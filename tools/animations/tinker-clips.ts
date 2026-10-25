@@ -41,7 +41,11 @@ const actions: Action[] = [
   strike("forwardTiltDown",8,3,20,{right:15,left:10,chest:45,elbow:-35,legs:32,knees:45},{chest:-25,right:-45,left:-35}),
   strike("upTilt",7,4,22,{right:-45,left:-45,chest:0,elbow:0},{chest:35,right:30,left:30,legs:35,knees:45}),
   strike("downTilt",6,3,19,{right:32,left:-28,chest:45,legs:45,knees:65,yaw:25}),
-  strike("dashAttack",10,4,26,{right:35,left:40,chest:40,elbow:-50,legs:22,knees:30},{chest:-25,right:-45,left:-35}),
+  {pose:"dashAttack",frames:39,donor:6,phases:[{frame:0},{frame:4,root:-12,chest:-40,head:12,right:-70,left:-60,legs:35,knees:55},
+    {frame:7,root:8,chest:40,right:50,left:54,elbow:-45,legs:30,knees:20},{frame:9,root:12,chest:46,right:56,left:58,elbow:-54,legs:38,knees:18},
+    {frame:12,root:14,chest:48,head:-8,right:66,left:56,elbow:-50,legs:42,knees:16},{frame:15,root:15,chest:49,head:6,right:54,left:70,elbow:-50,legs:46,knees:14},
+    {frame:18,root:20,chest:52,right:62,left:62,elbow:-50,legs:50,knees:12},{frame:22,root:21,chest:54,head:8,right:72,left:70,elbow:-38,legs:44,knees:28},
+    {frame:33,root:-2,chest:-5,head:-3,right:-5,left:-4,legs:3,knees:4},{frame:39}]},
   strike("forwardSmash",20,4,34,{right:80,left:28,chest:30,elbow:-42},{right:-58,left:-28,chest:-20},16),
   strike("upSmash",17,5,32,{right:-90,left:-90,chest:-8,legs:-12},{right:8,left:8,chest:32,legs:35,knees:55}),
   strike("downSmash",16,6,32,{right:46,left:46,chest:32,yaw:155,legs:32,knees:45},{right:-24,left:20,chest:-15,yaw:-55}),
@@ -109,9 +113,10 @@ const input=resolve(inputArg), output=resolve(outputArg), project=resolve(import
 ensure(relative(project,output).startsWith(".."),"Derived Warcraft assets must be outside the checkout");
 mkdirSync(join(output,"hero-models"),{recursive:true});
 const source=parseSource(await Bun.file(input).arrayBuffer()), model=structuredClone(source);
-const painOnly=process.argv.includes("pain");
-ensure(painOnly||source.Sequences.length===23,"Tinker authoring requires the unmodified classic 23-sequence model");
+const painOnly=process.argv.includes("pain"),rekeyAt=process.argv.indexOf("rekey");
+ensure(painOnly||rekeyAt>=0||source.Sequences.length===23,"Tinker authoring requires the unmodified classic 23-sequence model");
 if(painOnly){await authorPain();process.exit(0);}
+if(rekeyAt>=0){await authorInPlace(process.argv.slice(rekeyAt+1).filter(a=>!a.startsWith("--")));process.exit(0);}
 const helperId=model.Nodes.length;
 const motion:mdx.Helper={Name:"Tinker Floor Motion",ObjectId:helperId,Parent:null,Flags:0,
   PivotPoint:new Float32Array([0,0,0]),Translation:{LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:[]}};
@@ -277,34 +282,29 @@ function quietSmoke(target:mdx.Model,cells:readonly number[]){
       visibility.Keys.sort((a,b)=>a.Frame-b.Frame);}
   }
 }
-function verifyPain(bytes:ArrayBuffer,cells:readonly number[]):DrawnModel{
+function verifyUnchanged(bytes:ArrayBuffer,cells:readonly number[]):DrawnModel{
   const drawn=new DrawnModel(bytes,1),before=new DrawnModel(generateMDX(source),1);
   for(const [index,s]of source.Sequences.entries())if(!cells.includes(index))for(const progress of [0,.5,1]){
     const time=(s.Interval[1]!-s.Interval[0]!)*progress/1000,a=before.triangles(index,time,1),b=drawn.triangles(index,time,1);
     ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<.001),`${s.Name}: shipped pose changed`);
   }
-  for(let a=0;a<cells.length;a++)for(let b=a+1;b<cells.length;b++){
-    const first=drawn.triangles(cells[a]!,0,1),second=drawn.triangles(cells[b]!,0,1);
-    ensure(first.length===second.length&&first.some((v,i)=>Math.abs(v-second[i]!)>2),`Pain cells ${a}/${b} share a silhouette`);
-  }
   return drawn;
 }
-async function authorPain(){
-  const pains=actions.filter(a=>a.pose.startsWith("pain"));
-  const cells=pains.map(a=>{const i=model.Sequences.findIndex(s=>s.Name===`Tinker ${a.pose}`);ensure(i>=0,`${a.pose}: shipped sequence missing`);return i;});
+function rekeyInPlace(chosen:readonly Action[]):number[]{
+  const cells=chosen.map(a=>{const i=model.Sequences.findIndex(s=>s.Name===`Tinker ${a.pose}`);ensure(i>=0,`${a.pose}: shipped sequence missing`);return i;});
   const floor=model.Helpers.find(h=>h.Name==="Tinker Floor Motion");ensure(floor?.Translation,"Tinker Floor Motion missing");
-  const frameKey=(start:number,frame:number)=>start+Math.round(frame*1000/60);
-  for(const [n,action]of pains.entries()){
+  for(const [n,action]of chosen.entries()){
     const [start,end]=model.Sequences[cells[n]!]!.Interval as unknown as [number,number];
     ensure(end-start===Math.round(action.frames*1000/60),`${action.pose}: timing changed`);
     for(const kind of ["Bones","Helpers"] as const)for(const [at,node]of model[kind].entries()){
       if(/Motion$/.test(node.Name))continue;
       for(const channel of ["Rotation","Translation","Scaling"] as const){
         const track=node[channel],old=source[kind][at]![channel];if(!track||!old||onGlobalClock(old))continue;
+        const donor=action.donor??6;
         track.Keys=track.Keys.filter(k=>k.Frame<start||k.Frame>end);
         for(const frame of action.phases.map(p=>p.frame)){
-          const p=shapeAt(action,frame);let vector=sample(old,6);
-          if(channel==="Scaling"&&!old.Keys.some(k=>k.Frame>=source.Sequences[6]!.Interval[0]!&&k.Frame<=source.Sequences[6]!.Interval[1]!))vector=new Float32Array([1,1,1]);
+          const p=shapeAt(action,frame);let vector=sample(old,donor);
+          if(channel==="Scaling"&&!old.Keys.some(k=>k.Frame>=source.Sequences[donor]!.Interval[0]!&&k.Frame<=source.Sequences[donor]!.Interval[1]!))vector=new Float32Array([1,1,1]);
           if(channel==="Rotation"){vector=rotate(vector,angle(node.Name,p));if(/^Bone_Root01$|^Dummy01_Tank$/.test(node.Name))vector=rotate(vector,p.yaw??0,2);}
           if(channel==="Translation"&&node.Name==="Bone_Root01")vector[2]+=(p.height??0);
           track.Keys.push({Frame:frameKey(start,frame),Vector:vector,...(old.LineType>=2?{InTan:vector.slice(),OutTan:vector.slice()}:{})});
@@ -316,18 +316,46 @@ async function authorPain(){
     for(let frame=0;frame<=action.frames;frame++)floor.Translation.Keys.push({Frame:frameKey(start,frame),Vector:new Float32Array([0,0,0])});
     floor.Translation.Keys.sort((a,b)=>a.Frame-b.Frame);
   }
+  return cells;
+}
+function plantFloor(chosen:readonly Action[],cells:readonly number[],low:(cell:number,time:number)=>number){
+  const floor=model.Helpers.find(h=>h.Name==="Tinker Floor Motion")!;
+  for(const [n,action]of chosen.entries()){
+    const start=model.Sequences[cells[n]!]!.Interval[0]!;
+    const lows=Array.from({length:action.frames+1},(_,frame)=>low(cells[n]!,frame/60));
+    for(const [frame,lowest]of lows.entries())floor.Translation!.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([0,0,-lowest]);
+  }
+}
+function frameKey(start:number,frame:number){return start+Math.round(frame*1000/60);}
+async function authorPain(){
+  const pains=actions.filter(a=>a.pose.startsWith("pain"));
+  const cells=rekeyInPlace(pains);
   quietSmoke(model,cells);
   const body=new PainBody(generateMDX(model),Character.tinker);
-  for(const [n,action]of pains.entries()){
-    const start=model.Sequences[cells[n]!]!.Interval[0]!;
-    const lows=Array.from({length:action.frames+1},(_,frame)=>body.floor(cells[n]!,frame/60));
-    for(const [frame,low]of lows.entries())floor.Translation.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([0,0,-low]);
+  plantFloor(pains,cells,(cell,time)=>body.floor(cell,time));
+  const bytes=encodeVerified(parseSource(generateMDX(model))),drawn=verifyUnchanged(bytes,cells);
+  for(let a=0;a<cells.length;a++)for(let b=a+1;b<cells.length;b++){
+    const first=drawn.triangles(cells[a]!,0,1),second=drawn.triangles(cells[b]!,0,1);
+    ensure(first.length===second.length&&first.some((v,i)=>Math.abs(v-second[i]!)>2),`Pain cells ${a}/${b} share a silhouette`);
   }
-  const bytes=encodeVerified(parseSource(generateMDX(model))),drawn=verifyPain(bytes,cells);
   const gate=painGate(bytes,Character.tinker,standIndex(bytes),cells);
   console.log(gate.report);ensure(gate.pass,"Tinker pain poses fail the pain gate");
   await Bun.write(join(output,"hero-models/herotinker.mdx"),bytes);
   const frames:PoseFrame[]=cells.map(clip=>({frame:0,phase:0,x:0,z:0,facing:1,parts:[],strikes:[],clip,seconds:0} as PoseFrame));
   await Bun.write(join(output,"pain-cells.png"),sheet("Tinker pain low/mid/high x small/medium/large",drawn,frames,3).png);
   console.log(`TINKER_PAIN_PASS ${cells.length} pain cells re-authored at ${cells.join(",")}; ${source.Sequences.length-cells.length} shipped sequences unchanged; ${output}`);
+}
+async function authorInPlace(poses:readonly string[]){
+  const chosen=poses.map(pose=>{const action=actions.find(a=>a.pose===pose);ensure(action&&!pose.startsWith("pain"),`${pose}: no in-place action (pain cells use the pain mode)`);return action!;});
+  const cells=rekeyInPlace(chosen);
+  const unplanted=new DrawnModel(generateMDX(model),1);
+  plantFloor(chosen,cells,(cell,time)=>{const triangles=unplanted.triangles(cell,time,1);let lowest=Infinity;for(let i=1;i<triangles.length;i+=2)lowest=Math.min(lowest,triangles[i]!);return lowest;});
+  const bytes=encodeVerified(parseSource(generateMDX(model))),drawn=verifyUnchanged(bytes,cells);
+  await Bun.write(join(output,"hero-models/herotinker.mdx"),bytes);
+  for(const [n,action]of chosen.entries()){
+    const times=action.phases.map(p=>p.frame);
+    const frames:PoseFrame[]=[1,-1].flatMap(facing=>times.map(frame=>({frame,phase:0,x:0,z:0,facing,parts:[],strikes:[],clip:cells[n]!,seconds:frame/60} as PoseFrame)));
+    await Bun.write(join(output,`${action.pose}-both-facings.png`),sheet(action.pose,drawn,frames,times.length).png);
+  }
+  console.log(`TINKER_REKEY_PASS ${chosen.map(a=>a.pose).join(",")} re-authored at ${cells.join(",")}; ${source.Sequences.length-cells.length} shipped sequences unchanged; ${output}`);
 }
