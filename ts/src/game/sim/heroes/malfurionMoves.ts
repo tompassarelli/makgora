@@ -28,7 +28,7 @@ export const MALFURION_MOVES: FighterMoves = {
       [AttackStyle.jab]: reach(3, 6, 40.0, 48.0, 35.0), [AttackStyle.jab2]: reach(3, 6, 44.0, 50.0, 10.0),
       [AttackStyle.forwardTilt]: reach(8, 10, 38.0, 54.0, 30.0), [AttackStyle.forwardTiltUp]: reach(8, 10, 38.0, 74.0, 30.0),
       [AttackStyle.forwardTiltDown]: reach(8, 10, 38.0, 28.0, 30.0), [AttackStyle.upTilt]: reach(6, 13, 8.0, 110.0),
-      [AttackStyle.downTilt]: reach(6, 8, 38.0, 22.0, 30.0), [AttackStyle.dashAttack]: reach(9, 16, 38.0, 50.0, 30.0),
+      [AttackStyle.downTilt]: reach(6, 8, 38.0, 22.0, 30.0), [AttackStyle.dashAttack]: reach(6, 21, 38.0, 50.0, 30.0),
       [AttackStyle.forwardSmash]: reach(17, 23, 44.0, 54.0), [AttackStyle.upSmash]: reach(16, 23, 8.0, 112.0),
       [AttackStyle.downSmash]: reach(15, 25, 34.0, 20.0), [AttackStyle.neutralAir]: reach(6, 15, 36.0, 50.0),
       [AttackStyle.forwardAir]: reach(10, 16, 42.0, 52.0), [AttackStyle.backAir]: reach(7, 13, -42.0, 52.0),
@@ -42,7 +42,7 @@ export const MALFURION_MOVES: FighterMoves = {
     [AttackStyle.forwardTilt]: tilt(54.0, 35), [AttackStyle.forwardTiltUp]: tilt(94.0, 55), [AttackStyle.forwardTiltDown]: tilt(10.0, 25),
     [AttackStyle.upTilt]: heroMove(8, 4, 21, 0, [heroRegion(8, 11, path(-30.0, 116.0, 38.0, 124.0, 16.0), malfurionHit(7.0, 90, 75.0, 36.0))]),
     [AttackStyle.downTilt]: heroMove(7, 3, 18, 0, [heroRegion(7, 9, path(18.0, 10.0, 103.0, 8.0, 8.0), malfurionHit(6.0, 80, 65.0, 35.0))]),
-    [AttackStyle.dashAttack]: heroMove(11, 4, 28, 0, [heroRegion(11, 14, path(30.0, 48.0, 102.0, 48.0, 15.0), malfurionHit(9.25, 55, 90.0, 28.0))], 55.0, true),
+    [AttackStyle.dashAttack]: heroMove(8, 12, 21, 0, [heroRegion(8, 19, path(30.0, 48.0, 102.0, 48.0, 15.0), malfurionHit(9.25, 55, 90.0, 28.0))], 55.0, true),
     [AttackStyle.forwardSmash]: tipperMove(heroMove(19, 3, 37, 0, [heroRegion(19, 21, path(30.0, 55.0, 175.0, 55.0, 8.0), malfurionHit(16.0, 35, 116.0, 26.0))]), 0.25),
     [AttackStyle.upSmash]: heroMove(18, 4, 34, 0, [heroRegion(18, 21, path(0.0, 65.0, 0.0, 170.0, 22.0), malfurionHit(16.0, 90, 112.0, 24.0))]),
     [AttackStyle.downSmash]: heroMove(17, 6, 32, 0, [
