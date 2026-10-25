@@ -20,6 +20,7 @@ leaves out is decided only in [gameplay design decisions](../../gameplay-design.
 - [Why](why.md): what the designer and the community have said about the game's shape.
 - [Hit and movement events](hit-effects.md): the effect and sound each hit, element,
   strength, footstep and landing plays.
+- [Top eight against the cast](top-tiers.md): generated distributions per move type and attribute, Melee's top eight against the other eighteen.
 
 ## Where the numbers come from
 
