@@ -370,8 +370,10 @@ function offer(top: Top, limit: number, name: string, count: number): void {
     at--;
   }
   if (at >= limit) return;
-  top.kept.splice(at, 0, { name, count });
-  if (top.kept.length > limit) top.kept.pop();
+  const kept = top.kept;
+  let index = Math.min(kept.length, limit - 1);
+  for (; index > at; index--) kept[index] = kept[index - 1] ?? { name, count };
+  kept[at] = { name, count };
 }
 
 const emptyTop = (): Top => ({ kept: [], rows: 0 });

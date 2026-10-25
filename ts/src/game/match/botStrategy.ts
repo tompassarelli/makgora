@@ -22,6 +22,7 @@ const HISTORY_LIMIT = 128;
 export const BURN_MEMORY_FRAMES = 150;
 const READ_CHOICES = [HabitChoice.attack, HabitChoice.shield, HabitChoice.jump, HabitChoice.retreat, HabitChoice.approach, HabitChoice.landing, HabitChoice.ledge] as const;
 
+const retained: number[] = [];
 const readCounts = [0, 0, 0, 0, 0, 0, 0, 0];
 const readIntervals = [0, 0, 0, 0, 0, 0, 0, 0];
 const readTimed = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -50,8 +51,6 @@ interface SavedBotRead {
 export interface BotStrategy {
   // Lua arrays keep their peak capacity, so snapshots share each history instead of copying it; replace it, never mutate it.
   history: readonly number[];
-
-  historyKey: string;
   observedFrame: number;
   opponent: number;
   lastChoice: HabitChoice;
@@ -85,7 +84,7 @@ const NO_HABITS: readonly number[] = [];
 const noRecentOptions = (): number[] => Array.from({ length: 2 * VARIETY_STARTS }, () => -1);
 
 export function createBotStrategy(): BotStrategy {
-  return { history: NO_HABITS, historyKey: "", observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, recentOptions: noRecentOptions() };
+  return { history: NO_HABITS, observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, recentOptions: noRecentOptions() };
 }
 
 export type SavedBotStrategy = Pick<BotStrategy, "observedFrame" | "opponent" | "lastChoice" | "lastContext" | "lastSerial" | "events" | "lastOption" | "recentOptions" | "burnHurt" | "burnStyle" | "burnCharacter" | "burnFrame" | "burnCount" | "burnGap"> & {
@@ -119,7 +118,6 @@ export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrat
   const history: number[] = [];
   for (const habit of saved.history) history.push(habit.frame, habit.context, habit.choice, habit.interval);
   state.history = history;
-  state.historyKey = history.join(",");
   state.observedFrame = saved.observedFrame;
   state.opponent = saved.opponent;
   state.lastChoice = saved.lastChoice;
@@ -152,7 +150,6 @@ export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrat
 
 export function copyBotStrategy(target: BotStrategy, source: Readonly<BotStrategy>): void {
   target.history = source.history;
-  target.historyKey = source.historyKey;
   target.observedFrame = source.observedFrame;
   target.opponent = source.opponent;
   target.lastChoice = source.lastChoice;
@@ -182,8 +179,15 @@ export function copyBotStrategy(target: BotStrategy, source: Readonly<BotStrateg
   target.readActionFacing = source.readActionFacing;
 }
 
+function sameHistory(a: readonly number[], b: readonly number[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let index = 0; index < a.length; index++) if (a[index] !== b[index]) return false;
+  return true;
+}
+
 export function sameBotStrategy(a: Readonly<BotStrategy>, b: Readonly<BotStrategy>): boolean {
-  return a.historyKey === b.historyKey && a.observedFrame === b.observedFrame && a.opponent === b.opponent && a.lastChoice === b.lastChoice
+  return sameHistory(a.history, b.history) && a.observedFrame === b.observedFrame && a.opponent === b.opponent && a.lastChoice === b.lastChoice
     && a.lastContext === b.lastContext && a.lastSerial === b.lastSerial && a.events === b.events && a.lastOption === b.lastOption
     && a.burnHurt === b.burnHurt && a.burnStyle === b.burnStyle && a.burnCharacter === b.burnCharacter && a.burnFrame === b.burnFrame && a.burnCount === b.burnCount && a.burnGap === b.burnGap
     && a.readActive === b.readActive && a.readChoice === b.readChoice && a.readContext === b.readContext && a.readExpectedFrame === b.readExpectedFrame
@@ -250,19 +254,18 @@ export function learnBotHabit(state: BotStrategy, ownObserved: Readonly<Fighter>
         if (at(state.history, index + 1) === fromContext && at(state.history, index + 2) === choice) { previous = at(state.history, index); break; }
       }
       let kept = 0;
-      const retained: number[] = [];
-      for (let index = state.history.length - HABIT_FIELDS; index >= 0 && retained.length < HISTORY_LIMIT - 1; index -= HABIT_FIELDS) {
+      let count = 0;
+      for (let index = state.history.length - HABIT_FIELDS; index >= 0 && count < HISTORY_LIMIT - 1; index -= HABIT_FIELDS) {
         if (at(state.history, index + 1) === fromContext && ++kept >= policy.historyCapacity) continue;
-        retained.push(index);
+        retained[count++] = index;
       }
       const history: number[] = [];
-      for (let index = retained.length - 1; index >= 0; index--) {
+      for (let index = count - 1; index >= 0; index--) {
         const from = at(retained, index);
         for (let field = 0; field < HABIT_FIELDS; field++) history.push(at(state.history, from + field));
       }
       history.push(observedFrame, fromContext, choice, previous < 0 ? 0 : observedFrame - previous);
       state.history = history;
-      state.historyKey = history.join(",");
     }
   }
   state.observedFrame = observedFrame;
