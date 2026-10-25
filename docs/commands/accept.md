@@ -5,7 +5,12 @@
   as few fresh matches as their maps allow and prints pass, fail or
   needs-look per check with its evidence folder (wisp:docs/accept.md). `--pair K`
   selects the offline pool pair; every check, capture and receipt follows its
-  two clients, and sessions start through `lan fresh`. `--solo --pair K`
+  two clients, and sessions start through `lan fresh`. When a client of pair K
+  has dropped, accept restarts the pair before it reads the pair's clients file
+  and writes `pair-restart.txt` to `--out`: the dropped client and each
+  `Errors/` crash folder its clients wrote since the pair started; a client
+  that drops while a session starts fails that session with the same line,
+  and the next accept on the pair restarts it. `--solo --pair K`
   starts each client in its own single-player game through `lan solo`, for
   captures on 3.0.1 where LAN is removed; it sends each game's setup separately.
   Several pairs
@@ -46,7 +51,8 @@
   recorded checksum, every key must reach the game and every move must start,
   or the shard fails. `match-NN.tsv` lists each key and move with its
   verdict, and `match-NN.json` its dead bindings and moves that did not start;
-  each shard's folder gets a `smoke.json` with them and whether the shard
+  each shard's folder gets a `smoke.json` with them, its `pair-restart.txt` line
+  in `restart` and the Run column when accept restarted the pair, and whether the shard
   crashed, written when that shard finishes, and `play --install-green`, which runs this smoke on each candidate,
   refuses any of the three whatever `SMASHCRAFT_GREEN_GATE` says. A `--shard`
   run replaces only its own shards' `smoke.json`, so runs of a few shards on
