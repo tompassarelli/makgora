@@ -97,7 +97,7 @@ ledger issues (#287, #288, #289) turn each line into a generated row; anchors
 here are from main at 938bf89c8 and the tool resolves them afresh on every run.
 Sources name the SmashWiki page unless marked: MFD is
 `references/melee-frame-data/records.jsonl` (meleeframedata.com), FC is
-`references/melee-frame-data/fightcore.csv` (FightCore.gg export for all 26 fighters, read through #310), CS is our case study in `docs/design/melee/`.
+`references/melee-frame-data/fightcore.csv` (FightCore.gg export for all 26 fighters, on main at 98282eb3b, read through #310), CA is `references/melee-frame-data/character-attributes.csv` (SuperCombo Wiki "SSBM/Character_Attributes", per-fighter attributes for all 26 fighters), CS is our case study in `docs/design/melee/`.
 
 ### Hits, knockback and hitstun
 
@@ -182,11 +182,11 @@ Sources name the SmashWiki page unless marked: MFD is
 
 | Attribute | Our code | Ours | Melee and source | Status |
 |---|---|---|---|---|
-| Shared record | `ts/src/game/sim/tuning.ts:138` | gravity 0.23, terminal 2.8, fast fall 3.4, jump squat 3, jumps 3.68/2.1, double ×1.2, air acceleration 0.08, air friction 0.02 | Fox's values (FC; SmashWiki "Fox (SSBM)"; `ts/scripts/meleeOracle.ts:37`) | match to Fox, a design choice to review per fighter |
-| Rifleman | `ts/src/game/sim/tuning.ts:162` | gravity 0.17, fast fall 3.5, jump squat 5 | Falco's (`ts/scripts/meleeOracle.ts:42`) | match to Falco |
+| Shared record | `ts/src/game/sim/tuning.ts:138` | gravity 0.23, terminal 2.8, fast fall 3.4, jump squat 3, jumps 3.68/2.1, double ×1.2, air acceleration 0.08, air friction 0.02 | Fox's values (CA; `ts/scripts/meleeOracle.ts:37`) | match to Fox, a design choice to review per fighter |
+| Rifleman | `ts/src/game/sim/tuning.ts:162` | gravity 0.17, fast fall 3.5, jump squat 5 | Falco's (CA; `ts/scripts/meleeOracle.ts:42`) | match to Falco |
 | Illidan | `ts/src/game/sim/tuning.ts:186` | gravity 0.19, fast fall 3.45, jump squat 4, weight 86 | Inside the Melee spread | ours, inside spread |
-| Heroes | `ts/src/game/sim/tuning.ts:225,236-260`; `ts/src/game/sim/heroes/heroBodies.ts:26-50` | weight 75 × body, walk/dash/run clamped to Melee's spread (`ts/src/game/sim/tuning.ts:236-239`), air speed 1.0 × body, traction | Melee spread per attribute (Weight; Dash; Run; Air speed) | per fighter in #289 |
-| Maiev | `ts/src/game/sim/heroes/heroBodies.ts:29` | weight 60, dash 2.0, run 2.3, walk 1.6, air speed 1.10, Fox's falls and jumps | Fox weight 75, Falco 80 (Weight) | lighter than any spacie, retuned in #304 |
+| Heroes | `ts/src/game/sim/tuning.ts:225,236-260`; `ts/src/game/sim/heroes/heroBodies.ts:26-50` | weight 75 × body, walk/dash/run clamped to Melee's spread (`ts/src/game/sim/tuning.ts:236-239`), air speed 1.0 × body, traction | Melee spread per attribute across the 26 fighters (CA) | per fighter in #289 |
+| Maiev | `ts/src/game/sim/heroes/heroBodies.ts:29` | weight 60, dash 2.0, run 2.3, walk 1.6, air speed 1.10, Fox's falls and jumps | Fox weight 75, Falco 80 (CA) | lighter than any spacie, retuned in #304 |
 
 ## Ledger
 
@@ -245,7 +245,8 @@ Built on the existing headless sim and search, not beside them.
   and a page; byte-identical across runs.
 - Fox fixture (#310, #295, #296): FightCore's export for all 26 fighters
   (`references/melee-frame-data/fightcore.csv`, per-hitbox angle, base, growth
-  and set knockback, getups, techs and ledge options) gets a typed reader checked
+  and set knockback, getups, techs and ledge options) and the SuperCombo
+  attributes (`character-attributes.csv`) get typed readers, FightCore checked
   against meleeframedata (#310); a check-only module transcribes Fox's attributes and hitboxes as
   numbers; the sim loads it as a check-only fighter absent from the roster and
   the map.
@@ -310,13 +311,12 @@ Running work is absorbed, not restarted:
 
 `references/melee-frame-data/fightcore.csv` gives per-hitbox angle, base,
 growth and set knockback for every move of all 26 fighters, plus their getups,
-techs and ledge options; libmelee gives hitbox positions. Still missing:
+techs and ledge options; libmelee gives hitbox positions; `character-attributes.csv` gives every
+fighter's gravity, terminal and fast-fall speed, jump squat, jump and short-hop
+velocities, air speed, mobility and friction, ground friction, dash and walk,
+weight, shield size, per-aerial landing lag, and ledge and wall jumps. Still
+missing:
 
-- Per-fighter air and fall attributes beyond the `misc` rows of
-  `records.jsonl` (air acceleration, air friction, terminal speed, double-jump
-  multiplier, jump velocities, traction): SmashWiki's per-character "(SSBM)"
-  pages and its attribute ranking pages ("Weight", "Falling speed", "Air
-  speed", "Air acceleration", "Traction", "Jumpsquat", "Dash", "Run").
 - Hitlag multipliers by element and effect: SmashWiki "Hitlag".
 - Hitbox IDs and priorities within a move: SmashWiki's "<fighter>
   (SSBM)/<move>" Hitbox Data tables (seen on "Fox (SSBM)/Neutral aerial") and
