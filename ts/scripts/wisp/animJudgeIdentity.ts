@@ -5,7 +5,7 @@ import type { ScoreFrame } from "./animScore";
 
 const QUANTUM = 0.05;
 
-export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], framing: string): string {
+export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], travels: readonly number[], framing: string): string {
   const hasher = new Bun.CryptoHasher("sha256").update(`${framing}|`);
   for (const frame of frames) {
     if (frame === undefined) {
@@ -15,6 +15,8 @@ export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], framin
     const quantized = Int32Array.from(frame.vertices, (value) => Math.round(value / QUANTUM));
     hasher.update(new Uint8Array(quantized.buffer)).update("|");
   }
+  const travel = Int32Array.from(travels, (value) => Math.round(value / QUANTUM));
+  if (travel.some((value) => value !== 0)) hasher.update("travel|").update(new Uint8Array(travel.buffer));
   return hasher.digest("hex").slice(0, 16);
 }
 

@@ -6,7 +6,8 @@ and a summary for every fighter. `--fighter F` limits a run to a fighter slug;
 `--assets PRIVATE_DIR` uses another packaged asset view. A limited run replaces that fighter's rows.
 
 Each row measures the mesh at the exact animation time chosen by production
-pose selection while the simulation plays the move. Distances are fractions
+pose selection while the simulation plays the move; a dash attack starts from a
+run at the fighter's run speed, as the game enters it. Distances are fractions
 of the ready body's height; silhouette masks use the far gameplay camera's
 pixel scale. Ready is the pose production pose selection shows on the frame
 after the move ends (a special ends when its lock does, the first frame the
@@ -118,7 +119,7 @@ keeps the widest framing and instead holds the camera on the drawn floor and gro
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
-`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing and the key-frame poses `prepare` rendered, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
+`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing, the key-frame poses `prepare` rendered and, for a move that travels, each key frame's forward travel, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
 
 ## Thresholds
 

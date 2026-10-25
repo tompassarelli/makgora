@@ -7,7 +7,7 @@ import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../..
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { beginFighterAttack, resolveAttacks } from "../../src/game/sim/attacks";
-import { AttackPhase, AttackStyle, Character, LedgeState, SpecialAction } from "../../src/game/sim/codes";
+import { AttackPhase, AttackStyle, Character, GroundAction, LedgeState, SpecialAction } from "../../src/game/sim/codes";
 import type { Capsule } from "../../src/game/sim/geometry/contactGeometry";
 import { fighterHurtParts } from "../../src/game/sim/hurtboxes";
 import { snapToLedge } from "../../src/game/sim/ledge";
@@ -179,10 +179,14 @@ export interface SampledMove {
 
   readonly seconds: readonly number[];
   readonly heights: readonly number[];
+  readonly travels: readonly number[];
 }
 
 const strikeEnd = (capsule: { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number }, chestZ: number) =>
   Math.hypot(capsule.x2, capsule.z2 - chestZ) >= Math.hypot(capsule.x1, capsule.z1 - chestZ) ? { x: capsule.x2, z: capsule.z2 } : { x: capsule.x1, z: capsule.z1 };
+
+
+const travels = (frames: readonly PoseFrame[]) => frames.map((frame) => (frame.x - (frames[0]?.x ?? 0)) * (frames[0]?.facing ?? 1));
 
 
 function openWindows(f: Fighter): number[] {
@@ -198,6 +202,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   if (authoredHitRegionCount(entry.style, f.tuning.moves) === 0) return undefined;
   const world = createRoster(1, [f]);
   if (entry.aerial) { f.motion.grounded = false; f.motion.z = 900.0; }
+  if (entry.style === AttackStyle.dashAttack) { f.ground.action = GroundAction.run; f.motion.vx = f.tuning.physics.runSpeed; }
   const p = createFighterPose();
   const input = neutralControls();
   beginFighterAttack(world, 0, entry.style, false);
@@ -226,7 +231,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   if (ready === undefined) return undefined;
   const chestZ = skeleton.chest === undefined ? 50 : posed[first]?.nodes[skeleton.chest * 2 + 1] ?? 50;
   return {
-    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - (entry.aerial ? 900.0 - 300.0 : 0.0)),
+    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - (entry.aerial ? 900.0 - 300.0 : 0.0)), travels: travels(frames),
     sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), pixelsPerUnit },
   };
 }
@@ -284,7 +289,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const ready = posed[moveFrames];
   if (ready === undefined) return undefined;
   return {
-    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z),
+    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames),
     sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, pixelsPerUnit },
   };
 }

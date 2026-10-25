@@ -23,20 +23,21 @@ export const judgePixelsPerUnit = (): number => FRAME_HEIGHT / (2 * JUDGE_CAMERA
 
 export const judgeFraming = (): string => `${JUDGE_CAMERA.distance}/${JUDGE_CAMERA.tangent}`;
 
-export const heldHeight = (heights: readonly number[], index: number, pixelsPerUnit: number) => {
-  const slack = CAMERA_SLACK_PIXELS / pixelsPerUnit, at = heights[index] ?? 0;
-  const middle = (Math.min(...heights, at) + Math.max(...heights, at)) / 2;
+export const heldOffset = (offsets: readonly number[], index: number, pixelsPerUnit: number) => {
+  const slack = CAMERA_SLACK_PIXELS / pixelsPerUnit, at = offsets[index] ?? 0;
+  const middle = (Math.min(...offsets, at) + Math.max(...offsets, at)) / 2;
   return Math.min(at + slack, Math.max(at - slack, middle));
 };
 
-export function judgeCrop(frames: readonly (ScoreFrame | undefined)[], heights: readonly number[], pixelsPerUnit: number): { readonly width: number; readonly height: number; readonly x: number; readonly y: number } {
+export function judgeCrop(frames: readonly (ScoreFrame | undefined)[], heights: readonly number[], travels: readonly number[], pixelsPerUnit: number): { readonly width: number; readonly height: number; readonly x: number; readonly y: number } {
   let left = FRAME_WIDTH, right = 0, top = FRAME_HEIGHT, bottom = 0;
   for (const [index, frame] of frames.entries()) {
     if (frame === undefined) continue;
-    const offset = (heights[index] ?? 0) - heldHeight(heights, index, pixelsPerUnit) - CAMERA_LIFT;
+    const offset = (heights[index] ?? 0) - heldOffset(heights, index, pixelsPerUnit) - CAMERA_LIFT;
+    const shift = (travels[index] ?? 0) - heldOffset(travels, index, pixelsPerUnit);
     for (let vertex = 0; vertex < frame.drawn.length; vertex++) {
       if (frame.drawn[vertex] !== 1) continue;
-      const column = FRAME_WIDTH / 2 + (frame.vertices[vertex * 2] ?? 0) * pixelsPerUnit;
+      const column = FRAME_WIDTH / 2 + (shift + (frame.vertices[vertex * 2] ?? 0)) * pixelsPerUnit;
       const row = FRAME_HEIGHT / 2 - (offset + (frame.vertices[vertex * 2 + 1] ?? 0)) * pixelsPerUnit * PITCH_COS;
       left = Math.min(left, column);
       right = Math.max(right, column);
