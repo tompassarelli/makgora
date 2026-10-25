@@ -145,7 +145,7 @@ for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; 
   const gain = PAIN_GAIN[strength]!, stretch = HIGH_STRETCH[strength]!;
   damageActions.push({ pose: "damageGround", frames: 24, contact: 1, hold: true, pain: true,
     gesture: height === 0 ? { thigh: -80 * gain, knee: -100 * gain, leftThigh: -80 * gain, chest: 25 * gain, head: 15 * gain, arm: 60 * gain, elbow: -60 * gain, leftArm: -60 * gain }
-    : height === 1 ? { chest: 65 * gain, pelvis: -20 * gain, yaw: -30 * gain, head: 20 * gain, arm: -90 * gain, elbow: 40 * gain, leftArm: -50 * gain, leftElbow: -40 * gain }
+    : height === 1 ? { chest: 90 + 25 * gain, lean: 8 * gain, pelvis: -30 * gain, head: 25 * gain, arm: 10 * gain, elbow: 60 * gain, hand: 90, leftArm: -40 * gain, leftElbow: -70 * gain, thigh: 30 * gain, leftThigh: -30 * gain, knee: -45 * gain }
     : { head: -45 * stretch, chest: -40 * stretch, pelvis: 10 * stretch, arm: 50 * stretch, elbow: -50 * stretch, leftArm: 70 * stretch } });
 }
 function rotated(q: ArrayLike<number>, y: number, z = 0) {
