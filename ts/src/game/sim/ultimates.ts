@@ -7,6 +7,7 @@ import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
 import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";
 import type { NamedMove } from "./heroes/hero";
+import { ANKH_BURST_MODEL, ANKH_MODEL } from "../../generated/assets/ankhAssetInfo";
 
 // Each fighter's ultimate (docs/design/ultimates.md): ordinary authored special
 // data, run by the hero special engine, bought with the whole bar.
@@ -245,16 +246,15 @@ const SYLVANAS: AuthoredSpecial = {
 };
 
 const CAIRNE_ANKH: SpecialProjectile = {
-  ...mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: 0.5,
+  ...mark(ANKH_MODEL, 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(0.625),
 };
 const CAIRNE: AuthoredSpecial = {
   name: "Reincarnation", endFrame: 50,
   projectiles: [
     CAIRNE_ANKH,
-    ...[f32(0.83), f32(0.76), f32(0.71), f32(0.66)].map((modelRadius): SpecialProjectile => ({ ...mark("UI\\Feedback\\SelectionCircle\\SelectionCircle.mdx", 1, 36, 0.0, 230.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius })),
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
     { ...mark("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", 25, 16, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(0.625) },
-    { ...mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 25, 14, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(1.23) },
+    { ...mark(ANKH_BURST_MODEL, 25, 12, 0.0, 60.0), atStageCentre: true, cancelOnInterrupt: true },
     { ...mark("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", 20, 24, 0.0), cancelOnInterrupt: true },
   ],
   regionOrigin: CAIRNE_ANKH,

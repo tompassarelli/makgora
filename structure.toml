@@ -217,6 +217,9 @@ producer = "tools/effects/shield.ts"
 paths = ["ts/src/generated/assets/candleAssetInfo.ts"]
 producer = "tools/effects/candle.ts"
 [[generated]]
+paths = ["ts/src/generated/assets/ankhAssetInfo.ts"]
+producer = "tools/effects/ankh.ts"
+[[generated]]
 paths = ["ts/src/generated/assets/frostAssetInfo.ts"]
 producer = "tools/effects/trap.ts"
 [[generated]]
