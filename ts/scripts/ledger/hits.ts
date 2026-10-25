@@ -11,6 +11,8 @@ import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
 import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "../../src/game/sim/moves";
 import { ASDI_TRAVEL, HIT_TRAVEL, SDI_PULSE_TRAVEL, SDI_STEP_TRAVEL, STRING_TRAVEL } from "../../src/game/sim/smashDirectionalInfluence";
 import { WEAK_HIT_DAMAGE_SCALE, WEAK_HIT_KNOCKBACK_SCALE } from "../../src/game/sim/strongHits";
+import { FIGHTCORE_URL } from "../../../references/melee-frame-data/fightcore";
+import { compareThresholds } from "../meleeThresholds";
 import { type LedgerRow, PARITY, probe, range, shortNumber } from "./row";
 
 const wiki = (page: string): string => `https://www.ssbwiki.com/${page}`;
@@ -42,6 +44,12 @@ function whoFreezes(): string {
 const tumbleKnockback = (): number => range(0, 200).find((knockback) => damageLevelForKnockback(knockback) === 3) ?? Number.NaN;
 
 const meleeHitlag = (damage: number): number => Math.floor(damage / 3 + 3);
+
+function thresholdTies(): string {
+  const { comparisons } = compareThresholds();
+  const ties = comparisons.filter((row) => row.agreement === "tie").length;
+  return `single precision: ${ties} of ${comparisons.length} FightCore threshold percents are exact ties, each 1% from FightCore's`;
+}
 
 export const HIT_ROWS: readonly LedgerRow[] = [
   {
@@ -204,7 +212,19 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     id: "staling", family: "hits", name: "Stale-move negation",
     melee: { value: "9-move queue", source: wiki("Stale-move_negation") }, ours: () => "none",
     anchor: { file: "ts/src/game/sim/contacts.ts", symbol: "collectDamageContact" },
+    checkedBy: { file: "ts/scripts/meleeThresholds.ts", symbol: "meleeStaledKnockback" },
     status: { kind: "deviation", reason: "move diversity comes from move design, not a repeat penalty", decided: "2026-10-04" },
+  },
+  {
+    id: "knockback-threshold-ties", family: "hits", name: "Knockback exactly at a knockdown threshold",
+    melee: {
+      undocumented: "which side of the threshold Melee's single-precision arithmetic puts a hit whose exact knockback equals it; FightCore computes the percent in doubles, which can put one either side too",
+      source: FIGHTCORE_URL,
+    },
+    ours: thresholdTies,
+    anchor: { file: KNOCKBACK, symbol: "contactKnockback" },
+    checkedBy: { file: "ts/scripts/meleeThresholds.ts", symbol: "knockbackEqualsExactly" },
+    status: { kind: "open", reason: "no public source gives Melee's operation order, which decides an exact tie; measuring one from outside settles it (Falco's second up-air hit, hitbox id2, against Samus at 280%: tumble or not)", issue: 311 },
   },
   {
     id: "clank", family: "hits", name: "Clank and priority",

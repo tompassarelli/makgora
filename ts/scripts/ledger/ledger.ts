@@ -9,6 +9,7 @@ export interface Evaluated {
   readonly row: LedgerRow;
   readonly ours: Value | Error;
   readonly line: number | undefined;
+  readonly checkLine: number | undefined;
 }
 
 export type ReadSource = (file: string) => string | undefined;
@@ -33,12 +34,13 @@ function readOurs(row: LedgerRow): Value | Error {
 }
 
 export const evaluate = (rows: readonly LedgerRow[], read: ReadSource): Evaluated[] =>
-  rows.map((row) => ({ row, ours: readOurs(row), line: anchorLine(row.anchor, read) }));
+  rows.map((row) => ({ row, ours: readOurs(row), line: anchorLine(row.anchor, read), checkLine: row.checkedBy === undefined ? undefined : anchorLine(row.checkedBy, read) }));
 
-function rowProblems({ row, ours, line }: Evaluated): string[] {
+function rowProblems({ row, ours, line, checkLine }: Evaluated): string[] {
   const problems: string[] = [];
   if (!/^https:\/\/\S+$/.test(row.melee.source)) problems.push(`${row.id}: no public source`);
   if (line === undefined) problems.push(`${row.id}: anchor ${row.anchor.symbol} no longer resolves in ${row.anchor.file}`);
+  if (row.checkedBy !== undefined && checkLine === undefined) problems.push(`${row.id}: check ${row.checkedBy.symbol} no longer resolves in ${row.checkedBy.file}`);
   if (row.status.kind === "deviation" && !/^\d{4}-\d{2}-\d{2}$/.test(row.status.decided)) problems.push(`${row.id}: deviation needs Tom's decision date as YYYY-MM-DD`);
   if (ours instanceof Error) return [...problems, `${row.id}: reading our value failed: ${ours.message}`];
   if (!("value" in row.melee)) {
@@ -69,10 +71,14 @@ export function statusText(status: Status): string {
   return `open: ${status.reason}${status.issue === undefined ? "" : ` (#${status.issue})`}`;
 }
 
-function rowLine({ row, ours, line }: Evaluated): string {
+const codeLink = (anchor: Anchor, line: number | undefined): string => {
+  const file = anchor.file.split("/").at(-1) ?? anchor.file;
+  return line === undefined ? `${anchor.symbol} unresolved` : `[${file}:${line}](../../${anchor.file}#L${line}) \`${anchor.symbol}\``;
+};
+
+function rowLine({ row, ours, line, checkLine }: Evaluated): string {
   const melee = "value" in row.melee ? showValue(row.melee.value) : `not documented: ${row.melee.undocumented}`;
-  const file = row.anchor.file.split("/").at(-1) ?? row.anchor.file;
-  const code = line === undefined ? `${row.anchor.symbol} unresolved` : `[${file}:${line}](../../${row.anchor.file}#L${line}) \`${row.anchor.symbol}\``;
+  const code = row.checkedBy === undefined ? codeLink(row.anchor, line) : `${codeLink(row.anchor, line)}; checked by ${codeLink(row.checkedBy, checkLine)}`;
   const value = ours instanceof Error ? `error: ${ours.message}` : showValue(ours);
   return `| ${cell(row.name)} \`${row.id}\` | ${cell(value)} | [${cell(melee)}](${row.melee.source}) | ${code} | ${cell(statusText(row.status))} |`;
 }

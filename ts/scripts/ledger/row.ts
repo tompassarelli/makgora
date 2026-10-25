@@ -27,6 +27,7 @@ export interface LedgerRow {
   readonly melee: Melee;
   readonly ours: () => Value;
   readonly anchor: Anchor;
+  readonly checkedBy?: Anchor;
   readonly status: Status;
 }
 

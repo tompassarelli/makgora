@@ -326,6 +326,11 @@ the move fills FightCore's nine-slot queue from slot 1 (0.09, then 0.08, …,
 0.44, 0.45. FightCore's rule subtracts the staled damage from the percent but
 keeps the fresh damage in the knockback term.
 
+`fightcore-thresholds.ts` reads both files. `bun wisp oracle` checks every
+threshold percent against our knockback formula (`ts/scripts/meleeThresholds.ts`):
+fresh percents through the shipped `ts/src/game/sim/knockback.ts`, stale ones
+through a Melee-only staling path, since Smashcraft has no staling.
+
 Repeat the intake from the checkout's root (about two minutes; fetched pages
 are cached in the first directory):
 

@@ -6,7 +6,7 @@ from Melee's with no deviation row, when a deviation now matches Melee, when a c
 resolves or when a row has no public source. Ours is read from the exported constant or probed headless;
 each Melee value links its public source. The plan is [melee-parity-plan.md](melee-parity-plan.md).
 
-31 rows: 21 parity, 4 deviations, 6 open.
+32 rows: 21 parity, 4 deviations, 7 open.
 
 ## Hits, knockback and hitstun
 
@@ -40,6 +40,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 | Smash charge frames to full charge `smash-charge-frames` | 60 | [60](https://www.ssbwiki.com/Charge) | [moves.ts:10](../../ts/src/game/sim/moves.ts#L10) `SMASH_MAX_CHARGE_FRAMES` | parity |
 | Smash charge damage at full charge `smash-charge-multiplier` | 1.3671 | [1.3671](https://www.ssbwiki.com/Charge) | [moves.ts:11](../../ts/src/game/sim/moves.ts#L11) `SMASH_MAX_DAMAGE_MULTIPLIER` | parity |
 | Frames a full charge can be held `smash-charge-hold` | 120 | [0](https://www.ssbwiki.com/Charge) | [moves.ts:12](../../ts/src/game/sim/moves.ts#L12) `SMASH_FULL_CHARGE_HOLD_FRAMES` | deviation: a held smash becomes a timing mix-up, one rule for every fighter (Tom 2026-10-26, #328) |
-| Stale-move negation `staling` | none | [9-move queue](https://www.ssbwiki.com/Stale-move_negation) | [contacts.ts:133](../../ts/src/game/sim/contacts.ts#L133) `collectDamageContact` | deviation: move diversity comes from move design, not a repeat penalty (Tom 2026-10-04) |
+| Stale-move negation `staling` | none | [9-move queue](https://www.ssbwiki.com/Stale-move_negation) | [contacts.ts:133](../../ts/src/game/sim/contacts.ts#L133) `collectDamageContact`; checked by [meleeThresholds.ts:56](../../ts/scripts/meleeThresholds.ts#L56) `meleeStaledKnockback` | deviation: move diversity comes from move design, not a repeat penalty (Tom 2026-10-04) |
+| Knockback exactly at a knockdown threshold `knockback-threshold-ties` | single precision: 17 of 86840 FightCore threshold percents are exact ties, each 1% from FightCore's | [not documented: which side of the threshold Melee's single-precision arithmetic puts a hit whose exact knockback equals it; FightCore computes the percent in doubles, which can put one either side too](https://www.fightcore.gg) | [knockback.ts:65](../../ts/src/game/sim/knockback.ts#L65) `contactKnockback`; checked by [meleeThresholds.ts:74](../../ts/scripts/meleeThresholds.ts#L74) `knockbackEqualsExactly` | open: no public source gives Melee's operation order, which decides an exact tie; measuring one from outside settles it (Falco's second up-air hit, hitbox id2, against Samus at 280%: tumble or not) (#311) |
 | Clank and priority `clank` | strikes trade; only grabs clash | [ground attacks within 9% clank; aerials do not clank](https://www.ssbwiki.com/Priority) | [attacks.ts:217](../../ts/src/game/sim/attacks.ts#L217) `resolveAttacks` | deviation: simultaneous strikes resolve symmetrically as trades, with no unseen priority system (docs/gameplay-design.md, Same-frame strikes and clanking) (Tom 2026-10-06) |
 | Strong and weak hits `weak-hit-ratio` | weak hit 0.7× damage, 0.85× growth and base | [authored per hitbox](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [strongHits.ts:4](../../ts/src/game/sim/strongHits.ts#L4) `WEAK_HIT_DAMAGE_SCALE` | open: ours: one global ratio instead of per-hitbox values (#292) |
