@@ -113,7 +113,7 @@ The median radius column is in Melee units and needs no body size.
 | forward tilt | 26 | 3.91 | 0.259 | 0.290 | 0.330 |
 | up tilt | 26 | 4.69 | 0.290 | 0.352 | 0.400 |
 | down tilt | 26 | 4.10 | 0.262 | 0.316 | 0.345 |
-| dash attack | 18 | 4.49 | 0.299 | 0.342 | 0.376 |
+| dash attack | 19 | 4.49 | 0.293 | 0.341 | 0.374 |
 | forward smash | 26 | 4.49 | 0.268 | 0.333 | 0.365 |
 | up smash | 26 | 4.88 | 0.323 | 0.377 | 0.446 |
 | down smash | 26 | 4.69 | 0.290 | 0.330 | 0.380 |
@@ -464,6 +464,6 @@ shield safety compares the last active frame. Launcher and early-kill value
 need hit advantage and KO percent, which the combo analyzer will measure.
 Ledge coverage, hurtbox shifts that are not intangibility (Captain Falcon's
 leaning forward smash), shield damage beyond its damage-driven share and
-disjoint measured against hurtboxes are not in these sources. libmelee has
-no recording of eight dash attacks, and neither frame table has Peach's forward
-smash, so her forward row is empty.
+disjoint measured against hurtboxes are not in these sources.
+meleeframedata.com's database has no forward smash for Peach, so her forward
+row is empty.

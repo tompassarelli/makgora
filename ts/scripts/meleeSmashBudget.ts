@@ -14,6 +14,9 @@ const MotionRecord = Schema.Struct({
   hitbox_frames: Schema.Array(Schema.Struct({ frame: Schema.Finite, hitboxes: Schema.Array(Hitbox) })),
   locomotion_x: Schema.NullOr(Schema.Array(Schema.Finite)),
 });
+const ReplayTravel = Schema.Struct({
+  character: Schema.String, category: Schema.String, action: Schema.String, locomotion_x: Schema.Array(Schema.Finite),
+});
 type FrameRecord = typeof FrameRecord.Type;
 type MotionRecord = typeof MotionRecord.Type;
 
@@ -51,7 +54,13 @@ const GEOMETRY_TIE = 0.5;
 const SWEETSPOT = 1.2;
 
 const records = await jsonl("records.jsonl", FrameRecord);
-const motion = await jsonl("libmelee.jsonl", MotionRecord);
+const recorded = await jsonl("libmelee.jsonl", MotionRecord);
+const measured = await jsonl("replay-dash-attacks.jsonl", ReplayTravel);
+const motion: MotionRecord[] = [
+  ...recorded,
+  ...measured.filter((m) => !recorded.some((r) => r.character === m.character && r.category === m.category && r.action === m.action))
+    .map((m) => ({ ...m, hitbox_frames: [] })),
+];
 const fightcore = await csv("fightcore.csv");
 const intangibility = await csv("smashwiki-intangibility.csv");
 const record = (id: string, action: string): FrameRecord | undefined =>
@@ -160,5 +169,6 @@ for (const option of ["a reach", "b active", "f damage", "g angle", "h coverage"
 }
 
 const missing = fighters.flatMap((id) => TRAVEL_MOVES.filter((action) => motionOf(id, action)?.locomotion_x == null).map((action) => `${NAMES[id]} ${action}`));
-lines.push("", `Forward travel by frame is recorded for ${fighters.length * TRAVEL_MOVES.length - missing.length} of ${fighters.length * TRAVEL_MOVES.length} moves; libmelee has no recording of ${missing.join(", ")}.`);
+const fromReplays = measured.map((m) => `${NAMES[m.character] ?? m.character} ${m.action}`);
+lines.push("", `Forward travel by frame is recorded for ${fighters.length * TRAVEL_MOVES.length - missing.length} of ${fighters.length * TRAVEL_MOVES.length} moves${fromReplays.length === 0 ? "" : `, measured from public replays for ${fromReplays.join(", ")}`}${missing.length === 0 ? "" : `; none is recorded for ${missing.join(", ")}`}.`);
 console.log(lines.join("\n"));

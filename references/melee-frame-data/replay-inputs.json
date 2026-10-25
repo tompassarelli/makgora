@@ -1,0 +1,422 @@
+{
+  "dataset": "https://huggingface.co/datasets/erickfm/slippi-public-dataset-v3.7",
+  "revision": "c82be5f6e43f3388555cfe0cf8652580601f396d",
+  "replays": [
+    {
+      "path": "BOWSER/14_09_55 Bowser + Captain Falcon (PS).slp",
+      "sha256": "8dbfb97a679eb3e03843df0c6b74e049c3e3b08df2f12908baa8a968f7c9108e"
+    },
+    {
+      "path": "BOWSER/14_22_35 Bowser + Bowser (DL).slp",
+      "sha256": "69d0c5cdacd353ed4214a7d31c7108cd8ce51fbfd642849361aad32a395dc534"
+    },
+    {
+      "path": "BOWSER/14_30_14 Bowser + Kirby (YS).slp",
+      "sha256": "ef8ebd578d45f5cf2f84c0076aa51c785b7f64b13cc4508b04e72ce9accfd4f1"
+    },
+    {
+      "path": "BOWSER/14_34_58 Bowser + Marth (DL).slp",
+      "sha256": "ec7e2f1ee32979dd7266153ab73a13800377948d337056fe627a712033d89b6b"
+    },
+    {
+      "path": "BOWSER/14_41_19 Bowser + Marth (YS).slp",
+      "sha256": "ec6237654e5647f1b01f1f5d48bc19cf334f91bb47a3f35074a31a99be5a74b9"
+    },
+    {
+      "path": "BOWSER/15_48_17 [BOEY] Bowser + Marth (YS).slp",
+      "sha256": "b8573012432aa5c45aa56a93f1d68992fbcde770b4bb013b88ab77dec0a00a0e"
+    },
+    {
+      "path": "BOWSER/16_17_35 [314] Bowser + [CUMB] Pikachu (DL).slp",
+      "sha256": "765081586f8aeb5cc1dfc7341210f5eaeae627bfa3f3c69e572e73e5e68b4e90"
+    },
+    {
+      "path": "BOWSER/17_36_01 Roy + Bowser (FD).slp",
+      "sha256": "e30b58669c606b1cc41d17313734ce8a59b2573e49d2e1b5e32a73041587c669"
+    },
+    {
+      "path": "BOWSER/17_52_32 Young Link + [INFP] Bowser (BF).slp",
+      "sha256": "1d22f4c27d45aa112baadedd16da3036115b774e59da42fd06f8ee7b6feba5d3"
+    },
+    {
+      "path": "BOWSER/17_57_02 Roy + [INFP] Bowser (FD).slp",
+      "sha256": "56fba927d790850c25c1771c70835f93b935f695777fef58e583080a0f141535"
+    },
+    {
+      "path": "BOWSER/18_16_21 [DANI] Fox + Bowser + Falco + Bowser (YS).slp",
+      "sha256": "8dc448d528fbeb226b7fdb5c305de0802907380f60953487e29a29034a6b65c2"
+    },
+    {
+      "path": "BOWSER/18_49_08 Bowser + Fox (PS).slp",
+      "sha256": "a85f6b21074362511262e32014afb625a8c0c154b95be3c6a74a59ff97eb1f01"
+    },
+    {
+      "path": "DK/10_18_05 Donkey Kong + Fox (DL).slp",
+      "sha256": "8f2b4f3caf55fbc8fdaee3b597a5d3a7fdadbc981a1faee34c830fc31a741d20"
+    },
+    {
+      "path": "DK/10_39_58 Donkey Kong + Mr. Game _ Watch (FoD).slp",
+      "sha256": "9e9b9bf80fa26ebaff8df9c0095064fe239ef1b2643f3e95709e0203e7b2194a"
+    },
+    {
+      "path": "DK/10_58_20 Captain Falcon + Donkey Kong (YS).slp",
+      "sha256": "677b1c75a747d7b2b90451c6d71528b6e377a52acc617b3130ad8e1c2fa3ed4a"
+    },
+    {
+      "path": "DK/11_36_40 Donkey Kong + Falco (FoD).slp",
+      "sha256": "8e266bedda32fe3ad238cd24c27064c039c8bc16b1f4f39fcf6715b5a31bd32c"
+    },
+    {
+      "path": "DK/11_39_26 Donkey Kong + Falco (DL).slp",
+      "sha256": "1bd376dddddc67d290f4ecd16f4c1cb3e666c212d7466f3755df379331b4dd27"
+    },
+    {
+      "path": "DK/11_55_03 [TITP] Donkey Kong + Marth (FoD).slp",
+      "sha256": "2bb7c994f5c43c1c2e78374864a5fbc2b792b1a4ad787ff82cee6f13e8ac38cb"
+    },
+    {
+      "path": "DK/12_03_47 [TITP] Donkey Kong + Jigglypuff (FD).slp",
+      "sha256": "9fc6cfa0249e2be3b4233d97f637891f97b60ecb2cab4554c70c67743b4c8c46"
+    },
+    {
+      "path": "DK/12_08_28 Donkey Kong + Fox (YS).slp",
+      "sha256": "00c8484791a16343bb3ab6ad5f43bf680d4253318f44db4445a0ce17138c620f"
+    },
+    {
+      "path": "DK/12_48_17 Donkey Kong + Captain Falcon (FD).slp",
+      "sha256": "a913368951f46bd8622ff9e5e94826d60587885043c5d3c912e2c2c6cc14a182"
+    },
+    {
+      "path": "DK/13_02_05 Donkey Kong + Captain Falcon (PS).slp",
+      "sha256": "e5cad62bd656a24af0ccb79fe5574b3c8027715f5c1f23b0baa42ceddfa39e61"
+    },
+    {
+      "path": "DK/13_08_05 Donkey Kong + Captain Falcon (FD).slp",
+      "sha256": "7665f54ddff5cbc36374b8a603e004b59b4b3ef13b19d253c60754ddbb848a8a"
+    },
+    {
+      "path": "DK/13_20_58 Mario + Donkey Kong (DL).slp",
+      "sha256": "15792849c38a21cdc2d411438b15bd8b33874b53458384ca165eb0d1b5005b74"
+    },
+    {
+      "path": "DK/13_26_05 Fox + Donkey Kong (FoD).slp",
+      "sha256": "9b77338c91aa54baff8332a095c205d419ad8380e2083e8a1ff385f5ce681def"
+    },
+    {
+      "path": "DK/13_49_18 Donkey Kong + Falco (PS).slp",
+      "sha256": "40a257229705ed22b27ee2cdaf08fa59043bf0f4ebace8d8f4cad49fd790c02c"
+    },
+    {
+      "path": "DK/14_19_47 Donkey Kong + [FOX] Marth (BF).slp",
+      "sha256": "e8d6ee6da4401e5969524f27951f6119ec6bbcd4f5733eea409334e43df1a3c2"
+    },
+    {
+      "path": "DK/14_22_53 Donkey Kong + Fox (FoD).slp",
+      "sha256": "261be65b9bfe33af0a04fbc8b34969fe27052e8a05465b8231310b0b63384bff"
+    },
+    {
+      "path": "DK/14_40_19 Donkey Kong + Donkey Kong (DL).slp",
+      "sha256": "95b0cf766d52653255916a4af8ef8aa8ce7938746dc9b94404d05a850714c958"
+    },
+    {
+      "path": "DK/14_44_38 Captain Falcon + Donkey Kong (PS).slp",
+      "sha256": "8f4d37890bfc743723c3d7f0772f966933f6c4a45db5505b2ec0e25f1692061a"
+    },
+    {
+      "path": "JIGGLYPUFF/00_35_18.356Z Jigglypuff + Sheik (PS).slp",
+      "sha256": "cf1a5e8b6780aa505275421b4ba08dd524d1c797abc8267820e194010e19b298"
+    },
+    {
+      "path": "JIGGLYPUFF/01_02_49.857Z Jigglypuff + Marth (BF).slp",
+      "sha256": "5867e26a56bbeda7675387e888afea6e8528b8b9a01a06fc186a7d88b4efec1d"
+    },
+    {
+      "path": "JIGGLYPUFF/01_06_23.913Z Jigglypuff + Marth (PS).slp",
+      "sha256": "46462d4bfd63e6b69fd6ac47672869e52c5914afdb7641282ccc66b1ef80fc80"
+    },
+    {
+      "path": "JIGGLYPUFF/01_09_54.529Z Jigglypuff + Marth (DL).slp",
+      "sha256": "97244d1802384fe74cf8c2252dfe157a3dc5b28352ec1234dd741fedb58c17d9"
+    },
+    {
+      "path": "JIGGLYPUFF/01_31_18.843Z Jigglypuff + Sheik (DL).slp",
+      "sha256": "c57cdb36da7913e16790d3cddbc9b3a34a9880da3a55becc48dc9d4400579a95"
+    },
+    {
+      "path": "JIGGLYPUFF/01_48_36.460Z Jigglypuff + Sheik (YI).slp",
+      "sha256": "2517bd60e60b69e55b435e1a9ae3660fe040afd99b064ff057192a5e0cdd5deb"
+    },
+    {
+      "path": "JIGGLYPUFF/01_50_24 Jigglypuff + [TITP] Captain Falcon (DL).slp",
+      "sha256": "d41cbe2a49da81328d675e535ede16b679a42286543bf2860d7b524abd065e74"
+    },
+    {
+      "path": "JIGGLYPUFF/01_53_06.378Z Jigglypuff + Sheik (PS).slp",
+      "sha256": "78df3272ad35d7309065e82096995611010769f03d6c3c154cb3d41420df41d5"
+    },
+    {
+      "path": "KIRBY/12_57_25 [C2] Fox + Kirby (FD).slp",
+      "sha256": "f9eabd8484f650d4fce6fd80d680b04be4c7e77ea53a1db24cfc2a28098de2f6"
+    },
+    {
+      "path": "KIRBY/13_06_39 Fox + Kirby (FD).slp",
+      "sha256": "3ea8f1a776dc1058d0e183c7679aade8b4e95b032971d9406dd64199fa7129bc"
+    },
+    {
+      "path": "KIRBY/13_53_14 Marth + Kirby (PS).slp",
+      "sha256": "a538a47d701a649b7238047b8ae8a79ca7076ed1107f4a47814c0bc618a011dc"
+    },
+    {
+      "path": "KIRBY/14_06_50 Marth + Kirby (FoD).slp",
+      "sha256": "65fd2b7a04513b41afc471fa4fcdc64e074196a688ac0410fe0f94b5127afbd4"
+    },
+    {
+      "path": "KIRBY/14_20_50 Marth + Kirby (FoD).slp",
+      "sha256": "39bbc18eff2dabe2846617afa7dbf000a06584bfef46bdd6b8ec391f8ee886f1"
+    },
+    {
+      "path": "KIRBY/14_21_53 Kirby + [FOX] Marth (DL).slp",
+      "sha256": "db2238c15acbd4a5b539356d9b100663be8c082f016f034713d8db750c00ec5e"
+    },
+    {
+      "path": "KIRBY/14_26_05 Marth + Kirby (PS).slp",
+      "sha256": "2899737acc40b5659a3f21e31204c40c800d067422a808fc3819cc86246b0a9d"
+    },
+    {
+      "path": "KIRBY/14_26_33 Captain Falcon + Kirby (FD).slp",
+      "sha256": "2d7868181fdb9847b90dcece0e50b5285e99bf14b40bbe75de5fb2b347ba2dd2"
+    },
+    {
+      "path": "KIRBY/14_29_04 Kirby + Marth (BF).slp",
+      "sha256": "e3fb90449d5c719c71cf18ee2f6d1d1b3c106c78b42e7d3b57e42986b3b244a6"
+    },
+    {
+      "path": "KIRBY/14_30_06 Kirby + [FOX] Marth (DL).slp",
+      "sha256": "97dbc83df87285dc92c301ac671d65af3a7681d3e57e7bc46260da4e028dfb17"
+    },
+    {
+      "path": "KIRBY/14_30_14 Bowser + Kirby (YS).slp",
+      "sha256": "ef8ebd578d45f5cf2f84c0076aa51c785b7f64b13cc4508b04e72ce9accfd4f1"
+    },
+    {
+      "path": "KIRBY/14_37_22 Fox + Kirby (FoD).slp",
+      "sha256": "ec89671f7c5b70a677e62e0ae8cbc1a4222afe676a36df9b40d656493b290d70"
+    },
+    {
+      "path": "KIRBY/14_44_00 Fox + Kirby (DL).slp",
+      "sha256": "1207effa89486dfe759b78f0ef85ff8a0709378f587ebceb5efc4e71f913da66"
+    },
+    {
+      "path": "KIRBY/14_46_17 Fox + Kirby (FD).slp",
+      "sha256": "73d2f21ed7f650bb6bff1756d73b2a1b8fe5a948262b96352323ee1db533732a"
+    },
+    {
+      "path": "KIRBY/14_50_45 Kirby + Marth (BF).slp",
+      "sha256": "e29cd0e4ac585ef83e7e1656ca53f82e2c95101dae28405a581b6c5070608986"
+    },
+    {
+      "path": "KIRBY/14_51_56 Fox + Kirby (FoD).slp",
+      "sha256": "c0831f6ed745fca85bace54a42e0e0622db69ef6e3360c326d6df87c8afc4f9e"
+    },
+    {
+      "path": "KIRBY/14_53_21 Kirby + Marth (PS).slp",
+      "sha256": "182048ecc5e68d0b7a29886e44ab4e96770563122b4f3fbe85e1f45336cd4d1b"
+    },
+    {
+      "path": "KIRBY/15_08_30 Captain Falcon + Kirby (DL).slp",
+      "sha256": "552d69488ff5344d7638f16ca528630a3aa4ef2778920ace3ab43a47e730a7fa"
+    },
+    {
+      "path": "KIRBY/16_29_40 [314] Donkey Kong + [CUMB] Kirby (PS).slp",
+      "sha256": "ba55250999bbbcb5af1b4e52d2e5c397e4f64932eb2b2e682158fe5091f140da"
+    },
+    {
+      "path": "LUIGI/09_21_32 Fox + Luigi (FD).slp",
+      "sha256": "749d522ced3e613ebe39924222c37bf80f1123de344489190247b07808234133"
+    },
+    {
+      "path": "LUIGI/09_28_34 Luigi + Luigi (BF).slp",
+      "sha256": "d1136941aca4961dcc70c470a35eefef6ff0f095ee9caf4b6a85734c7dee38fa"
+    },
+    {
+      "path": "LUIGI/10_11_23 Captain Falcon + Luigi (BF).slp",
+      "sha256": "fad65e6082a8430f357cbfbae4e76025c75287407c428d30d736aa5dafc28e51"
+    },
+    {
+      "path": "LUIGI/10_43_16 Luigi + Jigglypuff (FD).slp",
+      "sha256": "24faced5016574a09d3add557f91ec1c3bced73896c9d086769d15b3f5499c53"
+    },
+    {
+      "path": "LUIGI/11_15_54 Luigi + Falco (FoD).slp",
+      "sha256": "728b5bc3db587b67a54bfc7fcd2add9372c0c57302d7e426ff00f34f5ea0998a"
+    },
+    {
+      "path": "LUIGI/11_39_01 Fox + Luigi (DL).slp",
+      "sha256": "4300699958941b37c5da9adf7c7001a2c9a83ea8428274d2bf2eb77850bb82cb"
+    },
+    {
+      "path": "LUIGI/11_40_48 Luigi + Captain Falcon (DL).slp",
+      "sha256": "4cc6413d281a9ad40e46fb7664bd175b3af0e58c9b59a2a369ab12db997a1fd1"
+    },
+    {
+      "path": "LUIGI/11_45_02 Captain Falcon + Luigi (FD).slp",
+      "sha256": "53ff394d5537e26385774a6d69ff1408742b2d9c5f1baf5c862e47ff8edc60f7"
+    },
+    {
+      "path": "MARIO/10_16_39 Mario + Mr. Game & Watch (FoD).slp",
+      "sha256": "9eeec262dcef1455fee2e0e5287823d56d989972c138155f38fdda47caf049fb"
+    },
+    {
+      "path": "MARIO/10_52_14 Mario + Peach (DL).slp",
+      "sha256": "0bdb4ea9f808c523318cefe624046b340bc635b8cdd08982b85e2003fedfb322"
+    },
+    {
+      "path": "MARIO/11_44_19 Captain Falcon + [BEEB] Mario (FD).slp",
+      "sha256": "6ae4b3f0098fe744ceec448a37f45fd475c8706ef233ab3d453b5bc4a36d4081"
+    },
+    {
+      "path": "MARIO/12_08_27 Mario + Marth (FD).slp",
+      "sha256": "4e4a179c7f500d049c90d47fb0aebe662493be727ee1c0895a34eca49272680e"
+    },
+    {
+      "path": "MARIO/12_25_10 Roy + Mario (PS).slp",
+      "sha256": "edc4dec05497e7643647b01458bce1aa16c4d9c9424851da035d5be49c2d0dd9"
+    },
+    {
+      "path": "MARIO/12_44_42 Mario + Marth (DL).slp",
+      "sha256": "6bee202a1bb02d9d26816eccf2da450986fbabe1345e95c223c8ce427ca48da5"
+    },
+    {
+      "path": "MARIO/12_44_57 Mario + Young Link (BF).slp",
+      "sha256": "d56b09e9ed41452101de96f721e43e737dee8eeb5e0c6817ef4ae52b136089e5"
+    },
+    {
+      "path": "MARIO/13_14_29 Mario + Fox (YS).slp",
+      "sha256": "183298702ae5e99b613797e1634822f3999e2f0f1e35d6abc2d72dbefa88add6"
+    },
+    {
+      "path": "MARIO/13_20_58 Mario + Donkey Kong (DL).slp",
+      "sha256": "15792849c38a21cdc2d411438b15bd8b33874b53458384ca165eb0d1b5005b74"
+    },
+    {
+      "path": "MARIO/13_35_49 Falco + Mario (PS).slp",
+      "sha256": "2fbeb1e624e9a8eab75c0b7ca527442c7f007ab5e3cc6bef77fe0ccfeea88501"
+    },
+    {
+      "path": "ROY/11_07_05 Fox + Roy (PS).slp",
+      "sha256": "20ab71d9131b89baef69277e53282ce5f03371a4a2b63b27a09420d319200426"
+    },
+    {
+      "path": "ROY/12_25_10 Roy + Mario (PS).slp",
+      "sha256": "edc4dec05497e7643647b01458bce1aa16c4d9c9424851da035d5be49c2d0dd9"
+    },
+    {
+      "path": "ROY/12_26_30 Roy + Marth (BF).slp",
+      "sha256": "1fdd999ed2906fde767f8f84c26519ea1e76dd4e585326bc6db6ad8f479a22f0"
+    },
+    {
+      "path": "ROY/12_36_56 Roy + Roy (BF).slp",
+      "sha256": "ae4743aeb7e7d569b8c36da6b3aced96f0153d6fb4499663fbfbe6dabbd89064"
+    },
+    {
+      "path": "ROY/12_40_22 Roy + Jigglypuff (FoD).slp",
+      "sha256": "204f7c20ebb99a0793ea60c86175b915f3f11e1a62e1b1267ef0fd1666032699"
+    },
+    {
+      "path": "ROY/12_49_09 Captain Falcon + [C2] Roy (FD).slp",
+      "sha256": "30d10c64f336727aec8f6b8b0d706ae6b6467a62ec541653a6ecb72b750c3a6f"
+    },
+    {
+      "path": "ROY/13_29_01 Roy + Fox (FD).slp",
+      "sha256": "105c221bb4831a65588fa4004a87a81291fb192e8e62e57b9d6f19d8a6338090"
+    },
+    {
+      "path": "ROY/13_29_05 Roy + [C2] Roy (FD).slp",
+      "sha256": "3e186180e2bbdea96e14cab6ca8d9dc9d8f3153481b185e763cec548a914ad2f"
+    },
+    {
+      "path": "ROY/13_47_44 Roy + Fox (FoD).slp",
+      "sha256": "3e2350a03fcb77895ec110ece5cf9c3218e05179586e1f790e3b7497b8aa226c"
+    },
+    {
+      "path": "ROY/14_32_55 Roy + Captain Falcon (DL).slp",
+      "sha256": "4466e9e0af3205d3e068513f806c159158d87b6b292b52ee86e5480c860da097"
+    },
+    {
+      "path": "YOSHI/09_22_19 Captain Falcon + Yoshi (DL).slp",
+      "sha256": "366cf0bfb6b55f3ca69b286f699a33306217ac713d172c03bd64f8021d0d2be6"
+    },
+    {
+      "path": "YOSHI/09_28_18 Captain Falcon + Yoshi (PS).slp",
+      "sha256": "dd1b0b67153796a0640cd87620867918c9600438a2a473e94c060c1f70238289"
+    },
+    {
+      "path": "YOSHI/09_30_59 Captain Falcon + Yoshi (BF).slp",
+      "sha256": "30796856e75ee1098acc2dc04a771a38177cb83063348ae937a1d705ef9fd3eb"
+    },
+    {
+      "path": "YOSHI/09_34_30 Captain Falcon + Yoshi (FoD).slp",
+      "sha256": "b046d8bc09303fc9c5fbd2e7fb2d5eb8980933bd2fe5c50ca0409a96b3332d5b"
+    },
+    {
+      "path": "YOSHI/09_50_42 Fox + [ALLY] Yoshi (PS).slp",
+      "sha256": "9053d42ce0e9ddfd0b2225689ac8ef11c7c9433dda6ce8dc1bcd5bb1473a9e6c"
+    },
+    {
+      "path": "YOSHI/10_53_39 Yoshi + Falco (FoD).slp",
+      "sha256": "48340e48b3ff392dcd6e1a09fd4efca54ccdad1b14468348f0953b0c68a2ec90"
+    },
+    {
+      "path": "YOSHI/12_32_14 Fox + Yoshi (FoD).slp",
+      "sha256": "f72dc67c6e256680707ea40457cbe7d2acb838b74d9fc10108391f4cd2b1c005"
+    },
+    {
+      "path": "YOSHI/12_50_28 Sheik + Yoshi (PS).slp",
+      "sha256": "a79338dbaf906853c9842ad7f323a2b88566f160c5ed24e0abaaaa2d1a87701d"
+    },
+    {
+      "path": "YOSHI/12_58_28 Fox + Yoshi (DL).slp",
+      "sha256": "beb079c00467d838bd4f5f8f90890e85f38c85c1456b5734bc3c373151c4b4fc"
+    },
+    {
+      "path": "YOSHI/13_08_34 [19XX] Mr. Game _ Watch + [ALLY] Yoshi (DL).slp",
+      "sha256": "93509c6de968e99f2a4e1a129db6a057b90ede3763a7f3d6c7f8f79e18169fb5"
+    },
+    {
+      "path": "YOSHI/13_45_01 Fox + Yoshi (FD).slp",
+      "sha256": "3277af1e06921608f6c6bb1239802cbab8e5899574fca68c6fddc4c0d526e72a"
+    },
+    {
+      "path": "YOSHI/13_51_03 [314] Fox + Yoshi (BF).slp",
+      "sha256": "9c512ce2c762cf2e7ada3512b167ce4ab72c889c086b0a0613b16f1ea0d14418"
+    },
+    {
+      "path": "YOSHI/13_54_42 [314] Fox + Yoshi (YI).slp",
+      "sha256": "e2588ae7959af9e145fac7fb91f2025c17a0b43cb26fcfada36a4aedc5732fa5"
+    },
+    {
+      "path": "YOSHI/14_02_12 Fox + Yoshi (YI).slp",
+      "sha256": "16e4608f4822f41e65505eb4a3c201bd875e925f95898bcde7598623492697b8"
+    },
+    {
+      "path": "YOSHI/14_12_03 Sheik + Yoshi (BF).slp",
+      "sha256": "44b9f3c5d5d6f70ed6a19bb884ca0c91114f69aa74db11a2d42fa5724f18072d"
+    },
+    {
+      "path": "YOSHI/14_14_56 Marth + Yoshi (DL).slp",
+      "sha256": "750ce719cc8e511b9ddff1bebcdee90ee2e6eb2624ac0b2f878207a546fb40b8"
+    },
+    {
+      "path": "YOSHI/14_18_15 Sheik + Yoshi (YI).slp",
+      "sha256": "7d571ba1feb30415da459e20339a8e946ea66ff2fd2f4f3f1ef23da0f99f9026"
+    },
+    {
+      "path": "YOSHI/14_35_35 Zelda + [INFP] Yoshi (YS).slp",
+      "sha256": "97bc1bd9f404cb5e2cb0d80640bfe262396bc41679a48c32cdf4bc4bcf67f5f5"
+    },
+    {
+      "path": "YOSHI/14_38_28 Falco + [INFP] Yoshi (DL).slp",
+      "sha256": "0a9a8f20ba9c65159c4fdeb936a38ada2699ab26ad3a121e2ddf0cff9e51e6a5"
+    }
+  ]
+}

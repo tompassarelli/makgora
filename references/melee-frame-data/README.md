@@ -1,10 +1,12 @@
 # Melee frame-data reference
 
 Smashcraft's one corpus of Melee frame data: a factual research reference, not a
-physics specification or an importable character definition. It has three
+physics specification or an importable character definition. It has four
 inputs, each with its own provenance: meleeframedata.com's database
 (`records.jsonl`, below), libmelee's recorded per-frame table
-(`libmelee.jsonl`, under "libmelee hitbox positions and dodge travel") and
+(`libmelee.jsonl`, under "libmelee hitbox positions and dodge travel"),
+dash-attack travel measured from public Slippi replays
+(`replay-dash-attacks.jsonl`, under "Dash-attack travel from public replays") and
 FightCore's frame data with knockback values (`fightcore.csv`, with every
 fighter's per-phase hitboxes and knockdown thresholds in `fightcore-phases.jsonl`
 and `fightcore-thresholds.jsonl`, under "FightCore knockback and getup data").
@@ -136,7 +138,7 @@ and representative site values rather than merely replacing the checksum.
 `smashcraft:references/melee-frame-data/libmelee.jsonl` reduces libmelee's
 recorded frame table to what meleeframedata.com's database lacks: where each
 normal attack's and grab's hitboxes are, frame by frame, and how far each attack
-and ground dodge moves the fighter on each frame. It has 476 records, one per `(character, action)`,
+and ground dodge moves the fighter on each frame. It has 477 records, one per `(character, action)`,
 for the 26 fighters (Popo stands for the Ice Climbers; Nana is left out).
 
 Source: https://github.com/altf4/libmelee at revision
@@ -168,12 +170,13 @@ Each record has:
   that frame gives its reach from where the move started.
 
 Coverage is libmelee's. Of jab, the three tilts, the three smashes and dash
-attack, 200 of the 208 for 26 fighters are recorded; libmelee has none for the
-dash attacks of Bowser, Donkey Kong, Jigglypuff, Kirby, Luigi, Mario, Roy and
-Yoshi. Mr. Game & Watch's jab, down tilt and forward smash, Ness's three
+attack, 201 of the 208 for 26 fighters are recorded; libmelee has none for the
+dash attacks of Bowser, Donkey Kong, Jigglypuff, Luigi, Mario, Roy and Yoshi,
+which "Dash-attack travel from public replays" below measures. Kirby's dash
+attack (63 frames hitting 9 to 43), Mr. Game & Watch's jab, down tilt and forward smash, Ness's three
 smashes and Peach's forward smash are those fighters' own action states, which
 libmelee records but does not name; each is identified by its recorded length
-and hit frames matching `records.jsonl` (Ness's forward smash 49 frames hitting
+and hit frames matching `records.jsonl` (Kirby's state 351 for his dash attack; Ness's forward smash 49 frames hitting
 16 to 17, up smash 49 hitting 12 to 31, down smash 61 hitting 12 to 31; Mr.
 Game & Watch's jab 17 hitting 4 to 6, down tilt 29 hitting 6 to 13, forward
 smash 44 hitting 13 to 33). Peach's forward smash is in neither frame table;
@@ -196,6 +199,63 @@ bun references/melee-frame-data/libmelee-intake.ts /tmp/libmelee-framedata.csv r
 
 The tool checks the input hash, refuses non-numeric values and frame gaps, and
 checks the two representative records.
+
+## Dash-attack travel from public replays
+
+`smashcraft:references/melee-frame-data/replay-dash-attacks.jsonl` gives the
+per-frame forward travel of the seven dash attacks libmelee never recorded:
+Bowser, Donkey Kong, Jigglypuff, Luigi, Mario, Roy and Yoshi. It is measured
+from tournament replays as black-box observation of the running game: each
+player's position on every frame of the dash attack action state (50), from
+its first frame.
+
+Source: the Slippi Public Dataset v3 (about 95,000 tournament `.slp` replays
+compiled by altf4 and shared on the Slippi Discord in October 2020, with
+contributions from nikki and yashichi), through its Hugging Face mirror
+https://huggingface.co/datasets/erickfm/slippi-public-dataset-v3.7 at revision
+`c82be5f6e43f3388555cfe0cf8652580601f396d`, licensed CC0-1.0 on its card.
+`replay-inputs.json` pins the 104 replays that contribute, by dataset path
+and SHA-256. The replays are read by `replay-intake.ts`, written for this
+corpus from Project Slippi's public replay specification
+(https://github.com/project-slippi/slippi-wiki/blob/master/SPEC.md); no
+parser library is used. Only positions, facing, action state and its frame
+counter are read. No disc data or disc-extracted table is used.
+
+A dash attack counts when it is entered from another state, stays grounded at
+one height and facing, its frame counter rises by one every frame (no hitlag,
+so it hit nothing), and it lasts at least to the frame before `records.jsonl`'s
+IASA (total where IASA is absent). Each record has:
+
+- `character`, `category` and `action` as in `libmelee.jsonl`; `source`:
+  dataset, revision, specification and the replays the instances came from.
+- `frame_index_origin`: 1; `recorded_frames`: the frames at least five
+  instances cover, which ends at or near IASA since players act out of it.
+- `instances`: the number of instances measured on each frame.
+- `locomotion_x`: the median forward movement on each frame, Melee units,
+  positive ahead of the fighter, as in `libmelee.jsonl`;
+  `locomotion_x_min` and `locomotion_x_max`: its range over the instances.
+
+Control: the tool measures Fox, Captain Falcon and Marth the same way and
+refuses to write unless every frame's median is within 0.001 units of
+libmelee's recorded travel. On 2026-10-25 the medians matched over 39, 39 and
+45 frames (total 33.59, 38.45 and 27.27 units), so dash-attack travel is the
+same from replay to replay and the median is the move's own travel. Totals
+for the seven: Bowser 34.39 over 55 frames, Donkey Kong 14.75 over 54,
+Jigglypuff 32.89 over 38, Luigi 37.12 over 59, Mario 32.94 over 41, Roy 26.45
+over 39, Yoshi 45.56 over 43, from 9 to 15 instances each. The disc revision
+is not stated by the dataset.
+
+Repeat the intake from the checkout's root (downloads about 260 MB, then
+seconds):
+
+```sh
+jq -r '.replays[].path' references/melee-frame-data/replay-inputs.json | while IFS= read -r p; do
+  curl --fail --location --create-dirs --output "/tmp/slippi-public/$p" "https://huggingface.co/datasets/erickfm/slippi-public-dataset-v3.7/resolve/c82be5f6e43f3388555cfe0cf8652580601f396d/$(jq -rn --arg p "$p" '$p|@uri' | sed 's|%2F|/|g')"
+done
+bun references/melee-frame-data/replay-intake.ts /tmp/slippi-public references/melee-frame-data
+```
+
+The tool checks every replay's hash and the control before writing.
 
 ## FightCore knockback and getup data
 

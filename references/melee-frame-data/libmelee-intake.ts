@@ -31,6 +31,7 @@ const actions = new Map<number, [string, string]>([
 ]);
 // libmelee leaves these fighters' own action states unnamed; each matches records.jsonl's length and hit frames (Peach's three items: SmashWiki, hits 15-18 of 47).
 const fighterActions = new Map<string, [string, string]>([
+  ["4/351", ["attacks", "dattack"]],
   ["8/341", ["attacks", "fsmash"]], ["8/342", ["attacks", "usmash"]], ["8/345", ["attacks", "dsmash"]],
   ["9/349", ["attacks", "fsmash"]],
   ["24/341", ["attacks", "jab1"]], ["24/345", ["attacks", "dtilt"]], ["24/346", ["attacks", "fsmash"]],
