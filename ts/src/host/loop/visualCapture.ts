@@ -2,6 +2,7 @@ import { readChunk } from "wisp/src/platform/fileio";
 import { Phase } from "../../game/lobby/lobbyState";
 import { clearVisualCapture, heldVisualFrame, holdVisualFrame, releaseVisualFrame, visualCapture, visualReleaseFile } from "../../game/session/visualCapture";
 import { drawnFrame } from "./drawnFrame";
+import { holdAgeSeekedEffects } from "./heldAnimations";
 import { type ShellState, localSlot } from "./state";
 import { resumePresentationHeld, lockArenaCamera, pauseMatchPresentation, renderPersistentPresentation, renderUi } from "./view";
 
@@ -16,7 +17,7 @@ export function serviceVisualCapture(s: ShellState): void {
     releaseVisualFrame(slot);
     if (s.game.phase !== Phase.match) clearVisualCapture(slot);
     pauseMatchPresentation(s, s.session.paused);
-  }
+  } else holdAgeSeekedEffects(s);
 }
 
 
@@ -29,5 +30,6 @@ export function holdPresentedCapture(s: ShellState): void {
     lockArenaCamera(s);
     renderUi(s);
     pauseMatchPresentation(s, true);
+    holdAgeSeekedEffects(s);
   }
 }

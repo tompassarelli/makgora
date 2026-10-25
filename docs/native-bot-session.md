@@ -251,6 +251,9 @@ For scripts started by `#! chat` or `--chat`, capture rows install a finite
 local visual schedule on the existing quick-match command. After presenting an
 authored target frame, the client holds that pose through the framebuffer read;
 the runner releases it with a unique FileIO acknowledgement on success or failure.
+A projectile effect whose draw entry reseeks by age is seeked to the held
+frame's age on every held callback, so consecutive held frames show its
+animation advancing with the game.
 Simulation and helper input deadlines continue unchanged. A skipped target is
 INVALID. A lost runner releases the visual hold after 600 callbacks, and reset
 clears it immediately. `captures.json` marks these images `held visual`: they

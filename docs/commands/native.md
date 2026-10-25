@@ -74,7 +74,9 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   `bun scripts/nativeCapture.ts build --out MAP.w3x --control PAD|DIR...` bakes
   the scripts and their `capture` frames into a native-capture map that plays
   both pads itself and holds each capture frame with the fighters' animations
-  and effects frozen; host it with `bun wisp fresh MAP.w3x --no-quick
+  and effects frozen, seeking an effect whose draw entry reseeks by age to the
+  held frame's age on every held tick, so consecutive frames show it grow;
+  host it with `bun wisp fresh MAP.w3x --no-quick
   --clients-file FILE` while `bun scripts/nativeCapture.ts run --clients-file FILE
   --client NAME --install DIR --manifest MAP.captures.json --out DIR` captures
   the screen. `run` first reads DIR/.build.info and the live build from

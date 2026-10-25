@@ -250,19 +250,19 @@ const CAIRNE_ANKH: SpecialProjectile = {
   ...mark(ANKH_MODEL, 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(0.625),
 };
 const CAIRNE: AuthoredSpecial = {
-  name: "Reincarnation", endFrame: 50,
+  name: "Reincarnation", endFrame: 58,
   projectiles: [
     CAIRNE_ANKH,
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
     { ...mark("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", 25, 16, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(0.625) },
     { ...mark(ANKH_BURST_MODEL, 25, 12, 0.0, 60.0), atStageCentre: true, cancelOnInterrupt: true },
-    { ...mark("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", 20, 24, 0.0), cancelOnInterrupt: true },
+    { ...mark("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", 28, 24, 0.0), cancelOnInterrupt: true },
   ],
   regionOrigin: CAIRNE_ANKH,
   regions: [heroRegion(25, 27, capsule(-140.0, 50.0, 140.0, 50.0, 50.0), hit(12.0, 85, 60.0, 55.0, HitElement.holy))],
-  motion: [{ ...frames(26, 26), velocityX: 0.0, velocityZ: 0.0, relocateProjectile: CAIRNE_ANKH }],
-  // The engine primes intangibility one frame ahead, so arrival protection starts at teleport frame 26.
-  intangible: frames(27, 31),
+  motion: [{ ...frames(34, 34), velocityX: 0.0, velocityZ: 0.0, relocateProjectile: CAIRNE_ANKH }],
+  // The engine primes intangibility one frame ahead, so arrival protection starts at teleport frame 34.
+  intangible: frames(35, 39),
 };
 
 const SPIRIT = "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl";
@@ -438,7 +438,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
   [Character.sylvanas]: "She becomes a banshee, glides low at the nearest foe, swings back round after them and passes through them. Hit her while she changes; shield, roll through her late or run away.",
-  [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
+  [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts; 9 frames later he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
   [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",
   [Character.tinker]: "His Robo-Goblin waddles ahead and explodes. Walk away or shield the blast.",

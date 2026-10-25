@@ -16,8 +16,8 @@ import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { MURLOC_SWAMP_CLOUD_MODEL } from "../assets/importedModelInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { carrierDrawsMark } from "../presentation/ultimateVoice";
-import { ARENA_CAMERA } from "../presentation/arenaCamera";
-import { cosineTurns, sineTurns } from "../sim/mathTables";
+import { cameraLift } from "./cameraLift";
+import { sineTurns } from "../sim/mathTables";
 import { tintProjectile } from "./projectileTint";
 import { addPoolEffect, addPoolEffects } from "./projectilePoolEffects";
 
@@ -176,8 +176,9 @@ export class ProjectilePresentation {
     for (let index = 0; index < this.assigned.length; index++) this.assigned[index] = -1;
   }
 
-
-
+  drawnModel(index: number): effect | undefined {
+    return this.models[this.assigned[index] ?? -1];
+  }
 
 
   private placeRisen(slot: number, born: boolean): void {
@@ -188,13 +189,8 @@ export class ProjectilePresentation {
     const height = f32(636.061981);
     const centerX = f32(-0.3387);
     const centerZ = f32(-389.412987);
-    const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
-    const distance = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
-    const eyeX = GetCameraTargetPositionX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
-    const eyeZ = GetCameraField(CAMERA_FIELD_ZOFFSET) - sineTurns(pitch) * distance;
-    const toward = sineTurns(yaw) * cosineTurns(pitch) * distance;
-    const lift = toward > RISEN_FRONT * 2.0 ? RISEN_FRONT / toward : 0.0;
-    const y = this.origin.y - RISEN_FRONT * (lift > 0.0 ? 1.0 : 0.0);
+    const { eyeX, eyeZ, lift, front } = cameraLift(RISEN_FRONT);
+    const y = this.origin.y - front;
     const scaleX = f32(f32(f32(2.0 * placed.radius) / width) * (draw?.width ?? 1.0));
     const grown = f32(f32(f32(placed.z + placed.radius) + RISEN_HEADROOM) * (born ? RISEN_BIRTH : 1.0));
     const scaleZ = f32(grown / height);
@@ -212,13 +208,8 @@ export class ProjectilePresentation {
     const placed = this.risen[slot];
     if (placed === undefined || placed.raised.length === 0) return;
     const age = this.risenAge[slot] ?? 0;
-    const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
-    const distance = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
-    const eyeX = GetCameraTargetPositionX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
-    const eyeZ = GetCameraField(CAMERA_FIELD_ZOFFSET) - sineTurns(pitch) * distance;
-    const toward = sineTurns(yaw) * cosineTurns(pitch) * distance;
-    const lift = toward > RAISED_FRONT * 2.0 ? RAISED_FRONT / toward : 0.0;
-    const y = this.origin.y - RAISED_FRONT * (lift > 0.0 ? 1.0 : 0.0);
+    const { eyeX, eyeZ, lift, front } = cameraLift(RAISED_FRONT);
+    const y = this.origin.y - front;
     const z = this.origin.z;
     for (let index = 0; index < placed.raised.length; index++) {
       const raisedSlot = placed.raised[index];

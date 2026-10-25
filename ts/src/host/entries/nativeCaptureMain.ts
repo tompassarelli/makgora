@@ -15,6 +15,7 @@ import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "
 import { applyDeveloperCommand } from "../loop/developerCommands";
 import { bareFighter } from "../loop/fighterCloak";
 import { paintDrawnStamp } from "../loop/drawnStamp";
+import { holdAgeSeekedEffects } from "../loop/heldAnimations";
 import { CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
 
 const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted", receiptsOnScreen: false, disjointCues: false };
@@ -92,6 +93,7 @@ export function captureTick(fixtures: readonly CaptureFixture[]): void {
       r.stampTick = r.ticks;
     }
   }
+  holdAgeSeekedEffects(s);
   r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
   if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
   r.held = 0;
