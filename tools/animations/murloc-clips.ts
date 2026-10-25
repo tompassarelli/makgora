@@ -32,15 +32,16 @@ const slug = fighterName.toLowerCase();
 const kitMoves = kobold ? KOBOLD_MOVES : MURLOC_MOVES;
 const kitSpecials = kobold ? KOBOLD_SPECIALS : MURLOC_SPECIALS;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const painOnly = process.argv.includes("pain");
+const replaced = process.argv.slice(4).filter(arg => !arg.startsWith("--")), inPlace = replaced.length > 0, painOnly = replaced.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [--kobold]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [POSE...] [--kobold]");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), model = structuredClone(source);
-ensure((painOnly || source.Sequences.length === 9) && source.Helpers.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Murloc Tiderunner");
+ensure((inPlace || source.Sequences.length === 9) && source.Helpers.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Murloc Tiderunner");
 const stand = source.Sequences[kobold ? 0 : 2]!;
-interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
+interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; tx?: number; tz?: number; }
+interface Key { frame: number; g: Gesture }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; keys?: readonly Key[]; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
 const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
@@ -70,6 +71,17 @@ for (const [pose, style, gesture, target] of normals) {
   const move = kitMoves.normals[style]; ensure(move, `${pose}: missing timing`);
   actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture, target, air: pose.endsWith("Air") });
 }
+const couched: Gesture = { arm: -75, elbow: -120, hand: 0, pelvis: -5, leftElbow: -20 };
+if (!kobold) Object.assign(actions.find(action => action.pose === "dashAttack")!, { target: undefined, keys: [
+  { frame: 0, g: { arm: -20, chest: 8, lean: 6, tx: 4, thigh: -20, leftThigh: 20 } },
+  { frame: 3, g: { ...couched, hand: 35, chest: -10, head: 10, tx: -22, thigh: 50, knee: -80, leftThigh: 30, leftArm: -60 } },
+  { frame: 5, g: { ...couched, hand: -10, chest: 25, head: -15, tx: 22, thigh: -75, knee: 10, leftThigh: 75, leftArm: 70 } },
+  { frame: 7, g: { ...couched, hand: -10, chest: 28, head: -15, tx: 26, thigh: -80, knee: 10, leftThigh: 78, leftArm: 75 } },
+  { frame: 16, g: { ...couched, hand: -5, chest: 30, head: -12, tx: 21, thigh: -85, leftThigh: 80, leftArm: 70 } },
+  { frame: 22, g: { ...couched, hand: 45, chest: 20, head: -5, tx: 16, thigh: -60, knee: -10, leftThigh: 50, leftArm: 40 } },
+  { frame: 29, g: { arm: -30, elbow: -50, hand: 20, chest: 5, tx: 6, thigh: -20, leftThigh: 15, leftArm: 10 } },
+  { frame: MURLOC_MOVES.normals[AttackStyle.dashAttack]!.totalFrames, g: {} },
+] });
 const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["crouch", 30, 8, brace], ["landing", 8, 2, brace], ["shield", 30, 5, { ...brace, leftArm: -105 }],
   ["airDodge", 49, 4, { ...brace, lean: -25 }], ["smashCharge", 30, 8, { ...cast, arm: -80, leftArm: -80 }],
@@ -157,12 +169,17 @@ function joint(name: string, g: Gesture): [number, number] {
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
+const standTriangles = new DrawnModel(originalBytes, 1).triangles(source.Sequences.indexOf(stand), 0, 1);
+let standFloor = Infinity;
+for (let i = 1; i < standTriangles.length; i += 2) standFloor = Math.min(standFloor, standTriangles[i]!);
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
-if (painOnly) actions.length = 0;
+ensure(replaced.every(pose => pose === "pain" || actions.some(action => action.pose === pose)), `unknown pose in ${replaced.join(" ")}`);
+if (inPlace) actions.splice(0, actions.length, ...actions.filter(action => replaced.includes(action.pose)));
+if (inPlace && !painOnly) damageActions.length = 0;
 for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const name = ordinal < actions.length ? `${fighterName} ${action.pose}` : `${fighterName} Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
-  const existing = painOnly ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
-  ensure(!painOnly || existing >= 0, `${name}: shipped sequence missing`);
+  const existing = inPlace ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
+  ensure(!inPlace || existing >= 0, `${name}: shipped sequence missing`);
   const index = existing >= 0 ? existing : model.Sequences.length;
   const start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
   if (existing >= 0) {
@@ -173,25 +190,30 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
       MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   }
-  const phaseFrames = [...new Set([0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
+  const phaseFrames = action.keys ? action.keys.map(key => key.frame) : [...new Set([0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
   const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
     const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]); if (!first) return;
-    const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
+    const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path), moved = /^\.(Bones|Helpers)\.(\d+)\.Translation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
+    const rootTranslation = moved !== null && source[moved[1] as "Bones" | "Helpers"][Number(moved[2])]!.Name === "Bone_Root";
     for (const frame of phaseFrames) {
       let Vector = first.Vector.slice();
-      if (node) { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
+      const keyed = action.keys?.find(key => key.frame === frame)?.g;
+      if (keyed) {
+        if (node) { const [y, z] = joint(node.Name, keyed); Vector = rotated(first.Vector, y, z); }
+        else if (rootTranslation) { Vector[0] = Vector[0]! + (keyed.tx ?? 0); Vector[2] = Vector[2]! + (keyed.tz ?? 0); }
+      } else if (node) { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(first.InTan ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
   });
-  if (painOnly) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
+  if (inPlace) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
   if (action.target) {
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index); data.frame = start + Math.round(action.contact * 1000 / 60);
     const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = model.Nodes.find(n => n.Name === "Bone_Hand_R")!, pivot = model.PivotPoints[hand.ObjectId]!;
@@ -210,7 +232,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     const triangles = drawn.triangles(index, frame / 60, 1); let lowest = Infinity;
     for (let i = 1; i < triangles.length; i += 2) lowest = Math.min(lowest, triangles[i]!);
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
-    if (!action.air) { key.Vector[2] = key.Vector[2]! - lowest; if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
+    if (!action.air) { key.Vector[2] = key.Vector[2]! - lowest + (action.keys ? standFloor : 0); if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
   }
   const victim = /^victim(Pummel|Throw)/.test(action.pose);
   const binding = `{ index: ${index}, seconds: ${seconds(victim ? 1 : (end - start) / 1000)}, aligned: true${action.paired ? `, contact: ${seconds(victim ? 0.5 : action.contact / 60)}` : ""} }`;
@@ -234,7 +256,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 
-if (!painOnly) await Bun.write(join(project, `ts/src/game/sim/heroes/${slug}Clips.ts`), [
+if (!inPlace) await Bun.write(join(project, `ts/src/game/sim/heroes/${slug}Clips.ts`), [
   `// Generated by tools/animations/murloc-clips.ts from the stock classic ${fighterName} rig.`,
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   `export const ${fighterName.toUpperCase()}_MODEL_FILE = ${JSON.stringify(["units", "creeps", fighterName, `${fighterName}.mdl`].join(String.fromCharCode(92)))};`,
@@ -244,7 +266,7 @@ if (!painOnly) await Bun.write(join(project, `ts/src/game/sim/heroes/${slug}Clip
 ].join("\n"));
 const normalReach = [];
 let tiltForward = 0;
-if (!painOnly) for (const style of [AttackStyle.forwardTilt, AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTiltUp,
+if (!inPlace) for (const style of [AttackStyle.forwardTilt, AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTiltUp,
   AttackStyle.forwardTiltDown, AttackStyle.upTilt, AttackStyle.downTilt, AttackStyle.dashAttack]) {
   const ordinal = normals.findIndex(normal => normal[1] === style), action = actions[ordinal]!;
   const index = source.Sequences.length + ordinal, [start, end] = model.Sequences[index]!.Interval;
@@ -294,7 +316,7 @@ if (!painOnly) for (const style of [AttackStyle.forwardTilt, AttackStyle.jab, At
       }
   ensure(selected, `${action.pose}: no skinned recoil/contact pose meets original reach gates`);
 }
-if (painOnly) {
+if (inPlace) {
   const before = new DrawnModel(originalBytes, 1), after = new DrawnModel(generateMDX(model), 1), authored = new Set(records.map(record => record.index));
   for (const [index, sequence] of source.Sequences.entries()) if (!authored.has(index)) for (const part of [0, 0.5, 1]) {
     const time = (sequence.Interval[1]! - sequence.Interval[0]!) * part / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
