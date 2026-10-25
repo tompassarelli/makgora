@@ -5,7 +5,7 @@ what his side/forward B does at all. Look at how Demon Hunters work in modern
 World of Warcraft and how Illidan works as a raid boss, and come up with
 interesting design improvements to how he plays and functions." Same day,
 his expressive actions carry the identity: warglaive chains, Fel Rush branches,
-wing glide, plunge and Eye Blast. Tom revised the resource rule on 9 Oct
+wing dive, plunge and Eye Blast. Tom revised the resource rule on 9 Oct
 (#148/#335): ordinary hits and throws no longer drain another fighter's
 meter; all fighters use the same damage-dealt/taken gain rules. Named spells
 remain deliberate actions.
@@ -44,7 +44,7 @@ dash is not.
 | The Hunt | 1 s cast, charge up to 50 yards, root 1.5 s, damage over time ([Warcraft Wiki](https://warcraft.wiki.gg/wiki/The_Hunt)) | A long telegraphed lunge that marks |
 | Sigil of Flame | A placed sigil that activates 2 s later ([Warcraft Wiki](https://warcraft.wiki.gg/wiki/Sigil_of_Flame)) | A delayed, visible zone |
 | Soul Fragments (Vengeance) | Shattered souls left on the ground for 20 s, consumed by walking near; at most 5 ([Warcraft Wiki](https://warcraft.wiki.gg/wiki/Shattered_Souls_(Vengeance))) | A pickup resource on the stage |
-| Glide, double jump, Spectral Sight, Demon Spikes | Class mobility and defence ([Warcraft Wiki](https://warcraft.wiki.gg/wiki/Demon_hunter)) | Glide already lives in Wing Ascent (#128); the double jump is every fighter's |
+| Glide, double jump, Spectral Sight, Demon Spikes | Class mobility and defence ([Warcraft Wiki](https://warcraft.wiki.gg/wiki/Demon_hunter)) | Wing Ascent's dive covers the mobility (#279); the double jump is every fighter's |
 
 ### Illidan as a raid boss (Black Temple)
 
@@ -151,7 +151,7 @@ enders and big hits drain more:
 | Forward smash | 10 | Up, down smash | 8 |
 | Each throw | 6 | Fel Rush pass | 4 |
 | Chaos Strike | 10 | Immolate | 6 |
-| Glide wing slash | 5 | Mana Burn orb | the mana lane's drain |
+| Wing Dive | 5 | Mana Burn orb | the mana lane's drain |
 
 A shielded hit drains nothing; pummels, get-up and ledge attacks drain
 nothing; mana never goes below 0 and Illidan gains none. Each drain flashes
@@ -184,9 +184,15 @@ smashcraft:ts/src/game/sim/projectiles.ts.
 
 ## Up and down specials (kept)
 
-- **Wing Ascent with the glide** (#128): the Demon Hunter's Glide already
-  lives here, and with Fel Rush in the air his recovery now has a high route
-  (ascent and glide) and a level one (rush, then ascent).
+- **Wing Ascent with the Wing Dive** (#279): Tom asked for a follow-up like
+  Mountain King's Thunder Leap or Pikachu's second Quick Attack in place of the
+  glide (2026-10-25). A second special in the ascent's frames 15-27 is a
+  6-frame backflip, then a 13-frame dive at 30 a frame along the stick held
+  at the press, any of 8 directions, forward and down with none held. The
+  dive hits along its line (9%, 50 degrees), ends in helpless fall, keeps
+  10 frames of landing lag and comes once per airtime. With Fel Rush in the
+  air his recovery has a high route (ascent and dive) and a level one (rush,
+  then ascent).
 - **Immolate on the ground, jump-cancellable** (#128): the Warcraft III
   Immolation as a shine, which Tom asked for. Kept, and in the air it stalls
   his fall like the shine (below).

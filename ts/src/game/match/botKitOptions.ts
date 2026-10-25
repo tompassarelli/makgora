@@ -22,7 +22,7 @@ import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
 import {
-  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_GLIDE_FIRST, DEMONHUNTER_GLIDE_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_WING_DURATION,
+  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FIRST, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_LAST, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP,
   RIFLEMAN_RECOVERY_STARTUP_FRAMES, RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
 import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
@@ -64,9 +64,7 @@ const LEVEL_REACH = 140.0;
 const LEVEL_BELOW = 20.0;
 const LEVEL_ABOVE = 40.0;
 
-const GLIDE_GAP = 180.0;
-
-const SLASH_REACH = 90.0;
+const DIVE_AIM_DEAD = 60.0;
 
 const RUSH_NEAR = 80.0;
 const RUSH_FAR = 230.0;
@@ -414,6 +412,32 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
 
 
 
+function steerWingDive(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, floor: number, home: number, outside: number, input: Controls): boolean {
+  const { special, motion } = f;
+  if (special.form !== 0 || special.frame < DEMONHUNTER_DIVE_FIRST || special.frame > DEMONHUNTER_DIVE_LAST) return false;
+  if (outside > 0.0) {
+    if (motion.vz > 4.0 && special.frame < DEMONHUNTER_DIVE_LAST) return false;
+    pressDive(input, home, motion.z < f32(floor + LEVEL_ABOVE) ? 1 : 0);
+    return true;
+  }
+  if (target === undefined) return false;
+  const dx = f32(target.motion.x - motion.x);
+  const dz = f32(target.motion.z - motion.z);
+  const reach = f32(DEMONHUNTER_DIVE_SPEED * DEMONHUNTER_DIVE_FRAMES);
+  if (f32(f32(dx * dx) + f32(dz * dz)) > f32(reach * reach) || !safeAt(stage, target.motion.x, 0.0)) return false;
+  pressDive(input, Math.abs(dx) <= DIVE_AIM_DEAD ? 0 : dx < 0 ? -1 : 1, Math.abs(dz) <= DIVE_AIM_DEAD ? 0 : dz < 0 ? -1 : 1);
+  return true;
+}
+
+function pressDive(input: Controls, aimX: number, aimZ: number): void {
+  input.specialPressed = true;
+  input.specialX = aimX;
+  input.specialZ = aimZ;
+  input.direction = aimX;
+  input.verticalDirection = aimZ;
+}
+
+
 export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, skill: CpuSkill, input: Controls): boolean {
   const { special, motion } = f;
   if (skill.kitTenths <= 0 || special.action === SpecialAction.none || f.launch.hitstun > 0 || f.launch.hitlag > 0) return false;
@@ -464,30 +488,8 @@ export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fight
       input.jumpPressed = true;
       input.jumpHeld = target !== undefined && f32(target.motion.z - motion.z) > 60.0;
       return true;
-    case SpecialAction.demonHunterWingAscent: {
-      if (special.form === 0) {
-        if (next < DEMONHUNTER_GLIDE_FIRST || next > DEMONHUNTER_WING_DURATION) return false;
-
-        const returning = outside > 60.0 && motion.z > f32(floor + 20.0) && f.facing === home;
-        const ahead = target === undefined ? 0.0 : f32(f32(target.motion.x - motion.x) * f.facing);
-        const chasing = outside <= 0.0 && target !== undefined && ahead >= GLIDE_GAP && target.motion.z <= motion.z && safeAt(stage, target.motion.x, 0.0);
-        if (!returning && !chasing) return false;
-        input.jumpPressed = true;
-        return true;
-      }
-      if (special.form !== DEMONHUNTER_GLIDE_FORM) return false;
-      if (outside > 0.0) {
-
-        input.verticalDirection = motion.z < f32(floor + 40.0) ? 1 : 0;
-        return true;
-      }
-      if (target === undefined) return false;
-      const ahead = f32(f32(target.motion.x - motion.x) * f.facing);
-      const below = f32(motion.z - target.motion.z);
-      input.verticalDirection = below > 40.0 ? -1 : 0;
-      input.attackPressed = ahead >= 0.0 && ahead <= SLASH_REACH && Math.abs(below) <= 70.0;
-      return true;
-    }
+    case SpecialAction.demonHunterWingAscent:
+      return steerWingDive(f, target, stage, floor, home, outside, input);
   }
   return false;
 }

@@ -321,7 +321,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
       pose.clipTime = peonRestClipTime(f.special.frame);
       return 0.0;
     }
-    playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}`, fighterSpecialClip(f).index);
+    playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}`, fighterSpecialClip(f).index);
     return rate;
   }
   if (holdsSpecialEnd(pose, f)) return 0.0;
@@ -705,7 +705,10 @@ export function peonRestClipTime(frame: number): number {
   return Math.min(PEON_REST_ASLEEP_SECONDS, f32(PEON_REST_JOLT_SECONDS + f32(Math.max(0, frame - 1) * FRAME_SECONDS)));
 }
 
+const wingBranch = (f: Readonly<Fighter>): boolean => f.special.action === SpecialAction.demonHunterWingAscent && f.special.form !== 0;
+
 function fighterSpecialClip(f: Readonly<Fighter>): HeroClip {
+  if (wingBranch(f)) return clips.illidanWingClip(f.special.form);
   if (f.character === Character.chen && f.special.action === SpecialAction.heroDown && f.special.form >= 2 * FOLLOW_UP_FORM) {
     return clips.clipFor(f.character, f.motion.grounded ? "sideSpecialFollowUp" : "sideSpecialFollowUpAir");
   }

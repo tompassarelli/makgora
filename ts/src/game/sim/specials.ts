@@ -81,17 +81,18 @@ export const DEMONHUNTER_WING_STARTUP = 3;
 export const DEMONHUNTER_WING_DURATION = 28;
 
 
-export const DEMONHUNTER_GLIDE_FIRST = 16;
-export const DEMONHUNTER_GLIDE_FRAMES = 90;
-export const DEMONHUNTER_GLIDE_FORM = 1;
-export const DEMONHUNTER_GLIDE_SLASH_FORM = 2;
-const DEMONHUNTER_GLIDE_SLASH_FRAMES = 20;
-export const DEMONHUNTER_GLIDE_SLASH_FIRST = 4;
-export const DEMONHUNTER_GLIDE_SLASH_LAST = 7;
-const DEMONHUNTER_GLIDE_LANDING_LAG = 10;
-const GLIDE_LEVEL = { speed: 9.0, sink: 1.5 };
-const GLIDE_HIGH = { speed: 7.0, sink: 0.5 };
-const GLIDE_DIVE = { speed: 11.0, sink: 4.0 };
+export const DEMONHUNTER_DIVE_FIRST = 15;
+export const DEMONHUNTER_DIVE_LAST = 27;
+export const DEMONHUNTER_BACKFLIP_FORM = 1;
+export const DEMONHUNTER_DIVE_FORM = 2;
+export const DEMONHUNTER_BACKFLIP_FRAMES = 6;
+export const DEMONHUNTER_DIVE_FRAMES = 13;
+export const DEMONHUNTER_DIVE_SPEED = 30.0;
+const DEMONHUNTER_BACKFLIP_DRIFT = 4.0;
+const DEMONHUNTER_BACKFLIP_RISE = 10.0;
+const DEMONHUNTER_BACKFLIP_FALL = 2.0;
+const DEMONHUNTER_DIVE_CARRY = 5.0;
+export const DEMONHUNTER_DIVE_LANDING_LAG = 10;
 export const DEMONHUNTER_IMMOLATE_STARTUP = 4;
 export const DEMONHUNTER_IMMOLATE_ACTIVE = 4;
 export const DEMONHUNTER_IMMOLATE_DURATION = 27;
@@ -248,7 +249,7 @@ function secondRecoilShot(owner: Fighter, input: Readonly<Controls>): boolean {
 
 
 
-export function demonHunterJumpOrGlideCancel(owner: Fighter, input: Readonly<Controls>): void {
+export function demonHunterJumpOrAttackBranch(owner: Fighter, input: Readonly<Controls>): void {
   const { special } = owner;
   if (owner.character !== Character.demonHunter || owner.launch.hitlag > 0) return;
   if (input.jumpPressed && special.action === SpecialAction.demonHunterImmolate && special.form === 0 && special.frame >= DEMONHUNTER_IMMOLATE_STARTUP) {
@@ -260,18 +261,32 @@ export function demonHunterJumpOrGlideCancel(owner: Fighter, input: Readonly<Con
   }
   if (input.attackPressed && special.action === SpecialAction.demonHunterFelRush) {
     felRushBranch(owner, input, true);
-    return;
-  }
-  if (special.action !== SpecialAction.demonHunterWingAscent) return;
-  if (input.jumpPressed && special.form === 0 && special.frame >= DEMONHUNTER_GLIDE_FIRST - 1 && special.frame < DEMONHUNTER_WING_DURATION) {
-    startGlidePhase(owner, DEMONHUNTER_GLIDE_FORM, DEMONHUNTER_GLIDE_FRAMES);
-  } else if (input.attackPressed && special.form === DEMONHUNTER_GLIDE_FORM) {
-    startGlidePhase(owner, DEMONHUNTER_GLIDE_SLASH_FORM, DEMONHUNTER_GLIDE_SLASH_FRAMES);
-    for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
   }
 }
 
-function startGlidePhase(owner: Fighter, form: number, frames: number): void {
+function wingDive(owner: Fighter, input: Readonly<Controls>): boolean {
+  const { special } = owner;
+  if (special.form !== 0 || special.frame < DEMONHUNTER_DIVE_FIRST || special.frame > DEMONHUNTER_DIVE_LAST || owner.launch.hitlag > 0) return false;
+  aimDive(owner, input);
+  observeActionDecision(SPECIAL_ACTION_BIT);
+  startBranchPhase(owner, DEMONHUNTER_BACKFLIP_FORM, DEMONHUNTER_BACKFLIP_FRAMES);
+  return true;
+}
+
+function aimDive(owner: Fighter, input: Readonly<Controls>): void {
+  const { special } = owner;
+  const pressed = input.specialX !== 0 || input.specialZ !== 0;
+  const aimX = sign(pressed ? input.specialX : chargedAimX(input));
+  const aimZ = sign(pressed ? input.specialZ : chargedAimZ(input));
+  const neutral = aimX === 0 && aimZ === 0;
+  special.aimX = neutral ? owner.facing : aimX;
+  special.aimZ = neutral ? -1 : aimZ;
+  if (special.aimX !== 0) owner.facing = special.aimX;
+}
+
+const sign = (value: number): number => value < 0 ? -1 : value > 0 ? 1 : 0;
+
+function startBranchPhase(owner: Fighter, form: number, frames: number): void {
   const { special } = owner;
   special.form = form;
   special.frame = 0;
@@ -281,7 +296,7 @@ function startGlidePhase(owner: Fighter, form: number, frames: number): void {
 }
 
 
-export function demonHunterGliding(f: Readonly<Fighter>): boolean {
+export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
   const { special } = f;
   if (special.action === SpecialAction.demonHunterFelRush) {
     return special.form === 0 ? special.frame < FEL_RUSH_LAST : special.form === VENGEFUL_RETREAT_FORM && special.frame < VENGEFUL_RETREAT_MOVE_LAST;
@@ -313,11 +328,11 @@ function felRushBranch(owner: Fighter, input: Readonly<Controls>, attack: boolea
   owner.attack.cooldown = 0;
   if (attack) {
     if (input.direction !== 0) owner.facing = input.direction < 0 ? -1 : 1;
-    startGlidePhase(owner, motion.grounded ? CHAOS_STRIKE_FORM : CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FRAMES);
+    startBranchPhase(owner, motion.grounded ? CHAOS_STRIKE_FORM : CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FRAMES);
     motion.vx = motion.grounded ? 0.0 : f32(owner.facing * FEL_RUSH_AIR_CARRY);
     return true;
   }
-  startGlidePhase(owner, VENGEFUL_RETREAT_FORM, VENGEFUL_RETREAT_FRAMES);
+  startBranchPhase(owner, VENGEFUL_RETREAT_FORM, VENGEFUL_RETREAT_FRAMES);
   motion.grounded = false;
   motion.surface = undefined;
   motion.vx = f32(-owner.facing * VENGEFUL_RETREAT_SPEED);
@@ -376,20 +391,32 @@ function stopFelRushAtShields(world: Roster, slot: number): void {
 }
 
 
-function glide(owner: Fighter, input: Readonly<Controls> | undefined): void {
+function advanceWingDive(owner: Fighter): void {
   const { motion, special } = owner;
   if (motion.grounded) {
     special.action = SpecialAction.none;
     special.frame = 0;
     special.lockFrames = 0;
     owner.attack.cooldown = 0;
-    owner.landing.lag = max(owner.landing.lag, DEMONHUNTER_GLIDE_LANDING_LAG);
+    owner.landing.lag = max(owner.landing.lag, DEMONHUNTER_DIVE_LANDING_LAG);
     return;
   }
-  const pitch = input?.verticalDirection ?? 0;
-  const line = special.form === DEMONHUNTER_GLIDE_SLASH_FORM || pitch === 0 ? GLIDE_LEVEL : pitch > 0 ? GLIDE_HIGH : GLIDE_DIVE;
-  motion.vx = f32(owner.facing * line.speed);
-  motion.vz = -line.sink;
+  if (special.form === DEMONHUNTER_BACKFLIP_FORM) {
+    motion.vx = f32(-owner.facing * DEMONHUNTER_BACKFLIP_DRIFT);
+    motion.vz = f32(DEMONHUNTER_BACKFLIP_RISE - f32(special.frame * DEMONHUNTER_BACKFLIP_FALL));
+    if (special.frame < special.duration) return;
+    startBranchPhase(owner, DEMONHUNTER_DIVE_FORM, DEMONHUNTER_DIVE_FRAMES);
+    for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
+    special.hit = false;
+  }
+  if (special.frame < special.duration) {
+    const scale = special.aimX !== 0 && special.aimZ !== 0 ? AIM_DIAGONAL : 1.0;
+    motion.vx = f32(f32(special.aimX * DEMONHUNTER_DIVE_SPEED) * scale);
+    motion.vz = f32(f32(special.aimZ * DEMONHUNTER_DIVE_SPEED) * scale);
+  } else {
+    motion.vx = f32(special.aimX * DEMONHUNTER_DIVE_CARRY);
+    motion.vz = 0.0;
+  }
 }
 
 
@@ -552,8 +579,8 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   if (owner.tuning.specials !== undefined && isHeroSpecialAction(owner.special.action)) return followUpHeroSpecial(owner, input);
   if (!input.specialPressed) return false;
   if (owner.tuning.specials !== undefined) return startHeroFighterSpecial(owner, input, world);
-  if (owner.character === Character.rifleman && owner.special.action === SpecialAction.riflemanRecovery) return secondRecoilShot(owner, input);
-  if (owner.character === Character.demonHunter && owner.special.action === SpecialAction.demonHunterFelRush) return felRushBranch(owner, input, false);
+  const branched = originalSpecialBranch(owner, input);
+  if (branched !== undefined) return branched;
   const requested = requestedSpecial(owner, input);
   if (!specialCanStart(owner, requested)) return false;
   observeActionDecision(SPECIAL_ACTION_BIT);
@@ -567,6 +594,15 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   }
   else owner.facing = facing;
   return started;
+}
+
+function originalSpecialBranch(owner: Fighter, input: Readonly<Controls>): boolean | undefined {
+  const { action } = owner.special;
+  if (owner.character === Character.rifleman && action === SpecialAction.riflemanRecovery) return secondRecoilShot(owner, input);
+  if (owner.character !== Character.demonHunter) return undefined;
+  if (action === SpecialAction.demonHunterFelRush) return felRushBranch(owner, input, false);
+  if (action === SpecialAction.demonHunterWingAscent) return wingDive(owner, input);
+  return undefined;
 }
 
 function startOriginalSpecial(owner: Fighter, stage: number, matchFrame: number, requested: SpecialAction, moveX: number): boolean {
@@ -628,7 +664,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
       owner.status.invincible = max(owner.status.invincible, 2);
     }
   }
-  if (special.action === SpecialAction.demonHunterWingAscent && special.form !== 0) glide(owner, input);
+  if (special.action === SpecialAction.demonHunterWingAscent && special.form !== 0) advanceWingDive(owner);
   if (special.action === SpecialAction.demonHunterFelRush) advanceFelRush(owner);
   if (special.action === SpecialAction.demonHunterImmolate) stallImmolate(owner);
   if (special.action === SpecialAction.demonHunterWingAscent && special.form === 0 && special.frame === DEMONHUNTER_WING_STARTUP) {
@@ -676,22 +712,24 @@ export const immolationRegion = (grounded: boolean, ex = false): Readonly<HitReg
 
 
 
-const GLIDE_SLASH: Readonly<HitRegion> = {
-  minX: 0.0, maxX: 120.0, minZ: -20.0, maxZ: 110.0,
-  effect: { damage: 8.0, growth: 100.0, base: 24.0, launchX: 0.7071067690849304, launchZ: 0.7071067690849304, electric: false, manaDrain: 5 },
+const WING_DIVE: Readonly<HitRegion> = {
+  minX: -50.0, maxX: 70.0, minZ: -40.0, maxZ: 110.0,
+  effect: { damage: 9.0, growth: 95.0, base: 26.0, launchX: 0.6427876353263855, launchZ: 0.7660444378852844, electric: false, element: HitElement.fire, manaDrain: 5 },
   window: 1,
 };
 
-export const glideSlashRegion = (): Readonly<HitRegion> => GLIDE_SLASH;
+
+export function wingDiveRegion(form: number, frame: number): Readonly<HitRegion> {
+  return form === DEMONHUNTER_DIVE_FORM && frame < DEMONHUNTER_DIVE_FRAMES ? WING_DIVE : NO_HIT_REGION;
+}
 
 
-function glideSlashContact(owner: Fighter, targetSlot: number, target: Fighter): Readonly<HitRegion> {
-  const { special } = owner;
-  if (special.frame < DEMONHUNTER_GLIDE_SLASH_FIRST || special.frame > DEMONHUNTER_GLIDE_SLASH_LAST) return NO_HIT_REGION;
-  if (specialAlreadyHit(owner, targetSlot) || target.status.out || isIntangible(target)) return NO_HIT_REGION;
+function wingDiveContact(owner: Fighter, targetSlot: number, target: Fighter): Readonly<HitRegion> {
+  const region = wingDiveRegion(owner.special.form, owner.special.frame);
+  if (region.window <= 0 || specialAlreadyHit(owner, targetSlot) || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const localX = f32(f32(target.motion.x - owner.motion.x) * owner.facing);
   const localZ = f32(target.motion.z - owner.motion.z);
-  return localX >= GLIDE_SLASH.minX && localX <= GLIDE_SLASH.maxX && localZ >= GLIDE_SLASH.minZ && localZ <= GLIDE_SLASH.maxZ ? GLIDE_SLASH : NO_HIT_REGION;
+  return localX >= region.minX && localX <= region.maxX && localZ >= region.minZ && localZ <= region.maxZ ? region : NO_HIT_REGION;
 }
 
 
@@ -753,7 +791,7 @@ function demonHunterSpecialContact(owner: Fighter, targetSlot: number, target: F
   const { special } = owner;
   if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterManaBurn && special.form === EYE_BLAST_FORM) return eyeBlastContact(owner, targetSlot, target);
   if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterFelRush) return felRushContact(owner, targetSlot, target);
-  if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterWingAscent && special.form === DEMONHUNTER_GLIDE_SLASH_FORM) return glideSlashContact(owner, targetSlot, target);
+  if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterWingAscent && special.form === DEMONHUNTER_DIVE_FORM) return wingDiveContact(owner, targetSlot, target);
   if (owner.character !== Character.demonHunter || special.action !== SpecialAction.demonHunterImmolate) return NO_HIT_REGION;
   if (specialAlreadyHit(owner, targetSlot) || special.frame < DEMONHUNTER_IMMOLATE_STARTUP) return NO_HIT_REGION;
   if (special.frame >= DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE || target.status.out || isIntangible(target)) return NO_HIT_REGION;

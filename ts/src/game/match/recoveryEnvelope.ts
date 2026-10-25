@@ -233,7 +233,7 @@ function route(character: Character, mana: number, hold: (frame: number) => numb
 export function upSpecialRoute(character: Character, mana: number): UpSpecialRoute {
   const rise = route(character, mana, () => UP).rise;
   let reach = 0.0;
-  for (const plan of [() => AWAY | UP, () => AWAY, (frame: number) => frame === 20 ? AWAY | JUMP : AWAY]) {
+  for (const plan of [() => AWAY | UP, () => AWAY, (frame: number) => frame === 20 ? AWAY | SPECIAL : AWAY, (frame: number) => frame === 20 ? AWAY | UP | SPECIAL : AWAY]) {
     const across = route(character, mana, plan).reach;
     if (across > reach) reach = across;
   }

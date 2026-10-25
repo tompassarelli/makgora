@@ -597,9 +597,6 @@
    "original.source.specials.ts.0.CHAOS_STRIKE_FRAMES": 30,
    "original.source.specials.ts.0.CHAOS_STRIKE_LANDING_LAG": 12,
    "original.source.specials.ts.0.DEMONHUNTER_WING_STARTUP": 3,
-   "original.source.specials.ts.0.DEMONHUNTER_GLIDE_FRAMES": 90,
-   "original.source.specials.ts.0.DEMONHUNTER_GLIDE_SLASH_FRAMES": 20,
-   "original.source.specials.ts.0.DEMONHUNTER_GLIDE_LANDING_LAG": 10,
    "original.source.specials.ts.0.DEMONHUNTER_IMMOLATE_STARTUP": 4,
    "original.source.specials.ts.0.DEMONHUNTER_IMMOLATE_ACTIVE": 4,
    "original.source.specials.ts.0.FLAME_CRASH_FRAMES": 34,
@@ -724,7 +721,6 @@
    "original.source.exSpecials.ts.0.EX_ARMOR_DAMAGE": 8,
    "original.source.exSpecials.ts.0.EX_ARMOR_FRAMES": 6,
    "original.specials.CHAOS_STRIKE_FRAMES": 30,
-   "original.specials.DEMONHUNTER_GLIDE_FRAMES": 90,
    "original.specials.DEMONHUNTER_IMMOLATE_ACTIVE": 4,
    "original.specials.DEMONHUNTER_IMMOLATE_STARTUP": 4,
    "original.specials.DEMONHUNTER_MANA_BURN_RECOVERY": 30,
@@ -767,7 +763,12 @@
    "authored.moves.throws.3.effect.growth": 70,
    "authored.moves.throws.3.effect.base": 45,
    "authored.moves.throws.3.effect.launchX": 0.5,
-   "authored.moves.throws.3.effect.launchZ": 0.8660253882408142
+   "authored.moves.throws.3.effect.launchZ": 0.8660253882408142,
+   "original.source.specials.ts.0.DEMONHUNTER_BACKFLIP_FRAMES": 6,
+   "original.source.specials.ts.0.DEMONHUNTER_DIVE_FRAMES": 13,
+   "original.source.specials.ts.0.DEMONHUNTER_DIVE_LANDING_LAG": 10,
+   "original.specials.DEMONHUNTER_BACKFLIP_FRAMES": 6,
+   "original.specials.DEMONHUNTER_DIVE_FRAMES": 13
   },
   "play": "{\"range\":{\"near\":220,\"far\":520},\"spacing\":[{\"move\":30,\"near\":200,\"far\":700},{\"move\":31,\"near\":120,\"far\":450},{\"move\":33,\"near\":60,\"far\":260},{\"move\":8,\"near\":0,\"far\":150}],\"approach\":[{\"via\":\"shoot\",\"moves\":[30,31,33,8],\"weight\":3},{\"via\":\"jump\",\"moves\":[13,16]}],\"defense\":[\"shield\",\"shield\",\"spotDodge\",\"jump\"],\"combos\":[{\"starter\":8,\"followUps\":[13,7,8]},{\"starter\":33,\"followUps\":[4,2]},{\"starter\":31,\"followUps\":[30,4]}],\"kills\":[{\"move\":4,\"fromPercent\":80},{\"move\":2,\"fromPercent\":95},{\"move\":32,\"fromPercent\":100}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"close\"]}",
   "feel": {
@@ -1155,9 +1156,6 @@
    "original.source.specials.ts.0.CHAOS_STRIKE_FRAMES": 30,
    "original.source.specials.ts.0.CHAOS_STRIKE_LANDING_LAG": 12,
    "original.source.specials.ts.0.DEMONHUNTER_WING_STARTUP": 3,
-   "original.source.specials.ts.0.DEMONHUNTER_GLIDE_FRAMES": 90,
-   "original.source.specials.ts.0.DEMONHUNTER_GLIDE_SLASH_FRAMES": 20,
-   "original.source.specials.ts.0.DEMONHUNTER_GLIDE_LANDING_LAG": 10,
    "original.source.specials.ts.0.DEMONHUNTER_IMMOLATE_STARTUP": 4,
    "original.source.specials.ts.0.DEMONHUNTER_IMMOLATE_ACTIVE": 4,
    "original.source.specials.ts.0.FLAME_CRASH_FRAMES": 34,
@@ -1282,7 +1280,6 @@
    "original.source.exSpecials.ts.0.EX_ARMOR_DAMAGE": 8,
    "original.source.exSpecials.ts.0.EX_ARMOR_FRAMES": 6,
    "original.specials.CHAOS_STRIKE_FRAMES": 30,
-   "original.specials.DEMONHUNTER_GLIDE_FRAMES": 90,
    "original.specials.DEMONHUNTER_IMMOLATE_ACTIVE": 4,
    "original.specials.DEMONHUNTER_IMMOLATE_STARTUP": 4,
    "original.specials.DEMONHUNTER_MANA_BURN_RECOVERY": 30,
@@ -1318,7 +1315,12 @@
    "original.moves.RIFLEMAN_BLASTER_GROUND_FRAMES": 38,
    "original.moves.RIFLEMAN_BLASTER_GROUND_SHOT_FRAME": 9,
    "original.moves.RIFLEMAN_BLASTER_LANDING_LAG": 8,
-   "original.moves.SMASH_MAX_CHARGE_FRAMES": 60
+   "original.moves.SMASH_MAX_CHARGE_FRAMES": 60,
+   "original.source.specials.ts.0.DEMONHUNTER_BACKFLIP_FRAMES": 6,
+   "original.source.specials.ts.0.DEMONHUNTER_DIVE_FRAMES": 13,
+   "original.source.specials.ts.0.DEMONHUNTER_DIVE_LANDING_LAG": 10,
+   "original.specials.DEMONHUNTER_BACKFLIP_FRAMES": 6,
+   "original.specials.DEMONHUNTER_DIVE_FRAMES": 13
   },
   "play": "{\"range\":{\"near\":110,\"far\":200},\"spacing\":[{\"move\":13,\"near\":90,\"far\":195},{\"move\":4,\"near\":120,\"far\":215},{\"move\":6,\"near\":60,\"far\":155}],\"approach\":[{\"via\":\"jump\",\"moves\":[13,14,12],\"weight\":3},{\"via\":\"run\",\"moves\":[19,4,5],\"weight\":1}],\"defense\":[\"jump\",\"jump\",\"shield\",\"shield\",\"spotDodge\"],\"combos\":[{\"starter\":7,\"followUps\":[15,13]},{\"starter\":8,\"followUps\":[13,12,19]},{\"starter\":42,\"followUps\":[15]},{\"starter\":15,\"followUps\":[15]}],\"kills\":[{\"move\":4,\"fromPercent\":90},{\"move\":14,\"fromPercent\":110},{\"move\":2,\"fromPercent\":100}],\"recovery\":{\"aim\":\"mixed\",\"upSpecial\":\"mixed\"},\"avoid\":[\"close\",\"far\"]}",
   "feel": {
@@ -1447,9 +1449,9 @@
     "advantage": -18,
     "killPercent": 139
    },
-   "special.glide": {
-    "advantage": -11,
-    "killPercent": 119
+   "special.dive": {
+    "advantage": -7,
+    "killPercent": 116
    }
   }
  },

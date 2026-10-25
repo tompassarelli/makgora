@@ -44,7 +44,7 @@ import { GroundOption } from "./stickZones";
 import { heroMotionHolds, heroMotionPassesPlatforms, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
-import { demonHunterGliding, demonHunterJumpOrGlideCancel } from "./specials";
+import { demonHunterAuthoredMotion, demonHunterJumpOrAttackBranch } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
@@ -509,7 +509,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (launch.hitlag <= 0) launch.hitstun = max(0, launch.hitstun - 1);
   if (launch.hitstun === 0) launch.throwHitstun = false;
   const squatBeforeInput = jump.squat;
-  if (input.jumpPressed || input.attackPressed) demonHunterJumpOrGlideCancel(f, input);
+  if (input.jumpPressed || input.attackPressed) demonHunterJumpOrAttackBranch(f, input);
   if (input.jumpPressed) jumpCancelHeroSpecial(f, input);
 
   const wet = sea.wet(f, stage);
@@ -565,7 +565,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   }
   let dashEntryDisplacementAdjustment = 0.0;
 
-  const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterGliding(f);
+  const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
   const canSteer = !authoredMotion && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
     && (!motion.grounded || attack.cooldown <= 0) && f.surfaceRecovery.state !== SurfaceContact.techWall;

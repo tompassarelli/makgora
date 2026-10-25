@@ -6,7 +6,7 @@ import { runningHeroSpecial } from "../sim/specials/engine";
 import { forsakenPaladinSwordAttack } from "../sim/heroes/forsakenPaladinSword";
 import { type Cue, type CueBirth } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
-import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTER_GLIDE_SLASH_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, immolationRegion, glideSlashRegion } from "../sim/specials";
+import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, immolationRegion, wingDiveRegion } from "../sim/specials";
 
 
 const NEUTRAL_FLARE: Cue = { model: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx", anchor: "body", scale: 0.5, sequence: "stand", seconds: f32(0.3), timeScale: 0.0 };
@@ -62,7 +62,7 @@ export function specialAreaRegion(fighter: Readonly<Fighter>, index: number): Re
   if (index > 0 || fighter.character !== Character.demonHunter) return NO_HIT_REGION;
   const { action, form, frame } = fighter.special;
   if (action === SpecialAction.demonHunterFelRush) return felRushRegion(form, frame);
-  if (action === SpecialAction.demonHunterWingAscent && form === DEMONHUNTER_GLIDE_SLASH_FORM && frame >= DEMONHUNTER_GLIDE_SLASH_FIRST && frame <= DEMONHUNTER_GLIDE_SLASH_LAST) return glideSlashRegion();
+  if (action === SpecialAction.demonHunterWingAscent) return wingDiveRegion(form, frame);
   if (action !== SpecialAction.demonHunterImmolate) return NO_HIT_REGION;
   return frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE ? immolationRegion(fighter.motion.grounded) : NO_HIT_REGION;
 }

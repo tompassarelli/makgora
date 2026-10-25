@@ -306,7 +306,7 @@ resume acknowledgments retained (#206, wisp#86).
   speak (see below).
 
 A press that never landed natively fails all three. Fighter lines include
-each damage change and each change of a special's form (a glide, a Chaos
+each damage change and each change of a special's form (a Wing Dive, a Chaos
 Strike, a swap), so a hit or a follow-up shows on its frame. A native run
 is invalid, neither pass nor fail, when a client wrote a desync report or
 crash during it, or when the match reached its results early. The native

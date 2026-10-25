@@ -9,7 +9,7 @@ const PROJECTILE_SPEED_MAX = 30;
 
 function routeControl(character: Character): string {
   if (character === Character.rifleman) return "aimed (8-way, 4 frames), second shot re-aims";
-  if (character === Character.demonHunter) return "guided, glide branch";
+  if (character === Character.demonHunter) return "guided, aimed dive branch (8-way)";
   const specials = heroDefinition(character)?.specials;
   if (specials === undefined) return "fixed";
   const move = specialForm(specialKit(specials, SpecialSlot.up), SpecialForm.air);

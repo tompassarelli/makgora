@@ -114,7 +114,7 @@ export function currentFeel(character: Character): FeelValues {
         out[`special.chaos.${ex}`] = sample(chaos.effect, specials.CHAOS_STRIKE_FRAMES - specials.CHAOS_STRIKE_FIRST, false);
         for (const grounded of [false,true]) out[`special.immolate.${grounded}.${ex}`] = sample(specials.immolationRegion(grounded, ex).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
       }
-      out["special.glide"] = sample(specials.glideSlashRegion().effect, number("DEMONHUNTER_GLIDE_SLASH_FRAMES") - specials.DEMONHUNTER_GLIDE_SLASH_FIRST, false);
+      out["special.dive"] = sample(specials.wingDiveRegion(specials.DEMONHUNTER_DIVE_FORM, 0).effect, specials.DEMONHUNTER_DIVE_FRAMES, false);
     }
   }
   return out;

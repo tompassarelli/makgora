@@ -2263,7 +2263,7 @@ aim launches upward. An up special spends the aerial jump and ends helpless.
 [spec #252] With empty mana, an up special reaches at least 240 units on each
 axis, and the full recovery envelope reaches at least 500 units deep and 640
 units out. Original fighters spend no mana. The up-special bands describe the
-best route, including Illidan's glide jump; every aim need not reach both limits.
+best route, including Illidan's Wing Dive; every aim need not reach both limits.
 
 An envelope measures recovery from rest with one aerial jump, combining the
 jump, air dodge, side special and up special through 21 timing/aim plans. Its
@@ -2318,7 +2318,7 @@ The branch's up-special and empty-mana measurements are kept there too.
 `GAME_TESTS=upSpecialRecovery bun test test/game.test.ts` measures each
 selectable fighter's up-special route from (700, 300), facing away from the
 stage with jumps spent: vertical holds up; horizontal takes the best of level,
-diagonal-up and a glide jump at frame 20 while within 10 units below the start.
+diagonal-up and a Wing Dive pressed at frame 20, level or diagonal-up, while within 10 units below the start.
 The same tests check charged angles and guided steering through keyboard and
 controller input. `GAME_TESTS=edgeRecovery bun test test/game.test.ts` checks
 wall rides, Blink lip outcomes and descending up-special catches. The farm
@@ -2381,7 +2381,7 @@ Expert field.
 | Fighter | Up special | Startup | Intangible | Top speed | Rise / reach | Route control | Opening | Beaten by | Mixed returns |
 |---|---|---:|---:|---:|---:|---|---:|---|---:|
 | Rifleman | Recoil Shot | 4 | 8 | 34 | 523 / 870 | aimed (8-way, 4 frames), second shot re-aims | 31 | read down air (offstage launch, KO at 40%), reaction aerial | 208/208 |
-| Illidan | Wing Ascent | 1 | 4 | 29 | 435 / 864 | guided, glide branch | 49 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 182/208 |
+| Illidan | Wing Ascent | 1 | 4 | 29 | 435 / 591 | guided, aimed dive branch (8-way) | 49 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 201/208 |
 | Blademaster | Rising Whirlwind | 9 | 0 | 55 | 540 / 544 | aimed (8-way, 8 frames) | 47 | read down air (spike, KO at 40%), reaction aerial | 208/208 |
 | Mountain King | Thunder Leap | 9 | 0 | 32 | 355 / 359 | aimed (8-way, 8 frames) | 41 | read down air (offstage launch, KO at 40%), reaction aerial | 207/208 |
 | Warden | Blink | 9 | 4 | 462 (teleport) | 461 / 465 | aimed (8-way, 8 frames) | 37 | read down air (spike, KO at 40%), reaction aerial | 205/208 |

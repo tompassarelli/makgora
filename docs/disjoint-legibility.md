@@ -36,7 +36,7 @@ The named Smash moves are visual references, not copied animation assets or shar
 | Beastmaster | Wild Axes (traveling spell), Summon Bear (traveling spell), Summon Quilbeast (traveling spell) | Melee Link forward smash |
 | Lich King | Ascension of the Damned, Howling Blast (traveling spell), Val'kyr Shadowguard (traveling spell), Defile (placed field / burst) | Ultimate Hero Flame Slash / Kacrackle Slash |
 | Rifleman | Blaster, recoil recovery shot, Summon Bear swipe, Freeze Trap | Melee Ness PK Fire; Ultimate Robin Arcfire |
-| Illidan | Mana Burn, Fel Rush / Chaos Strike, glide slash, Immolation on the ground and in the air | Ultimate Hero Kafrizz / Flame Slash; Melee Zelda Din’s Fire |
+| Illidan | Mana Burn, Fel Rush / Chaos Strike, Wing Dive, Immolation on the ground and in the air | Ultimate Hero Kafrizz / Flame Slash; Melee Zelda Din’s Fire |
 
 Spectral Ascent and Frost Armor have no damaging hitbox. Their body cues remain visible; Dark Ritual’s shatter is a separate active strike marked at its centre. Frost Nova’s traveling orb and recalled remote burst, and both Death and Decay strikes, retain their actual projectile centre on every live frame. Stationary spell art holds its visible pose rather than aging away before the active window.
 

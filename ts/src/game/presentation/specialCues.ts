@@ -19,7 +19,10 @@ import {
   CHAOS_STRIKE_FIRST,
   CHAOS_STRIKE_FORM,
   CHAOS_STRIKE_LAST,
-  DEMONHUNTER_GLIDE_SLASH_FORM,
+  DEMONHUNTER_BACKFLIP_FORM,
+  DEMONHUNTER_BACKFLIP_FRAMES,
+  DEMONHUNTER_DIVE_FORM,
+  DEMONHUNTER_DIVE_FRAMES,
   DEMONHUNTER_IMMOLATE_ACTIVE,
   DEMONHUNTER_IMMOLATE_STARTUP,
   DEMONHUNTER_MANA_BURN_STARTUP,
@@ -478,7 +481,8 @@ export const ORIGINAL_BRANCH_CUES: { readonly [action: number]: { readonly [form
   },
 
   [SpecialAction.demonHunterWingAscent]: {
-    [DEMONHUNTER_GLIDE_SLASH_FORM]: { cues: branch("Glide slash", FEL_TELL, cue("Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx", "ahead", f32(0.8))), first: 1, last: 1 },
+    [DEMONHUNTER_BACKFLIP_FORM]: { cues: branch("Backflip", FEL_TELL, timed(cue("Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx", "body", 1.0), "stand", 0.0)), first: 1, last: DEMONHUNTER_BACKFLIP_FRAMES },
+    [DEMONHUNTER_DIVE_FORM]: { cues: branch("Wing dive", FEL_TELL, cue(FEL_FLAMES, "body", f32(0.8))), first: 1, last: DEMONHUNTER_DIVE_FRAMES - 1 },
   },
   [SpecialAction.riflemanRecovery]: {
     [RIFLEMAN_SECOND_SHOT_FORM]: { cues: branch("Second recoil shot", cue("Abilities\\Spells\\Human\\FlakCannons\\FlakTarget.mdx", "feet", f32(0.8)), cue("Abilities\\Weapons\\SteamTank\\SteamTankImpact.mdx", "feet", f32(0.8))), first: RIFLEMAN_SECOND_SHOT_FIRST, last: RIFLEMAN_SECOND_SHOT_LAST },

@@ -151,7 +151,7 @@ function originalSpecialMeasures(character: Character): Readonly<Record<string, 
   }
   const rows: Record<string, Measures> = {
     [`special.projectile.${ProjectileKind.manaBurn}`]: specialMeasures(specials.DEMONHUNTER_MANA_BURN_STARTUP, specials.DEMONHUNTER_MANA_BURN_STARTUP, specials.DEMONHUNTER_MANA_BURN_STARTUP + specials.DEMONHUNTER_MANA_BURN_RECOVERY),
-    "special.glide": specialMeasures(specials.DEMONHUNTER_GLIDE_SLASH_FIRST, specials.DEMONHUNTER_GLIDE_SLASH_LAST, number("DEMONHUNTER_GLIDE_SLASH_FRAMES")),
+    "special.dive": specialMeasures(specials.DEMONHUNTER_BACKFLIP_FRAMES + 1, specials.DEMONHUNTER_BACKFLIP_FRAMES + specials.DEMONHUNTER_DIVE_FRAMES - 1, specials.DEMONHUNTER_BACKFLIP_FRAMES + specials.DEMONHUNTER_DIVE_FRAMES),
   };
   for (const ex of [false, true]) {
     rows[`special.rush.${ex}`] = specialMeasures(specials.FEL_RUSH_FIRST, specials.FEL_RUSH_LAST, specials.FEL_RUSH_FRAMES);

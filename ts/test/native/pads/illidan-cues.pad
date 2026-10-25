@@ -52,7 +52,7 @@
 701 a stick 0 0
 702 a capture
 704 a capture
-# Turn left, jump, Wing Ascent, glide on its 17th frame, wing slash.
+# Turn left, jump, Wing Ascent, a second special on its 17th frame backflips into a forward-down dive.
 800 a stick -0.5 0
 804 a stick 0 0
 840 a tap B 6
@@ -61,9 +61,9 @@
 848 a stick 0 0
 849 a capture
 851 a capture
-863 a tap B 2
+863 a tap X 2
 865 a capture
-871 a tap A 2
+871 a capture
 # Expected, frame by frame (headless run of this script): each special starts on its frame, and its cues and missiles show.
 #! expect a 60 special 9 form 0
 #! expect b 110 damage 5.000
@@ -78,7 +78,7 @@
 #! expect a 700 special 12 form 0
 #! expect a 847 special 11 form 0
 #! expect a 863 special-form 1 action 11
-#! expect a 871 special-form 2 action 11
+#! expect a 869 special-form 2 action 11
 #! scene a ManaBurnTarget
 #! scene a SpellBreakerAttack
 #! scene a DemonHunterMissile
@@ -89,7 +89,6 @@
 #! scene a ImmolationTarget
 # BreathOfFireMissile is gone: c888ba8f67 gave Flame Crash RedDragonMissile, and 80fce5213e replaced Flame Crash with the air Immolate the Immolation lines check (trace: run 39009305845).
 #! scene a ImmolationDamage
-#! scene a ImpaleHitTarget
 873 a capture
 1000 a press VIEW
 1070 a release VIEW

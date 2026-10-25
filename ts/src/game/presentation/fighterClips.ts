@@ -9,6 +9,7 @@ import { heroLook } from "../roster/looks";
 import { RIFLEMAN_GROUND, type GroundKit } from "../sim/heroes/groundNormals";
 import { STOCK_FALLBACK_CLIP, jabSlice, strikeClip } from "./model/look";
 import * as dh from "./demonHunterAssetInfo";
+import { DEMONHUNTER_BACKFLIP_FORM } from "../sim/specials";
 import * as assets from "./fighterAssetInfo";
 import { RECOVERY_CLIPS } from "./recoveryClipInfo";
 import { DRILL_CLIPS } from "./drillClipInfo";
@@ -322,6 +323,10 @@ const RIFLEMAN_TRAP = clip(assets.RIFLEMAN_SPECIAL_DOWN_INDEX, assets.RIFLEMAN_S
 const RIFLEMAN_RECOVERY = clip(assets.RIFLEMAN_SPECIAL_UP_INDEX, assets.RIFLEMAN_SPECIAL_UP_SECONDS);
 
 const byGrounding = (clips: GroundingClips, grounded: boolean): HeroClip => grounded ? clips.grounded : clips.air;
+
+const WING_BACKFLIP = clip(dh.DEMON_HUNTER_DOUBLE_JUMP_INDEX, dh.DEMON_HUNTER_DOUBLE_JUMP_SECONDS);
+
+export const illidanWingClip = (form: number): HeroClip => form === DEMONHUNTER_BACKFLIP_FORM ? WING_BACKFLIP : FEL_RUSH.air;
 
 
 
