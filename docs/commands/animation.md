@@ -231,7 +231,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/chen-clips.ts STOCK_CHEN.mdx PRIVATE_OUTPUT` authors
   Chen's staff, footwork, special, recovery, paired throw and nine pain clips
   from his private stock model and regenerates his clip table
-  (smashcraft:docs/design/chen.md).
+  (smashcraft:docs/design/chen.md). With `pain` and his shipped model it re-authors
+  only the nine pain clips in place and gates them with pain-gate.ts.
 
 - Damage reactions (from the repository root):
   `bun tools/animations/damage-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --fighter NAME...`
