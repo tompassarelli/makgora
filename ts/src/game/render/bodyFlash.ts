@@ -1,76 +1,38 @@
 import { HEAVY_SHEEN, HEAVY_SHEEN_ALPHA, heavySheen } from "../presentation/itemLook";
-import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels";
-import { ARENA_CAMERA, FLOOR_HEIGHT } from "../presentation/arenaCamera";
-import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
-import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import type { FighterPose } from "../presentation/fighterPose";
-import { characterModelScale } from "../presentation/modelScale";
 import { createWhiteGlowState, whiteGlowAlpha } from "../presentation/whiteGlow";
 import type { Character } from "../sim/codes";
-import { fighterPoseFacing } from "../sim/conditions";
-import { cosineTurns, sineTurns } from "../sim/mathTables";
-import { squareRoot } from "../sim/warcraftMath";
 import type { Fighter } from "../sim/fighter";
 import type { MatchCamera } from "../sim/matchCamera";
-import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { at } from "wisp/src/runtime/lookup";
+import type { WorldOrigin } from "./effects";
+import { PosedWhiteModel } from "./posedWhiteModel";
 
 const FLASH_LIFT = 8.0;
 
 export class BodyFlash {
-  private readonly model: effect;
+  private readonly model: PosedWhiteModel;
   private readonly state = createWhiteGlowState();
-  private readonly placement = { x: 0.0, z: 0.0 };
-  private shown = false;
 
-  constructor(private readonly character: Character, private readonly origin: WorldOrigin) {
-    this.model = AddSpecialEffect(WHITE_FIGHTER_MODELS[character] ?? "", origin.x, origin.y);
-    BlzSetSpecialEffectAnimationBlendTime(this.model, 0.0);
-    BlzSetSpecialEffectAnimation(this.model, "Stand");
-    BlzSetSpecialEffectTimeScale(this.model, 0.0);
-    hideEffect(this.model, origin);
+  constructor(character: Character, origin: WorldOrigin) {
+    this.model = new PosedWhiteModel(character, origin);
   }
 
   present(fighter: Readonly<Fighter> | undefined, pose: Readonly<FighterPose>, stage: number, frame: number, camera: Readonly<MatchCamera>): void {
     const glow = fighter === undefined ? 0 : whiteGlowAlpha(this.state, fighter, frame);
     const sheen = glow === 0 && fighter !== undefined && heavySheen(fighter);
     const alpha = sheen ? HEAVY_SHEEN_ALPHA : glow;
-    const index = pose.clipIndex ?? originalClipNamed(this.character, pose.clipName);
-    const clip = index === undefined ? undefined : originalClip(this.character, index);
-    if (fighter === undefined || alpha === 0 || index === undefined || clip === undefined) {
-      if (this.shown) hideEffect(this.model, this.origin);
-      this.shown = false;
+    if (fighter === undefined || alpha === 0 || !this.model.pose(fighter, pose, stage, camera, FLASH_LIFT, 1.0, 0.0)) {
+      this.model.hide();
       return;
     }
-    fitFighterPlacement(this.placement, fighter, stage);
-    let seconds = Math.max(0.0, pose.clipTime);
-    const duration = clip.endSeconds - clip.startSeconds;
-    if (duration <= 0.0) seconds = 0.0;
-    else if (clip.looping) seconds -= I2R(R2I(seconds / duration)) * duration;
-    else seconds = Math.min(seconds, duration);
-    BlzSetSpecialEffectTime(this.model, clip.startSeconds + seconds);
-    BlzSetSpecialEffectYaw(this.model, facingYaw(fighterPoseFacing(fighter)));
-    const x = this.origin.x + this.placement.x, y = this.origin.y, z = this.origin.z + this.placement.z;
-    const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
-    const distance = camera.distance;
-    const towardX = this.origin.x + camera.x - cosineTurns(yaw) * cosineTurns(pitch) * distance - x;
-    const towardY = this.origin.y - sineTurns(yaw) * cosineTurns(pitch) * distance - y;
-    const towardZ = FLOOR_HEIGHT + camera.z - sineTurns(pitch) * distance - z;
-    const length = squareRoot(towardX * towardX + towardY * towardY + towardZ * towardZ);
-    const lift = length > FLASH_LIFT * 2.0 ? FLASH_LIFT / length : 0.0;
-    placeEffect(this.model, x + towardX * lift, y + towardY * lift, z + towardZ * lift);
-    BlzSetSpecialEffectScale(this.model, characterModelScale(fighter.character) * (1.0 - lift));
-    BlzSetSpecialEffectAlpha(this.model, alpha);
-    BlzSetSpecialEffectColor(this.model, sheen ? HEAVY_SHEEN.red : 255, sheen ? HEAVY_SHEEN.green : 255, sheen ? HEAVY_SHEEN.blue : 255);
-    this.shown = true;
+    this.model.tint(alpha, sheen ? HEAVY_SHEEN.red : 255, sheen ? HEAVY_SHEEN.green : 255, sheen ? HEAVY_SHEEN.blue : 255);
   }
 
   drawnEffects(into: effect[]): void {
-    into.push(this.model);
+    this.model.drawnEffects(into);
   }
 
   destroy(): void {
-    hideEffect(this.model, this.origin);
-    DestroyEffect(this.model);
+    this.model.destroy();
   }
 }

@@ -40,6 +40,7 @@ import { ItemPresentation } from "../../game/render/itemPresentation";
 import { MeterDropPresentation } from "../../game/render/meterDropPresentation";
 import { CandlePresentation } from "../../game/render/candlePresentation";
 import { BodyFlash } from "../../game/render/bodyFlash";
+import { MeterGlow } from "../../game/render/meterGlow";
 import { ClassicPresentation } from "../../game/render/classicPresentation";
 import { PauseMenu } from "../../game/ui/pauseMenu";
 
@@ -54,6 +55,7 @@ interface FighterRenderers {
   readonly pool: FighterPoolPresentation | undefined;
   readonly agency: AgencyMarker;
   readonly flash: BodyFlash;
+  readonly glow: MeterGlow;
   readonly candle: CandlePresentation | undefined;
 
   readonly hitAreas: HitAreaPresentation | undefined;
@@ -157,6 +159,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.pool?.destroy();
   renderers?.agency.destroy();
   renderers?.flash.destroy();
+  renderers?.glow.destroy();
   renderers?.candle?.destroy();
   renderers?.hitAreas?.destroy();
 }
@@ -186,7 +189,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin) : undefined;
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin),
     candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
   };
@@ -287,6 +290,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     if (renderers.pool !== undefined) bindPrototype(renderers.pool, FighterPoolPresentation.prototype);
     bindPrototype(renderers.agency, AgencyMarker.prototype);
     bindPrototype(renderers.flash, BodyFlash.prototype);
+    bindPrototype(renderers.glow, MeterGlow.prototype);
     if (renderers.candle !== undefined) bindPrototype(renderers.candle, CandlePresentation.prototype);
     bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
     if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);

@@ -448,8 +448,10 @@ export function renderPersistentPresentation(s: ShellState): void {
       else renderers.pool.hide();
     }
     const live = playing ? fighter : undefined;
-    renderers?.flash.present(ui.match.posing === slot ? undefined : live, runtime.poses[slot], stage, runtime.simulationFrame, game.camera);
-    renderers?.candle?.present(ui.match.posing === slot ? undefined : live, stage, runtime.simulationFrame);
+    const posed = ui.match.posing === slot ? undefined : live;
+    renderers?.flash.present(posed, runtime.poses[slot], stage, runtime.simulationFrame, game.camera);
+    renderers?.glow.present(posed, runtime.poses[slot], stage, runtime.simulationFrame, game.camera, game.ultimatesOff);
+    renderers?.candle?.present(posed, stage, runtime.simulationFrame);
     if (renderers !== undefined) renderers.agency.present(live, live === undefined ? "act" : agencyMarks[slot]);
     ui.special.presentStatic(runtime.specials, live, slot);
     ui.special.presentSummons(runtime.summons, live, slot);
@@ -462,7 +464,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.shield.present(fighter, playing);
     renderers?.projectiles.present(fighter, playing, s.session.paused);
     renderers?.cues?.present(fighter, playing, s.session.paused);
-    renderers?.meter?.present(runtime.simulationFrame, fighter, playing, game.ultimatesOff, presentedCueTrace(s, slot, runtime.simulationFrame));
+    renderers?.meter?.present(runtime.simulationFrame, fighter, playing, presentedCueTrace(s, slot, runtime.simulationFrame));
     renderers?.hitAreas?.present(live);
   }
   const capture = s.dev.shieldEnergyCapture;

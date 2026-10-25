@@ -18,6 +18,7 @@ function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   if (renderers === undefined) return drawn;
   renderers.pool?.drawnEffects(drawn);
   renderers.flash.drawnEffects(drawn);
+  renderers.glow.drawnEffects(drawn);
   renderers.agency.drawnEffects(drawn);
   renderers.shield.drawnEffects(drawn);
   renderers.candle?.drawnEffects(drawn);
