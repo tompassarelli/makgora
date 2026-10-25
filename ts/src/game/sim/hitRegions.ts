@@ -107,18 +107,16 @@ function region(
 const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = {
   [AttackStyle.jab]: region(0.0, 92.0, -55.0, 105.0, 5.0, 100.0, 18.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.jab2]: region(0.0, 96.0, -50.0, 100.0, 4.0, 30.0, 22.0, 0.3420201539993286, 0.9396926164627075),
-  [AttackStyle.jab3]: region(0.0, 110.0, -50.0, 110.0, 6.0, 95.0, 22.0, 0.7660444378852844, 0.6427876353263855),
-  [AttackStyle.upSmash]: region(-105.0, 105.0, -30.0, 195.0, 15.0, 94.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
-  [AttackStyle.downSmash]: region(-105.0, 105.0, -195.0, 45.0, 15.0, 100.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
+  [AttackStyle.upSmash]: { ...region(-21.0, 31.0, 74.0, 196.0, 15.0, 94.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 5.0, z1: 100.0, x2: 5.0, z2: 170.0, radius: 26.0 } },
   [AttackStyle.forwardSmash]: region(25.0, 120.0, -75.0, 105.0, 10.0, 85.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
 
-  [AttackStyle.demonHunterDashAttack]: region(0.0, 150.0, -70.0, 115.0, 9.0, 95.0, 20.0, 0.5, 0.8660253882408142),
+  [AttackStyle.demonHunterDashAttack]: { ...region(37.0, 78.0, 37.0, 158.0, 9.0, 95.0, 20.0, 0.5, 0.8660253882408142), strike: { x1: 55.0, z1: 55.0, x2: 60.0, z2: 140.0, radius: 18.0 } },
 
   [AttackStyle.forwardTilt]: region(0.0, 135.0, -80.0, 95.0, 8.0, 80.0, 20.0, 0.9063078165054321, 0.4226182699203491),
-  [AttackStyle.upTilt]: region(0.0, 125.0, -30.0, 185.0, 8.0, 105.0, 18.0, 0.25, 0.968245804309845),
-  [AttackStyle.downTilt]: region(-115.0, 115.0, -145.0, 40.0, 7.0, 90.0, 16.0, DIAGONAL_UNIT, 0.30000001192092896),
-  [AttackStyle.forwardTiltUp]: region(0.0, 135.0, -30.0, 145.0, 8.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394),
-  [AttackStyle.forwardTiltDown]: region(0.0, 135.0, -145.0, 5.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394),
+  [AttackStyle.upTilt]: { ...region(-22.0, 42.0, 98.0, 187.0, 8.0, 105.0, 18.0, 0.25, 0.968245804309845), strike: { x1: 0.0, z1: 120.0, x2: 20.0, z2: 165.0, radius: 22.0 } },
+  [AttackStyle.downTilt]: { ...region(-97.0, 132.0, -2.0, 52.0, 7.0, 90.0, 16.0, DIAGONAL_UNIT, 0.30000001192092896), strike: { x1: -75.0, z1: 30.0, x2: 110.0, z2: 20.0, radius: 22.0 } },
+  [AttackStyle.forwardTiltUp]: { ...region(11.0, 92.0, 91.0, 194.0, 8.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394), strike: { x1: 25.0, z1: 105.0, x2: 78.0, z2: 180.0, radius: 14.0 } },
+  [AttackStyle.forwardTiltDown]: { ...region(19.0, 134.0, -11.0, 78.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394), strike: { x1: 35.0, z1: 62.0, x2: 118.0, z2: 5.0, radius: 16.0 } },
   [AttackStyle.neutralAir]: region(-115.0, 115.0, -45.0, 100.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.forwardAir]: region(0.0, 175.0, -55.0, 115.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787),
   [AttackStyle.backAir]: { ...region(-99.0, 4.0, 76.0, 114.0, 6.0, 85.0, 18.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: -85.0, z1: 100.0, x2: -10.0, z2: 90.0, radius: 14.0 } },
@@ -134,9 +132,14 @@ const FORWARD_AIR_LINK = { ...region(-4.0, 94.0, 66.0, 94.0, 2.0, 10.0, 30.0, -0
 const FORWARD_AIR_LAUNCH = { ...region(-9.0, 84.0, 61.0, 89.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2), strike: { x1: 5.0, z1: 75.0, x2: 70.0, z2: 75.0, radius: 14.0 } };
 const NEUTRAL_AIR_CLEAN = { ...DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION, effect: strongHit((DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION).effect) };
 const NEUTRAL_AIR_LATE = { ...NEUTRAL_AIR_CLEAN, effect: weakHit(NEUTRAL_AIR_CLEAN.effect) };
-const AZZINOTH_GLAIVES = { ...region(-190.0, 190.0, -60.0, 60.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524), effect: downSmashHit(region(-190.0, 190.0, -60.0, 60.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524).effect) };
+const AZZINOTH_STRIKE = { x1: -80.0, z1: 45.0, x2: 105.0, z2: 40.0, radius: 30.0 };
+const AZZINOTH_GLAIVES = { ...region(-110.0, 135.0, 10.0, 75.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524), effect: downSmashHit(region(-110.0, 135.0, 10.0, 75.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524).effect), strike: AZZINOTH_STRIKE };
 
-const AZZINOTH_FLAMES = { ...region(-190.0, 190.0, -30.0, 170.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495), effect: downSmashHit(region(-190.0, 190.0, -30.0, 170.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495).effect) };
+const AZZINOTH_FLAMES = { ...region(-110.0, 135.0, 10.0, 75.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495), effect: downSmashHit(region(-110.0, 135.0, 10.0, 75.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495).effect), strike: AZZINOTH_STRIKE };
+const JAB3_EFFECT = region(0.0, 0.0, 0.0, 0.0, 6.0, 95.0, 22.0, 0.7660444378852844, 0.6427876353263855);
+const JAB3_RISE = { ...JAB3_EFFECT, minX: 39.0, maxX: 126.0, minZ: 29.0, maxZ: 126.0, strike: { x1: 55.0, z1: 45.0, x2: 110.0, z2: 110.0, radius: 16.0 } };
+const JAB3_CREST = { ...JAB3_EFFECT, minX: -16.0, maxX: 96.0, minZ: 119.0, maxZ: 176.0, strike: { x1: 0.0, z1: 160.0, x2: 80.0, z2: 135.0, radius: 16.0 } };
+const JAB3_OVERHEAD = { ...JAB3_EFFECT, minX: -42.0, maxX: -8.0, minZ: 86.0, maxZ: 204.0, strike: { x1: -28.0, z1: 100.0, x2: -22.0, z2: 190.0, radius: 14.0 } };
 
 
 
@@ -146,6 +149,8 @@ function demonHunterRegion(style: AttackStyle, activeFrame: number): Readonly<Hi
       return activeFrame <= 1 ? FORWARD_AIR_LINK : activeFrame >= 4 ? FORWARD_AIR_LAUNCH : NO_HIT_REGION;
     case AttackStyle.downSmash:
       return activeFrame <= 2 ? AZZINOTH_GLAIVES : AZZINOTH_FLAMES;
+    case AttackStyle.jab3:
+      return activeFrame <= 0 ? JAB3_RISE : activeFrame === 1 ? JAB3_CREST : JAB3_OVERHEAD;
     case AttackStyle.neutralAir:
       return activeFrame < DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES ? NEUTRAL_AIR_CLEAN : NEUTRAL_AIR_LATE;
     default:

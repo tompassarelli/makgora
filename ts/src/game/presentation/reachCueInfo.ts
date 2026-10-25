@@ -3,7 +3,7 @@ import type { AttackStyle } from "../sim/codes";
 
 export const REACH_CUE_NORMALS: { readonly [character: number]: readonly AttackStyle[] | undefined } = {
   1: [2, 6, 7, 8, 9, 10, 11, 17, 19],
-  2: [2, 3, 7, 9, 10, 11, 17, 18],
+  2: [11, 17],
   3: [4, 9, 11],
   4: [0, 2, 3, 4, 7, 8, 9, 11, 17],
   5: [3, 11],

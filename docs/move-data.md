@@ -194,4 +194,30 @@ models, no disjoint cited). Cairne's down air belongs to #96.
 | medivh | 12 (0.09) back | -4 (-0.03) front | -1 (-0.01) back | 19 (0.15) up | -1 (-0.01) down |
 | kobold | -10 (-0.08) back | 2 (0.02) front | -1 (-0.01) back | 2 (0.01) up | 10 (0.08) down |
 
+## Illidan's ground reach
+
+Illidan's ground normals measured on every active frame on 25 October 2026
+(#280), facing right: the drawn Classic model (body and both glaives,
+skinned at the clip time the fighter pool shows) is projected onto the stage
+plane on that frame, and each hit capsule's furthest reach past that frame's
+drawn box is listed in world units, then as a share of the drawn reach on
+that side (front and back from his centre line, up and down from 66 units
+above his feet). Moves past 25% were refitted onto the glaives the clip
+draws; the rest kept their regions.
+
+| Move | Before | After |
+| --- | --- | --- |
+| jab | -12 (-14%) front | unchanged |
+| jab 2 | -20 (-22%) front | unchanged |
+| jab 3 | 26 (44%) front | 12 (14%) front, one capsule a frame along the rising glaive |
+| forward tilt | -29 (-21%) front | unchanged |
+| forward tilt up | 23 (26%) front | 4 (4%) front |
+| forward tilt down | 89 (125%) down | 5 (7%) down |
+| up tilt | 86 (217%) front | 3 (6%) front |
+| down tilt | 19 (26%) down | 0 (0%) back |
+| forward smash | 12 (14%) front | unchanged |
+| up smash | 58 (124%) front | 1 (1%) up |
+| down smash | 81 (74%) back | 1 (1%) back, the capsule axis within 18 of a drawn glaive on every active frame |
+| dash attack | 45 (55%) front | 5 (6%) up |
+
 Before #222, Illidan's and Rifleman's down airs used the shared vertical down-air capsule and reached 215 (1.63) and 187 (1.42) below the drawn feet; both now sit on the driven leg.

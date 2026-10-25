@@ -224,11 +224,15 @@ shared system with its own owner decisions, #102).
 In Black Temple he throws both Warglaives into the floor and each becomes a
 Flame of Azzinoth. Startup 8 and total 42 as before; active frames 3 → 9:
 
-- Frames 1–3 of the active window: the glaives strike both sides out to
-  190 (was 105), 14% at 75°, base 22, growth 95, drain 8.
-- Frames 4–9: fel fire fills the space between the glaives, ±190 and up to
-  170 high: 3% at 85°, base 30, growth 20, drain 2. Glaives and fire share
-  one contact, so only a fighter the glaives missed burns.
+- Frames 1–3 of the active window: the glaives strike both sides where the
+  clip holds them, 14% at 75°, base 22, growth 95, drain 8.
+- Frames 4–9: fel fire burns along the held glaives: 3% at 85°, base 30,
+  growth 20, drain 2. Glaives and fire share one contact, so only a fighter
+  the glaives missed burns.
+
+Both parts use one capsule from 80 behind to 105 in front, 40 to 45 high,
+radius 30, on the two glaives the clip holds out and down (#280). The
+earlier ±190 box hit 56 to 81 units past the drawn blades.
 
 Counterplay: the total is unchanged, so after the flames he still has 26
 frames of recovery: a shield holds both parts and drops with more than 10
