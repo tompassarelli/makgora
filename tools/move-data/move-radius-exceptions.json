@@ -1,0 +1,527 @@
+[
+  {
+    "fighter": "rifleman",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 25 game units against a 88-unit shield, 0.11 to 0.28 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "illidan",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 40 game units against a 145-unit shield, 0.07 to 0.28 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "blademaster",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 6 to 30 game units against a 112-unit shield, 0.05 to 0.27 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "mountain-king",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 12 to 24 game units against a 91-unit shield, 0.13 to 0.26 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "warden",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 6 to 30 game units against a 107-unit shield, 0.06 to 0.28 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "lich",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 7 to 26 game units against a 137-unit shield, 0.05 to 0.19 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "forsaken-paladin",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 8 to 18 game units against a 108-unit shield, 0.07 to 0.17 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "dreadlord",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 12 game units against a 144-unit shield, 0.07 to 0.08 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "shadow-hunter",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 7 to 38 game units against a 115-unit shield, 0.06 to 0.33 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "pit-lord",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 30 game units against a 142-unit shield, 0.07 to 0.21 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "beastmaster",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 9 to 22 game units against a 133-unit shield, 0.07 to 0.17 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "lich-king",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 11 to 15 game units against a 134-unit shield, 0.08 to 0.11 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "lich-king",
+    "moves": [
+      "up smash"
+    ],
+    "issue": "#320",
+    "reason": "A 95.6-unit column against a 134-unit shield, 0.71 of it, above Melee's upper quartile 0.45: Remorseless Winter is drawn as a wide frost column over the Lich King. Recorded when the rule landed (2026-10-25); a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "thrall",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 20 to 28 game units against a 180-unit shield, 0.11 to 0.16 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "jaina-proudmoore",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 7 to 22 game units against a 112-unit shield, 0.06 to 0.20 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "sylvanas-windrunner",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 8 to 12 game units against a 107-unit shield, 0.07 to 0.11 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "cairne-bloodhoof",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 14 to 32 game units against a 152-unit shield, 0.09 to 0.21 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "chen-stormstout",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 12 to 24 game units against a 110-unit shield, 0.11 to 0.22 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "peon",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 8 to 8 game units against a 82-unit shield, 0.10 to 0.10 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "goblin-tinker",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 22 game units against a 101-unit shield, 0.10 to 0.22 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "kael'thas-sunstrider",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 25 game units against a 119-unit shield, 0.08 to 0.21 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "murloc",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 8 to 20 game units against a 77-unit shield, 0.10 to 0.26 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "grom-hellscream",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 8 to 24 game units against a 136-unit shield, 0.06 to 0.18 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "kobold",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 8 to 16 game units against a 71-unit shield, 0.11 to 0.23 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "malfurion-stormrage",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 7 to 22 game units against a 117-unit shield, 0.06 to 0.19 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "medivh",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 10 to 25 game units against a 117-unit shield, 0.09 to 0.21 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "anub'arak",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#320",
+    "reason": "Hit capsules of 15 to 30 game units against a 148-unit shield, 0.10 to 0.20 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  }
+]

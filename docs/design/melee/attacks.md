@@ -91,6 +91,49 @@ Swords and disjointed limbs reach farthest: the longest-reaching normals are
 | Ness | Dash attack | 28.1 |
 <!-- /table -->
 
+## Hitbox size
+
+How thick each move type's hitbox is next to its user's body. For each
+fighter and move, the largest hitbox radius recorded on any active frame of
+libmelee's table (`references/melee-frame-data/libmelee.jsonl`, `size`)
+is divided by the fighter's body size; the table gives the quartiles across
+fighters. Jab is the first jab; forward tilt and forward smash are unangled.
+
+Body size is the "Shield Size" column of
+`references/melee-frame-data/character-attributes.csv` times its "Model
+Scaling" column. The data has no height column, so shield size is the only
+body measure it supports, and only scaled: unscaled, Pichu's shield (24.3)
+would be twice Pikachu's (12), while scaled they sit together (12.2 and 10.8).
+The median radius column is in Melee units and needs no body size.
+
+<!-- table:radiusBands -->
+| Move | Fighters | Median radius | Lower quartile | Median | Upper quartile |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| jab | 25 | 3.91 | 0.246 | 0.286 | 0.316 |
+| forward tilt | 26 | 3.91 | 0.259 | 0.290 | 0.330 |
+| up tilt | 26 | 4.69 | 0.290 | 0.352 | 0.400 |
+| down tilt | 25 | 3.91 | 0.261 | 0.315 | 0.339 |
+| dash attack | 18 | 4.49 | 0.299 | 0.342 | 0.376 |
+| forward smash | 23 | 4.69 | 0.293 | 0.336 | 0.364 |
+| up smash | 25 | 5.08 | 0.337 | 0.379 | 0.450 |
+| down smash | 25 | 4.69 | 0.291 | 0.330 | 0.380 |
+| neutral air | 25 | 4.30 | 0.264 | 0.313 | 0.386 |
+| forward air | 26 | 5.12 | 0.332 | 0.361 | 0.417 |
+| back air | 25 | 4.88 | 0.322 | 0.348 | 0.372 |
+| up air | 25 | 4.69 | 0.316 | 0.354 | 0.420 |
+| down air | 25 | 5.47 | 0.368 | 0.434 | 0.455 |
+<!-- /table -->
+
+`bun scripts/moveRadius.ts` (from `ts/`) prints this table, and
+`bun wisp shapes --check` fails when it drifts from the data. The same check
+divides each of our moves' largest strike-capsule radius by the fighter's
+shield radius (`ts/src/game/sim/heroes/heroBodies.ts`) and fails a move
+outside its move type's quartiles unless
+`tools/move-data/move-radius-exceptions.json` records why. When the check
+landed (2026-10-25) 336 of our 338 moves sat below their band: our strikes are
+capsules swept along a limb or weapon with a radius of 6 to 40 game units, where Melee's
+are spheres. Lich King's up smash sat above it.
+
 ## Safety on shield
 
 Grounded normals lose on shield. Hitting on their first active frame, the median
