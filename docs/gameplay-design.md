@@ -146,6 +146,21 @@ Where Smashcraft keeps its own rule, and why:
   strong attack): Strong + A gives the up, down or forward smash (forward with
   no direction too; in the air, Strong + A gives the aerial for that
   direction, the neutral air with none), and holding Strong or A charges it.
+  On the ground Strong works like a C-stick (#325): while it is held, each
+  direction press starts that direction's smash on that frame, a Strong press
+  with a direction held does the same, and the directions do not move the
+  fighter (no walk, dash, crouch or tap jump) until Strong is released. Shield,
+  Special (the EX chord) and the air leave the directions as movement. Rivals
+  needs no A for this: its Strong button with a direction is the strong attack
+  in that direction, out of a run too ([Mizuumi controls](https://mizuumi.wiki/w/Rivals_Of_Aether/Controls),
+  [Hit Box guide](https://www.hitboxarcade.com/blogs/hit-box/getting-started-with-rivals-of-aether-on-hit-box)).
+  Rivals publishes no window for a direction followed by Strong; ours is
+  DASH_FLICK_SAMPLES (the direction's press frame and the two after it),
+  where a keyboard press is still in the dash's first frames: a smash in the
+  dash-smash window (dash frames 1–3, up and down smashes too) starts in place,
+  with the dash's speed dropped. Rivals' Strong alone, with no direction, is
+  the forward strong; ours needs A for it, so that holding Strong to aim and
+  holding Strong for the EX chord do not start a forward smash.
   A direction + A is always a tilt; a fresh flick dashes on its first frame, so the forward tilt
   takes the dash's frames 1–3 that the forward smash had, and a flick + A
   gives the forward tilt where Melee gives the forward smash. Out of a run, or
@@ -921,7 +936,8 @@ rule over all 13 selectable fighters.
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
 - **Attack inputs** (owner; Strong since #186): neutral attack is the jab,
-  attack with a direction is a tilt, and attack while holding Strong is a smash
+  attack with a direction is a tilt, and attack while holding Strong, or a
+  direction pressed while Strong is held on the ground, is a smash
   (smashcraft:docs/physics.md, "Prototype attack phases").
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in

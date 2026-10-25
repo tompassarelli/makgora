@@ -144,7 +144,7 @@ gives down-B. Release down, then hard-press it to drop immediately. Analog
 inputs need a quick flick; keyboard inputs need a fresh down-key press. The
 drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
-N with a direction performs a tilt, a fresh flick included; out of a run (or a dash after its first three frames) N is the dash attack. Hold Strong (9 on WASD and Hitbox, 0 on Custom, LB or RB on a pad) and press N for a smash: up, down, or forward with a side direction or none. Keep holding Strong or N to charge it. B is
+N with a direction performs a tilt, a fresh flick included; out of a run (or a dash after its first three frames) N is the dash attack. Strong (9 on WASD and Hitbox, 0 on Custom, LB or RB on a pad) gives the smashes, after Rivals of Aether's strong button. On the ground, hold Strong and press a direction for that direction's smash: up, down, or forward for a side, turning to face it. Pressing Strong while a direction is held does the same, so a walk, a dash's first frames or a fresh press stops in place for the smash. While Strong is held on the ground, the directions aim smashes and do not move you; release Strong to move again. Strong + N with no direction is the forward smash the way you face. Keep holding Strong or N to charge it. In the air, Strong + N with a direction gives that aerial, as N does. B is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
 normal aerial momentum. WASD and Hitbox use 7 for right trigger and 9
 for Strong; Custom uses 8 and 0. T is unbound by default.
@@ -152,7 +152,7 @@ for Strong; Custom uses 8 and 0. T is unbound by default.
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). Strong + U
 with a direction casts that special's EX
-form, costing one of the super bar's three segments. At a full bar,
+form (press U with the direction or before it, since Strong and a direction alone smash), costing one of the super bar's three segments. At a full bar,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate, Strong held or not (below a full bar it is the plain special); the
 Ultimates rule at fighter selection turns them off.
 

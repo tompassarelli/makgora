@@ -54,8 +54,10 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   const { held, pressed } = row;
   clearAttackBuffer(attacks);
   destination.attackRequested = false;
-  destination.direction = movementAxis(row, Action.moveLeft, Action.moveRight, row.axisX);
-  destination.verticalDirection = movementAxis(row, Action.moveDown, Action.moveUp, row.axisZ);
+  const aimX = movementAxis(row, Action.moveLeft, Action.moveRight, row.axisX);
+  const aimZ = movementAxis(row, Action.moveDown, Action.moveUp, row.axisZ);
+  destination.direction = aimX;
+  destination.verticalDirection = aimZ;
   destination.diStickValid = true;
   destination.diStickX = f32(row.axisX / 127.0);
   destination.driftStickX = destination.diStickX;
@@ -95,6 +97,16 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.jumpHeld = (held & JUMP_BIT) !== 0;
   destination.techPressed = destination.shieldPressed;
   const airborne = (fighter.jump.squat > 0 || !fighter.motion.grounded) && fighter.ledge.state === LedgeState.none;
+  const standing = fighter.motion.grounded && fighter.ledge.state === LedgeState.none;
+  const strongAim = strong && standing && !destination.shieldTriggerActive && ((held | pressed) & SPECIAL_BIT) === 0;
+  if (strongAim) {
+    destination.direction = 0;
+    destination.verticalDirection = 0;
+    destination.diStickX = 0.0;
+    destination.diStickZ = 0.0;
+    destination.driftStickX = 0.0;
+    destination.down = false;
+  }
   const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && (pressed & WALK_BIT) !== 0 && ((held | pressed) & SMASHES) === 0;
   destination.airDodgePressed = destination.shieldPressed || tiltDodge;
   destination.dodgeX = destination.shieldPressed ? row.dodgeX : tiltDodge ? destination.direction : 0;
@@ -123,11 +135,13 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.groundDodgePressed = dodge !== undefined;
   destination.groundDodgeDirection = dodge ?? 0;
 
-  if (destination.attackPressed || ((held & ATTACK_BIT) !== 0 && (pressed & MOVEMENT_ACTIONS) !== 0)) {
+  const directionPressed = (pressed & MOVEMENT_ACTIONS) !== 0;
+  const strongAimed = strongAim && (aimX !== 0 || aimZ !== 0) && (directionPressed || (pressed & STRONG_BIT) !== 0);
+  if (destination.attackPressed || ((held & ATTACK_BIT) !== 0 && directionPressed) || strongAimed) {
     const shieldGrab = fighter.motion.grounded && (fighter.shield.raised || destination.shield);
     queueAttack(attacks, {
-      style: normalAttackStyle(destination.direction, destination.verticalDirection, destination.walking, strong, shieldGrab),
-      facing: sign(destination.direction), frame, mayCharge: true,
+      style: normalAttackStyle(aimX, aimZ, destination.walking, strong, shieldGrab),
+      facing: sign(aimX), frame, mayCharge: true,
     });
   }
   if ((pressed & GRAB_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.grab, facing: 0, frame, mayCharge: false });

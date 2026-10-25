@@ -127,6 +127,9 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
 
 
 
+const isGroundSmash = (style: AttackStyle): boolean =>
+  style === AttackStyle.forwardSmash || style === AttackStyle.upSmash || style === AttackStyle.downSmash;
+
 function groundOption(style: AttackStyle, dashStartTilt: boolean): GroundOption | undefined {
   switch (style) {
     case AttackStyle.jab: return GroundOption.jab;
@@ -177,7 +180,9 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
   const aerial = isAerialAttack(action);
   if (((groundAttack && grounded) || action === AttackStyle.shot || (aerial && !grounded)) && canStartAttackStyle(fighter, action)) {
     const pivot = action === AttackStyle.grab && fighter.ground.action === GroundAction.turnRun;
+    const smashFromDash = grounded && fighter.ground.action === GroundAction.dash && isGroundSmash(action);
     beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge);
+    if (smashFromDash) fighter.motion.vx = 0.0;
     fighter.attack.pivotGrab = pivot;
   }
 }
