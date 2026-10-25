@@ -354,6 +354,30 @@ reason.
   a little too strong at high percent. Revisit this after the baseline, as a
   deviation row with its own decision.
 
+## Throws
+
+Tom almost never links a throw into a punish and feels our throw hitstun is
+shorter than Melee's (2026-10-26). This is the first and most tangible parity
+item. #329 measures frame advantage after each of our throws at 0, 30, 60 and
+90% on a Fox-weight target. It sets them against the throws of Fox, Falco,
+Sheik, Marth and Captain Falcon, computed from `fightcore.csv` under Melee's
+weight-dependent throw rules (`character-attributes.csv` flags). It names the
+cause before any fix. #330 proposes a throw-role menu from prior art: combo
+starter, set-knockback tech-chase starter, kill throw, positional throw,
+regrab, percent-window confirm. It also offers two roster rules: today's fixed
+slot per role (#107), or a per-fighter set covering at least three roles.
+Tom picks in #331. #332 verifies each throw's role at its window with the
+analyzer.
+
+## Taste guide
+
+A page generated from the reference data, `docs/design/melee/top-tiers.md`. It
+shows Melee's top eight (Fox, Falco, Marth, Sheik, Jigglypuff, Captain Falcon,
+Peach, Ice Climbers) against the rest, as distributions per move type and per
+attribute (#333). It then says, with cited public rationale, which moves and
+attributes put each one above (#334). Tom can browse it to build instinct for
+frame-data ranges.
+
 ## Order of work
 
 1. Clean room: #285, #286.
@@ -364,6 +388,10 @@ reason.
 6. Maiev: targets #303, movement #304, aerials #305, ground game and throws #306, edge guard #307, balance field #308.
 
 7. Move shapes: travel and reach #318, shapes check #319, analyzer options #326, radius bands #320, dash-attack rule #321, dash-attack retunes #322, #323, #324.
+
+8. Throws: parity measure #329, roles proposal #330, Tom's pick #331, analyzer roles #332.
+
+9. Taste guide: distributions #333, rationale #334.
 
 ## Numbers we lack
 
