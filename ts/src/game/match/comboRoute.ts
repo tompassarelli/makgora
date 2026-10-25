@@ -21,6 +21,8 @@ export interface ComboSetup {
   readonly defenderZ: number;
 
   readonly percent: number;
+
+  readonly defenderWeight?: number | undefined;
 }
 
 export interface ComboRoute {
@@ -40,6 +42,7 @@ export function comboScene(setup: ComboSetup): Scene {
   if (setup.attackerZ > 0) airborne(attacker, setup.attackerX, setup.attackerZ);
   if (setup.defenderZ > 0) airborne(defender, setup.defenderX, setup.defenderZ);
   defender.status.damage = setup.percent;
+  if (setup.defenderWeight !== undefined) defender.tuning = { ...defender.tuning, physics: { ...defender.tuning.physics, weight: f32(setup.defenderWeight) } };
   return match;
 }
 

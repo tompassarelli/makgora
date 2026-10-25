@@ -17,9 +17,10 @@ import { Action } from "../../../src/game/input/actions";
 import { playComboRoute } from "../../../src/game/match/comboRoute";
 import { Character } from "../../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/sim/heroes/registry";
-import { type FighterSummary, MAX_CONVERSIONS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
+import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
+import { type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
 const unitsFile = join(moveData, "combos/units.jsonl");
@@ -27,6 +28,7 @@ const summaryFile = join(moveData, "combo-potential.json");
 const pageFile = join(moveData, "combo-potential.md");
 const advantageFile = join(moveData, "advantage-state.jsonl");
 const advantagePageFile = join(moveData, "advantage-state.md");
+const linksDir = join(moveData, "links");
 
 class CombosFailure extends Schema.TaggedError<CombosFailure>()("CombosFailure", { problem: Schema.String }) {
   override get message(): string {
@@ -264,9 +266,30 @@ const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
   yield* writeAdvantage(rows, rows);
 });
 
+const linkSlug = (attacker: Character): string => (fighterName(attacker).split(" ")[0] ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(attackers, (attacker) => Effect.gen(function* () {
+  const units: LinkUnit[] = OPENERS.map((_, opener) => ({ attacker, opener }));
+  const found = yield* inWorkers<LinkUnit, readonly LinkRow[]>(new URL("../../comboLinksWorker.ts", import.meta.url), units, jobs,
+    (unit) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name} links`,
+    (unit, rows) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name}, ${rows.length} rows`,
+  ).pipe(step(`${units.length} ${fighterName(attacker)} openers' links on ${jobs} threads`));
+  const rows = found.flat();
+  const file = join(linksDir, linkSlug(attacker));
+  yield* Effect.tryPromise({
+    try: async () => {
+      await Bun.write(`${file}.jsonl`, rows.map((row) => JSON.stringify(row)).join("\n") + "\n");
+      await Bun.write(`${file}.md`, linksPage(fighterName(attacker), rows) + "\n");
+    },
+    catch: failure,
+  }).pipe(step(`writing tools/move-data/links/${linkSlug(attacker)}.jsonl and .md`));
+  const count = (kind: LinkRow["class"]) => rows.filter((row) => row.class === kind).length;
+  yield* Console.log(`${fighterName(attacker)} links: ${rows.length} rows, ${count("true")} true, ${count("DI-dependent")} DI-dependent, ${count("read")} read, ${count("none")} none`);
+}), { discard: true });
+
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -286,6 +309,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     if (code !== 0) return yield* new CombosFailure({ problem: `the admitted run exited ${code}` });
     return;
   }
+  if (parsed.links === true) return yield* links(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed["zero-to-death"] === true) return yield* zeroToDeath(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0, shard);
   const units: Unit[] = attackers.flatMap((attacker) => attacker === undefined ? [] : OPPONENTS.flatMap((opponent) => POSITIONS.map((position) => ({ attacker, opponent, position }))));

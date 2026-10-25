@@ -3,15 +3,16 @@
 
 
 import { Action, has } from "../input/actions";
+import { adaptInput } from "../input/adapter";
 import { type InputRow, copyInput, emptyInput } from "../input/inputRow";
 import { type ParticipantInputs, participantInputs } from "../input/participants";
 import { type FrameControls, createBufferedFrameControls } from "./controls";
-import { type MatchFrameInput, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
+import { type MatchFrameInput, captureFrame, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { type PacingAndPresentation, createPacingAndPresentation } from "./pacingAndPresentation";
 import { type MatchState, Phase, createMatchState, setHumanMask } from "../lobby/lobbyState";
 import { Character, DownState } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
-import { type Roster, createRoster, fighterAt } from "../sim/roster";
+import { type Controls, type Roster, createRoster, fighterAt } from "../sim/roster";
 
 export interface Scene {
   readonly world: Roster;
@@ -104,6 +105,25 @@ export function frameMasks(s: Scene, held: (slot: number) => number, amend?: (ro
   if (!executeMatchFrame(s.row, s.game, s.world, s.controls, s.runtime, next)) throw new Error(`frame ${next} not executed`);
 }
 
+
+const steered = createBufferedFrameControls();
+
+export function frameSteered(s: Scene, held: (slot: number) => number, steer: (controls: Controls, slot: number) => void): void {
+  const next = s.runtime.simulationFrame + 1;
+  for (let slot = 0; slot < s.previous.length; slot++) {
+    const row = s.source[slot];
+    const input = steered.inputs[slot];
+    const commands = steered.commands[slot];
+    if (row === undefined || input === undefined || commands === undefined) throw new Error(`slot ${slot} has no controller row`);
+    const mask = held(slot);
+    padRow(row, mask, s.previous[slot] ?? 0);
+    adaptInput(row, fighterAt(s.world, slot), next, input, commands);
+    steer(input, slot);
+    s.previous[slot] = mask;
+  }
+  if (!captureFrame(s.row, next, s.world.mask, steered, s.runtime)) throw new Error(`frame ${next} not captured`);
+  if (!executeMatchFrame(s.row, s.game, s.world, s.controls, s.runtime, next)) throw new Error(`frame ${next} not executed`);
+}
 
 export function frame(s: Scene, ...held: (readonly Action[])[]): void {
   frameRows(s, held);

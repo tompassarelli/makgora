@@ -19,3 +19,12 @@
   takes the stock without a read, tech chase or edge-guard between hits, with
   its frame-by-frame inputs, and fails when it finds one
   (smashcraft:docs/gameplay-design.md, "Advantage state", #44).
+
+- Links: `bun wisp combos --links [--fighter NAME]... [--jobs N]` says what
+  each opener hit (each region class: clean, late, sweet, sour) combos into at
+  0-150% against victim weights 60, 75, 100 and 143 under every DI: per
+  follow-up the frame advantage, whether the explorer's best input lands it,
+  and its class against the victim options of the agency measure (true,
+  DI-dependent, read, none). It writes
+  smashcraft:tools/move-data/links/<fighter>.jsonl and .md
+  (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #294).
