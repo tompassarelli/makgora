@@ -37,21 +37,50 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain");
+const reposed = process.argv.slice(4).filter(arg => arg !== "pain" && !arg.startsWith("--")) as HeroPose[];
+const inPlace = painOnly || reposed.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/grom-clips.ts STOCK_GROM.mdx|SHIPPED_GROM.mdx PRIVATE_OUTPUT [pain]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/grom-clips.ts STOCK_GROM.mdx|SHIPPED_GROM.mdx PRIVATE_OUTPUT [pain|POSE...]");
 const originalBytes = await Bun.file(input).arrayBuffer();
 if (process.argv.includes("--stride-only")) { await writeStride(originalBytes); process.exit(0); }
 const source = parseMDX(originalBytes), model = structuredClone(source);
-ensure((painOnly || source.Sequences.length === 16) && source.Bones.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Grom Hellscream");
+ensure((inPlace || source.Sequences.length === 16) && source.Bones.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Grom Hellscream");
 const stand = source.Sequences[8]!;
-interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; lastActive?: number; gesture: Gesture; follow?: Gesture; followDistance?: number; drive?: Readonly<Partial<Record<"Bone_Root" | "Bone_Chest" | "Bone_Pelvis", readonly [number, number]>>>; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
+interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; leftKnee?: number; armZ?: number; yaw?: number; lean?: number; }
+interface Action { pose: HeroPose; frames: number; contact: number; lastActive?: number; gesture: Gesture; follow?: Gesture; followDistance?: number; drive?: Readonly<Partial<Record<"Bone_Root" | "Bone_Chest" | "Bone_Pelvis", readonly [number, number]>>>; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; beats?: readonly Beat[]; }
+interface Beat { frame: number; gesture: Gesture; drive: readonly [number, number]; aim?: { hand: readonly [number, number]; weapon: readonly [number, number] }; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
 const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
 const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20, yaw: 105 };
 const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
 const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
+const LUNGE_CARRY: Gesture = { chest: 4, lean: 2 };
+const LUNGE_COIL: Gesture = { chest: -42, pelvis: 14, lean: -22, leftArm: -60, leftElbow: -30, head: 18, thigh: -35, knee: 75, leftThigh: 25, leftKnee: 70 };
+const LUNGE_DRIVE: Gesture = { chest: 42, pelvis: -12, lean: 18, leftArm: 50, leftElbow: -20, head: -25, thigh: -65, knee: 60, leftThigh: 45, leftKnee: 5 };
+const LUNGE_FOLLOW: Gesture = { chest: 50, pelvis: -14, lean: 22, leftArm: 60, leftElbow: -15, head: -28, thigh: -70, knee: 70, leftThigh: 48, leftKnee: 8 };
+const LUNGE_SETTLE: Gesture = {};
+type Aim = NonNullable<Beat["aim"]>;
+const CARRY_AIM: Aim = { hand: [22, -10], weapon: [82, -25] }, COIL_AIM: Aim = { hand: [12, -14], weapon: [66, -40] }, DRIVE_AIM: Aim = { hand: [25, 0], weapon: [85, -20] };
+const SAG_AIM: Aim = { hand: [14, -14], weapon: [58, -48] }, FOLLOW_AIM: Aim = { hand: [19, -12], weapon: [70, -44] }, LIFT_AIM: Aim = { hand: [12, 0], weapon: [40, 48] }, REST_AIM: Aim = { hand: [22, -23], weapon: [-25, 23] };
+function blend(a: Gesture, b: Gesture, t: number): Gesture {
+  return Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map(key => [key, (a[key as keyof Gesture] ?? 0) * (1 - t) + (b[key as keyof Gesture] ?? 0) * t]));
+}
+function between(a: Aim, b: Aim, t: number): Aim {
+  return { hand: [a.hand[0] + (b.hand[0] - a.hand[0]) * t, a.hand[1] + (b.hand[1] - a.hand[1]) * t], weapon: [a.weapon[0] + (b.weapon[0] - a.weapon[0]) * t, a.weapon[1] + (b.weapon[1] - a.weapon[1]) * t] };
+}
+function lungeBeats(contact: number, lastActive: number, frames: number): Beat[] {
+  const ease = (t: number) => t * t * (3 - 2 * t), reach = 62, hold = (frame: number) => 0.94 - 0.19 * (frame - contact - 3) / Math.max(1, lastActive - contact - 1);
+  const coil = Array.from({ length: contact }, (_, frame) => { const t = ease(Math.min(1, frame / (contact - 2))); return { frame, gesture: blend(LUNGE_CARRY, LUNGE_COIL, t), drive: [-66 * t, -12 * t] as const, aim: between(CARRY_AIM, COIL_AIM, t) }; });
+  const drive = [40, 52, reach].map((x, i) => ({ frame: contact + i, gesture: LUNGE_DRIVE, drive: [x, -12 - i] as const, aim: DRIVE_AIM }));
+  const carry = Array.from({ length: lastActive - contact - 1 }, (_, i) => contact + 3 + i).map(frame => ({ frame, gesture: blend(LUNGE_DRIVE, LUNGE_FOLLOW, (0.94 - hold(frame)) / 0.19), drive: [reach * hold(frame), -14 - 14 * (0.94 - hold(frame)) / 0.19] as const, aim: between(DRIVE_AIM, SAG_AIM, (1 - hold(frame)) / 0.25) }));
+  const back = Array.from({ length: frames - lastActive - 1 }, (_, i) => lastActive + 2 + i).map(frame => {
+    const s = (frame - lastActive - 1) / (frames - lastActive - 1), t = 1 - (1 - s) ** 2, push = 1 - ease(Math.min(1, s / 0.35));
+    const aim = s < 0.2 ? between(SAG_AIM, FOLLOW_AIM, s / 0.2) : s < 0.6 ? between(FOLLOW_AIM, LIFT_AIM, (s - 0.2) / 0.4) : s < 0.92 ? between(LIFT_AIM, REST_AIM, (s - 0.6) / 0.32) : undefined;
+    return { frame, gesture: blend(blend(LUNGE_DRIVE, LUNGE_FOLLOW, push), LUNGE_SETTLE, t), drive: [reach * 0.75 * (1 - t), -28 * (1 - t)] as const, aim };
+  });
+  return [...coil, ...drive, ...carry, ...back];
+}
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, number]][] = [
   ["jab", AttackStyle.jab, { ...forward, chest: 8, arm: -65 }, [48, 65]],
@@ -85,7 +114,7 @@ const bodyDrive: Partial<Record<HeroPose, Action["drive"]>> = {
 };
 for (const [pose, style, gesture, target] of normals) {
   const move = GROM_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
-  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, lastActive: Math.max(...move.regions.map(region => region.lastFrame)), gesture, follow: followThrough[pose], followDistance: pose === "backAir" ? 8 : undefined, drive: bodyDrive[pose], target, air: pose.endsWith("Air") });
+  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, lastActive: Math.max(...move.regions.map(region => region.lastFrame)), gesture, follow: followThrough[pose], followDistance: pose === "backAir" ? 8 : undefined, drive: bodyDrive[pose], target: pose === "dashAttack" ? undefined : target, beats: pose === "dashAttack" ? lungeBeats(move.startupFrames, Math.max(...move.regions.map(region => region.lastFrame)), move.totalFrames) : undefined, air: pose.endsWith("Air") });
 }
 const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["crouch", 30, 8, brace], ["landing", 8, 2, brace], ["shield", 30, 5, { ...brace, leftArm: -105 }],
@@ -158,7 +187,7 @@ function rotated(q: ArrayLike<number>, y: number, z = 0) {
 function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Chest") return [g.chest ?? 0, g.yaw ?? 0];
   if (name === "Bone_Pelvis") return [g.pelvis ?? 0, 0];
-  if (name === "Bone_Arm1_R") return [g.arm ?? 0, 0];
+  if (name === "Bone_Arm1_R") return [g.arm ?? 0, g.armZ ?? 0];
   if (name === "Bone_Arm2_R") return [g.elbow ?? 0, 0];
   if (name === "Bone_Hand_R") return [g.hand ?? 0, 0];
   if (name === "Bone_Arm1_L") return [g.leftArm ?? 0, 0];
@@ -166,20 +195,48 @@ function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Head") return [g.head ?? 0, 0];
   if (name === "Bone_Leg1_R") return [g.thigh ?? 0, 0];
   if (name === "Bone_Leg1_L") return [g.leftThigh ?? 0, 0];
-  if (/^Bone_Leg2_[LR]$/.test(name)) return [g.knee ?? 0, 0];
+  if (name === "Bone_Leg2_L") return [g.leftKnee ?? g.knee ?? 0, 0];
+  if (name === "Bone_Leg2_R") return [g.knee ?? 0, 0];
   if (name === "Bone_Root") return [g.lean ?? 0, 0];
   return [0, 0];
+}
+function aimBeats(index: number, start: number, frames: number, beats: readonly Beat[]) {
+  const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index);
+  const named = (name: string) => model.Nodes.find(node => node.Name === name)!;
+  const at = (node: mdx.Node) => { const p = model.PivotPoints[node.ObjectId]!, m = data.nodes[node.ObjectId].matrix; return [m[0] * p[0]! + m[4] * p[1]! + m[8] * p[2]! + m[12], m[2] * p[0]! + m[6] * p[1]! + m[10] * p[2]! + m[14]] as const; };
+  const chain = ["Bone_Arm1_R", "Bone_Arm2_R", "Bone_Hand_R"].map(named), weapon = named("Weapon Ref");
+  const bases = chain.map(node => source.Nodes[node.ObjectId]!.Rotation!.Keys.find(key => key.Frame >= stand.Interval[0]! && key.Frame <= stand.Interval[1]!)!.Vector);
+  const write = (frame: number, values: readonly number[]) => chain.forEach((node, i) => { const key = node.Rotation!.Keys.find(candidate => candidate.Frame === start + Math.round(frame * 1000 / 60))!; key.Vector = rotated(bases[i]!, values[i * 2]!, values[i * 2 + 1]!); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); } });
+  const aimed = beats.filter(beat => beat.aim !== undefined), solved = new Map<number, number[]>();
+  let angles = [0, 0, 0, 0, 0, 0];
+  for (const beat of aimed) {
+    const previous = [...angles], aim = beat.aim!;
+    const loss = () => { write(beat.frame, angles); data.frame = start + Math.round(beat.frame * 1000 / 60); renderer.update(0); const s = at(chain[0]!), h = at(chain[2]!), w = at(weapon); return (h[0] - s[0] - aim.hand[0]) ** 2 + (h[1] - s[1] - aim.hand[1]) ** 2 + (w[0] - s[0] - aim.weapon[0]) ** 2 + (w[1] - s[1] - aim.weapon[1]) ** 2 + 0.02 * angles.reduce((sum, value, i) => sum + (value - previous[i]!) ** 2, 0); };
+    for (const step of solved.size === 0 ? [20, 5, 2, 1] : [6, 3, 1]) for (let d = 0; d < 6; d++) { let best = Infinity, bestAngle = angles[d]!; const centre = angles[d]!; for (let k = -8; k <= 8; k++) { angles[d] = solved.size === 0 && step === 20 ? -180 + (k + 8) * 22.5 : centre + k * step; const value = loss(); if (value < best) { best = value; bestAngle = angles[d]!; } } angles[d] = bestAngle; }
+    write(beat.frame, angles); solved.set(beat.frame, [...angles]);
+  }
+  const first = aimed[0]?.frame, last = aimed.at(-1)?.frame;
+  if (first === undefined || last === undefined) return;
+  const ease = (t: number) => t * t * (3 - 2 * t);
+  for (const beat of beats) if (!solved.has(beat.frame)) { const weight = beat.frame < first ? ease(beat.frame / first) : 1 - ease((beat.frame - last) / (frames - last)), from = beat.frame < first ? solved.get(first)! : solved.get(last)!; write(beat.frame, from.map(value => value * weight)); }
 }
 const flatTangent = (track: mdx.AnimVector, vector: KeyVector, path: string) => path.endsWith(".Rotation") || track.LineType === mdx.LineType.Bezier ? vector.slice() : new Float32Array(vector.length);
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
-const records: { pose: string; index: number; frames: number; contact: number }[] = [];
+const records: { pose: string; index: number; frames: number; contact: number }[] = [], retired: number[] = [];
 if (painOnly) actions.length = 0;
+if (reposed.length > 0) {
+  for (const pose of reposed) ensure(actions.some(action => action.pose === pose), `${pose}: not an authored Grom pose`);
+  actions.splice(0, actions.length, ...actions.filter(action => reposed.includes(action.pose))); damageActions.length = 0;
+}
 for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const name = ordinal < actions.length ? `Grom ${action.pose}` : `Grom Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
-  const existing = painOnly ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
-  ensure(!painOnly || existing >= 0, `${name}: shipped sequence missing`);
+  const shipped = inPlace ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
+  ensure(!inPlace || shipped >= 0, `${name}: shipped sequence missing`);
+  const resized = shipped >= 0 && !painOnly && model.Sequences[shipped]!.Interval[1]! - model.Sequences[shipped]!.Interval[0]! !== Math.round(action.frames * 1000 / 60);
+  if (resized) { model.Sequences[shipped]!.Name = `${name} retired`; retired.push(shipped); }
+  const existing = resized ? -1 : shipped;
   const index = existing >= 0 ? existing : model.Sequences.length;
   const start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
   if (existing >= 0) {
@@ -193,7 +250,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const followEnd = Math.min(action.frames - 1, followStart + Math.max(3, Math.floor((action.frames - followStart) / 2)));
   const followFrames = action.follow === undefined ? [] : Array.from({ length: followEnd - followStart + 1 }, (_, i) => followStart + i);
   const recoveryFrames = action.follow === undefined ? [] : Array.from({ length: action.frames - recoveryStart }, (_, i) => recoveryStart + i);
-  const phaseFrames = [...new Set([0, Math.max(1, action.contact - 3), action.contact, followStart, ...followFrames, ...recoveryFrames, action.frames,
+  const phaseFrames = action.beats ? action.beats.map(beat => beat.frame) : [...new Set([0, Math.max(1, action.contact - 3), action.contact, followStart, ...followFrames, ...recoveryFrames, action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
   const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 ? 0 : action.follow !== undefined && frame >= recoveryStart ? 1 - (frame - recoveryStart) / Math.max(1, action.frames - 1 - recoveryStart) : frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
@@ -202,7 +259,8 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     const match = /^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation)$/.exec(path);
     const rotationTrack = match?.[3] === "Rotation";
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
-    const drivenOffset = node?.Name === "Bone_Root" || node?.Name === "Bone_Chest" || node?.Name === "Bone_Pelvis" ? action.drive?.[node.Name] : undefined;
+    const beat = (frame: number) => action.beats?.find(candidate => candidate.frame === frame);
+    const drivenOffset = action.beats && node?.Name === "Bone_Root" ? [0, 0] as const : node?.Name === "Bone_Root" || node?.Name === "Bone_Chest" || node?.Name === "Bone_Pelvis" ? action.drive?.[node.Name] : undefined;
     const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])
       ?? (drivenOffset !== undefined && match?.[3] === "Translation"
         ? donor.Keys.toSorted((a, b) => Math.abs(a.Frame - stand.Interval[0]) - Math.abs(b.Frame - stand.Interval[0]))[0]
@@ -210,15 +268,16 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     if (!first) return;
     for (const frame of phaseFrames) {
       let Vector = first.Vector.slice();
-      if (node && match?.[3] === "Translation" && drivenOffset !== undefined) { Vector[0] = Vector[0]! + drivenOffset[0] * amount(frame); Vector[2] = Vector[2]! + drivenOffset[1] * amount(frame); }
-      if (node && match?.[3] === "Rotation") { const rawProgress = action.follow === undefined ? 0 : Math.max(0, Math.min(1, (frame - followStart) / Math.max(1, followEnd - followStart))); const progress = rawProgress * rawProgress * (3 - 2 * rawProgress); const gesture = action.follow === undefined ? action.gesture : Object.fromEntries(new Set([...Object.keys(action.gesture), ...Object.keys(action.follow)]).values().map(key => [key, (action.gesture[key as keyof Gesture] ?? 0) + ((action.follow![key as keyof Gesture] ?? 0) - (action.gesture[key as keyof Gesture] ?? 0)) * progress])) as Gesture; let [y, z] = joint(node.Name, gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
+      if (node && match?.[3] === "Translation" && drivenOffset !== undefined) { const offset = beat(frame)?.drive ?? drivenOffset, scale = action.beats ? 1 : amount(frame); Vector[0] = Vector[0]! + offset[0] * scale; Vector[2] = Vector[2]! + offset[1] * scale; }
+      if (node && match?.[3] === "Rotation") { const rawProgress = action.follow === undefined ? 0 : Math.max(0, Math.min(1, (frame - followStart) / Math.max(1, followEnd - followStart))); const progress = rawProgress * rawProgress * (3 - 2 * rawProgress); const gesture = action.follow === undefined ? action.gesture : Object.fromEntries(new Set([...Object.keys(action.gesture), ...Object.keys(action.follow)]).values().map(key => [key, (action.gesture[key as keyof Gesture] ?? 0) + ((action.follow![key as keyof Gesture] ?? 0) - (action.gesture[key as keyof Gesture] ?? 0)) * progress])) as Gesture; let [y, z] = joint(node.Name, beat(frame)?.gesture ?? gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : action.beats ? y : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
-        z *= amount(frame); Vector = rotated(first.Vector, y, z); }
+        if (!action.beats) z *= amount(frame); Vector = rotated(first.Vector, y, z); }
       const tangent = () => rotationTrack || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(first.InTan ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
   });
-  if (painOnly) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
+  if (inPlace) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
+  if (action.beats) aimBeats(index, start, action.frames, action.beats);
   if (action.target) {
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index); data.frame = start + Math.round(action.contact * 1000 / 60);
     const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = model.Nodes.find(n => n.Name === "Bone_Hand_R")!, pivot = model.PivotPoints[hand.ObjectId]!;
@@ -252,7 +311,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       for (const frame of phaseFrames.filter(frame => frame >= followStart)) { const t = Math.max(0, Math.min(1, (frame - followStart) / (followEnd - followStart))), progress = t * t * (3 - 2 * t); const blended = followAngles.map((value, index) => followStartAngles[index]! + (value - followStartAngles[index]!) * progress); writeFollow(frame, blended); }
     }
   }
-  const nativeSwing = ["jab", "downTilt", "dashAttack", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "jab2", "forwardSmash", "forwardAir", "sideSpecial", "sideSpecialAir", "downSpecial", "downSpecialAir", "neutralAir"].includes(action.pose);
+  const nativeSwing = ["jab", "downTilt", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "jab2", "forwardSmash", "forwardAir", "sideSpecial", "sideSpecialAir", "downSpecial", "downSpecialAir", "neutralAir"].includes(action.pose);
   if (nativeSwing) {
     const overhead = ["upTilt", "upSmash", "upAir"].includes(action.pose);
     const heavy = ["forwardSmash", "forwardAir", "downSpecial", "downSpecialAir"].includes(action.pose);
@@ -317,7 +376,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 const normalReach = [];
-for (const style of painOnly ? [] : [AttackStyle.upTilt]) {
+for (const style of inPlace ? [] : [AttackStyle.upTilt]) {
   const ordinal = normals.findIndex(normal => normal[1] === style), action = actions[ordinal]!;
   const index = source.Sequences.length + ordinal, [start, end] = model.Sequences[index]!.Interval;
   const root = model.Nodes.find(node => node.Name === "Bone_Root")!, chest = model.Nodes.find(node => node.Name === "Bone_Chest")!;
@@ -363,8 +422,8 @@ for (const style of painOnly ? [] : [AttackStyle.upTilt]) {
       }
   ensure(selected, `${action.pose}: no skinned recoil/contact pose meets original reach gates`);
 }
-if (painOnly) {
-  const before = new DrawnModel(originalBytes, 1), after = new DrawnModel(generateMDX(model), 1), authored = new Set(records.map(record => record.index));
+if (inPlace) {
+  const before = new DrawnModel(originalBytes, 1), after = new DrawnModel(generateMDX(model), 1), authored = new Set([...records.map(record => record.index), ...retired]);
   for (const [index, sequence] of source.Sequences.entries()) if (!authored.has(index)) for (const part of [0, 0.5, 1]) {
     const time = (sequence.Interval[1]! - sequence.Interval[0]!) * part / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
     ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${sequence.Name}: shipped pose changed`);
@@ -376,10 +435,10 @@ if (painOnly) {
 }
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
-const gate = painGate(bytes, Character.grom, standIndex(bytes), records.slice(-9).map(record => record.index));
-console.log(gate.report); ensure(gate.pass, "pain gate failed");
+if (reposed.length === 0) { const gate = painGate(bytes, Character.grom, standIndex(bytes), records.slice(-9).map(record => record.index));
+console.log(gate.report); ensure(gate.pass, "pain gate failed"); }
 mkdirSync(output, { recursive: true }); await Bun.write(join(output, "hellscream.mdx"), bytes);
-if (!painOnly) await Bun.write(join(project, "ts/src/game/sim/heroes/gromClips.ts"), [
+if (!inPlace) await Bun.write(join(project, "ts/src/game/sim/heroes/gromClips.ts"), [
   "// Generated by tools/animations/grom-clips.ts from the stock classic Grom Hellscream rig.",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   'export const GROM_MODEL_FILE = "units\\\\orc\\\\Hellscream\\\\Hellscream.mdl";',
@@ -387,6 +446,12 @@ if (!painOnly) await Bun.write(join(project, "ts/src/game/sim/heroes/gromClips.t
   'export const GROM_CLIPS = { idle: GROM_FALLBACK, walk: { index: 5, seconds: f32(0.733) }, dash: { index: 5, seconds: f32(0.733) }, run: { index: 5, seconds: f32(0.733) }, ko: { index: 4, seconds: f32(1.9) },',
   ...bindings, '} as const satisfies HeroClipTable;', 'export const GROM_DAMAGE_CLIPS: readonly HeroClip[] = [', ...damageBindings, '];', "",
 ].join("\n"));
+if (reposed.length > 0) {
+  const table = join(project, "ts/src/game/sim/heroes/gromClips.ts");
+  let clips = await Bun.file(table).text();
+  for (const line of bindings) { const pose = line.trim().split(":")[0]!; const old = new RegExp(`^  ${pose}: \\{.*\\},$`, "m"); ensure(old.test(clips), `${pose}: no clip binding`); clips = clips.replace(old, line); }
+  await Bun.write(table, clips);
+}
 const finalDrawn = new DrawnModel(bytes, 1);
 const distance = (a: Float32Array, b: Float32Array) => { ensure(a.length === b.length && a.length > 0, "Missing drawn body"); let maximum = 0; for (let i = 0; i < a.length; i += 2) maximum = Math.max(maximum, Math.hypot(a[i]! - b[i]!, a[i + 1]! - b[i + 1]!)); return maximum; };
 let measured = 0;
@@ -394,9 +459,10 @@ for (const [i, action] of [...actions, ...damageActions].entries()) {
   const index = records[i]!.index;
   const first = finalDrawn.triangles(index, 0, 1), contact = finalDrawn.triangles(index, action.contact / 60, 1);
   ensure(action.hold ? distance(contact, finalDrawn.triangles(index, action.frames / 60, 1)) < 0.01 : distance(first, contact) > 3, `${action.pose}: dead or drifting gesture`);
-  const panels: PoseFrame[] = [1, -1].flatMap(facing => [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames, action.contact + 4), action.frames].map(frame => ({ frame, phase: frame < action.contact ? AttackPhase.startup : frame <= action.contact + 4 ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
+  const keyFrames = action.beats ? [0, action.contact - 2, action.contact, action.contact + 2, action.lastActive ?? action.contact, Math.round(((action.lastActive ?? action.contact) + action.frames) / 2), action.frames] : [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames, action.contact + 4), action.frames];
+  const panels: PoseFrame[] = [1, -1].flatMap(facing => keyFrames.map(frame => ({ frame, phase: frame < action.contact ? AttackPhase.startup : frame <= action.contact + 4 ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
   await Bun.write(join(output, `${records[i]!.pose.replaceAll(" ", "-")}.png`), sheet(records[i]!.pose, finalDrawn, panels, 5).png); measured++;
 }
 await Bun.write(join(output, "grom-clips.json"), JSON.stringify({ stockSequences: source.Sequences.length, appended: records.length, measuredBothFacings: measured, records }, null, 2) + "\n");
 console.log(`GROM_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; ${measured} both-facing sheets; private output ${output}`);
-if (!painOnly) await writeStride(bytes);
+if (!inPlace) await writeStride(bytes);

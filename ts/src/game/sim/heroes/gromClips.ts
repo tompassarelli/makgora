@@ -11,7 +11,7 @@ export const GROM_CLIPS = { idle: GROM_FALLBACK, walk: { index: 5, seconds: f32(
   forwardTiltDown: { index: 20, seconds: f32(0.467), aligned: true },
   upTilt: { index: 21, seconds: f32(0.433), aligned: true },
   downTilt: { index: 22, seconds: f32(0.4), aligned: true },
-  dashAttack: { index: 23, seconds: f32(0.533), aligned: true },
+  dashAttack: { index: 98, seconds: f32(0.633), aligned: true },
   forwardSmash: { index: 24, seconds: f32(0.767), aligned: true },
   upSmash: { index: 25, seconds: f32(0.7), aligned: true },
   downSmash: { index: 26, seconds: f32(0.733), aligned: true },
