@@ -49,11 +49,12 @@ const xset = Effect.suspend(() => {
   return found !== null ? Effect.succeed(found) : runProcess(ChildProcess.make("nix", ["build", "--no-link", "--print-out-paths", "nixpkgs#xorg.xset"], { stdin: "ignore" })).pipe(Effect.map(out => join(out.trim().split("\n")[0] ?? "", "bin", "xset")));
 });
 
-// Xwayland's autorepeat turns a tape key held past 660 ms into fresh presses that the game keeps reading after its keyup.
-const stopAutorepeat = (client: Client) => xset.pipe(
-  Effect.flatMap(path => runProcess(ChildProcess.make(path, ["r", "off"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" }))),
-  Effect.mapError(fail(`moves gate autorepeat ${client.name}`)),
-);
+// Xwayland's autorepeat turns a tape key held past 660 ms into fresh presses, and every VNC connection turns it back on.
+const stopAutorepeat = (path: string, client: Client) => Effect.gen(function*() {
+  const run = (args: readonly string[]) => runProcess(ChildProcess.make(path, args, { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" }));
+  yield* run(["r", "off"]);
+  if (!/auto repeat:\s+off/.test(yield* run(["q"]))) return yield* new AcceptFailure({ operation: `moves gate autorepeat ${client.name}`, problem: "xset q still reads auto repeat on after xset r off" });
+}).pipe(Effect.mapError(cause => cause instanceof AcceptFailure ? cause : new AcceptFailure({ operation: `moves gate autorepeat ${client.name}`, problem: String(cause) })));
 
 export const isReplayFromMatch = (file: string, modified: number, started: number): boolean =>
   REPLAY.test(file) && modified >= started;
@@ -233,12 +234,12 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
   const tap = (client: Client, key: string) => xdotool(client, ["keydown", key, "sleep", "0.12", "keyup", key]);
   const save = (file: string, text: string | Uint8Array) => Effect.try({ try: () => writeFileSync(join(directory, file), text, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "moves gate evidence", problem: String(cause) }) });
 
+  const xsetPath = yield* xset.pipe(Effect.mapError(fail("moves gate autorepeat")));
   const initial = yield* menu();
   if (initial.phase !== "CHARACTER") return yield* new AcceptFailure({ operation: "moves gate setup", problem: `expected CHARACTER, got ${initial.phase}` });
   for (const client of clients) {
     yield* focus(client).pipe(Effect.mapError(fail("moves gate setup")));
     yield* prime(client);
-    yield* stopAutorepeat(client);
     yield* xdotool(client, SMOKE_BINDINGS.keys.filter(bound => bound !== 0).flatMap(bound => ["keyup", "--delay", "0", keyName(bound)]));
     yield* reachFighterSelect(client, save);
   }
@@ -289,7 +290,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     const schedule = caster === undefined ? smokeSchedule(smokeApproaches(characters[0] ?? Character.rifleman, characters[1] ?? Character.rifleman)) : neutralSpecialSchedule(caster);
     const runs: SettleShot[][] = [];
     for (const segment of schedule) {
-      yield* Effect.forEach(segment.flatMap(({ slot }) => clients[slot] ?? []), client => focus(client).pipe(Effect.mapError(fail("moves gate focus"))), { discard: true });
+      yield* Effect.forEach(segment.flatMap(({ slot }) => clients[slot] ?? []), client => focus(client).pipe(Effect.mapError(fail("moves gate focus")), Effect.andThen(stopAutorepeat(xsetPath, client))), { discard: true });
       const points = settlePoints(segment.find(tape => caster === undefined || caster === "both" || tape.slot === caster)?.steps ?? []);
       const [, settles] = yield* Effect.all([
         Effect.forEach(segment, ({ slot, steps }) => {
