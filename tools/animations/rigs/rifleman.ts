@@ -19,6 +19,7 @@ export const classic = {
 } as const;
 export const pain = {
     rows: {
+        low: { turn: { pelvis: -15, chest: -30, head: 10, 'wrist.weapon': -180 }, aim: { 'arm.weapon': 240, 'forearm.weapon': 280, 'arm.free': 250, 'forearm.free': 290 } },
         high: { aim: { 'arm.weapon': 300, 'forearm.weapon': 320 } },
     },
 } as const;

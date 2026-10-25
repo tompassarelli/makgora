@@ -12,7 +12,10 @@ export const classic = {
     'wrist.R': 'Mesh02',
 } as const;
 export const pain = {
+    segments: [{ node: 'Cylinder03', child: 'Cylinder04', limb: 'thigh.front' }],
     rows: {
-        low: { turn: { chest: -10, head: 10 }, drop: -14 },
+        low: { turn: { chest: -35, head: 20 }, aim: { 'thigh.front': 18, 'arm.weapon': 200, 'forearm.weapon': 225, 'arm.free': 215, 'forearm.free': 240 }, drop: -24 },
+        middle: { aim: { 'thigh.front': 347 } },
+        high: { aim: { 'thigh.front': 347 } },
     },
 } as const;
