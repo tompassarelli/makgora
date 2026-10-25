@@ -1,0 +1,10 @@
+# Cairne Shockwave native proof on stage 2, facing left: the earth Shockwave should run along the floor at its radius-20 hit circle from its spawn on special frame 24 (match frame 282) and face its travel.
+#! chat -dev quick stage 2 pair cairne bloodhoof / mountain king
+250 a stick -1 0
+254 a stick 0 0
+260 a tap X 2
+284 a capture
+290 a capture
+298 a capture
+308 a capture
+320 a capture

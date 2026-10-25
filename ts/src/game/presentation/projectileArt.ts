@@ -103,7 +103,6 @@ export function allProjectileModels(): readonly string[] {
 
 export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined; readonly color?: readonly [number, number, number] | undefined } | undefined } = {
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { scale: f32(0.16) },
-  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": { scale: f32(0.3) },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { scale: f32(1.2) },
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": { scale: 1.5 },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { scale: f32(0.4) },
@@ -139,7 +138,6 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { x: 0.0, z: 0.0, sequence: "birth", disc: [155, 225, 255], discVertical: true },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { x: 0.0, z: 0.0, disc: [255, 215, 115] },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { x: 0.0, z: 0.0, roll: f32(1.570796327) },
-  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": { x: -20.0, z: -33.0, sequence: "stand", reseek: true, width: f32(0.75), height: 2.0 },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { x: 0.0, z: 0.0, sequence: "birth", seconds: f32(0.2) },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
   "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx": { x: 0.0, z: 0.0, sequence: "birth" },

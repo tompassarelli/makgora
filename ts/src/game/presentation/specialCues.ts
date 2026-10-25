@@ -231,7 +231,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
       { x: -97.75504302978516, z: 177.99998474121094 },
       { x: -97.75504302978516, z: 178.06654357910156 },
       { x: -97.75504302978516, z: 178.1291961669922 },
-    ] }, active: drawn("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx", "ahead") },
+    ] }, active: drawn("Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx", "ahead") },
     side: { spell: "Bloodhoof Gore", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.35)), active: cue("Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx", "ahead", f32(0.6)) },
     up: { spell: "Spirit Lift", startup: QUIET_BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx", "feet", f32(0.7)) },
     down: { spell: "War Stomp", startup: QUIET_BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.5)) },

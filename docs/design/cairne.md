@@ -96,9 +96,9 @@ projectile and armored charge. Compared with Beastmaster, he fights with one
 body. Compared with the Lich King, he has no frost-zone kit or persistent pool.
 
 Use the base-game Tauren Chieftain model and command portrait, stock Warcraft
-impact sounds, a spirit-blue Crushing Wave missile and a small stock ground
-ring for War Stomp sized to its regions. The wave stays distinct from Mountain King's ground
-waves. His halberd remains attached;
+impact sounds, the Tauren Chieftain's own earth Shockwave missile sized to its
+radius-20 wave, and a small stock ground ring for War Stomp sized to its regions.
+One wave forward reads apart from Mountain King's smaller paired clap waves. His halberd remains attached;
 the gesture plants his feet, moves the whole shoulder and follows through.
 Map or author the complete hero pose table, including both sides of throws,
 recovery, and nine pain poses. His gameplan is the hard read: Shockwave makes
