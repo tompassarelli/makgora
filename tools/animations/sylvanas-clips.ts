@@ -8,13 +8,16 @@ import { DRAWN_STRIDES } from "../../ts/src/game/presentation/drawnStrideInfo";
 import { drawnStrideSource, measureDrawnStride } from "../../ts/scripts/wisp/drawnMotion";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 
-const [input, output] = process.argv.slice(2).map(p => resolve(p));
+const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
+const painOnly = process.argv.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/sylvanas-clips.ts STOCK_SYLVANAS.mdx PRIVATE_OUTPUT");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/sylvanas-clips.ts STOCK_SYLVANAS.mdx|SHIPPED_SYLVANAS.mdx PRIVATE_OUTPUT [pain]");
 mkdirSync(join(output, "hero-models"), { recursive: true });
-const source = parseSource(await Bun.file(input).arrayBuffer());
-ensure(source.Sequences.length === 11, "Use the unmodified stock Sylvanas model");
+const originalBytes = await Bun.file(input).arrayBuffer();
+const source = parseSource(originalBytes);
+ensure(painOnly ? source.Sequences.some(s => s.Name === "Sylvanas pain00") : source.Sequences.length === 11, painOnly ? "Use the shipped Sylvanas model" : "Use the unmodified stock Sylvanas model");
 const model = structuredClone(source), stand = source.Sequences[9];
 ensure(stand?.Name === "Stand Ready", "Sylvanas stock sequence order changed");
 
@@ -22,6 +25,7 @@ interface Gesture {
   readonly chest?: number; readonly head?: number; readonly bow?: number; readonly elbow?: number;
   readonly grip?: number; readonly knee?: number; readonly twist?: number; readonly lean?: number;
   readonly roll?: number; readonly yaw?: number; readonly tuck?: number; readonly height?: number;
+  readonly wrist?: number; readonly hip?: number; readonly shin?: number;
 }
 interface Phase { readonly at: number; readonly pose: Gesture }
 interface Action { readonly name: string; readonly frames: number; readonly phases: readonly Phase[]; readonly air?: boolean; readonly hold?: boolean; readonly contact?: number; readonly pain?: boolean }
@@ -94,9 +98,10 @@ paired("victimThrowUp", captive, { ...captive, chest: 35, knee: 55 }, { ...capti
 paired("throwDown", held, { ...held, chest: -22, grip: -140, knee: 15 }, { ...held, chest: 58, grip: -45, bow: 25, knee: 48 });
 paired("victimThrowDown", captive, { ...captive, chest: -24, grip: -118, knee: 45 }, { ...captive, chest: 76, head: -8, grip: -40, bow: 36, knee: 70, twist: 25 });
 for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; strength++) {
-  const amount = [0.65, 1, 1.35][strength]!;
-  const g: Gesture = { chest: [12, 34, -24][height]! * amount, head: [-16, -28, -34][height]! * amount, bow: [-16, -38, 22][height]! * amount,
-    grip: [-16, -38, 22][height]! * amount, elbow: [18, 38, 28][height]! * amount, knee: [52, 22, 22][height]! * amount, lean: [-5, 5, -12][height]! * amount };
+  const gain = PAIN_GAIN[strength]!, stretch = HIGH_STRETCH[strength]!;
+  const g: Gesture = height === 0 ? { knee: 100 * gain, shin: 55 * gain, hip: 20 * gain, tuck: 0.16 * gain, chest: 12 * gain, head: -20 * gain, lean: 14 * gain, bow: -70 * gain, wrist: 50, grip: -70 * gain, elbow: 20 }
+    : height === 1 ? { chest: 50 * gain, head: 28 * gain, twist: 28 * gain, bow: 35 * gain, wrist: 40, grip: 55 * gain, elbow: 55 * gain, knee: 24 * gain, lean: 6 * gain }
+    : { hip: -22 * stretch, chest: -25 * stretch, head: -40 * stretch, lean: -6 * stretch, knee: -10 * stretch, bow: -70 * stretch, wrist: -45, grip: -110 * stretch, elbow: 15 * stretch };
   add(`pain${height}${strength}`, 24, [phase(0, g), phase(3, g), phase(12, Object.fromEntries(Object.entries(g).map(([k,v]) => [k,v * 0.85]))), phase(24, Object.fromEntries(Object.entries(g).map(([k,v]) => [k,v * 0.75])))], { air: true, pain: true });
 }
 
@@ -120,11 +125,76 @@ function joint(name: string, g: Gesture): [number,number] {
   if(name === "Bone_Arm1_L") return [g.bow ?? 0, 0];
   if(name === "Bone_Arm1_R") return [g.grip ?? 0, 0];
   if(name === "Bone_Arm2_L") return [g.elbow ?? 0, 0];
+  if(name === "Bone_Hand_L") return [g.wrist ?? 0, 0];
+  if(name === "Bone_Pelvis") return [g.hip ?? 0, 0];
   if(name === "Bone_Arm2_R") return [-(g.elbow ?? 0)*0.5, 0];
   if(name === "Bone_Leg1_L") return [-(g.knee ?? 0)*0.85,0];
   if(name === "Bone_Leg1_R") return [-(g.knee ?? 0)*0.35,0];
-  if(/^Bone_Leg2_[LR]$/.test(name)) return [g.knee ?? 0,0];
+  if(name === "Bone_Leg2_L") return [(g.knee ?? 0) + (g.shin ?? 0),0];
+  if(name === "Bone_Leg2_R") return [g.knee ?? 0,0];
   return [0,0];
+}
+const painActions = actions.filter(a => a.pain);
+const keyAt = (track: mdx.AnimVector, Frame: number) => { const key = track.Keys.find(k => k.Frame === Frame); ensure(key, `missing key at ${Frame}`); return key; };
+function snapPain(cells: readonly number[], motion: mdx.AnimVector) {
+  const body = new PainBody(generateMDX(model), Character.sylvanas), rest = body.floor(9, 0);
+  for (const [cell, index] of cells.entries()) {
+    const action = painActions[cell]!, [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+    for (let f = 0; f <= action.frames; f++) keyAt(motion, Math.round(start + f * (end - start) / action.frames)).Vector[2]! -= body.floor(index, f / 60) - rest;
+  }
+}
+function requirePainGate(bytes: ArrayBuffer, cells: readonly number[]) {
+  const { pass, report } = painGate(bytes, Character.sylvanas, 9, cells);
+  console.log(report);
+  ensure(pass, "Sylvanas pain gate failed");
+}
+async function painSheets(bytes: ArrayBuffer, cells: readonly number[]) {
+  const drawn = new DrawnModel(bytes, 1);
+  for (const [cell, index] of cells.entries()) {
+    const action = painActions[cell]!, moments = action.phases.map(p => Math.round(p.at));
+    const capture = sheet(`Sylvanas ${action.name}`, drawn, [1, -1].flatMap(facing => moments.map(frame => ({ frame, facing, clip: index, seconds: frame / 60, phase: AttackPhase.active, x: 0, z: 0, parts: [], strikes: [] }))), moments.length);
+    await Bun.write(join(output, `${action.name}.png`), capture.png);
+  }
+}
+if (painOnly) {
+  const motion = model.Helpers.find(h => h.Name === "Sylvanas Motion");
+  ensure(motion?.Rotation && motion.Translation && motion.Scaling, "Shipped Sylvanas has no motion helper");
+  const cells = painActions.map(action => {
+    const index = model.Sequences.findIndex(s => s.Name === `Sylvanas ${action.name}`);
+    ensure(index >= 0, `${action.name}: shipped sequence missing`);
+    const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+    ensure(end - start === Math.round(action.frames * 1000 / 60), `${action.name}: timing changed`);
+    const frameAt = (f: number) => Math.round(start + f * (end - start) / action.frames);
+    tracks(model, (track, path) => {
+      const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
+      if (!match || onGlobalClock(track)) return;
+      const node = model[match[1] as "Bones" | "Helpers"][Number(match[2])]!;
+      if (node.Name.endsWith(" Motion")) return;
+      const first = track.Keys.find(k => k.Frame >= stand.Interval[0]! && k.Frame <= stand.Interval[1]!); if (!first) return;
+      for (let f = 0; f <= action.frames; f++) {
+        const [pitch, yaw] = joint(node.Name, poseAt(action, f)), key = keyAt(track, frameAt(f)), Vector = rotate(first.Vector, pitch, yaw);
+        key.Vector = Vector; if (key.InTan) key.InTan = Vector.slice(); if (key.OutTan) key.OutTan = Vector.slice();
+      }
+    });
+    for (let f = 0; f <= action.frames; f++) {
+      const g = poseAt(action, f), Frame = frameAt(f);
+      keyAt(motion.Rotation!, Frame).Vector = rotate(new Float32Array([0, 0, 0, 1]), (g.roll ?? 0) + (g.lean ?? 0), g.yaw ?? 0);
+      keyAt(motion.Scaling!, Frame).Vector = new Float32Array([1, 1, 1 - (g.tuck ?? 0)]);
+      keyAt(motion.Translation!, Frame).Vector = new Float32Array([0, 0, g.height ?? 0]);
+    }
+    return index;
+  });
+  snapPain(cells, motion.Translation!);
+  const bytes = encodeVerified(parseSource(generateMDX(model))), before = new DrawnModel(originalBytes, 1), after = new DrawnModel(bytes, 1), authored = new Set(cells);
+  for (const [index, sequence] of source.Sequences.entries()) if (!authored.has(index)) for (const part of [0, 0.5, 1]) {
+    const time = (sequence.Interval[1]! - sequence.Interval[0]!) * part / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
+    ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${sequence.Name}: shipped pose changed`);
+  }
+  await painSheets(bytes, cells);
+  const modelPath = join(output, "evilsylvanas.mdx"); await Bun.write(modelPath, bytes); chmodSync(modelPath, 0o644);
+  requirePainGate(bytes, cells);
+  console.log(`SYLVANAS_PAIN_PASS: 9 pain cells re-authored in place; ${source.Sequences.length - cells.length} other sequences unchanged; ${bytes.byteLength} model bytes`);
+  process.exit(0);
 }
 const id = model.Nodes.length;
 const helper: mdx.Helper = { Name: "Sylvanas Motion", ObjectId:id, Parent:null, Flags:0, PivotPoint:new Float32Array([0,0,55]),
@@ -173,6 +243,8 @@ for(const action of actions) {
   }
   bindings.set(action.name,{index,seconds:(end-start)/1000,...(action.contact?{contact:action.contact}:{})});
 }
+const painCells = painActions.map(a => bindings.get(a.name)!.index);
+snapPain(painCells, helper.Translation!);
 const beforeRetime = new DrawnModel(generateMDX(model), 1);
 const victimPummel = bindings.get("victimPummel")!;
 const victimSequence = model.Sequences[victimPummel.index]!;
@@ -230,6 +302,7 @@ for(const action of actions) {
 const idle=before.triangles(9,0,1),pain=actions.filter(a=>a.pain).map(a=>after.triangles(bindings.get(a.name)!.index,0,1));
 for(const [cell,p] of pain.entries())ensure(p.some((v,i)=>Math.abs(v-idle[i]!)>=8),`Pain ${cell}: insufficient recoil`);
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++)ensure(pain[a]!.some((v,i)=>Math.abs(v-pain[b]![i]!)>2),`Pain ${a}/${b}: same pose`);
+requirePainGate(bytes,painCells);
 const modelPath=join(output,"hero-models/evilsylvanas.mdx");await Bun.write(modelPath,bytes);chmodSync(modelPath,0o644);
 const literal=(b:{index:number,seconds:number,contact?:number})=>`{ index: ${b.index}, seconds: ${seconds(b.seconds)}, aligned: true${b.contact?`, contact: ${seconds(b.contact)}`:""} }`;
 const aliases:Record<string,string>={doubleJump:"jump",wallJump:"jump",wallTech:"tech",fallSpecial:"fall",downDamage:"knockdown",damageTumble:"knockdown",damageGround:"pain11",damageAir:"pain11",damageShield:"stop",smashCharge:"shield",neutralSpecialAir:"neutralSpecial",sideSpecialAir:"sideSpecial",upSpecialAir:"upSpecial",downSpecialAir:"downSpecial"};
