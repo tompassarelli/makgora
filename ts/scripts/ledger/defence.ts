@@ -137,7 +137,7 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     id: "floor-rebound", family: "defence", name: "Missed tech into the floor at speed",
     melee: { value: "the fall stops", source: wiki("Meteor_smash") }, ours: () => `rebounds ×${shortNumber(SURFACE_REFLECT_ATTENUATION)}, as off walls`,
     anchor: { file: "ts/src/game/sim/surfaces.ts", symbol: "SURFACE_REFLECT_ATTENUATION" },
-    status: { kind: "deviation", reason: "a missed tech keeps its momentum, so a hard spike can carry off the top (docs/gameplay-design.md, Airborne floor rebound)", decided: "2026-10-15" },
+    status: { kind: "deviation", reason: "a missed tech keeps its momentum, so a hard spike can carry off the top (docs/physics.md, Floor bounces)", decided: "2026-10-15", elsewhere: "Smash 4 and Ultimate: floors no longer halt knockback momentum; a missed tech rebounds like a stage spike, so a meteor can KO off the top ([SmashWiki](https://www.ssbwiki.com/Floor))" },
   },
   {
     id: "down-wait", family: "defence", name: "Frames lying down before standing by itself",
@@ -199,7 +199,7 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     melee: { value: "⌊(0.45d + 2)·200/201⌋", source: wiki("Shield") },
     ours: probe({ text: "⌊(0.6d + 2)·200/201⌋", inputs: DAMAGE, label: (damage) => `damage ${damage}`, ours: (damage) => digitalShieldstunFrames(damage, true), melee: (damage) => meleeShieldstun(damage, 0.6) }),
     anchor: { file: SHIELD, symbol: "shieldstunFrames" },
-    status: { kind: "deviation", reason: "aerials take a third more shieldstun per damage, tilting slightly toward aggression (docs/gameplay-design.md, Aerial shieldstun)", decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "aerials take a third more shieldstun per damage, tilting slightly toward aggression (docs/gameplay-design.md, Aerials on shield)", decided: "2026-10-06", issue: 106, elsewhere: "Ultimate: ⌊0.8 × damage × 0.33 + 2⌋ for aerials, 0.264 a damage, with shield hitlag × 0.67 ([SmashWiki](https://www.ssbwiki.com/Shieldstun), [hitlag](https://www.ssbwiki.com/Hitlag)). Rivals 2: 0.8 × damage + 1 for every attack, and the input buffer drops to 2 frames after a shield contact ([Dragdown](https://dragdown.wiki/wiki/RoA2/System_Mechanics/Defense))" },
   },
   {
     id: "shield-health", family: "defence", name: "Shield health",
@@ -245,20 +245,20 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     id: "shield-release", family: "defence", name: "Shield release lag",
     melee: { value: 15, source: wiki("Shield") }, ours: () => SHIELD_RELEASE_LAG_FRAMES,
     anchor: { file: SHIELD, symbol: "SHIELD_RELEASE_LAG_FRAMES" },
-    status: { kind: "deviation", reason: "Ultimate's 11 makes dropping shield a real option beside jumping or rolling out (docs/gameplay-design.md, Shield release lag)", decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "Melee's 15 makes dropping shield almost never worth it; Ultimate's 11, the starting point, makes it a real option beside jumping or rolling out (docs/gameplay-design.md, Principles)", decided: "2026-10-06", issue: 100, elsewhere: "Ultimate: 11 frames" },
   },
   {
     id: "powershield", family: "defence", name: "Powershield",
     melee: { value: "first 4 frames of shield on a hit: no shield damage, more pushback, same shieldstun; first 2 reflect projectiles", source: wiki("Powershield") },
     ours: () => "a parry: no shield damage, no shieldstun, no release lag",
     anchor: { file: SHIELD, symbol: "grantParry" },
-    status: { kind: "deviation", reason: "a true parry whose reward is the defender's own punish (docs/gameplay-design.md, Powershield and parry)", decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "a true parry whose reward is the defender's own punish (docs/gameplay-design.md, Powershield and parry)", decided: "2026-10-06", issue: 102, elsewhere: "Ultimate: release-timed in the first 5 frames of the 11-frame shield drop; any attack skips the drop lag and acts 3 frames sooner than a block against direct hits; no reflection ([SmashWiki](https://www.ssbwiki.com/Perfect_shield)). Rivals 2: a 4-frame perfect shield plus a separate parry, active 6–13, that stuns the attacker 40–100 frames ([Dragdown](https://dragdown.wiki/wiki/RoA2/System_Mechanics/Defense))" },
   },
   {
     id: "platform-shield-drop", family: "defence", name: "Shield drop through a platform",
     melee: { value: "down while shielding drops through", source: wiki("Shield_dropping") }, ours: () => "none: a raised shield stays on the platform",
     anchor: { file: "ts/src/game/sim/platformMoves.ts", symbol: "dropFromPlatform" },
-    status: { kind: "deviation", reason: "shielded fighters keep their jump, dodge or release choices (docs/gameplay-design.md, Platform shield drop)", decided: "2026-10-14" },
+    status: { kind: "deviation", reason: "shielded fighters keep their jump, dodge or release choices (docs/gameplay-design.md, Platform shield drop)", decided: "2026-10-14", issue: 103, elsewhere: "Removed in Ultimate; Project+ keeps it" },
   },
   {
     id: "out-of-shield", family: "defence", name: "Jump and grab out of shield, probed headless",
@@ -281,7 +281,7 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     melee: { value: "⌊76 + 1.6p⌋", source: wiki("Grab") },
     ours: probe({ text: "⌊90 + 1.75p⌋", inputs: PERCENT, label: (percent) => `${percent}%`, ours: grabHoldFrames, melee: (percent) => Math.floor(90 + 1.75 * percent) }),
     anchor: { file: MOVES, symbol: "grabHoldFrames" },
-    status: { kind: "deviation", reason: "Ultimate's hold formula with a visible escape meter (docs/gameplay-design.md, Grab holds and pummels)", decided: "2026-10-14" },
+    status: { kind: "deviation", reason: "Ultimate's hold formula with a visible escape meter (docs/gameplay-design.md, Grab holds and pummels)", decided: "2026-10-14", issue: 101, elsewhere: "Brawl onward: 90 + 1.7 frames per percent, 8 per stick mash input (14.4 per button in Smash 4 and Ultimate), never under 19 ([SmashWiki](https://www.ssbwiki.com/Grab)). Rivals 2: one pummel per grab, Attack or Special, broken when the victim presses the same button ([FAQ](https://rivals2.com/faq)); a 60-frame hold animation ([workshop](https://rivals2.com/workshop/?p=389))" },
   },
   {
     id: "grab-mash", family: "defence", name: "Hold frames each mash input removes",

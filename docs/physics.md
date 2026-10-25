@@ -698,7 +698,7 @@ Melee is the design target here, from public sources only:
   the momentum" and the fighter rebounds "much like a stage spike with the
   floor instead of a wall" ([SmashWiki, Floor](https://www.ssbwiki.com/Floor)),
   so a meteor can carry a midair target off the top blast zone (a deliberate
-  divergence, smashcraft:docs/gameplay-design.md "Deviations from Melee").
+  divergence, ledger row `floor-rebound` in smashcraft:docs/design/melee-parity.md).
   A tumbling airborne fighter with no tech in the window whose downward
   knockback exceeds the wall reflect threshold (1 Melee unit a frame) rebounds:
   its knockback plus own velocity reflects upward at 0.800000011920929, it stays
@@ -1078,7 +1078,7 @@ rolls preserve facing. Neither move permits attacks, jumps, steering or shieldin
 during its recovery. Jump takes priority over a simultaneous dodge request.
 Spot dodge does not drop through a platform. Intangibility and recovery clocks
 pause in hitlag. Every character uses the owner's common dodge profile
-(smashcraft:docs/gameplay-design.md, "Deviations from Melee"): spot dodge
+(ledger row `dodge-timing`, smashcraft:docs/design/melee-parity.md): spot dodge
 22 / protection 2–15, both rolls 31 / protection 4–19, and air dodge 49 /
 protection 4–29 with 10 landing frames for every character. Air dodge is
 available once per airtime and ends actionable after its 49-frame animation;
@@ -1210,8 +1210,8 @@ multiplier or hold.
 The extra hold is Tom's deviation from Melee (26 Oct 2026, #328), taken from
 Ultimate: SmashWiki's [Smash attack](https://www.ssbwiki.com/Smash_attack) and
 [Charge](https://www.ssbwiki.com/Charge) pages give Ultimate 60 frames of
-charge, then 120 more frames of hold that add no damage. It is a row in
-smashcraft:docs/gameplay-design.md "Deviations from Melee". Hitlag pauses charge accumulation;
+charge, then 120 more frames of hold that add no damage. It is ledger row `smash-charge-hold` in
+smashcraft:docs/design/melee-parity.md. Hitlag pauses charge accumulation;
 fighter steering and attack/cooldown clocks pause while ordinary world timers,
 gravity and platform motion continue. C-stick/direct smash commands are
 immediate. These state and input rules are prototype choices, not claims of

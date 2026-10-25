@@ -22,7 +22,6 @@ const SIM = "ts/src/game/sim";
 const LEDGE = `${SIM}/ledge.ts`;
 const PLATFORMS = `${SIM}/platformMoves.ts`;
 const STICK_ZONES = `${SIM}/stickZones.ts`;
-const DEVIATIONS = "docs/gameplay-design.md, Deviations from Melee";
 const AERIALS = [AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir] as const;
 const ALWAYS_CANCELLED = "every aerial lands with the halved lag, with no input";
 
@@ -69,7 +68,7 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "l-cancel", family: "movement", name: "L-cancel, probed on every aerial",
     melee: { value: "an L, R or Z press within 7 frames before landing halves an aerial's landing lag", source: wiki("L-cancel") }, ours: landingLagCancel,
     anchor: { file: `${SIM}/moves.ts`, symbol: "attackLandingLag" },
-    status: { kind: "deviation", reason: `an input chore on every aerial with no decision in it (${DEVIATIONS})`, decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "an input chore on every aerial with no decision in it", decided: "2026-10-06", issue: 54, elsewhere: "Removed from Brawl onward, with more autocancel; kept in Project M and Project+ ([SmashWiki](https://www.ssbwiki.com/L-cancel))" },
   },
   {
     id: "aerial-auto-cancel", family: "movement", name: "Aerial auto-cancel windows",
@@ -127,14 +126,14 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "platform-drop", family: "movement", name: "Platform drop",
     melee: { value: "a fresh down falls through", source: wiki("Platform") }, ours: () => "a fresh hard down drops at once; down held after mounting crouches",
     anchor: { file: PLATFORMS, symbol: "dropFromPlatform" },
-    status: { kind: "deviation", reason: "Tom removed the descent animation and frames (docs/gameplay-design.md, Platforms)", decided: "2026-10-14" },
+    status: { kind: "deviation", reason: "Tom removed the descent animation and frames (docs/gameplay-design.md, Platforms)", decided: "2026-10-14", issue: 392, elsewhere: "Ultimate drops through at once; Rivals 2 not sourced" },
   },
   {
     id: "platform-ascent", family: "movement", name: "Platform ascent",
     melee: { value: "a rising fighter passes up through with no change to its action", source: wiki("Platform") },
     ours: () => "down past crouch depth, without an aerial, mounts at once; otherwise passes through",
     anchor: { file: PLATFORMS, symbol: "mountPlatform" },
-    status: { kind: "deviation", reason: "Tom's instant-mount rule (docs/gameplay-design.md, Platforms)", decided: "2026-10-14" },
+    status: { kind: "deviation", reason: "Tom's instant-mount rule (docs/gameplay-design.md, Platforms)", decided: "2026-10-14", issue: 392, elsewhere: "Ultimate passes through the same way; Rivals 2 not sourced" },
   },
   {
     id: "platforms-in-hitstun", family: "movement", name: "Platforms in hitstun",
@@ -172,7 +171,7 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "tap-jump", family: "movement", name: "Tap jump",
     melee: { value: "stick up jumps, always", source: wiki("Tap_jump") }, ours: () => "off: jump is its own button",
     anchor: { file: STICK_ZONES, symbol: "TAP_JUMP_WINDOW" },
-    status: { kind: "deviation", reason: `jump is its own button (${DEVIATIONS})`, decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "jump is its own button", decided: "2026-10-06", issue: 49, elsewhere: "Optional from Brawl onward (\"Stick Jump\" in Ultimate; [SmashWiki](https://www.ssbwiki.com/Tap_jump))" },
   },
   {
     id: "tilt-versus-smash", family: "movement", name: "Tilt or smash, probed on a full forward press",
@@ -191,7 +190,7 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "air-dodge", family: "movement", name: "Air dodge",
     melee: { value: "directional; ends in helpless fall until landing", source: wiki("Air_dodge") }, ours: () => "once per airtime, ending actionable; refreshed on landing, ledge catch and being hit",
     anchor: { file: `${SIM}/jumpsAndDodges.ts`, symbol: "beginAirDodge" },
-    status: { kind: "deviation", reason: `the air dodge works as in Smash (${DEVIATIONS})`, decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "the air dodge works as in Smash", decided: "2026-10-06", issue: 100, elsewhere: "Ultimate: one directional air dodge per airtime, no helpless fall, refreshed on landing, ledge grab and being hit ([SmashWiki](https://www.ssbwiki.com/Air_dodge)). Rivals of Aether 2: the dodge ends in an ordinary fall ([workshop](https://rivals2.com/workshop/?p=389))" },
   },
   {
     id: "air-dodge-decay", family: "movement", name: "Air dodge speed decay a frame",
@@ -202,13 +201,13 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "fast-fall-control", family: "movement", name: "Fast fall input",
     melee: { value: "a fresh stick down, diagonals included", source: wiki("Fast_fall") }, ours: () => "down with neutral horizontal input only; diagonals keep drifting",
     anchor: { file: `${SIM}/fighter.ts`, symbol: "FAST_FALL_INPUT_WINDOW" },
-    status: { kind: "deviation", reason: `owner-selected control (${DEVIATIONS})`, decided: "2026-09-30" },
+    status: { kind: "deviation", reason: "owner-selected control", decided: "2026-09-30" },
   },
   {
     id: "horizontal-dodge-control", family: "movement", name: "Horizontal air dodge direction",
     melee: { value: "where the stick points", source: wiki("Air_dodge") }, ours: () => "a horizontal-only digital air dodge angles 18° below horizontal",
     anchor: { file: `${SIM}/jumpsAndDodges.ts`, symbol: "beginAirDodge" },
-    status: { kind: "deviation", reason: `owner-selected control; the shallow angle keeps horizontal momentum into the landing (${DEVIATIONS})`, decided: "2026-09-30" },
+    status: { kind: "deviation", reason: "owner-selected control; the shallow angle keeps horizontal momentum into the landing", decided: "2026-09-30" },
   },
   {
     id: "traction-doubling", family: "movement", name: "Traction above walk speed, probed headless",
@@ -220,6 +219,6 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     melee: { value: "per fighter", source: wiki("Spot_dodge") },
     ours: () => `spot dodge ${SPOT_DODGE_FRAMES}, intangible ${SPOT_DODGE_INTANGIBLE_START}–${SPOT_DODGE_INTANGIBLE_END}; rolls ${GROUND_ROLL_FRAMES}, intangible ${GROUND_ROLL_INTANGIBLE_START}–${GROUND_ROLL_INTANGIBLE_END}; air dodge ${AIR_DODGE_ANIMATION_FRAMES}, intangible ${AIR_DODGE_INTANGIBLE_START}–${AIR_DODGE_INTANGIBLE_END}, landing ${AIR_DODGE_LANDING_LAG}`,
     anchor: { file: `${SIM}/conditions.ts`, symbol: "SPOT_DODGE_FRAMES" },
-    status: { kind: "deviation", reason: `one shared frame-data profile for every fighter (${DEVIATIONS})`, decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "one shared frame-data profile for every fighter", decided: "2026-10-06" },
   },
 ];

@@ -59,7 +59,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 
 - [Player guide](player-guide.md): controls, menus and match flow.
 - [Move list](move-list.md): every fighter's specials and ultimate by official name, generated from the kit data by `bun install` (from ts/; untracked).
-- [Gameplay design decisions](gameplay-design.md): the owner's principles and decisions, the deviations from Melee and open questions. The only place Smashcraft's stance is written.
+- [Gameplay design decisions](gameplay-design.md): the owner's principles and decisions and open questions; each deviation from Melee is a row of the [Melee parity ledger](design/melee-parity.md). The only place Smashcraft's stance is written.
 - [Melee case study](design/melee/README.md): Melee's movement, attacks, defence, archetypes, techniques and jank, described with numbers computed from the reference data.
 - [Fighting-game design language](design/fighting-games.md): frame advantage, highs and lows, footsies, okizeme, strike/throw, hitboxes and hurtboxes, archetypes, with sources.
 - [Platform-fighter design language](design/platform-fighters.md): how platform fighters change that language: shield, aerials on shield, ledge, DI and SDI, tech chases, edgeguarding, the interaction graph.

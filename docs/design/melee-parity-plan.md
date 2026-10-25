@@ -26,8 +26,8 @@ map.
   `ts/src/game/sim/motion.ts:206-257`). `bun wisp oracle`
   (`ts/scripts/meleeOracle.ts`) already checks about 120 behavioural
   scenarios against Melee, with Fox and Falco reference records as numbers
-  (`ts/scripts/meleeOracle.ts:37-46`), and every departure must name a row of
-  the hand-kept table in `docs/gameplay-design.md:828` ("Deviations from Melee").
+  (`ts/scripts/meleeOracle.ts:37-46`), and every departure names a deviation
+  row of the ledger by id (#290).
 - The combo search exists: `bun wisp combos` (`ts/scripts/comboExplorer.ts`)
   is a headless, deterministic beam search over inputs at percents 0-180, DI
   out/up/down/in/none, against Rifleman and Cairne; `ts/scripts/agencyBranch.ts`

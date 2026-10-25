@@ -1,6 +1,7 @@
 import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
+import { LEDGER_ROWS, departureProblems } from "../../ledger/ledger";
 import { formatOracle, oracleProblems, runOracle } from "../../meleeOracle";
 import { compareThresholds, formatThresholds } from "../../meleeThresholds";
 
@@ -17,7 +18,7 @@ export const oracle: Command = (args) => {
     yield* Console.log(formatOracle(rows));
     const thresholds = yield* Effect.sync(() => compareThresholds()).pipe(step("FightCore knockdown thresholds"));
     yield* Console.log(formatThresholds(thresholds));
-    const problems = [...oracleProblems(rows), ...thresholds.problems];
+    const problems = [...oracleProblems(rows), ...departureProblems(rows, LEDGER_ROWS), ...thresholds.problems];
     if (problems.length > 0) return yield* new OracleFailure({ problems });
   });
 };

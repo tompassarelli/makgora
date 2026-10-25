@@ -16,7 +16,7 @@ export type Melee =
 
 export type Status =
   | { readonly kind: "parity" }
-  | { readonly kind: "deviation"; readonly reason: string; readonly decided: string; readonly issue?: number }
+  | { readonly kind: "deviation"; readonly reason: string; readonly decided: string; readonly issue?: number; readonly elsewhere?: string }
   | { readonly kind: "open"; readonly reason: string; readonly issue?: number };
 
 export interface Anchor {

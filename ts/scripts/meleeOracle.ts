@@ -118,6 +118,7 @@ interface OracleRow {
   readonly actual: string;
   readonly outcome: Outcome;
   readonly cite: string;
+  readonly deviation?: string;
 }
 
 interface Check {
@@ -134,7 +135,7 @@ interface Scenario {
 
   readonly run: (character: Character) => Check | undefined;
 
-  readonly departure?: string;
+  readonly deviation?: string;
 }
 
 const FIGHTERS = [
@@ -146,12 +147,12 @@ const show = (value: string | number | boolean): string =>
   typeof value === "number" ? (Number.isInteger(value) ? String(value) : value.toFixed(4).replace(/0+$/, "")) : String(value);
 
 function rowFor(scenario: Scenario, character: Character, name: string): OracleRow {
-  const base = { area: scenario.area, scenario: scenario.name, fighter: name, cite: scenario.departure === undefined ? scenario.cite : `${scenario.cite}; departure: ${scenario.departure}` };
+  const base = { area: scenario.area, scenario: scenario.name, fighter: name, cite: scenario.cite, ...(scenario.deviation === undefined ? {} : { deviation: scenario.deviation }) };
   const check = scenario.run(character);
   if (check === undefined) return { ...base, expected: "-", actual: "-", outcome: "n/a" };
   const { expected, actual, tolerance = 0.0 } = check;
   const pass = typeof expected === "number" && typeof actual === "number" ? Math.abs(expected - actual) <= tolerance : expected === actual;
-  return { ...base, expected: show(expected), actual: show(actual), outcome: pass ? "pass" : scenario.departure === undefined ? "mismatch" : "departure" };
+  return { ...base, expected: show(expected), actual: show(actual), outcome: pass ? "pass" : scenario.deviation === undefined ? "mismatch" : "departure" };
 }
 
 
@@ -371,7 +372,7 @@ const LANDING: readonly Scenario[] = [
   {
     area: "landing", name: "neutral aerial landing lag with no L press",
     cite: L_CANCEL,
-    departure: "L-cancelling: removed, every aerial lands with the cancelled lag (owner decision 2026-10-06, #54)",
+    deviation: "l-cancel",
     run: (c) => ({ expected: NAIR_LAG, actual: landingLag(c, aerialFall) }),
   },
 ];
@@ -579,7 +580,7 @@ const KNOCKBACK: readonly Scenario[] = [
   {
     area: "knockback", name: "the same move landing 5 times in a row: hit 5 damage against hit 1",
     cite: STALE_MOVES,
-    departure: "Stale moves and freshness bonuses: none (owner decision 2026-10-04, reaffirmed 2026-10-06)",
+    deviation: "staling",
     run: (c) => {
       const hits = repeatedHits(c, 5);
       return { expected: "hit 5 deals less than hit 1", actual: hits.every((hit) => hit === hits[0]) ? `all 5 hits: ${hits[0]}` : `varies: ${hits.join("; ")}` };
@@ -661,8 +662,6 @@ function downThroughDeck(character: Character): string {
 const PLATFORM_LINES = "platforms are floor lines that are solid only while descending; ceilings ignore them";
 const PLATFORM_PASS = "Pass needs stick y of at least 0.66 down, reached within 6 frames, on a platform";
 
-const PLATFORM_DROP = "Platform descent: falling onto a platform with down past the crouch threshold drops through it, ending the aerial (owner decision 2026-10-09, #392)";
-
 const PLATFORMS: readonly Scenario[] = [
   { area: "hazard", name: "Whispy's first gust moves a standing fighter", cite: "wind strength 0.2; wind after blow frame 45", run: (c) => {
     const s = solo(WIND_TEST_STAGE, c, 240.0);
@@ -716,8 +715,8 @@ const PLATFORMS: readonly Scenario[] = [
     area: "platform", name: "fresh down on a raised deck: how the fighter leaves it", cite: `${PLATFORM_PASS}; the fighter enters a fall at once`,
     run: (c) => ({ expected: "falls through at once", actual: downThroughDeck(c) }),
   },
-  { area: "platform", name: "falling onto a raised deck holding down: landing", cite: `${PLATFORM_LINES}; airborne collision has no stick test`, departure: PLATFORM_DROP, run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 0) }) },
-  { area: "platform", name: "still holding down 30 frames after that landing", cite: PLATFORM_PASS, departure: PLATFORM_DROP, run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 30) }) },
+  { area: "platform", name: "falling onto a raised deck holding down: landing", cite: `${PLATFORM_LINES}; airborne collision has no stick test`, deviation: "platform-drop", run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 0) }) },
+  { area: "platform", name: "still holding down 30 frames after that landing", cite: PLATFORM_PASS, deviation: "platform-drop", run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 30) }) },
 ];
 
 
@@ -1163,14 +1162,11 @@ const wavelandFall: Fall = { setup: (f) => airborne(f, 0.0, 6.0), held: (n) => (
 const DODGE_DATA = "Fox/Falco dodges from references/melee-frame-data/records.jsonl";
 const DODGE_INTANGIBLE = "Fox/Falco intangibility from public frame data (EscapeN, EscapeF, EscapeAir), as references/melee-frame-data/records.jsonl reports for the ground dodges";
 
-const SHIELD_RELEASE_DEPARTURE = "Shield release lag: 11 frames, Ultimate's value (owner decision 2026-10-06, #100)";
-const AIR_DODGE_DEPARTURE = "Air dodge: once per airtime, ends actionable, refreshed on landing, ledge catch and being hit (owner decision 2026-10-06, #100)";
-
 const SHIELD_AND_DODGES: readonly Scenario[] = [
   {
     area: "shield/dodge", name: "shield release: frames until an attack starts",
     cite: "SmashWiki Shield: Melee shield drop lag 15 frames",
-    departure: SHIELD_RELEASE_DEPARTURE,
+    deviation: "shield-release",
     run: (c) => forReference(c, () => ({ expected: 15, actual: shieldReleaseLag(c) })),
   },
   {
@@ -1194,7 +1190,7 @@ const SHIELD_AND_DODGES: readonly Scenario[] = [
   {
     area: "shield/dodge", name: "air dodge ends in helpless fall: no attack before landing",
     cite: "EscapeAir ends in FallSpecial, which allows no action until landing",
-    departure: AIR_DODGE_DEPARTURE,
+    deviation: "air-dodge",
     run: (c) => ({ expected: false, actual: actsAfterAirDodge(c) }),
   },
   {
@@ -1235,25 +1231,24 @@ function pressInShieldstun(character: Character): string {
   return f.shield.stun > 0 && f.shield.perfectFrames > 0 ? "parries the next hit" : "ignored";
 }
 
-const PARRY_DEPARTURE = "Powershield: a parry with no shieldstun or release lag and a red parry in shieldstun (owner direction 2026-10-06, #102)";
 const POWERSHIELD: readonly Scenario[] = [
   {
     area: "powershield", name: "shieldstun of a parried 10-damage hit",
     cite: "GuardSetOff runs at the ordinary rate whether or not the perfect flag is set",
     run: (c) => ({ expected: digitalShieldstunFrames(TEST_HIT.damage), actual: shieldedHit(c, true).f.shield.stun }),
-    departure: PARRY_DEPARTURE,
+    deviation: "powershield",
   },
   {
     area: "powershield", name: "dropping the shield after a parry",
     cite: "GuardOff still plays; the counter (4) only admits attacks and grabs during it",
     run: (c) => ({ expected: "GuardOff, attacks only", actual: dropAfterParry(c) }),
-    departure: PARRY_DEPARTURE,
+    deviation: "powershield",
   },
   {
     area: "powershield", name: "a fresh shield press during shieldstun",
     cite: "GuardSetOff accepts no input",
     run: (c) => ({ expected: "ignored", actual: pressInShieldstun(c) }),
-    departure: PARRY_DEPARTURE,
+    deviation: "powershield",
   },
 ];
 
@@ -1344,15 +1339,14 @@ function grabHold(character: Character, percent: number, mashOn?: number): numbe
 }
 
 const GRAB_RULE = "the escape timer starts at 76 + 1.6 frames per percent and falls 1 a frame plus 6 per mash input: smashcraft:docs/design/melee/defense.md#grabs";
-const GRAB_DEPARTURE = "Grab hold: floor(90 + 1.75 x percent) frames, 8 off per mash input down to 60, one pummel connecting on frame 60 (owner direction 2026-10-06 #101, Ultimate formula 2026-10-14 #550)";
 
 const GRABS: readonly Scenario[] = [
   {
-    area: "grabs", name: "frames held at 150% without mashing", cite: GRAB_RULE, departure: GRAB_DEPARTURE,
+    area: "grabs", name: "frames held at 150% without mashing", cite: GRAB_RULE, deviation: "grab-hold",
     run: (c) => ({ expected: 76 + 240, actual: grabHold(c, 150.0) }),
   },
   {
-    area: "grabs", name: "frames one mash press takes off a hold at 0%", cite: GRAB_RULE, departure: GRAB_DEPARTURE,
+    area: "grabs", name: "frames one mash press takes off a hold at 0%", cite: GRAB_RULE, deviation: "grab-mash",
     run: (c) => {
       const plain = grabHold(c, 0.0);
       const mashed = grabHold(c, 0.0, 1);
@@ -1403,17 +1397,16 @@ function sdiMash(character: Character): { readonly travel: number; readonly step
 }
 
 const SDI_RULE = "a stick at least 0.70 from centre that newly moved within 4 frames shifts the fighter by  = 6 units on each hitlag frame, and ASDI shifts 3 once on release: smashcraft:docs/design/melee/defense.md#influence-on-knockback";
-const SDI_DEPARTURE = "SDI: bounded travel, at most 9 units of SDI and 12 with ASDI per hit, 24 per string, in steps of at most 3 per frame (owner-authorized default 2026-10-06, #70)";
 
 const SMASH_DI: readonly Scenario[] = [
   {
     area: "smash DI", name: "travel from 19 alternating fresh pulses in 20 frames of hitlag",
-    cite: SDI_RULE, departure: SDI_DEPARTURE,
+    cite: SDI_RULE, deviation: "sdi-bound",
     run: (c) => ({ expected: 19 * 6, actual: sdiMash(c).travel, tolerance: 0.001 }),
   },
   {
     area: "smash DI", name: "largest one-frame SDI shift",
-    cite: SDI_RULE, departure: SDI_DEPARTURE,
+    cite: SDI_RULE, deviation: "sdi-bound",
     run: (c) => ({ expected: 6, actual: sdiMash(c).step, tolerance: 0.001 }),
   },
 ];
@@ -1466,8 +1459,8 @@ export function oracleProblems(rows: readonly OracleRow[]): string[] {
       .map((row) => `new mismatch: ${rowKey(row)}: expected ${row.expected}, got ${row.actual}`),
     ...rows.filter((row) => row.outcome !== "mismatch" && KNOWN_MISMATCHES.has(rowKey(row)))
       .map((row) => `known mismatch now ${row.outcome}: ${rowKey(row)}; remove it from KNOWN_MISMATCHES`),
-    ...rows.filter((row) => row.outcome === "pass" && SCENARIOS.some((scenario) => scenario.name === row.scenario && scenario.departure !== undefined))
-      .map((row) => `departure now matches Melee: ${rowKey(row)}; remove its departure`),
+    ...rows.filter((row) => row.outcome === "pass" && row.deviation !== undefined)
+      .map((row) => `departure now matches Melee: ${rowKey(row)}; remove its deviation`),
     ...[...KNOWN_MISMATCHES.keys()].filter((key) => !keys.has(key)).map((key) => `known mismatch has no row: ${key}`),
   ];
 }
@@ -1481,7 +1474,7 @@ export function formatOracle(rows: readonly OracleRow[]): string {
   for (const row of rows) {
     const heading = `${row.area}: ${row.scenario}`;
     if (heading !== previous) {
-      lines.push("", heading, `    ${row.cite}`);
+      lines.push("", heading, `    ${row.cite}`, ...(row.deviation === undefined ? [] : [`    departs from Melee: ledger row ${row.deviation}`]));
       previous = heading;
     }
     const mark = row.outcome === "mismatch" ? (KNOWN_MISMATCHES.has(rowKey(row)) ? "MISMATCH (known)" : "MISMATCH") : row.outcome;

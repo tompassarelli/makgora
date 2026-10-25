@@ -15,6 +15,24 @@ export interface Evaluated {
   readonly checkLine: number | undefined;
 }
 
+export interface OracleCheck {
+  readonly deviation?: string;
+  readonly area: string;
+  readonly scenario: string;
+  readonly fighter: string;
+  readonly outcome: string;
+}
+
+export function departureProblems(checks: readonly OracleCheck[], rows: readonly LedgerRow[]): string[] {
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const named = new Map(checks.flatMap(({ area, scenario, deviation }) => (deviation === undefined ? [] : [[`${area}: ${scenario}`, deviation] as const])));
+  return [...named].flatMap(([scenario, id]) => {
+    const row = byId.get(id);
+    if (row === undefined) return [`oracle departure "${scenario}" names ${id}, which is no ledger row`];
+    return row.status.kind === "deviation" ? [] : [`oracle departure "${scenario}" names ${id}, a ${row.status.kind} row, not a deviation`];
+  });
+}
+
 export const familyNotes = (read: ReadSource): FamilyNote[] => [sharedRecordNote(read)];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -65,10 +83,11 @@ function rowProblems({ row, ours, line, checkLine }: Evaluated): string[] {
 
 export const spreadText = ([low, high]: readonly [number, number]): string => `${shortNumber(low)}–${shortNumber(high)}`;
 
-export function ledgerProblems(evaluated: readonly Evaluated[], notes: readonly FamilyNote[]): string[] {
+export function ledgerProblems(evaluated: readonly Evaluated[], notes: readonly FamilyNote[], checks: readonly OracleCheck[]): string[] {
   const seen = new Set<string>();
   const duplicates = evaluated.filter(({ row }) => (seen.has(row.id) ? true : (seen.add(row.id), false))).map(({ row }) => `${row.id}: duplicate row id`);
-  return [...duplicates, ...evaluated.flatMap(rowProblems), ...notes.flatMap(({ problems }) => problems)];
+  const rows = evaluated.map(({ row }) => row);
+  return [...duplicates, ...evaluated.flatMap(rowProblems), ...notes.flatMap(({ problems }) => problems), ...departureProblems(checks, rows)];
 }
 
 export const openRows = (evaluated: readonly Evaluated[]): Evaluated[] => evaluated.filter(({ row }) => row.status.kind === "open");
@@ -91,14 +110,42 @@ const codeLink = (anchor: Anchor, line: number | undefined): string => {
   return line === undefined ? `${anchor.symbol} unresolved` : `[${file}:${line}](../../${anchor.file}#L${line}) \`${anchor.symbol}\``;
 };
 
+const valueText = (ours: Value | Error): string => (ours instanceof Error ? `error: ${ours.message}` : showValue(ours));
+
 function rowLine({ row, ours, line, checkLine }: Evaluated): string {
   const melee = meleeText(row.melee);
   const code = row.checkedBy === undefined ? codeLink(row.anchor, line) : `${codeLink(row.anchor, line)}; checked by ${codeLink(row.checkedBy, checkLine)}`;
-  const value = ours instanceof Error ? `error: ${ours.message}` : showValue(ours);
+  const value = valueText(ours);
   return `| ${cell(row.name)} \`${row.id}\` | ${cell(value)} | [${cell(melee)}](${row.melee.source}) | ${code} | ${cell(statusText(row.status))} |`;
 }
 
-export function ledgerPage(evaluated: readonly Evaluated[], notes: readonly FamilyNote[]): string {
+function deviationLines({ row, ours }: Evaluated): string[] {
+  if (row.status.kind !== "deviation") return [];
+  const { reason, decided, issue, elsewhere } = row.status;
+  return [
+    `- ${row.name} \`${row.id}\`: ${reason} (Tom ${decided}${issueLink(issue)})`,
+    `  - Ours: ${valueText(ours)}; Melee: ${meleeText(row.melee)}`,
+    ...(elsewhere === undefined ? [] : [`  - Other games: ${elsewhere}`]),
+  ];
+}
+
+function checkLines(evaluated: readonly Evaluated[], checks: readonly OracleCheck[]): string[] {
+  const lines = evaluated.flatMap(({ row }) => {
+    const named = checks.filter(({ deviation }) => deviation === row.id);
+    if (named.length === 0) return [];
+    const count = (outcome: string): number => named.filter((check) => check.outcome === outcome).length;
+    const others = [...new Set(named.map(({ outcome }) => outcome))].filter((outcome) => outcome !== "pass" && outcome !== "departure");
+    const counts = [`${count("pass")} pass`, `${count("departure")} departure`, ...others.map((outcome) => `${count(outcome)} ${outcome}`)].join(", ");
+    const scenarios = [...new Set(named.map(({ area, scenario }) => `${area}: ${scenario}`))];
+    return [
+      `- ${row.name} \`${row.id}\`: ${counts}`,
+      ...scenarios.map((scenario) => `  - ${scenario}: ${named.filter(({ area, scenario: name }) => `${area}: ${name}` === scenario).map(({ fighter, outcome }) => `${fighter} ${outcome}`).join(", ")}`),
+    ];
+  });
+  return lines.length === 0 ? [] : ["", "### Oracle checks", "", ...lines];
+}
+
+export function ledgerPage(evaluated: readonly Evaluated[], notes: readonly FamilyNote[], checks: readonly OracleCheck[]): string {
   const count = (kind: Status["kind"]): number => evaluated.filter(({ row }) => row.status.kind === kind).length;
   const families = [...new Set(evaluated.map(({ row }) => row.family))] as Family[];
   const table = (rows: readonly Evaluated[]): string[] => ["", "| Row | Ours | Melee | Code | Status |", "|---|---|---|---|---|", ...rows.map(rowLine)];
@@ -114,6 +161,7 @@ export function ledgerPage(evaluated: readonly Evaluated[], notes: readonly Fami
         ...(block === undefined ? [] : ["", `### ${block}`]),
         ...table(rows.filter(({ row }) => row.block === block)),
       ]),
+      ...checkLines(rows, checks),
     ];
   });
   return [
@@ -124,8 +172,17 @@ export function ledgerPage(evaluated: readonly Evaluated[], notes: readonly Fami
     "(Autoland regenerates it on each merged candidate), when our value differs from Melee's with no deviation row, when a deviation now matches Melee, when a code anchor no longer",
     "resolves or when a row has no public source. Ours is read from the exported constant or probed headless;",
     "each Melee value links its public source. The plan is [melee-parity-plan.md](melee-parity-plan.md).",
+    "Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks",
+    "list those scenarios under their row with each fighter's outcome.",
     "",
     `${evaluated.length} rows: ${count("parity")} parity, ${count("deviation")} deviations, ${count("open")} open.`,
+    "",
+    "## Deviations from Melee",
+    "",
+    "Each row Tom decided to keep different from Melee, with his reason and date. These rows are the only place a",
+    "deviation's reason, issue and decision date are written.",
+    "",
+    ...evaluated.flatMap(deviationLines),
     ...sections,
     "",
   ].join("\n");

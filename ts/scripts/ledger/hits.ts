@@ -219,7 +219,7 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     melee: { value: "none", source: wiki("Smash_directional_influence") },
     ours: () => `${SDI_STEP_TRAVEL} a frame, ${HIT_TRAVEL} a hit with ASDI, ${STRING_TRAVEL} a string`,
     anchor: { file: "ts/src/game/sim/smashDirectionalInfluence.ts", symbol: "STRING_TRAVEL" },
-    status: { kind: "deviation", reason: "keeps SDI choices useful while bounding visible jumps and repeated-hit travel (docs/gameplay-design.md, Bounded SDI)", decided: "2026-10-06" },
+    status: { kind: "deviation", reason: "keeps SDI choices useful while bounding visible jumps and repeated-hit travel (docs/gameplay-design.md, Bounded SDI)", decided: "2026-10-06", issue: 70, elsewhere: "Weakened in later games ([SmashWiki](https://www.ssbwiki.com/Smash_directional_influence))" },
   },
   {
     id: "sakurai-angle", family: "hits", name: "Sakurai angle (361), probed headless at knockback 31 and 33, both facings",
@@ -240,14 +240,14 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     id: "smash-charge-hold", family: "hits", name: "Frames a full charge can be held",
     melee: { value: 0, source: wiki("Charge") }, ours: () => SMASH_FULL_CHARGE_HOLD_FRAMES,
     anchor: { file: "ts/src/game/sim/moves.ts", symbol: "SMASH_FULL_CHARGE_HOLD_FRAMES" },
-    status: { kind: "deviation", reason: "a held smash becomes a timing mix-up, one rule for every fighter", decided: "2026-10-26", issue: 328 },
+    status: { kind: "deviation", reason: "a held smash becomes a timing mix-up, one rule for every fighter", decided: "2026-10-26", issue: 328, elsewhere: "Ultimate: the same 60 frames of charge, then up to 120 more frames held at full charge (180 in all) that add no damage ([SmashWiki: Smash attack](https://www.ssbwiki.com/Smash_attack), [Charge](https://www.ssbwiki.com/Charge))" },
   },
   {
     id: "staling", family: "hits", name: "Stale-move negation",
     melee: { value: "9-move queue", source: wiki("Stale-move_negation") }, ours: () => "none",
     anchor: { file: "ts/src/game/sim/contacts.ts", symbol: "collectDamageContact" },
     checkedBy: { file: "ts/scripts/meleeThresholds.ts", symbol: "meleeStaledKnockback" },
-    status: { kind: "deviation", reason: "move diversity comes from move design, not a repeat penalty", decided: "2026-10-04" },
+    status: { kind: "deviation", reason: "move diversity comes from move design, not a repeat penalty", decided: "2026-10-04", elsewhere: "Ultimate keeps the 9-move queue, adds a freshness bonus, counts shield hits and weakens the knockback effect ([SmashWiki](https://www.ssbwiki.com/Stale-move_negation))" },
   },
   {
     id: "knockback-threshold-ties", family: "hits", name: "Knockback exactly at a knockdown threshold",
