@@ -112,6 +112,7 @@ Sources name the SmashWiki page unless marked: MFD is
 | Grounded low launch and bounce | `ts/src/game/sim/knockback.ts:122-134` | Below tumble with flat or downward direction stays grounded; tumble downward bounces ×0.8 | Ground hit below tumble stays grounded; spiked victims bounce (Knockback, Meteor smash) | match |
 | Crouch cancel | `ts/src/game/sim/knockback.ts:72,89` | Knockback ×2/3, hitlag ×2/3; throws exempt | ×2/3 knockback (Crouch cancel; CS defense.md:99-101) | match |
 | Smash-charge victim | `ts/src/game/sim/knockback.ts:73` | ×1.2 | Not confirmed on a public page | needs public source, #292 |
+| Smash charge | `ts/src/game/sim/moves.ts:10-13,174` | 60 frames to 1.3671x for every fighter, then held up to 120 more frames with no further gain | 60 frames to 1.3671x, then releases by itself (Smash attack) | charge parity; hold is a deviation, Tom 2026-10-26, #328 |
 | Hitstun | `ts/src/game/sim/knockback.ts:19,96-98` | ⌊0.4·KB⌋, at least 1 | ⌊0.4·KB⌋ (Hitstun) | match |
 | Tumble threshold | `ts/src/game/sim/knockback.ts:100-105` | KB ≥ 80 | 80 (Tumble) | match |
 | Hitlag | `ts/src/game/sim/knockback.ts:85-90` | ⌊d/3 + 3⌋, electric ×1.5, crouch ×2/3, cap 20 | Same (Hitlag; CS defense.md:58-61) | match |
