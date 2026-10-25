@@ -1,0 +1,14 @@
+# Illidan's down smash (Flames of Azzinoth) facing left with hit areas shown: on active frames 248-256 the red strike capsule should lie along the two glaives the clip holds out and down (#280).
+#! chat -dev quick hero illidan hit-areas
+#! cue 248-256 glaives: effect=DemonHunterMissile
+200 a stick -1 0
+202 a stick 0 0
+240 a cstick 0 -1
+240 a capture
+244 a cstick 0 0
+#! expect a 240 applied attack 2 style 3
+248 a capture
+250 a capture
+251 a capture
+254 a capture
+256 a capture
