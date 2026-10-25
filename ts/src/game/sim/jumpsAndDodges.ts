@@ -6,6 +6,7 @@ import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { jumpBuffed } from "./itemBuffs";
 import { DIAGONAL_UNIT } from "./knockback";
+import { meleeHandling } from "./meleeHandling";
 import { observeActionDecision, observeActionStart } from "./observations";
 import { clearDownState } from "./transitions";
 import { melee } from "./tuning";
@@ -106,6 +107,7 @@ export function endFinishedAirDodge(f: Fighter): void {
   if (!dodge.airDodging || dodge.airFrame < AIR_DODGE_DECAY_FRAMES) return;
   dodge.airDodging = false;
   dodge.airFrame = 0;
+  if (meleeHandling.airDodgeEndsHelpless && !f.motion.grounded) f.special.fall = true;
 }
 
 export function canBeginGroundDodge(f: Fighter): boolean {

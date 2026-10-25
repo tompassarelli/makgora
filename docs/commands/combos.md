@@ -32,6 +32,12 @@
   references/melee-frame-data (smashcraft:ts/scripts/ledger/fixtures/fighters.ts,
   #296); `bun ts/scripts/ledger/fixtures/fighters.ts` lists what the corpus
   does not give it. It is absent from the roster and the map.
+  `--melee ROW`, repeatable, measures 0-60% twice, as shipped and with the
+  ledger row `ROW` on Melee's handling for that run only, and prints the true
+  and DI-dependent links gained and lost at 0-20% and 30-60%; the switched rows
+  go to build/links-melee/ROW/<fighter>.jsonl. It refuses a row with no Melee
+  value, a parity row and a row with no switch in
+  smashcraft:ts/scripts/ledger/meleeSwitches.ts (#298).
 
 - Objectives: `bun wisp combos --objectives [--fighter NAME]` checks each
   declared target in smashcraft:tools/move-data/combo-objectives.json. Its

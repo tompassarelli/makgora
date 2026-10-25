@@ -56,9 +56,14 @@ export interface LinkRow {
   readonly optionEscapes: readonly string[];
 }
 
-export interface LinkUnit {
+export interface LinkOpener {
   readonly attacker: Character;
   readonly opener: number;
+  readonly melee?: string;
+}
+
+export interface LinkUnit extends LinkOpener {
+  readonly percents?: readonly number[];
 }
 
 interface Regions {
@@ -465,11 +470,11 @@ export function measureLinks(unit: LinkUnit): LinkRow[] {
   return REGIONS.flatMap((region) => {
     const setup = setups.get(region);
     if (setup === undefined) return [];
-    return LINK_PERCENTS.flatMap((percent) => LINK_WEIGHTS.flatMap((weight) => cellRows(unit.attacker, opener, setup, region, percent, weight)));
+    return (unit.percents ?? LINK_PERCENTS).flatMap((percent) => LINK_WEIGHTS.flatMap((weight) => cellRows(unit.attacker, opener, setup, region, percent, weight)));
   });
 }
 
-export interface LinkCell extends LinkUnit {
+export interface LinkCell extends LinkOpener {
   readonly victim: Character;
   readonly region: Region;
   readonly percent: number;
@@ -481,4 +486,3 @@ export function measureLinkCell(cell: LinkCell): LinkRow[] {
   const setup = setupsFor(cell.attacker, cell.victim, opener).get(cell.region);
   return setup === undefined ? [] : cellRows(cell.attacker, opener, setup, cell.region, cell.percent, cell.weight);
 }
-

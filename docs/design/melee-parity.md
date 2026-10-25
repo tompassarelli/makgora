@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-490 rows: 437 parity, 26 deviations, 27 open.
+493 rows: 437 parity, 26 deviations, 30 open.
 
 ## Deviations from Melee
 
@@ -211,10 +211,17 @@ deviation's reason, issue and decision date are written.
 | Tap jump `tap-jump` | off: jump is its own button | [stick up jumps, always](https://www.ssbwiki.com/Tap_jump) | [stickZones.ts:17](../../ts/src/game/sim/stickZones.ts#L17) `TAP_JUMP_WINDOW` | deviation: jump is its own button (Tom 2026-10-06, #49) |
 | Tilt or smash, probed on a full forward press `tilt-versus-smash` | the Strong button or C-stick; a full stick press alone is a tilt | [stick speed: a flick smashes, a slower press tilts](https://www.ssbwiki.com/Smash_attack) | [combat.ts:33](../../ts/src/game/input/combat.ts#L33) `normalAttackStyle` | deviation: smashes come from the Strong button, after Rivals of Aether's strong attack (docs/gameplay-design.md, Ground states) (Tom 2026-10-24, #186) |
 | Tilt modifier stick values `tilt-modifier` | x 0.6875, up 0.65, down 0.675 | [none](https://www.ssbwiki.com/Control_stick) | [stick.ts:11](../../ts/src/game/sim/stick.ts#L11) `TILT_STICK_X` | deviation: a box controller's modifier, one stick unit inside roll, tap jump and crouch (Tom 2026-10-25, #282) |
+<<<<<<< HEAD
 | Air dodge `air-dodge` | once per airtime, ending actionable; refreshed on landing, ledge catch and being hit | [directional; ends in helpless fall until landing](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:67](../../ts/src/game/sim/jumpsAndDodges.ts#L67) `beginAirDodge` | deviation: the air dodge works as in Smash (Tom 2026-10-06, #100) |
 | Air dodge speed decay a frame `air-dodge-decay` | 0.9 | [0.9](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:15](../../ts/src/game/sim/jumpsAndDodges.ts#L15) `AIR_DODGE_DECAY` | parity |
 | Fast fall input `fast-fall-control` | down with neutral horizontal input only; diagonals keep drifting | [a fresh stick down, diagonals included](https://www.ssbwiki.com/Fast_fall) | [fighter.ts:36](../../ts/src/game/sim/fighter.ts#L36) `FAST_FALL_INPUT_WINDOW` | deviation: owner-selected control (Tom 2026-09-30) |
 | Horizontal air dodge direction `horizontal-dodge-control` | a horizontal-only digital air dodge angles 18° below horizontal | [where the stick points](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:67](../../ts/src/game/sim/jumpsAndDodges.ts#L67) `beginAirDodge` | deviation: owner-selected control; the shallow angle keeps horizontal momentum into the landing (Tom 2026-09-30) |
+=======
+| Air dodge `air-dodge` | once per airtime, ending actionable; refreshed on landing, ledge catch and being hit | [directional; ends in helpless fall until landing](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:68](../../ts/src/game/sim/jumpsAndDodges.ts#L68) `beginAirDodge` | deviation: the air dodge works as in Smash (docs/gameplay-design.md, Deviations from Melee) (Tom 2026-10-06) |
+| Air dodge speed decay a frame `air-dodge-decay` | 0.9 | [0.9](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:16](../../ts/src/game/sim/jumpsAndDodges.ts#L16) `AIR_DODGE_DECAY` | parity |
+| Fast fall input `fast-fall-control` | down with neutral horizontal input only; diagonals keep drifting | [a fresh stick down, diagonals included](https://www.ssbwiki.com/Fast_fall) | [fighter.ts:36](../../ts/src/game/sim/fighter.ts#L36) `FAST_FALL_INPUT_WINDOW` | deviation: owner-selected control (docs/gameplay-design.md, Deviations from Melee) (Tom 2026-09-30) |
+| Horizontal air dodge direction `horizontal-dodge-control` | a horizontal-only digital air dodge angles 18° below horizontal | [where the stick points](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:68](../../ts/src/game/sim/jumpsAndDodges.ts#L68) `beginAirDodge` | deviation: owner-selected control; the shallow angle keeps horizontal momentum into the landing (docs/gameplay-design.md, Deviations from Melee) (Tom 2026-09-30) |
+>>>>>>> 4f6a6174b (Let the link analyzer run one ledger row on Melee's handling: bun wisp combos --links --melee ROW (Refs #298))
 | Traction above walk speed, probed headless `traction-doubling` | ×2 above walk speed at rest, ×1 below | [×2 above walk speed at rest, ×1 below](https://www.ssbwiki.com/Traction) | [groundMovement.ts:139](../../ts/src/game/sim/groundMovement.ts#L139) `restingTraction` | parity |
 | Dodge timing profile `dodge-timing` | spot dodge 22, intangible 2–15; rolls 31, intangible 4–19; air dodge 49, intangible 4–29, landing 10 | [per fighter](https://www.ssbwiki.com/Spot_dodge) | [conditions.ts:10](../../ts/src/game/sim/conditions.ts#L10) `SPOT_DODGE_FRAMES` | deviation: one shared frame-data profile for every fighter (Tom 2026-10-06) |
 
@@ -755,3 +762,11 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Run speed `anub'arak-run` | 1.804 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Walk speed `anub'arak-walk` | 1.312 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `anub'arak-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+
+## Maiev's moves against Fox's
+
+| Row | Ours | Melee | Code | Status |
+|---|---|---|---|---|
+| Maiev's neutral air launch angle `maiev-neutral-air-angle` | 50° | [361](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:228](../../ts/src/game/sim/heroes/wardenMoves.ts#L228) `WARDEN_MOVES` | open: Maiev's neutral air against Fox's clean hit; her aerial retune decides (#305) |
+| Maiev's neutral air damage `maiev-neutral-air-damage` | 4.579608 | [12](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:228](../../ts/src/game/sim/heroes/wardenMoves.ts#L228) `WARDEN_MOVES` | open: Maiev's neutral air against Fox's clean hit; her aerial retune decides (#305) |
+| Maiev's neutral air base knockback and growth `maiev-neutral-air-knockback` | base 18, growth 93.0504 | [base 10, growth 100](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:228](../../ts/src/game/sim/heroes/wardenMoves.ts#L228) `WARDEN_MOVES` | open: Maiev's neutral air against Fox's clean hit; her aerial retune decides (#305) |

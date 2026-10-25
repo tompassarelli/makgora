@@ -22,8 +22,10 @@ import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } fr
 import { admit } from "../../heavyCapacity";
 import { type ComboObjective, ComboObjectivesSchema, objectiveMisses, objectiveName, throwDeclarations } from "../../comboObjectives";
 import type { LinkCell, LinkRow, LinkUnit } from "../../comboLinks";
+import { ATTRIBUTION_PERCENTS, linkGains } from "../../comboLinkGains";
 import { linksPage } from "../../comboLinksPage";
 import { LINKS_DIR, linkSlug } from "../../linkTable";
+import { meleeSwitchRefusal } from "../../ledger/meleeSwitches";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
 import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
@@ -36,6 +38,7 @@ const pageFile = join(moveData, "combo-potential.md");
 const advantageFile = join(moveData, "advantage-state.jsonl");
 const advantagePageFile = join(moveData, "advantage-state.md");
 const objectivesFile = join(moveData, "combo-objectives.json");
+const meleeLinksDir = join(import.meta.dir, "../../../../build/links-melee");
 
 class CombosFailure extends Schema.TaggedError<CombosFailure>()("CombosFailure", { problem: Schema.String }) {
   override get message(): string {
@@ -273,13 +276,16 @@ const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
   yield* writeAdvantage(rows, rows);
 });
 
+const linkRows = (attacker: Character, extra: Partial<LinkUnit>, jobs: number, label: string) => {
+  const units: LinkUnit[] = OPENERS.map((_, opener) => ({ attacker, opener, ...extra }));
+  return inWorkers<LinkUnit, readonly LinkRow[]>(new URL("../../comboLinksWorker.ts", import.meta.url), units, jobs,
+    (unit) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name} links${label}`,
+    (unit, rows) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name}${label}, ${rows.length} rows`,
+  ).pipe(step(`${units.length} ${fighterName(attacker)} openers' links${label} on ${jobs} threads`), Effect.map((found) => found.flat()));
+};
+
 const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(attackers, (attacker) => Effect.gen(function* () {
-  const units: LinkUnit[] = OPENERS.map((_, opener) => ({ attacker, opener }));
-  const found = yield* inWorkers<LinkUnit, readonly LinkRow[]>(new URL("../../comboLinksWorker.ts", import.meta.url), units, jobs,
-    (unit) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name} links`,
-    (unit, rows) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name}, ${rows.length} rows`,
-  ).pipe(step(`${units.length} ${fighterName(attacker)} openers' links on ${jobs} threads`));
-  const rows = found.flat();
+  const rows = yield* linkRows(attacker, {}, jobs, "");
   const file = join(LINKS_DIR, linkSlug(attacker));
   yield* Effect.tryPromise({
     try: async () => {
@@ -357,9 +363,24 @@ const validate = (jobs: number) => Effect.gen(function* () {
   if (misses > 0) return yield* new CombosFailure({ problem: `${misses} Fox cases missed their Melee class` });
 });
 
+const signed = (value: number): string => (value > 0 ? `+${value}` : `${value}`);
+
+const meleeLinks = (attackers: readonly Character[], meleeRows: readonly string[], jobs: number) => Effect.forEach(attackers, (attacker) => Effect.gen(function* () {
+  const before = yield* linkRows(attacker, { percents: ATTRIBUTION_PERCENTS }, jobs, "");
+  yield* Effect.forEach(meleeRows, (row) => Effect.gen(function* () {
+    const after = yield* linkRows(attacker, { percents: ATTRIBUTION_PERCENTS, melee: row }, jobs, ` on Melee's ${row}`);
+    const file = join(meleeLinksDir, row, `${linkSlug(attacker)}.jsonl`);
+    yield* Effect.tryPromise({ try: () => Bun.write(file, after.map((own) => JSON.stringify(own)).join("\n") + "\n"), catch: failure });
+    yield* Console.log([
+      `${fighterName(attacker)} with ${row} on Melee's handling, ${ATTRIBUTION_PERCENTS[0]}-${ATTRIBUTION_PERCENTS.at(-1)}% (rows in ${file}):`,
+      ...linkGains(before, after).map((gain) => `  ${gain.band} ${gain.class}: ${gain.before} -> ${gain.after} (${signed(gain.after - gain.before)}; ${gain.gained} gained, ${gain.lost} lost)`),
+    ].join("\n"));
+  }), { discard: true });
+}), { discard: true });
+
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, objectives: { type: "boolean" }, validate: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, melee: { type: "string", multiple: true }, objectives: { type: "boolean" }, validate: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -374,6 +395,10 @@ export const combos: Command = (args) => Effect.gen(function*() {
   if (parsed.shard !== undefined && (shard === undefined || shard.index >= shard.count || shard.rows === "" || parsed.advantage !== true || names.length > 0)) {
     return yield* new UsageFailure({ problem: "--shard I/N takes --advantage, --rows FILE and no --fighter, with I below N" });
   }
+  if (parsed.melee !== undefined) {
+    const refusals = parsed.links === true ? parsed.melee.flatMap((row) => meleeSwitchRefusal(row) ?? []) : ["--melee ROW takes --links"];
+    if (refusals.length > 0) return yield* new UsageFailure({ problem: refusals.join("\n") });
+  }
   const code = yield* admit("heavy", "smashcraft:combos", 3600);
   if (code !== undefined) {
     if (code !== 0) return yield* new CombosFailure({ problem: `the admitted run exited ${code}` });
@@ -381,6 +406,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
   }
   if (parsed.validate === true) return yield* validate(jobs);
   if (parsed.objectives === true) return yield* objectives(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
+  if (parsed.links === true && parsed.melee !== undefined) return yield* meleeLinks(attackers.filter((attacker): attacker is Character => attacker !== undefined), parsed.melee, jobs);
   if (parsed.links === true) return yield* links(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed["zero-to-death"] === true) return yield* zeroToDeath(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0, shard);

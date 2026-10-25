@@ -1,12 +1,13 @@
 export type Value = number | string;
 
-export type Family = "hits" | "defence" | "movement" | "attributes";
+export type Family = "hits" | "defence" | "movement" | "attributes" | "moves";
 
 export const FAMILY_TITLES: Readonly<Record<Family, string>> = {
   hits: "Hits, knockback and hitstun",
   defence: "Defence: techs, knockdown, getups, shield, grabs and throws",
   movement: "Movement, landing, ledges, platforms and the stick",
   attributes: "Fighter attributes",
+  moves: "Maiev's moves against Fox's",
 };
 
 export type Melee =

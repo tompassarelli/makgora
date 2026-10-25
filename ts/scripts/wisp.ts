@@ -37,7 +37,7 @@ const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Pr
   strengths: { usage: "strengths FIELD.json   (per-fighter KO direction, KO percent, edge-guard and spacing profile against tools/move-data/fighter-strengths.json)", load: async () => (await import("./wisp/commands/strengths")).strengths },
   "throw-parity": throwParityEntry,
   shapes: shapesEntry,
-  combos: { usage: "combos [--fighter NAME]... [--jobs N] [--advantage | --zero-to-death | --links | --validate]", load: async () => (await import("./wisp/commands/combos")).combos },
+  combos: { usage: "combos [--fighter NAME]... [--jobs N] [--advantage | --zero-to-death | --links [--melee ROW]... | --validate]", load: async () => (await import("./wisp/commands/combos")).combos },
   parity: { usage: "parity numeric [RESULT_FILE ...] | tapes | corpus [DIR ...] | corpus keep RECORDING...   (native recordings replayed headless: scripts/wisp/corpus.ts)", load: async () => (await import("./wisp/commands/parity")).parity },
   integrity: { usage: "integrity capture [--four-fighters | --playable] OPTIONS... | capture --screen --clients-file FILE --client NAME --out PRIVATE_DIR [--count N] [--region X,Y,WIDTH,HEIGHT] | result CAPTURE_DIR | headless --helper BINARY --out DIR | delay RUN_DIR...   (input delay and rollback depth per client from saved integrity rows, #396)", load: async () => (await import("./wisp/commands/parity")).integrity },
   client: { usage: "client [--clients-file FILE] look|read|click|keys CLIENT ... | watch [CLIENT...] [--once] [--json] [--record FILE] | doctor [CLIENT...] | wait CLIENT STATE... [--seconds N]", load: async () => (await import("./wisp/commands/client")).client },

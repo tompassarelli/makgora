@@ -1,10 +1,11 @@
 import { ATTRIBUTE_ROWS, sharedRecordNote } from "./attributes";
 import { DEFENCE_ROWS } from "./defence";
 import { HIT_ROWS } from "./hits";
+import { MOVE_ROWS } from "./moves";
 import { MOVEMENT_ROWS } from "./movement";
 import { type Anchor, FAMILY_TITLES, type Family, type FamilyNote, type LedgerRow, type Melee, type ReadSource, type Status, type Value, sameValue, shortNumber, showValue } from "./row";
 
-export const LEDGER_ROWS: readonly LedgerRow[] = [...HIT_ROWS, ...DEFENCE_ROWS, ...MOVEMENT_ROWS, ...ATTRIBUTE_ROWS];
+export const LEDGER_ROWS: readonly LedgerRow[] = [...HIT_ROWS, ...DEFENCE_ROWS, ...MOVEMENT_ROWS, ...ATTRIBUTE_ROWS, ...MOVE_ROWS];
 
 export const PAGE_PATH = "docs/design/melee-parity.md";
 
