@@ -1,7 +1,7 @@
 // Foreign-data boundary only: reads a public reference database, never gameplay.
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const revision = "ec5155149faeed24b5e5781d7efe17387cc9ee3d";
@@ -49,7 +49,9 @@ for (const [character, start, end, total, iasa, stun] of [["fox",2,3,17,16,3],["
   for (const [key, expectedValue] of Object.entries({start,end,total,iasa,stun}))
     if (row?.values[key] !== expectedValue) throw new Error(`Representative source mismatch: ${character}.${key}`);
 }
-const summary = { record_count: parsed.length, character_ids: Object.keys(coverage).length,
+const coveragePath = join(outputDirectory, "coverage.json");
+const previous = existsSync(coveragePath) ? JSON.parse(readFileSync(coveragePath, "utf8")) : {};
+const summary = { ...previous, record_count: parsed.length, character_ids: Object.keys(coverage).length,
   records_with_excluded_notes: parsed.filter(r => r.notes_present_but_excluded).length,
   records_with_missing_values: parsed.filter(r => Object.values(r.values).includes(null)).length,
   by_character: coverage, missing_by_field: missing };

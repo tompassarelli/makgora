@@ -1,4 +1,4 @@
-// Foreign-data boundary only: reduces FightCore's public Fox and Falco move pages to hitbox phases and
+// Foreign-data boundary only: reduces FightCore's public move pages of all 26 fighters to hitbox phases and
 // knockdown-threshold percents per target fighter.
 // Usage: bun fightcore-intake.ts PAGES_DIRECTORY OUTPUT_DIRECTORY
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -6,7 +6,6 @@ import { join } from "node:path";
 import { FIGHTCORE_COLUMNS, type FightCoreRow, readFightCore } from "./fightcore";
 
 const site = "https://www.fightcore.gg";
-const attackers = ["fox", "falco"];
 const [pagesArgument, outputArgument] = process.argv.slice(2);
 if (pagesArgument === undefined || outputArgument === undefined) throw new Error("Usage: bun fightcore-intake.ts PAGES_DIRECTORY OUTPUT_DIRECTORY");
 const pagesDirectory: string = pagesArgument, outputDirectory: string = outputArgument;
@@ -81,6 +80,7 @@ for (const normalizedName of [...characterIds.keys()].sort()) {
   targets.push({ key: characterIds.get(normalizedName)?.[1] ?? "", name: character.name, weight: character.characterStatistics.weight });
 }
 targets.sort((a, b) => (a.name > b.name ? 1 : -1));
+const attackers = [...characters.keys()];
 
 // FightCore's staleness queue adds slot reductions in JavaScript doubles, and its percent depends on that sum.
 const staleness = queueSlots.reduce<number[]>((levels, slot) => [...levels, (levels.at(-1) ?? 0) + slot], [0]);
@@ -123,8 +123,8 @@ function renderedCards(html: string): Map<number, Map<string, Percent>> {
 }
 
 const source = (from: Page) => ({ site, url: from.url, fetched: from.fetched, build_id: from.buildId });
-const phases: unknown[] = [];
-const thresholds: unknown[] = [];
+const phases: Record<string, unknown>[] = [];
+const thresholds: Record<string, unknown>[] = [];
 const pagedMoves = new Map<string, Move>();
 let checkedCards = 0;
 for (const attacker of attackers) {
@@ -162,17 +162,17 @@ for (const attacker of attackers) {
         const [hitbox] = group;
         if (hitbox === undefined) continue;
         const listedTargets = knockbackTargets.filter((knockbackTarget) => hitbox.angle === 361 || !sakuraiOnly.has(knockbackTarget));
-        for (const target of targets) {
-          thresholds.push({
-            schema_version: 1, ...identity, phase: index + 1, start: hit.start, end: hit.end, hitboxes: group.map(({ name }) => name),
-            target: target.key, target_weight: target.weight,
-            staleness: staleness.map((level) => Number(level.toFixed(2))),
+        thresholds.push({
+          schema_version: 2, ...identity, phase: index + 1, start: hit.start, end: hit.end, hitboxes: group.map(({ name }) => name),
+          staleness: staleness.map((level) => Number(level.toFixed(2))),
+          targets: Object.fromEntries(targets.map((target) => [target.key, {
+            weight: target.weight,
             percent: Object.fromEntries(listedTargets.map((knockbackTarget) => [
               String(knockbackTarget), staleness.map((level) => threshold(hitbox, target.weight, knockbackTarget, level)),
             ])),
-            source: source(from),
-          });
-        }
+          }])),
+          source: source(from),
+        });
       }
     });
     const cards = renderedCards(from.html);
@@ -196,7 +196,17 @@ for (const attacker of attackers) {
 const lines = (records: unknown[]): string => records.map((record) => JSON.stringify(record)).join("\n") + "\n";
 writeFileSync(join(outputDirectory, "fightcore-phases.jsonl"), lines(phases));
 writeFileSync(join(outputDirectory, "fightcore-thresholds.jsonl"), lines(thresholds));
-console.log(`${phases.length} phases, ${thresholds.length} threshold rows; ${checkedCards} rendered cards match the computed staleness-0 percents`);
+const coveragePath = join(outputDirectory, "coverage.json");
+const byCharacter: Record<string, { moves: number; phases: number; threshold_groups: number }> = {};
+for (const attacker of attackers) {
+  const key = characterIds.get(attacker)?.[1] ?? attacker;
+  const of = (records: Record<string, unknown>[]) => records.filter((record) => record.character === key);
+  byCharacter[key] = { moves: new Set(of(phases).map((record) => record.move)).size, phases: of(phases).length, threshold_groups: of(thresholds).length };
+}
+const coverage = existsSync(coveragePath) ? JSON.parse(readFileSync(coveragePath, "utf8")) : {};
+coverage.fightcore_pages = { characters: attackers.length, phases: phases.length, threshold_groups: thresholds.length, threshold_targets: thresholds.length * targets.length, by_character: byCharacter };
+writeFileSync(coveragePath, `${JSON.stringify(coverage, null, 2)}\n`);
+console.log(`${phases.length} phases, ${thresholds.length} threshold groups for ${targets.length} targets; ${checkedCards} rendered cards match the computed staleness-0 percents`);
 
 const exportRows = readFightCore(join(import.meta.dir, "../.."));
 const valueSet = (values: readonly number[]): string => [...new Set(values.length === 0 ? [0] : values)].sort((a, b) => a - b).join(" / ");

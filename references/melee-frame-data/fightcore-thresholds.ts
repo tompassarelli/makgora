@@ -80,19 +80,24 @@ const phase = (record: Json, where: string): Phase => ({
   }),
 });
 
-function threshold(record: Json, where: string): Threshold {
-  const percents = object(record.percent, `${where} percent`);
-  const unknown = Object.keys(percents).filter((key) => !(THRESHOLD_KNOCKBACKS as readonly number[]).includes(Number(key)));
-  if (unknown.length > 0) throw new Error(`${where} percent: unknown knockback ${unknown.join(", ")}`);
-  return {
+function thresholds(record: Json, where: string): Threshold[] {
+  const group = {
     character: text(record.character, `${where} character`), move: text(record.move, `${where} move`), phase: finite(record.phase, `${where} phase`),
     hitboxes: list(record.hitboxes, `${where} hitboxes`).map((id, index) => text(id, `${where} hitboxes ${index}`)),
-    target: text(record.target, `${where} target`), target_weight: finite(record.target_weight, `${where} target_weight`),
     staleness: list(record.staleness, `${where} staleness`).map((level, index) => finite(level, `${where} staleness ${index}`)),
-    percent: Object.fromEntries(Object.entries(percents).map(([knockback, values]) =>
-      [knockback, list(values, `${where} percent ${knockback}`).map((value, index) => percent(value, `${where} percent ${knockback} ${index}`))])),
   };
+  return Object.entries(object(record.targets, `${where} targets`)).map(([target, entry]) => {
+    const at = `${where} target ${target}`;
+    const percents = object(object(entry, at).percent, `${at} percent`);
+    const unknown = Object.keys(percents).filter((key) => !(THRESHOLD_KNOCKBACKS as readonly number[]).includes(Number(key)));
+    if (unknown.length > 0) throw new Error(`${at} percent: unknown knockback ${unknown.join(", ")}`);
+    return {
+      ...group, target, target_weight: finite(object(entry, at).weight, `${at} weight`),
+      percent: Object.fromEntries(Object.entries(percents).map(([knockback, values]) =>
+        [knockback, list(values, `${at} percent ${knockback}`).map((value, index) => percent(value, `${at} percent ${knockback} ${index}`))])),
+    };
+  });
 }
 
 export const readFightCorePhases = (root: string): Phase[] => readJsonl(root, FIGHTCORE_PHASES_FILE, phase);
-export const readFightCoreThresholds = (root: string): Threshold[] => readJsonl(root, FIGHTCORE_THRESHOLDS_FILE, threshold);
+export const readFightCoreThresholds = (root: string): Threshold[] => readJsonl(root, FIGHTCORE_THRESHOLDS_FILE, thresholds).flat();

@@ -206,5 +206,143 @@
     "throws.total": 1,
     "dodges.inv_end": 24,
     "dodges.start": 23
+  },
+  "fightcore_pages": {
+    "characters": 26,
+    "phases": 1738,
+    "threshold_groups": 2117,
+    "threshold_targets": 55042,
+    "by_character": {
+      "bowser": {
+        "moves": 33,
+        "phases": 79,
+        "threshold_groups": 81
+      },
+      "captain_falcon": {
+        "moves": 35,
+        "phases": 58,
+        "threshold_groups": 73
+      },
+      "donkey_kong": {
+        "moves": 36,
+        "phases": 56,
+        "threshold_groups": 54
+      },
+      "dr._mario": {
+        "moves": 34,
+        "phases": 62,
+        "threshold_groups": 76
+      },
+      "falco": {
+        "moves": 34,
+        "phases": 49,
+        "threshold_groups": 50
+      },
+      "fox": {
+        "moves": 34,
+        "phases": 56,
+        "threshold_groups": 64
+      },
+      "ganondorf": {
+        "moves": 31,
+        "phases": 49,
+        "threshold_groups": 65
+      },
+      "ice_climbers": {
+        "moves": 32,
+        "phases": 51,
+        "threshold_groups": 50
+      },
+      "jigglypuff": {
+        "moves": 33,
+        "phases": 54,
+        "threshold_groups": 58
+      },
+      "kirby": {
+        "moves": 58,
+        "phases": 170,
+        "threshold_groups": 177
+      },
+      "link": {
+        "moves": 32,
+        "phases": 79,
+        "threshold_groups": 111
+      },
+      "luigi": {
+        "moves": 33,
+        "phases": 53,
+        "threshold_groups": 54
+      },
+      "mario": {
+        "moves": 33,
+        "phases": 59,
+        "threshold_groups": 73
+      },
+      "marth": {
+        "moves": 38,
+        "phases": 47,
+        "threshold_groups": 96
+      },
+      "mewtwo": {
+        "moves": 30,
+        "phases": 62,
+        "threshold_groups": 102
+      },
+      "mr._game_&_watch": {
+        "moves": 30,
+        "phases": 66,
+        "threshold_groups": 69
+      },
+      "ness": {
+        "moves": 32,
+        "phases": 108,
+        "threshold_groups": 108
+      },
+      "peach": {
+        "moves": 30,
+        "phases": 53,
+        "threshold_groups": 77
+      },
+      "pichu": {
+        "moves": 30,
+        "phases": 56,
+        "threshold_groups": 57
+      },
+      "pikachu": {
+        "moves": 32,
+        "phases": 64,
+        "threshold_groups": 66
+      },
+      "roy": {
+        "moves": 37,
+        "phases": 56,
+        "threshold_groups": 103
+      },
+      "samus": {
+        "moves": 32,
+        "phases": 85,
+        "threshold_groups": 73
+      },
+      "sheik": {
+        "moves": 30,
+        "phases": 48,
+        "threshold_groups": 59
+      },
+      "yoshi": {
+        "moves": 32,
+        "phases": 77,
+        "threshold_groups": 96
+      },
+      "young_link": {
+        "moves": 32,
+        "phases": 76,
+        "threshold_groups": 107
+      },
+      "zelda": {
+        "moves": 29,
+        "phases": 65,
+        "threshold_groups": 118
+      }
+    }
   }
 }
