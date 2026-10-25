@@ -1063,12 +1063,11 @@ rolls; pressing shield while direction was already held does not roll. Two
 opposite horizontal press edges cancel, and down takes priority if several
 directions arrive in one frame. These are Smashcraft's digital-input rules.
 
-The local reference at Melee separates
-forward/backward roll relative to facing and changes facing through an
-animation event. Our simulation owns that transition instead of Warcraft's
-animation. No reference implementation is copied. Cached character pages do
-not provide verified dodge timing values; the initial ground-dodge parameters
-are provisional rather than a Melee parity claim.
+Melee's forward roll turns the fighter around partway through; our
+simulation owns that transition instead of Warcraft's animation. Ground-dodge
+frame counts are in smashcraft:references/melee-frame-data/records.jsonl
+(`dodges`); the initial ground-dodge parameters are provisional rather than a
+Melee parity claim.
 
 Historical fixture before #339: Roll lasts 31 frames and is intangible on frames 4–19 inclusive. Archer and
 Rifleman use character/action-specific per-frame translation samples from
@@ -1091,18 +1090,12 @@ for playback and art limits.
 
 ## Knockdown reference observations
 
-The local reference at the revision recorded above distinguishes ground
-impact, down wait, stand-up, directional get-up rolls and get-up attack.
-Melee decrements a waiting timer
-and eventually stands the fighter up. Its input priority checks attack,
-then roll, then stand. Melee
-accepts attack or special; Melee
-accepts Up or shield. Melee distinguishes
-forward/back relative to facing. These are our design targets from public frame data. Timing values for our
-first recovery pass are provisional rather than extracted animation data.
+Melee distinguishes ground impact, down wait, stand-up, directional get-up
+rolls and get-up attack (SmashWiki "Get-up attack"). Timing values for our first
+recovery pass are provisional Smashcraft tuning.
 
 Historical fixture before #339: Tumble starts at knockback 80 (damage level 3). After hitstun it ends on an
-accepted air jump, air dodge or attack, or on a sideways stick flick: at least = 0.8 on the frame the stick crosses = 0.25.
+accepted air jump, air dodge or attack, or on a sideways stick flick: at least 0.8 on the frame the stick crosses 0.25 (Smashcraft's thresholds).
 A full keyboard diagonal reads 0.707 and does not flick. Landing while still
 tumbling techs or starts the 26-tick bound, then the 220-tick wait and its
 options listed under "Grounded knockdown and jab resets".
@@ -1156,25 +1149,18 @@ into 9-frame recovery, half its authored 18. The tucked startup and downward
 kick are animation only: down-air preserves ordinary aerial momentum,
 gravity, and knockback. C-stick Down does not set movement Down or force
 fast-fall; explicit straight-down movement retains separate fast-fall.
-These are provisional design values, not extracted Sheik frame data.
+These are provisional design values, not Sheik's frame data.
 
 ## Floor-tech reference
 
-The local Melee checkout's
-Melee gates tech eligibility on
-input timing counters and common data, and
-Melee chooses forward/back by
-horizontal input relative to facing. Those are not timing values.
-
-The Melee section of https://www.ssbwiki.com/Tech, retrieved 2026-09-29 and
-cached at ~/code/smashcraft/worktrees/test-loop/build/ref-Tech.html, reports a
+A tech rolls forward or back by horizontal input relative to facing. The Melee
+section of SmashWiki "Tech" (https://www.ssbwiki.com/Tech) reports a
 20-frame digital shield-press window and a 40-frame interval between presses.
 A repeated press inside that interval cancels the current opportunity. Grounded
 shield presses also count. Pressing before the last hitlag frame leaves one
 post-hitlag opportunity; pressing on the last hitlag frame leaves 20. The
 lockout lasts 40 frames after hitlag. Most characters have six vulnerable frames
-at the end of a tech. These are factual parameters from a secondary reference,
-not extracted local binary measurements. Analog-trigger behavior is outside our
+at the end of a tech. These are factual parameters from that page. Analog-trigger behavior is outside our
 digital keyboard controls.
 
 The first floor-tech implementation counts the press tick as opportunity 1:
@@ -1190,7 +1176,7 @@ An in-place tech lasts 26 ticks with intangibility on 1–20; a directional tech
 lasts 40 with intangibility on 1–34. These totals are shared chosen tuning;
 both leave six vulnerable recovery ticks. Rifleman use 39 empirical
 motion samples and a stationary final tick; Illidan retains the 128-unit path. Direction at
-contact chooses the roll when the stick is at least = 0.2 sideways; its movement is clamped to the current platform.
+contact chooses the roll when the stick is at least 0.2 sideways (Smashcraft's threshold); its movement is clamped to the current platform.
 A tech clears impact hitstun and consumes its input window. Early-hitlag versus
 last-hitlag inputs, repeated/grounded presses, window/lockout boundaries,
 recovery actions, interruption and reset are tested in the simulation the map
@@ -1201,8 +1187,8 @@ movement does (smashcraft:ts/src/game/sim/smashDirectionalInfluence.ts).
 ## Aerial landing lag
 
 Landing ends an unfinished aerial and starts its landing lag: half the move's
-authored lag, at least one frame, which is Melee's L-cancelled lag (
-= 2, Melee). Neutral, forward,
+authored lag, at least one frame, which is Melee's L-cancelled lag (SmashWiki "L-canceling": halved,
+rounded down). Neutral, forward,
 back, up and down aerials land for 5/7/8/7/9 frames, from authored
 10/14/16/15/18. No input changes it: Smashcraft omits L-cancelling, see
 smashcraft:docs/gameplay-design.md. Empty landings (4 frames) and air-dodge
@@ -1212,13 +1198,7 @@ landings (10) keep their own lag.
 
 Melee smash attacks can be charged for up to 60 frames while holding attack.
 SmashWiki reports a Melee maximum damage multiplier of 1.3671× (the 1.4× figure
-is the rounded general-series value). Source: https://www.ssbwiki.com/Charge,
-retrieved 2026-09-29 and cached at
-`~/code/smashcraft/worktrees/test-loop/build/ref-Charge.html`. The local
-reference's smash-charge data path in Melee and
-Melee confirms that duration and multiplier are
-separate inputs and that damage grows with charge progress; the game-data values
-are not taken from it.
+is the rounded general-series value). Source: SmashWiki "Charge" (https://www.ssbwiki.com/Charge).
 
 The prototype lets a grounded up, down, or forward smash started through the
 normal Attack binding pause just before its active frames. Holding Attack
