@@ -80,7 +80,7 @@ The raw column names are intentionally preserved, even when misleading:
 | throws.start, end, total, percent | Reported throw timing and damage; site's timing assumes Mario as target |
 | dodges.start, inv_end, total | Invulnerability start/end and total |
 | misc.weight | Reported weight |
-| misc.gravity | **Fast-fall speed** on the live site, not gravitational acceleration |
+| misc.gravity | **Terminal (fall) velocity**, neither gravitational acceleration nor fast-fall speed: it equals `character-attributes.csv` Terminal Velocity for all 26 fighters |
 | misc.walk_speed | **Dash speed** on the live site, not walking speed |
 | misc.run_speed | Run speed |
 | misc.wd_length | Wavedash length **rank**, not distance |
@@ -324,6 +324,40 @@ are cached in the first directory):
 ```sh
 bun references/melee-frame-data/fightcore-intake.ts /tmp/fightcore-pages references/melee-frame-data
 ```
+
+### Which file wins
+
+`bun references/melee-frame-data/fightcore-check.ts` pairs FightCore's rows with
+`records.jsonl` and compares every field both hold. Specials are paired by
+their input slot under the SmashWiki name, and the script keeps that mapping.
+Each disagreement is printed beside a third source where the corpus has one:
+libmelee's recorded hitbox frames, length and IASA, or the attributes file's
+per-aerial landing lag. On 2026-10-26 it paired 740 moves and compared 3594
+values, of which 307 disagree. The rule per field, from that run:
+
+- First active frame, total frames and IASA: libmelee decides where it holds
+  the move, and elsewhere `records.jsonl` wins. libmelee sided with it on 10 of 10
+  attack starts, 11 of 11 attack totals, 42 of 45 grab starts, 42 of 44 grab
+  totals (FightCore counts grabs one frame later) and 3 of 5 IASA frames.
+- Last active frame: libmelee decides where it holds the move, and elsewhere
+  FightCore wins, as libmelee sided with it on 22 of 34.
+- Landing lag and L-cancelled lag: the attributes file's per-aerial landing lag
+  decides. It sided with FightCore on both rows (Bowser's neutral and forward
+  air, 30 where `records.jsonl` has 15), and the L-cancelled lag follows the same
+  file.
+- Damage, angle, base knockback, growth, set knockback and effect: FightCore wins
+  as the only file listing every hitbox. `records.jsonl` percent and percent_weak
+  are rounded strongest and weakest values and stand only where FightCore has none.
+- Throw damage (40 of 104 throws differ, with neither file always the larger),
+  autocancel (6 rows) and dodge intangibility (4 rows): unresolved, so neither
+  file wins. A check that uses one of these rows takes the value from SmashWiki
+  and cites it.
+- Shieldstun: `records.jsonl` for every fighter. For Fox and Falco,
+  `fightcore-phases.jsonl` also gives it for each phase.
+- Fighter attributes: `character-attributes.csv` wins. It agrees with the `misc`
+  rows on weight, terminal velocity, jump squat and run speed for all 26
+  fighters, and on dash speed for all but Luigi (1.34 against 1.3).
+  `records.jsonl` holds no fast-fall speed.
 
 ## Character attributes
 

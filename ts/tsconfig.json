@@ -81,7 +81,8 @@
     "test/pad-trace.test.ts",
     "test/balance-farm.test.ts",
     "test/workflow-artifacts.test.ts",
-  "test/pain-strip.test.ts"
+  "test/pain-strip.test.ts",
+  "../references/melee-frame-data/fightcore-check.ts"
   ],
   "exclude": [
     "src/platform/**",
