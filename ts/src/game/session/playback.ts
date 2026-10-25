@@ -117,7 +117,10 @@ export function repairBudget(speculative: number, depth: number, whole: number):
 
 
 
-export const confirmedBudget = (confirmable: number, journal: boolean): number => (journal && confirmable > 2 * CATCH_UP_FRAMES ? CATCH_UP_FRAMES : 3);
+const KEYBOARD_CONFIRMED = 2;
+
+// Confirmed frames make natives every client must call in the same callback, so nothing local may change this.
+export const confirmedBudget = (confirmable: number, journal: boolean): number => (journal ? (confirmable > 2 * CATCH_UP_FRAMES ? CATCH_UP_FRAMES : 3) : KEYBOARD_CONFIRMED);
 
 
 

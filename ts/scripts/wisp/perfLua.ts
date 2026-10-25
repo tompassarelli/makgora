@@ -22,7 +22,7 @@ import { profileRun } from "./censusProfile";
 import type { LuaHeadlessMap } from "wisp/src/headless/lua";
 import type { SyncDelivery } from "wisp/src/headless/lockstep";
 import { SMASHCRAFT_NOOPS, smashcraftNativeBehavior } from "./headlessNatives";
-import { DEEP_ROLLBACK_DEPTHS, DEEP_ROLLBACK_SPIKES, confirmedLag, deepestRollback, lagSpikeDelivery } from "./rollbackSpike";
+import { DEEP_ROLLBACK_DEPTHS, DEEP_ROLLBACK_SPIKES, confirmedLag, deepestRollback, framesRun, lagSpikeDelivery } from "./rollbackSpike";
 import { CATCH_UP_FRAMES } from "../../src/game/session/playback";
 
 declare const arg: Readonly<Record<number, string | undefined>>;
@@ -79,6 +79,9 @@ else if (bot !== undefined) {
   const depths: string[] = [];
   const play = (clients: Lockstep, measure: PerfMeasure) => {
     const catchingUp = clients.clients.map(() => 0);
+    const ran = clients.clients.map(() => ({ confirmed: 0, speculative: 0 }));
+    const indebted = clients.clients.map((): number | undefined => undefined);
+    const cleared = clients.clients.map((): number[] => []);
     let requested = false;
     const played = () => {
       if (capturing && !requested) {
@@ -86,7 +89,21 @@ else if (bot !== undefined) {
         clients.chat(0, `-dev capture ${Number(framesText) - CAPTURE_SETTLE_FRAMES}`);
       }
       clients.clients.forEach((client, index) => {
-        if ((confirmedLag(client) ?? 0) > CATCH_UP_FRAMES) catchingUp[index] = (catchingUp[index] ?? 0) + 1;
+        const lag = confirmedLag(client) ?? 0;
+        if (lag > CATCH_UP_FRAMES) catchingUp[index] = (catchingUp[index] ?? 0) + 1;
+        const since = indebted[index];
+        if (lag >= CATCH_UP_FRAMES) indebted[index] = clients.frame;
+        else if (lag === 0 && since !== undefined) {
+          cleared[index]?.push(clients.frame - since);
+          indebted[index] = undefined;
+        }
+        const now = framesRun(client);
+        const last = ran[index];
+        if (now === undefined || last === undefined) return;
+        const confirmed = now.confirmed - last.confirmed;
+        const speculative = now.speculative - last.speculative;
+        if (options.samples && last.confirmed > 0 && (confirmed > 1 || speculative > 1)) depths.push(`catch-up frame ${clients.frame} p${client.slot} confirmed=${confirmed} speculative=${speculative}`);
+        ran[index] = now;
       });
     };
     const result = playBotMatch(clients, bot, Number(framesText), measure, build, deep ? played : undefined);
@@ -98,6 +115,10 @@ else if (bot !== undefined) {
       if (depth === undefined) lines.push(`p${client.slot} has no rollback session`);
       else {
         depths.push(`p${client.slot} rollback window ${depth.window} deepest ${depth.deepest} corrections ${depth.corrections} catch-up callbacks ${catchingUp[index] ?? 0}`);
+        const debts = cleared[index] ?? [];
+        const most = debts.reduce((worst, callbacks) => Math.max(worst, callbacks), 0);
+        const mean = debts.reduce((total, callbacks) => total + callbacks, 0) / Math.max(1, debts.length);
+        depths.push(`p${client.slot} cleared ${debts.length} confirmed debts of ${CATCH_UP_FRAMES} frames in ${mean.toFixed(2)} callbacks mean, ${most} most${indebted[index] === undefined ? "" : ", one unpaid at the end"}`);
         const reached = DEEP_ROLLBACK_DEPTHS[index] ?? depth.window;
         if (depth.deepest < reached) lines.push(`p${client.slot} deepest rollback ${depth.deepest} never reached ${reached} frames`);
       }

@@ -31,7 +31,7 @@ interface DepthShell {
   readonly rollback?: {
     readonly window: number;
     readonly net: { readonly depths: readonly number[] };
-    readonly schedule: { knownThrough(): number; nextConfirmedFrame(): number };
+    readonly schedule: { knownThrough(): number; nextConfirmedFrame(): number; speculativeFrame(): number };
   };
 }
 
@@ -46,6 +46,11 @@ function rollbackOf(client: HeadlessClient): DepthShell["rollback"] {
 export function confirmedLag(client: HeadlessClient): number | undefined {
   const rollback = rollbackOf(client);
   return rollback === undefined ? undefined : rollback.schedule.knownThrough() - rollback.schedule.nextConfirmedFrame() + 1;
+}
+
+export function framesRun(client: HeadlessClient): { readonly confirmed: number; readonly speculative: number } | undefined {
+  const rollback = rollbackOf(client);
+  return rollback === undefined ? undefined : { confirmed: rollback.schedule.nextConfirmedFrame(), speculative: rollback.schedule.speculativeFrame() };
 }
 
 export function deepestRollback(client: HeadlessClient): { readonly window: number; readonly deepest: number; readonly corrections: number } | undefined {

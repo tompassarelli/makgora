@@ -670,6 +670,21 @@ lands on a confirm-6 or repair callback; at most two speculative frames run a
 callback. Without `os.clock`, or from 65536 s of process uptime, where its
 binary32 step passes 4 ms, the target is the callback count again.
 
+A keyboard callback confirms at most 2 frames, not 3 (smashcraft#239). With a
+repair pending, the repair also replays every frame the callback confirms, so
+a 3-confirmed callback ran about six frames of work: the 10–11 ms callbacks of
+the laptop native-perf capture. Confirmed frames make natives that must match on
+every client callback for callback, so the limit may not depend on anything
+local such as a pending repair: a limit of 2 only while repairing made the
+headless four-client run report a desync (unit calls in a different order on
+slots 0 and 1). Confirmation
+still outruns arrivals, two frames a callback against one, so a confirmed
+debt is repaid over more callbacks, and the drawn frames are unchanged,
+because speculative frames do not wait on confirmation. Going from 3 to 2 in
+`rollback-four`, the worst catch-up callback fell from 9.46 to 8.91 ms
+predicted, and a 6-frame debt took 3.75 callbacks on average (at most 10)
+instead of 2.86 (at most 6).
+
 The reading changes only how many frames a callback runs. It is never sent,
 snapshotted or checksummed; rows stay keyed by frame and confirmed state
 depends only on accepted rows, the precedent the journal path's catch-up set
