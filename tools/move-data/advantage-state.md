@@ -65,26 +65,26 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Goblin Tinker | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
-| Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash grab, up throw, forward tilt; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash grab, back throw; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away short hop, neutral special, jab; missed tech forward smash; trap short hop, neutral special, jab covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw; tech in forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
 | Murloc | medium | yes | yes | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, down throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | heavy | yes | yes | yes | yes | yes | back throw at 60%: tech in place dash grab, back throw; tech in short hop +4, down air, short hop, down air, forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, tech away, missed tech | up throw at 60% → up air against 5/5 DI |
 | Grom Hellscream | light | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw; tech in short hop, down special; tech away dash grab, up throw, forward smash; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Grom Hellscream | medium | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; tech in short hop, down special; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
-| Grom Hellscream | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away dash grab, up throw, forward smash; missed tech side special; trap dash grab, up throw, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Grom Hellscream | medium | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in short hop, down special; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
+| Grom Hellscream | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in forward smash; tech away dash grab, up throw, forward smash; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kobold | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw; tech in forward smash; tech away dash grab, up throw, up smash; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
 | Kobold | medium | yes | yes | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, down throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kobold | heavy | yes | yes | yes | yes | yes | back throw at 60%: tech in place dash grab, back throw, dash grab, back throw; tech in full hop, down air, short hop, forward air, side special, up smash, full hop, up special; tech away dash grab, back throw, dash grab, back throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 5/5 DI |
 | Malfurion Stormrage | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away side special; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Malfurion Stormrage | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash grab, back throw; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Malfurion Stormrage | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away side special; missed tech forward smash; trap side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Medivh | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, up throw, forward tilt; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Medivh | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Medivh | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Medivh | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away short hop, neutral special, grab, up throw, forward tilt; missed tech forward smash; trap short hop, neutral special, grab, up throw, forward tilt covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Medivh | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away short hop, neutral special, grab, up throw, dash, dash attack; missed tech forward smash; trap short hop, neutral special, grab, up throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in full hop in place, down air, up tilt, down smash; tech away dash, dash attack; missed tech down smash; trap full hop in place, down air, up tilt, down smash covers tech in place, tech in, missed tech | up throw at 60% → up air against 4/5 DI |
-| Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in full hop, down air, down smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 60% → up air against 4/5 DI |
+| Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in full hop, down air, dash, dash attack, dash, dash attack; tech away dash grab, back throw; missed tech forward smash; trap full hop, down air, dash, dash attack, dash, dash attack covers tech in place, tech in, missed tech | up throw at 60% → up air against 4/5 DI |
 | Anub'arak | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away side special; missed tech down smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 
 ## True combos from each throw
@@ -323,15 +323,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Goblin Tinker | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Kael'thas Sunstrider | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Kael'thas Sunstrider | light | up throw | 1/1 in up tilt, out down tilt | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 |
+| Kael'thas Sunstrider | light | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 in forward tilt, out dash, dash attack |
 | Kael'thas Sunstrider | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Kael'thas Sunstrider | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Kael'thas Sunstrider | medium | up throw | 1/1 in up tilt, out forward tilt | 1/1 in up tilt, out dash, dash attack | 1/1 KD | 1/1 in forward tilt, out dash, dash attack |
+| Kael'thas Sunstrider | medium | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 KD | 2/1 in forward tilt, out dash, dash attack |
 | Kael'thas Sunstrider | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Kael'thas Sunstrider | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
-| Kael'thas Sunstrider | heavy | up throw | 1/1 in up tilt, out down tilt | 1/1 in up tilt, out forward tilt | 1/1 | 1/1 KD |
+| Kael'thas Sunstrider | heavy | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 KD |
 | Kael'thas Sunstrider | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Murloc | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Murloc | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -353,7 +353,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Grom Hellscream | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | medium | up throw | 1/1 | 1/1 in forward tilt, out forward smash | 1/1 in dash, dash attack, out down special | 1/1 in dash, dash attack, out down special |
 | Grom Hellscream | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Grom Hellscream | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
+| Grom Hellscream | heavy | forward throw | 0/0 | 0/0 | 1/1 | 0/0 KD |
 | Grom Hellscream | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Grom Hellscream | heavy | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in forward tilt, out forward smash | 1/1 in forward tilt, out down special |
 | Grom Hellscream | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -366,7 +366,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Kobold | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 |
 | Kobold | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kobold | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
-| Kobold | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
+| Kobold | heavy | back throw | 0/0 | 0/0 | 1/0 | 0/0 KD |
 | Kobold | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 KD in up smash, out down smash | 1/1 in up smash, out forward smash |
 | Kobold | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Malfurion Stormrage | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -383,15 +383,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Malfurion Stormrage | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Medivh | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Medivh | light | up throw | 1/1 in up tilt, out down tilt | 1/1 | 1/1 | 1/0 |
+| Medivh | light | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 | 1/1 in forward tilt, out dash, dash attack |
 | Medivh | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Medivh | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Medivh | medium | up throw | 1/1 in up tilt, out forward tilt | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
+| Medivh | medium | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
 | Medivh | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Medivh | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Medivh | heavy | up throw | 1/1 in up tilt, out down tilt | 1/1 in up tilt, out forward tilt | 1/1 KD | 1/1 |
+| Medivh | heavy | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 KD | 1/1 |
 | Medivh | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Anub'arak | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
