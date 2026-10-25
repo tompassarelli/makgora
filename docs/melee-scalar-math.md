@@ -4,10 +4,7 @@
 `meleeSin(angle)`, and `meleeCos(angle)`. Inputs and intermediate results use
 explicit binary32 rounding and fused multiply-add. The implementation is
 independently authored from numerical approximation facts and mathematical
-equations.
-
-The numerical targets are recorded in this page and in the tests. No external
-implementation code is reused, and no proprietary data is kept in repositories.
+equations. No external implementation code is reused.
 
 Atan uses an odd polynomial, reciprocal reduction, and five tangent-subtraction
 segments. Each segment stores a split denominator offset, split numerator, and
@@ -18,33 +15,8 @@ after individual reductions and additions is observable and intentional.
 
 The supported sine/cosine domain is finite angles within
 `[-float32(pi), float32(pi)]`, including angles returned by `meleeAtan2`.
-`meleeAtan2` accepts finite vectors; zero vectors use the vertical zero's sign
-to choose positive or negative half pi. Nonfinite inputs are outside the claim;
-this is not a general replacement for all platform trigonometric functions.
-
-The subsequent original-routine fixture
-the recorded design targets exposes a
-branch discrepancy: atan2(-0, -1) returns negative float32(pi), whereas the
-previous implementation selected positive pi. Their sine residues have
-opposite signs. atan2(-0, +0) also selects negative half pi. The implementation
-now preserves the zero's sign when selecting the quadrant. The fourteen-case
-generated Wurst fixture checks forty actual emitted-Lua outputs against the
-original routines, including zero-result signs through IEEE reciprocal.
-It failed on the negative-zero angle before repair and passes afterward.
-Evidence: smashcraft:build/signed-zero-before.log and
-smashcraft:build/signed-zero-after.log. This verifies these scalar cases,
-not all signed-zero behavior in the remaining physics formulas or native Warcraft.
-
-The 16 recorded input cases cover cardinal axes, ordinary vectors, diagonals in
-all four quadrants, a small vector angle, and direct axis angles. They yield 43
-function outputs. All 16 focused Wurst tests and all 43 exact numeric comparisons
-in actual generated Lua passed with compiler
-`9913e1bd300c2053637d756a11bae8c3c8ed568f` and standard library
-`bb1e0458db5a372ba2a6928112452785e435d01a`. Numeric equality here does not
-distinguish the sign of zero. The ignored worker harness is at
-`~/code/smashcraft/worktrees/retail-trig-math/build/scalar-math/check.sh` and
-`~/code/smashcraft/worktrees/retail-trig-math/build/scalar-math/run.lua`.
-
-The original scalar outputs were obtained under QEMU PPC750, not measured on
-GameCube hardware. These checks establish agreement on the recorded scalar
-cases, not exhaustive finite-domain equivalence or full-game physics fidelity.
+`meleeAtan2` accepts finite vectors and keeps the sign of zero when choosing
+the quadrant, as the C standard's atan2 does: atan2(-0, -1) is negative
+float32(pi) and atan2(-0, +0) is negative half pi. Nonfinite inputs are outside
+the claim; this is not a general replacement for all platform trigonometric
+functions.

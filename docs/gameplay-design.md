@@ -66,25 +66,25 @@ smashcraft:ts/src/game/sim/stickZones.ts.
 
 Stick values are −1 to 1 after the 0.28 absolute deadzone, which
 the input adapter applies to row directions. A side "flick" means the stick
-crossed the 0.25 smash deadzone at most two samples ago (Melee's
-`dash_smash_window` is 2; #188 keeps three samples). An up flick is the
+crossed the 0.25 smash deadzone within the last three samples (#188). An up flick is the
 same on the vertical axis within the 4-frame tap-jump window. Zones
-are checked in a Melee routine's order: jump, dash, crouch, turn, walk, so the
-diagonal corners go to the earlier zone.
+are checked in the order jump, dash, crouch, turn, walk, so the diagonal
+corners go to the earlier zone. The thresholds are Smashcraft's, held in
+smashcraft:ts/src/game/sim/stickZones.ts.
 
-| Zone | Condition (facing right; mirror for left) | Melee field / function |
-| --- | --- | --- |
-| Deadzone | \|x\| < 0.28 and no other zone | a Melee constant |
-| Tilt turn | x ≤ −0.28, not a fresh smash | a Melee routine |
-| Smash turn | x ≤ −0.8, fresh flick |, a Melee routine → a Melee routine |
-| Walk slow | 0.28 ≤ x < 0.4 | 0.18 (under the deadzone), 0.4 a Melee routine |
-| Walk middle | 0.4 ≤ x < 0.8 | |
-| Walk fast | x ≥ 0.8, not a fresh flick | 0.8 |
-| Dash slow | 0.8 ≤ \|x\| < 1, fresh flick; run target = \|x\| × run speed |, `getAccelAndTarget` |
-| Dash fast | \|x\| = 1, fresh flick | same |
-| Dash 1f → jump | dash zone with 0.5625 ≤ y < 0.6625 on a fresh up flick: dash, then the relaxed tap jump next frame | `relaxed_tap_jump_threshold`, a Melee routine |
-| Jump | y ≥ 0.6625 on a fresh up flick (0.5625 in dash, run, run brake, turn-run) | |
-| Crouch | y < −0.6875; held until y > −0.625 | a Melee routine, a Melee routine |
+| Zone | Condition (facing right; mirror for left) |
+| --- | --- |
+| Deadzone | \|x\| < 0.28 and no other zone |
+| Tilt turn | x ≤ −0.28, not a fresh smash |
+| Smash turn | x ≤ −0.8, fresh flick |
+| Walk slow | 0.28 ≤ x < 0.4 |
+| Walk middle | 0.4 ≤ x < 0.8 |
+| Walk fast | x ≥ 0.8, not a fresh flick |
+| Dash slow | 0.8 ≤ \|x\| < 1, fresh flick; run target = \|x\| × run speed |
+| Dash fast | \|x\| = 1, fresh flick |
+| Dash 1f → jump | dash zone with 0.5625 ≤ y < 0.6625 on a fresh up flick: dash, then the relaxed tap jump next frame |
+| Jump | y ≥ 0.6625 on a fresh up flick (0.5625 in dash, run, run brake, turn-run) |
+| Crouch | y < −0.6875; held until y > −0.625 |
 
 Run holds while x × facing ≥ 0.625,
 turns at ≤ −0.375 and otherwise brakes; a dash enters
@@ -116,7 +116,7 @@ smashcraft:ts/src/game/sim/stick.ts.
 | State | Entered by | Tilts / jab | Smashes | Dash attack | Grab | Shield | Jump | Crouch | Dash / dash dance | Run turnaround |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Stand | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
-| Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window (a Melee routine in Walk's list) | yes | yes | – | yes | yes | yes | yes | dash | – |
+| Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window | yes | yes | – | yes | yes | yes | yes | dash | – |
 | Initial dash | dash zone from stand, walk or crouch, or a dash back | forward tilt on frames 1–3 only (#186); otherwise A gives the dash attack | forward smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
 | Run | dash held forward to its run frame | no: A gives the dash attack | no | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
 | Run brake | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
@@ -193,8 +193,8 @@ Tom decided, 7 Oct (delegated) (#190), after his playtest found too little
 horizontal air drift on many fighters: a dash, a jump at the dash's speed and a
 long aerial that crosses up a shield should feel good.
 
-**Melee's rules.** Values are our design targets (NTSC 1.02 Melee frame data from SmashWiki and
-Smashboards); the per-fighter air table is in the
+**Melee's rules.** Values are our design targets, from SmashWiki and the public frame data in
+smashcraft:references/melee-frame-data; the per-fighter air table is in the
 [movement reference](design/melee/movement.md#falling-and-air-control).
 
 - A ground jump's horizontal speed on takeoff is the ground speed × the
@@ -707,7 +707,7 @@ grab started on the frame a shielding opponent jumps catches it for every
 pair of fighters (smashcraft:ts/src/game/match/jumpOutOfShieldGrabContracts.tests.ts).
 In Melee the standing catch boxes are live on timeline frames 6 to 8
 (SmashWiki's Grab page)
-and jump squat runs 3 to 8 frames (a Melee routine,
+and jump squat runs 3 to 8 frames (references/melee-frame-data/records.jsonl,
 [movement](design/melee/movement.md#jumps)), so a jump from a 3-frame squat
 is already 4 frames into its ascent when a same-frame grab's box appears.
 Ultimate gives every fighter a 3-frame jump squat and adds about 4 frames to
@@ -855,7 +855,7 @@ smashcraft:ts/src/game/sim/moves.ts:
 
 ## Physics foundation
 
-Smashcraft's shared physics follows Melee's NTSC 1.02 rules, as roadmaps #2
+Smashcraft's shared physics follows Melee's rules, as roadmaps #2
 and #9 set out, set from public frame data and checked by `bun wisp oracle`
 (smashcraft:docs/physics.md). Where Smashcraft departs from Melee, the
 departure is a row in the table below, and the oracle reports each departure it
@@ -879,7 +879,7 @@ checks that every oracle departure names a row here.
 | Ground traction | 0.025-0.1 by fighter; doubled above walk speed while standing or landing ([case study](design/melee/movement.md#ground-movement)) | – | Melee's doubling rule; heroes 0.03-0.08 by body type, median 0.06, with fast runners no lower than 0.055 ([traction](physics.md#ground-traction-by-fighter)) | Owner direction, 15 Oct: ground friction closer to Melee, with more slide so moonwalks and wavedashes are stronger | – |
 | Shield release lag | 15 frames (GuardOff) | Ultimate: 11 frames | 11 frames; the 8-frame minimum hold and direct shield grab/jump bypass are unchanged | Owner decision, 6 Oct: Melee's lag makes dropping shield almost never worth it; dropping shield should be a real alternative to jumping into an aerial or rolling out of shield. Ultimate's value is the starting point; tune if it still goes unused | #100 |
 | Dodge timing | Per fighter | – | One shared profile: spot dodge 22 frames, intangible 2–15; rolls 31, intangible 4–19; air dodge 49, intangible 4–29, landing 10 | Owner's common frame-data profile | – |
-| Powershield | A full press within 2 frames of the trigger moving, while raising the shield: a hit in its first 4 frames does no shield damage and pushes back harder, a projectile in its first 2 reflects. The hit's shieldstun is unchanged, and the  counter (4 frames) only lets attacks and grabs cut the shield drop short; a press during shieldstun is ignored (a Melee routine is empty) | Ultimate: release-timed in the first 5 frames of the 11-frame shield drop; any attack skips the drop lag and acts 3 frames sooner than a block against direct hits; no reflection ([SmashWiki](https://www.ssbwiki.com/Perfect_shield)). Rivals 2: a 4-frame perfect shield plus a separate parry, active 6–13, that stuns the attacker 40–100 frames ([Dragdown](https://dragdown.wiki/wiki/RoA2/System_Mechanics/Defense)) | Melee's raise-timed press, but a parry: no shield damage, no shieldstun, no release lag; the whole shield reflects during its 2 reflector frames, not Melee's 0.75 reflector circle (#118); any grounded option on the first frame after the hit's freeze, an option pressed during the freeze buffered into it. One press parries one hit; a red parry re-pressed in shieldstun parries the next hit in a 2-frame window. Ground only ([Powershield and parry](#powershield-and-parry)) | A true parry with a clear reward that stays the player's own choice of punish, after Street Fighter III's parry and red parry (owner, 6 Oct) | #102 |
+| Powershield | A full press within 2 frames of the trigger moving, while raising the shield: a hit in its first 4 frames does no shield damage and pushes back harder, a projectile in its first 2 reflects. The hit's shieldstun is unchanged, and the shield can be dropped 1 frame after it instead of 15 (SmashWiki "Powershield") | Ultimate: release-timed in the first 5 frames of the 11-frame shield drop; any attack skips the drop lag and acts 3 frames sooner than a block against direct hits; no reflection ([SmashWiki](https://www.ssbwiki.com/Perfect_shield)). Rivals 2: a 4-frame perfect shield plus a separate parry, active 6–13, that stuns the attacker 40–100 frames ([Dragdown](https://dragdown.wiki/wiki/RoA2/System_Mechanics/Defense)) | Melee's raise-timed press, but a parry: no shield damage, no shieldstun, no release lag; the whole shield reflects during its 2 reflector frames, not a smaller reflector circle (#118); any grounded option on the first frame after the hit's freeze, an option pressed during the freeze buffered into it. One press parries one hit; a red parry re-pressed in shieldstun parries the next hit in a 2-frame window. Ground only ([Powershield and parry](#powershield-and-parry)) | A true parry with a clear reward that stays the player's own choice of punish, after Street Fighter III's parry and red parry (owner, 6 Oct) | #102 |
 | Aerial shieldstun | ⌊(0.45 × damage + 2) × 200/201⌋ frames on a full shield, the same for every attack; 1.425 × damage + 2 on the lightest shield ([case study](design/melee/aerials-on-shield.md#shieldstun)) | Ultimate: ⌊0.8 × damage × 0.33 + 2⌋ for aerials, 0.264 a damage, with shield hitlag × 0.67 ([SmashWiki](https://www.ssbwiki.com/Shieldstun), [hitlag](https://www.ssbwiki.com/Hitlag)). Rivals 2: 0.8 × damage + 1 for every attack, and the input buffer drops to 2 frames after a shield contact ([Dragdown](https://dragdown.wiki/wiki/RoA2/System_Mechanics/Defense)) | Aerials: ⌊(0.6 × damage + 2) × 200/201⌋ (Melee's damage term × 4/3; the same × 4/3 on light shields). Ground attacks, hitlag, pushback and landing lag stay Melee's ([Aerials on shield](#aerials-on-shield)) | Tilt slightly toward aggression from Melee, in Rivals 2's direction rather than Ultimate's; pays back the defender's 6-frame grab buffer, which Melee lacks | #106 |
 | Platform ascent | A rising fighter passes up through a platform with no change to its action | Ultimate passes through the same way; Rivals 2 not sourced | Down past crouch depth, without an aerial, mounts instantly; neutral, tilt + down or an active aerial passes through ([Platforms](#platforms)) | Tom’s final instant-mount rule, 14 Oct 2026 | #103, #392 |
 | Platform descent | A fresh down falls through at once | Ultimate drops through at once; Rivals 2 not sourced | A fresh hard-down press drops immediately; held down after mounting crouches; a drop consumes its press before fast fall ([Platforms](#platforms)) | Tom removed descent animation and frames, 14 Oct 2026 | #103, #392 |
@@ -1798,9 +1798,8 @@ smashcraft:ts/src/game/sim/shield.ts (`AERIAL_SHIELD_STUN_MULTIPLIER`):
   automatic L-cancelled lag (#54).
 - Why the attacker needs it: Smashcraft's defender has a 6-frame attack
   buffer, so a shield grab pressed during shieldstun comes out on the first
-  free frame. Melee has none (a Melee routine is empty and
-  a Melee routine reads that frame's press), which made its shield grab
-  a frame-perfect input. Rivals 2 answers the same problem by cutting the
+  free frame. Melee has no such buffer, which made its shield grab a frame-perfect
+  input. Rivals 2 answers the same problem by cutting the
   buffer to 2 frames after a shield contact; Smashcraft keeps the buffer, an
   aid with no decision in it, and pays the attacker in shieldstun instead.
 - Shield release (#100, 11 frames) does not touch this: shield grab and jump

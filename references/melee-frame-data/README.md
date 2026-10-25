@@ -8,8 +8,8 @@ inputs, each with its own provenance: meleeframedata.com's database
 FightCore's frame data with knockback values (`fightcore.csv`, with Fox's and
 Falco's per-phase hitboxes and knockdown thresholds in `fightcore-phases.jsonl`
 and `fightcore-thresholds.jsonl`, under "FightCore knockback and getup data").
-Physics parameters and retail observations are in
-smashcraft:docs/smash-melee-reference/README.md.
+The public-source parity ledger built on it is
+smashcraft:docs/design/melee-parity-plan.md.
 
 The database intake contains 789 records: 502 attacks,
 52 grabs, 105 throws, 104 dodges, and 26 character-stat records. It covers all

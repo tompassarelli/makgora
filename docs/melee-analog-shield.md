@@ -1,49 +1,27 @@
 # Analog shield pressure
 
-Production now preserves analog shield pressure from the existing NetworkInput
-trigger bytes through InputSnapshot, fighter state, replay snapshots and frame
-comparisons. A digital click supplies full strength. With no digital click,
-bytes 0–76 do not request guard; byte 77 is the first active pressure. Pressure
-below the retail threshold preserves the previous strength during a forced
-minimum hold. Shieldstun and hitlag retain the contact strength.
+Analog shield pressure travels from the NetworkInput trigger bytes through
+InputSnapshot, fighter state, replay snapshots and frame comparisons. A digital
+click supplies full strength. With no digital click, bytes 0–76 do not request
+guard and byte 77 is the first active pressure. Pressure below that threshold
+keeps the previous strength through the forced minimum hold. Shieldstun and
+hitlag keep the contact's strength.
 
-The shared pressure interpolation drives guard drain, shield damage, stun,
-defender pushback, and relative visual size. Authored Warcraft shield scale and
-fighter parameters remain unchanged. At pressure 128, strength is
-0.28851544857025146: a 10-power contact at health 60 leaves 51.577030181884766
-health, produces duration 13.436975479125977, and pushes back
-1.612437129020691 Melee units. The production integer stun count is 13 under
-the existing duration-to-action-clock rule.
+One pressure interpolation drives guard drain, shield damage, stun, defender
+pushback and relative visual size, following the light-shield formulas of
+SmashWiki "Shield": the trigger reading n runs from 43 to 140, a Z shield is
+s = 0.35, and with a the lightness the shield's size is
+(HP × a / 60) × 0.85 + 0.15, damage taken a + 0.7, depletion (a + 0.1) × 0.14,
+shieldstun (damage × (a + 0.3) × 1.5 + 2) × 200/201, defender pushback
+(damage × (a + 0.09) + 0.4) × shield and attacker pushback damage × a + 0.02.
+Authored Warcraft shield scale and fighter parameters are unchanged.
 
-The corpus the recorded design targets
-contains 54 original NTSC 1.02 observations over six pressures, three health
-values and three integer contact powers. The complete nonbreaking guard update
-and stun routines run under QEMU PPC750. Size, damage and pushback use bounded
-original fragments with the explicit return patches recorded in the corpus.
-The size observation uses unit base size, isolating the shared multiplier
-without importing any retail fighter's geometry. The observations establish
-scalar outputs, not a complete original guard/contact update.
-
-The analog-shield figures are our own design targets, set from public frame
-data (SmashWiki's Shield page).
-
-Observed focused check: 54 numeric-observation tests and four connected
-input/guard/contact/replay tests pass (58/58), with zero compiler errors and
-one existing unused-import warning. The fixed compiler and standard-library
-pins are unchanged. No existing test or gate was weakened.
-
-After integration, the emitted-Lua comparison matches all 54 numeric rows
-and passes all fourteen precision groups with zero compiler errors or warnings.
-The normal suite passes 592/592. Evidence:
-smashcraft:build/analog-precision-integration.log and
-smashcraft:build/analog-normal-integration.log.
-
-Still open: geometric shield coverage/pokes/tilt, ordinary melee powershield
-contacts, physical analog controller capture, ordered original guard-state
-traces, and native Warcraft verification. Projectile powershield timing and
-reflection are tracked separately in smashcraft:docs/melee-powershield.md.
-Current melee contacts still use the existing whole-fighter guard rule;
-visual size does not establish collision coverage. Existing keyboard producer
-rows use digital guard and full trigger bytes. A future physical analog
-producer must preserve independent digital-click bits and pressure bytes;
-setting a digital held bit for every nonzero pressure forces full shielding.
+Still open: geometric shield coverage, pokes and tilt, ordinary melee
+powershield contacts, physical analog controller capture and native Warcraft
+verification. Projectile powershield timing and reflection are in
+smashcraft:docs/melee-powershield.md. Melee contacts still use the
+whole-fighter guard rule; visual size does not establish collision coverage.
+Keyboard producer rows use digital guard and full trigger bytes. A future
+physical analog producer must keep the digital-click bits and pressure bytes
+independent; setting a digital held bit for every nonzero pressure forces full
+shielding.

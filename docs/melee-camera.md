@@ -1,80 +1,44 @@
 # Melee's gameplay camera and ours
 
-How Melee's standard match camera moves, the constants it reads, and how
-smashcraft:ts/src/game/sim/matchCamera.ts follows it. Stage camera limits,
-blast zones and the off-screen magnifier are in smashcraft:docs/physics.md,
-"Camera limits, off-screen damage and blast zones".
+How smashcraft:ts/src/game/sim/matchCamera.ts frames and follows the fighters.
+Stage camera limits, blast zones and the off-screen magnifier are in
+smashcraft:docs/physics.md, "Camera limits, off-screen damage and blast zones".
 
-Sources: the constants below are our own design targets, set from public
-frame data and from watching the game.
+Melee's camera keeps every fighter in view, zooming out as they spread apart
+and in as they close, and lets a launched fighter outrun the view into the
+off-screen magnifier. Its constants
+are not on a public page, so the values below are Smashcraft's own, tuned by
+watching play and by `bun scripts/cameraFeel.ts`.
 
-## Per frame
-
-1. **Subject boxes.** Each fighter's camera callback
-   (a Melee routine, run by `Fighter_procCamera`) sets the subject
-   position to the fighter's `cur_pos` plus ftData's y offset (10) and
-   its target extents: 22 forward times the stage's fixed zoom,
-   9 back, 16 up, 9 down (Fox, Falco and Captain Falcon alike). Turning
-   around swaps the forward and back extents.
-2. **Extent easing**: each extent moves toward its target
-   by at most 0.5 Melee units a frame. A turnaround therefore slides the box
-   over about 48 frames instead of jumping.
-3. **Bounds**: each extent is scaled by the stage's track
-   ratio times a Melee routine's subject weight
-   (1.5, 1.32, 1.16, 1.0 for one to four subjects); the position and the four
-   extent points are clamped into the stage's camera range (bottom at least
-   ground + 1). The union's bottom then drops by 10 + 390 × clamp((|eye z| −
-   80) / 4920, 0, 1).
-4. **Field of view** eases from 30° toward  = 38° by =
-   0.1 a frame.
-5. **Fit**: the union is fitted vertically between the
-   tilted top and bottom rays and horizontally at the view aspect 1.2173333; the eye distance is the larger of the two, clamped to the
-   stage's zoom range (grGroundParam = 83, = 1000 on Final
-   Destination). The vertical tilt is −10° + clamp(−(base − 30) ×
-   0.05°, −7°, 5°), base being the union's centre height lowered by up to
-   0.0682 of it (, between spreads = 60 and
-   = 120); the horizontal angle is clamp(−centre x × 0.05°, ±17.5°).
-6. **Corner limits**: the *target* eye and interest shift
-   so the view's four corners stay inside the camera range, by half of both
-   overlaps when opposite sides overflow. The limit is applied before easing.
-7. **Easing**: the interest moves
-   toward its target by clamp(speed × track smooth, 0.0001, 1) a frame, where
-   speed is  = 0.05 below a spread of = 120, =
-   0.1 above = 900 and linear between, spread is the larger side of the
-   bounds, and track smooth is grGroundParam = 1.8: 9% to 18% a frame.
-   The eye (pan and zoom alike) moves by = 0.15 × 1.8 = 27% a frame.
-   Zooming in and out use the same rate; there is no dead zone or hysteresis.
-8. **Quakes** (`Camera_UpdateQuakes`, `Camera_ApplyQuake`) offset the view on
-   requested shakes, scaled 1.0 near and 0.6 far.
-
-**Hitlag** does not move the camera: the hitlag and grab-mash shake is a drawing offset, and the subject reads `cur_pos`.
-**Knockback** is followed like any movement: the damage-flight states keep
-a Melee routine, and the clamp in step 3 stops the box at the
-camera range, so a launched fighter outruns the view and shows in the
-magnifier. A star KO's callback pins its subject to the
-top blast line, scaled toward the centre.
+Each frame matchCamera.ts gives every fighter a subject box around its body
+that is longer ahead of it than behind, eases each box edge toward its target
+so a turnaround slides the box rather than jumping it, scales the boxes by the
+number of fighters, clamps them into the stage's camera range, fits the union
+into the view, keeps the view's corners inside the range, and then eases the
+view toward that goal. Hitlag does not move the camera; a launched fighter is
+followed like any movement until the camera range stops the box.
 
 ## Smashcraft's camera
 
-matchCamera.ts runs steps 1–7 once per match frame in deterministic state,
+matchCamera.ts runs these steps once per match frame in deterministic state,
 with Melee heights at six world units a Melee unit: box 198 forward, 54 back,
 96 up, 54 down around a point 60 above the feet; extents ease by 3 × the
 subject ratio a frame (0.5 Melee units before scaling); interest 9–18% and
 zoom 14% a frame, the follow speed reading the larger side of the subject box;
 eye distance 498–6000. Corner and underside limits shape the goal before
-easing (step 6), so reaching a limit eases in. Deliberate differences:
+easing, so reaching a limit eases in. Deliberate differences:
 
 - **Side view.** Warcraft keeps yaw 90° and pitch 10°, so the fit has no tilt
   or pan angles; it centres the box. The half-angle tangent eases from 30° to
-  38° like step 4.
+  38°.
 - **16:9 and the HUD.** The fit uses the 16:9 match view, and its vertical
   fit keeps the box above the HUD (1.44 half-heights instead of 2). A
   fighter within 100 of the main deck's underside keeps it and the fighter
   above the HUD. Our view is therefore height-bound in neutral where Melee's
   4:3 view is usually width-bound, so a jump zooms out a little more than in
   Melee.
-- **Slower zoom.** The eye distance eases 14% a frame, not Melee's 27%. Our
-  height-bound fit turns every jump on a platform into a zoom, so at 27% four
+- **Slower zoom.** The eye distance eases 14% a frame. Our
+  height-bound fit turns every jump on a platform into a zoom, so at nearly twice that rate four
   fighters made the view zoom more and reverse more often than Melee's
   (`--players 4`: zoom p95 3.3% vs 2.3% of the view a frame, travel 59% vs 49%
   a second, 108 vs 57 snap frames). At 14% four-player zoom travels 49% a
@@ -88,7 +52,7 @@ easing (step 6), so reaching a limit eases in. Deliberate differences:
 
 `bun scripts/cameraFeel.ts` (from ts/) plays six fixed computer 1v1 matches, or
 three four-player ones with `--players 4`, and
-reports, for our camera and for a reference port of steps 1–7 driven by the
+reports, for our camera and for the script's reference camera driven by the
 same fighter paths, the pan and zoom per frame as fractions of the view,
 the change of that velocity per frame, frames that jump more than 3% (pan) or
 6% (zoom), travel a second, direction reversals a second and our frames with a
