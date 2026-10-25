@@ -90,8 +90,6 @@ function emptyContact(): DamageContact {
   };
 }
 
-
-
 const batch: { contacts: DamageContact[]; count: number; collecting: boolean } = { contacts: [], count: 0, collecting: false };
 const candleHeat: number[] = [0, 0, 0, 0];
 const candleDrop: boolean[] = [false, false, false, false];
