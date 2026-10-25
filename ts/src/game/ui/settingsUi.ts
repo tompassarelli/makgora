@@ -33,6 +33,7 @@ const BUTTON_TEXTURE = "war3mapImported\\SelectionAction.tga";
 const PRESET_STEP = f32(0.148);
 const PRESET_WIDTH = f32(0.142);
 export const LOAD_PROFILE = { x: f32(0.564), y: f32(0.548), width: PRESET_WIDTH, height: f32(0.034) } as const;
+export const presetButton = (index: number) => ({ x: f32(0.12) + index * PRESET_STEP, y: f32(0.548), width: PRESET_WIDTH, height: f32(0.034) });
 const DIM_KEY = 105;
 const LIT_KEY = 255;
 
@@ -95,8 +96,10 @@ export class SettingsPanel {
       return { art, label };
     };
     BlzFrameSetText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
-    this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, framehandle] =>
-      [preset, button(`MeleeSettingsPreset${I2S(index)}`, f32(0.12) + index * PRESET_STEP, f32(0.548), PRESET_WIDTH, f32(0.034), PRESET_NAMES[preset], { kind: "preset", preset }).label]);
+    this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, framehandle] => {
+      const { x, y, width, height } = presetButton(index);
+      return [preset, button(`MeleeSettingsPreset${I2S(index)}`, x, y, width, height, PRESET_NAMES[preset], { kind: "preset", preset }).label];
+    });
     this.profileButton = button("MeleeSettingsProfile", LOAD_PROFILE.x, LOAD_PROFILE.y, LOAD_PROFILE.width, LOAD_PROFILE.height, NO_SAVED_PROFILE, { kind: "profile" }).label;
     this.hint = line("MeleeSettingsHint", f32(0.12), f32(0.51), f32(0.6), f32(0.018));
     this.help = line("MeleeSettingsHelp", f32(0.12), f32(0.489), f32(0.6), f32(0.018), f32(0.0095));

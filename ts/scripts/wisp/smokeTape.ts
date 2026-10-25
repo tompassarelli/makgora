@@ -1,10 +1,11 @@
 import { Action } from "../../src/game/input/actions";
-import { type KeyBindings, actionFor, keyFor, presetBindings } from "../../src/game/input/keyBindings";
+import { type BindingPreset, type KeyBindings, actionFor, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { type InputRow, copyInput, emptyInput } from "../../src/game/input/inputRow";
 import { commitEdges, keyboardCapture, sampleKeys } from "../../src/game/input/keyboardCapture";
 import { AttackStyle } from "../../src/game/sim/codes";
 
-export const SMOKE_BINDINGS: KeyBindings = presetBindings("standard");
+export const SMOKE_PRESET: BindingPreset = "standard";
+export const SMOKE_BINDINGS: KeyBindings = presetBindings(SMOKE_PRESET);
 
 export type MoveClass =
   | { readonly kind: "attack"; readonly styles: readonly AttackStyle[] }

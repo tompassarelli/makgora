@@ -10,9 +10,11 @@ import { journalMenuFile } from "../../src/game/core/gameFiles";
 import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
+import { BINDING_PRESETS } from "../../src/game/input/keyBindings";
 import { Character } from "../../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/sim/heroes/registry";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
+import { PICKER_DONE, presetButton } from "../../src/game/ui/settingsUi";
 import { HAZARDS_BUTTON } from "../../src/game/ui/stageUi";
 import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
@@ -22,7 +24,7 @@ import { type MapStall, readMapStalls } from "./mapStalls";
 import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
 import { smokePairs } from "./smokeShards";
-import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_PRESET, type SettlePoint, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
@@ -32,6 +34,11 @@ const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";
 const MATCH_ATTEMPTS = 3;
 const HAZARD_TRIES = 3;
+const START_PANELS = 4;
+const PARK_X = 0.4;
+const PARK_Y = 0.02;
+const LABEL_SCALE = 2;
+const CONTROLS_SCREEN = /^(recommended|smash)$/i;
 const NEUTRAL_SPECIAL_PAIR = [PLAYABLE_CHARACTERS.indexOf(Character.thrall), PLAYABLE_CHARACTERS.indexOf(Character.jaina)] as const;
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
@@ -68,18 +75,40 @@ const stallLines = (stalls: readonly (readonly MapStall[])[]) => stalls.flatMap(
 
 export const readHazards = (words: readonly string[]) => /\bhaz[a-z]*:?\s+(on|off)\b/i.exec(words.join(" "))?.[1]?.toLowerCase();
 
-const hazardsLabel = (host: Client, view: Viewport) => capture(host, view).pipe(
-  Effect.flatMap(frame => frameWords(host, frame, "light")),
+export const enlarge = ({ width, height, rgb }: Frame): Frame => {
+  const out = new Uint8Array(width * height * 3 * LABEL_SCALE * LABEL_SCALE);
+  for (let y = 0; y < height * LABEL_SCALE; y++) {
+    for (let x = 0; x < width * LABEL_SCALE; x++) {
+      const from = ((y / LABEL_SCALE | 0) * width + (x / LABEL_SCALE | 0)) * 3;
+      out.set(rgb.subarray(from, from + 3), (y * width * LABEL_SCALE + x) * 3);
+    }
+  }
+  return { width: width * LABEL_SCALE, height: height * LABEL_SCALE, rgb: out };
+};
+
+const hazardsButton = (view: Viewport) => {
+  const corner = point(view, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y);
+  const far = point(view, HAZARDS_BUTTON.x + HAZARDS_BUTTON.width, HAZARDS_BUTTON.y - HAZARDS_BUTTON.height);
+  return { x: corner.x, y: corner.y, width: far.x - corner.x, height: far.y - corner.y };
+};
+
+const hazardsLabel = (host: Client, view: Viewport) => capture(host, hazardsButton(view)).pipe(
+  Effect.flatMap(frame => frameWords(host, enlarge(frame), "light")),
   Effect.map(words => readHazards(words.map(word => word.text))),
   Effect.mapError(fail("moves gate hazards")),
 );
+
+const park = (client: Client, view: Viewport) => {
+  const spot = point(view, PARK_X, PARK_Y);
+  return runProcess(ChildProcess.make(client.tools.xdotool, ["mousemove", String(spot.x), String(spot.y)], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail("moves gate hazards")));
+};
 
 const turnHazardsOff = (host: Client, view: Viewport) => Effect.gen(function*() {
   const toggle = point(view, HAZARDS_BUTTON.x + HAZARDS_BUTTON.width / 2, HAZARDS_BUTTON.y - HAZARDS_BUTTON.height / 2);
   for (let attempt = 0; attempt < HAZARD_TRIES; attempt++) {
     const label = yield* hazardsLabel(host, view);
     if (label === "off") return;
-    if (label === "on") yield* click(host, toggle.x, toggle.y).pipe(Effect.mapError(fail("moves gate hazards")));
+    if (label === "on") yield* click(host, toggle.x, toggle.y).pipe(Effect.mapError(fail("moves gate hazards")), Effect.andThen(park(host, view)));
     yield* Effect.sleep("400 millis");
   }
   return yield* new AcceptFailure({ operation: "moves gate hazards", problem: `the stage screen does not read "Hazards: Off" after ${HAZARD_TRIES} tries` });
@@ -93,13 +122,46 @@ export interface MovesGateReceipts {
   readonly specials: ReceiptFile;
 }
 
-export const startPromptReady = (words: readonly { readonly text: string; readonly y: number }[], height: number): boolean => {
-  const prompt = words.filter(({ y }) => y >= height * 0.88).map(({ text }) => text.toLowerCase());
+interface ScreenWord {
+  readonly text: string;
+  readonly y: number;
+}
+
+const promptWords = (words: readonly ScreenWord[], height: number) => words.filter(({ y }) => y <= height * 0.12).map(({ text }) => text.toLowerCase());
+
+export const startPromptReady = (words: readonly ScreenWord[], height: number): boolean => {
+  const prompt = promptWords(words, height);
   return prompt.includes("start") && prompt.includes("click");
 };
 
+export const controlsShowing = (words: readonly ScreenWord[]): boolean => words.some(({ text }) => CONTROLS_SCREEN.test(text));
+
+export const fighterSelectShowing = (words: readonly ScreenWord[], height: number): boolean => !controlsShowing(words) && promptWords(words, height).includes("click");
+
+const screenWords = (client: Client, frame: Frame) => Effect.all([frameWords(client, frame, "light"), frameWords(client, frame, "gold")]).pipe(Effect.map(inks => inks.flat()));
+
+const reachFighterSelect = (client: Client, save: (file: string, bytes: Uint8Array) => Effect.Effect<void, AcceptFailure>) => Effect.gen(function*() {
+  const viewport = yield* InputInjection.use(input => input.windowRegion(client)).pipe(Effect.mapError(fail("moves gate setup")));
+  const done = point(viewport, PICKER_DONE.x + PICKER_DONE.width / 2, PICKER_DONE.y - PICKER_DONE.height / 2);
+  const preset = presetButton(BINDING_PRESETS.indexOf(SMOKE_PRESET));
+  const tape = point(viewport, preset.x + preset.width / 2, preset.y - preset.height / 2);
+  for (let pass = 0; pass <= START_PANELS; pass++) {
+    const frame = yield* capture(client, viewport).pipe(Effect.mapError(fail("moves gate setup")));
+    const words = yield* screenWords(client, frame).pipe(Effect.mapError(fail("moves gate setup")));
+    if (fighterSelectShowing(words, frame.height)) return;
+    if (pass === START_PANELS) {
+      yield* save(`stuck-select-${client.name}.ppm`, encodePpm(frame));
+      return yield* new AcceptFailure({ operation: "moves gate setup", problem: `${client.name} shows ${controlsShowing(words) ? "its Controls screen" : "no fighter select prompt"} after ${START_PANELS} tries; stuck-select-${client.name}.ppm holds its screen` });
+    }
+    const notNow = words.find(word => word.text === "Not");
+    const targets = controlsShowing(words) ? [tape, done] : notNow === undefined ? [] : [{ x: viewport.x + notNow.x, y: viewport.y + notNow.y }];
+    yield* Effect.forEach(targets, target => click(client, target.x, target.y).pipe(Effect.andThen(Effect.sleep("300 millis"))), { discard: true }).pipe(Effect.mapError(fail("moves gate setup")));
+    yield* Effect.sleep("500 millis");
+  }
+});
+
 const waitForStartPrompt = (host: Client, viewport: Viewport) => pollUntil(capture(host, viewport).pipe(
-  Effect.flatMap(frame => frameWords(host, frame, "light").pipe(Effect.map(words => startPromptReady(words, frame.height)))),
+  Effect.flatMap(frame => screenWords(host, frame).pipe(Effect.map(words => startPromptReady(words, frame.height)))),
   Effect.mapError(fail("moves gate selection ready")),
 ), { every: "250 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate selection ready", problem: "fighter choices did not reach the Start / Click prompt" })) });
 
@@ -164,10 +226,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
   for (const client of clients) {
     yield* focus(client).pipe(Effect.mapError(fail("moves gate setup")));
     yield* prime(client);
-    const viewport = yield* input.windowRegion(client).pipe(Effect.mapError(fail("moves gate setup")));
-    const words = yield* frameWords(client, yield* capture(client, viewport).pipe(Effect.mapError(fail("moves gate setup"))), "light").pipe(Effect.mapError(fail("moves gate tutorial")));
-    const notNow = words.find(word => word.text === "Not");
-    if (notNow !== undefined) yield* click(client, viewport.x + notNow.x, viewport.y + notNow.y).pipe(Effect.mapError(fail("moves gate tutorial")));
+    yield* reachFighterSelect(client, save);
   }
   const hostView = yield* input.windowRegion(host).pipe(Effect.mapError(fail("moves gate viewport")));
   const { training } = RULE_BUTTONS;
