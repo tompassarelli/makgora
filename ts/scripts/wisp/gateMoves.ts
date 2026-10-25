@@ -134,7 +134,8 @@ export const startPromptReady = (words: readonly ScreenWord[], height: number): 
   return prompt.includes("start") && prompt.includes("click");
 };
 
-export const controlsShowing = (words: readonly ScreenWord[]): boolean => words.some(({ text }) => CONTROLS_SCREEN.test(text));
+export const controlsShowing = (words: readonly ScreenWord[]): boolean =>
+  words.some(({ text }, index) => CONTROLS_SCREEN.test(text) || (/^press$/i.test(text) && /^done\b/i.test(words[index + 1]?.text ?? "")));
 
 export const fighterSelectShowing = (words: readonly ScreenWord[], height: number): boolean => !controlsShowing(words) && promptWords(words, height).includes("click");
 
