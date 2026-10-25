@@ -77,7 +77,7 @@ repeated runs reuse its map and helper.
 
 Helper compilation uses one Cargo target directory at
 `~/.local/share/smashcraft-build-inputs/play-helper-target`, shared across
-temporary play-build worktrees. Cargo locks its build output; the play launcher
+revisions of the play-build worktree. Cargo locks its build output; the play launcher
 also holds a lock through copying the finished binaries into the controller
 source tree's `play-helpers/` directory, so concurrent revisions deliver their
 own helper. On 8 October 2026 the old fresh-worktree build took 4m46s;

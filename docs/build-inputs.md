@@ -59,11 +59,14 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
 - **Play.** `bun wisp play` builds main from main's manifest. Builders of a
   revision share the lock ~/.local/share/smashcraft-build-inputs/locks/play-REVISION.lock
   (flock(2), released by the kernel when its holder exits): the first builds
-  in the revision's lane worktrees/play-build-REV12 into a staging folder
+  in the one worktrees/play-build checkout (moved to the revision under
+  locks/play-build-checkout.lock, kept between builds so a landing that
+  changes no compile input reuses its compiled script, and with that script
+  discarded whenever `git diff` names a changed compile input) into a staging folder
   beside play-current/REVISION and renames it into place; the others wait,
   then reuse that map. A new revision's number is reserved under
   locks/play-version.lock as play-current/REVISION.version, so two revisions
-  built at once never share a number. The lane is removed after the build.
+  built at once never share a number.
 - **Optional helper.** The controller helper is optional (#166). A new play
   build tries it after the map; a failure prints one line and play goes on on
   the keyboard. `bun wisp controller` builds it on demand.
