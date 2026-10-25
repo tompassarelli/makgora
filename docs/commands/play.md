@@ -34,14 +34,15 @@
   pool pair the install runs `bun wisp smoke --native` on: after building
   every candidate it would install, it smokes every move of that candidate one
   fighter pair per run, writes its shard reports there
-  (smashcraft:docs/commands/accept.md) and `smoke.json` beside them, which
-  records per shard whether the run crashed (stopped, not run, or ended without
+  (smashcraft:docs/commands/accept.md) and a `smoke.json` in each shard's
+  folder, which records whether the run crashed (stopped, not run, or ended without
   a judged match), its dead bindings and its moves that failed to start.
-  Without `--pair` the install builds and reads the `smoke.json` an earlier
-  whole `bun wisp smoke --native --pair K` run on this machine wrote for the
-  candidate's bytes; a missing one blocks the install like a smoke crash.
+  Without `--pair` the install builds and reads the shard `smoke.json` files
+  earlier `bun wisp smoke --native --pair K [--shard N]` runs on this machine
+  wrote for the candidate's bytes, on one pair or several; a shard with none
+  blocks the install like a smoke crash.
   A smoke crash, a dead binding or a move that fails to start, or a missing
-  or mismatched `smoke.json`, always keeps the last installed build, and
+  or mismatched shard `smoke.json`, always keeps the last installed build, and
   status.json reads `blocked` with them under `blocking`. With
   `SMASHCRAFT_GREEN_GATE=enforce`, missing checks, reports, looks, mismatched
   bytes, `needs-look` and every other failed check keep the last installed

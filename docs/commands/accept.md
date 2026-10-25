@@ -46,10 +46,12 @@
   recorded checksum, every key must reach the game and every move must start,
   or the shard fails. `match-NN.tsv` lists each key and move with its
   verdict, and `match-NN.json` its dead bindings and moves that did not start;
-  `smoke.json` beside `smoke.md` gathers them per shard with whether the shard
-  crashed, and `play --install-green`, which runs this smoke on each candidate,
+  each shard's folder gets a `smoke.json` with them and whether the shard
+  crashed, written when that shard finishes, and `play --install-green`, which runs this smoke on each candidate,
   refuses any of the three whatever `SMASHCRAFT_GREEN_GATE` says. A `--shard`
-  run writes a `smoke.json` for those shards only, which the install refuses.
+  run replaces only its own shards' `smoke.json`, so runs of a few shards on
+  several pairs together smoke a whole candidate; the install refuses a shard
+  with none. `smoke.md` is the last run's table.
   Keys go out through xdotool with no per-key delay, timed from the game
   rate each match's replay measures. When a step's next reset arrives more
   than 24 frames early, the client froze for that long; a failed move or spot

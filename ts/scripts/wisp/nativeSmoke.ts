@@ -12,7 +12,7 @@ import { stopBunProcess } from "../hostProcess";
 import { userSessionEnv } from "./commands/nativeUnit";
 import { currentPlaytest } from "./currentPlaytest";
 import { type SmokeReport, isGreen } from "./greenBuilds";
-import { greenMain, greenState, smokeResultFile } from "./installGreen";
+import { greenMain, greenState, smokeShardFile } from "./installGreen";
 import { SMOKE_TABLE_HEADER, type SmokeMatchFailures } from "./smokeJudge";
 import { movesShardId, smokePairs, smokeShardLabel, smokeShards, specialsShardId } from "./smokeShards";
 
@@ -135,16 +135,18 @@ export const runNativeSmoke = (pair: string, map: string, shards: readonly numbe
   const sha256 = createHash("sha256").update(readFileSync(map)).digest("hex");
   const root = join(greenState, "accept", sha256, "classic");
   mkdirSync(root, { recursive: true, mode: 0o700 });
-  rmSync(smokeResultFile(sha256), { force: true });
   const outcomes: ShardOutcome[] = [];
   for (const shard of shards) {
     const directory = join(root, movesShardId(shard));
+    rmSync(smokeShardFile(sha256, shard), { force: true });
     const first = yield* runShard(shard, pair, map, directory);
-    outcomes.push(!shardPassed(first) && frozen(first) ? yield* runShard(shard, pair, map, directory) : first);
+    const outcome = !shardPassed(first) && frozen(first) ? yield* runShard(shard, pair, map, directory) : first;
+    outcomes.push(outcome);
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
+    writeFileSync(smokeShardFile(sha256, shard), `${JSON.stringify(smokeResult(sha256, [outcome]), null, 2)}\n`, { mode: 0o600 });
   }
   const report = smokeReport(map, sha256, outcomes);
   writeFileSync(join(root, "smoke.md"), report, { mode: 0o600 });
-  writeFileSync(smokeResultFile(sha256), `${JSON.stringify(smokeResult(sha256, outcomes), null, 2)}\n`, { mode: 0o600 });
   console.log(report);
   console.log(`Smoke table ${join(root, "smoke.md")}`);
   return outcomes;

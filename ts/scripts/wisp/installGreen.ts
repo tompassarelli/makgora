@@ -13,6 +13,7 @@ import { GREEN_GATE_LOOKS, greenGateFailures, greenInstallDecision, smokeBlocks,
 import { installLatest, installedMaps } from "./mapLibrary";
 import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
 import { projectRoot } from "./project";
+import { movesShardId, smokeShards } from "./smokeShards";
 import { clientHold } from "./runningGames";
 
 const COMMITS_CONSIDERED = 20;
@@ -50,7 +51,21 @@ const SmokeResult = Schema.Struct({
 const decodeSmokeResult = Schema.decodeUnknownEffect(Schema.fromJsonString(SmokeResult));
 export const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
 
-export const smokeResultFile = (mapSha256: string, stateDirectory = greenState): string => join(stateDirectory, "accept", mapSha256, "classic", "smoke.json");
+export const smokeShardFile = (mapSha256: string, shard: number, stateDirectory = greenState): string => join(stateDirectory, "accept", mapSha256, "classic", movesShardId(shard), "smoke.json");
+
+const readSmokeShard = (mapSha256: string, shard: number, stateDirectory: string) => {
+  const file = smokeShardFile(mapSha256, shard, stateDirectory);
+  return Effect.tryPromise({ try: () => Bun.file(file).text(), catch: (cause) => new PlayProblem({ problem: `${file}: ${String(cause)}` }) }).pipe(
+    Effect.flatMap(text => decodeSmokeResult(text).pipe(Effect.mapError(problem))), Effect.map((report): SmokeReport | undefined => report), Effect.orElseSucceed(() => undefined),
+  );
+};
+
+const readSmoke = (mapSha256: string, stateDirectory: string) => Effect.forEach(smokeShards(), shard => readSmokeShard(mapSha256, shard, stateDirectory)).pipe(
+  Effect.map((parts): SmokeReport | undefined => {
+    const shards = parts.flatMap(part => part?.candidateMapSha256 === mapSha256 ? part.shards : []);
+    return shards.length === 0 ? undefined : { candidateMapSha256: mapSha256, shards };
+  }),
+);
 
 export const gateReportFiles = (directory: string): string[] => existsSync(directory)
   ? [join(directory, "report.json"), ...readdirSync(directory, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => join(directory, entry.name, "report.json"))].filter(file => existsSync(file))
@@ -108,11 +123,7 @@ export const installAcceptedGreen = (documents: string, map: string, revision: s
       else unreadable.push({ look, id: "gate-report", reason: report.failure.problem });
     }
   }
-  const smokeFile = smokeResultFile(mapSha256, stateDirectory);
-  const smoke = existsSync(smokeFile) ? yield* Effect.tryPromise({ try: () => Bun.file(smokeFile).text(), catch: (cause) => new PlayProblem({ problem: `${smokeFile}: ${String(cause)}` }) }).pipe(
-    Effect.flatMap(text => decodeSmokeResult(text).pipe(Effect.mapError(problem))), Effect.map((report): SmokeReport | undefined => report), Effect.orElseSucceed(() => undefined),
-  ) : undefined;
-  const blocking = smokeBlocks(mapSha256, smoke);
+  const blocking = smokeBlocks(mapSha256, yield* readSmoke(mapSha256, stateDirectory));
   const failures = [...unreadable, ...greenGateFailures(mapSha256, declared, reports)];
   const decision = greenInstallDecision(failures, blocking, unreadable.length > 0, enforce);
   yield* writeStatus(stateDirectory, { revision, candidate: map, candidateMapSha256: mapSha256, state: decision.state, blocking, failures,
