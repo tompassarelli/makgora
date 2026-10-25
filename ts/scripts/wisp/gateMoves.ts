@@ -24,7 +24,7 @@ import { type MapStall, readMapStalls } from "./mapStalls";
 import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
 import { smokePairs } from "./smokeShards";
-import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_PRESET, type SettlePoint, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_BINDINGS, SMOKE_PRESET, type SettlePoint, keyName, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
@@ -239,6 +239,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     yield* focus(client).pipe(Effect.mapError(fail("moves gate setup")));
     yield* prime(client);
     yield* stopAutorepeat(client);
+    yield* xdotool(client, SMOKE_BINDINGS.keys.filter(bound => bound !== 0).flatMap(bound => ["keyup", "--delay", "0", keyName(bound)]));
     yield* reachFighterSelect(client, save);
   }
   const hostView = yield* input.windowRegion(host).pipe(Effect.mapError(fail("moves gate viewport")));
