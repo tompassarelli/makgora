@@ -48,6 +48,7 @@ export interface MoveSample {
 
   readonly firstActive: number;
   readonly lastActive: number;
+  readonly hits: readonly number[];
 
   readonly strike: { readonly x: number; readonly z: number };
 
