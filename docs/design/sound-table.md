@@ -244,7 +244,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | WoodHeavyBashFlesh | WoodHeavyBashFlesh + Fireball | WoodHeavyBashMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | WoodMediumBashFlesh | WoodHeavyBashFlesh + Fireball | WoodMediumBashMetal |  |
 | Neutral special: Fireball | FireballLaunch | FlameStrike | FlameStrike + Fireball | WoodMediumBashMetal |  |
-| Side special: Flame Strike | FlameStrike | FlameStrike | FlameStrike + Fireball | WoodMediumBashMetal |  |
+| Side special: Flame Strike | FlameStrikeTarget | FlameStrike | FlameStrike + Fireball | WoodMediumBashMetal |  |
 | Up special: Phoenix | PhoenixMissileLaunch | Fireball | Fireball + Fireball | WoodMediumBashMetal |  |
 | Down special: Banish | BanishCaster | BanishCaster | BanishCaster + Fireball | WoodMediumBashMetal |  |
 

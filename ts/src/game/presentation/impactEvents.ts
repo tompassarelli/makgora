@@ -10,7 +10,7 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "../sim/tuning";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
-import { hasImpactSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
+import { hasImpactSound, hasPerformSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
@@ -380,15 +380,18 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
   }
 
   const { style } = attack;
-  if (present && style !== undefined && style !== AttackStyle.grab && style !== AttackStyle.shot && !attack.dashGrab
+  const grab = style === AttackStyle.grab;
+  if (present && style !== undefined && style !== AttackStyle.shot && (grab ? hasPerformSound(fighter.character, style) : !attack.dashGrab)
     && (attack.serial !== events.previousAttackSerial || attack.frame !== events.previousAttackFrame) && attack.frame === attackStartup(fighter, style)) {
-    events.swing = moveTier(fighter.character, style);
+    if (!grab) events.swing = moveTier(fighter.character, style);
     events.perform = style;
     events.performSerial = attack.serial;
   }
   const { special } = fighter;
   const slot = specialSlot(special.action);
-  if (present && slot >= 0 && (special.action !== events.previousSpecialAction || special.frame < events.previousSpecialFrame || special.form !== events.previousSpecialForm)) {
+  const started = special.action !== events.previousSpecialAction || special.frame < events.previousSpecialFrame || special.form !== events.previousSpecialForm;
+  const aim = slot >= 0 ? runningHeroSpecial(fighter)?.aim : undefined;
+  if (present && slot >= 0 && (aim === undefined ? started : special.frame === aim.frame + 1 && (started || special.frame !== events.previousSpecialFrame))) {
     events.perform = specialMove(slot);
     events.performSerial = attack.serial + jump.serial + visuals.hit;
   }

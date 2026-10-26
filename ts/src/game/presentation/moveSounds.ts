@@ -136,7 +136,8 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.kaelthas]: {
     weapon: Weapon.blunt, strong: "Fireball",
-    specials: [s("FireballLaunch", "FlameStrike"), s("FlameStrike", "FlameStrike"), s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
+    specials: [s("FireballLaunch", "FlameStrike"), s("FlameStrikeTarget", "FlameStrike"), s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
+    normals: { [AttackStyle.grab]: { perform: "SiphonManaCaster" } },
   },
   [Character.murloc]: {
     weapon: Weapon.claw, strong: "CrushingWaveDamage",
@@ -300,6 +301,10 @@ export function playHit(character: Character, move: number, strong: boolean, ele
   playLayers(strong ? row.strong : row.hit, serial, sink);
   const sweetener = elementLook(element).sound;
   if (sweetener !== undefined && !isSpecialMove(move)) playLayer(layer([sweetener], SWEETENER_VOLUME), serial, 0, sink);
+}
+
+export function hasPerformSound(character: Character, move: number): boolean {
+  return (moveSound(character, move)?.perform.length ?? 0) > 0;
 }
 
 export function hasImpactSound(character: Character, move: number): boolean {

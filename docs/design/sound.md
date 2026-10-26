@@ -125,7 +125,10 @@ layers, and each layer is a native sound with alternatives:
   Sounds key on the special slot and the normal's input, not on a kit's
   internals, so the new kits inherit them:
   - Kael'thas's Fireball keeps the Fireball launch and Flame Strike hit.
-  - His Flame Strike casts and bursts with Flame Strike's eruption.
+  - His Flame Strike sounds the rune (FlameStrikeTarget) when the held cast is
+    released and bursts with Flame Strike's eruption.
+  - His Siphon Mana grab sounds Siphon Mana as the tether goes out; other
+    grabs stay silent until they catch.
   - His Phoenix charge and flight keep the Phoenix launch with his battle cry.
   - Banish keeps Banish and Feedback.
   - Illidan's lunging forward smash plays the blade swing and heavy slice, and
