@@ -386,7 +386,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       ],
       capture: [{ kind: "frames", name: "victory-from-result", client: "a", count: 46, everyMs: 67 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS, { kind: "receipt", pattern: "^rules stocks=1 minutes=10$", client: "a", min: 1 }, { kind: "receipt", pattern: "^result frames=\\d+ winner=P2 timed-out=0 interrupted=0$", client: "a", min: 1 }],
-      look: "Classic: idle Rifleman loses one stock to computer Blademaster by KO. Capture immediately on the first result receipt, then at roughly four-frame intervals for three seconds. The GAME call and results panel reveal Blademaster playing his stock victory clip from its beginning, visibly different from Rifleman's clip. Judge the original strip and elapsed capture times; receipt polling and framebuffer reads can miss the first animation frame.",
+      look: "Classic: idle Rifleman loses one stock to computer Blademaster by KO. Capture immediately on the first result receipt, then at roughly four-frame intervals for three seconds. The GAME call, drawn since #336 as the status-line words 'Computer wins!' with no centred text, holds about 1.5 s; then the results panel names Blademaster the winner. Across both, Blademaster plays his stock victory clip from its beginning, visibly different from Rifleman's clip. Judge the original strip and elapsed capture times; receipt polling and framebuffer reads can miss the first animation frame.",
     },
     {
       id: "c39-wren-match", closes: "smashcraft#7 C39N setup: the opening quick match's replay is written before the countdown check starts waiting", map: "presentation", session: "c39-countdown",
