@@ -4,7 +4,7 @@
 #! cue 60-72 glint: effect=HolyBoltSpecialArt
 #! cue 73-90 lunge: effect=GlaiveMissileTarget
 20 a stick 1 0
-44 a stick 0 0
+32 a stick 0 0
 60 a stick 1 0
 60 a tap X 2
 60 a capture
