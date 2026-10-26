@@ -39,8 +39,8 @@ export function comboScene(setup: ComboSetup): Scene {
   ]);
   const attacker = fighter(match, 0);
   const defender = fighter(match, 1);
-  if (setup.attackerZ > 0) airborne(attacker, setup.attackerX, setup.attackerZ);
-  if (setup.defenderZ > 0) airborne(defender, setup.defenderX, setup.defenderZ);
+  if (setup.attackerZ !== 0) airborne(attacker, setup.attackerX, setup.attackerZ);
+  if (setup.defenderZ !== 0) airborne(defender, setup.defenderX, setup.defenderZ);
   defender.status.damage = setup.percent;
   if (setup.defenderWeight !== undefined) defender.tuning = { ...defender.tuning, physics: { ...defender.tuning.physics, weight: f32(setup.defenderWeight) } };
   return match;

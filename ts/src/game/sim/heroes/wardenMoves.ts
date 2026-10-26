@@ -87,15 +87,16 @@ const SKY_LIFT: readonly Strike[] = [
 
 
 const KNIFE_REACH = f32(S + 10.0);
-const fallingKnives = (damage: number, base: number) => drillStrikes(30.0, -30.0, KNIFE_REACH,
-  { centre: linkAt(damage, base, 270), front: linkAt(damage, base, 250), back: linkAt(damage, base, 290) },
-  { centre: linkAt(damage, base, 270), front: linkAt(damage, base, 250), back: linkAt(damage, base, 290) });
+const knifeLinks = (damage: number, base: number) => ({ centre: linkAt(damage, base, 270), front: linkAt(damage, base, 250), back: linkAt(damage, base, 290) });
+const fallingKnives = (damage: number, base: number) => drillStrikes(30.0, -30.0, KNIFE_REACH, knifeLinks(damage, base), knifeLinks(damage, base));
+const KNIFE_SPIKE = wardenHit(2.289803981781006, "SPIKE", 270);
+const SPIKING_KNIVES = drillStrikes(30.0, -30.0, KNIFE_REACH, { centre: KNIFE_SPIKE, front: KNIFE_SPIKE, back: KNIFE_SPIKE }, knifeLinks(2.289803981781006, 40.0));
 const FALLING_KNIVES: AuthoredMove = {
   ...heroMove(7, 7, 14, 10, multiHit([
     { first: 7, last: 7, strikes: fallingKnives(1.526535987854004, 25.0) },
     { first: 9, last: 9, strikes: fallingKnives(1.526535987854004, 25.0) },
     { first: 11, last: 11, strikes: fallingKnives(1.526535987854004, 25.0) },
-    { first: 13, last: 13, strikes: fallingKnives(2.289803981781006, 40.0) },
+    { first: 13, last: 13, strikes: SPIKING_KNIVES },
   ])),
   fall: [{ firstFrame: 6, lastFrame: 12, speedZ: -9.0 }],
 };

@@ -289,6 +289,11 @@ Built on the existing headless sim and search, not beside them.
   The first declarations are today's slots: up throws combo starters, down
   throws tech-chase starters, the KILL-class back throws kill throws, every
   other forward and back throw positional.
+- Edge guards (#307): the same file's `edgeGuards` place the victim offstage
+  past the ledge, land the declared move and let the victim recover under
+  each DI (`ts/scripts/edgeGuardObjectives.ts`); a row holds when every listed
+  DI loses the stock at every percent of its window. Maiev's rows are in
+  [Maiev](maiev.md).
 
 The agency rule (`docs/gameplay-design.md:578`, at most 2 true links in a row,
 0-to-death in 2-3 reads) stays the guard against loops; the objectives set the

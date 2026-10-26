@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 import { DIS } from "./comboExplorer";
 import { LINK_PERCENTS, type LinkClass, type LinkRow, REGIONS } from "./comboLinks";
+import { EdgeGuardObjectiveSchema } from "./edgeGuardObjectives";
 import { ROLE_PERCENTS, THROW_DIRECTIONS, THROW_ROLES, type ThrowDeclaration } from "./throwRoleObjectives";
 
 export const ComboObjectiveSchema = Schema.Struct({
@@ -17,6 +18,7 @@ export type ComboObjective = typeof ComboObjectiveSchema.Type;
 const DeclaredThrowSchema = Schema.Union([Schema.Literals(THROW_ROLES), Schema.Struct({ role: Schema.Literals(THROW_ROLES), percents: Schema.Array(Schema.Finite) })]);
 export const ComboObjectivesSchema = Schema.Struct({
   links: Schema.Array(ComboObjectiveSchema),
+  edgeGuards: Schema.Array(EdgeGuardObjectiveSchema),
   throws: Schema.Record(Schema.String, Schema.Struct({ forward: DeclaredThrowSchema, back: DeclaredThrowSchema, up: DeclaredThrowSchema, down: DeclaredThrowSchema })),
 });
 export type ComboObjectives = typeof ComboObjectivesSchema.Type;

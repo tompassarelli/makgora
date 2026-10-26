@@ -29,6 +29,7 @@ import { meleeSwitchRefusal, switchableRows } from "../../ledger/meleeSwitches";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
 import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
+import { type EdgeGuardObjective, type EdgeGuardUnit, checkEdgeGuard } from "../../edgeGuardObjectives";
 import { type ThrowDeclaration, type ThrowRoleResult, type ThrowRoleUnit, VICTIM, VICTIM_WEIGHT, coverageProblems } from "../../throwRoleObjectives";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
@@ -335,11 +336,28 @@ const throwRoles = (declarations: readonly ThrowDeclaration[], attackers: readon
   return failed + coverage.length;
 });
 
+const edgeGuards = (declared: readonly EdgeGuardObjective[], attackers: readonly Character[]) => Effect.gen(function* () {
+  const units = declared.flatMap((objective): EdgeGuardUnit[] => {
+    const attacker = fighterNamed(objective.fighter);
+    return attacker === undefined || !attackers.includes(attacker) ? [] : [{ attacker, objective }];
+  });
+  const unknown = declared.filter((objective) => fighterNamed(objective.fighter) === undefined).map((objective) => `  coverage: ${objective.fighter} is not a selectable fighter`);
+  const results = yield* Effect.sync(() => units.map(checkEdgeGuard)).pipe(step(`${units.length} declared edge guards`));
+  const failed = results.filter((result) => !result.passes).length;
+  yield* Console.log([
+    `edge guards: ${results.length - failed} of ${results.length} declared edge guards kill offstage (victim ${fighterName(VICTIM)})`,
+    ...results.map((result) => `  ${result.passes ? "pass" : "FAIL"} ${result.name}: ${result.measured}${result.passes ? "" : ` — ${result.problems.join("; ")}`}`),
+    ...unknown,
+  ].join("\n"));
+  return failed + unknown.length;
+});
+
 const objectives = (attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
   const declared = yield* readText(objectivesFile).pipe(Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(ComboObjectivesSchema))(text).pipe(Effect.mapError(failure))));
   const links = yield* linkObjectives(declared.links);
+  const edges = yield* edgeGuards(declared.edgeGuards, attackers);
   const throws = yield* throwRoles(throwDeclarations(declared), attackers, jobs);
-  if (links + throws > 0) return yield* new CombosFailure({ problem: `${links} combo objectives and ${throws} throw-role rules miss` });
+  if (links + edges + throws > 0) return yield* new CombosFailure({ problem: `${links} combo objectives, ${edges} edge guards and ${throws} throw-role rules miss` });
 });
 
 const validate = (jobs: number) => Effect.gen(function* () {

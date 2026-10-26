@@ -41,13 +41,21 @@ retune.
 
 ## Edge-guard targets
 
-The link table measures at the stage's centre, so these are checked by the
-edge-guard work (#307), not by `--objectives`:
+The link table measures on the stage, so these are `edgeGuards` rows in
+`tools/move-data/combo-objectives.json`, which `bun wisp combos --objectives`
+simulates (#307). Each places a weight-75 Kobold offstage past the ledge, lands
+the move from the nearest spot that reaches, and the victim, under each DI,
+then double jumps and up specials home. A row holds when every DI loses the
+stock at every percent of its window; reaching the ledge or the stage misses.
 
-- back air: her offstage kill aerial, Fox's and Falco's back air role.
-- down air: a spike offstage, Falco's down air role.
-- air Fan of Knives (#272): a set-knockback spike offstage, the tool no
-  spacie has.
+| Move | Victim past the ledge, height | Percent | Role |
+| --- | --- | --- | --- |
+| back air | 40, ledge level | 60-150 | her offstage kill aerial, Fox's and Falco's back air role |
+| back air | 60, 40 below | 50-150 | |
+| down air | 40, ledge level | 60-150 | a spike offstage, Falco's down air role: its last knife hit spikes airborne foes and keeps its link hit on grounded ones |
+| down air | 80, 80 below | 50-150 | |
+| air Fan of Knives (#272) | 40, ledge level | 40-150 | the earliest spike, the tool no spacie has |
+| air Fan of Knives | 80, 80 below | 30-150 | |
 
 ## Identity guard
 

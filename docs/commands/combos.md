@@ -43,7 +43,10 @@
   declared target in smashcraft:tools/move-data/combo-objectives.json. Its
   `links` (an opener hit at a percent window into a follow-up, against a
   victim weight, at least a class and optionally with DIs that must not
-  escape) are checked against the committed link table; its `throws` declare
+  escape) are checked against the committed link table; its `edgeGuards` (a
+  back air, down air or down special landed on a victim past the ledge at a
+  percent window, with the DIs that must all lose the stock) are simulated
+  against the victim's double jump and up special home; its `throws` declare
   each fighter's four throw roles, and each named fighter's throws are
   simulated against their role's test. It names every row, percent and throw
   that misses and fails (smashcraft:docs/design/melee-parity-plan.md, "Combo
