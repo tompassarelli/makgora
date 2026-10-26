@@ -177,7 +177,8 @@ export const HIT_ROWS: readonly LedgerRow[] = [
   {
     id: "hitstun", family: "hits", name: "Hitstun frames per knockback (⌊0.4·KB⌋), the combo-ease knob",
     melee: { value: 0.4, source: wiki("Hitstun") }, ours: () => HITSTUN_FRAMES_PER_KNOCKBACK,
-    anchor: { file: KNOCKBACK, symbol: "HITSTUN_FRAMES_PER_KNOCKBACK" }, status: PARITY,
+    anchor: { file: KNOCKBACK, symbol: "HITSTUN_FRAMES_PER_KNOCKBACK" },
+    status: { kind: "parity", reason: "kept Melee 0.40, Tom via north gate 57; revisit after the baseline tag and playtests", decided: "2026-10-26", issue: 301 },
   },
   {
     id: "tumble", family: "hits", name: "Tumble threshold, the least knockback that tumbles",

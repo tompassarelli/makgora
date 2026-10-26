@@ -64,6 +64,8 @@ function rowProblems({ row, ours, line, checkLine }: Evaluated): string[] {
   if (line === undefined) problems.push(`${row.id}: anchor ${row.anchor.symbol} no longer resolves in ${row.anchor.file}`);
   if (row.checkedBy !== undefined && checkLine === undefined) problems.push(`${row.id}: check ${row.checkedBy.symbol} no longer resolves in ${row.checkedBy.file}`);
   if (row.status.kind === "deviation" && !/^\d{4}-\d{2}-\d{2}$/.test(row.status.decided)) problems.push(`${row.id}: deviation needs Tom's decision date as YYYY-MM-DD`);
+  if (row.status.kind === "parity" && (row.status.reason === undefined) !== (row.status.decided === undefined)) problems.push(`${row.id}: a parity decision needs both its reason and Tom's date`);
+  if (row.status.kind === "parity" && row.status.decided !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(row.status.decided)) problems.push(`${row.id}: parity decision needs Tom's decision date as YYYY-MM-DD`);
   if (ours instanceof Error) return [...problems, `${row.id}: reading our value failed: ${ours.message}`];
   if ("spread" in row.melee) {
     const [low, high] = row.melee.spread;
@@ -98,7 +100,7 @@ const cell = (text: string): string => text.replaceAll("|", "\\|").replaceAll("\
 const issueLink = (issue: number | undefined): string => (issue === undefined ? "" : `, #${issue}`);
 
 export function statusText(status: Status): string {
-  if (status.kind === "parity") return "parity";
+  if (status.kind === "parity") return status.reason === undefined ? "parity" : `parity: ${status.reason} (Tom ${status.decided}${issueLink(status.issue)})`;
   if (status.kind === "deviation") return `deviation: ${status.reason} (Tom ${status.decided}${issueLink(status.issue)})`;
   return `open: ${status.reason}${status.issue === undefined ? "" : ` (#${status.issue})`}`;
 }
