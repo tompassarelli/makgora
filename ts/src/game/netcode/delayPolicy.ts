@@ -1,4 +1,5 @@
 import { floorDiv } from "wisp/src/sim/intMath";
+import { at } from "wisp/src/runtime/lookup";
 import { MAX_INPUT_DELAY } from "./fixedSchedule";
 
 // Integer milliseconds and frames only, so Bun and both Lua32 modes decide alike.
@@ -72,6 +73,11 @@ export function agreedDelay(requests: readonly number[], fallback: number = DEFA
 export function timeSyncWait(localAdvantage: number, remoteAdvantage: number, framesSinceWait: number): boolean {
   return framesSinceWait >= TIME_SYNC_INTERVAL && localAdvantage - remoteAdvantage >= 2;
 }
+
+const PACING_BAND = 6;
+const PACE_CALLBACKS = [0, 2, 4, 8, 12, 20, 30];
+
+export const paceCallbacks = (margin: number): number => (margin <= 0 || margin > PACING_BAND ? 0 : at(PACE_CALLBACKS, margin));
 
 export const HELD_ERROR_CALLBACKS = 2;
 export const DEEP_ERROR_PERCENT = 50;

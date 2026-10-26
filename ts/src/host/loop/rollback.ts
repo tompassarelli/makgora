@@ -24,6 +24,7 @@ import { JournalInputSource } from "../../game/netcode/journal/source";
 import { captureReplaySnapshot, restoreReplaySnapshot } from "../../game/replay/snapshot";
 import { pacedStop, resetPauseBarrier, settlePace, stopFrame } from "../../game/session/pauseBarrier";
 import { confirmedBudget, keyboardCatchesUp, repairBudget, speculativeBudget } from "../../game/session/playback";
+import { paceCallbacks } from "../../game/netcode/delayPolicy";
 import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame, presentPredictedHits } from "./frame";
@@ -277,6 +278,19 @@ function noteWaiting(rollback: Rollback, waiting: number, notice: number): void 
 }
 
 
+// Local pacing only: no snapshot or gameplay state reads it, so clients may skip on different callbacks.
+function paceSkips(keyboard: KeyboardRollback, margin: number): boolean {
+  const every = paceCallbacks(margin);
+  if (every === 0) {
+    if (margin > 0) keyboard.paced = 0;
+    return false;
+  }
+  keyboard.paced++;
+  if (keyboard.paced < every) return false;
+  keyboard.paced = 0;
+  return true;
+}
+
 export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const { schedule, epoch, keyboard, journal, speculative } = rollback;
   const { trace, probe } = s;
@@ -372,7 +386,8 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     const speculativeStop = stopAt === undefined ? paced : paced === undefined ? stopAt : Math.min(stopAt, paced);
     const presentationStop = s.build.responseProbe ? visualCaptureStopBefore(slot, speculativeStop) : speculativeStop;
     beginFrameSection(SPECULATIVE_SECTION);
-    let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
+    const skipped = keyboard !== undefined && paceSkips(keyboard, schedule.rollbackFrames() - (before - schedule.remoteThrough(slot)));
+    let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, skipped ? 0 : speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
     endFrameSection(SPECULATIVE_SECTION);
     const due = keyboard === undefined ? 0 : realFramesDue(keyboard.real, rollback.epochCallbacks, schedule.speculativeFrame() - 1, realSeconds());
     if (advanced && keyboard !== undefined && schedule.speculativeFrame() > before && keyboardCatchesUp(schedule.speculativeFrame(), due, schedule.rollbackFrames(), schedule.remoteThrough(slot), steps, repaired)) {
