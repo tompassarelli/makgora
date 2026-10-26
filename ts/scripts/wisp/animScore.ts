@@ -77,7 +77,7 @@ export interface ClassThresholds {
 
 export interface LineOne { readonly pass: boolean; readonly bodyShare: number; readonly massShift: number; readonly limb: string; readonly rule: "body" | "limb"; readonly limbDrive: number }
 export interface LineTwo { readonly pass: boolean; readonly endError: number; readonly jump: number; readonly overshoot: number }
-export interface LineThree { readonly pass: boolean; readonly windup: number; readonly peak: number; readonly settle: number; readonly fill: number }
+export interface LineThree { readonly pass: boolean; readonly windup: number; readonly peak: number; readonly settle: number; readonly fill: number; readonly held: number; readonly returnPeak: number }
 export interface LineFour { readonly pass: boolean; readonly contrast: number; readonly windupContact: number; readonly contactRecovery: number }
 export interface MoveScore {
   readonly line1: LineOne;
@@ -114,6 +114,11 @@ const SETTLED = 0.01;
 
 const LEAST_PULLBACK = 0.01;
 const SHORT_STARTUP = 3;
+
+const HELD_WINDOW = { heldPose: 0.05, mostHeld: 9, returnPeak: 1.4 } as const;
+
+const heldWindow = (sample: { readonly moveClass: MoveClass; readonly hits: readonly number[] }): boolean =>
+  sample.moveClass === "dash-attack" || sample.hits.length > 1;
 
 function drawnBounds(frame: ScoreFrame): { readonly minZ: number; readonly maxZ: number } {
   let minZ = Infinity, maxZ = -Infinity;
@@ -413,8 +418,19 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
   const fill = Math.min(1, Math.max(0, settle - sample.lastActive) / endLag);
   const pullback = (tipAt(0) - tipAt(windup)) / height;
   const windupOk = windup < sample.firstActive && (pullback >= LEAST_PULLBACK || sample.firstActive <= SHORT_STARTUP);
-  const peakOk = peak >= sample.firstActive - 1 && peak <= sample.firstActive + thresholds.peakLate;
-  const line3: LineThree = { pass: windupOk && peakOk && fill >= thresholds.fill, windup, peak, settle, fill };
+  const held = heldWindow(sample);
+  const peakOk = peak >= sample.firstActive - 1 && peak <= (held ? sample.lastActive : sample.firstActive) + thresholds.peakLate;
+  let mostHeld = 0;
+  for (let start = contact; held && start < moveFrames; start++) {
+    let stop = start;
+    while (stop + 1 < moveFrames && meanVertexDistance(frames[start] ?? last, frames[stop + 1] ?? last) / height < HELD_WINDOW.heldPose) stop++;
+    mostHeld = Math.max(mostHeld, stop - start + 1);
+  }
+  const steps = Array.from({ length: Math.max(0, moveFrames - 1 - sample.lastActive) }, (_, step) => meanVertexDistance(frames[sample.lastActive + step] ?? last, frames[sample.lastActive + step + 1] ?? last));
+  const meanStep = steps.reduce((sum, step) => sum + step, 0) / Math.max(1, steps.length);
+  const returnPeak = held && meanStep > 0 ? Math.max(...steps) / meanStep : 0;
+  const heldOk = !held || (mostHeld <= HELD_WINDOW.mostHeld && returnPeak <= HELD_WINDOW.returnPeak);
+  const line3: LineThree = { pass: windupOk && peakOk && heldOk && fill >= thresholds.fill, windup, peak, settle, fill, held: mostHeld, returnPeak };
 
 
   const recovery = Math.min(moveFrames - 1, Math.round((sample.lastActive + moveFrames - 1) / 2));
@@ -429,6 +445,6 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
   const over = (value: number, most: number) => Math.max(0, value - most) / Math.max(most, 1e-6);
   const shortfall = (rule === "limb" ? short(limbDrive, LIMB_STRIKE.limbDrive) : short(bodyShare, thresholds.bodyShare)) + short(massShift, thresholds.massShift)
     + over(endError, thresholds.endError) + over(jump, thresholds.jump) + short(overshoot, thresholds.overshoot)
-    + (windupOk ? 0 : 1) + (peakOk ? 0 : 1) + short(fill, thresholds.fill) + short(contrast, thresholds.contrast);
+    + (windupOk ? 0 : 1) + (peakOk ? 0 : 1) + (heldOk ? 0 : 1) + short(fill, thresholds.fill) + short(contrast, thresholds.contrast);
   return { line1, line2, line3, line4, keys: { windup: windupKey, contact, recovery, hitWindups }, shortfall };
 }

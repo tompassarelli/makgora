@@ -1,3 +1,4 @@
+import { JUDGE_PART_TILES } from "./animJudgeStrip";
 import { createMatchCamera, type MatchCamera } from "../../src/game/sim/matchCamera";
 import type { ScoreFrame } from "./animScore";
 import type { SampledCue } from "./animScoreSample";
@@ -24,7 +25,7 @@ export function judgeCamera(): MatchCamera {
 
 export const judgePixelsPerUnit = (): number => FRAME_HEIGHT / (2 * JUDGE_CAMERA.distance * JUDGE_CAMERA.tangent);
 
-export const judgeFraming = (): string => `${JUDGE_CAMERA.distance}/${JUDGE_CAMERA.tangent}`;
+export const judgeFraming = (): string => `${JUDGE_CAMERA.distance}/${JUDGE_CAMERA.tangent}/parts of ${JUDGE_PART_TILES}`;
 
 export const heldOffset = (offsets: readonly number[], index: number, pixelsPerUnit: number) => {
   const slack = CAMERA_SLACK_PIXELS / pixelsPerUnit, at = offsets[index] ?? 0;

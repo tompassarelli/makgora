@@ -34,14 +34,24 @@ fighter can act), so line 2 measures the transition the game draws.
 3. **Timing:** the deepest pullback lies before first active; the extension
    peak is within one frame before contact or the class's late allowance;
    recovery keeps moving for the class's minimum share of end lag. Startup
-   of three frames or less can omit measurable pullback. Active windows come
+   of three frames or less can omit measurable pullback. A dash attack or a
+   move with several hits holds its hit regions for many frames, so its
+   extension peak may fall anywhere up to the last active frame plus the
+   late allowance, and two checks measure its follow-through from contact
+   to the end: no pose holds within 5% of body height for more than 9
+   frames (`held`), and the largest single-frame change of the return after
+   the last active frame is at most 1.4 times the return's mean frame change
+   (`return`), so the body neither freezes through the hold nor pops back to
+   ready. Active windows come
    from production collision regions or projectile spawns. The table also
    lists the linked Melee reference's start and total from the checked-in
    frame-data records; those columns do not change our gameplay timing.
 4. **Contrast:** rasterize the drawn triangles, then take one minus the
    larger IoU of windup/contact and contact/mid-recovery. More is clearer.
 5. **Judgement:** a fresh agent reads six gameplay-size key poses beside a
-   Melee reference (a move with several hits adds each hit's contact frame
+   Melee reference, with frames added from contact to the end so no two shown
+   frames are more than six frames apart, split into images of at most six
+   panels so each panel reaches the judge at the size a six-panel strip did (a move with several hits adds each hit's contact frame
    and, for each later hit, its windup: the frame after the previous hit
    where the striking tip is pulled furthest back, so the motion behind
    every hit is in view), scoring readability, weight, anticipation, follow-through
@@ -113,7 +123,7 @@ match camera's typical framing, `JUDGE_CAMERA` in
 of one seeded two-fighter computer match on Frozen Throne, which
 `bun scripts/matchFraming.ts` (from `ts/`) replays and prints beside the
 widest framing (917.7 against 2132.3, so a fighter draws 2.32 times larger).
-Each tile is cropped to the drawn extent of the move's six key poses plus a
+Each tile is cropped to the drawn extent of the move's shown poses plus a
 margin, never enlarged. The camera holds
 still at the middle of the move's height range, as a match camera does, so a
 drop or rise shows in the tiles; it follows only travel that would put the body
@@ -191,6 +201,22 @@ Anticipation uses the good jabs, Pit Lord/Lich King/Mountain King tilts,
 Blademaster up smash and Beastmaster neutral special. Contrast uses each
 class's good readability examples. Tilt return, aerial weight/timing
 have no good class example and use the pooled values.
+
+The held-window checks (line 3) are calibrated on the two moves fresh judges
+scored 4 on follow-through on the filled strip: Kael'thas's dash attack
+(held 7, return 1.18) and Thrall's back air (8, 1.27); 110% of the larger,
+rounded outward, gives 9 frames and 1.4. Cairne's down air, judged 4 on the
+six-pose strip, scored 3, 3 and 2 on the filled one: its spike holds from
+frame 19 to 34. Neither drawn-vertex distance (5 frames) nor silhouette
+overlap (4) measures that hold, so line 5 alone catches it. Measuring line
+2's overshoot past the last active frame was tried and dropped, because it
+failed Kael'thas, Thrall and Cairne alike. They apply to dash
+attacks and multi-hit moves only, the moves fresh judges scored on the filled
+strip; single-hit aerials with a long held pose, such as a held neutral air,
+keep the single-contact rules until judged. Decided 2026-10-26 by the proxy
+under Tom's judged-box delegation (north gate 37), from the diagnosis on
+#343: the follow-through line failed on every dash attack because the
+strike stopped at contact and the active frames barely moved.
 
 `bun run check` is the named source check.
 Re-author worst first under #180; keep a change only when its row improves

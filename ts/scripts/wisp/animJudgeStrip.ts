@@ -1,6 +1,7 @@
 import type { JudgeKeys } from "./animJudgeFrames";
 
 const JUDGE_ROW_TILES = 4;
+export const JUDGE_PART_TILES = 6;
 const BACKGROUND = "#101522";
 const BORDER = 3;
 
@@ -10,6 +11,12 @@ export function judgeRows(count: number): number[][] {
   const rows = Math.max(1, Math.ceil(count / JUDGE_ROW_TILES)), columns = Math.ceil(count / rows);
   return Array.from({ length: rows }, (_, row) => Array.from({ length: Math.min(columns, count - row * columns) }, (_, column) => row * columns + column));
 }
+
+export function judgeParts(count: number): number[][] {
+  return Array.from({ length: Math.ceil(count / JUDGE_PART_TILES) }, (_, part) => Array.from({ length: Math.min(JUDGE_PART_TILES, count - part * JUDGE_PART_TILES) }, (_, index) => part * JUDGE_PART_TILES + index));
+}
+
+export const judgeImageStem = (fighter: string, move: string, part: number, parts: number): string => parts === 1 ? `${fighter}-${move}` : `${fighter}-${move}-part-${part + 1}-of-${parts}`;
 
 export function judgeStrip(crops: readonly string[], labels: readonly string[], tile: JudgeTile, output: string): { readonly args: string[]; readonly width: number } {
   const tiles = crops.map((crop, index) => ["(", crop, "-gravity", "NorthWest", "-crop", `${tile.width}x${tile.height}+${tile.x}+${tile.y}`, "+repage", "(", "-size", `${tile.width}x`, "-gravity", "center", `caption:${labels[index] ?? ""}`, ")", "-gravity", "NorthWest", "-append", "-bordercolor", BACKGROUND, "-border", `${BORDER}`, ")"]);
@@ -27,5 +34,6 @@ export function judgeFrameLabel(keys: JudgeKeys, frame: number): string {
     frame === 0 ? "start" : "", frame === keys.windup ? "windup" : "", rewind >= 0 ? `hit ${rewind + 2} windup` : "", hit >= 0 ? `hit ${hit + 1}` : frame === keys.contact ? "contact" : "",
     frame === keys.lastActive ? "last active" : "", frame === keys.recovery ? "recovery" : "", frame === keys.end ? "end" : "",
   ].filter((role) => role !== "");
+  if (roles.length === 0) roles.push(frame < keys.lastActive ? "active" : "recovery");
   return `frame ${frame}: ${roles.join(", ")}`;
 }

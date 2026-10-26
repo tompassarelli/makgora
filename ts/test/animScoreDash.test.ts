@@ -46,3 +46,22 @@ test("a dash attack whose body does not travel still fails line 1 [k2 property]"
   expect(line1.bodyShare).toBe(0);
   expect(line1.pass).toBe(false);
 });
+
+const span = (length: number, from: number, to: number) => Array.from({ length }, (_, step) => from + ((to - from) * (step + 1)) / length);
+const held = (moveClass: MoveClass, shoulders: readonly number[], reach: readonly number[]): MoveSample => ({ ...sample(moveClass, shoulders, reach), lastActive: 15 });
+const CARRIED = { shoulders: [0, -4, -6, -2, ...span(12, 2, 26), ...span(16, 26, 0)], reach: [20, 10, 0, 10, ...span(12, 30, 30), ...span(16, 30, 20)] };
+const FROZEN = { shoulders: [0, -4, -6, -2, ...span(17, 13, 13), ...span(11, 13, 0)], reach: [20, 10, 0, 10, ...span(17, 30, 30), ...span(11, 30, 20)] };
+const SNAPPED = { shoulders: [...CARRIED.shoulders.slice(0, 16), ...span(3, 26, 0), ...span(13, 0, 0)], reach: [...CARRIED.reach.slice(0, 16), ...span(3, 30, 20), ...span(13, 20, 20)] };
+
+test("a dash attack passes line 3 when it carries through its active window and returns evenly, and fails when it freezes or snaps back [k3 measure docs/animation-scorecard.md]", () => {
+  const carried = scoreMove(held("dash-attack", CARRIED.shoulders, CARRIED.reach), THRESHOLDS["dash-attack"]).line3;
+  expect(carried.peak).toBe(15);
+  expect(carried.pass).toBe(true);
+  const frozen = scoreMove(held("dash-attack", FROZEN.shoulders, FROZEN.reach), THRESHOLDS["dash-attack"]).line3;
+  expect(frozen.held).toBeGreaterThan(9);
+  expect(frozen.pass).toBe(false);
+  const snapped = scoreMove(held("dash-attack", SNAPPED.shoulders, SNAPPED.reach), THRESHOLDS["dash-attack"]).line3;
+  expect(snapped.returnPeak).toBeGreaterThan(1.4);
+  expect(snapped.pass).toBe(false);
+  expect(scoreMove(held("tilt", CARRIED.shoulders, CARRIED.reach), THRESHOLDS.tilt).line3.pass).toBe(false);
+});
