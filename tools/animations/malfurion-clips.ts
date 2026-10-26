@@ -17,34 +17,51 @@ import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./or
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain");
+const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
+const rigOutput = option("--rig"), bakedKeys = option("--keys");
+const reposed = process.argv.slice(4).filter((a, i, all) => a !== "pain" && !a.startsWith("--") && !all[i - 1]?.startsWith("--")) as HeroPose[];
+const inPlace = painOnly || reposed.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/malfurion-clips.ts STOCK_MALFURION.mdx|SHIPPED_MALFURION.mdx PRIVATE_OUTPUT [pain]");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || reposed.length === 1), "usage: bun tools/animations/malfurion-clips.ts STOCK_MALFURION.mdx|SHIPPED_MALFURION.mdx PRIVATE_OUTPUT [pain|POSE...] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseSource(originalBytes), model = structuredClone(source);
-ensure((painOnly || source.Sequences.length === 8) && source.Helpers.some(b => b.Name === "Bone_Arm1_RArchDruid"), "Expected original classic Malfurion");
+ensure((inPlace || source.Sequences.length === 8) && source.Helpers.some(b => b.Name === "Bone_Arm1_RArchDruid"), "Expected original classic Malfurion");
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.malfurion); ensure(hero, "Register Malfurion before exporting his clips");
-interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; front?: number; back?: number; kneeFront?: number; kneeBack?: number; yaw?: number; lean?: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; active?: number; }
+interface Gesture { hand?: number; chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; front?: number; back?: number; kneeFront?: number; kneeBack?: number; yaw?: number; lean?: number; }
+interface Beat { frame: number; amount: number; arm?: number; travel: number; gesture?: Gesture; aim?: Point; }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; active?: number; beats?: readonly Beat[]; }
 const forward: Gesture = {chest:16,arm:-60,wrist:15,leftArm:-35,head:-8,front:12,back:-8};
 const overhead: Gesture = {chest:-12,arm:-140,wrist:10,leftArm:-85,head:-10,front:-12,back:10};
 const low: Gesture = {chest:48,arm:20,wrist:35,leftArm:-35,head:-28,front:-80,back:-70,kneeFront:130,kneeBack:120};
 const back: Gesture = {chest:-12,arm:55,wrist:25,leftArm:-30,head:15,yaw:155,front:12,back:12};
 const cast: Gesture = {chest:10,arm:-85,wrist:15,leftArm:-100,head:-10,front:8};
 const brace: Gesture = {chest:20,arm:-35,wrist:25,leftArm:-50,head:-10,front:25,back:25};
+const DASH_COIL: Gesture = {chest:-28,lean:-14,head:16,arm:95,wrist:-20,front:-50,kneeFront:60,back:-10,kneeBack:60};
+const DASH_DRIVE: Gesture = {chest:42,waist:-22,lean:14,head:-22,leftArm:-70,front:-60,kneeFront:60,back:55,kneeBack:40};
+const DASH_CARRY: Gesture = {chest:50,waist:-24,lean:16,head:-24,front:-64,kneeFront:72,back:58,kneeBack:44};
+const DASH_SETTLE: Gesture = {chest:-10,lean:-5,head:8,front:-8,kneeFront:10,back:6,kneeBack:10};
 const STAFF = ["Object16ArchDruid"];
 const PAIN_LOW = (g: number): Gesture => ({front:-55*g,kneeFront:65*g,back:15*g,kneeBack:95*g,chest:28*g,head:-12*g,wrist:-95,leftArm:-45*g});
 const PAIN_MIDDLE = (g: number): Gesture => ({chest:55*g,waist:-25*g,arm:30*g,leftArm:35*g,head:20*g});
 const PAIN_HIGH = (s: number): Gesture => ({head:-55*s,chest:-40*s,lean:-22*s,arm:-120,leftArm:-150*s,front:-20*s,kneeFront:0,kneeBack:0});
 const actions: Action[] = [];
+function driveBeats(contact:number,active:number,frames:number):Beat[]{
+ const last=contact+active-1,carry=last+3,top=frames-4,carryArm=0.95,carryTravel=1.1,settleArm=-0.1,settleTravel=0.2;
+ const mix=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(key=>[key,(a[key as keyof Gesture]??0)*(1-t)+(b[key as keyof Gesture]??0)*t]));
+ const ramp=0.25,peak=1/(1-ramp),glide=(t:number)=>t<ramp?peak*t*t/(2*ramp):t<1-ramp?peak*(t-ramp/2):1-peak*(1-t)**2/(2*ramp);
+ const rise=Array.from({length:Math.ceil((top-carry)/2)},(_,i)=>Math.min(top,carry+2*(i+1))).map(frame=>{const t=glide((frame-carry)/(top-carry));return {frame,amount:1,arm:carryArm+(settleArm-carryArm)*t,travel:carryTravel+(settleTravel-carryTravel)*t,gesture:mix(DASH_CARRY,DASH_SETTLE,t)};});
+ const settle=Array.from({length:frames-top},(_,i)=>top+i+1).map(frame=>{const amount=(1-(frame-top)/(frames-top))**2;return {frame,amount,arm:settleArm*amount,travel:settleTravel*amount,gesture:DASH_SETTLE};});
+ return [{frame:0,amount:0,arm:0,travel:0},{frame:Math.max(1,contact-5),amount:0.8,travel:-0.9,gesture:DASH_COIL,aim:[10,18,120]},{frame:contact-2,amount:1,travel:-1.3,gesture:DASH_COIL,aim:[20,18,140]},{frame:contact,amount:1,arm:1,travel:1},{frame:contact+2,amount:1.1,arm:1.05,travel:1.15},{frame:last,amount:1,arm:1,travel:1.15,gesture:DASH_DRIVE},{frame:carry,amount:1,arm:carryArm,travel:carryTravel,gesture:DASH_CARRY},...rise,...settle];
+}
 const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
  ["jab",AttackStyle.jab,{...forward,arm:-42,chest:6}], ["jab2",AttackStyle.jab2,{...forward,arm:-92,chest:22}],
  ["forwardTilt",AttackStyle.forwardTilt,forward], ["forwardTiltUp",AttackStyle.forwardTiltUp,{...overhead,arm:-130}], ["forwardTiltDown",AttackStyle.forwardTiltDown,{...low,arm:-70}],
- ["upTilt",AttackStyle.upTilt,overhead], ["downTilt",AttackStyle.downTilt,low], ["dashAttack",AttackStyle.dashAttack,{...forward,lean:18,leftArm:-125}],
+ ["upTilt",AttackStyle.upTilt,overhead], ["downTilt",AttackStyle.downTilt,low], ["dashAttack",AttackStyle.dashAttack,{chest:28,waist:-18,lean:10,head:-15,front:-50,kneeFront:30,back:45,kneeBack:25,leftArm:-60,arm:-70,wrist:30,hand:70}],
  ["forwardSmash",AttackStyle.forwardSmash,{...forward,chest:35,waist:-20,arm:-115,wrist:60}], ["upSmash",AttackStyle.upSmash,{...overhead,chest:-30,arm:-175}], ["downSmash",AttackStyle.downSmash,low],
  ["neutralAir",AttackStyle.neutralAir,{...forward,yaw:70}], ["forwardAir",AttackStyle.forwardAir,{...forward}], ["backAir",AttackStyle.backAir,back], ["upAir",AttackStyle.upAir,overhead], ["downAir",AttackStyle.downAir,{...low,lean:45,front:45}],
 ];
-for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,active:move.activeFrames,air:pose.endsWith("Air")}); }
+for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,active:move.activeFrames,air:pose.endsWith("Air"),beats:pose==="dashAttack"?driveBeats(move.startupFrames,move.activeFrames,move.totalFrames):undefined}); }
 const extra: readonly [HeroPose,number,number,Gesture][] = [
  ["crouch",30,12,brace],["landing",8,2,brace],["shield",30,8,{...brace,leftArm:-100}],["airDodge",49,4,{...brace,lean:-25}], ["smashCharge",30,8,{...overhead,arm:-100}],["dizzy",60,25,{chest:-15,head:30,arm:20,leftArm:15}],
  ["turn",8,4,{yaw:140,chest:-12}], ["stop",8,3,{...brace,lean:-18}], ["jumpSquat",5,4,{...brace,front:55,back:55}],
@@ -115,6 +132,7 @@ function joint(name:string,g:Gesture):[number,number]{
  if(name==="Bone_PelvisArchDruid")return [g.waist??0,0];
  if(name==="Bone_Arm1_RArchDruid")return [g.arm??0,0];
  if(name==="Bone_Arm2_RArchDruid")return [g.wrist??0,0];
+ if(name==="Bone_Hand_RArchDruid")return [g.hand??0,0];
  if(name==="Bone_Arm1_LArchDruid")return [g.leftArm??0,0];
  if(name==="Bone_Head")return [g.head??0,0];
  if(/^Bone_Leg1_[LR]ArchDruid$/.test(name))return [name.includes("_L")?g.front??0:g.back??0,0];
@@ -123,35 +141,45 @@ function joint(name:string,g:Gesture):[number,number]{
  return [0,0];
 }
 const originals=new Map<string,mdx.AnimVector>();tracks(source,(t,p)=>originals.set(p,t));
+const skeleton=(["Bones","Helpers"] as const).flatMap(kind=>model[kind].map((n,i)=>({n,path:`.${kind}.${i}`})));
+const restKey=(path:string)=>{const t=originals.get(path);return t&&!onGlobalClock(t)?t.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])?.Vector:undefined;};
+if(rigOutput){
+ const action=actions.find(a=>a.pose===reposed[0]);ensure(action,`${reposed[0]}: not an authored Malfurion pose`);
+ const at=(path:string)=>{const v=restKey(path);return v?Array.from(v):null;};
+ await Bun.write(rigOutput,JSON.stringify({frames:action.frames,contact:action.contact,active:action.active,nodes:skeleton.map(({n,path})=>({name:n.Name,parent:skeleton.findIndex(s=>s.n.ObjectId===n.Parent),pivot:Array.from(source.PivotPoints[n.ObjectId]!),rotation:at(`${path}.Rotation`),translation:at(`${path}.Translation`),scaling:at(`${path}.Scaling`)}))}));
+ console.log(`MALFURION_RIG ${reposed[0]} ${rigOutput}`);process.exit(0);
+}
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[], records:unknown[]=[];
 const damageActions:Action[]=[];
 for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=PAIN_GAIN[strength]!,stretch=HIGH_STRETCH[strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,gesture:height===0?PAIN_LOW(gain):height===1?PAIN_MIDDLE(gain):PAIN_HIGH(stretch)});}
 if(painOnly)actions.length=0;
-const painCells:number[]=[];
+if(reposed.length>0){for(const pose of reposed)ensure(actions.some(a=>a.pose===pose),`${pose}: not an authored Malfurion pose`);actions.splice(0,actions.length,...actions.filter(a=>reposed.includes(a.pose)));damageActions.length=0;}
+const reauthored:number[]=[];
 for(const [ordinal,action]of [...actions,...damageActions].entries()){
  const name=ordinal<actions.length?`Malfurion ${action.pose}`:`Malfurion Damage ${Math.floor((ordinal-actions.length)/3)} ${((ordinal-actions.length)%3)}`;
- const existing=painOnly?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!painOnly||existing>=0,`${name}: shipped sequence missing`);
+ const existing=inPlace?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!inPlace||existing>=0,`${name}: shipped sequence missing`);
  const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[index]!.Interval[0]!:cursor,end=start+Math.round(action.frames*1000/60);
- if(ordinal>=actions.length)painCells.push(index);
+ if(inPlace)reauthored.push(index);
  if(existing>=0){ensure(model.Sequences[index]!.Interval[1]===end,`${name}: timing changed`);tracks(model,track=>{if(!onGlobalClock(track))track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>end);});}
  else {cursor=end+100;model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});}
  const reverse=action.pose==="downSmash"?action.contact+3:action.pose==="getUpAttack"?action.contact+2:undefined;
  const phaseFrames=[...new Set([0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames,...action.roll?[0.25,0.5,0.75].map(p=>Math.round(action.frames*p)):[],...reverse?[reverse]:[],...action.pose.startsWith("neutralSpecial")?[action.frames-12]:[]])].sort((a,b)=>a-b);
- const phases=phaseFrames.map(frame=>({frame,amount:action.hold?1:action.roll?Math.sin(Math.PI*frame/action.frames):frame===0||frame===action.frames?0:frame===Math.max(1,action.contact-3)?-0.3:1}));
+ const phases=action.beats??phaseFrames.map(frame=>({frame,amount:action.hold?1:action.roll?Math.sin(Math.PI*frame/action.frames):frame===0||frame===action.frames?0:frame===Math.max(1,action.contact-3)?-0.3:1}));
  tracks(model,(track,path)=>{
   const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;let first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
 
   if(!first&&/^\.(Bones|Helpers)\.\d+\.(Rotation|Translation|Scaling)$/.test(path)){const Vector=new Float32Array(path.endsWith("Rotation")?[0,0,0,1]:path.endsWith("Scaling")?[1,1,1]:[0,0,0]);first={Frame:stand.Interval[0],Vector,...track.LineType>1?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}};}
   if(!first)return;
   const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-  for(const {frame,amount}of phases){let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,action.gesture);if(node.Name==="Bone_RootArchDruid"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;if(node.Name==="Bone_ChestArchDruid"&&reverse&&frame>=reverse&&frame<action.frames)z=165;if(node.Name==="Bone_RootArchDruid"&&(action.pose==="getUp"||action.pose==="getUpAttack")&&frame<action.contact)y=85*(1-frame/action.contact);Vector=rotated(first.Vector,y,z);}
+  for(const phase of phases){const {frame,amount}=phase;let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,"gesture" in phase&&phase.gesture?phase.gesture:action.gesture);if(node.Name==="Bone_RootArchDruid"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;if(node.Name==="Bone_ChestArchDruid"&&reverse&&frame>=reverse&&frame<action.frames)z=165;if(node.Name==="Bone_RootArchDruid"&&(action.pose==="getUp"||action.pose==="getUpAttack")&&frame<action.contact)y=85*(1-frame/action.contact);Vector=rotated(first.Vector,y,z);}
    const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
    track.Keys.push({...first,Frame:start+Math.round(frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});
   }
  });
- if(painOnly)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
- const aim=contactAim(action.pose);if(ordinal<actions.length&&aim)aimArm(index,start,action,phases,true,[aim.hand[0],18,aim.hand[2]],aim.direction);
+ if(inPlace)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
+ const aim=contactAim(action.pose);if(ordinal<actions.length&&aim)aimArm(index,start,action,action.beats?.flatMap(b=>b.arm===undefined?[]:[{frame:b.frame,amount:b.arm}])??phases,true,[aim.hand[0],18,aim.hand[2]],aim.direction);
+ for(const beat of action.beats??[])if(beat.aim)aimArm(index,start,{...action,contact:beat.frame,gesture:beat.gesture??action.gesture},[{frame:beat.frame,amount:1}],true,beat.aim);
  if(reverse)aimArm(index,start,{...action,contact:reverse},phases.filter(p=>p.frame>=reverse),true,[-35,18,28],[-1,0,-0.2]);
  if(["grab","grabHold","pummel","throwForward","neutralSpecial","neutralSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,false,[36,-12,65]);
  if(["sideSpecial","sideSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,false,[27,-12,112]);
@@ -166,7 +194,8 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  center.Translation.Keys=[...beforeKeys,...translations].sort((a,b)=>a.Frame-b.Frame);
  const step=({jab:35,jab2:10,forwardTilt:45,forwardTiltUp:45,forwardTiltDown:45,downTilt:45,dashAttack:45} as Partial<Record<HeroPose,number>>)[action.pose];
  const rise=action.pose==="upAir"?38:0;
- if(step!==undefined||rise>0){
+ if(action.beats){for(const beat of action.beats){const key=center.Translation.Keys.find(k=>k.Frame===start+Math.round(beat.frame*1000/60))!;key.Vector[0]=(step??0)*beat.travel;}}
+ else if(step!==undefined||rise>0){
   const last=action.contact+(action.active??1)-1;
   for(const key of center.Translation.Keys)if(key.Frame>=start&&key.Frame<=end){
    const frame=(key.Frame-start)*60/1000;
@@ -187,7 +216,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  records.push({pose:name,index,frames:victimContact?60:action.frames,contact:victimContact?30:action.contact});
 }
 
-if(!painOnly){
+if(!inPlace){
 const upTiltOrdinal=actions.findIndex(action=>action.pose==="upTilt"),upTiltAction=actions[upTiltOrdinal]!,upTiltIndex=source.Sequences.length+upTiltOrdinal;
 const upTiltSequence=model.Sequences[upTiltIndex]!,upTiltStart=upTiltSequence.Interval[0],upTiltEnd=upTiltSequence.Interval[1];
 const upTiltFrame=(frame:number)=>upTiltStart+Math.round(frame*1000/60),upTiltCoil=upTiltFrame(upTiltAction.contact-3);
@@ -210,14 +239,30 @@ for(const [ordinal,action]of actions.entries())if(/^victim(Pummel|Throw)/.test(a
  sequence.Interval=new Uint32Array([start,start+1000]);
 }
 }
+if(bakedKeys){
+ const action=actions.find(a=>a.pose===reposed[0])!,index=model.Sequences.findIndex(s=>s.Name===`Malfurion ${action.pose}`),[start,end]=model.Sequences[index]!.Interval as unknown as [number,number];
+ const authored=await Bun.file(bakedKeys).json() as {frames:number;nodes:{rotation:number[][];translation:number[][]}[]};
+ ensure(authored.frames===action.frames&&authored.nodes.length===skeleton.length,`${action.pose}: Blender keys cover ${authored.frames} frames of ${authored.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
+ const at=(frame:number)=>start+Math.round(frame*1000/60);
+ for(const [node,{n,path}]of skeleton.entries())for(const kind of ["Rotation","Translation"] as const){
+  const track=n[kind];if(!track||onGlobalClock(track))continue;
+  const baked=authored.nodes[node]![kind==="Rotation"?"rotation":"translation"];
+  track.Keys=[...track.Keys.filter(k=>k.Frame<start||k.Frame>end),...baked.map((v,frame)=>{const Vector=Float32Array.from(v);return {Frame:at(frame),Vector,...(track.LineType>=mdx.LineType.Hermite?{InTan:Vector.slice(),OutTan:Vector.slice()}:{})};})].sort((a,b)=>a.Frame-b.Frame);
+ }
+ const root=model.Nodes.find(n=>n?.Name==="Bone_RootArchDruid")!.Translation!,drawn=new DrawnModel(generateMDX(model),1);
+ for(let frame=0;frame<=action.frames;frame++){const triangles=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangles.length;i+=2)lowest=Math.min(lowest,triangles[i]!);root.Keys.find(k=>k.Frame===at(frame))!.Vector[2]!-=lowest;}
+ ensure(end===at(action.frames),`${action.pose}: timing changed`);
+}
 const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"malfurion.mdx"),bytes);
-if(painOnly){
+if(inPlace){
  const before=new DrawnModel(originalBytes,1),after=new DrawnModel(bytes,1);
- for(const [index,sequence]of source.Sequences.entries())if(!painCells.includes(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]!-sequence.Interval[0]!)*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${sequence.Name}: shipped pose changed`);}
- const gate=painGate(bytes,Character.malfurion,0,painCells,STAFF);console.log(gate.report);
- await Bun.write(join(output,"pain.png"),sheet("Malfurion pain",after,[1,-1].flatMap(facing=>painCells.map((clip,cell)=>({frame:cell,phase:AttackPhase.active,x:0,z:0,facing,parts:[],strikes:[],clip,seconds:0}))),9).png);
+ for(const [index,sequence]of source.Sequences.entries())if(!reauthored.includes(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]!-sequence.Interval[0]!)*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${sequence.Name}: shipped pose changed`);}
+ if(!painOnly){for(const [cell,action]of actions.entries()){const clip=reauthored[cell]!,frames=[...new Set((action.beats??[]).map(b=>Math.min(action.frames-1,b.frame)))];await Bun.write(join(output,`${action.pose}.png`),sheet(`Malfurion ${action.pose}`,after,[1,-1].flatMap(facing=>frames.map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<action.contact+(action.active??1)?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip,seconds:frame/60}))),frames.length).png);}
+ console.log(`MALFURION_POSE_PASS ${actions.map(a=>a.pose).join(",")} re-authored in place; ${source.Sequences.length-reauthored.length} shipped sequences unchanged; private output ${output}`);}
+ else{const gate=painGate(bytes,Character.malfurion,0,reauthored,STAFF);console.log(gate.report);
+ await Bun.write(join(output,"pain.png"),sheet("Malfurion pain",after,[1,-1].flatMap(facing=>reauthored.map((clip,cell)=>({frame:cell,phase:AttackPhase.active,x:0,z:0,facing,parts:[],strikes:[],clip,seconds:0}))),9).png);
  ensure(gate.pass,"Malfurion pain gate failed");
- console.log(`MALFURION_PAIN_PASS ${painCells.length} pain cells re-authored; ${source.Sequences.length-painCells.length} shipped sequences unchanged; private output ${output}`);
+ console.log(`MALFURION_PAIN_PASS ${reauthored.length} pain cells re-authored; ${source.Sequences.length-reauthored.length} shipped sequences unchanged; private output ${output}`);}
 }else{
 await Bun.write(join(project,"ts/src/game/presentation/heroes/malfurionClips.ts"),[
  "// Generated by tools/animations/malfurion-clips.ts from the stock classic Malfurion rig.",'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',

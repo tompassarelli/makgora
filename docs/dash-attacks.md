@@ -127,3 +127,14 @@ floor-set lifted the whole body back up by however far the hips dropped. His
 arcane cue (Medivh's own missile) is drawn on the move as a caster's signature
 normal. Lines 1–4 pass (body share 0.93, held 7, return 1.34) and three fresh
 judges give medians 4/4/4/4/4.
+
+Malfurion's dash attack (#342) is authored in Blender
+(`tools/animations/malfurion-dash-attack.py`): a rear-back of about 30° on
+bent knees with the staff drawn up behind his shoulder, held from frame 2,
+a lunge on the first active frame, a 45° pounce mid-window, then an even
+glide from the pounce to ready. An upright brake at the last active frame
+read as a pop (follow-through 3), and every pose take scored character 3
+until his signature cue was drawn: Entangling Roots at the staff, held on
+the model's drawn geometry because Tranquility's particles never render
+natively. Lines 1–4 pass (body share 1.00, held 7, return 1.24) and three
+fresh judges give medians 4/4/4/4/4.

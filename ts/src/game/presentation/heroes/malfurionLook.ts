@@ -1,4 +1,5 @@
 import { MALFURION_CLIPS, MALFURION_DAMAGE_CLIPS, MALFURION_FALLBACK, MALFURION_MODEL_FILE } from "./malfurionClips";
+import { AttackStyle } from "../../sim/codes";
 import type { HeroLook } from "../model/look";
 
 export const malfurionLook: HeroLook = {
@@ -8,4 +9,5 @@ export const malfurionLook: HeroLook = {
   fallback: MALFURION_FALLBACK,
   clips: MALFURION_CLIPS,
   damageClips: MALFURION_DAMAGE_CLIPS,
+  cueReadNormals: [AttackStyle.dashAttack],
 };

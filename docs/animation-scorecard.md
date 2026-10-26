@@ -142,6 +142,10 @@ from its robed silhouette alone. A fighter's look lists those normals in
 the game draws it (`normalAreaPose`), `prepare` draws it in the key poses and
 says so in the caption, and the clip's identity covers the cue placements, so a
 move judged with its effect keeps those judgements only while the effect is drawn.
+A caster normal whose weapon covers its hit region gets no reach flare, so
+`SIGNATURE_CUE_NORMALS` in `disjointCues.ts` draws the fighter's cue on it
+regardless of reach: Medivh's dash attack draws his arcane missile and
+Malfurion's bursts Entangling Roots at the staff (north gate 41, 2026-10-26).
 
 ## Thresholds
 

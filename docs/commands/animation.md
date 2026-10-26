@@ -153,6 +153,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   store `illidan-animation`, and refresh the original clip pool.
 
 - Malfurion stock-rig authoring: `bun tools/animations/malfurion-clips.ts STOCK_FURION.mdx PRIVATE_OUTPUT` appends staff, nature-spell, recovery, paired-throw and nine pain gestures while preserving the eight campaign sequences.
+  `bun tools/animations/malfurion-clips.ts SHIPPED_FURION.mdx PRIVATE_OUTPUT POSE...` re-authors only the named clips of the shipped model in place, checking every other clip is unchanged; `pain` does the same for the nine pain clips.
+  His dash attack is authored in Blender (#342): `... SHIPPED_FURION.mdx PRIVATE_OUTPUT dashAttack --rig RIG.json` writes his skeleton and stand pose, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/malfurion-dash-attack.py -- RIG.json KEYS.json`
+  bakes one key per attack frame on an identity-rest armature (no MDL exporter), and `... dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
 
 - Medivh animation authoring (from the repository root):
   `bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx PRIVATE_OUTPUT`
