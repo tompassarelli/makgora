@@ -16,17 +16,19 @@ import { AcceptDriver, AcceptFailure, type AcceptSuite, type ReceiptFile, select
 import type { Frame } from "wisp/scripts/wisp/frameProbe";
 import { liveAcceptDriver } from "wisp/scripts/wisp/acceptLive";
 import { spawnLogged } from "wisp/scripts/wisp/hostProcess";
-import { Clients } from "wisp/scripts/wisp/clients";
+import { type Client, Clients } from "wisp/scripts/wisp/clients";
 import { type Command, UsageFailure, flagValues, describeCause } from "wisp/scripts/wisp/command";
 import { makeAccept } from "wisp/scripts/wisp/commands/accept";
 import { lan } from "wisp/scripts/wisp/commands/lan";
 import { step } from "wisp/scripts/wisp/timings";
-import { GameFiles } from "wisp/scripts/wisp/gameFiles";
+import { GameFiles, dataDirectory, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
 import { currentPlaytest } from "../currentPlaytest";
 import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
-import { DevCommandReceipt } from "../boundary";
+import { DevCommandReceipt, MeleeReady } from "../boundary";
+import { MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
+import { send as sendShowcase } from "../../showcase";
 import { rebuildMap } from "../mapInputs";
 import { clientState, gameFilesLayer, projectRoot } from "../project";
 import { clientArguments } from "./client";
@@ -105,10 +107,21 @@ export const acceptForSoloClients = (suite: AcceptSuite, clients: readonly [stri
   })),
 });
 
+const drivenInput = (client: Client) => readGameFile(join(dataDirectory(client.documents), MELEE_READY_FILE), MeleeReady).pipe(
+  Effect.map(file => file?.value.input === "native-driver"),
+  Effect.orElseSucceed(() => false),
+);
+
+const DRIVER_CHAT = "driver ";
+
 export const sendSoloDevCommand = (command: string, name?: string) => Effect.gen(function*() {
   const clients = yield* Clients;
-  yield* Effect.forEach(clients.all.filter(client => name === undefined || client.name === name), client =>
-    sendDevCommand(command, client.name).pipe(Effect.provideService(Clients, { ...clients, all: [client] })), { discard: true });
+  const driverCommand = command.startsWith(DRIVER_CHAT) ? command.substring(DRIVER_CHAT.length) : undefined;
+  yield* Effect.forEach(clients.all.filter(client => name === undefined || client.name === name), client => Effect.gen(function*() {
+    if (yield* drivenInput(client)) return yield* sendShowcase(dataDirectory(client.documents), driverCommand ?? `dev ${command}`, 10).pipe(Effect.asVoid);
+    if (driverCommand !== undefined) return yield* new UsageFailure({ problem: `${client.name}: ${command} needs a native-driver map` });
+    return yield* sendDevCommand(command, client.name).pipe(Effect.provideService(Clients, { ...clients, all: [client] }));
+  }), { discard: true });
 });
 
 const fighterCount = (mask: number) => {
@@ -339,7 +352,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   const liveDriver = liveAcceptDriver({
     start,
     receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-") || name.startsWith("smashcraft-match-"),
-  }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)));
+  }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [smashcraftWatch]))));
   let smoke: ReturnType<typeof withSmokeCapture> | undefined;
   const driver = Layer.effect(AcceptDriver, Effect.gen(function*() {
     const live = yield* AcceptDriver;
@@ -377,7 +390,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     smoke = validated;
     if (gate) return validated.driver;
     return withShieldEnergyCapture(smoke.driver);
-  })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)), Layer.provide(platformLayer()));
+  })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [smashcraftWatch]))), Layer.provide(platformLayer()));
   const shards = {
     flags: ["--pair", "--pairs"],
     select: () => Effect.succeed(requested),

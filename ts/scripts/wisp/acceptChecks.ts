@@ -1,6 +1,7 @@
 import { SHIELD_ENERGY_SETUP } from "../../src/game/session/shieldEnergyCapture";
 import { teamResultsCheck } from "./teamResultsCheck";
 import { loserPoseChecks } from "./loserPoseChecks";
+import { showcaseChecks } from "./showcaseChecks";
 import { winCountChecks } from "./winCountChecks";
 import { koboldDirectionChecks } from "./koboldDirectionChecks";
 import { murlocStabChecks } from "./murlocStabChecks";
@@ -53,6 +54,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
   "slash-lit": { describe: "integrity map built with the slash hit spark's contact light", path: join(inputs, "particles-192-20261008/after.w3x"), quick: "-dev quick" },
   presentation: { describe: "development map rebuilt from this checkout, `-dev quick` (Illidan and Rifleman idle on the default stage)", path: PRESENTATION, rebuild: "main", quick: "-dev quick" },
   "team-results": { describe: "development map rebuilt from this checkout, left at fighter select for the four-computer team setup", path: PRESENTATION, rebuild: "main", quick: "" },
+  showcase: { describe: "showcase-profile map from `bun wisp map build --profile showcase`, given with --map, left at fighter select for the -dev showcase verbs", path: join(inputs, "showcase/Smashcraft showcase.w3x"), quick: "" },
 
 
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
@@ -407,6 +409,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     },
     teamResultsCheck([NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT]),
     ...loserPoseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
+    ...showcaseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...murlocStabChecks(heroProfile("Murloc"), [NO_IMPORT_FAILURES, NO_ERRORS]),

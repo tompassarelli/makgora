@@ -79,6 +79,14 @@
   `--map MAP.w3x` uses that already-built candidate for the selected checks
   without rebuilding it; select checks needing the same build profile. Each
   shard receives the same immutable map. Use revision-specific private paths.
+  Persistent showcase: `bun wisp accept --solo --pair K --map SHOWCASE.w3x
+  --only '422-*'`, with a map from `bun wisp map build --profile showcase`,
+  runs `-dev showcase start`, `spawn` and `clear` three times in one session
+  on client a, each pad receipt within 3 s, and keeps a frame after each
+  spawn and clear (smashcraft:ts/scripts/wisp/showcaseChecks.ts). A solo
+  run has no client watch, and on a native-driver map its dev commands go
+  through the driver channel (`bun scripts/showcase.ts send`), because Wisp
+  types chat only into a match the watch reports.
   Render cadence: `-dev render-clock` in a development map records timer
   callback bursts and cost; `bun wisp accept --only 169-render-clock --dry-run`
   prints its native plan (smashcraft:docs/high-refresh.md).

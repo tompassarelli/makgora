@@ -93,7 +93,10 @@ function serviceEpochWindow(s: ShellState, recorder: probe.ResponseProbe): void 
 function gameTick(s: ShellState): void {
   beforeNativeSoakTick(s);
   beforeProbedTick(s);
-  if (!beforeNativeDriverTick(s)) return;
+  if (!beforeNativeDriverTick(s)) {
+    writeReadyMarker(s);
+    return;
+  }
   if (s.build.pausePositionProbe && s.game.phase === Phase.match && s.probe?.run === 0) probe.startProbe(s.probe, false);
   if (s.build.epochProbe === true && s.probe !== undefined) serviceEpochWindow(s, s.probe);
   const pausedBefore = s.session.paused;
