@@ -91,7 +91,7 @@ def reach(p, seed):
     solved = dict(p)
     if "aim" in p:
         aim(solved, seed)
-    solved.update(banner=-0.8 * (solved.get("chest", 0) + solved.get("lean", 0)), bannerTwist=-solved.get("twist", 0))
+    solved.update(bannerTwist=-solved.get("twist", 0))
     return solved
 
 
@@ -126,20 +126,20 @@ KEYS = {
     contact - 2: dict(chest=-30, pelvis=8, lean=-18, head=24, twist=-50, leftArm=-95, leftElbow=-35,
                       thigh=-30, knee=8, foot=22, leftThigh=32, leftKnee=88, leftFoot=-34, travel=-32,
                       aim=(-14, 26, -70, 75)),
-    contact: dict(chest=36, pelvis=-12, lean=18, head=-32, twist=45, leftArm=40, leftElbow=-20,
-                  thigh=-74, knee=68, foot=8, leftThigh=40, leftKnee=6, travel=36,
+    contact: dict(chest=36, pelvis=-12, lean=38, head=-42, twist=45, leftArm=40, leftElbow=-20,
+                  thigh=-94, knee=68, foot=8, leftThigh=20, leftKnee=6, travel=36,
                   aim=(26, -14, 114, -20)),
-    (contact + last) // 2: dict(chest=28, pelvis=-10, lean=12, head=-24, twist=40, leftArm=30, leftElbow=-20,
-                                thigh=-30, knee=30, foot=6, leftThigh=-40, leftKnee=80, leftFoot=-10, travel=54,
+    (contact + last) // 2: dict(chest=28, pelvis=-10, lean=27, head=-32, twist=40, leftArm=30, leftElbow=-20,
+                                thigh=-45, knee=30, foot=6, leftThigh=-55, leftKnee=80, leftFoot=-10, travel=54,
                                 aim=(24, -6, 110, 6)),
-    last: dict(chest=58, pelvis=-20, lean=26, head=-46, twist=62, leftArm=60, leftElbow=-10,
-               thigh=56, knee=12, foot=8, leftThigh=-92, leftKnee=100, leftFoot=8, travel=70,
+    last: dict(chest=58, pelvis=-20, lean=48, head=-57, twist=62, leftArm=60, leftElbow=-10,
+               thigh=34, knee=12, foot=8, leftThigh=-114, leftKnee=100, leftFoot=8, travel=70,
                aim=(24, -32, 100, -58)),
-    last + 4: dict(chest=50, pelvis=-17, lean=21, head=-38, twist=55, leftArm=52, leftElbow=-14,
-                   thigh=34, knee=34, foot=6, leftThigh=-82, leftKnee=92, leftFoot=6, travel=68,
+    last + 4: dict(chest=50, pelvis=-17, lean=39, head=-47, twist=55, leftArm=52, leftElbow=-14,
+                   thigh=16, knee=34, foot=6, leftThigh=-100, leftKnee=92, leftFoot=6, travel=68,
                    aim=(6, -16, 56, 34)),
-    last + 7: dict(chest=40, pelvis=-14, lean=16, head=-28, twist=48, leftArm=45, leftElbow=-18,
-                   thigh=8, knee=62, foot=4, leftThigh=-62, leftKnee=78, leftFoot=4, travel=66,
+    last + 7: dict(chest=40, pelvis=-14, lean=28, head=-34, twist=48, leftArm=45, leftElbow=-18,
+                   thigh=-4, knee=62, foot=4, leftThigh=-74, leftKnee=78, leftFoot=4, travel=66,
                    aim=(6, -8, 40, 74)),
 }
 keys, seed = {}, {}
