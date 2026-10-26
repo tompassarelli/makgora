@@ -40,7 +40,7 @@ if (source.Sequences.length > 17) {
 const model = structuredClone(source);
 ensure(source.Sequences.length === 17 && source.Helpers.some(b => b.Name === "Bone_ArmClawR"), "Expected original classic Crypt Lord");
 const stand = source.Sequences[0]!;
-interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; wrist?: number; hand?: number; leftArm?: number; leftElbow?: number; leftWrist?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; frontThigh?: number; leftFrontThigh?: number; shield?: number; leftShield?: number; shieldTwist?: number; leftShieldTwist?: number; yaw?: number; lean?: number; }
+interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; wrist?: number; hand?: number; leftArm?: number; leftElbow?: number; leftWrist?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; frontThigh?: number; leftFrontThigh?: number; frontKnee?: number; leftFrontKnee?: number; shield?: number; leftShield?: number; shieldTwist?: number; leftShieldTwist?: number; yaw?: number; lean?: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
@@ -197,7 +197,7 @@ const jointPitch: Readonly<Record<string, readonly [keyof Gesture, number]>> = {
   Bone_Arm1R: ["arm", 0.65], Bone_Arm2R: ["elbow", 1], Bone_Arm3R: ["wrist", 1], Bone_ArmClawR: ["hand", 1],
   Bone_Arm1L: ["leftArm", 0.65], Bone_Arm2L: ["leftElbow", 1], Bone_Arm3L: ["leftWrist", 1],
   Bone_LFLeg09: ["thigh", 1], Bone_LFLeg13: ["leftThigh", 1], Bone_LFLeg10: ["knee", 1], Bone_LFLeg14: ["knee", 1],
-  Bone_LFLeg07: ["frontThigh", 1], Bone_LFLeg04: ["leftFrontThigh", 1], Bone_ArmShieldR: ["shield", 1], Bone_ArmShieldR01: ["leftShield", 1],
+  Bone_LFLeg07: ["frontThigh", 1], Bone_LFLeg04: ["leftFrontThigh", 1], Bone_LFLeg06: ["frontKnee", 1], Bone_LFLeg03: ["leftFrontKnee", 1], Bone_ArmShieldR: ["shield", 1], Bone_ArmShieldR01: ["leftShield", 1],
 };
 function joint(name: string, g: Gesture): [number, number] {
   const pitch = jointPitch[name];
