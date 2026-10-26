@@ -48,12 +48,12 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
 const beats: Partial<Record<HeroPose,(move:{startupFrames:number;activeFrames:number;totalFrames:number})=>readonly Beat[]>> = {
  dashAttack:({startupFrames:c,activeFrames:a,totalFrames:t})=>[
   {frame:0,g:{lean:6,chest:8,head:-4,arm:-10,front:-25,back:18},hand:[24,-18,62],direction:[1,0,0.1]},
-  {frame:Math.max(1,c-3),g:{tx:-44,lean:-28,chest:-28,head:14,arm:-20,front:-35,back:35,kneeFront:70,kneeBack:60,yaw:-45},hand:[18,-18,62],direction:[1,0,0.15]},
-  {frame:c,g:{tx:14,lean:28,chest:28,head:-14,arm:45,wrist:20,front:-55,back:32,kneeFront:85,yaw:14},hand:[40,-18,46],direction:[1,0,-0.35]},
-  {frame:Math.round(c+(a-1)/2),g:{tx:22,lean:24,chest:24,head:-14,arm:50,wrist:22,front:-55,back:34,kneeFront:75,yaw:18},hand:[48,-18,56],direction:[1,0,0]},
-  {frame:c+a-1,g:{tx:26,lean:12,chest:12,head:-12,arm:40,wrist:20,front:-45,back:30,kneeFront:55,yaw:14},hand:[44,-18,72],direction:[1,0,0.65]},
-  {frame:c+a+4,g:{tx:20,lean:9,chest:8,head:-10,arm:34,wrist:15,front:-38,back:25,kneeFront:45,yaw:11},hand:[40,-18,77],direction:[0.85,0,0.8]},
-  {frame:Math.round(c+a+(t-c-a)*0.5),g:{tx:12,lean:5,chest:4,head:-6,arm:20,front:-22,back:14,kneeFront:25,yaw:6},hand:[30,-18,80],direction:[0.45,0,1]},
+  {frame:Math.max(1,c-2),g:{tx:-30,lean:-22,chest:-24,head:14,arm:-30,front:-35,back:35,kneeFront:70,kneeBack:60,yaw:-45},hand:[-12,-18,54],direction:[-1,0,-0.25]},
+  {frame:c,g:{tx:8,lean:26,chest:26,head:-14,arm:45,wrist:20,front:-55,back:32,kneeFront:85,yaw:14},hand:[40,-18,52],direction:[1,0,-0.15]},
+  {frame:Math.round(c+(a-1)/2),g:{tx:14,lean:28,chest:28,head:-15,arm:52,wrist:22,front:-58,back:34,kneeFront:85,yaw:18},hand:[48,-18,54],direction:[1,0,0]},
+  {frame:c+a-1,g:{tx:18,lean:30,chest:32,head:-17,arm:58,wrist:25,front:-62,back:36,kneeFront:90,yaw:20},hand:[54,-18,52],direction:[1,0,-0.05]},
+  {frame:c+a+5,g:{tx:18,lean:26,chest:28,head:-15,arm:52,wrist:26,front:-58,back:32,kneeFront:88,yaw:14},hand:[46,-18,50],direction:[1,0,-0.1]},
+  {frame:Math.round(c+a+(t-c-a)*0.6),g:{tx:10,lean:13,chest:13,head:-8,arm:30,front:-32,back:17,kneeFront:50,yaw:6},hand:[36,-18,54],direction:[0.85,0,0.5]},
  ],
 };
 for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air"),beats:beats[pose]?.(move)}); }
