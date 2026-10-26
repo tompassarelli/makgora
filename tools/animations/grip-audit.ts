@@ -92,8 +92,8 @@ for (const [character, rig] of FIGHTER_RIGS) {
   if (fighter === undefined) throw new Error(`Missing fighter source ${character}`);
   const source = parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer());
   const clips = source.Sequences.map((sequence, index) => ({ sequence, clip: originalClip(character, index) }));
-  const readyIndex = source.Sequences.findIndex(sequence => /stand ready/i.test(sequence.Name));
-  const calibrationClip = clips[readyIndex]?.clip ?? clips[0]?.clip;
+  const calibrationIndex = [/stand ready/i, /^stand$/i].map(name => source.Sequences.findIndex(sequence => name.test(sequence.Name.trim()))).find(index => index >= 0) ?? 0;
+  const calibrationClip = clips[calibrationIndex]?.clip;
   if (calibrationClip === undefined) throw new Error(`${fighter.name}: no calibration clip`);
   const scale = characterModelScale(character as Character);
   {
@@ -177,7 +177,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
 const summary = rows.reduce((totals, row) => ({ rows: totals.rows + 1, samples: totals.samples + row.samples, detached: totals.detached + (row.detached ?? 0), intersecting: totals.intersecting + (row.intersecting ?? 0), unavailableRows: totals.unavailableRows + Number(row.unavailable !== '' || row.detached === null || row.intersecting === null) }), { rows: 0, samples: 0, detached: 0, intersecting: 0, unavailableRows: 0 });
 const lines = ['fighter\tlook\tsequence\tsamples\tframes detached\tframes intersecting\tmax grip gap\tmin capsule clearance\tunavailable', ...rows.map(row => [row.fighter, row.look, row.sequence, row.samples, row.detached ?? 'unavailable', row.intersecting ?? 'unavailable', row.maxGap?.toFixed(3) ?? 'unavailable', row.minClearance?.toFixed(3) ?? (row.intersecting === 0 ? 'hidden' : 'unavailable'), row.unavailable].join('\t'))];
 await Bun.write(join(out, 'grip-audit.tsv'), `${lines.join('\n')}\n`);
-await Bun.write(join(out, 'grip-audit.json'), `${JSON.stringify({ method: '60 Hz samples including the final endpoint; grip point calibrated from Stand Ready; farthest weighted vertex as weapon tip; a weapon whose bone is scaled below half size is hidden and unmeasured; fixed joint-following capsules with radii scaled from adjacent joints; geometric rows are candidates pending visual acceptance', summary, unavailable, rows }, null, 2)}\n`);
+await Bun.write(join(out, 'grip-audit.json'), `${JSON.stringify({ method: '60 Hz samples including the final endpoint; grip point calibrated from Stand Ready, else Stand; farthest weighted vertex as weapon tip; a weapon whose bone is scaled below half size is hidden and unmeasured; fixed joint-following capsules with radii scaled from adjacent joints; geometric rows are candidates pending visual acceptance', summary, unavailable, rows }, null, 2)}\n`);
 console.log(lines[0]);
 console.log(`TOTAL ${JSON.stringify(summary)}`);
 console.log(`OUTPUT ${out}`);
