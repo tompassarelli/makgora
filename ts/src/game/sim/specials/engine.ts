@@ -14,7 +14,7 @@ import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
@@ -521,6 +521,71 @@ function seeks(move: Readonly<AuthoredSpecial>): boolean {
 }
 
 
+const turned = { x: 0.0, z: 0.0 };
+
+function turnHeading(headingX: number, headingZ: number, wantX: number, wantZ: number, turnCos: number, turnSin: number, facing: number): void {
+  const dot = f32(f32(headingX * wantX) + f32(headingZ * wantZ));
+  if (dot >= turnCos) {
+    turned.x = wantX;
+    turned.z = wantZ;
+    return;
+  }
+  const cross = f32(f32(headingX * wantZ) - f32(headingZ * wantX));
+  const sine = cross > 0.0 || (cross === 0.0 && (headingX !== 0.0 ? headingX > 0.0 : facing > 0)) ? turnSin : -turnSin;
+  const turnedX = f32(f32(headingX * turnCos) - f32(headingZ * sine));
+  const turnedZ = f32(f32(headingZ * turnCos) + f32(headingX * sine));
+  const length = squareRoot(f32(f32(turnedX * turnedX) + f32(turnedZ * turnedZ)));
+  turned.x = f32(turnedX / length);
+  turned.z = f32(turnedZ / length);
+}
+
+
+function launchHeading(f: Readonly<Fighter>): void {
+  const { aimX, aimZ } = f.special;
+  const diagonal = aimX !== 0 && aimZ !== 0;
+  turned.x = diagonal ? f32(aimX * DIAGONAL) : aimX;
+  turned.z = aimX === 0 && aimZ === 0 ? 1.0 : diagonal ? f32(aimZ * DIAGONAL) : aimZ;
+}
+
+
+function steeredHeading(f: Readonly<Fighter>, steer: Readonly<SpecialSteer>, length: number, input: Readonly<Controls> | undefined): void {
+  const headingX = length > 0.0 ? f32(f.motion.vx / length) : 0.0;
+  const headingZ = length > 0.0 ? f32(f.motion.vz / length) : 1.0;
+  turned.x = headingX;
+  turned.z = headingZ;
+  if (input === undefined) return;
+  const stickX = input.diStickValid ? input.diStickX : input.direction;
+  const stickZ = input.diStickValid ? input.diStickZ : input.verticalDirection;
+  const stick = squareRoot(f32(f32(stickX * stickX) + f32(stickZ * stickZ)));
+  if (stick > 0.0) turnHeading(headingX, headingZ, f32(stickX / stick), f32(stickZ / stick), steer.turnCos, steer.turnSin, f.facing);
+}
+
+
+function steerFlight(f: Fighter, steer: Readonly<SpecialSteer>, launching: boolean, input: Readonly<Controls> | undefined): void {
+  const { motion } = f;
+  const length = squareRoot(f32(f32(motion.vx * motion.vx) + f32(motion.vz * motion.vz)));
+  if (launching) launchHeading(f);
+  else steeredHeading(f, steer, length, input);
+  const speed = launching ? steer.launchSpeed : min(steer.speed, f32(length + steer.acceleration));
+  motion.vx = f32(turned.x * speed);
+  motion.vz = f32(turned.z * speed);
+  if (motion.vx !== 0.0) f.facing = motion.vx < 0 ? -1 : 1;
+}
+
+
+export function steeredFlightLeft(f: Readonly<Fighter>): number {
+  if (f.special.action === SpecialAction.none) return 0.0;
+  const move = runningHeroSpecial(f);
+  const frame = f.special.frame;
+  for (const segment of move?.motion ?? []) {
+    if (segment.steer === undefined) continue;
+    if (frame < segment.first) return 1.0;
+    return frame > segment.last ? 0.0 : f32((segment.last - frame + 1) / (segment.last - segment.first + 1));
+  }
+  return 0.0;
+}
+
+
 function seekFoe(f: Fighter, world: Roster, speed: number, turnCos: number, turnSin: number): void {
   const { motion, special } = f;
   if (special.seekTarget === 0) special.seekTarget = seekTargetSlot(world, f) + 1;
@@ -528,7 +593,7 @@ function seekFoe(f: Fighter, world: Roster, speed: number, turnCos: number, turn
   const foe = slot >= 0 && isActive(world, slot) ? fighterAt(world, slot) : undefined;
   let headingX = motion.vx;
   let headingZ = motion.vz;
-  let length = squareRoot(f32(f32(headingX * headingX) + f32(headingZ * headingZ)));
+  const length = squareRoot(f32(f32(headingX * headingX) + f32(headingZ * headingZ)));
   const towardX = foe === undefined || foe.status.out ? 0.0 : f32(foe.motion.x - motion.x);
   const towardZ = foe === undefined || foe.status.out ? 0.0 : f32(foe.motion.z - motion.z);
   const toward = squareRoot(f32(f32(towardX * towardX) + f32(towardZ * towardZ)));
@@ -544,21 +609,9 @@ function seekFoe(f: Fighter, world: Roster, speed: number, turnCos: number, turn
     headingX = f32(headingX / length);
     headingZ = f32(headingZ / length);
     if (toward > 0.0) {
-      const wantX = f32(towardX / toward);
-      const wantZ = f32(towardZ / toward);
-      const dot = f32(f32(headingX * wantX) + f32(headingZ * wantZ));
-      if (dot >= turnCos) {
-        headingX = wantX;
-        headingZ = wantZ;
-      } else {
-        const cross = f32(f32(headingX * wantZ) - f32(headingZ * wantX));
-        const sine = cross > 0.0 || (cross === 0.0 && (headingX !== 0.0 ? headingX > 0.0 : f.facing > 0)) ? turnSin : -turnSin;
-        const turnedX = f32(f32(headingX * turnCos) - f32(headingZ * sine));
-        const turnedZ = f32(f32(headingZ * turnCos) + f32(headingX * sine));
-        length = squareRoot(f32(f32(turnedX * turnedX) + f32(turnedZ * turnedZ)));
-        headingX = f32(turnedX / length);
-        headingZ = f32(turnedZ / length);
-      }
+      turnHeading(headingX, headingZ, f32(towardX / toward), f32(towardZ / toward), turnCos, turnSin, f.facing);
+      headingX = turned.x;
+      headingZ = turned.z;
     }
   }
   motion.vx = f32(headingX * speed);
@@ -606,6 +659,11 @@ function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number,
     if (segment.liftSpeed !== undefined && input !== undefined) {
       const stick = input.diStickValid ? input.diStickZ : input.verticalDirection;
       velocityZ = f32(velocityZ + f32(min(1.0, max(-1.0, stick)) * segment.liftSpeed));
+    }
+    if (segment.steer !== undefined) {
+      steerFlight(f, segment.steer, frame === segment.first, input);
+      velocityX = motion.vx;
+      velocityZ = motion.vz;
     }
     if (segment.seek !== undefined && world !== undefined) {
       seekFoe(f, world, segment.seek.speed, segment.seek.turnCos, segment.seek.turnSin);
@@ -740,6 +798,33 @@ export function heroMotionHolds(f: Readonly<Fighter>): boolean {
   if (ultimateHovers(f)) return true;
   for (const segment of move.motion ?? []) if (f.special.frame >= segment.first && f.special.frame <= segment.last) return true;
   return false;
+}
+
+
+export function hatchesOnHit(f: Readonly<Fighter>): boolean {
+  if (!isHeroSpecialAction(f.special.action)) return false;
+  const egg = runningHeroSpecial(f)?.egg;
+  return egg !== undefined && inWindow(egg.window, f.special.frame);
+}
+
+
+export function becomeEgg(f: Fighter): void {
+  f.special.egg = true;
+  f.special.fall = true;
+  f.jump.remaining = 0;
+  f.motion.fastFalling = false;
+}
+
+
+export function heroEgg(f: Readonly<Fighter>): SpecialEgg | undefined {
+  const specials = f.tuning.specials;
+  if (!f.special.egg || specials === undefined) return undefined;
+  for (let slot = 0; slot <= SpecialSlot.down; slot++) {
+    const kit = specialKit(specials, slot);
+    const egg = kit.ground.egg ?? kit.air?.egg;
+    if (egg !== undefined) return egg;
+  }
+  return undefined;
 }
 
 

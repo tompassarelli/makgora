@@ -56,6 +56,8 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) 
         aimedSpeed: motion.aimedSpeed === undefined ? undefined : f32(motion.aimedSpeed * travel),
         driftSpeed: motion.driftSpeed === undefined ? undefined : f32(motion.driftSpeed * travel),
         liftSpeed: motion.liftSpeed === undefined ? undefined : f32(motion.liftSpeed * travel),
+        steer: motion.steer === undefined ? undefined : { ...motion.steer,
+          launchSpeed: f32(motion.steer.launchSpeed * travel), speed: f32(motion.steer.speed * travel), acceleration: f32(motion.steer.acceleration * travel) },
         relocateReach: motion.relocateReach === undefined ? undefined : f32(motion.relocateReach * travel),
       })),
       projectiles: move.projectiles?.map((each) => projectile(each)),

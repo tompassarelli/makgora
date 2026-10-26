@@ -13,6 +13,7 @@ function routeControl(character: Character): string {
   const specials = heroDefinition(character)?.specials;
   if (specials === undefined) return "fixed";
   const move = specialForm(specialKit(specials, SpecialSlot.up), SpecialForm.air);
+  if (move.motion?.some((segment) => segment.steer !== undefined) === true) return `steered (launch 8-way, ${move.aimFrames ?? 0} frames)`;
   if (move.aimFrames !== undefined) return `aimed (8-way, ${move.aimFrames} frames)`;
   return "guided";
 }

@@ -19,7 +19,7 @@ import { squareRoot } from "./warcraftMath";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_COOLDOWN_FRAMES, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
-import { isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
+import { heroEgg, isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 
 export const AIR_DODGE_LANDING_LAG = 10;
@@ -100,6 +100,18 @@ function reboundOffFloor(f: Fighter, stage: number, matchFrame: number, landing:
   recovery.reflectCooldown = SURFACE_REFLECT_COOLDOWN_FRAMES;
 }
 
+function hatchEgg(f: Fighter): boolean {
+  const egg = heroEgg(f);
+  if (egg === undefined) return false;
+  f.special.egg = false;
+  f.launch.hitstun = 0;
+  f.launch.throwHitstun = false;
+  f.tech.window = 0;
+  clearDownState(f);
+  f.landing.lag = max(f.landing.lag, egg.hatchFrames);
+  return true;
+}
+
 export function finishLanding(f: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, landing: number, fromAsdi: boolean): void {
   const { motion, launch, landing: landingState, dodge } = f;
   if (reboundsOffFloor(f, fromAsdi)) {
@@ -150,6 +162,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   f.special.fall = false;
   if (!isHeroSpecialAction(f.special.action)) f.special.airtimeUses = 0;
   if (f.jump.squat <= 0) f.jump.remaining = groundedJumps(f);
+  if (hatchEgg(f)) return;
   if (isTumbling(f)) {
     const launchDirection = totalVelocityX(f) < 0 ? -1 : 1;
     launch.hitstun = 0;

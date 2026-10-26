@@ -272,6 +272,7 @@ interface Special {
   seekTarget: number;
 
   guarded: boolean;
+  egg: boolean;
 }
 
 export interface Projectile {
@@ -673,6 +674,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       grabFrame: 0,
       seekTarget: 0,
       guarded: false,
+      egg: false,
     },
     projectiles: repeat(PROJECTILE_CAPACITY, () => emptyProjectile()),
     projectileSlots: 0,

@@ -139,6 +139,7 @@ export function clearSpecialOnStock(f: Fighter): void {
   cancelSpecialState(f);
   const { special } = f;
   special.fall = false;
+  special.egg = false;
   special.hit = false;
   restBear(f);
   for (let animal = 0; animal <= f.pack.length; animal++) if (!restingLife(placedObject(f, animal).life)) mutablePlacedObject(f, animal).life = 0;

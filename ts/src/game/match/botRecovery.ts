@@ -164,6 +164,15 @@ const DIAGONAL = 0.7071067690849304;
 
 
 
+function steerUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: Controls): void {
+  const ledgeX = side < 0 ? mainDeckLeft(stage) : mainDeckRight(stage);
+  const outside = f32(f32(f.motion.x - ledgeX) * side);
+  input.verticalDirection = 1;
+  if (f.motion.z < mainDeckZ(stage)) input.direction = outside > LEDGE_LINE_FAR ? -side : outside < LEDGE_LINE_NEAR ? side : 0;
+  else input.direction = -side;
+}
+
+
 function aimUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: Controls): void {
   if (f.special.action === SpecialAction.riflemanRecovery) {
     if (f.special.frame < RIFLEMAN_RECOVERY_STARTUP_FRAMES) input.verticalDirection = 1;
@@ -171,6 +180,10 @@ function aimUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: 
   }
   if (f.special.action !== SpecialAction.heroUp) return;
   const move = runningHeroSpecial(f);
+  if (move?.motion?.some((segment) => segment.steer !== undefined) === true) {
+    steerUpSpecial(f, stage, side, input);
+    return;
+  }
   if (move?.aimFrames === undefined || f.special.frame >= move.aimFrames) return;
   let reach = 0.0;
   for (const segment of move.motion ?? []) {

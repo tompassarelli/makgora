@@ -97,6 +97,17 @@ hits the phoenix wins the egg: it drops fast and helpless and must land on
 stage to hatch. He can catch the ledge during the flight, and walking off
 keeps the aerial jump.
 
+The flight hovers 12 frames, reading an eight-way launch direction, then
+burns for 40 frames: it starts at 9 units a frame and gains 0.5 a frame up
+to 14.5, and the stick turns its heading at most 5° a frame while a neutral
+stick holds the line. Straight up he rises about 600 units and level reach
+is about 684 (the Fire Fox version: 612 and 691); a jump and then Phoenix
+held up return from 840 below the ledge, where the long band asks 780. The
+body hits 4% at 55° once per target. The egg falls at 24 a frame against a
+20.4 fast fall, takes no input, cannot catch the ledge and hatches through
+30 frames of landing lag. The computer steers up beside the ledge, then in
+over the stage.
+
 **Meter and EX.** Kael keeps the universal meter and strong-button EX (strong
 + B is the EX special, strong + A the smashes, #186). Nothing of his feeds
 or drains meter. EX Fireball deals a quarter more, EX Flame Strike's burst

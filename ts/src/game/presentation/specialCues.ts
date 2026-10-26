@@ -11,7 +11,7 @@ import { type AuthoredSpecial, FOLLOW_UP_FORM, type FrameWindow, SpecialForm } f
 import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { HERO_ROSTER } from "../sim/heroes/registry";
-import { PHOENIX_CHARGE_FRAMES, PHOENIX_FLIGHT_FRAMES } from "../sim/heroes/kaelthasSpecials";
+import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../sim/heroes/kaelthasSpecials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
 import { REST_SOUR_FRAME } from "../sim/heroes/peonSpecials";
 import {
@@ -575,8 +575,8 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
     return frame <= fighter.special.grabFrame + 16 ? { cues: DREADLORD_BITE_CUES, phase: "active" } : NONE;
   }
   if (fighter.character === Character.kaelthas && action === SpecialAction.heroUp && fighter.special.form < FOLLOW_UP_FORM) {
-    if (frame > PHOENIX_CHARGE_FRAMES && frame <= PHOENIX_CHARGE_FRAMES + PHOENIX_FLIGHT_FRAMES) return { cues: KAEL_PHOENIX_FORM, phase: "active" };
-    return frame <= PHOENIX_CHARGE_FRAMES ? { cues: KAEL_PHOENIX_CHARGE, phase: frame < 16 ? "startup" : "active" } : NONE;
+    if (frame > PHOENIX_STARTUP_FRAMES && frame <= PHOENIX_STARTUP_FRAMES + PHOENIX_BURN_FRAMES) return { cues: KAEL_PHOENIX_FORM, phase: "active" };
+    return frame <= PHOENIX_STARTUP_FRAMES ? { cues: KAEL_PHOENIX_CHARGE, phase: "startup" } : NONE;
   }
   if (fighter.character === Character.kobold && action === SpecialAction.heroUltimate) {
     return frame >= KOBOLD_BURROW_FIRST && frame <= KOBOLD_BURROW_LAST ? { cues: KOBOLD_BURROW_TRAIL, phase: "active" } : NONE;

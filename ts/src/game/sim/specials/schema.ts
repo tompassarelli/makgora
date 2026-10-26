@@ -1,7 +1,6 @@
 
 
 
-
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { f32 } from "wisp/src/sim/f32";
 import type { MoveRegion, StrikeCapsule } from "../heroMoves";
@@ -16,8 +15,6 @@ export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
 
 export const SpecialForm = { ground: 0, air: 1, recall: 3, marked: 4 } as const;
 export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
-
-
 
 
 export const FOLLOW_UP_FORM = 6;
@@ -37,40 +34,23 @@ export interface FrameWindow {
 }
 
 
-
-
-
-
-
-
-
-
-
 export interface SpecialMotion extends FrameWindow {
   readonly velocityX: number;
   readonly velocityZ: number;
   readonly aimedSpeed?: number | undefined;
 
 
-
-
   readonly model?: string | undefined;
   readonly aimedTilt?: { readonly x: number; readonly z: number } | undefined;
-
-
 
 
   readonly driftSpeed?: number | undefined;
   readonly liftSpeed?: number | undefined;
 
 
-
-
   readonly stopsAtBody?: boolean | undefined;
 
   readonly stopsAtShield?: boolean | undefined;
-
-
 
 
   readonly relocate?: Relocation | undefined;
@@ -86,14 +66,24 @@ export interface SpecialMotion extends FrameWindow {
 
   /** Flies at `speed` toward the foe locked on its first frame, turning at most the angle whose cosine and sine it names a frame, through platforms. */
   readonly seek?: { readonly speed: number; readonly turnCos: number; readonly turnSin: number } | undefined;
+
+  readonly steer?: SpecialSteer | undefined;
 }
 
 
+export interface SpecialSteer {
+  readonly launchSpeed: number;
+  readonly speed: number;
+  readonly acceleration: number;
+  readonly turnCos: number;
+  readonly turnSin: number;
+}
 
-
-
-
-
+export interface SpecialEgg {
+  readonly window: FrameWindow;
+  readonly fallSpeed: number;
+  readonly hatchFrames: number;
+}
 
 
 export interface CommandGrab extends FrameWindow {
@@ -106,11 +96,6 @@ export interface CommandGrab extends FrameWindow {
 
   readonly status?: AppliedStatus | undefined;
 }
-
-
-
-
-
 
 
 export interface SpecialProjectile {
@@ -146,14 +131,9 @@ export interface SpecialProjectile {
   readonly modelOffsetZ?: number | undefined;
 
 
-
-
   readonly model?: string | undefined;
 
   readonly modelAnimation?: { readonly sequence: string; readonly warningSeconds: number; readonly activeSeconds: number } | undefined;
-
-
-
 
 
   readonly returns?: { readonly age: number; readonly speed: number } | undefined;
@@ -195,18 +175,10 @@ export interface SpecialArmor extends FrameWindow {
   readonly maxDamage: number;
 
 
-
-
-
   readonly shell?: boolean | undefined;
 
   readonly chillsStriker?: boolean | undefined;
 }
-
-
-
-
-
 
 
 interface ProjectilePool {
@@ -214,13 +186,6 @@ interface ProjectilePool {
   readonly growth: number;
   readonly maxRadius: number;
 }
-
-
-
-
-
-
-
 
 
 export interface SpecialPlacement {
@@ -255,10 +220,6 @@ export interface SpecialPlacement {
 
   readonly companion?: SpecialCompanion | undefined;
 }
-
-
-
-
 
 
 export interface SpecialCompanion {
@@ -299,10 +260,6 @@ export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3 } a
 export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
 
 
-
-
-
-
 export interface SpecialGuard extends FrameWindow {
   readonly heal: number;
 
@@ -316,8 +273,6 @@ export interface AuthoredSpecial {
 
   readonly ex?: AuthoredSpecial | undefined;
   readonly variants?: readonly AuthoredSpecial[] | undefined;
-
-
 
 
   readonly name?: string | undefined;
@@ -360,8 +315,6 @@ export interface AuthoredSpecial {
   readonly facesStick?: boolean | undefined;
 
 
-
-
   readonly hurt?: readonly HurtPose[] | undefined;
 
   readonly placement?: SpecialPlacement | undefined;
@@ -378,14 +331,7 @@ export interface AuthoredSpecial {
   readonly cleanseFrame?: number | undefined;
 
 
-
-
-
-
   readonly followUps?: readonly SpecialFollowUp[] | undefined;
-
-
-
 
 
   readonly burst?: { readonly frame: number; readonly from: SpecialProjectile; readonly into: SpecialProjectile } | undefined;
@@ -394,6 +340,8 @@ export interface AuthoredSpecial {
 
   /** Frames on which each target may be struck again. */
   readonly rehits?: readonly number[] | undefined;
+
+  readonly egg?: SpecialEgg | undefined;
 
   /** Its user gets back her air jump and air-once specials whenever it ends, as a landing would give. */
   readonly refreshesAir?: true | undefined;
@@ -426,14 +374,9 @@ export interface SpecialKit {
   readonly recall?: AuthoredSpecial | undefined;
 
 
-
-
-
   readonly recallWhile?: "projectile" | "armor" | undefined;
 
   readonly recallGroundOnly?: boolean | undefined;
-
-
 
 
   readonly marked?: { readonly special: AuthoredSpecial; readonly range: number } | undefined;
@@ -478,14 +421,6 @@ export const frames = (first: number, last: number): FrameWindow => ({ first, la
 
 
 export const CHARGED_AIM_FRAMES = 8;
-
-
-
-
-
-
-
-
 
 
 export function chargedAngleMotion(distance: number, travelFrames: number): readonly SpecialMotion[] {

@@ -27,6 +27,7 @@ import {
 } from "./knockback";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Controls, type Roster, fighterAt, isActive } from "./roster";
+import { becomeEgg, hatchesOnHit } from "./specials/engine";
 import {
   SHIELD_BREAK_RESTORED_ENERGY,
   SHIELD_HIT_WEIGHT_MULTIPLIER,
@@ -396,8 +397,10 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   launch.diLaunchSpeed = 0.0;
   interruptJumpOrDodge(target);
   if (!jabReset) clearDownState(target);
+  const egg = hatchesOnHit(target) || target.special.egg;
   cancelAttack(target);
   cancelSpecialState(target);
+  if (egg) becomeEgg(target);
   launch.hitstun = winner === undefined ? max(launch.hitstun, flinchHitstunFrames(chosen.effect.damage))
     : stunWinner ? stunHitstunFrames(chosen.effect.stunFrames ?? 0, postHitPercent) : ordinaryHitstunFrames(strongest);
   launch.throwHitstun = chosen.kind === ContactKind.throw && launch.hitstun > 0;

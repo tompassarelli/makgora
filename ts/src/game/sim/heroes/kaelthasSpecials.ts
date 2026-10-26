@@ -33,33 +33,32 @@ const banish = (landingLag: number | undefined): AuthoredSpecial => ({
   regions: [heroRegion(12, 14, CURSE, kaelHit(3.254040002822876, 35, 0.0, 30.0))], strikeStatus: BANISH,
 });
 
-export const PHOENIX_CHARGE_FRAMES = 42;
-export const PHOENIX_AIM_FRAMES = 14;
-export const PHOENIX_FLIGHT_FRAMES = 30;
-export const PHOENIX_SPEED = 16.0;
-const SWIRL: StrikeCapsule = { x1: -20.0, z1: 55.0, x2: 20.0, z2: 55.0, radius: 42.0 };
+export const PHOENIX_STARTUP_FRAMES = 12;
+export const PHOENIX_BURN_FRAMES = 40;
+export const PHOENIX_EGG_FALL_SPEED = 24.0;
+export const PHOENIX_EGG_HATCH_FRAMES = 30;
+const PHOENIX_TURN_COS = 0.9961947202682495;
+const PHOENIX_TURN_SIN = 0.08715574443340302;
+const PHOENIX_FLIGHT = frames(PHOENIX_STARTUP_FRAMES + 1, PHOENIX_STARTUP_FRAMES + PHOENIX_BURN_FRAMES);
 const BIRD: StrikeCapsule = { x1: -24.0, z1: 55.0, x2: 24.0, z2: 55.0, radius: 32.0 };
-const swirl = kaelHit(2.1693599224090576, 80, 0.0, 30.0);
-const phoenix = (speed: number): AuthoredSpecial => ({
-  endFrame: 84, aimFrames: PHOENIX_AIM_FRAMES, rehits: [25, 31, 37, PHOENIX_CHARGE_FRAMES], oncePerAirtime: true, helpless: true, landingLag: 18,
+const phoenix: AuthoredSpecial = {
+  endFrame: PHOENIX_STARTUP_FRAMES + PHOENIX_BURN_FRAMES, aimFrames: PHOENIX_STARTUP_FRAMES, oncePerAirtime: true, helpless: true, landingLag: 18,
   motion: [
-    { ...frames(1, 15), velocityX: 0.0, velocityZ: 0.0 },
-    { ...frames(16, PHOENIX_CHARGE_FRAMES), velocityX: 0.0, velocityZ: -0.5 },
-    { ...frames(PHOENIX_CHARGE_FRAMES + 1, PHOENIX_CHARGE_FRAMES + PHOENIX_FLIGHT_FRAMES), velocityX: 0.0, velocityZ: speed, aimedSpeed: speed, liftSpeed: 1.5 },
+    { ...frames(1, PHOENIX_STARTUP_FRAMES), velocityX: 0.0, velocityZ: 0.0 },
+    { ...PHOENIX_FLIGHT, velocityX: 0.0, velocityZ: 0.0,
+      steer: { launchSpeed: 9.0, speed: 14.5, acceleration: 0.5, turnCos: PHOENIX_TURN_COS, turnSin: PHOENIX_TURN_SIN } },
   ],
-  regions: [
-    heroRegion(20, 21, SWIRL, swirl), heroRegion(26, 27, SWIRL, swirl), heroRegion(32, 33, SWIRL, swirl), heroRegion(38, 39, SWIRL, swirl),
-    heroRegion(43, 52, BIRD, kaelHit(11.0, 55, 76.04872131347656, 40.0)), heroRegion(53, 72, BIRD, kaelHit(6.508080005645752, 70, 57.03654098510742, 30.0)),
-  ],
-});
+  regions: [heroRegion(PHOENIX_FLIGHT.first, PHOENIX_FLIGHT.last, BIRD, kaelHit(4.0, 55, 30.0, 30.0))],
+  egg: { window: PHOENIX_FLIGHT, fallSpeed: PHOENIX_EGG_FALL_SPEED, hatchFrames: PHOENIX_EGG_HATCH_FRAMES },
+};
 
 export const KAELTHAS_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Fireball", description: "A fast, weak fire missile straight ahead, two on screen at most. Shield, jump or reflect it.",
     ground: fireball(undefined), air: fireball(FIREBALL_LANDING_LAG) }, { damage: 1.25 }),
   side: withExKit({ name: "Drain Mana", description: "A short tether that grabs through shields and drinks the victim's meter. Jump or dodge it.",
     ground: drainMana(undefined), air: drainMana(AIR_LANDING_LAG) }, { damage: 1.25 }),
-  up: withExKit({ name: "Phoenix", description: "Charge in swirling flame, then fly as a phoenix the way you aim; up or down bends the flight. Helpless after.",
-    ground: phoenix(PHOENIX_SPEED) }, { travel: 1.25 }),
+  up: withExKit({ name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
+    ground: phoenix }, { travel: 1.25 }),
   down: withExKit({ name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
     ground: banish(undefined), air: banish(18) }, { reach: 1.25 }),
 };

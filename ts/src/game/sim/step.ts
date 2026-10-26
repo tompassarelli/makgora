@@ -41,7 +41,7 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroMotionHolds, heroMotionPassesPlatforms, jumpCancelHeroSpecial } from "./specials/engine";
+import { heroEgg, heroMotionHolds, heroMotionPassesPlatforms, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterJumpOrAttackBranch } from "./specials";
@@ -568,7 +568,8 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   let dashEntryDisplacementAdjustment = 0.0;
 
   const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
-  const canSteer = !authoredMotion && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
+  const egg = heroEgg(f);
+  const canSteer = !authoredMotion && egg === undefined && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
     && (!motion.grounded || attack.cooldown <= 0) && f.surfaceRecovery.state !== SurfaceContact.techWall;
   motion.crouching = ((input.down || motion.crouching) && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield
@@ -633,6 +634,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
       motion.fastFallInputAge = PLATFORM_DROP_INPUT_WINDOW;
     }
     if (drill?.speedZ !== undefined) motion.vz = drill.speedZ;
+    else if (egg !== undefined) motion.vz = -egg.fallSpeed;
     else if (motion.fastFalling) motion.vz = -heavyFall(f, physics.fastFallSpeed);
     else applyMeleeGravity(f);
   }

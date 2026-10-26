@@ -142,7 +142,7 @@ export function isUpSpecialAction(action: number): boolean {
 function canCatchLedge(f: Fighter): boolean {
   const { attack, special, dodge, launch, down } = f;
   const upSpecial = isUpSpecialAction(special.action);
-  return !f.status.out && f.status.frozenFrames <= 0 && launch.hitlag <= 0 && launch.hitstun <= 0
+  return !f.status.out && !special.egg && f.status.frozenFrames <= 0 && launch.hitlag <= 0 && launch.hitstun <= 0
     && attack.style === undefined && (upSpecial || (attack.cooldown <= 0 && special.action === SpecialAction.none && special.lockFrames <= 0))
     && !dodge.airDodging && f.shield.breakState === ShieldBreak.none
     && !inGrabContext(f) && (down.state === DownState.none || isTumbling(f));
