@@ -360,12 +360,17 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   keeps the stock Forsaken body, sword and rig, and
   authors his strikes, recovery, paired throws and nine pain poses.
   Given the shipped model and pose names (or `pain` for the nine pain cells)
-  instead, it re-authors only those clips in place at their indices and lengths.
+  instead, it re-authors only those clips in place at their indices. A clip whose
+  move length has changed moves to the end of the timeline at the move's length,
+  and its binding in `forsakenPaladinClips.ts` is rewritten. His dash attack is
+  keyed against [the dash-attack brief](../dash-attacks.md) (#435), its root
+  carried forward through the lunge, with the blade aimed at the measured hit points.
   `bun tools/animations/stock-forsaken-model.ts STOCK_CLASSIC_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
   restores the stock Classic mesh and version-1800 skin while retaining the shipped motion.
   `bun tools/animations/forsaken-paladin-weapon-clips.ts STOCK_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT`
   replaces normal and special motion at the canonical indices with the stock Attack 1,
-  Attack Slam and Spell Slam sequences. It remaps their wind-up, strike and recovery
+  Attack Slam and Spell Slam sequences, except the dash attack, whose blade it only
+  measures. It remaps their wind-up, strike and recovery
   to the existing move frames, keeps the pummel's held left arm, and writes measured
   weapon contact geometry through `forsakenPaladinWeaponGeometry.ts`. The authoring
   move tables provide the contact targets; shipped collision follows the measured

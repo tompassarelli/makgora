@@ -155,3 +155,17 @@ stab the floor ahead, and judges read the risen body as a hunched, cluttered
 mass. On the Blender take that scored 3/4/3/3/4; on the generator clip, which
 keeps its windup and contact, 3/4/4/3/4. Lines 1–4 pass; three fresh judges
 give the shipped clip medians 4/4/4/3/4.
+
+Forsaken Paladin's dash attack (#435) replaced the stock Attack Slam, which
+was stretched over the 41-frame move with the sword overhead and the head
+leading at contact. It is keyed in `DASH_KEYS` of
+`tools/animations/forsaken-paladin-clips.ts`, at the move's own 41 frames, with
+the blade aimed at the measured hit points so collision is unchanged. The
+judges first read frames 14 to 23 as one held lunge. Follow-through reached 4
+once a carry key at frame 20 kept the body sliding and rising with the blade
+dragged along the floor. That key had to sit at frame 20, not 23, so both
+halves of the return move at the same pace (line 3 return 1.26). Character
+stayed at 3 ("a generic sword lunge") in every take: the floor drag, a
+shoulder twist that drives the pauldron into the hit, and a salute in recovery
+(which also failed lines 2 and 3). Lines 1–4 pass; three fresh judges give
+medians 4/4/4/4/3.

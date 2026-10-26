@@ -16,13 +16,13 @@ import { FORSAKEN_PALADIN_CLIPS } from "../../ts/src/game/sim/heroes/forsakenPal
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 
 type Target = { frame: number; x: number; z: number };
-type Action = { pose: HeroPose; donor: number; frames: number; first: number; last: number; targets: Target[] };
+type Action = { pose: HeroPose; donor: number | undefined; frames: number; first: number; last: number; targets: Target[] };
 class WeaponFailure extends Schema.TaggedError<WeaponFailure>()("WeaponFailure", { cause: Schema.Unknown }) {}
 
-const normalDonors: readonly [HeroPose, AttackStyle, number][] = [
+const normalDonors: readonly [HeroPose, AttackStyle, number | undefined][] = [
     ["jab", AttackStyle.jab, 5], ["jab2", AttackStyle.jab2, 15],
     ["forwardTilt", AttackStyle.forwardTilt, 15], ["forwardTiltUp", AttackStyle.forwardTiltUp, 15], ["forwardTiltDown", AttackStyle.forwardTiltDown, 15],
-    ["upTilt", AttackStyle.upTilt, 5], ["downTilt", AttackStyle.downTilt, 27], ["dashAttack", AttackStyle.dashAttack, 15],
+    ["upTilt", AttackStyle.upTilt, 5], ["downTilt", AttackStyle.downTilt, 27], ["dashAttack", AttackStyle.dashAttack, undefined],
     ["forwardSmash", AttackStyle.forwardSmash, 15], ["upSmash", AttackStyle.upSmash, 5], ["downSmash", AttackStyle.downSmash, 27],
     ["neutralAir", AttackStyle.neutralAir, 5], ["forwardAir", AttackStyle.forwardAir, 15], ["backAir", AttackStyle.backAir, 5],
     ["upAir", AttackStyle.upAir, 5], ["downAir", AttackStyle.downAir, 27],
@@ -106,12 +106,14 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
     const inverse = mat4.create(); ensure(mat4.invert(inverse, data.nodes[hand.ObjectId].matrix), "Singular reference"); vec3.transformMat4(headInHand, headInHand, inverse);
     const changed = new Set<number>(), receipts = [];
     for (const action of actions) {
+        const donorIndex = action.donor;
+        if (donorIndex === undefined) continue;
         const throwing = action.pose.startsWith("throw");
         const binding = FORSAKEN_PALADIN_CLIPS[action.pose as keyof typeof FORSAKEN_PALADIN_CLIPS]; ensure(binding, `${action.pose}: no clip`);
         const index = binding.index, sequence = model.Sequences[index]!, [start, end] = sequence.Interval;
         ensure(Math.abs((end - start) - action.frames * 1000 / 60) < 1, `${action.pose}: clip timing changed`);
         changed.add(index);
-        const donor = stock.Sequences[action.donor]!, donorLength = donor.Interval[1] - donor.Interval[0];
+        const donor = stock.Sequences[donorIndex]!, donorLength = donor.Interval[1] - donor.Interval[0];
         const contactStart = action.donor === 27 ? 0.46 : action.donor === 15 ? 0.48 : 0.43;
         const contactEnd = action.donor === 27 ? 0.63 : action.donor === 15 ? 0.59 : 0.53;
         const donorTime = (frame: number) => {
@@ -187,7 +189,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
             }
         }
         tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
-        receipts.push({ pose: action.pose, index, donor: { index: action.donor, name: donor.Name, interval: [...donor.Interval] }, frames: action.frames, contact: [action.first, action.last], targets: action.targets });
+        receipts.push({ pose: action.pose, index, donor: { index: donorIndex, name: donor.Name, interval: [...donor.Interval] }, frames: action.frames, contact: [action.first, action.last], targets: action.targets });
     }
     const originalTracks = new Map<string, mdx.AnimVector>(); tracks(source, (track, path) => originalTracks.set(path, track));
     let preserved = 0;

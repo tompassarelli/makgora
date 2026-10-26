@@ -10,7 +10,7 @@ export const FORSAKEN_PALADIN_CLIPS = { idle: { index: 1, seconds: 3.0 }, walk: 
   forwardTiltDown: { index: 32, seconds: f32(0.617), aligned: true },
   upTilt: { index: 33, seconds: f32(0.583), aligned: true },
   downTilt: { index: 34, seconds: f32(0.517), aligned: true },
-  dashAttack: { index: 35, seconds: f32(0.567), aligned: true },
+  dashAttack: { index: 35, seconds: f32(0.683), aligned: true },
   forwardSmash: { index: 36, seconds: f32(0.983), aligned: true },
   upSmash: { index: 37, seconds: f32(0.9), aligned: true },
   downSmash: { index: 38, seconds: f32(0.733), aligned: true },

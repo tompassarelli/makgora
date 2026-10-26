@@ -40,7 +40,7 @@ if (!replacing) {
 const model = structuredClone(source);
 ensure((source.Sequences.length === 28 || replacing) && source.Nodes.some(n => n.Name === "Wep01_R0_0_jnt"), "Expected 3.0 Forsaken Paladin");
 const stand = source.Sequences[1]!;
-interface Gesture { chest?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number }
+interface Gesture { chest?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; ahead?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number] }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; keyed?: boolean; target?: readonly [number, number]; damage?: boolean }
 const ready: Gesture = {};
@@ -54,15 +54,14 @@ const captive: Gesture = { chest: -25, head: -28, arm: 25, elbow: 55, free: 20, 
 
 const DASH_KEYS: readonly Phase[] = [
   {frame:0,gesture:ready},
-  {frame:4,gesture:{chest:-10,head:6,arm:-140,elbow:30,free:-40,leftHip:-20,rightHip:10,knee:22,lean:-6},target:[-5,135]},
-  {frame:8,gesture:{chest:-24,head:16,arm:-190,elbow:40,free:-85,freeElbow:20,leftHip:-38,rightHip:22,knee:30,lean:-14},target:[-40,140]},
-  {frame:11,gesture:{chest:24,head:-24,arm:-80,elbow:10,free:35,leftHip:-48,rightHip:34,knee:34,lean:20},target:[100,50]},
-  {frame:12,gesture:{chest:28,head:-28,arm:-60,elbow:10,free:45,leftHip:-50,rightHip:36,knee:38,lean:23},target:[104,17]},
-  {frame:13,gesture:{chest:31,head:-30,arm:-45,elbow:10,free:50,leftHip:-50,rightHip:36,knee:40,lean:24},target:[96,5]},
-  {frame:16,gesture:{chest:34,head:-30,arm:-35,elbow:12,free:50,leftHip:-50,rightHip:36,knee:44,lean:25},target:[86,-2]},
-  {frame:24,gesture:{chest:16,head:-14,arm:-40,elbow:25,free:12,leftHip:-28,rightHip:18,knee:26,lean:10},target:[55,20]},
-  {frame:33,gesture:ready},
-  {frame:34,gesture:ready},
+  {frame:4,gesture:{yaw:-15,ahead:-2,chest:-8,head:8,arm:-150,elbow:30,free:-30,hip:-15,knee:30,lean:-14},target:[-5,115]},
+  {frame:8,gesture:{yaw:-32,ahead:-5,chest:-14,head:14,arm:-190,elbow:40,free:-70,freeElbow:20,leftHip:-34,rightHip:-20,knee:45,lean:-28},target:[-20,125]},
+  {frame:11,gesture:{yaw:30,ahead:0,chest:10,head:-36,arm:-80,elbow:10,free:40,leftHip:-66,rightHip:24,knee:40,lean:38},target:[101.75,64]},
+  {frame:12,gesture:{yaw:34,ahead:20,chest:14,head:-44,arm:-50,elbow:10,free:50,leftHip:-78,rightHip:14,knee:52,lean:46},target:[108.3,24]},
+  {frame:13,gesture:{yaw:34,ahead:28,chest:16,head:-48,arm:-40,elbow:10,free:60,leftHip:-82,rightHip:10,knee:56,lean:50},target:[102.8,2.75]},
+  {frame:14,gesture:{yaw:32,ahead:29,chest:18,head:-52,arm:-40,elbow:20,free:80,leftHip:-88,rightHip:12,knee:62,lean:54},target:[86,2]},
+  {frame:20,gesture:{yaw:22,ahead:38,chest:8,head:-34,arm:-40,elbow:20,free:50,leftHip:-60,rightHip:10,knee:46,lean:30},target:[76,14]},
+  {frame:41,gesture:ready},
 ];
 const COIL: Partial<Record<HeroPose, number>> = { jab: 1.5, jab2: 1, downTilt: 1, dashAttack: 1 };
 const actions: Action[] = [];
@@ -165,17 +164,20 @@ const weaponPoint=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]
 const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand pose is singular");vec3.transformMat4(weaponPoint,weaponPoint,inverseHand);
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const authoredIndices = new Map<string, number>(), painIndices: number[] = [];
-const bindings:string[]=[],damageBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
+const bindings:string[]=[],damageBindings:string[]=[],relocations:HeroPose[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
 for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const name=action.damage?`Forsaken Paladin Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:action.pose==="downAir"?"Down Air Sword Drop":`Forsaken Paladin ${action.pose}`;
   const existing = replacing ? model.Sequences.findIndex(sequence => sequence.Name === name || action.pose === "downAir" && sequence.Name === "Down Air Hammer Drop") : -1;
   ensure(!replacing || existing >= 0, `${name}: shipped sequence missing`);
   const index = existing >= 0 ? existing : model.Sequences.length;
-  const start = existing >= 0 ? model.Sequences[index]!.Interval[0] : cursor;
-  const end = start + Math.round(action.frames*1000/60); cursor=end+100;
-  if (existing >= 0) {
-    ensure(model.Sequences[index]!.Interval[1] === end, `${name}: timing changed`);
-    tracks(model, track => { if (!onGlobalClock(track)) track.Keys.splice(0, track.Keys.length, ...track.Keys.filter(key => key.Frame < start || key.Frame > end)); });
+  const shipped = existing >= 0 ? model.Sequences[index]!.Interval : undefined, length = Math.round(action.frames*1000/60);
+  const relocated = shipped !== undefined && shipped[1]! - shipped[0]! !== length;
+  const start = shipped !== undefined && !relocated ? shipped[0]! : cursor;
+  const end = start + length; cursor=Math.max(cursor,end+100);
+  if (shipped !== undefined) {
+    const [first, last] = [shipped[0]!, shipped[1]!];
+    tracks(model, track => { if (!onGlobalClock(track)) track.Keys.splice(0, track.Keys.length, ...track.Keys.filter(key => key.Frame < first || key.Frame > last)); });
+    if (relocated) { ensure(!action.damage, `${name}: pain timing changed`); model.Sequences[index]!.Interval = new Uint32Array([start, end]); relocations.push(action.pose); }
   }
   if (action.damage) painIndices.push(index); else authoredIndices.set(action.pose, index);
   if (existing < 0) model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
@@ -197,6 +199,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
 
 
   tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
+  const ahead=(frame:number)=>{const right=phases.findIndex(p=>p.frame>=frame);if(right<=0)return phases.at(right)?.gesture.ahead??0;const a=phases[right-1]!,b=phases[right]!,t=(frame-a.frame)/(b.frame-a.frame);return (a.gesture.ahead??0)*(1-t)+(b.gesture.ahead??0)*t;};
   const shoulder=model.Nodes.find(n=>n.Name==="arm_R0_0_jnt")!,elbow=model.Nodes.find(n=>n.Name==="arm_R0_3_jnt")!;
   const baseline=(node:mdx.Node)=>source.Nodes[node.ObjectId]!.Rotation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!.Vector;
   for(const phase of phases)if(phase.target){
@@ -204,7 +207,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
     const angles=[phase.gesture.arm??0,0,0,phase.gesture.elbow??0,0,0];
     const loss=()=>{armKey.Vector=rotation(baseline(shoulder),angles[0]!,angles[1]!,angles[2]!);elbowKey.Vector=rotation(baseline(elbow),angles[3]!,angles[4]!,angles[5]!);
       evaluate(index,phase.frame);const point=vec3.create();vec3.transformMat4(point,weaponPoint,data.nodes[hand.ObjectId].matrix);
-      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+(point[1]!+12)**2;};
+      return (point[0]!+ahead(phase.frame)-phase.target![0])**2+(point[2]!-phase.target![1])**2+(point[1]!+12)**2;};
     for(let pass=0;pass<4;pass++)for(let axis=0;axis<6;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let angle=-180;angle<=180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
     loss();for(const key of [armKey,elbowKey])if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
   }
@@ -229,7 +232,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const drawn=new DrawnModel(generateHdBody(model),1);const rootTrack=main.Translation!;
   if(!action.air){const mainDonor={Vector:new Float32Array([0,0,0])};
     for(let frame=0;frame<=action.frames;frame++){const vertices=drawn.triangles(index,frame/60,1);let floor=Infinity;for(let i=1;i<vertices.length;i+=2)floor=Math.min(floor,vertices[i]!);
-      const Frame=start+Math.round(frame*1000/60),Vector=mainDonor.Vector.slice();Vector[2]=Vector[2]!-floor;
+      const Frame=start+Math.round(frame*1000/60),Vector=mainDonor.Vector.slice();Vector[0]=ahead(frame);Vector[2]=Vector[2]!-floor;
       const key={Frame,Vector,...rootTrack.LineType>1?{InTan:new Float32Array(3),OutTan:new Float32Array(3)}:{}};
       const previous=rootTrack.Keys.find(k=>k.Frame===Frame);if(previous)Object.assign(previous,key);else rootTrack.Keys.push(key);}
     rootTrack.Keys.sort((a,b)=>a.Frame-b.Frame);}
@@ -269,6 +272,13 @@ if (!replacing) await Bun.write(join(project,"ts/src/game/sim/heroes/forsakenPal
   'export const FORSAKEN_PALADIN_CLIPS = { idle: { index: 1, seconds: 3.0 }, walk: { index: 12, seconds: f32(0.766) }, dash: { index: 12, seconds: f32(0.766) }, run: { index: 12, seconds: f32(0.766) }, ko: { index: 7, seconds: f32(1.666) },',
   ...bindings,'} as const satisfies HeroClipTable;', 'export const FORSAKEN_PALADIN_DAMAGE_CLIPS: readonly HeroClip[] = [',...damageBindings,'];',"",
 ].join("\n"));
+if (relocations.length > 0) {
+  const table = join(project,"ts/src/game/sim/heroes/forsakenPaladinClips.ts");
+  let text = await Bun.file(table).text();
+  for (const pose of relocations) { const line = bindings.find(binding => binding.startsWith(`  ${pose}: `))!, pattern = new RegExp(`^  ${pose}: .*,$`, "m");
+    ensure(pattern.test(text), `${pose}: binding missing`); text = text.replace(pattern, line); }
+  await Bun.write(table, text);
+}
 const before=new DrawnModel(generateHdBody(source),1.2),after=new DrawnModel(generateHdBody(model),1.2);
 const strides:DrawnStride[]=Object.entries(DRAWN_STRIDES).flatMap(([character,row])=>row===undefined||Number(character)===Character.forsakenPaladin?[]:
   (["walk","run"] as const).map(motion=>({character:Number(character) as Character,motion,...row[motion]})));
