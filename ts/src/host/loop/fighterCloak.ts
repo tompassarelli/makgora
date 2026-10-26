@@ -22,6 +22,8 @@ function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   renderers.agency.drawnEffects(drawn);
   renderers.shield.drawnEffects(drawn);
   renderers.candle?.drawnEffects(drawn);
+  renderers.spheres?.drawnEffects(drawn);
+  renderers.flight?.drawnEffects(drawn);
   renderers.cues?.weaponEffects(drawn);
   return drawn;
 }

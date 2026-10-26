@@ -13,7 +13,7 @@ import { JOB_DONE_VOICE } from "./matchAudio";
 import { ELEMENTS } from "./elementLooks";
 import { tierSoundPaths } from "./moveTiers";
 import { STRONG_SPARK_SCALE } from "./moveTiers";
-import { IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL } from "./impactState";
+import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL } from "./impactState";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_JUMP_MODEL, IMPACT_SHIELD_MODEL, IMPACT_HIT_MODEL, IMPACT_KO_MODEL } from "../assets/impactAssetInfo";
 
 
@@ -41,6 +41,7 @@ export function impactModel(kind: number): string {
     case 9: return "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx";
     case IMPACT_FIRE_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_SLASH_HIT: return IMPACT_HIT_MODEL;
+    case IMPACT_ARCANE_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_ICE_HIT: return "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
     default: return "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx";
   }
@@ -49,20 +50,21 @@ export function impactModel(kind: number): string {
 
 const PLAIN_SPARK_COLOUR: readonly number[] = [255, 255, 255];
 const FIRE_SPARK_COLOUR: readonly number[] = [255, 100, 25];
+const ARCANE_SPARK_COLOUR: readonly number[] = [190, 110, 255];
 export const STRONG_SPARK_COLOUR: readonly number[] = [255, 205, 40];
 
 
 export function impactColour(kind: number, strength: number): readonly number[] | undefined {
-  if (kind !== 0 && kind !== IMPACT_SLASH_HIT && kind !== IMPACT_FIRE_HIT) return undefined;
+  if (kind !== 0 && kind !== IMPACT_SLASH_HIT && kind !== IMPACT_FIRE_HIT && kind !== IMPACT_ARCANE_HIT) return undefined;
   if (strength === STRONG_SPARK_SCALE) return STRONG_SPARK_COLOUR;
-  return kind === IMPACT_FIRE_HIT ? FIRE_SPARK_COLOUR : PLAIN_SPARK_COLOUR;
+  return kind === IMPACT_FIRE_HIT ? FIRE_SPARK_COLOUR : kind === IMPACT_ARCANE_HIT ? ARCANE_SPARK_COLOUR : PLAIN_SPARK_COLOUR;
 }
 
 
 export function impactAnimation(kind: number): string {
   return kind === 0 || kind === 1 || kind === 2 || kind === 3 || kind === 4 || kind === 6 || kind === 7 || kind === 8 || kind === 9 || kind === 10
     || kind === 11 || kind === 12 || kind === 14 || kind === 15 || kind === IMPACT_FIRE_HIT || kind === IMPACT_PUMMEL
-    || kind === IMPACT_SLASH_HIT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD ? "Stand" : "Birth";
+    || kind === IMPACT_SLASH_HIT || kind === IMPACT_ARCANE_HIT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD ? "Stand" : "Birth";
 }
 
 
@@ -81,7 +83,7 @@ export function impactStartSeconds(kind: number): number {
 export function impactModelScale(kind: number): number {
   if (kind === 5) return 1.0;
   if (kind === IMPACT_ELECTRIC_SHIELD) return 0.6000000238418579;
-  return kind === 0 || kind === IMPACT_PUMMEL ? 1.5 : 1.0;
+  return kind === 0 || kind === IMPACT_PUMMEL || kind === IMPACT_ARCANE_HIT ? 1.5 : 1.0;
 }
 
 

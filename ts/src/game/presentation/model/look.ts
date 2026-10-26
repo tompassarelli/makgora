@@ -24,6 +24,27 @@ export interface HeroLook {
   readonly ultimateBurst?: UltimateBurstLook | undefined;
 
   readonly cueReadNormals?: readonly AttackStyle[] | undefined;
+
+  readonly orbit?: OrbitLook | undefined;
+
+  readonly flight?: FlightLook | undefined;
+}
+
+export interface OrbitLook {
+  readonly model: string;
+  readonly count: number;
+  readonly radius: number;
+  readonly z: number;
+  readonly periodFrames: number;
+  readonly scale: number;
+}
+
+export interface FlightLook {
+  readonly flames: string;
+  readonly flamesScale: number;
+  readonly flamesZ: number;
+  readonly egg: string;
+  readonly eggScale: number;
 }
 
 export interface UltimateBurstLook {

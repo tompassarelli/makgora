@@ -31,9 +31,10 @@ export const IMPACT_SLASH_HIT = 19;
 export const IMPACT_ICE_HIT = 20;
 export const IMPACT_ELECTRIC_SHIELD = 21;
 export const IMPACT_PUMMEL = 22;
+export const IMPACT_ARCANE_HIT = 23;
 
 export const IMPACTS_PER_KIND = 8;
-export const IMPACT_KIND_COUNT = 23;
+export const IMPACT_KIND_COUNT = 24;
 export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
 export const KO_STAR_FRAMES = 108;
@@ -217,6 +218,7 @@ export function impactLifetime(kind: number): number {
     case IMPACT_FIRE_HIT:
     case IMPACT_SLASH_HIT:
     case IMPACT_ICE_HIT:
+    case IMPACT_ARCANE_HIT:
     case IMPACT_PUMMEL:
     case IMPACT_SHIELD_HIT: return CONTACT_FRAMES;
     case IMPACT_TECH: return 15;
@@ -280,7 +282,7 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
   if (events.ledgeRecovery) spawn(state, IMPACT_LEDGE_RECOVERY, events.ledgeX, events.ledgeZ, 0, f32(0.8));
   if (events.hit) {
     const kind = events.pummel ? IMPACT_PUMMEL : events.element === HitElement.fire ? IMPACT_FIRE_HIT
-      : events.element === HitElement.slash ? IMPACT_SLASH_HIT : events.element === HitElement.ice ? IMPACT_ICE_HIT
+      : events.element === HitElement.slash ? IMPACT_SLASH_HIT : events.element === HitElement.ice ? IMPACT_ICE_HIT : events.element === HitElement.arcane ? IMPACT_ARCANE_HIT
       : events.electric || events.element === HitElement.electric ? IMPACT_ELECTRIC_HIT : IMPACT_HIT;
     spawn(state, kind, x, f32(z + 50.0), 0, events.strong && !events.pummel ? STRONG_SPARK_SCALE : TIER_SPARK_SCALE[events.tier] ?? 1.0);
   }

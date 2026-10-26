@@ -317,7 +317,7 @@ const KAELTHAS: AuthoredSpecial = {
   name: "Summon Phoenix", endFrame: 36, projectiles: [mark("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", 2, SUMMON_PHOENIX_FRAME - 2, -40.0, 110.0)],
   placement: {
     frame: SUMMON_PHOENIX_FRAME, offsetX: -40.0, offsetZ: 110.0, radius: 30.0, height: 60.0, durability: 12.0, life: 180, fireAges: [30, 60, 90, 120, 150, 178],
-    shot: { ...shot(0, 0.0, 0.0, 0.0, 0.0, 6, 70.0, PHOENIX_BURN, "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx"), limit: 3 }, companion: SUMMONED_PHOENIX,
+    shot: { ...shot(0, 0.0, 0.0, 0.0, 0.0, 6, 70.0, PHOENIX_BURN, "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx"), limit: 3 }, companion: SUMMONED_PHOENIX,
     model: { path: "units\\human\\Phoenix\\Phoenix.mdl", height: 110.0, alpha: 255 },
   },
 };

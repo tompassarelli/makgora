@@ -21,6 +21,7 @@ import type { Fighter } from "../sim/fighter";
 import { type WorldOrigin, FIGHTER_PHASE_ALPHA, facingYaw, hideEffect, placeEffect } from "./effects";
 import { damageTint } from "../presentation/hitPresentation";
 import { heroCueWindows, specialCueState } from "../presentation/specialCues";
+import { eggShown } from "../presentation/flightLook";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { specialClip } from "../presentation/fighterClips";
 import { characterModelScale } from "../presentation/modelScale";
@@ -224,6 +225,7 @@ export class FighterPoolPresentation {
       alpha = body.alpha;
     }
     if (transformation.phase === "active" && transformation.cues?.active.replacesBody === true) alpha = 0;
+    if (eggShown(fighter)) alpha = 0;
     if (fighter.status.condition === HeroStatusKind.hex && !fighter.status.out) alpha = 0;
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
       BlzSetSpecialEffectColor(model, red, green, blue);

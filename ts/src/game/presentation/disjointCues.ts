@@ -30,7 +30,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.beastmaster]: NEUTRAL_FLARE,
   [Character.lichKing]: FROST_FLARE,
   [Character.chen]: FIRE_FLARE,
-  [Character.kaelthas]: FIRE_FLARE,
+  [Character.kaelthas]: ARCANE_FLARE,
   [Character.kobold]: FIRE_FLARE,
   [Character.thrall]: NEUTRAL_FLARE,
   [Character.jaina]: FROST_FLARE,

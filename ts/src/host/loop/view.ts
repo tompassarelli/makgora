@@ -452,6 +452,8 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.flash.present(posed, runtime.poses[slot], stage, runtime.simulationFrame, game.camera);
     renderers?.glow.present(posed, runtime.poses[slot], stage, runtime.simulationFrame, game.camera, game.ultimatesOff);
     renderers?.candle?.present(posed, stage, runtime.simulationFrame);
+    renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
+    renderers?.flight?.present(posed, stage, s.session.paused);
     if (renderers !== undefined) renderers.agency.present(live, live === undefined ? "act" : agencyMarks[slot]);
     ui.special.presentStatic(runtime.specials, live, slot);
     ui.special.presentSummons(runtime.summons, live, slot);
