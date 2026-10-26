@@ -353,7 +353,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   if (fighter.status.frozenFrames > 0 || heroStatusMashes(fighter)) {
     // A human-paced mash, 10 presses a second, so a trap, a Sleep or a Hex still rewards its user.
     input.grabMashPressed = floorMod(frame, skill.freezeMashFrames) === 0;
-    // A Hex leaves movement, shields and jumps: the computer keeps playing between presses.
+    // A freeze, Sleep or Hex leaves nothing but the mash (#521).
     if (fighter.status.frozenFrames > 0 || heroStatusBlocksActions(fighter)) return;
   }
   if (fighter.grab.owner !== undefined) {

@@ -43,6 +43,7 @@ import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOption
 import { GroundOption } from "./stickZones";
 import { heroEgg, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus } from "./heroStatus";
+import { hopHeroStatus } from "./hexHop";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpOrAttackBranch } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
@@ -569,6 +570,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   }
   let dashEntryDisplacementAdjustment = 0.0;
 
+  hopHeroStatus(f, slot, stage, matchFrame);
   const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
   const authoredHeight = authoredMotion || demonHunterHoldsHeight(f);
   const egg = heroEgg(f);

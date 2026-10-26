@@ -38,6 +38,11 @@ interface StatusRules {
 
   readonly carry?: { readonly speed: number; readonly rise: number } | undefined;
 
+  /** A blocksActions status that still lets hit reactions and grabs read the stick, mash and tech as they do unhexed. */
+  readonly keepsHitReactions?: boolean | undefined;
+
+  /** Helpless hops on the ground: every `every` frames, `run` of walk speed sideways and `rise` of a short hop up. */
+  readonly hop?: { readonly every: number; readonly run: number; readonly rise: number } | undefined;
 }
 
 const RULES: { readonly [kind: number]: StatusRules | undefined } = {
@@ -48,7 +53,8 @@ const RULES: { readonly [kind: number]: StatusRules | undefined } = {
   [HeroStatusKind.sleep]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 24 },
 
 
-  [HeroStatusKind.hex]: { blocksActions: false, blocksSpecials: true, blocksAttacks: true, endsOnDamage: false, mashMinimum: 36 },
+  [HeroStatusKind.hex]: { blocksActions: true, blocksSpecials: true, blocksAttacks: true, endsOnDamage: false, mashMinimum: 36,
+    keepsHitReactions: true, hop: { every: 30, run: 0.5, rise: 0.5 } },
 
   [HeroStatusKind.chill]: { blocksActions: false, blocksSpecials: false, endsOnDamage: false },
   [HeroStatusKind.stun]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
@@ -180,16 +186,19 @@ export function clearHeroStatus(f: Fighter): void {
 
 const NEUTRAL = neutralControls();
 
+const reacting = (f: Readonly<Fighter>, held: boolean): boolean =>
+  held || f.launch.hitlag > 0 || f.launch.hitstun > 0 || f.launch.diPending;
 
 
 
 
 
-export function maskHeroStatusControls(f: Fighter, input: Controls, commands: AttackBuffer): void {
+
+export function maskHeroStatusControls(f: Fighter, input: Controls, commands: AttackBuffer, held: boolean): void {
   const active = rules(f);
   if (active === undefined) return;
   if (active.mashMinimum !== undefined) f.status.conditionFrames = advanceMash(f.grab, input, f.status.conditionFrames, active.mashMinimum) + 1;
-  if (active.blocksActions) {
+  if (active.blocksActions && !(active.keepsHitReactions === true && reacting(f, held))) {
     copyControls(input, NEUTRAL);
     clearAttackBuffer(commands);
     return;
@@ -221,4 +230,9 @@ export function carryHeroStatus(f: Fighter): boolean {
     f.jump.remaining = min(f.jump.remaining, aerialJumps(f));
   }
   return true;
+}
+
+
+export function heroStatusHop(f: Readonly<Fighter>): StatusRules["hop"] {
+  return rules(f)?.hop;
 }

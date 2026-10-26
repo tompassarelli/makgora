@@ -4,15 +4,16 @@ import { queueAttack } from "../input/attackBuffer";
 import { Phase, createMatchState } from "../lobby/lobbyState";
 import { createBufferedFrameControls } from "../match/controls";
 import { stepMatch } from "../match/step";
-import { AttackStyle, Character, GrabAction, SpecialAction } from "./codes";
+import { AttackStyle, Character, GrabAction, HeroStatusKind, SpecialAction } from "./codes";
 import { BANISH_SPELL_DAMAGE } from "./contacts";
 import { type Fighter, createFighter } from "./fighter";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import { BANISH } from "./heroes/kaelthasSpecials";
+import { HEX } from "./heroes/shadowHunterSpecials";
 import { applyHeroStatus } from "./heroStatus";
 import { traitMove } from "./identityTraits";
 import { type Controls, copyControls, createRoster } from "./roster";
-import { mainDeckRight, mainDeckZ } from "./stage";
+import { mainDeckLeft, mainDeckRight, mainDeckZ } from "./stage";
 import { lift } from "./testDuel";
 import { controls } from "./testWorld";
 
@@ -192,4 +193,86 @@ test("A Banished fighter offstage can still start their up special [k1 scenario]
     run(b, 2, controls({ specialPressed: true, specialZ: 1, verticalDirection: 1 }));
     assertEquals(traitMove(b.first.special.action), "up");
   }
+});
+
+interface HexTrace {
+  readonly frames: number;
+  readonly path: string;
+  readonly acted: boolean;
+  readonly hops: readonly number[];
+  readonly offDeck: boolean;
+}
+
+/** Hexes the first fighter at `x` (aloft if `z` is set) and plays `input` each frame (`first` on the first) until the hex ends. */
+function hexed(input: Readonly<Controls>, attack?: AttackStyle, first: Readonly<Controls> = input, x = 0.0, z?: number): HexTrace {
+  const b = bout(Character.blademaster, Character.rifleman, FAR);
+  b.first.motion.x = x;
+  if (z !== undefined) lift(b.first, z);
+  applyHeroStatus(b.first, HEX);
+  let frames = 0;
+  let path = "";
+  let acted = false;
+  let offDeck = false;
+  const hops: number[] = [];
+  for (let frame = 0; frame < 2 * HEX.frames && b.first.status.condition === HeroStatusKind.hex; frame++) {
+    const grounded = b.first.motion.grounded;
+    b.step(frame === 0 ? first : input, frame === 0 ? attack : undefined);
+    frames++;
+    const { motion } = b.first;
+    path += `${motion.x},${motion.z},${b.first.facing};`;
+    acted ||= b.first.attack.style !== undefined || b.first.grab.action !== GrabAction.none || b.first.special.action !== SpecialAction.none
+      || b.first.shield.raised || b.first.jump.squat > 0 || b.first.dodge.airDodging || b.first.dodge.groundFrame > 0;
+    if (grounded && !motion.grounded && motion.vz > 0.0) hops.push(motion.vx > 0.0 ? 1 : motion.vx < 0.0 ? -1 : 0);
+    offDeck ||= motion.x > mainDeckRight(0) || motion.x < mainDeckLeft(0);
+  }
+  return { frames, path, acted, hops, offDeck };
+}
+
+const ONE_MASH = controls({ grabMashPressed: true });
+
+test("A hexed fighter ignores attack, grab, every special, shield, jump and dodge inputs and hops the same seeded path for HEX.frames frames; a held stick only mashes [k3 measure #521]", () => {
+  const still = hexed(controls());
+  assertEquals(still.frames, HEX.frames);
+  assertTrue(!still.acted);
+  assertEquals(hexed(controls()).path, still.path);
+  const ignored: readonly (readonly [Readonly<Controls>, AttackStyle | undefined])[] = [
+    [controls(), AttackStyle.jab], [controls(), AttackStyle.forwardSmash], [controls(), AttackStyle.grab],
+    [controls({ specialPressed: true }), undefined], [controls({ specialPressed: true, specialX: 1 }), undefined],
+    [controls({ specialPressed: true, specialZ: -1 }), undefined], [controls({ specialPressed: true, specialZ: 1 }), undefined],
+    [SHIELD, undefined], [controls({ jumpPressed: true, jumpHeld: true }), undefined], [controls({ shortHopPressed: true }), undefined],
+    [controls({ groundDodgePressed: true, groundDodgeDirection: 1 }), undefined], [controls({ airDodgePressed: true, dodgeX: 1 }), undefined],
+  ];
+  for (const [input, attack] of ignored) {
+    const trace = hexed(input, attack);
+    assertTrue(!trace.acted);
+    assertEquals(trace.path, still.path);
+  }
+  const mashedOnce = hexed(controls(), undefined, ONE_MASH);
+  for (const stick of [controls({ direction: 1 }), controls({ direction: -1, walking: true }), controls({ verticalDirection: 1 }), controls({ verticalDirection: -1, down: true })]) {
+    const held = hexed(stick);
+    assertTrue(!held.acted);
+    assertEquals(held.path, mashedOnce.path);
+  }
+});
+
+test("Hex hops go both ways on the seeded draw and turn back at either edge of the deck instead of hopping off [k1 scenario]", () => {
+  const middle = hexed(controls());
+  assertTrue(middle.hops.includes(1) && middle.hops.includes(-1));
+  for (const side of [1, -1]) {
+    const edge = side > 0 ? mainDeckRight(0) : mainDeckLeft(0);
+    const trace = hexed(controls(), undefined, controls(), f32(edge - f32(side * f32(H * f32(0.1)))));
+    assertEquals(trace.hops[0], -side);
+    assertTrue(!trace.offDeck);
+  }
+});
+
+test("A fighter hexed in the air falls with a held stick steering nothing, and mashing ends Hex sooner but never before its mash minimum [k1 scenario]", () => {
+  const z = f32(mainDeckZ(0) + f32(H * f32(2.0)));
+  const falling = hexed(controls(), undefined, ONE_MASH, 0.0, z);
+  const steered = hexed(controls({ direction: 1 }), undefined, controls({ direction: 1 }), 0.0, z);
+  assertEquals(steered.path, falling.path);
+  assertTrue(!steered.acted);
+  const mashed = hexed(controls({ grabMashPressed: true }));
+  assertTrue(mashed.frames < HEX.frames);
+  assertGreaterThan(mashed.frames, 35);
 });

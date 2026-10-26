@@ -177,7 +177,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     observedFrameLegalActions[slot] = 0;
     observedFrameStartedActions[slot] = 0;
     beforeOut[slot] = f.status.out;
-    maskHeroStatusControls(f, controls.inputs[slot], controls.commands[slot]);
+    maskHeroStatusControls(f, controls.inputs[slot], controls.commands[slot], inGrabContext(f));
     hadDashGrabWindow[slot] = f.ground.dashGrabWindow > 0 && f.status.frozenFrames === 0 && f.launch.hitlag <= 1;
     wasGrabbed[slot] = inGrabContext(f);
     if (wasGrabbed[slot]) clearAttackBuffer(controls.commands[slot]);
