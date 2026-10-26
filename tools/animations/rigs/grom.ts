@@ -18,3 +18,4 @@ export const classic = {
     'ankle.R': 'Bone_Foot_R',
     weapon: 'Bone_Sword',
 } as const;
+export const weaponGeosets = { weapon: 0 } as const;

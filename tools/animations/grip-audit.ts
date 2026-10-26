@@ -62,6 +62,18 @@ function verticesForNode(model: ReturnType<typeof parseSource>, objectId: number
   }
   return weighted.filter(vertex => vertex.weight >= 0.1).map(vertex => vertex.point);
 }
+function geosetMesh(model: ReturnType<typeof parseSource>, index: number) {
+  const geoset = model.Geosets[index];
+  if (geoset === undefined) return undefined;
+  const bones = new Set<number>(), count = geoset.Vertices.length / 3;
+  for (let vertex = 0; vertex < count; vertex++) {
+    if (geoset.SkinWeights) { for (let slot = 0; slot < 4; slot++) if (geoset.SkinWeights[vertex * 8 + 4 + slot]! > 0) bones.add(geoset.SkinWeights[vertex * 8 + slot]!); }
+    else for (const bone of geoset.Groups[geoset.VertexGroup[vertex]!] ?? []) bones.add(bone);
+  }
+  const node = bones.size === 1 ? model.Nodes[[...bones][0]!] : undefined;
+  if (node === undefined) return undefined;
+  return { node, vertices: Array.from({ length: count }, (_, vertex) => point(geoset.Vertices.slice(vertex * 3, vertex * 3 + 3))) };
+}
 
 const rows: Row[] = [], unavailable: string[] = [];
 for (const [character, rig] of FIGHTER_RIGS) {
@@ -104,7 +116,9 @@ for (const [character, rig] of FIGHTER_RIGS) {
     seek(calibrationClip.startSeconds);
     for (const joint of weaponJoints) {
       const weaponName = bodyNode(rig, joint), handJoints: readonly RigJoint[] = ['wrist.R', 'wrist.L'];
-      const weapon = weaponName === undefined ? undefined : nodeNamed(model, weaponName);
+      const geoset = rig.weaponGeosets?.[joint], mesh = geoset === undefined ? undefined : geosetMesh(model, geoset);
+      if (geoset !== undefined && mesh === undefined) { unavailable.push(`${fighter.name}/${look}/${joint}: geoset ${geoset} is not skinned to one bone`); continue; }
+      const weapon = mesh?.node ?? (weaponName === undefined ? undefined : nodeNamed(model, weaponName));
       const hand = handJoints.map(handJoint => {
         const name = bodyNode(rig, handJoint);
         return name === undefined ? undefined : nodeNamed(model, name);
@@ -113,7 +127,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
       const inverse = mat4.invert(mat4.create(), data.nodes[weapon.ObjectId]!.matrix);
       if (inverse === null) { unavailable.push(`${fighter.name}/${look}/${joint}: singular weapon matrix`); continue; }
       const grip = transform(mul(nodePosition(model, data, hand, 1 / scale), 1), inverse);
-      const vertices = verticesForNode(model, weapon.ObjectId);
+      const vertices = mesh?.vertices ?? verticesForNode(model, weapon.ObjectId);
       if (vertices.length === 0) { unavailable.push(`${fighter.name}/${look}/${joint}: no weapon weighted vertices`); continue; }
       const tip = vertices.toSorted((a, b) => distance(b, grip) - distance(a, grip))[0]!;
       weapons.push({ joint, weapon, hand, grip, tip });

@@ -21,6 +21,8 @@ export interface FighterRig {
     readonly character: Character;
     /** Classic skeleton → rig: the Classic node that carries each humanoid joint. */
     readonly classic: Readonly<Partial<Record<HumanoidJoint, string>>>;
+    /** Classic geoset that draws a weapon whose mesh is skinned to a bone other than its rig joint. */
+    readonly weaponGeosets?: Readonly<Partial<Record<'weapon' | 'weapon.L', number>>>;
     readonly pain?: PainCorrection;
 }
 

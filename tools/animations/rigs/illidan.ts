@@ -19,3 +19,4 @@ export const classic = {
     weapon: 'blade_base',
     'weapon.L': 'stand_blade_L',
 } as const;
+export const weaponGeosets = { 'weapon.L': 4 } as const;
