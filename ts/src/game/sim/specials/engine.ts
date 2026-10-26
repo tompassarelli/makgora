@@ -637,10 +637,21 @@ function faceStruck(f: Fighter, world: Roster): void {
   if (gap !== 0.0) f.facing = gap < 0 ? -1 : 1;
 }
 
+function fallsFreely(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, frame: number): boolean {
+  return move.jumpWindow !== undefined && !f.motion.grounded && frame >= move.jumpWindow.first;
+}
+
+export function heroSpecialJumps(f: Readonly<Fighter>): boolean {
+  if (!isHeroSpecialAction(f.special.action)) return false;
+  const move = runningHeroSpecial(f);
+  return move !== undefined && f.launch.hitlag <= 0 && inWindow(move.jumpWindow, f.special.frame);
+}
+
 function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
   const { motion, special } = f;
   holdHoveringUltimate(f);
   if (special.grabFrame > 0 && move.commandGrab !== undefined) return;
+  if (!ultimateHovers(f) && fallsFreely(f, move, frame)) return;
   for (const segment of move.motion ?? []) {
     if (frame < segment.first || frame > segment.last) continue;
     let velocityX = f32(f.facing * segment.velocityX);
@@ -797,6 +808,7 @@ export function heroMotionHolds(f: Readonly<Fighter>): boolean {
   const move = runningHeroSpecial(f);
   if (move === undefined) return false;
   if (ultimateHovers(f)) return true;
+  if (fallsFreely(f, move, f.special.frame)) return false;
   for (const segment of move.motion ?? []) if (f.special.frame >= segment.first && f.special.frame <= segment.last) return true;
   return false;
 }

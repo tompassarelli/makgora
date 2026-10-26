@@ -408,6 +408,10 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
   }
   if (move.cleanseFrame !== undefined) int("cleanseFrame", move.cleanseFrame);
   if (move.refreshesAir === true) int("refreshesAir", 1);
+  if (move.jumpWindow !== undefined) {
+    int("jumpWindow.first", move.jumpWindow.first);
+    int("jumpWindow.last", move.jumpWindow.last);
+  }
   if (move.placement !== undefined) result.push(specialPlacementCanonical(move.placement, `${name}.placement`));
   if (move.recall === true) int("recall", 1);
   if (move.command !== undefined) {

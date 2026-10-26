@@ -112,6 +112,10 @@ acts again on N+1. It may author:
   run before specials advance). It protects nothing itself; pair it with
   `intangible`. The success and the stock's healing are fighter state;
 - `groundOnly`, `oncePerAirtime`, `helpless` and `landingLag`;
+- a `jumpWindow`: on those frames its user may full hop, short hop or air
+  jump without ending it; off the floor from the window's first frame its
+  motion segments give way to gravity and air drift, and landing keeps it
+  running (Bladestorm);
 - `placement`: the fighter's one placed object (`SpecialPlacement`, such as
   Serpent Ward), standing `offsetX` ahead of the caster's feet from the
   placement frame, which is its age 1. `sim/placedObjects.ts` runs it after

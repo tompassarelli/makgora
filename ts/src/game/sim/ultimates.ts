@@ -68,7 +68,7 @@ const ILLIDAN: AuthoredSpecial = {
 
 const BLADESTORM_TICKS = [17, 26, 35, 44, 53, 62] as const;
 const BLADEMASTER: AuthoredSpecial = {
-  name: "Bladestorm", endFrame: 104, groundOnly: true,
+  name: "Bladestorm", endFrame: 104, jumpWindow: frames(17, 74),
   hurt: [
       hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       hurtPose(9, 16, [hurtPart(0.0, 24.0, 16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
@@ -431,7 +431,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
 const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined } = {
   [Character.rifleman]: "Kneel and aim: a red line shows the shot, then one bullet crosses the stage. Jump or shield it.",
   [Character.demonHunter]: "Fel fire burns around him as he becomes a demon: a burst launches nearby foes, then he moves faster for 8 seconds.",
-  [Character.blademaster]: "A steerable whirlwind of cuts ending in a strong slash, then he is dizzy. Shield, jump above it or outrun it.",
+  [Character.blademaster]: "A steerable whirlwind of cuts ending in a strong slash, then he is dizzy. He can jump while it spins. Shield or outrun it.",
   [Character.mountainKing]: "He turns to stone with a stomp: heavier for 10 seconds. Hit him while he changes.",
   [Character.warden]: "The Avatar of Vengeance rises behind her and throws four ghostly glaives. Break it or dodge the glaives.",
   [Character.lich]: "A frost wyrm sweeps straight ahead at body height. Jump or shield it.",

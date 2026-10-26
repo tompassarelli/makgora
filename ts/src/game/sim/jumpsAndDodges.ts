@@ -27,16 +27,16 @@ const DODGE_BITS = 768;
 const sign = (value: number) => (value === 0 ? 0 : value > 0 ? 1 : -1);
 
 
-export function lockedOut(f: Fighter): boolean {
+export function lockedOut(f: Fighter, throughMove = false): boolean {
   return inSurfaceTechStartup(f) || inGrabContext(f) || f.ledge.state !== LedgeState.none || f.status.out || f.special.fall
     || f.shield.breakState !== ShieldBreak.none || (f.down.state !== DownState.none && !isTumbling(f))
-    || f.launch.hitlag > 0 || f.launch.hitstun > 0 || f.shield.stun > 0 || f.landing.lag > 0 || f.attack.cooldown > 0;
+    || f.launch.hitlag > 0 || f.launch.hitstun > 0 || f.shield.stun > 0 || f.landing.lag > 0 || (f.attack.cooldown > 0 && !throughMove);
 }
 
 
-export function beginJump(f: Fighter, horizontal: number, shortHop = false): void {
+export function beginJump(f: Fighter, horizontal: number, shortHop = false, throughMove = false): void {
   const { motion, jump, shield } = f;
-  if (lockedOut(f) || (shield.releaseLag > 0 && !motion.grounded) || f.dodge.airDodging || isGroundDodging(f) || jump.squat > 0 || jump.remaining <= 0) return;
+  if (lockedOut(f, throughMove) || (shield.releaseLag > 0 && !motion.grounded) || f.dodge.airDodging || isGroundDodging(f) || jump.squat > 0 || jump.remaining <= 0) return;
   observeActionDecision(JUMP_BIT);
   f.surfaceRecovery.state = SurfaceContact.none;
   f.surfaceRecovery.frame = 0;
