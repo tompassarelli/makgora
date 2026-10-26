@@ -7,7 +7,7 @@ import { BLADEMASTER_GROUND } from "./groundNormals";
 import type { HitEffect } from "../hitRegions";
 import { strongHit } from "../strongHits";
 import { drillStrikes, linkAt, multiHit } from "./multiHit";
-import { type Angle, capsuleOf, makeHit, path } from "./authoring";
+import { ANGLES, type Angle, capsuleOf, makeHit, path } from "./authoring";
 
 
 export const H = HERO_REFERENCE_HEIGHT;
@@ -115,6 +115,40 @@ const SHOULDER_X = 6.0;
 const SHOULDER_Z = 90.0;
 
 export const reach = (handX: number, handZ: number) => arm(SHOULDER_X, SHOULDER_Z, handX, handZ);
+export const HEAD = hurtPart(0.0, 95.0, 0.0, 95.0, 25.0);
+
+export const SWORD_LENGTH = length(f32(0.75));
+const UP_AIR_GRIP = 40.0;
+const UP_AIR_TIP = f32(UP_AIR_GRIP + SWORD_LENGTH);
+const UP_AIR_FIRST = 6;
+
+export interface Blade { readonly gripX: number; readonly gripZ: number; readonly tipX: number; readonly tipZ: number }
+
+const bladeAt = (angle: Angle, side: number): Blade => {
+  const direction = ANGLES[angle];
+  const x = f32(direction.x * side);
+  return {
+    gripX: f32(UP_AIR_GRIP * x), gripZ: f32(SHOULDER_Z + f32(UP_AIR_GRIP * direction.z)),
+    tipX: f32(UP_AIR_TIP * x), tipZ: f32(SHOULDER_Z + f32(UP_AIR_TIP * direction.z)),
+  };
+};
+
+const UP_AIR_SWEEP: readonly (readonly Blade[])[] = [
+  [bladeAt(20, 1.0), bladeAt(40, 1.0), bladeAt(60, 1.0)],
+  [bladeAt(70, 1.0), bladeAt(90, 1.0), bladeAt(70, -1.0)],
+  [bladeAt(60, -1.0), bladeAt(40, -1.0), bladeAt(20, -1.0)],
+];
+
+export const UP_AIR_BLADE: readonly Blade[] = UP_AIR_SWEEP.map(blades => blades[1] ?? bladeAt(90, 1.0));
+
+function upAirArc(effect: Readonly<HitEffect>): readonly MoveRegion[] {
+  const regions: MoveRegion[] = [];
+  for (let index = 0; index < UP_AIR_SWEEP.length; index++) {
+    const frame = UP_AIR_FIRST + index;
+    for (const blade of UP_AIR_SWEEP[index] ?? []) regions.push(heroRegion(frame, frame, capsule(blade.gripX, blade.gripZ, blade.tipX, blade.tipZ), effect));
+  }
+  return regions;
+}
 
 const BODY: FighterHurtboxes = {
   stand: [TORSO, hurtPart(-16.0, 110.0, 16.0, 110.0, 8.0)],
@@ -212,10 +246,10 @@ const BODY: FighterHurtboxes = {
       heroHurtPose(25, 33, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
     [AttackStyle.upAir]: [
-      heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(17, 24, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(25, 27, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), HEAD]),
+      heroHurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), HEAD]),
+      heroHurtPose(17, 24, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), HEAD]),
+      heroHurtPose(25, 27, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), HEAD]),
     ],
     [AttackStyle.downAir]: [
       heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
@@ -283,11 +317,7 @@ export const BLADEMASTER_MOVES: FighterMoves = {
     ])),
     [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, cut(10, [60.0, 45.0, 30.0], L, hit(8.519732475280762, "EDGE", 40), hit(10.843297958374023, "EDGE", 40))),
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, cut(8, [34.0, 45.0, 56.0], L, hit(9.294255256652832, "KILL", 35, -1.0), undefined, -1.0)),
-    [AttackStyle.upAir]: heroMove(6, 3, 19, 11, path(6, [
-      capsule(0.0, 45.0, 0.0, f32(M - BLADE_RADIUS)),
-      capsule(3.0, 45.0, 3.0, f32(M - BLADE_RADIUS)),
-      capsule(6.0, 45.0, 6.0, f32(M - BLADE_RADIUS)),
-    ], hit(6.196170330047607, "LAUNCH", 85))),
+    [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, upAirArc(hit(6.196170330047607, "LAUNCH", 85))),
     [AttackStyle.downAir]: bladestorm,
     [AttackStyle.grab]: heroMove(7, 2, 22, 0, path(7, [
       capsule(18.0, 45.0, f32(S - 10.0), 45.0, 10.0),

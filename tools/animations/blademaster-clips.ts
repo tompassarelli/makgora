@@ -8,6 +8,7 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, AttackStyle, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
+import { type Blade, UP_AIR_BLADE } from "../../ts/src/game/sim/heroes/blademasterMoves";
 import { seconds } from "./asset-info";
 import { swordGestureBaseModel } from "./recovery-model";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
@@ -56,6 +57,7 @@ type V = readonly [number, number, number];
 interface Figure { pitch: number; chest: number; chestTwist: number; pelvis: number; pelvisTwist: number; left: readonly [number, number]; right: readonly [number, number] }
 interface Pose { hand: V; tip: V; lean: number; twist: number; knee: number; offhand: number; legSplit:number; drop:number; pitch:number; figure?: Figure }
 const pose = (hand: V, tip: V, lean = 0, twist = 0, knee = 12, offhand = 25, legSplit=0, drop=0, pitch=0): Pose => ({hand, tip, lean, twist, knee, offhand, legSplit, drop, pitch});
+const upAirPose = (b: Blade) => pose([b.gripX,-24,b.gripZ],[b.tipX,-24,b.tipZ],-14,10,80,70,65);
 const guard = pose([26,-25,100],[100,-25,145]);
 const coil = pose([-16,-25,135],[-65,-20,180],-12,-20,24,35);
 interface Body { lean: number; twist: number; knee: number; offhand: number; drop: number; pitch: number }
@@ -81,7 +83,7 @@ const gestures = [
   {key:"neutralAir",name:"Air Crescent Slash",style:AttackStyle.neutralAir,prep:pose([-15,-24,121],[-70,-24,172],-9,-18,48,50),hit:pose([48,-24,99],[140,-24,117],4,12,38,55),exit:pose([-40,-24,96],[-130,-24,121],-5,-25,54,65),second:12},
   {key:"forwardAir",name:"Air Forward Cleave",style:AttackStyle.forwardAir,prep:pose([-5,-24,144],[-45,-24,225],-15,-22,55,50),hit:pose([52,-24,95],[140,-24,49],16,18,40,60),exit:pose([43,-24,52],[90,-24,-25],22,30,64,65)},
   {key:"backAir",name:"Air Turning Back Cut",style:AttackStyle.backAir,prep:pose([26,-24,130],[95,-24,192],-10,20,52,45),hit:pose([-42,-24,100],[-138,-24,83],-12,-55,44,65),exit:pose([-40,-24,112],[-115,-24,174],-6,-65,62,60)},
-  {key:"upAir",name:"Air Upward Pierce",style:AttackStyle.upAir,prep:pose([10,-24,88],[52,-24,6],20,-12,62,45),hit:pose([7,-24,147],[7,-24,246],-14,10,80,70,65),exit:pose([24,-24,136],[62,-24,219],-5,18,64,55,35)},
+  {key:"upAir",name:"Air Upward Pierce",style:AttackStyle.upAir,prep:pose([10,-24,88],[52,-24,6],20,-12,62,45),hit:upAirPose(UP_AIR_BLADE[0]!),exit:pose([-40,-24,112],[-120,-24,160],-5,-18,64,55,35)},
   {key:"throwBack",name:"Throw Back Heave",style:undefined,prep:pose([40,-24,105],[100,-24,148],10,18,30,75),hit:pose([-40,-24,140],[-125,-24,196],-18,-45,28,90),exit:pose([-30,-24,119],[-100,-24,150],-6,-55,20,55)},
 ] as const;
 const replacements = [
@@ -150,6 +152,7 @@ const records: ClipRecord[]=[],bindings:string[]=[],names:string[]=[];
 function timeline(g: Gesture, first: number, last: number, total: number): { controlFrames: number[]; poses: Pose[] } {
   if("keys" in g)return {controlFrames:g.keys.map(([frame])=>frame),poses:g.keys.map(([,p])=>p)};
   if(g.style===AttackStyle.upTilt)return {controlFrames:[0,first-3,first,first+1,first+2,first+3,last,last+2,total-4,total],poses:[guard,pose([30,-50,70],[115,-50,5],14,-15,34,40),pose([40,-50,120],[165,-50,120],8,-10),pose([28,-50,140],[108,-50,242],-6,-4),pose([0,-50,150],[-22,-50,275],-10,0),pose([-28,-50,140],[-131,-50,212],-6,4),pose([-40,-50,120],[-165,-50,120],4,10),pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
+  if(g.style===AttackStyle.upAir)return {controlFrames:[0,Math.max(1,first-3),...UP_AIR_BLADE.map((_,index)=>first+index),last+2,total],poses:[guard,g.prep,...UP_AIR_BLADE.map(upAirPose),g.exit,guard]};
   if(g.style===AttackStyle.forwardTiltUp)return {controlFrames:[0,Math.max(1,first-3),first,last+2,total-4,total],poses:[guard,g.prep,g.hit,pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
   return {controlFrames:[0,Math.max(1,first-3),first,("second" in g?g.second:last+2),total],poses:[guard,g.prep,g.hit,g.exit,guard]};
 }
