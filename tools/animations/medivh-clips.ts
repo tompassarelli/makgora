@@ -30,6 +30,12 @@ const HANG_SLACK=8,hangHands=["Bone_Hand_L","Bone_Hand_R"].map(name=>model.Nodes
 function hangRoot(drawn:DrawnModel,index:number,time:number,old?:ArrayLike<number>){const [x,z]=ledgeGripOffset(drawn,index,time,highestGrip(drawn,index,time,hangHands),Character.medivh);return new Float32Array([(old?.[0]??0)+x-HANG_SLACK,old?.[1]??0,(old?.[2]??0)+z]);}
 interface Gesture { tx?: number; chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; front?: number; back?: number; kneeFront?: number; kneeBack?: number; yaw?: number; lean?: number; }
 interface Beat { frame: number; g: Gesture; hand: Point; direction: Point; }
+function everyFrame(anchors:readonly Beat[],from:number,to:number):Beat[] {
+ const mix=(a:number,b:number,s:number)=>a+(b-a)*s,point=(a:Point,b:Point,s:number):Point=>[mix(a[0],b[0],s),mix(a[1],b[1],s),mix(a[2],b[2],s)];
+ return Array.from({length:to-from+1},(_,i)=>from+i).map(frame=>{const j=Math.max(0,anchors.findIndex(b=>b.frame>=frame)-1),a=anchors[j]!,b=anchors[j+1]??a,s=b.frame>a.frame?Math.min(1,Math.max(0,(frame-a.frame)/(b.frame-a.frame))):0;
+  const keys=[...new Set([...Object.keys(a.g),...Object.keys(b.g)])] as (keyof Gesture)[];
+  return {frame,g:Object.fromEntries(keys.map(k=>[k,mix(a.g[k]??0,b.g[k]??0,s)])),hand:point(a.hand,b.hand,s),direction:point(a.direction,b.direction,s)};});
+}
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; beats?: readonly Beat[]; }
 const forward: Gesture = {chest:23,arm:-80,wrist:15,leftArm:-55,head:-15,front:18,back:-12};
 const overhead: Gesture = {chest:-12,arm:-140,wrist:10,leftArm:-85,head:-10,front:-12,back:10};
@@ -46,15 +52,18 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
  ["neutralAir",AttackStyle.neutralAir,{...forward,yaw:70}], ["forwardAir",AttackStyle.forwardAir,{...forward}], ["backAir",AttackStyle.backAir,back], ["upAir",AttackStyle.upAir,overhead], ["downAir",AttackStyle.downAir,{...low,lean:45,front:45}],
 ];
 const beats: Partial<Record<HeroPose,(move:{startupFrames:number;activeFrames:number;totalFrames:number})=>readonly Beat[]>> = {
- dashAttack:({startupFrames:c,activeFrames:a,totalFrames:t})=>[
-  {frame:0,g:{lean:6,chest:8,head:-4,arm:-10,front:-25,back:18},hand:[24,-18,62],direction:[1,0,0.1]},
-  {frame:Math.max(1,c-2),g:{tx:-30,lean:-22,chest:-24,head:14,arm:-30,front:-35,back:35,kneeFront:70,kneeBack:60,yaw:-45},hand:[-12,-18,54],direction:[-1,0,-0.25]},
-  {frame:c,g:{tx:8,lean:26,chest:26,head:-14,arm:45,wrist:20,front:-55,back:32,kneeFront:85,yaw:14},hand:[40,-18,52],direction:[1,0,-0.15]},
-  {frame:Math.round(c+(a-1)/2),g:{tx:14,lean:28,chest:28,head:-15,arm:52,wrist:22,front:-58,back:34,kneeFront:85,yaw:18},hand:[48,-18,54],direction:[1,0,0]},
-  {frame:c+a-1,g:{tx:18,lean:30,chest:32,head:-17,arm:58,wrist:25,front:-62,back:36,kneeFront:90,yaw:20},hand:[54,-18,52],direction:[1,0,-0.05]},
-  {frame:c+a+5,g:{tx:18,lean:26,chest:28,head:-15,arm:52,wrist:26,front:-58,back:32,kneeFront:88,yaw:14},hand:[46,-18,50],direction:[1,0,-0.1]},
-  {frame:Math.round(c+a+(t-c-a)*0.6),g:{tx:10,lean:13,chest:13,head:-8,arm:30,front:-32,back:17,kneeFront:50,yaw:6},hand:[36,-18,54],direction:[0.85,0,0.5]},
- ],
+ dashAttack:({startupFrames:c,activeFrames:a,totalFrames:t})=>{
+  const run:Beat={frame:0,g:{lean:6,chest:8,head:-4,arm:-10,front:-25,back:18},hand:[24,-18,62],direction:[1,0,0.1]};
+  return [run,...everyFrame([run,
+   {frame:Math.max(1,c-2),g:{tx:-30,lean:-26,chest:-24,head:14,arm:-30,front:-35,back:35,kneeFront:80,kneeBack:70,yaw:-45},hand:[-12,-18,54],direction:[-1,0,-0.25]},
+   {frame:c,g:{tx:10,lean:38,chest:20,head:-18,arm:45,wrist:20,front:-60,back:40,kneeFront:90,yaw:14},hand:[44,-18,46],direction:[1,0,-0.1]},
+   {frame:c+5,g:{tx:18,lean:56,chest:24,head:-26,arm:52,wrist:22,front:-72,back:52,kneeFront:105,yaw:18},hand:[54,-18,38],direction:[1,0,-0.05]},
+   {frame:c+8,g:{tx:20,lean:48,chest:20,head:-22,arm:46,wrist:24,front:-66,back:46,kneeFront:96,yaw:15},hand:[48,-18,44],direction:[1,0,0.15]},
+   {frame:c+a-1,g:{tx:22,lean:36,chest:14,head:-14,arm:34,wrist:28,front:-55,back:38,kneeFront:85,yaw:12},hand:[36,-18,56],direction:[1,0,0.55]},
+  ],Math.max(1,c-2),c+a-1),
+  {frame:Math.round(c+a-1+(t-c-a+1)*0.4),g:{tx:15,lean:20,chest:8,head:-8,arm:24,front:-35,back:22,kneeFront:55,yaw:6},hand:[30,-18,64],direction:[0.65,0,0.75]},
+  {frame:Math.round(c+a-1+(t-c-a+1)*0.7),g:{tx:6,lean:8,chest:3,head:-3,arm:14,front:-12,back:8,kneeFront:20,yaw:2},hand:[22,-18,70],direction:[0.35,0,0.95]}];
+ },
 };
 for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air"),beats:beats[pose]?.(move)}); }
 const extra: readonly [HeroPose,number,number,Gesture][] = [

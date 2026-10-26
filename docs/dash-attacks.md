@@ -106,3 +106,12 @@ Kael'thas's dash attack (#341) is keyed against this brief in
 `dashAttackKeys` of `tools/animations/kaelthas-clips.ts` and passes all five
 lines, line 5 at a median of 4 from three fresh judges. The takes that led
 there, their lines 1–4 and their fresh-judge medians are on #358.
+
+Medivh's dash attack (#343) is keyed against it in
+`tools/animations/medivh-clips.ts`, which solves the staff arm separately at
+each key. Between two keys solved apart, the interpolated staff swung up to
+60° off its aim (pointing at the floor mid-drive), so the windup and active
+window there are keyed every frame from the brief's poses (`everyFrame`).
+Drive, recoil and settle lifted readability and follow-through to 4; weight
+and character stayed at 3, because the cloak hides his hips, legs and free
+hand at tile size and judges read the lunge as a rigid board.
