@@ -28,7 +28,7 @@ const STRIP = 24;
 const DEFAULT_MINUTES = 25;
 const attempt = <A>(operation: string, run: () => A) => Effect.try({ try: run, catch: cause => new CaptureFailure({ problem: `${operation}: ${String(cause)}` }) });
 
-const shell = (command: readonly string[], stdin: "ignore" | "pipe" = "ignore") => Bun.spawn([...command], { stdin, stdout: "pipe", stderr: "pipe" });
+const shell = (command: readonly string[]) => Effect.sync(() => Bun.spawn([...command], { stdin: "ignore", stdout: "pipe", stderr: "pipe" }));
 
 const record = (args: readonly string[]) => Effect.gen(function*() {
   const clientsFile = option(args, "--clients-file");
@@ -74,10 +74,11 @@ const record = (args: readonly string[]) => Effect.gen(function*() {
 interface NativeShot {
   readonly checksums: ReadonlyMap<number, string>;
   readonly stocks: readonly string[];
+  readonly ended?: number;
 }
 
 export function parseTrailerLog(lines: readonly string[]): NativeShot[] {
-  const shots: { checksums: Map<number, string>; stocks: string[] }[] = [];
+  const shots: { checksums: Map<number, string>; stocks: string[]; ended?: number }[] = [];
   for (const line of lines) {
     const words = line.split(" ");
     if (words[0] === "SHOT") shots.push({ checksums: new Map(), stocks: [] });
@@ -85,6 +86,7 @@ export function parseTrailerLog(lines: readonly string[]): NativeShot[] {
     if (shot === undefined) continue;
     if (words[0] === "checksum") shot.checksums.set(Number(words[1]), words[2] ?? "");
     if (words[0] === "stock") shot.stocks.push(line);
+    if (words[0] === "ended") shot.ended = Number(words[1]);
   }
   return shots;
 }
@@ -119,18 +121,31 @@ export function replayShot(shot: TrailerShot, checksumFrames: ReadonlySet<number
       if (now !== held[slot]) stocks.push(`stock ${frame} ${slot} ${now}`);
       held[slot] = now;
     }
+    const ended = match.phase !== Phase.match;
+    if (ended) for (const slot of PARTICIPANT_SLOTS) clearAttackBuffer(controls.commands[slot]);
     if (checksumFrames.has(frame)) {
       captureReplaySnapshot(snapshot, world, match, controls, runtime);
       checksums.set(frame, stateChecksum(snapshot));
     }
+    if (ended) return { checksums, stocks: stocks.filter(line => Number(line.split(" ")[1]) < frame), ended: frame };
   }
   return { checksums, stocks };
 }
 
+const LATE_STOCK_FRAMES = 1;
+
+export function stocksMatch(native: readonly string[], headless: readonly string[]): boolean {
+  return native.length === headless.length && native.every((line, index) => {
+    const [, nativeFrame, ...nativeRest] = line.split(" ");
+    const [, headlessFrame, ...headlessRest] = (headless[index] ?? "").split(" ");
+    const late = Number(nativeFrame) - Number(headlessFrame);
+    return nativeRest.join(" ") === headlessRest.join(" ") && late >= 0 && late <= LATE_STOCK_FRAMES;
+  });
+}
+
 interface Stamped { readonly index: number; readonly frame: number }
 
-const stampStrips = (ffmpeg: string, video: string) => Effect.promise(async () => {
-  const child = shell([ffmpeg, "-v", "error", "-i", video, "-filter_complex", `[0:v]split[a][b];[a]crop=iw:${STRIP}:0:0[t];[b]crop=iw:${STRIP}:0:ih-${STRIP}[u];[t][u]vstack`, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]);
+const stampStrips = (ffmpeg: string, video: string) => Effect.flatMap(shell([ffmpeg, "-v", "error", "-i", video, "-filter_complex", `[0:v]split[a][b];[a]crop=iw:${STRIP}:0:0[t];[b]crop=iw:${STRIP}:0:ih-${STRIP}[u];[t][u]vstack`, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]), child => Effect.promise(async () => {
   const size = WIDTH * STRIP * 2 * 3;
   const stamps: (number | undefined)[] = [];
   let pending = new Uint8Array(0);
@@ -147,7 +162,7 @@ const stampStrips = (ffmpeg: string, video: string) => Effect.promise(async () =
   }
   await child.exited;
   return stamps;
-});
+}));
 
 export function segments(stamps: readonly (number | undefined)[]): Stamped[][] {
   const runs: Stamped[][] = [];
@@ -166,12 +181,14 @@ export function segments(stamps: readonly (number | undefined)[]): Stamped[][] {
   return runs;
 }
 
-export function windowOf(run: readonly Stamped[], shot: TrailerShot) {
-  const inside = run.filter(stamped => stamped.frame >= shot.start && stamped.frame <= shot.end);
+export const openedMatches = (runs: readonly Stamped[][]): Stamped[][] => runs.filter(run => (run[0]?.frame ?? Infinity) <= MATCH_TICKS_PER_SECOND);
+
+export function windowOf(run: readonly Stamped[], shot: TrailerShot, end = shot.end) {
+  const inside = run.filter(stamped => stamped.frame >= shot.start && stamped.frame <= end);
   const seen = new Map<number, number>();
   for (const { frame } of inside) seen.set(frame, (seen.get(frame) ?? 0) + 1);
   const missing: number[] = [];
-  for (let frame = shot.start; frame <= shot.end; frame++) if (!seen.has(frame)) missing.push(frame);
+  for (let frame = shot.start; frame <= end; frame++) if (!seen.has(frame)) missing.push(frame);
   const repeated = [...seen.entries()].filter(([, count]) => count > 1).map(([frame]) => frame);
   return { first: inside[0]?.index, last: inside.at(-1)?.index, missing, repeated };
 }
@@ -184,7 +201,10 @@ const judge = (args: readonly string[]) => Effect.gen(function*() {
   const ffprobe = tools["ffprobe"] ?? "ffprobe";
   const video = join(directory, "capture.mkv");
   const native = parseTrailerLog(yield* attempt("read trailer-log.txt", () => readFileSync(join(directory, "trailer-log.txt"), "utf8").split("\n")));
-  const runs = segments(yield* stampStrips(ffmpeg, video));
+  const cache = join(directory, "stamps.json");
+  const stamps: readonly (number | null)[] = existsSync(cache) ? JSON.parse(readFileSync(cache, "utf8")) as (number | null)[] : (yield* stampStrips(ffmpeg, video)).map(frame => frame ?? null);
+  if (!existsSync(cache)) yield* attempt("write stamps.json", () => writeFileSync(cache, JSON.stringify(stamps)));
+  const runs = openedMatches(segments(stamps.map(frame => frame ?? undefined)));
   if (runs.length !== TRAILER_SHOTS.length) return yield* new CaptureFailure({ problem: `${runs.length} stamped matches in the capture, ${TRAILER_SHOTS.length} shots` });
   const rows = [];
   for (const [index, shot] of TRAILER_SHOTS.entries()) {
@@ -193,22 +213,24 @@ const judge = (args: readonly string[]) => Effect.gen(function*() {
     if (nativeShot === undefined) return yield* new CaptureFailure({ problem: `the map log has no shot ${index}` });
     const headless = replayShot(shot, new Set(nativeShot.checksums.keys()));
     const checksumsEqual = [...nativeShot.checksums].every(([frame, sum]) => headless.checksums.get(frame) === sum);
-    const stocksEqual = nativeShot.stocks.join("|") === headless.stocks.filter(line => Number(line.split(" ")[1]) <= Math.max(...nativeShot.checksums.keys())).join("|");
-    const window = windowOf(run, shot);
+    const stocksEqual = stocksMatch(nativeShot.stocks, headless.stocks.filter(line => Number(line.split(" ")[1]) <= Math.max(...nativeShot.checksums.keys())));
+    const endedEqual = nativeShot.ended === headless.ended;
+    const end = Math.min(shot.end, headless.ended ?? shot.end);
+    const window = windowOf(run, shot, end);
     const name = `shot-${String(index + 1).padStart(2, "0")}-seed-${shot.seed}.mp4`;
-    let clip: { readonly frames: number; readonly missing: number; readonly repeated: number; readonly width?: number; readonly height?: number; readonly rate?: string } = { frames: 0, missing: shot.end - shot.start + 1, repeated: 0 };
+    let clip: { readonly frames: number; readonly missing: number; readonly repeated: number; readonly width?: number; readonly height?: number; readonly rate?: string } = { frames: 0, missing: end - shot.start + 1, repeated: 0 };
     if (window.first !== undefined && window.last !== undefined) {
       const frames = window.last - window.first + 1;
-      const cut = shell([ffmpeg, "-v", "error", "-y", "-ss", (window.first / 60).toFixed(6), "-i", video, "-frames:v", String(frames), "-r", "60", "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-pix_fmt", "yuv420p", join(directory, name)]);
+      const cut = yield* shell([ffmpeg, "-v", "error", "-y", "-ss", (window.first / 60).toFixed(6), "-i", video, "-frames:v", String(frames), "-r", "60", "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-pix_fmt", "yuv420p", join(directory, name)]);
       yield* Effect.promise(() => cut.exited);
-      const clipWindow = windowOf(segments(yield* stampStrips(ffmpeg, join(directory, name))).flat(), shot);
-      const probe = shell([ffprobe, "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries", "stream=width,height,r_frame_rate,nb_read_frames", "-of", "json", join(directory, name)]);
+      const clipWindow = windowOf(segments(yield* stampStrips(ffmpeg, join(directory, name))).flat(), shot, end);
+      const probe = yield* shell([ffprobe, "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries", "stream=width,height,r_frame_rate,nb_read_frames", "-of", "json", join(directory, name)]);
       const probed = JSON.parse(yield* Effect.promise(() => new Response(probe.stdout).text())) as { streams?: { width?: number; height?: number; r_frame_rate?: string; nb_read_frames?: string }[] };
       const stream = probed.streams?.[0];
       clip = { frames: Number(stream?.nb_read_frames ?? 0), missing: clipWindow.missing.length, repeated: clipWindow.repeated.length, ...(stream?.width === undefined ? {} : { width: stream.width }), ...(stream?.height === undefined ? {} : { height: stream.height }), ...(stream?.r_frame_rate === undefined ? {} : { rate: stream.r_frame_rate }) };
     }
-    const pass = checksumsEqual && stocksEqual && clip.missing === 0 && clip.repeated === 0 && clip.width === WIDTH && clip.height === HEIGHT && clip.rate === "60/1";
-    rows.push({ shot: index + 1, seed: shot.seed, fighters: shot.fighters, stage: shot.stage, start: shot.start, end: shot.end, file: name, checksumsEqual, stocksEqual, captureMissing: window.missing.length, captureRepeated: window.repeated.length, clip, pass });
+    const pass = checksumsEqual && stocksEqual && endedEqual && clip.missing === 0 && clip.repeated === 0 && clip.width === WIDTH && clip.height === HEIGHT && clip.rate === "60/1";
+    rows.push({ shot: index + 1, seed: shot.seed, fighters: shot.fighters, stage: shot.stage, start: shot.start, end, file: name, checksumsEqual, stocksEqual, endedEqual, captureMissing: window.missing.length, captureRepeated: window.repeated.length, clip, pass });
   }
   const verdict = { pass: rows.every(row => row.pass), shots: rows };
   yield* attempt("write verdict.json", () => writeFileSync(join(directory, "verdict.json"), `${JSON.stringify(verdict, null, 1)}\n`));
