@@ -241,6 +241,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `export-original-clips.ts --only FIGHTER` first.
   Store the family with `bun wisp inputs add original-clips-static-lights PRIVATE_POOL --all`.
 
+- Weapon grip (from the repository root): `bun tools/animations/grip-audit.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
+  counts, per Classic sequence, frames whose weapon sits more than 4 units from the hand it is
+  calibrated to in Stand Ready or crosses a body capsule, and records each row's worst grip-gap and
+  worst-clearance moments (#373). It measures one hand, so a two-handed weapon the other hand holds
+  reads as detached. From ts/, `bun scripts/gripStrips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT ASSETS`
+  renders those moments for every nonzero row in side, far-side and three-quarter Classic views,
+  which is how a row is accepted as a measurement artifact or found to be a real defect (#436).
+
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);
   pre-push runs it when the clip pool or its tools change. The 1.0-unit translation limit is

@@ -20,7 +20,7 @@ type Point = readonly [number, number, number];
 type NodeSample = { readonly matrix: Float32Array };
 type RendererSample = { frame: number; nodes: NodeSample[] };
 type RigJoint = 'pelvis' | 'chest' | 'head' | 'hip.L' | 'knee.L' | 'ankle.L' | 'hip.R' | 'knee.R' | 'ankle.R' | 'wrist.L' | 'wrist.R' | 'weapon' | 'weapon.L';
-type Row = { fighter: string; look: string; sequence: string; samples: number; detached: number | null; intersecting: number | null; maxGap: number | null; minClearance: number | null; unavailable: string };
+type Row = { fighter: string; look: string; sequence: string; samples: number; detached: number | null; intersecting: number | null; maxGap: number | null; minClearance: number | null; worstGapSeconds: number; worstClearanceSeconds: number; unavailable: string };
 type Capsule = { name: string; a: NonNullable<ReturnType<typeof nodeNamed>>; b: NonNullable<ReturnType<typeof nodeNamed>>; radius: number };
 
 function nodeNamed(model: ReturnType<typeof parseSource>, name: string) {
@@ -145,7 +145,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
     for (const { sequence, clip } of clips) {
       if (clip === undefined) throw new Error(`${fighter.name}/${look}/${sequence.Name}: sequence is not shipped`);
       const count = Math.ceil((clip.endSeconds - clip.startSeconds) * 60) + 1;
-      let detached = 0, intersecting = 0, maxGap = 0, minClearance = Infinity;
+      let detached = 0, intersecting = 0, maxGap = 0, minClearance = Infinity, worstGapSeconds = clip.startSeconds, worstClearanceSeconds = clip.startSeconds;
       for (let frame = 0; frame < count; frame++) {
         const time = Math.min(clip.endSeconds, clip.startSeconds + frame / 60);
         seek(time);
@@ -155,12 +155,12 @@ for (const [character, rig] of FIGHTER_RIGS) {
           if (Math.cbrt(Math.abs(mat4.determinant(matrix as mat4))) < 0.5) continue;
           const grip = mul(transform(weapon.grip, matrix), scale), tip = mul(transform(weapon.tip, matrix), scale), hand = nodePosition(model, data, weapon.hand, scale);
           const gap = distance(grip, hand);
-          maxGap = Math.max(maxGap, gap);
+          if (gap > maxGap) { maxGap = gap; worstGapSeconds = time; }
           frameDetached ||= gap > 4;
           const bladeStart = add(grip, mul(sub(tip, grip), 0.2));
           for (const capsule of capsules) {
             const clearance = segmentDistance(bladeStart, tip, nodePosition(model, data, capsule.a, scale), nodePosition(model, data, capsule.b, scale)) - capsule.radius;
-            minClearance = Math.min(minClearance, clearance);
+            if (clearance < minClearance) { minClearance = clearance; worstClearanceSeconds = time; }
             frameIntersecting ||= clearance < 0;
           }
         }
@@ -168,7 +168,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
         intersecting += Number(frameIntersecting);
       }
       const issue = weapons.length === weaponJoints.length ? '' : `${weapons.length}/${weaponJoints.length} props measured`;
-      rows.push({ fighter: fighter.name, look, sequence: sequence.Name, samples: count, detached: weapons.length === 0 ? null : detached, intersecting: weapons.length === 0 || capsules.length === 0 ? null : intersecting, maxGap: Number.isFinite(maxGap) ? maxGap : null, minClearance: Number.isFinite(minClearance) ? minClearance : null, unavailable: issue });
+      rows.push({ fighter: fighter.name, look, sequence: sequence.Name, samples: count, detached: weapons.length === 0 ? null : detached, intersecting: weapons.length === 0 || capsules.length === 0 ? null : intersecting, maxGap: Number.isFinite(maxGap) ? maxGap : null, minClearance: Number.isFinite(minClearance) ? minClearance : null, worstGapSeconds, worstClearanceSeconds, unavailable: issue });
     }
     console.log(`${fighter.name} ${look}: ${clips.length} sequences, ${weapons.length}/${weaponJoints.length} props, ${rows.filter(row => row.fighter === fighter.name && row.look === look).reduce((sum, row) => sum + row.samples, 0)} samples`);
   }
