@@ -1,4 +1,5 @@
 import { AttackStyle } from "../../src/game/sim/codes";
+import { MURLOC_MOVES } from "../../src/game/sim/heroes/murlocMoves";
 import { WARDEN_MOVES } from "../../src/game/sim/heroes/wardenMoves";
 import type { HitEffect } from "../../src/game/sim/hitRegions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
@@ -7,6 +8,9 @@ export const FOX_NEUTRAL_AIR = { damage: 12, base: 10, growth: 100, angle: "361"
 
 const FOX_NEUTRAL_AIR_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial";
 const WARDEN = "ts/src/game/sim/heroes/wardenMoves.ts";
+const MURLOC = "ts/src/game/sim/heroes/murlocMoves.ts";
+const SQUIRTLE_JAB = { undocumented: "Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units", source: "https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack" } as const;
+const SPEAR_POINT = { kind: "deviation", reason: "his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 497 } as const;
 const LOW_KNOCKBACK = { kind: "deviation", reason: "Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold", decided: "2026-10-26", issue: 305 } as const;
 
 export function maievNeutralAir(): HitEffect[] {
@@ -19,6 +23,12 @@ function only<T>(read: (effect: HitEffect) => T): T {
   const [value] = values;
   if (values.length !== 1 || value === undefined) throw new Error(`Maiev's neutral air hits disagree: ${values.join(", ")}`);
   return value;
+}
+
+function murlocReach(style: AttackStyle): number {
+  const region = MURLOC_MOVES.normals[style]?.regions[0];
+  if (region === undefined) throw new Error(`Murloc's attack style ${style} has no hit region`);
+  return region.hit.maxX;
 }
 
 const angle = (effect: HitEffect): string => (effect.sakurai === true ? FOX_NEUTRAL_AIR.angle : `${Math.round((Math.atan2(effect.launchZ, Math.abs(effect.launchX)) * 180) / Math.PI)}°`);
@@ -39,5 +49,15 @@ export const MOVE_ROWS: readonly LedgerRow[] = [
     melee: { value: `base ${FOX_NEUTRAL_AIR.base}, growth ${FOX_NEUTRAL_AIR.growth}`, source: FOX_NEUTRAL_AIR_PAGE },
     ours: () => only((effect) => `base ${shortNumber(effect.base)}, growth ${shortNumber(effect.growth)}`),
     anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: LOW_KNOCKBACK,
+  },
+  {
+    id: "murloc-jab-reach", family: "moves", name: "Murloc's jab 1 reach",
+    melee: SQUIRTLE_JAB, ours: () => murlocReach(AttackStyle.jab),
+    anchor: { file: MURLOC, symbol: "MURLOC_MOVES" }, status: SPEAR_POINT,
+  },
+  {
+    id: "murloc-jab2-reach", family: "moves", name: "Murloc's jab 2 reach",
+    melee: SQUIRTLE_JAB, ours: () => murlocReach(AttackStyle.jab2),
+    anchor: { file: MURLOC, symbol: "MURLOC_MOVES" }, status: SPEAR_POINT,
   },
 ];

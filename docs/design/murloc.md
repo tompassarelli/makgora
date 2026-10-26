@@ -52,7 +52,7 @@ and action.
 
 | Input | Gesture and role | Frames; damage; reach | Warcraft source | Smash reference |
 |---|---|---|---|---|
-| Jab 1 → 2 | Short point-first spear stab, then a second, longer stab | 3/2/11, 2% → 5/2/15, 4%; 48 → 54 | [Tiderunner claws][wc] | [Squirtle jab][sq] |
+| Jab 1 → 2 | Short point-first spear stab, then a second, longer stab | 3/2/11, 2% → 5/2/15, 4%; 70 → 78 | [Tiderunner claws][wc] | [Squirtle jab][sq] |
 | Forward tilt / angled | Stepping spear stab, shoulder and hips behind it (forward and down); upward claw swing; spacing poke | 6/3/19; 8%; 76 | [Tiderunner claws][wc] | [Squirtle forward tilt][sq] |
 | Up tilt | Overhead swipe; juggle starter | 5/4/18; 7%; height 102 | [Tiderunner claws][wc] | [Squirtle up tilt][sq] |
 | Down tilt | Floor claw; low launcher | 5/3/16; 6%; 70 | [Tiderunner claws][wc] | [Squirtle down tilt][sq] |

@@ -7,7 +7,7 @@ export const FAMILY_TITLES: Readonly<Record<Family, string>> = {
   defence: "Defence: techs, knockdown, getups, shield, grabs and throws",
   movement: "Movement, landing, ledges, platforms and the stick",
   attributes: "Fighter attributes",
-  moves: "Maiev's moves against Fox's",
+  moves: "Moves against Melee's",
 };
 
 export type Melee =

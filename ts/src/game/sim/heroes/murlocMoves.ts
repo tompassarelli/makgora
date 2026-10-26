@@ -36,8 +36,8 @@ export const MURLOC_MOVES: FighterMoves = {
     },
   },
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(3, 2, 11, 0, [heroRegion(3, 4, claw(16.0, 40.0, 40.0, 40.0, 8.0), ordinary(2.4977293014526367, 25, 45.10895538330078, 14.0))])),
-    [AttackStyle.jab2]: heroMove(5, 2, 15, 0, [heroRegion(5, 6, claw(18.0, 40.0, 46.0, 42.0), ordinary(4.995458602905273, 35))]),
+    [AttackStyle.jab]: jabStep(heroMove(3, 2, 11, 0, [heroRegion(3, 4, claw(16.0, 40.0, 62.0, 42.0, 8.0), ordinary(2.4977293014526367, 25, 45.10895538330078, 14.0))])),
+    [AttackStyle.jab2]: heroMove(5, 2, 15, 0, [heroRegion(5, 6, claw(18.0, 40.0, 68.0, 42.0), ordinary(4.995458602905273, 35))]),
     [AttackStyle.forwardTilt]: tilt(40.0, 35), [AttackStyle.forwardTiltUp]: tilt(64.0, 55), [AttackStyle.forwardTiltDown]: tilt(14.0, 25),
     [AttackStyle.upTilt]: heroMove(5, 4, 18, 0, [heroRegion(5, 8, claw(14.0, 50.0, 6.0, 90.0, 14.0), ordinary(8.742053031921387, 90, 81.19612121582031, 22.0))]),
     [AttackStyle.downTilt]: heroMove(5, 3, 16, 0, [heroRegion(5, 7, claw(18.0, 8.0, 60.0, 8.0), ordinary(7.493188381195068, 80, 81.19612121582031, 22.0))]),

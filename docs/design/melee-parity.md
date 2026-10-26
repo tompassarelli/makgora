@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-501 rows: 441 parity, 32 deviations, 28 open.
+503 rows: 441 parity, 34 deviations, 28 open.
 
 ## Deviations from Melee
 
@@ -94,6 +94,10 @@ deviation's reason, issue and decision date are written.
   - Ours: 6.106144; Melee: 12
 - Maiev's neutral air base knockback and growth `maiev-neutral-air-knockback`: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305)
   - Ours: base 28.5, growth 8; Melee: base 10, growth 100
+- Murloc's jab 1 reach `murloc-jab-reach`: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497)
+  - Ours: 70; Melee: not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units
+- Murloc's jab 2 reach `murloc-jab2-reach`: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497)
+  - Ours: 78; Melee: not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units
 
 ## Hits, knockback and hitstun
 
@@ -778,10 +782,12 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `anub'arak-walk` | 1.312 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `anub'arak-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-## Maiev's moves against Fox's
+## Moves against Melee's
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
 | Maiev's neutral air launch angle `maiev-neutral-air-angle` | 361 | [361](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:230](../../ts/src/game/sim/heroes/wardenMoves.ts#L230) `WARDEN_MOVES` | parity |
 | Maiev's neutral air damage `maiev-neutral-air-damage` | 6.106144 | [12](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:230](../../ts/src/game/sim/heroes/wardenMoves.ts#L230) `WARDEN_MOVES` | deviation: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305) |
 | Maiev's neutral air base knockback and growth `maiev-neutral-air-knockback` | base 28.5, growth 8 | [base 10, growth 100](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:230](../../ts/src/game/sim/heroes/wardenMoves.ts#L230) `WARDEN_MOVES` | deviation: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305) |
+| Murloc's jab 1 reach `murloc-jab-reach` | 70 | [not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units](https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack) | [murlocMoves.ts:22](../../ts/src/game/sim/heroes/murlocMoves.ts#L22) `MURLOC_MOVES` | deviation: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497) |
+| Murloc's jab 2 reach `murloc-jab2-reach` | 78 | [not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units](https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack) | [murlocMoves.ts:22](../../ts/src/game/sim/heroes/murlocMoves.ts#L22) `MURLOC_MOVES` | deviation: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497) |
