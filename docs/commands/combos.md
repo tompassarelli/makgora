@@ -54,5 +54,5 @@
   against itself at Fox's weight, each through the link table's measure with
   every ledger row that has a switch on Melee's handling, and fails when one
   comes out of its Melee class (true, DI-dependent, or no combo meaning read
-  or none) (smashcraft:docs/design/melee-parity-plan.md,
-  "Combo analyzer", #297).
+  or none), unless the case cites the open ledger row that explains the miss
+  (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #297).

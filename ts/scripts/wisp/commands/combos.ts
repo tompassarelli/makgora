@@ -359,8 +359,9 @@ const validate = (jobs: number) => Effect.gen(function* () {
     (cell, rows) => `${OPENERS[cell.opener]?.name} at ${cell.percent}%, ${rows.length} follow-ups`,
   ).pipe(step(`${cells.length} Fox cases on ${jobs} threads`));
   const results = FOX_CASES.map((kase, index) => judge(kase, found[index] ?? []));
-  const misses = results.filter((result) => !result.passed).length;
-  yield* Console.log([...results.map(caseLine), `${results.length - misses} of ${results.length} Fox cases come out in their Melee class with ${melee.join(", ")} on Melee's handling`].join("\n"));
+  const passes = results.filter((result) => result.passed).length;
+  const misses = results.filter((result) => !result.passed && result.explained === undefined).length;
+  yield* Console.log([...results.map(caseLine), `${passes} of ${results.length} Fox cases come out in their Melee class and ${results.length - passes - misses} miss as their ledger row explains, with ${melee.join(", ")} on Melee's handling`].join("\n"));
   if (misses > 0) return yield* new CombosFailure({ problem: `${misses} Fox cases missed their Melee class` });
 });
 

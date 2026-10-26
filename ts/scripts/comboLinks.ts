@@ -11,9 +11,10 @@ import { totalVelocityZ } from "../src/game/sim/motion";
 import { floorBelow } from "../src/game/sim/stage";
 import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { DEFAULT_POLICY, VICTIM_OPTIONS, type VictimOption } from "./agencyBranch";
+import { LINK_GROUND_MODES, PIVOT_MODES } from "./comboLinkModes";
 import { onShield } from "./comboLinkShield";
 import {
-  AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, DIS, type Defender, type Di, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, type Mode, type Move,
+  AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, DIS, type Defender, type Di, FINE_FRAMES, GATE_X, GATE_Z, type Mode, type Move,
   OPENERS, type Opener, type Saved, SPACINGS, STAND, Sim, defenderMask, free, openerRoot, owned, settled, setupFor, started, startedOf,
 } from "./comboExplorer";
 
@@ -235,6 +236,7 @@ interface Candidate {
   readonly loose: boolean;
   readonly attacker: readonly number[];
   readonly grab: boolean;
+  readonly pivot: boolean;
 }
 
 function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move: Move, window: number): Candidate | undefined {
@@ -250,7 +252,7 @@ function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move
   const grab = move.kind === "grab";
   const found = (n: number): Candidate => ({
     followUp: move === DASH_GRAB ? "grab" : move.name, input: `${mode.name}, ${move.name} pressed ${k} frames after the hit`,
-    k, contact: n, loose, attacker, grab,
+    k, contact: n, loose, attacker, grab, pivot: PIVOT_MODES.includes(mode),
   });
   for (let n = k; n <= window; n++) {
     const a = sim.a;
@@ -274,7 +276,7 @@ function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move
 function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle): Map<string, Candidate[]> {
   sim.load(from);
   const byFollowUp = new Map<string, Candidate[]>();
-  const modes = sim.a.motion.grounded || idle.grounded[idle.start] === true ? GROUND_MODES : AIR_MODES;
+  const modes = sim.a.motion.grounded || idle.grounded[idle.start] === true ? LINK_GROUND_MODES : AIR_MODES;
   for (const mode of modes) {
     sim.load(from);
     const earliest = mode.earliest(idle.start, sim.a);
@@ -378,6 +380,9 @@ interface CellLinks {
   readonly byFollowUp: ReadonlyMap<string, DiOutcome>;
 }
 
+const shortlist = (own: readonly Candidate[]): Candidate[] =>
+  [...own.filter((candidate) => !candidate.pivot).slice(0, CANDIDATES), ...own.filter((candidate) => candidate.pivot).slice(0, CANDIDATES)].sort((x, y) => x.contact - y.contact);
+
 function linkCell(sim: Sim, from: Saved, d: Defender): CellLinks | undefined {
   const idle = idleTrack(sim, from, d);
   if (idle === undefined) return undefined;
@@ -387,7 +392,7 @@ function linkCell(sim: Sim, from: Saved, d: Defender): CellLinks | undefined {
   const byFollowUp = new Map<string, DiOutcome>();
   for (const [followUp, own] of found) {
     let best: { readonly candidate: Candidate; readonly escapes: readonly string[] } | undefined;
-    for (const candidate of own.slice(0, CANDIDATES)) {
+    for (const candidate of shortlist(own)) {
       if (!landsAgainst(sim, from, d, candidate, undefined)) throw new Error(`${followUp} (${candidate.input}) lands in the search but not on replay`);
       const escapes = candidate.loose ? options.filter((option) => !landsAgainst(sim, from, d, candidate, option)).map((option) => option.id) : [];
       if (best === undefined || escapes.length < best.escapes.length) best = { candidate, escapes };

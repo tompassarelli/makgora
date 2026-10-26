@@ -154,7 +154,7 @@ export function foxFighter(fixture: FoxFixture): CheckFighter {
 export function foxFighterGaps(fixture: FoxFixture): string[] {
   const loaded = fixture.moves.filter((move) => NORMALS[move.id] !== undefined || THROWS[move.id] !== undefined || SPECIALS[move.id] !== undefined);
   return [
-    "hurtboxes: no file in the corpus gives Fox's, so the fighter stands in the sim's reference capsule",
+    "hurtboxes: no public source gives Fox's, so the fighter stands in the sim's reference capsule (ledger row fox-fixture-hurtbox)",
     "grab: Fox's frames, with the sim's shared grab box, since the grab path reads no authored region",
     "presentation: headless runs pose it with Maiev's clips, which never reach the sim",
     `not loaded: ${fixture.moves.filter((move) => !loaded.includes(move)).map((move) => move.id).join(", ")} (no specials but the reflector, no rapid jab)`,

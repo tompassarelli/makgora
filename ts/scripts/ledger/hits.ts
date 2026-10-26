@@ -8,10 +8,12 @@ import {
   SAKURAI_AIRBORNE_DEGREES, SAKURAI_GROUNDED_DEGREES, SAKURAI_HIGH_KNOCKBACK, SAKURAI_LOW_KNOCKBACK, SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG,
   damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
 } from "../../src/game/sim/knockback";
+import { REFERENCE_HURT_CAPSULE } from "../../src/game/sim/geometry/contactGeometry";
 import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
 import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "../../src/game/sim/moves";
 import { ASDI_TRAVEL, HIT_TRAVEL, SDI_PULSE_TRAVEL, SDI_STEP_TRAVEL, STRING_TRAVEL } from "../../src/game/sim/smashDirectionalInfluence";
 import { WEAK_HIT_DAMAGE_SCALE, WEAK_HIT_KNOCKBACK_SCALE } from "../../src/game/sim/strongHits";
+import { WORLD_UNITS_PER_MELEE_UNIT } from "../../src/game/sim/tuning";
 import { FIGHTCORE_URL } from "../../../references/melee-frame-data/fightcore";
 import { MELEE_PERCENT_LIMIT, compareThresholds } from "../meleeThresholds";
 import { type LedgerRow, PARITY, probe, range, shortNumber } from "./row";
@@ -298,5 +300,16 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     melee: { value: 999, source: wiki("Damage") }, ours: () => "none",
     anchor: { file: "ts/src/game/sim/contacts.ts", symbol: "resolveDamageContacts" },
     status: { kind: "open", reason: "missing: percent grows without a ceiling", issue: 293 },
+  },
+  {
+    id: "fox-fixture-hurtbox", family: "hits", name: "Fox fixture hurtbox: no public source",
+    melee: { undocumented: "SmashWiki's Hurtbox and Fox (SSBM) pages give no hurtbox sizes or positions, and neither fightcore.csv nor libmelee.jsonl records hurtboxes", source: wiki("Hurtbox") },
+    ours: () => {
+      const { z1, z2, radius } = REFERENCE_HURT_CAPSULE;
+      const units = (world: number): string => (world / WORLD_UNITS_PER_MELEE_UNIT).toFixed(2);
+      return `the reference capsule, from ${units(Math.min(z1, z2) - radius)} to ${units(Math.max(z1, z2) + radius)} Melee units from the feet`;
+    },
+    anchor: { file: "ts/src/game/sim/geometry/contactGeometry.ts", symbol: "REFERENCE_HURT_CAPSULE" },
+    status: { kind: "open", reason: "the capsule reaches below the feet, so a grab touches a rising victim whose feet are already above Fox's grab box", issue: 293 },
   },
 ];

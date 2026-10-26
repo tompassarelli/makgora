@@ -1,4 +1,6 @@
 import type { LinkClass, LinkRow, Region } from "./comboLinks";
+import { LEDGER_ROWS } from "./ledger/ledger";
+import type { LedgerRow } from "./ledger/row";
 
 export const FOX_FIXTURE = "fixture:fox";
 
@@ -12,11 +14,13 @@ export interface ComboCase {
   readonly expected: Expected;
   readonly source: string;
   readonly says: string;
+  readonly explainedBy?: string;
 }
 
 const wiki = (page: string): string => `https://www.ssbwiki.com/${page}`;
 const UP_THROW = wiki("Fox_(SSBM)/Up_throw");
 const DOWN_AIR = wiki("Fox_(SSBM)/Down_aerial");
+const HURTBOX = "fox-fixture-hurtbox";
 
 export const FOX_CASES: readonly ComboCase[] = [
   { opener: "down air", region: "clean", percent: 0, followUp: "grab", expected: "true", source: DOWN_AIR, says: "the drill, timed from the second airborne frame, true combos into grab" },
@@ -26,8 +30,8 @@ export const FOX_CASES: readonly ComboCase[] = [
   { opener: "up throw", region: "clean", percent: 30, followUp: "grab", expected: "true", source: UP_THROW, says: "against Fox, up throw chains into itself regardless of DI from 0 to 54% at the higher port and to 66% at the lower" },
   { opener: "up throw", region: "clean", percent: 30, followUp: "up tilt", expected: "DI-dependent", source: UP_THROW, says: "at about 20-40% an up throw that is not DI'd is followed by up tilt, and the combo works as long as the victim does not DI" },
   { opener: "up throw", region: "clean", percent: 80, followUp: "up smash", expected: "DI-dependent", source: UP_THROW, says: "at higher percents up throw combos into up smash when the victim DIs in, and without DI up to 102%; other DI escapes" },
-  { opener: "up throw", region: "clean", percent: 90, followUp: "grab", expected: "non-combo", source: UP_THROW, says: "the chain grab on Fox ends at 66% regardless of DI and at 86% at best, so a regrab at 90% is no combo" },
-  { opener: "down throw", region: "clean", percent: 30, followUp: "grab", expected: "non-combo", source: wiki("Fox_(SSBM)/Down_throw"), says: "against most of the cast down throw leads to a tech chase that must read the tech option, not react to it" },
+  { opener: "up throw", region: "clean", percent: 90, followUp: "grab", expected: "non-combo", source: UP_THROW, says: "the chain grab on Fox ends at 66% regardless of DI and at 86% at best, so a regrab at 90% is no combo", explainedBy: HURTBOX },
+  { opener: "down throw", region: "clean", percent: 30, followUp: "grab", expected: "non-combo", source: wiki("Fox_(SSBM)/Down_throw"), says: "against most of the cast down throw leads to a tech chase that must read the tech option, not react to it", explainedBy: HURTBOX },
   { opener: "down special", region: "clean", percent: 0, followUp: "neutral air", expected: "non-combo", source: wiki("Fox_(SSBM)/Down_special"), says: "a shine on a grounded Fox puts him in tumble and he can tech, escaping the punish" },
 ];
 
@@ -38,15 +42,20 @@ export interface CaseResult {
   readonly kase: ComboCase;
   readonly row: LinkRow | undefined;
   readonly passed: boolean;
+  readonly explained: LedgerRow | undefined;
 }
 
 export function judge(kase: ComboCase, rows: readonly LinkRow[]): CaseResult {
   const row = rows.find((own) => own.followUp === kase.followUp);
-  return { kase, row, passed: row !== undefined && meets(kase.expected, row.class) };
+  const passed = row !== undefined && meets(kase.expected, row.class);
+  const ledger = kase.explainedBy === undefined ? undefined : LEDGER_ROWS.find((own) => own.id === kase.explainedBy);
+  if (kase.explainedBy !== undefined && ledger?.status.kind !== "open") throw new Error(`${kase.opener} at ${kase.percent}% cites ${kase.explainedBy}, which is no open ledger row`);
+  return { kase, row, passed, explained: passed ? undefined : ledger };
 }
 
 export function caseLine(result: CaseResult): string {
   const { kase, row } = result;
   const measured = row === undefined ? `no setup lands the ${kase.region} ${kase.opener}` : `${row.class}${row.diEscapes.length > 0 ? `, DI ${row.diEscapes.join("/")} escapes` : ""}${row.optionEscapes.length > 0 ? `, ${row.optionEscapes.join("/")} escapes` : ""}`;
-  return `${result.passed ? "pass" : "MISS"} ${kase.opener} (${kase.region}) at ${kase.percent}% into ${kase.followUp}: expected ${kase.expected}, measured ${measured} (${kase.source})`;
+  const verdict = result.passed ? "pass" : result.explained === undefined ? "MISS" : `explained by ledger row ${result.explained.id} (${result.explained.name}):`;
+  return `${verdict} ${kase.opener} (${kase.region}) at ${kase.percent}% into ${kase.followUp}: expected ${kase.expected}, measured ${measured} (${kase.source})`;
 }

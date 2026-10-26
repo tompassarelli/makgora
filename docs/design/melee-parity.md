@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-495 rows: 439 parity, 26 deviations, 30 open.
+496 rows: 439 parity, 26 deviations, 31 open.
 
 ## Deviations from Melee
 
@@ -122,6 +122,7 @@ deviation's reason, issue and decision date are written.
 | Clank and priority `clank` | strikes trade; only grabs clash | [ground attacks within 9% clank; aerials do not clank](https://www.ssbwiki.com/Priority) | [attacks.ts:217](../../ts/src/game/sim/attacks.ts#L217) `resolveAttacks` | deviation: simultaneous strikes resolve symmetrically as trades, with no unseen priority system (docs/gameplay-design.md, Same-frame strikes and clanking) (Tom 2026-10-06) |
 | Strong and weak hits `weak-hit-ratio` | weak hit 0.7× damage, 0.85× growth and base | [authored per hitbox](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [strongHits.ts:4](../../ts/src/game/sim/strongHits.ts#L4) `WEAK_HIT_DAMAGE_SCALE` | open: ours: one global ratio instead of per-hitbox values (#293) |
 | Percent cap `percent-cap` | none | [999](https://www.ssbwiki.com/Damage) | [contacts.ts:236](../../ts/src/game/sim/contacts.ts#L236) `resolveDamageContacts` | open: missing: percent grows without a ceiling (#293) |
+| Fox fixture hurtbox: no public source `fox-fixture-hurtbox` | the reference capsule, from -3.33 to 18.67 Melee units from the feet | [not documented: SmashWiki's Hurtbox and Fox (SSBM) pages give no hurtbox sizes or positions, and neither fightcore.csv nor libmelee.jsonl records hurtboxes](https://www.ssbwiki.com/Hurtbox) | [contactGeometry.ts:226](../../ts/src/game/sim/geometry/contactGeometry.ts#L226) `REFERENCE_HURT_CAPSULE` | open: the capsule reaches below the feet, so a grab touches a rising victim whose feet are already above Fox's grab box (#293) |
 
 ### Oracle checks
 

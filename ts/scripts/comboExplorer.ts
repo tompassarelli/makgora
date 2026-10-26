@@ -963,8 +963,8 @@ export function exploreFrom(setup: ComboSetup, state: ReplayState): Ending {
   return best;
 }
 
-export { Explorer, Sim, openerRoot, toward, expand, settled, defenderMask, landingSetup, better, owned, diMask, free, startedOf, started, setupFor };
-export { AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, SPACINGS, STAND };
+export { Explorer, Sim, openerRoot, toward, away, expand, settled, defenderMask, landingSetup, better, owned, diMask, free, startedOf, started, setupFor };
+export { AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, GRAB_MOVE, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, SPACINGS, STAND };
 export type { Defender, Mode, Move, Opener, Saved };
 export const fighterNamed = (name: string): Character | undefined =>
   [...SELECTABLE_CHARACTERS, ...FIXTURE_FIGHTERS].find((character) => fighterName(character).toLowerCase() === name.toLowerCase() || fighterName(character).split(" ")[0]?.toLowerCase() === name.toLowerCase());
