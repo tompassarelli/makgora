@@ -23,7 +23,7 @@ import { min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
-import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
+import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkCue, parkOnce, placeEffect } from "./effects";
 import { beamSegment, runningHeroSpecial } from "../sim/specials/engine";
 import { emptyCapsule } from "../sim/geometry/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
@@ -146,10 +146,14 @@ export class SpecialEffects {
     parkOnce(model, this.origin, (this.parked ??= []), SLOT_EFFECTS * slot + effect);
   }
 
+  private parkMark(model: effect, slot: number, effect: number): void {
+    parkCue(model, this.origin, (this.parked ??= []), SLOT_EFFECTS * slot + effect);
+  }
+
   private parkEyeBlast(slot: SpecialSlot, index: number): void {
     for (let mark = 0; mark < EYE_BLAST_MARKS; mark++) {
       const model = slot.eyeBlast[mark];
-      if (model !== undefined) this.park(model, index, EYE_BLAST + mark);
+      if (model !== undefined) this.parkMark(model, index, EYE_BLAST + mark);
     }
   }
 
@@ -159,13 +163,14 @@ export class SpecialEffects {
       if (model === undefined) continue;
       const pose = eyeBlastMark(fighter, mark);
       if (pose === undefined) {
-        this.park(model, index, EYE_BLAST + mark);
+        this.parkMark(model, index, EYE_BLAST + mark);
         continue;
       }
       this.placed(index, EYE_BLAST + mark);
       placeEffect(model, this.origin.x + pose.x, this.front, this.origin.z + pose.z);
       BlzSetSpecialEffectScale(model, pose.scale);
       BlzSetSpecialEffectAlpha(model, pose.alpha);
+      BlzSetSpecialEffectTimeScale(model, 1.0);
     }
   }
 
@@ -239,7 +244,7 @@ export class SpecialEffects {
 
       const striking = immolating && frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE;
       this.presentImmolationSound(fighter, slot, entered && immolating, slot.previousSpecial === SpecialAction.demonHunterImmolate && !immolating);
-      if (immolating) this.show(felFlames, index, FEL_FLAMES, fighter, 0.0, 25.0, striking ? f32(2.0) : f32(1.35));
+      if (immolating) this.show(felFlames, index, FEL_FLAMES, fighter, 0.0, 25.0, striking ? f32(1.8) : f32(1.35));
       else this.park(felFlames, index, FEL_FLAMES);
       if (action === SpecialAction.demonHunterManaBurn && fighter.special.form !== EYE_BLAST_FORM && frame <= DEMONHUNTER_MANA_BURN_STARTUP) this.show(manaHand, index, MANA_HAND, fighter, fighter.facing * 45.0, 90.0, 0.75);
       else this.showStun(fighter, index, manaHand);

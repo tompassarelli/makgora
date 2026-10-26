@@ -28,7 +28,7 @@ export function eyeBlastMark(fighter: Readonly<Fighter>, mark: number): Readonly
   pose.x = f32(fighter.motion.x + f32(fighter.facing * ahead));
   pose.z = f32(fighter.motion.z + MARK_HEIGHT);
   const grown = f32(f32(min(frame, EYE_BLAST_WINDUP)) / EYE_BLAST_WINDUP);
-  pose.scale = lit ? 1.0 : f32(f32(0.2) + f32(f32(0.15) * grown));
+  pose.scale = lit ? f32(0.6) : f32(f32(0.2) + f32(f32(0.15) * grown));
   pose.alpha = lit ? 255 : 120 + toInt(f32(100.0 * grown));
   return pose;
 }

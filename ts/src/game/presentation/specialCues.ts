@@ -477,7 +477,7 @@ export const EYE_BLAST_EYES: Cue = { model: "Abilities\\Weapons\\IllidanMissile\
 
 export const ORIGINAL_BRANCH_CUES: { readonly [action: number]: { readonly [form: number]: OriginalBranch } } = {
   [SpecialAction.demonHunterManaBurn]: {
-    [EYE_BLAST_FORM]: { cues: branch("Eye Blast", EYE_BLAST_EYES, timed(cue("Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx", "breath", f32(1.5)), "birth", 0.0)), first: EYE_BLAST_FIRST, last: EYE_BLAST_LAST },
+    [EYE_BLAST_FORM]: { cues: branch("Eye Blast", EYE_BLAST_EYES, timed(cue("Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx", "breath", f32(0.9)), "birth", 0.0)), first: EYE_BLAST_FIRST, last: EYE_BLAST_LAST },
   },
   [SpecialAction.demonHunterFelRush]: {
 
