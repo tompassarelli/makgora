@@ -847,103 +847,10 @@ No setup lands a hit with up special, so it has no rows.
 
 | Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | +9 | +11 | +12 | -6 | -6 | -5 | -5 | -4 | -4 | -3 | -3 | -2 | -2 | -1 | -1 | 0 |
-| frame advantage | 75 | +9 | +10 | +12 | -7 | -6 | -6 | -5 | -5 | -4 | -4 | -3 | -3 | -2 | -2 | -2 | -1 |
-| frame advantage | 100 | +9 | +10 | +11 | +12 | -6 | -6 | -6 | -5 | -5 | -4 | -4 | -4 | -3 | -3 | -2 | -2 |
-| frame advantage | 143 | +9 | +10 | +11 | +12 | +12 | -6 | -6 | -6 | -5 | -5 | -5 | -4 | -4 | -4 | -3 | -3 |
-| launch angle | 60 | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° |
-| launch angle | 75 | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° |
-| launch angle | 100 | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° |
-| launch angle | 143 | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° | 35° |
-| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| forward throw into jab | 60 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into jab | 75 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into jab | 100 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into jab | 143 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward tilt | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward tilt | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward tilt | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward tilt | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up tilt | 60 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up tilt | 75 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up tilt | 100 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up tilt | 143 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down tilt | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down tilt | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down tilt | 100 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down tilt | 143 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward smash | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward smash | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward smash | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward smash | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down smash | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down smash | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down smash | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down smash | 143 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into grab | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into grab | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into grab | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into grab | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into dash attack | 60 | T | T | T | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| forward throw into dash attack | 75 | T | T | T | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| forward throw into dash attack | 100 | T | T | T | T | R | R | R | R | R | R | R | R | R | R | R | R |
-| forward throw into dash attack | 143 | T | T | T | T | T | R | R | R | R | R | R | R | R | R | R | R |
-| forward throw into neutral air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into forward air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into back air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into back air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into back air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into back air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral special | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into neutral special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into side special | 60 | R | T | T | · | · | R | · | · | · | · | · | · | · | · | · | · |
-| forward throw into side special | 75 | R | R | T | · | · | R | · | · | · | · | · | · | · | · | · | · |
-| forward throw into side special | 100 | R | R | R | T | · | · | R | · | · | · | · | · | · | · | · | · |
-| forward throw into side special | 143 | R | R | T | T | R | · | · | R | R | · | · | · | · | · | · | · |
-| forward throw into up special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down special | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward throw into down special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-
-## back throw (clean)
-
-| Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | +7 | +8 | +9 | -8 | -8 | -7 | -7 | -7 | -6 | -6 | -5 | -5 | -4 | -4 | -4 | -3 |
-| frame advantage | 75 | +7 | +8 | +9 | +9 | -8 | -8 | -7 | -7 | -6 | -6 | -6 | -5 | -5 | -5 | -4 | -4 |
-| frame advantage | 100 | +7 | +8 | +8 | +9 | -8 | -8 | -8 | -7 | -7 | -7 | -6 | -6 | -6 | -5 | -5 | -5 |
-| frame advantage | 143 | +7 | +7 | +8 | +9 | +9 | -8 | -8 | -8 | -7 | -7 | -7 | -7 | -6 | -6 | -6 | -5 |
+| frame advantage | 60 | -9 | -8 | -8 | -7 | -6 | -5 | -4 | -3 | -2 | -1 | +1 | +2 | +4 | +5 | +7 | +9 |
+| frame advantage | 75 | -9 | -8 | -8 | -7 | -6 | -5 | -5 | -4 | -3 | -2 | 0 | +1 | +2 | +3 | +5 | +7 |
+| frame advantage | 100 | -9 | -9 | -8 | -7 | -7 | -6 | -5 | -5 | -4 | -3 | -2 | -1 | 0 | +1 | +2 | +4 |
+| frame advantage | 143 | -9 | -9 | -8 | -8 | -7 | -7 | -6 | -5 | -5 | -4 | -4 | -3 | -2 | -1 | -1 | 0 |
 | launch angle | 60 | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° |
 | launch angle | 75 | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° |
 | launch angle | 100 | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° | 40° |
@@ -956,14 +863,107 @@ No setup lands a hit with up special, so it has no rows.
 | on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| forward throw into jab | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into jab | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into jab | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into jab | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into grab | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into grab | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into grab | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into grab | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into dash attack | 60 | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · |
+| forward throw into dash attack | 75 | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · |
+| forward throw into dash attack | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | · | · | · |
+| forward throw into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| forward throw into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into forward air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into back air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into back air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into back air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into back air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into neutral special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into side special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into side special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into side special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into side special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward throw into down special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+
+## back throw (clean)
+
+| Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| frame advantage | 60 | -8 | -7 | -6 | -5 | -5 | -4 | -3 | -1 | 0 | +1 | +2 | +4 | +5 | +7 | +9 | +11 |
+| frame advantage | 75 | -8 | -7 | -6 | -6 | -5 | -4 | -3 | -2 | -1 | 0 | +1 | +2 | +4 | +5 | +7 | +8 |
+| frame advantage | 100 | -8 | -7 | -7 | -6 | -5 | -5 | -4 | -3 | -2 | -1 | 0 | +1 | +2 | +3 | +4 | +5 |
+| frame advantage | 143 | -8 | -7 | -7 | -6 | -6 | -5 | -5 | -4 | -3 | -3 | -2 | -1 | -1 | 0 | +1 | +2 |
+| launch angle | 60 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 75 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 100 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 143 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | back throw into jab | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into jab | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into jab | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into jab | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward tilt | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward tilt | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward tilt | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward tilt | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -972,71 +972,71 @@ No setup lands a hit with up special, so it has no rows.
 | back throw into down tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into down tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into down tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward smash | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward smash | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward smash | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward smash | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down smash | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down smash | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down smash | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down smash | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into grab | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into grab | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into grab | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into grab | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into dash attack | 60 | T | T | T | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| back throw into dash attack | 75 | T | T | T | T | R | R | R | R | R | R | R | R | R | R | R | R |
-| back throw into dash attack | 100 | T | T | T | T | R | R | R | R | R | R | R | R | R | R | R | R |
-| back throw into dash attack | 143 | T | T | T | T | T | R | R | R | R | R | R | R | R | R | R | R |
-| back throw into neutral air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into forward air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into back air | 60 | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into back air | 75 | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into back air | 100 | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into back air | 143 | · | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into up air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into up air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into up air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into up air | 143 | R | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral special | 60 | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral special | 75 | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral special | 100 | · | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral special | 143 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into side special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into side special | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into side special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into side special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into grab | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into grab | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into grab | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into grab | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into dash attack | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | · | · | · |
+| back throw into dash attack | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | · |
+| back throw into dash attack | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| back throw into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| back throw into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into forward air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into back air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into back air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into back air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into back air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into up air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into side special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into side special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into side special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into side special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down special | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into down special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into down special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 
 ## up throw (clean)
 
 | Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | +14 | +15 | +16 | +17 | +18 | +19 | +20 | +21 | +17 | +18 | +20 | +21 | +22 | +24 | +25 | +27 |
-| frame advantage | 75 | +14 | +15 | +16 | +17 | +17 | +18 | +19 | +20 | +16 | +17 | +18 | +20 | +21 | +22 | +24 | +25 |
-| frame advantage | 100 | +14 | +15 | +16 | +16 | +17 | +18 | +19 | +19 | +20 | +21 | +17 | +18 | +19 | +20 | +21 | +22 |
-| frame advantage | 143 | +14 | +15 | +15 | +16 | +16 | +17 | +18 | +18 | +19 | +20 | +21 | +21 | +17 | +18 | +18 | +19 |
+| frame advantage | 60 | +20 | +22 | +25 | +27 | +30 | +32 | +35 | +38 | +39 | +41 | +43 | +45 | +46 | +48 | +50 | +52 |
+| frame advantage | 75 | +20 | +22 | +24 | +26 | +29 | +31 | +34 | +36 | +38 | +40 | +41 | +43 | +45 | +46 | +48 | +49 |
+| frame advantage | 100 | +20 | +22 | +23 | +25 | +27 | +29 | +31 | +34 | +36 | +38 | +39 | +41 | +42 | +43 | +45 | +46 |
+| frame advantage | 143 | +20 | +21 | +23 | +24 | +26 | +27 | +29 | +31 | +33 | +35 | +37 | +38 | +39 | +40 | +41 | +42 |
 | launch angle | 60 | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° |
 | launch angle | 75 | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° |
 | launch angle | 100 | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° | 85° |
@@ -1049,91 +1049,91 @@ No setup lands a hit with up special, so it has no rows.
 | on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| up throw into jab | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into jab | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into jab | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into jab | 143 | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into forward tilt | 60 | T | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI |
-| up throw into forward tilt | 75 | T | T | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI |
-| up throw into forward tilt | 100 | T | T | T | T | T | T | T | T | T | T | T | T | DI | DI | DI | DI |
-| up throw into forward tilt | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | DI | DI |
-| up throw into up tilt | 60 | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up tilt | 75 | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up tilt | 100 | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up tilt | 143 | T | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down tilt | 60 | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down tilt | 75 | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down tilt | 100 | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down tilt | 143 | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into forward smash | 60 | R | R | T | T | T | T | T | T | T | T | R | R | DI | DI | DI | DI |
-| up throw into forward smash | 75 | R | R | T | T | T | T | T | T | T | T | T | R | R | DI | DI | DI |
-| up throw into forward smash | 100 | R | R | T | T | T | T | T | T | T | T | T | T | R | R | R | DI |
-| up throw into forward smash | 143 | R | R | R | T | T | T | T | T | T | T | T | T | T | T | T | R |
-| up throw into up smash | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up smash | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up smash | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up smash | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down smash | 60 | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down smash | 75 | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down smash | 100 | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down smash | 143 | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into grab | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up throw into grab | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| up throw into jab | 60 | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · | · |
+| up throw into jab | 75 | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · | · |
+| up throw into jab | 100 | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · |
+| up throw into jab | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · |
+| up throw into forward tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · |
+| up throw into forward tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R |
+| up throw into forward tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R |
+| up throw into forward tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into up tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | · | · | · | · | · |
+| up throw into up tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | · | · | · | · |
+| up throw into up tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | · | · |
+| up throw into up tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R |
+| up throw into down tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · | · | · | · |
+| up throw into down tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · | · | · |
+| up throw into down tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | R | · |
+| up throw into down tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R |
+| up throw into forward smash | 60 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | R |
+| up throw into forward smash | 75 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R |
+| up throw into forward smash | 100 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R |
+| up throw into forward smash | 143 | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into up smash | 60 | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · | · | · |
+| up throw into up smash | 75 | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · | · |
+| up throw into up smash | 100 | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · |
+| up throw into up smash | 143 | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · |
+| up throw into down smash | 60 | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · | · | · | · |
+| up throw into down smash | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | · | · | · |
+| up throw into down smash | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | R | · |
+| up throw into down smash | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R |
+| up throw into grab | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | · | · | · |
+| up throw into grab | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | · | · | · |
 | up throw into grab | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up throw into grab | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up throw into dash attack | 60 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into dash attack | 75 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into dash attack | 100 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into dash attack | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | R |
-| up throw into neutral air | 60 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into neutral air | 75 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into neutral air | 100 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into neutral air | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into forward air | 60 | T | T | R | R | R | T | R | R | R | R | R | T | T | T | T | T |
-| up throw into forward air | 75 | T | T | R | R | R | T | R | R | R | R | R | R | T | T | T | T |
-| up throw into forward air | 100 | T | T | R | R | R | R | T | R | R | T | R | R | R | T | T | T |
-| up throw into forward air | 143 | T | T | T | R | R | R | R | T | R | R | R | T | R | R | R | R |
-| up throw into back air | 60 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into back air | 75 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into back air | 100 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into back air | 143 | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into up air | 60 | R | DI | DI | DI | DI | DI | DI | DI | R | R | R | DI | DI | DI | DI | DI |
-| up throw into up air | 75 | R | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | DI | DI | DI | DI |
-| up throw into up air | 100 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | DI | DI |
-| up throw into up air | 143 | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R |
-| up throw into down air | 60 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into down air | 75 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into down air | 100 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into down air | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into neutral special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up throw into neutral special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up throw into neutral special | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up throw into neutral special | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up throw into side special | 60 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into side special | 75 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into dash attack | 60 | T | T | T | T | T | T | DI | DI | DI | R | R | R | R | R | R | · |
+| up throw into dash attack | 75 | T | T | T | T | T | T | DI | DI | DI | R | R | R | R | R | R | R |
+| up throw into dash attack | 100 | T | T | T | T | T | T | T | DI | DI | DI | DI | R | R | R | R | R |
+| up throw into dash attack | 143 | T | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | R | R |
+| up throw into neutral air | 60 | T | T | T | T | T | R | R | T | T | T | T | T | T | T | DI | DI |
+| up throw into neutral air | 75 | T | T | T | T | T | T | R | R | T | T | T | T | T | T | T | DI |
+| up throw into neutral air | 100 | T | T | T | T | T | T | T | R | R | T | T | T | T | T | T | T |
+| up throw into neutral air | 143 | T | T | T | T | T | T | T | T | R | R | R | T | T | T | T | T |
+| up throw into forward air | 60 | T | T | T | T | T | DI | DI | R | R | R | R | DI | DI | DI | DI | DI |
+| up throw into forward air | 75 | T | T | T | T | T | T | DI | R | R | R | R | R | DI | DI | DI | DI |
+| up throw into forward air | 100 | T | T | T | T | T | T | T | DI | R | R | R | R | R | DI | DI | DI |
+| up throw into forward air | 143 | T | T | T | T | T | T | T | T | DI | DI | R | R | R | R | R | R |
+| up throw into back air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into back air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into back air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into back air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into up air | 60 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into up air | 75 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into up air | 100 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into up air | 143 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down air | 60 | T | T | T | T | DI | R | DI | R | R | R | R | DI | DI | DI | DI | DI |
+| up throw into down air | 75 | T | T | T | T | DI | DI | R | DI | R | R | R | R | DI | DI | DI | DI |
+| up throw into down air | 100 | T | T | T | T | T | DI | DI | R | DI | R | R | R | R | R | DI | DI |
+| up throw into down air | 143 | T | T | T | T | T | T | DI | DI | R | DI | DI | R | R | R | R | R |
+| up throw into neutral special | 60 | R | R | R | R | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into neutral special | 75 | R | R | R | R | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into neutral special | 100 | R | R | R | R | R | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into neutral special | 143 | R | R | R | R | R | R | T | T | T | T | T | T | T | T | T | T |
+| up throw into side special | 60 | T | T | T | T | T | T | T | T | T | T | T | T | R | R | R | R |
+| up throw into side special | 75 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | R | R |
 | up throw into side special | 100 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
 | up throw into side special | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
 | up throw into up special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up throw into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up throw into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up throw into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| up throw into down special | 60 | T | T | T | T | T | T | T | T | R | R | R | R | R | R | DI | DI |
-| up throw into down special | 75 | T | T | T | T | T | T | T | T | T | R | R | R | R | R | R | R |
-| up throw into down special | 100 | T | T | T | T | T | T | T | T | T | T | T | R | R | R | R | R |
-| up throw into down special | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | R | R | R |
+| up throw into down special | 60 | R | R | R | DI | DI | DI | DI | DI | R | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down special | 75 | R | R | R | DI | DI | DI | DI | DI | DI | R | DI | DI | DI | DI | DI | DI |
+| up throw into down special | 100 | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | DI | DI | DI | DI | DI |
+| up throw into down special | 143 | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 
 ## down throw (clean)
 
 | Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | -8 | -8 | -7 | -7 | -7 | -7 | -7 | -6 | -6 | -6 | -6 | -6 | -5 | -5 | -5 | -5 |
-| frame advantage | 75 | -8 | -8 | -7 | -7 | -7 | -7 | -7 | -7 | -6 | -6 | -6 | -6 | -6 | -5 | -5 | -5 |
-| frame advantage | 100 | -8 | -8 | -8 | -7 | -7 | -7 | -7 | -7 | -7 | -6 | -6 | -6 | -6 | -6 | -6 | -5 |
-| frame advantage | 143 | -8 | -8 | -8 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -6 | -6 | -6 | -6 | -6 |
-| launch angle | 60 | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° |
-| launch angle | 75 | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° |
-| launch angle | 100 | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° |
-| launch angle | 143 | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° | 25° |
+| frame advantage | 60 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 |
+| frame advantage | 75 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 |
+| frame advantage | 100 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 |
+| frame advantage | 143 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 | -7 |
+| launch angle | 60 | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° |
+| launch angle | 75 | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° |
+| launch angle | 100 | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° |
+| launch angle | 143 | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° | 70° |
 | KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
@@ -1142,22 +1142,22 @@ No setup lands a hit with up special, so it has no rows.
 | on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| down throw into jab | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into jab | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into jab | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into jab | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into forward tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into forward tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into forward tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into forward tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into up tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into up tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into up tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into up tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down throw into jab | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into jab | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into jab | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into jab | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into forward tilt | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into forward tilt | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into forward tilt | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into forward tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into up tilt | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into up tilt | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into up tilt | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into up tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down tilt | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down tilt | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down tilt | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into forward smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into forward smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into forward smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1170,14 +1170,14 @@ No setup lands a hit with up special, so it has no rows.
 | down throw into down smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into down smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into down smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into grab | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into grab | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into grab | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into grab | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into dash attack | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into dash attack | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into dash attack | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into dash attack | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down throw into grab | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into grab | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into grab | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into grab | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into dash attack | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into dash attack | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into dash attack | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1202,18 +1202,18 @@ No setup lands a hit with up special, so it has no rows.
 | down throw into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into neutral special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into side special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into side special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into side special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into side special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down throw into side special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into side special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into side special | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into side special | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into up special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down throw into down special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down special | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down special | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 
 ## neutral air (clean)
 

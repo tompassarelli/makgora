@@ -147,7 +147,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       { first: 11, last: 13, strikes: [[blade(0.0, 48.0, 0.0, f32(M - BLADE_RADIUS), 10.0), wardenHit(3.8163399696350098, "LAUNCH", 85, 1.0, HitElement.normal)]] },
     ])),
     [AttackStyle.downAir]: FALLING_KNIVES,
-    [AttackStyle.grab]: heroMove(6, 2, 22, 0, [heroRegion(6, 7,
+    [AttackStyle.grab]: heroMove(6, 2, 23, 0, [heroRegion(6, 7,
       blade(16.0, 45.0, f32(GRAB - 10.0), 45.0, 10.0), GRAB_EFFECT)]),
 };
 
@@ -232,9 +232,9 @@ export const WARDEN_MOVES: FighterMoves = {
   hurtboxes: wardenHurtboxes(),
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } },
-    [GrabAction.throwForward]: throwMove(10, 18, { ...wardenHit(4.579607963562012, "EDGE", 35), growth: 56.0, base: 61.0 }),
-    [GrabAction.throwBack]: throwMove(14, 21, { ...wardenHit(5.3428754806518555, "EDGE", 40, -1.0), growth: 36.0, base: 66.0 }),
-    [GrabAction.throwUp]: throwMove(11, 9, wardenHit(3.8163399696350098, "JUGGLE", 85)),
-    [GrabAction.throwDown]: throwMove(14, 20, { ...wardenHit(3.053071975708008, "CHASE", 25), growth: 35.0, base: 104.0 }),
+    [GrabAction.throwForward]: throwMove(10, 23, { ...wardenHit(4.0, "EDGE", 40), growth: 80.0, base: 70.0 }),
+    [GrabAction.throwBack]: throwMove(15, 23, { ...wardenHit(4.0, "EDGE", 45, -1.0), growth: 70.0, base: 72.0 }),
+    [GrabAction.throwUp]: throwMove(11, 9, { ...wardenHit(3.8163399696350098, "JUGGLE", 85), growth: 100.0, base: 70.0 }),
+    [GrabAction.throwDown]: throwMove(14, 29, { ...wardenHit(3.0, "CHASE", 70), growth: 0.0, base: 0.0, setKnockback: 90.0 }),
   },
 };

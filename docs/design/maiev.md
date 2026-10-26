@@ -21,7 +21,7 @@ beats read. The DIs listed must not escape.
 | neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | read |
 | down air | 0-100 | down special (Fan of Knives) | true | | Fox down air into shine, true | holds |
 | down air | 0-60 | grab | true | | Fox true | holds |
-| up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | read at 80-90 |
+| up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | holds (#306) |
 | up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | read |
 | up air | 70-100 | up air | read | | Falco: the string ends in a read | holds |
 | side special (Shadow Pursuit) | 0-150 | grab | true | | her stun (#273) | holds |
@@ -38,6 +38,29 @@ Down tilt into down tilt is true at every percent today, where Fox's is a read
 or DI-dependent. The objectives set floors only; the agency rule
 (`docs/gameplay-design.md`, at most 2 true links in a row) caps it in the
 retune.
+
+## Grab and throws (#306)
+
+Her grab, forward throw and back throw take Fox's frames from
+`references/melee-frame-data/fightcore.csv`, and down throw his 43-frame
+total; up throw keeps its own 20 frames. The knockback is ours, tuned until
+each throw passes its declared role in `bun wisp combos --objectives`
+(`docs/design/throw-roles.md`).
+
+Up throw into up air read at 80-90% because a tumbling victim who DIs out
+lands before a late up air and techs it; the stronger up throw moves that band
+to 0%, where Fox's row is not checked.
+
+| Move | Release / total | Melee Fox | Knockback | Role and measure |
+| --- | --- | --- | --- | --- |
+| grab | active 6-7 / 30 | 7-8 / 30 (Sheik 6) | | inside the spread |
+| forward throw | 10 / 33 | 10 / 33 | 40°, base 70, growth 80 | positional: past the ledge from midway at 60% under every DI |
+| back throw | 15 / 38 | 15 / 38 | 45° behind, base 72, growth 70 | positional: past the ledge from midway at 60% under every DI |
+| up throw | 11 / 20, kept | 18 / 38 | 85°, base 70, growth 100 | combo starter at 0/30/60%; into up air DI-dependent at 10-150%, a read only at 0% |
+| down throw | 14 / 43 | 23 / 43 | 70°, set knockback 90 | tech-chase starter: lands 17-23 frames after release at 0-90%, at most 3 frames apart per DI, all four tech options read |
+
+Down throw is set knockback, as Sheik's throws are, so the landing frame does
+not drift with percent and the tech chase reads the same at 0% and 90%.
 
 ## Edge-guard targets
 
