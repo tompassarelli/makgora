@@ -65,7 +65,7 @@ import { observeActionDecision, observeActionStart } from "./observations";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies } from "./travelStop";
-import { canTeeter, shieldPressed, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
+import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
 import { moveTravelFrames } from "./heroMoves";
 import {
   SHIELD_MIN_HOLD_FRAMES,
@@ -624,8 +624,10 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   let buoyant = false;
   const teeters = (canSteer || f.landing.lag > 0) && !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f);
   const pushedOnShield = shieldPressed(f);
+  const grabHolds = grabHoldsEdge(f);
   moveHorizontally(f, stage, matchFrame, dashEntryDisplacementAdjustment);
-  if (teeters) teeterAtEdge(f, stage, matchFrame, horizontalStick);
+  if (grabHolds) stopGrabAtEdge(f, stage, matchFrame);
+  else if (teeters) teeterAtEdge(f, stage, matchFrame, horizontalStick);
   else if (pushedOnShield) teeterShieldAtEdge(f, stage, matchFrame);
   if (isGroundDodging(f) || (motion.grounded && jump.squat > 0)) {
     motion.vz = 0.0;

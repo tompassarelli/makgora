@@ -2213,6 +2213,13 @@ Tom made the rule symmetric on 2026-10-26 so that no hidden facing rule
 decides whether a fighter stays on; the parity ledger records the departure
 (`teeter`).
 
+A grab that carries momentum (a dash grab, a grab out of a run, or any grab
+while sliding) stops at the platform or stage edge and finishes there, for
+every fighter, Kael'thas's Siphon Mana included; it never carries the fighter
+off, whatever the stick holds. A hit grabs from the edge as usual; a whiff
+plays its full end lag standing at the edge and teeters on the first frame
+after it (Tom's rule, 2026-10-26, #501; ts/src/game/sim/grabTeeter.tests.ts).
+
 | State reaching an edge | Melee | Smashcraft |
 | --- | --- | --- |
 | Standing or walking slowly | Teeters; a slow walk teeters and only a stick tilted past a certain amount walks off ([SmashWiki Teeter](https://www.ssbwiki.com/Teeter)) | Teeters below the middle walk zone (stick 0.4 toward the edge); at or past it the fighter walks off. Melee's tilt is unpublished, so 0.4 is ours |
@@ -2222,7 +2229,7 @@ decides whether a fighter stays on; the parity ledger records the departure
 | The same landing facing away from the edge | Slides off with the lag cancelled; a backward wavedash "will topple the combatant over the side" ([SmashWiki Wavedash](https://www.ssbwiki.com/Wavedash), [Edge cancel](https://www.ssbwiki.com/Edge_cancel)) | Teeters facing away, its lag ended (Tom's rule: the departure above) |
 | A landing in either facing with the stick held toward the edge | Facing the edge, slides off: "you need to be holding straight forward" to slide off ([Smashboards](https://smashboards.com/threads/help-with-wavedashing-onto-platforms.231530)) | No teeter: the edge cancel is kept and the fighter enters fall on the frame it would have teetered |
 | A waveland with the shield still held | Stops at the edge: the same thread says the shield must be released to slide off | Not changed here; a shield in pushback or shieldstun stops at the edge (Shield pressure at an edge, below, #483) |
-| Attacks, specials, rolls, crouch, turnaround run, knockback | Not teeter states in any public source | Unchanged: ground moves slide off as above, rolls and spot dodges stop at the edge, the rest slide off |
+| Attacks, specials, rolls, crouch, turnaround run, knockback | Not teeter states in any public source | Unchanged: ground moves slide off as above, rolls, spot dodges and grabs stop at the edge (grabs: above, #501), the rest slide off |
 
 FightCore publishes frame data only and states nothing about teetering. The
 rule lives in ts/src/game/sim/teeter.ts and holds the fighter at the deck's

@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { DownState, GroundAction, SpecialAction } from "./codes";
+import { AttackStyle, DownState, GroundAction, SpecialAction } from "./codes";
 import { inGrabContext } from "./conditions";
 import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
@@ -46,4 +46,13 @@ export function teeterShieldAtEdge(f: Fighter, stage: number, matchFrame: number
   stopAtEdge(f, stage, matchFrame, side);
   f.shield.pushbackX = 0.0;
   return true;
+}
+
+export function grabHoldsEdge(f: Readonly<Fighter>): boolean {
+  return f.motion.grounded && f.attack.style === AttackStyle.grab;
+}
+
+export function stopGrabAtEdge(f: Fighter, stage: number, matchFrame: number): void {
+  const side = edgeSide(f, stage, matchFrame);
+  if (side !== 0) stopAtEdge(f, stage, matchFrame, side);
 }
