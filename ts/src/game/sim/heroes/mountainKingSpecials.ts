@@ -83,13 +83,13 @@ const THUNDER_CLAP: AuthoredSpecial = { endFrame: 32, regions: ring(4, 12.0), pr
 
 const HOLD: AuthoredSpecial = { endFrame: 1 };
 const CHARGED_CLAP: AuthoredSpecial = {
-  endFrame: 81,
-  regions: ring(53, 12.0),
-  projectiles: WAVES(53),
+  endFrame: 78,
+  regions: ring(50, 12.0),
+  projectiles: WAVES(50),
   followUps: [
-    { window: frames(10, 29), special: CLAP },
-    { window: frames(30, 49), special: THUNDER_CLAP },
-    { window: frames(10, 49), input: FollowUpInput.shield, special: HOLD },
+    { window: frames(7, 26), special: CLAP },
+    { window: frames(27, 46), special: THUNDER_CLAP },
+    { window: frames(7, 46), input: FollowUpInput.shield, special: HOLD },
   ],
 };
 
@@ -161,8 +161,8 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
     description: "Raise the hammer and slam: early for a small clap, late for a ring with shockwaves. Shield drops the charge.",
     ground: CHARGED_CLAP,
     air: {
-      endFrame: 53,
-      regions: [heroRegion(18, 21, capsule(10.0, 10.0, f32(SHORT - 14.0), -20.0, 14.0), AIR_CLAP)],
+      endFrame: 50,
+      regions: [heroRegion(15, 18, capsule(10.0, 10.0, f32(SHORT - 14.0), -20.0, 14.0), AIR_CLAP)],
       landingLag: 20,
     },
   }, { reach: 1.25 }),

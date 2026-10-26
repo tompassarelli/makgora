@@ -31,7 +31,7 @@
 308 a capture
 312 b shield 1
 316 b shield 0
-324 a capture
+321 a capture
 332 b stick 0 -1
 332 b tap X 2
 333 b stick 0 0

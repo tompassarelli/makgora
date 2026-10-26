@@ -20,7 +20,7 @@ cancelling.
 | Rifleman | Freeze Trap tossed in the air falls and arms on deck contact | A8 W22 L31/E38 | A8 W22 L13/E38 | A8 W22 L3/E38 | A8 W22 L—/E38 |
 | Illidan | Immolate in the air, a Falco-style shine that holds him in place and a jump cancels | A12 W1 L37/E15 | A12 W1 L36/E15 | A12 W1 L21/E15 | A12 W1 L—/E15 |
 | Blademaster | Mirror Image placed in the air, then a backward step | S1 W8 L34/E24 | S1 W8 L25/E24 | S1 W8 L3/E24 | S1 W8 L—/E24 |
-| Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W18 L27/E27 | S1 W53 L15/E81 | S1 W53 L3/E81 | S1 W18 L—/E53 |
+| Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W15 L27/E27 | S1 W— L15/E15 | S1 W50 L3/E78 | S1 W15 L—/E50 |
 | Warden | Fan of Knives in the air, a ring of knives with a shine-like semi-spike that nearly stops her fall and a jump cancels | S1 W4 L46/E27 | S1 W4 L44/E27 | S1 W4 L16/E27 | S1 W4 L—/E27 |
 | Lich | Frost Armor cast in the air; lands into the grounded cast | S0 W21 L27/E27 | S0 W21 L15/E45 | S0 W21 L3/E45 | S0 W21 L—/E45 |
 | Forsaken Paladin | downward holy pulse with the Consecration hit | S1 W16 L27/E27 | S1 W16 L15/E42 | S1 W16 L3/E42 | S1 W16 L—/E42 |
@@ -44,4 +44,4 @@ cancelling.
 | Medivh | Last Word holds height, blinks back and bursts | S0 W12 L59/E38 | S0 W12 L57/E38 | S0 W12 L43/E38 | S0 W12 L—/E38 |
 | Anub'arak | downward beetle; recall works while falling | S1 W22 L27/E27 | S1 W22 L15/E46 | S1 W22 L3/E46 | S1 W22 L—/E46 |
 
-26 fighters, 104 presses, 0 dead inputs.
+26 fighters, 104 presses, 1 dead inputs.

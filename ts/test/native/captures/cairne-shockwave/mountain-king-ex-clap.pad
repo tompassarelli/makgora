@@ -1,13 +1,13 @@
-# Mountain King's EX Thunder Clap on stage 3, the reference for Cairne's Shockwave: its two earth Shockwave waves should hug the floor from their spawn on special frame 53 and run out both ways.
+# Mountain King's EX Thunder Clap on stage 3, the reference for Cairne's Shockwave: its two earth Shockwave waves should hug the floor from their spawn on special frame 50 and run out both ways.
 #! chat -dev setup quick stage 3 pair mountain king / cairne bloodhoof;meter 100
-#! cue 312-334 waves: effect=ShockwaveMissile
+#! cue 309-331 waves: effect=ShockwaveMissile
 256 a stick 0 -1
 260 a press LB
 260 a tap X 2
 262 a release LB
 264 a stick 0 0
-312 a capture
-316 a capture
-322 a capture
-328 a capture
-334 a capture
+309 a capture
+313 a capture
+319 a capture
+325 a capture
+331 a capture

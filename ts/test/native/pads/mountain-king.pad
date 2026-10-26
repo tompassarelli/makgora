@@ -29,7 +29,7 @@
 #! expect b 250 damage 10.807
 #! expect a 330 special 16 form 0
 # 56fabe5c68 slows the clap's shockwave to 0.85x and 70b72f2c9a set it to 7.565 (trace: run 39007977184).
-#! expect b 396 damage 18.372 hitlag 5 hitstun 21
+#! expect b 393 damage 18.372 hitlag 5 hitstun 21
 #! expect a 600 special 15 form 0
 #! expect a 615 special-form 6 action 15
 #! expect a 626 special 0 form 6
