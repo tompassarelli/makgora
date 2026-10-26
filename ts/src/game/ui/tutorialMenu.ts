@@ -3,6 +3,7 @@
 
 
 
+import { SELECT_LEVELS } from "./chatLayer";
 import { f32 } from "wisp/src/sim/f32";
 import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { type MatchState, humanCount } from "../lobby/lobbyState";
@@ -47,7 +48,7 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   BlzFrameSetTexture(root, PANEL_TEXTURE, 0, true);
   placeTopLeft(root, f32(0.2), f32(0.47));
   BlzFrameSetSize(root, f32(0.4), f32(0.2));
-  BlzFrameSetLevel(root, 20);
+  BlzFrameSetLevel(root, SELECT_LEVELS.tutorial);
   BlzFrameSetText(text(root, `MeleeTutorialTitle${suffix}`, f32(0.21), f32(0.46), f32(0.38), f32(0.03), f32(0.018)), "Tutorial");
   BlzFrameSetText(text(root, `MeleeTutorialBody${suffix}`, f32(0.215), f32(0.43), f32(0.37), f32(0.05), f32(0.011)),
     `New to Smashcraft? Learn the basics in ${LESSONS.length} short lessons with a training partner. Pick any lesson to play it again.`);

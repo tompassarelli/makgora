@@ -2,6 +2,7 @@
 
 
 
+import { SELECT_LEVELS } from "./chatLayer";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { stageInPool, stagePoolCount } from "../menu/stagePool";
 import { f32 } from "wisp/src/sim/f32";
@@ -114,7 +115,7 @@ export class StagePanel {
     }
     dialogButton(root, STAGE_POOL_BUTTON.x, STAGE_POOL_BUTTON.y, STAGE_POOL_BUTTON.width, STAGE_POOL_BUTTON.height, "Stage pool", { kind: "poolOpen" });
     this.poolRoot = BlzCreateFrameByType("FRAME", "MeleeStagePoolRoot", root, "", 0);
-    BlzFrameSetLevel(this.poolRoot, 30);
+    BlzFrameSetLevel(this.poolRoot, SELECT_LEVELS.stagePool);
     const poolBackdrop = createBackdrop("MeleeStagePoolBackdrop", this.poolRoot, 0);
     BlzFrameSetTexture(poolBackdrop, PANEL_TEXTURE, 0, true);
     placeTopLeft(poolBackdrop, f32(0.1), f32(0.49));

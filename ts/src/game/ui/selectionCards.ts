@@ -1,3 +1,4 @@
+import { SELECT_LEVELS } from "./chatLayer";
 import type { CpuDefaults } from "./selectionCpuSettings";
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
@@ -88,7 +89,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
   const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
   const chip = art(root, `MeleeChip${name}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
-  BlzFrameSetLevel(chip, 10);
+  BlzFrameSetLevel(chip, SELECT_LEVELS.cardChip);
   const box = cpuSettingsBox(slot);
   const settings = BlzCreateFrame("ScriptDialogButton", root, 0, 0);
   placeTopLeft(settings, box.x, box.y);

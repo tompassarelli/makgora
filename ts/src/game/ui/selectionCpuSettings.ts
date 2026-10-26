@@ -1,3 +1,4 @@
+import { SELECT_LEVELS } from "./chatLayer";
 import { type MatchState, canChooseComputer } from "../lobby/lobbyState";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
@@ -26,6 +27,7 @@ export interface CpuSettingsFrames {
 export function createCpuSettings(participantId: number, add: (frame: framehandle, target: CpuButton, text: string) => framehandle): CpuSettingsFrames {
   const cpu = createOpponentSettings(gameUi(), participantId);
   if (cpu === undefined) throw new Error("the Opponent settings frames did not load");
+  BlzFrameSetLevel(cpu.root, SELECT_LEVELS.cpuSettings);
   const steps: framehandle[] = [];
   const cpuButton = (frame: framehandle, button: CpuButton) => {
     if (button.kind === "cpuStep") steps.push(frame);

@@ -1,3 +1,4 @@
+import { SELECT_LEVELS } from "./chatLayer";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
@@ -212,7 +213,7 @@ export class SelectionPanel {
     }
     this.cards = PARTICIPANT_SLOTS.map(slot => createCard(root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
     this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
-    BlzFrameSetLevel(this.hand, 30);
+    BlzFrameSetLevel(this.hand, SELECT_LEVELS.hand);
     BlzFrameSetVisible(this.hand, false);
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height);
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(START_BUTTON.x + f32(0.006)), f32(START_BUTTON.y - f32(0.002)), f32(START_BUTTON.width - f32(0.012)), f32(START_BUTTON.height - f32(0.004)), f32(0.011));
@@ -273,7 +274,7 @@ export class SelectionPanel {
     this.help = createBackdrop(`MeleeRuleHelp${suffix}`, root, 0);
     BlzFrameSetTexture(this.help, PANEL_TEXTURE, 0, true);
     BlzFrameSetSize(this.help, RULE_HELP_WIDTH, RULE_HELP_HEIGHT);
-    BlzFrameSetLevel(this.help, 20);
+    BlzFrameSetLevel(this.help, SELECT_LEVELS.ruleHelp);
     BlzFrameSetEnable(this.help, false);
     this.helpText = createText(`MeleeRuleHelpText${suffix}`, this.help, 0);
     BlzFrameSetPoint(this.helpText, FRAMEPOINT_TOPLEFT, this.help, FRAMEPOINT_TOPLEFT, f32(0.008), f32(-0.006));
