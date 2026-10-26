@@ -39,7 +39,7 @@ const flameStrike = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 30, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_RUNE], aim: FLAME_STRIKE_AIM, replacesLive: true,
 });
 
-export const BANISH_FRAMES = 60;
+export const BANISH_FRAMES = 90;
 export const BANISH: AppliedStatus = { kind: HeroStatusKind.banish, frames: BANISH_FRAMES, group: HeroStatusGroup.silence, immunityFrames: 240 };
 const CURSE: StrikeCapsule = { x1: 25.0, z1: 62.0, x2: 110.0, z2: 62.0, radius: 20.0 };
 const banish = (landingLag: number | undefined): AuthoredSpecial => ({
