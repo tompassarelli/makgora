@@ -1,5 +1,8 @@
 import { createMatchCamera, type MatchCamera } from "../../src/game/sim/matchCamera";
 import type { ScoreFrame } from "./animScore";
+import type { SampledCue } from "./animScoreSample";
+
+const CUE_REACH = 40;
 
 const CAMERA_SLACK_PIXELS = 50;
 const FRAME_WIDTH = 1920;
@@ -29,21 +32,26 @@ export const heldOffset = (offsets: readonly number[], index: number, pixelsPerU
   return Math.min(at + slack, Math.max(at - slack, middle));
 };
 
-export function judgeCrop(frames: readonly (ScoreFrame | undefined)[], heights: readonly number[], travels: readonly number[], pixelsPerUnit: number): { readonly width: number; readonly height: number; readonly x: number; readonly y: number } {
+export function judgeCrop(frames: readonly (ScoreFrame | undefined)[], heights: readonly number[], travels: readonly number[], pixelsPerUnit: number, cues: readonly (readonly SampledCue[])[] = []): { readonly width: number; readonly height: number; readonly x: number; readonly y: number } {
   let left = FRAME_WIDTH, right = 0, top = FRAME_HEIGHT, bottom = 0;
-  for (const [index, frame] of frames.entries()) {
-    if (frame === undefined) continue;
+  const include = (index: number, x: number, z: number) => {
     const offset = (heights[index] ?? 0) - heldOffset(heights, index, pixelsPerUnit) - CAMERA_LIFT;
     const shift = (travels[index] ?? 0) - heldOffset(travels, index, pixelsPerUnit);
-    for (let vertex = 0; vertex < frame.drawn.length; vertex++) {
-      if (frame.drawn[vertex] !== 1) continue;
-      const column = FRAME_WIDTH / 2 + (shift + (frame.vertices[vertex * 2] ?? 0)) * pixelsPerUnit;
-      const row = FRAME_HEIGHT / 2 - (offset + (frame.vertices[vertex * 2 + 1] ?? 0)) * pixelsPerUnit * PITCH_COS;
-      left = Math.min(left, column);
-      right = Math.max(right, column);
-      top = Math.min(top, row);
-      bottom = Math.max(bottom, row);
-    }
+    const column = FRAME_WIDTH / 2 + (shift + x) * pixelsPerUnit;
+    const row = FRAME_HEIGHT / 2 - (offset + z) * pixelsPerUnit * PITCH_COS;
+    left = Math.min(left, column);
+    right = Math.max(right, column);
+    top = Math.min(top, row);
+    bottom = Math.max(bottom, row);
+  };
+  for (const [index, frame] of frames.entries()) {
+    if (frame === undefined) continue;
+    for (let vertex = 0; vertex < frame.drawn.length; vertex++) if (frame.drawn[vertex] === 1) include(index, frame.vertices[vertex * 2] ?? 0, frame.vertices[vertex * 2 + 1] ?? 0);
+  }
+  for (const [index, placed] of cues.entries()) for (const cue of placed) {
+    const x = cue.x - (travels[index] ?? 0), z = cue.z - (heights[index] ?? 0), reach = CUE_REACH * cue.scale;
+    include(index, x - reach, z - reach);
+    include(index, x + reach, z + reach);
   }
   const x = Math.max(0, Math.floor(left - MARGIN_PIXELS)), y = Math.max(0, Math.floor(top - MARGIN_PIXELS));
   return { width: Math.min(FRAME_WIDTH, Math.ceil(right + MARGIN_PIXELS)) - x, height: Math.min(FRAME_HEIGHT, Math.ceil(bottom + MARGIN_PIXELS)) - y, x, y };

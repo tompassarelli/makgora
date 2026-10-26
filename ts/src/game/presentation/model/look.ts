@@ -20,6 +20,8 @@ export interface HeroLook {
   readonly commandGrab?: CommandGrabClips | undefined;
 
   readonly ultimateBurst?: UltimateBurstLook | undefined;
+
+  readonly cueReadNormals?: readonly AttackStyle[] | undefined;
 }
 
 export interface UltimateBurstLook {

@@ -25,7 +25,9 @@ Each move is one image (open it with your file-reading tool):
   is missing; judge against the standard below.
 
 Judge the body's motion and silhouettes only: not textures, lighting,
-effects, model detail or damage numbers. Don't read the repository's code or
+effects, model detail or damage numbers. The exception is a caster's move whose
+caption says its spell effect is drawn: read that effect as part of the move,
+as a player sees it in a match, on every line. Don't read the repository's code or
 other judges' scores.
 
 ## Score five lines, 1 to 5

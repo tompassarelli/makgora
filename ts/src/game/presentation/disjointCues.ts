@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { type HitRegion, NO_HIT_REGION } from "../sim/hitRegions";
+import { type HitRegion, NO_HIT_REGION, authoredHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { forsakenPaladinSwordAttack } from "../sim/heroes/forsakenPaladinSword";
 import { type Cue, type CueBirth } from "./specialCues";
@@ -75,6 +75,11 @@ export interface HitAreaPose { visible: boolean; x: number; z: number; scale: nu
 
 
 const BODY_MIDDLE = 66.0;
+
+export function normalAreaPose(fighter: Readonly<Fighter>, style: AttackStyle, index: number, region: HitRegion, out: HitAreaPose): HitAreaPose {
+  return hitAreaPose(fighter, authoredHitRegion(region, fighter.character, style, fighter.attack.frame, fighter.attack.smashChargeFrames, index, fighter.tuning.moves), out);
+}
+
 
 export function hitAreaPose(fighter: Readonly<Fighter>, region: Readonly<HitRegion>, out: HitAreaPose): HitAreaPose {
   out.visible = region.effect.damage > 0.0 && !fighter.status.out;

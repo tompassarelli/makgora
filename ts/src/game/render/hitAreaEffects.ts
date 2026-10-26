@@ -1,15 +1,16 @@
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
-import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
+import { authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/engine";
-import { DISJOINT_CUES, disjointNormals, hitAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
+import { DISJOINT_CUES, disjointNormals, hitAreaPose, normalAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
 import { type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
 
 
 export const HIT_AREA_EFFECT_CAPACITY = 12;
 export const ACCENT_SEQUENCE = "stand";
 export const ACCENT_SECONDS = f32(0.3);
+export const CUE_FRONT = -14.0;
 
 
 export class HitAreaEffects {
@@ -43,15 +44,14 @@ export class HitAreaEffects {
       const count = normal ? authoredHitRegionCount(style, fighter.tuning.moves) : runningHeroSpecial(fighter)?.regions?.length ?? 2;
       for (let index = 0; index < count; index++) {
         if (fighter.character === Character.warden && fighter.special.action === SpecialAction.heroDown) continue;
-        const region = normal ? authoredHitRegion(this.region, fighter.character, style, fighter.attack.frame, fighter.attack.smashChargeFrames, index, fighter.tuning.moves) : specialAreaRegion(fighter, index);
-        const pose = hitAreaPose(fighter, region, this.pose);
+        const pose = normal ? normalAreaPose(fighter, style, index, this.region, this.pose) : hitAreaPose(fighter, specialAreaRegion(fighter, index), this.pose);
         if (!pose.visible) continue;
         const model = this.models[shown];
         if (model === undefined) break;
         const cue = DISJOINT_CUES[fighter.character];
         const starts = this.parked[shown] === true;
         this.parked[shown++] = false;
-        BlzSetSpecialEffectPosition(model, this.origin.x + pose.x, this.origin.y - 14.0, this.origin.z + pose.z);
+        BlzSetSpecialEffectPosition(model, this.origin.x + pose.x, this.origin.y + CUE_FRONT, this.origin.z + pose.z);
         BlzSetSpecialEffectYaw(model, facingYaw(fighter.facing));
         BlzSetSpecialEffectPitch(model, 0.0);
         BlzSetSpecialEffectScale(model, f32(pose.scale * (cue?.scale ?? 0.5)));

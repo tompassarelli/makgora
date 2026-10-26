@@ -10,6 +10,8 @@ import { beginFighterAttack, resolveAttacks } from "../../src/game/sim/attacks";
 import { AttackPhase, AttackStyle, Character, GroundAction, LedgeState, SpecialAction } from "../../src/game/sim/codes";
 import type { Capsule } from "../../src/game/sim/geometry/contactGeometry";
 import { fighterHurtParts } from "../../src/game/sim/hurtboxes";
+import { disjointNormals, normalAreaPose } from "../../src/game/presentation/disjointCues";
+import { heroLook } from "../../src/game/roster/looks";
 import { snapToLedge } from "../../src/game/sim/ledge";
 import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/contacts";
 import { attackPhase } from "../../src/game/sim/conditions";
@@ -180,6 +182,19 @@ export interface SampledMove {
   readonly seconds: readonly number[];
   readonly heights: readonly number[];
   readonly travels: readonly number[];
+  readonly cues: readonly (readonly SampledCue[])[];
+}
+
+export interface SampledCue { readonly x: number; readonly z: number; readonly scale: number; readonly age: number }
+
+function readCues(f: Fighter, style: AttackStyle, drop: number, since: number): SampledCue[] {
+  if (f.attack.style !== style) return [];
+  const region = emptyHitRegion(), out: SampledCue[] = [];
+  for (let index = 0; index < authoredHitRegionCount(style, f.tuning.moves); index++) {
+    const pose = normalAreaPose(f, style, index, region, { visible: false, x: 0.0, z: 0.0, scale: 1.0 });
+    if (pose.visible) out.push({ x: pose.x, z: pose.z - drop, scale: pose.scale, age: since });
+  }
+  return out;
 }
 
 const strikeEnd = (capsule: { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number }, chestZ: number) =>
@@ -210,6 +225,16 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   advanceFighterPose(p, f, world, input, false, false, true, false);
   const frames: PoseFrame[] = [capture(f, p)];
   const windows = [openWindows(f)];
+  const drop = entry.aerial ? 900.0 - 300.0 : 0.0, x0 = f.motion.x, facing = f.facing;
+  const reads = heroLook(character)?.cueReadNormals?.includes(entry.style) === true && disjointNormals(f).includes(entry.style);
+  const cues: SampledCue[][] = [];
+  let since = 0;
+  const readFrame = () => {
+    const found = reads ? readCues(f, entry.style, drop, since) : [];
+    since = found.length > 0 ? since + 1 : 0;
+    cues.push(found.map((cue) => ({ ...cue, x: (cue.x - x0) * facing })));
+  };
+  readFrame();
   let moveFrames = 0;
   while (frames.length < LIMIT) {
     advanceFighter(world, 0, 0, input, 0.0);
@@ -217,6 +242,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
     if (f.attack.style !== entry.style && moveFrames === 0) moveFrames = frames.length;
     frames.push(capture(f, p));
     windows.push(openWindows(f));
+    readFrame();
     if (moveFrames > 0 && frames.length >= moveFrames + AFTER_FRAMES) break;
   }
   if (moveFrames === 0) moveFrames = frames.length;
@@ -231,7 +257,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   if (ready === undefined) return undefined;
   const chestZ = skeleton.chest === undefined ? 50 : posed[first]?.nodes[skeleton.chest * 2 + 1] ?? 50;
   return {
-    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - (entry.aerial ? 900.0 - 300.0 : 0.0)), travels: travels(frames),
+    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - drop), travels: travels(frames), cues,
     sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), pixelsPerUnit },
   };
 }
@@ -289,7 +315,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const ready = posed[moveFrames];
   if (ready === undefined) return undefined;
   return {
-    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames),
+    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []),
     sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, pixelsPerUnit },
   };
 }

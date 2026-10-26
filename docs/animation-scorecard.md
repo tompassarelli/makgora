@@ -125,6 +125,14 @@ context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
 `tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing, the key-frame poses `prepare` rendered and, for a move that travels, each key frame's forward travel, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
 
+A caster's move is read with its spell effect: Tom's decision of 2026-10-26 via
+north gate 33, after 24 judges scored Kael'thas's dash attack 3 on character
+from its robed silhouette alone. A fighter's look lists those normals in
+`cueReadNormals`; the sampler places the move's hit-area cue on each frame as
+the game draws it (`normalAreaPose`), `prepare` draws it in the key poses and
+says so in the caption, and the clip's identity covers the cue placements, so a
+move judged with its effect keeps those judgements only while the effect is drawn.
+
 ## Thresholds
 
 The 9 October calibration uses 25 moves: five jabs, tilts, smashes, aerials

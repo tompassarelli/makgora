@@ -2,10 +2,11 @@ import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Schema } from "effect";
 import type { ScoreFrame } from "./animScore";
+import type { SampledCue } from "./animScoreSample";
 
 const QUANTUM = 0.05;
 
-export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], travels: readonly number[], framing: string): string {
+export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], travels: readonly number[], framing: string, cues: readonly (readonly SampledCue[])[] = []): string {
   const hasher = new Bun.CryptoHasher("sha256").update(`${framing}|`);
   for (const frame of frames) {
     if (frame === undefined) {
@@ -17,6 +18,8 @@ export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], travel
   }
   const travel = Int32Array.from(travels, (value) => Math.round(value / QUANTUM));
   if (travel.some((value) => value !== 0)) hasher.update("travel|").update(new Uint8Array(travel.buffer));
+  const placed = Int32Array.from(cues.flatMap((frame, index) => frame.flatMap((cue) => [index, cue.x, cue.z, cue.scale, cue.age])), (value) => Math.round(value / QUANTUM));
+  if (placed.length > 0) hasher.update("cue|").update(new Uint8Array(placed.buffer));
   return hasher.digest("hex").slice(0, 16);
 }
 

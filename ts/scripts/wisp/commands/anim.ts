@@ -15,12 +15,14 @@ import { parseMDX } from "../../clipNodes";
 import { JitterReport } from "../animJitter";
 import { extremeCamera, cameraFieldOfView, FLOOR_HEIGHT } from "../../../src/game/presentation/arenaCamera";
 import type { Character } from "../../../src/game/sim/codes";
+import { ACCENT_SECONDS, ACCENT_SEQUENCE, CUE_FRONT } from "../../../src/game/render/hitAreaEffects";
+import { DISJOINT_CUES } from "../../../src/game/presentation/disjointCues";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, type ScoreFrame, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
-import { type CrouchClipKind, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
+import { type CrouchClipKind, type SampledCue, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { CAMERA_LIFT, heldOffset, judgeCamera, judgeCrop, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
@@ -157,7 +159,7 @@ const measure = (fighters: readonly Character[], assets: string) => Effect.gen(f
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
       const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame, hits: sample.hits };
       const keyFrames = judgeKeyFrames(judgeKeys({ score, frames }));
-      const clip = clipIdentity(keyFrames.map((index) => sample.frames[index]), keyFrames.map((index) => sampled.travels[index] ?? 0), judgeFraming());
+      const clip = clipIdentity(keyFrames.map((index) => sample.frames[index]), keyFrames.map((index) => sampled.travels[index] ?? 0), judgeFraming(), keyFrames.map((index) => sampled.cues[index] ?? []));
       const panel = judgePanel(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
       const medians = JUDGE_LINES.map((line) => median(panel.map((entry) => entry[line])));
       rows.push({
@@ -248,7 +250,7 @@ const score: Command = (args) => Effect.gen(function*() {
 
 const JUDGE_BATCH = 6;
 
-interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly travels: readonly number[]; readonly poses: readonly (ScoreFrame | undefined)[]; readonly labels: readonly string[]; readonly caption: string; readonly movement: boolean }
+interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly travels: readonly number[]; readonly poses: readonly (ScoreFrame | undefined)[]; readonly labels: readonly string[]; readonly caption: string; readonly movement: boolean; readonly cues: readonly (readonly SampledCue[])[] }
 
 
 const judgeKeys = (row: Pick<Row, "score" | "frames">) => ({ ...row.score.keys, lastActive: row.frames.lastActive, end: row.frames.end, hits: row.frames.hits });
@@ -333,8 +335,8 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (sampled === undefined) continue;
     const reference = referenceFor(references, row.fighter, row.move);
     const indices = judgeKeyFrames(judgeKeys(row));
-    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), travels: indices.map((index) => sampled.travels[index] ?? 0), poses: indices.map((index) => sampled.sample.frames[index]), labels: indices.map((index) => judgeFrameLabel(judgeKeys(row), index)),
-      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}${row.score.keys.hitWindups.length > 0 ? `, each later hit's windup on ${row.score.keys.hitWindups.join(", ")}` : ""}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
+    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), travels: indices.map((index) => sampled.travels[index] ?? 0), cues: indices.map((index) => sampled.cues[index] ?? []), poses: indices.map((index) => sampled.sample.frames[index]), labels: indices.map((index) => judgeFrameLabel(judgeKeys(row), index)),
+      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}${row.score.keys.hitWindups.length > 0 ? `, each later hit's windup on ${row.score.keys.hitWindups.join(", ")}` : ""}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.${sampled.cues.some((frame) => frame.length > 0) ? " The flare at the hit is the move's own spell effect, drawn as in a match." : ""}`, movement: false });
   }
   for (const entry of wanted ?? []) {
     const [slug = "", move = ""] = entry.split(":");
@@ -342,7 +344,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
     if (character === undefined) continue;
     const { seconds, heights } = yield* attempt(`sample ${slug} ${move}`, async () => movementFrames(move, await loadBody(assets, character), character));
-    strips.push({ fighter: slug, move, seconds, heights, travels: heights.map(() => 0), poses: [], labels: [], caption: "", movement: true });
+    strips.push({ fighter: slug, move, seconds, heights, travels: heights.map(() => 0), cues: [], poses: [], labels: [], caption: "", movement: true });
   }
   if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
 
@@ -367,7 +369,11 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
       scenes.push({
         ...base, frame: id, units: [], ui: [], textTags: [],
         camera: { ...base.camera, x: strip.movement ? 0 : heldOffset(strip.travels, index, judgePixelsPerUnit()), y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: FLOOR_HEIGHT + (strip.movement ? 0 : heldOffset(strip.heights, index, judgePixelsPerUnit())) + CAMERA_LIFT, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
-        effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: strip.travels[index] ?? 0, y: 0, z, yaw: 0, teamColor: 0, alpha: 255 }],
+        effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: strip.travels[index] ?? 0, y: 0, z, yaw: 0, teamColor: 0, alpha: 255 },
+          ...(strip.cues[index] ?? []).flatMap((placed) => {
+            const cue = DISJOINT_CUES[character];
+            return cue === undefined ? [] : [{ ...bodyEffect, model: cue.model, animation: cue.sequence ?? ACCENT_SEQUENCE, animationElapsed: (cue.seconds ?? ACCENT_SECONDS) + (cue.timeScale ?? 0.0) * placed.age / 60, animationClock: 0, timeScale: 0, x: placed.x, y: CUE_FRONT, z: FLOOR_HEIGHT + placed.z, yaw: 0, pitch: 0, scale: placed.scale * (cue.scale ?? 0.5), teamColor: 0, alpha: 255 }];
+          })],
       });
     }
     frameIds.set(`${strip.fighter}/${strip.move}`, ids);
@@ -390,7 +396,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
       continue;
     }
     const ours = join(output, "moves", `${row.fighter}-${row.move}-ours.png`);
-    const tile = judgeCrop(row.poses, row.heights, row.travels, judgePixelsPerUnit());
+    const tile = judgeCrop(row.poses, row.heights, row.travels, judgePixelsPerUnit(), row.cues);
     const { args, width } = judgeStrip(crops, row.labels, tile, ours);
     yield* runProcess(ChildProcess.make("magick", args));
     const reference = referenceFor(references, row.fighter, row.move);
