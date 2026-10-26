@@ -105,19 +105,24 @@ too.
 
 ## Match HUD plate
 
-The plate follows the damage HUDs of Melee, Ultimate and Rivals 2 in the
-selection screen's art (gold edge, bevelled metal, navy). One 544x192 plate
+The plate follows the damage HUDs of Melee, Ultimate and Rivals in the
+selection screen's art (gold edge, bevelled metal, navy). One 544x236 plate
 (smashcraft:tools/selection/art/HudPlate.svg) per fighter is drawn 1:1 on the
-reference display, whatever the player count. A player-colour band sits behind
-the fighter's head-and-shoulders render (`Bust`, 256 px, clear background),
-which breaks out of the plate's top as Ultimate's does. The whole damage
-percent is large, with the tenth and percent sign smaller beside it. Its
-colour ramps continuously white → yellow → orange → red → dark red from 0% to
-200%, and it shakes for 14 rendered frames on each hit, harder for bigger hits
-(local presentation only). Stocks are 64 px renders of the fighter's head above
-the plate: up to five, then one icon and the count. The mana bar fills the
-track under the percent. smashcraft:ts/src/game/ui/plateLayout.ts holds every
-box in plate pixels.
+reference display, whatever the player count; the panels in the right half of
+the screen use its mirror image (`HudPlateMirror`), so two players' panels face
+each other. A player-colour band sits behind the fighter's head-and-shoulders
+render (`Bust`, 256 px, clear background), which breaks out of the plate's top
+as Ultimate's does. The whole damage percent is large with a small percent sign
+after it: the simulation keeps fractional damage, but every readout (HUD,
+results, training) shows the whole percent. Its colour blends continuously
+white → yellow (50%) → red (100%) → dark red (150% and above). It shakes for 14
+rendered frames on each hit, harder for bigger hits, and past 100% it trembles
+by 2 to 4 reference pixels, more as the percent rises (local presentation on the
+render clock only). The mana bar fills the track under the percent, the name
+sits on the strip under it, and the stock row under the name shows one 38 px
+head render per remaining stock, as Rivals does: up to five, then one icon and
+the count. smashcraft:ts/src/game/ui/plateLayout.ts holds every box in plate
+pixels.
 
 ## Slot colours
 

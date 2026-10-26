@@ -36,20 +36,25 @@ function applyCandleSetup(fighter: Fighter, target: SetupTarget, prepare: () => 
   return true;
 }
 
+const SETUP_KINDS = ["percent", "lives", "candle"] as const;
+
 export function applyFighterSetup(game: MatchState, world: Roster, message: string, prepare: () => void): string | undefined {
-  const percent = message.startsWith("-dev percent ");
-  if (!percent && !message.startsWith("-dev candle ")) return undefined;
-  const what = percent ? "percent" : "candle";
+  const what = SETUP_KINDS.find(kind => message.startsWith(`-dev ${kind} `));
+  if (what === undefined) return undefined;
   const refused = `dev: ${what} refused`;
   const target = setupTarget(message.substring(what.length + 6));
   if (target === undefined || game.phase !== Phase.match || !isActive(world, target.slot)) return refused;
   const fighter = fighterAt(world, target.slot);
   if (fighter.status.out) return refused;
-  if (percent) {
-    const { value } = target;
+  const { value } = target;
+  if (what === "percent") {
     if (value === undefined || value < 0 || value > 999) return refused;
     prepare();
     fighter.status.damage = f32(value);
+  } else if (what === "lives") {
+    if (value === undefined || value < 1 || value > 99) return refused;
+    prepare();
+    fighter.status.stocks = value;
   } else if (!applyCandleSetup(fighter, target, prepare)) return refused;
   return `dev: player ${target.player} ${what} ${target.valueText}`;
 }

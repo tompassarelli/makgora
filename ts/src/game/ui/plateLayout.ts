@@ -4,10 +4,8 @@ import { idiv, imod } from "wisp/src/sim/intMath";
 import { unitsForPixels } from "./portraitFrames";
 
 
-
-
 export const PLATE_WIDTH_PX = 544;
-export const PLATE_HEIGHT_PX = 192;
+export const PLATE_HEIGHT_PX = 236;
 
 const PLATE_BOTTOM = f32(0.012);
 export const PLATE_TOP = PLATE_BOTTOM + unitsForPixels(PLATE_HEIGHT_PX);
@@ -19,28 +17,62 @@ export interface PlateBox {
   readonly height: number;
 }
 
-
-export const BUST_BOX: PlateBox = { x: -12, y: -96, width: 256, height: 256 };
-// Warcraft wraps oversized frame text onto a hidden second line; reserve enough width for damage digits.
-
-
-
-
-export const DAMAGE_BOX: PlateBox = { x: 150, y: -4, width: 284, height: 124 };
-export const TENTHS_BOX: PlateBox = { x: 450, y: 34, width: 86, height: 70 };
-
-export const MANA_BOX: PlateBox = { x: 256, y: 120, width: 270, height: 16 };
-
 export const MANA_BAR_HEIGHT_PX = 12;
-
-export const NAME_BOX: PlateBox = { x: 244, y: 148, width: 228, height: 30 };
-export const SLOT_BOX: PlateBox = { x: 472, y: 148, width: 40, height: 30 };
-
 export const STOCK_ICON_PX = 64;
-export const STOCK_STEP_PX = 56;
-export const STOCK_ROW: PlateBox = { x: 244, y: -88, width: STOCK_ICON_PX, height: STOCK_ICON_PX };
-
 export const STOCK_ICONS_SHOWN = 5;
+const STOCK_SHOWN_PX = 38;
+const STOCK_STEP_PX = 44;
+
+export interface PanelLayout {
+  readonly mirrored: boolean;
+  readonly bust: PlateBox;
+  readonly damage: PlateBox;
+  readonly percent: PlateBox;
+  readonly name: PlateBox;
+  readonly slot: PlateBox;
+  readonly mana: PlateBox;
+  readonly stocks: readonly PlateBox[];
+  readonly stockCount: PlateBox;
+}
+
+const BUST: PlateBox = { x: -12, y: -96, width: 256, height: 256 };
+// Warcraft wraps oversized frame text onto a hidden second line; reserve enough width for damage digits.
+const DAMAGE: PlateBox = { x: 150, y: -4, width: 284, height: 124 };
+const PERCENT: PlateBox = { x: 436, y: 34, width: 60, height: 70 };
+const NAME: PlateBox = { x: 244, y: 148, width: 228, height: 30 };
+const SLOT: PlateBox = { x: 472, y: 148, width: 40, height: 30 };
+const MANA: PlateBox = { x: 256, y: 120, width: 270, height: 16 };
+const STOCK_LEFT_PX = 246;
+const STOCK_TOP_PX = 186;
+
+const flip = (box: PlateBox): PlateBox => ({ ...box, x: PLATE_WIDTH_PX - box.x - box.width });
+
+function stockBox(index: number): PlateBox {
+  return { x: STOCK_LEFT_PX + index * STOCK_STEP_PX, y: STOCK_TOP_PX, width: STOCK_SHOWN_PX, height: STOCK_SHOWN_PX };
+}
+
+const STOCKS: readonly PlateBox[] = [0, 1, 2, 3, 4].map(index => stockBox(index));
+const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHOWN_PX };
+
+const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, name: NAME, slot: SLOT, mana: MANA, stocks: STOCKS, stockCount: STOCK_COUNT };
+
+const GROUP_LEFT = PLATE_WIDTH_PX - PERCENT.x - PERCENT.width;
+
+const RIGHT_PANEL: PanelLayout = {
+  mirrored: true,
+  bust: flip(BUST),
+  damage: { ...DAMAGE, x: GROUP_LEFT },
+  percent: { ...PERCENT, x: GROUP_LEFT + PERCENT.x - DAMAGE.x },
+  name: flip(NAME),
+  slot: flip(SLOT),
+  mana: flip(MANA),
+  stocks: STOCKS.map(box => flip(box)),
+  stockCount: flip(STOCK_COUNT),
+};
+
+export const panelMirrored = (position: number, count: number): boolean => count > 1 && 2 * position >= count;
+
+export const panelLayout = (position: number, count: number): PanelLayout => panelMirrored(position, count) ? RIGHT_PANEL : LEFT_PANEL;
 
 
 export function plateLeft(position: number, count: number): number {
@@ -53,22 +85,25 @@ export const boxLeft = (left: number, box: PlateBox): number => left + unitsForP
 export const boxTop = (box: PlateBox): number => PLATE_TOP - unitsForPixels(box.y);
 
 
-const RAMP_DAMAGE = [0, 40, 80, 125, 200] as const;
-const RAMP_COLOUR = [0xffffff, 0xfff27a, 0xffa53a, 0xf2382b, 0x9a0f12] as const;
+export const shownPercent = (damage: number): number => toInt(damage);
+
+export const DAMAGE_DARK_FROM = 150;
+const RAMP_DAMAGE = [0, 50, 100, DAMAGE_DARK_FROM] as const;
+const RAMP_COLOUR = [0xffffff, 0xffe23a, 0xf0281e, 0x8c0a10] as const;
 
 const channel = (colour: number, shift: number) => imod(idiv(colour, shift), 256);
 const lerp = (from: number, to: number, step: number, steps: number) => from + idiv((to - from) * step, steps);
 
 
 export function damageColour(damage: number): number {
-  const whole = toInt(damage);
+  const whole = shownPercent(damage);
   for (let index = 1; index < RAMP_DAMAGE.length; index++) {
     const high = RAMP_DAMAGE[index] ?? 0;
     if (whole < high) {
       const low = RAMP_DAMAGE[index - 1] ?? 0;
       const from = RAMP_COLOUR[index - 1] ?? 0;
       const to = RAMP_COLOUR[index] ?? 0;
-      const step = whole - low;
+      const step = Math.max(0, whole - low);
       const steps = high - low;
       return lerp(channel(from, 65536), channel(to, 65536), step, steps) * 65536
         + lerp(channel(from, 256), channel(to, 256), step, steps) * 256
@@ -86,9 +121,9 @@ const colourCode = (damage: number) => {
   return `|cff${hexByte(channel(colour, 65536))}${hexByte(channel(colour, 256))}${hexByte(channel(colour, 1))}`;
 };
 
-export const damageWhole = (damage: number): string => `${colourCode(damage)}${toInt(damage)}|r`;
+export const damageText = (damage: number): string => `${colourCode(damage)}${shownPercent(damage)}|r`;
 
-export const damageTenths = (damage: number): string => `${colourCode(damage)}.${imod(toInt(damage * 10), 10)}%|r`;
+export const percentText = (damage: number): string => `${colourCode(damage)}%|r`;
 
 
 export const SHAKE_FRAMES = 14;
@@ -105,3 +140,26 @@ const shake = (pattern: readonly number[], strength: number, frame: number): num
 
 export const shakeX = (strength: number, frame: number): number => shake(SHAKE_X, strength, frame);
 export const shakeY = (strength: number, frame: number): number => shake(SHAKE_Y, strength, frame);
+
+
+export const TREMBLE_FROM = 100;
+const TREMBLE_FULL_AT = 200;
+export const TREMBLE_MIN_PX = 2;
+export const TREMBLE_MAX_PX = 4;
+const TREMBLE_X = [1, -1, 0, 1, -1, 1, 0, -1] as const;
+const TREMBLE_Y = [0, 1, -1, 0, 1, -1, 1, 0] as const;
+const TREMBLE_HOLD_FRAMES = 2;
+
+
+export function trembleStrength(damage: number): number {
+  const whole = shownPercent(damage);
+  if (whole <= TREMBLE_FROM) return 0.0;
+  const over = Math.min(whole - TREMBLE_FROM, TREMBLE_FULL_AT - TREMBLE_FROM);
+  return TREMBLE_MIN_PX + ((TREMBLE_MAX_PX - TREMBLE_MIN_PX) * over) / (TREMBLE_FULL_AT - TREMBLE_FROM);
+}
+
+const tremble = (pattern: readonly number[], strength: number, frame: number): number =>
+  strength * (pattern[imod(idiv(frame, TREMBLE_HOLD_FRAMES), pattern.length)] ?? 0);
+
+export const trembleX = (strength: number, frame: number): number => tremble(TREMBLE_X, strength, frame);
+export const trembleY = (strength: number, frame: number): number => tremble(TREMBLE_Y, strength, frame);

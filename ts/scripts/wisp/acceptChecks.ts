@@ -483,6 +483,9 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "wc3-melee-input-trace.txt on client a holds per-voice lines `frame F class C slot S live L` with every L <= 16.",
     },
+    { id: "570-damage-hud", closes: "smashcraft#570 box 3 (Classic)", map: "presentation", capture: [{ kind: "frames", name: "panels", client: "a", count: 6, everyMs: 50 }],
+      setup: [{ waitMs: 3000 }, { chat: "-dev percent 1 37" }, { chat: "-dev percent 2 124" }, { chat: "-dev lives 1 3" }, { chat: "-dev lives 2 1" }, { waitMs: 500 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS], look: "Both damage panels across the bottom, the right one mirrored: P1 reads 37% in light yellow with three stock icons under its name, P2 reads 124% in red with one stock icon and trembles by a pixel or two between frames; no tenths digit on either." },
     ...heroes.map(({ name }): NativeCheck => ({
       id: `96-hero-${heroProfile(name).slice(5)}`,
       closes: "smashcraft#96 box 5",
