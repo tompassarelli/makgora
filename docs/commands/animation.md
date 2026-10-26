@@ -183,6 +183,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   sequence unchanged. A phase's `travel` moves the whole drawn body forward by that
   many model units through the floor-planting helper, so a lunge carries its mass
   toward the target instead of tipping in place.
+  His dash attack is authored in Blender (#340): `... SHIPPED_HEROTINKER.mdx PRIVATE_OUTPUT rekey dashAttack --rig RIG.json`
+  writes his skeleton, stand pose and the move's timing, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/tinker-dash-attack.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, pitching each joint about the side-view axis, and `... rekey dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
 
 - Lich King animation authoring (from the repository root):
   `tools/smashcraft-tools/target/release/smashcraft-tools build-lichking [PRIVATE_INPUTS] [IMMUTABLE_EXISTING_MODEL] [--replace NAME]...`

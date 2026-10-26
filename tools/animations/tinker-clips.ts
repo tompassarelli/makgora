@@ -8,7 +8,8 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
 import { drawnStrideSource, type DrawnStride } from "../../ts/scripts/wisp/drawnMotion";
 import { DRAWN_STRIDES } from "../../ts/src/game/presentation/drawnStrideInfo";
-import { Character } from "../../ts/src/game/sim/codes";
+import { AttackStyle, Character } from "../../ts/src/game/sim/codes";
+import { TINKER_MOVES } from "../../ts/src/game/sim/heroes/tinkerMoves";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, hash, onGlobalClock, originalBodyClip, parseSource, tracks } from "./original-clips";
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate, standIndex } from "./pain-gate";
@@ -107,7 +108,9 @@ for (const [pose,frames,contact,shape] of [
   {frame:Math.max(1,contact-3),chest:35,right:65,left:65},{frame:contact,...shape},
   {frame:frames,...shape}]});
 const [inputArg,outputArg] = process.argv.slice(2);
-ensure(inputArg&&outputArg,"usage: bun tools/animations/tinker-clips.ts SOURCE.mdx|SHIPPED_HEROTINKER.mdx PRIVATE_OUTPUT [pain]");
+ensure(inputArg&&outputArg,"usage: bun tools/animations/tinker-clips.ts SOURCE.mdx|SHIPPED_HEROTINKER.mdx PRIVATE_OUTPUT [pain | rekey POSE... [--rig RIG.json | --keys KEYS.json]]");
+const option=(name:string)=>{const at=process.argv.indexOf(name);return at<0?undefined:resolve(process.argv[at+1]??"");};
+const rigOutput=option("--rig"),bakedKeys=option("--keys");
 const input=resolve(inputArg), output=resolve(outputArg), project=resolve(import.meta.dir,"../..");
 ensure(relative(project,output).startsWith(".."),"Derived Warcraft assets must be outside the checkout");
 mkdirSync(join(output,"hero-models"),{recursive:true});
@@ -115,7 +118,7 @@ const source=parseSource(await Bun.file(input).arrayBuffer()), model=structuredC
 const painOnly=process.argv.includes("pain"),rekeyAt=process.argv.indexOf("rekey");
 ensure(painOnly||rekeyAt>=0||source.Sequences.length===23,"Tinker authoring requires the unmodified classic 23-sequence model");
 if(painOnly){await authorPain();process.exit(0);}
-if(rekeyAt>=0){await authorInPlace(process.argv.slice(rekeyAt+1).filter(a=>!a.startsWith("--")));process.exit(0);}
+if(rekeyAt>=0){await authorInPlace(process.argv.slice(rekeyAt+1).filter((a,i,all)=>!a.startsWith("--")&&!all[i-1]?.startsWith("--")));process.exit(0);}
 const helperId=model.Nodes.length;
 const motion:mdx.Helper={Name:"Tinker Floor Motion",ObjectId:helperId,Parent:null,Flags:0,
   PivotPoint:new Float32Array([0,0,0]),Translation:{LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:[]}};
@@ -317,15 +320,24 @@ function rekeyInPlace(chosen:readonly Action[]):number[]{
   }
   return cells;
 }
-function plantFloor(chosen:readonly Action[],cells:readonly number[],low:(cell:number,time:number)=>number){
+function plantFloor(chosen:readonly Action[],cells:readonly number[],low:(cell:number,time:number)=>number,travel=(action:Action,frame:number)=>shapeAt(action,frame).travel??0){
   const floor=model.Helpers.find(h=>h.Name==="Tinker Floor Motion")!;
   for(const [n,action]of chosen.entries()){
     const start=model.Sequences[cells[n]!]!.Interval[0]!;
     const lows=Array.from({length:action.frames+1},(_,frame)=>low(cells[n]!,frame/60));
-    for(const [frame,lowest]of lows.entries())floor.Translation!.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([shapeAt(action,frame).travel??0,0,-lowest]);
+    for(const [frame,lowest]of lows.entries())floor.Translation!.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([travel(action,frame),0,-lowest]);
   }
 }
 function frameKey(start:number,frame:number){return start+Math.round(frame*1000/60);}
+function spliceBaked(action:Action,cell:number,nodes:readonly mdx.Node[],baked:{frames:number;nodes:{rotation:number[][];translation:number[][]}[]}){
+  ensure(baked.frames===action.frames&&baked.nodes.length===nodes.length,`${action.pose}: Blender keys cover ${baked.frames} frames of ${baked.nodes.length} nodes, the move ${action.frames} of ${nodes.length}`);
+  const [start,end]=model.Sequences[cell]!.Interval as unknown as [number,number];
+  for(const [at,node]of nodes.entries())if(!/Motion$/.test(node.Name))for(const kind of ["Rotation","Translation"] as const){
+    const track=node[kind] as mdx.AnimVector|undefined;if(!track||onGlobalClock(track))continue;
+    const keys=baked.nodes[at]![kind==="Rotation"?"rotation":"translation"];
+    track.Keys=[...track.Keys.filter(k=>k.Frame<start||k.Frame>end),...keys.map((v,frame)=>{const Vector=Float32Array.from(v);return {Frame:frameKey(start,frame),Vector,...(track.LineType>=2?{InTan:Vector.slice(),OutTan:Vector.slice()}:{})};})].sort((a,b)=>a.Frame-b.Frame);
+  }
+}
 async function authorPain(){
   const pains=actions.filter(a=>a.pose.startsWith("pain"));
   const cells=rekeyInPlace(pains);
@@ -346,9 +358,18 @@ async function authorPain(){
 }
 async function authorInPlace(poses:readonly string[]){
   const chosen=poses.map(pose=>{const action=actions.find(a=>a.pose===pose);ensure(action&&!pose.startsWith("pain"),`${pose}: no in-place action (pain cells use the pain mode)`);return action!;});
+  ensure(!(rigOutput||bakedKeys)||chosen.length===1,"--rig and --keys take exactly one POSE");
+  const skeleton=(["Bones","Helpers"] as const).flatMap(kind=>model[kind].map((n,at)=>({n,old:source[kind][at]!})));
+  if(rigOutput){
+    const action=chosen[0]!,move=TINKER_MOVES.normals[AttackStyle[action.pose as keyof typeof AttackStyle]];ensure(move,`${action.pose}: no Tinker move timing`);
+    const rest=(track:mdx.AnimVector|undefined)=>track&&!onGlobalClock(track)?Array.from(sample(track,action.donor??6)):null;
+    await Bun.write(rigOutput,JSON.stringify({frames:action.frames,contact:move!.startupFrames,active:move!.activeFrames,nodes:skeleton.map(({n,old})=>({name:n.Name,parent:skeleton.findIndex(s=>s.n.ObjectId===n.Parent),pivot:Array.from(source.PivotPoints[n.ObjectId]!),rotation:rest(old.Rotation),translation:rest(old.Translation),scaling:rest(old.Scaling)}))}));
+    console.log(`TINKER_RIG ${action.pose} ${rigOutput}`);return;
+  }
   const cells=rekeyInPlace(chosen);
+  if(bakedKeys)spliceBaked(chosen[0]!,cells[0]!,skeleton.map(s=>s.n),await Bun.file(bakedKeys).json());
   const unplanted=new DrawnModel(generateMDX(model),1);
-  plantFloor(chosen,cells,(cell,time)=>{const triangles=unplanted.triangles(cell,time,1);let lowest=Infinity;for(let i=1;i<triangles.length;i+=2)lowest=Math.min(lowest,triangles[i]!);return lowest;});
+  plantFloor(chosen,cells,(cell,time)=>{const triangles=unplanted.triangles(cell,time,1);let lowest=Infinity;for(let i=1;i<triangles.length;i+=2)lowest=Math.min(lowest,triangles[i]!);return lowest;},bakedKeys?()=>0:undefined);
   const bytes=encodeVerified(parseSource(generateMDX(model))),drawn=verifyUnchanged(bytes,cells);
   await Bun.write(join(output,"hero-models/herotinker.mdx"),bytes);
   for(const [n,action]of chosen.entries()){
