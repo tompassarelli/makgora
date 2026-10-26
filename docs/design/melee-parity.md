@@ -8,11 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-<<<<<<< HEAD
-503 rows: 449 parity, 34 deviations, 20 open.
-=======
-503 rows: 448 parity, 34 deviations, 21 open.
->>>>>>> 943944f46 (Run set-knockback hits through Melee's formula at 10% with the set value as damage: effectKnockback now passes a set-knockback hit to fixedHitKnockback, so a set-90 growth-100 hit launches weight-75, 100 and 118 victims at 91.6, 82.4 and 77.08 knockback (90 at every weight before), and every set-knockback move takes Melee's growth 100 with its set value kept (the 24 authored down throws, the grabs.ts default and Warden's Fan of Knives, ground and air), so a down throw launches at 82.4 instead of 90; the set-knockback ledger row is a headless probe at parity (smashcraft#529))
+503 rows: 450 parity, 34 deviations, 19 open.
 
 ## Deviations from Melee
 
