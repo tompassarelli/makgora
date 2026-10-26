@@ -44,7 +44,7 @@ import { GroundOption } from "./stickZones";
 import { heroEgg, heroMotionHolds, heroMotionPassesPlatforms, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
-import { demonHunterAuthoredMotion, demonHunterJumpOrAttackBranch } from "./specials";
+import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpOrAttackBranch } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
@@ -569,6 +569,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   let dashEntryDisplacementAdjustment = 0.0;
 
   const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
+  const authoredHeight = authoredMotion || demonHunterHoldsHeight(f);
   const egg = heroEgg(f);
   const canSteer = !authoredMotion && egg === undefined && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
@@ -629,10 +630,10 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (isGroundDodging(f) || (motion.grounded && jump.squat > 0)) {
     motion.vz = 0.0;
     motion.z = stageSurfaces.surfaceZAt(stage, motion.surface ?? 0, matchFrame, motion.x);
-  } else if (wet && egg === undefined && !waterJumped && launch.hitstun <= 0 && !dodgeActive && !authoredMotion && drill?.speedZ === undefined) {
+  } else if (wet && egg === undefined && !waterJumped && launch.hitstun <= 0 && !dodgeActive && !authoredHeight && drill?.speedZ === undefined) {
     buoyant = true;
     sea.applyBuoyancy(f);
-  } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredMotion) {
+  } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredHeight) {
     if (!motion.grounded && !motion.fastFalling && !f.platform.dropConsumed && downHeld && motion.fastFallInputAge < FAST_FALL_INPUT_WINDOW && input.direction === 0
       && down.state === DownState.none && launch.hitstun <= 0 && motion.vz < 0) {
       motion.fastFalling = true;

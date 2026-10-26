@@ -438,3 +438,12 @@ export function chargedAngleMotion(distance: number, travelFrames: number): read
     { ...frames(stop, stop), velocityX: 0.0, velocityZ: 0.0 },
   ];
 }
+
+
+export function movementSpecial(move: Readonly<AuthoredSpecial>): boolean {
+  for (const segment of move.motion ?? []) {
+    if (segment.velocityX !== 0.0 || segment.velocityZ !== 0.0 || segment.aimedSpeed !== undefined || segment.driftSpeed !== undefined
+      || segment.liftSpeed !== undefined || segment.seek !== undefined || segment.steer !== undefined || segment.relocate !== undefined) return true;
+  }
+  return false;
+}

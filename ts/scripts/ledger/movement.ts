@@ -1,19 +1,20 @@
 import { resolve } from "node:path";
 import { CHARACTER_ATTRIBUTES_URL, readCharacterAttributes } from "../../../references/melee-frame-data/character-attributes";
-import { fighter, solo } from "../../src/game/match/padScene";
+import { Action } from "../../src/game/input/actions";
+import { fighter, frame, solo } from "../../src/game/match/padScene";
 import { normalAttackStyle } from "../../src/game/input/combat";
-import { AttackStyle, Character } from "../../src/game/sim/codes";
+import { AttackStyle, Character, SpecialAction } from "../../src/game/sim/codes";
 import {
   AIR_DODGE_INTANGIBLE_END, AIR_DODGE_INTANGIBLE_START, GROUND_ROLL_FRAMES, GROUND_ROLL_INTANGIBLE_END, GROUND_ROLL_INTANGIBLE_START,
   SPOT_DODGE_FRAMES, SPOT_DODGE_INTANGIBLE_END, SPOT_DODGE_INTANGIBLE_START,
 } from "../../src/game/sim/conditions";
 import { AIR_DODGE_LANDING_LAG, EMPTY_LANDING_LAG } from "../../src/game/sim/down";
-import { restingTraction } from "../../src/game/sim/groundMovement";
+import { groundState, restingTraction } from "../../src/game/sim/groundMovement";
 import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY } from "../../src/game/sim/jumpsAndDodges";
 import { LEDGE_HANG_LIMIT_FRAMES, LEDGE_INTANGIBLE_DECAY, ledgeIntangibleFrames, ledgeSnap } from "../../src/game/sim/ledge";
 import { attackLandingLag, uncancelledLandingLag } from "../../src/game/sim/moves";
 import { TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X } from "../../src/game/sim/stick";
-import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, STICK_DEADZONE, STICK_SMASH_DEADZONE, TAP_JUMP_STICK_THRESHOLD, WALK_MIDDLE_STICK_THRESHOLD } from "../../src/game/sim/stickZones";
+import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, GroundState, STICK_DEADZONE, STICK_SMASH_DEADZONE, TAP_JUMP_STICK_THRESHOLD, WALK_MIDDLE_STICK_THRESHOLD } from "../../src/game/sim/stickZones";
 import { LEDGE_REGRAB_FRAMES } from "../../src/game/sim/transitions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
 
@@ -25,6 +26,25 @@ const STICK_ZONES = `${SIM}/stickZones.ts`;
 const STICK_DEADZONE_URL = "https://smashboards.com/threads/%E2%80%9Cup-down-zoning%E2%80%9D-your-loose-zone-for-simpler-shield-dropping.441075";
 const AERIALS = [AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir] as const;
 const ALWAYS_CANCELLED = "every aerial lands with the halved lag, with no input";
+
+const SPECIAL_PRESSES = [
+  { name: "neutral", held: [Action.special] },
+  { name: "side", held: [Action.special, Action.moveRight] },
+  { name: "up", held: [Action.special, Action.moveUp] },
+  { name: "down", held: [Action.special, Action.moveDown] },
+] as const;
+
+function specialsOutOf(state: GroundState): string {
+  const started = SPECIAL_PRESSES.filter(({ held }) => {
+    const s = solo(0, Character.blademaster);
+    const f = fighter(s, 0);
+    for (let n = 1; n <= 40 && groundState(f) !== state; n++) frame(s, [Action.moveRight]);
+    if (groundState(f) !== state) throw new Error(`the probe never reached ground state ${state}`);
+    frame(s, held);
+    return f.special.action !== SpecialAction.none;
+  }).map(({ name }) => name);
+  return started.length === SPECIAL_PRESSES.length ? "every special" : started.length === 0 ? "none" : `${started.join(" and ")} special only`;
+}
 
 function commonLandingLag(): number {
   const counts = new Map<number, number>();
@@ -174,6 +194,17 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     melee: { undocumented: "no public page states the value a flick must start inside", source: wiki("Control_stick") }, ours: () => STICK_SMASH_DEADZONE,
     anchor: { file: STICK_ZONES, symbol: "STICK_SMASH_DEADZONE" },
     status: { kind: "open", reason: "ours; no public source gives Melee's value", issue: 293 },
+  },
+  {
+    id: "special-out-of-dash", family: "movement", name: "Specials out of Initial Dash, probed headless",
+    melee: { value: "side special only", source: wiki("Dash") }, ours: () => specialsOutOf(GroundState.dash),
+    anchor: { file: "ts/src/game/sim/specials.ts", symbol: "startFighterSpecial" },
+    status: { kind: "deviation", reason: "our smash turn is the dash back, so the flick-then-B turnaround special starts in Dash, and a grounded special stops horizontal movement, so a dash carries no speed into it (docs/gameplay-design.md, Special momentum)", decided: "2026-10-26", issue: 490 },
+  },
+  {
+    id: "special-out-of-run", family: "movement", name: "Specials out of Run, probed headless",
+    melee: { value: "every special", source: wiki("Run") }, ours: () => specialsOutOf(GroundState.run),
+    anchor: { file: "ts/src/game/sim/specials.ts", symbol: "startFighterSpecial" }, status: PARITY,
   },
   {
     id: "stick-dash", family: "movement", name: "Dash stick threshold",

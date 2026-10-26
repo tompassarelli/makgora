@@ -13,7 +13,7 @@ import {
   RIFLEMAN_BLASTER_GROUND_SHOT_FRAME,
 } from "./moves";
 import { HitElement, type HitEffect, type HitRegion, NO_HIT_REGION } from "./hitRegions";
-import { heroSpecialMove } from "./specials/schema";
+import { heroSpecialMove, movementSpecial } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
 import { ROSTER_MANA, spendMana } from "./mana";
@@ -297,9 +297,12 @@ function startBranchPhase(owner: Fighter, form: number, frames: number): void {
 }
 
 
+export function demonHunterHoldsHeight(f: Readonly<Fighter>): boolean {
+  return f.special.action === SpecialAction.demonHunterImmolate && !f.motion.grounded;
+}
+
 export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
   const { special } = f;
-  if (special.action === SpecialAction.demonHunterImmolate) return !f.motion.grounded;
   if (special.action === SpecialAction.demonHunterFelRush) {
     return special.form === 0 ? special.frame < FEL_RUSH_LAST : special.form === VENGEFUL_RETREAT_FORM && special.frame < VENGEFUL_RETREAT_MOVE_LAST;
   }
@@ -311,9 +314,7 @@ export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
 
 
 function stallImmolate(owner: Fighter): void {
-  if (owner.motion.grounded) return;
-  owner.motion.vx = 0.0;
-  owner.motion.vz = 0.0;
+  if (!owner.motion.grounded) owner.motion.vz = 0.0;
 }
 
 
@@ -515,6 +516,10 @@ function turnForSpecial(owner: Fighter, input: Readonly<Controls>): void {
 
 
 
+function originalMovementSpecial(action: SpecialAction): boolean {
+  return action === SpecialAction.riflemanRecovery || action === SpecialAction.demonHunterFelRush || action === SpecialAction.demonHunterWingAscent;
+}
+
 function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, world: Roster | undefined): boolean {
   const specials = owner.tuning.specials;
   const { special } = owner;
@@ -534,7 +539,7 @@ function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, worl
   const action = SpecialAction.heroNeutral + chosen.slot;
   startSpecialAction(owner, heroAction(action), move.endFrame, specialDirection(input, owner.facing));
   enterExSpecial(owner, input);
-  enterHeroSpecial(owner, chosen, input);
+  if (!movementSpecial(enterHeroSpecial(owner, chosen, input)) && owner.motion.grounded) owner.motion.vx = 0.0;
   return true;
 }
 
@@ -592,8 +597,10 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   const facing = owner.facing;
   turnForSpecial(owner, input);
   const moveX = specialDirection(input, owner.facing);
+  const grounded = owner.motion.grounded;
   const started = startOriginalSpecial(owner, stage, matchFrame, requested, moveX);
   if (started) {
+    if (grounded && !originalMovementSpecial(requested)) owner.motion.vx = 0.0;
     enterExSpecial(owner, input);
     if (requested === SpecialAction.demonHunterManaBurn && owner.special.ex && owner.motion.grounded) enterEyeBlast(owner);
   }

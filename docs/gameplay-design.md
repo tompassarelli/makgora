@@ -138,7 +138,8 @@ Where Smashcraft keeps its own rule, and why:
 - Turns have no separate 11-frame Turn state: a tilt turn walks the other way
   at once and a smash turn is the dash back.
 - Specials are not gated by ground state (Melee's Dash allows only the side
-  special); #390 gates the normals, grab, shield and crouch.
+  special, the ledger's `special-out-of-dash` deviation, [Special
+  momentum](#special-momentum)); #390 gates the normals, grab, shield and crouch.
 - Rolls come from shield on every state that allows shield (Melee also rolls
   out of dash frames 1–3,).
 - The forward-smash window applies to every initial dash, including dash backs.
@@ -906,6 +907,63 @@ straight up and up-forward keep the facing. Down specials keep their own
 aiming. Momentum is unchanged: no
 wavebounce. smashcraft:ts/src/game/sim/turnaroundSpecials.tests.ts holds the
 rule over all 13 selectable fighters.
+
+## Special momentum
+
+Tom decided, 26 Oct (#490). Reference: Melee's grounded specials stop the
+fighter where it stands, as Mario's fireball and Falco's laser do, and its
+aerial specials leave the air velocity to the ordinary air physics.
+
+One rule for every fighter's four specials
+(smashcraft:ts/src/game/sim/specials.ts, `startHeroFighterSpecial` and
+`startFighterSpecial`):
+
+- **Started on the ground, a special stops horizontal movement.** Its first
+  frame sets the horizontal speed to zero, so walking, dashing or running
+  into it carries nothing.
+- **Started in the air, a special keeps its horizontal velocity.** Air
+  friction and drift act as they do in any other air state, and Illidan's
+  air Immolate still holds his vertical speed at zero while his horizontal
+  speed carries.
+- **Movement specials keep their own authored motion**: a special whose
+  motion moves its user (`movementSpecial`,
+  smashcraft:ts/src/game/sim/specials/schema.ts), and the original kits'
+  Rifleman recoil shot, Illidan's Fel Rush and Wing Ascent. They are the
+  rushes, lunges, teleports and recoveries, and their motion would fight a
+  stop:
+
+| Fighter | Exceptions, ground and air |
+| --- | --- |
+| Rifleman | up: recoil shot (recovery) |
+| Illidan | side: Fel Rush (rush); up: Wing Ascent (recovery) |
+| Blademaster | side: Wind Walk (rush); up: Rising Whirlwind (recovery); down: Mirror Image (back-step relocation) |
+| Mountain King | side: Storm Rush (rush); up: Thunder Leap (recovery) |
+| Warden | side: Shadow Pursuit (lunge, teleport when marked); up: Blink (teleport) |
+| Lich | up: Spectral Ascent (recovery) |
+| Forsaken Paladin | side: Righteous Fury (rush); up: Ascension (recovery) |
+| Dreadlord | side: Vampiric Pounce (lunge); up: Bat Ascension (recovery) |
+| Shadow Hunter | up: Loa Vault (recovery) |
+| Pit Lord | side: Ruin Charge (rush); up: Abyssal Leap (recovery) |
+| Beastmaster | up in the air: Summon Hawk's lift (recovery; the ground form summons and stops) |
+| Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Ascension of the Damned, Far Sight, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
+| Cairne | side: Bloodhoof Gore (rush); up: Spirit Lift (recovery) |
+| Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
+| Murloc | side: Tidal Rush (rush); up: Tide Spout (recovery) |
+| Grom | side: Gorehowl Rush (rush); up: Blood Leap (recovery) |
+| Anub'arak | side: Burrow Hunt (rush); up: Crypt Eruption (recovery) |
+| Malfurion | side: Stag Charge (rush); up: Dream Ascent (recovery) |
+| Medivh | side: Vanishing Act (teleport); up: Raven Flight (recovery); down: Last Word (backward teleport) |
+| Kobold | side: Panic Dig (rush); up: Candle Escape (recovery) |
+
+Grounded specials come out of stand, walk, crouch, Dash and Run. Melee
+allows only the side special in its Initial Dash and every special in Run
+([SmashWiki: Dash](https://www.ssbwiki.com/Dash),
+[Run](https://www.ssbwiki.com/Run)); ours keeps every special in Dash, the
+ledger's `special-out-of-dash` deviation, because our smash turn is the dash
+back, so the flick-then-B turnaround special starts in Dash, and the stop
+above leaves a dash no speed to carry into a special.
+smashcraft:ts/src/game/sim/specialMomentum.tests.ts drives every fighter's
+four specials on the ground and in the air.
 
 ## Controls
 

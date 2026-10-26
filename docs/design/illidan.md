@@ -311,8 +311,9 @@ Crash:
 
 - The same timing as on the ground: it strikes on frame 1 only, his first
   frame is intangible, 27 in all, jump-cancellable from frame 4.
-- Every frame of it zeroes his horizontal and vertical speed, so he hangs in
-  place.
+- Every frame of it zeroes his vertical speed while his horizontal speed
+  carries, as every special started in the air keeps it (26 Oct, #490,
+  smashcraft:docs/gameplay-design.md#special-momentum).
 - Its strike since #272 is Fan of Knives' former shape on both sides of him:
   a foe whose feet are within 116 to either side and 104 below to 108 above
   (140, 114 and 118 for EX) is popped away from him at 85 degrees, base 75,
