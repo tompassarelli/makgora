@@ -141,6 +141,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `--only=ultimate` appends his ultimate's own burrow clip (#404): a pick chop
   into the floor, a dig with only the pick and candle above the dirt, a coil and
   a burst up through the hit, independent of Panic Dig's sequences.
+  Every clip it authors ends with a pick-clearance pass, and
+  `bun tools/animations/weapon-clear.ts SHIPPED.mdx FIGHTER PRIVATE_OUTPUT SEQUENCE...`
+  runs the same pass on named clips of any shipped model with a held weapon: on each
+  run of 60 Hz frames where the weapon comes within 2 units of the grip audit's limb
+  capsules (smashcraft:tools/animations/limb-capsules.ts), it keys the smallest hand
+  turn that clears them, eased in and out over 4 frames, and leaves every other clip
+  unchanged (#453).
   `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
   Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
   preserving all seventeen stock clips and writing both-facing pose sheets.

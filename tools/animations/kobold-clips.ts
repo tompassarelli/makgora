@@ -12,6 +12,9 @@ import { KOBOLD_SPECIALS } from "../../ts/src/game/sim/heroes/koboldSpecials";
 import { KOBOLD_BARE_CLIPS, KOBOLD_CLIPS } from "../../ts/src/game/sim/heroes/koboldClips";
 import { Character } from "../../ts/src/game/sim/codes";
 import { FIGHTER_ULTIMATES, KOBOLD_BURROW_FIRST } from "../../ts/src/game/sim/ultimates";
+import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
+import { FIGHTER_RIGS } from "./rigs";
+import { WEAPON_CLEAR_MARGIN, clearWeapon } from "./weapon-clearance";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -396,6 +399,7 @@ for (const action of actions) {
   }
   records.push({ pose: action.pose, index, frames: action.frames, contact: action.contact, beats: action.beats.map(b => b.frame), tipMiss });
 }
+for (const record of records) clearWeapon(model, FIGHTER_RIGS.get(Character.kobold)!, characterModelScale(Character.kobold), record.index, WEAPON_CLEAR_MARGIN);
 
 if (!source.Nodes[candle.ObjectId]!.Scaling && candle.Scaling) {
   const bareIntervals = actions.filter(a => a.bare).map(a => model.Sequences[seq(a.pose).index]!.Interval);
