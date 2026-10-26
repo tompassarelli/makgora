@@ -449,6 +449,30 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "A second fresh down press drops player 1 through the platform again.",
     },
     {
+      id: "c43-phased-opacity-roster", closes: "smashcraft#383 (roster)", map: "presentation", session: "c43-phased",
+      setup: [{ chat: "-dev reset" }, { chat: "-dev quick pair Dreadlord / Lich" }, { waitMs: 4000 }, { keys: ["q+s"], client: "b" }],
+      capture: [{ kind: "frames", name: "spot-dodge", client: "a", count: 16, everyMs: 33 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Player 2's Lich, the roster's other alpha-keyed body beside Dreadlord, spot dodges: drawn on every intangible frame, robe and skull intact, then fully opaque again.",
+    },
+    {
+      id: "c43-phased-opacity-lifecycle", closes: "smashcraft#383 (lifecycle)", map: "presentation", session: "c43-phased",
+      setup: [{ chat: "-dev reset" }, { chat: "-dev quick hero Dreadlord stocks 3" }, { waitMs: 4000 }, { keys: ["a"], holdMs: 1500, client: "a" }],
+      capture: [{ kind: "frames", name: "respawn", client: "a", count: 30, everyMs: 120 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Player 1's Dreadlord walks off the left edge and loses a stock; he respawns on the platform see-through yet drawn on every frame of his 90-frame invincibility, wings and all, then turns fully opaque when it ends.",
+    },
+    {
+      id: "c43-phased-opacity-hit-status", closes: "smashcraft#383 (hit status)", map: "presentation", session: "c43-phased",
+      setup: [
+        { chat: "-dev reset" }, { chat: "-dev quick pair Kael'thas Sunstrider / Dreadlord" }, { waitMs: 4000 },
+        { keys: ["d"], holdMs: 600, client: "a" }, { keys: ["s+u"], client: "a" }, { waitMs: 250 },
+      ],
+      capture: [{ kind: "frames", name: "banish", client: "a", count: 14, everyMs: 120 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Kael'thas's Banish lands on player 2's Dreadlord: the victim turns green and see-through yet stays drawn on every frame of the 90-frame status, then returns to full colour and opacity.",
+    },
+    {
       id: "482-shield-energy", closes: "smashcraft-dev#482 box 3 (Classic)", map: "shield-energy", session: "482-shield",
       setup: [{ chat: "-dev reset" }, { chat: SHIELD_ENERGY_SETUP }],
       capture: [{ kind: "frames", name: "shield-down-full-mid-low", client: "a", count: 4 }],
