@@ -32,10 +32,10 @@ const sample = (moveClass: MoveClass, shoulders: readonly number[], reach: reado
 const DRIVEN = [0, -4, -6, 2, 14, 14, 14, 14];
 const PLANTED = [0, 0, 0, 0, 0, 0, 0, 0];
 
-test("a dash attack may draw its weapon back past the shoulder in the windup, while a tilt may not [k3 measure docs/animation-scorecard.md]", () => {
+test("a dash attack measured from its windup passes with its weapon drawn back past the shoulder, while a tilt does not [k3 measure docs/animation-scorecard.md]", () => {
   const dash = scoreMove(sample("dash-attack", DRIVEN, RETURN), THRESHOLDS["dash-attack"]).line1;
   const tilt = scoreMove(sample("tilt", DRIVEN, RETURN), THRESHOLDS.tilt).line1;
-  expect(dash.bodyShare).toBeCloseTo(1, 5);
+  expect(dash.bodyShare).toBeCloseTo(0.5, 5);
   expect(dash.pass).toBe(true);
   expect(tilt.bodyShare).toBeCloseTo(0.5, 5);
   expect(tilt.pass).toBe(false);
