@@ -17,6 +17,7 @@ import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, 
 import { gateChecks } from "./gateChecks";
 import { specialStripChecks, specialStripMaps } from "./specialStripChecks";
 import { meterRimChecks } from "./meterRimChecks";
+import { ledgerCaptureChecks } from "./ledgerCaptureChecks";
 import { newestPresentation } from "./presentationInputs";
 
 const inputs = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -183,6 +184,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
   maps: MAP_PROFILES,
   checks: [
     ...gateChecks(NO_ERRORS),
+    ...ledgerCaptureChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     {
       id: "123-selection", closes: "smashcraft#123 box 5", map: "presentation", session: "123-match-flow",
       setup: [
