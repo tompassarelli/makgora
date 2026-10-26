@@ -119,34 +119,38 @@ def glide(t, ramp=0.2):
     return pace * t if t < 1 - ramp else 1 - pace * (1 - t) ** 2 / (2 * ramp)
 
 
-READY = {}
+def offsets():
+    pose({})
+    s, h, w = (bones[name].head for name in ('Bone_Arm1_R', 'Bone_Hand_R', 'axe'))
+    return (h.x - s.x, h.z - s.z, w.x - s.x, w.z - s.z)
+
+
+READY, READY_AIM = {}, offsets()
 KEYS = {
     0: dict(chest=10, lean=8, head=-8, leftArm=25, thigh=-26, knee=40, leftThigh=24, leftKnee=46),
-    2: dict(chest=-8, lean=-6, head=6, twist=-15, leftArm=-40, thigh=-36, knee=6, foot=14, leftThigh=16, leftKnee=46, travel=-12),
-    contact - 2: dict(chest=-30, pelvis=8, lean=-18, head=24, twist=-50, leftArm=-95, leftElbow=-35,
-                      thigh=-30, knee=8, foot=22, leftThigh=32, leftKnee=88, leftFoot=-34, travel=-32,
-                      aim=(-14, 26, -70, 75)),
-    contact: dict(chest=36, pelvis=-12, lean=18, head=-32, twist=45, leftArm=40, leftElbow=-20,
-                  thigh=-74, knee=68, foot=8, leftThigh=40, leftKnee=6, travel=36,
-                  aim=(26, -14, 114, -20)),
-    (contact + last) // 2: dict(chest=46, pelvis=-16, lean=22, head=-40, twist=55, leftArm=50, leftElbow=-16,
-                                thigh=-84, knee=86, foot=8, leftThigh=50, leftKnee=8, travel=52,
-                                aim=(26, -24, 108, -42)),
-    last: dict(chest=58, pelvis=-20, lean=26, head=-46, twist=62, leftArm=60, leftElbow=-10,
-               thigh=-92, knee=100, foot=8, leftThigh=56, leftKnee=10, travel=62,
-               aim=(24, -32, 98, -58)),
-    last + 4: dict(chest=50, pelvis=-17, lean=21, head=-38, twist=55, leftArm=52, leftElbow=-14,
-                   thigh=-84, knee=92, foot=7, leftThigh=30, leftKnee=40, leftFoot=-5, travel=60,
-                   aim=(6, -16, 56, 34)),
-    last + 7: dict(chest=40, pelvis=-14, lean=16, head=-28, twist=48, leftArm=45, leftElbow=-18,
-                   thigh=-72, knee=82, foot=6, leftThigh=4, leftKnee=66, leftFoot=-10, travel=60,
-                   aim=(6, -8, 40, 74)),
+    2: dict(chest=-12, lean=-14, head=8, twist=-20, leftArm=-40, thigh=-36, knee=20, foot=14, leftThigh=18, leftKnee=50, travel=-14),
+    contact - 2: dict(chest=-34, pelvis=14, lean=-40, head=30, twist=-55, leftArm=-95, leftElbow=-35,
+                      thigh=-46, knee=50, foot=24, leftThigh=40, leftKnee=80, leftFoot=-20, travel=-32,
+                      aim=(-18, 30, -64, 82)),
+    contact: dict(chest=34, pelvis=-10, lean=18, head=-30, twist=40, leftArm=40, leftElbow=-20,
+                  thigh=-78, knee=72, foot=8, leftThigh=44, leftKnee=6, travel=36,
+                  aim=(30, 0, 112, 10)),
+    contact + 6: dict(chest=62, pelvis=-20, lean=34, head=-52, twist=60, leftArm=60, leftElbow=-12,
+                      thigh=-96, knee=108, foot=8, leftThigh=58, leftKnee=8, travel=56,
+                      aim=(26, -34, 96, -64)),
+    last: dict(chest=52, pelvis=-17, lean=28, head=-44, twist=54, leftArm=40, leftElbow=-30,
+               thigh=-92, knee=102, foot=8, leftThigh=54, leftKnee=12, travel=62,
+               aim=(14, -6, 30, 18)),
 }
 keys, seed = {}, {}
 for frame in sorted(KEYS):
     keys[frame] = seed = reach(KEYS[frame], seed)
-settle = max(KEYS)
-keys.update({frame: blend(keys[settle], READY, glide((frame - settle) / (frames - settle))) for frame in range(settle + 1, frames + 1)})
+for frame in range(last + 1, frames):
+    t = glide(((frame - last) / (frames - last)) ** 1.3)
+    body = blend({k: v for k, v in KEYS[last].items() if k != 'aim'}, READY, t)
+    body['aim'] = tuple(a * (1 - t) + b * t for a, b in zip(KEYS[last]['aim'], READY_AIM))
+    keys[frame] = seed = reach(body, seed)
+keys[frames] = reach(READY, {})
 
 posed = {}
 for frame in sorted(keys):
