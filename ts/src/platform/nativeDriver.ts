@@ -20,12 +20,12 @@ import { applyDeveloperCommand } from "../host/loop/developerCommands";
 import { shell, type ShellState, localSlot } from "../host/loop/state";
 import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { fighterAt, neutralControls } from "../game/sim/roster";
-import { AttackStyle } from "../game/sim/codes";
+import { AttackStyle, DownState } from "../game/sim/codes";
 import { beginFighterAttack } from "../game/sim/attacks";
 import { startFighterSpecial } from "../game/sim/specials";
 import { isAerialAttack } from "../game/sim/moves";
 import { ROSTER_MANA } from "../game/sim/mana";
-import { beginAttack } from "../game/sim/transitions";
+import { beginAttack, beginDownState } from "../game/sim/transitions";
 import { selectScriptedAttackClip } from "../game/presentation/fighterPose";
 import { at } from "wisp/src/runtime/lookup";
 
@@ -240,7 +240,8 @@ export function startScriptedMove(s: ShellState, slot: number, kind: string | un
     const style = Object.values(AttackStyle).find(value => value === whole(code));
     if (style === undefined) throw new Error("native driver: invalid move style");
     if (isAerialAttack(style)) { fighter.motion.grounded = false; fighter.motion.z = 250.0; }
-    if (style === AttackStyle.getupAttack || style === AttackStyle.ledgeAttack) beginAttack(fighter, style, false);
+    if (style === AttackStyle.getupAttack) beginDownState(fighter, DownState.attack, 0);
+    else if (style === AttackStyle.ledgeAttack) beginAttack(fighter, style, false);
     else beginFighterAttack(s.world, slot, style, false);
     if (fighter.attack.style !== style) throw new Error("native driver: normal did not start");
     selectScriptedAttackClip(at(s.runtime.poses, slot), fighter);

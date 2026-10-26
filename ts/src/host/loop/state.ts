@@ -40,7 +40,7 @@ import { type ShowcasePads, createShowcasePads } from "../../game/session/showca
 import type { MenuPhase } from "../../game/session/journalFiles";
 import { type PauseBarrier, pauseBarrier } from "../../game/session/pauseBarrier";
 import type { RollbackPlayback, SpeculativeMatch } from "../../game/session/playback";
-import type { DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction } from "../../game/sim/codes";
+import type { Character, DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction } from "../../game/sim/codes";
 import { createFighter } from "../../game/sim/fighter";
 import { type Roster, createRoster } from "../../game/sim/roster";
 import { type BindingPersistence, type BindingSettings, createBindingSettings } from "../../game/ui/bindingSettings";
@@ -331,6 +331,7 @@ export interface ShellState {
   readonly hiddenFighters: Slots<HiddenFighter | undefined>;
   readonly showcase: ShowcasePads;
   showcaseFocus: ParticipantSlot | undefined;
+  showcaseDemo: Character | undefined;
   readonly showcaseMarkers: effect[];
 
   ui: UiObjects | undefined;
@@ -442,7 +443,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
-    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, showcaseMarkers: [], ui: undefined,
+    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, showcaseDemo: undefined, showcaseMarkers: [], ui: undefined,
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0, devStep: 1, devSteps: 1,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),

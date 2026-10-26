@@ -24,6 +24,13 @@ Classic `raised=T` with no visible bubble is FAIL, never RECAPTURE.
 AI observation records in replay dumps retain default shield energy; only
 the live fighter state or these direct receipts measures shield drain.
 
+On the persistent showcase map, `bun scripts/showcase.ts send CLIENT_DATA_DIR
+dev -dev showcase demo NAME` plays the fighter's showcase rows in-map on the
+shared timeline (`src/game/session/showcaseTimeline.ts`), writing the same
+`CAPTURE SCRIPT` status and drawn stamps as the capture map.
+`bun scripts/showcaseDemoCheck.ts SLUG...` plays that demo headless and
+refuses unless every held stamp and status equals the timeline frame for frame.
+
 `bun wisp native-capture reel --out PRIVATE_DIR [--fighter SLUG] [--hold-ticks N]`
 prepares Classic motion-reel pad scripts from the current roster and authored
 normals, four ground specials and ultimate. Each fighter directory is one

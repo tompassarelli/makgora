@@ -18,19 +18,12 @@ import type { Roster } from "../src/game/sim/roster";
 import { fighterAt } from "../src/game/sim/roster";
 import { damageTint, hitlagShake } from "../src/game/presentation/hitPresentation";
 import { SMASHCRAFT_HEADLESS } from "./wisp/headless";
-import type { CaptureFixture } from "../src/platform/captureFixtures";
-import { SELECTABLE_CHARACTERS, fighterKey, fighterSlug } from "../src/game/sim/heroes/registry";
-import { SHOWCASE_FIRST_FRAME, showcaseRows } from "../src/game/session/showcaseTimeline";
+import { type CaptureFixture, SHOWCASE_HOLD_TICKS, showcaseFixtures } from "../src/platform/captureFixtures";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
 
-export function reelFixtures(only: string | undefined, holdTicks = 6): CaptureFixture[][] {
+export function reelFixtures(only: string | undefined, holdTicks = SHOWCASE_HOLD_TICKS): CaptureFixture[][] {
   if (!Number.isInteger(holdTicks) || holdTicks < 6 || holdTicks > 180) throw new Error("reel hold ticks must be 6..180");
-  const batches = SELECTABLE_CHARACTERS.filter(character => only === undefined || fighterSlug(character) === only).map(character => {
-    const fighter = fighterSlug(character);
-    return showcaseRows(character).map(({ row, move, facing, frames }) => {
-      const script = `#! chat -dev quick hero ${fighterKey(character).toLowerCase()}\n#! reel ${fighter} ${row} ${move.slot} ${facing} ${holdTicks}\n${SHOWCASE_FIRST_FRAME} a move ${move.kind} ${move.code} ${facing}\n${frames.map(frame => `${frame} a capture`).join("\n")}\n`;
-      return { name: `${fighter}-${row}`, frames, script, holdTicks, openingTicks: 1, tailFrames: 0, reel: { fighter, row, slot: move.slot, facing } };
-    });
-  });
+  const batches = SELECTABLE_CHARACTERS.filter(character => only === undefined || fighterSlug(character) === only).map(character => showcaseFixtures(character, holdTicks));
   if (batches.length === 0) throw new Error(`unknown fighter ${only}`);
   return batches;
 }

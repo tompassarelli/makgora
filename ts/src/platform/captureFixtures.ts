@@ -1,7 +1,6 @@
-
-
-
-
+import type { Character } from "../game/sim/codes";
+import { fighterKey, fighterSlug } from "../game/sim/heroes/registry";
+import { SHOWCASE_FIRST_FRAME, showcaseRows } from "../game/session/showcaseTimeline";
 
 export interface Silhouette {
   readonly slot: 0 | 1;
@@ -24,6 +23,16 @@ export interface CaptureFixture {
 
 // A hidden capture's stamp names frame + SILHOUETTE_HIDDEN_FRAME, so a pixel stamp tells the pair apart.
 export const SILHOUETTE_HIDDEN_FRAME = 16384;
+
+export const SHOWCASE_HOLD_TICKS = 6;
+
+export function showcaseFixtures(character: Character, holdTicks = SHOWCASE_HOLD_TICKS): CaptureFixture[] {
+  const fighter = fighterSlug(character);
+  return showcaseRows(character).map(({ row, move, facing, frames }) => {
+    const script = `#! chat -dev quick hero ${fighterKey(character).toLowerCase()} stocks 9\n#! reel ${fighter} ${row} ${move.slot} ${facing} ${holdTicks}\n${SHOWCASE_FIRST_FRAME} a move ${move.kind} ${move.code} ${facing}\n${frames.map(frame => `${frame} a capture`).join("\n")}\n`;
+    return { name: `${fighter}-${row}`, frames, script, holdTicks, openingTicks: 1, tailFrames: 0, reel: { fighter, row, slot: move.slot, facing } };
+  });
+}
 
 const WALK = "#! chat -dev quick hero rifleman\n40 a stick 1 0\n70 a stick 0 0\n90 b tap X 2\n";
 const OTHER = "#! chat -dev quick hero mountain king\n40 b stick -1 0\n70 b stick 0 0\n";

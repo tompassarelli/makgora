@@ -12,6 +12,7 @@ export type ShowcaseRequest =
   | { readonly kind: "spawn"; readonly slot: ParticipantSlot; readonly character: Character }
   | { readonly kind: "clear"; readonly slot: ParticipantSlot }
   | { readonly kind: "camera"; readonly slot: ParticipantSlot | "all" }
+  | { readonly kind: "demo"; readonly character: Character }
   | { readonly kind: "invalid" };
 
 export interface ShowcasePads {
@@ -63,6 +64,10 @@ export function showcaseRequest(message: string): ShowcaseRequest | undefined {
     return fighters.length === names.length && fighters.length <= PARTICIPANT_SLOTS.length ? { kind: "start", fighters } : { kind: "invalid" };
   }
   if (verb === "camera") return cameraRequest(args);
+  if (verb === "demo") {
+    const character = characterNamed(args);
+    return character === undefined ? { kind: "invalid" } : { kind: "demo", character };
+  }
   const gap = args.indexOf(" ");
   const slot = padSlot(gap < 0 ? args : args.substring(0, gap));
   if (slot === undefined) return { kind: "invalid" };
@@ -71,7 +76,7 @@ export function showcaseRequest(message: string): ShowcaseRequest | undefined {
   return character === undefined ? { kind: "invalid" } : { kind: "spawn", slot, character };
 }
 
-const padName = (character: Character): string => fighterKey(character).toLowerCase();
+export const padName = (character: Character): string => fighterKey(character).toLowerCase();
 
 export function showcasePadsReceipt(pads: Readonly<ShowcasePads>): string {
   const filled: string[] = [];
@@ -83,7 +88,7 @@ export function showcasePadsReceipt(pads: Readonly<ShowcasePads>): string {
 }
 
 export function applyShowcaseRequest(pads: ShowcasePads, request: ShowcaseRequest): string | undefined {
-  if (request.kind === "invalid" || request.kind === "camera") return undefined;
+  if (request.kind === "invalid" || request.kind === "camera" || request.kind === "demo") return undefined;
   if (request.kind === "clear") {
     if (pads.fighters[request.slot] === undefined || showcaseMask(pads) === 1 << request.slot) return undefined;
     pads.fighters[request.slot] = undefined;

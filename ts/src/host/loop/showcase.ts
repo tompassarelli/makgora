@@ -1,6 +1,6 @@
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { Phase, firstHumanSlot, setEndless, setItemsOn, setMeterDropsOn, setParticipants, setUltimatesOn, stageClock, updateConnectedHumans } from "../../game/lobby/lobbyState";
-import { SHOWCASE_PAD_X, type ShowcasePads, type ShowcaseRequest, applyShowcaseRequest, copyShowcasePads, createShowcasePads, showcaseMask } from "../../game/session/showcase";
+import { SHOWCASE_PAD_X, type ShowcasePads, type ShowcaseRequest, applyShowcaseRequest, copyShowcasePads, createShowcasePads, padName, showcaseMask } from "../../game/session/showcase";
 import { STAGE_EDGE_LIGHT_MODEL } from "../../game/presentation/stageEdgeLights";
 import { Character } from "../../game/sim/codes";
 import { fighterAt, isActive } from "../../game/sim/roster";
@@ -67,6 +67,10 @@ export function applyShowcaseCommand(s: ShellState, request: ShowcaseRequest, re
     for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) hideFighter(s, slot, focus !== "all" && slot !== focus);
     if (focus === "all") renderPersistentPresentation(s);
     return `dev: showcase camera ${focus === "all" ? "all" : focus + 1}`;
+  }
+  if (request.kind === "demo") {
+    s.showcaseDemo = request.character;
+    return `dev: showcase demo ${padName(request.character)}`;
   }
   const pads = createShowcasePads();
   copyShowcasePads(pads, s.showcase);
