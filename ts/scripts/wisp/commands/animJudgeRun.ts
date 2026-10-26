@@ -8,6 +8,13 @@ import { runProcess } from "../../hostProcess";
 import { projectRoot } from "../project";
 
 const MODELS = ["haiku", "sonnet", "opus"] as const;
+/** The arm the calibration test of #557 picked for scorecard line 5 (proxy decision, 2026-10-26). */
+export const JUDGE_ARM = { model: "sonnet", effort: "medium" } as const;
+export function borderlineNotice(judged: readonly ({ readonly count: number; readonly needed: number } | undefined)[]): string[] {
+  const borderline = judged.filter((line) => line !== undefined && line.count < line.needed).length;
+  return borderline === 0 ? [] : [`${borderline} moves are borderline on line 5 (a score within half a point of the 4/5 bar); judge them again with bun wisp anim judge run PRIVATE_DIR (${JUDGE_ARM.model}, ${JUDGE_ARM.effort} effort), then anim judge record`];
+}
+
 const EFFORTS = ["low", "medium", "high"] as const;
 const SYSTEM = "You are a strict, independent animation judge. You see only the images attached to the message.";
 const REPLY = `Reply with exactly one line of JSON and nothing else: {"readability":N,"weight":N,"anticipation":N,"followThrough":N,"character":N,"note":"one sentence"}, each N an integer 1-5. The images are attached in order, so do not try to open files.`;
@@ -94,11 +101,11 @@ export const judgeRun: Command = (args) => Effect.gen(function*() {
     if (flag === undefined || value === undefined || !["--model", "--effort", "--judge", "--parallel", "--claude"].includes(flag)) { flags.clear(); break; }
     flags.set(flag, value);
   }
-  const model = flags.get("--model"), effort = flags.get("--effort"), parallel = Number(flags.get("--parallel") ?? "4");
-  const usage = "anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high] [--judge ID] [--parallel N] [--claude BIN]";
+  const chosen = !flags.has("--model") && !flags.has("--effort"), model = chosen ? JUDGE_ARM.model : flags.get("--model"), effort = chosen ? JUDGE_ARM.effort : flags.get("--effort"), parallel = Number(flags.get("--parallel") ?? "4");
+  const usage = "anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high] [--judge ID] [--parallel N] [--claude BIN]";
   if (directory === undefined || model === undefined || !(MODELS as readonly string[]).includes(model) || (effort !== undefined && !(EFFORTS as readonly string[]).includes(effort)) || !Number.isInteger(parallel) || parallel < 1) return yield* new UsageFailure({ problem: usage });
   const output = resolve(directory);
-  const judge = flags.get("--judge") ?? `bare-${model}${effort === undefined ? "" : `-${effort}`}`;
+  const judge = flags.get("--judge") ?? `bare-${model}${effort === undefined ? "" : `-${effort}`}-${Date.now().toString(36)}`;
   const brief = yield* attempt("read the judge brief", () => Bun.file(join(projectRoot, "docs/animation-judge-brief.md")).text());
   const batches = readdirSync(output).filter((name) => /^batch-\d+\.md$/.test(name)).sort();
   const items = (yield* Effect.forEach(batches, (name) => attempt(`read ${name}`, () => Bun.file(join(output, name)).text()))).flatMap(parseBatch);

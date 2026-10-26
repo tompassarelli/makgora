@@ -29,6 +29,24 @@ export function judgePanel<Entry extends { readonly clip?: string | undefined }>
   return own.filter((entry) => entry.clip === clip).slice(0, JUDGES_PER_CLIP);
 }
 
+const BORDERLINE_MARGIN = 0.5;
+
+export function judgementsNeeded(panel: readonly (readonly number[])[], bar: number): number {
+  const first = panel[0];
+  if (first === undefined) return 1;
+  return panel.length >= JUDGES_PER_CLIP || first.some((score) => Math.abs(score - bar) <= BORDERLINE_MARGIN) ? JUDGES_PER_CLIP : 1;
+}
+
+export const JUDGE_LINES = ["readability", "weight", "anticipation", "followThrough", "character"] as const;
+
+export function judgedLine(panel: readonly Readonly<Record<(typeof JUDGE_LINES)[number], number>>[], bar: number) {
+  if (panel.length === 0) return undefined;
+  const scores = panel.map((entry) => JUDGE_LINES.map((line) => entry[line]));
+  const needed = judgementsNeeded(scores, bar);
+  const medians = JUDGE_LINES.map((_, index) => median(scores.slice(0, needed).map((row) => row[index] ?? 0)));
+  return { count: panel.length, needed, lowest: Math.min(...medians), medians, pass: panel.length >= needed && Math.min(...medians) >= bar };
+}
+
 export const median = (values: readonly number[]): number => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
 
 const PREPARED_CLIPS = "clips.json";

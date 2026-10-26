@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -35,6 +35,28 @@ test("the bare judge call gives claude no tools, settings or session and the mov
     expect(message.message.content.filter((part) => part.type === "image")).toHaveLength(2);
     const [row] = readFileSync(join(directory, "scores-bare-test.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line) as Record<string, unknown>);
     expect(row).toMatchObject({ look: "classic", fighter: "murloc", move: "dash-attack", judge: "bare-test", character: 2, model: "haiku", effort: "low" });
+  } finally {
+    delete process.env.FAKE_CLAUDE_DIR;
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("the bare judge defaults to the arm the calibration picked, Sonnet at medium effort, with a fresh judge id per run [k3 measure #558]", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "judge-arm-"));
+  try {
+    const image = join(directory, "one.png");
+    writeFileSync(image, Uint8Array.from([137, 80, 78, 71]));
+    writeFileSync(join(directory, "batch-1.md"), `# batch\n\n- Murloc (\`murloc\`), \`dash-attack\`: ${image}\n  Upper rows, ours: frames 0, 1.\n`);
+    const claude = join(directory, "claude");
+    writeFileSync(claude, FAKE_CLAUDE);
+    chmodSync(claude, 0o755);
+    process.env.FAKE_CLAUDE_DIR = directory;
+    await Effect.runPromise(judgeRun([directory, "--claude", claude]));
+    const argv = JSON.parse(readFileSync(join(directory, "argv.json"), "utf8")) as string[];
+    expect(argv[argv.indexOf("--model") + 1]).toBe("sonnet");
+    expect(argv[argv.indexOf("--effort") + 1]).toBe("medium");
+    const scores = readdirSync(directory).filter((name) => /^scores-bare-sonnet-medium-.+\.jsonl$/.test(name));
+    expect(scores).toHaveLength(1);
   } finally {
     delete process.env.FAKE_CLAUDE_DIR;
     rmSync(directory, { recursive: true, force: true });

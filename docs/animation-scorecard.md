@@ -55,11 +55,20 @@ fighter can act), so line 2 measures the transition the game draws.
    and, for each later hit, its windup: the frame after the previous hit
    where the striking tip is pulled furthest back, so the motion behind
    every hit is in view), scoring readability, weight, anticipation, follow-through
-   and character independently. Three fresh judges score each clip, and
-   line 5 passes when the per-line median of the first three judgements of
-   that clip is at least 4/5 on every line. A move with fewer than three
-   judgements of its current clip has no passing line 5, and judgements past
-   the third do not count, so re-judging cannot roll a pass. Decided
+   and character independently. Line 5 uses the bare `anim judge run` call with
+   Sonnet at medium effort, the arm the calibration test of #557 picked (the
+   proxy's decision of 2026-10-26: all arms tied on Tom's three verdicts, and
+   Sonnet had half the Opus arm's run-to-run spread and a mean error of 0.41
+   against the recorded agent panels). One judgement decides a take unless it
+   lands within half a point of the 4/5 bar on any line (a 4), when the clip
+   needs three and passes on the per-line median of the first three being at
+   least 4/5 on every line; that arm's measured spread was under a point, so
+   a clear first judgement stands alone, and a spread of a point or more
+   measured for a later arm would ask for three every time. A clip with two
+   judgements waits for its third, and judgements past the third do not
+   count, so re-judging cannot roll a pass. The three Opus judgements already
+   recorded keep counting for the clips they judged. Before this rule: three fresh judges
+   scored each clip and the median of the first three decided. Decided
    2026-10-24 by the proxy under Tom's standing direction (north gate 34),
    because one judge's score varied by about one point per line on the same
    clip; the 4/5 bar stays. Judges see the key poses at the match camera's
@@ -138,8 +147,8 @@ keeps the widest framing and instead holds the camera on the drawn floor and gro
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
-`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing, the key-frame poses `prepare` rendered and, for a move that travels, each key frame's forward travel, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
-`bun wisp anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high] [--judge ID]` is the bare judge: one `claude -p` call per move with no tools, settings sources, MCP or session, the brief and the move's images in one message. It writes `scores-JUDGE.jsonl` (the `record` format plus the model and effort) and `usage-JUDGE.jsonl` (tokens and seconds per move) beside the batches (#557).
+`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing, the key-frame poses `prepare` rendered and, for a move that travels, each key frame's forward travel, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the judgement, or for a borderline or old clip the per-line median of the first three, whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
+`bun wisp anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high] [--judge ID]` is the bare judge (with no model or effort it runs the chosen arm, Sonnet at medium effort, under a fresh judge id each run so a repeat judgement is stored beside the first): one `claude -p` call per move with no tools, settings sources, MCP or session, the brief and the move's images in one message. It writes `scores-JUDGE.jsonl` (the `record` format plus the model and effort) and `usage-JUDGE.jsonl` (tokens and seconds per move) beside the batches (#557). `anim score` prints how many moves are borderline and the command that judges them again (#558). `tools/move-data/anim-score/judge-calibration.tsv` lists the clips Tom has given a verdict on, with the commit each renders from; the images stay private.
 
 A caster's move is read with its spell effect: Tom's decision of 2026-10-26 via
 north gate 33, after 24 judges scored Kael'thas's dash attack 3 on character

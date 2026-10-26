@@ -1,0 +1,4 @@
+fighter	move	commit	tom_verdict	date	basis
+warden	back-air	98bf683885^	fail	2026-10-26	Tom reported the back air does not read as a back air (#550)
+blademaster	down-air	f8126827a8^	fail	2026-10-25	Tom's playtest found one pose held through six airborne hits (#256)
+cairne-bloodhoof	down-air	276abb9d64	accept	2026-10-25	Tom chose the halberd slam (#96)

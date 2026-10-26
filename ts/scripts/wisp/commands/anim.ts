@@ -25,11 +25,11 @@ import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveS
 import { type CrouchClipKind, type SampledCue, type SampledMove, SCORED_NORMALS, SCORED_SPECIALS, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { CAMERA_LIFT, heldOffset, judgeCamera, judgeCrop, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, JUMP_LINES, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
-import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
+import { JUDGE_LINES, clipIdentity, judgePanel, judgedLine, judgementKey, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { JUDGE_MAX_GAP, judgeKeyFrames } from "../animJudgeFrames";
 import { judgeFrameLabel, judgeImageStem, judgeParts, judgeStrip } from "../animJudgeStrip";
 import { assetsView, readManifest } from "../buildInputs";
-import { judgeRun } from "./animJudgeRun";
+import { borderlineNotice, judgeRun } from "./animJudgeRun";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
 import { createStandaloneSession, NEUTRAL_INPUT } from "../standalone";
@@ -77,7 +77,6 @@ export const JudgeScore = Schema.Struct({
   clip: Schema.optional(Schema.String),
 });
 export type JudgeScore = typeof JudgeScore.Type;
-const JUDGE_LINES = ["readability", "weight", "anticipation", "followThrough", "character"] as const;
 
 export const JUDGE_PASS = 4;
 
@@ -100,7 +99,7 @@ interface Row {
   readonly score: MoveScore;
   readonly frames: { readonly firstActive: number; readonly lastActive: number; readonly end: number; readonly hits: readonly number[] };
   readonly clip: string;
-  readonly judged: { readonly count: number; readonly lowest: number; readonly medians: readonly number[]; readonly pass: boolean } | undefined;
+  readonly judged: { readonly count: number; readonly needed: number; readonly lowest: number; readonly medians: readonly number[]; readonly pass: boolean } | undefined;
   readonly reference: ReturnType<typeof meleeTiming>;
 }
 
@@ -160,11 +159,10 @@ const measure = (fighters: readonly Character[], assets: string) => Effect.gen(f
       const keyFrames = judgeKeyFrames(judgeKeys({ score, frames }));
       const clip = clipIdentity(keyFrames.map((index) => sample.frames[index]), keyFrames.map((index) => sampled.travels[index] ?? 0), judgeFraming(), keyFrames.map((index) => sampled.cues[index] ?? []));
       const panel = judgePanel(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
-      const medians = JUDGE_LINES.map((line) => median(panel.map((entry) => entry[line])));
       rows.push({
         fighter, move: sampled.move, moveClass: sample.moveClass, score,
         frames, clip,
-        judged: panel.length === 0 ? undefined : { count: panel.length, lowest: Math.min(...medians), medians, pass: panel.length === JUDGES_PER_CLIP && Math.min(...medians) >= JUDGE_PASS },
+        judged: judgedLine(panel, JUDGE_PASS),
         reference: meleeTiming(records, fighter, sampled.move),
       });
       samples.set(`${fighter}/${sampled.move}`, sampled);
@@ -194,7 +192,7 @@ const score: Command = (args) => Effect.gen(function*() {
   yield* Console.log(`worst first (${look}; L1 body, L2 return to ready, L3 phases, L4 contrast, L5 judged):`);
   for (const row of sorted.slice(0, 40)) {
     const { line1, line2, line3, line4 } = row.score;
-    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}${line3.held > 0 ? ` held ${line3.held} return ${n(line3.returnPeak)}` : ""}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? `unjudged (0/${JUDGES_PER_CLIP} judges)` : `${mark(row.judged.pass)} ${n(row.judged.lowest)} (${row.judged.count}/${JUDGES_PER_CLIP} judges)`}`);
+    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}${line3.held > 0 ? ` held ${line3.held} return ${n(line3.returnPeak)}` : ""}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? `unjudged (0/1 judges)` : `${mark(row.judged.pass)} ${n(row.judged.lowest)} (${row.judged.count}/${row.judged.needed} judges${row.judged.count < row.judged.needed ? ", borderline: judge again" : ""})`}`);
   }
   const fighterRows = new Map<string, Row[]>();
   for (const row of rows) fighterRows.set(row.fighter, [...(fighterRows.get(row.fighter) ?? []), row]);
@@ -204,6 +202,7 @@ const score: Command = (args) => Effect.gen(function*() {
     yield* Console.log(`${fighter.padEnd(18)} ${count((row) => row.score.line1.pass && row.score.line2.pass && row.score.line3.pass && row.score.line4.pass)}/${own.length} all  L1 ${count((row) => row.score.line1.pass)}  L2 ${count((row) => row.score.line2.pass)}  L3 ${count((row) => row.score.line3.pass)}  L4 ${count((row) => row.score.line4.pass)}  L5 ${count((row) => row.judged?.pass === true)}/${count((row) => row.judged !== undefined)} judged`);
   }
   yield* Console.log(`${rows.length} rows; ${relative(projectRoot, table)}`);
+  for (const notice of borderlineNotice(rows.map((row) => row.judged))) yield* Console.log(notice);
 
   const movementTable = (kind: string, header: string, measured: readonly string[]) => Effect.gen(function*() {
     const path = join(TABLE_DIRECTORY, `${look}-${kind}.tsv`);
@@ -439,7 +438,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
 
 
 const record = (files: readonly string[]) => Effect.gen(function*() {
-  if (files.length === 0) return yield* new UsageFailure({ problem: "anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high]" });
+  if (files.length === 0) return yield* new UsageFailure({ problem: "anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high]" });
   const entries: JudgeScore[] = [];
   for (const file of files) {
     const judged = yield* decodeLines(JudgeScore, file);
@@ -495,5 +494,5 @@ export const anim: Command = ([mode, verb, ...rest]) => {
   const judging: Readonly<Record<string, Command>> = { fetch: () => fetchReferences.pipe(Effect.provide(BunServices.layer)), prepare, record, run: judgeRun };
   const step = mode === "judge" && verb !== undefined ? judging[verb] : undefined;
   if (step !== undefined) return step(rest);
-  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high]" }));
+  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high]" }));
 };
