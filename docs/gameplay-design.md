@@ -117,7 +117,7 @@ smashcraft:ts/src/game/sim/stick.ts.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Stand | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
 | Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window | yes | yes | – | yes | yes | yes | yes | dash | – |
-| Initial dash | dash zone from stand, walk or crouch, or a dash back | forward tilt on frames 1–3 only (#186); otherwise A gives the dash attack | smashes on frames 1–3 only, the up smash after them through a jump cancel; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
+| Initial dash | dash zone from stand, walk or crouch, or a dash back | forward tilt on frames 1–3 only (#186); otherwise A gives the dash attack | up smash on every frame (Smashcraft, #489, as in Ultimate); forward and down smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
 | Run | dash held forward to its run frame | no: A gives the dash attack | up smash only (Smashcraft, #489); forward and down: A gives the dash attack | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
 | Run brake | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
 | Turn-run | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
@@ -152,11 +152,11 @@ Where Smashcraft keeps its own rule, and why:
   the fighter moves (dash, run, walk) Strong leaves the directions as movement
   and only upgrades A: where the state allows a smash, A gives the smash in
   place of the tilt or dash attack; where it does not, A gives what it gives
-  without Strong. So Strong + A in the dash-smash window is the smash, Strong +
-  A in a run is the dash attack, except Strong + up + A in a run, which is the
-  up smash directly (forward and down smashes stay closed in a run). Out of a
-  dash past its smash window the up smash still comes only through a jump
-  cancel. A smash out of a walk is the walk modifier held first, then Strong,
+  without Strong. So Strong + A in the dash-smash window is the smash, and
+  past it, or in a run, it is the dash attack, except Strong + up + A, which is
+  the up smash directly out of a dash at any frame or a run, as in Ultimate
+  (forward and down smashes stay closed there). The up smash out of jump
+  squat, out of shield or as a jump-cancelled up smash, works as before. A smash out of a walk is the walk modifier held first, then Strong,
   then A. Standing still (stand or crouch), Strong works like a C-stick
   (#325): while it is held, each direction press starts that direction's smash
   in place on that frame, and the directions do not move the fighter (no walk,

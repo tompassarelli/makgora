@@ -150,12 +150,23 @@ test("Strong + A in a run gives what A gives without Strong, the dash attack, fo
   assertEquals(owner.attack.style, AttackStyle.upSmash);
 });
 
-test("Out of a dash past its smash window Strong + up + A is no up smash, and a jump-cancelled Strong + up + A still is [k1 scenario]", () => {
+test("Out of a dash at any frame Strong + up + A is the up smash directly while forward and down past the smash window stay what A gives without Strong, and an up smash out of jump squat still starts after a dash and out of shield [k1 scenario]", () => {
   const direct = keyboard();
   direct.press(R);
   runUntil(direct, R, pastDashSmash);
   direct.press(R | U | S | A);
-  assertTrue(direct.owner.attack.style !== AttackStyle.upSmash);
+  assertEquals(direct.owner.attack.style, AttackStyle.upSmash);
+  for (const key of [0, D]) {
+    const strong = keyboard(), plain = keyboard();
+    strong.press(R);
+    plain.press(R);
+    runUntil(strong, R, pastDashSmash);
+    runUntil(plain, R, pastDashSmash);
+    strong.press(R | key | S | A);
+    plain.press(R | key | A);
+    assertTrue(strong.owner.attack.style !== smashFor(key));
+    assertEquals(strong.owner.attack.style, plain.owner.attack.style);
+  }
   const cancelled = keyboard();
   cancelled.press(R);
   runUntil(cancelled, R, pastDashSmash);
@@ -164,6 +175,14 @@ test("Out of a dash past its smash window Strong + up + A is no up smash, and a 
   cancelled.press(R | U | S | A);
   assertEquals(cancelled.owner.attack.style, AttackStyle.upSmash);
   assertTrue(cancelled.owner.motion.grounded);
+  const shielded = keyboard();
+  for (let i = 0; i < 8; i++) shielded.press(T);
+  assertTrue(shielded.owner.shield.raised);
+  shielded.press(T | J);
+  assertTrue(shielded.owner.jump.squat > 0);
+  shielded.press(U | S | A);
+  assertEquals(shielded.owner.attack.style, AttackStyle.upSmash);
+  assertTrue(shielded.owner.motion.grounded);
 });
 
 test("With the walk modifier held, Strong held while walking leaves the walk unchanged, and Strong + A gives the smash out of the walk [k1 scenario]", () => {
