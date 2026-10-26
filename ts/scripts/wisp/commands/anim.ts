@@ -29,6 +29,7 @@ import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPr
 import { JUDGE_MAX_GAP, judgeKeyFrames } from "../animJudgeFrames";
 import { judgeFrameLabel, judgeImageStem, judgeParts, judgeStrip } from "../animJudgeStrip";
 import { assetsView, readManifest } from "../buildInputs";
+import { judgeRun } from "./animJudgeRun";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
 import { createStandaloneSession, NEUTRAL_INPUT } from "../standalone";
@@ -40,8 +41,6 @@ const TABLE_DIRECTORY = join(projectRoot, "build/anim-score");
 const REFERENCE_STORE = join(homedir(), ".local/share/smashcraft-animation-reference");
 const REFERENCE_DIRECTORY = join(REFERENCE_STORE, "scorecard-references");
 const REFERENCE_MANIFEST = join(REFERENCE_DIRECTORY, "manifest.json");
-
-
 
 
 
@@ -440,7 +439,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
 
 
 const record = (files: readonly string[]) => Effect.gen(function*() {
-  if (files.length === 0) return yield* new UsageFailure({ problem: "anim judge record SCORES.jsonl..." });
+  if (files.length === 0) return yield* new UsageFailure({ problem: "anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high]" });
   const entries: JudgeScore[] = [];
   for (const file of files) {
     const judged = yield* decodeLines(JudgeScore, file);
@@ -493,8 +492,8 @@ const jitter: Command = (args) => Effect.gen(function*() {
 export const anim: Command = ([mode, verb, ...rest]) => {
   if (mode === "jitter") return jitter(verb === undefined ? [] : [verb, ...rest]);
   if (mode === "score") return score(verb === undefined ? [] : [verb, ...rest]);
-  if (mode === "judge" && verb === "fetch") return fetchReferences.pipe(Effect.provide(BunServices.layer));
-  if (mode === "judge" && verb === "prepare") return prepare(rest);
-  if (mode === "judge" && verb === "record") return record(rest);
-  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl..." }));
+  const judging: Readonly<Record<string, Command>> = { fetch: () => fetchReferences.pipe(Effect.provide(BunServices.layer)), prepare, record, run: judgeRun };
+  const step = mode === "judge" && verb !== undefined ? judging[verb] : undefined;
+  if (step !== undefined) return step(rest);
+  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high]" }));
 };
