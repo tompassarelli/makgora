@@ -6,7 +6,9 @@ own keys. Both feet and both hands are solved to side-view targets each frame, t
 side-view axis so its face stays to the camera, and her cloak's ground anchor follows the body so the cloth hangs
 from her instead of stretching back to where she stood. She leans back over her rear leg with the glaive raised
 overhead and coils lower through the hold, springs forward on the first active frame with the ring thrown out
-ahead, cuts it down and back under through the active window, and rises through a carry evenly back to ready.
+ahead, then somersaults forward through the active window with the ring held out at arm's length, spinning the
+crescent ahead of her like a saw while she splits her legs wide upside down, lands in a low crouch with the ring ahead, and cuts it
+down before she glides back to ready.
 Her arm keeps nearly the same reach from the shoulder from windup to contact, so the body carries the glaive.
 
   blender --background --factory-startup --python tools/animations/warden-pursuit-lunge.py -- RIG.json KEYS.json
@@ -103,20 +105,46 @@ relative = lambda side: (bones[f'Bone_Hand_{side}'].head.x - SHOULDER[side].x, b
 READY = dict(dx=0, dz=0, lean=0, chest=0, head=0, hand=relative('R'), ring=side_angle(ring_center() - bones['Bone_Hand_R'].head),
              off=relative('L'), front=bones['Bone_Foot_L'].head.x, back=bones['Bone_Foot_R'].head.x, cape=0)
 GRIP = bones['Bone_Hand_R'].matrix.to_quaternion()
-WINDUP = dict(dx=-54, dz=-22, lean=-24, chest=-8, head=18, hand=(22, 26), ring=95, off=(40, -4), front=-18, back=-104, cape=-20)
-COIL = dict(dx=-60, dz=-28, lean=-28, chest=-10, head=22, hand=(20, 30), ring=105, off=(42, 0), front=-18, back=-106, cape=-24)
-THROW = dict(dx=74, dz=-14, lean=22, chest=10, head=-20, hand=(-2, 2), ring=-15, off=(-30, -20), front=100, back=20, cape=30)
-EXTEND = dict(dx=80, dz=-16, lean=26, chest=12, head=-22, hand=(0, 0), ring=-20, off=(-32, -18), front=100, back=26, cape=34)
-CUT = dict(dx=60, dz=-36, lean=40, chest=18, head=-28, hand=(-4, -14), ring=-100, off=(-36, -6), front=94, back=24, cape=30)
-SWEEP = dict(dx=52, dz=-30, lean=30, chest=12, head=-22, hand=(-22, -18), ring=-165, off=(-10, -18), front=90, back=26, cape=26)
-CARRY = dict(dx=34, dz=-20, lean=16, chest=6, head=-10, hand=(-4, -22), ring=-165, off=(-14, -16), front=70, back=10, cape=14)
+WINDUP = dict(dx=-66, dz=-22, lean=-24, chest=-8, head=18, hand=(22, 26), ring=95, off=(40, -4), front=-30, back=-116, cape=-20)
+COIL = dict(dx=-72, dz=-28, lean=-28, chest=-10, head=22, hand=(20, 30), ring=105, off=(42, 0), front=-30, back=-118, cape=-24)
+THROW = dict(dx=88, dz=-14, lean=22, chest=10, head=-20, hand=(24, 4), ring=-10, off=(-30, -20), front=114, back=32, cape=30)
+EXTEND = dict(dx=94, dz=-16, lean=26, chest=12, head=-22, hand=(26, 2), ring=-15, off=(-32, -18), front=116, back=38, cape=34)
+TUCK = (12, -22, -8, -20)
+SPLIT = (34, -40, -34, -40)
+
+
+def body(lean, x, z):
+    t = radians(lean)
+    return (x * cos(t) + z * sin(t), -x * sin(t) + z * cos(t))
+
+
+def flip(lean, dx, dz, air, arm=26, legs=TUCK):
+    return dict(dx=dx, dz=dz, lean=lean, chest=0, head=-10, hand=body(lean, arm, 0), ring=-lean, off=body(lean, -10, -14),
+                front=110, back=44, cape=-60, air=air, legs=legs)
+
+
+DIVE = flip(95, 88, -4, 0.6, 18)
+INVERT = dict(flip(180, 92, 22, 1, legs=SPLIT), hand=(22, -10), ring=-395)
+OVER = dict(flip(270, 92, 12, 1), ring=-630)
+LAND = dict(dx=90, dz=-30, lean=380, chest=10, head=-20, hand=(20, -12), ring=-740, off=(-30, -14), front=112, back=44, cape=40)
+FOLLOW = dict(dx=86, dz=-26, lean=376, chest=8, head=-16, hand=(14, -18), ring=-770, off=(-26, -16), front=110, back=42, cape=34)
+for key in (READY, WINDUP, COIL, THROW, EXTEND, LAND, FOLLOW):
+    key.update(air=0, legs=TUCK)
+DONE = dict(READY, lean=360, ring=READY['ring'] - 360 * ((READY['ring'] - FOLLOW['ring']) // 360 + 1))
 settle = 6
-BEATS = [(0, READY), (settle, WINDUP), (contact - 1, COIL), (contact, THROW), (contact + 1, EXTEND), (contact + 6, CUT), (last, SWEEP)]
+cut = last - 1
+follow = cut + 4
+rise = follow + 10
+BEATS = [(0, READY), (settle, WINDUP), (contact - 1, COIL), (contact, THROW), (contact + 1, EXTEND), (contact + 3, DIVE), (contact + 5, INVERT),
+         (contact + 7, OVER), (cut, LAND), (follow, FOLLOW)]
 
 
 def blend(a, b, t):
     mix = lambda u, v: tuple(p * (1 - t) + q * t for p, q in zip(u, v)) if isinstance(u, tuple) else u * (1 - t) + v * t
     return {k: mix(a[k], b[k]) for k in a}
+
+
+RISE = blend(FOLLOW, DONE, 0.6)
 
 
 def glide(t, ramp=0.2):
@@ -133,13 +161,15 @@ def smooth(t):
 
 
 def at(frame):
-    if frame > last:
-        u = glide((frame - last) / (frames - last))
-        return blend(SWEEP, CARRY, u / 0.45) if u < 0.45 else blend(CARRY, READY, (u - 0.45) / 0.55)
+    if frame > rise:
+        u = (frame - rise) / (frames - rise)
+        return blend(RISE, DONE, 1 - (1 - u) ** 2)
+    if frame > follow:
+        return blend(FOLLOW, RISE, (frame - follow) / (rise - follow))
     for (a, pa), (b, pb) in zip(BEATS, BEATS[1:]):
         if a <= frame <= b:
             t = (frame - a) / (b - a)
-            return blend(pa, pb, t if b - a == 1 else smooth(t))
+            return blend(pa, pb, t if a >= contact else smooth(t))
     return READY
 
 
@@ -154,11 +184,14 @@ def pose(p):
     pitch('Bone_Chest', p['chest'])
     pitch('Bone_Head', p['head'])
     pitch('Cape_Dummy02', p['cape'] - p['lean'] - p['chest'])
-    for upper, lower, end, x in (('Bone_Leg1_L', 'Bone_Leg2_L', 'Bone_Foot_L', p['front']), ('Bone_Leg1_R', 'Bone_Leg2_R', 'Bone_Foot_R', p['back'])):
-        reach(upper, lower, end, x, FLOOR, (1, 0, 0))
+    t = radians(p['lean'])
+    ahead, up = Vector((cos(t), 0, -sin(t))), Vector((sin(t), 0, cos(t)))
+    for upper, lower, end, x, tuck in (('Bone_Leg1_L', 'Bone_Leg2_L', 'Bone_Foot_L', p['front'], p['legs'][:2]), ('Bone_Leg1_R', 'Bone_Leg2_R', 'Bone_Foot_R', p['back'], p['legs'][2:])):
+        tucked = bones[upper].head + ahead * tuck[0] + up * tuck[1]
+        reach(upper, lower, end, x * (1 - p['air']) + tucked.x * p['air'], FLOOR * (1 - p['air']) + tucked.z * p['air'], ahead)
     for side, key in (('R', 'hand'), ('L', 'off')):
         shoulder = bones[f'Bone_Arm1_{side}'].head
-        reach(f'Bone_Arm1_{side}', f'Bone_Arm2_{side}', f'Bone_Hand_{side}', shoulder.x + p[key][0], shoulder.z + p[key][1], (0, 0, -1))
+        reach(f'Bone_Arm1_{side}', f'Bone_Arm2_{side}', f'Bone_Hand_{side}', shoulder.x + p[key][0], shoulder.z + p[key][1], -up)
     held = Quaternion(Y, radians(READY['ring'] - p['ring'])) @ GRIP
     turn('Bone_Hand_R', held @ bones['Bone_Hand_R'].matrix.to_quaternion().inverted())
 
