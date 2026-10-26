@@ -4,10 +4,9 @@ The rig comes from `attack-gesture-clips.ts PRIVATE_ASSETS OUT --character 5 --r
 every node becomes a bone with identity rest orientation, so a bone's local rotation and location are the model's
 own keys. Both feet and both hands are solved to side-view targets each frame, the glaive ring is swung about the
 side-view axis so its face stays to the camera, and her cloak's ground anchor follows the body so the cloth hangs
-from her instead of stretching back to where she stood. She leans back over her rear leg with the glaive raised
-overhead and coils lower through the hold, springs forward on the first active frame with the ring thrown out
-ahead, cuts it down and back under through the active window, and rises through a carry evenly back to ready.
-Her arm keeps nearly the same reach from the shoulder from windup to contact, so the body carries the glaive.
+from her instead of stretching back to where she stood. She sinks back over her rear leg with the glaive swung
+behind her and coils lower through the hold, springs forward on the first active frame with the ring thrown out
+ahead, cuts it down to the floor through the active window, and glides evenly back to ready.
 
   blender --background --factory-startup --python tools/animations/warden-pursuit-lunge.py -- RIG.json KEYS.json
 """
@@ -103,13 +102,13 @@ relative = lambda side: (bones[f'Bone_Hand_{side}'].head.x - SHOULDER[side].x, b
 READY = dict(dx=0, dz=0, lean=0, chest=0, head=0, hand=relative('R'), ring=side_angle(ring_center() - bones['Bone_Hand_R'].head),
              off=relative('L'), front=bones['Bone_Foot_L'].head.x, back=bones['Bone_Foot_R'].head.x, cape=0)
 GRIP = bones['Bone_Hand_R'].matrix.to_quaternion()
-WINDUP = dict(dx=-54, dz=-22, lean=-24, chest=-8, head=18, hand=(22, 26), ring=95, off=(40, -4), front=-18, back=-104, cape=-20)
-COIL = dict(dx=-60, dz=-28, lean=-28, chest=-10, head=22, hand=(20, 30), ring=105, off=(42, 0), front=-18, back=-106, cape=-24)
-THROW = dict(dx=74, dz=-14, lean=22, chest=10, head=-20, hand=(-2, 2), ring=-15, off=(-30, -20), front=100, back=20, cape=30)
-EXTEND = dict(dx=80, dz=-16, lean=26, chest=12, head=-22, hand=(0, 0), ring=-20, off=(-32, -18), front=100, back=26, cape=34)
-CUT = dict(dx=60, dz=-36, lean=40, chest=18, head=-28, hand=(-4, -14), ring=-100, off=(-36, -6), front=94, back=24, cape=30)
-SWEEP = dict(dx=52, dz=-30, lean=30, chest=12, head=-22, hand=(-22, -18), ring=-165, off=(-10, -18), front=90, back=26, cape=26)
-CARRY = dict(dx=34, dz=-20, lean=16, chest=6, head=-10, hand=(-4, -22), ring=-165, off=(-14, -16), front=70, back=10, cape=14)
+WINDUP = dict(dx=-66, dz=-22, lean=-24, chest=-8, head=18, hand=(22, 26), ring=95, off=(40, -4), front=-30, back=-116, cape=-20)
+COIL = dict(dx=-72, dz=-28, lean=-28, chest=-10, head=22, hand=(20, 30), ring=105, off=(42, 0), front=-30, back=-118, cape=-24)
+THROW = dict(dx=88, dz=-14, lean=22, chest=10, head=-20, hand=(24, 4), ring=-10, off=(-30, -20), front=114, back=32, cape=30)
+EXTEND = dict(dx=94, dz=-16, lean=26, chest=12, head=-22, hand=(26, 2), ring=-15, off=(-32, -18), front=116, back=38, cape=34)
+CUT = dict(dx=80, dz=-34, lean=40, chest=18, head=-28, hand=(14, -10), ring=-80, off=(-36, -6), front=114, back=40, cape=32)
+SWEEP = dict(dx=78, dz=-32, lean=40, chest=18, head=-26, hand=(8, -14), ring=-115, off=(-38, -4), front=114, back=44, cape=30)
+CARRY = dict(dx=48, dz=-18, lean=16, chest=6, head=-10, hand=(-6, -20), ring=-155, off=(-14, -16), front=84, back=18, cape=14)
 settle = 6
 BEATS = [(0, READY), (settle, WINDUP), (contact - 1, COIL), (contact, THROW), (contact + 1, EXTEND), (contact + 6, CUT), (last, SWEEP)]
 
