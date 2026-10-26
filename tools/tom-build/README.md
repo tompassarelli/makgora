@@ -37,7 +37,10 @@ unknown. A build above 20% pressure counts against neither budget: the watcher
 neither files nor closes a speed-budget issue for it. A failed build is in
 `journalctl --user -u smashcraft-tom-build`. Every sha the watcher starts is
 recorded in `~/.local/state/smashcraft/tom-build/attempted`, so it never builds
-a sha twice, even after a failure or restart.
+a sha twice, even after a failure or restart. A build that finds a pinned input
+missing from the local store runs `bun wisp inputs fetch` for the store hosts in
+`INPUT_HOSTS` (gex45, skipping the host it runs on) and builds once more; if the
+input is still missing, the watcher forgets the sha so the next poll tries again.
 
 Each install replaces the previous build in Maps/00-Smashcraft and removes any
 `Smashcraft X.Y.Z-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,

@@ -1,16 +1,17 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { homedir, hostname } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Clock, type Duration, Effect } from "effect";
 import { ChildProcess, type ChildProcessSpawner } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
+import { FETCH_HINT } from "./wisp/buildInputs";
 import { type LandingDecision, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
 import { type BuildStage, TOM_EDITION, currentPlaytest } from "./wisp/currentPlaytest";
 import { installLatest, library } from "./wisp/mapLibrary";
-import { PLAYTEST_PREFIX, projectRoot } from "./wisp/project";
+import { PLAYTEST_PREFIX, projectRoot, tsDirectory } from "./wisp/project";
 import { clientHold, liveClients } from "./wisp/runningGames";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -22,6 +23,7 @@ const POLL = "10 seconds";
 export const BUILD_BUDGET_SECONDS = 20;
 export const LAND_TO_MAPS_BUDGET_SECONDS = 360;
 export const BUSY_PRESSURE = 20;
+export const INPUT_HOSTS = ["gex45"];
 export const SPEED_BUDGET_TITLE = "Speed budget: a landing took too long to reach Tom's Maps folder";
 
 export interface Load {
@@ -84,6 +86,7 @@ export interface WatchSteps<R> {
   readonly measured: <A>(work: Effect.Effect<A, PlayProblem, R>) => Effect.Effect<readonly [A, Load], PlayProblem, R>;
   readonly held: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
+  readonly fetchInputs: Effect.Effect<void, PlayProblem, R>;
   readonly install: (built: Built) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
   readonly budget: (sha: string, timing: Timing) => Effect.Effect<void, never, R>;
@@ -119,6 +122,16 @@ export const buildLine = (sha: string, { version, path }: Installed, timing: Tim
     seconds(onMain === undefined ? undefined : onMain - landed), known(load.pressure), known(load.clients), stageField, path].join(" ");
 };
 
+export const missingInputs = ({ problem }: PlayProblem) => problem.includes(FETCH_HINT);
+
+const builtWithInputs = <R>(steps: WatchSteps<R>, sha: string) => steps.build(sha).pipe(
+  Effect.catchIf(missingInputs, (missing) => steps.fetchInputs.pipe(
+    Effect.tapError(({ problem }) => Effect.sync(() => console.error(`Fetching build inputs failed: ${problem}`))),
+    Effect.mapError(() => missing),
+    Effect.andThen(steps.build(sha)),
+  )),
+);
+
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
   const previous = lines(files.log).at(-1)?.split(" ")[1];
   const sha = yield* steps.tip(previous);
@@ -129,7 +142,9 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   yield* append(files.attempts, sha);
   if (decision === "red") return undefined;
   const started = yield* Clock.currentTimeMillis;
-  const [built, load] = yield* steps.measured(steps.build(sha));
+  const [built, load] = yield* steps.measured(builtWithInputs(steps, sha)).pipe(
+    Effect.tapError((problem) => missingInputs(problem) ? forget(files.attempts, sha) : Effect.void),
+  );
   const late = yield* steps.held;
   if (late !== undefined) {
     yield* forget(files.attempts, sha);
@@ -205,6 +220,10 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     const version = buildLabel(file);
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, source, stages });
   })),
+  fetchInputs: runProcess(ChildProcess.make("bun", ["wisp", "inputs", "fetch", ...INPUT_HOSTS.filter((host) => host !== hostname())], { cwd: tsDirectory, stdin: "ignore" })).pipe(
+    Effect.tap((text) => Effect.sync(() => console.log(text.trim()))),
+    Effect.mapError((cause) => new PlayProblem({ problem: `bun wisp inputs fetch: ${cause.message}` })),
+  ),
   install: ({ version, source }) => Effect.try({
     try: () => {
       const documents = documentsFolder(PLAYTEST_PREFIX);
