@@ -3,9 +3,9 @@
 The rig comes from `anubarak-clips.ts STOCK_ANUBARAK.mdx OUT --rig RIG.json`: every bone and helper becomes a bone
 with identity rest orientation, so a bone's local rotation and location are the model's own keys. Each joint turns
 about a world axis whatever its parent's stand pose, so a pitch reads in profile. He rears back with both claws
-drawn up behind his head, lunges with the claws raised high ahead on the first active frame, flattens lower and
-longer through the active window with his legs splaying out as the claws sweep level and then down, and glides
-evenly back to ready. Clip frame N is attack frame N;
+drawn up behind his head, lunges flat with the claws raised high ahead on the first active frame, then through
+the active window pitches nose down as his hind legs swing under his hips and his abdomen lifts, so his rear rises
+while both claws stab down in front, and glides evenly back to ready. Clip frame N is attack frame N;
 `anubarak-clips.ts STOCK_ANUBARAK.mdx OUT --keys KEYS.json` splices the baked frames and sets each one on the floor.
 
   blender --background --factory-startup --python tools/animations/anubarak-dash-attack.py -- RIG.json KEYS.json
@@ -96,12 +96,12 @@ READY = {}
 load = dict(lean=-12, chest=-8, head=8, arms=-60, elbows=20, front=-15, rear=10, rearKnee=15, travel=-8)
 coil = dict(lean=-30, chest=-18, head=14, butt=10, arms=-170, elbows=35, wrists=20, claws=20,
             front=-35, frontKnee=-20, rear=20, rearKnee=30, travel=-16)
-strike = dict(lean=18, chest=10, head=-10, butt=-5, arms=-145, elbows=-10, wrists=-5, claws=-5,
-              front=-45, frontKnee=10, rear=45, rearKnee=-10, splay=10, travel=30)
-drive = dict(lean=25, chest=15, head=-15, butt=-5, arms=-95, elbows=0, wrists=0, claws=0,
-             front=-55, frontKnee=30, rear=60, rearKnee=-15, splay=25, travel=50)
-recoil = dict(lean=22, chest=12, head=-5, butt=-5, arms=-40, elbows=-15, wrists=-10, claws=-5,
-              front=-60, frontKnee=20, rear=70, rearKnee=-25, splay=35, travel=62)
+strike = dict(lean=12, chest=10, head=-10, butt=-5, arms=-145, elbows=-10, wrists=-5, claws=-5,
+              front=-45, frontKnee=10, rear=30, rearKnee=-10, travel=30)
+drive = dict(lean=32, chest=15, head=-15, butt=25, arms=-60, elbows=0, wrists=0, claws=0,
+             front=-75, frontKnee=40, rear=-20, rearKnee=-15, travel=50)
+recoil = dict(lean=75, chest=12, head=-15, butt=45, arms=0, elbows=-15, wrists=-10, claws=-5,
+              front=-110, frontKnee=60, rear=-60, rearKnee=-20, travel=62)
 
 
 def glide(t, ramp=0.05):

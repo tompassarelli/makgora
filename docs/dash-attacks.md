@@ -148,4 +148,10 @@ and a root lunge that keeps carrying forward until it) each read to the judges
 as one held pose from contact to the last active frame. Blender takes that
 flatten the body lower at each beat by splaying the legs out reached
 follow-through 4 but lost readability to 3, since the splayed legs crowd the
-claws. Lines 1–4 pass; three fresh judges give medians 4/4/4/3/4.
+claws. Raising the rear as the claws dig down through frames 8–19, with no
+splay, did not help either: hind legs swung under the hips, a nose-down pitch
+and a lifted abdomen put the rear above the head by frame 19 while the claws
+stab the floor ahead, and judges read the risen body as a hunched, cluttered
+mass. On the Blender take that scored 3/4/3/3/4; on the generator clip, which
+keeps its windup and contact, 3/4/4/3/4. Lines 1–4 pass; three fresh judges
+give the shipped clip medians 4/4/4/3/4.
