@@ -152,7 +152,7 @@ export class SelectionPanel {
   private readonly movesTitle: framehandle;
   private readonly movesBody: framehandle;
   private readonly delayLine: framehandle;
-  private net: LobbyNet = { delayText: "", pings: PARTICIPANT_SLOTS.map(() => "") };
+  private net: LobbyNet = { delayText: "", echoes: PARTICIPANT_SLOTS.map(() => "") };
 
   private readonly modeLabel: framehandle;
   private readonly rules: RuleFrames;
@@ -659,7 +659,7 @@ export class SelectionPanel {
       const palette = teamsShown ? game.teamChoices[slot] : slot;
       presentCardTeam(frames, game, slot, participantId, menuFocus, active, human, teamsShown, palette);
       presentCardTag(frames, game, slot, participantId, menuFocus, active, human);
-      presentCardStatus(frames, game, slot, active, ready, human, choice, palette, sessionWins[slot], this.net.pings);
+      presentCardStatus(frames, game, slot, active, ready, human, choice, palette, sessionWins[slot], this.net.echoes);
       presentCardCpu(frames, game, slot, menuFocus, active, human, CPU_DEFAULTS);
       if (presentCardChip(frames, this.drag, this.roster.grid, slot, active, ready, human, choice, x, y)) pinching = true;
     }

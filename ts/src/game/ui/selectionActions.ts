@@ -4,7 +4,7 @@ import type { TrainingSetting } from "./ruleButtons";
 
 export interface LobbyNet {
   readonly delayText: string;
-  readonly pings: readonly string[];
+  readonly echoes: readonly string[];
 }
 
 export interface SelectionActions {

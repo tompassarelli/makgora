@@ -119,12 +119,12 @@ export function presentCardTag(frames: CardFrames, game: Readonly<MatchState>, s
   BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));
 }
 
-export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, palette: number, sessionWins: number, pings: readonly string[]): void {
+export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, palette: number, sessionWins: number, echoes: readonly string[]): void {
   BlzFrameSetVisible(frames.portrait, active && ready);
   BlzFrameSetVisible(frames.name, active && ready);
   const winsShown = active && ready && sessionWins > 0;
   presentSessionWinsFrames(frames.wins, sessionWins, active && ready);
-  const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}${at(pings, slot)}`;
+  const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}${at(echoes, slot)}`;
   setFrameText(frames.status, statusText);
   placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins)}`);
   if (ready) {

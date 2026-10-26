@@ -91,12 +91,12 @@ export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>):
 export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>): LobbyNet {
   const online = isOnline(game);
   const delay = matchDelay(net, game);
-  const pings = PARTICIPANT_SLOTS.map((slot) => {
+  const echoes = PARTICIPANT_SLOTS.map((slot) => {
     const echo = at(net.slotEchoMs, slot);
     if (!online || !humanActive(game, slot) || echo < 0) return "";
-    return at(net.slotSlow, slot) ? ` · |cffff4040${I2S(echo)} ms|r` : ` · ${I2S(echo)} ms`;
+    return at(net.slotSlow, slot) ? ` · echo |cffff4040${I2S(echo)} ms|r` : ` · echo ${I2S(echo)} ms`;
   });
-  return { delayText: `Input delay: ${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${I2S(delay)} frames|r`, pings };
+  return { delayText: `Input delay: ${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${I2S(delay)} frames|r`, echoes };
 }
 
 export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {
