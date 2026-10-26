@@ -106,7 +106,6 @@ export function mountainKingClips(kit: KitNormals): HeroClipTable {
     fallSpecial: play("Death", f32(0.3)),
     damageGround: play("Death", f32(0.35)),
     damageAir: play("Death", f32(0.35)),
-    damageTumble: play("Death", f32(0.8)),
     damageShield: play("Stand Ready"),
     grabHold: play("Stand Ready"),
     grabbed: play("Death", f32(0.2)),

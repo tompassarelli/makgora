@@ -280,6 +280,9 @@ producer = "tools/animations/jump-clips.ts"
 paths = ["ts/src/game/presentation/movementClipInfo.ts"]
 producer = "tools/animations/movement-clips.ts"
 [[generated]]
+paths = ["ts/src/game/presentation/tumbleClipInfo.ts"]
+producer = "tools/animations/tumble-clips.ts"
+[[generated]]
 paths = ["ts/src/game/presentation/drillClipInfo.ts"]
 producer = "tools/animations/drill-clips.ts"
 [[generated]]

@@ -57,7 +57,7 @@ export function shadowHunterLook(kit: KitNormals): HeroLook {
       jump: STAND_READY, doubleJump: STAND_READY, fallSpecial: STAND_4,
 
       wallJump: SPELL_THROW, wallTech: STAND_HIT,
-      damageGround: STAND_HIT, damageAir: STAND_HIT, damageTumble: STAND_HIT, damageShield: STAND_HIT,
+      damageGround: STAND_HIT, damageAir: STAND_HIT, damageShield: STAND_HIT,
       grabHold: STAND_READY, grabbed: STAND_HIT,
       pummel: ATTACK, throwForward: SPELL_THROW, throwBack: STAND_2, throwUp: SPELL, throwDown: STAND_CHANNEL,
       victimPummel: STAND_HIT, victimThrowForward: STAND_HIT, victimThrowBack: STAND_HIT,

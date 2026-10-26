@@ -16,6 +16,7 @@ import { DRILL_CLIPS } from "./drillClipInfo";
 import { DOWN_AIR_CLIPS } from "./downAirClipInfo";
 import { JUMP_CLIPS } from "./jumpClipInfo";
 import { MOVEMENT_CLIPS } from "./movementClipInfo";
+import { TUMBLE_CLIPS } from "./tumbleClipInfo";
 import { BLADEMASTER_AUTHORED_CLIPS } from "./blademasterClipInfo";
 import { GRAB_CLIPS } from "./grabClipInfo";
 import { ROSTER_ATTACK_CLIPS } from "./rosterAttackClipInfo";
@@ -145,6 +146,12 @@ const ORIGINAL_CLIPS: { readonly [character: number]: HeroClipTable | undefined 
   [Character.demonHunter]: DEMON_HUNTER_CLIPS,
 };
 const NO_CLIPS: HeroClipTable = {};
+function overlay(tables: Record<number, HeroClipTable>, layer: Readonly<Record<number, HeroClipTable | undefined>>): void {
+  for (const [character, clips] of Object.entries(layer)) {
+    const id = Number(character);
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...clips };
+  }
+}
 function recoveryTables(): Readonly<Record<number, HeroClipTable>> {
   const tables: Record<number, HeroClipTable> = {};
   const drills: Readonly<Record<number, HeroClipTable | undefined>> = DRILL_CLIPS;
@@ -152,32 +159,11 @@ function recoveryTables(): Readonly<Record<number, HeroClipTable>> {
     const id = Number(character);
     tables[id] = { ...(ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...recovery, ...drills[id] };
   }
-  for (const [character, grabs] of Object.entries(GRAB_CLIPS)) {
-    const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...grabs };
-  }
-  for (const [character, downAir] of Object.entries(DOWN_AIR_CLIPS)) {
-    const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...downAir };
-  }
-  for (const [character, jumps] of Object.entries(JUMP_CLIPS)) {
-    const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...jumps };
-  }
-  for (const [character, movement] of Object.entries(MOVEMENT_CLIPS)) {
-    const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...movement };
-  }
-  for (const [character, attacks] of Object.entries(ROSTER_ATTACK_CLIPS)) {
-    const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...attacks };
-  }
+  for (const layer of [GRAB_CLIPS, DOWN_AIR_CLIPS, JUMP_CLIPS, MOVEMENT_CLIPS, ROSTER_ATTACK_CLIPS]) overlay(tables, layer);
   tables[Character.blademaster] = { ...tables[Character.blademaster], ...BLADEMASTER_AUTHORED_CLIPS };
   tables[Character.shadowHunter] = { ...tables[Character.shadowHunter], ...SHADOW_HUNTER_AUTHORED_CLIPS };
-  for (const [character, swaps] of Object.entries(STOCK_CLIP_SWAPS)) {
-    const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...swaps };
-  }
+  overlay(tables, TUMBLE_CLIPS);
+  overlay(tables, STOCK_CLIP_SWAPS);
   return tables;
 }
 const COMBINED_CLIPS = recoveryTables();

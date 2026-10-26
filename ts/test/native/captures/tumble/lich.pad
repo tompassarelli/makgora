@@ -1,0 +1,15 @@
+# Lich's tumble native proof (#359): Pit Lord walks in and up-smashes Lich at 45%, launching it into tumble; once hitstun ends it falls over the stage in its looping back flip until it lands.
+#! chat -dev setup quick pair lich / pit lord;percent 1 45
+20 b stick -1 0
+52 b stick 0 0
+80 b cstick 0 1
+82 b cstick 0 0
+192 a capture
+196 a capture
+200 a capture
+204 a capture
+208 a capture
+212 a capture
+216 a capture
+220 a capture
+224 a capture

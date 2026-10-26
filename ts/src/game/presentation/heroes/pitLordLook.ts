@@ -43,7 +43,7 @@ export const pitLordLook: HeroLook = {
     jump: STAND_2, doubleJump: STAND_2, fallSpecial: STAND_3,
 
     wallJump: ATTACK_SLAM_1, wallTech: SPELL_SLAM,
-    damageGround: STAND_2, damageAir: STAND_2, damageTumble: STAND_2, damageShield: STAND_2,
+    damageGround: STAND_2, damageAir: STAND_2, damageShield: STAND_2,
     grabHold: STAND, grabbed: STAND_2,
     pummel: ATTACK, throwForward: ATTACK_3, throwBack: ATTACK_2, throwUp: SPELL_SLAM, throwDown: ATTACK_SLAM_1,
     victimPummel: STAND_2, victimThrowForward: STAND_2, victimThrowBack: STAND_2,

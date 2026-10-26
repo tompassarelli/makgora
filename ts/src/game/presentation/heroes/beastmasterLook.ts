@@ -40,7 +40,7 @@ export const beastmasterLook = (kit: KitNormals): HeroLook => ({
     jump: STAND_READY, doubleJump: STAND_READY, fallSpecial: STAND_1,
 
     wallJump: SPELL_SLAM, wallTech: ATTACK_2,
-    damageGround: STAND_READY, damageAir: STAND_READY, damageTumble: STAND_READY, damageShield: STAND_READY,
+    damageGround: STAND_READY, damageAir: STAND_READY, damageShield: STAND_READY,
     grabHold: STAND_READY, grabbed: STAND_READY,
     pummel: ATTACK, throwForward: ATTACK, throwBack: ATTACK_2, throwUp: ATTACK_2, throwDown: SPELL_SLAM,
     victimPummel: STAND_READY, victimThrowForward: STAND_READY, victimThrowBack: STAND_READY,

@@ -1,0 +1,22 @@
+# Pit Lord's tumble native proof (#359): Pit Lord walks in and up-smashes Pit Lord at 70%, launching it into tumble; once hitstun ends it falls over the stage in its looping back flip until it lands.
+#! chat -dev setup quick pair pit lord / pit lord;percent 1 70
+20 b stick -1 0
+52 b stick 0 0
+80 b cstick 0 1
+82 b cstick 0 0
+204 a capture
+208 a capture
+212 a capture
+216 a capture
+220 a capture
+224 a capture
+228 a capture
+232 a capture
+236 a capture
+240 a capture
+244 a capture
+248 a capture
+252 a capture
+256 a capture
+260 a capture
+264 a capture

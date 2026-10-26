@@ -43,7 +43,7 @@ export function lichLook(kit: KitNormals): HeroLook {
       jump: STAND_READY, doubleJump: CHANNEL, fallSpecial: CHANNEL,
 
       wallJump: SPELL, wallTech: ATTACK,
-      damageGround: STAND_3, damageAir: STAND_3, damageTumble: STAND_3, damageShield: STAND_3,
+      damageGround: STAND_3, damageAir: STAND_3, damageShield: STAND_3,
       grabHold: CHANNEL, grabbed: STAND_3,
       pummel: ATTACK, throwForward: SPELL, throwBack: CHANNEL, throwUp: SPELL, throwDown: SPELL,
       victimPummel: STAND_3, victimThrowForward: STAND_3, victimThrowBack: STAND_3, victimThrowUp: STAND_3, victimThrowDown: STAND_3,

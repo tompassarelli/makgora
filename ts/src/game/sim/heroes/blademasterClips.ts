@@ -15,6 +15,7 @@ import { RECOVERY_CLIPS } from "../../presentation/recoveryClipInfo";
 import { BLADEMASTER_AUTHORED_CLIPS } from "../../presentation/blademasterClipInfo";
 import { DOWN_AIR_CLIPS } from "../../presentation/downAirClipInfo";
 import { JUMP_CLIPS } from "../../presentation/jumpClipInfo";
+import { TUMBLE_CLIPS } from "../../presentation/tumbleClipInfo";
 import type { HeroClip, HeroFollowUpPose, HeroPose } from "./hero";
 
 
@@ -101,7 +102,7 @@ export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<He
   fallSpecial: sequence("Stand - 2"),
   damageGround: RECOIL,
   damageAir: RECOIL,
-  damageTumble: sequence("Death", f32(0.9)),
+  damageTumble: TUMBLE_CLIPS[Character.blademaster].damageTumble,
   damageShield: COMBAT_STANCE,
   grabHold: COMBAT_STANCE,
   grabbed: sequence("Death", f32(0.25)),

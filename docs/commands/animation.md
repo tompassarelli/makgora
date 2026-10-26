@@ -29,6 +29,15 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   fighter's double jump in the style smashcraft:docs/design/animation-reference.md picks (Blademaster keeps his #230 flip) and retains other jump bindings; `--no-preview`
   skips silhouette sheets. Store the changed model family and refresh both body
   timelines and clip metadata before using the generated bindings.
+  `bun tools/animations/tumble-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors the
+  tumble (Melee's DamageFall, played once hitstun ends while still airborne) for
+  Blademaster, Mountain King, Lich, Shadow Hunter, Pit Lord and Beastmaster, whose
+  tumble had been a stand or Death clip (#359): a looping 24-frame back flip about the
+  body centre through the model's existing root helper, limbs flung through the
+  canonical rig. A rerun re-authors `Tumble Motion damageTumble` in place; every
+  other clip stays identical. It binds the clips in the generated
+  smashcraft:ts/src/game/presentation/tumbleClipInfo.ts and writes both-facing
+  sheets; store the family and run `bun wisp inputs derive --fighter NAME`.
   `bun tools/animations/movement-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose crouch|ledgeHang [--pose ...]`
   authors a fighter's crouch or ledge hang on its shipped model through the
   canonical rig (#40): each mapped joint turns about the side-view axis, one root

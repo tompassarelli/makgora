@@ -1,0 +1,15 @@
+# Mountain King's tumble native proof (#359): a second Mountain King walks in and up-smashes him at 45%, launching him into tumble; once hitstun ends he falls over the stage in his looping back flip until he lands.
+#! chat -dev setup quick pair mountain king / mountain king;percent 1 45
+20 b stick -1 0
+52 b stick 0 0
+92 b cstick 0 1
+94 b cstick 0 0
+184 a capture
+188 a capture
+192 a capture
+196 a capture
+200 a capture
+204 a capture
+208 a capture
+212 a capture
+216 a capture
