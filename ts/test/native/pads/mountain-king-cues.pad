@@ -51,17 +51,14 @@
 400 b stick 0 1
 400 b tap X 2
 401 b stick 0 0
-# a turns away and throws Storm Bolt, then calls it back while it flies.
+# a turns away and throws Storm Bolt.
 440 a stick -1 0
 441 a stick 0 0
 450 a tap X 2
 452 a capture
-470 a capture
+473 a capture
 # View held a second: the first of two moments the parity check replays.
 500 a press VIEW
-510 a tap X 2
-512 a capture
-514 a capture
 560 a stick 1 0
 561 a stick 0 0
 570 a release VIEW
@@ -96,13 +93,11 @@
 #! expect a 306 special 16 form 1
 #! expect a 380 special 14 form 0
 #! expect a 450 special 13 form 0
-#! expect a 510 special 13 form 3
 #! expect a 796 special 14 form 1
 #! expect a 880 special 15 form 0
 #! expect a 895 special-form 6 action 15
 # Startup and active cues of each special and branch and both missiles.
 #! scene a ForkedLightningTarget
-#! scene a LightningShieldBuff
 #! scene a DefendCaster
 #! scene a ImpaleTargetDust
 #! scene a WarStompCaster

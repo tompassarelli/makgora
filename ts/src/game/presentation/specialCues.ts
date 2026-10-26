@@ -437,7 +437,6 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     down: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },
   },
   [Character.mountainKing]: {
-    neutral: { recall: branch("Storm Bolt recall", STORM, cue("Abilities\\Spells\\Orc\\LightningShield\\LightningShieldBuff.mdx", "hand", f32(0.8))) },
     up: { followUps: [HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES] },
 
     down: { followUps: [branch("Small Clap", STORM, { ...cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.255)), sound: "ThunderClap" }), "slot", "none"] },
