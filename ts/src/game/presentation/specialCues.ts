@@ -143,7 +143,7 @@ const cue = (model: string, anchor: CueAnchor, scale: number): Cue => {
     : name === "DarkRitualCaster" ? 1.0 : name === "DeathAndDecayTarget" ? 0.5
     : name === "DeathCoilSpecialArt" || name === "ThunderClapCaster" || name === "WarStompCaster" ? f32(0.3)
     : name === "StarfallTarget" ? f32(0.8) : f32(0.2);
-  const pitch = name === "ThunderClapCaster" || name === "WarStompCaster" || name === "Consecration" || name === "FanOfKnivesCaster" ? f32(1.570796327) : 0.0;
+  const pitch = name === "ThunderClapCaster" || name === "WarStompCaster" || name === "Consecration" ? f32(1.570796327) : 0.0;
   return { model, anchor, scale, sequence, seconds, pitch };
 };
 const drawn = (model: string, anchor: CueAnchor): Cue => ({ model, anchor, scale: 1.0, drawn: true });
@@ -321,7 +321,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Shadow Strike", startup: cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "hand", f32(0.7)), active: timed(cue("Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", "hand", 1.0), "stand", 0.0) },
     side: { spell: "Shadow Pursuit", startup: SHADOW, active: cue("Abilities\\Weapons\\GlaiveMissile\\GlaiveMissileTarget.mdx", "ahead", 1.0) },
     up: { spell: "Blink", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
-    down: { spell: "Fan of Knives", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)) },
+    down: { spell: "Fan of Knives", startup: SHADOW, active: { ...cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)), roll: f32(1.570796327) } },
   },
   [Character.lich]: {
     neutral: { spell: "Frost Nova", startup: FROST, active: timed(cue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", "hand", 0.5), "stand", 0.0) },
