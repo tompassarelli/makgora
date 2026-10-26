@@ -131,7 +131,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Blademaster | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 |
-| Muradin Bronzebeard | light | up throw | 1/1 | 1/0 | 1/1 in short hop, back air, out dash, dash attack | 1/1 in down smash, out dash, dash attack |
+| Muradin Bronzebeard | light | up throw | 1/1 | 1/0 KD | 1/1 in short hop, back air, out dash, dash attack | 1/1 in down smash, out dash, dash attack |
 | Muradin Bronzebeard | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
