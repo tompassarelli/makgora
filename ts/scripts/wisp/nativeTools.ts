@@ -29,6 +29,13 @@ export const NATIVE_TOOLS: Readonly<Record<string, string>> = {
   nsenter: "util-linux.bin",
 };
 
+/** Screen recording tools, resolved only by the commands that record video. */
+export const VIDEO_TOOLS: Readonly<Record<string, string>> = {
+  "wf-recorder": "wf-recorder",
+  ffmpeg: "ffmpeg-headless",
+  ffprobe: "ffmpeg-headless",
+};
+
 const MAP_PACKER = join(projectRoot, "build/tools/map-pack");
 
 const standardDirectories = () => [
@@ -61,7 +68,7 @@ export const resolveTools = (names: readonly string[] = Object.keys(NATIVE_TOOLS
   const problems: string[] = [];
   const missing: string[] = [];
   for (const name of names) {
-    const attribute = NATIVE_TOOLS[name] ?? name;
+    const attribute = NATIVE_TOOLS[name] ?? VIDEO_TOOLS[name] ?? name;
     const given = sources.env[`WISP_${name.toUpperCase()}`];
     const onPath = given !== undefined && given !== "" ? given : sources.which(name);
     if (onPath !== null && existsSync(onPath)) {

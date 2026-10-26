@@ -39,6 +39,7 @@ export const bundleConfigs = {
   "native-driver": { entry: "src/host/entries/nativeDriverMain.ts", bundle: "native-driver.lua" },
   "native-capture": { entry: "src/host/entries/nativeCaptureMain.ts", bundle: "native-capture.lua" },
   "voice-check": { entry: "src/host/entries/voiceCheckMain.ts", bundle: "voice-check.lua" },
+  trailer: { entry: "src/host/entries/trailerMain.ts", bundle: "trailer.lua" },
   showcase: { entry: "src/host/entries/showcaseMain.ts", bundle: "showcase.lua" },
   "analog-keys": { entry: "src/host/entries/analogKeysMain.ts", bundle: "analog-keys.lua" },
   "analog-cursor": { entry: "src/host/entries/analogCursorMain.ts", bundle: "analog-cursor.lua" },

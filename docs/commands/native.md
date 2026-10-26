@@ -115,6 +115,20 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   `verdict.json`. A hit passes when its audio onset, after the median latency
   of non-hit voices with no other voice within 150 ms, lies within one frame of the
   moment its frame was drawn.
+- Trailer footage (#363): `bun wisp map build --profile trailer` plays every
+  shot in `src/game/session/trailerShots.ts` in turn as the same seeded Expert
+  computer match `bun scripts/playtest.ts --repro SEED` plays headless
+  (`fieldMatch`), up to the shot's end frame, with the drawn stamp on every
+  frame. It writes `smashcraft-trailer-log.txt`: each shot's stock losses and
+  state checksums at its first and last frame. Play it with `lan solo` on a
+  `--pool-profile capture-classic-1080` pair while `bun
+  scripts/trailerCapture.ts record --clients-file FILE --client NAME --install
+  DIR --out DIR --geometry 'X,Y 1920x1080'` records the game area with
+  wf-recorder at 60 fps. `bun scripts/trailerCapture.ts judge DIR` replays
+  each seed headless, compares its checksums and stock losses with the log,
+  cuts `shot-NN-seed-S.mp4` at the stamped start and end frames, and passes a
+  shot only when its clip is 1920x1080 at 60/1 with every frame from start to
+  end stamped exactly once.
 - Offline Classic capture batches can use `bun scripts/nativeCapture.ts chunks
   --out DIR PAD|DIR...` to build a separate map per row and write
   `capture-batch.json`. Run it with `bun scripts/nativeCapture.ts batch --plan

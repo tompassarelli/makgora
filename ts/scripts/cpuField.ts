@@ -18,11 +18,11 @@ import { captureReplaySnapshot, createReplaySnapshot } from "../src/game/replay/
 import { parseArgs } from "node:util";
 import { clearAttackBuffer } from "../src/game/input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
-import { type FrameControls, createFrameControls } from "../src/game/match/controls";
+import { type FrameControls, createBufferedFrameControls, createFrameControls } from "../src/game/match/controls";
 import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { type PacingAndPresentation, createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, createMatchState, setComputerParticipants } from "../src/game/lobby/lobbyState";
-import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase } from "../src/game/lobby/lobbyState";
+import { fieldMatch, fieldSpawnX } from "../src/game/match/fieldMatch";
 import { scheduleMeterDrops } from "../src/game/match/meterDrops";
 import { produceComputerInput } from "../src/game/match/botPlay";
 import { CORNER_BAND, cornered, insideLip } from "../src/game/match/botCorner";
@@ -33,11 +33,11 @@ import { gameplanOf } from "../src/game/match/botGameplan";
 import type { CpuSkill } from "../src/game/match/cpuSkill";
 import { type GameplanMove, GameplanSpecial, GameplanThrow } from "../src/game/sim/gameplan";
 import { AttackStyle, type Character, DownState, GrabAction, LedgeState, SpecialAction } from "../src/game/sim/codes";
-import { createFighter, type Fighter } from "../src/game/sim/fighter";
+import { type Fighter } from "../src/game/sim/fighter";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
 import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
-import { type Roster, copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
+import { type Roster, copyControls, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import soak from "./wisp/soak";
 import { admitsThroughHelper, runAdmitted } from "./heavyCapacity";
@@ -259,6 +259,8 @@ export interface FieldOptions {
 
   readonly drops?: boolean;
 
+  readonly bufferedAttacks?: boolean;
+
   readonly frameCap?: number;
 
   readonly checksumEvery?: number;
@@ -394,35 +396,17 @@ export function openFieldMatch(a: Character, b: Character, stageName: string, va
   const stage = FIELD_STAGES[stageName];
   if (stage === undefined) throw new Error(`no stage named ${stageName}`);
   const shift = SHIFTS[variant % SHIFTS.length] ?? 0.0;
-  const xs = [f32(matchSpawnX(0) + shift), f32(matchSpawnX(1) + shift)] as const;
+  const xs = [fieldSpawnX(0, shift), fieldSpawnX(1, shift)] as const;
 
   if (xs.some((x) => x <= mainDeckLeft(stage) + 40 || x >= mainDeckRight(stage) - 40)) return undefined;
-  const match = createMatchState();
-  setComputerParticipants(match, 3);
-  match.characterChoices[0] = a;
-  match.characterChoices[1] = b;
-  match.stageChoice = stage;
   const opponents = options.opponents ?? ["wren", "wren"];
   const tiers = options.tiers ?? ["expert", "expert"];
-  for (const slot of [0, 1] as const) {
-    match.cpuOpponents[slot] = opponents[slot];
-    match.cpuResolvedOpponents[slot] = opponents[slot];
-    match.cpuTiers[slot] = tiers[slot];
-  }
-  match.matchSeed = seed;
-  match.stockCount = options.stocks ?? 3;
-  match.timeLimitMinutes = options.minutes ?? 4;
-  match.remainingFrames = match.timeLimitMinutes * 60 * MATCH_TICKS_PER_SECOND;
-  match.phase = Phase.match;
-  match.drops.on = options.drops === true;
-  scheduleMeterDrops(match);
+  const { match, world } = fieldMatch(a, b, { stage, seed, shift, opponents, tiers, stocks: options.stocks, minutes: options.minutes, drops: options.drops });
   const dropRule = options.dropVariant === undefined || !match.drops.on ? undefined : startDropVariant(options.dropVariant, match);
-  const world = createRoster(3, [createFighter(a, xs[0], 1), createFighter(b, xs[1], -1)]);
-  const controls = createFrameControls();
-  const produced = createFrameControls();
+  const controls = options.bufferedAttacks === true ? createBufferedFrameControls() : createFrameControls();
+  const produced = options.bufferedAttacks === true ? createBufferedFrameControls() : createFrameControls();
   const runtime = createPacingAndPresentation();
   const row = createMatchFrameInput();
-  initializeMatchFighters(match, world);
   return { stage, match, world, controls, produced, runtime, row, dropRule, opponents, tiers };
 }
 

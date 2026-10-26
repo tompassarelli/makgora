@@ -48,6 +48,8 @@ export const drawnFrameLine = (build: string, epoch: number, frame: number) => `
 export const NATIVE_SOAK_FILE = "smashcraft-native-soak.txt";
 export const VOICE_LOG_FILE = "smashcraft-voice-log.txt";
 export const VOICE_CHECK_SCRIPT = 63;
+export const TRAILER_LOG_FILE = "smashcraft-trailer-log.txt";
+export const TRAILER_SCRIPT = 62;
 
 export const sessionRatesFile = (load: string, minute: number) => `smashcraft-rates-${load}-${minute}.txt`;
 export const sessionRatesHeader = (load: string, minute: number, build: string, version: string, clock: boolean) => `smashcraft-rates v=1 load=${load} minute=${minute} build=${build} version=${version} clock=${clock ? "os" : "ticks"}`;

@@ -104,7 +104,7 @@ export function playExpert(spec: MatchSpec): MatchRecord {
   const a = selectableCharacterBySlug(spec.a);
   const b = selectableCharacterBySlug(spec.b);
   if (a === undefined || b === undefined || spec.tier !== "expert") throw new Error(`seed ${spec.seed} is not an Expert computer match`);
-  const record = playCpuMatch(a, b, spec.stage, 0, { tiers: ["expert", "expert"], frameCap: DEFAULT_CONFIG.frameCap, playtest: true }, spec.seed);
+  const record = playCpuMatch(a, b, spec.stage, 0, { tiers: ["expert", "expert"], frameCap: DEFAULT_CONFIG.frameCap, playtest: true, bufferedAttacks: true }, spec.seed);
   if (record === undefined) throw new Error(`no spawn for ${spec.stage}`);
   return record;
 }
