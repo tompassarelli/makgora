@@ -34,7 +34,7 @@ export interface EdgeGuardResult {
 const STAGE = 0;
 const HORIZON = 600;
 const REACHES = [0, 10, 20, 30, 40, 50, 60, 80] as const;
-const HEIGHTS = [0, 20, 40, 60, 80, 100, 120] as const;
+const HEIGHTS = [0, 20, 40, 60, 80, 100, 120, -20, -40, -60, -80] as const;
 
 const edgeGuardName = (objective: EdgeGuardObjective): string =>
   `${objective.fighter} ${objective.move} at ${objective.percent[0]}-${objective.percent[1]}% on a weight-${objective.weight} victim ${objective.victim.pastLedge} past the ledge at height ${objective.victim.height}, kills against DI ${objective.di.join(", ")}`;
