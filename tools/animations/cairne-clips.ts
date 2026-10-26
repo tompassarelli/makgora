@@ -29,9 +29,10 @@ const painOnly = process.argv.includes("pain");
 const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
 const rigOutput = option("--rig"), bakedKeys = option("--keys");
 const bakedPose = rigOutput || bakedKeys ? process.argv.slice(4).find((arg, i, all) => !arg.startsWith("--") && !all[i - 1]?.startsWith("--")) as HeroPose | undefined : undefined;
-const inPlace = painOnly || bakedPose !== undefined;
+const regrip = process.argv[4] === "grip";
+const inPlace = painOnly || regrip || bakedPose !== undefined;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || (bakedPose && !painOnly)), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx|SHIPPED_TAUREN.mdx PRIVATE_OUTPUT [pain | POSE --rig RIG.json | POSE --keys KEYS.json]");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || (bakedPose && !painOnly)), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx|SHIPPED_TAUREN.mdx PRIVATE_OUTPUT [pain | grip | POSE --rig RIG.json | POSE --keys KEYS.json]");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure((inPlace || source.Sequences.length === 12) && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
@@ -277,8 +278,25 @@ const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand p
 const shaft=vec3.normalize(vec3.create(),vec3.subtract(vec3.create(),weaponPoint,handPivot)),unpivot=vec3.create();
 const bladeNormal=vec3.fromValues(0,1,0);{const turn=mat3.create();mat3.fromMat4(turn,inverseHand);vec3.transformMat3(bladeNormal,bladeNormal,turn);vec3.normalize(bladeNormal,bladeNormal);}
 evaluate(0,0);const idleOffset=mat4.create();ensure(mat4.invert(idleOffset,data.nodes[hand.ObjectId].matrix),"Hand's idle pose is singular");mat4.multiply(idleOffset,idleOffset,data.nodes[weapon.ObjectId].matrix);
-const mixMatrix=(a:mat4,b:mat4,t:number)=>{const qa=quat.create(),qb=quat.create(),ta=vec3.create(),tb=vec3.create(),out=mat4.create();mat4.getRotation(qa,a);mat4.getRotation(qb,b);mat4.getTranslation(ta,a);mat4.getTranslation(tb,b);
-  quat.slerp(qa,qa,qb,t);vec3.lerp(ta,ta,tb,t);return mat4.fromRotationTranslation(out,quat.normalize(qa,qa),ta);};
+const mixMatrix=(a:mat4,b:mat4,t:number)=>{const qa=quat.create(),qb=quat.create(),ta=vec3.transformMat4(vec3.create(),handPivot,a),tb=vec3.transformMat4(vec3.create(),handPivot,b),out=mat4.create();mat4.getRotation(qa,a);mat4.getRotation(qb,b);
+  quat.slerp(qa,qa,qb,t);quat.normalize(qa,qa);vec3.lerp(ta,ta,tb,t);vec3.subtract(ta,ta,vec3.transformQuat(tb,handPivot,qa));return mat4.fromRotationTranslation(out,qa,ta);};
+if(regrip){
+  const qa=mat4.getRotation(quat.create(),offset),qb=mat4.getRotation(quat.create(),idleOffset),span=quat.getAngle(qa,qb),pivot=model.PivotPoints[weapon.ObjectId]!,p=vec3.fromValues(pivot[0]!,pivot[1]!,pivot[2]!);
+  const rekeyed:string[]=[],writes:{frame:number;rotation:Float32Array;translation:Float32Array}[]=[];
+  for(const [index,sequence]of model.Sequences.entries()){const inside=(k:mdx.AnimKeyframe)=>k.Frame>=sequence.Interval[0]!&&k.Frame<=sequence.Interval[1]!,keys=weapon.Rotation!.Keys.filter(inside),moves=new Set(weapon.Translation!.Keys.filter(inside).map(k=>k.Frame));
+    if(!sequence.Name.startsWith("Cairne ")||keys.length!==moves.size||!keys.every(k=>moves.has(k.Frame)))continue;let count=0;
+    for(const key of keys){
+      render.setSequence(index);data.frame=key.Frame;render.update(0);const held=mat4.create(),q=quat.create();ensure(mat4.invert(held,data.nodes[hand.ObjectId].matrix),"Hand pose is singular");
+      mat4.multiply(held,held,data.nodes[weapon.ObjectId].matrix);mat4.getRotation(q,held);quat.normalize(q,q);const t=quat.getAngle(qa,q)/span;
+      if(t<1e-3||t>1-1e-3||quat.getAngle(q,quat.slerp(quat.create(),qa,qb,t))>0.01)continue;
+      const world=mat4.multiply(mat4.create(),data.nodes[hand.ObjectId].matrix,mixMatrix(offset,idleOffset,t)),local=mat4.create();ensure(mat4.invert(local,data.nodes[main.ObjectId].matrix),"Main pose is singular");mat4.multiply(local,local,world);
+      const r=quat.normalize(quat.create(),mat4.getRotation(quat.create(),local)),v=vec3.transformQuat(vec3.create(),p,r);
+      writes.push({frame:key.Frame,rotation:new Float32Array(r),translation:new Float32Array([local[12]!-p[0]!+v[0]!,local[13]!-p[1]!+v[1]!,local[14]!-p[2]!+v[2]!])});count++;}
+    if(count)rekeyed.push(`${sequence.Name.slice(7)} ${count}`);}
+  for(const {frame,rotation,translation}of writes){const r=weapon.Rotation!.Keys.find(k=>k.Frame===frame)!,m=weapon.Translation!.Keys.find(k=>k.Frame===frame)!;
+    r.Vector=rotation;if(r.InTan){r.InTan=rotation.slice();r.OutTan=rotation.slice();}m.Vector=translation;}
+  mkdirSync(output,{recursive:true});await Bun.write(join(output,"herotaurenchieftain.mdx"),encodeVerified(parseSource(generateMDX(model))));
+  console.log(`CAIRNE_GRIP_PASS ${writes.length} halberd frames re-keyed about the hand (${rekeyed.join(", ")}); ${output}`);process.exit(0);}
 const feet=["Foot Left Ref ","Foot Right Ref "].map(name=>model.Nodes.find(n=>n.Name===name)!);
 const soles=()=>Math.min(...feet.map(foot=>{const pivot=model.PivotPoints[foot.ObjectId]!,at=vec3.fromValues(pivot[0]!,pivot[1]!,pivot[2]!);vec3.transformMat4(at,at,data.nodes[foot.ObjectId].matrix);return at[2]!;}));
 evaluate(4,0);const soleRest=soles()-Math.min(...[...new DrawnModel(generateMDX(source),1).triangles(4,0,1)].filter((_,i)=>i%2===1));

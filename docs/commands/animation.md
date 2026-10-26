@@ -316,6 +316,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/cairne-down-air.py -- RIG.json KEYS.json`
   bakes one key per attack frame, and `... downAir --keys KEYS.json` splices them into the shipped
   model in place, keys the halberd to his hand and checks every other clip is unchanged.
+  Each clip eases the halberd from its Stand Ready grip to his idle grip, turned 179 degrees
+  apart, about his right hand (#447). `... SHIPPED_TAUREN.mdx PRIVATE_OUTPUT grip` re-keys only
+  the halberd in the shipped clips whose ease had swung it about the model origin, up to 54 units off his hand.
 
 - Forsaken Paladin animation authoring (from the repository root):
   `bun tools/animations/forsaken-paladin-clips.ts STOCK_FORSAKEN_PALADIN.mdx PRIVATE_OUTPUT`
