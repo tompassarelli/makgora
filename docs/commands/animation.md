@@ -123,6 +123,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/grom-clips.ts STOCK_GROM.mdx PRIVATE_OUTPUT` authors
   Grom's axe attacks, war cry, rush, leap, throws, recovery and nine pain
   poses on his stock campaign rig and writes both-facing sheets.
+  His dash attack is authored in Blender (#344): `... SHIPPED_GROM.mdx PRIVATE_OUTPUT dashAttack --rig RIG.json` writes his skeleton and stand pose, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/grom-dash-attack.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, turning every joint in the side-view plane and solving the axe arm onto each key's hand and axe-head aim,
+  and `... dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
   `blender --background --python tools/animations/strikes.py -- rifleman|illidan`.
   `SMASHCRAFT_ANIMATION_ASSETS=PRIVATE_DIR` selects the editable inputs;
   `SMASHCRAFT_STRIKE_CLIP='Attack Jab'` reauthors only the jab.

@@ -37,10 +37,12 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain");
-const reposed = process.argv.slice(4).filter(arg => arg !== "pain" && !arg.startsWith("--")) as HeroPose[];
+const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
+const rigOutput = option("--rig"), bakedKeys = option("--keys");
+const reposed = process.argv.slice(4).filter((arg, i, all) => arg !== "pain" && !arg.startsWith("--") && !["--rig", "--keys"].includes(all[i - 1] ?? "")) as HeroPose[];
 const inPlace = painOnly || reposed.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/grom-clips.ts STOCK_GROM.mdx|SHIPPED_GROM.mdx PRIVATE_OUTPUT [pain|POSE...]");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || reposed.length === 1), "usage: bun tools/animations/grom-clips.ts STOCK_GROM.mdx|SHIPPED_GROM.mdx PRIVATE_OUTPUT [pain|POSE...] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
 const originalBytes = await Bun.file(input).arrayBuffer();
 if (process.argv.includes("--stride-only")) { await writeStride(originalBytes); process.exit(0); }
 const source = parseMDX(originalBytes), model = structuredClone(source);
@@ -223,6 +225,13 @@ function aimBeats(index: number, start: number, frames: number, beats: readonly 
 }
 const flatTangent = (track: mdx.AnimVector, vector: KeyVector, path: string) => path.endsWith(".Rotation") || track.LineType === mdx.LineType.Bezier ? vector.slice() : new Float32Array(vector.length);
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
+const skeleton = (["Bones", "Helpers"] as const).flatMap(kind => model[kind].map((node, i) => ({ node, path: `.${kind}.${i}` })));
+if (rigOutput) {
+  const action = actions.find(candidate => candidate.pose === reposed[0]); ensure(action, `${reposed[0]}: not an authored Grom pose`);
+  const rest = (path: string) => { const track = originals.get(path); const key = track && !globalClock(track) ? track.Keys.find(k => k.Frame >= stand.Interval[0]! && k.Frame <= stand.Interval[1]!) : undefined; return key ? Array.from(key.Vector) : null; };
+  await Bun.write(rigOutput, JSON.stringify({ frames: action.frames, contact: action.contact, lastActive: action.lastActive, nodes: skeleton.map(({ node, path }) => ({ name: node.Name, parent: skeleton.findIndex(other => other.node.ObjectId === node.Parent), pivot: Array.from(source.PivotPoints[node.ObjectId]!), rotation: rest(`${path}.Rotation`), translation: rest(`${path}.Translation`) })) }));
+  console.log(`GROM_RIG ${reposed[0]} ${rigOutput}`); process.exit(0);
+}
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const records: { pose: string; index: number; frames: number; contact: number }[] = [], retired: number[] = [];
@@ -422,6 +431,20 @@ for (const style of inPlace ? [] : [AttackStyle.upTilt]) {
         break selection;
       }
   ensure(selected, `${action.pose}: no skinned recoil/contact pose meets original reach gates`);
+}
+if (bakedKeys) {
+  const action = actions.find(candidate => candidate.pose === reposed[0])!, index = model.Sequences.findIndex(sequence => sequence.Name === `Grom ${action.pose}`), [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+  const authored = await Bun.file(bakedKeys).json() as { frames: number; nodes: { rotation: number[][]; translation: number[][] }[] };
+  ensure(authored.frames === action.frames && authored.nodes.length === skeleton.length, `${action.pose}: Blender keys cover ${authored.frames} frames of ${authored.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
+  const at = (frame: number) => start + Math.round(frame * 1000 / 60);
+  for (const [i, { node }] of skeleton.entries()) for (const kind of ["Rotation", "Translation"] as const) {
+    const track = node[kind]; if (!track || globalClock(track)) continue;
+    const baked = authored.nodes[i]![kind === "Rotation" ? "rotation" : "translation"];
+    track.Keys = [...track.Keys.filter(key => key.Frame < start || key.Frame > end), ...baked.map((v, frame) => { const Vector = Float32Array.from(v); return { Frame: at(frame), Vector, ...(track.LineType >= mdx.LineType.Hermite ? { InTan: Vector.slice(), OutTan: Vector.slice() } : {}) }; })].sort((a, b) => a.Frame - b.Frame);
+  }
+  const root = model.Nodes.find(node => node.Name === "Bone_Root")!.Translation!, drawn = new DrawnModel(generateMDX(model), 1);
+  for (let frame = 0; frame <= action.frames; frame++) { const triangles = drawn.triangles(index, frame / 60, 1); let lowest = Infinity; for (let i = 1; i < triangles.length; i += 2) lowest = Math.min(lowest, triangles[i]!); root.Keys.find(key => key.Frame === at(frame))!.Vector[2]! -= lowest; }
+  ensure(end === at(action.frames), `${action.pose}: timing changed`);
 }
 if (inPlace) {
   const before = new DrawnModel(originalBytes, 1), after = new DrawnModel(generateMDX(model), 1), authored = new Set([...records.map(record => record.index), ...retired]);
