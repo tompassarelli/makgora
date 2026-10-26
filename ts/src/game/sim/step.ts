@@ -66,7 +66,7 @@ import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies } from "./travelStop";
 import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
-import { moveTravelFrames } from "./heroMoves";
+import { moveTravelStep } from "./heroMoves";
 import {
   SHIELD_MIN_HOLD_FRAMES,
   SHIELD_PERFECT_ACTIVE_FRAMES,
@@ -117,8 +117,9 @@ function attackStartupTravel(world: Roster, slot: number): number {
   const move = f.attack.style === undefined ? undefined : f.tuning.moves?.normals[f.attack.style];
   const lunge = felLungeStep(f.character, f.attack.style, f.attack.frame, f.attack.smashCharging, f.attack.smashChargeFrames);
   if (lunge > 0.0 && f.motion.grounded) return f32(travelBeforeBodies(world, slot, lunge, true) * f.facing);
-  if (move?.travelX === undefined || !f.motion.grounded || f.attack.frame <= 0 || f.attack.frame > move.startupFrames) return 0.0;
-  const distance = travelBeforeBodies(world, slot, f32(move.travelX / move.startupFrames), move.travelStopsAtBody === true);
+  const step = move === undefined || !f.motion.grounded ? undefined : moveTravelStep(move, f.attack.frame);
+  if (step === undefined) return 0.0;
+  const distance = travelBeforeBodies(world, slot, step, move?.travelStopsAtBody === true);
   return f32(distance * f.facing);
 }
 

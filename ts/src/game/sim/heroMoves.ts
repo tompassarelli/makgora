@@ -103,6 +103,12 @@ export function moveTravelFrames(move: Readonly<AuthoredMove>): number {
 }
 
 
+export function moveTravelStep(move: Readonly<AuthoredMove>, frame: number): number | undefined {
+  if (move.travelX === undefined || frame <= 0 || frame > move.startupFrames) return undefined;
+  return f32(move.travelX / move.startupFrames);
+}
+
+
 export function travelThrough(move: AuthoredMove, lastFrame: number): AuthoredMove {
   return { ...move, travelFrames: lastFrame };
 }
