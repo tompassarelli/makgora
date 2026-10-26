@@ -5,6 +5,7 @@ import { showcaseChecks } from "./showcaseChecks";
 import { winCountChecks } from "./winCountChecks";
 import { koboldDirectionChecks } from "./koboldDirectionChecks";
 import { murlocStabChecks } from "./murlocStabChecks";
+import { fighterSelectChecks } from "./fighterSelectChecks";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
@@ -60,6 +61,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
   underside: { describe: "development map built with scenario underside (smashcraft:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Smashcraft diagnostic underside.w3x"), quick: "-dev quick" },
   "cpu-startup": { describe: "development map rebuilt from this checkout, hosted with one lobby computer and left on fighter select", path: PRESENTATION, rebuild: "main", quick: "", computers: 1 },
+  "fighter-select": { describe: "development map rebuilt from this checkout, two players left on fighter select", path: PRESENTATION, rebuild: "main", quick: "" },
   "shield-energy": { describe: "development map rebuilt from this checkout, held shield-down/full/mid/low samples with drawn-state receipts", path: PRESENTATION, rebuild: "main", quick: SHIELD_ENERGY_SETUP },
   training: { describe: "development map rebuilt from this checkout, `-dev quick training` (a computer partner shielding at 40%, hit areas on)", path: PRESENTATION, rebuild: "main", quick: QUICK_TRAINING_COMMAND },
 
@@ -413,13 +415,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...murlocStabChecks(heroProfile("Murloc"), [NO_IMPORT_FAILURES, NO_ERRORS]),
-    ...(["first", "second"] as const).map((order): NativeCheck => ({
-      id: `c40-cpu-startup-${order}`, closes: "smashcraft#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
-      setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }],
-      capture: [{ kind: "frames", name: "fighter-select", client: "a" }, { kind: "frames", name: "fighter-select", client: "b" }],
-      pass: [NO_IMPORT_FAILURES, NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SETUP .* computers=[1-9]", min: 1 }, { kind: "receipt", client: "b", pattern: "^SETUP .* computers=[1-9]", min: 1 }],
-      look: "With each client's first-run Controls panel closed, the computer's starting fighter in SETUP characters= is the same on both clients and matches both fighter-select frames; it differs between the first and second session.",
-    })),
+    ...fighterSelectChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     {
       id: "c37-mount", closes: "smashcraft#10 C37N", map: "presentation", session: "c37-platforms",
       setup: [{ chat: "-dev reset" }, { chat: "-dev slots 3 0" }, { chat: "-dev quick stage 2" }, { waitMs: 4000 }, { keys: ["8"], holdMs: 150, client: "a" }],
