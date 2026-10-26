@@ -17,12 +17,12 @@ beats read. The DIs listed must not escape.
 | Opener | Percent | Follow-up | Floor | DIs that must not escape | Source | Today |
 | --- | --- | --- | --- | --- | --- | --- |
 | down tilt | 0-20 | down tilt | true | | starter row (#299) | holds |
-| neutral air | 10-20 | grab | DI-dependent | in, none | Fox true at 10-20 | read |
-| neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | read |
+| neutral air | 10-20 | grab | DI-dependent | in, none | Fox true at 10-20 | holds |
+| neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | holds |
 | down air | 0-100 | down special (Fan of Knives) | true | | Fox down air into shine, true | holds |
 | down air | 0-60 | grab | true | | Fox true | holds |
 | up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | holds (#306) |
-| up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | read |
+| up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | holds |
 | up air | 70-100 | up air | read | | Falco: the string ends in a read | holds |
 | side special (Shadow Pursuit) | 0-150 | grab | true | | her stun (#273) | holds |
 | side special (Shadow Pursuit) | 0-150 | forward smash | true | | her stun (#273) | holds |

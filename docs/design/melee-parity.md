@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-496 rows: 439 parity, 26 deviations, 31 open.
+496 rows: 440 parity, 28 deviations, 28 open.
 
 ## Deviations from Melee
 
@@ -81,6 +81,10 @@ deviation's reason, issue and decision date are written.
   - Ours: a horizontal-only digital air dodge angles 18° below horizontal; Melee: where the stick points
 - Dodge timing profile `dodge-timing`: one shared frame-data profile for every fighter (Tom 2026-10-06)
   - Ours: spot dodge 22, intangible 2–15; rolls 31, intangible 4–19; air dodge 49, intangible 4–29, landing 10; Melee: per fighter
+- Maiev's neutral air damage `maiev-neutral-air-damage`: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305)
+  - Ours: 6.106144; Melee: 12
+- Maiev's neutral air base knockback and growth `maiev-neutral-air-knockback`: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305)
+  - Ours: base 28.5, growth 8; Melee: base 10, growth 100
 
 ## Hits, knockback and hitstun
 
@@ -764,6 +768,6 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
-| Maiev's neutral air launch angle `maiev-neutral-air-angle` | 50° | [361](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:229](../../ts/src/game/sim/heroes/wardenMoves.ts#L229) `WARDEN_MOVES` | open: Maiev's neutral air against Fox's clean hit; her aerial retune decides (#305) |
-| Maiev's neutral air damage `maiev-neutral-air-damage` | 4.579608 | [12](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:229](../../ts/src/game/sim/heroes/wardenMoves.ts#L229) `WARDEN_MOVES` | open: Maiev's neutral air against Fox's clean hit; her aerial retune decides (#305) |
-| Maiev's neutral air base knockback and growth `maiev-neutral-air-knockback` | base 18, growth 93.0504 | [base 10, growth 100](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:229](../../ts/src/game/sim/heroes/wardenMoves.ts#L229) `WARDEN_MOVES` | open: Maiev's neutral air against Fox's clean hit; her aerial retune decides (#305) |
+| Maiev's neutral air launch angle `maiev-neutral-air-angle` | 361 | [361](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:230](../../ts/src/game/sim/heroes/wardenMoves.ts#L230) `WARDEN_MOVES` | parity |
+| Maiev's neutral air damage `maiev-neutral-air-damage` | 6.106144 | [12](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:230](../../ts/src/game/sim/heroes/wardenMoves.ts#L230) `WARDEN_MOVES` | deviation: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305) |
+| Maiev's neutral air base knockback and growth `maiev-neutral-air-knockback` | base 28.5, growth 8 | [base 10, growth 100](https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial) | [wardenMoves.ts:230](../../ts/src/game/sim/heroes/wardenMoves.ts#L230) `WARDEN_MOVES` | deviation: Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold (Tom 2026-10-26, #305) |
