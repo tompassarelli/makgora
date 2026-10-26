@@ -106,6 +106,11 @@ and Lich's float (21) are the lowest styles that read as distinct, and the
 values are Tom's to tune. The cold reader on the Classic motion strip stays
 the bar.
 
+`build/anim-score/LOOK-ledge-double-jump.tsv` scores the double jump taken
+from ledge hang as its own line: the fighter hangs on the right ledge of stage
+0 for 30 frames, jumps off it, and the midair jump's rise is compared with the
+ledge jump's rise on the same columns and thresholds.
+
 The silhouette centre is a visible mass proxy, rather than a physical
 mass-weighted centre. Missing limb names use body travel; the stored `limb`
 column makes this inspectable. The independent weight judgement catches

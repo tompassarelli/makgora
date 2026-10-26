@@ -70,3 +70,8 @@ export const coldReadBatch = (brief: string, look: string, batch: readonly ColdS
 
 export const answerKey = (look: string, strips: readonly ColdStrip[]) =>
   `${["look", "strip", "fighter", "move", "expected"].join("\t")}\n${strips.map((strip) => [look, strip.id, strip.fighter, strip.move, MOVEMENT_EXPECTED[strip.move]].join("\t")).join("\n")}\n`;
+
+export const JUMP_LINES = [
+  { start: "ground", kind: "double-jump", title: "double jump", first: "first jump" },
+  { start: "ledge", kind: "ledge-double-jump", title: "double jump taken from ledge hang", first: "ledge jump" },
+] as const;

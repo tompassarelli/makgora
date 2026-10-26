@@ -425,7 +425,11 @@ export interface JumpSample {
 
 const JUMP_PHASES = 16;
 
-export function sampleJumps(model: DrawnModel, character: Character): JumpSample {
+export type JumpStart = "ground" | "ledge";
+
+const LEDGE_JUMP_HANG_FRAMES = 30;
+
+export function sampleJumps(model: DrawnModel, character: Character, start: JumpStart = "ground"): JumpSample {
   const f = createFighter(character, 0.0, 1);
   const world = createRoster(1, [f]);
   const p = createFighterPose();
@@ -438,6 +442,11 @@ export function sampleJumps(model: DrawnModel, character: Character): JumpSample
   const neutral = neutralControls(), held = { ...neutralControls(), jumpHeld: true }, jump = { ...held, jumpPressed: true };
   let standing = capture(f, p);
   for (let tick = 0; tick < 30; tick++) standing = advance(neutral);
+  if (start === "ledge") {
+    if (!snapToLedge(world, 0, 0, 1)) throw new Error(`${fighterSlug(character)}: the sampled fighter catches the ledge`);
+    for (let tick = 0; tick < LEDGE_JUMP_HANG_FRAMES; tick++) advance(neutral);
+    if (f.ledge.state !== LedgeState.hang) throw new Error(`${fighterSlug(character)}: still hanging before the ledge jump`);
+  }
   const rise = () => {
     const frames: PoseFrame[] = [];
     let input: Readonly<Controls> = jump;
