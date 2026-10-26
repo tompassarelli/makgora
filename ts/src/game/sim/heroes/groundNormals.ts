@@ -150,7 +150,7 @@ export const WARDEN_GROUND: GroundKit = {
     [AttackStyle.forwardTiltDown]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 40.0, 110.0, 10.0], [18.0, 38.0, 119.0, 4.0], [18.0, 36.0, 105.0, 0.0]], 6.0, wardenThrust(20))),
     [AttackStyle.upTilt]: heroMove(4, 4, 16, 0, swing(4, [[18.0, 40.0, 95.0, 60.0], [16.0, 50.0, 70.0, 90.0], [8.0, 56.0, 35.0, 99.0], [0.0, 56.0, -10.0, 99.0]], 6.0,
       groundHit(6.0, 90, 60.0, 32.0, WD))),
-    [AttackStyle.downTilt]: heroMove(3, 2, 9, 0, swing(3, [[24.0, 22.0, 93.0, 10.0], [36.0, 14.0, 93.0, 8.0]], 12.0, groundHit(3.0, 0, 20.0, 32.0, WD))),
+    [AttackStyle.downTilt]: heroMove(3, 2, 9, 0, swing(3, [[24.0, 22.0, 93.0, 10.0], [36.0, 17.0, 93.0, 9.0]], 12.0, groundHit(3.0, 0, 20.0, 32.0, WD))),
     [AttackStyle.dashAttack]: travelThrough(heroMove(5, 10, 21, 0, [...swing(5, [[18.0, 30.0, 105.0, 40.0], [18.0, 40.0, 105.0, 52.0], [18.0, 50.0, 100.0, 62.0]], 6.0,
       groundHit(7.0, 50, 70.0, 24.0, WD)), held(8, 14, [18.0, 50.0, 100.0, 62.0], 6.0, groundHit(5.0, 50, 60.0, 20.0, WD))], 179.0, true), 14),
   },

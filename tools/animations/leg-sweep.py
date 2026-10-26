@@ -162,14 +162,15 @@ def lift(node, turned, drop):
 def smoothed(searched):
     keys = {key for found in searched for key in found}
     held = [frame == 0 or frame >= frames - 1 for frame in range(len(searched))]
-    def window(frame, values, reach):
-        return [values[g] for g in range(max(0, frame - reach), min(len(values), frame + reach + 1))]
+    def window(frame, values):
+        return [values[g] for g in range(max(0, frame - 2), min(len(values), frame + 3))]
+    def taper(frame):
+        return min(1, (frames - 1 - frame) / SETTLE)
     out = [dict(found) for found in searched]
     for key in keys:
         raw = [found.get(key, 0) for found in searched]
-        peak = [raw[f] if held[f] else max(window(f, raw, 1), key=abs) for f in range(len(raw))]
         for f in range(len(raw)):
-            out[f][key] = raw[f] if held[f] else sum(window(f, peak, 2)) / len(window(f, peak, 2))
+            out[f][key] = raw[f] if held[f] else taper(f) * sum(window(f, raw)) / len(window(f, raw))
     return out
 
 
@@ -178,6 +179,7 @@ OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}.js
 BEATS = OWN['beats']
 MARGIN = OWN.get('margin', 0)
 MARGIN_DROP = 10
+SETTLE = 3
 SIDES = {}
 POINTS = spec['points']
 rest()
@@ -229,6 +231,7 @@ for frame in range(frames + 1):
     toe = joint(f'ankle.{kick}').head
     hip = joint(f'hip.{kick}').head
     knee = joint(f'knee.{kick}').head
-    print(f'LEG_SWEEP frame {frame}: {kick} hip ({hip.x:.1f}, {hip.z - FLOOR:.1f}) knee ({knee.x:.1f}, {knee.z - FLOOR:.1f}) ankle ({toe.x:.1f}, {toe.y:.1f}, {toe.z - FLOOR:.1f}) planted ankle z {joint(f"ankle.{plant}").head.z - FLOOR:.1f}', flush=True)
+    head = joint('head').head
+    print(f'LEG_SWEEP frame {frame}: head ({head.x:.1f}, {head.z - FLOOR:.1f}) {kick} hip ({hip.x:.1f}, {hip.z - FLOOR:.1f}) knee ({knee.x:.1f}, {knee.z - FLOOR:.1f}) ankle ({toe.x:.1f}, {toe.y:.1f}, {toe.z - FLOOR:.1f}) planted ankle z {joint(f"ankle.{plant}").head.z - FLOOR:.1f}', flush=True)
 open(keys_path, 'w').write(json.dumps(out))
 print('LEG_SWEEP_KEYS', keys_path, frames + 1, 'frames; leg', round(LEG, 1), flush=True)
