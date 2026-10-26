@@ -93,6 +93,10 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
 };
 
+export const SWEPT_STRIKES: Readonly<Record<string, readonly string[]>> = {
+  warden: ["forward-air"],
+};
+
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
 
 
@@ -256,9 +260,11 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   const ready = posed[moveFrames];
   if (ready === undefined) return undefined;
   const chestZ = skeleton.chest === undefined ? 50 : posed[first]?.nodes[skeleton.chest * 2 + 1] ?? 50;
+  const swept = SWEPT_STRIKES[fighterSlug(character)]?.includes(entry.move) === true;
+  const regions = frames.slice(0, moveFrames).map((frame, index) => swept && active.includes(index) ? frame.strikes.map((s) => ({ x1: s.x1 - frame.x, z1: s.z1 - frame.z, x2: s.x2 - frame.x, z2: s.z2 - frame.z })) : []);
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - drop), travels: travels(frames), cues,
-    sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), pixelsPerUnit },
+    sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), regions, pixelsPerUnit },
   };
 }
 
@@ -316,7 +322,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   if (ready === undefined) return undefined;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []),
-    sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, pixelsPerUnit },
+    sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
   };
 }
 

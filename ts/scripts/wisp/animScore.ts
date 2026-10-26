@@ -24,6 +24,9 @@ export interface ScoreFrame {
 }
 
 
+export interface StrikeSegment { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number }
+
+
 export interface ScoreLimb { readonly name: string; readonly root: number; readonly end: number }
 
 
@@ -51,6 +54,8 @@ export interface MoveSample {
   readonly hits: readonly number[];
 
   readonly strike: { readonly x: number; readonly z: number };
+
+  readonly regions: readonly (readonly StrikeSegment[])[];
 
   readonly pixelsPerUnit: number;
 }
@@ -328,6 +333,31 @@ export function strikingLimb(skeleton: ScoreSkeleton, frames: readonly ScoreFram
 }
 
 
+const segmentDistance = (p: { readonly x: number; readonly z: number }, s: StrikeSegment) => {
+  const dx = s.x2 - s.x1, dz = s.z2 - s.z1, length = dx * dx + dz * dz;
+  const t = length > 0 ? Math.max(0, Math.min(1, ((p.x - s.x1) * dx + (p.z - s.z1) * dz) / length)) : 0;
+  return Math.hypot(p.x - s.x1 - t * dx, p.z - s.z1 - t * dz);
+};
+
+
+export function strikingVertex(sample: Pick<MoveSample, "frames" | "regions" | "strike">, contactFrame: ScoreFrame): number {
+  const active = sample.regions.flatMap((segments, index) => segments.length > 0 && sample.frames[index] !== undefined ? [index] : []);
+  const miss = (vertex: number) => active.length === 0
+    ? Math.hypot((contactFrame.vertices[vertex * 2] ?? 0) - sample.strike.x, (contactFrame.vertices[vertex * 2 + 1] ?? 0) - sample.strike.z)
+    : Math.max(...active.map((index) => {
+      const at = point(sample.frames[index]?.vertices ?? new Float32Array(0), vertex);
+      return Math.min(...(sample.regions[index] ?? []).map((segment) => segmentDistance(at, segment)));
+    }));
+  let tip = 0, nearest = Infinity;
+  for (let vertex = 0; vertex < contactFrame.drawn.length; vertex++) {
+    if (contactFrame.drawn[vertex] !== 1) continue;
+    const distance = miss(vertex);
+    if (distance < nearest) { nearest = distance; tip = vertex; }
+  }
+  return tip;
+}
+
+
 export function lineOneRule(limbStrike: boolean, limb: ScoreLimb | undefined): "body" | "limb" {
   return limbStrike && (limb?.name.startsWith("leg ") === true || limb?.name.startsWith("arm ") === true) ? "limb" : "body";
 }
@@ -345,12 +375,7 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
   const ux = dx / length, uz = dz / length;
   const along = (p: { readonly x: number; readonly z: number }) => p.x * ux + p.z * uz;
 
-  let tip = 0, nearest = Infinity;
-  for (let vertex = 0; vertex < contactFrame.drawn.length; vertex++) {
-    if (contactFrame.drawn[vertex] !== 1) continue;
-    const distance = Math.hypot((contactFrame.vertices[vertex * 2] ?? 0) - sample.strike.x, (contactFrame.vertices[vertex * 2 + 1] ?? 0) - sample.strike.z);
-    if (distance < nearest) { nearest = distance; tip = vertex; }
-  }
+  const tip = strikingVertex(sample, contactFrame);
   const tipAt = (index: number) => along(point(frames[index]?.vertices ?? new Float32Array(0), tip));
 
   let peak = 0;

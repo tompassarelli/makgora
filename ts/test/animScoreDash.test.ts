@@ -26,6 +26,7 @@ const sample = (moveClass: MoveClass, shoulders: readonly number[], reach: reado
   lastActive: 5,
   hits: [4],
   strike: { x: 60, z: 48 },
+  regions: [],
   pixelsPerUnit: 1,
 });
 
