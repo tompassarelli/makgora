@@ -24,6 +24,7 @@ import { type MapStall, readMapStalls } from "./mapStalls";
 import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokeMatchFailures, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
 import { smokePairs } from "./smokeShards";
+import { controlsShowing, fighterSelectShowing, screenWords, startPromptReady } from "./gateIntro";
 import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_BINDINGS, SMOKE_PRESET, type SettlePoint, keyName, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
@@ -38,7 +39,6 @@ const START_PANELS = 4;
 const PARK_X = 0.4;
 const PARK_Y = 0.02;
 const LABEL_SCALE = 2;
-const CONTROLS_SCREEN = /^(recommended|smash)$/i;
 const NEUTRAL_SPECIAL_PAIR = [PLAYABLE_CHARACTERS.indexOf(Character.thrall), PLAYABLE_CHARACTERS.indexOf(Character.jaina)] as const;
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
@@ -133,25 +133,6 @@ export interface MovesGateReceipts {
   readonly moves: ReceiptFile;
   readonly specials: ReceiptFile;
 }
-
-interface ScreenWord {
-  readonly text: string;
-  readonly y: number;
-}
-
-const promptWords = (words: readonly ScreenWord[], height: number) => words.filter(({ y }) => y <= height * 0.12).map(({ text }) => text.toLowerCase());
-
-export const startPromptReady = (words: readonly ScreenWord[], height: number): boolean => {
-  const prompt = promptWords(words, height);
-  return prompt.includes("start") && prompt.includes("click");
-};
-
-export const controlsShowing = (words: readonly ScreenWord[]): boolean =>
-  words.some(({ text }, index) => CONTROLS_SCREEN.test(text) || (/^press$/i.test(text) && /^done\b/i.test(words[index + 1]?.text ?? "")));
-
-export const fighterSelectShowing = (words: readonly ScreenWord[], height: number): boolean => !controlsShowing(words) && promptWords(words, height).includes("click");
-
-const screenWords = (client: Client, frame: Frame) => Effect.all([frameWords(client, frame, "light"), frameWords(client, frame, "gold")]).pipe(Effect.map(inks => inks.flat()));
 
 const reachFighterSelect = (client: Client, save: (file: string, bytes: Uint8Array) => Effect.Effect<void, AcceptFailure>) => Effect.gen(function*() {
   const viewport = yield* InputInjection.use(input => input.windowRegion(client)).pipe(Effect.mapError(fail("moves gate setup")));

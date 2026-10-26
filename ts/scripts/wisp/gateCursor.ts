@@ -7,12 +7,13 @@ import { ChildProcess } from "effect/process";
 import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
-import { batch, capture, click, focus, loadClients, frameWords } from "wisp/scripts/warcraft/desktop";
+import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
 import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, HAND_HEIGHT, HAND_WIDTH, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { readTga, type Rgba } from "../blp";
 import { runProcess } from "../hostProcess";
+import { reachFighterSelect } from "./gateIntro";
 import { projectRoot } from "./project";
 import { loadStockCursor, stockCursorAt } from "./stockCursor";
 import { type UiRect, pixelPoint, texturePixels } from "./uiTexture";
@@ -50,10 +51,8 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     },
     catch: cause => new AcceptFailure({ operation: "cursor gate texture", problem: String(cause) }),
   });
+  yield* reachFighterSelect(client, region);
   const frame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
-  const words = yield* frameWords(client, frame, "light").pipe(Effect.mapError(fail("cursor gate tutorial")));
-  const notNow = words.find(word => word.text === "Not");
-  if (notNow !== undefined) yield* click(client, region.x + notNow.x, region.y + notNow.y).pipe(Effect.mapError(fail("cursor gate tutorial")));
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   const samples: { file: string; sha256: string; elapsedMs: number; attempts: number; phase: string; x: number; y: number; error: number | undefined; pinched: boolean; handPixels: number; matchedHandPixels: number; chipError: number | undefined; visible: boolean }[] = [];
   const started = yield* Clock.currentTimeMillis;

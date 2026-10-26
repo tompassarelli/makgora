@@ -1,0 +1,45 @@
+import { Effect } from "effect";
+import { AcceptFailure } from "wisp/scripts/wisp/accept";
+import type { Frame } from "wisp/scripts/wisp/frameProbe";
+import { capture, click, type Client, frameWords, type Region } from "wisp/scripts/warcraft/desktop";
+import { PICKER_DONE } from "../../src/game/ui/settingsUi";
+
+const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
+
+const INTRO_STEPS = 4;
+const CONTROLS_SCREEN = /^(recommended|smash)$/i;
+
+export interface ScreenWord {
+  readonly text: string;
+  readonly y: number;
+}
+
+const promptWords = (words: readonly ScreenWord[], height: number) => words.filter(({ y }) => y <= height * 0.12).map(({ text }) => text.toLowerCase());
+
+export const startPromptReady = (words: readonly ScreenWord[], height: number): boolean => {
+  const prompt = promptWords(words, height);
+  return prompt.includes("start") && prompt.includes("click");
+};
+
+export const controlsShowing = (words: readonly ScreenWord[]): boolean =>
+  words.some(({ text }, index) => CONTROLS_SCREEN.test(text) || (/^press$/i.test(text) && /^done\b/i.test(words[index + 1]?.text ?? "")));
+
+export const fighterSelectShowing = (words: readonly ScreenWord[], height: number): boolean => !controlsShowing(words) && promptWords(words, height).includes("click");
+
+export const screenWords = (client: Client, frame: Frame) => Effect.all([frameWords(client, frame, "light"), frameWords(client, frame, "gold")]).pipe(Effect.map(inks => inks.flat()));
+
+export const viewportPoint = (region: Region, x: number, y: number) => ({ x: region.x + Math.round((region.width - region.height * 4 / 3) / 2 + x * region.height / 0.6), y: region.y + Math.round(region.height - y * region.height / 0.6) });
+
+export const reachFighterSelect = (client: Client, region: Region) => Effect.gen(function*() {
+  const done = viewportPoint(region, PICKER_DONE.x + PICKER_DONE.width / 2, PICKER_DONE.y - PICKER_DONE.height / 2);
+  for (let step = 0; step <= INTRO_STEPS; step++) {
+    const frame = yield* capture(client, region).pipe(Effect.mapError(fail("fighter select capture")));
+    const words = yield* screenWords(client, frame).pipe(Effect.mapError(fail("fighter select intro")));
+    if (fighterSelectShowing(words, frame.height)) return;
+    if (step === INTRO_STEPS) return yield* new AcceptFailure({ operation: "fighter select intro", problem: `${client.name} shows ${controlsShowing(words) ? "its Controls screen" : "no fighter select prompt"} after ${INTRO_STEPS} dismissals` });
+    const notNow = words.find(word => word.text === "Not");
+    const target = controlsShowing(words) ? done : notNow === undefined ? undefined : { x: region.x + notNow.x, y: region.y + notNow.y };
+    if (target !== undefined) yield* click(client, target.x, target.y).pipe(Effect.mapError(fail("fighter select intro")));
+    yield* Effect.sleep("500 millis");
+  }
+});
