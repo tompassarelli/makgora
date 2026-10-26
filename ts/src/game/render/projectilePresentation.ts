@@ -15,9 +15,9 @@ import { opponentReflectedModels } from "../presentation/reflectedProjectileArt"
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { MURLOC_SWAMP_CLOUD_MODEL } from "../assets/importedModelInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
+import { type DiscLook, discLook } from "../presentation/discLook";
 import { carrierDrawsMark } from "../presentation/ultimateVoice";
 import { cameraLift } from "./cameraLift";
-import { sineTurns } from "../sim/mathTables";
 import { tintProjectile } from "./projectileTint";
 import { addPoolEffect, addPoolEffects } from "./projectilePoolEffects";
 
@@ -92,6 +92,7 @@ export class ProjectilePresentation {
   private parked: ParkedFlags | undefined;
   private readonly aimedShot: lightning[] = [];
   private readonly lineShown: boolean[] = [];
+  private readonly disc: DiscLook = { lift: 0.0, radius: 0.0, red: 0, green: 0, blue: 0, alpha: 0 };
   private tracerFrame = 0;
   private tracerX = 0.0;
   private tracerZ = 0.0;
@@ -424,24 +425,17 @@ export class ProjectilePresentation {
           BlzSetSpecialEffectTime(boundary, f32(pulseFrame / 60));
           BlzSetSpecialEffectTimeScale(boundary, paused ? 0.0 : 1.0);
         } else {
-          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (draw?.disc === undefined ? 0.0 : draw.z));
-          BlzSetSpecialEffectScale(boundary, pose.dangerRadius);
+          const look = discLook(this.disc, draw, pose, defile, fighter?.character === Character.lich, defile && projectile?.spec?.pool !== undefined ? projectile.spec.life - projectile.life : -1);
+          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + look.lift);
+          BlzSetSpecialEffectScale(boundary, look.radius);
           if (defile || draw?.discVertical === true) {
             BlzResetSpecialEffectMatrix(boundary);
             BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
             // Warcraft may apply matrix scale before or after the roll, so the rim's 0.6 height is stretched on Y and Z alike.
             BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
           }
-          const frost = fighter?.character === Character.lich;
-          if (defile && projectile?.spec?.pool !== undefined) {
-            const age = projectile.spec.life - projectile.life;
-            const since = pose.poolSince;
-            const flash = since >= 0 && since <= 12 ? 1.0 - since / 12 : 0.0;
-            const glow = Math.min(1.0, f32(0.72) + f32(0.12) * sineTurns(age / 23) + f32(0.08) * sineTurns(age / 9) + 0.5 * flash);
-            BlzSetSpecialEffectColor(boundary, Math.floor(255 * glow), Math.floor(255 * glow), 255);
-          } else if (draw?.disc !== undefined) BlzSetSpecialEffectColor(boundary, draw.disc[0], draw.disc[1], draw.disc[2]);
-          else BlzSetSpecialEffectColor(boundary, frost ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost ? 255 : pose.armed ? 255 : 100);
-          BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : defile ? 96 : 160);
+          BlzSetSpecialEffectColor(boundary, look.red, look.green, look.blue);
+          BlzSetSpecialEffectAlpha(boundary, look.alpha);
           if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
           BlzSetSpecialEffectTimeScale(boundary, 0.0);
           if (defile && pose.armed) this.lingering[boundarySlot] = 1;

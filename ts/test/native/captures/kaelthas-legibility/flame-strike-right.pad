@@ -1,0 +1,24 @@
+# smashcraft#495: Kael'thas holds Flame Strike toward the Mountain King, so the rune slides out, and
+# releases on frame 272; the ring over the rune stays small while held, then grows and heats onto
+# the pillar's hit area until the burst on 304, with the wind-up sound 15 frames before it.
+#! chat -dev quick pair kael'thas sunstrider / mountain king
+#! cue 272-274 placement: sound=FlameStrikeTargetWaveNonLoop1
+#! cue 289-291 wind-up: sound=RainOfFireTarget2
+#! cue 304-306 burst: effect=FlameStrike1
+250 a stick 1 0
+252 a press X
+256 a stick 0 0
+262 a capture
+270 a capture
+272 a release X
+274 a capture
+280 a capture
+286 a capture
+290 a capture
+294 a capture
+298 a capture
+301 a capture
+303 a capture
+305 a capture
+308 a capture
+314 a capture

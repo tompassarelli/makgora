@@ -1,0 +1,19 @@
+# smashcraft#495: Kael'thas walks up, catches the Mountain King with Siphon Mana and throws him forward.
+# The throw releases on 443 and he is actionable on 461, 18 frames later; the frames run from the
+# release past his end lag, which should read as a clear return to stance.
+#! chat -dev quick pair kael'thas sunstrider / mountain king
+#! cue 443-444 throw: sound=BlinkTarget
+250 a stick 0.4 0
+390 a stick 0 0
+394 a tap RB 2
+430 a stick 1 0
+434 a stick 0 0
+443 a capture
+446 a capture
+449 a capture
+452 a capture
+455 a capture
+458 a capture
+461 a capture
+464 a capture
+467 a capture

@@ -18,12 +18,13 @@ interface ProjectilePose {
   poolSince: number;
   modelScale: number;
   modelZ: number;
+  burning: number;
   animationSequence?: string | undefined;
   animationSeconds?: number | undefined;
 }
 
 
-const HIDDEN: Readonly<ProjectilePose> = { visible: false, x: 0.0, z: 0.0, yaw: 0.0, pitch: 0.0, poolRadius: 0.0, dangerRadius: 0.0, armed: false, poolPulse: 0.0, poolSince: -1, modelScale: 1.0, modelZ: 0.0 };
+const HIDDEN: Readonly<ProjectilePose> = { visible: false, x: 0.0, z: 0.0, yaw: 0.0, pitch: 0.0, poolRadius: 0.0, dangerRadius: 0.0, armed: false, poolPulse: 0.0, poolSince: -1, modelScale: 1.0, modelZ: 0.0, burning: 0.0 };
 
 
 export function projectedProjectile(fighter: Readonly<Fighter> | undefined, index: number, playing: boolean): Readonly<ProjectilePose> {
@@ -55,6 +56,7 @@ export function projectedProjectile(fighter: Readonly<Fighter> | undefined, inde
     poolSince: spec?.pool === undefined ? -1 : projectile.poolHits > 0 ? spec.pool.every - 1 - projectile.poolWait : age - first,
     modelScale: spec?.modelRadius === undefined ? 1.0 : f32(heroProjectileRadius(projectile, spec) / spec.modelRadius),
     modelZ: f32(projectile.z + (spec?.modelOffsetZ ?? 0.0)),
+    burning: spec?.expiresInto === undefined || (spec.activeFrom ?? 0) < spec.life ? 0.0 : f32(age / spec.life),
     animationSequence: animation?.sequence,
     animationSeconds,
   };

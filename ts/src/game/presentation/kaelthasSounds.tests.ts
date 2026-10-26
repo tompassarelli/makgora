@@ -72,3 +72,17 @@ test("Siphon Mana sounds once, on the frame its tether goes out [k1 scenario]", 
   for (let frame = 0; frame < 60; frame++) if (sounds(step(run, idle).own, "SiphonManaCaster")) heard.push(run.kael.attack.frame);
   assertEquals(heard.join(), `${attackStartupFrames(AttackStyle.grab, KAELTHAS_MOVES)}`);
 });
+
+test("Flame Strike's wind-up sounds once, 15 frames before the pillar bursts, even when the pillar strikes nobody [k1 scenario]", () => {
+  assertTrue(soundFiles("RainOfFireWave").length > 0);
+  const run = replay(900.0);
+  const windUp: number[] = [];
+  let burstFrame = -1;
+  for (let frame = 0; frame < 120; frame++) {
+    const input = frame === 0 ? press : frame <= FLAME_STRIKE_AIM.frame + HELD_FRAMES ? hold : idle;
+    if (sounds(step(run, input).own, "RainOfFireWave")) windUp.push(run.frame);
+    if (burstFrame < 0 && run.kael.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === FLAME_STRIKE_BURST)) burstFrame = run.frame;
+  }
+  assertTrue(burstFrame > 0 && run.target.status.damage === 0.0);
+  assertEquals(windUp.join(), `${burstFrame - 15}`);
+});

@@ -10,7 +10,7 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "../sim/tuning";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
-import { hasImpactSound, hasPerformSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
+import { hasFuseSound, hasImpactSound, hasPerformSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
@@ -30,6 +30,7 @@ export type DodgeCue = (typeof DodgeCue)[keyof typeof DodgeCue];
 
 
 const SIDE_KO_X = 920.0;
+const FUSE_LEAD_FRAMES = 15;
 
 
 
@@ -90,6 +91,11 @@ export interface ImpactEvents {
   perform: number;
   performSerial: number;
   impact: number;
+  fuse: number;
+  fuseSerial: number;
+  fuseX: number;
+  fuseZ: number;
+  previousFuseSerial: number;
   hitCharacter: Character;
   hitMove: number;
   strong: boolean;
@@ -142,7 +148,7 @@ export function createImpactEvents(): ImpactEvents {
     previousChargeFrames: 0, previousLedgeSerial: 0, previousLedgeState: LedgeState.none,
     previousLedgeSide: 0, previousAttackSerial: 0, previousAttackFrame: 0, previousSpecialAction: SpecialAction.none, previousSpecialFrame: 0, previousSpecialForm: 0, grab: false, throwRelease: false, charge: false, ready: false, previousBuiltSerial: -1, jobDone: false,
     ledgeCatch: false, ledgeRecovery: false, ledgeX: 0.0, ledgeZ: 0.0, hit: false, electric: false,
-    element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, hitCharacter: 1, hitMove: -1, strong: false,
+    element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, fuse: -1, fuseSerial: 0, fuseX: 0.0, fuseZ: 0.0, previousFuseSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
     shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false,
     movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false,
@@ -209,6 +215,7 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.swing = -1;
   events.perform = -1;
   events.impact = -1;
+  events.fuse = -1;
   events.hitMove = -1;
   events.shieldMove = -1;
   events.strong = false;
@@ -399,6 +406,16 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     && hasImpactSound(fighter.character, specialMove(slot)) && special.frame === firstRegionFrame(fighter)) {
     events.impact = specialMove(slot);
     if (events.perform < 0) events.performSerial = attack.serial + jump.serial + visuals.hit;
+  }
+  if (present) for (const projectile of fighter.projectiles) {
+    if (projectile.kind !== ProjectileKind.hero || projectile.life !== FUSE_LEAD_FRAMES || projectile.serial === events.previousFuseSerial || projectile.spec?.expiresInto === undefined) continue;
+    const move = specialMove(projectileSlot(fighter.character, projectile.spec));
+    if (!hasFuseSound(fighter.character, move)) continue;
+    events.fuse = move;
+    events.fuseSerial = projectile.serial;
+    events.fuseX = projectile.x;
+    events.fuseZ = projectile.z;
+    events.previousFuseSerial = projectile.serial;
   }
   events.shieldElectric = visuals.shieldElectric;
   events.shieldHit = present && visuals.shield !== events.previousShieldVisualSerial;

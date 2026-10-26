@@ -40,6 +40,7 @@ interface SpecialSound {
   readonly performVolume?: number | undefined;
   readonly hit: string;
   readonly impact?: string | undefined;
+  readonly fuse?: string | undefined;
 }
 
 interface FighterSound {
@@ -136,7 +137,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.kaelthas]: {
     weapon: Weapon.blunt, strong: "Fireball",
-    specials: [s("FireballLaunch", "FlameStrike"), s("FlameStrikeTarget", "FlameStrike"), s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
+    specials: [s("FireballLaunch", "FlameStrike"), { ...s("FlameStrikeTarget", "FlameStrike"), fuse: "RainOfFireWave" }, s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
     normals: { [AttackStyle.grab]: { perform: "SiphonManaCaster" } },
   },
   [Character.murloc]: {
@@ -177,6 +178,7 @@ export interface MoveSound {
   readonly strong: readonly SoundLayer[];
   readonly shield: readonly SoundLayer[];
   readonly impact: readonly SoundLayer[];
+  readonly fuse: readonly SoundLayer[];
   readonly voice: SoundLayer | undefined;
 }
 
@@ -214,6 +216,7 @@ function resolveSpecial(fighter: FighterSound, move: number): MoveSound | undefi
     strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
     shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],
     impact: special.impact === undefined ? [] : [layer([special.impact], at(TIER_HIT_VOLUME, SoundTier.large))],
+    fuse: special.fuse === undefined ? [] : [layer([special.fuse], PERFORM_VOLUME)],
     voice: undefined,
   };
 }
@@ -236,6 +239,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
     strong: [layer([own?.hit ?? at(at(FLESH, weapon), SoundTier.large)], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
     shield: [layer([at(at(METAL, weapon), tier)], SHIELD_VOLUME)],
     impact: [],
+    fuse: [],
     voice: fighter.effort !== undefined && isSmashAttack(style) ? layer(fighter.effort, VOICE_VOLUME) : undefined,
   };
 }
@@ -316,6 +320,15 @@ export function playImpact(character: Character, move: number, serial: number, s
   if (row !== undefined) playLayers(row.impact, serial, sink);
 }
 
+export function hasFuseSound(character: Character, move: number): boolean {
+  return (moveSound(character, move)?.fuse.length ?? 0) > 0;
+}
+
+export function playFuse(character: Character, move: number, serial: number, sink: MoveSoundSink): void {
+  const row = moveSound(character, move);
+  if (row !== undefined) playLayers(row.fuse, serial, sink);
+}
+
 export function playShieldHit(character: Character, move: number, serial: number, sink: MoveSoundSink): void {
   const row = moveSound(character, move);
   if (row !== undefined) playLayers(row.shield, serial, sink);
@@ -328,12 +341,12 @@ export function moveSoundLabels(characters: readonly Character[]): string[] {
     for (let style = 0; style <= AttackStyle.jab3; style++) {
       const row = moveSound(character, style);
       if (row === undefined) continue;
-      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
+      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...row.fuse, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
     }
     for (let move = SPECIAL_MOVE; move <= ULTIMATE_MOVE; move++) {
       const row = moveSound(character, move);
       if (row === undefined) continue;
-      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
+      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...row.fuse, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
     }
   }
   return labels;

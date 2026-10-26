@@ -12,7 +12,9 @@ import type { Projectile } from "../sim/fighter";
 import { HERO_ROSTER, heroDefinition } from "../sim/heroes/registry";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile } from "../sim/specials/schema";
+import { FLAME_STRIKE_BURST } from "../sim/heroes/kaelthasSpecials";
 import type { CueBirth } from "./specialCues";
+import type { Fuse } from "./discLook";
 
 
 export const ORIGINAL_PROJECTILE_MODELS = {
@@ -140,12 +142,13 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx": { scale: 0.5 },
 };
 
-export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined } | undefined } = {
+export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined; readonly fuse?: Fuse | undefined } | undefined } = {
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { x: 0.0, z: 0.0, sequence: "birth", disc: [155, 225, 255], discVertical: true },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { x: 0.0, z: 0.0, disc: [255, 215, 115] },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { x: 0.0, z: 0.0, roll: f32(1.570796327) },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { x: 0.0, z: 0.0, sequence: "birth", seconds: f32(0.2) },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
+  "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx": { x: 0.0, z: 0.0, disc: [255, 80, 20], discVertical: true, fuse: { z: FLAME_STRIKE_BURST.offsetZ, hot: [255, 245, 190] } },
   "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
   [ANKH_BURST_MODEL]: { x: 0.0, z: 0.0, sequence: "stand", reseek: true },
   "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": { x: 0.0, z: 0.0, sequence: "spell" },
