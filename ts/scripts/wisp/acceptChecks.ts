@@ -3,6 +3,7 @@ import { teamResultsCheck } from "./teamResultsCheck";
 import { loserPoseChecks } from "./loserPoseChecks";
 import { winCountChecks } from "./winCountChecks";
 import { koboldDirectionChecks } from "./koboldDirectionChecks";
+import { murlocStabChecks } from "./murlocStabChecks";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
@@ -406,6 +407,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...loserPoseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
+    ...murlocStabChecks(heroProfile("Murloc"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...(["first", "second"] as const).map((order): NativeCheck => ({
       id: `c40-cpu-startup-${order}`, closes: "smashcraft#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
       setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }],

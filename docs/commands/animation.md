@@ -120,7 +120,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   writes his skeleton and stand pose, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/murloc-dash-attack.py -- RIG.json KEYS.json`
   pitches each joint about the side-view axis, squashes and stretches his body, aims the spear by its blade and bakes one key per attack frame,
-  and `... dashAttack --keys KEYS.json` splices them, adds rotation or scaling tracks to nodes that lack one, and sets every frame on his feet.
+  and `... dashAttack --keys KEYS.json` splices them, adds rotation or scaling tracks to nodes that lack one
+  (or appends to such a track another clip added), and sets every frame on his feet.
+  His jabs and forward tilts are point-first stabs (#497): `tools/animations/murloc-stabs.py -- POSE RIG.json KEYS.json`
+  takes `jab`, `jab2`, `forwardTilt` or `forwardTiltDown`, solves his shoulder and elbow each
+  startup and active frame so the spear tip rides a straight line along the hit direction, and splices the same way.
+  Both scripts share the rig, pose vocabulary and bake in `tools/animations/murloc_rig.py`.
   Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
   recovery, throw and nine pain gestures and refresh only his clip/stride rows.
   `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then

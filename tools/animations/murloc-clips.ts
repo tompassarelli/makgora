@@ -190,7 +190,7 @@ if (rigOutput) {
   const span = spear.flatMap(a => spear.map(b => [a, b] as const)).reduce((best, pair) => Math.hypot(...pair[0].map((x, i) => x - pair[1][i]!)) > Math.hypot(...best[0].map((x, i) => x - best[1][i]!)) ? pair : best);
   const bladePivot = source.PivotPoints[source.Nodes.find(node => node?.Name === "Blade")!.ObjectId]!;
   const [butt, blade] = Math.hypot(...span[0].map((x, i) => x - bladePivot[i]!)) > Math.hypot(...span[1].map((x, i) => x - bladePivot[i]!)) ? [span[1], span[0]] : span;
-  await Bun.write(rigOutput, JSON.stringify({ frames: action.frames, contact: action.contact, active: move?.activeFrames ?? 1, blade: blade.map((x, i) => x - butt[i]!),
+  await Bun.write(rigOutput, JSON.stringify({ frames: action.frames, contact: action.contact, active: move?.activeFrames ?? 1, blade: blade.map((x, i) => x - butt[i]!), tip: blade,
     nodes: skeleton.map(({ node, path }) => ({ name: node.Name, parent: skeleton.findIndex(s => s.node.ObjectId === node.Parent), pivot: Array.from(source.PivotPoints[node.ObjectId]!), rotation: at(`${path}.Rotation`), translation: at(`${path}.Translation`) })) }));
   console.log(`MURLOC_RIG ${action.pose} ${rigOutput}`); process.exit(0);
 }
@@ -198,7 +198,7 @@ const baked = bakedKeys ? await Bun.file(bakedKeys).json() as { frames: number; 
 if (baked) {
   const action = actions.find(a => a.pose === replaced[0]); ensure(action, `${replaced[0]}: not an authored ${fighterName} pose`);
   ensure(baked.frames === action.frames && baked.nodes.length === skeleton.length, `${action.pose}: Blender keys cover ${baked.frames} frames of ${baked.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
-  action.keys = Array.from({ length: action.frames + 1 }, (_, frame) => ({ frame, g: {} }));
+  action.keys = Array.from({ length: action.frames + 1 }, (_, frame) => ({ frame, g: {} })); action.target = undefined;
 }
 const bakedVector = (path: string, frame: number) => {
   const [, kind, index, channel] = /^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation)$/.exec(path) ?? [];
@@ -261,8 +261,10 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     const { rotation, scaling } = baked.nodes[ordinal]!, rest = { Rotation: [0, 0, 0, 1], Scaling: [1, 1, 1] };
     for (const [channel, keys] of [["Rotation", rotation], ["Scaling", scaling]] as const) {
       if (!keys?.some(v => v.some((axis, i) => Math.abs(axis - rest[channel][i]!) > 1e-4)) || (channel === "Rotation" && node.Rotation)) continue;
-      ensure(!node[channel], `${node.Name}: authored ${channel} needs a node without a stock track`);
-      node[channel] = { LineType: mdx.LineType.Linear, GlobalSeqId: -1, Keys: keys.map((v, frame) => ({ Frame: start + Math.round(frame * 1000 / 60), Vector: Float32Array.from(v) })) };
+      ensure(!node[channel] || !globalClock(node[channel]!), `${node.Name}: authored ${channel} needs a track on the sequence clock`);
+      const authored = keys.map((v, frame) => ({ Frame: start + Math.round(frame * 1000 / 60), Vector: Float32Array.from(v) }));
+      if (node[channel]) node[channel]!.Keys.push(...authored);
+      else node[channel] = { LineType: mdx.LineType.Linear, GlobalSeqId: -1, Keys: authored };
     }
   }
   if (inPlace) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
