@@ -338,6 +338,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   move tables provide the contact targets; shipped collision follows the measured
   grip and blade. Run the original clip export, timeline export
   and Character 7 white-copy export afterward. Other fighter inputs stay unchanged.
+  His sword joint hangs from the root rather than his hand, so later arm passes left it
+  up to 64 units out of his fist (#515).
+  `bun tools/animations/weapon-grip.ts SHIPPED.mdx PRIVATE_OUTPUT CHARACTER FIRST_AUTHORED_SEQUENCE`
+  re-keys only the weapon joint, at 60 Hz, in each authored clip whose grip strays more than
+  2.5 units from the wrist, sliding the weapon back to 2.5 units without turning it, and
+  checks every other track and clip is unchanged; run it with `7 28` on his shipped model.
 
 - Chen animation authoring (from the repository root):
   `bun tools/animations/chen-clips.ts STOCK_CHEN.mdx PRIVATE_OUTPUT` authors
