@@ -1,5 +1,6 @@
 import { SHIELD_ENERGY_SETUP } from "../../src/game/session/shieldEnergyCapture";
 import { teamResultsCheck } from "./teamResultsCheck";
+import { winCountChecks } from "./winCountChecks";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
@@ -397,22 +398,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "After the first match ends, the rematch seconds 5 to 1 and then the next match's 3, 2, 1, GO! each appear centred on the stage, popping in and fading out; the next match's fighters stay held until GO!.",
     },
     teamResultsCheck([NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT]),
-    {
-      id: "c46-second-match", closes: "smashcraft#7 C46 setup: the second Wren match ends", map: "presentation", session: "c39-countdown",
-      setup: [{ receipt: "^parts [0-9]+$", client: "a", seconds: 600 }],
-      pass: [NO_ERRORS],
-    },
-    {
-      id: "c46-win-counts", closes: "smashcraft#7 C46", map: "presentation", session: "c39-countdown",
-      setup: [
-        { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
-        { waitMs: 2500 }, { keys: ["n"], client: "a" }, { waitMs: 300 }, { keys: ["n"], client: "b" }, { waitMs: 300 },
-        { keys: ["n"], client: "a" }, { waitMs: 300 }, { keys: ["n"], client: "b" }, { waitMs: 3000 },
-      ],
-      capture: [{ kind: "frames", name: "fighter-select-after-three", client: "a" }, { kind: "frames", name: "fighter-select-after-three", client: "b" }],
-      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
-      look: "Three one-sided matches against Wren Expert have ended by KO; after both players cancel the rematch countdown and confirm from results, both clients' fighter select still holds the computer in slot 2 and shows x3 on its card and no tally on player 1's card, so each win was awarded exactly once to the fixed slot through results, rematch and the return to the menu.",
-    },
+    ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...(["first", "second"] as const).map((order): NativeCheck => ({
       id: `c40-cpu-startup-${order}`, closes: "smashcraft#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
       setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }],
