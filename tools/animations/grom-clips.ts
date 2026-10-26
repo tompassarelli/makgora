@@ -48,7 +48,7 @@ ensure((inPlace || source.Sequences.length === 16) && source.Bones.some(b => b.N
 const stand = source.Sequences[8]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; leftKnee?: number; armZ?: number; yaw?: number; lean?: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; lastActive?: number; gesture: Gesture; follow?: Gesture; followDistance?: number; drive?: Readonly<Partial<Record<"Bone_Root" | "Bone_Chest" | "Bone_Pelvis", readonly [number, number]>>>; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; beats?: readonly Beat[]; }
-interface Beat { frame: number; gesture: Gesture; drive: readonly [number, number]; aim?: { hand: readonly [number, number]; weapon: readonly [number, number] }; }
+interface Beat { frame: number; gesture: Gesture; drive: readonly [number, number]; aim?: { hand: readonly [number, number]; weapon: readonly [number, number]; home?: number }; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
 const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
@@ -75,9 +75,10 @@ function lungeBeats(contact: number, lastActive: number, frames: number): Beat[]
   const swing = { frame: contact - 1, gesture: blend(LUNGE_COIL, LUNGE_DRIVE, 0.45), drive: [6, -10] as const, aim: OVER_AIM };
   const drive = [44, 56, reach + 4].map((x, i) => ({ frame: contact + i, gesture: blend(LUNGE_DRIVE, LUNGE_CLEAVE, i / 6), drive: [x, -12 - i] as const, aim: between(CHOP_AIM, CLEAVE_AIM, i / 6) }));
   const carry = Array.from({ length: settle - contact - 2 }, (_, i) => contact + 3 + i).map(frame => { const t = 0.5 + 0.5 * ease((frame - contact - 2) / (settle - contact - 2)); return { frame, gesture: blend(LUNGE_DRIVE, LUNGE_CLEAVE, t), drive: [reach + 4 + 6 * t, -14 - 16 * t] as const, aim: between(CHOP_AIM, CLEAVE_AIM, t) }; });
+  const glide = (s: number) => { const r = 0.12, v = 1 / (1 - r); return s < r ? v * s * s / (2 * r) : s < 1 - r ? v * (s - r / 2) : 1 - v * (1 - s) ** 2 / (2 * r); };
   const back = Array.from({ length: frames - settle }, (_, i) => settle + 1 + i).map(frame => {
-    const s = (frame - settle) / (frames - settle), t = 0.5 * ease(s) + 0.5 * (1 - (1 - s) ** 2), h = Math.min(1, s / 0.5), g = (x: number) => 0.5 * x + 0.5 * ease(x);
-    return { frame, gesture: s < 0.5 ? blend(LUNGE_CLEAVE, LUNGE_HOIST, g(h)) : blend(LUNGE_HOIST, LUNGE_SETTLE, ease((s - 0.5) / 0.5)), drive: [(reach + 10) * (1 - t), -30 * (1 - t)] as const, aim: s < 0.5 ? between(CLEAVE_AIM, HOIST_AIM, g(h)) : s < 0.9 ? between(HOIST_AIM, REST_AIM, ease((s - 0.5) / 0.4)) : undefined };
+    const t = glide((frame - settle) / (frames - settle)), h = Math.min(1, t / 0.62);
+    return { frame, gesture: t < 0.62 ? blend(LUNGE_CLEAVE, LUNGE_HOIST, h) : blend(LUNGE_HOIST, LUNGE_SETTLE, (t - 0.62) / 0.38), drive: [(reach + 10) * (1 - t), -30 * (1 - t)] as const, aim: t < 0.62 ? between(CLEAVE_AIM, HOIST_AIM, h) : t < 0.97 ? { ...between(HOIST_AIM, REST_AIM, Math.min(1, (t - 0.62) / 0.3)), home: 0.5 * (t - 0.62) } : undefined };
   });
   return [...coil, swing, ...drive, ...carry, ...back];
 }
@@ -211,7 +212,7 @@ function aimBeats(index: number, start: number, frames: number, beats: readonly 
   let angles = [0, 0, 0, 0, 0, 0];
   for (const beat of aimed) {
     const previous = [...angles], aim = beat.aim!;
-    const loss = () => { write(beat.frame, angles); data.frame = start + Math.round(beat.frame * 1000 / 60); renderer.update(0); const s = at(chain[0]!), h = at(chain[2]!), w = at(weapon); return (h[0] - s[0] - aim.hand[0]) ** 2 + (h[1] - s[1] - aim.hand[1]) ** 2 + (w[0] - s[0] - aim.weapon[0]) ** 2 + (w[1] - s[1] - aim.weapon[1]) ** 2 + 0.02 * angles.reduce((sum, value, i) => sum + (value - previous[i]!) ** 2, 0); };
+    const loss = () => { write(beat.frame, angles); data.frame = start + Math.round(beat.frame * 1000 / 60); renderer.update(0); const s = at(chain[0]!), h = at(chain[2]!), w = at(weapon); return (h[0] - s[0] - aim.hand[0]) ** 2 + (h[1] - s[1] - aim.hand[1]) ** 2 + (w[0] - s[0] - aim.weapon[0]) ** 2 + (w[1] - s[1] - aim.weapon[1]) ** 2 + 0.02 * angles.reduce((sum, value, i) => sum + (value - previous[i]!) ** 2, 0) + (aim.home ?? 0) * angles.reduce((sum, value) => sum + value * value, 0); };
     for (const step of solved.size === 0 ? [20, 5, 2, 1] : [6, 3, 1]) for (let d = 0; d < 6; d++) { let best = Infinity, bestAngle = angles[d]!; const centre = angles[d]!; for (let k = -8; k <= 8; k++) { angles[d] = solved.size === 0 && step === 20 ? -180 + (k + 8) * 22.5 : centre + k * step; const value = loss(); if (value < best) { best = value; bestAngle = angles[d]!; } } angles[d] = bestAngle; }
     write(beat.frame, angles); solved.set(beat.frame, [...angles]);
   }
