@@ -85,13 +85,13 @@ HAND_Y = -40
 KEYS = {
     0: dict(rise=0, lean=0, chest=0, head=0, hips=0, knees=0, shins=0, hooves=0, gripX=READY_GRIP.x, gripZ=READY_GRIP.z, aim=READY_AIM, solve=0),
     4: dict(rise=6, lean=-6, chest=-14, head=-8, hips=-50, knees=64, shins=-10, hooves=18, gripX=-10, gripZ=150, aim=95, solve=1),
-    contact - 2: dict(rise=34, lean=-20, chest=-40, head=-20, hips=-110, knees=130, shins=-20, hooves=32, gripX=-30, gripZ=165, aim=128, solve=1),
-    contact: dict(rise=-30, lean=36, chest=12, head=-8, hips=-55, knees=85, shins=-6, hooves=0, gripX=40, gripZ=14, aim=-84, solve=1),
-    contact + 3: dict(rise=-32, lean=56, chest=8, head=-14, hips=-4, knees=20, shins=0, hooves=-25, gripX=44, gripZ=2, aim=-90, solve=1),
-    last: dict(rise=-30, lean=68, chest=6, head=-18, hips=20, knees=8, shins=0, hooves=-30, gripX=38, gripZ=24, aim=-106, solve=1),
-    last + 9: dict(rise=-24, lean=52, chest=5, head=-14, hips=12, knees=8, shins=0, hooves=-22, gripX=24, gripZ=30, aim=-124, solve=0.85),
-    last + 20: dict(rise=-15, lean=30, chest=3, head=-8, hips=5, knees=5, shins=0, hooves=-12, gripX=-8, gripZ=42, aim=-148, solve=0.55),
-    last + 30: dict(rise=-6, lean=12, chest=1, head=-3, hips=2, knees=2, shins=0, hooves=-5, gripX=-34, gripZ=54, aim=-162, solve=0.25),
+    contact - 2: dict(rise=34, lean=-12, chest=-34, head=-18, hips=-80, knees=110, shins=-20, hooves=30, gripX=-40, gripZ=170, aim=150, solve=1),
+    contact: dict(rise=-42, lean=10, chest=22, head=24, hips=14, knees=-28, shins=0, hooves=-18, gripX=44, gripZ=10, aim=-88, solve=1),
+    contact + 3: dict(rise=-68, lean=14, chest=28, head=28, hips=16, knees=-32, shins=0, hooves=-20, gripX=46, gripZ=-4, aim=-96, solve=1),
+    last: dict(rise=-54, lean=12, chest=32, head=26, hips=-46, knees=72, shins=-6, hooves=8, gripX=36, gripZ=10, aim=-122, solve=1),
+    last + 9: dict(rise=-38, lean=8, chest=18, head=16, hips=-26, knees=38, shins=-4, hooves=4, gripX=18, gripZ=26, aim=-138, solve=0.85),
+    last + 20: dict(rise=-22, lean=4, chest=8, head=7, hips=-12, knees=16, shins=0, hooves=2, gripX=-8, gripZ=42, aim=-152, solve=0.55),
+    last + 30: dict(rise=-8, lean=1, chest=2, head=3, hips=-4, knees=5, shins=0, hooves=0, gripX=-34, gripZ=54, aim=-162, solve=0.25),
     frames: dict(rise=0, lean=0, chest=0, head=0, hips=0, knees=0, shins=0, hooves=0, gripX=READY_GRIP.x, gripZ=READY_GRIP.z, aim=READY_AIM, solve=0),
 }
 
