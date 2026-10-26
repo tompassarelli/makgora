@@ -1,27 +1,22 @@
-import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../codes";
 import { heroRegion, type StrikeCapsule } from "../heroMoves";
 import { withExKit } from "../exSpecialAuthoring";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialCompanion, type SpecialKit, type SpecialPlacement, type SpecialProjectile } from "../specials/schema";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../specials/schema";
 import type { AppliedStatus } from "../heroStatus";
 import { kaelCastBody, kaelHit } from "./kaelthasMoves";
 
 const AIR_LANDING_LAG = 20;
+const FIREBALL_LANDING_LAG = 10;
 
-export const KAEL_PILLAR: SpecialProjectile = {
-  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx",
-  spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 12, activeFrom: 13, radius: 40.0, effect: kaelHit(10.0, 80, 90.30785369873047, 30.0),
-  reflectable: false, limit: 1,
-};
-export const KAEL_FLAME_BOLT: SpecialProjectile = {
+export const FIREBALL_LIMIT = 2;
+export const FIREBALL: SpecialProjectile = {
   model: "Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx",
-  spawnFrame: 16, offsetX: 40.0, offsetZ: 55.0, velocityX: 9.0, velocityZ: 0.0,
-  life: 34, radius: 16.0, effect: KAEL_PILLAR.effect, homing: { turn: f32(0.35), maxRise: 4.0 }, burstInto: KAEL_PILLAR,
-  reflectable: true, limit: 1, needsLineOfSight: true,
+  spawnFrame: 9, offsetX: 40.0, offsetZ: 55.0, velocityX: 18.0, velocityZ: 0.0,
+  life: 50, radius: 14.0, effect: kaelHit(3.0, 0, 8.0, 8.0),
+  reflectable: true, limit: FIREBALL_LIMIT,
 };
-const flamestrike = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 38, cooldownFrames: 40, landingLag, hurt: kaelCastBody(8, 26, 40.0, 66.0), projectiles: [KAEL_FLAME_BOLT],
+const fireball = (landingLag: number | undefined): AuthoredSpecial => ({
+  endFrame: 26, landingLag, hurt: kaelCastBody(6, 18, 44.0, 58.0), projectiles: [FIREBALL],
 });
 
 const DRAIN_BEAM: StrikeCapsule = { x1: 30.0, z1: 60.0, x2: 120.0, z2: 60.0, radius: 18.0 };
@@ -58,35 +53,13 @@ const phoenix = (speed: number): AuthoredSpecial => ({
   ],
 });
 
-const PHOENIX_AURA: SpecialProjectile = {
-  model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx",
-  spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 6, radius: 70.0, effect: kaelHit(4.338719844818115, 70, 38.02436065673828, 30.0), reflectable: false, limit: 3,
-};
-const SUMMONED_PHOENIX: SpecialCompanion = {
-  behavior: "flying", followSpeed: 9.0, followBehind: -60.0, followHeight: 110.0, returnSpeed: 12.0,
-  lungeStartup: 6, lungeActive: 6, lungeRecovery: 20, lungeTravel: 0.0,
-  bite: { x1: -20.0, z1: 0.0, x2: 20.0, z2: 0.0, radius: 30.0 }, biteEffect: kaelHit(4.338719844818115, 70, 38.02436065673828, 30.0),
-  stunFrames: 30, leash: 600.0, leashFrames: 60,
-};
-export const SUMMON_PHOENIX: SpecialPlacement = {
-  frame: PHOENIX_CHARGE_FRAMES + PHOENIX_FLIGHT_FRAMES + 1, offsetX: -40.0, offsetZ: 110.0, radius: 30.0, height: 60.0,
-  durability: 12.0, life: 180, fireAges: [30, 60, 90, 120, 150, 178], shot: PHOENIX_AURA, companion: SUMMONED_PHOENIX,
-  model: { path: "units\\human\\Phoenix\\Phoenix.mdl", height: 110.0, alpha: 255 },
-};
-
-function withSummonedPhoenix(kit: SpecialKit): SpecialKit {
-  const ex = kit.ground.ex;
-  return ex === undefined ? kit : { ...kit, ground: { ...kit.ground, ex: { ...ex, placement: SUMMON_PHOENIX } } };
-}
-
 export const KAELTHAS_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Flamestrike", description: "A fire bolt that drifts toward the enemy and bursts into a pillar of flame on contact. Shield or reflect it.",
-    ground: flamestrike(undefined), air: flamestrike(AIR_LANDING_LAG) }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Fireball", description: "A fast, weak fire missile straight ahead, two on screen at most. Shield, jump or reflect it.",
+    ground: fireball(undefined), air: fireball(FIREBALL_LANDING_LAG) }, { damage: 1.25 }),
   side: withExKit({ name: "Drain Mana", description: "A short tether that grabs through shields and drinks the victim's meter. Jump or dodge it.",
     ground: drainMana(undefined), air: drainMana(AIR_LANDING_LAG) }, { damage: 1.25 }),
-  up: withSummonedPhoenix(withExKit({ name: "Phoenix", description: "Charge in swirling flame, then fly as a phoenix the way you aim; up or down bends the flight. Helpless after.",
-    ground: phoenix(PHOENIX_SPEED) }, { travel: 1.25 })),
+  up: withExKit({ name: "Phoenix", description: "Charge in swirling flame, then fly as a phoenix the way you aim; up or down bends the flight. Helpless after.",
+    ground: phoenix(PHOENIX_SPEED) }, { travel: 1.25 }),
   down: withExKit({ name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
     ground: banish(undefined), air: banish(18) }, { reach: 1.25 }),
 };

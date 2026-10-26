@@ -4,7 +4,7 @@ import { GameplanSpecial, GameplanThrow, type FighterGameplan } from "../gamepla
 export const KAELTHAS_GAMEPLAN: FighterGameplan = {
   range: { near: 120.0, far: 210.0 },
   spacing: [
-    { move: GameplanSpecial.neutral, near: 150.0, far: 330.0 },
+    { move: GameplanSpecial.neutral, near: 200.0, far: 800.0 },
     { move: GameplanSpecial.down, near: 90.0, far: 260.0 },
     { move: GameplanSpecial.side, near: 50.0, far: 150.0 },
     { move: AttackStyle.forwardTilt, near: 75.0, far: 125.0 },
@@ -13,7 +13,7 @@ export const KAELTHAS_GAMEPLAN: FighterGameplan = {
   defense: ["stance", "retreat", "shield", "roll", "jump"],
   combos: [
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.upAir, AttackStyle.forwardAir] },
-    { starter: GameplanSpecial.neutral, followUps: [AttackStyle.upAir, AttackStyle.forwardAir] },
+    { starter: GameplanSpecial.neutral, followUps: [AttackStyle.dashAttack, AttackStyle.forwardTilt] },
     { starter: GameplanSpecial.side, followUps: [AttackStyle.dashAttack, GameplanSpecial.neutral] },
     { starter: GameplanThrow.down, followUps: [AttackStyle.downTilt, GameplanSpecial.neutral] },
   ],

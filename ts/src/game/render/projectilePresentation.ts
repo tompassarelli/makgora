@@ -27,6 +27,7 @@ export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx",
   "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx",
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx",
+  "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx",
   "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx",
   "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx",
   "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx",

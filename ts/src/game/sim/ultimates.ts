@@ -306,15 +306,20 @@ const TINKER: AuthoredSpecial = {
   projectiles: [{ ...shot(20, 60.0, 30.0, 6.0, 0.0, 60, 40.0, hit(3.0, 30, 20.0, 30.0), "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl"), expiresInto: OVERDRIVE_BLAST, ...ON_FLOOR }],
 };
 
-const GRAVITY_RING = "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx";
-const GRAVITY_LIFT = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx";
+const PHOENIX_BURN = hit(4.338719844818115, 70, 38.02436065673828, 30.0, HitElement.fire);
+const SUMMONED_PHOENIX: SpecialCompanion = {
+  behavior: "flying", followSpeed: 9.0, followBehind: -60.0, followHeight: 110.0, returnSpeed: 12.0,
+  lungeStartup: 6, lungeActive: 6, lungeRecovery: 20, lungeTravel: 0.0, bite: capsule(-20.0, 0.0, 20.0, 0.0, 30.0), biteEffect: PHOENIX_BURN,
+  stunFrames: 30, leash: 600.0, leashFrames: 60,
+};
+export const SUMMON_PHOENIX_FRAME = 20;
 const KAELTHAS: AuthoredSpecial = {
-  name: "Gravity Lapse", endFrame: 60,
-  projectiles: [
-    ...[-260.0, 0.0, 260.0].map((offsetX) => mark(GRAVITY_RING, 2, 27, offsetX)),
-    ...[-180.0, 0.0, 180.0].map((offsetX) => mark(GRAVITY_LIFT, 29, 24, offsetX)),
-  ],
-  regions: [heroRegion(29, 31, capsule(-260.0, 40.0, 260.0, 40.0, 120.0), hit(14.0, 90, 85.0, 60.0, HitElement.arcane))],
+  name: "Summon Phoenix", endFrame: 36, projectiles: [mark("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", 2, SUMMON_PHOENIX_FRAME - 2, -40.0, 110.0)],
+  placement: {
+    frame: SUMMON_PHOENIX_FRAME, offsetX: -40.0, offsetZ: 110.0, radius: 30.0, height: 60.0, durability: 12.0, life: 180, fireAges: [30, 60, 90, 120, 150, 178],
+    shot: { ...shot(0, 0.0, 0.0, 0.0, 0.0, 6, 70.0, PHOENIX_BURN, "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx"), limit: 3 }, companion: SUMMONED_PHOENIX,
+    model: { path: "units\\human\\Phoenix\\Phoenix.mdl", height: 110.0, alpha: 255 },
+  },
 };
 
 const MURLOC_MODEL = "units\\creeps\\Murloc\\Murloc.mdl";
@@ -443,7 +448,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
   [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",
   [Character.tinker]: "His Robo-Goblin waddles ahead and explodes. Walk away or shield the blast.",
-  [Character.kaelthas]: "Arcane orbs ring him, then everyone inside is lifted straight up. Leave the ring.",
+  [Character.kaelthas]: "Embers gather behind him and a phoenix rises at his shoulder, follows him and burns anyone near it. Break it or keep away from its flames.",
   [Character.murloc]: "He blows a conch and a swarm of murlocs pours across the ground. Jump over it or shield.",
   [Character.grom]: "Demon blood drives a charge that catches the first foe, through a shield, for three Gorehowl chops. Jump it.",
   [Character.anubarak]: "A slow cloud of beetles drifts ahead, stinging anyone standing in it. Jump or shield.",
