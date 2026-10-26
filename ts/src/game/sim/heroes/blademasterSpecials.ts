@@ -104,7 +104,7 @@ const risingBlade: AuthoredSpecial = {
 
 
 const IMAGE_STEP_SPEED = f32(-f32(length(f32(1.0)) / 4));
-const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 150, fireAges: [] };
+export const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 210, fireAges: [] };
 const mirrorImage: AuthoredSpecial = {
   endFrame: 24,
   hurt: [
