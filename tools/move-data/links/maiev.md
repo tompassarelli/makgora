@@ -94,8 +94,8 @@ No setup lands a hit with up special, so it has no rows.
 | jab into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| jab into down special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | DI | DI | DI |
-| jab into down special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | DI | DI |
+| jab into down special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| jab into down special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | jab into down special | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | jab into down special | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 
@@ -171,10 +171,10 @@ No setup lands a hit with up special, so it has no rows.
 | forward tilt into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down air | 60 | · | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward tilt into down air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down air | 100 | · | · | · | · | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down air | 143 | · | · | · | · | · | R | · | · | · | · | · | · | · | · | · | · |
+| forward tilt into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward tilt into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -187,10 +187,10 @@ No setup lands a hit with up special, so it has no rows.
 | forward tilt into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward tilt into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down special | 60 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down special | 75 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down special | 100 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward tilt into down special | 143 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| forward tilt into down special | 60 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| forward tilt into down special | 75 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| forward tilt into down special | 100 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| forward tilt into down special | 143 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
 
 ## up tilt (clean)
 
@@ -264,7 +264,7 @@ No setup lands a hit with up special, so it has no rows.
 | up tilt into up air | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up tilt into up air | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up tilt into up air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up tilt into down air | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | DI | DI |
+| up tilt into down air | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | DI |
 | up tilt into down air | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up tilt into down air | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up tilt into down air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
@@ -280,8 +280,8 @@ No setup lands a hit with up special, so it has no rows.
 | up tilt into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up tilt into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up tilt into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| up tilt into down special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | DI | DI | DI |
-| up tilt into down special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | DI | DI |
+| up tilt into down special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| up tilt into down special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up tilt into down special | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | up tilt into down special | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 
@@ -636,10 +636,10 @@ No setup lands a hit with up special, so it has no rows.
 | up smash into up air | 75 | · | · | R | R | DI | DI | DI | DI | · | · | · | · | · | · | · | · |
 | up smash into up air | 100 | · | · | · | R | R | DI | DI | DI | DI | DI | · | · | · | · | · | · |
 | up smash into up air | 143 | · | · | R | · | R | R | DI | DI | DI | DI | DI | DI | · | · | · | · |
-| up smash into down air | 60 | · | · | · | R | R | R | DI | · | · | · | · | · | · | · | · | · |
-| up smash into down air | 75 | · | · | · | R | R | DI | R | DI | · | · | · | · | · | · | · | · |
-| up smash into down air | 100 | · | · | · | R | R | R | DI | R | DI | · | · | · | · | · | · | · |
-| up smash into down air | 143 | · | · | · | · | R | R | R | R | R | DI | DI | · | · | · | · | · |
+| up smash into down air | 60 | · | · | · | R | DI | DI | DI | · | · | · | · | · | · | · | · | · |
+| up smash into down air | 75 | · | · | · | R | R | DI | DI | DI | · | · | · | · | · | · | · | · |
+| up smash into down air | 100 | · | · | · | R | R | DI | DI | DI | DI | · | · | · | · | · | · | · |
+| up smash into down air | 143 | · | · | · | · | R | R | R | DI | DI | DI | DI | · | · | · | · | · |
 | up smash into neutral special | 60 | · | · | · | R | R | R | R | R | R | · | · | · | · | · | · | · |
 | up smash into neutral special | 75 | · | · | · | · | R | R | R | R | R | R | · | · | · | · | · | · |
 | up smash into neutral special | 100 | · | · | · | · | R | R | R | R | R | R | R | R | · | · | · | · |
@@ -652,10 +652,10 @@ No setup lands a hit with up special, so it has no rows.
 | up smash into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up smash into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up smash into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| up smash into down special | 60 | R | R | R | R | DI | DI | DI | R | · | · | · | · | · | · | · | · |
-| up smash into down special | 75 | R | R | R | R | DI | DI | DI | DI | · | · | · | · | · | · | · | · |
-| up smash into down special | 100 | R | R | R | R | R | DI | DI | DI | DI | R | · | · | · | · | · | · |
-| up smash into down special | 143 | R | R | R | R | R | R | DI | DI | DI | DI | DI | R | · | · | · | · |
+| up smash into down special | 60 | R | R | R | R | DI | R | R | DI | · | · | · | · | · | · | · | · |
+| up smash into down special | 75 | R | R | R | R | DI | R | R | DI | · | · | · | · | · | · | · | · |
+| up smash into down special | 100 | R | R | R | R | R | DI | R | R | DI | DI | · | · | · | · | · | · |
+| up smash into down special | 143 | R | R | R | R | R | R | DI | DI | R | R | DI | DI | · | · | · | · |
 
 ## down smash (clean)
 
@@ -1101,10 +1101,10 @@ No setup lands a hit with up special, so it has no rows.
 | up throw into up air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R |
 | up throw into up air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | up throw into up air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down air | 60 | T | T | R | R | R | R | DI | DI | DI | DI | DI | R | R | R | · | · |
-| up throw into down air | 75 | T | T | R | R | R | R | R | DI | DI | DI | DI | DI | R | R | R | R |
-| up throw into down air | 100 | T | T | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R |
-| up throw into down air | 143 | T | T | T | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down air | 60 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | R | · | · |
+| up throw into down air | 75 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | R | R |
+| up throw into down air | 100 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R |
+| up throw into down air | 143 | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
 | up throw into neutral special | 60 | R | R | T | T | T | T | T | T | T | T | T | T | T | R | R | R |
 | up throw into neutral special | 75 | R | R | R | T | T | T | T | T | T | T | T | T | T | T | R | R |
 | up throw into neutral special | 100 | R | R | R | R | T | T | T | T | T | T | T | T | T | T | T | T |
@@ -1117,10 +1117,10 @@ No setup lands a hit with up special, so it has no rows.
 | up throw into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up throw into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up throw into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| up throw into down special | 60 | DI | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R | R | · | · |
-| up throw into down special | 75 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R | R | · |
-| up throw into down special | 100 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R |
-| up throw into down special | 143 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down special | 60 | T | T | T | T | T | T | R | R | DI | DI | DI | DI | DI | R | · | · |
+| up throw into down special | 75 | T | T | T | T | T | T | R | R | R | DI | DI | DI | DI | DI | R | · |
+| up throw into down special | 100 | T | T | T | T | T | T | T | R | R | R | DI | DI | DI | DI | DI | DI |
+| up throw into down special | 143 | T | T | T | T | T | T | T | T | T | R | R | R | DI | DI | DI | DI |
 
 ## down throw (clean)
 
@@ -1381,7 +1381,7 @@ No setup lands a hit with up special, so it has no rows.
 | forward air into up air | 100 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into up air | 143 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1396,10 +1396,10 @@ No setup lands a hit with up special, so it has no rows.
 | forward air into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down special | 60 | R | DI | DI | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down special | 75 | R | DI | DI | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down special | 100 | R | DI | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down special | 143 | R | R | DI | DI | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down special | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 
 ## back air (clean)
 
@@ -1473,10 +1473,10 @@ No setup lands a hit with up special, so it has no rows.
 | back air into up air | 75 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into up air | 100 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into up air | 143 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down air | 60 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down air | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down air | 100 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down air | 143 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down air | 60 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down air | 75 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down air | 100 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down air | 143 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into neutral special | 60 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into neutral special | 75 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into neutral special | 100 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1489,10 +1489,10 @@ No setup lands a hit with up special, so it has no rows.
 | back air into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back air into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down special | 60 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down special | 75 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down special | 100 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back air into down special | 143 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down special | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| back air into down special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 
 ## up air (clean)
 
@@ -1566,10 +1566,10 @@ No setup lands a hit with up special, so it has no rows.
 | up air into up air | 75 | R | R | R | R | R | R | R | R | R | R | DI | R | R | R | R | R |
 | up air into up air | 100 | R | R | R | R | R | R | R | R | R | R | R | R | DI | R | R | R |
 | up air into up air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| up air into down air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up air into down air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up air into down air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up air into down air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up air into down air | 60 | R | R | R | R | DI | DI | DI | R | DI | R | R | R | R | R | R | R |
+| up air into down air | 75 | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | R | R | R | R |
+| up air into down air | 100 | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R |
+| up air into down air | 143 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R |
 | up air into neutral special | 60 | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
 | up air into neutral special | 75 | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
 | up air into neutral special | 100 | R | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI |
@@ -1582,8 +1582,8 @@ No setup lands a hit with up special, so it has no rows.
 | up air into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up air into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | up air into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| up air into down special | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R |
-| up air into down special | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R |
+| up air into down special | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up air into down special | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | up air into down special | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | up air into down special | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 

@@ -7,12 +7,11 @@ import { WARDEN_GROUND } from "./groundNormals";
 import type { HitEffect } from "../hitRegions";
 import { strongHit } from "../strongHits";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, hurtPart, hurtPose } from "../hurtboxes";
-import { type Strike, drillStrikes, linkAt, multiHit } from "./multiHit";
-import { type Angle, capsuleOf, makeHit, path } from "./authoring";
+import { type Strike, linkAt, multiHit } from "./multiHit";
+import { ANGLES, type Angle, capsuleOf, makeHit, path } from "./authoring";
 import { wardenSpinBlade, wardenSpinSectors } from "./wardenSpin";
 
 
-const S = f32(HERO_REFERENCE_HEIGHT * f32(0.55));
 const M = f32(HERO_REFERENCE_HEIGHT * f32(0.80));
 const L = f32(HERO_REFERENCE_HEIGHT * f32(1.10));
 const GRAB = f32(HERO_REFERENCE_HEIGHT * f32(0.48));
@@ -87,11 +86,32 @@ const SKY_LIFT: readonly Strike[] = [
 
 
 
-const KNIFE_REACH = f32(S + 10.0);
+const BODY_RADIUS = f32(24.0 * f32(0.90));
+export const WARDEN_BODY: HurtPart = hurtPart(0.0, 4.0, 0.0, f32(f32(4.0 + 132.0) - f32(2.0 * BODY_RADIUS)), BODY_RADIUS);
+
+const DRILL_PIVOT_Z = f32(f32(WARDEN_BODY.z1 + WARDEN_BODY.z2) * 0.5);
+const DRILL_AXIS = { x: ANGLES[60].x, z: -ANGLES[60].z } as const;
+const DRILL_FOOT = f32(f32(f32(WARDEN_BODY.z2 - WARDEN_BODY.z1) * 0.5) + BODY_RADIUS);
+const DRILL_SPAN = 14.0;
+const DRILL_RADIUS = 24.0;
+
+function drillAlongAxis(air: { readonly centre: Readonly<HitEffect>; readonly front: Readonly<HitEffect>; readonly back: Readonly<HitEffect> }, ground: typeof air): readonly Strike[] {
+  const at = (from: number, to: number): StrikeCapsule => ({
+    x1: f32(DRILL_AXIS.x * from), z1: f32(DRILL_PIVOT_Z + f32(DRILL_AXIS.z * from)),
+    x2: f32(DRILL_AXIS.x * to), z2: f32(DRILL_PIVOT_Z + f32(DRILL_AXIS.z * to)),
+    radius: DRILL_RADIUS,
+  });
+  return [
+    [at(f32(DRILL_FOOT - DRILL_SPAN), f32(DRILL_FOOT + DRILL_SPAN)), air.centre, ground.centre],
+    [at(DRILL_FOOT, f32(DRILL_FOOT + f32(2.0 * DRILL_SPAN))), air.front, ground.front],
+    [at(f32(DRILL_FOOT - f32(2.0 * DRILL_SPAN)), DRILL_FOOT), air.back, ground.back],
+  ];
+}
+
 const knifeLinks = (damage: number, base: number) => ({ centre: linkAt(damage, base, 270), front: linkAt(damage, base, 250), back: linkAt(damage, base, 290) });
-const fallingKnives = (damage: number, base: number) => drillStrikes(30.0, -30.0, KNIFE_REACH, knifeLinks(damage, base), knifeLinks(damage, base));
+const fallingKnives = (damage: number, base: number) => drillAlongAxis(knifeLinks(damage, base), knifeLinks(damage, base));
 const KNIFE_SPIKE = wardenHit(2.289803981781006, "SPIKE", 270);
-const SPIKING_KNIVES = drillStrikes(30.0, -30.0, KNIFE_REACH, { centre: KNIFE_SPIKE, front: KNIFE_SPIKE, back: KNIFE_SPIKE }, knifeLinks(2.289803981781006, 40.0));
+const SPIKING_KNIVES = drillAlongAxis({ centre: KNIFE_SPIKE, front: KNIFE_SPIKE, back: KNIFE_SPIKE }, knifeLinks(2.289803981781006, 40.0));
 const FALLING_KNIVES: AuthoredMove = {
   ...heroMove(7, 7, 14, 10, multiHit([
     { first: 7, last: 7, strikes: fallingKnives(1.526535987854004, 25.0) },
@@ -156,8 +176,6 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
 
 
 
-const BODY_RADIUS = f32(24.0 * f32(0.90));
-export const WARDEN_BODY: HurtPart = hurtPart(0.0, 4.0, 0.0, f32(f32(4.0 + 132.0) - f32(2.0 * BODY_RADIUS)), BODY_RADIUS);
 const SHOULDER_Z = 70.0;
 const LIMB_RADIUS = 7.0;
 const LIMB_LEAD_FRAMES = 2;
