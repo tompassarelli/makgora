@@ -2,13 +2,13 @@
 import { Advantage, type TrainingState } from "../match/trainingState";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
 import { DownState, ItemKind, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/moveNames";
 import { fighterName } from "../sim/heroes/registry";
 import { classicResultHelp, classicResultMessage, tierName } from "../classic/classicText";
-import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
+import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, cpuProfileLabel } from "../match/cpuProfiles";
 import { TEAM_NAMES } from "../sim/teams";
 import { loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
 
@@ -22,7 +22,12 @@ export function fighterLabel(game: Readonly<MatchState>, slot: number): string {
 export function cpuOpponentSummary(game: Readonly<MatchState>, slot: number): string {
   const opponent = game.cpuResolvedOpponents[slot] ?? CPU_OPPONENT_DEFAULT;
   const tier = game.cpuTiers[slot] ?? CPU_TIER_DEFAULT;
-  return `CPU ${slot + 1} · ${opponent.charAt(0).toUpperCase()}${opponent.slice(1)} · ${tier.charAt(0).toUpperCase()}${tier.slice(1)}`;
+  return `CPU ${slot + 1} · ${fighterName(game.characterChoices[slot] ?? 0)} · ${cpuProfileLabel(opponent, tier)}`;
+}
+
+export function matchStartNotice(game: Readonly<MatchState>): string {
+  if (!holdingStart(game) || game.run.active) return "";
+  return PARTICIPANT_SLOTS.filter(slot => computerActive(game, slot) && fighterActive(game, slot)).map(slot => cpuOpponentSummary(game, slot)).join("\n");
 }
 
 export function resultMessage(game: Readonly<MatchState>): string {

@@ -9,7 +9,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { scheduleMatchItems } from "../match/centreItem";
 import { type MatchMeterDrops, copyMatchMeterDrops, createMatchMeterDrops, scheduleMeterDrops } from "../match/meterDrops";
 import { nextMatchSeed } from "../match/botRandom";
-import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
+import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, drawCpuFighter, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
 import { type Team } from "../sim/teams";
@@ -35,6 +35,7 @@ export interface MatchState {
   phase: Phase;
   readonly characterChoices: Slots<Character>;
   readonly cpuOpponents: Slots<CpuOpponentChoice>;
+  readonly cpuRandomFighters: Slots<boolean>;
   readonly cpuTiers: Slots<CpuTier>;
 
   readonly cpuResolvedOpponents: Slots<CpuOpponentId>;
@@ -101,6 +102,7 @@ export function createMatchState(): MatchState {
     camera: createMatchCamera(),
     phase: Phase.characterMenu, characterChoices: [defaultChoice(0), defaultChoice(1), defaultChoice(2), defaultChoice(0)], matchSeed: 0,
     cpuOpponents: [CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT],
+    cpuRandomFighters: [false, false, false, false],
     cpuTiers: [CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT],
     cpuResolvedOpponents: [CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT],
     characterReadiness: [false, false, false, false], rematchReadiness: [false, false, false, false],
@@ -141,6 +143,7 @@ export function initializeComputerChoices(game: MatchState, seed: number): void 
     const salted = floorMod(floorMod(seed, 46337) + (slot + 1) * 7919, 46337);
     const mixed = floorMod(salted * salted + 12345, 46337);
     game.characterChoices[slot] = defaultChoice(mixed ^ floorMod(mixed * 31, 46337));
+    game.cpuRandomFighters[slot] = true;
   }
 }
 
@@ -202,6 +205,7 @@ export function cycleSlotMode(game: MatchState, actor: number, slot: number): bo
   if (humanFighterActive(game, slot)) {
     game.humanFighterMask -= bit;
     game.computerMask += bit;
+    game.cpuRandomFighters[slot] = true;
     game.characterReadiness[slot] = true;
   } else if (computerActive(game, slot)) {
     game.computerMask -= bit;
@@ -264,6 +268,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
     target.characterChoices[slot] = source.characterChoices[slot];
     target.teamChoices[slot] = source.teamChoices[slot];
     target.cpuOpponents[slot] = source.cpuOpponents[slot];
+    target.cpuRandomFighters[slot] = source.cpuRandomFighters[slot];
     target.cpuTiers[slot] = source.cpuTiers[slot];
     target.cpuResolvedOpponents[slot] = source.cpuResolvedOpponents[slot];
     target.characterReadiness[slot] = source.characterReadiness[slot];
@@ -294,10 +299,35 @@ export function selectCharacter(game: MatchState, slot: number, choice: number):
   game.characterReadiness[slot] = true;
 }
 
+export const RANDOM_FIGHTER = -1;
+
+export const randomFighterOffered = (game: Readonly<MatchState>): boolean => !game.classic && !game.lore;
+
+export const cpuFighterRandom = (game: Readonly<MatchState>, slot: number): boolean => isParticipantSlot(slot) && computerActive(game, slot) && game.cpuRandomFighters[slot] && randomFighterOffered(game);
+
+export const shownFighter = (game: Readonly<MatchState>, slot: number): number | undefined => cpuFighterRandom(game, slot) ? RANDOM_FIGHTER : characterFor(game, slot);
+
 export function selectCpuCharacter(game: MatchState, actor: number, slot: number, choice: number): void {
-  if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !canChooseComputer(game, actor, slot) || !selectableMatchCharacter(game, choice)) return;
-  game.characterChoices[slot] = choice;
+  if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !canChooseComputer(game, actor, slot)) return;
+  if (choice === RANDOM_FIGHTER && randomFighterOffered(game)) game.cpuRandomFighters[slot] = true;
+  else if (selectableMatchCharacter(game, choice)) {
+    game.characterChoices[slot] = choice;
+    game.cpuRandomFighters[slot] = false;
+  } else return;
   game.characterReadiness[slot] = true;
+}
+
+export function nextCpuCharacter(game: Readonly<MatchState>, slot: number, direction: number): number {
+  if (!randomFighterOffered(game)) return nextMatchCharacter(game, characterFor(game, slot), direction);
+  const last = PLAYABLE_CHARACTERS.length - 1;
+  const index = cpuFighterRandom(game, slot) ? (direction > 0 ? -1 : last + 1) : PLAYABLE_CHARACTERS.indexOf(game.characterChoices[slot] ?? Character.rifleman);
+  const next = index + (direction > 0 ? 1 : -1);
+  return next < 0 || next > last ? RANDOM_FIGHTER : PLAYABLE_CHARACTERS[next] ?? Character.rifleman;
+}
+
+function drawCpuFighters(game: MatchState): void {
+  if (game.run.active) return;
+  for (const slot of PARTICIPANT_SLOTS) if (cpuFighterRandom(game, slot)) game.characterChoices[slot] = drawCpuFighter(PLAYABLE_CHARACTERS, game.matchSeed, slot);
 }
 
 export function practiceSelected(game: Readonly<MatchState>): boolean {
@@ -561,6 +591,7 @@ function beginMatch(game: MatchState): void {
   if (game.matchFrame > 0) game.matchSeed = nextMatchSeed(game.matchSeed);
   resolveStageChoice(game, game.matchSeed);
   for (const slot of PARTICIPANT_SLOTS) game.cpuResolvedOpponents[slot] = resolveCpuOpponent(game.cpuOpponents[slot], game.matchSeed, slot);
+  drawCpuFighters(game);
   game.startHold = game.practice || game.training ? 0 : START_HOLD_FRAMES;
   game.matchFrame = 0;
   game.phase = Phase.match;

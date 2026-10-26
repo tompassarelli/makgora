@@ -34,7 +34,7 @@ import { drawnScale, lavaPiece } from "../../game/presentation/stageScenery";
 import { hasLava, lavaSide } from "../../game/sim/lava";
 import type { Fighter } from "../../game/sim/fighter";
 import { journalIngress } from "../../game/session/build";
-import { type StartControl, matchHelp, resultNotice, waitingMessage } from "../../game/session/messages";
+import { type StartControl, matchHelp, matchStartNotice, resultNotice, waitingMessage } from "../../game/session/messages";
 import { isIntangible } from "../../game/sim/conditions";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
@@ -615,7 +615,8 @@ export function renderUi(s: ShellState): void {
     BlzFrameSetVisible(help, helpVisible);
   }
   const waiting = game.phase === Phase.match ? activeRollback(s)?.waitingFor ?? 0 : 0;
-  const noticeVisible = showMatch && (waiting !== 0 || (game.phase === Phase.result && !ui.match.resultsShown()));
+  const starting = matchStartNotice(game);
+  const noticeVisible = showMatch && (waiting !== 0 || starting !== "" || (game.phase === Phase.result && !ui.match.resultsShown()));
   if (shownMessages.noticeVisible !== noticeVisible) {
     shownMessages.noticeVisible = noticeVisible;
     BlzFrameSetVisible(notice, noticeVisible);
@@ -628,7 +629,7 @@ export function renderUi(s: ShellState): void {
       BlzFrameSetText(help, helpText);
     }
     probeWaiting(s.probe, waiting, localSlot());
-    const noticeText = game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : "";
+    const noticeText = game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : starting;
     if (shownMessages.notice !== noticeText) {
       shownMessages.notice = noticeText;
       BlzFrameSetText(notice, noticeText);

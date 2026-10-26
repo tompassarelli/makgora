@@ -1,4 +1,4 @@
-import { nextMatchCharacter, selectableMatchCharacter } from "../lobby/lobbyState";
+import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
 import { f32 } from "wisp/src/sim/f32";
@@ -53,7 +53,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
-import { TILE_NAMES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, nameText, portraitTexture, tileOfCharacter } from "./selectionFrames";
+import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, createCard, menuFocusList, presentCardChip, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createMatchRules } from "./selectionRules";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
@@ -139,7 +139,7 @@ export class SelectionPanel {
   private menuCursorAllowed = true;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
-  private readonly roster: Roster = { grid: rosterGrid(PLAYABLE_CHARACTERS.length), selectable: 0, chips: this.chips };
+  private readonly roster: Roster = { grid: rosterGrid(ROSTER_TILES), selectable: 0, chips: this.chips };
 
   private game: Readonly<MatchState> | undefined;
   private settingsOpen = false;
@@ -200,9 +200,8 @@ export class SelectionPanel {
       const tileFrame = art(root, `MeleeTile${name}`, MENU_STYLE.borderTexture, x, y, f32(grid.cellWidth), f32(grid.cellHeight));
       const portrait = tilePortrait(scale);
       const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
-      const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(PLAYABLE_CHARACTERS[choice], true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
-      const fighter = PLAYABLE_CHARACTERS[choice] ?? Character.rifleman;
-      const text = TILE_NAMES[fighter] ?? nameText(fighter);
+      const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(characterOfTile(choice), true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
+      const text = tileLabel(choice);
       const tileName = label(root, `MeleeTileName${name}`, x + f32(0.002) * scale, y - f32(0.106) * scale, f32(0.108) * scale, f32(0.023) * scale, NATIVE_TEXT_BASE);
       setFrameText(tileName, text);
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
@@ -321,7 +320,7 @@ export class SelectionPanel {
     if (this.cpuSlot !== undefined && button.kind !== "cpuStep" && button.kind !== "cpuClose") return;
     if (button.kind === "tile") {
       const game = this.choosing();
-      if (game === undefined || !selectableMatchCharacter(game, characterOfTile(button.tile))) return;
+      if (game === undefined || !tileOffered(game, button.tile)) return;
       if (this.ownsLocalClient()) this.sendPlacement({ slot: this.drag.held ?? this.participantId, tile: button.tile });
     }
     else if (button.kind === "team") this.actions.changeTeam(this.participantId, button.slot, 1);
@@ -458,15 +457,15 @@ export class SelectionPanel {
 
   private chooseFocus(game: Readonly<MatchState>, target: MenuFocus, action: Action): boolean {
     if (action === Action.moveLeft || action === Action.moveRight) {
-      const choice = nextMatchCharacter(game, characterFor(game, target.slot), action === Action.moveLeft ? -1 : 1);
-      if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, choice);
-      else this.actions.selectCpuChoice(this.participantId, target.slot, choice);
+      const direction = action === Action.moveLeft ? -1 : 1;
+      if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, nextMatchCharacter(game, characterFor(game, target.slot), direction));
+      else this.actions.selectCpuChoice(this.participantId, target.slot, nextCpuCharacter(game, target.slot, direction));
       return true;
     }
     if (action === Action.attack && this.menuFocus !== undefined) {
       const choice = characterFor(game, target.slot) ?? Character.rifleman;
       if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, choice);
-      else this.actions.selectCpuChoice(this.participantId, target.slot, choice);
+      else this.actions.selectCpuChoice(this.participantId, target.slot, shownFighter(game, target.slot) ?? choice);
       return true;
     }
     return false;
@@ -484,7 +483,7 @@ export class SelectionPanel {
 
   private acceptCpuDrop(data: string): void {
     const game = this.choosing();
-    const placement = decodeCpuPlacement(data, PLAYABLE_CHARACTERS.length);
+    const placement = decodeCpuPlacement(data, ROSTER_TILES);
     if (game !== undefined && placement !== undefined && canChooseComputer(game, this.participantId, placement.slot)) this.actions.selectCpuChoice(this.participantId, placement.slot, characterOfTile(placement.tile));
   }
 
@@ -623,7 +622,7 @@ export class SelectionPanel {
 
   private showTiles(game: Readonly<MatchState>): void {
     for (let tile = 0; tile < this.tiles.length; tile++) {
-      const selectable = selectableMatchCharacter(game, characterOfTile(tile));
+      const selectable = tileOffered(game, tile);
       for (const frame of this.tiles[tile] ?? []) BlzFrameSetVisible(frame, selectable);
       const button = this.tileButtons[tile];
       if (button !== undefined) BlzFrameSetVisible(button, selectable);
@@ -636,7 +635,7 @@ export class SelectionPanel {
     for (const slot of PARTICIPANT_SLOTS) {
       const chip = this.chips[slot];
       if (chip !== undefined) {
-        chip.choice = tileOfCharacter(characterFor(game, slot) ?? Character.rifleman);
+        chip.choice = tileOfCharacter(shownFighter(game, slot) ?? Character.rifleman);
         chip.placed = characterReady(game, slot);
       }
       if ((slot === participantId && humanFighterActive(game, slot)) || canChooseComputer(game, participantId, slot)) selectable |= 1 << slot;
@@ -655,7 +654,7 @@ export class SelectionPanel {
       const active = fighterActive(game, slot);
       const ready = characterReady(game, slot);
       const human = humanFighterActive(game, slot);
-      const choice = characterFor(game, slot);
+      const choice = shownFighter(game, slot);
       const teamsShown = game.teamBattle && active;
       const palette = teamsShown ? game.teamChoices[slot] : slot;
       presentCardTeam(frames, game, slot, participantId, menuFocus, active, human, teamsShown, palette);

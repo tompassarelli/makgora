@@ -9,6 +9,7 @@ import { fighterName } from "../sim/heroes/registry";
 import { MatchCue } from "./matchAudio";
 import { ROSTER_MANA } from "../sim/mana";
 import { TEAM_NAMES } from "../sim/teams";
+import { cpuProfileLabel } from "../match/cpuProfiles";
 import type { Character } from "../sim/codes";
 import { type CombatObservation, type CombatTally, clearCombatTally, createCombatObservation, createCombatTally, observeCombat, tallyCombat } from "./combatStats";
 
@@ -133,8 +134,10 @@ export function resultRows(game: Readonly<MatchState>, world: Readonly<Roster>, 
     const fighter = fighterAt(world, slot);
     const winner = (winningMask(game) & (1 << slot)) !== 0;
     const stocks = game.endless ? "" : `Stocks ${fighter.status.stocks}  ·  `;
-    const label = humanFighterActive(game, slot) ? `P${slot + 1}` : `P${slot + 1} CPU`;
-    const text = `${winner ? "WINNER · " : ""}${label}${game.teamBattle ? ` · ${TEAM_NAMES[game.teamChoices[slot]]}` : ""} · ${fighterName(fighter.character)}\n`
+    const human = humanFighterActive(game, slot);
+    const label = human ? `P${slot + 1}` : `P${slot + 1} CPU`;
+    const profile = human || game.run.active ? "" : ` · ${cpuProfileLabel(game.cpuResolvedOpponents[slot], game.cpuTiers[slot])}`;
+    const text = `${winner ? "WINNER · " : ""}${label}${game.teamBattle ? ` · ${TEAM_NAMES[game.teamChoices[slot]]}` : ""} · ${fighterName(fighter.character)}${profile}\n`
       + `${stocks}Damage ${percent(fighter.status.damage)}\nKOs ${tally.kos[slot]}  ·  Falls ${tally.falls[slot]}`;
     const row = { slot, winner, text };
     if (winner) rows.unshift(row);

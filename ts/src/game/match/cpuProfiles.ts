@@ -31,12 +31,23 @@ export function stepCpuTier(tier: CpuTier, direction: -1 | 1): CpuTier {
   return at(CPU_TIERS, Math.max(0, Math.min(CPU_TIERS.length - 1, CPU_TIERS.indexOf(tier) + direction)));
 }
 
-/** One pure match-start draw per slot; products fit Warcraft's 32-bit integers. */
-export function resolveCpuOpponent(choice: CpuOpponentChoice, seed: number, slot: number): CpuOpponentId {
-  if (choice !== "random") return choice;
-  const salted = floorMod(floorMod(seed, 46337) + (slot + 1) * 7919, 46337);
+/** One pure match-start draw per slot and salt; products fit Warcraft's 32-bit integers. */
+function matchDraw(seed: number, slot: number, salt: number, count: number): number {
+  const salted = floorMod(floorMod(seed, 46337) + (slot + 1) * 7919 + salt, 46337);
   const mixed = floorMod(salted * salted + 12345, 46337);
-  return at(CPU_OPPONENT_IDS, floorMod(mixed ^ floorMod(mixed * 31, 46337), CPU_OPPONENT_IDS.length));
+  return floorMod(mixed ^ floorMod(mixed * 31, 46337), count);
+}
+
+export function resolveCpuOpponent(choice: CpuOpponentChoice, seed: number, slot: number): CpuOpponentId {
+  return choice === "random" ? at(CPU_OPPONENT_IDS, matchDraw(seed, slot, 0, CPU_OPPONENT_IDS.length)) : choice;
+}
+
+const titled = (name: string): string => `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+
+export const cpuProfileLabel = (opponent: CpuOpponentId, tier: CpuTier): string => `${titled(opponent)} · ${titled(tier)}`;
+
+export function drawCpuFighter<T>(roster: readonly T[], seed: number, slot: number): T {
+  return at(roster, matchDraw(seed, slot, 21143, roster.length));
 }
 
 /** Explicit rows preserve each identity's individual primary and secondary growth. */

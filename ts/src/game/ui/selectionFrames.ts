@@ -6,11 +6,13 @@ import { PLAYABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { fighterPortrait } from "../roster/looks";
 import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
+import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
-export const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number) => fighterPortrait(choice ?? Character.rifleman, tile ? "Tile" : "Card", slot);
-export const nameText = (choice: number | undefined) => fighterName(choice ?? Character.rifleman);
+export const RANDOM_FIGHTER_TEXTURE = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
+export const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number) => choice === RANDOM_FIGHTER ? RANDOM_FIGHTER_TEXTURE : fighterPortrait(choice ?? Character.rifleman, tile ? "Tile" : "Card", slot);
+export const nameText = (choice: number | undefined) => choice === RANDOM_FIGHTER ? "Random" : fighterName(choice ?? Character.rifleman);
 export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.mountainKing]: "Muradin",
   [Character.forsakenPaladin]: "Paladin",
@@ -90,14 +92,24 @@ export function hotspot(parent: framehandle, x: number, y: number, width: number
 
 export const modeBox = (slot: number) => ({ x: cardRight(slot, f32(0.014)), y: cardDown(f32(0.005)), width: cardSize(f32(0.132)), height: cardSize(f32(0.027)) });
 
-export const characterOfTile = (tile: RosterTile): number => PLAYABLE_CHARACTERS[tile] ?? Character.rifleman;
+export const RANDOM_FIGHTER_TILE: RosterTile = PLAYABLE_CHARACTERS.length;
+export const ROSTER_TILES = PLAYABLE_CHARACTERS.length + 1;
+export const characterOfTile = (tile: RosterTile): number => tile === RANDOM_FIGHTER_TILE ? RANDOM_FIGHTER : PLAYABLE_CHARACTERS[tile] ?? Character.rifleman;
 export function tileOfCharacter(character: number): RosterTile {
+  if (character === RANDOM_FIGHTER) return RANDOM_FIGHTER_TILE;
   for (let tile = 0; tile < PLAYABLE_CHARACTERS.length; tile++) if (PLAYABLE_CHARACTERS[tile] === character) return tile;
   return 0;
 }
 
 export const decodeTile = (data: string): RosterTile | undefined => {
   const tile = S2I(data);
-  return I2S(tile) === data && tile >= 0 && tile < PLAYABLE_CHARACTERS.length ? tile : undefined;
+  return I2S(tile) === data && tile >= 0 && tile < ROSTER_TILES ? tile : undefined;
 };
 export const decodeSlot = (data: string): number | undefined => (data === "0" ? 0 : data === "1" ? 1 : data === "2" ? 2 : data === "3" ? 3 : undefined);
+
+export const tileOffered = (game: Readonly<MatchState>, tile: RosterTile): boolean => tile === RANDOM_FIGHTER_TILE ? randomFighterOffered(game) : selectableMatchCharacter(game, characterOfTile(tile));
+
+export function tileLabel(tile: RosterTile): string {
+  const fighter = PLAYABLE_CHARACTERS[tile];
+  return fighter === undefined ? nameText(RANDOM_FIGHTER) : TILE_NAMES[fighter] ?? nameText(fighter);
+}

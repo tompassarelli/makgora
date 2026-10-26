@@ -278,23 +278,37 @@ Space/E up/down, N Choose, U Back; Enter remains Warcraft chat.
    focus is local. Shared changes refresh an open preview; permission loss
    changes it to read-only.
 
-New CPU slots default to **Random + Intermediate**, so each match brings a
-different opponent. Retain choices across New Match, fighter/stage changes and automatic
-rematches in the map session; no new cross-session storage is needed. Training
-**Fight** uses these choices; Stand/Shield/etc. keep their explicit behavior.
+New CPU slots default to a **Random** fighter and **Random + Intermediate**
+opponent, so each match brings a different fighter and opponent. Retain choices
+across New Match, fighter/stage changes and automatic rematches in the map
+session; no new cross-session storage is needed. Training **Fight** uses these
+choices; Stand/Shield/etc. keep their explicit behavior.
 
-**Random** changes only opponent, with preview **A different opponent each
-match.** and no fixed identity/strength/weakness preview. Draw uniformly from
-six IDs once at match start with the shared match seed. Retain the resolved
-identity through replay/rollback and reveal it in countdown/results, for
-example `CPU 2 · Kite · Intermediate`. Rematches draw again; repeats are
-allowed. The selector continues to show Random until changed.
+**Random** opponent changes only opponent, with preview **A different opponent
+each match.** and no fixed identity/strength/weakness preview. Draw uniformly
+from six IDs once at match start with the shared match seed.
+
+The roster grid ends with a **Random** tile that only CPU chips accept. A new
+CPU slot's chip sits on it and its card shows the Random portrait until a
+match resolves it; dropping the chip on a fighter (or stepping left/right past
+the roster's ends with the card focused) fixes the fighter, and returning it to
+Random restores the draw. At match start each Random CPU fighter is drawn
+uniformly from the playable roster with the shared match seed and a salt
+separate from the opponent's, never client-local randomness. Classic and Lore
+runs choose their own fighters and hide the tile.
+
+Retain the resolved fighter and identity through replay/rollback and reveal
+them in the countdown and results, for example
+`CPU 2 · Thrall · Kite · Intermediate`. New Match and automatic rematches draw
+both again from the next match seed; repeats are allowed. The selector and card
+continue to show Random until changed.
 
 ## State, implementation and calibration
 
 Use stable opponent IDs `rook`, `ember`, `flint`, `vale`, `kite`, `wren` and tier
 IDs `rookie`, `beginner`, `intermediate`, `advanced`, `expert`, distinct from
-copy. Selection records chosen opponent (or Random) and tier; match state also
+copy. Selection records chosen opponent (or Random), tier and whether the fighter
+is Random; match state also
 records resolved opponent and bounded observation/commitment history per CPU.
 Snapshots, canonical comparisons, first-difference and full-match replays carry
 these fields. All decisions use existing seeded integer draws, with no clock,

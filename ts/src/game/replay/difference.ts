@@ -466,6 +466,7 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
     if (e.rematchReadiness[slot] !== a.rematchReadiness[slot]) return `match.slot${slot}.rematch`;
     if (e.rematchReadiness[slot] && e.resultPicks[slot] !== a.resultPicks[slot]) return `match.slot${slot}.resultPick`;
     if (e.cpuOpponents[slot] !== a.cpuOpponents[slot]) return `match.slot${slot}.cpuOpponent`;
+    if (e.cpuRandomFighters[slot] !== a.cpuRandomFighters[slot]) return `match.slot${slot}.cpuRandomFighter`;
     if (e.cpuTiers[slot] !== a.cpuTiers[slot]) return `match.slot${slot}.cpuTier`;
     if (e.cpuResolvedOpponents[slot] !== a.cpuResolvedOpponents[slot]) return `match.slot${slot}.cpuResolvedOpponent`;
   }

@@ -821,6 +821,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
     bool(`${prefix}.ready`, match.characterReadiness[slot]);
     bool(`${prefix}.rematch`, match.rematchReadiness[slot]);
     int(`${prefix}.cpuOpponent`, CPU_OPPONENT_CHOICES.indexOf(match.cpuOpponents[slot]));
+    bool(`${prefix}.cpuRandomFighter`, match.cpuRandomFighters[slot]);
     int(`${prefix}.cpuTier`, CPU_TIERS.indexOf(match.cpuTiers[slot]));
     int(`${prefix}.cpuResolvedOpponent`, CPU_OPPONENT_IDS.indexOf(match.cpuResolvedOpponents[slot]));
   }
