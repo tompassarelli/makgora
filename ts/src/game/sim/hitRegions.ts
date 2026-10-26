@@ -270,10 +270,15 @@ function activeRegion(character: Character, style: AttackStyle, frame: number, i
 
 
 
+function grabHitRegion(frame: number, index: number, moves?: FighterMoves): Readonly<HitRegion> {
+  const startup = attackStartupFrames(AttackStyle.grab, moves);
+  if (index !== 0 || frame < startup || frame >= startup + 3) return NO_HIT_REGION;
+  return moves?.grabRegion ?? SHARED_GRAB_REGION;
+}
+
 export function authoredHitRegion(out: HitRegion, character: Character, style: AttackStyle | undefined, frame: number, chargeFrames: number, index: number, moves?: FighterMoves): HitRegion {
   if (style === AttackStyle.grab) {
-    const startup = attackStartupFrames(style, moves);
-    copyHitRegion(out, index === 0 && frame >= startup && frame < startup + 3 ? SHARED_GRAB_REGION : NO_HIT_REGION);
+    copyHitRegion(out, grabHitRegion(frame, index, moves));
     return out;
   }
   const authored = style === undefined ? undefined : moves?.normals[style];

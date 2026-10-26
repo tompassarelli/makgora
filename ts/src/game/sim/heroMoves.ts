@@ -86,6 +86,7 @@ export interface FighterMoves {
 
   readonly throws: { readonly [action: number]: AuthoredThrow | undefined };
   readonly dashAttack: AttackStyle;
+  readonly grabRegion?: Readonly<HitRegion> | undefined;
 
 
   readonly hurtboxes?: FighterHurtboxes | undefined;

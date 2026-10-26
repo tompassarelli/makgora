@@ -17,7 +17,9 @@ import {
 import { SUMMON_BEAR } from "../presentation/summonClipInfo";
 import { type SummonState, projectBear } from "../presentation/summonState";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, HeroStatusKind, SpecialAction } from "../sim/codes";
+import { AttackStyle, Character, HeroStatusKind, SpecialAction } from "../sim/codes";
+import { attackActive, attackStartup } from "../sim/conditions";
+import { min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
@@ -316,7 +318,7 @@ export class SpecialEffects {
     effects.laserShown = true;
   }
 
-  /** While Siphon Mana holds its victim, a drain beam joins Kael's hand to the victim's chest. */
+  /** While Siphon Mana reaches out or holds its victim, a drain beam joins Kael's hand to the victim's chest. */
   private presentSiphon(effects: SpecialSlot, fighter: Readonly<Fighter>): void {
     if (fighter.character === Character.sylvanas) {
       const move = runningHeroSpecial(fighter);
@@ -343,15 +345,19 @@ export class SpecialEffects {
     }
     const target = fighter.grab.target;
     const victim = target === undefined ? undefined : this.slots[target];
-    if (fighter.character !== Character.kaelthas || fighter.status.out || fighter.special.action !== SpecialAction.heroSide
-      || fighter.special.grabFrame <= 0 || victim === undefined) {
+    const tether = fighter.attack.style === AttackStyle.grab ? fighter.tuning.moves?.grabRegion?.strike : undefined;
+    const reaching = tether !== undefined && fighter.attack.frame < attackStartup(fighter, AttackStyle.grab) + attackActive(fighter, AttackStyle.grab);
+    if (fighter.character !== Character.kaelthas || fighter.status.out || (victim === undefined && !reaching)) {
       this.hideSiphon(effects);
       return;
     }
     const scale = characterModelScale(fighter.character);
     const { x, z } = this.origin;
+    const reach = tether === undefined ? 0.0 : min(1.0, f32(f32(fighter.attack.frame + 1) / f32(attackStartup(fighter, AttackStyle.grab) + 1)));
+    const endX = victim !== undefined ? victim.lastX : fighter.motion.x + fighter.facing * f32((tether?.x2 ?? 0.0) * reach);
+    const endZ = victim !== undefined ? victim.lastZ + 55.0 : fighter.motion.z + (tether?.z2 ?? 0.0);
     MoveLightningEx(effects.siphon, false, x + fighter.motion.x + fighter.facing * 40.0 * scale, this.front, z + fighter.motion.z + 65.0 * scale,
-      x + victim.lastX, this.front, z + victim.lastZ + 55.0);
+      x + endX, this.front, z + endZ);
     SetLightningColor(effects.siphon, 1.0, 1.0, 1.0, 1.0);
     effects.siphonShown = true;
   }

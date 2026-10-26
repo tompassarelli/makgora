@@ -18,8 +18,11 @@ const reach = (first: number, last: number, x: number, z: number) => [heroHurtPo
 const tilt = (height: number, angle: 25 | 35 | 55) => heroMove(9, 3, 20, 0, [heroRegion(9, 11, capsule(28.0, 58.0, 106.0, height), ordinary(8.67743968963623, angle))]);
 const throwMove = (contactFrame: number, recovery: number, effect: ReturnType<typeof ordinary>) => ({ contactFrame, totalFrames: contactFrame + recovery, effect });
 
+const SIPHON_MANA = heroRegion(14, 16, capsule(24.0, 54.0, 150.0, 54.0, 10.0), kaelHit(0.0, 35, 0.0, 0.0));
+
 export const KAELTHAS_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
+  grabRegion: SIPHON_MANA.hit,
   hurtboxes: {
     stand: [torso], crouch: [hurtPart(0.0, 4.0, 0.0, f32(body.z2 * f32(0.6)), body.radius)],
     attacks: {
@@ -31,7 +34,7 @@ export const KAELTHAS_MOVES: FighterMoves = {
       [AttackStyle.downSmash]: reach(17, 26, 42.0, 20.0), [AttackStyle.neutralAir]: reach(6, 16, 34.0, 64.0),
       [AttackStyle.forwardAir]: reach(6, 12, 42.0, 62.0), [AttackStyle.backAir]: [heroHurtPose(10, 23, [torso, hurtPart(8, 94, -52, 62, 16)])],
       [AttackStyle.upAir]: reach(8, 15, 12.0, 120.0), [AttackStyle.downAir]: reach(12, 20, 12.0, -20.0),
-      [AttackStyle.grab]: reach(6, 11, 48.0, 54.0),
+      [AttackStyle.grab]: reach(10, 22, 60.0, 54.0),
     },
   },
   normals: {
@@ -52,7 +55,7 @@ export const KAELTHAS_MOVES: FighterMoves = {
     [AttackStyle.backAir]: heroMove(12, 3, 24, 16, [heroRegion(12, 14, capsule(-24.0, 70.0, -90.0, 95.0), ordinary(11.931480407714844, 35, 104.5669937133789, 28.0, true))]),
     [AttackStyle.upAir]: heroMove(10, 4, 21, 14, [heroRegion(10, 13, capsule(-24.0, 136.0, 24.0, 136.0, 19.0), ordinary(9.76211929321289, 90, 90.30785369873047, 24.0))]),
     [AttackStyle.downAir]: heroMove(15, 3, 29, 20, [heroRegion(15, 17, capsule(6.0, 16.0, 10.0, -20.0, 16.0), { ...ordinary(13.016160011291504, 90, 90.30785369873047, 24.0), launchZ: -1.0 }, ordinary(13.016160011291504, 70, 90.30785369873047, 24.0))]),
-    [AttackStyle.grab]: heroMove(8, 2, 26, 0, [heroRegion(8, 9, capsule(20.0, 54.0, 58.0, 54.0), kaelHit(0.0, 35, 0.0, 0.0))]),
+    [AttackStyle.grab]: heroMove(14, 3, 42, 0, [SIPHON_MANA]),
     [AttackStyle.getupAttack]: heroMove(17, 3, 30, 0, [heroRegion(17, 19, capsule(-65.0, 20.0, 65.0, 20.0, 18.0), ordinary(7.59276008605957, 35))]),
     [AttackStyle.ledgeAttack]: heroMove(17, 3, 21, 0, [heroRegion(17, 19, capsule(20.0, 50.0, 90.0, 50.0), ordinary(7.59276008605957, 35))]),
   },

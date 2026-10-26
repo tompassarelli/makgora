@@ -48,7 +48,7 @@ export const KAELTHAS_CLIPS = { idle: KAELTHAS_FALLBACK, walk: { index: 2, secon
   damageAir: { index: 52, seconds: f32(0.4), aligned: true },
   damageTumble: { index: 53, seconds: 0.5, aligned: true },
   damageShield: { index: 54, seconds: f32(0.4), aligned: true },
-  grab: { index: 55, seconds: f32(0.583), aligned: true, contact: f32(0.11666666666666667) },
+  grab: { index: 55, seconds: f32(0.9666666666666667), aligned: true, contact: f32(0.21666666666666667) },
   grabHold: { index: 56, seconds: 0.5, aligned: true, contact: f32(0.016666666666666666) },
   grabbed: { index: 57, seconds: 0.5, aligned: true, contact: f32(0.016666666666666666) },
   pummel: { index: 58, seconds: f32(0.4), aligned: true, contact: f32(0.13333333333333333) },

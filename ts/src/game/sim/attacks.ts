@@ -100,7 +100,7 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
   if (attack.style === AttackStyle.grab) {
     const startup = attackStartup(attacker, attack.style);
     const active = attackActive(attacker, attack.style);
-    const region = attack.pivotGrab ? PIVOT_GRAB_REGION : attack.dashGrab ? DASH_GRAB_REGION : SHARED_GRAB_REGION;
+    const region = attacker.tuning.moves?.grabRegion ?? (attack.pivotGrab ? PIVOT_GRAB_REGION : attack.dashGrab ? DASH_GRAB_REGION : SHARED_GRAB_REGION);
     const hits = target.hits;
     if (attack.frame < startup || attack.frame >= startup + active || (hits.lastAttacker === attackerSlot && hits.lastAttackSerial === attack.serial && hits.lastWindow >= region.window)) return false;
     const localX = facingOffsetX(attacker, target);
