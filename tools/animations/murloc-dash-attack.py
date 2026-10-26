@@ -4,10 +4,11 @@ The rig comes from `murloc-clips.ts SHIPPED OUT dashAttack --rig RIG.json`: ever
 identity rest orientation, so a bone's local rotation and location are the model's own keys. Each joint is
 pitched about the side-view axis in armature space, so the rig's yawed leg frames cannot turn a bend into a
 roll; the waist twists about the vertical, and the spear is aimed by the blade axis the rig measures from
-its mesh. His round body hides pitch, so the move reads through stance, twist and spear: he rocks back over
-a bent back leg wound away with the spear cocked, drives forward square on the first active frame, twists
-into a lower, longer lunge with the tip dropping through the last, steps through as the tip dips, then
-rises into ready along an even arc-length glide. Clip frame N is attack frame N; `murloc-clips.ts --keys`
+its mesh. His round body hides pitch, so the move reads through squash and stretch of the body mesh bones,
+stance, twist and spear: he squashes back over a bent back leg wound away with the spear cocked, stretches
+long and flat as he drives forward on the first active frame and through a level extension, gathers into a
+low crouch with the tip dropping on the last, steps through as the tip dips, then rises into ready along an
+even arc-length glide. Clip frame N is attack frame N; `murloc-clips.ts --keys`
 splices the baked frames and sets each one on his feet.
 
   blender --background --factory-startup --python tools/animations/murloc-dash-attack.py -- RIG.json KEYS.json
@@ -53,6 +54,7 @@ JOINTS = {
 ORDER = ['lean', 'twist', 'waist', 'chest', 'head', 'arm', 'elbow', 'leftArm', 'leftElbow',
          'front', 'kneeFront', 'footFront', 'back', 'kneeBack', 'footBack']
 HAND = 'Bone_Hand_R'
+BODY = ('Spine', 'chest', 'Head')
 
 
 def rest():
@@ -62,6 +64,7 @@ def rest():
         x, y, z, w = n['rotation'] or (0, 0, 0, 1)
         b.rotation_quaternion = Quaternion((w, x, y, z))
         b.location = Vector(n['translation'] or (0, 0, 0))
+        b.scale = Vector((1, 1, 1))
     bpy.context.view_layer.update()
 
 
@@ -87,19 +90,28 @@ def pose(p):
         elevation = radians(p['aim'])
         whole = blade.rotation_difference(Vector((cos(elevation), 0, sin(elevation))))
         turn(hand, Quaternion().slerp(whole, p.get('grip', 1)))
+    for name in BODY:
+        b = bones[name]
+        axes = b.matrix.to_3x3().normalized().transposed()
+        forward = max(range(3), key=lambda i: abs(axes[i].x))
+        up = max((i for i in range(3) if i != forward), key=lambda i: abs(axes[i].z))
+        scale = [1.0, 1.0, 1.0]
+        scale[forward], scale[up] = 1 + p.get('stretch', 0), 1 + p.get('squash', 0)
+        b.scale = Vector(scale)
+    bpy.context.view_layer.update()
 
 
 READY = {}
-load = dict(twist=-30, lean=-20, chest=-10, head=12, arm=90, elbow=-40, leftArm=-50, aim=115, grip=1,
+load = dict(twist=-30, lean=-20, chest=-10, head=12, arm=90, elbow=-40, leftArm=-50, aim=115, grip=1, stretch=-0.2, squash=-0.28,
             front=-30, kneeFront=0, back=25, kneeBack=55, footBack=-20, travel=-34, drop=-6)
-strike = dict(twist=0, lean=15, chest=8, head=-12, arm=-90, elbow=-5, leftArm=60, aim=-12, grip=1,
+strike = dict(twist=0, lean=15, chest=8, head=-12, arm=-90, elbow=-5, leftArm=60, aim=-12, grip=1, stretch=0.5, squash=-0.25,
               front=-45, kneeFront=45, footFront=-20, back=30, kneeBack=5, travel=34, drop=-2)
-lunge = dict(twist=30, lean=22, chest=10, head=-16, arm=-95, elbow=0, leftArm=70, aim=-22, grip=1,
-             front=-72, kneeFront=60, footFront=-30, back=33, kneeBack=0, travel=36, drop=-6)
-drive = dict(twist=55, lean=30, chest=14, head=-22, arm=-100, elbow=0, leftArm=80, aim=-40, grip=1,
-             front=-85, kneeFront=80, footFront=-35, back=32, kneeBack=0, travel=44, drop=-10)
-carry = dict(twist=25, lean=15, chest=8, head=-12, arm=-55, elbow=-30, leftArm=45, aim=-75, grip=1,
-             front=-35, kneeFront=40, footFront=-10, back=-40, kneeBack=50, travel=22, drop=-6)
+lunge = dict(twist=25, lean=12, chest=6, head=-10, arm=-115, elbow=0, leftArm=80, aim=-4, grip=1, stretch=0.6, squash=-0.3,
+             front=-60, kneeFront=35, footFront=-25, back=55, kneeBack=0, travel=40, drop=0)
+drive = dict(twist=55, lean=35, chest=16, head=-24, arm=-95, elbow=0, leftArm=70, aim=-48, grip=1, stretch=0.1, squash=0.05,
+             front=-95, kneeFront=105, footFront=-40, back=35, kneeBack=0, travel=44, drop=-16)
+carry = dict(twist=-15, lean=5, chest=4, head=-4, arm=-40, elbow=-40, leftArm=30, aim=-88, grip=1, stretch=-0.12, squash=0.15,
+             front=-10, kneeFront=25, footFront=-5, back=-45, kneeBack=40, travel=26, drop=-2)
 
 
 def blend(a, b, t):
@@ -152,7 +164,7 @@ def along(s):
 
 def at(frame):
     if frame > last:
-        return recovery(along(glide((frame - last) / (frames - last))))
+        return recovery(along(glide((frame - last) / (frames - last), 0.2)))
     for (a, pa), (b, pb) in zip(beats, beats[1:]):
         if a <= frame <= b:
             t = (frame - a) / (b - a)
@@ -160,7 +172,7 @@ def at(frame):
     return READY
 
 
-out = {'frames': frames, 'nodes': [{'rotation': [], 'translation': []} for _ in created]}
+out = {'frames': frames, 'nodes': [{'rotation': [], 'translation': [], 'scaling': []} for _ in created]}
 previous = {}
 for frame in range(frames + 1):
     pose(at(frame))
@@ -171,5 +183,6 @@ for frame in range(frames + 1):
         previous[name] = q
         entry['rotation'].append([q.x, q.y, q.z, q.w])
         entry['translation'].append(list(bones[name].location))
+        entry['scaling'].append(list(bones[name].scale))
 open(keys_path, 'w').write(json.dumps(out))
 print('MURLOC_DASH_ATTACK_KEYS', keys_path, frames + 1, 'frames', flush=True)

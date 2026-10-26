@@ -105,8 +105,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   His dash attack is authored in Blender (#345): `... SHIPPED_MURLOC.mdx PRIVATE_OUTPUT dashAttack --rig RIG.json`
   writes his skeleton and stand pose, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/murloc-dash-attack.py -- RIG.json KEYS.json`
-  pitches each joint about the side-view axis, aims the spear by its blade and bakes one key per attack frame,
-  and `... dashAttack --keys KEYS.json` splices them and sets every frame on his feet.
+  pitches each joint about the side-view axis, squashes and stretches his body, aims the spear by its blade and bakes one key per attack frame,
+  and `... dashAttack --keys KEYS.json` splices them, adds rotation or scaling tracks to nodes that lack one, and sets every frame on his feet.
   Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
   recovery, throw and nine pain gestures and refresh only his clip/stride rows.
   `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then

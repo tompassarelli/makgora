@@ -194,7 +194,7 @@ if (rigOutput) {
     nodes: skeleton.map(({ node, path }) => ({ name: node.Name, parent: skeleton.findIndex(s => s.node.ObjectId === node.Parent), pivot: Array.from(source.PivotPoints[node.ObjectId]!), rotation: at(`${path}.Rotation`), translation: at(`${path}.Translation`) })) }));
   console.log(`MURLOC_RIG ${action.pose} ${rigOutput}`); process.exit(0);
 }
-const baked = bakedKeys ? await Bun.file(bakedKeys).json() as { frames: number; nodes: { rotation: number[][]; translation: number[][] }[] } : undefined;
+const baked = bakedKeys ? await Bun.file(bakedKeys).json() as { frames: number; nodes: { rotation: number[][]; translation: number[][]; scaling?: number[][] }[] } : undefined;
 if (baked) {
   const action = actions.find(a => a.pose === replaced[0]); ensure(action, `${replaced[0]}: not an authored ${fighterName} pose`);
   ensure(baked.frames === action.frames && baked.nodes.length === skeleton.length, `${action.pose}: Blender keys cover ${baked.frames} frames of ${baked.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
@@ -256,6 +256,15 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(first.InTan ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
   });
+  if (baked && action.keys) for (const [ordinal, { path }] of skeleton.entries()) {
+    const [, kind, at] = /^\.(Bones|Helpers)\.(\d+)$/.exec(path)!, node = model[kind as "Bones" | "Helpers"][Number(at)]!;
+    const { rotation, scaling } = baked.nodes[ordinal]!, rest = { Rotation: [0, 0, 0, 1], Scaling: [1, 1, 1] };
+    for (const [channel, keys] of [["Rotation", rotation], ["Scaling", scaling]] as const) {
+      if (!keys?.some(v => v.some((axis, i) => Math.abs(axis - rest[channel][i]!) > 1e-4)) || (channel === "Rotation" && node.Rotation)) continue;
+      ensure(!node[channel], `${node.Name}: authored ${channel} needs a node without a stock track`);
+      node[channel] = { LineType: mdx.LineType.Linear, GlobalSeqId: -1, Keys: keys.map((v, frame) => ({ Frame: start + Math.round(frame * 1000 / 60), Vector: Float32Array.from(v) })) };
+    }
+  }
   if (inPlace) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
   if (action.target) {
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index); data.frame = start + Math.round(action.contact * 1000 / 60);
