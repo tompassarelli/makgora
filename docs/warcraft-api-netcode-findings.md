@@ -1530,3 +1530,75 @@ raw state read up inside every handler. A player's own pressed row
 therefore does not pay the relay's round trip or jitter-buffer depth; the
 opponent's view and rollback depth do (wisp:docs/relay.md, "How it meets
 Smashcraft's frame-stamped inputs and rollback").
+
+## Callback silences in a two-human match with a CPU (smashcraft#416, 26 October 2026)
+
+Asked: in a native two-human match with one CPU, what does each client's
+Lua cost per callback, and what causes each silence over 25 ms between
+callbacks: a rollback spiral (our own Lua overrunning its frame), the relay
+(turns leaving the host late), or neither? Measured on Warcraft III
+3.0.0.24268 (Classic, offline LAN pair 15 on gex45, 60 fps cap, Wisp's LAN
+host at 25 ms turns), native-perf build of 24f1320250, Sky Deck, Rifleman
+on both human slots against a CPU Illidan, nine stocks. A host-side driver
+tapped random movement, attack, special, shield and jump keys on both
+clients; the host relayed 156 and 154 key events (about 78 taps each,
+one every 2.6 s) during the capture, so the humans' input was light.
+Other sessions' LAN clients ran on the same host;
+`/proc/pressure/cpu` some avg300 read 44.7% a minute after the capture.
+
+Method. `-dev callback-clock 10800` and `-dev capture 10800` started on
+turns 2995 and 3338, so the clock and the frame-cost capture
+(wisp:docs/frame-cost.md) overlap for 10,285 callbacks; the first 515 clock callbacks have no Lua
+cost, and none of their silences passed 41.7 ms. Every one of the
+18 `r` checkpoints puts each capture 515 callbacks after its clock, on both
+clients. The host's `actions.log` gives a send time for 6,417 of the
+capture's 8,193 turns. Each client's clock is placed on the host's clock
+at the callback after the `-dev callback-clock` turn; that anchor is good
+to about one frame, so host gaps and the other client's gaps are read
+within 25 ms of each silence. A silence is named by these rules, in order:
+
+- **spiral**: the callback before it ran at least one 16.7 ms frame of Lua,
+  more of it in the reconcile, confirmed and speculative sections than in
+  presentation, camera and UI;
+- **neither, presentation**: the same, but presentation, camera and UI cost
+  more than the simulation;
+- **neither, turn cadence**: at most 41.7 ms, one 25 ms turn plus one 60 Hz
+  frame, which turns drawn on frames produce on their own;
+- **relay**: longer, the host's turn gap there covers it to within a frame,
+  and the other client is silent past 41.7 ms there too;
+- **neither, local stall**: longer, with the host and the other client on
+  time.
+
+`bun wisp perf native CAPTURE.txt bot --samples bot.perf` read both
+captures against `bun wisp perf bot --samples` at the same commit.
+
+| Client | Callbacks | Lua p50 / p95 / p99 / max ms | Gap p50 / p95 / p99 / max ms | Silences over 25 ms | Turn cadence | Spiral | Presentation | Local stall | Relay |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| a | 10,800 | 5.0 / 9.0 / 12.0 / 28.0 | 19 / 28 / 32 / 54 | 1,914 | 1,894 (≤ 41 ms) | 12 (≤ 39 ms) | 2 (≤ 31 ms) | 6 (44–54 ms) | 0 |
+| b | 10,800 | 5.0 / 9.0 / 13.0 / 30.0 | 19 / 28 / 31 / 55 | 1,885 | 1,860 (≤ 41 ms) | 9 (≤ 35 ms) | 2 (≤ 33 ms) | 14 (42–55 ms) | 0 |
+
+**No silence was the relay.** Of 5,255 consecutive logged host turns, 23
+left more than 30 ms after the one before and one more than 41.7 ms
+(49 ms, at host time 108.7 s). Both clients were in heavy callbacks there,
+and their silences stayed within 38 ms.
+
+**Spirals are short.** The 21 spiral silences lasted 26–39 ms. Each
+followed a callback of 17–30 ms of mostly simulation: 19 stepped one or two
+catch-up frames, and two spent 7 ms in reconcile. Speculative ran 6–10
+frames ahead of confirmed. None reached two turns. The largest cluster was
+four on client a within 0.2 s, at host time 108.6–108.8 s, around the
+host's one 49 ms gap. The four presentation silences were 29–33 ms.
+
+**The longest silences were local.** All 20 silences over 41.7 ms
+(42–55 ms) followed callbacks of 3–9 ms of Lua, while the host kept
+sending turns 24–30 ms apart and the other client stayed within cadence.
+The client itself did not run a callback for that time, and our Lua was
+not running. On a host this loaded, that is consistent with the process
+not being scheduled, but this run cannot name the cause inside Warcraft.
+
+**Headless over-predicts the tail.** `perf native` gave the same windows
+on both clients: median 5.00 ms against 6.04 predicted (+21%), p95
+8.97 ms against 14.10 (+57%), and worst window 12.02 ms (a) and 13.00 ms (b)
+against 34.24. It exits FAIL on its 20% median and p95 rule. The
+prediction comes from `perf bot`'s bot-only match, not from this two-human
+match with one CPU.
