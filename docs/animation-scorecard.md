@@ -151,6 +151,9 @@ A caster normal whose weapon covers its hit region gets no reach flare, so
 `SIGNATURE_CUE_NORMALS` in `disjointCues.ts` draws the fighter's cue on it
 regardless of reach: Medivh's dash attack draws his arcane missile and
 Malfurion's bursts Entangling Roots at the staff (north gate 41, 2026-10-26).
+Anub'arak's dash attack draws Impale spikes erupting at the hit, held mid-rise
+(north gate 45, 2026-10-26), because his claws vanish against his shell at
+match size.
 
 ## Thresholds
 

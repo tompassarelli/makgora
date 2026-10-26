@@ -138,3 +138,14 @@ until his signature cue was drawn: Entangling Roots at the staff, held on
 the model's drawn geometry because Tranquility's particles never render
 natively. Lines 1–4 pass (body share 1.00, held 7, return 1.24) and three
 fresh judges give medians 4/4/4/4/4.
+
+Anub'arak's dash attack (#339) draws Impale spikes at the hit (north gate 45).
+His claws vanish against the shell at tile size, and no pose take scored
+readability 4 without the spikes; with them, his generator clip reaches 4.
+Follow-through stays at 3 in every compact take: three changes to the active
+window (an even glide from the last active frame, a deeper pose at that frame,
+and a root lunge that keeps carrying forward until it) each read to the judges
+as one held pose from contact to the last active frame. Blender takes that
+flatten the body lower at each beat by splaying the legs out reached
+follow-through 4 but lost readability to 3, since the splayed legs crowd the
+claws. Lines 1–4 pass; three fresh judges give medians 4/4/4/3/4.

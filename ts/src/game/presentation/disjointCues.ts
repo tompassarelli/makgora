@@ -14,6 +14,7 @@ const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\Im
 const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
 const ARCANE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", scale: f32(0.9), seconds: f32(0.3), timeScale: 1.0, birth: { eachFrame: false } };
 const NATURE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", scale: f32(0.9) };
+const IMPALE_SPIKES: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", scale: f32(1.0), sequence: "birth", seconds: f32(0.4) };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
@@ -42,12 +43,14 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.grom]: FIRE_FLARE,
   [Character.malfurion]: NATURE_FLARE,
   [Character.medivh]: ARCANE_FLARE,
+  [Character.anubarak]: IMPALE_SPIKES,
 };
 
 
 export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly AttackStyle[] } = {
   [Character.malfurion]: [AttackStyle.dashAttack],
   [Character.medivh]: [AttackStyle.dashAttack],
+  [Character.anubarak]: [AttackStyle.dashAttack],
 };
 
 
