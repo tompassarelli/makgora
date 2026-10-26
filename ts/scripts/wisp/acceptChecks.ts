@@ -406,10 +406,10 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...(["first", "second"] as const).map((order): NativeCheck => ({
       id: `c40-cpu-startup-${order}`, closes: "smashcraft#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
-      setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }],
+      setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }],
       capture: [{ kind: "frames", name: "fighter-select", client: "a" }, { kind: "frames", name: "fighter-select", client: "b" }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SETUP .* computers=[1-9]", min: 1 }, { kind: "receipt", client: "b", pattern: "^SETUP .* computers=[1-9]", min: 1 }],
-      look: "The computer's starting fighter in SETUP characters= is the same on both clients and matches both fighter-select frames; it differs between the first and second session.",
+      look: "With each client's first-run Controls panel closed, the computer's starting fighter in SETUP characters= is the same on both clients and matches both fighter-select frames; it differs between the first and second session.",
     })),
     {
       id: "c37-mount", closes: "smashcraft#10 C37N", map: "presentation", session: "c37-platforms",
