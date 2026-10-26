@@ -21,33 +21,33 @@ Gap = mean Melee advantage (five references) minus mean ours (26 fighters), in f
 
 | Throw | Victim % | Ours | Melee | Gap | Knockback values | Weight in knockback | Thrower end lag | Weight-dependent timing |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| forward | 0 | 7.6 | 9.1 | 1.6 | -0.5 | -0.3 | 0.5 | 1.9 |
-| forward | 30 | 11.8 | 12.7 | 0.9 | -1 | -0.6 | 0.5 | 1.9 |
-| forward | 60 | 16.3 | 16.3 | 0 | -1.3 | -1.2 | 0.5 | 1.9 |
-| forward | 90 | 20.8 | 20.1 | -0.7 | -1.4 | -1.7 | 0.5 | 1.9 |
-| forward | all | 14.1 | 14.6 | 0.4 | -1.1 | -0.9 | 0.5 | 1.9 |
-| back | 0 | 6.4 | 4.7 | -1.7 | -0.1 | -0.3 | -6 | 4.7 |
-| back | 30 | 11.3 | 8.7 | -2.6 | -0.4 | -0.9 | -6 | 4.7 |
-| back | 60 | 16.3 | 12.7 | -3.5 | -0.8 | -1.5 | -6 | 4.7 |
-| back | 90 | 21 | 16.3 | -4.7 | -1.5 | -2 | -6 | 4.7 |
-| back | all | 13.8 | 10.6 | -3.1 | -0.7 | -1.1 | -6 | 4.7 |
-| up | 0 | 13.4 | 9.4 | -4 | 11.1 | -0.2 | -19.5 | 4.6 |
-| up | 30 | 18.9 | 12.8 | -6 | 9.7 | -0.8 | -19.5 | 4.6 |
-| up | 60 | 24.1 | 16.8 | -7.3 | 9 | -1.3 | -19.5 | 4.6 |
-| up | 90 | 29.5 | 20.8 | -8.7 | 8.5 | -2.3 | -19.5 | 4.6 |
-| up | all | 21.5 | 15 | -6.5 | 9.6 | -1.2 | -19.5 | 4.6 |
-| down | 0 | 10.9 | 27.8 | 17 | 42.6 | -35 | 6.5 | 2.8 |
-| down | 30 | 10.9 | 29.6 | 18.8 | 44.4 | -35 | 6.5 | 2.8 |
-| down | 60 | 10.9 | 31.6 | 20.8 | 46.4 | -35 | 6.5 | 2.8 |
-| down | 90 | 10.9 | 33.4 | 22.6 | 48.2 | -35 | 6.5 | 2.8 |
-| down | all | 10.9 | 30.6 | 19.8 | 45.4 | -35 | 6.5 | 2.8 |
-| all | all | 15.1 | 17.7 | 2.6 | 13.3 | -9.6 | -4.6 | 3.5 |
+| forward | 0 | 7.7 | 9.1 | 1.4 | -0.5 | -0.3 | 0.3 | 1.9 |
+| forward | 30 | 12 | 12.7 | 0.7 | -1 | -0.6 | 0.3 | 1.9 |
+| forward | 60 | 16.5 | 16.3 | -0.2 | -1.3 | -1.2 | 0.3 | 1.9 |
+| forward | 90 | 21 | 20.1 | -0.8 | -1.4 | -1.7 | 0.3 | 1.9 |
+| forward | all | 14.3 | 14.6 | 0.3 | -1.1 | -0.9 | 0.3 | 1.9 |
+| back | 0 | 6.6 | 4.7 | -1.9 | -0.1 | -0.3 | -6.2 | 4.7 |
+| back | 30 | 11.5 | 8.7 | -2.8 | -0.4 | -0.9 | -6.2 | 4.7 |
+| back | 60 | 16.5 | 12.7 | -3.7 | -0.8 | -1.5 | -6.2 | 4.7 |
+| back | 90 | 21.2 | 16.3 | -4.9 | -1.5 | -2 | -6.2 | 4.7 |
+| back | all | 14 | 10.6 | -3.3 | -0.7 | -1.1 | -6.2 | 4.7 |
+| up | 0 | 13.5 | 9.4 | -4.1 | 11.1 | -0.2 | -19.6 | 4.6 |
+| up | 30 | 19 | 12.8 | -6.1 | 9.7 | -0.8 | -19.6 | 4.6 |
+| up | 60 | 24.2 | 16.8 | -7.4 | 9 | -1.3 | -19.6 | 4.6 |
+| up | 90 | 29.6 | 20.8 | -8.8 | 8.5 | -2.3 | -19.6 | 4.6 |
+| up | all | 21.6 | 15 | -6.6 | 9.6 | -1.2 | -19.6 | 4.6 |
+| down | 0 | 11.2 | 27.8 | 16.6 | 7.6 | 0 | 6.2 | 2.8 |
+| down | 30 | 11.2 | 29.6 | 18.4 | 9.4 | 0 | 6.2 | 2.8 |
+| down | 60 | 11.2 | 31.6 | 20.4 | 11.4 | 0 | 6.2 | 2.8 |
+| down | 90 | 11.2 | 33.4 | 22.2 | 13.2 | 0 | 6.2 | 2.8 |
+| down | all | 11.2 | 30.6 | 19.4 | 10.4 | 0 | 6.2 | 2.8 |
+| all | all | 15.3 | 17.7 | 2.5 | 4.5 | -0.8 | -4.8 | 3.5 |
 
-Mean hitstun after a throw is 36.4 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.3 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 2.6 frames (knockback values 512%, weight in knockback -369%, thrower end lag -177%, weight-dependent timing 135%).
+Mean hitstun after a throw is 36.4 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.1 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 2.5 frames (knockback values 180%, weight in knockback -32%, thrower end lag -192%, weight-dependent timing 140%).
 
-Where ours trails Melee (6 of 16 throw and percent cells: forward 0%, forward 30%, down 0%, down 30%, down 60%, down 90%), the gap sums to 81.7 frames: knockback values 220%, weight in knockback -172%, thrower end lag 33%, weight-dependent timing 18%.
+Where ours trails Melee (6 of 16 throw and percent cells: forward 0%, forward 30%, down 0%, down 30%, down 60%, down 90%), the gap sums to 79.7 frames: knockback values 50%, weight in knockback -1%, thrower end lag 32%, weight-dependent timing 19%.
 
-Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 311 of 416 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
+Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 310 of 416 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
 
 ## Melee references
 
@@ -442,22 +442,22 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Goblin Tinker | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Goblin Tinker | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Goblin Tinker | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Kael'thas Sunstrider | forward | 0 | 3 | 26 | 23 | 14 | 8.3, 0 | 67 at 25° |
-| Kael'thas Sunstrider | forward | 30 | 6 | 29 | 23 | 14 | 8.3, 0 | 74.3 at 25° |
-| Kael'thas Sunstrider | forward | 60 | 9 | 32 | 23 | 14 | 8.3, 0 | 81.7 at 25°, tumble, knockdown at +8 |
-| Kael'thas Sunstrider | forward | 90 | 12 | 35 | 23 | 14 | 8.3, 0 | 89 at 25°, tumble, knockdown at +8 |
-| Kael'thas Sunstrider | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 81.2 at 145°, tumble, knockdown at +10 |
-| Kael'thas Sunstrider | back | 30 | 15 | 41 | 26 | 17 | -8.3, 0 | 103.7 at 145°, tumble, knockdown at +13 |
-| Kael'thas Sunstrider | back | 60 | 24 | 50 | 26 | 17 | -8.3, 0 | 126.1 at 145°, tumble, knockdown at +18 |
-| Kael'thas Sunstrider | back | 90 | 33 | 59 | 26 | 17 | -8.3, 0 | 148.6 at 145°, tumble, knockdown at +26 |
-| Kael'thas Sunstrider | up | 0 | 8 | 24 | 16 | 16 | 8.3, 10.8 | 62.3 at 90° |
-| Kael'thas Sunstrider | up | 30 | 13 | 29 | 16 | 16 | 8.3, 10.8 | 73.6 at 90° |
-| Kael'thas Sunstrider | up | 60 | 17 | 33 | 16 | 16 | 8.3, 10.8 | 84.9 at 90°, tumble, knockdown at +28 |
-| Kael'thas Sunstrider | up | 90 | 22 | 38 | 16 | 16 | 8.3, 10.8 | 96.1 at 90°, tumble, knockdown at +34 |
-| Kael'thas Sunstrider | down | 0 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
-| Kael'thas Sunstrider | down | 30 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
-| Kael'thas Sunstrider | down | 60 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
-| Kael'thas Sunstrider | down | 90 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | forward | 0 | 7 | 26 | 19 | 14 | 8.3, 0 | 67 at 25° |
+| Kael'thas Sunstrider | forward | 30 | 10 | 29 | 19 | 14 | 8.3, 0 | 74.3 at 25° |
+| Kael'thas Sunstrider | forward | 60 | 13 | 32 | 19 | 14 | 8.3, 0 | 81.7 at 25°, tumble, knockdown at +8 |
+| Kael'thas Sunstrider | forward | 90 | 16 | 35 | 19 | 14 | 8.3, 0 | 89 at 25°, tumble, knockdown at +8 |
+| Kael'thas Sunstrider | back | 0 | 11 | 32 | 21 | 17 | -8.3, 0 | 81.2 at 145°, tumble, knockdown at +10 |
+| Kael'thas Sunstrider | back | 30 | 20 | 41 | 21 | 17 | -8.3, 0 | 103.7 at 145°, tumble, knockdown at +13 |
+| Kael'thas Sunstrider | back | 60 | 29 | 50 | 21 | 17 | -8.3, 0 | 126.1 at 145°, tumble, knockdown at +18 |
+| Kael'thas Sunstrider | back | 90 | 38 | 59 | 21 | 17 | -8.3, 0 | 148.6 at 145°, tumble, knockdown at +26 |
+| Kael'thas Sunstrider | up | 0 | 10 | 24 | 14 | 16 | 8.3, 10.8 | 62.3 at 90° |
+| Kael'thas Sunstrider | up | 30 | 15 | 29 | 14 | 16 | 8.3, 10.8 | 73.6 at 90° |
+| Kael'thas Sunstrider | up | 60 | 19 | 33 | 14 | 16 | 8.3, 10.8 | 84.9 at 90°, tumble |
+| Kael'thas Sunstrider | up | 90 | 24 | 38 | 14 | 16 | 8.3, 10.8 | 96.1 at 90°, tumble, knockdown at +34 |
+| Kael'thas Sunstrider | down | 0 | 19 | 36 | 17 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | down | 30 | 19 | 36 | 17 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | down | 60 | 19 | 36 | 17 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | down | 90 | 19 | 36 | 17 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
 | Murloc | forward | 0 | 7 | 28 | 21 | 12 | 8.3, 0 | 70.1 at 40° |
 | Murloc | forward | 30 | 10 | 31 | 21 | 12 | 8.3, 0 | 78.9 at 40° |
 | Murloc | forward | 60 | 14 | 35 | 21 | 12 | 8.3, 0 | 87.6 at 40°, tumble, knockdown at +12 |

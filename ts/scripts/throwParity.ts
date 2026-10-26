@@ -91,7 +91,7 @@ export function ourThrow(character: Character, name: ThrowName, percent: number)
   return {
     fighter: fighterName(character), throw: name, percent, release, endLag: throwerActs, hitstun, advantage: hitstun - throwerActs,
     knockback: round(knockback), angle: Math.round(angle), offset: `${round(offsetX)}, ${round(offsetZ)}`, tumble, knockdownAt,
-    hitstunAtWeight100: hitstunOf(throwKnockback(percent, effect.damage, MELEE_THROW_WEIGHT, effect.growth, effect.base)),
+    hitstunAtWeight100: hitstunOf(effect.setKnockback ?? throwKnockback(percent, effect.damage, MELEE_THROW_WEIGHT, effect.growth, effect.base)),
     endLagAtFullLength: throwerActs,
   };
 }
