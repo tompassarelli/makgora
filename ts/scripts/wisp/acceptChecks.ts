@@ -11,6 +11,7 @@ import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 import { gateChecks } from "./gateChecks";
+import { specialStripChecks, specialStripMaps } from "./specialStripChecks";
 import { newestPresentation } from "./presentationInputs";
 
 const inputs = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -74,6 +75,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
     rebuild: "main",
     quick: `${QUICK_HERO_COMMAND}${name.toLowerCase()}`,
   }])),
+  ...specialStripMaps(PRESENTATION),
 };
 
 
@@ -288,6 +290,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "deck and fighters drawn on each client; run with client A's private desktop at 2880x1920 for the 3:2 box",
     },
     ...effectChecks,
+    ...specialStripChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...stageChecks,
     ...lightingChecks,
     ...STAGE_COMPOSITION_CHECKS,
