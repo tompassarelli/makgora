@@ -41,6 +41,13 @@ ensure((inPlace || source.Sequences.length === 9) && source.Helpers.some(b => b.
 const stand = source.Sequences[kobold ? 0 : 2]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; tx?: number; tz?: number; }
 interface Key { frame: number; g: Gesture }
+const everyFrame = (keys: readonly Key[]): Key[] => keys.flatMap((key, i) => {
+  const next = keys[i + 1];
+  if (!next) return [key];
+  const fields = [...new Set([...Object.keys(key.g), ...Object.keys(next.g)])] as (keyof Gesture)[];
+  return Array.from({ length: next.frame - key.frame }, (_, step) => ({ frame: key.frame + step,
+    g: Object.fromEntries(fields.map(field => [field, (key.g[field] ?? 0) + ((next.g[field] ?? 0) - (key.g[field] ?? 0)) * step / (next.frame - key.frame)])) }));
+});
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; keys?: readonly Key[]; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
@@ -72,16 +79,17 @@ for (const [pose, style, gesture, target] of normals) {
   actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture, target, air: pose.endsWith("Air") });
 }
 const couched: Gesture = { arm: -75, elbow: -120, hand: 0, pelvis: -5, leftElbow: -20 };
-if (!kobold) Object.assign(actions.find(action => action.pose === "dashAttack")!, { target: undefined, keys: [
+if (!kobold) Object.assign(actions.find(action => action.pose === "dashAttack")!, { target: undefined, keys: everyFrame([
   { frame: 0, g: { arm: -20, chest: 8, lean: 6, tx: 4, thigh: -20, leftThigh: 20 } },
   { frame: 3, g: { ...couched, hand: 35, chest: -10, head: 10, tx: -22, thigh: 50, knee: -80, leftThigh: 30, leftArm: -60 } },
-  { frame: 5, g: { ...couched, hand: -10, chest: 25, head: -15, tx: 22, thigh: -75, knee: 10, leftThigh: 75, leftArm: 70 } },
-  { frame: 7, g: { ...couched, hand: -10, chest: 28, head: -15, tx: 26, thigh: -80, knee: 10, leftThigh: 78, leftArm: 75 } },
-  { frame: 16, g: { ...couched, hand: -5, chest: 30, head: -12, tx: 21, thigh: -85, leftThigh: 80, leftArm: 70 } },
-  { frame: 22, g: { ...couched, hand: 45, chest: 20, head: -5, tx: 16, thigh: -60, knee: -10, leftThigh: 50, leftArm: 40 } },
-  { frame: 29, g: { arm: -30, elbow: -50, hand: 20, chest: 5, tx: 6, thigh: -20, leftThigh: 15, leftArm: 10 } },
+  { frame: 5, g: { ...couched, hand: -10, chest: 25, head: -15, tx: 22, thigh: -55, knee: -50, leftThigh: 50, leftArm: 70 } },
+  { frame: 9, g: { ...couched, arm: -60, hand: 0, chest: 14, head: -8, tx: 29, thigh: -20, knee: -60, leftThigh: 0, leftArm: 40 } },
+  { frame: 13, g: { ...couched, arm: -80, hand: -10, chest: 32, head: -15, tx: 38, thigh: 45, knee: -20, leftThigh: -60, leftArm: 75 } },
+  { frame: 16, g: { ...couched, arm: -80, hand: -5, chest: 36, head: -12, tx: 41, thigh: 55, knee: -15, leftThigh: -70, leftArm: 70 } },
+  { frame: 23, g: { arm: -62, elbow: -105, hand: 0, chest: 31, tx: 32, thigh: 35, knee: -25, leftThigh: -45, leftArm: 55 } },
+  { frame: 30, g: { arm: -40, elbow: -60, hand: 5, chest: 14, tx: 11, thigh: 8, knee: -18, leftThigh: -12, leftArm: 22 } },
   { frame: MURLOC_MOVES.normals[AttackStyle.dashAttack]!.totalFrames, g: {} },
-] });
+]) });
 const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["crouch", 30, 8, brace], ["landing", 8, 2, brace], ["shield", 30, 5, { ...brace, leftArm: -105 }],
   ["airDodge", 49, 4, { ...brace, lean: -25 }], ["smashCharge", 30, 8, { ...cast, arm: -80, leftArm: -80 }],
@@ -169,9 +177,11 @@ function joint(name: string, g: Gesture): [number, number] {
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
-const standTriangles = new DrawnModel(originalBytes, 1).triangles(source.Sequences.indexOf(stand), 0, 1);
-let standFloor = Infinity;
-for (let i = 1; i < standTriangles.length; i += 2) standFloor = Math.min(standFloor, standTriangles[i]!);
+const feet = (drawn: DrawnModel, sequence: number, seconds: number) => {
+  const names = drawn.nodes().map(node => node.name), nodes = drawn.posed(sequence, seconds, 1).nodes;
+  return Math.min(...["Bone_Foot_L", "Bone_Foot_R"].map(name => nodes[names.indexOf(name) * 2 + 1]!));
+};
+const standFeet = feet(new DrawnModel(originalBytes, 1), source.Sequences.indexOf(stand), 0);
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
 ensure(replaced.every(pose => pose === "pain" || actions.some(action => action.pose === pose)), `unknown pose in ${replaced.join(" ")}`);
 if (inPlace) actions.splice(0, actions.length, ...actions.filter(action => replaced.includes(action.pose)));
@@ -231,8 +241,9 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   for (const frame of phaseFrames) {
     const triangles = drawn.triangles(index, frame / 60, 1); let lowest = Infinity;
     for (let i = 1; i < triangles.length; i += 2) lowest = Math.min(lowest, triangles[i]!);
+    if (action.keys) lowest = feet(drawn, index, frame / 60) - standFeet;
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
-    if (!action.air) { key.Vector[2] = key.Vector[2]! - lowest + (action.keys ? standFloor : 0); if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
+    if (!action.air) { key.Vector[2] = key.Vector[2]! - lowest; if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
   }
   const victim = /^victim(Pummel|Throw)/.test(action.pose);
   const binding = `{ index: ${index}, seconds: ${seconds(victim ? 1 : (end - start) / 1000)}, aligned: true${action.paired ? `, contact: ${seconds(victim ? 0.5 : action.contact / 60)}` : ""} }`;
