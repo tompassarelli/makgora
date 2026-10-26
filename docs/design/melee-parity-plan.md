@@ -276,10 +276,8 @@ Built on the existing headless sim and search, not beside them.
   window needs a row whose class is at least the required one (true over
   DI-dependent over read) and whose DI escapes miss every listed DI. It names
   each missed row and percent and exits non-zero. JSON rather than TypeScript
-  because scripts may not import from tools (`structure.toml`). The starter
-  rows are Maiev's down tilt into down tilt at 0-20% (true), and up smash at
-  30-50% and neutral air at 100-150% into grab with DI in or none, all
-  against weight 75.
+  because scripts may not import from tools (`structure.toml`). Maiev's rows
+  and identity guard are in [Maiev](maiev.md) (#303).
 - Throw roles (#332): the same file's `throws` declares each fighter's four
   throws by role from [throw roles](throw-roles.md) (Rule B, #331), with the
   role's percents unless a throw gives its own. After the link rows,
