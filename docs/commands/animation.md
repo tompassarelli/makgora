@@ -285,6 +285,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   reads as detached. From ts/, `bun scripts/gripStrips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT ASSETS`
   renders those moments for every nonzero row in side, far-side and three-quarter Classic views,
   which is how a row is accepted as a measurement artifact or found to be a real defect (#436).
+  A weapon that hangs from the root rather than a hand (Rifleman's Rifle01, named in
+  smashcraft:ts/scripts/wisp/victoryJoints.ts) is re-keyed to its hand with
+  `bun tools/animations/carry-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --sequence NAME...`:
+  in each named sequence it keeps the weapon where the hand held it in Stand Ready, and
+  every other sequence stays identical. Store the family and run `bun wisp inputs derive --fighter NAME`.
+  Rifleman's Knockdown, Down Damage, Get Up and Get Up Attack were carried this way (#436).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);

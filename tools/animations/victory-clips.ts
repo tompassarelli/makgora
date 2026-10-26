@@ -7,8 +7,9 @@ import { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
 import { sheet, type PoseFrame } from '../../ts/scripts/wisp/hurtboxView';
 import { fighters } from '../../ts/scripts/heroModelSource';
 import { AttackPhase, Character } from '../../ts/src/game/sim/codes';
-import { mat4, quat, vec3 } from 'gl-matrix';
+import { mat4, quat } from 'gl-matrix';
 import { ensure, onGlobalClock, rotated, tracks } from './original-clips';
+import { carriedKey, carryOffset } from './carry';
 import { bodyJoint, followers, limbJoint, type Limb, type Side } from '../../ts/scripts/wisp/victoryJoints';
 import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts/wisp/victoryTorso';
 import { anatomyFindings } from '../../ts/scripts/wisp/victoryAnatomy';
@@ -237,9 +238,7 @@ for (const character of characters) {
 
     const carried = followers(model).filter(({ node, side }) => !below(node, arms[side]![2]!)).map(({ node, side }) => {
         renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]; renderer.update(0);
-        const offset = mat4.invert(mat4.create(), data.nodes[arms[side]![2]!.ObjectId].matrix);
-        ensure(offset, `${fighter.name}: the stand hand pose is singular`);
-        return { node, hand: arms[side]![2]!, offset: mat4.multiply(offset, offset, data.nodes[node.ObjectId].matrix) };
+        return { node, hand: arms[side]![2]!, offset: carryOffset(data, arms[side]![2]!, node) };
     });
     const hanging = (HANGING[character] ?? []).map(name => {
         const node = model.Nodes.find(candidate => candidate?.Name === name);
@@ -258,14 +257,8 @@ for (const character of characters) {
                 if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
             }
             for (const { node, hand, offset } of carried) {
-                const world = mat4.multiply(mat4.create(), data.nodes[hand.ObjectId].matrix, offset);
-                const parent = node.Parent == null || node.Parent === -1 ? undefined : data.nodes[node.Parent];
-                const inverse = parent === undefined ? mat4.create() : mat4.invert(mat4.create(), parent.matrix);
-                ensure(inverse, `${fighter.name}: ${node.Name}'s parent pose is singular`);
-                const local = mat4.multiply(mat4.create(), inverse, world);
-                const [x, y, z] = model.PivotPoints[node.ObjectId]!, p = vec3.fromValues(x!, y!, z!);
-                const q = quat.normalize(quat.create(), mat4.getRotation(quat.create(), local)), v = vec3.transformQuat(vec3.create(), p, q);
-                for (const [track, vector] of [[node.Rotation, new Float32Array(q)], [node.Translation, new Float32Array([local[12]! - p[0]! + v[0]!, local[13]! - p[1]! + v[1]!, local[14]! - p[2]! + v[2]!])]] as const) {
+                const { rotation, translation } = carriedKey(model, data, node, hand, offset);
+                for (const [track, vector] of [[node.Rotation, rotation], [node.Translation, translation]] as const) {
                     ensure(track, `${fighter.name}: ${node.Name} has no track to follow the hand`);
                     const key = track.Keys.find(candidate => candidate.Frame === time(beat.frame));
                     ensure(key, `${fighter.name}: ${node.Name} key ${beat.frame} missing`);
