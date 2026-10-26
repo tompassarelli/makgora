@@ -13,6 +13,7 @@ import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
 import { DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
 import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, SPECIAL_SLOTS, heroProjectileArt, ultimateProjectiles, fighterProjectileModels } from "../../src/game/presentation/projectileArt";
 import { STATIONARY_PARTICLE_MODELS, STATIONARY_SECONDS, BIRTH_MISSILES, RISEN_ALPHA } from "../../src/game/render/projectilePresentation";
+import { projectileModelScale } from "../../src/game/presentation/projectilePose";
 import { ACCENT_SECONDS, ACCENT_SEQUENCE } from "../../src/game/render/hitAreaEffects";
 import { FIGHTER_ULTIMATES } from "../../src/game/sim/ultimates";
 import { summonClip, summonClipCount, SUMMON_BEAR } from "../../src/game/presentation/summonClipInfo";
@@ -216,19 +217,18 @@ function cueUse(fighter: string, move: string, kind: EffectUse["kind"], cue: Cue
   return { fighter, move, kind, model: cue.model, scale: cue.scale, scaleEnd: popcorn ? undefined : cue.scaleEnd, alpha: popcorn || kind === "contact accent" ? 255 : cue.alpha ?? 255, lifetime: popcorn ? 1 : undefined, anchor: cue.anchor, sequence: popcorn && cue.birth !== undefined ? "birth" : cue.sequence ?? (kind === "contact accent" ? ACCENT_SEQUENCE : undefined), seconds: popcorn && cue.birth !== undefined ? 0 : cue.seconds ?? (kind === "contact accent" ? ACCENT_SECONDS : 0), timeScale: popcorn ? 1 : cue.timeScale ?? (kind === "contact accent" ? 0 : 1), travels: false, anchored: "fighter", ...(popcorn ? { playbackUnknown: cue.birth?.lingerFrames === undefined ? "confirmed emitter births are hidden by predicted cue phase; active-window coverage is unverified (#365/#496)" : "confirmed emitter births retain a bounded phase handoff; native active-window coverage is unverified (#365/#496)" } : {}) };
 }
 
-function projectileUse(character: Character, fighter: string, move: string, spec: SpecialProjectile): EffectUse | undefined {
+export function projectileUse(character: Character, fighter: string, move: string, spec: SpecialProjectile): EffectUse | undefined {
   const model = spec.model;
   if (model === undefined) return undefined;
   const draw = PROJECTILE_DRAW_OFFSETS[model];
   const cue = PROJECTILE_DRAW_CUES[model];
   const travels = spec.velocityX !== 0 || spec.velocityZ !== 0;
   const birthNamed = BIRTH_MISSILES.some((name) => model.includes(name));
-  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: cue?.scale ?? 1, lifetime: spec.life / 60, anchor: "projectile", width: draw?.width, height: draw?.height };
+  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: (cue?.scale ?? 1) * projectileModelScale(spec.radius, spec), lifetime: spec.life / 60, anchor: "projectile", width: draw?.width, height: draw?.height };
   if (character === Character.lichKing && spec.pool !== undefined) return { ...base, sequence: "stand", seconds: 0, timeScale: 1, playbackUnknown: "Defile per-frame age seeking and armed visibility is unmodeled" };
   if (character === Character.lichKing && model.includes("ImpaleHitTarget")) return { ...base, sequence: "birth", seconds: STATIONARY_SECONDS, timeScale: 0, alpha: RISEN_ALPHA };
   if (character === Character.lichKing && model.includes("AnimateDeadTarget")) return { ...base, sequence: "birth", seconds: 0, timeScale: 1, playbackUnknown: "Val'kyr tell per-frame lifetime seeking is unmodeled" };
-  if (spec.modelAnimation !== undefined && cue?.birth === undefined) return { ...base, sequence: spec.modelAnimation.sequence, seconds: spec.modelAnimation.warningSeconds, timeScale: 0, playbackUnknown: "per-frame warning/active animation seeking is unmodeled" };
-  if (spec.modelRadius !== undefined) return { ...base, sequence: draw?.sequence, seconds: draw?.seconds ?? 0, timeScale: draw?.seconds === undefined ? 1 : 0, playbackUnknown: "per-frame projectile radius scale coverage is unmodeled" };
+  if (spec.modelAnimation !== undefined && cue?.birth === undefined) return { ...base, sequence: spec.modelAnimation.sequence, seconds: spec.modelAnimation.activeSeconds, timeScale: 0 };
   if (draw?.seconds !== undefined) return { ...base, sequence: draw.sequence, seconds: draw.seconds, timeScale: 0 };
   if (cue?.birth !== undefined) return { ...base, sequence: "birth", seconds: 0, timeScale: 1 };
   const sequence = draw?.sequence ?? (birthNamed ? "birth" : "stand");

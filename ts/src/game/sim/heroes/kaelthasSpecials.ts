@@ -19,13 +19,18 @@ const fireball = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 26, landingLag, hurt: kaelCastBody(6, 18, 44.0, 58.0), projectiles: [FIREBALL],
 });
 
+// FlameStrike1.mdx draws its column only in birth, from about 1.0 s to 4.7 s; its stand is fully transparent.
+const FLAME_STRIKE_PILLAR_SECONDS = 1.25;
+const FLAME_STRIKE_BURN_SECONDS = 2.0;
 export const FLAME_STRIKE_BURN: SpecialProjectile = {
-  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", modelRadius: 125.0, modelOffsetZ: -50.0,
+  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 155.0, modelOffsetZ: -50.0,
+  modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_BURN_SECONDS, activeSeconds: FLAME_STRIKE_BURN_SECONDS },
   spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
   life: 48, radius: 45.0, effect: kaelHit(2.0, 80, 0.0, 0.0), burn: { every: 8 }, reflectable: false, limit: 1,
 };
 export const FLAME_STRIKE_BURST: SpecialProjectile = {
-  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 310.0, modelOffsetZ: -50.0,
+  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 155.0, modelOffsetZ: -50.0,
+  modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_PILLAR_SECONDS, activeSeconds: FLAME_STRIKE_PILLAR_SECONDS },
   spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
   life: 6, radius: 45.0, effect: kaelHit(14.0, 80, 90.30785369873047, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
 };

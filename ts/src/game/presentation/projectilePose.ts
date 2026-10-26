@@ -2,6 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { heroProjectileRadius, projectileActive } from "../sim/projectiles";
 import { ProjectileKind } from "../sim/codes";
+import type { SpecialProjectile } from "../sim/specials/schema";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 
 interface ProjectilePose {
@@ -26,6 +27,8 @@ interface ProjectilePose {
 
 const HIDDEN: Readonly<ProjectilePose> = { visible: false, x: 0.0, z: 0.0, yaw: 0.0, pitch: 0.0, poolRadius: 0.0, dangerRadius: 0.0, armed: false, poolPulse: 0.0, poolSince: -1, modelScale: 1.0, modelZ: 0.0, burning: 0.0 };
 
+
+export const projectileModelScale = (radius: number, spec: Readonly<SpecialProjectile>): number => spec.modelRadius === undefined ? 1.0 : f32(radius / spec.modelRadius);
 
 export function projectedProjectile(fighter: Readonly<Fighter> | undefined, index: number, playing: boolean): Readonly<ProjectilePose> {
   const projectile = fighter?.projectiles[index];
@@ -54,7 +57,7 @@ export function projectedProjectile(fighter: Readonly<Fighter> | undefined, inde
     poolPulse: spec?.pool === undefined || projectile.poolHits === 0 ? 0.0
       : f32(Math.max(0.0, f32((projectile.poolWait - (spec.pool.every - 13)) / 12.0))),
     poolSince: spec?.pool === undefined ? -1 : projectile.poolHits > 0 ? spec.pool.every - 1 - projectile.poolWait : age - first,
-    modelScale: spec?.modelRadius === undefined ? 1.0 : f32(heroProjectileRadius(projectile, spec) / spec.modelRadius),
+    modelScale: spec === undefined ? 1.0 : projectileModelScale(heroProjectileRadius(projectile, spec), spec),
     modelZ: f32(projectile.z + (spec?.modelOffsetZ ?? 0.0)),
     burning: spec?.expiresInto === undefined || (spec.activeFrom ?? 0) < spec.life ? 0.0 : f32(age / spec.life),
     animationSequence: animation?.sequence,
