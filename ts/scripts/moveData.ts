@@ -8,7 +8,7 @@ import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { attackCapsule, emptyCapsule, hurtCapsule } from "../src/game/sim/geometry/contactGeometry";
 import { authoredTuning } from "../src/game/sim/tuning";
-import { attackLandingLag, attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames,
+import { aerialAutoCancel, attackLandingLag, attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames,
   isAerialAttack, isSmashAttack, SMASH_MAX_CHARGE_FRAMES, smashDamageMultiplier } from "../src/game/sim/moves";
 import { ordinaryHitKnockback, ordinaryHitstunFrames, ordinaryHitlagFrames, victimHitlagFrames } from "../src/game/sim/knockback";
 import { digitalShieldDamage, digitalShieldstunFrames, digitalShieldPushback, digitalShieldRecoil } from "../src/game/sim/shield";
@@ -65,6 +65,7 @@ export function observeLandingLag(character: Character, style: AttackStyle): num
   fighter.motion.z = 1;
   fighter.motion.vz = -2;
   fighter.attack.style = style;
+  fighter.attack.frame = attackStartupFrames(style, fighter.tuning.moves);
   fighter.attack.duration = attackDurationFramesForGrounding(style, false);
   fighter.attack.cooldown = fighter.attack.duration;
   const world = createRoster(1, [fighter]);
@@ -73,7 +74,7 @@ export function observeLandingLag(character: Character, style: AttackStyle): num
 }
 
 function emitMoves(): void {
-    rows.push(json({ kind: "context", schema: 1, roster: ["Rifleman", "Illidan"], units: "simulation world units; frames are zero-based attack ticks, excluding charge/hitlag pauses", derivedContext: { preHitPercent: 0, victimWeight: 100, contextScale: 1, shieldStrength: 1, crouching: false, di: "none; launch vector is authored before DI", simultaneousContacts: false }, motionContext: { stage: 0, x: 0, groundStartZ: 0, aerialStartZ: 700, initialVelocity: [0, 0], facing: 1, input: "neutral", contacts: false, chargeFrames: 0 }, conditions: { selection: "lowest contacting region index wins; body capsule intersection or shield intersection", rehit: "one hit per attacker/attack serial/window; a higher window permits another hit", smashCharge: "grounded held attack pauses before first active frame; endpoints exported", start: "beginFighterAttack enforces grounding and canStartAttackStyle; motion fixture starts idle", landing: "aerial landing cancels attack; no autocancel window represented" }, unknown: ["reference corpus mapping", "reachable punishments", "DI/contact/spacing dependent matchup outcomes", "animation-specific hurtboxes", "autocancel windows"], maxChargeFrames: SMASH_MAX_CHARGE_FRAMES }));
+    rows.push(json({ kind: "context", schema: 1, roster: ["Rifleman", "Illidan"], units: "simulation world units; frames are zero-based attack ticks, excluding charge/hitlag pauses", derivedContext: { preHitPercent: 0, victimWeight: 100, contextScale: 1, shieldStrength: 1, crouching: false, di: "none; launch vector is authored before DI", simultaneousContacts: false }, motionContext: { stage: 0, x: 0, groundStartZ: 0, aerialStartZ: 700, initialVelocity: [0, 0], facing: 1, input: "neutral", contacts: false, chargeFrames: 0 }, conditions: { selection: "lowest contacting region index wins; body capsule intersection or shield intersection", rehit: "one hit per attacker/attack serial/window; a higher window permits another hit", smashCharge: "grounded held attack pauses before first active frame; endpoints exported", start: "beginFighterAttack enforces grounding and canStartAttackStyle; motion fixture starts idle", landing: "aerial landing cancels attack; observedLandingLag lands on the first active frame; autocancelWindows is Melee's 1-based <before from>, landing outside it takes landingLag and inside it the empty landing lag" }, unknown: ["reference corpus mapping", "reachable punishments", "DI/contact/spacing dependent matchup outcomes", "animation-specific hurtboxes"], maxChargeFrames: SMASH_MAX_CHARGE_FRAMES }));
   for (const character of charList) for (const style of styleList) {
     if (!names[style]) continue;
 
@@ -88,7 +89,7 @@ function emitMoves(): void {
       const hurt = hurtCapsule(character);
       const move = { kind: "move", character, move: names[style], style, chargeFrames: charge, startup, active, recovery, totalUnpaused: total,
         landingLag: attackLandingLag(style, moves), observedLandingLag: observeLandingLag(character, style),
-        chargeDamageMultiplier: multiplier, hurtCapsule: hurt, autocancelWindows: null, animationHurtboxes: null };
+        chargeDamageMultiplier: multiplier, hurtCapsule: hurt, autocancelWindows: isAerialAttack(style) ? aerialAutoCancel(character, style, moves) : null, animationHurtboxes: null };
       rows.push(json(move));
       for (let frame = 0; frame < total; frame++) for (let region = 0; region < authoredHitRegionCount(style, moves); region++) {
         const hit = authoredHitRegion(emptyHitRegion(), character, style, frame, charge, region, moves);

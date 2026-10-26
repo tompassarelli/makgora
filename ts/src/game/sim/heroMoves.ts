@@ -52,6 +52,15 @@ export interface AuthoredMove {
   readonly fall?: readonly AuthoredFall[] | undefined;
 
   readonly landingHit?: AuthoredLandingHit | undefined;
+
+  readonly autoCancel?: AutoCancel | undefined;
+}
+
+
+/** Melee's `<before from>` in 1-based move frames: an aerial landing before `before` or from `from` takes only the empty landing lag. */
+export interface AutoCancel {
+  readonly before: number;
+  readonly from: number;
 }
 
 

@@ -120,9 +120,11 @@ const FALLING_KNIVES: AuthoredMove = {
     { first: 13, last: 13, strikes: SPIKING_KNIVES },
   ])),
   fall: [{ firstFrame: 6, lastFrame: 12, speedZ: -9.0 }],
+  autoCancel: { before: 5, from: 33 },
 };
 const GRAB_EFFECT = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
+/** Maiev is modelled on Fox (docs/design/maiev.md), so each aerial auto-cancels in Fox's window for the same aerial (references/melee-frame-data/fightcore.csv). */
 const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     ...WARDEN_GROUND.normals,
     [AttackStyle.forwardSmash]: heroMove(15, 3, 30, 0, cut(15, [64.0, 45.0, 26.0], L, wardenHit(9.159215927124023, "KILL", 40), wardenHit(12.212287902832031, "KILL", 40))),
@@ -143,8 +145,8 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
         blade(-18.0, 4.0, -f32(M - BLADE_RADIUS), 4.0),
       ], downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0))),
     ]),
-    [AttackStyle.neutralAir]: heroMove(5, 5, 18, 7, spin(5, 5, { ...wardenHit(6.106143951416016, "NUDGE", 45), sakurai: true })),
-    [AttackStyle.forwardAir]: heroMove(8, 3, 20, 12, [
+    [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, spin(5, 5, { ...wardenHit(6.106143951416016, "NUDGE", 45), sakurai: true })), autoCancel: { before: 4, from: 36 } },
+    [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, [
       heroRegion(8, 8, blade(37.662445068359375, 146.75, 58.328670501708984, 135.1438751220703), FORWARD_AIR),
       heroRegion(8, 8, blade(58.328670501708984, 135.1438751220703, 76.17012023925781, 114.24028778076172), FORWARD_AIR),
       heroRegion(8, 8, blade(76.17012023925781, 114.24028778076172, 87.3436279296875, 88.04920959472656), FORWARD_AIR),
@@ -154,19 +156,19 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       heroRegion(9, 9, blade(56.640132904052734, 7.324544906616211, 27.074600219726562, -6.831627368927002), FORWARD_AIR),
       heroRegion(9, 9, blade(27.074600219726562, -6.831627368927002, 0.05732898414134979, -8.744290351867676), FORWARD_AIR),
       heroRegion(10, 10, blade(0.05732898414134979, -8.744290351867676, 0.05732898414134979, -8.744290351867676), FORWARD_AIR),
-    ]),
+    ]), autoCancel: { before: 6, from: 48 } },
 
-    [AttackStyle.backAir]: heroMove(7, 3, 22, 12, [
+    [AttackStyle.backAir]: { ...heroMove(7, 3, 22, 12, [
       ...cut(7, [54.0, 45.0, 36.0], M, BACK_AIR, undefined, -1.0),
       heroRegion(7, 9, blade(-8.0, 42.0, -16.0, 38.0, 8.0), BACK_AIR),
-    ]),
+    ]), autoCancel: { before: 4, from: 22 } },
 
 
-    [AttackStyle.upAir]: heroMove(5, 9, 15, 9, multiHit([
+    [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 9, multiHit([
       { first: 5, last: 6, strikes: SKY_LIFT },
       { first: 8, last: 9, strikes: SKY_LIFT },
       { first: 11, last: 13, strikes: [[blade(0.0, 48.0, 0.0, f32(M - BLADE_RADIUS), 10.0), wardenHit(3.8163399696350098, "CHASE", 90, 1.0, HitElement.normal)]] },
-    ])),
+    ])), autoCancel: { before: 8, from: 25 } },
     [AttackStyle.downAir]: FALLING_KNIVES,
     [AttackStyle.grab]: heroMove(6, 2, 23, 0, [heroRegion(6, 7,
       blade(16.0, 45.0, f32(GRAB - 10.0), 45.0, 10.0), GRAB_EFFECT)]),

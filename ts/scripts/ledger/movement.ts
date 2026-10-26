@@ -1,20 +1,24 @@
 import { resolve } from "node:path";
 import { CHARACTER_ATTRIBUTES_URL, readCharacterAttributes } from "../../../references/melee-frame-data/character-attributes";
+import { FIGHTCORE_URL, readFightCore } from "../../../references/melee-frame-data/fightcore";
 import { Action } from "../../src/game/input/actions";
 import { fighter, frame, solo } from "../../src/game/match/padScene";
 import { normalAttackStyle } from "../../src/game/input/combat";
+import { beginFighterAttack } from "../../src/game/sim/attacks";
 import { AttackStyle, Character, SpecialAction } from "../../src/game/sim/codes";
 import {
   AIR_DODGE_INTANGIBLE_END, AIR_DODGE_INTANGIBLE_START, GROUND_ROLL_FRAMES, GROUND_ROLL_INTANGIBLE_END, GROUND_ROLL_INTANGIBLE_START,
   SPOT_DODGE_FRAMES, SPOT_DODGE_INTANGIBLE_END, SPOT_DODGE_INTANGIBLE_START,
 } from "../../src/game/sim/conditions";
 import { AIR_DODGE_LANDING_LAG, EMPTY_LANDING_LAG } from "../../src/game/sim/down";
+import { createFighter } from "../../src/game/sim/fighter";
 import { groundState, restingTraction } from "../../src/game/sim/groundMovement";
 import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY } from "../../src/game/sim/jumpsAndDodges";
 import { LEDGE_HANG_LIMIT_FRAMES, LEDGE_INTANGIBLE_DECAY, ledgeIntangibleFrames, ledgeSnap } from "../../src/game/sim/ledge";
 import { attackLandingLag, uncancelledLandingLag } from "../../src/game/sim/moves";
 import { TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X } from "../../src/game/sim/stick";
 import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, GroundState, STICK_DEADZONE, STICK_SMASH_DEADZONE, TAP_JUMP_STICK_THRESHOLD, WALK_MIDDLE_STICK_THRESHOLD } from "../../src/game/sim/stickZones";
+import { duelPair, lift, stepDuel } from "../../src/game/sim/testDuel";
 import { LEDGE_REGRAB_FRAMES } from "../../src/game/sim/transitions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
 
@@ -57,6 +61,38 @@ function landingLagCancel(): string {
   return differs === undefined ? ALWAYS_CANCELLED : `aerial style ${differs} lands with ${attackLandingLag(differs)} of ${uncancelledLandingLag(differs)}`;
 }
 
+const FOX_UP_AIR_AUTO_CANCEL = readFightCore(resolve(import.meta.dir, "../../..")).find((row) => row.character === "Fox" && row.section === "Air" && row.move === "Up Air")?.autocancel;
+
+function foxUpAirWindow(): { before: number; from: number } {
+  if (FOX_UP_AIR_AUTO_CANCEL === undefined || FOX_UP_AIR_AUTO_CANCEL === null) throw new Error("fightcore.csv has no autocancel for Fox's up air");
+  return FOX_UP_AIR_AUTO_CANCEL;
+}
+
+const autoCancelText = ({ before, from }: { before: number; from: number }): string =>
+  `Fox's up air <${before} ${from}>: landing on frames ${before - 1} and ${from} takes the normal landing lag, on frames ${before} and ${from - 1} its own`;
+
+function upAirLandingLag(landingFrame: number): number {
+  const { world, owner } = duelPair(createFighter(Character.warden, 0.0, 1), createFighter(Character.rifleman, -500.0, 1));
+  lift(owner, 600.0);
+  beginFighterAttack(world, 0, AttackStyle.upAir, false);
+  for (let frame = 2; frame < landingFrame; frame++) stepDuel(world);
+  owner.motion.z = 0.5;
+  owner.motion.vz = -3.0;
+  stepDuel(world);
+  if (!owner.motion.grounded) throw new Error("the auto-cancel probe did not land");
+  return owner.landing.lag;
+}
+
+function aerialAutoCancel(): string {
+  const window = foxUpAirWindow();
+  const own = attackLandingLag(AttackStyle.upAir, createFighter(Character.warden, 0.0, 1).tuning.moves);
+  const frames = [window.before - 1, window.before, window.from - 1, window.from];
+  const lags = frames.map(upAirLandingLag);
+  const expected = [EMPTY_LANDING_LAG, own, own, EMPTY_LANDING_LAG];
+  if (lags.every((lag, n) => lag === expected[n])) return autoCancelText(window);
+  return `Maiev's up air: ${frames.map((frame, n) => `frame ${frame} lands with ${lags[n] ?? 0}`).join(", ")}`;
+}
+
 function tractionAboveWalk(): string {
   const f = fighter(solo(0, Character.rifleman));
   const walk = f.tuning.physics.walkSpeed;
@@ -92,10 +128,9 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     status: { kind: "deviation", reason: "an input chore on every aerial with no decision in it", decided: "2026-10-06", issue: 54, elsewhere: "Removed from Brawl onward, with more autocancel; kept in Project M and Project+ ([SmashWiki](https://www.ssbwiki.com/L-cancel))" },
   },
   {
-    id: "aerial-auto-cancel", family: "movement", name: "Aerial auto-cancel windows",
-    melee: { value: "per aerial: landing before or after its window takes normal landing lag", source: wiki("Auto-cancel") }, ours: () => "none",
-    anchor: { file: `${SIM}/moves.ts`, symbol: "attackLandingLag" },
-    status: { kind: "open", reason: "missing: every aerial takes its landing lag whatever the frame", issue: 293 },
+    id: "aerial-auto-cancel", family: "movement", name: "Aerial auto-cancel windows, probed headless on Maiev's up air, modelled on Fox's",
+    melee: { value: autoCancelText(foxUpAirWindow()), source: FIGHTCORE_URL }, ours: aerialAutoCancel,
+    anchor: { file: `${SIM}/moves.ts`, symbol: "landsInAutoCancel" }, status: PARITY,
   },
   {
     id: "edge-cancel", family: "movement", name: "Edge cancel",

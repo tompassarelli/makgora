@@ -92,10 +92,12 @@ function normalOf(move: FoxMove): AuthoredMove {
   const { firstActive, lastActive } = move.hitboxes;
   const frames = move.frames;
   const first = firstActive.value, last = lastActive.value, total = frames?.["total"]?.value, iasa = frames?.["iasa"]?.value ?? null;
+  const before = frames?.["auto_cancel_s"]?.value ?? null, from = frames?.["auto_cancel_e"]?.value ?? null;
   if (first === null || last === null || total === undefined || total === null) throw new Error(`${move.id}: no active or total frames`);
   const authored: AuthoredMove = {
     startupFrames: first - 1, activeFrames: last - first + 1, totalFrames: iasa === null ? total : iasa - 1,
     landingLag: frames?.["cancel_lag"]?.value ?? 0, regions: move.id === "grab" ? [] : regionsOf(move),
+    autoCancel: before === null || from === null ? undefined : { before, from },
   };
   return move.id === "jab1" ? jabStep(authored) : authored;
 }
@@ -160,7 +162,7 @@ export function foxFighterGaps(fixture: FoxFixture): string[] {
     `not loaded: ${fixture.moves.filter((move) => !loaded.includes(move)).map((move) => move.id).join(", ")} (no specials but the reflector, no rapid jab)`,
     "reflector: held for its shortest length only, centred on the reference capsule's midpoint because the corpus gives no bone position, with no reflection",
     "launch direction: a hitbox behind Fox's origin sends backward, where Melee picks the side by the victim's position",
-    "aerial auto-cancel windows: not modelled; every aerial landing takes records.jsonl's L-cancelled lag",
+    "aerial landing lag: outside records.jsonl's auto-cancel window every aerial landing takes its L-cancelled lag",
   ];
 }
 

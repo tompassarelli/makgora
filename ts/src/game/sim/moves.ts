@@ -5,7 +5,7 @@ import { toInt } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { AttackStyle, Character, GrabAction } from "./codes";
-import type { AuthoredFall, FighterMoves } from "./heroMoves";
+import type { AuthoredFall, AutoCancel, FighterMoves } from "./heroMoves";
 
 export const SMASH_MAX_CHARGE_FRAMES = 60;
 export const SMASH_MAX_DAMAGE_MULTIPLIER = 1.3671000003814697;
@@ -128,6 +128,23 @@ export function attackLandingLag(style: AttackStyle | undefined, moves?: Fighter
   if (style !== undefined && moves?.normals[style] !== undefined) return moves.normals[style].landingLag;
   const lag = uncancelledLandingLag(style);
   return lag > 0 ? max(1, idiv(lag, 2)) : 0;
+}
+
+/** The median over Melee's 130 aerials in fightcore.csv of the late auto-cancel frame less the last active frame. */
+export const AUTO_CANCEL_FRAMES_AFTER_ACTIVE = 9;
+
+/** Melee's `<before from>` in 1-based move frames: the default opens before the first active frame and from the median gap after the last. */
+export function aerialAutoCancel(character: Character, style: AttackStyle, moves?: FighterMoves): Readonly<AutoCancel> {
+  const authored = moves?.normals[style]?.autoCancel;
+  if (authored !== undefined) return authored;
+  const startup = attackStartupFrames(style, moves);
+  return { before: startup + 1, from: startup + characterAttackActiveFrames(character, style, moves) + AUTO_CANCEL_FRAMES_AFTER_ACTIVE };
+}
+
+export function landsInAutoCancel(character: Character, style: AttackStyle | undefined, frame: number, moves?: FighterMoves): boolean {
+  if (style === undefined || !isAerialAttack(style)) return false;
+  const { before, from } = aerialAutoCancel(character, style, moves);
+  return frame + 1 < before || frame + 1 >= from;
 }
 
 export function attackDamage(style: AttackStyle): number {
