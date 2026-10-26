@@ -335,6 +335,13 @@ Crash:
   of Knives' knife capsule (0.7 fighter heights out, 0.3 radius, centred 48
   up) grown by a reference body, since Immolate tests the foe's feet and Fan
   of Knives tested its hurtbox.
+- He turns around in it, on the ground or in the air, the way Falco turns
+  around in a held shine (#513, Tom's 26 Oct direction): holding the stick
+  away from his facing on the press frame starts it facing the other way,
+  and pressing the stick the other way on any later frame flips him for the
+  rest of the move without restarting it, so the jump cancel comes out
+  facing the new way. Only facing flips: the flames strike both sides alike,
+  and every frame and timing is unchanged.
 
 Counterplay: he hangs in place for 15 frames unless he jumps out, so a
 fighter outside the flames punishes the stall; offstage the jump cancel

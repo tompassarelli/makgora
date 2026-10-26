@@ -87,7 +87,7 @@ const fanRing = (effect: Parameters<typeof heroRegion>[3]): readonly MoveRegion[
   heroRegion(4, 7, { ...FAN_KNIVES, x1: -FAN_KNIVES.x2, x2: -FAN_KNIVES.x1 }, { ...effect, launchX: -effect.launchX }),
 ];
 const FAN_OF_KNIVES: AuthoredSpecial = {
-  endFrame: FAN_FRAMES, regions: fanRing(FAN_GROUND_HIT), strikeStatus: POISON, jumpCancelFrame: FAN_JUMP_CANCEL,
+  endFrame: FAN_FRAMES, regions: fanRing(FAN_GROUND_HIT), strikeStatus: POISON, jumpCancelFrame: FAN_JUMP_CANCEL, facesStick: true, turnsAround: true,
 };
 const FAN_OF_KNIVES_AIR: AuthoredSpecial = {
   ...FAN_OF_KNIVES, regions: fanRing(FAN_AIR_HIT),
@@ -98,5 +98,5 @@ export const WARDEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target.", ground: SHADOW_STRIKE }, { damage: 1.25 }),
   side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a Pursuit Lunge that cuts through them and turns to face them. Either hit stuns in place for a grab or Fan of Knives; a second stun within two seconds only knocks them away.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { damage: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
-  down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, marking and poisoning them; on the ground it pushes them away along a low angle with the same knockback at every percent, never knocking them down, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),
+  down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, marking and poisoning them; on the ground it pushes them away along a low angle with the same knockback at every percent, never knocking them down, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),
 };

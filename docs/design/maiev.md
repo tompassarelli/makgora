@@ -105,6 +105,13 @@ What she keeps, so she does not become Fox in a costume:
   it sits near shine and must stay apart from it: it reflects nothing, it
   never downs, and it must not loop; down special into down special stays
   below true.
+- Fan of Knives turnaround (#513, Tom's 26 Oct direction): she turns around
+  in it the way Fox turns around in a held shine. Holding the stick away from
+  her facing on the press frame starts it facing the other way; pressing the
+  stick the other way on any later frame, on the ground or in the air, flips
+  her for the rest of the move without restarting it, and the jump cancel
+  comes out facing the new way. Only facing flips: the ring strikes both
+  sides alike, and every frame and timing is unchanged.
 
 What she must not mirror: Fox's shine loop or waveshine, his laser, and his
 Fire Fox recovery.

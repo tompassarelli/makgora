@@ -355,6 +355,8 @@ export interface AuthoredSpecial {
 
   readonly jumpWindow?: FrameWindow | undefined;
 
+  readonly turnsAround?: true | undefined;
+
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
 }

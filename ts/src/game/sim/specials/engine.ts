@@ -927,6 +927,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
   if (holdAim(f, move, input, stage, matchFrame)) return;
+  if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
@@ -1312,6 +1313,11 @@ export function enterUltimate(f: Fighter, input: Readonly<Controls>): AuthoredSp
   special.seekTarget = 0;
   applyWindows(f, move, 0);
   return move;
+}
+
+
+export function faceHeldStick(f: Fighter, input: Readonly<Controls> | undefined): void {
+  if (input !== undefined && input.direction !== 0) f.facing = input.direction < 0 ? -1 : 1;
 }
 
 

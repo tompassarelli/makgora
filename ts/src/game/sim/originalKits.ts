@@ -50,7 +50,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
         forms: [{ form: DEMONHUNTER_BACKFLIP_FORM, name: "Backflip" }, { form: DEMONHUNTER_DIVE_FORM, name: "Wing Dive" }],
       },
       {
-        action: SpecialAction.demonHunterImmolate, name: "Immolate", description: "A frame-one burst of flame around him that pops foes upward and burns their mana; jump out of it from frame 4, and in the air it holds him in place.",
+        action: SpecialAction.demonHunterImmolate, name: "Immolate", description: "A frame-one burst of flame around him that pops foes upward and burns their mana; jump out of it from frame 4, and in the air it holds him in place. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.",
       },
     ],
     jab: { name: "Warglaive Flurry", description: "Three quick glaive cuts on repeated jabs; the third launches." },

@@ -30,7 +30,7 @@ import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
-import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
+import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
@@ -503,6 +503,7 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     return true;
   }
   if (action === SpecialAction.demonHunterImmolate) {
+    if (moveX !== 0) owner.facing = moveX < 0 ? -1 : 1;
     startSpecialAction(owner, action, DEMONHUNTER_IMMOLATE_DURATION, moveX);
     special.cooldowns[action] = 24;
     special.hit = false;
@@ -724,7 +725,10 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   }
   if (special.action === SpecialAction.demonHunterWingAscent && special.form !== 0) advanceWingDive(owner);
   if (special.action === SpecialAction.demonHunterFelRush) advanceFelRush(owner);
-  if (special.action === SpecialAction.demonHunterImmolate) stallImmolate(owner);
+  if (special.action === SpecialAction.demonHunterImmolate) {
+    faceHeldStick(owner, input);
+    stallImmolate(owner);
+  }
   if (special.action === SpecialAction.demonHunterWingAscent && special.form === 0) advanceWingAscent(owner, input);
   if (special.action === SpecialAction.riflemanBear && special.frame >= RIFLEMAN_BEAR_SUMMON_FRAMES) endSpecialAction(owner, false);
   if (special.action === SpecialAction.riflemanRecovery && special.frame >= RIFLEMAN_RECOVERY_FRAMES) endSpecialAction(owner, true);
