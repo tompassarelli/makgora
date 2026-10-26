@@ -1,5 +1,5 @@
 import { type Capsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
-import type { Fighter } from "../sim/fighter";
+import { type Fighter, placedObject } from "../sim/fighter";
 import type { MatchCamera } from "../sim/matchCamera";
 import { heroRegionOrigin, runningHeroSpecial } from "../sim/heroSpecialRules";
 import { cameraPoint } from "./arenaCamera";
@@ -35,7 +35,7 @@ export function hurtBounds(f: Readonly<Fighter>, into: WorldBounds): WorldBounds
   return into;
 }
 
-export function strikeBounds(f: Readonly<Fighter>, into: WorldBounds): WorldBounds {
+export function effectBounds(f: Readonly<Fighter>, into: WorldBounds): WorldBounds {
   collectHitAreas(f, areas);
   for (let index = 0; index < areas.count; index++) {
     const area = areas.areas[index];
@@ -53,6 +53,12 @@ export function strikeBounds(f: Readonly<Fighter>, into: WorldBounds): WorldBoun
   for (const projectile of f.projectiles) {
     if (projectile.life <= 0) continue;
     widenCapsule(into, { x1: projectile.x, z1: projectile.z, x2: projectile.x + projectile.velocityX, z2: projectile.z + projectile.velocityZ, radius: projectile.spec?.radius ?? 24.0 });
+  }
+  for (let animal = 0; animal <= f.pack.length; animal++) {
+    const placed = placedObject(f, animal);
+    const spec = placed.spec;
+    if (placed.life <= 0 || spec === undefined) continue;
+    widen(into, placed.x - spec.radius, placed.x + spec.radius, placed.z, placed.z + Math.max(spec.height, spec.model?.height ?? 0.0));
   }
   return into;
 }

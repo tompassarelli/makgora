@@ -16,7 +16,7 @@ import { applyDeveloperCommand } from "./shell/keys";
 import { bareFighter } from "./shell/fighterCloak";
 import { paintDrawnStamp } from "./shell/drawnStamp";
 import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../runtime/gameFiles";
-import { emptyBounds, hurtBounds, screenBox, strikeBounds, type PixelBox } from "../game/presentation/screenBoxes";
+import { emptyBounds, hurtBounds, screenBox, effectBounds, type PixelBox } from "../game/presentation/screenBoxes";
 import { fighterAt, isActive } from "../game/sim/roster";
 import type { ShellState } from "./shell/state";
 
@@ -59,7 +59,7 @@ function recordScreenBoxes(s: ShellState, fixture: CaptureFixture, slot: 0 | 1, 
   const width = BlzGetLocalClientWidth();
   const height = BlzGetLocalClientHeight();
   const aspect = height > 0 ? I2R(width) / I2R(height) : 16.0 / 9.0;
-  const region = screenBox(s.camera, aspect, width, height, strikeBounds(fighter, hurtBounds(fighter, emptyBounds())));
+  const region = screenBox(s.camera, aspect, width, height, effectBounds(fighter, hurtBounds(fighter, emptyBounds())));
   const body = screenBox(s.camera, aspect, width, height, hurtBounds(fighter, emptyBounds()));
   screenLines.push(`SCREEN ${fixture.name} ${frame} ${width} ${height} ${boxText(region)} ${boxText(body)}`);
   writeLines(CAPTURE_SCREEN_FILE, screenLines);

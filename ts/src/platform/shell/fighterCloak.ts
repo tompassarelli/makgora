@@ -39,6 +39,7 @@ function cueEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   renderers.cues?.drawnEffects(drawn);
   renderers.projectiles.drawnEffects(drawn);
   s.ui?.special.slotEffects(slot, drawn);
+  s.ui?.placed.slotEffects(slot, drawn);
   return drawn;
 }
 
@@ -57,10 +58,13 @@ function concealCues(s: ShellState, slot: ParticipantSlot): void {
   }
 }
 
-function revealCues(slot: ParticipantSlot): void {
+function revealCues(s: ShellState, slot: ParticipantSlot): void {
   const concealed = concealedCues[slot];
   if (concealed === undefined) return;
-  concealed.models.forEach((model, index) => BlzSetSpecialEffectScale(model, concealed.scales[index] ?? 1.0));
+  for (const model of cueEffects(s, slot)) {
+    const index = concealed.models.indexOf(model);
+    if (index >= 0) BlzSetSpecialEffectScale(model, concealed.scales[index] ?? 1.0);
+  }
   concealed.models.length = 0;
   concealed.scales.length = 0;
 }
@@ -101,7 +105,7 @@ export function hideCues(s: ShellState, slot: ParticipantSlot, hidden: boolean):
   const was = s.hiddenFighters[slot];
   s.hiddenFighters[slot] = cloaked(was, { cues: hidden }, was?.unitShown ?? !IsUnitHidden(body.unit));
   if (hidden) concealFighter(s, slot);
-  else revealCues(slot);
+  else revealCues(s, slot);
   return true;
 }
 
@@ -138,6 +142,6 @@ export function bareFighter(s: ShellState, slot: ParticipantSlot, bare: boolean)
 export function clearCloaks(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     s.hiddenFighters[slot] = undefined;
-    revealCues(slot);
+    revealCues(s, slot);
   }
 }
