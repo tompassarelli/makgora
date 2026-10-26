@@ -26,6 +26,15 @@ type Capsule = { name: string; a: NonNullable<ReturnType<typeof nodeNamed>>; b: 
 function nodeNamed(model: ReturnType<typeof parseSource>, name: string) {
   return model.Nodes.find(node => node?.Name === name);
 }
+function descendsFrom(model: ReturnType<typeof parseSource>, node: NonNullable<ReturnType<typeof nodeNamed>>, ancestor: NonNullable<ReturnType<typeof nodeNamed>>): boolean {
+  for (let current = node; current.Parent !== undefined && current.Parent >= 0;) {
+    const parent = model.Nodes.find(candidate => candidate?.ObjectId === current.Parent);
+    if (parent === undefined) return false;
+    if (parent === ancestor) return true;
+    current = parent;
+  }
+  return false;
+}
 function point(value: ArrayLike<number>): Point { return [value[0]!, value[1]!, value[2]!]; }
 function transform(value: ArrayLike<number>, matrix: ArrayLike<number>): Point {
   return point(vec3.transformMat4(vec3.create(), value as vec3, matrix as mat4));
@@ -119,10 +128,11 @@ for (const [character, rig] of FIGHTER_RIGS) {
       const geoset = rig.weaponGeosets?.[joint], mesh = geoset === undefined ? undefined : geosetMesh(model, geoset);
       if (geoset !== undefined && mesh === undefined) { unavailable.push(`${fighter.name}/${look}/${joint}: geoset ${geoset} is not skinned to one bone`); continue; }
       const weapon = mesh?.node ?? (weaponName === undefined ? undefined : nodeNamed(model, weaponName));
-      const hand = handJoints.map(handJoint => {
+      const hands = handJoints.map(handJoint => {
         const name = bodyNode(rig, handJoint);
         return name === undefined ? undefined : nodeNamed(model, name);
-      }).filter((node): node is NonNullable<typeof node> => node !== undefined).sort((a, b) => distance(nodePosition(model, data, a, scale), nodePosition(model, data, weapon!, scale)) - distance(nodePosition(model, data, b, scale), nodePosition(model, data, weapon!, scale)))[0];
+      }).filter((node): node is NonNullable<typeof node> => node !== undefined);
+      const hand = weapon === undefined ? undefined : hands.find(node => descendsFrom(model, weapon, node)) ?? hands.sort((a, b) => distance(nodePosition(model, data, a, scale), nodePosition(model, data, weapon, scale)) - distance(nodePosition(model, data, b, scale), nodePosition(model, data, weapon, scale)))[0];
       if (weapon === undefined || hand === undefined) { unavailable.push(`${fighter.name}/${look}/${joint}: missing weapon or wrist node`); continue; }
       const inverse = mat4.invert(mat4.create(), data.nodes[weapon.ObjectId]!.matrix);
       if (inverse === null) { unavailable.push(`${fighter.name}/${look}/${joint}: singular weapon matrix`); continue; }
