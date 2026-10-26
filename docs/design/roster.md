@@ -1,5 +1,7 @@
 # Smashcraft roster
 
+> **Frozen (26 October 2026):** Kobold and Forsaken Paladin are frozen pending replacement. No issue, audit, design change or worker task is opened for either until Tom permits it; `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, lists them.
+
 Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 26 fighters, Melee’s size, until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343), and [Kobold (#344)](https://github.com/tompassarelli/smashcraft/issues/344). No further additions are planned.
 
 We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.
@@ -112,6 +114,8 @@ requested by Tom on 8 October 2026, is a small, light rushdown; his kit,
 body and gameplan are in [murloc.md](murloc.md).
 
 ## Kobold — You no take candle! (#344)
+
+> Frozen pending replacement; no work until Tom permits it.
 
 A tiny, frantic candle-hoarder who wins scraps with a mining pick, then scurries
 away clutching his light. He is comedy through movement: anxious tiptoe runs,
@@ -897,6 +901,8 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 
 ## Forsaken Paladin
+
+> Frozen pending replacement; no work until Tom permits it.
 
 **Identity:** a Forsaken Paladin with his stock sword, a short slowing
 charge and a small holy patch that contests grounded landings. His slow feet
