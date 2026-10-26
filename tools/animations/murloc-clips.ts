@@ -32,9 +32,11 @@ const slug = fighterName.toLowerCase();
 const kitMoves = kobold ? KOBOLD_MOVES : MURLOC_MOVES;
 const kitSpecials = kobold ? KOBOLD_SPECIALS : MURLOC_SPECIALS;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const replaced = process.argv.slice(4).filter(arg => !arg.startsWith("--")), inPlace = replaced.length > 0, painOnly = replaced.includes("pain");
+const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
+const rigOutput = option("--rig"), bakedKeys = option("--keys");
+const replaced = process.argv.slice(4).filter((arg, i, all) => !arg.startsWith("--") && !["--rig", "--keys"].includes(all[i - 1]!)), inPlace = replaced.length > 0, painOnly = replaced.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [POSE...] [--kobold]");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || (replaced.length === 1 && !painOnly)), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [POSE...] [--kobold] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), model = structuredClone(source);
 ensure((inPlace || source.Sequences.length === 9) && source.Helpers.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Murloc Tiderunner");
@@ -175,6 +177,35 @@ function joint(name: string, g: Gesture): [number, number] {
   return [0, 0];
 }
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
+const skeleton = (["Bones", "Helpers"] as const).flatMap(kind => source[kind].map((node, i) => ({ node, path: `.${kind}.${i}` })));
+const restKey = (path: string) => { const track = originals.get(path); return track && !globalClock(track) ? track.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])?.Vector : undefined; };
+if (rigOutput) {
+  const action = actions.find(a => a.pose === replaced[0]); ensure(action, `${replaced[0]}: not an authored ${fighterName} pose`);
+  const style = normals.find(normal => normal[0] === action.pose)?.[1], move = style === undefined ? undefined : kitMoves.normals[style];
+  const at = (path: string) => { const v = restKey(path); return v ? Array.from(v) : null; };
+  const spearNodes = new Set(source.Nodes.flatMap(node => node && ["Hand1", "Blade"].includes(node.Name) ? [node.ObjectId] : []));
+  const spear = source.Geosets.flatMap(geoset => Array.from({ length: geoset.Vertices.length / 3 }, (_, v) => v).filter(v =>
+    (geoset.SkinWeights ? Array.from(geoset.SkinWeights.subarray(v * 8, v * 8 + 4)) : geoset.Groups[geoset.VertexGroup[v] ?? 0] ?? []).some(node => spearNodes.has(node)))
+    .map(v => Array.from(geoset.Vertices.subarray(v * 3, v * 3 + 3))));
+  const span = spear.flatMap(a => spear.map(b => [a, b] as const)).reduce((best, pair) => Math.hypot(...pair[0].map((x, i) => x - pair[1][i]!)) > Math.hypot(...best[0].map((x, i) => x - best[1][i]!)) ? pair : best);
+  const bladePivot = source.PivotPoints[source.Nodes.find(node => node?.Name === "Blade")!.ObjectId]!;
+  const [butt, blade] = Math.hypot(...span[0].map((x, i) => x - bladePivot[i]!)) > Math.hypot(...span[1].map((x, i) => x - bladePivot[i]!)) ? [span[1], span[0]] : span;
+  await Bun.write(rigOutput, JSON.stringify({ frames: action.frames, contact: action.contact, active: move?.activeFrames ?? 1, blade: blade.map((x, i) => x - butt[i]!),
+    nodes: skeleton.map(({ node, path }) => ({ name: node.Name, parent: skeleton.findIndex(s => s.node.ObjectId === node.Parent), pivot: Array.from(source.PivotPoints[node.ObjectId]!), rotation: at(`${path}.Rotation`), translation: at(`${path}.Translation`) })) }));
+  console.log(`MURLOC_RIG ${action.pose} ${rigOutput}`); process.exit(0);
+}
+const baked = bakedKeys ? await Bun.file(bakedKeys).json() as { frames: number; nodes: { rotation: number[][]; translation: number[][] }[] } : undefined;
+if (baked) {
+  const action = actions.find(a => a.pose === replaced[0]); ensure(action, `${replaced[0]}: not an authored ${fighterName} pose`);
+  ensure(baked.frames === action.frames && baked.nodes.length === skeleton.length, `${action.pose}: Blender keys cover ${baked.frames} frames of ${baked.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
+  action.keys = Array.from({ length: action.frames + 1 }, (_, frame) => ({ frame, g: {} }));
+}
+const bakedVector = (path: string, frame: number) => {
+  const [, kind, index, channel] = /^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation)$/.exec(path) ?? [];
+  if (!baked || !kind) return undefined;
+  const node = skeleton.findIndex(s => s.path === `.${kind}.${index}`);
+  return Float32Array.from(baked.nodes[node]![channel === "Rotation" ? "rotation" : "translation"][frame]!);
+};
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const feet = (drawn: DrawnModel, sequence: number, seconds: number) => {
@@ -213,7 +244,9 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     for (const frame of phaseFrames) {
       let Vector = first.Vector.slice();
       const keyed = action.keys?.find(key => key.frame === frame)?.g;
-      if (keyed) {
+      const authored = action.keys ? bakedVector(path, frame) : undefined;
+      if (authored) Vector = authored;
+      else if (keyed) {
         if (node) { const [y, z] = joint(node.Name, keyed); Vector = rotated(first.Vector, y, z); }
         else if (rootTranslation) { Vector[0] = Vector[0]! + (keyed.tx ?? 0); Vector[2] = Vector[2]! + (keyed.tz ?? 0); }
       } else if (node) { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
