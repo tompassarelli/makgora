@@ -637,5 +637,5 @@ export function renderUi(s: ShellState): void {
     }
   }
   ui.stage.update(game);
-  layerChat(selecting);
+  layerChat(s.frames, selecting);
 }
