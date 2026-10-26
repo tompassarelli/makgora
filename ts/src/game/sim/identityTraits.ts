@@ -5,16 +5,13 @@
 import { Character, ContactKind, SpecialAction } from "./codes";
 import type { Fighter } from "./fighter";
 
-/** status: an applied hero status (chill, poison, silence, banish, stun...); heal: the move lowers its owner's damage; mana: drains or steals meter; spell: amplified on a Banished target. */
-export type Trait = "status" | "heal" | "mana" | "spell";
-export const TRAITS: readonly Trait[] = ["status", "heal", "mana", "spell"];
+/** status: an applied hero status (chill, poison, silence, banish, stun...); heal: the move lowers its owner's damage; mana: drains or steals meter. */
+export type Trait = "status" | "heal" | "mana";
+export const TRAITS: readonly Trait[] = ["status", "heal", "mana"];
 export type TraitSet = Readonly<Partial<Record<Trait, true>>>;
 
 export type TraitMove = "neutral" | "side" | "up" | "down" | "ultimate";
-export const TRAIT_MOVES: readonly TraitMove[] = ["neutral", "side", "up", "down", "ultimate"];
 export type IdentityTraits = Readonly<Partial<Record<TraitMove, TraitSet>>>;
-
-const SPELL: TraitSet = { spell: true };
 
 /** Each fighter's traits by special. A move absent here carries no trait; ordinary moves are never here. */
 export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
@@ -37,7 +34,7 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.chen]: { side: { status: true } },
   [Character.peon]: {},
   [Character.tinker]: {},
-  [Character.kaelthas]: { neutral: SPELL, side: { mana: true, spell: true }, up: SPELL, down: { status: true, spell: true }, ultimate: SPELL },
+  [Character.kaelthas]: { side: { mana: true }, down: { status: true } },
   [Character.murloc]: { neutral: { status: true }, down: { status: true } },
   [Character.grom]: {},
   [Character.anubarak]: {},
@@ -70,18 +67,16 @@ export function currentTraits(f: Readonly<Fighter>): TraitSet {
 }
 
 // A projectile, summon or placement exists only because a special spawned it, and
-// its own spec carries that special's status, mana and heal; the fighter's spell
-// trait follows whichever of its specials spawned it.
-const SPAWNED_TRAITS: { [character: number]: TraitSet } = {};
-for (const key in IDENTITY_TRAITS) {
-  const character = Number(key) as Character;
-  const spawned: Partial<Record<Trait, true>> = { status: true, heal: true, mana: true };
-  for (const move of TRAIT_MOVES) if (moveTraits(character, move).spell === true) spawned.spell = true;
-  SPAWNED_TRAITS[character] = spawned;
+// its own spec carries that special's status, mana and heal.
+const SPAWNED_TRAITS: TraitSet = { status: true, heal: true, mana: true };
+
+/** The traits a contact may carry: the source's current move for its own body, grabs and throws; otherwise those its spawned object's spec carries. */
+export function contactTraits(source: Readonly<Fighter>, kind: ContactKind, direct: boolean): TraitSet {
+  if (direct || kind === ContactKind.throw || kind === ContactKind.pummel) return currentTraits(source);
+  return SPAWNED_TRAITS;
 }
 
-/** The traits a contact may carry: the source's current move for its own body, grabs and throws; otherwise those of the fighter whose special spawned the object, which a reflection does not change. */
-export function contactTraits(source: Readonly<Fighter>, kind: ContactKind, direct: boolean, family = source.character): TraitSet {
-  if (direct || kind === ContactKind.throw || kind === ContactKind.pummel) return currentTraits(source);
-  return SPAWNED_TRAITS[family] ?? NO_TRAITS;
+export function contactIsSpell(source: Readonly<Fighter>, kind: ContactKind, direct: boolean): boolean {
+  if (kind === ContactKind.pummel || (kind === ContactKind.throw && !direct)) return false;
+  return !direct || traitMove(source.special.action) !== undefined;
 }

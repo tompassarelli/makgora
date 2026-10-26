@@ -5,7 +5,7 @@ import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFlo
 import { Character, ContactKind, DownState, HeroStatusKind, STUN_REPEAT_FRAMES } from "./codes";
 import { f32 } from "wisp/src/sim/f32";
 
-/** A Banished fighter takes this much more damage from Kael's spells. */
+/** A Banished fighter takes this much more damage from any fighter's spells. */
 export const BANISH_SPELL_DAMAGE = f32(1.3);
 import { isDownDamageState } from "./conditions";
 import { DOWN_DAMAGE_RESET_THRESHOLD } from "./down";
@@ -44,11 +44,11 @@ import { at } from "wisp/src/runtime/lookup";
 import { CHILL } from "./chill";
 import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
-import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus } from "./heroStatus";
+import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
 import { dealtManaGain, gainMana, takenManaGain } from "./mana";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
-import { contactTraits } from "./identityTraits";
+import { contactIsSpell, contactTraits } from "./identityTraits";
 import { MELEE_THROW_WEIGHT, meleeHandling } from "./meleeHandling";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
 
@@ -139,6 +139,9 @@ export function collectDamageContact(
   if (sourceSlot !== targetSlot && !canHit(world, sourceSlot, targetSlot)) return;
   const source = fighterAt(world, sourceSlot);
   const target = fighterAt(world, targetSlot);
+  const ethereal = sourceSlot !== targetSlot && isEthereal(target);
+  const spell = ethereal && contactIsSpell(source, kind, direct);
+  if (ethereal && !spell) return;
   let contact = batch.contacts[batch.count];
   if (contact === undefined) {
     contact = emptyContact();
@@ -149,15 +152,12 @@ export function collectDamageContact(
   contact.source = sourceSlot;
   contact.target = targetSlot;
   copyHitEffect(contact.effect, effect);
-  const traits = contactTraits(source, kind, direct, family);
+  const traits = contactTraits(source, kind, direct);
   if (traits.mana !== true) {
     contact.effect.manaDrain = undefined;
     contact.effect.manaSteal = undefined;
   }
-  // Banish: an ethereal fighter takes more from the Blood Mage's spells, as Warcraft's ethereal units take extra magic damage.
-  if (target.status.condition === HeroStatusKind.banish && traits.spell === true) {
-    contact.effect.damage = f32(contact.effect.damage * BANISH_SPELL_DAMAGE);
-  }
+  if (spell) contact.effect.damage = f32(contact.effect.damage * BANISH_SPELL_DAMAGE);
   contact.facing = facing;
   contact.kind = kind;
   contact.direct = direct;

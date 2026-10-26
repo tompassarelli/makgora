@@ -12,7 +12,7 @@ import type { Fighter } from "./fighter";
 import { type AttackBuffer, clearAttackBuffer } from "../input/attackBuffer";
 import { type Controls, copyControls, neutralControls } from "./roster";
 import { cancelAttack, cancelSpecialState } from "./transitions";
-import { HERO_STATUS_GROUPS, HeroStatusKind, type HeroStatusGroup } from "./codes";
+import { HERO_STATUS_GROUPS, HeroStatusKind, type HeroStatusGroup, SpecialAction } from "./codes";
 import { ROSTER_MANA, drainMana } from "./mana";
 
 
@@ -27,6 +27,8 @@ interface StatusRules {
 
   readonly blocksAttacks?: boolean | undefined;
 
+  readonly ethereal?: boolean | undefined;
+
   readonly mashMinimum?: number | undefined;
 
 
@@ -40,7 +42,7 @@ interface StatusRules {
 const RULES: { readonly [kind: number]: StatusRules | undefined } = {
   [HeroStatusKind.root]: { blocksActions: false, blocksSpecials: false, endsOnDamage: true },
   [HeroStatusKind.silence]: { blocksActions: false, blocksSpecials: true, endsOnDamage: false },
-  [HeroStatusKind.banish]: { blocksActions: false, blocksSpecials: false, blocksAttacks: true, endsOnDamage: false },
+  [HeroStatusKind.banish]: { blocksActions: false, blocksSpecials: false, blocksAttacks: true, ethereal: true, endsOnDamage: false },
 
   [HeroStatusKind.sleep]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 24 },
 
@@ -91,6 +93,11 @@ export function heroStatusMashes(f: Readonly<Fighter>): boolean {
 
 export function heroStatusBlocksActions(f: Readonly<Fighter>): boolean {
   return rules(f)?.blocksActions === true;
+}
+
+
+export function isEthereal(f: Readonly<Fighter>): boolean {
+  return rules(f)?.ethereal === true;
 }
 
 
@@ -191,6 +198,10 @@ export function maskHeroStatusControls(f: Fighter, input: Controls, commands: At
     input.attackRequested = false;
     input.attackPressed = false;
     input.getupAttackPressed = false;
+  }
+  if (active.ethereal === true && f.special.action === SpecialAction.none) {
+    input.shield = false;
+    input.shieldPressed = false;
   }
   if (active.blocksSpecials && input.specialZ <= 0) input.specialPressed = false;
 }

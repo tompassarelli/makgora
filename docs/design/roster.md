@@ -2140,10 +2140,13 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 Move healing restores its authored amount on a successful action, capped by
 current damage; it keeps no hidden per-stock bank. Peon's proposed burrow HP,
 ducking, peeking face and occupied-break hitstun belong to a future move change.
-Which special carries which trait (a status, a heal, meter drain or steal, the
-Banish spell bonus) is one table, smashcraft:ts/src/game/sim/identityTraits.ts;
+Which special carries which trait (a status, a heal, meter drain or steal) is
+one table, smashcraft:ts/src/game/sim/identityTraits.ts;
 contacts, command grabs, guards and armour read it, so an ordinary move, throw
-or pummel carries no trait. One #148 property over the roster checks every
+or pummel carries no trait. The same file classifies every contact for
+Banish (#360): a spell comes from a special or ultimate or what one spawned,
+and lands on a Banished fighter for 30% more; an attack (normal, grab, pummel,
+throw) passes through them. One #148 property over the roster checks every
 ordinary move adds no counted damage, healing, status, meter effect or jump
 refund, and every declared trait fires on its special and matches the kit's
 data. Existing normal, special and command-grab checks continue to pin the

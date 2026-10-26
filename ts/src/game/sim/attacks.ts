@@ -11,6 +11,7 @@ import { finishDamageContacts, openDamageContacts } from "./contacts";
 import type { Fighter } from "./fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, copyHitEffect, copyHitRegion, emptyHitRegion, SHARED_GRAB_REGION } from "./hitRegions";
 import { applyAttackHit } from "./hits";
+import { isEthereal } from "./heroStatus";
 import { hangsOnLedge } from "./ledge";
 import { belowStandingPlatform } from "./platformMoves";
 import { isAerialAttack, isJab } from "./moves";
@@ -214,6 +215,11 @@ function contactBetween(source: number, target: number): HitRegion {
 }
 
 
+function attackReaches(world: Roster, source: number, target: number): boolean {
+  return canHit(world, source, target) && !isEthereal(fighterAt(world, target));
+}
+
+
 export function resolveAttacks(world: Roster, stage?: number): void {
   const ownsBatch = openDamageContacts();
   const { styles, shots, facings, clashed, choices, grabbed, spent } = scratch;
@@ -227,7 +233,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
     choices[source] = undefined;
     grabbed[source] = false;
     for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
-      if (isActive(world, target) && canHit(world, source, target)) spent[source * PARTICIPANT_CAPACITY + target] = selectHitRegion(world, source, target, contactBetween(source, target), stage);
+      if (isActive(world, target) && attackReaches(world, source, target)) spent[source * PARTICIPANT_CAPACITY + target] = selectHitRegion(world, source, target, contactBetween(source, target), stage);
     }
   }
 
@@ -235,7 +241,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
   for (let source = 0; source < PARTICIPANT_CAPACITY; source++) {
     if (!isActive(world, source) || styles[source] !== AttackStyle.grab) continue;
     for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
-      if (!isActive(world, target) || !canHit(world, source, target) || styles[target] !== AttackStyle.grab) continue;
+      if (!isActive(world, target) || !attackReaches(world, source, target) || styles[target] !== AttackStyle.grab) continue;
       const forward = contactBetween(source, target);
       if (forward.window > 0 && contactBetween(target, source).window > 0) {
         clashed[source] = true;
@@ -250,7 +256,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
     let best: number | undefined;
     let distance = 0.0;
     for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
-      if (!isActive(world, target) || !canHit(world, source, target) || grabbed[target] || choices[target] !== undefined) continue;
+      if (!isActive(world, target) || !attackReaches(world, source, target) || grabbed[target] || choices[target] !== undefined) continue;
       const victim = fighterAt(world, target);
       const candidate = Math.abs(f32(victim.motion.x - sourceX));
       if (contactBetween(source, target).window > 0 && victim.status.frozenFrames === 0 && !inGrabContext(victim) && !hangsOnLedge(victim)
@@ -284,7 +290,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
     }
     if (style === undefined || style === AttackStyle.grab) continue;
     for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
-      if (!isActive(world, target) || !canHit(world, source, target)) continue;
+      if (!isActive(world, target) || !attackReaches(world, source, target)) continue;
       const contact = contactBetween(source, target);
       if (contact.window <= 0) continue;
       const victim = fighterAt(world, target);
