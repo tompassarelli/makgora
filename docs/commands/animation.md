@@ -209,6 +209,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/jaina-clips.ts STOCK_JAINA.mdx PRIVATE_OUTPUT`
   appends her staff strikes, spell gestures, movement and nine contact reactions;
   store the generated model in `hero-models` and refresh the original clip pool.
+  Given the shipped model and pose names instead, it re-authors only those clips in
+  place at their indices, rewrites their bindings and checks every other clip is unchanged.
+  Every authored clip ends with a staff-clearance pass: on any 60 Hz frame where her staff
+  comes within 7 units of the grip audit's limb capsules (smashcraft:tools/animations/limb-capsules.ts),
+  it keys the smallest hand turn that clears it (#522).
 
 - Tinker animation authoring (from the repository root):
   `bun tools/animations/tinker-clips.ts PRIVATE_CLASSIC_HEROTINKER.mdx PRIVATE_OUTPUT [--no-pool]`

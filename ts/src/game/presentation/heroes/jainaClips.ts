@@ -11,7 +11,7 @@ export const JAINA_CLIPS = { idle: JAINA_FALLBACK, walk: { index: 6, seconds: 2.
   forwardTiltDown: { index: 13, seconds: f32(0.55), aligned: true },
   upTilt: { index: 14, seconds: f32(0.533), aligned: true },
   downTilt: { index: 15, seconds: f32(0.45), aligned: true },
-  dashAttack: { index: 16, seconds: f32(0.667), aligned: true },
+  dashAttack: { index: 16, seconds: f32(0.6), aligned: true },
   forwardSmash: { index: 17, seconds: f32(0.917), aligned: true },
   upSmash: { index: 18, seconds: f32(0.917), aligned: true },
   downSmash: { index: 19, seconds: f32(0.9), aligned: true },

@@ -8,6 +8,7 @@ import { characterModelScale } from '../../ts/src/game/presentation/modelScale';
 import { FIGHTER_RIGS } from './rigs';
 import { parseSource } from './original-clips';
 import { fighters } from '../../ts/scripts/heroModelSource';
+import { LIMB_CAPSULES, add, bladeStart, capsuleRadius, distance, mul, segmentDistance, sub, type Point } from './limb-capsules';
 
 const [assetsArg, outArg] = process.argv.slice(2);
 const project = resolve(import.meta.dir, '../..');
@@ -16,7 +17,6 @@ const assets = resolve(assetsArg), out = resolve(outArg);
 if (!relative(project, out).startsWith('..')) throw new Error('Grip audit output stays in private storage');
 mkdirSync(out, { recursive: true });
 
-type Point = readonly [number, number, number];
 type NodeSample = { readonly matrix: Float32Array };
 type RendererSample = { frame: number; nodes: NodeSample[] };
 type RigJoint = 'pelvis' | 'chest' | 'head' | 'hip.L' | 'knee.L' | 'ankle.L' | 'hip.R' | 'knee.R' | 'ankle.R' | 'wrist.L' | 'wrist.R' | 'weapon' | 'weapon.L';
@@ -38,18 +38,6 @@ function descendsFrom(model: ReturnType<typeof parseSource>, node: NonNullable<R
 function point(value: ArrayLike<number>): Point { return [value[0]!, value[1]!, value[2]!]; }
 function transform(value: ArrayLike<number>, matrix: ArrayLike<number>): Point {
   return point(vec3.transformMat4(vec3.create(), value as vec3, matrix as mat4));
-}
-function add(a: Point, b: Point): Point { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
-function sub(a: Point, b: Point): Point { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
-function mul(a: Point, scalar: number): Point { return [a[0] * scalar, a[1] * scalar, a[2] * scalar]; }
-function dot(a: Point, b: Point): number { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
-function distance(a: Point, b: Point): number { return Math.hypot(...sub(a, b)); }
-function segmentDistance(a: Point, b: Point, c: Point, d: Point): number {
-  const u = sub(b, a), v = sub(d, c), w = sub(a, c), aa = dot(u, u), bb = dot(u, v), cc = dot(v, v), dd = dot(u, w), ee = dot(v, w), denominator = aa * cc - bb * bb;
-  let s = denominator > 1e-8 ? Math.max(0, Math.min(1, (bb * ee - cc * dd) / denominator)) : 0;
-  let t = cc > 1e-8 ? Math.max(0, Math.min(1, (bb * s + ee) / cc)) : 0;
-  s = aa > 1e-8 ? Math.max(0, Math.min(1, (bb * t - dd) / aa)) : 0;
-  return distance(add(a, mul(u, s)), add(c, mul(v, t)));
 }
 function nodePosition(model: ReturnType<typeof parseSource>, data: RendererSample, node: NonNullable<ReturnType<typeof nodeNamed>>, scale: number): Point {
   return mul(transform(model.PivotPoints[node.ObjectId]!, data.nodes[node.ObjectId]!.matrix), scale);
@@ -109,17 +97,14 @@ for (const [character, rig] of FIGHTER_RIGS) {
     const data = Reflect.get(renderer, 'rendererData') as RendererSample;
     const seek = (seconds: number) => { data.frame = seconds * 1000; renderer.update(0); };
     const capsules: Capsule[] = [];
-    const jointPairs: readonly (readonly [RigJoint, RigJoint, number])[] = [
-      ['pelvis', 'chest', 0.22], ['head', 'head', 0.12], ['hip.L', 'knee.L', 0.16], ['knee.L', 'ankle.L', 0.13], ['hip.R', 'knee.R', 0.16], ['knee.R', 'ankle.R', 0.13],
-    ];
-    for (const [aJoint, bJoint, factor] of jointPairs) {
+    for (const [aJoint, bJoint, factor] of LIMB_CAPSULES) {
       const aName = bodyNode(rig, aJoint), bName = bodyNode(rig, bJoint);
       const a = aName === undefined ? undefined : nodeNamed(model, aName), b = bName === undefined ? undefined : nodeNamed(model, bName);
       if (a === undefined || b === undefined) continue;
       const chestName = bodyNode(rig, 'chest'), chest = chestName === undefined ? undefined : nodeNamed(model, chestName);
       if (aJoint === bJoint && chest === undefined) continue;
       const length = aJoint === bJoint ? distance(nodePosition(model, data, a, scale), nodePosition(model, data, chest!, scale)) : distance(nodePosition(model, data, a, scale), nodePosition(model, data, b, scale));
-      capsules.push({ name: `${aJoint}-${bJoint}`, a, b, radius: Math.max(3, Math.min(22, length * factor)) });
+      capsules.push({ name: `${aJoint}-${bJoint}`, a, b, radius: capsuleRadius(length, factor) });
     }
     const weapons = [];
     seek(calibrationClip.startSeconds);
@@ -157,9 +142,8 @@ for (const [character, rig] of FIGHTER_RIGS) {
           const gap = distance(grip, hand);
           if (gap > maxGap) { maxGap = gap; worstGapSeconds = time; }
           frameDetached ||= gap > 4;
-          const bladeStart = add(grip, mul(sub(tip, grip), 0.2));
           for (const capsule of capsules) {
-            const clearance = segmentDistance(bladeStart, tip, nodePosition(model, data, capsule.a, scale), nodePosition(model, data, capsule.b, scale)) - capsule.radius;
+            const clearance = segmentDistance(bladeStart(grip, tip), tip, nodePosition(model, data, capsule.a, scale), nodePosition(model, data, capsule.b, scale)) - capsule.radius;
             if (clearance < minClearance) { minClearance = clearance; worstClearanceSeconds = time; }
             frameIntersecting ||= clearance < 0;
           }
