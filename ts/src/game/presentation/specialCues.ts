@@ -436,10 +436,6 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {
-    side: { followUps: [
-      branch("Backstab", WIND_WALK, cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0)),
-      branch("Step Out", WIND_WALK, cue("Abilities\\Spells\\Orc\\EtherealForm\\SpiritWalkerChange.mdx", "body", f32(0.7))),
-    ] },
     down: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },
   },
   [Character.mountainKing]: {

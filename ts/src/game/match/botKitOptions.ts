@@ -132,18 +132,9 @@ export function steerHeroBranches(f: Readonly<Fighter>, target: Readonly<Fighter
   const seed = actionSeed(f);
   if (!takes(skill, seed, f.character * 7 + 1)) return false;
   const next = f.special.frame + 1;
-  const backstab = branchBy(followUps, FollowUpInput.attack, true);
+  const strike = branchBy(followUps, FollowUpInput.attack, true);
   const stepOut = branchBy(followUps, FollowUpInput.special, false);
-  if (backstab !== undefined && backstab.facesStick === true && stepOut !== undefined) {
-
-    const mode = botChoice(seed, f.character * 7 + 2, 3);
-    if (mode === 0 || next < backstab.window.first) return false;
-    const ahead = f32(f32(target.motion.x - f.motion.x) * f.facing);
-    if (mode === 1) return ahead >= 0.0 && next < backstab.window.last - 2;
-    if (next >= stepOut.window.first && (Math.abs(ahead) <= FEINT_GAP || next >= stepOut.window.last - 4)) input.specialPressed = true;
-    return true;
-  }
-  if (stepOut !== undefined && backstab === undefined) {
+  if (stepOut !== undefined && strike === undefined) {
 
     if (next < stepOut.window.first || next > stepOut.window.last) return false;
     const answered = target.attack.style !== undefined || !target.motion.grounded || target.shield.raised;

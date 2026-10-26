@@ -5,91 +5,93 @@ import { adaptInput } from "../../match/inputAdapter";
 import { inputRow } from "../../input/inputRow";
 import { Phase } from "../../lobby/lobbyState";
 import { stepMatch } from "../../match/step";
+import { airborne, fighter, frame, scene } from "../../match/padScene";
 import { createReplaySnapshot } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
+import { SELECTABLE_CHARACTERS, fighterName } from "../../roster/kits";
 import { Character, SpecialAction } from "../../sim/codes";
-import { createFighter, placedObject } from "../../sim/fighter";
+import { canAttack, isIntangible } from "../../sim/conditions";
+import { type Fighter, createFighter, placedObject } from "../../sim/fighter";
 import { fighterAt } from "../../sim/roster";
+import { mainDeckZ } from "../../sim/stage";
 import { length } from "./moves";
-import { MIRROR_IMAGE_OBJECT } from "./specials";
+import { MIRROR_IMAGE_OBJECT, WIND_WALK_DASH } from "./specials";
 
-const TARGET_AHEAD = f32(length(f32(1.0)));
-const WATCH_FRAMES = 90;
 const BLADEMASTER_X = -200.0;
 const FOE_X = 550.0;
 const IMAGE_LIFE_FRAMES = 210;
 
-interface WindWalkOnShield {
+const WIND_WALK_START = f32(-length(f32(1.1)));
+const WIND_WALK_HOP = 80.0;
+const OVERLAP = length(f32(0.3));
+const PUNISH_PRESS = WIND_WALK_DASH.last + 2;
+const PUNISH_RUN = 2;
+const WIND_WALK_WATCH = 120;
+const RECOVERY_HEIGHT = 900.0;
+const RECOVERY_REACH = length(f32(2.0));
+const RECOVERY_DROP = length(f32(0.1));
+
+type Punish = (self: Fighter, blademaster: Fighter, frame: number) => readonly Action[];
+const toward = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.moveRight : Action.moveLeft);
+const runInto = (press: Action): Punish => (self, other, frame) =>
+  frame < PUNISH_RUN ? [toward(self, other)] : frame === PUNISH_RUN ? [toward(self, other), press] : [];
+const DASH_ATTACK = runInto(Action.attack);
+const RUNNING_GRAB = runInto(Action.grab);
+
+interface WindWalkPast {
   readonly passed: boolean;
-  readonly endSide: number;
-  readonly shieldedThroughout: boolean;
-  readonly struck: boolean;
-  readonly damage: number;
-  readonly hitstun: number;
-  readonly pushedAway: boolean;
-  readonly punishFrames: number;
+  readonly untouchedPass: boolean;
+  readonly punished: boolean;
 }
 
-function windWalkIntoShield(slashTick: number, slashX: number): WindWalkOnShield {
-  const state = createReplaySnapshot();
-  const blademaster = fighterAt(state.world, 0);
-  const target = fighterAt(state.world, 1);
-  copyFighterState(blademaster, createFighter(Character.blademaster, 0.0, 1), 3);
-  copyFighterState(target, createFighter(Character.rifleman, TARGET_AHEAD, -1), 3);
+function windWalkPast(character: Character, air: boolean, punish: Punish): WindWalkPast {
+  const s = scene(0, [{ character: Character.blademaster, x: WIND_WALK_START, facing: 1 }, { character, x: 0.0, facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  const foe = fighter(s, 1);
   blademaster.mana.points = 100;
-  state.match.phase = Phase.match;
-  state.match.stageChoice = 0;
-  state.match.matchSeed = 504;
-  state.match.hazards = false;
-  state.match.items.on = false;
-  state.match.timeLimitMinutes = 0;
-  state.match.ultimatesOff = true;
-  const startX = target.motion.x;
+  if (air) airborne(blademaster, WIND_WALK_START, f32(mainDeckZ(0) + WIND_WALK_HOP));
   let passed = false;
-  let shieldedThroughout = true;
-  let struck = false;
-  let damage = 0.0;
-  let hitstun = 0;
-  let actionableTick = 0;
-  let recoveredTick = 0;
-  for (let tick = 1; tick <= WATCH_FRAMES; tick++) {
-    const walkRow = tick === 1
-      ? { held: maskOf(Action.moveRight, Action.special), pressed: maskOf(Action.special), axisX: 127, specialX: 1 }
-      : tick === slashTick
-        ? { held: maskOf(slashX < 0 ? Action.moveLeft : Action.moveRight, Action.attack), pressed: maskOf(Action.attack), axisX: slashX * 127 }
-        : {};
-    const row = inputRow(walkRow);
-    const shieldRow = inputRow({ held: maskOf(Action.rightTrigger), pressed: tick === 1 ? maskOf(Action.rightTrigger) : 0, triggerRight: 255 });
-    if (row === undefined || shieldRow === undefined) throw new Error("Wind Walk input row");
-    adaptInput(row, blademaster, tick, state.controls.inputs[0], state.controls.commands[0]);
-    adaptInput(shieldRow, target, tick, state.controls.inputs[1], state.controls.commands[1]);
-    stepMatch(state.match, state.world, state.controls, tick);
-    if (tick === 1) assertEquals(blademaster.special.action, SpecialAction.heroSide, "Blademaster starts Wind Walk");
-    if (tick > 8 && tick < slashTick) shieldedThroughout &&= target.shield.raised;
-    passed ||= blademaster.motion.x > target.motion.x;
-    struck ||= target.shield.stun > 0;
-    damage = target.status.damage;
-    hitstun = Math.max(hitstun, target.launch.hitstun);
-    if (struck && actionableTick === 0 && target.shield.stun <= 0 && target.launch.hitlag <= 0) actionableTick = tick;
-    if (tick > 1 && recoveredTick === 0 && blademaster.special.action === SpecialAction.none) recoveredTick = tick;
+  let untouchedPass = true;
+  let acted = false;
+  for (let n = 1; n <= WIND_WALK_WATCH; n++) {
+    const own = n === 1 ? [Action.moveRight, Action.special] : [];
+    const theirs = n >= PUNISH_PRESS ? punish(foe, blademaster, n - PUNISH_PRESS) : [];
+    frame(s, own, theirs);
+    if (n === 1 && blademaster.special.action !== SpecialAction.heroSide) return { passed: false, untouchedPass: false, punished: false };
+    if (blademaster.status.damage > 0.0 || blademaster.grab.owner !== undefined) return { passed, untouchedPass, punished: !acted };
+    if (n <= WIND_WALK_DASH.last + 1 && Math.abs(f32(blademaster.motion.x - foe.motion.x)) <= OVERLAP && !isIntangible(blademaster)) untouchedPass = false;
+    passed ||= blademaster.motion.x > foe.motion.x;
+    acted ||= n > 1 && blademaster.special.action === SpecialAction.none && canAttack(blademaster);
+    if (acted) break;
   }
-  const pushedAway = f32(f32(target.motion.x - startX) * f32(blademaster.motion.x - target.motion.x)) < 0.0;
-  return { passed, endSide: Math.sign(blademaster.motion.x - target.motion.x), shieldedThroughout, struck, damage, hitstun, pushedAway, punishFrames: recoveredTick - actionableTick };
+  return { passed, untouchedPass, punished: false };
 }
 
-test("Blademaster's Wind Walk walks through a shielding opponent to the far side, and Backstab from behind or in front is an ordinary shield hit he can be punished for [k1 scenario]", () => {
-  for (const [label, slashTick, slashX, side] of [["cross-up", 17, -1, 1], ["straight", 11, 1, -1]] as const) {
-    const run = windWalkIntoShield(slashTick, slashX);
-    assertEquals(run.shieldedThroughout, true, `${label}: the opponent keeps shielding as he walks`);
-    if (side > 0) assertEquals(run.passed, true, `${label}: the walk passes the shielding opponent`);
-    assertEquals(run.endSide, side, `${label}: side he ends on`);
-    assertEquals(run.struck, true, `${label}: Backstab meets the shield`);
-    assertEquals(run.damage, 0.0, `${label}: the shield takes the hit`);
-    assertEquals(run.hitstun, 0, `${label}: no hitstun through the shield`);
-    assertEquals(run.pushedAway, true, `${label}: shield pushback carries the opponent away from him`);
-    assertGreaterThan(run.punishFrames, 0);
+test("Blademaster's Wind Walk dashes untouchable through every fighter, grounded and from a hop, and every fighter's dash attack or running grab, pressed after the dash ends, lands before he can act [k3 measure #523]", () => {
+  const misses: string[] = [];
+  for (const character of SELECTABLE_CHARACTERS) {
+    for (const air of [false, true]) {
+      const label = `${fighterName(character)}, ${air ? "aerial" : "grounded"}`;
+      const pass = windWalkPast(character, air, DASH_ATTACK);
+      if (!pass.passed) misses.push(`${label}: does not pass`);
+      if (!pass.untouchedPass) misses.push(`${label}: tangible while overlapping`);
+      if (!pass.punished && !windWalkPast(character, air, RUNNING_GRAB).punished) misses.push(`${label}: no punish`);
+    }
   }
+  assertEquals(misses.join("; "), "", "Wind Walk whiffs");
 });
+
+test("Blademaster's air Wind Walk, his only sideways recovery, carries him at least 2H sideways by the end of its dash and drops him less than 0.1H [k3 measure #523]", () => {
+  const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  blademaster.mana.points = 100;
+  airborne(blademaster, 0.0, RECOVERY_HEIGHT);
+  for (let n = 1; n <= WIND_WALK_DASH.last + 1; n++) frame(s, n === 1 ? [Action.moveRight, Action.special] : []);
+  assertGreaterThan(blademaster.motion.x, RECOVERY_REACH);
+  assertGreaterThan(blademaster.motion.z, f32(RECOVERY_HEIGHT - RECOVERY_DROP));
+  assertEquals(blademaster.special.action, SpecialAction.heroSide, "still in Wind Walk");
+});
+
 
 test("Mirror Image still stands on frame 209 after placement and is gone on frame 210 [k3 measure #500]", () => {
   const state = createReplaySnapshot();

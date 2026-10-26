@@ -111,36 +111,35 @@ These are kit data, so each fighter states which it uses:
 ## Blademaster (#124)
 
 Identity kept: spacing and whiff punishment, weak at range. The redesign
-gives him Warcraft's two tricks: Wind Walk's backstab and Mirror Image's
+gives him Warcraft's two tricks: Wind Walk's vanishing dash and Mirror Image's
 second body.
 
 ### Side B: Wind Walk (picked)
 
-18 mana. Frames 1–7: he fades (translucent, never invisible); frames 8–31:
-he walks 0.09H a frame (2.2H in all), passing through bodies whether or not
-they shield. From frame 10 to 31:
+Rebuilt for #523 (2026-10-27, north gate 78): the walk with its Backstab and
+step-out branches did not read, so Wind Walk is now a quick dash through the
+opponent that leaves him open.
 
-- **Attack: Backstab.** A slash, active on its frames 6–8, 12% EDGE at 40°,
-  ending on its frame 28. The stick held at the press picks the side: held
-  back, he turns and slashes behind, so walking through the opponent and
-  slashing back is the cross-up, the slash in front the straight read.
-- **Special: Step out.** The walk stops and the action ends 8 frames later:
-  the feint into grab or shield.
-- **Nothing:** the walk ends on frame 31 and he recovers to frame 44.
+18 mana. Frame 1 stops his run; frames 1–7 he gathers in the stock Wind Walk
+fade (in the air he hangs there); frames 8–15 he dashes 2.2H straight ahead,
+through bodies whether or not they shield, intangible on frames 8–16 and drawn
+see-through while he is; he stops on frame 16 and stands open until frame 46,
+first acting on frame 47. It has no hit: it is a committed cross-up or escape,
+not an attack. In the air it is once per airtime and ends helpless; landing
+mid-move keeps the rest of the move's lag. EX travels 25% farther.
 
-In the air it travels once per airtime and ends helpless, Backstab included.
+Counterplay: the 7-frame fade is the cue. The dash cannot be hit, so the answer
+is where it ends: every fighter, turning and running at him the frame after the
+dash stops, lands a dash attack or a running grab before he can act, grounded or
+from a hop (smashcraft:ts/src/game/fighters/blademaster/specials.tests.ts).
+Reward: position behind the opponent, or out of a corner, against 18 mana and
+30 frames of exposure. Off stage it is still his only sideways recovery: about
+2H across, losing under 0.1H of height by the end of the dash, then helpless.
 
-Counterplay: the 7-frame fade is the cue; no intangibility, so any hit stops
-it; a shield does not stop the walk, but it blocks Backstab from either side
-as an ordinary shield hit (shieldstun and pushback), so read where the walk
-ends, hold shield toward that side and punish Backstab's recovery on shield;
-a spot-dodge or roll timed to the slash beats it outright, a hit on the
-walk's exit stops it, and a jump over the walk leaves him in 13 frames of
-recovery. Reward 12% and an edge launch against 18 mana.
-
-Rejected: a hold-to-travel Shadow Sneak (distance by charge). It needs a held
-special input the controls don't carry, and the distance read is weaker than
-the side read.
+Rejected for #523: today's walk made readable (the branches stay hard to see),
+and a Marth-style parry (a pure counter leaves him no sideways recovery).
+Rejected earlier: a hold-to-travel Shadow Sneak (distance by charge). It needs
+a held special input the controls don't carry.
 
 ### Down B: Mirror Image (picked)
 

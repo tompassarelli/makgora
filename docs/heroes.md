@@ -38,7 +38,7 @@ data record; the simulation, replay, selection and object data read it.
 `FighterSpecials` has a `SpecialKit` per input (neutral, side, up, down).
 A kit has its official `name` and a one-line `description`, a `ground`
 form, an optional `air` form and an optional `free` form; a form the design
-names on its own (Backstab, Hammerfall) carries its own `name`. Names are
+names on its own (Image Swap, Hammerfall) carries its own `name`. Names are
 written only there (and in `sim/originalKits.ts` for the original three);
 `sim/moveNames.ts` reads them for [the move list](move-list.md), which
 `bun run test` and `wisp map build` generate (untracked, cached by a hash of its sources: smashcraft:ts/scripts/generated.ts), the Moves page and training's readout.
@@ -102,7 +102,7 @@ acts again on N+1. It may author:
   cannot itself branch. The running form records it (base form +
   `FOLLOW_UP_FORM` times one more than its index), so rollback restores it,
   and it plays the `<slot>SpecialFollowUp` pose when the hero's clip table
-  maps one (Wind Walk's Backstab); a recall form plays it too (Mirror Image's
+  maps one (Chen's Fire Palm); a recall form plays it too (Mirror Image's
   swap). The computer presses an attack or special branch whose strike
   reaches its target (match/botHeroKit.ts `pressHeroFollowUp`);
 - a `guard` window with `heal` and `healCapPerStock`: when an opponent's

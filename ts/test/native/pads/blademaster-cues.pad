@@ -19,28 +19,24 @@
 160 a release LB
 165 a tap A 2
 168 a capture
-# #144: Wind Walk through b, then Backstab turned back toward it on its 11th frame: the fourth hit, a critical strike.
+# #523: Wind Walk dashes through b untouched and stands open behind it.
 195 a stick 1 0
 195 a tap X 2
 196 a stick 0 0
 197 a capture
 203 a capture
-205 a stick -1 0
-205 a tap A 2
-206 a stick 0 0
 207 a capture
 211 a capture
 # #144: Wind Cutter on the ground.
 260 a tap X 2
 262 a capture
 278 a capture
-# #144: Wind Walk back, Step Out on its 16th frame.
+# #523: Wind Walk back.
 300 a stick -1 0
 300 a tap X 2
 301 a stick 0 0
 302 a capture
 308 a capture
-315 a tap X 2
 317 a capture
 # #144: Mirror Image, then the swap with its slash.
 360 a stick 0 -1
@@ -85,23 +81,19 @@
 #! expect a 100 applied attack 1 style 0
 #! expect a 165 applied attack 3 style 0
 #! expect a 195 special 14 form 0
-#! expect a 205 special-form 6 action 14
-# #144: every current form starts on its frame (ground 0, air 1, swap 3, Backstab 5, Step Out 10), and its cues and missile show.
+# #144: every current form starts on its frame (ground 0, air 1, swap 3), and its cues and missile show.
 #! expect a 260 special 13 form 0
 #! expect a 300 special 14 form 0
-#! expect a 315 special-form 12 action 14
 #! expect a 360 special 16 form 0
 #! expect a 400 special 16 form 3
 #! expect a 450 special 15 form 0
 #! expect a 552 special 16 form 1
 # 339199a792 (#499) gives Blademaster wind tells, not Bloodlust or Mark of Chaos: Wind Cutter gathers TornadoElementalSmall for
-# BloodlustSpecial, and Backstab strikes with BloodImpact for MarkOfChaosTarget (trace: run 39009305845).
+# BloodlustSpecial (trace: run 39009305845).
 #! scene a TornadoElementalSmall
 #! scene a WingedSerpentMissile
 #! scene a InvisibilityTarget
 #! scene a SunderingBlades
-#! scene a BloodImpact
-#! scene a SpiritWalkerChange
 #! scene a CycloneTarget
 #! scene a MirrorImageCaster
 #! scene a MirrorImageDeathCaster

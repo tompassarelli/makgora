@@ -3,7 +3,7 @@
 
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, CHARGED_AIM_FRAMES, FollowUpInput, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, CHARGED_AIM_FRAMES, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
 import { BLADE_RADIUS, L, M, capsule, cut, hit, length, reach } from "./moves";
 import { path } from "../../sim/heroes/authoring";
@@ -46,29 +46,19 @@ const windCutter: AuthoredSpecial = {
 
 
 
-const WALK_FRAMES = 24;
-const WALK_SPEED = f32(length(f32(2.2)) / WALK_FRAMES);
+export const WIND_WALK_DASH = frames(8, 15);
+const WIND_WALK_END = 46;
+const DASH_SPEED = f32(length(f32(2.2)) / (WIND_WALK_DASH.last - WIND_WALK_DASH.first + 1));
 const STOP = { velocityX: 0.0, velocityZ: 0.0 };
-const walkMotion = [{ ...frames(8, 31), velocityX: WALK_SPEED, velocityZ: 0.0 }, { ...frames(32, 32), ...STOP }];
-const WALK_BRANCHES = frames(10, 31);
 
-
-const backstab: AuthoredSpecial = { name: "Backstab", endFrame: 33, hurt: [hurtPose(4, 12, LOW_CUT_ARM)], motion: [{ ...frames(1, 1), ...STOP }], regions: cut(6, [52.0, 45.0, 38.0], L, { ...hit(8.5, "EDGE", 40), growth: 116.0 }) };
-
-const stepOut: AuthoredSpecial = { name: "Step Out", endFrame: 8, motion: [{ ...frames(1, 1), ...STOP }] };
-
-const windWalk = (air: boolean): AuthoredSpecial => {
-  const finish = (special: AuthoredSpecial): AuthoredSpecial => (air ? { ...special, helpless: true } : special);
-  return finish({
-    endFrame: 47,
-    motion: walkMotion,
-    oncePerAirtime: air ? true : undefined,
-    followUps: [
-      { window: WALK_BRANCHES, input: FollowUpInput.attack, facesStick: true, special: finish(backstab) },
-      { window: WALK_BRANCHES, input: FollowUpInput.special, special: finish(stepOut) },
-    ],
-  });
-};
+const windWalk = (air: boolean): AuthoredSpecial => ({
+  endFrame: WIND_WALK_END,
+  motion: [{ ...frames(1, 1), ...STOP }, { ...WIND_WALK_DASH, velocityX: DASH_SPEED, velocityZ: 0.0 }, { ...frames(WIND_WALK_DASH.last + 1, WIND_WALK_DASH.last + 1), ...STOP }],
+  intangible: frames(WIND_WALK_DASH.first, WIND_WALK_DASH.last + 1),
+  airStall: air ? frames(1, WIND_WALK_DASH.first - 1) : undefined,
+  oncePerAirtime: air ? true : undefined,
+  helpless: air ? true : undefined,
+});
 
 
 
@@ -138,7 +128,7 @@ const inAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...special, land
 
 export const BLADEMASTER_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { damage: 1.25 }),
-  side: withExKit({ name: "Wind Walk", description: "Fade and walk through bodies; attack to Backstab on either side, special to step out.", ground: windWalk(false), air: windWalk(true) }, { damage: 1.25 }),
+  side: withExKit({ name: "Wind Walk", description: "Fade, then dash through bodies untouchable, and stand open after.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),
   up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
   down: withExKit({ name: "Mirror Image", description: "Step back and leave an image; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImage, air: inAir(mirrorImage), recall: imageSwap }, { damage: 1.25, durability: 2.0 }),
 };
