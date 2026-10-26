@@ -104,8 +104,14 @@ test at every listed percent.
 | Combo starter | The throw leads straight into a follow-up, and a grab counts as one: a chain grab is a combo starter whose follow-up is a grab. | At 0, 30 and 60%, at least one follow-up lands before the victim's first actionable frame against every DI (`guaranteedFollowups >= 1`). |
 | Tech-chase starter, set knockback | The victim must pick a tech option, and the thrower reads it. | At 0, 30, 60 and 90%, the victim tumbles and lands inside throw hitstun. The landing frame varies by at most 3 frames across those percents, which is what set knockback buys. Each of the four tech options has a follow-up that lands when read. |
 | Kill throw | The throw itself ends the stock. | Released at the ledge facing off stage, it KOs at 150% or lower under the worst DI. |
-| Positional or edge throw | It wins stage position instead of damage. | Released halfway between centre stage and the ledge, the victim's first actionable frame is past the ledge at 60%, or more than 40% of the stage width from the release point. No follow-up is required. |
+| Positional or edge throw | It wins stage position instead of damage. | Released halfway between centre stage and the ledge, the victim's first actionable frame is past the ledge at 60%, or more than 16% of the stage width from the release point. No follow-up is required. |
 | Percent-window confirm | It becomes a guaranteed kill inside a band of percents. | For a Fox-weight victim, some percent band at least 10% wide has a follow-up that lands against every DI and KOs. Outside the band no kill is guaranteed. |
+
+The positional share was 40% until 2026-10-26 (#493). Melee's Fox back throw,
+the first positional row in the reference table below, carries the victim
+16.6% of the stage width under DI in at 60% when `fixture:fox` runs this test,
+so the 40% bar failed the throw it was written from. 16% is that carry rounded
+down.
 
 A throw can pass more than one role. Fox's up throw, for example, is both a
 combo starter and a percent-window confirm.
