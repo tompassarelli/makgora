@@ -297,7 +297,8 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
       windows[frames.length] = (move?.regions ?? []).filter((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined).map((candidate) => candidate.hit.window);
       if (region !== undefined || projectile !== undefined || grab !== undefined || placed !== undefined) {
         activeFrames.push(frames.length);
-        if (strike === undefined && region?.hit.strike !== undefined) strike = strikeEnd(region.hit.strike, 50);
+        const weapon = region?.hit.strike?.path === true ? move?.regions?.find((candidate) => candidate.hit.strike !== undefined && candidate.hit.strike.path !== true)?.hit.strike : undefined;
+        if (strike === undefined && region?.hit.strike !== undefined) strike = strikeEnd(weapon ?? region.hit.strike, 50);
         else if (strike === undefined && grab !== undefined) strike = strikeEnd(grab.strike, 50);
         else if (strike === undefined && placed !== undefined) strike = { x: placed.offsetX, z: placed.offsetZ ?? 60.0 };
         else if (strike === undefined && projectile !== undefined) {

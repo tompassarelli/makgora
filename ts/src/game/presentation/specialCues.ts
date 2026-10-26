@@ -159,7 +159,7 @@ const STORM = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "hand", 1.0);
 // Warcraft discards the first seek after selecting an animation, so this held stand ring keeps its default sequence.
 const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / f32(187.05800313601685))), sequence: undefined, pitch: 0.0, timeScale: 0.0, sound: "ThunderClap" };
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
-const GLAIVE_GLINT: Cue = { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), anchorFrames: Array.from({ length: WARDEN_SPECIALS.side.ground.endFrame }, () => ({ x: 10.0, z: 85.0 })), color: [200, 230, 255], sound: "MetalLightSliceMetal" };
+const GLAIVE_GLINT: Cue = { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), anchorFrames: Array.from({ length: WARDEN_SPECIALS.side.ground.endFrame }, () => ({ x: -70.0, z: 62.0 })), color: [200, 230, 255], sound: "MetalLightSliceMetal" };
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
 const VAMPIRIC = cue("Abilities\\Spells\\Undead\\UnholyFrenzy\\UnholyFrenzyTarget.mdx", "hand", f32(0.8));

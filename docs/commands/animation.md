@@ -20,8 +20,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   appends distinct roster attack gestures without changing combat data or old clips;
   `--character` regenerates one fighter while retaining other generated bindings;
   `--pose POSE` appends only that missing gesture, preserving existing clips;
-  `--replace-pose POSE` replaces only an existing gesture and refreshes its
-  dependent sequence indices.
+  `--replace-pose POSE` re-authors only an existing gesture at its own sequence
+  index, so later clips and their bindings keep their indices. Warden's side
+  special holds a crouched windup with the glaive drawn back behind her
+  (`WARDEN_WINDUP`) until it drives into the lunge (#487).
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip
