@@ -1,12 +1,12 @@
 import { f32 } from "wisp/src/sim/f32";
-import { AttackStyle, LedgeState } from "../sim/codes";
+import { AttackStyle, GroundAction, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { groundState } from "../sim/groundMovement";
 import { squareRoot } from "../sim/warcraftMath";
 import { stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
-import { GroundState, SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE } from "../sim/stickZones";
+import { GroundOption, GroundState, SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE, groundOptionAllowed } from "../sim/stickZones";
 import { Action, bit, has, maskOf } from "../input/actions";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "../input/attackBuffer";
 import { groundDodgeIntent, normalAttackStyle } from "../input/combat";
@@ -50,6 +50,16 @@ function movementAxis(row: Readonly<InputRow>, negative: Action, positive: Actio
   return edgePair(row.pressed, negative, positive);
 }
 
+/** Whether the smash Strong + a direction aims may start from the fighter's ground state; up smash alone cancels jump squat. */
+function strongSmashOpen(fighter: Readonly<Fighter>, style: AttackStyle): boolean {
+  if (fighter.jump.squat > 0) return style === AttackStyle.upSmash;
+  if (fighter.motion.crouching && fighter.ground.action !== GroundAction.none) return false;
+  const state = groundState(fighter);
+  const option = style === AttackStyle.upSmash ? GroundOption.upSmash : style === AttackStyle.downSmash ? GroundOption.downSmash : GroundOption.forwardSmash;
+  // The sim advances the dash clock before it gates the attack, so the dash-smash window is judged on the next dash frame.
+  const frame = state === GroundState.dash ? fighter.ground.actionFrame + 1 : fighter.ground.actionFrame;
+  return groundOptionAllowed(state, frame, option, fighter.tuning.ground.runBrakeTurnCommandEndFrame);
+}
 
 export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, frame: number, destination: Controls, attacks: AttackBuffer): void {
   const { held, pressed } = row;
@@ -99,8 +109,8 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.techPressed = destination.shieldPressed;
   const airborne = (fighter.jump.squat > 0 || !fighter.motion.grounded) && fighter.ledge.state === LedgeState.none;
   const state = groundState(fighter);
-  const still = fighter.motion.grounded && fighter.ledge.state === LedgeState.none && (state === GroundState.stand || state === GroundState.crouch);
-  const strongAim = strong && still && !destination.shieldTriggerActive && ((held | pressed) & SPECIAL_BIT) === 0;
+  const strongSmash = strong && fighter.motion.grounded && fighter.ledge.state === LedgeState.none && !destination.shieldTriggerActive && ((held | pressed) & SPECIAL_BIT) === 0;
+  const strongAim = strongSmash && (state === GroundState.stand || (state === GroundState.crouch && fighter.ground.action === GroundAction.none));
   if (strongAim) {
     destination.direction = 0;
     destination.verticalDirection = 0;
@@ -139,7 +149,8 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.groundDodgeDirection = dodge ?? 0;
 
   const directionPressed = (pressed & MOVEMENT_ACTIONS) !== 0;
-  const strongAimed = strongAim && (aimX !== 0 || aimZ !== 0) && directionPressed;
+  const strongAimed = strongSmash && (aimX !== 0 || aimZ !== 0) && (directionPressed || (pressed & STRONG_BIT) !== 0)
+    && strongSmashOpen(fighter, normalAttackStyle(aimX, aimZ, false, true, false));
   if (destination.attackPressed || ((held & ATTACK_BIT) !== 0 && directionPressed) || strongAimed) {
     const shieldGrab = fighter.motion.grounded && (fighter.shield.raised || destination.shield);
     queueAttack(attacks, {

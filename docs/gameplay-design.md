@@ -148,21 +148,25 @@ Where Smashcraft keeps its own rule, and why:
   no direction too; in the air, Strong + A gives the aerial for that
   direction, the neutral air with none), and holding Strong or A charges it.
   Strong is a pure modifier (#489, Tom's rule of 26 Oct 2026): alone it never
-  attacks, and pressing it with a direction already held starts nothing. While
-  the fighter moves (dash, run, walk) Strong leaves the directions as movement
-  and only upgrades A: where the state allows a smash, A gives the smash in
-  place of the tilt or dash attack; where it does not, A gives what it gives
-  without Strong. So Strong + A in the dash-smash window is the smash, and
-  past it, or in a run, it is the dash attack, except Strong + up + A, which is
-  the up smash directly out of a dash at any frame or a run, as in Ultimate
-  (forward and down smashes stay closed there). The up smash out of jump
-  squat, out of shield or as a jump-cancelled up smash, works as before. A smash out of a walk is the walk modifier held first, then Strong,
-  then A. Standing still (stand or crouch), Strong works like a C-stick
-  (#325): while it is held, each direction press starts that direction's smash
-  in place on that frame, and the directions do not move the fighter (no walk,
+  attacks. Strong + a direction is the smash, with no A press (#548, Tom's
+  rule of 26 Oct 2026, reversing #489's moving-state rule), in every ground
+  state that allows that smash: standing, walking (the walk modifier held),
+  crouching, the dash-smash window, the up smash out of a dash at any frame
+  or a run, as in Ultimate, and the up smash out of jump squat. It fires on a
+  direction press while Strong is held, or on a Strong press with a direction
+  held (a direction pressed inside the DASH_FLICK_SAMPLES window before is
+  still held); holding Strong charges it. Where the state allows no smash
+  (forward or down smash in a run or past the dash-smash window, a run brake
+  or turn), Strong + a direction starts nothing, no dash attack and no tilt,
+  and the direction moves the fighter as it would without Strong: down in a
+  run still brakes into a crouch, and a fresh direction from that crouch then
+  smashes. Strong + A still gives the smash the state allows and otherwise
+  what A gives without Strong (the dash attack in a run or past the window).
+  Standing still (stand or crouch), Strong works like a C-stick
+  (#325): while it is held, the directions do not move the fighter (no walk,
   dash, crouch or tap jump) until Strong is released. Shield, Special (the EX
   chord) and the air leave the directions as movement. Rivals
-  needs no A for this: its Strong button with a direction is the strong attack
+  needs no A for this either: its Strong button with a direction is the strong attack
   in that direction, out of a run too ([Mizuumi controls](https://mizuumi.wiki/w/Rivals_Of_Aether/Controls),
   [Hit Box guide](https://www.hitboxarcade.com/blogs/hit-box/getting-started-with-rivals-of-aether-on-hit-box)).
   A smash in the dash-smash window (dash frames 1–3, up and down smashes too)
@@ -985,9 +989,8 @@ four specials on the ground and in the air.
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
 - **Attack inputs** (owner; Strong since #186): neutral attack is the jab,
-  attack with a direction is a tilt, and attack while holding Strong where
-  the ground state allows a smash, or a direction pressed while Strong is
-  held standing still, is a smash
+  attack with a direction is a tilt, and Strong + a direction (or attack
+  while holding Strong) where the ground state allows a smash is a smash
   (smashcraft:docs/physics.md, "Prototype attack phases").
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in
