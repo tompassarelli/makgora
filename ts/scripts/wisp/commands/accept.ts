@@ -377,7 +377,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         const measured = specials.get(name);
         if (measured === undefined) return yield* new AcceptFailure({ operation: "specials gate", problem: "gate-moves did not run in this session; the specials spot check reads its settle frames" });
         measurements.set(name, [...(measurements.get(name) ?? []), { ...measured, modified: yield* Clock.currentTimeMillis }]);
-      }) : (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context));
+      }) : !text.startsWith("-dev ") ? live.chat(name, text) : (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context));
       },
       receipts: name => Effect.map(live.receipts(name), receipts => [...receipts, ...(measurements.get(name) ?? [])]),
     });

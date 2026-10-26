@@ -18,6 +18,8 @@
   once, one process per pair, with each map built once; the merged report and
   each `shard-K/` are under the run's evidence folder. Declare
   a new native box there, next to the issue it closes, instead of a hand procedure.
+  A `chat` setup step that starts with `-dev ` waits for every client's command
+  receipt; any other text is typed as a plain chat line.
   Development-map profiles rebuild the script into the newest complete
   `native-acceptance-YYYYMMDD` set under smashcraft-build-inputs (its
   presentation .w3x and .w3x.base.lua). When accept reports that the map
