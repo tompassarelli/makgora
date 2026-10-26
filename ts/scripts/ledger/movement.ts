@@ -13,7 +13,7 @@ import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY } from "../../src/game/sim/
 import { LEDGE_HANG_LIMIT_FRAMES, LEDGE_INTANGIBLE_DECAY, ledgeIntangibleFrames, ledgeSnap } from "../../src/game/sim/ledge";
 import { attackLandingLag, uncancelledLandingLag } from "../../src/game/sim/moves";
 import { TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X } from "../../src/game/sim/stick";
-import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, STICK_DEADZONE, STICK_SMASH_DEADZONE, TAP_JUMP_STICK_THRESHOLD } from "../../src/game/sim/stickZones";
+import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, STICK_DEADZONE, STICK_SMASH_DEADZONE, TAP_JUMP_STICK_THRESHOLD, WALK_MIDDLE_STICK_THRESHOLD } from "../../src/game/sim/stickZones";
 import { LEDGE_REGRAB_FRAMES } from "../../src/game/sim/transitions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
 
@@ -81,6 +81,26 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "edge-cancel", family: "movement", name: "Edge cancel",
     melee: { value: "landing lag ends when the fighter slides off an edge", source: wiki("Edge_cancel") }, ours: () => "landing lag ends when the fighter slides off an edge",
     anchor: { file: `${SIM}/step.ts`, symbol: "slideOffEdge" }, status: PARITY,
+  },
+  {
+    id: "teeter", family: "movement", name: "Teeter at an edge, and the teeter cancel",
+    melee: { value: "only a fighter facing the edge with forward not held teeters; facing away it slides off or edge-slips", source: wiki("Edge_cancel") },
+    ours: () => "either facing, a fighter in landing lag, standing or ending a dash with the stick not held toward the edge stops and teeters; held toward it, the fighter slides off",
+    anchor: { file: `${SIM}/teeter.ts`, symbol: "teeterAtEdge" },
+    status: { kind: "deviation", reason: "Melee's teeter is one forward-facing animation; a symmetric rule leaves no hidden facing rule deciding the result (docs/gameplay-design.md, Teeter and the teeter cancel)", decided: "2026-10-26", issue: 458 },
+  },
+  {
+    id: "teeter-walk-off-stick", family: "movement", name: "Stick tilt that walks a fighter off instead of teetering",
+    melee: { undocumented: "no public page states the tilt; SmashWiki says only that the stick must pass a certain amount", source: wiki("Teeter") },
+    ours: () => `${shortNumber(WALK_MIDDLE_STICK_THRESHOLD)} toward the edge, the end of the slow walk`,
+    anchor: { file: `${SIM}/teeter.ts`, symbol: "teeterAtEdge" },
+    status: { kind: "open", reason: "ours; no public source gives Melee's value", issue: 293 },
+  },
+  {
+    id: "teeter-landing-speed", family: "movement", name: "A landing with the stick not held toward the edge teeters whatever its speed",
+    melee: { value: "only a fighter moving sufficiently slowly stays teetering", source: wiki("Edge_cancel") }, ours: () => "teeters at any speed, its landing lag ended",
+    anchor: { file: `${SIM}/teeter.ts`, symbol: "teeterAtEdge" },
+    status: { kind: "deviation", reason: "SmashWiki gives no speed; one facing rule reads at a glance (docs/gameplay-design.md, Teeter and the teeter cancel)", decided: "2026-10-26", issue: 458 },
   },
   {
     id: "edge-shield-slide-off", family: "movement", name: "Shield pushed off an edge",

@@ -2111,7 +2111,7 @@ stage lip and to the ends of platforms alike.
 
 | | Melee | Ultimate | Smashcraft |
 | --- | --- | --- | --- |
-| Landing lag when sliding off an edge | Cancelled for any landing: aerial, empty and freefall landings; the fighter falls with its air momentum and aerial options ([SmashWiki](https://www.ssbwiki.com/Edge_cancel)) | Restricted to specific actions; Smash 4 allowed it only on an air dodge facing the ledge | Cancelled for every landing lag (aerial, empty, air dodge or waveland, special fall) |
+| Landing lag when sliding off an edge | Cancelled for any landing: aerial, empty and freefall landings; the fighter falls with its air momentum and aerial options, and the result depends on "the direction which is held, and the direction that the character is facing" ([SmashWiki](https://www.ssbwiki.com/Edge_cancel)) | Restricted to specific actions; Smash 4 allowed it only on an air dodge facing the ledge | Cancelled for every landing lag (aerial, empty, air dodge or waveland, special fall) that slides off an edge with the stick held toward it, in either facing; with the stick not held toward the edge, the landing teeters instead (below, #458) |
 | A grounded attack carried off an edge | Cancelled: shield pushback or a windbox that slides the attacker off ends the attack ([SmashWiki](https://www.ssbwiki.com/Edge_cancel), shield pushback and windbox variants) | Not sourced | Cancelled in any phase, startup and active frames included |
 | Grounded specials | Per move; SmashWiki lists the Melee specials whose grounded part or landing cancels | Per move | Not changed here: each hero special keeps its own grounded and airborne handling |
 
@@ -2128,15 +2128,53 @@ not an input chore.
 Melee mechanics this does not model, named so they are not mistaken for
 parity: the backward edge slip (SmashWiki's [Edge slip](https://www.ssbwiki.com/Edge_slip)
 puts a fighter who slips off facing away into a short helpless animation;
-Smashcraft's shield slide-off falls helpless instead), and slow walks that
-teeter at the edge. Rolls and spot dodges stop at the edge as before.
+Smashcraft's shield slide-off falls helpless instead), and SmashWiki's
+limit that only a fighter "moving sufficiently slowly" with forward not held
+stays teetering ([Edge cancel](https://www.ssbwiki.com/Edge_cancel)): Smashcraft
+teeters at any speed, by Tom's rule (2026-10-26). Rolls and spot dodges stop
+at the edge as before.
+
+#### Teeter and the teeter cancel (#458)
+
+A grounded fighter in landing lag, standing, walking slowly or ending a dash or
+run that slides to an edge with the stick not held toward it stops at the edge
+and teeters, in either facing; a fighter facing away teeters facing away. The
+teeter ends any landing lag left, so every standing action is open from the
+teeter on the next frame. Held toward the edge, there is no teeter: a landing
+keeps its edge cancel and enters fall on the frame it would have teetered, and
+a standing or dashing fighter walks or runs off.
+
+This departs from Melee on purpose. Melee teeters only a fighter facing the
+edge, because its teeter is one forward-facing animation; a fighter facing
+away slides off, or edge-slips ([SmashWiki Edge cancel](https://www.ssbwiki.com/Edge_cancel),
+[Teeter](https://www.ssbwiki.com/Teeter), [Edge slip](https://www.ssbwiki.com/Edge_slip)).
+Tom made the rule symmetric on 2026-10-26 so that no hidden facing rule
+decides whether a fighter stays on; the parity ledger records the departure
+(`teeter`).
+
+| State reaching an edge | Melee | Smashcraft |
+| --- | --- | --- |
+| Standing or walking slowly | Teeters; a slow walk teeters and only a stick tilted past a certain amount walks off ([SmashWiki Teeter](https://www.ssbwiki.com/Teeter)) | Teeters below the middle walk zone (stick 0.4 toward the edge); at or past it the fighter walks off. Melee's tilt is unpublished, so 0.4 is ours |
+| Dash or run with the stick released | Teeters: the teeter cancel ("let go of the control stick just short of a platform's edge while dashing") ends the dash's ending lag, and any standing attack follows ([SmashWiki Teeter cancel](https://www.ssbwiki.com/Teeter_cancel)) | Teeters and the dash or run brake ends; jab, tilts and every standing option are open at once |
+| Dash or run with the stick held toward the edge | Runs off ([SmashWiki Teeter](https://www.ssbwiki.com/Teeter)) | Runs off |
+| A landing (aerial, waveland, empty) facing the edge, stick not toward it, with or without lag left | Teeters and stops at the very end of the platform ([Smashboards](https://smashboards.com/threads/help-with-wavedashing-onto-platforms.231530)); a fighter sliding into the ledge has "any remaining lag ... immediately canceled" and falls off or topples "depending on your direction and input" ([TASVideos](https://tasvideos.org/Forum/Posts/360045)); the teeter cancel removes aerial lag ([SmashWiki Teeter cancel](https://www.ssbwiki.com/Teeter_cancel)). SmashWiki limits this to a fighter "moving sufficiently slowly" ([Edge cancel](https://www.ssbwiki.com/Edge_cancel)) | Teeters at any speed and the landing lag ends (Tom's rule for the speed) |
+| The same landing facing away from the edge | Slides off with the lag cancelled; a backward wavedash "will topple the combatant over the side" ([SmashWiki Wavedash](https://www.ssbwiki.com/Wavedash), [Edge cancel](https://www.ssbwiki.com/Edge_cancel)) | Teeters facing away, its lag ended (Tom's rule: the departure above) |
+| A landing in either facing with the stick held toward the edge | Facing the edge, slides off: "you need to be holding straight forward" to slide off ([Smashboards](https://smashboards.com/threads/help-with-wavedashing-onto-platforms.231530)) | No teeter: the edge cancel is kept and the fighter enters fall on the frame it would have teetered |
+| A waveland with the shield still held | Stops at the edge: the same thread says the shield must be released to slide off | Not changed here: shield pushback at an edge is its own follow-up |
+| Attacks, specials, rolls, crouch, turnaround run, knockback | Not teeter states in any public source | Unchanged: ground moves slide off as above, rolls and spot dodges stop at the edge, the rest slide off |
+
+FightCore publishes frame data only and states nothing about teetering. The
+rule lives in ts/src/game/sim/teeter.ts and holds the fighter at the deck's
+end with no speed or lag left; ts/src/game/sim/teeter.tests.ts replays each
+row.
 
 The tape checker holds the rule on every acceptance tape
 (ts/scripts/wisp/acceptanceTapes.ts): a fighter that leaves a surface during
 landing lag, air dodge motion or a ground move must have no lag, move or air
 dodge motion left and must not rise for its next four frames. The tapes
-`edge-cancel-waveland-platform`, `edge-cancel-waveland-lip` and
-`edge-cancel-dash-attack-platform` exercise each case.
+`edge-cancel-waveland-platform` and `edge-cancel-waveland-lip` (wavelands
+held toward the edge) and `edge-cancel-dash-attack-platform` exercise each
+case.
 
 The attacker's options out of the cancel, each deterministic and visible on the
 tapes `edge-cancel-turnaround` and `edge-cancel-back-air`:

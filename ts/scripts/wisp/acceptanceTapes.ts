@@ -242,7 +242,7 @@ function playMatch(script: MatchScript, session: TapeSession, play: (...lines: s
     if (script.exercise !== undefined && !moved) moved = exercised(session, script.exercise, memory);
     checkSlideFalls(session, slides);
   }
-  if (script.exercise !== undefined && !moved) throw new Error(`no fighter was ${script.exercise} by the stage on stage ${script.stage}`);
+  if (script.exercise !== undefined && !moved) throw new Error(`no fighter was ${script.exercise} by the stage on stage ${script.stage} from ${script.placement ?? "the spawn"}`);
   const { drops } = session.live.match;
   if (script.dropPickups !== undefined && (drops.spawnSerial < script.dropPickups || drops.pickupSerial < script.dropPickups)) {
     throw new Error(`${drops.spawnSerial} meter drops spawned and ${drops.pickupSerial} taken; the script needs ${script.dropPickups}`);
@@ -548,10 +548,10 @@ const ULTIMATE_PAIRS: readonly (readonly [keyof typeof Character, keyof typeof C
 export function generateTapes(): Map<string, string> {
   const pressed = [new Set<string>(), new Set<string>()];
   const tapes = new Map([
-    ["edge-cancel-turnaround", recordTape("An aerial lands at the edge, the fighter slides off, the landing lag ends at once and the fighter turns back to catch the ledge, with predictions and rollback.", [{
+    ["edge-cancel-turnaround", recordTape("An aerial lands at the edge with the stick held toward it, the fighter slides off, the landing lag ends at once and the fighter turns back to catch the ledge, with predictions and rollback.", [{
       placement: "test-air 0 480 0",
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 120,
-      holds: [[[1, 1, LEFT, WALK], [3, 3, JUMP], [3, 26, RIGHT], [20, 2, ATTACK]], [[1, 120, SHIELD_LEFT]]],
+      holds: [[[1, 1, LEFT, WALK], [3, 3, JUMP], [3, 30, RIGHT], [20, 2, ATTACK]], [[1, 120, SHIELD_LEFT]]],
       approaches: [[], []], rollbacks: [[30, 60]], predictions: [[22, 28]], exercise: "edgeCancel",
     }])],
     ["edge-cancel-back-air", recordTape("An aerial lands at the edge, the cancel frees the fighter at once and a back air follows, with rollback.", [{
@@ -560,16 +560,16 @@ export function generateTapes(): Map<string, string> {
       holds: [[[1, 3, JUMP], [1, 36, RIGHT], [20, 2, ATTACK], [32, 2, C_LEFT]], [[1, 120, SHIELD_LEFT]]],
       approaches: [[], []], rollbacks: [[30, 60]], exercise: "edgeCancel",
     }])],
-    ["edge-cancel-waveland-platform", recordTape("A waveland slides off the end of a platform and falls at once, with rollback.", [{
+    ["edge-cancel-waveland-platform", recordTape("A waveland held toward the edge slides off the end of a platform and falls at once, with rollback.", [{
       placement: "test-air 0 100 182",
       characters: [Character.rifleman, Character.rifleman], stage: 3, stocks: 3, minutes: 0, frames: 90,
-      holds: [[[1, 1, JUMP], [2, 1, RIGHT, DOWN, SHIELD_LEFT]], []],
+      holds: [[[1, 1, JUMP], [2, 1, RIGHT, DOWN, SHIELD_LEFT], [3, 40, RIGHT]], []],
       approaches: [[], []], rollbacks: [[10, 40]], exercise: "edgeCancel",
     }])],
-    ["edge-cancel-waveland-lip", recordTape("A waveland slides off the stage lip and falls at once, with rollback.", [{
+    ["edge-cancel-waveland-lip", recordTape("A waveland held toward the edge slides off the stage lip and falls at once, with rollback.", [{
       placement: "test-air 0 520 2",
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 90,
-      holds: [[[1, 1, JUMP], [2, 1, RIGHT, DOWN, SHIELD_LEFT]], []],
+      holds: [[[1, 1, JUMP], [2, 1, RIGHT, DOWN, SHIELD_LEFT], [3, 40, RIGHT]], []],
       approaches: [[], []], rollbacks: [[10, 40]], exercise: "edgeCancel",
     }])],
     ["edge-cancel-dash-attack-platform", recordTape("A dash attack carries the fighter off the end of a platform; the attack ends and the fighter falls, with rollback.", [{
