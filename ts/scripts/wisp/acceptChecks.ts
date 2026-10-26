@@ -14,6 +14,7 @@ import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 import { gateChecks } from "./gateChecks";
 import { specialStripChecks, specialStripMaps } from "./specialStripChecks";
+import { meterRimChecks } from "./meterRimChecks";
 import { newestPresentation } from "./presentationInputs";
 
 const inputs = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -293,6 +294,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     },
     ...effectChecks,
     ...specialStripChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
+    ...meterRimChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...stageChecks,
     ...lightingChecks,
     ...STAGE_COMPOSITION_CHECKS,

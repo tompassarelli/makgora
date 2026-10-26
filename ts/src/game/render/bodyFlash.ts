@@ -1,4 +1,5 @@
 import { HEAVY_SHEEN, HEAVY_SHEEN_ALPHA, heavySheen } from "../presentation/itemLook";
+import { fighterModelReplaced } from "../presentation/fighterForm";
 import type { FighterPose } from "../presentation/fighterPose";
 import { createWhiteGlowState, whiteGlowAlpha } from "../presentation/whiteGlow";
 import type { Character } from "../sim/codes";
@@ -21,7 +22,7 @@ export class BodyFlash {
     const glow = fighter === undefined ? 0 : whiteGlowAlpha(this.state, fighter, frame);
     const sheen = glow === 0 && fighter !== undefined && heavySheen(fighter);
     const alpha = sheen ? HEAVY_SHEEN_ALPHA : glow;
-    if (fighter === undefined || alpha === 0 || !this.model.pose(fighter, pose, stage, camera, FLASH_LIFT, 1.0, 0.0)) {
+    if (fighter === undefined || alpha === 0 || fighterModelReplaced(fighter) || !this.model.pose(fighter, pose, stage, camera, FLASH_LIFT, 1.0, 0.0)) {
       this.model.hide();
       return;
     }

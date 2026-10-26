@@ -5,6 +5,7 @@ import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import type { Character } from "../sim/codes";
 import { sineTurns } from "../sim/mathTables";
 import type { ItemColor } from "./itemLook";
+import { fighterModelReplaced } from "./fighterForm";
 import { exReady, ultimateReady } from "./meterCues";
 
 export const METER_GLOW_GROW = f32(1.09);
@@ -18,6 +19,7 @@ export const FULL_GLOW_PERIOD = 120;
 
 /** The rim round a fighter's silhouette that shows its meter (docs/design/ultimates.md): cool blue with an EX segment, warm gold breathing slowly at a full bar. */
 export function meterGlowColor(fighter: Readonly<Fighter>, ultimatesOff: boolean): ItemColor | undefined {
+  if (fighterModelReplaced(fighter)) return undefined;
   if (ultimateReady(fighter, ultimatesOff)) return FULL_GLOW;
   return exReady(fighter, ultimatesOff) ? EX_GLOW : undefined;
 }
