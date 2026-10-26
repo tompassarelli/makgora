@@ -1,4 +1,4 @@
-import { floatVector, unkeyedRest } from './animVector';
+import { blend, floatVector, unkeyedRest } from './animVector';
 
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -14,6 +14,8 @@ import { ANUBARAK_SPECIALS } from "../../ts/src/game/sim/heroes/anubarakSpecials
 import { seconds } from "./asset-info";
 import { blenderOptions, blenderSkeleton } from "./blender-keys";
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
+import { rekeySequences } from "./sequence-rekey";
+import { eased, lungeAt, type Lunge } from "./root-lunge";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -24,12 +26,13 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const { rig: rigOutput, keys: bakedKeys } = blenderOptions(process.argv), blenderPose: HeroPose = "dashAttack";
+const rekeyAt = process.argv.indexOf("--rekey"), rekeyed = rekeyAt < 0 ? [] : process.argv.slice(rekeyAt + 1).filter(arg => !arg.startsWith("--"));
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith("..") && !(rigOutput && bakedKeys), "usage: bun tools/animations/anubarak-clips.ts STOCK_ANUBARAK.mdx|SHIPPED_ANUBARAK.mdx PRIVATE_OUTPUT [--rig RIG.json | --keys KEYS.json]");
+ensure(input && output && relative(project, output).startsWith("..") && !(rigOutput && bakedKeys) && (rekeyAt < 0 || rekeyed.length > 0), "usage: bun tools/animations/anubarak-clips.ts STOCK_ANUBARAK.mdx|SHIPPED_ANUBARAK.mdx PRIVATE_OUTPUT [--rig RIG.json | --keys KEYS.json] [--rekey POSE...]");
 const originalBytes = await Bun.file(input).arrayBuffer();
-const source = parseMDX(originalBytes);
+const source = parseMDX(originalBytes), shipped = parseMDX(originalBytes);
 if (source.Sequences.length > 17) {
-  ensure(source.Sequences.slice(17).every(sequence => sequence.Name.startsWith("Anubarak ")), "Expected only previously authored Anubarak clips after the stock sequences");
+  ensure(rekeyed.length > 0 || source.Sequences.slice(17).every(sequence => sequence.Name.startsWith("Anubarak ")), "Expected only previously authored Anubarak clips after the stock sequences");
   source.Sequences = source.Sequences.slice(0, 17);
   const stockEnd = Math.max(...source.Sequences.map(sequence => sequence.Interval[1]!));
   tracks(source, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(key => key.Frame <= stockEnd); });
@@ -55,7 +58,6 @@ const burrowRake: readonly Gesture[] = [
   { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
   { chest: -40, pelvis: -25, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -20, leftThigh: 20 },
 ];
-interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; decay?: number; }
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
   jab2: { contact: 7, x: 64, back: 32 },
@@ -64,7 +66,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSmash: { contact: 15, x: 10, back: 6 },
   neutralAir: { contact: 9, x: 12, back: 6 },
   forwardAir: { contact: 12, x: 20, back: 10, decay: 26 },
-  backAir: { contact: 10, x: -70, back: 35 },
+  backAir: { contact: 10, x: -70, back: 35, over: 0, peak: 9, hold: 0, snap: { frames: 3, keep: 0.3 }, decay: 27 },
   dashAttack: { contact: 8, x: 56, back: 26, over: 0.4, ramp: 11, decay: 21 },
   downAir: { contact: 16, z: -12, back: 6 },
   neutralSpecial: { contact: 17, x: 32, back: 16, over: 0.4, ramp: 8 },
@@ -72,7 +74,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
 };
-interface Rake { contact: number; through: number; settle?: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
+interface Rake { contact: number; through: number; settle?: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; release?: number; ease?: number; }
 const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
   windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
   strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
@@ -87,7 +89,7 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
   downTilt: { contact: 7, through: 10, windup: { chest: -15, pelvis: -10, lean: -8, arm: -220, elbow: 80, wrist: 40, leftArm: -40, head: -15, thigh: 20, knee: -30 }, strike: { chest: 55, pelvis: 20, lean: 22, arm: -130, elbow: 40, wrist: 30, hand: 0, head: 20, thigh: 40, knee: -50, leftArm: -60 }, follow: { chest: 20, pelvis: 20, arm: -40, elbow: 60, wrist: 70, hand: 30, head: 15, thigh: 35, knee: -45, leftArm: -60 }, carry: { frame: 18, gesture: { chest: 15, pelvis: 15, lean: -5, arm: 20, wrist: 30, head: 10, thigh: 30, knee: -40, leftArm: -60 } } },
   dashAttack: { contact: 8, through: 19, windup: { chest: -16, pelvis: -10, lean: -28, arm: -230, elbow: 70, wrist: 40, leftArm: -200, leftElbow: 60, head: -18, thigh: 25, knee: -35, leftThigh: 15, frontThigh: 15, leftFrontThigh: 15 }, strike: { chest: 8, arm: -80, elbow: -20, leftArm: -70, leftElbow: -20, head: 15, shieldTwist: 80, leftShieldTwist: 80, thigh: 50, knee: -10, leftThigh: 50, frontThigh: -45, leftFrontThigh: -45 }, follow: { chest: 28, lean: 12, arm: -35, elbow: 10, wrist: 30, leftArm: -25, leftElbow: 10, leftWrist: 40, head: 25, shieldTwist: 80, leftShieldTwist: 80, thigh: 72, knee: -22, leftThigh: 72, frontThigh: -66, leftFrontThigh: -66 }, carry: { frame: 19, gesture: { chest: 28, lean: 12, arm: -35, elbow: 10, wrist: 30, leftArm: -25, leftElbow: 10, leftWrist: 40, head: 25, shieldTwist: 80, leftShieldTwist: 80, thigh: 72, knee: -22, leftThigh: 72, frontThigh: -66, leftFrontThigh: -66 } } },
   forwardAir: { contact: 12, through: 15, settle: 1, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
-  backAir: { contact: 10, through: 13, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -45, pelvis: -30, lean: -20, arm: -100, elbow: 20, leftArm: -100 } },
+  backAir: { contact: 10, through: 12, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -30, pelvis: -38, lean: -15, arm: -100, elbow: 20, leftArm: -100 }, release: 13, ease: 1.1 },
   neutralSpecial: { contact: 18, through: 26, ...scythe(35, 15) },
   neutralSpecialAir: { contact: 18, through: 26, ...scythe(35, 15) },
   downSpecial: { contact: 21, through: 31, settle: 2, ...scythe(35, 15) },
@@ -98,13 +100,6 @@ const swings: Partial<Record<HeroPose, readonly [windup: number, follow: number]
   upSpecial: [0.8, 1],
   upSpecialAir: [0.8, 1],
   downAir: [0.6, 1.3],
-};
-const lungeAt = (lunge: Lunge, frame: number, frames: number) => {
-  const over = lunge.over ?? 0.25, drive = lunge.x ?? lunge.z ?? 0, reach = Math.abs(drive), sign = Math.sign(drive);
-  const windup = Math.max(1, Math.round(lunge.contact * 0.6)), hold = Math.min(frames - 1, lunge.contact + Math.max(3, lunge.ramp ?? 0));
-  return sign * (frame <= windup ? -lunge.back * Math.sin(frame / windup * Math.PI / 2)
-    : frame <= lunge.contact ? -lunge.back + (lunge.back + reach) * Math.sqrt((frame - windup) / (lunge.contact - windup))
-    : frame <= hold ? reach * (1 + over * Math.min(1, (frame - lunge.contact) / (lunge.ramp ?? 1))) : reach * (1 + over) * Math.max(0, 1 - (frame - hold) / (lunge.decay ?? Math.min(20, frames - hold))));
 };
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, number]][] = [
@@ -208,12 +203,6 @@ function joint(name: string, g: Gesture): [number, number] {
   const pitch = jointPitch[name];
   return [pitch ? (g[pitch[0]] ?? 0) * pitch[1] : 0, name === "Bone_Chest" ? g.yaw ?? 0 : name === "Bone_ArmShieldR" ? g.shieldTwist ?? 0 : name === "Bone_ArmShieldR01" ? g.leftShieldTwist ?? 0 : 0];
 }
-function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array<ArrayBuffer> {
-  let dot = 0; for (let i = 0; i < 4; i++) dot += from[i]! * to[i]!;
-  const sign = dot < 0 ? -1 : 1;
-  const vector = Array.from({ length: 4 }, (_, i) => from[i]! * (1 - weight) + sign * to[i]! * weight);
-  const length = Math.hypot(...vector); return new Float32Array(vector.map(v => v / length));
-}
 const groundGestures = new Set(normals.slice(0, 8).map(([pose]) => pose));
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
 const blender = blenderSkeleton(source, originals, stand, globalClock), blenderAction = actions.find(a => a.pose === blenderPose)!;
@@ -246,7 +235,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   };
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
-    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? (rake ? unkeyedRest(donor.Keys[0], path) : donor.Keys[0]);
+    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? (rake && !action.air ? unkeyedRest(donor.Keys[0], path) : donor.Keys[0]);
     if (!first) return;
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
@@ -276,13 +265,13 @@ for (const [ordinal, action] of authoredActions.entries()) {
       }
       if (node && rake) {
         const poses = [rake.windup, rake.strike, rake.follow, rake.carry?.gesture ?? rake.follow].map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
-        const cocked = Math.max(1, rake.contact - 3), carried = rake.carry?.frame ?? rake.through, released = Math.min(action.frames - 1, rake.carry ? carried : rake.through + 2);
+        const cocked = Math.max(1, rake.contact - 3), carried = rake.carry?.frame ?? rake.through, released = Math.min(action.frames - 1, rake.release ?? (rake.carry ? carried : rake.through + 2));
         Vector = frame <= cocked ? blend(first.Vector, poses[0]!, frame / cocked)
           : frame <= rake.contact ? blend(poses[0]!, poses[1]!, (frame - cocked) / (rake.contact - cocked))
           : frame <= rake.through ? blend(poses[1]!, poses[2]!, (frame - rake.contact) / (rake.through - rake.contact))
           : frame <= carried ? blend(poses[2]!, poses[3]!, (frame - rake.through) / (carried - rake.through))
           : frame <= released ? poses[3]!.slice()
-          : blend(poses[3]!, first.Vector, Math.min(1, (frame - released) / (settled - released)));
+          : blend(poses[3]!, first.Vector, eased(Math.min(1, (frame - released) / (settled - released)), rake.ease));
       } else if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }
@@ -423,7 +412,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 
-await Bun.write(join(project, "ts/src/game/sim/heroes/anubarakClips.ts"), [
+if (rekeyed.length === 0) await Bun.write(join(project, "ts/src/game/sim/heroes/anubarakClips.ts"), [
   "",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   'export const ANUBARAK_MODEL_FILE = "units\\\\undead\\\\HeroCryptLord\\\\HeroCryptLord.mdl";',
@@ -454,6 +443,14 @@ for (let index = source.Sequences.length; index < model.Sequences.length; index+
 const stripped = structuredClone(model); stripped.Sequences = stripped.Sequences.slice(0, source.Sequences.length);
 tracks(stripped, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(k => k.Frame < cutoff); });
 ensure(isDeepStrictEqual(stripped, source), "Authored suffix changed original body or animation");
+if (rekeyed.length > 0) {
+  rekeySequences(shipped, model, rekeyed.map(pose => `Anubarak ${pose}`));
+  const bytes = generateMDX(shipped), decoded = parseMDX(bytes);
+  ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
+  mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herocryptlord.mdx"), bytes);
+  console.log(`ANUBARAK_REKEY_PASS ${rekeyed.join(" ")} re-keyed at their shipped intervals; every other clip unchanged; private output ${output}`);
+  process.exit(0);
+}
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herocryptlord.mdx"), bytes);

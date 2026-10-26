@@ -154,6 +154,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
   Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
   preserving all seventeen stock clips and writing both-facing pose sheets.
+  Given the shipped model instead, `... SHIPPED_CRYPT_LORD.mdx PRIVATE_OUTPUT --rekey POSE...`
+  authors the named clips and splices their keys in at their shipped intervals, refusing a
+  changed length; every other clip, and the `... Motion` roots later passes added, stays
+  byte-identical, so a move whose sim timing is unchanged is reworked without regenerating the
+  clips that later passes edited (#459).
   A Blender take of his dash attack (#339, judged but not yet shipped): `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --rig RIG.json`
   writes his skeleton, stand pose and the move's timing, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/anubarak-dash-attack.py -- RIG.json KEYS.json`

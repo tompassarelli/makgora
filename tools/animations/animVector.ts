@@ -9,3 +9,9 @@ export function unkeyedRest(key: AnimKeyframe | undefined, path: string): AnimKe
   if (key === undefined || kind === undefined) return key;
   return { ...key, Vector: new Float32Array(kind === "Rotation" ? [0, 0, 0, 1] : kind === "Scaling" ? [1, 1, 1] : [0, 0, 0]) };
 }
+export function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array<ArrayBuffer> {
+  let dot = 0; for (let i = 0; i < 4; i++) dot += from[i]! * to[i]!;
+  const sign = dot < 0 ? -1 : 1;
+  const vector = Array.from({ length: 4 }, (_, i) => from[i]! * (1 - weight) + sign * to[i]! * weight);
+  const length = Math.hypot(...vector); return new Float32Array(vector.map(v => v / length));
+}
