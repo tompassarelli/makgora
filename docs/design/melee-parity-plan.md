@@ -328,8 +328,8 @@ Running work is absorbed, not restarted:
   set-hitstun Smashcraft move with no Melee analogue, a Maiev deviation row,
   and its +14 frames is her first objective row.
 - Down special swap (#272) lands as filed; its `setKnockback` field is the set
-  knockback row of the ledger (#287), and the air Fan of Knives spike is one of
-  her edge-guard tools (#307).
+  knockback row of the ledger (#287), and the air Fan of Knives spike was one of
+  her edge-guard tools (#307) until #494 made it a shine-like semi-spike.
 - Tilt-modifier values (#282) land as filed; they are the stick rows of #289.
 
 ## Move shapes

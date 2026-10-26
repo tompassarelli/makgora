@@ -1,0 +1,19 @@
+# #494: Fan of Knives on the ground, then in the air off a full hop; the knives leave her in a ring.
+#! chat -dev quick hero warden
+100 a stick 0 -1
+100 a tap X 2
+101 a stick 0 0
+104 a capture
+106 a capture
+109 a capture
+113 a capture
+200 a tap B 6
+212 a stick 0 -1
+212 a tap X 2
+213 a stick 0 0
+216 a capture
+218 a capture
+221 a capture
+225 a capture
+#! expect a 100 special
+#! expect a 212 special

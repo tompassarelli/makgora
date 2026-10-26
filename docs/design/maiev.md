@@ -80,8 +80,13 @@ stock at every percent of its window; reaching the ledge or the stage misses.
 | --- | --- | --- | --- |
 | back air | 40, ledge level | 60-150 | her offstage kill aerial, Fox's back air role |
 | back air | 60, 40 below | 50-150 | |
-| air Fan of Knives (#272) | 40, ledge level | 40-150 | the earliest spike, the tool no spacie has |
-| air Fan of Knives | 80, 80 below | 30-150 | |
+
+Air Fan of Knives has no row since #494 (26 Oct). Its Fox-shine hit (5%, set
+knockback 80, horizontal) loses no stock under every DI from 20 to 120 past
+the ledge at ledge level down to 120 below, at any percent: the victim still
+holds its double jump and up special and reaches the ledge or the stage, as a
+Melee shine spike only gimps a foe who has spent its jump. The #272 rows were
+for the straight-down spike it replaced.
 
 ## Identity guard
 
@@ -95,10 +100,11 @@ What she keeps, so she does not become Fox in a costume:
 - Shadow Pursuit stun (side special, #273): a set stun that opens grab, smash
   or Fan of Knives, with a second stun inside two seconds only knocking away;
   it has no Melee analogue and stays a recorded deviation.
-- Fan of Knives (down special, #272): a frame-4 knife burst with set
-  knockback that she can jump out of, so it sits near shine and must stay
-  apart from it: it reflects nothing, it never downs, and it must not loop;
-  down special into down special stays below true.
+- Fan of Knives (down special, #272, #494): a frame-4 ring of knives with set
+  knockback, a shine-like semi-spike in the air, that she can jump out of, so
+  it sits near shine and must stay apart from it: it reflects nothing, it
+  never downs, and it must not loop; down special into down special stays
+  below true.
 
 What she must not mirror: Fox's shine loop or waveshine, his laser, and his
 Fire Fox recovery.
