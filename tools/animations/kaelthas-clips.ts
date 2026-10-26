@@ -212,8 +212,8 @@ for (const [pose, key] of [["neutralSpecial", "neutral"], ["sideSpecial", "side"
   const special = KAELTHAS_SPECIALS[key]!;
   for (const air of [false, true]) {
     const form = air ? special.air ?? special.ground : special.ground;
-    const first = key === "neutral" ? form.projectiles![0]!.spawnFrame : key === "side" ? form.commandGrab!.first : (form.regions![0]!.firstFrame + 1);
-    const last = key === "neutral" ? first : key === "side" ? form.commandGrab!.last : form.regions![0]!.lastFrame + 1;
+    const first = key === "neutral" || key === "side" ? form.projectiles![0]!.spawnFrame : (form.regions![0]!.firstFrame + 1);
+    const last = key === "neutral" || key === "side" ? first : form.regions![0]!.lastFrame + 1;
     const keys = key === "up" ? PHOENIX : strikeKeys(form.endFrame, first, last - first + 1, STRIKES[pose]!);
     actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, frames: form.endFrame, contact: first, gesture: keys[2]!.g, keys, air, float: key === "up" });
   }
@@ -288,10 +288,13 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
       MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   }
+  const thrown = /^throw/.test(action.pose), held = action.contact + 3;
   const phaseFrames = action.keys ? Array.from({ length: action.frames + 1 }, (_, i) => i) : [...new Set([0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
+    ...(thrown ? Array.from({ length: action.frames - held }, (_, i) => held + i) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
-  const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
+  const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3
+    : thrown && frame > held ? (1 - (frame - held) / (action.frames - held)) ** 2 : 1;
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
     const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]); if (!first) return;
