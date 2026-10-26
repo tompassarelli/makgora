@@ -51,5 +51,6 @@ export function realFramesDue(real: RealFrames, callbacks: number, ran: number, 
     anchor(real, Math.min(Math.max(real.due, ran - CATCH_UP_FRAMES), ran + CATCH_UP_FRAMES), seconds, callbacks, true);
     real.due = real.anchorFrame;
   }
+  real.due = Math.max(real.due, callbacks);
   return real.due;
 }
