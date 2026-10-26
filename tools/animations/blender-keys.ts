@@ -5,7 +5,7 @@ type Track = mdx.AnimVector;
 type Baked = { frames: number; nodes: { rotation: number[][]; translation: number[][] }[] };
 
 export interface BlenderSkeleton {
-  writeRig(path: string, timing: { frames: number; contact: number; active: number }): Promise<void>;
+  writeRig(path: string, timing: { frames: number; contact: number; active: number; readonly [field: string]: unknown }): Promise<void>;
   readKeys(path: string, frames: number): Promise<(path: string, frame: number) => Float32Array<ArrayBuffer> | undefined>;
 }
 

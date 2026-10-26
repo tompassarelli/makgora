@@ -22,8 +22,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `--pose POSE` appends only that missing gesture, preserving existing clips;
   `--replace-pose POSE` re-authors only an existing gesture at its own sequence
   index, so later clips and their bindings keep their indices. Warden's side
-  special holds a crouched windup with the glaive drawn back behind her
-  (`WARDEN_WINDUP`) until it drives into the lunge (#487).
+  special is authored in Blender (#487): `... --character 5 --replace-pose sideSpecial --rig RIG.json`
+  writes her skeleton, glaive tip and the move's timing, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/warden-pursuit-lunge.py -- RIG.json KEYS.json`
+  bakes one key per frame: a crouched hold with the glaive ring kept face-on to the camera, a lunge on the first
+  active frame and a downward cut, and `... --replace-pose sideSpecial --keys KEYS.json` splices the keys in place.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip

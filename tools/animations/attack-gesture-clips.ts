@@ -19,6 +19,7 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { attackGestureBaseModel } from "./recovery-model";
 import { removeAttackSequence, selectedAttackPose } from "./remove-attack-sequence";
+import { blenderOptions, blenderSkeleton } from "./blender-keys";
 import { crouchWindup, WARDEN_LUNGE, WARDEN_TARGETS, WARDEN_WINDUP } from "./warden-gestures";
 
 const PLAN: Readonly<Record<number, readonly HeroPose[]>> = {
@@ -387,6 +388,8 @@ const [inputArg,outputArg,...options]=process.argv.slice(2),input=resolve(inputA
 const only=options[0]==="--character"?Number(options[1]):undefined;
 const { pose: selectedPose, replace: replacePose } = selectedAttackPose(options) as { readonly pose: HeroPose | undefined; readonly replace: boolean };
 ensure(selectedPose === undefined || only !== undefined, "--pose requires --character");
+const { rig: rigOutput, keys: bakedKeys } = blenderOptions(options);
+ensure(!(rigOutput || bakedKeys) || replacePose, "--rig and --keys need --replace-pose");
 ensure(input&&output&&relative(project,output).startsWith(".."),"usage: bun tools/animations/attack-gesture-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT");
 mkdirSync(output,{recursive:true});
 
@@ -437,6 +440,14 @@ for(const [id,poses]of Object.entries(PLAN)) {
     const contact=special?heroCueWindows(special,1).active.first-(character===5&&(pose==="neutralSpecial"||pose==="ultimate"||pose==="sideSpecial")?1:0):attackStartupFrames(style!,moves);
     const total=special?special.endFrame:attackDurationFramesForGrounding(style!,!pose.endsWith("Air"),moves);
     ensure(contact>0&&total>contact,`${f.name}/${pose}: invalid timing`);
+    const blender=rigOutput||bakedKeys?blenderSkeleton(source,originals,stand,onGlobalClock):undefined;
+    if(blender&&rigOutput){
+      const nodes=[...source.Bones,...source.Helpers,...source.Attachments],tip=nodes.find(n=>n.Name==="Weapon Ref");ensure(tip&&tip.Parent!=null,`${f.name}: missing Weapon Ref`);
+      await blender.writeRig(rigOutput,{frames:total,contact,active:special?heroCueWindows(special,1).active.last-contact+1:characterAttackActiveFrames(character,style!,moves),
+        tip:{parent:nodes.find(n=>n.ObjectId===tip.Parent)!.Name,pivot:Array.from(source.PivotPoints[tip.ObjectId]!)}});
+      console.log(`ATTACK_GESTURE_RIG ${f.name}/${pose} ${rigOutput}`);process.exit(0);
+    }
+    const baked=blender&&bakedKeys?await blender.readKeys(bakedKeys,total):undefined;
     const start=cursor,end=start+Math.round(total*1000/60),index=replaced>=0?replaced:model.Sequences.length;cursor=end+100;
     model.Sequences.splice(index,0,{...stand,Name:`Attack Gesture ${pose}`,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
     let articulated=0;const back=DRAW_BACK[character]?.[pose]??0.3;
@@ -449,7 +460,7 @@ for(const [id,poses]of Object.entries(PLAN)) {
       for(let frame=0;frame<=total;frame++) {
         const anticipation=Math.max(1,contact-(CONTACT_LEAD[character]?.[pose]??2));
         const amountAt=frame<anticipation?-back*Math.sin(frame/anticipation*Math.PI/2):frame<=contact?-back+(1+back)*(contact>anticipation?(frame-anticipation)/(contact-anticipation):1):frame<contact+3?1+0.18*(frame-contact)/3:1.18*Math.max(0,1-(frame-contact-3)/(total-contact-3));
-        const Vector=amount?rotate(key.Vector,amount*amountAt):key.Vector.slice();
+        const Vector=baked?.(path,frame)??(amount?rotate(key.Vector,amount*amountAt):key.Vector.slice());
         track.Keys.push({...key,Frame:start+Math.round(frame*1000/60),Vector,...key.InTan?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}});
       }
     });
@@ -458,12 +469,13 @@ for(const [id,poses]of Object.entries(PLAN)) {
       const drive=WARDEN_WINDUP[pose]?.drive??0;
       const arc=frame<=contact?Math.sin(frame/contact*Math.PI/2):drive&&character===5&&frame<=contact+drive?1+0.6*(frame-contact)/drive:Math.max(0,1-(frame-contact-drive)/(total-contact-drive))*(drive&&character===5?1.6:1);
       const spin = SPIN_POSES[character]?.includes(pose) ?? false;
-      helper.Rotation?.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:rotate(new Float32Array([0,0,0,1]),spin ? 360*Math.min(1,Math.max(0,(frame-contact)/(characterAttackActiveFrames(character,AttackStyle.dashAttack,moves)-1))) : contactProfile(pose,character)![7]!*arc,spin ? 2 : 1)});
+      const helperPath=`.Helpers.${model.Helpers.indexOf(helper)}.Rotation`;
+      helper.Rotation?.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:baked?.(helperPath,frame)??rotate(new Float32Array([0,0,0,1]),spin ? 360*Math.min(1,Math.max(0,(frame-contact)/(characterAttackActiveFrames(character,AttackStyle.dashAttack,moves)-1))) : contactProfile(pose,character)![7]!*arc,spin ? 2 : 1)});
     }
     if(hop)for(let frame=0;frame<=total;frame++)hop.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([0,0,frame<contact?(hops[pose]??0)*Math.sin(Math.PI*frame/contact):0])});
     const shadowLow = character === 9 && pose === "downTilt";
     const aligned = wardenWeaponPose(character,pose) || shadowLow || character === 5 && (pose === "neutralAir" || pose === "forwardAir");
-    if (aligned) aimWeaponContact(model,index,start,contact,total,pose,shadowLow);
+    if (aligned && !baked) aimWeaponContact(model,index,start,contact,total,pose,shadowLow);
     const binding=`{ index: ${index}, seconds: ${seconds((end-start)/1000)}${aligned||character===5&&pose==="downSmash"?", aligned: true":""} }`;
     bindings.push(`    ${pose}: ${binding},`);
     if(special&&pose!=="ultimate"&&!NO_FORM_BINDINGS[character]?.includes(pose))for(const suffix of ["Air","FollowUp","FollowUpAir"])bindings.push(`    ${pose}${suffix}: ${binding},`);
