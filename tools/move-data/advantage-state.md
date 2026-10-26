@@ -37,7 +37,7 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Shadow Hunter | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Pit Lord | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash, dash, dash attack; tech away dash, dash attack; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Pit Lord | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in dash, dash attack; tech away dash grab, back throw; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 60% → up tilt against 4/5 DI |
-| Pit Lord | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash; tech away full hop, forward air; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Pit Lord | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash; tech away full hop, forward air, dash, dash attack; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Rexxar | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in up smash, dash, dash attack; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Rexxar | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Rexxar | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 5/5 DI |
@@ -83,7 +83,7 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Medivh | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Medivh | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, forward smash; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Medivh | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in full hop, down air, jab, short hop, down air, full hop, down air, dash, dash attack; tech away side special; missed tech dash grab, back throw, dash, dash attack; trap full hop, down air, jab, short hop, down air, full hop, down air, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 20% → up air against 4/5 DI |
+| Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in full hop, down air, short hop, down air, forward smash; tech away side special; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
 | Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Anub'arak | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away side special; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
 
@@ -279,7 +279,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Cairne Bloodhoof | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | up throw | 1/1 | 1/1 KD in up tilt, out dash, dash attack | 1/1 KD in up tilt, out dash, dash attack | 2/2 in short hop, down air, out dash, dash attack |
+| Cairne Bloodhoof | medium | up throw | 1/1 | 1/1 KD in up tilt, out dash, dash attack | 1/1 KD in up tilt, out dash, dash attack | 3/2 in full hop in place, down air, out dash, dash attack |
 | Cairne Bloodhoof | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -395,7 +395,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Medivh | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | light | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | light | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 1/1 in short hop, back air, out forward smash | 2/2 in full hop, back air, out full hop, down air |
+| Anub'arak | light | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 1/1 in short hop, back air, out forward smash | 2/2 in full hop, back air, out full hop, down air KO |
 | Anub'arak | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -403,6 +403,6 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Anub'arak | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | heavy | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | heavy | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 1/1 | 1/1 in full hop, back air, out forward smash |
+| Anub'arak | heavy | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 1/1 | 1/1 in full hop, back air, out full hop, down air |
 | Anub'arak | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 
