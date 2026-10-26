@@ -224,7 +224,7 @@ export const LICH_KING_MOVES: FighterMoves = {
   throws: {
 
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, ...NO_LAUNCH } },
-    [GrabAction.throwForward]: { contactFrame: 15, totalFrames: 38, effect: { ...hit(12.5, "EDGE", 35, 1.0, HitElement.normal), growth: 46.5, base: 61.0 } },
+    [GrabAction.throwForward]: { contactFrame: 15, totalFrames: 38, effect: { ...hit(12.5, "EDGE", 35, 1.0, HitElement.normal), growth: 36.5, base: 61.0 } },
     [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 46, effect: { ...hit(15.0, "KILL", 40, -1.0, HitElement.normal), growth: 67.0, base: 57.0 } },
     [GrabAction.throwUp]: { contactFrame: 16, totalFrames: 30, effect: hit(10.0, "JUGGLE", 85) },
 

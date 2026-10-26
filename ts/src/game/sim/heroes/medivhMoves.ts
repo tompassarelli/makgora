@@ -58,8 +58,8 @@ export const MEDIVH_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: throwMove(1, 0, ordinary(3.5226004123687744, 35, 0.0, 0.0)),
-    [GrabAction.throwForward]: throwMove(14, 22, ordinary(8.219401359558105, 35, 63.0, 59.0)),
-    [GrabAction.throwBack]: throwMove(17, 25, ordinary(10.567800521850586, 40, 34.5, 72.0, true)),
+    [GrabAction.throwForward]: throwMove(14, 22, ordinary(8.219401359558105, 25, 33.0, 59.0)),
+    [GrabAction.throwBack]: throwMove(17, 25, ordinary(10.567800521850586, 40, 29.5, 72.0, true)),
     [GrabAction.throwUp]: throwMove(16, 15, ordinary(8.219401359558105, 90, 50.66062545776367, 50.0)),
     [GrabAction.throwDown]: throwMove(18, 24, { ...ordinary(7.045200824737549, 70, 0.0, 0.0), setKnockback: 90.0 }),
   },

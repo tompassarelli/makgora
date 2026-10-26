@@ -702,7 +702,8 @@ deliberate trade-off, and shields cannot trivially escape them.
 - **Forward and back throws** follow each fighter's identity (spacing, edge
   position, Mountain King's and the Dreadlord's KILL back throws). A
   positional one released halfway between centre stage and the ledge at 60%
-  carries the victim past the ledge under every DI (#493).
+  carries the victim past the ledge, or more than 16% of the stage width, under
+  every DI, as Melee Fox's back throw does (#493).
 
 Measured by `bun wisp interactions` for every selectable fighter in
 smashcraft:tools/move-data/interactions/throws.md

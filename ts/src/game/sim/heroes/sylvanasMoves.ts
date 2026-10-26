@@ -68,8 +68,8 @@ export const SYLVANAS_MOVES: FighterMoves = {
   hurtboxes: { stand: SYLVANAS_STAND, attacks: limbPoses },
   throws: {
     [GrabAction.pummel]: { contactFrame: 60, totalFrames: 75, effect: { ...NOTHING, damage: 3.0 } },
-    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 33, effect: sylvanasHit(6.803999900817871, 40, 74.0, 63.0) },
-    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 37, effect: sylvanasHit(7.776000022888184, 40, 50.0, 68.0, true) },
+    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 33, effect: sylvanasHit(6.803999900817871, 40, 46.5, 63.0) },
+    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 37, effect: sylvanasHit(7.776000022888184, 40, 30.0, 68.0, true) },
     [GrabAction.throwUp]: { contactFrame: 14, totalFrames: 24, effect: sylvanasHit(5.831999778747559, 75, 87.63500213623047, 60.0, true) },
     [GrabAction.throwDown]: { contactFrame: 18, totalFrames: 39, effect: { ...sylvanasHit(5.831999778747559, 70, 0.0, 0.0), setKnockback: 90.0 } },
   },

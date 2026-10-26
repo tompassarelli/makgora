@@ -197,7 +197,7 @@ export const BEASTMASTER_MOVES: FighterMoves = {
 
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 2.861999750137329, ...NO_LAUNCH } },
     [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 35, effect: { ...hit(5.782460689544678, "EDGE", 35, 1.0, HitElement.normal), growth: 79.0, base: 61.0 } },
-    [GrabAction.throwBack]: { contactFrame: 17, totalFrames: 43, effect: { ...hit(6.505268573760986, "EDGE", 40, -1.0, HitElement.normal), growth: 56.0, base: 66.0 } },
+    [GrabAction.throwBack]: { contactFrame: 17, totalFrames: 43, effect: { ...hit(6.505268573760986, "EDGE", 40, -1.0, HitElement.normal), growth: 41.0, base: 66.0 } },
     [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 24, effect: hit(5.059652805328369, "JUGGLE", 85, 1.0, HitElement.normal) },
     [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 44, effect: { ...hit(4.336845397949219, "CHASE", 70, 1.0, HitElement.normal), growth: 0.0, base: 0.0, setKnockback: 90.0 } },
   },

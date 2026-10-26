@@ -21,16 +21,16 @@ Gap = mean Melee advantage (five references) minus mean ours (26 fighters), in f
 
 | Throw | Victim % | Ours | Melee | Gap | Knockback values | Weight in knockback | Thrower end lag | Weight-dependent timing |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| forward | 0 | 8.6 | 9.1 | 0.5 | -1.6 | -0.3 | 0.5 | 1.9 |
-| forward | 30 | 14 | 12.7 | -1.2 | -2.9 | -0.8 | 0.5 | 1.9 |
-| forward | 60 | 19.5 | 16.3 | -3.1 | -4.1 | -1.4 | 0.5 | 1.9 |
-| forward | 90 | 24.9 | 20.1 | -4.8 | -5.1 | -2.1 | 0.5 | 1.9 |
-| forward | all | 16.7 | 14.6 | -2.2 | -3.4 | -1.1 | 0.5 | 1.9 |
-| back | 0 | 7.1 | 4.7 | -2.4 | -0.9 | -0.2 | -6 | 4.7 |
-| back | 30 | 12.7 | 8.7 | -4 | -1.8 | -0.9 | -6 | 4.7 |
-| back | 60 | 18.3 | 12.7 | -5.6 | -2.8 | -1.6 | -6 | 4.7 |
-| back | 90 | 24 | 16.3 | -7.6 | -4.1 | -2.3 | -6 | 4.7 |
-| back | all | 15.5 | 10.6 | -4.9 | -2.4 | -1.2 | -6 | 4.7 |
+| forward | 0 | 7.6 | 9.1 | 1.6 | -0.5 | -0.3 | 0.5 | 1.9 |
+| forward | 30 | 11.8 | 12.7 | 0.9 | -1 | -0.6 | 0.5 | 1.9 |
+| forward | 60 | 16.3 | 16.3 | 0 | -1.3 | -1.2 | 0.5 | 1.9 |
+| forward | 90 | 20.8 | 20.1 | -0.7 | -1.4 | -1.7 | 0.5 | 1.9 |
+| forward | all | 14.1 | 14.6 | 0.4 | -1.1 | -0.9 | 0.5 | 1.9 |
+| back | 0 | 6.4 | 4.7 | -1.7 | -0.1 | -0.3 | -6 | 4.7 |
+| back | 30 | 11.3 | 8.7 | -2.6 | -0.4 | -0.9 | -6 | 4.7 |
+| back | 60 | 16.3 | 12.7 | -3.5 | -0.8 | -1.5 | -6 | 4.7 |
+| back | 90 | 21 | 16.3 | -4.7 | -1.5 | -2 | -6 | 4.7 |
+| back | all | 13.8 | 10.6 | -3.1 | -0.7 | -1.1 | -6 | 4.7 |
 | up | 0 | 13.5 | 9.4 | -4.1 | 11 | -0.2 | -19.5 | 4.6 |
 | up | 30 | 19 | 12.8 | -6.1 | 9.6 | -0.8 | -19.5 | 4.6 |
 | up | 60 | 24.2 | 16.8 | -7.4 | 8.9 | -1.3 | -19.5 | 4.6 |
@@ -41,13 +41,13 @@ Gap = mean Melee advantage (five references) minus mean ours (26 fighters), in f
 | down | 60 | 10.9 | 31.6 | 20.8 | 46.4 | -35 | 6.5 | 2.8 |
 | down | 90 | 10.9 | 33.4 | 22.6 | 48.2 | -35 | 6.5 | 2.8 |
 | down | all | 10.9 | 30.6 | 19.8 | 45.4 | -35 | 6.5 | 2.8 |
-| all | all | 16.2 | 17.7 | 1.5 | 12.3 | -9.6 | -4.6 | 3.5 |
+| all | all | 15.1 | 17.7 | 2.6 | 13.3 | -9.6 | -4.6 | 3.5 |
 
-Mean hitstun after a throw is 37.5 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.3 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 1.5 frames (knockback values 820%, weight in knockback -640%, thrower end lag -307%, weight-dependent timing 233%).
+Mean hitstun after a throw is 36.4 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.3 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 2.6 frames (knockback values 512%, weight in knockback -369%, thrower end lag -177%, weight-dependent timing 135%).
 
-Where ours trails Melee (5 of 16 throw and percent cells: forward 0%, down 0%, down 30%, down 60%, down 90%), the gap sums to 79.7 frames: knockback values 226%, weight in knockback -176%, thrower end lag 33%, weight-dependent timing 16%.
+Where ours trails Melee (6 of 16 throw and percent cells: forward 0%, forward 30%, down 0%, down 30%, down 60%, down 90%), the gap sums to 81.7 frames: knockback values 220%, weight in knockback -172%, thrower end lag 33%, weight-dependent timing 18%.
 
-Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 322 of 416 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
+Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 311 of 416 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
 
 ## Melee references
 
@@ -170,14 +170,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Illidan | down | 30 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Illidan | down | 60 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Illidan | down | 90 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Blademaster | forward | 0 | 12 | 31 | 19 | 12 | 8.3, 0 | 77.7 at 35° |
-| Blademaster | forward | 30 | 17 | 36 | 19 | 12 | 8.3, 0 | 91 at 35°, tumble, knockdown at +12 |
-| Blademaster | forward | 60 | 22 | 41 | 19 | 12 | 8.3, 0 | 104.2 at 35°, tumble, knockdown at +13 |
-| Blademaster | forward | 90 | 28 | 47 | 19 | 12 | 8.3, 0 | 117.5 at 35°, tumble, knockdown at +16 |
-| Blademaster | back | 0 | 8 | 31 | 23 | 15 | -8.3, 0 | 78.4 at 140° |
-| Blademaster | back | 30 | 12 | 35 | 23 | 15 | -8.3, 0 | 89.3 at 140°, tumble, knockdown at +13 |
-| Blademaster | back | 60 | 17 | 40 | 23 | 15 | -8.3, 0 | 100.1 at 140°, tumble, knockdown at +15 |
-| Blademaster | back | 90 | 21 | 44 | 23 | 15 | -8.3, 0 | 111 at 140°, tumble, knockdown at +17 |
+| Blademaster | forward | 0 | 9 | 28 | 19 | 12 | 8.3, 0 | 71.4 at 35° |
+| Blademaster | forward | 30 | 12 | 31 | 19 | 12 | 8.3, 0 | 79.6 at 35° |
+| Blademaster | forward | 60 | 16 | 35 | 19 | 12 | 8.3, 0 | 87.8 at 35°, tumble, knockdown at +11 |
+| Blademaster | forward | 90 | 19 | 38 | 19 | 12 | 8.3, 0 | 96 at 35°, tumble, knockdown at +12 |
+| Blademaster | back | 0 | 6 | 29 | 23 | 15 | -8.3, 0 | 72.9 at 145° |
+| Blademaster | back | 30 | 8 | 31 | 23 | 15 | -8.3, 0 | 79 at 145° |
+| Blademaster | back | 60 | 11 | 34 | 23 | 15 | -8.3, 0 | 85 at 145°, tumble, knockdown at +11 |
+| Blademaster | back | 90 | 13 | 36 | 23 | 15 | -8.3, 0 | 91.1 at 145°, tumble, knockdown at +12 |
 | Blademaster | up | 0 | 13 | 24 | 11 | 13 | 8.3, 10.8 | 62.1 at 85° |
 | Blademaster | up | 30 | 17 | 28 | 11 | 13 | 8.3, 10.8 | 70.7 at 85° |
 | Blademaster | up | 60 | 20 | 31 | 11 | 13 | 8.3, 10.8 | 79.3 at 85° |
@@ -218,14 +218,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Maiev Shadowsong | down | 30 | 6 | 36 | 30 | 14 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Maiev Shadowsong | down | 60 | 6 | 36 | 30 | 14 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Maiev Shadowsong | down | 90 | 6 | 36 | 30 | 14 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Kel'Thuzad | forward | 0 | 6 | 30 | 24 | 14 | 8.3, 0 | 76.1 at 35° |
-| Kel'Thuzad | forward | 30 | 12 | 36 | 24 | 14 | 8.3, 0 | 90.6 at 35°, tumble, knockdown at +12 |
-| Kel'Thuzad | forward | 60 | 18 | 42 | 24 | 14 | 8.3, 0 | 105.2 at 35°, tumble, knockdown at +14 |
-| Kel'Thuzad | forward | 90 | 23 | 47 | 24 | 14 | 8.3, 0 | 119.7 at 35°, tumble, knockdown at +16 |
-| Kel'Thuzad | back | 0 | 4 | 31 | 27 | 18 | -8.3, 0 | 78 at 140° |
-| Kel'Thuzad | back | 30 | 8 | 35 | 27 | 18 | -8.3, 0 | 89.9 at 140°, tumble, knockdown at +13 |
-| Kel'Thuzad | back | 60 | 13 | 40 | 27 | 18 | -8.3, 0 | 101.8 at 140°, tumble, knockdown at +15 |
-| Kel'Thuzad | back | 90 | 18 | 45 | 27 | 18 | -8.3, 0 | 113.7 at 140°, tumble, knockdown at +18 |
+| Kel'Thuzad | forward | 0 | 4 | 28 | 24 | 14 | 8.3, 0 | 71.7 at 35° |
+| Kel'Thuzad | forward | 30 | 8 | 32 | 24 | 14 | 8.3, 0 | 82.1 at 35°, tumble, knockdown at +10 |
+| Kel'Thuzad | forward | 60 | 12 | 36 | 24 | 14 | 8.3, 0 | 92.4 at 35°, tumble, knockdown at +12 |
+| Kel'Thuzad | forward | 90 | 17 | 41 | 24 | 14 | 8.3, 0 | 102.7 at 35°, tumble, knockdown at +13 |
+| Kel'Thuzad | back | 0 | 2 | 29 | 27 | 18 | -8.3, 0 | 73.4 at 140° |
+| Kel'Thuzad | back | 30 | 5 | 32 | 27 | 18 | -8.3, 0 | 80.6 at 140°, tumble, knockdown at +11 |
+| Kel'Thuzad | back | 60 | 8 | 35 | 27 | 18 | -8.3, 0 | 87.9 at 140°, tumble, knockdown at +12 |
+| Kel'Thuzad | back | 90 | 11 | 38 | 27 | 18 | -8.3, 0 | 95.1 at 140°, tumble, knockdown at +14 |
 | Kel'Thuzad | up | 0 | 10 | 24 | 14 | 17 | 8.3, 10.8 | 60.1 at 90° |
 | Kel'Thuzad | up | 30 | 15 | 29 | 14 | 17 | 8.3, 10.8 | 74.7 at 90° |
 | Kel'Thuzad | up | 60 | 21 | 35 | 14 | 17 | 8.3, 10.8 | 89.3 at 90°, tumble, knockdown at +30 |
@@ -234,14 +234,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Kel'Thuzad | down | 30 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Kel'Thuzad | down | 60 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Kel'Thuzad | down | 90 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Forsaken Paladin | forward | 0 | 7 | 31 | 24 | 14 | 8.3, 0 | 79.8 at 40° |
-| Forsaken Paladin | forward | 30 | 13 | 37 | 24 | 14 | 8.3, 0 | 94.3 at 40°, tumble, knockdown at +13 |
-| Forsaken Paladin | forward | 60 | 19 | 43 | 24 | 14 | 8.3, 0 | 108.8 at 40°, tumble, knockdown at +16 |
-| Forsaken Paladin | forward | 90 | 25 | 49 | 24 | 14 | 8.3, 0 | 123.2 at 40°, tumble, knockdown at +21 |
-| Forsaken Paladin | back | 0 | 4 | 31 | 27 | 18 | -8.3, 0 | 79.8 at 140° |
-| Forsaken Paladin | back | 30 | 9 | 36 | 27 | 18 | -8.3, 0 | 90.1 at 140°, tumble, knockdown at +13 |
-| Forsaken Paladin | back | 60 | 13 | 40 | 27 | 18 | -8.3, 0 | 100.4 at 140°, tumble, knockdown at +15 |
-| Forsaken Paladin | back | 90 | 17 | 44 | 27 | 18 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +17 |
+| Forsaken Paladin | forward | 0 | 5 | 29 | 24 | 14 | 8.3, 0 | 73.3 at 40° |
+| Forsaken Paladin | forward | 30 | 8 | 32 | 24 | 14 | 8.3, 0 | 81.9 at 40°, tumble, knockdown at +12 |
+| Forsaken Paladin | forward | 60 | 12 | 36 | 24 | 14 | 8.3, 0 | 90.4 at 40°, tumble, knockdown at +13 |
+| Forsaken Paladin | forward | 90 | 15 | 39 | 24 | 14 | 8.3, 0 | 98.9 at 40°, tumble, knockdown at +14 |
+| Forsaken Paladin | back | 0 | 3 | 30 | 27 | 18 | -8.3, 0 | 75.4 at 140° |
+| Forsaken Paladin | back | 30 | 5 | 32 | 27 | 18 | -8.3, 0 | 81.5 at 140°, tumble, knockdown at +11 |
+| Forsaken Paladin | back | 60 | 8 | 35 | 27 | 18 | -8.3, 0 | 87.6 at 140°, tumble, knockdown at +12 |
+| Forsaken Paladin | back | 90 | 10 | 37 | 27 | 18 | -8.3, 0 | 93.7 at 140°, tumble, knockdown at +13 |
 | Forsaken Paladin | up | 0 | 14 | 24 | 10 | 16 | 8.3, 10.8 | 60.8 at 90° |
 | Forsaken Paladin | up | 30 | 18 | 28 | 10 | 16 | 8.3, 10.8 | 70 at 90° |
 | Forsaken Paladin | up | 60 | 21 | 31 | 10 | 16 | 8.3, 10.8 | 79.3 at 90° |
@@ -266,14 +266,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Mal'Ganis | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Mal'Ganis | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Mal'Ganis | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Shadow Hunter | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 76.7 at 35° |
-| Shadow Hunter | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 90.4 at 35°, tumble, knockdown at +12 |
-| Shadow Hunter | forward | 60 | 20 | 41 | 21 | 12 | 8.3, 0 | 104.1 at 35°, tumble, knockdown at +13 |
-| Shadow Hunter | forward | 90 | 26 | 47 | 21 | 12 | 8.3, 0 | 117.9 at 35°, tumble, knockdown at +16 |
-| Shadow Hunter | back | 0 | 6 | 31 | 25 | 16 | -8.3, 0 | 78.1 at 140° |
-| Shadow Hunter | back | 30 | 10 | 35 | 25 | 16 | -8.3, 0 | 89.4 at 140°, tumble, knockdown at +13 |
-| Shadow Hunter | back | 60 | 15 | 40 | 25 | 16 | -8.3, 0 | 100.8 at 140°, tumble, knockdown at +15 |
-| Shadow Hunter | back | 90 | 19 | 44 | 25 | 16 | -8.3, 0 | 112.1 at 140°, tumble, knockdown at +17 |
+| Shadow Hunter | forward | 0 | 8 | 29 | 21 | 12 | 8.3, 0 | 72.8 at 35° |
+| Shadow Hunter | forward | 30 | 12 | 33 | 21 | 12 | 8.3, 0 | 83.2 at 35°, tumble, knockdown at +11 |
+| Shadow Hunter | forward | 60 | 16 | 37 | 21 | 12 | 8.3, 0 | 93.6 at 35°, tumble, knockdown at +12 |
+| Shadow Hunter | forward | 90 | 20 | 41 | 21 | 12 | 8.3, 0 | 103.9 at 35°, tumble, knockdown at +13 |
+| Shadow Hunter | back | 0 | 4 | 29 | 25 | 16 | -8.3, 0 | 74.1 at 140° |
+| Shadow Hunter | back | 30 | 7 | 32 | 25 | 16 | -8.3, 0 | 81.6 at 140°, tumble, knockdown at +11 |
+| Shadow Hunter | back | 60 | 10 | 35 | 25 | 16 | -8.3, 0 | 89.2 at 140°, tumble, knockdown at +13 |
+| Shadow Hunter | back | 90 | 13 | 38 | 25 | 16 | -8.3, 0 | 96.7 at 140°, tumble, knockdown at +14 |
 | Shadow Hunter | up | 0 | 16 | 25 | 9 | 14 | 8.3, 10.8 | 62.6 at 85° |
 | Shadow Hunter | up | 30 | 20 | 29 | 9 | 14 | 8.3, 10.8 | 72.7 at 85° |
 | Shadow Hunter | up | 60 | 24 | 33 | 9 | 14 | 8.3, 10.8 | 82.8 at 85°, tumble, knockdown at +27 |
@@ -302,10 +302,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Rexxar | forward | 30 | 13 | 36 | 23 | 13 | 8.3, 0 | 91.1 at 35°, tumble, knockdown at +12 |
 | Rexxar | forward | 60 | 18 | 41 | 23 | 13 | 8.3, 0 | 104.3 at 35°, tumble, knockdown at +13 |
 | Rexxar | forward | 90 | 24 | 47 | 23 | 13 | 8.3, 0 | 117.6 at 35°, tumble, knockdown at +16 |
-| Rexxar | back | 0 | 4 | 31 | 27 | 17 | -8.3, 0 | 78.4 at 140° |
-| Rexxar | back | 30 | 8 | 35 | 27 | 17 | -8.3, 0 | 89.2 at 140°, tumble, knockdown at +13 |
-| Rexxar | back | 60 | 12 | 39 | 27 | 17 | -8.3, 0 | 99.9 at 140°, tumble, knockdown at +14 |
-| Rexxar | back | 90 | 17 | 44 | 27 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +17 |
+| Rexxar | back | 0 | 3 | 30 | 27 | 17 | -8.3, 0 | 75.1 at 140° |
+| Rexxar | back | 30 | 6 | 33 | 27 | 17 | -8.3, 0 | 83 at 140°, tumble, knockdown at +12 |
+| Rexxar | back | 60 | 9 | 36 | 27 | 17 | -8.3, 0 | 90.8 at 140°, tumble, knockdown at +13 |
+| Rexxar | back | 90 | 12 | 39 | 27 | 17 | -8.3, 0 | 98.7 at 140°, tumble, knockdown at +14 |
 | Rexxar | up | 0 | 15 | 25 | 10 | 15 | 8.3, 10.8 | 64.8 at 85° |
 | Rexxar | up | 30 | 20 | 30 | 10 | 15 | 8.3, 10.8 | 76.7 at 85° |
 | Rexxar | up | 60 | 25 | 35 | 10 | 15 | 8.3, 10.8 | 88.7 at 85°, tumble, knockdown at +30 |
@@ -314,10 +314,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Rexxar | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Rexxar | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Rexxar | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Lich King | forward | 0 | 6 | 30 | 24 | 15 | 8.3, 0 | 75.9 at 35° |
-| Lich King | forward | 30 | 12 | 36 | 24 | 15 | 8.3, 0 | 91.5 at 35°, tumble, knockdown at +12 |
-| Lich King | forward | 60 | 18 | 42 | 24 | 15 | 8.3, 0 | 107.1 at 35°, tumble, knockdown at +14 |
-| Lich King | forward | 90 | 25 | 49 | 24 | 15 | 8.3, 0 | 122.8 at 35°, tumble, knockdown at +17 |
+| Lich King | forward | 0 | 5 | 29 | 24 | 15 | 8.3, 0 | 72.7 at 35° |
+| Lich King | forward | 30 | 9 | 33 | 24 | 15 | 8.3, 0 | 84.9 at 35°, tumble, knockdown at +11 |
+| Lich King | forward | 60 | 14 | 38 | 24 | 15 | 8.3, 0 | 97.2 at 35°, tumble, knockdown at +12 |
+| Lich King | forward | 90 | 19 | 43 | 24 | 15 | 8.3, 0 | 109.5 at 35°, tumble, knockdown at +14 |
 | Lich King | back | 0 | 4 | 33 | 29 | 18 | -8.3, 0 | 82.7 at 140°, tumble, knockdown at +12 |
 | Lich King | back | 30 | 15 | 44 | 29 | 18 | -8.3, 0 | 110.1 at 140°, tumble, knockdown at +17 |
 | Lich King | back | 60 | 25 | 54 | 29 | 18 | -8.3, 0 | 137.4 at 140°, tumble, knockdown at +27 |
@@ -350,10 +350,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Jaina Proudmoore | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 91.1 at 35°, tumble, knockdown at +12 |
 | Jaina Proudmoore | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.7 at 35°, tumble, knockdown at +14 |
 | Jaina Proudmoore | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 118.3 at 35°, tumble, knockdown at +16 |
-| Jaina Proudmoore | back | 0 | 6 | 31 | 25 | 17 | -8.3, 0 | 79.5 at 140° |
-| Jaina Proudmoore | back | 30 | 10 | 35 | 25 | 17 | -8.3, 0 | 90 at 140°, tumble, knockdown at +13 |
-| Jaina Proudmoore | back | 60 | 15 | 40 | 25 | 17 | -8.3, 0 | 100.4 at 140°, tumble, knockdown at +15 |
-| Jaina Proudmoore | back | 90 | 19 | 44 | 25 | 17 | -8.3, 0 | 110.9 at 140°, tumble, knockdown at +17 |
+| Jaina Proudmoore | back | 0 | 5 | 30 | 25 | 17 | -8.3, 0 | 77.1 at 140° |
+| Jaina Proudmoore | back | 30 | 9 | 34 | 25 | 17 | -8.3, 0 | 85.4 at 140°, tumble, knockdown at +12 |
+| Jaina Proudmoore | back | 60 | 12 | 37 | 25 | 17 | -8.3, 0 | 93.8 at 140°, tumble, knockdown at +13 |
+| Jaina Proudmoore | back | 90 | 15 | 40 | 25 | 17 | -8.3, 0 | 102.1 at 140°, tumble, knockdown at +15 |
 | Jaina Proudmoore | up | 0 | 14 | 25 | 11 | 15 | 8.3, 10.8 | 63.8 at 90° |
 | Jaina Proudmoore | up | 30 | 21 | 32 | 11 | 15 | 8.3, 10.8 | 80.2 at 90°, tumble, knockdown at +26 |
 | Jaina Proudmoore | up | 60 | 27 | 38 | 11 | 15 | 8.3, 10.8 | 96.7 at 90°, tumble, knockdown at +34 |
@@ -362,14 +362,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Jaina Proudmoore | down | 30 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Jaina Proudmoore | down | 60 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Jaina Proudmoore | down | 90 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Sylvanas Windrunner | forward | 0 | 10 | 31 | 21 | 13 | 8.3, 0 | 79.5 at 40° |
-| Sylvanas Windrunner | forward | 30 | 16 | 37 | 21 | 13 | 8.3, 0 | 93.8 at 40°, tumble, knockdown at +13 |
-| Sylvanas Windrunner | forward | 60 | 22 | 43 | 21 | 13 | 8.3, 0 | 108 at 40°, tumble, knockdown at +16 |
-| Sylvanas Windrunner | forward | 90 | 27 | 48 | 21 | 13 | 8.3, 0 | 122.2 at 40°, tumble, knockdown at +20 |
-| Sylvanas Windrunner | back | 0 | 9 | 31 | 22 | 16 | -8.3, 0 | 79.8 at 140° |
-| Sylvanas Windrunner | back | 30 | 14 | 36 | 22 | 16 | -8.3, 0 | 90.6 at 140°, tumble, knockdown at +13 |
-| Sylvanas Windrunner | back | 60 | 18 | 40 | 22 | 16 | -8.3, 0 | 101.4 at 140°, tumble, knockdown at +15 |
-| Sylvanas Windrunner | back | 90 | 22 | 44 | 22 | 16 | -8.3, 0 | 112.2 at 140°, tumble, knockdown at +17 |
+| Sylvanas Windrunner | forward | 0 | 8 | 29 | 21 | 13 | 8.3, 0 | 73.4 at 40° |
+| Sylvanas Windrunner | forward | 30 | 11 | 32 | 21 | 13 | 8.3, 0 | 82.3 at 40°, tumble, knockdown at +12 |
+| Sylvanas Windrunner | forward | 60 | 15 | 36 | 21 | 13 | 8.3, 0 | 91.3 at 40°, tumble, knockdown at +13 |
+| Sylvanas Windrunner | forward | 90 | 19 | 40 | 21 | 13 | 8.3, 0 | 100.2 at 40°, tumble, knockdown at +15 |
+| Sylvanas Windrunner | back | 0 | 8 | 30 | 22 | 16 | -8.3, 0 | 75.1 at 140° |
+| Sylvanas Windrunner | back | 30 | 10 | 32 | 22 | 16 | -8.3, 0 | 81.6 at 140°, tumble, knockdown at +11 |
+| Sylvanas Windrunner | back | 60 | 13 | 35 | 22 | 16 | -8.3, 0 | 88 at 140°, tumble, knockdown at +12 |
+| Sylvanas Windrunner | back | 90 | 15 | 37 | 22 | 16 | -8.3, 0 | 94.5 at 140°, tumble, knockdown at +13 |
 | Sylvanas Windrunner | up | 0 | 20 | 31 | 11 | 14 | 8.3, 10.8 | 78.6 at 105° |
 | Sylvanas Windrunner | up | 30 | 26 | 37 | 11 | 14 | 8.3, 10.8 | 93.4 at 105°, tumble, knockdown at +31 |
 | Sylvanas Windrunner | up | 60 | 32 | 43 | 11 | 14 | 8.3, 10.8 | 108.1 at 105°, tumble, knockdown at +40 |
@@ -410,14 +410,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Chen Stormstout | down | 30 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Chen Stormstout | down | 60 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Chen Stormstout | down | 90 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Peon | forward | 0 | 8 | 30 | 22 | 13 | 8.3, 0 | 75.8 at 35° |
-| Peon | forward | 30 | 13 | 35 | 22 | 13 | 8.3, 0 | 89.6 at 35°, tumble, knockdown at +11 |
-| Peon | forward | 60 | 19 | 41 | 22 | 13 | 8.3, 0 | 103.5 at 35°, tumble, knockdown at +13 |
-| Peon | forward | 90 | 24 | 46 | 22 | 13 | 8.3, 0 | 117.3 at 35°, tumble, knockdown at +16 |
-| Peon | back | 0 | 6 | 31 | 25 | 16 | -8.3, 0 | 78 at 140° |
-| Peon | back | 30 | 10 | 35 | 25 | 16 | -8.3, 0 | 89.8 at 140°, tumble, knockdown at +13 |
-| Peon | back | 60 | 15 | 40 | 25 | 16 | -8.3, 0 | 101.6 at 140°, tumble, knockdown at +15 |
-| Peon | back | 90 | 20 | 45 | 25 | 16 | -8.3, 0 | 113.3 at 140°, tumble, knockdown at +18 |
+| Peon | forward | 0 | 6 | 28 | 22 | 13 | 8.3, 0 | 71.8 at 35° |
+| Peon | forward | 30 | 10 | 32 | 22 | 13 | 8.3, 0 | 81.8 at 35°, tumble, knockdown at +10 |
+| Peon | forward | 60 | 14 | 36 | 22 | 13 | 8.3, 0 | 91.9 at 35°, tumble, knockdown at +12 |
+| Peon | forward | 90 | 18 | 40 | 22 | 13 | 8.3, 0 | 101.9 at 35°, tumble, knockdown at +13 |
+| Peon | back | 0 | 4 | 29 | 25 | 16 | -8.3, 0 | 73.7 at 140° |
+| Peon | back | 30 | 7 | 32 | 25 | 16 | -8.3, 0 | 81.3 at 140°, tumble, knockdown at +11 |
+| Peon | back | 60 | 10 | 35 | 25 | 16 | -8.3, 0 | 88.9 at 140°, tumble, knockdown at +13 |
+| Peon | back | 90 | 13 | 38 | 25 | 16 | -8.3, 0 | 96.4 at 140°, tumble, knockdown at +14 |
 | Peon | up | 0 | 13 | 24 | 11 | 12 | 8.3, 10.8 | 61.9 at 85° |
 | Peon | up | 30 | 17 | 28 | 11 | 12 | 8.3, 10.8 | 72.3 at 85° |
 | Peon | up | 60 | 22 | 33 | 11 | 12 | 8.3, 10.8 | 82.7 at 85°, tumble, knockdown at +27 |
@@ -426,14 +426,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Peon | down | 30 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Peon | down | 60 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Peon | down | 90 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Goblin Tinker | forward | 0 | 8 | 31 | 23 | 14 | 8.3, 0 | 79.2 at 35° |
-| Goblin Tinker | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 92.3 at 35°, tumble, knockdown at +12 |
-| Goblin Tinker | forward | 60 | 19 | 42 | 23 | 14 | 8.3, 0 | 105.3 at 35°, tumble, knockdown at +14 |
-| Goblin Tinker | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 118.4 at 35°, tumble, knockdown at +16 |
-| Goblin Tinker | back | 0 | 6 | 32 | 26 | 18 | -8.3, 0 | 81.5 at 135°, tumble, knockdown at +12 |
-| Goblin Tinker | back | 30 | 11 | 37 | 26 | 18 | -8.3, 0 | 92.9 at 135°, tumble, knockdown at +15 |
-| Goblin Tinker | back | 60 | 15 | 41 | 26 | 18 | -8.3, 0 | 104.4 at 135°, tumble, knockdown at +18 |
-| Goblin Tinker | back | 90 | 20 | 46 | 26 | 18 | -8.3, 0 | 115.8 at 135°, tumble, knockdown at +22 |
+| Goblin Tinker | forward | 0 | 5 | 28 | 23 | 14 | 8.3, 0 | 71.9 at 35° |
+| Goblin Tinker | forward | 30 | 8 | 31 | 23 | 14 | 8.3, 0 | 78.8 at 35° |
+| Goblin Tinker | forward | 60 | 11 | 34 | 23 | 14 | 8.3, 0 | 85.6 at 35°, tumble, knockdown at +11 |
+| Goblin Tinker | forward | 90 | 13 | 36 | 23 | 14 | 8.3, 0 | 92.4 at 35°, tumble, knockdown at +12 |
+| Goblin Tinker | back | 0 | 3 | 29 | 26 | 18 | -8.3, 0 | 74.4 at 150° |
+| Goblin Tinker | back | 30 | 5 | 31 | 26 | 18 | -8.3, 0 | 79.4 at 150° |
+| Goblin Tinker | back | 60 | 7 | 33 | 26 | 18 | -8.3, 0 | 84.4 at 150°, tumble, knockdown at +9 |
+| Goblin Tinker | back | 90 | 9 | 35 | 26 | 18 | -8.3, 0 | 89.3 at 150°, tumble, knockdown at +10 |
 | Goblin Tinker | up | 0 | 15 | 25 | 10 | 15 | 8.3, 10.8 | 63.6 at 85° |
 | Goblin Tinker | up | 30 | 19 | 29 | 10 | 15 | 8.3, 10.8 | 74.2 at 85° |
 | Goblin Tinker | up | 60 | 23 | 33 | 10 | 15 | 8.3, 10.8 | 84.9 at 85°, tumble, knockdown at +28 |
@@ -442,10 +442,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Goblin Tinker | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Goblin Tinker | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Goblin Tinker | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Kael'thas Sunstrider | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 75.2 at 35° |
-| Kael'thas Sunstrider | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 90.1 at 35°, tumble, knockdown at +11 |
-| Kael'thas Sunstrider | forward | 60 | 19 | 42 | 23 | 14 | 8.3, 0 | 105 at 35°, tumble, knockdown at +14 |
-| Kael'thas Sunstrider | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 119.9 at 35°, tumble, knockdown at +16 |
+| Kael'thas Sunstrider | forward | 0 | 3 | 26 | 23 | 14 | 8.3, 0 | 67 at 25° |
+| Kael'thas Sunstrider | forward | 30 | 6 | 29 | 23 | 14 | 8.3, 0 | 74.3 at 25° |
+| Kael'thas Sunstrider | forward | 60 | 9 | 32 | 23 | 14 | 8.3, 0 | 81.7 at 25°, tumble, knockdown at +8 |
+| Kael'thas Sunstrider | forward | 90 | 12 | 35 | 23 | 14 | 8.3, 0 | 89 at 25°, tumble, knockdown at +8 |
 | Kael'thas Sunstrider | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 81.2 at 145°, tumble, knockdown at +10 |
 | Kael'thas Sunstrider | back | 30 | 15 | 41 | 26 | 17 | -8.3, 0 | 103.7 at 145°, tumble, knockdown at +13 |
 | Kael'thas Sunstrider | back | 60 | 24 | 50 | 26 | 17 | -8.3, 0 | 126.1 at 145°, tumble, knockdown at +18 |
@@ -458,14 +458,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Kael'thas Sunstrider | down | 30 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
 | Kael'thas Sunstrider | down | 60 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
 | Kael'thas Sunstrider | down | 90 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
-| Murloc | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 77 at 40° |
-| Murloc | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 92.4 at 40°, tumble, knockdown at +13 |
-| Murloc | forward | 60 | 22 | 43 | 21 | 12 | 8.3, 0 | 107.7 at 40°, tumble, knockdown at +16 |
-| Murloc | forward | 90 | 28 | 49 | 21 | 12 | 8.3, 0 | 123.1 at 40°, tumble, knockdown at +21 |
-| Murloc | back | 0 | 9 | 32 | 23 | 14 | -8.3, 0 | 80.4 at 140°, tumble, knockdown at +11 |
-| Murloc | back | 30 | 13 | 36 | 23 | 14 | -8.3, 0 | 91.3 at 140°, tumble, knockdown at +13 |
-| Murloc | back | 60 | 17 | 40 | 23 | 14 | -8.3, 0 | 102.2 at 140°, tumble, knockdown at +15 |
-| Murloc | back | 90 | 22 | 45 | 23 | 14 | -8.3, 0 | 113.2 at 140°, tumble, knockdown at +18 |
+| Murloc | forward | 0 | 7 | 28 | 21 | 12 | 8.3, 0 | 70.1 at 40° |
+| Murloc | forward | 30 | 10 | 31 | 21 | 12 | 8.3, 0 | 78.9 at 40° |
+| Murloc | forward | 60 | 14 | 35 | 21 | 12 | 8.3, 0 | 87.6 at 40°, tumble, knockdown at +12 |
+| Murloc | forward | 90 | 17 | 38 | 21 | 12 | 8.3, 0 | 96.4 at 40°, tumble, knockdown at +14 |
+| Murloc | back | 0 | 8 | 31 | 23 | 14 | -8.3, 0 | 78.2 at 140° |
+| Murloc | back | 30 | 11 | 34 | 23 | 14 | -8.3, 0 | 86.7 at 140°, tumble, knockdown at +12 |
+| Murloc | back | 60 | 15 | 38 | 23 | 14 | -8.3, 0 | 95.3 at 140°, tumble, knockdown at +14 |
+| Murloc | back | 90 | 18 | 41 | 23 | 14 | -8.3, 0 | 103.9 at 140°, tumble, knockdown at +15 |
 | Murloc | up | 0 | 9 | 24 | 15 | 12 | 8.3, 10.8 | 61.6 at 90° |
 | Murloc | up | 30 | 13 | 28 | 15 | 12 | 8.3, 10.8 | 72.3 at 90° |
 | Murloc | up | 60 | 18 | 33 | 15 | 12 | 8.3, 10.8 | 83 at 90°, tumble, knockdown at +27 |
@@ -490,14 +490,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Grom Hellscream | down | 30 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Grom Hellscream | down | 60 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Grom Hellscream | down | 90 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Kobold | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 77 at 40° |
-| Kobold | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 92.3 at 40°, tumble, knockdown at +13 |
-| Kobold | forward | 60 | 22 | 43 | 21 | 12 | 8.3, 0 | 107.7 at 40°, tumble, knockdown at +16 |
-| Kobold | forward | 90 | 28 | 49 | 21 | 12 | 8.3, 0 | 123.1 at 40°, tumble, knockdown at +21 |
-| Kobold | back | 0 | 12 | 32 | 20 | 14 | -8.3, 0 | 80.4 at 140°, tumble, knockdown at +11 |
-| Kobold | back | 30 | 16 | 36 | 20 | 14 | -8.3, 0 | 91.3 at 140°, tumble, knockdown at +13 |
-| Kobold | back | 60 | 20 | 40 | 20 | 14 | -8.3, 0 | 102.2 at 140°, tumble, knockdown at +15 |
-| Kobold | back | 90 | 25 | 45 | 20 | 14 | -8.3, 0 | 113.1 at 140°, tumble, knockdown at +18 |
+| Kobold | forward | 0 | 7 | 28 | 21 | 12 | 8.3, 0 | 70.1 at 40° |
+| Kobold | forward | 30 | 10 | 31 | 21 | 12 | 8.3, 0 | 78.9 at 40° |
+| Kobold | forward | 60 | 14 | 35 | 21 | 12 | 8.3, 0 | 87.6 at 40°, tumble, knockdown at +12 |
+| Kobold | forward | 90 | 17 | 38 | 21 | 12 | 8.3, 0 | 96.4 at 40°, tumble, knockdown at +14 |
+| Kobold | back | 0 | 11 | 31 | 20 | 14 | -8.3, 0 | 78.2 at 140° |
+| Kobold | back | 30 | 14 | 34 | 20 | 14 | -8.3, 0 | 86.7 at 140°, tumble, knockdown at +12 |
+| Kobold | back | 60 | 18 | 38 | 20 | 14 | -8.3, 0 | 95.3 at 140°, tumble, knockdown at +14 |
+| Kobold | back | 90 | 21 | 41 | 20 | 14 | -8.3, 0 | 103.9 at 140°, tumble, knockdown at +15 |
 | Kobold | up | 0 | 9 | 24 | 15 | 12 | 8.3, 10.8 | 61.5 at 90° |
 | Kobold | up | 30 | 13 | 28 | 15 | 12 | 8.3, 10.8 | 72.2 at 90° |
 | Kobold | up | 60 | 18 | 33 | 15 | 12 | 8.3, 10.8 | 82.9 at 90°, tumble, knockdown at +27 |
@@ -510,10 +510,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Malfurion Stormrage | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 90.8 at 35°, tumble, knockdown at +12 |
 | Malfurion Stormrage | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.6 at 35°, tumble, knockdown at +14 |
 | Malfurion Stormrage | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 118.4 at 35°, tumble, knockdown at +16 |
-| Malfurion Stormrage | back | 0 | 6 | 31 | 25 | 17 | -8.3, 0 | 78.8 at 140° |
-| Malfurion Stormrage | back | 30 | 10 | 35 | 25 | 17 | -8.3, 0 | 89.7 at 140°, tumble, knockdown at +13 |
-| Malfurion Stormrage | back | 60 | 15 | 40 | 25 | 17 | -8.3, 0 | 100.7 at 140°, tumble, knockdown at +15 |
-| Malfurion Stormrage | back | 90 | 19 | 44 | 25 | 17 | -8.3, 0 | 111.6 at 140°, tumble, knockdown at +17 |
+| Malfurion Stormrage | back | 0 | 5 | 30 | 25 | 17 | -8.3, 0 | 76.2 at 140° |
+| Malfurion Stormrage | back | 30 | 8 | 33 | 25 | 17 | -8.3, 0 | 84.5 at 140°, tumble, knockdown at +12 |
+| Malfurion Stormrage | back | 60 | 12 | 37 | 25 | 17 | -8.3, 0 | 92.8 at 140°, tumble, knockdown at +13 |
+| Malfurion Stormrage | back | 90 | 15 | 40 | 25 | 17 | -8.3, 0 | 101.1 at 140°, tumble, knockdown at +15 |
 | Malfurion Stormrage | up | 0 | 13 | 24 | 11 | 15 | 8.3, 10.8 | 61.1 at 90° |
 | Malfurion Stormrage | up | 30 | 19 | 30 | 11 | 15 | 8.3, 10.8 | 76.2 at 90° |
 | Malfurion Stormrage | up | 60 | 25 | 36 | 11 | 15 | 8.3, 10.8 | 91.4 at 90°, tumble, knockdown at +31 |
@@ -522,14 +522,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Malfurion Stormrage | down | 30 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Malfurion Stormrage | down | 60 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Malfurion Stormrage | down | 90 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Medivh | forward | 0 | 6 | 29 | 23 | 14 | 8.3, 0 | 74.5 at 35° |
-| Medivh | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 89.6 at 35°, tumble, knockdown at +11 |
-| Medivh | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.7 at 35°, tumble, knockdown at +14 |
-| Medivh | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 119.8 at 35°, tumble, knockdown at +16 |
-| Medivh | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 81.7 at 140°, tumble, knockdown at +11 |
-| Medivh | back | 30 | 10 | 36 | 26 | 17 | -8.3, 0 | 91.6 at 140°, tumble, knockdown at +13 |
-| Medivh | back | 60 | 14 | 40 | 26 | 17 | -8.3, 0 | 101.6 at 140°, tumble, knockdown at +15 |
-| Medivh | back | 90 | 18 | 44 | 26 | 17 | -8.3, 0 | 111.5 at 140°, tumble, knockdown at +17 |
+| Medivh | forward | 0 | 3 | 26 | 23 | 14 | 8.3, 0 | 67.1 at 25° |
+| Medivh | forward | 30 | 7 | 30 | 23 | 14 | 8.3, 0 | 75 at 25° |
+| Medivh | forward | 60 | 10 | 33 | 23 | 14 | 8.3, 0 | 82.9 at 25°, tumble, knockdown at +8 |
+| Medivh | forward | 90 | 13 | 36 | 23 | 14 | 8.3, 0 | 90.9 at 25°, tumble, knockdown at +9 |
+| Medivh | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 80.3 at 140°, tumble, knockdown at +11 |
+| Medivh | back | 30 | 9 | 35 | 26 | 17 | -8.3, 0 | 88.8 at 140°, tumble, knockdown at +13 |
+| Medivh | back | 60 | 12 | 38 | 26 | 17 | -8.3, 0 | 97.3 at 140°, tumble, knockdown at +14 |
+| Medivh | back | 90 | 16 | 42 | 26 | 17 | -8.3, 0 | 105.8 at 140°, tumble, knockdown at +16 |
 | Medivh | up | 0 | 8 | 24 | 16 | 16 | 8.3, 10.8 | 62.5 at 90° |
 | Medivh | up | 30 | 13 | 29 | 16 | 16 | 8.3, 10.8 | 74.6 at 90° |
 | Medivh | up | 60 | 18 | 34 | 16 | 16 | 8.3, 10.8 | 86.8 at 90°, tumble, knockdown at +29 |

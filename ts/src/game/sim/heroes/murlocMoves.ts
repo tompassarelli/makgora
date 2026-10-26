@@ -59,8 +59,8 @@ export const MURLOC_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 1, totalFrames: 1, effect: ordinary(2.4977293014526367, 35, 0.0, 0.0) },
-    [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 32, effect: ordinary(8.742053031921387, 40, 64.0, 61.0) },
-    [GrabAction.throwBack]: { contactFrame: 14, totalFrames: 36, effect: ordinary(11.239782333374023, 40, 35.0, 70.0, true) },
+    [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 32, effect: ordinary(8.742053031921387, 40, 36.5, 61.0) },
+    [GrabAction.throwBack]: { contactFrame: 14, totalFrames: 36, effect: ordinary(11.239782333374023, 40, 27.5, 70.0, true) },
     [GrabAction.throwUp]: { contactFrame: 12, totalFrames: 26, effect: ordinary(7.493188381195068, 90, 49.619850158691406, 50.0) },
     [GrabAction.throwDown]: { contactFrame: 16, totalFrames: 38, effect: { ...ordinary(6.244323253631592, 70, 0.0, 0.0), setKnockback: 90.0 } },
   },
