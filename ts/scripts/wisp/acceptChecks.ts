@@ -169,6 +169,20 @@ const slashLightChecks: NativeCheck[] = (["before", "after"] as const).map((phas
   look: `Slash hit ${phase}: the same chest-height spark at 25 ms intervals over its 150 ms life. After must light the nearer fighter's surface warm white and fade by 140 ms in Reforged; Classic shows the identical spark with no light. Record graphics mode and native frame cost against the #168 budget.`,
 }));
 
+const koboldGrabChecks: NativeCheck[] = ([["right", "a", "d"], ["left", "b", "a"]] as const).flatMap(([facing, client, toward]): NativeCheck[] => {
+  const check = (move: string, setup: NonNullable<NativeCheck["setup"]>, count: number, look: string): NativeCheck => ({
+    id: `402-kobold-${move}-${facing}`, closes: "smashcraft#402", map: heroProfile("Kobold"), session: "402-kobold",
+    setup, capture: [{ kind: "frames", name: move, client, count, everyMs: 16 }], pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+    look: `Kobold facing ${facing}: ${look}`,
+  });
+  return [
+    check("stop", [{ chat: "-dev reset" }, { chat: `${QUICK_HERO_COMMAND}kobold` }, { waitMs: 4000 }, { keys: [toward], holdMs: 370, client }], 20,
+      "runs at the other Kobold and, on release, plants his feet and brakes to a stand in front of him"),
+    check("grab", [{ waitMs: 600 }, { keys: ["o"], client }], 20, "reaches forward with his free hand and seizes the other Kobold"),
+    check("throwUp", [{ keys: ["w"], client }], 24, "heaves the held Kobold straight overhead with both arms, launching him upward"),
+  ];
+});
+
 export const SMASHCRAFT_ACCEPT: AcceptSuite = {
   maps: MAP_PROFILES,
   checks: [
@@ -296,6 +310,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...FIGHTER_SEPARATION_CHECKS,
     ...contactLightChecks,
     ...slashLightChecks,
+    ...koboldGrabChecks,
     {
       id: "57-underside",
       closes: "smashcraft#57 box 2",
