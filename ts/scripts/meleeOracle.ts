@@ -58,9 +58,7 @@ const FALCO: ReferenceFighter = {
 
 
 const MAIEV: ReferenceFighter = {
-  jumpSquat: 3, jumpVelocity: 4.0, hopVelocity: 1.899999976158142,
-  aerialJumpMultiplier: 1.0, gravity: 0.17000000178813934, fastFallVelocity: 3.5,
-  dashInitialVelocity: 2.0, runVelocity: 2.299999952316284, walkVelocity: 1.600000023841858,
+  ...FOX, dashInitialVelocity: 2.0, runVelocity: 2.299999952316284, walkVelocity: 1.600000023841858,
 };
 
 function referenceFighter(character: Character): ReferenceFighter | undefined {

@@ -241,14 +241,6 @@ export const MELEE_DASH_RUN_FRAME_SPREAD: readonly [number, number] = [8, 19];
 type VerticalPhysics = Pick<FighterPhysics, "gravity" | "terminalSpeed" | "fastFallSpeed" | "fullJumpSpeed" | "shortJumpSpeed" | "aerialJumpSpeed">;
 
 export const HERO_VERTICAL: { readonly [character: number]: VerticalPhysics | undefined } = {
-  [Character.warden]: {
-    gravity: melee(0.17000000178813934),
-    terminalSpeed: melee(3.0999999046325684),
-    fastFallSpeed: melee(3.5),
-    fullJumpSpeed: melee(4.0),
-    shortJumpSpeed: melee(1.899999976158142),
-    aerialJumpSpeed: melee(4.0),
-  },
   [Character.kaelthas]: {
     gravity: melee(0.08500000089406967),
     terminalSpeed: melee(1.5499999523162842),

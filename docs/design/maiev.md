@@ -1,13 +1,19 @@
 # Maiev: combo targets and identity guard
 
-Tom set the direction on 2026-10-25: Maiev is modelled on Fox with some Falco,
-with explosive combos, edge guarding and tech chases, and she keeps her own
-identity. These are her targets for the retune (#304-#308), written before it
-starts (#303). The link rows live in `tools/move-data/combo-objectives.json`
+Tom set the direction on 2026-10-25: Maiev is modelled on Fox, with
+explosive combos, edge guarding and tech chases, and she keeps her own identity. These are her
+targets for the retune (#304-#308), written before it starts (#303). The link rows live in `tools/move-data/combo-objectives.json`
 and `bun wisp combos --objectives` checks them against the committed link
 table; misses are expected until the retune lands. Each row's window and class
 comes from the Fox fixture's link table (`tools/move-data/links/fixturefox.md`)
-at Fox's weight 75, moved toward Falco where she should be more vertical.
+at Fox's weight 75.
+
+On 2026-10-26 Tom clarified that her reference is Fox alone: the Falco-style
+vertical combo game belongs to Illidan (#457). Her falls, jumps, weight and air
+speed went back to Fox's (#456), the up air string row that ended in a
+Falco-style read was dropped because Fox's up air into up air has no link past
+60%, and the down air spike edge guards, a Falco role, were dropped; her down
+air keeps its spike as her own move, unchecked.
 
 ## Link targets
 
@@ -17,13 +23,12 @@ beats read. The DIs listed must not escape.
 | Opener | Percent | Follow-up | Floor | DIs that must not escape | Source | Today |
 | --- | --- | --- | --- | --- | --- | --- |
 | down tilt | 0-20 | down tilt | true | | starter row (#299) | holds |
-| neutral air | 10-20 | grab | DI-dependent | in, none | Fox true at 10-20 | holds |
-| neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | holds |
+| neutral air | 10-20 | grab | DI-dependent | in, none | Fox true at 10-20 | misses (#456): read, the grab lands 21 frames after the hit, 3 frames later than with Falco's falls, and jump, air dodge and tech away escape |
+| neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | misses (#456): read, the jab lands 17 frames after the hit, 3 frames later than with Falco's falls, and shield escapes |
 | down air | 0-100 | down special (Fan of Knives) | true | | Fox down air into shine, true | holds |
 | down air | 0-60 | grab | true | | Fox true | holds |
 | up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | holds (#306) |
-| up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | holds |
-| up air | 70-100 | up air | read | | Falco: the string ends in a read | holds |
+| up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | misses (#456): read, tech away escapes the short-hop up air, which lands 27 frames after the hit on Fox's lower short hop |
 | side special (Shadow Pursuit) | 0-150 | grab | true | | her stun (#273) | holds |
 | side special (Shadow Pursuit) | 0-150 | forward smash | true | | her stun (#273) | holds |
 | up smash | 30-50 | grab | read | | Fox read; a tech-chase read | holds |
@@ -73,10 +78,8 @@ stock at every percent of its window; reaching the ledge or the stage misses.
 
 | Move | Victim past the ledge, height | Percent | Role |
 | --- | --- | --- | --- |
-| back air | 40, ledge level | 60-150 | her offstage kill aerial, Fox's and Falco's back air role |
+| back air | 40, ledge level | 60-150 | her offstage kill aerial, Fox's back air role |
 | back air | 60, 40 below | 50-150 | |
-| down air | 40, ledge level | 60-150 | a spike offstage, Falco's down air role: its last knife hit spikes airborne foes and keeps its link hit on grounded ones |
-| down air | 80, 80 below | 50-150 | |
 | air Fan of Knives (#272) | 40, ledge level | 40-150 | the earliest spike, the tool no spacie has |
 | air Fan of Knives | 80, 80 below | 30-150 | |
 

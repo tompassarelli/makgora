@@ -109,7 +109,7 @@ Frames count from one, as the [roster](roster.md) does.
 | Blademaster neutral air, Blade Wheel | 7–9 (3), 13–15 (6) | first turn pulls in | second, tighter turn launches at 50° | like Falcon's and Marth's |
 | Dreadlord neutral air, Batwing Turn | 7–8, 10–11 (2 each), 14–16 (5) | wing beats drag along | launches at 50° | |
 | Lich neutral air, Frost Halo | 9–11, 13–15, 17–19 (2 each), 21–22 (4) | a ring that holds a target in place; nothing at its centre | bursts outward at 50° | long, so it is a trap more than an approach |
-| Warden up air, Sky Crescent | 5–6, 8–9 (2 each), 11–13 (5) | lifts with her | launches at 85° | the juggle kick, after Fox's and Falco's |
+| Warden up air, Sky Crescent | 5–6, 8–9 (2 each), 11–13 (5) | lifts with her | launches at 85° | the juggle kick, after Fox's |
 
 Illidan's two-hit forward air belongs to his kit. Rifleman's
 shared up air was already two hits (4 then 8, two frames apart); both link,

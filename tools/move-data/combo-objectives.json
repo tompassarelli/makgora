@@ -7,7 +7,6 @@
     { "fighter": "Maiev Shadowsong", "opener": "down air", "region": "clean", "percent": [0,60], "weight": 75, "followUp": "grab", "class": "true" },
     { "fighter": "Maiev Shadowsong", "opener": "up throw", "region": "clean", "percent": [30,90], "weight": 75, "followUp": "up air", "class": "DI-dependent", "di": ["in","none"] },
     { "fighter": "Maiev Shadowsong", "opener": "up air", "region": "clean", "percent": [10,60], "weight": 75, "followUp": "up air", "class": "DI-dependent", "di": ["in","none"] },
-    { "fighter": "Maiev Shadowsong", "opener": "up air", "region": "clean", "percent": [70,100], "weight": 75, "followUp": "up air", "class": "read" },
     { "fighter": "Maiev Shadowsong", "opener": "side special", "region": "clean", "percent": [0,150], "weight": 75, "followUp": "grab", "class": "true" },
     { "fighter": "Maiev Shadowsong", "opener": "side special", "region": "clean", "percent": [0,150], "weight": 75, "followUp": "forward smash", "class": "true" },
     { "fighter": "Maiev Shadowsong", "opener": "up smash", "region": "clean", "percent": [30,50], "weight": 75, "followUp": "grab", "class": "read" }
@@ -15,8 +14,6 @@
   "edgeGuards": [
     { "fighter": "Maiev Shadowsong", "move": "back air", "percent": [60,150], "weight": 75, "victim": { "pastLedge": 40, "height": 0 }, "di": ["out","up","down","in","none"] },
     { "fighter": "Maiev Shadowsong", "move": "back air", "percent": [50,150], "weight": 75, "victim": { "pastLedge": 60, "height": -40 }, "di": ["out","up","down","in","none"] },
-    { "fighter": "Maiev Shadowsong", "move": "down air", "percent": [60,150], "weight": 75, "victim": { "pastLedge": 40, "height": 0 }, "di": ["out","up","down","in","none"] },
-    { "fighter": "Maiev Shadowsong", "move": "down air", "percent": [50,150], "weight": 75, "victim": { "pastLedge": 80, "height": -80 }, "di": ["out","up","down","in","none"] },
     { "fighter": "Maiev Shadowsong", "move": "down special", "percent": [40,150], "weight": 75, "victim": { "pastLedge": 40, "height": 0 }, "di": ["out","up","down","in","none"] },
     { "fighter": "Maiev Shadowsong", "move": "down special", "percent": [30,150], "weight": 75, "victim": { "pastLedge": 80, "height": -80 }, "di": ["out","up","down","in","none"] }
   ],

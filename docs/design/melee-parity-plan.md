@@ -8,7 +8,7 @@ explosive punishes that need a few correct reads and intense edge guarding.
 The parity record is generated from the code so it cannot rot, and a combo
 analyzer says what combos into what, so objectives such as "this move at 30%
 combos into grab" can be dialled. The first fighter is Maiev, modelled on Fox
-with some Falco, without becoming Fox in a costume.
+alone (clarified 2026-10-26, #456), without becoming Fox in a costume.
 
 The work is the umbrella issue "Melee parity baseline and combo program"
 (#311), whose children are listed in order under [Order of work](#order-of-work).
@@ -187,7 +187,7 @@ Sources name the SmashWiki page unless marked: MFD is
 | Rifleman | `ts/src/game/sim/tuning.ts:162` | gravity 0.17, fast fall 3.5, jump squat 5 | Falco's (CA; `ts/scripts/meleeOracle.ts:42`) | match to Falco |
 | Illidan | `ts/src/game/sim/tuning.ts:186` | gravity 0.19, fast fall 3.45, jump squat 4, weight 86 | Inside the Melee spread | ours, inside spread |
 | Heroes | `ts/src/game/sim/tuning.ts:225,236-260`; `ts/src/game/sim/heroes/heroBodies.ts:26-50` | weight 75 × body, walk/dash/run clamped to Melee's spread (`ts/src/game/sim/tuning.ts:236-239`), air speed 1.0 × body, traction | Melee spread per attribute across the 26 fighters (CA) | per fighter in #289 |
-| Maiev | `ts/src/game/sim/heroes/heroBodies.ts:29`, `HERO_VERTICAL` in `ts/src/game/sim/tuning.ts` | weight 78, dash 2.0, run 2.3, walk 1.6, air speed 0.95; Fox's jump squat 3; Falco's gravity 0.17, terminal 3.1, fast fall 3.5 and short hop 1.9; full and double jump 4.0 | Fox weight 75, Falco 80; full jump 3.68/4.1, double jump 4.416/3.854 (CA) | inside the spread, retuned in #304: full hop apex 49.1 and double jump rise 45.1 against Fox's 31.3 and 40.2 |
+| Maiev | `ts/src/game/sim/heroes/heroBodies.ts:29` | weight 75, dash 2.0, run 2.3, walk 1.6, air speed 0.83; Fox's falls, jumps and jump squat from the shared record | Fox weight 75, air speed 0.83 (CA) | Fox's, retuned in #304 and returned to Fox in #456 |
 
 ## Ledger
 
@@ -315,8 +315,8 @@ the defender's reads that the agency rule depends on.
 
 After the baseline (#303-#308). Her targets come from Fox's ground game
 (neutral air and jab into grab at low percent, down air into her down special,
-up throw into up air by DI) and Falco's verticality (higher jumps, faster fall,
-up air strings that end in a read), written as objectives. The identity guard
+up throw into up air by DI) and his up air strings, written as objectives;
+the Falco-style vertical game is Illidan's (#457). The identity guard
 keeps her Maiev: marks, poison, Blink, Shadow Pursuit stun and Fan of Knives;
 no reflector-like shine loop, no laser. Order: targets (Tom approves), her own
 physics record inside the Melee spread, aerials, ground game and throws, edge
