@@ -338,7 +338,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       : Effect.fail(new AcceptFailure({ operation: `start ${map}`, problem: `${pairDropText(drop)}; the next accept on pair ${drop.pair} restarts it` }))))));
   const liveDriver = liveAcceptDriver({
     start,
-    receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-"),
+    receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-") || name.startsWith("smashcraft-match-"),
   }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)));
   let smoke: ReturnType<typeof withSmokeCapture> | undefined;
   const driver = Layer.effect(AcceptDriver, Effect.gen(function*() {
