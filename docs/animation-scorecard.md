@@ -165,6 +165,15 @@ Anub'arak's dash attack draws Impale spikes erupting at the hit, held mid-rise
 (north gate 45, 2026-10-26), because his claws vanish against his shell at
 match size.
 
+Named exceptions ship a move whose line 5 stays below 4 after every
+measured line passes. Murloc's jab, jab 2, forward tilt and down-angled
+forward tilt ship with line 5 below 4 (3 on the tilts; 2 on readability and
+anticipation for the jabs, 3 on the rest): Tom's decision of 2026-10-26 via north
+gate 76, after five Blender takes failed to lift it and judges kept naming
+the thin spear crossing his crest and his round body, properties of the
+model rather than the motion (#497). A cold read of the native Classic clips
+still has to call each a forward stab with no broken limb.
+
 ## Thresholds
 
 The 9 October calibration uses 25 moves: five jabs, tilts, smashes, aerials
