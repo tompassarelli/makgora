@@ -219,6 +219,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   His dash attack is authored in Blender (#342): `... SHIPPED_FURION.mdx PRIVATE_OUTPUT dashAttack --rig RIG.json` writes his skeleton and stand pose, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/malfurion-dash-attack.py -- RIG.json KEYS.json`
   bakes one key per attack frame on an identity-rest armature (no MDL exporter), and `... dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
+  His victory is authored in Blender too (#545), because his cloak is skinned to both upper arms and stretches when either rises (#514), so `victory-clips.ts` refuses him:
+  `bun tools/animations/malfurion-victory.ts PRIVATE_ASSETS PRIVATE_OUTPUT --rig RIG.json` writes his skeleton and stand pose, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/malfurion-victory.py -- RIG.json KEYS.json`
+  bakes the cheer (staff hand at the hip, the free fist pumped from the elbow beside his shoulder), and `... --keys KEYS.json` splices it into his victory in place,
+  sets every frame on the floor, and refuses a cheer that stretches any cloak edge past twice its stand length or breaks the anatomy rules.
 
 - Medivh animation authoring (from the repository root):
   `bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx PRIVATE_OUTPUT`

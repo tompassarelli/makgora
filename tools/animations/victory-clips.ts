@@ -36,7 +36,7 @@ const alternating = (low: Arms): readonly Beat[] => [
 const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number; readonly free?: Arms }>> = {
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
     [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25, free: 'wide' }, [Character.kobold]: { low: 'pumped', hop: 1 },
-    [Character.malfurion]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 }, [Character.jaina]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
+    [Character.jaina]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
     [Character.mountainKing]: { low: 'pumped', hop: 1, raise: [0.85, 0.6], tip: 25 },
 };
 const sided = (weapon: Side, held: Arms, free: Arms): readonly [Arms, Arms] => weapon === 0 ? [held, free] : [free, held];
@@ -81,6 +81,7 @@ const point = (matrix: ArrayLike<number>, p: ArrayLike<number>) => [0, 1, 2].map
 for (const character of characters) {
     const fighter = fighters.get(character);
     ensure(fighter !== undefined, `No fighter ${character}`);
+    ensure(character !== Character.malfurion, "Malfurion's victory is authored in Blender: tools/animations/malfurion-victory.ts");
     const name = `${fighter.name} Victory`;
     const source = parseMDX(await Bun.file(join(assets, fighter.source)).arrayBuffer()), model = structuredClone(source);
     const existing = source.Sequences.findIndex(sequence => sequence.Name === name);
