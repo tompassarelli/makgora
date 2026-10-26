@@ -16,12 +16,7 @@ const FRAMES_PER_SECOND = 60;
 
 export const DROP_TELEGRAPH_FRAMES = 3 * FRAMES_PER_SECOND;
 
-export const DROP_FIRST_SECONDS = 15;
-
-export const DROP_INTERVAL_MIN_SECONDS = 10;
-export const DROP_INTERVAL_MAX_SECONDS = 18;
-
-export const DROP_METER = ROSTER_MANA.exCost;
+export const DROP_INTERVAL_SECONDS = 20;
 
 export const DROP_REACH = melee(8.0);
 
@@ -29,7 +24,6 @@ export const DROP_HEIGHT = melee(10.0);
 
 export const DROP_POINT_SPAN = 150.0;
 
-const INTERVAL_SALT = 3;
 const POINT_SALT = 4;
 
 export interface DropPoint {
@@ -131,16 +125,14 @@ export const matchHasMeterDrops = (game: Readonly<MatchState>): boolean => game.
 
 function scheduleNext(drops: MatchMeterDrops, seed: number, stage: number, from: number): void {
   const count = meterDropPoints(stage).length;
-  const seconds = drops.draws === 0 ? DROP_FIRST_SECONDS
-    : DROP_INTERVAL_MIN_SECONDS + itemDraw(seed, drops.draws, INTERVAL_SALT, DROP_INTERVAL_MAX_SECONDS - DROP_INTERVAL_MIN_SECONDS + 1);
   drops.nextPoint = drops.draws === 0 ? 0 : floorMod(itemDraw(seed, 0, POINT_SALT, count) + drops.draws, count);
-  drops.nextSpawnFrame = from + seconds * FRAMES_PER_SECOND;
+  drops.nextSpawnFrame = from + DROP_INTERVAL_SECONDS * FRAMES_PER_SECOND;
   drops.draws++;
 }
 
 export function scheduleMeterDrops(game: MatchState): void {
   resetMatchMeterDrops(game.drops);
-  if (matchHasMeterDrops(game)) scheduleNext(game.drops, game.matchSeed, game.stageChoice, game.startHold + 1);
+  if (matchHasMeterDrops(game)) scheduleNext(game.drops, game.matchSeed, game.stageChoice, game.startHold);
 }
 
 export function dropTelegraphFrames(drops: Readonly<MatchMeterDrops>, matchFrame: number): number | undefined {
@@ -169,9 +161,8 @@ export function advanceMeterDrops(game: MatchState, world: Roster): void {
   const { drops } = game;
   if (drops.nextSpawnFrame !== 0 && game.matchFrame >= drops.nextSpawnFrame) {
     drops.point = drops.nextPoint;
-    drops.nextSpawnFrame = 0;
-    drops.nextPoint = -1;
     drops.spawnSerial++;
+    scheduleNext(drops, game.matchSeed, game.stageChoice, drops.nextSpawnFrame);
   }
   if (drops.point < 0) return;
   const point = meterDropPoint(game.stageChoice, drops.point);
@@ -188,9 +179,8 @@ export function advanceMeterDrops(game: MatchState, world: Roster): void {
     }
   }
   if (taker < 0) return;
-  gainMana(fighterAt(world, taker), DROP_METER);
+  gainMana(fighterAt(world, taker), ROSTER_MANA.dropGain);
   drops.point = -1;
   drops.pickupSerial++;
   drops.lastTaker = taker;
-  scheduleNext(drops, game.matchSeed, game.stageChoice, game.matchFrame);
 }

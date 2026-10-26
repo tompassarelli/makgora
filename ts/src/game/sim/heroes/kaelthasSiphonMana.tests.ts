@@ -3,7 +3,6 @@ import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction } from "../codes";
 import { canAttack } from "../conditions";
 import { type Fighter, createFighter } from "../fighter";
-import { dealtManaGain, takenManaGain } from "../mana";
 import { attackStartupFrames, characterAttackActiveFrames } from "../moves";
 import { duelPair, stepDuel } from "../testDuel";
 import { controls, testBeginAttacks } from "../testWorld";
@@ -63,8 +62,7 @@ test("Siphon Mana's pummel deals damage and nothing else: no heal, no mana beyon
   const dealt = f32(target.status.damage - before.targetDamage);
   assertTrue(dealt > 0.0);
   assertEquals(kael.status.damage, before.kaelDamage);
-  assertEquals(kael.mana.points, before.kaelMana + dealtManaGain(dealt));
-  assertEquals(target.mana.points, before.targetMana + takenManaGain(dealt));
+  assertEquals(kael.mana.points - before.kaelMana, target.mana.points - before.targetMana);
   assertEquals(target.grab.owner, 0);
   assertEquals(target.launch.knockbackX, 0.0);
   assertEquals(target.launch.knockbackZ, 0.0);

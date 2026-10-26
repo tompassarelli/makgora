@@ -6,7 +6,6 @@ import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import { takenManaGain } from "./mana";
 import { type Controls, type Roster, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
 
@@ -14,11 +13,6 @@ export interface Duel {
   readonly illidan: Fighter;
   readonly target: Fighter;
   readonly commands: readonly [AttackBuffer, AttackBuffer];
-
-
-
-
-  drained: number;
 
   readonly step: (this: void, first?: Readonly<Controls>, second?: Readonly<Controls>) => number;
   readonly run: (this: void, frames: number, first?: Readonly<Controls>, second?: Readonly<Controls>) => void;
@@ -42,13 +36,10 @@ export function duel(gap: number, character: Character = Character.rifleman): Du
     return out;
   };
   const d: Duel = {
-    illidan, target, commands, drained: 0,
+    illidan, target, commands,
     step: (first = controls(), second = controls()) => {
       frame++;
-      const mana = target.mana.points;
-      const damage = target.status.damage;
       stepMatch(game, world, frameControls(first, second), frame);
-      if (target.status.damage > damage) d.drained += mana - target.mana.points + takenManaGain(target.status.damage - damage);
       return frame;
     },
     run: (frames, first, second) => { for (let i = 0; i < frames; i++) d.step(first, second); },

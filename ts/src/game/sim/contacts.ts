@@ -46,7 +46,7 @@ import { CHILL } from "./chill";
 import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
-import { dealtManaGain, gainMana, takenManaGain } from "./mana";
+import { gainMana } from "./mana";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactIsSpell, contactTraits } from "./identityTraits";
@@ -293,13 +293,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       drainMana(target, stolen);
       gainMana(source, stolen);
     }
-    if (damage > 0) {
-      if (source !== target) {
-        gainMana(source, dealtManaGain(damage));
-        candleHeat[contact.source] = at(candleHeat, contact.source) + candleHeatGain(source, damage);
-      }
-      gainMana(target, takenManaGain(damage));
-    }
+    if (damage > 0 && source !== target) candleHeat[contact.source] = at(candleHeat, contact.source) + candleHeatGain(source, damage);
     if (damage > 0 && contact.kind !== ContactKind.pummel) {
       thawFighter(target);
       damageEndsHeroStatus(target);

@@ -950,22 +950,17 @@ The specification answers these design questions for the expansion:
 | --- | --- |
 | Physical differences | Use each hero's relative weight, run and air-speed table as initial tuning. The complete candidate table spans weight 0.85–1.28, run 0.80–1.14 and air 0.75–1.22 (of 1.00 Melee units a frame since #190). Jump velocity and gravity initially inherit the reference. |
 | Archetypes | State each fighter's purpose and exploitable weakness before building its moves. |
-| Meter | 100 mana, full on spawn; normal/throw hits earn 1 per whole percent (12 cap), hits taken earn 1 per 2 whole percent (6 cap), and a perfect shield/parry earns 8. Idle, movement and shielding earn nothing. Specials pay their listed costs; normals/grabs are free; up specials retain free recovery. |
+| Meter | One 100-point bar filled by a trickle on a pure clock and by meter drops, never by damage (#484); specials are free and EX and ultimates spend it (smashcraft:docs/design/mana.md). |
 | EX specials | Strong + Special spends the normal cost plus 25 mana for one-hit startup armor. See the EX table below. A + Special at a full bar is the ultimate. Existing per-move cooldowns remain part of each kit. |
 
 ### Build-and-spend mana and EX specials
 
-Mana rewards getting into exchanges. A normal or throw earns one point per
-whole percent dealt to the body, capped at 12 per contact. Any non-pummel
-body hit gives its victim one point per two whole percent actually taken,
-capped at 6. A perfect shield or reflected projectile gives eight points
-once per parry window. Ordinary shield contacts and pummels earn nothing;
-specials do not earn their caster mana. Every gain caps at 100. Stock loss
-and rematch restore 100 and clear the spending and armor state.
-
-Idle time, movement and shielding earn nothing; there is no idle refill
-(smashcraft:docs/design/mana.md). There is no spending delay. Offense builds the budget faster than waiting;
-recovery remains available through the existing free up-special forms.
+Since #484 (26 Oct 2026) no meter comes from damage dealt or taken. Both
+players fill at the same fixed rate on a pure clock, and meter drops on a fixed
+20 s clock give about half of each player's meter
+(smashcraft:docs/design/mana.md, [meter drops](#meter-drops-385)). Every gain
+caps at 100, and points are kept through a KO. Recovery remains available
+through the existing free up-special forms.
 
 Hold Strong and press Special to request EX, on the same frame as an
 ordinary special; with A also held the press asks for the ultimate instead,
@@ -2346,8 +2341,8 @@ Rivals of Aether 2 has neither items nor meter, so it offers no precedent
 here.
 
 Smashcraft keeps the timing and the place public and removes the random
-parts: the schedule comes from the match seed, the place from a fixed
-rotation, and the effect is always one EX segment.
+parts: the schedule is a fixed clock, the place comes from a fixed
+rotation, and the amount never varies.
 
 ### Rules
 
@@ -2359,9 +2354,11 @@ Tom decided, 9 Oct (delegated in #385):
   match camera. Classic Wisp frames, effects alone: marker 0.8%, orb 1.1% of
   the screen, under #380's 4%; the marker hides when the orb appears. A
   sound plays at the point when the telegraph starts, when the orb appears and when it is taken.
-- **Schedule.** The first drop appears 15 s after GO. Each later drop appears
-  a seeded 10–18 s (whole seconds from the match seed and the draw count) after
-  the previous one is taken. An untaken orb stays until someone touches it.
+- **Schedule.** Tom fixed the clock on 26 Oct 2026 (#484), as Dota 2's power
+  runes spawn: a drop appears every 20 s after GO (20 s, 40 s, 60 s, …) whether
+  or not the last was taken. An untaken orb vanishes when the next appears, so
+  at most one orb is ever out, and the next one's telegraph can start while
+  the last is still out.
 - **Points.** The first drop is at the centre of the main deck. Later drops
   rotate through the stage's fixed points in a fixed order (centre, then each
   static platform centred within 150 units of the stage centre, in deck
@@ -2374,8 +2371,9 @@ Tom decided, 9 Oct (delegated in #385):
   [stages](design/stages.md#meter-drop-points).
 - **Amount.** Touching the orb (the body within 48 units sideways, from
   60 units above the point down to the fighter's height below it) grants
-  one EX segment, 33 mana (`ROSTER_MANA.exCost`), to the nearest touching
-  fighter, capped at full. A full fighter still takes the orb and denies it.
+  18 points (`ROSTER_MANA.dropGain`, sized with the trickle so drops give about
+  half of each player's meter, [super meter](design/mana.md)) to the nearest
+  touching fighter, capped at full. A full fighter still takes the orb and denies it.
 - **Rule.** Drops are on in the standard ruleset; the Drops button on the
   stage menu (or `-dev drops on|off`) turns them off. They never appear in
   training or in Classic and lore runs.

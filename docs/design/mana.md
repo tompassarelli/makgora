@@ -9,15 +9,26 @@ costs the full bar.
 
 The simulation stores the bar in each fighter's `mana.points`; meter is part
 of replay and rollback state. The rules live in
-smashcraft:ts/src/game/sim/mana.ts and sim/exSpecials.ts; the body-contact
-resolver awards damage gains.
+smashcraft:ts/src/game/sim/mana.ts and sim/exSpecials.ts; the match step runs
+the trickle and smashcraft:ts/src/game/match/meterDrops.ts the drops.
+
+Tom rebuilt how the bar fills on 26 October 2026 (#484): no meter comes from
+damage, taken or dealt. Gain from taking damage rewarded the player who guessed
+wrong, and gain from dealing it was win-more. The bar now fills from two
+sources: a trickle that both players earn at the same rate on a pure clock
+(as Street Fighter 6's Drive gauge regenerates), and meter drops on a fixed
+20 s clock (as Dota 2's power runes spawn,
+[gameplay design](../gameplay-design.md#meter-drops-385)). In an even match
+about half of each player's meter comes from each, so the player who wins the
+drops earns about one extra ultimate a match.
 
 | Rule | Value |
 |---|---|
 | Bar size | 100 integer points, one bar in three segments at 33 and 66. A new match starts at 0. |
-| Damage dealt to a body | 1 point per whole percent of damage, up to 12 points per hit. Normals, specials, projectiles, summons, throws and pummels all count. |
-| Damage taken to the body | 1 point per 2 whole percent, up to 6 points per hit. This earns half as much as attacking. |
-| Idle, movement or shielding | 0 points per frame. No idle refill. |
+| Trickle | 1 point every 150 frames (2.5 s, `ROSTER_MANA.trickleFrames`) for each fighter in the match, counted from GO on a pure clock with no conditions: none in the start hold or while KO'd. 24 points a minute. |
+| Meter drop | 18 points (`ROSTER_MANA.dropGain`) to the fighter who takes it; one drop every 20 s on a fixed clock. |
+| Damage dealt or taken | 0 points. |
+| Idle, movement or shielding | Nothing beyond the trickle. |
 | Shield damage or parry | 0 points. |
 | Stock loss | Keep the current points through the KO and respawn. |
 | Regular special | 0 points; always chooses its full ground or air form. Existing cooldowns, airtime limits and entity limits still apply. |
@@ -27,10 +38,20 @@ resolver awards damage gains.
 | Interrupted or missed EX | The bar stays spent. Follow-up inputs do not spend it again. |
 | Full bar | Further gain stops at 100; no second bar or stored overflow. |
 
-Examples: a 7% hit awards 7 points to its attacker and 3 to its victim; a
-3.5% hit awards 3 and 1. A 20% hit awards 12 and 6 because of the per-hit
-caps. Ten 10% hits fill an attacker's bar; twenty such hits fill the victim's
-bar. A fighter at 98 gains only 2 more points from a 10% hit.
+Examples: the trickle alone fills one EX segment in 82.5 s and a full bar in
+250 s. A player who takes two drops and trickles for a minute holds 60 points.
+A fighter at 99 that takes a drop holds 100.
+
+The values come from `bun scripts/meterRate.ts` (from ts/): a seeded field of
+Expert CPUs over every pair of the roster, 3 stocks on Frozen Throne. Over 325
+matches (median 2.3 minutes, 2.5 stocks lost per player), 150 frames per
+trickle point and 18 points per drop earned 0.50 full bars per stock lost
+(one ultimate per two stocks lost if EX is unspent). 49% of all meter came
+from drops. The fighter ahead on stocks took 16% of drops, the fighter behind
+25%, and 58% were taken with stocks level (#484).
+
+Training and Classic and lore runs have no drops, so the trickle alone fills
+the bar there.
 
 ## Ready signal
 
@@ -55,7 +76,7 @@ frames, fighter flash and ready sound log.
 
 ## Drain and refunds
 
-Authored damage drains and steals operate on the same 100-point bar; gain still comes from body damage. Illidan's Mana Burn can
+Authored damage drains and steals operate on the same 100-point bar; gain still comes only from the trickle and drops. Illidan's Mana Burn can
 drain the opponent's stored meter and its stun reads the resulting bar.
 Hero-specific spell refunds remain authored move effects; they never make
 an ordinary special cost meter.
@@ -63,7 +84,7 @@ an ordinary special cost meter.
 ## Every special has an EX form (#329)
 
 Tom's 8 October super-bar decision (#335), with the #382 segments:
-ordinary specials are free; damage dealt and taken builds one bar, and one
+ordinary specials are free; the trickle and meter drops build one bar (#484), and one
 segment buys one EX with Shield + Special in any direction. #335 owns the bar's
 earning rules and display. This section owns the move upgrades.
 

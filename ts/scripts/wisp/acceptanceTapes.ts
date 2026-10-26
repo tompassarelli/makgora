@@ -368,7 +368,7 @@ const COMPUTER: MatchScript = {
 
 
 const METER_DROPS: MatchScript = {
-  characters: [Character.rifleman, Character.demonHunter], stage: 0, stocks: 5, minutes: 0, frames: 2800, computer: true, dropPickups: 2,
+  characters: [Character.rifleman, Character.demonHunter], stage: 0, stocks: 5, minutes: 0, frames: 4700, computer: true, dropPickups: 2,
   holds: [[
     [100, 2, ATTACK], [300, 20, SHIELD_LEFT], [500, 2, SPECIAL], [700, 3, JUMP], [704, 2, ATTACK], [880, 2, GRAB],
     [1100, 2, ATTACK], [1205, 20, RIGHT], [1400, 24, SHIELD_RIGHT], [1700, 2, SPECIAL], [1890, 30, LEFT], [2000, 3, JUMP], [2004, 2, ATTACK], [2300, 2, GRAB],

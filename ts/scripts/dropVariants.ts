@@ -1,31 +1,20 @@
 import { f32 } from "wisp/src/sim/f32";
-import { itemDraw } from "../src/game/match/centreItem";
-import { DROP_INTERVAL_MAX_SECONDS, DROP_INTERVAL_MIN_SECONDS, DROP_METER, DROP_TELEGRAPH_FRAMES, type DropPoint, editableMeterDropPoints, meterDropPoints } from "../src/game/match/meterDrops";
+import { DROP_TELEGRAPH_FRAMES, type DropPoint, editableMeterDropPoints, meterDropPoints } from "../src/game/match/meterDrops";
 import type { MatchState } from "../src/game/lobby/lobbyState";
-import { gainMana } from "../src/game/sim/mana";
 import { type Roster, fighterAt } from "../src/game/sim/roster";
 import { mainDeckZAt } from "../src/game/sim/stage";
 
 // Field-only variants of #385's meter drops, applied around the shipped rule
 // (meterDrops.ts) so a variant is measured before any of it reaches the game:
 // centre keeps every drop on the main deck's centre, trailing telegraphs it
-// halfway from the centre toward the fighter behind on stocks, and rich
-// grants two EX segments on a faster clock; slow and sparse keep one segment
-// on a clock 1.5 and 2 times as slow.
+// halfway from the centre toward the fighter behind on stocks.
 
-export const DROP_VARIANTS = ["shipped", "centre", "trailing", "rich", "slow", "sparse"] as const;
+export const DROP_VARIANTS = ["shipped", "centre", "trailing"] as const;
 export type DropVariant = (typeof DROP_VARIANTS)[number];
 export const isDropVariant = (value: string): value is DropVariant => DROP_VARIANTS.some(known => known === value);
 
-const RICH_FIRST_SECONDS = 10;
-const RICH_INTERVAL_MIN_SECONDS = 6;
-const RICH_INTERVAL_MAX_SECONDS = 10;
-const RICH_SALT = 5;
-const SLOWER_CLOCKS: Partial<Record<DropVariant, number>> = { slow: 1.5, sparse: 2 };
-
 export interface DropVariantState {
   readonly variant: DropVariant;
-  pickups: number;
   /** The draw whose point the variant last placed. */
   placed: number;
   /** The shipped point list's own entries, restored after a trailing match. */
@@ -35,8 +24,7 @@ export interface DropVariantState {
 /** Starts a match's variant after scheduleMeterDrops. */
 export function startDropVariant(variant: DropVariant, match: MatchState): DropVariantState {
   const shipped = [...meterDropPoints(match.stageChoice)];
-  if (variant === "rich" && match.drops.nextSpawnFrame !== 0) match.drops.nextSpawnFrame = match.startHold + 1 + RICH_FIRST_SECONDS * 60;
-  return { variant, pickups: 0, placed: -1, shipped };
+  return { variant, placed: -1, shipped };
 }
 
 /** Applies the variant after a frame executes. */
@@ -56,18 +44,6 @@ export function advanceDropVariant(state: DropVariantState, match: MatchState, w
       drops.nextPoint = state.shipped.length;
     } else if (drops.nextPoint >= state.shipped.length) drops.nextPoint = 0;
   }
-  if (drops.pickupSerial === state.pickups) return;
-  state.pickups = drops.pickupSerial;
-  const slower = SLOWER_CLOCKS[state.variant];
-  if (slower !== undefined) {
-    const low = Math.round(slower * DROP_INTERVAL_MIN_SECONDS), high = Math.round(slower * DROP_INTERVAL_MAX_SECONDS);
-    drops.nextSpawnFrame = match.matchFrame + (low + itemDraw(match.matchSeed, drops.draws, RICH_SALT, high - low + 1)) * 60;
-    return;
-  }
-  if (state.variant !== "rich") return;
-  if (drops.lastTaker === 0 || drops.lastTaker === 1) gainMana(fighterAt(world, drops.lastTaker), DROP_METER);
-  const seconds = RICH_INTERVAL_MIN_SECONDS + itemDraw(match.matchSeed, drops.draws, RICH_SALT, RICH_INTERVAL_MAX_SECONDS - RICH_INTERVAL_MIN_SECONDS + 1);
-  drops.nextSpawnFrame = match.matchFrame + seconds * 60;
 }
 
 /** Restores the stage's shipped points after a match. */

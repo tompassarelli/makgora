@@ -38,6 +38,7 @@ import { copyFighterState } from "../../generated/state/fighterState";
 import { type MatchState, Phase, advanceClock, holdingStart, humanFighterActive, keepsStocks, resolveStocks, stageClock } from "../lobby/lobbyState";
 import { advanceItems } from "./centreItem";
 import { advanceMeterDrops } from "./meterDrops";
+import { advanceManaTrickle } from "./meterTrickle";
 
 import { bossClock, collectBossContacts, strikeBoss } from "../classic/bosses";
 import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../classic/configuredMatch";
@@ -208,6 +209,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   }
   advanceWater(world, stage, game.matchFrame, game.hazards);
   advanceItems(game, world, controls, frame);
+  advanceManaTrickle(world, game.matchFrame - game.startHold);
   advanceMeterDrops(game, world);
   advanceStageCannon(world, stage, stageFrame, controls.inputs);
 
