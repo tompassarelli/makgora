@@ -21,7 +21,7 @@ import { ChildProcess } from "effect/process";
 import { spawnLogged } from "wisp/scripts/wisp/hostProcess";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { UsageFailure, describeCause } from "wisp/scripts/wisp/command";
-import { loadClients } from "wisp/scripts/warcraft/desktop";
+import { loadClients, toplevelMissing } from "wisp/scripts/warcraft/desktop";
 import { Clients } from "wisp/scripts/wisp/clients";
 import { HotReload } from "wisp/scripts/wisp/hotReload";
 import { MapBuild } from "wisp/scripts/wisp/mapBuild";
@@ -90,9 +90,25 @@ export function batchScripts(paths: readonly string[]): string[] {
 
 
 
-function needsNewGame(previous: "none" | "valid" | "failed" | "invalid" | "broken", freshEach: boolean): boolean {
+function needsNewGame(previous: "none" | RunOutcome, freshEach: boolean): boolean {
   return freshEach || previous === "none" || previous === "invalid" || previous === "broken";
 }
+
+export type RunOutcome = "valid" | "invalid" | "failed" | "broken";
+
+/** A native run's outcome: its own verdict; failed for a pad replay off its frames; invalid when a client's compositor listed no game toplevel, so the run had no input or capture and says nothing about the build; else broken. */
+export const runOutcome = (ran: Exit.Exit<Exclude<RunOutcome, "broken">, unknown>): RunOutcome => {
+  if (Exit.isSuccess(ran)) return ran.value;
+  if (replayFailure(ran.cause)) return "failed";
+  return toplevelMissing(Option.getOrUndefined(Cause.findErrorOption(ran.cause))) ? "invalid" : "broken";
+};
+
+/** Whether `--retries` reruns a script after attempt `attempt`: always after an invalid run, and after a failed one whose off-frame edges were all written late while attempts remain. */
+export const rerun = <E>(outcome: RunOutcome, attempt: number, retries: number, slipped: Effect.Effect<boolean, E>): Effect.Effect<boolean, E> => {
+  if (outcome === "invalid") return Effect.succeed(true);
+  if (outcome !== "failed") return Effect.succeed(false);
+  return slipped.pipe(Effect.map((late) => late && attempt < retries));
+};
 
 const seconds = (since: number) => (performance.now() - since) / 1000;
 
@@ -411,10 +427,11 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
         const ran = yield* Effect.exit(pair.lan === undefined ? onHealthyClients(play, { retry: false, clientsFile: pair.clients }) : play);
         made.run += seconds(at);
 
-        outcome = ran._tag === "Success" ? ran.value : replayFailure(ran.cause) ? "failed" : "broken";
+        outcome = runOutcome(ran);
         if (outcome === "broken" && ran._tag === "Failure") made.summary = Cause.pretty(ran.cause);
+        if (outcome === "invalid" && ran._tag === "Failure") made.summary = `INVALID: ${Cause.pretty(ran.cause).split("\n")[0]}`;
         previous = outcome;
-        if (outcome === "invalid") {
+        if (outcome === "invalid" && ran._tag === "Success") {
           const resultPath = join(padOptions.out, "result.json");
           const result = yield* readResult(resultPath);
           if (result?.setup !== undefined) {
@@ -423,7 +440,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
           }
         }
 
-        if (outcome === "invalid" || (outcome === "failed" && (yield* slipped(padOptions.out)) && attempt < retries)) return yield* new BatchRetry({ script: run.script });
+        if (yield* rerun(outcome, attempt, retries, slipped(padOptions.out))) return yield* new BatchRetry({ script: run.script });
       })).pipe(Effect.retry({ schedule: Schedule.recurs(retries), while: (failure) => failure._tag === "BatchRetry" }), Effect.catchTag("BatchRetry", () => Effect.void));
       if (outcome === "invalid" || outcome === "broken") {
         if (outcome === "invalid") {
