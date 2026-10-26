@@ -117,8 +117,8 @@ second body.
 ### Side B: Wind Walk (picked)
 
 18 mana. Frames 1–7: he fades (translucent, never invisible); frames 8–31:
-he walks 0.09H a frame (2.2H in all), passing through bodies but stopping at
-a raised shield. From frame 10 to 31:
+he walks 0.09H a frame (2.2H in all), passing through bodies whether or not
+they shield. From frame 10 to 31:
 
 - **Attack: Backstab.** A slash, active on its frames 6–8, 12% EDGE at 40°,
   ending on its frame 28. The stick held at the press picks the side: held
@@ -131,9 +131,12 @@ a raised shield. From frame 10 to 31:
 In the air it travels once per airtime and ends helpless, Backstab included.
 
 Counterplay: the 7-frame fade is the cue; no intangibility, so any hit stops
-it; a raised shield stops the walk and blocks both slash sides, and the
-Backstab is punishable on shield; a jump over the walk leaves him in 13
-frames of recovery. Reward 12% and an edge launch against 18 mana.
+it; a shield does not stop the walk, but it blocks Backstab from either side
+as an ordinary shield hit (shieldstun and pushback), so read where the walk
+ends, hold shield toward that side and punish Backstab's recovery on shield;
+a spot-dodge or roll timed to the slash beats it outright, a hit on the
+walk's exit stops it, and a jump over the walk leaves him in 13 frames of
+recovery. Reward 12% and an edge launch against 18 mana.
 
 Rejected: a hold-to-travel Shadow Sneak (distance by charge). It needs a held
 special input the controls don't carry, and the distance read is weaker than

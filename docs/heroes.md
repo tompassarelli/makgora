@@ -63,7 +63,7 @@ acts again on N+1. It may author:
   that many units per frame (Spectral Ascent's steering); `stopsAtBody`
   clamps forward travel to end just short of a raised shield or another
   fighter's body (Storm Rush), and `stopsAtShield` only at a raised shield,
-  passing bodies (Wind Walk); `relocate` moves the fighter at once on the
+  passing bodies (Storm Step); `relocate` moves the fighter at once on the
   window's first frame, onto its placed object (Mirror Image's swap) or just
   behind the nearest marked opponent within `relocateReach`, spending the mark
   (Shadow Pursuit); a kit's `marked` form is chosen while a poisoned opponent

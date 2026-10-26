@@ -49,7 +49,7 @@ const windCutter: AuthoredSpecial = {
 const WALK_FRAMES = 24;
 const WALK_SPEED = f32(length(f32(2.2)) / WALK_FRAMES);
 const STOP = { velocityX: 0.0, velocityZ: 0.0 };
-const walkMotion = [{ ...frames(8, 31), velocityX: WALK_SPEED, velocityZ: 0.0, stopsAtShield: true }, { ...frames(32, 32), ...STOP }];
+const walkMotion = [{ ...frames(8, 31), velocityX: WALK_SPEED, velocityZ: 0.0 }, { ...frames(32, 32), ...STOP }];
 const WALK_BRANCHES = frames(10, 31);
 
 
