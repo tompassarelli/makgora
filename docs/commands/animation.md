@@ -119,6 +119,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
   Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
   preserving all seventeen stock clips and writing both-facing pose sheets.
+  A Blender take of his dash attack (#339, judged but not yet shipped): `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --rig RIG.json`
+  writes his skeleton, stand pose and the move's timing, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/anubarak-dash-attack.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, and `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --keys KEYS.json` authors every clip with
+  those keys spliced into the dash attack, set on the floor each frame (`tools/animations/blender-keys.ts`).
   `bun tools/animations/grab-pads.ts` generates the #180 mirror and unlike-height capture batch:
   every selectable fighter, four throws, both facings, with ordinary catch/pummel
   inputs and contact-frame captures in smashcraft:ts/test/native/pads/180/.

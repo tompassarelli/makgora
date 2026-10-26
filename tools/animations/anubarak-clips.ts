@@ -12,6 +12,7 @@ import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { ANUBARAK_MOVES } from "../../ts/src/game/sim/heroes/anubarakMoves";
 import { ANUBARAK_SPECIALS } from "../../ts/src/game/sim/heroes/anubarakSpecials";
 import { seconds } from "./asset-info";
+import { blenderOptions, blenderSkeleton } from "./blender-keys";
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
@@ -21,9 +22,10 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
   for (const [key, child] of Object.entries(value)) if (key !== "Nodes") tracks(child, visit, `${path}.${key}`);
 }
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
-const [input, output] = process.argv.slice(2).map(p => resolve(p));
+const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
+const { rig: rigOutput, keys: bakedKeys } = blenderOptions(process.argv), blenderPose: HeroPose = "dashAttack";
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/anubarak-clips.ts STOCK_ANUBARAK.mdx PRIVATE_OUTPUT");
+ensure(input && output && relative(project, output).startsWith("..") && !(rigOutput && bakedKeys), "usage: bun tools/animations/anubarak-clips.ts STOCK_ANUBARAK.mdx|SHIPPED_ANUBARAK.mdx PRIVATE_OUTPUT [--rig RIG.json | --keys KEYS.json]");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes);
 if (source.Sequences.length > 17) {
@@ -214,6 +216,9 @@ function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): 
 }
 const groundGestures = new Set(normals.slice(0, 8).map(([pose]) => pose));
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
+const blender = blenderSkeleton(source, originals, stand, globalClock), blenderAction = actions.find(a => a.pose === blenderPose)!;
+if (rigOutput) { await blender.writeRig(rigOutput, { frames: blenderAction.frames, contact: blenderAction.contact, active: ANUBARAK_MOVES.normals[AttackStyle.dashAttack]!.activeFrames }); console.log(`ANUBARAK_RIG ${blenderPose} ${rigOutput}`); process.exit(0); }
+const bakedVector = bakedKeys ? await blender.readKeys(bakedKeys, blenderAction.frames) : undefined;
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
@@ -289,6 +294,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
           : frame <= 13 ? poses[2]!.slice()
           : blend(poses[2]!, first.Vector, (frame - 13) / (action.frames - 13));
       }
+      if (action.pose === blenderPose) Vector = bakedVector?.(path, frame) ?? Vector;
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(track.LineType > 1 ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
@@ -390,7 +396,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
     if (!action.air && (action.pose !== "sideSpecial" || frame >= 23)) { key.Vector[2] = key.Vector[2]! - lowest; if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
   }
-  if (lunge) for (const frame of phaseFrames) {
+  if (lunge && !(bakedVector && action.pose === blenderPose)) for (const frame of phaseFrames) {
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
     key.Vector[lunge.x === undefined ? 2 : 0] += lungeAt(lunge, frame, settled);
     if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
