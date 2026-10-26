@@ -72,7 +72,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
 };
-interface Rake { contact: number; through: number; settle?: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
+interface Rake { contact: number; through: number; settle?: number; fallRest?: boolean; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
 const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
   windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
   strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
@@ -87,6 +87,7 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
   downTilt: { contact: 7, through: 10, windup: { chest: -15, pelvis: -10, lean: -8, arm: -220, elbow: 80, wrist: 40, leftArm: -40, head: -15, thigh: 20, knee: -30 }, strike: { chest: 55, pelvis: 20, lean: 22, arm: -130, elbow: 40, wrist: 30, hand: 0, head: 20, thigh: 40, knee: -50, leftArm: -60 }, follow: { chest: 20, pelvis: 20, arm: -40, elbow: 60, wrist: 70, hand: 30, head: 15, thigh: 35, knee: -45, leftArm: -60 }, carry: { frame: 18, gesture: { chest: 15, pelvis: 15, lean: -5, arm: 20, wrist: 30, head: 10, thigh: 30, knee: -40, leftArm: -60 } } },
   dashAttack: { contact: 8, through: 19, windup: { chest: -16, pelvis: -10, lean: -28, arm: -230, elbow: 70, wrist: 40, leftArm: -200, leftElbow: 60, head: -18, thigh: 25, knee: -35, leftThigh: 15, frontThigh: 15, leftFrontThigh: 15 }, strike: { chest: 8, arm: -80, elbow: -20, leftArm: -70, leftElbow: -20, head: 15, shieldTwist: 80, leftShieldTwist: 80, thigh: 50, knee: -10, leftThigh: 50, frontThigh: -45, leftFrontThigh: -45 }, follow: { chest: 28, lean: 12, arm: -35, elbow: 10, wrist: 30, leftArm: -25, leftElbow: 10, leftWrist: 40, head: 25, shieldTwist: 80, leftShieldTwist: 80, thigh: 72, knee: -22, leftThigh: 72, frontThigh: -66, leftFrontThigh: -66 }, carry: { frame: 19, gesture: { chest: 28, lean: 12, arm: -35, elbow: 10, wrist: 30, leftArm: -25, leftElbow: 10, leftWrist: 40, head: 25, shieldTwist: 80, leftShieldTwist: 80, thigh: 72, knee: -22, leftThigh: 72, frontThigh: -66, leftFrontThigh: -66 } } },
   forwardAir: { contact: 12, through: 15, settle: 1, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
+  downAir: { contact: 16, through: 22, fallRest: true, windup: { chest: -25, pelvis: -15, lean: -15, arm: -230, elbow: 20, leftArm: -230, leftElbow: 20, head: -15, thigh: -20, leftThigh: 20 }, strike: { chest: 32, pelvis: 18, lean: 12, arm: -20, elbow: -10, leftArm: -20, leftElbow: -10, head: 15, thigh: 30, leftThigh: -10 }, follow: { chest: 46, pelvis: 24, lean: 18, arm: 40, elbow: 10, leftArm: 40, leftElbow: 10, head: 20, thigh: 36, leftThigh: -14 }, carry: { frame: 25, gesture: { chest: 30, pelvis: 16, lean: 12, arm: 26, elbow: 6, leftArm: 26, leftElbow: 6, head: 13, thigh: 23, leftThigh: -9 } } },
   backAir: { contact: 10, through: 13, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -45, pelvis: -30, lean: -20, arm: -100, elbow: 20, leftArm: -100 } },
   neutralSpecial: { contact: 18, through: 26, ...scythe(35, 15) },
   neutralSpecialAir: { contact: 18, through: 26, ...scythe(35, 15) },
@@ -246,7 +247,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   };
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
-    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? (rake ? unkeyedRest(donor.Keys[0], path) : donor.Keys[0]);
+    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? (rake && !rake.fallRest ? unkeyedRest(donor.Keys[0], path) : donor.Keys[0]);
     if (!first) return;
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
