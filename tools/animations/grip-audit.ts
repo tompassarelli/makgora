@@ -126,7 +126,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
       if (weapon === undefined || hand === undefined) { unavailable.push(`${fighter.name}/${look}/${joint}: missing weapon or wrist node`); continue; }
       const inverse = mat4.invert(mat4.create(), data.nodes[weapon.ObjectId]!.matrix);
       if (inverse === null) { unavailable.push(`${fighter.name}/${look}/${joint}: singular weapon matrix`); continue; }
-      const grip = transform(mul(nodePosition(model, data, hand, 1 / scale), 1), inverse);
+      const grip = transform(nodePosition(model, data, hand, 1), inverse);
       const vertices = mesh?.vertices ?? verticesForNode(model, weapon.ObjectId);
       if (vertices.length === 0) { unavailable.push(`${fighter.name}/${look}/${joint}: no weapon weighted vertices`); continue; }
       const tip = vertices.toSorted((a, b) => distance(b, grip) - distance(a, grip))[0]!;
