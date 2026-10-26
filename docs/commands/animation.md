@@ -45,7 +45,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   for the crouch and puts one wrist (Thrall: the wolf's front paws) on the ledge
   corner for the hang, and a coordinate search over the joint angles keeps the
   pose scoring best on `anim score`'s crouch or ledge line, measured against the
-  standing pose the sampler shows; a crouch keeps its chest within 40 degrees of upright,
+  standing pose the sampler shows, and that keeps every held weapon's blade 4 units clear of
+  the grip audit's limb capsules on every frame (smashcraft:tools/animations/weapon-clearance.ts, #451); a crouch keeps its chest within 40 degrees of upright,
   so it lowers by bending the legs rather than tipping into a lunge, and fails if it
   sinks a non-weapon vertex more than 3% of its height below the stand's lowest
   (a robe or tabard hem may dip into the deck). Pit Lord's tail and every legged body's fold are

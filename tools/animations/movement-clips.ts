@@ -25,6 +25,7 @@ import { createRoster } from "../../ts/src/game/sim/roster";
 import { seconds } from "./asset-info";
 import { type Choice, type Pose, type Space, type Variant, describe, SPACES } from "./movement-space";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { weaponClearance } from "./weapon-clearance";
 
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
@@ -210,11 +211,19 @@ function poseShortfall(pose: Pose, stand: ScoreFrame, at: (frame: number) => Sco
   return { value: 3 * Math.max(0, Math.max(...hang.map(headroom)) + 0.05) + Math.max(0, s.grip - t.grip) / t.grip + 3 * (Math.max(0, t.below + 0.06 - s.below) + Math.max(0, t.clear + 0.03 - s.clear) + Math.max(0, t.fit + 0.03 - s.fit)), pass: s.pass, report: `grip ${s.grip.toFixed(3)} below ${s.below.toFixed(3)} clear ${s.clear.toFixed(3)} fit ${s.fit.toFixed(3)}` };
 }
 
+const WEAPON_MARGIN = 4;
+const weaponGap = weaponClearance(source, rig!, standIndex, scale);
+function clearOfWeapon(slot: Slot, shortfall: Shortfall): Shortfall {
+  const gap = weaponGap(model, slot.index, Array.from({ length: slot.frames + 1 }, (_, frame) => slot.start + ms(frame)));
+  if (!Number.isFinite(gap)) return shortfall;
+  return { value: shortfall.value + 3 * Math.max(0, WEAPON_MARGIN - gap) / WEAPON_MARGIN, pass: shortfall.pass && gap >= 0, report: `${shortfall.report} weapon ${gap.toFixed(1)}` };
+}
+
 function classicShortfall(slot: Slot): Shortfall {
   const drawn = new DrawnModel(generateMDX(model), scale);
-  return poseShortfall(slot.pose, standFrame, (frame) => ({ frame, ...drawn.posed(slot.index, frame / 60, 1) }), slot.frames,
+  return clearOfWeapon(slot, poseShortfall(slot.pose, standFrame, (frame) => ({ frame, ...drawn.posed(slot.index, frame / 60, 1) }), slot.frames,
     (frame) => headId === undefined ? -1 : ((frame.nodes[headId * 2 + 1] ?? 0) - LEDGE_HANG_DEPTH) / standHeight,
-    drawn.influencedBy(new Set(Object.entries(rig!.classic).flatMap(([joint, bone]) => WEAPON_JOINTS.has(joint) && bone !== undefined ? [bone] : []))));
+    drawn.influencedBy(new Set(Object.entries(rig!.classic).flatMap(([joint, bone]) => WEAPON_JOINTS.has(joint) && bone !== undefined ? [bone] : [])))));
 }
 
 let cursor = Math.max(...source.Sequences.map((s) => s.Interval[1])) + 100;
