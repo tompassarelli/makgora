@@ -107,9 +107,9 @@ around an unresolved asset defect.
 Demon Hunter: neutral-special Mana Burn; side-special Fel Rush with
 Vengeful Retreat and Chaos Strike branches, and mana drained by every hit he
 lands (#147, smashcraft:docs/design/illidan.md);
-up-special visible animated wings and quick rising recovery, with a second
-special in its frames 15-27 starting a backflip into an 8-way aimed dive
-(#279); down-special Immolate with shine-like horizontal ground knockback and
+up-special visible animated wings and a rising recovery aimed by the stick on
+its 7th frame (#519), with a second special in its frames 19-31 starting a
+backflip into an 8-way aimed dive (#279); down-special Immolate with shine-like horizontal ground knockback and
 downward air spike, jump-cancellable from its first active frame (#128,
 smashcraft:docs/design/kit-review-1.md). Do not infer reflection or final
 tuning from move names alone. Deliver

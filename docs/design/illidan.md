@@ -184,9 +184,23 @@ smashcraft:ts/src/game/sim/projectiles.ts.
 
 ## Up and down specials (kept)
 
-- **Wing Ascent with the Wing Dive** (#279): Tom asked for a follow-up like
+- **Wing Ascent, aimed like Fire Bird** (#519): Tom asked on 26 Oct for 4 more
+  startup frames and an aimable launch, like Falco's Fire Bird. Illidan holds
+  still on spread wings for frames 1-7 (on the ground he stays standing), and
+  the stick held on frame 7, the last startup frame, sets the launch
+  direction: any angle the stick gives on a pad, 8 directions on a keyboard,
+  straight up with none held. Four frames of protection start there, as
+  before. The ascent keeps its speed and distance and only turns: 30 units a
+  frame at launch, slowing by his gravity (1.14) each frame, about 380 units
+  from the launch to frame 32, then helpless fall. No drift steers it once it
+  launches. Aimed into the floor, he slides along it until the move ends.
+  Before, his frames 1-3 already rose about 56 units and the launch came on
+  frame 3; that hop is now the still startup, so his whole rise from the
+  press is about 380 instead of 435.
+- **Wing Dive** (#279): Tom asked for a follow-up like
   Mountain King's Thunder Leap or Pikachu's second Quick Attack in place of the
-  glide (2026-10-25). A second special in the ascent's frames 15-27 is a
+  glide (2026-10-25). A second special in the ascent's frames 19-31 (15-27
+  before #519 moved it 4 later with the startup) is a
   6-frame backflip, then a 13-frame dive at 30 a frame along the stick held
   at the press, any of 8 directions, forward and down with none held. The
   dive hits along its line (9%, 50 degrees), ends in helpless fall, keeps
@@ -499,7 +513,8 @@ What he keeps, so he does not become Falco in a costume:
 - Warglaives: his normals keep their glaive reach, the twin-glaive forward air
   and the Flames of Azzinoth down smash.
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
-  eight-way dive, not a charged Fire Bird.
+  eight-way dive. Since #519 the ascent aims and starts like Fire Bird, but it
+  takes no charge and does not hit.
 - Eye Blast and Mana Burn: the beam stays a meter-gated EX special and the
   neutral special stays the slow mana orb; he gets no laser.
 - Drain on hit: every landed hit still drains mana.
