@@ -1,4 +1,4 @@
-import { floatVector } from './animVector';
+import { floatVector, unkeyedRest } from './animVector';
 
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -246,7 +246,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   };
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
-    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? donor.Keys[0];
+    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? (rake ? unkeyedRest(donor.Keys[0], path) : donor.Keys[0]);
     if (!first) return;
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
