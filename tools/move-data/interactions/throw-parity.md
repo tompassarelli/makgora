@@ -31,11 +31,11 @@ Gap = mean Melee advantage (five references) minus mean ours (26 fighters), in f
 | back | 60 | 16.3 | 12.7 | -3.5 | -0.8 | -1.5 | -6 | 4.7 |
 | back | 90 | 21 | 16.3 | -4.7 | -1.5 | -2 | -6 | 4.7 |
 | back | all | 13.8 | 10.6 | -3.1 | -0.7 | -1.1 | -6 | 4.7 |
-| up | 0 | 13.5 | 9.4 | -4.1 | 11 | -0.2 | -19.5 | 4.6 |
-| up | 30 | 19 | 12.8 | -6.1 | 9.6 | -0.8 | -19.5 | 4.6 |
-| up | 60 | 24.2 | 16.8 | -7.4 | 8.9 | -1.3 | -19.5 | 4.6 |
-| up | 90 | 29.6 | 20.8 | -8.8 | 8.4 | -2.3 | -19.5 | 4.6 |
-| up | all | 21.6 | 15 | -6.6 | 9.5 | -1.2 | -19.5 | 4.6 |
+| up | 0 | 13.4 | 9.4 | -4 | 11.1 | -0.2 | -19.5 | 4.6 |
+| up | 30 | 18.9 | 12.8 | -6 | 9.7 | -0.8 | -19.5 | 4.6 |
+| up | 60 | 24.1 | 16.8 | -7.3 | 9 | -1.3 | -19.5 | 4.6 |
+| up | 90 | 29.5 | 20.8 | -8.7 | 8.5 | -2.3 | -19.5 | 4.6 |
+| up | all | 21.5 | 15 | -6.5 | 9.6 | -1.2 | -19.5 | 4.6 |
 | down | 0 | 10.9 | 27.8 | 17 | 42.6 | -35 | 6.5 | 2.8 |
 | down | 30 | 10.9 | 29.6 | 18.8 | 44.4 | -35 | 6.5 | 2.8 |
 | down | 60 | 10.9 | 31.6 | 20.8 | 46.4 | -35 | 6.5 | 2.8 |
@@ -194,10 +194,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Muradin Bronzebeard | back | 30 | 17 | 45 | 28 | 18 | -8.3, 0 | 113.7 at 140°, tumble, knockdown at +18 |
 | Muradin Bronzebeard | back | 60 | 29 | 57 | 28 | 18 | -8.3, 0 | 144.9 at 140°, tumble, knockdown at +31 |
 | Muradin Bronzebeard | back | 90 | 42 | 70 | 28 | 18 | -8.3, 0 | 176 at 140°, tumble |
-| Muradin Bronzebeard | up | 0 | 16 | 30 | 14 | 16 | 8.3, 10.8 | 75.5 at 90° |
-| Muradin Bronzebeard | up | 30 | 22 | 36 | 14 | 16 | 8.3, 10.8 | 90.5 at 90°, tumble, knockdown at +31 |
-| Muradin Bronzebeard | up | 60 | 28 | 42 | 14 | 16 | 8.3, 10.8 | 105.4 at 90°, tumble, knockdown at +40 |
-| Muradin Bronzebeard | up | 90 | 34 | 48 | 14 | 16 | 8.3, 10.8 | 120.4 at 90°, tumble |
+| Muradin Bronzebeard | up | 0 | 14 | 28 | 14 | 16 | 8.3, 10.8 | 70.5 at 90° |
+| Muradin Bronzebeard | up | 30 | 20 | 34 | 14 | 16 | 8.3, 10.8 | 85.5 at 90°, tumble, knockdown at +28 |
+| Muradin Bronzebeard | up | 60 | 26 | 40 | 14 | 16 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
+| Muradin Bronzebeard | up | 90 | 32 | 46 | 14 | 16 | 8.3, 10.8 | 115.4 at 90°, tumble |
 | Muradin Bronzebeard | down | 0 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Muradin Bronzebeard | down | 30 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Muradin Bronzebeard | down | 60 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
