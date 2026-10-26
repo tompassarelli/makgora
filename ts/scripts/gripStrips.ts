@@ -7,7 +7,7 @@ import { captureScene, renderScenes, type RenderScene } from "wisp/scripts/wisp/
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { cameraFieldOfView, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
 import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighters } from "./heroModelSource";
 import { CAMERA_LIFT, judgeCamera } from "./wisp/animJudgeCamera";
 import { runProcess } from "./hostProcess";
 import { headlessRender } from "./wisp/headlessRender";
@@ -20,19 +20,31 @@ type Panel = { readonly id: number; readonly label: string };
 const VIEWS = [{ name: "side", yaw: 0 }, { name: "far side", yaw: Math.PI }, { name: "three-quarter", yaw: -Math.PI / 4 }] as const;
 const CROP = "340x300+790+440";
 
-const [auditJson, fighter, out, assets] = process.argv.slice(2);
-if (!auditJson || !fighter || !out || !assets) throw new Error("usage: bun scripts/gripStrips.ts GRIP_AUDIT_JSON FIGHTER PRIVATE_OUTPUT ASSETS");
+const [auditJson, fighter, out, assets, ...named] = process.argv.slice(2);
+if (!auditJson || !fighter || !out || !assets) throw new Error("usage: bun scripts/gripStrips.ts GRIP_AUDIT_JSON FIGHTER PRIVATE_OUTPUT ASSETS [SEQUENCE]...");
 const output = resolve(out);
 if (!relative(projectRoot, output).startsWith("..")) throw new Error("grip strips stay in private storage");
 mkdirSync(join(output, "frames"), { recursive: true });
-const character = SELECTABLE_CHARACTERS.find(candidate => fighterName(candidate).replaceAll(" ", "") === fighter.replaceAll(" ", ""));
+const character = [...fighters].find(([, candidate]) => candidate.name === fighter.replaceAll(" ", ""))?.[0];
 if (character === undefined) throw new Error(`unknown fighter ${fighter}`);
 const body = originalClip(character, 0);
 if (body === undefined) throw new Error(`${fighter}: no shipped clips`);
 const { rows } = await Bun.file(auditJson).json() as { rows: Row[] };
-const flagged = rows.filter(row => row.fighter === fighter && (row.detached > 0 || row.intersecting > 0));
+const fighterRows = rows.filter(row => row.fighter === fighter);
+const flagged = named.length === 0 ? fighterRows.filter(row => row.detached > 0 || row.intersecting > 0) : named.map(sequence => {
+  const row = fighterRows.find(candidate => candidate.sequence === sequence);
+  if (row === undefined) throw new Error(`${fighter}: the audit has no ${sequence}`);
+  return row;
+});
+const MOMENTS = 6;
 
 function moments(row: Row): Map<number, string> {
+  if (named.length > 0) {
+    const clip = originalClip(character!, fighterRows.indexOf(row));
+    if (clip === undefined) throw new Error(`${fighter}/${row.sequence}: sequence is not shipped`);
+    const length = clip.endSeconds - clip.startSeconds;
+    return new Map(Array.from({ length: MOMENTS }, (_, moment) => [clip.startSeconds + length * moment / (MOMENTS - 1), `${(length * moment / (MOMENTS - 1)).toFixed(2)} s`]));
+  }
   const picks = new Map<number, string>();
   if (row.detached > 0) picks.set(row.worstGapSeconds, "worst grip gap");
   if (row.intersecting > 0 && !picks.has(row.worstClearanceSeconds)) picks.set(row.worstClearanceSeconds, "worst clearance");

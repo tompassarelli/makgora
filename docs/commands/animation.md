@@ -282,15 +282,20 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   counts, per Classic sequence, frames whose weapon sits more than 4 units from the hand it is
   calibrated to in Stand Ready or crosses a body capsule, and records each row's worst grip-gap and
   worst-clearance moments (#373). It measures one hand, so a two-handed weapon the other hand holds
-  reads as detached. From ts/, `bun scripts/gripStrips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT ASSETS`
+  reads as detached. From ts/, `bun scripts/gripStrips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT ASSETS [SEQUENCE]...`
   renders those moments for every nonzero row in side, far-side and three-quarter Classic views,
-  which is how a row is accepted as a measurement artifact or found to be a real defect (#436).
-  A weapon that hangs from the root rather than a hand (Rifleman's Rifle01, named in
-  smashcraft:ts/scripts/wisp/victoryJoints.ts) is re-keyed to its hand with
+  which is how a row is accepted as a measurement artifact or found to be a real defect (#436);
+  named sequences instead render at six evenly spaced moments whatever their counts, to show a
+  weapon held through a whole clip (#505).
+  A stock sequence that lets a weapon leave the hand is re-keyed with
   `bun tools/animations/carry-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --sequence NAME...`:
-  in each named sequence it keeps the weapon where the hand held it in Stand Ready, and
-  every other sequence stays identical. Store the family and run `bun wisp inputs derive --fighter NAME`.
-  Rifleman's Knockdown, Down Damage, Get Up and Get Up Attack were carried this way (#436).
+  in each named sequence every rig weapon (`weapon`, `weapon.L` in tools/animations/rigs/) stays
+  where its hand held it in Stand Ready, at its Stand Ready scale, each geoset keeps its Stand Ready
+  visibility, so a thrown or dropped prop geoset stays hidden, and every other sequence stays
+  identical. A weapon under a wrist follows that wrist; one hanging from the root follows the
+  weapon side's wrist. Store the family and run `bun wisp inputs derive --fighter NAME`.
+  Rifleman's Knockdown, Down Damage, Get Up and Get Up Attack (#436) and Mountain King's
+  Stand - 4 and Death (#505) were carried this way.
   `bun tools/animations/grip-zoom-strips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT PRIVATE_ASSETS [SEQUENCE]...`
   settles what those fixed-crop strips cannot: it draws the posed Classic mesh centred on the pelvis
   in side, far-side, front and top views, body grey, arms pale, each held weapon in a flat colour,
