@@ -786,7 +786,9 @@ never hides the fighters:
   near match camera (`extremeCamera(..., "near")`, following the fighter).
   Source: `bun wisp view cues` on 9 Oct 2026, Classic: 108 drawn moves,
   median 0.7%, 90th percentile 2.7%, then a gap from 3.9% to the six broad
-  spells at 4.3-11.6% that the limit rejects.
+  spells at 4.3-11.6% that the limit rejects. A beam special (Chain Lightning, the
+  Tinker's laser) draws its strike as lightning, so it shows no hit-area
+  flare over the beam's bounding box.
 - **Over a body.** An effect drawn over a fighter's body stays no longer than
   that fighter's hitlag. The check below does not measure this one yet.
 
@@ -823,6 +825,12 @@ down, 8.3% to 2.9%), Chain Lightning 0.5 (Thrall, 11.6% to 3.0%), Frost Nova
 0.5 (Lich King up, 7.4% to 2.9%), Howl of Terror 0.7 (Pit Lord, 5.8% to
 2.9%), Holy Bolt 0.8 (Forsaken Paladin, 4.3% to 3.1%) and Carrion Swarm 0.85
 (Dreadlord, 3.8-4.1% to 2.7%).
+
+On 26 Oct 2026 (#378): Doom 0.42 (Pit Lord up, 4.6-4.7% to 3.1-3.3%);
+Chain Lightning drops its hit-area flare (Thrall neutral, 4.9% to 2.1%);
+Anub'arak's nest (28 frames of linger) and Malfurion's treant (13) fall
+to 0 under the placed-object rule, and a move is followed for up to 300
+frames so the 240-frame treant ends inside the measurement.
 
 The check also plays a meter drop (#385) as `meter-drop:telegraph-and-orb`:
 three seconds of telegraph, then the orb, measured for coverage only (a drop

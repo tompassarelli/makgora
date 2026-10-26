@@ -44,6 +44,7 @@ export class HitAreaEffects {
       const count = normal ? authoredHitRegionCount(style, fighter.tuning.moves) : runningHeroSpecial(fighter)?.regions?.length ?? 2;
       for (let index = 0; index < count; index++) {
         if (fighter.character === Character.warden && fighter.special.action === SpecialAction.heroDown) continue;
+        if (!normal && runningHeroSpecial(fighter)?.beam !== undefined) continue;
         const pose = normal ? normalAreaPose(fighter, style, index, this.region, this.pose) : hitAreaPose(fighter, specialAreaRegion(fighter, index), this.pose);
         if (!pose.visible) continue;
         const model = this.models[shown];

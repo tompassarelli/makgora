@@ -61,7 +61,7 @@ const WIDTH = 640, HEIGHT = 360;
 export const CUE_FRAMES = process.env.CUE_FRAMES ?? join(homedir(), ".local/state/smashcraft/cue-budget");
 const AFTER_FRAMES = 40;
 const RENDER_BATCH = 600;
-const LIMIT = 240;
+const LIMIT = 300;
 const MODEL_SAMPLES = 8;
 
 const SPECIALS = [

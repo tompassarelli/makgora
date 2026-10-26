@@ -350,7 +350,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   [Character.pitLord]: {
     neutral: { spell: "Howl of Terror", startup: FEL, active: cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "body", f32(0.7)) },
     side: { spell: "Ruin Charge", startup: FEL, active: timed(cue(IMPACT_DUST_MODEL, "feet", f32(0.8)), "stand", 0.0) },
-    up: { spell: "Abyssal Leap", startup: FEL, active: timed(cue("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", "feet", f32(0.5)), "birth", f32(0.2)) },
+    up: { spell: "Abyssal Leap", startup: FEL, active: timed(cue("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", "feet", f32(0.42)), "birth", f32(0.2)) },
     down: { spell: "Rain of Fire", startup: FEL, active: { ...timed(cue(RAIN_OF_FIRE_TARGET, "overhead", f32(0.5)), "birth", f32(0.8)), timeScale: 1.5 } },
   },
   [Character.lichKing]: {
