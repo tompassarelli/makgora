@@ -2,6 +2,7 @@
 
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
+import { idiv } from "wisp/src/sim/intMath";
 import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
 import { FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 
@@ -713,7 +714,7 @@ function fighterSpecialClip(f: Readonly<Fighter>): HeroClip {
     return clips.clipFor(f.character, f.motion.grounded ? "sideSpecialFollowUp" : "sideSpecialFollowUpAir");
   }
   const aerialShot = f.special.duration === RIFLEMAN_BLASTER_AIR_FRAMES;
-  return clips.specialClip(f.character, f.special.action, f.motion.grounded, aerialShot, playsFollowUpPose(f));
+  return clips.specialClip(f.character, f.special.action, f.motion.grounded, aerialShot, playsFollowUpPose(f), f.special.form >= FOLLOW_UP_FORM ? idiv(f.special.form, FOLLOW_UP_FORM) - 1 : 0);
 }
 
 function damageClipPose(reaction: DamagePose): HeroPose {

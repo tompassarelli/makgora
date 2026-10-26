@@ -1257,7 +1257,9 @@ export function followUpOnContact(f: Fighter): void {
 
 function followUpPressed(followUp: Readonly<SpecialFollowUp>, input: Readonly<Controls>): boolean {
   const kind = followUp.input ?? FollowUpInput.special;
-  return kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special && input.specialPressed;
+  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special && input.specialPressed;
+  const stick = followUp.stick;
+  return pressed && (stick === undefined || (Math.abs(chargedAimX(input)) === stick.x && chargedAimZ(input) === stick.z));
 }
 
 
@@ -1275,6 +1277,7 @@ export function followUpHeroSpecial(f: Fighter, input: Readonly<Controls>): bool
   const followUp = at(followUps, index);
   const next = followUp.special;
   if (followUp.facesStick === true && input.direction !== 0) f.facing = input.direction < 0 ? -1 : 1;
+  if (followUp.stick !== undefined && followUp.stick.x !== 0) f.facing = chargedAimX(input) < 0 ? -1 : 1;
   special.form += FOLLOW_UP_FORM * (index + 1);
   enterFollowUp(f, next);
   return true;

@@ -410,6 +410,7 @@ export interface HeroBranchCues {
 }
 
 const branch = (spell: string, startup: Cue, active: Cue): MoveCues => ({ spell, startup, active });
+const HAMMERFALL_CUES = branch("Hammerfall", STORM, cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.6)));
 
 
 export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: HeroBranchCues } } = {
@@ -437,7 +438,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
   },
   [Character.mountainKing]: {
     neutral: { recall: branch("Storm Bolt recall", STORM, cue("Abilities\\Spells\\Orc\\LightningShield\\LightningShieldBuff.mdx", "hand", f32(0.8))) },
-    up: { followUps: [branch("Hammerfall", STORM, cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.6)))] },
+    up: { followUps: [HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES] },
 
     down: { followUps: [branch("Small Clap", STORM, { ...cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.255)), sound: "ThunderClap" }), "slot", "none"] },
   },

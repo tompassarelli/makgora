@@ -368,6 +368,8 @@ export interface SpecialFollowUp {
   readonly input?: FollowUpInput | undefined;
 
   readonly facesStick?: boolean | undefined;
+
+  readonly stick?: { readonly x: number; readonly z: number } | undefined;
 }
 
 

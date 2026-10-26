@@ -28,6 +28,10 @@
   DI-dependent, read, none). It writes
   smashcraft:tools/move-data/links/<fighter>.jsonl and .md
   (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #294).
+  A special whose follow-up branches are aimed by the stick (`stick` on
+  `followUps`, Mountain King's Thunder Leap into Hammerfall, #509) is also
+  measured holding toward the victim, and its rows add the follow-up pressed
+  in its window with the stick at rest or in each of 8 directions.
   `--fighter fixture:fox` runs Melee's Fox, a check-only fighter built from
   references/melee-frame-data (smashcraft:ts/scripts/ledger/fixtures/fighters.ts,
   #296); `bun ts/scripts/ledger/fixtures/fighters.ts` lists what the corpus

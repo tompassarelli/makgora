@@ -50,6 +50,9 @@ const play = (sequence: MountainKingSequence, seconds?: number): HeroClip => {
 export const MOUNTAIN_KING_FALLBACK = play("Stand Ready");
 
 
+export const MOUNTAIN_KING_DIVES: readonly HeroClip[] = [play("Attack -1"), play("Spell Throw"), play("Attack -2"), play("Attack Slam")];
+
+
 export function mountainKingClips(kit: KitNormals): HeroClipTable {
   const ground = (sequence: MountainKingSequence, strike: number, style: AttackStyle, frame?: number): HeroClip =>
     strikeClip(MOUNTAIN_KING_SEQUENCES[sequence], strike, kit, style, frame);

@@ -515,6 +515,10 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int(`followUp[${index}].last`, followUp.window.last);
     int(`followUp[${index}].input`, followUp.input ?? 0);
     int(`followUp[${index}].facesStick`, bit(followUp.facesStick));
+    if (followUp.stick !== undefined) {
+      int(`followUp[${index}].stickX`, followUp.stick.x);
+      int(`followUp[${index}].stickZ`, followUp.stick.z);
+    }
     result.push(specialMoveCanonical(followUp.special, `${name}.followUp[${index}]`));
   }
   return result.join("");

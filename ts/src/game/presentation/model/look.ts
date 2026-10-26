@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { AttackStyle } from "../../sim/codes";
-import type { CommandGrabClips, HeroClip, HeroClipTable } from "../../sim/heroes/hero";
+import type { CommandGrabClips, HeroClip, HeroClipTable, HeroFollowUpPose } from "../../sim/heroes/hero";
 
 export interface HeroLook {
 
@@ -13,6 +13,8 @@ export interface HeroLook {
   readonly placedModel?: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true } | undefined;
 
   readonly clips: HeroClipTable;
+
+  readonly followUpClips?: { readonly [pose in HeroFollowUpPose]?: readonly HeroClip[] } | undefined;
 
   readonly damageClips?: readonly HeroClip[] | undefined;
   readonly fallback: HeroClip;

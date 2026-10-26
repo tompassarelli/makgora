@@ -341,9 +341,10 @@ const FOLLOW_UP_POSES: readonly (readonly [grounded: HeroFollowUpPose, air: Hero
   ["upSpecialFollowUp", "upSpecialFollowUpAir"], ["downSpecialFollowUp", "downSpecialFollowUpAir"],
 ];
 
-export function specialClip(character: number, action: SpecialAction, grounded: boolean, aerialShot: boolean, followUp = false): HeroClip {
+export function specialClip(character: number, action: SpecialAction, grounded: boolean, aerialShot: boolean, followUp = false, branch = 0): HeroClip {
   const poses = followUp ? FOLLOW_UP_POSES[action - SpecialAction.heroNeutral] : undefined;
-  const own = poses === undefined ? undefined : characterClips(character)[grounded ? poses[0] : poses[1]];
+  const pose = poses === undefined ? undefined : grounded ? poses[0] : poses[1];
+  const own = pose === undefined ? undefined : heroLook(character)?.followUpClips?.[pose]?.[branch] ?? characterClips(character)[pose];
   if (own !== undefined) return own;
   switch (action) {
     case SpecialAction.heroNeutral: return clipFor(character, grounded ? "neutralSpecial" : "neutralSpecialAir");

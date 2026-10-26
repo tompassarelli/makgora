@@ -1,4 +1,5 @@
-import type { LinkClass, LinkRow, Region } from "./comboLinks";
+import type { Region } from "./comboLinkRegions";
+import type { LinkClass, LinkRow } from "./comboLinks";
 import { LEDGER_ROWS } from "./ledger/ledger";
 import type { LedgerRow } from "./ledger/row";
 

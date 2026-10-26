@@ -2,9 +2,9 @@ import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { hurtCapsule } from "../geometry/contactGeometry";
 import { Character, HitElement } from "../codes";
-import { HERO_REFERENCE_HEIGHT, type MoveRegion, heroRegion } from "../heroMoves";
+import { HERO_REFERENCE_HEIGHT, type MoveRegion, type StrikeCapsule, heroRegion } from "../heroMoves";
 import { hurtPart, hurtPose } from "../hurtboxes";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, type SpecialMotion, type SpecialProjectile, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, type SpecialMotion, type SpecialProjectile, type SpecialFollowUp, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../specials/schema";
 import { MEDIUM, SHORT, capsule, hit } from "./mountainKingMoves";
 
 
@@ -36,7 +36,9 @@ const RUSH_HURT = [hurtPose(13, 18, [hurtCapsule(Character.mountainKing), hurtPa
 
 
 
-const leap = (distance: number): readonly SpecialMotion[] => chargedAngleMotion(distance, 16);
+const LEAP_DELAY = 2;
+const leap = (distance: number): readonly SpecialMotion[] => chargedAngleMotion(distance, 16).map((segment, index) =>
+  index === 0 ? { ...segment, last: segment.last + LEAP_DELAY } : { ...segment, first: segment.first + LEAP_DELAY, last: segment.last + LEAP_DELAY });
 const FULL_LEAP = leap(heights(f32(2.7)));
 const THUNDER_LEAP = hit(8.645519256591797, "LAUNCH", 80, false, HitElement.electric);
 const LEAP_HAMMER = capsule(10.0, 60.0, 30.0, f32(MEDIUM + 20.0), 16.0);
@@ -46,15 +48,48 @@ const LEAP_HAMMER = capsule(10.0, 60.0, 30.0, f32(MEDIUM + 20.0), 16.0);
 
 
 const PLUNGE = heights(f32(0.16));
+const HAMMERFALL_DAMAGE = 12.968278884887695;
+const HAMMERFALL_GROUNDED = hit(10.806899070739746, "LAUNCH", 55, false, HitElement.electric);
+const HAMMERFALL_HAMMER = capsule(4.0, 10.0, 4.0, -24.0, 20.0);
 const HAMMERFALL: AuthoredSpecial = {
   name: "Hammerfall",
 
   endFrame: 70,
   motion: [{ ...frames(1, 3), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(4, 70), velocityX: 0.0, velocityZ: -PLUNGE }],
-  regions: [heroRegion(4, 70, capsule(4.0, 10.0, 4.0, -24.0, 20.0), hit(12.968278884887695, "SPIKE", 270, false, HitElement.electric), hit(10.806899070739746, "LAUNCH", 55, false, HitElement.electric))],
+  regions: [heroRegion(4, 70, HAMMERFALL_HAMMER, hit(HAMMERFALL_DAMAGE, "SPIKE", 270, false, HitElement.electric), HAMMERFALL_GROUNDED)],
   landingLag: 24,
   helpless: true,
 };
+
+const DIAGONAL = f32(0.7071067811865476);
+const DIVE_PIVOT = 45.0;
+const DIVE_WINDOW = frames(18, 30);
+const DIVE_LAST = 15;
+const DIVE_END = 33;
+const diveHammer = (aimX: number, aimZ: number): StrikeCapsule => {
+  const turn = (x: number, z: number): { readonly x: number; readonly z: number } => ({
+    x: f32(f32(f32(-aimZ) * x) - f32(aimX * f32(z - DIVE_PIVOT))),
+    z: f32(DIVE_PIVOT + f32(f32(aimX * x) + f32(f32(-aimZ) * f32(z - DIVE_PIVOT)))),
+  });
+  const near = turn(HAMMERFALL_HAMMER.x1, HAMMERFALL_HAMMER.z1);
+  const far = turn(HAMMERFALL_HAMMER.x2, HAMMERFALL_HAMMER.z2);
+  return capsule(near.x, near.z, far.x, far.z, HAMMERFALL_HAMMER.radius);
+};
+const dive = (aimX: number, aimZ: number, angle: Parameters<typeof hit>[2], last: number, endFrame: number): AuthoredSpecial => ({
+  ...HAMMERFALL,
+  endFrame,
+  motion: [{ ...frames(1, 3), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(4, last), velocityX: f32(aimX * PLUNGE), velocityZ: f32(aimZ * PLUNGE) },
+    { ...frames(last + 1, last + 1), velocityX: 0.0, velocityZ: 0.0 }],
+  regions: [heroRegion(4, last, diveHammer(aimX, aimZ), hit(HAMMERFALL_DAMAGE, aimZ < 0 ? "SPIKE" : "LAUNCH", angle, false, HitElement.electric), HAMMERFALL_GROUNDED)],
+});
+const HAMMERFALL_DIVES: readonly SpecialFollowUp[] = [
+  { window: DIVE_WINDOW, stick: { x: 0, z: 1 }, special: dive(0.0, 1.0, 85, DIVE_LAST, DIVE_END) },
+  { window: DIVE_WINDOW, stick: { x: 1, z: 1 }, special: dive(DIAGONAL, DIAGONAL, 50, DIVE_LAST, DIVE_END) },
+  { window: DIVE_WINDOW, stick: { x: 1, z: 0 }, special: dive(1.0, 0.0, 35, DIVE_LAST, DIVE_END) },
+  { window: DIVE_WINDOW, stick: { x: 1, z: -1 }, special: dive(DIAGONAL, -DIAGONAL, 270, HAMMERFALL.endFrame, HAMMERFALL.endFrame) },
+  { window: DIVE_WINDOW, special: HAMMERFALL },
+];
 
 
 
@@ -143,16 +178,16 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
   }, { damage: 1.25 }),
   up: withHammerfallEx({
     name: "Thunder Leap",
-    description: "Hold a direction as he crouches, then a hammer leap that way; press special at the top to plunge down as Hammerfall.",
+    description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, press special at the top to dive hammer first along the held stick in any of eight directions as Hammerfall, straight down with the stick at rest.",
     ground: {
-      endFrame: 28,
-      regions: [heroRegion(9, 14, LEAP_HAMMER, THUNDER_LEAP)],
+      endFrame: 30,
+      regions: [heroRegion(11, 16, LEAP_HAMMER, THUNDER_LEAP)],
       aimFrames: CHARGED_AIM_FRAMES,
       motion: FULL_LEAP,
       facesStick: true,
       oncePerAirtime: true,
       helpless: true,
-      followUps: [{ window: frames(16, 28), special: HAMMERFALL }],
+      followUps: HAMMERFALL_DIVES,
     },
 
   }),

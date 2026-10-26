@@ -1,5 +1,6 @@
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { characterClips, clipFor } from "../src/game/presentation/fighterClips";
+import { heroLook } from "../src/game/roster/looks";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
 
 const SAMPLES = 30;
@@ -10,6 +11,11 @@ for (const character of SELECTABLE_CHARACTERS) {
   const name = fighterSlug(character);
   for (const [pose, clip] of Object.entries(characterClips(character))) {
     if (clip !== undefined && originalClip(character, clip.index) === undefined) refused.push(`${name} ${pose}: no sequence ${clip.index} in its model`);
+  }
+  for (const [pose, branches] of Object.entries(heroLook(character)?.followUpClips ?? {})) {
+    for (const [branch, clip] of (branches ?? []).entries()) {
+      if (originalClip(character, clip.index) === undefined) refused.push(`${name} ${pose} branch ${branch}: no sequence ${clip.index} in its model`);
+    }
   }
   const jump = clipFor(character, "doubleJump");
   const sequence = originalClip(character, jump.index);

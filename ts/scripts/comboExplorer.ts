@@ -24,6 +24,7 @@ import type { Fighter } from "../src/game/sim/fighter";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { attackStartupFrames } from "../src/game/sim/moves";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
+import { SpecialSlot } from "../src/game/sim/specials/schema";
 import { FIXTURE_FIGHTERS } from "./ledger/fixtures/fighters";
 
 const STAGE = 0;
@@ -85,13 +86,14 @@ interface Move {
   readonly name: string;
   readonly kind: "ground" | "air" | "special" | "dash" | "grab";
   readonly style?: AttackStyle;
+  readonly slot?: SpecialSlot;
 
   readonly press: (self: Readonly<Fighter>, other: Readonly<Fighter>) => number;
 }
 
 const ground = (name: string, style: AttackStyle, press: Move["press"]): Move => ({ name, kind: "ground", style, press });
 const aerial = (name: string, style: AttackStyle, press: Move["press"]): Move => ({ name, kind: "air", style, press });
-const special = (name: string, press: Move["press"]): Move => ({ name, kind: "special", press });
+const special = (name: string, slot: SpecialSlot, press: Move["press"]): Move => ({ name, kind: "special", slot, press });
 
 const GROUND_MOVES: readonly Move[] = [
   ground("jab", AttackStyle.jab, () => ATTACK),
@@ -114,10 +116,10 @@ const AERIALS: readonly Move[] = [
   aerial("down air", AttackStyle.downAir, () => SMASH_DOWN),
 ];
 const SPECIALS: readonly Move[] = [
-  special("neutral special", () => SPECIAL),
-  special("side special", (a, b) => SPECIAL | toward(a, b)),
-  special("up special", () => SPECIAL | UP),
-  special("down special", () => SPECIAL | DOWN),
+  special("neutral special", SpecialSlot.neutral, () => SPECIAL),
+  special("side special", SpecialSlot.side, (a, b) => SPECIAL | toward(a, b)),
+  special("up special", SpecialSlot.up, () => SPECIAL | UP),
+  special("down special", SpecialSlot.down, () => SPECIAL | DOWN),
 ];
 const THROWS: readonly Throw[] = ["forward", "back", "up", "down"];
 const throwMask = (self: Readonly<Fighter>, direction: Throw): number =>

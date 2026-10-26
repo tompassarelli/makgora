@@ -262,6 +262,11 @@ export function upSpecialStartable(f: Readonly<Fighter>, cooldownReady: boolean)
 
 
 
+function aimsByStick(f: Readonly<Fighter>): boolean {
+  for (const branch of runningHeroSpecial(f)?.followUps ?? []) if (branch.stick !== undefined) return true;
+  return false;
+}
+
 export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, input: Controls): boolean {
   if (!isHeroSpecialAction(f.special.action) || f.special.form >= FOLLOW_UP_FORM || f.launch.hitstun > 0) return false;
   const next = f.special.frame + 1;
@@ -271,11 +276,17 @@ export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter
     const kind = branch.input ?? FollowUpInput.special;
     if (kind === FollowUpInput.shield || next < branch.window.first || next > branch.window.last) continue;
     if (branch.special.helpless === true && !safeAt(stage, f.motion.x, 0.0)) continue;
-    const facing = branch.facesStick === true && dx !== 0.0 ? (dx < 0 ? -1 : 1) : f.facing;
+    const turns = branch.facesStick === true || (branch.stick !== undefined && branch.stick.x !== 0);
+    const facing = turns && dx !== 0.0 ? (dx < 0 ? -1 : 1) : f.facing;
     if (!strikeMeets(branch.special, target, f32(dx * facing), localZ)) continue;
     if (kind === FollowUpInput.attack) input.attackPressed = true;
     else input.specialPressed = true;
     if (branch.facesStick === true) input.direction = facing;
+    if (aimsByStick(f)) {
+      input.diStickValid = false;
+      input.direction = branch.stick === undefined || branch.stick.x === 0 ? 0 : facing;
+      input.verticalDirection = branch.stick?.z ?? 0;
+    }
     return true;
   }
   return false;

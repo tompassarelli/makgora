@@ -12,6 +12,8 @@ import { floorBelow } from "../src/game/sim/stage";
 import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { DEFAULT_POLICY, VICTIM_OPTIONS, type VictimOption } from "./agencyBranch";
 import { LINK_GROUND_MODES, PIVOT_MODES } from "./comboLinkModes";
+import { type BranchStick, branchFollowUps, branchMove, branchOpen } from "./comboLinkBranches";
+import { type Region, REGIONS, landedRegion } from "./comboLinkRegions";
 import { onShield } from "./comboLinkShield";
 import {
   AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, DIS, type Defender, type Di, FINE_FRAMES, GATE_X, GATE_Z, type Mode, type Move,
@@ -27,8 +29,6 @@ export const FOLLOW_UPS: readonly string[] = [
   ...OPENERS.filter((opener) => opener.throw === undefined && opener.move.kind !== "ground").map((opener) => opener.name),
 ];
 
-export type Region = "clean" | "late" | "sweet" | "sour";
-export const REGIONS: readonly Region[] = ["clean", "late", "sweet", "sour"];
 export type LinkClass = "true" | "DI-dependent" | "read" | "none";
 
 export const SLACK = DEFAULT_POLICY.slack;
@@ -71,27 +71,6 @@ export interface LinkUnit extends LinkOpener {
   readonly percents?: readonly number[];
 }
 
-interface Regions {
-  readonly strong: Region;
-  readonly weak: Region | undefined;
-}
-
-function regionsOf(a: Readonly<Fighter>, opener: Opener): Regions {
-  const moves = a.tuning.moves;
-  const style = opener.move.style === AttackStyle.dashAttack ? moves?.dashAttack : opener.move.style;
-  const authored = opener.throw !== undefined || style === undefined ? undefined : moves?.normals[style];
-  const strong = authored?.regions.filter((region) => region.hit.effect.strong === true) ?? [];
-  const weak = authored?.regions.filter((region) => region.hit.effect.strong !== true) ?? [];
-  if (strong.length === 0 || weak.length === 0) return { strong: "clean", weak: undefined };
-  const overlap = strong.some((s) => weak.some((w) => s.firstFrame <= w.lastFrame && w.firstFrame <= s.lastFrame));
-  return overlap ? { strong: "sweet", weak: "sour" } : { strong: "clean", weak: "late" };
-}
-
-const landedRegion = (sim: Sim, opener: Opener): Region => {
-  const regions = regionsOf(sim.a, opener);
-  return sim.b.visuals.hitStrong ? regions.strong : regions.weak ?? regions.strong;
-};
-
 const NO_DI: Defender = { name: "none", di: "none" };
 
 interface Standing {
@@ -118,7 +97,7 @@ function approachesFor(attacker: Character, victim: Character, opener: Opener): 
   const most = new Map<Region, Measured>();
   const closest = new Map<Region, Measured>();
   const airborne = opener.airborne === true;
-  const variants = airborne ? [opener, { ...opener, drift: true }] : [opener];
+  const variants = airborne || branchFollowUps(attacker, opener).length > 0 ? [opener, { ...opener, drift: true }] : [opener];
   for (const variant of variants) for (const height of airborne ? SETUP_HEIGHTS : [[0, 0] as const]) for (const spacing of SETUP_SPACINGS) {
     const setup: ComboSetup = { ...setupFor(attacker, victim, opener, 0, "centre", spacing, height), defenderWeight: 75 };
     const played = openerRoot(setup, variant, NO_DI);
@@ -165,6 +144,8 @@ interface Idle extends Track {
   readonly bx: readonly number[];
   readonly bz: readonly number[];
   readonly grounded: readonly boolean[];
+  readonly branch: readonly boolean[];
+  readonly actionable: boolean;
   readonly start: number;
   readonly free: number;
   readonly window: number;
@@ -176,14 +157,18 @@ function idleTrack(sim: Sim, from: Saved, d: Defender): Idle | "ko" | undefined 
   const bx: number[] = [];
   const bz: number[] = [];
   const grounded: boolean[] = [];
+  const branch: boolean[] = [];
   const stocks = sim.b.status.stocks;
   let freeAt = LIMIT + 1;
   let start = -1;
+  let firstBranch = -1;
   let wasTumbling = sim.b.down.state === DownState.tumble && !sim.b.motion.grounded;
   for (let n = 1; n <= LIMIT && (start < 0 || n <= freeAt + SLACK); n++) {
     const a = sim.a;
     const b = sim.b;
     if (start < 0 && canAttack(a)) start = n;
+    branch[n] = branchOpen(a);
+    if (firstBranch < 0 && branch[n] === true) firstBranch = n;
     track.ax[n] = a.motion.x;
     track.az[n] = a.motion.z;
     track.avx[n] = a.motion.vx;
@@ -203,11 +188,11 @@ function idleTrack(sim: Sim, from: Saved, d: Defender): Idle | "ko" | undefined 
     if (freeAt > LIMIT && landed) freeAt = n;
     else if (freeAt > LIMIT && settled(b)) freeAt = n + 1;
   }
-  if (start < 0) {
+  if (start < 0 && firstBranch < 0) {
     release(track);
     return undefined;
   }
-  return { ...track, bx, bz, grounded, start, free: freeAt, window: Math.min(LIMIT, freeAt + SLACK) };
+  return { ...track, bx, bz, grounded, branch, actionable: start >= 0, start: start >= 0 ? start : firstBranch, free: freeAt, window: Math.min(LIMIT, freeAt + SLACK) };
 }
 
 function modeTrack(sim: Sim, from: Saved, d: Defender, idle: Idle, mode: Mode, earliest: number): Track {
@@ -273,10 +258,23 @@ function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move
   return undefined;
 }
 
-function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle): Map<string, Candidate[]> {
+function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle, sticks: readonly BranchStick[]): Map<string, Candidate[]> {
   sim.load(from);
   const byFollowUp = new Map<string, Candidate[]>();
-  const modes = sim.a.motion.grounded || idle.grounded[idle.start] === true ? LINK_GROUND_MODES : AIR_MODES;
+  const add = (found: Candidate | undefined): void => {
+    if (found === undefined) return;
+    const own = byFollowUp.get(found.followUp) ?? [];
+    own.push(found);
+    byFollowUp.set(found.followUp, own);
+  };
+  const firstBranch = idle.branch.findIndex((open) => open === true);
+  if (firstBranch > 0) {
+    for (let k = firstBranch; k <= idle.window; k += k < firstBranch + FINE_FRAMES ? 1 : 2) {
+      if (idle.branch[k] !== true) continue;
+      for (const stick of sticks) add(strike(sim, d, idle, k, STAND, branchMove(stick), idle.window));
+    }
+  }
+  const modes = !idle.actionable ? [] : sim.a.motion.grounded || idle.grounded[idle.start] === true ? LINK_GROUND_MODES : AIR_MODES;
   for (const mode of modes) {
     sim.load(from);
     const earliest = mode.earliest(idle.start, sim.a);
@@ -296,11 +294,7 @@ function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle): Map<string,
           const ahead = f32((track.ax[k] ?? 0) + f32((track.avx[k] ?? 0) * startup));
           if (Math.abs((idle.bx[contact] ?? 0) - ahead) > GATE_X || Math.abs((idle.bz[contact] ?? 0) - (track.az[k] ?? 0)) > GATE_Z) continue;
         }
-        const found = strike(sim, d, track, k, mode, move, idle.window);
-        if (found === undefined) continue;
-        const own = byFollowUp.get(found.followUp) ?? [];
-        own.push(found);
-        byFollowUp.set(found.followUp, own);
+        add(strike(sim, d, track, k, mode, move, idle.window));
       }
     }
     if (track !== idle) release(track);
@@ -383,11 +377,11 @@ interface CellLinks {
 const shortlist = (own: readonly Candidate[]): Candidate[] =>
   [...own.filter((candidate) => !candidate.pivot).slice(0, CANDIDATES), ...own.filter((candidate) => candidate.pivot).slice(0, CANDIDATES)].sort((x, y) => x.contact - y.contact);
 
-function linkCell(sim: Sim, from: Saved, d: Defender): CellLinks | undefined {
+function linkCell(sim: Sim, from: Saved, d: Defender, sticks: readonly BranchStick[]): CellLinks | undefined {
   const idle = idleTrack(sim, from, d);
   if (idle === undefined) return undefined;
   if (idle === "ko") return { ko: true, advantage: 0, byFollowUp: new Map() };
-  const found = candidates(sim, from, d, idle);
+  const found = candidates(sim, from, d, idle, sticks);
   const options = [...found.values()].some((own) => own.some((candidate) => candidate.loose)) ? liveOptions(sim, from, d, idle) : [];
   const byFollowUp = new Map<string, DiOutcome>();
   for (const [followUp, own] of found) {
@@ -430,6 +424,7 @@ function koesAt(setup: ComboSetup, opener: Opener, region: Region): boolean {
 }
 
 function cellRows(attacker: Character, { setup, opener }: Approach, region: Region, percent: number, weight: number): LinkRow[] {
+  const sticks = branchFollowUps(attacker, opener);
   let angle: number | undefined;
   const cells = new Map<Di, CellLinks | undefined>();
   for (const di of DIS) {
@@ -438,7 +433,7 @@ function cellRows(attacker: Character, { setup, opener }: Approach, region: Regi
     if (played === undefined) continue;
     if (landedRegion(played.sim, opener) === region) {
       if (di === "none") angle = launchAngle(played.sim);
-      cells.set(di, linkCell(played.sim, played.root.saved, d));
+      cells.set(di, linkCell(played.sim, played.root.saved, d, sticks));
     }
     free(played.root.saved);
   }
@@ -449,7 +444,7 @@ function cellRows(attacker: Character, { setup, opener }: Approach, region: Regi
   const ledgeKo = koesAt(ledge, opener, region);
   const shield = onShield({ ...setup, defenderWeight: weight }, opener, LIMIT);
   const surviving = DIS.filter((di) => cells.get(di)?.ko !== true);
-  return FOLLOW_UPS.map((followUp) => {
+  return [...FOLLOW_UPS, ...sticks.map((stick) => stick.name)].map((followUp) => {
     const outcomes = new Map<Di, DiOutcome | undefined>(DIS.map((di) => [di, cells.get(di)?.byFollowUp.get(followUp)]));
     const own = outcomes.get("none");
     const escapes = new Set(DIS.flatMap((di) => outcomes.get(di)?.escapes ?? []));

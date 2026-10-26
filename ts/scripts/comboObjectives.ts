@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 import { DIS } from "./comboExplorer";
-import { LINK_PERCENTS, type LinkClass, type LinkRow, REGIONS } from "./comboLinks";
+import { REGIONS } from "./comboLinkRegions";
+import { LINK_PERCENTS, type LinkClass, type LinkRow } from "./comboLinks";
 import { EdgeGuardObjectiveSchema } from "./edgeGuardObjectives";
 import { ROLE_PERCENTS, THROW_DIRECTIONS, THROW_ROLES, type ThrowDeclaration } from "./throwRoleObjectives";
 
