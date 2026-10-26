@@ -11,6 +11,8 @@ import { mat4, quat, vec3 } from 'gl-matrix';
 import { ensure, onGlobalClock, tracks } from './original-clips';
 import { bodyJoint, followers, limbJoint, type Limb, type Side } from '../../ts/scripts/wisp/victoryJoints';
 import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts/wisp/victoryTorso';
+import { anatomyFindings } from '../../ts/scripts/wisp/victoryAnatomy';
+import { bodyPoseReader, standSequence } from './victory-pose';
 
 type Arms = 'rest' | 'low' | 'raised' | 'pumped' | 'chest' | 'wide' | 'wave' | 'overhead';
 interface Beat { readonly frame: number; readonly arms: Arms | readonly [Arms, Arms]; readonly chest: number; readonly head: number; readonly hop: number }
@@ -22,6 +24,7 @@ const CHEER: readonly Beat[] = [
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
 const FRAMES = 90;
+const SOLVE_MARGIN = 10;
 const alternating = (low: Arms): readonly Beat[] => [
     { frame: 0, arms: 'rest', chest: 0, head: 0, hop: 0 }, { frame: 8, arms: 'low', chest: 20, head: 12, hop: 0 },
     { frame: 16, arms: 'raised', chest: -15, head: -22, hop: 0.5 }, { frame: 28, arms: ['raised', low], chest: -12, head: -18, hop: 0 },
@@ -38,7 +41,7 @@ const step = (weapon: Side, frame: number, held: Arms, free: Arms, chest: number
     ({ frame, arms: held === 'rest' && free === 'rest' ? 'rest' : sided(weapon, held, free), chest, head, hop });
 const bow = (weapon: Side): readonly Beat[] => [
     step(weapon, 0, 'rest', 'rest', 0, 0), step(weapon, 15, 'chest', 'wave', -10, -18), step(weapon, 28, 'chest', 'wide', 0, 0),
-    step(weapon, 45, 'chest', 'wide', 40, 35), step(weapon, 60, 'chest', 'low', 40, 35), step(weapon, 75, 'chest', 'overhead', -10, -18),
+    step(weapon, 45, 'chest', 'wide', 40, 35), step(weapon, 60, 'chest', 'low', 40, 35), step(weapon, 68, 'chest', 'wide', 15, 8), step(weapon, 75, 'chest', 'overhead', -10, -18),
     step(weapon, 90, 'rest', 'rest', 0, 0),
 ];
 const fists = (weapon: Side): readonly Beat[] => [
@@ -86,8 +89,7 @@ for (const character of characters) {
     const pumps = PUMPS[character], hops = BOUNCE[character], bouncing = hops !== undefined || pumps !== undefined || design !== undefined;
     const cheer = design ?? (pumps === undefined ? CHEER : alternating(pumps.low));
     const beats = design ?? cheer.map(beat => pumps !== undefined ? { ...beat, hop: beat.hop * pumps.hop } : bouncing ? { ...beat, hop: hops?.[beat.frame] ?? 0 } : beat);
-    const idle = (sequence: mdx.Sequence) => /^stand(\s*-?\s*1)?$/.test(sequence.Name.trim().toLowerCase());
-    const stand = source.Sequences.find(sequence => sequence.Name.trim().toLowerCase() === 'stand') ?? source.Sequences.find(idle);
+    const stand = source.Sequences[standSequence(source)];
     ensure(stand !== undefined, `${fighter.name} has no Stand sequence`);
     const body = (role: Parameters<typeof bodyJoint>[1]) => { const found = bodyJoint(model, role); ensure(found, `${fighter.name} has no ${role}; add its names to victoryJoints.ts`); return found; };
     const limb = (kind: Limb, side: Side) => { const found = limbJoint(model, kind, side); ensure(found, `${fighter.name} has no ${kind} ${side}; add its names to victoryJoints.ts`); return found; };
@@ -116,10 +118,10 @@ for (const character of characters) {
             ...(first.InTan ? { InTan: rotation ? first.Vector.slice() : new Float32Array(first.Vector.length), OutTan: rotation ? first.Vector.slice() : new Float32Array(first.Vector.length) } : {}) });
     });
     const settle = (track: mdx.AnimVector) => {
-        const first = track.Keys.findIndex(inside);
-        if (first < 0) return;
+        if (!track.Keys.some(inside)) return;
         const window = track.Keys.filter(inside).sort((a, b) => a.Frame - b.Frame), outside = track.Keys.filter(key => !inside(key));
-        track.Keys = [...outside.slice(0, first), ...window, ...outside.slice(first)];
+        const after = outside.findIndex(key => key.Frame > end);
+        track.Keys = after < 0 ? [...outside, ...window] : [...outside.slice(0, after), ...window, ...outside.slice(after)];
     };
     tracks(model, track => { if (!onGlobalClock(track)) settle(track); });
     for (const { frame } of cheer) if (!root.Translation.Keys.some(key => key.Frame === time(frame))) {
@@ -140,6 +142,8 @@ for (const character of characters) {
     };
 
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, 'rendererData');
+    const read = bodyPoseReader(model, renderer, fighter.name), restPose = read();
+    const broken = (frame: number, side: number) => anatomyFindings(restPose, [{ frame, pose: read() }], SOLVE_MARGIN).filter(finding => finding.side === side);
     const evaluate = (frame: number) => { renderer.setSequence(index); data.frame = time(frame); renderer.update(0); };
     const pivot = (joint: mdx.Node) => point(data.nodes[joint.ObjectId].matrix, model.PivotPoints[joint.ObjectId]!);
     evaluate(0);
@@ -195,7 +199,7 @@ for (const character of characters) {
             const apply = () => { pose(shoulder!, beat.frame, angles[0]!, angles[1]!, angles[4]!); pose(elbow!, beat.frame, angles[2]!, angles[3]!); };
             if (known === undefined) {
                 const target = targets[kind](solved.has('rear') ? (evaluate(beat.frame), pivot(shoulder!)) : shoulders[side]!, side);
-                const loss = () => { apply(); evaluate(beat.frame); const at = pivot(hand!); return Math.hypot(at[0]! - target[0]!, at[1]! - target[1]!, at[2]! - target[2]!); };
+                const loss = () => { apply(); evaluate(beat.frame); const at = pivot(hand!); return Math.hypot(at[0]! - target[0]!, at[1]! - target[1]!, at[2]! - target[2]!) + broken(beat.frame, side).reduce((sum, finding) => sum + finding.excess * reach[side]! / 10 + reach[side]!, 0); };
                 const descend = (dimensions: number) => { for (let pass = 0; pass < 4; pass++) for (let dimension = 0; dimension < dimensions; dimension++) {
                     let best = Infinity, choice = 0;
                     for (let value = -180; value <= 180; value += pass === 0 ? 20 : pass === 1 ? 5 : 2) { angles[dimension] = value; const distance = loss(); if (distance < best) { best = distance; choice = value; } }
@@ -209,7 +213,7 @@ for (const character of characters) {
                     if (attempt < best) { best = attempt; kept = angles.slice(); }
                 }
                 angles.splice(0, 5, ...kept);
-                ensure(loss() < reach[side]! * 0.25, `${fighter.name}: ${kind} hand ${side} misses its target by ${loss().toFixed(1)} of a ${reach[side]!.toFixed(1)} reach`);
+                ensure(loss() < reach[side]! * 0.25, `${fighter.name}: ${kind} hand ${side} misses its target by ${loss().toFixed(1)} of a ${reach[side]!.toFixed(1)} reach, ${broken(beat.frame, side).map(finding => `${finding.joint} ${finding.rule} (${finding.value})`).join(", ") || "anatomically"}`);
                 solved.set(`${kind}${side}`, angles);
             }
             apply();
@@ -285,6 +289,9 @@ for (const character of characters) {
     }
 
     follow();
+    const everyFrame = Array.from({ length: FRAMES + 1 }, (_, frame) => { evaluate(frame); return { frame, pose: read() }; });
+    const breaks = anatomyFindings(restPose, everyFrame);
+    ensure(breaks.length === 0, `${fighter.name}: the cheer breaks the body between its beats: ${breaks.map(finding => `frame ${finding.frame} arm ${finding.side} ${finding.joint} ${finding.rule} (${finding.value})`).join('; ')}`);
     const outside = (value: mdx.Model) => { const copy = structuredClone(value); copy.Sequences = copy.Sequences.filter((_, at) => at !== index); tracks(copy, track => { if (!onGlobalClock(track)) track.Keys = track.Keys.filter(key => !inside(key)); }); return copy; };
     ensure(isDeepStrictEqual(outside(model), outside(source)), `${fighter.name}: the cheer changed another sequence`);
     const bytes = generateMDX(model), decoded = parseMDX(bytes);

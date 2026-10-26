@@ -93,6 +93,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   headless match with each selectable fighter, or only the named ones, checks the winner's victory clip starts at its first
   frame, prints each sampled pose and renders a six-frame Classic results-screen strip per winner against the next fighter, or against each `--against` loser,
   with the UI (`classic`) and, for cold readers, without the UI or the winner's level-up burst (`classic-poses`).
+  `bun tools/animations/victory-anatomy.ts` (from ts/) samples every selectable fighter's shipped victory every third frame,
+  prints each frame and joint that breaks the anatomy rules in smashcraft:ts/scripts/wisp/victoryAnatomy.ts (an elbow bent
+  backward, folded past its range or off its hinge, a bone stretched, an elbow or hand inside the torso) and rewrites the
+  joint record ts/test/fixtures/victory-anatomy.json that `bun run test` checks (#496). Rerun it after storing a changed hero model;
+  `victory-clips.ts` refuses any cheer pose that breaks the same rules.
   `bun tools/animations/grab-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]` appends
   coordinated expansion-hero reach, hold, pummel and four-direction holder/victim
   gestures or reauthors their existing indices. `--character` limits reauthoring
