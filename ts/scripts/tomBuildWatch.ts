@@ -254,7 +254,7 @@ const reportBudget = (sha: string, timing: Timing) => Effect.gen(function*() {
     for (const number of open) yield* gh("issue", "close", number, "--comment", `Landing ${sha} was within both budgets. ${stageReport(timing)}`);
     return;
   }
-  if (open[0] === undefined) yield* gh("issue", "create", "--title", SPEED_BUDGET_TITLE, "--body", body);
+  if (open[0] === undefined) yield* gh("issue", "create", "--title", SPEED_BUDGET_TITLE, "--body", body, "--label", "bug", "--label", "priority:now", "--label", "evidence:code");
   else yield* gh("issue", "comment", open[0], "--body", body);
 });
 

@@ -139,7 +139,7 @@ env:
       [ "${4:-}" = alarm ] || return 0
       alarm=$(gh issue list --state open --search 'in:title "Autoland stalled"' --json number,title --jq '[.[] | select(.title == "Autoland stalled")][0].number // empty')
       if [ -z "$alarm" ]; then
-        gh issue create --title "Autoland stalled" --body "\`$branch\` (${tip:0:10}) $text ($RUN_URL) (smashcraft#513). This alarm stays open until the lane is pushed again, lands or is deleted.
+        gh issue create --title "Autoland stalled" --label bug --label priority:now --label evidence:code --body "\`$branch\` (${tip:0:10}) $text ($RUN_URL) (smashcraft#513). This alarm stays open until the lane is pushed again, lands or is deleted.
     $lane" > /dev/null
       else
         gh api "repos/$GH_REPO/issues/$alarm/comments?per_page=100" --jq '.[].body' 2>/dev/null | grep -qF "$lane" && return 0

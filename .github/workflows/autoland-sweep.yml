@@ -125,7 +125,7 @@ jobs:
           if [ "$stalled" = true ]; then
             body="Main hasn't moved since $landed with $pending lanes pending. This sweep ($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID) cancelled ${#cancelled[@]} stuck runs and dispatched an Autoland plan. Unfinished runs: $(jq length runs.json)."
             if [ -z "$issue" ]; then
-              gh issue create --title "$STALLED_TITLE" --body "$body (smashcraft#513)"
+              gh issue create --title "$STALLED_TITLE" --body "$body (smashcraft#513)" --label bug --label priority:now --label evidence:code
             elif [ $(( $(date -d "$now" +%s) - $(date -d "$(jq -r .updatedAt <<< "$issue")" +%s) )) -ge 1800 ]; then
               gh issue comment "$(jq -r .number <<< "$issue")" --body "$body"
             fi
