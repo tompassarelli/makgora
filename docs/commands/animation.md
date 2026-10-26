@@ -163,6 +163,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   from the existing `PRIVATE_OUTPUT/thrall.mdx`, preserving every other clip.
   Exact `Thrall Damage HEIGHT STRENGTH` names (each number 0–2) replace only
   the selected held pain poses; the generator requires nine distinct first poses.
+  His back air is authored in Blender (#260): `... STOCK_THRALL.mdx PRIVATE_OUTPUT backAir --rig RIG.json`
+  writes his skeleton, stand pose, hammer head and both hits' frames, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/thrall-back-air.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, and `... backAir --keys KEYS.json` splices them into the existing `PRIVATE_OUTPUT/thrall.mdx`.
 
 - Illidan locomotion authoring (from the repository root): run Blender with
   `--python tools/animations/illidan-locomotion.py -- PRIVATE_FIGHTER.blend PRIVATE_AUTHORED`,

@@ -1,4 +1,4 @@
-# #260: Thrall's back air swings the hammer high behind at its first hit, re-cocks it overhead, and drives it level behind at its second, in both facings; syntax and checks: smashcraft:docs/native-bot-session.md.
+# #260: Thrall's back air throws the hammer low behind as the wolf kicks at its first hit, cocks it forward again, and sweeps it level behind at its second, in both facings; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero thrall
 # Both full-hop facing each other, then back air with the C-stick away from the other; captures at its start, windup, first hit, second hit's windup, second hit, last active and recovery.
 40 a press Y

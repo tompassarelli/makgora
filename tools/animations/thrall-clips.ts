@@ -15,9 +15,11 @@ import { DRAWN_STRIDES } from "../../ts/src/game/presentation/drawnStrideInfo";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
 import { PAIN_GAIN, HIGH_STRETCH, PainBody, painGate } from "./pain-gate";
 const [input, output] = process.argv.slice(2,4).map(p => resolve(p));
-const replacements = process.argv.slice(4);
+const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
+const rigOutput = option("--rig"), bakedKeys = option("--keys");
+const replacements = process.argv.slice(4).filter((arg, i, all) => !arg.startsWith("--") && !["--rig", "--keys"].includes(all[i - 1]!));
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/thrall-clips.ts STOCK_THRALL.mdx PRIVATE_OUTPUT");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || replacements.length === 1), "usage: bun tools/animations/thrall-clips.ts STOCK_THRALL.mdx PRIVATE_OUTPUT [POSE...] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure(source.Sequences.length === 7 && source.Bones.some(b => b.Name === "Hammer"), "Expected original classic mounted Thrall");
 const stand = source.Sequences[0]!;
@@ -79,6 +81,20 @@ function joint(name:string,g:Gesture):[number,number]{
  if(name==="Bone_Chest")return [g.chest??0,0];if(name==="Bone Rider Waist")return [g.waist??0,g.yaw??0];if(name==="Bone Rider R Arm")return [g.arm??0,0];if(name==="Bone Rider R Wrist")return [g.wrist??0,0];if(name==="Bone Rider L Arm")return [g.leftArm??0,0];if(name==="Bone_Head")return [g.head??0,g.look??0];if(name==="Bone Wolf Waist")return [g.wolf??0,0];if(name==="Bone Wolf Neck")return [g.neck??0,0];if(/^Bone Front [LR] Leg$/.test(name))return [g.front??0,0];if(/^Bone Back [LR] Leg$/.test(name))return [g.back??0,0];if(/^Bone Back [LR] Shin$/.test(name))return [g.hock??0,0];if(name==="Bone Center")return [g.lean??0,g.turn??0];return [0,0];
 }
 const originals=new Map<string,mdx.AnimVector>();tracks(source,(t,p)=>originals.set(p,t));
+const skeleton=(["Bones","Helpers"] as const).flatMap(kind=>source[kind].map((n,i)=>({n,path:`.${kind}.${i}`})));
+if(rigOutput){
+ const action=actions.find(a=>a.pose===replacements[0]),style=normals.find(([pose])=>pose===replacements[0])?.[1],move=style===undefined?undefined:hero.moves.normals[style];ensure(action&&move,`${replacements[0]}: not an authored Thrall normal`);
+ const at=(path:string)=>{const t=originals.get(path),v=t&&!onGlobalClock(t)?t.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])?.Vector:undefined;return v?Array.from(v):null;};
+ const hammer=source.Nodes.find(n=>n?.Name==="Hammer")!;
+ const head=source.Geosets.flatMap(g=>Array.from({length:g.Vertices.length/3},(_,i)=>i).filter(i=>g.Groups[g.VertexGroup[i]!]!.includes(hammer.ObjectId)&&g.Vertices[i*3]!>=0).map(i=>Array.from(g.Vertices.subarray(i*3,i*3+3))));
+ const hammerHead=[0,1,2].map(i=>(Math.min(...head.map(p=>p[i]!))+Math.max(...head.map(p=>p[i]!)))/2);
+ await Bun.write(rigOutput,JSON.stringify({frames:action.frames,hits:move.regions.map(r=>[r.firstFrame,r.lastFrame]),hammerHead,nodes:skeleton.map(({n,path})=>({name:n.Name,parent:skeleton.findIndex(s=>s.n.ObjectId===n.Parent),pivot:Array.from(source.PivotPoints[n.ObjectId]!),rotation:at(`${path}.Rotation`),translation:at(`${path}.Translation`)}))}));
+ console.log(`THRALL_RIG ${replacements[0]} ${rigOutput}`);process.exit(0);
+}
+const baked=bakedKeys?await Bun.file(bakedKeys).json() as {frames:number;nodes:{rotation:number[][];translation:number[][]}[]}:undefined;
+const bakedAction=baked?actions.find(a=>a.pose===replacements[0]):undefined;
+if(baked){ensure(bakedAction&&baked.frames===bakedAction.frames&&baked.nodes.length===skeleton.length,`${replacements[0]}: Blender keys cover ${baked.frames} frames of ${baked.nodes.length} nodes, the move ${bakedAction?.frames} of ${skeleton.length}`);bakedAction.keys=Array.from({length:bakedAction.frames+1},(_,frame)=>({frame,gesture:{},ik:0}));}
+const bakedVector=(path:string,frame:number)=>{const match=/^(\.(?:Bones|Helpers)\.\d+)\.(Rotation|Translation)$/.exec(path),node=match?skeleton.findIndex(s=>s.path===match[1]):-1;return node<0?undefined:Float32Array.from(baked!.nodes[node]![match![2]==="Rotation"?"rotation":"translation"][frame]!);};
 const retainedFile=Bun.file(join(output,"thrall.mdx"));
 const retained=await retainedFile.exists()?parseSource(await retainedFile.arrayBuffer()):undefined;
 ensure(replacements.length === 0 || retained !== undefined, "Replacing clips needs the existing thrall.mdx in PRIVATE_OUTPUT");
@@ -105,6 +121,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
   if(!first)return;
   const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
   for(const {frame,amount,gesture}of phases){let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,gesture);if(node.Name==="Bone Center"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;Vector=rotated(first.Vector,y,z);}
+   if(action===bakedAction)Vector=bakedVector(path,frame)??Vector;
    if(node?.Name==="Bone Wolf Head"&&frame===phaseFrames[1]&&headAnticipation[action.pose]!==undefined)Vector=rotated(Vector,headAnticipation[action.pose]!);
    const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
    track.Keys.push({...first,Frame:start+Math.round(frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});
@@ -114,7 +131,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
 
  const center=model.Nodes.find(b=>b.Name==="Bone Center");ensure(center,"No mount root");
  if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
- if (["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","throwForward","throwBack","throwUp","throwDown"].includes(action.pose)) {
+ if (["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","throwForward","throwBack","throwUp","throwDown"].includes(action.pose) && action !== bakedAction) {
   const headContact = ["jab","jab2","forwardTilt"].includes(action.pose);
   const target = action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];
 
