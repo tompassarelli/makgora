@@ -73,12 +73,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`.
-  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace down-air|up-air]`
+  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace down-air|up-air|forward-air]`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the double-jump flip, and re-authors the Down Air Sword Plunge clip
   in place as one alternating downward swipe per airborne hit, then the plunge and
   landing pop (#256). `--replace down-air` or `--replace up-air` re-authors only that clip on the shipped
-  model, checking every other clip is unchanged.
+  model, checking every other clip is unchanged. `--replace forward-air` plays the stock
+  Attack Slam as the forward air, retimed so its level cut lands on the first active frame,
+  under the airborne legs and root of the clip it replaces (#502).
   `bun tools/animations/peon-clips.ts STOCK_PEON.mdx PRIVATE_OUTPUT` appends
   Peon's tool strikes, movement, recovery, paired grabs and nine pain poses,
   preserves the 22 stock sequences and writes both-facing silhouette sheets.

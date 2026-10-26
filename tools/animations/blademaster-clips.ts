@@ -17,7 +17,7 @@ import { fighters } from "../../ts/scripts/heroModelSource";
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const replaceFlag = process.argv.indexOf("--replace"), replaceOnly = replaceFlag < 0 ? undefined : process.argv[replaceFlag + 1];
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith("..") && (replaceOnly === undefined || replaceOnly === "down-air" || replaceOnly === "up-air"), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace down-air|up-air]");
+ensure(input && output && relative(project, output).startsWith("..") && (replaceOnly === undefined || replaceOnly === "down-air" || replaceOnly === "up-air" || replaceOnly === "forward-air"), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace down-air|up-air|forward-air]");
 const fighter = fighters.get(Character.blademaster)!; ensure(fighter, "missing Blademaster");
 const shipped = parseSource(await Bun.file(join(input, fighter.source)).arrayBuffer());
 const source = replaceOnly ? shipped : swordGestureBaseModel(shipped) ?? shipped;
@@ -231,7 +231,7 @@ for(const g of replaceOnly ? [] : gestures){
   records.push({pose:g.key,name:`Sword Gesture ${g.name}`,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const replaced=new Set<number>();
-const inPlace=replaceOnly==="up-air"?gestures.filter(g=>g.style===AttackStyle.upAir).map(g=>({g,name:`Sword Gesture ${g.name}`,matchesMove:false})):replacements.map(g=>({g,name:g.name,matchesMove:true}));
+const inPlace=replaceOnly==="forward-air"?[]:replaceOnly==="up-air"?gestures.filter(g=>g.style===AttackStyle.upAir).map(g=>({g,name:`Sword Gesture ${g.name}`,matchesMove:false})):replacements.map(g=>({g,name:g.name,matchesMove:true}));
 for(const {g,name,matchesMove} of inPlace){
   const move=g.style===undefined?undefined:hero.moves.normals[g.style],index=model.Sequences.findIndex(s=>s.Name===name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
   ensure(move&&start!==undefined&&end!==undefined,`missing ${name}`);
@@ -239,6 +239,38 @@ for(const {g,name,matchesMove} of inPlace){
   ensure(!matchesMove||total===move.totalFrames,`${name}: clip length differs from the move`);
   const controlFrames=author(g,index,start,end,first,last,total);replaced.add(index);
   records.push({pose:g.key,name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
+}
+if(replaceOnly==="forward-air"){
+  const name="Sword Gesture Air Forward Cleave",index=model.Sequences.findIndex(s=>s.Name===name),slam=model.Sequences.find(s=>s.Name==="Attack Slam"),move=hero.moves.normals[AttackStyle.forwardAir];
+  ensure(index>=0&&slam&&move,"missing forward-air retime inputs");
+  const [start,end]=[model.Sequences[index]!.Interval[0],model.Sequences[index]!.Interval[1]],total=Math.round((end-start)*60/1000),first=move.startupFrames,last=first+move.activeFrames-1;
+  const from=[0,767,833,slam.Interval[1]-slam.Interval[0]],stock=(ms:number)=>ms<=from[2]!||ms>=from[3]!,to=[0,first,last,total].map(frame=>frame*1000/60);
+  const retime=(ms:number)=>{const i=Math.min(from.length-2,from.findIndex((v,j)=>ms<=from[j+1]!));return start+Math.round(to[i]!+(to[i+1]!-to[i]!)*(ms-from[i]!)/(from[i+1]!-from[i]!));};
+  const hold=16,leanKeys=[[0,0],[6,-10],[first,6],[last,6],[hold,14],[total,0]] as const;
+  const lean=(frame:number)=>{const i=Math.max(0,leanKeys.findLastIndex(([f])=>f<=frame)),[f0,p0]=leanKeys[i]!,[f1,p1]=leanKeys[Math.min(i+1,leanKeys.length-1)]!;return f1===f0?p0:p0+(p1-p0)*(frame-f0)/(f1-f0);};
+  const airborne=new Set(["Bone_Root","Bone_Leg1_L","Bone_Leg2_L","Bone_Foot_L","Bone_Leg1_R","Bone_Leg2_R","Bone_Foot_R"]);
+  tracks(model,(t,path)=>{
+    if(onGlobalClock(t))return;
+    const match=/^\.(Bones|Helpers)\.(\d+)\./.exec(path);if(match&&airborne.has(model[match[1] as "Bones"|"Helpers"][Number(match[2])]!.Name))return;
+    const keys=new Map<number,(typeof t.Keys)[number]>();
+    for(const k of t.Keys)if(k.Frame>=slam.Interval[0]&&k.Frame<=slam.Interval[1]&&stock(k.Frame-slam.Interval[0]))keys.set(retime(k.Frame-slam.Interval[0]),{...structuredClone(k),Frame:retime(k.Frame-slam.Interval[0])});
+    for(const frame of [start,end]){const ready=t.Keys.find(k=>k.Frame===frame),key=keys.get(frame);if(ready&&key)keys.set(frame,{...structuredClone(ready),Frame:frame});}
+    if(match&&model[match[1] as "Bones"|"Helpers"][Number(match[2])]!.Name==="Bone_Chest"&&path.endsWith("Rotation"))for(const k of keys.values()){const pitch=lean((k.Frame-start)*60/1000);for(const field of ["Vector","InTan","OutTan"] as const){const q=k[field];if(q)k[field]=rotate(q,[0,1,0],pitch);}}
+    if(path===pelvisRotation)for(const [frame,pitch] of leanKeys){const Vector=rotate(base.get(path)!,[0,1,0],pitch);keys.set(start+Math.round(frame*1000/60),{Frame:start+Math.round(frame*1000/60),Vector,...(t.LineType>=mdx.LineType.Hermite?{InTan:Vector.slice(),OutTan:Vector.slice()}:{})});}
+    t.Keys=t.Keys.filter(k=>k.Frame<start||k.Frame>end).concat([...keys.values()]).sort((a,b)=>a.Frame-b.Frame);
+  });
+  const renderer=new ModelRenderer(model),data=Reflect.get(renderer,"rendererData") as {frame:number;nodes:{matrix:Float32Array}[]};
+  renderer.setSequence(index);data.frame=start+Math.round(last*1000/60);renderer.update(0);
+  const holdFrame=start+Math.round(hold*1000/60);
+  for(const node of [...model.Bones,...model.Helpers]){
+    const t=node.Rotation;if(!t||onGlobalClock(t)||airborne.has(node.Name)||!t.Keys.some(k=>k.Frame>start&&k.Frame<end))continue;
+    const world=mat4.getRotation(quat.create(),data.nodes[node.ObjectId]!.matrix),parent=node.Parent==null?quat.create():mat4.getRotation(quat.create(),data.nodes[node.Parent]!.matrix);
+    let Vector=new Float32Array(quat.normalize(quat.create(),quat.multiply(quat.create(),quat.invert(quat.create(),parent),world)));
+    if(node.Name==="Bone_Chest")Vector=rotate(Vector,[0,1,0],lean(hold)-lean(last));
+    t.Keys=t.Keys.filter(k=>k.Frame!==holdFrame).concat({Frame:holdFrame,Vector,...(t.LineType>=mdx.LineType.Hermite?{InTan:Vector.slice(),OutTan:Vector.slice()}:{})}).sort((a,b)=>a.Frame-b.Frame);
+  }
+  replaced.add(index);
+  records.push({pose:"forwardAir",name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames:[0,first,last,total]});
 }
 const bytes=encodeVerified(parseSource(generateMDX(model))),before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
 for(const [index,s]of source.Sequences.entries())if(!replaced.has(index))for(const fraction of [0,0.5,1]){const t=(s.Interval[1]-s.Interval[0])*fraction/1000,a=before.triangles(index,t,1),b=after.triangles(index,t,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${s.Name}: shipped pose changed`);}
