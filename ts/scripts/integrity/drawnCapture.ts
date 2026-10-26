@@ -52,10 +52,12 @@ export interface DrawnShot<A> {
   readonly before: number;
   readonly after: number;
   readonly waitedMs: number;
+  readonly reads: number;
+  readonly staleMs: number;
 }
 
 
-export const captureWhenDrawn = <A, E>(read: () => Drawn | undefined, epoch: number, frame: number, timeoutMs: number, shoot: Effect.Effect<A, E>, where: string) =>
+export const captureWhenDrawn = <A, E>(read: () => Drawn | undefined, epoch: number, frame: number, timeoutMs: number, shoot: Effect.Effect<A, E>, where: string, repeats: (shot: A) => boolean = () => false, repeatWaitMs = 3000) =>
   Effect.gen(function*() {
     const started = performance.now();
     for (;;) {
@@ -63,13 +65,21 @@ export const captureWhenDrawn = <A, E>(read: () => Drawn | undefined, epoch: num
       if (drawn !== undefined && drawn.epoch === epoch && drawn.frame >= frame) {
         if (drawn.frame !== frame) return yield* new IntegrityFailure({ operation: `capture frame ${frame}`, path: where, cause: `INVALID: request boundary missed match ${epoch} frame ${frame}; observed frame ${drawn.frame}` });
         const waitedMs = performance.now() - started;
-        const shot = yield* shoot;
+        let shot = yield* shoot;
+        let reads = 1;
+        while (repeats(shot)) {
+          if (performance.now() - started - waitedMs > repeatWaitMs) return yield* new IntegrityFailure({ operation: `capture frame ${frame}`, path: where, cause: `INVALID: stale image: ${reads} reads over ${repeatWaitMs} ms after match ${epoch} frame ${frame} was drawn repeat this client's previous capture` });
+          yield* Effect.sleep("15 millis");
+          shot = yield* shoot;
+          reads++;
+        }
+        const staleMs = reads === 1 ? 0 : performance.now() - started - waitedMs;
         const after = read();
         if (after === undefined || after.epoch !== epoch || after.frame !== frame) {
           const seen = after === undefined ? "no drawn-frame receipt" : `match ${after.epoch} frame ${after.frame}`;
           return yield* new IntegrityFailure({ operation: `capture frame ${frame}`, path: where, cause: `INVALID: completion boundary expected match ${epoch} frame ${frame}; observed ${seen}` });
         }
-        return { shot, before: drawn.frame, after: after.frame, waitedMs } satisfies DrawnShot<A>;
+        return { shot, before: drawn.frame, after: after.frame, waitedMs, reads, staleMs } satisfies DrawnShot<A>;
       }
       if (performance.now() - started > timeoutMs) {
         const seen = drawn === undefined ? "no drawn frame" : `epoch ${drawn.epoch} frame ${drawn.frame}`;

@@ -258,6 +258,10 @@ Simulation and helper input deadlines continue unchanged. A skipped target is
 INVALID. A lost runner releases the visual hold after 600 callbacks, and reset
 clears it immediately. `captures.json` marks these images `held visual`: they
 show the authored pose, and cannot be used to measure live input-to-screen time.
+The drawn receipt can land before the client presents the held pose, so a
+framebuffer read that repeats the client's previous capture byte for byte is
+read again until it changes; `reads` and `stale_ms` record the wait, and a
+capture still repeating after three seconds is INVALID.
 A dash attack is A with the stick back at neutral while the fighter still
 dashes (a jab out of a dash); A with the stick held, even 12 frames into
 the dash, is a forward smash. A menu-started

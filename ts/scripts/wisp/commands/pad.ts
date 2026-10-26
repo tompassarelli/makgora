@@ -361,6 +361,7 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
   const captures: Record<string, unknown>[] = [];
   const captureFailures: { frame: number; message: string }[] = [];
   const shots: Fiber.Fiber<void>[] = [];
+  const lastImage = new Map<string, Uint8Array>();
   yield* checkFirstEdge(steps, epochs, scriptPath);
   const producerPath = join(out, "producer.jsonl");
   const producer = yield* Effect.acquireRelease(tryIntegrity("open producer log", producerPath, () => openSync(producerPath, "w")), (fd) => Effect.sync(() => closeSync(fd)));
@@ -370,11 +371,15 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
     if (item.kind === "capture") {
 
       const client = clients[item.slot];
-      const shot = captureWhenDrawn(drawnFrom(join(at(data, item.slot), drawnFrameFile(build, item.slot))), at(matchIds, item.slot), item.frame, CAPTURE_WAIT_MS, capture(client).pipe(Effect.mapError(fromDesktop), Effect.provide(platformLayer())), out).pipe(
-        Effect.flatMap(({ shot: frame, before, after, waitedMs }) => tryIntegrity("save frame", out, () => {
+      const shot = captureWhenDrawn(drawnFrom(join(at(data, item.slot), drawnFrameFile(build, item.slot))), at(matchIds, item.slot), item.frame, CAPTURE_WAIT_MS, capture(client).pipe(Effect.mapError(fromDesktop), Effect.provide(platformLayer())), out, (frame) => {
+        const previous = lastImage.get(client.name);
+        return previous !== undefined && Buffer.compare(previous, frame.rgb) === 0;
+      }).pipe(
+        Effect.flatMap(({ shot: frame, before, after, waitedMs, reads, staleMs }) => tryIntegrity("save frame", out, () => {
           const name = `frame-${item.frame}-${client.name}-drawn-${before}.ppm`;
+          lastImage.set(client.name, frame.rgb);
           writeFileSync(join(out, name), encodePpm(frame));
-          captures.push({ status: "PASS", mode: captureToken === undefined ? "live" : "held visual", candidate: options.candidate ?? build, build, epoch: at(matchIds, item.slot), line: item.line, client: client.name, planned: item.frame, drawn_before: before, drawn_after: after, waited_ms: Math.round(waitedMs), file: name });
+          captures.push({ status: "PASS", mode: captureToken === undefined ? "live" : "held visual", candidate: options.candidate ?? build, build, epoch: at(matchIds, item.slot), line: item.line, client: client.name, planned: item.frame, drawn_before: before, drawn_after: after, waited_ms: Math.round(waitedMs), reads, stale_ms: Math.round(staleMs), file: name });
         })),
         Effect.catch((failure) => Effect.sync(() => {
           console.error(`capture at frame ${item.frame}: ${failure.message}`);
