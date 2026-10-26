@@ -299,7 +299,8 @@ const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(
   yield* Console.log(`${fighterName(attacker)} links: ${rows.length} rows, ${count("true")} true, ${count("DI-dependent")} DI-dependent, ${count("read")} read, ${count("none")} none`);
 }), { discard: true });
 
-const linkObjectives = (declared: readonly ComboObjective[]) => Effect.gen(function* () {
+const linkObjectives = (all: readonly ComboObjective[], attackers: readonly Character[]) => Effect.gen(function* () {
+  const declared = all.filter((objective) => { const attacker = fighterNamed(objective.fighter); return attacker === undefined || attackers.includes(attacker); });
   const fighters = [...new Set(declared.map((objective) => objective.fighter))];
   const rows = (yield* Effect.forEach(fighters, (fighter) => {
     const attacker = fighterNamed(fighter);
@@ -354,7 +355,7 @@ const edgeGuards = (declared: readonly EdgeGuardObjective[], attackers: readonly
 
 const objectives = (attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
   const declared = yield* readText(objectivesFile).pipe(Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(ComboObjectivesSchema))(text).pipe(Effect.mapError(failure))));
-  const links = yield* linkObjectives(declared.links);
+  const links = yield* linkObjectives(declared.links, attackers);
   const edges = yield* edgeGuards(declared.edgeGuards, attackers);
   const throws = yield* throwRoles(throwDeclarations(declared), attackers, jobs);
   if (links + edges + throws > 0) return yield* new CombosFailure({ problem: `${links} combo objectives, ${edges} edge guards and ${throws} throw-role rules miss` });

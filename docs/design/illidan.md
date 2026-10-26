@@ -421,6 +421,73 @@ Source: smashcraft:ts/src/game/sim/specials.ts (Fel Rush),
 smashcraft:ts/src/game/sim/hitRegions.ts (drain on hit), contract tests in
 smashcraft:ts/src/game/sim/felRush.tests.ts.
 
+## Combo targets: Falco's vertical game (#457)
+
+Tom set the direction on 2026-10-26: Illidan, whose air Immolate is already a
+Falco-style shine, owns Falco's vertical combo game; Maiev goes back to Fox
+(#456). These are his targets for the retune, written before it starts, as
+Maiev's were (#303). The link rows live in `tools/move-data/combo-objectives.json`
+and `bun wisp combos --objectives --fighter Illidan` checks them against his
+committed link table (`tools/move-data/links/illidan.md`). Each row is a
+Falco pattern from SmashWiki's [Falco (SSBM)](https://www.ssbwiki.com/Falco_(SSBM))
+and [Pillar](https://www.ssbwiki.com/Pillar) pages, which give the routes but
+no percent windows; the windows follow Maiev's Fox-derived rows at weight 75
+where the route is shared, and Falco's notes where it is his own.
+
+### Link targets
+
+Against weight 75, clean hits. A class is the floor: true beats DI-dependent
+beats read. The DIs listed must not escape.
+
+| Opener | Percent | Follow-up | Floor | DIs that must not escape | Falco source | Today |
+| --- | --- | --- | --- | --- | --- | --- |
+| down special (Immolate) | 0-50 | up air | true | | shine into up air, the shine's vertical pop | none to 40, read at 50 |
+| down special (Immolate) | 0-60 | down air | DI-dependent | in, none | the pillar: shine into down air | none to 10, read |
+| down special (Immolate) | 60-100 | back air | DI-dependent | in, none | "back aerial is good out of a shine at higher percents" | none to 70, read |
+| down air | 0-100 | down special (Immolate) | true | | the pillar: down air into shine | true to 40, read at 50, DI-dependent from 60 |
+| down air | 60-100 | forward smash | DI-dependent | in, none | a grounded down air into forward smash | holds |
+| down tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | down tilt leads into shine | read, none at 40 |
+| up tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | up tilt segues into more shines | no row: up tilt never hits a grounded foe |
+| up throw | 20-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | read |
+| down throw | 0-40 | down tilt | read | | down throw into down tilt, a tech chase | holds |
+| up air | 10-60 | up air | DI-dependent | in, none | up air strings | read to 40 |
+| up air | 70-100 | up air | read | | the string ends in a read | holds |
+
+### Edge-guard targets
+
+Checked by `--objectives` from the ledge, against every DI:
+
+- down air: Falco's spike, from 40 past the ledge at stage height (60-150%)
+  and from 80 past and 80 below (50-150%).
+- back air: Falco's offstage kill aerial, from 40 past the ledge (60-150%).
+
+Today 3 of 11 link rows hold. Both down air spikes kill against every DI;
+back air does not reach the victim 40 past the ledge.
+
+### Body toward Falco
+
+The retune moves his movement toward Falco's inside Melee's spread
+([character attributes](https://wiki.supercombo.gg/w/SSBM/Character_Attributes)):
+Falco's gravity 0.17, terminal speed 3.1, fast fall 3.5, full jump 4.1 and
+short hop 1.9, against his 0.19, 3.0, 3.45, 4.03 and 2.2. The short hop also
+closes his open ledger row (`illidan-short-jump`, above Melee's 2.14).
+
+### Identity guard
+
+What he keeps, so he does not become Falco in a costume:
+
+- Fel Rush and its branches: his side special stays the straight fel dash
+  with Vengeful Retreat and Chaos Strike, not Falco's Phantasm.
+- Warglaives: his normals keep their glaive reach, the twin-glaive forward air
+  and the Flames of Azzinoth down smash.
+- Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
+  eight-way dive, not a charged Fire Bird.
+- Eye Blast and Mana Burn: the beam stays a meter-gated EX special and the
+  neutral special stays the slow mana orb; he gets no laser.
+- Drain on hit: every landed hit still drains mana.
+- Immolate stays a shine, not a loop: Immolate into Immolate stays below true,
+  and no waveshine infinite.
+
 ## Play-style profile
 
 Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Air speed and glaive reach: he attacks from the air and chases.
