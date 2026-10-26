@@ -291,6 +291,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   in each named sequence it keeps the weapon where the hand held it in Stand Ready, and
   every other sequence stays identical. Store the family and run `bun wisp inputs derive --fighter NAME`.
   Rifleman's Knockdown, Down Damage, Get Up and Get Up Attack were carried this way (#436).
+  `bun tools/animations/grip-zoom-strips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT PRIVATE_ASSETS [SEQUENCE]...`
+  settles what those fixed-crop strips cannot: it draws the posed Classic mesh centred on the pelvis
+  in side, far-side, front and top views, body grey, arms pale, each held weapon in a flat colour,
+  depth-tested, with every line where a blade crosses the body surface in yellow. For every 60 Hz
+  frame it also measures how deep a blade point lies inside the body (behind the body surface from
+  all six axis directions), and draws the deepest frame. A blade more than 1 unit inside is
+  contact, not a measurement artifact; Blizzard's own Illidan Attack reaches 8.8 (#437).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);
