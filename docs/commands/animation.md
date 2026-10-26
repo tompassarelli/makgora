@@ -280,6 +280,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `victory-clips.ts --character 16` to re-append his double jump (96) and victory (97);
   `bun run check` (smashcraft:ts/scripts/clipBindingsCheck.ts) refuses a clip binding
   past the end of a fighter's model (#278).
+  His down air is authored in Blender (#96): `... SHIPPED_TAUREN.mdx PRIVATE_OUTPUT downAir --rig RIG.json`
+  writes his skeleton, stand pose and halberd grip, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/cairne-down-air.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, and `... downAir --keys KEYS.json` splices them into the shipped
+  model in place, keys the halberd to his hand and checks every other clip is unchanged.
 
 - Forsaken Paladin animation authoring (from the repository root):
   `bun tools/animations/forsaken-paladin-clips.ts STOCK_FORSAKEN_PALADIN.mdx PRIVATE_OUTPUT`

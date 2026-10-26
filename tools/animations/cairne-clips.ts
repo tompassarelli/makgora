@@ -26,10 +26,14 @@ function encodeVerified(value:mdx.Model){const bytes=generateMDX(value);ensure(i
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain");
+const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
+const rigOutput = option("--rig"), bakedKeys = option("--keys");
+const bakedPose = rigOutput || bakedKeys ? process.argv.slice(4).find((arg, i, all) => !arg.startsWith("--") && !all[i - 1]?.startsWith("--")) as HeroPose | undefined : undefined;
+const inPlace = painOnly || bakedPose !== undefined;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx|SHIPPED_TAUREN.mdx PRIVATE_OUTPUT [pain]");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || (bakedPose && !painOnly)), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx|SHIPPED_TAUREN.mdx PRIVATE_OUTPUT [pain | POSE --rig RIG.json | POSE --keys KEYS.json]");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
-ensure((painOnly || source.Sequences.length === 12) && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
+ensure((inPlace || source.Sequences.length === 12) && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
 interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number; shin?: number; leftShin?: number; rightShin?: number; hoof?: number; leftHoof?: number; rightHoof?: number; pelvis?: number; slide?: number; grip2?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean; glide?: boolean }
@@ -289,9 +293,24 @@ const farthestReach=(clip:number)=>{const [first,last]=source.Sequences[clip]!.I
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[],goreBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
 if(painOnly){actions.length=0;goreActions.length=0;}
+const skeleton=(["Bones","Helpers"] as const).flatMap(kind=>source[kind].map((node,i)=>({node,path:`.${kind}.${i}`})));
+const baked=bakedKeys?await Bun.file(bakedKeys).json() as {frames:number;nodes:{rotation:number[][];translation:number[][]}[]}:undefined;
+if(bakedPose){
+  const action=actions.find(a=>a.pose===bakedPose),style=normals.find(([pose])=>pose===bakedPose)?.[1],move=style===undefined?undefined:CAIRNE_MOVES.normals[style];ensure(action&&move,`${bakedPose}: not an authored Cairne normal`);
+  if(rigOutput){
+    const at=(path:string)=>{const t=originals.get(path),v=t&&!onGlobalClock(t)?t.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])?.Vector:undefined;return v?Array.from(v):null;};
+    await Bun.write(rigOutput,JSON.stringify({frames:action.frames,contact:action.contact,active:move.activeFrames,hand:hand.Name,handPivot:Array.from(handPivot),weaponPoint:Array.from(weaponPoint),
+      nodes:skeleton.map(({node,path})=>({name:node.Name,parent:skeleton.findIndex(s=>s.node.ObjectId===node.Parent),pivot:Array.from(source.PivotPoints[node.ObjectId]!),rotation:at(`${path}.Rotation`),translation:at(`${path}.Translation`)}))}));
+    console.log(`CAIRNE_RIG ${bakedPose} ${rigOutput}`);process.exit(0);
+  }
+  ensure(baked&&baked.frames===action.frames&&baked.nodes.length===skeleton.length,`${bakedPose}: Blender keys cover ${baked?.frames} frames of ${baked?.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
+  actions.splice(0,actions.length,{...action,beats:Array.from({length:action.frames+1},(_,frame)=>({frame,gesture:ready}))});damageActions.length=0;goreActions.length=0;
+}
+const bakedVector=(path:string,frame:number)=>{const [,kind,index,channel]=/^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation)$/.exec(path)??[];if(!baked||!kind)return undefined;
+  return Float32Array.from(baked.nodes[skeleton.findIndex(s=>s.path===`.${kind}.${index}`)]![channel==="Rotation"?"rotation":"translation"][frame]!);};
 for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entries()) {
   const name=action.gore?`Cairne Gore ${action.gore}`:action.damage?`Cairne Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:`Cairne ${action.pose}`;
-  const existing=painOnly?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!painOnly||existing>=0,`${name}: shipped sequence missing`);
+  const existing=inPlace?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!inPlace||existing>=0,`${name}: shipped sequence missing`);
   const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[index]!.Interval[0]!:cursor,end=start+Math.round(action.frames*1000/60);
   if(existing>=0){ensure(model.Sequences[index]!.Interval[1]===end,`${name}: timing changed`);tracks(model,track=>{if(!onGlobalClock(track))track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>end);});}
   else{cursor=end+100;model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
@@ -324,11 +343,11 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
     const first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);if(!first)return;
     const idleKey=donor.Keys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...first,Vector:resting(path,first.Vector)};
     const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-    for(const phase of phases){if(phase.glide&&["Bone_UpperArmR","Bone_LowerArmR","Bone_UpperArmL","Bone_LowerArmL"].includes(node?.Name??""))continue;const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(base.Vector,pitch,yaw):base.Vector.slice();
+    for(const phase of phases){if(phase.glide&&["Bone_UpperArmR","Bone_LowerArmR","Bone_UpperArmL","Bone_LowerArmL"].includes(node?.Name??""))continue;const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=bakedVector(path,phase.frame)??(node?rotation(base.Vector,pitch,yaw):base.Vector.slice());
       const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
       track.Keys.push({...base,Frame:start+Math.round(phase.frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});}
   });
-  if(painOnly)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
+  if(inPlace)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
 
 
   const shoulder=model.Nodes.find(n=>n.Name==="Bone_UpperArmR")!,elbow=model.Nodes.find(n=>n.Name==="Bone_LowerArmR")!;
@@ -409,13 +428,13 @@ for(const [ordinal,action]of actions.entries())if(action.pose.startsWith("victim
 }
 if(painOnly)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
 const bytes=encodeVerified(parseSource(generateMDX(model)));
-const painCells=records.filter(record=>record.pose.startsWith("Cairne Pain ")).map(record=>record.index),gate=painGate(bytes,Character.cairne,standIndex(bytes),painCells);
-console.log(gate.report);ensure(gate.pass,"Cairne pain poses fail the pain gate");
+const painCells=records.filter(record=>record.pose.startsWith("Cairne Pain ")).map(record=>record.index);
+if(!bakedPose){const gate=painGate(bytes,Character.cairne,standIndex(bytes),painCells);console.log(gate.report);ensure(gate.pass,"Cairne pain poses fail the pain gate");}
 mkdirSync(output,{recursive:true});await Bun.write(join(output,"herotaurenchieftain.mdx"),bytes);
-if(painOnly){const before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1),authored=new Set(painCells);let kept=0;
+if(inPlace){const before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1),authored=new Set(records.map(record=>record.index));let kept=0;
   for(const [index,sequence]of source.Sequences.entries())if(!authored.has(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]-sequence.Interval[0])*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);
     ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${sequence.Name}: shipped pose changed`);kept++;}
-  console.log(`CAIRNE_PAIN_PASS ${painCells.length} pain clips re-authored; ${kept} shipped pose samples unchanged; ${output}`);process.exit(0);}
+  console.log(`${bakedPose?`CAIRNE_KEYS_PASS ${bakedPose}`:`CAIRNE_PAIN_PASS ${painCells.length} pain clips`} re-authored; ${kept} shipped pose samples unchanged; ${output}`);process.exit(0);}
 await Bun.write(join(project,"ts/src/game/presentation/heroes/cairneClips.ts"),[
   "// Generated by tools/animations/cairne-clips.ts; regenerate instead of editing.", 'import { f32 } from "wisp/src/sim/f32";', 'import type { CommandGrabClips, HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
   'export const CAIRNE_FALLBACK: HeroClip = { index: 4, seconds: 2.0 };',
