@@ -188,6 +188,14 @@ for (const [style, pose] of [[AttackStyle.jab, "jab"], [AttackStyle.jab2, "jab2"
   const move = weaponNormals[style];
   if (move !== undefined) weaponNormals[style] = { ...move, regions: forsakenWeaponRegions(pose, move.regions) };
 }
+const FLOOR_REACH = capsule(16.0, 14.0, 50.0, 14.0, 10.0);
+for (const [style, ordinal] of [[AttackStyle.jab, 0], [AttackStyle.forwardTilt, 2], [AttackStyle.upTilt, 0], [AttackStyle.downTilt, 0]] as const) {
+  const move = weaponNormals[style];
+  const swing = move?.regions[ordinal];
+  if (move === undefined || swing === undefined) continue;
+  const active = swing.firstFrame + 1;
+  weaponNormals[style] = { ...move, regions: [...move.regions, heroRegion(active, active, FLOOR_REACH, swing.hit.effect, swing.hit.groundedEffect, swing.hit.window)] };
+}
 weaponNormals[AttackStyle.forwardTiltUp] = weaponNormals[AttackStyle.forwardTilt];
 weaponNormals[AttackStyle.forwardTiltDown] = weaponNormals[AttackStyle.forwardTilt];
 export const FORSAKEN_PALADIN_MOVES: FighterMoves = { ...FORSAKEN_PALADIN_AUTHORING_MOVES, normals: weaponNormals };

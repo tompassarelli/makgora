@@ -46,7 +46,8 @@ const pairedPose = (first: number, turn: number, last: number, front: HurtPart, 
   heroHurtPose(last + 1, last + 3, [BODY, half(back)]),
 ];
 const arm = (x: number, z: number) => hurtPart(20.0, 90.0, x, z, 18.0);
-const FORWARD_TILT = heroMove(14, 4, 29, 0, sweep(14, 170.0, [170.0, 115.0, 60.0, 12.0], 10.473372459411621, "edge"));
+const FLOOR_REACH = c(24.0, 16.0, 64.0, 16.0);
+const FORWARD_TILT = heroMove(14, 4, 29, 0, [...sweep(14, 170.0, [170.0, 115.0, 60.0, 12.0], 10.473372459411621, "edge"), strike(17, 17, FLOOR_REACH, 10.473372459411621, "edge", 40)]);
 export const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 export const CAIRNE_MOVES: FighterMoves = {
@@ -74,7 +75,7 @@ export const CAIRNE_MOVES: FighterMoves = {
     },
   },
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(7, 3, 18, 0, [strike(7, 9, c(30.0, 75.0, 88.0, 72.0), 4.028219699859619, "link", 35)])),
+    [AttackStyle.jab]: jabStep(heroMove(7, 3, 18, 0, [strike(7, 9, c(30.0, 75.0, 88.0, 72.0), 4.028219699859619, "link", 35), strike(7, 7, FLOOR_REACH, 4.028219699859619, "link", 35)])),
     [AttackStyle.jab2]: heroMove(9, 3, 23, 0, [strike(9, 11, c(35.0, 85.0, 110.0, 60.0), 6.445152282714844, "poke", 40)]),
     [AttackStyle.forwardTilt]: FORWARD_TILT,
     [AttackStyle.forwardTiltUp]: FORWARD_TILT,
@@ -83,6 +84,7 @@ export const CAIRNE_MOVES: FighterMoves = {
       strike(13, 14, c(30.0, 115.0, 90.0, 175.0), 9.66772747039795, "launch", 85),
       strike(15, 15, c(0.0, 130.0, 0.0, 215.0), 9.66772747039795, "launch", 85),
       strike(16, 17, c(-30.0, 115.0, -90.0, 175.0), 9.66772747039795, "launch", 85),
+      strike(13, 13, FLOOR_REACH, 9.66772747039795, "launch", 85),
     ]),
     [AttackStyle.downTilt]: heroMove(11, 3, 25, 0, [strike(11, 13, c(34.0, 25.0, 140.0, 14.0), 8.056439399719238, "launch", 70)]),
     [AttackStyle.dashAttack]: heroMove(10, 10, 26, 0, [strike(10, 19, c(20.0, 60.0, 95.0, 75.0, 32.0), 11.25, "kill", 40)], 32.0, true),
