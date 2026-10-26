@@ -8,7 +8,7 @@ import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../../g
 import { clearPulse } from "../../game/input/directionalInput";
 import { ownConfirmedState } from "./confirmedState";
 import { startKeyUp } from "../../game/match/controls";
-import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, initializeComputerChoices, participantLeft, updateConnectedHumans } from "../../game/lobby/lobbyState";
+import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, participantLeft, startComputerChoices, updateConnectedHumans } from "../../game/lobby/lobbyState";
 import { chooseScenarioCharacters } from "../../game/session/scenarios";
 import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
 import { holdGameSpeed } from "./gameSpeed";
@@ -36,7 +36,7 @@ import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
 import { onDevCommand } from "./developerCommands";
 import { openControlsFirst, panelActions, previewControlsFirst, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
-import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
+import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, receivedLobbyCounter, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
 import { STAGE_READY_PREFIX } from "../../game/session/stageLoad";
@@ -401,7 +401,7 @@ function completeStartingChoices(): void {
   if (s === undefined || s.startingChoicesReady !== false) return;
   const first = firstHumanSlot(s.game);
   if (first === undefined || !s.participants[first].bindings.ready) return;
-  initializeComputerChoices(s.game, s.menuFrames ?? 0);
+  startComputerChoices(s.game, receivedLobbyCounter(first), s.menuFrames ?? 0);
   chooseScenarioCharacters(s.build.scenario, s.game);
   s.startingChoicesReady = true;
   makePreview(s);

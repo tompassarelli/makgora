@@ -40,6 +40,7 @@ export const replayFile = (serial: number) => `smashcraft-replay-${serial}.txt`;
 export const replayPartFile = (serial: number, part: number) => `smashcraft-replay-${serial}-${part}.txt`;
 
 export const MATCH_RECORD_INDEX_FILE = "smashcraft-match-index.pld";
+export const LOBBY_COUNTER_FILE = "smashcraft-lobby-counter.pld";
 
 export const drawnFrameFile = (build: string, slot: number) => `smashcraft-drawn-${build}-p${slot}.txt`;
 export const drawnFrameLine = (build: string, epoch: number, frame: number) => `SMASHCRAFT DRAWN v=1 build=${build} epoch=${epoch} frame=${frame}`;

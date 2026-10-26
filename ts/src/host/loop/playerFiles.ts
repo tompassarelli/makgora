@@ -5,12 +5,14 @@
 import type { BindingPersistence } from "../../game/ui/bindingSettings";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { trampoline } from "wisp/src/platform/dispatch";
-import { readChunks, writeChunks } from "wisp/src/platform/fileio";
-import { departPlayerFiles, enqueuePlayerFile, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
+import { readChunk, readChunks, writeChunks } from "wisp/src/platform/fileio";
+import { LOBBY_COUNTER_FILE } from "../../game/core/gameFiles";
+import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
 
 export const PLAYER_FILE_RECEIVED = "shell.playerFileReceived";
 const MORE_PREFIX = "SC_FL";
 const LAST_PREFIX = "SC_FE";
+const COUNTER_END = ":";
 
 const CHUNK = 200;
 const BINDINGS_FILE = "MeleePrototypeBindings.pld";
@@ -18,6 +20,7 @@ const BINDINGS_FILE = "MeleePrototypeBindings.pld";
 declare global {
   var __smashcraftPlayerFiles: PlayerFileQueue | undefined;
   var __smashcraftSavedBindings: string | undefined;
+  var __smashcraftLobbyCounter: number | undefined;
 }
 
 function files(): PlayerFileQueue {
@@ -36,12 +39,20 @@ function sendFile(owner: number): void {
     BlzSendSyncData(MORE_PREFIX, text.substring(offset, offset + CHUNK));
     offset += CHUNK;
   }
-  BlzSendSyncData(LAST_PREFIX, text.substring(offset));
+  BlzSendSyncData(LAST_PREFIX, `${globalThis.__smashcraftLobbyCounter ?? 0}${COUNTER_END}${text.substring(offset)}`);
 }
 
 
 export function playerFileReceived(): void {
-  receivePlayerFileChunk(files(), GetPlayerId(GetTriggerPlayer()), BlzGetTriggerSyncData(), BlzGetTriggerSyncPrefix() === LAST_PREFIX, sendFile);
+  const owner = GetPlayerId(GetTriggerPlayer());
+  const data = BlzGetTriggerSyncData();
+  if (BlzGetTriggerSyncPrefix() !== LAST_PREFIX) {
+    receivePlayerFileChunk(files(), owner, data, false, sendFile);
+    return;
+  }
+  const end = data.indexOf(COUNTER_END);
+  receiveLobbyCounter(files(), owner, S2I(data.substring(0, end)));
+  receivePlayerFileChunk(files(), owner, data.substring(end + 1), true, sendFile);
 }
 
 export function playerFilesOwnerLeft(owner: number): void {
@@ -49,7 +60,18 @@ export function playerFilesOwnerLeft(owner: number): void {
 }
 
 
+export const receivedLobbyCounter = (owner: number): number => lobbyCounter(files(), owner) ?? 0;
+
+// Engine: Preloader replays the first counter it read for the whole process, so the latest counter written is kept in memory.
+function takeLobbyCounter(): void {
+  const counter = (globalThis.__smashcraftLobbyCounter ?? S2I(readChunk(LOBBY_COUNTER_FILE) ?? "")) + 1;
+  globalThis.__smashcraftLobbyCounter = counter;
+  writeChunks(LOBBY_COUNTER_FILE, [`${counter}`]);
+}
+
 export function startPlayerFiles(): void {
+  takeLobbyCounter();
+  delete files().lobbyCounters;
   const trigger = CreateTrigger();
   for (const slot of PARTICIPANT_SLOTS) {
     BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), MORE_PREFIX, false);

@@ -10,6 +10,7 @@ export interface PlayerFileQueue {
 
   readonly queue: PendingLoad[];
   departedMask?: number;
+  lobbyCounters?: (number | undefined)[];
 }
 
 type SendFile = (owner: number) => void;
@@ -53,3 +54,9 @@ export function departPlayerFiles(files: PlayerFileQueue, owner: number, send: S
   for (const pending of removed) pending.complete({ kind: "unavailable" });
   if (next !== undefined && next !== previous && files.queue[0] === next) send(next.owner);
 }
+
+export function receiveLobbyCounter(files: PlayerFileQueue, owner: number, counter: number): void {
+  (files.lobbyCounters ??= [undefined, undefined, undefined, undefined])[owner] = counter;
+}
+
+export const lobbyCounter = (files: Readonly<PlayerFileQueue>, owner: number): number | undefined => files.lobbyCounters?.[owner];
