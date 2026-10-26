@@ -125,6 +125,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   settle into the idle pose; it adds a root step, lean and rise, grounds the
   body every frame and keeps the candle upright. Every other sequence stays
   byte-identical, and Murloc's generator output does not change.
+  `--only=ultimate` appends his ultimate's own burrow clip (#404): a pick chop
+  into the floor, a dig with only the pick and candle above the dirt, a coil and
+  a burst up through the hit, independent of Panic Dig's sequences.
   `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
   Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
   preserving all seventeen stock clips and writing both-facing pose sheets.

@@ -22,7 +22,7 @@ import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/ma
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, type ScoreFrame, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
-import { type CrouchClipKind, type SampledCue, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
+import { type CrouchClipKind, type SampledCue, type SampledMove, SCORED_NORMALS, SCORED_SPECIALS, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { CAMERA_LIFT, heldOffset, judgeCamera, judgeCrop, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, JUMP_LINES, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
@@ -447,7 +447,7 @@ const record = (files: readonly string[]) => Effect.gen(function*() {
     entries.push(...(yield* attempt(`read the clip identities beside ${file}`, () => withPreparedClips(judged, file))));
   }
   const known = new Set(SELECTABLE_CHARACTERS.map(fighterSlug));
-  const unknown = entries.filter((entry) => !known.has(entry.fighter) || REFERENCE_ACTIONS[entry.move] === undefined);
+  const unknown = entries.filter((entry) => !known.has(entry.fighter) || ![...SCORED_NORMALS, ...SCORED_SPECIALS].some((scored) => scored.move === entry.move));
   if (unknown.length > 0) return yield* new AnimFailure({ problem: `unknown fighter or move: ${unknown.map((entry) => `${entry.fighter}/${entry.move}`).join(", ")}` });
   const old = yield* decodeLines(JudgeScore, JUDGE_FILE);
   const seen = new Set(old.map(judgementKey));

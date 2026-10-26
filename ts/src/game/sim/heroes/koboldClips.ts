@@ -72,7 +72,7 @@ export const KOBOLD_CLIPS = { idle: KOBOLD_FALLBACK, walk: { index: 1, seconds: 
   neutralSpecialAir: { index: 74, seconds: f32(0.6), aligned: true },
   sideSpecial: { index: 94, seconds: f32(0.533), aligned: true },
   sideSpecialAir: { index: 95, seconds: f32(0.533), aligned: true },
-  ultimate: { index: 75, seconds: f32(0.533), aligned: true },
+  ultimate: { index: 97, seconds: f32(1.4166666666666667), aligned: true },
   upSpecial: { index: 77, seconds: f32(0.567), aligned: true },
   upSpecialAir: { index: 78, seconds: f32(0.567), aligned: true },
   downSpecial: { index: 79, seconds: f32(0.567), aligned: true },

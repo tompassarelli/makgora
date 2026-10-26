@@ -10,6 +10,8 @@ import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { KOBOLD_MOVES } from "../../ts/src/game/sim/heroes/koboldMoves";
 import { KOBOLD_SPECIALS } from "../../ts/src/game/sim/heroes/koboldSpecials";
 import { KOBOLD_BARE_CLIPS, KOBOLD_CLIPS } from "../../ts/src/game/sim/heroes/koboldClips";
+import { Character } from "../../ts/src/game/sim/codes";
+import { FIGHTER_ULTIMATES, KOBOLD_BURROW_FIRST } from "../../ts/src/game/sim/ultimates";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -188,6 +190,31 @@ for (const pose of ["sideSpecial", "sideSpecialAir"] as const) if (!only || only
         return { frame, gesture: blend(last, settle, (frame - digRegion.lastFrame) / (dig.endFrame - digRegion.lastFrame)) };
       })] });
 }
+const burrow = FIGHTER_ULTIMATES[Character.kobold]!, burst = burrow.regions![0]!;
+const tunnel = (frame: number): Gesture => {
+  const phase = (frame - KOBOLD_BURROW_FIRST) * Math.PI / 5, paw = Math.sin(phase);
+  return { chest: 10, lean: 15, head: -30, tail: -20, arm: -150, elbow: -10, leftArm: -100 - 35 * paw, leftElbow: -40,
+    thigh: -30 - 20 * paw, leftThigh: -30 + 20 * paw, knee: 60, leftKnee: 60, rise: -60 + 2 * Math.cos(phase * 2) };
+};
+const coil: Gesture = { chest: 10, lean: 0, head: -30, tail: -40, arm: -150, elbow: -10, leftArm: -150, leftElbow: -20, thigh: -90, knee: 130, leftThigh: -90, leftKnee: 130, rise: -112 };
+const erupt: Gesture = { chest: -12, lean: -4, head: -35, tail: 20, arm: -125, elbow: -30, leftArm: -150, leftElbow: -6, thigh: 5, knee: -5, leftThigh: -8, leftKnee: -10, rise: 12 };
+const crest: Gesture = { ...erupt, chest: -14, arm: (erupt.arm ?? 0) - 3, elbow: 0, leftArm: -160, rise: 15 };
+const sink: Gesture = { ...crest, arm: -118, rise: 5 };
+const chop: Gesture = { chest: 15, lean: 6, head: 10, tail: 10, arm: -70, elbow: 0, leftArm: -55, leftElbow: -10, thigh: 10, knee: -15, leftThigh: -5, leftKnee: -20, step: 4, rise: 3 };
+const touchdown: Gesture = { ...squash, arm: -45, elbow: -20, leftArm: -60, leftElbow: -40, head: 5, tail: -20 };
+if (!only || only.includes("ultimate")) actions.push({ pose: "ultimate", frames: burrow.endFrame, contact: burst.firstFrame,
+  beats: [{ frame: 0, gesture: ready },
+    { frame: 5, gesture: { chest: -10, arm: -225, elbow: -70, leftArm: -200, leftElbow: -50, lean: -8, step: -4, head: -20, thigh: 30, knee: -50, leftThigh: 40, leftKnee: -60 } },
+    { frame: 8, gesture: { chest: 55, arm: -45, elbow: 0, leftArm: -40, lean: 25, step: 6, head: 20, thigh: 40, knee: -60, leftThigh: 35, leftKnee: -55 } },
+    { frame: 11, gesture: { chest: 50, lean: 40, head: -20, tail: -10, arm: -150, elbow: -20, leftArm: -95, leftElbow: -20, thigh: 10, knee: 20, leftThigh: 20, leftKnee: 10, step: 6, rise: -24 } },
+    ...Array.from({ length: Math.floor((burst.firstFrame - 7 - KOBOLD_BURROW_FIRST) / 2) + 1 }, (_, i) => {
+      const frame = KOBOLD_BURROW_FIRST + i * 2; return { frame, gesture: tunnel(frame) };
+    }),
+    { frame: burst.firstFrame - 4, gesture: coil }, { frame: burst.firstFrame - 1, gesture: coil },
+    { frame: burst.firstFrame, gesture: erupt },
+    { frame: burst.firstFrame + 1, gesture: crest }, { frame: burst.firstFrame + 3, gesture: sink }, { frame: burst.lastFrame + 7, gesture: chop },
+    { frame: 70, gesture: { ...chop, chest: 40, lean: 14, arm: -25, leftArm: -20, head: 20, rise: 0, thigh: 30, knee: -45, leftThigh: 25, leftKnee: -40 } }, { frame: 76, gesture: touchdown },
+    { frame: 80, gesture: blend(touchdown, ready, 0.6) }, { frame: burrow.endFrame, gesture: ready }] });
 const charge: Gesture = { chest: -30, arm: -220, elbow: -32, leftArm: -205, leftElbow: -32, lean: -15, step: -6, head: -30, thigh: -20, leftThigh: 24, knee: -22 };
 const crouch: Gesture = { chest: -60, lean: 20, head: 15, arm: 20, elbow: -60, leftArm: -40, thigh: -80, knee: 120, leftThigh: -80, leftKnee: 120 };
 if (!only || only.includes("smashCharge")) actions.push({ pose: "smashCharge", frames: 30, contact: 8, hold: true, beats: [{ frame: 0, gesture: charge }, { frame: 30, gesture: charge }] });
@@ -217,7 +244,7 @@ if (!only || only.includes("bareIdle")) actions.push({ pose: "bareIdle", frames:
   }) });
 
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1]!)) + 100;
-for (const pose of ["run", "dash", "bareIdle", "bareRun", "sideSpecial", "sideSpecialAir"] as const) {
+for (const pose of ["run", "dash", "bareIdle", "bareRun", "sideSpecial", "sideSpecialAir", "ultimate"] as const) {
   const action = actions.find(a => a.pose === pose); if (!action) continue;
   const index = seq(pose).index;
   if (model.Sequences[index]) continue;
