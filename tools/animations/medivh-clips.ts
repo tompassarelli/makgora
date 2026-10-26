@@ -195,7 +195,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  if(action.beats)for(const beat of action.beats)aimArm(index,start,{...action,contact:beat.frame},[{frame:beat.frame,amount:1}],true,beat.hand,beat.direction);
  const aim=contactAim(action.pose);if(ordinal<actions.length&&aim&&!action.beats&&action.pose!=="upSpecial"&&action.pose!=="upSpecialAir")aimArm(index,start,action,phases,true,aim.hand,aim.direction);
  if(reverse)aimArm(index,start,{...action,contact:reverse},phases.filter(p=>p.frame>=reverse),true,[-35,-18,28],[-1,0,-0.2]);
- if(["grab","grabHold","pummel","throwForward","neutralSpecial","neutralSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[36,12,65]);
+ if(["grab","grabHold","pummel","throwForward","neutralSpecial","neutralSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[36,12,65],action.pose==="throwForward"?[1,0,0]:undefined);
  if(["sideSpecial","sideSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[27,12,112]);
  if(["downSpecial","downSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[35,12,32]);
 
