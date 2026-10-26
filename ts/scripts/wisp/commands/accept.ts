@@ -49,6 +49,7 @@ import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
 import { movesShardId, parseShardChat } from "../smokeShards";
 import { measureResultsGate } from "../gateResults";
+import { measureStagesGate } from "../gateStages";
 
 const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 
@@ -360,6 +361,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       "gate:start": (name: string) => measureStartGate(selectedClients, name, evidence("gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")),
       "gate:start-rest": (name: string) => measureStartRestGate(selectedClients, name, evidence("gate-start-rest", name)),
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),
+      "gate:stages": (name: string) => measureStagesGate(selectedClients, evidence("gate-stages", name), controlled.start("gate-playable", "gate-stages")),
       "gate:bindings": (name: string) => measureBindingsGate(selectedClients, name, evidence("gate-bindings", name), pair?.appIds ?? new Map()),
     };
     const receiptGate = (text: string) => Object.hasOwn(receiptGates, text) ? receiptGates[text as keyof typeof receiptGates] : undefined;
