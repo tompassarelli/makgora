@@ -20,6 +20,7 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { SELECTABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { Key } from "../../src/host/loop/keyEvents";
 import { botBeatKeys, gameOf } from "./botMatch";
+import { deliverKey } from "./deliverKey";
 import { PREDICTED_LOCAL_NATIVES } from "./localNatives";
 import { HandleCensus, compactEmulator, reach } from "./memoryCensus";
 
@@ -84,13 +85,13 @@ const frame = () => {
   const inMatch = clients.frame > 0 && gameOf(host).phase === Phase.match;
   const [tap, hold] = inMatch && releaseMatches === undefined && !nativeSequence ? botBeatKeys(++beat) : [0, 0];
   for (const player of clients.clients) {
-    if (hold !== held && held !== 0) for (const client of clients.clients) client.key(player.slot, held, 0, false);
-    if (hold !== held && hold !== 0) for (const client of clients.clients) client.key(player.slot, hold, 0, true);
-    if (tap !== 0) for (const client of clients.clients) client.key(player.slot, tap, 0, true);
+    if (hold !== held && held !== 0) for (const client of clients.clients) deliverKey(client, player.slot, held, 0, false);
+    if (hold !== held && hold !== 0) for (const client of clients.clients) deliverKey(client, player.slot, hold, 0, true);
+    if (tap !== 0) for (const client of clients.clients) deliverKey(client, player.slot, tap, 0, true);
   }
   held = hold;
   clients.frames(1);
-  if (tap !== 0) for (const player of clients.clients) for (const client of clients.clients) client.key(player.slot, tap, 0, false);
+  if (tap !== 0) for (const player of clients.clients) for (const client of clients.clients) deliverKey(client, player.slot, tap, 0, false);
 
   for (const client of clients.clients) client.forget(client.log.length);
   if (releaseMatches === undefined && floorMod(clients.frame - nativeStart, FRAMES_PER_MINUTE) === 0) census(`kind=minute minute=${floorDiv(clients.frame - nativeStart, FRAMES_PER_MINUTE)}`);

@@ -6,7 +6,7 @@ import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
 import { attachedPoolReady, attachExistingPool, pairClientCount } from "./wisp/nativePool";
-import { processIsAlive } from "./wisp/commands/pairClaim";
+import { alive, poolHolder } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "./hostPoll";
 
 class CaptureBatchFailure extends Schema.TaggedError<CaptureBatchFailure>()("CaptureBatchFailure", { problem: Schema.String }) {
@@ -66,11 +66,8 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
 const poolScope = (pair: number, desktop: string, capacity: string, solo: boolean, network: boolean) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
   const existing = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
-  const holder = yield* Effect.try({ try: () => {
-    const path = join(lanState, `pair-${pair}`, "pool.pid");
-    return existsSync(path) ? Number(readFileSync(path, "utf8").trim()) : 0;
-  }, catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
-  const attach = attachExistingPool(existing, Number.isInteger(holder) && holder > 1 && processIsAlive(holder));
+  const holder = poolHolder(pair);
+  const attach = attachExistingPool(existing, holder !== undefined && alive(holder));
   if (attach && solo) return yield* new CaptureBatchFailure({ problem: `pair ${pair} is already running; a --solo batch restarts its pair between rows, so stop it first (\`bun wisp lan stop --pair ${pair}\` for a pool unit, Ctrl-C for a foreground \`lan pool\`)` });
   const child = attach ? undefined : yield* Effect.acquireRelease(
     Effect.try({

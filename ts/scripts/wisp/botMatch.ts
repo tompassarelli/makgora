@@ -8,6 +8,7 @@ import { passStartControls } from "./startControls";
 
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
+import { deliverKey } from "./deliverKey";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
@@ -151,9 +152,9 @@ export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number,
       const [tap, hold] = at < 1 ? [0, 0] : botBeatKeys(at);
       tapped[index] = tap;
       const last = held[index] ?? 0;
-      if (hold !== last && last !== 0) for (const client of clients.clients) client.key(player.slot, last, 0, false);
-      if (hold !== last && hold !== 0) for (const client of clients.clients) client.key(player.slot, hold, 0, true);
-      if (tap !== 0) for (const client of clients.clients) client.key(player.slot, tap, 0, true);
+      if (hold !== last && last !== 0) for (const client of clients.clients) deliverKey(client, player.slot, last, 0, false);
+      if (hold !== last && hold !== 0) for (const client of clients.clients) deliverKey(client, player.slot, hold, 0, true);
+      if (tap !== 0) for (const client of clients.clients) deliverKey(client, player.slot, tap, 0, true);
       held[index] = hold;
     });
   };
@@ -182,7 +183,7 @@ export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number,
     clients.clients.forEach((player, index) => {
       const tap = tapped[index] ?? 0;
       if (tap === 0) return;
-      for (const client of clients.clients) client.key(player.slot, tap, 0, false);
+      for (const client of clients.clients) deliverKey(client, player.slot, tap, 0, false);
       tapped[index] = 0;
     });
     if (!keyboard) helpers.service(clients);

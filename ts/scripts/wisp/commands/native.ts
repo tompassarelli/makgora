@@ -9,7 +9,7 @@ import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { runProcess } from "../../hostProcess";
 import { type Box, Plan, parseBoxes, planBoxes, shardBatch, type Batch } from "../nativePlan";
-import { readPairClaim } from "./pairClaim";
+import { alive, readClaim } from "wisp/scripts/wisp/lan/pool";
 const attempt = <A>(f: () => A) => Effect.try({ try: f, catch: cause => new UsageFailure({ problem: String(cause) }) });
 const read = (path: string) => attempt(() => readFileSync(path, "utf8"));
 const save = (path: string, value: unknown) => attempt(() => { mkdirSync(resolve(path, ".."), { recursive: true }); writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`); });
@@ -36,9 +36,8 @@ const selectPairs = (values: NativeOptions, dry: boolean) => Effect.gen(function
   else {
     const pool = yield* Schema.decodeEffect(Schema.fromJsonString(Pool))(yield* read(join(state, "pool.json")));
     pairs = yield* attempt(() => pool.pairs.filter(pair => {
-      const claim = readPairClaim(pair.id);
-      if (claim === undefined || claim.session === process.env.NORTH_FLEET_SESSION) return true;
-      try { process.kill(claim.pid, 0); return false; } catch { return true; }
+      const claim = readClaim(pair.id);
+      return claim === undefined || claim.session === process.env.NORTH_FLEET_SESSION || !alive(claim.pid);
     }).map(pair => pair.id));
     if (requested !== undefined && requested.some(id => !pairs.includes(id)) || count !== undefined && pairs.length < count) return yield* new UsageFailure({ problem: "requested pairs are absent or owned by another session" });
     pairs = requested ?? (count === undefined ? pairs : pairs.slice(0, count));

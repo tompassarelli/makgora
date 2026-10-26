@@ -25,16 +25,17 @@ runs; never touch Tom’s install.
   `protectedCpuSomeAvg10` stays under 20 (three pairs read 22-31 under normal
   agent load).
 
-Pair 0's pool unit owns `~/.local/state/wisp/lan/pair-0/claim.json` for its
-fleet session. `NORTH_FLEET_SESSION` names that session; `--owner NAME` names
-the lane in the claim. `lan fresh`, `lan end`, `accept`, native pair pad scripts and
-capture batches refuse pair 0 unless this live claim belongs to their session.
-To label an already-running pool explicitly, run
-`bun wisp lan claim --pair 0 --owner NAME`. `bun wisp lan stop --pair 0` or
-`bun wisp lan release --pair 0` stops the pool and releases the claim. A live
-claim from another session refuses with its owner, session and PID; a claim
-whose pool process exited can be taken over and reports that takeover.
+Wisp holds each pair's custody (wisp:docs/lan.md, wisp#69): the pool holding
+pair K names itself in `~/.local/state/wisp/lan/pair-K/claim.json` (its PID,
+the fleet session from `NORTH_FLEET_SESSION` and the lane label from
+`--owner NAME`). Every smashcraft `lan pool` waits in Wisp's line with
+`--queue`, so sessions asking for a held pair get it one at a time in the order
+they asked (smashcraft:ts/test/lan-pool-queue.test.ts). A pool unit is named per fleet
+session and pairs and passes `--owner-pid` with the session's own process, the
+outermost ancestor carrying its `NORTH_FLEET_SESSION`, so a running or waiting
+unit stops itself once that session ends.
 
-`bun wisp lan stop` stops only the pool units started from the caller's
-`NORTH_FLEET_SESSION` and names each other session's unit it leaves running;
-`--pair K` on another session's unit refuses with its owner.
+`bun wisp lan stop` stops the pool units, holding or waiting, started from the
+caller's `NORTH_FLEET_SESSION` and names each other session's unit it leaves
+running; it sweeps a pair's capacity scopes only while no other pool has taken
+the pair.

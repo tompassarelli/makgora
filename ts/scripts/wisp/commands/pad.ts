@@ -65,7 +65,6 @@ import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { hostLoad, inQuietNativeWindow, windowLoad } from "../quietWindow";
 import { quickMatchHero, quickMatchStage, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../../src/game/session/devSettings";
-import { assertPairClaim } from "./pairClaim";
 import { withNativeUnit } from "./nativeUnit";
 import { pauseDraws } from "../pauseDraws";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -592,9 +591,6 @@ const pad: Command = (args) => Effect.gen(function*() {
   }
   const { helper, out, chat, compare } = parsed.values;
   const clientsFile = parsed.values["clients-file"] ?? clientState;
-  if (parsed.values.headless !== true && ((parsed.values.pair ?? []).includes("0") || parsed.values.pairs !== undefined)) {
-    yield* Effect.try({ try: () => assertPairClaim(0, process.env["NORTH_FLEET_SESSION"] ?? ""), catch: cause => new UsageFailure({ problem: String(cause) }) });
-  }
   const renderFrames = parsed.values.frames?.split(",").map(Number);
   const graphics = yield* Effect.try({ try: () => [...new Set(parsed.values.graphics?.map(parseGraphics) ?? ["classic" as const])], catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
   if (parsed.values.graphics !== undefined && parsed.values.render === undefined) return yield* new UsageFailure({ problem: "--graphics chooses what --render draws" });

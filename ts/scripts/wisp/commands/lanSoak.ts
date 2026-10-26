@@ -16,7 +16,6 @@ import { onHealthyClients } from "../doctor";
 import { pollUntil } from "../../hostPoll";
 import { NATIVE_SOAK_FILE, nativeChatFile } from "../../../src/game/core/gameFiles";
 import { INTEGRITY_BUILD } from "../../../src/game/session/currentBuild";
-import { assertPairClaim } from "./pairClaim";
 
 class NativeSoakFailure extends Schema.TaggedError<NativeSoakFailure>()("NativeSoakFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
@@ -68,7 +67,6 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
   const minutes = wholeFlag(args, "minutes", { min: 1, max: 1440 });
   const [outText] = flagValues(args, "out");
   if (pair instanceof UsageFailure) return yield* pair;
-  if (pair === 0) yield* Effect.try({ try: () => assertPairClaim(0, process.env["NORTH_FLEET_SESSION"] ?? ""), catch: cause => new NativeSoakFailure({ problem: String(cause) }) });
   if (minutes instanceof UsageFailure) return yield* minutes;
   if (map === undefined || !existsSync(map) || (pair === undefined) === (signedIn === undefined) || minutes === undefined || outText === undefined) return yield* new UsageFailure({ problem: "lan soak MAP.w3x (--pair K | --clients FILE) --minutes N --out DIR [--diagnostic-start] (an integrity map or named soak diagnostic)" });
   const out = resolve(outText);

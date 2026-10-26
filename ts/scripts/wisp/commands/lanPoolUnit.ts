@@ -1,19 +1,19 @@
-import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
-import { Console, Effect } from "effect";
+import { Console, Duration, Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { lan as frameworkLan } from "wisp/scripts/wisp/commands/lan";
 import { LanFailure } from "wisp/scripts/wisp/lan/join";
-import { agentSocket, readPool, stopPairScopes } from "wisp/scripts/wisp/lan/pool";
+import { agentSocket, alive, poolHolder, readClaim, readPool, stopPairScopes } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "../../hostPoll";
 import { runProcess } from "../../hostProcess";
 import { readClientEntries } from "../nativeTools";
 import { projectRoot } from "../project";
 import { userSessionEnv } from "./nativeUnit";
 import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
-import { claimPair, processIsAlive, readPairClaim, releasePair } from "./pairClaim";
 
 export const POOL_UNIT_PREFIX = "smashcraft-lan-pool";
 const FOREGROUND = "--foreground";
@@ -26,23 +26,54 @@ export const poolPairIds = (args: readonly string[]): readonly number[] => {
   return Array.from({ length: Number(count) }, (_, index) => index);
 };
 
-export const poolUnitName = (ids: readonly number[]) => `${POOL_UNIT_PREFIX}-${ids.join("-")}`;
+/** One unit per fleet session and pairs, so a second session's pool can wait in wisp's line for a pair the first holds. */
+export const poolUnitName = (ids: readonly number[], session = process.env["NORTH_FLEET_SESSION"] ?? "") =>
+  `${POOL_UNIT_PREFIX}-${ids.join("-")}${session === "" ? "" : `-s${createHash("sha256").update(session).digest("hex").slice(0, 8)}`}`;
+
+/** The pairs a pool unit runs, read back from its name. */
+export const unitPairIds = (unit: string): readonly number[] =>
+  unit.slice(POOL_UNIT_PREFIX.length + 1).split("-").filter((part) => /^\d+$/.test(part)).map(Number);
+
+const parentOf = (pid: number) => {
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, "utf8");
+    return Number(stat.slice(stat.lastIndexOf(")") + 2).split(" ")[1]);
+  } catch {
+    return undefined;
+  }
+};
+
+const carries = (pid: number, variable: string) => {
+  try { return readFileSync(`/proc/${pid}/environ`, "latin1").split("\0").includes(variable); } catch { return false; }
+};
+
+/** The fleet session's own process, which a pool unit names with `--owner-pid` because it runs outside that process tree: the outermost ancestor carrying the same `NORTH_FLEET_SESSION`. */
+export const fleetSessionPid = (session: string, from = process.pid) => {
+  let outermost = from;
+  for (let pid = parentOf(from); pid !== undefined && pid > 1 && carries(pid, `NORTH_FLEET_SESSION=${session}`); pid = parentOf(pid)) outermost = pid;
+  return outermost;
+};
+
+/** A pool's arguments with `--queue`, so it waits its turn behind earlier waiters instead of being refused. */
+export const queuedPoolArgs = (args: readonly string[]) => args.includes("--queue") ? args : [...args, "--queue"];
 
 const CPU_LIST = /^\d+(-\d+)?(,\d+(-\d+)?)*$/;
 
 /** The `--cpus LIST` affinity of the pool unit, which every client's capacity scope inherits, so native evidence can run on the performance cores. */
 export const poolCpus = (args: readonly string[]) => flagValues(args, "cpus")[0];
 
-/** The transient user unit that owns a pool: it outlives the caller's shell, tool limits and cgroup, and `lan stop` stops it. */
-export const poolUnitCommand = (args: readonly string[], path: string, uid: number, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
-  "systemd-run", "--user", "--collect", `--unit=${poolUnitName(poolPairIds(args))}`,
+/** The transient user unit that owns a pool: it outlives the caller's shell, tool limits and cgroup, and `lan stop` stops it. Its pool waits in wisp's line and names the fleet session's process with `--owner-pid`, so it stops once that session ends. */
+export const poolUnitCommand = (args: readonly string[], path: string, uid: number, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string, ownerPid = (session: string) => fleetSessionPid(session)): readonly string[] => [
+  "systemd-run", "--user", "--collect", `--unit=${poolUnitName(poolPairIds(args), env["NORTH_FLEET_SESSION"] ?? "")}`,
   `--working-directory=${projectRoot}`, `--setenv=PATH=${path}`,
   ...Object.entries(userSessionEnv(uid)).map(([name, value]) => `--setenv=${name}=${value}`),
   ...privateDesktopUnitEnv(env, readDisplay),
   ...(env["NORTH_FLEET_SESSION"] === undefined ? [] : [`--setenv=NORTH_FLEET_SESSION=${env["NORTH_FLEET_SESSION"]}`]),
   "--property=KillMode=control-group", "--property=TimeoutStopSec=180",
   ...(poolCpus(args) === undefined ? [] : [`--property=CPUAffinity=${poolCpus(args)}`]),
-  "--", runtime, WISP_PROGRAM, "lan", "pool", ...args.filter((arg) => arg !== FOREGROUND), FOREGROUND,
+  "--", runtime, WISP_PROGRAM, "lan", "pool", ...queuedPoolArgs(args.filter((arg) => arg !== FOREGROUND)),
+  ...(env["NORTH_FLEET_SESSION"] === undefined || env["NORTH_FLEET_SESSION"] === "" || flagValues(args, "owner-pid").length > 0 ? [] : ["--owner-pid", String(ownerPid(env["NORTH_FLEET_SESSION"]))]),
+  FOREGROUND,
 ];
 
 const currentUid = () => process.getuid?.() ?? 0;
@@ -61,19 +92,8 @@ const withoutPairFlags = (args: readonly string[]) => args.filter((arg, index) =
 
 export const poolStart: Command = (args) => {
   if (args.includes(FOREGROUND)) {
-    const ids = poolPairIds(args);
-    const session = process.env["NORTH_FLEET_SESSION"] ?? "";
-    const [owner = session] = flagValues(args, "owner");
-    const clean = args.filter((arg, index) => arg !== FOREGROUND && !["--owner", "--cpus"].includes(arg) && !["--owner", "--cpus"].includes(args[index - 1] ?? "") && !arg.startsWith("--owner=") && !arg.startsWith("--cpus="));
-    return Effect.scoped(Effect.gen(function*() {
-      for (const id of ids) if (id === 0) {
-        yield* Effect.acquireRelease(
-          Effect.try({ try: () => claimPair(id, owner, session), catch: cause => new LanFailure({ problem: String(cause) }) }),
-          claim => Effect.sync(() => { if (claim.pid === process.pid) { try { releasePair(id, claim.session); } catch {} } }),
-        );
-      }
-      yield* frameworkLan(["pool", ...clean]);
-    })).pipe(Effect.asVoid);
+    const clean = args.filter((arg, index) => arg !== FOREGROUND && arg !== "--cpus" && args[index - 1] !== "--cpus" && !arg.startsWith("--cpus="));
+    return frameworkLan(["pool", ...queuedPoolArgs(clean)]);
   }
   const ids = poolPairIds(args);
   if (ids.length > 1) {
@@ -82,22 +102,27 @@ export const poolStart: Command = (args) => {
   }
   const cpus = poolCpus(args);
   if (cpus !== undefined && !CPU_LIST.test(cpus)) return Effect.fail(new UsageFailure({ problem: `--cpus takes a CPU list such as 0-11, not ${cpus}` }));
-  if (ids.includes(0) && process.env["NORTH_FLEET_SESSION"] === undefined) return Effect.fail(new LanFailure({ problem: "pair 0 pool requires NORTH_FLEET_SESSION so its claim names the fleet owner" }));
-  const [owner] = flagValues(args, "owner");
-  const ownedArgs = owner === undefined ? [...args, "--owner", process.env["NORTH_FLEET_SESSION"] ?? ""] : args;
   const unit = poolUnitName(ids);
   const [waitText = "1800"] = flagValues(args, "wait");
   return Effect.gen(function*() {
-    if (yield* unitActive(unit)) {
-      const claim = ids.includes(0) ? readPairClaim(0) : undefined;
-      return yield* new UsageFailure({ problem: claim === undefined ? `${unit} is already running; stop it with \`bun wisp lan stop\`` : `pair 0 is held by ${claim.owner} (fleet session ${claim.session}, pid ${claim.pid})` });
-    }
-    const [program = "", ...rest] = poolUnitCommand(ownedArgs, unitPath(), currentUid());
+    if (yield* unitActive(unit)) return yield* new UsageFailure({ problem: `${unit} is already running or waiting; stop it with \`bun wisp lan stop\`` });
+    const [program = "", ...rest] = poolUnitCommand(args, unitPath(), currentUid());
     yield* runProcess(userManager(program, rest)).pipe(Effect.mapError((cause) => new LanFailure({ problem: `start ${unit}: ${cause.message}` })));
+    const stopped = new LanFailure({ problem: `${unit} stopped before its pairs were up; see \`journalctl --user -u ${unit}\`` });
+    let said = "";
     yield* pollUntil(Effect.gen(function*() {
-      if (!(yield* unitActive(unit))) return yield* new LanFailure({ problem: `${unit} stopped before its pairs were up; see \`journalctl --user -u ${unit}\`` });
-      const claimed = !ids.includes(0) || readPairClaim(0)?.session === process.env["NORTH_FLEET_SESSION"];
-      return claimed && ids.every((id) => existsSync(agentSocket(id))) ? true : undefined;
+      if (!(yield* unitActive(unit))) return yield* stopped;
+      const pid = Number((yield* runProcess(userManager("systemctl", ["--user", "show", unit, "--property=MainPID", "--value"])).pipe(Effect.orElseSucceed(() => ""))).trim());
+      const waiting = ids.filter((id) => readClaim(id)?.pid !== pid);
+      if (waiting.length === 0) return true;
+      const line = waiting.map((id) => { const claim = readClaim(id); return `pair ${id}: waiting in line${claim === undefined ? "" : `; held by ${claim.owner} (fleet session ${claim.session || "(none)"}, pool ${claim.pid})`}`; }).join("; ");
+      if (line !== said) yield* Console.log(line);
+      said = line;
+      return undefined;
+    }), { every: "2 seconds", within: Duration.infinity, orElse: () => Effect.void });
+    yield* pollUntil(Effect.gen(function*() {
+      if (!(yield* unitActive(unit))) return yield* stopped;
+      return ids.every((id) => existsSync(agentSocket(id))) ? true : undefined;
     }), { every: "2 seconds", within: `${Number(waitText) + 900} seconds`, orElse: () => Effect.fail(new LanFailure({ problem: `${unit}'s pairs weren't up in time; see \`journalctl --user -u ${unit}\`` })) });
     yield* Console.log(`pool unit ${unit} running; \`bun wisp lan stop\` stops it`);
   }).pipe(Effect.provide(BunServices.layer));
@@ -109,30 +134,27 @@ export const unitFleetSession = (environment: string) => /(?:^|\s)NORTH_FLEET_SE
 export const poolStop: Command = (args) => Effect.gen(function*() {
   const ids = flagValues(args, "pair").map(Number);
   const listed = yield* runProcess(userManager("systemctl", ["--user", "list-units", "--plain", "--no-legend", "--all", `${POOL_UNIT_PREFIX}-*.service`])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `list pool units: ${cause.message}` })));
-  const units = listed.split("\n").flatMap((line) => /^(\S+)\.service/.exec(line.trim())?.[1] ?? []).filter((unit) => ids.length === 0 || ids.some((id) => unit.split("-").slice(3).map(Number).includes(id)));
+  const units = listed.split("\n").flatMap((line) => /^(\S+)\.service/.exec(line.trim())?.[1] ?? []).filter((unit) => ids.length === 0 || ids.some((id) => unitPairIds(unit).includes(id)));
   if (units.length === 0) return yield* Console.log("no pool unit is running");
   const session = process.env["NORTH_FLEET_SESSION"] ?? "";
   for (const unit of units) {
     const environment = yield* runProcess(userManager("systemctl", ["--user", "show", unit, "--property=Environment", "--value"])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `read ${unit} owner: ${cause.message}` })));
     const owner = unitFleetSession(environment);
     if (owner !== session) {
-      if (ids.length > 0) return yield* new LanFailure({ problem: `${unit} belongs to fleet session ${owner || "(none)"}; only that session stops it` });
       yield* Console.log(`left ${unit}: it belongs to fleet session ${owner || "(none)"}`);
       continue;
     }
-    const pairIds = unit.split("-").slice(3).map(Number);
-    for (const id of pairIds) {
-      const claim = readPairClaim(id);
-      if (claim !== undefined && claim.session !== (process.env["NORTH_FLEET_SESSION"] ?? "") && processIsAlive(claim.pid)) {
-        return yield* new LanFailure({ problem: `pair ${id} is held by ${claim.owner} (fleet session ${claim.session}, pid ${claim.pid})` });
-      }
-    }
+    const pairIds = unitPairIds(unit);
     yield* runProcess(userManager("systemctl", ["--user", "stop", unit])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `stop ${unit}: ${cause.message}` })));
     for (const id of pairIds) {
+      const next = poolHolder(id);
+      if (next !== undefined && alive(next)) {
+        yield* Console.log(`pair ${id}: pool ${next} has taken the pair`);
+        continue;
+      }
       const left = yield* stopPairScopes(id, (name, lease) => Console.log(`${name} outlived ${unit} (lease ${lease}); killing its capacity scope`));
       if (left.length > 0) return yield* new LanFailure({ problem: `stopped ${unit}, but the capacity scope of ${left.join(" and ")} still runs` });
     }
-    for (const id of pairIds) yield* Effect.try({ try: () => releasePair(id, process.env["NORTH_FLEET_SESSION"] ?? ""), catch: cause => new LanFailure({ problem: String(cause) }) });
     yield* Console.log(`stopped ${unit}`);
   }
 }).pipe(Effect.provide(BunServices.layer));

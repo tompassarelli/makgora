@@ -12,6 +12,7 @@ import { Character } from "../../src/game/sim/codes";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
+import { deliverKey } from "./deliverKey";
 import { headlessRender } from "./headlessRender";
 import { createNetStandalone, smashcraftMapHash } from "./net";
 
@@ -102,19 +103,19 @@ export async function createStandaloneSession(options: { readonly script?: strin
         let tap = 0;
         if (fourFighters) {
           const [beatTap, hold] = botBeatKeys(++beat);
-          if (beatHeld !== hold && beatHeld !== 0) client.key(0, beatHeld, 0, false);
-          if (beatHeld !== hold && hold !== 0) client.key(0, hold, 0, true);
-          if (beatTap !== 0) client.key(0, beatTap, 0, true);
+          if (beatHeld !== hold && beatHeld !== 0) deliverKey(client, 0, beatHeld, 0, false);
+          if (beatHeld !== hold && hold !== 0) deliverKey(client, 0, hold, 0, true);
+          if (beatTap !== 0) deliverKey(client, 0, beatTap, 0, true);
           beatHeld = hold;
           tap = beatTap;
         } else if (script === undefined) {
           const next = heldKeys(input);
-          for (const key of held) if (!next.has(key)) client.key(0, key, 0, false);
-          for (const key of next) if (!held.has(key)) client.key(0, key, 0, true);
+          for (const key of held) if (!next.has(key)) deliverKey(client, 0, key, 0, false);
+          for (const key of next) if (!held.has(key)) deliverKey(client, 0, key, 0, true);
           held = next;
         }
         clients.frames(1);
-        if (tap !== 0) client.key(0, tap, 0, false);
+        if (tap !== 0) deliverKey(client, 0, tap, 0, false);
         for (const current of clients.clients) if (current.errors.length > 0) throw new Error(current.errors.join("\n"));
       },
       checksum: () => value(() => confirmedChecksum(shell())),

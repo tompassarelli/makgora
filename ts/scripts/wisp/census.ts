@@ -9,6 +9,7 @@ import { passStartControls } from "./startControls";
 
 
 import type { Lockstep } from "wisp/src/headless/lockstep";
+import { deliverKey } from "./deliverKey";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { Phase, type MatchState } from "../../src/game/lobby/lobbyState";
 import { Character, SpecialAction } from "../../src/game/sim/codes";
@@ -111,7 +112,7 @@ function shellOf(clients: Lockstep): Shell {
 }
 
 function keyEvent(clients: Lockstep, key: number, down: boolean): void {
-  for (const client of clients.clients) client.key(0, key, 0, down);
+  for (const client of clients.clients) deliverKey(client, 0, key, 0, down);
 }
 
 
