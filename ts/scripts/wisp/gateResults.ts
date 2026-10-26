@@ -50,7 +50,7 @@ const shownStocks = (words: readonly string[]) => {
 const REMATCH = { x: choiceLeft(ResultPick.rematch) + BUTTON_WIDTH / 2, y: CHOICE_TOP - CHOICE_HEIGHT / 2 };
 const AWAY = { x: 0.4, y: 0.3 };
 
-const gateDriver = (host: Client, directory: string) => Effect.gen(function*() {
+export const gateDriver = (host: Client, directory: string) => Effect.gen(function*() {
   const input = yield* InputInjection;
   const view = (client: Client) => input.windowRegion(client).pipe(Effect.mapError(fail(`results gate viewport ${client.name}`)));
   const shot = (client: Client) => view(client).pipe(Effect.flatMap(region => capture(client, region)), Effect.mapError(fail(`results gate capture ${client.name}`)));
@@ -85,10 +85,10 @@ const gateDriver = (host: Client, directory: string) => Effect.gen(function*() {
   return { view, shot, words, at, save, menu, phase, xdotool, hover };
 });
 
-type Driver = Effect.Success<ReturnType<typeof gateDriver>>;
+export type Driver = Effect.Success<ReturnType<typeof gateDriver>>;
 type Menu = Effect.Success<ReturnType<Driver["menu"]>>;
 
-const dismissFirstRunPanels = (d: Driver, client: Client) => Effect.gen(function*() {
+export const dismissFirstRunPanels = (d: Driver, client: Client) => Effect.gen(function*() {
   yield* focus(client).pipe(Effect.mapError(fail("results gate setup")));
   for (let pass = 0; pass <= FIRST_RUN_PANELS; pass++) {
     const seen = yield* d.words(client, yield* d.shot(client));
@@ -118,7 +118,7 @@ const oneStock = (d: Driver, host: Client) => Effect.gen(function*() {
   return yield* new AcceptFailure({ operation: "results gate stocks", problem: `the rules read ${stocks ?? "no"} stocks after ${STOCK_STEPS} steps` });
 });
 
-const startMatch = (d: Driver, clients: readonly Client[], host: Client, after: number) => Effect.gen(function*() {
+export const pickFighters = (d: Driver, clients: readonly Client[]) => Effect.gen(function*() {
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   for (const [slot, client] of clients.entries()) {
     const tile = cellRect(grid, slot);
@@ -127,11 +127,15 @@ const startMatch = (d: Driver, clients: readonly Client[], host: Client, after: 
     yield* batch(client, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 150 }, { kind: "click", ...drop, holdMillis: 200 }, { kind: "wait", millis: 300 }]).pipe(Effect.mapError(fail("results gate fighters")));
     yield* d.save(`picked-${client.name}.ppm`, yield* d.shot(client));
   }
+});
+
+const startMatch = (d: Driver, clients: readonly Client[], host: Client, after: number) => Effect.gen(function*() {
+  yield* pickFighters(d, clients);
   const stage = yield* pressStartUntil(d, host, "STAGE", after, STAGE_WAIT_SECONDS);
   return { stage, match: yield* pressStartUntil(d, host, "BLOCKED", stage.epoch + 1, MATCH_WAIT_SECONDS) };
 });
 
-const pressStartUntil = (d: Driver, host: Client, wanted: Menu["phase"], after: number, seconds: number) => Effect.gen(function*() {
+export const pressStartUntil = (d: Driver, host: Client, wanted: Menu["phase"], after: number, seconds: number) => Effect.gen(function*() {
   for (let press = 0; press < START_PRESSES; press++) {
     yield* batch(host, [{ kind: "keys", keys: ["y"] }]).pipe(Effect.mapError(fail(`results gate ${wanted}`)));
     const seen = yield* d.phase(wanted, after, seconds).pipe(Effect.option);

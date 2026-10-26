@@ -23,6 +23,12 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     setup: [{ chat: "gate:results", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE results stocks=1 epoch=\\d+ result=1 cursor=1 held=1 rematch=1 pass=1$", min: 1 }],
   },
+  {
+    id: "gate-stages", closes: "smashcraft#430", map: "gate-playable", session: "gate-stages",
+    setup: [{ chat: "gate:stages", client: "a" }],
+    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE stages stages=(\\d+) started=\\1 pass=1$", min: 1 }],
+    look: "Each stage's match start on the candidate: no goo or splat decals under either fighter, no squiggly line art under the platforms, and no gray rocks on the Frozen Throne platforms.",
+  },
   ...neutralSpecialChecks(noErrors),
   ...smokeShards().flatMap((shard): NativeCheck[] => {
     const fighters = new Set(smokePairs()[shard]).size;

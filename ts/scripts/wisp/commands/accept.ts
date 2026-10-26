@@ -47,6 +47,7 @@ import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
 import { movesShardId, parseShardChat } from "../smokeShards";
 import { measureResultsGate } from "../gateResults";
+import { measureStagesGate } from "../gateStages";
 
 const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 
@@ -354,6 +355,8 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" || text === "gate:neutral-both" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), `c4-${text.slice("gate:neutral-".length)}-neutral-special`, name), text === "gate:neutral-thrall" ? 0 : text === "gate:neutral-jaina" ? 1 : "both").pipe(
         Effect.tap(receipts => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipts.specials]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:results" ? measureResultsGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-results-rematch", name)).pipe(
+        Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : text === "gate:stages" ? measureStagesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-stages", name), controlled.start("gate-playable", "gate-stages")).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : parseShardChat(text, "moves") !== undefined ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), movesShardId(parseShardChat(text, "moves") ?? 0), name), undefined, parseShardChat(text, "moves")).pipe(
         Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
