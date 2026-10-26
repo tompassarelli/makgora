@@ -156,6 +156,12 @@ export class SpecialEffects {
     (this.parked ??= [])[SLOT_EFFECTS * slot + effect] = false;
   }
 
+  slotEffects(slot: number, into: effect[]): void {
+    const effects = this.slots[slot];
+    if (effects === undefined) return;
+    into.push(effects.aura, effects.felFlames, effects.manaHand, effects.wingTrail, effects.drainFlash, effects.silence, ...effects.eyeBlast);
+  }
+
   setPaused(paused: boolean): void {
     const scale = paused ? 0.0 : 1.0;
     for (const { felFlames, manaHand, silence } of this.slots) {

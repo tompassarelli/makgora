@@ -15,7 +15,10 @@ import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "
 import { applyDeveloperCommand } from "./shell/keys";
 import { bareFighter } from "./shell/fighterCloak";
 import { paintDrawnStamp } from "./shell/drawnStamp";
-import { CAPTURE_STATUS_FILE } from "../runtime/gameFiles";
+import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../runtime/gameFiles";
+import { emptyBounds, hurtBounds, screenBox, strikeBounds, type PixelBox } from "../game/presentation/screenBoxes";
+import { fighterAt, isActive } from "../game/sim/roster";
+import type { ShellState } from "./shell/state";
 
 const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted" };
 const TICK = "capture.fixtures";
@@ -46,6 +49,21 @@ declare global { var __smashcraftCaptureRunner: Runner | undefined; }
 const runner = (): Runner => globalThis.__smashcraftCaptureRunner ??= { ticks: 0, script: -1, stage: "opening", frame: 0, held: 0, tail: 0, hidden: false };
 
 function status(line: string): void { writeLines(CAPTURE_STATUS_FILE, [line]); }
+
+const screenLines: string[] = [];
+const boxText = (box: PixelBox | undefined) => box === undefined ? "- - - -" : `${box.x} ${box.y} ${box.width} ${box.height}`;
+
+function recordScreenBoxes(s: ShellState, fixture: CaptureFixture, slot: 0 | 1, frame: number): void {
+  if (!isActive(s.world, slot)) return;
+  const fighter = fighterAt(s.world, slot);
+  const width = BlzGetLocalClientWidth();
+  const height = BlzGetLocalClientHeight();
+  const aspect = height > 0 ? I2R(width) / I2R(height) : 16.0 / 9.0;
+  const region = screenBox(s.camera, aspect, width, height, strikeBounds(fighter, hurtBounds(fighter, emptyBounds())));
+  const body = screenBox(s.camera, aspect, width, height, hurtBounds(fighter, emptyBounds()));
+  screenLines.push(`SCREEN ${fixture.name} ${frame} ${width} ${height} ${boxText(region)} ${boxText(body)}`);
+  writeLines(CAPTURE_SCREEN_FILE, screenLines);
+}
 
 function nextScript(r: Runner, fixtures: readonly CaptureFixture[]): void {
   r.script++;
@@ -83,10 +101,12 @@ export function captureTick(fixtures: readonly CaptureFixture[]): void {
   }
   const target = fixture.frames[r.frame];
   const silhouette = fixture.silhouette;
-  if (silhouette !== undefined) bareFighter(s, silhouette.slot, true);
+  const cues = silhouette?.conceal === "cues";
+  if (silhouette !== undefined && !cues) bareFighter(s, silhouette.slot, true);
   if (target === undefined || now !== target) return;
   if (silhouette !== undefined && r.held === 0) {
     ClearTextMessages();
+    if (cues && !r.hidden) recordScreenBoxes(s, fixture, silhouette.slot, target);
     if (r.hidden) {
       paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
       r.stampTick = r.ticks;
@@ -97,7 +117,7 @@ export function captureTick(fixtures: readonly CaptureFixture[]): void {
   r.held = 0;
   if (silhouette !== undefined) {
     r.hidden = !r.hidden;
-    applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
+    applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} ${cues ? "cues" : "fighter"} ${silhouette.slot}`);
     ClearTextMessages();
     if (r.hidden) {
       r.hideTick = r.ticks;
@@ -111,7 +131,7 @@ export function captureTick(fixtures: readonly CaptureFixture[]): void {
     return;
   }
   r.stage = "tail";
-  if (silhouette !== undefined) bareFighter(s, silhouette.slot, false);
+  if (silhouette !== undefined && !cues) bareFighter(s, silhouette.slot, false);
   r.tail = target + (fixture.tailFrames ?? TAIL_FRAMES);
   nativeDriverCommand(`resume ${r.tail}`);
 }

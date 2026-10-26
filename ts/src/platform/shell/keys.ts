@@ -28,7 +28,7 @@ import { probeFrameCostClock } from "./frameCost";
 import { probeRenderClock } from "./renderClock";
 import { startDrawingBetweenFrames } from "./betweenFrames";
 import { showBackdrop, showStageLighting, leverCommand } from "./stageScenery";
-import { fighterHideCommand, hideFighter } from "./fighterCloak";
+import { clearCloaks, fighterHideCommand, hideCues, hideFighter } from "./fighterCloak";
 import { clearCapturedInputs } from "./inputs";
 import { journalEpoch, journalIdentity } from "./journal";
 import { chatBusy, requestPause } from "./journalPause";
@@ -294,7 +294,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   if (original === RESET_COMMAND) {
     s.promoHudHidden = false;
     clearVisualCapture(localSlot());
-    for (const slot of PARTICIPANT_SLOTS) s.hiddenFighters[slot] = undefined;
+    clearCloaks(s);
     pauseMatchPresentation(s, s.session.paused);
   }
   const captured = s.build.responseProbe ? configureVisualCapture(original, localSlot()) : original;
@@ -402,9 +402,9 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     s.viewExtreme = message === "-dev view near" ? "near" : message === "-dev view far" ? "far" : undefined;
     receipt = `dev: view ${s.viewExtreme ?? "off"}`;
   } else if (fighterHide !== undefined) {
-    if (!hideFighter(s, fighterHide.slot, fighterHide.hidden)) return;
-    if (!fighterHide.hidden) renderPersistentPresentation(s);
-    receipt = `dev: fighter ${fighterHide.slot} ${fighterHide.hidden ? "hidden" : "shown"}`;
+    if (!(fighterHide.part === "cues" ? hideCues : hideFighter)(s, fighterHide.slot, fighterHide.hidden)) return;
+    if (!fighterHide.hidden && fighterHide.part === "fighter") renderPersistentPresentation(s);
+    receipt = `dev: ${fighterHide.part} ${fighterHide.slot} ${fighterHide.hidden ? "hidden" : "shown"}`;
   } else if (message.startsWith("-dev lever ")) {
     const words = message.slice(11).split(" ");
     leverCommand(s, words[0] ?? "", words[1] ?? "", words[2] ?? "");

@@ -56,11 +56,12 @@ const positional = (args: readonly string[]) => args.filter((value, index) => !v
 
 // `#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]`: the fighter in that slot, the move it plays and the client resolution.
 export function silhouetteOf(path: string, lines: readonly string[]): Silhouette | undefined {
-  const rows = lines.filter(line => /^\s*#!\s*silhouette\b/.test(line));
+  const rows = lines.filter(line => /^\s*#!\s*(?:silhouette|conceal-cues)\b/.test(line));
   if (rows.length === 0) return undefined;
-  const match = /^\s*#!\s*silhouette\s+([ab])\s+(\S+)\s+(\S+)(?:\s+(\d+)x(\d+))?\s*$/.exec(rows[0] ?? "");
+  const match = /^\s*#!\s*(silhouette|conceal-cues)\s+([ab])\s+(\S+)\s+(\S+)(?:\s+(\d+)x(\d+))?\s*$/.exec(rows[0] ?? "");
   if (rows.length > 1 || match === null) return fail(`${path}: a silhouette line is "#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]", once`);
-  return { slot: match[1] === "a" ? 0 : 1, fighter: match[2] ?? "", move: match[3] ?? "", width: Number(match[4] ?? 1920), height: Number(match[5] ?? 1080) };
+  const silhouette: Silhouette = { slot: match[2] === "a" ? 0 : 1, fighter: match[3] ?? "", move: match[4] ?? "", width: Number(match[5] ?? 1920), height: Number(match[6] ?? 1080) };
+  return match[1] === "conceal-cues" ? { ...silhouette, conceal: "cues" } : silhouette;
 }
 
 export function fixtureOf(path: string, script: string): CaptureFixture {

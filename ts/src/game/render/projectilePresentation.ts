@@ -500,6 +500,10 @@ export class ProjectilePresentation {
     }
   }
 
+  drawnEffects(into: effect[]): void {
+    for (const model of this.models) into.push(model);
+  }
+
   setPaused(paused: boolean): void {
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];

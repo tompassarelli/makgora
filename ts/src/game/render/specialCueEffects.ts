@@ -320,6 +320,14 @@ export class SpecialCueEffects {
     this.areas.drawnEffects(into);
   }
 
+  drawnEffects(into: effect[]): void {
+    into.push(this.missing);
+    for (const { model } of this.cues) into.push(model);
+    for (const { model } of this.popcorn) into.push(model);
+    for (const voices of Object.values(this.voices)) for (const model of voices?.models ?? []) into.push(model);
+    this.areas.drawnEffects(into);
+  }
+
   destroy(): void {
     this.clear();
     this.areas.destroy();
