@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-507 rows: 455 parity, 34 deviations, 18 open.
+508 rows: 455 parity, 35 deviations, 18 open.
 
 ## Deviations from Melee
 
@@ -98,6 +98,8 @@ deviation's reason, issue and decision date are written.
   - Ours: 70; Melee: not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units
 - Murloc's jab 2 reach `murloc-jab2-reach`: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497)
   - Ours: 78; Melee: not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units
+- Maiev's down tilt reach `maiev-down-tilt-reach`: her down tilt is a low leg sweep, so its region follows the sweeping leg along the floor in front and keeps the old reach; frame data, damage and knockback are unchanged (Tom 2026-10-26, #517)
+  - Ours: 105; Melee: not documented: Fox's down tilt sweeps his tail along the floor, and no Melee page gives its reach in units
 
 ## Hits, knockback and hitstun
 
@@ -795,3 +797,4 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Illidan's down smash launch angle, front and back `illidan-down-smash-angle` | 25° | [25°](https://www.fightcore.gg/characters/218/falco/moves/1330/dsmash/) | [originalMoves.ts:27](../../ts/src/game/sim/originalMoves.ts#L27) `ILLIDAN_MOVES` | parity |
 | Murloc's jab 1 reach `murloc-jab-reach` | 70 | [not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units](https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack) | [moves.ts:22](../../ts/src/game/fighters/murloc/moves.ts#L22) `MURLOC_MOVES` | deviation: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497) |
 | Murloc's jab 2 reach `murloc-jab2-reach` | 78 | [not documented: Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units](https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack) | [moves.ts:22](../../ts/src/game/fighters/murloc/moves.ts#L22) `MURLOC_MOVES` | deviation: his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged (Tom 2026-10-26, #497) |
+| Maiev's down tilt reach `maiev-down-tilt-reach` | 105 | [not documented: Fox's down tilt sweeps his tail along the floor, and no Melee page gives its reach in units](https://www.ssbwiki.com/Fox_(SSBM)/Down_tilt) | [moves.ts:261](../../ts/src/game/fighters/warden/moves.ts#L261) `WARDEN_MOVES` | deviation: her down tilt is a low leg sweep, so its region follows the sweeping leg along the floor in front and keeps the old reach; frame data, damage and knockback are unchanged (Tom 2026-10-26, #517) |

@@ -16,6 +16,8 @@ const SPLIT_ANGLE = "25°";
 const FOX_DOWN_SMASH_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Down_smash";
 const FALCO_DOWN_SMASH_PAGE = "https://www.ssbwiki.com/Falco_(SSBM)/Down_smash";
 const MURLOC = "ts/src/game/fighters/murloc/moves.ts";
+const FOX_DOWN_TILT = { undocumented: "Fox's down tilt sweeps his tail along the floor, and no Melee page gives its reach in units", source: "https://www.ssbwiki.com/Fox_(SSBM)/Down_tilt" } as const;
+const LEG_SWEEP = { kind: "deviation", reason: "her down tilt is a low leg sweep, so its region follows the sweeping leg along the floor in front and keeps the old reach; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 517 } as const;
 const SQUIRTLE_JAB = { undocumented: "Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units", source: "https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack" } as const;
 const SPEAR_POINT = { kind: "deviation", reason: "his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 497 } as const;
 const LOW_KNOCKBACK = { kind: "deviation", reason: "Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold", decided: "2026-10-26", issue: 305 } as const;
@@ -50,6 +52,12 @@ function downSmashAngle(moves: FighterMoves): string {
   const [value] = angles;
   if (angles.length !== 1 || value === undefined) throw new Error(`down smash angles disagree: ${angles.join(", ")}`);
   return value;
+}
+
+function maievDownTiltReach(): number {
+  const regions = WARDEN_MOVES.normals[AttackStyle.downTilt]?.regions ?? [];
+  if (regions.length === 0) throw new Error("Maiev's down tilt has no hit region");
+  return Math.max(...regions.map((region) => region.hit.maxX));
 }
 
 const angle = (effect: HitEffect): string => (effect.sakurai === true ? FOX_NEUTRAL_AIR.angle : `${Math.round((Math.atan2(effect.launchZ, Math.abs(effect.launchX)) * 180) / Math.PI)}°`);
@@ -100,5 +108,10 @@ export const MOVE_ROWS: readonly LedgerRow[] = [
     id: "murloc-jab2-reach", family: "moves", name: "Murloc's jab 2 reach",
     melee: SQUIRTLE_JAB, ours: () => murlocReach(AttackStyle.jab2),
     anchor: { file: MURLOC, symbol: "MURLOC_MOVES" }, status: SPEAR_POINT,
+  },
+  {
+    id: "maiev-down-tilt-reach", family: "moves", name: "Maiev's down tilt reach",
+    melee: FOX_DOWN_TILT, ours: maievDownTiltReach,
+    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: LEG_SWEEP,
   },
 ];

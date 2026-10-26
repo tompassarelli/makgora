@@ -87,6 +87,7 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   "shadow-hunter": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"],
   thrall: ["back-air"],
   illidan: ["down-tilt"],
+  warden: ["down-tilt"],
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
 };
 
