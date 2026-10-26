@@ -115,3 +115,15 @@ window there are keyed every frame from the brief's poses (`everyFrame`).
 Drive, recoil and settle lifted readability and follow-through to 4; weight
 and character stayed at 3, because the cloak hides his hips, legs and free
 hand at tile size and judges read the lunge as a rigid board.
+
+Medivh's dash attack is now authored in Blender
+(`tools/animations/medivh-dash-attack.py`), as gate 40 ruled for a stalled
+generator clip. Three things the generator could not do carried it: feet and
+staff hand solved to targets each frame (a planted front foot, a back leg that
+stretches out), the staff aimed along its own shaft rather than the
+hand-to-staff pivot line (28° off), and robe panels that flare over the legs
+just enough to keep the hem off the floor. Without the flare, the per-frame
+floor-set lifted the whole body back up by however far the hips dropped. His
+arcane cue (Medivh's own missile) is drawn on the move as a caster's signature
+normal. Lines 1–4 pass (body share 0.93, held 7, return 1.34) and three fresh
+judges give medians 4/4/4/4/4.

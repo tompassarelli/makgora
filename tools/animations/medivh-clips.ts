@@ -19,9 +19,12 @@ import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
 class ClipFailure extends Schema.TaggedError<ClipFailure>()("ClipFailure", { cause: Schema.Unknown }) {}
 BunRuntime.runMain(Effect.tryPromise({ try: async () => {
-const args = process.argv.slice(2), [input, output] = args.slice(0, 2).map(p => resolve(p)), replaced = args.slice(2), inPlace = replaced.length > 0;
+const args = process.argv.slice(2), [input, output] = args.slice(0, 2).map(p => resolve(p));
+const option = (name: string) => { const at = args.indexOf(name); return at < 0 ? undefined : resolve(args[at + 1] ?? ""); };
+const rigOutput = option("--rig"), bakedKeys = option("--keys");
+const replaced = args.slice(2).filter((a, i, all) => !a.startsWith("--") && !all[i - 1]?.startsWith("--")) as HeroPose[], inPlace = replaced.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx|SHIPPED_MEDIVH.mdx PRIVATE_OUTPUT [POSE...]");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || replaced.length === 1), "usage: bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx|SHIPPED_MEDIVH.mdx PRIVATE_OUTPUT [POSE...] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure((inPlace ? source.Sequences.some(s => s.Name === "Medivh Damage 0 0") : source.Sequences.length === 22) && source.Bones.some(b => b.Name === "Staff"), "Expected original classic Medivh");
 const stand = source.Sequences[0]!;
@@ -143,6 +146,15 @@ function joint(name:string,g:Gesture):[number,number]{
  return [0,0];
 }
 const originals=new Map<string,mdx.AnimVector>();tracks(source,(t,p)=>originals.set(p,t));
+const skeleton=(["Bones","Helpers"] as const).flatMap(kind=>model[kind].map((n,i)=>({n,path:`.${kind}.${i}`})));
+if(rigOutput){
+ const action=actions.find(a=>a.pose===replaced[0]),style=normals.find(([pose])=>pose===replaced[0])?.[1],move=style===undefined?undefined:hero.moves.normals[style];ensure(action&&move,`${replaced[0]}: not an authored Medivh normal`);
+ const at=(path:string)=>{const t=originals.get(path),v=t&&!onGlobalClock(t)?t.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])?.Vector:undefined;return v?Array.from(v):null;};
+ const staff=model.Nodes.find(n=>n?.Name.trim()==="Staff")!,grip=Array.from(source.PivotPoints[staff.ObjectId]!);let staffTip=grip,reach=0;
+ for(const g of source.Geosets)for(let v=0;v<g.Vertices.length/3;v++)if(g.Groups[g.VertexGroup[v]!]?.includes(staff.ObjectId)){const p=Array.from(g.Vertices.subarray(3*v,3*v+3)),d=Math.hypot(...p.map((x,i)=>x-grip[i]!));if(d>reach){reach=d;staffTip=p;}}
+ await Bun.write(rigOutput,JSON.stringify({frames:action.frames,contact:action.contact,active:move.activeFrames,staffTip,nodes:skeleton.map(({n,path})=>({name:n.Name,parent:skeleton.findIndex(s=>s.n.ObjectId===n.Parent),pivot:Array.from(source.PivotPoints[n.ObjectId]!),rotation:at(`${path}.Rotation`),translation:at(`${path}.Translation`)}))}));
+ console.log(`MEDIVH_RIG ${replaced[0]} ${rigOutput}`);return;
+}
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[], records:{pose:string;index:number;frames:number;contact:number}[]=[];
 const damageActions:Action[]=[];
@@ -224,6 +236,20 @@ if(!inPlace)for(const [ordinal,action]of actions.entries())if(/^victim(Pummel|Th
  const sequence=model.Sequences[source.Sequences.length+ordinal]!,[first,last]=sequence.Interval,contact=first!+Math.round(action.contact*1000/60),start=cursor;cursor=start+1100;
  tracks(model,track=>{if(onGlobalClock(track))return;for(const key of track.Keys)if(key.Frame>=first!&&key.Frame<=last!)key.Frame=start+(key.Frame<=contact?Math.round((key.Frame-first!)/(contact-first!)*500):500+Math.round((key.Frame-contact)/(last!-contact)*500));track.Keys.sort((a,b)=>a.Frame-b.Frame);});
  sequence.Interval=new Uint32Array([start,start+1000]);
+}
+if(bakedKeys){
+ const action=actions.find(a=>a.pose===replaced[0])!,index=model.Sequences.findIndex(s=>s.Name===`Medivh ${action.pose}`),[start,end]=model.Sequences[index]!.Interval as unknown as [number,number];
+ const authored=await Bun.file(bakedKeys).json() as {frames:number;nodes:{rotation:number[][];translation:number[][]}[]};
+ ensure(authored.frames===action.frames&&authored.nodes.length===skeleton.length,`${action.pose}: Blender keys cover ${authored.frames} frames of ${authored.nodes.length} nodes, the move ${action.frames} of ${skeleton.length}`);
+ const at=(frame:number)=>start+Math.round(frame*1000/60);
+ for(const [node,{n}]of skeleton.entries())for(const kind of ["Rotation","Translation"] as const){
+  const track=n[kind];if(!track||onGlobalClock(track))continue;
+  const baked=authored.nodes[node]![kind==="Rotation"?"rotation":"translation"];
+  track.Keys=[...track.Keys.filter(k=>k.Frame<start||k.Frame>end),...baked.map((v,frame)=>{const Vector=Float32Array.from(v);return {Frame:at(frame),Vector,...(track.LineType>=mdx.LineType.Hermite?{InTan:Vector.slice(),OutTan:Vector.slice()}:{})};})].sort((a,b)=>a.Frame-b.Frame);
+ }
+ const root=model.Nodes.find(n=>n?.Name==="Bone_Root")!.Translation!,drawn=new DrawnModel(generateMDX(model),1);
+ for(let frame=0;frame<=action.frames;frame++){const triangles=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangles.length;i+=2)lowest=Math.min(lowest,triangles[i]!);root.Keys.find(k=>k.Frame===at(frame))!.Vector[2]!-=lowest;}
+ ensure(end===at(action.frames),`${action.pose}: timing changed`);
 }
 const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"medivh.mdx"),bytes);
 const clipTable=join(project,"ts/src/game/presentation/heroes/medivhClips.ts");

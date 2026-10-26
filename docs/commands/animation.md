@@ -161,6 +161,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   Given the shipped model and pose names (`dashAttack`) instead, it re-authors only
   those clips in place at their indices, fits a retimed clip before the next sequence,
   rewrites its binding and checks every other clip is unchanged.
+  His dash attack is authored in Blender (#343): `... SHIPPED_MEDIVH.mdx PRIVATE_OUTPUT dashAttack --rig RIG.json`
+  writes his skeleton, stand pose and staff tip, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/medivh-dash-attack.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, and `... dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
 
 - Jaina animation authoring (from the repository root):
   `bun tools/animations/jaina-clips.ts STOCK_JAINA.mdx PRIVATE_OUTPUT`

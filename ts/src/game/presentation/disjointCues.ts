@@ -12,6 +12,7 @@ import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegio
 const NEUTRAL_FLARE: Cue = { model: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx", anchor: "body", scale: 0.5, sequence: "stand", seconds: f32(0.3), timeScale: 0.0 };
 const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", seconds: f32(0.2), timeScale: 1.0, birth: { eachFrame: false } };
 const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
+const ARCANE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", scale: f32(0.9), seconds: f32(0.3), timeScale: 1.0, birth: { eachFrame: false } };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
@@ -39,7 +40,12 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.murloc]: NEUTRAL_FLARE,
   [Character.grom]: FIRE_FLARE,
   [Character.malfurion]: NEUTRAL_FLARE,
-  [Character.medivh]: NEUTRAL_FLARE,
+  [Character.medivh]: ARCANE_FLARE,
+};
+
+
+export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly AttackStyle[] } = {
+  [Character.medivh]: [AttackStyle.dashAttack],
 };
 
 
@@ -48,7 +54,9 @@ const FORSAKEN_SWORD_NORMALS: readonly AttackStyle[] = Object.values(AttackStyle
 
 export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
   if (fighter.character === Character.forsakenPaladin) return FORSAKEN_SWORD_NORMALS;
-  return DISJOINT_CUES[fighter.character] === undefined ? [] : REACH_CUE_NORMALS[fighter.character] ?? [];
+  if (DISJOINT_CUES[fighter.character] === undefined) return [];
+  const reach = REACH_CUE_NORMALS[fighter.character] ?? [], signature = SIGNATURE_CUE_NORMALS[fighter.character] ?? [];
+  return signature.length === 0 ? reach : [...reach, ...signature.filter(style => !reach.includes(style))];
 }
 
 
