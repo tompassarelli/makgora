@@ -32,8 +32,9 @@ input gates and countdowns on the frame hitlag reaches zero; release DI and
 ASDI happen before that frame's physics.
 
 Two launches stack only when the second comes 10 or more frames after the
-first; otherwise the second replaces the first (SmashWiki "Knockback",
-section "Knockback stacking"). From frame ten Smashcraft merges each axis: opposite
+first and leaves the fighter airborne; otherwise the second replaces the first,
+so a hit that keeps its target on the floor always replaces (SmashWiki
+"Knockback", In Melee; smashcraft#536). From frame ten Smashcraft merges each axis: opposite
 components add and same-direction components keep the greater magnitude. The
 launch age freezes during hitlag. The contact batch first chooses its strongest
 launch, then merges it once with residual motion; hitstun and reaction level

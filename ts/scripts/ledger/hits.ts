@@ -2,11 +2,12 @@ import { Action } from "../../src/game/input/actions";
 import { type Scene, fighter, frame, solo } from "../../src/game/match/padScene";
 import { Character, ContactKind } from "../../src/game/sim/codes";
 import { beginDamageContacts, collectDamageContact, finishDamageContacts } from "../../src/game/sim/contacts";
+import { createFighter } from "../../src/game/sim/fighter";
 import {
   CROUCH_CANCEL_KNOCKBACK_SCALE, DI_MAX_DEGREES, ELECTRIC_HITLAG_SCALE, HITLAG_CAP_FRAMES, HITSTUN_FRAMES_PER_KNOCKBACK, KNOCKBACK_CAP,
   KNOCKBACK_DAMAGE_SCALE, KNOCKBACK_GROWTH_ADDEND, KNOCKBACK_GROWTH_SCALE, KNOCKBACK_LAUNCH_SPEED, KNOCKBACK_PERCENT_SCALE, KNOCKBACK_STACKING_FRAMES,
   SAKURAI_AIRBORNE_DEGREES, SAKURAI_GROUNDED_DEGREES, SAKURAI_HIGH_KNOCKBACK, SAKURAI_LOW_KNOCKBACK, SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG,
-  damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
+  ageKnockback, damageLevelForKnockback, effectKnockback, fixedHitKnockback, installDamageLaunch, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
 } from "../../src/game/sim/knockback";
 import { REFERENCE_HURT_CAPSULE } from "../../src/game/sim/geometry/contactGeometry";
 import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
@@ -24,6 +25,23 @@ const KNOCKBACK = "ts/src/game/sim/knockback.ts";
 const DAMAGE = range(1, 50);
 const MELEE_FREEZE = "attacker and victim on direct and shield hits; not a projectile's shooter";
 const FREEZE_HIT = { damage: 10.0, growth: 100.0, base: 21.0, launchX: 0.7071067690849304, launchZ: 0.7071067690849304, electric: false };
+
+const STACKING_PROBE_FRAMES = 12;
+
+function secondHitLaunchX(grounded: boolean): number {
+  const target = createFighter(Character.rifleman, 0.0, 1);
+  installDamageLaunch(target, 50.0, 1.0, 0.0, grounded);
+  for (let n = 0; n < STACKING_PROBE_FRAMES; n++) ageKnockback(target);
+  installDamageLaunch(target, 30.0, -1.0, 0.0, grounded);
+  return target.launch.knockbackX;
+}
+
+function secondHitOnGrounded(): string {
+  const alone = createFighter(Character.rifleman, 0.0, 1);
+  installDamageLaunch(alone, 30.0, -1.0, 0.0, true);
+  const grounded = secondHitLaunchX(true) === alone.launch.knockbackX ? "replaces the first launch" : "merges with the first launch";
+  return secondHitLaunchX(false) === alone.launch.knockbackX ? `${grounded}; airborne also replaces` : grounded;
+}
 
 function frozen(direct: boolean, shielded: boolean): string {
   const s: Scene = solo(0, Character.rifleman);
@@ -211,10 +229,10 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     anchor: { file: KNOCKBACK, symbol: "KNOCKBACK_STACKING_FRAMES" }, status: PARITY,
   },
   {
-    id: "knockback-stacking-grounded", family: "hits", name: "A second hit on a fighter it leaves grounded",
-    melee: { value: "replaces the first launch", source: wiki("Knockback") }, ours: () => "merges with the first launch past the stacking frames",
-    anchor: { file: KNOCKBACK, symbol: "installDamageLaunch" },
-    status: { kind: "open", reason: "ours merges a late second launch whether or not it lifts the target; Melee merges only when the target leaves the ground", issue: 293 },
+    id: "knockback-stacking-grounded", family: "hits",
+    name: "A second hit on a fighter it leaves grounded, probed headless: knockback 30 back 12 frames after knockback 50 forward",
+    melee: { value: "replaces the first launch", source: wiki("Knockback") }, ours: secondHitOnGrounded,
+    anchor: { file: KNOCKBACK, symbol: "installDamageLaunch" }, status: PARITY,
   },
   {
     id: "di-angle", family: "hits", name: "Trajectory DI, most degrees",

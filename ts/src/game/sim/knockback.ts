@@ -194,7 +194,7 @@ export function installDamageLaunch(target: Fighter, knockback: number, directio
     target.jump.remaining = aerialJumps(target);
     target.special.airtimeUses = 0;
   }
-  if (launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
+  if (!motion.grounded && launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
     launch.knockbackX = mergeLaunchAxis(launch.knockbackX, launchX);
     launch.knockbackZ = mergeLaunchAxis(launch.knockbackZ, launchZ);
   } else {
