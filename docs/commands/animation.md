@@ -182,6 +182,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/grom-dash-attack.py -- RIG.json KEYS.json`
   bakes one key per attack frame, turning every joint in the side-view plane and solving the axe arm onto each key's hand and axe-head aim,
   and `... dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
+  Mountain King's neutral and forward air are authored in Blender around his hammers (#511):
+  `bun tools/animations/mountain-king-aerials.ts SHIPPED_MOUNTAIN_KING.mdx PRIVATE_OUTPUT neutralAir|forwardAir --rig RIG.json`
+  writes his skeleton, Stand Ready rest pose and both hammer heads measured from the mesh, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/mountain-king-aerials.py -- RIG.json KEYS.json`
+  bakes one key per attack frame, and `... POSE --keys KEYS.json` splices them into the shipped
+  roster gesture in place, lights his stock Bash trail through the active frames and checks every
+  other clip is unchanged. Run it after `attack-gesture-clips.ts --character 4`, which rebuilds his
+  gestures, then run `bun wisp view strikes` so the strike table follows the new contact poses.
   `blender --background --python tools/animations/strikes.py -- rifleman|illidan`.
   `SMASHCRAFT_ANIMATION_ASSETS=PRIVATE_DIR` selects the editable inputs;
   `SMASHCRAFT_STRIKE_CLIP='Attack Jab'` reauthors only the jab.
