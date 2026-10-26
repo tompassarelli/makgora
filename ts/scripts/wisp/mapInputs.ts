@@ -1,5 +1,5 @@
 
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
@@ -95,8 +95,10 @@ const OriginalClipEvidence = Schema.Struct({
 });
 
 const importLines = (path: string) =>
-  tryMapPromise("read import list", path, () => Bun.file(path).text()).pipe(
-    Effect.map((text) => text.split(/\r?\n/).filter((line) => line.length > 0)),
+  tryMapPromise("read import list", path, async () => path.endsWith(".txt")
+    ? Bun.file(path).text()
+    : (await Promise.all(readdirSync(path).filter((file) => file.endsWith(".txt")).sort().map((file) => Bun.file(join(path, file)).text()))).join("\n")).pipe(
+    Effect.map((text) => [...new Set(text.split(/\r?\n/).filter((line) => line.length > 0))]),
   );
 
 
@@ -104,7 +106,7 @@ const importLines = (path: string) =>
 
 
 export const GENERATED_MODELS: readonly { readonly list: string; readonly generator: string; readonly models: readonly string[] }[] = [
-  { list: "impact-assets/white-flash-imports.txt", generator: "tools/animations/white-flash-models.ts", models: Object.values(WHITE_FIGHTER_MODELS) },
+  { list: "impact-assets/white-flash-imports", generator: "tools/animations/white-flash-models.ts", models: Object.values(WHITE_FIGHTER_MODELS) },
   { list: "stage-assets/imports.txt", generator: "tools/stage/package.ts", models: [...new Set([...Object.values(STAGE_DECK_MODELS).flatMap(({ main, slab, alternate }) => alternate === undefined ? [main, slab] : [main, slab, alternate]), STAGE_SNOW_MODEL, STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, ...Object.values(STAGE_POINT_LIGHT_MODELS).flat(), ...Object.values(STAGE_SKY_MODELS)])] },
   { list: "impact-assets/imports.txt", generator: "tools/effects/package.ts", models: Object.values(impactModels) },
   { list: "impact-assets/frost-imports.txt", generator: "tools/effects/trap.ts", models: Object.values(frostModels) },
