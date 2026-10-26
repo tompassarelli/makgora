@@ -137,6 +137,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   takes `jab`, `jab2`, `forwardTilt` or `forwardTiltDown`, solves his shoulder and elbow each
   startup and active frame so the spear tip rides a straight line along the hit direction, and splices the same way.
   Both scripts share the rig, pose vocabulary and bake in `tools/animations/murloc_rig.py`.
+  Illidan's and Maiev's down tilts are leg sweeps authored in Blender (#517):
+  `bun tools/animations/rekey-clip.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose downTilt --limb R --rig RIG.json`
+  writes the fighter's skeleton, canonical joints and per-frame hit regions, then
+  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER`
+  poses the beats in `tools/animations/leg-sweeps/FIGHTER.json` (planted support foot, swept ankle on a floor arc,
+  hip twist, listed cloth folded clear of the floor), and `... --keys KEYS.json` re-keys the clip production plays
+  for the move in place, refusing an unrelated clip change, a frame below the stand or a lower leg outside the hit region.
   Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
   recovery, throw and nine pain gestures and refresh only his clip/stride rows.
   `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then
