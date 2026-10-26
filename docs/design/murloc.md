@@ -69,12 +69,12 @@ and action.
 | Forward throw | Shove; spacing | release 12, recover 20; 7%, 40° | [Tiderunner claws][wc] | [Squirtle forward throw][sq] |
 | Back throw | Roll behind; edge position | release 14, recover 22; 9%, 40° back | [murloc swim][wc] | [Squirtle back throw][sq] |
 | Up throw | Head toss; juggle | release 12, recover 14; 6%, 90° | [Tiderunner claws][wc] | [Squirtle up throw][sq] |
-| Down throw | Belly-press; tech chase | release 16, recover 22; 5%, 25° | [murloc swim][wc] | [Squirtle down throw][sq] |
+| Down throw | Belly-press; tech chase | release 16, recover 22; 6%, 70°, set knockback 90 | [murloc swim][wc] | [Squirtle down throw][sq] |
 | Get-up / ledge attack | Low sweep / forward claw | shared action timings; 6% / 6% | [Tiderunner claws][wc] | [Squirtle floor/ledge attacks][sq] |
 
 Launch classes: 70/18 for pokes, 90/22 for launchers, 105/26 for finishers
 (forward smash 112/26, back air 110/26),
-90/22 for the spike, 55/50 for up throw and 40/75 for down throw. Smashes
+90/22 for the spike, 55/50 for up throw and set knockback 90 for down throw. Smashes
 use the shared charge (physics.md, "Smash charge"). Shared grab escape, pummel limit,
 DI/SDI, techs and shield rules apply. No guaranteed repeat-grab or net loop
 is designed: Ensnare's slow lowers top speeds only, so the victim keeps every

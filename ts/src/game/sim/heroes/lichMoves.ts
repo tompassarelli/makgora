@@ -463,9 +463,9 @@ export const LICH_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.ice } },
-    [GrabAction.throwForward]: throwMove(14, 23, { ...hit(8.727526664733887, "EDGE", 35), growth: 43.0, base: 61.0 }),
-    [GrabAction.throwBack]: throwMove(18, 26, { ...hit(9.974315643310547, "EDGE", 40, true), growth: 27.5, base: 66.0 }),
+    [GrabAction.throwForward]: throwMove(14, 23, { ...hit(8.727526664733887, "EDGE", 35), growth: 60.5, base: 61.0 }),
+    [GrabAction.throwBack]: throwMove(18, 26, { ...hit(9.974315643310547, "EDGE", 40, true), growth: 45.0, base: 66.0 }),
     [GrabAction.throwUp]: throwMove(17, 13, hit(8.727526664733887, "JUGGLE", 90)),
-    [GrabAction.throwDown]: throwMove(19, 26, { ...hit(7.48073673248291, "CHASE", 70), growth: 24.5, base: 104.0 }),
+    [GrabAction.throwDown]: throwMove(19, 26, { ...hit(7.48073673248291, "CHASE", 70), growth: 0.0, base: 0.0, setKnockback: 90.0 }),
   },
 };

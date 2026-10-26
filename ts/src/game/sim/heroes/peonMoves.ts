@@ -92,9 +92,9 @@ export const PEON_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 60, totalFrames: 68, effect: peonHit(3.072000026702881, 90, 0.0, 0.0) },
-    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 34, effect: peonHit(7.168000221252441, 35, 46.5, 61.0) },
-    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: peonHit(8.192000389099121, 40, 31.5, 66.0, true) },
+    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 34, effect: peonHit(7.168000221252441, 35, 64.0, 61.0) },
+    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: peonHit(8.192000389099121, 40, 49.0, 66.0, true) },
     [GrabAction.throwUp]: { contactFrame: 12, totalFrames: 22, effect: peonHit(6.144000053405762, 85, 54.17499923706055, 50.0) },
-    [GrabAction.throwDown]: { contactFrame: 17, totalFrames: 42, effect: peonHit(5.119999885559082, 25, 28.0, 104.0) },
+    [GrabAction.throwDown]: { contactFrame: 17, totalFrames: 42, effect: { ...peonHit(5.119999885559082, 70, 0.0, 0.0), setKnockback: 90.0 } },
   },
 };

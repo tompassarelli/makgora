@@ -258,9 +258,9 @@ export const PIT_LORD_MOVES: FighterMoves = {
   throws: {
 
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, ...NO_LAUNCH } },
-    [GrabAction.throwForward]: { contactFrame: 17, totalFrames: 44, effect: { ...hit(13.22969913482666, "EDGE", 35, 1.0, HitElement.normal), growth: 38.0, base: 61.0 } },
+    [GrabAction.throwForward]: { contactFrame: 17, totalFrames: 44, effect: { ...hit(13.22969913482666, "EDGE", 35, 1.0, HitElement.normal), growth: 43.0, base: 61.0 } },
     [GrabAction.throwBack]: { contactFrame: 22, totalFrames: 54, effect: { ...hit(14.43239974975586, "KILL", 40, -1.0, HitElement.normal), growth: 74.5, base: 56.0 } },
     [GrabAction.throwUp]: { contactFrame: 20, totalFrames: 30, effect: hit(10.600000381469727, "JUGGLE", 85, 1.0, HitElement.normal) },
-    [GrabAction.throwDown]: { contactFrame: 23, totalFrames: 50, effect: { ...hit(9.621599197387695, "CHASE", 70, 1.0, HitElement.normal), growth: 25.0, base: 104.0 } },
+    [GrabAction.throwDown]: { contactFrame: 23, totalFrames: 50, effect: { ...hit(9.621599197387695, "CHASE", 70, 1.0, HitElement.normal), growth: 0.0, base: 0.0, setKnockback: 90.0 } },
   },
 };

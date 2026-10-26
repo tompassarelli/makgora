@@ -21,33 +21,33 @@ Gap = mean Melee advantage (five references) minus mean ours (26 fighters), in f
 
 | Throw | Victim % | Ours | Melee | Gap | Knockback values | Weight in knockback | Thrower end lag | Weight-dependent timing |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| forward | 0 | 7.2 | 9.1 | 1.9 | -0.3 | -0.2 | 0.5 | 1.9 |
-| forward | 30 | 11.2 | 12.7 | 1.5 | -0.4 | -0.5 | 0.5 | 1.9 |
-| forward | 60 | 15.3 | 16.3 | 1 | -0.4 | -1 | 0.5 | 1.9 |
-| forward | 90 | 19.4 | 20.1 | 0.7 | -0.2 | -1.5 | 0.5 | 1.9 |
-| forward | all | 13.3 | 14.6 | 1.3 | -0.3 | -0.8 | 0.5 | 1.9 |
-| back | 0 | 6.4 | 4.7 | -1.7 | -0.1 | -0.3 | -6 | 4.7 |
-| back | 30 | 11.3 | 8.7 | -2.6 | -0.4 | -0.9 | -6 | 4.7 |
-| back | 60 | 16.3 | 12.7 | -3.5 | -0.8 | -1.5 | -6 | 4.7 |
-| back | 90 | 21 | 16.3 | -4.7 | -1.5 | -2 | -6 | 4.7 |
-| back | all | 13.8 | 10.6 | -3.1 | -0.7 | -1.1 | -6 | 4.7 |
-| up | 0 | 13.3 | 9.4 | -3.8 | 10.9 | -0.2 | -19.2 | 4.6 |
-| up | 30 | 18.7 | 12.8 | -5.9 | 9.5 | -0.8 | -19.2 | 4.6 |
-| up | 60 | 24 | 16.8 | -7.1 | 8.8 | -1.3 | -19.2 | 4.6 |
-| up | 90 | 29.4 | 20.8 | -8.5 | 8.3 | -2.3 | -19.2 | 4.6 |
-| up | all | 21.3 | 15 | -6.3 | 9.4 | -1.2 | -19.2 | 4.6 |
-| down | 0 | 18 | 27.8 | 9.8 | 1.8 | -1.3 | 6.5 | 2.8 |
-| down | 30 | 20.1 | 29.6 | 9.6 | 1.9 | -1.7 | 6.5 | 2.8 |
-| down | 60 | 22.3 | 31.6 | 9.4 | 1.9 | -1.9 | 6.5 | 2.8 |
-| down | 90 | 24.3 | 33.4 | 9.1 | 1.9 | -2.2 | 6.5 | 2.8 |
-| down | all | 21.2 | 30.6 | 9.5 | 1.9 | -1.8 | 6.5 | 2.8 |
-| all | all | 17.4 | 17.7 | 0.3 | 2.6 | -1.2 | -4.6 | 3.5 |
+| forward | 0 | 8.6 | 9.1 | 0.5 | -1.6 | -0.3 | 0.5 | 1.9 |
+| forward | 30 | 14 | 12.7 | -1.2 | -2.9 | -0.8 | 0.5 | 1.9 |
+| forward | 60 | 19.5 | 16.3 | -3.1 | -4.1 | -1.4 | 0.5 | 1.9 |
+| forward | 90 | 24.9 | 20.1 | -4.8 | -5.1 | -2.1 | 0.5 | 1.9 |
+| forward | all | 16.7 | 14.6 | -2.2 | -3.4 | -1.1 | 0.5 | 1.9 |
+| back | 0 | 7.1 | 4.7 | -2.4 | -0.9 | -0.2 | -6 | 4.7 |
+| back | 30 | 12.7 | 8.7 | -4 | -1.8 | -0.9 | -6 | 4.7 |
+| back | 60 | 18.3 | 12.7 | -5.6 | -2.8 | -1.6 | -6 | 4.7 |
+| back | 90 | 24 | 16.3 | -7.6 | -4.1 | -2.3 | -6 | 4.7 |
+| back | all | 15.5 | 10.6 | -4.9 | -2.4 | -1.2 | -6 | 4.7 |
+| up | 0 | 13.5 | 9.4 | -4.1 | 11 | -0.2 | -19.5 | 4.6 |
+| up | 30 | 19 | 12.8 | -6.1 | 9.6 | -0.8 | -19.5 | 4.6 |
+| up | 60 | 24.2 | 16.8 | -7.4 | 8.9 | -1.3 | -19.5 | 4.6 |
+| up | 90 | 29.6 | 20.8 | -8.8 | 8.4 | -2.3 | -19.5 | 4.6 |
+| up | all | 21.6 | 15 | -6.6 | 9.5 | -1.2 | -19.5 | 4.6 |
+| down | 0 | 10.9 | 27.8 | 17 | 42.6 | -35 | 6.5 | 2.8 |
+| down | 30 | 10.9 | 29.6 | 18.8 | 44.4 | -35 | 6.5 | 2.8 |
+| down | 60 | 10.9 | 31.6 | 20.8 | 46.4 | -35 | 6.5 | 2.8 |
+| down | 90 | 10.9 | 33.4 | 22.6 | 48.2 | -35 | 6.5 | 2.8 |
+| down | all | 10.9 | 30.6 | 19.8 | 45.4 | -35 | 6.5 | 2.8 |
+| all | all | 16.2 | 17.7 | 1.5 | 12.3 | -9.6 | -4.6 | 3.5 |
 
-Mean hitstun after a throw is 38.8 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.4 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 0.3 frames (knockback values 867%, weight in knockback -400%, thrower end lag -1533%, weight-dependent timing 1167%).
+Mean hitstun after a throw is 37.5 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.3 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 1.5 frames (knockback values 820%, weight in knockback -640%, thrower end lag -307%, weight-dependent timing 233%).
 
-Where ours trails Melee (8 of 16 throw and percent cells: forward 0%, forward 30%, forward 60%, forward 90%, down 0%, down 30%, down 60%, down 90%), the gap sums to 43 frames: knockback values 14%, weight in knockback -24%, thrower end lag 65%, weight-dependent timing 44%.
+Where ours trails Melee (5 of 16 throw and percent cells: forward 0%, down 0%, down 30%, down 60%, down 90%), the gap sums to 79.7 frames: knockback values 226%, weight in knockback -176%, thrower end lag 33%, weight-dependent timing 16%.
 
-Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 307 of 416 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 15 frames after the release), so it can tech before the thrower acts.
+Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 322 of 416 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
 
 ## Melee references
 
@@ -138,10 +138,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 
 | Fighter | Throw | Victim % | Frame advantage | Hitstun | Thrower end lag | Release frame | Release offset (x, z) | Launch |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Rifleman | forward | 0 | 17 | 36 | 19 | 12 | 8.3, 0 | 91.3 at 60°, tumble, knockdown at +19 |
-| Rifleman | forward | 30 | 20 | 39 | 19 | 12 | 8.3, 0 | 98.1 at 60°, tumble, knockdown at +22 |
-| Rifleman | forward | 60 | 22 | 41 | 19 | 12 | 8.3, 0 | 104.9 at 60°, tumble, knockdown at +25 |
-| Rifleman | forward | 90 | 25 | 44 | 19 | 12 | 8.3, 0 | 111.7 at 60°, tumble, knockdown at +29 |
+| Rifleman | forward | 0 | 17 | 36 | 19 | 12 | 8.3, 0 | 91.3 at 35°, tumble, knockdown at +12 |
+| Rifleman | forward | 30 | 20 | 39 | 19 | 12 | 8.3, 0 | 98.1 at 35°, tumble, knockdown at +13 |
+| Rifleman | forward | 60 | 22 | 41 | 19 | 12 | 8.3, 0 | 104.9 at 35°, tumble, knockdown at +14 |
+| Rifleman | forward | 90 | 25 | 44 | 19 | 12 | 8.3, 0 | 111.7 at 35°, tumble, knockdown at +15 |
 | Rifleman | back | 0 | 18 | 37 | 19 | 16 | -8.3, 0 | 93.7 at 150°, tumble, knockdown at +11 |
 | Rifleman | back | 30 | 20 | 39 | 19 | 16 | -8.3, 0 | 98.2 at 150°, tumble, knockdown at +11 |
 | Rifleman | back | 60 | 22 | 41 | 19 | 16 | -8.3, 0 | 102.6 at 150°, tumble, knockdown at +12 |
@@ -150,10 +150,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Rifleman | up | 30 | 16 | 27 | 11 | 14 | 8.3, 10.8 | 67.6 at 80° |
 | Rifleman | up | 60 | 20 | 31 | 11 | 14 | 8.3, 10.8 | 78.1 at 80° |
 | Rifleman | up | 90 | 24 | 35 | 11 | 14 | 8.3, 10.8 | 88.7 at 80°, tumble, knockdown at +29 |
-| Rifleman | down | 0 | 22 | 43 | 21 | 16 | 8.3, 0 | 109.9 at 70°, tumble, knockdown at +32 |
-| Rifleman | down | 30 | 24 | 45 | 21 | 16 | 8.3, 0 | 114.7 at 70°, tumble, knockdown at +36 |
-| Rifleman | down | 60 | 26 | 47 | 21 | 16 | 8.3, 0 | 119.5 at 70°, tumble, knockdown at +40 |
-| Rifleman | down | 90 | 28 | 49 | 21 | 16 | 8.3, 0 | 124.3 at 70°, tumble, knockdown at +44 |
+| Rifleman | down | 0 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rifleman | down | 30 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rifleman | down | 60 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rifleman | down | 90 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Illidan | forward | 0 | 17 | 36 | 19 | 12 | 8.3, 0 | 91.3 at 30°, tumble, knockdown at +10 |
 | Illidan | forward | 30 | 20 | 39 | 19 | 12 | 8.3, 0 | 98.1 at 30°, tumble, knockdown at +11 |
 | Illidan | forward | 60 | 22 | 41 | 19 | 12 | 8.3, 0 | 104.9 at 30°, tumble, knockdown at +12 |
@@ -166,26 +166,26 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Illidan | up | 30 | 16 | 27 | 11 | 14 | 8.3, 10.8 | 67.6 at 80° |
 | Illidan | up | 60 | 20 | 31 | 11 | 14 | 8.3, 10.8 | 78.1 at 80° |
 | Illidan | up | 90 | 24 | 35 | 11 | 14 | 8.3, 10.8 | 88.7 at 80°, tumble, knockdown at +29 |
-| Illidan | down | 0 | 22 | 43 | 21 | 16 | 8.3, 0 | 109.9 at 70°, tumble, knockdown at +32 |
-| Illidan | down | 30 | 24 | 45 | 21 | 16 | 8.3, 0 | 114.7 at 70°, tumble, knockdown at +36 |
-| Illidan | down | 60 | 26 | 47 | 21 | 16 | 8.3, 0 | 119.5 at 70°, tumble, knockdown at +40 |
-| Illidan | down | 90 | 28 | 49 | 21 | 16 | 8.3, 0 | 124.3 at 70°, tumble, knockdown at +44 |
-| Blademaster | forward | 0 | 9 | 28 | 19 | 12 | 8.3, 0 | 71.4 at 35° |
-| Blademaster | forward | 30 | 12 | 31 | 19 | 12 | 8.3, 0 | 79.6 at 35° |
-| Blademaster | forward | 60 | 16 | 35 | 19 | 12 | 8.3, 0 | 87.8 at 35°, tumble, knockdown at +11 |
-| Blademaster | forward | 90 | 19 | 38 | 19 | 12 | 8.3, 0 | 96 at 35°, tumble, knockdown at +12 |
-| Blademaster | back | 0 | 6 | 29 | 23 | 15 | -8.3, 0 | 72.9 at 140° |
-| Blademaster | back | 30 | 8 | 31 | 23 | 15 | -8.3, 0 | 79 at 140° |
-| Blademaster | back | 60 | 11 | 34 | 23 | 15 | -8.3, 0 | 85 at 140°, tumble, knockdown at +12 |
-| Blademaster | back | 90 | 13 | 36 | 23 | 15 | -8.3, 0 | 91.1 at 140°, tumble, knockdown at +13 |
+| Illidan | down | 0 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Illidan | down | 30 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Illidan | down | 60 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Illidan | down | 90 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Blademaster | forward | 0 | 12 | 31 | 19 | 12 | 8.3, 0 | 77.7 at 35° |
+| Blademaster | forward | 30 | 17 | 36 | 19 | 12 | 8.3, 0 | 91 at 35°, tumble, knockdown at +12 |
+| Blademaster | forward | 60 | 22 | 41 | 19 | 12 | 8.3, 0 | 104.2 at 35°, tumble, knockdown at +13 |
+| Blademaster | forward | 90 | 28 | 47 | 19 | 12 | 8.3, 0 | 117.5 at 35°, tumble, knockdown at +16 |
+| Blademaster | back | 0 | 8 | 31 | 23 | 15 | -8.3, 0 | 78.4 at 140° |
+| Blademaster | back | 30 | 12 | 35 | 23 | 15 | -8.3, 0 | 89.3 at 140°, tumble, knockdown at +13 |
+| Blademaster | back | 60 | 17 | 40 | 23 | 15 | -8.3, 0 | 100.1 at 140°, tumble, knockdown at +15 |
+| Blademaster | back | 90 | 21 | 44 | 23 | 15 | -8.3, 0 | 111 at 140°, tumble, knockdown at +17 |
 | Blademaster | up | 0 | 13 | 24 | 11 | 13 | 8.3, 10.8 | 62.1 at 85° |
 | Blademaster | up | 30 | 17 | 28 | 11 | 13 | 8.3, 10.8 | 70.7 at 85° |
 | Blademaster | up | 60 | 20 | 31 | 11 | 13 | 8.3, 10.8 | 79.3 at 85° |
 | Blademaster | up | 90 | 24 | 35 | 11 | 13 | 8.3, 10.8 | 87.9 at 85°, tumble, knockdown at +29 |
-| Blademaster | down | 0 | 23 | 44 | 21 | 16 | 8.3, 0 | 110.1 at 25°, tumble, knockdown at +11 |
-| Blademaster | down | 30 | 24 | 45 | 21 | 16 | 8.3, 0 | 113.8 at 25°, tumble, knockdown at +11 |
-| Blademaster | down | 60 | 26 | 47 | 21 | 16 | 8.3, 0 | 117.5 at 25°, tumble, knockdown at +11 |
-| Blademaster | down | 90 | 27 | 48 | 21 | 16 | 8.3, 0 | 121.2 at 25°, tumble, knockdown at +12 |
+| Blademaster | down | 0 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Blademaster | down | 30 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Blademaster | down | 60 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Blademaster | down | 90 | 15 | 36 | 21 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Muradin Bronzebeard | forward | 0 | 8 | 31 | 23 | 14 | 8.3, 0 | 77.5 at 35° |
 | Muradin Bronzebeard | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 91 at 35°, tumble, knockdown at +12 |
 | Muradin Bronzebeard | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.5 at 35°, tumble, knockdown at +13 |
@@ -194,14 +194,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Muradin Bronzebeard | back | 30 | 17 | 45 | 28 | 18 | -8.3, 0 | 113.7 at 140°, tumble, knockdown at +18 |
 | Muradin Bronzebeard | back | 60 | 29 | 57 | 28 | 18 | -8.3, 0 | 144.9 at 140°, tumble, knockdown at +31 |
 | Muradin Bronzebeard | back | 90 | 42 | 70 | 28 | 18 | -8.3, 0 | 176 at 140°, tumble |
-| Muradin Bronzebeard | up | 0 | 12 | 26 | 14 | 16 | 8.3, 10.8 | 65.5 at 90° |
-| Muradin Bronzebeard | up | 30 | 18 | 32 | 14 | 16 | 8.3, 10.8 | 80.5 at 90°, tumble, knockdown at +26 |
-| Muradin Bronzebeard | up | 60 | 24 | 38 | 14 | 16 | 8.3, 10.8 | 95.4 at 90°, tumble, knockdown at +33 |
-| Muradin Bronzebeard | up | 90 | 30 | 44 | 14 | 16 | 8.3, 10.8 | 110.4 at 90°, tumble |
-| Muradin Bronzebeard | down | 0 | 17 | 44 | 27 | 20 | 8.3, 0 | 111.5 at 70°, tumble, knockdown at +34 |
-| Muradin Bronzebeard | down | 30 | 20 | 47 | 27 | 20 | 8.3, 0 | 118.4 at 70°, tumble, knockdown at +39 |
-| Muradin Bronzebeard | down | 60 | 23 | 50 | 27 | 20 | 8.3, 0 | 125.3 at 70°, tumble, knockdown at +45 |
-| Muradin Bronzebeard | down | 90 | 25 | 52 | 27 | 20 | 8.3, 0 | 132.2 at 70°, tumble, knockdown at +51 |
+| Muradin Bronzebeard | up | 0 | 16 | 30 | 14 | 16 | 8.3, 10.8 | 75.5 at 90° |
+| Muradin Bronzebeard | up | 30 | 22 | 36 | 14 | 16 | 8.3, 10.8 | 90.5 at 90°, tumble, knockdown at +31 |
+| Muradin Bronzebeard | up | 60 | 28 | 42 | 14 | 16 | 8.3, 10.8 | 105.4 at 90°, tumble, knockdown at +40 |
+| Muradin Bronzebeard | up | 90 | 34 | 48 | 14 | 16 | 8.3, 10.8 | 120.4 at 90°, tumble |
+| Muradin Bronzebeard | down | 0 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Muradin Bronzebeard | down | 30 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Muradin Bronzebeard | down | 60 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Muradin Bronzebeard | down | 90 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Maiev Shadowsong | forward | 0 | 10 | 34 | 24 | 10 | 8.3, 0 | 85.9 at 40°, tumble, knockdown at +12 |
 | Maiev Shadowsong | forward | 30 | 14 | 38 | 24 | 10 | 8.3, 0 | 97.5 at 40°, tumble, knockdown at +14 |
 | Maiev Shadowsong | forward | 60 | 19 | 43 | 24 | 10 | 8.3, 0 | 109 at 40°, tumble, knockdown at +17 |
@@ -218,42 +218,42 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Maiev Shadowsong | down | 30 | 6 | 36 | 30 | 14 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Maiev Shadowsong | down | 60 | 6 | 36 | 30 | 14 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
 | Maiev Shadowsong | down | 90 | 6 | 36 | 30 | 14 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
-| Kel'Thuzad | forward | 0 | 4 | 28 | 24 | 14 | 8.3, 0 | 71.7 at 35° |
-| Kel'Thuzad | forward | 30 | 8 | 32 | 24 | 14 | 8.3, 0 | 82.1 at 35°, tumble, knockdown at +10 |
-| Kel'Thuzad | forward | 60 | 12 | 36 | 24 | 14 | 8.3, 0 | 92.4 at 35°, tumble, knockdown at +12 |
-| Kel'Thuzad | forward | 90 | 17 | 41 | 24 | 14 | 8.3, 0 | 102.7 at 35°, tumble, knockdown at +13 |
-| Kel'Thuzad | back | 0 | 2 | 29 | 27 | 18 | -8.3, 0 | 73.4 at 140° |
-| Kel'Thuzad | back | 30 | 5 | 32 | 27 | 18 | -8.3, 0 | 80.6 at 140°, tumble, knockdown at +11 |
-| Kel'Thuzad | back | 60 | 8 | 35 | 27 | 18 | -8.3, 0 | 87.9 at 140°, tumble, knockdown at +12 |
-| Kel'Thuzad | back | 90 | 11 | 38 | 27 | 18 | -8.3, 0 | 95.1 at 140°, tumble, knockdown at +14 |
+| Kel'Thuzad | forward | 0 | 6 | 30 | 24 | 14 | 8.3, 0 | 76.1 at 35° |
+| Kel'Thuzad | forward | 30 | 12 | 36 | 24 | 14 | 8.3, 0 | 90.6 at 35°, tumble, knockdown at +12 |
+| Kel'Thuzad | forward | 60 | 18 | 42 | 24 | 14 | 8.3, 0 | 105.2 at 35°, tumble, knockdown at +14 |
+| Kel'Thuzad | forward | 90 | 23 | 47 | 24 | 14 | 8.3, 0 | 119.7 at 35°, tumble, knockdown at +16 |
+| Kel'Thuzad | back | 0 | 4 | 31 | 27 | 18 | -8.3, 0 | 78 at 140° |
+| Kel'Thuzad | back | 30 | 8 | 35 | 27 | 18 | -8.3, 0 | 89.9 at 140°, tumble, knockdown at +13 |
+| Kel'Thuzad | back | 60 | 13 | 40 | 27 | 18 | -8.3, 0 | 101.8 at 140°, tumble, knockdown at +15 |
+| Kel'Thuzad | back | 90 | 18 | 45 | 27 | 18 | -8.3, 0 | 113.7 at 140°, tumble, knockdown at +18 |
 | Kel'Thuzad | up | 0 | 10 | 24 | 14 | 17 | 8.3, 10.8 | 60.1 at 90° |
 | Kel'Thuzad | up | 30 | 15 | 29 | 14 | 17 | 8.3, 10.8 | 74.7 at 90° |
 | Kel'Thuzad | up | 60 | 21 | 35 | 14 | 17 | 8.3, 10.8 | 89.3 at 90°, tumble, knockdown at +30 |
 | Kel'Thuzad | up | 90 | 27 | 41 | 14 | 17 | 8.3, 10.8 | 103.8 at 90°, tumble, knockdown at +39 |
-| Kel'Thuzad | down | 0 | 16 | 43 | 27 | 19 | 8.3, 0 | 109.7 at 70°, tumble, knockdown at +32 |
-| Kel'Thuzad | down | 30 | 19 | 46 | 27 | 19 | 8.3, 0 | 115 at 70°, tumble, knockdown at +36 |
-| Kel'Thuzad | down | 60 | 21 | 48 | 27 | 19 | 8.3, 0 | 120.3 at 70°, tumble, knockdown at +41 |
-| Kel'Thuzad | down | 90 | 23 | 50 | 27 | 19 | 8.3, 0 | 125.6 at 70°, tumble, knockdown at +45 |
-| Forsaken Paladin | forward | 0 | 5 | 29 | 24 | 14 | 8.3, 0 | 73.3 at 40° |
-| Forsaken Paladin | forward | 30 | 8 | 32 | 24 | 14 | 8.3, 0 | 81.9 at 40°, tumble, knockdown at +12 |
-| Forsaken Paladin | forward | 60 | 12 | 36 | 24 | 14 | 8.3, 0 | 90.4 at 40°, tumble, knockdown at +13 |
-| Forsaken Paladin | forward | 90 | 15 | 39 | 24 | 14 | 8.3, 0 | 98.9 at 40°, tumble, knockdown at +14 |
-| Forsaken Paladin | back | 0 | 3 | 30 | 27 | 18 | -8.3, 0 | 75.4 at 140° |
-| Forsaken Paladin | back | 30 | 5 | 32 | 27 | 18 | -8.3, 0 | 81.5 at 140°, tumble, knockdown at +11 |
-| Forsaken Paladin | back | 60 | 8 | 35 | 27 | 18 | -8.3, 0 | 87.6 at 140°, tumble, knockdown at +12 |
-| Forsaken Paladin | back | 90 | 10 | 37 | 27 | 18 | -8.3, 0 | 93.7 at 140°, tumble, knockdown at +13 |
+| Kel'Thuzad | down | 0 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kel'Thuzad | down | 30 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kel'Thuzad | down | 60 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kel'Thuzad | down | 90 | 9 | 36 | 27 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Forsaken Paladin | forward | 0 | 7 | 31 | 24 | 14 | 8.3, 0 | 79.8 at 40° |
+| Forsaken Paladin | forward | 30 | 13 | 37 | 24 | 14 | 8.3, 0 | 94.3 at 40°, tumble, knockdown at +13 |
+| Forsaken Paladin | forward | 60 | 19 | 43 | 24 | 14 | 8.3, 0 | 108.8 at 40°, tumble, knockdown at +16 |
+| Forsaken Paladin | forward | 90 | 25 | 49 | 24 | 14 | 8.3, 0 | 123.2 at 40°, tumble, knockdown at +21 |
+| Forsaken Paladin | back | 0 | 4 | 31 | 27 | 18 | -8.3, 0 | 79.8 at 140° |
+| Forsaken Paladin | back | 30 | 9 | 36 | 27 | 18 | -8.3, 0 | 90.1 at 140°, tumble, knockdown at +13 |
+| Forsaken Paladin | back | 60 | 13 | 40 | 27 | 18 | -8.3, 0 | 100.4 at 140°, tumble, knockdown at +15 |
+| Forsaken Paladin | back | 90 | 17 | 44 | 27 | 18 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +17 |
 | Forsaken Paladin | up | 0 | 14 | 24 | 10 | 16 | 8.3, 10.8 | 60.8 at 90° |
 | Forsaken Paladin | up | 30 | 18 | 28 | 10 | 16 | 8.3, 10.8 | 70 at 90° |
 | Forsaken Paladin | up | 60 | 21 | 31 | 10 | 16 | 8.3, 10.8 | 79.3 at 90° |
 | Forsaken Paladin | up | 90 | 25 | 35 | 10 | 16 | 8.3, 10.8 | 88.6 at 90°, tumble, knockdown at +30 |
-| Forsaken Paladin | down | 0 | 16 | 43 | 27 | 20 | 8.3, 0 | 109.3 at 70°, tumble, knockdown at +32 |
-| Forsaken Paladin | down | 30 | 18 | 45 | 27 | 20 | 8.3, 0 | 113.5 at 70°, tumble, knockdown at +35 |
-| Forsaken Paladin | down | 60 | 20 | 47 | 27 | 20 | 8.3, 0 | 117.7 at 70°, tumble, knockdown at +38 |
-| Forsaken Paladin | down | 90 | 21 | 48 | 27 | 20 | 8.3, 0 | 121.9 at 70°, tumble, knockdown at +42 |
-| Mal'Ganis | forward | 0 | 8 | 29 | 21 | 12 | 8.3, 0 | 72.6 at 35° |
-| Mal'Ganis | forward | 30 | 12 | 33 | 21 | 12 | 8.3, 0 | 84.8 at 35°, tumble, knockdown at +11 |
-| Mal'Ganis | forward | 60 | 17 | 38 | 21 | 12 | 8.3, 0 | 96.9 at 35°, tumble, knockdown at +12 |
-| Mal'Ganis | forward | 90 | 22 | 43 | 21 | 12 | 8.3, 0 | 109.1 at 35°, tumble, knockdown at +14 |
+| Forsaken Paladin | down | 0 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Forsaken Paladin | down | 30 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Forsaken Paladin | down | 60 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Forsaken Paladin | down | 90 | 9 | 36 | 27 | 20 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Mal'Ganis | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 75.6 at 35° |
+| Mal'Ganis | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 90.9 at 35°, tumble, knockdown at +12 |
+| Mal'Ganis | forward | 60 | 21 | 42 | 21 | 12 | 8.3, 0 | 106.1 at 35°, tumble, knockdown at +14 |
+| Mal'Ganis | forward | 90 | 27 | 48 | 21 | 12 | 8.3, 0 | 121.4 at 35°, tumble, knockdown at +17 |
 | Mal'Ganis | back | 0 | 6 | 32 | 26 | 18 | -8.3, 0 | 82.4 at 140°, tumble, knockdown at +12 |
 | Mal'Ganis | back | 30 | 18 | 44 | 26 | 18 | -8.3, 0 | 110.1 at 140°, tumble, knockdown at +17 |
 | Mal'Ganis | back | 60 | 29 | 55 | 26 | 18 | -8.3, 0 | 137.8 at 140°, tumble, knockdown at +27 |
@@ -262,30 +262,30 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Mal'Ganis | up | 30 | 16 | 31 | 15 | 15 | 8.3, 10.8 | 77.6 at 85° |
 | Mal'Ganis | up | 60 | 21 | 36 | 15 | 15 | 8.3, 10.8 | 91.6 at 85°, tumble, knockdown at +31 |
 | Mal'Ganis | up | 90 | 27 | 42 | 15 | 15 | 8.3, 10.8 | 105.6 at 85°, tumble, knockdown at +40 |
-| Mal'Ganis | down | 0 | 17 | 43 | 26 | 19 | 8.3, 0 | 109.8 at 25°, tumble, knockdown at +11 |
-| Mal'Ganis | down | 30 | 20 | 46 | 26 | 19 | 8.3, 0 | 115.8 at 25°, tumble, knockdown at +11 |
-| Mal'Ganis | down | 60 | 22 | 48 | 26 | 19 | 8.3, 0 | 121.7 at 25°, tumble, knockdown at +12 |
-| Mal'Ganis | down | 90 | 25 | 51 | 26 | 19 | 8.3, 0 | 127.7 at 25°, tumble, knockdown at +12 |
-| Shadow Hunter | forward | 0 | 8 | 29 | 21 | 12 | 8.3, 0 | 72.8 at 35° |
-| Shadow Hunter | forward | 30 | 12 | 33 | 21 | 12 | 8.3, 0 | 83.2 at 35°, tumble, knockdown at +11 |
-| Shadow Hunter | forward | 60 | 16 | 37 | 21 | 12 | 8.3, 0 | 93.6 at 35°, tumble, knockdown at +12 |
-| Shadow Hunter | forward | 90 | 20 | 41 | 21 | 12 | 8.3, 0 | 103.9 at 35°, tumble, knockdown at +13 |
-| Shadow Hunter | back | 0 | 4 | 29 | 25 | 16 | -8.3, 0 | 74.1 at 140° |
-| Shadow Hunter | back | 30 | 7 | 32 | 25 | 16 | -8.3, 0 | 81.6 at 140°, tumble, knockdown at +11 |
-| Shadow Hunter | back | 60 | 10 | 35 | 25 | 16 | -8.3, 0 | 89.2 at 140°, tumble, knockdown at +13 |
-| Shadow Hunter | back | 90 | 13 | 38 | 25 | 16 | -8.3, 0 | 96.7 at 140°, tumble, knockdown at +14 |
+| Mal'Ganis | down | 0 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Mal'Ganis | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Mal'Ganis | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Mal'Ganis | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Shadow Hunter | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 76.7 at 35° |
+| Shadow Hunter | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 90.4 at 35°, tumble, knockdown at +12 |
+| Shadow Hunter | forward | 60 | 20 | 41 | 21 | 12 | 8.3, 0 | 104.1 at 35°, tumble, knockdown at +13 |
+| Shadow Hunter | forward | 90 | 26 | 47 | 21 | 12 | 8.3, 0 | 117.9 at 35°, tumble, knockdown at +16 |
+| Shadow Hunter | back | 0 | 6 | 31 | 25 | 16 | -8.3, 0 | 78.1 at 140° |
+| Shadow Hunter | back | 30 | 10 | 35 | 25 | 16 | -8.3, 0 | 89.4 at 140°, tumble, knockdown at +13 |
+| Shadow Hunter | back | 60 | 15 | 40 | 25 | 16 | -8.3, 0 | 100.8 at 140°, tumble, knockdown at +15 |
+| Shadow Hunter | back | 90 | 19 | 44 | 25 | 16 | -8.3, 0 | 112.1 at 140°, tumble, knockdown at +17 |
 | Shadow Hunter | up | 0 | 16 | 25 | 9 | 14 | 8.3, 10.8 | 62.6 at 85° |
 | Shadow Hunter | up | 30 | 20 | 29 | 9 | 14 | 8.3, 10.8 | 72.7 at 85° |
 | Shadow Hunter | up | 60 | 24 | 33 | 9 | 14 | 8.3, 10.8 | 82.8 at 85°, tumble, knockdown at +27 |
 | Shadow Hunter | up | 90 | 28 | 37 | 9 | 14 | 8.3, 10.8 | 92.9 at 85°, tumble, knockdown at +32 |
-| Shadow Hunter | down | 0 | 20 | 44 | 24 | 17 | 8.3, 0 | 110.2 at 70°, tumble, knockdown at +33 |
-| Shadow Hunter | down | 30 | 21 | 45 | 24 | 17 | 8.3, 0 | 114.7 at 70°, tumble, knockdown at +36 |
-| Shadow Hunter | down | 60 | 23 | 47 | 24 | 17 | 8.3, 0 | 119.2 at 70°, tumble, knockdown at +40 |
-| Shadow Hunter | down | 90 | 25 | 49 | 24 | 17 | 8.3, 0 | 123.6 at 70°, tumble, knockdown at +43 |
-| Pit Lord | forward | 0 | 1 | 29 | 28 | 17 | 8.3, 0 | 73.9 at 35° |
-| Pit Lord | forward | 30 | 7 | 35 | 28 | 17 | 8.3, 0 | 87.6 at 35°, tumble, knockdown at +11 |
-| Pit Lord | forward | 60 | 12 | 40 | 28 | 17 | 8.3, 0 | 101.2 at 35°, tumble, knockdown at +13 |
-| Pit Lord | forward | 90 | 17 | 45 | 28 | 17 | 8.3, 0 | 114.9 at 35°, tumble, knockdown at +15 |
+| Shadow Hunter | down | 0 | 12 | 36 | 24 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Shadow Hunter | down | 30 | 12 | 36 | 24 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Shadow Hunter | down | 60 | 12 | 36 | 24 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Shadow Hunter | down | 90 | 12 | 36 | 24 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Pit Lord | forward | 0 | 2 | 30 | 28 | 17 | 8.3, 0 | 75.6 at 35° |
+| Pit Lord | forward | 30 | 8 | 36 | 28 | 17 | 8.3, 0 | 91 at 35°, tumble, knockdown at +12 |
+| Pit Lord | forward | 60 | 14 | 42 | 28 | 17 | 8.3, 0 | 106.5 at 35°, tumble, knockdown at +14 |
+| Pit Lord | forward | 90 | 20 | 48 | 28 | 17 | 8.3, 0 | 122 at 35°, tumble, knockdown at +17 |
 | Pit Lord | back | 0 | 0 | 33 | 33 | 22 | -8.3, 0 | 83.2 at 140°, tumble, knockdown at +12 |
 | Pit Lord | back | 30 | 11 | 44 | 33 | 22 | -8.3, 0 | 111.8 at 140°, tumble, knockdown at +17 |
 | Pit Lord | back | 60 | 23 | 56 | 33 | 22 | -8.3, 0 | 140.4 at 140°, tumble, knockdown at +28 |
@@ -294,30 +294,30 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Pit Lord | up | 30 | 20 | 31 | 11 | 20 | 8.3, 10.8 | 77.8 at 85° |
 | Pit Lord | up | 60 | 25 | 36 | 11 | 20 | 8.3, 10.8 | 91.8 at 85°, tumble, knockdown at +31 |
 | Pit Lord | up | 90 | 31 | 42 | 11 | 20 | 8.3, 10.8 | 105.8 at 85°, tumble, knockdown at +40 |
-| Pit Lord | down | 0 | 16 | 44 | 28 | 23 | 8.3, 0 | 110.6 at 70°, tumble, knockdown at +33 |
-| Pit Lord | down | 30 | 18 | 46 | 28 | 23 | 8.3, 0 | 117.2 at 70°, tumble, knockdown at +38 |
-| Pit Lord | down | 60 | 21 | 49 | 28 | 23 | 8.3, 0 | 123.8 at 70°, tumble, knockdown at +44 |
-| Pit Lord | down | 90 | 24 | 52 | 28 | 23 | 8.3, 0 | 130.4 at 70°, tumble, knockdown at +49 |
-| Rexxar | forward | 0 | 6 | 29 | 23 | 13 | 8.3, 0 | 74.6 at 35° |
-| Rexxar | forward | 30 | 11 | 34 | 23 | 13 | 8.3, 0 | 85.3 at 35°, tumble, knockdown at +11 |
-| Rexxar | forward | 60 | 15 | 38 | 23 | 13 | 8.3, 0 | 96.1 at 35°, tumble, knockdown at +12 |
-| Rexxar | forward | 90 | 19 | 42 | 23 | 13 | 8.3, 0 | 106.8 at 35°, tumble, knockdown at +14 |
-| Rexxar | back | 0 | 3 | 30 | 27 | 17 | -8.3, 0 | 75.1 at 140° |
-| Rexxar | back | 30 | 6 | 33 | 27 | 17 | -8.3, 0 | 83 at 140°, tumble, knockdown at +12 |
-| Rexxar | back | 60 | 9 | 36 | 27 | 17 | -8.3, 0 | 90.8 at 140°, tumble, knockdown at +13 |
-| Rexxar | back | 90 | 12 | 39 | 27 | 17 | -8.3, 0 | 98.7 at 140°, tumble, knockdown at +14 |
+| Pit Lord | down | 0 | 8 | 36 | 28 | 23 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Pit Lord | down | 30 | 8 | 36 | 28 | 23 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Pit Lord | down | 60 | 8 | 36 | 28 | 23 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Pit Lord | down | 90 | 8 | 36 | 28 | 23 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rexxar | forward | 0 | 8 | 31 | 23 | 13 | 8.3, 0 | 77.8 at 35° |
+| Rexxar | forward | 30 | 13 | 36 | 23 | 13 | 8.3, 0 | 91.1 at 35°, tumble, knockdown at +12 |
+| Rexxar | forward | 60 | 18 | 41 | 23 | 13 | 8.3, 0 | 104.3 at 35°, tumble, knockdown at +13 |
+| Rexxar | forward | 90 | 24 | 47 | 23 | 13 | 8.3, 0 | 117.6 at 35°, tumble, knockdown at +16 |
+| Rexxar | back | 0 | 4 | 31 | 27 | 17 | -8.3, 0 | 78.4 at 140° |
+| Rexxar | back | 30 | 8 | 35 | 27 | 17 | -8.3, 0 | 89.2 at 140°, tumble, knockdown at +13 |
+| Rexxar | back | 60 | 12 | 39 | 27 | 17 | -8.3, 0 | 99.9 at 140°, tumble, knockdown at +14 |
+| Rexxar | back | 90 | 17 | 44 | 27 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +17 |
 | Rexxar | up | 0 | 15 | 25 | 10 | 15 | 8.3, 10.8 | 64.8 at 85° |
 | Rexxar | up | 30 | 20 | 30 | 10 | 15 | 8.3, 10.8 | 76.7 at 85° |
 | Rexxar | up | 60 | 25 | 35 | 10 | 15 | 8.3, 10.8 | 88.7 at 85°, tumble, knockdown at +30 |
 | Rexxar | up | 90 | 30 | 40 | 10 | 15 | 8.3, 10.8 | 100.6 at 85°, tumble, knockdown at +37 |
-| Rexxar | down | 0 | 18 | 44 | 26 | 19 | 8.3, 0 | 111.3 at 70°, tumble, knockdown at +33 |
-| Rexxar | down | 30 | 20 | 46 | 26 | 19 | 8.3, 0 | 116.6 at 70°, tumble, knockdown at +37 |
-| Rexxar | down | 60 | 22 | 48 | 26 | 19 | 8.3, 0 | 121.8 at 70°, tumble, knockdown at +42 |
-| Rexxar | down | 90 | 24 | 50 | 26 | 19 | 8.3, 0 | 127.1 at 70°, tumble, knockdown at +46 |
-| Lich King | forward | 0 | 5 | 29 | 24 | 15 | 8.3, 0 | 72.7 at 35° |
-| Lich King | forward | 30 | 9 | 33 | 24 | 15 | 8.3, 0 | 84.9 at 35°, tumble, knockdown at +11 |
-| Lich King | forward | 60 | 14 | 38 | 24 | 15 | 8.3, 0 | 97.2 at 35°, tumble, knockdown at +12 |
-| Lich King | forward | 90 | 19 | 43 | 24 | 15 | 8.3, 0 | 109.5 at 35°, tumble, knockdown at +14 |
+| Rexxar | down | 0 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rexxar | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rexxar | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Rexxar | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Lich King | forward | 0 | 6 | 30 | 24 | 15 | 8.3, 0 | 75.9 at 35° |
+| Lich King | forward | 30 | 12 | 36 | 24 | 15 | 8.3, 0 | 91.5 at 35°, tumble, knockdown at +12 |
+| Lich King | forward | 60 | 18 | 42 | 24 | 15 | 8.3, 0 | 107.1 at 35°, tumble, knockdown at +14 |
+| Lich King | forward | 90 | 25 | 49 | 24 | 15 | 8.3, 0 | 122.8 at 35°, tumble, knockdown at +17 |
 | Lich King | back | 0 | 4 | 33 | 29 | 18 | -8.3, 0 | 82.7 at 140°, tumble, knockdown at +12 |
 | Lich King | back | 30 | 15 | 44 | 29 | 18 | -8.3, 0 | 110.1 at 140°, tumble, knockdown at +17 |
 | Lich King | back | 60 | 25 | 54 | 29 | 18 | -8.3, 0 | 137.4 at 140°, tumble, knockdown at +27 |
@@ -326,14 +326,14 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Lich King | up | 30 | 15 | 30 | 15 | 16 | 8.3, 10.8 | 76.4 at 85° |
 | Lich King | up | 60 | 20 | 35 | 15 | 16 | 8.3, 10.8 | 89.8 at 85°, tumble, knockdown at +30 |
 | Lich King | up | 90 | 26 | 41 | 15 | 16 | 8.3, 10.8 | 103.3 at 85°, tumble, knockdown at +38 |
-| Lich King | down | 0 | 16 | 43 | 27 | 24 | 8.3, 0 | 109.6 at 70°, tumble, knockdown at +32 |
-| Lich King | down | 30 | 18 | 45 | 27 | 24 | 8.3, 0 | 114.8 at 70°, tumble, knockdown at +36 |
-| Lich King | down | 60 | 20 | 47 | 27 | 24 | 8.3, 0 | 120 at 70°, tumble, knockdown at +40 |
-| Lich King | down | 90 | 23 | 50 | 27 | 24 | 8.3, 0 | 125.2 at 70°, tumble, knockdown at +45 |
-| Thrall | forward | 0 | 9 | 30 | 21 | 14 | 8.3, 0 | 76.8 at 35° |
-| Thrall | forward | 30 | 13 | 34 | 21 | 14 | 8.3, 0 | 86.4 at 35°, tumble, knockdown at +11 |
-| Thrall | forward | 60 | 17 | 38 | 21 | 14 | 8.3, 0 | 96 at 35°, tumble, knockdown at +12 |
-| Thrall | forward | 90 | 21 | 42 | 21 | 14 | 8.3, 0 | 105.6 at 35°, tumble, knockdown at +14 |
+| Lich King | down | 0 | 9 | 36 | 27 | 24 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Lich King | down | 30 | 9 | 36 | 27 | 24 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Lich King | down | 60 | 9 | 36 | 27 | 24 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Lich King | down | 90 | 9 | 36 | 27 | 24 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Thrall | forward | 0 | 10 | 31 | 21 | 14 | 8.3, 0 | 79.9 at 35° |
+| Thrall | forward | 30 | 15 | 36 | 21 | 14 | 8.3, 0 | 92.5 at 35°, tumble, knockdown at +12 |
+| Thrall | forward | 60 | 21 | 42 | 21 | 14 | 8.3, 0 | 105.1 at 35°, tumble, knockdown at +14 |
+| Thrall | forward | 90 | 26 | 47 | 21 | 14 | 8.3, 0 | 117.7 at 35°, tumble, knockdown at +16 |
 | Thrall | back | 0 | 9 | 32 | 23 | 18 | -8.3, 0 | 82.3 at 140°, tumble, knockdown at +12 |
 | Thrall | back | 30 | 13 | 36 | 23 | 18 | -8.3, 0 | 91 at 140°, tumble, knockdown at +13 |
 | Thrall | back | 60 | 16 | 39 | 23 | 18 | -8.3, 0 | 99.6 at 140°, tumble, knockdown at +14 |
@@ -342,46 +342,46 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Thrall | up | 30 | 25 | 39 | 14 | 15 | 8.3, 10.8 | 97.5 at 105°, tumble, knockdown at +33 |
 | Thrall | up | 60 | 32 | 46 | 14 | 15 | 8.3, 10.8 | 115.6 at 105°, tumble |
 | Thrall | up | 90 | 39 | 53 | 14 | 15 | 8.3, 10.8 | 133.7 at 105°, tumble |
-| Thrall | down | 0 | 20 | 44 | 24 | 19 | 8.3, 0 | 110.1 at 70°, tumble, knockdown at +33 |
-| Thrall | down | 30 | 22 | 46 | 24 | 19 | 8.3, 0 | 115.5 at 70°, tumble, knockdown at +37 |
-| Thrall | down | 60 | 24 | 48 | 24 | 19 | 8.3, 0 | 120.9 at 70°, tumble, knockdown at +41 |
-| Thrall | down | 90 | 26 | 50 | 24 | 19 | 8.3, 0 | 126.3 at 70°, tumble, knockdown at +46 |
-| Jaina Proudmoore | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.4 at 35° |
-| Jaina Proudmoore | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.9 at 35°, tumble, knockdown at +11 |
-| Jaina Proudmoore | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +13 |
-| Jaina Proudmoore | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +15 |
-| Jaina Proudmoore | back | 0 | 5 | 30 | 25 | 17 | -8.3, 0 | 77.1 at 140° |
-| Jaina Proudmoore | back | 30 | 9 | 34 | 25 | 17 | -8.3, 0 | 85.4 at 140°, tumble, knockdown at +12 |
-| Jaina Proudmoore | back | 60 | 12 | 37 | 25 | 17 | -8.3, 0 | 93.8 at 140°, tumble, knockdown at +13 |
-| Jaina Proudmoore | back | 90 | 15 | 40 | 25 | 17 | -8.3, 0 | 102.1 at 140°, tumble, knockdown at +15 |
+| Thrall | down | 0 | 12 | 36 | 24 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Thrall | down | 30 | 12 | 36 | 24 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Thrall | down | 60 | 12 | 36 | 24 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Thrall | down | 90 | 12 | 36 | 24 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Jaina Proudmoore | forward | 0 | 8 | 31 | 23 | 14 | 8.3, 0 | 77.5 at 35° |
+| Jaina Proudmoore | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 91.1 at 35°, tumble, knockdown at +12 |
+| Jaina Proudmoore | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.7 at 35°, tumble, knockdown at +14 |
+| Jaina Proudmoore | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 118.3 at 35°, tumble, knockdown at +16 |
+| Jaina Proudmoore | back | 0 | 6 | 31 | 25 | 17 | -8.3, 0 | 79.5 at 140° |
+| Jaina Proudmoore | back | 30 | 10 | 35 | 25 | 17 | -8.3, 0 | 90 at 140°, tumble, knockdown at +13 |
+| Jaina Proudmoore | back | 60 | 15 | 40 | 25 | 17 | -8.3, 0 | 100.4 at 140°, tumble, knockdown at +15 |
+| Jaina Proudmoore | back | 90 | 19 | 44 | 25 | 17 | -8.3, 0 | 110.9 at 140°, tumble, knockdown at +17 |
 | Jaina Proudmoore | up | 0 | 14 | 25 | 11 | 15 | 8.3, 10.8 | 63.8 at 90° |
 | Jaina Proudmoore | up | 30 | 21 | 32 | 11 | 15 | 8.3, 10.8 | 80.2 at 90°, tumble, knockdown at +26 |
 | Jaina Proudmoore | up | 60 | 27 | 38 | 11 | 15 | 8.3, 10.8 | 96.7 at 90°, tumble, knockdown at +34 |
 | Jaina Proudmoore | up | 90 | 34 | 45 | 11 | 15 | 8.3, 10.8 | 113.1 at 90°, tumble |
-| Jaina Proudmoore | down | 0 | 19 | 44 | 25 | 19 | 8.3, 0 | 111.3 at 70°, tumble, knockdown at +33 |
-| Jaina Proudmoore | down | 30 | 21 | 46 | 25 | 19 | 8.3, 0 | 117.2 at 70°, tumble, knockdown at +38 |
-| Jaina Proudmoore | down | 60 | 24 | 49 | 25 | 19 | 8.3, 0 | 123.1 at 70°, tumble, knockdown at +43 |
-| Jaina Proudmoore | down | 90 | 26 | 51 | 25 | 19 | 8.3, 0 | 129 at 70°, tumble, knockdown at +48 |
-| Sylvanas Windrunner | forward | 0 | 8 | 29 | 21 | 13 | 8.3, 0 | 73.4 at 40° |
-| Sylvanas Windrunner | forward | 30 | 11 | 32 | 21 | 13 | 8.3, 0 | 82.3 at 40°, tumble, knockdown at +12 |
-| Sylvanas Windrunner | forward | 60 | 15 | 36 | 21 | 13 | 8.3, 0 | 91.3 at 40°, tumble, knockdown at +13 |
-| Sylvanas Windrunner | forward | 90 | 19 | 40 | 21 | 13 | 8.3, 0 | 100.2 at 40°, tumble, knockdown at +15 |
-| Sylvanas Windrunner | back | 0 | 8 | 30 | 22 | 16 | -8.3, 0 | 75.1 at 140° |
-| Sylvanas Windrunner | back | 30 | 10 | 32 | 22 | 16 | -8.3, 0 | 81.6 at 140°, tumble, knockdown at +11 |
-| Sylvanas Windrunner | back | 60 | 13 | 35 | 22 | 16 | -8.3, 0 | 88 at 140°, tumble, knockdown at +12 |
-| Sylvanas Windrunner | back | 90 | 15 | 37 | 22 | 16 | -8.3, 0 | 94.5 at 140°, tumble, knockdown at +13 |
+| Jaina Proudmoore | down | 0 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Jaina Proudmoore | down | 30 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Jaina Proudmoore | down | 60 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Jaina Proudmoore | down | 90 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Sylvanas Windrunner | forward | 0 | 10 | 31 | 21 | 13 | 8.3, 0 | 79.5 at 40° |
+| Sylvanas Windrunner | forward | 30 | 16 | 37 | 21 | 13 | 8.3, 0 | 93.8 at 40°, tumble, knockdown at +13 |
+| Sylvanas Windrunner | forward | 60 | 22 | 43 | 21 | 13 | 8.3, 0 | 108 at 40°, tumble, knockdown at +16 |
+| Sylvanas Windrunner | forward | 90 | 27 | 48 | 21 | 13 | 8.3, 0 | 122.2 at 40°, tumble, knockdown at +20 |
+| Sylvanas Windrunner | back | 0 | 9 | 31 | 22 | 16 | -8.3, 0 | 79.8 at 140° |
+| Sylvanas Windrunner | back | 30 | 14 | 36 | 22 | 16 | -8.3, 0 | 90.6 at 140°, tumble, knockdown at +13 |
+| Sylvanas Windrunner | back | 60 | 18 | 40 | 22 | 16 | -8.3, 0 | 101.4 at 140°, tumble, knockdown at +15 |
+| Sylvanas Windrunner | back | 90 | 22 | 44 | 22 | 16 | -8.3, 0 | 112.2 at 140°, tumble, knockdown at +17 |
 | Sylvanas Windrunner | up | 0 | 20 | 31 | 11 | 14 | 8.3, 10.8 | 78.6 at 105° |
 | Sylvanas Windrunner | up | 30 | 26 | 37 | 11 | 14 | 8.3, 10.8 | 93.4 at 105°, tumble, knockdown at +31 |
 | Sylvanas Windrunner | up | 60 | 32 | 43 | 11 | 14 | 8.3, 10.8 | 108.1 at 105°, tumble, knockdown at +40 |
 | Sylvanas Windrunner | up | 90 | 38 | 49 | 11 | 14 | 8.3, 10.8 | 122.8 at 105°, tumble |
-| Sylvanas Windrunner | down | 0 | 22 | 44 | 22 | 18 | 8.3, 0 | 110.3 at 70°, tumble, knockdown at +33 |
-| Sylvanas Windrunner | down | 30 | 24 | 46 | 22 | 18 | 8.3, 0 | 115.2 at 70°, tumble, knockdown at +36 |
-| Sylvanas Windrunner | down | 60 | 26 | 48 | 22 | 18 | 8.3, 0 | 120.2 at 70°, tumble, knockdown at +40 |
-| Sylvanas Windrunner | down | 90 | 28 | 50 | 22 | 18 | 8.3, 0 | 125.1 at 70°, tumble, knockdown at +45 |
-| Cairne Bloodhoof | forward | 0 | 2 | 29 | 27 | 19 | 8.3, 0 | 74 at 35° |
-| Cairne Bloodhoof | forward | 30 | 7 | 34 | 27 | 19 | 8.3, 0 | 86.5 at 35°, tumble, knockdown at +11 |
-| Cairne Bloodhoof | forward | 60 | 12 | 39 | 27 | 19 | 8.3, 0 | 99 at 35°, tumble, knockdown at +13 |
-| Cairne Bloodhoof | forward | 90 | 17 | 44 | 27 | 19 | 8.3, 0 | 111.5 at 35°, tumble, knockdown at +15 |
+| Sylvanas Windrunner | down | 0 | 14 | 36 | 22 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Sylvanas Windrunner | down | 30 | 14 | 36 | 22 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Sylvanas Windrunner | down | 60 | 14 | 36 | 22 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Sylvanas Windrunner | down | 90 | 14 | 36 | 22 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Cairne Bloodhoof | forward | 0 | 3 | 30 | 27 | 19 | 8.3, 0 | 76.6 at 35° |
+| Cairne Bloodhoof | forward | 30 | 9 | 36 | 27 | 19 | 8.3, 0 | 91.4 at 35°, tumble, knockdown at +12 |
+| Cairne Bloodhoof | forward | 60 | 15 | 42 | 27 | 19 | 8.3, 0 | 106.3 at 35°, tumble, knockdown at +14 |
+| Cairne Bloodhoof | forward | 90 | 21 | 48 | 27 | 19 | 8.3, 0 | 121.2 at 35°, tumble, knockdown at +17 |
 | Cairne Bloodhoof | back | 0 | 0 | 32 | 32 | 23 | -8.3, 0 | 82.4 at 140°, tumble, knockdown at +12 |
 | Cairne Bloodhoof | back | 30 | 12 | 44 | 32 | 23 | -8.3, 0 | 110.4 at 140°, tumble, knockdown at +17 |
 | Cairne Bloodhoof | back | 60 | 23 | 55 | 32 | 23 | -8.3, 0 | 138.5 at 140°, tumble, knockdown at +27 |
@@ -390,10 +390,10 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Cairne Bloodhoof | up | 30 | 20 | 32 | 12 | 21 | 8.3, 10.8 | 80.8 at 85°, tumble |
 | Cairne Bloodhoof | up | 60 | 26 | 38 | 12 | 21 | 8.3, 10.8 | 95.9 at 85°, tumble, knockdown at +34 |
 | Cairne Bloodhoof | up | 90 | 32 | 44 | 12 | 21 | 8.3, 10.8 | 111 at 85°, tumble |
-| Cairne Bloodhoof | down | 0 | 16 | 44 | 28 | 24 | 8.3, 0 | 112 at 80°, tumble, knockdown at +37 |
-| Cairne Bloodhoof | down | 30 | 19 | 47 | 28 | 24 | 8.3, 0 | 119.5 at 80°, tumble, knockdown at +43 |
-| Cairne Bloodhoof | down | 60 | 22 | 50 | 28 | 24 | 8.3, 0 | 126.9 at 80°, tumble |
-| Cairne Bloodhoof | down | 90 | 25 | 53 | 28 | 24 | 8.3, 0 | 134.4 at 80°, tumble |
+| Cairne Bloodhoof | down | 0 | 8 | 36 | 28 | 24 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Cairne Bloodhoof | down | 30 | 8 | 36 | 28 | 24 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Cairne Bloodhoof | down | 60 | 8 | 36 | 28 | 24 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Cairne Bloodhoof | down | 90 | 8 | 36 | 28 | 24 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
 | Chen Stormstout | forward | 0 | 10 | 32 | 22 | 12 | 8.3, 0 | 80.6 at 40°, tumble, knockdown at +11 |
 | Chen Stormstout | forward | 30 | 15 | 37 | 22 | 12 | 8.3, 0 | 94.4 at 40°, tumble, knockdown at +13 |
 | Chen Stormstout | forward | 60 | 21 | 43 | 22 | 12 | 8.3, 0 | 108.1 at 40°, tumble, knockdown at +16 |
@@ -406,46 +406,46 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Chen Stormstout | up | 30 | 16 | 28 | 12 | 14 | 8.3, 10.8 | 70.8 at 90° |
 | Chen Stormstout | up | 60 | 20 | 32 | 12 | 14 | 8.3, 10.8 | 81.1 at 90°, tumble, knockdown at +26 |
 | Chen Stormstout | up | 90 | 24 | 36 | 12 | 14 | 8.3, 10.8 | 91.4 at 90°, tumble, knockdown at +31 |
-| Chen Stormstout | down | 0 | 19 | 44 | 25 | 18 | 8.3, 0 | 111 at 70°, tumble, knockdown at +33 |
-| Chen Stormstout | down | 30 | 22 | 47 | 25 | 18 | 8.3, 0 | 117.6 at 70°, tumble, knockdown at +38 |
-| Chen Stormstout | down | 60 | 24 | 49 | 25 | 18 | 8.3, 0 | 124.2 at 70°, tumble, knockdown at +44 |
-| Chen Stormstout | down | 90 | 27 | 52 | 25 | 18 | 8.3, 0 | 130.8 at 70°, tumble, knockdown at +50 |
-| Peon | forward | 0 | 6 | 28 | 22 | 13 | 8.3, 0 | 71.8 at 35° |
-| Peon | forward | 30 | 10 | 32 | 22 | 13 | 8.3, 0 | 81.8 at 35°, tumble, knockdown at +10 |
-| Peon | forward | 60 | 14 | 36 | 22 | 13 | 8.3, 0 | 91.9 at 35°, tumble, knockdown at +12 |
-| Peon | forward | 90 | 18 | 40 | 22 | 13 | 8.3, 0 | 101.9 at 35°, tumble, knockdown at +13 |
-| Peon | back | 0 | 4 | 29 | 25 | 16 | -8.3, 0 | 73.7 at 140° |
-| Peon | back | 30 | 7 | 32 | 25 | 16 | -8.3, 0 | 81.3 at 140°, tumble, knockdown at +11 |
-| Peon | back | 60 | 10 | 35 | 25 | 16 | -8.3, 0 | 88.9 at 140°, tumble, knockdown at +13 |
-| Peon | back | 90 | 13 | 38 | 25 | 16 | -8.3, 0 | 96.4 at 140°, tumble, knockdown at +14 |
+| Chen Stormstout | down | 0 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Chen Stormstout | down | 30 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Chen Stormstout | down | 60 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Chen Stormstout | down | 90 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Peon | forward | 0 | 8 | 30 | 22 | 13 | 8.3, 0 | 75.8 at 35° |
+| Peon | forward | 30 | 13 | 35 | 22 | 13 | 8.3, 0 | 89.6 at 35°, tumble, knockdown at +11 |
+| Peon | forward | 60 | 19 | 41 | 22 | 13 | 8.3, 0 | 103.5 at 35°, tumble, knockdown at +13 |
+| Peon | forward | 90 | 24 | 46 | 22 | 13 | 8.3, 0 | 117.3 at 35°, tumble, knockdown at +16 |
+| Peon | back | 0 | 6 | 31 | 25 | 16 | -8.3, 0 | 78 at 140° |
+| Peon | back | 30 | 10 | 35 | 25 | 16 | -8.3, 0 | 89.8 at 140°, tumble, knockdown at +13 |
+| Peon | back | 60 | 15 | 40 | 25 | 16 | -8.3, 0 | 101.6 at 140°, tumble, knockdown at +15 |
+| Peon | back | 90 | 20 | 45 | 25 | 16 | -8.3, 0 | 113.3 at 140°, tumble, knockdown at +18 |
 | Peon | up | 0 | 13 | 24 | 11 | 12 | 8.3, 10.8 | 61.9 at 85° |
 | Peon | up | 30 | 17 | 28 | 11 | 12 | 8.3, 10.8 | 72.3 at 85° |
 | Peon | up | 60 | 22 | 33 | 11 | 12 | 8.3, 10.8 | 82.7 at 85°, tumble, knockdown at +27 |
 | Peon | up | 90 | 26 | 37 | 11 | 12 | 8.3, 10.8 | 93.1 at 85°, tumble, knockdown at +32 |
-| Peon | down | 0 | 17 | 43 | 26 | 17 | 8.3, 0 | 109.8 at 25°, tumble, knockdown at +11 |
-| Peon | down | 30 | 19 | 45 | 26 | 17 | 8.3, 0 | 114.5 at 25°, tumble, knockdown at +11 |
-| Peon | down | 60 | 21 | 47 | 26 | 17 | 8.3, 0 | 119.3 at 25°, tumble, knockdown at +12 |
-| Peon | down | 90 | 23 | 49 | 26 | 17 | 8.3, 0 | 124 at 25°, tumble, knockdown at +12 |
-| Goblin Tinker | forward | 0 | 5 | 28 | 23 | 14 | 8.3, 0 | 71.9 at 35° |
-| Goblin Tinker | forward | 30 | 8 | 31 | 23 | 14 | 8.3, 0 | 78.8 at 35° |
-| Goblin Tinker | forward | 60 | 11 | 34 | 23 | 14 | 8.3, 0 | 85.6 at 35°, tumble, knockdown at +11 |
-| Goblin Tinker | forward | 90 | 13 | 36 | 23 | 14 | 8.3, 0 | 92.4 at 35°, tumble, knockdown at +12 |
-| Goblin Tinker | back | 0 | 3 | 29 | 26 | 18 | -8.3, 0 | 74.4 at 135° |
-| Goblin Tinker | back | 30 | 5 | 31 | 26 | 18 | -8.3, 0 | 79.4 at 135° |
-| Goblin Tinker | back | 60 | 7 | 33 | 26 | 18 | -8.3, 0 | 84.4 at 135°, tumble, knockdown at +13 |
-| Goblin Tinker | back | 90 | 9 | 35 | 26 | 18 | -8.3, 0 | 89.3 at 135°, tumble, knockdown at +14 |
+| Peon | down | 0 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Peon | down | 30 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Peon | down | 60 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Peon | down | 90 | 10 | 36 | 26 | 17 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Goblin Tinker | forward | 0 | 8 | 31 | 23 | 14 | 8.3, 0 | 79.2 at 35° |
+| Goblin Tinker | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 92.3 at 35°, tumble, knockdown at +12 |
+| Goblin Tinker | forward | 60 | 19 | 42 | 23 | 14 | 8.3, 0 | 105.3 at 35°, tumble, knockdown at +14 |
+| Goblin Tinker | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 118.4 at 35°, tumble, knockdown at +16 |
+| Goblin Tinker | back | 0 | 6 | 32 | 26 | 18 | -8.3, 0 | 81.5 at 135°, tumble, knockdown at +12 |
+| Goblin Tinker | back | 30 | 11 | 37 | 26 | 18 | -8.3, 0 | 92.9 at 135°, tumble, knockdown at +15 |
+| Goblin Tinker | back | 60 | 15 | 41 | 26 | 18 | -8.3, 0 | 104.4 at 135°, tumble, knockdown at +18 |
+| Goblin Tinker | back | 90 | 20 | 46 | 26 | 18 | -8.3, 0 | 115.8 at 135°, tumble, knockdown at +22 |
 | Goblin Tinker | up | 0 | 15 | 25 | 10 | 15 | 8.3, 10.8 | 63.6 at 85° |
 | Goblin Tinker | up | 30 | 19 | 29 | 10 | 15 | 8.3, 10.8 | 74.2 at 85° |
 | Goblin Tinker | up | 60 | 23 | 33 | 10 | 15 | 8.3, 10.8 | 84.9 at 85°, tumble, knockdown at +28 |
 | Goblin Tinker | up | 90 | 28 | 38 | 10 | 15 | 8.3, 10.8 | 95.5 at 85°, tumble, knockdown at +33 |
-| Goblin Tinker | down | 0 | 18 | 44 | 26 | 19 | 8.3, 0 | 110.9 at 70°, tumble, knockdown at +33 |
-| Goblin Tinker | down | 30 | 20 | 46 | 26 | 19 | 8.3, 0 | 116.4 at 70°, tumble, knockdown at +37 |
-| Goblin Tinker | down | 60 | 22 | 48 | 26 | 19 | 8.3, 0 | 122 at 70°, tumble, knockdown at +42 |
-| Goblin Tinker | down | 90 | 25 | 51 | 26 | 19 | 8.3, 0 | 127.5 at 70°, tumble, knockdown at +47 |
-| Kael'thas Sunstrider | forward | 0 | 3 | 26 | 23 | 14 | 8.3, 0 | 67 at 35° |
-| Kael'thas Sunstrider | forward | 30 | 6 | 29 | 23 | 14 | 8.3, 0 | 74.3 at 35° |
-| Kael'thas Sunstrider | forward | 60 | 9 | 32 | 23 | 14 | 8.3, 0 | 81.7 at 35°, tumble, knockdown at +10 |
-| Kael'thas Sunstrider | forward | 90 | 12 | 35 | 23 | 14 | 8.3, 0 | 89 at 35°, tumble, knockdown at +11 |
+| Goblin Tinker | down | 0 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Goblin Tinker | down | 30 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Goblin Tinker | down | 60 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Goblin Tinker | down | 90 | 10 | 36 | 26 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kael'thas Sunstrider | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 75.2 at 35° |
+| Kael'thas Sunstrider | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 90.1 at 35°, tumble, knockdown at +11 |
+| Kael'thas Sunstrider | forward | 60 | 19 | 42 | 23 | 14 | 8.3, 0 | 105 at 35°, tumble, knockdown at +14 |
+| Kael'thas Sunstrider | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 119.9 at 35°, tumble, knockdown at +16 |
 | Kael'thas Sunstrider | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 81.2 at 145°, tumble, knockdown at +10 |
 | Kael'thas Sunstrider | back | 30 | 15 | 41 | 26 | 17 | -8.3, 0 | 103.7 at 145°, tumble, knockdown at +13 |
 | Kael'thas Sunstrider | back | 60 | 24 | 50 | 26 | 17 | -8.3, 0 | 126.1 at 145°, tumble, knockdown at +18 |
@@ -454,103 +454,103 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Kael'thas Sunstrider | up | 30 | 13 | 29 | 16 | 16 | 8.3, 10.8 | 73.6 at 90° |
 | Kael'thas Sunstrider | up | 60 | 17 | 33 | 16 | 16 | 8.3, 10.8 | 84.9 at 90°, tumble, knockdown at +28 |
 | Kael'thas Sunstrider | up | 90 | 22 | 38 | 16 | 16 | 8.3, 10.8 | 96.1 at 90°, tumble, knockdown at +34 |
-| Kael'thas Sunstrider | down | 0 | 15 | 40 | 25 | 18 | 8.3, 0 | 101.6 at 80°, tumble, knockdown at +29 |
-| Kael'thas Sunstrider | down | 30 | 17 | 42 | 25 | 18 | 8.3, 0 | 107.3 at 80°, tumble, knockdown at +33 |
-| Kael'thas Sunstrider | down | 60 | 20 | 45 | 25 | 18 | 8.3, 0 | 113.1 at 80°, tumble, knockdown at +38 |
-| Kael'thas Sunstrider | down | 90 | 22 | 47 | 25 | 18 | 8.3, 0 | 118.8 at 80°, tumble |
-| Murloc | forward | 0 | 7 | 28 | 21 | 12 | 8.3, 0 | 70.1 at 40° |
-| Murloc | forward | 30 | 10 | 31 | 21 | 12 | 8.3, 0 | 78.9 at 40° |
-| Murloc | forward | 60 | 14 | 35 | 21 | 12 | 8.3, 0 | 87.6 at 40°, tumble, knockdown at +12 |
-| Murloc | forward | 90 | 17 | 38 | 21 | 12 | 8.3, 0 | 96.4 at 40°, tumble, knockdown at +14 |
-| Murloc | back | 0 | 8 | 31 | 23 | 14 | -8.3, 0 | 78.2 at 140° |
-| Murloc | back | 30 | 11 | 34 | 23 | 14 | -8.3, 0 | 86.7 at 140°, tumble, knockdown at +12 |
-| Murloc | back | 60 | 15 | 38 | 23 | 14 | -8.3, 0 | 95.3 at 140°, tumble, knockdown at +14 |
-| Murloc | back | 90 | 18 | 41 | 23 | 14 | -8.3, 0 | 103.9 at 140°, tumble, knockdown at +15 |
+| Kael'thas Sunstrider | down | 0 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | down | 30 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | down | 60 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Kael'thas Sunstrider | down | 90 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 80°, tumble, knockdown at +22 |
+| Murloc | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 77 at 40° |
+| Murloc | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 92.4 at 40°, tumble, knockdown at +13 |
+| Murloc | forward | 60 | 22 | 43 | 21 | 12 | 8.3, 0 | 107.7 at 40°, tumble, knockdown at +16 |
+| Murloc | forward | 90 | 28 | 49 | 21 | 12 | 8.3, 0 | 123.1 at 40°, tumble, knockdown at +21 |
+| Murloc | back | 0 | 9 | 32 | 23 | 14 | -8.3, 0 | 80.4 at 140°, tumble, knockdown at +11 |
+| Murloc | back | 30 | 13 | 36 | 23 | 14 | -8.3, 0 | 91.3 at 140°, tumble, knockdown at +13 |
+| Murloc | back | 60 | 17 | 40 | 23 | 14 | -8.3, 0 | 102.2 at 140°, tumble, knockdown at +15 |
+| Murloc | back | 90 | 22 | 45 | 23 | 14 | -8.3, 0 | 113.2 at 140°, tumble, knockdown at +18 |
 | Murloc | up | 0 | 9 | 24 | 15 | 12 | 8.3, 10.8 | 61.6 at 90° |
 | Murloc | up | 30 | 13 | 28 | 15 | 12 | 8.3, 10.8 | 72.3 at 90° |
 | Murloc | up | 60 | 18 | 33 | 15 | 12 | 8.3, 10.8 | 83 at 90°, tumble, knockdown at +27 |
 | Murloc | up | 90 | 22 | 37 | 15 | 12 | 8.3, 10.8 | 93.8 at 90°, tumble, knockdown at +32 |
-| Murloc | down | 0 | 20 | 43 | 23 | 16 | 8.3, 0 | 109.6 at 25°, tumble, knockdown at +11 |
-| Murloc | down | 30 | 22 | 45 | 23 | 16 | 8.3, 0 | 114.5 at 25°, tumble, knockdown at +11 |
-| Murloc | down | 60 | 24 | 47 | 23 | 16 | 8.3, 0 | 119.4 at 25°, tumble, knockdown at +12 |
-| Murloc | down | 90 | 26 | 49 | 23 | 16 | 8.3, 0 | 124.3 at 25°, tumble, knockdown at +12 |
-| Grom Hellscream | forward | 0 | 9 | 30 | 21 | 14 | 8.3, 0 | 77 at 40° |
-| Grom Hellscream | forward | 30 | 14 | 35 | 21 | 14 | 8.3, 0 | 88.1 at 40°, tumble, knockdown at +12 |
-| Grom Hellscream | forward | 60 | 18 | 39 | 21 | 14 | 8.3, 0 | 99.2 at 40°, tumble, knockdown at +14 |
-| Grom Hellscream | forward | 90 | 23 | 44 | 21 | 14 | 8.3, 0 | 110.3 at 40°, tumble, knockdown at +17 |
+| Murloc | down | 0 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Murloc | down | 30 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Murloc | down | 60 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Murloc | down | 90 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Grom Hellscream | forward | 0 | 10 | 31 | 21 | 14 | 8.3, 0 | 79.9 at 40° |
+| Grom Hellscream | forward | 30 | 16 | 37 | 21 | 14 | 8.3, 0 | 93.7 at 40°, tumble, knockdown at +13 |
+| Grom Hellscream | forward | 60 | 22 | 43 | 21 | 14 | 8.3, 0 | 107.5 at 40°, tumble, knockdown at +16 |
+| Grom Hellscream | forward | 90 | 27 | 48 | 21 | 14 | 8.3, 0 | 121.3 at 40°, tumble, knockdown at +20 |
 | Grom Hellscream | back | 0 | 8 | 31 | 23 | 16 | -8.3, 0 | 79.8 at 140° |
 | Grom Hellscream | back | 30 | 12 | 35 | 23 | 16 | -8.3, 0 | 89.1 at 140°, tumble, knockdown at +13 |
 | Grom Hellscream | back | 60 | 16 | 39 | 23 | 16 | -8.3, 0 | 98.5 at 140°, tumble, knockdown at +14 |
 | Grom Hellscream | back | 90 | 20 | 43 | 23 | 16 | -8.3, 0 | 107.9 at 140°, tumble, knockdown at +16 |
-| Grom Hellscream | up | 0 | 18 | 33 | 15 | 14 | 8.3, 10.8 | 83.3 at 105°, tumble, knockdown at +26 |
-| Grom Hellscream | up | 30 | 26 | 41 | 15 | 14 | 8.3, 10.8 | 103.5 at 105°, tumble, knockdown at +37 |
-| Grom Hellscream | up | 60 | 34 | 49 | 15 | 14 | 8.3, 10.8 | 123.7 at 105°, tumble |
-| Grom Hellscream | up | 90 | 42 | 57 | 15 | 14 | 8.3, 10.8 | 143.9 at 105°, tumble |
-| Grom Hellscream | down | 0 | 20 | 43 | 23 | 18 | 8.3, 0 | 108.4 at 25°, tumble, knockdown at +10 |
-| Grom Hellscream | down | 30 | 22 | 45 | 23 | 18 | 8.3, 0 | 114.3 at 25°, tumble, knockdown at +11 |
-| Grom Hellscream | down | 60 | 25 | 48 | 23 | 18 | 8.3, 0 | 120.2 at 25°, tumble, knockdown at +12 |
-| Grom Hellscream | down | 90 | 27 | 50 | 23 | 18 | 8.3, 0 | 126 at 25°, tumble, knockdown at +12 |
-| Kobold | forward | 0 | 7 | 28 | 21 | 12 | 8.3, 0 | 70.1 at 40° |
-| Kobold | forward | 30 | 10 | 31 | 21 | 12 | 8.3, 0 | 78.9 at 40° |
-| Kobold | forward | 60 | 14 | 35 | 21 | 12 | 8.3, 0 | 87.6 at 40°, tumble, knockdown at +12 |
-| Kobold | forward | 90 | 17 | 38 | 21 | 12 | 8.3, 0 | 96.4 at 40°, tumble, knockdown at +14 |
-| Kobold | back | 0 | 11 | 31 | 20 | 14 | -8.3, 0 | 78.2 at 140° |
-| Kobold | back | 30 | 14 | 34 | 20 | 14 | -8.3, 0 | 86.7 at 140°, tumble, knockdown at +12 |
-| Kobold | back | 60 | 18 | 38 | 20 | 14 | -8.3, 0 | 95.3 at 140°, tumble, knockdown at +14 |
-| Kobold | back | 90 | 21 | 41 | 20 | 14 | -8.3, 0 | 103.9 at 140°, tumble, knockdown at +15 |
+| Grom Hellscream | up | 0 | 14 | 29 | 15 | 14 | 8.3, 10.8 | 73.3 at 105° |
+| Grom Hellscream | up | 30 | 22 | 37 | 15 | 14 | 8.3, 10.8 | 93.5 at 105°, tumble, knockdown at +31 |
+| Grom Hellscream | up | 60 | 30 | 45 | 15 | 14 | 8.3, 10.8 | 113.7 at 105°, tumble, knockdown at +44 |
+| Grom Hellscream | up | 90 | 38 | 53 | 15 | 14 | 8.3, 10.8 | 133.9 at 105°, tumble |
+| Grom Hellscream | down | 0 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Grom Hellscream | down | 30 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Grom Hellscream | down | 60 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Grom Hellscream | down | 90 | 13 | 36 | 23 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kobold | forward | 0 | 9 | 30 | 21 | 12 | 8.3, 0 | 77 at 40° |
+| Kobold | forward | 30 | 15 | 36 | 21 | 12 | 8.3, 0 | 92.3 at 40°, tumble, knockdown at +13 |
+| Kobold | forward | 60 | 22 | 43 | 21 | 12 | 8.3, 0 | 107.7 at 40°, tumble, knockdown at +16 |
+| Kobold | forward | 90 | 28 | 49 | 21 | 12 | 8.3, 0 | 123.1 at 40°, tumble, knockdown at +21 |
+| Kobold | back | 0 | 12 | 32 | 20 | 14 | -8.3, 0 | 80.4 at 140°, tumble, knockdown at +11 |
+| Kobold | back | 30 | 16 | 36 | 20 | 14 | -8.3, 0 | 91.3 at 140°, tumble, knockdown at +13 |
+| Kobold | back | 60 | 20 | 40 | 20 | 14 | -8.3, 0 | 102.2 at 140°, tumble, knockdown at +15 |
+| Kobold | back | 90 | 25 | 45 | 20 | 14 | -8.3, 0 | 113.1 at 140°, tumble, knockdown at +18 |
 | Kobold | up | 0 | 9 | 24 | 15 | 12 | 8.3, 10.8 | 61.5 at 90° |
 | Kobold | up | 30 | 13 | 28 | 15 | 12 | 8.3, 10.8 | 72.2 at 90° |
 | Kobold | up | 60 | 18 | 33 | 15 | 12 | 8.3, 10.8 | 82.9 at 90°, tumble, knockdown at +27 |
 | Kobold | up | 90 | 22 | 37 | 15 | 12 | 8.3, 10.8 | 93.5 at 90°, tumble, knockdown at +32 |
-| Kobold | down | 0 | 20 | 43 | 23 | 16 | 8.3, 0 | 109.6 at 25°, tumble, knockdown at +11 |
-| Kobold | down | 30 | 22 | 45 | 23 | 16 | 8.3, 0 | 114.5 at 25°, tumble, knockdown at +11 |
-| Kobold | down | 60 | 24 | 47 | 23 | 16 | 8.3, 0 | 119.4 at 25°, tumble, knockdown at +12 |
-| Kobold | down | 90 | 26 | 49 | 23 | 16 | 8.3, 0 | 124.3 at 25°, tumble, knockdown at +12 |
-| Malfurion Stormrage | forward | 0 | 6 | 29 | 23 | 14 | 8.3, 0 | 74.6 at 35° |
-| Malfurion Stormrage | forward | 30 | 11 | 34 | 23 | 14 | 8.3, 0 | 86 at 35°, tumble, knockdown at +11 |
-| Malfurion Stormrage | forward | 60 | 15 | 38 | 23 | 14 | 8.3, 0 | 97.4 at 35°, tumble, knockdown at +12 |
-| Malfurion Stormrage | forward | 90 | 20 | 43 | 23 | 14 | 8.3, 0 | 108.8 at 35°, tumble, knockdown at +14 |
-| Malfurion Stormrage | back | 0 | 5 | 30 | 25 | 17 | -8.3, 0 | 76.2 at 140° |
-| Malfurion Stormrage | back | 30 | 8 | 33 | 25 | 17 | -8.3, 0 | 84.5 at 140°, tumble, knockdown at +12 |
-| Malfurion Stormrage | back | 60 | 12 | 37 | 25 | 17 | -8.3, 0 | 92.8 at 140°, tumble, knockdown at +13 |
-| Malfurion Stormrage | back | 90 | 15 | 40 | 25 | 17 | -8.3, 0 | 101.1 at 140°, tumble, knockdown at +15 |
+| Kobold | down | 0 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kobold | down | 30 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kobold | down | 60 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Kobold | down | 90 | 13 | 36 | 23 | 16 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Malfurion Stormrage | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 77 at 35° |
+| Malfurion Stormrage | forward | 30 | 13 | 36 | 23 | 14 | 8.3, 0 | 90.8 at 35°, tumble, knockdown at +12 |
+| Malfurion Stormrage | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.6 at 35°, tumble, knockdown at +14 |
+| Malfurion Stormrage | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 118.4 at 35°, tumble, knockdown at +16 |
+| Malfurion Stormrage | back | 0 | 6 | 31 | 25 | 17 | -8.3, 0 | 78.8 at 140° |
+| Malfurion Stormrage | back | 30 | 10 | 35 | 25 | 17 | -8.3, 0 | 89.7 at 140°, tumble, knockdown at +13 |
+| Malfurion Stormrage | back | 60 | 15 | 40 | 25 | 17 | -8.3, 0 | 100.7 at 140°, tumble, knockdown at +15 |
+| Malfurion Stormrage | back | 90 | 19 | 44 | 25 | 17 | -8.3, 0 | 111.6 at 140°, tumble, knockdown at +17 |
 | Malfurion Stormrage | up | 0 | 13 | 24 | 11 | 15 | 8.3, 10.8 | 61.1 at 90° |
 | Malfurion Stormrage | up | 30 | 19 | 30 | 11 | 15 | 8.3, 10.8 | 76.2 at 90° |
 | Malfurion Stormrage | up | 60 | 25 | 36 | 11 | 15 | 8.3, 10.8 | 91.4 at 90°, tumble, knockdown at +31 |
 | Malfurion Stormrage | up | 90 | 31 | 42 | 11 | 15 | 8.3, 10.8 | 106.5 at 90°, tumble, knockdown at +41 |
-| Malfurion Stormrage | down | 0 | 19 | 44 | 25 | 19 | 8.3, 0 | 110.2 at 70°, tumble, knockdown at +33 |
-| Malfurion Stormrage | down | 30 | 21 | 46 | 25 | 19 | 8.3, 0 | 115.7 at 70°, tumble, knockdown at +37 |
-| Malfurion Stormrage | down | 60 | 23 | 48 | 25 | 19 | 8.3, 0 | 121.2 at 70°, tumble, knockdown at +41 |
-| Malfurion Stormrage | down | 90 | 25 | 50 | 25 | 19 | 8.3, 0 | 126.6 at 70°, tumble, knockdown at +46 |
-| Medivh | forward | 0 | 3 | 26 | 23 | 14 | 8.3, 0 | 67.1 at 35° |
-| Medivh | forward | 30 | 7 | 30 | 23 | 14 | 8.3, 0 | 75 at 35° |
-| Medivh | forward | 60 | 10 | 33 | 23 | 14 | 8.3, 0 | 82.9 at 35°, tumble, knockdown at +11 |
-| Medivh | forward | 90 | 13 | 36 | 23 | 14 | 8.3, 0 | 90.9 at 35°, tumble, knockdown at +12 |
-| Medivh | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 80.3 at 140°, tumble, knockdown at +11 |
-| Medivh | back | 30 | 9 | 35 | 26 | 17 | -8.3, 0 | 88.8 at 140°, tumble, knockdown at +13 |
-| Medivh | back | 60 | 12 | 38 | 26 | 17 | -8.3, 0 | 97.3 at 140°, tumble, knockdown at +14 |
-| Medivh | back | 90 | 16 | 42 | 26 | 17 | -8.3, 0 | 105.8 at 140°, tumble, knockdown at +16 |
+| Malfurion Stormrage | down | 0 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Malfurion Stormrage | down | 30 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Malfurion Stormrage | down | 60 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Malfurion Stormrage | down | 90 | 11 | 36 | 25 | 19 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Medivh | forward | 0 | 6 | 29 | 23 | 14 | 8.3, 0 | 74.5 at 35° |
+| Medivh | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 89.6 at 35°, tumble, knockdown at +11 |
+| Medivh | forward | 60 | 18 | 41 | 23 | 14 | 8.3, 0 | 104.7 at 35°, tumble, knockdown at +14 |
+| Medivh | forward | 90 | 24 | 47 | 23 | 14 | 8.3, 0 | 119.8 at 35°, tumble, knockdown at +16 |
+| Medivh | back | 0 | 6 | 32 | 26 | 17 | -8.3, 0 | 81.7 at 140°, tumble, knockdown at +11 |
+| Medivh | back | 30 | 10 | 36 | 26 | 17 | -8.3, 0 | 91.6 at 140°, tumble, knockdown at +13 |
+| Medivh | back | 60 | 14 | 40 | 26 | 17 | -8.3, 0 | 101.6 at 140°, tumble, knockdown at +15 |
+| Medivh | back | 90 | 18 | 44 | 26 | 17 | -8.3, 0 | 111.5 at 140°, tumble, knockdown at +17 |
 | Medivh | up | 0 | 8 | 24 | 16 | 16 | 8.3, 10.8 | 62.5 at 90° |
 | Medivh | up | 30 | 13 | 29 | 16 | 16 | 8.3, 10.8 | 74.6 at 90° |
 | Medivh | up | 60 | 18 | 34 | 16 | 16 | 8.3, 10.8 | 86.8 at 90°, tumble, knockdown at +29 |
 | Medivh | up | 90 | 23 | 39 | 16 | 16 | 8.3, 10.8 | 98.9 at 90°, tumble, knockdown at +36 |
-| Medivh | down | 0 | 18 | 43 | 25 | 18 | 8.3, 0 | 110 at 70°, tumble, knockdown at +32 |
-| Medivh | down | 30 | 21 | 46 | 25 | 18 | 8.3, 0 | 115.6 at 70°, tumble, knockdown at +37 |
-| Medivh | down | 60 | 23 | 48 | 25 | 18 | 8.3, 0 | 121.2 at 70°, tumble, knockdown at +41 |
-| Medivh | down | 90 | 25 | 50 | 25 | 18 | 8.3, 0 | 126.8 at 70°, tumble, knockdown at +46 |
-| Anub'arak | forward | 0 | 7 | 32 | 25 | 16 | 8.3, 0 | 80.4 at 40°, tumble, knockdown at +11 |
-| Anub'arak | forward | 30 | 11 | 36 | 25 | 16 | 8.3, 0 | 92.4 at 40°, tumble, knockdown at +13 |
-| Anub'arak | forward | 60 | 16 | 41 | 25 | 16 | 8.3, 0 | 104.4 at 40°, tumble, knockdown at +15 |
-| Anub'arak | forward | 90 | 21 | 46 | 25 | 16 | 8.3, 0 | 116.4 at 40°, tumble, knockdown at +19 |
+| Medivh | down | 0 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Medivh | down | 30 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Medivh | down | 60 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Medivh | down | 90 | 11 | 36 | 25 | 18 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Anub'arak | forward | 0 | 8 | 33 | 25 | 16 | 8.3, 0 | 82.6 at 40°, tumble, knockdown at +12 |
+| Anub'arak | forward | 30 | 13 | 38 | 25 | 16 | 8.3, 0 | 97 at 40°, tumble, knockdown at +14 |
+| Anub'arak | forward | 60 | 19 | 44 | 25 | 16 | 8.3, 0 | 111.3 at 40°, tumble, knockdown at +17 |
+| Anub'arak | forward | 90 | 25 | 50 | 25 | 16 | 8.3, 0 | 125.7 at 40°, tumble, knockdown at +22 |
 | Anub'arak | back | 0 | 7 | 35 | 28 | 19 | -8.3, 0 | 87.8 at 140°, tumble, knockdown at +12 |
 | Anub'arak | back | 30 | 11 | 39 | 28 | 19 | -8.3, 0 | 98.1 at 140°, tumble, knockdown at +14 |
 | Anub'arak | back | 60 | 15 | 43 | 28 | 19 | -8.3, 0 | 108.3 at 140°, tumble, knockdown at +16 |
 | Anub'arak | back | 90 | 19 | 47 | 28 | 19 | -8.3, 0 | 118.6 at 140°, tumble, knockdown at +19 |
-| Anub'arak | up | 0 | 14 | 36 | 22 | 15 | 8.3, 10.8 | 91.4 at 100°, tumble, knockdown at +31 |
-| Anub'arak | up | 30 | 25 | 47 | 22 | 15 | 8.3, 10.8 | 117.5 at 100°, tumble |
-| Anub'arak | up | 60 | 35 | 57 | 22 | 15 | 8.3, 10.8 | 143.7 at 100°, tumble |
-| Anub'arak | up | 90 | 45 | 67 | 22 | 15 | 8.3, 10.8 | 169.8 at 100°, tumble |
-| Anub'arak | down | 0 | 16 | 44 | 28 | 21 | 8.3, 0 | 110.4 at 70°, tumble, knockdown at +33 |
-| Anub'arak | down | 30 | 18 | 46 | 28 | 21 | 8.3, 0 | 116.5 at 70°, tumble, knockdown at +37 |
-| Anub'arak | down | 60 | 21 | 49 | 28 | 21 | 8.3, 0 | 122.6 at 70°, tumble, knockdown at +42 |
-| Anub'arak | down | 90 | 23 | 51 | 28 | 21 | 8.3, 0 | 128.7 at 70°, tumble, knockdown at +48 |
+| Anub'arak | up | 0 | 20 | 34 | 14 | 15 | 8.3, 10.8 | 86.4 at 100°, tumble, knockdown at +28 |
+| Anub'arak | up | 30 | 31 | 45 | 14 | 15 | 8.3, 10.8 | 112.5 at 100°, tumble, knockdown at +44 |
+| Anub'arak | up | 60 | 41 | 55 | 14 | 15 | 8.3, 10.8 | 138.7 at 100°, tumble |
+| Anub'arak | up | 90 | 51 | 65 | 14 | 15 | 8.3, 10.8 | 164.8 at 100°, tumble |
+| Anub'arak | down | 0 | 8 | 36 | 28 | 21 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Anub'arak | down | 30 | 8 | 36 | 28 | 21 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Anub'arak | down | 60 | 8 | 36 | 28 | 21 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |
+| Anub'arak | down | 90 | 8 | 36 | 28 | 21 | 8.3, 0 | 90 at 70°, tumble, knockdown at +21 |

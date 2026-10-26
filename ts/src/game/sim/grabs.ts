@@ -74,8 +74,8 @@ export function authoredThrowEffect(action: GrabAction, moves?: FighterMoves): R
   throwHit.damage = up ? 6.0 : down ? 5.0 : 7.0;
 
 
-  throwHit.growth = down ? 28.5 : up ? 55.0 : back ? 20.5 : 31.5;
-  throwHit.base = down ? 104.0 : up ? 45.0 : back ? 89.0 : 84.0;
+  throwHit.growth = down ? 0.0 : up ? 55.0 : back ? 20.5 : 31.5;
+  throwHit.base = down ? 0.0 : up ? 45.0 : back ? 89.0 : 84.0;
   throwHit.launchX = up ? 0.17364799976348877 : down ? 0.3420201241970062 : 0.8660249710083008;
   throwHit.launchZ = up ? 0.9848080277442932 : down ? 0.9396926164627075 : 0.5;
   throwHit.element = undefined;
@@ -83,7 +83,7 @@ export function authoredThrowEffect(action: GrabAction, moves?: FighterMoves): R
   throwHit.electric = false;
   throwHit.manaDrain = undefined;
   throwHit.manaSteal = undefined;
-  throwHit.setKnockback = undefined;
+  throwHit.setKnockback = down ? 90.0 : undefined;
   throwHit.fixedPower = undefined;
   throwHit.stunFrames = undefined;
   const authored = moves?.throws[action];

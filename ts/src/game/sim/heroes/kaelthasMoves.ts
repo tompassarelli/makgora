@@ -90,9 +90,9 @@ export const KAELTHAS_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: throwMove(1, 0, arcane(3.254040002822876, 35, 0.0, 0.0)),
-    [GrabAction.throwForward]: throwMove(14, 22, arcane(7.59276008605957, 35, 34.0, 59.0)),
+    [GrabAction.throwForward]: throwMove(14, 22, arcane(7.59276008605957, 35, 69.0, 59.0)),
     [GrabAction.throwBack]: throwMove(17, 25, arcane(11.0, 35, 72.0, 60.0, true)),
     [GrabAction.throwUp]: throwMove(16, 15, arcane(7.59276008605957, 90, 52.28349685668945, 50.0)),
-    [GrabAction.throwDown]: throwMove(18, 24, arcane(6.0, 80, 30.0, 95.0)),
+    [GrabAction.throwDown]: throwMove(18, 24, { ...arcane(6.0, 80, 0.0, 0.0), setKnockback: 90.0 }),
   },
 };

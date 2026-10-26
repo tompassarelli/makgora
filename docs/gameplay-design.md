@@ -692,15 +692,17 @@ deliberate trade-off, and shields cannot trivially escape them.
   follow-ups land whatever the victim does at 0, 30 and 60%. Past that the
   victim tumbles and can tech, so the follow-up becomes a read: the up throw
   is the safer, smaller reward.
-- **Down throw: a tech chase.** Every down throw tumbles its victim from 0%
-  (its CHASE class, knockback above 80) and lands it 14 to 35 frames after
-  the release, inside the throw's hitstun, so the victim must tech in place,
+- **Down throw: a tech chase.** Every down throw launches at a set
+  knockback of 90 (above tumble's 80), so it tumbles its victim from 0% and
+  lands it 17 to 23 frames after the release whatever the percent, inside
+  the throw's hitstun (#493), so the victim must tech in place,
   tech roll either way or miss the tech. No down throw guarantees a
   follow-up at 0-60%; each tech option has a follow-up that lands when the
   thrower reads it. It is the harder throw with the higher ceiling.
 - **Forward and back throws** follow each fighter's identity (spacing, edge
-  position, Mountain King's and the Dreadlord's KILL back throws); #107
-  leaves them unchanged.
+  position, Mountain King's and the Dreadlord's KILL back throws). A
+  positional one released halfway between centre stage and the ledge at 60%
+  carries the victim past the ledge under every DI (#493).
 
 Measured by `bun wisp interactions` for every selectable fighter in
 smashcraft:tools/move-data/interactions/throws.md

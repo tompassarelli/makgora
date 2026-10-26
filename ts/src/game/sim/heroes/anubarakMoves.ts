@@ -137,9 +137,9 @@ export const ANUBARAK_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 1, totalFrames: 1, effect: anubarakHit(3.716279983520508, 35, 0.0, 0.0) },
-    [GrabAction.throwForward]: { contactFrame: 16, totalFrames: 40, effect: anubarakHit(11.148839950561523, 40, 38.5, 69.0) },
+    [GrabAction.throwForward]: { contactFrame: 16, totalFrames: 40, effect: anubarakHit(11.148839950561523, 40, 46.0, 69.0) },
     [GrabAction.throwBack]: { contactFrame: 19, totalFrames: 46, effect: anubarakHit(13.626359939575195, 40, 28.5, 78.0, true) },
-    [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 36, effect: anubarakHit(9.910080909729004, 80, 98.92410278320312, 65.0, true) },
-    [GrabAction.throwDown]: { contactFrame: 21, totalFrames: 48, effect: anubarakHit(8.671319961547852, 70, 25.5, 104.0) },
+    [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 28, effect: anubarakHit(9.910080909729004, 80, 98.92410278320312, 60.0, true) },
+    [GrabAction.throwDown]: { contactFrame: 21, totalFrames: 48, effect: { ...anubarakHit(8.671319961547852, 70, 0.0, 0.0), setKnockback: 90.0 } },
   },
 };
