@@ -177,7 +177,7 @@ export const withSmokeCapture = (driver: AcceptDriver["Service"], settle: Durati
         if (failed !== undefined) return yield* stopped();
         const since = yield* Clock.currentTimeMillis;
         yield* driver.start(map, session);
-        if (smoked) return;
+        if (smoked || MAP_PROFILES[map]?.quick === "") return;
         smoked = true;
         yield* Effect.sleep(settle);
         const host = driver.clients[0];
@@ -368,7 +368,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     });
     const validated = withSmokeCapture(controlled);
     smoke = validated;
-    if (gate) return AcceptDriver.of({ ...validated.driver, start: (map, session) => map === "gate-playable" ? controlled.start(map, session) : validated.driver.start(map, session) });
+    if (gate) return validated.driver;
     return withShieldEnergyCapture(smoke.driver);
   })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)), Layer.provide(platformLayer()));
   const shards = {
