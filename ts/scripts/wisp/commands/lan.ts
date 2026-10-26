@@ -30,7 +30,7 @@ const release = (args: readonly string[]) => Effect.gen(function*() {
 }).pipe(Effect.asVoid);
 
 export const claimedLanPair = (args: readonly string[]): number | undefined => {
-  if (args[0] !== "fresh") return undefined;
+  if (args[0] !== "fresh" && args[0] !== "end") return undefined;
   const pairFlag = args.find((arg) => arg === "--pair" || arg.startsWith("--pair="));
   if (pairFlag === undefined) return 0;
   const value = pairFlag === "--pair" ? args[args.indexOf(pairFlag) + 1] : pairFlag.slice("--pair=".length);
@@ -44,7 +44,8 @@ export const lan: Command = (args) => {
     case "stop": return poolStop(args.slice(1));
     case "claim": return claim(args.slice(1));
     case "release": return release(args.slice(1));
-    case "fresh": {
+    case "fresh":
+    case "end": {
       const pair = claimedLanPair(args);
       if (pair === 0) {
         try { assertPairClaim(0, process.env["NORTH_FLEET_SESSION"] ?? ""); }

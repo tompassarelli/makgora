@@ -96,7 +96,8 @@ export const poolStart: Command = (args) => {
     yield* runProcess(userManager(program, rest)).pipe(Effect.mapError((cause) => new LanFailure({ problem: `start ${unit}: ${cause.message}` })));
     yield* pollUntil(Effect.gen(function*() {
       if (!(yield* unitActive(unit))) return yield* new LanFailure({ problem: `${unit} stopped before its pairs were up; see \`journalctl --user -u ${unit}\`` });
-      return ids.every((id) => existsSync(agentSocket(id))) ? true : undefined;
+      const claimed = !ids.includes(0) || readPairClaim(0)?.session === process.env["NORTH_FLEET_SESSION"];
+      return claimed && ids.every((id) => existsSync(agentSocket(id))) ? true : undefined;
     }), { every: "2 seconds", within: `${Number(waitText) + 900} seconds`, orElse: () => Effect.fail(new LanFailure({ problem: `${unit}'s pairs weren't up in time; see \`journalctl --user -u ${unit}\`` })) });
     yield* Console.log(`pool unit ${unit} running; \`bun wisp lan stop\` stops it`);
   }).pipe(Effect.provide(BunServices.layer));

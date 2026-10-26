@@ -27,7 +27,7 @@ runs; never touch Tom’s install.
 
 Pair 0's pool unit owns `~/.local/state/wisp/lan/pair-0/claim.json` for its
 fleet session. `NORTH_FLEET_SESSION` names that session; `--owner NAME` names
-the lane in the claim. `lan fresh`, `accept`, native pair pad scripts and
+the lane in the claim. `lan fresh`, `lan end`, `accept`, native pair pad scripts and
 capture batches refuse pair 0 unless this live claim belongs to their session.
 To label an already-running pool explicitly, run
 `bun wisp lan claim --pair 0 --owner NAME`. `bun wisp lan stop --pair 0` or
