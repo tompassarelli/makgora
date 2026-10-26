@@ -30,7 +30,7 @@ export const DevCommandReceipt = preloadRecord(
   {
     head: [
       "SMASHCRAFT DEV v=1 build={build} receipt={receipt} step={step} steps={steps} epoch={epoch} rb={rollback} delay={delay} batch={batch} rematchSeconds={rematchSeconds} ",
-      "SETUP phase={phase} human-fighters={humanFighters} computers={computers} characters={characters} stocks={stocks} minutes={minutes} automatic-rematch={automaticRematch} team-battle={teamBattle} friendly-fire={friendlyFire} teams={teams} stage={stage} ",
+      "SETUP phase={phase} human-fighters={humanFighters} computers={computers} characters={characters} stocks={stocks} minutes={minutes} automatic-rematch={automaticRematch} team-battle={teamBattle} friendly-fire={friendlyFire} teams={teams} stage={stage} wins={wins} ",
     ],
   },
   Schema.Struct({
@@ -55,6 +55,7 @@ export const DevCommandReceipt = preloadRecord(
     friendlyFire: Count,
     teams: Schema.String.check(Schema.isPattern(/^\d+,\d+,\d+,\d+$/)),
     stage: Count,
+    wins: Schema.String.check(Schema.isPattern(/^\d+,\d+,\d+,\d+$/)),
   }),
 );
 

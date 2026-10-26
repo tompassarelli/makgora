@@ -336,6 +336,6 @@ function desyncReceipt(actor: number): string {
 function writeDeveloperReceipt(s: ShellState, receipt: string): void {
   s.devReceipts++;
   if (s.build.receiptsOnScreen && !s.promoHudHidden) DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, receipt);
-  const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.devStep, s.devSteps, s.dev, s.game);
+  const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.devStep, s.devSteps, s.dev, s.game, s.sessionWins.counts);
   writeLines(file.name, file.lines);
 }

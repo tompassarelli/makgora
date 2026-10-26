@@ -2,6 +2,7 @@
 
 import type { DevSettings } from "./devSettings";
 import type { MatchState } from "../lobby/lobbyState";
+import type { Slots } from "../input/participants";
 import type { JournalIngress } from "./build";
 import { devCommandReceiptFile, journalControlFile, journalLifecycleFile, journalReadyFile, journalMenuFile, journalTransportReadyFile, journalFailureFile, stageReceiptFile } from "../core/gameFiles";
 
@@ -120,13 +121,13 @@ export function failureFile({ build, epoch, slot }: JournalIdentity, reason: str
 
 
 
-export function devReceiptFile({ build, epoch, slot }: JournalIdentity, receipt: number, step: number, steps: number, { rollback, delay, batch, rematchSeconds }: Readonly<DevSettings>, game: Readonly<MatchState>): PreloadFile {
+export function devReceiptFile({ build, epoch, slot }: JournalIdentity, receipt: number, step: number, steps: number, { rollback, delay, batch, rematchSeconds }: Readonly<DevSettings>, game: Readonly<MatchState>, wins: Readonly<Slots<number>>): PreloadFile {
   const [a, b, c, d] = game.characterChoices;
   return {
     name: devCommandReceiptFile(build, slot),
     lines: [
       `SMASHCRAFT DEV v=1 build=${build} receipt=${receipt} step=${step} steps=${steps} epoch=${epoch} rb=${rollback} delay=${delay} batch=${batch} rematchSeconds=${rematchSeconds} `,
-      `SETUP phase=${game.phase} human-fighters=${game.humanFighterMask} computers=${game.computerMask} characters=${a},${b},${c},${d} stocks=${game.stockCount} minutes=${game.timeLimitMinutes} automatic-rematch=${game.automaticRematch ? 1 : 0} team-battle=${game.teamBattle ? 1 : 0} friendly-fire=${game.friendlyFire ? 1 : 0} teams=${game.teamChoices.join(",")} stage=${game.stageChoice} `,
+      `SETUP phase=${game.phase} human-fighters=${game.humanFighterMask} computers=${game.computerMask} characters=${a},${b},${c},${d} stocks=${game.stockCount} minutes=${game.timeLimitMinutes} automatic-rematch=${game.automaticRematch ? 1 : 0} team-battle=${game.teamBattle ? 1 : 0} friendly-fire=${game.friendlyFire ? 1 : 0} teams=${game.teamChoices.join(",")} stage=${game.stageChoice} wins=${wins.join(",")} `,
     ],
   };
 }
