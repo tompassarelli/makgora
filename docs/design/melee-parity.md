@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-503 rows: 441 parity, 34 deviations, 28 open.
+503 rows: 442 parity, 34 deviations, 27 open.
 
 ## Deviations from Melee
 
@@ -287,12 +287,12 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
 | Weight `illidan-weight` | 86 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
-| Gravity `illidan-gravity` | 0.19 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
-| Terminal speed `illidan-terminal` | 3 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
-| Fast-fall speed `illidan-fast-fall` | 3.45 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
+| Gravity `illidan-gravity` | 0.17 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
+| Terminal speed `illidan-terminal` | 3.1 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
+| Fast-fall speed `illidan-fast-fall` | 3.5 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
 | Jump squat frames `illidan-jump-squat` | 4 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
-| Full jump velocity `illidan-full-jump` | 4.03333 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
-| Short jump velocity `illidan-short-jump` | 2.2 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | open: ours, outside Melee's spread; needs Tom's decision (#293) |
+| Full jump velocity `illidan-full-jump` | 4.1 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
+| Short jump velocity `illidan-short-jump` | 1.9 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
 | Double jump velocity, against fighters with one double jump `illidan-double-jump` | 4.25 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
 | Air speed `illidan-air-speed` | 0.88 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
 | Air acceleration `illidan-air-acceleration` | 0.075 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |

@@ -185,9 +185,9 @@ export const AUTHORED_PHYSICS: { readonly [name in OriginalFighter]: FighterPhys
   },
   demonHunter: {
     weight: 86.0,
-    gravity: melee(0.1899999976158142),
-    terminalSpeed: melee(3.0),
-    fastFallSpeed: melee(3.450000047683716),
+    gravity: melee(0.17000000178813934),
+    terminalSpeed: melee(3.0999999046325684),
+    fastFallSpeed: melee(3.5),
     airAcceleration: melee(0.07500000298023224),
     airSpeed: melee(0.8799999952316284),
     airFriction: melee(0.019999999552965164),
@@ -197,8 +197,8 @@ export const AUTHORED_PHYSICS: { readonly [name in OriginalFighter]: FighterPhys
     runSpeed: melee(1.850000023841858),
     walkSpeed: melee(1.5499999523162842),
     jumpSquatFrames: 4,
-    fullJumpSpeed: 24.200000762939453,
-    shortJumpSpeed: 13.199999809265137,
+    fullJumpSpeed: melee(4.099999904632568),
+    shortJumpSpeed: melee(1.899999976158142),
     aerialJumpSpeed: 25.5,
 
     jumpMomentum: 1.0,

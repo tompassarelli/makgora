@@ -310,19 +310,19 @@ as Fox's shine does in Melee. Down special in the air is Immolate, not Flame
 Crash:
 
 - The same timing as on the ground: it strikes on frame 1 only, his first
-  frame is intangible, 27 in all, jump-cancellable from frame 4.
+  frame is intangible, 15 in all, jump-cancellable from frame 4.
 - Every frame of it zeroes his vertical speed while his horizontal speed
   carries, as every special started in the air keeps it (26 Oct, #490,
   smashcraft:docs/gameplay-design.md#special-momentum).
 - Its strike since #272 is Fan of Knives' former shape on both sides of him:
   a foe whose feet are within 116 to either side and 104 below to 108 above
-  (140, 114 and 118 for EX) is popped away from him at 85 degrees, base 75,
-  growth 50; 7% on the ground, 9% in the air, drain 6. Those bounds are Fan
+  (140, 114 and 118 for EX) is popped away from him at 85 degrees, base 108,
+  growth 18; 7% on the ground, 9% in the air, drain 6. Those bounds are Fan
   of Knives' knife capsule (0.7 fighter heights out, 0.3 radius, centred 48
   up) grown by a reference body, since Immolate tests the foe's feet and Fan
   of Knives tested its hurtbox.
 
-Counterplay: he hangs in place for 27 frames unless he jumps out, so a
+Counterplay: he hangs in place for 15 frames unless he jumps out, so a
 fighter outside the flames punishes the stall; offstage the jump cancel
 spends his double jump. Alternatives: **B, Flame Crash: hang, plunge, burst
 on landing** (replaced by the owner's 17 Oct direction); **C, Agonizing
@@ -442,16 +442,16 @@ beats read. The DIs listed must not escape.
 
 | Opener | Percent | Follow-up | Floor | DIs that must not escape | Falco source | Today |
 | --- | --- | --- | --- | --- | --- | --- |
-| down special (Immolate) | 0-50 | up air | true | | shine into up air, the shine's vertical pop | none to 40, read at 50 |
-| down special (Immolate) | 0-60 | down air | DI-dependent | in, none | the pillar: shine into down air | none to 10, read |
-| down special (Immolate) | 60-100 | back air | DI-dependent | in, none | "back aerial is good out of a shine at higher percents" | none to 70, read |
+| down special (Immolate) | 0-50 | up air | true | | shine into up air, the shine's vertical pop | DI-dependent: DI out and down escape |
+| down special (Immolate) | 0-60 | down air | DI-dependent | in, none | the pillar: shine into down air | holds |
+| down special (Immolate) | 60-100 | back air | DI-dependent | in, none | "back aerial is good out of a shine at higher percents" | holds |
 | down air | 0-100 | down special (Immolate) | true | | the pillar: down air into shine | true to 40, read at 50, DI-dependent from 60 |
 | down air | 60-100 | forward smash | DI-dependent | in, none | a grounded down air into forward smash | holds |
-| down tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | down tilt leads into shine | read, none at 40 |
-| up tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | up tilt segues into more shines | no row: up tilt never hits a grounded foe |
-| up throw | 20-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | read |
+| down tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | down tilt leads into shine | holds |
+| up tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | up tilt segues into more shines | holds |
+| up throw | 20-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | read at 20, holds from 30 |
 | down throw | 0-40 | down tilt | read | | down throw into down tilt, a tech chase | holds |
-| up air | 10-60 | up air | DI-dependent | in, none | up air strings | read to 40 |
+| up air | 10-60 | up air | DI-dependent | in, none | up air strings | read to 30, DI none escapes at 60 |
 | up air | 70-100 | up air | read | | the string ends in a read | holds |
 
 ### Edge-guard targets
@@ -462,10 +462,25 @@ Checked by `--objectives` from the ledge, against every DI:
   and from 80 past and 80 below (50-150%).
 - back air: Falco's offstage kill aerial, from 40 past the ledge (60-150%).
 
-Today 3 of 11 link rows hold. Both down air spikes kill against every DI,
-and so does back air since it took Falco's back air knockback, 13% at base
-10 and growth 100, from 6% at base 18 and growth 85, which killed only at
-140-150% (#493, 2026-10-26).
+Today 7 of 11 link rows hold, and all three edge guards kill against every
+DI; back air kills since it took Falco's back air knockback, 13% at base 10
+and growth 100, from 6% at base 18 and growth 85, which killed only at
+140-150% (#493, 2026-10-26). The retune (#457): Immolate 15 frames in all,
+base 108, growth 18; down tilt and up tilt base 83, growth 20, at 80
+degrees, up tilt's capsule reaching down to a grounded foe; up air base 50,
+growth 70, capsule radius 55. The rows that still miss:
+
+- Immolate into up air: the link table searches follow-ups only from his
+  first actionable frame, not from the frame-4 jump cancel, so the pop must
+  outlast 15 frames of Immolate; DI out carries the foe past his drift and
+  DI down keeps a grounded foe on the floor.
+- Down air into Immolate: from 50% the grounded down air bounces the foe at
+  79 degrees into a tech (50%) or past Immolate's reach under DI out (60%+).
+- Up throw into up air: at 20% the shared up throw's hitstun ends before
+  the up air lands, so the foe acts first; up throw is not his own row.
+- Up air into up air: at 10-30% the foe lands or acts before his second
+  up air after landing lag and a new hop; at 60% the foe under no DI
+  escapes the earliest second up airs.
 
 ### Body toward Falco
 

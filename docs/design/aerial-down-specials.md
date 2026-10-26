@@ -18,7 +18,7 @@ cancelling.
 | Fighter | Aerial choice | Rising | Falling | Near ground | Offstage |
 |---|---|---|---|---|---|
 | Rifleman | Freeze Trap tossed in the air falls and arms on deck contact | A8 W22 L31/E38 | A8 W22 L13/E38 | A8 W22 L3/E38 | A8 W22 L—/E38 |
-| Illidan | Immolate in the air, a Falco-style shine that holds him in place and a jump cancels | A12 W1 L49/E27 | A12 W1 L47/E27 | A12 W1 L33/E27 | A12 W1 L—/E27 |
+| Illidan | Immolate in the air, a Falco-style shine that holds him in place and a jump cancels | A12 W1 L37/E15 | A12 W1 L36/E15 | A12 W1 L21/E15 | A12 W1 L—/E15 |
 | Blademaster | Mirror Image placed in the air, then a backward step | S1 W8 L34/E24 | S1 W8 L25/E24 | S1 W8 L3/E24 | S1 W8 L—/E24 |
 | Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W18 L27/E27 | S1 W53 L15/E81 | S1 W53 L3/E81 | S1 W18 L—/E53 |
 | Warden | Fan of Knives in the air, a ring of knives with a shine-like semi-spike that nearly stops her fall and a jump cancels | S1 W4 L46/E27 | S1 W4 L44/E27 | S1 W4 L16/E27 | S1 W4 L—/E27 |

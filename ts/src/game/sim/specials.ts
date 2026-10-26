@@ -96,7 +96,7 @@ export const DEMONHUNTER_DIVE_LANDING_LAG = 10;
 export const DEMONHUNTER_IMMOLATE_STARTUP = 1;
 export const DEMONHUNTER_IMMOLATE_ACTIVE = 1;
 export const DEMONHUNTER_IMMOLATE_JUMP_CANCEL = 4;
-export const DEMONHUNTER_IMMOLATE_DURATION = 27;
+export const DEMONHUNTER_IMMOLATE_DURATION = 15;
 
 
 
@@ -704,7 +704,7 @@ const IMMOLATE_REACH_EX = 140.0;
 function immolateRegion(damage: number, reach: number, minZ: number, maxZ: number, facing: number): Readonly<HitRegion> {
   return {
     minX: facing > 0 ? 0.0 : -reach, maxX: facing > 0 ? reach : 0.0, minZ, maxZ,
-    effect: { damage, growth: 49.62688064575195, base: 75.0, launchX: f32(facing * 0.08715574443340302), launchZ: 0.9961947202682495, electric: false, element: HitElement.fire, manaDrain: 6 },
+    effect: { damage, growth: 18.0, base: 108.0, launchX: f32(facing * 0.08715574443340302), launchZ: 0.9961947202682495, electric: false, element: HitElement.fire, manaDrain: 6 },
     window: 1,
   };
 }
