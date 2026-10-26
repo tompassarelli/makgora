@@ -37,17 +37,23 @@ export const SPECIAL_SLOTS = ["neutral", "side", "up", "down"] as const;
 export type SpecialSlot = (typeof SPECIAL_SLOTS)[number];
 
 
+function chainProjectiles(projectile: SpecialProjectile | undefined, into: SpecialProjectile[]): void {
+  if (projectile === undefined) return;
+  into.push(projectile);
+  chainProjectiles(projectile.expiresInto, into);
+  chainProjectiles(projectile.burstInto, into);
+}
+
 function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProjectile[]): void {
   if (special === undefined) return;
-  for (const projectile of special.projectiles ?? []) {
-    into.push(projectile);
-    if (projectile.expiresInto !== undefined) into.push(projectile.expiresInto);
-    if (projectile.burstInto !== undefined) into.push(projectile.burstInto);
-  }
+  for (const projectile of special.projectiles ?? []) chainProjectiles(projectile, into);
   if (special.placement?.shot !== undefined) into.push(special.placement.shot);
   if (special.placement?.finalShot !== undefined) into.push(special.placement.finalShot);
   if (special.placement?.mark !== undefined) into.push(special.placement.mark);
-  if (special.burst !== undefined) into.push(special.burst.from, special.burst.into);
+  if (special.burst !== undefined) {
+    chainProjectiles(special.burst.from, into);
+    chainProjectiles(special.burst.into, into);
+  }
   for (const followUp of special.followUps ?? []) formProjectiles(followUp.special, into);
   for (const variant of special.variants ?? []) formProjectiles(variant, into);
 }

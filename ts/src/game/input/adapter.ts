@@ -124,6 +124,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.cStickUpFlick = (pressed & SMASH_UP_BIT) !== 0;
   destination.cStickSideFlick = edgePair(pressed, Action.smashLeft, Action.smashRight);
   destination.attackHeld = (held & (ATTACK_BIT | STRONG_BIT)) !== 0;
+  destination.specialHeld = (held & SPECIAL_BIT) !== 0;
   const leftShield = (held & LEFT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerLeft);
   const rightShield = (held & RIGHT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerRight);
   destination.resetPressed = leftShield && rightShield && destination.attackPressed;

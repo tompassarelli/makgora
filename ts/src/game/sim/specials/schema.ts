@@ -160,6 +160,7 @@ export interface SpecialProjectile {
   readonly homing?: { readonly turn: number; readonly maxRise: number } | undefined;
   /** On body or shield contact it becomes this projectile where it is, which deals the hit and then only shows. */
   readonly burstInto?: SpecialProjectile | undefined;
+  readonly burn?: { readonly every: number } | undefined;
 }
 
 export interface SpecialBeam {
@@ -280,6 +281,10 @@ export interface AuthoredSpecial {
   readonly endFrame: number;
 
   readonly cooldownFrames?: number | undefined;
+
+  readonly aim?: { readonly frame: number; readonly reach: number; readonly speed: number } | undefined;
+
+  readonly replacesLive?: true | undefined;
 
   readonly regions?: readonly MoveRegion[] | undefined;
   readonly regionOrigin?: SpecialProjectile | undefined;

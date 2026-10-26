@@ -271,7 +271,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.kaelthas]: {
     neutral: { spell: "Fireball", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.25), active: drawn("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx", "hand") },
-    side: { spell: "Drain Mana", startup: cue("Abilities\\Spells\\Other\\Drain\\ManaDrainCaster.mdx", "hand", 1.0), active: cue("Abilities\\Spells\\Other\\Drain\\ManaDrainTarget.mdx", "ahead", 1.0) },
+    side: { spell: "Flame Strike", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: drawn("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", "ahead") },
     up: KAEL_PHOENIX_CHARGE,
     down: { spell: "Banish", startup: cue("Abilities\\Spells\\Orc\\EtherealForm\\SpiritWalkerChange.mdx", "hand", 0.5), active: cue("Abilities\\Spells\\Human\\Banish\\BanishTarget.mdx", "hand", 0.5) },
   },

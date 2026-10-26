@@ -31,7 +31,7 @@ const FLAG_FIELDS: Readonly<Record<FlagField, true>> = {
   shieldPressed: true, shieldTriggerActive: true, jumpPressed: true, shortHopPressed: true, exPressed: true, airDodgePressed: true, techPressed: true,
   mashPressed: true, attackPressed: true, grabMashPressed: true, groundDodgePressed: true,
   getupAttackPressed: true, getupStandPressed: true, getupDirectionPressed: true, cStickUpFlick: true, jumpHeld: true, walking: true,
-  attackHeld: true, resetPressed: true,
+  attackHeld: true, specialHeld: true, resetPressed: true,
 };
 
 

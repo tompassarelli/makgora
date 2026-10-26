@@ -17,7 +17,7 @@ import { exSpecialAffordable } from "../sim/exSpecials";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine";
+import { aimedProjectile, companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
@@ -437,6 +437,11 @@ function pressDive(input: Controls, aimX: number, aimZ: number): void {
   input.verticalDirection = aimZ;
 }
 
+
+export function holdAimAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {
+  const rune = aimedProjectile(f);
+  if (rune !== undefined) input.specialHeld = target !== undefined && f32(f32(target.motion.x - rune.x) * f.facing) > 0.0;
+}
 
 export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, skill: CpuSkill, input: Controls): boolean {
   const { special, motion } = f;

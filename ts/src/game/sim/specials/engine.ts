@@ -214,6 +214,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   special.guarded = false;
   special.seekTarget = 0;
   special.cooldowns[SpecialAction.heroNeutral + chosen.slot] = move.cooldownFrames ?? 0;
+  if (move.replacesLive === true) endLiveCasts(f, specialKit(specials, chosen.slot));
   if (move.oncePerAirtime === true) special.airtimeUses |= 1 << chosen.slot;
   if (move.recallsProjectiles === true) recallProjectiles(f);
   applyWindows(f, move, 0);
@@ -859,9 +860,60 @@ function burstProjectiles(f: Fighter, from: Readonly<SpecialProjectile>, into: R
 }
 
 
+function castMakes(move: Readonly<AuthoredSpecial> | undefined, spec: Readonly<SpecialProjectile>): boolean {
+  if (move === undefined) return false;
+  for (const shot of move.projectiles ?? []) if (chainHolds(shot, spec)) return true;
+  return move.burst !== undefined && chainHolds(move.burst.into, spec);
+}
+
+function chainHolds(shot: Readonly<SpecialProjectile> | undefined, spec: Readonly<SpecialProjectile>): boolean {
+  if (shot === undefined) return false;
+  return shot === spec || chainHolds(shot.burstInto, spec) || chainHolds(shot.expiresInto, spec);
+}
+
+function endLiveCasts(f: Fighter, kit: Readonly<SpecialKit>): void {
+  let index = -1;
+  for (const projectile of f.projectiles) {
+    index++;
+    const spec = projectile.spec;
+    if (projectile.life <= 0 || projectile.kind !== ProjectileKind.hero || spec === undefined) continue;
+    if (castMakes(kit.ground, spec) || castMakes(kit.ground.ex, spec) || castMakes(kit.air, spec) || castMakes(kit.air?.ex, spec)) mutableProjectile(f, index).life = 0;
+  }
+}
+
+function holdAim(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Controls> | undefined, stage: number, matchFrame: number): boolean {
+  const aim = move.aim;
+  const rune = move.projectiles?.[0];
+  if (aim === undefined || rune === undefined || input?.specialHeld !== true || f.special.frame !== aim.frame + 1) return false;
+  let index = -1;
+  for (const projectile of f.projectiles) {
+    index++;
+    if (projectile.life <= 0 || projectile.spec !== rune) continue;
+    const x = f32(projectile.x + f32(f.facing * aim.speed));
+    if (f32(f32(x - f.motion.x) * f.facing) > aim.reach) return false;
+    const held = mutableProjectile(f, index);
+    held.x = x;
+    held.life = rune.life;
+    held.z = floorBelow(stage, matchFrame, held.x, f.motion.z) ?? f.motion.z;
+    f.special.frame = aim.frame;
+    f.special.lockFrames++;
+    f.attack.cooldown++;
+    return true;
+  }
+  return false;
+}
+
+
+export function aimedProjectile(f: Readonly<Fighter>): Readonly<Projectile> | undefined {
+  const move = runningHeroSpecial(f);
+  return move?.aim === undefined || f.special.frame !== move.aim.frame ? undefined : projectileAnchor(f, move.projectiles?.[0]);
+}
+
+
 export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Controls>, world?: Roster, matchFrame = 0): void {
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
+  if (holdAim(f, move, input, stage, matchFrame)) return;
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;

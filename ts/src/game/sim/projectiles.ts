@@ -161,7 +161,7 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
   if (projectile.kind === ProjectileKind.hero && spec !== undefined) {
     copyHitEffect(projectileHit, heroProjectileEffect(projectile, spec));
     projectileHit.damage = projectileDamage(projectile);
-    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, ContactKind.launch, false, undefined, shieldContact, spec.status, projectile.z, projectile.visualFamily);
+    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, spec.burn === undefined ? ContactKind.launch : ContactKind.damageOnly, false, undefined, shieldContact, spec.status, projectile.z, projectile.visualFamily);
     return;
   }
   const { kind } = projectile;
@@ -494,11 +494,15 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
         continue;
       }
       const pool = projectile.kind === ProjectileKind.hero ? projectile.spec?.pool : undefined;
+      const burn = projectile.kind === ProjectileKind.hero ? projectile.spec?.burn : undefined;
       if (nearest !== undefined && pool !== undefined) {
 
         applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
         projectile.poolWait = pool.every - 1;
         if (!selected.shield) projectile.poolHits++;
+      } else if (nearest !== undefined && burn !== undefined) {
+        applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
+        projectile.poolWait = burn.every - 1;
       } else if (nearest !== undefined) {
         const burst = projectile.kind === ProjectileKind.hero ? projectile.spec?.burstInto : undefined;
         if (!(selected.reflector && reflectProjectile(fighterAt(world, nearest), projectile))) {

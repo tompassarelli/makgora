@@ -19,10 +19,24 @@ const fireball = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 26, landingLag, hurt: kaelCastBody(6, 18, 44.0, 58.0), projectiles: [FIREBALL],
 });
 
-const DRAIN_BEAM: StrikeCapsule = { x1: 30.0, z1: 60.0, x2: 120.0, z2: 60.0, radius: 18.0 };
-const drainMana = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 38, landingLag, hurt: kaelCastBody(6, 20, 46.0, 60.0),
-  commandGrab: { ...frames(10, 13), strike: DRAIN_BEAM, holdFrames: 18, effect: { ...kaelHit(4.338719844818115, 40, 38.02436065673828, 40.0), manaSteal: 30 }, recovery: 16 },
+export const FLAME_STRIKE_BURN: SpecialProjectile = {
+  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", modelRadius: 125.0, modelOffsetZ: -50.0,
+  spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
+  life: 48, radius: 45.0, effect: kaelHit(2.0, 80, 0.0, 0.0), burn: { every: 8 }, reflectable: false, limit: 1,
+};
+export const FLAME_STRIKE_BURST: SpecialProjectile = {
+  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 310.0, modelOffsetZ: -50.0,
+  spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
+  life: 6, radius: 45.0, effect: kaelHit(14.0, 80, 90.30785369873047, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
+};
+export const FLAME_STRIKE_RUNE: SpecialProjectile = {
+  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx",
+  spawnFrame: 8, offsetX: 80.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0, dropsToFloor: true,
+  life: 34, activeFrom: 35, radius: 45.0, effect: kaelHit(0.0, 80), expiresInto: FLAME_STRIKE_BURST, reflectable: false, limit: 1, cancelOnInterrupt: true,
+};
+export const FLAME_STRIKE_AIM = { frame: FLAME_STRIKE_RUNE.spawnFrame, reach: 320.0, speed: 8.0 } as const;
+const flameStrike = (landingLag: number | undefined): AuthoredSpecial => ({
+  endFrame: 30, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_RUNE], aim: FLAME_STRIKE_AIM, replacesLive: true,
 });
 
 export const BANISH_FRAMES = 60;
@@ -55,8 +69,8 @@ const phoenix: AuthoredSpecial = {
 export const KAELTHAS_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Fireball", description: "A fast, weak fire missile straight ahead, two on screen at most. Shield, jump or reflect it.",
     ground: fireball(undefined), air: fireball(FIREBALL_LANDING_LAG) }, { damage: 1.25 }),
-  side: withExKit({ name: "Drain Mana", description: "A short tether that grabs through shields and drinks the victim's meter. Jump or dodge it.",
-    ground: drainMana(undefined), air: drainMana(AIR_LANDING_LAG) }, { damage: 1.25 }),
+  side: withExKit({ name: "Flame Strike", description: "Hold to slide a rune outward, release to call a pillar of fire onto it; the pillar lingers and burns. Over open air it stands at Kael's height. One at a time.",
+    ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) }, { damage: 1.25 }),
   up: withExKit({ name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
     ground: phoenix }, { travel: 1.25 }),
   down: withExKit({ name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
