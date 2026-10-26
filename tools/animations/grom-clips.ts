@@ -70,7 +70,7 @@ function between(a: Aim, b: Aim, t: number): Aim {
   return { hand: [a.hand[0] + (b.hand[0] - a.hand[0]) * t, a.hand[1] + (b.hand[1] - a.hand[1]) * t], weapon: [a.weapon[0] + (b.weapon[0] - a.weapon[0]) * t, a.weapon[1] + (b.weapon[1] - a.weapon[1]) * t] };
 }
 function lungeBeats(contact: number, lastActive: number, frames: number): Beat[] {
-  const ease = (t: number) => t * t * (3 - 2 * t), reach = 62, peak = contact - 2, settle = lastActive - 3;
+  const ease = (t: number) => t * t * (3 - 2 * t), reach = 62, peak = contact - 2, settle = contact + 6;
   const coil = Array.from({ length: peak + 1 }, (_, frame) => { const t = ease(frame / peak); return { frame, gesture: blend(LUNGE_SETTLE, LUNGE_COIL, t), drive: [-60 * t, -12 * t] as const, aim: between(CARRY_AIM, REAR_AIM, t) }; });
   const swing = { frame: contact - 1, gesture: blend(LUNGE_COIL, LUNGE_DRIVE, 0.45), drive: [6, -10] as const, aim: OVER_AIM };
   const drive = [44, 56, reach + 4].map((x, i) => ({ frame: contact + i, gesture: blend(LUNGE_DRIVE, LUNGE_CLEAVE, i / 6), drive: [x, -12 - i] as const, aim: between(CHOP_AIM, CLEAVE_AIM, i / 6) }));
