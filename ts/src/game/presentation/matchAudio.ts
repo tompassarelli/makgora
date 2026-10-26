@@ -188,7 +188,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.pitLord]: "spell",
   [Character.beastmaster]: "beastmaster victory",
   [Character.lichKing]: "lichking victory",
-  [Character.thrall]: "spell",
+  [Character.thrall]: "thrall victory",
   [Character.jaina]: "stand victory",
   [Character.sylvanas]: "sylvanaswindrunner victory",
   [Character.cairne]: "cairnebloodhoof victory",
@@ -199,7 +199,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.murloc]: "murloc victory",
   [Character.grom]: "stand victory",
   [Character.anubarak]: "anubarak victory",
-  [Character.malfurion]: "spell",
+  [Character.malfurion]: "malfurionstormrage victory",
   [Character.medivh]: "medivh victory",
   [Character.kobold]: "kobold victory",
 };

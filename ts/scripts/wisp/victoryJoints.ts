@@ -4,11 +4,11 @@ export type Side = 0 | 1;
 export type Limb = 'shoulder' | 'elbow' | 'hand';
 
 const BODY = {
-    root: ['Bone_Root', 'Bone_Root01', 'Root', 'local_C0_0_jnt'],
+    root: ['Bone_Root', 'Bone_Root01', 'Root', 'local_C0_0_jnt', 'Bone_RootArchDruid'],
     pelvis: ['Bone_Pelvis', 'spine_C0_0_jnt', 'Bone_Root01', 'Bone_Root', 'Root', 'Bone Koto Waist01', 'Bone_PelvisArchDruid'],
     waist: ['Bone_Waist', 'spine_C0_1_jnt', 'Stomach'],
     chest: ['Bone_Chest', 'Bone_Chest01', 'bone_chest', 'Chest', 'Cylinder01', 'Bone_ChestArchDruid'],
-    head: ['Bone_Head', 'Bone_Head01', 'bone_head', 'Head'],
+    head: ['Bone_Head', 'Bone_Head01', 'bone_head', 'Head', 'Bone_HeadArchDruid'],
 } as const;
 
 const LIMBS: Readonly<Record<Limb, readonly [readonly string[], readonly string[]]>> = {

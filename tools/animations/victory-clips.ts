@@ -8,7 +8,7 @@ import { sheet, type PoseFrame } from '../../ts/scripts/wisp/hurtboxView';
 import { fighters } from '../../ts/scripts/heroModelSource';
 import { AttackPhase, Character } from '../../ts/src/game/sim/codes';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { ensure, onGlobalClock, tracks } from './original-clips';
+import { ensure, onGlobalClock, rotated, tracks } from './original-clips';
 import { bodyJoint, followers, limbJoint, type Limb, type Side } from '../../ts/scripts/wisp/victoryJoints';
 import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts/wisp/victoryTorso';
 import { anatomyFindings } from '../../ts/scripts/wisp/victoryAnatomy';
@@ -32,9 +32,10 @@ const alternating = (low: Arms): readonly Beat[] => [
     { frame: 64, arms: [low, 'raised'], chest: -12, head: -18, hop: 0.3 }, { frame: 76, arms: 'raised', chest: -15, head: -22, hop: 0.5 },
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
-const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number }>> = {
+const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number }>> = {
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
-    [Character.shadowHunter]: { low: 'pumped', hop: 1 }, [Character.chen]: { low: 'pumped', hop: 1 }, [Character.kobold]: { low: 'pumped', hop: 1 },
+    [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1 }, [Character.kobold]: { low: 'pumped', hop: 1 },
+    [Character.malfurion]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
 };
 const sided = (weapon: Side, held: Arms, free: Arms): readonly [Arms, Arms] => weapon === 0 ? [held, free] : [free, held];
 const step = (weapon: Side, frame: number, held: Arms, free: Arms, chest: number, head: number, hop = 0): Beat =>
@@ -68,15 +69,6 @@ ensure(assetsArg && outputArg && characters.length > 0, 'usage: bun tools/animat
 const [assets, output] = [resolve(assetsArg), resolve(outputArg)];
 ensure(relative(resolve(import.meta.dir, '../..'), output).startsWith('..'), 'Victory clips stay private');
 
-function rotated(q: ArrayLike<number>, y: number, z = 0, roll = 0): Float32Array<ArrayBuffer> {
-    const a = y * Math.PI / 360, b = z * Math.PI / 360, c = roll * Math.PI / 360;
-    const [yi, yj, yk, yl] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
-    const [i, j, k, l] = [yl * Math.sin(c) + yi * Math.cos(c), yj * Math.cos(c) - yk * Math.sin(c), yk * Math.cos(c) + yj * Math.sin(c), yl * Math.cos(c) - yi * Math.sin(c)];
-    const [x = 0, v = 0, w = 0, t = 1] = Array.from(q);
-    const out = [l * x + i * t + j * w - k * v, l * v - i * w + j * t + k * x, l * w + i * v - j * x + k * t, l * t - i * x - j * v - k * w];
-    const length = Math.hypot(...out);
-    return new Float32Array(out.map(n => n / length));
-}
 const point = (matrix: ArrayLike<number>, p: ArrayLike<number>) => [0, 1, 2].map(r => matrix[r]! * p[0]! + matrix[4 + r]! * p[1]! + matrix[8 + r]! * p[2]! + matrix[12 + r]!);
 
 for (const character of characters) {
@@ -158,7 +150,7 @@ for (const character of characters) {
     const outward = (shoulder: readonly number[], side: number, share: number) => centre + Math.sign(shoulder[1]! - centre) * (Math.abs(shoulder[1]! - centre) + reach[side]! * share);
     const targets: Record<Exclude<Arms, 'rest'>, (shoulder: readonly number[], side: number) => readonly number[]> = {
         low: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.25), shoulder[2]! - reach[side]! * 0.9],
-        raised: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, bouncing ? 0.5 : 0.25), shoulder[2]! + reach[side]! * 0.92],
+        raised: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, pumps?.raise?.[0] ?? (bouncing ? 0.5 : 0.25)), shoulder[2]! + reach[side]! * (pumps?.raise?.[1] ?? 0.92)],
         pumped: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.55), shoulder[2]! + reach[side]! * 0.55],
         chest: (shoulder, side) => [shoulder[0]! + reach[side]! * 0.45, centre + (shoulder[1]! - centre) * 0.3, shoulder[2]! - reach[side]! * 0.35],
         wide: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.95), shoulder[2]! - reach[side]! * 0.1],
@@ -169,7 +161,8 @@ for (const character of characters) {
     const below = (child: mdx.Node, ancestor: mdx.Node): boolean => { let at: mdx.Node | undefined = child; while (at !== undefined && at.Parent != null && at.Parent !== -1) { if (at.Parent === ancestor.ObjectId) return true; at = model.Nodes[at.Parent]; } return false; };
     const held = bouncing && design === undefined ? arms.flatMap(([, , hand], side) => model.Nodes.filter(candidate => candidate !== undefined && /^weapon ref$/i.test(candidate.Name.trim()) && below(candidate, hand!)).map(weapon => ({ side, hand: hand!, weapon }))).at(0) : undefined;
     const direction = (from: mdx.Node, to: mdx.Node) => { const [a, b] = [pivot(from), pivot(to)]; const d = [0, 1, 2].map(i => b[i]! - a[i]!); const length = Math.hypot(...d); return d.map(v => v / length); };
-    const upright = held === undefined ? undefined : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
+    const tip = (pumps?.tip ?? 0) * Math.PI / 180;
+    const upright = held === undefined ? undefined : tip !== 0 ? [0, Math.sign(shoulders[held.side]![1]! - centre) * Math.sin(tip), Math.cos(tip)] : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
     for (const beat of beats) {
         pose(chest, beat.frame, beat.chest); pose(head, beat.frame, beat.head);
         const sides = typeof beat.arms === 'string' ? [beat.arms, beat.arms] as const : beat.arms;

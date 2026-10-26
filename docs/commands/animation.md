@@ -176,6 +176,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   from the existing `PRIVATE_OUTPUT/thrall.mdx`, preserving every other clip.
   Exact `Thrall Damage HEIGHT STRENGTH` names (each number 0–2) replace only
   the selected held pain poses; the generator requires nine distinct first poses.
+  `bun tools/animations/thrall-victory.ts PRIVATE_ASSETS PRIVATE_OUTPUT` appends
+  his victory, or re-authors it in place, on the shipped model: his rider arm is
+  one bone, so victory-clips.ts cannot solve it; the hammer and free fist rise
+  out to his sides so the front-on results view keeps them off his face (#514).
   His back air is authored in Blender (#260): `... STOCK_THRALL.mdx PRIVATE_OUTPUT backAir --rig RIG.json`
   writes his skeleton, stand pose, hammer head and both hits' frames, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/thrall-back-air.py -- RIG.json KEYS.json`

@@ -282,3 +282,13 @@ export function originalBodyClip(source: mdx.Model, sequenceIndex: number, mode:
     return {model, mode, sequenceIndex, name: sequence.Name, interval: [start, end], looping: !sequence.NonLooping,
         originalKeys, retainedKeys, trackCount, emptyTracks, omittedEmptyTracks, omittedEffects};
 }
+
+export function rotated(q: ArrayLike<number>, y: number, z = 0, roll = 0): Float32Array<ArrayBuffer> {
+    const a = y * Math.PI / 360, b = z * Math.PI / 360, c = roll * Math.PI / 360;
+    const [yi, yj, yk, yl] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
+    const [i, j, k, l] = [yl * Math.sin(c) + yi * Math.cos(c), yj * Math.cos(c) - yk * Math.sin(c), yk * Math.cos(c) + yj * Math.sin(c), yl * Math.cos(c) - yi * Math.sin(c)];
+    const [x = 0, v = 0, w = 0, t = 1] = Array.from(q);
+    const out = [l * x + i * t + j * w - k * v, l * v - i * w + j * t + k * x, l * w + i * v - j * x + k * t, l * t - i * x - j * v - k * w];
+    const length = Math.hypot(...out);
+    return new Float32Array(out.map(n => n / length));
+}
