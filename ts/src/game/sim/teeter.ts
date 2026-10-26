@@ -1,5 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { DownState, GroundAction, SpecialAction } from "./codes";
+import { inGrabContext } from "./conditions";
 import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { WALK_MIDDLE_STICK_THRESHOLD } from "./stickZones";
@@ -13,16 +14,36 @@ export function canTeeter(f: Readonly<Fighter>): boolean {
     && launch.knockbackX === 0 && shield.pushbackX === 0 && shield.recoilX === 0;
 }
 
-export function teeterAtEdge(f: Fighter, stage: number, matchFrame: number, horizontalStick: number): boolean {
+export function shieldPressed(f: Readonly<Fighter>): boolean {
+  return f.motion.grounded && (f.shield.pushbackX !== 0 || f.shield.stun > 0) && f.launch.hitstun <= 0 && f.down.state === DownState.none && !inGrabContext(f) && !f.status.out;
+}
+
+function edgeSide(f: Readonly<Fighter>, stage: number, matchFrame: number): number {
   const { motion } = f;
   const deck = motion.surface ?? 0;
-  const left = stageSurfaces.surfaceLeft(stage, deck, matchFrame);
-  const right = stageSurfaces.surfaceRight(stage, deck, matchFrame);
-  const side = motion.x > right ? 1 : motion.x < left ? -1 : 0;
-  if (side === 0 || f32(horizontalStick * side) >= WALK_MIDDLE_STICK_THRESHOLD) return false;
-  motion.x = side > 0 ? right : left;
+  return motion.x > stageSurfaces.surfaceRight(stage, deck, matchFrame) ? 1 : motion.x < stageSurfaces.surfaceLeft(stage, deck, matchFrame) ? -1 : 0;
+}
+
+function stopAtEdge(f: Fighter, stage: number, matchFrame: number, side: number): void {
+  const { motion } = f;
+  const deck = motion.surface ?? 0;
+  motion.x = side > 0 ? stageSurfaces.surfaceRight(stage, deck, matchFrame) : stageSurfaces.surfaceLeft(stage, deck, matchFrame);
   motion.vx = 0.0;
+}
+
+export function teeterAtEdge(f: Fighter, stage: number, matchFrame: number, horizontalStick: number): boolean {
+  const side = edgeSide(f, stage, matchFrame);
+  if (side === 0 || f32(horizontalStick * side) >= WALK_MIDDLE_STICK_THRESHOLD) return false;
+  stopAtEdge(f, stage, matchFrame, side);
   f.landing.lag = 0;
   clearDash(f);
+  return true;
+}
+
+export function teeterShieldAtEdge(f: Fighter, stage: number, matchFrame: number): boolean {
+  const side = edgeSide(f, stage, matchFrame);
+  if (side === 0) return false;
+  stopAtEdge(f, stage, matchFrame, side);
+  f.shield.pushbackX = 0.0;
   return true;
 }

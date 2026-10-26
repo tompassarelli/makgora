@@ -103,10 +103,11 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     status: { kind: "deviation", reason: "SmashWiki gives no speed; one facing rule reads at a glance (docs/gameplay-design.md, Teeter and the teeter cancel)", decided: "2026-10-26", issue: 458 },
   },
   {
-    id: "edge-shield-slide-off", family: "movement", name: "Shield pushed off an edge",
-    melee: { undocumented: "no public page states what a shielding fighter does after sliding off", source: wiki("Edge_cancel") }, ours: () => "falls helpless",
-    anchor: { file: `${SIM}/step.ts`, symbol: "slideOffEdge" },
-    status: { kind: "open", reason: "ours; no public source gives Melee's value", issue: 293 },
+    id: "shield-pushback-teeter", family: "movement", name: "Shield pushed to an edge",
+    melee: { value: "the pushback slides the shielding fighter off the edge", source: wiki("Shield") },
+    ours: () => "stops at the edge and teeters, its shieldstun unchanged, in either facing",
+    anchor: { file: `${SIM}/teeter.ts`, symbol: "teeterShieldAtEdge" },
+    status: { kind: "deviation", reason: "a pushback slide off the edge is a free escape from corner pressure; stopping at the edge rewards the corner (docs/gameplay-design.md, Shield pressure at an edge)", decided: "2026-10-26", issue: 483, elsewhere: "Smash 4 and Ultimate stop the shield at the edge too ([SmashWiki](https://www.ssbwiki.com/Shield))" },
   },
   {
     id: "ledge-catch-box", family: "movement", name: "Ledge catch box",

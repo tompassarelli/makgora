@@ -29,6 +29,7 @@ import { meleeSwitchRefusal, switchableRows } from "../../ledger/meleeSwitches";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
 import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
+import { edgeShieldPage } from "../../edgeShieldPressure";
 import { type EdgeGuardObjective, type EdgeGuardUnit, checkEdgeGuard } from "../../edgeGuardObjectives";
 import { type ThrowDeclaration, type ThrowRoleResult, type ThrowRoleUnit, VICTIM, VICTIM_WEIGHT, coverageProblems } from "../../throwRoleObjectives";
 
@@ -401,7 +402,7 @@ const meleeLinks = (attackers: readonly Character[], meleeRows: readonly string[
 
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, melee: { type: "string", multiple: true }, objectives: { type: "boolean" }, validate: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, melee: { type: "string", multiple: true }, objectives: { type: "boolean" }, "edge-shield": { type: "boolean" }, validate: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -426,6 +427,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     return;
   }
   if (parsed.validate === true) return yield* validate(jobs);
+  if (parsed["edge-shield"] === true) return yield* Console.log(edgeShieldPage(attackers.filter((attacker): attacker is Character => attacker !== undefined)).join("\n"));
   if (parsed.objectives === true) return yield* objectives(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.links === true && parsed.melee !== undefined) return yield* meleeLinks(attackers.filter((attacker): attacker is Character => attacker !== undefined), parsed.melee, jobs);
   if (parsed.links === true) return yield* links(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);

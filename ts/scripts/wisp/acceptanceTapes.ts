@@ -15,7 +15,7 @@ import { Character, DownState, LedgeState } from "../../src/game/sim/codes";
 import type { Fighter } from "../../src/game/sim/fighter";
 import { isAerialAttack } from "../../src/game/sim/moves";
 import { type Controls, fighterAt, isActive, neutralControls } from "../../src/game/sim/roster";
-import { surfaceShiftX, surfaceShiftZ } from "../../src/game/sim/stage";
+import { surfaceLeft, surfaceRight, surfaceShiftX, surfaceShiftZ } from "../../src/game/sim/stage";
 import { windPush } from "../../src/game/sim/stageHazards";
 import { stageClock } from "../../src/game/lobby/lobbyState";
 
@@ -74,7 +74,7 @@ interface MatchScript {
 
   readonly hazardsOff?: boolean;
 
-  readonly exercise?: "pushed" | "carried" | "shieldPush" | "edgeCancel" | "shieldSlide";
+  readonly exercise?: "pushed" | "carried" | "shieldPush" | "edgeCancel" | "shieldTeeter";
 
   readonly dropPickups?: number;
 }
@@ -86,7 +86,7 @@ interface EdgeMemory {
   guarding: boolean;
 }
 
-function exercised(session: TapeSession, exercise: "pushed" | "carried" | "shieldPush" | "edgeCancel" | "shieldSlide", memory: EdgeMemory[]): boolean {
+function exercised(session: TapeSession, exercise: "pushed" | "carried" | "shieldPush" | "edgeCancel" | "shieldTeeter", memory: EdgeMemory[]): boolean {
   const { world, match } = session.live;
   const frame = stageClock(match);
   let edge = false;
@@ -99,13 +99,13 @@ function exercised(session: TapeSession, exercise: "pushed" | "carried" | "shiel
     const guarding = fighter.shield.raised || fighter.shield.stun > 0;
     if (before !== undefined && before.grounded && !motion.grounded) {
       if (exercise === "edgeCancel" && before.lag > 0 && !before.guarding && lag === 0) edge = true;
-      if (exercise === "shieldSlide" && before.guarding && fighter.special.fall && !fighter.shield.raised) edge = true;
     }
     memory[slot] = { grounded: motion.grounded, lag, guarding };
     if (exercise === "shieldPush" && fighterAt(world, slot).shield.pushbackX !== 0) return true;
     if (!motion.grounded) continue;
     if (exercise === "pushed" && windPush(match.stageChoice, frame, motion.x, motion.z) !== 0) return true;
     const deck = motion.surface;
+    if (exercise === "shieldTeeter" && guarding && deck !== undefined && (motion.x === surfaceRight(match.stageChoice, deck, frame) || motion.x === surfaceLeft(match.stageChoice, deck, frame))) return true;
     if (exercise === "carried" && deck !== undefined && deck > 0 && (surfaceShiftX(match.stageChoice, deck, frame) !== 0 || surfaceShiftZ(match.stageChoice, deck, frame) !== 0)) return true;
   }
   return edge;
@@ -578,11 +578,11 @@ export function generateTapes(): Map<string, string> {
       holds: [[[1, 30, RIGHT], [16, 2, ATTACK]], []],
       approaches: [[], []], rollbacks: [[10, 40]], exercise: "edgeCancel",
     }])],
-    ["shield-slide-off", recordTape("A shielding fighter at the edge is pushed off by repeated hits and falls helpless, with rollback.", [{
+    ["shield-teeter", recordTape("A shielding fighter at the edge is pushed by repeated hits and stops at the edge in its shieldstun, with rollback.", [{
       placement: "test-air 0 592 0",
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 240,
       holds: [[[1, 240, SHIELD_LEFT]], [[1, 6, RIGHT, WALK], [20, 2, ATTACK], [50, 2, ATTACK], [80, 2, ATTACK], [110, 2, ATTACK], [140, 2, ATTACK], [170, 2, ATTACK]]],
-      approaches: [[], [[1, 40]]], rollbacks: [[30, 60]], exercise: "shieldSlide",
+      approaches: [[], [[1, 40]]], rollbacks: [[30, 60]], exercise: "shieldTeeter",
     }])],
     ["push-physics", recordTape("Walking overlapping bodies and striking a held shield, with predictions and rollback.", [{
       placement: "test-air 1 -215 0",

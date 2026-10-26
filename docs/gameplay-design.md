@@ -2128,7 +2128,7 @@ not an input chore.
 Melee mechanics this does not model, named so they are not mistaken for
 parity: the backward edge slip (SmashWiki's [Edge slip](https://www.ssbwiki.com/Edge_slip)
 puts a fighter who slips off facing away into a short helpless animation;
-Smashcraft's shield slide-off falls helpless instead), and SmashWiki's
+a Smashcraft fighter that slides off with its shield held after its shieldstun falls helpless instead), and SmashWiki's
 limit that only a fighter "moving sufficiently slowly" with forward not held
 stays teetering ([Edge cancel](https://www.ssbwiki.com/Edge_cancel)): Smashcraft
 teeters at any speed, by Tom's rule (2026-10-26). Rolls and spot dodges stop
@@ -2160,7 +2160,7 @@ decides whether a fighter stays on; the parity ledger records the departure
 | A landing (aerial, waveland, empty) facing the edge, stick not toward it, with or without lag left | Teeters and stops at the very end of the platform ([Smashboards](https://smashboards.com/threads/help-with-wavedashing-onto-platforms.231530)); a fighter sliding into the ledge has "any remaining lag ... immediately canceled" and falls off or topples "depending on your direction and input" ([TASVideos](https://tasvideos.org/Forum/Posts/360045)); the teeter cancel removes aerial lag ([SmashWiki Teeter cancel](https://www.ssbwiki.com/Teeter_cancel)). SmashWiki limits this to a fighter "moving sufficiently slowly" ([Edge cancel](https://www.ssbwiki.com/Edge_cancel)) | Teeters at any speed and the landing lag ends (Tom's rule for the speed) |
 | The same landing facing away from the edge | Slides off with the lag cancelled; a backward wavedash "will topple the combatant over the side" ([SmashWiki Wavedash](https://www.ssbwiki.com/Wavedash), [Edge cancel](https://www.ssbwiki.com/Edge_cancel)) | Teeters facing away, its lag ended (Tom's rule: the departure above) |
 | A landing in either facing with the stick held toward the edge | Facing the edge, slides off: "you need to be holding straight forward" to slide off ([Smashboards](https://smashboards.com/threads/help-with-wavedashing-onto-platforms.231530)) | No teeter: the edge cancel is kept and the fighter enters fall on the frame it would have teetered |
-| A waveland with the shield still held | Stops at the edge: the same thread says the shield must be released to slide off | Not changed here: shield pushback at an edge is its own follow-up |
+| A waveland with the shield still held | Stops at the edge: the same thread says the shield must be released to slide off | Not changed here; a shield in pushback or shieldstun stops at the edge (Shield pressure at an edge, below, #483) |
 | Attacks, specials, rolls, crouch, turnaround run, knockback | Not teeter states in any public source | Unchanged: ground moves slide off as above, rolls and spot dodges stop at the edge, the rest slide off |
 
 FightCore publishes frame data only and states nothing about teetering. The
@@ -2187,15 +2187,53 @@ tapes `edge-cancel-turnaround` and `edge-cancel-back-air`:
 - Back air: the freed fighter attacks backward at once, so a back air can
   follow a shielded aerial and carry the attacker back toward the centre.
 
+#### Shield pressure at an edge (#483)
+
+A grounded fighter in shield pushback or shieldstun that reaches the end of its
+surface stops there and teeters, in either facing, whatever the stick holds;
+its pushback ends and its shieldstun runs on unchanged, so it acts on the frame
+after the stun ends with no added stun. The same holds when another fighter's
+body pushes it there during the stun. Melee's pushback "can even push the
+shielder off an edge and cause edge slipping, except in Smash 4 and Ultimate"
+([SmashWiki Shield](https://www.ssbwiki.com/Shield)); there a shielded hit at
+the edge is a free escape. Tom set the departure on 2026-10-26 to reward the
+corner; the parity ledger records it (`shield-pushback-teeter`). The rule lives
+in ts/src/game/sim/teeter.ts (`teeterShieldAtEdge`), called after the motion
+step and after body push; ts/src/game/sim/shieldTeeter.tests.ts replays it.
+
+`bun wisp combos --edge-shield` measures it (docs/commands/combos.md): every
+aerial landed from a hop on a shield 0, 6 or 12 units from a platform's end,
+then the attacker's jab, tilts, grab or down special against the defender
+holding shield, jumping, shield grabbing or rolling in from its first free
+frame. Across the 26 fighters whose aerials meet the shield from the hop grid
+(1,464 strings), on 2026-10-26:
+
+| | Follow-up connects | Defender off stage | Follow-up whiffs |
+| --- | ---: | ---: | ---: |
+| Before (slides off) | 4% | 79% | 17% |
+| Teeter, no added stun | 17% | 34% | 49% |
+| Teeter, 2 frames added | 22% | 30% | 48% |
+| Teeter, 4 frames added | 28% | 25% | 46% |
+
+Against a held shield the follow-up connects 44% of the time, up from 10%;
+against a shield grab 20%, up from 5%. The off-stage share left is a body push
+after the stun, which drops a still-held shield into a helpless fall (Corner
+pressure, below). The added stun buys its gain mostly from the defender's shield
+grab (20% to 51% at 4 frames) and leaves the roll in, the corner's escape, at
+2%. The teeter adds no stun: corner pressure is already rewarded, and stun on
+top would make a shielded hit at the edge safer than the same hit mid-stage.
+
 ### Corner pressure
 
 Shield pushback stays Melee's damage-only formula (owner decision, 9 Oct);
-momentum-scaled pushback is not adopted. What changes is the edge. A fighter that
-is shielding, in shieldstun or being pushed when it leaves the surface drops its
-shield, loses the pushback and enters a helpless fall (`special.fall`), which
-ends only on a ledge catch, a landing or a hit. Rolling or full-hopping out of the
-corner stays available beforehand, readable and punishable. Tape
-`shield-slide-off` shows repeated hits carrying a shielding fighter off.
+momentum-scaled pushback is not adopted. What changes is the edge. Pushback or
+shieldstun never carries a fighter off: it stops at the edge and teeters (Shield
+pressure at an edge, above, #483). A fighter still holding its shield after the
+stun that is pushed off by another body drops its shield and enters a helpless
+fall (`special.fall`), which ends only on a ledge catch, a landing or a hit.
+Rolling or full-hopping out of the corner stays available, readable and
+punishable. Tape `shield-teeter` shows repeated hits holding a shielding fighter
+at the edge.
 
 ### Ledge intangibility decay
 

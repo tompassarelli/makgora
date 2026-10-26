@@ -52,6 +52,16 @@
   that misses and fails (smashcraft:docs/design/melee-parity-plan.md, "Combo
   analyzer", #299 and #332).
 
+- Edge shield pressure: `bun wisp combos --edge-shield [--fighter NAME]...`
+  lands each aerial from a hop on a Rifleman shielding at a side platform's
+  edge (0, 6 and 12 units from it), presses jab, forward tilt, down tilt, grab
+  or down special on the attacker's first actionable frame, and lets the
+  defender hold its shield, jump, shield grab or roll in from its first free
+  frame. It prints how often the follow-up connects, the defender ends off
+  stage, the follow-up whiffs or the defender hits first, with 0, 2 and 4
+  frames of added teeter stun (smashcraft:ts/scripts/edgeShieldPressure.ts,
+  smashcraft:docs/gameplay-design.md, "Shield pressure at an edge", #483).
+
 - Validation: `bun wisp combos --validate [--jobs N]` runs the cited Fox cases
   in smashcraft:ts/scripts/comboValidation.ts on the Fox fixture fighter
   against itself at Fox's weight, each through the link table's measure with

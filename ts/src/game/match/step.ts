@@ -183,7 +183,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     controls.inputs[slot].attackRequested = hasPendingAttack(controls.commands[slot], frame) && f.status.frozenFrames === 0;
   }
   resolveLedges(world, stage, controls.inputs);
-  pushFighterBodies(world);
+  pushFighterBodies(world, stage, stageFrame);
 
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;

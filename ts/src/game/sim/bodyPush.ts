@@ -4,13 +4,14 @@ import { hurtCapsule } from "./geometry/contactGeometry";
 import { inGrabContext, isGroundDodging } from "./conditions";
 import { moveMeleeX } from "./motion";
 import { fighterAt, isActive, type Roster } from "./roster";
+import { shieldPressed, teeterShieldAtEdge } from "./teeter";
 import { melee } from "./tuning";
 
 const PUSH_PER_CONTACT = melee(0.30000001192092896);
 const pushes: Slots<number> = [0.0, 0.0, 0.0, 0.0];
 
 
-export function pushFighterBodies(world: Roster): void {
+export function pushFighterBodies(world: Roster, stage: number, stageFrame: number): void {
   pushes.fill(0.0);
   for (const first of PARTICIPANT_SLOTS) {
     if (!isActive(world, first)) continue;
@@ -32,6 +33,9 @@ export function pushFighterBodies(world: Roster): void {
     }
   }
   for (const slot of PARTICIPANT_SLOTS) {
-    if (isActive(world, slot)) moveMeleeX(fighterAt(world, slot), pushes[slot]);
+    if (!isActive(world, slot)) continue;
+    const f = fighterAt(world, slot);
+    moveMeleeX(f, pushes[slot]);
+    if (shieldPressed(f)) teeterShieldAtEdge(f, stage, stageFrame);
   }
 }
