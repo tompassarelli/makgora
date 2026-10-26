@@ -121,6 +121,7 @@ export interface MoveCues {
   readonly active: Cue;
   /** The fighter's own body tint and alpha while either cue shows. */
   readonly body?: { readonly red: number; readonly green: number; readonly blue: number; readonly alpha: number } | undefined;
+  readonly trail?: true | undefined;
 }
 
 
@@ -414,7 +415,8 @@ export interface HeroBranchCues {
 }
 
 const branch = (spell: string, startup: Cue, active: Cue): MoveCues => ({ spell, startup, active });
-const HAMMERFALL_CUES = branch("Hammerfall", STORM, cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.6)));
+// A flat stomp ring read as a streak ahead of him on every dive line (#577), so the dive trails lightning instead.
+const HAMMERFALL_CUES: MoveCues = { ...branch("Hammerfall", STORM, STORM), trail: true };
 
 
 export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: HeroBranchCues } } = {

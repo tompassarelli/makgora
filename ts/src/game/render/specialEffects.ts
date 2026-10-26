@@ -27,6 +27,7 @@ import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkCue, p
 import { beamSegment, runningHeroSpecial } from "../sim/specials/engine";
 import { emptyCapsule } from "../sim/geometry/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
+import { emptyTrailLine, specialTrail } from "../presentation/specialTrail";
 import { characterModelScale } from "../presentation/modelScale";
 import { IMMOLATE_SOUNDS } from "../presentation/elementLooks";
 import { SummonPresentation } from "./summonPresentation";
@@ -82,6 +83,7 @@ export class SpecialEffects {
 
   private readonly front: number;
   private readonly beamLine = emptyCapsule();
+  private readonly trailLine = emptyTrailLine();
 
   constructor(private readonly origin: WorldOrigin) {
     const { x, y } = origin;
@@ -310,7 +312,7 @@ export class SpecialEffects {
     const beam = runningHeroSpecial(fighter)?.beam;
     const region = specialAreaRegion(fighter, 0);
     if (beam === undefined || fighter.status.out || region.strike === undefined) {
-      this.hideLaser(effects);
+      this.presentTrail(effects, fighter);
       return;
     }
     const line = beamSegment(this.beamLine, fighter, beam, region.strike.radius);
@@ -320,6 +322,19 @@ export class SpecialEffects {
     MoveLightningEx(shown, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
     if (beam.chain === true) SetLightningColor(shown, 1.0, 1.0, 1.0, 1.0);
     else SetLightningColor(shown, 1.0, f32(0.3), f32(0.15), 1.0);
+    effects.laserShown = true;
+  }
+
+  private presentTrail(effects: SpecialSlot, fighter: Readonly<Fighter>): void {
+    const line = this.trailLine;
+    if (!specialTrail(fighter, line)) {
+      this.hideLaser(effects);
+      return;
+    }
+    const { x, z } = this.origin;
+    SetLightningColor(effects.laser, 1.0, 1.0, 1.0, 0.0);
+    MoveLightningEx(effects.chain, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
+    SetLightningColor(effects.chain, 1.0, 1.0, 1.0, 1.0);
     effects.laserShown = true;
   }
 
