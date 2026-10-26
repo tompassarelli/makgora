@@ -65,9 +65,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Goblin Tinker | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
-| Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Kael'thas Sunstrider | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 20% → up tilt against 4/5 DI |
-| Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away short hop, back air; missed tech forward smash; trap short hop, back air covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Kael'thas Sunstrider | light | yes | **no** | yes | yes | yes | forward throw at 20%: tech in place uncovered; tech in forward smash; tech away neutral special; missed tech uncovered; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Kael'thas Sunstrider | medium | yes | yes | yes | yes | yes | forward throw at 20%: tech in place dash grab, back throw; tech in forward smash; tech away neutral special; missed tech dash grab, back throw; trap neutral special covers tech in place, tech away, missed tech | up throw at 20% → up tilt against 4/5 DI |
+| Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | forward throw at 20%: tech in place dash, dash attack; tech in up smash, up smash, up smash, forward smash; tech away dash grab, forward throw, dash grab, up throw, forward smash; missed tech short hop, neutral special, up air, up smash, up smash, forward smash; trap dash grab, forward throw, dash grab, up throw, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Murloc | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw; trap short hop, forward air covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
 | Murloc | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away full hop, forward air; missed tech short hop, down air; trap full hop, forward air covers tech in place, tech away, missed tech | up throw at 60% → up air against 5/5 DI |
@@ -323,16 +323,16 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Goblin Tinker | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kael'thas Sunstrider | light | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
-| Kael'thas Sunstrider | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Kael'thas Sunstrider | light | up throw | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 2/1 in up smash, out forward smash | 1/1 in forward tilt, out dash, dash attack |
+| Kael'thas Sunstrider | light | down throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Kael'thas Sunstrider | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kael'thas Sunstrider | medium | up throw | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
-| Kael'thas Sunstrider | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kael'thas Sunstrider | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Kael'thas Sunstrider | medium | up throw | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 2/1 in up smash, out forward smash | 1/1 in forward tilt, out dash, dash attack |
+| Kael'thas Sunstrider | medium | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Kael'thas Sunstrider | heavy | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kael'thas Sunstrider | heavy | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 KD |
-| Kael'thas Sunstrider | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Kael'thas Sunstrider | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out forward smash | 2/1 in up smash, out forward smash |
+| Kael'thas Sunstrider | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
 | Murloc | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Murloc | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Murloc | light | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in forward tilt, out dash, dash attack |
