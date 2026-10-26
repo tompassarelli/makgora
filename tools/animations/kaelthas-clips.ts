@@ -129,16 +129,16 @@ const STRIKES: Partial<Record<HeroPose, Strike>> = Object.fromEntries(Object.ent
   return [pose, { ...strike, o, r: along(along({}, o, 0.5), strike.r, counter) }];
 }));
 function dashAttackKeys(total: number, contact: number, last: number): Key[] {
-  const drive = Math.round((contact + last) / 2), settle = Math.round(last + (total - last) * 0.4), ease = Math.round(last + (total - last) * 0.7);
+  const drive = contact + 3, settle = Math.round(last + (total - last) * 0.4), ease = Math.round(last + (total - last) * 0.7);
   return [
     { frame: 0, g: {} },
-    { frame: contact - 3, g: { thigh: 25, knee: -40, leftThigh: 35, leftKnee: -30, tx: -60, tz: -4, lean: -22, chest: -12, yaw: -35, head: 12, arm: 40, elbow: -40, leftArm: -50, leftElbow: -70 } },
-    { frame: contact, g: { thigh: -57, knee: 25, leftThigh: 13, leftKnee: 0, tx: 26, lean: 22, chest: 12, yaw: 25, head: -10, arm: -120, leftArm: -165, leftElbow: -10 }, ease: "in" },
-    { frame: contact + 2, g: { thigh: -59, knee: 27, leftThigh: 12, leftKnee: 0, tx: 30, lean: 24, chest: 14, yaw: 28, head: -10, arm: -123, leftArm: -150, leftElbow: -10 }, ease: "out" },
+    { frame: contact - 3, g: { thigh: 30, knee: -45, leftThigh: 40, leftKnee: -35, tx: -72, tz: -4, lean: -32, chest: -20, yaw: -40, head: 18, arm: 50, elbow: -40, leftArm: -60, leftElbow: -70 } },
+    { frame: contact, g: { thigh: -70, knee: 38, leftThigh: 22, leftKnee: 0, tx: 30, tz: -10, lean: 38, chest: 16, yaw: 25, head: -18, arm: -145, leftArm: -170, leftElbow: -10 }, ease: "in" },
+    { frame: contact + 2, g: { thigh: -78, knee: 45, leftThigh: 26, leftKnee: 0, tx: 35, tz: -16, lean: 45, chest: 18, yaw: 24, head: -22, arm: -160, leftArm: -170, leftElbow: -10 }, ease: "out" },
     { frame: drive, g: { thigh: -85, knee: 50, leftThigh: 30, leftKnee: 0, tx: 40, tz: -22, lean: 50, chest: 20, yaw: 20, head: -25, arm: -170, leftArm: -170, leftElbow: -10 } },
-    { frame: last, g: { thigh: -60, knee: 10, leftThigh: -20, leftKnee: -50, tx: 34, tz: 0, lean: 0, chest: -6, yaw: 10, head: 0, arm: -80, leftArm: -60, leftElbow: -10 } },
-    { frame: settle, g: { thigh: -30, knee: 15, leftThigh: -5, leftKnee: -25, tx: 22, tz: -3, lean: -6, chest: -6, yaw: 5, arm: -60, elbow: -20, leftArm: -30, leftElbow: -15 }, ease: "linear" },
-    { frame: ease, g: { thigh: -10, knee: 5, leftKnee: -8, tx: 9, tz: -1, lean: -3, chest: -3, arm: -30, elbow: -15, leftArm: -15 }, ease: "linear" },
+    { frame: last, g: { thigh: -70, knee: 30, leftThigh: 5, leftKnee: -30, tx: 38, tz: -12, lean: 34, chest: 14, yaw: 12, head: -14, arm: -100, elbow: -80, leftArm: -120, leftElbow: -10 } },
+    { frame: settle, g: { thigh: -45, knee: 35, leftThigh: 20, leftKnee: -45, tx: 26, tz: -10, lean: 16, chest: 10, yaw: 5, head: -6, arm: -60, elbow: -50, leftArm: -50, leftElbow: -20 }, ease: "linear" },
+    { frame: ease, g: { thigh: -15, knee: 12, leftThigh: 8, leftKnee: -15, tx: 10, tz: -4, lean: 5, chest: 4, arm: -28, elbow: -20, leftArm: -18 }, ease: "linear" },
     { frame: total, g: {}, ease: "linear" },
   ];
 }

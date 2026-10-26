@@ -122,7 +122,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 - [Graphics settings](graphics-settings.md): which Warcraft III graphics settings Smashcraft reads, the LAN pool profiles and recommended player settings.
 - [What a player sees](player-view.md): scene report and frame probe checks, their expectations and thresholds.
 - [Fighter animation work](fighter-animation-work.md): asset authoring and native pose checks.
-- [Dash attacks](dash-attacks.md): the coil, contact, drive, brake and settle poses a dash attack needs to read at judge-tile size, with the scorecard constraints they must keep.
+- [Dash attacks](dash-attacks.md): the coil, contact, drive, recoil and settle poses a dash attack needs to read at judge-tile size, with the scorecard constraints they must keep.
 - [Warcraft procedures](wc3-procedures.md), [screen states](wc3-screen-state.md) and [authentication](warcraft-authentication.md).
 
 ## Keeping docs from rotting
