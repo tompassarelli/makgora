@@ -4,7 +4,8 @@ import { delimiter, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Duration, Effect } from "effect";
 import { ChildProcess } from "effect/process";
-import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
+import { type Command, type CommandFailure, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
+import type { Platform } from "wisp/scripts/platform/services";
 import { lan as frameworkLan } from "wisp/scripts/wisp/commands/lan";
 import { LanFailure } from "wisp/scripts/wisp/lan/join";
 import { agentSocket, alive, poolHolder, readClaim, readPool, stopPairScopes } from "wisp/scripts/wisp/lan/pool";
@@ -159,7 +160,7 @@ export const poolStop: Command = (args) => Effect.gen(function*() {
   }
 }).pipe(Effect.provide(BunServices.layer));
 
-interface PairStatus { readonly clients: readonly { readonly name: string; readonly pid?: number }[] }
+export interface PairStatus { readonly clients: readonly { readonly name: string; readonly pid?: number }[] }
 
 /** A pair is dropped when its agent is unreachable or either of its two clients has no process. */
 export const pairNeedsRestart = (status: PairStatus | undefined): boolean =>
@@ -191,8 +192,7 @@ export const crashReports = (clientsFile: string): string[] => {
 export const pairDropText = ({ pair, dropped, crashes }: PairDrop): string =>
   `pair ${pair} lost ${dropped.join(" and ")}; ${crashes.length === 0 ? "no Errors/ crash report since the pair started" : `crash ${crashes.join(", ")}`}`;
 
-const pairDropOf = (pair: number) => Effect.gen(function*() {
-  const status = yield* pairStatus(pair);
+const pairDropOf = (pair: number, status: PairStatus | undefined) => Effect.gen(function*() {
   if (!pairNeedsRestart(status)) return undefined;
   const known = yield* readPool.pipe(Effect.orElseSucceed(() => undefined));
   const clients = known?.pairs.find(item => item.id === pair)?.clients;
@@ -201,19 +201,52 @@ const pairDropOf = (pair: number) => Effect.gen(function*() {
   return { drop, profile: known?.profile };
 });
 
-export const droppedPair = (pair: number) => pairDropOf(pair).pipe(Effect.map(found => found?.drop), Effect.provide(BunServices.layer));
+export const droppedPair = (pair: number) => pairStatus(pair).pipe(Effect.flatMap(status => pairDropOf(pair, status)), Effect.map(found => found?.drop), Effect.provide(BunServices.layer));
 
 export const pairRestartFile = (directory: string): string => join(directory, "pair-restart.txt");
 
-/** Restarts a pair whose client dropped, through the pool's own unit; returns what dropped, or undefined when nothing did. */
-export const restartDroppedPair = (pair: number) => Effect.gen(function*() {
-  const found = yield* pairDropOf(pair);
+export interface PairControl {
+  readonly status: Effect.Effect<PairStatus | undefined>;
+  readonly stop: Effect.Effect<void, CommandFailure, Platform>;
+  readonly start: (profile: string | undefined) => Effect.Effect<void, CommandFailure, Platform>;
+  readonly every: Duration.Input;
+  readonly within: Duration.Input;
+}
+
+const stopHolder = (pair: number) => Effect.gen(function*() {
+  yield* poolStop(["--pair", String(pair)]);
+  const holder = poolHolder(pair);
+  if (holder === undefined || !alive(holder)) return;
+  const claim = readClaim(pair);
+  const session = process.env["NORTH_FLEET_SESSION"] ?? "";
+  if (claim?.session !== session) return yield* new LanFailure({ problem: `pair ${pair} is still held by pool ${holder}${claim === undefined ? "" : ` of fleet session ${claim.session || "(none)"}`}; only that session restarts it` });
+  yield* frameworkLan(["stop", "--pair", String(pair)]);
+});
+
+const livePairControl = (pair: number): PairControl => ({
+  status: pairStatus(pair),
+  stop: stopHolder(pair),
+  start: (profile) => poolStart(["--pair", String(pair), ...(profile === undefined ? [] : ["--pool-profile", profile])]),
+  every: "2 seconds",
+  within: "10 minutes",
+});
+
+export const restartPair = (pair: number, control: PairControl) => Effect.gen(function*() {
+  const found = yield* pairDropOf(pair, yield* control.status);
   if (found === undefined) return undefined;
   yield* Console.log(`${pairDropText(found.drop)}; restarting the pair`);
-  yield* poolStop(["--pair", String(pair)]);
-  yield* poolStart(["--pair", String(pair), ...(found.profile === undefined ? [] : ["--pool-profile", found.profile])]);
+  yield* control.stop;
+  yield* control.start(found.profile);
+  yield* pollUntil(control.status.pipe(Effect.map(status => pairNeedsRestart(status) ? undefined : status)), {
+    every: control.every,
+    within: control.within,
+    orElse: () => control.status.pipe(Effect.flatMap(status => Effect.fail(new LanFailure({ problem: `pair ${pair} wasn't back after its restart: ${status === undefined ? "its agent doesn't answer" : status.clients.filter(({ pid }) => pid === undefined).map(({ name }) => name).join(" and ") + " not running"}` })))),
+  });
+  yield* Console.log(`pair ${pair} is back`);
   return found.drop;
 }).pipe(Effect.provide(BunServices.layer));
+
+export const restartDroppedPair = (pair: number) => restartPair(pair, livePairControl(pair));
 
 export const restartDroppedPairInto = (pair: number, directory: string | undefined) => restartDroppedPair(pair).pipe(Effect.tap(drop => Effect.sync(() => {
   if (drop === undefined || directory === undefined) return;
