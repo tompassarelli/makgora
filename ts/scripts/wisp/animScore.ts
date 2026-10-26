@@ -24,7 +24,7 @@ export interface ScoreFrame {
 }
 
 
-export interface StrikeSegment { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number }
+export interface StrikeSegment { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number; readonly radius: number }
 
 
 export interface ScoreLimb { readonly name: string; readonly root: number; readonly end: number }
@@ -340,19 +340,25 @@ const segmentDistance = (p: { readonly x: number; readonly z: number }, s: Strik
 };
 
 
+export function strikeOutside(sample: Pick<MoveSample, "frames" | "regions">, vertex: number): number[] {
+  return sample.regions.flatMap((segments, index) => {
+    const frame = sample.frames[index];
+    if (segments.length === 0 || frame === undefined) return [];
+    const at = point(frame.vertices, vertex);
+    return [Math.min(...segments.map((segment) => segmentDistance(at, segment) - segment.radius))];
+  });
+}
+
+
 export function strikingVertex(sample: Pick<MoveSample, "frames" | "regions" | "strike">, contactFrame: ScoreFrame): number {
-  const active = sample.regions.flatMap((segments, index) => segments.length > 0 && sample.frames[index] !== undefined ? [index] : []);
-  const miss = (vertex: number) => active.length === 0
-    ? Math.hypot((contactFrame.vertices[vertex * 2] ?? 0) - sample.strike.x, (contactFrame.vertices[vertex * 2 + 1] ?? 0) - sample.strike.z)
-    : Math.max(...active.map((index) => {
-      const at = point(sample.frames[index]?.vertices ?? new Float32Array(0), vertex);
-      return Math.min(...(sample.regions[index] ?? []).map((segment) => segmentDistance(at, segment)));
-    }));
-  let tip = 0, nearest = Infinity;
+  const reach = (vertex: number) => Math.hypot((contactFrame.vertices[vertex * 2] ?? 0) - sample.strike.x, (contactFrame.vertices[vertex * 2 + 1] ?? 0) - sample.strike.z);
+  let tip = 0, best = { held: -Infinity, stray: Infinity, distance: Infinity };
   for (let vertex = 0; vertex < contactFrame.drawn.length; vertex++) {
     if (contactFrame.drawn[vertex] !== 1) continue;
-    const distance = miss(vertex);
-    if (distance < nearest) { nearest = distance; tip = vertex; }
+    const outside = strikeOutside(sample, vertex);
+    const rank = { held: outside.filter((miss) => miss <= 0).length, stray: Math.max(0, ...outside), distance: reach(vertex) };
+    const better = rank.held !== best.held ? rank.held > best.held : rank.stray !== best.stray ? rank.stray < best.stray : rank.distance < best.distance;
+    if (better) { best = rank; tip = vertex; }
   }
   return tip;
 }
