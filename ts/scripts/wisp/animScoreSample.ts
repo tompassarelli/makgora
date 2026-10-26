@@ -60,10 +60,6 @@ export const SCORED_SPECIALS: readonly { readonly move: string; readonly x: numb
   { move: "ultimate", x: 0, z: 0, ultimate: true },
 ];
 
-
-
-
-
 const PELVIS = [/^bone_pelvis/i, /^pelvis_bind_jnt$/i, /^pelvis$/i, /^hips$/i, /^bone rider waist$/i, /^bone koto waist/i, /^bone_butt$/i, /^spine_c0_0_jnt$/i, /^root$/i, /^bone_root/i];
 const CHEST = [/^bone_chest/i, /^chest$/i, /^bone neck$/i, /^bone_neck$/i, /^spine_c0_1_jnt$/i];
 
@@ -183,6 +179,7 @@ export interface SampledMove {
   readonly heights: readonly number[];
   readonly travels: readonly number[];
   readonly cues: readonly (readonly SampledCue[])[];
+  readonly strikes: readonly (readonly Capsule[])[];
 }
 
 export interface SampledCue { readonly x: number; readonly z: number; readonly scale: number; readonly age: number }
@@ -203,6 +200,7 @@ const strikeEnd = (capsule: { readonly x1: number; readonly z1: number; readonly
 
 const travels = (frames: readonly PoseFrame[]) => frames.map((frame) => (frame.x - (frames[0]?.x ?? 0)) * (frames[0]?.facing ?? 1));
 
+const localStrikes = (frame: PoseFrame): Capsule[] => frame.strikes.map((s) => ({ x1: s.x1 - frame.x, z1: s.z1 - frame.z, x2: s.x2 - frame.x, z2: s.z2 - frame.z, radius: s.radius }));
 
 function openWindows(f: Fighter): number[] {
   const style = f.attack.style;
@@ -256,9 +254,9 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   const ready = posed[moveFrames];
   if (ready === undefined) return undefined;
   const chestZ = skeleton.chest === undefined ? 50 : posed[first]?.nodes[skeleton.chest * 2 + 1] ?? 50;
-  const regions = frames.slice(0, moveFrames).map((frame, index) => active.includes(index) ? frame.strikes.map((s) => ({ x1: s.x1 - frame.x, z1: s.z1 - frame.z, x2: s.x2 - frame.x, z2: s.z2 - frame.z, radius: s.radius })) : []);
+  const regions = frames.slice(0, moveFrames).map((frame, index) => active.includes(index) ? localStrikes(frame) : []);
   return {
-    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - drop), travels: travels(frames), cues,
+    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - drop), travels: travels(frames), cues, strikes: frames.map(localStrikes),
     sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), regions, pixelsPerUnit },
   };
 }
@@ -276,6 +274,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const frames: PoseFrame[] = [];
   const activeFrames: number[] = [];
   const windows: number[][] = [];
+  const strikes: Capsule[][] = [];
   let strike: { x: number; z: number } | undefined;
   let moveFrames = 0;
   for (let tick = 0; tick < LIMIT; tick++) {
@@ -295,6 +294,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
       const grab = move?.commandGrab !== undefined && frame >= move.commandGrab.first - 1 && frame <= move.commandGrab.last - 1 ? move.commandGrab : undefined;
       const placed = move?.placement?.frame === frame + 1 ? move.placement : undefined;
       windows[frames.length] = (move?.regions ?? []).filter((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined).map((candidate) => candidate.hit.window);
+      strikes[frames.length] = (move?.regions ?? []).flatMap((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined ? [{ ...candidate.hit.strike }] : []);
       if (region !== undefined || projectile !== undefined || grab !== undefined || placed !== undefined) {
         activeFrames.push(frames.length);
         const weapon = region?.hit.strike?.path === true ? move?.regions?.find((candidate) => candidate.hit.strike !== undefined && candidate.hit.strike.path !== true)?.hit.strike : undefined;
@@ -317,7 +317,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const ready = posed[moveFrames];
   if (ready === undefined) return undefined;
   return {
-    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []),
+    move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []), strikes: frames.map((_, index) => strikes[index] ?? []),
     sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
   };
 }

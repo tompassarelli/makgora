@@ -303,6 +303,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   frame it also measures how deep a blade point lies inside the body (behind the body surface from
   all six axis directions), and draws the deepest frame. A blade more than 1 unit inside is
   contact, not a measurement artifact; Blizzard's own Illidan Attack reaches 8.8 (#437).
+- Weapon against hit regions (from the repository root): `bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX]`
+  traces each armed fighter's weapon (its rig's weapon bone) through every active frame of every
+  move and fails a move whose weapon tip leaves that frame's hit regions, or whose region's far end
+  lies away from everywhere the weapon goes during the move, by more than 20 units; limb strikes
+  are reported, not failed. It writes build/anim-score/classic-weapons.tsv worst first.
+  `--shift` moves one region of one move by DX units for a mutant run (#508).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);

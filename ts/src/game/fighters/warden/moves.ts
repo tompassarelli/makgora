@@ -21,7 +21,7 @@ export const WARDEN_GROUND: GroundKit = {
     [AttackStyle.forwardTilt]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 50.0, 119.0, 52.0], [18.0, 50.0, 119.0, 50.0], [18.0, 48.0, 110.0, 46.0]], 6.0, wardenThrust(35))),
     [AttackStyle.forwardTiltUp]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 58.0, 105.0, 100.0], [18.0, 60.0, 110.0, 95.0], [18.0, 58.0, 100.0, 88.0]], 6.0, wardenThrust(55))),
     [AttackStyle.forwardTiltDown]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 40.0, 110.0, 10.0], [18.0, 38.0, 119.0, 4.0], [18.0, 36.0, 105.0, 0.0]], 6.0, wardenThrust(20))),
-    [AttackStyle.upTilt]: heroMove(4, 4, 16, 0, swing(4, [[18.0, 40.0, 95.0, 60.0], [16.0, 50.0, 70.0, 90.0], [8.0, 56.0, 35.0, 99.0], [0.0, 56.0, -10.0, 99.0]], 6.0,
+    [AttackStyle.upTilt]: heroMove(4, 4, 16, 0, swing(4, [[3.0, 126.0, -4.0, 185.0], [13.0, 129.0, 5.0, 187.0], [16.0, 130.0, -7.0, 183.0], [13.0, 129.0, -11.0, 182.0]], 12.0,
       groundHit(6.0, 90, 60.0, 32.0, WD))),
     [AttackStyle.downTilt]: heroMove(3, 2, 9, 0, swing(3, [[16.0, 8.0, 99.0, 8.0], [16.0, 5.0, 99.0, 5.0]], 6.0, groundHit(3.0, 0, 20.0, 32.0, WD))),
     [AttackStyle.dashAttack]: travelThrough(heroMove(5, 10, 21, 0, [...swing(5, [[18.0, 30.0, 105.0, 40.0], [18.0, 40.0, 105.0, 52.0], [18.0, 50.0, 100.0, 62.0]], 6.0,
@@ -148,10 +148,10 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     ...WARDEN_GROUND.normals,
     [AttackStyle.forwardSmash]: heroMove(15, 3, 30, 0, cut(15, [64.0, 45.0, 26.0], L, wardenHit(9.159215927124023, "KILL", 40), wardenHit(12.212287902832031, "KILL", 40))),
     [AttackStyle.upSmash]: heroMove(13, 4, 27, 0, path(13, [
-      blade(12.0, 46.0, 24.0, f32(M - BLADE_RADIUS)),
-      blade(8.0, 46.0, 10.0, f32(M - BLADE_RADIUS)),
-      blade(0.0, 46.0, -10.0, f32(M - BLADE_RADIUS)),
-      blade(-8.0, 46.0, -24.0, f32(M - BLADE_RADIUS)),
+      blade(-14.0, 131.0, -8.0, 191.0, 12.0),
+      blade(-12.0, 138.0, -8.0, 199.0, 12.0),
+      blade(-12.0, 141.0, -8.0, 202.0, 12.0),
+      blade(-13.0, 141.0, -10.0, 201.0, 12.0),
     ], wardenHit(10.685750961303711, "KILL", 90))),
     [AttackStyle.downSmash]: heroMove(12, 5, 28, 0, [
       ...path(12, [
