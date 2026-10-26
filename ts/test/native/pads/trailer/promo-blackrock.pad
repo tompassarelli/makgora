@@ -1,0 +1,7 @@
+#! chat -dev quick promo stage 12 pair mountain king / kobold
+#! expect b 1524 ledge 1
+#! expect b 1569 ledge 0
+#! expect b 1577 damage 128
+#! expect b 1719 damage 0.000
+1750 a press VIEW
+1820 a release VIEW

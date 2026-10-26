@@ -1,0 +1,19 @@
+#! chat -dev quick stage 14 pair grom hellscream / thrall
+#! expect a 70 grab action 1
+#! expect b 85 damage 7
+40 a stick 1 0
+40 b stick -1 0
+46 a stick 0 0
+46 b stick 0 0
+60 a tap RB 2
+72 a stick 1 0
+76 a stick 0 0
+120 b stick 1 0
+124 b stick 0 0
+150 b tap A 2
+154 b tap A 2
+200 a tap B 8
+208 a cstick 1 0
+212 a cstick 0 0
+310 a press VIEW
+380 a release VIEW

@@ -1,0 +1,7 @@
+#! chat -dev quick promo stage 6 pair dreadlord / forsaken paladin
+#! expect b 1502 ledge 1
+#! expect b 1543 damage 94
+#! expect b 1605 ledge 1
+#! expect b 1646 ledge 0
+1670 a press VIEW
+1740 a release VIEW

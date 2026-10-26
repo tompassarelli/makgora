@@ -1,0 +1,5 @@
+#! chat -dev quick promo stage 4 pair sylvanas windrunner / lich
+#! expect b 1466 damage 134
+#! expect b 1573 damage 0.000
+1600 a press VIEW
+1670 a release VIEW

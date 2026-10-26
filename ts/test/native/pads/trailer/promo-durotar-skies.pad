@@ -1,0 +1,6 @@
+#! chat -dev quick promo stage 3 pair blademaster / thrall
+#! expect a 1640 damage 137
+#! expect a 1678 special 15
+#! expect a 1819 damage 0.000
+1850 a press VIEW
+1920 a release VIEW

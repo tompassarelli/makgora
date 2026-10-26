@@ -1,0 +1,6 @@
+#! chat -dev quick promo stage 7 pair warden / murloc
+#! expect b 857 damage 81
+#! expect b 906 damage 89
+#! expect b 1019 damage 0.000
+1050 a press VIEW
+1120 a release VIEW

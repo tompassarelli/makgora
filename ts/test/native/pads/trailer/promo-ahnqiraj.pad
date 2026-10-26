@@ -1,0 +1,5 @@
+#! chat -dev quick promo stage 13 pair cairne bloodhoof / chen stormstout
+#! expect a 728 damage 113
+#! expect a 963 damage 0.000
+990 a press VIEW
+1060 a release VIEW

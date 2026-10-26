@@ -1,0 +1,6 @@
+#! chat -dev quick promo stage 10 pair medivh / malfurion stormrage
+#! expect b 1766 ledge 1
+#! expect a 1783 damage 90
+#! expect b 1811 ledge 0
+1850 a press VIEW
+1920 a release VIEW

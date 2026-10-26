@@ -1,0 +1,13 @@
+#! preset melee
+#! chat -dev setup quick stage 3 pair mountain king / cairne bloodhoof;meter 100
+#! expect a 260 special 16
+#! expect a 260 meter-cue ex-aura on
+#! expect a 290 meter-cue ex-aura off
+#! expect a 1 meter-cue super-aura on
+256 a stick 0 -1
+260 a press LB
+260 a tap B 2
+262 a release LB
+264 a stick 0 0
+350 a press VIEW
+420 a release VIEW

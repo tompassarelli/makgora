@@ -1,0 +1,6 @@
+#! chat -dev quick promo stage 14 pair pit lord / illidan
+#! expect b 259 damage 51
+#! expect b 350 damage 79
+#! expect b 502 damage 0.000
+530 a press VIEW
+600 a release VIEW

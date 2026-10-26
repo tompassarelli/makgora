@@ -1,0 +1,6 @@
+#! chat -dev quick promo stage 11 pair jaina proudmoore / rifleman
+#! expect b 1682 ledge 1
+#! expect b 1721 damage 130
+#! expect b 1964 damage 0.000
+1990 a press VIEW
+2060 a release VIEW

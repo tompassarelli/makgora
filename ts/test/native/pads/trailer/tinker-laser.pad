@@ -1,0 +1,19 @@
+#! chat -dev quick stage 11 pair goblin tinker / mountain king
+#! expect a 70 special 14
+#! expect b 92 damage 6
+40 b stick -1 0
+52 b stick 0 0
+70 a stick 1 0
+70 a tap X 2
+72 a stick 0 0
+72 b shield 1
+73 b stick -1 0
+75 b stick 0 0
+76 b shield 0
+96 b stick 1 0
+99 b tap RB 2
+101 b stick 0 0
+125 b stick 1 0
+128 b stick 0 0
+150 a press VIEW
+220 a release VIEW

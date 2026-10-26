@@ -1,0 +1,12 @@
+#! chat -dev setup quick stage 13 pair kael'thas sunstrider / grom hellscream;meter 100
+#! expect a 91 special 17
+#! expect a 91 meter-cue ultimate-burst on
+#! expect b 140 damage 4
+#! expect b 260 damage 21
+40 b stick -1 0
+52 b stick 0 0
+90 a press A
+91 a tap X 2
+93 a release A
+290 a press VIEW
+360 a release VIEW
