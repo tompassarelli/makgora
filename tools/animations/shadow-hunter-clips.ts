@@ -251,7 +251,7 @@ function upAngledKick(): Authored {
 }
 function upTilt(): Authored {
   const { contact, total } = timing(AttackStyle.upTilt);
-  const hold = (k: number): Gesture => ({ ...still(k), arm: GUARD.arm! * k, wrist: 45 * k });
+  const hold = (k: number): Gesture => ({ ...still(k), arm: GUARD.arm! * k, armYaw: -60 * k, wrist: 45 * k });
   return { pose: "upTilt", style: AttackStyle.upTilt, support: "L", phases: [
     { frame: 0, gesture: READY },
     { frame: contact - 4, gesture: { ...hold(1), lean: 4, chest: 4, backKnee: 60, drop: -6, frontKnee: 16 }, reach: ["footR", -50, 2] },
