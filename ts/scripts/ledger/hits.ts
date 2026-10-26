@@ -7,7 +7,7 @@ import {
   CROUCH_CANCEL_KNOCKBACK_SCALE, DI_MAX_DEGREES, ELECTRIC_HITLAG_SCALE, HITLAG_CAP_FRAMES, HITSTUN_FRAMES_PER_KNOCKBACK, KNOCKBACK_CAP,
   KNOCKBACK_DAMAGE_SCALE, KNOCKBACK_GROWTH_ADDEND, KNOCKBACK_GROWTH_SCALE, KNOCKBACK_LAUNCH_SPEED, KNOCKBACK_PERCENT_SCALE, KNOCKBACK_STACKING_FRAMES,
   SAKURAI_AIRBORNE_DEGREES, SAKURAI_GROUNDED_DEGREES, SAKURAI_HIGH_KNOCKBACK, SAKURAI_LOW_KNOCKBACK, SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG,
-  ageKnockback, damageLevelForKnockback, effectKnockback, fixedHitKnockback, installDamageLaunch, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
+  ageKnockback, damageLevelForKnockback, installDamageLaunch, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
 } from "../../src/game/sim/knockback";
 import { REFERENCE_HURT_CAPSULE } from "../../src/game/sim/geometry/contactGeometry";
 import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
@@ -15,7 +15,7 @@ import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAG
 import { ASDI_TRAVEL, HIT_TRAVEL, SDI_PULSE_TRAVEL, SDI_STEP_TRAVEL, STRING_TRAVEL } from "../../src/game/sim/smashDirectionalInfluence";
 import { WEAK_HIT_DAMAGE_SCALE, WEAK_HIT_KNOCKBACK_SCALE } from "../../src/game/sim/strongHits";
 import { MAX_PERCENT } from "../../src/game/sim/percent";
-import { WORLD_UNITS_PER_MELEE_UNIT } from "../../src/game/sim/tuning";
+import { WORLD_UNITS_PER_MELEE_UNIT, melee } from "../../src/game/sim/tuning";
 import { FIGHTCORE_URL } from "../../../references/melee-frame-data/fightcore";
 import { MELEE_PERCENT_LIMIT, compareThresholds } from "../meleeThresholds";
 import { type LedgerRow, PARITY, probe, range, shortNumber } from "./row";
@@ -92,13 +92,21 @@ const tumbleKnockback = (): number => range(0, 200).find((knockback) => damageLe
 
 const MELEE_SET_KNOCKBACK = "percent 10 and the set value as damage, through the formula";
 
-function setKnockback(): string {
-  const grid = range(40, 160, 20).flatMap((weight) => [0, 50, 100].map((growth) => ({ weight, growth })));
-  const differs = grid.find(({ weight, growth }) => effectKnockback({ growth, base: 10, setKnockback: 60 }, 80, 12, weight) !== fixedHitKnockback(60, weight, growth, 10, 1.0));
-  if (differs === undefined) return MELEE_SET_KNOCKBACK;
-  const fixed = grid.every(({ weight, growth }) => effectKnockback({ growth, base: 10, setKnockback: 60 }, 80, 12, weight) === 60);
-  return fixed ? "the knockback itself, whatever the weight, growth and base" : `differs at weight ${differs.weight}, growth ${differs.growth}`;
+const SET_KNOCKBACK_HIT = { damage: 5.0, growth: 100.0, base: 0.0, launchX: 0.3420201241970062, launchZ: 0.9396926164627075, electric: false, setKnockback: 90.0 };
+
+function setKnockbackLaunch(weight: number): number {
+  const s: Scene = solo(0, Character.rifleman);
+  const victim = fighter(s, 0);
+  victim.tuning = { ...victim.tuning, physics: { ...victim.tuning.physics, weight } };
+  victim.status.damage = 40.0;
+  beginDamageContacts();
+  collectDamageContact(s.world, 1, 0, SET_KNOCKBACK_HIT, 1, ContactKind.launch, true, undefined, false);
+  finishDamageContacts(s.world);
+  return Math.hypot(victim.launch.knockbackX, victim.launch.knockbackZ) / melee(KNOCKBACK_LAUNCH_SPEED);
 }
+
+const meleeSetKnockback = (weight: number): number =>
+  ((10 / 10 + (10 * SET_KNOCKBACK_HIT.setKnockback) / 20) * (200 / (weight + 100)) * 1.4 + 18) * (SET_KNOCKBACK_HIT.growth / 100) + SET_KNOCKBACK_HIT.base;
 
 function percentAfterHit(percent: number, damage: number): number {
   const s: Scene = solo(0, Character.rifleman);
@@ -154,10 +162,13 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     anchor: { file: KNOCKBACK, symbol: "KNOCKBACK_CAP" }, status: PARITY,
   },
   {
-    id: "set-knockback", family: "hits", name: "Set knockback",
-    melee: { value: MELEE_SET_KNOCKBACK, source: wiki("Knockback") }, ours: setKnockback,
-    anchor: { file: KNOCKBACK, symbol: "effectKnockback" },
-    status: { kind: "open", reason: "a move's setKnockback is the knockback itself, so weight, growth and base no longer apply", issue: 293 },
+    id: "set-knockback", family: "hits", name: "Set knockback, probed headless: a set-90 growth-100 hit on weight-75, 100 and 118 victims",
+    melee: { value: MELEE_SET_KNOCKBACK, source: wiki("Knockback") },
+    ours: probe({
+      text: MELEE_SET_KNOCKBACK, inputs: [75, 100, 118], label: (weight) => `weight ${weight}`,
+      ours: setKnockbackLaunch, melee: meleeSetKnockback, close: (ours, melee) => Math.abs(ours - melee) <= 0.01,
+    }),
+    anchor: { file: KNOCKBACK, symbol: "effectKnockback" }, status: PARITY,
   },
   {
     id: "crouch-cancel-knockback", family: "hits", name: "Crouch cancel knockback",

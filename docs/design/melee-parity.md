@@ -8,7 +8,11 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
+<<<<<<< HEAD
 503 rows: 449 parity, 34 deviations, 20 open.
+=======
+503 rows: 448 parity, 34 deviations, 21 open.
+>>>>>>> 943944f46 (Run set-knockback hits through Melee's formula at 10% with the set value as damage: effectKnockback now passes a set-knockback hit to fixedHitKnockback, so a set-90 growth-100 hit launches weight-75, 100 and 118 victims at 91.6, 82.4 and 77.08 knockback (90 at every weight before), and every set-knockback move takes Melee's growth 100 with its set value kept (the 24 authored down throws, the grabs.ts default and Warden's Fan of Knives, ground and air), so a down throw launches at 82.4 instead of 90; the set-knockback ledger row is a headless probe at parity (smashcraft#529))
 
 ## Deviations from Melee
 
@@ -109,7 +113,7 @@ deviation's reason, issue and decision date are written.
 | Knockback: addend before growth (+18) `knockback-growth-addend` | 18 | [18](https://www.ssbwiki.com/Knockback) | [knockback.ts:28](../../ts/src/game/sim/knockback.ts#L28) `KNOCKBACK_GROWTH_ADDEND` | parity |
 | Knockback: weight term, probed at weights 40-160 `knockback-weight-term` | 200/(w+100) | [200/(w+100)](https://www.ssbwiki.com/Knockback) | [knockback.ts:60](../../ts/src/game/sim/knockback.ts#L60) `launchWeightFactor` | parity |
 | Knockback cap `knockback-cap` | 2500 | [2500](https://www.ssbwiki.com/Knockback) | [knockback.ts:29](../../ts/src/game/sim/knockback.ts#L29) `KNOCKBACK_CAP` | parity |
-| Set knockback `set-knockback` | the knockback itself, whatever the weight, growth and base | [percent 10 and the set value as damage, through the formula](https://www.ssbwiki.com/Knockback) | [knockback.ts:89](../../ts/src/game/sim/knockback.ts#L89) `effectKnockback` | open: a move's setKnockback is the knockback itself, so weight, growth and base no longer apply (#293) |
+| Set knockback, probed headless: a set-90 growth-100 hit on weight-75, 100 and 118 victims `set-knockback` | percent 10 and the set value as damage, through the formula | [percent 10 and the set value as damage, through the formula](https://www.ssbwiki.com/Knockback) | [knockback.ts:89](../../ts/src/game/sim/knockback.ts#L89) `effectKnockback` | parity |
 | Crouch cancel knockback `crouch-cancel-knockback` | 0.6666667 | [0.6666667](https://www.ssbwiki.com/Crouch_cancel) | [knockback.ts:31](../../ts/src/game/sim/knockback.ts#L31) `CROUCH_CANCEL_KNOCKBACK_SCALE` | parity |
 | Knockback on a victim charging a smash `smash-charge-victim-knockback` | 1.2 | [1.2](https://www.ssbwiki.com/Knockback) | [knockback.ts:32](../../ts/src/game/sim/knockback.ts#L32) `SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE` | parity |
 | Hitlag, probed at damage 1-50 `hitlag` | ⌊d/3 + 3⌋ | [⌊d/3 + 3⌋](https://www.ssbwiki.com/Hitlag) | [knockback.ts:118](../../ts/src/game/sim/knockback.ts#L118) `victimHitlagFrames` | parity |

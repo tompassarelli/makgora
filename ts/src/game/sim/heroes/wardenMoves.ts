@@ -254,6 +254,6 @@ export const WARDEN_MOVES: FighterMoves = {
     [GrabAction.throwForward]: throwMove(10, 23, { ...wardenHit(4.0, "EDGE", 40), growth: 80.0, base: 70.0 }),
     [GrabAction.throwBack]: throwMove(15, 23, { ...wardenHit(4.0, "EDGE", 45, -1.0), growth: 70.0, base: 72.0 }),
     [GrabAction.throwUp]: throwMove(11, 9, { ...wardenHit(3.8163399696350098, "JUGGLE", 85), growth: 100.0, base: 70.0 }),
-    [GrabAction.throwDown]: throwMove(14, 29, { ...wardenHit(3.0, "CHASE", 70), growth: 0.0, base: 0.0, setKnockback: 90.0 }),
+    [GrabAction.throwDown]: throwMove(14, 29, { ...wardenHit(3.0, "CHASE", 70), growth: 100.0, base: 0.0, setKnockback: 90.0 }),
   },
 };

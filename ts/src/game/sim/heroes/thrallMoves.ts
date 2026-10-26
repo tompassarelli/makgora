@@ -61,6 +61,6 @@ export const THRALL_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 34, effect: thrallHit(8.192000389099121, 35, 52.5, 67.0) },
     [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 40, effect: thrallHit(10.239999771118164, 40, 30.0, 74.0, true) },
     [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 28, effect: thrallHit(7.168000221252441, 75, 83.80999755859375, 60.0, true) },
-    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 42, effect: { ...thrallHit(6.144000053405762, 70, 0.0, 0.0), setKnockback: 90.0 } },
+    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 42, effect: { ...thrallHit(6.144000053405762, 70, 0.0, 0.0), growth: 100.0, setKnockback: 90.0 } },
   },
 };

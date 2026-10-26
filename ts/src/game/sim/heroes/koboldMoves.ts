@@ -62,6 +62,6 @@ export const KOBOLD_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 32, effect: ordinary(8.710169792175293, 40, 36.5, 61.0) },
     [GrabAction.throwBack]: { contactFrame: 14, totalFrames: 33, effect: ordinary(11.198789596557617, 40, 27.5, 70.0, true) },
     [GrabAction.throwUp]: { contactFrame: 12, totalFrames: 26, effect: ordinary(7.465859889984131, 90, 49.355682373046875, 50.0) },
-    [GrabAction.throwDown]: { contactFrame: 16, totalFrames: 38, effect: { ...ordinary(6.221549987792969, 70, 0.0, 0.0), setKnockback: 90.0 } },
+    [GrabAction.throwDown]: { contactFrame: 16, totalFrames: 38, effect: { ...ordinary(6.221549987792969, 70, 0.0, 0.0), growth: 100.0, setKnockback: 90.0 } },
   },
 };
