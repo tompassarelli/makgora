@@ -164,11 +164,15 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   changed length; every other clip, and the `... Motion` roots later passes added, stays
   byte-identical, so a move whose sim timing is unchanged is reworked without regenerating the
   clips that later passes edited (#459).
-  A Blender take of his dash attack (#339, judged but not yet shipped): `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --rig RIG.json`
+  Blender takes name the move after the output: `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT POSE --rig RIG.json`
   writes his skeleton, stand pose and the move's timing, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/anubarak-dash-attack.py -- RIG.json KEYS.json`
-  bakes one key per attack frame, and `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --keys KEYS.json` authors every clip with
-  those keys spliced into the dash attack, set on the floor each frame (`tools/animations/blender-keys.ts`).
+  bakes one key per attack frame, and `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT POSE --keys KEYS.json` authors every clip with
+  those keys spliced into that move, set on the floor each frame (`tools/animations/blender-keys.ts`); the rig, pose
+  vocabulary and bake are shared in `tools/animations/anubarak_rig.py`. The dash attack (#339, judged but not yet
+  shipped) is `anubarak-dash-attack.py`. The shipped forward air (#464) is `anubarak-forward-air.py`, re-keyed into
+  the shipped model with `... SHIPPED_CRYPT_LORD.mdx PRIVATE_OUTPUT forwardAir --keys KEYS.json --rekey forwardAir`
+  from a rig written the same way from the shipped model.
   `bun tools/animations/grab-pads.ts` generates the #180 mirror and unlike-height capture batch:
   every selectable fighter, four throws, both facings, with ordinary catch/pummel
   inputs and contact-frame captures in smashcraft:ts/test/native/pads/180/.

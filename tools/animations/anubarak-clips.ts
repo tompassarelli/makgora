@@ -25,10 +25,10 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
 }
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const { rig: rigOutput, keys: bakedKeys } = blenderOptions(process.argv), blenderPose: HeroPose = "dashAttack";
+const { rig: rigOutput, keys: bakedKeys } = blenderOptions(process.argv), blenderPose = process.argv[4]?.startsWith("--") === false ? process.argv[4] as HeroPose : undefined;
 const rekeyAt = process.argv.indexOf("--rekey"), rekeyed = rekeyAt < 0 ? [] : process.argv.slice(rekeyAt + 1).filter(arg => !arg.startsWith("--"));
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith("..") && !(rigOutput && bakedKeys) && (rekeyAt < 0 || rekeyed.length > 0), "usage: bun tools/animations/anubarak-clips.ts STOCK_ANUBARAK.mdx|SHIPPED_ANUBARAK.mdx PRIVATE_OUTPUT [--rig RIG.json | --keys KEYS.json] [--rekey POSE...]");
+ensure(input && output && relative(project, output).startsWith("..") && !(rigOutput && bakedKeys) && (rekeyAt < 0 || rekeyed.length > 0) && (blenderPose === undefined) === !(rigOutput || bakedKeys), "usage: bun tools/animations/anubarak-clips.ts STOCK_ANUBARAK.mdx|SHIPPED_ANUBARAK.mdx PRIVATE_OUTPUT [POSE --rig RIG.json | POSE --keys KEYS.json] [--rekey POSE...]");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), shipped = parseMDX(originalBytes);
 if (source.Sequences.length > 17) {
@@ -205,9 +205,10 @@ function joint(name: string, g: Gesture): [number, number] {
 }
 const groundGestures = new Set(normals.slice(0, 8).map(([pose]) => pose));
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
-const blender = blenderSkeleton(source, originals, stand, globalClock), blenderAction = actions.find(a => a.pose === blenderPose)!;
-if (rigOutput) { await blender.writeRig(rigOutput, { frames: blenderAction.frames, contact: blenderAction.contact, active: ANUBARAK_MOVES.normals[AttackStyle.dashAttack]!.activeFrames }); console.log(`ANUBARAK_RIG ${blenderPose} ${rigOutput}`); process.exit(0); }
-const bakedVector = bakedKeys ? await blender.readKeys(bakedKeys, blenderAction.frames) : undefined;
+const blender = blenderSkeleton(source, originals, stand, globalClock), blenderAction = actions.find(a => a.pose === blenderPose), blenderMove = blenderPose && ANUBARAK_MOVES.normals[AttackStyle[blenderPose as keyof typeof AttackStyle]];
+ensure(!blenderPose || (blenderAction && blenderMove), `${blenderPose}: not a Blender-authorable normal`);
+if (rigOutput) { await blender.writeRig(rigOutput, { frames: blenderAction!.frames, contact: blenderAction!.contact, active: blenderMove!.activeFrames }); console.log(`ANUBARAK_RIG ${blenderPose} ${rigOutput}`); process.exit(0); }
+const bakedVector = bakedKeys ? await blender.readKeys(bakedKeys, blenderAction!.frames) : undefined;
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
