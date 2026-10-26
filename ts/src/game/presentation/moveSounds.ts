@@ -136,7 +136,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.kaelthas]: {
     weapon: Weapon.blunt, strong: "Fireball",
-    specials: [s("FireballLaunch", "FlameStrike"), s("SiphonManaCaster", "SiphonManaCaster"), s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
+    specials: [s("FireballLaunch", "FlameStrike"), s("FlameStrike", "FlameStrike"), s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
   },
   [Character.murloc]: {
     weapon: Weapon.claw, strong: "CrushingWaveDamage",
