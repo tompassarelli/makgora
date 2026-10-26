@@ -1,6 +1,7 @@
 
 
 
+import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
@@ -164,6 +165,33 @@ function landingFrame(f: Readonly<Fighter>, frames: number, deckZ: number, match
 
 
 
+const slides: number[] = [0.0];
+const lastSlide = { speed: -1.0, traction: 0.0, walkSpeed: 0.0, velocity: 0.0, steps: 0 };
+
+
+function slideAfter(speed: number, traction: number, walkSpeed: number, steps: number): number {
+  const memo = lastSlide;
+  if (memo.speed !== speed || memo.traction !== traction || memo.walkSpeed !== walkSpeed) {
+    memo.speed = speed;
+    memo.traction = traction;
+    memo.walkSpeed = walkSpeed;
+    memo.velocity = speed;
+    memo.steps = 0;
+  }
+  let velocity = memo.velocity;
+  let slide = at(slides, memo.steps);
+  while (memo.steps < steps && velocity > 0.0) {
+    velocity = Math.max(0.0, f32(velocity - (velocity > walkSpeed ? f32(traction * 2.0) : traction)));
+    slide = f32(slide + velocity);
+    memo.steps++;
+    slides[memo.steps] = slide;
+  }
+  memo.velocity = velocity;
+  return at(slides, Math.min(steps, memo.steps));
+}
+
+
+
 export function horizontalAhead(f: Readonly<Fighter>, frames: number, stage: number, matchFrame: number): number {
   const { x, z, deltaX } = f.motion;
   const straight = f32(x + f32(deltaX * frames));
@@ -176,12 +204,7 @@ export function horizontalAhead(f: Readonly<Fighter>, frames: number, stage: num
   const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, { grounded: true, surface: deck }));
   const speed = Math.abs(deltaX);
   const walkSpeed = f.tuning.physics.walkSpeed;
-  let velocity = speed;
-  let slide = 0.0;
-  for (let frame = landing; frame < frames && velocity > 0.0; frame++) {
-    velocity = Math.max(0.0, f32(velocity - (velocity > walkSpeed ? f32(traction * 2.0) : traction)));
-    slide = f32(slide + velocity);
-  }
+  const slide = slideAfter(speed, traction, walkSpeed, frames - landing);
   const landed = f32(x + f32(deltaX * landing));
   const rest = deltaX < 0 ? f32(landed - slide) : f32(landed + slide);
   return Math.max(surfaceLeft(stage, deck, matchFrame), Math.min(surfaceRight(stage, deck, matchFrame), rest));
