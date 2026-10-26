@@ -1,11 +1,10 @@
 # Mountain King's native checks by parity: #125 Storm Bolt, Thunder Clap, Hammerfall.
 # Mountain King a against Mountain King b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero mountain king
-# Storm Bolt out and back; its return hits b.
+# Storm Bolt flies straight out and hits b; it never comes back.
 60 a tap X 2
-# Storm Bolt recalled early on its 16th frame.
+# A second Storm Bolt hits b again.
 200 a tap X 2
-215 a tap X 2
 # b dashes in; a late Thunder Clap, held 50 frames.
 300 b stick -1 0
 308 b stick 0 0
@@ -23,10 +22,10 @@
 615 a tap X 2
 # Expected, frame by frame (headless run of this script):
 #! expect a 60 special 13 form 0
-# 56fabe5c68 slows Storm Bolt to 0.85x, so it meets b later; 70b72f2c9a (Oct 10 retune) set it to 5.403 (trace: run 39006853648).
-#! expect b 108 damage 5.403
+# 56fabe5c68 slows Storm Bolt to 0.85x, so it meets b later; #547 throws it 3 frames later; 70b72f2c9a (Oct 10 retune) set it to 5.403 (trace: run 39006853648).
+#! expect b 111 damage 5.403
 #! expect a 200 special 13 form 0
-#! expect b 250 damage 10.807
+#! expect b 253 damage 10.807
 #! expect a 330 special 16 form 0
 # 56fabe5c68 slows the clap's shockwave to 0.85x and 70b72f2c9a set it to 7.565 (trace: run 39007977184).
 #! expect b 393 damage 18.372 hitlag 5 hitstun 21

@@ -17,9 +17,6 @@ const heights = (amount: number) => f32(H * f32(amount));
 
 
 export const BOLT_SPEED = heights(f32(0.102));
-export const BOLT_RETURN = { age: 45, speed: heights(f32(0.119)) };
-
-const BOLT_RECALL: AuthoredSpecial = { endFrame: 10, recallsProjectiles: true, landingLag: 10 };
 const BOLT_RADIUS = heights(f32(0.18));
 const STORM_BOLT = hit(5.403449535369873, "LAUNCH", 65, false, HitElement.electric);
 
@@ -145,18 +142,16 @@ function withHammerfallEx(kit: SpecialKit): SpecialKit {
 export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
   neutral: withExKit({
     name: "Storm Bolt",
-    description: "A hammer that flies out and back, hitting toward him on the return; press again to call it back.",
+    description: "A hammer thrown straight ahead that flies until it hits or its flight ends; it never comes back.",
     ground: {
-      endFrame: 58,
+      endFrame: 61,
       projectiles: [{
         model: "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdx",
-        spawnFrame: 20, offsetX: 32.0, offsetZ: 56.0, velocityX: BOLT_SPEED, velocityZ: 0.0,
-        life: 90, radius: BOLT_RADIUS, effect: STORM_BOLT, reflectable: true, limit: 1, returns: BOLT_RETURN,
+        spawnFrame: 23, offsetX: 32.0, offsetZ: 56.0, velocityX: BOLT_SPEED, velocityZ: 0.0,
+        life: 90, radius: BOLT_RADIUS, effect: STORM_BOLT, reflectable: true, limit: 1,
       }],
       landingLag: 20,
     },
-    recall: BOLT_RECALL,
-    recallWhile: "projectile",
   }, { damage: 1.25 }),
   side: withExKit({
     name: "Storm Rush",

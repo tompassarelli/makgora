@@ -27,6 +27,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/warden-pursuit-lunge.py -- RIG.json KEYS.json`
   bakes one key per frame: a crouched hold with the glaive ring kept face-on to the camera, a lunge on the first
   active frame and a downward cut, and `... --replace-pose sideSpecial --keys KEYS.json` splices the keys in place.
+  Warden's back air is authored in Blender too (#550): `... --character 5 --replace-pose backAir --rig RIG.json`
+  writes her skeleton and timing, `blender ... --python tools/animations/warden-back-air.py -- RIG.json KEYS.json`
+  bakes a tucked windup, the glaive thrown over her shoulder and whipped down behind her through the three active
+  frames with her legs off the floor, and `... --replace-pose backAir --keys KEYS.json` splices the keys in place.
+  Its three hit capsules run along the drawn glaive on frames 7 to 9.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip

@@ -324,8 +324,11 @@ producer = "ts/scripts/releaseRoster.ts"
 # Not declared: platform/damageBlendProbeModels.ts (header names tools/animations/damage-blend-probe.ts, absent at HEAD; S6 deletes
 # the file or restores the producer) and ui/opponentSettingsFrames.ts (producer is wisp:host/compile/frames.ts, outside this tree).
 [[generated]]
-paths = ["ts/src/generated/state/**"]
+paths = ["ts/src/generated/state/fighterState.ts"]
 producer = "ts/codegen/fighterState.ts"
+[[generated]]
+paths = ["ts/src/generated/state/fighterDifference.ts"]
+producer = "ts/codegen/fighterDifference.ts"
 [[generated]]
 paths = ["docs/design/melee-parity.md"]
 producer = "ts/scripts/wisp/commands/ledger.ts"

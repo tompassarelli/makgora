@@ -10,9 +10,10 @@ import { matchStartNotice } from "../session/messages";
 import { resetMatchFrameInput } from "../match/frameInput";
 import { PLAYABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { fighterAt } from "../sim/roster";
+import { type PlayerFileQueue, lobbyCounter, receiveLobbyCounter } from "../../host/loop/playerFileQueue";
 import {
   Phase, RANDOM_FIGHTER, ResultPick, beginRematchCountdown, confirmRematch, cpuFighterRandom, cycleSlotMode, requestStageSelect, selectCharacter,
-  selectCpuCharacter, setAutomaticRematch, tickRematchCountdown,
+  selectCpuCharacter, setAutomaticRematch, startComputerChoices, tickRematchCountdown,
 } from "./lobbyState";
 
 const CPU = 1;
@@ -133,4 +134,26 @@ test("Random CPU fighter and opponent draw again on every New Match and automati
   game.phase = Phase.characterMenu;
   selectCpuCharacter(game, 0, CPU, RANDOM_FIGHTER);
   assertTrue(cpuFighterRandom(game, CPU));
+});
+
+function lobbyStartup(sentCounter: number): TapeSession {
+  const session = lobbyWithRandomCpu(0);
+  const files: PlayerFileQueue = { queue: [] };
+  receiveLobbyCounter(files, 0, sentCounter);
+  startComputerChoices(session.live.match, lobbyCounter(files, 0) ?? 0, 0);
+  return session;
+}
+
+test("Two lobbies whose first human sends different lobby counters at the same menu frame start and draw the CPU differently, and both clients of one lobby agree [k2 property]", () => {
+  const first = lobbyStartup(1);
+  const second = lobbyStartup(2);
+  const peer = lobbyStartup(1);
+  assertFalse(first.live.match.characterChoices[CPU] === second.live.match.characterChoices[CPU]);
+  assertEquals(snapshot(peer), snapshot(first), "clients of one lobby");
+  start(first);
+  start(second);
+  start(peer);
+  assertDrawn(first);
+  assertFalse(first.live.match.characterChoices[CPU] === second.live.match.characterChoices[CPU]);
+  assertEquals(snapshot(peer), snapshot(first), "clients of one lobby in the match");
 });

@@ -87,7 +87,7 @@ export interface KnockbackTerms {
 }
 
 export function effectKnockback(effect: KnockbackTerms, postHitPercent: number, hitDamage: number, victimWeight: number): number {
-  if (effect.setKnockback !== undefined) return effect.setKnockback;
+  if (effect.setKnockback !== undefined) return fixedHitKnockback(effect.setKnockback, victimWeight, effect.growth, effect.base, 1.0);
   return effect.fixedPower === undefined ? contactKnockback(postHitPercent, hitDamage, victimWeight, effect.growth, effect.base, 1.0)
     : fixedHitKnockback(effect.fixedPower, victimWeight, effect.growth, effect.base, 1.0);
 }
@@ -194,7 +194,7 @@ export function installDamageLaunch(target: Fighter, knockback: number, directio
     target.jump.remaining = aerialJumps(target);
     target.special.airtimeUses = 0;
   }
-  if (launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
+  if (!motion.grounded && launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
     launch.knockbackX = mergeLaunchAxis(launch.knockbackX, launchX);
     launch.knockbackZ = mergeLaunchAxis(launch.knockbackZ, launchZ);
   } else {

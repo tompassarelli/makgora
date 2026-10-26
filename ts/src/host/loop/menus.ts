@@ -382,7 +382,9 @@ export function resetToStartingSelection(s: ShellState): void {
     pauseMatchPresentation(s, false);
   }
   for (const panel of views(s).settings) panel.close();
-  copyMatchState(s.game, startingSelection(s.build.scenario, (s.menuFrames ?? 0) + s.game.matchSeed));
+  const { matchSeed } = s.game;
+  copyMatchState(s.game, startingSelection(s.build.scenario, (s.menuFrames ?? 0) + matchSeed));
+  s.game.matchSeed = matchSeed;
   s.dev.stageChoice = undefined;
   resetMomentRecorder(s.moment.recorder);
   resetPacingAndPresentation(s.runtime);

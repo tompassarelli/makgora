@@ -179,7 +179,7 @@ export const FORSAKEN_PALADIN_AUTHORING_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 37, effect: { ...hit(9.776639938354492, "EDGE", 40), growth: 39.5, base: 64.0 } },
     [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 44, effect: { ...hit(10.998720169067383, "EDGE", 40, true), growth: 25.5, base: 69.0 } },
     [GrabAction.throwUp]: { contactFrame: 16, totalFrames: 25, effect: hit(8.554560661315918, "JUGGLE", 90) },
-    [GrabAction.throwDown]: { contactFrame: 20, totalFrames: 46, effect: { ...hit(7.332479953765869, "CHASE", 70), growth: 0.0, base: 0.0, setKnockback: 90.0 } },
+    [GrabAction.throwDown]: { contactFrame: 20, totalFrames: 46, effect: { ...hit(7.332479953765869, "CHASE", 70), growth: 100.0, base: 0.0, setKnockback: 90.0 } },
   },
 };
 

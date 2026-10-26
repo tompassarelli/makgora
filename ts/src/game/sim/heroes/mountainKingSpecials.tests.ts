@@ -7,13 +7,13 @@ import { Phase } from "../../lobby/lobbyState";
 import { stepMatch } from "../../match/step";
 import { createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
-import { Character, SpecialAction } from "../codes";
+import { Character, ProjectileKind, SpecialAction } from "../codes";
 import { createFighter, type Fighter } from "../fighter";
 import { setWorldMotionValue } from "../motion";
 import { fighterAt } from "../roster";
 import { CLAP_REACH } from "./mountainKingSpecials";
 import { SHORT } from "./mountainKingMoves";
-import { FOLLOW_UP_FORM } from "../specials/schema";
+import { FOLLOW_UP_FORM, SpecialForm } from "../specials/schema";
 
 const WATCH_FRAMES = 90;
 const AIR_HEIGHT = 200.0;
@@ -197,4 +197,53 @@ test("Each of the eight stick directions dives Hammerfall along that line into a
     assertEquals(diveAt(direction, 1), true, `${direction.name}: the dive strikes the foe on its line`);
     assertEquals(diveAt(direction, -1), false, `${direction.name}: the dive misses the foe behind it`);
   }
+});
+
+
+const BOLT_WATCH_FRAMES = 160;
+const BOLT_SECOND_PRESS = 70;
+
+function liveHammer(king: Fighter): { readonly x: number; readonly velocityX: number } | undefined {
+  for (const projectile of king.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.hero) return projectile;
+  return undefined;
+}
+
+test("Storm Bolt's hammer flies straight out to the end of its life, never back toward him, and a second press while it flies starts no recall (#547) [k1 scenario]", () => {
+  const { state, king } = leapMatch(-FOE_AWAY);
+  step(state, king, 1, 0, 0, true);
+  assertEquals(king.special.action, SpecialAction.heroNeutral, "Storm Bolt starts");
+  let lastX: number | undefined;
+  let flown = 0;
+  let ended = false;
+  for (let tick = 2; tick <= BOLT_WATCH_FRAMES && !ended; tick++) {
+    step(state, king, tick, 0, 0, tick === BOLT_SECOND_PRESS);
+    if (tick === BOLT_SECOND_PRESS) assertEquals(liveHammer(king) !== undefined, true, "the hammer still flies at the second press");
+    assertEquals(king.special.action !== SpecialAction.none && king.special.form === SpecialForm.recall, false, `frame ${tick}: no recall starts`);
+    const hammer = liveHammer(king);
+    if (hammer === undefined) {
+      ended = lastX !== undefined;
+      continue;
+    }
+    assertEquals(Math.sign(hammer.velocityX), king.facing, `frame ${tick}: the hammer's velocity keeps pointing ahead`);
+    if (lastX !== undefined) assertEquals(f32(hammer.x - lastX) * king.facing > 0.0, true, `frame ${tick}: the hammer moves away from him`);
+    lastX = hammer.x;
+    flown++;
+  }
+  assertEquals(ended, true, "the hammer's flight ends");
+  assertEquals(flown >= BOLT_SECOND_PRESS, true, `the hammer flies ${flown} frames, past the second press`);
+});
+
+test("Storm Bolt's hammer first exists on frame 23 of the move and the move ends on frame 61 (#547) [k3 measure #547]", () => {
+  const { state, king } = leapMatch(-FOE_AWAY);
+  step(state, king, 1, 0, 0, true);
+  assertEquals(king.special.action, SpecialAction.heroNeutral, "Storm Bolt starts");
+  let spawned = 0;
+  let ended = 0;
+  for (let tick = 2; tick <= BOLT_WATCH_FRAMES && ended === 0; tick++) {
+    step(state, king, tick, 0, 0, false);
+    if (spawned === 0 && liveHammer(king) !== undefined) spawned = tick;
+    if (king.special.action !== SpecialAction.heroNeutral) ended = tick;
+  }
+  assertEquals(spawned, 23, "the hammer first exists on frame 23");
+  assertEquals(ended, 61, "the move ends on frame 61");
 });

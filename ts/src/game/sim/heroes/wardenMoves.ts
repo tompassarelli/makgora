@@ -2,7 +2,7 @@ import { downSmashHit } from "../downMoveValues";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { AttackStyle, GrabAction, HitElement, LAST_ATTACK_STYLE } from "../codes";
-import { HERO_REFERENCE_HEIGHT, heroHurtPose, heroMove, heroRegion, type AuthoredMove, type FighterMoves, type MoveRegion, type StrikeCapsule } from "../heroMoves";
+import { HERO_REFERENCE_HEIGHT, heroMove, heroRegion, type AuthoredMove, type FighterMoves, type MoveRegion, type StrikeCapsule } from "../heroMoves";
 import { WARDEN_GROUND } from "./groundNormals";
 import type { HitEffect } from "../hitRegions";
 import { strongHit } from "../strongHits";
@@ -36,7 +36,7 @@ export const wardenHit = makeHit({
 const blade = capsuleOf(BLADE_RADIUS);
 
 
-function cut(first: number, heights: readonly number[], reach: number, inner: Readonly<HitEffect>, tip?: Readonly<HitEffect>, facing = 1.0): readonly MoveRegion[] {
+function cut(first: number, heights: readonly number[], reach: number, inner: Readonly<HitEffect>, tip?: Readonly<HitEffect>): readonly MoveRegion[] {
   const regions: MoveRegion[] = [];
   const end = f32(reach - BLADE_RADIUS);
   const boundary = f32(reach - 30.0);
@@ -48,10 +48,10 @@ function cut(first: number, heights: readonly number[], reach: number, inner: Re
     const zAt = (x: number) => f32(45.0 + f32(rise * f32(x / end)));
     if (tip !== undefined) {
       const tipStart = f32(boundary + BLADE_RADIUS);
-      regions.push(heroRegion(frame, frame, blade(f32(tipStart * facing), zAt(tipStart), f32(end * facing), height), strongHit(tip)));
+      regions.push(heroRegion(frame, frame, blade(tipStart, zAt(tipStart), end, height), strongHit(tip)));
     }
     const innerEnd = tip === undefined ? end : boundary;
-    regions.push(heroRegion(frame, frame, blade(f32(18.0 * facing), zAt(18.0), f32(innerEnd * facing), zAt(innerEnd)), inner));
+    regions.push(heroRegion(frame, frame, blade(18.0, zAt(18.0), innerEnd, zAt(innerEnd)), inner));
   }
   return regions;
 }
@@ -159,10 +159,10 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     ]), autoCancel: { before: 6, from: 48 } },
 
     [AttackStyle.backAir]: { ...heroMove(7, 3, 22, 12, [
-      ...cut(7, [54.0, 45.0, 36.0], M, BACK_AIR, undefined, -1.0),
-      heroRegion(7, 9, blade(-8.0, 42.0, -16.0, 38.0, 8.0), BACK_AIR),
+      heroRegion(7, 7, blade(-30.5, 66.0, -74.0, 141.0, 8.0), BACK_AIR),
+      heroRegion(8, 8, blade(-17.5, 52.5, -96.0, 89.5, 8.0), BACK_AIR),
+      heroRegion(9, 9, blade(-8.0, 41.0, -94.5, 48.5, 8.0), BACK_AIR),
     ]), autoCancel: { before: 4, from: 22 } },
-
 
     [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 9, multiHit([
       { first: 5, last: 6, strikes: SKY_LIFT },
@@ -183,7 +183,6 @@ const LIMB_RADIUS = 7.0;
 const LIMB_LEAD_FRAMES = 2;
 const LIMB_HOLD_FRAMES = 4;
 const LIMB_POSE_FRAMES = 3;
-const HEEL = hurtPart(-4.0, 42.0, -26.0, 38.0, 8.0);
 
 interface Point {
   readonly x: number;
@@ -240,9 +239,7 @@ function wardenHurtboxes(): FighterHurtboxes {
   for (let style = 0; style <= LAST_ATTACK_STYLE; style++) {
     if (NORMALS[style] === undefined) continue;
 
-    attacks[style] = style === AttackStyle.backAir
-      ? [heroHurtPose(5, 13, [WARDEN_BODY, HEEL])]
-      : limbPoses(NORMALS[style], style === AttackStyle.grab);
+    attacks[style] = limbPoses(NORMALS[style], style === AttackStyle.grab);
   }
   return { stand: [WARDEN_BODY], attacks };
 }
@@ -256,6 +253,6 @@ export const WARDEN_MOVES: FighterMoves = {
     [GrabAction.throwForward]: throwMove(10, 23, { ...wardenHit(4.0, "EDGE", 40), growth: 80.0, base: 70.0 }),
     [GrabAction.throwBack]: throwMove(15, 23, { ...wardenHit(4.0, "EDGE", 45, -1.0), growth: 70.0, base: 72.0 }),
     [GrabAction.throwUp]: throwMove(11, 9, { ...wardenHit(3.8163399696350098, "JUGGLE", 85), growth: 100.0, base: 70.0 }),
-    [GrabAction.throwDown]: throwMove(14, 29, { ...wardenHit(3.0, "CHASE", 70), growth: 0.0, base: 0.0, setKnockback: 90.0 }),
+    [GrabAction.throwDown]: throwMove(14, 29, { ...wardenHit(3.0, "CHASE", 70), growth: 100.0, base: 0.0, setKnockback: 90.0 }),
   },
 };

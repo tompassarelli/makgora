@@ -20,7 +20,13 @@ export const LEDGE_CLIMB_FRAMES = 25;
 export const LEDGE_ROLL_FRAMES = 36;
 export const LEDGE_INTANGIBLE_FRAMES = 30;
 export const LEDGE_INTANGIBLE_DECAY = 8;
-export const LEDGE_HANG_LIMIT_FRAMES = 300;
+export const LEDGE_HANG_LIMIT_FRAMES = 660;
+export const LEDGE_HANG_LIMIT_FRAMES_DAMAGED = 480;
+export const LEDGE_HANG_DAMAGED_PERCENT = 100.0;
+
+export function ledgeHangLimitFrames(damage: number): number {
+  return damage < LEDGE_HANG_DAMAGED_PERCENT ? LEDGE_HANG_LIMIT_FRAMES : LEDGE_HANG_LIMIT_FRAMES_DAMAGED;
+}
 
 export function ledgeIntangibleFrames(grabs: number): number {
   return max(0, LEDGE_INTANGIBLE_FRAMES - LEDGE_INTANGIBLE_DECAY * grabs);
@@ -303,7 +309,7 @@ export function advanceLedge(world: Roster, slot: number, stage: number, input: 
       }
     }
     ledge.frame++;
-    if (ledge.frame >= LEDGE_HANG_LIMIT_FRAMES) {
+    if (ledge.frame >= ledgeHangLimitFrames(f.status.damage)) {
       motion.vx = f32(ledge.side * 2.0);
       motion.vz = -2.0;
       leaveLedge(f);

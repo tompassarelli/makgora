@@ -14,7 +14,7 @@ import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts
 import { anatomyFindings } from '../../ts/scripts/wisp/victoryAnatomy';
 import { bodyPoseReader, standSequence } from './victory-pose';
 
-type Arms = 'rest' | 'low' | 'raised' | 'pumped' | 'chest' | 'wide' | 'wave' | 'overhead';
+type Arms = 'rest' | 'low' | 'raised' | 'pumped' | 'chest' | 'wide' | 'wave' | 'overhead' | 'dabReach' | 'dabTuck';
 interface Beat { readonly frame: number; readonly arms: Arms | readonly [Arms, Arms]; readonly chest: number; readonly head: number; readonly hop: number }
 const CHEER: readonly Beat[] = [
     { frame: 0, arms: 'rest', chest: 0, head: 0, hop: 0 }, { frame: 8, arms: 'low', chest: 20, head: 12, hop: 0 },
@@ -46,13 +46,18 @@ const bow = (weapon: Side): readonly Beat[] => [
     step(weapon, 45, 'chest', 'wide', 40, 35), step(weapon, 60, 'chest', 'low', 40, 35), step(weapon, 68, 'chest', 'wide', 15, 8), step(weapon, 75, 'chest', 'overhead', -10, -18),
     step(weapon, 90, 'rest', 'rest', 0, 0),
 ];
+const DAB_CHEST = 14, DAB_HEAD = 38;
+const dab = (weapon: Side): readonly Beat[] => [
+    step(weapon, 0, 'rest', 'rest', 0, 0), step(weapon, 6, 'dabReach', 'dabTuck', DAB_CHEST, DAB_HEAD),
+    step(weapon, 56, 'dabReach', 'dabTuck', DAB_CHEST, DAB_HEAD), step(weapon, 74, 'rest', 'rest', 0, 0), step(weapon, 90, 'rest', 'rest', 0, 0),
+];
 const fists = (weapon: Side): readonly Beat[] => [
     step(weapon, 0, 'rest', 'rest', 0, 0), step(weapon, 8, 'rest', 'low', 18, 10),
     step(weapon, 15, 'rest', 'overhead', -12, -22, 0.35), step(weapon, 30, 'rest', 'pumped', -6, -10), step(weapon, 45, 'rest', 'overhead', -12, -22, 0.35),
     step(weapon, 60, 'rest', 'pumped', -6, -10), step(weapon, 75, 'rest', 'overhead', -12, -22, 0.35), step(weapon, 90, 'rest', 'rest', 0, 0),
 ];
 const DESIGNED: Readonly<Record<number, readonly Beat[]>> = {
-    [Character.warden]: bow(0),
+    [Character.warden]: dab(0),
     [Character.sylvanas]: fists(1),
 };
 const HANGING: Readonly<Record<number, readonly string[]>> = {
@@ -157,6 +162,8 @@ for (const character of characters) {
         wide: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.95), shoulder[2]! - reach[side]! * 0.1],
         wave: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.85), shoulder[2]! + reach[side]! * 0.6],
         overhead: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.2), shoulder[2]! + reach[side]! * 0.98],
+        dabReach: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.6), shoulder[2]! + reach[side]! * 0.8],
+        dabTuck: (shoulder, side) => [shoulder[0]! + reach[side]! * 0.5, centre - Math.sign(shoulder[1]! - centre) * reach[side]! * 0.15, shoulder[2]! + reach[side]! * 0.2],
     };
     const solved = new Map<string, number[]>();
     const below = (child: mdx.Node, ancestor: mdx.Node): boolean => { let at: mdx.Node | undefined = child; while (at !== undefined && at.Parent != null && at.Parent !== -1) { if (at.Parent === ancestor.ObjectId) return true; at = model.Nodes[at.Parent]; } return false; };

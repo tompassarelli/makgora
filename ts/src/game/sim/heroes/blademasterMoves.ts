@@ -329,7 +329,7 @@ export const BLADEMASTER_MOVES: FighterMoves = {
     [GrabAction.throwForward]: authoredThrow(12, 18, { ...hit(5.589328765869141, "EDGE", 35), growth: 49.0, base: 61.0 }),
     [GrabAction.throwBack]: authoredThrow(15, 22, { ...hit(6.196170330047607, "EDGE", 35, -1.0), growth: 31.5, base: 66.0 }),
     [GrabAction.throwUp]: authoredThrow(13, 10, hit(4.647127628326416, "JUGGLE", 85)),
-    [GrabAction.throwDown]: authoredThrow(16, 20, { ...hit(3.992377519607544, "CHASE", 70), growth: 0.0, base: 0.0, setKnockback: 90.0 }),
+    [GrabAction.throwDown]: authoredThrow(16, 20, { ...hit(3.992377519607544, "CHASE", 70), growth: 100.0, base: 0.0, setKnockback: 90.0 }),
   },
   dashAttack: AttackStyle.dashAttack,
   hurtboxes: BODY,

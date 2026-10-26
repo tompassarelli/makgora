@@ -2,10 +2,10 @@ import { resolve } from "node:path";
 import { CHARACTER_ATTRIBUTES_URL, readCharacterAttributes } from "../../../references/melee-frame-data/character-attributes";
 import { FIGHTCORE_URL, readFightCore } from "../../../references/melee-frame-data/fightcore";
 import { Action } from "../../src/game/input/actions";
-import { fighter, frame, solo } from "../../src/game/match/padScene";
+import { fighter, frame, framesUntil, solo } from "../../src/game/match/padScene";
 import { normalAttackStyle } from "../../src/game/input/combat";
 import { beginFighterAttack } from "../../src/game/sim/attacks";
-import { AttackStyle, Character, SpecialAction } from "../../src/game/sim/codes";
+import { AttackStyle, Character, LedgeState, SpecialAction } from "../../src/game/sim/codes";
 import {
   AIR_DODGE_INTANGIBLE_END, AIR_DODGE_INTANGIBLE_START, GROUND_ROLL_FRAMES, GROUND_ROLL_INTANGIBLE_END, GROUND_ROLL_INTANGIBLE_START,
   SPOT_DODGE_FRAMES, SPOT_DODGE_INTANGIBLE_END, SPOT_DODGE_INTANGIBLE_START,
@@ -14,7 +14,7 @@ import { AIR_DODGE_LANDING_LAG, EMPTY_LANDING_LAG } from "../../src/game/sim/dow
 import { createFighter } from "../../src/game/sim/fighter";
 import { groundState, restingTraction } from "../../src/game/sim/groundMovement";
 import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY } from "../../src/game/sim/jumpsAndDodges";
-import { LEDGE_HANG_LIMIT_FRAMES, LEDGE_INTANGIBLE_DECAY, ledgeIntangibleFrames, ledgeSnap } from "../../src/game/sim/ledge";
+import { LEDGE_HANG_DAMAGED_PERCENT, LEDGE_INTANGIBLE_DECAY, ledgeIntangibleFrames, ledgeSnap, snapToLedge } from "../../src/game/sim/ledge";
 import { attackLandingLag, uncancelledLandingLag } from "../../src/game/sim/moves";
 import { TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X } from "../../src/game/sim/stick";
 import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, GroundState, STICK_DEADZONE, STICK_SMASH_DEADZONE, TAP_JUMP_STICK_THRESHOLD, WALK_MIDDLE_STICK_THRESHOLD } from "../../src/game/sim/stickZones";
@@ -48,6 +48,23 @@ function specialsOutOf(state: GroundState): string {
     return f.special.action !== SpecialAction.none;
   }).map(({ name }) => name);
   return started.length === SPECIAL_PRESSES.length ? "every special" : started.length === 0 ? "none" : `${started.join(" and ")} special only`;
+}
+
+const HANG_PROBE_PERCENTS = [50.0, 120.0] as const;
+
+function hangFrames(damage: number): number {
+  const s = solo(0, Character.rifleman);
+  const f = fighter(s, 0);
+  f.status.damage = damage;
+  if (!snapToLedge(s.world, 0, 0, 1)) throw new Error("the hang probe never caught the ledge");
+  const frames = framesUntil(s, () => f.ledge.state !== LedgeState.hang, 1200);
+  if (frames === undefined) throw new Error(`the hang probe at ${damage}% never let go`);
+  return frames;
+}
+
+function hangLimit(): string {
+  const [under, from] = HANG_PROBE_PERCENTS.map(hangFrames);
+  return `${under} frames under ${shortNumber(LEDGE_HANG_DAMAGED_PERCENT)}%, ${from} from ${shortNumber(LEDGE_HANG_DAMAGED_PERCENT)}%`;
 }
 
 function commonLandingLag(): number {
@@ -188,11 +205,9 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     anchor: { file: `${SIM}/transitions.ts`, symbol: "LEDGE_REGRAB_FRAMES" }, status: PARITY,
   },
   {
-    id: "ledge-hang-limit", family: "movement", name: "Ledge hang limit",
-    melee: { value: "660 frames under 100%, 480 from 100%", source: wiki("Edge") },
-    ours: () => `${LEDGE_HANG_LIMIT_FRAMES} frames at any percent`,
-    anchor: { file: LEDGE, symbol: "LEDGE_HANG_LIMIT_FRAMES" },
-    status: { kind: "open", reason: "ours: a first value for Tom to tune (docs/gameplay-design.md, Ledge hang limit), shorter than Melee's 11 and 8 seconds", issue: 293 },
+    id: "ledge-hang-limit", family: "movement", name: "Ledge hang limit, probed headless: an idle hanger at 50% and at 120%",
+    melee: { value: "660 frames under 100%, 480 from 100%", source: wiki("Edge") }, ours: hangLimit,
+    anchor: { file: LEDGE, symbol: "ledgeHangLimitFrames" }, status: PARITY,
   },
   {
     id: "ledgedash-intangibility", family: "movement", name: "Ledge intangibility after letting go (ledgedash)",

@@ -106,8 +106,8 @@ export function canStartAttack(attacker: Fighter, allowJumpSquat = false): boole
     && attacker.attack.cooldown <= 0;
 }
 
-export function canAttack(attacker: Fighter): boolean {
-  return canStartAttack(attacker) && !attacker.shield.raised && attacker.status.frozenFrames <= 0;
+export function canAttack(attacker: Fighter, allowJumpSquat = false): boolean {
+  return canStartAttack(attacker, allowJumpSquat) && !attacker.shield.raised && attacker.status.frozenFrames <= 0;
 }
 
 export function canShieldGrab(attacker: Fighter): boolean {
@@ -131,6 +131,12 @@ export function jabChainStep(f: Readonly<Fighter>): AttackStyle | undefined {
 
 export function cancelsJumpSquat(style: AttackStyle | undefined): boolean {
   return style === AttackStyle.grab || style === AttackStyle.upSmash;
+}
+
+
+/** An up special pressed in grounded jump squat starts there, as Melee's jump-cancelled up special out of shield. */
+export function canStartSpecial(attacker: Fighter, specialZ: number): boolean {
+  return canAttack(attacker, specialZ > 0 && attacker.motion.grounded);
 }
 
 

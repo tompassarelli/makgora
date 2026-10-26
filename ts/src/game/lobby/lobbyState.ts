@@ -8,7 +8,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantMask,
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { scheduleMatchItems } from "../match/centreItem";
 import { type MatchMeterDrops, copyMatchMeterDrops, createMatchMeterDrops, scheduleMeterDrops } from "../match/meterDrops";
-import { nextMatchSeed } from "../match/botRandom";
+import { lobbyMatchSeed, nextMatchSeed } from "../match/botRandom";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, drawCpuFighter, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
@@ -145,6 +145,11 @@ export function initializeComputerChoices(game: MatchState, seed: number): void 
     game.characterChoices[slot] = defaultChoice(mixed ^ floorMod(mixed * 31, 46337));
     game.cpuRandomFighters[slot] = true;
   }
+}
+
+export function startComputerChoices(game: MatchState, lobbyCounter: number, menuFrames: number): void {
+  game.matchSeed = lobbyMatchSeed(lobbyCounter);
+  initializeComputerChoices(game, menuFrames + game.matchSeed);
 }
 
 export function firstHumanSlot(game: Readonly<MatchState>): ParticipantSlot | undefined {

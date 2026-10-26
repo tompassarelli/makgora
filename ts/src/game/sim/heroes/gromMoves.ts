@@ -45,6 +45,6 @@ export const GROM_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 34, effect: gromHit(7.241039752960205, 40, 64.0, 65.0) },
     [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 38, effect: gromHit(8.850160598754883, 40, 39.0, 70.0, true) },
     [GrabAction.throwUp]: { contactFrame: 14, totalFrames: 28, effect: gromHit(6.4364800453186035, 75, 105.28992462158203, 50.0, true) },
-    [GrabAction.throwDown]: { contactFrame: 18, totalFrames: 40, effect: { ...gromHit(5.631919860839844, 70, 0.0, 0.0), setKnockback: 90.0 } },
+    [GrabAction.throwDown]: { contactFrame: 18, totalFrames: 40, effect: { ...gromHit(5.631919860839844, 70, 0.0, 0.0), growth: 100.0, setKnockback: 90.0 } },
   },
 };

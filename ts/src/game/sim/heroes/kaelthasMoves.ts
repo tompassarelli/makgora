@@ -93,6 +93,6 @@ export const KAELTHAS_MOVES: FighterMoves = {
     [GrabAction.throwForward]: throwMove(14, 18, arcane(7.59276008605957, 25, 34.0, 59.0)),
     [GrabAction.throwBack]: throwMove(17, 20, arcane(11.0, 35, 72.0, 60.0, true)),
     [GrabAction.throwUp]: throwMove(16, 13, arcane(7.59276008605957, 90, 52.28349685668945, 50.0)),
-    [GrabAction.throwDown]: throwMove(18, 16, { ...arcane(6.0, 80, 0.0, 0.0), setKnockback: 90.0 }),
+    [GrabAction.throwDown]: throwMove(18, 16, { ...arcane(6.0, 80, 0.0, 0.0), growth: 100.0, setKnockback: 90.0 }),
   },
 };

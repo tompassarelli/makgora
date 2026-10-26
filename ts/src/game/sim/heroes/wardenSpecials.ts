@@ -79,8 +79,8 @@ const BLINK = blink(f32(H * f32(3.5)));
 
 const FAN_FRAMES = 27;
 const FAN_JUMP_CANCEL = 4;
-const FAN_GROUND_HIT = { damage: f32(6.1061435), growth: 0.0, base: 0.0, launchX: f32(0.965925826), launchZ: f32(0.258819045), electric: false, element: HitElement.slash, setKnockback: 60.0 };
-const FAN_AIR_HIT = { damage: 5.0, growth: 0.0, base: 0.0, launchX: 1.0, launchZ: 0.0, electric: false, element: HitElement.slash, setKnockback: 80.0 };
+const FAN_GROUND_HIT = { damage: f32(6.1061435), growth: 100.0, base: 0.0, launchX: f32(0.965925826), launchZ: f32(0.258819045), electric: false, element: HitElement.slash, setKnockback: 60.0 };
+const FAN_AIR_HIT = { damage: 5.0, growth: 100.0, base: 0.0, launchX: 1.0, launchZ: 0.0, electric: false, element: HitElement.slash, setKnockback: 80.0 };
 const FAN_KNIVES = blade(48.0, 56.0, 92.0, 56.0, 24.0);
 const fanRing = (effect: Parameters<typeof heroRegion>[3]): readonly MoveRegion[] => [
   heroRegion(4, 7, FAN_KNIVES, effect),

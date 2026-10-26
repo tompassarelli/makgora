@@ -5,7 +5,7 @@ import { canHit } from "./teams";
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, ProjectileKind, SPECIAL_ACTION_CAPACITY, SpecialAction, SurfaceContact } from "./codes";
-import { canAttack, isIntangible } from "./conditions";
+import { canAttack, canStartSpecial, isIntangible } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
 import { type Fighter, TURNAROUND_SPECIAL_WINDOW_FRAMES } from "./fighter";
 import {
@@ -17,7 +17,7 @@ import { heroSpecialMove, movementSpecial } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
 import { ROSTER_MANA, spendMana } from "./mana";
-import { cancelAttack } from "./transitions";
+import { cancelAttack, cancelJumpSquat } from "./transitions";
 import { applyAttackHit } from "./hits";
 import { meleeHitIntersectsShield } from "./attacks";
 import { observeActionDecision } from "./observations";
@@ -64,8 +64,12 @@ export const EYE_BLAST_NEAR = 195.0;
 export const EYE_BLAST_SWEEP = 50.0;
 export const EYE_BLAST_REACH = EYE_BLAST_NEAR + EYE_BLAST_SWEEP * (EYE_BLAST_LAST - EYE_BLAST_FIRST);
 
+// Fel Rush's airtime bits: the airtime's rush, the earned (aimed) second, the earned charge, and two for the rush in progress.
 const FEL_RUSH_AIRTIME = 2;
 const FEL_RUSH_AIMED_AIRTIME = 4;
+const FEL_RUSH_EARNED = 8;
+const FEL_RUSH_STRUCK = 16;
+const FEL_RUSH_FROM_AIR = 32;
 const FEL_RUSH_AIR_CARRY = 5.0;
 export const VENGEFUL_RETREAT_FORM = 1;
 export const CHAOS_STRIKE_FORM = 2;
@@ -132,7 +136,7 @@ const SPECIAL_ACTION_BIT = 64;
 
 function startSpecialAction(owner: Fighter, action: SpecialAction, duration: number, direction: number): void {
   const { special, attack } = owner;
-  if (action === SpecialAction.demonHunterImmolate || isHeroSpecialAction(action)) {
+  if (action === SpecialAction.demonHunterImmolate || action === SpecialAction.demonHunterFelRush || isHeroSpecialAction(action)) {
     for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
   }
   owner.surfaceRecovery.state = SurfaceContact.none;
@@ -182,10 +186,10 @@ function requestedSpecial(owner: Fighter, input: Readonly<Controls>): SpecialAct
   }
 }
 
-function specialCanStart(owner: Fighter, action: SpecialAction): boolean {
+function specialCanStart(owner: Fighter, action: SpecialAction, specialZ: number): boolean {
   const { special } = owner;
   return action > SpecialAction.none && action < SPECIAL_ACTION_CAPACITY && at(special.cooldowns, action) <= 0
-    && special.lockFrames <= 0 && special.action === SpecialAction.none && canAttack(owner);
+    && special.lockFrames <= 0 && special.action === SpecialAction.none && canStartSpecial(owner, specialZ);
 }
 
 function launchUpward(owner: Fighter): void {
@@ -415,6 +419,28 @@ function advanceFelRush(owner: Fighter, input: Readonly<Controls> | undefined): 
 }
 
 
+/** A rush ending airborne is the airtime's rush; one that struck earns one more, cooled at once, and an air rush that struck nobody ends helpless. */
+function endFelRush(owner: Fighter): void {
+  const { special } = owner;
+  const uses = special.airtimeUses;
+  special.airtimeUses = uses & ~(FEL_RUSH_STRUCK | FEL_RUSH_FROM_AIR);
+  if (owner.motion.grounded) {
+    endSpecialAction(owner, false);
+    return;
+  }
+  const struck = (uses & FEL_RUSH_STRUCK) !== 0;
+  special.airtimeUses |= FEL_RUSH_AIRTIME;
+  if (struck && (uses & FEL_RUSH_AIMED_AIRTIME) === 0) {
+    special.airtimeUses |= FEL_RUSH_EARNED;
+    special.cooldowns[SpecialAction.demonHunterFelRush] = 0;
+  }
+  endSpecialAction(owner, !struck && (uses & FEL_RUSH_FROM_AIR) !== 0);
+}
+
+function markFelRushStrike(owner: Fighter): void {
+  if (owner.character === Character.demonHunter && owner.special.action === SpecialAction.demonHunterFelRush) owner.special.airtimeUses |= FEL_RUSH_STRUCK;
+}
+
 function stopFelRushAtShields(world: Roster, slot: number): void {
   const f = fighterAt(world, slot);
   if (f.character !== Character.demonHunter || f.special.action !== SpecialAction.demonHunterFelRush || f.special.form !== 0) return;
@@ -536,15 +562,16 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     return true;
   }
   if (action === SpecialAction.demonHunterFelRush) {
-    if (!motion.grounded && (special.airtimeUses & FEL_RUSH_AIMED_AIRTIME) !== 0) return false;
-
+    const uses = special.airtimeUses & ~(FEL_RUSH_STRUCK | FEL_RUSH_FROM_AIR);
+    const first = (uses & FEL_RUSH_AIRTIME) === 0;
+    if (!motion.grounded && !first && ((uses & FEL_RUSH_EARNED) === 0 || (uses & FEL_RUSH_AIMED_AIRTIME) !== 0)) return false;
     owner.facing = moveX < 0 ? -1 : 1;
     startSpecialAction(owner, action, FEL_RUSH_FRAMES, moveX);
     special.cooldowns[action] = FEL_RUSH_COOLDOWN;
     special.hit = false;
     special.aimX = 0;
     special.aimZ = 0;
-    if (!motion.grounded) special.airtimeUses |= (special.airtimeUses & FEL_RUSH_AIRTIME) !== 0 ? FEL_RUSH_AIMED_AIRTIME : FEL_RUSH_AIRTIME;
+    special.airtimeUses = motion.grounded ? uses : uses | FEL_RUSH_FROM_AIR | (first ? FEL_RUSH_AIRTIME : FEL_RUSH_AIMED_AIRTIME);
     motion.vx = 0.0;
     if (!motion.grounded) motion.vz = 0.0;
     return true;
@@ -596,7 +623,7 @@ function originalMovementSpecial(action: SpecialAction): boolean {
 function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, world: Roster | undefined): boolean {
   const specials = owner.tuning.specials;
   const { special } = owner;
-  if (specials === undefined || special.lockFrames > 0 || special.action !== SpecialAction.none || !canAttack(owner)) return false;
+  if (specials === undefined || special.lockFrames > 0 || special.action !== SpecialAction.none || !canStartSpecial(owner, input.specialZ)) return false;
   let chosen = chooseHeroSpecial(owner, specials, input, heroRefusal, world);
 
   if (chosen === undefined && heroRefusal.groundOnly && input.specialX !== 0 && input.specialZ === 0) {
@@ -611,6 +638,7 @@ function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, worl
   if (input.specialX !== 0 && input.specialZ !== 0 && move.facesStick === true) owner.facing = input.specialX < 0 ? -1 : 1;
   const action = SpecialAction.heroNeutral + chosen.slot;
   startSpecialAction(owner, heroAction(action), move.endFrame, specialDirection(input, owner.facing));
+  cancelJumpSquat(owner);
   enterExSpecial(owner, input);
   if (!movementSpecial(enterHeroSpecial(owner, chosen, input)) && owner.motion.grounded) owner.motion.vx = 0.0;
   return true;
@@ -665,7 +693,7 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   const branched = originalSpecialBranch(owner, input);
   if (branched !== undefined) return branched;
   const requested = requestedSpecial(owner, input);
-  if (!specialCanStart(owner, requested)) return false;
+  if (!specialCanStart(owner, requested, input.specialZ)) return false;
   observeActionDecision(SPECIAL_ACTION_BIT);
   const facing = owner.facing;
   turnForSpecial(owner, input);
@@ -673,6 +701,7 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   const grounded = owner.motion.grounded;
   const started = startOriginalSpecial(owner, stage, matchFrame, requested, moveX);
   if (started) {
+    cancelJumpSquat(owner);
     if (grounded && !originalMovementSpecial(requested)) owner.motion.vx = 0.0;
     enterExSpecial(owner, input);
     if (requested === SpecialAction.demonHunterManaBurn && owner.special.ex && owner.motion.grounded) enterEyeBlast(owner);
@@ -762,7 +791,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   if (special.action === SpecialAction.riflemanBlaster && special.frame >= special.duration) endSpecialAction(owner, false);
   if (special.action === SpecialAction.demonHunterManaBurn && special.frame >= special.duration) endSpecialAction(owner, false);
   if (special.action === SpecialAction.demonHunterFelRush && special.frame >= special.duration) {
-    endSpecialAction(owner, false);
+    endFelRush(owner);
     special.lockFrames = 0;
   }
   if (special.action === SpecialAction.demonHunterWingAscent && special.frame >= special.duration) endSpecialAction(owner, true);
@@ -938,8 +967,10 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
       const strike = contact.strike;
       const contactZ = runningHeroSpecial(owner)?.beam !== undefined ? owner.special.beamZ
         : f32(heroRegionOrigin(owner).z + f32(f32((strike?.z1 ?? contact.minZ) + (strike?.z2 ?? contact.maxZ)) * 0.5));
+      const shielded = contact.strike === undefined ? meleeHitIntersectsShield(owner, target, contact) : heroStrikeMeetsShield(owner, target, contact);
+      if (!shielded) markFelRushStrike(owner);
       applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, at(facings, ownerSlot), heroContactEffect(contact, target), true,
-        contact.strike === undefined ? meleeHitIntersectsShield(owner, target, contact) : heroStrikeMeetsShield(owner, target, contact), runningHeroSpecial(owner)?.strikeStatus, contactZ);
+        shielded, runningHeroSpecial(owner)?.strikeStatus, contactZ);
     }
   }
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {

@@ -228,6 +228,6 @@ export const LICH_KING_MOVES: FighterMoves = {
     [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 46, effect: { ...hit(15.0, "KILL", 40, -1.0, HitElement.normal), growth: 67.0, base: 57.0 } },
     [GrabAction.throwUp]: { contactFrame: 16, totalFrames: 30, effect: hit(10.0, "JUGGLE", 85) },
 
-    [GrabAction.throwDown]: { inspiredBy: "Harvest Soul (Icecrown Citadel)", contactFrame: 24, totalFrames: 50, effect: { ...hit(7.5, "CHASE", 70, 1.0, HitElement.dark), growth: 0.0, base: 0.0, setKnockback: 90.0 } },
+    [GrabAction.throwDown]: { inspiredBy: "Harvest Soul (Icecrown Citadel)", contactFrame: 24, totalFrames: 50, effect: { ...hit(7.5, "CHASE", 70, 1.0, HitElement.dark), growth: 100.0, base: 0.0, setKnockback: 90.0 } },
   },
 };

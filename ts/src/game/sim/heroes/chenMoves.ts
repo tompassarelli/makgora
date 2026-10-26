@@ -58,6 +58,6 @@ export const CHEN_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 33, effect: { ...finish(7.49616003036499), growth: 52.0, base: 67.0 } },
     [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 39, effect: { ...finish(8.43317985534668, true), growth: 33.5, base: 72.0 } },
     [GrabAction.throwUp]: { contactFrame: 14, totalFrames: 25, effect: chenHit(6.559140205383301, 42.890159606933594, 50.0, 0.0, 1.0) },
-    [GrabAction.throwDown]: { contactFrame: 18, totalFrames: 42, effect: { ...chenHit(5.622119903564453, 0.0, 0.0, f32(0.342020), f32(0.939693)), setKnockback: 90.0 } },
+    [GrabAction.throwDown]: { contactFrame: 18, totalFrames: 42, effect: { ...chenHit(5.622119903564453, 0.0, 0.0, f32(0.342020), f32(0.939693)), growth: 100.0, setKnockback: 90.0 } },
   },
 };

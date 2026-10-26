@@ -56,7 +56,7 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 | Stage hazard | `ts/src/game/sim/stageHazards.ts` | `stages/<slug>/deck.ts` (no slice yet) |
 | New stage: id and catalog line | `ts/src/game/menu/stageCatalog.ts` | `roster/stages.ts` |
 | Stage lighting, palette, lights, scenery | `ts/src/game/assets/stageLighting.ts`, `ts/src/game/assets/stagePalette.ts`, `ts/src/game/assets/stagePointLights.ts`, `ts/src/game/presentation/stageScenery.ts` | `stages/<slug>/look.ts` |
-| New Fighter state field | `ts/src/game/sim/fighter.ts` (interface, `createFighter`), a row in `ts/src/game/sim/state/fighterSchema.ts` (copy, compare, canonical text and state hash, then `bun run generate`), `ts/src/game/replay/difference.ts`, `ts/src/game/sim/stocks.ts` | one row in `sim/state/fighterSchema.ts` after S1a-S1d |
+| New Fighter state field | `ts/src/game/sim/fighter.ts` (interface, `createFighter`), a row in `ts/src/game/sim/state/fighterSchema.ts` (copy, compare, canonical text and state hash, first-difference name with its place in `FIGHTER_DIFF_ORDER`, blast and respawn reset, then `bun run generate`) | one row in `sim/state/fighterSchema.ts` after S1a-S1d |
 | Match step, stocks, training | `ts/src/game/match/step.ts`, `ts/src/game/match/training.ts` | stays |
 | Lobby option (stock, timer, teams, stage pool) | `ts/src/game/lobby/lobbyState.ts`, `ts/src/game/menu/stagePool.ts` | `lobby/` in S9b |
 | Menu or HUD frame | `ts/src/game/ui/` | stays |
