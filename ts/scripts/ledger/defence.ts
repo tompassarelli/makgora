@@ -2,15 +2,17 @@ import { resolve } from "node:path";
 import { FIGHTCORE_URL, type FightCoreRow, readFightCore } from "../../../references/melee-frame-data/fightcore";
 import { Action } from "../../src/game/input/actions";
 import { fighter, frame, scene, solo } from "../../src/game/match/padScene";
-import { AttackStyle, Character, GrabAction, SpecialAction } from "../../src/game/sim/codes";
+import { AttackStyle, Character, ContactKind, GrabAction, SpecialAction } from "../../src/game/sim/codes";
 import {
   DOWN_ATTACK_INTANGIBLE_FRAMES_DOWN, DOWN_ATTACK_INTANGIBLE_FRAMES_UP, DOWN_RECOVERY_INTANGIBLE_FRAMES, DOWN_ROLL_INTANGIBLE_FRAMES_BACK_DOWN,
   DOWN_ROLL_INTANGIBLE_FRAMES_BACK_UP, TECH_INTANGIBLE_FRAMES, TECH_ROLL_INTANGIBLE_FRAMES, WALL_TECH_STARTUP_FRAMES,
 } from "../../src/game/sim/conditions";
 import { DOWN_BOUND_FRAMES, DOWN_DAMAGE_RESET_THRESHOLD, DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, DOWN_WAIT_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../../src/game/sim/down";
+import { beginDamageContacts, collectDamageContact, finishDamageContacts } from "../../src/game/sim/contacts";
 import { SHIELD_MAX } from "../../src/game/sim/fighter";
+import { authoredThrowEffect } from "../../src/game/sim/grabs";
 import { TECH_REPEAT_MINIMUM_AGE_FRAMES, TECH_WINDOW_FRAMES } from "../../src/game/sim/geometry/techInput";
-import { damageLevelForKnockback } from "../../src/game/sim/knockback";
+import { THROW_KNOCKBACK_WEIGHT, damageLevelForKnockback } from "../../src/game/sim/knockback";
 import { MASH_FRAMES } from "../../src/game/sim/mash";
 import {
   DOWN_ATTACK_FRAMES, GRAB_HOLD_MINIMUM_FRAMES, GRAB_RELEASE_STUN_FRAMES, PUMMEL_DAMAGE,
@@ -98,6 +100,25 @@ function pummels(): string {
   for (let n = 0; n < 40; n++) frame(s, n % 2 === 0 ? [Action.attack] : []);
   const count = fighter(s, 0).grab.pummels;
   return count > 1 ? `repeatable, ${shortNumber(PUMMEL_DAMAGE)}%` : `${count} a grab, ${shortNumber(PUMMEL_DAMAGE)}%`;
+}
+
+const THROW_PROBE_WEIGHTS = [75.0, THROW_KNOCKBACK_WEIGHT, 127.0];
+
+function throwLaunchSpeed(weight: number): number {
+  const s = solo(0, Character.rifleman);
+  const victim = fighter(s, 0);
+  victim.tuning = { ...victim.tuning, physics: { ...victim.tuning.physics, weight } };
+  victim.status.damage = 50.0;
+  beginDamageContacts();
+  collectDamageContact(s.world, 1, 0, authoredThrowEffect(GrabAction.throwForward), 1, ContactKind.throw, true, undefined, false);
+  finishDamageContacts(s.world);
+  return Math.hypot(victim.launch.knockbackX, victim.launch.knockbackZ);
+}
+
+function throwWeight(): string {
+  const speeds = THROW_PROBE_WEIGHTS.map(throwLaunchSpeed);
+  if (speeds.every((speed) => speed === speeds[0])) return `knockback hits at weight ${shortNumber(THROW_KNOCKBACK_WEIGHT)}`;
+  return THROW_PROBE_WEIGHTS.map((weight, n) => `weight ${shortNumber(weight)}: ${shortNumber(speeds[n] ?? 0)}`).join("; ");
 }
 
 export const DEFENCE_ROWS: readonly LedgerRow[] = [
@@ -307,10 +328,9 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     status: { kind: "deviation", reason: "every release frees the victim 4 frames first, so no release leads to a guaranteed regrab (docs/gameplay-design.md, Grab holds and pummels)", decided: "2026-10-14" },
   },
   {
-    id: "throw-knockback", family: "defence", name: "Throw knockback",
-    melee: { value: "knockback hits at weight 100", source: wiki("Throw") }, ours: () => "knockback hits at the victim's weight",
-    anchor: { file: GRABS, symbol: "authoredThrowEffect" },
-    status: { kind: "open", reason: "ours throws with the victim's weight, so heavy fighters fly less off a throw; Melee throws every fighter as weight 100", issue: 293 },
+    id: "throw-knockback", family: "defence", name: "Throw knockback, probed headless: a forward throw at 50% on weight-75, 100 and 127 victims",
+    melee: { value: "knockback hits at weight 100", source: wiki("Throw") }, ours: throwWeight,
+    anchor: { file: "ts/src/game/sim/knockback.ts", symbol: "THROW_KNOCKBACK_WEIGHT" }, status: PARITY,
   },
   {
     id: "throw-speed", family: "defence", name: "Throw animation speed",

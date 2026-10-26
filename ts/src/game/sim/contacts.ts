@@ -23,6 +23,7 @@ import {
   ordinaryHitstunFrames,
   STUN_KNOCKBACK,
   stunHitstunFrames,
+  THROW_KNOCKBACK_WEIGHT,
   victimHitlagFrames,
 } from "./knockback";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -51,7 +52,7 @@ import { capPercent } from "./percent";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactIsSpell, contactTraits } from "./identityTraits";
-import { MELEE_THROW_WEIGHT, meleeHandling } from "./meleeHandling";
+import { meleeHandling } from "./meleeHandling";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
 
 
@@ -308,7 +309,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.kind === ContactKind.flinch) flinch ??= index;
     if (contact.kind === ContactKind.launch || contact.kind === ContactKind.throw) {
       const stuns = contact.kind === ContactKind.launch && contact.effect.stunFrames !== undefined && launch.stunAge >= STUN_REPEAT_FRAMES;
-      const weight = contact.kind === ContactKind.throw && meleeHandling.throwsAtNeutralWeight ? MELEE_THROW_WEIGHT : knockbackWeight(target);
+      const weight = contact.kind === ContactKind.throw ? THROW_KNOCKBACK_WEIGHT : knockbackWeight(target);
       const magnitude = stuns ? STUN_KNOCKBACK : effectKnockback(contact.effect, postHitPercent, damage, weight);
       const knockback = contact.kind === ContactKind.throw ? magnitude : hitContextKnockback(magnitude, contact.crouching, contact.smashCharging);
 
