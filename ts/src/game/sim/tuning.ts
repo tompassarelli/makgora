@@ -249,6 +249,14 @@ export const HERO_VERTICAL: { readonly [character: number]: VerticalPhysics | un
     shortJumpSpeed: melee(1.899999976158142),
     aerialJumpSpeed: melee(4.0),
   },
+  [Character.kaelthas]: {
+    gravity: melee(0.08500000089406967),
+    terminalSpeed: melee(1.5499999523162842),
+    fastFallSpeed: melee(2.200000047683716),
+    fullJumpSpeed: melee(2.299999952316284),
+    shortJumpSpeed: melee(1.350000023841858),
+    aerialJumpSpeed: melee(2.5),
+  },
 };
 
 const meleeSpread = (value: number, spread: readonly [number, number]): number => Math.max(spread[0], Math.min(spread[1], value));

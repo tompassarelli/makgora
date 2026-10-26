@@ -35,7 +35,7 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.pitLord]: { ...body(f32(1.28), f32(0.80), f32(0.75), f32(1.65), f32(1.35)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.beastmaster]: { ...body(f32(1.10), f32(0.97), f32(0.88), f32(1.15), f32(1.26)), traction: f32(0.065) },
   [Character.chen]: { ...body(f32(1.3733333333333333), f32(0.7272727272727273), f32(1.12), f32(1.18), f32(1.04)), traction: f32(0.065) },
-  [Character.kaelthas]: { ...body(f32(1.0533333333333332), f32(1.025), 1.25, f32(0.96), f32(1.12)), traction: f32(0.055) },
+  [Character.kaelthas]: { ...body(f32(0.88), f32(0.78), f32(1.28), f32(0.96), f32(1.12)), traction: f32(0.055) },
   [Character.lichKing]: { ...body(f32(1.12), f32(0.84), f32(0.86), f32(1.12), f32(1.26)), traction: f32(0.065) },
   [Character.thrall]: { ...body(f32(1.6933333333333334), f32(0.68), f32(0.75), 1.25, f32(1.15)), dashRunFrame: 16, traction: f32(0.07) },
   [Character.malfurion]: { ...body(f32(94.0 / 75.0), f32(f32(10.8) / f32(13.2)), f32(0.95), 1.0, f32(1.1)), traction: f32(0.05) },

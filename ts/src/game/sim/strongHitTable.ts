@@ -146,7 +146,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   [Character.chen]: { [AttackStyle.neutralAir]: "A drunken flying kick: hit early to punish, let it linger to cover a landing." },
   [Character.peon]: { [AttackStyle.forwardSmash]: "The pick bites hardest at its point, like a swing at the mine." },
   [Character.tinker]: { [AttackStyle.forwardSmash]: "The claw clamps hardest at full extension; the arm only pushes." },
-  [Character.kaelthas]: { [AttackStyle.forwardSmash]: "Phoenix flame at the blade's tip: a vain duelist who must space to shine." },
+  [Character.kaelthas]: { [AttackStyle.forwardSmash]: "The arcane blast bursts at its far edge; the palm itself only shoves, so the mage kills by spacing." },
   [Character.murloc]: { [AttackStyle.neutralAir]: "A flailing spin strongest at its first slap; the rest is a scrappy weak wall." },
   [Character.grom]: { [AttackStyle.forwardSmash]: "Gorehowl bites with its blade; the haft only shoves." },
   [Character.kobold]: { [AttackStyle.forwardSmash]: "The candle's flame at the end of the pick: you no take candle." },
