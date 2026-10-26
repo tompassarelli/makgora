@@ -4,7 +4,7 @@ import { Character } from "../codes";
 import { type Fighter, type Projectile, createFighter } from "../fighter";
 import type { Roster } from "../roster";
 import type { SpecialProjectile } from "../specials/schema";
-import { mainDeckRight, mainDeckZ } from "../stage";
+import { CARRIED_TEST_STAGE, mainDeckRight, mainDeckZ, surfaceZ } from "../stage";
 import { duelPair, lift, stepDuel } from "../testDuel";
 import { controls } from "../testWorld";
 import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURN, FLAME_STRIKE_BURST, FLAME_STRIKE_RUNE } from "./kaelthasSpecials";
@@ -118,4 +118,67 @@ test("Cast in the air off the stage, the pillar stands at Kael's height over the
   assertTrue(burst.x > edge);
   assertTrue(runeZ > mainDeckZ(0));
   assertEquals(burst.z, f32(runeZ + FLAME_STRIKE_BURST.offsetZ), "the pillar rises from the rune");
+});
+
+test("The burst launches a foe up at its 80° and crushes a shield, where a burn tick neither launches nor dents the shield [k1 scenario]", () => {
+  const hit = (into: Readonly<SpecialProjectile>, shield: boolean): { knockbackX: number; knockbackZ: number; shieldLoss: number } => {
+    const { kael, target, world } = kaelDuel();
+    const guard = controls({ shield });
+    stepDuel(world, press, guard);
+    let spot: Readonly<Projectile> | undefined;
+    for (let frame = 0; frame < 120 && spot === undefined; frame++) {
+      stepDuel(world, idle, guard);
+      spot = live(kael, into === FLAME_STRIKE_BURST ? FLAME_STRIKE_RUNE : FLAME_STRIKE_BURN);
+    }
+    target.motion.x = present(spot, "cast").x;
+    let knockbackX = 0.0;
+    let knockbackZ = 0.0;
+    let shieldLoss = 0.0;
+    for (let frame = 0; frame < 60; frame++) {
+      const energy = target.shield.energy;
+      stepDuel(world, idle, guard);
+      shieldLoss = Math.max(shieldLoss, f32(energy - target.shield.energy));
+      if (knockbackZ === 0.0) {
+        knockbackX = target.launch.knockbackX;
+        knockbackZ = target.launch.knockbackZ;
+      }
+    }
+    return { knockbackX, knockbackZ, shieldLoss };
+  };
+  const burst = hit(FLAME_STRIKE_BURST, false);
+  assertTrue(burst.knockbackX > 0.0);
+  assertTrue(burst.knockbackZ > f32(burst.knockbackX * 5.0) && burst.knockbackZ < f32(burst.knockbackX * 6.5));
+  const burn = hit(FLAME_STRIKE_BURN, false);
+  assertEquals(burn.knockbackX, 0.0, "a burn tick does not launch");
+  assertEquals(burn.knockbackZ, 0.0, "a burn tick does not launch");
+  const crushed = hit(FLAME_STRIKE_BURST, true).shieldLoss;
+  const dented = hit(FLAME_STRIKE_BURN, true).shieldLoss;
+  assertTrue(dented > 0.0);
+  assertTrue(crushed > f32(dented * 5.0));
+});
+
+test("A rune held off a moving deck stays where it lands while the deck carries Kael on, and a rune left on the deck rides with it [k1 scenario]", () => {
+  const deckZ = surfaceZ(CARRIED_TEST_STAGE, 1, 0);
+  const cast = (heldFrames: number): { runeZ: number; drift: number } => {
+    const kael = createFighter(Character.kaelthas, -210.0, 1);
+    lift(kael, f32(deckZ + 20.0));
+    const { world } = duelPair(kael, createFighter(Character.rifleman, -500.0, -1), 3, CARRIED_TEST_STAGE);
+    for (let frame = 0; frame < 60; frame++) stepDuel(world);
+    assertEquals(kael.motion.surface, 1, "Kael stands on the moving deck");
+    stepDuel(world, press);
+    for (let frame = 0; frame < FLAME_STRIKE_AIM.frame + heldFrames; frame++) stepDuel(world, hold);
+    const rune = present(live(kael, FLAME_STRIKE_RUNE), "rune");
+    const x = rune.x;
+    const z = rune.z;
+    const deckX = kael.motion.x;
+    const burst = stepUntil(world, kael, FLAME_STRIKE_BURST);
+    assertTrue(f32(kael.motion.x - deckX) > 30.0);
+    return { runeZ: z, drift: f32(burst.x - x) };
+  };
+  const off = cast(12);
+  assertEquals(off.runeZ, mainDeckZ(CARRIED_TEST_STAGE), "the held rune slid off onto the main deck");
+  assertEquals(off.drift, 0.0, "off the deck, the rune stays put");
+  const on = cast(0);
+  assertEquals(on.runeZ, deckZ, "a tapped rune lands on the deck");
+  assertTrue(on.drift > 30.0);
 });

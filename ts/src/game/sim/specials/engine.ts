@@ -892,9 +892,10 @@ function holdAim(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Co
     const x = f32(projectile.x + f32(f.facing * aim.speed));
     if (f32(f32(x - f.motion.x) * f.facing) > aim.reach) return false;
     const held = mutableProjectile(f, index);
-    held.x = x;
+    held.x = markX(f, rune, stage, matchFrame, x);
     held.life = rune.life;
     held.z = floorBelow(stage, matchFrame, held.x, f.motion.z) ?? f.motion.z;
+    held.surface = riddenDeck(rune, undefined, stage, matchFrame, held.x, held.z);
     f.special.frame = aim.frame;
     f.special.lockFrames++;
     f.attack.cooldown++;

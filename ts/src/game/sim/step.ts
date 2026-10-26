@@ -624,7 +624,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (isGroundDodging(f) || (motion.grounded && jump.squat > 0)) {
     motion.vz = 0.0;
     motion.z = stageSurfaces.surfaceZAt(stage, motion.surface ?? 0, matchFrame, motion.x);
-  } else if (wet && !waterJumped && launch.hitstun <= 0 && !dodgeActive && !authoredMotion && drill?.speedZ === undefined) {
+  } else if (wet && egg === undefined && !waterJumped && launch.hitstun <= 0 && !dodgeActive && !authoredMotion && drill?.speedZ === undefined) {
     buoyant = true;
     sea.applyBuoyancy(f);
   } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredMotion) {

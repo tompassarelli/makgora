@@ -8,7 +8,8 @@ import { type Fighter, createFighter } from "../fighter";
 import { applyAttackHit } from "../hits";
 import { type Controls, type Roster } from "../roster";
 import { becomeEgg, steeredFlightLeft } from "../specials/engine";
-import { mainDeckRight, mainDeckZ } from "../stage";
+import { TOMB_OF_SARGERAS_STAGE, mainDeckRight, mainDeckZ } from "../stage";
+import { SEA_SURFACE_Z } from "../stageHazards";
 import { duelPair, lift, stepDuel } from "../testDuel";
 import { controls } from "../testWorld";
 import { Action, bit } from "../../input/actions";
@@ -161,4 +162,30 @@ test("Phoenix: from the long band's depth, a jump and a Phoenix held up still re
   const ratio = f32(rise(true) / rise(false));
   assertGreaterThan(ratio, f32(1.2));
   assertLessThan(ratio, f32(1.3));
+});
+
+test("Phoenix: an egg that drops into the sea keeps falling at its egg speed and is lost, where a helpless fall floats [k3 measure #360]", () => {
+  const sink = (egg: boolean): { stocks: number; lowest: number; seaSpeeds: boolean } => {
+    const pair = duelPair(createFighter(Character.kaelthas, f32(mainDeckRight(TOMB_OF_SARGERAS_STAGE) + 200.0), -1), createFighter(Character.rifleman, -500.0, 1), 3, TOMB_OF_SARGERAS_STAGE);
+    const kael = pair.owner;
+    const stocks = kael.status.stocks;
+    lift(kael, f32(SEA_SURFACE_Z + 60.0));
+    kael.special.fall = true;
+    kael.jump.remaining = 0;
+    if (egg) becomeEgg(kael);
+    let lowest = kael.motion.z;
+    let seaSpeeds = true;
+    for (let frame = 0; frame < 120 && kael.status.stocks === stocks; frame++) {
+      stepDuel(pair.world, hold(0, 1));
+      lowest = Math.min(lowest, kael.motion.z);
+      if (kael.special.egg && kael.motion.z < SEA_SURFACE_Z && kael.motion.vz !== -PHOENIX_EGG_FALL_SPEED) seaSpeeds = false;
+    }
+    return { stocks: stocks - kael.status.stocks, lowest, seaSpeeds };
+  };
+  const egg = sink(true);
+  assertTrue(egg.seaSpeeds);
+  assertEquals(egg.stocks, 1, "the egg sinks out of the blast zone");
+  const helpless = sink(false);
+  assertEquals(helpless.stocks, 0, "a helpless fall floats");
+  assertGreaterThan(helpless.lowest, f32(SEA_SURFACE_Z - 200.0));
 });
