@@ -265,8 +265,11 @@ function step(world: Roster, input: Readonly<Controls>): void {
   advanceHeroStatus(f);
 }
 
+const objectsLive = (f: Fighter): boolean => f.bear.life > 0 || f.freezeTrap.life > 0 || f.placed.life > 0 || f.pack.some(object => object.life > 0);
+
 function dangerous(f: Fighter, style: AttackStyle | undefined): boolean {
   for (let index = 0; index < f.projectiles.length; index++) if (projectileActive(f, index)) return true;
+  if (objectsLive(f)) return true;
   if (style !== undefined) return f.attack.style === style && attackPhase(f) === AttackPhase.active;
   if (f.special.action === SpecialAction.none) return false;
   if (specialCueState(f).phase === "active") return true;
@@ -404,7 +407,7 @@ export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; read
       const running = move.style !== undefined ? f.attack.style === move.style : f.special.action !== SpecialAction.none;
       if (tick === 0 && !running) return { scenes: [], poses: [], lastDanger: -1, empty: captureScene(client) };
       if (dangerous(f, move.style)) lastDanger = tick;
-      const live = running || f.projectiles.some((_, index) => projectileActive(f, index)) || f.bear.life > 0 || f.freezeTrap.life > 0 || f.placed.life > 0 || f.pack.some(object => object.life > 0);
+      const live = running || f.projectiles.some((_, index) => projectileActive(f, index)) || objectsLive(f);
       if (!live && ended < 0) ended = tick;
       if (live) lastLive = tick;
       advanceSpecialEffect(specialState, f, 0);

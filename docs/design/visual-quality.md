@@ -287,7 +287,7 @@ expansion's art add, read on 8 Oct 2026 from
 | --- | --- | --- |
 | Battle.net players, every region | 3.0.1.24342 | `http://us.patch.battle.net:1119/w3/versions` on 8 Oct: us, eu and kr all list `3.0.1.24342`. [BlizzTrack](https://blizztrack.com/view/w3?type=versions) indexed it on 7 Oct at 16:33 UTC, replacing 3.0.0.24268 |
 | Public test realm | 3.0.1.24332 | `…/w3t/versions` on 8 Oct: one build older than live. No 3.1 test build exists, and no 3.1 topic appears in the [forum's latest topics](https://us.forums.blizzard.com/en/warcraft3/latest) |
-| Our test clients | 3.0.1.24342 | The `.build.info` of all 34 offline pool clients (~/.local/share/wisp/lan/clients/), the signed-in clones a–d and Tom's install, all written 8 Oct 00:41 +0800 |
+| Our test clients | 3.0.1.24342 | The `.build.info` of all 34 offline pool clients (~/.local/share/wisp/lan/clients/), the signed-in clones a–d and Tom's install, all written on 8 Oct |
 | Our base map | saved by the 3.0.0.24268 editor | The base input's war3map.w3i: format 39, editor 7000, game version 3.0.0.24268, Lua, graphics-modes field 3, game data version 2 (*(guess)* 2 is the Forsaken Kingdom data set that the [Hive bugs thread](https://www.hiveworkshop.com/threads/warcraft-iii-3-0-bugs-issues.374131/) says unversioned maps fall into) |
 
 The #170 lighting captures (7 Oct, 08:11–08:22 UTC) ran before 3.0.1 went
@@ -777,8 +777,11 @@ never hides the fighters:
 
 - **Lifetime.** Visible no longer than the move's last active frame plus 12
   frames of fade. Active frames are a live hit region, a special's active
-  cue window or a projectile's flight (projectiles: their flight plus 12); a
-  move with none counts from its last frame.
+  cue window, a projectile's flight or a placed object's life (projectiles:
+  their flight plus 12); a move with none counts from its last frame. A
+  placed object (a summoned bear, hawk or quilbeast, a mirror image, a trap)
+  is a fighter on the stage, hittable and drawn as a unit, so it shows for
+  its whole life; the 12-frame fade starts when it ends (#377).
 - **Coverage.** One move's effects cover at most **4%** of the screen at the
   near match camera (`extremeCamera(..., "near")`, following the fighter).
   Source: `bun wisp view cues` on 9 Oct 2026, Classic: 108 drawn moves,

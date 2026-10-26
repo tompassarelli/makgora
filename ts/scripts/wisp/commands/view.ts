@@ -332,7 +332,10 @@ const cues = (args: readonly string[]) => Effect.gen(function*() {
   if (args.length !== only.length * 2) {
     return yield* new UsageFailure({ problem: "view cues takes [--move FIGHTER:MOVE]..." });
   }
-  const moves = cueMoves().filter(({ name }) => only.length === 0 || only.includes(name));
+  const known = cueMoves();
+  const unknown = only.filter((name) => !known.some((move) => move.name === name));
+  if (unknown.length > 0) return yield* new UsageFailure({ problem: `view cues knows no move ${unknown.join(", ")}; names look like blademaster:down-special-air-ex` });
+  const moves = known.filter(({ name }) => only.length === 0 || only.includes(name));
   const rows: CueMeasurement[] = [...yield* measureCueMoves(moves, CUE_FRAMES)];
   const frames = (value: number) => Number.isFinite(value) ? String(value) : "never";
   for (const row of [...rows].sort((a, b) => b.linger - a.linger || b.coverage - a.coverage)) {
