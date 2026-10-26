@@ -133,7 +133,7 @@ level.
 
 ### Candle
 
-Constants live in ts/src/game/sim/heroes/koboldCandle.ts.
+Constants live in ts/src/game/fighters/kobold/candle.ts.
 
 - Heat is a whole number from 0 to 300. Level is heat / 75, capped at 3:
   level 0 is 0-74, level 1 is 75-149, level 2 is 150-224, level 3 is 225-300.
@@ -513,7 +513,7 @@ Standing grab 7/2/22, reach 0.55H, one-handed collar catch. Pummel: pommel strik
 
 **Required counterplay test:** forward smash whiff must give a fast fighter at its outer edge a plausible approach punish; Mirror Image cannot reset its own recovery or create a true 50/50 without prior advantage.
 
-**As implemented** (smashcraft:ts/src/game/sim/heroes/blademasterMoves.ts, blademasterSpecials.ts, blademasterClips.ts). Every row above is authored; these are the departures:
+**As implemented** (smashcraft:ts/src/game/fighters/blademaster/moves.ts, blademasterSpecials.ts, blademasterClips.ts). Every row above is authored; these are the departures:
 
 - Forward tilt also has up- and down-angled forms with the row's timing and damage; only the blade path changes.
 - Down air's tip spikes airborne targets only; it sends grounded targets at 55 degrees, as the shared notation directs.
@@ -602,7 +602,7 @@ Standing grab 8/2/25, reach 0.50H. Pummel: helmet headbutt.
 
 **Required counterplay test:** blocked Storm Bolt must not guarantee a grab from its full travel distance; Thunder Clap cannot cover both a retreat and a jump without a read (a jump clears ring and waves; the shield cancel is the bait).
 
-**Implemented kit** (smashcraft:ts/src/game/sim/heroes/mountainKingMoves.ts, mountainKingSpecials.ts, presentation/heroes/mountainKingClips.ts). Every row above is implemented; nothing is omitted. Deliberate additions and choices where the table is silent:
+**Implemented kit** (smashcraft:ts/src/game/fighters/mountain-king/moves.ts, mountainKingSpecials.ts, fighters/mountain-king/clips.ts). Every row above is implemented; nothing is omitted. Deliberate additions and choices where the table is silent:
 
 - Forward tilt also has up- and down-angled paths with the same timing and damage.
 - Hammer Drop's head and Double Boot launch grounded targets at 55 degrees (the shared grounded spike rule).
@@ -615,7 +615,7 @@ Standing grab 8/2/25, reach 0.50H. Pummel: helmet headbutt.
 
 **Balance** (#105, all-pairs computer field, 3 stocks): Storm Bolt 7 → 5 damage, so it covers his slow approach instead of winning neutral from range: field win rate 71% (b2ed6109, 100/pair) → 66% (20/pair), self-destructs 1%.
 
-**Gameplan** (smashcraft:ts/src/game/sim/heroes/mountainKingGameplan.ts, #105): he keeps 0.6-1.0H, at Axe Hook's tip, spacing with Axe Hook and Boot and Axe and covering his slow approach with Storm Bolt from 1.5H out; he shoots or runs in with grab, Boot and Axe and Dwarf Charge, never jumps in, and meets an attack with his shield or a spot dodge. Boot and Axe, Hammer Lift and the down throw start his strings; Mountain Breaker, Twin Lift, Backhand Axe and the back throw finish. His limited air drift is the weakness he plays around: he fights on the ground and keeps his spot 160 units inside the edge, so a launch leaves the shortest way back, and returns to the ledge with his jump before Thunder Leap.
+**Gameplan** (smashcraft:ts/src/game/fighters/mountain-king/gameplan.ts, #105): he keeps 0.6-1.0H, at Axe Hook's tip, spacing with Axe Hook and Boot and Axe and covering his slow approach with Storm Bolt from 1.5H out; he shoots or runs in with grab, Boot and Axe and Dwarf Charge, never jumps in, and meets an attack with his shield or a spot dodge. Boot and Axe, Hammer Lift and the down throw start his strings; Mountain Breaker, Twin Lift, Backhand Axe and the back throw finish. His limited air drift is the weakness he plays around: he fights on the ground and keeps his spot 160 units inside the edge, so a launch leaves the shortest way back, and returns to the ledge with his jump before Thunder Leap.
 
 ### Play-style profile
 
@@ -695,7 +695,7 @@ Standing grab 6/2/22, reach 0.48H. Pummel: elbow to the ribs.
 
 **Required counterplay test:** Blink endpoint can be covered after reading direction; Fan of Knives on shield must leave a punish opportunity. No teleport may be activated from attack recovery.
 
-**As implemented** (smashcraft:ts/src/game/sim/heroes/wardenMoves.ts, wardenSpecials.ts, wardenHero.ts; clips in smashcraft:ts/src/game/presentation/heroes/wardenClips.ts). Every row above is authored; these are the departures:
+**As implemented** (smashcraft:ts/src/game/fighters/warden/moves.ts, wardenSpecials.ts, wardenHero.ts; clips in smashcraft:ts/src/game/fighters/warden/clips.ts). Every row above is authored; these are the departures:
 
 - Forward tilt also has up- and down-angled forms with the row's timing and damage; only the blade path changes.
 - Warden's arm reaches each blade's hand from two frames before the strike to four after, in held poses; only the blades are disjoint. Heel Blade's leg is exposed on frames 5-13.
@@ -706,7 +706,7 @@ Standing grab 6/2/22, reach 0.48H. Pummel: elbow to the ribs.
 - Presentation uses the stock Warden model with authored motion clips. Fan of Knives has distinct ground and air casts, coiling then spreading both arms at release (#239). Shadow Strike plays Spell Throw, and Blink plays Dissipate.
 - Spirit of Vengeance is not implemented; ultimates stay off in competitive play.
 
-**Gameplan** (smashcraft:ts/src/game/sim/heroes/wardenGameplan.ts, #105): she keeps 0.7-1.4H, just past her blades, and spaces with Crescent Slice and Pursuit Lunge; she runs in with dash attack, lunge and grab or jumps in with aerials led by Pursuer, and never camps at long range. Up tilt, down tilt, up air, the up and down throws and her side special start her strings, the side special stun into grab or Fan of Knives; Heel Blade, Judgment Edge, Moon Arc and the low outward Pursuer and Twin Crescent finish. She spends her jump before Blink, so its punishable endpoint is her last resort, and stays out from under a target.
+**Gameplan** (smashcraft:ts/src/game/fighters/warden/gameplan.ts, #105): she keeps 0.7-1.4H, just past her blades, and spaces with Crescent Slice and Pursuit Lunge; she runs in with dash attack, lunge and grab or jumps in with aerials led by Pursuer, and never camps at long range. Up tilt, down tilt, up air, the up and down throws and her side special start her strings, the side special stun into grab or Fan of Knives; Heel Blade, Judgment Edge, Moon Arc and the low outward Pursuer and Twin Crescent finish. She spends her jump before Blink, so its punishable endpoint is her last resort, and stays out from under a target.
 
 ### Play-style profile
 
@@ -834,7 +834,7 @@ Standing grab 10/2/28, reach 0.70H. Visible spectral hand, no tether recovery or
 
 ### As built
 
-Source: smashcraft:ts/src/game/sim/heroes/lichHero.ts, lichMoves.ts and
+Source: smashcraft:ts/src/game/fighters/lich/kit.ts, lichMoves.ts and
 lichSpecials.ts. Every normal, grab, pummel, throw and special above is
 implemented; the ultimate is not (there is no ultimate action). Changes from
 the tables:
@@ -862,7 +862,7 @@ the tables:
 - Knockback classes use provisional growth/base values, not the
   displacement-calibrated bands.
 
-**Gameplan** (smashcraft:ts/src/game/sim/heroes/lichGameplan.ts, #105): he keeps 1.5-2.4H, where Death and Decay lands on the target and Frost Nova still flies, and never runs in: he advances behind his shots and covers a run-in with Ice Spear. A threat close by he mostly answers by backing out to range. Death and Decay, down tilt, up tilt and the down throw start his strings; Ice Spear, Bone Spike and a late Death and Decay finish. He jumps before Spectral Ascent, aims for the ledge, and stays off the edge, out of close range and out from under a target.
+**Gameplan** (smashcraft:ts/src/game/fighters/lich/gameplan.ts, #105): he keeps 1.5-2.4H, where Death and Decay lands on the target and Frost Nova still flies, and never runs in: he advances behind his shots and covers a run-in with Ice Spear. A threat close by he mostly answers by backing out to range. Death and Decay, down tilt, up tilt and the down throw start his strings; Ice Spear, Bone Spike and a late Death and Decay finish. He jumps before Spectral Ascent, aims for the ledge, and stays off the edge, out of close range and out from under a target.
 
 ### Play-style profile
 
@@ -990,7 +990,7 @@ Standing grab 7/3/26, reach 0.65H. Pummel: claw squeeze. No automatic lifesteal.
 
 **Required counterplay test:** Sleep from neutral must be jumpable or shieldable and cannot reset its own sleep chain. Vampiric Pounce should lose to a preemptive attack and to a correctly spaced retreat.
 
-**As implemented (smashcraft:ts/src/game/sim/heroes/dreadlordMoves.ts, dreadlordSpecials.ts):** every row above is present; the departures are these.
+**As implemented (smashcraft:ts/src/game/fighters/dreadlord/moves.ts, dreadlordSpecials.ts):** every row above is present; the departures are these.
 
 - Nothing Dreadlord swings is disjointed: each claw, wing, horn and elbow path is also his body, fully out from a frame before its first active frame to two after its last, drawn out and folded back through held 3-frame poses. His standing body adds folded wings behind the shoulders to the roster capsule.
 - Vampiric Pounce’s ground and air approaches stop at a body or shield and hold their height through the corkscrew. Both forms bite; the air form is once per airtime and ends helpless.
@@ -1076,7 +1076,7 @@ Standing grab 8/2/24, reach 0.55H. Pummel: mask headbutt.
 
 **Required counterplay test:** a ward can be cleared with one or two intentional attacks; ward fire plus Hex cannot permanently remove recovery or lock shield. Throws into a ward are setups to measure, not assumed true combos.
 
-**Implemented kit notes.** Source: smashcraft:ts/src/game/sim/heroes/shadowHunterMoves.ts (normals, grab, throws), shadowHunterSpecials.ts (specials, ward and Hex values) and shadowHunterHero.ts (registration and clip map). The model is the classic `units\orc\HeroShadowHunter\HeroShadowHunter.mdl` at scale 1.0 (Stand Ready is 138 units tall against 1.08H). It has fourteen sequences and one attack clip, so moves share clips by motion: glaive cuts play Attack, overhead moves Spell, the low lunge and the overhand release Spell Throw, Twin Totems and Serpent Ward the hopping Stand Channel, jumps and Loa Vault the leap in Stand Victory, knockdown Death, and a KO the rising spirit of Dissipate. The model has no kick, so Heel Hook plays the rear arm-and-glaive sweep of Stand -2; its hit volume keeps the listed M reach and the swinging arm carries an exposed hurt volume, preserving the move's no-disjoint trade-off. No move is omitted.
+**Implemented kit notes.** Source: smashcraft:ts/src/game/fighters/shadow-hunter/moves.ts (normals, grab, throws), shadowHunterSpecials.ts (specials, ward and Hex values) and shadowHunterHero.ts (registration and clip map). The model is the classic `units\orc\HeroShadowHunter\HeroShadowHunter.mdl` at scale 1.0 (Stand Ready is 138 units tall against 1.08H). It has fourteen sequences and one attack clip, so moves share clips by motion: glaive cuts play Attack, overhead moves Spell, the low lunge and the overhand release Spell Throw, Twin Totems and Serpent Ward the hopping Stand Channel, jumps and Loa Vault the leap in Stand Victory, knockdown Death, and a KO the rising spirit of Dissipate. The model has no kick, so Heel Hook plays the rear arm-and-glaive sweep of Stand -2; its hit volume keeps the listed M reach and the swinging arm carries an exposed hurt volume, preserving the move's no-disjoint trade-off. No move is omitted.
 
 ### Play-style profile
 
@@ -1160,7 +1160,7 @@ Standing grab 11/3/31, reach 0.80H. Pummel: horn jab, shared 3 damage despite hu
 
 ### Pit Lord as built
 
-Source: smashcraft:ts/src/game/sim/heroes/pitLordMoves.ts (normals, grabs,
+Source: smashcraft:ts/src/game/fighters/pit-lord/moves.ts (normals, grabs,
 throws, body), pitLordSpecials.ts and pitLordHero.ts (#121). Every row
 above is implemented with its listed timing, damage, angle and reach. Launch
 classes use provisional coefficients. Deliberate differences:
@@ -1189,7 +1189,7 @@ seventeen sequences and no hit, ready or jump clip, so flinches play
 pair (overhead) and "attack - 2" (both-sides sweep). pitLordHero.ts lists
 every pose's clip.
 
-**Gameplan** (smashcraft:ts/src/game/sim/heroes/pitLordGameplan.ts, #105):
+**Gameplan** (smashcraft:ts/src/game/fighters/pit-lord/gameplan.ts, #105):
 he holds 120-190 units at Cleaving Sweep's tip. He makes the target act with
 Rain of Fire from range and runs in behind Ruin Charge's armor. Down tilt and the
 throws start his strings. Annihilating Cleave kills from 70%, then Abyssal
@@ -1380,7 +1380,7 @@ Stampede is the Bear command on side special; it needs no separate ultimate
 input. Normals and throws retain their current authored data, including the
 low down-throw chase from #208 and the accepted #186 numeric tuning.
 
-Source: smashcraft:ts/src/game/sim/heroes/beastmasterMoves.ts,
+Source: smashcraft:ts/src/game/fighters/beastmaster/moves.ts,
 beastmasterSpecials.ts, beastmasterHero.ts and sim/companions.ts. Stock classic
 BeastMaster, GrizzlyBear, QuillBeast and WarEagle models draw the formation;
 the Stampede missile draws its two thunder lizards. The computer uses the
@@ -1491,7 +1491,7 @@ caster: the Lich King wins with blade reach and kill power and controls space
 with Defile and the Val'kyr. He is slow on foot and in the air, so fast
 pressure inside the blade and juggles are his weakness.
 
-Source: smashcraft:ts/src/game/sim/heroes/lichKingMoves.ts, lichKingSpecials.ts,
+Source: smashcraft:ts/src/game/fighters/lich-king/moves.ts, lichKingSpecials.ts,
 lichKingHero.ts and lichKingGameplan.ts. Frames are F/A/R as in the notation
 above; damage and launch classes are provisional. The move list
 (smashcraft:docs/move-list.md) names every special.

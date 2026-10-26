@@ -7,7 +7,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { createFighter } from "../sim/fighter";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import { attackStartupFrames } from "../sim/moves";
-import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { chooseDefense } from "./botDefense";
 import { chooseRecoveryInput } from "./botRecovery";

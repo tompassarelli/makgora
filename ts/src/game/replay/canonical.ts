@@ -24,8 +24,8 @@ import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuP
 import { botStrategyValues } from "../match/botStrategy";
 import type { ReplayState } from "./snapshot";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import { HERO_ROSTER } from "../sim/heroes/registry";
-import { writeCandleView } from "../sim/heroes/koboldCandleView";
+import { HERO_ROSTER } from "../roster/kits";
+import { writeCandleView } from "../fighters/kobold/candleView";
 import { RIFLEMAN_MOVES } from "../sim/originalMoves";
 
 const REPLAY_CHECKSUM_MODULUS = 1_000_003;

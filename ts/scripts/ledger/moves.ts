@@ -1,14 +1,14 @@
 import { AttackStyle } from "../../src/game/sim/codes";
-import { MURLOC_MOVES } from "../../src/game/sim/heroes/murlocMoves";
-import { WARDEN_MOVES } from "../../src/game/sim/heroes/wardenMoves";
+import { MURLOC_MOVES } from "../../src/game/fighters/murloc/moves";
+import { WARDEN_MOVES } from "../../src/game/fighters/warden/moves";
 import type { HitEffect } from "../../src/game/sim/hitRegions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
 
 export const FOX_NEUTRAL_AIR = { damage: 12, base: 10, growth: 100, angle: "361" } as const;
 
 const FOX_NEUTRAL_AIR_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial";
-const WARDEN = "ts/src/game/sim/heroes/wardenMoves.ts";
-const MURLOC = "ts/src/game/sim/heroes/murlocMoves.ts";
+const WARDEN = "ts/src/game/fighters/warden/moves.ts";
+const MURLOC = "ts/src/game/fighters/murloc/moves.ts";
 const SQUIRTLE_JAB = { undocumented: "Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units", source: "https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack" } as const;
 const SPEAR_POINT = { kind: "deviation", reason: "his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 497 } as const;
 const LOW_KNOCKBACK = { kind: "deviation", reason: "Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold", decided: "2026-10-26", issue: 305 } as const;

@@ -10,7 +10,7 @@ data record; the simulation, replay, selection and object data read it.
   Mountain King 4, Warden 5, Lich 6, Forsaken Paladin 7, Dreadlord 8, Shadow Hunter 9, Pit Lord 10, Beastmaster 11, Lich King 12.
   Hero specials run under `SpecialAction.heroNeutral`..`heroDown` (13-16) and
   hero projectiles under `ProjectileKind.hero` (5).
-- `ts/src/game/sim/heroes/<hero>Hero.ts` is one hero's `HeroDefinition`
+- `ts/src/game/fighters/<hero>/kit.ts` is one hero's `HeroDefinition`
   (`sim/heroes/hero.ts`): product name, purpose, weakness, optional `ultimate`
   (official name and one line), `moves`
   (`FighterMoves`, `sim/heroMoves.ts`), `specials` (`FighterSpecials`,
@@ -27,7 +27,7 @@ data record; the simulation, replay, selection and object data read it.
   physics from the shared baseline (weight, dash/run/walk speed, air speed; jumps and
   gravity unchanged) and `physics/contactGeometry.ts` scales the reference hurt
   capsule by width and height. Ledge, wall and roll data use the shared Fox reference.
-- `ts/src/game/sim/heroes/registry.ts` lists the heroes in build order.
+- `ts/src/game/roster/kits.ts` lists the heroes in build order.
   `SELECTABLE_CHARACTERS` is the original three plus every hero whose
   `complete` is true; selection rules, menu cycling and the map's fighter
   objects (`game/objectData.ts`) use it, so an incomplete hero is never

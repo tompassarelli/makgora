@@ -1,6 +1,6 @@
 import { Character } from "../src/game/sim/codes";
 import { SpecialForm, SpecialSlot, specialForm, specialKit } from "../src/game/sim/specials/schema";
-import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/roster/kits";
 import { fighterKit } from "../src/game/sim/moveNames";
 import { upSpecialRoute } from "../src/game/match/recoveryEnvelope";
 import { EDGE_GUARD_SCENARIOS, EdgeGuardTool, MIXED_PLANS, OPENING_MIN, edgeGuardTool, guardedReturn, playScenario, recoveryProfile } from "../src/game/match/edgeGuardScenarios";

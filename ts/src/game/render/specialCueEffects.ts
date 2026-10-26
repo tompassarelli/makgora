@@ -14,7 +14,7 @@ import { HitAreaEffects } from "./hitAreaEffects";
 import { POPCORN_CUE_MODELS } from "../presentation/cueEmitterInfo";
 import { modelFailed } from "wisp/src/platform/modelFailures";
 import { idiv } from "wisp/src/sim/intMath";
-import { fighterName } from "../sim/heroes/registry";
+import { fighterName } from "../roster/kits";
 import { f32 } from "wisp/src/sim/f32";
 import { specialAreaRegion } from "../presentation/disjointCues";
 import { CueLinger, type CuePlace } from "../presentation/cueLinger";

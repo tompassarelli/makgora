@@ -22,7 +22,7 @@ import { canAttack } from "../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { attackStartupFrames } from "../src/game/sim/moves";
 import { createRoster, fighterAt } from "../src/game/sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { type AgencyReport, ESCAPE_FRAMES, type Loop, TIGHT_ESCAPE, agencyLetters, analyzeAgency, runFrame, sameGameplay, snapshotOf } from "./agency";
 import { exportComparisons } from "./moveComparisons";
 

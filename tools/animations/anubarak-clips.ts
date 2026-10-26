@@ -9,8 +9,8 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sampleAttack, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackStyle, AttackPhase, GrabAction, Character } from "../../ts/src/game/sim/codes";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
-import { ANUBARAK_MOVES } from "../../ts/src/game/sim/heroes/anubarakMoves";
-import { ANUBARAK_SPECIALS } from "../../ts/src/game/sim/heroes/anubarakSpecials";
+import { ANUBARAK_MOVES } from "../../ts/src/game/fighters/anubarak/moves";
+import { ANUBARAK_SPECIALS } from "../../ts/src/game/fighters/anubarak/specials";
 import { seconds } from "./asset-info";
 import { blenderOptions, blenderSkeleton } from "./blender-keys";
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
@@ -412,9 +412,9 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 
-if (rekeyed.length === 0) await Bun.write(join(project, "ts/src/game/sim/heroes/anubarakClips.ts"), [
+if (rekeyed.length === 0) await Bun.write(join(project, "ts/src/game/fighters/anubarak/clips.ts"), [
   "",
-  'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
+  'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
   'export const ANUBARAK_MODEL_FILE = "units\\\\undead\\\\HeroCryptLord\\\\HeroCryptLord.mdl";',
   'export const ANUBARAK_FALLBACK: HeroClip = { index: 0, seconds: 1.0 };',
   'export const ANUBARAK_CLIPS = { idle: ANUBARAK_FALLBACK, walk: { index: 2, seconds: 1.0 }, dash: { index: 2, seconds: 1.0 }, run: { index: 2, seconds: 1.0 }, ko: { index: 3, seconds: f32(3.033) },',

@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { ComboSetup } from "../src/game/match/comboRoute";
 import { Character, DownState } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
-import { fighterName } from "../src/game/sim/heroes/registry";
+import { fighterName } from "../src/game/roster/kits";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import {
   DIS, type Defender, type Di, type Ending, Explorer, OPENERS, type Opener, PERCENTS, TECH_OPTIONS, defenderMask, free, openerRoot, settled,

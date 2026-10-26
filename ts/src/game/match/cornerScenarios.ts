@@ -12,7 +12,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { AttackPhase } from "../sim/codes";
 import { attackPhase } from "../sim/conditions";
 import { type Fighter, createFighter } from "../sim/fighter";
-import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../sim/stage";
 import { CORNER_BAND, insideLip } from "./botCorner";

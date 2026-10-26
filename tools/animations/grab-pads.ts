@@ -9,7 +9,7 @@ import { createMatchState, Phase } from "../../ts/src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX, stepMatch } from "../../ts/src/game/match/step";
 import { AttackStyle, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";
-import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/game/roster/kits";
 import { copyControls, createRoster, fighterAt, neutralControls } from "../../ts/src/game/sim/roster";
 import { ensure } from "./original-clips";
 

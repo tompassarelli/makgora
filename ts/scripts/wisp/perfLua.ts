@@ -12,7 +12,7 @@
 import { type PerfMeasure, runLuaPerf, runLuaPerfWith } from "wisp/src/headless/luaPerf";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
 import { BOT_FOUR, BOT_THREE, HUMAN_DUEL, HUMAN_FOUR, botMatchAgainst, playBotMatch } from "./botMatch";
 import { PREDICTED_LOCAL_NATIVES, SMASHCRAFT_LOCAL_NATIVES } from "./localNatives";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";

@@ -6,7 +6,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { SpecialAction } from "./codes";
 import type { NamedMove } from "./heroes/hero";
-import { heroDefinition } from "./heroes/registry";
+import { heroDefinition } from "../roster/kits";
 import type { FighterMoves } from "./heroMoves";
 import { FOLLOW_UP_FORM, type AuthoredSpecial, type SpecialKit, SpecialForm, SpecialSlot, specialForm, specialKit } from "./specials/schema";
 import { ORIGINAL_KITS } from "./originalKits";

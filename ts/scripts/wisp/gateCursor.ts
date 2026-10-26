@@ -10,7 +10,7 @@ import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
 import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, HAND_HEIGHT, HAND_WIDTH, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
-import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { readTga, type Rgba } from "../blp";
 import { runProcess } from "../hostProcess";
 import { reachFighterSelect } from "./gateIntro";

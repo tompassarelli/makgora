@@ -49,11 +49,11 @@ import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
 import { gainMana } from "./mana";
 import { capPercent } from "./percent";
-import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
+import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "../fighters/kobold/candle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactIsSpell, contactTraits } from "./identityTraits";
 import { meleeHandling } from "./meleeHandling";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
+import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "../fighters/forsaken-paladin/sword";
 
 
 interface DamageContact {

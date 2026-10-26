@@ -15,7 +15,7 @@ import { RESULTS_DELAY_FRAMES } from "../../src/game/render/matchPresentation";
 import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
-import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../../src/game/ui/resultsBanner";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { PICKER_DONE } from "../../src/game/ui/settingsUi";

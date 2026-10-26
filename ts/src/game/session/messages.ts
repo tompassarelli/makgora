@@ -6,7 +6,7 @@ import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, computerActive, fighter
 import { DownState, ItemKind, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/moveNames";
-import { fighterName } from "../sim/heroes/registry";
+import { fighterName } from "../roster/kits";
 import { classicResultHelp, classicResultMessage, tierName } from "../classic/classicText";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, cpuProfileLabel } from "../match/cpuProfiles";
 import { TEAM_NAMES } from "../sim/teams";

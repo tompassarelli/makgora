@@ -11,7 +11,7 @@
 
 import { Schema } from "effect";
 import soak from "./wisp/soak";
-import { heroDefinition, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { heroDefinition, selectableCharacterBySlug } from "../src/game/roster/kits";
 
 
 const KO_CREDIT_FRAMES = 180;

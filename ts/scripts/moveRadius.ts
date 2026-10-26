@@ -5,7 +5,7 @@ import { AttackStyle, type Character } from "../src/game/sim/codes";
 import { attackCapsule, emptyCapsule } from "../src/game/sim/geometry/contactGeometry";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { fighterShield } from "../src/game/sim/heroes/heroBodies";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { attackDurationFramesForGrounding } from "../src/game/sim/moves";
 import { authoredTuning } from "../src/game/sim/tuning";
 

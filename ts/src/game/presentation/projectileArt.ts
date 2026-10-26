@@ -9,10 +9,10 @@ import { ANKH_BURST_MODEL } from "../../generated/assets/ankhAssetInfo";
 
 import { Character, ProjectileKind } from "../sim/codes";
 import type { Projectile } from "../sim/fighter";
-import { HERO_ROSTER, heroDefinition } from "../sim/heroes/registry";
+import { HERO_ROSTER, heroDefinition } from "../roster/kits";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile } from "../sim/specials/schema";
-import { FLAME_STRIKE_BURST } from "../sim/heroes/kaelthasSpecials";
+import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
 import type { CueBirth } from "./specialCues";
 import type { Fuse } from "./discLook";
 

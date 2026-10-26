@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Portrait } from 'wisp/scripts/wisp/screenBounds';
-import { RENDERED_FIGHTERS } from '../src/game/sim/heroes/registry';
+import { RENDERED_FIGHTERS } from '../src/game/roster/kits';
 import { originalClip } from '../src/generated/clips/fighterOriginalClipInfo';
 
 /** Classic node names per fighter for Wisp's in-frame verdict: the head (crown margin), its face, the weapon and the hand gripping it. */

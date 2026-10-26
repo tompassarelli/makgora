@@ -6,7 +6,7 @@
 import { DownState } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
 import { fighterAt } from "../src/game/sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { type FighterEntry, type Move, VICTIM_CHOICES, comboRow, openingState } from "./comboTrees";
 import { Timeline } from "./interactions";
 

@@ -19,7 +19,7 @@ import { fighterAt } from "../src/game/sim/roster";
 import { damageTint, hitlagShake } from "../src/game/presentation/hitPresentation";
 import { SMASHCRAFT_HEADLESS } from "./wisp/headless";
 import { type CaptureFixture, SHOWCASE_HOLD_TICKS, showcaseFixtures } from "../src/platform/captureFixtures";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 
 export function reelFixtures(only: string | undefined, holdTicks = SHOWCASE_HOLD_TICKS): CaptureFixture[][] {
   if (!Number.isInteger(holdTicks) || holdTicks < 6 || holdTicks > 180) throw new Error("reel hold ticks must be 6..180");

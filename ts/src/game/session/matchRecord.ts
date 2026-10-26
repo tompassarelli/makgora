@@ -12,7 +12,7 @@ import { type MatchState, computerActive } from "../lobby/lobbyState";
 import { stageInfo } from "../menu/stageCatalog";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { MatchTally } from "../presentation/matchCues";
-import { fighterName } from "../sim/heroes/registry";
+import { fighterName } from "../roster/kits";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 
 export const MATCH_RECORD_HEADER = "smashcraft-match";

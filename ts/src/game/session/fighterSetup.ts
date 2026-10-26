@@ -6,7 +6,7 @@ import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { mutableCandle } from "../sim/fighterRest";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL, dropCandle, resetCandle } from "../sim/heroes/koboldCandle";
+import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL, dropCandle, resetCandle } from "../fighters/kobold/candle";
 
 interface SetupTarget {
   readonly player: number;

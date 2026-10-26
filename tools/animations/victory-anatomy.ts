@@ -8,7 +8,7 @@ import { anatomyFindings, type PoseSample } from '../../ts/scripts/wisp/victoryA
 import { VICTORY_ANATOMY_RECORD, VICTORY_UNJOINTED, type VictoryAnatomyRecord } from '../../ts/scripts/wisp/victoryAnatomyRecord';
 import { originalClipNamed } from '../../ts/src/generated/clips/fighterOriginalClipInfo';
 import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
-import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/sim/heroes/registry';
+import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/roster/kits';
 import { bodyPoseReader } from './victory-pose';
 import { ensure } from './original-clips';
 

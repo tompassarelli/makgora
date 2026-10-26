@@ -5,7 +5,7 @@ import { Phase } from "../../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { type Character } from "../../src/game/sim/codes";
-import { fighterKey, fighterName } from "../../src/game/sim/heroes/registry";
+import { fighterKey, fighterName } from "../../src/game/roster/kits";
 import { SMASHCRAFT_HEADLESS } from "./headless";
 
 type HeadlessClient = Parameters<typeof captureScene>[0];

@@ -10,7 +10,7 @@ import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, frameWords, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
 import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
-import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { gameProcess } from "../integrity/capture";
 import { pollUntil } from "../hostPoll";
 import { runProcess, startInputProcess } from "../hostProcess";

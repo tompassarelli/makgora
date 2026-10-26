@@ -9,11 +9,11 @@ import { createMatchState, Phase } from "../../ts/src/game/lobby/lobbyState";
 import { initializeMatchFighters } from "../../ts/src/game/match/step";
 import { AttackStyle, Character } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";
-import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/game/roster/kits";
 import { createRoster, fighterAt } from "../../ts/src/game/sim/roster";
 import { initializePainScenario, PAIN_SCENARIOS } from "../../ts/src/game/session/painFixture";
 import { contactDamageClips } from "../../ts/src/game/presentation/damagePose";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/sim/heroes/forsakenPaladinSword";
+import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/fighters/forsaken-paladin/sword";
 import { parsePadScript } from "../../ts/scripts/integrity/padScript";
 import { ensure } from "./original-clips";
 

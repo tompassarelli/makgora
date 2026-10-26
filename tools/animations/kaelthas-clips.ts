@@ -7,8 +7,8 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackStyle, AttackPhase, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
-import { KAELTHAS_MOVES } from "../../ts/src/game/sim/heroes/kaelthasMoves";
-import { KAELTHAS_SPECIALS } from "../../ts/src/game/sim/heroes/kaelthasSpecials";
+import { KAELTHAS_MOVES } from "../../ts/src/game/fighters/kaelthas/moves";
+import { KAELTHAS_SPECIALS } from "../../ts/src/game/fighters/kaelthas/specials";
 import { seconds } from "./asset-info";
 import { measureDrawnReach } from "../../ts/scripts/wisp/drawnReach";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
@@ -373,7 +373,7 @@ if (inPlace) {
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herobloodelf.mdx"), bytes);
-const clipTable = join(project, "ts/src/game/sim/heroes/kaelthasClips.ts");
+const clipTable = join(project, "ts/src/game/fighters/kaelthas/clips.ts");
 if (inPlace) {
   let table = await Bun.file(clipTable).text();
   for (const binding of bindings) {
@@ -383,7 +383,7 @@ if (inPlace) {
   await Bun.write(clipTable, table);
 } else await Bun.write(clipTable, [
   "",
-  'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
+  'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
   'export const KAELTHAS_MODEL_FILE = "units\\\\human\\\\HeroBloodElf\\\\HeroBloodElf.mdl";',
   'export const KAELTHAS_FALLBACK: HeroClip = { index: 0, seconds: 1.5 };',
   'export const KAELTHAS_CLIPS = { idle: KAELTHAS_FALLBACK, walk: { index: 2, seconds: f32(0.933) }, dash: { index: 2, seconds: f32(0.933) }, run: { index: 2, seconds: f32(0.933) }, ko: { index: 9, seconds: 3.0 },',

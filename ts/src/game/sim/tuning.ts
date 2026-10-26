@@ -11,7 +11,7 @@ import type { FighterMoves } from "./heroMoves";
 import type { AuthoredSpecial, FighterSpecials } from "./specials/schema";
 import { FIGHTER_ULTIMATES } from "./ultimates";
 import { fighterShield, heroBody } from "./heroes/heroBodies";
-import { type CheckHero, heroDefinition, registerCheckHero } from "./heroes/registry";
+import { type CheckHero, heroDefinition, registerCheckHero } from "../roster/kits";
 import { originalFighterMoves } from "./originalMoves";
 
 export const WORLD_UNITS_PER_MELEE_UNIT = 6.0;

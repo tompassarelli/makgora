@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import ts from "typescript";
 import { AttackStyle, Character, GrabAction } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames, attackLandingLag, isAerialAttack } from "../src/game/sim/moves";

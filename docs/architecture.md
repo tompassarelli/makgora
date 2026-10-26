@@ -13,15 +13,15 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | core | `ts/src/game/sim/codes.ts`, `sim/mathTables.ts`, `sim/warcraftMath.ts` | Ids (`Character`), state codes, number helpers, trig tables | Wisp num/runtime |
 | input | `ts/src/game/input/` | Action vocabulary, key bindings, pad packet decode, wire; owns the controller contract | core |
 | sim | `ts/src/game/sim/` (geometry helpers in `sim/geometry/`) | Deterministic per-frame simulation; no natives, no presentation | core |
-| fighter-kit | `ts/src/game/sim/heroes/` | One fighter's gameplay data and special hooks | sim, core |
+| fighter-kit | `ts/src/game/fighters/<slug>/` (`kit.ts`, `moves.ts`, `specials.ts`), shared helpers in `ts/src/game/sim/heroes/` | One fighter's gameplay data and special hooks | sim, core |
 | snapshot | `ts/src/game/replay/{canonical,fighterState,difference,history,snapshot}.ts` | Canonical text, state hash, copy/compare/diff, rollback ring | sim, core |
-| ai | `ts/src/game/match/bot*.ts`, `match/cpu*.ts`, `sim/heroes/<fighter>Gameplan.ts` | Bots, perception, gameplans, edge-guard scenarios | sim, snapshot, input, core |
-| roster | `ts/src/game/sim/heroes/registry.ts`, `menu/stageCatalog.ts` | The only all-fighter and all-stage lists | fighter-kit, ai, core |
+| ai | `ts/src/game/match/bot*.ts`, `match/cpu*.ts`, `fighters/<slug>/gameplan.ts` | Bots, perception, gameplans, edge-guard scenarios | sim, snapshot, input, core |
+| roster | `ts/src/game/roster/kits.ts`, `menu/stageCatalog.ts` | The only all-fighter and all-stage lists | fighter-kit, ai, core |
 | lobby | `ts/src/game/lobby/lobbyState.ts`, `ts/src/game/menu/` | Slots, humans/CPU, character/stage select, teams, stock/timer choice | roster, core |
 | match | `ts/src/game/match/` | Match step, stocks/teams/meter rules, training | sim, snapshot, ai, roster, lobby, input, core |
 | replay | `ts/src/game/replay/` (tapes, moments, viewer) | Replay files, tapes, moments, viewer driver | match, snapshot, sim, input, core |
 | netcode | `ts/src/game/netcode/` | Delay policy, input journals | input, snapshot, match, core |
-| fighter-look | `ts/src/game/presentation/heroes/` (`<fighter>Look.ts`), `ts/src/game/presentation/model/` | One fighter's model, clips, cues, sounds, scale, labels | presentation types, fighter-kit (read numbers, never restate), generated art, core |
+| fighter-look | `ts/src/game/fighters/<slug>/` (`look.ts`, `clips.ts`), `ts/src/game/presentation/model/` | One fighter's model, clips, cues, sounds, scale, labels | presentation types, fighter-kit (read numbers, never restate), generated art, core |
 | presentation | `ts/src/game/presentation/` | Pose/clip choice, cue and sound selection; pure, no natives | fighter-look, roster, match, sim, snapshot, core |
 | render | `ts/src/game/render/` | Warcraft-native effects and sound playback | presentation, sim, core, Wisp map |
 | ui | `ts/src/game/ui/`, `ts/src/game/menu/` | Frames, menus, selection screens | lobby, roster, render, presentation, core |
@@ -29,28 +29,28 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | classic | `ts/src/game/classic/` | Classic mode routes and lore battles | session, match, lobby, roster, core |
 | host | `ts/src/platform/` (`*Main.ts` entries, `shell/` live loop) | Map entry points; view, keys, rollback tick | everything above, Wisp map |
 
-Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` importing generated clips (S5), sim importing `input/participants.ts` (S12), `sim/testDuel.ts` importing match (S9).
+Known breaks still in the tree (removed by slices, never copied): `fighters/*/kit.ts` importing generated clips (S5), sim importing `input/participants.ts` (S12), `sim/testDuel.ts` importing match (S9).
 
 ## Where things live
 
 | change | edit today | target |
 |---|---|---|
-| Frame data, hitbox or hurtbox of a normal | `ts/src/game/sim/heroes/<fighter>Moves.ts` (shared rows: `ts/src/game/sim/heroes/groundNormals.ts`) | `fighters/<slug>/moves.ts` in S8 |
-| A special move's data | `ts/src/game/sim/heroes/<fighter>Specials.ts` | `fighters/<slug>/specials.ts` in S8 |
+| Frame data, hitbox or hurtbox of a normal | `ts/src/game/fighters/<slug>/moves.ts` (shared rows: `ts/src/game/sim/heroes/groundNormals.ts`) | done in S8 |
+| A special move's data | `ts/src/game/fighters/<slug>/specials.ts` | done in S8 |
 | Special engine, types, per-fighter branches | `ts/src/game/sim/specials/engine.ts`, `ts/src/game/sim/specials/schema.ts`, `ts/src/game/sim/specials.ts` | `sim/specials/` in S9c; branches become kit hooks in S13 |
 | Ultimate | `ts/src/game/sim/ultimates.ts` | `fighters/<slug>/ultimate.ts` in S7b |
 | Fighter body, strong hits, identity traits | `ts/src/game/sim/heroes/heroBodies.ts`, `ts/src/game/sim/strongHitTable.ts`, `ts/src/game/sim/identityTraits.ts` | `fighters/<slug>/kit.ts` in S7c |
-| Fighter definition (name, kit wiring) | `ts/src/game/sim/heroes/<fighter>Hero.ts` | `fighters/<slug>/kit.ts` in S8 |
-| New fighter: id and roster line | `ts/src/game/sim/codes.ts`, `ts/src/game/sim/heroes/registry.ts` | `core/codes.ts`, `roster/*.ts` in S8 |
-| Fighter model, scale, clip binding | `ts/src/game/presentation/heroes/<fighter>Look.ts` (type `HeroLook` in `ts/src/game/presentation/model/look.ts`, read by character through `heroLook` in `ts/src/game/roster/looks.ts`), `ts/src/game/presentation/modelScale.ts`, `ts/src/game/presentation/fighterClips.ts` | `fighters/<slug>/look.ts` in S7e |
+| Fighter definition (name, kit wiring) | `ts/src/game/fighters/<slug>/kit.ts` | done in S8 |
+| New fighter: id and roster line | `ts/src/game/sim/codes.ts`, `ts/src/game/roster/kits.ts` | `core/codes.ts`, `roster/*.ts` in S8 |
+| Fighter model, scale, clip binding | `ts/src/game/fighters/<slug>/look.ts` (type `HeroLook` in `ts/src/game/presentation/model/look.ts`, read by character through `heroLook` in `ts/src/game/roster/looks.ts`), `ts/src/game/presentation/modelScale.ts`, `ts/src/game/presentation/fighterClips.ts` | `fighters/<slug>/look.ts` in S7e |
 | Selection label, short name | `ts/src/game/ui/selectionUi.ts` | `fighters/<slug>/look.ts` in S7e |
-| Animation clip | producer `tools/animations/<fighter>-clips.ts` (writes e.g. `ts/src/game/presentation/heroes/cairneClips.ts`) | output under `ts/src/generated/clips/` in S6a |
+| Animation clip | producer `tools/animations/<fighter>-clips.ts` (writes e.g. `ts/src/game/fighters/cairne/clips.ts`) | output under `ts/src/generated/clips/` in S6a |
 | Special/attack/disjoint cue, projectile art | `ts/src/game/presentation/specialCues.ts`, `ts/src/game/presentation/attackCues.ts`, `ts/src/game/presentation/disjointCues.ts`, `ts/src/game/presentation/projectileArt.ts` | `fighters/<slug>/cues.ts` in S7a |
 | A move's sound | `ts/src/game/presentation/moveSounds.ts` | `fighters/<slug>/sounds.ts` in S7d |
 | Warcry, victory, stage music, hurt voice | `ts/src/game/presentation/matchAudio.ts`, `ts/src/game/presentation/hurtVoice.ts` | `fighters/<slug>/sounds.ts` in S7d |
 | Sound tier and cue selection; playback | `ts/src/game/presentation/moveTiers.ts`; `ts/src/game/render/soundBank.ts` | `presentation/sound/`; stays in render |
 | Stock sound paths (generated) | producer `tools/presentation/stock-sounds.ts` (writes `ts/src/generated/assets/stockSoundInfo.ts`) | same path (S6b done) |
-| Bot gameplan for one fighter | `ts/src/game/sim/heroes/<fighter>Gameplan.ts` | `fighters/<slug>/gameplan.ts` in S8 |
+| Bot gameplan for one fighter | `ts/src/game/fighters/<slug>/gameplan.ts` | done in S8 |
 | Bot habit, edge-guard scenario | `ts/src/game/match/botHabits.ts`, `ts/src/game/match/edgeGuardScenarios.ts` | scenarios to `gameplan.ts` in S7f |
 | Stage deck geometry, surfaces | `ts/src/game/sim/stage.ts` | `stages/<slug>/deck.ts` (no slice yet) |
 | Stage hazard | `ts/src/game/sim/stageHazards.ts` | `stages/<slug>/deck.ts` (no slice yet) |
@@ -75,7 +75,7 @@ Tests sit beside their code as `*.tests.ts`; host tests are `ts/test/*.test.ts`.
 ## Generated files
 
 A generated file starts with `Generated by <producer>; regenerate instead of editing.` Change the producer and rerun it; never hand-edit the output.
-Today they sit beside hand code (`ts/src/game/assets/*Info.ts`, `ts/src/game/presentation/*ClipInfo.ts`, some `presentation/heroes/*Clips.ts`); S6a-c move them all under `ts/src/generated/<family>/` (host-only output under `ts/generated/`).
+Today they sit beside hand code (`ts/src/game/assets/*Info.ts`, `ts/src/game/presentation/*ClipInfo.ts`, some `fighters/<slug>/clips.ts` and `fighters/<slug>/clipInfo.ts`); S6a-c move them all under `ts/src/generated/<family>/` (host-only output under `ts/generated/`).
 Gate baselines merge row by row through `ts/scripts/mergeGenerated.ts` (`.gitattributes`).
 
 ## Target layout

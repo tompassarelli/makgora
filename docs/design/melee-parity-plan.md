@@ -55,8 +55,8 @@ map.
 
 Not by themselves. Each fighter has its own LINK/POKE/LAUNCH/EDGE/KILL/SPIKE/
 JUGGLE/CHASE table built with `makeHit` (`ts/src/game/sim/heroes/authoring.ts:45`),
-for example Maiev's at `ts/src/game/sim/heroes/wardenMoves.ts:22-31` and
-Cairne's at `ts/src/game/sim/heroes/cairneMoves.ts:8-15`. They replace Melee's
+for example Maiev's at `ts/src/game/fighters/warden/moves.ts:22-31` and
+Cairne's at `ts/src/game/fighters/cairne/moves.ts:8-15`. They replace Melee's
 common "low base, growth 100" with base 12-26 and growth 50-136. Through our
 Melee-exact formula, hitstun at 0% is the same as Fox's neutral air or higher:
 
@@ -78,7 +78,7 @@ one against Melee's handling before anything is retuned (#298):
 1. No Sakurai angle. Melee's 361 launches a grounded victim flat under 32
    knockback, so a weak neutral air leaves them grounded and grabbable
    (SmashWiki "Sakurai Angle"). Maiev's neutral air launches at 50°
-   (`ts/src/game/sim/heroes/wardenMoves.ts:124`), and any upward direction
+   (`ts/src/game/fighters/warden/moves.ts:124`), and any upward direction
    lifts a grounded victim (`ts/src/game/sim/knockback.ts:128`).
 2. Small damage per hit. Her neutral air deals 4.58% against Fox's 12%, so the
    percent and the damage term grow slowly and mid-percent hitstun lags

@@ -8,7 +8,7 @@ import { Context, Effect } from "effect";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { Character } from "../../src/game/sim/codes";
-import { fighterKey } from "../../src/game/sim/heroes/registry";
+import { fighterKey } from "../../src/game/roster/kits";
 import { MATCH_TICKS_PER_SECOND, START_HOLD_FRAMES } from "../../src/game/lobby/lobbyState";
 import type { Region } from "wisp/scripts/warcraft/desktop";
 import { openObservedChat } from "wisp/scripts/wisp/chatSetup";

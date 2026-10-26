@@ -6,7 +6,7 @@ import { assetsView, readManifest } from '../../ts/scripts/wisp/buildInputs';
 import { createResultSession } from '../../ts/scripts/wisp/resultSession';
 import { originalClip, originalClipNamed } from '../../ts/src/generated/clips/fighterOriginalClipInfo';
 import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
-import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/sim/heroes/registry';
+import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/roster/kits';
 import { ensure } from './original-clips';
 
 const [outputArg, ...names] = process.argv.slice(2);

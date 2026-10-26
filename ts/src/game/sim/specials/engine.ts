@@ -9,7 +9,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "../itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "../heroStatus";
 import { AttackStyle, Character, ProjectileKind, SpecialAction } from "../codes";
-import { specialVariant } from "../heroes/koboldCandle";
+import { specialVariant } from "../../fighters/kobold/candle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";

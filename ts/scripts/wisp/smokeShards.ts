@@ -1,4 +1,4 @@
-import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 
 export const smokePairs = (roster: readonly number[] = PLAYABLE_CHARACTERS): (readonly [number, number])[] =>
   Array.from({ length: Math.ceil(roster.length / 2) }, (_, index) => [2 * index, (2 * index + 1) % roster.length] as const);

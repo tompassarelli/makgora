@@ -17,7 +17,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
-import { SELECTABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { Key } from "../../src/host/loop/keyEvents";
 import { botBeatKeys, gameOf } from "./botMatch";
 import { deliverKey } from "./deliverKey";

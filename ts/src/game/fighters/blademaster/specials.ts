@@ -1,0 +1,144 @@
+
+
+
+import { withExKit } from "../../sim/exSpecialAuthoring";
+import { f32 } from "wisp/src/sim/f32";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, CHARGED_AIM_FRAMES, FollowUpInput, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
+import { hurtPart, hurtPose } from "../../sim/hurtboxes";
+import { BLADE_RADIUS, L, M, capsule, cut, hit, length, reach } from "./moves";
+import { path } from "../../sim/heroes/authoring";
+
+
+
+const LOW_CUT_ARM = reach(46.0, 56.0);
+
+
+const AIR_LANDING_LAG = 20;
+
+
+const windCutter: AuthoredSpecial = {
+  endFrame: 40,
+  hurt: [
+      hurtPose(1, 8, [hurtPart(-32.0, 56.0, -48.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(9, 11, [hurtPart(-56.0, 64.0, -40.0, 125.0, 35.0), hurtPart(0.0, 79.0, -8.0, 95.0, 41.0)]),
+      hurtPose(12, 16, [hurtPart(-20.0, 20.0, -4.0, 86.0, 51.0), hurtPart(-49.0, 66.0, 20.0, 100.0, 29.0)]),
+      hurtPose(17, 24, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(25, 32, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(33, 39, [hurtPart(16.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
+  projectiles: [{
+    model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx",
+    spawnFrame: 18,
+    offsetX: 40.0,
+    offsetZ: 45.0,
+    velocityX: length(f32(0.14)),
+    velocityZ: 0.0,
+    life: 24,
+    radius: length(f32(0.16)),
+    effect: hit(4.647127628326416, "POKE", 35),
+    reflectable: true,
+    limit: 1,
+  }],
+};
+
+
+
+
+
+
+const WALK_FRAMES = 24;
+const WALK_SPEED = f32(length(f32(2.2)) / WALK_FRAMES);
+const STOP = { velocityX: 0.0, velocityZ: 0.0 };
+const walkMotion = [{ ...frames(8, 31), velocityX: WALK_SPEED, velocityZ: 0.0 }, { ...frames(32, 32), ...STOP }];
+const WALK_BRANCHES = frames(10, 31);
+
+
+const backstab: AuthoredSpecial = { name: "Backstab", endFrame: 33, hurt: [hurtPose(4, 12, LOW_CUT_ARM)], motion: [{ ...frames(1, 1), ...STOP }], regions: cut(6, [52.0, 45.0, 38.0], L, { ...hit(8.5, "EDGE", 40), growth: 116.0 }) };
+
+const stepOut: AuthoredSpecial = { name: "Step Out", endFrame: 8, motion: [{ ...frames(1, 1), ...STOP }] };
+
+const windWalk = (air: boolean): AuthoredSpecial => {
+  const finish = (special: AuthoredSpecial): AuthoredSpecial => (air ? { ...special, helpless: true } : special);
+  return finish({
+    endFrame: 47,
+    motion: walkMotion,
+    oncePerAirtime: air ? true : undefined,
+    followUps: [
+      { window: WALK_BRANCHES, input: FollowUpInput.attack, facesStick: true, special: finish(backstab) },
+      { window: WALK_BRANCHES, input: FollowUpInput.special, special: finish(stepOut) },
+    ],
+  });
+};
+
+
+
+
+
+const RISE_FRAMES = 14;
+const rise = (distance: number) => chargedAngleMotion(length(distance), RISE_FRAMES);
+const BLADE_TOP = f32(M - BLADE_RADIUS);
+
+
+const risingBlade: AuthoredSpecial = {
+  endFrame: 24,
+  aimFrames: CHARGED_AIM_FRAMES,
+  motion: rise(f32(4.1)),
+  regions: path(9, [
+    capsule(40.0, 30.0, 70.0, 70.0),
+    capsule(30.0, 40.0, 55.0, 90.0),
+    capsule(20.0, 50.0, 35.0, BLADE_TOP),
+    capsule(10.0, 55.0, 15.0, BLADE_TOP),
+    capsule(5.0, 60.0, 5.0, BLADE_TOP),
+    capsule(0.0, 60.0, 0.0, BLADE_TOP),
+  ], hit(6.970690727233887, "LAUNCH", 80)),
+  hurt: [
+      hurtPose(1, 8, [hurtPart(0.0, 30.0, -16.0, 115.0, 45.0), hurtPart(-25.0, 90.0, 41.0, 115.0, 30.0)]),
+      hurtPose(9, 16, [hurtPart(-4.0, 25.0, -20.0, 115.0, 40.0), hurtPart(20.0, 96.0, 36.0, 125.0, 35.0)]),
+      hurtPose(17, 23, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
+  oncePerAirtime: true,
+  helpless: true,
+};
+
+
+
+
+const IMAGE_STEP_SPEED = f32(-f32(length(f32(1.0)) / 4));
+export const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 210, fireAges: [] };
+const mirrorImage: AuthoredSpecial = {
+  endFrame: 24,
+  hurt: [
+      hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(17, 23, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
+  facesStick: true,
+  placement: MIRROR_IMAGE_OBJECT,
+  motion: [
+    { ...frames(8, 11), velocityX: IMAGE_STEP_SPEED, velocityZ: 0.0 },
+    { ...frames(12, 12), ...STOP },
+  ],
+};
+
+
+
+
+
+
+const imageSwap: AuthoredSpecial = {
+  name: "Image Swap",
+
+  endFrame: 30,
+  hurt: [hurtPose(6, 14, LOW_CUT_ARM)],
+  motion: [{ ...frames(6, 6), ...STOP, relocate: Relocation.placed }],
+  regions: cut(8, [52.0, 45.0, 38.0], L, hit(7.745212554931641, "EDGE", 40)),
+};
+
+const inAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...special, landingLag: AIR_LANDING_LAG });
+
+export const BLADEMASTER_SPECIALS: FighterSpecials = {
+  neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { damage: 1.25 }),
+  side: withExKit({ name: "Wind Walk", description: "Fade and walk through bodies; attack to Backstab on either side, special to step out.", ground: windWalk(false), air: windWalk(true) }, { damage: 1.25 }),
+  up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
+  down: withExKit({ name: "Mirror Image", description: "Step back and leave an image; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImage, air: inAir(mirrorImage), recall: imageSwap }, { damage: 1.25, durability: 2.0 }),
+};

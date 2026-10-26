@@ -5,7 +5,7 @@ import { at } from "wisp/src/runtime/lookup";
 import type { HeroClip } from "../sim/heroes/hero";
 import { DAMAGE_CLIPS } from "./damageClipInfo";
 import { heroLook } from "../roster/looks";
-import { lookCharacter } from "../sim/heroes/registry";
+import { lookCharacter } from "../roster/kits";
 
 
 export const DamagePose = { none: 0, ground: 1, air: 2, tumble: 3, shield: 4 } as const;

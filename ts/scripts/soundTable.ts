@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { SPECIAL_INPUTS, fighterKit, normalName } from "../src/game/sim/moveNames";
 import { type SoundLayer, isSpecialMove, moveSound, soundedMoves, specialMove } from "../src/game/presentation/moveSounds";
 

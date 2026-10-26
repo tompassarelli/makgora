@@ -10,7 +10,7 @@ import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { ROSTER_MANA } from "../../game/sim/mana";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
-import { fighterKey } from "../../game/sim/heroes/registry";
+import { fighterKey } from "../../game/roster/kits";
 import { devReceiptFile } from "../../game/session/journalFiles";
 import { applyFighterSetup } from "../../game/session/fighterSetup";
 import { prepareDevState, commitDevState } from "./devState";

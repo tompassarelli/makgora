@@ -8,7 +8,7 @@ import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 import { captureFrame, executeMatchFrame } from "../src/game/match/frameInput";
 import { type Character, SpecialAction } from "../src/game/sim/codes";
 import type { Fighter } from "../src/game/sim/fighter";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { ROSTER_MANA, trickleDue } from "../src/game/sim/mana";
 import { copyControls, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { type FieldOptions, openFieldMatch } from "./cpuField";

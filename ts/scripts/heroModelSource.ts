@@ -1,6 +1,6 @@
 import type { Character } from "../src/game/sim/codes";
 import { IMPORTED_MODEL_FILES } from "../src/game/assets/importedModelInfo";
-import { HERO_ROSTER } from "../src/game/sim/heroes/registry";
+import { HERO_ROSTER } from "../src/game/roster/kits";
 import { heroLook } from "../src/game/roster/looks";
 
 

@@ -5,7 +5,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot 
 import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, keepsStocks, winningMask } from "../lobby/lobbyState";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { fighterName } from "../sim/heroes/registry";
+import { fighterName } from "../roster/kits";
 import { MatchCue } from "./matchAudio";
 import { ROSTER_MANA } from "../sim/mana";
 import { TEAM_NAMES } from "../sim/teams";

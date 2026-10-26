@@ -8,7 +8,7 @@
 import { parseArgs } from "node:util";
 import { CPU_TIERS, type CpuTier } from "../src/game/match/cpuProfiles";
 import type { Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../src/game/roster/kits";
 import { FIELD_STAGES, playCpuMatch } from "./cpuField";
 import { runAdmitted } from "./heavyCapacity";
 

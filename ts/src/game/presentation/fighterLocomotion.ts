@@ -7,7 +7,7 @@ import { characterClips } from "./fighterClips";
 import * as dh from "./demonHunterAssetInfo";
 import { IllidanLocomotion } from "./illidanMotion";
 import { DRAWN_STRIDES } from "./drawnStrideInfo";
-import { lookCharacter } from "../sim/heroes/registry";
+import { lookCharacter } from "../roster/kits";
 
 const named = (character: Character, name: string): HeroClip | undefined => {
   const index = originalClipNamed(character, name);

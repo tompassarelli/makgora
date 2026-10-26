@@ -1,4 +1,4 @@
-import { fighterName } from "../src/game/sim/heroes/registry";
+import { fighterName } from "../src/game/roster/kits";
 import { DIS, OPENERS } from "./comboExplorer";
 import { CANDIDATES, FOLLOW_UPS, LINK_PERCENTS, LINK_VICTIM, LINK_WEIGHTS, type LinkClass, type LinkRow, SLACK } from "./comboLinks";
 import { PIVOT_DASH_FRAMES } from "./comboLinkModes";

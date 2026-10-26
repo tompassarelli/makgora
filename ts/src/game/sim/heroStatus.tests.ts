@@ -8,8 +8,8 @@ import { AttackStyle, Character, GrabAction, HeroStatusKind, SpecialAction } fro
 import { BANISH_SPELL_DAMAGE } from "./contacts";
 import { type Fighter, createFighter } from "./fighter";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
-import { BANISH } from "./heroes/kaelthasSpecials";
-import { HEX } from "./heroes/shadowHunterSpecials";
+import { BANISH } from "../fighters/kaelthas/specials";
+import { HEX } from "../fighters/shadow-hunter/specials";
 import { applyHeroStatus } from "./heroStatus";
 import { traitMove } from "./identityTraits";
 import { type Controls, copyControls, createRoster } from "./roster";

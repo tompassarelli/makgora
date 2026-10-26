@@ -4,7 +4,7 @@ import { Character, DownState, GrabAction } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
 import { authoredThrowEffect } from "../src/game/sim/grabs";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { TUMBLE_KNOCKBACK, contactKnockback, fixedHitKnockback } from "../src/game/sim/knockback";
 import { WORLD_UNITS_PER_MELEE_UNIT, authoredTuning } from "../src/game/sim/tuning";
 import { type Move, moveOption } from "./comboTrees";

@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { anatomyFindings, elbowFlex, swingForearm } from "../scripts/wisp/victoryAnatomy";
 import { VICTORY_ANATOMY_RECORD, VICTORY_UNJOINTED, type VictoryAnatomyRecord } from "../scripts/wisp/victoryAnatomyRecord";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 
 const records: readonly VictoryAnatomyRecord[] = await Bun.file(VICTORY_ANATOMY_RECORD).json();
 

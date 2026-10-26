@@ -12,7 +12,7 @@ import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { BINDING_PRESETS } from "../../src/game/input/keyBindings";
 import { Character } from "../../src/game/sim/codes";
-import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/roster/kits";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { PICKER_DONE, presetButton } from "../../src/game/ui/settingsUi";
 import { HAZARDS_BUTTON } from "../../src/game/ui/stageUi";

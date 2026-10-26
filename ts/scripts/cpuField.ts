@@ -36,7 +36,7 @@ import { AttackStyle, type Character, DownState, GrabAction, LedgeState, Special
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { type Roster, copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import soak from "./wisp/soak";

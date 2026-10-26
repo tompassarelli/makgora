@@ -1,5 +1,5 @@
 
-import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../src/game/roster/kits";
 import { fighterCoverage } from "../src/game/match/botCoverage";
 
 const reports = SELECTABLE_CHARACTERS.map((_character, index) => fighterCoverage(index));

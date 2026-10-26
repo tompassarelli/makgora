@@ -5,7 +5,7 @@ import type { ParticipantSlot } from "../input/participants";
 import { AttackStyle, CandleState, Character } from "../sim/codes";
 import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
-import { candleLoose } from "../sim/heroes/koboldCandle";
+import { candleLoose } from "../fighters/kobold/candle";
 import type { Controls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../sim/stage";
 import { botChance } from "./botRandom";

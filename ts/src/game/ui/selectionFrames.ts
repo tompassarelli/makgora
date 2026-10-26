@@ -2,7 +2,7 @@ import type { SessionWinsFrames } from "./sessionWinsFrames";
 import { f32 } from "wisp/src/sim/f32";
 import { type RosterTile, cardDown, cardRight, cardSize } from "../menu/selectionDrag";
 import { NATIVE_TEXT_BASE } from "./hudLayout";
-import { PLAYABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
+import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";

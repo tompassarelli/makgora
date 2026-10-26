@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import { runProcess } from "./hostProcess";
 import { type FieldOptions, type MatchRecord, playCpuField } from "./cpuField";
 import { DROP_VARIANTS, type DropVariant, isDropVariant } from "./dropVariants";
-import { SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 
 // #385's camping field: the fighter ahead on stocks camps, with drops off,

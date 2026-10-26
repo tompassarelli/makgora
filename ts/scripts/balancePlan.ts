@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { BunRuntime } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { runnerAdmission } from "./farmAdmission";
 import { JOB_SECONDS, measuredSeconds, ofKind, shardWork, type Work } from "./balanceShards";
 

@@ -21,7 +21,7 @@ import { selectableStage } from "../menu/stageCatalog";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../roster/kits";
 import { isScenario, type Scenario } from "./build";
 
 export interface DevSettings {

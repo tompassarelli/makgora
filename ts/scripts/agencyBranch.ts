@@ -7,7 +7,7 @@ import { produceComputerInput } from "../src/game/match/botPlay";
 import { isCpuTier } from "../src/game/match/cpuProfiles";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/sim/geometry/techInput";
-import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { selectableCharacterBySlug } from "../src/game/roster/kits";
 import { type Controls, copyControls, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { type AgencyLink, type AgencyString, type OptionWeights, type BranchOutcome, conversion, linkEscape } from "./agencyCore";
 import { type FieldMatch, openFieldMatch } from "./cpuField";

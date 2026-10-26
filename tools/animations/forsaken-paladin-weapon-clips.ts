@@ -10,9 +10,9 @@ import { renumberNodes } from "../../ts/scripts/clipNodes";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackStyle, AttackPhase, GrabAction } from "../../ts/src/game/sim/codes";
-import { FORSAKEN_PALADIN_AUTHORING_MOVES as FORSAKEN_PALADIN_MOVES } from "../../ts/src/game/sim/heroes/forsakenPaladinMoves";
-import { FORSAKEN_PALADIN_AUTHORING_SPECIALS as FORSAKEN_PALADIN_SPECIALS } from "../../ts/src/game/sim/heroes/forsakenPaladinSpecials";
-import { FORSAKEN_PALADIN_CLIPS } from "../../ts/src/game/sim/heroes/forsakenPaladinClips";
+import { FORSAKEN_PALADIN_AUTHORING_MOVES as FORSAKEN_PALADIN_MOVES } from "../../ts/src/game/fighters/forsaken-paladin/moves";
+import { FORSAKEN_PALADIN_AUTHORING_SPECIALS as FORSAKEN_PALADIN_SPECIALS } from "../../ts/src/game/fighters/forsaken-paladin/specials";
+import { FORSAKEN_PALADIN_CLIPS } from "../../ts/src/game/fighters/forsaken-paladin/clips";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 
 type Target = { frame: number; x: number; z: number };
@@ -226,9 +226,9 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
             changes.push({ pose: action.pose, frame, region: ordinal, old, new: { x1: coordinates[0], z1: coordinates[1], x2: coordinates[2], z2: coordinates[3], radius: old.radius } });
         }
     }
-    if (!selectedPoses.includes("grab")) await Bun.write(join(import.meta.dir, "../../ts/src/game/sim/heroes/forsakenPaladinWeaponGeometry.ts"), [
+    if (!selectedPoses.includes("grab")) await Bun.write(join(import.meta.dir, "../../ts/src/game/fighters/forsaken-paladin/weaponGeometry.ts"), [
         'import { f32 } from "wisp/src/sim/f32";',
-        'import { heroRegion, type MoveRegion } from "../heroMoves";',
+        'import { heroRegion, type MoveRegion } from "../../sim/heroMoves";',
         'const CONTACTS: Readonly<Record<string, readonly [number, number, number, number]>> = {', ...geometry, '};',
         'export function forsakenWeaponRegions(pose: string, regions: readonly MoveRegion[]): readonly MoveRegion[] {',
         '  const output: MoveRegion[] = [];',

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Character } from "../src/game/sim/codes";
-import { fighterName } from "../src/game/sim/heroes/registry";
+import { fighterName } from "../src/game/roster/kits";
 import type { LinkRow } from "./comboLinks";
 
 export const LINKS_DIR = join(import.meta.dir, "../../tools/move-data/links");

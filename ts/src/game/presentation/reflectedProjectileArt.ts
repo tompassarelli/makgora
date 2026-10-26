@@ -1,5 +1,5 @@
 import { type Character, ProjectileKind } from "../sim/codes";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroDefinition } from "../roster/kits";
 import type { SpecialProjectile } from "../sim/specials/schema";
 import { ORIGINAL_KINDS, ORIGINAL_PROJECTILE_MODELS, heroProjectileArt, ultimateProjectiles } from "./projectileArt";
 

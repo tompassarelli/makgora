@@ -7,7 +7,7 @@ import { captureScene, renderScenes, type RenderScene } from "wisp/scripts/wisp/
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { cameraFieldOfView, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
 import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { CAMERA_LIFT, judgeCamera } from "./wisp/animJudgeCamera";
 import { runProcess } from "./hostProcess";
 import { headlessRender } from "./wisp/headlessRender";

@@ -35,9 +35,9 @@ paths = [
   "ts/src/game/presentation/*ClipInfo.ts", "ts/src/game/presentation/*AssetInfo.ts", "ts/src/game/presentation/drawnStrideInfo.ts",
   "ts/src/game/presentation/reachCueInfo.ts", "ts/src/game/presentation/cueEmitterInfo.ts", "ts/src/game/presentation/heroStrikeMomentInfo.ts",
   "ts/src/game/presentation/fighterViewBounds.ts",
-  "ts/src/game/presentation/heroes/cairneClips.ts", "ts/src/game/presentation/heroes/jainaClips.ts", "ts/src/game/presentation/heroes/malfurionClips.ts",
-  "ts/src/game/presentation/heroes/medivhClips.ts", "ts/src/game/presentation/heroes/peonClips.ts", "ts/src/game/presentation/heroes/sylvanasClips.ts",
-  "ts/src/game/presentation/heroes/thrallClips.ts", "ts/src/game/presentation/heroes/*ClipInfo.ts",
+  "ts/src/game/fighters/cairne/clips.ts", "ts/src/game/fighters/jaina/clips.ts", "ts/src/game/fighters/malfurion/clips.ts",
+  "ts/src/game/fighters/medivh/clips.ts", "ts/src/game/fighters/peon/clips.ts", "ts/src/game/fighters/sylvanas/clips.ts",
+  "ts/src/game/fighters/thrall/clips.ts", "ts/src/game/fighters/*/clipInfo.ts",
   "ts/src/game/menu/stageSilhouettes.ts", "ts/src/game/sim/heroes/releaseRoster.ts",
 ]
 responsibility = "Producer output compiled into the map: clips, asset tables, view facts, math tables, generated state ops."
@@ -61,23 +61,23 @@ may_use = ["core"]
 [[module]]
 name = "fighter-kit"
 paths = ["ts/src/game/fighters/*/kit.ts", "ts/src/game/fighters/*/moves.ts", "ts/src/game/fighters/*/specials.ts", "ts/src/game/fighters/*/ultimate.ts",
-         "ts/src/game/sim/heroes/*Hero.ts", "ts/src/game/sim/heroes/*Moves.ts", "ts/src/game/sim/heroes/*Specials.ts",
+         "ts/src/game/fighters/warden/spin.ts", "ts/src/game/fighters/forsaken-paladin/sword.ts", "ts/src/game/fighters/forsaken-paladin/weaponGeometry.ts",
+         "ts/src/game/fighters/kobold/candle.ts", "ts/src/game/fighters/kobold/candleStrikes.ts", "ts/src/game/fighters/kobold/candleView.ts",
          "ts/src/game/sim/heroes/groundNormals.ts", "ts/src/game/sim/heroes/heroBodies.ts", "ts/src/game/sim/heroes/multiHit.ts",
-         "ts/src/game/sim/heroes/wardenSpin.ts", "ts/src/game/sim/heroes/forsakenPaladin*.ts", "ts/src/game/sim/heroes/authoring.ts",
-         "ts/src/game/sim/heroes/hero.ts", "ts/src/game/stages/*/deck.ts"]
+         "ts/src/game/sim/heroes/authoring.ts", "ts/src/game/sim/heroes/hero.ts", "ts/src/game/stages/*/deck.ts"]
 responsibility = "One fighter's (or stage's) gameplay data and hooks: frame data, specials, ultimate, body, traits, deck geometry."
 may_use = ["sim", "core", "generated"]
 
 [[module]]
 name = "ai"
-paths = ["ts/src/game/ai/**", "ts/src/game/fighters/*/gameplan.ts", "ts/src/game/sim/heroes/*Gameplan.ts",
+paths = ["ts/src/game/ai/**", "ts/src/game/fighters/*/gameplan.ts",
          "ts/src/game/match/bot*.ts", "ts/src/game/match/cpu*.ts", "ts/src/game/match/edgeGuard*.ts", "ts/src/game/match/recoveryEnvelope.ts"]
 responsibility = "Bots, perception, CPU profiles and per-fighter gameplans."
 may_use = ["snapshot", "sim", "fighter-kit", "input", "core", "generated"]
 
 [[module]]
 name = "roster"
-paths = ["ts/src/game/roster/**", "ts/src/game/sim/heroes/registry.ts", "ts/src/game/objectData.ts", "ts/src/game/menu/stageCatalog.ts"]
+paths = ["ts/src/game/roster/**", "ts/src/game/objectData.ts", "ts/src/game/menu/stageCatalog.ts"]
 responsibility = "The only all-fighter and all-stage registries."
 may_use = ["fighter-kit", "fighter-look", "ai", "sim", "core", "generated"]
 
@@ -117,13 +117,13 @@ may_use = ["match", "snapshot", "input", "core"]
 [[module]]
 name = "fighter-look"
 paths = ["ts/src/game/fighters/*/look.ts", "ts/src/game/fighters/*/cues.ts", "ts/src/game/fighters/*/sounds.ts", "ts/src/game/stages/*/look.ts",
-         "ts/src/game/presentation/model/**", "ts/src/game/presentation/heroes/**", "ts/src/game/sim/heroes/*Clips.ts",
+         "ts/src/game/fighters/*/clips.ts", "ts/src/game/fighters/warden/clipTable.ts", "ts/src/game/fighters/kobold/locomotion.ts",
+         "ts/src/game/presentation/model/**",
          "ts/src/game/assets/stageLighting.ts", "ts/src/game/assets/stagePalette.ts", "ts/src/game/assets/stagePointLights.ts",
          "ts/src/game/assets/importedModelInfo.ts"]
 responsibility = "One fighter's or stage's look (model, clip binding, cues, sounds, scale, labels) and the presentation types."
 may_use = ["fighter-kit", "core", "generated"]
 
-# sim sits after fighter-look so sim/heroes/*Clips.ts matches fighter-look first.
 [[module]]
 name = "sim"
 paths = ["ts/src/game/sim/**", "ts/src/game/physics/**"]
@@ -286,34 +286,34 @@ producer = "tools/animations/tumble-clips.ts"
 paths = ["ts/src/game/presentation/drillClipInfo.ts"]
 producer = "tools/animations/drill-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/cairneClips.ts"]
+paths = ["ts/src/game/fighters/cairne/clips.ts"]
 producer = "tools/animations/cairne-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/jainaClips.ts"]
+paths = ["ts/src/game/fighters/jaina/clips.ts"]
 producer = "tools/animations/jaina-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/malfurionClips.ts"]
+paths = ["ts/src/game/fighters/malfurion/clips.ts"]
 producer = "tools/animations/malfurion-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/medivhClips.ts"]
+paths = ["ts/src/game/fighters/medivh/clips.ts"]
 producer = "tools/animations/medivh-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/peonClips.ts"]
+paths = ["ts/src/game/fighters/peon/clips.ts"]
 producer = "tools/animations/peon-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/sylvanasClips.ts"]
+paths = ["ts/src/game/fighters/sylvanas/clips.ts"]
 producer = "tools/animations/sylvanas-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/thrallClips.ts"]
+paths = ["ts/src/game/fighters/thrall/clips.ts"]
 producer = "tools/animations/thrall-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/tinkerClipInfo.ts"]
+paths = ["ts/src/game/fighters/tinker/clipInfo.ts"]
 producer = "tools/animations/tinker-clips.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/pitLordClipInfo.ts"]
+paths = ["ts/src/game/fighters/pit-lord/clipInfo.ts"]
 producer = "tools/animations/pit-lord-specials.ts"
 [[generated]]
-paths = ["ts/src/game/presentation/heroes/lichKingClipInfo.ts"]
+paths = ["ts/src/game/fighters/lich-king/clipInfo.ts"]
 producer = "tools/animations/package-lichking.ts"
 [[generated]]
 paths = ["ts/src/game/sim/mathTableData.ts"]

@@ -17,7 +17,7 @@ import { extremeCamera, cameraFieldOfView, FLOOR_HEIGHT } from "../../../src/gam
 import type { Character } from "../../../src/game/sim/codes";
 import { ACCENT_SECONDS, ACCENT_SEQUENCE, CUE_FRONT } from "../../../src/game/render/hitAreaEffects";
 import { DISJOINT_CUES } from "../../../src/game/presentation/disjointCues";
-import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/roster/kits";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";

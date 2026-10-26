@@ -6,7 +6,7 @@
 
 import { Action } from "../src/game/input/actions";
 import { Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../src/game/sim/stage";
 import { fighter, frameRows, scene } from "../src/game/match/padScene";
 

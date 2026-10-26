@@ -4,7 +4,7 @@ import { RIFLEMAN_MODEL_FILE } from "./presentation/fighterAssetInfo";
 import { DEMON_HUNTER_MODEL_FILE } from "./presentation/demonHunterAssetInfo";
 import { characterModelScale } from "./presentation/modelScale";
 import { Character } from "./sim/codes";
-import { HERO_ROSTER, heroDefinition } from "./sim/heroes/registry";
+import { HERO_ROSTER, heroDefinition } from "./roster/kits";
 import { heroLook } from "./roster/looks";
 
 export interface FighterObject {

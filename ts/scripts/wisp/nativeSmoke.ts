@@ -6,7 +6,7 @@ import { Deferred, Effect, Schema, Stream } from "effect";
 import { ChildProcess } from "effect/process";
 import { UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { quietNativeSessionArgs } from "wisp/scripts/wisp/quietNativeCapacity";
-import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { capacityHelper, admitsThroughHelper } from "../heavyCapacity";
 import { stopBunProcess } from "../hostProcess";
 import { pairRestartFile, restartDroppedPairInto } from "./commands/lanPoolUnit";

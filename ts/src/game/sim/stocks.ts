@@ -1,6 +1,6 @@
 import { blastFighterFields, respawnFighterFields } from "../../generated/state/fighterState";
 import { restCannon, restFreezeTrap, restWater } from "./fighterRest";
-import { resetCandle } from "./heroes/koboldCandle";
+import { resetCandle } from "../fighters/kobold/candle";
 import { TOP_KO_MINIMUM_UPWARD_KNOCKBACK } from "./knockback";
 import { setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt } from "./roster";

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/roster/kits";
 import { currentKit } from "../../balanceKit";
 import { currentFeel } from "../../balanceFeel";
 import { type Direction, type Intent, type ProfileMatch, contradictions, profiles } from "../../strengthProfile";

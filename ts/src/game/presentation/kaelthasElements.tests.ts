@@ -7,7 +7,7 @@ import { HitElement } from "../sim/hitRegions";
 import { becomeEgg } from "../sim/specials/engine";
 import { duelPair, lift, stepDuel } from "../sim/testDuel";
 import { controls } from "../sim/testWorld";
-import { PHOENIX_STARTUP_FRAMES } from "../sim/heroes/kaelthasSpecials";
+import { PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { createImpactEvents } from "./impactEvents";
 import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_HIT, createImpactState, emitImpacts } from "./impactState";
 import { impactColour } from "./hitPresentation";

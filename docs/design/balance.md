@@ -233,14 +233,14 @@ An optimizer that tunes a fighter against its score changes only these, per
 fighter, within these bounds:
 
 - **Normals and throws** (`AuthoredMove` and `AuthoredThrow` in
-  smashcraft:ts/src/game/sim/heroes/NAMEMoves.ts; the original fighters'
+  smashcraft:ts/src/game/fighters/NAME/moves.ts; the original fighters'
   in smashcraft:ts/src/game/sim/moves.ts): each hit region's damage, base
   knockback and growth within ±25% of the frozen baseline value; startup, active
   and ending frames and landing lag within ±3 frames (startup at least 1).
-- **Specials** (smashcraft:ts/src/game/sim/heroes/NAMESpecials.ts): damage,
+- **Specials** (smashcraft:ts/src/game/fighters/NAME/specials.ts): damage,
   knockback, mana cost and cooldown within ±25% of the frozen baseline; frames within ±3 of baseline.
 - **Computer weights** (the fighter's gameplan,
-  smashcraft:ts/src/game/sim/heroes/NAMEGameplan.ts or
+  smashcraft:ts/src/game/fighters/NAME/gameplan.ts or
   smashcraft:ts/src/game/sim/originalGameplans.ts): calibrate weights and spacing against its play-style profile first,
   then freeze the complete gameplan, computer code and chosen opponent/tier
   before kit tuning. Win rate is never

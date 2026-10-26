@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { CHARACTER_ATTRIBUTES_URL, type CharacterAttributes, readCharacterAttributes } from "../../../references/melee-frame-data/character-attributes";
 import { Character } from "../../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../src/game/roster/kits";
 import { AUTHORED_PHYSICS, type FighterPhysics, HERO_VERTICAL, WORLD_UNITS_PER_MELEE_UNIT, authoredPhysics, melee } from "../../src/game/sim/tuning";
 import { type FamilyNote, type LedgerRow, PARITY, type ReadSource, type Status, sameValue, shortNumber } from "./row";
 

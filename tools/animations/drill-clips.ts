@@ -6,7 +6,7 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, AttackStyle, Character } from "../../ts/src/game/sim/codes";
-import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
+import { heroDefinition } from "../../ts/src/game/roster/kits";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, hash, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";

@@ -1,7 +1,7 @@
 import { Action, bit } from "../src/game/input/actions";
 import type { Character } from "../src/game/sim/codes";
 import type { Fighter } from "../src/game/sim/fighter";
-import { heroDefinition } from "../src/game/sim/heroes/registry";
+import { heroDefinition } from "../src/game/roster/kits";
 import { isHeroSpecialAction, runningHeroSpecial } from "../src/game/sim/specials/engine";
 import { FOLLOW_UP_FORM, FollowUpInput, specialKit } from "../src/game/sim/specials/schema";
 import { type Move, type Opener, away, toward } from "./comboExplorer";

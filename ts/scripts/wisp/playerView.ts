@@ -37,7 +37,7 @@ import { allCueModels, MISSING_CUE_MODEL } from "../../src/game/presentation/spe
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { Character } from "../../src/game/sim/codes";
 import type { AuthoredSpecial } from "../../src/game/sim/specials/schema";
-import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER } from "../../src/game/roster/kits";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { stageBounds } from "../../src/game/sim/stageBounds";
 import { STAGE_LAVA_MODEL } from "../../src/generated/stages/terrainAssetInfo";

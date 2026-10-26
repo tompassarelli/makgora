@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { createWhiteGlowState, whiteGlowAlpha } from "../presentation/whiteGlow";
 import { AttackStyle, type Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import { SELECTABLE_CHARACTERS } from "./heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { authoredHitRegion, emptyHitRegion } from "./hitRegions";
 import { SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER, SMASH_MAX_HOLD_FRAMES, smashDamageMultiplier } from "./moves";
 import { advanceSolo, controls } from "./testWorld";

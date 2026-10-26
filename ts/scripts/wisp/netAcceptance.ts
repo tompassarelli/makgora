@@ -5,7 +5,7 @@ import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { NetFailure } from "wisp/scripts/wisp/net/peer";
 import { runProxy } from "wisp/scripts/wisp/net/proxy";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { SELECTABLE_CHARACTERS, fighterKey } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterKey } from "../../src/game/roster/kits";
 
 const MATCH_START = 300;
 const BUTTONS = ["A", "A", "A", "X", "X", "B", "RB"] as const;

@@ -2,7 +2,7 @@ import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Character, HeroStatusGroup, HeroStatusKind, SpecialAction } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { applyHeroStatus } from "../sim/heroStatus";
-import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../sim/heroes/kaelthasSpecials";
+import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { ROSTER_MANA } from "../sim/mana";
 import type { Roster } from "../sim/roster";
 import { becomeEgg } from "../sim/specials/engine";

@@ -1255,7 +1255,7 @@ Spell Throw (Howling Blast) and Death (knockdown) are
 retimed piecewise so that the frame where Frostmourne's point reaches farthest
 toward the strike (or the chest reaches the floor) lands on the move's first
 active frame. Every swing is timed to the kit's frames
-(smashcraft:ts/src/game/sim/heroes/lichKingMoves.ts).
+(smashcraft:ts/src/game/fighters/lich-king/moves.ts).
 
 smashcraft:tools/animations/package-lichking.ts ships the original MDX
 unchanged, with each authored sequence appended after the built-ins (whose
@@ -1264,7 +1264,7 @@ those that linear interpolation cannot reproduce. Every other track (emitters,
 geoset colour, events) comes from the clip's donor built-in, scaled to the new
 length. It writes `LichKingFighter.mdx`, which the map imports as
 war3mapImported\LichKing2.mdx, and regenerates
-smashcraft:ts/src/game/presentation/heroes/lichKingClipInfo.ts (sequence name
+smashcraft:ts/src/game/fighters/lich-king/clipInfo.ts (sequence name
 to index and frames).
 
 Defile's cast (#174) lifts Frostmourne above his shoulder, plants its point in

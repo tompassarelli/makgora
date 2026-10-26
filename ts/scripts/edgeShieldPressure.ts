@@ -4,7 +4,7 @@ import { comboScene } from "../src/game/match/comboRoute";
 import { type Scene, airborne, fighter, frameMasks } from "../src/game/match/padScene";
 import { Character } from "../src/game/sim/codes";
 import { canAttack, inGrabContext } from "../src/game/sim/conditions";
-import { fighterName } from "../src/game/sim/heroes/registry";
+import { fighterName } from "../src/game/roster/kits";
 import { surfaceRight, surfaceZ } from "../src/game/sim/stage";
 
 const STAGE = 1;

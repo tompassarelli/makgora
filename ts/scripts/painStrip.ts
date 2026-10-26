@@ -6,7 +6,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { installHeadless, playHeadless } from "wisp/scripts/wisp/headless";
 import { type RenderScene, captureScene, renderScenes } from "wisp/scripts/wisp/headlessRender";
 import type { MapEntry } from "wisp/src/headless/client";
-import { SELECTABLE_CHARACTERS, fighterKey } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterKey } from "../src/game/roster/kits";
 import { contactDamageClips } from "../src/game/presentation/damagePose";
 import { PAIN_ENTRY_BLEND_FRAMES } from "../src/game/presentation/damageBlend";
 import { PAIN_SCENARIOS } from "../src/game/session/painFixture";

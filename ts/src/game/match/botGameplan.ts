@@ -10,7 +10,7 @@ import { floorDiv } from "wisp/src/sim/intMath";
 import { AttackStyle, Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type DefenseOption, type FighterGameplan, type GameplanMove, type GameplanSituation, GameplanSpecial, GameplanThrow } from "../sim/gameplan";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroDefinition } from "../roster/kits";
 import { ORIGINAL_GAMEPLANS } from "../sim/originalGameplans";
 import { mainDeckLeft, mainDeckRight } from "../sim/stage";
 

@@ -17,7 +17,7 @@ import { mapCompiler, report } from "wisp/scripts/compiler";
 import { type Command, UsageFailure, describeCause, flagValues } from "wisp/scripts/wisp/command";
 import { PerfFailure, type PerfProject, measureRun } from "wisp/scripts/wisp/commands/perf";
 import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { CENSUS_PARTNER, CENSUS_STAGE } from "./census";
 import { stockLua } from "./luaRuntimes";

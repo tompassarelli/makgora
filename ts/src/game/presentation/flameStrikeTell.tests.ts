@@ -4,7 +4,7 @@ import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { duelPair, stepDuel } from "../sim/testDuel";
 import { controls } from "../sim/testWorld";
-import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURST, FLAME_STRIKE_RUNE } from "../sim/heroes/kaelthasSpecials";
+import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURST, FLAME_STRIKE_RUNE } from "../fighters/kaelthas/specials";
 import { type DiscLook, discLook } from "./discLook";
 import { PROJECTILE_DRAW_OFFSETS } from "./projectileArt";
 import { projectedProjectile } from "./projectilePose";

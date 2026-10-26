@@ -5,7 +5,7 @@ import { CANDLE_FLAME_MODELS, CANDLE_FLAME_SCALES, CANDLE_SMOKE, candleFlameColo
 import { CandleState } from "../sim/codes";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
-import { candleLevel, candleLoose } from "../sim/heroes/koboldCandle";
+import { candleLevel, candleLoose } from "../fighters/kobold/candle";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
 
 const TIP = { x: 8.0, z: 74.0 };

@@ -1,5 +1,5 @@
 import type { Character } from "../game/sim/codes";
-import { fighterKey, fighterSlug } from "../game/sim/heroes/registry";
+import { fighterKey, fighterSlug } from "../game/roster/kits";
 import { SHOWCASE_FIRST_FRAME, showcaseRows } from "../game/session/showcaseTimeline";
 
 export interface Silhouette {

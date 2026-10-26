@@ -1,7 +1,7 @@
 import { NATIVE_SOAK_FILE } from "../game/core/gameFiles";
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
 import { Phase, computerActive, cycleSlotMode, firstHumanSlot, selectCpuCharacter, setCpuOpponent, setCpuTier, setTimeLimit } from "../game/lobby/lobbyState";
-import { SELECTABLE_CHARACTERS } from "../game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../game/roster/kits";
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { writeLines } from "wisp/src/platform/fileio";

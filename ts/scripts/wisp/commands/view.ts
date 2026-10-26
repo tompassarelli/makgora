@@ -30,12 +30,12 @@ import { measureStrikeMoments, staleStrikeFighters, strikeMomentSource } from ".
 import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
 import { checkoutInputs } from "../buildInputs";
 import { BODY_HEIGHT, type ReachCueRow, measureReachCue, measuredStyles, reachCueSource, showsReachCue } from "../reachCues";
-import { HERO_ROSTER, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
+import { HERO_ROSTER, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug } from "../../../src/game/roster/kits";
 import { DRAWN_STRIDES } from "../../../src/game/presentation/drawnStrideInfo";
 import { DRAWN_MOTION } from "../drawnMotionInfo";
 import { MOTION_STATES, drawnStrideSource, measureDrawnMotion, measureDrawnStride, type DrawnStride, type DrawnMotionRow } from "../drawnMotion";
 import { AttackPhase, AttackStyle, Character } from "../../../src/game/sim/codes";
-import { KOBOLD_BARE_CLIPS } from "../../../src/game/sim/heroes/koboldClips";
+import { KOBOLD_BARE_CLIPS } from "../../../src/game/fighters/kobold/clips";
 import { AUTHORED_SAMPLE_STYLES } from "../../../src/game/sim/hurtboxes";
 import { CUE_FRAMES, type CueMeasurement, cueMoves, measureCueMoves } from "../cueBudget";
 

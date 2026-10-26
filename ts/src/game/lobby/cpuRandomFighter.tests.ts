@@ -8,7 +8,7 @@ import { cpuProfileLabel, drawCpuFighter, resolveCpuOpponent } from "../match/cp
 import { createMatchTally, resultRows } from "../presentation/matchCues";
 import { matchStartNotice } from "../session/messages";
 import { resetMatchFrameInput } from "../match/frameInput";
-import { PLAYABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
+import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { type PlayerFileQueue, lobbyCounter, receiveLobbyCounter } from "../../host/loop/playerFileQueue";
 import {

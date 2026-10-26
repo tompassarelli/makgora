@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { defineSoak } from "wisp/scripts/wisp/soak";
 import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
 import { TYPED_AHEAD_CHARACTERS } from "../../src/game/netcode/journal/text";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
 import { SOAK_CONTROLLER } from "../../test/soak/controller";
 import { PREDICTED_HEADLESS } from "./headless";
 import { SMASHCRAFT_SCENE } from "./playerView";

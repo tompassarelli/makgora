@@ -10,7 +10,7 @@ import { AttackStyle, Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { attackStartupFrames } from "../sim/moves";
-import { HERO_ROSTER } from "../sim/heroes/registry";
+import { HERO_ROSTER } from "../roster/kits";
 import { type Cue, fighterOwnCues, timed } from "./specialCues";
 import { DISJOINT_CUES } from "./disjointCues";
 

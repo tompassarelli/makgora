@@ -16,7 +16,7 @@ roles ([roster.md](roster.md)) and #105 gameplans. Numbers are provisional
 authoring values, not measured balance; the #105 balance pass tunes them and
 Tom can veto any of them.
 
-Sources: smashcraft:ts/src/game/sim/heroes/ (each kit's `*Specials.ts`) and
+Sources: smashcraft:ts/src/game/fighters/ (each kit's `specials.ts`) and
 the hero special engine, smashcraft:ts/src/game/sim/specials/engine.ts.
 
 ## How the moves are scored

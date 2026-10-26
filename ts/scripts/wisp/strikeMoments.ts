@@ -9,7 +9,7 @@ import { attackPose, clipFor, ownAttackClip } from "../../src/game/presentation/
 import { SPECIAL_KEY } from "../../src/game/presentation/heroStrikeMomentKeys";
 import { SPECIAL_SLOTS } from "../../src/game/presentation/projectileArt";
 import { AttackStyle } from "../../src/game/sim/codes";
-import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER } from "../../src/game/roster/kits";
 import { DrawnModel } from "./drawnModel";
 import { heroLook } from "../../src/game/roster/looks";
 

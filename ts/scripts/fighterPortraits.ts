@@ -12,7 +12,7 @@ import { captureScene, renderScenes, type RenderScene } from 'wisp/scripts/wisp/
 import { createStandaloneSession, NEUTRAL_INPUT } from './wisp/standalone';
 import { headlessRender } from './wisp/headlessRender';
 import { assetsView, readManifest } from './wisp/buildInputs';
-import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/sim/heroes/registry';
+import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/roster/kits';
 import { fighterPortrait } from '../src/game/roster/looks';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';

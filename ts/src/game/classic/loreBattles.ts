@@ -7,7 +7,7 @@ import { type CpuOpponentId, type CpuTier } from "../match/cpuProfiles";
 import { type MatchState, Phase, endConfiguredRun, firstHumanSlot } from "../lobby/lobbyState";
 import { stageInfo, type StageTile } from "../menu/stageCatalog";
 import { Character } from "../sim/codes";
-import { fighterName } from "../sim/heroes/registry";
+import { fighterName } from "../roster/kits";
 import { bossDefinition, bossHealth } from "./bosses";
 import { runTime } from "./classicText";
 import { applyConfiguredMatch, beginConfiguredRun } from "./configuredMatch";

@@ -4,7 +4,7 @@ import type { ReplayState } from "../../src/game/replay/snapshot";
 import type { AttackStyle } from "../../src/game/sim/codes";
 import { traitMove } from "../../src/game/sim/identityTraits";
 import { normalName } from "../../src/game/sim/moveNames";
-import { fighterName } from "../../src/game/sim/heroes/registry";
+import { fighterName } from "../../src/game/roster/kits";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import type { MapStall } from "./mapStalls";
 import { FRAME_MILLIS, type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, bindingSweep, keyName, tapeFrames } from "./smokeTape";

@@ -14,7 +14,7 @@ import { hasFuseSound, hasImpactSound, hasPerformSound, specialMove, specialSlot
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroDefinition } from "../roster/kits";
 import { type AuthoredSpecial, type SpecialProjectile, specialKit } from "../sim/specials/schema";
 
 

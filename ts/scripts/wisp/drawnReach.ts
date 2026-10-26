@@ -5,7 +5,7 @@
 
 
 import { AttackPhase, AttackStyle, Character } from "../../src/game/sim/codes";
-import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER } from "../../src/game/roster/kits";
 import { type DrawnModel } from "./drawnModel";
 import { type PoseFrame, sampleAttack } from "./hurtboxView";
 

@@ -104,7 +104,7 @@ jobs:
         timeout-minutes: 25
         run: |
           mkdir -p census-out
-          fighters=$(bun -e 'import { SELECTABLE_CHARACTERS, fighterSlug } from "./src/game/sim/heroes/registry"; console.log(SELECTABLE_CHARACTERS.map(fighterSlug).join("\n"))' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
+          fighters=$(bun -e 'import { SELECTABLE_CHARACTERS, fighterSlug } from "./src/game/roster/kits"; console.log(SELECTABLE_CHARACTERS.map(fighterSlug).join("\n"))' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
           bun wisp perf census $fighters --jobs 4 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
       - if: ${{ !cancelled() && matrix.kind == 'census' }}
         uses: actions/upload-artifact@v4
@@ -170,7 +170,7 @@ jobs:
         run: |
           cat census/census-*/census-pairs-*.txt > census-pairs.txt 2>/dev/null
           measured=$(wc -l < census-pairs.txt)
-          expected=$(bun -e 'import { SELECTABLE_CHARACTERS } from "./src/game/sim/heroes/registry"; console.log(SELECTABLE_CHARACTERS.length)')
+          expected=$(bun -e 'import { SELECTABLE_CHARACTERS } from "./src/game/roster/kits"; console.log(SELECTABLE_CHARACTERS.length)')
           [ "$measured" = "$expected" ] || { echo "::error title=Unmeasured::the census measured $measured of $expected fighter pairs: see the census jobs"; exit 1; }
           if [ -f prior/census-pairs.txt ]; then
             bun wisp perf compare prior/census-pairs.txt census-pairs.txt

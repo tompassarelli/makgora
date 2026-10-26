@@ -11,7 +11,7 @@ import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { Action, bit } from "../../src/game/input/actions";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { parkedChipCentre, parkedChipLeft, readyChipSize } from "../../src/game/menu/selectionDrag";
-import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { journalMenuFile } from "../../src/game/core/gameFiles";

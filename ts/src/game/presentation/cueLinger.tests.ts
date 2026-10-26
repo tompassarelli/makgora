@@ -10,7 +10,7 @@ import { Character, SpecialAction } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { setWorldMotionValue } from "../sim/motion";
 import { fighterAt } from "../sim/roster";
-import { WARDEN_SPECIALS } from "../sim/heroes/wardenSpecials";
+import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 import { CueLinger, type CuePlace } from "./cueLinger";
 import { advanceFighterPose, createFighterPose } from "./fighterPose";
 import { CUE_ANCHORS, HERO_CUES, specialCueState } from "./specialCues";

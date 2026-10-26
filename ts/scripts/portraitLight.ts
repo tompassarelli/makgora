@@ -4,7 +4,7 @@
 import { join } from 'node:path';
 import { Effect, Schema } from 'effect';
 import { assetsView, readManifest } from './wisp/buildInputs';
-import { RENDERED_FIGHTERS, fighterRenderName } from '../src/game/sim/heroes/registry';
+import { RENDERED_FIGHTERS, fighterRenderName } from '../src/game/roster/kits';
 import { CARD_PREVIEW, CARD_TEXTURE_PX, TILE_TEXTURE_PX, cardPortrait } from '../src/game/ui/portraitFrames';
 
 /** Calibrated on Peon, Blademaster and Thrall, the portraits Tom accepts as well lit (#363). */

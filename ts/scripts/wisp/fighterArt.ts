@@ -3,7 +3,7 @@ import { basename, dirname, join, relative } from "node:path";
 import { Effect } from "effect";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { ImportGraph } from "wisp/scripts/wisp/importGraph";
-import { fighterSlug } from "../../src/game/sim/heroes/registry";
+import { fighterSlug } from "../../src/game/roster/kits";
 import { fighters } from "../heroModelSource";
 import { stopBunProcess } from "../hostProcess";
 import { pruneWhiteTextures } from "../whiteImports";

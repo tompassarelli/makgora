@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { type FieldOptions, type MatchRecord, playCpuMatch } from "./cpuField";
 import { type Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 
 export interface DropFieldSummary {

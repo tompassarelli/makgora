@@ -5,7 +5,7 @@ import { stateChecksum } from "../src/game/replay/canonical";
 import { AttackStyle, Character, DownState } from "../src/game/sim/codes";
 import { canAttack, canBeGrabbed } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
-import { fighterName } from "../src/game/sim/heroes/registry";
+import { fighterName } from "../src/game/roster/kits";
 import { attackStartupFrames } from "../src/game/sim/moves";
 import { totalVelocityZ } from "../src/game/sim/motion";
 import { floorBelow } from "../src/game/sim/stage";

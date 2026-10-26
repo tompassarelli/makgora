@@ -27,7 +27,7 @@ import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInf
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS } from "../../src/game/roster/kits";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";

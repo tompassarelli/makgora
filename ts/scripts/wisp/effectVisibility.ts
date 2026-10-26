@@ -7,7 +7,7 @@ import { type model as mdx } from "wisp/vendor/war3-model.mjs";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { selectSequence } from "wisp/src/headless/animation";
 import { Character } from "../../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug, heroDefinition } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug, heroDefinition } from "../../src/game/roster/kits";
 import { HERO_CUES, fighterMoveCues, fighterBranchCues, fighterCueList, type Cue } from "../../src/game/presentation/specialCues";
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
 import { DISJOINT_CUES } from "../../src/game/presentation/disjointCues";

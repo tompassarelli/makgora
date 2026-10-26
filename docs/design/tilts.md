@@ -5,7 +5,7 @@ attack. Each one
 has its own frame data, hit volumes, reach and reward, so a player can tell
 the fighters apart by their tilts alone. This page covers the reference
 distribution, the angling rule and each fighter's design. The numbers come
-from the kits in smashcraft:ts/src/game/sim/heroes/ and the original fighters'
+from the kits in smashcraft:ts/src/game/fighters/ and the original fighters'
 tables, and smashcraft:ts/src/game/match/groundNormalContracts.tests.ts pins the relations.
 Illidan's normals belong to his own kit work and are not designed here.
 

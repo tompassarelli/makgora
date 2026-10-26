@@ -1,0 +1,70 @@
+import { f32 } from "wisp/src/sim/f32";
+import { AttackStyle, Character, GrabAction, HitElement } from "../../sim/codes";
+import { hurtCapsule } from "../../sim/geometry/contactGeometry";
+import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type MoveRegion, type StrikeCapsule, tipperMove } from "../../sim/heroMoves";
+import type { HitEffect } from "../../sim/hitRegions";
+import { hurtPart } from "../../sim/hurtboxes";
+import { ANGLES, type Angle, capsuleOf } from "../../sim/heroes/authoring";
+
+const STRENGTH = {
+  link: { growth: 57.68373107910156, base: 12.0 }, poke: { growth: 86.52560424804688, base: 20.0 },
+  launch: { growth: 103.83071899414062, base: 32.0 }, edge: { growth: 121.13583374023438, base: 25.0 },
+  kill: { growth: 136.13360595703125, base: 28.0 }, spike: { growth: 109.5990982055664, base: 22.0 },
+  juggle: { growth: 63.45210266113281, base: 50.0 }, chase: { growth: 46.1469841003418, base: 75.0 },
+} as const;
+export function tinkerHit(damage: number, kind: keyof typeof STRENGTH, angle: Angle, facing = 1.0, element: HitElement = HitElement.normal): Readonly<HitEffect> {
+  const direction = ANGLES[angle];
+  const strength = STRENGTH[kind];
+  const growth = kind === "link" || kind === "juggle" || kind === "chase" ? strength.growth
+    : f32(strength.growth * (kind === "kill" ? f32(0.8) : f32(0.65)));
+  return { damage, ...strength, growth, launchX: f32(direction.x * facing), launchZ: direction.z, electric: false, element };
+}
+export const claw = capsuleOf(10.0);
+const region = (first: number, last: number, strike: StrikeCapsule, effect: Readonly<HitEffect>, grounded?: Readonly<HitEffect>): MoveRegion => heroRegion(first, last, strike, effect, grounded);
+const poke = (first: number, last: number, reach: number, height: number, effect: Readonly<HitEffect>) => [region(first, last, claw(18.0, 48.0, reach, height), effect)];
+const body = hurtCapsule(Character.tinker);
+const BODY = hurtPart(0.0, 4.0, 0.0, body.z2, body.radius);
+const limb = (first: number, last: number, x: number, z: number) => [heroHurtPose(first - 2, last + 2, [BODY, hurtPart(12.0, 40.0, x, z, 12.0)])];
+const none = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
+
+export const TINKER_MOVES: FighterMoves = {
+  dashAttack: AttackStyle.dashAttack,
+  hurtboxes: { stand: [BODY], attacks: {
+    [AttackStyle.jab]: limb(4, 5, 38.0, 48.0), [AttackStyle.jab2]: limb(4, 5, 40.0, 56.0),
+    [AttackStyle.jab3]: limb(6, 8, 43.0, 48.0), [AttackStyle.grab]: limb(8, 9, 55.0, 46.0),
+    [AttackStyle.dashAttack]: limb(8, 19, 54.0, 42.0),
+  } },
+  normals: {
+    [AttackStyle.jab]: jabStep(heroMove(4, 2, 12, 0, poke(4, 5, 52.0, 46.0, tinkerHit(2.570435047149658, "link", 35)))),
+    [AttackStyle.jab2]: jabStep(heroMove(4, 2, 12, 0, poke(4, 5, 57.0, 55.0, tinkerHit(2.570435047149658, "link", 70)))),
+    [AttackStyle.jab3]: heroMove(6, 3, 18, 0, poke(6, 8, 68.0, 48.0, tinkerHit(4.284058094024658, "poke", 45))),
+    [AttackStyle.forwardTilt]: heroMove(8, 3, 17, 0, poke(8, 10, 98.0, 48.0, tinkerHit(7.5, "edge", 35))),
+    [AttackStyle.forwardTiltUp]: heroMove(8, 3, 17, 0, poke(8, 10, 88.0, 94.0, tinkerHit(7.5, "edge", 55))),
+    [AttackStyle.forwardTiltDown]: heroMove(8, 3, 17, 0, poke(8, 10, 96.0, 12.0, tinkerHit(7.5, "edge", 25))),
+    [AttackStyle.upTilt]: heroMove(7, 4, 22, 0, [region(7, 10, claw(-28.0, 86.0, 30.0, 134.0, 15.0), tinkerHit(5.997681617736816, "launch", 85))]),
+    [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, [region(6, 8, claw(20.0, 14.0, 87.0, 8.0), tinkerHit(5.140870094299316, "launch", 70))]),
+    [AttackStyle.dashAttack]: heroMove(8, 12, 20, 0, [region(8, 19, claw(15.0, 36.0, 70.0, 44.0, 17.0), tinkerHit(9.75, "launch", 55))]),
+    [AttackStyle.forwardSmash]: tipperMove(heroMove(17, 4, 34, 0, [region(17, 20, claw(28.0, 68.0, 154.0, 70.0, 17.0), tinkerHit(16.25, "kill", 35))]), 0.30000001192092896),
+    [AttackStyle.upSmash]: heroMove(14, 5, 35, 0, [region(14, 18, claw(0.0, 65.0, 0.0, 160.0, 22.0), tinkerHit(15.5, "kill", 85, 1.0, HitElement.fire))]),
+    [AttackStyle.downSmash]: heroMove(16, 6, 32, 0, [
+      region(16, 18, claw(20.0, 14.0, 107.0, 10.0, 13.0), tinkerHit(12.5, "edge", 25)),
+      region(19, 21, claw(-20.0, 14.0, -107.0, 10.0, 13.0), tinkerHit(12.5, "edge", 25, -1.0)),
+    ]),
+    [AttackStyle.neutralAir]: heroMove(8, 6, 24, 16, [
+      region(8, 10, claw(10.0, 55.0, 62.0, 50.0, 14.0), tinkerHit(7.711304664611816, "poke", 45)),
+      region(11, 13, claw(-10.0, 55.0, -36.0, 50.0, 14.0), tinkerHit(7.711304664611816, "poke", 45, -1.0)),
+    ]),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 24, 16, poke(10, 12, 70.0, 68.0, tinkerHit(8.568116188049316, "edge", 35))),
+    [AttackStyle.backAir]: heroMove(12, 3, 26, 18, [region(12, 14, claw(-20.0, 55.0, -54.0, 65.0, 15.0), tinkerHit(10.281740188598633, "edge", 35, -1.0, HitElement.fire))]),
+    [AttackStyle.upAir]: heroMove(8, 4, 23, 14, [region(8, 11, claw(-20.0, 88.0, 24.0, 143.0, 13.0), tinkerHit(6.854493141174316, "launch", 85))]),
+    [AttackStyle.downAir]: heroMove(16, 4, 31, 22, [region(16, 19, claw(6.0, 22.0, 14.0, 0.0, 16.0), tinkerHit(10.281740188598633, "spike", 270, 1.0, HitElement.fire), tinkerHit(10.281740188598633, "spike", 55, 1.0, HitElement.fire))]),
+    [AttackStyle.grab]: heroMove(8, 2, 25, 0, [region(8, 9, claw(20.0, 45.0, 64.0, 46.0, 12.0), none)]),
+  },
+  throws: {
+    [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { ...none, damage: 3.0 } },
+    [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 36, effect: { ...tinkerHit(6.854493141174316, "edge", 35), growth: 35.5, base: 64.0 } },
+    [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 43, effect: { ...tinkerHit(7.711304664611816, "edge", 30, -1.0), growth: 23.0, base: 69.0 } },
+    [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 24, effect: tinkerHit(5.997681617736816, "juggle", 85) },
+    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 44, effect: { ...tinkerHit(5.140870094299316, "chase", 70), growth: 100.0, base: 0.0, setKnockback: 90.0 } },
+  },
+};

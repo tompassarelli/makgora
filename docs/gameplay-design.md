@@ -1184,7 +1184,7 @@ Factory moved from side to down special unchanged. The numbers and why:
   the range.
 - **EX:** 25% more damage and range.
 
-smashcraft:ts/src/game/sim/heroes/tinker.tests.ts checks the frame-20 contact,
+smashcraft:ts/src/game/fighters/tinker/tinker.tests.ts checks the frame-20 contact,
 the range and behind cut-offs, tracking against the fastest tech roll and an
 air dodge, the shield punish, the shield stop, the aim bound and the EX
 upgrade.

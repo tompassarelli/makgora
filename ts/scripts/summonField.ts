@@ -17,7 +17,7 @@ import { HERO_REFERENCE_HEIGHT } from "../src/game/sim/heroMoves";
 import { companionReady, runningHeroSpecial } from "../src/game/sim/specials/engine";
 import { CompanionMode, SpecialSlot } from "../src/game/sim/specials/schema";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { type Controls, copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 

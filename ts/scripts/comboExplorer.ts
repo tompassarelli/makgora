@@ -21,7 +21,7 @@ import { type ReplayState, captureReplaySnapshot, createReplaySnapshot, restoreR
 import { AttackStyle, Character, DownState, GrabAction, LedgeState, SpecialAction } from "../src/game/sim/codes";
 import { canAttack, canBeGrabbed, canStartAttack } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { attackStartupFrames } from "../src/game/sim/moves";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import { SpecialSlot } from "../src/game/sim/specials/schema";

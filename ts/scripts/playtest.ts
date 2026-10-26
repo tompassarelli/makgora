@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { Schema } from "effect";
 import { CPU_TIERS, isCpuTier } from "../src/game/match/cpuProfiles";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { measureCombos } from "./agencyBranch";
 import type { AgencyString } from "./agencyCore";
 import { FIELD_STAGES, moveName, playCpuMatch, reportedMove } from "./cpuField";

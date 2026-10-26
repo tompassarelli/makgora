@@ -3,7 +3,7 @@ import { Effect, Schema } from "effect";
 import { type Command, UsageFailure, describeCause, flagValues } from "wisp/scripts/wisp/command";
 import type { Character } from "../../../src/game/sim/codes";
 import { isCpuTier } from "../../../src/game/match/cpuProfiles";
-import { selectableCharacterBySlug } from "../../../src/game/sim/heroes/registry";
+import { selectableCharacterBySlug } from "../../../src/game/roster/kits";
 import { DEFAULT_OPTIONS, type TextMatchOptions, playTextMatch } from "../../textMatch";
 import { parseCommands } from "../../textMatchView";
 

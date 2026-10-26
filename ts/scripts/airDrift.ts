@@ -8,7 +8,7 @@
 import { Action } from "../src/game/input/actions";
 import { AttackStyle, type Character } from "../src/game/sim/codes";
 import type { Fighter } from "../src/game/sim/fighter";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 import { fighter, frame, scene, solo, type Scene } from "../src/game/match/padScene";
 import { copyReplayState } from "../src/game/replay/snapshot";

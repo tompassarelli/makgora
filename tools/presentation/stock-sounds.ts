@@ -10,7 +10,7 @@ import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {IMPORTED_MUSIC} from '../../ts/src/game/assets/importedMusicInfo';
 import {presentationSoundPaths} from '../../ts/src/game/presentation/matchAudio';
-import {SELECTABLE_CHARACTERS} from '../../ts/src/game/sim/heroes/registry';
+import {SELECTABLE_CHARACTERS} from '../../ts/src/game/roster/kits';
 import {STAGE_CATALOG} from '../../ts/src/game/menu/stageCatalog';
 import {hitPresentationSoundLabels} from '../../ts/src/game/session/hitPresentationCases';
 import {tierSoundPaths} from '../../ts/src/game/presentation/moveTiers';

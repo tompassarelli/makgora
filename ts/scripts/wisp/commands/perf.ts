@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { type PerfProject, makePerf } from "wisp/scripts/wisp/commands/perf";
 import { bundleConfig } from "../bundleConfigs";
 import { buildProject, tsDirectory } from "../project";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/roster/kits";
 import { census, comparePairRuns, profile } from "../perfCensus";
 import { budget } from "../perfBudget";
 import { rates } from "../sessionRates";

@@ -1,5 +1,5 @@
 import { Character } from "../src/game/sim/codes";
-import { fighterName } from "../src/game/sim/heroes/registry";
+import { fighterName } from "../src/game/roster/kits";
 import {
   DIS, type Defender, type Di, type Ending, Explorer, OPENERS, type Opener, POSITIONS, type Position, Sim, TECH_OPTIONS,
   defenderMask, expand, landingSetup, measureCell, openerRoot,

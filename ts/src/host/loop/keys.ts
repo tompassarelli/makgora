@@ -12,7 +12,7 @@ import { heldActions, keyDown, pressKey, releaseKey } from "../../game/input/pla
 import { startKeyDown, startKeyUp } from "../../game/match/controls";
 import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter } from "../../game/lobby/lobbyState";
 import { leaveFinishedTutorial } from "../../game/match/tutorial";
-import { fighterName } from "../../game/sim/heroes/registry";
+import { fighterName } from "../../game/roster/kits";
 import { endReplaySegment } from "./replays";
 import { pausedMessage } from "../../game/session/messages";
 import { cancelBindingCapture, captureBinding } from "../../game/ui/bindingSettings";

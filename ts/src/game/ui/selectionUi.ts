@@ -42,7 +42,7 @@ import {
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, SETTINGS_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
-import { PLAYABLE_CHARACTERS, nextSelectableCharacter } from "../sim/heroes/registry";
+import { PLAYABLE_CHARACTERS, nextSelectableCharacter } from "../roster/kits";
 import {
   MOVES_HEADER, movesPage, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting,
   partnerEscapeSetting, partnerTechSetting, stockSetting, timeSetting, trainingSpeedSetting,

@@ -4,7 +4,7 @@ import { Effect, Schema } from "effect";
 import { cpuSkill } from "../src/game/match/cpuSkill";
 import { ceilingSkill, type CeilingMode } from "../src/game/match/cpuCeilingProfiles";
 import { CPU_OPPONENT_IDS } from "../src/game/match/cpuProfiles";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { CEILING_SPEC } from "./balance";
 import { ceilingTable, readCeilingPlans, type CeilingRow } from "./ceiling";
 import { FIELD_STAGES, playCpuField, playCpuMatch } from "./cpuField";

@@ -1,5 +1,5 @@
 import type { Frame } from "wisp/scripts/wisp/frameProbe";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
 import { effectSourceDigest, effectUses, effectUseDigest } from "./effectVisibility";
 
 export interface PixelBox { readonly x: number; readonly y: number; readonly width: number; readonly height: number }

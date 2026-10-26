@@ -24,7 +24,7 @@ import {
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
 import { type Character, ItemKind, itemBit } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterKey } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterKey } from "../roster/kits";
 
 export const SLOTS_COMMAND = "-dev slots ";
 export const FIGHTER_COMMAND = "-dev fighter ";

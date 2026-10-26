@@ -5,8 +5,8 @@ import { characterClips, illidanSmashClips, namedClips, specialClip } from "../s
 import { heroLook } from "../src/game/roster/looks";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { AttackStyle, Character, SpecialAction } from "../src/game/sim/codes";
-import { WARDEN_MOVES } from "../src/game/sim/heroes/wardenMoves";
-import { HERO_ROSTER, fighterSlug } from "../src/game/sim/heroes/registry";
+import { WARDEN_MOVES } from "../src/game/fighters/warden/moves";
+import { HERO_ROSTER, fighterSlug } from "../src/game/roster/kits";
 
 export const output = "src/generated/fighterArtData.ts";
 export const rulesDirectory = "src/generated/fighter-art";

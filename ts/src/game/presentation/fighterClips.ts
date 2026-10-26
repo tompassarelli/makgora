@@ -20,7 +20,7 @@ import { TUMBLE_CLIPS } from "./tumbleClipInfo";
 import { BLADEMASTER_AUTHORED_CLIPS } from "./blademasterClipInfo";
 import { GRAB_CLIPS } from "./grabClipInfo";
 import { ROSTER_ATTACK_CLIPS } from "./rosterAttackClipInfo";
-import { SHADOW_HUNTER_AUTHORED_CLIPS } from "./heroes/shadowHunterClipInfo";
+import { SHADOW_HUNTER_AUTHORED_CLIPS } from "../fighters/shadow-hunter/clipInfo";
 import { STOCK_CLIP_SWAPS } from "./stockClipSwaps";
 
 const clip = (index: number, seconds: number): HeroClip => ({ index, seconds });

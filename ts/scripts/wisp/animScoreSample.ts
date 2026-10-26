@@ -17,7 +17,7 @@ import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/co
 import { attackPhase } from "../../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
-import { HERO_ROSTER, fighterSlug } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER, fighterSlug } from "../../src/game/roster/kits";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../src/game/sim/hitRegions";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";
 import { advancePlacedObjects } from "../../src/game/sim/placedObjects";

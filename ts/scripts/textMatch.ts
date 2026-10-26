@@ -11,7 +11,7 @@ import { AttackPhase, type Character, DownState, GrabAction, LedgeState, ShieldB
 import { attackPhase } from "../src/game/sim/conditions";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
-import { fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { normalName, specialName } from "../src/game/sim/moveNames";
 import { createRoster, fighterAt } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight, surfaceCount, surfaceLeft, surfaceRight, surfaceTopZ } from "../src/game/sim/stage";

@@ -1,6 +1,6 @@
 import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
 import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumePoolStage, togglePoolMode, togglePoolStage } from "../menu/stagePool";
-import { PLAYABLE_CHARACTERS, isSelectableCharacter, nextCharacterIn } from "../sim/heroes/registry";
+import { PLAYABLE_CHARACTERS, isSelectableCharacter, nextCharacterIn } from "../roster/kits";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type MatchCamera, createMatchCamera, copyMatchCamera } from "../sim/matchCamera";

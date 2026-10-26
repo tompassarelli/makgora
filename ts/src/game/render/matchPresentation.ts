@@ -18,7 +18,7 @@ import { mainDeckZAt } from "../sim/stage";
 import { confirmedItemCues, createItemCueObservation, observeItemCues } from "../presentation/itemLook";
 import { confirmedDropCues, createDropCueObservation, observeDropCues } from "../presentation/dropLook";
 import { meterDropPoint } from "../match/meterDrops";
-import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { coverScreen, createBackdrop, createText, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "../ui/hudLayout";

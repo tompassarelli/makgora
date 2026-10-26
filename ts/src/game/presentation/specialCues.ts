@@ -10,10 +10,10 @@ import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } f
 import { type AuthoredSpecial, FOLLOW_UP_FORM, type FrameWindow, SpecialForm } from "../sim/specials/schema";
 import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/engine";
-import { HERO_ROSTER } from "../sim/heroes/registry";
-import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../sim/heroes/kaelthasSpecials";
+import { HERO_ROSTER } from "../roster/kits";
+import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
-import { REST_SOUR_FRAME } from "../sim/heroes/peonSpecials";
+import { REST_SOUR_FRAME } from "../fighters/peon/specials";
 import {
   CHAOS_STRIKE_AIR_FORM,
   CHAOS_STRIKE_FIRST,
@@ -45,8 +45,8 @@ import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { GROM_BLOODLUST_MODEL, MURLOC_SWAMP_MIST_MODEL } from "../assets/importedModelInfo";
-import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";
-import { WARDEN_SPECIALS } from "../sim/heroes/wardenSpecials";
+import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
+import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";

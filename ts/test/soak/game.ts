@@ -23,7 +23,7 @@ import { AttackStyle, Character, DownState, GrabAction, ProjectileKind, SpecialA
 import type { Fighter } from "../../src/game/sim/fighter";
 import { isHeroSpecialAction } from "../../src/game/sim/specials/engine";
 import type { SpecialProjectile } from "../../src/game/sim/specials/schema";
-import { fighterName, selectableCharacterBySlug } from "../../src/game/sim/heroes/registry";
+import { fighterName, selectableCharacterBySlug } from "../../src/game/roster/kits";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../../src/game/sim/stage";
 import { install as installGame, startBuild } from "../../src/platform/main";

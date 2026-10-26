@@ -11,7 +11,7 @@ import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
 import { QUICK_CPU_COMMAND, QUICK_HERO_COMMAND, QUICK_TRAINING_COMMAND } from "../../src/game/session/devSettings";
 import { HIT_PRESENTATION_CASES } from "../../src/game/session/hitPresentationCases";
-import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER } from "../../src/game/roster/kits";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 import { gateChecks } from "./gateChecks";

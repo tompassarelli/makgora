@@ -1,7 +1,7 @@
 import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { Character } from "../../../src/game/sim/codes";
-import { PLAYABLE_CHARACTERS } from "../../../src/game/sim/heroes/registry";
+import { PLAYABLE_CHARACTERS } from "../../../src/game/roster/kits";
 import { smokePairs } from "../smokeShards";
 import { mergeVerdicts, smokeLines, smokeReceipt } from "../smokeJudge";
 import { nativeSmoke } from "../nativeSmoke";

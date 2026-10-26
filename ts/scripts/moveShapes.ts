@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Schema } from "effect";
 import { AttackStyle, type Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { authoredHurtboxes, HurtState, type HurtPart } from "../src/game/sim/hurtboxes";

@@ -3,7 +3,7 @@ import { effectRecordProblem, formatEffectRecord } from "../scripts/wisp/cueMode
 import { judgeUse, projectileUse, type EffectUse, type ModelFacts } from "../scripts/wisp/effectVisibility";
 import { Character } from "../src/game/sim/codes";
 import { projectileModelScale } from "../src/game/presentation/projectilePose";
-import { FLAME_STRIKE_BURST } from "../src/game/sim/heroes/kaelthasSpecials";
+import { FLAME_STRIKE_BURST } from "../src/game/fighters/kaelthas/specials";
 
 const use = (model: string): EffectUse => ({ fighter: "fixture", move: `cue ${model}`, kind: "special cue", model, sequence: "stand", seconds: 0, timeScale: 1, travels: false, anchored: "fighter" });
 const drawsNothing: ModelFacts = { sequences: [{ name: "Stand", start: 0, end: 1000, looping: true, rarity: 0 }], particles: 0, legacyParticles: false, emitters: [], ribbons: [], geosets: [] };

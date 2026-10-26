@@ -1,5 +1,5 @@
 import { parseArgs } from "node:util";
-import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { selectableCharacterBySlug } from "../src/game/roster/kits";
 import { MATCH_TICKS_PER_SECOND } from "../src/game/lobby/lobbyState";
 import { type ComboRecord, type MatchRecord, moveName, playCpuMatch, reportedMove } from "./cpuField";
 import { type MatchSpec, DEFAULT_CONFIG, planMatches } from "./playtestCore";

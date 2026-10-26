@@ -8,7 +8,7 @@ import { AttackStyle } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../ts/src/game/sim/hitRegions";
 import { attackStartupFrames, characterAttackActiveFrames, attackDurationFramesForGrounding } from "../../ts/src/game/sim/moves";
-import { SELECTABLE_CHARACTERS, fighterName } from "../../ts/src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../../ts/src/game/roster/kits";
 import { hurtCapsule } from "../../ts/src/game/sim/geometry/contactGeometry";
 import { ensure, parseSource } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";

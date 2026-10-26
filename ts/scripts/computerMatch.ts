@@ -8,7 +8,7 @@ import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/g
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import { createFighter } from "../src/game/sim/fighter";
-import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { selectableCharacterBySlug } from "../src/game/roster/kits";
 import { copyControls, createRoster, neutralControls, type Roster } from "../src/game/sim/roster";
 
 export interface ComputerMatch {

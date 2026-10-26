@@ -1,7 +1,7 @@
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { characterClips, clipFor } from "../src/game/presentation/fighterClips";
 import { heroLook } from "../src/game/roster/looks";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 
 const SAMPLES = 30;
 const SLACK = 0.001;

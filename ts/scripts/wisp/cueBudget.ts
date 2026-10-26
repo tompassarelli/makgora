@@ -30,7 +30,7 @@ import { beginDamageContacts, finishDamageContacts, queueDamageContact } from ".
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { mutableCandle } from "../../src/game/sim/fighterRest";
 import { advanceHeroStatus, enterFollowUp, runningHeroSpecial } from "../../src/game/sim/specials/engine";
-import { fighterSlug } from "../../src/game/sim/heroes/registry";
+import { fighterSlug } from "../../src/game/roster/kits";
 import { isAerialAttack } from "../../src/game/sim/moves";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";
 import { advancePlacedObjects } from "../../src/game/sim/placedObjects";
@@ -45,7 +45,7 @@ import { DROP_TELEGRAPH_FRAMES, advanceMeterDrops, meterDropPoint } from "../../
 import { Phase, createMatchState } from "../../src/game/lobby/lobbyState";
 import { MeterDropPresentation } from "../../src/game/render/meterDropPresentation";
 import { CandlePresentation } from "../../src/game/render/candlePresentation";
-import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL } from "../../src/game/sim/heroes/koboldCandle";
+import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL } from "../../src/game/fighters/kobold/candle";
 import { CombatEffects } from "../../src/game/render/combatEffects";
 import { advanceImpacts, createImpactState, emitImpacts } from "../../src/game/presentation/impactState";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../src/game/presentation/impactEvents";

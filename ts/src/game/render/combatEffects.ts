@@ -34,7 +34,7 @@ import { SoundBank, SoundKind } from "./soundBank";
 import { tierSoundPaths } from "../presentation/moveTiers";
 import type { ImpactEvents } from "../presentation/impactEvents";
 import { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
 import { characterModelScale } from "../presentation/modelScale";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";

@@ -3,7 +3,7 @@
 
 
 import { join } from "node:path";
-import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/roster/kits";
 import { type AuthoredSpecial, type FighterSpecials, SpecialSlot, specialKit } from "../src/game/sim/specials/schema";
 import { SPECIAL_INPUTS, fighterKit, normalName } from "../src/game/sim/moveNames";
 import { WORLD_UNITS_PER_MELEE_UNIT, authoredTuning } from "../src/game/sim/tuning";

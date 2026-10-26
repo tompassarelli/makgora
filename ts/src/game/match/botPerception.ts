@@ -8,7 +8,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/pa
 import { PROJECTILE_CAPACITY, createFighter, type Fighter, type Projectile } from "../sim/fighter";
 import type { Bear, StageCannon } from "../sim/fighterRest";
 import { fighterAt, isActive, type Controls, type Roster } from "../sim/roster";
-import { copyCandleView, sameCandleView } from "../sim/heroes/koboldCandleView";
+import { copyCandleView, sameCandleView } from "../fighters/kobold/candleView";
 
 import { botChoice } from "./botRandom";
 import { CPU_TIERS, type CpuTier } from "./cpuProfiles";

@@ -4,7 +4,7 @@ import { installHeadless } from "wisp/scripts/wisp/headless";
 import { CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
 import { STAMP_CELLS, type StampCell, readStamp } from "../src/game/core/drawnStamp";
 import { showcaseRows } from "../src/game/session/showcaseTimeline";
-import { fighterKey, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { fighterKey, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { SHOWCASE_HOLD_TICKS } from "../src/platform/captureFixtures";
 import type { Character } from "../src/game/sim/codes";
 import { SMASHCRAFT_HEADLESS } from "./wisp/headless";

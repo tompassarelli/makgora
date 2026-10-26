@@ -4,7 +4,7 @@ import { chmodSync, cpSync, lstatSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
 import { AttackStyle, Character } from "../../ts/src/game/sim/codes";
-import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
+import { heroDefinition } from "../../ts/src/game/roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, characterAttackActiveFrames, PUMMEL_CONTACT_FRAME } from "../../ts/src/game/sim/moves";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";

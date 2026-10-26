@@ -1,4 +1,4 @@
-import { fighterSlug } from "../../src/game/sim/heroes/registry";
+import { fighterSlug } from "../../src/game/roster/kits";
 import { fighters } from "../heroModelSource";
 
 const ROSTER = [...fighters].map(([character, { name, source }]) => ({ name, source, slug: fighterSlug(character) }));

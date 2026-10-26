@@ -21,7 +21,7 @@ import * as dh from "./demonHunterAssetInfo";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
-import { koboldLocomotionClips } from "./heroes/koboldLocomotion";
+import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./specialCues";

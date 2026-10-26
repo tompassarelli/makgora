@@ -3,7 +3,7 @@
 
 import { installSceneReport, startSceneReport } from "wisp/src/platform/scene";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH } from "../game/presentation/arenaCamera";
-import { HERO_ROSTER } from "../game/sim/heroes/registry";
+import { HERO_ROSTER } from "../game/roster/kits";
 import { shellState } from "../host/loop/state";
 import { presentedFrame } from "../host/loop/presentedMatch";
 import { heroLook } from "../game/roster/looks";

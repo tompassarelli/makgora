@@ -15,7 +15,7 @@ import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { cannonOn, hasTide } from "../sim/stageHazards";
 import { firstMeterDropsDifference } from "../match/meterDrops";
 import { AttackStyle, LAST_ATTACK_STYLE } from "../sim/codes";
-import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { authoredTuning } from "../sim/tuning";
 import { type FighterMoves, type StrikeCapsule, moveTravelStep } from "../sim/heroMoves";
 import { attackCapsule, emptyCapsule, hurtCapsule } from "../sim/geometry/contactGeometry";

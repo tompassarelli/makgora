@@ -5,7 +5,7 @@
 import { Character, SpecialAction } from "../sim/codes";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import { PROJECTILE_CAPACITY, type Fighter } from "../sim/fighter";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroDefinition } from "../roster/kits";
 import { HERO_PROJECTILE_CAP } from "../sim/specials/engine";
 import { f32 } from "wisp/src/sim/f32";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, parkCue } from "./effects";

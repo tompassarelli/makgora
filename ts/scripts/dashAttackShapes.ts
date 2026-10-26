@@ -1,5 +1,5 @@
 import { AttackStyle, type Character, GroundAction } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { authoredTuning, WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { attackDurationFramesForGrounding } from "../src/game/sim/moves";

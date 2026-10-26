@@ -16,7 +16,7 @@ import { step } from "wisp/scripts/wisp/timings";
 import { Action } from "../../../src/game/input/actions";
 import { playComboRoute } from "../../../src/game/match/comboRoute";
 import { Character } from "../../../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/roster/kits";
 import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";

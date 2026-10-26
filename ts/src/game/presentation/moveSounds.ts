@@ -4,7 +4,7 @@ import { imod } from "wisp/src/sim/intMath";
 import { AttackStyle, Character, LAST_ATTACK_STYLE, SpecialAction } from "../sim/codes";
 import { HitElement } from "../sim/hitRegions";
 import { isSmashAttack, jabChainFrom } from "../sim/moves";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroDefinition } from "../roster/kits";
 import { originalFighterMoves } from "../sim/originalMoves";
 import { VERIFIED_STOCK_SOUND_LABELS } from "../../generated/assets/stockSoundInfo";
 import { elementLook } from "./elementLooks";
