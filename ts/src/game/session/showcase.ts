@@ -52,22 +52,26 @@ function cameraRequest(args: string): ShowcaseRequest {
   return focus === undefined ? { kind: "invalid" } : { kind: "camera", slot: focus };
 }
 
+function startRequest(args: string): ShowcaseRequest {
+  const names = args.split(",");
+  const fighters = names.map(name => characterNamed(name)).filter(character => character !== undefined);
+  return fighters.length === names.length && fighters.length <= PARTICIPANT_SLOTS.length ? { kind: "start", fighters } : { kind: "invalid" };
+}
+
+function demoRequest(args: string): ShowcaseRequest {
+  const character = characterNamed(args);
+  return character === undefined ? { kind: "invalid" } : { kind: "demo", character };
+}
+
 export function showcaseRequest(message: string): ShowcaseRequest | undefined {
   if (!message.startsWith(SHOWCASE_COMMAND)) return undefined;
   const rest = message.substring(SHOWCASE_COMMAND.length);
   const space = rest.indexOf(" ");
   const verb = space < 0 ? rest : rest.substring(0, space);
   const args = space < 0 ? "" : rest.substring(space + 1);
-  if (verb === "start") {
-    const names = args.split(",");
-    const fighters = names.map(name => characterNamed(name)).filter(character => character !== undefined);
-    return fighters.length === names.length && fighters.length <= PARTICIPANT_SLOTS.length ? { kind: "start", fighters } : { kind: "invalid" };
-  }
+  if (verb === "start") return startRequest(args);
   if (verb === "camera") return cameraRequest(args);
-  if (verb === "demo") {
-    const character = characterNamed(args);
-    return character === undefined ? { kind: "invalid" } : { kind: "demo", character };
-  }
+  if (verb === "demo") return demoRequest(args);
   const gap = args.indexOf(" ");
   const slot = padSlot(gap < 0 ? args : args.substring(0, gap));
   if (slot === undefined) return { kind: "invalid" };

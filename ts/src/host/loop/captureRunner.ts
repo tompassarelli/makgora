@@ -1,12 +1,12 @@
 import { writeLines } from "wisp/src/platform/fileio";
 import { CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
-import { type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "../../platform/captureFixtures";
+import { type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../../platform/captureFixtures";
 import { nativeDriverCommand } from "../../platform/nativeDriver";
 import { applyDeveloperCommand } from "./developerCommands";
 import { paintDrawnStamp } from "./drawnStamp";
 import { bareFighter } from "./fighterCloak";
 import { holdAgeSeekedEffects } from "./heldAnimations";
-import { shellState } from "./state";
+import { type ShellState, shellState } from "./state";
 
 const WARMUP_TICKS = 300;
 
@@ -53,6 +53,58 @@ function nextScript(r: Runner, fixtures: readonly CaptureFixture[]): void {
   status(`CAPTURE SCRIPT ${r.script + 1} ${fixture.name}`);
 }
 
+function openingTick(r: Runner, fixture: CaptureFixture): void {
+  if (++r.held < (fixture.openingTicks ?? OPENING_TICKS)) return;
+  r.held = 0;
+  r.stage = "target";
+  nativeDriverCommand(`resume ${fixture.frames[0] ?? 0}`);
+}
+
+function beginHold(s: ShellState, r: Runner, silhouette: Silhouette | undefined, target: number): void {
+  if (silhouette !== undefined && r.held === 0) {
+    ClearTextMessages();
+    if (r.hidden) {
+      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+      r.stampTick = r.ticks;
+    }
+  }
+  holdAgeSeekedEffects(s);
+  r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
+}
+
+function hidesNext(s: ShellState, r: Runner, silhouette: Silhouette | undefined): boolean {
+  if (silhouette === undefined) return false;
+  r.hidden = !r.hidden;
+  applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
+  ClearTextMessages();
+  if (r.hidden) r.hideTick = r.ticks;
+  return r.hidden;
+}
+
+function nextFrame(s: ShellState, r: Runner, fixture: CaptureFixture, target: number): void {
+  r.frame++;
+  const next = fixture.frames[r.frame];
+  if (next !== undefined) {
+    nativeDriverCommand(`resume ${next}`);
+    return;
+  }
+  r.stage = "tail";
+  if (fixture.silhouette !== undefined) bareFighter(s, fixture.silhouette.slot, false);
+  r.tail = target + (fixture.tailFrames ?? TAIL_FRAMES);
+  nativeDriverCommand(`resume ${r.tail}`);
+}
+
+function targetTick(s: ShellState, r: Runner, fixture: CaptureFixture, now: number): void {
+  const target = fixture.frames[r.frame];
+  const silhouette = fixture.silhouette;
+  if (silhouette !== undefined) bareFighter(s, silhouette.slot, true);
+  if (target === undefined || now !== target) return;
+  beginHold(s, r, silhouette, target);
+  if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
+  r.held = 0;
+  if (!hidesNext(s, r, silhouette)) nextFrame(s, r, fixture, target);
+}
+
 export function captureTick(fixtures: readonly CaptureFixture[]): void {
   const s = shellState();
   const r = runner();
@@ -63,47 +115,6 @@ export function captureTick(fixtures: readonly CaptureFixture[]): void {
   const now = s.runtime.simulationFrame;
   if (r.stage === "tail") {
     if (now >= r.tail) nextScript(r, fixtures);
-    return;
-  }
-  if (r.stage === "opening") {
-    if (++r.held < (fixture.openingTicks ?? OPENING_TICKS)) return;
-    r.held = 0;
-    r.stage = "target";
-    nativeDriverCommand(`resume ${fixture.frames[0] ?? 0}`);
-    return;
-  }
-  const target = fixture.frames[r.frame];
-  const silhouette = fixture.silhouette;
-  if (silhouette !== undefined) bareFighter(s, silhouette.slot, true);
-  if (target === undefined || now !== target) return;
-  if (silhouette !== undefined && r.held === 0) {
-    ClearTextMessages();
-    if (r.hidden) {
-      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
-      r.stampTick = r.ticks;
-    }
-  }
-  holdAgeSeekedEffects(s);
-  r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
-  if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
-  r.held = 0;
-  if (silhouette !== undefined) {
-    r.hidden = !r.hidden;
-    applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
-    ClearTextMessages();
-    if (r.hidden) {
-      r.hideTick = r.ticks;
-      return;
-    }
-  }
-  r.frame++;
-  const next = fixture.frames[r.frame];
-  if (next !== undefined) {
-    nativeDriverCommand(`resume ${next}`);
-    return;
-  }
-  r.stage = "tail";
-  if (silhouette !== undefined) bareFighter(s, silhouette.slot, false);
-  r.tail = target + (fixture.tailFrames ?? TAIL_FRAMES);
-  nativeDriverCommand(`resume ${r.tail}`);
+  } else if (r.stage === "opening") openingTick(r, fixture);
+  else targetTick(s, r, fixture, now);
 }
