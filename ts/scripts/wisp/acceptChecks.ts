@@ -1,5 +1,6 @@
 import { SHIELD_ENERGY_SETUP } from "../../src/game/session/shieldEnergyCapture";
 import { teamResultsCheck } from "./teamResultsCheck";
+import { loserPoseChecks } from "./loserPoseChecks";
 import { winCountChecks } from "./winCountChecks";
 import { koboldDirectionChecks } from "./koboldDirectionChecks";
 import { homedir } from "node:os";
@@ -402,6 +403,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "After the first match ends, the rematch seconds 5 to 1 and then the next match's 3, 2, 1, GO! each appear centred on the stage, popping in and fading out; the next match's fighters stay held until GO!.",
     },
     teamResultsCheck([NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT]),
+    ...loserPoseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...(["first", "second"] as const).map((order): NativeCheck => ({
