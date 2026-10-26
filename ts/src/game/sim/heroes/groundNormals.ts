@@ -107,3 +107,27 @@ export const RIFLEMAN_GROUND: GroundKit = {
   },
   reaches: {},
 };
+
+export interface Splits {
+  readonly firstActive: number;
+  readonly active: number;
+  readonly recovery: number;
+  readonly chargeFrame: number;
+  readonly hip: number;
+  readonly reach: number;
+  readonly height: number;
+  readonly radius: number;
+  readonly front: Readonly<HitEffect>;
+  readonly back: Readonly<HitEffect>;
+}
+
+export function splitsMove({ firstActive, active, recovery, chargeFrame, hip, reach, height, radius, front, back }: Splits): AuthoredMove {
+  const last = firstActive + active - 1;
+  return {
+    ...heroMove(firstActive, active, recovery, 0, [
+      heroRegion(firstActive, last, capsule([hip, height, reach, height], radius), front),
+      heroRegion(firstActive, last, capsule([-hip, height, -reach, height], radius), back),
+    ]),
+    chargeFrame,
+  };
+}

@@ -26,7 +26,7 @@ import type { ReplayState } from "./snapshot";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import { HERO_ROSTER } from "../roster/kits";
 import { writeCandleView } from "../fighters/kobold/candleView";
-import { RIFLEMAN_MOVES } from "../sim/originalMoves";
+import { ILLIDAN_MOVES, RIFLEMAN_MOVES } from "../sim/originalMoves";
 
 const REPLAY_CHECKSUM_MODULUS = 1_000_003;
 
@@ -138,6 +138,7 @@ export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = 
     int(`${name}.stopsAtBody`, move.travelStopsAtBody ? 1 : 0);
     if (move.travelFrames !== undefined) int(`${name}.travelFrames`, move.travelFrames);
     if (move.chainsFrom !== undefined) int(`${name}.chainsFrom`, move.chainsFrom);
+    if (move.chargeFrame !== undefined) int(`${name}.chargeFrame`, move.chargeFrame);
 
     const phases = move.fall ?? [];
     for (let index = 0; index < phases.length; index++) {
@@ -1046,7 +1047,7 @@ export function foldStateChecksum(fold: StateChecksumFold, characters: number): 
 
 
 export function prepareKitDigests(): void {
-  for (const moves of [RIFLEMAN_MOVES]) kitDigestField("moves", moves, MOVES_DIGESTS, fighterMovesCanonical);
+  for (const moves of [RIFLEMAN_MOVES, ILLIDAN_MOVES]) kitDigestField("moves", moves, MOVES_DIGESTS, fighterMovesCanonical);
   for (const hero of HERO_ROSTER) {
     kitDigestField("moves", hero.moves, MOVES_DIGESTS, fighterMovesCanonical);
     kitDigestField("specials", hero.specials, SPECIALS_DIGESTS, fighterSpecialsCanonical);

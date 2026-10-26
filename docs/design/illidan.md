@@ -252,30 +252,26 @@ drain needs a body hit. Alternatives: **B, Shear as the jab finisher**
 seam); **C, Shear shrinks the target's shield** (rejected: shield health is a
 shared system with its own owner decisions, #102).
 
-### Down smash: Flames of Azzinoth (picked)
+### Down smash: the splits with Azzinoth's fel fire (picked, #518)
 
-In Black Temple he throws both Warglaives into the floor and each becomes a
-Flame of Azzinoth. Startup 8 and total 42 as before; active frames 3 → 9:
+Tom decided on 2026-10-26 that his down smash becomes Falco's: from a crouch he
+drops into the splits, one leg kicking out in front and one behind at the same
+instant, low along the floor, then rises back to stance. The kick replaces the
+thrown glaives of the Flames of Azzinoth; the Azzinoth fel fire stays as the
+burn on contact (a fire hit), so the move still reads as Illidan's.
 
-- Frames 1–3 of the active window: the glaives strike both sides where the
-  clip holds them, 14% at 75°, base 22, growth 95, drain 8.
-- Frames 4–9: fel fire burns along the held glaives: 3% at 85°, base 30,
-  growth 20, drain 2. Glaives and fire share one contact, so only a fighter
-  the glaives missed burns.
+- Timing is Falco's through the parity mapping, pinned by ledger rows
+  `illidan-down-smash-timing` and `illidan-down-smash-angle`: active frames
+  6-10, interruptible from 46, charge between frames 2 and 3.
+- Both legs hit on the same frames: 13% at 25° away from him on each side,
+  the shared down smash knockback. One capsule per leg from 12 to 92 out,
+  12 high, radius 13 (`ILLIDAN_MOVES` in `ts/src/game/sim/originalMoves.ts`).
 
-Both parts use one capsule from 80 behind to 105 in front, 40 to 45 high,
-radius 30, on the two glaives the clip holds out and down (#280). The
-earlier ±190 box hit 56 to 81 units past the drawn blades.
-
-Counterplay: the total is unchanged, so after the flames he still has 26
-frames of recovery: a shield holds both parts and drops with more than 10
-frames of the smash left; a full jump clears the
-flames' height; a roll through ends past the glaives. Alternatives: **B, the
-glaives thrown as two returning projectiles** (rejected: a smash that
-becomes two projectiles breaks the 3-projectile cap's spirit and duplicates
-Mountain King's returning Storm Bolt); **C, the flames as persistent stage
-hazards** (rejected: a lingering zone after a smash outlives his
-commitment).
+Counterplay: the hitboxes sit at the floor, so a full jump or anything airborne
+above his knees clears it, and he has 35 frames of recovery after the kick for
+a shield to punish. Alternatives: **B, keep the thrown glaives** (rejected:
+Tom asked for the splits); **C, a one-sided kick** (rejected: the splits hits
+both sides, which is the Melee move's point).
 
 ### Forward smash: Fel Lunge (picked, #379)
 
@@ -442,7 +438,7 @@ attackCues.ts and elementLooks.ts):
 | Shear (forward tilt, all angles) | Demon Bolt impact where the glaive cuts |
 | Fel Lunge (forward smash) | Illidan's Metamorphosis missile trail |
 | Eye Blast windup / beam | Metamorphosis missile over his eyes and small green dragon flames along the floor / green dragon fire, each floor flame growing as the beam reaches it |
-| Flames of Azzinoth glaives / fire wall | Demon Hunter glaive / Flame Strike |
+| Down smash, the splits | the fire hit's fel burn on the foe it kicks |
 | Twin-glaive forward air | Illidan's missile trail |
 | Drain on hit (any victim) | Mana Burn target over the victim's head through that hit's hitlag and hitstun |
 
@@ -536,7 +532,7 @@ What he keeps, so he does not become Falco in a costume:
 - Fel Rush and its branches: his side special stays the straight fel dash
   with Vengeful Retreat and Chaos Strike, not Falco's Phantasm.
 - Warglaives: his normals keep their glaive reach, the twin-glaive forward air
-  and the Flames of Azzinoth down smash.
+  and Azzinoth's fel fire on his split-kick down smash.
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
   eight-way dive. Since #519 the ascent aims and starts like Fire Bird, but it
   takes no charge and does not hit.

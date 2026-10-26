@@ -668,7 +668,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Dash attack — Pursuit Cut | 8/4/24 | 9 | M, 60, LAUNCH | Advances 0.6H, stops at opponent/shield |
 | Forward smash — Judgment Edge | 15/3/30 | 16 | L, 40, KILL | Requires spacing; inner hit 12 damage |
 | Up smash — Moon Arc | 13/4/27 | 14 | M, 90, KILL | Vertical threat with small ground coverage |
-| Down smash — Twin Crescent | 12/5/28 | 12 | M, 25, EDGE | Front then rear arcs |
+| Down smash — the splits (#518) | 6/5/35, charge between 2 and 3 | 12 | S, 25, EDGE | Fox's split kick: both legs out along the floor at once, hitting front and back on the same frames, each launching away from her |
 | Neutral air — Cloak Spin | 5/5/18; L10 | 6 | M, 50, POKE | Short circular blade sweep |
 | Forward air — Pursuer | 8/3/20; L12 | 10 | M, 40, EDGE | Fast approach aerial with limited reach |
 | Back air — Heel Blade | 7/3/22; L12 | 11 | M, 35, KILL | Exposed leg before weapon tip |

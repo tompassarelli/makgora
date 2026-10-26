@@ -5,5 +5,12 @@
     "rule": "range triangle",
     "issue": "#311",
     "reason": "Forward smash and forward tilt both hit on frame 7. Recorded when the check landed (2026-10-25); a retune or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "illidan",
+    "direction": "down",
+    "rule": "range triangle",
+    "issue": "#518",
+    "reason": "Tom decided on 2026-10-26 that Illidan's down smash takes Falco's split-kick timing, first active frame 6, which ties his shared frame-6 down tilt. Falco's own down smash (frame 6) is faster than his down tilt (frame 7) on FightCore, so the tie is Melee's shape, not a retune target."
   }
 ]

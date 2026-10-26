@@ -56,7 +56,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
     jab: { name: "Warglaive Flurry", description: "Three quick glaive cuts on repeated jabs; the third launches." },
     inspiredBy: {
       [AttackStyle.forwardTilt]: "Shear, from the Black Temple encounter",
-      [AttackStyle.downSmash]: "Flames of Azzinoth, from the Black Temple encounter",
+      [AttackStyle.downSmash]: "Falco's down smash, the splits, with the fel fire of the Flames of Azzinoth on contact",
       [AttackStyle.forwardSmash]: "Fel Lunge, from the Demon Hunter's Fel Rush",
       [AttackStyle.forwardAir]: "His twin warglaives crossing",
     },

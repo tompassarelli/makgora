@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { AttackStyle, GrabAction, HitElement, LAST_ATTACK_STYLE } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroMove, heroRegion, type AuthoredMove, type FighterMoves, type MoveRegion, type StrikeCapsule, jabStep, travelThrough } from "../../sim/heroMoves";
-import { groundHit, swing, held, type GroundKit } from "../../sim/heroes/groundNormals";
+import { groundHit, swing, held, splitsMove, type GroundKit } from "../../sim/heroes/groundNormals";
 import type { HitEffect } from "../../sim/hitRegions";
 import { strongHit } from "../../sim/strongHits";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, hurtPart, hurtPose } from "../../sim/hurtboxes";
@@ -31,6 +31,7 @@ export const WARDEN_GROUND: GroundKit = {
 };
 
 
+const S = f32(HERO_REFERENCE_HEIGHT * f32(0.55));
 const M = f32(HERO_REFERENCE_HEIGHT * f32(0.80));
 const L = f32(HERO_REFERENCE_HEIGHT * f32(1.10));
 const GRAB = f32(HERO_REFERENCE_HEIGHT * f32(0.48));
@@ -153,17 +154,11 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       blade(-12.0, 141.0, -8.0, 202.0, 12.0),
       blade(-13.0, 141.0, -10.0, 201.0, 12.0),
     ], wardenHit(10.685750961303711, "KILL", 90))),
-    [AttackStyle.downSmash]: heroMove(12, 5, 28, 0, [
-      ...path(12, [
-        blade(18.0, 16.0, f32(M - BLADE_RADIUS), 16.0),
-        blade(18.0, 8.0, f32(M - BLADE_RADIUS), 8.0),
-        blade(18.0, 2.0, 84.0, 2.0),
-      ], downSmashHit(wardenHit(12.0, "EDGE", 25))),
-      ...path(15, [
-        blade(-18.0, 12.0, -f32(M - BLADE_RADIUS), 12.0),
-        blade(-18.0, 4.0, -f32(M - BLADE_RADIUS), 4.0),
-      ], downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0))),
-    ]),
+    [AttackStyle.downSmash]: splitsMove({
+      firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 10.0, reach: f32(S + 6.0), height: 10.0, radius: 10.0,
+      front: { ...downSmashHit(wardenHit(12.0, "EDGE", 25)), element: HitElement.normal },
+      back: { ...downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0)), element: HitElement.normal },
+    }),
     [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, spin(5, 5, { ...wardenHit(6.106143951416016, "NUDGE", 45), sakurai: true })), autoCancel: { before: 4, from: 36 } },
     [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, [
       heroRegion(8, 8, blade(37.662445068359375, 146.75, 58.328670501708984, 135.1438751220703), FORWARD_AIR),

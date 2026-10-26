@@ -49,6 +49,8 @@ export interface AuthoredMove {
 
   readonly chainsFrom?: number | undefined;
 
+  readonly chargeFrame?: number | undefined;
+
   readonly fall?: readonly AuthoredFall[] | undefined;
 
   readonly landingHit?: AuthoredLandingHit | undefined;

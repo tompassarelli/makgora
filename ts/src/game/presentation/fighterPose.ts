@@ -12,7 +12,7 @@ import type { Fighter } from "../sim/fighter";
 import { AIR_DODGE_ANIMATION_FRAMES } from "../sim/jumpsAndDodges";
 import { LEDGE_CLIMB_FRAMES, LEDGE_ROLL_FRAMES } from "../sim/ledge";
 import { totalVelocityX } from "../sim/motion";
-import { LEDGE_ATTACK_FRAMES, RIFLEMAN_BLASTER_AIR_FRAMES, attackStartupFrames, characterAttackActiveFrames, grabActionDuration, grabContactFrame, isSmashAttack } from "../sim/moves";
+import { LEDGE_ATTACK_FRAMES, RIFLEMAN_BLASTER_AIR_FRAMES, attackStartupFrames, characterAttackActiveFrames, grabActionDuration, grabContactFrame, isSmashAttack, smashChargeFrame } from "../sim/moves";
 import { type Controls, type Roster, fighterAt } from "../sim/roster";
 import { SHIELD_RELEASE_LAG_FRAMES } from "../sim/shield";
 import { INITIAL_DASH_FRAMES, SHIELD_BREAK_LAND_FRAMES, SHIELD_BREAK_STAND_FRAMES, authoredPhysics } from "../sim/tuning";
@@ -444,7 +444,7 @@ function selectTableAction(pose: FighterPose, f: Readonly<Fighter>, table: Reado
   const heldRelease = f.character === Character.shadowHunter && release?.aligned === true;
   if (charging && heldRelease) {
     playIndex(pose, "smash-charge", release.index);
-    const chargeFrame = style === undefined ? attack.frame : max(attack.frame, attackStartupFrames(style, f.tuning.moves) - 1);
+    const chargeFrame = style === undefined ? attack.frame : max(attack.frame, smashChargeFrame(style, f.tuning.moves));
     pose.clipTime = f32(chargeFrame * FRAME_SECONDS);
     return 0.0;
   }

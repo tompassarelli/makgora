@@ -2,6 +2,7 @@ import { floorDiv } from "wisp/src/sim/intMath";
 import type { Character } from "../sim/codes";
 import { AttackStyle } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
+import { heroDefinition } from "../roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../sim/moves";
 import { specialKit } from "../sim/specials/schema";
 import { heroCueWindows } from "../presentation/specialCues";
@@ -27,9 +28,9 @@ export interface ShowcaseRow {
 
 export function showcaseMoves(character: Character): ShowcaseMove[] {
   const tuning = authoredTuning(character);
-  const normals = tuning.moves === undefined
-    ? Object.entries(AttackStyle).filter(([, code]) => code !== AttackStyle.grab && code !== AttackStyle.dashAttack)
-    : Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined);
+  const original = heroDefinition(character) === undefined;
+  const normals = Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined
+    || (original && code !== AttackStyle.grab && code !== AttackStyle.dashAttack));
   const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;

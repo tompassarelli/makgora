@@ -1,6 +1,8 @@
 import { AttackStyle } from "../../src/game/sim/codes";
 import { MURLOC_MOVES } from "../../src/game/fighters/murloc/moves";
 import { WARDEN_MOVES } from "../../src/game/fighters/warden/moves";
+import { ILLIDAN_MOVES } from "../../src/game/sim/originalMoves";
+import type { FighterMoves } from "../../src/game/sim/heroMoves";
 import type { HitEffect } from "../../src/game/sim/hitRegions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
 
@@ -8,6 +10,11 @@ export const FOX_NEUTRAL_AIR = { damage: 12, base: 10, growth: 100, angle: "361"
 
 const FOX_NEUTRAL_AIR_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial";
 const WARDEN = "ts/src/game/fighters/warden/moves.ts";
+const ILLIDAN = "ts/src/game/sim/originalMoves.ts";
+const SPLIT_TIMING = "active 6-10, interruptible 46, charge between 2-3";
+const SPLIT_ANGLE = "25°";
+const FOX_DOWN_SMASH_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Down_smash";
+const FALCO_DOWN_SMASH_PAGE = "https://www.ssbwiki.com/Falco_(SSBM)/Down_smash";
 const MURLOC = "ts/src/game/fighters/murloc/moves.ts";
 const SQUIRTLE_JAB = { undocumented: "Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units", source: "https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack" } as const;
 const SPEAR_POINT = { kind: "deviation", reason: "his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 497 } as const;
@@ -31,6 +38,20 @@ function murlocReach(style: AttackStyle): number {
   return region.hit.maxX;
 }
 
+function downSmashTiming(moves: FighterMoves): string {
+  const move = moves.normals[AttackStyle.downSmash];
+  if (move === undefined) throw new Error("no authored down smash");
+  const charge = move.chargeFrame ?? move.startupFrames - 1;
+  return `active ${move.startupFrames + 1}-${move.startupFrames + move.activeFrames}, interruptible ${move.totalFrames + 1}, charge between ${charge + 1}-${charge + 2}`;
+}
+
+function downSmashAngle(moves: FighterMoves): string {
+  const angles = [...new Set((moves.normals[AttackStyle.downSmash]?.regions ?? []).map((region) => angle(region.hit.effect)))];
+  const [value] = angles;
+  if (angles.length !== 1 || value === undefined) throw new Error(`down smash angles disagree: ${angles.join(", ")}`);
+  return value;
+}
+
 const angle = (effect: HitEffect): string => (effect.sakurai === true ? FOX_NEUTRAL_AIR.angle : `${Math.round((Math.atan2(effect.launchZ, Math.abs(effect.launchX)) * 180) / Math.PI)}°`);
 
 export const MOVE_ROWS: readonly LedgerRow[] = [
@@ -49,6 +70,26 @@ export const MOVE_ROWS: readonly LedgerRow[] = [
     melee: { value: `base ${FOX_NEUTRAL_AIR.base}, growth ${FOX_NEUTRAL_AIR.growth}`, source: FOX_NEUTRAL_AIR_PAGE },
     ours: () => only((effect) => `base ${shortNumber(effect.base)}, growth ${shortNumber(effect.growth)}`),
     anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: LOW_KNOCKBACK,
+  },
+  {
+    id: "maiev-down-smash-timing", family: "moves", name: "Maiev's down smash, the splits: active frames, interruptible frame and charge frame",
+    melee: { value: SPLIT_TIMING, source: FOX_DOWN_SMASH_PAGE }, ours: () => downSmashTiming(WARDEN_MOVES),
+    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: PARITY,
+  },
+  {
+    id: "maiev-down-smash-angle", family: "moves", name: "Maiev's down smash launch angle, front and back",
+    melee: { value: SPLIT_ANGLE, source: FOX_DOWN_SMASH_PAGE }, ours: () => downSmashAngle(WARDEN_MOVES),
+    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: PARITY,
+  },
+  {
+    id: "illidan-down-smash-timing", family: "moves", name: "Illidan's down smash, the splits: active frames, interruptible frame and charge frame",
+    melee: { value: SPLIT_TIMING, source: FALCO_DOWN_SMASH_PAGE }, ours: () => downSmashTiming(ILLIDAN_MOVES),
+    anchor: { file: ILLIDAN, symbol: "ILLIDAN_MOVES" }, status: PARITY,
+  },
+  {
+    id: "illidan-down-smash-angle", family: "moves", name: "Illidan's down smash launch angle, front and back",
+    melee: { value: SPLIT_ANGLE, source: "https://www.fightcore.gg/characters/218/falco/moves/1330/dsmash/" }, ours: () => downSmashAngle(ILLIDAN_MOVES),
+    anchor: { file: ILLIDAN, symbol: "ILLIDAN_MOVES" }, status: PARITY,
   },
   {
     id: "murloc-jab-reach", family: "moves", name: "Murloc's jab 1 reach",

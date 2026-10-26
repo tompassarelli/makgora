@@ -106,7 +106,7 @@ export function shippedHurtboxes(character: Character, moves?: FighterMoves): Fi
 }
 
 const FALLBACK_HURTBOXES = shippedHurtboxes(Character.demonHunter);
-const DEMON_HUNTER_HURTBOXES: FighterHurtboxes = {
+export const DEMON_HUNTER_HURTBOXES: FighterHurtboxes = {
   stand: FALLBACK_HURTBOXES.stand,
   attacks: {
     ...FALLBACK_HURTBOXES.attacks,

@@ -50,7 +50,7 @@ import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodg
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
-import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, felLungeStep, isSmashAttack } from "./moves";
+import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, felLungeStep, isSmashAttack, smashChargeFrame } from "./moves";
 import {
   addMeleeWorldValues,
   airDriftVelocity,
@@ -186,7 +186,7 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
       attack.smashChargeAllowed = false;
     }
   } else if (f.motion.grounded && attack.style !== undefined && attack.smashChargeAllowed && isSmashAttack(attack.style)
-    && input.attackHeld && attack.frame >= attackStartupFrames(attack.style, f.tuning.moves) - 1) {
+    && input.attackHeld && attack.frame >= smashChargeFrame(attack.style, f.tuning.moves)) {
     attack.smashCharging = true;
     attack.smashChargeFrames = 1;
     smashChargePaused = true;

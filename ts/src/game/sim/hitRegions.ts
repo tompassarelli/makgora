@@ -144,10 +144,6 @@ const FORWARD_AIR_LINK = { ...region(-4.0, 94.0, 66.0, 94.0, 2.0, 10.0, 30.0, -0
 const FORWARD_AIR_LAUNCH = { ...region(-9.0, 84.0, 61.0, 89.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2), strike: { x1: 5.0, z1: 75.0, x2: 70.0, z2: 75.0, radius: 14.0 } };
 const NEUTRAL_AIR_CLEAN = { ...DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION, effect: strongHit((DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION).effect) };
 const NEUTRAL_AIR_LATE = { ...NEUTRAL_AIR_CLEAN, effect: weakHit(NEUTRAL_AIR_CLEAN.effect) };
-const AZZINOTH_STRIKE = { x1: -80.0, z1: 45.0, x2: 105.0, z2: 40.0, radius: 30.0 };
-const AZZINOTH_GLAIVES = { ...region(-110.0, 135.0, 10.0, 75.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524), effect: downSmashHit(region(-110.0, 135.0, 10.0, 75.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524).effect), strike: AZZINOTH_STRIKE };
-
-const AZZINOTH_FLAMES = { ...region(-110.0, 135.0, 10.0, 75.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495), effect: downSmashHit(region(-110.0, 135.0, 10.0, 75.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495).effect), strike: AZZINOTH_STRIKE };
 const JAB3_EFFECT = region(0.0, 0.0, 0.0, 0.0, 6.0, 95.0, 22.0, 0.7660444378852844, 0.6427876353263855);
 const JAB3_RISE = { ...JAB3_EFFECT, minX: 39.0, maxX: 126.0, minZ: 29.0, maxZ: 126.0, strike: { x1: 55.0, z1: 45.0, x2: 110.0, z2: 110.0, radius: 16.0 } };
 const JAB3_CREST = { ...JAB3_EFFECT, minX: -16.0, maxX: 96.0, minZ: 119.0, maxZ: 176.0, strike: { x1: 0.0, z1: 160.0, x2: 80.0, z2: 135.0, radius: 16.0 } };
@@ -159,8 +155,6 @@ function demonHunterRegion(style: AttackStyle, activeFrame: number): Readonly<Hi
   switch (style) {
     case AttackStyle.forwardAir:
       return activeFrame <= 1 ? FORWARD_AIR_LINK : activeFrame >= 4 ? FORWARD_AIR_LAUNCH : NO_HIT_REGION;
-    case AttackStyle.downSmash:
-      return activeFrame <= 2 ? AZZINOTH_GLAIVES : AZZINOTH_FLAMES;
     case AttackStyle.jab3:
       return activeFrame <= 0 ? JAB3_RISE : activeFrame === 1 ? JAB3_CREST : JAB3_OVERHEAD;
     case AttackStyle.neutralAir:

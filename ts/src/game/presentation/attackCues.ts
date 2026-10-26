@@ -58,8 +58,6 @@ export const ATTACK_CUES: { readonly [character: number]: { readonly [style: num
 
     [AttackStyle.forwardSmash]: [{ name: "Fel Lunge", fromActive: 0, cue: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", f32(1.3)), "stand", 0.0) }],
 
-    [AttackStyle.downSmash]: [{ name: "Azzinoth glaives", fromActive: 0, cue: timed(cue("Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx", f32(1.4)), "stand", 0.0) }],
-
     [AttackStyle.forwardAir]: [{ name: "Twin glaives", fromActive: 0, cue: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", 1.0), "stand", 0.0) }],
 
     [AttackStyle.forwardTilt]: SHEAR,

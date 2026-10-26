@@ -21,7 +21,6 @@ export const DOWN_ATTACK_DAMAGE = 7.0;
 export const DOWN_ATTACK_BASE_KNOCKBACK = 75.0;
 
 export const DEMON_HUNTER_FORWARD_AIR_ACTIVE = 6;
-export const DEMON_HUNTER_DOWN_SMASH_ACTIVE = 9;
 export const DEMON_HUNTER_FORWARD_SMASH_ACTIVE = 3;
 export const DEMON_HUNTER_DASH_ATTACK_ACTIVE = 10;
 
@@ -101,7 +100,7 @@ export function jabChainFrom(character: Character, style: AttackStyle, moves?: F
   if (next === undefined) return undefined;
   const shared = attackStartupFrames(style) + attackActiveFrames(style) + 1;
 
-  if (moves !== undefined) return moves.normals[next] === undefined ? undefined : moves.normals[style]?.chainsFrom ?? (moves.normals[style] === undefined ? shared : undefined);
+  if (moves !== undefined && (moves.normals[style] !== undefined || moves.normals[next] !== undefined)) return moves.normals[next] === undefined ? undefined : moves.normals[style]?.chainsFrom ?? (moves.normals[style] === undefined ? shared : undefined);
   return character === Character.demonHunter ? shared : undefined;
 }
 
@@ -251,6 +250,10 @@ export function attackStartupFrames(style: AttackStyle, moves?: FighterMoves): n
   }
 }
 
+export function smashChargeFrame(style: AttackStyle, moves?: FighterMoves): number {
+  return moves?.normals[style]?.chargeFrame ?? attackStartupFrames(style, moves) - 1;
+}
+
 export function attackActiveFrames(style: AttackStyle): number {
   switch (style) {
     case AttackStyle.ledgeAttack:
@@ -281,7 +284,6 @@ export function characterAttackActiveFrames(character: Character, style: AttackS
 
   if (character === Character.demonHunter) {
     if (style === AttackStyle.forwardAir) return DEMON_HUNTER_FORWARD_AIR_ACTIVE;
-    if (style === AttackStyle.downSmash) return DEMON_HUNTER_DOWN_SMASH_ACTIVE;
     if (style === AttackStyle.forwardSmash) return DEMON_HUNTER_FORWARD_SMASH_ACTIVE;
     if (style === AttackStyle.demonHunterDashAttack) return DEMON_HUNTER_DASH_ATTACK_ACTIVE;
   }
