@@ -65,6 +65,7 @@ export const EYE_BLAST_SWEEP = 50.0;
 export const EYE_BLAST_REACH = EYE_BLAST_NEAR + EYE_BLAST_SWEEP * (EYE_BLAST_LAST - EYE_BLAST_FIRST);
 
 const FEL_RUSH_AIRTIME = 2;
+const FEL_RUSH_AIMED_AIRTIME = 4;
 const FEL_RUSH_AIR_CARRY = 5.0;
 export const VENGEFUL_RETREAT_FORM = 1;
 export const CHAOS_STRIKE_FORM = 2;
@@ -355,17 +356,40 @@ function felRushBranch(owner: Fighter, input: Readonly<Controls>, attack: boolea
 
 
 
-function advanceFelRush(owner: Fighter): void {
+function aimFelRush(owner: Fighter, input: Readonly<Controls> | undefined): void {
+  const { special, motion } = owner;
+  if (input === undefined || motion.grounded || (special.airtimeUses & FEL_RUSH_AIMED_AIRTIME) === 0) return;
+  special.aimX = chargedAimX(input);
+  special.aimZ = chargedAimZ(input);
+  if (special.aimX !== 0) owner.facing = special.aimX;
+}
+
+function moveFelRush(owner: Fighter): void {
+  const { special, motion } = owner;
+  const frame = special.frame;
+  if (frame > FEL_RUSH_LAST) return;
+  if (frame === FEL_RUSH_LAST) {
+    motion.vx = motion.grounded ? 0.0 : f32(owner.facing * FEL_RUSH_AIR_CARRY);
+    if (!motion.grounded) motion.vz = 0.0;
+    return;
+  }
+  const rushing = frame >= FEL_RUSH_FIRST - 1;
+  if (special.aimZ === 0) {
+    motion.vx = rushing ? f32(owner.facing * FEL_RUSH_SPEED) : 0.0;
+    if (!motion.grounded) motion.vz = 0.0;
+    return;
+  }
+  const scale = special.aimX !== 0 ? AIM_DIAGONAL : 1.0;
+  motion.vx = rushing ? f32(f32(special.aimX * FEL_RUSH_SPEED) * scale) : 0.0;
+  motion.vz = rushing && !motion.grounded ? f32(f32(special.aimZ * FEL_RUSH_SPEED) * scale) : 0.0;
+}
+
+function advanceFelRush(owner: Fighter, input: Readonly<Controls> | undefined): void {
   const { special, motion } = owner;
   const frame = special.frame;
   if (special.form === 0) {
-    const rushing = frame >= FEL_RUSH_FIRST - 1 && frame < FEL_RUSH_LAST;
-    if (frame < FEL_RUSH_LAST) {
-      motion.vx = rushing ? f32(owner.facing * FEL_RUSH_SPEED) : 0.0;
-      if (!motion.grounded) motion.vz = 0.0;
-    } else if (frame === FEL_RUSH_LAST) {
-      motion.vx = motion.grounded ? 0.0 : f32(owner.facing * FEL_RUSH_AIR_CARRY);
-    }
+    if (frame === FEL_RUSH_TELL_LAST) aimFelRush(owner, input);
+    moveFelRush(owner);
     return;
   }
   if (special.form === VENGEFUL_RETREAT_FORM) {
@@ -512,13 +536,15 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     return true;
   }
   if (action === SpecialAction.demonHunterFelRush) {
-    if (!motion.grounded && (special.airtimeUses & FEL_RUSH_AIRTIME) !== 0) return false;
+    if (!motion.grounded && (special.airtimeUses & FEL_RUSH_AIMED_AIRTIME) !== 0) return false;
 
     owner.facing = moveX < 0 ? -1 : 1;
     startSpecialAction(owner, action, FEL_RUSH_FRAMES, moveX);
     special.cooldowns[action] = FEL_RUSH_COOLDOWN;
     special.hit = false;
-    if (!motion.grounded) special.airtimeUses |= FEL_RUSH_AIRTIME;
+    special.aimX = 0;
+    special.aimZ = 0;
+    if (!motion.grounded) special.airtimeUses |= (special.airtimeUses & FEL_RUSH_AIRTIME) !== 0 ? FEL_RUSH_AIMED_AIRTIME : FEL_RUSH_AIRTIME;
     motion.vx = 0.0;
     if (!motion.grounded) motion.vz = 0.0;
     return true;
@@ -724,7 +750,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
     }
   }
   if (special.action === SpecialAction.demonHunterWingAscent && special.form !== 0) advanceWingDive(owner);
-  if (special.action === SpecialAction.demonHunterFelRush) advanceFelRush(owner);
+  if (special.action === SpecialAction.demonHunterFelRush) advanceFelRush(owner, input);
   if (special.action === SpecialAction.demonHunterImmolate) {
     faceHeldStick(owner, input);
     stallImmolate(owner);

@@ -90,7 +90,15 @@ Ground or air, any facing (the stick picks the side).
   Any hit stops it; no armor.
 - **Frames 6–15, the rush:** 20 units a frame (200 in all, 1.5H) in a
   straight line, leaving a fel trail. In the air he flies level (gravity off),
-  as Fel Rush does in WoW. The rush passes through bodies, striking each once:
+  as Fel Rush does in WoW. A grounded rush, and the first rush in an airtime,
+  always go level, the stick picking only the side.
+- **The second rush in an airtime is aimed:** the stick held on its last tell
+  frame (frame 5) sends it in any of 8 directions (up, down, the diagonals,
+  either side) at the same 20 units a frame and 200 in all; with the stick
+  neutral it flies level in his facing. The press itself still picks the side,
+  since an up or down press is Wing Ascent or Immolate. Meeting the floor
+  during a downward rush lands him and the horizontal part carries on. The
+  rush passes through bodies, striking each once:
   6% fire at 80°, base 45, growth 40, a pop-up he can follow. It stops just
   short of a raised shield, and the strike meets the shield.
 - **Frames 16–29:** recovery; he acts on frame 30.
@@ -106,7 +114,8 @@ Ground or air, any facing (the stick picks the side).
     (held back turns him, the cross-up after passing through): active on its
     frames 5–8, 10% fire at 40°, base 30, growth 95; ends on frame 30. In the
     air, landing ends it with 12 frames of landing lag.
-- **Limits:** once per airtime (landing, a ledge catch or a hit refreshes it);
+- **Limits:** twice per airtime, the second aimed (landing, a ledge catch or a
+  hit refreshes both);
   40-frame cooldown from the press; a recovery tool that never ends helpless.
 - **Cost:** the mana lane's side-special cost (12); the branches are free.
 
