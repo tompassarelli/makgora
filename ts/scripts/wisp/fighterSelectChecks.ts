@@ -13,7 +13,7 @@ export const fighterSelectChecks = (pass: readonly Rule[]): NativeCheck[] => [
   {
     id: "434-chat-fighter-select", closes: "smashcraft#434", map: "fighter-select", session: "434-chat-select",
     setup: [
-      { waitMs: 8000 }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Rifleman", client: "b" },
+      { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Rifleman", client: "b" },
       { waitMs: 1500 }, { chat: "Chat stays readable over fighter select", client: "b" }, { waitMs: 500 },
     ],
     capture: [{ kind: "frames", name: "chat-fighter-select", client: "a" }, { kind: "frames", name: "chat-fighter-select", client: "b" }],
