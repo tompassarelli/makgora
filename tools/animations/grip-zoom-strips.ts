@@ -173,7 +173,7 @@ function extent(meshes: ReturnType<typeof pose>): number {
 
 const { rows } = await Bun.file(auditArg).json() as { rows: Row[] };
 const flagged = rows.filter(row => row.fighter === fighter.name && (only.length > 0 ? only.includes(row.sequence) : (row.detached ?? 0) > 0 || (row.intersecting ?? 0) > 0));
-const lines = ['sequence\tframes\tframes with a blade crossing the body surface\tbody parts crossed most\tframes with a blade more than ${INSIDE_UNITS} unit inside the body\tdeepest blade point inside the body\tstrip seconds\tstrip'];
+const lines = [`sequence\tframes\tframes with a blade crossing the body surface\tbody parts crossed most\tframes with a blade more than ${INSIDE_UNITS} unit inside the body\tdeepest blade point inside the body\tstrip seconds\tstrip`];
 for (const row of flagged) {
   const index = source.Sequences.findIndex(sequence => sequence.Name === row.sequence);
   const clip = originalClip(character, index);
