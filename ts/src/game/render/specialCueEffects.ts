@@ -17,6 +17,7 @@ import { idiv } from "wisp/src/sim/intMath";
 import { fighterName } from "../sim/heroes/registry";
 import { f32 } from "wisp/src/sim/f32";
 import { specialAreaRegion } from "../presentation/disjointCues";
+import { CueLinger, type CuePlace } from "../presentation/cueLinger";
 
 interface CueModel {
   readonly cue: Cue;
@@ -70,6 +71,8 @@ export class SpecialCueEffects {
   private readonly voices: { [model: string]: PopcornVoices | undefined } = {};
   private readonly placed: CuePlacement = { x: 0.0, z: 0.0, scale: 0.0 };
   private readonly cueSounds: { [name: string]: sound | undefined } = {};
+  private readonly linger = new CueLinger();
+  private readonly heldPlace: CuePlace = { x: 0.0, y: 0.0, z: 0.0, facing: 1, scale: 1.0 };
 
   // Online, Warcraft handles must be born on the same turn on every client, so shared play restarts emitters made here instead of making fresh ones on confirmed frames.
   constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly shared: boolean, disjointCues: boolean) {
@@ -105,6 +108,7 @@ export class SpecialCueEffects {
     this.shown = undefined;
     this.shownKey = 0;
     this.seekAgain = false;
+    this.linger.clear();
     for (const entry of this.popcorn) this.retirePopcorn(entry.model);
     this.popcorn.length = 0;
     this.confirmedCue = undefined;
@@ -228,31 +232,44 @@ export class SpecialCueEffects {
         DisplayTimedTextToPlayer(GetLocalPlayer(), 0.0, 0.0, 30.0, `Missing effect: ${fighterName(this.character)} / ${identity}`);
       }
     } else parkOnce(this.missing, this.origin, this.missingParked, 0);
+    const held = fighter !== undefined && cue !== undefined && !failed && POPCORN_CUE_MODELS[cue.model] !== true ? cue : undefined;
+    if (held !== undefined && fighter !== undefined) {
+      const progress = held.scaleFrames === undefined ? 0.0 : f32(Math.min(1.0, Math.max(0.0, f32((fighter.special.frame - 1) / Math.max(1, held.scaleFrames - 1)))));
+      const scale = held.scaleEnd === undefined ? held.scale : f32(held.scale + f32(f32(held.scaleEnd - held.scale) * progress));
+      const place = this.heldPlace;
+      place.x = this.origin.x + fighter.motion.x + fighter.facing * x;
+      place.y = this.front - (held.depth ?? 0.0) * this.scale;
+      place.z = this.origin.z + fighter.motion.z + z;
+      place.facing = fighter.facing;
+      place.scale = scale * strikeScale * this.scale;
+    }
+    this.linger.show(held, held === undefined ? undefined : this.heldPlace, this.popcornNow, fighter === undefined || !playing || fighter.status.out);
+    const lingering = this.linger.lingering;
     for (let index = 0; index < this.cues.length; index++) {
       const entry = this.cues[index];
       if (entry === undefined) continue;
-      if (fighter === undefined || entry.cue !== cue || failed) {
+      const place = entry.cue === held ? this.heldPlace : entry.cue === lingering ? this.linger.place : undefined;
+      if (fighter === undefined || place === undefined) {
         parkCue(entry.model, this.origin, parked, index);
         continue;
       }
       const { model } = entry;
       parked[index] = false;
-      placeEffect(model, this.origin.x + fighter.motion.x + fighter.facing * x, this.front - (cue.depth ?? 0.0) * this.scale, this.origin.z + fighter.motion.z + z);
-      if (this.shown !== cue || this.shownKey !== key) {
+      placeEffect(model, place.x, place.y, place.z);
+      // A lingering cue keeps playing the animation it already had.
+      if (entry.cue === held && (this.shown !== held || this.shownKey !== key)) {
         if (entry.cue.sequence !== undefined) BlzSetSpecialEffectAnimation(model, entry.cue.sequence);
         BlzSetSpecialEffectTime(model, entry.cue.seconds ?? 0.0);
         this.seekAgain = true;
-      } else if (this.seekAgain) {
+      } else if (entry.cue === held && this.seekAgain) {
         // Warcraft discards animation seeks in the callback selecting the animation (#58 native rulers).
         BlzSetSpecialEffectTime(model, entry.cue.seconds ?? 0.0);
         this.seekAgain = false;
       }
-      BlzSetSpecialEffectYaw(model, cue.yaw ?? facingYaw(fighter.facing));
+      BlzSetSpecialEffectYaw(model, entry.cue.yaw ?? facingYaw(place.facing));
       BlzSetSpecialEffectPitch(model, entry.cue.pitch ?? 0.0);
       BlzSetSpecialEffectRoll(model, entry.cue.roll ?? 0.0);
-      const progress = entry.cue.scaleFrames === undefined ? 0.0 : f32(Math.min(1.0, Math.max(0.0, f32((fighter.special.frame - 1) / Math.max(1, entry.cue.scaleFrames - 1)))));
-      const scale = entry.cue.scaleEnd === undefined ? entry.cue.scale : f32(entry.cue.scale + f32(f32(entry.cue.scaleEnd - entry.cue.scale) * progress));
-      BlzSetSpecialEffectScale(model, scale * strikeScale * this.scale);
+      BlzSetSpecialEffectScale(model, place.scale);
       BlzSetSpecialEffectAlpha(model, entry.cue.alpha ?? 255);
       const color = entry.cue.color;
       if (color !== undefined) BlzSetSpecialEffectColor(model, color[0], color[1], color[2]);

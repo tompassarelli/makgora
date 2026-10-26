@@ -105,7 +105,11 @@ export interface Cue {
 
   readonly replacesBody?: boolean | undefined;
   readonly rebirthFrames?: number | undefined;
+  /** When its move ends early, the cue keeps playing where it stood until this many frames after it first showed (presentation/cueLinger.ts). */
+  readonly lingerFrames?: number | undefined;
 }
+
+export const ACTIVE_CUE_FRAMES = 18;
 
 
 export const timed = (cue: Cue, sequence: string, seconds: number): Cue => ({ ...cue, sequence, seconds });
@@ -323,7 +327,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Shadow Strike", startup: cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "hand", f32(0.7)), active: timed(cue("Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", "hand", 1.0), "stand", 0.0) },
     side: { spell: "Pursuit Lunge", startup: GLAIVE_GLINT, active: cue("Abilities\\Weapons\\GlaiveMissile\\GlaiveMissileTarget.mdx", "ahead", 1.0) },
     up: { spell: "Blink", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
-    down: { spell: "Fan of Knives", startup: SHADOW, active: { ...cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)), roll: f32(1.570796327) } },
+    down: { spell: "Fan of Knives", startup: SHADOW, active: { ...cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)), roll: f32(1.570796327), lingerFrames: ACTIVE_CUE_FRAMES } },
   },
   [Character.lich]: {
     neutral: { spell: "Frost Nova", startup: FROST, active: timed(cue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", "hand", 0.5), "stand", 0.0) },
@@ -496,9 +500,6 @@ export interface CueWindows {
   readonly startup: FrameWindow;
   readonly active: FrameWindow;
 }
-
-
-export const ACTIVE_CUE_FRAMES = 18;
 
 const widen = (window: { first: number; last: number }, first: number, last: number): void => {
   window.first = Math.min(window.first, first);
