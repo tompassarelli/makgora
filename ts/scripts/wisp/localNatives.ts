@@ -66,7 +66,7 @@ export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
 const PREDICTED_PRESENTATION: LocalNatives = {
   ...Object.fromEntries([
     "BlzPlaySpecialEffect", "BlzSpecialEffectClearSubAnimations", "BlzSetSpecialEffectAlpha", "BlzSetSpecialEffectAnimation", "BlzSetSpecialEffectAnimationBlendTime", "BlzSetSpecialEffectColor",
-    "BlzSetSpecialEffectColorByPlayer", "BlzSetSpecialEffectMatrixScale", "BlzSetSpecialEffectPitch", "BlzSetSpecialEffectPosition",
+    "BlzSetSpecialEffectColorByPlayer", "BlzSetSpecialEffectMatrixScale", "BlzSetSpecialEffectOrientation", "BlzSetSpecialEffectPitch", "BlzSetSpecialEffectPosition",
     "BlzSetSpecialEffectRoll", "BlzSetSpecialEffectScale", "BlzSetSpecialEffectTime", "BlzSetSpecialEffectTimeScale", "BlzSetSpecialEffectYaw",
   ].map((name) => [name, "poses an existing effect from this client's prediction"])),
   MoveLightningEx: "places training's existing hit-area outlines from this client's prediction",

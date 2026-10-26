@@ -17,6 +17,8 @@ import { installHeadless } from "wisp/scripts/wisp/headless";
 import type { Roster } from "../src/game/sim/roster";
 import { fighterAt } from "../src/game/sim/roster";
 import { damageTint, hitlagShake } from "../src/game/presentation/hitPresentation";
+import { teeterSide } from "../src/game/presentation/teeterLean";
+import { type MatchState, stageClock } from "../src/game/lobby/lobbyState";
 import { SMASHCRAFT_HEADLESS } from "./wisp/headless";
 import { type CaptureFixture, SHOWCASE_HOLD_TICKS, showcaseFixtures } from "../src/platform/captureFixtures";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
@@ -30,7 +32,7 @@ export function reelFixtures(only: string | undefined, holdTicks = SHOWCASE_HOLD
 
 
 const platform = join(import.meta.dir, "../src/platform");
-interface Shell { readonly world: Roster; readonly runtime: { readonly simulationFrame: number } }
+interface Shell { readonly world: Roster; readonly game: MatchState; readonly runtime: { readonly simulationFrame: number } }
 const loadPlatform = async () => {
   const { shell }: { shell(): Shell } = await import(join(platform, "../host/loop/state.ts"));
   const { nativeDriverCommand }: { nativeDriverCommand(text: string): void } = await import(join(platform, "nativeDriver.ts"));
@@ -43,7 +45,7 @@ export class PlanFailure extends Schema.TaggedError<PlanFailure>()("PlanFailure"
   override get message(): string { return this.problem; }
 }
 
-type Look = "tint" | "shake" | "recoil";
+type Look = "tint" | "shake" | "recoil" | "teeter";
 type Check = { readonly kind: "sound"; readonly name: string } | { readonly kind: "effect"; readonly name: string } | { readonly kind: Look; readonly slot: number };
 export interface Cue { readonly from: number; readonly to: number; readonly name: string; readonly checks: readonly Check[]; readonly line: number }
 
@@ -58,7 +60,7 @@ export function parseCues(script: string): Cue[] {
     const checks = (match[4] ?? "").split(/\s+/).map((word): Check => {
       const [kind, value = ""] = word.split("=");
       if (kind === "sound" || kind === "effect") return kind === "sound" ? { kind, name: value } : { kind, name: value };
-      if ((kind === "tint" || kind === "shake" || kind === "recoil") && (value === "a" || value === "b")) return { kind, slot: value === "a" ? 0 : 1 };
+      if ((kind === "tint" || kind === "shake" || kind === "recoil" || kind === "teeter") && (value === "a" || value === "b")) return { kind, slot: value === "a" ? 0 : 1 };
       throw new Error(`line ${index + 1}: unknown check ${word}`);
     });
     const from = Number(match[1]);
@@ -118,6 +120,7 @@ function play({ shell, nativeDriverCommand, entry }: Platform, fixture: CaptureF
           if (damageTint(fighter) !== undefined) shown.push("tint");
           if (hitlagShake(fighter) !== 0) shown.push("shake");
           if (fighter.shield.raised && fighter.shield.stun > 0) shown.push("recoil");
+          if (teeterSide(fighter, shell().game.stageChoice, stageClock(shell().game)) !== 0) shown.push("teeter");
           looks.push(shown);
         }
       });

@@ -445,7 +445,7 @@ export function renderPersistentPresentation(s: ShellState): void {
       if (body !== undefined) ShowUnit(body.unit, false);
     }
     if (renderers?.pool !== undefined) {
-      if (fighter !== undefined && game.phase !== Phase.result && ui.match.posing !== slot) renderers.pool.present(fighter, runtime.poses[slot], stage, runtime.simulationFrame);
+      if (fighter !== undefined && game.phase !== Phase.result && ui.match.posing !== slot) renderers.pool.present(fighter, runtime.poses[slot], stage, runtime.simulationFrame, matchFrame);
       else renderers.pool.hide();
     }
     const live = playing ? fighter : undefined;

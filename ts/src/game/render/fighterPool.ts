@@ -27,6 +27,7 @@ import { specialClip } from "../presentation/fighterClips";
 import { characterModelScale } from "../presentation/modelScale";
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
+import { teeterPitch } from "../presentation/teeterLean";
 
 export class FighterPoolPresentation {
   private readonly clips: effect[] = [];
@@ -35,6 +36,7 @@ export class FighterPoolPresentation {
   private lightVisible = false;
   private visible: number | undefined;
   private yaw: number | undefined;
+  private pitch: number | undefined;
   private seconds: number | undefined;
   private red: number | undefined;
   private green: number | undefined;
@@ -104,6 +106,7 @@ export class FighterPoolPresentation {
 
   redraw(): void {
     this.yaw = undefined;
+    this.pitch = undefined;
     this.lightYaw = undefined;
   }
 
@@ -118,8 +121,8 @@ export class FighterPoolPresentation {
     }
   }
 
-  /** `frame` is the presented simulation frame, which times pose blends. */
-  present(fighter: Readonly<Fighter>, pose: Readonly<FighterPose>, stage: number, frame: number): void {
+  /** `frame` is the presented simulation frame, which times pose blends; `matchFrame` places moving decks. */
+  present(fighter: Readonly<Fighter>, pose: Readonly<FighterPose>, stage: number, frame: number, matchFrame: number): void {
     if (this.clips.length === 0) return;
     const special = specialCueState(fighter);
     const startup = special.phase === "startup"
@@ -160,13 +163,16 @@ export class FighterPoolPresentation {
 
     const y = this.origin.y - (fighter.grab.target === undefined ? 0.0 : 80.0);
     const z = this.origin.z + this.placement.z;
-    const yaw = facingYaw(fighterPoseFacing(fighter));
+    const facing = fighterPoseFacing(fighter);
+    const yaw = facingYaw(facing);
+    const pitch = teeterPitch(fighter, stage, matchFrame, frame, facing);
     placeEffect(model, x, y, z);
-    if (changed || this.yaw !== yaw) {
+    if (changed || this.yaw !== yaw || this.pitch !== pitch) {
       // Native yaw can discard an earlier effect scale (#360's floes), so the scale follows every yaw.
-      BlzSetSpecialEffectYaw(model, yaw);
+      BlzSetSpecialEffectOrientation(model, yaw, pitch, 0.0);
       BlzSetSpecialEffectScale(model, this.scale);
       this.yaw = yaw;
+      this.pitch = pitch;
     }
     if (changed || this.seconds !== seconds) {
       BlzSetSpecialEffectTime(model, (clip.timeline ? clip.startSeconds : 0.0) + seconds);

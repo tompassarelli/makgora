@@ -1,0 +1,17 @@
+# #482: Rifleman slow-walks onto the left edge and teeters facing it, leaning out over the drop; a one-frame light tilt right turns him in place and he teeters facing away, leaning back over the drop.
+#! chat -dev quick hero rifleman
+#! cue 280-310 facing the edge: teeter=a
+#! cue 340-400 facing away: teeter=a
+100 a stick -0.3 0
+280 a capture
+290 a capture
+300 a capture
+310 a capture
+320 a stick 0 0
+330 a stick 0.3 0
+331 a stick 0 0
+340 a capture
+350 a capture
+360 a capture
+380 a capture
+400 a capture

@@ -100,7 +100,7 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   client's own PipeWire sink to DIR/audio.wav on the captures' clock
   (`--audio-sink SINK` or `--no-audio`). `bun scripts/nativeCapture.ts plan
   PAD|DIR...` plays the scripts headlessly on the map's schedule and checks
-  each `#! cue FROM[-TO] NAME: sound=… effect=… tint=b shake=b recoil=b` line
+  each `#! cue FROM[-TO] NAME: sound=… effect=… tint=b shake=b recoil=b teeter=b` line
   against the held capture frames, without a Warcraft client.
 - Voice budget (#30): `bun wisp map build --profile voice-check --out MAP.w3x`
   starts four Wren Expert computers over three stocks and two minutes as soon
