@@ -42,6 +42,9 @@ export const WALL_TECH_JUMP_INPUT_WINDOW_FRAMES = 20;
 export const WALL_JUMP_FLICK_FRAMES = 3;
 /** A neutral special faces the side the stick last pressed at most this many input frames before it (smashcraft:docs/gameplay-design.md, "Turnaround specials"). */
 export const TURNAROUND_SPECIAL_WINDOW_FRAMES = 8;
+export const RESPAWN_FRAMES = 60;
+export const RESPAWN_HEIGHT = 280.0;
+export const RESPAWN_INVINCIBLE_FRAMES = 90;
 const STARTING_STOCKS = 3;
 
 

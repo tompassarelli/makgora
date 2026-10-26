@@ -1,6 +1,7 @@
 import { FIGHTER_ARRAYS, FIGHTER_CONSTANTS, FIGHTER_FIELDS, FIGHTER_GROUPS, FIGHTER_SAME_ORDER } from "../src/game/sim/state/fighterSchema";
 import type { CanonColumn, CanonKit, FighterArray, FighterFieldRow, FighterGroup, Guard } from "../src/game/sim/state/fighterSchema";
 import { UNROLLED, sameLine, arrayOf, copyHalf, copyPart, copyValue, groupKey, inSameOrder, keeps, leaf, packWalk, restWalk, retainedSlots, rowsOf, sameTest, sourceLocal } from "./fighterStateRows";
+import { respawnWalk } from "./fighterRespawn";
 
 export const output = "src/generated/state/fighterState.ts";
 export const producer = "ts/codegen/fighterState.ts";
@@ -394,7 +395,6 @@ const checkCoverage = () => {
   if (placed.join() !== pack.join()) throw new Error("pack[] rows must mirror placed rows");
 };
 
-
 export function renderFighterState(): string {
   checkCoverage();
   checkPackCanon();
@@ -408,6 +408,8 @@ export function renderFighterState(): string {
   const sameTail = body("same", FIGHTER_GROUPS.slice(half));
   const projectiles = projectileFunctions();
   const canon = canonWalk();
+  const blast = respawnWalk("blast", { use, capacity, groupLocal });
+  const respawn = respawnWalk("respawn", { use, capacity, groupLocal });
   for (const name of used) {
     const module = FIGHTER_CONSTANTS[name];
     if (module === undefined) throw new Error(`no module for ${name}`);
@@ -465,6 +467,16 @@ export function renderFighterState(): string {
     "export function writeFighterFields(sink: FighterFieldSink, prefix: string, fighter: Readonly<Fighter>, participantMask: number, kits: FighterKitText): void {",
     ...canon.locals,
     ...canon.body,
+    "}",
+    "",
+    "export function blastFighterFields(f: Fighter): void {",
+    ...blast.locals,
+    ...blast.body,
+    "}",
+    "",
+    "export function respawnFighterFields(f: Fighter, startX: number): void {",
+    ...respawn.locals,
+    ...respawn.body,
     "}",
     "",
   ].join("\n");
