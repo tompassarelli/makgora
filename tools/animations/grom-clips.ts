@@ -55,29 +55,33 @@ const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60,
 const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20, yaw: 105 };
 const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
 const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
-const LUNGE_CARRY: Gesture = { chest: 4, lean: 2 };
-const LUNGE_COIL: Gesture = { chest: -42, pelvis: 14, lean: -22, leftArm: -60, leftElbow: -30, head: 18, thigh: -35, knee: 75, leftThigh: 25, leftKnee: 70 };
+const LUNGE_COIL: Gesture = { chest: -34, pelvis: 12, lean: -18, leftArm: -55, leftElbow: -30, head: 14, thigh: -30, knee: 70, leftThigh: 25, leftKnee: 65 };
 const LUNGE_DRIVE: Gesture = { chest: 42, pelvis: -12, lean: 18, leftArm: 50, leftElbow: -20, head: -25, thigh: -65, knee: 60, leftThigh: 45, leftKnee: 5 };
-const LUNGE_FOLLOW: Gesture = { chest: 50, pelvis: -14, lean: 22, leftArm: 60, leftElbow: -15, head: -28, thigh: -70, knee: 70, leftThigh: 48, leftKnee: 8 };
+const LUNGE_CLEAVE: Gesture = { chest: 58, pelvis: -16, lean: 24, leftArm: 65, leftElbow: -10, head: -30, thigh: -72, knee: 75, leftThigh: 50, leftKnee: 10 };
 const LUNGE_SETTLE: Gesture = {};
+const LUNGE_CARRY: Gesture = { chest: 8, lean: 4, head: -5 };
 type Aim = NonNullable<Beat["aim"]>;
-const CARRY_AIM: Aim = { hand: [22, -10], weapon: [82, -25] }, COIL_AIM: Aim = { hand: [12, -14], weapon: [66, -40] }, DRIVE_AIM: Aim = { hand: [25, 0], weapon: [85, -20] };
-const SAG_AIM: Aim = { hand: [14, -14], weapon: [58, -48] }, FOLLOW_AIM: Aim = { hand: [19, -12], weapon: [70, -44] }, LIFT_AIM: Aim = { hand: [12, 0], weapon: [40, 48] }, REST_AIM: Aim = { hand: [22, -23], weapon: [-25, 23] };
+const CARRY_AIM: Aim = { hand: [22, -10], weapon: [82, -25] }, DRAW_AIM: Aim = { hand: [-12, -20], weapon: [-70, -8] }, THRUST_AIM: Aim = { hand: [25, 0], weapon: [85, -20] };
+const CLEAVE_AIM: Aim = { hand: [20, -16], weapon: [62, -62] }, RAISE_AIM: Aim = { hand: [22, 2], weapon: [62, 40] };
+const OVER_AIM: Aim = { hand: [12, 8], weapon: [5, 68] }, REST_AIM: Aim = { hand: [22, -23], weapon: [-25, 23] };
 function blend(a: Gesture, b: Gesture, t: number): Gesture {
   return Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map(key => [key, (a[key as keyof Gesture] ?? 0) * (1 - t) + (b[key as keyof Gesture] ?? 0) * t]));
 }
 function between(a: Aim, b: Aim, t: number): Aim {
   return { hand: [a.hand[0] + (b.hand[0] - a.hand[0]) * t, a.hand[1] + (b.hand[1] - a.hand[1]) * t], weapon: [a.weapon[0] + (b.weapon[0] - a.weapon[0]) * t, a.weapon[1] + (b.weapon[1] - a.weapon[1]) * t] };
 }
+function along(path: readonly Aim[], t: number): Aim {
+  const span = Math.min(path.length - 2, Math.floor(t * (path.length - 1)));
+  return between(path[span]!, path[span + 1]!, t * (path.length - 1) - span);
+}
 function lungeBeats(contact: number, lastActive: number, frames: number): Beat[] {
-  const ease = (t: number) => t * t * (3 - 2 * t), reach = 62, hold = (frame: number) => 0.94 - 0.19 * (frame - contact - 3) / Math.max(1, lastActive - contact - 1);
-  const coil = Array.from({ length: contact }, (_, frame) => { const t = ease(Math.min(1, frame / (contact - 2))); return { frame, gesture: blend(LUNGE_CARRY, LUNGE_COIL, t), drive: [-66 * t, -12 * t] as const, aim: between(CARRY_AIM, COIL_AIM, t) }; });
-  const drive = [40, 52, reach].map((x, i) => ({ frame: contact + i, gesture: LUNGE_DRIVE, drive: [x, -12 - i] as const, aim: DRIVE_AIM }));
-  const carry = Array.from({ length: lastActive - contact - 1 }, (_, i) => contact + 3 + i).map(frame => ({ frame, gesture: blend(LUNGE_DRIVE, LUNGE_FOLLOW, (0.94 - hold(frame)) / 0.19), drive: [reach * hold(frame), -14 - 14 * (0.94 - hold(frame)) / 0.19] as const, aim: between(DRIVE_AIM, SAG_AIM, (1 - hold(frame)) / 0.25) }));
+  const ease = (t: number) => t * t * (3 - 2 * t), reach = 62;
+  const coil = Array.from({ length: contact }, (_, frame) => { const t = ease(Math.min(1, frame / (contact - 2))); return { frame, gesture: blend(LUNGE_CARRY, LUNGE_COIL, t), drive: [-60 * t, -12 * t] as const, aim: between(CARRY_AIM, DRAW_AIM, ease(Math.min(1, frame / (contact - 2)))) }; });
+  const drive = [44, 56, reach + 4].map((x, i) => ({ frame: contact + i, gesture: LUNGE_DRIVE, drive: [x, -12 - i] as const, aim: THRUST_AIM }));
+  const carry = Array.from({ length: lastActive - contact - 1 }, (_, i) => contact + 3 + i).map(frame => { const t = (frame - contact - 2) / (lastActive - contact - 1); return { frame, gesture: blend(LUNGE_DRIVE, LUNGE_CLEAVE, ease(t)), drive: [reach + 1 + 7 * t, -14 - 16 * t] as const, aim: between(THRUST_AIM, CLEAVE_AIM, ease(t)) }; });
   const back = Array.from({ length: frames - lastActive - 1 }, (_, i) => lastActive + 2 + i).map(frame => {
-    const s = (frame - lastActive - 1) / (frames - lastActive - 1), t = 1 - (1 - s) ** 2, push = 1 - ease(Math.min(1, s / 0.35));
-    const aim = s < 0.2 ? between(SAG_AIM, FOLLOW_AIM, s / 0.2) : s < 0.6 ? between(FOLLOW_AIM, LIFT_AIM, (s - 0.2) / 0.4) : s < 0.92 ? between(LIFT_AIM, REST_AIM, (s - 0.6) / 0.32) : undefined;
-    return { frame, gesture: blend(blend(LUNGE_DRIVE, LUNGE_FOLLOW, push), LUNGE_SETTLE, t), drive: [reach * 0.75 * (1 - t), -28 * (1 - t)] as const, aim };
+    const s = (frame - lastActive - 1) / (frames - lastActive - 1), t = ease(s);
+    return { frame, gesture: blend(LUNGE_CLEAVE, LUNGE_SETTLE, t), drive: [(reach + 8) * (1 - t), -30 * (1 - t)] as const, aim: s < 0.88 ? along([CLEAVE_AIM, RAISE_AIM, OVER_AIM, REST_AIM], ease(s / 0.88)) : undefined };
   });
   return [...coil, ...drive, ...carry, ...back];
 }
