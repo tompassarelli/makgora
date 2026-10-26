@@ -27,7 +27,7 @@ import { SoundBank, SoundKind } from "./soundBank";
 import { resultFighterPlacement } from "../presentation/arenaCamera";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
-import { resultPoseAt, type ResultClips } from "../presentation/resultPose";
+import { defeatClip, resultPoseAt, type ResultClips } from "../presentation/resultPose";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -294,7 +294,7 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip } };
+      this.poses[slot] = { character, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) } };
     }
   }
 

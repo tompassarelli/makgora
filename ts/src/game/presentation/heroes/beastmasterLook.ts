@@ -48,5 +48,5 @@ export const beastmasterLook = (kit: KitNormals): HeroLook => ({
     neutralSpecial: ATTACK, sideSpecial: SPELL, upSpecial: SPELL, downSpecial: SPELL,
     neutralSpecialAir: ATTACK, sideSpecialAir: SPELL, upSpecialAir: SPELL, downSpecialAir: SPELL,
   },
-  fallback: STAND_1,
+  fallback: STAND_1, defeat: "death",
 });

@@ -65,6 +65,6 @@ export function shadowHunterLook(kit: KitNormals): HeroLook {
       neutralSpecial: SPELL_THROW, sideSpecial: STAND_CHANNEL, upSpecial: STAND_VICTORY, downSpecial: SPELL,
       neutralSpecialAir: SPELL_THROW, sideSpecialAir: STAND_CHANNEL, upSpecialAir: STAND_VICTORY, downSpecialAir: SPELL,
     },
-    fallback: STAND_1,
+    fallback: STAND_1, defeat: "death",
   };
 }

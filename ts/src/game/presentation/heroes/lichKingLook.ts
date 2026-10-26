@@ -7,5 +7,5 @@ export const lichKingLook: HeroLook = {
   objectId: 0x6d666c6b,
   portrait: LICH_KING_ICON,
   clips: LICH_KING_CLIPS,
-  fallback: LICH_KING_FALLBACK,
+  fallback: LICH_KING_FALLBACK, defeat: "death",
 };

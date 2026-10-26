@@ -6,6 +6,6 @@ export const forsakenPaladinLook: HeroLook = {
   objectId: 0x6d667574,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNForsakenPaladin.blp",
   clips: FORSAKEN_PALADIN_CLIPS,
-  fallback: FORSAKEN_PALADIN_FALLBACK_CLIP,
+  fallback: FORSAKEN_PALADIN_FALLBACK_CLIP, defeat: "death",
   damageClips: FORSAKEN_PALADIN_DAMAGE_CLIPS,
 };

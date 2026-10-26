@@ -8,5 +8,5 @@ export const peonLook: HeroLook = {
   placedModel: { path: "buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", height: 180.0, alpha: 255, finished: true },
   clips: PEON_CLIPS,
   damageClips: PEON_PAIN_CLIPS,
-  fallback: PEON_FALLBACK_CLIP,
+  fallback: PEON_FALLBACK_CLIP, defeat: "death",
 };

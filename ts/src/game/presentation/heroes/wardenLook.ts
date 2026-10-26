@@ -7,5 +7,5 @@ export const wardenLook = (kit: KitNormals): HeroLook => ({
   objectId: 0x6d667764,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNHeroWarden.blp",
   clips: wardenClipTable(kit),
-  fallback: wardenClips(kit).idle,
+  fallback: wardenClips(kit).idle, defeat: "death",
 });

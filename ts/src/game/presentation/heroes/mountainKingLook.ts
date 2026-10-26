@@ -6,5 +6,5 @@ export const mountainKingLook = (kit: KitNormals): HeroLook => ({
   objectId: 0x6d666d6b,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNHeroMountainKing.blp",
   clips: mountainKingClips(kit),
-  fallback: MOUNTAIN_KING_FALLBACK,
+  fallback: MOUNTAIN_KING_FALLBACK, defeat: "death",
 });

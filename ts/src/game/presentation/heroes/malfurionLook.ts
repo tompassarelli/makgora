@@ -6,7 +6,7 @@ export const malfurionLook: HeroLook = {
   model: MALFURION_MODEL_FILE, objectId: 0x6d666d61,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNFurion.blp",
   placedModel: { path: "units\\nightelf\\Ent\\Ent.mdl", height: 110.0, alpha: 255 },
-  fallback: MALFURION_FALLBACK,
+  fallback: MALFURION_FALLBACK, defeat: "death",
   clips: MALFURION_CLIPS,
   damageClips: MALFURION_DAMAGE_CLIPS,
   cueReadNormals: [AttackStyle.dashAttack],

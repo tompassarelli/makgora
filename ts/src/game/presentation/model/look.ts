@@ -17,6 +17,8 @@ export interface HeroLook {
   readonly damageClips?: readonly HeroClip[] | undefined;
   readonly fallback: HeroClip;
 
+  readonly defeat?: string | undefined;
+
   readonly commandGrab?: CommandGrabClips | undefined;
 
   readonly ultimateBurst?: UltimateBurstLook | undefined;

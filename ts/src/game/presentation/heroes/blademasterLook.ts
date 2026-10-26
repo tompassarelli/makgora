@@ -8,5 +8,5 @@ export const blademasterLook: HeroLook = {
 
   placedModel: { path: "units\\orc\\HeroBladeMaster\\HeroBladeMaster.mdl", height: 140.0, alpha: 120 },
   clips: BLADEMASTER_CLIPS,
-  fallback: BLADEMASTER_FALLBACK_CLIP,
+  fallback: BLADEMASTER_FALLBACK_CLIP, defeat: "death",
 };

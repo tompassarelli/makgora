@@ -50,6 +50,6 @@ export function lichLook(kit: KitNormals): HeroLook {
       neutralSpecial: SPELL, sideSpecial: SPELL, upSpecial: CHANNEL, downSpecial: SPELL,
       neutralSpecialAir: SPELL, sideSpecialAir: SPELL, upSpecialAir: CHANNEL, downSpecialAir: SPELL,
     },
-    fallback: STAND_READY,
+    fallback: STAND_READY, defeat: "death",
   };
 }

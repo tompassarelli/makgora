@@ -50,5 +50,5 @@ export const pitLordLook: HeroLook = {
     victimThrowUp: STAND_2, victimThrowDown: STAND_2,
     ...PIT_LORD_SPECIAL_CLIPS,
   },
-  fallback: STAND,
+  fallback: STAND, defeat: "death",
 };
