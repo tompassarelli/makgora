@@ -28,8 +28,9 @@
   (effects and frames of the stage-loading cover, one fighter body per fighter) equal their counts
   after the first match, every other kind (sounds, timers, triggers, ...) the cold menu's. It prints
   each client's counts before, after the first match and after the last rematch, and fails
-  naming the kind and match that differ. 21 matches exceed both suites' per-test ceilings;
-  smashcraft:ts/test/handle-baseline.test.ts keeps the match and one rematch.
+  naming the kind and match that differ. Each match is bounded by frames stepped, not wall time:
+  a match past `SOAK_MATCH_FRAME_BOUND` fails naming its frame count, and both runs print
+  `frames=N longest match=M of at most B`.
   It takes about 20 minutes on four cores (Bun 2.5, Lua32 20) and each Lua run holds
   about 1.4 GB, compacting the emulator after every match.
   Native handles are checked separately: their emulator-owned record identities

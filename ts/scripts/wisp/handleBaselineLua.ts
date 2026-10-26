@@ -3,7 +3,7 @@ import { luaLockstep, readFile } from "wisp/src/headless/lua";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { SMASHCRAFT_NOOPS, smashcraftNativeBehavior } from "./headlessNatives";
 import { gameOf } from "./botMatch";
-import { SOAK_MATCHES, handleLine, handleProblems, playHandleBaseline } from "./handleBaseline";
+import { SOAK_MATCHES, frameLine, handleLine, handleProblems, playHandleBaseline } from "./handleBaseline";
 import { SMASHCRAFT_LOCAL_NATIVES } from "./localNatives";
 import { compactEmulator } from "./memoryCensus";
 
@@ -31,6 +31,7 @@ clients.clients.forEach((client, index) => {
   print(`${p} after match ${matches} (rematch ${matches - 1}): ${handleLine(run.afterMatches[matches - 1]?.[index])}`);
   for (const error of client.errors) problems.push(`${p}: ${error}`);
 });
+print(frameLine(run));
 for (const problem of problems) print(`problem ${problem}`);
 print(`done problems=${problems.length}`);
 if (problems.length > 0) os.exit(1);

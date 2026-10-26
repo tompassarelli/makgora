@@ -4,7 +4,7 @@ import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { install, startBuild } from "../../src/platform/main";
 import { shell } from "../../src/host/loop/state";
 import type { Game } from "../../scripts/wisp/botMatch";
-import { type HandleBaseline, SOAK_MATCHES, handleLine, handleProblems, playHandleBaseline } from "../../scripts/wisp/handleBaseline";
+import { type HandleBaseline, SOAK_MATCHES, frameLine, handleLine, handleProblems, playHandleBaseline } from "../../scripts/wisp/handleBaseline";
 import { SMASHCRAFT_HEADLESS } from "../../scripts/wisp/headless";
 
 export interface BunBaseline extends HandleBaseline {
@@ -46,6 +46,7 @@ if (import.meta.main) {
     console.log(`${p} after match 1: ${handleLine(run.afterMatches[0]?.[index])}`);
     console.log(`${p} after match ${matches} (rematch ${matches - 1}): ${handleLine(run.afterMatches[matches - 1]?.[index])}`);
   });
+  console.log(frameLine(run));
   for (const problem of problems) console.log(`problem ${problem}`);
   console.log(`done problems=${problems.length}`);
   if (problems.length > 0) process.exitCode = 1;

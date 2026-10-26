@@ -18,6 +18,12 @@ export const BASELINE_STAGE = 2;
 /** Matches the soak plays: the first match and 20 rematches (#409). */
 export const SOAK_MATCHES = 21;
 
+/**
+ * Frames one match may step from fighter selection back to it; a run that steps more fails with its count.
+ * Set from the longest match measured, 4178 frames in both Bun and Lua32 over 21 matches (2026-10-26, #369).
+ */
+export const SOAK_MATCH_FRAME_BOUND = 5_000;
+
 // The first match leaves handles the menu keeps from then on: the stage-loading cover's frames, the effects
 // they hold and one fighter body (unit) per fighter, so these kinds return to the first match's counts and
 // every other kind to the cold menu's.
@@ -30,7 +36,12 @@ export interface HandleBaseline {
   readonly afterMatches: readonly (readonly HandleCounts[])[];
   /** Frames the lockstep stepped from its start to the last count. */
   readonly frames: number;
+  /** Frames each match stepped from fighter selection back to it. */
+  readonly matchFrames: readonly number[];
 }
+
+/** The frame line both halves print: frames stepped and the longest match against its bound. */
+export const frameLine = (baseline: HandleBaseline) => `frames=${baseline.frames} longest match=${Math.max(...baseline.matchFrames)} of at most ${SOAK_MATCH_FRAME_BOUND}`;
 
 const countOf = (counts: HandleCounts | undefined, kind: string) => (counts ?? []).find(([name]) => name === kind)?.[1] ?? 0;
 
@@ -81,10 +92,14 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
   const censuses = clients.clients.map(client => new HandleCensus(client, functions));
   const host = clients.client(0);
   const live = () => censuses.map(census => census.counts());
+  let match = 0;
+  let matchStart = 0;
   const until = (what: string, limit: number, done: () => boolean, each?: (frame: number) => void) => {
     for (let frame = 0; frame < limit && !done(); frame++) {
       each?.(frame);
       clients.frames(1);
+      const stepped = clients.frame - matchStart;
+      if (stepped > SOAK_MATCH_FRAME_BOUND) throw new Error(`match ${match + 1} stepped ${stepped} frames without reaching ${what}, over its bound of ${SOAK_MATCH_FRAME_BOUND}`);
     }
     if (!done()) throw new Error(`${what} not reached; phase ${gameOf(host).phase}`);
   };
@@ -111,7 +126,9 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
   clients.frames(60);
   const cold = live();
   const afterMatches: HandleCounts[][] = [];
-  for (let match = 0; match < matches; match++) {
+  const matchFrames: number[] = [];
+  for (; match < matches; match++) {
+    matchStart = clients.frame;
     choose(false);
     clients.press(0, Key.y);
     until("stage selection", 120, () => gameOf(host).phase === Phase.stageMenu);
@@ -126,11 +143,12 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
       if (floorMod(frame, 30) === 0) clients.press(floorMod(floorDiv(frame, 30), 2), gameOf(host).phase === Phase.stageMenu ? Key.escape : Key.y);
     });
     clients.frames(60);
+    matchFrames.push(clients.frame - matchStart);
     afterMatches.push(live());
     if (compact !== undefined) clients.clients.forEach((client, index) => {
       const census = censuses[index];
       if (census !== undefined) compact(client, census.takeReleased());
     });
   }
-  return { cold, afterMatches, frames: clients.frame };
+  return { cold, afterMatches, frames: clients.frame, matchFrames };
 }

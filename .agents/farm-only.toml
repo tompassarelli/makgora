@@ -42,7 +42,7 @@ why = "whole-roster balance field"
 
 [[command]]
 pattern = ["bun", "wisp", "soak"]
-narrowing = ["--fighter", "--pair", "--repro"]
+narrowing = ["--fighter", "--pair", "--repro", "--rematches"]
 farm = "bun wisp farm memory --ref <sha> --wait"
 why = "soak sweep belongs on the farm"
 
