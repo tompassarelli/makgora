@@ -53,7 +53,7 @@ const burrowRake: readonly Gesture[] = [
   { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
   { chest: -40, pelvis: -25, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -20, leftThigh: 20 },
 ];
-interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; }
+interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; decay?: number; }
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
   jab2: { contact: 7, x: 64, back: 32 },
@@ -63,7 +63,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   neutralAir: { contact: 9, x: 12, back: 6 },
   forwardAir: { contact: 12, x: 20, back: 10 },
   backAir: { contact: 10, x: -70, back: 35 },
-  dashAttack: { contact: 8, x: 56, back: 26, over: 0.4 },
+  dashAttack: { contact: 8, x: 56, back: 26, over: 0.4, decay: 29 },
   downAir: { contact: 16, z: -12, back: 6 },
   neutralSpecial: { contact: 17, x: 32, back: 16, over: 0.4, ramp: 8 },
   upSpecial: { contact: 8, z: 34, back: 24 },
@@ -102,7 +102,7 @@ const lungeAt = (lunge: Lunge, frame: number, frames: number) => {
   const windup = Math.max(1, Math.round(lunge.contact * 0.6)), hold = Math.min(frames - 1, lunge.contact + Math.max(3, lunge.ramp ?? 0));
   return sign * (frame <= windup ? -lunge.back * Math.sin(frame / windup * Math.PI / 2)
     : frame <= lunge.contact ? -lunge.back + (lunge.back + reach) * Math.sqrt((frame - windup) / (lunge.contact - windup))
-    : frame <= hold ? reach * (1 + over * Math.min(1, (frame - lunge.contact) / (lunge.ramp ?? 1))) : reach * (1 + over) * Math.max(0, 1 - (frame - hold) / Math.min(20, frames - hold)));
+    : frame <= hold ? reach * (1 + over * Math.min(1, (frame - lunge.contact) / (lunge.ramp ?? 1))) : reach * (1 + over) * Math.max(0, 1 - (frame - hold) / (lunge.decay ?? Math.min(20, frames - hold))));
 };
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, number]][] = [
