@@ -1199,7 +1199,12 @@ while she turns; only the arms carry the per-turn pulse, since a pulse on the
 hips or legs turns with the spin and swings the feet off the axis. Warden's
 `Cape_*` helpers bind no vertices: her cloth is the `Mesh` bone chains under
 her shoulders (cape strands), chest (robe panels) and head (hood tail), which
-the drill lifts and flares radially, each link lagging its parent.
+the drill wraps in around her body line, each link lagging its parent. Cloth
+flared outward, or weapon swung wide of the axis, changes her silhouette's
+angle by up to 30 degrees from frame to frame, and three cold viewers read
+that native clip as a somersault, not a drill (#507, 2026-10-26). Wrapped
+cloth keeps the drawn silhouette's long axis at 30±9 degrees off vertical,
+0.22 of its length wide, through the active frames.
 
 ### Movement and recovery clips
 

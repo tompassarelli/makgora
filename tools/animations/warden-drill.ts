@@ -99,7 +99,7 @@ for (const [name, depth] of Object.entries(CLOTH)) {
   const axis = [py / length, -(px + 8) / length, 0] as const, phase = Math.atan2(py, px + 8), weight = depth ? 0.5 : 1;
   rewrite(node, (frame, base) => {
     const lagged = Math.max(0, frame - depth * 1.2), spin = Math.min(1, spinRate(lagged));
-    const swing = 30 * dive(lagged) + 15 * spin + 8 * spin * Math.sin(turn(lagged) * Math.PI / 90 + phase) + 15 * settle(lagged);
+    const swing = -(12 * dive(lagged) + 6 * spin + 3.2 * spin * Math.sin(turn(lagged) * Math.PI / 90 + phase) + 6 * settle(lagged));
     return times(about(axis, swing * weight), base);
   });
 }
