@@ -139,6 +139,7 @@ its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
 `tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing, the key-frame poses `prepare` rendered and, for a move that travels, each key frame's forward travel, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
+`bun wisp anim judge run PRIVATE_DIR --model haiku|sonnet|opus [--effort low|medium|high] [--judge ID]` is the bare judge: one `claude -p` call per move with no tools, settings sources, MCP or session, the brief and the move's images in one message. It writes `scores-JUDGE.jsonl` (the `record` format plus the model and effort) and `usage-JUDGE.jsonl` (tokens and seconds per move) beside the batches (#557). `tools/move-data/anim-score/judge-calibration.tsv` lists the clips Tom has given a verdict on, with the commit each renders from; the images stay private.
 
 A caster's move is read with its spell effect: Tom's decision of 2026-10-26 via
 north gate 33, after 24 judges scored Kael'thas's dash attack 3 on character
