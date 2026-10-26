@@ -24,7 +24,7 @@ import { produceScenarioComputerInput } from "../session/scenarios";
 import { type Fighter, placedObject, PROJECTILE_CAPACITY } from "../sim/fighter";
 import { mutableProjectile } from "../sim/fighterProjectiles";
 import { initializeInfluenceOperands } from "../sim/influenceOperands";
-import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
+import type { AuthoredSpecial, FighterSpecials, SpecialKit, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
 import { settleProjectileSlots } from "../sim/fighterProjectiles";
@@ -42,6 +42,8 @@ export const MOMENT_FRAMES = 600;
 export const ROW_FRAMES = SNAPSHOT_FRAMES * SNAPSHOTS;
 
 const SECTION_WIDTH = 6;
+
+export const SECTION_TOKEN_WIDTH = REPRO_LINE_WIDTH - SECTION_WIDTH;
 
 
 export type MomentInput = { readonly kind: "network" } | { readonly kind: "callback"; readonly scenario: Scenario };
@@ -204,9 +206,17 @@ export function savedRuntime(runtime: Readonly<PacingAndPresentation>): SavedRun
   return { ...runtime, botStrategies: [savedBotStrategy(strategies[0]), savedBotStrategy(strategies[1]), savedBotStrategy(strategies[2]), savedBotStrategy(strategies[3])] };
 }
 
+const savedKit = ({ name: _name, description: _description, ...kit }: SpecialKit) => kit;
+
+export function savedFighter(fighter: Fighter): object {
+  const specials = fighter.tuning.specials;
+  if (specials === undefined) return fighter;
+  return { ...fighter, tuning: { ...fighter.tuning, specials: { neutral: savedKit(specials.neutral), side: savedKit(specials.side), up: savedKit(specials.up), down: savedKit(specials.down) } } };
+}
+
 export function savedView(state: Readonly<ReplayState>) {
-  const fighters: (Fighter | undefined)[] = [];
-  for (const slot of PARTICIPANT_SLOTS) if (isActive(state.world, slot)) fighters[slot] = fighterAt(state.world, slot);
+  const fighters: (object | undefined)[] = [];
+  for (const slot of PARTICIPANT_SLOTS) if (isActive(state.world, slot)) fighters[slot] = savedFighter(fighterAt(state.world, slot));
   return { mask: state.world.mask, fighters, match: state.match, commands: state.controls.commands, runtime: savedRuntime(state.runtime) };
 }
 
@@ -286,12 +296,12 @@ function startSnapshot(recorder: MomentRecorder, last: number): number | undefin
   return chosen;
 }
 
-export const sectionLines = (prefix: string, lines: string[]): TokenLines => createTokenLines(prefix, REPRO_LINE_WIDTH - SECTION_WIDTH, lines);
+export const sectionLines = (prefix: string, lines: string[]): TokenLines => createTokenLines(prefix, SECTION_TOKEN_WIDTH, lines);
 
 const SECTION = sectionLines("", []);
 
 export function pushSection(lines: string[], prefix: string, tokens: readonly string[]): void {
-  openTokenLines(SECTION, prefix, REPRO_LINE_WIDTH - SECTION_WIDTH, lines);
+  openTokenLines(SECTION, prefix, SECTION_TOKEN_WIDTH, lines);
   for (const token of tokens) addToken(SECTION, token);
   endTokenLine(SECTION);
 }
