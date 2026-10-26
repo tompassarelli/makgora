@@ -187,7 +187,7 @@ Sources name the SmashWiki page unless marked: MFD is
 | Rifleman | `ts/src/game/sim/tuning.ts:162` | gravity 0.17, fast fall 3.5, jump squat 5 | Falco's (CA; `ts/scripts/meleeOracle.ts:42`) | match to Falco |
 | Illidan | `ts/src/game/sim/tuning.ts:186` | gravity 0.19, fast fall 3.45, jump squat 4, weight 86 | Inside the Melee spread | ours, inside spread |
 | Heroes | `ts/src/game/sim/tuning.ts:225,236-260`; `ts/src/game/sim/heroes/heroBodies.ts:26-50` | weight 75 × body, walk/dash/run clamped to Melee's spread (`ts/src/game/sim/tuning.ts:236-239`), air speed 1.0 × body, traction | Melee spread per attribute across the 26 fighters (CA) | per fighter in #289 |
-| Maiev | `ts/src/game/sim/heroes/heroBodies.ts:29` | weight 60, dash 2.0, run 2.3, walk 1.6, air speed 1.10, Fox's falls and jumps | Fox weight 75, Falco 80 (CA) | lighter than any spacie, retuned in #304 |
+| Maiev | `ts/src/game/sim/heroes/heroBodies.ts:29`, `HERO_VERTICAL` in `ts/src/game/sim/tuning.ts` | weight 78, dash 2.0, run 2.3, walk 1.6, air speed 0.95; Fox's jump squat 3; Falco's gravity 0.17, terminal 3.1, fast fall 3.5 and short hop 1.9; full and double jump 4.0 | Fox weight 75, Falco 80; full jump 3.68/4.1, double jump 4.416/3.854 (CA) | inside the spread, retuned in #304: full hop apex 49.1 and double jump rise 45.1 against Fox's 31.3 and 40.2 |
 
 ## Ledger
 

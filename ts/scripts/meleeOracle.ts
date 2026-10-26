@@ -57,8 +57,15 @@ const FALCO: ReferenceFighter = {
 };
 
 
+const MAIEV: ReferenceFighter = {
+  jumpSquat: 3, jumpVelocity: 4.0, hopVelocity: 1.899999976158142,
+  aerialJumpMultiplier: 1.0, gravity: 0.17000000178813934, fastFallVelocity: 3.5,
+  dashInitialVelocity: 2.0, runVelocity: 2.299999952316284, walkVelocity: 1.600000023841858,
+};
+
 function referenceFighter(character: Character): ReferenceFighter | undefined {
-  return character === Character.rifleman ? FALCO : undefined;
+  if (character === Character.rifleman) return FALCO;
+  return character === Character.warden ? MAIEV : undefined;
 }
 
 
@@ -138,10 +145,17 @@ interface Scenario {
   readonly deviation?: string;
 }
 
-const FIGHTERS = [
+interface OracleFighter {
+  readonly character: Character;
+  readonly name: string;
+  readonly areas?: readonly string[];
+}
+
+const FIGHTERS: readonly OracleFighter[] = [
   { character: Character.rifleman, name: "Rifleman" },
   { character: Character.demonHunter, name: "Illidan" },
-] as const;
+  { character: Character.warden, name: "Maiev", areas: ["jump", "ground", "fast-fall"] },
+];
 
 const show = (value: string | number | boolean): string =>
   typeof value === "number" ? (Number.isInteger(value) ? String(value) : value.toFixed(4).replace(/0+$/, "")) : String(value);
@@ -1441,7 +1455,7 @@ const SCENARIOS: readonly Scenario[] = [
 const rowKey = (row: Pick<OracleRow, "area" | "scenario" | "fighter">): string => `${row.area} | ${row.scenario} | ${row.fighter}`;
 
 export function runOracle(): OracleRow[] {
-  return SCENARIOS.flatMap((scenario) => FIGHTERS.map(({ character, name }) => rowFor(scenario, character, name)));
+  return SCENARIOS.flatMap((scenario) => FIGHTERS.filter(({ areas }) => areas === undefined || areas.includes(scenario.area)).map(({ character, name }) => rowFor(scenario, character, name)));
 }
 
 

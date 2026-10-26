@@ -238,6 +238,19 @@ export const MELEE_DASH_SPEED_SPREAD: readonly [number, number] = [melee(1.0), m
 export const MELEE_RUN_SPEED_SPREAD: readonly [number, number] = [melee(1.100000023841858), melee(2.299999952316284)];
 export const MELEE_DASH_RUN_FRAME_SPREAD: readonly [number, number] = [8, 19];
 
+type VerticalPhysics = Pick<FighterPhysics, "gravity" | "terminalSpeed" | "fastFallSpeed" | "fullJumpSpeed" | "shortJumpSpeed" | "aerialJumpSpeed">;
+
+export const HERO_VERTICAL: { readonly [character: number]: VerticalPhysics | undefined } = {
+  [Character.warden]: {
+    gravity: melee(0.17000000178813934),
+    terminalSpeed: melee(3.0999999046325684),
+    fastFallSpeed: melee(3.5),
+    fullJumpSpeed: melee(4.0),
+    shortJumpSpeed: melee(1.899999976158142),
+    aerialJumpSpeed: melee(4.0),
+  },
+};
+
 const meleeSpread = (value: number, spread: readonly [number, number]): number => Math.max(spread[0], Math.min(spread[1], value));
 
 function heroPhysics(character: Character): FighterPhysics {
@@ -254,6 +267,7 @@ function heroPhysics(character: Character): FighterPhysics {
     walkSpeed: meleeSpread(body.walkSpeed ?? f32(reference.walkSpeed * body.run), MELEE_WALK_SPEED_SPREAD),
     airSpeed: f32(REFERENCE_AIR_SPEED * body.air),
     traction: body.traction === undefined ? reference.traction : melee(body.traction),
+    ...HERO_VERTICAL[character],
   };
   heroPhysicsRecords[character] = physics;
   return physics;

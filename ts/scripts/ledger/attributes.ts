@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 import { CHARACTER_ATTRIBUTES_URL, type CharacterAttributes, readCharacterAttributes } from "../../../references/melee-frame-data/character-attributes";
 import { Character } from "../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../src/game/sim/heroes/registry";
-import { AUTHORED_PHYSICS, type FighterPhysics, WORLD_UNITS_PER_MELEE_UNIT, authoredPhysics, melee } from "../../src/game/sim/tuning";
+import { AUTHORED_PHYSICS, type FighterPhysics, HERO_VERTICAL, WORLD_UNITS_PER_MELEE_UNIT, authoredPhysics, melee } from "../../src/game/sim/tuning";
 import { type FamilyNote, type LedgerRow, PARITY, type ReadSource, type Status, sameValue, shortNumber } from "./row";
 
 const TUNING = "ts/src/game/sim/tuning.ts";
@@ -64,6 +64,15 @@ const FALCO = meleeFighter("Falco");
 
 const valuesText = (values: readonly number[]): string => values.map(shortNumber).join("/");
 
+const VERTICAL: ReadonlySet<string> = new Set(["gravity", "terminal", "fast-fall", "full-jump", "short-jump", "double-jump"]);
+const ownVertical = (character: Character): boolean => HERO_VERTICAL[character] !== undefined;
+
+function anchor(character: Character, attribute: Attribute): LedgerRow["anchor"] {
+  if (attribute.body === true && character !== Character.rifleman && character !== Character.demonHunter) return { file: BODIES, symbol: "HERO_BODIES" };
+  if (ownVertical(character) && VERTICAL.has(attribute.key)) return { file: TUNING, symbol: "HERO_VERTICAL" };
+  return { file: TUNING, symbol: "AUTHORED_PHYSICS" };
+}
+
 function attributeRow(character: Character, attribute: Attribute): LedgerRow {
   const all = MELEE.flatMap(attribute.melee);
   const id = `${fighterSlug(character)}-${attribute.key}`;
@@ -76,7 +85,7 @@ function attributeRow(character: Character, attribute: Attribute): LedgerRow {
       source: CHARACTER_ATTRIBUTES_URL,
     },
     ours: () => attribute.ours(authoredPhysics(character)),
-    anchor: original || attribute.body !== true ? { file: TUNING, symbol: "AUTHORED_PHYSICS" } : { file: BODIES, symbol: "HERO_BODIES" },
+    anchor: anchor(character, attribute),
     status: STATUS[id] ?? PARITY,
   };
 }
@@ -101,10 +110,11 @@ export function sharedRecordNote(read: ReadSource): FamilyNote {
   const show = (field: (p: FighterPhysics) => number): string => shortNumber(field(reference));
   const [gravity, fastFall, fullJump, shortJump] = SHARED.map(({ ours }) => show(ours));
   const heroes = SELECTABLE_CHARACTERS.filter((character) => character !== Character.rifleman && character !== Character.demonHunter);
+  const own = heroes.filter(ownVertical);
   const problems = [
     ...(index < 0 ? [`attributes: the shared reference record no longer resolves in ${TUNING}`] : []),
     ...SHARED.filter(({ ours, fox }) => !sameValue(ours(reference), fox)).map(({ name, fox }) => `attributes: the shared record's ${name} is no longer Fox's ${shortNumber(fox)}`),
-    ...heroes.flatMap((character) => INHERITED.filter((field) => authoredPhysics(character)[field] !== reference[field]).map((field) => `attributes: ${fighterName(character)} no longer inherits the shared record's ${field}`)),
+    ...heroes.flatMap((character) => INHERITED.filter((field) => !(field in (HERO_VERTICAL[character] ?? {})) && authoredPhysics(character)[field] !== reference[field]).map((field) => `attributes: ${fighterName(character)} no longer inherits the shared record's ${field}`)),
   ];
   return {
     family: "attributes",
@@ -112,7 +122,8 @@ export function sharedRecordNote(read: ReadSource): FamilyNote {
     lines: [
       `Every hero but Illidan and Rifleman inherits the shared \`reference\` record ([tuning.ts:${line}](../../${TUNING}#L${line})): its gravity ${gravity},`,
       `fast fall ${fastFall} and jumps ${fullJump}/${shortJump} are Fox's, and so are its terminal speed, jump squat, double jump, air acceleration`,
-      "and air friction. A hero's body in `heroBodies.ts` sets only its weight, walk, dash and run speed, air speed and traction.",
+      "and air friction. A hero's body in `heroBodies.ts` sets only its weight, walk, dash and run speed, air speed and traction;",
+      `${own.map(fighterName).join(", ")} instead ${own.length === 1 ? "takes" : "take"} gravity, terminal and fast-fall speed and jump velocities from \`HERO_VERTICAL\`.`,
       `Each block compares a fighter with Melee's spread across the ${MELEE.length} fighters in the [character attributes](${CHARACTER_ATTRIBUTES_URL}),`,
       "in Melee units, with Fox's and Falco's values beside it; a value outside the spread is a deviation or an open row.",
     ],
