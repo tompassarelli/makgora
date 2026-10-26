@@ -13,6 +13,7 @@ import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
 import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "../../src/game/sim/moves";
 import { ASDI_TRAVEL, HIT_TRAVEL, SDI_PULSE_TRAVEL, SDI_STEP_TRAVEL, STRING_TRAVEL } from "../../src/game/sim/smashDirectionalInfluence";
 import { WEAK_HIT_DAMAGE_SCALE, WEAK_HIT_KNOCKBACK_SCALE } from "../../src/game/sim/strongHits";
+import { MAX_PERCENT } from "../../src/game/sim/percent";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../../src/game/sim/tuning";
 import { FIGHTCORE_URL } from "../../../references/melee-frame-data/fightcore";
 import { MELEE_PERCENT_LIMIT, compareThresholds } from "../meleeThresholds";
@@ -79,6 +80,15 @@ function setKnockback(): string {
   if (differs === undefined) return MELEE_SET_KNOCKBACK;
   const fixed = grid.every(({ weight, growth }) => effectKnockback({ growth, base: 10, setKnockback: 60 }, 80, 12, weight) === 60);
   return fixed ? "the knockback itself, whatever the weight, growth and base" : `differs at weight ${differs.weight}, growth ${differs.growth}`;
+}
+
+function percentAfterHit(percent: number, damage: number): number {
+  const s: Scene = solo(0, Character.rifleman);
+  fighter(s, 0).status.damage = percent;
+  beginDamageContacts();
+  collectDamageContact(s.world, 1, 0, { ...FREEZE_HIT, damage }, 1, ContactKind.launch, true, undefined, false);
+  finishDamageContacts(s.world);
+  return fighter(s, 0).status.damage;
 }
 
 const meleeHitlag = (damage: number): number => Math.floor(damage / 3 + 3);
@@ -297,10 +307,10 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     status: { kind: "open", reason: "ours: one global ratio instead of per-hitbox values", issue: 293 },
   },
   {
-    id: "percent-cap", family: "hits", name: "Percent cap",
-    melee: { value: 999, source: wiki("Damage") }, ours: () => "none",
-    anchor: { file: "ts/src/game/sim/contacts.ts", symbol: "resolveDamageContacts" },
-    status: { kind: "open", reason: "missing: percent grows without a ceiling", issue: 293 },
+    id: "percent-cap", family: "hits", name: "Percent cap, probed headless: a 50% hit at 980%",
+    melee: { value: 999, source: wiki("Damage") }, ours: () => percentAfterHit(980.0, 50.0),
+    anchor: { file: "ts/src/game/sim/percent.ts", symbol: "MAX_PERCENT" },
+    status: PARITY,
   },
   {
     id: "fox-fixture-hurtbox", family: "hits", name: "Fox fixture hurtbox: no public source",

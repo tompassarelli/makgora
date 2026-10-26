@@ -47,6 +47,7 @@ import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
 import { gainMana } from "./mana";
+import { capPercent } from "./percent";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactIsSpell, contactTraits } from "./identityTraits";
@@ -265,7 +266,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       damageObserver?.(contact.source, contact.target, contact.effect.damage);
     }
   }
-  const postHitPercent = addFloat32(toInt(max(0.0, roundToFloat32(status.damage))), totalDamage);
+  const postHitPercent = capPercent(addFloat32(toInt(max(0.0, roundToFloat32(status.damage))), totalDamage));
   for (let index = 0; index < batch.count; index++) {
     const contact = contactAt(index);
     if (contact.target !== slot) continue;
@@ -334,7 +335,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       launch.hitlag = max(launch.hitlag, launch.hitlagFrames);
     }
   }
-  status.damage = addFloat32(roundToFloat32(status.damage), totalDamage);
+  status.damage = capPercent(addFloat32(roundToFloat32(status.damage), totalDamage));
   if (blockedContact) {
     target.visuals.shieldElectric = shieldElectric;
     if (perfectShield) {

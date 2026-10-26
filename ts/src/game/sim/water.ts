@@ -18,6 +18,7 @@ import { clearDownState } from "./transitions";
 import { stageBounds } from "./stageBounds";
 import { checkBlastZone } from "./stocks";
 import { mutableWater } from "./fighterRest";
+import { capPercent } from "./percent";
 
 
 export const HYDRA_TRIGGER_FRAMES = 150;
@@ -143,7 +144,7 @@ export function advanceWater(world: Roster, stage: number, matchFrame: number, h
 
 function hydraCatch(world: Roster, slot: number, stage: number): void {
   const f = fighterAt(world, slot);
-  f.status.damage = f32(f.status.damage + HYDRA_CATCH_DAMAGE);
+  f.status.damage = capPercent(f32(f.status.damage + HYDRA_CATCH_DAMAGE));
   f.motion.z = f32(stageBounds(stage).blast.bottom - 1.0);
   setWorldMotionValue(f.motion.meleeZ, f.motion.z);
   checkBlastZone(world, slot, stage);

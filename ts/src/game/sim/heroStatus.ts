@@ -14,6 +14,7 @@ import { type Controls, copyControls, neutralControls } from "./roster";
 import { cancelAttack, cancelSpecialState } from "./transitions";
 import { HERO_STATUS_GROUPS, HeroStatusKind, type HeroStatusGroup, SpecialAction } from "./codes";
 import { ROSTER_MANA, drainMana } from "./mana";
+import { capPercent } from "./percent";
 
 
 
@@ -153,7 +154,7 @@ export function advanceHeroConditions(f: Fighter): void {
   const { status } = f;
   if (status.poisonFrames > 0) {
     status.poisonFrames--;
-    if (floorMod(status.poisonFrames, status.poisonEvery) === 0) status.damage = addFloat32(roundToFloat32(status.damage), status.poisonDamage);
+    if (floorMod(status.poisonFrames, status.poisonEvery) === 0) status.damage = capPercent(addFloat32(roundToFloat32(status.damage), status.poisonDamage));
   }
   for (let group = 0; group < HERO_STATUS_GROUPS; group++) {
     const left = status.conditionImmunity[group] ?? 0;
