@@ -32,6 +32,8 @@ import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
 import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 import { mutableBear } from "./fighterRest";
+import { heavyFall } from "./itemBuffs";
+import { squareRoot } from "./warcraftMath";
 
 
 export const DEMONHUNTER_MANA_BURN_STARTUP = 16;
@@ -77,12 +79,14 @@ export const CHAOS_STRIKE_FIRST = 5;
 export const CHAOS_STRIKE_LAST = 8;
 export const CHAOS_STRIKE_FRAMES = 30;
 const CHAOS_STRIKE_LANDING_LAG = 12;
-export const DEMONHUNTER_WING_STARTUP = 3;
-export const DEMONHUNTER_WING_DURATION = 28;
+export const DEMONHUNTER_WING_STARTUP = 7;
+export const DEMONHUNTER_WING_DURATION = 32;
+const DEMONHUNTER_WING_SPEED = 30.0;
+const DEMONHUNTER_WING_EX_SPEED = 37.5;
 
 
-export const DEMONHUNTER_DIVE_FIRST = 15;
-export const DEMONHUNTER_DIVE_LAST = 27;
+export const DEMONHUNTER_DIVE_FIRST = 19;
+export const DEMONHUNTER_DIVE_LAST = 31;
 export const DEMONHUNTER_BACKFLIP_FORM = 1;
 export const DEMONHUNTER_DIVE_FORM = 2;
 export const DEMONHUNTER_BACKFLIP_FRAMES = 6;
@@ -306,7 +310,7 @@ export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
   if (special.action === SpecialAction.demonHunterFelRush) {
     return special.form === 0 ? special.frame < FEL_RUSH_LAST : special.form === VENGEFUL_RETREAT_FORM && special.frame < VENGEFUL_RETREAT_MOVE_LAST;
   }
-  return special.action === SpecialAction.demonHunterWingAscent && special.form !== 0;
+  return special.action === SpecialAction.demonHunterWingAscent;
 }
 
 
@@ -396,6 +400,46 @@ function stopFelRushAtShields(world: Roster, slot: number): void {
 }
 
 
+function aimWingAscent(owner: Fighter, input: Readonly<Controls> | undefined): void {
+  const { special } = owner;
+  const analog = input !== undefined && input.diStickValid && (input.diStickX !== 0 || input.diStickZ !== 0);
+  const x = input === undefined ? 0.0 : analog ? input.diStickX : sign(input.direction);
+  const z = input === undefined ? 0.0 : analog ? input.diStickZ : sign(input.verticalDirection);
+  const length = squareRoot(f32(f32(x * x) + f32(z * z)));
+  special.aimX = length > 0.0 ? f32(x / length) : 0.0;
+  special.aimZ = length > 0.0 ? f32(z / length) : 1.0;
+  if (special.aimX !== 0) owner.facing = special.aimX < 0 ? -1 : 1;
+}
+
+export function wingAscentSpeed(owner: Readonly<Fighter>, frame: number): number {
+  const launch = owner.special.ex ? DEMONHUNTER_WING_EX_SPEED : DEMONHUNTER_WING_SPEED;
+  return max(0.0, f32(launch - f32((frame - DEMONHUNTER_WING_STARTUP + 1) * heavyFall(owner, owner.tuning.physics.gravity))));
+}
+
+export function wingAscentReach(owner: Readonly<Fighter>): number {
+  let reach = 0.0;
+  for (let frame = DEMONHUNTER_WING_STARTUP; frame < DEMONHUNTER_WING_DURATION; frame++) reach = f32(reach + wingAscentSpeed(owner, frame));
+  return reach;
+}
+
+function advanceWingAscent(owner: Fighter, input: Readonly<Controls> | undefined): void {
+  const { motion, special } = owner;
+  if (special.frame < DEMONHUNTER_WING_STARTUP) {
+    motion.vx = 0.0;
+    motion.vz = 0.0;
+    return;
+  }
+  if (special.frame === DEMONHUNTER_WING_STARTUP) {
+    aimWingAscent(owner, input);
+    launchUpward(owner);
+    owner.status.invincible = max(owner.status.invincible, 4);
+  }
+  if (special.frame >= special.duration) return;
+  const speed = wingAscentSpeed(owner, special.frame);
+  motion.vx = f32(special.aimX * speed);
+  motion.vz = f32(special.aimZ * speed);
+}
+
 function advanceWingDive(owner: Fighter): void {
   const { motion, special } = owner;
   if (motion.grounded) {
@@ -450,9 +494,11 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
   if (action === SpecialAction.demonHunterWingAscent) {
     startSpecialAction(owner, action, DEMONHUNTER_WING_DURATION, moveX);
     special.cooldowns[action] = 90;
-    motion.vx = f32(moveX * 5.0);
-    motion.vz = 30.0;
-    launchUpward(owner);
+    special.aimX = 0.0;
+    special.aimZ = 1.0;
+    motion.vx = 0.0;
+    motion.vz = 0.0;
+    if (!motion.grounded) owner.jump.remaining = 0;
     owner.jump.squat = 0;
     return true;
   }
@@ -679,12 +725,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   if (special.action === SpecialAction.demonHunterWingAscent && special.form !== 0) advanceWingDive(owner);
   if (special.action === SpecialAction.demonHunterFelRush) advanceFelRush(owner);
   if (special.action === SpecialAction.demonHunterImmolate) stallImmolate(owner);
-  if (special.action === SpecialAction.demonHunterWingAscent && special.form === 0 && special.frame === DEMONHUNTER_WING_STARTUP) {
-    motion.vz = special.ex ? 37.5 : 30.0;
-    motion.vx = f32(f32(special.direction * 5.0) * (special.ex ? 1.25 : 1.0));
-    launchUpward(owner);
-    owner.status.invincible = max(owner.status.invincible, 4);
-  }
+  if (special.action === SpecialAction.demonHunterWingAscent && special.form === 0) advanceWingAscent(owner, input);
   if (special.action === SpecialAction.riflemanBear && special.frame >= RIFLEMAN_BEAR_SUMMON_FRAMES) endSpecialAction(owner, false);
   if (special.action === SpecialAction.riflemanRecovery && special.frame >= RIFLEMAN_RECOVERY_FRAMES) endSpecialAction(owner, true);
   if (special.action === SpecialAction.riflemanTrap && special.frame >= TRAP_SET_FRAMES) endSpecialAction(owner, false);

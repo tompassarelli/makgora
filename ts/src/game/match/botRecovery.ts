@@ -14,7 +14,7 @@ import type { Fighter } from "../sim/fighter";
 import { totalVelocityZ } from "../sim/motion";
 import { wet } from "../sim/water";
 import { SEA_SURFACE_Z, tideNextDirection } from "../sim/stageHazards";
-import { RIFLEMAN_RECOVERY_STARTUP_FRAMES } from "../sim/specials";
+import { DEMONHUNTER_WING_STARTUP, RIFLEMAN_RECOVERY_STARTUP_FRAMES, wingAscentReach } from "../sim/specials";
 import type { Controls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZ, surfaceCount, surfaceLeft, surfacePass, surfaceRight, surfaceZ, surfaceZAt } from "../sim/stage";
 import { botChance, botChoice } from "./botRandom";
@@ -178,6 +178,10 @@ function aimUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: 
     if (f.special.frame < RIFLEMAN_RECOVERY_STARTUP_FRAMES) input.verticalDirection = 1;
     return;
   }
+  if (f.special.action === SpecialAction.demonHunterWingAscent) {
+    if (f.special.form === 0 && f.special.frame < DEMONHUNTER_WING_STARTUP) aimEightWay(f, stage, side, wingAscentReach(f), input);
+    return;
+  }
   if (f.special.action !== SpecialAction.heroUp) return;
   const move = runningHeroSpecial(f);
   if (move?.motion?.some((segment) => segment.steer !== undefined) === true) {
@@ -190,6 +194,10 @@ function aimUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: 
     if (segment.aimedSpeed !== undefined) reach = f32(reach + f32(segment.aimedSpeed * (segment.last - segment.first + 1)));
   }
   if (reach <= 0.0) return;
+  aimEightWay(f, stage, side, reach, input);
+}
+
+function aimEightWay(f: Readonly<Fighter>, stage: number, side: number, reach: number, input: Controls): void {
   const left = mainDeckLeft(stage);
   const right = mainDeckRight(stage);
   const floor = mainDeckZ(stage);

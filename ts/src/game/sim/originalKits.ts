@@ -46,7 +46,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
         forms: [{ form: VENGEFUL_RETREAT_FORM, name: "Vengeful Retreat" }, { form: CHAOS_STRIKE_FORM, name: "Chaos Strike" }, { form: CHAOS_STRIKE_AIR_FORM, name: "Aerial Chaos Strike" }],
       },
       {
-        action: SpecialAction.demonHunterWingAscent, name: "Wing Ascent", description: "Rise on his wings; press special near the top to flip back and dive the way you hold, forward and down by default.",
+        action: SpecialAction.demonHunterWingAscent, name: "Wing Ascent", description: "Spread his wings, then launch the way you hold, straight up by default; press special near the top to flip back and dive the way you hold, forward and down by default.",
         forms: [{ form: DEMONHUNTER_BACKFLIP_FORM, name: "Backflip" }, { form: DEMONHUNTER_DIVE_FORM, name: "Wing Dive" }],
       },
       {

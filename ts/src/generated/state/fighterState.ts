@@ -1430,8 +1430,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   if (tuning.specials !== undefined) {
     sink.int(prefix, "specialForm", special.form);
     if (special.variant !== 0) sink.int(prefix, "specialVariant", special.variant);
-    sink.int(prefix, "specialAimX", special.aimX);
-    sink.int(prefix, "specialAimZ", special.aimZ);
+    sink.real(prefix, "specialAimX", special.aimX);
+    sink.real(prefix, "specialAimZ", special.aimZ);
     if (special.beamX !== 0 || special.beamZ !== 0 || 1 / special.beamX < 0 || 1 / special.beamZ < 0) {
       sink.real(prefix, "specialBeamX", special.beamX);
       sink.real(prefix, "specialBeamZ", special.beamZ);

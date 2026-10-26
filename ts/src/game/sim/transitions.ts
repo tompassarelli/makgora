@@ -166,8 +166,8 @@ export function clearSpecialOnStock(f: Fighter): void {
   restProjectiles(f, f.character);
   special.form = 0;
   special.variant = 0;
-  special.aimX = 0;
-  special.aimZ = 0;
+  special.aimX = 0.0;
+  special.aimZ = 0.0;
   special.beamX = 0.0;
   special.beamZ = 0.0;
   special.beamLength = 0.0;
