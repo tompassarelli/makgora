@@ -1,8 +1,8 @@
 import { resolve } from "node:path";
 import { FIGHTCORE_URL, type FightCoreRow, readFightCore } from "../../../references/melee-frame-data/fightcore";
 import { Action } from "../../src/game/input/actions";
-import { fighter, frame, scene, solo } from "../../src/game/match/padScene";
-import { AttackStyle, Character, ContactKind, GrabAction, SpecialAction } from "../../src/game/sim/codes";
+import { fighter, frame, framesUntil, scene, solo, tumbling } from "../../src/game/match/padScene";
+import { AttackStyle, Character, ContactKind, GrabAction, SpecialAction, SurfaceContact } from "../../src/game/sim/codes";
 import {
   DOWN_ATTACK_INTANGIBLE_FRAMES_DOWN, DOWN_ATTACK_INTANGIBLE_FRAMES_UP, DOWN_RECOVERY_INTANGIBLE_FRAMES, DOWN_ROLL_INTANGIBLE_FRAMES_BACK_DOWN,
   DOWN_ROLL_INTANGIBLE_FRAMES_BACK_UP, TECH_INTANGIBLE_FRAMES, TECH_ROLL_INTANGIBLE_FRAMES, WALL_TECH_STARTUP_FRAMES,
@@ -22,6 +22,7 @@ import {
   SHIELD_BREAK_RESTORED_ENERGY, SHIELD_REGEN_PER_FRAME, SHIELD_RELEASE_LAG_FRAMES, digitalShieldstunFrames, shieldContactPushbackMelee, shieldDrain,
   shieldSizeMultiplier,
 } from "../../src/game/sim/shield";
+import { mainDeckRight } from "../../src/game/sim/stage";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES } from "../../src/game/sim/surfaces";
 import { AUTHORED_TECH_TIMING } from "../../src/game/sim/tuning";
 import { type LedgerRow, PARITY, type Value, probe, range, shortNumber } from "./row";
@@ -56,6 +57,12 @@ function fightCoreFrames(moves: readonly string[]): Value {
   const others = [...totals].filter(([, frames]) => frames.some((total) => total !== fox)).map(([character]) => character);
   const which = others.length <= 6 ? `: ${others.join(", ")}` : "";
   return `Fox ${fox}; ${others.length} of ${totals.size} fighters differ${which}; ${least}-${most}`;
+}
+
+function foxFrames(move: string): number {
+  const fox = FIGHT_CORE.find((row) => row.section === "Getups/Techs" && row.character === "Fox" && row.move === move)?.totalFrames;
+  if (fox === undefined || fox === null) throw new Error(`fightcore.csv has no Fox ${move} total`);
+  return fox;
 }
 
 const meleeShieldstun = (damage: number, perDamage: number): number => Math.floor(((perDamage * damage + 2) * 200) / 201);
@@ -119,6 +126,24 @@ function throwWeight(): string {
   const speeds = THROW_PROBE_WEIGHTS.map(throwLaunchSpeed);
   if (speeds.every((speed) => speed === speeds[0])) return `knockback hits at weight ${shortNumber(THROW_KNOCKBACK_WEIGHT)}`;
   return THROW_PROBE_WEIGHTS.map((weight, n) => `weight ${shortNumber(weight)}: ${shortNumber(speeds[n] ?? 0)}`).join("; ");
+}
+
+const WALL_TECH_PROBE_FRAMES = 40;
+
+// The wall contact is frame 1; the tech's last frame is the one before an attack pressed alone first starts.
+function wallTechLastFrame(): number {
+  for (let at = 2; at <= WALL_TECH_PROBE_FRAMES; at++) {
+    const s = solo(0, Character.rifleman);
+    const f = fighter(s);
+    tumbling(f, mainDeckRight(0) + 30.0, -30.0);
+    f.launch.knockbackX = -18.0;
+    framesUntil(s, () => f.surfaceRecovery.contactSerial > 0, 10, (n) => n === 1 ? [Action.leftTrigger] : []);
+    if (f.surfaceRecovery.state !== SurfaceContact.techWall) throw new Error("the probe's fighter did not tech the wall");
+    for (let n = 2; n < at; n++) frame(s, []);
+    frame(s, [Action.attack]);
+    if (f.attack.style !== undefined) return at - 1;
+  }
+  throw new Error(`a wall tech was still not actionable on frame ${WALL_TECH_PROBE_FRAMES}`);
 }
 
 export const DEFENCE_ROWS: readonly LedgerRow[] = [
@@ -197,10 +222,9 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     anchor: { file: "ts/src/game/sim/tuning.ts", symbol: "AUTHORED_TECH_TIMING" }, status: PARITY,
   },
   {
-    id: "wall-tech-frames", family: "defence", name: "Wall tech, total frames, fightcore.csv",
-    melee: { value: fightCoreFrames(["Tech-Wall"]), source: FIGHTCORE_URL }, ours: () => AUTHORED_TECH_TIMING.wallAnimationEndFrame,
-    anchor: { file: "ts/src/game/sim/tuning.ts", symbol: "AUTHORED_TECH_TIMING" },
-    status: { kind: "open", reason: "ours ends the wall tech on frame 26, short of fightcore.csv's Tech-Wall total", issue: 293 },
+    id: "wall-tech-frames", family: "defence", name: `Wall tech, total frames, probed headless (the frame before an attack first starts) against Fox in fightcore.csv: ${fightCoreFrames(["Tech-Wall"])}`,
+    melee: { value: foxFrames("Tech-Wall"), source: FIGHTCORE_URL }, ours: wallTechLastFrame,
+    anchor: { file: CONDITIONS, symbol: "surfaceTechLocksActions" }, status: PARITY,
   },
   {
     id: "wall-tech-intangibility", family: "defence", name: "Wall and ceiling tech: hang and intangibility",

@@ -1471,7 +1471,10 @@ offscreen damage and an off-camera KO without changing combat completion.
 A wall tech holds the fighter on the wall for five frames, then pushes it off
 away from the wall, or, when jump was pressed in the last 20 frames or the
 stick is up, launches a wall jump sideways and up; then air friction and
-gravity act as usual. Each fighter takes these from its Melee reference, in
+gravity act as usual. A wall tech that pushes off holds every action until it
+ends: it is actionable on frame 32, counting the wall contact as frame 1
+(Fox's Tech-Wall total of 31, fightcore.csv), while the wall tech's jump frees
+the fighter once the hang ends. Each fighter takes these from its Melee reference, in
 Melee units a frame, from SuperCombo Wiki's attributes
 (smashcraft:references/melee-frame-data/character-attributes.csv: "Wall Tech
 Bounce Back", "Walljump H/V Velocity", "Ceiling Tech - X momentum"):

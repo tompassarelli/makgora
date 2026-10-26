@@ -66,9 +66,10 @@ export function inEarlyAscent(f: Readonly<Fighter>): boolean {
 }
 
 
-export function inSurfaceTechStartup(f: Fighter): boolean {
-  const { state, frame } = f.surfaceRecovery;
-  return state === SurfaceContact.techCeiling || (state === SurfaceContact.techWall && frame < WALL_TECH_STARTUP_FRAMES);
+/** A wall tech holds its fighter until it ends, as Melee's does; a wall jump out of one frees it once the hang ends. */
+export function surfaceTechLocksActions(f: Fighter): boolean {
+  const { state, frame, wallJumpQueued } = f.surfaceRecovery;
+  return state === SurfaceContact.techCeiling || (state === SurfaceContact.techWall && (!wallJumpQueued || frame < WALL_TECH_STARTUP_FRAMES));
 }
 
 export function isIntangible(f: Fighter): boolean {
@@ -93,7 +94,7 @@ export function isIntangible(f: Fighter): boolean {
 }
 
 export function canStartAttack(attacker: Fighter, allowJumpSquat = false): boolean {
-  if (inSurfaceTechStartup(attacker)) return false;
+  if (surfaceTechLocksActions(attacker)) return false;
   const { grab, shield } = attacker;
   if (grab.target !== undefined || grab.action !== GrabAction.none) return false;
   if (attacker.status.frozenFrames > 0) return false;
