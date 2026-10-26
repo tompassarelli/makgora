@@ -1191,6 +1191,16 @@ smashcraft:ts/src/game/presentation/drillClipInfo.ts with its pins. The pool
 exporter reuses the exact retained source prefix and exports just the three
 new sequences. Native playback decides their final appearance.
 
+Warden's drill is then re-authored in place by
+smashcraft:tools/animations/warden-drill.ts as Maiev's Fox-style drill (#507),
+matching her down air's hit regions on the line 30 degrees off vertical toward
+her facing. The spin pivots on her body line, so her feet stay on that line
+while she turns; only the arms carry the per-turn pulse, since a pulse on the
+hips or legs turns with the spin and swings the feet off the axis. Warden's
+`Cape_*` helpers bind no vertices: her cloth is the `Mesh` bone chains under
+her shoulders (cape strands), chest (robe panels) and head (hood tail), which
+the drill lifts and flares radially, each link lagging its parent.
+
 ### Movement and recovery clips
 
 `bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` appends
