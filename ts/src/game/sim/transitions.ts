@@ -319,6 +319,14 @@ export function beginDownDamage(f: Fighter, hitstunFrames: number): void {
 }
 
 
+export function cancelJumpSquat(f: Fighter): void {
+  f.jump.squat = 0;
+  f.jump.dodgeQueued = false;
+  f.jump.dodgeX = 0;
+  f.jump.dodgeZ = 0;
+}
+
+
 export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: boolean): void {
   endDivineShield(attacker);
   const isDashGrab = style === DASH_GRAB_REQUEST;
@@ -335,12 +343,7 @@ export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: bo
     shield.raised = false;
     shield.heldFrames = 0;
   }
-  if (cancelsJumpSquat(resolvedStyle)) {
-    attacker.jump.squat = 0;
-    attacker.jump.dodgeQueued = false;
-    attacker.jump.dodgeX = 0;
-    attacker.jump.dodgeZ = 0;
-  }
+  if (cancelsJumpSquat(resolvedStyle)) cancelJumpSquat(attacker);
   attack.style = resolvedStyle;
   attack.dashGrab = isDashGrab;
   attack.pivotGrab = false;

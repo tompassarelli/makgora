@@ -312,8 +312,7 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
   {
     id: "up-special-out-of-shield", family: "defence", name: "Up special out of shield, probed headless",
     melee: { value: "from jump squat", source: wiki("Out_of_shield") }, ours: upSpecialOutOfShield,
-    anchor: { file: CONDITIONS, symbol: "cancelsJumpSquat" },
-    status: { kind: "open", reason: "Melee cancels jump squat into an up special (a jump-cancelled up special out of shield); ours cancels it only into grab and up smash", issue: 293 },
+    anchor: { file: CONDITIONS, symbol: "canStartSpecial" }, status: PARITY,
   },
   {
     id: "grab-frames", family: "defence", name: "Standing grab, total frames, fightcore.csv",

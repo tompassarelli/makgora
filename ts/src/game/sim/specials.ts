@@ -5,7 +5,7 @@ import { canHit } from "./teams";
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, ProjectileKind, SPECIAL_ACTION_CAPACITY, SpecialAction, SurfaceContact } from "./codes";
-import { canAttack, isIntangible } from "./conditions";
+import { canAttack, canStartSpecial, isIntangible } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
 import { type Fighter, TURNAROUND_SPECIAL_WINDOW_FRAMES } from "./fighter";
 import {
@@ -17,7 +17,7 @@ import { heroSpecialMove, movementSpecial } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
 import { ROSTER_MANA, spendMana } from "./mana";
-import { cancelAttack } from "./transitions";
+import { cancelAttack, cancelJumpSquat } from "./transitions";
 import { applyAttackHit } from "./hits";
 import { meleeHitIntersectsShield } from "./attacks";
 import { observeActionDecision } from "./observations";
@@ -182,10 +182,10 @@ function requestedSpecial(owner: Fighter, input: Readonly<Controls>): SpecialAct
   }
 }
 
-function specialCanStart(owner: Fighter, action: SpecialAction): boolean {
+function specialCanStart(owner: Fighter, action: SpecialAction, specialZ: number): boolean {
   const { special } = owner;
   return action > SpecialAction.none && action < SPECIAL_ACTION_CAPACITY && at(special.cooldowns, action) <= 0
-    && special.lockFrames <= 0 && special.action === SpecialAction.none && canAttack(owner);
+    && special.lockFrames <= 0 && special.action === SpecialAction.none && canStartSpecial(owner, specialZ);
 }
 
 function launchUpward(owner: Fighter): void {
@@ -596,7 +596,7 @@ function originalMovementSpecial(action: SpecialAction): boolean {
 function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, world: Roster | undefined): boolean {
   const specials = owner.tuning.specials;
   const { special } = owner;
-  if (specials === undefined || special.lockFrames > 0 || special.action !== SpecialAction.none || !canAttack(owner)) return false;
+  if (specials === undefined || special.lockFrames > 0 || special.action !== SpecialAction.none || !canStartSpecial(owner, input.specialZ)) return false;
   let chosen = chooseHeroSpecial(owner, specials, input, heroRefusal, world);
 
   if (chosen === undefined && heroRefusal.groundOnly && input.specialX !== 0 && input.specialZ === 0) {
@@ -611,6 +611,7 @@ function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, worl
   if (input.specialX !== 0 && input.specialZ !== 0 && move.facesStick === true) owner.facing = input.specialX < 0 ? -1 : 1;
   const action = SpecialAction.heroNeutral + chosen.slot;
   startSpecialAction(owner, heroAction(action), move.endFrame, specialDirection(input, owner.facing));
+  cancelJumpSquat(owner);
   enterExSpecial(owner, input);
   if (!movementSpecial(enterHeroSpecial(owner, chosen, input)) && owner.motion.grounded) owner.motion.vx = 0.0;
   return true;
@@ -665,7 +666,7 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   const branched = originalSpecialBranch(owner, input);
   if (branched !== undefined) return branched;
   const requested = requestedSpecial(owner, input);
-  if (!specialCanStart(owner, requested)) return false;
+  if (!specialCanStart(owner, requested, input.specialZ)) return false;
   observeActionDecision(SPECIAL_ACTION_BIT);
   const facing = owner.facing;
   turnForSpecial(owner, input);
@@ -673,6 +674,7 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   const grounded = owner.motion.grounded;
   const started = startOriginalSpecial(owner, stage, matchFrame, requested, moveX);
   if (started) {
+    cancelJumpSquat(owner);
     if (grounded && !originalMovementSpecial(requested)) owner.motion.vx = 0.0;
     enterExSpecial(owner, input);
     if (requested === SpecialAction.demonHunterManaBurn && owner.special.ex && owner.motion.grounded) enterEyeBlast(owner);
