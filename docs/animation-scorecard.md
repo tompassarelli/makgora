@@ -23,6 +23,10 @@ fighter can act), so line 2 measures the transition the game draws.
    claw's travel toward the strike from windup to contact, as a fraction of
    body height. The class's
    mass shift still applies, and the cold reader (line 5) stays the bar.
+   A dash attack is its own class: the weapon tip may lead the shoulder
+   during the anticipation frames only, so the tip's draw-back beyond the
+   shoulder's own before the windup is left out of the tip travel that
+   body share divides by.
 2. **Return:** mean drawn-vertex error from ready on the final move frame,
    largest single-frame change from end lag through two following frames,
    and tip travel past contact along its incoming direction. Zero overshoot
@@ -141,6 +145,7 @@ Tom as better examples are authored.
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | jab | .41 | .15 | .053 | .029 | .029 | 1 | .86 | .36 |
 | tilt | .90 | .023 | .053 | .055 | .029 | 2 | .53 | .16 |
+| dash attack | .90 | .023 | .053 | .055 | .029 | 2 | .53 | .16 |
 | smash | .29 | .071 | .026 | .025 | .095 | 3 | .84 | .43 |
 | aerial | .29 | .023 | .008 | .015 | .12 | 3 | .53 | .25 |
 | special | .90 | .20 | .046 | .055 | .039 | 1 | .90 | .48 |
@@ -156,6 +161,14 @@ as a kick swings the foot from the hip, and the claw's own swing through
 at least 90° (#43) carries most of the tip's travel, so his shoulder cannot
 reach the tilt line's .90 body share. His up tilt, smashes, other aerials and
 specials, up special included, are carried by the body and keep body share.
+
+A dash attack is not a tilt (the proxy's ruling of 2026-10-26 under Tom's
+delegated judged-box rulings of 2026-10-25): three cold judges failed
+Medivh's and Murloc's dash attacks for lacking a weapon draw-back (#343,
+#345), while the tilt rule scored every Medivh candidate that drew the staff
+back below .90 (behind the hip .56, cocked upward .78). It keeps the tilt
+class's values and allows the draw-back instead: those two candidates score
+.92 and .96, and a dash attack whose shoulder stays planted still scores 0.
 
 Jab weight uses Lich King's second jab; smash weight/return use Malfurion's
 down smash; tilt weight uses Mountain King's angled up tilt and Thrall's

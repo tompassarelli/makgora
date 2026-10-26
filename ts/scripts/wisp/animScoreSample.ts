@@ -40,7 +40,7 @@ export const SCORED_NORMALS: readonly { readonly move: string; readonly style: A
   { move: "forward-tilt-down", style: AttackStyle.forwardTiltDown, moveClass: "tilt", aerial: false },
   { move: "up-tilt", style: AttackStyle.upTilt, moveClass: "tilt", aerial: false },
   { move: "down-tilt", style: AttackStyle.downTilt, moveClass: "tilt", aerial: false },
-  { move: "dash-attack", style: AttackStyle.dashAttack, moveClass: "tilt", aerial: false },
+  { move: "dash-attack", style: AttackStyle.dashAttack, moveClass: "dash-attack", aerial: false },
   { move: "forward-smash", style: AttackStyle.forwardSmash, moveClass: "smash", aerial: false },
   { move: "up-smash", style: AttackStyle.upSmash, moveClass: "smash", aerial: false },
   { move: "down-smash", style: AttackStyle.downSmash, moveClass: "smash", aerial: false },
