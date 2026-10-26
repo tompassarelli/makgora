@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-503 rows: 446 parity, 34 deviations, 23 open.
+503 rows: 447 parity, 34 deviations, 22 open.
 
 ## Deviations from Melee
 
