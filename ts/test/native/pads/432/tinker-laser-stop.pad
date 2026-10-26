@@ -1,0 +1,24 @@
+# #432 Tinker row (a4844fb): Laser stops a running Tinker dead on the ground, then a drifting Tinker in the air.
+#! chat -dev quick hero goblin tinker stocks 3
+20 a stick 1 0
+38 a capture
+40 a tap X 2
+40 a capture
+42 a stick 0 0
+60 a capture
+96 a capture
+150 a tap B 8
+158 a stick 1 0
+168 a capture
+170 a tap X 2
+170 a capture
+172 a stick 0 0
+180 a capture
+187 a capture
+300 a press VIEW
+370 a release VIEW
+#! expect a 40 ground-speed vx 0.000
+#! expect a 40 special 14 form 0 action-frame 1 x -33.691
+#! expect a 97 special 0 form 0 action-frame 0 x -33.691
+#! expect a 170 special 14 form 1 action-frame 1 x 9.989
+#! expect a 188 land lag 20 x 9.989

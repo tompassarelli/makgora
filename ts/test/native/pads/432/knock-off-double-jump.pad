@@ -1,0 +1,22 @@
+# #432 row 16: a stands on the deck near the left edge, b's forward smash knocks it off, and a gets exactly one double jump.
+#! chat -dev quick hero mountain king stocks 3
+20 a stick -1 0
+36 a stick 0 0
+40 b stick -1 0
+88 b stick 0 0
+120 b stick -1 0
+120 b tap A 2
+122 b stick 0 0
+129 a capture
+158 a tap B 4
+158 a capture
+166 a capture
+172 a tap B 4
+176 a capture
+186 a tap B 4
+190 a capture
+300 a press VIEW
+370 a release VIEW
+#! expect a 129 launch up 1 from-air 0
+#! expect a 158 applied jump 1 double 1
+#! absent a 159-234 applied jump

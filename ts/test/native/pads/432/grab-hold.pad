@@ -1,0 +1,41 @@
+# #432 row 17: b grabs a three times: at 0% a sits out the 90-frame hold; b jabs a to damage it and the hold grows by 1.75 frames a percent; a mashes the third grab down to the 60-frame floor.
+#! chat -dev quick hero mountain king stocks 3
+40 a stick 1 0
+68 a stick 0 0
+150 b tap RB 2
+157 b capture
+247 b capture
+280 b tap A 2
+300 b tap A 2
+320 b tap A 2
+345 a stick 1 0
+347 a stick 0 0
+450 b tap RB 2
+457 b capture
+568 b capture
+600 b tap RB 2
+604 a stick 1 0
+607 b capture
+607 a stick -1 0
+610 a stick 1 0
+613 a stick -1 0
+616 a stick 1 0
+619 a stick -1 0
+622 a stick 1 0
+625 a stick -1 0
+628 a stick 1 0
+631 a stick -1 0
+634 a stick 1 0
+637 a stick -1 0
+640 a stick 1 0
+643 a stick 0 0
+667 b capture
+760 a press VIEW
+830 a release VIEW
+#! expect b 157 grab-hold start
+#! expect b 247 grab-hold end
+#! expect a 305 damage 12.155
+#! expect b 457 grab-hold start
+#! expect b 568 grab-hold end
+#! expect b 607 grab-hold start
+#! expect b 667 grab-hold end
