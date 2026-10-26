@@ -101,7 +101,7 @@ for (const at of active) {
   const inside = leg.filter(([x, z]) => strikes.some((s) => distance(x, z, s) <= 0)).length / Math.max(1, leg.length);
   const tip = leg.reduce((far, point) => point[0] > far[0] ? point : far, [-Infinity, 0] as readonly [number, number]);
   const tipIn = strikes.some((s) => distance(tip[0], tip[1], s) <= 0);
-  console.log(`REKEY_LIMB ${fighter.name} ${pose} frame ${at}: ${(inside * 100).toFixed(1)}% of the ${side} lower leg inside the hit region, foot tip (${tip[0].toFixed(1)}, ${tip[1].toFixed(1)}) ${tipIn ? "inside" : "outside"}`);
+  console.log(`REKEY_LIMB ${fighter.name} ${pose} frame ${at}: ${(inside * 100).toFixed(1)}% of the ${side} lower leg inside the hit region, foot tip (${tip[0].toFixed(1)}, ${tip[1].toFixed(1)}) ${tipIn ? "inside" : "outside"}, leg x ${Math.min(...leg.map((p) => p[0])).toFixed(1)}..${tip[0].toFixed(1)} z ${Math.min(...leg.map((p) => p[1])).toFixed(1)}..${Math.max(...leg.map((p) => p[1])).toFixed(1)}`);
   if (inside < LIMB_INSIDE || !tipIn) outside.push(`the ${side} lower leg leaves the hit region on frame ${at}`);
 }
 const standPose = new DrawnModel(generateMDX(source), scale).triangles(source.Sequences.indexOf(stand), 0, 1).filter((_, i) => i % 2 === 1);

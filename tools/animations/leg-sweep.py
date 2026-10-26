@@ -101,7 +101,6 @@ LEG = (joint(f'knee.{kick}').head - HIP).length + (ANKLE[kick] - joint(f'knee.{k
 FLOOR = min(a.z for a in ANKLE.values())
 SIDE = 1 if kick == 'L' else -1
 TURN = -SIDE
-CLOTH_CLEARANCE = 14
 
 
 def pose(p):
@@ -138,7 +137,7 @@ def lift(node, turned):
         turned.matrix = start
         update()
         turn(turned, Quaternion(PITCH, radians(degrees)))
-        if lowest(node) >= floor:
+        if lowest(node) >= floor + MARGIN:
             return True
         tried.append((lowest(node), degrees))
     turned.matrix = start
@@ -150,6 +149,7 @@ def lift(node, turned):
 READY = {}
 OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}.json')).read())
 BEATS = OWN['beats']
+MARGIN = OWN.get('margin', 0)
 POINTS = spec['points']
 rest()
 REST_LOW = {node: lowest(bones[node]) for node, _ in OWN.get('clear', [])}
