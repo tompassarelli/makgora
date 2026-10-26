@@ -63,7 +63,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   upSmash: { contact: 17, z: 48, back: 24 },
   downSmash: { contact: 15, x: 10, back: 6 },
   neutralAir: { contact: 9, x: 12, back: 6 },
-  forwardAir: { contact: 12, x: 20, back: 10 },
+  forwardAir: { contact: 12, x: 20, back: 10, decay: 26 },
   backAir: { contact: 10, x: -70, back: 35 },
   dashAttack: { contact: 8, x: 56, back: 26, over: 0.4, ramp: 11, decay: 21 },
   downAir: { contact: 16, z: -12, back: 6 },
@@ -72,7 +72,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
 };
-interface Rake { contact: number; through: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
+interface Rake { contact: number; through: number; settle?: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
 const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
   windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
   strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
@@ -86,12 +86,12 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
   forwardTiltDown: { contact: 9, through: 12, windup: { chest: -20, pelvis: -12, lean: -10, arm: -230, elbow: 70, wrist: 40, leftArm: -60, head: -20 }, strike: { chest: 55, pelvis: 18, lean: 22, arm: -150, elbow: 40, wrist: 30, head: 15, leftArm: -60, thigh: 30, knee: -40 }, follow: { chest: 45, pelvis: 28, lean: 18, arm: -80, elbow: 100, wrist: 60, head: 15, leftArm: -60, thigh: 40, knee: -50, leftThigh: -20 }, carry: { frame: 20, gesture: { chest: 40, pelvis: 28, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -60, thigh: 35, knee: -45 } } },
   downTilt: { contact: 7, through: 10, windup: { chest: -15, pelvis: -10, lean: -8, arm: -220, elbow: 80, wrist: 40, leftArm: -40, head: -15, thigh: 20, knee: -30 }, strike: { chest: 55, pelvis: 20, lean: 22, arm: -130, elbow: 40, wrist: 30, hand: 0, head: 20, thigh: 40, knee: -50, leftArm: -60 }, follow: { chest: 20, pelvis: 20, arm: -40, elbow: 60, wrist: 70, hand: 30, head: 15, thigh: 35, knee: -45, leftArm: -60 }, carry: { frame: 18, gesture: { chest: 15, pelvis: 15, lean: -5, arm: 20, wrist: 30, head: 10, thigh: 30, knee: -40, leftArm: -60 } } },
   dashAttack: { contact: 8, through: 19, windup: { chest: -16, pelvis: -10, lean: -28, arm: -230, elbow: 70, wrist: 40, leftArm: -200, leftElbow: 60, head: -18, thigh: 25, knee: -35, leftThigh: 15, frontThigh: 15, leftFrontThigh: 15 }, strike: { chest: 8, arm: -80, elbow: -20, leftArm: -70, leftElbow: -20, head: 15, shieldTwist: 80, leftShieldTwist: 80, thigh: 50, knee: -10, leftThigh: 50, frontThigh: -45, leftFrontThigh: -45 }, follow: { chest: 28, lean: 12, arm: -35, elbow: 10, wrist: 30, leftArm: -25, leftElbow: 10, leftWrist: 40, head: 25, shieldTwist: 80, leftShieldTwist: 80, thigh: 72, knee: -22, leftThigh: 72, frontThigh: -66, leftFrontThigh: -66 }, carry: { frame: 19, gesture: { chest: 28, lean: 12, arm: -35, elbow: 10, wrist: 30, leftArm: -25, leftElbow: 10, leftWrist: 40, head: 25, shieldTwist: 80, leftShieldTwist: 80, thigh: 72, knee: -22, leftThigh: 72, frontThigh: -66, leftFrontThigh: -66 } } },
-  forwardAir: { contact: 12, through: 15, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
+  forwardAir: { contact: 12, through: 15, settle: 1, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
   backAir: { contact: 10, through: 13, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -45, pelvis: -30, lean: -20, arm: -100, elbow: 20, leftArm: -100 } },
   neutralSpecial: { contact: 18, through: 26, ...scythe(35, 15) },
   neutralSpecialAir: { contact: 18, through: 26, ...scythe(35, 15) },
-  downSpecial: { contact: 21, through: 31, ...scythe(35, 15) },
-  downSpecialAir: { contact: 21, through: 31, ...scythe(35, 15) },
+  downSpecial: { contact: 21, through: 31, settle: 2, ...scythe(35, 15) },
+  downSpecialAir: { contact: 21, through: 31, settle: 2, ...scythe(35, 15) },
   ultimate: { contact: 17, through: 25, ...scythe(33, 14) },
 };
 const swings: Partial<Record<HeroPose, readonly [windup: number, follow: number]>> = {
@@ -232,7 +232,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   const name = !action.pain ? `Anubarak ${action.pose}` : `Anubarak Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
-  const rake = rakes[action.pose], groundGesture = groundGestures.has(action.pose) && rake === undefined, lunge = lunges[action.pose], settled = action.pose.startsWith("downSpecial") ? action.frames - 2 : action.frames;
+  const rake = rakes[action.pose], groundGesture = groundGestures.has(action.pose) && rake === undefined, lunge = lunges[action.pose], settled = action.frames - (rake?.settle ?? 0);
   const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture || lunge || rake?.carry ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
