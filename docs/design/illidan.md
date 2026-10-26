@@ -462,8 +462,10 @@ Checked by `--objectives` from the ledge, against every DI:
   and from 80 past and 80 below (50-150%).
 - back air: Falco's offstage kill aerial, from 40 past the ledge (60-150%).
 
-Today 3 of 11 link rows hold. Both down air spikes kill against every DI;
-back air does not reach the victim 40 past the ledge.
+Today 3 of 11 link rows hold. Both down air spikes kill against every DI,
+and so does back air since it took Falco's back air knockback, 13% at base
+10 and growth 100, from 6% at base 18 and growth 85, which killed only at
+140-150% (#493, 2026-10-26).
 
 ### Body toward Falco
 

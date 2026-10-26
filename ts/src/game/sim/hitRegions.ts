@@ -131,7 +131,7 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
   [AttackStyle.forwardTiltDown]: { ...region(19.0, 134.0, -11.0, 78.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394), strike: { x1: 35.0, z1: 62.0, x2: 118.0, z2: 5.0, radius: 16.0 } },
   [AttackStyle.neutralAir]: region(-115.0, 115.0, -45.0, 100.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.forwardAir]: region(0.0, 175.0, -55.0, 115.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787),
-  [AttackStyle.backAir]: { ...region(-99.0, 4.0, 76.0, 114.0, 6.0, 85.0, 18.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: -85.0, z1: 100.0, x2: -10.0, z2: 90.0, radius: 14.0 } },
+  [AttackStyle.backAir]: { ...region(-99.0, 4.0, 76.0, 114.0, 13.0, 100.0, 10.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: -85.0, z1: 100.0, x2: -10.0, z2: 90.0, radius: 14.0 } },
   [AttackStyle.upAir]: { ...region(-40.0, 40.0, 30.0, 195.0, 8.0, 105.0, 19.0, 0.2199999988079071, 0.9750000238418579), strike: { x1: 0.0, z1: 70.0, x2: 0.0, z2: 155.0, radius: 40.0 } },
   [AttackStyle.downAir]: { ...region(-16.0, 22.0, -33.0, 48.0, 9.0, 100.0, 20.0, 0.1599999964237213, -0.9869999885559082), strike: { x1: 2.0, z1: 30.0, x2: 4.0, z2: -15.0, radius: 18.0 } },
 };
