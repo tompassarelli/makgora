@@ -125,8 +125,7 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     id: "tech-intangibility", family: "defence", name: "Tech intangibility, in place and roll",
     melee: { value: MELEE_TECH_INTANGIBILITY, source: wiki("Tech") },
     ours: () => techIntangibility(TECH_INTANGIBLE_FRAMES, TECH_ROLL_INTANGIBLE_FRAMES),
-    anchor: { file: CONDITIONS, symbol: "TECH_ROLL_INTANGIBLE_FRAMES" },
-    status: { kind: "open", reason: "ours gives the tech roll 14 more intangible frames than the tech in place; Melee gives both the same, and neither fightcore.csv nor SmashWiki has the count", issue: 293 },
+    anchor: { file: CONDITIONS, symbol: "TECH_ROLL_INTANGIBLE_FRAMES" }, status: PARITY,
   },
   {
     id: "missed-tech-bound", family: "defence", name: "Missed tech: frames bouncing on the floor (DownBound)",

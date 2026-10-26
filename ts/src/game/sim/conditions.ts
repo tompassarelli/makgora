@@ -20,7 +20,7 @@ export const DOWN_ROLL_INTANGIBLE_FRAMES_BACK_DOWN = 20;
 export const DOWN_ATTACK_INTANGIBLE_FRAMES_UP = 27;
 export const DOWN_ATTACK_INTANGIBLE_FRAMES_DOWN = 22;
 export const TECH_INTANGIBLE_FRAMES = 20;
-export const TECH_ROLL_INTANGIBLE_FRAMES = 34;
+export const TECH_ROLL_INTANGIBLE_FRAMES = 20;
 export const WALL_TECH_STARTUP_FRAMES = 5;
 
 export function isTumbling(f: Fighter): boolean {

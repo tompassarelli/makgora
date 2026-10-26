@@ -1148,7 +1148,7 @@ Factory moved from side to down special unchanged. The numbers and why:
   (`beamSegment` in smashcraft:ts/src/game/sim/specials/engine.ts). The
   fastest roster tech roll averages 9.09 units a frame while it moves (Warden,
   forward), and 11 is 1.2 times that, so the aim is waiting where a roll ends
-  when its 34 intangible frames run out: a tech chase. An air dodge opens at
+  when its 20 intangible frames run out: a tech chase. An air dodge opens at
   18.6 units a frame (Melee's 3.1) with frames 4–29 intangible, so it outruns
   the aim and passes through the beam: in the air the Laser forces the dodge
   rather than winning outright. Rolling behind him or leaving range escapes.

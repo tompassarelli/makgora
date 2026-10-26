@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-503 rows: 442 parity, 34 deviations, 27 open.
+503 rows: 443 parity, 34 deviations, 26 open.
 
 ## Deviations from Melee
 
@@ -157,7 +157,7 @@ deviation's reason, issue and decision date are written.
 | Tech lockout after a press `tech-lockout` | 40 | [40](https://www.ssbwiki.com/Tech) | [techInput.ts:6](../../ts/src/game/sim/geometry/techInput.ts#L6) `TECH_REPEAT_MINIMUM_AGE_FRAMES` | parity |
 | Tech in place, total frames, every fighter in fightcore.csv `tech-in-place-frames` | 26 | [26](https://www.fightcore.gg) | [down.ts:30](../../ts/src/game/sim/down.ts#L30) `TECH_IN_PLACE_FRAMES` | parity |
 | Tech roll, total frames, every fighter in fightcore.csv `tech-roll-frames` | 40 | [40](https://www.fightcore.gg) | [down.ts:31](../../ts/src/game/sim/down.ts#L31) `TECH_ROLL_FRAMES` | parity |
-| Tech intangibility, in place and roll `tech-intangibility` | in place 1-20, roll 1-34 | [the roll as long as in place; no public frame count](https://www.ssbwiki.com/Tech) | [conditions.ts:23](../../ts/src/game/sim/conditions.ts#L23) `TECH_ROLL_INTANGIBLE_FRAMES` | open: ours gives the tech roll 14 more intangible frames than the tech in place; Melee gives both the same, and neither fightcore.csv nor SmashWiki has the count (#293) |
+| Tech intangibility, in place and roll `tech-intangibility` | the roll as long as in place; no public frame count | [the roll as long as in place; no public frame count](https://www.ssbwiki.com/Tech) | [conditions.ts:23](../../ts/src/game/sim/conditions.ts#L23) `TECH_ROLL_INTANGIBLE_FRAMES` | parity |
 | Missed tech: frames bouncing on the floor (DownBound) `missed-tech-bound` | 26 | [not documented: fightcore.csv's Getups/Techs rows and SmashWiki's Tech page give no DownBound length](https://www.ssbwiki.com/Tech) | [down.ts:32](../../ts/src/game/sim/down.ts#L32) `DOWN_BOUND_FRAMES` | open: ours; no public source gives Melee's value (#293) |
 | Missed tech into the floor at speed `floor-rebound` | rebounds ×0.8, as off walls | [the fall stops](https://www.ssbwiki.com/Meteor_smash) | [surfaces.ts:17](../../ts/src/game/sim/surfaces.ts#L17) `SURFACE_REFLECT_ATTENUATION` | deviation: a missed tech keeps its momentum, so a hard spike can carry off the top (docs/physics.md, Floor bounces) (Tom 2026-10-15) |
 | Frames lying down before standing by itself `down-wait` | 220 | [not documented: not on SmashWiki](https://www.ssbwiki.com/Lock) | [down.ts:33](../../ts/src/game/sim/down.ts#L33) `DOWN_WAIT_FRAMES` | open: ours; no public source gives Melee's value (#293) |

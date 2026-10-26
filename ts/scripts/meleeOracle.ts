@@ -15,6 +15,7 @@ import { AttackStyle, Character, ContactKind, DownState, LedgeState, SurfaceCont
 import { isIntangible } from "../src/game/sim/conditions";
 import { beginDamageContacts, collectDamageContact, finishDamageContacts } from "../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
+import { setWorldMotionValue } from "../src/game/sim/motion";
 import { uncancelledLandingLag } from "../src/game/sim/moves";
 import { CANNON_TEST_STAGE, WIND_TEST_STAGE, DRIFTING_DECK_STAGE, MAIN_DECK_BODY_SURFACES, SOLID_DECK_TEST_STAGE, solidSurfaceAt, mainDeckRight, mainDeckZ, surfaceZ } from "../src/game/sim/stage";
 import { CANNON_Z, cannonX } from "../src/game/sim/stageHazards";
@@ -424,7 +425,41 @@ function techAfterRepeat(character: Character, gap: number): string {
   return tumbleLanding(character, 740.0, [landing - 1 - gap, landing - 1]).result;
 }
 
+const JAB_GAP = 30.0;
+
+function jabLead(): number {
+  const s = scene(0, [{ character: Character.rifleman, x: 0.0, facing: 1 }, { character: Character.rifleman, x: -JAB_GAP, facing: 1 }]);
+  const target = fighter(s, 0);
+  for (let n = 1; n <= 30; n++) {
+    frame(s, [], n === 1 ? [Action.attack] : []);
+    if (target.status.damage > 0) return n;
+  }
+  throw new Error("the jab never hit");
+}
+
+function techRollJabbed(character: Character, activeFrom: number): string {
+  const { landing } = tumbleLanding(character, 600.0, []);
+  const lead = jabLead();
+  const s = scene(0, [{ character, x: 0.0, facing: 1 }, { character: Character.rifleman, x: -400.0, facing: 1 }]);
+  const target = fighter(s, 0);
+  const attacker = fighter(s, 1);
+  tumbling(target, 0.0, 600.0);
+  for (let n = 1; n <= 300; n++) {
+    const rolling = target.down.state === DownState.techRoll;
+    if (rolling) {
+      attacker.motion.x = target.motion.x - JAB_GAP;
+      setWorldMotionValue(attacker.motion.meleeX, attacker.motion.x);
+    }
+    const struck = target.down.frame + 1;
+    const press = rolling && target.down.frame === activeFrom - lead;
+    frame(s, rolling ? [] : n === landing - 5 ? [Action.leftTrigger, Action.moveRight] : [Action.moveRight], press ? [Action.attack] : []);
+    if (target.status.damage > 0) return rolling ? `hit on frame ${struck}` : "hit outside the tech roll";
+  }
+  return "never hit";
+}
+
 const TECH_GATE = "tech: L/R press age under 20 frames and previous press interval at least 40";
+const TECH_INTANGIBLE = "a tech roll is intangible as long as a tech in place, frames 1-20 (#532)";
 
 const TECHS: readonly Scenario[] = [
   { area: "tech", name: "no tech press", cite: "missed tech enters DownBound", run: (c) => ({ expected: "knockdown", actual: techBeforeLanding(c, undefined) }) },
@@ -437,6 +472,8 @@ const TECHS: readonly Scenario[] = [
   },
   { area: "tech", name: "second press 40 frames after the first", cite: TECH_GATE, run: (c) => ({ expected: "knockdown", actual: techAfterRepeat(c, 40) }) },
   { area: "tech", name: "second press 41 frames after the first", cite: TECH_GATE, run: (c) => ({ expected: "tech", actual: techAfterRepeat(c, 41) }) },
+  { area: "tech", name: "jab active from tech roll frame 20", cite: TECH_INTANGIBLE, run: (c) => ({ expected: "hit on frame 21", actual: techRollJabbed(c, 20) }) },
+  { area: "tech", name: "jab active from tech roll frame 21", cite: TECH_INTANGIBLE, run: (c) => ({ expected: "hit on frame 21", actual: techRollJabbed(c, 21) }) },
 ];
 
 

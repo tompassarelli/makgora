@@ -136,7 +136,7 @@ Sources name the SmashWiki page unless marked: MFD is
 | Item | Our code | Ours | Melee and source | Status |
 |---|---|---|---|---|
 | Tech window and lockout | `ts/src/game/sim/geometry/techInput.ts:5-6,40-47` | 20, 40 | 20, 40 (Tech) | match |
-| Tech in place and roll | `ts/src/game/sim/down.ts:30-31,45`; `ts/src/game/sim/conditions.ts:21-22` | 26 frames, intangible 1-20; roll 40, 1-34; one profile | Per fighter (Tech; FC Getups/Techs rows) | deviation, shared profile |
+| Tech in place and roll | `ts/src/game/sim/down.ts:30-31,45`; `ts/src/game/sim/conditions.ts:21-22` | 26 frames, intangible 1-20; roll 40, 1-20; one profile | Per fighter (Tech; FC Getups/Techs rows) | deviation, shared profile |
 | Missed tech | `ts/src/game/sim/down.ts:32,169`; `ts/src/game/sim/step.ts:166-169` | DownBound 26 | Per fighter (Knockdown; FC Getups/Techs rows) | compare per fighter, #288 |
 | Floor rebound on missed tech | `ts/src/game/sim/down.ts:82-101`; `ts/src/game/sim/surfaces.ts:16-18` | Rebounds ×0.8 | Fall stops (Meteor smash) | deviation, Tom 2026-10-15 |
 | Down-wait timeout | `ts/src/game/sim/down.ts:33,185-192` | 220 then stand | Not on SmashWiki | no data |
