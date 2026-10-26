@@ -42,7 +42,7 @@ const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20
 const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
 const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
 const actions: Action[] = [];
-interface Strike { w: Gesture; c: Gesture; o: Gesture; r: Gesture; late: number; mid?: number; lead?: number; hold?: Gesture }
+interface Strike { w: Gesture; c: Gesture; o: Gesture; r: Gesture; late: number; mid?: number; lead?: number }
 const along = (from: Gesture, to: Gesture, amount: number): Gesture => {
   const out: Gesture = {};
   for (const field of GESTURE_FIELDS) out[field] = (from[field] ?? 0) + ((to[field] ?? 0) - (from[field] ?? 0)) * amount;
@@ -55,8 +55,7 @@ function strikeKeys(total: number, startup: number, active: number, strike: Stri
   if (strike.lead !== undefined && c - 1 > w) { const arms = along(strike.w, strike.c, strike.lead);
     keys.push({ frame: c - 1, g: { ...strike.c, arm: arms.arm, elbow: arms.elbow, leftArm: arms.leftArm, leftElbow: arms.leftElbow }, ease: "in" }, { frame: c, g: strike.c, ease: "linear" }); }
   else keys.push({ frame: c, g: strike.c, ease: "in" });
-  if (strike.hold && last > peak) keys.push({ frame: peak, g: strike.o, ease: "out" }, { frame: last, g: strike.hold, ease: "linear" });
-  else if (last > c && last < peak) keys.push({ frame: last, g: along(strike.c, strike.o, 0.85), ease: "linear" }, { frame: peak, g: strike.o, ease: "out" });
+  if (last > c && last < peak) keys.push({ frame: last, g: along(strike.c, strike.o, 0.85), ease: "linear" }, { frame: peak, g: strike.o, ease: "out" });
   else keys.push({ frame: peak, g: strike.o, ease: "out" });
   const middle = Math.round(Math.max(last, peak) + (end - Math.max(last, peak)) * (strike.mid ?? 0.5));
   if (middle > peak + 1 && middle < end - 1) keys.push({ frame: middle, g: strike.r, ease: "linear" });
@@ -88,11 +87,6 @@ const RAW_STRIKES: Partial<Record<HeroPose, Strike>> = {
   downTilt: { late: 2, w: { thigh: -45, knee: -75, leftThigh: 25, leftKnee: -45, tx: -40, lean: 30, arm: -45, leftArm: 20 },
     c: { thigh: -45, knee: -75, leftThigh: 25, leftKnee: -45, tx: 16, lean: 36, arm: -45, leftArm: 30 }, o: { thigh: -45, knee: -75, leftThigh: 25, leftKnee: -45, tx: 20, lean: 37, arm: -45, leftArm: 32 },
     r: { thigh: -15, knee: -25, tx: -4, lean: 8, arm: -25 } },
-  dashAttack: { late: 2, mid: 0.5, w: { thigh: 9, knee: 0, leftThigh: 29, leftKnee: 10, tx: -50, lean: -24, chest: -18, yaw: -35, head: 12, arm: -30, elbow: 0, leftArm: -50, leftElbow: -70 },
-    c: { thigh: -57, knee: 25, leftThigh: 13, leftKnee: 0, tx: 26, lean: 22, chest: 12, yaw: 25, head: -10, arm: -120, leftArm: -165, leftElbow: -10 },
-    o: { thigh: -59, knee: 27, leftThigh: 12, leftKnee: 0, tx: 30, lean: 24, chest: 14, yaw: 28, head: -10, arm: -123, leftArm: -150, leftElbow: -10 },
-    hold: { thigh: -72, knee: 40, leftThigh: 10, leftKnee: 0, tx: 30, lean: 34, chest: 18, yaw: 12, head: -16, arm: -140, leftArm: -110, leftElbow: 0 },
-    r: { thigh: -45, knee: 20, leftThigh: 5, tx: 16, lean: 16, chest: 10, yaw: 6, arm: -60, elbow: -20, leftArm: -50, leftElbow: -20 } },
   forwardSmash: { late: 2, mid: 0.6, w: { ...LOAD, tx: -18, lean: -14, arm: 40, elbow: -60, leftArm: 30, leftElbow: -60 },
     c: { ...STEP, tx: 20, lean: 14, arm: -95, leftArm: -95 }, o: { ...STEP, tx: 27, lean: 17, arm: -125, leftArm: -125 },
     r: { tx: 2, lean: -5, arm: -40, elbow: -40, leftArm: -40, leftElbow: -40 } },
@@ -127,13 +121,27 @@ const RAW_STRIKES: Partial<Record<HeroPose, Strike>> = {
     c: { ...STEP, tx: 24, lean: 8, arm: -110, yaw: 20, leftArm: 35 }, o: { ...STEP, tx: 27, lean: 18, arm: -112, yaw: 24, leftArm: 40 },
     r: { tx: -7, lean: -5, arm: -40, leftArm: -10 } },
 };
-const OVERSHOOT: Partial<Record<HeroPose, number>> = { jab: 2, jab2: 4, forwardTilt: 3, forwardTiltUp: 4.5, forwardTiltDown: 4.5, upTilt: 3, downTilt: 3, dashAttack: 3,
+const OVERSHOOT: Partial<Record<HeroPose, number>> = { jab: 2, jab2: 4, forwardTilt: 3, forwardTiltUp: 4.5, forwardTiltDown: 4.5, upTilt: 3, downTilt: 3,
   forwardSmash: 0.5, upSmash: 1, downSmash: 1, neutralAir: 1, forwardAir: 1, backAir: 1, upAir: 1, downAir: 1, neutralSpecial: 1.1, sideSpecial: 1.1, downSpecial: 1.3 };
 const COUNTER: Partial<Record<HeroPose, number>> = { jab: 1.2 };
 const STRIKES: Partial<Record<HeroPose, Strike>> = Object.fromEntries(Object.entries(RAW_STRIKES).map(([pose, strike]) => {
   const o = { ...along(strike.c, strike.o, OVERSHOOT[pose as HeroPose] ?? 1), arm: strike.o.arm, elbow: strike.o.elbow, leftArm: strike.o.leftArm, leftElbow: strike.o.leftElbow }, counter = COUNTER[pose as HeroPose] ?? 1;
   return [pose, { ...strike, o, r: along(along({}, o, 0.5), strike.r, counter) }];
 }));
+function dashAttackKeys(total: number, contact: number, last: number): Key[] {
+  const drive = Math.round((contact + last) / 2), settle = Math.round(last + (total - last) * 0.4), ease = Math.round(last + (total - last) * 0.7);
+  return [
+    { frame: 0, g: {} },
+    { frame: contact - 3, g: { thigh: 25, knee: -40, leftThigh: 35, leftKnee: -30, tx: -60, tz: -4, lean: -22, chest: -12, yaw: -35, head: 12, arm: 40, elbow: -40, leftArm: -50, leftElbow: -70 } },
+    { frame: contact, g: { thigh: -57, knee: 25, leftThigh: 13, leftKnee: 0, tx: 26, lean: 22, chest: 12, yaw: 25, head: -10, arm: -120, leftArm: -165, leftElbow: -10 }, ease: "in" },
+    { frame: contact + 2, g: { thigh: -59, knee: 27, leftThigh: 12, leftKnee: 0, tx: 30, lean: 24, chest: 14, yaw: 28, head: -10, arm: -123, leftArm: -150, leftElbow: -10 }, ease: "out" },
+    { frame: drive, g: { thigh: -85, knee: 50, leftThigh: 30, leftKnee: 0, tx: 40, tz: -22, lean: 50, chest: 20, yaw: 20, head: -25, arm: -170, leftArm: -170, leftElbow: -10 } },
+    { frame: last, g: { thigh: -60, knee: 10, leftThigh: -20, leftKnee: -50, tx: 34, tz: 0, lean: 0, chest: -6, yaw: 10, head: 0, arm: -80, leftArm: -60, leftElbow: -10 } },
+    { frame: settle, g: { thigh: -30, knee: 15, leftThigh: -5, leftKnee: -25, tx: 22, tz: -3, lean: -6, chest: -6, yaw: 5, arm: -60, elbow: -20, leftArm: -30, leftElbow: -15 }, ease: "linear" },
+    { frame: ease, g: { thigh: -10, knee: 5, leftKnee: -8, tx: 9, tz: -1, lean: -3, chest: -3, arm: -30, elbow: -15, leftArm: -15 }, ease: "linear" },
+    { frame: total, g: {}, ease: "linear" },
+  ];
+}
 const NORMAL_STYLES: readonly [HeroPose, AttackStyle][] = [
   ["jab", AttackStyle.jab], ["jab2", AttackStyle.jab2], ["forwardTilt", AttackStyle.forwardTilt], ["forwardTiltUp", AttackStyle.forwardTiltUp],
   ["forwardTiltDown", AttackStyle.forwardTiltDown], ["upTilt", AttackStyle.upTilt], ["downTilt", AttackStyle.downTilt], ["dashAttack", AttackStyle.dashAttack],
@@ -143,8 +151,8 @@ const NORMAL_STYLES: readonly [HeroPose, AttackStyle][] = [
 const normals = NORMAL_STYLES;
 for (const [pose, style] of NORMAL_STYLES) {
   const move = KAELTHAS_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
-  const strike = STRIKES[pose]!;
-  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture: strike.c, keys: strikeKeys(move.totalFrames, move.startupFrames + 1, move.activeFrames, strike, pose.endsWith("Air")), air: pose.endsWith("Air"), float: pose === "upSmash" || pose === "upTilt" });
+  const keys = pose === "dashAttack" ? dashAttackKeys(move.totalFrames, move.startupFrames, move.startupFrames + move.activeFrames - 1) : strikeKeys(move.totalFrames, move.startupFrames + 1, move.activeFrames, STRIKES[pose]!, pose.endsWith("Air"));
+  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture: keys.find(key => key.frame === move.startupFrames)!.g, keys, air: pose.endsWith("Air"), float: pose === "upSmash" || pose === "upTilt" });
 }
 const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["crouch", 30, 8, brace], ["landing", 8, 2, brace], ["shield", 30, 5, { ...brace, leftArm: -105 }],
