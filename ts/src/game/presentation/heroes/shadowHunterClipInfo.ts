@@ -38,4 +38,5 @@ export const SHADOW_HUNTER_AUTHORED_CLIPS: HeroClipTable = {
   victimThrowDown: { index: 87, seconds: f32(0.667), aligned: true, contact: f32(0.283) },
   victimThrowForward: { index: 84, seconds: f32(0.533), aligned: true, contact: f32(0.2) },
   victimThrowUp: { index: 86, seconds: f32(0.367), aligned: true, contact: f32(0.233) },
+  wallJump: { index: 55, seconds: 0.5, aligned: true },
 };

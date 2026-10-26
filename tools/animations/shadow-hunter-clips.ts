@@ -79,7 +79,7 @@ function jump(): Authored {
 
 function doubleJump(): Authored {
   const tuck: Gesture = { chest: 30, head: 20, arm: -205, elbow: 15, wrist: -60, free: -100, freeElbow: 90, frontHip: 120, frontKnee: -150, frontFoot: 45, backHip: 110, backKnee: -140, backFoot: 45, cloth: 20 };
-  return { pose: "doubleJump", frames: 30, airborne: true, phases: [
+  return { pose: "doubleJump", frames: 30, airborne: true, forms: ["wallJump"], phases: [
     { frame: 0, gesture: FALL },
     { frame: 3, gesture: { lean: 25, chest: 14, head: 4, arm: -205, elbow: 15, wrist: -60, free: -150, freeElbow: 20, frontHip: 80, frontKnee: -100, frontFoot: 30, backHip: 70, backKnee: -90, backFoot: 30, cloth: 0 } },
     { frame: 7, gesture: { ...tuck, lean: 110 } },
