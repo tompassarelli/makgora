@@ -15,9 +15,9 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const replaceOnly = process.argv.includes("--replace-down-air");
+const replaceFlag = process.argv.indexOf("--replace"), replaceOnly = replaceFlag < 0 ? undefined : process.argv[replaceFlag + 1];
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace-down-air]");
+ensure(input && output && relative(project, output).startsWith("..") && (replaceOnly === undefined || replaceOnly === "down-air" || replaceOnly === "up-air"), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace down-air|up-air]");
 const fighter = fighters.get(Character.blademaster)!; ensure(fighter, "missing Blademaster");
 const shipped = parseSource(await Bun.file(join(input, fighter.source)).arrayBuffer());
 const source = replaceOnly ? shipped : swordGestureBaseModel(shipped) ?? shipped;
@@ -152,7 +152,7 @@ const records: ClipRecord[]=[],bindings:string[]=[],names:string[]=[];
 function timeline(g: Gesture, first: number, last: number, total: number): { controlFrames: number[]; poses: Pose[] } {
   if("keys" in g)return {controlFrames:g.keys.map(([frame])=>frame),poses:g.keys.map(([,p])=>p)};
   if(g.style===AttackStyle.upTilt)return {controlFrames:[0,first-3,first,first+1,first+2,first+3,last,last+2,total-4,total],poses:[guard,pose([30,-50,70],[115,-50,5],14,-15,34,40),pose([40,-50,120],[165,-50,120],8,-10),pose([28,-50,140],[108,-50,242],-6,-4),pose([0,-50,150],[-22,-50,275],-10,0),pose([-28,-50,140],[-131,-50,212],-6,4),pose([-40,-50,120],[-165,-50,120],4,10),pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
-  if(g.style===AttackStyle.upAir)return {controlFrames:[0,Math.max(1,first-3),...UP_AIR_BLADE.map((_,index)=>first+index),last+2,total],poses:[guard,g.prep,...UP_AIR_BLADE.map(upAirPose),g.exit,guard]};
+  if(g.style===AttackStyle.upAir)return {controlFrames:[0,Math.max(1,first-4),...UP_AIR_BLADE.map((_,index)=>first-1+index),last+1,last+6,total-6,total],poses:[guard,g.prep,...UP_AIR_BLADE.map(upAirPose),g.exit,pose([-25,-24,100],[-50,-24,2],5,-12,50,45),pose([15,-24,85],[62,-24,4],12,-6,40,40),guard]};
   if(g.style===AttackStyle.forwardTiltUp)return {controlFrames:[0,Math.max(1,first-3),first,last+2,total-4,total],poses:[guard,g.prep,g.hit,pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
   return {controlFrames:[0,Math.max(1,first-3),first,("second" in g?g.second:last+2),total],poses:[guard,g.prep,g.hit,g.exit,guard]};
 }
@@ -231,13 +231,14 @@ for(const g of replaceOnly ? [] : gestures){
   records.push({pose:g.key,name:`Sword Gesture ${g.name}`,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const replaced=new Set<number>();
-for(const g of replacements){
-  const move=hero.moves.normals[g.style],index=model.Sequences.findIndex(s=>s.Name===g.name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
-  ensure(move&&start!==undefined&&end!==undefined,`missing ${g.name}`);
+const inPlace=replaceOnly==="up-air"?gestures.filter(g=>g.style===AttackStyle.upAir).map(g=>({g,name:`Sword Gesture ${g.name}`,matchesMove:false})):replacements.map(g=>({g,name:g.name,matchesMove:true}));
+for(const {g,name,matchesMove} of inPlace){
+  const move=g.style===undefined?undefined:hero.moves.normals[g.style],index=model.Sequences.findIndex(s=>s.Name===name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
+  ensure(move&&start!==undefined&&end!==undefined,`missing ${name}`);
   const total=Math.round((end-start)*60/1000),first=move.startupFrames,last=first+move.activeFrames-1;
-  ensure(total===move.totalFrames,`${g.name}: clip length differs from the move`);
+  ensure(!matchesMove||total===move.totalFrames,`${name}: clip length differs from the move`);
   const controlFrames=author(g,index,start,end,first,last,total);replaced.add(index);
-  records.push({pose:g.key,name:g.name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
+  records.push({pose:g.key,name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const bytes=encodeVerified(parseSource(generateMDX(model))),before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
 for(const [index,s]of source.Sequences.entries())if(!replaced.has(index))for(const fraction of [0,0.5,1]){const t=(s.Interval[1]-s.Interval[0])*fraction/1000,a=before.triangles(index,t,1),b=after.triangles(index,t,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${s.Name}: shipped pose changed`);}
