@@ -21,8 +21,8 @@ const LIMBS: Readonly<Record<Limb, readonly [readonly string[], readonly string[
         ['Bone_Arm2_L', 'Bone_Arm2_L01', 'Bone_LowerArmL', 'Bone_Arm2L', 'arm_L0_2_jnt', 'Lelbow', 'Mesh05', 'Bone_Arm2_LArchDruid'],
     ],
     hand: [
-        ['Bone_Hand_R', 'Bone_Hand_R01', 'Bone_HandR', 'arm_R0_end_jnt', 'Rhand', 'Hand Right Ref ', 'Hand Right Ref', 'Mesh02', 'Bone_Hand_RArchDruid'],
-        ['Bone_Hand_L', 'Bone_Hand_L01', 'Bone_HandL', 'arm_L0_end_jnt', 'Lhand', 'Hand Left Ref ', 'Hand Left Ref', 'Mesh03', 'Bone_Hand_LArchDruid'],
+        ['Bone_Hand_R', 'Bone_Hand_R01', 'Bone_HandR', 'arm_R0_end_jnt', 'Rhand', 'Bone_Hand_RArchDruid', 'Hand Right Ref ', 'Hand Right Ref', 'Mesh02'],
+        ['Bone_Hand_L', 'Bone_Hand_L01', 'Bone_HandL', 'arm_L0_end_jnt', 'Lhand', 'Bone_Hand_LArchDruid', 'Hand Left Ref ', 'Hand Left Ref', 'Mesh03'],
     ],
 };
 

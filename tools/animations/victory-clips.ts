@@ -32,10 +32,11 @@ const alternating = (low: Arms): readonly Beat[] => [
     { frame: 64, arms: [low, 'raised'], chest: -12, head: -18, hop: 0.3 }, { frame: 76, arms: 'raised', chest: -15, head: -22, hop: 0.5 },
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
-const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number }>> = {
+const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number; readonly free?: Arms }>> = {
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
-    [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1 }, [Character.kobold]: { low: 'pumped', hop: 1 },
-    [Character.malfurion]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
+    [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25, free: 'wide' }, [Character.kobold]: { low: 'pumped', hop: 1 },
+    [Character.malfurion]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 }, [Character.jaina]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
+    [Character.mountainKing]: { low: 'pumped', hop: 1, raise: [0.85, 0.6], tip: 25 },
 };
 const sided = (weapon: Side, held: Arms, free: Arms): readonly [Arms, Arms] => weapon === 0 ? [held, free] : [free, held];
 const step = (weapon: Side, frame: number, held: Arms, free: Arms, chest: number, head: number, hop = 0): Beat =>
@@ -165,7 +166,7 @@ for (const character of characters) {
     const upright = held === undefined ? undefined : tip !== 0 ? [0, Math.sign(shoulders[held.side]![1]! - centre) * Math.sin(tip), Math.cos(tip)] : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
     for (const beat of beats) {
         pose(chest, beat.frame, beat.chest); pose(head, beat.frame, beat.head);
-        const sides = typeof beat.arms === 'string' ? [beat.arms, beat.arms] as const : beat.arms;
+        const sides = (typeof beat.arms === 'string' ? [beat.arms, beat.arms] : beat.arms).map((kind, side) => kind === 'rest' || held === undefined || side === held.side ? kind : pumps?.free ?? kind);
         if (sides.some(kind => kind === 'raised' || kind === 'pumped' || kind === 'wave' || kind === 'overhead')) {
             const lean = () => torsoLean(model, index, time(beat.frame) - cutoff, renderer);
             const rear = (value: number, axis: number) => { const own = spine === chest ? beat.chest : 0; pose(spine, beat.frame, axis === 0 ? value + own : own, axis === 1 ? value : 0, axis === 2 ? value : 0); };
