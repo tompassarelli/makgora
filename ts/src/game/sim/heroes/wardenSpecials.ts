@@ -29,18 +29,20 @@ const SHADOW_STRIKE: AuthoredSpecial = {
 
 
 const LUNGE_TRAVEL_FRAMES = 10;
+const LUNGE_FIRST = 14;
+const LUNGE_LAST = LUNGE_FIRST + LUNGE_TRAVEL_FRAMES - 1;
 const LUNGE_SPEED = f32(H / f32(LUNGE_TRAVEL_FRAMES));
 const LUNGE_STUN_FRAMES = 52;
 const PURSUIT_STUN_FRAMES = 40;
 const pursuitHit = (stunFrames: number) => ({ ...wardenHit(7.6326799392700195, "POKE", 35), stunFrames });
 const LUNGE_PASS_RADIUS = 20.0;
 const lungeRegions = (): readonly MoveRegion[] => [
-  heroRegion(11, 14, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(LUNGE_STUN_FRAMES)),
-  heroRegion(5, 14, { x1: 0.0, z1: 48.0, x2: 0.0, z2: 48.0, radius: LUNGE_PASS_RADIUS, path: true }, pursuitHit(LUNGE_STUN_FRAMES)),
+  heroRegion(LUNGE_FIRST + 6, LUNGE_LAST, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(LUNGE_STUN_FRAMES)),
+  heroRegion(LUNGE_FIRST, LUNGE_LAST, { x1: 0.0, z1: 48.0, x2: 0.0, z2: 48.0, radius: LUNGE_PASS_RADIUS, path: true }, pursuitHit(LUNGE_STUN_FRAMES)),
 ];
 const PURSUIT_LUNGE: AuthoredSpecial = {
-  name: "Pursuit Lunge", endFrame: 40, regions: lungeRegions(),
-  motion: [{ ...frames(5, 14), velocityX: LUNGE_SPEED, velocityZ: 0.0 }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
+  name: "Pursuit Lunge", endFrame: LUNGE_LAST + 26, regions: lungeRegions(),
+  motion: [{ ...frames(LUNGE_FIRST, LUNGE_LAST), velocityX: LUNGE_SPEED, velocityZ: 0.0 }, { ...frames(LUNGE_LAST + 1, LUNGE_LAST + 1), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
 };
 
 
@@ -56,7 +58,7 @@ const SHADOW_PURSUIT: AuthoredSpecial = {
 const LUNGE_TILT = { x: f32(0.939692621), z: f32(0.342020143) };
 const PURSUIT_LUNGE_AIR: AuthoredSpecial = {
   ...PURSUIT_LUNGE, oncePerAirtime: true, helpless: true, landingLag: 12, aimFrames: 4,
-  motion: [{ ...frames(5, 14), velocityX: LUNGE_SPEED, velocityZ: 0.0, aimedTilt: LUNGE_TILT }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
+  motion: [{ ...frames(LUNGE_FIRST, LUNGE_LAST), velocityX: LUNGE_SPEED, velocityZ: 0.0, aimedTilt: LUNGE_TILT }, { ...frames(LUNGE_LAST + 1, LUNGE_LAST + 1), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
 };
 
 

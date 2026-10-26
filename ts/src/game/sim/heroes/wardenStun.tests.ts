@@ -94,6 +94,30 @@ test("Pursuit Lunge passes through a close or mid-range foe, stuns it and ends b
   assertTrue(whiff.maievFree >= WARDEN_SPECIALS.side.ground.endFrame);
 });
 
+test("Pursuit Lunge holds its windup in place through frame 13, travels from frame 14 and first cuts a close foe on frame 14 [k3 measure #487]", () => {
+  const firstFrames = (gap: number): { readonly moved: number; readonly hit: number } => {
+    const maiev = createFighter(Character.warden, 0.0, 1);
+    maiev.mana.points = 100;
+    const target = createFighter(Character.rifleman, gap, -1);
+    const { world } = duelPair(maiev, target);
+    stepDuel(world, side);
+    const startX = maiev.motion.x;
+    let moved = 0;
+    let hit = 0;
+    while ((moved === 0 || hit === 0) && maiev.special.frame > 0 && maiev.special.frame < 30) {
+      const frame = maiev.special.frame;
+      stepDuel(world);
+      if (moved === 0 && maiev.motion.x !== startX) moved = frame;
+      if (hit === 0 && target.status.damage > 0.0) hit = frame;
+    }
+    return { moved, hit };
+  };
+  assertEquals(firstFrames(f32(H * f32(3.0))).moved, 14);
+  assertEquals(firstFrames(f32(H * f32(0.2))).hit, 14);
+  assertEquals(WARDEN_SPECIALS.side.ground.endFrame, 49);
+  assertEquals(WARDEN_SPECIALS.side.air?.endFrame, 49);
+});
+
 test("An airborne foe barely drifts from the stun, and a second stun within 120 frames is an ordinary launch [k3 measure #273]", () => {
   const air = sideSpecial(f32(H * f32(0.9)), 0.0, (_maiev, target) => lift(target, 30.0));
   assertTrue(air.hit);
