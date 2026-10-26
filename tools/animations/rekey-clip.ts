@@ -4,12 +4,17 @@ import type { model as mdx } from "war3-model";
 import { generateModelMDX as generateMDX } from "../../ts/scripts/mdxCodec";
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
-import { type PoseFrame, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
+import { capture, type PoseFrame, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { clipFor } from "../../ts/src/game/presentation/fighterClips";
+import { advanceFighterPose, createFighterPose } from "../../ts/src/game/presentation/fighterPose";
 import { HERO_STRIKE_MOMENTS } from "../../ts/src/game/presentation/heroStrikeMomentInfo";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
+import { beginFighterAttack } from "../../ts/src/game/sim/attacks";
 import { AttackPhase, AttackStyle, type Character } from "../../ts/src/game/sim/codes";
+import { createFighter } from "../../ts/src/game/sim/fighter";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
+import { createRoster, neutralControls } from "../../ts/src/game/sim/roster";
+import { advanceFighter } from "../../ts/src/game/sim/step";
 import { blenderOptions, blenderSkeleton } from "./blender-keys";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { FIGHTER_RIGS } from "./rigs";
@@ -37,8 +42,17 @@ const active = frames.flatMap((f, i) => f.phase === AttackPhase.active && f.stri
 ensure(active.length > 0, `${fighter.name} ${pose}: no active hit region`);
 
 const source = parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer()), model = structuredClone(source);
-const stand = source.Sequences.find((s) => /^stand ready$/i.test(s.Name.trim())) ?? source.Sequences.find((s) => /^stand(?:\s*-?\s*1)?$/i.test(s.Name.trim()));
-ensure(stand, `${fighter.name}: missing stand`);
+function readyClip(attack: AttackStyle): number {
+  const f = createFighter(character, 0.0, 1), world = createRoster(1, [f]), shown = createFighterPose(), input = neutralControls();
+  beginFighterAttack(world, 0, attack, false);
+  advanceFighterPose(shown, f, world, input, false, false, true, false);
+  while (f.attack.style === attack) { advanceFighter(world, 0, 0, input, 0.0); advanceFighterPose(shown, f, world, input, false, false, false, false); }
+  const after = capture(f, shown);
+  ensure(after.seconds === 0, `${pose}: ready starts ${after.seconds}s into clip ${after.clip}`);
+  return after.clip;
+}
+const stand = source.Sequences[readyClip(style)];
+ensure(stand, `${fighter.name}: missing the ready clip shown after ${pose}`);
 const sequence = model.Sequences[clip.index];
 ensure(sequence, `${fighter.name}: no clip ${clip.index}`);
 const scale = characterModelScale(character);

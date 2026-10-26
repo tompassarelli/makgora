@@ -103,7 +103,7 @@ SIDE = 1 if kick == 'L' else -1
 TURN = -SIDE
 
 
-def pose(p):
+def pose(p, lifts=None):
     rest()
     pivot = joint('pelvis').head.copy()
     BODY.location += Vector((p.get('travel', 0), 0, p.get('drop', 0)))
@@ -120,8 +120,17 @@ def pose(p):
     for side, key in ((kick, 'kickArm'), (plant, 'plantArm')):
         turn(joint(f'shoulder.{side}'), Quaternion(PITCH, radians(p.get(key, 0))))
         turn(joint(f'elbow.{side}'), Quaternion(PITCH, radians(p.get(key + 'Elbow', 0))))
+    found = {}
     for node, chain in OWN.get('clear', []):
-        any(lift(bones[node], bones[turned]) for turned in chain)
+        for turned in chain:
+            key = f'{node}/{turned}'
+            if lifts is not None:
+                turn(bones[turned], Quaternion(PITCH, radians(lifts.get(key, 0))))
+                continue
+            cleared, found[key] = lift(bones[node], bones[turned], -p.get('drop', 0))
+            if cleared:
+                break
+    return found
 
 
 def lowest(b):
@@ -130,26 +139,46 @@ def lowest(b):
     return min(own + [lowest(c) for c in b.children], default=b.head.z)
 
 
-def lift(node, turned):
-    start, floor = turned.matrix.copy(), REST_LOW[node.name]
+def lift(node, turned, drop):
+    start, floor = turned.matrix.copy(), REST_LOW[node.name] + MARGIN * min(1, drop / MARGIN_DROP)
     tried = []
-    for degrees in sorted(range(-90, 91, 5), key=abs):
+    sides = [SIDES[node.name]] if node.name in SIDES else [1, -1]
+    for degrees in sorted((side * step for side in sides for step in range(91)), key=abs):
         turned.matrix = start
         update()
         turn(turned, Quaternion(PITCH, radians(degrees)))
-        if lowest(node) >= floor + MARGIN:
-            return True
+        if lowest(node) >= floor:
+            if degrees:
+                SIDES.setdefault(node.name, 1 if degrees > 0 else -1)
+            return True, degrees
         tried.append((lowest(node), degrees))
     turned.matrix = start
     update()
-    turn(turned, Quaternion(PITCH, radians(max(tried)[1])))
-    return False
+    best = max(tried)[1]
+    turn(turned, Quaternion(PITCH, radians(best)))
+    return False, best
+
+
+def smoothed(searched):
+    keys = {key for found in searched for key in found}
+    held = [frame == 0 or frame >= frames - 1 for frame in range(len(searched))]
+    def window(frame, values, reach):
+        return [values[g] for g in range(max(0, frame - reach), min(len(values), frame + reach + 1))]
+    out = [dict(found) for found in searched]
+    for key in keys:
+        raw = [found.get(key, 0) for found in searched]
+        peak = [raw[f] if held[f] else max(window(f, raw, 1), key=abs) for f in range(len(raw))]
+        for f in range(len(raw)):
+            out[f][key] = raw[f] if held[f] else sum(window(f, peak, 2)) / len(window(f, peak, 2))
+    return out
 
 
 READY = {}
 OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}.json')).read())
 BEATS = OWN['beats']
 MARGIN = OWN.get('margin', 0)
+MARGIN_DROP = 10
+SIDES = {}
 POINTS = spec['points']
 rest()
 REST_LOW = {node: lowest(bones[node]) for node, _ in OWN.get('clear', [])}
@@ -172,22 +201,24 @@ def ease(t):
 
 
 def keyframes():
-    marks = {'contact': contact, 'last': last, 'end': frames}
-    return [(marks.get(at, at) if isinstance(at, str) else (at if at >= 0 else frames + at), p) for at, p in BEATS]
+    marks = {'contact': contact, 'last': last, 'end': frames - 1}
+    return [(marks.get(at, at) if isinstance(at, str) else (at if at >= 0 else frames + at), p, shape) for at, p, *shape in BEATS]
 
 
 def at(frame):
     beats = keyframes()
-    for (a, pa), (b, pb) in zip(beats, beats[1:]):
+    for (a, pa, _), (b, pb, shape) in zip(beats, beats[1:]):
         if a <= frame <= b:
-            return blend(pa, pb, ease((frame - a) / max(1, b - a)))
+            t = (frame - a) / max(1, b - a)
+            return blend(pa, pb, t if shape == ['linear'] else ease(t))
     return beats[-1][1]
 
 
 out = {'frames': frames, 'nodes': [{'rotation': [], 'translation': []} for _ in created]}
 previous = {}
+LIFTS = smoothed([pose(at(frame)) for frame in range(frames + 1)])
 for frame in range(frames + 1):
-    pose(at(frame))
+    pose(at(frame), LIFTS[frame])
     for name, entry in zip(created, out['nodes']):
         q = bones[name].rotation_quaternion.normalized()
         if name in previous and previous[name].dot(q) < 0:
@@ -196,6 +227,8 @@ for frame in range(frames + 1):
         entry['rotation'].append([q.x, q.y, q.z, q.w])
         entry['translation'].append(list(bones[name].location))
     toe = joint(f'ankle.{kick}').head
-    print(f'LEG_SWEEP frame {frame}: {kick} ankle ({toe.x:.1f}, {toe.y:.1f}, {toe.z - FLOOR:.1f}) planted ankle z {joint(f"ankle.{plant}").head.z - FLOOR:.1f}', flush=True)
+    hip = joint(f'hip.{kick}').head
+    knee = joint(f'knee.{kick}').head
+    print(f'LEG_SWEEP frame {frame}: {kick} hip ({hip.x:.1f}, {hip.z - FLOOR:.1f}) knee ({knee.x:.1f}, {knee.z - FLOOR:.1f}) ankle ({toe.x:.1f}, {toe.y:.1f}, {toe.z - FLOOR:.1f}) planted ankle z {joint(f"ankle.{plant}").head.z - FLOOR:.1f}', flush=True)
 open(keys_path, 'w').write(json.dumps(out))
 print('LEG_SWEEP_KEYS', keys_path, frames + 1, 'frames; leg', round(LEG, 1), flush=True)
