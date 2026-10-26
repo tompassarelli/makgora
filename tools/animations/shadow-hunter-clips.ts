@@ -63,25 +63,26 @@ function neutralSpecial(): Authored {
   ] };
 }
 
-const FALL: Gesture = { chest: 6, head: -4, arm: -205, elbow: 15, wrist: -60, free: -80, freeElbow: 30, frontHip: 66, frontKnee: -89, frontFoot: 15, backHip: 83, backKnee: -71, backFoot: 20, cloth: -10 };
+const HOLD: Gesture = { arm: -205, elbow: 15 };
+const FALL: Gesture = { chest: 6, head: -4, ...HOLD, free: -80, freeElbow: 30, frontHip: 66, frontKnee: -89, frontFoot: 15, backHip: 83, backKnee: -71, backFoot: 20, cloth: -10 };
 
 function jump(): Authored {
   return { pose: "jump", frames: 24, airborne: true, phases: [
-    { frame: 0, gesture: { chest: 14, head: -14, arm: -205, elbow: 15, wrist: -60, free: 20, freeElbow: 20, frontHip: 16, frontKnee: 26, frontFoot: 0, backHip: 8, backKnee: 44, backFoot: 0, cloth: -25 } },
-    { frame: 3, gesture: { chest: 12, head: -14, arm: -205, elbow: 15, wrist: -60, free: -160, freeElbow: 10, frontHip: 106, frontKnee: -140, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 10 } },
-    { frame: 6, gesture: { chest: 10, head: -10, arm: -205, elbow: 15, wrist: -60, free: -150, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 35, backHip: 73, backKnee: -76, backFoot: 35, cloth: 0 } },
-    { frame: 10, gesture: { chest: 12, head: -6, arm: -205, elbow: 15, wrist: -60, free: -115, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 25, backHip: 58, backKnee: -54, backFoot: 25, cloth: -15 } },
-    { frame: 14, gesture: { chest: 18, head: -2, arm: -205, elbow: 15, wrist: -60, free: -60, freeElbow: 50, frontHip: 26, frontKnee: 2, frontFoot: 15, backHip: 23, backKnee: 15, backFoot: 15, cloth: -40, clothTip: -15 } },
-    { frame: 19, gesture: { chest: 8, head: -6, arm: -205, elbow: 15, wrist: -60, free: -95, freeElbow: 25, frontHip: 56, frontKnee: -55, frontFoot: 15, backHip: 63, backKnee: -62, backFoot: 20, cloth: -20 } },
+    { frame: 0, gesture: { chest: 14, head: -14, ...HOLD, free: 20, freeElbow: 20, frontHip: 16, frontKnee: 26, frontFoot: 0, backHip: 8, backKnee: 44, backFoot: 0, cloth: -25 } },
+    { frame: 3, gesture: { chest: 12, head: -14, ...HOLD, free: -160, freeElbow: 10, frontHip: 106, frontKnee: -140, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 10 } },
+    { frame: 6, gesture: { chest: 10, head: -10, ...HOLD, free: -150, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 35, backHip: 73, backKnee: -76, backFoot: 35, cloth: 0 } },
+    { frame: 10, gesture: { chest: 12, head: -6, ...HOLD, free: -115, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 25, backHip: 58, backKnee: -54, backFoot: 25, cloth: -15 } },
+    { frame: 14, gesture: { chest: 18, head: -2, ...HOLD, free: -60, freeElbow: 50, frontHip: 26, frontKnee: 2, frontFoot: 15, backHip: 23, backKnee: 15, backFoot: 15, cloth: -40, clothTip: -15 } },
+    { frame: 19, gesture: { chest: 8, head: -6, ...HOLD, free: -95, freeElbow: 25, frontHip: 56, frontKnee: -55, frontFoot: 15, backHip: 63, backKnee: -62, backFoot: 20, cloth: -20 } },
     { frame: 24, gesture: FALL },
   ] };
 }
 
 function doubleJump(): Authored {
-  const tuck: Gesture = { chest: 30, head: 20, arm: -205, elbow: 15, wrist: -60, free: -100, freeElbow: 90, frontHip: 120, frontKnee: -150, frontFoot: 45, backHip: 110, backKnee: -140, backFoot: 45, cloth: 20 };
+  const tuck: Gesture = { chest: 30, head: 20, ...HOLD, free: -100, freeElbow: 90, frontHip: 120, frontKnee: -150, frontFoot: 45, backHip: 110, backKnee: -140, backFoot: 45, cloth: 20 };
   return { pose: "doubleJump", frames: 30, airborne: true, forms: ["wallJump"], phases: [
     { frame: 0, gesture: FALL },
-    { frame: 3, gesture: { lean: 25, chest: 14, head: 4, arm: -205, elbow: 15, wrist: -60, free: -150, freeElbow: 20, frontHip: 80, frontKnee: -100, frontFoot: 30, backHip: 70, backKnee: -90, backFoot: 30, cloth: 0 } },
+    { frame: 3, gesture: { lean: 25, chest: 14, head: 4, ...HOLD, free: -150, freeElbow: 20, frontHip: 80, frontKnee: -100, frontFoot: 30, backHip: 70, backKnee: -90, backFoot: 30, cloth: 0 } },
     { frame: 7, gesture: { ...tuck, lean: 110 } },
     { frame: 12, gesture: { ...tuck, lean: 210 } },
     { frame: 17, gesture: { ...tuck, lean: 290, chest: 18, head: 8, frontHip: 95, frontKnee: -115, backHip: 90, backKnee: -105 } },
@@ -250,14 +251,15 @@ function upAngledKick(): Authored {
 }
 function upTilt(): Authored {
   const { contact, total } = timing(AttackStyle.upTilt);
+  const hold = (k: number): Gesture => ({ ...still(k), arm: GUARD.arm! * k, wrist: 45 * k });
   return { pose: "upTilt", style: AttackStyle.upTilt, support: "L", phases: [
     { frame: 0, gesture: READY },
-    { frame: contact - 4, gesture: { ...still(1), lean: 4, chest: 4, backKnee: 60, drop: -6, frontKnee: 16 }, reach: ["footR", -50, 2] },
-    { frame: contact - 2, gesture: { ...still(1), lean: -10, backKnee: 120, step: 2 }, reach: ["footR", 26, 76] },
-    { frame: contact, gesture: { ...still(1), lean: -28, chest: -14, head: 14, backKnee: 0, step: 2 }, reach: ["footR", 20, 150] },
-    { frame: contact + 2, gesture: { ...still(1), lean: -32, chest: -16, head: 16, backKnee: 0, step: 2 }, reach: ["footR", -10, 160] },
-    { frame: contact + 6, gesture: { ...still(1), lean: -14, chest: -6, backKnee: 40, step: 4 }, reach: ["footR", 50, 90] },
-    { frame: contact + 12, gesture: { ...still(0.8), lean: -2, backKnee: 50, step: 6 }, reach: ["footR", 50, 20] },
+    { frame: contact - 4, gesture: { ...hold(1), lean: 4, chest: 4, backKnee: 60, drop: -6, frontKnee: 16 }, reach: ["footR", -50, 2] },
+    { frame: contact - 2, gesture: { ...hold(1), lean: -10, backKnee: 120, step: 2 }, reach: ["footR", 26, 76] },
+    { frame: contact, gesture: { ...hold(1), lean: -28, chest: -14, head: 14, backKnee: 0, step: 2 }, reach: ["footR", 20, 150] },
+    { frame: contact + 2, gesture: { ...hold(1), lean: -32, chest: -16, head: 16, backKnee: 0, step: 2 }, reach: ["footR", -10, 160] },
+    { frame: contact + 6, gesture: { ...hold(1), arm: GUARD.arm! - 30, lean: -14, chest: -6, backKnee: 40, step: 4 }, reach: ["footR", 50, 90] },
+    { frame: contact + 12, gesture: { ...hold(0.8), lean: -2, backKnee: 50, step: 6 }, reach: ["footR", 50, 20] },
     { frame: total, gesture: READY },
   ] };
 }
