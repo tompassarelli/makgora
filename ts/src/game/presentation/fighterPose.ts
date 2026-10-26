@@ -357,7 +357,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     playIndex(pose, motionKey(pose.motion.motion), moving.index);
     return pose.motion.motion === IllidanLocomotion.run ? locomotionRate(f, pose.motion.motion) : tableLocomotionRate(moving, pose.motion.motion);
   }
-  const walking = f.motion.grounded && Math.abs(totalVelocityX(f)) > f32(0.1);
+  const walking = pose.motion.motion !== IllidanLocomotion.idle && f.motion.grounded && Math.abs(totalVelocityX(f)) > f32(0.1);
 
   const locomotion = locomotionTable[walking ? "walk" : "idle"];
   if (locomotion === undefined) playName(pose, walking ? "walk" : "stand", walking ? "walk" : "stand");

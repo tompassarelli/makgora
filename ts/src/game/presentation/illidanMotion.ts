@@ -112,7 +112,7 @@ export function advanceIllidanMotion(history: IllidanMotion, fighter: Readonly<F
   const available = motion.grounded && canAttack(fighter) && !shield.raised && shield.releaseLag === 0 && jump.squat === 0;
   if (!available) {
     history.transitionRemaining = 0;
-    history.motion = motion.fastFalling ? IllidanLocomotion.fastFall : IllidanLocomotion.fall;
+    history.motion = motion.grounded && fighter.attack.style !== undefined ? IllidanLocomotion.idle : motion.fastFalling ? IllidanLocomotion.fastFall : IllidanLocomotion.fall;
   } else if (controls.direction === 0 && ground.action === GroundAction.none && history.motion === IllidanLocomotion.turn
     && (ground.pivotGraceFrames > 0 || f32(motion.vx * fighter.facing) < 0)) {
     history.motion = IllidanLocomotion.idle;
@@ -130,7 +130,7 @@ export function advanceIllidanMotion(history: IllidanMotion, fighter: Readonly<F
   else if (ground.dashFrame > 0 && ground.dashFrame <= INITIAL_DASH_FRAMES && controls.direction !== 0) history.motion = IllidanLocomotion.dash;
   else if (moving) {
     if (controls.direction !== 0) history.motion = controls.walking ? IllidanLocomotion.walk : IllidanLocomotion.run;
-    else if (history.motion !== IllidanLocomotion.stop) {
+    else if (history.motion !== IllidanLocomotion.stop && history.motion !== IllidanLocomotion.idle) {
       history.motion = IllidanLocomotion.stop;
       history.transitionRemaining = TRANSITION_FRAMES;
     }
