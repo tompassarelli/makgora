@@ -66,7 +66,7 @@ export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<He
   run: sequence("Walk"),
 
   crouch: COMBAT_STANCE,
-  fall: COMBAT_STANCE,
+  fall: BLADEMASTER_AUTHORED_CLIPS.fall,
   landing: COMBAT_STANCE,
   shield: COMBAT_STANCE,
   smashCharge: COMBAT_STANCE,
@@ -93,7 +93,7 @@ export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<He
 
   knockdown: sequence("Death"),
   downDamage: sequence("Dissipate", f32(0.15)),
-  jump: COMBAT_STANCE,
+  jump: BLADEMASTER_AUTHORED_CLIPS.jump,
   doubleJump: JUMP_CLIPS[Character.blademaster].doubleJump,
 
   wallJump: sequence("Attack Slam"),
