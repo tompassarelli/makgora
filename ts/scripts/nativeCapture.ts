@@ -308,7 +308,7 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
           if (column === 3 || column === 7) putSheetFrame(canvas, row, column === 3 ? 8 : 9, whole, effectCrop ?? fail("missing effect crop"));
         }
       });
-      saved.set(key, { fixture: fixture.name, frame: held.frame, phase: held.phase, file, capturedMs: before - started, width: whole.width, height: whole.height });
+      saved.set(key, { fixture: fixture.name, frame: held.frame, phase: held.phase, file, capturedMs: before - started, width: shot.width, height: shot.height });
       if (resumable) yield* attempt("checkpoint captured frame", () => {
         const temporary = `${checkpointPath}.tmp`;
         writeFileSync(temporary, `${JSON.stringify({ version: 1, mapSha256, sourceRevision, captures: [...saved.values()] }, null, 1)}\n`);
