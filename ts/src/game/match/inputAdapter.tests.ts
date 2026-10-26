@@ -8,15 +8,15 @@ import { TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X, stickX, stickZ } from "..
 import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, GroundState, SHIELD_DODGE_STICK_THRESHOLD, StickZone, TAP_JUMP_STICK_THRESHOLD, stickZone } from "../sim/stickZones";
 import { bodyTop } from "../sim/surfaces";
 import { beginFighterAttack } from "../sim/attacks";
-import { attackStyleForGrounding } from "./combat";
+import { attackStyleForGrounding } from "../input/combat";
 import { advanceFighter } from "../sim/step";
 import { advanceSolo, soloWorld } from "../sim/testWorld";
 import { melee } from "../sim/tuning";
-import { Action, maskOf } from "./actions";
-import { adaptInput } from "./adapter";
-import { attackBuffer, takeAttack } from "./attackBuffer";
-import { inputRow } from "./inputRow";
-import { commitEdges, keyboardCapture, sampleKeys } from "./keyboardCapture";
+import { Action, maskOf } from "../input/actions";
+import { adaptInput } from "./inputAdapter";
+import { attackBuffer, takeAttack } from "../input/attackBuffer";
+import { inputRow } from "../input/inputRow";
+import { commitEdges, keyboardCapture, sampleKeys } from "../input/keyboardCapture";
 
 const STICK_UNIT = f32(0.0125);
 const STAGE = 1;

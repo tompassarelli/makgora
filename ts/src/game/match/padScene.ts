@@ -3,7 +3,7 @@
 
 
 import { Action, has } from "../input/actions";
-import { adaptInput } from "../input/adapter";
+import { adaptInput } from "./inputAdapter";
 import { type InputRow, copyInput, emptyInput } from "../input/inputRow";
 import { type ParticipantInputs, participantInputs } from "../input/participants";
 import { type FrameControls, createBufferedFrameControls } from "./controls";

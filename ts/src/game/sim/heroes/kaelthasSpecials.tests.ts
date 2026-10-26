@@ -1,6 +1,6 @@
 import { assertDefined, assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { Action, maskOf } from "../../input/actions";
-import { adaptInput } from "../../input/adapter";
+import { adaptInput } from "../../match/inputAdapter";
 import { inputRow } from "../../input/inputRow";
 import { Phase } from "../../lobby/lobbyState";
 import { stepMatch } from "../../match/step";

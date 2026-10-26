@@ -1,7 +1,7 @@
 import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { inputRow } from "../../input/inputRow";
-import { adaptInput } from "../../input/adapter";
+import { adaptInput } from "../../match/inputAdapter";
 import { Phase } from "../../lobby/lobbyState";
 import { stepMatch } from "../../match/step";
 import { createReplaySnapshot } from "../../replay/snapshot";

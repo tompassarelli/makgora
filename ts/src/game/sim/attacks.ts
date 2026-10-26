@@ -140,8 +140,8 @@ function groundOption(style: AttackStyle, dashStartTilt: boolean): GroundOption 
     case AttackStyle.upTilt:
     case AttackStyle.downTilt: return GroundOption.tilt;
     case AttackStyle.forwardSmash: return GroundOption.forwardSmash;
-    case AttackStyle.upSmash:
-    case AttackStyle.downSmash: return GroundOption.upDownSmash;
+    case AttackStyle.upSmash: return GroundOption.upSmash;
+    case AttackStyle.downSmash: return GroundOption.downSmash;
     case AttackStyle.grab: return GroundOption.grab;
     default: return undefined;
   }

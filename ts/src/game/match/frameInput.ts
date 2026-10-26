@@ -1,5 +1,5 @@
 import { copyAttackBuffer, queueAttack, sameAttackBuffer } from "../input/attackBuffer";
-import { adaptInput } from "../input/adapter";
+import { adaptInput } from "./inputAdapter";
 import { type InputRow, copyInput, sameInput } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type ParticipantInputs, type ParticipantSlot, type Slots, isParticipantMask, isParticipantSlot, participantActive, participantInputs } from "../input/participants";
 import { captureImpactEventsBefore, finishImpactEventsAfter } from "../presentation/impactEvents";

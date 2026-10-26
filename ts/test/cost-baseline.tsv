@@ -10,7 +10,7 @@ src/game/assets/stagePalette.tests.ts	3	0.003
 src/game/classic/classic.tests.ts	8	1.111
 src/game/classic/loreBattles.tests.ts	4	0.010
 src/game/core/math/meleeScalarMath.tests.ts	2	0.000
-src/game/input/adapter.tests.ts	8	0.171
+src/game/match/inputAdapter.tests.ts	8	0.171
 src/game/input/attackBuffer.tests.ts	6	0.002
 src/game/input/input.tests.ts	5	0.020
 src/game/input/padCapture.tests.ts	2	0.058

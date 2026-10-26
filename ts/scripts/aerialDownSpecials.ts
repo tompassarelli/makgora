@@ -1,7 +1,7 @@
 // Every fighter's down special pressed in the air (#448): rising, falling, near the deck and offstage.
 // `bun scripts/aerialDownSpecials.ts` prints the per-fighter table kept in docs/design/aerial-down-specials.md.
 import { Action, maskOf } from "../src/game/input/actions";
-import { adaptInput } from "../src/game/input/adapter";
+import { adaptInput } from "../src/game/match/inputAdapter";
 import { inputRow } from "../src/game/input/inputRow";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { stepMatch } from "../src/game/match/step";

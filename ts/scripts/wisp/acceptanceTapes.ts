@@ -3,7 +3,7 @@
 
 
 import "../../test/host-natives";
-import { adaptInput } from "../../src/game/input/adapter";
+import { adaptInput } from "../../src/game/match/inputAdapter";
 import { ACTION_COUNT, Action, bit } from "../../src/game/input/actions";
 import { type AttackBuffer, attackBuffer } from "../../src/game/input/attackBuffer";
 import { commitEdges, keyboardCapture, sampleKeys } from "../../src/game/input/keyboardCapture";

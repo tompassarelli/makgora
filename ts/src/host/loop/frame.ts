@@ -3,7 +3,7 @@ import { recordSessionWins } from "../../game/session/sessionWins";
 
 
 import { hasPendingAttack, clearAttackBuffer } from "../../game/input/attackBuffer";
-import { adaptInput } from "../../game/input/adapter";
+import { adaptInput } from "../../game/match/inputAdapter";
 import { commitEdges } from "../../game/input/keyboardCapture";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, participantActive } from "../../game/input/participants";
 import { borrowMatchFrame, captureFrame, executeMatchFrame, hasNetworkRows } from "../../game/match/frameInput";

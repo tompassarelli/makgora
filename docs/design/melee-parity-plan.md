@@ -175,8 +175,8 @@ Sources name the SmashWiki page unless marked: MFD is
 | Air dodge | `ts/src/game/sim/jumpsAndDodges.ts:69,87`; `ts/src/game/sim/transitions.ts:214` | Once per airtime, actionable, refreshed on hit | Ends in helpless fall (Air dodge) | deviation, #100 and #347 |
 | Stick deadzone | `ts/src/game/sim/stickZones.ts:4` | 0.28 | 0.2875 is the commonly quoted value (Control stick) | open, #292 |
 | Stick zones | `ts/src/game/sim/stickZones.ts:5-15` | Dash 0.8, crouch 0.6875, tap jump 0.6625 | Same (Control stick; CS movement.md) | match |
-| Tilt versus smash | `ts/src/game/input/combat.ts:33-44`; `ts/src/game/input/adapter.ts:73,133-137` | Strong button or C-stick | Stick speed (Smash attack) | open, #292 |
-| Tilt modifier | `ts/src/game/input/adapter.ts:87-91`; `ts/src/game/sim/stick.ts:11-15` | Just inside Melee's thresholds | none, a box-controller convention | addition, #282 |
+| Tilt versus smash | `ts/src/game/input/combat.ts:33-44`; `ts/src/game/match/inputAdapter.ts:73,133-137` | Strong button or C-stick | Stick speed (Smash attack) | open, #292 |
+| Tilt modifier | `ts/src/game/match/inputAdapter.ts:87-91`; `ts/src/game/sim/stick.ts:11-15` | Just inside Melee's thresholds | none, a box-controller convention | addition, #282 |
 | Tap jump | adapter | Off, jump is a button | On (Tap jump) | deviation, #49 |
 
 ### Fighter attributes

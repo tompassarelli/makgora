@@ -8,7 +8,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { type TokenLines, addToken, createTokenLines, endTokenLine, lineTokens, openTokenLines, parseRecord, recordTokens } from "wisp/src/runtime/recordText";
 import { REPRO_LINE_WIDTH, type Repro, type ReproInspection, type ReproResult } from "wisp/src/runtime/repro";
 import { floorMod } from "wisp/src/sim/intMath";
-import { adaptInput } from "../input/adapter";
+import { adaptInput } from "../match/inputAdapter";
 import { type AttackBuffer, clearAttackBuffer } from "../input/attackBuffer";
 import { INPUT_ROW_NUMBERS, type InputRow, emptyInput, loadInputNumbers, storeInputNumbers } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type ParticipantInputs, type Slots, participantActive } from "../input/participants";

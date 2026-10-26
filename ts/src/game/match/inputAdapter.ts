@@ -3,13 +3,14 @@ import { AttackStyle, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import { analogShieldActive, analogShieldStrength } from "../sim/shield";
+import { groundState } from "../sim/groundMovement";
 import { squareRoot } from "../sim/warcraftMath";
 import { stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
-import { SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE } from "../sim/stickZones";
-import { Action, bit, has, maskOf } from "./actions";
-import { type AttackBuffer, clearAttackBuffer, queueAttack } from "./attackBuffer";
-import { groundDodgeIntent, normalAttackStyle } from "./combat";
-import type { Direction, InputRow } from "./inputRow";
+import { GroundState, SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE } from "../sim/stickZones";
+import { Action, bit, has, maskOf } from "../input/actions";
+import { type AttackBuffer, clearAttackBuffer, queueAttack } from "../input/attackBuffer";
+import { groundDodgeIntent, normalAttackStyle } from "../input/combat";
+import type { Direction, InputRow } from "../input/inputRow";
 
 const ATTACK_BIT = bit(Action.attack);
 const GRAB_BIT = bit(Action.grab);
@@ -97,8 +98,9 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.jumpHeld = (held & JUMP_BIT) !== 0;
   destination.techPressed = destination.shieldPressed;
   const airborne = (fighter.jump.squat > 0 || !fighter.motion.grounded) && fighter.ledge.state === LedgeState.none;
-  const standing = fighter.motion.grounded && fighter.ledge.state === LedgeState.none;
-  const strongAim = strong && standing && !destination.shieldTriggerActive && ((held | pressed) & SPECIAL_BIT) === 0;
+  const state = groundState(fighter);
+  const still = fighter.motion.grounded && fighter.ledge.state === LedgeState.none && (state === GroundState.stand || state === GroundState.crouch);
+  const strongAim = strong && still && !destination.shieldTriggerActive && ((held | pressed) & SPECIAL_BIT) === 0;
   if (strongAim) {
     destination.direction = 0;
     destination.verticalDirection = 0;
@@ -137,7 +139,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.groundDodgeDirection = dodge ?? 0;
 
   const directionPressed = (pressed & MOVEMENT_ACTIONS) !== 0;
-  const strongAimed = strongAim && (aimX !== 0 || aimZ !== 0) && (directionPressed || (pressed & STRONG_BIT) !== 0);
+  const strongAimed = strongAim && (aimX !== 0 || aimZ !== 0) && directionPressed;
   if (destination.attackPressed || ((held & ATTACK_BIT) !== 0 && directionPressed) || strongAimed) {
     const shieldGrab = fighter.motion.grounded && (fighter.shield.raised || destination.shield);
     queueAttack(attacks, {

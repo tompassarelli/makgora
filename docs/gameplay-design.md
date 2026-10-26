@@ -117,8 +117,8 @@ smashcraft:ts/src/game/sim/stick.ts.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Stand | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
 | Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window | yes | yes | – | yes | yes | yes | yes | dash | – |
-| Initial dash | dash zone from stand, walk or crouch, or a dash back | forward tilt on frames 1–3 only (#186); otherwise A gives the dash attack | forward smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
-| Run | dash held forward to its run frame | no: A gives the dash attack | no | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
+| Initial dash | dash zone from stand, walk or crouch, or a dash back | forward tilt on frames 1–3 only (#186); otherwise A gives the dash attack | smashes on frames 1–3 only, the up smash after them through a jump cancel; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
+| Run | dash held forward to its run frame | no: A gives the dash attack | up smash only (Smashcraft, #489); forward and down: A gives the dash attack | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
 | Run brake | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
 | Turn-run | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
 | Crouch | crouch zone from stand, walk or run brake | yes | yes | – | yes | yes | yes | holds | dash | – |
@@ -146,19 +146,26 @@ Where Smashcraft keeps its own rule, and why:
   strong attack): Strong + A gives the up, down or forward smash (forward with
   no direction too; in the air, Strong + A gives the aerial for that
   direction, the neutral air with none), and holding Strong or A charges it.
-  On the ground Strong works like a C-stick (#325): while it is held, each
-  direction press starts that direction's smash on that frame, a Strong press
-  with a direction held does the same, and the directions do not move the
-  fighter (no walk, dash, crouch or tap jump) until Strong is released. Shield,
-  Special (the EX chord) and the air leave the directions as movement. Rivals
+  Strong is a pure modifier (#489, Tom's rule of 26 Oct 2026): alone it never
+  attacks, and pressing it with a direction already held starts nothing. While
+  the fighter moves (dash, run, walk) Strong leaves the directions as movement
+  and only upgrades A: where the state allows a smash, A gives the smash in
+  place of the tilt or dash attack; where it does not, A gives what it gives
+  without Strong. So Strong + A in the dash-smash window is the smash, Strong +
+  A in a run is the dash attack, except Strong + up + A in a run, which is the
+  up smash directly (forward and down smashes stay closed in a run). Out of a
+  dash past its smash window the up smash still comes only through a jump
+  cancel. A smash out of a walk is the walk modifier held first, then Strong,
+  then A. Standing still (stand or crouch), Strong works like a C-stick
+  (#325): while it is held, each direction press starts that direction's smash
+  in place on that frame, and the directions do not move the fighter (no walk,
+  dash, crouch or tap jump) until Strong is released. Shield, Special (the EX
+  chord) and the air leave the directions as movement. Rivals
   needs no A for this: its Strong button with a direction is the strong attack
   in that direction, out of a run too ([Mizuumi controls](https://mizuumi.wiki/w/Rivals_Of_Aether/Controls),
   [Hit Box guide](https://www.hitboxarcade.com/blogs/hit-box/getting-started-with-rivals-of-aether-on-hit-box)).
-  Rivals publishes no window for a direction followed by Strong; ours is
-  DASH_FLICK_SAMPLES (the direction's press frame and the two after it),
-  where a keyboard press is still in the dash's first frames: a smash in the
-  dash-smash window (dash frames 1–3, up and down smashes too) starts in place,
-  with the dash's speed dropped. Rivals' Strong alone, with no direction, is
+  A smash in the dash-smash window (dash frames 1–3, up and down smashes too)
+  starts in place, with the dash's speed dropped. Rivals' Strong alone, with no direction, is
   the forward strong; ours needs A for it, so that holding Strong to aim and
   holding Strong for the EX chord do not start a forward smash.
   A direction + A is always a tilt; a fresh flick dashes on its first frame, so the forward tilt
@@ -917,8 +924,9 @@ rule over all 13 selectable fighters.
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
 - **Attack inputs** (owner; Strong since #186): neutral attack is the jab,
-  attack with a direction is a tilt, and attack while holding Strong, or a
-  direction pressed while Strong is held on the ground, is a smash
+  attack with a direction is a tilt, and attack while holding Strong where
+  the ground state allows a smash, or a direction pressed while Strong is
+  held standing still, is a smash
   (smashcraft:docs/physics.md, "Prototype attack phases").
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in
