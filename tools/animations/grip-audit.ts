@@ -27,7 +27,7 @@ function nodeNamed(model: ReturnType<typeof parseSource>, name: string) {
   return model.Nodes.find(node => node?.Name === name);
 }
 function descendsFrom(model: ReturnType<typeof parseSource>, node: NonNullable<ReturnType<typeof nodeNamed>>, ancestor: NonNullable<ReturnType<typeof nodeNamed>>): boolean {
-  for (let current = node; current.Parent !== undefined && current.Parent >= 0;) {
+  for (let current = node; (current.Parent ?? -1) >= 0;) {
     const parent = model.Nodes.find(candidate => candidate?.ObjectId === current.Parent);
     if (parent === undefined) return false;
     if (parent === ancestor) return true;
