@@ -1,9 +1,12 @@
-import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, SpecialAction } from "./codes";
+import { Character, LedgeState, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { type Controls, type Roster } from "./roster";
-import { FEL_RUSH_FIRST, FEL_RUSH_LAST, FEL_RUSH_SPEED, FEL_RUSH_TELL_LAST } from "./specials";
+import { snapToLedge } from "./ledge";
+import { ROSTER_MANA } from "./mana";
+import { CHAOS_STRIKE_AIR_FORM, FEL_RUSH_BRANCH_FIRST, FEL_RUSH_FIRST, FEL_RUSH_FRAMES, FEL_RUSH_LAST, FEL_RUSH_SPEED, FEL_RUSH_TELL_LAST, VENGEFUL_RETREAT_FORM } from "./specials";
+import { surfaceRight, surfaceZ } from "./stage";
 import { controls } from "./testWorld";
 import { duelPair, lift, stepDuel } from "./testDuel";
 
@@ -52,15 +55,18 @@ function assertTravels(result: Rush, x: number, z: number): void {
 
 function secondRush(x: number, z: number, onLine?: (target: Fighter, startX: number, startZ: number) => void): { first: Rush; second: Rush; third: Rush; target: Fighter } {
   const { world, owner, target } = illidan(HEIGHT);
-  const first = rush(world, owner, 1, 0, 1);
+  const first = rush(world, owner, 1, 0, 1, () => { if (target.status.damage === 0.0) ahead(owner, target, 30.0); });
   settle(world, owner, HEIGHT);
+  target.motion.x = -900.0;
+  lift(target, 0.0);
+  target.status.damage = 0.0;
   const second = rush(world, owner, 1, x, z, onLine === undefined ? undefined : (startX, startZ) => onLine(target, startX, startZ));
   settle(world, owner, HEIGHT);
   const third = rush(world, owner, 1, 0, 0);
   return { first, second, third, target };
 }
 
-test("Fel Rush: the first air rush flies level even with the stick held up, the second goes the way the stick points on its last tell frame in all 8 directions, and a third in the same airtime is refused [k3 measure #520]", () => {
+test("Fel Rush: the first air rush flies level even with the stick held up, the second (earned by the first's hit) goes the way the stick points on its last tell frame in all 8 directions, and a third in the same airtime is refused [k3 measure #520]", () => {
   for (const [x, z] of DIRECTIONS) {
     const { first, second, third } = secondRush(x, z);
     assertTravels(first, 1, 0);
@@ -96,4 +102,178 @@ test("Fel Rush: grounded rushes stay level with the stick picking the side, what
       assertEquals(owner.special.airtimeUses, 0);
     }
   }
+});
+
+const EDGE = surfaceRight(0, 0, 0);
+const TOP = surfaceZ(0, 0, 0);
+
+function ahead(owner: Readonly<Fighter>, foe: Fighter, gap: number): void {
+  foe.motion.x = f32(owner.motion.x + f32(owner.facing * gap));
+  lift(foe, owner.motion.z);
+}
+
+/** Steps until the Fel Rush action ends, passing each frame's input from `input`; returns the frames it took. */
+function runOut(world: Roster, owner: Fighter, input: (owner: Fighter) => Readonly<Controls> = () => controls()): number {
+  let frames = 0;
+  while (owner.special.action === SpecialAction.demonHunterFelRush && frames < 80) {
+    stepDuel(world, input(owner));
+    frames++;
+  }
+  return frames;
+}
+
+const pressed = (owner: Readonly<Fighter>): boolean => owner.special.action === SpecialAction.demonHunterFelRush && owner.special.frame <= 1;
+
+function pressAgain(world: Roster, owner: Fighter): boolean {
+  stepDuel(world, sideB(owner.facing));
+  return pressed(owner);
+}
+
+/** A neutral air rush that strikes `target` placed on its line, run to its end. */
+function hittingAirRush(world: Roster, owner: Fighter, target: Fighter): void {
+  const before = target.status.damage;
+  stepDuel(world, sideB(owner.facing));
+  assertTrue(pressed(owner));
+  runOut(world, owner, () => {
+    if (target.status.damage === before) ahead(owner, target, 30.0);
+    return controls();
+  });
+  assertGreaterThan(target.status.damage, before);
+}
+
+const branchPress = (attack: boolean) => (owner: Readonly<Fighter>): Controls =>
+  owner.special.form === 0 && owner.special.frame + 1 === FEL_RUSH_BRANCH_FIRST ? controls(attack ? { attackPressed: true } : { specialPressed: true }) : controls();
+
+test("Fel Rush: an air rush that hits nobody, plain or EX, ends in helpless fall, and no second press before landing starts another [k3 measure #554]", () => {
+  for (const ex of [false, true]) {
+    const { world, owner } = illidan(HEIGHT);
+    owner.mana.points = ROSTER_MANA.max;
+    stepDuel(world, controls({ specialPressed: true, specialX: 1, direction: 1, exPressed: ex }));
+    assertTrue(pressed(owner));
+    assertEquals(owner.special.ex, ex);
+    runOut(world, owner);
+    assertFalse(owner.motion.grounded);
+    assertTrue(owner.special.fall);
+    assertEquals(owner.jump.remaining, 0);
+    settle(world, owner, HEIGHT);
+    assertFalse(pressAgain(world, owner));
+    owner.special.fall = false;
+    settle(world, owner, HEIGHT);
+    assertFalse(pressAgain(world, owner));
+  }
+});
+
+test("Fel Rush: an air rush whose Vengeful Retreat or Chaos Strike branch hits nobody ends in helpless fall with no second rush [k3 measure #554]", () => {
+  for (const attack of [false, true]) {
+    const { world, owner } = illidan(HEIGHT);
+    stepDuel(world, sideB(1));
+    assertTrue(pressed(owner));
+    runOut(world, owner, branchPress(attack));
+    assertFalse(owner.motion.grounded);
+    assertTrue(owner.special.fall);
+    owner.special.fall = false;
+    settle(world, owner, HEIGHT);
+    assertFalse(pressAgain(world, owner));
+  }
+});
+
+test("Fel Rush: a grounded rush carried off a ledge counts as the airtime's rush, so a whiff leaves no air rush but no helpless either [k3 measure #554]", () => {
+  const { world, owner } = illidan(0.0);
+  owner.motion.x = f32(EDGE - 40.0);
+  stepDuel(world);
+  assertTrue(owner.motion.grounded);
+  stepDuel(world, sideB(1));
+  assertTrue(pressed(owner));
+  runOut(world, owner);
+  assertFalse(owner.motion.grounded);
+  assertFalse(owner.special.fall);
+  lift(owner, HEIGHT);
+  settle(world, owner, HEIGHT);
+  assertFalse(pressAgain(world, owner));
+});
+
+test("Fel Rush: an air rush that hits earns exactly one more, usable at once and aimed, and a hit with that one earns no third [k3 measure #554]", () => {
+  const { world, owner, target } = illidan(HEIGHT);
+  hittingAirRush(world, owner, target);
+  assertFalse(owner.special.fall);
+  assertEquals(owner.special.cooldowns[SpecialAction.demonHunterFelRush] ?? 0, 0);
+  hittingAirRush(world, owner, target);
+  assertFalse(owner.special.fall);
+  settle(world, owner, HEIGHT);
+  assertFalse(pressAgain(world, owner));
+});
+
+test("Fel Rush: a hit by the air rush's Chaos Strike branch earns the second rush [k3 measure #554]", () => {
+  const { world, owner, target } = illidan(HEIGHT);
+  stepDuel(world, sideB(1));
+  runOut(world, owner, (f) => {
+    if (target.status.damage === 0.0) {
+      target.motion.x = f.motion.x;
+      lift(target, f32(f.motion.z + 600.0));
+      if (f.special.form === CHAOS_STRIKE_AIR_FORM) ahead(f, target, 60.0);
+    }
+    return branchPress(true)(f);
+  });
+  assertGreaterThan(target.status.damage, 0.0);
+  assertFalse(owner.special.fall);
+  lift(owner, HEIGHT);
+  assertTrue(pressAgain(world, owner));
+});
+
+test("Fel Rush: a hit by the ledge-carried grounded rush earns one more air rush [k3 measure #554]", () => {
+  const { world, owner, target } = illidan(0.0);
+  owner.motion.x = f32(EDGE - 40.0);
+  stepDuel(world);
+  stepDuel(world, sideB(1));
+  runOut(world, owner, (f) => {
+    if (f.special.frame >= FEL_RUSH_FIRST && target.status.damage === 0.0) ahead(f, target, 30.0);
+    return controls();
+  });
+  assertGreaterThan(target.status.damage, 0.0);
+  assertFalse(owner.motion.grounded);
+  lift(owner, HEIGHT);
+  assertTrue(pressAgain(world, owner));
+  runOut(world, owner);
+  settle(world, owner, HEIGHT);
+  assertFalse(pressAgain(world, owner));
+});
+
+test("Fel Rush: a grounded rush that hits nobody ends as before, grounded on frame 29 with no helpless and no airtime use [k3 measure #554]", () => {
+  const { world, owner } = illidan(0.0);
+  stepDuel(world, sideB(1));
+  assertTrue(pressed(owner));
+  assertEquals(runOut(world, owner) + 1, FEL_RUSH_FRAMES);
+  assertTrue(owner.motion.grounded);
+  assertFalse(owner.special.fall);
+  assertEquals(owner.special.airtimeUses, 0);
+});
+
+test("Fel Rush: landing or a ledge grab after a whiffed air rush gives the air rush back [k3 measure #554]", () => {
+  for (const ledge of [false, true]) {
+    const { world, owner } = illidan(HEIGHT);
+    stepDuel(world, sideB(1));
+    runOut(world, owner);
+    assertTrue(owner.special.fall);
+    if (ledge) assertTrue(snapToLedge(world, 0, 0, 1));
+    else for (let frame = 0; frame < 300 && !owner.motion.grounded; frame++) stepDuel(world);
+    assertFalse(owner.special.fall);
+    assertEquals(owner.special.airtimeUses, 0);
+    if (ledge) for (let frame = 0; frame < 60 && owner.ledge.state !== LedgeState.none; frame++) stepDuel(world, controls({ jumpPressed: owner.ledge.frame > 0 }));
+    for (let frame = 0; frame < 60 && owner.landing.lag > 0; frame++) stepDuel(world);
+    lift(owner, HEIGHT);
+    settle(world, owner, HEIGHT);
+    assertTrue(pressAgain(world, owner));
+  }
+});
+
+test("Fel Rush: a Vengeful Retreat branched from a grounded rush still ends without helpless [k3 measure #554]", () => {
+  const { world, owner } = illidan(0.0);
+  stepDuel(world, sideB(1));
+  let retreated = false;
+  runOut(world, owner, (f) => {
+    retreated ||= f.special.form === VENGEFUL_RETREAT_FORM;
+    return branchPress(false)(f);
+  });
+  assertTrue(retreated);
+  assertFalse(owner.special.fall);
 });

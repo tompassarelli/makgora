@@ -92,7 +92,15 @@ Ground or air, any facing (the stick picks the side).
   straight line, leaving a fel trail. In the air he flies level (gravity off),
   as Fel Rush does in WoW. A grounded rush, and the first rush in an airtime,
   always go level, the stick picking only the side.
-- **The second rush in an airtime is aimed:** the stick held on its last tell
+- **One rush per airtime, plus one earned (#554):** a rush that ends airborne
+  is the airtime's rush, whether it started in the air or ran off a ledge.
+  If that rush, or the Vengeful Retreat or Chaos Strike branched from it,
+  strikes a fighter, he earns one more rush this airtime with its cooldown
+  cleared; the earned rush earns no third, so offstage rush chains stop at
+  two. An air rush whose rush and branch strike nobody ends in helpless fall
+  until he lands or grabs a ledge; a grounded rush that strikes nobody ends
+  as before. Landing, a ledge grab and being hit give the airtime back.
+- **The earned second rush is aimed:** the stick held on its last tell
   frame (frame 5) sends it in any of 8 directions (up, down, the diagonals,
   either side) at the same 20 units a frame and 200 in all; with the stick
   neutral it flies level in his facing. The press itself still picks the side,
@@ -114,9 +122,10 @@ Ground or air, any facing (the stick picks the side).
     (held back turns him, the cross-up after passing through): active on its
     frames 5–8, 10% fire at 40°, base 30, growth 95; ends on frame 30. In the
     air, landing ends it with 12 frames of landing lag.
-- **Limits:** twice per airtime, the second aimed (landing, a ledge catch or a
-  hit refreshes both);
-  40-frame cooldown from the press; a recovery tool that never ends helpless.
+- **Limits:** once per airtime, a second (aimed) only when the first or its
+  branch strikes a fighter (landing, a ledge catch or a hit refreshes both);
+  40-frame cooldown from the press, cleared when the second is earned; an air
+  rush that strikes nobody ends helpless.
 - **Cost:** the mana lane's side-special cost (12); the branches are free.
 
 **Counterplay.** The tell is 5 frames, so up close the rush is a read, not a
