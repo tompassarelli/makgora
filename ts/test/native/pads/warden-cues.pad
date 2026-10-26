@@ -102,6 +102,8 @@
 #! scene a GlaiveMissileTarget
 #! scene a FanOfKnivesCaster
 #! scene a BlinkCaster
+# #487 opens the unmarked Pursuit Lunge's windup with a glint on her glaive.
+#! scene a HolyBoltSpecialArt
 868 a capture
 882 a capture
 1000 a press VIEW
