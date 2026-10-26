@@ -56,13 +56,14 @@ const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_P
 
 const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, name: NAME, slot: SLOT, mana: MANA, stocks: STOCKS, stockCount: STOCK_COUNT };
 
-const GROUP_LEFT = PLATE_WIDTH_PX - PERCENT.x - PERCENT.width;
+const MIRRORED_PERCENT_X = 236;
+const GROUP_LEFT = MIRRORED_PERCENT_X - PERCENT.x + DAMAGE.x;
 
 const RIGHT_PANEL: PanelLayout = {
   mirrored: true,
   bust: flip(BUST),
   damage: { ...DAMAGE, x: GROUP_LEFT },
-  percent: { ...PERCENT, x: GROUP_LEFT + PERCENT.x - DAMAGE.x },
+  percent: { ...PERCENT, x: MIRRORED_PERCENT_X },
   name: flip(NAME),
   slot: flip(SLOT),
   mana: flip(MANA),
