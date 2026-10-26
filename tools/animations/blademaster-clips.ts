@@ -15,8 +15,10 @@ import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const replaceOnly = process.argv.includes("--replace-down-air");
+const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
+const rigOutput = option("--rig"), downAirKeys = option("--down-air-keys");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace-down-air]");
+ensure(input && output && relative(project, output).startsWith("..") && (rigOutput || downAirKeys), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT (--rig RIG.json | --down-air-keys KEYS.json [--replace-down-air])");
 const fighter = fighters.get(Character.blademaster)!; ensure(fighter, "missing Blademaster");
 const shipped = parseSource(await Bun.file(join(input, fighter.source)).arrayBuffer());
 const source = replaceOnly ? shipped : swordGestureBaseModel(shipped) ?? shipped;
@@ -53,19 +55,10 @@ if (!replaceOnly) {
 const model = structuredClone(source), hero = heroDefinition(Character.blademaster); ensure(hero, "missing moves");
 const stand = source.Sequences.find(s => s.Name === "Stand Ready"); ensure(stand, "missing guard");
 type V = readonly [number, number, number];
-interface Figure { pitch: number; chest: number; chestTwist: number; pelvis: number; pelvisTwist: number; left: readonly [number, number]; right: readonly [number, number] }
-interface Pose { hand: V; tip: V; lean: number; twist: number; knee: number; offhand: number; legSplit:number; drop:number; pitch:number; figure?: Figure }
+interface Pose { hand: V; tip: V; lean: number; twist: number; knee: number; offhand: number; legSplit:number; drop:number; pitch:number }
 const pose = (hand: V, tip: V, lean = 0, twist = 0, knee = 12, offhand = 25, legSplit=0, drop=0, pitch=0): Pose => ({hand, tip, lean, twist, knee, offhand, legSplit, drop, pitch});
 const guard = pose([26,-25,100],[100,-25,145]);
 const coil = pose([-16,-25,135],[-65,-20,180],-12,-20,24,35);
-interface Body { lean: number; twist: number; knee: number; offhand: number; drop: number; pitch: number }
-const swing = (x: number, z: number, degrees: number, b: Body) =>
-  pose([x,-24,z],[x+100*Math.cos(degrees*Math.PI/180),-24,z+100*Math.sin(degrees*Math.PI/180)],b.lean,b.twist,b.knee,b.offhand,0,b.drop,b.pitch);
-interface Stance extends Partial<Omit<Figure, "left" | "right">> { left: readonly [number, number]; right: readonly [number, number]; drop: number; offhand?: number }
-const figure = (x: number, z: number, degrees: number, s: Stance): Pose => {
-  const f: Figure = {pitch:0,chest:0,chestTwist:0,pelvis:0,pelvisTwist:0,...s};
-  return {...swing(x,z+s.drop,degrees,{lean:f.chest,twist:f.chestTwist,knee:0,offhand:s.offhand??55,drop:s.drop,pitch:f.pitch}),figure:f};
-};
 const gestures = [
   {key:"jab",name:"Jab Quick Cut",style:AttackStyle.jab,prep:pose([10,-50,120],[-45,-50,170],-5,-12),hit:pose([46,-24,76],[128,-24,65],8,8,16),exit:pose([42,-25,64],[65,-24,12],12,16)},
   {key:"jab2",name:"Jab Returning Cut",style:AttackStyle.jab2,prep:pose([30,-24,58],[78,-24,8],14,18),hit:pose([48,-24,74],[135,-24,91],3,-12,20),exit:pose([15,-25,126],[-40,-24,160],-4,-20)},
@@ -84,38 +77,7 @@ const gestures = [
   {key:"upAir",name:"Air Upward Pierce",style:AttackStyle.upAir,prep:pose([10,-24,88],[52,-24,6],20,-12,62,45),hit:pose([7,-24,147],[7,-24,246],-14,10,80,70,65),exit:pose([24,-24,136],[62,-24,219],-5,18,64,55,35)},
   {key:"throwBack",name:"Throw Back Heave",style:undefined,prep:pose([40,-24,105],[100,-24,148],10,18,30,75),hit:pose([-40,-24,140],[-125,-24,196],-18,-45,28,90),exit:pose([-30,-24,119],[-100,-24,150],-6,-55,20,55)},
 ] as const;
-const replacements = [
-  {key:"downAir",name:"Down Air Sword Plunge",style:AttackStyle.downAir,keys:[
-    [0,guard],
-    [3,figure(-10,128,120,{pitch:-20,chest:-14,left:[60,100],right:[45,90],drop:10,offhand:40})],
-    [5,figure(-30,140,160,{pitch:-34,chest:-20,chestTwist:-24,pelvisTwist:12,left:[90,130],right:[75,125],drop:20,offhand:35})],
-    [7,figure(14,118,40,{pitch:10,chest:20,left:[40,80],right:[20,60],drop:4,offhand:55})],
-    [8,figure(34,62,-18,{pitch:36,chest:30,chestTwist:16,left:[-10,30],right:[0,45],drop:-30,offhand:70})],
-    [9,figure(34,58,-62,{pitch:50,chest:34,chestTwist:22,pelvis:-8,pelvisTwist:-14,left:[-30,8],right:[-20,20],drop:-40,offhand:85})],
-    [10,figure(28,62,-128,{pitch:54,chest:36,chestTwist:18,pelvis:-8,left:[-35,8],right:[-25,25],drop:-36,offhand:85})],
-    [11,figure(0,140,95,{pitch:-8,chest:-12,chestTwist:-20,left:[100,135],right:[60,20],drop:-28,offhand:20})],
-    [12,figure(10,66,-90,{pitch:20,chest:24,chestTwist:-26,pelvisTwist:20,left:[95,130],right:[90,125],drop:-26,offhand:70})],
-    [13,figure(-28,72,-165,{pitch:-44,chest:-16,chestTwist:-34,pelvisTwist:16,left:[88,10],right:[62,40],drop:-23,offhand:60})],
-    [14,figure(-30,110,178,{pitch:20,chest:10,chestTwist:30,pelvisTwist:-20,left:[20,90],right:[45,120],drop:-20,offhand:60})],
-    [15,figure(32,64,-85,{pitch:32,chest:30,chestTwist:40,pelvis:6,pelvisTwist:-24,left:[75,5],right:[-35,100],drop:-20,offhand:85})],
-    [16,figure(26,62,-120,{pitch:34,chest:30,chestTwist:36,pelvis:6,pelvisTwist:-24,left:[72,8],right:[-38,105],drop:-21,offhand:85})],
-    [17,figure(20,130,95,{pitch:-10,chest:-14,chestTwist:-18,left:[20,60],right:[40,90],drop:-18,offhand:45})],
-    [18,figure(40,56,-88,{pitch:6,chest:16,chestTwist:-10,pelvis:-10,left:[-8,4],right:[10,20],drop:-24,offhand:65})],
-    [19,figure(-34,72,-168,{pitch:-32,chest:-22,chestTwist:-42,pelvis:-10,pelvisTwist:26,left:[-38,115],right:[72,22],drop:-21,offhand:30})],
-    [20,figure(-10,150,135,{pitch:-46,chest:-26,chestTwist:-30,pelvisTwist:14,left:[-20,60],right:[30,110],drop:-6,offhand:15})],
-    [21,figure(30,62,-70,{pitch:40,chest:36,chestTwist:-30,pelvis:10,pelvisTwist:30,left:[85,120],right:[-25,15],drop:-22,offhand:85})],
-    [22,figure(24,60,-112,{pitch:42,chest:38,chestTwist:-30,pelvis:10,pelvisTwist:30,left:[85,120],right:[-28,15],drop:-23,offhand:85})],
-    [23,figure(16,142,110,{pitch:-22,chest:-16,chestTwist:16,left:[60,105],right:[65,110],drop:-10,offhand:40})],
-    [24,figure(24,70,-90,{pitch:30,chest:34,pelvis:-6,left:[-20,30],right:[-10,45],drop:-18,offhand:75})],
-    [27,figure(20,72,-92,{pitch:34,chest:36,pelvis:-6,left:[-25,25],right:[-12,40],drop:-22,offhand:75})],
-    [30,figure(16,72,-118,{pitch:18,chest:22,left:[25,65],right:[35,75],drop:-20,offhand:55})],
-    [33,figure(13,70,-150,{pitch:2,chest:6,left:[12,25],right:[4,20],drop:-14,offhand:30})],
-    [37,swing(12,76,-185,{lean:5,twist:2,knee:9,offhand:28,drop:-10,pitch:1})],
-    [40,swing(14,86,152,{lean:3,twist:2,knee:10,offhand:27,drop:-6,pitch:0})],
-    [43,swing(18,94,130,{lean:1,twist:1,knee:11,offhand:26,drop:-2,pitch:0})],[45,guard],[46,guard],
-  ]},
-] as const;
-type Gesture = (typeof gestures)[number] | (typeof replacements)[number];
+type Gesture = (typeof gestures)[number];
 
 function writeBindings(bindings: readonly string[], names: readonly string[]) {
   return Bun.write(join(project,"ts/src/game/presentation/blademasterClipInfo.ts"),["// Generated by tools/animations/blademaster-clips.ts; regenerate instead of editing.",'import { f32 } from "wisp/src/sim/f32";','import type { HeroClipTable } from "../sim/heroes/hero";',"export const BLADEMASTER_AUTHORED_CLIPS = {",...bindings,"} as const satisfies HeroClipTable;","","export const BLADEMASTER_AUTHORED_CLIP_NAMES = {",...names,"} as const;",""].join("\n"));
@@ -142,26 +104,23 @@ for (const [path,t] of donor) {
 const pelvisRotation=[...donor.keys()].find(path=>{const m=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);return m!==null&&source[m[1] as "Bones"|"Helpers"][Number(m[2])]?.Name==="Bone_Pelvis";});
 ensure(pelvisRotation,"missing pelvis rotation");
 if(!base.has(pelvisRotation))base.set(pelvisRotation,new Float32Array([0,0,0,1]));
+const skeleton=(["Bones","Helpers"] as const).flatMap(kind=>model[kind].map((n,i)=>({n,path:`.${kind}.${i}`})));
+if(rigOutput){
+  const at=(path:string)=>{const v=base.get(path);return v?Array.from(v):null;};
+  await Bun.write(rigOutput,JSON.stringify({frames:hero.moves.normals[AttackStyle.downAir]?.totalFrames,nodes:skeleton.map(({n,path})=>({name:n.Name,parent:skeleton.findIndex(s=>s.n.ObjectId===n.Parent),pivot:Array.from(source.PivotPoints[n.ObjectId]!),rotation:at(`${path}.Rotation`),translation:at(`${path}.Translation`),scaling:at(`${path}.Scaling`)}))}));
+  console.log(`BLADEMASTER_RIG ${rigOutput}`);process.exit(0);
+}
 const nodes=[...model.Bones,...model.Helpers], nodeByName=(name:string)=>{const n=nodes.find(n=>n.Name===name);ensure(n,name);return n;};
 const arm=[nodeByName("Bone_Arm1_R"),nodeByName("Bone_Arm2_R")],hand=nodeByName("Bone_Hand_R"),tip=nodeByName("Shimmer");
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 interface ClipRecord { pose:string; name:string; index:number; first:number; last:number; total:number; seconds:number; strikeSeconds:number; controlFrames:number[] }
 const records: ClipRecord[]=[],bindings:string[]=[],names:string[]=[];
 function timeline(g: Gesture, first: number, last: number, total: number): { controlFrames: number[]; poses: Pose[] } {
-  if("keys" in g)return {controlFrames:g.keys.map(([frame])=>frame),poses:g.keys.map(([,p])=>p)};
   if(g.style===AttackStyle.upTilt)return {controlFrames:[0,first-3,first,first+1,first+2,first+3,last,last+2,total-4,total],poses:[guard,pose([30,-50,70],[115,-50,5],14,-15,34,40),pose([40,-50,120],[165,-50,120],8,-10),pose([28,-50,140],[108,-50,242],-6,-4),pose([0,-50,150],[-22,-50,275],-10,0),pose([-28,-50,140],[-131,-50,212],-6,4),pose([-40,-50,120],[-165,-50,120],4,10),pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
   if(g.style===AttackStyle.forwardTiltUp)return {controlFrames:[0,Math.max(1,first-3),first,last+2,total-4,total],poses:[guard,g.prep,g.hit,pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
   return {controlFrames:[0,Math.max(1,first-3),first,("second" in g?g.second:last+2),total],poses:[guard,g.prep,g.hit,g.exit,guard]};
 }
 function posedJoint(name: string, q: Float32Array<ArrayBuffer>, p: Pose): Float32Array<ArrayBuffer> {
-  const f=p.figure;
-  if(f){
-    if(name==="Bone_Chest")return rotate(rotate(q,[0,1,0],f.pitch+f.chest),[0,0,1],f.chestTwist);
-    if(name==="Bone_Pelvis")return rotate(rotate(q,[0,1,0],f.pitch+f.pelvis),[0,0,1],f.pelvisTwist);
-    if(name==="Bone_Head")return rotate(q,[0,1,0],-f.chest*0.3);
-    const leg=/^Bone_Leg([12])_([LR])$/.exec(name);
-    if(leg){const [hip,knee]=leg[2]==="L"?f.left:f.right;return rotate(q,[0,1,0],leg[1]==="1"?-hip:knee);}
-  }
   if(name==="Bone_Chest")return rotate(rotate(q,[0,1,0],p.lean+p.pitch),[0,0,1],p.twist);
   if(name==="Bone_Pelvis")return rotate(rotate(q,[0,1,0],p.pitch),[0,0,1],-p.twist*0.35);
   if(name==="Bone_Head")return rotate(q,[0,1,0],-p.lean*0.4);
@@ -196,7 +155,7 @@ function reach(temp: mdx.Model, start: number, p: Pose, g: Gesture) {
   };
   for(let iteration=0;iteration<12;iteration++)for(const joint of arm.toReversed())aim(joint,hand,p.hand);
   if(g.style===AttackStyle.upTilt) aim(hand,sword!,p.tip,new Float32Array([90.45929718017578,63.46139907836914,82.50170135498047]));
-  else for(let iteration=0;iteration<("keys" in g?8:1);iteration++)aim(hand,tip,p.tip);
+  else aim(hand,tip,p.tip);
 }
 function author(g: Gesture, index: number, start: number, end: number, first: number, last: number, total: number): number[] {
   const {controlFrames,poses}=timeline(g,first,last,total);
@@ -228,13 +187,23 @@ for(const g of replaceOnly ? [] : gestures){
   records.push({pose:g.key,name:`Sword Gesture ${g.name}`,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const replaced=new Set<number>();
-for(const g of replacements){
-  const move=hero.moves.normals[g.style],index=model.Sequences.findIndex(s=>s.Name===g.name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
-  ensure(move&&start!==undefined&&end!==undefined,`missing ${g.name}`);
+{
+  const name="Down Air Sword Plunge",move=hero.moves.normals[AttackStyle.downAir],index=model.Sequences.findIndex(s=>s.Name===name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
+  ensure(move&&start!==undefined&&end!==undefined,`missing ${name}`);
   const total=Math.round((end-start)*60/1000),first=move.startupFrames,last=first+move.activeFrames-1;
-  ensure(total===move.totalFrames,`${g.name}: clip length differs from the move`);
-  const controlFrames=author(g,index,start,end,first,last,total);replaced.add(index);
-  records.push({pose:g.key,name:g.name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
+  ensure(total===move.totalFrames,`${name}: clip length differs from the move`);
+  const authored=await Bun.file(downAirKeys!).json() as {frames:number;nodes:{rotation?:number[][];translation?:number[][]}[]};
+  ensure(authored.frames===total,`${name}: Blender keys cover ${authored.frames} frames, the move ${total}`);
+  const controlFrames=Array.from({length:total+1},(_,frame)=>frame);
+  for(const [at,{n,path}] of skeleton.entries())for(const kind of ["Rotation","Translation"] as const){
+    const t=n[kind],v=base.get(`${path}.${kind}`)??(kind==="Rotation"?[0,0,0,1]:[0,0,0]);if(!t||onGlobalClock(t))continue;
+    const keyed=authored.nodes[at]?.[kind==="Rotation"?"rotation":"translation"];
+    t.Keys=t.Keys.filter(k=>k.Frame<start||k.Frame>end);
+    for(const frame of controlFrames){const Vector=Float32Array.from(keyed?.[frame]??v);t.Keys.push({Frame:start+Math.round(frame*1000/60),Vector,...(t.LineType>=mdx.LineType.Hermite?{InTan:Vector.slice(),OutTan:Vector.slice()}:{})});}
+    t.Keys.sort((a,b)=>a.Frame-b.Frame);
+  }
+  replaced.add(index);
+  records.push({pose:"downAir",name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const bytes=encodeVerified(parseSource(generateMDX(model))),before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
 for(const [index,s]of source.Sequences.entries())if(!replaced.has(index))for(const fraction of [0,0.5,1]){const t=(s.Interval[1]-s.Interval[0])*fraction/1000,a=before.triangles(index,t,1),b=after.triangles(index,t,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${s.Name}: shipped pose changed`);}

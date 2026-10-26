@@ -53,12 +53,19 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`.
-  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace-down-air]`
+  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --down-air-keys KEYS.json [--replace-down-air]`
   appends a distinct gesture for each Blademaster normal and his back throw,
-  preserving the double-jump flip, and re-authors the Down Air Sword Plunge clip
-  in place as one alternating downward swipe per airborne hit, then the plunge and
-  landing pop (#256). `--replace-down-air` re-authors only that clip on the shipped
-  model, checking every other clip is unchanged.
+  preserving the double-jump flip, and writes the Down Air Sword Plunge clip in
+  place from keys authored in Blender (#256). `--replace-down-air` re-authors only
+  that clip on the shipped model, checking every other clip is unchanged.
+  The keys come from two steps: `--rig RIG.json --replace-down-air` (in place of
+  `--down-air-keys`) writes his skeleton and guard pose, then
+  `blender --background --factory-startup --python tools/animations/blademaster-down-air.py -- RIG.json KEYS.json`
+  builds an identity-rest armature on it and bakes one frame per attack frame: a
+  downward cut per airborne hit that alternates through the front and the back,
+  legs tucking on each windup and driving down through each cut, the overhead
+  plunge, and a landing whose blade rises behind his back into the guard. It needs
+  no MDL exporter.
   `bun tools/animations/peon-clips.ts STOCK_PEON.mdx PRIVATE_OUTPUT` appends
   Peon's tool strikes, movement, recovery, paired grabs and nine pain poses,
   preserves the 22 stock sequences and writes both-facing silhouette sheets.
