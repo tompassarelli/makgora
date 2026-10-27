@@ -246,7 +246,6 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
   if (spec.status !== undefined) {
     int("status.kind", spec.status.kind);
     int("status.frames", spec.status.frames);
-    if (spec.status.airFrames !== undefined) int("status.airFrames", spec.status.airFrames);
     int("status.group", spec.status.group);
     int("status.immunityFrames", spec.status.immunityFrames);
     if (spec.status.tick !== undefined) {
@@ -321,7 +320,6 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
     if (partner.biteStatus !== undefined) {
       int("companion.biteStatus.kind", partner.biteStatus.kind);
       int("companion.biteStatus.frames", partner.biteStatus.frames);
-      if (partner.biteStatus.airFrames !== undefined) int("companion.biteStatus.airFrames", partner.biteStatus.airFrames);
       int("companion.biteStatus.group", partner.biteStatus.group);
       int("companion.biteStatus.immunityFrames", partner.biteStatus.immunityFrames);
       if (partner.biteStatus.tick !== undefined) {

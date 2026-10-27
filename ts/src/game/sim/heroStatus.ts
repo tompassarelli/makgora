@@ -74,8 +74,6 @@ export interface AppliedStatus {
 
   readonly tick?: { readonly every: number; readonly damage: number } | undefined;
 
-  readonly airFrames?: number | undefined;
-
 
 
 
@@ -122,7 +120,7 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
   if (status.drain !== undefined) drainMana(f, status.drain.mana);
   if ((state.conditionImmunity[status.group] ?? 0) > 0) return;
   state.condition = status.kind;
-  state.conditionFrames = status.airFrames !== undefined && !f.motion.grounded ? status.airFrames : heroStatusFrames(status, f.mana.points);
+  state.conditionFrames = heroStatusFrames(status, f.mana.points);
   if (RULES[status.kind]?.mashMinimum !== undefined) clearMash(f.grab);
   state.conditionGroup = status.group;
   state.conditionImmunityFrames = status.immunityFrames;

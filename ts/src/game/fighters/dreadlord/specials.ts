@@ -40,7 +40,7 @@ const SLEEP_ORB: AuthoredSpecial = {
     spawnFrame: 26, offsetX: 40.0, offsetZ: 60.0, velocityX: h(f32(0.06)), velocityZ: 0.0, life: 50, radius: h(f32(0.18)),
     effect: { damage: 1.8100000619888306, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
     reflectable: true, limit: 1,
-    status: { kind: HeroStatusKind.sleep, frames: 160, airFrames: 24, group: HeroStatusGroup.sleep, immunityFrames: 240 },
+    status: { kind: HeroStatusKind.sleep, frames: 160, group: HeroStatusGroup.sleep, immunityFrames: 240 },
   }],
 };
 

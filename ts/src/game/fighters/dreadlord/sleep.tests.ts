@@ -7,8 +7,7 @@ const SLEEP_ORB = [Action.special, Action.moveDown];
 const ORB_GAP = 250.0;
 const AIR_HEIGHT = 40.0;
 const WATCHED_FRAMES = 400;
-const GROUND_SLEEP_FRAMES = 160;
-const AIR_SLEEP_FRAMES = 24;
+const SLEEP_FRAMES = 160;
 
 function sleepFrames(airborne: boolean): number {
   const s = scene(0, [{ character: Character.dreadlord, x: 0.0, facing: 1 }, { character: Character.rifleman, x: ORB_GAP, facing: -1 }]);
@@ -24,17 +23,23 @@ function sleepFrames(airborne: boolean): number {
   frame(s, [], []);
   frame(s, SLEEP_ORB, []);
   let asleep = 0;
+  let airborneAtHit = false;
   for (let tick = 1; tick <= WATCHED_FRAMES; tick++) {
     frame(s, [], []);
-    if (victim.status.condition === HeroStatusKind.sleep) asleep++;
+    if (victim.status.condition === HeroStatusKind.sleep) {
+      if (asleep === 0) airborneAtHit = !victim.motion.grounded;
+      asleep++;
+    }
     hover();
   }
+  assertEquals(airborneAtHit, airborne);
   return asleep;
 }
 
-test("Sleep keeps a grounded fighter asleep for one second longer than the old 100 frames, 160 at 60 frames a second, and still an airborne one for 24 [k3 measure docs/design/kit-review-2.md]", () => {
+test("Sleep keeps a grounded fighter and an airborne one asleep for the same 160 frames, one second longer than the old grounded 100 [k3 measure docs/design/kit-review-2.md]", () => {
   const ground = sleepFrames(false);
-  assertGreaterThan(ground, GROUND_SLEEP_FRAMES - 3);
-  assertLessThan(ground, GROUND_SLEEP_FRAMES + 1);
-  assertEquals(sleepFrames(true), AIR_SLEEP_FRAMES);
+  const air = sleepFrames(true);
+  assertGreaterThan(ground, SLEEP_FRAMES - 3);
+  assertLessThan(ground, SLEEP_FRAMES + 1);
+  assertEquals(air, ground);
 });
