@@ -143,6 +143,16 @@ checks it explicitly because the headless frame recorder stores requested
 points without reproducing the native clipping. A fresh map creates the
 correct parents; hot reload retains the parents of existing native handles.
 
+The character and stage select backdrops have the same fullscreen parent.
+On Classic 3.0.0.24268, showing a `ConsoleUIBackdrop` child draws it over
+Warcraft's chat lines and chat entry box until the level of
+`ORIGIN_FRAME_CHAT_MSG` is set again, whatever that level is. Select shows
+its backdrop on every frame, so `layerChat`
+(smashcraft:ts/src/game/ui/chatLayer.ts) sets the chat level on every select
+frame. Pool pair 1 probes on 2026-10-28 found that chat drew over fighter
+select with the backdrop hidden, or with the level set each frame at 0 or at
+110, and did not draw with the level set once (#566).
+
 ## Below the deck
 
 The match HUD covers the frame from about 77% of its height down

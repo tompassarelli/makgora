@@ -11,20 +11,23 @@ export const fighterSelectChecks = (pass: readonly Rule[]): NativeCheck[] => [
     look: "With each client's first-run Controls panel closed, the computer's starting fighter in SETUP characters= is the same on both clients and matches both fighter-select frames; it differs between the first and second session.",
   })),
   {
-    id: "434-chat-fighter-select", closes: "smashcraft#434", map: "fighter-select", session: "434-chat-select",
+    id: "434-chat-fighter-select", closes: "smashcraft#566", map: "fighter-select", session: "434-chat-select",
     setup: [
       { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Rifleman", client: "b" },
-      { waitMs: 1500 }, { chat: "Chat stays readable over fighter select", client: "b" }, { waitMs: 500 },
+      { waitMs: 1500 }, { chat: "Chat stays readable over fighter select", client: "b" }, { waitMs: 500 }, { keys: ["Return"], client: "a" }, { waitMs: 400 },
     ],
     capture: [{ kind: "frames", name: "chat-fighter-select", client: "a" }, { kind: "frames", name: "chat-fighter-select", client: "b" }],
     pass,
-    look: "On both clients the line Chat stays readable over fighter select, sent from client b, is drawn whole above the roster, cards and buttons, with no select frame covering any of its letters.",
+    look: "On both clients the line Chat stays readable over fighter select, sent from client b, is drawn whole above the roster, cards and buttons, with no select frame covering any of its letters, and client a shows Warcraft's chat entry box that Enter opened.",
   },
   {
-    id: "434-chat-stage-select", closes: "smashcraft#434", map: "fighter-select", session: "434-chat-select",
-    setup: [{ keys: ["y"], client: "a" }, { waitMs: 1500 }, { chat: "Chat stays readable over stage select", client: "a" }, { waitMs: 500 }],
+    id: "434-chat-stage-select", closes: "smashcraft#566", map: "fighter-select", session: "434-chat-select",
+    setup: [
+      { keys: ["Return"], client: "a" }, { waitMs: 300 }, { keys: ["y"], client: "a" }, { waitMs: 1500 }, { chat: "Chat stays readable over stage select", client: "a" }, { waitMs: 500 },
+      { keys: ["Return"], client: "b" }, { waitMs: 400 },
+    ],
     capture: [{ kind: "frames", name: "chat-stage-select", client: "a" }, { kind: "frames", name: "chat-stage-select", client: "b" }],
     pass,
-    look: "Both clients show STAGE SELECT, and the line Chat stays readable over stage select, sent from client a, is drawn whole above the stage tiles and buttons, with no select frame covering any of its letters.",
+    look: "Both clients show STAGE SELECT, and the line Chat stays readable over stage select, sent from client a, is drawn whole above the stage tiles and buttons, with no select frame covering any of its letters, and client b shows Warcraft's chat entry box that Enter opened.",
   },
 ];

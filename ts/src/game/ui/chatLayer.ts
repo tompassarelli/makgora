@@ -8,9 +8,15 @@ export function chatLevel(selecting: boolean): number {
   return selecting ? CHAT_LEVELS.select : CHAT_LEVELS.match;
 }
 
-export function layerChat(view: object, selecting: boolean): void {
+// Engine: showing a ConsoleUIBackdrop child draws it over chat until chat's level is set again, so select sets it every frame.
+export function chatLevelToSet(shown: number | undefined, selecting: boolean): number | undefined {
   const level = chatLevel(selecting);
-  if (shownLevels.get(view) === level) return;
+  return selecting || shown !== level ? level : undefined;
+}
+
+export function layerChat(view: object, selecting: boolean): void {
+  const level = chatLevelToSet(shownLevels.get(view), selecting);
+  if (level === undefined) return;
   shownLevels.set(view, level);
   BlzFrameSetLevel(BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0), level);
 }
