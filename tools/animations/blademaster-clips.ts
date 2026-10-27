@@ -14,9 +14,10 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const replaceOnly = process.argv.includes("--replace-down-air");
+const replaceKeys = process.argv.flatMap((arg, index) => process.argv[index - 1] === "--replace" ? [arg] : []);
+const replaceOnly = replaceKeys.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace-down-air]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace KEY]...");
 const fighter = fighters.get(Character.blademaster)!; ensure(fighter, "missing Blademaster");
 const shipped = parseSource(await Bun.file(join(input, fighter.source)).arrayBuffer());
 const source = replaceOnly ? shipped : swordGestureBaseModel(shipped) ?? shipped;
@@ -228,13 +229,15 @@ for(const g of replaceOnly ? [] : gestures){
   records.push({pose:g.key,name:`Sword Gesture ${g.name}`,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const replaced=new Set<number>();
-for(const g of replacements){
-  const move=hero.moves.normals[g.style],index=model.Sequences.findIndex(s=>s.Name===g.name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
-  ensure(move&&start!==undefined&&end!==undefined,`missing ${g.name}`);
+const clipName=(g: Gesture)=>"keys" in g?g.name:`Sword Gesture ${g.name}`;
+const replacing=replaceOnly?replaceKeys.map(key=>{const g=[...gestures,...replacements].find(g=>g.key===key);ensure(g&&g.style!==undefined,`no normal gesture ${key}`);return g;}):replacements;
+for(const g of replacing){
+  const move=g.style===undefined?undefined:hero.moves.normals[g.style],name=clipName(g),index=model.Sequences.findIndex(s=>s.Name===name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
+  ensure(move&&start!==undefined&&end!==undefined,`missing ${name}`);
   const total=Math.round((end-start)*60/1000),first=move.startupFrames,last=first+move.activeFrames-1;
-  ensure(total===move.totalFrames,`${g.name}: clip length differs from the move`);
+  ensure(total===move.totalFrames,`${name}: clip length differs from the move`);
   const controlFrames=author(g,index,start,end,first,last,total);replaced.add(index);
-  records.push({pose:g.key,name:g.name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
+  records.push({pose:g.key,name,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
 const bytes=encodeVerified(parseSource(generateMDX(model))),before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
 for(const [index,s]of source.Sequences.entries())if(!replaced.has(index))for(const fraction of [0,0.5,1]){const t=(s.Interval[1]-s.Interval[0])*fraction/1000,a=before.triangles(index,t,1),b=after.triangles(index,t,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${s.Name}: shipped pose changed`);}
