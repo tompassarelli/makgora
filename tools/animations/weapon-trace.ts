@@ -77,6 +77,7 @@ function reachGap(frames: readonly number[], regions: readonly (readonly Capsule
   let found: Gap | undefined;
   frames.forEach((frame, index) => {
     for (const capsule of regions[index] ?? []) {
+      if ('path' in capsule && capsule.path === true) continue;
       const end = farEnd(capsule);
       const gap = Math.max(0, Math.min(...path.map(edge => segmentDistance(end, edge.grip, edge.tip))) - capsule.radius);
       if (found === undefined || gap > found.gap) found = { gap, frame, at: end };
