@@ -35,7 +35,8 @@ const lift = (): AuthoredSpecial => ({
   motion: [{ ...frames(1, 10), velocityX: 0.0, velocityZ: 0.0 },
     { ...frames(11, 26), velocityX: 0.0, velocityZ: 20.0, driftSpeed: 10.0 },
     { ...frames(27, 32), velocityX: 0.0, velocityZ: 6.0, driftSpeed: 3.0 }],
-  regions: [heroRegion(11, 16, c(0.0, 95.0, 0.0, 200.0, 20.0), hit(7.250796318054199, "launch", 80))],
+  regions: [heroRegion(11, 11, c(-55.0, 183.0, -102.0, 217.0, 20.0), hit(7.250796318054199, "launch", 80)),
+    heroRegion(12, 16, c(-19.0, 169.0, -53.0, 200.0, 20.0), hit(7.250796318054199, "launch", 80))],
 });
 
 export const CAIRNE_SPECIALS: FighterSpecials = {

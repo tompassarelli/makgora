@@ -26,10 +26,11 @@ export function cairneHit(damage: number, strength: keyof typeof STRENGTH, angle
 }
 export const cairneCapsule = (x1: number, z1: number, x2: number, z2: number, radius = 14.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
 const c = cairneCapsule;
+type AxePath = readonly (readonly [number, number, number, number])[];
 const strike = (first: number, last: number, shape: StrikeCapsule, damage: number, strength: keyof typeof STRENGTH, angle: keyof typeof DIRECTIONS, direction = 1): MoveRegion =>
   heroRegion(first, last, shape, cairneHit(damage, strength, angle, direction));
-const sweep = (first: number, reach: number, heights: readonly number[], damage: number, strength: keyof typeof STRENGTH, direction = 1): MoveRegion[] =>
-  heights.map((z, i) => strike(first + i, first + i, c(34.0 * direction, 95.0, (reach - 14.0) * direction, z), damage, strength, 40, direction));
+const along = (first: number, path: AxePath, damage: number, strength: keyof typeof STRENGTH, angle: keyof typeof DIRECTIONS, direction = 1, radius = 14.0): MoveRegion[] =>
+  path.map(([x1, z1, x2, z2], i) => strike(first + i, first + i, c(x1, z1, x2, z2, radius), damage, strength, angle, direction));
 const BODY = hurtCapsule(Character.cairne);
 const half = (part: HurtPart): HurtPart => ({ ...part, x2: f32(f32(part.x1 + part.x2) * 0.5), z2: f32(f32(part.z1 + part.z2) * 0.5) });
 export const cairneHurtPose = (first: number, last: number, part: HurtPart) => [
@@ -46,8 +47,8 @@ const pairedPose = (first: number, turn: number, last: number, front: HurtPart, 
   heroHurtPose(last + 1, last + 3, [BODY, half(back)]),
 ];
 const arm = (x: number, z: number) => hurtPart(20.0, 90.0, x, z, 18.0);
-const FLOOR_REACH = c(24.0, 16.0, 64.0, 16.0);
-const FORWARD_TILT = heroMove(14, 4, 29, 0, [...sweep(14, 170.0, [170.0, 115.0, 60.0, 12.0], 10.473372459411621, "edge"), strike(17, 17, FLOOR_REACH, 10.473372459411621, "edge", 40)]);
+const forwardTilt = (path: AxePath) => heroMove(14, 4, 29, 0, along(14, path, 10.473372459411621, "edge", 40));
+const FORWARD_SMASH: AxePath = [[162.0, 154.0, 232.0, 161.0], [178.0, 119.0, 246.0, 105.0], [182.0, 81.0, 242.0, 48.0], [181.0, 44.0, 235.0, 0.0]];
 export const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 export const CAIRNE_MOVES: FighterMoves = {
@@ -75,39 +76,34 @@ export const CAIRNE_MOVES: FighterMoves = {
     },
   },
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(7, 3, 18, 0, [strike(7, 9, c(30.0, 75.0, 88.0, 72.0), 4.028219699859619, "link", 35), strike(7, 7, FLOOR_REACH, 4.028219699859619, "link", 35)])),
-    [AttackStyle.jab2]: heroMove(9, 3, 23, 0, [strike(9, 11, c(35.0, 85.0, 110.0, 60.0), 6.445152282714844, "poke", 40)]),
-    [AttackStyle.forwardTilt]: FORWARD_TILT,
-    [AttackStyle.forwardTiltUp]: FORWARD_TILT,
-    [AttackStyle.forwardTiltDown]: FORWARD_TILT,
-    [AttackStyle.upTilt]: heroMove(13, 5, 27, 0, [
-      strike(13, 14, c(30.0, 115.0, 90.0, 175.0), 9.66772747039795, "launch", 85),
-      strike(15, 15, c(0.0, 130.0, 0.0, 215.0), 9.66772747039795, "launch", 85),
-      strike(16, 17, c(-30.0, 115.0, -90.0, 175.0), 9.66772747039795, "launch", 85),
-      strike(13, 13, FLOOR_REACH, 9.66772747039795, "launch", 85),
-    ]),
-    [AttackStyle.downTilt]: heroMove(11, 3, 25, 0, [strike(11, 13, c(34.0, 25.0, 140.0, 14.0), 8.056439399719238, "launch", 70)]),
-    [AttackStyle.dashAttack]: heroMove(10, 10, 26, 0, [strike(10, 19, c(20.0, 60.0, 95.0, 75.0, 32.0), 11.25, "kill", 40)], 32.0, true),
+    [AttackStyle.jab]: jabStep(heroMove(7, 3, 18, 0, [strike(7, 9, c(102.0, 71.0, 150.0, 26.0), 4.028219699859619, "link", 35)])),
+    [AttackStyle.jab2]: heroMove(9, 3, 23, 0, [strike(9, 11, c(117.0, 78.0, 186.0, 71.0), 6.445152282714844, "poke", 40)]),
+    [AttackStyle.forwardTilt]: forwardTilt([[104.0, 153.0, 176.0, 152.0], [120.0, 116.0, 189.0, 97.0], [126.0, 76.0, 186.0, 41.0], [81.0, 3.0, 94.0, -66.0]]),
+    [AttackStyle.forwardTiltUp]: forwardTilt([[103.0, 153.0, 175.0, 148.0], [117.0, 119.0, 186.0, 99.0], [124.0, 83.0, 184.0, 50.0], [80.0, 12.0, 94.0, -54.0]]),
+    [AttackStyle.forwardTiltDown]: forwardTilt([[107.0, 150.0, 179.0, 149.0], [122.0, 114.0, 191.0, 97.0], [127.0, 76.0, 189.0, 44.0], [82.0, -3.0, 95.0, -71.0]]),
+    [AttackStyle.upTilt]: heroMove(13, 5, 27, 0, along(13, [[88.0, 166.0, 159.0, 174.0], [54.0, 195.0, -81.0, 133.0], [15.0, 208.0, -84.0, 97.0], [-42.0, 198.0, -58.0, 50.0], [-78.0, 169.0, -12.0, 35.0]], 9.66772747039795, "launch", 85)),
+    [AttackStyle.downTilt]: heroMove(11, 3, 25, 0, [strike(11, 13, c(107.0, 20.0, 174.0, 0.0), 8.056439399719238, "launch", 70)]),
+    [AttackStyle.dashAttack]: heroMove(10, 10, 26, 0, along(10, [[-66.0, 67.0, 24.0, 17.0], [-42.0, 69.0, 36.0, 23.0], [-16.0, 69.0, -68.0, 46.0], [2.0, 67.0, -45.0, 42.0], [7.0, 67.0, -39.0, 42.0], [14.0, 66.0, -30.0, 41.0], [22.0, 66.0, -21.0, 40.0], [30.0, 66.0, -12.0, 39.0], [33.0, 66.0, -8.0, 39.0], [28.0, 65.0, -14.0, 36.0]], 11.25, "kill", 40, 1, 32.0), 32.0, true),
     [AttackStyle.forwardSmash]: heroMove(30, 4, 43, 0, [
-      ...[180.0, 120.0, 60.0, 10.0].map((z, i) => strongRegion(strike(30 + i, 30 + i, c(148.0, z, 175.0, z, 15.0), 20.14109992980957, "kill", 40))),
-      ...sweep(30, 145.0, [180.0, 120.0, 60.0, 10.0], 15.307236671447754, "kill"),
+      ...FORWARD_SMASH.map(([x1, z1, x2, z2], i) => strongRegion(strike(30 + i, 30 + i, c(f32((x1 + x2) * 0.5), f32((z1 + z2) * 0.5), x2, z2, 15.0), 20.14109992980957, "kill", 40))),
+      ...along(30, FORWARD_SMASH.map(([x1, z1, x2, z2]) => [x1, z1, f32((x1 + x2) * 0.5), f32((z1 + z2) * 0.5)] as const), 15.307236671447754, "kill", 40),
     ]),
-    [AttackStyle.upSmash]: heroMove(25, 5, 39, 0, [strike(25, 29, c(0.0, 115.0, 0.0, 245.0, 20.0), 18.52981185913086, "kill", 85)]),
+    [AttackStyle.upSmash]: heroMove(25, 5, 39, 0, along(25, [[-4.0, 226.0, -80.0, 98.0], [-4.0, 229.0, -82.0, 105.0], [-6.0, 230.0, -79.0, 110.0], [-11.0, 228.0, -75.0, 116.0], [-18.0, 225.0, -71.0, 121.0]], 18.52981185913086, "kill", 85, 1, 20.0)),
     [AttackStyle.downSmash]: heroMove(19, 14, 13, 0, [
-      strike(19, 22, c(20.0, 20.0, 148.0, 10.0, 18.0), 18.0, "stompFront", 80),
-      strike(29, 32, c(-20.0, 20.0, -148.0, 10.0, 18.0), 16.0, "stompRear", 80, -1),
+      ...along(19, [[118.0, 36.0, 165.0, -14.0], [112.0, 28.0, 172.0, -7.0], [86.0, 19.0, 132.0, -31.0], [43.0, 14.0, 68.0, -50.0]], 18.0, "stompFront", 80, 1, 18.0),
+      ...along(29, [[-111.0, 30.0, -177.0, 5.0], [-114.0, 26.0, -180.0, 2.0], [-116.0, 23.0, -183.0, -1.0], [-119.0, 20.0, -185.0, -3.0]], 16.0, "stompRear", 80, -1, 18.0),
     ]),
     [AttackStyle.neutralAir]: heroMove(12, 7, 29, 22, [
-      strike(12, 14, c(28.0, 75.0, 132.0, 95.0), 10.473372459411621, "poke", 50),
-      strike(15, 16, c(0.0, 130.0, 0.0, 194.0), 10.473372459411621, "poke", 50),
-      strike(17, 18, c(-28.0, 75.0, -132.0, 95.0), 10.473372459411621, "poke", 50, -1),
+      ...along(12, [[75.0, 120.0, 75.0, 120.0], [75.0, 120.0, 52.0, 154.0], [52.0, 154.0, 15.0, 168.0], [15.0, 168.0, -20.0, 158.0], [-20.0, 158.0, -54.0, 131.0]], 10.473372459411621, "poke", 50, 1, 20.0),
+      ...along(17, [[-54.0, 131.0, -67.0, 84.0], [-67.0, 84.0, -65.0, 87.0]], 10.473372459411621, "poke", 50, -1, 20.0),
     ]),
-    [AttackStyle.forwardAir]: heroMove(20, 4, 36, 26, sweep(20, 175.0, [165.0, 110.0, 55.0, 0.0], 15.307236671447754, "kill")),
-    [AttackStyle.backAir]: heroMove(15, 4, 30, 22, sweep(15, 155.0, [120.0, 90.0, 60.0, 30.0], 12.890304565429688, "edge", -1)),
-    [AttackStyle.upAir]: heroMove(12, 4, 28, 20, [strike(12, 15, c(0.0, 125.0, 0.0, 194.0, 20.0), 10.473372459411621, "launch", 85)]),
+    [AttackStyle.forwardAir]: heroMove(20, 4, 36, 26, along(20, [[94.0, 155.0, 167.0, 153.0], [109.0, 105.0, 176.0, 80.0], [106.0, 51.0, 161.0, 9.0], [93.0, 16.0, 134.0, -39.0]], 15.307236671447754, "kill", 40)),
+    [AttackStyle.backAir]: heroMove(15, 4, 30, 22, along(15, [[-119.0, 108.0, 10.0, 33.0], [-121.0, 90.0, 18.0, 37.0], [-121.0, 71.0, 24.0, 36.0], [-116.0, 52.0, 30.0, 41.0]], 12.890304565429688, "edge", 40, -1)),
+    [AttackStyle.upAir]: heroMove(12, 4, 28, 20, [strike(12, 15, c(-89.0, 63.0, 48.0, 96.0, 20.0), 10.473372459411621, "launch", 85)]),
     [AttackStyle.downAir]: heroMove(14, 7, 39, 28, [
-      heroRegion(14, 16, c(0.0, 30.0, 0.0, -80.0, 20.0), cairneHit(18.0, "stompMeteor", 270), cairneHit(18.0, "stompMeteor", 55)),
-      strike(17, 20, c(0.0, 30.0, 0.0, -80.0, 18.0), 12.0, "stompLate", 55),
+      ...([[25.0, -32.0, 36.0, -104.0], [29.0, -48.0, 31.0, -121.0], [33.0, -54.0, 34.0, -127.0]] as const).map(([x1, z1, x2, z2], i) =>
+        heroRegion(14 + i, 14 + i, c(x1, z1, x2, z2, 20.0), cairneHit(18.0, "stompMeteor", 270), cairneHit(18.0, "stompMeteor", 55))),
+      ...along(17, [[34.0, -57.0, 33.0, -130.0], [33.0, -57.0, 27.0, -131.0], [31.0, -54.0, 67.0, 90.0], [41.0, -13.0, 41.0, -13.0]], 12.0, "stompLate", 55, 1, 18.0),
     ]),
     [AttackStyle.grab]: heroMove(10, 3, 31, 0, [heroRegion(10, 12, c(30.0, 65.0, 98.0, 60.0), { damage: 0.0, ...NO_LAUNCH })]),
   },

@@ -88,6 +88,7 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   thrall: ["back-air", "down-tilt", "forward-tilt-down", "down-smash", "down-air", "dash-attack"],
   illidan: ["down-tilt"],
   warden: ["down-tilt"],
+  "cairne-bloodhoof": ["down-special"],
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
 };
 
@@ -300,7 +301,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
       const grab = move?.commandGrab !== undefined && frame >= move.commandGrab.first - 1 && frame <= move.commandGrab.last - 1 ? move.commandGrab : undefined;
       const placed = move?.placement?.frame === frame + 1 ? move.placement : undefined;
       windows[frames.length] = (move?.regions ?? []).filter((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined).map((candidate) => candidate.hit.window);
-      strikes[frames.length] = (move?.regions ?? []).flatMap((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined ? [{ ...candidate.hit.strike }] : []);
+      strikes[frames.length] = move?.regionOrigin !== undefined ? [] : (move?.regions ?? []).flatMap((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined ? [{ ...candidate.hit.strike }] : []);
       if (region !== undefined || projectile !== undefined || grab !== undefined || placed !== undefined) {
         activeFrames.push(frames.length);
         const weapon = region?.hit.strike?.path === true ? move?.regions?.find((candidate) => candidate.hit.strike !== undefined && candidate.hit.strike.path !== true)?.hit.strike : undefined;
