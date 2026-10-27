@@ -9,7 +9,6 @@ import type { Controls } from "./roster";
 import { surfaceCount, surfaceLeft, surfacePass, surfaceRight, surfaceZ } from "./stage";
 import { stickX, stickZ } from "./stick";
 import { bodyTop } from "./surfaces";
-import { cancelAttack } from "./transitions";
 import { clearDash } from "./groundMovement";
 import { aerialJumps } from "./itemBuffs";
 import { melee } from "./tuning";
@@ -85,13 +84,6 @@ export function dropFromPlatform(f: Fighter, stage: number, matchFrame: number, 
     || f.platform.downAge >= DASH_FLICK_SAMPLES || stickZ(input) >= -CROUCH_STICK_THRESHOLD
     || input.attackRequested || input.specialPressed || f.attack.style !== undefined
     || f.special.action !== SpecialAction.none || f.jump.squat > 0 || f.shield.raised) return false;
-  dropPlatform(f, stage, matchFrame, deck);
-  return true;
-}
-
-export function beginPlatformContact(f: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, deck: number): boolean {
-  if (!intentOpen(f, stage, deck) || input.walking || stickZ(input) >= -CROUCH_STICK_THRESHOLD) return false;
-  cancelAttack(f);
   dropPlatform(f, stage, matchFrame, deck);
   return true;
 }

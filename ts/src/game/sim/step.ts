@@ -663,10 +663,9 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
 
   const ascending = edge === EdgePass.none && !teleportsThisFrame(f) && platforms.mountPlatform(f, stage, matchFrame, input);
   const landing = edge === EdgePass.land ? 0 : edge !== EdgePass.none || ascending ? undefined : landingDeck(f, stage, matchFrame, oldX, oldZ, carried);
-  const contact = landing !== undefined && !motion.grounded && platforms.beginPlatformContact(f, stage, matchFrame, input, landing);
-  if (landing !== undefined && !contact) {
+  if (landing !== undefined) {
     finishLanding(f, stage, matchFrame, input, landing, false);
-  } else if (!ascending && !contact) {
+  } else if (!ascending) {
 
 
 

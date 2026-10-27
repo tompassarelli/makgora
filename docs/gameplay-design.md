@@ -841,8 +841,11 @@ animations and their frames from #103/#392.
 - The drop consumes that down input and never starts fast fall. Leave the down
   zone toward neutral, or release the keyboard key, then press down again to
   fast-fall within the existing fast-fall window.
-- Falling with full down still passes through a platform, cancelling the
-  aerial without landing lag. The input is consumed by that drop as well.
+- Falling onto a platform with down held lands on it, as with any other
+  input; the only way down through a platform is to stand on it and give a
+  down input. Landing with down already held needs the stick let go and
+  pressed down again to drop (Tom, 2026-10-28, replacing the 14 Oct rule that
+  a fall with full down passed through).
 - Tom’s two-platform route is falling down air → drop → up air → drop →
   double jump → rising up air through the platform → down air.
 
