@@ -3,7 +3,8 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, w
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { packagerSource } from "wisp/scripts/wisp/mapBuild";
-import { poolUnitCommand, unitPairIds } from "../scripts/wisp/commands/lanPoolUnit";
+import { ownerWalkStart, poolUnitCommand, unitPairIds } from "../scripts/wisp/commands/lanPoolUnit";
+import { NATIVE_OUTER_PID } from "../scripts/wisp/commands/pairGuard";
 
 const ts = join(import.meta.dir, "..");
 const fixtures = join(import.meta.dir, "fixtures/lan-pool");
@@ -96,4 +97,5 @@ test("each fleet session's pool unit has its own name, reads back its pairs, wai
   expect(pool(unit("early"))).toEqual(["--pair", "0", "--queue", "--owner-pid", "4242", "--foreground"]);
   expect(pool(unit("early", ["--pair", "0", "--queue", "--owner-pid", "7"]))).toEqual(["--pair", "0", "--queue", "--owner-pid", "7", "--foreground"]);
   expect(pool(unit(""))).toEqual(["--pair", "0", "--queue", "--foreground"]);
+  expect([ownerWalkStart({ [NATIVE_OUTER_PID]: "4242" }, 99), ownerWalkStart({}, 99), ownerWalkStart({ [NATIVE_OUTER_PID]: "" }, 99)]).toEqual([4242, 99, 99]);
 });

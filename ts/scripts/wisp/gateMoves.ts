@@ -24,7 +24,7 @@ import { type MapStall, readMapStalls } from "./mapStalls";
 import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokeMatchFailures, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
 import { smokePairs } from "./smokeShards";
-import { controlsShowing, fighterSelectShowing, screenWords, startPromptReady } from "./gateIntro";
+import { controlsShowing, enlarge, fighterSelectShowing, screenWords, startPromptReady } from "./gateIntro";
 import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_BINDINGS, SMOKE_PRESET, type SettlePoint, keyName, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
@@ -38,7 +38,6 @@ const HAZARD_TRIES = 3;
 const START_PANELS = 4;
 const PARK_X = 0.4;
 const PARK_Y = 0.02;
-const LABEL_SCALE = 2;
 const NEUTRAL_SPECIAL_PAIR = [PLAYABLE_CHARACTERS.indexOf(Character.thrall), PLAYABLE_CHARACTERS.indexOf(Character.jaina)] as const;
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
@@ -86,17 +85,6 @@ const matchStalls = (clients: readonly Client[], manifests: readonly string[], s
 const stallLines = (stalls: readonly (readonly MapStall[])[]) => stalls.flatMap((list, slot) => list.map(({ from, through, millis }) => `stall P${slot + 1} ${Math.round(millis)} ms over frames ${from}-${through}`));
 
 export const readHazards = (words: readonly string[]) => /\bhaz[a-z]*:?\s+(on|off)\b/i.exec(words.join(" "))?.[1]?.toLowerCase();
-
-export const enlarge = ({ width, height, rgb }: Frame): Frame => {
-  const out = new Uint8Array(width * height * 3 * LABEL_SCALE * LABEL_SCALE);
-  for (let y = 0; y < height * LABEL_SCALE; y++) {
-    for (let x = 0; x < width * LABEL_SCALE; x++) {
-      const from = ((y / LABEL_SCALE | 0) * width + (x / LABEL_SCALE | 0)) * 3;
-      out.set(rgb.subarray(from, from + 3), (y * width * LABEL_SCALE + x) * 3);
-    }
-  }
-  return { width: width * LABEL_SCALE, height: height * LABEL_SCALE, rgb: out };
-};
 
 const hazardsButton = (view: Viewport) => {
   const corner = point(view, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y);

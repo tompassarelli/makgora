@@ -14,6 +14,7 @@ import { runProcess } from "../../hostProcess";
 import { readClientEntries } from "../nativeTools";
 import { projectRoot } from "../project";
 import { userSessionEnv } from "./nativeUnit";
+import { NATIVE_OUTER_PID } from "./pairGuard";
 import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
 
 export const POOL_UNIT_PREFIX = "smashcraft-lan-pool";
@@ -48,8 +49,13 @@ const carries = (pid: number, variable: string) => {
   try { return readFileSync(`/proc/${pid}/environ`, "latin1").split("\0").includes(variable); } catch { return false; }
 };
 
+export const ownerWalkStart = (env: Readonly<Record<string, string | undefined>> = process.env, self = process.pid) => {
+  const outer = Number(env[NATIVE_OUTER_PID] ?? "");
+  return Number.isInteger(outer) && outer > 1 ? outer : self;
+};
+
 /** The fleet session's own process, which a pool unit names with `--owner-pid` because it runs outside that process tree: the outermost ancestor carrying the same `NORTH_FLEET_SESSION`. */
-export const fleetSessionPid = (session: string, from = process.pid) => {
+export const fleetSessionPid = (session: string, from = ownerWalkStart()) => {
   let outermost = from;
   for (let pid = parentOf(from); pid !== undefined && pid > 1 && carries(pid, `NORTH_FLEET_SESSION=${session}`); pid = parentOf(pid)) outermost = pid;
   return outermost;

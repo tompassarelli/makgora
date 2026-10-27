@@ -7,6 +7,7 @@ import { PICKER_DONE } from "../../src/game/ui/settingsUi";
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
 const INTRO_STEPS = 4;
+const LABEL_SCALE = 2;
 const CONTROLS_SCREEN = /^(recommended|smash)$/i;
 
 export interface ScreenWord {
@@ -26,7 +27,23 @@ export const controlsShowing = (words: readonly ScreenWord[]): boolean =>
 
 export const fighterSelectShowing = (words: readonly ScreenWord[], height: number): boolean => !controlsShowing(words) && promptWords(words, height).includes("click");
 
-export const screenWords = (client: Client, frame: Frame) => Effect.all([frameWords(client, frame, "light"), frameWords(client, frame, "gold")]).pipe(Effect.map(inks => inks.flat()));
+export const enlarge = ({ width, height, rgb }: Frame): Frame => {
+  const out = new Uint8Array(width * height * 3 * LABEL_SCALE * LABEL_SCALE);
+  for (let y = 0; y < height * LABEL_SCALE; y++) {
+    for (let x = 0; x < width * LABEL_SCALE; x++) {
+      const from = ((y / LABEL_SCALE | 0) * width + (x / LABEL_SCALE | 0)) * 3;
+      out.set(rgb.subarray(from, from + 3), (y * width * LABEL_SCALE + x) * 3);
+    }
+  }
+  return { width: width * LABEL_SCALE, height: height * LABEL_SCALE, rgb: out };
+};
+
+const scaledWords = (client: Client, frame: Frame, scale: number) => Effect.all([frameWords(client, frame, "light"), frameWords(client, frame, "gold")]).pipe(
+  Effect.map(inks => inks.flat().map(word => ({ ...word, x: Math.round(word.x / scale), y: Math.round(word.y / scale) }))),
+);
+
+export const screenWords = (client: Client, frame: Frame) =>
+  Effect.all([scaledWords(client, frame, 1), scaledWords(client, enlarge(frame), LABEL_SCALE)]).pipe(Effect.map(scales => scales.flat()));
 
 export const viewportPoint = (region: Region, x: number, y: number) => ({ x: region.x + Math.round((region.width - region.height * 4 / 3) / 2 + x * region.height / 0.6), y: region.y + Math.round(region.height - y * region.height / 0.6) });
 
