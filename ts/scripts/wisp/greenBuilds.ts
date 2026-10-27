@@ -10,6 +10,7 @@ export interface RunSummary {
 
 export interface Candidate {
   readonly sha: string;
+  readonly build: number;
   readonly ci: Verdict;
   readonly farm: Verdict;
 }
@@ -19,7 +20,7 @@ export const PREDICT_COST = "--predict-cost";
 export const costPrediction = (args: readonly string[]) => ({ predict: args.includes(PREDICT_COST), args: args.filter((arg) => arg !== PREDICT_COST) });
 
 export const LANE_FILE = /^Smashcraft (\d+\.\d+\.\d+)-([a-z0-9]+(?:-[a-z0-9]+)*)\.w3x$/;
-export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+\.\d+)(?:-dev ([0-9a-f]{7,40})| RC-\d+)?\.w3x$/;
+export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+\.\d+)(?:-dev\.(\d+)| RC-(\d+))?\.w3x$/;
 export const buildLabel = (file: string) => PLAYABLE_FILE.test(file) ? file.slice("Smashcraft ".length, -".w3x".length) : undefined;
 
 
@@ -51,27 +52,28 @@ export function farmVerdict(sha: string, tree: string, exact: Verdict, statuses:
   return landed || passed || passedTrees.includes(tree) ? "success" : "missing";
 }
 
-export function installName(version: string, sha: string): string {
-  return `Smashcraft ${version}-dev ${sha.slice(0, SHORT_COMMIT)}`;
+export function installName(version: string, build: number): string {
+  return `Smashcraft ${version}-dev.${build}`;
 }
 
 export interface Installed {
   readonly version: readonly [number, number, number];
-  readonly commit: string | undefined;
+  readonly build: number | undefined;
+  readonly candidate: number | undefined;
 }
 
 export function parseInstalled(file: string): Installed | undefined {
   const match = PLAYABLE_FILE.exec(file);
   if (match === null) return undefined;
   const [major = 0, minor = 0, patch = 0] = (match[1] ?? "").split(".").map(Number);
-  return { version: [major, minor, patch], commit: match[2] };
+  return { version: [major, minor, patch], build: match[2] === undefined ? undefined : Number(match[2]), candidate: match[3] === undefined ? undefined : Number(match[3]) };
 }
 
-export function pickGreen(commits: readonly Candidate[], installed: readonly string[]): Candidate | undefined {
-  const has = (sha: string) => installed.some((commit) => commit.length > 0 && sha.startsWith(commit));
+export function pickGreen(commits: readonly Candidate[], installed: readonly number[]): Candidate | undefined {
+  const has = (build: number) => installed.includes(build);
   const index = commits.findIndex(isGreen);
   if (index === -1) return undefined;
-  if (commits.slice(0, index + 1).some(({ sha }) => has(sha))) return undefined;
+  if (commits.slice(0, index + 1).some(({ build }) => has(build))) return undefined;
   return commits[index];
 }
 
@@ -80,7 +82,7 @@ export type GreenStep =
   | { readonly kind: "hold"; readonly candidate: Candidate; readonly reason: string }
   | { readonly kind: "none" };
 
-export function greenStep(commits: readonly Candidate[], installed: readonly string[], hold: string | undefined): GreenStep {
+export function greenStep(commits: readonly Candidate[], installed: readonly number[], hold: string | undefined): GreenStep {
   const candidate = pickGreen(commits, installed);
   if (candidate === undefined) return { kind: "none" };
   if (hold !== undefined) return { kind: "hold", candidate, reason: hold };

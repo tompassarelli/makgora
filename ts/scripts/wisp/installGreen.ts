@@ -7,7 +7,7 @@ import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
-import { currentPlaytest, playName } from "./currentPlaytest";
+import { currentPlaytest, devBuild, playName } from "./currentPlaytest";
 import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
 import { GREEN_GATE_LOOKS, greenGateFailures, greenInstallDecision, smokeBlocks, type GreenGateReport, type SmokeReport, type Candidate, type RunSummary, buildLabel, farmVerdict, greenStep, isGreen, parseInstalled, verdictOf } from "./greenBuilds";
 import { installLatest, installedMaps } from "./mapLibrary";
@@ -99,13 +99,12 @@ function installedBuilds(documents: string) {
   return installedMaps(documents).flatMap((file) => parseInstalled(file) ?? []);
 }
 
-const installedCommits = (documents: string): string[] => installedBuilds(documents).flatMap(({ commit }) => commit ?? []);
+const installedNumbers = (documents: string): number[] => installedBuilds(documents).flatMap(({ build }) => build ?? []);
 
-/** The commit of the newest installed numbered build, the base of the next playtest checklist. */
-function previousInstalled(documents: string): string | undefined {
-  const [newest] = installedBuilds(documents).filter(({ commit }) => commit !== undefined)
-    .sort((a, b) => b.version[0] - a.version[0] || b.version[1] - a.version[1] || b.version[2] - a.version[2]);
-  return newest?.commit;
+/** The commit of the newest installed numbered build among `considered`, the base of the next playtest checklist. */
+function previousInstalled(documents: string, considered: readonly Candidate[]): string | undefined {
+  const newest = Math.max(...installedNumbers(documents));
+  return considered.find(({ build }) => build === newest)?.sha;
 }
 
 export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState, enforce = process.env.SMASHCRAFT_GREEN_GATE === "enforce") => Effect.gen(function*() {
@@ -157,7 +156,7 @@ export const greenMain = Effect.gen(function*() {
     const exact = verdictOf(farmRuns.filter(({ displayTitle }) => displayTitle.startsWith(`Farm test ${sha} `)).map(summary));
     const tree = evidence.find(({ oid }) => oid === sha)?.tree.oid;
     const farm = tree === undefined ? exact : farmVerdict(sha, tree, exact, statuses, passedTrees);
-    considered.push({ sha, ci, farm });
+    considered.push({ sha, build: yield* devBuild(sha), ci, farm });
     if (ci === "success" && farm === "success") break;
   }
   return considered;
@@ -166,11 +165,11 @@ export const greenMain = Effect.gen(function*() {
 export const installGreen = <E, R, SE extends { readonly message: string }, SR>(documents: string, dryRun: boolean, smoke: ((map: string) => Effect.Effect<unknown, SE, SR>) | undefined, controller: Effect.Effect<string, E, R>) => Effect.gen(function*() {
   const considered = yield* greenMain;
 
-  const installed = installedCommits(documents);
+  const installed = installedNumbers(documents);
   const step = greenStep(considered, installed, yield* clientHold(documents));
   if (dryRun) {
     console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}, ${smoke === undefined ? "read its existing smoke.json" : "run the move smoke on it"} and refuse a smoke crash, dead binding or move that fails to start; other gate-* failures ${process.env.SMASHCRAFT_GREEN_GATE === "enforce" ? "block" : "are recorded"}`}`);
-    if (step.kind === "install") console.log(`Dry run: would write playtest notes ${checklistPath(buildLabel(`${yield* playName(step.candidate.sha)}.w3x`) ?? step.candidate.sha)} for ${previousInstalled(documents) ?? `${step.candidate.sha.slice(0, 7)}^`}..${step.candidate.sha.slice(0, 7)}`);
+    if (step.kind === "install") console.log(`Dry run: would write playtest notes ${checklistPath(buildLabel(`${yield* playName(step.candidate.sha)}.w3x`) ?? step.candidate.sha)} for ${previousInstalled(documents, considered) ?? `${step.candidate.sha.slice(0, 7)}^`}..${step.candidate.sha.slice(0, 7)}`);
     return;
   }
 
@@ -183,9 +182,9 @@ export const installGreen = <E, R, SE extends { readonly message: string }, SR>(
   if (step.kind === "hold") return yield* hold(step.candidate.sha, step.reason);
 
   const pick = step.candidate;
-  const previous = previousInstalled(documents);
+  const previous = previousInstalled(documents, considered);
   const { map } = yield* currentPlaytest({ revision: pick.sha, helper: false });
-  const late = greenStep([pick], installedCommits(documents), yield* clientHold(documents));
+  const late = greenStep([pick], installedNumbers(documents), yield* clientHold(documents));
   if (late.kind === "hold") return yield* hold(pick.sha, late.reason);
   if (late.kind === "none") return console.log(`${pick.sha.slice(0, 7)} was installed while it built`);
   console.log(`Controller helper: ${yield* controller}`);

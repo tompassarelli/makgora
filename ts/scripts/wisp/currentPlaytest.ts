@@ -40,29 +40,37 @@ export function releaseTarget(described: string | undefined): string | undefined
   return `${match[1]}.${match[2]}.${Number(match[3]) + (match[4] === undefined ? 0 : 1)}`;
 }
 
-export function buildName(tags: readonly string[], target: string, revision: string): string {
+export function buildName(tags: readonly string[], target: string, build: number): string {
   if (tags.includes(`v${target}`)) return `Smashcraft ${target}`;
   const candidates = tags.flatMap((tag) => {
     const [version, number = ""] = tag.slice(1).split("-rc.");
     return tag.startsWith("v") && version === target && /^\d+$/.test(number) ? [Number(number)] : [];
   });
   if (candidates.length > 0) return `Smashcraft ${target} RC-${Math.max(...candidates)}`;
-  return installName(target, revision);
+  return installName(target, build);
 }
 
-const tagsAt = (revision: string) =>
-  capture(projectRoot, ["git", "tag", "--points-at", revision]).pipe(Effect.map((text) => (text ?? "").split("\n").map((tag) => tag.trim()).filter((tag) => tag !== "")));
+const tagsAt = (revision: string, repo: string) =>
+  capture(repo, ["git", "tag", "--points-at", revision]).pipe(Effect.map((text) => (text ?? "").split("\n").map((tag) => tag.trim()).filter((tag) => tag !== "")));
 
 /** The release `revision` builds toward: its own vX.Y.Z tag, else the patch after the newest one it descends from. */
-export const playTarget = (revision: string) => Effect.gen(function*() {
-  const target = releaseTarget(yield* capture(projectRoot, ["git", "describe", "--tags", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]));
+export const playTarget = (revision: string, repo = projectRoot) => Effect.gen(function*() {
+  const target = releaseTarget(yield* capture(repo, ["git", "describe", "--tags", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]));
   if (target === undefined) return yield* playProblem(new Error(`no vX.Y.Z release tag is reachable from ${revision.slice(0, 12)}`));
   return target;
 }).pipe(Effect.provide(BunServices.layer));
 
-export const playName = (revision: string) => Effect.gen(function*() {
-  const target = yield* playTarget(revision);
-  return buildName(yield* tagsAt(revision), target, revision);
+/** The first-parent commits `revision` is past the newest release tag it descends from: the number a dev build carries, which only grows along main. */
+export const devBuild = (revision: string, repo = projectRoot) => Effect.gen(function*() {
+  const tag = (yield* capture(repo, ["git", "describe", "--tags", "--abbrev=0", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]))?.trim();
+  const count = tag === undefined ? undefined : (yield* capture(repo, ["git", "rev-list", "--first-parent", "--count", `${tag}..${revision}`]))?.trim();
+  if (count === undefined || !/^\d+$/.test(count)) return yield* playProblem(new Error(`can't count first-parent commits past the newest release tag for ${revision.slice(0, 12)}`));
+  return Number(count);
+}).pipe(Effect.provide(BunServices.layer));
+
+export const playName = (revision: string, repo = projectRoot) => Effect.gen(function*() {
+  const target = yield* playTarget(revision, repo);
+  return buildName(yield* tagsAt(revision, repo), target, yield* devBuild(revision, repo));
 }).pipe(Effect.provide(BunServices.layer));
 
 
@@ -192,8 +200,8 @@ export interface PlaytestOptions {
 export type Edition = "classic" | "full";
 export const TOM_EDITION: Edition = "classic";
 
-export const playableMapBuild = (title: string, out: string, predictCost = false, edition: Edition = "full") =>
-  ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(predictCost ? [PREDICT_COST] : [])];
+export const playableMapBuild = (title: string, out: string, predictCost = false, edition: Edition = "full", commit?: string) =>
+  ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(commit === undefined ? [] : ["--commit", commit]), ...(predictCost ? [PREDICT_COST] : [])];
 
 export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, predictCost = false, edition = "full" }: PlaytestOptions = {}) => Effect.gen(function*() {
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
@@ -206,7 +214,7 @@ export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, 
     console.log(`Building ${title}`);
     yield* withBuildCheckout(mainCheckout, revision, stages, (lane) => Effect.gen(function*() {
       yield* run(join(lane, "ts"), ["bun", "install", "--frozen-lockfile"]).pipe(timedStage(stages, "bun-install"));
-      yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost, edition)).pipe(timedStage(stages, "map-build"));
+      yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost, edition, revision)).pipe(timedStage(stages, "map-build"));
       if (wantsHelper && !existsSync(helper)) {
         yield* buildHelper(lane, helper).pipe(Effect.catch((problem) => Effect.sync(() => console.log(`No controller helper for this build (${problem.problem}); the keyboard plays`))));
       }

@@ -105,7 +105,7 @@ export const build: Command = (args) => Effect.gen(function*() {
   return yield* decodeBuildOptions(inputsOnly ? ["--name", "Input check", "--out", "build/input-check.w3x", ...options.args] : options.args, playable ? "classic" : "full").pipe(
     Effect.flatMap((options) => Effect.gen(function*() {
       yield* Effect.sync(ensureGenerated);
-      const { base, container, assets, summon, packager, edition, ...map } = options;
+      const { base, container, assets, summon, packager, edition, commit, ...map } = options;
       if (insideTomsLibrary(map.out)) return yield* tomsLibraryOut(map.out);
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined
         ? { base, container, assets, summon }
@@ -115,7 +115,7 @@ export const build: Command = (args) => Effect.gen(function*() {
       const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved"));
       yield* Console.log(`${checked} cue model resolutions passed`);
       if (inputsOnly) return yield* Console.log("map-build inputs passed; compilation and packaging skipped");
-      yield* MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: SMASHCRAFT_MAP, imports, objectData: generatedFiles() })).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded, edition)));
+      yield* MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: commit === undefined ? SMASHCRAFT_MAP : { ...SMASHCRAFT_MAP, description: `${SMASHCRAFT_MAP.description} Build ${commit}.` }, imports, objectData: generatedFiles() })).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded, edition)));
       if (predict) yield* writePlaytestCost(map.out).pipe(step("predict playtest Lua cost"));
     })),
     Effect.provide(options.services),

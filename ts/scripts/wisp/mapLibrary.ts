@@ -1,11 +1,12 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
-import { PLAYABLE_FILE } from "./greenBuilds";
+import { PLAYABLE_FILE, parseInstalled } from "./greenBuilds";
 import { PLAYTEST_PREFIX } from "./project";
 
 export const LIBRARY_FOLDER = "Maps/00-Smashcraft";
 export const MAP_FOLDER = "00-Smashcraft";
+export const OLD_FOLDER = "old";
 
 export const library = (documents: string) => {
   if (!isAbsolute(documents)) throw new Error(`documents folder must be absolute: ${JSON.stringify(documents)}`);
@@ -20,7 +21,7 @@ export const insideTomsLibrary = (path: string) => {
 };
 
 export const RELEASE_FILE = /^Smashcraft \d+\.\d+\.\d+\.w3x$/;
-const DEV_FILE = (file: string) => PLAYABLE_FILE.exec(file)?.[2] !== undefined;
+const DEV_FILE = (file: string) => parseInstalled(file)?.build !== undefined;
 const KEPT_FILE = (file: string) => PLAYABLE_FILE.test(file) && !DEV_FILE(file);
 
 function place(documents: string, map: string): { root: string; name: string } {
@@ -39,10 +40,25 @@ const remove = (root: string, entries: readonly string[]) => {
   for (const entry of entries) rmSync(join(root, entry), { force: true });
 };
 
+const releaseRank = (file: string) => {
+  const { version, candidate } = parseInstalled(file) ?? { version: [0, 0, 0] as const, candidate: undefined };
+  return [...version, candidate ?? Infinity];
+};
+
+const newerRelease = (a: string, b: string) => releaseRank(b).reduce((order, part, index) => order !== 0 ? order : part - (releaseRank(a)[index] ?? 0), 0);
+
+function archiveOlderReleases(root: string): void {
+  const older = files(root).filter(KEPT_FILE).sort(newerRelease).slice(1);
+  if (older.length === 0) return;
+  mkdirSync(join(root, OLD_FOLDER), { recursive: true });
+  for (const entry of older) renameSync(join(root, entry), join(root, OLD_FOLDER, entry));
+}
+
 export function installLatest(documents: string, map: string): void {
   if (!PLAYABLE_FILE.test(basename(map))) throw new Error(`not a playable map: ${basename(map)}`);
   const { root, name } = place(documents, map);
   if (DEV_FILE(name)) remove(root, files(root).filter((entry) => entry !== name && !KEPT_FILE(entry)));
+  archiveOlderReleases(root);
 }
 
 export function installTryout(documents: string, map: string): string {

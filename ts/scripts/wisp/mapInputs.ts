@@ -56,6 +56,7 @@ const BuildOptions = Schema.Struct({
   assets: Schema.optional(Schema.NonEmptyString),
   summon: Schema.optional(Schema.NonEmptyString),
   name: Schema.String.check(Schema.isPattern(/^[\x20-\x7e]{1,200}$/)),
+  commit: Schema.optional(Schema.String.check(Schema.isPattern(/^[0-9a-f]{40}$/))),
   out: Schema.String.check(Schema.isPattern(/\.w3x$/)),
   packager: Schema.optional(Schema.NonEmptyString),
 });

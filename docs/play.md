@@ -41,17 +41,14 @@ against a computer. The match plays on the keyboard; a pad the service finds
 presses the same keys, and without one play says "keyboard" and goes on. It reuses the signed-in Battle.net launcher and never signs
 in, logs out or switches accounts.
 
-Maps/00-Smashcraft has two folders. releases/ keeps every release build
-`Smashcraft X.Y.Z.w3x`; no install ever removes one, and online hosting picks the
-newest of them. dev/ holds the newest installed main build
-`Smashcraft X.Y.Z-dev abc1234.w3x` (version and short commit; the file and in-game
-title carry the same name). Installing a main build (`play`, `playtest:build`,
-the Tom build watcher, `play --install-green`) removes everything else in dev/;
-a build of a release-tagged commit goes to releases/ instead and removes nothing. Only releases are public, so X.Y.Z is the next release, never a build
+Maps/00-Smashcraft keeps at its top level the latest release `Smashcraft X.Y.Z.w3x` (online hosting picks it) and the newest installed main build
+`Smashcraft X.Y.Z-dev.N.w3x` (the file and in-game title carry the same name). Installing a main build (`play`, `playtest:build`,
+the Tom build watcher, `play --install-green`) removes every older dev build; every earlier release moves to old/, none is deleted. Only releases are public, so X.Y.Z is the next release, never a build
 counter: the patch after the newest `vX.Y.Z` tag reachable from the commit
 (`git describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`),
-and the short commit tells development builds apart, so every build after
-v0.1.0 is `Smashcraft 0.1.1-dev abc1234`. When Tom calls a release candidate, a
+and N counts the first-parent commits on main since that tag
+(`git rev-list --first-parent --count vX.Y.Z..COMMIT`), so it only grows along main and
+the newest build is the highest N: `Smashcraft 0.1.1-dev.830`. The map description names the full commit. When Tom calls a release candidate, a
 `v0.1.1-rc.N` tag on its commit names the build `Smashcraft 0.1.1 RC-N`
 (the highest N), and the `v0.1.1` release tag names it `Smashcraft 0.1.1`. At
 most one lane or test build for Tom to try sits beside the dev build (lane builds below,
@@ -94,8 +91,8 @@ version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft X.Y.Z-dev abc1234` file in dev/ and replaces the previous build and any
-lane build there; releases/ is left alone.
+`Smashcraft X.Y.Z-dev.N` file at the top of Maps/00-Smashcraft and replaces the previous dev build and any
+lane build there; releases are left alone.
 While Warcraft III runs in Tom's prefix the watcher builds nothing, and a
 build that finishes while it runs is not copied; that sha stays unattempted, so
 it builds and installs once the game closes. Each install writes the same
