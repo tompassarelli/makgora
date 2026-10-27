@@ -181,3 +181,7 @@ export const PLAYABLE_CHARACTERS: readonly Character[] = playableCharactersOf(SE
 export function nonWeaponStrikes(character: number): NonWeaponStrikes {
   return heroDefinition(character)?.nonWeaponStrikes ?? ORIGINAL_NON_WEAPON_STRIKES[character] ?? {};
 }
+
+export function isLimbStrike(character: number, move: string): boolean {
+  return nonWeaponStrikes(character).limb?.includes(move) === true;
+}

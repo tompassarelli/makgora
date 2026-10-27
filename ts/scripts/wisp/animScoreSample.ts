@@ -18,7 +18,7 @@ import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/co
 import { attackPhase } from "../../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
-import { HERO_ROSTER, fighterSlug, nonWeaponStrikes } from "../../src/game/roster/kits";
+import { HERO_ROSTER, fighterSlug, isLimbStrike } from "../../src/game/roster/kits";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../src/game/sim/hitRegions";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";
 import { advancePlacedObjects } from "../../src/game/sim/placedObjects";
@@ -81,7 +81,6 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
 ];
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
-
 
 const AFTER_FRAMES = 2;
 const LIMIT = 150;
@@ -253,7 +252,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - drop), travels: travels(frames), cues, strikes: frames.map(localStrikes),
     regionFrames: frames.map((frame) => frame.frame), regionOwners: frames.map(() => f.tuning.moves?.normals[entry.style]),
-    sample: { moveClass: entry.moveClass, limbStrike: nonWeaponStrikes(character).limb?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), regions, pixelsPerUnit },
+    sample: { moveClass: entry.moveClass, limbStrike: isLimbStrike(character, entry.move), frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), regions, pixelsPerUnit },
   };
 }
 
@@ -319,7 +318,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []), strikes: frames.map((_, index) => strikes[index] ?? []),
     regionFrames: frames.map((_, index) => regionFrames[index] ?? -1), regionOwners: frames.map((_, index) => regionOwners[index]),
-    sample: { moveClass: "special", limbStrike: nonWeaponStrikes(character).limb?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
+    sample: { moveClass: "special", limbStrike: isLimbStrike(character, entry.move), frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
   };
 }
 
