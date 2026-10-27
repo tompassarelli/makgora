@@ -182,6 +182,54 @@ judged. Tom's standing delegation of pending decisions to the recommendation
 (2026-10-26) was applied on 2026-10-27 by the smashcraft triage lead, which
 recommended shipping it as a named exception.
 
+Murloc's dash attack ships with line 5 at 3: the judge medians on readability,
+weight and anticipation are 3, and follow-through and character are 4, while
+lines 1 to 4 pass on origin/main (`bun wisp anim score --fighter murloc`: body
+share 0.69, mass shift 0.81, end error 0.01, jump 0.03, overshoot 0.19,
+contrast 0.45). Both takes were judged and neither passed line 5, so the take
+that landed is take 2, a deeper coil into a long flat lunge. Tom accepted it as
+judged on 2026-10-26 (north gate 73), with no further takes (#345, landed as
+653571a588). The judges read the windup as brief and the body as a cluttered
+blob across frames, which the triage traced to Murloc's round, spiky body at
+tile size rather than to the spear.
+
+Illidan's down tilt ships with line 5 at 3: the judge medians on readability,
+anticipation and character are 3, and weight and follow-through are 4, while
+lines 1 to 4 pass on origin/main (`bun wisp anim score --fighter illidan`: body
+share 0.34, mass shift 0.35, end error 0.00, jump 0.05, overshoot 0.07,
+contrast 0.63). The take is clip e9c973df, the version its three judges scored
+3/4/3/4/3, not the later windup. Tom accepted it as judged on 2026-10-26 (north
+gate 71), with no further takes (#517, landed as 92d90124e5).
+
+Maiev's down tilt (`warden` in the scorer) ships with line 5 at 3 on the take
+judged at clip 917cde7f: the judge medians on readability, weight, anticipation
+and follow-through are 3, and character is 4. Tom accepted it as judged on
+2026-10-26 (north gate 74), with no further takes (#517, landed as cc50b28aba).
+On origin/main the move no longer scores that way: `bun wisp anim score
+--fighter warden` gives 3/4, because line 2 fails at end error 0.05, jump 0.06
+(against .055) and overshoot 0.09, and line 5 is unjudged since the clip changed
+in d9de93cf15 (#507). The regression is tracked as #608.
+
+Blademaster's forward air ships below the bar on lines 1, 2 and 5, not only on
+line 5. It retimes the stock Attack Slam onto the forward-air clip, with the
+level cut on frame 10, a low hold and a chest lean. On origin/main `bun wisp
+anim score --fighter blademaster` scores it 2/5: line 1 fails at body share
+0.19 (against .29), line 2 fails at end error 0.02 (against .008) and jump 0.02
+(against .015), lines 3 and 4 pass (fill 1.00, contrast 0.54), and line 5 scores
+3.00 from three bare Sonnet medium judges, with medians of 4, 3, 4, 3 and 4 on
+readability, weight, anticipation, follow-through and character. A third take
+that met lines 1 and 2 would need body drive the stock slam's grounded body
+cannot reach without its leap. The proxy accepted this take under Tom's standing
+delegation to the recommendation, with the lines short and no further takes
+(north gate 81, 2026-10-27; #502, landed as f35e1d7680).
+
+Malfurion's victory cheer ships unscored, because victories are not in the move
+scorecard and `anim judge record` refuses its judgments. Its three bare judges
+(Sonnet medium) give medians of 3, 2, 2, 3 and 3 on readability, weight,
+anticipation, follow-through and character, and three fresh Opus cold viewers
+called the take clean. Tom accepted take 1 as judged on 2026-10-26 (north gate
+79), with no further takes (#545, landed as 5a69f43959).
+
 ## Thresholds
 
 The 9 October calibration uses 25 moves: five jabs, tilts, smashes, aerials
