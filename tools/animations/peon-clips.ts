@@ -9,12 +9,12 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const painOnly = process.argv.includes("pain");
+const painOnly = process.argv.includes("pain"), lumberOnly = process.argv.includes("lumber"), shipped = painOnly || lumberOnly;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/peon-clips.ts STOCK_PEON.mdx|SHIPPED_PEON.mdx PRIVATE_OUTPUT [pain]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/peon-clips.ts STOCK_PEON.mdx|SHIPPED_PEON.mdx PRIVATE_OUTPUT [pain|lumber]");
 mkdirSync(join(output, "hero-models"), { recursive: true });
 const source = parseSource(await Bun.file(input).arrayBuffer());
-ensure(source.Sequences.length === (painOnly ? 90 : 22), painOnly ? "Use the shipped 90-sequence Peon model" : "Use the unmodified stock Peon model");
+ensure(source.Sequences.length === (shipped ? 90 : 22), shipped ? "Use the shipped 90-sequence Peon model" : "Use the unmodified stock Peon model");
 const model = structuredClone(source), stand = source.Sequences[9], PEON = 18 as Character;
 ensure(stand?.Name === "Stand Ready", "Peon stock sequence order changed");
 
@@ -130,6 +130,33 @@ const snapPain = (bytes: ArrayBuffer, index: number, frames: number, translation
   const body = new PainBody(bytes, PEON), floor = body.floor(9, 0);
   for (let f = 0; f <= frames; f++) translations[f]!.Vector[2]! -= body.floor(index, f / 60) - floor;
 };
+const CARGO = [16, 19], LUMBER_GEOSET = 3;
+const hideLumber = (m: mdx.Model) => {
+  ensure(m.Sequences[16]?.Name === "Walk Lumber" && m.Sequences[19]?.Name === "Stand Lumber", "Peon lumber sequence order changed");
+  const alpha = m.GeosetAnims.find(a => a.GeosetId === LUMBER_GEOSET)?.Alpha;
+  ensure(alpha !== undefined && typeof alpha !== "number" && alpha.LineType === 0, "Peon lumber geoset lacks its stepped alpha track");
+  for (const index of CARGO) {
+    const [start, end] = m.Sequences[index]!.Interval as unknown as [number, number];
+    alpha.Keys = alpha.Keys.filter(k => k.Frame < start || k.Frame > end);
+    alpha.Keys.push({ Frame: start, Vector: new Float32Array([0]) }, { Frame: end, Vector: new Float32Array([0]) });
+  }
+  alpha.Keys.sort((a, b) => a.Frame - b.Frame);
+};
+const checkCargo = (before: DrawnModel, after: DrawnModel, from: mdx.Model) => {
+  for (const [index, s] of from.Sequences.entries()) for (const t of [0, 0.5, 1]) {
+    const a = before.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1), b = after.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1);
+    if (CARGO.includes(index)) ensure(b.length > 0 && b.length < a.length, `${s.Name}: lumber bundle still drawn`);
+    else ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${s.Name}: pose changed`);
+  }
+};
+if (lumberOnly) {
+  hideLumber(model);
+  const bytes = encodeVerified(parseSource(generateMDX(model)));
+  checkCargo(new DrawnModel(generateMDX(source), 1), new DrawnModel(bytes, 1), source);
+  const modelPath = join(output, "hero-models/peon.mdx"); await Bun.write(modelPath, bytes); chmodSync(modelPath, 0o644);
+  console.log(`PEON_LUMBER_PASS: lumber geoset ${LUMBER_GEOSET} hidden in sequences ${CARGO.join(" and ")}; ${source.Sequences.length - CARGO.length} sequences unchanged; ${bytes.byteLength} model bytes`);
+  process.exit(0);
+}
 if (painOnly) {
   const motion = model.Helpers.find(h => h.Name === "Peon Motion");
   ensure(motion !== undefined, "Shipped Peon lacks its motion helper");
@@ -270,11 +297,9 @@ lumberSequence.Interval = new Uint32Array([cursor, cursor + 800]);
 bindings.set("neutralSpecial", { index: lumberToss.index, seconds: 0.8 });
 const lumberAction = actions.findIndex(action => action.name === "neutralSpecial");
 actions[lumberAction] = { ...actions[lumberAction]!, frames: 48, phases: [...actions[lumberAction]!.phases, phase(48)] };
+hideLumber(model);
 const bytes=encodeVerified(parseSource(generateMDX(model))),before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
-for(const [index,s] of source.Sequences.entries())for(const t of [0,0.5,1]) {
-  const a=before.triangles(index,(s.Interval[1]-s.Interval[0])*t/1000,1),b=after.triangles(index,(s.Interval[1]-s.Interval[0])*t/1000,1);
-  ensure(a.length===b.length && a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`Stock ${s.Name}: pose changed`);
-}
+checkCargo(before,after,source);
 const evidence=[];
 for(const action of actions) {
   const binding=bindings.get(action.name)!;let travel=0,drift=0;

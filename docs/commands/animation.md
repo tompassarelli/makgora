@@ -102,6 +102,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/peon-clips.ts STOCK_PEON.mdx PRIVATE_OUTPUT` appends
   Peon's tool strikes, movement, recovery, paired grabs and nine pain poses,
   preserves the 22 stock sequences and writes both-facing silhouette sheets.
+  It hides the lumber bundle (geoset 3) in Walk Lumber and Stand Lumber (16, 19) so they
+  serve as the cargo-carry walk and stand; `SHIPPED_PEON.mdx PRIVATE_OUTPUT lumber` applies
+  only that to the shipped model, checking every other sequence draws unchanged.
   `bun tools/animations/peon-pool.ts AUTHORED_PEON.mdx PRIVATE_OUTPUT` prepares
   Peon's checked pooled clips and a retained record for the final roster export.
   `bun tools/animations/warden-fan-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors
