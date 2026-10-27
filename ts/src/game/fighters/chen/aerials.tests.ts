@@ -168,3 +168,84 @@ test("Chen's dash and run carry him within a tenth of Warden's Falcon-speed dist
   assertGreaterThan(chen, f32(warden * f32(0.9)));
   assertLessThan(chen, warden);
 });
+
+const CHAIN_LINK_FRAMES = 70;
+const FULL_HOP_HOLD = 8;
+
+type Aerial = "uair" | "fair";
+interface Link { readonly delay: number; readonly hop: "short" | "full"; readonly aerial: Aerial }
+interface Hop { jumped: boolean; tapped: boolean; holdJump: number; airborneFor: number; pressed: boolean }
+interface Landed { readonly ko: boolean; readonly inHitstun: boolean }
+
+const aerialPress = (user: Fighter, aerial: Aerial): Action =>
+  aerial === "uair" ? Action.cUp : user.facing > 0 ? Action.cRight : Action.cLeft;
+
+const actionable = (user: Fighter): boolean =>
+  user.attack.style === undefined && user.landing.lag === 0 && user.launch.hitlag === 0 && user.launch.hitstun === 0;
+
+function takeOff(user: Fighter, link: Link, hop: Hop, held: Action[]): boolean {
+  if (user.jump.squat > 0) {
+    hop.jumped = true;
+    hop.holdJump = link.hop === "full" ? FULL_HOP_HOLD : 0;
+    if (hop.holdJump > 0) held.push(Action.jump);
+    return true;
+  }
+  if (!user.motion.grounded) return false;
+  if (actionable(user)) {
+    if (!hop.tapped) held.push(Action.jump);
+    hop.tapped = !hop.tapped;
+  }
+  return true;
+}
+
+function hopInputs(user: Fighter, link: Link, hop: Hop): Action[] | undefined {
+  const held: Action[] = [];
+  if (!hop.jumped && !takeOff(user, link, hop, held)) return undefined;
+  if (!hop.jumped) return held;
+  if (hop.holdJump > 1) { held.push(Action.jump); hop.holdJump--; }
+  if (!user.motion.grounded || user.jump.squat === 1) hop.airborneFor++;
+  if (hop.airborneFor >= 0 && actionable(user)) { held.push(aerialPress(user, link.aerial)); hop.pressed = true; }
+  return held;
+}
+
+function playLink(s: Scene, user: Fighter, foe: Fighter, link: Link, stocks: number): Landed | undefined {
+  const hop: Hop = { jumped: false, tapped: false, holdJump: 0, airborneFor: -1, pressed: false };
+  for (let t = 0; t < link.delay + CHAIN_LINK_FRAMES; t++) {
+    const held = t >= link.delay && !hop.pressed ? hopInputs(user, link, hop) : [];
+    if (held === undefined) return undefined;
+    const inHitstun = foe.launch.hitstun > 0 || foe.launch.hitlag > 0;
+    const damage = foe.status.damage;
+    frame(s, held, []);
+    if (foe.status.stocks < stocks) return { ko: true, inHitstun };
+    if (foe.status.damage > damage) return { ko: false, inHitstun };
+    if (hop.pressed && user.attack.style === undefined && user.motion.grounded) return undefined;
+  }
+  return undefined;
+}
+
+const CHAIN_FOE_X = 60.0;
+const KO_AFTER_FRAMES = 150;
+const CHAIN: readonly Link[] = [
+  { delay: 0, hop: "short", aerial: "uair" },
+  { delay: 20, hop: "short", aerial: "uair" },
+  { delay: 20, hop: "short", aerial: "uair" },
+  { delay: 20, hop: "full", aerial: "uair" },
+  { delay: 34, hop: "full", aerial: "fair" },
+];
+
+test("From 0%, Chen's short-hop up air on a standing Chen starts a true combo: three more up airs and a full-hop forward air each land while the target is still in hitstun, and the forward air takes the stock [k1 scenario]", () => {
+  const s = scene(0, [{ character: Character.chen, x: 0.0, facing: 1 }, { character: Character.chen, x: CHAIN_FOE_X, facing: -1 }]);
+  const user = fighter(s), foe = fighter(s, 1);
+  const stocks = foe.status.stocks;
+  CHAIN.forEach((link, index) => {
+    const landed = playLink(s, user, foe, link, stocks);
+    assertTrue(landed !== undefined && !landed.ko);
+    if (index > 0) assertTrue(landed?.inHitstun === true);
+  });
+  let lost = false;
+  for (let tick = 0; tick < KO_AFTER_FRAMES && !lost; tick++) {
+    frame(s, [], []);
+    lost = foe.status.stocks < stocks;
+  }
+  assertTrue(lost);
+});

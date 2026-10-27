@@ -24,18 +24,31 @@ set the timing relations; every region, damage and angle is original.
   on the two clean frames, electric, 20%, launching at 35°; the leg on those
   frames and the whole kick from frame 16 to 30 are the 6% sourspot.
 - Down air is the stomp's structure: the keg's base spikes straight down on
-  frames 16–18; the rim, and the base on frames 19–20, deal 9% down and
-  forward. A grounded target pops up instead (80° and 75°), so a short-hop
-  stomp starts a juggle.
+  frames 14–16; the rim, and the base on frames 17–18, deal 9% down and
+  forward. A grounded target pops up instead (85° and 75°). It starts on
+  frame 14, not Falcon's 16, because Chen's short hop is shorter: a short-hop
+  down air pressed on the takeoff frame or any of the next five frames must
+  hit a standing Shadow Hunter before he lands (the roster bar, 2026-10-28).
 - Neutral air spins the staff twice: hit one (frames 7–9) is a fixed 30
   knockback carry that holds the target in hitstun into hit two (frames
   15–18), which launches at 40°.
 - Up air scoops the staff from just below level in front (frame 6) through
   overhead (frames 9–10) to behind his back (frames 11–13); the first two
-  frames are the clean hit.
-- Hitstun uses the shared rule (0.4 frames per knockback unit). His combo
-  game comes from up-angled hits whose knockback stays inside his fast run,
-  jump and aerial frame advantage, not from a separate hitstun multiplier.
+  frames are the clean hit (12%), the rest 9%. Both launch straight up with
+  base 80 and 75 and growth 70, so the target rises into his next jump at
+  low percent and outgrows the juggle by the time a forward air kills.
+- Hitstun keeps the shared rule (0.4 frames per knockback unit); a 1.5x
+  multiplier on his aerial hits was tried and dropped, because the chain below
+  holds without it. Landing ends hitstun, so the combo is the up air's lift. Aerials auto-cancel on
+  landing with Falcon's windows: neutral air before 4 or from 34, forward air
+  before 7 or from 33, up air from 21, down air before 4 or from 35. Up air
+  lands in 4 frames.
+- Zero to death: from 0% against a mirror Chen holding no direction, a
+  short-hop up air, two more short-hop up airs, a full-hop up air and a
+  full-hop forward air sweetspot each land in hitstun and take the stock
+  (68% before the knee). The string is found by search over jump timing and
+  aerials and replayed in aerials.tests.ts; it checks no victim input, so DI
+  escape is untested.
 
 ## Sources and decisions
 
@@ -78,11 +91,11 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 | Forward smash | Two-handed staff sweep, 118-unit reach | 19/4/34/0; 22.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu forward smash](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Up smash | Rising barrel shoulder | 15/4/31/0; 17% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken up smash](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Down smash | Low staff sweep front then back; one hit total | 15/6/32/0; 17.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu down smash](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
-| Neutral air | Spinning staff: a carrying first hit links into a launching second | 7–9 and 15–18 / 22 / 15; 4% then 9% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon neutral air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
-| Forward air | Drunken flying kick: a tiny electric heel sweetspot on its two clean frames kills; the leg and the late kick shove | 14/17/8/19; heel 20% electric (14–15), leg and late 6% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Knee Smash](https://www.ssbwiki.com/Knee_Smash) |
+| Neutral air | Spinning staff: a carrying first hit links into a launching second | 7–9 and 15–18 / 22 / 8; 4% then 9% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon neutral air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
+| Forward air | Drunken flying kick: a tiny electric heel sweetspot on its two clean frames kills; the leg and the late kick shove | 14/17/8/10; heel 20% electric (14–15), leg and late 6% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Knee Smash](https://www.ssbwiki.com/Knee_Smash) |
 | Back air | Heel behind the barrel | 8/3/23/14; 13.75% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken back air](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
-| Up air | Staff scoop: from level in front, up over the hat to behind him | 6/8/20/15; 12% clean (6–7), 9% late | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon up air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
-| Down air | Keg slam: the keg's base spikes on its clean frames; the rim and the late slam knock away weakly; grounded targets pop up | 16/5/24/24; base 15% spike (16–18), rim and late 9% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon down air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
+| Up air | Staff scoop: from level in front, up over the hat to behind him | 6/8/20/4; 12% clean (6–7), 9% late | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon up air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
+| Down air | Keg slam: the keg's base spikes on its clean frames; the rim and the late slam knock away weakly; grounded targets pop up | 14/5/26/13; base 15% spike (14–16), rim and late 9% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon down air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
 | Grab / shield grab | Free hand reaches 64 units; misses recover | 7/2/24/0 | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu grab](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Pummel | Short knee, one fresh press | Shared pummel timing; 3% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken pummel](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Forward / back throw | Shoulder toss / turn-and-toss | Contact 12/16, total 33/39; 10/11.25% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu throws](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
