@@ -67,6 +67,9 @@ const ILLIDAN: AuthoredSpecial = {
 };
 
 const BLADESTORM_TICKS = [17, 26, 35, 44, 53, 62] as const;
+const BLADESTORM_TICK = hit(2.5, 80, 20.0, 35.0, HitElement.slash);
+const BLADESTORM_SWORD: readonly (readonly [number, number, number, number, number])[] = [[17, 74.0, 113.0, 188.0, 121.0], [18, 73.0, 112.0, 189.0, 121.0], [35, -67.0, 108.0, -145.0, 118.0],
+  [36, -71.0, 108.0, -157.0, 121.0], [44, -60.0, 114.0, -179.0, 121.0], [45, -54.0, 114.0, -171.0, 121.0]];
 const BLADEMASTER: AuthoredSpecial = {
   name: "Bladestorm", endFrame: 104, jumpWindow: frames(17, 74),
   hurt: [
@@ -87,7 +90,8 @@ const BLADEMASTER: AuthoredSpecial = {
   motion: [{ ...frames(17, 74), velocityX: 0.0, velocityZ: 0.0, driftSpeed: 5.0 }, { ...frames(75, 75), velocityX: 0.0, velocityZ: 0.0 }],
   projectiles: [mark("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", 2, 12, 0.0)],
   regions: [
-    ...BLADESTORM_TICKS.map((first): MoveRegion => heroRegion(first, first + 1, capsule(-110.0, 50.0, 110.0, 50.0, 60.0), hit(2.5, 80, 20.0, 35.0, HitElement.slash))),
+    ...BLADESTORM_TICKS.map((first): MoveRegion => heroRegion(first, first + 1, capsule(-110.0, 50.0, 110.0, 50.0, 60.0), BLADESTORM_TICK)),
+    ...BLADESTORM_SWORD.map(([frame, x1, z1, x2, z2]): MoveRegion => heroRegion(frame, frame, capsule(x1, z1, x2, z2, 6.0), BLADESTORM_TICK)),
     heroRegion(75, 78, capsule(-120.0, 60.0, 120.0, 60.0, 70.0), hit(9.0, 45, 95.0, 50.0, HitElement.slash)),
   ],
   rehits: [...BLADESTORM_TICKS, 75],

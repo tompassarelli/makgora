@@ -8,7 +8,7 @@ export interface LagSpikes {
   readonly hold: number;
 }
 
-export const DEEP_ROLLBACK_SPIKES: LagSpikes = { first: 240, period: 301, hold: 40 };
+export const DEEP_ROLLBACK_SPIKES: LagSpikes = { first: 230, period: 301, hold: 40 };
 
 export const DEEP_ROLLBACK_DEPTHS: readonly number[] = [24, 24, 24, 23];
 

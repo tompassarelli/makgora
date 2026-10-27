@@ -20,6 +20,7 @@ import { controls } from "./testWorld";
 const H = HERO_REFERENCE_HEIGHT;
 const FAR = f32(H * f32(6.0));
 const CLOSE = f32(H * f32(0.4));
+const SWEEP = f32(H * f32(0.6));
 
 interface Bout {
   readonly first: Fighter;
@@ -146,9 +147,10 @@ const normal = (style: AttackStyle) => (b: Bout): void => b.step(undefined, styl
 test("Every fighter's normals and grab, Kael's own included, pass through a Banished fighter with no damage, hitlag or catch, and a throw of a fighter Banished while held deals nothing [k1 scenario]", () => {
   for (const attacker of [Character.blademaster, Character.kaelthas, Character.mountainKing]) {
     for (const style of [AttackStyle.jab, AttackStyle.forwardSmash, AttackStyle.grab]) {
-      const plain = struck(attacker, false, CLOSE, normal(style));
+      const gap = style === AttackStyle.forwardSmash ? SWEEP : CLOSE;
+      const plain = struck(attacker, false, gap, normal(style));
       assertTrue(plain.damage > 0.0 || plain.held);
-      const ghost = struck(attacker, true, CLOSE, normal(style));
+      const ghost = struck(attacker, true, gap, normal(style));
       assertEquals(ghost.damage, 0.0);
       assertTrue(!ghost.hitlag);
       assertTrue(!ghost.held);

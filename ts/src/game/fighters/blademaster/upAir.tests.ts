@@ -13,7 +13,7 @@ import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
 import { surfaceTopZ } from "../../sim/stage";
 import { beginAttack } from "../../sim/transitions";
-import { BLADEMASTER_MOVES, HEAD, SWORD_LENGTH, UP_AIR_BLADE } from "./moves";
+import { BLADEMASTER_MOVES, HEAD, SWORD_LENGTH, UP_AIR_DRAWN } from "./moves";
 
 const RAISED_STAGE = 1;
 const PLATFORM = 2;
@@ -83,20 +83,20 @@ test("Blademaster's up air hits a foe standing on a platform above his head, abo
 test("Blademaster's up air reaches a sword length above his head, and his blade tip lies inside its hit region on every active frame [k2 property]", () => {
   assertTrue(UP_AIR !== undefined);
   if (UP_AIR === undefined) return;
-  assertTrue(UP_AIR_BLADE.length === UP_AIR.activeFrames);
+  assertTrue(UP_AIR_DRAWN.length === UP_AIR.activeFrames);
   let top = 0.0;
   for (const region of UP_AIR.regions) top = Math.max(top, region.hit.maxZ);
   assertGreaterThan(top, f32(f32(HEAD.z2 + HEAD.radius) + SWORD_LENGTH));
   for (let index = 0; index < UP_AIR.activeFrames; index++) {
     const frame = UP_AIR.startupFrames + index;
-    const blade = UP_AIR_BLADE[index];
+    const blade = UP_AIR_DRAWN[index];
     assertTrue(blade !== undefined);
     if (blade === undefined) continue;
     let inside = false;
     for (const region of UP_AIR.regions) {
       const strike = region.hit.strike;
       if (strike === undefined || frame < region.firstFrame || frame > region.lastFrame) continue;
-      if (squaredDistanceToStrike(blade.tipX, blade.tipZ, strike) <= strike.radius * strike.radius) inside = true;
+      if (squaredDistanceToStrike(blade[2], blade[3], strike) <= strike.radius * strike.radius) inside = true;
     }
     assertTrue(inside);
   }

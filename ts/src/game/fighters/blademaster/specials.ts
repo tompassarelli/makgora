@@ -5,7 +5,7 @@ import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, CHARGED_AIM_FRAMES, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
-import { BLADE_RADIUS, L, M, capsule, cut, hit, length, reach } from "./moves";
+import { L, capsule, cut, hit, length, reach } from "./moves";
 import { path } from "../../sim/heroes/authoring";
 
 
@@ -66,7 +66,6 @@ const windWalk = (air: boolean): AuthoredSpecial => ({
 
 const RISE_FRAMES = 14;
 const rise = (distance: number) => chargedAngleMotion(length(distance), RISE_FRAMES);
-const BLADE_TOP = f32(M - BLADE_RADIUS);
 
 
 const risingBlade: AuthoredSpecial = {
@@ -74,12 +73,12 @@ const risingBlade: AuthoredSpecial = {
   aimFrames: CHARGED_AIM_FRAMES,
   motion: rise(f32(4.1)),
   regions: path(9, [
-    capsule(40.0, 30.0, 70.0, 70.0),
-    capsule(30.0, 40.0, 55.0, 90.0),
-    capsule(20.0, 50.0, 35.0, BLADE_TOP),
-    capsule(10.0, 55.0, 15.0, BLADE_TOP),
-    capsule(5.0, 60.0, 5.0, BLADE_TOP),
-    capsule(0.0, 60.0, 0.0, BLADE_TOP),
+    capsule(74.0, 113.0, 188.0, 121.0),
+    capsule(65.0, 114.0, 185.0, 121.0),
+    capsule(35.0, 114.0, 141.0, 121.0),
+    capsule(-1.0, 112.0, 55.0, 121.0),
+    capsule(-31.0, 113.0, -43.0, 122.0),
+    capsule(-51.0, 108.0, -103.0, 118.0),
   ], hit(6.970690727233887, "LAUNCH", 80)),
   hurt: [
       hurtPose(1, 8, [hurtPart(0.0, 30.0, -16.0, 115.0, 45.0), hurtPart(-25.0, 90.0, 41.0, 115.0, 30.0)]),

@@ -3,25 +3,28 @@ import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, GrabAction, HitElement } from "../../sim/codes";
 import { type AuthoredMove, type AuthoredThrow, type FighterMoves, type MoveRegion, HERO_REFERENCE_HEIGHT, heroHurtPose, heroMove, heroRegion, jabStep, travelThrough } from "../../sim/heroMoves";
 import { type FighterHurtboxes, type HurtPart, hurtPart } from "../../sim/hurtboxes";
-import { groundHit, swing, tipped, unangled, type GroundKit } from "../../sim/heroes/groundNormals";
+import { type Segment, groundHit, swing, tipped, type GroundKit } from "../../sim/heroes/groundNormals";
 import type { HitEffect } from "../../sim/hitRegions";
 import { strongHit } from "../../sim/strongHits";
 import { drillStrikes, linkAt, multiHit } from "../../sim/heroes/multiHit";
 import { ANGLES, type Angle, capsuleOf, makeHit, path } from "../../sim/heroes/authoring";
 
 const BM = HitElement.slash;
+const forwardTilt = (segments: readonly Segment[]): AuthoredMove => heroMove(7, 3, 23, 0, tipped(7, segments, 6.0, 26.0,
+  groundHit(7.900000095367432, 30, 113.5999984741211, 24.0, BM), groundHit(6.0, 40, 79.80000305175781, 18.0, BM)));
 export const BLADEMASTER_GROUND: GroundKit = {
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(3, 2, 13, 0, swing(3, [[18.0, 46.0, 76.0, 46.0], [20.0, 48.0, 76.0, 48.0]], 6.0, groundHit(3.705400228500366, 50, 52.525001525878906, 22.0, BM)))),
-    [AttackStyle.jab2]: heroMove(3, 2, 16, 0, swing(3, [[18.0, 52.0, 80.0, 50.0], [20.0, 50.0, 80.0, 44.0]], 6.0, groundHit(4.631750106811523, 40, 85.95000457763672, 22.0, BM))),
-    ...unangled(heroMove(7, 3, 23, 0, tipped(7, [[18.0, 80.0, 159.0, 110.0], [18.0, 60.0, 159.0, 58.0], [18.0, 40.0, 159.0, 6.0]], 6.0, 26.0,
-      groundHit(7.900000095367432, 30, 113.5999984741211, 24.0, BM), groundHit(6.0, 40, 79.80000305175781, 18.0, BM)))),
+    [AttackStyle.jab]: jabStep(heroMove(3, 2, 13, 0, swing(3, [[50.0, 74.0, 168.0, 58.0], [49.0, 69.0, 157.0, 19.0]], 6.0, groundHit(3.705400228500366, 50, 52.525001525878906, 22.0, BM)))),
+    [AttackStyle.jab2]: heroMove(3, 2, 16, 0, swing(3, [[45.0, 79.0, 162.0, 91.0], [42.0, 105.0, 114.0, 198.0]], 6.0, groundHit(4.631750106811523, 40, 85.95000457763672, 22.0, BM))),
+    [AttackStyle.forwardTilt]: forwardTilt([[53.0, 105.0, 157.0, 162.0], [57.0, 83.0, 175.0, 77.0], [55.0, 75.0, 169.0, 44.0]]),
+    [AttackStyle.forwardTiltUp]: forwardTilt([[48.0, 100.0, 162.0, 135.0], [43.0, 123.0, 124.0, 209.0], [37.0, 132.0, 104.0, 229.0]]),
+    [AttackStyle.forwardTiltDown]: forwardTilt([[54.0, 75.0, 172.0, 78.0], [48.0, 57.0, 147.0, -6.0], [42.0, 52.0, 127.0, -30.0]]),
     [AttackStyle.upTilt]: heroMove(6, 5, 18, 0, swing(6, [
       [41.0, 116.0, 160.0, 122.0], [26.0, 136.0, 98.0, 230.0], [-2.0, 150.0, -19.0, 268.0], [-34.0, 145.0, -133.0, 210.0], [-49.0, 122.0, -168.0, 121.0],
     ], 6.0, groundHit(6.484450340270996, 85, 66.85000610351562, 38.0, BM))),
-    [AttackStyle.downTilt]: heroMove(6, 2, 13, 0, tipped(6, [[18.0, 10.0, 152.0, 8.0], [18.0, 6.0, 152.0, 4.0]], 6.0, 26.0,
+    [AttackStyle.downTilt]: heroMove(6, 2, 13, 0, tipped(6, [[23.0, 62.0, 134.0, 73.0], [43.0, 58.0, 148.0, 2.0]], 6.0, 26.0,
       groundHit(5.949999809265137, 20, 71.5999984741211, 18.0, BM), groundHit(3.7200000286102295, 20, 57.30000305175781, 18.0, BM))),
-    [AttackStyle.dashAttack]: travelThrough(heroMove(11, 4, 23, 0, tipped(11, [[18.0, 60.0, 145.0, 50.0], [18.0, 50.0, 145.0, 40.0], [18.0, 40.0, 145.0, 30.0], [18.0, 30.0, 145.0, 22.0]], 6.0, 26.0,
+    [AttackStyle.dashAttack]: travelThrough(heroMove(11, 4, 23, 0, tipped(11, [[63.0, 70.0, 175.0, 31.0], [60.0, 64.0, 167.0, 13.0], [57.0, 59.0, 157.0, -4.0], [56.0, 57.0, 145.0, -19.0]], 6.0, 26.0,
       groundHit(7.199999809265137, 30, 105.0, 24.0, BM), groundHit(5.75, 40, 89.5, 18.0, BM)), 179.0, true), 14),
   },
   reaches: {
@@ -80,28 +83,38 @@ export function cut(firstFrame: number, tipHeights: readonly number[], reach: nu
   return regions;
 }
 
-function lowSweep(firstFrame: number, facing: number): readonly MoveRegion[] {
-  return path(firstFrame, [
-    capsule(f32(18.0 * facing), 14.0, f32(f32(L - BLADE_RADIUS) * facing), 14.0),
-    capsule(f32(18.0 * facing), 8.0, f32(f32(L - BLADE_RADIUS) * facing), 8.0),
-    capsule(f32(18.0 * facing), 2.0, f32(f32(L - BLADE_RADIUS) * facing), 2.0),
-  ], downSmashHit(hit(12.968900680541992, "EDGE", 25, facing)));
-}
+const blades = (segments: readonly Segment[], radius = BLADE_RADIUS) => segments.map(([x1, z1, x2, z2]) => capsule(x1, z1, x2, z2, radius));
+const lowSweep = (firstFrame: number, segments: readonly Segment[], facing: number) => path(firstFrame, blades(segments), downSmashHit(hit(12.968900680541992, "EDGE", 25, facing)));
+const heldBlades = (firstFrame: number, segments: readonly Segment[], effect: Readonly<HitEffect>, window: number, radius = BLADE_RADIUS, grounded?: Readonly<HitEffect>) =>
+  blades(segments, radius).map((strike, index) => heroRegion(firstFrame + index, firstFrame + index, strike, effect, grounded, window));
 
 
 
 
 
-
-const BLADE_WHEEL_INNER = 60.0;
 const BLADESTORM_SPINS = [10, 13, 16, 19, 22] as const;
 const BLADESTORM_PLUNGE = 25;
 const BLADESTORM_LAST = 34;
 const BLADESTORM_TOTAL = 46;
 const BLADESTORM_REACH = f32(M - BLADE_RADIUS);
-const BLADESTORM = drillStrikes(5.0, -55.0, 75.0,
-  { centre: linkAt(2.0, 10.0, 90), front: linkAt(2.0, 10.0, 100), back: linkAt(2.0, 10.0, 80) },
-  { centre: linkAt(2.0, 20.0, 270), front: linkAt(2.0, 20.0, 250), back: linkAt(2.0, 20.0, 290) });
+const BLADESTORM_AIR = { centre: linkAt(2.0, 10.0, 90), front: linkAt(2.0, 10.0, 100), back: linkAt(2.0, 10.0, 80) };
+const BLADESTORM_GROUND = { centre: linkAt(2.0, 20.0, 270), front: linkAt(2.0, 20.0, 250), back: linkAt(2.0, 20.0, 290) };
+const BLADESTORM = drillStrikes(5.0, -55.0, 75.0, BLADESTORM_AIR, BLADESTORM_GROUND);
+const BLADESTORM_SPIN_BLADES: readonly (readonly Segment[])[] = [
+  [[38.0, 7.0, 101.0, -92.0], [21.0, 17.0, -51.0, -76.0]],
+  [[13.0, 29.0, -2.0, -89.0], [-38.0, 45.0, -155.0, 28.0]],
+  [[35.0, 33.0, 30.0, -86.0], [21.0, 31.0, -38.0, -71.0]],
+  [[34.0, 29.0, 48.0, -87.0], [-45.0, 49.0, -163.0, 38.0]],
+  [[34.0, 30.0, 60.0, -86.0], [19.0, 27.0, -39.0, -77.0]],
+];
+const BLADESTORM_PLUNGE_BLADES: readonly Segment[] = [
+  [24.0, 41.0, 9.0, -77.0], [24.0, 39.0, 7.0, -78.0], [22.0, 38.0, 6.0, -79.0], [21.0, 38.0, 6.0, -78.0], [16.0, 41.0, -26.0, -70.0],
+  [13.0, 41.0, -51.0, -60.0], [12.0, 41.0, -56.0, -56.0], [7.0, 45.0, -76.0, -40.0], [5.0, 48.0, -90.0, -24.0], [3.0, 51.0, -97.0, -12.0],
+];
+const bladestormBlades = (first: number, segments: readonly Segment[], window: number) => segments.flatMap((segment, index) => {
+  const side = segment[2] >= 0.0 ? "front" : "back";
+  return heldBlades(first + index, [segment], BLADESTORM_AIR[side], window, BLADE_RADIUS, BLADESTORM_GROUND[side]);
+});
 const bladestorm: AuthoredMove = {
   ...heroMove(10, BLADESTORM_LAST - 10 + 1, BLADESTORM_TOTAL - BLADESTORM_LAST, 20, [
     ...multiHit([
@@ -109,6 +122,8 @@ const bladestorm: AuthoredMove = {
 
       { first: BLADESTORM_PLUNGE, last: BLADESTORM_LAST, strikes: BLADESTORM },
     ]),
+    ...BLADESTORM_SPINS.flatMap((first, spin) => bladestormBlades(first, BLADESTORM_SPIN_BLADES[spin] ?? [], spin + 1)),
+    ...bladestormBlades(BLADESTORM_PLUNGE, BLADESTORM_PLUNGE_BLADES, BLADESTORM_SPINS.length + 1),
     heroRegion(BLADESTORM_TOTAL + 1, BLADESTORM_TOTAL + 2, capsule(-BLADESTORM_REACH, 30.0, BLADESTORM_REACH, 30.0, 30.0),
       linkAt(4.0, 90.0, 80), undefined, BLADESTORM_SPINS.length + 2),
   ]),
@@ -162,14 +177,7 @@ const UP_AIR_SWEEP: readonly (readonly Blade[])[] = [
 
 export const UP_AIR_BLADE: readonly Blade[] = UP_AIR_SWEEP.map(blades => blades[1] ?? bladeAt(90, 1.0));
 
-function upAirArc(effect: Readonly<HitEffect>): readonly MoveRegion[] {
-  const regions: MoveRegion[] = [];
-  for (let index = 0; index < UP_AIR_SWEEP.length; index++) {
-    const frame = UP_AIR_FIRST + index;
-    for (const blade of UP_AIR_SWEEP[index] ?? []) regions.push(heroRegion(frame, frame, capsule(blade.gripX, blade.gripZ, blade.tipX, blade.tipZ), effect));
-  }
-  return regions;
-}
+export const UP_AIR_DRAWN: readonly Segment[] = [[38.0, 121.0, 120.0, 207.0], [-9.0, 138.0, -44.0, 252.0], [-37.0, 125.0, -142.0, 184.0]];
 
 const BODY: FighterHurtboxes = {
   stand: [TORSO, hurtPart(-16.0, 110.0, 16.0, 110.0, 8.0)],
@@ -313,32 +321,22 @@ const BODY: FighterHurtboxes = {
 export const BLADEMASTER_MOVES: FighterMoves = {
   normals: {
     ...BLADEMASTER_GROUND.normals,
-    [AttackStyle.forwardSmash]: heroMove(17, 3, 35, 0, cut(17, [58.0, 45.0, 32.0], XL, { ...hit(13.0, "KILL", 40), base: 30.0 }, { ...hit(17.0, "KILL", 40), base: 30.0 })),
-    [AttackStyle.upSmash]: heroMove(15, 4, 30, 0, path(15, [
-      capsule(16.0, 38.0, 24.0, f32(L - BLADE_RADIUS)),
-      capsule(8.0, 38.0, 12.0, f32(L - BLADE_RADIUS)),
-      capsule(0.0, 38.0, 0.0, f32(L - BLADE_RADIUS)),
-      capsule(-8.0, 38.0, -12.0, f32(L - BLADE_RADIUS)),
-    ], hit(12.392340660095215, "KILL", 90))),
-    [AttackStyle.downSmash]: heroMove(14, 6, 19, 0, [...lowSweep(14, 1.0), ...lowSweep(17, -1.0)]),
+    [AttackStyle.forwardSmash]: heroMove(17, 3, 35, 0, tipped(17, [[40.0, 132.0, 150.0, 131.0], [56.0, 116.0, 158.0, 58.0], [62.0, 102.0, 147.0, 18.0]], BLADE_RADIUS, TIP_LENGTH, { ...hit(17.0, "KILL", 40), base: 30.0 }, { ...hit(13.0, "KILL", 40), base: 30.0 })),
+    [AttackStyle.upSmash]: heroMove(15, 4, 30, 0, path(15, blades([[8.0, 151.0, 8.0, 269.0], [1.0, 153.0, -15.0, 271.0], [-6.0, 154.0, -38.0, 269.0], [-8.0, 156.0, -59.0, 264.0]]), hit(12.392340660095215, "KILL", 90))),
+    [AttackStyle.downSmash]: heroMove(14, 6, 19, 0, [
+      ...lowSweep(14, [[44.0, 59.0, 145.0, -5.0], [20.0, 61.0, 87.0, 3.0]], 1.0),
+      ...lowSweep(16, [[-16.0, 60.0, -44.0, 2.0], [-36.0, 54.0, -140.0, 7.0], [-37.0, 53.0, -141.0, 5.0], [-34.0, 53.0, -134.0, 4.0]], -1.0),
+    ]),
 
 
 
-    [AttackStyle.neutralAir]: heroMove(7, 9, 17, 12, multiHit([
-      { first: 7, last: 9, strikes: [
-        [capsule(20.0, 35.0, f32(M - BLADE_RADIUS), 50.0), linkAt(3.0, 30.0, 100)],
-        [capsule(0.0, 55.0, 0.0, f32(M - BLADE_RADIUS)), linkAt(3.0, 30.0, 90)],
-        [capsule(-20.0, 35.0, -f32(M - BLADE_RADIUS), 50.0), linkAt(3.0, 30.0, 80)],
-      ] },
-      { first: 13, last: 15, strikes: [
-        [capsule(20.0, 45.0, BLADE_WHEEL_INNER, 45.0, 10.0), hit(4.647127628326416, "POKE", 50)],
-        [capsule(0.0, 55.0, 0.0, f32(BLADE_WHEEL_INNER + 45.0), 10.0), hit(4.647127628326416, "POKE", 50)],
-        [capsule(-20.0, 45.0, -BLADE_WHEEL_INNER, 45.0, 10.0), hit(4.647127628326416, "POKE", 50, -1.0)],
-      ] },
-    ])),
-    [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, cut(10, [60.0, 45.0, 30.0], L, hit(8.519732475280762, "EDGE", 40), hit(10.843297958374023, "EDGE", 40))),
-    [AttackStyle.backAir]: heroMove(8, 3, 23, 13, cut(8, [34.0, 45.0, 56.0], L, hit(9.294255256652832, "KILL", 35, -1.0), undefined, -1.0)),
-    [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, upAirArc(hit(6.196170330047607, "LAUNCH", 85))),
+    [AttackStyle.neutralAir]: heroMove(7, 9, 17, 12, [
+      ...heldBlades(7, [[54.0, 103.0, 169.0, 131.0], [47.0, 85.0, 161.0, 61.0], [27.0, 72.0, 103.0, 5.0]], linkAt(3.0, 30.0, 100), 1),
+      ...heldBlades(13, [[-52.0, 90.0, -170.0, 90.0], [-49.0, 100.0, -164.0, 129.0], [-46.0, 103.0, -160.0, 136.0]], hit(4.647127628326416, "POKE", 50, -1.0), 2, 10.0),
+    ]),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, tipped(10, [[52.0, 65.0, 163.0, 72.0], [53.0, 63.0, 163.0, 51.0], [52.0, 61.0, 159.0, 30.0]], BLADE_RADIUS, TIP_LENGTH, hit(10.843297958374023, "EDGE", 40), hit(8.519732475280762, "EDGE", 40))),
+    [AttackStyle.backAir]: heroMove(8, 3, 23, 13, swing(8, [[-48.0, 121.0, -130.0, 205.0], [-44.0, 120.0, -127.0, 205.0], [-41.0, 120.0, -123.0, 205.0]], BLADE_RADIUS, hit(9.294255256652832, "KILL", 35, -1.0))),
+    [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, path(UP_AIR_FIRST, blades(UP_AIR_DRAWN), hit(6.196170330047607, "LAUNCH", 85))),
     [AttackStyle.downAir]: bladestorm,
     [AttackStyle.grab]: heroMove(7, 2, 22, 0, path(7, [
       capsule(18.0, 45.0, f32(S - 10.0), 45.0, 10.0),
