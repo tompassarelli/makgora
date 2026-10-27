@@ -191,10 +191,12 @@ export function stepJolt(jolt: NumberJolt, visible: boolean, damage: number): bo
   if (visible && added > 0.0) {
     jolt.shakeFrame = 0;
     jolt.shakeStrength = shakeStrength(added);
-  } else if (jolt.shakeFrame >= SHAKE_FRAMES && trembling === 0.0) return false;
-  else if (jolt.shakeFrame < SHAKE_FRAMES) jolt.shakeFrame++;
+  } else if (jolt.shakeFrame < SHAKE_FRAMES) jolt.shakeFrame++;
   jolt.trembleFrame = trembling === 0.0 ? 0 : jolt.trembleFrame + 1;
-  jolt.dx = shakeX(jolt.shakeStrength, jolt.shakeFrame) + trembleX(trembling, jolt.trembleFrame);
-  jolt.dy = shakeY(jolt.shakeStrength, jolt.shakeFrame) + trembleY(trembling, jolt.trembleFrame);
+  const dx = shakeX(jolt.shakeStrength, jolt.shakeFrame) + trembleX(trembling, jolt.trembleFrame);
+  const dy = shakeY(jolt.shakeStrength, jolt.shakeFrame) + trembleY(trembling, jolt.trembleFrame);
+  if (dx === jolt.dx && dy === jolt.dy) return false;
+  jolt.dx = dx;
+  jolt.dy = dy;
   return true;
 }

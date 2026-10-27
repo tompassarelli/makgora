@@ -9,7 +9,7 @@ import { trainingReadout } from "../session/messages";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { Phase, requestStageSelect, selectCharacter } from "../lobby/lobbyState";
-import { DAMAGE_DARK_FROM, TREMBLE_FROM, TREMBLE_MAX_PX, damageColour, damageText, percentText, trembleStrength } from "./plateLayout";
+import { DAMAGE_DARK_FROM, SHAKE_FRAMES, TREMBLE_FROM, TREMBLE_MAX_PX, damageColour, damageText, numberJolt, percentText, stepJolt, trembleStrength } from "./plateLayout";
 
 const channels = (colour: number): readonly number[] => [imod(idiv(colour, 65536), 256), imod(idiv(colour, 256), 256), imod(colour, 256)];
 const plain = (text: string): string => text.substring(10, text.length - 2);
@@ -62,5 +62,20 @@ test("the percent blends white at 0, yellow near 50, red at 100 and dark red fro
     assertGreaterThan(strength, 0.0);
     assertTrue(strength >= shaken && strength <= TREMBLE_MAX_PX);
     shaken = strength;
+  }
+});
+
+test("the percent comes to rest on its home spot once a hit's shake or a past-100 tremble ends, however many frames the tremble ran before a KO dropped it [k2 property]", () => {
+  for (let trembled = SHAKE_FRAMES; trembled < SHAKE_FRAMES + 8; trembled++) {
+    const jolt = numberJolt();
+    for (let frame = 0; frame < trembled; frame++) stepJolt(jolt, true, 150.0);
+    stepJolt(jolt, true, 0.0);
+    assertEquals(jolt.dx, 0.0, `KO after ${trembled} trembling frames`);
+    assertEquals(jolt.dy, 0.0, `KO after ${trembled} trembling frames`);
+    stepJolt(jolt, true, f32(12.5));
+    for (let frame = 0; frame < SHAKE_FRAMES; frame++) stepJolt(jolt, true, f32(12.5));
+    assertEquals(jolt.dx, 0.0, `quiet after a hit, ${trembled}`);
+    assertEquals(jolt.dy, 0.0, `quiet after a hit, ${trembled}`);
+    assertTrue(!stepJolt(jolt, true, f32(12.5)));
   }
 });
