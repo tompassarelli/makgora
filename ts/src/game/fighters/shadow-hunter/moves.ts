@@ -126,7 +126,7 @@ export const SHADOW_HUNTER_MOVES: FighterMoves = {
     ...SHADOW_HUNTER_GROUND.normals,
     [AttackStyle.forwardSmash]: heroMove(19, 3, 34, 0, path(19, [capsule(20.0, 45.0, 146.0, 106.0), capsule(20.0, 45.0, 166.0, 71.0), capsule(20.0, 45.0, 160.0, 31.0)], hit(15.760541915893555, "KILL", 40))),
     [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, path(17, [
-      capsule(4.0, 98.0, 20.0, 176.0),
+      capsule(15.0, 50.0, 20.0, 176.0),
       capsule(6.0, 96.0, 30.0, 172.0),
       capsule(9.0, 95.0, 39.0, 167.0),
       capsule(12.0, 93.0, 47.0, 162.0),
