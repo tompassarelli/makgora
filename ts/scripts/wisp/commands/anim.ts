@@ -489,9 +489,9 @@ const jitter: Command = (args) => Effect.gen(function*() {
 }).pipe(Effect.provide(BunServices.layer));
 
 export const anim: Command = ([mode, verb, ...rest]) => {
-  if (mode === "jitter") return jitter(verb === undefined ? [] : [verb, ...rest]);
-  if (mode === "score") return score(verb === undefined ? [] : [verb, ...rest]);
-  if (mode === "capture") return Effect.promise(() => import("../../captureQueueCommand")).pipe(Effect.flatMap((module) => module.capture(verb === undefined ? [] : [verb, ...rest])));
+  const modes: Readonly<Record<string, Command>> = { jitter, score, capture: (args) => Effect.promise(() => import("../../captureQueueCommand")).pipe(Effect.flatMap((module) => module.capture(args))) };
+  const direct = mode === undefined ? undefined : modes[mode];
+  if (direct !== undefined) return direct(verb === undefined ? [] : [verb, ...rest]);
   const judging: Readonly<Record<string, Command>> = { fetch: () => fetchReferences.pipe(Effect.provide(BunServices.layer)), prepare, record, run: judgeRun };
   const step = mode === "judge" && verb !== undefined ? judging[verb] : undefined;
   if (step !== undefined) return step(rest);
