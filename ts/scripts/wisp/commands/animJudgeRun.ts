@@ -1,5 +1,5 @@
-import { readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Effect, Schema, Stream } from "effect";
 import { ChildProcess } from "effect/process";
@@ -78,15 +78,25 @@ export function parseResult(stdout: string): { readonly reply: string; readonly 
 
 const verdictText = (reply: string) => /\{[\s\S]*\}/.exec(reply)?.[0] ?? reply;
 
-const ask = (binary: string, args: readonly string[], input: string) =>
-  runProcess(ChildProcess.make(binary, args, { stdin: Stream.make(new TextEncoder().encode(input)) })).pipe(Effect.mapError((cause) => new JudgeRunFailure({ problem: `run claude: ${cause.message}` })));
+export interface JudgeAccount { readonly name: string; readonly configDir: string }
 
-const judgeOne = (directory: string, binary: string, args: readonly string[], brief: string, item: BatchItem) => Effect.gen(function*() {
+export function judgeAccount(env: Record<string, string | undefined>): JudgeAccount | string {
+  const configDir = env.CLAUDE_CONFIG_DIR;
+  if (configDir === undefined || configDir === "") return "CLAUDE_CONFIG_DIR is not set, so the judge calls would spend the host's default Claude login; run from a fleet session or export CLAUDE_CONFIG_DIR to the profile of the account to spend";
+  if (!existsSync(configDir)) return `CLAUDE_CONFIG_DIR ${configDir} does not exist, so the judge account is unknown; export it to the profile of the account to spend`;
+  const profile = basename(resolve(configDir));
+  return { name: /^claude-(.+)$/.exec(profile)?.[1] ?? profile, configDir };
+}
+
+const ask = (binary: string, args: readonly string[], input: string, account: JudgeAccount) =>
+  runProcess(ChildProcess.make(binary, args, { stdin: Stream.make(new TextEncoder().encode(input)), env: { CLAUDE_CONFIG_DIR: account.configDir }, extendEnv: true })).pipe(Effect.mapError((cause) => new JudgeRunFailure({ problem: `run claude: ${cause.message}` })));
+
+const judgeOne = (directory: string, binary: string, args: readonly string[], account: JudgeAccount, brief: string, item: BatchItem) => Effect.gen(function*() {
   const images = yield* attempt(`read the images of ${item.fighter}/${item.move}`, () => Promise.all(item.images.map(async (path) => new Uint8Array(await Bun.file(path).arrayBuffer()))));
   const input = judgeMessage(brief, item, images);
   const started = performance.now();
   for (let tries = 0; ; tries++) {
-    const parsed = parseResult(yield* ask(binary, args, input));
+    const parsed = parseResult(yield* ask(binary, args, input, account));
     const verdict = parsed === undefined ? undefined : yield* decodeVerdict(verdictText(parsed.reply)).pipe(Effect.option);
     if (parsed !== undefined && verdict?._tag === "Some") return { item, verdict: verdict.value, tokens: parsed.tokens, outputTokens: parsed.outputTokens, seconds: (performance.now() - started) / 1000, tries: tries + 1 };
     if (tries >= 1) return yield* new JudgeRunFailure({ problem: `${item.fighter}/${item.move}: no valid scores after ${tries + 1} calls (${directory})` });
@@ -110,8 +120,11 @@ export const judgeRun: Command = (args) => Effect.gen(function*() {
   const batches = readdirSync(output).filter((name) => /^batch-\d+\.md$/.test(name)).sort();
   const items = (yield* Effect.forEach(batches, (name) => attempt(`read ${name}`, () => Bun.file(join(output, name)).text()))).flatMap(parseBatch);
   if (items.length === 0) return yield* new UsageFailure({ problem: `no batch-N.md with moves in ${output}; run anim judge prepare first` });
+  const account = judgeAccount(process.env);
+  if (typeof account === "string") return yield* new JudgeRunFailure({ problem: account });
+  yield* Console.log(`judging as Claude account ${account.name} (${account.configDir})`);
   const calls = claudeArguments(model, effort);
-  const done = yield* Effect.forEach(items, (item) => judgeOne(output, flags.get("--claude") ?? "claude", calls, brief, { ...item, images: item.images.map((path) => resolve(path)) }), { concurrency: parallel });
+  const done = yield* Effect.forEach(items, (item) => judgeOne(output, flags.get("--claude") ?? "claude", calls, account, brief, { ...item, images: item.images.map((path) => resolve(path)) }), { concurrency: parallel });
   const rows = done.map(({ item, verdict }) => ({ look: "classic", fighter: item.fighter, move: item.move, judge, ...verdict, model, ...(effort === undefined ? {} : { effort }) }));
   const costs = done.map(({ item, tokens, outputTokens, seconds, tries }) => ({ fighter: item.fighter, move: item.move, judge, model, tokens, outputTokens, seconds: Math.round(seconds * 10) / 10, tries }));
   yield* attempt("write the scores", async () => {
@@ -119,5 +132,5 @@ export const judgeRun: Command = (args) => Effect.gen(function*() {
     await Bun.write(join(output, `usage-${judge}.jsonl`), costs.map((row) => `${JSON.stringify(row)}\n`).join(""));
   });
   const tokens = costs.reduce((sum, row) => sum + row.tokens, 0), seconds = costs.reduce((sum, row) => sum + row.seconds, 0);
-  yield* Console.log(`${rows.length} moves judged by ${judge}: ${Math.round(tokens / rows.length)} tokens and ${(seconds / rows.length).toFixed(1)} s per move; record with: bun wisp anim judge record ${join(output, `scores-${judge}.jsonl`)}`);
+  yield* Console.log(`${rows.length} moves judged by ${judge} on account ${account.name}: ${Math.round(tokens / rows.length)} tokens and ${(seconds / rows.length).toFixed(1)} s per move; record with: bun wisp anim judge record ${join(output, `scores-${judge}.jsonl`)}`);
 }).pipe(Effect.provide(BunServices.layer));
