@@ -62,8 +62,8 @@ export function sampleKeys(capture: KeyboardCapture, held: number): boolean {
   if (has(rose, Action.moveUp) || has(rose, Action.moveDown)) row.ledgeVertical = vertical(rose);
   row.pressed |= rose;
   row.released |= fell;
-  row.throwX = clampThrow(row.throwX + horizontal(rose) + directionOf(rose, Action.smashRight, Action.smashLeft));
-  row.throwZ = clampThrow(row.throwZ + vertical(rose) + directionOf(rose, Action.smashUp, Action.smashDown));
+  row.throwX = clampThrow(row.throwX + horizontal(rose) + directionOf(rose, Action.cRight, Action.cLeft));
+  row.throwZ = clampThrow(row.throwZ + vertical(rose) + directionOf(rose, Action.cUp, Action.cDown));
   updateDirections(directions, x, z);
   row.sdi = pulsePending(directions);
   row.sdiX = directions.pulseX;

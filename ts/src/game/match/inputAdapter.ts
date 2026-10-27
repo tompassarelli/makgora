@@ -24,17 +24,17 @@ const MOVE_RIGHT_BIT = bit(Action.moveRight);
 const MOVE_UP_BIT = bit(Action.moveUp);
 const RIGHT_TRIGGER_BIT = bit(Action.rightTrigger);
 const SHORT_HOP_BIT = bit(Action.shortHop);
-const SMASH_DOWN_BIT = bit(Action.smashDown);
-const SMASH_LEFT_BIT = bit(Action.smashLeft);
-const SMASH_RIGHT_BIT = bit(Action.smashRight);
-const SMASH_UP_BIT = bit(Action.smashUp);
+const SMASH_DOWN_BIT = bit(Action.cDown);
+const SMASH_LEFT_BIT = bit(Action.cLeft);
+const SMASH_RIGHT_BIT = bit(Action.cRight);
+const SMASH_UP_BIT = bit(Action.cUp);
 const SPECIAL_BIT = bit(Action.special);
 const STRONG_BIT = bit(Action.strong);
 const WALK_BIT = bit(Action.walk);
 const GRAB_MASH_ACTIONS = maskOf(Action.attack, Action.special, Action.jump, Action.shortHop, Action.grab, Action.leftTrigger, Action.rightTrigger, Action.lightShield);
 const MOVEMENT_ACTIONS = maskOf(Action.moveLeft, Action.moveRight, Action.moveDown, Action.moveUp);
 const TRIGGERS = maskOf(Action.leftTrigger, Action.rightTrigger, Action.lightShield);
-const SMASHES = maskOf(Action.smashLeft, Action.smashRight, Action.smashUp, Action.smashDown);
+const SMASHES = maskOf(Action.cLeft, Action.cRight, Action.cUp, Action.cDown);
 
 const sign = (value: number): Direction => value < 0 ? -1 : value > 0 ? 1 : 0;
 
@@ -143,7 +143,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.getupDirection = edgePair(pressed, Action.moveLeft, Action.moveRight);
   destination.getupDirectionPressed = destination.getupDirection !== 0;
   destination.cStickUpFlick = (pressed & SMASH_UP_BIT) !== 0;
-  destination.cStickSideFlick = edgePair(pressed, Action.smashLeft, Action.smashRight);
+  destination.cStickSideFlick = edgePair(pressed, Action.cLeft, Action.cRight);
   destination.attackHeld = (held & ATTACK_BIT) !== 0 || ((held & STRONG_BIT) !== 0 && strongHoldsSmash(fighter, aimX, aimZ));
   destination.specialHeld = (held & SPECIAL_BIT) !== 0;
   const leftShield = (held & LEFT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerLeft);

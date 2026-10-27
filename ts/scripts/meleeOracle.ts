@@ -559,12 +559,12 @@ const GETUPS: readonly Scenario[] = [
   {
     area: "getup", name: "C-stick up flick in the down wait: get-up attack",
     cite: C_STICK_GETUP,
-    run: (c) => ({ expected: "get-up attack", actual: downStateName(stateAfter(knockdown(c, 120, (after) => (after === 40 ? [Action.smashUp] : [])), DownState.wait)) }),
+    run: (c) => ({ expected: "get-up attack", actual: downStateName(stateAfter(knockdown(c, 120, (after) => (after === 40 ? [Action.cUp] : [])), DownState.wait)) }),
   },
   {
     area: "getup", name: "C-stick right flick in the down wait: roll",
     cite: C_STICK_GETUP,
-    run: (c) => ({ expected: "roll", actual: downStateName(stateAfter(knockdown(c, 120, (after) => (after === 40 ? [Action.smashRight] : [])), DownState.wait)) }),
+    run: (c) => ({ expected: "roll", actual: downStateName(stateAfter(knockdown(c, 120, (after) => (after === 40 ? [Action.cRight] : [])), DownState.wait)) }),
   },
 ];
 

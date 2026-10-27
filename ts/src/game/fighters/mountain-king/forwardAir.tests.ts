@@ -48,7 +48,7 @@ function forwardAirContacts(foe: Character, foeAhead: number, foeBelow: number, 
   const contacts: Contact[] = [];
   let seen = percent;
   for (let tick = 1; tick <= WATCH_FRAMES; tick++) {
-    const row = inputRow({ held: tick === 1 ? maskOf(Action.smashRight) : 0, pressed: tick === 1 ? maskOf(Action.smashRight) : 0 });
+    const row = inputRow({ held: tick === 1 ? maskOf(Action.cRight) : 0, pressed: tick === 1 ? maskOf(Action.cRight) : 0 });
     if (row === undefined) throw new Error("forward air input row");
     adaptInput(row, muradin, tick, state.controls.inputs[0], state.controls.commands[0]);
     stepMatch(state.match, state.world, state.controls, tick);

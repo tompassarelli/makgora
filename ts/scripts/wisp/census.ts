@@ -29,7 +29,7 @@ const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
 const KEY = {
   left: bound(Action.moveLeft), right: bound(Action.moveRight), down: bound(Action.moveDown), up: bound(Action.moveUp), jump: bound(Action.shortHop),
   attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shieldLeft: bound(Action.leftTrigger), shieldRight: bound(Action.rightTrigger),
-  cLeft: bound(Action.smashLeft), cRight: bound(Action.smashRight), cUp: bound(Action.smashUp), cDown: bound(Action.smashDown), walk: bound(Action.walk),
+  cLeft: bound(Action.cLeft), cRight: bound(Action.cRight), cUp: bound(Action.cUp), cDown: bound(Action.cDown), walk: bound(Action.walk),
 } as const;
 
 

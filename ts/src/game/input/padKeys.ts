@@ -22,10 +22,10 @@ export const PAD_LAYER: readonly PadKey[] = [
   { action: Action.moveRight, key: "]", code: 0xdd },
   { action: Action.moveUp, key: ";", code: 0xba },
   { action: Action.moveDown, key: "'", code: 0xde },
-  { action: Action.smashLeft, key: ",", code: 0xbc },
-  { action: Action.smashRight, key: ".", code: 0xbe },
-  { action: Action.smashUp, key: "-", code: 0xbd },
-  { action: Action.smashDown, key: "\\", code: 0xdc },
+  { action: Action.cLeft, key: ",", code: 0xbc },
+  { action: Action.cRight, key: ".", code: 0xbe },
+  { action: Action.cUp, key: "-", code: 0xbd },
+  { action: Action.cDown, key: "\\", code: 0xdc },
 ];
 
 export function padLayerAction(code: number): Action | undefined {

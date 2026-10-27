@@ -92,7 +92,7 @@ class ControllerRows {
       }
       const was = this.axes[edge.axis] ?? 0;
       this.axes[edge.axis] = edge.value;
-      const [negative, positive] = edge.axis === 0 ? [bit(Action.smashLeft), bit(Action.smashRight)] : [bit(Action.smashDown), bit(Action.smashUp)];
+      const [negative, positive] = edge.axis === 0 ? [bit(Action.cLeft), bit(Action.cRight)] : [bit(Action.cDown), bit(Action.cUp)];
       const toward = edge.value < 0 ? negative : positive;
 
       this.smash &= ~((Math.abs(edge.value) < SMASH_REACH ? negative | positive : 0) | (toward === negative ? positive : negative));

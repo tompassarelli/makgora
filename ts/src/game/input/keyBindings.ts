@@ -29,7 +29,7 @@ export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WA
 export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
   wasd: "Recommended if you're new",
   standard: "Leverless controller style",
-  custom: "Hitbox with 9 jump, 8 shield and 0 EX",
+  custom: "Hitbox with 9 jump, 8 shield and 0 C-up",
 };
 
 const EMPTY = 0;
@@ -43,6 +43,8 @@ const SLASH = 191;
 
 const code = (character: string) => character.charCodeAt(0);
 
+const START_KEY = code("Y");
+
 
 
 const RESERVED_KEYS: readonly number[] = [8, 13, 27, 89, 112, 116, 117, 118];
@@ -51,7 +53,7 @@ const RESERVED_REASONS: Readonly<Record<number, string>> = {
   8: "Backspace is reserved for Pause",
   13: "Enter is reserved for Warcraft chat",
   27: "Escape is reserved for cancel",
-  89: "Y is reserved for Start",
+  89: "Y is Start on the select screens, and Strong only by default in a match",
   112: "F1 is reserved for this screen",
   116: "F5 is reserved for Warcraft shortcuts",
   117: "F6 is reserved for Warcraft shortcuts",
@@ -89,15 +91,14 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.leftTrigger, code("Q"));
   if (custom) bind(Action.rightTrigger, code("8"), code("G"));
   else bind(Action.rightTrigger, code("7"));
-  bind(Action.smashLeft, code("B"), custom ? SLASH : EMPTY);
-  bind(Action.smashRight, code("M"));
-  bind(Action.smashUp, code("J"));
-  bind(Action.smashDown, code("H"));
-  bind(Action.walk, code("P"));
+  bind(Action.cLeft, code("B"), custom ? SLASH : EMPTY);
+  bind(Action.cRight, code("M"));
+  bind(Action.cUp, code(custom ? "0" : "9"), code("J"));
+  bind(Action.cDown, code("P"));
+  bind(Action.walk, code("H"));
   bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
-  if (custom) bind(Action.strong, code("0"), code("X"));
-  else bind(Action.strong, code("9"));
+  bind(Action.strong, START_KEY, custom ? code("X") : EMPTY);
   return { keys };
 }
 
@@ -109,8 +110,11 @@ export function previousStandardKeys(): number[] {
   };
   bind(Action.jump, code("Z"), code("8"));
   bind(Action.rightTrigger, code("7"), code("G"));
-  bind(Action.smashLeft, code("B"), SLASH);
+  bind(Action.cLeft, code("B"), SLASH);
   bind(Action.lightShield, code("A"), EMPTY);
+  bind(Action.cUp, code("J"), EMPTY);
+  bind(Action.cDown, code("H"), EMPTY);
+  bind(Action.walk, code("P"), EMPTY);
   bind(Action.strong, code("9"), code("X"));
   return keys;
 }
@@ -165,7 +169,7 @@ export function pauseMenuKeys(bindings: Readonly<KeyBindings>): number[] {
 
 function bindSlot(keys: number[], index: number, key: number): boolean {
   if (key !== EMPTY) {
-    if (key < 1 || key > 255 || RESERVED_KEYS.includes(key)) return false;
+    if (key < 1 || key > 255 || (RESERVED_KEYS.includes(key) && key !== START_KEY)) return false;
     if (keys.some((bound, other) => other !== index && bound === key)) return false;
   }
   keys[index] = key;
@@ -215,7 +219,7 @@ const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 const SKIPPED_ON_LOAD = code("Y");
 
-export const SAVED_BINDING_FORMAT = { version: CURRENT_SAVE, slots: SAVED_SLOTS, keyDigits: SAVED_KEY_DIGITS, empty: EMPTY, skippedOnLoad: SKIPPED_ON_LOAD, reservedKeys: RESERVED_KEYS } as const;
+export const SAVED_BINDING_FORMAT = { version: CURRENT_SAVE, slots: SAVED_SLOTS, keyDigits: SAVED_KEY_DIGITS, empty: EMPTY, skippedOnLoad: START_KEY, reservedKeys: RESERVED_KEYS } as const;
 
 export function encodeBindings({ keys }: Readonly<KeyBindings>): string {
   return CURRENT_SAVE + keys.map((key) => String(key).padStart(SAVED_KEY_DIGITS, "0")).join("");
@@ -256,8 +260,8 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
   const first = (action: Action) => keyFor(bindings, action, 0);
   if (version === "K9") return;
   if (version === "K8") {
-    if (first(Action.smashDown) === code("J") && free(code("H"))) rebind(bindings, Action.smashDown, 0, code("H"));
-    if (first(Action.smashUp) === code("0") && free(code("J"))) rebind(bindings, Action.smashUp, 0, code("J"));
+    if (first(Action.cDown) === code("J") && free(code("H"))) rebind(bindings, Action.cDown, 0, code("H"));
+    if (first(Action.cUp) === code("0") && free(code("J"))) rebind(bindings, Action.cUp, 0, code("J"));
     return;
   }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
@@ -302,7 +306,8 @@ export function decodeBindings(saved: string): KeyBindings | undefined {
     const key = readKey(saved, 2 + index * SAVED_KEY_DIGITS);
     if (key === undefined) return undefined;
 
-    if (key !== SKIPPED_ON_LOAD && !bindSlot(keys, index, key)) return undefined;
+    const legacyStart = key === START_KEY && version !== CURRENT_SAVE;
+    if (!legacyStart && !bindSlot(keys, index, key)) return undefined;
   }
   const bindings = { keys };
   if (version !== CURRENT_SAVE) upgradeToCurrentKeys(bindings, version);
@@ -322,10 +327,10 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.grab]: "Grab",
   [Action.leftTrigger]: "Left trigger",
   [Action.rightTrigger]: "Right trigger",
-  [Action.smashLeft]: "C-stick left",
-  [Action.smashRight]: "C-stick right",
-  [Action.smashUp]: "C-stick up",
-  [Action.smashDown]: "C-stick down",
+  [Action.cLeft]: "C-left",
+  [Action.cRight]: "C-right",
+  [Action.cUp]: "C-up",
+  [Action.cDown]: "C-down",
   [Action.walk]: "Tilt",
   [Action.lightShield]: "Light shield",
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
@@ -343,10 +348,10 @@ export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
   [Action.grab]: "Grab",
   [Action.leftTrigger]: "Shield",
   [Action.rightTrigger]: "Shield R",
-  [Action.smashLeft]: "Smash L",
-  [Action.smashRight]: "Smash R",
-  [Action.smashUp]: "Smash U",
-  [Action.smashDown]: "Smash D",
+  [Action.cLeft]: "C-left",
+  [Action.cRight]: "C-right",
+  [Action.cUp]: "C-up",
+  [Action.cDown]: "C-down",
   [Action.walk]: "Tilt",
   [Action.lightShield]: "Light sh.",
   [Action.shortHop]: "Hop",

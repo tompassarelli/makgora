@@ -355,7 +355,7 @@ function firstStart(plans: Plans): number {
 
 const towardOf = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.moveRight : Action.moveLeft);
 const awayOf = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.moveLeft : Action.moveRight);
-const smashToward = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.smashRight : Action.smashLeft);
+const smashToward = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.cRight : Action.cLeft);
 
 const press = (name: string, kind: StartKind, held: (self: Fighter, other: Fighter) => Held): Option =>
   ({ name, kind, input: (i, self, other) => (i === 0 ? held(self, other) : []) });
@@ -371,8 +371,8 @@ const FTILT = attack("forward tilt", AttackStyle.forwardTilt, (self, other) => [
 const UTILT = attack("up tilt", AttackStyle.upTilt, () => [Action.walk, Action.moveUp, Action.attack]);
 const DTILT = attack("down tilt", AttackStyle.downTilt, () => [Action.walk, Action.moveDown, Action.attack]);
 const FSMASH = attack("forward smash", AttackStyle.forwardSmash, (self, other) => [smashToward(self, other)]);
-const USMASH = attack("up smash", AttackStyle.upSmash, () => [Action.smashUp]);
-const DSMASH = attack("down smash", AttackStyle.downSmash, () => [Action.smashDown]);
+const USMASH = attack("up smash", AttackStyle.upSmash, () => [Action.cUp]);
+const DSMASH = attack("down smash", AttackStyle.downSmash, () => [Action.cDown]);
 const GRAB = attack("grab", AttackStyle.grab, () => [Action.grab]);
 const SHIELD: Option = { name: "shield", kind: "shield", input: () => [Action.rightTrigger] };
 const SPOT_DODGE = press("spot dodge", "dodge", () => [Action.rightTrigger, Action.moveDown]);
@@ -395,10 +395,10 @@ type Aerial = (typeof AERIALS)[number];
 function aerialPress(self: Fighter, style: AttackStyle): Held {
   switch (style) {
     case AttackStyle.neutralAir: return [Action.attack];
-    case AttackStyle.forwardAir: return [self.facing > 0 ? Action.smashRight : Action.smashLeft];
-    case AttackStyle.backAir: return [self.facing > 0 ? Action.smashLeft : Action.smashRight];
-    case AttackStyle.upAir: return [Action.smashUp];
-    default: return [Action.smashDown];
+    case AttackStyle.forwardAir: return [self.facing > 0 ? Action.cRight : Action.cLeft];
+    case AttackStyle.backAir: return [self.facing > 0 ? Action.cLeft : Action.cRight];
+    case AttackStyle.upAir: return [Action.cUp];
+    default: return [Action.cDown];
   }
 }
 

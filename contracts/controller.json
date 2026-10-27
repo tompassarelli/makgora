@@ -41,19 +41,19 @@
       "bit": 9
     },
     {
-      "name": "smashLeft",
+      "name": "cLeft",
       "bit": 10
     },
     {
-      "name": "smashRight",
+      "name": "cRight",
       "bit": 11
     },
     {
-      "name": "smashUp",
+      "name": "cUp",
       "bit": 12
     },
     {
-      "name": "smashDown",
+      "name": "cDown",
       "bit": 13
     },
     {
@@ -147,22 +147,22 @@
     {
       "key": ",",
       "code": 188,
-      "action": "smashLeft"
+      "action": "cLeft"
     },
     {
       "key": ".",
       "code": 190,
-      "action": "smashRight"
+      "action": "cRight"
     },
     {
       "key": "-",
       "code": 189,
-      "action": "smashUp"
+      "action": "cUp"
     },
     {
       "key": "\\",
       "code": 220,
-      "action": "smashDown"
+      "action": "cDown"
     }
   ],
   "savedBindings": {

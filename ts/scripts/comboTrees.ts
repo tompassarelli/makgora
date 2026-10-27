@@ -63,11 +63,11 @@ function attackButtons(move: Move, self: Fighter, other: Fighter): Held {
     case AttackStyle.forwardTiltDown: return [Action.walk, toward(self, other), Action.moveDown, Action.attack];
     case AttackStyle.upTilt: return [Action.walk, Action.moveUp, Action.attack];
     case AttackStyle.downTilt: return [Action.walk, Action.moveDown, Action.attack];
-    case AttackStyle.forwardSmash: return [other.motion.x >= self.motion.x ? Action.smashRight : Action.smashLeft];
-    case AttackStyle.upSmash: case AttackStyle.upAir: return [Action.smashUp];
-    case AttackStyle.downSmash: case AttackStyle.downAir: return [Action.smashDown];
-    case AttackStyle.forwardAir: return [self.facing > 0 ? Action.smashRight : Action.smashLeft];
-    case AttackStyle.backAir: return [self.facing > 0 ? Action.smashLeft : Action.smashRight];
+    case AttackStyle.forwardSmash: return [other.motion.x >= self.motion.x ? Action.cRight : Action.cLeft];
+    case AttackStyle.upSmash: case AttackStyle.upAir: return [Action.cUp];
+    case AttackStyle.downSmash: case AttackStyle.downAir: return [Action.cDown];
+    case AttackStyle.forwardAir: return [self.facing > 0 ? Action.cRight : Action.cLeft];
+    case AttackStyle.backAir: return [self.facing > 0 ? Action.cLeft : Action.cRight];
     default: return [Action.attack];
   }
 }

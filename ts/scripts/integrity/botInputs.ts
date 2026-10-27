@@ -22,10 +22,10 @@ const BUTTONS = [
   [EV_ABS, ABS_Z, 1, "shield", bit(Action.leftTrigger)],
   [EV_ABS, ABS_X, 1, "dash-right", bit(Action.moveRight)],
   [EV_ABS, ABS_X, -1, "dash-left", bit(Action.moveLeft)],
-  [EV_ABS, ABS_RX, 1, "c-right", bit(Action.smashRight)],
-  [EV_ABS, ABS_RX, -1, "c-left", bit(Action.smashLeft)],
-  [EV_ABS, ABS_RY, -1, "c-up", bit(Action.smashUp)],
-  [EV_ABS, ABS_RY, 1, "c-down", bit(Action.smashDown)],
+  [EV_ABS, ABS_RX, 1, "c-right", bit(Action.cRight)],
+  [EV_ABS, ABS_RX, -1, "c-left", bit(Action.cLeft)],
+  [EV_ABS, ABS_RY, -1, "c-up", bit(Action.cUp)],
+  [EV_ABS, ABS_RY, 1, "c-down", bit(Action.cDown)],
 ] as const;
 const HELD_BUTTONS = bit(Action.attack) | bit(Action.jump) | bit(Action.special) | bit(Action.grab) | bit(Action.leftTrigger) | bit(Action.rightTrigger);
 

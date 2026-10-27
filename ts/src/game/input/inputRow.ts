@@ -59,9 +59,9 @@ const sign = (positive: boolean, negative: boolean) => (positive ? 1 : 0) - (neg
 function pressedThrows(pressed: number): Pick<InputRow, "throwX" | "throwZ"> {
   return {
     throwX: sign(has(pressed, Action.moveRight), has(pressed, Action.moveLeft))
-      + sign(has(pressed, Action.smashRight), has(pressed, Action.smashLeft)),
+      + sign(has(pressed, Action.cRight), has(pressed, Action.cLeft)),
     throwZ: sign(has(pressed, Action.moveUp), has(pressed, Action.moveDown))
-      + sign(has(pressed, Action.smashUp), has(pressed, Action.smashDown)),
+      + sign(has(pressed, Action.cUp), has(pressed, Action.cDown)),
   };
 }
 

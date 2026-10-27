@@ -56,10 +56,10 @@ function heldActions(pad: Pad): number {
   if (x > STICK_DIGITAL) held |= bit(Action.moveRight);
   if (up < -STICK_DIGITAL) held |= bit(Action.moveDown);
   if (up > STICK_DIGITAL) held |= bit(Action.moveUp) | bit(Action.jump);
-  if (raw(pad.cx) > C_STICK_DIGITAL) held |= bit(Action.smashRight);
-  if (raw(pad.cx) < -C_STICK_DIGITAL) held |= bit(Action.smashLeft);
-  if (raw(pad.cy) > C_STICK_DIGITAL) held |= bit(Action.smashUp);
-  if (raw(pad.cy) < -C_STICK_DIGITAL) held |= bit(Action.smashDown);
+  if (raw(pad.cx) > C_STICK_DIGITAL) held |= bit(Action.cRight);
+  if (raw(pad.cx) < -C_STICK_DIGITAL) held |= bit(Action.cLeft);
+  if (raw(pad.cy) > C_STICK_DIGITAL) held |= bit(Action.cUp);
+  if (raw(pad.cy) < -C_STICK_DIGITAL) held |= bit(Action.cDown);
   if (pad.rightStickTilts === true && Math.max(Math.abs(raw(pad.cx)), Math.abs(raw(pad.cy))) > C_STICK_DIGITAL) held |= bit(Action.walk);
   if (pad.trigger === true && RAW > TRIGGER_DIGITAL) held |= bit(Action.leftTrigger);
   if (pad.rightTrigger === true && RAW > TRIGGER_DIGITAL) held |= bit(Action.rightTrigger);

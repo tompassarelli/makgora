@@ -20,10 +20,10 @@ const FOE_DISTANCE = 1500.0;
 const FRAME_LIMIT = 120;
 
 function aerialAction(style: AttackStyle, facing: number): Action {
-  if (style === AttackStyle.forwardAir) return facing > 0 ? Action.smashRight : Action.smashLeft;
-  if (style === AttackStyle.backAir) return facing > 0 ? Action.smashLeft : Action.smashRight;
-  if (style === AttackStyle.upAir) return Action.smashUp;
-  if (style === AttackStyle.downAir) return Action.smashDown;
+  if (style === AttackStyle.forwardAir) return facing > 0 ? Action.cRight : Action.cLeft;
+  if (style === AttackStyle.backAir) return facing > 0 ? Action.cLeft : Action.cRight;
+  if (style === AttackStyle.upAir) return Action.cUp;
+  if (style === AttackStyle.downAir) return Action.cDown;
   return Action.attack;
 }
 
@@ -91,7 +91,7 @@ function shortHopDownAirHits(character: Character, foe: Character, facing: numbe
   let airborne = -1;
   for (let tick = 2; tick <= FRAME_LIMIT; tick++) {
     if (airborne >= 0 || !user.motion.grounded || user.jump.squat === 1) airborne++;
-    frame(s, airborne === delay ? [Action.smashDown] : []);
+    frame(s, airborne === delay ? [Action.cDown] : []);
     if (airborne > 0 && user.motion.grounded) return false;
     if (airborne >= delay && user.attack.style === AttackStyle.downAir && target.launch.hitlag > 0) return true;
   }

@@ -144,7 +144,7 @@
       "press": "key",
       "key": "-",
       "code": 189,
-      "action": "smashUp",
+      "action": "cUp",
       "label": "Up smash",
       "when": {
         "setting": "rightStick",
@@ -156,7 +156,7 @@
       "press": "key",
       "key": "-",
       "code": 189,
-      "action": "smashUp",
+      "action": "cUp",
       "label": "Up tilt / up air",
       "when": {
         "setting": "rightStick",
@@ -171,7 +171,7 @@
       "press": "key",
       "key": "\\",
       "code": 220,
-      "action": "smashDown",
+      "action": "cDown",
       "label": "Down smash",
       "when": {
         "setting": "rightStick",
@@ -183,7 +183,7 @@
       "press": "key",
       "key": "\\",
       "code": 220,
-      "action": "smashDown",
+      "action": "cDown",
       "label": "Down tilt / down air",
       "when": {
         "setting": "rightStick",
@@ -198,7 +198,7 @@
       "press": "key",
       "key": ",",
       "code": 188,
-      "action": "smashLeft",
+      "action": "cLeft",
       "label": "Smash left",
       "when": {
         "setting": "rightStick",
@@ -210,7 +210,7 @@
       "press": "key",
       "key": ",",
       "code": 188,
-      "action": "smashLeft",
+      "action": "cLeft",
       "label": "Tilt left / air left",
       "when": {
         "setting": "rightStick",
@@ -225,7 +225,7 @@
       "press": "key",
       "key": ".",
       "code": 190,
-      "action": "smashRight",
+      "action": "cRight",
       "label": "Smash right",
       "when": {
         "setting": "rightStick",
@@ -237,7 +237,7 @@
       "press": "key",
       "key": ".",
       "code": 190,
-      "action": "smashRight",
+      "action": "cRight",
       "label": "Tilt right / air right",
       "when": {
         "setting": "rightStick",

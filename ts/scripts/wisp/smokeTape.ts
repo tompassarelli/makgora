@@ -62,7 +62,7 @@ function afterReset(name: string, presses: readonly Press[], frames: number, exp
 export const approachStep = (slot: number, frames: number): SmokeStep => ({ name: "approach", presses: [{ at: 0, keys: [key(Action.walk), key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft)], hold: frames }], frames });
 
 export const strikeStep = (slot: number, approach: number): SmokeStep => {
-  const smash = key(facingOf(slot) > 0 ? Action.smashRight : Action.smashLeft);
+  const smash = key(facingOf(slot) > 0 ? Action.cRight : Action.cLeft);
   return { name: "strike", presses: Array.from({ length: STRIKES }, (_, strike): Press => ({ at: approach + 4 + strike * STRIKE_EVERY, keys: [smash], hold: 4 })), frames: approach + 4 + STRIKES * STRIKE_EVERY };
 };
 
@@ -87,8 +87,8 @@ export function bindingSweep(): SmokeStep[] {
 export function smokeMoves(facing: 1 | -1): readonly SmokeStep[] {
   const toward = facing > 0 ? Action.moveRight : Action.moveLeft;
   const away = facing > 0 ? Action.moveLeft : Action.moveRight;
-  const smashToward = facing > 0 ? Action.smashRight : Action.smashLeft;
-  const smashAway = facing > 0 ? Action.smashLeft : Action.smashRight;
+  const smashToward = facing > 0 ? Action.cRight : Action.cLeft;
+  const smashAway = facing > 0 ? Action.cLeft : Action.cRight;
   const walk = key(Action.walk);
   const move = (name: string, presses: readonly Press[], expect: MoveClass, frames = 60) => afterReset(name, presses, frames, expect);
   const aerial = (name: string, press: Action, style: AttackStyle) => move(name, [tap([key(Action.jump)], 5), { at: 12, keys: [key(press)], hold: 4 }], attack(style));
@@ -98,15 +98,15 @@ export function smokeMoves(facing: 1 | -1): readonly SmokeStep[] {
     move("Up tilt", [tap([walk, key(Action.moveUp), key(Action.attack)])], attack(AttackStyle.upTilt)),
     move("Down tilt", [tap([walk, key(Action.moveDown), key(Action.attack)])], attack(AttackStyle.downTilt)),
     move("Forward smash", [tap([key(smashToward)])], attack(AttackStyle.forwardSmash)),
-    move("Up smash", [tap([key(Action.smashUp)])], attack(AttackStyle.upSmash)),
-    move("Down smash", [tap([key(Action.smashDown)])], attack(AttackStyle.downSmash)),
+    move("Up smash", [tap([key(Action.cUp)])], attack(AttackStyle.upSmash)),
+    move("Down smash", [tap([key(Action.cDown)])], attack(AttackStyle.downSmash)),
     move("Grab", [tap([key(Action.grab)])], attack(AttackStyle.grab)),
     move("Dash attack", [{ at: 0, keys: [key(away)], hold: 34 }, { at: 18, keys: [key(Action.attack)], hold: 4 }, { at: 26, keys: [key(Action.attack)], hold: 4 }], attack(AttackStyle.dashAttack, AttackStyle.demonHunterDashAttack)),
     aerial("Neutral air", Action.attack, AttackStyle.neutralAir),
     aerial("Forward air", smashToward, AttackStyle.forwardAir),
     aerial("Back air", smashAway, AttackStyle.backAir),
-    aerial("Up air", Action.smashUp, AttackStyle.upAir),
-    aerial("Down air", Action.smashDown, AttackStyle.downAir),
+    aerial("Up air", Action.cUp, AttackStyle.upAir),
+    aerial("Down air", Action.cDown, AttackStyle.downAir),
     move("Neutral special", [tap([key(Action.special)])], special("neutral"), SPECIAL_TAIL),
     move("Side special", [tap([key(toward), key(Action.special)])], special("side"), SPECIAL_TAIL),
     move("Side special away", [tap([key(away), key(Action.special)])], special("side"), SPECIAL_TAIL),

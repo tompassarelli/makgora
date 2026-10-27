@@ -48,8 +48,8 @@ const SHIELD = 12;
 const DASH = 18;
 const TAPS = [Action.attack, Action.jump, Action.special];
 const CYCLE = 3 * REST + (SHIELD + REST) + 2 * (DASH + REST);
-const RIGHT = bit(Action.moveRight) | bit(Action.smashRight);
-const LEFT = bit(Action.moveLeft) | bit(Action.smashLeft);
+const RIGHT = bit(Action.moveRight) | bit(Action.cRight);
+const LEFT = bit(Action.moveLeft) | bit(Action.cLeft);
 
 
 

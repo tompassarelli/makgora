@@ -120,8 +120,8 @@ function replayProblems(routes: readonly (RouteRecord & { readonly fighter: stri
 
 const NAMES: Readonly<Record<number, string>> = {
   [Action.moveLeft]: "left", [Action.moveRight]: "right", [Action.moveDown]: "down", [Action.moveUp]: "up", [Action.jump]: "jump",
-  [Action.attack]: "A", [Action.special]: "B", [Action.grab]: "Z", [Action.rightTrigger]: "R", [Action.smashLeft]: "C-left",
-  [Action.smashRight]: "C-right", [Action.smashUp]: "C-up", [Action.smashDown]: "C-down", [Action.walk]: "walk",
+  [Action.attack]: "A", [Action.special]: "B", [Action.grab]: "Z", [Action.rightTrigger]: "R", [Action.cLeft]: "C-left",
+  [Action.cRight]: "C-right", [Action.cUp]: "C-up", [Action.cDown]: "C-down", [Action.walk]: "walk",
 };
 
 

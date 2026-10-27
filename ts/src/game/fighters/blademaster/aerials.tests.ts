@@ -85,7 +85,7 @@ test("Blademaster's down air spikes an airborne foe struck by the blade tip and 
       const user = fighter(s), foe = fighter(s, 1);
       airborne(user, 0.0, AIR_Z);
       airborne(foe, facing * spot.ahead, AIR_Z - spot.below);
-      const hits = contacts(s, user, foe, once(Action.smashDown));
+      const hits = contacts(s, user, foe, once(Action.cDown));
       assertEquals(hits.length, 1);
       return hits[0];
     };
@@ -97,7 +97,7 @@ test("Blademaster's down air spikes an airborne foe struck by the blade tip and 
 
     const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing }, { character: Character.warden, x: facing * FOE_AHEAD, facing: -facing }]);
     const user = fighter(s), foe = fighter(s, 1);
-    assertEquals(contacts(s, user, foe, shortHop(s, user, Action.smashDown)).length, 1);
+    assertEquals(contacts(s, user, foe, shortHop(s, user, Action.cDown)).length, 1);
   }
 });
 
@@ -114,7 +114,7 @@ function reactsAfterDownAir(reaction: Reaction, pressTick: number): boolean {
   const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing: 1 }, { character: Character.warden, x: 500.0, facing: -1 }]);
   const user = fighter(s);
   airborne(user, 0.0, HIGH_AIR_Z);
-  frame(s, [Action.smashDown]);
+  frame(s, [Action.cDown]);
   for (let tick = 1; tick < pressTick; tick++) frame(s, []);
   assertEquals(user.attack.style, AttackStyle.downAir);
   const jumps = user.jump.remaining, serial = user.attack.serial, special = user.special.action, dodging = user.dodge.airDodging;

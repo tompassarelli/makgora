@@ -60,10 +60,10 @@ const AERIALS = [AttackStyle.backAir, AttackStyle.neutralAir, AttackStyle.forwar
 function aerialPress(self: Fighter, style: AttackStyle): Held {
   switch (style) {
     case AttackStyle.neutralAir: return [Action.attack];
-    case AttackStyle.forwardAir: return [self.facing > 0 ? Action.smashRight : Action.smashLeft];
-    case AttackStyle.backAir: return [self.facing > 0 ? Action.smashLeft : Action.smashRight];
-    case AttackStyle.upAir: return [Action.smashUp];
-    default: return [Action.smashDown];
+    case AttackStyle.forwardAir: return [self.facing > 0 ? Action.cRight : Action.cLeft];
+    case AttackStyle.backAir: return [self.facing > 0 ? Action.cLeft : Action.cRight];
+    case AttackStyle.upAir: return [Action.cUp];
+    default: return [Action.cDown];
   }
 }
 

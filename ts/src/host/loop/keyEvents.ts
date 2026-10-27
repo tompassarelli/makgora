@@ -67,7 +67,7 @@ function registerKeys(s: ShellState): void {
   const { keyEvents } = s;
   ensureKeyTriggerPair(keyEvents, () => CreateTrigger(), (down, up) => {
     for (let key = 1; key <= 255; key++) {
-      if (key === Key.y || key === Key.enter || key === Key.backspace) continue;
+      if (key === Key.enter || key === Key.backspace) continue;
       registerKey(s, down, key, true);
       registerKey(s, up, key, false);
     }

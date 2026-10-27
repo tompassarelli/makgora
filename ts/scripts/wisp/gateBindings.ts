@@ -39,8 +39,8 @@ const actions: Readonly<Record<string, Action>> = {
   attack: Action.attack, special: Action.special, jump: Action.jump, grab: Action.grab,
   shield: Action.leftTrigger, rightTrigger: Action.rightTrigger, lightShield: Action.lightShield,
   shortHop: Action.shortHop, exSpecial: Action.strong, moveLeft: Action.moveLeft, moveRight: Action.moveRight,
-  moveUp: Action.moveUp, moveDown: Action.moveDown, smashLeft: Action.smashLeft,
-  smashRight: Action.smashRight, smashUp: Action.smashUp, smashDown: Action.smashDown,
+  moveUp: Action.moveUp, moveDown: Action.moveDown, cLeft: Action.cLeft,
+  cRight: Action.cRight, cUp: Action.cUp, cDown: Action.cDown,
 };
 const samples = [
   ["Attack", "button a", 1, 0, "smash", "full"],

@@ -68,10 +68,10 @@ const RIGHT = bit(Action.moveRight);
 const UP = bit(Action.moveUp);
 const DOWN = bit(Action.moveDown);
 const SHIELD = bit(Action.rightTrigger);
-const SMASH_LEFT = bit(Action.smashLeft);
-const SMASH_RIGHT = bit(Action.smashRight);
-const SMASH_UP = bit(Action.smashUp);
-const SMASH_DOWN = bit(Action.smashDown);
+const SMASH_LEFT = bit(Action.cLeft);
+const SMASH_RIGHT = bit(Action.cRight);
+const SMASH_UP = bit(Action.cUp);
+const SMASH_DOWN = bit(Action.cDown);
 
 const toward = (self: Readonly<Fighter>, other: Readonly<Fighter>): number => (other.motion.x >= self.motion.x ? RIGHT : LEFT);
 const away = (self: Readonly<Fighter>, other: Readonly<Fighter>): number => (other.motion.x >= self.motion.x ? LEFT : RIGHT);

@@ -135,8 +135,8 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     return;
   }
   if ((key === Key.y || key === Key.escape) && cancelRematchCountdown(s.game, slot)) return;
-  if (key === Key.y) {
-    if (s.game.phase !== Phase.match) startDown(s, slot);
+  if (key === Key.y && (startKey || s.game.phase !== Phase.match)) {
+    if (startKey && s.game.phase !== Phase.match) startDown(s, slot);
     return;
   }
   if (s.game.phase === Phase.match && s.session.paused) {
@@ -189,7 +189,7 @@ function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false
 
   if (s.pauseMenu?.title && menuAction(s.participants[slot].bindings.bindings, key) === Action.attack) s.titleAwaitRelease = false;
 
-  if (key === Key.y) {
+  if (key === Key.y && startKey) {
     startKeyUp(s.session, slot);
     return;
   }

@@ -36,14 +36,14 @@ const unbound = (settings: Readonly<BindingSettings>) => unboundActions(settings
 
 test("a rebind swaps with the action holding the key, Delete and the x clear a slot, reserved keys stay refused and Reset to layout restores the preset [k2 property]", () => {
   const settings = customSettings();
-  assertEquals(slots(settings, Action.walk), "P —", "Custom Tilt");
-  assertEquals(slots(settings, Action.strong), "0 X", "Custom Strong");
+  assertEquals(slots(settings, Action.walk), "H —", "Custom Tilt");
+  assertEquals(slots(settings, Action.strong), "Y X", "Custom Strong");
 
   beginBindingCapture(settings, Action.walk, 0);
   assertEquals(captureBinding(settings, code("0")), true);
   assertEquals(slots(settings, Action.walk), "0 —", "Tilt after the swap");
-  assertEquals(slots(settings, Action.strong), "P X", "Strong after the swap");
-  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.strong]}.`);
+  assertEquals(slots(settings, Action.cUp), "H J", "C-up after the swap");
+  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.cUp]}.`);
   assertEquals(settings.capture, undefined);
 
   beginBindingCapture(settings, Action.walk, 0);
@@ -54,9 +54,9 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(settings.capture, undefined);
 
   clearKey(settings, code("X"));
-  assertEquals(slots(settings, Action.strong), "P —", "Strong after its x");
+  assertEquals(slots(settings, Action.strong), "Y —", "Strong after its x");
   assertEquals(settings.message, `X cleared from ${ACTION_LABELS[Action.strong]}.`);
-  clearKey(settings, code("P"));
+  clearKey(settings, code("Y"));
   assertEquals(unbound(settings), `${Action.walk},${Action.strong}`);
   const before = encodeBindings(settings.bindings);
   clearKey(settings, code("C"));

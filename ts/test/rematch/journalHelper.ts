@@ -26,9 +26,9 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 
 
 const PULSES: readonly number[] = [
-  bit(Action.moveLeft) | bit(Action.smashLeft),
-  bit(Action.moveRight) | bit(Action.smashRight),
-  bit(Action.moveDown) | bit(Action.smashDown),
+  bit(Action.moveLeft) | bit(Action.cLeft),
+  bit(Action.moveRight) | bit(Action.cRight),
+  bit(Action.moveDown) | bit(Action.cDown),
   bit(Action.jump) | bit(Action.moveUp),
   bit(Action.jump),
   bit(Action.jump),
@@ -49,7 +49,7 @@ export interface Workload {
   readonly walkers: readonly number[];
 }
 
-const DIRECTIONS = bit(Action.moveLeft) | bit(Action.moveRight) | bit(Action.moveDown) | bit(Action.moveUp) | bit(Action.smashLeft) | bit(Action.smashRight) | bit(Action.smashDown) | bit(Action.smashUp);
+const DIRECTIONS = bit(Action.moveLeft) | bit(Action.moveRight) | bit(Action.moveDown) | bit(Action.moveUp) | bit(Action.cLeft) | bit(Action.cRight) | bit(Action.cDown) | bit(Action.cUp);
 
 const tapFrames = (workload: Workload) => workload.denseCycles * PULSES.length * 3;
 

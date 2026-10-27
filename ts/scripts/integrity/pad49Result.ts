@@ -17,7 +17,7 @@ if (directory === undefined) throw new Error("usage: bun scripts/integrity/pad49
 const epoch = Number(epochText);
 
 const MOVES = bit(Action.moveLeft) | bit(Action.moveRight) | bit(Action.moveDown) | bit(Action.moveUp)
-  | bit(Action.smashLeft) | bit(Action.smashRight) | bit(Action.smashUp) | bit(Action.smashDown) | bit(Action.walk);
+  | bit(Action.cLeft) | bit(Action.cRight) | bit(Action.cUp) | bit(Action.cDown) | bit(Action.walk);
 
 let epochNs: number | undefined;
 let inEpoch = false;
@@ -59,7 +59,7 @@ for (const edge of readEdges(directory)) {
 
 type Check = (row: InputRow) => string | undefined;
 const neutral: Check = (row) => (row.axisX !== 0 || row.axisZ !== 0 || (row.held & MOVES) !== 0 ? `stick ${row.axisX},${row.axisZ} held ${row.held}` : undefined);
-const noDown: Check = (row) => ((row.held & (bit(Action.moveDown) | bit(Action.smashDown))) !== 0 ? `down held (${row.held}, axis ${row.axisZ})` : undefined);
+const noDown: Check = (row) => ((row.held & (bit(Action.moveDown) | bit(Action.cDown))) !== 0 ? `down held (${row.held}, axis ${row.axisZ})` : undefined);
 const down: Check = (row) => ((row.held & bit(Action.moveDown)) === 0 ? `no down (${row.held}, axis ${row.axisZ})` : undefined);
 const right: Check = (row) => ((row.held & bit(Action.moveRight)) === 0 || (row.released & bit(Action.moveRight)) !== 0 ? `right not held (${row.held}/${row.released})` : undefined);
 const HOLDS: Readonly<Record<string, Check>> = {

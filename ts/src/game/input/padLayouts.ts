@@ -53,10 +53,10 @@ const shared: readonly PadBinding[] = [
   bind("left_right", Action.moveRight, "Move right"),
   bind("left_down", Action.moveDown, "Crouch / fast fall"),
   bind("left_up", Action.moveUp, "Up (aim, up special)"),
-  ...rightStick("right_up", Action.smashUp, "Up smash", "Up tilt / up air"),
-  ...rightStick("right_down", Action.smashDown, "Down smash", "Down tilt / down air"),
-  ...rightStick("right_left", Action.smashLeft, "Smash left", "Tilt left / air left"),
-  ...rightStick("right_right", Action.smashRight, "Smash right", "Tilt right / air right"),
+  ...rightStick("right_up", Action.cUp, "Up smash", "Up tilt / up air"),
+  ...rightStick("right_down", Action.cDown, "Down smash", "Down tilt / down air"),
+  ...rightStick("right_left", Action.cLeft, "Smash left", "Tilt left / air left"),
+  ...rightStick("right_right", Action.cRight, "Smash right", "Tilt right / air right"),
 ];
 
 export const PAD_LAYOUTS: readonly PadLayout[] = [

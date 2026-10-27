@@ -18,7 +18,7 @@ export const NEUTRAL: Held = { buttons: 0, axisX: 0, axisZ: 0 };
 const BUTTONS: Readonly<Record<string, number>> = {
   attack: bit(Action.attack), special: bit(Action.special), jump: bit(Action.jump), grab: bit(Action.grab),
   shield: bit(Action.leftTrigger), walk: bit(Action.walk), "short-hop": bit(Action.shortHop),
-  "smash-left": bit(Action.smashLeft), "smash-right": bit(Action.smashRight), "smash-up": bit(Action.smashUp), "smash-down": bit(Action.smashDown),
+  "smash-left": bit(Action.cLeft), "smash-right": bit(Action.cRight), "smash-up": bit(Action.cUp), "smash-down": bit(Action.cDown),
 };
 
 const STICKS: Readonly<Record<string, readonly [number, number, number]>> = {

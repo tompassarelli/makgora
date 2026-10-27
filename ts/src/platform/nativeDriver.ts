@@ -133,8 +133,8 @@ function padSample(pad: Pad): void {
   set(Action.leftTrigger, pad.shield > f32(TRIGGER_PRESS_LEVEL / TRIGGER_FULL_LEVEL));
   set(Action.moveLeft, x < 0.0); set(Action.moveRight, x > 0.0);
   set(Action.moveDown, z <= -TAP_JUMP_STICK_THRESHOLD); set(Action.moveUp, z > 0.0);
-  set(Action.smashLeft, cx <= -DASH_STICK_THRESHOLD); set(Action.smashRight, cx >= DASH_STICK_THRESHOLD);
-  set(Action.smashDown, cz <= -TAP_JUMP_STICK_THRESHOLD); set(Action.smashUp, cz >= TAP_JUMP_STICK_THRESHOLD);
+  set(Action.cLeft, cx <= -DASH_STICK_THRESHOLD); set(Action.cRight, cx >= DASH_STICK_THRESHOLD);
+  set(Action.cDown, cz <= -TAP_JUMP_STICK_THRESHOLD); set(Action.cUp, cz >= TAP_JUMP_STICK_THRESHOLD);
   sampleNativeKeys(pad.capture, held, x, z);
 }
 
