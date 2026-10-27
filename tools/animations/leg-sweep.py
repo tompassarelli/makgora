@@ -8,7 +8,12 @@ out in front along the floor to full reach on the active frames with the hips an
 across, folded back into the crouch and risen to ready. Clip frame N is attack frame N;
 `rekey-clip.ts ... --keys KEYS.json` splices the baked frames into the shipped clip in place.
 
-  blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER
+`--stomp` bakes a down air from a `--pose downAir` rig instead, Falco's tilted, twirling stomp (#512): one compact
+spindle, legs straight and together with the toes pointed and both arms raised close over the head so a held weapon
+trails above, leaned back 30 degrees about the pelvis so the feet lead down and forward, and turned once about that
+long axis through the strike; it holds through the active frames, then unwinds to the aerial ready pose.
+
+  blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER [--stomp]
 """
 import json
 import sys
@@ -17,7 +22,7 @@ from math import radians, sqrt
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-rig_path, keys_path, fighter = sys.argv[sys.argv.index('--') + 1:]
+rig_path, keys_path, fighter = sys.argv[sys.argv.index('--') + 1:][:3]
 spec = json.loads(open(rig_path).read())
 frames, contact, last = spec['frames'], spec['contact'], spec['contact'] + spec['active'] - 1
 joints, kick = spec['joints'], spec['limb']
@@ -73,8 +78,7 @@ def aim(b, endpoint, target):
     turn(b, (endpoint - b.head).rotation_difference(target - b.head))
 
 
-def reach(side, target, pole):
-    upper, lower, end = joint(f'hip.{side}'), joint(f'knee.{side}'), joint(f'ankle.{side}')
+def chain(upper, lower, end, target, pole):
     start = upper.head.copy()
     a, b = (lower.head - start).length, (end.head - lower.head).length
     direction = (target - start).normalized()
@@ -85,10 +89,69 @@ def reach(side, target, pole):
     aim(lower, end.head.copy(), start + direction * distance)
 
 
+def reach(side, target, pole):
+    chain(joint(f'hip.{side}'), joint(f'knee.{side}'), joint(f'ankle.{side}'), target, pole)
+
+
 def body():
     pelvis, chest = joint('pelvis'), joint('chest')
     ancestors = list(pelvis.parent_recursive)
     return next(b for b in chest.parent_recursive if b in ancestors)
+
+
+def stomp():
+    tilt, turns, lift = 30, 1, 12
+    rest()
+    gesture, pelvis = joint('root').parent, joint('pelvis').head.copy()
+    hips = {s: joint(f'hip.{s}').head.copy() for s in 'LR'}
+    shoulders = {s: joint(f'shoulder.{s}').head.copy() for s in 'LR'}
+    leg = {s: (joint(f'knee.{s}').head - hips[s]).length + (joint(f'ankle.{s}').head - joint(f'knee.{s}').head).length for s in 'LR'}
+    arm = {s: (joint(f'elbow.{s}').head - shoulders[s]).length + (joint(f'wrist.{s}').head - joint(f'elbow.{s}').head).length for s in 'LR'}
+
+    def eased(t):
+        c = max(0.0, min(1.0, t))
+        return c * c * (3 - 2 * c)
+
+    def spin(frame):
+        return 360 * turns * eased((frame - 1) / (last + 3))
+
+    def pose(frame):
+        rest()
+        w = eased(frame / 3) * (1 - eased((frame - last - 3) / 12))
+        joint('root').location += Vector((0, 0, lift * w))
+        update()
+        for s, sign in (('L', 1), ('R', -1)):
+            foot = hips[s] + Vector((0, -sign * (abs(hips[s].y - pelvis.y) - 5), -leg[s]))
+            reach(s, joint(f'ankle.{s}').head.lerp(foot, w), Vector((1, 0, 0)))
+            turn(joint(f'ankle.{s}'), Quaternion(PITCH, radians(50 * w)))
+            hand = shoulders[s] + Vector((-4, sign * 4, arm[s] * 0.96))
+            chain(joint(f'shoulder.{s}'), joint(f'elbow.{s}'), joint(f'wrist.{s}'), joint(f'wrist.{s}').head.lerp(hand, w), Vector((-1, sign * 0.3, 0)))
+        turn(joint('head'), Quaternion(PITCH, radians(-8 * w)))
+        centre = joint('pelvis').head.copy()
+        turn(gesture, Quaternion(PITCH, radians(-tilt * w)) @ Quaternion(YAW, radians(spin(frame))))
+        joint('root').matrix = Matrix.Translation(centre - joint('pelvis').head) @ joint('root').matrix
+        update()
+
+    out = {'frames': frames, 'nodes': [{'rotation': [], 'translation': []} for _ in created]}
+    previous = {}
+    for frame in range(frames + 1):
+        pose(frame)
+        for name, entry in zip(created, out['nodes']):
+            q = bones[name].rotation_quaternion.normalized()
+            if name in previous and previous[name].dot(q) < 0:
+                q.negate()
+            previous[name] = q
+            entry['rotation'].append([q.x, q.y, q.z, q.w])
+            entry['translation'].append(list(bones[name].location))
+        ankle, wrist = joint('ankle.R').head, joint('wrist.R').head
+        print(f'STOMP frame {frame}: spin {spin(frame):.0f} ankle.R ({ankle.x:.1f}, {ankle.z:.1f}) wrist.R ({wrist.x:.1f}, {wrist.z:.1f})', flush=True)
+    open(keys_path, 'w').write(json.dumps(out))
+    print('STOMP_KEYS', keys_path, frames + 1, 'frames', flush=True)
+
+
+if '--stomp' in sys.argv:
+    stomp()
+    sys.exit(0)
 
 
 rest()

@@ -1,1 +1,1 @@
-{"entries":[]}
+{"entries":[{"glob":"tools/animations/*.py","class":"python","gap":"library","provenance":"Tom 2026-10-26: Python is fine for focused scripts against Blender's Python-only bpy API, not for larger machinery"}]}
