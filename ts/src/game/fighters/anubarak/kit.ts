@@ -8,5 +8,6 @@ export const ANUBARAK_HERO: HeroDefinition = {
   character: Character.anubarak, name: "Anub'arak", purpose: "Menacing insect king; heavy ground control",
   weakness: "Broad shell, slow aerials and exposed emergence", complete: true,
   jab: { name: "Royal Rebuke", description: "The king dismisses prey with one tusk, then the other." },
+  nonWeaponStrikes: { limb: ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"] },
   moves: ANUBARAK_MOVES, specials: ANUBARAK_SPECIALS, gameplan: ANUBARAK_GAMEPLAN,
 };

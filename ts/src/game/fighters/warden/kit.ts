@@ -13,6 +13,7 @@ export const WARDEN_HERO: HeroDefinition = {
   purpose: "Precision mobility and edge pressure",
   weakness: "Light body and punishable teleport endpoints",
   complete: true,
+  nonWeaponStrikes: { limb: ["down-tilt", "down-smash", "down-air", "down-special"] },
   moves: WARDEN_MOVES,
   specials: WARDEN_SPECIALS,
   jab: { name: "Crescent Flurry", description: "Three quick cuts of her crescent blade on repeated jabs." },

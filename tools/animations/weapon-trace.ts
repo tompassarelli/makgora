@@ -3,20 +3,17 @@ import { join, resolve } from 'node:path';
 import { Effect } from 'effect';
 import type { Character } from '../../ts/src/game/sim/codes';
 import type { Capsule } from '../../ts/src/game/sim/geometry/contactGeometry';
-import { SELECTABLE_CHARACTERS, fighterSlug } from '../../ts/src/game/roster/kits';
-import { LIMB_STRIKES, SPELL_STRIKES } from '../../ts/scripts/wisp/animStrikeKinds';
+import { SELECTABLE_CHARACTERS, fighterSlug, nonWeaponStrikes } from '../../ts/src/game/roster/kits';
 import { type SampledMove, loadBody, sampleFighter } from '../../ts/scripts/wisp/animScoreSample';
 import type { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
 import { assetsView, readManifest } from '../../ts/scripts/wisp/buildInputs';
 import { FIGHTER_RIGS } from './rigs';
+import { type Edge, type MoveFit, type Point, farEnd, fitMove, segmentDistance, writeFits } from './weapon-fit';
 
 const GAP_LIMIT = 20.0;
-const BODY_CENTRE: Point = [0, 60];
-const USAGE = 'usage: bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX]';
+const USAGE = 'usage: bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX | --fit]';
 
-type Point = readonly [number, number];
 type Weapon = { readonly name: string; readonly hand: number; readonly vertices: readonly number[] };
-type Edge = { readonly grip: Point; readonly tip: Point };
 type Shift = { readonly fighter: string; readonly move: string; readonly dx: number };
 type Gap = { readonly gap: number; readonly frame: number; readonly at: Point };
 type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly by: 'weapon' | 'limb' | 'spell'; readonly shifted: boolean };
@@ -24,17 +21,7 @@ type Row = { readonly fighter: string; readonly move: string; readonly weapons: 
 const fails = (row: Row) => row.by === 'weapon' && Math.max(row.tip.gap, row.reach.gap) > GAP_LIMIT;
 const worst = (row: Row) => Math.max(row.tip.gap, row.reach.gap);
 
-function segmentDistance(p: Point, a: Point, b: Point): number {
-  const ux = b[0] - a[0], uz = b[1] - a[1], length = ux * ux + uz * uz;
-  const t = length <= 1e-8 ? 0 : Math.max(0, Math.min(1, ((p[0] - a[0]) * ux + (p[1] - a[1]) * uz) / length));
-  return Math.hypot(p[0] - a[0] - ux * t, p[1] - a[1] - uz * t);
-}
 const outside = (p: Point, capsule: Capsule) => Math.max(0, segmentDistance(p, [capsule.x1, capsule.z1], [capsule.x2, capsule.z2]) - capsule.radius);
-const fromCentre = (p: Point) => Math.hypot(p[0] - BODY_CENTRE[0], p[1] - BODY_CENTRE[1]);
-function farEnd(capsule: Capsule): Point {
-  const a: Point = [capsule.x1, capsule.z1], b: Point = [capsule.x2, capsule.z2];
-  return fromCentre(b) >= fromCentre(a) ? b : a;
-}
 
 function rigWeapons(model: DrawnModel, character: Character): Weapon[] {
   const rig = FIGHTER_RIGS.get(character)?.classic;
@@ -87,26 +74,36 @@ function reachGap(frames: readonly number[], regions: readonly (readonly Capsule
   return found ?? { gap: 0, frame: frames[0] ?? 0, at: [0, 0] };
 }
 
-function traceMove(model: DrawnModel, fighter: string, weapons: readonly Weapon[], sampled: SampledMove, shift: Shift | undefined): Row | undefined {
-  const { firstActive, lastActive } = sampled.sample;
+type Traced = { readonly row: Row; readonly sampled: SampledMove; readonly edges: readonly (readonly Edge[])[] };
+
+function traceMove(model: DrawnModel, character: Character, weapons: readonly Weapon[], sampled: SampledMove, shift: Shift | undefined): Traced | undefined {
+  const fighter = fighterSlug(character), { firstActive, lastActive } = sampled.sample;
   const frames = Array.from({ length: lastActive - firstActive + 1 }, (_, index) => firstActive + index).filter(frame => (sampled.strikes[frame]?.length ?? 0) > 0);
   if (frames.length === 0) return undefined;
   const shifted = shift !== undefined && shift.fighter === fighter && shift.move === sampled.move;
   const regions = frames.map((frame, index) => (sampled.strikes[frame] ?? []).map((capsule, slot) =>
     shifted && index === 0 && slot === 0 ? { ...capsule, x1: capsule.x1 + shift.dx, x2: capsule.x2 + shift.dx } : capsule));
   const edges = frames.map(frame => weapons.map(weapon => edgeAt(model, weapon, sampled.seconds[frame] ?? 0)));
-  return {
+  const kinds = nonWeaponStrikes(character);
+  const row: Row = {
     fighter, move: sampled.move, weapons: weapons.map(weapon => weapon.name).join('+'), frames,
     tip: tipGap(frames, regions, edges), reach: reachGap(frames, regions, edges),
-    by: LIMB_STRIKES[fighter]?.includes(sampled.move) === true ? 'limb' : SPELL_STRIKES[fighter]?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted,
+    by: kinds.limb?.includes(sampled.move) === true ? 'limb' : kinds.spell?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted,
   };
+  return { row, sampled, edges };
 }
 
-function parseArgs(args: readonly string[]): { fighters: Character[]; assets: string | undefined; shift: Shift | undefined } {
+type Args = { fighters: Character[]; assets: string | undefined; shift: Shift | undefined; fit: 'no' | 'loop' | 'once' };
+function parseArgs(args: readonly string[]): Args {
   const fighters: Character[] = [];
-  let assets: string | undefined, shift: Shift | undefined;
+  let assets: string | undefined, shift: Shift | undefined, fit: Args['fit'] = 'no';
   for (let index = 0; index < args.length; index += 2) {
     const flag = args[index], value = args[index + 1];
+    if (flag === '--fit' || flag === '--fit-once') {
+      fit = flag === '--fit' ? 'loop' : 'once';
+      index -= 1;
+      continue;
+    }
     if (value === undefined) throw new Error(USAGE);
     if (flag === '--assets') assets = resolve(value);
     else if (flag === '--fighter') {
@@ -119,7 +116,8 @@ function parseArgs(args: readonly string[]): { fighters: Character[]; assets: st
       shift = { fighter, move, dx: Number(dx) };
     } else throw new Error(USAGE);
   }
-  return { fighters: fighters.length === 0 ? [...SELECTABLE_CHARACTERS] : fighters, assets, shift };
+  if (fit !== 'no' && shift !== undefined) throw new Error(`--fit takes no --shift; ${USAGE}`);
+  return { fighters: fighters.length === 0 ? [...SELECTABLE_CHARACTERS] : fighters, assets, shift, fit };
 }
 
 const point = (at: Point) => `${at[0].toFixed(1)},${at[1].toFixed(1)}`;
@@ -129,24 +127,60 @@ const tsvRow = (row: Row) => [
   row.reach.gap.toFixed(1), row.reach.frame, point(row.reach.at), row.by, row.shifted ? 'yes' : 'no', fails(row) ? 'FAIL' : 'pass',
 ].join('\t');
 
-const { fighters, assets: assetsArg, shift } = parseArgs(process.argv.slice(2));
-const assets = assetsArg ?? assetsView(await Effect.runPromise(readManifest()));
-const rows: Row[] = [], unarmed: string[] = [];
-for (const character of fighters) {
-  const body = await loadBody(assets, character);
-  const weapons = rigWeapons(body, character);
-  if (weapons.length === 0) { unarmed.push(fighterSlug(character)); continue; }
-  for (const sampled of sampleFighter(body, character)) {
-    const row = traceMove(body, fighterSlug(character), weapons, sampled, shift);
-    if (row !== undefined) rows.push(row);
-  }
-}
-const sorted = rows.toSorted((a, b) => Number(fails(b)) - Number(fails(a)) || worst(b) - worst(a));
+const FIT_ROUNDS = 6;
 const out = resolve(import.meta.dir, '../../build/anim-score');
-const table = join(out, shift === undefined ? 'classic-weapons.tsv' : 'classic-weapons-shifted.tsv');
+const fitReport = join(out, 'weapon-fit.json');
+
+async function fitLoop(argv: readonly string[], assets: string): Promise<void> {
+  const self = ['bun', resolve(import.meta.path), ...argv.filter(arg => arg !== '--fit')];
+  for (let round = 1; round <= FIT_ROUNDS; round++) {
+    const regen = Bun.spawnSync(['bun', 'wisp', 'view', 'strikes', '--assets', assets], { cwd: resolve(import.meta.dir, '../../ts'), stdout: 'inherit', stderr: 'inherit' });
+    if (regen.exitCode !== 0) throw new Error('bun wisp view strikes failed');
+    const fit = Bun.spawnSync([...self, '--fit-once'], { stdout: 'inherit', stderr: 'inherit' });
+    if (fit.exitCode !== 0) throw new Error(`weapon fit round ${round} failed`);
+    const written = (await Bun.file(fitReport).json()) as { readonly fitted: number };
+    console.log(`weapon fit round ${round}: ${written.fitted} moves refitted`);
+    if (written.fitted === 0) break;
+  }
+  process.exitCode = Bun.spawnSync(self, { stdout: 'inherit', stderr: 'inherit' }).exitCode;
+}
+
+async function fitFlagged(traced: readonly (Traced & { readonly character: Character })[]): Promise<number> {
+  const byFighter = new Map<Character, MoveFit[]>();
+  for (const { row, sampled, edges, character } of traced) {
+    if (!fails(row)) continue;
+    const fitted = fitMove(character, sampled, row.frames, edges);
+    if (typeof fitted === 'string') console.log(`not fitted: ${row.fighter} ${row.move}: ${fitted}`);
+    else byFighter.set(character, [...byFighter.get(character) ?? [], fitted]);
+  }
+  for (const [character, moves] of byFighter) console.log(`fitted ${moves.map(move => move.key).join(', ')} into ${await writeFits(character, moves)}`);
+  const fitted = [...byFighter.values()].reduce((sum, moves) => sum + moves.length, 0);
+  await Bun.write(fitReport, JSON.stringify({ fitted }));
+  return fitted;
+}
+
+const argv = process.argv.slice(2);
+const { fighters, assets: assetsArg, shift, fit } = parseArgs(argv);
+const assets = assetsArg ?? assetsView(await Effect.runPromise(readManifest()));
 mkdirSync(out, { recursive: true });
-await Bun.write(table, `${[HEADER.join('\t'), ...sorted.map(tsvRow)].join('\n')}\n`);
-const failing = sorted.filter(fails).length;
-console.log([HEADER.join('\t'), ...sorted.map(tsvRow)].join('\n'));
-console.log(`${rows.length} weapon moves over ${fighters.length - unarmed.length} armed fighters; ${failing} miss their weapon by more than ${GAP_LIMIT} units; unarmed: ${unarmed.join(', ') || 'none'}; ${table}`);
-if (failing > 0) process.exitCode = 1;
+if (fit === 'loop') await fitLoop(argv, assets);
+else {
+  const traced: (Traced & { readonly character: Character })[] = [], unarmed: string[] = [];
+  for (const character of fighters) {
+    const body = await loadBody(assets, character);
+    const weapons = rigWeapons(body, character);
+    if (weapons.length === 0) { unarmed.push(fighterSlug(character)); continue; }
+    for (const sampled of sampleFighter(body, character)) {
+      const found = traceMove(body, character, weapons, sampled, shift);
+      if (found !== undefined) traced.push({ ...found, character });
+    }
+  }
+  const sorted = traced.map(found => found.row).toSorted((a, b) => Number(fails(b)) - Number(fails(a)) || worst(b) - worst(a));
+  const table = join(out, shift === undefined ? 'classic-weapons.tsv' : 'classic-weapons-shifted.tsv');
+  await Bun.write(table, `${[HEADER.join('\t'), ...sorted.map(tsvRow)].join('\n')}\n`);
+  const failing = sorted.filter(fails).length;
+  if (fit === 'once') await fitFlagged(traced);
+  else console.log([HEADER.join('\t'), ...sorted.map(tsvRow)].join('\n'));
+  console.log(`${sorted.length} weapon moves over ${fighters.length - unarmed.length} armed fighters; ${failing} miss their weapon by more than ${GAP_LIMIT} units; unarmed: ${unarmed.join(', ') || 'none'}; ${table}`);
+  if (failing > 0 && fit === 'no') process.exitCode = 1;
+}

@@ -13,6 +13,7 @@ export const PIT_LORD_HERO: HeroDefinition = {
   weakness: "Very large target and slow recovery",
   jab: { name: "Haft and Chop", description: "A haft check, then a short cleaver chop on a second jab." },
   complete: true,
+  nonWeaponStrikes: { spell: ["neutral-special", "up-special"] },
   moves: PIT_LORD_MOVES,
   specials: PIT_LORD_SPECIALS,
   gameplan: PIT_LORD_GAMEPLAN,

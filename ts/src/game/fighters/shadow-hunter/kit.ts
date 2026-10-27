@@ -12,6 +12,7 @@ export const SHADOW_HUNTER_HERO: HeroDefinition = {
   purpose: "Totem placement and angles",
   weakness: "Setup can be destroyed or bypassed",
   complete: true,
+  nonWeaponStrikes: { limb: ["jab", "forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"] },
   moves: SHADOW_HUNTER_MOVES,
   specials: SHADOW_HUNTER_SPECIALS,
   jab: { name: "Glaive Handle", description: "Two jabs of the glaive handle, then a cut of its blade, on repeated jabs." },

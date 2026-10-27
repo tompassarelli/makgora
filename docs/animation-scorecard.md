@@ -17,8 +17,8 @@ fighter can act), so line 2 measures the transition the game draws.
    contact. A limb carrying that point is found by its hand/foot attachment;
    its shoulder/hip travel divided by tip travel measures body share. Also
    measure how far the filled silhouette's centre shifts toward the strike.
-   A limb strike (a kick, palm, elbow, shoulder or claw rake, listed per fighter in `LIMB_STRIKES` in
-   `ts/scripts/wisp/animScoreSample.ts`, whose struck point rides a leg or an
+   A limb strike (a kick, palm, elbow, shoulder or claw rake, listed in `nonWeaponStrikes.limb` of that
+   fighter's `ts/src/game/fighters/<folder>/kit.ts`, whose struck point rides a leg or an
    arm) is scored on limb drive instead of body share: the foot's or
    claw's travel toward the strike from windup to contact, as a fraction of
    body height. The class's

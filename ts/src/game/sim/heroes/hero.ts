@@ -87,6 +87,12 @@ export interface CommandGrabClips {
   readonly recovery: HeroClip;
 }
 
+export interface NonWeaponStrikes {
+  readonly limb?: readonly string[] | undefined;
+  readonly spell?: readonly string[] | undefined;
+}
+
+
 export interface HeroDefinition {
   readonly character: Character;
 
@@ -105,5 +111,6 @@ export interface HeroDefinition {
   readonly jab: NamedMove;
 
   readonly gameplan?: FighterGameplan | undefined;
+  readonly nonWeaponStrikes?: NonWeaponStrikes | undefined;
 }
 

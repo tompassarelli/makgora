@@ -2,7 +2,6 @@
 
 
 import { join } from "node:path";
-import { LIMB_STRIKES } from "./animStrikeKinds";
 import { originalClip, originalClipNames } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
@@ -10,6 +9,7 @@ import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { beginFighterAttack, resolveAttacks } from "../../src/game/sim/attacks";
 import { AttackPhase, AttackStyle, Character, GroundAction, LedgeState, SpecialAction } from "../../src/game/sim/codes";
 import type { Capsule } from "../../src/game/sim/geometry/contactGeometry";
+import type { MoveRegion } from "../../src/game/sim/heroMoves";
 import { fighterHurtParts } from "../../src/game/sim/hurtboxes";
 import { disjointNormals, normalAreaPose } from "../../src/game/presentation/disjointCues";
 import { heroLook } from "../../src/game/roster/looks";
@@ -18,7 +18,7 @@ import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/co
 import { attackPhase } from "../../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
-import { HERO_ROSTER, fighterSlug } from "../../src/game/roster/kits";
+import { HERO_ROSTER, fighterSlug, nonWeaponStrikes } from "../../src/game/roster/kits";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../src/game/sim/hitRegions";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";
 import { advancePlacedObjects } from "../../src/game/sim/placedObjects";
@@ -81,6 +81,7 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
 ];
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
+
 
 const AFTER_FRAMES = 2;
 const LIMIT = 150;
@@ -170,7 +171,11 @@ export interface SampledMove {
   readonly travels: readonly number[];
   readonly cues: readonly (readonly SampledCue[])[];
   readonly strikes: readonly (readonly Capsule[])[];
+  readonly regionFrames: readonly number[];
+  readonly regionOwners: readonly (RegionOwner | undefined)[];
 }
+
+export interface RegionOwner { readonly regions?: readonly MoveRegion[] | undefined }
 
 export interface SampledCue { readonly x: number; readonly z: number; readonly scale: number; readonly age: number }
 
@@ -247,7 +252,8 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   const regions = frames.slice(0, moveFrames).map((frame, index) => active.includes(index) ? localStrikes(frame) : []);
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - drop), travels: travels(frames), cues, strikes: frames.map(localStrikes),
-    sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), regions, pixelsPerUnit },
+    regionFrames: frames.map((frame) => frame.frame), regionOwners: frames.map(() => f.tuning.moves?.normals[entry.style]),
+    sample: { moveClass: entry.moveClass, limbStrike: nonWeaponStrikes(character).limb?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), regions, pixelsPerUnit },
   };
 }
 
@@ -265,6 +271,8 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const activeFrames: number[] = [];
   const windows: number[][] = [];
   const strikes: Capsule[][] = [];
+  const regionFrames: number[] = [];
+  const regionOwners: (RegionOwner | undefined)[] = [];
   let strike: { x: number; z: number } | undefined;
   let moveFrames = 0;
   for (let tick = 0; tick < LIMIT; tick++) {
@@ -284,6 +292,8 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
       const grab = move?.commandGrab !== undefined && frame >= move.commandGrab.first - 1 && frame <= move.commandGrab.last - 1 ? move.commandGrab : undefined;
       const placed = move?.placement?.frame === frame + 1 ? move.placement : undefined;
       windows[frames.length] = (move?.regions ?? []).filter((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined).map((candidate) => candidate.hit.window);
+      regionFrames[frames.length] = frame;
+      regionOwners[frames.length] = move?.beam === undefined ? move : undefined;
       strikes[frames.length] = move?.regionOrigin !== undefined ? [] : (move?.regions ?? []).flatMap((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined ? [{ ...candidate.hit.strike }] : []);
       if (region !== undefined || projectile !== undefined || grab !== undefined || placed !== undefined) {
         activeFrames.push(frames.length);
@@ -308,7 +318,8 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   if (ready === undefined) return undefined;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []), strikes: frames.map((_, index) => strikes[index] ?? []),
-    sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
+    regionFrames: frames.map((_, index) => regionFrames[index] ?? -1), regionOwners: frames.map((_, index) => regionOwners[index]),
+    sample: { moveClass: "special", limbStrike: nonWeaponStrikes(character).limb?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
   };
 }
 

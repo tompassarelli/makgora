@@ -2,7 +2,7 @@
 
 import { floorMod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
-import type { HeroDefinition } from "../sim/heroes/hero";
+import type { HeroDefinition, NonWeaponStrikes } from "../sim/heroes/hero";
 import { BEASTMASTER_HERO } from "../fighters/beastmaster/kit";
 import { CAIRNE_HERO } from "../fighters/cairne/kit";
 import { BLADEMASTER_HERO } from "../fighters/blademaster/kit";
@@ -150,6 +150,7 @@ export const PORTRAIT_KINDS: readonly PortraitKind[] = ["Tile", "Card", "Bust", 
 
 
 const ORIGINAL_SLUGS: Readonly<Record<number, string>> = { [Character.rifleman]: "rifleman", [Character.demonHunter]: "illidan" };
+const ORIGINAL_NON_WEAPON_STRIKES: { readonly [character: number]: NonWeaponStrikes | undefined } = { [Character.demonHunter]: { limb: ["down-tilt", "down-smash"] } };
 
 /** The fighter's name in commands and soak records: "rifleman", "illidan", "mountain-king". */
 export function fighterSlug(character: number): string {
@@ -176,3 +177,7 @@ export function playableCharactersOf(selectable: readonly Character[], hidden: r
 
 /** The fighters players and computers choose from on the selection screen: the release roster (releaseRoster.ts). */
 export const PLAYABLE_CHARACTERS: readonly Character[] = playableCharactersOf(SELECTABLE_CHARACTERS, HIDDEN_FIGHTERS);
+
+export function nonWeaponStrikes(character: number): NonWeaponStrikes {
+  return heroDefinition(character)?.nonWeaponStrikes ?? ORIGINAL_NON_WEAPON_STRIKES[character] ?? {};
+}
