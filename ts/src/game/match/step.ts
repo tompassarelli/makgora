@@ -192,7 +192,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     const f = fighterAt(world, slot);
     const pending = controls.commands[slot].pending;
     const pendingStyle = requestedStyle(pending?.style);
-    const jumpCancel = cancelsJumpSquat(pendingStyle) && hasPendingAttack(controls.commands[slot], frame) && f.motion.grounded && canStartAttackStyle(f, pendingStyle) && (f.jump.squat > 0 || controls.inputs[slot].jumpPressed);
+    const jumpCancel = cancelsJumpSquat(pendingStyle) && hasPendingAttack(controls.commands[slot], frame) && f.motion.grounded && canStartAttackStyle(f, pendingStyle) && (f.jump.squat > 1 || controls.inputs[slot].jumpPressed);
     if (jumpCancel) {
       f.jump.squat = 0;
       f.jump.dodgeQueued = false;

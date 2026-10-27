@@ -5,6 +5,10 @@ cleaver catches the jump out, and his roar buys space when a fast opponent
 gets inside. He is still the widest, heaviest, slowest fighter: weight 1.28,
 ground speed 0.80, air speed 0.75, width 1.65 and height 1.35 relative to the
 reference body. Those existing body values and his normal attacks remain.
+His vertical physics, shared with Cairne, follow Melee's heavyweights: gravity
+0.18 instead of Fox's 0.23, with full and double jump speeds lowered to keep
+Fox's peak heights. His short hop lasts 24 airborne frames instead of 19, so
+his f20 down air hits from it with 4 frames to spare (#611).
 All special values below are original, provisional Smashcraft tuning.
 
 ## Sources and interpretation

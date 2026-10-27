@@ -20,8 +20,13 @@ is the named body counterpart: weight **133**, run speed **1.485**, air speed
 **0.945**. The implementation divides weight by the roster's reference 75,
 run speed by the shared 2.2 baseline and uses the air speed directly as the hero's air
 multiplier. Width **1.75×** and height **1.45×** are original body scales,
-larger than Pit Lord's 1.65/1.35; shield scale is 1.45. Jumps, gravity and
-shared defensive actions retain the roster's common rules.
+larger than Pit Lord's 1.65/1.35; shield scale is 1.45. Shared defensive actions
+retain the roster's common rules. His vertical physics, shared with Pit Lord,
+follow Melee's heavyweights rather than Fox: gravity 0.18 instead of 0.23,
+with full and double jump speeds lowered to keep Fox's peak heights and Fox's
+terminal and fast-fall speeds kept. His short hop lasts 24 airborne frames
+instead of 19 and peaks 80 units up instead of 64, so his f14 down air and
+f20 forward air both hit from it (#611).
 
 [Bowser](https://www.ssbwiki.com/Bowser_(SSBU)) supplies the heavyweight
 trade-off: decisive close strikes balanced by a large target and punishable
@@ -57,7 +62,7 @@ link names a relationship, not copied frame data or geometry.
 | Forward air | 20/4/36/L26; 19 damage; descending halberd wall, outward launch. | [Halberd][wc] | [Bowser's forward wall][bowser] |
 | Back air | 15/4/30/L22; 16 damage; rearward halberd strike. | [Halberd][wc] | [K. Rool's committed rear attack][krool] |
 | Up air | 12/4/28/L20; 13 damage; narrow horn rise; horns are hittable. | [Tauren body][wc] | [Bowser's overhead head strike][bowser] |
-| Down air, Halberd Slam | 14/7/39/L28; both hands raise the halberd overhead through f11, then drive it straight down beneath him with the body folding after it. Clean f14–16: 18 damage, base 40, growth 100, 270-degree meteor in the air and 55-degree launch on the ground. Late f17–20: 12 damage, base 20, growth 80, 55-degree pop up and away. Cairne's short hop, measured headless, is 3 frames of jump squat and 19 airborne frames peaking 64 units up (a full hop is 33); a down air input on the first airborne frame reaches f14 on the 14th, so the clean slam is fully airborne with 5 airborne frames to spare, and the late hit runs into the landing. Melee Captain Falcon and Ganondorf hit on f16–20 for 16% and 22% at 270 degrees with base 40/50 and growth 100, interruptible from f38 with 24/35 landing lag, early enough to hit from their short hops; Cairne's shorter hop moves his slam to f14, splits the 7 active frames into a clean meteor and a weaker late hit, keeps the old 59-frame total and lands between them at L28 (#96, #206). | [War Stomp][wc] | [Captain Falcon][falcondair] and [Ganondorf][ganondair] down airs |
+| Down air, Halberd Slam | 14/7/39/L28; both hands raise the halberd overhead through f11, then drive it straight down beneath him with the body folding after it. Clean f14–16: 18 damage, base 40, growth 100, 270-degree meteor in the air and 55-degree launch on the ground. Late f17–20: 12 damage, base 20, growth 80, 55-degree pop up and away. Cairne's short hop, measured headless, is 3 frames of jump squat and 24 airborne frames peaking 80 units up; a down air input on the first airborne frame reaches f14 on the 14th, so the clean slam is fully airborne with 10 airborne frames to spare, a press as late as the 11th airborne frame still slams before landing, and the late hit stays airborne too (#611). Melee Captain Falcon and Ganondorf hit on f16–20 for 16% and 22% at 270 degrees with base 40/50 and growth 100, interruptible from f38 with 24/35 landing lag, early enough to hit from their short hops; Cairne's shorter hop moves his slam to f14, splits the 7 active frames into a clean meteor and a weaker late hit, keeps the old 59-frame total and lands between them at L28 (#96, #206). | [War Stomp][wc] | [Captain Falcon][falcondair] and [Ganondorf][ganondair] down airs |
 | Grab | 10/3/31; short free-hand reach; shared shield grab and escape. | [Tauren strength][wc] | [Bowser's close grab][bowser] |
 | Pummel | Shared contact f60, end f68; 3 damage; at most one pummel, escapable by mashing. | [Halberd haft][wc] | [Heavyweight local pummel][bowser] |
 | Forward throw | Contact f19, end f45; 11 damage at 35 degrees; stage control. | [Tauren strength][wc] | [Bowser's outward toss][bowser] |

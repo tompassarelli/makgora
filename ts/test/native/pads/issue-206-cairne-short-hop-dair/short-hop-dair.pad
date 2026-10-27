@@ -9,12 +9,12 @@
 121 a stick 1 0
 123 a cstick 0 -1
 124 a cstick 0 0
-150 a stick 0 0
+155 a stick 0 0
 #! expect a 123 applied jump
 #! expect a 123 applied attack
 #! expect b 136 damage 18.000
 #! absent a 120-136 land
-#! expect a 150 land lag 28
+#! expect a 155 land lag 28
 # View held a second: the moment the parity check replays.
 260 a press VIEW
 330 a release VIEW

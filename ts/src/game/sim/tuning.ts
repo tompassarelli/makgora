@@ -240,6 +240,15 @@ export const MELEE_DASH_RUN_FRAME_SPREAD: readonly [number, number] = [8, 19];
 
 type VerticalPhysics = Pick<FighterPhysics, "gravity" | "terminalSpeed" | "fastFallSpeed" | "fullJumpSpeed" | "shortJumpSpeed" | "aerialJumpSpeed">;
 
+const HEAVY_VERTICAL: VerticalPhysics = {
+  gravity: melee(0.18000000715255737),
+  terminalSpeed: melee(2.799999952316284),
+  fastFallSpeed: melee(3.4000000953674316),
+  fullJumpSpeed: melee(3.259999990463257),
+  shortJumpSpeed: melee(2.0999999046325684),
+  aerialJumpSpeed: melee(3.9100000858306885),
+};
+
 export const HERO_VERTICAL: { readonly [character: number]: VerticalPhysics | undefined } = {
   [Character.kaelthas]: {
     gravity: melee(0.08500000089406967),
@@ -249,6 +258,8 @@ export const HERO_VERTICAL: { readonly [character: number]: VerticalPhysics | un
     shortJumpSpeed: melee(1.350000023841858),
     aerialJumpSpeed: melee(2.5),
   },
+  [Character.cairne]: HEAVY_VERTICAL,
+  [Character.pitLord]: HEAVY_VERTICAL,
 };
 
 const meleeSpread = (value: number, spread: readonly [number, number]): number => Math.max(spread[0], Math.min(spread[1], value));
