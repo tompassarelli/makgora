@@ -125,7 +125,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Blademaster | medium | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | medium | up throw | 1/1 in down smash, out up tilt | 1/1 KD | 1/1 KD | 1/1 in down smash, out forward smash |
 | Blademaster | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Blademaster | heavy | forward throw | 1/1 | 1/0 | 0/0 KD | 0/0 KD |
+| Blademaster | heavy | forward throw | 1/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Blademaster | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | heavy | up throw | 1/1 in down smash, out forward tilt | 1/1 KD | 1/1 KD | 1/1 in up smash, out forward smash |
 | Blademaster | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
