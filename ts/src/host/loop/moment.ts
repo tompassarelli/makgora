@@ -21,7 +21,7 @@ function saveMoment(s: ShellState): void {
   beginMomentSave(s.moment.recorder, momentInput(s.build), s.world, s.game, s.controls, s.runtime);
 }
 
-// Warcraft withholds F8 from map key events; use synchronized K for moment saves.
+// Warcraft withholds F8 from map key events; use synchronized = for moment saves.
 
 
 

@@ -10,7 +10,7 @@ The live Hive Workshop page is written in [hive-post.md](hive-post.md) (smashcra
 
 Pick a Warcraft fighter, fight across floating stages, and knock your opponents out. Created by Tompas, Smashcraft has 26 fighters, Classic graphics, computer opponents, Training, Classic routes and Lore Battles.
 
-This is the first public version; it's early, expect rough edges, tell us what feels off. Send feedback through [Smashcraft GitHub Issues](https://github.com/tompassarelli/smashcraft/issues), including your Warcraft version, fighters, stage and what happened. A short clip helps. Press K during a match to save its last ten seconds for a bug report; the saved `smashcraft-repro-*.txt` is in Warcraft III's CustomMapData folder.
+This is the first public version; it's early, expect rough edges, tell us what feels off. Send feedback through [Smashcraft GitHub Issues](https://github.com/tompassarelli/smashcraft/issues), including your Warcraft version, fighters, stage and what happened. A short clip helps. Press = during a match to save its last ten seconds for a bug report; the saved `smashcraft-repro-*.txt` is in Warcraft III's CustomMapData folder.
 
 **Controls:** keyboard play needs no extra software. Open Controls with F1 before a match to choose QWERTY or Custom and save bindings. Custom uses W/R to move, Space to aim up, E to aim down or drop through platforms, I/9 to jump, Z to short hop, N to attack, U for specials, Q/8 to shield or air-dodge, and O to grab. Y confirms selections and pauses or resumes. Optional controllers use the Smashcraft controller helper; keyboard play is the simplest way to start.
 
@@ -42,7 +42,7 @@ Smashcraft 0.1.0 is the first public version of my Warcraft III platform fighter
 
 [Download the map from Hive Workshop](https://www.hiveworkshop.com/), put `Smashcraft 0.1.0.w3x` in your Warcraft III Maps folder, then open Custom Games. Requires Warcraft III 3.0 with Graphics set to Classic; keyboard play needs no helper. Start with Training. F1 opens Controls before a match; the Custom layout uses W/R to move, I to jump, N to attack, U for specials, Q to shield, O to grab and Y to pause.
 
-Please send feedback to [Smashcraft GitHub Issues](https://github.com/tompassarelli/smashcraft/issues), with the fighters, stage and Warcraft version. Press K to save a recent match moment for a report. For now, avoid Ctrl+R and F5 restarting; use New Match or Warcraft's Quit Mission instead. — Tompas
+Please send feedback to [Smashcraft GitHub Issues](https://github.com/tompassarelli/smashcraft/issues), with the fighters, stage and Warcraft version. Press = to save a recent match moment for a report. For now, avoid Ctrl+R and F5 restarting; use New Match or Warcraft's Quit Mission instead. — Tompas
 
 ## Reddit: r/WC3
 
@@ -52,7 +52,7 @@ I've made Smashcraft, a Warcraft III platform fighter with 26 Warcraft fighters,
 
 This is the first public version; it's early, expect rough edges, tell us what feels off. [Download from Hive Workshop](https://www.hiveworkshop.com/): put `Smashcraft 0.1.0.w3x` in your Warcraft III Maps folder and open it through Custom Games. Requires Warcraft III 3.0 with Graphics set to Classic. Keyboard play is built in; controllers use an optional helper. Start with Training and F1 for Controls. Custom uses W/R to move, I to jump, N to attack, U for specials, Q to shield, O to grab and Y to pause.
 
-I'd like feedback on how the fights feel and anything confusing when you start. Reply here or use [Smashcraft GitHub Issues](https://github.com/tompassarelli/smashcraft/issues); please mention the fighters, stage and Warcraft version. K saves a recent match moment for a report. Known restart caveat: avoid Ctrl+R and F5; use New Match or Warcraft's Quit Mission. — Tompas
+I'd like feedback on how the fights feel and anything confusing when you start. Reply here or use [Smashcraft GitHub Issues](https://github.com/tompassarelli/smashcraft/issues); please mention the fighters, stage and Warcraft version. = saves a recent match moment for a report. Known restart caveat: avoid Ctrl+R and F5; use New Match or Warcraft's Quit Mission. — Tompas
 
 ## Trailer edit: 75 seconds
 

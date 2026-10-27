@@ -298,7 +298,7 @@ function createTriggers(s: ShellState): void {
   TriggerAddAction(pauseDown, trampoline(KEY_PAUSE_DOWN));
   syncTrigger(s, KEYBOARD_PAUSE_PREFIX, KEYBOARD_PAUSE, true);
   const moment = CreateTrigger();
-  registerKey(s, moment, Key.k, true);
+  registerKey(s, moment, Key.equal, true);
   TriggerAddAction(moment, trampoline(SAVE_MOMENT));
   syncKeyEvents(s);
   const { rollback } = s;

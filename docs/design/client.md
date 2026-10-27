@@ -213,7 +213,7 @@ lobbies (Phase 4).
 
 ## What Smashcraft already has
 
-- **Moments ("repro" files).** K, or View held on a controller, saves the
+- **Moments ("repro" files).** =, or View held on a controller, saves the
   last ten to twelve seconds (smashcraft:ts/src/game/replay/moment.ts).
   - The file is `smashcraft-repro-p<slot>-f<frame>-<n>.txt` in
     CustomMapData, in Wisp's repro format (wisp:docs/repro.md): a header

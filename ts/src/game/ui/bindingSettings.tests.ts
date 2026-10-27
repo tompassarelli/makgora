@@ -17,6 +17,7 @@ import {
 const BACKSPACE = 0x08;
 const F6 = 0x75;
 const F7 = 0x76;
+const EQUALS = 0xbb;
 const code = (character: string) => character.charCodeAt(0);
 
 function customSettings(): BindingSettings {
@@ -59,7 +60,7 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(encodeBindings(settings.bindings), before, "clearing an unbound key");
 
   beginBindingCapture(settings, Action.attack, 0);
-  for (const key of [code("Y"), BACKSPACE, code("K"), F6, F7]) {
+  for (const key of [code("Y"), BACKSPACE, EQUALS, F6, F7]) {
     assertEquals(captureBinding(settings, key), true);
     assertEquals(settings.message, `${reservedReason(key)}. Press another key.`);
     assertEquals(encodeBindings(settings.bindings), before, `reserved ${keyLabel(key)}`);
@@ -68,6 +69,11 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   cancelBindingCapture(settings);
   assertEquals(settings.capture, undefined);
   assertEquals(settings.message, "Rebind cancelled.");
+  assertEquals(reservedReason(EQUALS), "= is reserved for saving a moment");
+  assertEquals(reservedReason(code("K")), undefined);
+  beginBindingCapture(settings, Action.attack, 0);
+  assertEquals(captureBinding(settings, code("K")), true);
+  assertEquals(slots(settings, Action.attack), "K —", "Attack after binding K");
 
   resetToLayout(settings);
   assertEquals(encodeBindings(settings.bindings), encodeBindings(presetBindings("custom")), "Reset to layout");

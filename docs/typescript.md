@@ -256,8 +256,8 @@ confirmed frame.
 
 A player who sees something wrong saves the moment
 ([Wisp repros](https://github.com/tompassarelli/wisp/blob/main/docs/repro.md)):
-K in every build, or View held for a second on a controller, which the
-companion helper types into the journal's edit box as `JM1` and the epoch. K is
+= in every build, or View held for a second on a controller, which the
+companion helper types into the journal's edit box as `JM1` and the epoch. = is
 registered as Y is; F8, registered the same way, never reached the map's handler
 in the development build or 0.0.48 (6 October 2026), while View did. Every
 client keeps the last ten to twelve seconds of its confirmed match
