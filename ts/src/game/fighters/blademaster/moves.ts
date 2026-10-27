@@ -111,7 +111,7 @@ const neutralAir: AuthoredMove = {
 export const DOWN_AIR_SWEEP: readonly DrawnBlade[] = [
   drawn(6, 34.0, 62.0, 104.0, -8.0), drawn(7, 3.0, 50.0, -6.0, -49.0), drawn(8, -22.0, 62.0, -92.0, -8.0), drawn(9, -33.0, 83.0, -131.0, 66.0),
 ];
-export const DOWN_AIR_TOTAL = 59;
+export const DOWN_AIR_TOTAL = 44;
 export const TIPPER_RADIUS = 8.0;
 export const DOWN_AIR_TIPPER: Readonly<HitEffect> = strongHit({ ...hit(12.07699966430664, "SPIKE", 290), growth: 75.45999908447266, base: 40.0 });
 export const DOWN_AIR_SOURSPOT: Readonly<HitEffect> = { ...hit(8.361000061035156, "POKE", 45), growth: 75.45999908447266, base: 20.0 };
@@ -129,7 +129,7 @@ const downAir: AuthoredMove = {
       heroRegion(blade.frame, blade.frame, capsule(blade.gripX, blade.gripZ, x, z), DOWN_AIR_SOURSPOT),
     ];
   })),
-  autoCancel: { before: 6, from: 47 },
+  autoCancel: { before: 6, from: 38 },
 };
 
 function authoredThrow(releaseFrame: number, recovery: number, effect: Readonly<HitEffect>): AuthoredThrow {
@@ -283,7 +283,7 @@ const BODY: FighterHurtboxes = {
       heroHurtPose(17, 24, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(25, 32, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(33, 40, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(41, 59, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      heroHurtPose(41, 44, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
     [AttackStyle.grab]: [
       heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),

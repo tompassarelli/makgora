@@ -15,7 +15,7 @@ export const blademasterStrikeMoments = {
   13: { clip: 68, seconds: f32(0.150), end: f32(0.567) },
   14: { clip: 69, seconds: f32(0.183), end: f32(0.550) },
   15: { clip: 70, seconds: f32(0.067), end: f32(0.450) },
-  16: { clip: 54, seconds: f32(0.083), end: f32(0.767) },
+  16: { clip: 54, seconds: f32(0.100), end: f32(0.767) },
   19: { clip: 63, seconds: f32(0.133), end: f32(0.567) },
   20: { clip: 57, seconds: f32(0.033), end: f32(0.333) },
   100: { clip: 2, seconds: f32(0.367), end: f32(1.167) },

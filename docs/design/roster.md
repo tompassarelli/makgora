@@ -491,7 +491,7 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Forward air — Long Cut | 10/3/22; L14 | 11 inner, 14 outer | L, 40, EDGE | Primary spacing aerial; outer 0.20H sweetspot |
 | Back air — Reverse Edge | 8/3/23; L13 | 12 | L, 35, KILL | Strong behind, commits facing |
 | Up air — High Thrust | 6/3/19; L11 | 8 | M, 85, LAUNCH | Narrow upward poke |
-| Down air — Crescent Tipper | 6/4/50; L16 | 12.1 tip, 8.4 inner | 0.75H blade; tip 290 (spike), base 40; inner 45, base 20 | One crescent sweep under him from front to back; the outer 0.20H of the blade is the tipper and spikes, the inner blade sends up and away; after Melee Marth's down air |
+| Down air — Crescent Tipper | 6/4/35; L16 | 12.1 tip, 8.4 inner | 0.75H blade; tip 290 (spike), base 40; inner 45, base 20; 44 frames, auto-cancel before 6 and from 38 | One crescent sweep under him from front to back; the outer 0.20H of the blade is the tipper and spikes, the inner blade sends up and away; after Melee Marth's down air, but 44 frames where Marth's is 59 (a deliberate departure: Tom asked on 2026-10-28 that Blademaster be able to down air off stage and still recover, so he can double jump, up special, air dodge or attack from frame 44) |
 
 ### B specials
 

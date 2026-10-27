@@ -1,12 +1,18 @@
-import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../../input/actions";
 import { type Scene, airborne, fighter, frame, scene } from "../../match/padScene";
 import { AttackStyle, Character } from "../../sim/codes";
 import type { Fighter } from "../../sim/fighter";
+import { landsInAutoCancel } from "../../sim/moves";
 import { BLADEMASTER_MOVES, DOWN_AIR_SOURSPOT, DOWN_AIR_TIPPER, NEUTRAL_AIR_LAUNCH, NEUTRAL_AIR_LINK } from "./moves";
 
 const REPLACED_DOWN_AIR_FRAMES = 46;
+const DOWN_AIR_ACTIONABLE_FRAME = 44;
+const DOWN_AIR_LATE_CANCEL_FRAME = 38;
+const DOWN_AIR_EARLY_CANCEL_BEFORE = 6;
+const DOWN_AIR_LANDING_LAG = 16;
+const HIGH_AIR_Z = 1500.0;
 const WATCH_FRAMES = 70;
 const DAMAGE_TOLERANCE = 0.0010000000474974513;
 const AIR_Z = 400.0;
@@ -93,4 +99,46 @@ test("Blademaster's down air spikes an airborne foe struck by the blade tip and 
     const user = fighter(s), foe = fighter(s, 1);
     assertEquals(contacts(s, user, foe, shortHop(s, user, Action.smashDown)).length, 1);
   }
+});
+
+interface Reaction { readonly name: string; readonly press: readonly Action[] }
+
+const REACTIONS: readonly Reaction[] = [
+  { name: "double jump", press: [Action.jump] },
+  { name: "up special", press: [Action.special, Action.moveUp] },
+  { name: "air dodge", press: [Action.leftTrigger] },
+  { name: "aerial", press: [Action.attack] },
+];
+
+function reactsAfterDownAir(reaction: Reaction, pressTick: number): boolean {
+  const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing: 1 }, { character: Character.warden, x: 500.0, facing: -1 }]);
+  const user = fighter(s);
+  airborne(user, 0.0, HIGH_AIR_Z);
+  frame(s, [Action.smashDown]);
+  for (let tick = 1; tick < pressTick; tick++) frame(s, []);
+  assertEquals(user.attack.style, AttackStyle.downAir);
+  const jumps = user.jump.remaining, serial = user.attack.serial, special = user.special.action, dodging = user.dodge.airDodging;
+  frame(s, reaction.press);
+  return user.jump.remaining !== jumps || user.attack.serial !== serial || user.special.action !== special || user.dodge.airDodging !== dodging;
+}
+
+test("Blademaster's down air frees him to double jump, up special, air dodge and attack in the air on frame 44 and not on the frame before [k1 scenario]", () => {
+  for (const reaction of REACTIONS) {
+    assertFalse(reactsAfterDownAir(reaction, DOWN_AIR_ACTIONABLE_FRAME - 1));
+    assertTrue(reactsAfterDownAir(reaction, DOWN_AIR_ACTIONABLE_FRAME));
+  }
+});
+
+test("Blademaster's down air auto-cancels its landing before frame 6 and from frame 38 and keeps its hit frames 6 to 9 and its 16 frames of landing lag [k3 measure docs/design/roster.md]", () => {
+  const move = BLADEMASTER_MOVES.normals[AttackStyle.downAir];
+  assertTrue(move !== undefined);
+  if (move === undefined) return;
+  assertEquals(move.startupFrames, 5);
+  assertEquals(move.activeFrames, 4);
+  assertEquals(move.landingLag, DOWN_AIR_LANDING_LAG);
+  const cancels = (displayFrame: number): boolean => landsInAutoCancel(Character.blademaster, AttackStyle.downAir, displayFrame - 1, BLADEMASTER_MOVES);
+  assertTrue(cancels(DOWN_AIR_EARLY_CANCEL_BEFORE - 1));
+  assertFalse(cancels(DOWN_AIR_EARLY_CANCEL_BEFORE));
+  assertFalse(cancels(DOWN_AIR_LATE_CANCEL_FRAME - 1));
+  assertTrue(cancels(DOWN_AIR_LATE_CANCEL_FRAME));
 });

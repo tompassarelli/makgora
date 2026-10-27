@@ -8,7 +8,7 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, AttackStyle, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import { heroDefinition } from "../../ts/src/game/roster/kits";
-import { type Blade, type DrawnBlade, DOWN_AIR_SWEEP, NEUTRAL_AIR_BLADES, NEUTRAL_AIR_FIRST_SPIN, NEUTRAL_AIR_SPIN_FRAMES, NEUTRAL_AIR_SPINS, UP_AIR_BLADE } from "../../ts/src/game/fighters/blademaster/moves";
+import { type Blade, type DrawnBlade, DOWN_AIR_SWEEP, DOWN_AIR_TOTAL, NEUTRAL_AIR_BLADES, NEUTRAL_AIR_FIRST_SPIN, NEUTRAL_AIR_SPIN_FRAMES, NEUTRAL_AIR_SPINS, UP_AIR_BLADE } from "../../ts/src/game/fighters/blademaster/moves";
 import { seconds } from "./asset-info";
 import { swordGestureBaseModel } from "./recovery-model";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
@@ -111,10 +111,10 @@ const replacements = [
     [3,sweep(75,-18,55)],
     [5,sweep(15,8,70)],
     ...DOWN_AIR_SWEEP.map((b,index)=>[b.frame,sweep(0,SWEEP_LEAN[index]??0,85,b.frame)] as const),
-    [12,sweep(150,-10,60)],
-    [22,sweep(175,-6,40)],
-    [40,pose([10,-25,100],[60,-25,170],0,0,20,30)],
-    [59,guard],
+    [11,sweep(150,-10,60)],
+    [18,sweep(175,-6,40)],
+    [31,pose([10,-25,100],[60,-25,170],0,0,20,30)],
+    [DOWN_AIR_TOTAL,guard],
   ]},
   {key:"neutralAir",name:"Sword Gesture Air Crescent Slash",style:AttackStyle.neutralAir,keys:[
     [0,guard],
