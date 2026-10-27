@@ -6,7 +6,7 @@ const MOVES = [
   ["ftilt", 1500, ["p+d+n"], "forward tilt"],
 ] as const;
 
-const MURLOC = { x: 160, y: 220, width: 480, height: 280 };
+const MURLOC = { x: 0, y: 230, width: 360, height: 200 };
 
 export const murlocStabChecks = (map: string, pass: readonly Rule[]): NativeCheck[] =>
   MOVES.map(([name, waitMs, keys, move]) => ({
