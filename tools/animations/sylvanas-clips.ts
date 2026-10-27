@@ -83,7 +83,8 @@ add("ledgeAttack", 40, [phase(0, { lean: 65, height: -60, grip: -150 }), phase(1
 
 const held: Gesture = { chest: 12, head: -8, grip: -72, elbow: -15, bow: -35, knee: 9, twist: -8 };
 const captive: Gesture = { chest: -24, head: -18, grip: -18, elbow: 46, bow: -32, knee: 16, twist: 12 };
-add("grab", 31, [phase(0), phase(4, { ...held, chest: -12, grip: -30 }), phase(6, held), phase(7, held), phase(31)]);
+const reach: Gesture = { bow: -92, elbow: -20, lean: 22, chest: 8, knee: 28, head: 8 };
+add("grab", 31, [phase(0), phase(3, { lean: -6, chest: -10, bow: 25, knee: 20 }), phase(6, reach), phase(12, reach), phase(20, { lean: 14, chest: 18, knee: 34, bow: -30, elbow: 30, head: 10 }), phase(31)]);
 add("grabHold", 60, [phase(0, held), phase(60, held)], { hold: true, air: true });
 add("grabbed", 60, [phase(0, captive), phase(60, captive)], { hold: true, air: true });
 const paired = (name: string, first: Gesture, coil: Gesture, hit: Gesture, last: Gesture = {}) =>
