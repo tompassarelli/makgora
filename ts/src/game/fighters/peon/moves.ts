@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, GrabAction, HitElement } from "../../sim/codes";
 import type { HitEffect } from "../../sim/hitRegions";
-import { cleanLate, heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type MoveRegion, type StrikeCapsule, tipper } from "../../sim/heroMoves";
+import { cleanLate, heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type MoveRegion, type StrikeCapsule, tipper, travelThrough } from "../../sim/heroMoves";
 import { hurtPart, type HurtPart, type HurtPose } from "../../sim/hurtboxes";
 import { ANGLES } from "../../sim/heroes/authoring";
 import { groundHit } from "../../sim/heroes/groundNormals";
@@ -28,6 +28,17 @@ const arm = (first: number, last: number, shoulderX: number, shoulderZ: number, 
   heroHurtPose(first, last, [BODY, hurtPart(shoulderX, shoulderZ, handX, handZ, 10.0)]);
 const tilt = (z: number) => heroMove(8, 3, 19, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 10.239999771118164, 40));
 const FORWARD_SMASH = peonHit(20.479999542236328, 40, 122.13999938964844, 28.0);
+const DIVE_FIRST = 8, DIVE_CLEAN_LAST = 10, SLIDE_LAST = 15;
+const DIVE = peonHit(11.263999938964844, 70);
+const SLIDE = peonHit(7.168000221252441, 40, 88.6500015258789, 18.0);
+const diveRegions = (first: number, last: number, effect: Readonly<HitEffect>, bodyX: number, bodyRadius: number, tipX: number, tipRadius: number): readonly MoveRegion[] => [
+  heroRegion(first, last, blade(bodyX, 22.0, f32(bodyX + 56.0), 20.0, bodyRadius), effect),
+  heroRegion(first, last, blade(f32(bodyX + 56.0), 18.0, tipX, 14.0, tipRadius), effect),
+];
+const DIVING = [hurtPart(-20.0, 36.0, 50.0, 44.0, 19.0), hurtPart(50.0, 44.0, 80.0, 36.0, 9.0)];
+const PRONE = [hurtPart(-4.0, 16.0, 70.0, 18.0, 16.0), hurtPart(70.0, 18.0, 96.0, 16.0, 9.0)];
+const PUSH_UP = [hurtPart(0.0, 18.0, 58.0, 36.0, 18.0)];
+const KNEEL = [hurtPart(8.0, 8.0, 20.0, 44.0, 20.0)];
 
 export const PEON_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -41,7 +52,7 @@ export const PEON_MOVES: FighterMoves = {
       [AttackStyle.forwardTiltDown]: reaching(8, 10, 55.0, 28.0),
       [AttackStyle.upTilt]: reaching(7, 10, 12.0, 92.0),
       [AttackStyle.downTilt]: reaching(6, 8, 45.0, 18.0),
-      [AttackStyle.dashAttack]: reaching(7, 14, 54.0, 38.0),
+      [AttackStyle.dashAttack]: [heroHurtPose(4, DIVE_FIRST - 1, [...DIVING]), heroHurtPose(DIVE_FIRST, SLIDE_LAST + 3, [...PRONE]), heroHurtPose(SLIDE_LAST + 4, SLIDE_LAST + 11, [...PUSH_UP]), heroHurtPose(SLIDE_LAST + 12, SLIDE_LAST + 18, [...KNEEL])],
       [AttackStyle.forwardSmash]: [arm(20, 26, 18.0, 60.0, 6.0, 68.0)],
       [AttackStyle.upSmash]: [heroHurtPose(15, 22, [BODY,
         hurtPart(12.0, 64.0, 12.0, 84.0, 10.0), hurtPart(-12.0, 66.0, -22.0, 82.0, 10.0)])],
@@ -67,7 +78,10 @@ export const PEON_MOVES: FighterMoves = {
       peonHit(10.239999771118164, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, axe(7, [[25.0, 75.0, 16.0, 119.0, 10.0], [25.0, 73.0, 20.0, 118.0, 10.0], [26.0, 72.0, 23.0, 117.0, 10.0], [26.0, 71.0, 26.0, 116.0, 10.0]], peonHit(8.192000389099121, 85, 68.94999694824219, 40.0))),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
-    [AttackStyle.dashAttack]: heroMove(7, 8, 24, 0, [...axe(7, [[12.0, 84.0, -10.0, 91.0, 8.0], [28.0, 70.0, 18.0, 113.0, 8.0], [36.0, 55.0, 55.0, 96.0, 8.0], [35.0, 44.0, 71.0, 61.0, 8.0]], peonHit(11.263999938964844, 55)), heroRegion(11, 14, blade(34.0, 43.0, 70.0, 54.0), peonHit(11.263999938964844, 55, 88.6500015258789, 22.0))], 34.0, true),
+    [AttackStyle.dashAttack]: travelThrough(heroMove(DIVE_FIRST, SLIDE_LAST - DIVE_FIRST + 1, 23, 0, [
+      ...diveRegions(DIVE_FIRST, DIVE_CLEAN_LAST, DIVE, 4.0, 25.0, 104.0, 14.0),
+      ...diveRegions(DIVE_CLEAN_LAST + 1, SLIDE_LAST, SLIDE, 20.0, 20.0, 116.0, 10.0),
+    ], 150.0, true), SLIDE_LAST),
     [AttackStyle.forwardSmash]: heroMove(22, 3, 35, 0, [
       ...tipper(axe(22, [[40.0, 52.0, 65.0, 68.0, 8.0], [34.0, 51.0, 61.0, 51.0, 8.0]], FORWARD_SMASH), 0.25),
       ...cleanLate(axe(24, [[26.0, 40.0, 51.0, 37.0, 8.0]], FORWARD_SMASH), 0),
