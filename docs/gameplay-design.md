@@ -523,6 +523,11 @@ transport (wisp#110) both call it.
     fighter's distance) and receivePacket (each remote row's sender, whether
     it landed behind the speculative cursor and whether it pressed or
     released anything); #219 has the commands and outputs.
+    With one budget, the 300 ms three-human route agrees on Auto 8, not the
+    6 it chose under R 8 (27 Oct 2026, #567): its slowest client's smoothed
+    ping is 436 ms, 14 one-way frames less R 6, where the 300 ms duel's
+    slowest is 380 ms and agrees on 5. At 8 it holds 0, stalls 0 and keeps
+    pop p95 at 107-175, so 8 is that route's expected delay.
 - **When delay changes:** only at match start, on the epoch every client
   begins together, from requests already exchanged through the synchronized
   channel. It never changes mid-exchange.
