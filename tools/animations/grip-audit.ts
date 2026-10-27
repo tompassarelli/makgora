@@ -20,7 +20,7 @@ mkdirSync(out, { recursive: true });
 type NodeSample = { readonly matrix: Float32Array };
 type RendererSample = { frame: number; nodes: NodeSample[] };
 type RigJoint = 'pelvis' | 'chest' | 'head' | 'hip.L' | 'knee.L' | 'ankle.L' | 'hip.R' | 'knee.R' | 'ankle.R' | 'wrist.L' | 'wrist.R' | 'weapon' | 'weapon.L';
-type Row = { fighter: string; look: string; sequence: string; samples: number; detached: number | null; intersecting: number | null; maxGap: number | null; minClearance: number | null; worstGapSeconds: number; worstClearanceSeconds: number; unavailable: string };
+type Row = { fighter: string; look: string; sequence: string; samples: number; detached: number | null; detachedBy: string; intersecting: number | null; maxGap: number | null; minClearance: number | null; worstGapSeconds: number; worstClearanceSeconds: number; unavailable: string };
 type Capsule = { name: string; a: NonNullable<ReturnType<typeof nodeNamed>>; b: NonNullable<ReturnType<typeof nodeNamed>>; radius: number };
 
 function nodeNamed(model: ReturnType<typeof parseSource>, name: string) {
@@ -130,6 +130,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
     for (const { sequence, clip } of clips) {
       if (clip === undefined) throw new Error(`${fighter.name}/${look}/${sequence.Name}: sequence is not shipped`);
       const count = Math.ceil((clip.endSeconds - clip.startSeconds) * 60) + 1;
+      const propDetached = new Map(weapons.map(weapon => [weapon.joint, 0]));
       let detached = 0, intersecting = 0, maxGap = 0, minClearance = Infinity, worstGapSeconds = clip.startSeconds, worstClearanceSeconds = clip.startSeconds;
       for (let frame = 0; frame < count; frame++) {
         const time = Math.min(clip.endSeconds, clip.startSeconds + frame / 60);
@@ -142,6 +143,7 @@ for (const [character, rig] of FIGHTER_RIGS) {
           const gap = distance(grip, hand);
           if (gap > maxGap) { maxGap = gap; worstGapSeconds = time; }
           frameDetached ||= gap > 4;
+          if (gap > 4) propDetached.set(weapon.joint, (propDetached.get(weapon.joint) ?? 0) + 1);
           for (const capsule of capsules) {
             const clearance = segmentDistance(bladeStart(grip, tip), tip, nodePosition(model, data, capsule.a, scale), nodePosition(model, data, capsule.b, scale)) - capsule.radius;
             if (clearance < minClearance) { minClearance = clearance; worstClearanceSeconds = time; }
@@ -152,14 +154,14 @@ for (const [character, rig] of FIGHTER_RIGS) {
         intersecting += Number(frameIntersecting);
       }
       const issue = weapons.length === weaponJoints.length ? '' : `${weapons.length}/${weaponJoints.length} props measured`;
-      rows.push({ fighter: fighter.name, look, sequence: sequence.Name, samples: count, detached: weapons.length === 0 ? null : detached, intersecting: weapons.length === 0 || capsules.length === 0 ? null : intersecting, maxGap: Number.isFinite(maxGap) ? maxGap : null, minClearance: Number.isFinite(minClearance) ? minClearance : null, worstGapSeconds, worstClearanceSeconds, unavailable: issue });
+      rows.push({ fighter: fighter.name, look, sequence: sequence.Name, samples: count, detached: weapons.length === 0 ? null : detached, detachedBy: [...propDetached].map(([joint, frames]) => `${joint} ${frames}`).join(", "), intersecting: weapons.length === 0 || capsules.length === 0 ? null : intersecting, maxGap: Number.isFinite(maxGap) ? maxGap : null, minClearance: Number.isFinite(minClearance) ? minClearance : null, worstGapSeconds, worstClearanceSeconds, unavailable: issue });
     }
     console.log(`${fighter.name} ${look}: ${clips.length} sequences, ${weapons.length}/${weaponJoints.length} props, ${rows.filter(row => row.fighter === fighter.name && row.look === look).reduce((sum, row) => sum + row.samples, 0)} samples`);
   }
 }
 
 const summary = rows.reduce((totals, row) => ({ rows: totals.rows + 1, samples: totals.samples + row.samples, detached: totals.detached + (row.detached ?? 0), intersecting: totals.intersecting + (row.intersecting ?? 0), unavailableRows: totals.unavailableRows + Number(row.unavailable !== '' || row.detached === null || row.intersecting === null) }), { rows: 0, samples: 0, detached: 0, intersecting: 0, unavailableRows: 0 });
-const lines = ['fighter\tlook\tsequence\tsamples\tframes detached\tframes intersecting\tmax grip gap\tmin capsule clearance\tunavailable', ...rows.map(row => [row.fighter, row.look, row.sequence, row.samples, row.detached ?? 'unavailable', row.intersecting ?? 'unavailable', row.maxGap?.toFixed(3) ?? 'unavailable', row.minClearance?.toFixed(3) ?? (row.intersecting === 0 ? 'hidden' : 'unavailable'), row.unavailable].join('\t'))];
+const lines = ['fighter\tlook\tsequence\tsamples\tframes detached\tdetached by prop\tframes intersecting\tmax grip gap\tmin capsule clearance\tunavailable', ...rows.map(row => [row.fighter, row.look, row.sequence, row.samples, row.detached ?? 'unavailable', row.detachedBy, row.intersecting ?? 'unavailable', row.maxGap?.toFixed(3) ?? 'unavailable', row.minClearance?.toFixed(3) ?? (row.intersecting === 0 ? 'hidden' : 'unavailable'), row.unavailable].join('\t'))];
 await Bun.write(join(out, 'grip-audit.tsv'), `${lines.join('\n')}\n`);
 await Bun.write(join(out, 'grip-audit.json'), `${JSON.stringify({ method: '60 Hz samples including the final endpoint; grip point calibrated from Stand Ready, else Stand; farthest weighted vertex as weapon tip; a weapon whose bone is scaled below half size is hidden and unmeasured; fixed joint-following capsules with radii scaled from adjacent joints; geometric rows are candidates pending visual acceptance', summary, unavailable, rows }, null, 2)}\n`);
 console.log(lines[0]);

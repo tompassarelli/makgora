@@ -32,6 +32,6 @@ export const SPACES: Readonly<Record<Pose, Space>> = {
     starts: [{ frame: 0, shoulder: -165, elbow: -20, chest: 5, hip: -30, knee: 60, lean: 0 }, { frame: 0, shoulder: -150, elbow: -60, chest: 25, hip: -100, knee: 140, lean: 0 }],
     options: { frame: [0, 1], shoulder: [-200, -185, -170, -155, -140, -125], elbow: [-90, -60, -30, 0, 30], chest: [-15, 5, 25], hip: [-120, -100, -70, -40, -10, 20], knee: [0, 40, 80, 110, 140], lean: [-70, -50, -35, -20, -10, 0, 10, 20, 35, 50, 70], weapon: [-60, 0, 60], tail: [-90, -60, -30, 0, 30, 60, 90], fold: [0, 30, 60, 90] },
     variant: (c) => ({ name: describe(c), fold: c.fold ?? 30, lean: c.lean ?? 0, parentFrame: c.frame === 1,
-      angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: c.head ?? -15, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), weapon: c.weapon ?? 0, pelvis: c.pelvis ?? 0, tail: c.tail ?? 0 } }),
+      angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: c.head ?? -15, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), weapon: c.weapon ?? 0, wrist: c.wrist ?? 0, pelvis: c.pelvis ?? 0, tail: c.tail ?? 0 } }),
   },
 };

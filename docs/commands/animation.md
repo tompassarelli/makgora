@@ -78,7 +78,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   carapace and squash, Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
-  than search (Chen's hang) is pinned in `PINNED`.
+  than search (Chen's hang) is pinned in `PINNED`; Chen's hang turns his left wrist rather than the staff, since the staff's own pivot is off the grip and turning it pulls the shaft out of his fist (#525).
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace down-air|up-air|forward-air]`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the double-jump flip, and re-authors the Down Air Sword Plunge clip
@@ -306,7 +306,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   counts, per Classic sequence, frames whose weapon sits more than 4 units from the hand it is
   calibrated to in Stand Ready or crosses a body capsule, and records each row's worst grip-gap and
   worst-clearance moments (#373). It measures one hand, so a two-handed weapon the other hand holds
-  reads as detached. From ts/, `bun scripts/gripStrips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT ASSETS [SEQUENCE]...`
+  reads as detached; its detached-by-prop column splits the count by rig joint, so one prop reads apart from another the same fighter holds (#525). From ts/, `bun scripts/gripStrips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT ASSETS [SEQUENCE]...`
   renders those moments for every nonzero row in side, far-side and three-quarter Classic views,
   which is how a row is accepted as a measurement artifact or found to be a real defect (#436);
   named sequences instead render at six evenly spaced moments whatever their counts, to show a

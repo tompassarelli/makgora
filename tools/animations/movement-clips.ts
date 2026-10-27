@@ -43,7 +43,7 @@ const LEG_BONES: Readonly<Partial<Record<number, readonly (readonly [string, str
   [Character.anubarak]: [["Bone_LFLeg04", "Bone_LFLeg03", "Bone_LegEnd03"], ["Bone_LFLeg07", "Bone_LFLeg06", "Bone_LegEnd01"], ["Bone_LFLeg13", "Bone_LFLeg14", "Bone_LegEnd04"], ["Bone_LFLeg09", "Bone_LFLeg10", "Bone_LegEnd02"]],
 };
 const PINNED: Readonly<Partial<Record<number, Readonly<Partial<Record<Pose, Choice>>>>>> = {
-  [Character.chen]: { ledgeHang: { frame: 0, shoulder: -207.5, elbow: 22.5, chest: 38, hip: -85, knee: 77.5, lean: 7.5, pelvis: -15, weapon: -45, head: -120 } },
+  [Character.chen]: { ledgeHang: { frame: 0, shoulder: -207.5, elbow: 22.5, chest: 38, hip: -85, knee: 77.5, lean: 7.5, pelvis: -15, wrist: -67.5, head: -120 } },
 };
 const FRAMES: Readonly<Record<Pose, number>> = { crouch: 24, ledgeHang: 60 };
 const LEDGE_CATCH_CLIPS: Readonly<Partial<Record<number, number>>> = { [Character.demonHunter]: DEMON_HUNTER_LEDGE_CATCH_INDEX };
