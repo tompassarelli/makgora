@@ -45,6 +45,10 @@ const COMPUTER_NEUTRAL = neutralControls();
 const TICK = f32(1.0 / MATCH_TICKS_PER_SECOND);
 /** Frames each plan lasts before the computer weighs another. */
 const PLAN_FRAMES = 40;
+/** A carrying computer throws once this close to the ledge it walks toward. */
+export const CARRY_THROW_GAP = 90.0;
+/** A carrying computer throws by this many carry frames even short of the ledge, before a mash-out wastes the grab. */
+const CARRY_WALK_FRAMES = 60;
 /** Plans: pressure on the ground, jump in with aerials, or keep away and shoot. */
 const Plan = { ground: 0, air: 1, range: 2 } as const;
 type Plan = (typeof Plan)[keyof typeof Plan];
@@ -60,15 +64,28 @@ function planFor(f: Readonly<Fighter>, slot: number, frame: number): Plan {
   return choice < 3 ? Plan.ground : choice < 5 ? Plan.air : Plan.range;
 }
 
+/** Carrying: walks toward the nearer ledge, then throws off it, forward when facing it and back otherwise. */
+function carryToLedge(f: Readonly<Fighter>, stage: number, input: Controls): void {
+  const left = mainDeckLeft(stage);
+  const right = mainDeckRight(stage);
+  const side = f32(right - f.motion.x) <= f32(f.motion.x - left) ? 1 : -1;
+  const gap = side > 0 ? f32(right - f.motion.x) : f32(f.motion.x - left);
+  if (f.motion.grounded && gap > CARRY_THROW_GAP && f.grab.frame < CARRY_WALK_FRAMES) {
+    input.direction = side;
+    return;
+  }
+  input.attackPressed = true;
+  input.direction = side === f.facing ? 0 : -f.facing;
+}
+
 /** Holding a grab: the gameplan's throw, or each hold frame pummels, throws one of four ways, or waits. */
-function followUpGrab(f: Readonly<Fighter>, held: Readonly<Fighter>, gameplan: FighterGameplan | undefined, frame: number, input: Controls): void {
-  const planned = gameplan === undefined ? undefined : gameplanThrow(gameplan, held, f.grab.serial, botChoice);
+function followUpGrab(f: Readonly<Fighter>, held: Readonly<Fighter>, gameplan: FighterGameplan | undefined, stage: number, frame: number, input: Controls): void {
   if (f.grab.action === GrabAction.carry) {
-    input.attackPressed = true;
-    input.direction = planned === GameplanThrow.back ? -f.facing : 0;
+    carryToLedge(f, stage, input);
     return;
   }
   if (f.grab.action !== GrabAction.hold) return;
+  const planned = gameplan === undefined ? undefined : gameplanThrow(gameplan, held, f.grab.serial, botChoice);
   if (planned !== undefined) {
     if (planned === GameplanThrow.forward || planned === GameplanThrow.back) input.grabThrowX = planned === GameplanThrow.forward ? f.facing : -f.facing;
     else input.grabThrowZ = planned === GameplanThrow.up ? 1 : -1;
@@ -371,7 +388,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
       input.grabThrowX = fighter.facing;
       input.attackPressed = fighter.grab.action === GrabAction.carry;
     }
-    else if (target !== undefined) followUpGrab(fighter, target, gameplan, frame, input);
+    else if (target !== undefined) followUpGrab(fighter, target, gameplan, stage, frame, input);
     return;
   }
   if (fighter.shield.breakState !== ShieldBreak.none) {

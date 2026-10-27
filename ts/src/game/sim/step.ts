@@ -67,7 +67,7 @@ import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies, travelBeforeLedge } from "./travelStop";
 import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
-import { advanceCarryWalk, isCarrying } from "./cargoCarry";
+import { beginCarryJump, carryThrowRequested, isCarrying, limitCarrySpeed, lowerCarryJump } from "./cargoCarry";
 import { moveTravelStep } from "./heroMoves";
 import {
   SHIELD_MIN_HOLD_FRAMES,
@@ -497,9 +497,9 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     }
   }
   if (status.out) return;
-  if (wallTechStartup || inGrabContext(f)) {
+  const carrying = isCarrying(f);
+  if (wallTechStartup || (inGrabContext(f) && !carrying)) {
     if (launch.hitlag <= 0) status.invincible = max(0, status.invincible - 1);
-    if (launch.hitlag <= 0 && isCarrying(f)) advanceCarryWalk(f, input, stage, matchFrame);
     checkBlastZone(world, slot, stage);
     return;
   }
@@ -509,7 +509,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     f.landing.lag = max(0, f.landing.lag - 1);
     smashChargePaused = advanceActionClocks(f, input);
   }
-  if (f.grab.target !== undefined) {
+  if (f.grab.target !== undefined && !carrying) {
     checkBlastZone(world, slot, stage);
     return;
   }
@@ -522,6 +522,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const wet = sea.wet(f, stage);
   const waterJumped = wet && (input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && sea.beginWaterJump(f, input.direction);
   if ((input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && !waterJumped) beginJump(f, input.direction, input.shortHopPressed, heroSpecialJumps(f));
+  if (carrying && input.jumpPressed) beginCarryJump(f, input.shortHopPressed);
   if (jump.squat > 0 && launch.hitlag === 0 && (f.character === Character.demonHunter || squatBeforeInput !== 1)) jump.held = jump.held && input.jumpHeld;
   if (input.airDodgePressed && !exSpecialPressed(input)) {
     if (motion.grounded && jump.squat > 0) {
@@ -542,6 +543,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     groundDodgeStarted = true;
   }
   const groundTakeoff = advanceJumpSquat(f, input, squatBeforeInput);
+  if (carrying && groundTakeoff) lowerCarryJump(f);
   if (launch.hitlag > 0) return;
   advanceShieldInputClocks(f, input);
   advanceGroundDodge(f, groundDodgeStarted);
@@ -563,8 +565,8 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const dodgeActive = dodge.airMotionFrames > 0;
   dodge.airMotionFrames = max(0, dodge.airMotionFrames - 1);
   shield.releaseLag = max(0, shield.releaseLag - 1);
-  const wantsShield = advanceGuard(f, input, forcedShield);
-  let direction = input.direction;
+  const wantsShield = !carrying && advanceGuard(f, input, forcedShield);
+  let direction = carrying && carryThrowRequested(f, input) ? 0 : input.direction;
   if (isTumbling(f) && !motion.grounded && launch.hitstun <= 0 && launch.hitlag <= 0 && tumbleExitFlick) {
     clearDownState(f);
     const airSpeed = speedBuffed(f, physics.airSpeed);
@@ -579,7 +581,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const canSteer = !authoredMotion && egg === undefined && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
     && (!motion.grounded || attack.cooldown <= 0) && f.surfaceRecovery.state !== SurfaceContact.techWall;
-  motion.crouching = ((input.down || motion.crouching) && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield
+  motion.crouching = ((input.down || motion.crouching) && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield && !carrying
     && attack.style === undefined && f.special.action === SpecialAction.none
     && groundOptionOpen(f, GroundOption.crouch);
   if (motion.crouching) direction = 0;
@@ -593,13 +595,14 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     if (motion.grounded) {
       const previousGroundVelocity = motion.vx;
 
-      if (advanceGroundMovement(f, direction, input.walking, horizontalStick, stageSurfaces.floorFriction(stage, motion))) dashEntryDisplacementAdjustment = f32(previousGroundVelocity - motion.vx);
+      if (advanceGroundMovement(f, direction, input.walking || carrying, horizontalStick, stageSurfaces.floorFriction(stage, motion))) dashEntryDisplacementAdjustment = f32(previousGroundVelocity - motion.vx);
     } else if (direction !== 0 && !groundTakeoff) {
 
       const driftStick = input.driftStickX ?? direction;
       motion.vx = wet ? sea.swimVelocity(motion.vx, direction) : airDriftVelocity(f, motion.vx, driftStick === 0 ? direction : driftStick);
     }
   }
+  if (carrying) limitCarrySpeed(f);
   if (isGroundDodging(f) && dodge.groundDirection !== 0) {
     if (f.character === Character.demonHunter) {
       const moving = dodge.groundFrame >= GROUND_ROLL_MOVE_START && dodge.groundFrame <= GROUND_ROLL_MOVE_END;

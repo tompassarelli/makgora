@@ -186,8 +186,15 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
       grab.frame = 0;
     } else grab.frame++;
   } else if (grab.action === GrabAction.carry) {
+    const next = throwAction !== GrabAction.none ? throwAction : grab.queuedThrow;
     if (targetSlot === undefined) grab.action = GrabAction.none;
-    else if (throwAction !== GrabAction.none) beginGrabAction(owner, throwAction);
+    else if (next !== GrabAction.none && owner.motion.grounded) {
+      grab.queuedThrow = GrabAction.none;
+      beginGrabAction(owner, next);
+    } else {
+      grab.queuedThrow = next;
+      grab.frame++;
+    }
   } else if (grab.action === GrabAction.hold) {
     if (throwAction !== GrabAction.none) beginGrabAction(owner, throwAction);
     else if (ownerInput.attackPressed) {

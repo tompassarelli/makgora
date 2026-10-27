@@ -96,8 +96,10 @@ export interface AuthoredThrow {
 export interface CargoCarry {
   readonly hoistFrames: number;
   readonly walkScale: number;
+  readonly jumpScale: number;
   readonly shoulderX: number;
   readonly shoulderZ: number;
+  readonly overheadRise: number;
 }
 
 

@@ -1,13 +1,11 @@
 import { f32 } from "wisp/src/sim/f32";
-import { min } from "../core/numbers";
+import { max, min } from "../core/numbers";
 import { GrabAction } from "./codes";
 import type { Fighter } from "./fighter";
 import type { CargoCarry } from "./heroMoves";
-import { moveMeleeX } from "./motion";
 import { GRAB_HOLD_DISTANCE } from "./moves";
 import type { Controls } from "./roster";
-import * as stageSurfaces from "./stage";
-import { stopGrabAtEdge } from "./teeter";
+import { clearDash } from "./groundMovement";
 
 export interface CarryOffset {
   x: number;
@@ -25,29 +23,39 @@ export function isCarrying(f: Readonly<Fighter>): boolean {
 }
 
 export function requestedCarryThrow(owner: Readonly<Fighter>, input: Readonly<Controls>): GrabAction {
+  if (input.cStickUpFlick) return GrabAction.throwUp;
+  if (input.cStickZ < 0) return GrabAction.throwDown;
   if (input.cStickSideFlick !== 0) return input.cStickSideFlick === owner.facing ? GrabAction.throwForward : GrabAction.throwBack;
-  if (input.attackPressed) return input.direction === -owner.facing ? GrabAction.throwBack : GrabAction.throwForward;
-  return GrabAction.none;
+  if (!input.attackPressed) return GrabAction.none;
+  if (input.verticalDirection !== 0) return input.verticalDirection > 0 ? GrabAction.throwUp : GrabAction.throwDown;
+  return input.direction === -owner.facing ? GrabAction.throwBack : GrabAction.throwForward;
 }
 
-export function advanceCarryWalk(f: Fighter, input: Readonly<Controls>, stage: number, matchFrame: number): void {
+export function carryThrowRequested(owner: Readonly<Fighter>, input: Readonly<Controls>): boolean {
+  return owner.motion.grounded && requestedCarryThrow(owner, input) !== GrabAction.none;
+}
+
+export function beginCarryJump(f: Fighter, shortHop: boolean): void {
+  const { motion, jump } = f;
+  if (!motion.grounded || jump.squat > 0 || f.launch.hitlag > 0) return;
+  motion.crouching = false;
+  clearDash(f);
+  jump.squat = f.tuning.physics.jumpSquatFrames;
+  jump.held = !shortHop;
+}
+
+export function lowerCarryJump(f: Fighter): void {
   const carry = cargoCarry(f);
-  const { motion } = f;
-  if (carry === undefined || !motion.grounded) return;
-  if (requestedCarryThrow(f, input) !== GrabAction.none) {
-    motion.vx = 0.0;
-    return;
-  }
-  const direction = input.direction;
-  if (direction !== 0) f.facing = direction;
-  motion.vx = f32(direction * f32(f.tuning.physics.walkSpeed * carry.walkScale));
-  const oldX = motion.x;
-  const oldZ = motion.z;
-  moveMeleeX(f, motion.vx);
-  stopGrabAtEdge(f, stage, matchFrame);
-  motion.z = stageSurfaces.surfaceZAt(stage, motion.surface ?? 0, matchFrame, motion.x);
-  motion.deltaX = f32(motion.x - oldX);
-  motion.deltaZ = f32(motion.z - oldZ);
+  if (carry !== undefined) f.motion.vz = f32(f.motion.vz * carry.jumpScale);
+}
+
+export function limitCarrySpeed(f: Fighter): void {
+  const carry = cargoCarry(f);
+  if (carry === undefined) return;
+  const physics = f.tuning.physics;
+  const limit = f32((f.motion.grounded ? physics.walkSpeed : physics.airSpeed) * carry.walkScale);
+  f.motion.vx = max(-limit, min(limit, f.motion.vx));
+  if (f.motion.grounded) clearDash(f);
 }
 
 /** Where the carried fighter sits relative to its carrier, by the carrier's grab action and frame. */
@@ -58,6 +66,14 @@ export function carriedOffset(carry: CargoCarry, action: GrabAction, frame: numb
     const progress = min(1.0, f32(f32(frame * 1.0) / hoistFrames));
     carryOffset.x = f32(frontX + f32(f32(shoulderX - frontX) * progress));
     carryOffset.z = f32(carry.shoulderZ * progress);
+  } else if (action === GrabAction.throwUp) {
+    const progress = min(1.0, f32(f32(frame * 1.0) / contact));
+    carryOffset.x = f32(shoulderX * f32(1 - progress));
+    carryOffset.z = f32(carry.shoulderZ + f32(carry.overheadRise * progress));
+  } else if (action === GrabAction.throwDown) {
+    const progress = min(1.0, f32(f32(frame * 1.0) / contact));
+    carryOffset.x = f32(shoulderX + f32(f32(frontX - shoulderX) * progress));
+    carryOffset.z = f32(carry.shoulderZ * f32(1 - progress));
   } else if (action === GrabAction.throwForward || action === GrabAction.throwBack) {
     const progress = min(1.0, f32(f32(frame * 1.0) / contact));
     const landingX = action === GrabAction.throwForward ? frontX : -frontX;
