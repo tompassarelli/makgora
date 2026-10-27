@@ -42,6 +42,6 @@ export function groundLocomotionRate(f: Readonly<Fighter>, motion: IllidanLocomo
   const gait = motion === IllidanLocomotion.walk ? "walk" : "run";
   const stride = DRAWN_STRIDES[lookCharacter(f.character)]?.[gait];
   if (stride === undefined) throw new Error(`missing drawn stride for ${f.character}/${gait}`);
-  const speed = clip === undefined ? stride.speed : stride.alternates?.[clip.index] ?? stride.speed;
+  const speed = clip === undefined ? stride.speed : clip.stance ?? stride.alternates?.[clip.index] ?? stride.speed;
   return f32(f32(Math.abs(f.motion.vx) * 60.0) / speed);
 }

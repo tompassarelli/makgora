@@ -20,6 +20,10 @@ export interface HeroClip {
 
   readonly contact?: number | undefined;
 
+  readonly entry?: number | undefined;
+
+  readonly stance?: number | undefined;
+
 
 
 

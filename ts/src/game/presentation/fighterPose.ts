@@ -144,9 +144,18 @@ function playIndex(pose: FighterPose, key: string, index: number): void {
   pose.animation = key;
 }
 
-function playLocomotionIndex(pose: FighterPose, key: string, index: number): void {
+const GAIT_KEYS: ReadonlySet<string> = new Set([motionKey(IllidanLocomotion.walk), motionKey(IllidanLocomotion.dash), motionKey(IllidanLocomotion.run), "walk"]);
+
+function playLocomotionIndex(pose: FighterPose, key: string, index: number, entry = 0.0): void {
+  if (pose.clipIndex === index && GAIT_KEYS.has(key) && GAIT_KEYS.has(pose.animation)) {
+    pose.animation = key;
+    return;
+  }
   if (pose.clipIndex !== index) pose.animation = "";
-  playIndex(pose, key, index);
+  if (pose.animation === key) return;
+  selectFighterClipIndex(pose, index);
+  pose.clipTime = entry;
+  pose.animation = key;
 }
 
 function playName(pose: FighterPose, key: string, name: string): void {
@@ -350,7 +359,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   const locomotionTable = koboldLocomotionClips(character, f.candle.state) ?? table;
   const groundClip = groundLocomotionClip(character, pose.motion.motion, locomotionTable);
   if (groundClip !== undefined) {
-    playLocomotionIndex(pose, motionKey(pose.motion.motion), groundClip.index);
+    playLocomotionIndex(pose, motionKey(pose.motion.motion), groundClip.index, groundClip.entry);
     return groundLocomotionRate(f, pose.motion.motion, groundClip);
   }
   const moving = tableLocomotion(locomotionTable, pose.motion.motion);
@@ -362,7 +371,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
 
   const locomotion = locomotionTable[walking ? "walk" : "idle"];
   if (locomotion === undefined) playName(pose, walking ? "walk" : "stand", walking ? "walk" : "stand");
-  else playLocomotionIndex(pose, walking ? "walk" : "stand", locomotion.index);
+  else playLocomotionIndex(pose, walking ? "walk" : "stand", locomotion.index, walking ? locomotion.entry : 0.0);
   return walking ? min(f32(1.4), max(f32(0.2), f32(Math.abs(f.motion.vx) / f.tuning.physics.runSpeed))) : rate;
 }
 
