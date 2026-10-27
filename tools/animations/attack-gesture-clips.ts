@@ -442,9 +442,9 @@ for(const [id,poses]of Object.entries(PLAN)) {
     ensure(contact>0&&total>contact,`${f.name}/${pose}: invalid timing`);
     const blender=rigOutput||bakedKeys?blenderSkeleton(source,originals,stand,onGlobalClock):undefined;
     if(blender&&rigOutput){
-      const nodes=[...source.Bones,...source.Helpers,...source.Attachments],tip=nodes.find(n=>n.Name==="Weapon Ref");ensure(tip&&tip.Parent!=null,`${f.name}: missing Weapon Ref`);
+      const nodes=[...source.Bones,...source.Helpers,...source.Attachments],tip=nodes.find(n=>n.Name==="Weapon Ref"&&n.Parent!=null);
       await blender.writeRig(rigOutput,{frames:total,contact,active:special?heroCueWindows(special,1).active.last-contact+1:characterAttackActiveFrames(character,style!,moves),
-        tip:{parent:nodes.find(n=>n.ObjectId===tip.Parent)!.Name,pivot:Array.from(source.PivotPoints[tip.ObjectId]!)}});
+        ...tip?{tip:{parent:nodes.find(n=>n.ObjectId===tip.Parent)!.Name,pivot:Array.from(source.PivotPoints[tip.ObjectId]!)}}:{}});
       console.log(`ATTACK_GESTURE_RIG ${f.name}/${pose} ${rigOutput}`);process.exit(0);
     }
     const baked=blender&&bakedKeys?await blender.readKeys(bakedKeys,total):undefined;

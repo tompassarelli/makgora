@@ -32,6 +32,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   bakes a tucked windup, the glaive thrown over her shoulder and whipped down behind her through the three active
   frames with her legs off the floor, and `... --replace-pose backAir --keys KEYS.json` splices the keys in place.
   Its three hit capsules run along the drawn glaive on frames 7 to 9.
+  Muradin's back air is authored the same way (#569): `... --character 4 --replace-pose backAir --rig RIG.json`,
+  then `blender ... --python tools/animations/mountain-king-back-air.py -- RIG.json KEYS.json` bakes the axe wound
+  across his front with his chest kept toward his facing, lifted overhead through a mid-arc frame and whipped
+  back and down behind him through the three active frames as his chest opens to profile, carried on under his
+  hip and settled, and
+  `... --replace-pose backAir --keys KEYS.json` splices the keys in place.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip
