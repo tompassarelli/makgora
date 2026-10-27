@@ -35,8 +35,13 @@ export const capsule = capsuleOf(BLADE_RADIUS);
 
 
 
-function cleave(first: number, heights: readonly number[], reach: number, effect: Readonly<HitEffect>): readonly MoveRegion[] {
-  return path(first, heights.map(z => capsule(40.0, 70.0, f32(reach - BLADE_RADIUS), z)), effect);
+type Blade = readonly [gripX: number, gripZ: number, tipX: number, tipZ: number];
+
+const along = (blades: readonly Blade[], radius: number | readonly number[] = BLADE_RADIUS) =>
+  blades.map(([gripX, gripZ, tipX, tipZ], index) => capsule(gripX, gripZ, tipX, tipZ, typeof radius === "number" ? radius : radius[index]));
+
+function sweep(first: number, blades: readonly Blade[], effect: Readonly<HitEffect>): readonly MoveRegion[] {
+  return path(first, along(blades), effect);
 }
 
 
@@ -138,118 +143,62 @@ const PIT_LORD_BODY: FighterHurtboxes = {
 
 const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
-const CLEAVING_SWEEP = heroMove(13, 4, 33, 0, cleave(13, [150.0, 100.0, 50.0, 10.0], XL, hit(14.43239974975586, "EDGE", 35)));
+const cleavingSweep = (blades: readonly Blade[]) => heroMove(13, 4, 33, 0, sweep(13, blades, hit(14.43239974975586, "EDGE", 35)));
+const RISING_SWEEP = cleavingSweep([[139, 110, 298, 127], [30, 84, 288, 144], [30, 82, 273, 161], [151, 122, 255, 177]]);
 
 export const PIT_LORD_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   hurtboxes: PIT_LORD_BODY,
   normals: {
 
-    [AttackStyle.jab]: jabStep(heroMove(7, 3, 19, 0, path(7, [
-      capsule(30.0, 64.0, f32(M - 12.0), 64.0, 12.0),
-      capsule(30.0, 60.0, f32(M - 12.0), 58.0, 12.0),
-      capsule(30.0, 56.0, f32(M - 16.0), 52.0, 12.0),
-    ], hit(7.21619987487793, "LINK", 35, 1.0, HitElement.normal)))),
+    [AttackStyle.jab]: jabStep(heroMove(7, 3, 19, 0, path(7, along([[85, 98, 259, 47], [30, 109, 257, 59], [30, 106, 253, 71]], 12.0),
+      hit(7.21619987487793, "LINK", 35, 1.0, HitElement.normal)))),
 
-    [AttackStyle.jab2]: heroMove(8, 3, 22, 0, path(8, [
-      capsule(30.0, 90.0, f32(M - 4.0), 70.0),
-      capsule(30.0, 70.0, f32(M - 4.0), 50.0),
-      capsule(30.0, 56.0, f32(M - 8.0), 36.0),
-    ], hit(8.418900489807129, "POKE", 40))),
+    [AttackStyle.jab2]: heroMove(8, 3, 22, 0, sweep(8, [[85, 98, 259, 47], [30, 109, 257, 58], [30, 104, 254, 68]], hit(8.418900489807129, "POKE", 40))),
 
 
 
-    [AttackStyle.forwardTilt]: CLEAVING_SWEEP,
-    [AttackStyle.forwardTiltUp]: CLEAVING_SWEEP,
-    [AttackStyle.forwardTiltDown]: CLEAVING_SWEEP,
+    [AttackStyle.forwardTilt]: cleavingSweep([[129, 145, 165, 205], [126, 73, 66, 242], [145, 95, 7, 213], [147, 100, -1, 206]]),
+    [AttackStyle.forwardTiltUp]: RISING_SWEEP,
+    [AttackStyle.forwardTiltDown]: RISING_SWEEP,
 
-    [AttackStyle.upTilt]: heroMove(12, 5, 27, 0, path(12, [
-      capsule(50.0, 110.0, 100.0, 150.0),
-      capsule(30.0, 120.0, 50.0, f32(L + 40.0)),
-      capsule(0.0, 120.0, 0.0, f32(L + 50.0)),
-      capsule(-30.0, 120.0, -50.0, f32(L + 40.0)),
-      capsule(-50.0, 110.0, -100.0, 150.0),
-    ], hit(14.43239974975586, "LAUNCH", 85))),
-    [AttackStyle.downTilt]: heroMove(10, 3, 24, 0, path(10, [
-      capsule(30.0, 22.0, f32(M - 14.0), 14.0, 14.0),
-      capsule(30.0, 18.0, f32(M - 14.0), 8.0, 14.0),
-      capsule(30.0, 14.0, f32(M - 14.0), 4.0, 14.0),
+    [AttackStyle.upTilt]: heroMove(12, 5, 27, 0, sweep(12, [[72, 168, 102, 349], [72, 169, 100, 350], [73, 169, 99, 350], [73, 169, 98, 351], [73, 169, 98, 351]],
+      hit(14.43239974975586, "LAUNCH", 85))),
+    [AttackStyle.downTilt]: heroMove(10, 3, 24, 0, path(10, along([[139, 110, 298, 127], [30, 94, 283, 150], [150, 121, 260, 173]], 14.0),
+      hit(12.027000427246094, "EDGE", 340, 1.0, HitElement.normal))),
 
-    ], hit(12.027000427246094, "EDGE", 340, 1.0, HitElement.normal))),
-
-    [AttackStyle.dashAttack]: heroMove(9, 8, 24, 0, [...path(9, [
-      capsule(20.0, 60.0, f32(L - 30.0), 60.0, 30.0),
-      capsule(20.0, 60.0, f32(L - 30.0), 58.0, 30.0),
-      capsule(20.0, 58.0, f32(L - 30.0), 56.0, 30.0),
-      capsule(20.0, 56.0, f32(L - 32.0), 54.0, 28.0),
-      capsule(20.0, 54.0, f32(L - 34.0), 52.0, 26.0),
-      capsule(20.0, 52.0, f32(L - 36.0), 50.0, 24.0),
-    ], hit(19.24319839477539, "KILL", 40, 1.0, HitElement.normal)), heroRegion(15, 16, capsule(20.0, 52.0, f32(L - 36.0), 50.0, 24.0), hit(19.24319839477539, "KILL", 40, 1.0, HitElement.normal))], 40.0),
+    [AttackStyle.dashAttack]: heroMove(9, 8, 24, 0, path(9, along([[83, 80, 234, 88], [30, 76, 235, 87], [30, 75, 230, 85], [30, 76, 220, 80], [22, 75, 204, 72], [5, 74, 181, 62], [-12, 73, 150, 50], [-28, 73, 113, 35]], [30.0, 30.0, 30.0, 28.0, 26.0, 24.0, 24.0, 24.0]),
+      hit(19.24319839477539, "KILL", 40, 1.0, HitElement.normal)), 40.0),
 
     [AttackStyle.forwardSmash]: heroMove(27, 4, 43, 0, [
-      ...[150.0, 100.0, 50.0, 10.0].map((z, index) => heroRegion(27 + index, 27 + index,
-        capsule(f32(XL - 55.0), z, f32(XL - 14.0), f32(z - 10.0), 14.0), strongHit(hit(26.375, "KILL", 40)))),
-      ...cleave(27, [150.0, 100.0, 50.0, 10.0], f32(XL - 50.0), hit(20.045000076293945, "KILL", 40)),
+      ...along([[234, 120, 298, 127], [233, 128, 291, 140], [226, 140, 280, 154], [220, 149, 267, 167]], 14.0).map((strike, index) =>
+        heroRegion(27 + index, 27 + index, strike, strongHit(hit(26.375, "KILL", 40)))),
+      ...sweep(27, [[30, 30, 234, 120], [30, 30, 233, 128], [30, 30, 226, 140], [30, 30, 220, 149]], hit(20.045000076293945, "KILL", 40)),
     ]),
 
-    [AttackStyle.upSmash]: heroMove(24, 5, 41, 0, path(24, [
-      capsule(40.0, 90.0, 70.0, f32(XL - 10.0)),
-      capsule(20.0, 100.0, 30.0, f32(XL + 20.0)),
-      capsule(0.0, 100.0, 0.0, f32(XL + 30.0)),
-      capsule(-20.0, 100.0, -30.0, f32(XL + 20.0)),
-      capsule(-40.0, 90.0, -70.0, f32(XL - 10.0)),
-    ], hit(26.45939826965332, "KILL", 85))),
+    [AttackStyle.upSmash]: heroMove(24, 5, 41, 0, sweep(24, [[116, 111, 129, 294], [114, 114, 125, 297], [112, 116, 122, 299], [111, 117, 120, 300], [110, 118, 119, 300]],
+      hit(26.45939826965332, "KILL", 85))),
 
     [AttackStyle.downSmash]: heroMove(22, 7, 28, 0, [
-      ...path(22, [
-        capsule(30.0, 14.0, f32(L - 14.0), 14.0, 14.0),
-        capsule(30.0, 10.0, f32(L - 14.0), 10.0, 14.0),
-        capsule(30.0, 8.0, f32(L - 14.0), 6.0, 14.0),
-      ], downSmashHit(hit(19.0, "EDGE", 25, 1.0, HitElement.normal))),
-      ...path(26, [
-        capsule(-30.0, 14.0, -f32(L - 14.0), 14.0, 14.0),
-        capsule(-30.0, 10.0, -f32(L - 14.0), 10.0, 14.0),
-        capsule(-30.0, 8.0, -f32(L - 14.0), 6.0, 14.0),
-      ], downSmashHit(hit(19.0, "EDGE", 25, -1.0, HitElement.normal))),
+      ...path(22, along([[83, 80, 234, 88], [30, 76, 235, 86], [30, 75, 231, 85]], 14.0), downSmashHit(hit(19.0, "EDGE", 25, 1.0, HitElement.normal))),
+      ...path(26, along([[28, 75, 211, 74], [12, 75, 192, 66], [-3, 74, 167, 56]], 14.0), downSmashHit(hit(19.0, "EDGE", 25, -1.0, HitElement.normal))),
     ]),
 
     [AttackStyle.neutralAir]: heroMove(12, 7, 29, 20, [
-      ...path(12, [
-        capsule(30.0, 60.0, f32(L - BLADE_RADIUS), 70.0),
-        capsule(30.0, 90.0, f32(L - 20.0), 120.0),
-        capsule(20.0, 110.0, 30.0, f32(L + 30.0)),
-        capsule(0.0, 110.0, -20.0, f32(L + 30.0)),
-      ], hit(15.635100364685059, "POKE", 50)),
-      ...path(16, [
-        capsule(-30.0, 90.0, -f32(L - 20.0), 120.0),
-        capsule(-30.0, 60.0, -f32(L - BLADE_RADIUS), 70.0),
-        capsule(-30.0, 40.0, -f32(L - BLADE_RADIUS), 30.0),
-      ], hit(15.635100364685059, "POKE", 50, -1.0)),
+      ...sweep(12, [[79, 108, 84, 282], [78, 105, 90, 279], [76, 102, 96, 276], [74, 99, 102, 272]], hit(15.635100364685059, "POKE", 50)),
+      ...sweep(16, [[72, 97, 108, 268], [71, 94, 114, 264], [69, 92, 119, 260]], hit(15.635100364685059, "POKE", 50, -1.0)),
     ]),
 
-    [AttackStyle.forwardAir]: heroMove(19, 4, 36, 25, cleave(19, [130.0, 90.0, 50.0, 15.0], XL, hit(22.851299285888672, "KILL", 40))),
+    [AttackStyle.forwardAir]: heroMove(19, 4, 36, 25, sweep(19, [[105, 76, 267, 97], [30, 66, 267, 99], [30, 65, 266, 101], [30, 65, 266, 102]], hit(22.851299285888672, "KILL", 40))),
 
-    [AttackStyle.backAir]: heroMove(14, 4, 31, 20, path(14, [
-      capsule(-30.0, 30.0, -f32(L - 14.0), 24.0, 14.0),
-      capsule(-30.0, 34.0, -f32(L - 14.0), 34.0, 14.0),
-      capsule(-30.0, 38.0, -f32(L - 14.0), 46.0, 14.0),
-      capsule(-30.0, 40.0, -f32(L - 14.0), 56.0, 14.0),
-    ], hit(18.04050064086914, "EDGE", 35, -1.0, HitElement.normal))),
+    [AttackStyle.backAir]: heroMove(14, 4, 31, 20, path(14, along([[-41, 142, -222, 130], [-38, 143, -218, 137], [-46, 129, -215, 140], [-45, 129, -213, 137]], 14.0),
+      hit(18.04050064086914, "EDGE", 35, -1.0, HitElement.normal))),
 
-    [AttackStyle.upAir]: heroMove(11, 4, 28, 18, path(11, [
-      capsule(10.0, 130.0, 14.0, f32(M + 70.0), 18.0),
-      capsule(5.0, 130.0, 7.0, f32(M + 75.0), 18.0),
-      capsule(0.0, 130.0, 0.0, f32(M + 75.0), 18.0),
-      capsule(-5.0, 130.0, -7.0, f32(M + 70.0), 18.0),
-    ], hit(14.43239974975586, "LAUNCH", 85, 1.0, HitElement.normal))),
+    [AttackStyle.upAir]: heroMove(11, 4, 28, 18, path(11, along([[70, 111, 75, 283], [69, 106, 87, 277], [67, 100, 99, 271], [65, 96, 110, 263]], 18.0),
+      hit(14.43239974975586, "LAUNCH", 85, 1.0, HitElement.normal))),
 
-    [AttackStyle.downAir]: heroMove(20, 5, 38, 28, path(20, [
-      capsule(-20.0, 50.0, -20.0, 6.0, 18.0),
-      capsule(-10.0, 50.0, -10.0, 6.0, 18.0),
-      capsule(0.0, 50.0, 0.0, 6.0, 18.0),
-      capsule(10.0, 50.0, 10.0, 6.0, 18.0),
-      capsule(20.0, 50.0, 20.0, 6.0, 18.0),
-    ], hit(21.64859962463379, "SPIKE", 270, 1.0, HitElement.normal), hit(21.64859962463379, "SPIKE", 55, 1.0, HitElement.normal))),
+    [AttackStyle.downAir]: heroMove(20, 5, 38, 28, path(20, along([[83, 136, -5, 277], [83, 135, -5, 277], [83, 135, -5, 277], [83, 135, -5, 277], [83, 135, -5, 277]], 18.0),
+      hit(21.64859962463379, "SPIKE", 270, 1.0, HitElement.normal), hit(21.64859962463379, "SPIKE", 55, 1.0, HitElement.normal))),
 
     [AttackStyle.grab]: heroMove(10, 3, 32, 0, [heroRegion(10, 12,
       capsule(30.0, 58.0, f32(M - 12.0), 56.0, 12.0),

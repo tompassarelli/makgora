@@ -56,7 +56,7 @@ const rain = (air: boolean): AuthoredSpecial => ({
 
 
 const CHARGE = hit(18.04050064086914, "EDGE", 35, 1.0, HitElement.normal);
-const CHARGE_BODY = capsule(10.0, 30.0, 40.0, 80.0, 40.0);
+const CHARGE_BODY = capsule(-4.0, 127.0, 102.0, -12.0, 40.0);
 const chargeMotion = (distance: number): readonly SpecialMotion[] => [
   { ...frames(19, 26), velocityX: perFrame(distance, 19, 26), velocityZ: 0.0, stopsAtBody: true },
   { ...frames(27, 27), velocityX: 0.0, velocityZ: 0.0 },

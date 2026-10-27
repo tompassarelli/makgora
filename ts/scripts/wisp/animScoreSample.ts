@@ -93,10 +93,10 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
 export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
   thrall: ["neutral-special", "down-special"],
   "chen-stormstout": ["neutral-special", "ultimate"],
+  "pit-lord": ["neutral-special", "up-special"],
 };
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
-
 
 const AFTER_FRAMES = 2;
 const LIMIT = 150;
