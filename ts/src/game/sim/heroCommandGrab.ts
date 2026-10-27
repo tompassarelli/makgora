@@ -11,6 +11,7 @@ import { queueDamageContact } from "./contacts";
 import type { Fighter } from "./fighter";
 import { runningHeroSpecial } from "./specials/engine";
 import { applyHeroStatus } from "./heroStatus";
+import { applyCurse } from "./curses";
 import { currentTraits } from "./identityTraits";
 import { grabTouchesBody } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -95,6 +96,7 @@ export function advanceHeroCommandGrab(world: Roster, slot: number): void {
   queueDamageContact(world, slot, targetSlot, grab.effect, owner.facing, ContactKind.throw, true, undefined);
   const traits = currentTraits(owner);
   if (grab.status !== undefined && traits.status === true) applyHeroStatus(target, grab.status);
+  if (grab.curse !== undefined && traits.status === true) applyCurse(target, slot);
   const heal = grab.heal;
   if (heal !== undefined && traits.heal === true) {
     const { status } = owner;

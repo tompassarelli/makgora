@@ -39,6 +39,8 @@ function placementPaths(character: Character): string[] {
       const path = placement.model?.path;
       if (path !== undefined && !paths.includes(path)) paths.push(path);
     }
+    const summoned = special.commandGrab?.curse?.summon.model?.path;
+    if (summoned !== undefined && !paths.includes(summoned)) paths.push(summoned);
     for (const followUp of special.followUps ?? []) visit(followUp.special);
     for (const variant of special.variants ?? []) visit(variant);
   };

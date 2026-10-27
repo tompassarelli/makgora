@@ -28,6 +28,7 @@ export interface PanelLayout {
   readonly bust: PlateBox;
   readonly damage: PlateBox;
   readonly percent: PlateBox;
+  readonly doom: PlateBox;
   readonly name: PlateBox;
   readonly slot: PlateBox;
   readonly mana: PlateBox;
@@ -39,6 +40,7 @@ const BUST: PlateBox = { x: -12, y: -96, width: 256, height: 256 };
 // Warcraft wraps oversized frame text onto a hidden second line; reserve enough width for damage digits.
 const DAMAGE: PlateBox = { x: 150, y: -4, width: 284, height: 124 };
 const PERCENT: PlateBox = { x: 436, y: 34, width: 60, height: 70 };
+const DOOM: PlateBox = { x: 444, y: -8, width: 44, height: 44 };
 const NAME: PlateBox = { x: 244, y: 148, width: 228, height: 30 };
 const SLOT: PlateBox = { x: 472, y: 148, width: 40, height: 30 };
 const MANA: PlateBox = { x: 256, y: 120, width: 270, height: 16 };
@@ -54,7 +56,7 @@ function stockBox(index: number): PlateBox {
 const STOCKS: readonly PlateBox[] = [0, 1, 2, 3, 4].map(index => stockBox(index));
 const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHOWN_PX };
 
-const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, name: NAME, slot: SLOT, mana: MANA, stocks: STOCKS, stockCount: STOCK_COUNT };
+const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, doom: DOOM, name: NAME, slot: SLOT, mana: MANA, stocks: STOCKS, stockCount: STOCK_COUNT };
 
 const MIRRORED_PERCENT_X = 236;
 const GROUP_LEFT = MIRRORED_PERCENT_X - PERCENT.x + DAMAGE.x;
@@ -64,6 +66,7 @@ const RIGHT_PANEL: PanelLayout = {
   bust: flip(BUST),
   damage: { ...DAMAGE, x: GROUP_LEFT },
   percent: { ...PERCENT, x: MIRRORED_PERCENT_X },
+  doom: { ...DOOM, x: MIRRORED_PERCENT_X + DOOM.x - PERCENT.x },
   name: flip(NAME),
   slot: flip(SLOT),
   mana: flip(MANA),
@@ -120,6 +123,8 @@ const hexByte = (value: number) => `${HEX.charAt(idiv(value, 16))}${HEX.charAt(i
 export const colourCode = (colour: number): string => `|cff${hexByte(channel(colour, 65536))}${hexByte(channel(colour, 256))}${hexByte(channel(colour, 1))}`;
 
 export const damageText = (damage: number): string => `${colourCode(damageColour(damage))}${shownPercent(damage)}|r`;
+
+export const DOOM_MARK_TEXTURE = "ReplaceableTextures\\CommandButtons\\BTNDoom.blp";
 
 export const percentText = (damage: number): string => `${colourCode(damageColour(damage))}%|r`;
 

@@ -212,6 +212,10 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.special.guarded !== actual.special.guarded) return "specialGuarded";
   if (expected.special.egg !== actual.special.egg) return "specialEgg";
   if (expected.status.divineFrames !== actual.status.divineFrames) return "divineFrames";
+  if ((expected.status.cursedBy ?? -1) !== (actual.status.cursedBy ?? -1)) return "cursedBy";
+  if (expected.status.curseFrames !== actual.status.curseFrames) return "curseFrames";
+  if (expected.status.summonFrames !== actual.status.summonFrames) return "summonFrames";
+  if (expected.status.summonX !== actual.status.summonX) return "summonX";
   if (expected.status.buff !== actual.status.buff) return "buff";
   if (expected.status.buffFrames !== actual.status.buffFrames) return "buffFrames";
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).spec !== at(actual.projectiles, i).spec) return `projectileSpec[${i}]`;

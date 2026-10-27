@@ -306,6 +306,7 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
     if (partner.followHeight !== undefined) real("companion.followHeight", partner.followHeight);
     if (partner.lungeDrop !== undefined) real("companion.lungeDrop", partner.lungeDrop);
     for (let i = 0; i < (partner.volleyFrames?.length ?? 0); i++) int(`companion.volley[${i}]`, partner.volleyFrames?.[i] ?? 0);
+    if (partner.waveFrame !== undefined) int("companion.waveFrame", partner.waveFrame);
     real("companion.followSpeed", partner.followSpeed);
     real("companion.followBehind", partner.followBehind);
     real("companion.returnSpeed", partner.returnSpeed);
@@ -469,6 +470,13 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int("commandGrab.recovery", grab.recovery);
     if (grab.heal !== undefined) {
       real("commandGrab.heal", grab.heal.heal);
+    }
+    if (grab.curse !== undefined) {
+      int("commandGrab.curse.every", grab.curse.every);
+      real("commandGrab.curse.damage", grab.curse.damage);
+      int("commandGrab.curse.summonDelay", grab.curse.summonDelay);
+      result.push(specialProjectileCanonical(grab.curse.portal, `${name}.commandGrab.curse.portal`));
+      result.push(specialPlacementCanonical(grab.curse.summon, `${name}.commandGrab.curse.summon`));
     }
     result.push(hitEffectCanonical(grab.effect, `${name}.commandGrab.effect`));
   }

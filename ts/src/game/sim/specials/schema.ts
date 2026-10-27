@@ -5,7 +5,6 @@ import type { HitEffect } from "../hitRegions";
 import type { AppliedStatus } from "../heroStatus";
 import type { HurtPose } from "../hurtboxes";
 
-
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
 export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
 
@@ -91,15 +90,16 @@ export interface SpecialEgg {
 }
 
 
+export interface SpecialCurse { readonly every: number; readonly damage: number; readonly summonDelay: number; readonly portal: SpecialProjectile; readonly summon: SpecialPlacement }
 export interface CommandGrab extends FrameWindow {
   readonly strike: StrikeCapsule;
   readonly holdFrames: number;
   readonly effect: Readonly<HitEffect>;
   readonly recovery: number;
-
   readonly heal?: { readonly heal: number } | undefined;
 
   readonly status?: AppliedStatus | undefined;
+  readonly curse?: SpecialCurse | undefined;
 }
 
 
@@ -236,8 +236,8 @@ export interface SpecialCompanion {
   readonly behavior?: "sentry" | "flying" | undefined;
   readonly followHeight?: number | undefined;
   readonly lungeDrop?: number | undefined;
-
   readonly volleyFrames?: readonly number[] | undefined;
+  readonly waveFrame?: number | undefined;
   readonly engage?: number | undefined;
 
   readonly followSpeed: number;

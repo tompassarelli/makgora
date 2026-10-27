@@ -283,6 +283,8 @@ export function effectUses(): EffectUse[] {
     const visit = (special: AuthoredSpecial | undefined, move: string): void => {
       if (special === undefined) return;
       for (const placement of specialPlacements(special)) uses.push(supplemental(fighter, `${move} placed object`, placement.model?.path ?? heroLook(character)?.placedModel?.path ?? "Units\\Orc\\SerpentWard\\SerpentWard.mdx", "placed-object animation/lifetime is unmodeled"));
+      const summoned = special.commandGrab?.curse?.summon.model?.path;
+      if (summoned !== undefined) uses.push(supplemental(fighter, `${move} curse summon`, summoned, "placed-object animation/lifetime is unmodeled"));
       visit(special.ex, `${move} EX`);
       for (const followUp of special.followUps ?? []) visit(followUp.special, `${move} follow-up`);
     };
@@ -296,6 +298,7 @@ export function effectUses(): EffectUse[] {
   }
   for (let clip = 0; clip < summonClipCount(SUMMON_BEAR); clip++) uses.push(supplemental(fighterSlug(Character.rifleman), `Bear summon clip ${clip}`, summonClip(SUMMON_BEAR, clip).modelPath, "summonPresentation seeking playback is unmodeled"));
   for (const [move, model] of [["Fel Rush aura", IMPACT_ROLL_MODEL], ["Immolate flames", STOCK_MODELS.immolationTarget], ["stun marker", STOCK_MODELS.manaBurnTarget], ["Wing Ascent trail", IMPACT_DUST_MODEL], ["drain flash", IMPACT_TECH_MODEL], ["silence status", STOCK_MODELS.silenceTarget], ["Eye Blast marks", STOCK_MODELS.greenDragonMissile]] as const) uses.push(supplemental(fighterSlug(Character.demonHunter), move, model, "specialEffects producer playback requires an observed frame trace"));
+  uses.push(supplemental(fighterSlug(Character.pitLord), "Doom curse", STOCK_MODELS.curseTarget, "specialEffects producer playback requires an observed frame trace"));
   for (const [move, model] of [["raised skeleton", "Units\\Undead\\Skeleton\\Skeleton.mdx"], ["raised burst", "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx"], ["Defile boundary", IMPACT_DEFILE_MODEL], ["Defile frost", "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx"]] as const) uses.push(supplemental(fighterSlug(Character.lichKing), move, model, "projectilePresentation supplemental playback is unmodeled"));
   uses.push(supplemental(fighterSlug(Character.lich), "Death and Decay ground", IMPACT_DEFILE_MODEL, "projectilePresentation supplemental playback is unmodeled"));
   for (const model of CANDLE_FLAME_MODELS) for (const [level, levelScale] of CANDLE_FLAME_SCALES.entries()) for (const anchor of ["head", "loose"]) uses.push({ fighter: fighterSlug(Character.kobold), move: `candle ${anchor} level ${level}`, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: anchor === "loose", anchored: anchor === "loose" ? "projectile" : "fighter", anchor, scale: levelScale * characterModelScale(Character.kobold) });

@@ -51,6 +51,9 @@ function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProj
   if (special === undefined) return;
   for (const projectile of special.projectiles ?? []) chainProjectiles(projectile, into);
   for (const placement of specialPlacements(special)) for (const shot of [placement.shot, placement.finalShot, placement.mark]) if (shot !== undefined) into.push(shot);
+  const curse = special.commandGrab?.curse;
+  if (curse !== undefined) chainProjectiles(curse.portal, into);
+  if (curse?.summon.shot !== undefined) into.push(curse.summon.shot);
   if (special.burst !== undefined) {
     chainProjectiles(special.burst.from, into);
     chainProjectiles(special.burst.into, into);

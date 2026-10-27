@@ -42,6 +42,7 @@ interface SpecialSlot {
   readonly wingTrail: effect;
   readonly drainFlash: effect;
   readonly silence: effect;
+  readonly curse: effect;
   readonly frog: effect;
   readonly siphon: lightning;
   siphonShown: boolean;
@@ -68,7 +69,8 @@ const DRAIN_FLASH = 5;
 const FROG = 6;
 export const HEX_FROG_MODEL = "units\\critters\\Frog\\Frog.mdx";
 const SILENCE = 7;
-const EYE_BLAST = 8;
+const CURSE = 8;
+const EYE_BLAST = 9;
 const SLOT_EFFECTS = EYE_BLAST + EYE_BLAST_MARKS;
 /** Warcraft's Drain Mana lightning, the Blood Mage's own Siphon Mana beam. */
 const SIPHON_LIGHTNING = "DRAM";
@@ -98,6 +100,8 @@ export class SpecialEffects {
       const wingTrail = AddSpecialEffect(IMPACT_DUST_MODEL, x, y);
       const drainFlash = AddSpecialEffect(IMPACT_TECH_MODEL, x, y);
       const silence = AddSpecialEffect(STOCK_MODELS.silenceTarget, x, y);
+      const curse = AddSpecialEffect(STOCK_MODELS.curseTarget, x, y);
+      BlzSetSpecialEffectColor(curse, 120, 255, 80);
       const frog = AddSpecialEffect(HEX_FROG_MODEL, x, y);
       const siphon = AddLightningEx(SIPHON_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       SetLightningColor(siphon, 1.0, 1.0, 1.0, 0.0);
@@ -112,7 +116,7 @@ export class SpecialEffects {
       BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
+        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -134,6 +138,7 @@ export class SpecialEffects {
       this.park(slot.wingTrail, index, WING_TRAIL);
       this.park(slot.drainFlash, index, DRAIN_FLASH);
       this.park(slot.silence, index, SILENCE);
+      this.park(slot.curse, index, CURSE);
       this.park(slot.frog, index, FROG);
       this.hideSiphon(slot);
       this.hideLaser(slot);
@@ -204,6 +209,11 @@ export class SpecialEffects {
   }
 
 
+  private showCurse(fighter: Readonly<Fighter>, slot: SpecialSlot, index: number): void {
+    if (!fighter.status.out && fighter.status.cursedBy !== undefined) this.show(slot.curse, index, CURSE, fighter, 0.0, 200.0, f32(0.8));
+    else this.park(slot.curse, index, CURSE);
+  }
+
   private showStun(fighter: Readonly<Fighter>, index: number, manaHand: effect): void {
     if (fighter.status.condition === HeroStatusKind.stun) this.show(manaHand, index, MANA_HAND, fighter, 0.0, 175.0, f32(0.6));
     else this.park(manaHand, index, MANA_HAND);
@@ -234,6 +244,7 @@ export class SpecialEffects {
     const { felFlames, manaHand } = slot;
     if (!fighter.status.out && fighter.status.condition === HeroStatusKind.silence) this.show(slot.silence, index, SILENCE, fighter, 0.0, 150.0, f32(0.7));
     else this.park(slot.silence, index, SILENCE);
+    this.showCurse(fighter, slot, index);
     if (!fighter.status.out && fighter.status.condition === HeroStatusKind.hex) {
       this.show(slot.frog, index, FROG, fighter, 0.0, 0.0, f32(1.6));
       BlzSetSpecialEffectYaw(slot.frog, facingYaw(fighter.facing));

@@ -17,8 +17,17 @@ All special values below are original, provisional Smashcraft tuning.
 provides Rain of Fire, Howl of Terror, Cleaving Attack and Doom. Its suggested
 rain-then-cleave plan is the center of this fighter. Warcraft's damage
 reduction becomes an immediate shove here: the opponent sees what the roar
-did. Cleaving Attack remains his broad weapon strikes. Doom is represented
-by the threatening demonic theme, without an invisible curse or a summon.
+did. Cleaving Attack remains his broad weapon strikes. Doom, his ultimate,
+keeps Warcraft's curse and its Doom Guard: the shield-ignoring grab dooms the
+thrown foe, who burns 1% a second (a fel curse over their head and a Doom mark
+by their percent) until they lose a stock. Dooming them again changes nothing.
+Three seconds after a doomed foe loses a stock, as they respawn, a fel portal
+opens on the main deck nearest where they fell and a Doom Guard steps out to
+fight for him for 8 seconds: 40 durability, a 26-frame wind-up into a heavy
+cleave every 90 frames that throws a short fire wave. It stands 40 frames
+before its first swing, so the returning foe is threatened, never hit while
+respawn-invincible. One Doom Guard at a time. Killing the Pit Lord first lifts
+his curses, cancels a pending Doom Guard and dismisses one already out.
 
 [Valve's original Underlord introduction](https://www.dota2.com/darkrift?l=english)
 provides Firestorm's repeated falling fire and Pit of Malice's control of a

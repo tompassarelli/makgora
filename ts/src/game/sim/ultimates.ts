@@ -1,9 +1,8 @@
 import { f32 } from "wisp/src/sim/f32";
-import { Character, HeroStatusGroup, HeroStatusKind, HitElement, ItemKind } from "./codes";
+import { Character, HitElement, ItemKind } from "./codes";
 import { CHILL } from "./chill";
 import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
-import { FollowUpInput, Relocation, frames, type AuthoredSpecial, type SpecialCompanion, type SpecialPlacement, type SpecialProjectile } from "./specials/schema";
-import type { AppliedStatus } from "./heroStatus";
+import { FollowUpInput, Relocation, frames, type AuthoredSpecial, type SpecialCompanion, type SpecialCurse, type SpecialPlacement, type SpecialProjectile } from "./specials/schema";
 import type { HitEffect } from "./hitRegions";
 import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";
 import type { NamedMove } from "./heroes/hero";
@@ -182,11 +181,16 @@ const SHADOW_HUNTER: AuthoredSpecial = {
   },
 };
 
-const DOOM: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 15, damage: 1.0 } };
+const DOOM_GUARD_WAVE: SpecialProjectile = shot(0, 70.0, 20.0, 8.0, 0.0, 30, 34.0, hit(6.0, 60, 60.0, 40.0, HitElement.fire), "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx");
+const DOOM_GUARD: SpecialCompanion = { followSpeed: 2.0, followBehind: 80.0, returnSpeed: 3.0, engage: 150.0, lungeStartup: 26, lungeActive: 6, lungeRecovery: 58, lungeTravel: 30.0, waveFrame: 32, bite: capsule(20.0, 30.0, 160.0, 90.0, 60.0), biteEffect: hit(14.0, 40, 85.0, 50.0, HitElement.slash), stunFrames: 40, leash: 4000.0, leashFrames: 600, };
+const DOOM: SpecialCurse = {
+  every: 60, damage: 1.0, summonDelay: 180, portal: { ...mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 0, 77, 0.0), ...ON_FLOOR },
+  summon: { frame: 0, offsetX: 0.0, radius: 50.0, height: 220.0, durability: 40.0, life: 480, fireAges: [], shot: DOOM_GUARD_WAVE, companion: DOOM_GUARD, model: { path: "Units\\Demon\\DoomGuard\\DoomGuard.mdl", height: 260.0, alpha: 255 }, },
+};
 const PIT_LORD: AuthoredSpecial = {
   name: "Doom", endFrame: 60,
   projectiles: [mark("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", 1, 18, 60.0, 80.0)],
-  commandGrab: { ...frames(19, 22), strike: capsule(30.0, 60.0, 130.0, 60.0, 40.0), holdFrames: 30, effect: hit(10.0, 45, 85.0, 45.0, HitElement.fire), recovery: 30, status: DOOM },
+  commandGrab: { ...frames(19, 22), strike: capsule(30.0, 60.0, 130.0, 60.0, 40.0), holdFrames: 30, effect: hit(10.0, 45, 85.0, 45.0, HitElement.fire), recovery: 30, curse: DOOM },
 };
 
 const BEASTMASTER: AuthoredSpecial = {
@@ -428,7 +432,6 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.kobold]: KOBOLD,
 };
 
-
 const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined } = {
   [Character.rifleman]: "Kneel and aim: a red line shows the shot, then one bullet crosses the stage. Jump or shield it.",
   [Character.demonHunter]: "Fel fire burns around him as he becomes a demon: a burst launches nearby foes, then he moves faster for 8 seconds.",
@@ -439,7 +442,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.forsakenPaladin]: "A golden circle marks where the Light's judgment will fall, then blesses the ground twice. Leave the circle.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead, then fights at your side. Break it or keep away from its flames.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
-  [Character.pitLord]: "A clawed grab that ignores shields brands the victim with Doom, burning on after the throw. Jump or roll away.",
+  [Character.pitLord]: "A clawed grab that ignores shields dooms the victim: they burn 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal where they fell and fights for him. Jump or roll from the grab; kill him first to lift the curse; break the Doom Guard or outlast it.",
   [Character.beastmaster]: "His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low.",
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
@@ -464,7 +467,6 @@ export function ultimateText(character: number): NamedMove | undefined {
   const description = ULTIMATE_DESCRIPTIONS[character];
   return move?.name === undefined || description === undefined ? undefined : { name: move.name, description };
 }
-
 
 /** Where a computer fighter presses its ultimate: the target's distance ahead, near to far; far 0 never (a counter or a high sweep it cannot aim). */
 export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: number; readonly far: number } | undefined } = {

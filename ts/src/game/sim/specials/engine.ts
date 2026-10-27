@@ -764,7 +764,7 @@ function placeOnMark(f: Fighter, spec: Readonly<SpecialPlacement>, mark: Readonl
   placed.mode = CompanionMode.stunned;
 }
 
-function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number, offsetX: number, deckStage: number | undefined): void {
+export function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number, offsetX: number, deckStage: number | undefined): void {
   if (spec.keepExisting === true && placedObject(f, slot).life > 0) return;
   const placed = mutablePlacedObject(f, slot);
   const facing = f.facing < 0 ? -1 : 1;

@@ -15,6 +15,7 @@ import { carryOnMovingDecks } from "../sim/movingDecks";
 import { observedActions, resetObservedActions } from "../sim/observations";
 import { updateProjectiles } from "../sim/projectiles";
 import { advancePlacedObjects } from "../sim/placedObjects";
+import { advanceCurses } from "../sim/curses";
 import { advanceCandleBodies, settleCandles } from "../fighters/kobold/candle";
 import { strikeCandles } from "../fighters/kobold/candleStrikes";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
@@ -171,6 +172,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   const mask = world.mask;
   if (scope !== undefined) setRosterMask(world, 1 << scope.slot);
   carryOnMovingDecks(world, stage, stageFrame);
+  advanceCurses(world, stage, stageFrame);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);

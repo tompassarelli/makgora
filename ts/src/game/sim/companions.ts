@@ -53,6 +53,13 @@ function biteOpponents(world: Roster, ownerSlot: number, placed: PlacedObject, p
 }
 
 
+function throwWave(owner: Fighter, placed: Readonly<PlacedObject>, partner: Readonly<SpecialCompanion>): void {
+  const shot = placed.spec?.shot;
+  if (placed.mode !== CompanionMode.lunge || placed.modeFrame !== partner.waveFrame || shot === undefined) return;
+  spawnHeroProjectileAt(owner, shot, f32(placed.x + f32(placed.direction * shot.offsetX)), f32(placed.z + shot.offsetZ), placed.direction, false, owner.attack.serial + 1);
+}
+
+
 export function advanceCompanion(world: Roster, ownerSlot: number, stage: number, matchFrame: number): void {
   const owner = fighterAt(world, ownerSlot);
   for (let animal = 0; animal <= owner.pack.length; animal++) {
@@ -97,6 +104,7 @@ function advanceAnimal(world: Roster, ownerSlot: number, stage: number, matchFra
       placed.mode = CompanionMode.follow;
       placed.modeFrame = 0;
     }
+    throwWave(owner, placed, partner);
   } else if (placed.mode === CompanionMode.stunned) {
     if (placed.modeFrame >= partner.stunFrames) {
       placed.mode = CompanionMode.follow;

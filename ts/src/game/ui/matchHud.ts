@@ -6,7 +6,7 @@ import { Character } from "../sim/codes";
 import { fighterName } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
-  PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
+  DOOM_MARK_TEXTURE, PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
   panelLayout, percentOutlineText, percentText, plateLeft, stepJolt,
 } from "./plateLayout";
 import { attachOutline, createOutline, createTemplateOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
@@ -65,6 +65,8 @@ export class FighterHud {
   private readonly stocks: readonly framehandle[];
 
   private readonly stockCount: framehandle;
+  private readonly doomMark: framehandle;
+  private shownCursed: boolean | undefined;
 
   private readonly body: readonly framehandle[];
   private shownCharacter: number | undefined;
@@ -118,8 +120,11 @@ export class FighterHud {
     this.stockCount = createText(`FighterHUDStockCount${suffix}`, parent, context + 6 + STOCK_ICONS_SHOWN);
     BlzFrameSetFont(this.stockCount, MENU_FONT, f32(0.011), 1);
     BlzFrameSetEnable(this.stockCount, false);
+    this.doomMark = createBackdrop(`FighterHUDDoom${suffix}`, parent, context + 8 + STOCK_ICONS_SHOWN);
+    BlzFrameSetTexture(this.doomMark, DOOM_MARK_TEXTURE, 0, true);
+    BlzFrameSetEnable(this.doomMark, false);
     this.body = [this.plate, this.portrait, this.damage, this.percent, this.name, this.slotLabel];
-    for (const frame of [...this.body, ...this.stocks, this.stockCount]) BlzFrameSetLevel(frame, 21);
+    for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark]) BlzFrameSetLevel(frame, 21);
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     this.layout(slot, count);
@@ -132,6 +137,7 @@ export class FighterHud {
     destroyOutline(this.percentOutline);
     for (const icon of this.stocks) BlzDestroyFrame(icon);
     BlzDestroyFrame(this.stockCount);
+    BlzDestroyFrame(this.doomMark);
   }
 
 
@@ -147,6 +153,7 @@ export class FighterHud {
     placeBox(this.damage, left, panel.damage);
     BlzFrameSetTextAlignment(this.damage, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     placeBox(this.percent, left, panel.percent);
+    placeBox(this.doomMark, left, panel.doom);
     placeBox(this.name, left, panel.name);
     BlzFrameSetTextAlignment(this.name, TEXT_JUSTIFY_MIDDLE, inner);
     placeBox(this.slotLabel, left, panel.slot);
@@ -161,7 +168,7 @@ export class FighterHud {
   }
 
 
-  update(visible: boolean, character: Character, color: number, damage: number, stocks: number): void {
+  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);
@@ -180,6 +187,7 @@ export class FighterHud {
     if (stepJolt(this.jolt, visible, damage)) this.placeNumber(unitsForPixels(this.jolt.dx), unitsForPixels(this.jolt.dy));
     this.showDamage(damage);
     this.showStocks(visible ? stocks : 0);
+    this.showCursed(visible && cursed);
   }
 
 
@@ -198,6 +206,12 @@ export class FighterHud {
       BlzFrameSetText(this.percent, shownPercent);
       setOutlineText(this.percentOutline, percentOutlineText(damage));
     }
+  }
+
+  private showCursed(cursed: boolean): void {
+    if (this.shownCursed === cursed) return;
+    this.shownCursed = cursed;
+    BlzFrameSetVisible(this.doomMark, cursed);
   }
 
   private showStocks(shownStocks: number): void {

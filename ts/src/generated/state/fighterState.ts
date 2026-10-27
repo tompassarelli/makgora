@@ -436,6 +436,10 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.armorMaxDamage = sourceStatus.armorMaxDamage;
   status.armorChills = sourceStatus.armorChills;
   status.divineFrames = sourceStatus.divineFrames;
+  status.cursedBy = sourceStatus.cursedBy;
+  status.curseFrames = sourceStatus.curseFrames;
+  status.summonFrames = sourceStatus.summonFrames;
+  status.summonX = sourceStatus.summonX;
   status.buff = sourceStatus.buff;
   status.buffFrames = sourceStatus.buffFrames;
   status.condition = sourceStatus.condition;
@@ -957,6 +961,10 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.soakFrames, b = sourceStatus.soakFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.soakLevel, b = sourceStatus.soakLevel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.divineFrames, b = sourceStatus.divineFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.cursedBy, b = sourceStatus.cursedBy; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.curseFrames, b = sourceStatus.curseFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.summonFrames, b = sourceStatus.summonFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.summonX, b = sourceStatus.summonX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buff, b = sourceStatus.buff; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buffFrames, b = sourceStatus.buffFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const mana = target.mana;
@@ -1489,6 +1497,10 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     sink.int(prefix, "specialEgg", special.egg ? 1 : 0);
     if (status.divineFrames !== 0) sink.int(prefix, "divineFrames", status.divineFrames);
   }
+  if (status.cursedBy !== undefined) sink.int(prefix, "cursedBy", status.cursedBy ?? -1);
+  if (status.curseFrames !== 0) sink.int(prefix, "curseFrames", status.curseFrames);
+  if (status.summonFrames !== 0) sink.int(prefix, "summonFrames", status.summonFrames);
+  if (status.summonX !== 0 || 1 / status.summonX < 0) sink.real(prefix, "summonX", status.summonX);
   if (status.buff !== 0 || status.buffFrames !== 0) {
     sink.int(prefix, "buff", status.buff);
     sink.int(prefix, "buffFrames", status.buffFrames);
@@ -1592,6 +1604,10 @@ export function blastFighterFields(f: Fighter): void {
   recovery.velocityApplied = false;
   recovery.wallJumpQueued = false;
   recovery.wallJumpRepeat = 0;
+  status.cursedBy = undefined;
+  status.curseFrames = 0;
+  status.summonFrames = 0;
+  status.summonX = 0.0;
   status.buff = ItemKind.none;
   status.buffFrames = 0;
 }
@@ -1779,6 +1795,8 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.armorFrames = 0;
   status.armorChills = false;
   status.divineFrames = 0;
+  status.cursedBy = undefined;
+  status.curseFrames = 0;
   status.buff = ItemKind.none;
   status.buffFrames = 0;
   status.condition = HeroStatusKind.none;
