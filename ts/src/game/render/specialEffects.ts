@@ -4,7 +4,7 @@
 
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL } from "../assets/impactAssetInfo";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { type ImpactPresentationCursor, consumeImpactFrame, createImpactPresentationCursor, resetImpactPresentationCursor } from "../presentation/impactEvents";
+import { type ImpactPresentationCursor, consumeImpactFrame, createImpactPresentationCursor, resetImpactPresentationCursor } from "../presentation/impactCursor";
 import {
   STATIC_AURA,
   STATIC_DRAIN_FLASH,

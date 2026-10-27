@@ -30,6 +30,13 @@ export interface HeroLook {
   readonly orbit?: OrbitLook | undefined;
 
   readonly flight?: FlightLook | undefined;
+
+  readonly carry?: CarryLook | undefined;
+}
+
+export interface CarryLook {
+  readonly stand: string;
+  readonly walk: string;
 }
 
 export interface OrbitLook {

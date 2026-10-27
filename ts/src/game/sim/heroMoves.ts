@@ -93,10 +93,19 @@ export interface AuthoredThrow {
 }
 
 
+export interface CargoCarry {
+  readonly hoistFrames: number;
+  readonly walkScale: number;
+  readonly shoulderX: number;
+  readonly shoulderZ: number;
+}
+
+
 export interface FighterMoves {
   readonly normals: { readonly [style: number]: AuthoredMove | undefined };
 
   readonly throws: { readonly [action: number]: AuthoredThrow | undefined };
+  readonly carry?: CargoCarry | undefined;
   readonly dashAttack: AttackStyle;
   readonly grabRegion?: Readonly<HitRegion> | undefined;
 

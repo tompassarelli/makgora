@@ -33,7 +33,7 @@ function catchTarget(world: Roster, attackerSlot: number, targetSlot: number): v
   target.grab.owner = attackerSlot;
   target.visuals.grab++;
   cancelAttack(attacker);
-  beginGrabAction(attacker, GrabAction.hold);
+  beginGrabAction(attacker, attacker.tuning.moves?.carry === undefined ? GrabAction.hold : GrabAction.hoist);
   clearDash(attacker);
   stopMotion(attacker);
   target.launch.diPending = false;

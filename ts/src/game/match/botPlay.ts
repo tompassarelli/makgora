@@ -62,8 +62,13 @@ function planFor(f: Readonly<Fighter>, slot: number, frame: number): Plan {
 
 /** Holding a grab: the gameplan's throw, or each hold frame pummels, throws one of four ways, or waits. */
 function followUpGrab(f: Readonly<Fighter>, held: Readonly<Fighter>, gameplan: FighterGameplan | undefined, frame: number, input: Controls): void {
-  if (f.grab.action !== GrabAction.hold) return;
   const planned = gameplan === undefined ? undefined : gameplanThrow(gameplan, held, f.grab.serial, botChoice);
+  if (f.grab.action === GrabAction.carry) {
+    input.attackPressed = true;
+    input.direction = planned === GameplanThrow.back ? -f.facing : 0;
+    return;
+  }
+  if (f.grab.action !== GrabAction.hold) return;
   if (planned !== undefined) {
     if (planned === GameplanThrow.forward || planned === GameplanThrow.back) input.grabThrowX = planned === GameplanThrow.forward ? f.facing : -f.facing;
     else input.grabThrowZ = planned === GameplanThrow.up ? 1 : -1;
@@ -362,7 +367,10 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     return;
   }
   if (fighter.grab.target !== undefined) {
-    if (skill.basicMoves !== undefined) input.grabThrowX = fighter.facing;
+    if (skill.basicMoves !== undefined) {
+      input.grabThrowX = fighter.facing;
+      input.attackPressed = fighter.grab.action === GrabAction.carry;
+    }
     else if (target !== undefined) followUpGrab(fighter, target, gameplan, frame, input);
     return;
   }

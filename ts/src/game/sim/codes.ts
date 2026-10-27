@@ -53,6 +53,8 @@ export const GrabAction = {
   throwUp: 5,
   throwDown: 6,
   escape: 7,
+  hoist: 8,
+  carry: 9,
 } as const;
 export type GrabAction = (typeof GrabAction)[keyof typeof GrabAction];
 

@@ -13,6 +13,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Controls, type Roster, controlsAt, fighterAt, isActive } from "./roster";
 import { beginGrabAction, clearGrabLinks } from "./transitions";
+import { cargoCarry, carriedOffset, requestedCarryThrow } from "./cargoCarry";
 
 const PUMMEL_HIT = { damage: PUMMEL_DAMAGE, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
@@ -119,22 +120,33 @@ function resolveHeldTarget(world: Roster, ownerSlot: number): void {
     clearGrabLinks(world, ownerSlot);
     return;
   }
-  owner.motion.vx = 0.0;
-  owner.motion.vz = 0.0;
-  owner.launch.knockbackX = 0.0;
-  owner.launch.groundKnockbackX = 0.0;
-  owner.launch.knockbackZ = 0.0;
-  const held = target.motion;
-  held.x = f32(owner.motion.x + f32(owner.facing * GRAB_HOLD_DISTANCE));
-  held.z = owner.motion.z;
   const { action, frame } = owner.grab;
-  if (action >= GrabAction.throwForward && action <= GrabAction.throwDown) {
-    const offset = heldOffset(action, frame, grabContactFrame(action, owner.tuning.moves), owner.facing);
-    if (action === GrabAction.throwBack) held.x = f32(owner.motion.x + offset.x);
-    if (action !== GrabAction.throwForward) held.z = f32(held.z + offset.z);
+  const carry = cargoCarry(owner);
+  if (action !== GrabAction.carry) {
+    owner.motion.vx = 0.0;
+    owner.motion.vz = 0.0;
+    owner.launch.knockbackX = 0.0;
+    owner.launch.groundKnockbackX = 0.0;
+    owner.launch.knockbackZ = 0.0;
   }
-  held.surface = owner.motion.surface;
-  held.grounded = owner.motion.grounded;
+  const held = target.motion;
+  if (carry !== undefined) {
+    const offset = carriedOffset(carry, action, frame, grabContactFrame(action, owner.tuning.moves), carry.hoistFrames, owner.facing);
+    held.x = f32(owner.motion.x + offset.x);
+    held.z = f32(owner.motion.z + offset.z);
+    held.surface = undefined;
+    held.grounded = false;
+  } else {
+    held.x = f32(owner.motion.x + f32(owner.facing * GRAB_HOLD_DISTANCE));
+    held.z = owner.motion.z;
+    if (action >= GrabAction.throwForward && action <= GrabAction.throwDown) {
+      const offset = heldOffset(action, frame, grabContactFrame(action, owner.tuning.moves), owner.facing);
+      if (action === GrabAction.throwBack) held.x = f32(owner.motion.x + offset.x);
+      if (action !== GrabAction.throwForward) held.z = f32(held.z + offset.z);
+    }
+    held.surface = owner.motion.surface;
+    held.grounded = owner.motion.grounded;
+  }
   target.facing = -owner.facing;
   held.vx = 0.0;
   held.vz = 0.0;
@@ -155,7 +167,7 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
   const { grab } = owner;
   if (grab.action === GrabAction.none || paused) return;
   const targetSlot = grab.target;
-  if (targetSlot !== undefined && (grab.action === GrabAction.hold || grab.action === GrabAction.pummel)) {
+  if (targetSlot !== undefined && (grab.action === GrabAction.hold || grab.action === GrabAction.pummel || grab.action === GrabAction.hoist || grab.action === GrabAction.carry)) {
     const held = fighterAt(world, targetSlot).grab;
     held.grabbedFrames = advanceMash(held, targetInput, held.grabbedFrames, GRAB_HOLD_MINIMUM_FRAMES);
     if (held.grabbedFrames === 0) {
@@ -163,8 +175,20 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
       return;
     }
   }
-  const throwAction = requestedThrow(owner, ownerInput);
-  if (grab.action === GrabAction.hold) {
+  const carry = cargoCarry(owner);
+  const throwAction = carry === undefined ? requestedThrow(owner, ownerInput) : grab.action === GrabAction.carry ? requestedCarryThrow(owner, ownerInput) : GrabAction.none;
+  if (carry !== undefined && grab.action === GrabAction.hoist) {
+    if (targetSlot === undefined) {
+      grab.action = GrabAction.none;
+      grab.frame = 0;
+    } else if (grab.frame >= carry.hoistFrames) {
+      grab.action = GrabAction.carry;
+      grab.frame = 0;
+    } else grab.frame++;
+  } else if (grab.action === GrabAction.carry) {
+    if (targetSlot === undefined) grab.action = GrabAction.none;
+    else if (throwAction !== GrabAction.none) beginGrabAction(owner, throwAction);
+  } else if (grab.action === GrabAction.hold) {
     if (throwAction !== GrabAction.none) beginGrabAction(owner, throwAction);
     else if (ownerInput.attackPressed) {
       grab.pummels++;

@@ -6,7 +6,7 @@ import { elementLook } from "./elementLooks";
 import { SoundTier, SWING_SOUND, TIER_HIT_VOLUME, TIER_SWING_PITCH, TIER_SWING_VOLUME, tierHitPath } from "./moveTiers";
 import { at } from "wisp/src/runtime/lookup";
 import { type ImpactEvents, ImpactLanding, JumpCue } from "./impactEvents";
-import { moveSoundLabels, playFuse, playHit, playImpact, playPerform, playShieldHit, soundFiles } from "./moveSounds";
+import { grabVoice, moveSoundLabels, playFuse, playHit, playImpact, playPerform, playShieldHit, soundFiles } from "./moveSounds";
 import { VoiceClass } from "./voiceBudget";
 import { Character } from "../sim/codes";
 import { JOB_DONE_VOICE } from "./matchAudio";
@@ -143,6 +143,8 @@ export function presentImpactSounds(events: Readonly<ImpactEvents>, sink: Impact
   if (events.shieldBreak) sink("ThunderClap", x, z, 100, 1.0, false, VoiceClass.hit);
   if (events.grab) sink("EntanglingRoots", x, z, 70, 1.0, false, VoiceClass.special);
   if (events.jobDone) sink(JOB_DONE_VOICE, x, z, 110, 1.0, true, VoiceClass.special);
+  const caughtVoice = events.caught ? grabVoice(events.character) : undefined;
+  if (caughtVoice !== undefined) sink(caughtVoice, x, z, 110, 1.0, true, VoiceClass.special);
   if (events.landing === ImpactLanding.tech || events.surface === SurfaceContact.techWall || events.surface === SurfaceContact.techCeiling) sink("DispelMagic", x, z, 120, 1.0, false, VoiceClass.movement);
   else if (events.landing === ImpactLanding.missedTech || events.surfaceMissedTech) sink("Warstomp", x, z, 90, 1.0, false, VoiceClass.movement);
   else if (events.ordinaryLanding) sink("DeepFootstep", x, z, 65, 0.75, false, VoiceClass.movement);

@@ -9,4 +9,5 @@ export const peonLook: HeroLook = {
   clips: PEON_CLIPS,
   damageClips: PEON_PAIN_CLIPS,
   fallback: PEON_FALLBACK_CLIP, defeat: "death",
+  carry: { stand: "stand lumber", walk: "walk lumber" },
 };

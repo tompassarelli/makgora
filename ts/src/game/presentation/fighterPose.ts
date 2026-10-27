@@ -389,9 +389,12 @@ function selectGrabClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly
   const owner = ownerSlot === undefined ? f : fighterAt(world, ownerSlot);
   const { action, serial } = owner.grab;
   const illidanEscape = f.character === Character.demonHunter && action === GrabAction.escape;
-  const key = `grab${action}:${serial}${victim ? ":victim" : ":holder"}`;
+  const carryLook = !victim && action === GrabAction.carry ? heroLook(f.character)?.carry : undefined;
+  const carryWalking = carryLook !== undefined && f.motion.vx !== 0.0;
+  const key = `grab${action}:${serial}${victim ? ":victim" : carryWalking ? ":carryWalk" : ":holder"}`;
   if (pose.animation !== key) {
     if (illidanEscape) selectFighterClipIndex(pose, dh.DEMON_HUNTER_GRAB_ESCAPE_INDEX);
+    else if (carryLook !== undefined) selectFighterClipName(pose, carryWalking ? carryLook.walk : carryLook.stand);
     else if (action === GrabAction.escape) {
 
       const stance = clips.characterClips(f.character).idle;
@@ -401,6 +404,7 @@ function selectGrabClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly
     pose.animation = key;
   }
   if (illidanEscape) return clipRate(dh.DEMON_HUNTER_GRAB_ESCAPE_SECONDS, grabActionDuration(action, f.tuning.moves));
+  if (carryLook !== undefined) return 1.0;
   const poses = clips.grabActionPoses(action);
   if (poses === undefined) {
     if (victim && f.character === Character.forsakenPaladin && (action === GrabAction.hold || action === GrabAction.none)) {

@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
-import { Character, DownState, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
+import { Character, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
 import { attackStartup, isFloorTeching, isGroundDodging, isTumbling } from "../sim/conditions";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { HitElement } from "../sim/hitRegions";
@@ -73,6 +73,8 @@ export interface ImpactEvents {
   ready: boolean;
   previousBuiltSerial: number;
   jobDone: boolean;
+  previousGrabSerial: number;
+  caught: boolean;
   ledgeCatch: boolean;
   ledgeRecovery: boolean;
 
@@ -146,7 +148,7 @@ export function createImpactEvents(): ImpactEvents {
     previousX: 0.0, previousZ: 0.0, previousVelocityX: 0.0, previousDownFrame: 0,
     previousGrabVisualSerial: 0, previousThrowVisualSerial: 0, previouslyCharging: false,
     previousChargeFrames: 0, previousLedgeSerial: 0, previousLedgeState: LedgeState.none,
-    previousLedgeSide: 0, previousAttackSerial: 0, previousAttackFrame: 0, previousSpecialAction: SpecialAction.none, previousSpecialFrame: 0, previousSpecialForm: 0, grab: false, throwRelease: false, charge: false, ready: false, previousBuiltSerial: -1, jobDone: false,
+    previousLedgeSide: 0, previousAttackSerial: 0, previousAttackFrame: 0, previousSpecialAction: SpecialAction.none, previousSpecialFrame: 0, previousSpecialForm: 0, grab: false, throwRelease: false, charge: false, ready: false, previousBuiltSerial: -1, jobDone: false, previousGrabSerial: 0, caught: false,
     ledgeCatch: false, ledgeRecovery: false, ledgeX: 0.0, ledgeZ: 0.0, hit: false, electric: false,
     element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, fuse: -1, fuseSerial: 0, fuseX: 0.0, fuseZ: 0.0, previousFuseSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
@@ -191,11 +193,13 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.previousSpecialFrame = fighter.special.frame;
   events.previousSpecialForm = fighter.special.form;
   events.previousBuiltSerial = lastBuiltSerial(fighter);
+  events.previousGrabSerial = fighter.grab.serial;
   events.grab = false;
   events.throwRelease = false;
   events.charge = false;
   events.ready = false;
   events.jobDone = false;
+  events.caught = false;
   events.ledgeCatch = false;
   events.ledgeRecovery = false;
   events.hit = false;
@@ -353,6 +357,8 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.ready = attack.smashCharging && events.previousChargeFrames < SMASH_MAX_CHARGE_FRAMES && attack.smashChargeFrames === SMASH_MAX_CHARGE_FRAMES;
     const built = lastBuiltSerial(fighter);
     events.jobDone = built >= 0 && built !== events.previousBuiltSerial;
+    events.caught = fighter.grab.target !== undefined && fighter.grab.serial !== events.previousGrabSerial
+      && (fighter.grab.action === GrabAction.hold || fighter.grab.action === GrabAction.hoist);
     events.ledgeCatch = ledge.serial !== events.previousLedgeSerial;
     events.ledgeRecovery = events.previousLedgeState === LedgeState.hang
       && (ledge.state === LedgeState.climb || ledge.state === LedgeState.roll || ledge.state === LedgeState.attack || jump.serial !== events.previousJumpSerial);
@@ -472,26 +478,4 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.direction = dodge.groundDirection;
     events.dodge = events.direction === 0 ? DodgeCue.spot : DodgeCue.roll;
   }
-}
-
-
-
-
-
-export interface ImpactPresentationCursor {
-  lastFrame: number | undefined;
-}
-
-export function createImpactPresentationCursor(): ImpactPresentationCursor {
-  return { lastFrame: undefined };
-}
-
-export function resetImpactPresentationCursor(cursor: ImpactPresentationCursor): void {
-  cursor.lastFrame = undefined;
-}
-
-export function consumeImpactFrame(cursor: ImpactPresentationCursor, frame: number): boolean {
-  if (cursor.lastFrame !== undefined && frame <= cursor.lastFrame) return false;
-  cursor.lastFrame = frame;
-  return true;
 }

@@ -52,6 +52,7 @@ interface FighterSound {
   readonly specials: readonly [SpecialSound, SpecialSound, SpecialSound, SpecialSound];
   readonly ultimate?: SpecialSound | undefined;
   readonly normals?: { readonly [style: number]: { readonly perform?: string; readonly hit?: string } | undefined } | undefined;
+  readonly grabVoice?: string | undefined;
 }
 
 const s = (perform: string | undefined, hit: string, performVolume?: number): SpecialSound => ({ perform, hit, performVolume });
@@ -130,6 +131,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   [Character.peon]: {
     weapon: Weapon.axe, strong: "AxeMediumChopWood",
     specials: [s("AxeMissileLaunch", "AxeMediumChopWood"), s("AxeMediumChopWood", "WyvernSpearMissile"), s("CatapultAttack1", "WoodMediumBashFlesh"), s("CreepSleep", "WoodHeavyBashFlesh")],
+    grabVoice: "Units\\Orc\\Peon\\PeonYes3.flac",
   },
   [Character.tinker]: {
     weapon: Weapon.hammer, strong: "ClusterRocketsImpact",
@@ -334,10 +336,16 @@ export function playShieldHit(character: Character, move: number, serial: number
   if (row !== undefined) playLayers(row.shield, serial, sink);
 }
 
+export function grabVoice(character: Character): string | undefined {
+  return FIGHTER_SOUNDS[character]?.grabVoice;
+}
+
 export function moveSoundLabels(characters: readonly Character[]): string[] {
   const labels: string[] = [];
   const add = (sound: string) => { if (!labels.includes(sound)) labels.push(sound); };
   for (const character of characters) {
+    const voice = grabVoice(character);
+    if (voice !== undefined) add(voice);
     for (let style = 0; style <= AttackStyle.jab3; style++) {
       const row = moveSound(character, style);
       if (row === undefined) continue;

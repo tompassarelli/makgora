@@ -67,6 +67,7 @@ import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies, travelBeforeLedge } from "./travelStop";
 import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
+import { advanceCarryWalk, isCarrying } from "./cargoCarry";
 import { moveTravelStep } from "./heroMoves";
 import {
   SHIELD_MIN_HOLD_FRAMES,
@@ -498,6 +499,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (status.out) return;
   if (wallTechStartup || inGrabContext(f)) {
     if (launch.hitlag <= 0) status.invincible = max(0, status.invincible - 1);
+    if (launch.hitlag <= 0 && isCarrying(f)) advanceCarryWalk(f, input, stage, matchFrame);
     checkBlastZone(world, slot, stage);
     return;
   }
