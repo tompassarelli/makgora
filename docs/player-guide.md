@@ -89,7 +89,7 @@ rebind. Reset to layout brings back the defaults of the layout you picked.
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
-bring back your saved ones. Y (Start, and Strong by default in a match) and Backspace (Pause) are reserved for rebinding; F6 and F7
+bring back your saved ones. Y binds to any action and stays Start on fighter and stage select; Backspace (Pause) is reserved for rebinding; F6 and F7
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
 is refused and the screen names what it is reserved for. Ctrl+T starts a developer input trace.
 

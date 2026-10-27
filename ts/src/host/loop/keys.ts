@@ -135,7 +135,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     return;
   }
   if ((key === Key.y || key === Key.escape) && cancelRematchCountdown(s.game, slot)) return;
-  if (key === Key.y && (startKey || s.game.phase !== Phase.match)) {
+  if (key === Key.y && (startKey || (s.game.phase !== Phase.match && bindings.capture === undefined))) {
     if (startKey && s.game.phase !== Phase.match) startDown(s, slot);
     return;
   }

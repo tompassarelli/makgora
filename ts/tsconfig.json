@@ -42,6 +42,7 @@
     "codegen/**/*.ts",
     "plugins/**/*.ts",
     "test/fighter-marker.test.ts",
+    "test/y-capture.test.ts",
     "test/y-strong.test.ts",
     "test/dash-feet.test.ts",
     "test/menu-journey.test.ts",

@@ -40,6 +40,8 @@ const SEMICOLON = 186;
 const COMMA = 188;
 const PERIOD = 190;
 const SLASH = 191;
+const OPEN_BRACKET = 219;
+const CLOSE_BRACKET = 221;
 
 const code = (character: string) => character.charCodeAt(0);
 
@@ -47,7 +49,7 @@ const START_KEY = code("Y");
 
 
 
-const RESERVED_KEYS: readonly number[] = [8, 13, 27, 89, 112, 116, 117, 118];
+const RESERVED_KEYS: readonly number[] = [8, 13, 27, 112, 116, 117, 118];
 
 const RESERVED_REASONS: Readonly<Record<number, string>> = {
   8: "Backspace is reserved for Pause",
@@ -169,7 +171,7 @@ export function pauseMenuKeys(bindings: Readonly<KeyBindings>): number[] {
 
 function bindSlot(keys: number[], index: number, key: number): boolean {
   if (key !== EMPTY) {
-    if (key < 1 || key > 255 || (RESERVED_KEYS.includes(key) && key !== START_KEY)) return false;
+    if (key < 1 || key > 255 || RESERVED_KEYS.includes(key)) return false;
     if (keys.some((bound, other) => other !== index && bound === key)) return false;
   }
   keys[index] = key;
@@ -217,7 +219,6 @@ const CURRENT_SAVE = "KB";
 const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, K9: KEY_SLOT_COUNT, KA: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
-const SKIPPED_ON_LOAD = code("Y");
 
 export const SAVED_BINDING_FORMAT = { version: CURRENT_SAVE, slots: SAVED_SLOTS, keyDigits: SAVED_KEY_DIGITS, empty: EMPTY, skippedOnLoad: START_KEY, reservedKeys: RESERVED_KEYS } as const;
 
@@ -367,6 +368,8 @@ export function keyLabel(key: number | undefined): string {
   if (key === SEMICOLON) return ";";
   if (key === COMMA) return ",";
   if (key === PERIOD) return ".";
+  if (key === OPEN_BRACKET) return "[";
+  if (key === CLOSE_BRACKET) return "]";
   if ((key >= code("A") && key <= code("Z")) || (key >= code("0") && key <= code("9"))) return String.fromCharCode(key);
   return `KEY ${key}`;
 }
