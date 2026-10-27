@@ -4,8 +4,7 @@ import { Action } from "../input/actions";
 import { fighter, frame, scene } from "../match/padScene";
 import { Character, ContactKind, ProjectileKind, SpecialAction } from "./codes";
 import { beginDamageContacts, collectDamageContact, finishDamageContacts } from "./contacts";
-import { EMPTY_LANDING_LAG } from "./down";
-import { EYE_BEAM_AIR_FRAMES, EYE_BEAM_AIR_SHOT, EYE_BEAM_DAMAGE, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT } from "./eyeBeam";
+import { EYE_BEAM_AIR_FRAMES, EYE_BEAM_AIR_SHOT, EYE_BEAM_DAMAGE, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { type Fighter, createFighter } from "./fighter";
 import { KNOCKBACK_LAUNCH_SPEED, TUMBLE_KNOCKBACK } from "./knockback";
 import { ROSTER_MANA } from "./mana";
@@ -87,12 +86,12 @@ function shortHopEyeBeam(target: Character, facing: number, fastFall: boolean): 
   return { hit: foe.status.damage > 0.0, landingLag: landing?.landingLag ?? -1, specialOnLanding: landing?.specialOnLanding ?? user.special.action };
 }
 
-test("A short-hop Eye Beam pressed on the takeoff frame hits a standing Shadow Hunter, average height, with or without a fast fall, either facing, and lands into 4 frames of lag [k1 scenario]", () => {
+test("A short-hop Eye Beam pressed on the takeoff frame hits a standing Shadow Hunter, average height, with or without a fast fall, either facing, and lands with no lag [k1 scenario]", () => {
   for (const [facing, fastFall] of [[1, true], [-1, true], [1, false], [-1, false]] as const) {
     const hop = shortHopEyeBeam(Character.shadowHunter, facing, fastFall);
     assertTrue(hop.hit);
     assertEquals(hop.specialOnLanding, SpecialAction.none);
-    assertEquals(hop.landingLag, EMPTY_LANDING_LAG);
+    assertEquals(hop.landingLag, EYE_BEAM_LANDING_LAG);
   }
 });
 

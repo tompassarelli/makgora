@@ -531,11 +531,6 @@ function summonBear(owner: Fighter, stage: number, matchFrame: number): void {
 }
 
 
-function eyeBeamInFlight(owner: Readonly<Fighter>): boolean {
-  for (const projectile of owner.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.eyeBeam) return true;
-  return false;
-}
-
 function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: number): boolean {
   const { motion, special } = owner;
   if (action === SpecialAction.demonHunterWingAscent) {
@@ -578,11 +573,9 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
 }
 
 function startEyeBeam(owner: Fighter, action: SpecialAction, moveX: number): boolean {
-  if (eyeBeamInFlight(owner)) return false;
   const { grounded } = owner.motion;
   startSpecialAction(owner, action, grounded ? EYE_BEAM_GROUND_FRAMES : EYE_BEAM_AIR_FRAMES, moveX);
   owner.special.form = grounded ? 0 : EYE_BEAM_AIR_FORM;
-  owner.special.cooldowns[action] = 8;
   return true;
 }
 

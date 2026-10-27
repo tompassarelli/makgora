@@ -4,6 +4,7 @@ export const EYE_BEAM_GROUND_SHOT = 23;
 export const EYE_BEAM_GROUND_FRAMES = 57;
 export const EYE_BEAM_AIR_SHOT = 13;
 export const EYE_BEAM_AIR_FRAMES = 42;
+export const EYE_BEAM_LANDING_LAG = 0;
 export const EYE_BEAM_AIR_FORM = 2;
 export const EYE_BEAM_SPEED = 48.0;
 export const EYE_BEAM_LIFETIME = 15;

@@ -3,6 +3,8 @@ import { MURLOC_MOVES } from "../../src/game/fighters/murloc/moves";
 import { WARDEN_MOVES } from "../../src/game/fighters/warden/moves";
 import { WARDEN_SPECIALS } from "../../src/game/fighters/warden/specials";
 import { ILLIDAN_MOVES } from "../../src/game/sim/originalMoves";
+import { EYE_BEAM_AIR_FRAMES, EYE_BEAM_AIR_SHOT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT, EYE_BEAM_LANDING_LAG } from "../../src/game/sim/eyeBeam";
+import type { AuthoredSpecial } from "../../src/game/sim/specials/schema";
 import type { FighterMoves } from "../../src/game/sim/heroMoves";
 import type { HitEffect } from "../../src/game/sim/hitRegions";
 import { type LedgerRow, PARITY, shortNumber } from "./row";
@@ -19,6 +21,16 @@ const SPLIT_TIMING = "active 6-10, interruptible 46, charge between 2-3";
 const SPLIT_ANGLE = "25°";
 const FOX_DOWN_SMASH_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Down_smash";
 const FALCO_DOWN_SMASH_PAGE = "https://www.ssbwiki.com/Falco_(SSBM)/Down_smash";
+const FOX_BLASTER_PAGE = "https://www.ssbwiki.com/Blaster_(Fox)";
+const FALCO_BLASTER_PAGE = "https://www.ssbwiki.com/Blaster_(Falco)";
+const EYE_BEAM_FILE = "ts/src/game/sim/eyeBeam.ts";
+
+function laserTiming(special: AuthoredSpecial | undefined): string {
+  const shot = special?.projectiles?.[0];
+  if (special === undefined || shot === undefined) throw new Error("Maiev's Shadow Strike has no dagger");
+  return `${shot.spawnFrame} of ${special.endFrame}`;
+}
+
 const MURLOC = "ts/src/game/fighters/murloc/moves.ts";
 const FOX_DOWN_TILT = { undocumented: "Fox's down tilt sweeps his tail along the floor, and no Melee page gives its reach in units", source: "https://www.ssbwiki.com/Fox_(SSBM)/Down_tilt" } as const;
 const LEG_SWEEP = { kind: "deviation", reason: "her down tilt is a low leg sweep, so its region follows the sweeping leg along the floor in front and keeps the old reach; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 517 } as const;
@@ -73,6 +85,30 @@ function maievDownTiltReach(): number {
 const angle = (effect: HitEffect): string => (effect.sakurai === true ? FOX_NEUTRAL_AIR.angle : `${Math.round((Math.atan2(effect.launchZ, Math.abs(effect.launchX)) * 180) / Math.PI)}°`);
 
 export const MOVE_ROWS: readonly LedgerRow[] = [
+  {
+    id: "maiev-shadow-strike-timing", family: "moves", name: "Maiev's Shadow Strike startup and total frames",
+    melee: { value: "ground 10 of 36, air 10 of 36", source: FOX_BLASTER_PAGE },
+    ours: () => `ground ${laserTiming(WARDEN_SPECIALS.neutral.ground)}, air ${laserTiming(WARDEN_SPECIALS.neutral.air)}`,
+    anchor: { file: WARDEN_SPECIALS_FILE, symbol: "WARDEN_SPECIALS" }, status: { kind: "parity", reason: "the dagger leaves on Fox's laser frame and she acts when his laser ends, one after another with nothing in between; the dagger's speed, damage, mark and poison are hers", decided: "2026-10-28" },
+  },
+  {
+    id: "maiev-shadow-strike-landing", family: "moves", name: "Maiev's aerial Shadow Strike landing",
+    melee: { value: "0 frames, landing ends the laser", source: FOX_BLASTER_PAGE },
+    ours: () => `${WARDEN_SPECIALS.neutral.air?.landingLag} frames, landing ends the laser`,
+    anchor: { file: WARDEN_SPECIALS_FILE, symbol: "WARDEN_SPECIALS" }, status: { kind: "parity", reason: "an aerial dagger landing cancels the move at once with no landing lag, as Fox's short-hop laser does", decided: "2026-10-28" },
+  },
+  {
+    id: "illidan-eye-beam-timing", family: "moves", name: "Illidan's Eye Beam startup and total frames",
+    melee: { value: "ground 23 of 57, air 13 of 42", source: FALCO_BLASTER_PAGE },
+    ours: () => `ground ${EYE_BEAM_GROUND_SHOT} of ${EYE_BEAM_GROUND_FRAMES}, air ${EYE_BEAM_AIR_SHOT} of ${EYE_BEAM_AIR_FRAMES}`,
+    anchor: { file: EYE_BEAM_FILE, symbol: "EYE_BEAM_GROUND_SHOT" }, status: { kind: "parity", reason: "the beam leaves on Falco's laser frame and he acts when it ends, with no cooldown and no cap on beams in flight; the beam's reach and hit are his own", decided: "2026-10-28" },
+  },
+  {
+    id: "illidan-eye-beam-landing", family: "moves", name: "Illidan's aerial Eye Beam landing",
+    melee: { value: "0 frames, landing ends the laser", source: FALCO_BLASTER_PAGE },
+    ours: () => `${EYE_BEAM_LANDING_LAG} frames, landing ends the laser`,
+    anchor: { file: EYE_BEAM_FILE, symbol: "EYE_BEAM_LANDING_LAG" }, status: { kind: "parity", reason: "an aerial beam landing cancels the move at once with no landing lag, as Falco's short-hop laser does", decided: "2026-10-28" },
+  },
   {
     id: "maiev-fan-of-knives-ground-knockback", family: "moves", name: "Maiev's ground Fan of Knives knockback",
     melee: { value: FOX_SHINE, source: FOX_SHINE_PAGE }, ours: () => fanKnockback("ground"),

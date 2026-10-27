@@ -132,8 +132,17 @@ unchanged.
 What she keeps, so she does not become Fox in a costume:
 
 - marks and poison: her neutral special, Shadow Strike, is one slow dagger
-  that marks and poisons (one on screen), not a laser; its value is the mark
-  and the poison, not chip damage or a stream.
+  that marks and poisons, not a laser; its value is the mark and the poison,
+  not chip damage or a stream. Since Tom's 2026-10-28 request it takes Fox's
+  laser frames: the dagger leaves on frame 10 of 36 standing and in the air,
+  she acts on frame 37, and landing in the air ends the cast with no landing
+  lag (fightcore.csv and records.jsonl: first active 10, total 36, aerial
+  landing 0), so a short-hop dagger is free and a short-hop double dagger
+  fires its second blade on landing. Up to two daggers may be out, because the
+  next cast can start on frame 37 while the dagger from frame 10 flies until
+  frame 40, and a short-hop double has its first blade in flight on landing.
+  The dagger's speed, damage, mark and poison are unchanged, and the mark is
+  the reason to throw it, not the stream.
 - Blink: her up special teleports in eight directions to a punishable spot,
   not a charged fire dash.
 - Shadow Pursuit stun (side special, #273): a set stun that opens grab, smash

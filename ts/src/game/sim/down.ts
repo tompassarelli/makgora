@@ -19,8 +19,8 @@ import { squareRoot } from "./warcraftMath";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_COOLDOWN_FRAMES, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
-import { heroEgg, isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
-import { EYE_BEAM_AIR_FORM } from "./eyeBeam";
+import { heroEgg, isHeroSpecialAction, landHeroSpecial, runningHeroSpecial } from "./specials/engine";
+import { EYE_BEAM_AIR_FORM, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 
 export const AIR_DODGE_LANDING_LAG = 10;
@@ -71,8 +71,13 @@ function damageLandingReaction(f: Fighter): DamageLanding {
 
 function airShotLandingLag(special: Readonly<Fighter["special"]>): number | undefined {
   if (special.action === SpecialAction.riflemanBlaster && special.duration === RIFLEMAN_BLASTER_AIR_FRAMES) return RIFLEMAN_BLASTER_LANDING_LAG;
-  if (special.action === SpecialAction.demonHunterEyeBeam && special.form === EYE_BEAM_AIR_FORM) return EMPTY_LANDING_LAG;
+  if (special.action === SpecialAction.demonHunterEyeBeam && special.form === EYE_BEAM_AIR_FORM) return EYE_BEAM_LANDING_LAG;
   return undefined;
+}
+
+
+function landsWithoutLag(f: Readonly<Fighter>): boolean {
+  return airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0;
 }
 
 
@@ -131,7 +136,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   const wasGrounded = motion.grounded;
   const damageLanding = !wasGrounded && !fromAsdi && launch.hitstun > 0 && !isTumbling(f) ? damageLandingReaction(f) : undefined;
   if (!motion.grounded) clearDash(f);
-  if (!motion.grounded && !dodge.airDodging && !isAerialAttack(f.attack.style) && f.down.state === DownState.none && launch.hitstun <= 0 && !fromAsdi) {
+  if (!motion.grounded && !dodge.airDodging && !isAerialAttack(f.attack.style) && f.down.state === DownState.none && launch.hitstun <= 0 && !fromAsdi && !landsWithoutLag(f)) {
     landingState.lag = max(landingState.lag, EMPTY_LANDING_LAG);
   }
   dodge.airUsed = false;

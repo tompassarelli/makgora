@@ -201,9 +201,17 @@ and its mana-scaled stun are gone; no other move used the stun's drain rule.
   (57 frames), Falco's ground Blaster (fightcore.csv: first active 23,
   total 57; SmashWiki gives the same 23 and 13 startups).
 - **Air:** the beam leaves on frame 13 of 42, Falco's air Blaster. Landing
-  during it ends the special into the ordinary 4-frame landing, the
-  auto-cancel that makes Falco's short-hop laser safe. Fast fall works
-  throughout, so a short hop, beam and fast fall lands with only those 4 frames.
+  during it ends the special with no landing lag (records.jsonl: Falco's aerial
+  Blaster lands with 0), the auto-cancel that makes Falco's short-hop laser
+  safe. Fast fall works throughout, so a short hop, beam and fast fall lands
+  free and can fire again the next frame.
+- **Refire (Tom, 2026-10-28):** he acts the frame after the move's last frame, with
+  no cooldown and no limit on beams in flight, as Falco does. The first Eye
+  Beam shipped with 4 landing frames and a one-beam-at-a-time rule, which
+  kept a short-hop double laser (short hop, beam, fast fall, beam on landing)
+  from firing its second beam until the first was spent; both are gone. The
+  scenario tests in sim/laserFrames.tests.ts replay the short-hop laser, the
+  short-hop double laser and a full-hop mash against Falco's frames.
 - **Windup:** fel fire (his Metamorphosis missile, Eye Blast's eye cue) burns
   over his eyes from frame 1 to the shot and flares on the shot frame.
 - **Beam:** a horizontal fel bolt along his facing from 140 above his feet, his
