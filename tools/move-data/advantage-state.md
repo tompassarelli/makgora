@@ -21,8 +21,8 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Muradin Bronzebeard | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Muradin Bronzebeard | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in up smash, dash, dash attack, dash, dash attack, dash, dash attack, short hop, forward air; tech away dash, dash attack; missed tech down smash; trap up smash, dash, dash attack, dash, dash attack, dash, dash attack, short hop, forward air covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Maiev Shadowsong | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special, forward smash; tech in down smash; tech away side special, forward smash; missed tech side special, forward smash; trap side special, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
-| Maiev Shadowsong | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special, forward smash, dash, dash attack; tech in forward smash; tech away dash, dash attack; missed tech side special, forward smash, dash, dash attack; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
-| Maiev Shadowsong | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special, forward smash; tech in down smash; tech away short hop, side special, forward smash; missed tech side special, forward smash; trap side special, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Maiev Shadowsong | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special, forward smash, dash, dash attack; tech in forward smash; tech away side special, forward smash; missed tech side special, forward smash, dash, dash attack; trap side special, forward smash, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
+| Maiev Shadowsong | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special, forward smash; tech in forward smash; tech away side special, forward smash; missed tech side special, forward smash; trap side special, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kel'Thuzad | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in short hop, back air; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kel'Thuzad | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in full hop, back air; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 40% → up tilt against 4/5 DI |
 | Kel'Thuzad | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in up smash, jab, short hop, back air, dash, dash attack; tech away full hop, forward air; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
@@ -143,15 +143,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Muradin Bronzebeard | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Maiev Shadowsong | light | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Maiev Shadowsong | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Maiev Shadowsong | light | up throw | 1/1 in down smash, out side special | 1/1 in down smash, out side special | 1/1 in down smash, out side special | 1/1 in down smash, out side special |
+| Maiev Shadowsong | light | up throw | 1/1 in down smash, out forward smash | 1/1 in down smash, out forward tilt | 1/1 in down smash, out side special | 1/1 in down smash, out side special |
 | Maiev Shadowsong | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Maiev Shadowsong | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Maiev Shadowsong | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Maiev Shadowsong | medium | up throw | 1/1 in down smash, out forward smash | 1/1 in down smash, out side special | 1/1 in down smash, out side special | 1/1 in down smash, out side special |
+| Maiev Shadowsong | medium | up throw | 1/1 in down smash, out forward smash | 1/1 in down smash, out forward tilt | 1/1 in down smash, out side special | 1/1 in down smash, out side special |
 | Maiev Shadowsong | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Maiev Shadowsong | heavy | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Maiev Shadowsong | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Maiev Shadowsong | heavy | up throw | 1/1 in down smash, out forward smash | 1/1 KD in down smash, out forward smash | 1/1 in down smash, out side special | 1/1 in down smash, out side special |
+| Maiev Shadowsong | heavy | up throw | 1/1 in down smash, out forward smash | 1/1 KD in down smash, out forward smash | 1/1 in down smash, out forward tilt | 1/1 in forward smash, out side special |
 | Maiev Shadowsong | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kel'Thuzad | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Kel'Thuzad | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
