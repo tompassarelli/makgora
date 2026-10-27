@@ -760,7 +760,7 @@ and Dreadlord/Shadow Hunter spring gestures. The flip coils chest, arms and
 legs before a full stage-plane rotation, then opens into recovery. It uses
 the existing 30 presentation frames; ground jumps retain 24. The tool checks
 every previous sequence at start/middle/end, including Blademaster's
-Bladestorm, and saves a private both-facing Blademaster silhouette sheet.
+down air, and saves a private both-facing Blademaster silhouette sheet.
 Publish the hero-models and original-clips-static-lights families after pool
 export. `jumpClips.tests.ts` checks all selectable fighters' jump/double-jump/
 fall indices against attacks and grounded/aerial specials in Bun and Lua.

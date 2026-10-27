@@ -13,7 +13,7 @@ export const BLADEMASTER_AUTHORED_CLIPS = {
   forwardSmash: { index: 64, seconds: f32(0.85) },
   upSmash: { index: 65, seconds: f32(0.8) },
   downSmash: { index: 66, seconds: f32(0.833) },
-  neutralAir: { index: 67, seconds: f32(0.533) },
+  neutralAir: { index: 67, seconds: f32(0.533), aligned: true },
   forwardAir: { index: 68, seconds: f32(0.567) },
   backAir: { index: 69, seconds: f32(0.55) },
   upAir: { index: 70, seconds: f32(0.45) },

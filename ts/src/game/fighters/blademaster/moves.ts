@@ -6,7 +6,8 @@ import { type FighterHurtboxes, type HurtPart, hurtPart } from "../../sim/hurtbo
 import { type Segment, groundHit, swing, tipped, type GroundKit } from "../../sim/heroes/groundNormals";
 import type { HitEffect } from "../../sim/hitRegions";
 import { strongHit } from "../../sim/strongHits";
-import { drillStrikes, linkAt, multiHit } from "../../sim/heroes/multiHit";
+import { linkAt } from "../../sim/heroes/multiHit";
+import { squareRoot } from "../../sim/warcraftMath";
 import { ANGLES, type Angle, capsuleOf, makeHit, path } from "../../sim/heroes/authoring";
 
 const BM = HitElement.slash;
@@ -85,54 +86,50 @@ export function cut(firstFrame: number, tipHeights: readonly number[], reach: nu
 
 const blades = (segments: readonly Segment[], radius = BLADE_RADIUS) => segments.map(([x1, z1, x2, z2]) => capsule(x1, z1, x2, z2, radius));
 const lowSweep = (firstFrame: number, segments: readonly Segment[], facing: number) => path(firstFrame, blades(segments), downSmashHit(hit(12.968900680541992, "EDGE", 25, facing)));
-const heldBlades = (firstFrame: number, segments: readonly Segment[], effect: Readonly<HitEffect>, window: number, radius = BLADE_RADIUS, grounded?: Readonly<HitEffect>) =>
-  blades(segments, radius).map((strike, index) => heroRegion(firstFrame + index, firstFrame + index, strike, effect, grounded, window));
+export interface DrawnBlade extends Blade { readonly frame: number }
+const drawn = (frame: number, gripX: number, gripZ: number, tipX: number, tipZ: number): DrawnBlade => ({ frame, gripX, gripZ, tipX, tipZ });
+const bladeRegion = (blade: DrawnBlade, effect: Readonly<HitEffect>, window: number) =>
+  heroRegion(blade.frame, blade.frame, capsule(blade.gripX, blade.gripZ, blade.tipX, blade.tipZ), effect, undefined, window);
 
-
-
-
-
-const BLADESTORM_SPINS = [10, 13, 16, 19, 22] as const;
-const BLADESTORM_PLUNGE = 25;
-const BLADESTORM_LAST = 34;
-const BLADESTORM_TOTAL = 46;
-const BLADESTORM_REACH = f32(M - BLADE_RADIUS);
-const BLADESTORM_AIR = { centre: linkAt(2.0, 10.0, 90), front: linkAt(2.0, 10.0, 100), back: linkAt(2.0, 10.0, 80) };
-const BLADESTORM_GROUND = { centre: linkAt(2.0, 20.0, 270), front: linkAt(2.0, 20.0, 250), back: linkAt(2.0, 20.0, 290) };
-const BLADESTORM = drillStrikes(5.0, -55.0, 75.0, BLADESTORM_AIR, BLADESTORM_GROUND);
-const BLADESTORM_SPIN_BLADES: readonly (readonly Segment[])[] = [
-  [[38.0, 7.0, 101.0, -92.0], [21.0, 17.0, -51.0, -76.0]],
-  [[13.0, 29.0, -2.0, -89.0], [-38.0, 45.0, -155.0, 28.0]],
-  [[35.0, 33.0, 30.0, -86.0], [21.0, 31.0, -38.0, -71.0]],
-  [[34.0, 29.0, 48.0, -87.0], [-45.0, 49.0, -163.0, 38.0]],
-  [[34.0, 30.0, 60.0, -86.0], [19.0, 27.0, -39.0, -77.0]],
+export const NEUTRAL_AIR_FIRST_SPIN = 5;
+export const NEUTRAL_AIR_SPIN_FRAMES = 8;
+export const NEUTRAL_AIR_SPINS = 2;
+export const NEUTRAL_AIR_HITS = [{ first: 6, last: 7 }, { first: 14, last: 17 }] as const;
+export const NEUTRAL_AIR_TOTAL = 36;
+export const NEUTRAL_AIR_BLADES: readonly DrawnBlade[] = [
+  drawn(6, 37.0, 75.0, 128.0, 113.0), drawn(7, 37.0, 45.0, 128.0, 7.0),
+  drawn(14, 37.0, 75.0, 128.0, 113.0), drawn(15, 37.0, 45.0, 128.0, 7.0), drawn(16, 15.0, 23.0, 53.0, -68.0), drawn(17, -15.0, 23.0, -53.0, -68.0),
 ];
-const BLADESTORM_PLUNGE_BLADES: readonly Segment[] = [
-  [24.0, 41.0, 9.0, -77.0], [24.0, 39.0, 7.0, -78.0], [22.0, 38.0, 6.0, -79.0], [21.0, 38.0, 6.0, -78.0], [16.0, 41.0, -26.0, -70.0],
-  [13.0, 41.0, -51.0, -60.0], [12.0, 41.0, -56.0, -56.0], [7.0, 45.0, -76.0, -40.0], [5.0, 48.0, -90.0, -24.0], [3.0, 51.0, -97.0, -12.0],
+export const NEUTRAL_AIR_LINK = linkAt(3.7160000801086426, 30.0, 90);
+export const NEUTRAL_AIR_LAUNCH: Readonly<HitEffect> = { ...hit(9.289999961853027, "LAUNCH", 45), growth: 86.23999786376953, base: 50.0 };
+const neutralAir: AuthoredMove = {
+  ...heroMove(NEUTRAL_AIR_HITS[0].first, NEUTRAL_AIR_HITS[1].last - NEUTRAL_AIR_HITS[0].first + 1, NEUTRAL_AIR_TOTAL - NEUTRAL_AIR_HITS[1].last, 7,
+    NEUTRAL_AIR_BLADES.map(blade => blade.frame <= NEUTRAL_AIR_HITS[0].last ? bladeRegion(blade, NEUTRAL_AIR_LINK, 1) : bladeRegion(blade, NEUTRAL_AIR_LAUNCH, 2))),
+  autoCancel: { before: 6, from: 24 },
+};
+
+export const DOWN_AIR_SWEEP: readonly DrawnBlade[] = [
+  drawn(6, 34.0, 62.0, 104.0, -8.0), drawn(7, 3.0, 50.0, -6.0, -49.0), drawn(8, -22.0, 62.0, -92.0, -8.0), drawn(9, -33.0, 83.0, -131.0, 66.0),
 ];
-const bladestormBlades = (first: number, segments: readonly Segment[], window: number) => segments.flatMap((segment, index) => {
-  const side = segment[2] >= 0.0 ? "front" : "back";
-  return heldBlades(first + index, [segment], BLADESTORM_AIR[side], window, BLADE_RADIUS, BLADESTORM_GROUND[side]);
-});
-const bladestorm: AuthoredMove = {
-  ...heroMove(10, BLADESTORM_LAST - 10 + 1, BLADESTORM_TOTAL - BLADESTORM_LAST, 20, [
-    ...multiHit([
-      ...BLADESTORM_SPINS.map(first => ({ first, last: first + 1, strikes: BLADESTORM })),
-
-      { first: BLADESTORM_PLUNGE, last: BLADESTORM_LAST, strikes: BLADESTORM },
-    ]),
-    ...BLADESTORM_SPINS.flatMap((first, spin) => bladestormBlades(first, BLADESTORM_SPIN_BLADES[spin] ?? [], spin + 1)),
-    ...bladestormBlades(BLADESTORM_PLUNGE, BLADESTORM_PLUNGE_BLADES, BLADESTORM_SPINS.length + 1),
-    heroRegion(BLADESTORM_TOTAL + 1, BLADESTORM_TOTAL + 2, capsule(-BLADESTORM_REACH, 30.0, BLADESTORM_REACH, 30.0, 30.0),
-      linkAt(4.0, 90.0, 80), undefined, BLADESTORM_SPINS.length + 2),
-  ]),
-
-  fall: [
-    { firstFrame: 9, lastFrame: BLADESTORM_PLUNGE - 2, speedZ: -1.5 },
-    { firstFrame: BLADESTORM_PLUNGE - 1, lastFrame: BLADESTORM_LAST - 1, speedZ: -14.0 },
-  ],
-  landingHit: { firstFrame: BLADESTORM_TOTAL, totalFrames: BLADESTORM_TOTAL + 12 },
+export const DOWN_AIR_TOTAL = 59;
+export const TIPPER_RADIUS = 8.0;
+export const DOWN_AIR_TIPPER: Readonly<HitEffect> = strongHit({ ...hit(12.07699966430664, "SPIKE", 290), growth: 75.45999908447266, base: 40.0 });
+export const DOWN_AIR_SOURSPOT: Readonly<HitEffect> = { ...hit(8.361000061035156, "POKE", 45), growth: 75.45999908447266, base: 20.0 };
+export function tipperSplit(blade: Blade): { readonly x: number; readonly z: number } {
+  const dx = f32(blade.tipX - blade.gripX);
+  const dz = f32(blade.tipZ - blade.gripZ);
+  const share = f32(TIP_LENGTH / squareRoot(f32(f32(dx * dx) + f32(dz * dz))));
+  return { x: f32(blade.tipX - f32(dx * share)), z: f32(blade.tipZ - f32(dz * share)) };
+}
+const downAir: AuthoredMove = {
+  ...heroMove(DOWN_AIR_SWEEP[0]?.frame ?? 6, DOWN_AIR_SWEEP.length, DOWN_AIR_TOTAL - (DOWN_AIR_SWEEP.at(-1)?.frame ?? 9), 16, DOWN_AIR_SWEEP.flatMap(blade => {
+    const { x, z } = tipperSplit(blade);
+    return [
+      heroRegion(blade.frame, blade.frame, capsule(x, z, blade.tipX, blade.tipZ, TIPPER_RADIUS), DOWN_AIR_TIPPER),
+      heroRegion(blade.frame, blade.frame, capsule(blade.gripX, blade.gripZ, x, z), DOWN_AIR_SOURSPOT),
+    ];
+  })),
+  autoCancel: { before: 6, from: 47 },
 };
 
 function authoredThrow(releaseFrame: number, recovery: number, effect: Readonly<HitEffect>): AuthoredThrow {
@@ -260,7 +257,7 @@ const BODY: FighterHurtboxes = {
       heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(17, 24, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(25, 32, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      heroHurtPose(25, 36, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
     [AttackStyle.forwardAir]: [
       heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
@@ -285,8 +282,8 @@ const BODY: FighterHurtboxes = {
       heroHurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(17, 24, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(25, 32, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(33, 40, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(16.0, 95.0, 0.0, 95.0, 25.0)]),
-      heroHurtPose(41, 46, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      heroHurtPose(33, 40, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      heroHurtPose(41, 59, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
     [AttackStyle.grab]: [
       heroHurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
@@ -330,14 +327,11 @@ export const BLADEMASTER_MOVES: FighterMoves = {
 
 
 
-    [AttackStyle.neutralAir]: heroMove(7, 9, 17, 12, [
-      ...heldBlades(7, [[54.0, 103.0, 169.0, 131.0], [47.0, 85.0, 161.0, 61.0], [27.0, 72.0, 103.0, 5.0]], linkAt(3.0, 30.0, 100), 1),
-      ...heldBlades(13, [[-52.0, 90.0, -170.0, 90.0], [-49.0, 100.0, -164.0, 129.0], [-46.0, 103.0, -160.0, 136.0]], hit(4.647127628326416, "POKE", 50, -1.0), 2, 10.0),
-    ]),
+    [AttackStyle.neutralAir]: neutralAir,
     [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, tipped(10, [[52.0, 65.0, 163.0, 72.0], [53.0, 63.0, 163.0, 51.0], [52.0, 61.0, 159.0, 30.0]], BLADE_RADIUS, TIP_LENGTH, hit(10.843297958374023, "EDGE", 40), hit(8.519732475280762, "EDGE", 40))),
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, swing(8, [[-48.0, 121.0, -130.0, 205.0], [-44.0, 120.0, -127.0, 205.0], [-41.0, 120.0, -123.0, 205.0]], BLADE_RADIUS, hit(9.294255256652832, "KILL", 35, -1.0))),
     [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, path(UP_AIR_FIRST, blades(UP_AIR_DRAWN), hit(6.196170330047607, "LAUNCH", 85))),
-    [AttackStyle.downAir]: bladestorm,
+    [AttackStyle.downAir]: downAir,
     [AttackStyle.grab]: heroMove(7, 2, 22, 0, path(7, [
       capsule(18.0, 45.0, f32(S - 10.0), 45.0, 10.0),
       capsule(18.0, 47.0, f32(S - 10.0), 47.0, 10.0),

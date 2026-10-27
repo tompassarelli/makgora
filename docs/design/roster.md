@@ -487,11 +487,11 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Forward smash — Execution Cut | 17/3/35 | 13 inner, 17 outer | XL, 40, KILL growth, base 30 | Large horizontal cut; outer 0.20H is sweetspot |
 | Up smash — Sky Splitter | 15/4/30 | 16 | L, 90, KILL | Narrow vertical blade with no broad ground scoop |
 | Down smash — Low Circle | 14/6/31 | 14 | L, 25, EDGE | Low sword sweep in front on frames 14–16, then behind on 17–19; one hit total per target |
-| Neutral air — Blade Wheel | 7/9/17; L12 | 3 + 6 | M, 50, POKE | Two quick arcing cuts ([multi-hit](aerials.md)): a wide pull-in link, then a tighter launcher |
+| Neutral air — Blade Wheel | 6–7, 14–17; 36 total; L7 | 3.7 + 9.3 | 0.75H blade, link 90 then 45, base 50 | Two forward flips with the blade out, one hit per flip ([multi-hit](aerials.md)): the first holds the foe in hitstun, the second launches; after Melee Marth's neutral air |
 | Forward air — Long Cut | 10/3/22; L14 | 11 inner, 14 outer | L, 40, EDGE | Primary spacing aerial; outer 0.20H sweetspot |
 | Back air — Reverse Edge | 8/3/23; L13 | 12 | L, 35, KILL | Strong behind, commits facing |
 | Up air — High Thrust | 6/3/19; L11 | 8 | M, 85, LAUNCH | Narrow upward poke |
-| Down air — Sword Plunge | 10/25/12; L20 | 6×2 + 4 landing | M, drill | Downward sword plunge: hangs, plunges, landing hit pops up; punishable on shield |
+| Down air — Crescent Tipper | 6/4/50; L16 | 12.1 tip, 8.4 inner | 0.75H blade; tip 290 (spike), base 40; inner 45, base 20 | One crescent sweep under him from front to back; the outer 0.20H of the blade is the tipper and spikes, the inner blade sends up and away; after Melee Marth's down air |
 
 ### B specials
 
@@ -525,7 +525,7 @@ Standing grab 7/2/22, reach 0.55H, one-handed collar catch. Pummel: pommel strik
 - Wind Cutter, Mirror Image and Wind Walk keep their grounded timing in the air; Wind Cutter and Mirror Image end on landing with 20 frames of lag, and the airborne Wind Walk hangs through its fade, is once per airtime and ends helpless; landing mid-move keeps the rest of its lag.
 - Rising Whirlwind hovers through f12, then dashes in the chosen direction over f13–26 and stops on f27, so the helpless fall starts from rest. Tom asked on 28 Oct 2026 (delegated) for four more startup frames than the f8 hover; the aim window, motion, hit regions, hurt poses and end frame all moved four frames later and the baseline's frame values with them. The paid route rises 480–640 units; the shorter free route reaches at least 240 units on either axis, with no hit (#252). The stock whirlwind is reserved for this move family.
 - Wind Walk's dash passes bodies whether or not they shield (no `stopsAtShield`, as in Melee no raised shield stops a fighter moving through), and its intangible frames draw him see-through. Mirror Image's image is a placed object drawn as his see-through model; the swap is its recall form (`relocate`). Tom asked on 28 Oct 2026 (delegated) for four more startup frames on Mirror Image: the image appears on f12 and the step back starts on f13 instead of f8 and f9, the end frame moves from f24 to f28, ground and air alike, and the swap press keeps its timing.
-- Presentation extends the stock model with a distinct authored gesture for every jab, tilt angle, smash and aerial. Down smash sweeps front then rear; neutral air cuts two short arcs; back air turns into its slash; down air swipes down-front then down-back once per airborne hit before the Sword Plunge and its landing pop. The double jump keeps its authored front flip. These clips preserve the existing combat timing, regions and damage.
+- Presentation extends the stock model with a distinct authored gesture for every jab, tilt angle, smash and aerial. Down smash sweeps front then rear; neutral air is two whole-body forward flips with the blade drawn on each hit; back air turns into its slash; down air sweeps one crescent under him from front to back. The double jump keeps its authored front flip. These clips preserve the existing combat timing, regions and damage.
 - Bladestorm is not implemented; ultimates stay off in competitive play.
 
 ### Play-style profile
