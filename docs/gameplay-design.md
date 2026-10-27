@@ -1104,7 +1104,7 @@ every newly registered fighter too.
 | Chen Stormstout | Breath of Fire (35) | Drunken Haze (37) | One 8% hit armored on frames 1–6 |
 | Peon | Gold Sack (25) | Log Heave (33) | One 8% hit armored on frames 1–6 |
 | Goblin Tinker | Cluster Rockets (35) | Laser (45) | One 8% hit armored on frames 1–6 |
-| Kael'thas Sunstrider | Fireball | Flame Strike | One 8% hit armored on frames 1–6 |
+| Kael'thas Sunstrider | Pyroblast | Flame Strike | One 8% hit armored on frames 1–6 |
 | Murloc | Ensnare (35) | Tidal Rush (35) | One 8% hit armored on frames 1–6 |
 
 Prior art informs the decision, not these original numbers:

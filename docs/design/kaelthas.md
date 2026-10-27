@@ -48,10 +48,11 @@ Banish duel from colour alone, at match size.
 
 ## Gameplan
 
-1. **Laser at range.** Fireball is a fast, weak, low-knockback missile with no
-   charge and at most two on screen. It does not kill; it makes the
-   opponent choose to jump, shield or eat chip, and the choice feeds the
-   next decision.
+1. **Steer the Pyroblast.** Pyroblast is one slow, heavy fireball he steers
+   while he stands rooted. It kills off the side at high percent and cracks
+   shields, but every frame he steers he cannot defend himself, a hit on him
+   puts it out, and a miss leaves him open for a long time. The opponent
+   chooses to outrun it, shield it and pay for it, or rush the rooted caster.
 2. **Draw the rune where they will be.** Flame Strike slides a bold ground
    rune outward while he holds and casts on release; a tap casts at a short
    default distance. The opponent has about 30 to 40 frames to read it. The
@@ -68,7 +69,7 @@ Banish duel from colour alone, at match size.
    so the rune can sit on the ledge or under a recovery line. Predictable
    recoveries die to it.
 
-The opponent's guess at mid range: stand in the laser and take chip; shield
+The opponent's guess at mid range: outrun the Pyroblast or rush the caster; shield
 the rune and get siphoned; jump the rune and meet back air or a neutral air;
 dash in early and beat him before the fire arrives.
 
@@ -76,7 +77,7 @@ dash in early and beat him before the fire arrives.
 
 | Input | What it does and the decision | Counterplay | Prior art |
 |---|---|---|---|
-| Neutral: **Fireball** | His Warcraft III missile as a laser: fast, weak, low knockback, no charge, at most two on screen. Range control and chip. | Jump it, shield it (it barely moves the shield), or close distance between shots. | [Falco's Blaster][blaster] (a weak fast laser that controls movement) |
+| Neutral: **Pyroblast** | About 18 frames of windup gathering fire in his hands, then one slow heavy fireball he steers with the stick for up to 60 frames, turning about 6 degrees a frame (PK Thunder's sharp turns), while he stands rooted on the ground or sinks slowly in the air. Special or shield lets it go: it flies straight about 14 frames and fizzles. 17%, launches at 40 degrees and kills off the side at high percent; 17 shield damage. One at a time, reflectable. Connecting leaves 18 frames of recovery; a miss (timed out, let go, reflected) leaves 40. | Outrun it, rush and hit Kael while he steers (that puts it out), or shield it and punish the long recovery; reflect it back at him. | [Ness's PK Thunder][pkthunder] (a steered projectile with a rooted caster) |
 | Side: **Flame Strike** | Hold to slide the rune outward, release to cast; tap for a short default cast. About 30 to 40 frames from rune to burst, then the pillar stands 0.6 s (36 frames: a 6-frame burst, a 30-frame burn) and its column plays out inside that window. The burst launches and crushes shields; the burn is flinchless chip. One pillar, a recast replaces it, no cooldown. Castable in the air and offstage: his edgeguard. | Leave the rune, roll past it, or punish the cast from outside its line; a shield survives the burst but invites the grab. | [Ness's PK Flash][pkflash] (a placed delayed burst); [Robin's Arcfire][arcfire] (a lingering pillar that zones) |
 | Down: **Banish** | A curse that turns the victim ethereal for about 60 frames (the duration sweep decides). They lose normals, grabs and shield, but still move, jump, air dodge and cast their specials. Only spells reach them, at +30%. | Space outside it or shield it; banished, keep away and fight with your specials; his spheres cannot touch you. | [Mewtwo's Disable][disable] (a status that removes options) |
 | Up: **Phoenix** | He becomes the phoenix and steers with momentum, not snapping. The flames burn down as the visible timer; when they are gone he falls helpless. Hit mid-flight, he becomes an egg that falls fast and helpless and hatches on landing. The phoenix body has a weak contact hitbox. | Hit the flight to make the egg, then cover where it lands; the burning-down flames show how far he can still go. | [Fox's Fire Fox][firefox] (a committed fire recovery), [Peach's Parasol][parasol] (steerable float) |
@@ -110,7 +111,7 @@ over the stage.
 
 **Meter and EX.** Kael keeps the universal meter and strong-button EX (strong
 + B is the EX special, strong + A the smashes, #186). Nothing of his feeds
-or drains meter. EX Fireball deals a quarter more, EX Flame Strike's burst
+or drains meter. EX Pyroblast deals a quarter more, EX Flame Strike's burst
 deals a quarter more, EX Banish reaches a quarter farther and EX Phoenix
 flies a quarter farther.
 
@@ -153,6 +154,10 @@ the normals and body box and checked by `bun wisp ledger --check` and
 - **The seeking fire bolt** (the old neutral special) drifted toward its
   target, so it decided for the player; Flame Strike's rune makes the player
   decide (2026-10-26).
+- **Fireball**, a fast weak laser with two on screen, was replaced by the steered
+  Pyroblast (2026-10-28): Tom wanted a heavy committal neutral special in the
+  style of PK Thunder. The player steers it, so it does not decide for them
+  the way the seeking bolt did.
 - **The old mana drain** fed and denied meter; Siphon Mana is now a grab with
   an ordinary pummel and no heal, so meter stays universal (2026-10-26).
 - **Cooldowns** are gone: one pillar on screen shows why there is no second
@@ -192,7 +197,7 @@ path: decision
 basic-moves: neutral-special,side-special,neutral-air
 ```
 
-Basic gameplan: Fireball at range, Flame Strike at a short tap, neutral air
+Basic gameplan: Pyroblast steered into the opponent from range, Flame Strike at a short tap, neutral air
 when pressed. Recovery is a straight Phoenix.
 
 Expert gameplan: place the rune where the opponent will land, Siphon the
@@ -209,8 +214,8 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 [wc]: https://wowpedia.fandom.com/wiki/Blood_Mage_(Warcraft_III)
 [kael]: https://wowpedia.fandom.com/wiki/Kael%27thas_Sunstrider
 [mw]: https://www.ssbwiki.com/Mewtwo_(SSBU)
-[blaster]: https://www.ssbwiki.com/Blaster
 [pkflash]: https://www.ssbwiki.com/PK_Flash
+[pkthunder]: https://www.ssbwiki.com/PK_Thunder
 [arcfire]: https://www.ssbwiki.com/Arcfire
 [disable]: https://www.ssbwiki.com/Disable
 [firefox]: https://www.ssbwiki.com/Fire_Fox

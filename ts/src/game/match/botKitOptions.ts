@@ -17,7 +17,7 @@ import { exSpecialAffordable } from "../sim/exSpecials";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { aimedProjectile, companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine";
+import { aimedProjectile, companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady, steeredShot } from "../sim/specials/engine";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
@@ -417,6 +417,24 @@ function aimDive(input: Controls, aimX: number, aimZ: number): void {
 export function holdAimAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {
   const rune = aimedProjectile(f);
   if (rune !== undefined) input.specialHeld = target !== undefined && f32(f32(target.motion.x - rune.x) * f.facing) > 0.0;
+}
+
+const SHOT_AIM_DEAD = 12.0;
+const SHOT_AIM_HEIGHT = 45.0;
+
+export function steerShotAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): boolean {
+  const shot = steeredShot(f);
+  if (shot === undefined) return false;
+  input.diStickValid = false;
+  input.shield = false;
+  input.shieldPressed = false;
+  input.specialPressed = target === undefined || target.status.out;
+  if (target === undefined) return true;
+  const dx = f32(target.motion.x - shot.x);
+  const dz = f32(f32(target.motion.z + SHOT_AIM_HEIGHT) - shot.z);
+  input.direction = Math.abs(dx) <= SHOT_AIM_DEAD ? 0 : dx < 0 ? -1 : 1;
+  input.verticalDirection = Math.abs(dz) <= SHOT_AIM_DEAD ? 0 : dz < 0 ? -1 : 1;
+  return true;
 }
 
 export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, skill: CpuSkill, input: Controls): boolean {

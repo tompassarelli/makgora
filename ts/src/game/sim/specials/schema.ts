@@ -79,6 +79,15 @@ export interface SpecialSteer {
   readonly turnSin: number;
 }
 
+export interface SpecialSteeredShot {
+  readonly frame: number;
+  readonly turnCos: number;
+  readonly turnSin: number;
+  readonly coast: number;
+  readonly fallSpeed: number;
+  readonly hitRecovery: number;
+}
+
 export interface SpecialEgg {
   readonly window: FrameWindow;
   readonly fallSpeed: number;
@@ -161,6 +170,7 @@ export interface SpecialProjectile {
   /** On body or shield contact it becomes this projectile where it is, which deals the hit and then only shows. */
   readonly burstInto?: SpecialProjectile | undefined;
   readonly burn?: { readonly every: number } | undefined;
+  readonly steered?: true | undefined;
 }
 
 export interface SpecialBeam {
@@ -290,6 +300,8 @@ export interface AuthoredSpecial {
   readonly cooldownFrames?: number | undefined;
 
   readonly aim?: { readonly frame: number; readonly reach: number; readonly speed: number } | undefined;
+
+  readonly steersShot?: SpecialSteeredShot | undefined;
 
   readonly replacesLive?: true | undefined;
 

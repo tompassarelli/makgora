@@ -13,10 +13,9 @@ export const KAELTHAS_GAMEPLAN: FighterGameplan = {
   defense: ["stance", "retreat", "shield", "roll", "jump"],
   combos: [
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.upAir, AttackStyle.forwardAir] },
-    { starter: GameplanSpecial.neutral, followUps: [AttackStyle.dashAttack, AttackStyle.forwardTilt] },
-    { starter: GameplanSpecial.side, followUps: [GameplanSpecial.neutral, AttackStyle.upAir] },
-    { starter: GameplanThrow.down, followUps: [AttackStyle.downTilt, GameplanSpecial.neutral] },
+    { starter: GameplanSpecial.side, followUps: [AttackStyle.upAir] },
+    { starter: GameplanThrow.down, followUps: [AttackStyle.downTilt, AttackStyle.upAir] },
   ],
-  kills: [{ move: AttackStyle.forwardSmash, fromPercent: 95 }, { move: AttackStyle.backAir, fromPercent: 110 }],
+  kills: [{ move: AttackStyle.forwardSmash, fromPercent: 95 }, { move: GameplanSpecial.neutral, fromPercent: 105 }, { move: AttackStyle.backAir, fromPercent: 110 }],
   recovery: { aim: "ledge", upSpecial: "last" }, avoid: ["close", "below", "edge"],
 };

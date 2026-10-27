@@ -11,7 +11,6 @@ import { createFighter, placedObject, type Fighter } from "../../sim/fighter";
 import { ROSTER_MANA } from "../../sim/mana";
 import { fighterAt } from "../../sim/roster";
 import { SUMMON_PHOENIX_FRAME } from "../../sim/ultimates";
-import { FIREBALL, FIREBALL_LIMIT } from "./specials";
 
 const KAEL_X = -550.0;
 const FOE_X = 550.0;
@@ -37,40 +36,6 @@ function step(state: ReplayState, kael: Fighter, tick: number, pressed: number):
   adaptInput(row, kael, tick, state.controls.inputs[0], state.controls.commands[0]);
   stepMatch(state.match, state.world, state.controls, tick);
 }
-
-function liveFireballs(kael: Readonly<Fighter>): number {
-  let count = 0;
-  for (const projectile of kael.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && projectile.spec === FIREBALL) count++;
-  return count;
-}
-
-test("Three Fireball presses leave at most two missiles live, and each flies level at one speed [k1 scenario]", () => {
-  const { state, kael } = kaelMatch();
-  state.match.ultimatesOff = true;
-  const starts: number[] = [];
-  let refused = false;
-  let peak = 0;
-  for (let tick = 1; tick <= WATCH_FRAMES; tick++) {
-    const press = starts.length + (refused ? 1 : 0) < 3 && kael.special.action === SpecialAction.none;
-    step(state, kael, tick, press ? maskOf(Action.special) : 0);
-    if (press && kael.special.action === SpecialAction.heroNeutral) starts.push(tick);
-    else if (press) {
-      refused = true;
-      assertEquals(liveFireballs(kael), FIREBALL_LIMIT, `frame ${tick}: the third press meets two live Fireballs`);
-    }
-    peak = Math.max(peak, liveFireballs(kael));
-    assertTrue(liveFireballs(kael) <= FIREBALL_LIMIT);
-    for (const projectile of kael.projectiles) {
-      if (projectile.life <= 0 || projectile.spec !== FIREBALL) continue;
-      assertEquals(projectile.z, FIREBALL.offsetZ, `frame ${tick}: Fireball height`);
-      assertEquals(projectile.velocityZ, 0.0, `frame ${tick}: Fireball vertical speed`);
-      assertEquals(projectile.velocityX, FIREBALL.velocityX, `frame ${tick}: Fireball speed`);
-    }
-  }
-  assertEquals(starts.length, 2, "two Fireballs cast");
-  assertTrue(refused);
-  assertEquals(peak, FIREBALL_LIMIT);
-});
 
 test("Kael'thas's ultimate summons a phoenix companion after a short cast [k1 scenario]", () => {
   const { state, kael } = kaelMatch();

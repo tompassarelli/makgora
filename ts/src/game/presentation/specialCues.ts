@@ -14,7 +14,7 @@ import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
-import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
+import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
 import { EMPTY_GOLD_SACK_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
@@ -278,7 +278,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Pocket Factory", startup: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body"), active: drawn("Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactory.mdl", "ahead") },
   },
   [Character.kaelthas]: {
-    neutral: { spell: "Fireball", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.25), active: drawn("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx", "hand") },
+    neutral: { spell: "Pyroblast", startup: { ...cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.25), scaleEnd: f32(0.9), scaleFrames: PYROBLAST_STARTUP_FRAMES }, active: drawn("Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx", "hand") },
     side: { spell: "Flame Strike", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: drawn("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", "ahead") },
     up: KAEL_PHOENIX_CHARGE,
     down: { spell: "Banish", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: cue("Abilities\\Spells\\Human\\Banish\\BanishTarget.mdx", "hand", 0.5) },

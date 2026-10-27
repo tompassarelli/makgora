@@ -13,7 +13,7 @@
 - **Maiev and Illidan down special:** turn around by holding the stick away as you press it, or cancel it into an up smash with Strong + up.
 - **Dreadlord (Mal'Ganis):** a two-hoof back kick, an overhead claw rake forward air, a Vampiric Pounce that bites on contact and launches straight up, and a new ultimate, Summon Inferno.
 - **Anub'arak:** a down air that drives straight down and hits from a short hop, a snapping back-air lunge, and Impale spikes on his dash attack.
-- **Kael'thas:** a Blood Mage kit with Fireball, Flame Strike, a steerable Phoenix and a long Siphon Mana grab.
+- **Kael'thas:** a Blood Mage kit with a steerable Pyroblast, Flame Strike, a steerable Phoenix and a long Siphon Mana grab.
 - **Cairne, Chen, Murloc and Thrall:** hit regions now follow Cairne's axe, Chen's staff and Thrall's Doomhammer, and Murloc stabs with his spear on jabs and forward tilt.
 - **Sylvanas, Muradin and Malfurion:** a longer-reaching standing grab, a backhand axe back air with lightning trailing Hammerfall, and a rework of the dash attack.
 - **Hex and Sleep:** Hex lasts 140 frames with the frog hopping at random, Sleep lasts a full 160 frames in the air and on the ground, and a Hexed or Slept fighter floats down slowly.

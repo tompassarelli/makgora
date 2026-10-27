@@ -116,7 +116,7 @@ export function cancelSpecialState(f: Fighter): void {
     for (let index = 0; index < f.projectiles.length; index++) {
       const projectile = at(f.projectiles, index);
       const spec = projectile.spec;
-      if (projectile.life > 0 && spec?.cancelOnInterrupt === true && spec.life - projectile.life < (spec.activeFrom ?? 0)) mutableProjectile(f, index).life = 0;
+      if (projectile.life > 0 && ((spec?.steered === true && projectile.damageMultiplier === 1.0) || (spec?.cancelOnInterrupt === true && spec.life - projectile.life < (spec.activeFrom ?? 0)))) mutableProjectile(f, index).life = 0;
     }
     for (let animal = 0; animal <= f.pack.length; animal++) {
       if (placedObject(f, animal).spec?.channeled === true) mutablePlacedObject(f, animal).life = 0;

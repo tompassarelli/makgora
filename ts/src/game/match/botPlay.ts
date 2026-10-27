@@ -32,7 +32,7 @@ import { chooseRecoveryInput } from "./botRecovery";
 import { guardOffstage, waitAtLip } from "./botEdgeGuard";
 import { escapeCorner, pokeGoal, pressCorner, pressEdgeCancel, steerEdgeCancel } from "./botCorner";
 import { pressHeroFollowUp } from "./botHeroKit";
-import { dashIn, holdAimAtFoe, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial } from "./botKitOptions";
+import { dashIn, holdAimAtFoe, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial, steerShotAtFoe } from "./botKitOptions";
 import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "../lobby/lobbyState";
 import { trainingPartnerInput } from "./training";
 import { sameFighterState } from "../../generated/state/fighterState";
@@ -405,6 +405,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   if (steerRunningSpecial(fighter, target, stage, skill, input) || recovering) return;
   if (isSmashAttack(fighter.attack.style) && fighter.attack.smashChargeAllowed) input.attackHeld = fighter.attack.smashChargeFrames < smashChargeGoal(fighter);
   holdAimAtFoe(fighter, target, input);
+  if (steerShotAtFoe(fighter, target, input)) return;
   if (target === undefined) return;
   if (skill.basicMoves === undefined && !game.training && waitAtLip(fighter, target, stage, skill, slot, frame, input)) return;
   if (chooseDefense(fighter, target, stage, input, skill, observationAge)) return;

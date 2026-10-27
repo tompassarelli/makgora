@@ -2,23 +2,32 @@ import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { heroRegion, type StrikeCapsule } from "../../sim/heroMoves";
 import { withExKit } from "../../sim/exSpecialAuthoring";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, type SpecialSteeredShot } from "../../sim/specials/schema";
 import type { AppliedStatus } from "../../sim/heroStatus";
 import { kaelCastBody, kaelHit } from "./moves";
 
 const AIR_LANDING_LAG = 20;
-const FIREBALL_LANDING_LAG = 10;
 
-export const FIREBALL_LIMIT = 2;
-export const FIREBALL: SpecialProjectile = {
-  model: "Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx",
-  spawnFrame: 9, offsetX: 40.0, offsetZ: 55.0, velocityX: 18.0, velocityZ: 0.0,
-  life: 50, radius: 14.0, effect: kaelHit(3.0, 0, 8.0, 8.0),
-  reflectable: true, limit: FIREBALL_LIMIT,
+export const PYROBLAST_STARTUP_FRAMES = 18;
+export const PYROBLAST_STEER_FRAMES = 60;
+export const PYROBLAST_COAST_FRAMES = 14;
+export const PYROBLAST_MISS_RECOVERY = 40;
+export const PYROBLAST_HIT_RECOVERY = 18;
+export const PYROBLAST_SPEED = 7.5;
+export const PYROBLAST: SpecialProjectile = {
+  model: "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx",
+  spawnFrame: PYROBLAST_STARTUP_FRAMES, offsetX: 52.0, offsetZ: 60.0, velocityX: PYROBLAST_SPEED, velocityZ: 0.0,
+  life: PYROBLAST_STEER_FRAMES + PYROBLAST_COAST_FRAMES, radius: 22.0, effect: { ...kaelHit(17.0, 40, 80.0, 25.0), strong: true },
+  reflectable: true, limit: 1, steered: true,
 };
-const fireball = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 26, landingLag, hurt: kaelCastBody(6, 18, 44.0, 58.0), projectiles: [FIREBALL],
-});
+export const PYROBLAST_STEER: SpecialSteeredShot = {
+  frame: PYROBLAST_STARTUP_FRAMES, turnCos: 0.9945219159126282, turnSin: 0.10452846437692642,
+  coast: PYROBLAST_COAST_FRAMES, fallSpeed: 1.5, hitRecovery: PYROBLAST_HIT_RECOVERY,
+};
+const pyroblast: AuthoredSpecial = {
+  endFrame: PYROBLAST_STARTUP_FRAMES + PYROBLAST_MISS_RECOVERY, hurt: kaelCastBody(6, PYROBLAST_STARTUP_FRAMES + 8, 44.0, 64.0),
+  projectiles: [PYROBLAST], steersShot: PYROBLAST_STEER,
+};
 
 // FlameStrike1.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the pillar plays that stretch across its burst and burn frames.
 export const FLAME_STRIKE_BURST_FRAMES = 6;
@@ -76,8 +85,8 @@ const phoenix: AuthoredSpecial = {
 };
 
 export const KAELTHAS_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Fireball", description: "A fast, weak fire missile straight ahead, two on screen at most. Shield, jump or reflect it.",
-    ground: fireball(undefined), air: fireball(FIREBALL_LANDING_LAG) }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Pyroblast", description: "A slow, heavy fireball he steers with the stick while he stands rooted; special or shield lets it go. It hits hard and cracks shields, but a miss leaves him open. One at a time.",
+    ground: pyroblast }, { damage: 1.25 }),
   side: withExKit({ name: "Flame Strike", description: "Hold to slide a rune outward, release to call a pillar of fire onto it; the pillar lingers and burns. Over open air it stands at Kael's height. One at a time.",
     ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) }, { damage: 1.25 }),
   up: withExKit({ name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",

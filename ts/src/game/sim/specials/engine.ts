@@ -16,7 +16,7 @@ import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
@@ -816,6 +816,7 @@ export function heroMotionHolds(f: Readonly<Fighter>): boolean {
   if (move === undefined) return false;
   if (ultimateHovers(f)) return true;
   if (fallsFreely(f, move, f.special.frame)) return false;
+  if (move.steersShot?.frame === f.special.frame) return true;
   for (const segment of move.motion ?? []) if (f.special.frame >= segment.first && f.special.frame <= segment.last) return true;
   return false;
 }
@@ -924,6 +925,52 @@ function holdAim(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Co
   return false;
 }
 
+function steerShot(ball: Projectile, steer: Readonly<SpecialSteeredShot>, input: Readonly<Controls>, facing: number): void {
+  const speed = squareRoot(f32(f32(ball.velocityX * ball.velocityX) + f32(ball.velocityZ * ball.velocityZ)));
+  const stickX = input.diStickValid ? input.diStickX : input.direction;
+  const stickZ = input.diStickValid ? input.diStickZ : input.verticalDirection;
+  const stick = squareRoot(f32(f32(stickX * stickX) + f32(stickZ * stickZ)));
+  if (speed <= 0.0 || stick <= 0.0) return;
+  turnHeading(f32(ball.velocityX / speed), f32(ball.velocityZ / speed), f32(stickX / stick), f32(stickZ / stick), steer.turnCos, steer.turnSin, facing);
+  ball.velocityX = f32(turned.x * speed);
+  ball.velocityZ = f32(turned.z * speed);
+  if (ball.velocityX !== 0.0) ball.direction = ball.velocityX < 0 ? -1 : 1;
+}
+
+function rootCaster(f: Fighter, steer: Readonly<SpecialSteeredShot>): void {
+  const { motion } = f;
+  motion.vx = 0.0;
+  if (!motion.grounded) motion.vz = -steer.fallSpeed;
+}
+
+function holdSteeredShot(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Controls> | undefined): boolean {
+  const steer = move.steersShot;
+  const shot = move.projectiles?.[0];
+  if (steer === undefined || shot === undefined || f.special.frame !== steer.frame + 1) return false;
+  let index = -1;
+  for (const projectile of f.projectiles) {
+    index++;
+    if (projectile.life <= 0 || projectile.spec !== shot) continue;
+    const ball = mutableProjectile(f, index);
+    if (ball.life > steer.coast && (input?.specialPressed === true || input?.shieldPressed === true)) ball.life = steer.coast;
+    else if (ball.life > steer.coast && input !== undefined) steerShot(ball, steer, input, f.facing);
+    rootCaster(f, steer);
+    f.special.frame = steer.frame;
+    f.special.lockFrames++;
+    f.attack.cooldown++;
+    return true;
+  }
+  if (f.special.hit) f.special.frame = max(f.special.frame, move.endFrame - steer.hitRecovery);
+  return false;
+}
+
+
+export function steeredShot(f: Readonly<Fighter>): Readonly<Projectile> | undefined {
+  const move = runningHeroSpecial(f);
+  return move?.steersShot === undefined || f.special.frame !== move.steersShot.frame ? undefined : projectileAnchor(f, move.projectiles?.[0]);
+}
+
+
 
 export function aimedProjectile(f: Readonly<Fighter>): Readonly<Projectile> | undefined {
   const move = runningHeroSpecial(f);
@@ -935,6 +982,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
   if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
+  if (holdSteeredShot(f, move, input)) return;
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);

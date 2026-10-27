@@ -480,6 +480,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
         if (!(selected.reflector && reflectProjectile(fighterAt(world, nearest), projectile))) {
           if (burst !== undefined) projectile.spec = burst;
           applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
+          if (projectile.spec?.steered === true && projectile.damageMultiplier === 1.0) fighterAt(world, ownerSlot).special.hit = true;
           if (burst !== undefined) {
             projectile.velocityX = 0.0;
             projectile.velocityZ = 0.0;
