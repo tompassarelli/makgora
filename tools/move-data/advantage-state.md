@@ -29,9 +29,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Forsaken Paladin | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in short hop, side special; tech away side special; missed tech side special; trap side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Forsaken Paladin | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away dash, dash attack; missed tech side special; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Forsaken Paladin | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away side special; missed tech side special; trap side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Mal'Ganis | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Mal'Ganis | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Mal'Ganis | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in dash grab, back throw, dash grab, back throw, dash, dash attack; tech away dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Mal'Ganis | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Mal'Ganis | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 20% → up tilt against 5/5 DI |
 | Shadow Hunter | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Shadow Hunter | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash, dash, dash attack; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Shadow Hunter | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
@@ -179,15 +179,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Forsaken Paladin | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | light | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mal'Ganis | light | up throw | 1/1 | 1/1 in short hop, back air, out forward tilt | 1/1 in short hop, back air, out short hop, forward air | 1/0 |
+| Mal'Ganis | light | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 in short hop, back air, out short hop, forward air |
 | Mal'Ganis | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | medium | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mal'Ganis | medium | up throw | 1/1 | 1/1 | 1/1 in short hop, back air, out down smash | 1/1 KD in forward tilt, out dash, dash attack |
+| Mal'Ganis | medium | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 in short hop, back air, out down smash |
 | Mal'Ganis | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | heavy | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mal'Ganis | heavy | up throw | 1/1 | 1/1 in short hop, back air, out short hop, neutral air | 1/1 in up smash, out short hop, forward air | 1/1 KD |
+| Mal'Ganis | heavy | up throw | 1/1 | 1/1 | 1/1 | 1/1 in up smash, out short hop, forward air |
 | Mal'Ganis | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Shadow Hunter | light | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
 | Shadow Hunter | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
