@@ -23,6 +23,7 @@ export const frameCostFile = (source: string, slot: number, language: "typescrip
 export const frameCostClockFile = (slot: number) => `smashcraft-frame-cost-clock-p${slot}.txt`;
 
 export const CAPTURE_STATUS_FILE = "smashcraft-capture-status.txt";
+export const CAPTURE_SCREEN_FILE = "smashcraft-capture-screen.txt";
 export const callbackClockFile = (slot: number, run: number) => `smashcraft-callback-clock-p${slot}-run${run}.txt`;
 export const renderClockFile = (slot: number, run: number) => `smashcraft-render-clock-p${slot}-run${run}.txt`;
 export const PHYSICS_REPORT_FILE = "smashcraft-native-physics-precision.txt";

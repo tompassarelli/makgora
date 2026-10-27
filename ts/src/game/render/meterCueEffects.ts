@@ -50,6 +50,10 @@ class MeterCueModel {
     this.seekAgain = false;
   }
 
+  drawnEffects(into: effect[]): void {
+    if (this.shown && this.model !== undefined) into.push(this.model);
+  }
+
   setPaused(paused: boolean): void {
     if (this.shown && this.model !== undefined) BlzSetSpecialEffectTimeScale(this.model, paused ? 0.0 : 1.0);
   }
@@ -185,6 +189,11 @@ export class MeterCueEffects {
   rebindModels(bind: (object: object, prototype: object) => void): void {
     bind(this.exAura, MeterCueModel.prototype);
     bind(this.burst, MeterCueModel.prototype);
+  }
+
+  drawnEffects(into: effect[]): void {
+    this.exAura.drawnEffects(into);
+    this.burst.drawnEffects(into);
   }
 
   setPaused(paused: boolean): void {

@@ -8,6 +8,7 @@ export interface Silhouette {
   readonly move: string;
   readonly width: number;
   readonly height: number;
+  readonly conceal?: "fighter" | "cues";
 }
 
 export interface CaptureFixture {

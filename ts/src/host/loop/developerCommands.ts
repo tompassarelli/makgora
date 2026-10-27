@@ -21,7 +21,7 @@ import { probeRenderClock } from "./renderClock";
 import { probeCallbackClock } from "./callbackClock";
 import { drawAtBurstTime } from "./betweenFrames";
 import { showBackdrop, showStageLighting, leverCommand } from "./stageScenery";
-import { fighterHideCommand, hideFighter } from "./fighterCloak";
+import { clearCloaks, fighterHideCommand, hideCues, hideFighter } from "./fighterCloak";
 import { journalIdentity } from "./journal";
 import { startBodyFit } from "./bodyFit";
 import { startAgencyFixture } from "./agencyFixture";
@@ -64,7 +64,7 @@ function resetDeveloperPresentation(s: ShellState): void {
   clearCaptureStage(s);
   s.promoHudHidden = false;
   clearVisualCapture(localSlot());
-  for (const slot of PARTICIPANT_SLOTS) s.hiddenFighters[slot] = undefined;
+  clearCloaks(s);
   pauseMatchPresentation(s, s.session.paused);
 }
 
@@ -258,9 +258,9 @@ function presentationReceipt(s: ShellState, actor: number, message: string, requ
 function sceneToggleReceipt(s: ShellState, actor: number, message: string, requests: DeveloperRequests): string | undefined {
   const { fighterHide } = requests;
   if (fighterHide !== undefined) {
-    if (!hideFighter(s, fighterHide.slot, fighterHide.hidden)) return undefined;
-    if (!fighterHide.hidden) renderPersistentPresentation(s);
-    return `dev: fighter ${fighterHide.slot} ${fighterHide.hidden ? "hidden" : "shown"}`;
+    if (!(fighterHide.part === "cues" ? hideCues : hideFighter)(s, fighterHide.slot, fighterHide.hidden)) return undefined;
+    if (!fighterHide.hidden && fighterHide.part === "fighter") renderPersistentPresentation(s);
+    return `dev: ${fighterHide.part} ${fighterHide.slot} ${fighterHide.hidden ? "hidden" : "shown"}`;
   }
   if (message.startsWith("-dev lever ")) return leverReceipt(s, message);
   if (message.startsWith("-dev fogv ")) return fogReceipt(s, message);

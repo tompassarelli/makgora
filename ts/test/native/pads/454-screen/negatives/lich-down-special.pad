@@ -1,0 +1,22 @@
+# #454 screen calibration: lich down-special, every active frame (special frames 22-39) held with its cues shown, then concealed by -dev hide cues 0.
+#! chat -dev quick hero lich
+#! conceal-cues a lich down-special 1470x840
+40 a move special 3 right
+60 a capture
+61 a capture
+62 a capture
+63 a capture
+64 a capture
+65 a capture
+66 a capture
+67 a capture
+68 a capture
+69 a capture
+70 a capture
+71 a capture
+72 a capture
+73 a capture
+74 a capture
+75 a capture
+76 a capture
+77 a capture

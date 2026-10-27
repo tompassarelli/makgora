@@ -1,0 +1,22 @@
+# #454 screen calibration: blademaster neutral-special, every active frame (special frames 18-35) held with its cues shown, then concealed by -dev hide cues 0.
+#! chat -dev quick hero blademaster
+#! conceal-cues a blademaster neutral-special 1470x840
+40 a move special 0 right
+56 a capture
+57 a capture
+58 a capture
+59 a capture
+60 a capture
+61 a capture
+62 a capture
+63 a capture
+64 a capture
+65 a capture
+66 a capture
+67 a capture
+68 a capture
+69 a capture
+70 a capture
+71 a capture
+72 a capture
+73 a capture

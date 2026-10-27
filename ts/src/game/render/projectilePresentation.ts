@@ -74,7 +74,7 @@ interface Pool {
 }
 
 export class ProjectilePresentation {
-  private readonly models: effect[] = [];
+  readonly models: effect[] = [];
   private readonly visible: boolean[] = [];
   private readonly pools: Pool[] = [];
 

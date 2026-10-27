@@ -75,7 +75,7 @@ the existing camera limits. `-dev hide fighter SLOT` (SLOT 0 to 3) stops
 drawing that fighter's body unit or effect body, its shadow, its disjoint
 weapon models, white flash, agency halo, shield and dizzy stars without
 touching the sim, stage, other fighters or HUD; `-dev show fighter SLOT` puts
-back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
+back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hide cues SLOT` instead stops drawing only that fighter's special cues, hit-area cues, projectiles, placed objects, meter cues and per-fighter special effects, keeping its body, the scene and the HUD, by zeroing each model's scale and parking it below the camera (a scale of zero leaves particle emitters running); `-dev show cues SLOT` puts each one back at its last drawn scale and position (receipt `dev: cues SLOT hidden|shown`).
 
 - One-client captures:
   `bun scripts/nativeCapture.ts build --out MAP.w3x --control PAD|DIR...` bakes
@@ -156,7 +156,11 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   `run` saves `FIXTURE/<frame>-shown.png` and `FIXTURE/<frame>-hidden.png` plus
   `FIXTURE/silhouette.json` (match frames, slot, fighter, move, resolution) for
   Wisp's `silhouetteBounds(shown, hidden)`; `run` refuses a capture of another
-  size. The default scenario is smashcraft:ts/test/native/captures/wisp125-warden-nair.pad
+  size. `#! conceal-cues a|b FIGHTER MOVE [WIDTHxHEIGHT]` holds each frame the same
+  way but hides only that fighter's cues (`-dev hide cues SLOT`), draws hit-area
+  cues as a match does, stamps the concealed grab only after 120 held ticks so particles the cues emitted before hiding have died, and writes one `SCREEN FIXTURE FRAME WIDTH HEIGHT` line
+  per frame with the projected strike-and-hurt and hurt-only boxes, which `run`
+  keeps as the receipt's `screen` lines (smashcraft:docs/commands/view.md). The default scenario is smashcraft:ts/test/native/captures/wisp125-warden-nair.pad
   (Warden's neutral air, 10 held frames); build and run it as above, never on
   Tom's install.
 

@@ -1,0 +1,22 @@
+# #454 screen calibration: cairne-bloodhoof neutral-special, every active frame (special frames 24-41) held with its cues shown, then concealed by -dev hide cues 0.
+#! chat -dev quick hero cairne bloodhoof
+#! conceal-cues a cairne-bloodhoof neutral-special 1470x840
+40 a move special 0 right
+62 a capture
+63 a capture
+64 a capture
+65 a capture
+66 a capture
+67 a capture
+68 a capture
+69 a capture
+70 a capture
+71 a capture
+72 a capture
+73 a capture
+74 a capture
+75 a capture
+76 a capture
+77 a capture
+78 a capture
+79 a capture

@@ -111,6 +111,13 @@ export class PlacedObjectEffects {
     return model;
   }
 
+  slotEffects(slot: number, into: effect[]): void {
+    for (let animal = 0; animal < ANIMALS; animal++) {
+      const model = this.models[slot * ANIMALS + animal];
+      if (model !== undefined) into.push(model);
+    }
+  }
+
   clear(): void {
     for (let slot = 0; slot < this.models.length; slot++) this.hideModel(slot);
     this.feedback.clear();
