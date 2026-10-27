@@ -97,7 +97,7 @@ export class CombatEffects {
 
 
 
-  private late: ImpactState | undefined;
+  private readonly late: ImpactState = createImpactState();
 
   private lateConfirmed: (number | undefined)[] = [];
   private lateLive = 0;
@@ -166,7 +166,7 @@ export class CombatEffects {
     for (let slot = 0; slot < VOICE_CAP; slot++) this.voiceHandles[slot] = undefined;
     this.shownEmissions = [];
     this.drawnContacts = [];
-    if (this.late !== undefined) clearImpactState(this.late);
+    clearImpactState(this.late);
     this.lateConfirmed = [];
     this.lateLive = 0;
     this.presentedFrame = undefined;
@@ -223,7 +223,7 @@ export class CombatEffects {
 
   confirmContacts(frame: number, slot: number, events: Readonly<ImpactEvents>): void {
     if (!events.hit && !events.shieldHit && !events.shieldReflect && !events.shieldBreak) return;
-    const late = (this.late ??= createImpactState());
+    const late = this.late;
     emitImpacts(late, events, frame, slot);
     let live = 0;
     // Use IMPACT_COUNT because free slots are undefined and Lua length skips them.
@@ -321,7 +321,7 @@ export class CombatEffects {
     const pose = playing && age !== undefined ? projectImpact(source, i, this.pose) : undefined;
     if (pose === undefined || !pose.visible) {
 
-      if (parked[i] !== true && (this.lateLive === 0 || this.late?.ages[i] === undefined)) parkOnce(model, this, parked, i);
+      if (parked[i] !== true && (this.lateLive === 0 || this.late.ages[i] === undefined)) parkOnce(model, this, parked, i);
       shownAges[i] = undefined;
       this.shownEmissions[i] = undefined;
       return;
@@ -432,7 +432,6 @@ export class CombatEffects {
 
   private presentLate(state: Readonly<ImpactState>, frame: number, playing: boolean): void {
     const late = this.late;
-    if (late === undefined) return;
     const parked = (this.parked ??= []);
     const advance = this.presentedFrame !== frame;
     this.presentedFrame = frame;
