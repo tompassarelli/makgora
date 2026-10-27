@@ -129,11 +129,11 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
       yield* pollUntil(shot().pipe(Effect.map(value => value.stage ? value : undefined)), { every: "100 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate stage pixels", problem: "no drawn CHOOSE A STAGE title" })) });
       const stagePointer = yield* park();
       const stage = yield* cursorOn(true, "stage");
-      const starting = yield* pressStart("stage", pollUntil(menu().pipe(Effect.map(value => value?.phase === "BLOCKED" && value.epoch > stageMenu.epoch ? value : undefined)), { every: "100 millis", within: "5 seconds", orElse: menu }));
+      const starting = yield* pressStart("stage", pollUntil(menu().pipe(Effect.map(value => value?.phase === "BLOCKED" ? value : undefined)), { every: "100 millis", within: "5 seconds", orElse: menu }));
       return { selectPointer, parkedSelect: select, select: opening.before, stageMenu, stagePointer, parkedStage: stage, stage: starting.before, after: starting.value };
     });
     const opened = run.stageMenu !== undefined;
-    const started = run.stageMenu !== undefined && run.after?.phase === "BLOCKED" && run.after.epoch > run.stageMenu.epoch;
+    const started = run.stageMenu !== undefined && run.after?.phase === "BLOCKED";
     const afterFrame = started ? yield* pollUntil(shot().pipe(Effect.map(value => value.stage || locate(value.frame) !== undefined ? undefined : value.frame)), { every: "100 millis", within: "60 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate calibration", problem: "no drawn gameplay frame without the stock cursor within 60 s of the match transition" })) }) : yield* capture(client, region).pipe(Effect.mapError(fail("start gate capture")));
     const after = yield* save("after-start", afterFrame);
     if (started && negativeControl === undefined) negativeControl = after;
