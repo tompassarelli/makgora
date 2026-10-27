@@ -50,7 +50,7 @@ launch rules. Air casts never stall their fall.
 
 | Input | Player decision, result and screen cue | Commitment and counterplay |
 | --- | --- | --- |
-| Neutral — **Howl of Terror** | Throw the arms wide and roar. A visible expanding ring hits both sides once for 7 damage, pushing opponents away at 35 degrees. This is the close-range reset, sourced from Warcraft's Howl and Bowser's readable body power. | 12 mana, active f15–18, ends f46; radius 1.0H. A shield stops the roar; its 28 recovery frames give the defender a punish. No lingering status. Air landing lag 24. |
+| Neutral — **Howl of Terror** | Inhale on f1–11 while a fel-red glow builds at the mouth, then roar on f12. A fel-red shockwave ring expands on both sides over f12–16 to 1.6H, with a small screen shake and Warcraft's Howl of Terror roar; the drawn ring is the live hit circle on every frame. Each foe is hit once for 4 damage. A grounded foe is **Terrified**: no launch, it cowers in place under Warcraft's Howl of Terror target art for 30 frames plus 0.4 a percent of its post-hit damage, at most 90; any hit ends it. An airborne foe is pushed away from Pit Lord at 45 degrees and is never terrified. A terrified foe then resists terror for 300 frames and shows a resist flash instead, so it cannot chain. Sourced from Warcraft's Howl of Terror fear and Mewtwo's Disable. | 12 mana, ends f34. At 0% a close foe recovers about when Pit Lord does and escapes; at mid percent dash attack, forward smash or Rain of Fire connects. A shield is not terrified but takes 18 shield damage and a big shield push. Air landing lag 12. |
 | Side — **Ruin Charge** | Lower the chest, plant the hind legs, then drive the horns and shoulder forward through a flame trail. 15 damage at 35 degrees. The armored push is an adaptation of Warcraft's charge-into-cleave plan with Bowser's commitment. | 22 mana, active/travel f19–26, ends f64. Ground travel 1.5H. One hit of at most 6 damage is absorbed on f19–24 only; a visible hard glow identifies that window. Stops at a body or shield. Air travel 0.8H, no armor, once per airtime, helpless afterward. |
 | Up — **Abyssal Leap** | Compress all four legs, then rear up hoof-first with embers beneath the body. The rising hoof hits for 10 damage at 80 degrees. Warcraft's demon body and DotA's abyssal escape theme meet a deliberately exposed heavy recovery. | 15 mana; hoof f13–18, travel through f32. Full rise 3.5H, forward drift 0.5H and up to 1.15H of stick steering. Below 15 mana: a shorter free rise with no hit, meeting the 240-unit route floor on both axes. Paid and free routes use the [#252 recovery measure](../gameplay-design.md#recovery-and-edgeguarding), with the paid route in the heavy band. Spends the aerial jump and ends helpless. Both forms remain hittable during the rise and exposed descent. |
 | Down — **Rain of Fire** | Raise the cleaver and free hand, then drag them downward. Three large flaming rocks fall in sequence into a lane ahead: near, middle, far. Each visibly falling rock can hit once for 5 damage at 70 degrees. This is Warcraft Rain of Fire and DotA Firestorm, using the heavy's obvious commitment from Smash. | 20 mana, meteors appear f25/31/37, cast ends f60. Centers 1.8H/2.2H/2.6H ahead, 2.8H above feet; fall 0.16H/frame, radius 0.22H, life 24. Three at once maximum; no new cast while they remain. Reflectable, shieldable. Rush underneath, jump beyond the lane or interrupt before later rocks appear. Air landing lag 24. |
@@ -58,7 +58,7 @@ launch rules. Air casts never stall their fall.
 The falling rocks themselves show the danger before contact. Rain has no
 hidden burn, guaranteed three-hit string or damage suppression. Its 6-frame
 spacing is pressure the defender can escape, not a promise of a combo. The
-roar's ring and launch are its whole effect. Charge's flame trail follows the
+roar's ring, the cower and the target art show the whole effect. Charge's flame trail follows the
 actual moving body, and the leap's hoof leads the actual hit region.
 
 ## Whole-kit decisions
@@ -66,8 +66,8 @@ actual moving body, and the leap's hoof leads the actual hit region.
 Hold the cleaver's existing 120–190 unit spacing. Rain pressures opponents
 outside that space; it is too slow when they are already close. Follow their
 jump with up tilt or up air, or catch a grounded approach with forward tilt.
-Charge punishes a predicted retreat, while Howl creates room after the
-opponent gets inside. The existing down tilt, up tilt and up throw remain
+Charge punishes a predicted retreat, while Howl freezes a grounded opponent
+who got inside long enough for a readable punish at mid percent. The existing down tilt, up tilt and up throw remain
 launchers into reads and tech chases. No new guaranteed string is designed.
 
 Compared with Rifleman he commits to a falling lane rather than

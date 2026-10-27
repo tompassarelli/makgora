@@ -11,7 +11,6 @@ export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
 export const SpecialForm = { ground: 0, air: 1, recall: 3, marked: 4 } as const;
 export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 
-
 export const FOLLOW_UP_FORM = 6;
 
 
@@ -380,6 +379,7 @@ export interface AuthoredSpecial {
   readonly jumpWindow?: FrameWindow | undefined;
 
   readonly turnsAround?: true | undefined;
+  readonly radial?: true | undefined;
 
   /** Started on the ground it keeps the ground speed it had and slides on traction; started in the air it stops horizontally. */
   readonly groundMomentum?: true | undefined;

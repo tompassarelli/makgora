@@ -23,6 +23,7 @@ import type { MenuControls } from "../../game/ui/frames";
 import { FighterHud, MatchClock, plateManaSlot } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
+import { TerrorPresentation } from "../../game/render/terrorPresentation";
 import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
 import { FighterMarker } from "../../game/ui/fighterMarker";
@@ -68,6 +69,7 @@ interface FighterRenderers {
   readonly flight: FlightPresentation | undefined;
 
   readonly hitAreas: HitAreaPresentation | undefined;
+  readonly terror: TerrorPresentation;
 }
 
 export interface UiObjects {
@@ -176,6 +178,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.spheres?.destroy();
   renderers?.flight?.destroy();
   renderers?.hitAreas?.destroy();
+  renderers?.terror.destroy();
 }
 
 
@@ -210,6 +213,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
     spheres: orbit === undefined ? undefined : new SpherePresentation(orbit, s.origin),
     flight: flight === undefined ? undefined : new FlightPresentation(flight, s.origin),
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
+    terror: new TerrorPresentation(s.origin),
   };
   return pool?.admitted() === true;
 }
@@ -318,6 +322,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     if (renderers.flight !== undefined) bindPrototype(renderers.flight, FlightPresentation.prototype);
     bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
     if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);
+    bindPrototype(renderers.terror, TerrorPresentation.prototype);
   }
 }
 

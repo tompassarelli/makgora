@@ -3,7 +3,7 @@
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
-import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ParasolState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
+import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ParasolState, ShieldBreak, SpecialAction, SurfaceContact } from "../sim/codes";
 import { type CommandGrab, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 
 import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES, WALL_TECH_STARTUP_FRAMES, attackPhase, inGrabContext, isForwardGroundRoll, isGroundDodging } from "../sim/conditions";
@@ -18,6 +18,7 @@ import { SHIELD_RELEASE_LAG_FRAMES } from "../sim/shield";
 import { INITIAL_DASH_FRAMES, SHIELD_BREAK_LAND_FRAMES, SHIELD_BREAK_STAND_FRAMES, authoredPhysics } from "../sim/tuning";
 import { DamagePose, contactDamageClip, damagePose } from "./damagePose";
 import * as dh from "./demonHunterAssetInfo";
+import { disabledPose } from "./disabledPose";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
@@ -287,14 +288,14 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     return rate;
   }
 
-  if (f.status.condition === HeroStatusKind.stun && f.launch.hitlag <= 0 && f.launch.hitstun <= 0) {
-    if (pose.animation !== "stunned") {
-      if (illidan) selectFighterClipIndex(pose, dh.DEMON_HUNTER_SHIELD_BREAK_INDEX);
-      else if (table.dizzy !== undefined) selectFighterClipIndex(pose, table.dizzy.index);
+  const disabled = disabledPose(f, table);
+  if (disabled !== undefined) {
+    if (pose.animation !== disabled.key) {
+      if (disabled.index !== undefined) selectFighterClipIndex(pose, disabled.index);
       else selectFighterClipName(pose, "stand hit");
-      pose.animation = "stunned";
+      pose.animation = disabled.key;
     }
-    return rate;
+    return disabled.holdFrames > 0 ? clipRate(disabled.seconds, disabled.holdFrames) : rate;
   }
   if (posesDown(f)) {
     const key = `down${f.down.state}`;

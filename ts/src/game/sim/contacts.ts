@@ -261,7 +261,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.blocked) {
       blockedContact = true;
       shieldElectric ||= contact.effect.electric || contact.effect.element === HitElement.electric;
-      if (!perfectShield) shieldDamage = addFloat32(shieldDamage, contact.effect.damage);
+      if (!perfectShield) shieldDamage = addFloat32(shieldDamage, contact.effect.shieldDamage ?? contact.effect.damage);
     } else {
       totalDamage = addFloat32(totalDamage, roundToFloat32(contact.effect.damage));
       damageObserver?.(contact.source, contact.target, contact.effect.damage);
@@ -273,12 +273,13 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.target !== slot) continue;
     const source = fighterAt(world, contact.source);
     const { damage } = contact.effect;
+    const shieldHit = contact.effect.shieldDamage ?? damage;
     if (contact.direct) source.launch.hitlag = max(source.launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
     if (contact.blocked) {
       if (contact.kind === ContactKind.damageOnly) continue;
-      if (!perfectShield) shield.stun = max(shield.stun, shieldstunFrames(damage, shield.strength, contact.sourceAerial));
+      if (!perfectShield) shield.stun = max(shield.stun, shieldstunFrames(shieldHit, shield.strength, contact.sourceAerial));
       launch.hitlag = max(launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
-      const pushback = shieldContactPushback(damage, shield.strength, perfectShield);
+      const pushback = shieldContactPushback(shieldHit, shield.strength, perfectShield);
       shieldPushback = max(shieldPushback, pushback);
       if (pushback === shieldPushback) shieldDirection = contact.facing;
       if (contact.direct) {

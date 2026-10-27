@@ -124,7 +124,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 + PitLordAttack1 / PitLordAttack2 / PitLordAttack3 | MetalHeavyChopFlesh | MetalHeavyChopFlesh + PitLordAttackSlam1 | MetalHeavyChopMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air | BattleNetWooshStereo1 + PitLordAttack1 / PitLordAttack2 / PitLordAttack3 | MetalMediumChopFlesh | MetalHeavyChopFlesh + PitLordAttackSlam1 | MetalMediumChopMetal |  |
 | Dash attack | BattleNetWooshStereo1 + PitLordAttackSlam1 | RockHeavyBashFlesh | RockHeavyBashFlesh + PitLordAttackSlam1 | MetalHeavyChopMetal |  |
-| Neutral special: Howl of Terror | HowlOfTerror | CrushingWaveDamage | CrushingWaveDamage + PitLordAttackSlam1 | MetalMediumChopMetal |  |
+| Neutral special: Howl of Terror |  | CrushingWaveDamage | CrushingWaveDamage + PitLordAttackSlam1 | MetalMediumChopMetal |  |
 | Side special: Ruin Charge | BalrogAttack1 | RockHeavyBashFlesh | RockHeavyBashFlesh + PitLordAttackSlam1 | MetalMediumChopMetal |  |
 | Up special: Abyssal Leap | PitLordAttackSlam1 | RockHeavyBashFlesh | RockHeavyBashFlesh + PitLordAttackSlam1 | MetalMediumChopMetal |  |
 | Down special: Rain of Fire | RainOfFireWave | Fireball | Fireball + PitLordAttackSlam1 | MetalMediumChopMetal |  |

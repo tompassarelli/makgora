@@ -4,7 +4,7 @@
 
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
-import { addFloat32, roundToFloat32, toInt } from "wisp/src/sim/binary32";
+import { addFloat32, multiplyFloat32, roundToFloat32, toInt } from "wisp/src/sim/binary32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { advanceMash, clearMash } from "./mash";
 import { aerialJumps } from "./itemBuffs";
@@ -63,6 +63,7 @@ const RULES: { readonly [kind: number]: StatusRules | undefined } = {
 
   [HeroStatusKind.chill]: { blocksActions: false, blocksSpecials: false, endsOnDamage: false },
   [HeroStatusKind.stun]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
+  [HeroStatusKind.fear]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
 
 
   [HeroStatusKind.carried]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 20, carry: { speed: 3.0, rise: 0.5 } },
@@ -82,9 +83,23 @@ export interface AppliedStatus {
   readonly soak?: { readonly level: number; readonly slow: AppliedStatus } | undefined;
   readonly ignite?: { readonly damage: readonly number[]; readonly frames: readonly number[]; readonly every: number; readonly tick: number } | undefined;
 
+  readonly perPercent?: { readonly frames: number; readonly cap: number } | undefined;
+
+  readonly groundedOnly?: true | undefined;
 
 
 
+
+}
+
+function refuses(f: Readonly<Fighter>, status: Readonly<AppliedStatus>): boolean {
+  return (f.status.conditionImmunity[status.group] ?? 0) > 0 || (status.groundedOnly === true && !f.motion.grounded);
+}
+
+export function heldFrames(status: Readonly<AppliedStatus>, percent: number): number {
+  const scale = status.perPercent;
+  if (scale === undefined) return status.frames;
+  return min(scale.cap, status.frames + toInt(multiplyFloat32(scale.frames, roundToFloat32(percent))));
 }
 
 const rules = (f: Readonly<Fighter>): StatusRules | undefined => RULES[f.status.condition];
@@ -128,9 +143,9 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
     return;
   }
   if (state.out) return;
-  if ((state.conditionImmunity[status.group] ?? 0) > 0) return;
+  if (refuses(f, status)) return;
   state.condition = status.kind;
-  state.conditionFrames = status.frames;
+  state.conditionFrames = heldFrames(status, state.damage);
   if (RULES[status.kind]?.mashMinimum !== undefined) clearMash(f.grab);
   state.conditionGroup = status.group;
   state.conditionImmunityFrames = status.immunityFrames;

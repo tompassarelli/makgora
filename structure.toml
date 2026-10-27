@@ -85,7 +85,7 @@ may_use = ["fighter-kit", "fighter-look", "ai", "sim", "core", "generated"]
 name = "snapshot"
 paths = ["ts/src/game/snapshot/**", "ts/src/game/replay/canonical.ts", "ts/src/game/replay/fighterState.ts", "ts/src/game/replay/difference.ts",
          "ts/src/game/replay/history.ts", "ts/src/game/replay/snapshot.ts", "ts/src/game/replay/scopedRepair.ts",
-         "ts/src/game/replay/frameDigest.ts", "ts/src/game/replay/limits.ts"]
+         "ts/src/game/replay/frameDigest.ts", "ts/src/game/replay/limits.ts", "ts/src/game/replay/strikeCanonical.ts"]
 responsibility = "Canonical text, state hash, copy/compare/diff of world state and the rollback ring."
 may_use = ["sim", "fighter-kit", "core", "generated"]
 

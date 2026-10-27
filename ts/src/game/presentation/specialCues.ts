@@ -48,6 +48,7 @@ import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { GROM_BLOODLUST_MODEL, MURLOC_SWAMP_MIST_MODEL } from "../assets/importedModelInfo";
 import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
+import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 
 
@@ -180,6 +181,8 @@ const BANSHEE_FORM: MoveCues = {
 const DREADLORD_BITE_CUES: MoveCues = { spell: "Healing bite", startup: VAMPIRIC, active: cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0) };
 const VOODOO = cue("Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx", "hand", f32(0.7));
 const FEL = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.7));
+const HOWL_INHALE: Cue = { ...FEL, scale: f32(0.25), scaleEnd: f32(0.9), scaleFrames: HOWL_FIRST - 1, color: [255, 40, 20], anchorFrames: Array.from({ length: HOWL_FIRST }, () => ({ x: 38.0, z: 118.0 })) };
+const HOWL_ROAR: Cue = { ...cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "feet", f32(HOWL_REACH / f32(440.0))), color: [255, 60, 30], sound: "HowlOfTerror" };
 const MURGUL = cue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx", "hand", f32(0.6));
 const BEAST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", "hand", f32(0.6));
 const QUIET_BEAST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.6));
@@ -358,7 +361,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Hex", startup: VOODOO, active: cue("Abilities\\Spells\\Human\\Polymorph\\PolymorphTarget.mdx", "hand", f32(0.6)) },
   },
   [Character.pitLord]: {
-    neutral: { spell: "Howl of Terror", startup: FEL, active: cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "body", f32(0.7)) },
+    neutral: { spell: "Howl of Terror", startup: HOWL_INHALE, active: HOWL_ROAR },
     side: { spell: "Ruin Charge", startup: FEL, active: timed(cue(IMPACT_DUST_MODEL, "feet", f32(0.8)), "stand", 0.0) },
     up: { spell: "Abyssal Leap", startup: FEL, active: timed(cue("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", "feet", f32(0.42)), "birth", f32(0.2)) },
     down: { spell: "Rain of Fire", startup: FEL, active: { ...timed(cue(RAIN_OF_FIRE_TARGET, "overhead", f32(0.5)), "birth", f32(0.8)), timeScale: 1.5 } },

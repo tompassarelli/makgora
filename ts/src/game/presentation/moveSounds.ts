@@ -96,7 +96,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.pitLord]: {
     weapon: Weapon.axe, swing: ["PitLordAttack1", "PitLordAttack2", "PitLordAttack3"], strong: "PitLordAttackSlam1",
-    specials: [s("HowlOfTerror", "CrushingWaveDamage"), s("BalrogAttack1", "RockHeavyBashFlesh"), s("PitLordAttackSlam1", "RockHeavyBashFlesh"), s("RainOfFireWave", "Fireball")],
+    specials: [s(undefined, "CrushingWaveDamage"), s("BalrogAttack1", "RockHeavyBashFlesh"), s("PitLordAttackSlam1", "RockHeavyBashFlesh"), s("RainOfFireWave", "Fireball")],
     normals: { [AttackStyle.dashAttack]: { perform: "PitLordAttackSlam1", hit: "RockHeavyBashFlesh" } },
   },
   [Character.beastmaster]: {

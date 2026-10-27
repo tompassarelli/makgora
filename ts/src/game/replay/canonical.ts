@@ -1,3 +1,4 @@
+import { writeStrikeTraits } from "./strikeCanonical";
 import { type FighterFieldSink, type FighterKitText, writeFighterFields } from "../../generated/state/fighterState";
 
 
@@ -348,7 +349,8 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
     + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "")
     + optionalField(`${prefix}.manaSteal`, hit.manaSteal, canonicalInt)
     + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
-    + optionalField(`${prefix}.stunFrames`, hit.stunFrames, canonicalInt);
+    + optionalField(`${prefix}.stunFrames`, hit.stunFrames, canonicalInt)
+    + optionalField(`${prefix}.shieldDamage`, hit.shieldDamage, canonicalRealField);
 }
 
 
@@ -424,12 +426,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     if (move.command.slot !== undefined) int("command.slot", move.command.slot);
   }
   if (move.recallsProjectiles === true) int("recallsProjectiles", 1);
-  if (move.strikeStatus !== undefined) {
-    int("strikeStatus.kind", move.strikeStatus.kind);
-    int("strikeStatus.frames", move.strikeStatus.frames);
-    int("strikeStatus.every", move.strikeStatus.tick?.every ?? 0);
-    real("strikeStatus.damage", move.strikeStatus.tick?.damage ?? 0.0);
-  }
+  writeStrikeTraits(move, int, real);
   if (move.guard !== undefined) {
     int("guard.first", move.guard.first);
     int("guard.last", move.guard.last);

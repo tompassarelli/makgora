@@ -3,7 +3,7 @@
 
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
-import { HitElement } from "../../sim/codes";
+import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialMotion, type SpecialProjectile, frames } from "../../sim/specials/schema";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
@@ -16,10 +16,10 @@ const perFrame = (distance: number, first: number, last: number): number => f32(
 
 const AIR_SPECIAL_LANDING_LAG = 24;
 const HOWL_HURT = [
-    hurtPose(1, 45, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
+    hurtPose(1, 33, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
 ];
 const HOWL_AIR_HURT = [
-    hurtPose(1, 45, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
+    hurtPose(1, 33, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
 ];
 const CHARGE_HURT = [
     hurtPose(1, 63, [hurtPart(-37.0, 34.0, 40.0, 87.0, 56.0)]),
@@ -100,21 +100,30 @@ const abyssalLeap = (rise: number, drift: number, steer: number): AuthoredSpecia
 
 
 
-const HOWL_REACH = h(1.0);
-const HOWL_RADIUS = h(f32(0.5));
+export const HOWL_FIRST = 12;
+export const HOWL_REACH = h(f32(1.6));
 const HOWL_HEIGHT = h(f32(0.6));
+const HOWL_RINGS = [f32(0.5), f32(0.625), f32(0.75), f32(0.875), 1.0] as const;
+const HOWL_AIR_LANDING_LAG = 12;
+const HOWL_DAMAGE = 4.810800075531006;
+const HOWL_HIT = { ...hit(HOWL_DAMAGE, "LINK", 45, 1.0, HitElement.normal), shieldDamage: 21.64859962463379 };
+const HOWL_GROUNDED_HIT = { ...HOWL_HIT, growth: 0.0, base: 0.0, launchX: 1.0, launchZ: 0.0, setKnockback: 0.0 };
+export const TERRIFIED: NonNullable<AuthoredSpecial["strikeStatus"]> = {
+  kind: HeroStatusKind.fear, frames: 30, group: HeroStatusGroup.sleep, immunityFrames: 300,
+  perPercent: { frames: 0.4000000059604645, cap: 90 }, groundedOnly: true,
+};
 const howl = (air: boolean): AuthoredSpecial => ({
-  endFrame: 46,
+  endFrame: 34,
   hurt: air ? HOWL_AIR_HURT : HOWL_HURT,
-  regions: [
-    heroRegion(15, 18, capsule(0.0, HOWL_HEIGHT, f32(HOWL_REACH - HOWL_RADIUS), HOWL_HEIGHT, HOWL_RADIUS), hit(8.418900489807129, "POKE", 35, 1.0, HitElement.normal)),
-    heroRegion(15, 18, capsule(0.0, HOWL_HEIGHT, -f32(HOWL_REACH - HOWL_RADIUS), HOWL_HEIGHT, HOWL_RADIUS), hit(8.418900489807129, "POKE", 35, -1.0, HitElement.normal)),
-  ],
-  landingLag: air ? AIR_SPECIAL_LANDING_LAG : undefined,
+  regions: HOWL_RINGS.map((share, index) =>
+    heroRegion(HOWL_FIRST + index, HOWL_FIRST + index, capsule(0.0, HOWL_HEIGHT, 0.0, HOWL_HEIGHT, f32(HOWL_REACH * share)), HOWL_HIT, HOWL_GROUNDED_HIT)),
+  radial: true,
+  strikeStatus: TERRIFIED,
+  landingLag: air ? HOWL_AIR_LANDING_LAG : undefined,
 });
 
 export const PIT_LORD_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Howl of Terror", description: "A close roar pushes enemies away on both sides; a shield stops it.", ground: howl(false), air: howl(true) }, { reach: 1.25 }),
+  neutral: withExKit({ name: "Howl of Terror", description: "Inhale, then roar: a fel shockwave expands on both sides. Grounded foes it reaches cower in terror, longer at higher damage, then resist it for five seconds; airborne foes are pushed away, and a shield takes a heavy blow and a big push instead.", ground: howl(false), air: howl(true) }, { reach: 1.25 }),
   side: withExKit({ name: "Ruin Charge", description: "A slow charge whose armor shrugs off one light hit; it stops at a shield.", ground: RUIN_CHARGE, air: RUIN_CHARGE_AIR }, { damage: 1.25 }),
   up: withExKit({ name: "Abyssal Leap", description: "A slow arcing leap you steer, with a hoof strike, then a helpless fall.", ground: abyssalLeap(h(f32(3.5)), h(f32(0.5)), h(f32(1.15))) }, { travel: 1.25 }),
   down: withExKit({ name: "Rain of Fire", description: "Three waves of fire fall ahead; rush underneath or tilt your shield up.", ground: rain(false), air: rain(true) }, { damage: 1.25 }),

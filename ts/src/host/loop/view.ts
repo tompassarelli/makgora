@@ -26,6 +26,8 @@ import { type MatchCamera, copyMatchCamera } from "../../game/sim/matchCamera";
 import { advanceMatchCamera } from "../../game/sim/matchCamera";
 import { stageBounds } from "../../game/sim/stageBounds";
 import { damageTint } from "../../game/presentation/hitPresentation";
+import { roaring } from "../../game/presentation/terrorCues";
+import { shakeRoarCamera } from "./roarCamera";
 import { DamagePose, damagePose } from "../../game/presentation/damagePose";
 import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
 import type { FighterPose } from "../../game/presentation/fighterPose";
@@ -440,6 +442,7 @@ export function renderPersistentPresentation(s: ShellState): void {
   if (playing) markAgency(ui, world, stage, matchFrame, s.controls, (activeRollback(s)?.repairedFrames ?? 0) > 0);
   ui.classic?.present(game);
   ui.combat.present(runtime.impacts, runtime.simulationFrame, s.runtime.impacts, playing);
+  const roared = roaring(world, playing);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const renderers = ui.fighters[slot];
@@ -459,7 +462,10 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.goldSack?.present(posed, stage);
     renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
     renderers?.flight?.present(posed, stage, s.session.paused);
-    if (renderers !== undefined) renderers.agency.present(live, live === undefined ? "act" : agencyMarks[slot]);
+    if (renderers !== undefined) {
+      renderers.agency.present(live, live === undefined ? "act" : agencyMarks[slot]);
+      renderers.terror.present(live, roared, s.session.paused);
+    }
     ui.special.presentStatic(runtime.specials, live, slot);
     ui.special.presentSummons(runtime.summons, live, slot);
     if (live !== undefined) ui.frost.present(live, slot);
@@ -542,6 +548,7 @@ export function lockArenaCamera(s: ShellState): void {
   probeCamera(s.probe, game.camera, framing, centerX, FLOOR_HEIGHT);
   const duration = s.cameraTween === true && game.phase === Phase.match && !s.session.paused ? FRAME_SECONDS : 0.0;
   applyArenaCamera(s, framing, aspect, pauseCameraAngle(s), duration);
+  shakeRoarCamera(world, game.phase, s.session.paused, FLOOR_HEIGHT + framing.z);
   if (s.build.analogPadDiagnostic === true) {
 
     SetCameraBounds(centerX, centerY, centerX, centerY, centerX, centerY, centerX, centerY);

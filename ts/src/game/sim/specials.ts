@@ -31,6 +31,7 @@ import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHi
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
 import { changesAimZone, chargedAimX, chargedAimZ } from "./specials/aimZone";
+import { heroContactFacing } from "./specials/radial";
 import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followUpOnContact, enterUltimate, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
@@ -973,7 +974,7 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
         : f32(heroRegionOrigin(owner).z + f32(f32((strike?.z1 ?? contact.minZ) + (strike?.z2 ?? contact.maxZ)) * 0.5));
       const shielded = contact.strike === undefined ? meleeHitIntersectsShield(owner, target, contact) : heroStrikeMeetsShield(owner, target, contact);
       if (!shielded) markFelRushStrike(owner);
-      applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, at(facings, ownerSlot), heroContactEffect(contact, target), true,
+      applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, heroContactFacing(owner, target, at(facings, ownerSlot)), heroContactEffect(contact, target), true,
         shielded, runningHeroSpecial(owner)?.strikeStatus, contactZ);
     }
   }
