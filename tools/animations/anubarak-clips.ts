@@ -171,7 +171,7 @@ for (const pose of ["rollForward", "techForward", "getUpRollForward", "ledgeRoll
 for (const [pose, key, gesture, contact, target] of [
   ["neutralSpecial", "neutral", { ...cast, chest: 30 }, 8, [48, 29]],
   ["sideSpecial", "side", { ...cast, arm: -105, leftArm: -65 }, 26, [52, 51]],
-  ["upSpecial", "up", { ...overhead, thigh: -50, leftThigh: 40, lean: -15 }, 11, [3, 102]],
+  ["upSpecial", "up", { ...overhead, thigh: -50, leftThigh: 40, lean: -15 }, 8, [3, 102]],
   ["downSpecial", "down", { ...brace, leftArm: 70, arm: -100, yaw: 30 }, 13, [45, 45]],
 ] as const) {
   const special = ANUBARAK_SPECIALS[key]!;
