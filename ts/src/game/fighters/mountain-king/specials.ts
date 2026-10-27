@@ -62,7 +62,8 @@ const HAMMERFALL: AuthoredSpecial = {
 
 const DIAGONAL = f32(0.7071067811865476);
 const DIVE_PIVOT = 45.0;
-const DIVE_WINDOW = frames(18, 30);
+export const THUNDER_LEAP_DIVE_FRAME = 27;
+const DIVE_WINDOW = frames(THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_DIVE_FRAME);
 const DIVE_LAST = 15;
 const DIVE_END = 33;
 const diveHammer = (aimX: number, aimZ: number): StrikeCapsule => {
@@ -82,12 +83,13 @@ const dive = (aimX: number, aimZ: number, angle: Parameters<typeof hit>[2], last
     { ...frames(last + 1, last + 1), velocityX: 0.0, velocityZ: 0.0 }],
   regions: [heroRegion(4, last, diveHammer(aimX, aimZ), hit(HAMMERFALL_DAMAGE, aimZ < 0 ? "SPIKE" : "LAUNCH", angle, false, HitElement.electric), HAMMERFALL_GROUNDED)],
 });
+const diveBranch = (x: number, z: number, special: AuthoredSpecial): SpecialFollowUp => ({ window: DIVE_WINDOW, input: FollowUpInput.auto, stick: { x, z }, special });
 const HAMMERFALL_DIVES: readonly SpecialFollowUp[] = [
-  { window: DIVE_WINDOW, stick: { x: 0, z: 1 }, special: dive(0.0, 1.0, 85, DIVE_LAST, DIVE_END) },
-  { window: DIVE_WINDOW, stick: { x: 1, z: 1 }, special: dive(DIAGONAL, DIAGONAL, 50, DIVE_LAST, DIVE_END) },
-  { window: DIVE_WINDOW, stick: { x: 1, z: 0 }, special: dive(1.0, 0.0, 35, DIVE_LAST, DIVE_END) },
-  { window: DIVE_WINDOW, stick: { x: 1, z: -1 }, special: dive(DIAGONAL, -DIAGONAL, 270, HAMMERFALL.endFrame, HAMMERFALL.endFrame) },
-  { window: DIVE_WINDOW, special: HAMMERFALL },
+  diveBranch(0, 1, dive(0.0, 1.0, 85, DIVE_LAST, DIVE_END)),
+  diveBranch(1, 1, dive(DIAGONAL, DIAGONAL, 50, DIVE_LAST, DIVE_END)),
+  diveBranch(1, 0, dive(1.0, 0.0, 35, DIVE_LAST, DIVE_END)),
+  diveBranch(1, -1, dive(DIAGONAL, -DIAGONAL, 270, HAMMERFALL.endFrame, HAMMERFALL.endFrame)),
+  diveBranch(0, -1, HAMMERFALL),
 ];
 
 
@@ -175,7 +177,7 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
   }, { damage: 1.25 }),
   up: withHammerfallEx({
     name: "Thunder Leap",
-    description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, press special at the top to dive hammer first along the held stick in any of eight directions as Hammerfall, straight down with the stick at rest.",
+    description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, change direction at the top and he dives hammer first that way on his own as Hammerfall, in any of the eight directions other than the one he leapt. Keep the stick where it was, or let it go, and he falls helpless instead.",
     ground: {
       endFrame: 30,
       regions: [heroRegion(11, 16, LEAP_HAMMER, THUNDER_LEAP)],

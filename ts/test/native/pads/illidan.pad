@@ -35,14 +35,13 @@
 720 a tap X 2
 721 a stick 0 0
 725 a tap B 6
-# #279: turn left, jump, Wing Ascent, a second special on its 17th frame backflips into a forward-down dive.
+# #279: turn left, jump, Wing Ascent, the stick held forward and down on its 17th frame backflips into a forward-down dive, with no special press.
 800 a stick -0.5 0
 804 a stick 0 0
 840 a tap B 6
 847 a stick 0 1
 847 a tap X 2
 848 a stick 0 0
-863 a tap X 2
 # Expected, frame by frame (headless run of this script):
 #! expect a 60 special 9 form 0
 #! expect b 90 damage 3.000 hitlag 4 hitstun 9
@@ -69,5 +68,7 @@
 #! expect a 881 special 0 form 2
 #! scene a ManaBurnTarget
 #! scene a IllidanMissile
+860 a stick -1 -1
+868 a stick 0 0
 1000 a press VIEW
 1070 a release VIEW

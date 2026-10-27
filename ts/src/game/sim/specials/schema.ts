@@ -20,7 +20,7 @@ export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 export const FOLLOW_UP_FORM = 6;
 
 
-export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3 } as const;
+export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4 } as const;
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
 

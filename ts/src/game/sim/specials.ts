@@ -30,7 +30,8 @@ import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
-import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
+import { changesAimZone, chargedAimX, chargedAimZ } from "./specials/aimZone";
+import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followUpOnContact, enterUltimate, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
@@ -86,8 +87,7 @@ const DEMONHUNTER_WING_SPEED = 30.0;
 const DEMONHUNTER_WING_EX_SPEED = 37.5;
 
 
-export const DEMONHUNTER_DIVE_FIRST = 19;
-export const DEMONHUNTER_DIVE_LAST = 31;
+export const DEMONHUNTER_DIVE_FRAME = 19;
 export const DEMONHUNTER_BACKFLIP_FORM = 1;
 export const DEMONHUNTER_DIVE_FORM = 2;
 export const DEMONHUNTER_BACKFLIP_FRAMES = 6;
@@ -279,22 +279,16 @@ export function demonHunterJumpOrAttackBranch(owner: Fighter, input: Readonly<Co
 
 function wingDive(owner: Fighter, input: Readonly<Controls>): boolean {
   const { special } = owner;
-  if (special.form !== 0 || special.frame < DEMONHUNTER_DIVE_FIRST || special.frame > DEMONHUNTER_DIVE_LAST || owner.launch.hitlag > 0) return false;
-  aimDive(owner, input);
+  if (special.form !== 0 || special.frame !== DEMONHUNTER_DIVE_FRAME || owner.launch.hitlag > 0) return false;
+  const aimX = chargedAimX(input);
+  const aimZ = chargedAimZ(input);
+  if (!changesAimZone(owner, aimX, aimZ)) return false;
+  special.aimX = aimX;
+  special.aimZ = aimZ;
+  if (aimX !== 0) owner.facing = aimX;
   observeActionDecision(SPECIAL_ACTION_BIT);
   startBranchPhase(owner, DEMONHUNTER_BACKFLIP_FORM, DEMONHUNTER_BACKFLIP_FRAMES);
   return true;
-}
-
-function aimDive(owner: Fighter, input: Readonly<Controls>): void {
-  const { special } = owner;
-  const pressed = input.specialX !== 0 || input.specialZ !== 0;
-  const aimX = sign(pressed ? input.specialX : chargedAimX(input));
-  const aimZ = sign(pressed ? input.specialZ : chargedAimZ(input));
-  const neutral = aimX === 0 && aimZ === 0;
-  special.aimX = neutral ? owner.facing : aimX;
-  special.aimZ = neutral ? -1 : aimZ;
-  if (special.aimX !== 0) owner.facing = special.aimX;
 }
 
 const sign = (value: number): number => value < 0 ? -1 : value > 0 ? 1 : 0;
@@ -694,11 +688,18 @@ export function startUltimate(owner: Fighter, input: Readonly<Controls>, stage: 
 }
 
 
+function secondPart(owner: Fighter, input: Readonly<Controls>): boolean | undefined {
+  if (owner.tuning.specials !== undefined && isHeroSpecialAction(owner.special.action)) return followUpHeroSpecial(owner, input);
+  if (owner.character === Character.demonHunter && owner.special.action === SpecialAction.demonHunterWingAscent) return wingDive(owner, input);
+  return undefined;
+}
+
 export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, world?: Roster): boolean {
   steerHeroSpecial(owner, input);
   if (startUltimate(owner, input, stage, matchFrame)) return true;
   if (owner.special.action === SpecialAction.heroUltimate) return false;
-  if (owner.tuning.specials !== undefined && isHeroSpecialAction(owner.special.action)) return followUpHeroSpecial(owner, input);
+  const second = secondPart(owner, input);
+  if (second !== undefined) return second;
   if (!input.specialPressed) return false;
   if (owner.tuning.specials !== undefined) return startHeroFighterSpecial(owner, input, world);
   const branched = originalSpecialBranch(owner, input);
@@ -726,7 +727,6 @@ function originalSpecialBranch(owner: Fighter, input: Readonly<Controls>): boole
   if (owner.character === Character.rifleman && action === SpecialAction.riflemanRecovery) return secondRecoilShot(owner, input);
   if (owner.character !== Character.demonHunter) return undefined;
   if (action === SpecialAction.demonHunterFelRush) return felRushBranch(owner, input, false);
-  if (action === SpecialAction.demonHunterWingAscent) return wingDive(owner, input);
   return undefined;
 }
 

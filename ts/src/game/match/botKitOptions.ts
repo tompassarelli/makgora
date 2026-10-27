@@ -22,12 +22,12 @@ import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
 import {
-  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FIRST, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_LAST, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_JUMP_CANCEL,
+  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FRAME, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_JUMP_CANCEL,
   RIFLEMAN_RECOVERY_STARTUP_FRAMES, RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
 import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
 import { safeAt, steerOnGround } from "./botFooting";
-import { HeroSpecialUse, heroSpecialUse, startableForm, strikeMeets } from "./botHeroKit";
+import { HeroSpecialUse, autoFollowUpDue, heroSpecialUse, holdFirstPartZone, startableForm, strikeMeets } from "./botHeroKit";
 import { aheadX, moveReachAhead } from "./botMoves";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
@@ -391,25 +391,24 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
 
 function steerWingDive(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, floor: number, home: number, outside: number, input: Controls): boolean {
   const { special, motion } = f;
-  if (special.form !== 0 || special.frame < DEMONHUNTER_DIVE_FIRST || special.frame > DEMONHUNTER_DIVE_LAST) return false;
+  if (special.form !== 0 || special.frame !== DEMONHUNTER_DIVE_FRAME) return false;
   if (outside > 0.0) {
-    if (motion.vz > 4.0 && special.frame < DEMONHUNTER_DIVE_LAST) return false;
-    pressDive(input, home, motion.z < f32(floor + LEVEL_ABOVE) ? 1 : 0);
+    aimDive(input, home, motion.z < f32(floor + LEVEL_ABOVE) ? 1 : 0);
     return true;
   }
-  if (target === undefined) return false;
-  const dx = f32(target.motion.x - motion.x);
-  const dz = f32(target.motion.z - motion.z);
+  const dx = target === undefined ? 0.0 : f32(target.motion.x - motion.x);
+  const dz = target === undefined ? 0.0 : f32(target.motion.z - motion.z);
   const reach = f32(DEMONHUNTER_DIVE_SPEED * DEMONHUNTER_DIVE_FRAMES);
-  if (f32(f32(dx * dx) + f32(dz * dz)) > f32(reach * reach) || !safeAt(stage, target.motion.x, 0.0)) return false;
-  pressDive(input, Math.abs(dx) <= DIVE_AIM_DEAD ? 0 : dx < 0 ? -1 : 1, Math.abs(dz) <= DIVE_AIM_DEAD ? 0 : dz < 0 ? -1 : 1);
+  if (target === undefined || f32(f32(dx * dx) + f32(dz * dz)) > f32(reach * reach) || !safeAt(stage, target.motion.x, 0.0)) {
+    holdFirstPartZone(f, input);
+    return true;
+  }
+  aimDive(input, Math.abs(dx) <= DIVE_AIM_DEAD ? 0 : dx < 0 ? -1 : 1, Math.abs(dz) <= DIVE_AIM_DEAD ? 0 : dz < 0 ? -1 : 1);
   return true;
 }
 
-function pressDive(input: Controls, aimX: number, aimZ: number): void {
-  input.specialPressed = true;
-  input.specialX = aimX;
-  input.specialZ = aimZ;
+function aimDive(input: Controls, aimX: number, aimZ: number): void {
+  input.diStickValid = false;
   input.direction = aimX;
   input.verticalDirection = aimZ;
 }
@@ -422,9 +421,15 @@ export function holdAimAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | u
 
 export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, skill: CpuSkill, input: Controls): boolean {
   const { special, motion } = f;
-  if (skill.kitTenths <= 0 || special.action === SpecialAction.none || f.launch.hitstun > 0 || f.launch.hitlag > 0) return false;
+  if (special.action === SpecialAction.none || f.launch.hitstun > 0 || f.launch.hitlag > 0) return false;
   const seed = actionSeed(f);
-  if (!takes(skill, seed, f.character * 7 + 17)) return false;
+  const dive = special.action === SpecialAction.demonHunterWingAscent && special.form === 0 && special.frame === DEMONHUNTER_DIVE_FRAME;
+  const skilled = skill.kitTenths > 0 && takes(skill, seed, f.character * 7 + 17);
+  if (autoFollowUpDue(f) || (dive && !skilled)) {
+    holdFirstPartZone(f, input);
+    return true;
+  }
+  if (!skilled) return false;
   const left = mainDeckLeft(stage);
   const right = mainDeckRight(stage);
   const floor = mainDeckZ(stage);

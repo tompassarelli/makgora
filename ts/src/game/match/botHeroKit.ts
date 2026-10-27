@@ -9,6 +9,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
+import { changesAimZone, launchZoneX, launchZoneZ } from "../sim/specials/aimZone";
 import { chooseHeroSpecial, isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/engine";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialForm, specialKit } from "../sim/specials/schema";
 import { type Controls, neutralControls } from "../sim/roster";
@@ -278,16 +279,33 @@ export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter
     if (branch.special.helpless === true && !safeAt(stage, f.motion.x, 0.0)) continue;
     const turns = branch.facesStick === true || (branch.stick !== undefined && branch.stick.x !== 0);
     const facing = turns && dx !== 0.0 ? (dx < 0 ? -1 : 1) : f.facing;
+    const stickX = branch.stick === undefined || branch.stick.x === 0 ? 0 : facing;
+    if (kind === FollowUpInput.auto && !changesAimZone(f, stickX, branch.stick?.z ?? 0)) continue;
     if (!strikeMeets(branch.special, target, f32(dx * facing), localZ)) continue;
     if (kind === FollowUpInput.attack) input.attackPressed = true;
-    else input.specialPressed = true;
+    else if (kind !== FollowUpInput.auto) input.specialPressed = true;
     if (branch.facesStick === true) input.direction = facing;
     if (aimsByStick(f)) {
       input.diStickValid = false;
-      input.direction = branch.stick === undefined || branch.stick.x === 0 ? 0 : facing;
+      input.direction = stickX;
       input.verticalDirection = branch.stick?.z ?? 0;
     }
     return true;
+  }
+  return false;
+}
+
+export function holdFirstPartZone(f: Readonly<Fighter>, input: Controls): void {
+  input.diStickValid = false;
+  input.direction = launchZoneX(f);
+  input.verticalDirection = launchZoneZ(f);
+}
+
+export function autoFollowUpDue(f: Readonly<Fighter>): boolean {
+  if (!isHeroSpecialAction(f.special.action) || f.special.form >= FOLLOW_UP_FORM) return false;
+  const next = f.special.frame + 1;
+  for (const branch of runningHeroSpecial(f)?.followUps ?? []) {
+    if (branch.input === FollowUpInput.auto && next >= branch.window.first && next <= branch.window.last) return true;
   }
   return false;
 }

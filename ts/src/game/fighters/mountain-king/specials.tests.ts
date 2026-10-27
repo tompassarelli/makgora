@@ -1,5 +1,6 @@
 import { assertEquals, assertFalse, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
+import { at } from "wisp/src/runtime/lookup";
 import { Action, maskOf } from "../../input/actions";
 import { adaptInput } from "../../match/inputAdapter";
 import { inputRow } from "../../input/inputRow";
@@ -11,7 +12,8 @@ import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
-import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_LANDING_LAG } from "./specials";
+import { ROSTER_MANA } from "../../sim/mana";
+import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
 import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
 
@@ -109,8 +111,8 @@ function directionMask(x: number, z: number): number {
   return (x < 0 ? maskOf(Action.moveLeft) : x > 0 ? maskOf(Action.moveRight) : 0) | (z < 0 ? maskOf(Action.moveDown) : z > 0 ? maskOf(Action.moveUp) : 0);
 }
 
-function step(state: ReplayState, king: Fighter, tick: number, x: number, z: number, special: boolean, upSpecial = false): void {
-  const held = directionMask(x, z) | (special ? maskOf(Action.special) : 0);
+function step(state: ReplayState, king: Fighter, tick: number, x: number, z: number, special: boolean, upSpecial = false, strong = false): void {
+  const held = directionMask(x, z) | (special ? maskOf(Action.special) : 0) | (strong ? maskOf(Action.strong) : 0);
   const row = inputRow({ held, pressed: special ? maskOf(Action.special) : 0, axisX: x * STICK, axisZ: z * STICK, specialZ: upSpecial ? 1 : 0 });
   if (row === undefined) throw new Error("Mountain King input row");
   adaptInput(row, king, tick, state.controls.inputs[0], state.controls.commands[0]);
@@ -129,59 +131,131 @@ function place(foe: Fighter, x: number, z: number): void {
   setWorldMotionValue(foe.motion.meleeVelocityZ, 0.0);
 }
 
-const DIVE_PRESS_FRAME = 28;
+const FIRE_STEP_FRAME = THUNDER_LEAP_DIVE_FRAME - 1;
 const PLUNGE_WATCH = 8;
+const UP = at(DIRECTIONS, 0);
+const UP_RIGHT = at(DIRECTIONS, 1);
+const RIGHT = at(DIRECTIONS, 2);
 
-function leapToDivePress(state: ReplayState, king: Fighter): number {
-  let tick = 1;
-  step(state, king, tick, 0, 1, true, true);
-  assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");
-  while (king.special.frame < DIVE_PRESS_FRAME - 1) step(state, king, ++tick, 0, 0, false);
-  return tick;
+interface Held {
+  readonly x: number;
+  readonly z: number;
+  readonly special: boolean;
 }
 
-test("Thunder Leap's first strike lands on frame 11 [k3 measure #509]", () => {
-  const { state, king, foe } = leapMatch(10.0);
-  let first = 0;
-  step(state, king, 1, 0, 1, true, true);
-  for (let tick = 2; tick <= LEAP_WATCH_FRAMES && first === 0; tick++) {
-    step(state, king, tick, 0, 1, false);
-    if (foe.status.damage > 0.0) first = king.special.frame;
+const REST: Held = { x: 0, z: 0, special: false };
+const holding = (direction: Direction, special = false): Held => ({ x: direction.x, z: direction.z, special });
+
+interface Leap {
+  readonly state: ReplayState;
+  readonly king: Fighter;
+  readonly foe: Fighter;
+  readonly trail: number[];
+  tick: number;
+  dived: boolean;
+}
+
+function startLeap(aim: Direction, ex = false, foeX = FOE_AWAY): Leap {
+  const { state, king, foe } = leapMatch(foeX);
+  if (ex) king.mana.points = ROSTER_MANA.max;
+  const leap: Leap = { state, king, foe, trail: [], tick: 1, dived: false };
+  step(state, king, leap.tick, aim.x, aim.z, true, true, ex);
+  assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");
+  assertEquals(king.special.ex, ex, "the leap is the EX leap only when asked");
+  return leap;
+}
+
+function advance(leap: Leap, aim: Direction, input: (frame: number) => Held, stopFrame: number): void {
+  const { state, king } = leap;
+  while (king.special.action === SpecialAction.heroUp && king.special.frame < stopFrame) {
+    const frame = king.special.frame;
+    const held = frame < CHARGED_AIM_FRAMES + 1 ? holding(aim) : input(frame);
+    step(state, king, ++leap.tick, held.x, held.z, held.special);
+    leap.dived ||= king.special.form >= FOLLOW_UP_FORM;
+    leap.trail.push(king.motion.x, king.motion.z);
   }
-  assertEquals(first, 11, "the leap's hammer meets the foe beside him first on frame 11");
+}
+
+function leapToTop(aim: Direction, input: (frame: number) => Held = () => REST, ex = false, foeX = FOE_AWAY): Leap {
+  const leap = startLeap(aim, ex, foeX);
+  advance(leap, aim, input, FIRE_STEP_FRAME);
+  assertEquals(leap.king.special.frame, FIRE_STEP_FRAME, "he reaches the step before the top");
+  assertEquals(leap.dived, false, "nothing dives before the top");
+  return leap;
+}
+
+function finish(leap: Leap, aim: Direction, input: (frame: number) => Held = () => REST): void {
+  advance(leap, aim, input, Number.MAX_SAFE_INTEGER);
+}
+
+function sameTrail(first: Leap, second: Leap): boolean {
+  return first.trail.length === second.trail.length && first.trail.every((value, index) => value === second.trail[index]);
+}
+
+function control(aim: Direction): Leap {
+  const leap = leapToTop(aim);
+  finish(leap, aim);
+  return leap;
+}
+
+test("Thunder Leap's top does nothing without a change of direction: the stick at rest or still in the leap's own zone starts no dive, he falls helpless, and a special press from frame 18 to 30 changes nothing [k1 scenario]", () => {
+  for (const aim of [UP, UP_RIGHT, RIGHT]) {
+    const baseline = control(aim);
+    assertEquals(baseline.dived, false, `${aim.name}: with the stick at rest there is no dive`);
+    assertEquals(baseline.king.motion.grounded || baseline.king.special.fall, true, `${aim.name}: he ends the move helpless or landed`);
+    const inZone = () => holding(aim);
+    const same = leapToTop(aim, inZone);
+    finish(same, aim, inZone);
+    assertEquals(same.dived, false, `${aim.name}: the stick still in the leap's zone starts no dive`);
+    const pressing = (frame: number): Held => frame >= 17 ? { x: aim.x, z: aim.z, special: true } : holding(aim);
+    const pressed = leapToTop(aim, pressing);
+    finish(pressed, aim, pressing);
+    assertEquals(pressed.dived, false, `${aim.name}: pressing special in the leap's zone starts no dive`);
+    assertEquals(sameTrail(pressed, same), true, `${aim.name}: the press changes no motion`);
+    const restPressing = (frame: number): Held => frame >= 17 ? { x: 0, z: 0, special: true } : REST;
+    const restPressed = leapToTop(aim, restPressing);
+    finish(restPressed, aim, restPressing);
+    assertEquals(restPressed.dived, false, `${aim.name}: a press with the stick at rest starts no dive`);
+    assertEquals(sameTrail(baseline, restPressed), true, `${aim.name}: a press at rest changes no motion`);
+  }
 });
 
-test("A Thunder Leap that hits nothing still dives as Hammerfall on a special press, straight down with the stick at rest, and he falls helpless after [k1 scenario]", () => {
-  const { state, king } = leapMatch(FOE_AWAY);
-  let tick = leapToDivePress(state, king);
-  assertEquals(king.special.hit, false, "the leap whiffs");
-  step(state, king, ++tick, 0, 0, true);
-  assertEquals(king.special.form >= FOLLOW_UP_FORM, true, "the press starts a dive");
-  const startX = king.motion.x;
-  const startZ = king.motion.z;
-  for (let n = 0; n < PLUNGE_WATCH; n++) step(state, king, ++tick, 0, 0, false);
-  assertEquals(king.motion.x, startX, "with the stick at rest he plunges straight down");
-  assertEquals(king.motion.z < startZ, true, "with the stick at rest he plunges down");
-  for (let n = 0; n < LEAP_WATCH_FRAMES * 2 && king.special.action !== SpecialAction.none; n++) step(state, king, ++tick, 0, 0, false);
-  assertEquals(king.motion.grounded || king.special.fall, true, "he lands from the dive or falls helpless");
+test("Thunder Leap dives on frame 27 on its own, plain or EX, in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
+  for (const ex of [false, true]) {
+    for (const direction of DIRECTIONS) {
+      if (direction === UP) continue;
+      const early = leapToTop(UP, frame => frame === FIRE_STEP_FRAME - 1 ? holding(direction, true) : REST, ex);
+      step(early.state, early.king, ++early.tick, 0, 0, true);
+      finish(early, UP);
+      assertEquals(early.dived, false, `${direction.name}: a change held only on the frame before the top starts no dive`);
+      const late = leapToTop(UP, () => REST, ex);
+      step(late.state, late.king, ++late.tick, 0, 0, false);
+      step(late.state, late.king, ++late.tick, direction.x, direction.z, true);
+      assertEquals(late.king.special.form >= FOLLOW_UP_FORM, false, `${direction.name}: a change on the frame after the top starts no dive`);
+      const leap = leapToTop(UP, () => holding(direction), ex);
+      step(leap.state, leap.king, ++leap.tick, direction.x, direction.z, false);
+      assertEquals(leap.king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the held change starts the dive with no press`);
+      assertEquals(leap.king.special.ex, ex, `${direction.name}: the dive keeps the leap's EX`);
+      if (direction.x !== 0) assertEquals(leap.king.facing, direction.x, `${direction.name}: he turns along the dive`);
+    }
+  }
 });
 
 function diveAt(direction: Direction, foeSide: number): boolean {
-  const { state, king, foe } = leapMatch(FOE_AWAY);
-  let tick = leapToDivePress(state, king);
+  const leap = leapToTop(UP);
+  const { state, king, foe } = leap;
   const length = direction.x !== 0 && direction.z !== 0 ? DIAGONAL : 1.0;
   const foeX = f32(king.motion.x + f32(f32(f32(foeSide * direction.x) * length) * FOE_GAP));
   const foeZ = f32(king.motion.z + f32(f32(f32(foeSide * direction.z) * length) * FOE_GAP));
   place(foe, foeX, foeZ);
-  step(state, king, ++tick, direction.x, direction.z, true);
-  assertEquals(king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the press starts a dive`);
-  if (direction.x !== 0) assertEquals(king.facing, direction.x, `${direction.name}: he turns along the dive`);
+  step(state, king, ++leap.tick, direction.x, direction.z, false);
+  assertEquals(king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the held change starts a dive`);
   const startX = king.motion.x;
   const startZ = king.motion.z;
   let struck = false;
   for (let n = 0; n < LEAP_WATCH_FRAMES && !struck && king.special.action === SpecialAction.heroUp; n++) {
     place(foe, foeX, foeZ);
-    step(state, king, ++tick, 0, 0, false);
+    step(state, king, ++leap.tick, 0, 0, false);
     struck = foe.status.damage > 0.0;
   }
   if (!struck) return false;
@@ -192,11 +266,35 @@ function diveAt(direction: Direction, foeSide: number): boolean {
   return true;
 }
 
-test("Each of the eight stick directions dives Hammerfall along that line into a foe held on it, and not into one held on the opposite line [k1 scenario]", () => {
+test("Each stick direction other than the leap's dives Hammerfall along that line into a foe held on it, and not into one held on the opposite line [k1 scenario]", () => {
   for (const direction of DIRECTIONS) {
+    if (direction === UP) continue;
     assertEquals(diveAt(direction, 1), true, `${direction.name}: the dive strikes the foe on its line`);
     assertEquals(diveAt(direction, -1), false, `${direction.name}: the dive misses the foe behind it`);
   }
+});
+
+test("A leap aimed off up dives straight up from the top, and a leap up-right dives up but not up-right, the leap's zone alone being excluded [k1 scenario]", () => {
+  const sideways = leapToTop(RIGHT, () => holding(UP));
+  const startZ = sideways.king.motion.z;
+  step(sideways.state, sideways.king, ++sideways.tick, UP.x, UP.z, false);
+  assertEquals(sideways.king.special.form >= FOLLOW_UP_FORM, true, "up after a leap right dives");
+  for (let n = 0; n < PLUNGE_WATCH; n++) step(sideways.state, sideways.king, ++sideways.tick, 0, 0, false);
+  assertEquals(sideways.king.motion.z > startZ, true, "the up dive climbs");
+  const diagonal = leapToTop(UP_RIGHT, () => holding(UP_RIGHT));
+  step(diagonal.state, diagonal.king, ++diagonal.tick, UP_RIGHT.x, UP_RIGHT.z, false);
+  assertEquals(diagonal.king.special.form >= FOLLOW_UP_FORM, false, "up-right after a leap up-right does not dive");
+});
+
+test("Thunder Leap's first strike lands on frame 11 [k3 measure #509]", () => {
+  const { state, king, foe } = leapMatch(10.0);
+  let first = 0;
+  step(state, king, 1, 0, 1, true, true);
+  for (let tick = 2; tick <= LEAP_WATCH_FRAMES && first === 0; tick++) {
+    step(state, king, tick, 0, 1, false);
+    if (foe.status.damage > 0.0) first = king.special.frame;
+  }
+  assertEquals(first, 11, "the leap's hammer meets the foe beside him first on frame 11");
 });
 
 
@@ -256,12 +354,10 @@ function landingLagAfter(leapHeight: number | undefined, aimZ: number, dive: boo
   let tick = 1;
   step(state, king, tick, 0, aimZ, true, true);
   assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");
-  let pressed: boolean = false;
   let left = leapHeight !== undefined;
   while (tick < LANDING_WATCH_FRAMES) {
-    const press: boolean = dive && !pressed && king.special.frame >= DIVE_PRESS_FRAME - 1;
-    pressed ||= press;
-    step(state, king, ++tick, 0, tick < CHARGED_AIM_FRAMES ? aimZ : 0, press);
+    const diveStick = dive && king.special.frame === FIRE_STEP_FRAME;
+    step(state, king, ++tick, 0, diveStick ? -1 : tick < CHARGED_AIM_FRAMES ? aimZ : 0, false);
     left ||= !king.motion.grounded;
     if (left && king.motion.grounded) return king.landing.lag;
   }

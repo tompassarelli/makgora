@@ -10,11 +10,11 @@ import { copyFighterState } from "../../generated/state/fighterState";
 import { Character, SpecialAction } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
 import { fighterAt } from "../sim/roster";
-import { FOLLOW_UP_FORM } from "../sim/specials/schema";
+import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM } from "../sim/specials/schema";
+import { THUNDER_LEAP_DIVE_FRAME } from "../fighters/mountain-king/specials";
 import { SPECIAL_TRAIL_FRAMES, emptyTrailLine, specialTrail } from "./specialTrail";
 
 const STICK = 127;
-const DIVE_PRESS_FRAME = 28;
 const DIVE_WATCH = 12;
 
 const DIRECTIONS = [
@@ -51,12 +51,16 @@ test("Each of the eight Hammerfall dives draws its trail from his body back alon
   for (const direction of DIRECTIONS) {
     const { state, king } = diveMatch();
     let tick = 1;
-    step(state, king, tick, 0, 1, true, true);
+    const aim = direction.x === 0 && direction.z === 1 ? { x: 1, z: 1 } : { x: 0, z: 1 };
+    step(state, king, tick, aim.x, aim.z, true, true);
     assertEquals(king.special.action, SpecialAction.heroUp, `${direction.name}: Thunder Leap starts`);
     assertEquals(specialTrail(king, line), false, `${direction.name}: the leap draws no trail`);
-    while (king.special.frame < DIVE_PRESS_FRAME - 1) step(state, king, ++tick, 0, 0, false);
-    step(state, king, ++tick, direction.x, direction.z, true);
-    assertEquals(king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the press starts a dive`);
+    while (king.special.frame < THUNDER_LEAP_DIVE_FRAME - 1) {
+      const aiming = king.special.frame <= CHARGED_AIM_FRAMES;
+      step(state, king, ++tick, aiming ? aim.x : 0, aiming ? aim.z : 0, false);
+    }
+    step(state, king, ++tick, direction.x, direction.z, false);
+    assertEquals(king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the held change starts a dive`);
     let drawn = 0;
     for (let n = 0; n < DIVE_WATCH && !king.motion.grounded; n++) {
       const x = king.motion.x;
@@ -64,7 +68,7 @@ test("Each of the eight Hammerfall dives draws its trail from his body back alon
       step(state, king, ++tick, 0, 0, false);
       const travelX = f32(king.motion.x - x);
       const travelZ = f32(king.motion.z - z);
-      if (!specialTrail(king, line)) continue;
+      if (!specialTrail(king, line) || (travelX === 0.0 && travelZ === 0.0)) continue;
       drawn++;
       const trailX = f32(line.x2 - line.x1);
       const trailZ = f32(line.z2 - line.z1);

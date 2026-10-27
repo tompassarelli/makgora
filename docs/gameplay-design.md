@@ -2577,7 +2577,7 @@ The branch's up-special and empty-mana measurements are kept there too.
 `GAME_TESTS=upSpecialRecovery bun test test/game.test.ts` measures each
 selectable fighter's up-special route from (700, 300), facing away from the
 stage with jumps spent: vertical holds up; horizontal takes the best of level,
-diagonal-up and a Wing Dive pressed at frame 20, level or diagonal-up, while within 10 units below the start.
+diagonal-up and a Wing Dive held on frame 19 (stick changed to level or diagonal-up from the launch's zone), while within 10 units below the start.
 The same tests check charged angles and guided steering through keyboard and
 controller input. `GAME_TESTS=edgeRecovery bun test test/game.test.ts` checks
 wall rides, Blink lip outcomes and descending up-special catches. The farm

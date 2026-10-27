@@ -1,4 +1,4 @@
-# Illidan's Wing Dive native proof, facing right: Wing Ascent from the ground, a second special on its 17th frame backflips about 6 frames and dives forward and down with no direction held; later a second ascent dives up and forward. Both dives end in helpless fall.
+# Illidan's Wing Dive native proof, facing right: Wing Ascent from the ground, the stick held forward and down on its 17th frame backflips about 6 frames and dives that way, with no special press; later a second ascent changes to up and forward and dives that way. Both dives end in helpless fall.
 #! chat -dev setup quick pair illidan / rifleman
 #! cue 76-80 backflip: effect=PossessionMissile
 #! cue 81-92 dive: effect=ImmolationTarget
@@ -15,10 +15,11 @@
 70 a capture
 72 a capture
 74 a capture
-76 a tap X 2
+74 a stick 1 -1
 76 a capture
 78 a capture
 80 a capture
+80 a stick 0 0
 82 a capture
 84 a capture
 86 a capture
@@ -46,12 +47,11 @@
 230 a capture
 232 a capture
 234 a capture
-236 a stick 1 1
-236 a tap X 2
+234 a stick 1 1
 236 a capture
-237 a stick 0 0
 238 a capture
 240 a capture
+240 a stick 0 0
 242 a capture
 244 a capture
 246 a capture

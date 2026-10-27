@@ -256,10 +256,14 @@ Peon, Rifleman, Mountain King and Tinker standing).
   press is about 380 instead of 435.
 - **Wing Dive** (#279): Tom asked for a follow-up like
   Mountain King's Thunder Leap or Pikachu's second Quick Attack in place of the
-  glide (2026-10-25). A second special in the ascent's frames 19-31 (15-27
-  before #519 moved it 4 later with the startup) is a
-  6-frame backflip, then a 13-frame dive at 30 a frame along the stick held
-  at the press, any of 8 directions, forward and down with none held. The
+  glide (2026-10-25). On frame 19 of the ascent (the frame the old
+  press window opened, 15 before #519 moved it 4 later with the startup) the dive starts on its own, as Pikachu's
+  second Quick Attack does, when the stick is held in a different one of the
+  8 direction zones from the launch's: a
+  6-frame backflip, then a 13-frame dive at 30 a frame along the zone held
+  on that frame. A stick at rest or still in the launch's zone starts nothing and the
+  ascent runs on into helpless fall; no special press is read (Tom 2026-10-28,
+  replacing the press and its forward-and-down default). The
   dive hits along its line (9%, 50 degrees), ends in helpless fall, keeps
   10 frames of landing lag and comes once per airtime. With Fel Rush in the
   air his recovery has a high route (ascent and dive) and a level one (rush,
@@ -579,7 +583,7 @@ What he keeps, so he does not become Falco in a costume:
 - Warglaives: his normals keep their glaive reach, the twin-glaive forward air
   and Azzinoth's fel fire on his split-kick down smash.
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
-  eight-way dive. Since #519 the ascent aims and starts like Fire Bird, but it
+  eight-way dive, which starts by itself on frame 19 when the stick changes zone. Since #519 the ascent aims and starts like Fire Bird, but it
   takes no charge and does not hit.
 - Eye Blast and Eye Beam: Eye Blast stays the meter-gated EX special; since
   Tom's 2026-10-28 request the neutral special is Eye Beam, a Falco-timed

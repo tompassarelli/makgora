@@ -1,5 +1,6 @@
 import { canHit, sameTeam } from "../teams";
 import { releaseCommandGrabLock } from "./commandGrabLock";
+import { changesAimZone, chargedAimX, chargedAimZ } from "./aimZone";
 
 
 
@@ -160,29 +161,6 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
 
 export function resetSpecialOnStock(f: Fighter): void {
   f.special.airtimeUses = 0;
-}
-
-
-const SECTOR_TANGENT = 0.41421356797218323;
-
-
-
-
-
-
-export function chargedAimX(input: Readonly<Controls>): number {
-  if (input.diStickValid && (input.diStickX !== 0 || input.diStickZ !== 0)) {
-    return Math.abs(input.diStickX) > f32(SECTOR_TANGENT * Math.abs(input.diStickZ)) ? (input.diStickX < 0 ? -1 : 1) : 0;
-  }
-  return input.direction < 0 ? -1 : input.direction > 0 ? 1 : 0;
-}
-
-
-export function chargedAimZ(input: Readonly<Controls>): number {
-  if (input.diStickValid && (input.diStickX !== 0 || input.diStickZ !== 0)) {
-    return Math.abs(input.diStickZ) > f32(SECTOR_TANGENT * Math.abs(input.diStickX)) ? (input.diStickZ < 0 ? -1 : 1) : 0;
-  }
-  return input.verticalDirection < 0 ? -1 : input.verticalDirection > 0 ? 1 : 0;
 }
 
 
@@ -1269,11 +1247,13 @@ export function followUpOnContact(f: Fighter): void {
   }
 }
 
-function followUpPressed(followUp: Readonly<SpecialFollowUp>, input: Readonly<Controls>): boolean {
+function followUpPressed(f: Readonly<Fighter>, followUp: Readonly<SpecialFollowUp>, input: Readonly<Controls>): boolean {
   const kind = followUp.input ?? FollowUpInput.special;
-  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special && input.specialPressed;
+  const x = chargedAimX(input);
+  const z = chargedAimZ(input);
+  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special ? input.specialPressed : kind === FollowUpInput.auto && changesAimZone(f, x, z);
   const stick = followUp.stick;
-  return pressed && (stick === undefined || (Math.abs(chargedAimX(input)) === stick.x && chargedAimZ(input) === stick.z));
+  return pressed && (stick === undefined || (Math.abs(x) === stick.x && z === stick.z));
 }
 
 
@@ -1286,7 +1266,7 @@ export function followUpHeroSpecial(f: Fighter, input: Readonly<Controls>): bool
   const followUps = runningHeroSpecial(f)?.followUps;
   if (followUps === undefined || special.form >= FOLLOW_UP_FORM || f.launch.hitlag > 0 || f.launch.hitstun > 0) return false;
   let index = 0;
-  while (index < followUps.length && !(inWindow(at(followUps, index).window, special.frame + 1) && followUpPressed(at(followUps, index), input))) index++;
+  while (index < followUps.length && !(inWindow(at(followUps, index).window, special.frame + 1) && followUpPressed(f, at(followUps, index), input))) index++;
   if (index >= followUps.length) return false;
   const followUp = at(followUps, index);
   const next = followUp.special;
