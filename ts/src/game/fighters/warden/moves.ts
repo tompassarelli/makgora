@@ -40,7 +40,7 @@ const BLADE_RADIUS = 6.0;
 
 
 export const wardenHit = makeHit({
-  NUDGE: { growth: 8.0, base: 28.5 },
+  SLIDE: { growth: 8.0, base: 37.0 },
   LINK: { growth: 68.2369613647461, base: 12.0 },
   POKE: { growth: 93.05039978027344, base: 18.0 },
   LAUNCH: { growth: 117.86384582519531, base: 20.0 },
@@ -159,7 +159,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       front: { ...downSmashHit(wardenHit(12.0, "EDGE", 25)), element: HitElement.normal },
       back: { ...downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0)), element: HitElement.normal },
     }),
-    [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, spin(5, 5, { ...wardenHit(6.106143951416016, "NUDGE", 45), sakurai: true })), autoCancel: { before: 4, from: 36 } },
+    [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, spin(5, 5, wardenHit(6.106143951416016, "SLIDE", 0))), autoCancel: { before: 4, from: 36 } },
     [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, [
       heroRegion(8, 8, blade(37.662445068359375, 146.75, 58.328670501708984, 135.1438751220703), FORWARD_AIR),
       heroRegion(8, 8, blade(58.328670501708984, 135.1438751220703, 76.17012023925781, 114.24028778076172), FORWARD_AIR),
@@ -178,7 +178,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       heroRegion(9, 9, blade(-8.0, 41.0, -94.5, 48.5, 8.0), BACK_AIR),
     ]), autoCancel: { before: 4, from: 22 } },
 
-    [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 9, multiHit([
+    [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 7, multiHit([
       { first: 5, last: 6, strikes: SKY_LIFT },
       { first: 8, last: 9, strikes: SKY_LIFT },
       { first: 11, last: 13, strikes: [[blade(0.0, 48.0, 0.0, f32(M - BLADE_RADIUS), 10.0), wardenHit(3.8163399696350098, "CHASE", 90, 1.0, HitElement.normal)]] },

@@ -20,7 +20,7 @@ const FOX_DOWN_TILT = { undocumented: "Fox's down tilt sweeps his tail along the
 const LEG_SWEEP = { kind: "deviation", reason: "her down tilt is a low leg sweep, so its region follows the sweeping leg along the floor in front and keeps the old reach; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 517 } as const;
 const SQUIRTLE_JAB = { undocumented: "Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units", source: "https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack" } as const;
 const SPEAR_POINT = { kind: "deviation", reason: "his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 497 } as const;
-const LOW_KNOCKBACK = { kind: "deviation", reason: "Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her frame-14 jab or frame-18 grab; 6.1% at base 28.5, growth 8 stays 30-32 from 0 to 30% and keeps it grounded with 12 frames of hitstun, which makes her neutral air into grab and jab hold", decided: "2026-10-26", issue: 305 } as const;
+const FLAT_SLIDE = { kind: "deviation", reason: "Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her jab or grab; on Fox's falls she lands 3 frames later than on Falco's, so the 12 frames of hitstun the Sakurai angle allows under 32 no longer cover her landing; 6.1% at base 37, growth 8 and a flat 0 degrees makes 39-40 from 0 to 30% with 15-16 frames of hitstun and slides a grounded victim along the floor, which makes her neutral air into grab true and into jab DI-dependent", decided: "2026-10-27", issue: 580 } as const;
 
 export function maievNeutralAir(): HitEffect[] {
   const regions = WARDEN_MOVES.normals[AttackStyle.neutralAir]?.regions ?? [];
@@ -66,18 +66,18 @@ export const MOVE_ROWS: readonly LedgerRow[] = [
   {
     id: "maiev-neutral-air-angle", family: "moves", name: "Maiev's neutral air launch angle",
     melee: { value: FOX_NEUTRAL_AIR.angle, source: FOX_NEUTRAL_AIR_PAGE }, ours: () => only(angle),
-    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: PARITY,
+    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: FLAT_SLIDE,
   },
   {
     id: "maiev-neutral-air-damage", family: "moves", name: "Maiev's neutral air damage",
     melee: { value: FOX_NEUTRAL_AIR.damage, source: FOX_NEUTRAL_AIR_PAGE }, ours: () => only((effect) => effect.damage),
-    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: LOW_KNOCKBACK,
+    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: FLAT_SLIDE,
   },
   {
     id: "maiev-neutral-air-knockback", family: "moves", name: "Maiev's neutral air base knockback and growth",
     melee: { value: `base ${FOX_NEUTRAL_AIR.base}, growth ${FOX_NEUTRAL_AIR.growth}`, source: FOX_NEUTRAL_AIR_PAGE },
     ours: () => only((effect) => `base ${shortNumber(effect.base)}, growth ${shortNumber(effect.growth)}`),
-    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: LOW_KNOCKBACK,
+    anchor: { file: WARDEN, symbol: "WARDEN_MOVES" }, status: FLAT_SLIDE,
   },
   {
     id: "maiev-down-smash-timing", family: "moves", name: "Maiev's down smash, the splits: active frames, interruptible frame and charge frame",

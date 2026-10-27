@@ -23,18 +23,24 @@ beats read. The DIs listed must not escape.
 | Opener | Percent | Follow-up | Floor | DIs that must not escape | Source | Today |
 | --- | --- | --- | --- | --- | --- | --- |
 | down tilt | 0-20 | down tilt | true | | starter row (#299) | holds |
-| neutral air | 10-20 | grab | read (DI-dependent until 2026-10-27) | | Fox true at 10-20 | holds as a read (#456): the grab lands 21 frames after the hit, 3 frames later than with Falco's falls, and jump, air dodge and tech away escape |
-| neutral air | 0-30 | jab | read (DI-dependent until 2026-10-27) | | Fox DI-dependent 0-60 | holds as a read (#456): the jab lands 17 frames after the hit, 3 frames later than with Falco's falls, and shield escapes |
+| neutral air | 10-20 | grab | DI-dependent | in, none | Fox true at 10-20 | holds (#580): true, the grab lands 18 frames after the hit |
+| neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | holds (#580): DI-dependent, the jab lands 14 frames after the hit and only DI out escapes |
 | down air | 0-100 | down special (Fan of Knives) | true | | Fox down air into shine, true | holds |
 | down air | 0-60 | grab | true | | Fox true | holds |
 | up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | holds (#306) |
-| up air | 10-60 | up air | read (DI-dependent until 2026-10-27) | | Fox DI-dependent 10-60 | holds as a read (#456): tech away escapes the short-hop up air, which lands 27 frames after the hit on Fox's lower short hop |
+| up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | holds (#580): DI-dependent, the short-hop up air lands 25 frames after the hit and DI out and down escape |
 | side special (Shadow Pursuit) | 0-150 | grab | true | | her stun (#273) | holds |
 | side special (Shadow Pursuit) | 0-150 | forward smash | true | | her stun (#273) | holds |
 
-Three rows dropped to the read they measure on 2026-10-27 (#493), so the
-objectives guard what she has; the Fox class stays in the source column as
-the retune's target (#311).
+Three rows dropped to the read they measured on 2026-10-27 (#493): back on
+Fox's falls (#456) she lands from a short-hop neutral air or up air 3 frames
+later than on Falco's. The retune (#580) restores their DI-dependent floors by
+changing the two aerials and leaving her physics Fox's:
+
+| Move | Value | Melee | Why |
+| --- | --- | --- | --- |
+| neutral air | flat 0°, base 37, growth 8, 6.1% | Fox 361, base 10, growth 100, 12% | under the Sakurai angle a grounded victim stays down only below 32 knockback, which caps hitstun at 12 frames; a flat angle keeps it sliding on the floor at 39-40 knockback with 15-16 frames, so grab and jab land before it acts (ledger rows `maiev-neutral-air-*`) |
+| up air | landing lag 7 | Fox 9 L-cancelled; Melee spread 7-16 (Falcon, Marth, Mario, Peach 7) | the short-hop follow-up rises 2 frames sooner and meets a falling victim before tech away |
 
 Up smash into grab at 30-50% (a read) was dropped the same day (#493): since
 her up smash and up tilt moved onto her glaive above her head (#508), neither

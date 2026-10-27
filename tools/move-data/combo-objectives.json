@@ -1,12 +1,12 @@
 {
   "links": [
     { "fighter": "Maiev Shadowsong", "opener": "down tilt", "region": "clean", "percent": [0,20], "weight": 75, "followUp": "down tilt", "class": "true" },
-    { "fighter": "Maiev Shadowsong", "opener": "neutral air", "region": "clean", "percent": [10,20], "weight": 75, "followUp": "grab", "class": "read" },
-    { "fighter": "Maiev Shadowsong", "opener": "neutral air", "region": "clean", "percent": [0,30], "weight": 75, "followUp": "jab", "class": "read" },
+    { "fighter": "Maiev Shadowsong", "opener": "neutral air", "region": "clean", "percent": [10,20], "weight": 75, "followUp": "grab", "class": "DI-dependent", "di": ["in","none"] },
+    { "fighter": "Maiev Shadowsong", "opener": "neutral air", "region": "clean", "percent": [0,30], "weight": 75, "followUp": "jab", "class": "DI-dependent", "di": ["in"] },
     { "fighter": "Maiev Shadowsong", "opener": "down air", "region": "clean", "percent": [0,100], "weight": 75, "followUp": "down special", "class": "true" },
     { "fighter": "Maiev Shadowsong", "opener": "down air", "region": "clean", "percent": [0,60], "weight": 75, "followUp": "grab", "class": "true" },
     { "fighter": "Maiev Shadowsong", "opener": "up throw", "region": "clean", "percent": [30,90], "weight": 75, "followUp": "up air", "class": "DI-dependent", "di": ["in","none"] },
-    { "fighter": "Maiev Shadowsong", "opener": "up air", "region": "clean", "percent": [10,60], "weight": 75, "followUp": "up air", "class": "read" },
+    { "fighter": "Maiev Shadowsong", "opener": "up air", "region": "clean", "percent": [10,60], "weight": 75, "followUp": "up air", "class": "DI-dependent", "di": ["in","none"] },
     { "fighter": "Maiev Shadowsong", "opener": "side special", "region": "clean", "percent": [0,150], "weight": 75, "followUp": "grab", "class": "true" },
     { "fighter": "Maiev Shadowsong", "opener": "side special", "region": "clean", "percent": [0,150], "weight": 75, "followUp": "forward smash", "class": "true" },
     { "fighter": "Illidan", "opener": "down special", "region": "clean", "percent": [0,50], "weight": 75, "followUp": "up air", "class": "DI-dependent", "di": ["in","none"] },
