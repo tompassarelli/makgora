@@ -48,13 +48,15 @@ const PLUNGE = heights(f32(0.16));
 const HAMMERFALL_DAMAGE = 12.968278884887695;
 const HAMMERFALL_GROUNDED = hit(10.806899070739746, "LAUNCH", 55, false, HitElement.electric);
 const HAMMERFALL_HAMMER = capsule(4.0, 10.0, 4.0, -24.0, 20.0);
+export const HAMMERFALL_LANDING_LAG = 24;
+export const THUNDER_LEAP_LANDING_LAG = 11;
 const HAMMERFALL: AuthoredSpecial = {
   name: "Hammerfall",
 
   endFrame: 70,
   motion: [{ ...frames(1, 3), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(4, 70), velocityX: 0.0, velocityZ: -PLUNGE }],
   regions: [heroRegion(4, 70, HAMMERFALL_HAMMER, hit(HAMMERFALL_DAMAGE, "SPIKE", 270, false, HitElement.electric), HAMMERFALL_GROUNDED)],
-  landingLag: 24,
+  landingLag: HAMMERFALL_LANDING_LAG,
   helpless: true,
 };
 
@@ -182,6 +184,8 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       facesStick: true,
       oncePerAirtime: true,
       helpless: true,
+      landingLag: THUNDER_LEAP_LANDING_LAG,
+      fallLandingLag: THUNDER_LEAP_LANDING_LAG,
       followUps: HAMMERFALL_DIVES,
     },
 

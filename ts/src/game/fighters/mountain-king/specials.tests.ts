@@ -11,9 +11,9 @@ import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
-import { CLAP_REACH } from "./specials";
+import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
-import { FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
+import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
 
 const WATCH_FRAMES = 90;
 const AIR_HEIGHT = 200.0;
@@ -246,4 +246,35 @@ test("Storm Bolt's hammer first exists on frame 23 of the move and the move ends
   }
   assertEquals(spawned, 23, "the hammer first exists on frame 23");
   assertEquals(ended, 61, "the move ends on frame 61");
+});
+
+const LANDING_WATCH_FRAMES = 400;
+
+function landingLagAfter(leapHeight: number | undefined, aimZ: number, dive: boolean): number {
+  const { state, king } = leapMatch(FOE_AWAY);
+  if (leapHeight !== undefined) lift(king, leapHeight);
+  let tick = 1;
+  step(state, king, tick, 0, aimZ, true, true);
+  assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");
+  let pressed: boolean = false;
+  let left = leapHeight !== undefined;
+  while (tick < LANDING_WATCH_FRAMES) {
+    const press: boolean = dive && !pressed && king.special.frame >= DIVE_PRESS_FRAME - 1;
+    pressed ||= press;
+    step(state, king, ++tick, 0, tick < CHARGED_AIM_FRAMES ? aimZ : 0, press);
+    left ||= !king.motion.grounded;
+    if (left && king.motion.grounded) return king.landing.lag;
+  }
+  return -1;
+}
+
+test("Mountain King lands from Thunder Leap in 11 frames of landing lag after its helpless fall and when he lands during the move, and from the Hammerfall dive in its own 24 [k3 measure docs/gameplay-design.md]", () => {
+  const lags = {
+    fall: landingLagAfter(undefined, 1, false),
+    midMove: landingLagAfter(AIR_HEIGHT, -1, false),
+    dive: landingLagAfter(undefined, 1, true),
+  };
+  assertEquals(lags.fall, THUNDER_LEAP_LANDING_LAG, "landing from the helpless fall");
+  assertEquals(lags.midMove, THUNDER_LEAP_LANDING_LAG, "landing during the leap");
+  assertEquals(lags.dive, HAMMERFALL_LANDING_LAG, "landing from the dive keeps its own lag");
 });
