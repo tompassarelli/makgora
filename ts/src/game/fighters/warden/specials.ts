@@ -37,8 +37,8 @@ const PURSUIT_STUN_FRAMES = 40;
 const pursuitHit = (stunFrames: number) => ({ ...wardenHit(7.6326799392700195, "POKE", 35), stunFrames });
 const LUNGE_PASS_RADIUS = 20.0;
 const LUNGE_BLADE: readonly (readonly [number, number, number, number])[] = [
-  [18.0, 68.0, 127.0, 28.0], [18.0, 68.0, 136.0, 19.0], [18.0, 67.0, 132.0, 11.0], [18.0, 66.0, 127.0, 4.0], [18.0, 66.0, 123.0, -3.0],
-  [18.0, 65.0, 119.0, -8.0], [18.0, 64.0, 116.0, -13.0], [18.0, 64.0, 113.0, -17.0], [18.0, 64.0, 130.0, -8.0], [18.0, 63.0, 113.0, -22.0],
+  [18.0, 69.0, 165.0, 34.0], [18.0, 68.0, 171.0, 21.0], [18.0, 66.0, 128.0, -11.0], [18.0, 62.0, 73.0, -21.0], [18.0, 64.0, 104.0, 93.0],
+  [18.0, 66.0, 134.0, 3.0], [18.0, 70.0, 25.0, 65.0], [18.0, 77.0, 90.0, 150.0], [18.0, 71.0, 143.0, 85.0], [18.0, 64.0, 157.0, -7.0],
 ];
 const lungeRegions = (): readonly MoveRegion[] => [
   ...LUNGE_BLADE.map(([x1, z1, x2, z2], index) => heroRegion(LUNGE_FIRST + index, LUNGE_FIRST + index, blade(x1, z1, x2, z2), pursuitHit(LUNGE_STUN_FRAMES))),
