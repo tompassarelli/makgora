@@ -41,6 +41,7 @@ export interface AuthoredMove {
 
   readonly travelX?: number | undefined;
   readonly travelStopsAtBody?: boolean | undefined;
+  readonly travelStopsAtLedge?: boolean | undefined;
   readonly travelFrames?: number | undefined;
 
 
@@ -198,4 +199,9 @@ export function cleanLateMove(move: AuthoredMove, cleanFrames: number): Authored
 
 export function heroHurtPose(first: number, last: number, parts: readonly HurtPart[]): HurtPose {
   return hurtPose(first - 1, last - 1, parts);
+}
+
+
+export function travelStopFlags(move: Readonly<AuthoredMove>): number {
+  return (move.travelStopsAtBody === true ? 1 : 0) + (move.travelStopsAtLedge === true ? 2 : 0);
 }

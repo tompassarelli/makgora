@@ -7,7 +7,9 @@ import { f32 } from "wisp/src/sim/f32";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
 import { hurtCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
+import type { Fighter } from "./fighter";
 import { type Roster, fighterAt, isActive } from "./roster";
+import * as stageSurfaces from "./stage";
 import { shieldSizeMultiplier } from "./shield";
 
 
@@ -32,4 +34,11 @@ export function travelBeforeBodies(world: Roster, slot: number, distance: number
     distance = min(distance, max(0.0, f32(ahead - f32(radius + ownRadius))));
   }
   return distance;
+}
+
+
+export function travelBeforeLedge(f: Readonly<Fighter>, stage: number, matchFrame: number, distance: number): number {
+  const deck = f.motion.surface ?? 0;
+  const edge = f.facing > 0 ? stageSurfaces.surfaceRight(stage, deck, matchFrame) : stageSurfaces.surfaceLeft(stage, deck, matchFrame);
+  return min(distance, max(0.0, f32(f32(edge - f.motion.x) * f.facing)));
 }

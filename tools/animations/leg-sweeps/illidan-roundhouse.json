@@ -1,0 +1,11 @@
+{"beats": [
+  [0, {}],
+  [4, {"drop": -5, "travel": 2, "twist": 30, "chest": -4, "foot": [6, 0, 38], "knee": 1.5, "toe": -30, "kickArm": -20, "plantArm": 25}],
+  [10, {"drop": -8, "travel": 8, "twist": 75, "chest": -10, "chestTwist": -10, "foot": [24, 0, 58], "knee": 2.5, "toe": -70, "kickArm": -35, "plantArm": 40}],
+  ["contact", {"drop": -8, "travel": 14, "twist": 95, "chest": -18, "chestTwist": -15, "foot": [78, 0, 72], "knee": 1.0, "toe": -90, "kickArm": -45, "plantArm": 50}],
+  [13, {"drop": -8, "travel": 17, "twist": 110, "chest": -22, "chestTwist": -15, "foot": [87, -4, 73], "knee": 0.5, "toe": -90, "kickArm": -50, "plantArm": 55}],
+  ["last", {"drop": -8, "travel": 16, "twist": 135, "chest": -20, "chestTwist": -15, "foot": [80, -26, 69], "knee": 0.5, "toe": -90, "kickArm": -45, "plantArm": 50}],
+  [20, {"drop": -7, "travel": 10, "twist": 200, "chest": -10, "foot": [18, -10, 58], "knee": 2.0, "toe": -40, "kickArm": -25, "plantArm": 30}],
+  [28, {"drop": -3, "travel": 3, "twist": 300, "chest": -2, "kickArm": -5, "plantArm": 8}],
+  ["end", {"twist": 360}]
+]}

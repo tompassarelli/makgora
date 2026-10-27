@@ -120,7 +120,6 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
   [AttackStyle.jab]: { ...region(27.0, 106.0, 76.0, 152.0, 5.0, 100.0, 18.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 41.0, z1: 90.0, x2: 92.0, z2: 138.0, radius: 14.0 } },
   [AttackStyle.jab2]: { ...region(27.0, 106.0, 76.0, 152.0, 4.0, 30.0, 22.0, 0.3420201539993286, 0.9396926164627075), strike: { x1: 41.0, z1: 90.0, x2: 92.0, z2: 138.0, radius: 14.0 } },
   [AttackStyle.upSmash]: { ...region(-21.0, 31.0, 74.0, 196.0, 15.0, 94.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 5.0, z1: 100.0, x2: 5.0, z2: 170.0, radius: 26.0 } },
-  [AttackStyle.forwardSmash]: { ...region(3.0, 71.0, 88.0, 172.0, 10.0, 85.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 57.0, z1: 102.0, x2: 17.0, z2: 158.0, radius: 14.0 } },
 
   [AttackStyle.demonHunterDashAttack]: { ...region(37.0, 78.0, 37.0, 158.0, 9.0, 95.0, 20.0, 0.5, 0.8660253882408142), strike: { x1: 55.0, z1: 55.0, x2: 60.0, z2: 140.0, radius: 18.0 } },
 

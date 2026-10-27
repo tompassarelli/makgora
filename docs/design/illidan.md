@@ -316,36 +316,50 @@ a shield to punish. Alternatives: **B, keep the thrown glaives** (rejected:
 Tom asked for the splits); **C, a one-sided kick** (rejected: the splits hits
 both sides, which is the Melee move's point).
 
-### Forward smash: Fel Lunge (picked, #379)
+### Forward smash: spinning roundhouse kick (picked, 2026-10-28)
 
-Tom's playtest (9 Oct, #379): the old forward smash, Eye Blast, became a
-645-unit floor beam when charged 20 frames. Its only tell was a glow over his
-eyes that did not read at gameplay zoom, and computers fired it from across
-the stage: a full-screen zoning tool on a rushdown fighter. Lead decision:
-forward smash loses the beam and lunges like Fel Rush; Eye Blast moves into
-his meter-gated special (below).
+Tom asked on 28 Oct, while playtesting, for a forward smash with more reach,
+perhaps a roundhouse, that steps forward the way Falco's forward smash does.
+The proxy set the numbers on his behalf. Fel Lunge (below) is replaced: its
+glaive strike started 88 units up, so it passed over Rifleman, Murloc and
+Kobold, and a 40-70 unit lunge read as a second Fel Rush.
 
-Startup 6 and total 36 as before; active frames 6–8 (3, was 10). On attack
-frames 6–9, after any charge, he travels forward 40 units, plus up to 30
-more at full charge (60 frames): 10 a frame uncharged, 17.5 fully charged.
-The lunge stops at a body or a raised shield, like Fel Rush. The glaive
-strikes from 25 to 120 units ahead, from 75 below his feet to 105 above:
-10% at 45° (base 20, growth 85), drain 10, scaled by charge like every
-smash. Reach from where he starts is 160 uncharged and 190 fully charged,
-inside the roster's forward-smash band (62–195; the widest other fighter
-reaches 190). No projectile and no beam.
+He chambers his right knee, turns his hips over and snaps the leg out level
+at chest height with the foot flexed, so the heel leads. Then he spins through
+the follow-through and back to his stance (`ILLIDAN_MOVES` in
+`ts/src/game/sim/originalMoves.ts`; animation in
+`tools/animations/leg-sweeps/illidan-roundhouse.json`).
 
-Kill percent, from the centre of stage 0, no DI, against Rifleman / Murloc
-/ Cairne: uncharged 128 / 122 / 171 (unchanged); fully charged 94 / 90 /
-125, where the charged beam killed at 75 / 76 / 114. Both stay inside the
-range the old move covered (75–171).
+- Timing: the first hit is on frame 12, the same as Falco's forward smash. The
+  kick is active on frames 12-16 and the move lasts 40 frames in total. The
+  charge holds on frame 11, in the chambered, turned pose.
+- Step: he steps 22 units over the windup, the same at any charge. The step
+  stops at a body or a raised shield, and stops at the ledge, so he never kicks
+  himself off the stage.
+- Hit regions follow his drawn leg on each active frame:
+  - The **heel** is the strong hit, the kill hit: 10% at 45°, base 20, growth
+    85. These are Fel Lunge's exact values, so his kill percents carry over.
+  - The **shin and the ball of the foot** are the weak hit: 7% at 45°, base 17,
+    growth 72.
+  - Damage scales with charge, like every smash.
+- Reach: the heel's far edge is 108 ahead of where he stands mid-kick, so the
+  kick reaches 130 from where he starts. That is inside the roster's
+  forward-smash band (62-195) and beyond Fel Lunge's 111 on its glaive
+  regions. Tom's brief asked for 160-175, which his 75-unit leg cannot reach
+  with a 20-25 step and the hitbox on the drawn heel. The kick sits at chest
+  height so the heel still lands on the short fighters (Rifleman, Mountain
+  King, Peon, Murloc). Only Kobold is short enough to duck the heel.
 
-Counterplay: the lunge is short and straight, so a shield stops it in place
-and he still has 27 frames of recovery after the strike; a jump over the low
-lunge lands behind him. Alternatives: **B, keep the charged beam with a
-louder tell** (rejected by the lead: a 645-unit forward smash is free stage
-control at any tell); **C, a lunge as long as Fel Rush** (rejected: it
-duplicates his side special and would leave the reach band).
+Counterplay: 11 frames of startup with an obvious chamber, and 24 frames of
+recovery after the kick for a shield to punish. The leg is a hurtbox while it
+is out, so a disjointed poke beats it. Alternatives: **B, keep Fel Lunge**
+(rejected: Tom asked for a kick with more reach); **C, a longer step to reach
+160** (rejected: a 40-unit step is the lunge again, which duplicates Fel Rush).
+
+Fel Lunge history (#379, 9 Oct): the earlier Eye Blast forward smash became a
+645-unit floor beam when charged, so it turned into a lunge like Fel Rush
+(startup 6, total 36, 40-70 units of travel). Eye Blast moved into his
+meter-gated special.
 
 ### EX neutral special: Eye Blast (picked, #379)
 
@@ -479,7 +493,7 @@ attackCues.ts and elementLooks.ts):
 | Vengeful Retreat | Possession missile trailing the vault |
 | Chaos Strike (ground and air) | Moon Glaive whirl |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
-| Fel Lunge (forward smash) | Illidan's Metamorphosis missile trail |
+| Roundhouse kick (forward smash) | none yet; its fel crescent and heel flash are the next change |
 | Eye Blast windup / beam | Metamorphosis missile over his eyes and small green dragon flames along the floor / green dragon fire, each floor flame growing as the beam reaches it |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |
 | Twin-glaive forward air | Illidan's missile trail |

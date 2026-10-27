@@ -50,7 +50,7 @@ import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodg
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
-import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, felLungeStep, isSmashAttack, smashChargeFrame } from "./moves";
+import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, isSmashAttack, smashChargeFrame } from "./moves";
 import {
   addMeleeWorldValues,
   airDriftVelocity,
@@ -65,7 +65,7 @@ import {
 import { observeActionDecision, observeActionStart } from "./observations";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
-import { travelBeforeBodies } from "./travelStop";
+import { travelBeforeBodies, travelBeforeLedge } from "./travelStop";
 import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
 import { moveTravelStep } from "./heroMoves";
 import {
@@ -114,14 +114,13 @@ const GUARD_BITS = 768;
 const STEERING_BITS = 16399;
 
 
-function attackStartupTravel(world: Roster, slot: number): number {
+function attackStartupTravel(world: Roster, slot: number, stage: number, matchFrame: number): number {
   const f = fighterAt(world, slot);
   const move = f.attack.style === undefined ? undefined : f.tuning.moves?.normals[f.attack.style];
-  const lunge = felLungeStep(f.character, f.attack.style, f.attack.frame, f.attack.smashCharging, f.attack.smashChargeFrames);
-  if (lunge > 0.0 && f.motion.grounded) return f32(travelBeforeBodies(world, slot, lunge, true) * f.facing);
-  const step = move === undefined || !f.motion.grounded ? undefined : moveTravelStep(move, f.attack.frame);
+  const step = move === undefined || !f.motion.grounded || f.attack.smashCharging ? undefined : moveTravelStep(move, f.attack.frame);
   if (step === undefined) return 0.0;
-  const distance = travelBeforeBodies(world, slot, step, move?.travelStopsAtBody === true);
+  const before = travelBeforeBodies(world, slot, step, move?.travelStopsAtBody === true);
+  const distance = move?.travelStopsAtLedge === true ? travelBeforeLedge(f, stage, matchFrame, before) : before;
   return f32(distance * f.facing);
 }
 
@@ -617,7 +616,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   platforms.dropFromPlatform(f, stage, matchFrame, input);
   const oldX = motion.x;
   const oldZ = motion.z;
-  dashEntryDisplacementAdjustment = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot));
+  dashEntryDisplacementAdjustment = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot, stage, matchFrame));
   decayKnockback(f, stageSurfaces.floorFriction(stage, motion));
   decayShieldMotion(f, stageSurfaces.floorFriction(stage, motion));
   if (dodgeActive && !motion.grounded) {

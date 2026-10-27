@@ -13,7 +13,7 @@ export const ILLIDAN_GAMEPLAN: FighterGameplan = {
   range: { near: 110.0, far: 200.0 },
   spacing: [
     { move: AttackStyle.forwardAir, near: 90.0, far: 195.0 },
-    { move: AttackStyle.forwardSmash, near: 120.0, far: 215.0 },
+    { move: AttackStyle.forwardSmash, near: 90.0, far: 150.0 },
     { move: AttackStyle.forwardTilt, near: 60.0, far: 155.0 },
   ],
   approach: [

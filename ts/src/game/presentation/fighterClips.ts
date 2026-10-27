@@ -362,3 +362,7 @@ export function specialClip(character: number, action: SpecialAction, grounded: 
     default: return byGrounding(RIFLEMAN_BLASTER, !aerialShot);
   }
 }
+
+export function smashClipsFor(character: Character, style: AttackStyle): SmashClips | undefined {
+  return character === Character.demonHunter ? illidanSmashClips(style) : undefined;
+}

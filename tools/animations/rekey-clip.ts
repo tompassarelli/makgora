@@ -5,13 +5,15 @@ import { generateModelMDX as generateMDX } from "../../ts/scripts/mdxCodec";
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { capture, type PoseFrame, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
-import { clipFor } from "../../ts/src/game/presentation/fighterClips";
+import { clipFor, smashClipsFor } from "../../ts/src/game/presentation/fighterClips";
 import { advanceFighterPose, createFighterPose } from "../../ts/src/game/presentation/fighterPose";
 import { HERO_STRIKE_MOMENTS } from "../../ts/src/game/presentation/heroStrikeMomentInfo";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { beginFighterAttack } from "../../ts/src/game/sim/attacks";
 import { AttackPhase, AttackStyle, type Character } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";
+import { attackStartupFrames, isSmashAttack, smashChargeFrame } from "../../ts/src/game/sim/moves";
+import { authoredTuning } from "../../ts/src/game/sim/tuning";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { createRoster, neutralControls } from "../../ts/src/game/sim/roster";
 import { advanceFighter } from "../../ts/src/game/sim/step";
@@ -78,23 +80,33 @@ if (rigOutput) {
   process.exit(0);
 }
 
-const [start = 0, end = 0] = sequence.Interval;
-const times = [...frames.map((f) => start + Math.round(f.seconds * 1000)), start + Math.round(clip.seconds * 1000)];
-ensure(times.every((t, i) => t <= end && (i === 0 || t > times[i - 1]!)), `${fighter.name} ${pose}: the move's clip times ${times.join(",")} leave clip ${clip.index} (${start}-${end})`);
 const baked = await blender.readKeys(bakedKeys!, frames.length);
-tracks(model, (track, path) => {
-  if (!/^\.(Bones|Helpers)\.\d+\.(Rotation|Translation)$/.test(path) || onGlobalClock(track)) return;
-  const template = track.Keys.find((k) => k.Frame >= start && k.Frame <= end);
-  const keyed = times.map((Frame, frame) => ({ Frame, Vector: baked(path, frame)! }));
-  if (end > times.at(-1)!) keyed.push({ Frame: end, Vector: keyed.at(-1)!.Vector });
-  track.Keys = [...track.Keys.filter((k) => k.Frame < start || k.Frame > end),
-    ...keyed.map(({ Frame, Vector }) => ({ ...template, Frame, Vector, ...(track.LineType >= 2 ? { InTan: Vector.slice(), OutTan: Vector.slice() } : {}) }))].sort((a, b) => a.Frame - b.Frame);
-});
+function rekey(index: number, moments: readonly (readonly [seconds: number, frame: number])[]): void {
+  const [start = 0, end = 0] = model.Sequences[index]!.Interval;
+  const times = moments.map(([seconds]) => start + Math.round(seconds * 1000));
+  ensure(times.every((t, i) => t <= end && (i === 0 || t > times[i - 1]!)), `${fighter!.name} ${pose}: the move's clip times ${times.join(",")} leave clip ${index} (${start}-${end})`);
+  tracks(model, (track, path) => {
+    if (!/^\.(Bones|Helpers)\.\d+\.(Rotation|Translation)$/.test(path) || onGlobalClock(track)) return;
+    const template = track.Keys.find((k) => k.Frame >= start && k.Frame <= end);
+    const keyed = times.map((Frame, at) => ({ Frame, Vector: baked(path, moments[at]![1])! }));
+    if (end > times.at(-1)!) keyed.push({ Frame: end, Vector: keyed.at(-1)!.Vector });
+    track.Keys = [...track.Keys.filter((k) => k.Frame < start || k.Frame > end),
+      ...keyed.map(({ Frame, Vector }) => ({ ...template, Frame, Vector, ...(track.LineType >= 2 ? { InTan: Vector.slice(), OutTan: Vector.slice() } : {}) }))].sort((a, b) => a.Frame - b.Frame);
+  });
+}
+rekey(clip.index, [...frames.map((f, at) => [f.seconds, at] as const), [clip.seconds, frames.length]]);
+const smash = isSmashAttack(style) ? smashClipsFor(character, style) : undefined;
+const moves = authoredTuning(character).moves, charge = smashChargeFrame(style, moves), released = frames.length - attackStartupFrames(style, moves);
+if (smash !== undefined) {
+  rekey(smash.charge.index, [[0, charge]]);
+  rekey(smash.release.index, frames.flatMap((_, at) => at >= charge && at - charge <= released ? [[(at - charge) / released * smash.release.seconds, at] as const] : []));
+}
+const rekeyed = new Set([clip.index, ...smash === undefined ? [] : [smash.charge.index, smash.release.index]]);
 
 const bytes = encodeVerified(parseSource(generateMDX(model)));
 const before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);
 for (const [index, other] of source.Sequences.entries()) for (const fraction of [0, 0.5, 1]) {
-  if (index === clip.index) continue;
+  if (rekeyed.has(index)) continue;
   const time = (other.Interval[1] - other.Interval[0]) * fraction / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
   ensure(a.length === b.length && a.every((v, i) => Math.abs(v - (b[i] ?? Infinity)) < 0.001), `${fighter.name}/${other.Name}: an unrelated clip changed`);
 }
@@ -135,4 +147,4 @@ ensure(outside.length === 0, `${fighter.name} ${pose}: ${outside.join("; ")}`);
 const path = join(output, fighter.source);
 mkdirSync(dirname(path), { recursive: true });
 await Bun.write(path, bytes); chmodSync(path, 0o644);
-console.log(`REKEY_CLIP ${fighter.name} ${pose}: re-keyed clip ${clip.index} in place over ${frames.length} move frames; every other clip unchanged; ${path}`);
+console.log(`REKEY_CLIP ${fighter.name} ${pose}: re-keyed clips ${[...rekeyed].join(", ")} in place over ${frames.length} move frames; every other clip unchanged; ${path}`);

@@ -175,6 +175,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   him, leaned back 30 degrees about his pelvis so his feet lead down and forward, and turned once about that long
   axis through the strike, then unwound to his aerial ready pose; `... --keys KEYS.json` re-keys the clip in place.
   Store the output as `illidan-animation` and run `package-illidan.ts PRIVATE_OUTPUT --metadata-only`.
+  Illidan's forward smash is a spinning roundhouse kick authored the same way:
+  `... rekey-clip.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character 2 --pose forwardSmash --limb R --rig RIG.json`, then
+  `blender ... --python tools/animations/leg-sweep.py -- RIG.json KEYS.json illidan-roundhouse` poses the beats in
+  `tools/animations/leg-sweeps/illidan-roundhouse.json`: he chambers the right knee, turns his hips over, snaps the leg out
+  level at chest height with the foot flexed so the heel leads, then spins once through the follow-through back to his
+  stance. Re-keying a smash also writes its charge pose (the baked charge frame) and its release clip (the baked frames
+  from the charge frame on), so a charged smash plays the same motion.
   Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
   recovery, throw and nine pain gestures and refresh only his clip/stride rows.
   `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then

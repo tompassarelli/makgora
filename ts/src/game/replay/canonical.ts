@@ -10,7 +10,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { BotObservationFrame } from "../match/botPerception";
 import { AttackStyle, GrabAction, LAST_ATTACK_STYLE } from "../sim/codes";
-import type { FighterMoves } from "../sim/heroMoves";
+import { type FighterMoves, travelStopFlags } from "../sim/heroMoves";
 import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import type { HitEffect } from "../sim/hitRegions";
 import { type HurtPart, HurtState } from "../sim/hurtboxes";
@@ -135,7 +135,7 @@ export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = 
     int(`${name}.total`, move.totalFrames);
     int(`${name}.landingLag`, move.landingLag);
     real(`${name}.travel`, move.travelX ?? 0.0);
-    int(`${name}.stopsAtBody`, move.travelStopsAtBody ? 1 : 0);
+    int(`${name}.stopsAtBody`, travelStopFlags(move));
     if (move.travelFrames !== undefined) int(`${name}.travelFrames`, move.travelFrames);
     if (move.chainsFrom !== undefined) int(`${name}.chainsFrom`, move.chainsFrom);
     if (move.chargeFrame !== undefined) int(`${name}.chargeFrame`, move.chargeFrame);

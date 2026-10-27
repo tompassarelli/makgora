@@ -57,7 +57,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
     inspiredBy: {
       [AttackStyle.forwardTilt]: "Shear, from the Black Temple encounter",
       [AttackStyle.downSmash]: "Falco's down smash, the splits, with the fel fire of the Flames of Azzinoth on contact",
-      [AttackStyle.forwardSmash]: "Fel Lunge, from the Demon Hunter's Fel Rush",
+      [AttackStyle.forwardSmash]: "Falco's forward smash, a stepping kick, thrown as a spinning roundhouse",
       [AttackStyle.forwardAir]: "His twin warglaives crossing",
     },
   },

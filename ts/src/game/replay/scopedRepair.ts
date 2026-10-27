@@ -23,7 +23,6 @@ import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegi
 import { type HurtPart, type HurtPose, shippedHurtboxes } from "../sim/hurtboxes";
 import type { AuthoredSpecial } from "../sim/specials/schema";
 import { SMASH_MAX_CHARGE_FRAMES, attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { felLungeStep } from "../sim/moves";
 import { EYE_BLAST_FORM, EYE_BLAST_REACH } from "../sim/specials";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { shieldReach } from "../sim/shieldTilt";
@@ -60,9 +59,7 @@ function buildAuthoredTravel(): { [character: number]: AuthoredTravel | undefine
 
 function authoredStartupStep(fighter: Readonly<Fighter>): number {
   const style = fighter.attack.style;
-  if (style === undefined || !fighter.motion.grounded) return 0.0;
-  const lunge = felLungeStep(fighter.character, style, fighter.attack.frame + 1, false, fighter.attack.smashChargeFrames);
-  if (lunge > 0.0) return f32(lunge * fighter.facing);
+  if (style === undefined || !fighter.motion.grounded || fighter.attack.smashCharging) return 0.0;
   const travel = authoredTravel[fighter.character];
   if (travel === undefined || travel.moves !== fighter.tuning.moves) return 0.0;
   const positions = at(travel.startup, style);
