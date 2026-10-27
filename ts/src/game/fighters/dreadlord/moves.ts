@@ -291,7 +291,7 @@ export const DREADLORD_MOVES: FighterMoves = {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 2.7150001525878906, ...NO_LAUNCH } },
     [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 32, effect: { ...dreadlordHit(11.276955604553223, "EDGE", 35), growth: 49.0, base: 61.0 } },
     [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 43, effect: { ...dreadlordHit(13.532346725463867, "KILL", 40, -1.0), growth: 77.0, base: 56.0 } },
-    [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 29, effect: dreadlordHit(10.149260520935059, "JUGGLE", 85) },
+    [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 29, effect: { ...dreadlordHit(10.149260520935059, "JUGGLE", 85), base: 40.0 } },
     [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 44, effect: { ...dreadlordHit(9.021564483642578, "CHASE", 70), growth: 100.0, base: 0.0, setKnockback: 90.0 } },
   },
 };

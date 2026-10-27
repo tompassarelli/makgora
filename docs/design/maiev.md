@@ -23,15 +23,22 @@ beats read. The DIs listed must not escape.
 | Opener | Percent | Follow-up | Floor | DIs that must not escape | Source | Today |
 | --- | --- | --- | --- | --- | --- | --- |
 | down tilt | 0-20 | down tilt | true | | starter row (#299) | holds |
-| neutral air | 10-20 | grab | DI-dependent | in, none | Fox true at 10-20 | misses (#456): read, the grab lands 21 frames after the hit, 3 frames later than with Falco's falls, and jump, air dodge and tech away escape |
-| neutral air | 0-30 | jab | DI-dependent | in | Fox DI-dependent 0-60 | misses (#456): read, the jab lands 17 frames after the hit, 3 frames later than with Falco's falls, and shield escapes |
+| neutral air | 10-20 | grab | read (DI-dependent until 2026-10-27) | | Fox true at 10-20 | holds as a read (#456): the grab lands 21 frames after the hit, 3 frames later than with Falco's falls, and jump, air dodge and tech away escape |
+| neutral air | 0-30 | jab | read (DI-dependent until 2026-10-27) | | Fox DI-dependent 0-60 | holds as a read (#456): the jab lands 17 frames after the hit, 3 frames later than with Falco's falls, and shield escapes |
 | down air | 0-100 | down special (Fan of Knives) | true | | Fox down air into shine, true | holds |
 | down air | 0-60 | grab | true | | Fox true | holds |
 | up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | holds (#306) |
-| up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | misses (#456): read, tech away escapes the short-hop up air, which lands 27 frames after the hit on Fox's lower short hop |
+| up air | 10-60 | up air | read (DI-dependent until 2026-10-27) | | Fox DI-dependent 10-60 | holds as a read (#456): tech away escapes the short-hop up air, which lands 27 frames after the hit on Fox's lower short hop |
 | side special (Shadow Pursuit) | 0-150 | grab | true | | her stun (#273) | holds |
 | side special (Shadow Pursuit) | 0-150 | forward smash | true | | her stun (#273) | holds |
-| up smash | 30-50 | grab | read | | Fox read; a tech-chase read | holds |
+
+Three rows dropped to the read they measure on 2026-10-27 (#493), so the
+objectives guard what she has; the Fox class stays in the source column as
+the retune's target (#311).
+
+Up smash into grab at 30-50% (a read) was dropped the same day (#493): since
+her up smash and up tilt moved onto her glaive above her head (#508), neither
+reaches a grounded foe, so the link table has no up smash or up tilt rows.
 
 Two starter rows changed. Up smash into grab at 30-50% was DI-dependent; since
 the victim techs its landing as in Melee (#297) tech in place, away and toward

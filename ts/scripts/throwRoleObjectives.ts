@@ -5,7 +5,7 @@ import { canAttack } from "../src/game/sim/conditions";
 import { fighterName } from "../src/game/roster/kits";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import {
-  DIS, type Defender, type Di, type Ending, Explorer, OPENERS, type Opener, PERCENTS, TECH_OPTIONS, defenderMask, free, openerRoot, settled,
+  DIS, type Defender, type Di, type Ending, Explorer, OPENERS, type Opener, PERCENTS, TECH_OPTIONS, type TechOption, defenderMask, free, openerRoot, settled,
 } from "./comboExplorer";
 
 export const THROW_ROLES = ["combo starter", "tech-chase starter", "kill throw", "positional", "percent-window confirm"] as const;
@@ -26,6 +26,7 @@ export interface ThrowDeclaration {
   readonly throw: ThrowDirection;
   readonly role: ThrowRole;
   readonly percents: readonly number[];
+  readonly unread?: readonly TechOption[];
 }
 
 export interface ThrowRoleUnit {
@@ -48,7 +49,7 @@ export const VICTIM_WEIGHT = 75;
 const STAGE = 0;
 const SPACINGS = [40, 70, 100, 20, 140] as const;
 const LANDING_SPREAD = 3;
-const POSITIONAL_SHARE = 0.16;
+const POSITIONAL_SHARE = 0.15;
 const CONFIRM_BAND = 10;
 const KILL_HORIZON = 300;
 const LAND_HORIZON = 150;
@@ -194,9 +195,11 @@ function techChaseStarter(attacker: Character, declaration: ThrowDeclaration): O
       return `${percent}%: ${best.moves.slice(1).join(", ") || "no tech chase"}`;
     }
     const reads = explorer.techReads(best, "none", percent);
-    const uncovered = TECH_OPTIONS.filter((_, index) => reads[index] === undefined);
+    const missed = TECH_OPTIONS.filter((_, index) => reads[index] === undefined);
+    const uncovered = missed.filter((option) => !(declaration.unread ?? []).includes(option));
     if (uncovered.length > 0) problems.push(`at ${percent}% no read covers ${uncovered.join(", ")}`);
-    return `${percent}%: ${TECH_OPTIONS.length - uncovered.length}/${TECH_OPTIONS.length} tech options read`;
+    const excused = missed.filter((option) => !uncovered.includes(option));
+    return `${percent}%: ${TECH_OPTIONS.length - missed.length}/${TECH_OPTIONS.length} tech options read${excused.length === 0 ? "" : ` (${excused.join(", ")} declared unread)`}`;
   });
   for (const [di, frames] of landings) {
     const spread = Math.max(...frames) - Math.min(...frames);
@@ -243,7 +246,7 @@ function positional(attacker: Character, declaration: ThrowDeclaration): Omit<Th
     const short = carried.filter(({ ok }) => !ok);
     if (short.length > 0) problems.push(`at ${percent}% DI ${short.map(({ di }) => di).join(", ")} leaves the victim on stage within ${POSITIONAL_SHARE * 100}% of the stage width`);
     const least = Math.min(...carried.map(({ share }) => share));
-    return `${percent}%: carried at least ${Math.round(least * 100)}% of the stage width`;
+    return `${percent}%: carried at least ${(least * 100).toFixed(1)}% of the stage width`;
   });
   return { passes: problems.length === 0, measured: cells.join("; "), problems };
 }

@@ -11,7 +11,7 @@ import { totalVelocityZ } from "../src/game/sim/motion";
 import { floorBelow } from "../src/game/sim/stage";
 import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { DEFAULT_POLICY, VICTIM_OPTIONS, type VictimOption } from "./agencyBranch";
-import { LINK_GROUND_MODES, PIVOT_MODES } from "./comboLinkModes";
+import { LINK_GROUND_MODES, PIVOT_MODES, jumpCancelFrame, modeStarts } from "./comboLinkModes";
 import { type BranchStick, branchFollowUps, branchMove, branchOpen } from "./comboLinkBranches";
 import { type Region, REGIONS, landedRegion } from "./comboLinkRegions";
 import { onShield } from "./comboLinkShield";
@@ -147,6 +147,7 @@ interface Idle extends Track {
   readonly branch: readonly boolean[];
   readonly actionable: boolean;
   readonly start: number;
+  readonly jumpCancel: number | undefined;
   readonly free: number;
   readonly window: number;
 }
@@ -192,10 +193,11 @@ function idleTrack(sim: Sim, from: Saved, d: Defender): Idle | "ko" | undefined 
     release(track);
     return undefined;
   }
-  return { ...track, bx, bz, grounded, branch, actionable: start >= 0, start: start >= 0 ? start : firstBranch, free: freeAt, window: Math.min(LIMIT, freeAt + SLACK) };
+  const jumpCancel = start > 0 ? jumpCancelFrame(sim, track.saved, d, start) : undefined;
+  return { ...track, bx, bz, grounded, branch, actionable: start >= 0, start: start >= 0 ? start : firstBranch, jumpCancel, free: freeAt, window: Math.min(LIMIT, freeAt + SLACK) };
 }
 
-function modeTrack(sim: Sim, from: Saved, d: Defender, idle: Idle, mode: Mode, earliest: number): Track {
+function modeTrack(sim: Sim, from: Saved, d: Defender, idle: Idle, mode: Mode, start: number, earliest: number): Track {
   sim.load(from);
   const track = emptyTrack();
   for (let n = 1; n <= idle.window; n++) {
@@ -206,7 +208,7 @@ function modeTrack(sim: Sim, from: Saved, d: Defender, idle: Idle, mode: Mode, e
     track.avx[n] = a.motion.vx;
     track.loose[n] = !owned(b);
     if (n >= earliest) track.saved[n] = sim.save();
-    const am = mode.hold(n, idle.start, a, b);
+    const am = mode.hold(n, start, a, b);
     track.attacker.push(am);
     sim.step(am, defenderMask(d, n, undefined, b, a));
   }
@@ -275,11 +277,11 @@ function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle, sticks: read
     }
   }
   const modes = !idle.actionable ? [] : sim.a.motion.grounded || idle.grounded[idle.start] === true ? LINK_GROUND_MODES : AIR_MODES;
-  for (const mode of modes) {
+  for (const [mode, start] of modeStarts(modes, idle.start, idle.jumpCancel)) {
     sim.load(from);
-    const earliest = mode.earliest(idle.start, sim.a);
+    const earliest = mode.earliest(start, sim.a);
     if (earliest > idle.window) continue;
-    const track = mode === STAND ? idle : modeTrack(sim, from, d, idle, mode, earliest);
+    const track = mode === STAND ? idle : modeTrack(sim, from, d, idle, mode, start, earliest);
     for (let k = earliest; k <= idle.window; k += k < earliest + FINE_FRAMES ? 1 : 2) {
       const saved = track.saved[k];
       if (saved === undefined) continue;

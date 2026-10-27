@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { DIS } from "./comboExplorer";
+import { DIS, TECH_OPTIONS } from "./comboExplorer";
 import { REGIONS } from "./comboLinkRegions";
 import { LINK_PERCENTS, type LinkClass, type LinkRow } from "./comboLinks";
 import { EdgeGuardObjectiveSchema } from "./edgeGuardObjectives";
@@ -16,7 +16,7 @@ export const ComboObjectiveSchema = Schema.Struct({
   di: Schema.optionalKey(Schema.Array(Schema.Literals(DIS))),
 });
 export type ComboObjective = typeof ComboObjectiveSchema.Type;
-const DeclaredThrowSchema = Schema.Union([Schema.Literals(THROW_ROLES), Schema.Struct({ role: Schema.Literals(THROW_ROLES), percents: Schema.Array(Schema.Finite) })]);
+const DeclaredThrowSchema = Schema.Union([Schema.Literals(THROW_ROLES), Schema.Struct({ role: Schema.Literals(THROW_ROLES), percents: Schema.optionalKey(Schema.Array(Schema.Finite)), unread: Schema.optionalKey(Schema.Array(Schema.Literals(TECH_OPTIONS))) })]);
 export const ComboObjectivesSchema = Schema.Struct({
   links: Schema.Array(ComboObjectiveSchema),
   edgeGuards: Schema.Array(EdgeGuardObjectiveSchema),
@@ -27,7 +27,7 @@ export type ComboObjectives = typeof ComboObjectivesSchema.Type;
 export const throwDeclarations = (objectives: ComboObjectives): ThrowDeclaration[] =>
   Object.entries(objectives.throws).flatMap(([fighter, throws]) => THROW_DIRECTIONS.map((direction): ThrowDeclaration => {
     const declared = throws[direction];
-    return typeof declared === "string" ? { fighter, throw: direction, role: declared, percents: ROLE_PERCENTS[declared] } : { fighter, throw: direction, ...declared };
+    return typeof declared === "string" ? { fighter, throw: direction, role: declared, percents: ROLE_PERCENTS[declared] } : { fighter, throw: direction, ...declared, percents: declared.percents ?? ROLE_PERCENTS[declared.role] };
   }));
 
 const STRENGTH: Readonly<Record<LinkClass, number>> = { none: 0, read: 1, "DI-dependent": 2, true: 3 };

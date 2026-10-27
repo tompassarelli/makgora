@@ -204,7 +204,7 @@ interface Defender {
 }
 
 export const TECH_OPTIONS = ["tech in place", "tech in", "tech away", "missed tech"] as const;
-type TechOption = (typeof TECH_OPTIONS)[number];
+export type TechOption = (typeof TECH_OPTIONS)[number];
 
 const owned = (b: Readonly<Fighter>): boolean => b.launch.hitlag > 0 || b.launch.hitstun > 0 || b.grab.owner !== undefined;
 
@@ -966,7 +966,7 @@ export function exploreFrom(setup: ComboSetup, state: ReplayState): Ending {
 }
 
 export { Explorer, Sim, openerRoot, toward, away, expand, settled, defenderMask, landingSetup, better, owned, diMask, free, startedOf, started, setupFor };
-export { AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, GRAB_MOVE, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, SPACINGS, STAND };
+export { AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, GRAB_MOVE, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, JUMP, SPACINGS, STAND, hop };
 export type { Defender, Mode, Move, Opener, Saved };
 export const fighterNamed = (name: string): Character | undefined =>
   [...SELECTABLE_CHARACTERS, ...FIXTURE_FIGHTERS].find((character) => fighterName(character).toLowerCase() === name.toLowerCase() || fighterName(character).split(" ")[0]?.toLowerCase() === name.toLowerCase());

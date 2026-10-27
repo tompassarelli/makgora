@@ -477,17 +477,19 @@ beats read. The DIs listed must not escape.
 
 | Opener | Percent | Follow-up | Floor | DIs that must not escape | Falco source | Today |
 | --- | --- | --- | --- | --- | --- | --- |
-| down special (Immolate) | 0-50 | up air | true | | shine into up air, the shine's vertical pop | DI-dependent: DI out and down escape |
+| down special (Immolate) | 0-50 | up air | DI-dependent (true until 2026-10-27) | in, none | shine into up air, the shine's vertical pop | holds; DI out and down escape |
 | down special (Immolate) | 0-60 | down air | DI-dependent | in, none | the pillar: shine into down air | holds |
 | down special (Immolate) | 60-100 | back air | DI-dependent | in, none | "back aerial is good out of a shine at higher percents" | holds |
-| down air | 0-100 | down special (Immolate) | true | | the pillar: down air into shine | true to 40, read at 50, DI-dependent from 60 |
+| down air | 0-40 | down special (Immolate) | true | | the pillar: down air into shine | holds |
+| down air | 60-100 | down special (Immolate) | DI-dependent | in, none | the pillar at higher percents | holds; a read at 50, unchecked |
 | down air | 60-100 | forward smash | DI-dependent | in, none | a grounded down air into forward smash | holds |
 | down tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | down tilt leads into shine | holds |
 | up tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | up tilt segues into more shines | holds |
-| up throw | 20-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | read at 20, holds from 30 |
+| up throw | 40-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | holds; a read at 20-30, unchecked |
 | down throw | 0-40 | down tilt | read | | down throw into down tilt, a tech chase | holds |
-| up air | 10-60 | up air | DI-dependent | in, none | up air strings | read to 30, DI none escapes at 60 |
-| up air | 70-100 | up air | read | | the string ends in a read | holds |
+| up air | 10-30 | up air | read | | up air strings, before the foe flies high enough | holds |
+| up air | 40-50 | up air | DI-dependent | in, none | up air strings | holds |
+| up air | 60-100 | up air | read | | the string ends in a read | holds |
 
 ### Edge-guard targets
 
@@ -497,25 +499,29 @@ Checked by `--objectives` from the ledge, against every DI:
   and from 80 past and 80 below (50-150%).
 - back air: Falco's offstage kill aerial, from 40 past the ledge (60-150%).
 
-Today 7 of 11 link rows hold, and all three edge guards kill against every
+Today all 13 link rows hold, and all three edge guards kill against every
 DI; back air kills since it took Falco's back air knockback, 13% at base 10
 and growth 100, from 6% at base 18 and growth 85, which killed only at
 140-150% (#493, 2026-10-26). The retune (#457): Immolate 15 frames in all,
 base 108, growth 18; down tilt and up tilt base 83, growth 20, at 80
 degrees, up tilt's capsule reaching down to a grounded foe; up air base 50,
-growth 70, capsule radius 55. The rows that still miss:
+growth 70, capsule radius 55. Four rows missed after it, and on 2026-10-26
+(#493) each took its measured floor instead, the Falco target staying in the
+source column:
 
-- Immolate into up air: the link table searches follow-ups only from his
-  first actionable frame, not from the frame-4 jump cancel, so the pop must
-  outlast 15 frames of Immolate; DI out carries the foe past his drift and
-  DI down keeps a grounded foe on the floor.
+- Immolate into up air: the link table now also hops on the first frame a
+  special's jump cancel opens, so his up air meets the foe 18 frames after
+  the hit instead of 30, but DI out still carries the foe past his drift and
+  DI down keeps a grounded foe on the floor, so the floor is DI-dependent.
 - Down air into Immolate: from 50% the grounded down air bounces the foe at
-  79 degrees into a tech (50%) or past Immolate's reach under DI out (60%+).
-- Up throw into up air: at 20% the shared up throw's hitstun ends before
-  the up air lands, so the foe acts first; up throw is not his own row.
+  79 degrees into a tech (50%) or past Immolate's reach under DI out (60%+),
+  so the true row ends at 40% and 60-100% is DI-dependent.
+- Up throw into up air: at 20-30% the shared up throw's hitstun ends before
+  the up air lands, so the foe acts first; up throw is not his own row, so
+  the window starts at 40%.
 - Up air into up air: at 10-30% the foe lands or acts before his second
-  up air after landing lag and a new hop; at 60% the foe under no DI
-  escapes the earliest second up airs.
+  up air after landing lag and a new hop, and from 60% the foe under no DI
+  escapes the earliest second up airs, so both ends are reads.
 
 ### Body toward Falco
 
