@@ -4,7 +4,7 @@ import { Effect } from 'effect';
 import type { Character } from '../../ts/src/game/sim/codes';
 import type { Capsule } from '../../ts/src/game/sim/geometry/contactGeometry';
 import { SELECTABLE_CHARACTERS, fighterSlug } from '../../ts/src/game/roster/kits';
-import { LIMB_STRIKES, type SampledMove, loadBody, sampleFighter } from '../../ts/scripts/wisp/animScoreSample';
+import { LIMB_STRIKES, SPELL_STRIKES, type SampledMove, loadBody, sampleFighter } from '../../ts/scripts/wisp/animScoreSample';
 import type { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
 import { assetsView, readManifest } from '../../ts/scripts/wisp/buildInputs';
 import { FIGHTER_RIGS } from './rigs';
@@ -18,9 +18,9 @@ type Weapon = { readonly name: string; readonly hand: number; readonly vertices:
 type Edge = { readonly grip: Point; readonly tip: Point };
 type Shift = { readonly fighter: string; readonly move: string; readonly dx: number };
 type Gap = { readonly gap: number; readonly frame: number; readonly at: Point };
-type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly limb: boolean; readonly shifted: boolean };
+type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly by: 'weapon' | 'limb' | 'spell'; readonly shifted: boolean };
 
-const fails = (row: Row) => !row.limb && Math.max(row.tip.gap, row.reach.gap) > GAP_LIMIT;
+const fails = (row: Row) => row.by === 'weapon' && Math.max(row.tip.gap, row.reach.gap) > GAP_LIMIT;
 const worst = (row: Row) => Math.max(row.tip.gap, row.reach.gap);
 
 function segmentDistance(p: Point, a: Point, b: Point): number {
@@ -98,7 +98,7 @@ function traceMove(model: DrawnModel, fighter: string, weapons: readonly Weapon[
   return {
     fighter, move: sampled.move, weapons: weapons.map(weapon => weapon.name).join('+'), frames,
     tip: tipGap(frames, regions, edges), reach: reachGap(frames, regions, edges),
-    limb: LIMB_STRIKES[fighter]?.includes(sampled.move) === true, shifted,
+    by: LIMB_STRIKES[fighter]?.includes(sampled.move) === true ? 'limb' : SPELL_STRIKES[fighter]?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted,
   };
 }
 
@@ -123,10 +123,10 @@ function parseArgs(args: readonly string[]): { fighters: Character[]; assets: st
 }
 
 const point = (at: Point) => `${at[0].toFixed(1)},${at[1].toFixed(1)}`;
-const HEADER = ['fighter', 'move', 'weapons', 'active', 'tip outside', 'tip frame', 'tip x,z', 'region overreach', 'overreach frame', 'overreach x,z', 'limb strike', 'shifted', 'verdict'];
+const HEADER = ['fighter', 'move', 'weapons', 'active', 'tip outside', 'tip frame', 'tip x,z', 'region overreach', 'overreach frame', 'overreach x,z', 'strike by', 'shifted', 'verdict'];
 const tsvRow = (row: Row) => [
   row.fighter, row.move, row.weapons, `${row.frames[0]}-${row.frames.at(-1)}`, row.tip.gap.toFixed(1), row.tip.frame, point(row.tip.at),
-  row.reach.gap.toFixed(1), row.reach.frame, point(row.reach.at), row.limb ? 'yes' : 'no', row.shifted ? 'yes' : 'no', fails(row) ? 'FAIL' : 'pass',
+  row.reach.gap.toFixed(1), row.reach.frame, point(row.reach.at), row.by, row.shifted ? 'yes' : 'no', fails(row) ? 'FAIL' : 'pass',
 ].join('\t');
 
 const { fighters, assets: assetsArg, shift } = parseArgs(process.argv.slice(2));

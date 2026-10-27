@@ -85,10 +85,14 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
 
 export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   "shadow-hunter": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"],
-  thrall: ["back-air"],
+  thrall: ["back-air", "down-tilt", "forward-tilt-down", "down-smash", "down-air", "dash-attack"],
   illidan: ["down-tilt"],
   warden: ["down-tilt"],
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
+};
+
+export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
+  thrall: ["neutral-special", "down-special"],
 };
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};

@@ -34,7 +34,7 @@ export const THRALL_MOVES: FighterMoves = {
     [AttackStyle.jab]: jabStep(normal(4, 2, 14, 0, capsule(38.0, 65.0, 45.0, 70.0, 22.0), 5.119999885559082, 45, 54.22999954223633, 18.0)),
     [AttackStyle.jab2]: normal(7, 3, 18, 0, capsule(42.0, 67.0, 50.0, 72.0, 22.0), 6.144000053405762, 40),
     [AttackStyle.forwardTilt]: normal(8, 3, 21, 0, capsule(68.0, 70.0, 92.0, 75.0, 24.0), 13.25, 35, 108.45999908447266),
-    [AttackStyle.forwardTiltUp]: normal(8, 3, 21, 0, capsule(-2.0, 178.0, -2.0, 188.0, 22.0), 13.25, 55, 108.45999908447266),
+    [AttackStyle.forwardTiltUp]: heroMove(8, 3, 21, 0, [capsule(22.0, 100.0, 37.0, 95.0, 22.0), capsule(26.0, 169.0, 37.0, 180.0, 22.0), capsule(3.0, 193.0, 7.0, 207.0, 22.0)].map((strike, index) => heroRegion(8 + index, 8 + index, strike, thrallHit(13.25, 55, 108.45999908447266, 24.0)))),
     [AttackStyle.forwardTiltDown]: normal(8, 3, 21, 0, capsule(52.0, 34.0, 96.0, 34.0, 20.0), 13.25, 20, 108.45999908447266),
     [AttackStyle.upTilt]: normal(8, 4, 20, 0, capsule(-2.0, 178.0, -2.0, 189.0, 22.0), 8.192000389099121, 85, 69.0199966430664, 36.0),
     [AttackStyle.downTilt]: normal(6, 3, 19, 0, capsule(52.0, 34.0, 96.0, 34.0, 20.0), 9.75, 70, 64.08999633789062, 20.0),
