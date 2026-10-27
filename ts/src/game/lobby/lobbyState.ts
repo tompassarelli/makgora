@@ -583,7 +583,7 @@ export const START_HOLD_FRAMES = 3 * MATCH_TICKS_PER_SECOND;
 
 export const holdingStart = (game: Readonly<MatchState>): boolean => game.phase === Phase.match && game.startHold > 0 && game.matchFrame <= game.startHold;
 
-function beginMatch(game: MatchState): void {
+function beginMatch(game: MatchState, keepCpuFighters = false): void {
   game.winner = undefined;
   game.interrupted = false;
   game.departedMask = 0;
@@ -596,7 +596,7 @@ function beginMatch(game: MatchState): void {
   if (game.matchFrame > 0) game.matchSeed = nextMatchSeed(game.matchSeed);
   resolveStageChoice(game, game.matchSeed);
   for (const slot of PARTICIPANT_SLOTS) game.cpuResolvedOpponents[slot] = resolveCpuOpponent(game.cpuOpponents[slot], game.matchSeed, slot);
-  drawCpuFighters(game);
+  if (!keepCpuFighters) drawCpuFighters(game);
   game.startHold = game.practice || game.training ? 0 : START_HOLD_FRAMES;
   game.matchFrame = 0;
   game.phase = Phase.match;
@@ -661,7 +661,7 @@ export function tickRematchCountdown(game: MatchState): boolean {
   game.rematchReadiness.fill(false);
   game.stageChoice = RANDOM_STAGE;
   game.stageResolved = false;
-  beginMatch(game);
+  beginMatch(game, true);
   return true;
 }
 
@@ -676,7 +676,7 @@ export function confirmRematch(game: MatchState, slot: number, pick: ResultPick 
   const agreed = present.every(participant => game.resultPicks[participant] === pick) ? pick : ResultPick.characters;
   game.rematchReadiness.fill(false);
   game.resultPicks.fill(ResultPick.characters);
-  if (agreed === ResultPick.rematch && allCharactersReady(game) && game.stageResolved) beginMatch(game);
+  if (agreed === ResultPick.rematch && allCharactersReady(game) && game.stageResolved) beginMatch(game, true);
   else if (agreed === ResultPick.newStage && allCharactersReady(game)) {
     game.stageChoice = RANDOM_STAGE;
     game.stageResolved = false;

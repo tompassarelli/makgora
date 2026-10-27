@@ -85,7 +85,7 @@ test("a new CPU slot draws its fighter and opponent from the match seed, keeps t
   assertTrue(row !== undefined && row.text.startsWith(`P2 CPU · ${reveal(session)}\n`));
 });
 
-test("Random CPU fighter and opponent draw again on every New Match and automatic rematch, and a fixed pick stays fixed [k2 property]", () => {
+test("Random CPU fighter draws again on every New Match but is kept through Rematch and automatic rematch, and a fixed pick stays fixed [k2 property]", () => {
   const session = lobbyWithRandomCpu(77);
   const game = session.live.match;
   setAutomaticRematch(game, 0, true);
@@ -107,6 +107,7 @@ test("Random CPU fighter and opponent draw again on every New Match and automati
     start(session);
     assertEquals(game.matchSeed, seed + 1, "New Match draws from a fresh shared seed");
   }
+  const kept = game.characterChoices[CPU];
   for (let rematch = 0; rematch < 6; rematch++) {
     const seed = game.matchSeed;
     game.matchFrame = 60;
@@ -115,7 +116,8 @@ test("Random CPU fighter and opponent draw again on every New Match and automati
     let begun = false;
     while (!begun) begun = tickRematchCountdown(game);
     assertEquals(game.matchSeed, seed + 1, "automatic rematch draws from a fresh shared seed");
-    assertEquals(game.characterChoices[CPU], drawCpuFighter(PLAYABLE_CHARACTERS, game.matchSeed, CPU));
+    assertEquals(game.characterChoices[CPU], kept, "automatic rematch keeps the fighter");
+    assertTrue(cpuFighterRandom(game, CPU));
     assertEquals(game.cpuResolvedOpponents[CPU], resolveCpuOpponent("random", game.matchSeed, CPU));
     record();
   }
@@ -134,6 +136,28 @@ test("Random CPU fighter and opponent draw again on every New Match and automati
   game.phase = Phase.characterMenu;
   selectCpuCharacter(game, 0, CPU, RANDOM_FIGHTER);
   assertTrue(cpuFighterRandom(game, CPU));
+});
+
+test("A manual Rematch keeps the Random CPU fighter and a New Match draws again [k1 scenario]", () => {
+  const session = lobbyWithRandomCpu(78);
+  const game = session.live.match;
+  start(session);
+  assertDrawn(session);
+  const played = game.characterChoices[CPU];
+  const seed = game.matchSeed;
+  assertFalse(drawCpuFighter(PLAYABLE_CHARACTERS, seed + 1, CPU) === played);
+  game.matchFrame = 60;
+  game.phase = Phase.result;
+  assertTrue(confirmRematch(game, 0, ResultPick.rematch));
+  assertEquals(game.phase, Phase.match);
+  assertEquals(game.matchSeed, seed + 1, "Rematch still advances the shared seed");
+  assertEquals(game.characterChoices[CPU], played, "Rematch keeps the fighter");
+  assertTrue(cpuFighterRandom(game, CPU));
+  game.matchFrame = 60;
+  game.phase = Phase.result;
+  assertTrue(confirmRematch(game, 0, ResultPick.newStage));
+  start(session);
+  assertEquals(game.characterChoices[CPU], drawCpuFighter(PLAYABLE_CHARACTERS, game.matchSeed, CPU), "New Match draws from the new seed");
 });
 
 function lobbyStartup(sentCounter: number): TapeSession {
