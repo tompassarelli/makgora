@@ -68,9 +68,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash, dash, dash attack; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | medium | yes | **no** | yes | yes | yes | back throw at 0%: tech in place dash grab, back throw, dash grab, back throw; tech in up smash, dash, dash attack; tech away uncovered; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place up smash; tech in up smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap up smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Murloc | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in up smash; tech away dash, dash attack; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
-| Murloc | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away dash, dash attack; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Murloc | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
+| Murloc | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in up smash; tech away dash, dash attack; missed tech short hop, down air; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Murloc | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in dash grab, back throw; tech away dash, dash attack; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Murloc | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, back air; tech in up smash; tech away dash grab, back throw, dash, dash attack; missed tech short hop, back air; trap short hop, back air covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Grom Hellscream | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Grom Hellscream | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech short hop, down special, dash, dash attack; trap short hop, down special, dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
 | Grom Hellscream | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down special; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
@@ -333,17 +333,17 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Kael'thas Sunstrider | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out forward smash | 1/1 |
 | Kael'thas Sunstrider | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murloc | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Murloc | light | forward throw | 0/0 | 1/0 | 0/0 KD | 0/0 KD |
 | Murloc | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Murloc | light | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in forward tilt, out dash, dash attack |
 | Murloc | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murloc | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Murloc | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murloc | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 in up smash, out forward smash | 1/1 in forward tilt, out dash, dash attack |
+| Murloc | medium | forward throw | 0/0 | 1/0 | 0/0 KD | 0/0 KD |
+| Murloc | medium | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Murloc | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 in up smash, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack |
 | Murloc | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murloc | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Murloc | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murloc | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 KD in up smash, out forward smash | 1/1 in forward tilt, out dash, dash attack |
+| Murloc | heavy | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
+| Murloc | heavy | back throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Murloc | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 in forward tilt, out dash, dash attack |
 | Murloc | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
