@@ -22,15 +22,19 @@ export const CHEN_IGNITE = igniteStatus(IGNITE_DAMAGE, IGNITE_BURN_FRAMES, IGNIT
 const electric = (effect: ReturnType<typeof chenHit>): ReturnType<typeof chenHit> => ({ ...effect, electric: true });
 
 const fire = chenHit(6.0, 55.0, 20.0, f32(0.906308), f32(0.422618), HitElement.fire);
-const breath = (air: boolean): AuthoredSpecial => ({
-  endFrame: 48, landingLag: air ? 20 : undefined, strikeStatus: CHEN_IGNITE,
-  regions: [
-    heroRegion(18, 28, chenCapsule(36.0, 62.0, 76.0, 62.0, 27.0), fire),
-    heroRegion(18, 28, chenCapsule(76.0, 62.0, 136.0, 62.0, 40.0), fire),
-    heroRegion(18, 28, chenCapsule(136.0, 62.0, 196.0, 62.0, 55.0), fire),
-    heroRegion(18, 28, chenCapsule(196.0, 62.0, 256.0, 62.0, 70.0), fire),
-  ],
-});
+export const BREATH_MOUTH = { x: 58.0, groundZ: 96.0, airZ: 92.0 } as const;
+const breath = (air: boolean): AuthoredSpecial => {
+  const z = air ? BREATH_MOUTH.airZ : BREATH_MOUTH.groundZ;
+  return {
+    endFrame: 48, landingLag: air ? 20 : undefined, strikeStatus: CHEN_IGNITE,
+    regions: [
+      heroRegion(18, 28, chenCapsule(BREATH_MOUTH.x, z, 98.0, z - 5.0, 27.0), fire),
+      heroRegion(18, 28, chenCapsule(98.0, z - 5.0, 152.0, z - 11.0, 40.0), fire),
+      heroRegion(18, 28, chenCapsule(152.0, z - 11.0, 206.0, z - 18.0, 55.0), fire),
+      heroRegion(18, 28, chenCapsule(206.0, z - 18.0, 260.0, z - 26.0, 70.0), fire),
+    ],
+  };
+};
 
 export const BODY_SLAM_FIRST = 10;
 export const BODY_SLAM_LAST = 24;

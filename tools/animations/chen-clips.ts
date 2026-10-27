@@ -18,11 +18,14 @@ const CHEN = 17 as Character;
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain");
+const specialsOnly = process.argv.includes("specials");
+const inPlace = painOnly || specialsOnly;
+const SPECIAL_POSES: ReadonlySet<string> = new Set(["neutralSpecial", "sideSpecial", "downSpecial", "downSpecialFollowUp", "sideSpecialFollowUp"].flatMap(pose => [pose, `${pose}Air`]));
 const project = resolve(import.meta.dir, "../..");
 function ensure(ok: unknown, why: string): asserts ok { if (!ok) throw new Error(why); }
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/chen-clips.ts STOCK_CHEN.mdx|SHIPPED_CHEN.mdx PRIVATE_OUTPUT [pain]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/chen-clips.ts STOCK_CHEN.mdx|SHIPPED_CHEN.mdx PRIVATE_OUTPUT [pain|specials]");
 const source = parseMDX(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
-ensure((painOnly ? source.Sequences.some(s => s.Name === "Chen Damage 0 0") : source.Sequences.length === 11) && source.Helpers.some(n => n.Name === "Bone Rope"), "Expected original classic Pandaren Brewmaster");
+ensure((inPlace ? source.Sequences.some(s => s.Name === "Chen Damage 0 0") : source.Sequences.length === 11) && source.Helpers.some(n => n.Name === "Bone Rope"), "Expected original classic Pandaren Brewmaster");
 const stand = source.Sequences[9]!;
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
   if (!value || typeof value !== "object" || ArrayBuffer.isView(value)) return;
@@ -116,21 +119,23 @@ for (const [pose, throwAction, gesture] of [
       : {...captive, chest: -55, lean: -35, palm: -90, staff: -80}, air: true, paired: true});
 }
 for (const [pose, key, gesture] of [
-  ["neutralSpecial", "neutral", {...thrust, chest: 40, head: 20, staff: 30, palm: -25}],
-  ["sideSpecial", "side", {...thrust, palm: -155, elbow: -10, chest: 15}],
+  ["neutralSpecial", "neutral", {chest: 30, head: 38, hip: -8, staff: -40, wrist: 10, palm: -35, elbow: 10, front: 10, back: -12}],
+  ["sideSpecial", "side", {...belly, lean: 38, chest: -32, hip: 24, front: -30, knee: 45, back: 40, backKnee: 30, palm: -40, staff: 15}],
   ["upSpecial", "up", {...overhead, palm: -135, staff: -170, front: -65, knee: 90, back: 30}],
-  ["downSpecial", "down", {...crouch, chest: 40, staff: -80, palm: -110}],
+  ["downSpecial", "down", {...hold, chest: 28, head: 20, palm: -85, elbow: -30, staff: 10, front: -20, knee: 35}],
 ] as const) {
   const move = CHEN_SPECIALS[key]; ensure(move, `${pose}: missing special`);
   for (const air of [false, true]) {
     const form = air ? move.air ?? move.ground : move.ground;
-    const contact = Math.min(...[...(form.regions?.map(r => r.firstFrame) ?? []), ...(form.motion?.map(r => r.first) ?? []), ...(form.projectiles?.map(r => r.spawnFrame) ?? []), 16]);
+    const contact = Math.min(...[...(form.regions?.map(r => r.firstFrame) ?? []), ...(form.motion?.map(r => r.first) ?? []), ...(form.projectiles?.map(r => r.spawnFrame) ?? []), form.charge?.hold ?? 16, 16]);
     actions.push({pose: (air ? `${pose}Air` : pose) as HeroPose, frames: form.endFrame, contact, active: pose === "upSpecial" ? 22 : pose === "neutralSpecial" ? 11 : 4, gesture, air, spin: pose === "upSpecial"});
   }
 }
 for (const air of [false, true]) {
-  actions.push({pose: air ? "downSpecialFollowUpAir" : "downSpecialFollowUp", frames: 32, contact: 8, active: 4, gesture: {...thrust, palm: -115, staff: 15, chest: 40}, air});
-  actions.push({pose: air ? "sideSpecialFollowUpAir" : "sideSpecialFollowUp", frames: 28, contact: 5, active: 8,
+  const toss = CHEN_SPECIALS.down.ground.followUps?.[0]?.special; ensure(toss, "downSpecialFollowUp: missing keg toss");
+  const landed = CHEN_SPECIALS.side.ground.followUps?.[0]?.special; ensure(landed, "sideSpecialFollowUp: missing landed slam");
+  actions.push({pose: air ? "downSpecialFollowUpAir" : "downSpecialFollowUp", frames: toss.endFrame, contact: toss.projectiles?.[0]?.spawnFrame ?? 6, active: 4, gesture: {...overhead, palm: -170, staff: -140, chest: -10, front: -20, back: 25}, air});
+  actions.push({pose: air ? "sideSpecialFollowUpAir" : "sideSpecialFollowUp", frames: landed.endFrame, contact: 1, active: 4,
     gesture: {...belly, lean: 42, chest: -25, front: -65, knee: 65, back: 55, palm: -80, staff: -30}, air});
 }
 const damage: Action[] = [];
@@ -170,14 +175,26 @@ const originals = new Map<string, mdx.AnimVector>(); tracks(source, (track, path
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const bindings: string[] = [], damageBindings: string[] = [], records: {pose: string; index: number; frames: number; contact: number; motion?: number}[] = [];
 if (painOnly) actions.length = 0;
+if (specialsOnly) {
+  const kept = actions.filter(action => SPECIAL_POSES.has(action.pose));
+  actions.length = 0;
+  actions.push(...kept);
+  damage.length = 0;
+}
 for (const [ordinal, action] of [...actions, ...damage].entries()) {
   const name = ordinal < actions.length ? `Chen ${action.pose}` : `Chen Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
-  const existing = painOnly ? model.Sequences.findIndex(s => s.Name === name) : -1;
-  ensure(!painOnly || existing >= 0, `${name}: shipped sequence missing`);
-  const index = existing >= 0 ? existing : model.Sequences.length, start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
-  if (existing >= 0) {
-    ensure(model.Sequences[index]!.Interval[1] === end, `${name}: timing changed`);
-    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end); });
+  const existing = inPlace ? model.Sequences.findIndex(s => s.Name === name) : -1;
+  ensure(!inPlace || existing >= 0, `${name}: shipped sequence missing`);
+  const index = existing >= 0 ? existing : model.Sequences.length, shipped = existing >= 0 ? model.Sequences[index]!.Interval.slice() : undefined;
+  const length = Math.round(action.frames * 1000 / 60), moved = shipped !== undefined && shipped[1]! - shipped[0]! !== length;
+  ensure(!moved || specialsOnly, `${name}: timing changed`);
+  const start = shipped !== undefined && !moved ? shipped[0]! : cursor, end = start + length;
+  if (shipped !== undefined) {
+    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(k => k.Frame < shipped[0]! || k.Frame > shipped[1]!); });
+    if (moved) {
+      model.Sequences[index]!.Interval = new Uint32Array([start, end]);
+      cursor = end + 100;
+    }
   } else {
     cursor = end + 100;
     model.Sequences.push({...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: !action.hold, MoveSpeed: 0, Rarity: 0,
@@ -213,7 +230,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
         ...(first.InTan ? {InTan: tangent(), OutTan: tangent()} : {})});
     }
   });
-  if (painOnly) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
+  if (inPlace) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
 
 
   const staffTargets: Partial<Record<HeroPose, readonly [number, number]>> = {
@@ -225,7 +242,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
   const handTargets: Partial<Record<HeroPose, readonly [number, number]>> = {
     jab: [85,80], jab3: [90,65], dashAttack: [95,75], upTilt: [25,185], grab: [62,72], grabHold: [62,72],
     throwForward: [65,80], throwBack: [-70,85], throwUp: [15,140], throwDown: [65,35],
-    neutralSpecial: [40,65], neutralSpecialAir: [40,65], sideSpecial: [65,105], sideSpecialAir: [65,105],
+    neutralSpecial: [40,65], neutralSpecialAir: [40,65],
     downSpecialFollowUp: [70,75], downSpecialFollowUpAir: [70,75],
   };
   const shortHand = ["jab", "jab3", "upTilt", "dashAttack"].includes(action.pose);
@@ -324,7 +341,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
   if (!root.Translation) root.Translation = {LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ,
     Keys: source.Sequences.flatMap(s => Array.from(s.Interval).map(Frame => ({Frame, Vector: new Float32Array([0,0,0])})))};
   if (!action.air) {
-    const posedBytes = generateMDX(model), drawn = new DrawnModel(posedBytes, 1), body = ordinal >= actions.length ? new PainBody(posedBytes, CHEN, ["Box02"]) : undefined;
+    const posedBytes = generateMDX(model), drawn = new DrawnModel(posedBytes, 1), body = ordinal >= actions.length || specialsOnly ? new PainBody(posedBytes, CHEN, ["Box02"]) : undefined;
     for (const frame of phaseFrames) {
       let floor = body?.floor(index, frame / 60) ?? Infinity;
       if (!body) { const triangles = drawn.triangles(index, frame / 60, 1); for (let i = 1; i < triangles.length; i += 2) floor = Math.min(floor, triangles[i]!); }
@@ -357,7 +374,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
 }
 const bytes = generateMDX(model), drawn = new DrawnModel(bytes, 1), before = new DrawnModel(generateMDX(source), 1);
 const authored = new Set(records.map(r => r.index));
-for (const [index, sequence] of source.Sequences.entries()) if (!painOnly || !authored.has(index)) for (const at of [0, 0.5, 1]) {
+for (const [index, sequence] of source.Sequences.entries()) if (!inPlace || !authored.has(index)) for (const at of [0, 0.5, 1]) {
   const time = (sequence.Interval[1]-sequence.Interval[0])*at/1000, a = before.triangles(index,time,1), b = drawn.triangles(index,time,1);
   ensure(a.length === b.length && a.every((v,i) => Math.abs(v-b[i]!) < 0.001), `${sequence.Name}: original geometry changed`);
 }
@@ -377,8 +394,18 @@ const painCells=records.slice(actions.length).map(r=>r.index), damageContacts=pa
 for(let a=0;a<damageContacts.length;a++)for(let b=a+1;b<damageContacts.length;b++)
   ensure(damageContacts[a]!.some((v,i)=>Math.abs(v-damageContacts[b]![i]!)>4),`Chen damage ${a}/${b}: indistinguishable contact pose`);
 mkdirSync(output, {recursive:true}); await Bun.write(join(output,"chen.mdx"),bytes);
-const gate = painGate(bytes, CHEN, 9, painCells, ["Box02"]); console.log(gate.report); ensure(gate.pass, "Chen pain gate failed");
-if (!painOnly) await Bun.write(join(project,"ts/src/game/fighters/chen/clips.ts"),[
+if (!specialsOnly) { const gate = painGate(bytes, CHEN, 9, painCells, ["Box02"]); console.log(gate.report); ensure(gate.pass, "Chen pain gate failed"); }
+if (specialsOnly) {
+  const clipsPath = join(project, "ts/src/game/fighters/chen/clips.ts");
+  let table = await Bun.file(clipsPath).text();
+  for (const line of bindings) {
+    const pose = line.trim().split(":")[0]!, pattern = new RegExp(`^  ${pose}: \\{[^\\n]*$`, "m");
+    ensure(pattern.test(table), `${pose}: binding missing from clips.ts`);
+    table = table.replace(pattern, line);
+  }
+  await Bun.write(clipsPath, table);
+}
+if (!inPlace) await Bun.write(join(project,"ts/src/game/fighters/chen/clips.ts"),[
   "// Generated by tools/animations/chen-clips.ts from the private classic Pandaren Brewmaster rig.",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";', "",
   'export const CHEN_MODEL_FILE = "units\\\\creeps\\\\PandarenBrewmaster\\\\PandarenBrewmaster.mdl";',
@@ -387,7 +414,7 @@ if (!painOnly) await Bun.write(join(project,"ts/src/game/fighters/chen/clips.ts"
   ...bindings, '} as const satisfies HeroClipTable;', 'export const CHEN_DAMAGE_CLIPS: readonly HeroClip[] = [', ...damageBindings, '];', "",
 ].join("\n"));
 const preview = new DrawnModel(bytes, 0.8);
-if (!painOnly) for (const pose of ["jab","jab2","jab3","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","downSpecialFollowUp","sideSpecialFollowUp","rollForward","getUpAttack","grab","throwForward","throwBack","throwUp","throwDown"] as const) {
+for (const pose of (["jab","jab2","jab3","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","downSpecialFollowUp","sideSpecialFollowUp","rollForward","getUpAttack","grab","throwForward","throwBack","throwUp","throwDown"] as const).filter(pose => !inPlace || actions.some(action => action.pose === pose))) {
   const ordinal = actions.findIndex(a => a.pose===pose), action=actions[ordinal]!, index=records[ordinal]!.index;
   const panels: PoseFrame[] = [1,-1].flatMap(facing => [0, Math.max(1,action.contact-3),action.contact,action.contact+(action.active??4)-1,action.frames].map(frame => ({frame,phase:frame<action.contact?AttackPhase.startup:frame<action.contact+(action.active??4)?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:index,seconds:Math.min(action.frames,frame)/60})));
   await Bun.write(join(output,`${pose}.png`),sheet(`Chen ${pose}`,preview,panels,5).png);

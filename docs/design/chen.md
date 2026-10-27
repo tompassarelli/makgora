@@ -115,9 +115,11 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 
 Chen's normals are short: his 118-unit staff smash is a commitment, not a
 neutral wall. Broad body and 1.6 run speed make projectile approaches costly.
-Tom's release cone uses four connected horizontal capsules, with centerline x36–256
-and radii 27, 40, 55 and 70. Centerline reach grows from 88 to 220 units (2.5×).
-The final rounded tip reaches x326; EX keeps its 1.25× reach upgrade.
+The cone leaves Chen's mouth (Tom, 2026-10-28): four connected capsules whose
+centreline starts at the front of his face, measured on the shipped model at
+x58, z96 on the ground and z92 in the air on the active frames, and runs along
+his facing to x260, sloping 26 units down so the far tip still sits low enough
+to jump. Radii are 27, 40, 55 and 70; the final rounded tip reaches x330; EX keeps its 1.25× reach upgrade.
 Active frames 18–28 (six more startup frames than the first cone) and end frame 48
 keep its 20 exit frames; damage, cost and landing lag are unchanged. Each active frame births one stock Breath of Fire flame per
 capsule, scaled by the square of its radius over 70 and shifted forward by 150
