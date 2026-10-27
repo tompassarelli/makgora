@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { type Lane, OPEN_STATES, TRAIN_TITLE, jobReads, laneSince, listedRuns, openRuns, plan, sinceMisses, testTitle } from "../scripts/autolandCore";
+import { type Lane, OPEN_STATES, STARTED, TESTING, TEST_SLOTS, TRAIN_TITLE, jobReads, laneSince, listedRuns, openRuns, plan, sinceMisses, testTitle } from "../scripts/autolandCore";
 
 const REPO = "tompassarelli/smashcraft";
 const NOW = Date.parse("2026-10-25T21:00:00Z");
@@ -54,20 +54,22 @@ const planReads = (gh: (path: string) => unknown, lanes: readonly Lane[]) => {
 
 test("a plan fetches one push-run list and the open-run lists for a ten-lane queue, and jobs only when a test can start, whatever the queue length [k2 property]", () => {
   const lanes = queue(10);
-  const full = [testRun(7000, 0, 0), testRun(7001, 1, 1), testRun(7002, 2, 2), train, pendingPlan, { ...pendingPlan, id: SELF, status: "in_progress" }];
+  const busy = Array.from({ length: TEST_SLOTS }, (_, slot) => testRun(7000 + slot, slot, slot));
+  const last = 7000 + TEST_SLOTS - 1;
+  const full = [...busy, train, pendingPlan, { ...pendingPlan, id: SELF, status: "in_progress" }];
   const saturated = github(lanes, full);
   const read = planReads(saturated.gh, lanes);
   expect(saturated.calls).toHaveLength(1 + OPEN_STATES.length);
   expect(read.lanes.map((lane) => lane.since)).toEqual(lanes.map((_, index) => pushedAt(index)));
-  expect(read.runs.map((run) => run.id).toSorted()).toEqual([7000, 7001, 7002, 8001, 8002]);
+  expect(read.runs.map((run) => run.id).toSorted()).toEqual([...busy.map((run) => run.id), 8001, 8002]);
   const withJobs = read.runs.map((run) => ({ ...run, jobs: [{ name: "suite / bun 1", status: "in_progress", created: "2026-10-25T20:50:00Z", started: "2026-10-25T20:50:10Z", labels: ["ubuntu-latest"] }] }));
   expect(plan(read.lanes, read.runs, NOW)).toEqual(plan(read.lanes, withJobs, NOW));
 
-  const own = github(lanes, full.filter((run) => run.id !== 7002));
+  const own = github(lanes, full.filter((run) => run.id !== last));
   const freed = planReads(own.gh, lanes);
   const jobRuns = freed.runs.filter((run) => run.status === "in_progress").length;
   expect(own.calls).toHaveLength(1 + OPEN_STATES.length + jobRuns);
-  expect(plan(freed.lanes, freed.runs, NOW).test).toEqual([{ branch: "claude/land-0", tip: tip(0), slot: 2 }]);
+  expect(plan(freed.lanes, freed.runs, NOW).test).toEqual([{ branch: "claude/land-0", tip: tip(0), slot: TEST_SLOTS - 1 }]);
 
   const longer = queue(40);
   const forty = github(longer, full);
@@ -83,4 +85,10 @@ test("a lane missing from the push-run list keeps its first autoland status as i
   expect(since[tip(4)]).toBe(pushedAt(4));
   expect(calls.filter((path) => path.includes("/statuses"))).toEqual([`repos/${REPO}/commits/${tip(3)}/statuses?per_page=100`]);
   expect(calls).toHaveLength(2);
+});
+
+test("a tip whose own test run set testing alone is not dispatched again while the open-run lists miss that run, and is again once that status outlives a live test [k2 property]", () => {
+  const testing = (minutesAgo: number): Lane => ({ ...queue(1)[0]!, status: { state: "pending", description: `${TESTING}${"c".repeat(10)}`, at: new Date(NOW - minutesAgo * 60_000).toISOString() } });
+  for (const age of [0, 1, 5, STARTED - 0.1]) expect(plan([testing(age)], [], NOW).test).toEqual([]);
+  expect(plan([testing(STARTED)], [], NOW).test).toEqual([{ branch: "claude/land-0", tip: tip(0), slot: 0 }]);
 });

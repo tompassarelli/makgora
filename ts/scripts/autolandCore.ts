@@ -1,4 +1,4 @@
-export const TEST_SLOTS = 3;
+export const TEST_SLOTS = 5;
 export const JOB_BUDGET = 32;
 export const RUN_PEAK = 11;
 export const RUN_BUILD = 2;
@@ -9,6 +9,7 @@ export const AGED = 60;
 export const TRAIN_CAP = 4;
 export const DIRECT_CAP = 2;
 export const DISPATCHED = 2;
+export const STARTED = 10;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
 export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly denylist?: string | null; readonly since?: string; readonly labels?: readonly string[]; readonly milestones?: readonly string[] }
@@ -17,6 +18,7 @@ export interface Run { readonly title: string; readonly status: string; readonly
 
 export const QUEUED = "queued";
 export const WAITING = "waiting to test alone";
+export const TESTING = "testing alone on ";
 export const TRAIN_TITLE = "Autoland train";
 export const FARM_TITLE = "Farm test ";
 export const testTitle = (slot: number, branch: string, tip: string): string => `Autoland test ${slot} ${branch} ${tip}`;
@@ -28,6 +30,7 @@ const PASSED = /^passed alone on ([0-9a-f]{40}) as tree ([0-9a-f]{40})$/;
 const LEGACY_TITLE = /^Autoland (claude\/\S+(?: claude\/\S+)*)$/;
 
 export type LaneState = "test" | "testing" | "passed" | "held" | "done";
+const HOLDS = [[WAITING, DISPATCHED], [TESTING, STARTED]] as const;
 
 export type Attestation = "test" | "hold" | "refuse";
 export const ATTESTED: Record<Exclude<Attestation, "test">, { readonly state: "pending" | "failure"; readonly description: string }> = {
@@ -45,7 +48,7 @@ export function passedAlone(lane: Lane): { readonly base: string; readonly tree:
 export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<string> = new Set(), now = Number.POSITIVE_INFINITY): LaneState {
   if (lane.status !== null && lane.status.state !== "pending") return retry.has(lane.branch) ? "test" : "done";
   if (passedAlone(lane) !== undefined) return "passed";
-  if (lane.status?.description === WAITING && minutes(now, lane.status.at) < DISPATCHED) return "testing";
+  if (HOLDS.some(([prefix, hold]) => lane.status?.description.startsWith(prefix) === true && minutes(now, lane.status.at) < hold)) return "testing";
   const rerun = RERUN.exec(lane.status?.description ?? "")?.[1];
   if (rerun !== undefined && (minutes(now, lane.status?.at ?? "") < BOUND.idle || runs.some((run) => run.status !== "completed" && String(run.id) === rerun))) return "testing";
   if (runs.some((run) => { const match = TEST_TITLE.exec(run.title); return run.status !== "completed" && match?.[2] === lane.branch && match[3] === lane.tip; })) return "testing";
@@ -198,7 +201,7 @@ export const stalled = (lanes: readonly Lane[], landed: string, now: number): bo
   minutes(now, landed) > BOUND.idle && lanes.some((lane) => lane.status?.state === "pending");
 
 export const looping = (descriptions: readonly string[]): boolean =>
-  descriptions.filter((description) => description.startsWith("testing alone on ")).length >= LOOP_TESTS;
+  descriptions.filter((description) => description.startsWith(TESTING)).length >= LOOP_TESTS;
 
 export type Tree = ReadonlyMap<string, string>;
 const NEVER_DISJOINT = /^(?:\.github\/workflows\/|ts\/scripts\/autoland)/;

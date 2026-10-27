@@ -48,7 +48,7 @@ else pushes main, so no landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
    status ("queued") and starts a plan run, unless a plain plan that hasn't
-   started yet or the test runs holding all three slots (each ends in a plan)
+   started yet or test runs holding three or more slots (each ends in a plan)
    will read the tip anyway, so a burst of pushes costs one plan (#350). A tip is tested, trained or
    landed only once a machine holding the private deny-list has attested it
    with a `denylist` commit status of success, which it follows by
@@ -61,7 +61,8 @@ else pushes main, so no landing restarts another's suites.
    finds a slot free, so no run waits on a busy slot. A test run is: the tip rebased onto main, the pre-push gate
    (smashcraft:ts/scripts/prePush.ts) on a scratch `farm/autoland-SHA`
    branch and the farm test workflow, which runs every check main's CI runs.
-   Tests run in three slots of one farm run each, outside the landing queue;
+   Tests run in five slots of one farm run each, outside the landing queue, so
+   the job budget rather than the slot count bounds how many run at once;
    a plan fills every free slot whose run fits 32 of the account's 40 hosted
    jobs at every moment: each run reserves the measured job profile `PROFILE`
    left at the new run's peak (11 jobs for 2 min, then decaying to 1 by 3 min; a run with no
@@ -71,7 +72,10 @@ else pushes main, so no landing restarts another's suites.
    lane waits to test, since the budget decides nothing otherwise (#350). The train is never held by that budget. A lane that arrived over 60 min
    ago goes ahead of every other, oldest first; its arrival is its push run's
    start from one list of Autoland's push runs, or its first `autoland` status
-   when that list misses it (#350).
+   when that list misses it (#350). A tip whose status reads "testing alone
+   on MAIN" counts as testing for `STARTED` (10 min), as "waiting to test alone"
+   does for `DISPATCHED` (2 min), because GitHub's open-run lists can miss a running test for
+   minutes and a plan would otherwise test that tip again in a second run.
    Because tests run outside the landing queue, a red tip gets its failed status and run summary within minutes. A
    conflicting tip, or one that changes `.github/workflows/` (the workflow
    token can't push those), is refused. A green tip lands straight from its
