@@ -1208,23 +1208,34 @@ whose Warden model is not the checkout's pinned one (`bun wisp inputs path
 assets`) and restores the pristine drill keys from the pre-#507 pin before
 re-authoring, so it changes only Drill Down Air whatever take the pin holds
 (#608: a run over stale assets reverted her down tilt, back air, Pursuit Lunge
-and victory), as Maiev's Fox-style drill (#507),
-matching her down air's hit regions on the line 30 degrees off vertical toward
-her facing. The spin pivots on her body line, so her feet stay on that line
-while she turns; nothing pulses per turn, since a pulse on the arms, hips or
-legs turns with the spin and swings the silhouette off the axis. The arms
-hold still through the spin, raised overhead and brought in until the glaive
-and its ring sit on the spin axis above her head, inside her body line, since
-a ring hanging off one hand swings 35 to 65 units off the axis on every half
-turn (take 2 read as a rocking tilt, #507, 2026-10-27). Warden's
-`Cape_*` helpers bind no vertices: her cloth is the `Mesh` bone chains under
-her shoulders (cape strands), chest (robe panels) and head (hood tail), which
-the drill wraps in around her body line, each link lagging its parent. Cloth
-flared outward, or weapon swung wide of the axis, changes her silhouette's
-angle by up to 30 degrees from frame to frame, and three cold viewers read
-that native clip as a somersault, not a drill (#507, 2026-10-26). Wrapped
-cloth keeps the drawn silhouette's long axis at 30±9 degrees off vertical,
-0.22 of its length wide, through the active frames.
+and victory), as Maiev's Fox-style drill (#507): her body tilts 45 degrees off
+vertical toward her facing, feet first, with straight legs pressed into a V
+that meets at the feet, and turns once about that line through the active
+frames, about 51 degrees a frame: two turns, about 103 degrees a frame, read
+to a cold viewer as two poses twitching, not a spin. The tool fails unless both drawn feet stay within 5 degrees of that
+line and, on each hit's first frame in both facings, a drawn foot sits inside
+the hit regions (they lie 30 degrees off vertical and still hold her feet at
+45). Her arms keep their standing rotation at her sides, so the glaive lies
+along her body with its ring at her feet, on the drill tip; arms raised
+overhead read as a weapon held up, not a drill (2026-10-28), and turning the
+hand to point the blade down moves the ring to her waist. Two tall feathered panels on
+her back (`Mesh22` and `Mesh13`) rise from her shoulders to above her head:
+edge-on while she stands they read as two spikes, but the spin turns them
+face-on into spread wings, so the drill folds them in toward her body line.
+Warden's `Cape_*` helpers bind no
+vertices: her cloth is the `Mesh` bone chains under her shoulders and chest,
+which together form one skirt tube (neighbouring strands share vertices), and
+under her head (hood tail). The skirt turns over as one tube, 180 degrees about
+each strand's root and narrowed at its roots, so it trails up past her head
+against the dive as a sleeve within 30 units of her body line; turning only the
+back strands tears the tube into flat sheets. The turn is computed about
+bind-pose axes, so each link first blends from the source clip's rotation
+(up to 124 degrees off bind on the skirt roots) to its bind orientation;
+turned from the source rotation instead, the skirt fanned 65 to 84 units off
+her body line and three cold viewers read it as flared wings. Each link lags
+its parent, flutters every frame and twists against the spin. The hood tail
+folds in along her back: streamed up past her head, cold viewers read its red
+stripes as a blade held overhead.
 
 ### Movement and recovery clips
 
