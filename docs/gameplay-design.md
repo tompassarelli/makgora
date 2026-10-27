@@ -2506,6 +2506,11 @@ Tom decided, 7 Oct (delegated in #189): guided up specials answer held input
 during travel. Charged-angle up specials choose one of eight directions during
 startup, then commit; Rifleman charges four frames, the others eight. Neutral
 aim launches upward. An up special spends the aerial jump and ends helpless.
+Tom asked on 28 Oct 2026 (delegated) that Blademaster's Rising Whirlwind land in
+at least his longest aerial landing lag (20 frames, Bladestorm's), both when he
+lands during the move and after the helpless fall; a move opts in with
+`fallLandingLag`, and other fighters keep the 4-frame empty landing until their
+kits set it.
 
 | Archetype | Fighters | Up-special rise | Up-special reach | Envelope height minimum | Envelope reach minimum |
 |---|---|---:|---:|---:|---:|

@@ -389,6 +389,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
   int("oncePerAirtime", bit(move.oncePerAirtime));
   int("helpless", bit(move.helpless));
   int("landingLag", move.landingLag ?? -1);
+  if (move.fallLandingLag !== undefined) int("fallLandingLag", move.fallLandingLag);
   if (move.facesStick === true) int("facesStick", 1);
   int("intangible.first", move.intangible?.first ?? -1);
   int("intangible.last", move.intangible?.last ?? -1);

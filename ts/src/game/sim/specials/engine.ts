@@ -961,8 +961,20 @@ export function heroSpecialEndFrame(f: Readonly<Fighter>, move: Readonly<Authore
 }
 
 
+function landFromSpecialFall(f: Fighter): void {
+  const specials = f.tuning.specials;
+  if (specials === undefined) return;
+  for (let slot = SpecialSlot.neutral; slot <= SpecialSlot.down; slot++) {
+    if ((f.special.airtimeUses & (1 << slot)) === 0) continue;
+    const lag = specialForm(specialKit(specials, slot), SpecialForm.air, f.special.ex, f.special.variant).fallLandingLag;
+    if (lag !== undefined) f.landing.lag = max(f.landing.lag, lag);
+  }
+}
+
+
 export function landHeroSpecial(f: Fighter): boolean {
   const move = runningHeroSpecial(f);
+  if (move === undefined) landFromSpecialFall(f);
   if (move?.landingLag === undefined) return false;
   const specials = f.tuning.specials;
   if (f.character === Character.cairne && f.special.action === SpecialAction.heroNeutral

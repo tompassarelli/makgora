@@ -315,6 +315,8 @@ export interface AuthoredSpecial {
 
   readonly landingLag?: number | undefined;
 
+  readonly fallLandingLag?: number | undefined;
+
   readonly aimFrames?: number | undefined;
 
   readonly facesStick?: boolean | undefined;

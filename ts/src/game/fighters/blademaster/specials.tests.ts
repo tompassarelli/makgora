@@ -9,9 +9,10 @@ import { airborne, fighter, frame, scene } from "../../match/padScene";
 import { createReplaySnapshot } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../roster/kits";
-import { Character, SpecialAction } from "../../sim/codes";
+import { AttackStyle, Character, SpecialAction } from "../../sim/codes";
 import { canAttack, isIntangible } from "../../sim/conditions";
 import { type Fighter, createFighter, placedObject } from "../../sim/fighter";
+import { attackLandingLag } from "../../sim/moves";
 import { fighterAt } from "../../sim/roster";
 import { mainDeckZ } from "../../sim/stage";
 import { length } from "./moves";
@@ -20,6 +21,8 @@ import { MIRROR_IMAGE_OBJECT, WIND_WALK_DASH } from "./specials";
 const BLADEMASTER_X = -200.0;
 const FOE_X = 550.0;
 const IMAGE_LIFE_FRAMES = 210;
+const UP_SPECIAL_HOP = 120.0;
+const UP_SPECIAL_WATCH = 250;
 
 const WIND_WALK_START = f32(-length(f32(1.1)));
 const WIND_WALK_HOP = 80.0;
@@ -121,4 +124,66 @@ test("Mirror Image still stands on frame 209 after placement and is gone on fram
   }
   assertEquals(lastAge, IMAGE_LIFE_FRAMES, "the image reaches its last frame");
   assertEquals(MIRROR_IMAGE_OBJECT.life, IMAGE_LIFE_FRAMES, "Mirror Image life");
+});
+
+
+interface UpSpecialRun {
+  readonly label: string;
+  readonly helplessAtEnd: boolean | undefined;
+  readonly landed: boolean;
+  readonly lag: number;
+}
+
+function upSpecialRun(air: boolean, ex: boolean, aim: readonly Action[]): UpSpecialRun {
+  const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  blademaster.mana.points = 100;
+  if (air) airborne(blademaster, BLADEMASTER_X, f32(mainDeckZ(0) + UP_SPECIAL_HOP));
+  const label = `${air ? "aerial" : "grounded"}${ex ? " EX" : ""} aim actions ${aim.join("+")}`;
+  let helplessAtEnd: boolean | undefined;
+  let leftGround = air;
+  for (let n = 1; n <= UP_SPECIAL_WATCH; n++) {
+    frame(s, n === 1 ? [Action.moveUp, Action.special, ...(ex ? [Action.strong] : [])] : aim);
+    if (n === 1 && blademaster.special.action !== SpecialAction.heroUp) return { label, helplessAtEnd, landed: false, lag: 0 };
+    if (helplessAtEnd === undefined && blademaster.special.action === SpecialAction.none) helplessAtEnd = blademaster.special.fall;
+    leftGround ||= !blademaster.motion.grounded;
+    if (leftGround && blademaster.motion.grounded) return { label, helplessAtEnd, landed: true, lag: blademaster.landing.lag };
+  }
+  return { label, helplessAtEnd, landed: false, lag: 0 };
+}
+
+const UP_SPECIAL_AIMS: readonly (readonly Action[])[] = [
+  [Action.moveUp], [Action.moveUp, Action.moveRight], [Action.moveUp, Action.moveLeft], [Action.moveLeft], [Action.moveRight],
+];
+const ONTO_THE_DECK_AIMS = UP_SPECIAL_AIMS.filter(aim => !aim.includes(Action.moveLeft));
+const leavesTheDeck =(air: boolean, aim: readonly Action[]): boolean => air || aim.includes(Action.moveUp);
+
+test("Blademaster's Rising Whirlwind ends in helpless fall when it ends airborne, from the ground or a hop, EX or not, aimed up, diagonal or sideways [k1 scenario]", () => {
+  const misses: string[] = [];
+  for (const air of [false, true]) {
+    for (const ex of [false, true]) {
+      for (const aim of UP_SPECIAL_AIMS.filter(each => leavesTheDeck(air, each))) {
+        const run = upSpecialRun(air, ex, aim);
+        if (run.helplessAtEnd !== true) misses.push(`${run.label}: helpless ${run.helplessAtEnd}`);
+      }
+    }
+  }
+  assertEquals(misses.join("; "), "", "Rising Whirlwind endings");
+});
+
+test("Blademaster lands from Rising Whirlwind in at least his longest aerial landing lag, after the helpless fall and when he lands during the move [k3 measure docs/gameplay-design.md]", () => {
+  const tuning = fighter(scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]), 0).tuning;
+  const aerials = [AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir];
+  const longestAerial = Math.max(...aerials.map(style => attackLandingLag(style, tuning.moves)));
+  const short: string[] = [];
+  const runs: readonly UpSpecialRun[] = [
+    ...[false, true].flatMap(ex => ONTO_THE_DECK_AIMS.map(aim => upSpecialRun(true, ex, aim))),
+    ...[false, true].flatMap(ex => ONTO_THE_DECK_AIMS.filter(aim => leavesTheDeck(false, aim)).map(aim => upSpecialRun(false, ex, aim))),
+    ...[false, true].map(ex => upSpecialRun(true, ex, [Action.moveDown])),
+  ];
+  for (const run of runs) {
+    if (!run.landed) short.push(`${run.label}: never landed`);
+    else if (run.lag < longestAerial) short.push(`${run.label}: lag ${run.lag}`);
+  }
+  assertEquals(short.join("; "), "", `landing lag under his longest aerial (${longestAerial})`);
 });

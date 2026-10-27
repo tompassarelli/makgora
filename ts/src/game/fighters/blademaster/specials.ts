@@ -13,7 +13,7 @@ import { path } from "../../sim/heroes/authoring";
 const LOW_CUT_ARM = reach(46.0, 56.0);
 
 
-const AIR_LANDING_LAG = 20;
+export const AIR_LANDING_LAG = 20;
 
 
 const windCutter: AuthoredSpecial = {
@@ -87,6 +87,8 @@ const risingBlade: AuthoredSpecial = {
     ],
   oncePerAirtime: true,
   helpless: true,
+  landingLag: AIR_LANDING_LAG,
+  fallLandingLag: AIR_LANDING_LAG,
 };
 
 
