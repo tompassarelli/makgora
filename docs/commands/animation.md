@@ -213,6 +213,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   then `bun tools/animations/illidan-locomotion.ts PRIVATE_ASSETS PRIVATE_AUTHORED PRIVATE_OUTPUT`.
   Package with `bun tools/animations/package-illidan.ts PRIVATE_OUTPUT --metadata-only`,
   store `illidan-animation`, and refresh the original clip pool.
+  His down smash, charge and release (the splits, #518) are keyed in place on the packaged
+  model by `bun tools/animations/illidan-down-smash.ts PRIVATE_OUTPUT` after packaging; it rewrites only those three clips' skeleton keys.
 
 - Malfurion stock-rig authoring: `bun tools/animations/malfurion-clips.ts STOCK_FURION.mdx PRIVATE_OUTPUT` appends staff, nature-spell, recovery, paired-throw and nine pain gestures while preserving the eight campaign sequences.
   `bun tools/animations/malfurion-clips.ts SHIPPED_FURION.mdx PRIVATE_OUTPUT POSE...` re-authors only the named clips of the shipped model in place, checking every other clip is unchanged; `pain` does the same for the nine pain clips.

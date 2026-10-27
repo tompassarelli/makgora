@@ -402,15 +402,6 @@ else:
                 'hand_L': (-52, 22, 34), 'aim_L': (-150, 22, 10)},
         follow={'step': (4, -24), 'lean': 18, 'hand_R': (52, -20, 40), 'aim_R': (130, -20, 30), 'hand_L': (-44, 22, 40), 'aim_L': (-120, 22, 30)}))
 
-
-    down_wind = {'step': (0, -10), 'lean': -6, 'hand_R': (-6, -30, 128), 'aim_R': (20, -30, 190), 'hand_L': (6, 30, 128), 'aim_L': (-20, 30, 190)}
-    down_strike = {'step': (0, -26), 'lean': 18, 'hand_R': (66, -24, 46), 'aim_R': (170, -24, 14),
-                   'hand_L': (-62, 24, 46), 'aim_L': (-170, 24, 14), 'foot_R': (44, -18, 22), 'foot_L': (-40, 18, 23)}
-    down_follow = {**down_strike, 'step': (0, -20), 'lean': 12, 'hand_R': (58, -24, 52), 'hand_L': (-56, 24, 52)}
-    illidan('Down Smash', swing(8, 9, 42, wind=down_wind, strike=down_strike, follow=down_follow, wind_at=5))
-
-    author('Down Smash Release', {0: down_strike, 8: down_strike, 14: down_follow, 28: {}, 34: {}}, base_from='Down Smash')
-    author('Down Smash Charge', {0: down_wind, 24: down_wind}, base_from='Down Smash')
     clips_path.write_text(json.dumps(clips, indent=2))
 
 scene.frame_set(0)
