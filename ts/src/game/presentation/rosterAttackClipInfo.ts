@@ -21,7 +21,6 @@ export const ROSTER_ATTACK_CLIPS = {
     jab3: { index: 55, seconds: f32(0.367), aligned: true },
     forwardTiltDown: { index: 56, seconds: f32(0.4), aligned: true },
     downTilt: { index: 57, seconds: f32(0.217), aligned: true },
-    backAir: { index: 58, seconds: f32(0.517) },
     dashAttack: { index: 59, seconds: f32(0.417), aligned: true },
     upSmash: { index: 60, seconds: f32(0.717), aligned: true },
     upAir: { index: 61, seconds: f32(0.467), aligned: true },
@@ -43,6 +42,7 @@ export const ROSTER_ATTACK_CLIPS = {
     sideSpecialAir: { index: 68, seconds: f32(0.817), aligned: true },
     sideSpecialFollowUp: { index: 68, seconds: f32(0.817), aligned: true },
     sideSpecialFollowUpAir: { index: 68, seconds: f32(0.817), aligned: true },
+    backAir: { index: 58, seconds: f32(0.517) },
   },
   6: {
     forwardTiltDown: { index: 51, seconds: f32(0.567) },

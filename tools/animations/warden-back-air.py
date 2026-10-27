@@ -7,7 +7,7 @@ side-view axis so its face stays to the camera, and her cloak's ground anchor fo
 with the glaive drawn across her chest, throws it up over her shoulder, and whips it back and down behind her
 through the active window while her legs stay off the floor, then carries it through and settles to ready.
 
-  blender --background --factory-startup --python tools/animations/warden-pursuit-lunge.py -- RIG.json KEYS.json
+  blender --background --factory-startup --python tools/animations/warden-back-air.py -- RIG.json KEYS.json
 """
 import json
 import sys
@@ -102,12 +102,13 @@ RING0 = side_angle(ring_center() - bones['Bone_Hand_R'].head)
 READY = dict(dx=0, dz=0, lean=0, chest=0, head=0, hand=relative('R'), ring=RING0 + 360 if RING0 < 0 else RING0,
              off=relative('L'), front=bones['Bone_Foot_L'].head.x, back=bones['Bone_Foot_R'].head.x, fl=0, bl=0, cape=0)
 GRIP = bones['Bone_Hand_R'].matrix.to_quaternion()
-TUCK = dict(dx=4, dz=14, lean=14, chest=8, head=-4, hand=(26, 8), ring=20, off=(22, -8), front=30, back=-14, fl=18, bl=26, cape=10)
-COCK = dict(dx=2, dz=22, lean=10, chest=4, head=-8, hand=(8, 40), ring=100, off=(18, 8), front=26, back=-8, fl=22, bl=30, cape=14)
+TUCK = dict(dx=2, dz=12, lean=8, chest=6, head=-2, hand=(-14, -30), ring=210, off=(24, -6), front=32, back=-12, fl=22, bl=28, cape=8)
+COCK = dict(dx=0, dz=22, lean=16, chest=4, head=6, hand=(-22, 30), ring=130, off=(28, 0), front=38, back=-24, fl=20, bl=34, cape=16)
 WHIP = dict(dx=-6, dz=20, lean=26, chest=18, head=14, hand=(-34, 14), ring=160, off=(30, -4), front=44, back=-34, fl=14, bl=36, cape=26)
 SWEEP = dict(dx=-12, dz=14, lean=34, chest=22, head=20, hand=(-46, 2), ring=195, off=(36, -8), front=50, back=-44, fl=8, bl=40, cape=34)
 LOW = dict(dx=-14, dz=8, lean=36, chest=22, head=18, hand=(-40, -14), ring=215, off=(34, -10), front=52, back=-40, fl=4, bl=36, cape=38)
-CARRY = dict(dx=-6, dz=4, lean=18, chest=10, head=8, hand=(-24, -22), ring=230, off=(24, -14), front=40, back=-20, fl=2, bl=16, cape=22)
+FOLLOW = dict(dx=-14, dz=6, lean=42, chest=26, head=16, hand=(-26, -34), ring=250, off=(38, -12), front=56, back=-42, fl=2, bl=34, cape=42)
+SETTLE = 21
 BEATS = [(0, READY), (2, TUCK), (contact - 1, COCK), (contact, WHIP), (contact + 1, SWEEP), (last, LOW)]
 
 
@@ -131,8 +132,9 @@ def smooth(t):
 
 def at(frame):
     if frame > last:
-        u = glide((frame - last) / (frames - last))
-        return blend(LOW, CARRY, u / 0.45) if u < 0.45 else blend(CARRY, READY, (u - 0.45) / 0.55)
+        if frame <= last + 3:
+            return blend(LOW, FOLLOW, smooth((frame - last) / 3))
+        return blend(FOLLOW, READY, glide(min(1, (frame - last - 3) / (SETTLE - last - 3))))
     for (a, pa), (b, pb) in zip(BEATS, BEATS[1:]):
         if a <= frame <= b:
             t = (frame - a) / (b - a)
