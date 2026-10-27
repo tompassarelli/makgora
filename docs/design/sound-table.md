@@ -27,7 +27,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Jab, Second jab, Third jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalLightSliceMetal |  |
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavySliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalHeavySliceMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
-| Neutral special: Mana Burn | DemonHunterMissileLaunch | ManaBurn | ManaBurn + DemonHunterMissileHit | MetalMediumSliceMetal |  |
+| Neutral special: Eye Beam | DemonHunterMissileLaunch | DemonHunterMissileHit | DemonHunterMissileHit + DemonHunterMissileHit | MetalMediumSliceMetal |  |
 | Side special: Fel Rush | DemonHunterMissileLaunch | MetalHeavySliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
 | Up special: Wing Ascent | DemonHunterMissileHit | MetalMediumSliceFlesh | MetalMediumSliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
 | Down special: Immolate | FireballLaunch | Fireball | Fireball + DemonHunterMissileHit | MetalMediumSliceMetal |  |
@@ -220,7 +220,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavyChopFlesh | MetalHeavyChopFlesh + AxeMediumChopWood | MetalHeavyChopMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalHeavyChopFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Neutral special: Lumber Toss | AxeMissileLaunch | AxeMediumChopWood | AxeMediumChopWood + AxeMediumChopWood | MetalMediumChopMetal |  |
-| Side special: Burrow | AxeMediumChopWood | WyvernSpearMissile | WyvernSpearMissile + AxeMediumChopWood | MetalMediumChopMetal |  |
+| Side special: Log Heave | AxeMediumChopWood | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Up special: Worksite Launch | CatapultAttack1 | WoodMediumBashFlesh | WoodMediumBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Down special: Rest | CreepSleep | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 

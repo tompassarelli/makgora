@@ -248,7 +248,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.peon]: {
     neutral: EMPTY_GOLD_SACK_CUES,
-    side: { spell: "Burrow", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
+    side: { spell: "Log Heave", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
     up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
     down: PEON_REST_CUES,
   },
@@ -432,9 +432,6 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
       branch("Fire Palm", BEAST, timed(cue("Abilities\\Spells\\Items\\AIfb\\AIfbSpecialArt.mdx", "ahead", f32(0.8)), "birth", 0.0)),
       branch("Storm Step", STORM, cue("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx", "body", f32(0.5))),
     ] },
-  },
-  [Character.peon]: {
-    side: { recall: branch("Pack Up", timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.15)), "stand", 0.0), cue("UI\\Feedback\\GoldCredit\\GoldCredit.mdl", "hand", f32(0.7))) },
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {

@@ -2101,7 +2101,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Sylvanas | Bow-and-dagger actions, Silence and chosen escape | Banked Black Quiver damage |
 | Cairne | Large visible body, halberd swings and guard read | Timed Endurance speed and stock heal bank |
 | Chen | Heavy staff actions and chosen Earth/Fire/Storm branch | Counted Drunken Brawler |
-| Peon | Tool strikes, chosen building and visible burrow | Pillage meter refund and stock heal bank |
+| Peon | Tool strikes, a heaved log and chosen building | Pillage meter refund and stock heal bank |
 | Tinker | Claw pack, factory placement and tracking Laser | Banked Engineering Upgrade |
 | Kael'thas | Sphere gestures and explicit spell choices | Ordinary-hit meter steal |
 | Murloc | Small visible body, quick claws and leap pressure | Ordinary-hit meter steal |
@@ -2111,8 +2111,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Down smash — Twin Stomp | Both feet up, a heavy front stomp, both feet up again, a heavy rear stomp; Captain Falcon's clock with Ganondorf's look (#84) | 19 / 14 / 13 (45 total, no separate tail); front frames 19–22 at 18%, 80°, base 30, growth 100, an upward pop-up; rear frames 29–32 at 16%, 80° behind him, base 20, growth 100; no set-knockback trap hit |
 
 Move healing restores its authored amount on a successful action, capped by
-current damage; it keeps no hidden per-stock bank. Peon's proposed burrow HP,
-ducking, peeking face and occupied-break hitstun belong to a future move change.
+current damage; it keeps no hidden per-stock bank.
 Which special carries which trait (a status, a heal, meter drain or steal) is
 one table, smashcraft:ts/src/game/sim/identityTraits.ts;
 contacts, command grabs, guards and armour read it, so an ordinary move, throw

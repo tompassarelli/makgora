@@ -1,6 +1,7 @@
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, type SpecialCharge, type SpecialFollowUp, frames } from "../../sim/specials/schema";
-import { heroRegion } from "../../sim/heroMoves";
+import { f32 } from "wisp/src/sim/f32";
+import { heroRegion, type MoveRegion, type StrikeCapsule } from "../../sim/heroMoves";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
 import { peonHit } from "./moves";
 
@@ -29,19 +30,34 @@ const goldSackFollowUps: readonly SpecialFollowUp[] = [
 
 const GOLD_SACK: AuthoredSpecial = { endFrame: GOLD_SACK_CHARGE.hold + 12, charge: GOLD_SACK_CHARGE, followUps: goldSackFollowUps };
 
-const BURROW_STOP = [{ ...frames(1, 52), velocityX: 0.0, velocityZ: 0.0 }];
+export const LOG_HEAVE_FIRST_ACTIVE = 14;
+export const LOG_ON_SHOULDER = frames(20, 25);
+export const LOG_HEAVE_END = 30;
 
-const BURROW: AuthoredSpecial = {
-  endFrame: 52, groundOnly: true, motion: BURROW_STOP,
-  placement: {
-    frame: 26, offsetX: 80.0, radius: 28.0, height: 76.0, durability: 32.0, life: 240,
-    fireAges: [45, 85, 125, 165, 205],
-    shot: {
-      model: "Abilities\\Weapons\\HunterMissile\\HunterMissile.mdl",
-      spawnFrame: 0, offsetX: 28.0, offsetZ: 48.0, velocityX: 12.0, velocityZ: 0.0,
-      life: 36, radius: 12.0, effect: peonHit(5.119999885559082, 35, 73.875, 18.0), reflectable: true, limit: 3,
-    },
-  },
+export const LOG_TIPPER = { ...peonHit(12.0, 75, 52.0, 68.0, true), strong: true };
+export const LOG_BUTT = { ...peonHit(5.0, 70, 20.0, 12.0), strong: false };
+const LOG_TIP_FRACTION = f32(0.3);
+const LOG_RADIUS = 13.0;
+const LOG_RISING: readonly StrikeCapsule[] = [
+  { x1: 22.0, z1: 18.0, x2: 128.0, z2: 10.0, radius: LOG_RADIUS },
+  { x1: 22.0, z1: 30.0, x2: 120.0, z2: 52.0, radius: LOG_RADIUS },
+];
+const LOG_OVERHEAD: readonly StrikeCapsule[] = [
+  { x1: 20.0, z1: 44.0, x2: 98.0, z2: 96.0, radius: LOG_RADIUS },
+  { x1: 16.0, z1: 60.0, x2: 62.0, z2: 128.0, radius: LOG_RADIUS },
+];
+const risingLog = (log: Readonly<StrikeCapsule>, frame: number): readonly MoveRegion[] => {
+  const x = f32(log.x2 - f32(f32(log.x2 - log.x1) * LOG_TIP_FRACTION));
+  const z = f32(log.z2 - f32(f32(log.z2 - log.z1) * LOG_TIP_FRACTION));
+  return [heroRegion(frame, frame, { ...log, x1: x, z1: z }, LOG_TIPPER), heroRegion(frame, frame, { ...log, x2: x, z2: z }, LOG_BUTT)];
+};
+
+const LOG_HEAVE: AuthoredSpecial = {
+  endFrame: LOG_HEAVE_END, groundOnly: true, motion: [{ ...frames(1, LOG_HEAVE_END), velocityX: 0.0, velocityZ: 0.0 }],
+  regions: [
+    ...LOG_RISING.flatMap((log, index) => risingLog(log, LOG_HEAVE_FIRST_ACTIVE + index)),
+    ...LOG_OVERHEAD.map((log, index) => heroRegion(LOG_HEAVE_FIRST_ACTIVE + LOG_RISING.length + index, LOG_HEAVE_FIRST_ACTIVE + LOG_RISING.length + index, log, LOG_BUTT)),
+  ],
 };
 
 const vault = (x: number, z: number): AuthoredSpecial => ({
@@ -67,7 +83,7 @@ const REST: AuthoredSpecial = {
 
 export const PEON_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Gold Sack", description: "Stuff gold into the sack, then press again to bonk; shield keeps the charge. A full sack kills.", ground: GOLD_SACK }, { damage: 1.25 }),
-  side: withExKit({ name: "Burrow", description: "Build a fragile burrow that fires spears; press again to pack it up.", ground: BURROW, recall: { name: "Pack Up", endFrame: 52, groundOnly: true, recall: true, motion: BURROW_STOP } }, { durability: 1.25, damage: 1.25, recallProtection: 4 }),
+  side: withExKit({ name: "Log Heave", description: "Bend down and heave up a huge log: its far end pops a foe up and back toward the Peon; the butt end barely moves them.", ground: LOG_HEAVE }, { damage: 1.25 }),
   up: withExKit({ name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) }, { travel: 1.25 }),
   down: withExKit({ name: "Rest", description: "Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds.", ground: REST }, { reach: 1.25 }),
 };

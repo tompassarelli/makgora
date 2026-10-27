@@ -7,7 +7,7 @@ export const PEON_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardTilt, near: 60.0, far: 120.0 },
     { move: AttackStyle.downTilt, near: 40.0, far: 95.0 },
     { move: AttackStyle.grab, near: 0.0, far: 75.0 },
-    { move: GameplanSpecial.side, near: 200.0, far: 420.0 },
+    { move: GameplanSpecial.side, near: 70.0, far: 130.0 },
   ],
   approach: [
     { via: "run", moves: [AttackStyle.downTilt, AttackStyle.grab], weight: 12 },
@@ -17,6 +17,7 @@ export const PEON_GAMEPLAN: FighterGameplan = {
   combos: [
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.upTilt, AttackStyle.forwardAir] },
     { starter: AttackStyle.upTilt, followUps: [AttackStyle.upAir] },
+    { starter: GameplanSpecial.side, followUps: [AttackStyle.upTilt, AttackStyle.upAir] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
     { starter: GameplanThrow.down, followUps: [AttackStyle.forwardTilt] },
   ],

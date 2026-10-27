@@ -6,7 +6,7 @@ import { hurtPart, type HurtPart, type HurtPose } from "../../sim/hurtboxes";
 import { ANGLES } from "../../sim/heroes/authoring";
 import { groundHit } from "../../sim/heroes/groundNormals";
 
-export const peonHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 85 | 90, growth = 88.6500015258789, base = 22.0, behind = false) =>
+export const peonHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 75 | 85 | 90, growth = 88.6500015258789, base = 22.0, behind = false) =>
   groundHit(damage, angle, growth, base, HitElement.normal, behind);
 
 const blade = (x1: number, z1: number, x2: number, z2: number, radius = 8.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
