@@ -320,6 +320,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   weapon side's wrist. Store the family and run `bun wisp inputs derive --fighter NAME`.
   Rifleman's Knockdown, Down Damage, Get Up and Get Up Attack (#436) and Mountain King's
   Stand - 4 and Death (#505) were carried this way.
+  `bun tools/animations/rifleman-aerial-aim.ts PRIVATE_ASSETS PRIVATE_OUTPUT` aims Rifleman's
+  rifle the way his forward and back air are named (#610): it re-keys the chest, arms, hands and
+  Rifle01 of Aerial Forward from Forward Tilt's thrust and of Aerial Back from the stock Aerial
+  Forward's backward swing, each through a frame map onto the aerial's own timing, keeps the legs,
+  and leaves every other sequence identical. It refuses a model whose Aerial Forward already aims
+  like Forward Tilt. Store the family and run `bun wisp inputs derive --fighter Rifleman`.
   `bun tools/animations/grip-zoom-strips.ts PRIVATE_OUTPUT/grip-audit.json FIGHTER STRIP_OUTPUT PRIVATE_ASSETS [SEQUENCE]...`
   settles what those fixed-crop strips cannot: it draws the posed Classic mesh centred on the pelvis
   in side, far-side, front and top views, body grey, arms pale, each held weapon in a flat colour,
@@ -334,7 +340,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   more than 20 units from the hand on both sides (a staff) counts as its full length; limb strikes and
   spell effects (`LIMB_STRIKES` and `SPELL_STRIKES` in ts/scripts/wisp/animStrikeKinds.ts: strikes made by
   a foot, a leg, thrown knives or a spell, not the weapon) are reported, not failed, and a pass-through
-  body region (marked path) is left out of the far-end check. It writes build/anim-score/classic-weapons.tsv worst first.
+  body region (marked path) is left out of the far-end check. A forward air whose weapon tip is not at positive x, or a back air whose tip is not at negative x, in any active frame fails too (#610). It writes build/anim-score/classic-weapons.tsv worst first.
   `--shift` moves one region of one move by DX units for a mutant run (#508).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`

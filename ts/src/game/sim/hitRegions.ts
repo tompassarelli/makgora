@@ -207,9 +207,9 @@ const GETUP_ATTACK = region(
 );
 const NEUTRAL_AIR = { ...ordinary(-38.0, 90.0, 35.0, 55.0, attackDamage(AttackStyle.neutralAir)), strike: { x1: -28.0, z1: 45.0, x2: 80.0, z2: 45.0, radius: 10.0 } };
 const NEUTRAL_AIR_LINGERING = { ...ordinary(-38.0, 90.0, 35.0, 55.0, 5.0), strike: { x1: -28.0, z1: 45.0, x2: 80.0, z2: 45.0, radius: 10.0 } };
-const FORWARD_AIR = { ...ordinary(-2.0, 58.0, 10.0, 42.0, attackDamage(AttackStyle.forwardAir)), strike: { x1: 24.0, z1: 46.0, x2: -40.0, z2: 60.0, radius: 14.0 } };
-const BACK_AIR = { ...ordinary(-72.0, 9.0, 41.0, 86.0, attackDamage(AttackStyle.backAir), -DIAGONAL_UNIT), strike: { x1: 4.0, z1: 52.0, x2: 70.0, z2: 68.0, radius: 14.0 } };
-const BACK_AIR_LINGERING = { ...ordinary(-72.0, 9.0, 41.0, 86.0, 5.0, -DIAGONAL_UNIT), strike: { x1: 4.0, z1: 52.0, x2: 70.0, z2: 68.0, radius: 14.0 } };
+const FORWARD_AIR = { ...ordinary(-2.0, 58.0, 10.0, 42.0, attackDamage(AttackStyle.forwardAir)), strike: { x1: 40.0, z1: 46.0, x2: 106.0, z2: 28.0, radius: 14.0 } };
+const BACK_AIR = { ...ordinary(-72.0, 9.0, 41.0, 86.0, attackDamage(AttackStyle.backAir), -DIAGONAL_UNIT), strike: { x1: 8.0, z1: 48.0, x2: -38.0, z2: 60.0, radius: 14.0 } };
+const BACK_AIR_LINGERING = { ...ordinary(-72.0, 9.0, 41.0, 86.0, 5.0, -DIAGONAL_UNIT), strike: { x1: 8.0, z1: 48.0, x2: -38.0, z2: 60.0, radius: 14.0 } };
 const UP_AIR = { ...region(-28.0, 12.0, 60.0, 138.0, 4.0, 60.0, 14.0, 0.25, 0.968245804309845), strike: { x1: -8.0, z1: 80.0, x2: -8.0, z2: 118.0, radius: 20.0 } };
 const UP_AIR_FINISHER = { ...region(-28.0, 12.0, 60.0, 138.0, 8.0, 110.0, 24.0, 0.25, 0.968245804309845, 2), strike: { x1: -8.0, z1: 80.0, x2: -8.0, z2: 118.0, radius: 20.0 } };
 const DOWN_AIR = {

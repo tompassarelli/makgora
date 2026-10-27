@@ -11,6 +11,7 @@ import { assetsView, readManifest } from '../../ts/scripts/wisp/buildInputs';
 import { FIGHTER_RIGS } from './rigs';
 
 const GAP_LIMIT = 20.0;
+const AERIAL_SIDE: Readonly<Record<string, number>> = { 'forward-air': 1, 'back-air': -1 };
 const BODY_CENTRE: Point = [0, 60];
 const USAGE = 'usage: bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX]';
 
@@ -19,9 +20,9 @@ type Weapon = { readonly name: string; readonly hand: number; readonly vertices:
 type Edge = { readonly grip: Point; readonly tip: Point };
 type Shift = { readonly fighter: string; readonly move: string; readonly dx: number };
 type Gap = { readonly gap: number; readonly frame: number; readonly at: Point };
-type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly by: 'weapon' | 'limb' | 'spell'; readonly shifted: boolean };
+type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly by: 'weapon' | 'limb' | 'spell'; readonly shifted: boolean; readonly turned: readonly number[] };
 
-const fails = (row: Row) => row.by === 'weapon' && Math.max(row.tip.gap, row.reach.gap) > GAP_LIMIT;
+const fails = (row: Row) => row.by === 'weapon' && (Math.max(row.tip.gap, row.reach.gap) > GAP_LIMIT || row.turned.length > 0);
 const worst = (row: Row) => Math.max(row.tip.gap, row.reach.gap);
 
 function segmentDistance(p: Point, a: Point, b: Point): number {
@@ -95,10 +96,12 @@ function traceMove(model: DrawnModel, fighter: string, weapons: readonly Weapon[
   const regions = frames.map((frame, index) => (sampled.strikes[frame] ?? []).map((capsule, slot) =>
     shifted && index === 0 && slot === 0 ? { ...capsule, x1: capsule.x1 + shift.dx, x2: capsule.x2 + shift.dx } : capsule));
   const edges = frames.map(frame => weapons.map(weapon => edgeAt(model, weapon, sampled.seconds[frame] ?? 0)));
+  const side = AERIAL_SIDE[sampled.move] ?? 0;
+  const turned = side === 0 ? [] : frames.filter((_, index) => !(edges[index] ?? []).some(edge => edge.tip[0] * side > 0));
   return {
     fighter, move: sampled.move, weapons: weapons.map(weapon => weapon.name).join('+'), frames,
     tip: tipGap(frames, regions, edges), reach: reachGap(frames, regions, edges),
-    by: LIMB_STRIKES[fighter]?.includes(sampled.move) === true ? 'limb' : SPELL_STRIKES[fighter]?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted,
+    by: LIMB_STRIKES[fighter]?.includes(sampled.move) === true ? 'limb' : SPELL_STRIKES[fighter]?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted, turned,
   };
 }
 
@@ -123,10 +126,10 @@ function parseArgs(args: readonly string[]): { fighters: Character[]; assets: st
 }
 
 const point = (at: Point) => `${at[0].toFixed(1)},${at[1].toFixed(1)}`;
-const HEADER = ['fighter', 'move', 'weapons', 'active', 'tip outside', 'tip frame', 'tip x,z', 'region overreach', 'overreach frame', 'overreach x,z', 'strike by', 'shifted', 'verdict'];
+const HEADER = ['fighter', 'move', 'weapons', 'active', 'tip outside', 'tip frame', 'tip x,z', 'region overreach', 'overreach frame', 'overreach x,z', 'strike by', 'shifted', 'tip on wrong side', 'verdict'];
 const tsvRow = (row: Row) => [
   row.fighter, row.move, row.weapons, `${row.frames[0]}-${row.frames.at(-1)}`, row.tip.gap.toFixed(1), row.tip.frame, point(row.tip.at),
-  row.reach.gap.toFixed(1), row.reach.frame, point(row.reach.at), row.by, row.shifted ? 'yes' : 'no', fails(row) ? 'FAIL' : 'pass',
+  row.reach.gap.toFixed(1), row.reach.frame, point(row.reach.at), row.by, row.shifted ? 'yes' : 'no', row.turned.length === 0 ? 'none' : row.turned.join(','), fails(row) ? 'FAIL' : 'pass',
 ].join('\t');
 
 const { fighters, assets: assetsArg, shift } = parseArgs(process.argv.slice(2));
@@ -148,5 +151,5 @@ mkdirSync(out, { recursive: true });
 await Bun.write(table, `${[HEADER.join('\t'), ...sorted.map(tsvRow)].join('\n')}\n`);
 const failing = sorted.filter(fails).length;
 console.log([HEADER.join('\t'), ...sorted.map(tsvRow)].join('\n'));
-console.log(`${rows.length} weapon moves over ${fighters.length - unarmed.length} armed fighters; ${failing} miss their weapon by more than ${GAP_LIMIT} units; unarmed: ${unarmed.join(', ') || 'none'}; ${table}`);
+console.log(`${rows.length} weapon moves over ${fighters.length - unarmed.length} armed fighters; ${failing} miss their weapon by more than ${GAP_LIMIT} units or aim a forward or back air the wrong way; unarmed: ${unarmed.join(', ') || 'none'}; ${table}`);
 if (failing > 0) process.exitCode = 1;
