@@ -83,7 +83,7 @@ const BLINK = blink(f32(H * f32(3.5)));
 
 const FAN_FRAMES = 27;
 const FAN_JUMP_CANCEL = 4;
-const FAN_GROUND_HIT = { damage: f32(6.1061435), growth: 100.0, base: 0.0, launchX: f32(0.965925826), launchZ: f32(0.258819045), electric: false, element: HitElement.slash, setKnockback: 60.0 };
+const FAN_GROUND_HIT = { damage: f32(6.1061435), growth: 100.0, base: 0.0, launchX: f32(0.965925826), launchZ: f32(0.258819045), electric: false, element: HitElement.slash, setKnockback: 80.0 };
 const FAN_AIR_HIT = { damage: 5.0, growth: 100.0, base: 0.0, launchX: 1.0, launchZ: 0.0, electric: false, element: HitElement.slash, setKnockback: 80.0 };
 const FAN_KNIVES = blade(48.0, 56.0, 92.0, 56.0, 24.0);
 const fanRing = (effect: Parameters<typeof heroRegion>[3]): readonly MoveRegion[] => [
@@ -102,5 +102,5 @@ export const WARDEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target.", ground: SHADOW_STRIKE }, { damage: 1.25 }),
   side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a Pursuit Lunge that cuts through them and turns to face them. Either hit stuns in place for a grab or Fan of Knives; a second stun within two seconds only knocks them away.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { damage: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
-  down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, marking and poisoning them; on the ground it pushes them away along a low angle with the same knockback at every percent, never knocking them down, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),
+  down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, marking and poisoning them; on the ground it pushes them away along a low angle with shine's knockback at every percent, so a light foe tumbles and a heavy one does not, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),
 };

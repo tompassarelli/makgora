@@ -116,7 +116,8 @@ What she keeps, so she does not become Fox in a costume:
 - Fan of Knives (down special, #272, #494): a frame-4 ring of knives with set
   knockback, a shine-like semi-spike in the air, that she can jump out of, so
   it sits near shine and must stay apart from it: it reflects nothing, it
-  never downs, and it must not loop; down special into down special stays
+  stuns as long as shine (27 Oct) and so tumbles the lighter half of the
+  roster as shine does, and it must not loop; down special into down special stays
   below true.
 - Fan of Knives turnaround (#513, Tom's 26 Oct direction): she turns around
   in it the way Fox turns around in a held shine. Holding the stick away from

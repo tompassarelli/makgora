@@ -8,6 +8,7 @@ import { stepMatch } from "../../match/step";
 import { createReplaySnapshot } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, DownState, SpecialAction } from "../../sim/codes";
+import { TUMBLE_KNOCKBACK, fixedHitKnockback, ordinaryHitstunFrames } from "../../sim/knockback";
 import type { Fighter } from "../../sim/fighter";
 import { createFighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
@@ -18,6 +19,10 @@ const TARGET_AHEAD = 60.0;
 const AIRBORNE_HEIGHT = 40.0;
 const MAIEV_AIR_HEIGHT = 300.0;
 const WATCH_FRAMES = 150;
+const LIGHT_VICTIM = Character.kaelthas;
+const AVERAGE_VICTIM = Character.jaina;
+const HEAVY_VICTIM = Character.cairne;
+const LIGHTEST_UNTUMBLED_VICTIM = Character.demonHunter;
 
 function lift(fighter: Fighter, height: number): void {
   fighter.motion.z = height;
@@ -28,12 +33,12 @@ function lift(fighter: Fighter, height: number): void {
   setWorldMotionValue(fighter.motion.meleeVelocityZ, fighter.motion.vz);
 }
 
-function fanScene(percent: number, targetX: number, maievHeight: number, targetHeight: number) {
+function fanScene(percent: number, targetX: number, maievHeight: number, targetHeight: number, victim: Character = Character.warden) {
   const state = createReplaySnapshot();
   const maiev = fighterAt(state.world, 0);
   const target = fighterAt(state.world, 1);
   copyFighterState(maiev, createFighter(Character.warden, 0.0, 1), 3);
-  copyFighterState(target, createFighter(Character.warden, targetX, targetX > 0 ? -1 : 1), 3);
+  copyFighterState(target, createFighter(victim, targetX, targetX > 0 ? -1 : 1), 3);
   target.status.damage = f32(percent);
   if (maievHeight > 0) lift(maiev, maievHeight);
   if (targetHeight > 0) lift(target, targetHeight);
@@ -55,8 +60,8 @@ function fanScene(percent: number, targetX: number, maievHeight: number, targetH
   return { maiev, target, step };
 }
 
-function fanOfKnivesAt(percent: number, airborne: boolean): void {
-  const { target, step } = fanScene(percent, TARGET_AHEAD, 0.0, airborne ? AIRBORNE_HEIGHT : 0.0);
+function fanOfKnivesAt(percent: number, airborne: boolean, victim: Character): void {
+  const { target, step } = fanScene(percent, TARGET_AHEAD, 0.0, airborne ? AIRBORNE_HEIGHT : 0.0, victim);
   let struck = false;
   for (let tick = 1; tick <= WATCH_FRAMES; tick++) {
     step(tick);
@@ -80,10 +85,12 @@ function fanLaunch(percent: number, targetX: number, maievHeight: number): { kno
   throw new Error(`Fan of Knives missed a foe at ${targetX} with Maiev ${maievHeight} up at ${percent}%`);
 }
 
-test("Maiev's ground Fan of Knives never tumbles or downs a grounded or airborne target at 0, 50, 100 or 150 percent [k1 scenario]", () => {
-  for (const percent of PERCENTS) {
-    fanOfKnivesAt(percent, false);
-    fanOfKnivesAt(percent, true);
+test("Maiev's ground Fan of Knives never tumbles or downs a grounded or airborne average or heavy target at 0, 50, 100 or 150 percent, as Fox's shine does not [k1 scenario]", () => {
+  for (const victim of [LIGHTEST_UNTUMBLED_VICTIM, AVERAGE_VICTIM, HEAVY_VICTIM]) {
+    for (const percent of PERCENTS) {
+      fanOfKnivesAt(percent, false, victim);
+      fanOfKnivesAt(percent, true, victim);
+    }
   }
 });
 
@@ -107,5 +114,41 @@ test("Maiev's air Fan of Knives sends a foe on either side of her away on the sa
     assertEquals(fresh.knockbackZ <= 0, true, `side ${side}: not popped up, knockback ${fresh.knockbackZ}`);
     assertEquals(worn.knockbackX, fresh.knockbackX, `side ${side}: same horizontal launch at 0 and 100 percent`);
     assertEquals(worn.knockbackZ, fresh.knockbackZ, `side ${side}: same vertical launch at 0 and 100 percent`);
+  }
+});
+
+const SHINE_SET_KNOCKBACK = 80.0;
+const SHINE_GROWTH = 100.0;
+const SHINE_BASE = 0.0;
+const HITSTUN_TOLERANCE = 1;
+
+function fanHit(victim: Character, maievHeight: number, targetHeight: number): { hitstun: number; damageLevel: number } {
+  const { target, step } = fanScene(0, TARGET_AHEAD, maievHeight, targetHeight, victim);
+  for (let tick = 1; tick <= 12; tick++) {
+    step(tick);
+    if (target.status.damage > 0) return { hitstun: target.launch.hitstun, damageLevel: target.launch.damageLevel };
+  }
+  throw new Error(`Fan of Knives missed character ${victim} with Maiev ${maievHeight} up and the foe ${targetHeight} up`);
+}
+
+function shine(victim: Character): { hitstun: number; tumbles: boolean } {
+  const weight = createFighter(victim, 0.0, 1).tuning.physics.weight;
+  const knockback = fixedHitKnockback(SHINE_SET_KNOCKBACK, weight, SHINE_GROWTH, SHINE_BASE, 1.0);
+  return { hitstun: ordinaryHitstunFrames(knockback), tumbles: knockback >= TUMBLE_KNOCKBACK };
+}
+
+test("Maiev's Fan of Knives, on the ground and in the air, stuns and tumbles a light, average and heavy foe as Fox's Melee shine does [k4 reference melee]", () => {
+  for (const victim of [LIGHT_VICTIM, AVERAGE_VICTIM, HEAVY_VICTIM]) {
+    const expected = shine(victim);
+    const hits = [
+      { form: "air", hit: fanHit(victim, MAIEV_AIR_HEIGHT, MAIEV_AIR_HEIGHT) },
+      { form: "ground, grounded foe", hit: fanHit(victim, 0.0, 0.0) },
+      { form: "ground, airborne foe", hit: fanHit(victim, 0.0, AIRBORNE_HEIGHT) },
+    ];
+    for (const { form, hit } of hits) {
+      const label = `character ${victim}, ${form}`;
+      assertEquals(Math.abs(hit.hitstun - expected.hitstun) <= HITSTUN_TOLERANCE, true, `${label}: ${hit.hitstun} frames of hitstun against shine's ${expected.hitstun}`);
+      assertEquals(hit.damageLevel === 3, expected.tumbles, `${label}: tumbles as shine does`);
+    }
   }
 });

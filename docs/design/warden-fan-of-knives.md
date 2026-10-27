@@ -22,10 +22,15 @@ ground and in the air. Fan of Knives now:
 - Strikes on frames 4-7 on both sides of her: two mirrored 24-radius knife
   capsules, 48 to 92 out at 56 up, ahead of her and behind her. Each side
   launches away from her, so a foe on either side is sent outward.
-- On the ground: 6.1% pushing the foe away at 15 degrees with a set
-  knockback of 60 at every percent: below the tumble threshold (80), its
-  launch speed stays under the landing-knockdown speed, so the foe never
-  tumbles, is never downed and lands on its feet (Tom, 26 Oct).
+- On the ground: 6.1% pushing the foe away at 15 degrees with shine's set
+  knockback of 80 at every percent, so it stuns a foe for the frames Fox's
+  shine does and the foe's weight alone sets the knockback: 34 frames on
+  Kael'thas, 31 on Jaina, 26 on Cairne. Foes of weight 84 or less (13 of the
+  26 fighters) are launched past the tumble threshold (80), as Fox's shine
+  tumbles them; heavier foes stay under it, are never downed and land on
+  their feet. It was a set 60 that never tumbled anyone and stunned
+  21-28 frames, 6-8 short of shine (Tom, 26 Oct; Tom asked for shine's
+  hitstun, 27 Oct).
 - In the air it hits like Fox's Melee shine: 5% with a set knockback of 80
   and no growth, on a fixed horizontal semi-spike away from her, the same at
   every percent, which makes a shine spike off-stage. SmashWiki's Melee

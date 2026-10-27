@@ -1,6 +1,7 @@
 import { AttackStyle } from "../../src/game/sim/codes";
 import { MURLOC_MOVES } from "../../src/game/fighters/murloc/moves";
 import { WARDEN_MOVES } from "../../src/game/fighters/warden/moves";
+import { WARDEN_SPECIALS } from "../../src/game/fighters/warden/specials";
 import { ILLIDAN_MOVES } from "../../src/game/sim/originalMoves";
 import type { FighterMoves } from "../../src/game/sim/heroMoves";
 import type { HitEffect } from "../../src/game/sim/hitRegions";
@@ -10,6 +11,9 @@ export const FOX_NEUTRAL_AIR = { damage: 12, base: 10, growth: 100, angle: "361"
 
 const FOX_NEUTRAL_AIR_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Neutral_aerial";
 const WARDEN = "ts/src/game/fighters/warden/moves.ts";
+const WARDEN_SPECIALS_FILE = "ts/src/game/fighters/warden/specials.ts";
+const FOX_SHINE = "set 80, growth 100, base 0";
+const FOX_SHINE_PAGE = "https://www.ssbwiki.com/Fox_(SSBM)/Down_special";
 const ILLIDAN = "ts/src/game/sim/originalMoves.ts";
 const SPLIT_TIMING = "active 6-10, interruptible 46, charge between 2-3";
 const SPLIT_ANGLE = "25°";
@@ -21,6 +25,12 @@ const LEG_SWEEP = { kind: "deviation", reason: "her down tilt is a low leg sweep
 const SQUIRTLE_JAB = { undocumented: "Murloc's jab follows Squirtle's, who is not in Melee, and no Melee page gives a jab's reach in units", source: "https://www.ssbwiki.com/Squirtle_(SSBB)/Neutral_attack" } as const;
 const SPEAR_POINT = { kind: "deviation", reason: "his jab regions run to the spear point, so the point-first stabs hit where the point lands; frame data, damage and knockback are unchanged", decided: "2026-10-26", issue: 497 } as const;
 const FLAT_SLIDE = { kind: "deviation", reason: "Fox's 12% at base 10, growth 100 passes the Sakurai angle's 32 at 0% and lifts a grounded victim at 44 degrees, so it techs before her jab or grab; on Fox's falls she lands 3 frames later than on Falco's, so the 12 frames of hitstun the Sakurai angle allows under 32 no longer cover her landing; 6.1% at base 37, growth 8 and a flat 0 degrees makes 39-40 from 0 to 30% with 15-16 frames of hitstun and slides a grounded victim along the floor, which makes her neutral air into grab true and into jab DI-dependent", decided: "2026-10-27", issue: 580 } as const;
+
+function fanKnockback(form: "ground" | "air"): string {
+  const effect = WARDEN_SPECIALS.down?.[form]?.regions?.[0]?.hit.effect;
+  if (effect === undefined) throw new Error(`Maiev's ${form} Fan of Knives has no hit`);
+  return `set ${shortNumber(effect.setKnockback ?? 0)}, growth ${shortNumber(effect.growth)}, base ${shortNumber(effect.base)}`;
+}
 
 export function maievNeutralAir(): HitEffect[] {
   const regions = WARDEN_MOVES.normals[AttackStyle.neutralAir]?.regions ?? [];
@@ -63,6 +73,16 @@ function maievDownTiltReach(): number {
 const angle = (effect: HitEffect): string => (effect.sakurai === true ? FOX_NEUTRAL_AIR.angle : `${Math.round((Math.atan2(effect.launchZ, Math.abs(effect.launchX)) * 180) / Math.PI)}°`);
 
 export const MOVE_ROWS: readonly LedgerRow[] = [
+  {
+    id: "maiev-fan-of-knives-ground-knockback", family: "moves", name: "Maiev's ground Fan of Knives knockback",
+    melee: { value: FOX_SHINE, source: FOX_SHINE_PAGE }, ours: () => fanKnockback("ground"),
+    anchor: { file: WARDEN_SPECIALS_FILE, symbol: "WARDEN_SPECIALS" }, status: { kind: "parity", reason: "set knockback gives the same knockback and hitstun at every percent and varies only with the foe's weight, so her ground Fan of Knives stuns a foe for the frames Fox's shine does, a light foe tumbling from it and an average or heavy one not", decided: "2026-10-27" },
+  },
+  {
+    id: "maiev-fan-of-knives-air-knockback", family: "moves", name: "Maiev's air Fan of Knives knockback",
+    melee: { value: FOX_SHINE, source: FOX_SHINE_PAGE }, ours: () => fanKnockback("air"),
+    anchor: { file: WARDEN_SPECIALS_FILE, symbol: "WARDEN_SPECIALS" }, status: PARITY,
+  },
   {
     id: "maiev-neutral-air-angle", family: "moves", name: "Maiev's neutral air launch angle",
     melee: { value: FOX_NEUTRAL_AIR.angle, source: FOX_NEUTRAL_AIR_PAGE }, ours: () => only(angle),
