@@ -130,9 +130,9 @@ export const LICH_KING_MOVES: FighterMoves = {
     [AttackStyle.forwardTiltUp]: FROSTMOURNE_SWEEP,
     [AttackStyle.forwardTiltDown]: heroMove(11, 4, 21, 0, path(11, [
       capsule(24.0, 69.0, 84.0, 177.0),
-      capsule(24.0, 69.0, 85.0, 177.0),
-      capsule(22.0, 74.0, 31.0, 179.0),
-      capsule(12.0, 78.0, -28.0, 151.0),
+      capsule(24.0, 69.0, 84.0, 177.0),
+      capsule(24.0, 69.0, 84.0, 177.0),
+      capsule(24.0, 69.0, 84.0, 177.0),
     ], hit(15.0, "EDGE", 35))),
 
     [AttackStyle.upTilt]: { ...heroMove(10, 5, 20, 0, path(10, [
