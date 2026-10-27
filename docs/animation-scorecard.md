@@ -171,8 +171,12 @@ forward tilt ship with line 5 below 4 (3 on the tilts; 2 on readability and
 anticipation for the jabs, 3 on the rest): Tom's decision of 2026-10-26 via north
 gate 76, after five Blender takes failed to lift it and judges kept naming
 the thin spear crossing his crest and his round body, properties of the
-model rather than the motion (#497). A cold read of the native Classic clips
-still has to call each a forward stab with no broken limb.
+model rather than the motion (#497). On 2026-10-27 three fresh viewers read
+the native Classic frames, cropped on him: none called either jab a stab (they
+said "other"), two of three called the forward tilt a stab, and nobody saw a
+swing or a broken limb. Under Tom's standing delegation of pending decisions to
+the recommendation (2026-10-26), applied to north gate 84 on 2026-10-27, the
+jab, jab 2 and forward tilt ship as they are.
 
 Grom's dash attack ships with line 5 at 3: the judge medians on readability,
 weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
