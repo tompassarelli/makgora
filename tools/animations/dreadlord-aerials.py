@@ -106,17 +106,22 @@ if move == 'backAir':
     BEATS = [(0, READY), (3, TUCK), (contact - 2, COIL), (contact, KICK), (contact + 1, DRIVE), (last, HELD)]
     AFTER = PULL
     FINAL = HELD
+    LET_GO = lambda t: t
+    RELEASE = lambda t: smooth(t)
 elif move == 'forwardAir':
-    DRAW = dict(dx=-4, dz=6, lean=-10, chest=-14, head=-6, wing=8, handR=(-26, 34), handL=(10, -30), footL=(14, -22), footR=(10, -24))
-    CROWN = dict(dx=-4, dz=7, lean=-12, chest=-18, head=-4, wing=12, handR=(-14, 48), handL=(12, -28), footL=(16, -20), footR=(12, -22))
-    OVER = dict(dx=0, dz=7, lean=-6, chest=-10, head=2, wing=8, handR=(8, 50), handL=(6, -30), footL=(16, -22), footR=(12, -24))
-    RAKE = dict(dx=6, dz=6, lean=14, chest=10, head=10, wing=-6, handR=(64, 18), handL=(-10, -26), footL=(12, -26), footR=(8, -28))
-    THRU = dict(dx=8, dz=5, lean=20, chest=14, head=12, wing=-10, handR=(62, -10), handL=(-16, -22), footL=(10, -28), footR=(6, -30))
-    LOW = dict(dx=8, dz=4, lean=22, chest=16, head=12, wing=-10, handR=(46, -38), handL=(-18, -20), footL=(10, -30), footR=(6, -32))
-    CARRY = dict(dx=4, dz=2, lean=12, chest=8, head=6, wing=-4, handR=(14, -42), handL=(-8, -26), footL=(8, -34), footR=(4, -36))
-    BEATS = [(0, READY), (3, DRAW), (contact - 2, CROWN), (contact - 1, OVER), (contact, RAKE), (contact + 1, THRU), (last, LOW)]
+    DRAW = dict(dx=-8, dz=6, lean=-22, chest=-20, head=-6, wing=-30, handR=(-26, 40), handL=(-20, 36), footL=(14, -22), footR=(10, -24))
+    CROWN = dict(dx=-8, dz=7, lean=-26, chest=-22, head=-4, wing=-38, handR=(-16, 52), handL=(-12, 48), footL=(16, -20), footR=(12, -22))
+    OVER = dict(dx=0, dz=7, lean=-8, chest=-6, head=2, wing=-10, handR=(14, 52), handL=(10, 48), footL=(16, -22), footR=(12, -24))
+    RAKE = dict(dx=10, dz=6, lean=26, chest=18, head=8, wing=40, handR=(64, 18), handL=(56, 8), footL=(12, -26), footR=(8, -28))
+    THRU = dict(dx=14, dz=5, lean=28, chest=18, head=10, wing=38, handR=(70, -22), handL=(54, -18), footL=(10, -28), footR=(6, -30))
+    LOW = dict(dx=13, dz=4, lean=24, chest=16, head=10, wing=30, handR=(58, -50), handL=(40, -40), footL=(10, -30), footR=(6, -32))
+    SINK = dict(LOW, dx=12, lean=22, wing=26, handR=(52, -56), handL=(36, -42))
+    CARRY = dict(dx=6, dz=2, lean=16, chest=10, head=6, wing=12, handR=(14, -42), handL=(10, -40), footL=(8, -34), footR=(4, -36))
+    BEATS = [(0, READY), (3, DRAW), (contact - 2, CROWN), (contact - 1, OVER), (contact, RAKE), (contact + 1, THRU), (last - 1, LOW), (last, SINK)]
     AFTER = CARRY
-    FINAL = LOW
+    FINAL = SINK
+    LET_GO = lambda t: 0.5 * t
+    RELEASE = lambda t: min(1, t / 0.9)
 else:
     raise SystemExit(f'unknown move {move}')
 
@@ -136,7 +141,7 @@ def recovery(frame):
 
 def at(frame):
     if frame > last:
-        return blend(FINAL, AFTER, recovery(frame))
+        return blend(FINAL, AFTER, LET_GO(recovery(frame)))
     for (a, pa), (b, pb) in zip(BEATS, BEATS[1:]):
         if a <= frame <= b:
             t = (frame - a) / (b - a) if b > a else 1
@@ -148,7 +153,7 @@ def settled(frame):
     if frame < 2:
         return 1 - smooth(frame / 2)
     if frame > last:
-        return smooth(recovery(frame))
+        return RELEASE(recovery(frame))
     return 0
 
 

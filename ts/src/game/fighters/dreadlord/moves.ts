@@ -109,10 +109,10 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       ] },
     ])),
     [AttackStyle.forwardAir]: heroMove(10, 4, 24, 11, path(10, [
-      capsule(50.0, 113.0, 93.0, 117.0),
-      capsule(57.0, 98.0, 98.0, 91.0),
-      capsule(56.0, 90.0, 96.0, 76.0),
-      capsule(52.0, 83.0, 89.0, 62.0),
+      capsule(63.0, 108.0, 113.0, 104.0),
+      capsule(67.0, 91.0, 114.0, 74.0),
+      capsule(59.0, 82.0, 96.0, 42.0),
+      capsule(54.0, 80.0, 91.0, 40.0),
     ], dreadlordHit(15.787736892700195, "EDGE", 40))),
     [AttackStyle.backAir]: cleanLateMove(heroMove(9, 4, 25, 11, path(9, [
       capsule(-5.0, 75.0, -73.0, 70.0, HOOF_RADIUS),
