@@ -1680,7 +1680,7 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Warden | Forward smash (blade edge) | Position |
 | Lich | Forward smash (staff tip) | Position |
 | Forsaken Paladin | Forward smash (sword blade) | Position |
-| Dreadlord | Back air (wing-claw) | Timing |
+| Dreadlord | Back air (hoof kick) | Timing |
 | Shadow Hunter | Forward tilt (spear point) | Position |
 | Pit Lord | Forward smash (cleaver edge) | Position |
 | Beastmaster | Forward smash (axe head) | Position |

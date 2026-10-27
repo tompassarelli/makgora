@@ -1032,7 +1032,7 @@ Expert gameplan: Mix sleep, grabs, cross-up rushes and conversion routes. Use th
 
 ### Signature strong/weak move (#389)
 
-Back air, split by timing: strong hit clean, frames 9-9, 13.6%; weak hit late, frames 10-12, 9.5%. The wing-claw rakes hardest the frame it opens; a vampire who reads the approach takes the clean strike, the rest lingers as a weak wall.
+Back air, split by timing: strong hit clean, frames 9-9, 13.6%; weak hit late, frames 10-12, 9.5%. The hoof kick lands hardest the frame it opens; a vampire who reads the approach takes the clean strike, the rest lingers as a weak wall.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 

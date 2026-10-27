@@ -13,7 +13,7 @@ export const dreadlordStrikeMoments = {
   10: { clip: 6, seconds: f32(0.483), end: f32(2.000) },
   12: { clip: 65, seconds: f32(0.050), end: f32(0.583) },
   13: { clip: 61, seconds: f32(0.150), end: f32(0.617) },
-  14: { clip: 62, seconds: f32(0.183), end: f32(0.617) },
+  14: { clip: 62, seconds: f32(0.133), end: f32(0.617) },
   15: { clip: 63, seconds: f32(0.100), end: f32(0.500) },
   16: { clip: 51, seconds: f32(0.000), end: f32(0.767) },
   19: { clip: 9, seconds: f32(0.700), end: f32(1.100) },

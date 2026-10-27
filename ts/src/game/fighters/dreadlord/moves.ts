@@ -39,6 +39,7 @@ const L = f32(HERO_REFERENCE_HEIGHT * f32(1.10));
 const GRAB = f32(HERO_REFERENCE_HEIGHT * f32(0.65));
 const CLAW_RADIUS = 10.0;
 const WING_RADIUS = 12.0;
+const HOOF_RADIUS = 12.0;
 const DRAWN_FRONT = 76.0;
 const DRAWN_BACK = 38.0;
 
@@ -107,12 +108,17 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
         [capsule(-16.0, 30.0, -DRAWN_BACK, 45.0, WING_RADIUS), dreadlordHit(7.893868446350098, "POKE", 50, -1.0)],
       ] },
     ])),
-    [AttackStyle.forwardAir]: heroMove(10, 4, 24, 11, rake(10, [88.0, 72.0, 56.0, 40.0], 95.0,dreadlordHit(15.787736892700195, "EDGE", 40))),
+    [AttackStyle.forwardAir]: heroMove(10, 4, 24, 11, path(10, [
+      capsule(50.0, 113.0, 93.0, 117.0),
+      capsule(57.0, 98.0, 98.0, 91.0),
+      capsule(56.0, 90.0, 96.0, 76.0),
+      capsule(52.0, 83.0, 89.0, 62.0),
+    ], dreadlordHit(15.787736892700195, "EDGE", 40))),
     [AttackStyle.backAir]: cleanLateMove(heroMove(9, 4, 25, 11, path(9, [
-      capsule(-16.0, 54.0, -76.0, 100.0, WING_RADIUS),
-      capsule(-16.0, 46.0, -76.0, 88.0, WING_RADIUS),
-      capsule(-16.0, 38.0, -76.0, 76.0, WING_RADIUS),
-      capsule(-16.0, 30.0, -76.0, 64.0, WING_RADIUS),
+      capsule(-5.0, 75.0, -73.0, 70.0, HOOF_RADIUS),
+      capsule(-8.0, 75.0, -73.0, 56.0, HOOF_RADIUS),
+      capsule(-6.0, 74.0, -70.0, 60.0, HOOF_RADIUS),
+      capsule(-3.0, 74.0, -68.0, 57.0, HOOF_RADIUS),
     ], dreadlordHit(16.915433883666992, "KILL", 35, -1.0))), 1),
     [AttackStyle.upAir]: heroMove(7, 3, 21, 12, path(7, [
       capsule(0.0, 68.0, 8.0, f32(M - 12.0), 12.0),

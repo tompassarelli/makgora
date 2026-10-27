@@ -43,6 +43,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   script cocks the left hammer over his shoulder and sweeps it level through the first, then raises the right hammer
   overhead and chops it forward and down through the second, legs tucked throughout. A clip spliced from Blender
   keys is bound `aligned`, so it plays one key per simulation frame instead of being re-timed around one strike moment.
+  Mal'Ganis's forward and back air are authored the same way: `... --character 8 --replace-pose backAir|forwardAir --rig RIG.json`,
+  then `blender ... --python tools/animations/dreadlord-aerials.py -- backAir|forwardAir RIG.json KEYS.json` bakes either
+  a two-hoof back kick (hooves coiled up behind his hips, chest pitched forward, both driven level straight back at
+  hip height on the first active frame as the wings swing clear, sinking down-back through the late hit) or an overhead claw rake (right claw drawn up behind his head, raked level in front and down
+  past his knees), and `... --replace-pose POSE --keys KEYS.json` splices each in place; run the forward air on the
+  back air's output so both stay. Their hit capsules run from hip to hoof and from elbow to claw on every active frame.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip
