@@ -9,10 +9,17 @@ import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
 import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/roster/kits';
 import { ensure } from './original-clips';
 
+const VIEWS = ['classic', 'classic-poses'] as const;
+const FLAGS = ['--against', '--views'];
 const [outputArg, ...names] = process.argv.slice(2);
-ensure(outputArg, 'usage: bun tools/animations/victory-captures.ts PRIVATE_OUTPUT [FIGHTER_NAME...] [--against LOSER_NAME...]');
-const only = names.filter((name, at) => name !== '--against' && names[at - 1] !== '--against');
-const against = names.filter((_, at) => names[at - 1] === '--against').map(name => {
+ensure(outputArg, 'usage: bun tools/animations/victory-captures.ts PRIVATE_OUTPUT [FIGHTER_NAME...] [--against LOSER_NAME...] [--views classic|classic-poses...]');
+const flagged = (flag: string) => names.filter((name, at) => !FLAGS.includes(name) && names.slice(0, at).reverse().find(earlier => FLAGS.includes(earlier)) === flag);
+const only = names.filter((name, at) => !FLAGS.includes(name) && !names.slice(0, at).some(earlier => FLAGS.includes(earlier)));
+const views = flagged('--views').map(view => {
+    ensure((VIEWS as readonly string[]).includes(view), `No view named ${view}; views are ${VIEWS.join(', ')}`);
+    return view as typeof VIEWS[number];
+});
+const against = flagged('--against').map(name => {
     const loser = SELECTABLE_CHARACTERS.find(character => fighterName(character) === name);
     ensure(loser !== undefined, `No fighter named ${name}`);
     return loser;
@@ -53,6 +60,7 @@ await Effect.runPromise(Effect.gen(function*() {
     const project = headlessRender({ assets });
     const poses = scenes.map(scene => ({ ...scene, ui: [], textTags: [], effects: scene.effects.filter(effect => !effect.model.includes('LevelupCaster')) }));
     for (const [directory, drawn] of [['classic', scenes], ['classic-poses', poses]] as const) {
+        if (views.length > 0 && !views.includes(directory)) continue;
         const images = yield* renderScenes(project, drawn, join(output, directory), 'classic');
         for (const image of images) ensure(image.notDrawn.length === 0, `${directory}/${image.frame}: ${image.notDrawn.join('; ')}`);
         console.log(`VICTORY_STRIPS_PASS ${directory}: ${scenes.length / STRIP_FRAMES} strips, ${images.length} frames; ${output}`);

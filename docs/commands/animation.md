@@ -102,10 +102,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/stand-captures.ts PRIVATE_OUTPUT` checks each selectable
   fighter's shipped timeline against its source geosets at every Stand/move frame
   and renders both-facing Stand frames in Classic.
-  `bun tools/animations/victory-captures.ts PRIVATE_OUTPUT [FIGHTER_NAME...] [--against LOSER_NAME...]` (through the capacity helper) wins a
+  `bun tools/animations/victory-captures.ts PRIVATE_OUTPUT [FIGHTER_NAME...] [--against LOSER_NAME...] [--views classic|classic-poses...]` (through the capacity helper) wins a
   headless match with each selectable fighter, or only the named ones, checks the winner's victory clip starts at its first
   frame, prints each sampled pose and renders a six-frame Classic results-screen strip per winner against the next fighter, or against each `--against` loser,
   with the UI (`classic`) and, for cold readers, without the UI or the winner's level-up burst (`classic-poses`).
+  `--views` renders only the listed views; `--views classic-poses` skips the UI view, which under software GL is what keeps a full 26-fighter round inside five minutes.
   `bun tools/animations/victory-anatomy.ts` (from ts/) samples every selectable fighter's shipped victory every third frame,
   prints each frame and joint that breaks the anatomy rules in smashcraft:ts/scripts/wisp/victoryAnatomy.ts (an elbow bent
   backward, folded past its range or off its hinge, a bone stretched, an elbow or hand inside the torso) and rewrites the
