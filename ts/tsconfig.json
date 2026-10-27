@@ -41,6 +41,7 @@
     "scripts/**/*.ts",
     "codegen/**/*.ts",
     "plugins/**/*.ts",
+    "test/fighter-marker.test.ts",
     "test/menu-journey.test.ts",
     "test/lan-pool-queue.test.ts",
     "test/result-vote.test.ts",

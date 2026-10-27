@@ -13,13 +13,17 @@ const SMASHCRAFT_DAMAGE_TEMPLATE = {
   font: { file: "MasterFont", size: 0.036, flags: 1 }, justify: { horizontal: "LEFT", vertical: "MIDDLE" },
 } as const;
 
+const SMASHCRAFT_DAMAGE_OUTLINE_TEMPLATE = {
+  ...SMASHCRAFT_DAMAGE_TEMPLATE, name: "SmashcraftDamageOutline", text: "0", font: { file: "MasterFont", size: 0.036, flags: 0 },
+} as const;
+
 export const SMASHCRAFT_HEADLESS: HeadlessMap = {
   filePrefix: "smashcraft",
   globalPrefixes: ["__smashcraft"],
   localNatives: SMASHCRAFT_LOCAL_NATIVES,
   intentionalNoops: SMASHCRAFT_NOOPS,
   natives: smashcraftNativeBehavior,
-  frames: [...UI_FRAMES.map(({ definition }) => definition), SMASHCRAFT_DAMAGE_TEMPLATE],
+  frames: [...UI_FRAMES.map(({ definition }) => definition), SMASHCRAFT_DAMAGE_TEMPLATE, SMASHCRAFT_DAMAGE_OUTLINE_TEMPLATE],
 };
 
 

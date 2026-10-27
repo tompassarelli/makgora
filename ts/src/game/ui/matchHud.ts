@@ -6,9 +6,10 @@ import { Character } from "../sim/codes";
 import { fighterName } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
-  PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, SHAKE_FRAMES, STOCK_ICONS_SHOWN, type PanelLayout, type PlateBox, boxLeft, boxTop, damageText, panelLayout, percentText, plateLeft,
-  shakeStrength, shakeX, shakeY, trembleStrength, trembleX, trembleY,
+  PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
+  panelLayout, percentOutlineText, percentText, plateLeft, stepJolt,
 } from "./plateLayout";
+import { attachOutline, createOutline, createTemplateOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
 import { unitsForPixels } from "./portraitFrames";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
@@ -52,6 +53,8 @@ export class MatchClock {
 
 
 
+const OUTLINE_PX = 2;
+
 export class FighterHud {
   private readonly plate: framehandle;
   private readonly portrait: framehandle;
@@ -76,11 +79,9 @@ export class FighterHud {
 
   private left = 0.0;
   private panel: PanelLayout = panelLayout(0, 1);
-  private damageValue = 0.0;
-
-  private shakeFrame = SHAKE_FRAMES;
-  private shakeStrength = 0.0;
-  private trembleFrame = 0;
+  private readonly jolt: NumberJolt = numberJolt();
+  private readonly damageOutline: readonly framehandle[];
+  private readonly percentOutline: readonly framehandle[];
 
 
   constructor(private readonly slot: number, count: number) {
@@ -92,6 +93,8 @@ export class FighterHud {
     BlzFrameSetEnable(this.plate, false);
     this.portrait = createBackdrop(`FighterHUDPortrait${suffix}`, parent, context + 1);
     BlzFrameSetEnable(this.portrait, false);
+    this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, 21);
+    this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, f32(0.016), 21);
     this.damage = BlzCreateFrame("SmashcraftDamage", parent, 0, context + 2);
     BlzFrameSetEnable(this.damage, false);
     this.percent = createText(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN);
@@ -117,12 +120,16 @@ export class FighterHud {
     BlzFrameSetEnable(this.stockCount, false);
     this.body = [this.plate, this.portrait, this.damage, this.percent, this.name, this.slotLabel];
     for (const frame of [...this.body, ...this.stocks, this.stockCount]) BlzFrameSetLevel(frame, 21);
+    attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+    attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     this.layout(slot, count);
     this.update(false, Character.rifleman, slot, 0.0, 0);
   }
 
   destroy(): void {
     for (const frame of this.body) BlzDestroyFrame(frame);
+    destroyOutline(this.damageOutline);
+    destroyOutline(this.percentOutline);
     for (const icon of this.stocks) BlzDestroyFrame(icon);
     BlzDestroyFrame(this.stockCount);
   }
@@ -158,6 +165,8 @@ export class FighterHud {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);
+      showOutline(this.damageOutline, visible);
+      showOutline(this.percentOutline, visible);
     }
     if (this.shownCharacter !== character || this.shownColor !== color || this.shownMirrored !== this.panel.mirrored) {
       this.shownCharacter = character;
@@ -168,21 +177,30 @@ export class FighterHud {
       BlzFrameSetText(this.name, fighterName(character).toUpperCase());
       for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color), 0, true);
     }
-    this.shake(visible, damage);
-    if (this.shownDamageValue !== damage) {
-      this.shownDamageValue = damage;
-      const shownDamage = damageText(damage);
-      if (this.shownDamage !== shownDamage) {
-        this.shownDamage = shownDamage;
-        BlzFrameSetText(this.damage, shownDamage);
-      }
-      const shownPercent = percentText(damage);
-      if (this.shownPercent !== shownPercent) {
-        this.shownPercent = shownPercent;
-        BlzFrameSetText(this.percent, shownPercent);
-      }
+    if (stepJolt(this.jolt, visible, damage)) this.placeNumber(unitsForPixels(this.jolt.dx), unitsForPixels(this.jolt.dy));
+    this.showDamage(damage);
+    this.showStocks(visible ? stocks : 0);
+  }
+
+
+  private showDamage(damage: number): void {
+    if (this.shownDamageValue === damage) return;
+    this.shownDamageValue = damage;
+    const shownDamage = damageText(damage);
+    if (this.shownDamage !== shownDamage) {
+      this.shownDamage = shownDamage;
+      BlzFrameSetText(this.damage, shownDamage);
+      setOutlineText(this.damageOutline, damageOutlineText(damage));
     }
-    const shownStocks = visible ? stocks : 0;
+    const shownPercent = percentText(damage);
+    if (this.shownPercent !== shownPercent) {
+      this.shownPercent = shownPercent;
+      BlzFrameSetText(this.percent, shownPercent);
+      setOutlineText(this.percentOutline, percentOutlineText(damage));
+    }
+  }
+
+  private showStocks(shownStocks: number): void {
     if (this.shownStocks === shownStocks) return;
     this.shownStocks = shownStocks;
     const counted = shownStocks > STOCK_ICONS_SHOWN;
@@ -193,22 +211,6 @@ export class FighterHud {
     }
     BlzFrameSetVisible(this.stockCount, counted);
     BlzFrameSetText(this.stockCount, `x${I2S(shownStocks)}`);
-  }
-
-
-  private shake(visible: boolean, damage: number): void {
-    const added = damage - this.damageValue;
-    this.damageValue = damage;
-    const trembling = visible ? trembleStrength(damage) : 0.0;
-    if (visible && added > 0.0) {
-      this.shakeFrame = 0;
-      this.shakeStrength = shakeStrength(added);
-    } else if (this.shakeFrame >= SHAKE_FRAMES && trembling === 0.0) return;
-    else if (this.shakeFrame < SHAKE_FRAMES) this.shakeFrame++;
-    this.trembleFrame = trembling === 0.0 ? 0 : this.trembleFrame + 1;
-    const dx = shakeX(this.shakeStrength, this.shakeFrame) + trembleX(trembling, this.trembleFrame);
-    const dy = shakeY(this.shakeStrength, this.shakeFrame) + trembleY(trembling, this.trembleFrame);
-    this.placeNumber(unitsForPixels(dx), unitsForPixels(dy));
   }
 
   private placeNumber(dx: number, dy: number): void {

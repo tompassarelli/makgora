@@ -117,14 +117,20 @@ export function damageColour(damage: number): number {
 const HEX = "0123456789abcdef";
 const hexByte = (value: number) => `${HEX.charAt(idiv(value, 16))}${HEX.charAt(imod(value, 16))}`;
 
-const colourCode = (damage: number) => {
-  const colour = damageColour(damage);
-  return `|cff${hexByte(channel(colour, 65536))}${hexByte(channel(colour, 256))}${hexByte(channel(colour, 1))}`;
-};
+export const colourCode = (colour: number): string => `|cff${hexByte(channel(colour, 65536))}${hexByte(channel(colour, 256))}${hexByte(channel(colour, 1))}`;
 
-export const damageText = (damage: number): string => `${colourCode(damage)}${shownPercent(damage)}|r`;
+export const damageText = (damage: number): string => `${colourCode(damageColour(damage))}${shownPercent(damage)}|r`;
 
-export const percentText = (damage: number): string => `${colourCode(damage)}%|r`;
+export const percentText = (damage: number): string => `${colourCode(damageColour(damage))}%|r`;
+
+const OUTLINE_DARK = 0x0a0608;
+const OUTLINE_LIGHT = 0xffe8d8;
+
+export const damageOutline = (damage: number): number => shownPercent(damage) >= DAMAGE_DARK_FROM ? OUTLINE_LIGHT : OUTLINE_DARK;
+
+export const damageOutlineText = (damage: number): string => `${colourCode(damageOutline(damage))}${shownPercent(damage)}|r`;
+
+export const percentOutlineText = (damage: number): string => `${colourCode(damageOutline(damage))}%|r`;
 
 
 export const SHAKE_FRAMES = 14;
@@ -164,3 +170,31 @@ const tremble = (pattern: readonly number[], strength: number, frame: number): n
 
 export const trembleX = (strength: number, frame: number): number => tremble(TREMBLE_X, strength, frame);
 export const trembleY = (strength: number, frame: number): number => tremble(TREMBLE_Y, strength, frame);
+
+
+export interface NumberJolt {
+  damage: number;
+  shakeFrame: number;
+  shakeStrength: number;
+  trembleFrame: number;
+  dx: number;
+  dy: number;
+}
+
+export const numberJolt = (): NumberJolt => ({ damage: 0.0, shakeFrame: SHAKE_FRAMES, shakeStrength: 0.0, trembleFrame: 0, dx: 0.0, dy: 0.0 });
+
+
+export function stepJolt(jolt: NumberJolt, visible: boolean, damage: number): boolean {
+  const added = damage - jolt.damage;
+  jolt.damage = damage;
+  const trembling = visible ? trembleStrength(damage) : 0.0;
+  if (visible && added > 0.0) {
+    jolt.shakeFrame = 0;
+    jolt.shakeStrength = shakeStrength(added);
+  } else if (jolt.shakeFrame >= SHAKE_FRAMES && trembling === 0.0) return false;
+  else if (jolt.shakeFrame < SHAKE_FRAMES) jolt.shakeFrame++;
+  jolt.trembleFrame = trembling === 0.0 ? 0 : jolt.trembleFrame + 1;
+  jolt.dx = shakeX(jolt.shakeStrength, jolt.shakeFrame) + trembleX(trembling, jolt.trembleFrame);
+  jolt.dy = shakeY(jolt.shakeStrength, jolt.shakeFrame) + trembleY(trembling, jolt.trembleFrame);
+  return true;
+}

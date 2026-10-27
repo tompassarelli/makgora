@@ -25,6 +25,7 @@ import { TrainingReadout } from "../../game/ui/trainingReadout";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
 import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
+import { FighterMarker } from "../../game/ui/fighterMarker";
 import { ManaBar } from "../../game/ui/manaBar";
 import { MANA_BAR_HEIGHT_PX } from "../../game/ui/plateLayout";
 import { unitsForPixels } from "../../game/ui/portraitFrames";
@@ -75,6 +76,7 @@ export interface UiObjects {
   readonly training: TrainingReadout;
   readonly huds: Slots<FighterHud>;
   readonly bubbles: Slots<OffscreenBubble>;
+  markers: Slots<FighterMarker>;
   readonly escapeMeters: Slots<EscapeMeter>;
 
   manaBars: Slots<ManaBars>;
@@ -138,6 +140,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     training: new TrainingReadout(),
     huds: each(slot => new FighterHud(slot, 4)),
     bubbles: each(slot => new OffscreenBubble(slot)),
+    markers: each(slot => new FighterMarker(slot)),
     escapeMeters: each(slot => new EscapeMeter(slot)),
     manaBars: each(createManaBars),
     stage: new StagePanel(actions.stage, controls),
@@ -239,6 +242,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   const retainedDrops: { readonly drops?: MeterDropPresentation } = ui;
   if (retainedDrops.drops === undefined) ui.drops = new MeterDropPresentation(s.origin);
   else bindPrototype(ui.drops, MeterDropPresentation.prototype);
+  const retainedMarkers: { readonly markers?: Slots<FighterMarker> } = ui;
+  if (retainedMarkers.markers === undefined) ui.markers = each(slot => new FighterMarker(slot));
+  else for (const slot of PARTICIPANT_SLOTS) bindPrototype(ui.markers[slot], FighterMarker.prototype);
   bindPrototype(ui.clock, MatchClock.prototype);
   bindPrototype(ui.training, TrainingReadout.prototype);
   for (const slot of PARTICIPANT_SLOTS) {

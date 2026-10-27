@@ -36,7 +36,18 @@ function applyCandleSetup(fighter: Fighter, target: SetupTarget, prepare: () => 
   return true;
 }
 
-const SETUP_KINDS = ["percent", "lives", "candle"] as const;
+function applyBesideSetup(world: Roster, fighter: Fighter, target: SetupTarget, prepare: () => void): boolean {
+  const other = (target.value ?? 0) - 1;
+  if (`${target.value}` !== target.valueText || other === target.slot || !isParticipantSlot(other) || !isActive(world, other)) return false;
+  const beside = fighterAt(world, other);
+  if (beside.status.out) return false;
+  prepare();
+  fighter.motion.x = beside.motion.x;
+  fighter.motion.z = beside.motion.z;
+  return true;
+}
+
+const SETUP_KINDS = ["percent", "lives", "candle", "beside"] as const;
 
 export function applyFighterSetup(game: MatchState, world: Roster, message: string, prepare: () => void): string | undefined {
   const what = SETUP_KINDS.find(kind => message.startsWith(`-dev ${kind} `));
@@ -55,6 +66,8 @@ export function applyFighterSetup(game: MatchState, world: Roster, message: stri
     if (value === undefined || value < 1 || value > 99) return refused;
     prepare();
     fighter.status.stocks = value;
+  } else if (what === "beside") {
+    if (!applyBesideSetup(world, fighter, target, prepare)) return refused;
   } else if (!applyCandleSetup(fighter, target, prepare)) return refused;
   return `dev: player ${target.player} ${what} ${target.valueText}`;
 }

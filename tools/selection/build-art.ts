@@ -46,6 +46,7 @@ BunRuntime.runMain(Effect.gen(function*() {
     yield* render(`SelectionChipCPUP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: `P${slot + 1}` }, true);
     yield* render(`SelectionCard${color.name}`, 'SelectionCard.svg', { CARD_COLOR: hex(mix(color.rgb, 0x000000, 0.4)), CARD_EDGE: hex(mix(color.rgb, 0xffffff, 0.35)), CARD_METAL: '#bbc6cf' }, false);
     yield* render(`HudPlate${slot}`, 'HudPlate.svg', { PLAYER_COLOR: hex(color.rgb) }, true);
+    yield* render(`MarkerArrow${slot}`, 'MarkerArrow.svg', { ARROW_COLOR: hex(color.rgb) }, false);
     yield* run(['magick', join(output, `HudPlate${slot}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `HudPlateMirror${slot}.tga`)}`]);
   }
   const HAND_POSES = {

@@ -65,11 +65,13 @@ export function readEscapeMeter(world: Readonly<Roster>, slot: number, view: Esc
 }
 
 
-export function overheadAnchorZ(f: Readonly<Fighter>): number {
+export function standingTopZ(f: Readonly<Fighter>): number {
   let top = 0.0;
   for (const part of fighterHurtboxes(f).stand) top = Math.max(top, Math.max(part.z1, part.z2) + part.radius);
-  return f.motion.z + top + HEAD_CLEARANCE;
+  return f.motion.z + top;
 }
+
+export const overheadAnchorZ = (f: Readonly<Fighter>): number => standingTopZ(f) + HEAD_CLEARANCE;
 
 
 export function escapeMeterFill(view: Readonly<EscapeMeterView>): number {

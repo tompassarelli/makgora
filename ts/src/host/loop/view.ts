@@ -31,6 +31,7 @@ import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
 import { FRAME_SECONDS, type FighterPose } from "../../game/presentation/fighterPose";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
+import { presentFighterMarkers } from "./fighterMarkers";
 import { drawnScale, lavaPiece } from "../../game/presentation/stageScenery";
 import { hasLava, lavaSide } from "../../game/sim/lava";
 import type { Fighter } from "../../game/sim/fighter";
@@ -557,8 +558,12 @@ export function lockArenaCamera(s: ShellState): void {
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
     const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);
     views(s).escapeMeters[slot].update(meter, meterPoint.column, meterPoint.row, aspect);
+    ESCAPING[slot] = meter.shown;
   }
+  presentFighterMarkers(s, framing, aspect, ESCAPING);
 }
+
+const ESCAPING = [false, false, false, false];
 
 
 const BUBBLE_POINT: ScreenPoint = { column: 0.0, row: 0.0 };

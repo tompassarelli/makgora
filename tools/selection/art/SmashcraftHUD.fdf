@@ -8,3 +8,12 @@ Frame "TEXT" "SmashcraftDamage" {
     FontJustificationV JUSTIFYMIDDLE,
     Text "0.0%",
 }
+
+Frame "TEXT" "SmashcraftDamageOutline" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.036, "",
+    FontColor 1.0 1.0 1.0 1.0,
+    FontJustificationH JUSTIFYLEFT,
+    FontJustificationV JUSTIFYMIDDLE,
+    Text "0",
+}

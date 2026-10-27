@@ -1,0 +1,160 @@
+import { f32 } from "wisp/src/sim/f32";
+import { type NumberJolt, colourCode, damageOutlineText, damageText, numberJolt, percentOutlineText, percentText, stepJolt } from "./plateLayout";
+import { unitsForPixels } from "./portraitFrames";
+import { slotColor } from "./slotColors";
+import { createBackdrop, createText, consoleUi } from "./frames";
+import { MENU_FONT } from "./hudLayout";
+import { attachOutline, createOutline, setOutlineText } from "./textOutline";
+
+export const MARKER_WIDTH = unitsForPixels(220);
+export const MARKER_HEIGHT = unitsForPixels(170);
+export const MARKER_CLEARANCE = unitsForPixels(16);
+export const MARKER_NAME_LENGTH = 12;
+
+const ARROW_WIDTH_PX = 40;
+const ARROW_HEIGHT_PX = 40;
+const NAME_HEIGHT_PX = 40;
+const NUMBER_WIDTH_PX = 170;
+const NUMBER_HEIGHT_PX = 80;
+const PERCENT_WIDTH_PX = 40;
+const PERCENT_HEIGHT_PX = 44;
+const NUMBER_RIGHT_PX = 14;
+const NUMBER_FONT = f32(0.024);
+const PERCENT_FONT = f32(0.012);
+const NAME_FONT = f32(0.009);
+const OUTLINE_PX = 2;
+const LEVEL = 9;
+
+
+export const markerName = (human: boolean, playerName: string): string => human ? playerName.substring(0, MARKER_NAME_LENGTH) : "CPU";
+
+
+export function spreadMarkers(x: number[], y: readonly number[], shown: readonly boolean[]): void {
+  for (let pass = 0; pass < x.length; pass++) {
+    for (let left = 0; left < x.length; left++) {
+      for (let right = left + 1; right < x.length; right++) {
+        if (shown[left] !== true || shown[right] !== true) continue;
+        const a = x[left] ?? 0.0, b = x[right] ?? 0.0;
+        const gap = Math.abs(b - a);
+        if (gap >= MARKER_WIDTH || Math.abs((y[right] ?? 0.0) - (y[left] ?? 0.0)) >= MARKER_HEIGHT) continue;
+        const push = (MARKER_WIDTH - gap) / 2.0;
+        const sign = b >= a ? 1.0 : -1.0;
+        x[left] = a - push * sign;
+        x[right] = b + push * sign;
+      }
+    }
+  }
+}
+
+
+export class FighterMarker {
+  private readonly root: framehandle;
+  private readonly damageOutline: readonly framehandle[];
+  private readonly percentOutline: readonly framehandle[];
+  private readonly damage: framehandle;
+  private readonly percent: framehandle;
+  private readonly name: framehandle;
+  private readonly arrow: framehandle;
+  private readonly jolt: NumberJolt = numberJolt();
+  private shown = false;
+  private shownColor: number | undefined;
+  private shownHuman: boolean | undefined;
+  private playerName = "";
+  private shownDamage: string | undefined;
+  private shownPercent: string | undefined;
+  private shownDamageValue: number | undefined;
+  private shownX = -1.0;
+  private shownY = -1.0;
+
+  constructor(private readonly slot: number) {
+    const suffix = I2S(slot);
+    const context = 1200 + slot * 20;
+    this.root = BlzCreateFrameByType("FRAME", `FighterMarker${suffix}`, consoleUi(), "", context);
+    BlzFrameSetSize(this.root, MARKER_WIDTH, MARKER_HEIGHT);
+    BlzFrameSetLevel(this.root, LEVEL);
+    this.damageOutline = createOutline(`FighterMarkerDamage${suffix}`, this.root, context + 1, MENU_FONT, NUMBER_FONT, LEVEL);
+    this.percentOutline = createOutline(`FighterMarkerPercent${suffix}`, this.root, context + 2, MENU_FONT, PERCENT_FONT, LEVEL);
+    this.damage = this.text(`FighterMarkerDamage${suffix}`, context + 3, NUMBER_FONT, NUMBER_WIDTH_PX, NUMBER_HEIGHT_PX);
+    this.percent = this.text(`FighterMarkerPercent${suffix}`, context + 4, PERCENT_FONT, PERCENT_WIDTH_PX, PERCENT_HEIGHT_PX);
+    this.name = this.text(`FighterMarkerName${suffix}`, context + 5, NAME_FONT, 220, NAME_HEIGHT_PX);
+    this.arrow = createBackdrop(`FighterMarkerArrow${suffix}`, this.root, context + 6);
+    BlzFrameSetSize(this.arrow, unitsForPixels(ARROW_WIDTH_PX), unitsForPixels(ARROW_HEIGHT_PX));
+    BlzFrameSetEnable(this.arrow, false);
+    BlzFrameSetLevel(this.arrow, LEVEL);
+    BlzFrameSetPoint(this.arrow, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, 0.0);
+    BlzFrameSetPoint(this.name, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, unitsForPixels(ARROW_HEIGHT_PX));
+    BlzFrameSetTextAlignment(this.name, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_CENTER);
+    BlzFrameSetTextAlignment(this.damage, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+    BlzFrameSetTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    BlzFrameSetPoint(this.percent, FRAMEPOINT_BOTTOMLEFT, this.damage, FRAMEPOINT_BOTTOMRIGHT, 0.0, unitsForPixels(10));
+    this.placeNumber();
+    attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+    attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    BlzFrameSetVisible(this.root, false);
+  }
+
+  destroy(): void {
+    BlzDestroyFrame(this.root);
+  }
+
+
+  update(shown: boolean, color: number, human: boolean, damage: number, x: number, y: number): void {
+    if (this.shownHuman !== human) {
+      this.shownHuman = human;
+      this.playerName = markerName(human, GetPlayerName(Player(this.slot)));
+      this.shownColor = undefined;
+    }
+    if (shown !== this.shown) {
+      this.shown = shown;
+      BlzFrameSetVisible(this.root, shown);
+    }
+    const jolted = stepJolt(this.jolt, shown, damage);
+    if (!shown) return;
+    if (this.shownColor !== color) {
+      this.shownColor = color;
+      BlzFrameSetTexture(this.arrow, `war3mapImported\\MarkerArrow${I2S(color)}.tga`, 0, true);
+      BlzFrameSetText(this.name, `${colourCode(slotColor(color).rgb)}${this.playerName}|r`);
+    }
+    this.showDamage(damage);
+    const moved = x !== this.shownX || y !== this.shownY;
+    if (moved) {
+      this.shownX = x;
+      this.shownY = y;
+      BlzFrameSetAbsPoint(this.root, FRAMEPOINT_BOTTOM, x, y);
+    }
+    if (moved || jolted) this.placeNumber();
+  }
+
+
+  private showDamage(damage: number): void {
+    if (this.shownDamageValue === damage) return;
+    this.shownDamageValue = damage;
+    const shownDamage = damageText(damage);
+    if (this.shownDamage !== shownDamage) {
+      this.shownDamage = shownDamage;
+      BlzFrameSetText(this.damage, shownDamage);
+      setOutlineText(this.damageOutline, damageOutlineText(damage));
+    }
+    const shownPercent = percentText(damage);
+    if (this.shownPercent !== shownPercent) {
+      this.shownPercent = shownPercent;
+      BlzFrameSetText(this.percent, shownPercent);
+      setOutlineText(this.percentOutline, percentOutlineText(damage));
+    }
+  }
+
+  private placeNumber(): void {
+    const right = this.shownX + unitsForPixels(NUMBER_RIGHT_PX + this.jolt.dx);
+    const bottom = this.shownY + unitsForPixels(ARROW_HEIGHT_PX + NAME_HEIGHT_PX - this.jolt.dy);
+    BlzFrameSetAbsPoint(this.damage, FRAMEPOINT_BOTTOMRIGHT, right, bottom);
+  }
+
+  private text(name: string, context: number, size: number, width: number, height: number): framehandle {
+    const frame = createText(name, this.root, context);
+    BlzFrameSetFont(frame, MENU_FONT, size, 1);
+    BlzFrameSetSize(frame, unitsForPixels(width), unitsForPixels(height));
+    BlzFrameSetEnable(frame, false);
+    BlzFrameSetLevel(frame, LEVEL);
+    return frame;
+  }
+}

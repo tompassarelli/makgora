@@ -236,7 +236,8 @@ Release names and permission follow the root AGENTS.md.
 Developer setup uses the synchronized `-dev` chat channel in dev, integrity and
 native-driver builds. Player builds refuse it. Slots are 1–4; teams are 0–3.
 `-dev percent SLOT N` sets an active fighter to a whole percent from 0–999;
-`-dev lives SLOT N` sets its remaining stocks to 1–99.
+`-dev lives SLOT N` sets its remaining stocks to 1–99;
+`-dev beside SLOT OTHER` moves it onto another active fighter's position.
 `-dev candle SLOT LEVEL` sets Kobold's held candle to level 0–3 (with heat
 headroom for a one-second capture); `-dev candle SLOT drop` starts the ordinary
 loose-candle simulation, including kick, snuff, pickup and timed relight.

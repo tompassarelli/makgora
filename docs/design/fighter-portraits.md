@@ -122,7 +122,21 @@ render clock only). The mana bar fills the track under the percent, the name
 sits on the strip under it, and the stock row under the name shows one 38 px
 head render per remaining stock, as Rivals does: up to five, then one icon and
 the count. smashcraft:ts/src/game/ui/plateLayout.ts holds every box in plate
-pixels.
+pixels. The number and its percent sign carry a 2-pixel outline, dark around
+the light colours and light from 150%, so the dark reds stay readable on the
+plate and on dark stages.
+
+## Overhead marker
+
+Above each fighter in a match, as in Rivals, a marker repeats the whole percent
+in the HUD's colour, outline and tremble, the player's name (the Warcraft
+player name, or CPU) in the slot colour under it, and a slot-colour triangle
+(`MarkerArrow`) pointing down at the fighter. It sits a fixed 16 reference
+pixels above the top of the fighter's standing hurtbox (higher while an escape
+meter shows), follows the fighter every rendered frame, hides while the fighter
+is offscreen, out, or the match is paused, and two markers that would overlap
+are pushed apart sideways (smashcraft:ts/src/game/ui/fighterMarker.ts). It reads
+simulation state and never writes it.
 
 ## Slot colours
 
