@@ -207,6 +207,7 @@ export const pairRestartFile = (directory: string): string => join(directory, "p
 
 export interface PairControl {
   readonly status: Effect.Effect<PairStatus | undefined>;
+  readonly listed: Effect.Effect<boolean>;
   readonly stop: Effect.Effect<void, CommandFailure, Platform>;
   readonly start: (profile: string | undefined) => Effect.Effect<void, CommandFailure, Platform>;
   readonly every: Duration.Input;
@@ -225,6 +226,7 @@ const stopHolder = (pair: number) => Effect.gen(function*() {
 
 const livePairControl = (pair: number): PairControl => ({
   status: pairStatus(pair),
+  listed: readPool.pipe(Effect.map(pool => pool?.pairs.some(({ id }) => id === pair) ?? false), Effect.orElseSucceed(() => false)),
   stop: stopHolder(pair),
   start: (profile) => poolStart(["--pair", String(pair), ...(profile === undefined ? [] : ["--pool-profile", profile])]),
   every: "2 seconds",
@@ -237,10 +239,11 @@ export const restartPair = (pair: number, control: PairControl) => Effect.gen(fu
   yield* Console.log(`${pairDropText(found.drop)}; restarting the pair`);
   yield* control.stop;
   yield* control.start(found.profile);
-  yield* pollUntil(control.status.pipe(Effect.map(status => pairNeedsRestart(status) ? undefined : status)), {
+  const back = Effect.all([control.status, control.listed]);
+  yield* pollUntil(back.pipe(Effect.map(([status, listed]) => pairNeedsRestart(status) || !listed ? undefined : status)), {
     every: control.every,
     within: control.within,
-    orElse: () => control.status.pipe(Effect.flatMap(status => Effect.fail(new LanFailure({ problem: `pair ${pair} wasn't back after its restart: ${status === undefined ? "its agent doesn't answer" : status.clients.filter(({ pid }) => pid === undefined).map(({ name }) => name).join(" and ") + " not running"}` })))),
+    orElse: () => back.pipe(Effect.flatMap(([status]) => Effect.fail(new LanFailure({ problem: `pair ${pair} wasn't back after its restart: ${status === undefined ? "its agent doesn't answer" : pairNeedsRestart(status) ? status.clients.filter(({ pid }) => pid === undefined).map(({ name }) => name).join(" and ") + " not running" : "the pool hasn't listed it"}` })))),
   });
   yield* Console.log(`pair ${pair} is back`);
   return found.drop;
