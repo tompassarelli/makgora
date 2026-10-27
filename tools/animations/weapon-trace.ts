@@ -54,13 +54,11 @@ function rigWeapons(model: DrawnModel, character: Character): Weapon[] {
 function edgeAt(model: DrawnModel, weapon: Weapon, seconds: number): Edge {
   const posed = model.posed(0, seconds, 1);
   const hand: Point = [posed.nodes[weapon.hand * 2] ?? 0, posed.nodes[weapon.hand * 2 + 1] ?? 0];
-  let tip = hand, grip = hand, far = -1, near = Infinity;
-  for (const index of weapon.vertices) {
-    const point: Point = [posed.vertices[index * 2] ?? 0, posed.vertices[index * 2 + 1] ?? 0];
-    const distance = Math.hypot(point[0] - hand[0], point[1] - hand[1]);
-    if (distance > far) { far = distance; tip = point; }
-    if (distance < near) { near = distance; grip = point; }
-  }
+  const points = weapon.vertices.map((index): Point => [posed.vertices[index * 2] ?? 0, posed.vertices[index * 2 + 1] ?? 0]);
+  const farthestFrom = (from: Point) => points.reduce((far, point) => Math.hypot(point[0] - from[0], point[1] - from[1]) > Math.hypot(far[0] - from[0], far[1] - from[1]) ? point : far, from);
+  const tip = farthestFrom(hand), other = farthestFrom(tip);
+  if (Math.hypot(other[0] - hand[0], other[1] - hand[1]) > GAP_LIMIT) return { grip: other, tip };
+  const grip = points.reduce((near, point) => Math.hypot(point[0] - hand[0], point[1] - hand[1]) < Math.hypot(near[0] - hand[0], near[1] - hand[1]) ? point : near, hand);
   return { grip, tip };
 }
 

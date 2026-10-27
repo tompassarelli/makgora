@@ -323,7 +323,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 - Weapon against hit regions (from the repository root): `bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX]`
   traces each armed fighter's weapon (its rig's weapon bone) through every active frame of every
   move and fails a move whose weapon tip leaves that frame's hit regions, or whose region's far end
-  lies away from everywhere the weapon goes during the move, by more than 20 units; limb strikes and
+  lies away from everywhere the weapon goes during the move, by more than 20 units; a weapon held
+  more than 20 units from the hand on both sides (a staff) counts as its full length; limb strikes and
   spell effects (`LIMB_STRIKES` and `SPELL_STRIKES` in ts/scripts/wisp/animScoreSample.ts) are
   reported, not failed. It writes build/anim-score/classic-weapons.tsv worst first.
   `--shift` moves one region of one move by DX units for a mutant run (#508).
