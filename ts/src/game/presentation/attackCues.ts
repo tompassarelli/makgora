@@ -23,7 +23,7 @@ export interface AttackCue {
   readonly cue: Cue;
 }
 
-const SHEAR: readonly AttackCue[] = [{ name: "Shear", fromActive: 0, cue: timed(cue("Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdx", f32(0.8)), "stand", f32(0.3)) }];
+const SHEAR: readonly AttackCue[] = [{ name: "Shear", fromActive: 0, cue: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", f32(0.9)), "stand", 0.0) }];
 
 export const ATTACK_CUES: { readonly [character: number]: { readonly [style: number]: readonly AttackCue[] } } = {
   [Character.blademaster]: {

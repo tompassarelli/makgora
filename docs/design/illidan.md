@@ -474,7 +474,7 @@ attackCues.ts and elementLooks.ts):
 | Fel Rush (frames 6–15) | Illidan's Metamorphosis missile trail |
 | Vengeful Retreat | Possession missile trailing the vault |
 | Chaos Strike (ground and air) | Moon Glaive whirl |
-| Shear (forward tilt, all angles) | Demon Bolt impact where the glaive cuts |
+| Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
 | Fel Lunge (forward smash) | Illidan's Metamorphosis missile trail |
 | Eye Blast windup / beam | Metamorphosis missile over his eyes and small green dragon flames along the floor / green dragon fire, each floor flame growing as the beam reaches it |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |
@@ -486,7 +486,7 @@ of these names the sequence it starts and starts where its model already
 draws, read from the model's keys (game archives, 7 Oct): Death Coil special
 art's only Stand bursts 0.3–0.6 s, so the tell starts at 0.3 s; Flame Strike's
 Birth reaches its full fire at 1.3 s and its Stand draws nothing, so the fire
-wall starts at 1.3 s into Birth; Demon Bolt impact and Mana Burn target draw
+wall starts at 1.3 s into Birth; Mana Burn target draws
 nothing before 0.23 s and start at 0.3 s; Breath of Fire missile and Volcano
 death have only a Birth, drawn 0–0.5 s; the missiles and Moon Glaive draw
 from 0 s. smashcraft:ts/src/game/presentation/illidanCues.tests.ts holds the
