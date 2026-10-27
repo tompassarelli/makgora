@@ -209,10 +209,10 @@ Maiev's down tilt (`warden` in the scorer) ships with line 5 at 3 on the take
 judged at clip 917cde7f: the judge medians on readability, weight, anticipation
 and follow-through are 3, and character is 4. Tom accepted it as judged on
 2026-10-26 (north gate 74), with no further takes (#517, landed as cc50b28aba).
-On origin/main the move no longer scores that way: `bun wisp anim score
---fighter warden` gives 3/4, because line 2 fails at end error 0.05, jump 0.06
-(against .055) and overshoot 0.09, and line 5 is unjudged since the clip changed
-in d9de93cf15 (#507). The regression is tracked as #608.
+On origin/main `bun wisp anim score --fighter warden` gives it 4/5: line 1
+passes (limb 0.86), line 2 passes at end error 0.00, jump 0.05 and overshoot
+0.04, lines 3 and 4 pass (fill 1.00, contrast 0.70), and line 5 fails at 3.00
+from 3 of 3 judges.
 
 Blademaster's forward air ships below the bar on lines 1, 2 and 5, not only on
 line 5. It retimes the stock Attack Slam onto the forward-air clip, with the

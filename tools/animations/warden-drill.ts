@@ -1,5 +1,5 @@
-import { chmodSync, cpSync, mkdirSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { basename, join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
@@ -9,6 +9,7 @@ import { heroDefinition } from "../../ts/src/game/roster/kits";
 import { WARDEN_BODY } from "../../ts/src/game/fighters/warden/moves";
 import { encodeVerified, ensure, parseSource } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
+import { INPUTS_STORE, readPins } from "../../ts/scripts/wisp/buildInputs";
 
 const [input, output] = process.argv.slice(2).map(p => resolve(p));
 const project = resolve(import.meta.dir, "../..");
@@ -17,6 +18,7 @@ mkdirSync(output, { recursive: true });
 cpSync(join(input, "hero-models"), join(output, "hero-models"), { recursive: true, dereference: true });
 chmodSync(join(output, "hero-models"), 0o755);
 
+const PRISTINE_DRILL = "251d4228e26996f30ff70249791ca029eac6153ddf488117acaf6a89ff044445";
 const TILT = 30;
 const TURNS = 2;
 type Quat = Float32Array<ArrayBuffer>;
@@ -44,7 +46,11 @@ const sample = (keys: readonly mdx.AnimKeyframe[], frame: number): Quat => {
 
 const fighter = fighters.get(Character.warden)!, move = heroDefinition(Character.warden)?.moves.normals[AttackStyle.downAir];
 ensure(fighter && move, "missing Warden down air");
-const source = parseSource(await Bun.file(join(input, fighter.source)).arrayBuffer());
+const sourceBytes = await Bun.file(join(input, fighter.source)).arrayBuffer();
+const shard = readPins()["hero-models"];
+const pinned = join(INPUTS_STORE, "hero-models", typeof shard === "object" ? shard.warden ?? "" : "", basename(fighter.source));
+ensure(existsSync(pinned) && Buffer.from(sourceBytes).equals(readFileSync(pinned)), `${join(input, fighter.source)} is not this checkout's pinned Warden model; rebuild from the pinned assets (bun wisp inputs path assets)`);
+const source = parseSource(sourceBytes);
 const model = structuredClone(source);
 const index = model.Sequences.findIndex(s => s.Name === "Drill Down Air");
 ensure(index >= 0, "Warden has no Drill Down Air clip to re-author");
@@ -53,6 +59,16 @@ const frames = move.totalFrames, first = move.startupFrames, last = first + move
 ensure(Math.round(frames * 1000 / 60) === end - start, "Drill Down Air length no longer matches the move");
 const at = (frame: number) => Math.round(start + frame * 1000 / 60);
 const nodes = [...model.Bones, ...model.Helpers];
+const pristine = parseSource(await Bun.file(join(INPUTS_STORE, "hero-models", PRISTINE_DRILL, basename(fighter.source))).arrayBuffer());
+for (const node of nodes) {
+  const original = [...pristine.Bones, ...pristine.Helpers].find(n => n.Name === node.Name);
+  for (const track of ["Translation", "Rotation", "Scaling"] as const) {
+    const target = node[track], from = original?.[track];
+    if (!target || !from) continue;
+    const inside = (k: mdx.AnimKeyframe) => k.Frame >= start && k.Frame <= end;
+    target.Keys = [...target.Keys.filter(k => k.Frame < start), ...from.Keys.filter(inside), ...target.Keys.filter(k => k.Frame > end)];
+  }
+}
 const named = (name: string) => { const node = nodes.find(n => n.Name === name); ensure(node, `missing ${name}`); return node; };
 const pivot = (node: mdx.Node) => Array.from(model.PivotPoints[node.ObjectId] ?? [0, 0, 0]);
 

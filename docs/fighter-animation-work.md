@@ -1192,7 +1192,12 @@ exporter reuses the exact retained source prefix and exports just the three
 new sequences. Native playback decides their final appearance.
 
 Warden's drill is then re-authored in place by
-smashcraft:tools/animations/warden-drill.ts as Maiev's Fox-style drill (#507),
+smashcraft:tools/animations/warden-drill.ts, which refuses any SHIPPED_ASSETS
+whose Warden model is not the checkout's pinned one (`bun wisp inputs path
+assets`) and restores the pristine drill keys from the pre-#507 pin before
+re-authoring, so it changes only Drill Down Air whatever take the pin holds
+(#608: a run over stale assets reverted her down tilt, back air, Pursuit Lunge
+and victory), as Maiev's Fox-style drill (#507),
 matching her down air's hit regions on the line 30 degrees off vertical toward
 her facing. The spin pivots on her body line, so her feet stay on that line
 while she turns; nothing pulses per turn, since a pulse on the arms, hips or
