@@ -3,6 +3,10 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { CARRY_THROW_GAP, produceComputerInput } from "../../match/botPlay";
 import { createBufferedFrameControls, createFrameControls } from "../../match/controls";
+import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../../match/frameInput";
+import { clipFor } from "../../presentation/fighterClips";
+import { originalClipNamed } from "../../../generated/clips/fighterOriginalClipInfo";
+import { peonLook } from "./look";
 import { createPacingAndPresentation } from "../../match/pacingAndPresentation";
 import { stepMatch } from "../../match/step";
 import { Phase, createMatchState } from "../../lobby/lobbyState";
@@ -264,4 +268,35 @@ test("Peon says his Work, work line exactly once for a grab carried and thrown, 
     assertEquals(target.grab.owner, undefined);
     assertEquals(spoken, character === Character.peon ? 1 : 0);
   }
+});
+
+test("Carrying, Peon draws his look's carry stand clip while still and its carry walk clip while walking, through the match frame pipeline [k1 scenario]", () => {
+  const peon = createFighter(Character.peon, 0.0, 1);
+  const target = createFighter(Character.rifleman, GAP, -1);
+  const match = createMatchState();
+  match.phase = Phase.match;
+  match.timeLimitMinutes = 0;
+  const world = createRoster(3, [peon, target]);
+  const frameControls = createFrameControls();
+  const runtime = createPacingAndPresentation();
+  const produced = createFrameControls();
+  const row = createMatchFrameInput();
+  const step = (input: Readonly<Controls>): number => {
+    const frame = runtime.simulationFrame + 1;
+    copyControls(produced.inputs[0], input);
+    copyControls(produced.inputs[1], idle);
+    assertTrue(captureFrame(row, frame, world.mask, produced, runtime) && executeMatchFrame(row, match, world, frameControls, runtime, frame));
+    const pose = runtime.poses[0]!;
+    return pose.clipIndex ?? originalClipNamed(Character.peon, pose.clipName) ?? -1;
+  };
+  for (let frame = 0; frame < 3; frame++) step(idle);
+  testBeginAttacks(world, AttackStyle.grab, undefined);
+  let shown = -1;
+  for (let frame = 0; frame < 60 && peon.grab.action !== GrabAction.carry; frame++) shown = step(idle);
+  shown = step(idle);
+  assertEquals(peon.grab.action, GrabAction.carry);
+  assertEquals(shown, clipFor(Character.peon, peonLook.carry!.stand).index);
+  for (let frame = 0; frame < 6; frame++) shown = step(controls({ direction: 1 }));
+  assertGreaterThan(peon.motion.vx, 0.0);
+  assertEquals(shown, clipFor(Character.peon, peonLook.carry!.walk).index);
 });

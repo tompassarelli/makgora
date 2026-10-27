@@ -15,5 +15,5 @@ export const peonLook: HeroLook = {
   followUpClips: { neutralSpecialFollowUp: SACK_BONKS, neutralSpecialFollowUpAir: SACK_BONKS },
   damageClips: PEON_PAIN_CLIPS,
   fallback: PEON_FALLBACK_CLIP, defeat: "death",
-  carry: { stand: "stand lumber", walk: "walk lumber" },
+  carry: { stand: "grabHold", walk: "walk" },
 };

@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { AttackStyle } from "../../sim/codes";
-import type { CommandGrabClips, HeroClip, HeroClipTable, HeroFollowUpPose } from "../../sim/heroes/hero";
+import type { CommandGrabClips, HeroClip, HeroClipTable, HeroFollowUpPose, HeroPose } from "../../sim/heroes/hero";
 
 export interface HeroLook {
 
@@ -35,8 +35,8 @@ export interface HeroLook {
 }
 
 export interface CarryLook {
-  readonly stand: string;
-  readonly walk: string;
+  readonly stand: HeroPose;
+  readonly walk: HeroPose;
 }
 
 export interface OrbitLook {

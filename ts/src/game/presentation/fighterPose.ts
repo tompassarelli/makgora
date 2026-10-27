@@ -394,7 +394,7 @@ function selectGrabClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly
   const key = `grab${action}:${serial}${victim ? ":victim" : carryWalking ? ":carryWalk" : ":holder"}`;
   if (pose.animation !== key) {
     if (illidanEscape) selectFighterClipIndex(pose, dh.DEMON_HUNTER_GRAB_ESCAPE_INDEX);
-    else if (carryLook !== undefined) selectFighterClipName(pose, carryWalking ? carryLook.walk : carryLook.stand);
+    else if (carryLook !== undefined) selectFighterClipIndex(pose, clips.clipFor(f.character, carryWalking ? carryLook.walk : carryLook.stand).index);
     else if (action === GrabAction.escape) {
 
       const stance = clips.characterClips(f.character).idle;
