@@ -2,6 +2,7 @@
 
 
 import { join } from "node:path";
+import { LIMB_STRIKES } from "./animStrikeKinds";
 import { originalClip, originalClipNames } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
@@ -78,24 +79,6 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
   ["leg", "^bone back {S} leg(01)?$", "^bone (back {S} toe|toe {S})\\s*$"],
   ["foreleg", "^bone front {S} leg(01)?$", "^bone front ?{S} toe(01)?$"],
 ];
-
-export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
-  "shadow-hunter": ["jab", "forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"],
-  thrall: ["back-air", "down-tilt", "forward-tilt-down", "down-smash", "down-air", "dash-attack"],
-  illidan: ["down-tilt", "down-smash"],
-  warden: ["down-tilt", "down-smash", "down-air", "down-special"],
-  "cairne-bloodhoof": ["down-special"],
-  "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
-  "mountain-king": ["down-air"],
-  "chen-stormstout": ["jab", "jab3", "up-tilt", "down-tilt", "dash-attack", "up-smash", "neutral-air", "forward-air", "back-air", "down-air"],
-};
-
-export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
-  "mountain-king": ["down-special", "ultimate"],
-  thrall: ["neutral-special", "down-special"],
-  "chen-stormstout": ["neutral-special", "ultimate"],
-  "pit-lord": ["neutral-special", "up-special"],
-};
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
 
