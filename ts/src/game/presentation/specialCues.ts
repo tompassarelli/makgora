@@ -416,8 +416,9 @@ export interface HeroBranchCues {
 }
 
 const branch = (spell: string, startup: Cue, active: Cue): MoveCues => ({ spell, startup, active });
-// A flat stomp ring read as a streak ahead of him on every dive line (#577), so the dive trails lightning instead.
-const HAMMERFALL_CUES: MoveCues = { ...branch("Hammerfall", STORM, STORM), trail: true };
+// A flat stomp ring read as a streak ahead of him on every dive line (#577), so the dive trails lightning instead, and the glow sits on his body because the hammer in his hand leads the dive.
+const HAMMERFALL_GLOW = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "body", f32(0.8));
+const HAMMERFALL_CUES: MoveCues = { ...branch("Hammerfall", HAMMERFALL_GLOW, HAMMERFALL_GLOW), trail: true };
 
 
 export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: HeroBranchCues } } = {
