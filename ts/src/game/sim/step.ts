@@ -42,7 +42,7 @@ import {
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
 import { heroEgg, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
-import { carryHeroStatus } from "./heroStatus";
+import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { hopHeroStatus } from "./hexHop";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpOrAttackBranch } from "./specials";
@@ -646,8 +646,8 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     }
     if (drill?.speedZ !== undefined) motion.vz = drill.speedZ;
     else if (egg !== undefined) motion.vz = -egg.fallSpeed;
-    else if (motion.fastFalling) motion.vz = -heavyFall(f, physics.fastFallSpeed);
-    else applyMeleeGravity(f);
+    else if (motion.fastFalling) motion.vz = -heavyFall(f, f32(physics.fastFallSpeed * heroStatusFall(f)));
+    else applyMeleeGravity(f, heroStatusFall(f));
   }
   moveMeleeVerticalVelocity(f);
   moveMeleeZ(f, divideFloat32(launch.knockbackZ, WORLD_UNITS_PER_MELEE_UNIT));

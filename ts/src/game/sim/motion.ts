@@ -137,10 +137,11 @@ export function termsOfPhysics(physics: Readonly<FighterPhysics>): PhysicsTerms 
 
 const GROUND_KNOCKBACK_FRICTION_MULTIPLIER = 1.0;
 
-export function applyMeleeGravity(f: Fighter): void {
+export function applyMeleeGravity(f: Fighter, share = 1.0): void {
   const velocity = retainedOriginal(f.motion.meleeVelocityZ, f.motion.vz);
   const { gravity, terminalSpeed: terminal } = termsOfPhysics(f.tuning.physics);
-  setMeleeVerticalVelocity(f, max(-heavyFall(f, terminal), subtractFloat32(velocity, heavyFall(f, gravity))));
+  const shared = (value: number): number => share === 1.0 || velocity > 0.0 ? value : multiplyFloat32(value, share);
+  setMeleeVerticalVelocity(f, max(-heavyFall(f, shared(terminal)), subtractFloat32(velocity, heavyFall(f, shared(gravity)))));
 }
 
 export function moveMeleeVerticalVelocity(f: Fighter): void {

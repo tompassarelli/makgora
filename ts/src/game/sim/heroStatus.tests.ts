@@ -1,21 +1,21 @@
-import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertGreaterThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { queueAttack } from "../input/attackBuffer";
 import { Phase, createMatchState } from "../lobby/lobbyState";
 import { createBufferedFrameControls } from "../match/controls";
 import { stepMatch } from "../match/step";
-import { AttackStyle, Character, GrabAction, HeroStatusKind, SpecialAction } from "./codes";
-import { BANISH_SPELL_DAMAGE } from "./contacts";
+import { AttackStyle, Character, ContactKind, GrabAction, HeroStatusGroup, HeroStatusKind, LedgeState, SpecialAction } from "./codes";
+import { BANISH_SPELL_DAMAGE, queueDamageContact } from "./contacts";
 import { type Fighter, createFighter } from "./fighter";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import { BANISH } from "../fighters/kaelthas/specials";
 import { HEX } from "../fighters/shadow-hunter/specials";
-import { applyHeroStatus } from "./heroStatus";
+import { type AppliedStatus, DISABLED_FALL, applyHeroStatus } from "./heroStatus";
 import { traitMove } from "./identityTraits";
-import { type Controls, copyControls, createRoster } from "./roster";
+import { type Controls, type Roster, copyControls, createRoster } from "./roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZ } from "./stage";
 import { lift } from "./testDuel";
-import { controls } from "./testWorld";
+import { contactBatch, controls, hitEffect } from "./testWorld";
 
 const H = HERO_REFERENCE_HEIGHT;
 const FAR = f32(H * f32(6.0));
@@ -23,6 +23,7 @@ const CLOSE = f32(H * f32(0.4));
 const SWEEP = f32(H * f32(0.6));
 
 interface Bout {
+  readonly world: Roster;
   readonly first: Fighter;
   readonly second: Fighter;
   readonly step: (this: void, first?: Readonly<Controls>, attack?: AttackStyle, second?: Readonly<Controls>) => void;
@@ -44,7 +45,7 @@ function bout(first: Character, second: Character, gap: number): Bout {
     stepMatch(game, world, frameControls, frame);
   };
   for (let settle = 0; settle < 3; settle++) step();
-  return { first: a, second: b, step };
+  return { world, first: a, second: b, step };
 }
 
 function run(b: Bout, frames: number, input?: Readonly<Controls>, attack?: AttackStyle, watch: () => void = () => {}): void {
@@ -277,4 +278,78 @@ test("A fighter hexed in the air falls with a held stick steering nothing, and m
   const mashed = hexed(controls({ grabMashPressed: true }));
   assertTrue(mashed.frames < HEX.frames);
   assertGreaterThan(mashed.frames, 35);
+});
+
+const SLEEP: AppliedStatus = { kind: HeroStatusKind.sleep, frames: 160, group: HeroStatusGroup.sleep, immunityFrames: 240 };
+const OFFSTAGE_X = f32(mainDeckRight(0) + 120.0);
+const RECOVER_UP = controls({ specialPressed: true, specialZ: 1, direction: -1, verticalDirection: 1 });
+const RECOVER_HOLD = controls({ direction: -1, verticalDirection: 1 });
+
+interface Disabled {
+  readonly drop: number;
+  readonly frames: number;
+  readonly fastest: number;
+  readonly recovered: boolean;
+}
+
+/** A median-fall Shadow Hunter with jumps spent is disabled at ledge height just off the main deck, then presses its up special as the status ends. */
+function disabledOffstage(status: Readonly<AppliedStatus> | undefined, waitFrames: number): Disabled {
+  const b = bout(Character.shadowHunter, Character.rifleman, f32(-H * f32(12.0)));
+  const { first } = b;
+  lift(first, mainDeckZ(0));
+  first.motion.x = OFFSTAGE_X;
+  first.facing = -1;
+  first.jump.remaining = 0;
+  const stocks = first.status.stocks;
+  if (status !== undefined) applyHeroStatus(first, status);
+  let frames = 0;
+  let fastest = 0.0;
+  let drop = 0.0;
+  while (frames < waitFrames && first.status.stocks === stocks && (status === undefined || first.status.condition !== HeroStatusKind.none || frames === 0)) {
+    b.step();
+    frames++;
+    fastest = Math.max(fastest, -first.motion.vz);
+    drop = Math.max(drop, f32(mainDeckZ(0) - first.motion.z));
+  }
+  b.step(RECOVER_UP);
+  let recovered = false;
+  for (let frame = 0; frame < 240 && first.status.stocks === stocks && !recovered; frame++) {
+    b.step(RECOVER_HOLD);
+    recovered = first.ledge.state === LedgeState.hang || first.motion.grounded;
+  }
+  return { drop, frames, fastest, recovered };
+}
+
+test("A fighter Hexed for 140 frames or Slept for 160 frames at ledge height just off the main deck falls at DISABLED_FALL of its max fall speed and, waking, reaches the ledge with its up special, where an unslowed fall of the same frames cannot [k3 measure docs/gameplay-design.md]", () => {
+  const { terminalSpeed } = createFighter(Character.shadowHunter, 0.0, 1).tuning.physics;
+  for (const status of [HEX, SLEEP]) {
+    const slowed = disabledOffstage(status, status.frames + 20);
+    assertEquals(slowed.frames, status.frames);
+    assertNear(slowed.fastest, f32(terminalSpeed * DISABLED_FALL), f32(0.001));
+    assertTrue(slowed.recovered);
+    const unslowed = disabledOffstage(undefined, status.frames);
+    assertGreaterThan(unslowed.drop, slowed.drop * 2.0);
+    assertTrue(!unslowed.recovered);
+  }
+});
+
+function struckWhile(status: Readonly<AppliedStatus> | undefined): number[] {
+  const b = bout(Character.shadowHunter, Character.rifleman, f32(-H * f32(12.0)));
+  const { first, step, world } = b;
+  lift(first, f32(mainDeckZ(0) + f32(H * f32(8.0))));
+  first.motion.x = 0.0;
+  if (status !== undefined) applyHeroStatus(first, status);
+  contactBatch(world, () => queueDamageContact(world, 1, 0, hitEffect(18.0, 100.0, 60.0, 0.0, 1.0), 1, ContactKind.launch, true, undefined));
+  const path: number[] = [];
+  for (let frame = 0; frame < 40 && first.launch.hitstun > 0; frame++) {
+    step();
+    path.push(first.motion.z);
+  }
+  return path;
+}
+
+test("A fighter struck while Hexed or Slept is launched and falls at its full gravity through hitstun, as an unstatused fighter struck the same way does [k1 scenario]", () => {
+  const plain = struckWhile(undefined);
+  assertGreaterThan(plain.length, 3);
+  for (const status of [HEX, SLEEP]) assertEquals(struckWhile(status).join(","), plain.join(","));
 });

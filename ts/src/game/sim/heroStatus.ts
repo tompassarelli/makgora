@@ -43,18 +43,24 @@ interface StatusRules {
 
   /** Helpless hops on the ground: every `every` frames, `run` of walk speed sideways and `rise` of a short hop up. */
   readonly hop?: { readonly every: number; readonly run: number; readonly rise: number } | undefined;
+
+  /** Share of the fighter's gravity and max fall speed while the status holds out of hitstun: the disabled fighter floats down. */
+  readonly fall?: number | undefined;
 }
+
+/** A Hexed or Sleeping fighter falls at a tenth of its gravity and max fall speed: held to the 140-frame Hex and 160-frame Sleep, a median faller still reaches the ledge with its up special (docs/gameplay-design.md). */
+export const DISABLED_FALL = 0.10000000149011612;
 
 const RULES: { readonly [kind: number]: StatusRules | undefined } = {
   [HeroStatusKind.root]: { blocksActions: false, blocksSpecials: false, endsOnDamage: true },
   [HeroStatusKind.silence]: { blocksActions: false, blocksSpecials: true, endsOnDamage: false },
   [HeroStatusKind.banish]: { blocksActions: false, blocksSpecials: false, blocksAttacks: true, ethereal: true, endsOnDamage: false },
 
-  [HeroStatusKind.sleep]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 24 },
+  [HeroStatusKind.sleep]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 24, fall: DISABLED_FALL },
 
 
   [HeroStatusKind.hex]: { blocksActions: true, blocksSpecials: true, blocksAttacks: true, endsOnDamage: false, mashMinimum: 36,
-    keepsHitReactions: true, hop: { every: 30, run: 0.5, rise: 0.5 } },
+    keepsHitReactions: true, hop: { every: 30, run: 0.5, rise: 0.5 }, fall: DISABLED_FALL },
 
   [HeroStatusKind.chill]: { blocksActions: false, blocksSpecials: false, endsOnDamage: false },
   [HeroStatusKind.stun]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
@@ -228,6 +234,12 @@ export function carryHeroStatus(f: Fighter): boolean {
     f.jump.remaining = min(f.jump.remaining, aerialJumps(f));
   }
   return true;
+}
+
+
+export function heroStatusFall(f: Readonly<Fighter>): number {
+  const fall = rules(f)?.fall;
+  return fall === undefined || f.launch.hitstun > 0 ? 1.0 : fall;
 }
 
 

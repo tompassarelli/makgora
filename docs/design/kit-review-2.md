@@ -207,7 +207,9 @@ long and contested:
 
 - A grounded fighter it hits sleeps **160 frames** (2026-10-27: one second longer, so a landed orb pays for the close-in read; it was 70 here and 100 in the kit); an airborne one sleeps
   just as long: the short air sleep (24 frames) is removed by Tom's 2026-10-27
-  correction that sleep has no air special case.
+  correction that sleep has no air special case. Instead the airborne sleeper falls at a tenth of its gravity and
+  max fall speed for the full 160 frames (Tom, 2026-10-27), so the long sleep off-stage still leaves a ledge recovery after waking; the shared
+  status rule and its measurement are in gameplay-design.md "Disabled fall".
 - The sleeper **mashes out** with the grab and freeze rule
   (smashcraft:ts/src/game/sim/mash.ts): each press or new stick direction
   takes 8 frames off, never waking before frame 24. Any damaging hit wakes
@@ -262,6 +264,8 @@ Warcraft's critter can still run. The victim **mashes** out with the shared
 rule, never before frame 20; 240 frames of immunity afterwards. Shadow
 Hunter's window is real (no challenges), the victim's answer is real (run,
 shield, mash). Counterplay: jump or shield the orb; powershield reflects it.
+
+Update (Tom, 2026-10-27, after #521 made Hex a full control loss): a fighter hexed in the air floats down at a tenth of its gravity and max fall speed, so the 140 frames are a punish window and not a free KO off-stage; the shared status rule and its measurement are in gameplay-design.md "Disabled fall".
 
 **Rejected: Healing Wave on the glaive.** Forsaken Paladin owns the returning heal
 (Holy Light); two returning heals would blur both identities.

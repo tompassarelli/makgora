@@ -4,12 +4,13 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { DownState } from "./codes";
 import { inGrabContext } from "./conditions";
 import type { Fighter } from "./fighter";
-import { heroStatusHop } from "./heroStatus";
+import { heroStatusFall, heroStatusHop } from "./heroStatus";
 import { aerialJumps } from "./itemBuffs";
 import { surfaceLeft, surfaceRight } from "./stage";
 
 // Same scramble as the match's item draws: its prime's square fits Lua32 integers, so draws are exact in every runtime.
 const HOP_PRIME = 46337;
+const HOP_DESCENT_LIMIT = 240;
 
 function scramble(value: number): number {
   const square = floorMod(value * value + 12345, HOP_PRIME);
@@ -22,6 +23,23 @@ function hopSide(slot: number, frame: number, left: number): number {
   return floorMod(floorDiv(scramble(mixed), 3), 2) === 0 ? -1 : 1;
 }
 
+/** Frames a hop launched at `rise` spends in the air: the climb at full gravity, then the descent at the status's share of gravity and max fall speed. */
+function hopAirFrames(f: Readonly<Fighter>, rise: number): number {
+  const { gravity, terminalSpeed } = f.tuning.physics;
+  const climb = f32(rise / gravity);
+  const apex = f32(f32(rise * climb) * 0.5);
+  const share = heroStatusFall(f);
+  const pull = f32(gravity * share);
+  const cap = f32(terminalSpeed * share);
+  let speed = 0.0, fallen = 0.0, frames = 0;
+  while (fallen < apex && frames < HOP_DESCENT_LIMIT) {
+    speed = min(cap, f32(speed + pull));
+    fallen = f32(fallen + speed);
+    frames++;
+  }
+  return f32(climb + frames);
+}
+
 /** Starts a status's helpless hop on its beat; a hop that would land past its deck's edge turns back, and with no room either way it hops in place. */
 export function hopHeroStatus(f: Fighter, slot: number, stage: number, frame: number): void {
   const hop = heroStatusHop(f);
@@ -31,7 +49,7 @@ export function hopHeroStatus(f: Fighter, slot: number, stage: number, frame: nu
   const physics = f.tuning.physics;
   const run = f32(physics.walkSpeed * hop.run);
   const rise = f32(physics.shortJumpSpeed * hop.rise);
-  const reach = f32(run * f32(f32(rise * 2.0) / physics.gravity));
+  const reach = f32(run * hopAirFrames(f, rise));
   const deck = motion.surface ?? 0;
   const fits = (side: number): boolean => {
     const x = f32(motion.x + f32(side * reach));

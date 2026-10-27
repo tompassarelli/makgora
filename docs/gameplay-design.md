@@ -2576,6 +2576,12 @@ controller input. `GAME_TESTS=edgeRecovery bun test test/game.test.ts` checks
 wall rides, Blink lip outcomes and descending up-special catches. The farm
 sweeps check every fighter's envelope and all eight aims against the stage.
 
+### Disabled fall
+
+Tom, 2026-10-27: a fighter helpless in the air floats down. Hex (140 frames) and Sleep (160 frames) carry one `fall` share on their status rules (smashcraft:ts/src/game/sim/heroStatus.ts, `DISABLED_FALL`): while the status holds and the fighter is out of hitstun, gravity and max fall speed (and a fast fall already under way) are that share of the fighter's own, and only while descending, so a ground Hex hop climbs as before. A hit puts full gravity back until hitstun ends, and the status ending restores it at once; the state is derived from the status and hitstun, so snapshots hold nothing new. Presentation reads the sim's position, so the float is what is drawn.
+
+Measured from `heroStatus.tests.ts`: a median faller (every fighter on the default hero physics, gravity 1.38 and max fall 16.8 world units a frame; Shadow Hunter stands for them) with jumps spent, disabled at ledge height 120 units off the main deck's right edge, then pressing its up special toward the stage as the status ends. Unslowed it passes the blast zone (830 below the deck) by frame 55. At a tenth it falls 226 units in Hex's 140 frames and 259 in Sleep's 160, at most 1.68 a frame, and catches the ledge. Up-special-only depth from the same start (jumps spent, best of three aims; 8-unit search): Shadow Hunter 398, the median of the 21 default-physics fighters 437, range 187 (Warden, Jaina) to 546; so 259 is inside every measured depth but Warden's and Jaina's. Shadow Hunter's recovery fails at a share of about 0.135 (Sleep binds), so a tenth leaves a margin; an eighth passes with little.
+
 ### Edge-guarding and gimps (#387)
 
 Delegated by Tom, 9 Oct (#387), within Melee precedent. Prior art:
