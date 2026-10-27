@@ -117,37 +117,37 @@ function region(
 
 
 const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = {
-  [AttackStyle.jab]: region(0.0, 92.0, -55.0, 105.0, 5.0, 100.0, 18.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
-  [AttackStyle.jab2]: region(0.0, 96.0, -50.0, 100.0, 4.0, 30.0, 22.0, 0.3420201539993286, 0.9396926164627075),
+  [AttackStyle.jab]: { ...region(27.0, 106.0, 76.0, 152.0, 5.0, 100.0, 18.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 41.0, z1: 90.0, x2: 92.0, z2: 138.0, radius: 14.0 } },
+  [AttackStyle.jab2]: { ...region(27.0, 106.0, 76.0, 152.0, 4.0, 30.0, 22.0, 0.3420201539993286, 0.9396926164627075), strike: { x1: 41.0, z1: 90.0, x2: 92.0, z2: 138.0, radius: 14.0 } },
   [AttackStyle.upSmash]: { ...region(-21.0, 31.0, 74.0, 196.0, 15.0, 94.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 5.0, z1: 100.0, x2: 5.0, z2: 170.0, radius: 26.0 } },
-  [AttackStyle.forwardSmash]: region(25.0, 120.0, -75.0, 105.0, 10.0, 85.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
+  [AttackStyle.forwardSmash]: { ...region(3.0, 71.0, 88.0, 172.0, 10.0, 85.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: 57.0, z1: 102.0, x2: 17.0, z2: 158.0, radius: 14.0 } },
 
   [AttackStyle.demonHunterDashAttack]: { ...region(37.0, 78.0, 37.0, 158.0, 9.0, 95.0, 20.0, 0.5, 0.8660253882408142), strike: { x1: 55.0, z1: 55.0, x2: 60.0, z2: 140.0, radius: 18.0 } },
 
-  [AttackStyle.forwardTilt]: region(0.0, 135.0, -80.0, 95.0, 8.0, 80.0, 20.0, 0.9063078165054321, 0.4226182699203491),
+  [AttackStyle.forwardTilt]: { ...region(61.0, 154.0, 67.0, 104.0, 8.0, 80.0, 20.0, 0.9063078165054321, 0.4226182699203491), strike: { x1: 75.0, z1: 81.0, x2: 140.0, z2: 90.0, radius: 14.0 } },
   [AttackStyle.upTilt]: { ...region(-22.0, 62.0, 14.0, 191.0, 8.0, 20.0, 83.0, 0.1736481785774231, 0.9848077297210693), strike: { x1: 30.0, z1: 40.0, x2: 10.0, z2: 165.0, radius: 26.0 } },
   [AttackStyle.downTilt]: { ...region(-97.0, 132.0, -2.0, 52.0, 7.0, 20.0, 83.0, 0.1736481785774231, 0.9848077297210693), strike: { x1: -75.0, z1: 30.0, x2: 110.0, z2: 20.0, radius: 22.0 } },
-  [AttackStyle.forwardTiltUp]: { ...region(11.0, 92.0, 91.0, 194.0, 8.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394), strike: { x1: 25.0, z1: 105.0, x2: 78.0, z2: 180.0, radius: 14.0 } },
+  [AttackStyle.forwardTiltUp]: { ...region(39.0, 82.0, 133.0, 228.0, 8.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394), strike: { x1: 53.0, z1: 147.0, x2: 68.0, z2: 214.0, radius: 14.0 } },
   [AttackStyle.forwardTiltDown]: { ...region(19.0, 134.0, -11.0, 78.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394), strike: { x1: 35.0, z1: 62.0, x2: 118.0, z2: 5.0, radius: 16.0 } },
-  [AttackStyle.neutralAir]: region(-115.0, 115.0, -45.0, 100.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
-  [AttackStyle.forwardAir]: region(0.0, 175.0, -55.0, 115.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787),
-  [AttackStyle.backAir]: { ...region(-99.0, 4.0, 76.0, 114.0, 13.0, 100.0, 10.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: -85.0, z1: 100.0, x2: -10.0, z2: 90.0, radius: 14.0 } },
+  [AttackStyle.neutralAir]: { ...region(-41.0, 10.0, 57.0, 139.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: -4.0, z1: 125.0, x2: -27.0, z2: 71.0, radius: 14.0 } },
+  [AttackStyle.forwardAir]: { ...region(4.0, 76.0, 86.0, 171.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787), strike: { x1: 62.0, z1: 100.0, x2: 18.0, z2: 157.0, radius: 14.0 } },
+  [AttackStyle.backAir]: { ...region(-52.0, 35.0, 88.0, 147.0, 13.0, 100.0, 10.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: 21.0, z1: 133.0, x2: -38.0, z2: 102.0, radius: 14.0 } },
   [AttackStyle.upAir]: { ...region(-55.0, 55.0, 15.0, 215.0, 8.0, 70.0, 50.0, 0.2199999988079071, 0.9750000238418579), strike: { x1: 0.0, z1: 70.0, x2: 0.0, z2: 160.0, radius: 55.0 } },
-  [AttackStyle.downAir]: { ...region(-16.0, 22.0, -33.0, 48.0, 9.0, 100.0, 20.0, 0.1599999964237213, -0.9869999885559082), strike: { x1: 2.0, z1: 30.0, x2: 4.0, z2: -15.0, radius: 18.0 } },
+  [AttackStyle.downAir]: { ...region(24.0, 79.0, 57.0, 149.0, 9.0, 100.0, 20.0, 0.1599999964237213, -0.9869999885559082), strike: { x1: 38.0, z1: 71.0, x2: 65.0, z2: 135.0, radius: 14.0 } },
 };
 
 
 
 
 export const DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES = 4;
-const FORWARD_AIR_LINK = { ...region(-4.0, 94.0, 66.0, 94.0, 2.0, 10.0, 30.0, -0.258819043636322, 0.9659258127212524), strike: { x1: 10.0, z1: 80.0, x2: 80.0, z2: 80.0, radius: 14.0 } };
-const FORWARD_AIR_LAUNCH = { ...region(-9.0, 84.0, 61.0, 89.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2), strike: { x1: 5.0, z1: 75.0, x2: 70.0, z2: 75.0, radius: 14.0 } };
+const FORWARD_AIR_LINK = { ...region(4.0, 76.0, 86.0, 171.0, 2.0, 10.0, 30.0, -0.258819043636322, 0.9659258127212524), strike: { x1: 62.0, z1: 100.0, x2: 18.0, z2: 157.0, radius: 14.0 } };
+const FORWARD_AIR_LAUNCH = { ...region(6.0, 70.0, 86.0, 175.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2), strike: { x1: 56.0, z1: 100.0, x2: 20.0, z2: 161.0, radius: 14.0 } };
 const NEUTRAL_AIR_CLEAN = { ...DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION, effect: strongHit((DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION).effect) };
 const NEUTRAL_AIR_LATE = { ...NEUTRAL_AIR_CLEAN, effect: weakHit(NEUTRAL_AIR_CLEAN.effect) };
 const JAB3_EFFECT = region(0.0, 0.0, 0.0, 0.0, 6.0, 95.0, 22.0, 0.7660444378852844, 0.6427876353263855);
-const JAB3_RISE = { ...JAB3_EFFECT, minX: 39.0, maxX: 126.0, minZ: 29.0, maxZ: 126.0, strike: { x1: 55.0, z1: 45.0, x2: 110.0, z2: 110.0, radius: 16.0 } };
-const JAB3_CREST = { ...JAB3_EFFECT, minX: -16.0, maxX: 96.0, minZ: 119.0, maxZ: 176.0, strike: { x1: 0.0, z1: 160.0, x2: 80.0, z2: 135.0, radius: 16.0 } };
-const JAB3_OVERHEAD = { ...JAB3_EFFECT, minX: -42.0, maxX: -8.0, minZ: 86.0, maxZ: 204.0, strike: { x1: -28.0, z1: 100.0, x2: -22.0, z2: 190.0, radius: 14.0 } };
+const JAB3_RISE = { ...JAB3_EFFECT, minX: -34.0, maxX: 58.0, minZ: 70.0, maxZ: 108.0, strike: { x1: -20.0, z1: 84.0, x2: 44.0, z2: 94.0, radius: 14.0 } };
+const JAB3_CREST = { ...JAB3_EFFECT, minX: -32.0, maxX: 54.0, minZ: 54.0, maxZ: 108.0, strike: { x1: -18.0, z1: 68.0, x2: 40.0, z2: 94.0, radius: 14.0 } };
+const JAB3_OVERHEAD = { ...JAB3_EFFECT, minX: 0.0, maxX: 68.0, minZ: 55.0, maxZ: 142.0, strike: { x1: 14.0, z1: 69.0, x2: 54.0, z2: 128.0, radius: 14.0 } };
 
 
 
