@@ -14,9 +14,9 @@ const thrust = (ends: readonly (readonly [number, number, number])[], angle: Ang
 const spin = (damage: number, angle: Angle, growth: number, base: number) => groundHit(damage, angle, growth, base, SH);
 export const SHADOW_HUNTER_GROUND: GroundKit = {
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(4, 2, 12, 0, swing(4, [[16.0, 44.0, 85.0, 44.0], [18.0, 46.0, 85.0, 46.0]], 7.0, groundHit(2.9700000286102295, 35, 50.0, 16.0, HitElement.normal)))),
-    [AttackStyle.jab2]: jabStep(heroMove(4, 2, 13, 0, swing(4, [[16.0, 48.0, 88.0, 48.0], [18.0, 48.0, 88.0, 44.0]], 7.0, groundHit(2.9700000286102295, 60, 30.0, 26.0, HitElement.normal)))),
-    [AttackStyle.jab3]: heroMove(6, 3, 18, 0, swing(6, [[18.0, 40.0, 100.0, 52.0], [18.0, 46.0, 104.0, 46.0], [18.0, 40.0, 100.0, 40.0]], 7.0, groundHit(4.949999809265137, 40, 90.0, 22.0, SH))),
+    [AttackStyle.jab]: jabStep(heroMove(4, 2, 12, 0, swing(4, [[18.0, 62.0, 66.0, 67.0], [18.0, 62.0, 70.0, 66.0]], 7.0, groundHit(2.9700000286102295, 35, 50.0, 16.0, HitElement.normal)))),
+    [AttackStyle.jab2]: jabStep(heroMove(4, 2, 13, 0, swing(4, [[16.0, 40.0, 84.0, 14.0], [16.0, 42.0, 81.0, 15.0]], 7.0, groundHit(2.9700000286102295, 60, 30.0, 26.0, HitElement.normal)))),
+    [AttackStyle.jab3]: heroMove(6, 3, 18, 0, swing(6, [[18.0, 49.0, 104.0, 78.0], [18.0, 50.0, 104.0, 83.0], [18.0, 49.0, 103.0, 89.0]], 7.0, groundHit(4.949999809265137, 40, 90.0, 22.0, SH))),
     [AttackStyle.forwardTilt]: tipperMove(heroMove(9, 2, 19, 0, thrust([[50.0, 151.0, 52.0], [50.0, 151.0, 48.0]], 35)), 0.30000001192092896),
     [AttackStyle.forwardTiltUp]: heroMove(9, 2, 21, 0, thrust([[56.0, 130.0, 120.0], [56.0, 138.0, 110.0]], 55)),
     [AttackStyle.forwardTiltDown]: heroMove(9, 2, 21, 0, thrust([[40.0, 145.0, -10.0], [38.0, 151.0, -20.0]], 15)),
@@ -40,7 +40,6 @@ export const SHADOW_HUNTER_GROUND: GroundKit = {
 
 const S = f32(HERO_REFERENCE_HEIGHT * f32(0.55));
 const M = f32(HERO_REFERENCE_HEIGHT * f32(0.80));
-const L = f32(HERO_REFERENCE_HEIGHT * f32(1.10));
 const BLADE_RADIUS = 7.0;
 
 
@@ -59,11 +58,6 @@ export const hit = makeHit({
 
 
 const capsule = capsuleOf(BLADE_RADIUS);
-
-
-function chop(first: number, heights: readonly number[], reach: number, effect: Readonly<HitEffect>): readonly MoveRegion[] {
-  return path(first, heights.map(z => capsule(20.0, 45.0, f32(reach - BLADE_RADIUS), z)), effect);
-}
 
 
 
@@ -130,12 +124,12 @@ export const SHADOW_HUNTER_MOVES: FighterMoves = {
   hurtboxes: SHADOW_HUNTER_BODY,
   normals: {
     ...SHADOW_HUNTER_GROUND.normals,
-    [AttackStyle.forwardSmash]: heroMove(19, 3, 34, 0, chop(19, [85.0, 45.0, 5.0], L, hit(15.760541915893555, "KILL", 40))),
+    [AttackStyle.forwardSmash]: heroMove(19, 3, 34, 0, path(19, [capsule(20.0, 45.0, 146.0, 106.0), capsule(20.0, 45.0, 166.0, 71.0), capsule(20.0, 45.0, 160.0, 31.0)], hit(15.760541915893555, "KILL", 40))),
     [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, path(17, [
-      capsule(10.0, 36.0, 18.0, f32(L - BLADE_RADIUS)),
-      capsule(5.0, 36.0, 9.0, f32(L - BLADE_RADIUS)),
-      capsule(0.0, 36.0, 0.0, f32(L - BLADE_RADIUS)),
-      capsule(-5.0, 36.0, -9.0, f32(L - BLADE_RADIUS)),
+      capsule(4.0, 98.0, 20.0, 176.0),
+      capsule(6.0, 96.0, 30.0, 172.0),
+      capsule(9.0, 95.0, 39.0, 167.0),
+      capsule(12.0, 93.0, 47.0, 162.0),
     ], hit(13.133785247802734, "KILL", 90, 1.0, HitElement.normal))),
     [AttackStyle.downSmash]: heroMove(16, 5, 21, 0, [
       ...path(16, [
@@ -150,26 +144,26 @@ export const SHADOW_HUNTER_MOVES: FighterMoves = {
     ]),
     [AttackStyle.neutralAir]: heroMove(7, 5, 21, 13, [
       ...path(7, [
-        capsule(18.0, 32.0, f32(M - BLADE_RADIUS), 32.0),
-        capsule(12.0, 50.0, 60.0, 85.0),
-        capsule(0.0, 52.0, 0.0, f32(M - BLADE_RADIUS)),
+        capsule(18.0, 57.0, 124.0, 52.0),
+        capsule(-6.0, 53.0, 69.0, 53.0),
       ], hit(7.004685401916504, "POKE", 50)),
-      ...path(10, [
-        capsule(-12.0, 50.0, -60.0, 85.0),
-        capsule(-18.0, 32.0, -f32(M - BLADE_RADIUS), 32.0),
+      ...path(9, [
+        capsule(-50.0, 53.0, -2.0, 54.0),
+        capsule(-48.0, 52.0, -48.0, 13.0),
+        capsule(-31.0, 52.0, -82.0, 54.0),
       ], hit(7.004685401916504, "POKE", 50, -1.0)),
     ]),
-    [AttackStyle.forwardAir]: heroMove(10, 3, 25, 15, chop(10, [55.0, 35.0, 15.0], 100.0, hit(9.63144302368164, "EDGE", 40))),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 25, 15, path(10, [capsule(20.0, 24.0, 102.0, 8.0), capsule(20.0, 25.0, 102.0, 7.0), capsule(20.0, 25.0, 102.0, 7.0)], hit(9.63144302368164, "EDGE", 40))),
 
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, path(8, [
-      capsule(-12.0, 24.0, -f32(M - 12.0), 30.0, 12.0),
-      capsule(-12.0, 28.0, -f32(M - 12.0), 42.0, 12.0),
-      capsule(-12.0, 30.0, -f32(M - 12.0), 54.0, 12.0),
+      capsule(-24.0, 57.0, -116.0, 35.0, 12.0),
+      capsule(-24.0, 59.0, -124.0, 39.0, 12.0),
+      capsule(-24.0, 59.0, -128.0, 38.0, 12.0),
     ], hit(8.755857467651367, "EDGE", 35, -1.0, HitElement.normal))),
     [AttackStyle.upAir]: heroMove(7, 3, 21, 12, path(7, [
-      capsule(8.0, 50.0, 18.0, f32(M - BLADE_RADIUS)),
-      capsule(0.0, 50.0, 0.0, f32(M - BLADE_RADIUS)),
-      capsule(-8.0, 50.0, -18.0, f32(M - BLADE_RADIUS)),
+      capsule(7.0, 95.0, 27.0, 160.0),
+      capsule(13.0, 90.0, 46.0, 149.0),
+      capsule(18.0, 85.0, 60.0, 135.0),
     ], hit(7.004685401916504, "LAUNCH", 85))),
     [AttackStyle.downAir]: GLAIVE_DRILL,
     [AttackStyle.grab]: heroMove(8, 2, 24, 0, [heroRegion(8, 9,
