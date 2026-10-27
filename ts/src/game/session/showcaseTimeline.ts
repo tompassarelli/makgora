@@ -5,7 +5,7 @@ import { authoredTuning } from "../sim/tuning";
 import { heroDefinition } from "../roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../sim/moves";
 import { specialKit } from "../sim/specials/schema";
-import { heroCueWindows } from "../presentation/specialCues";
+import { heroCueWindows } from "../presentation/cueWindows";
 
 export const SHOWCASE_FIRST_FRAME = 40;
 export const SHOWCASE_SPECIAL_SLOTS: readonly string[] = ["neutral_b", "side_b", "up_b", "down_b"];

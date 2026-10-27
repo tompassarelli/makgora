@@ -7,7 +7,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
-import { type AuthoredSpecial, FOLLOW_UP_FORM, type FrameWindow, SpecialForm } from "../sim/specials/schema";
+import { type AuthoredSpecial, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
+import { ACTIVE_CUE_FRAMES, type CueWindows, heroCueWindows } from "./cueWindows";
 import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { commandGrabHolding } from "../sim/specials/commandGrabLock";
@@ -109,9 +110,6 @@ export interface Cue {
   /** When its move ends early, the cue keeps playing where it stood until this many frames after it first showed (presentation/cueLinger.ts). */
   readonly lingerFrames?: number | undefined;
 }
-
-export const ACTIVE_CUE_FRAMES = 18;
-
 
 export const timed = (cue: Cue, sequence: string, seconds: number): Cue => ({ ...cue, sequence, seconds });
 
@@ -495,45 +493,6 @@ export const ORIGINAL_BRANCH_CUES: { readonly [action: number]: { readonly [form
     [RIFLEMAN_SECOND_SHOT_FORM]: { cues: branch("Second recoil shot", cue("Abilities\\Spells\\Human\\FlakCannons\\FlakTarget.mdx", "feet", f32(0.8)), cue("Abilities\\Weapons\\SteamTank\\SteamTankImpact.mdx", "feet", f32(0.8))), first: RIFLEMAN_SECOND_SHOT_FIRST, last: RIFLEMAN_SECOND_SHOT_LAST },
   },
 };
-
-
-export interface CueWindows {
-  readonly startup: FrameWindow;
-  readonly active: FrameWindow;
-}
-
-const widen = (window: { first: number; last: number }, first: number, last: number): void => {
-  window.first = Math.min(window.first, first);
-  window.last = Math.max(window.last, last);
-};
-
-
-
-
-
-
-export function heroCueWindows(move: Readonly<AuthoredSpecial>, minimumActive = ACTIVE_CUE_FRAMES): CueWindows {
-
-  const active = { first: 1000000, last: 0 };
-
-  for (const region of move.regions ?? []) widen(active, region.firstFrame + 1, region.lastFrame + 1);
-  for (const projectile of move.projectiles ?? []) widen(active, projectile.spawnFrame, projectile.spawnFrame);
-  for (const segment of move.motion ?? []) {
-    if (segment.velocityX !== 0 || segment.velocityZ !== 0 || (segment.aimedSpeed ?? 0) !== 0
-      || (segment.driftSpeed ?? 0) !== 0 || segment.relocate !== undefined) widen(active, segment.first, segment.last);
-  }
-  if (move.placement !== undefined) widen(active, move.placement.frame, move.placement.frame);
-  if (move.burst !== undefined) widen(active, move.burst.frame, move.burst.frame);
-  if (move.ritual !== undefined) widen(active, move.ritual.frame, move.ritual.frame);
-  if (move.commandGrab !== undefined) widen(active, move.commandGrab.first, move.commandGrab.last);
-  if (move.guard !== undefined) widen(active, move.guard.first, move.guard.last);
-  if (move.intangible !== undefined) widen(active, move.intangible.first, move.intangible.last);
-
-  if (move.armor !== undefined) widen(active, move.armor.first, move.armor.shell === true ? move.armor.first : move.armor.last);
-  if (active.last === 0) widen(active, 1, 1);
-  const first = Math.max(1, active.first);
-  return { startup: { first: 1, last: Math.max(1, first - 1) }, active: { first, last: Math.min(move.endFrame, Math.max(active.last, first + minimumActive - 1)) } };
-}
 
 
 function originalActiveFrame(action: number, grounded: boolean): number {

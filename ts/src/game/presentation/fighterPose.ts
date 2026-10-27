@@ -24,7 +24,7 @@ import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion"
 import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
-import { heroCueWindows } from "./specialCues";
+import { heroCueWindows } from "./cueWindows";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { heroLook } from "../roster/looks";
 import {

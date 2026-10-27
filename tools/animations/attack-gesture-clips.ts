@@ -12,7 +12,7 @@ import { wardenSpinTipDegrees } from "../../ts/src/game/fighters/warden/spin";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames } from "../../ts/src/game/sim/moves";
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
-import { heroCueWindows } from "../../ts/src/game/presentation/specialCues";
+import { heroCueWindows } from "../../ts/src/game/presentation/cueWindows";
 import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
