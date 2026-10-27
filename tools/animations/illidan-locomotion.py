@@ -63,12 +63,30 @@ def limb(side, kind, target, pole):
     aim(upper, elbow, joint)
     aim(lower, end.matrix.translation.copy(), pivot + axis*length)
 
-def foot(phase, span, lift, side, center=0):
+def foot(phase, span, lift, side, center=0, stance=.5):
     phase %= 1
-
-    x = span*(1 - 4*phase) if phase < .5 else -span*cos((phase - .5)*2*pi)
-    z = 23 + (lift*sin((phase - .5)*2*pi) if phase >= .5 else 0)
+    if phase < stance:
+        x = span*(1 - 2*phase/stance)
+        z = 23
+    else:
+        u = (phase - stance)/(1 - stance)
+        x = -span*cos(u*pi)
+        z = 23 + lift*sin(u*pi)
     return Vector((center + x, -15 if side == 'R' else 15, z))
+
+def smooth(t):
+    t = min(max(t, 0), 1)
+    return t*t*(3 - 2*t)
+
+def sole_pitch(phase, stance):
+    phase %= 1
+    if phase < stance:
+        w = phase/stance
+        return HEEL_STRIKE*(1 - smooth(w/.2)) - TOE_OFF*smooth((w - .65)/.35)
+    u = (phase - stance)/(1 - stance)
+    return -TOE_OFF*(1 - smooth(u/.35)) + HEEL_STRIKE*smooth((u - .5)/.5)
+
+WALK_SPAN, WALK_STANCE, WALK_CROUCH, HEEL_STRIKE, TOE_OFF = 62, .54, 15, 14, 24
 
 def pose(kind, frame, frames):
     for name, matrix in base.items():
@@ -76,8 +94,8 @@ def pose(kind, frame, frames):
     bpy.context.view_layer.update()
     phase = frame/frames
     running = kind != 'Walk'
-    lean = 19 if running else 5
-    crouch = 9 + 2*sin(phase*4*pi) if running else 8 + 1.5*sin(phase*4*pi)
+    lean = 19 if running else 0
+    crouch = 9 + 2*sin(phase*4*pi) if running else WALK_CROUCH + 1.5*sin(phase*4*pi)
     if kind == 'Initial Dash Burst':
         lean = 10 + 17*sin(min(1, phase*2)*pi/2)
         crouch = 13 - 5*phase
@@ -90,13 +108,13 @@ def pose(kind, frame, frames):
     hips = 0 if running else sum(rig.pose.bones[f'Bone_Leg1_{side}'].matrix.translation.x for side in 'RL')/2
     for side, offset in [('R', 0), ('L', .5)]:
         p = phase + offset
-        limb(side, 'leg', foot(p, 40 if running else 50, 36 if running else 14, side, hips), Vector((hips + 80, -15 if side == 'R' else 15, 65)))
+        limb(side, 'leg', foot(p, 40 if running else WALK_SPAN, 36 if running else 14, side, hips, .5 if running else WALK_STANCE), Vector((hips + 80, -15 if side == 'R' else 15, 65)))
         swing = sin(p*2*pi)
         if running: limb(side, 'arm', Vector((-20 + 15*swing, -28 if side == 'R' else 28, 82 + 5*swing)), Vector((-15, -70 if side == 'R' else 70, 90)))
         else:
-            rotate(f'Bone_Arm1_{side}', 10*cos(p*2*pi))
+            rotate(f'Bone_Arm1_{side}', 16*cos(p*2*pi))
             sole = rig.pose.bones[f'Bone_Foot_{side}']
-            sole.matrix = Matrix.Translation(sole.matrix.translation) @ flat[side]
+            sole.matrix = Matrix.Translation(sole.matrix.translation) @ Quaternion(Vector((0, 1, 0)), radians(-sole_pitch(p, WALK_STANCE))).to_matrix().to_4x4() @ flat[side]
     bpy.context.view_layer.update()
 
 for kind, frames in [('Walk', 60), ('Run', 36), ('Initial Dash Burst', 10)]:
