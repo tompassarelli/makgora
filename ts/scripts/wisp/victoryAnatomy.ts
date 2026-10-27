@@ -1,7 +1,7 @@
 export type Point = readonly [number, number, number];
 
-/** One arm's joint pivots in world space, and its elbow's hinge axis as carried by the upper arm from the stand pose. */
-export interface ArmPose { readonly shoulder: Point; readonly elbow: Point; readonly hand: Point; readonly hinge: Point }
+/** One arm's joint pivots in world space, its elbow's hinge axis as carried by the upper arm from the stand pose, and how far its shoulder seam has opened: the tenth-percentile growth, in shoulder widths, of the distance from each arm vertex beside the shoulder to its nearest torso vertex in the stand pose. */
+export interface ArmPose { readonly shoulder: Point; readonly elbow: Point; readonly hand: Point; readonly hinge: Point; readonly seam: number }
 export interface BodyPose { readonly pelvis: Point; readonly arms: readonly [ArmPose, ArmPose] }
 export interface PoseSample { readonly frame: number; readonly pose: BodyPose }
 /** `excess` is how far past its limit a finding lies, in degrees or percentage points, so a search can descend toward a whole body. */
@@ -11,6 +11,7 @@ export const ELBOW_FLEX_DEGREES = [-10, 155] as const;
 export const ELBOW_OFF_HINGE_DEGREES = 65;
 export const BONE_LENGTH_SHARE = 0.08;
 export const TORSO_RADIUS_SHARE = 0.3;
+export const SEAM_OPENING_SHARE = 0.3;
 
 const sub = (a: Point, b: Point): Point => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a: Point, b: Point) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -37,10 +38,10 @@ function segmentDistance(p: Point, a: Point, b: Point): number {
     return length(sub(p, [a[0] + ab[0] * t, a[1] + ab[1] * t, a[2] + ab[2] * t]));
 }
 
-/** The limits are set so every stock Blizzard victory clip in the roster passes (#496). Every way a sampled clip bends a body past what one can: each elbow a hinge within its human range, bone lengths held, and elbows and hands kept outside the torso, the pelvis-to-shoulders line. A `margin` tightens the elbow limits by that many degrees and the torso's by that many percentage points. */
+/** The limits are set so every stock Blizzard victory clip in the roster passes (#496). Every way a sampled clip bends a body past what one can: each elbow a hinge within its human range, bone lengths held, elbows and hands kept outside the torso, the pelvis-to-shoulders line, and each upper arm kept in its shoulder, its seam with the torso closed. A `margin` tightens the elbow limits by that many degrees and the torso and seam limits by that many percentage points. */
 export function anatomyFindings(rest: BodyPose, samples: readonly PoseSample[], margin = 0): AnatomyFinding[] {
     const findings: AnatomyFinding[] = [];
-    const [backward, folded, offLimit, lengthLimit, torsoLimit] = [ELBOW_FLEX_DEGREES[0] + margin, ELBOW_FLEX_DEGREES[1] - margin, ELBOW_OFF_HINGE_DEGREES - margin, BONE_LENGTH_SHARE, TORSO_RADIUS_SHARE + margin / 100];
+    const [backward, folded, offLimit, lengthLimit, torsoLimit, seamLimit] = [ELBOW_FLEX_DEGREES[0] + margin, ELBOW_FLEX_DEGREES[1] - margin, ELBOW_OFF_HINGE_DEGREES - margin, BONE_LENGTH_SHARE, TORSO_RADIUS_SHARE + margin / 100, SEAM_OPENING_SHARE - margin / 100];
     const span = length(sub(rest.arms[0].shoulder, rest.arms[1].shoulder));
     for (const { frame, pose } of samples) for (const side of [0, 1] as const) {
         const arm = pose.arms[side], at = rest.arms[side];
@@ -54,6 +55,7 @@ export function anatomyFindings(rest: BodyPose, samples: readonly PoseSample[], 
             const share = length(sub(to, from)) / length(sub(restTo, restFrom)) - 1;
             if (Math.abs(share) > lengthLimit) add(joint, 'changes bone length', share, 100 * (Math.abs(share) - lengthLimit));
         }
+        if (arm.seam > seamLimit) add('shoulder', 'leaves its socket', arm.seam, 100 * (arm.seam - seamLimit));
         for (const joint of ['elbow', 'hand'] as const) {
             const inside = segmentDistance(arm[joint], pose.pelvis, midpoint(pose.arms[0].shoulder, pose.arms[1].shoulder)) / span;
             if (inside < torsoLimit) add(joint, 'passes through the torso', inside, 100 * (torsoLimit - inside));

@@ -128,8 +128,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `--views` renders only the listed views; `--views classic-poses` skips the UI view, which under software GL is what keeps a full 26-fighter round inside five minutes.
   `bun tools/animations/victory-anatomy.ts` (from ts/) samples every selectable fighter's shipped victory every third frame,
   prints each frame and joint that breaks the anatomy rules in smashcraft:ts/scripts/wisp/victoryAnatomy.ts (an elbow bent
-  backward, folded past its range or off its hinge, a bone stretched, an elbow or hand inside the torso) and rewrites the
-  joint record ts/test/fixtures/victory-anatomy.json that `bun run test` checks (#496). Rerun it after storing a changed hero model;
+  backward, folded past its range or off its hinge, a bone stretched, an elbow or hand inside the torso, an upper arm pulled
+  out of its shoulder) and rewrites the joint record ts/test/fixtures/victory-anatomy.json that `bun run test` checks (#496).
+  The shoulder rule pairs each arm-only vertex within 0.6 shoulder widths of the shoulder with its nearest torso vertex in the
+  stand pose, and flags a frame where even the closest tenth of those pairs have drawn more than 0.3 shoulder widths apart:
+  the arm has left the pauldron or sleeve it sits in, which reads as a dislocated arm (Kael'thas's arms-overhead cheer reached
+  0.41; the stock Blademaster, Grom and Pit Lord victories reach 0.27). Victories still owing a fix are listed in
+  `VICTORY_SEAM_DEBT` (smashcraft:ts/scripts/wisp/victoryAnatomyRecord.ts). Rerun it after storing a changed hero model;
   `victory-clips.ts` refuses any cheer pose that breaks the same rules.
   Both `jump-clips.ts` and `victory-clips.ts` key a free weapon (Cairne's `Bone_Axe_Free`, listed in smashcraft:ts/scripts/wisp/victoryJoints.ts) to its hand on every frame of the clip they author, from its Stand Ready or Stand grip, so it cannot drift off the hand between beats (#540).
   Illidan's victory is his own cheer (#590): arms out in a V, the right glaive tipped 75 degrees outward, both sleeve flaps hung from the forearm so no red shard points sideways, and a lowered-arm start so the stock stand pose's glaive disc is not on screen at frame 1;
