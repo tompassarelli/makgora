@@ -368,7 +368,7 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
   {
     id: "shield-stop", family: "defence", name: "Shield stop out of the initial dash, probed headless on its third frame",
     melee: { value: shieldStops(() => 0.0), source: wiki("Shield_stop") }, ours: () => shieldStops(shieldStopSpeed),
-    anchor: { file: "ts/src/game/sim/step.ts", symbol: "advanceGuard" },
+    anchor: { file: "ts/src/game/sim/shield.ts", symbol: "raiseShield" },
     checkedBy: { file: "ts/src/game/sim/shieldMomentum.tests.ts", symbol: "lastInitialDashFrame" }, status: PARITY,
   },
   {
