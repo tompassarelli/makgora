@@ -63,7 +63,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.demonHunter]: {
     weapon: Weapon.blade, strong: "DemonHunterMissileHit",
-    specials: [s("DemonHunterMissileLaunch", "ManaBurn"), s("DemonHunterMissileLaunch", "MetalHeavySliceFlesh"), s("DemonHunterMissileHit", "MetalMediumSliceFlesh"), s("FireballLaunch", "Fireball")],
+    specials: [s("DemonHunterMissileLaunch", "DemonHunterMissileHit"), s("DemonHunterMissileLaunch", "MetalHeavySliceFlesh"), s("DemonHunterMissileHit", "MetalMediumSliceFlesh"), s("FireballLaunch", "Fireball")],
   },
   [Character.blademaster]: {
     weapon: Weapon.blade, swing: ["HeroBladeMasterAttack1", "HeroBladeMasterAttack2"], strong: "CriticalStrike",
@@ -198,7 +198,7 @@ const isNormalMove = (move: number): move is AttackStyle => move < SPECIAL_MOVE;
 
 export function specialSlot(action: SpecialAction): number {
   switch (action) {
-    case SpecialAction.heroNeutral: case SpecialAction.riflemanBlaster: case SpecialAction.demonHunterManaBurn: return 0;
+    case SpecialAction.heroNeutral: case SpecialAction.riflemanBlaster: case SpecialAction.demonHunterEyeBeam: return 0;
     case SpecialAction.heroSide: case SpecialAction.riflemanBear: case SpecialAction.demonHunterFelRush: return 1;
     case SpecialAction.heroUp: case SpecialAction.riflemanRecovery: case SpecialAction.demonHunterWingAscent: return 2;
     case SpecialAction.heroDown: case SpecialAction.riflemanTrap: case SpecialAction.demonHunterImmolate: return 3;

@@ -21,7 +21,7 @@ const pose: EyeBlastMarkPose = { x: 0.0, z: 0.0, scale: 0.0, alpha: 0 };
 
 export function eyeBlastMark(fighter: Readonly<Fighter>, mark: number): Readonly<EyeBlastMarkPose> | undefined {
   const { action, form, frame } = fighter.special;
-  if (fighter.character !== Character.demonHunter || fighter.status.out || action !== SpecialAction.demonHunterManaBurn || form !== EYE_BLAST_FORM) return undefined;
+  if (fighter.character !== Character.demonHunter || fighter.status.out || action !== SpecialAction.demonHunterEyeBeam || form !== EYE_BLAST_FORM) return undefined;
   if (frame < 1 || frame > EYE_BLAST_LAST) return undefined;
   const ahead = f32(MARK_NEAR + f32(MARK_SPACING * mark));
   const lit = frame >= EYE_BLAST_FIRST && ahead <= f32(EYE_BLAST_NEAR + f32(EYE_BLAST_SWEEP * (frame - EYE_BLAST_FIRST)));

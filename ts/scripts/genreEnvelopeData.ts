@@ -11,6 +11,7 @@ import { currentFeel } from "./balanceFeel";
 import { currentKit } from "./balanceKit";
 import { readProfiles } from "./balance";
 import * as specials from "../src/game/sim/specials";
+import { EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT } from "../src/game/sim/eyeBeam";
 import { type Envelope, type Field, type Measures, type MoveClass, type MoveRow, type Range, type Sample, type Tolerances, type EnvelopeExemption, parseEnvelopeExemptions, MOVE_CLASSES, buildEnvelope } from "./genreEnvelope";
 
 const ROOT = join(import.meta.dir, "../..");
@@ -150,7 +151,7 @@ function originalSpecialMeasures(character: Character): Readonly<Record<string, 
     };
   }
   const rows: Record<string, Measures> = {
-    [`special.projectile.${ProjectileKind.manaBurn}`]: specialMeasures(specials.DEMONHUNTER_MANA_BURN_STARTUP, specials.DEMONHUNTER_MANA_BURN_STARTUP, specials.DEMONHUNTER_MANA_BURN_STARTUP + specials.DEMONHUNTER_MANA_BURN_RECOVERY),
+    [`special.projectile.${ProjectileKind.eyeBeam}`]: specialMeasures(EYE_BEAM_GROUND_SHOT, EYE_BEAM_GROUND_SHOT, EYE_BEAM_GROUND_FRAMES),
     "special.dive": specialMeasures(specials.DEMONHUNTER_BACKFLIP_FRAMES + 1, specials.DEMONHUNTER_BACKFLIP_FRAMES + specials.DEMONHUNTER_DIVE_FRAMES - 1, specials.DEMONHUNTER_BACKFLIP_FRAMES + specials.DEMONHUNTER_DIVE_FRAMES),
   };
   for (const ex of [false, true]) {

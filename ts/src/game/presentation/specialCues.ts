@@ -7,6 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
+import { eyeBeamShotFrameWhen } from "../sim/eyeBeam";
 import { type AuthoredSpecial, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 import { ACTIVE_CUE_FRAMES, type CueWindows, heroCueWindows } from "./cueWindows";
 import { idiv } from "wisp/src/sim/intMath";
@@ -27,7 +28,6 @@ import {
   DEMONHUNTER_DIVE_FRAMES,
   DEMONHUNTER_IMMOLATE_ACTIVE,
   DEMONHUNTER_IMMOLATE_STARTUP,
-  DEMONHUNTER_MANA_BURN_STARTUP,
   DEMONHUNTER_WING_STARTUP,
   EYE_BLAST_FIRST,
   EYE_BLAST_FORM,
@@ -383,7 +383,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
 const FEL_TELL = timed(cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "body", 0.5), "stand", f32(0.3));
 
 
-const MANA_BURN_HAND = "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdx";
+export const EYE_BLAST_EYES: Cue = { model: "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", anchor: "overhead", scale: f32(0.9), sequence: "stand", seconds: 0.0 };
 const FEL_FLAMES = "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx";
 
 
@@ -392,7 +392,7 @@ export const ORIGINAL_CUES: { readonly [action: number]: MoveCues } = {
   [SpecialAction.riflemanBear]: { spell: "Summon Bear", startup: cue("Abilities\\Spells\\NightElf\\BattleRoar\\RoarTarget.mdx", "body", f32(0.7)), active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritTarget.mdx", "ahead", f32(0.8)) },
   [SpecialAction.riflemanRecovery]: { spell: "Recoil Shot", startup: cue("Abilities\\Spells\\Human\\FlakCannons\\FlakTarget.mdx", "feet", f32(0.8)), active: timed(cue("Abilities\\Weapons\\Mortar\\MortarMissile.mdx", "feet", f32(0.4)), "death", 0.0) },
   [SpecialAction.riflemanTrap]: { spell: "Frost Trap", startup: FROST_TRAP, active: FROST_TRAP },
-  [SpecialAction.demonHunterManaBurn]: { spell: "Mana Burn", startup: drawn(MANA_BURN_HAND, "hand"), active: cue("Abilities\\Spells\\Human\\Feedback\\SpellBreakerAttack.mdx", "hand", 1.0) },
+  [SpecialAction.demonHunterEyeBeam]: { spell: "Eye Beam", startup: EYE_BLAST_EYES, active: { ...EYE_BLAST_EYES, scale: f32(1.3) } },
 
   [SpecialAction.demonHunterFelRush]: { spell: "Fel Rush", startup: FEL_TELL, active: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", "body", 1.0), "stand", 0.0) },
   [SpecialAction.demonHunterWingAscent]: { spell: "Metamorphosis wings", startup: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0), active: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0) },
@@ -472,10 +472,8 @@ export interface OriginalBranch {
 const CHAOS_STRIKE_CUES: OriginalBranch = { cues: branch("Chaos Strike", FEL_TELL, timed(cue("Abilities\\Spells\\NightElf\\MoonGlaive\\MoonGlaiveCaster.mdx", "ahead", 1.0), "stand", 0.0)), first: CHAOS_STRIKE_FIRST, last: CHAOS_STRIKE_LAST };
 
 
-export const EYE_BLAST_EYES: Cue = { model: "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", anchor: "overhead", scale: f32(0.9), sequence: "stand", seconds: 0.0 };
-
 export const ORIGINAL_BRANCH_CUES: { readonly [action: number]: { readonly [form: number]: OriginalBranch } } = {
-  [SpecialAction.demonHunterManaBurn]: {
+  [SpecialAction.demonHunterEyeBeam]: {
     [EYE_BLAST_FORM]: { cues: branch("Eye Blast", EYE_BLAST_EYES, timed(cue("Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx", "breath", f32(0.9)), "birth", 0.0)), first: EYE_BLAST_FIRST, last: EYE_BLAST_LAST },
   },
   [SpecialAction.demonHunterFelRush]: {
@@ -501,7 +499,7 @@ function originalActiveFrame(action: number, grounded: boolean): number {
     case SpecialAction.riflemanBear: return RIFLEMAN_BEAR_CAST_FRAMES;
     case SpecialAction.riflemanRecovery: return RIFLEMAN_RECOVERY_STARTUP_FRAMES;
     case SpecialAction.riflemanTrap: return 2;
-    case SpecialAction.demonHunterManaBurn: return DEMONHUNTER_MANA_BURN_STARTUP;
+    case SpecialAction.demonHunterEyeBeam: return eyeBeamShotFrameWhen(grounded);
     case SpecialAction.demonHunterFelRush: return FEL_RUSH_FIRST;
     case SpecialAction.demonHunterWingAscent: return DEMONHUNTER_WING_STARTUP;
     case SpecialAction.demonHunterImmolate: return DEMONHUNTER_IMMOLATE_STARTUP;
@@ -573,7 +571,7 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
 
 export const ORIGINAL_ACTIONS: { readonly [character: number]: readonly SpecialAction[] } = {
   [Character.rifleman]: [SpecialAction.riflemanBlaster, SpecialAction.riflemanBear, SpecialAction.riflemanRecovery, SpecialAction.riflemanTrap],
-  [Character.demonHunter]: [SpecialAction.demonHunterManaBurn, SpecialAction.demonHunterFelRush, SpecialAction.demonHunterWingAscent, SpecialAction.demonHunterImmolate],
+  [Character.demonHunter]: [SpecialAction.demonHunterEyeBeam, SpecialAction.demonHunterFelRush, SpecialAction.demonHunterWingAscent, SpecialAction.demonHunterImmolate],
 };
 
 

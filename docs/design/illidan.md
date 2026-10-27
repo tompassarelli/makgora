@@ -169,7 +169,7 @@ enders and big hits drain more:
 | Forward smash | 10 | Up, down smash | 8 |
 | Each throw | 6 | Fel Rush pass | 4 |
 | Chaos Strike | 10 | Immolate | 6 |
-| Wing Dive | 5 | Mana Burn orb | the mana lane's drain |
+| Wing Dive | 5 | Eye Beam | 0 |
 
 A shielded hit drains nothing; pummels, get-up and ledge attacks drain
 nothing; mana never goes below 0 and Illidan gains none. Each drain flashes
@@ -178,8 +178,8 @@ hit (the flash rises over the drained fighter's head). A forward air into forwar
 string about 14–18.
 
 Counterplay: drain needs a landed hit, so the answer is the ordinary one,
-not getting hit; a fighter who spends mana freely arrives at Illidan's Mana
-Burn with less to lose, and a fighter who keeps its mana gives up specials.
+not getting hit; a fighter who spends mana freely has less left for EX specials, and a
+fighter who keeps its mana gives up specials.
 
 **Alternative B, a separate always-on Mana Break at a flat 3 per hit
 (superseded).** Tom's refinement: drain is what his hits do, not a
@@ -190,15 +190,54 @@ drain more than its damage implies.
 
 
 
-## Neutral special: Mana Burn (kept; drain owned by the mana lane)
+## Neutral special: Eye Beam (replaces Mana Burn, 2026-10-28)
 
-The slow orb of #116 stays: cast 16 frames, recovery 30, speed 12, one out.
-The mana lane rebuilds its hit around mana: it burns the target's mana and the
-stun grows as the target's mana empties, keeping the 300-frame window in which
-a stunned fighter can't be stunned again. Every landed attack feeds it: less mana, a
-longer next stun. Source of truth for
-the formula: smashcraft:docs/design/mana.md and
-smashcraft:ts/src/game/sim/projectiles.ts.
+Tom asked (2026-10-28) for his neutral special to become Eye Beam: his eyes
+glow over a windup timed like Falco's laser, then he fires a beam that works
+from a short hop the way Falco's short-hop laser does. Mana Burn's slow orb
+and its mana-scaled stun are gone; no other move used the stun's drain rule.
+
+- **Ground:** the beam leaves his eyes on frame 23 and he acts on frame 58
+  (57 frames), Falco's ground Blaster (fightcore.csv: first active 23,
+  total 57; SmashWiki gives the same 23 and 13 startups).
+- **Air:** the beam leaves on frame 13 of 42, Falco's air Blaster. Landing
+  during it ends the special into the ordinary 4-frame landing, the
+  auto-cancel that makes Falco's short-hop laser safe. Fast fall works
+  throughout, so a short hop, beam and fast fall lands with only those 4 frames.
+- **Windup:** fel fire (his Metamorphosis missile, Eye Blast's eye cue) burns
+  over his eyes from frame 1 to the shot and flares on the shot frame.
+- **Beam:** a horizontal fel bolt along his facing from 140 above his feet, his
+  eye line, at 48 units a frame for 15 frames: 720 units, 120 Melee units at
+  6 units to one, three fifths of the 1200-unit main stage. Falco's laser
+  lives about 100 frames and crosses any legal stage; Tom's brief asked for a
+  long laser short of full screen, so the reach is ours, not Melee's. A
+  fel-green lightning streak runs from his eyes to the bolt's head, at most
+  260 long. One beam out at a time.
+- **Hit:** 3%, set knockback 5 at growth 100 and the Sakurai angle (Falco's
+  Blaster: 3%, 361, growth 100, set 5), so a standing foe takes the same
+  small flinch-launch at any percent, never tumble: an interrupt and approach
+  tool, not a kill. Fire element.
+- **Reach band:** the hit volume runs from 80 below his eye line to 20 above
+  it (the fel pours down toward the target), so on the ground it hits every
+  standing fighter down to Kobold (72 tall). In the air the beam from a short
+  hop pressed on the takeoff frame fires 195 above the floor and hits a
+  standing Shadow Hunter (124 tall, the roster median); shorter fighters need
+  it fired lower in the hop, and a full-jump beam passes over everyone
+  standing.
+- **EX (Shield + Special, air or below a full bar):** 25% more damage, 3.75%,
+  same frames, as every EX keeps its base frames (mana.md). On the ground with
+  a full bar the press is Eye Blast, unchanged.
+
+Counterplay: the 23-frame ground windup is a reaction window to jump it or
+close in; a shield holds it and a powershield reflects it; crouching short
+fighters still take it, but a full-hop foe is over it. Source:
+smashcraft:ts/src/game/sim/eyeBeam.ts (numbers), sim/specials.ts and
+sim/projectiles.ts; tests in sim/eyeBeam.tests.ts.
+
+**Alternative B, keep Mana Burn and add the beam as a separate move**
+(rejected: Tom replaced it). **Alternative C, a beam from his eyes with a
+thin hit band** (rejected: from his 140 eye line it would miss Kobold, Murloc,
+Peon, Rifleman, Mountain King and Tinker standing).
 
 ## Up and down specials (kept)
 
@@ -310,9 +349,9 @@ The issue first placed Eye Blast inside Metamorphosis; the lead corrected
 it (9 Oct): Smashcraft has no ultimate system, only the one super meter that
 buys EX specials (#335), so Eye Blast is Illidan's EX neutral special under
 those rules. Shield + Special with no direction on a full 100-point bar, on
-the ground, starts Eye Blast in place of Mana Burn's 25% reach EX and spends
+the ground, starts Eye Blast in place of Eye Beam's 25% damage EX and spends
 the whole bar. Below a full bar, or in the air, the press is the ordinary or
-EX Mana Burn.
+EX Eye Beam.
 
 - **Frames 1–24, the windup:** he stands rooted; fel fire burns over his
   eyes (his Metamorphosis missile) and eight small green dragon flames stand
@@ -328,7 +367,7 @@ EX Mana Burn.
 Counterplay: 24 frames of windup with the whole path marked is a reaction
 for every fighter: a short hop clears the low beam, a shield holds it, and
 anyone near him punishes the windup. Alternatives: **B, Eye Blast as the
-ordinary neutral special** (rejected: Mana Burn is kept and is his drain
+ordinary neutral special** (rejected at the time: Mana Burn was kept as his drain
 identity); **C, a beam on every forward smash** (rejected: #379).
 
 ### Down special in the air: Immolate (picked)
@@ -542,8 +581,9 @@ What he keeps, so he does not become Falco in a costume:
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
   eight-way dive. Since #519 the ascent aims and starts like Fire Bird, but it
   takes no charge and does not hit.
-- Eye Blast and Mana Burn: the beam stays a meter-gated EX special and the
-  neutral special stays the slow mana orb; he gets no laser.
+- Eye Blast and Eye Beam: Eye Blast stays the meter-gated EX special; since
+  Tom's 2026-10-28 request the neutral special is Eye Beam, a Falco-timed
+  laser from his eyes.
 - Drain on hit: every landed hit still drains mana.
 - Immolate stays a shine, not a loop: Immolate into Immolate stays below true,
   and no waveshine infinite.

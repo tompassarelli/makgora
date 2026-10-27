@@ -205,7 +205,7 @@ function reaching(f: Readonly<Fighter>): boolean {
 
 /** How far `f` may act on another fighter this frame: Eye Blast's whole beam, a tracking beam and its aim, any other reaching action, or a body push. */
 function strikeReach(f: Readonly<Fighter>): Readonly<Extent> {
-  if (f.special.action === SpecialAction.demonHunterManaBurn && f.special.form === EYE_BLAST_FORM) return EYE_BLAST_EXTENT;
+  if (f.special.action === SpecialAction.demonHunterEyeBeam && f.special.form === EYE_BLAST_FORM) return EYE_BLAST_EXTENT;
   if (runningHeroSpecial(f)?.beam !== undefined) return BEAM_EXTENT;
   if (f.attack.style !== undefined && f.special.action === SpecialAction.none
     && f.grab.owner === undefined && f.grab.target === undefined && !inGrabContext(f)

@@ -40,7 +40,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
   },
   2: {
     specials: [
-      { action: SpecialAction.demonHunterManaBurn, name: "Mana Burn", description: "A slow orb that burns mana and stuns; the emptier it leaves the target, the longer the stun. On a full meter, its EX is Eye Blast." },
+      { action: SpecialAction.demonHunterEyeBeam, name: "Eye Beam", description: "His eyes burn fel green, then fire a fast beam that makes the target flinch; short hop and fast fall to fire it low. On a full meter on the ground, its EX is Eye Blast." },
       {
         action: SpecialAction.demonHunterFelRush, name: "Fel Rush", description: "Dash through anyone in your path; press special to flip back out, or attack to slash.",
         forms: [{ form: VENGEFUL_RETREAT_FORM, name: "Vengeful Retreat" }, { form: CHAOS_STRIKE_FORM, name: "Chaos Strike" }, { form: CHAOS_STRIKE_AIR_FORM, name: "Aerial Chaos Strike" }],

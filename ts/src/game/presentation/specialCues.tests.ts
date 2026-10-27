@@ -12,5 +12,5 @@ test("A special's cue windows are measured once and handed back unchanged on eve
   assertTrue(single !== first);
   assertEquals(single.active.first, first.active.first);
   assertEquals(single.active.last, 27);
-  assertEquals(first.active.first, 18);
+  assertEquals(first.active.first, (lunge.regions?.[0]?.firstFrame ?? 0) + 1);
 });

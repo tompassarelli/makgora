@@ -25,13 +25,13 @@ export const ORIGINAL_PROJECTILE_MODELS = {
 
   [ProjectileKind.recoil]: "Abilities\\Weapons\\Mortar\\MortarMissile.mdx",
 
-  [ProjectileKind.manaBurn]: "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx",
+  [ProjectileKind.eyeBeam]: "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx",
 } as const satisfies Record<Exclude<ProjectileKind, typeof ProjectileKind.hero>, string>;
 
 
 export const ORIGINAL_KINDS: { readonly [character: number]: readonly Exclude<ProjectileKind, typeof ProjectileKind.hero>[] } = {
   [Character.rifleman]: [ProjectileKind.blaster, ProjectileKind.recoil],
-  [Character.demonHunter]: [ProjectileKind.manaBurn],
+  [Character.demonHunter]: [ProjectileKind.eyeBeam],
 };
 
 

@@ -71,7 +71,7 @@ export const SpecialAction = {
   riflemanRecovery: 6,
   riflemanBlaster: 7,
   riflemanTrap: 8,
-  demonHunterManaBurn: 9,
+  demonHunterEyeBeam: 9,
   demonHunterFelRush: 10,
   demonHunterWingAscent: 11,
   demonHunterImmolate: 12,
@@ -88,7 +88,7 @@ export type SpecialAction = (typeof SpecialAction)[keyof typeof SpecialAction];
 export const SPECIAL_ACTION_CAPACITY = 17;
 
 
-export const ProjectileKind = { blaster: 0, recoil: 3, manaBurn: 4, hero: 5 } as const;
+export const ProjectileKind = { blaster: 0, recoil: 3, eyeBeam: 4, hero: 5 } as const;
 export type ProjectileKind = (typeof ProjectileKind)[keyof typeof ProjectileKind];
 
 

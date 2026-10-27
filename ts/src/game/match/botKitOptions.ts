@@ -54,7 +54,6 @@ const RITUAL_LAST_FRAMES = 30;
 
 const BEHIND_MARK_ROOM = 60.0;
 
-const ORB_FOLLOW_GAP = 70.0;
 
 const SHOT_NEAR = 180.0;
 const SHOT_FAR = 620.0;
@@ -301,13 +300,6 @@ function pressHeroOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
 }
 
 
-function orbTowardTarget(f: Readonly<Fighter>, target: Readonly<Fighter>) {
-  for (const projectile of f.projectiles) {
-    if (projectile.life <= 0 || projectile.kind !== ProjectileKind.manaBurn) continue;
-    if (f32(f32(target.motion.x - projectile.x) * projectile.direction) > 0 && f32(f32(projectile.x - f.motion.x) * projectile.direction) > 0) return projectile;
-  }
-  return undefined;
-}
 
 
 
@@ -372,13 +364,7 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
     }
     case Character.demonHunter: {
 
-      const orb = orbTowardTarget(f, target);
-      if (orb !== undefined && free && motion.grounded && takes(skill, orb.serial, f.character * 7 + 16)) {
-        steerOnGround(f, stage, f32(orb.x - f32(orb.direction * ORB_FOLLOW_GAP)), input);
-        return true;
-      }
-
-      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap >= EYE_BLAST_NEAR && gap <= EYE_BLAST_FAR && exSpecialAffordable(f) && affords(f, SpecialAction.demonHunterManaBurn)
+      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap >= EYE_BLAST_NEAR && gap <= EYE_BLAST_FAR && exSpecialAffordable(f) && affords(f, SpecialAction.demonHunterEyeBeam)
         && Math.abs(f32(target.motion.z - motion.z)) <= 40.0 && takes(skill, floorDiv(frame, 30), f.character * 7 + 24) && botChoice(floorDiv(frame, 30), f.character * 7 + 25, 3) === 0) {
         pressSlot(input, SpecialSlot.neutral, 0);
         input.exPressed = true;

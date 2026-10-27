@@ -34,14 +34,10 @@ import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, char
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
+import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_DAMAGE_MULTIPLIER, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED, eyeBeamShotFrame } from "./eyeBeam";
 
 
-export const DEMONHUNTER_MANA_BURN_STARTUP = 16;
-export const DEMONHUNTER_MANA_BURN_RECOVERY = 30;
-export const DEMONHUNTER_MANA_BURN_SPEED = 12.0;
-export const DEMONHUNTER_MANA_BURN_LIFETIME = 90;
 
-export const DEMONHUNTER_MANA_BURN_HEIGHT = 45.0;
 
 
 
@@ -182,7 +178,7 @@ function requestedSpecial(owner: Fighter, input: Readonly<Controls>): SpecialAct
       return down ? SpecialAction.riflemanTrap : up ? SpecialAction.riflemanRecovery : side ? SpecialAction.riflemanBear : SpecialAction.riflemanBlaster;
     case Character.demonHunter:
       return up ? SpecialAction.demonHunterWingAscent : down ? SpecialAction.demonHunterImmolate
-        : side ? SpecialAction.demonHunterFelRush : SpecialAction.demonHunterManaBurn;
+        : side ? SpecialAction.demonHunterFelRush : SpecialAction.demonHunterEyeBeam;
   }
 }
 
@@ -534,8 +530,8 @@ function summonBear(owner: Fighter, stage: number, matchFrame: number): void {
 }
 
 
-function manaBurnInFlight(owner: Readonly<Fighter>): boolean {
-  for (const projectile of owner.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.manaBurn) return true;
+function eyeBeamInFlight(owner: Readonly<Fighter>): boolean {
+  for (const projectile of owner.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.eyeBeam) return true;
   return false;
 }
 
@@ -576,9 +572,15 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     if (!motion.grounded) motion.vz = 0.0;
     return true;
   }
-  if (manaBurnInFlight(owner)) return false;
-  startSpecialAction(owner, action, DEMONHUNTER_MANA_BURN_STARTUP + DEMONHUNTER_MANA_BURN_RECOVERY, moveX);
-  special.cooldowns[action] = 24;
+  return startEyeBeam(owner, action, moveX);
+}
+
+function startEyeBeam(owner: Fighter, action: SpecialAction, moveX: number): boolean {
+  if (eyeBeamInFlight(owner)) return false;
+  const { grounded } = owner.motion;
+  startSpecialAction(owner, action, grounded ? EYE_BEAM_GROUND_FRAMES : EYE_BEAM_AIR_FRAMES, moveX);
+  owner.special.form = grounded ? 0 : EYE_BEAM_AIR_FORM;
+  owner.special.cooldowns[action] = 8;
   return true;
 }
 
@@ -590,7 +592,7 @@ function enterEyeBlast(owner: Fighter): void {
   special.hit = false;
   special.duration = EYE_BLAST_FRAMES;
   special.lockFrames = EYE_BLAST_FRAMES;
-  special.cooldowns[SpecialAction.demonHunterManaBurn] = EYE_BLAST_FRAMES;
+  special.cooldowns[SpecialAction.demonHunterEyeBeam] = EYE_BLAST_FRAMES;
   owner.attack.cooldown = max(owner.attack.cooldown, EYE_BLAST_FRAMES);
   owner.motion.vx = 0.0;
 }
@@ -704,7 +706,7 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
     cancelJumpSquat(owner);
     if (grounded && !originalMovementSpecial(requested)) owner.motion.vx = 0.0;
     enterExSpecial(owner, input);
-    if (requested === SpecialAction.demonHunterManaBurn && owner.special.ex && owner.motion.grounded) enterEyeBlast(owner);
+    if (requested === SpecialAction.demonHunterEyeBeam && owner.special.ex && owner.motion.grounded) enterEyeBlast(owner);
   }
   else owner.facing = facing;
   return started;
@@ -756,9 +758,9 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   }
   if (special.action === SpecialAction.riflemanTrap && special.frame === TRAP_APPEAR_FRAME) startFreezeTrap(owner, stage, matchFrame);
   if (special.action === SpecialAction.riflemanBear && special.frame === RIFLEMAN_BEAR_CAST_FRAMES) summonBear(owner, stage, matchFrame);
-  if (special.action === SpecialAction.demonHunterManaBurn && special.form === EYE_BLAST_FORM && motion.grounded) motion.vx = 0.0;
-  if (special.action === SpecialAction.demonHunterManaBurn && special.form !== EYE_BLAST_FORM && special.frame === DEMONHUNTER_MANA_BURN_STARTUP) {
-    spawnProjectileMotion(owner, ProjectileKind.manaBurn, f32(owner.facing * DEMONHUNTER_MANA_BURN_SPEED), 0.0, DEMONHUNTER_MANA_BURN_LIFETIME, shotSerial, 1.0, DEMONHUNTER_MANA_BURN_HEIGHT);
+  if (special.action === SpecialAction.demonHunterEyeBeam && special.form === EYE_BLAST_FORM && motion.grounded) motion.vx = 0.0;
+  if (special.action === SpecialAction.demonHunterEyeBeam && special.form !== EYE_BLAST_FORM && special.frame === eyeBeamShotFrame(special.form)) {
+    spawnProjectileMotion(owner, ProjectileKind.eyeBeam, f32(owner.facing * EYE_BEAM_SPEED), 0.0, EYE_BEAM_LIFETIME, shotSerial, special.ex ? EYE_BEAM_EX_DAMAGE_MULTIPLIER : 1.0, EYE_BEAM_EYE_HEIGHT);
   }
   if (special.action === SpecialAction.riflemanRecovery) {
     if (special.frame === RIFLEMAN_RECOVERY_STARTUP_FRAMES) {
@@ -789,7 +791,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   if (special.action === SpecialAction.riflemanRecovery && special.frame >= RIFLEMAN_RECOVERY_FRAMES) endSpecialAction(owner, true);
   if (special.action === SpecialAction.riflemanTrap && special.frame >= TRAP_SET_FRAMES) endSpecialAction(owner, false);
   if (special.action === SpecialAction.riflemanBlaster && special.frame >= special.duration) endSpecialAction(owner, false);
-  if (special.action === SpecialAction.demonHunterManaBurn && special.frame >= special.duration) endSpecialAction(owner, false);
+  if (special.action === SpecialAction.demonHunterEyeBeam && special.frame >= special.duration) endSpecialAction(owner, false);
   if (special.action === SpecialAction.demonHunterFelRush && special.frame >= special.duration) {
     endFelRush(owner);
     special.lockFrames = 0;
@@ -907,7 +909,7 @@ function eyeBlastContact(owner: Fighter, targetSlot: number, target: Fighter): R
 
 function demonHunterSpecialContact(owner: Fighter, targetSlot: number, target: Fighter): Readonly<HitRegion> {
   const { special } = owner;
-  if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterManaBurn && special.form === EYE_BLAST_FORM) return eyeBlastContact(owner, targetSlot, target);
+  if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterEyeBeam && special.form === EYE_BLAST_FORM) return eyeBlastContact(owner, targetSlot, target);
   if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterFelRush) return felRushContact(owner, targetSlot, target);
   if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterWingAscent && special.form === DEMONHUNTER_DIVE_FORM) return wingDiveContact(owner, targetSlot, target);
   if (owner.character !== Character.demonHunter || special.action !== SpecialAction.demonHunterImmolate) return NO_HIT_REGION;

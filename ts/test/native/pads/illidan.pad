@@ -1,9 +1,9 @@
-# Illidan's native checks by parity: #116 Mana Burn, #128 Immolate, #147 Fel Rush, #279 Wing Dive.
+# Illidan's native checks by parity: Eye Beam (2026-10-28), #128 Immolate, #147 Fel Rush, #279 Wing Dive.
 # Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero illidan
-# #116: the orb hits a standing b and stuns it.
+# Eye Beam: the beam hits a standing b and makes it flinch.
 60 a tap X 2
-# #116 counterplay: b full-jumps the second orb.
+# A second beam: b's full jump starts a frame after the fast beam lands.
 200 a tap X 2
 232 b tap B 8
 # Both dash in, about 75 apart.
@@ -45,19 +45,20 @@
 863 a tap X 2
 # Expected, frame by frame (headless run of this script):
 #! expect a 60 special 9 form 0
-#! expect b 110 damage 5.000 hitlag 4 hitstun 15
+#! expect b 90 damage 3.000 hitlag 4 hitstun 9
 #! expect a 200 special 9 form 0
-#! expect b 235 applied jump
-#! absent b 111-330 damage
+#! expect b 231 damage 6.000 hitlag 4 hitstun 9
+#! absent b 91-230 damage
+#! absent b 232-330 damage
 #! expect a 340 special 10 form 0
 # #482's per-fighter shields (9d81faac91, f2fd55307f) are larger, so the rush into b's shield stops sooner and the next rush,
 # starting closer, also hits b at 477: probe run 39025304908 on the old 45/60 shields restores 372 x 50.719 and 606 (trace: run 39009305845).
-#! expect a 368 special 0 form 0 action-frame 0 x 4.319
+#! expect a 368 special 0 form 0 action-frame 0 x 36.774
 #! expect a 470 special 10 form 0
 #! expect a 486 special-form 1 action 10
 #! expect a 600 special 10 form 0
-#! expect b 477 damage 11.000
-#! expect b 611 damage 17.000
+#! expect b 477 damage 12.000
+#! expect b 611 damage 18.000
 #! expect a 616 special-form 2 action 10
 #! expect a 720 special 12 form 0
 #! expect a 725 special 0
@@ -67,6 +68,6 @@
 #! expect a 868 special-form 2 action 11
 #! expect a 881 special 0 form 2
 #! scene a ManaBurnTarget
-#! scene a DemonHunterMissile
+#! scene a IllidanMissile
 1000 a press VIEW
 1070 a release VIEW

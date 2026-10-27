@@ -283,7 +283,7 @@ const THROW_NAMES: Readonly<Record<number, string>> = {
 };
 
 const PROJECTILE_MOVES: Readonly<Record<number, string>> = {
-  [ProjectileKind.blaster]: "neutral-special", [ProjectileKind.manaBurn]: "neutral-special",
+  [ProjectileKind.blaster]: "neutral-special", [ProjectileKind.eyeBeam]: "neutral-special",
   [ProjectileKind.recoil]: "up-special",
 };
 

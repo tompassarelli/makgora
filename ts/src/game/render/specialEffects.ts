@@ -21,7 +21,7 @@ import { AttackStyle, Character, HeroStatusKind, SpecialAction } from "../sim/co
 import { attackActive, attackStartup } from "../sim/conditions";
 import { min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
-import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM } from "../sim/specials";
+import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
 import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkCue, parkOnce, placeEffect } from "./effects";
 import { beamSegment, runningHeroSpecial } from "../sim/specials/engine";
@@ -240,7 +240,6 @@ export class SpecialEffects {
     } else this.park(slot.frog, index, FROG);
     if (fighter.character === Character.demonHunter && !fighter.status.out) {
       if (entered && action === SpecialAction.demonHunterImmolate) BlzSetSpecialEffectTime(felFlames, 0.0);
-      else if (entered && action === SpecialAction.demonHunterManaBurn) BlzSetSpecialEffectTime(manaHand, 0.0);
 
       const immolating = action === SpecialAction.demonHunterImmolate;
 
@@ -248,8 +247,7 @@ export class SpecialEffects {
       this.presentImmolationSound(fighter, slot, entered && immolating, slot.previousSpecial === SpecialAction.demonHunterImmolate && !immolating);
       if (immolating) this.show(felFlames, index, FEL_FLAMES, fighter, 0.0, 25.0, striking ? f32(1.8) : f32(1.35));
       else this.park(felFlames, index, FEL_FLAMES);
-      if (action === SpecialAction.demonHunterManaBurn && fighter.special.form !== EYE_BLAST_FORM && frame <= DEMONHUNTER_MANA_BURN_STARTUP) this.show(manaHand, index, MANA_HAND, fighter, fighter.facing * 45.0, 90.0, 0.75);
-      else this.showStun(fighter, index, manaHand);
+      this.showStun(fighter, index, manaHand);
     } else {
       this.presentImmolationSound(fighter, slot, false, slot.previousSpecial === SpecialAction.demonHunterImmolate);
       this.park(felFlames, index, FEL_FLAMES);

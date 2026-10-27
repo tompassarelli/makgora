@@ -101,7 +101,7 @@ specials.ts and shield.ts.
 |---|---|---|---|---|
 | Rifleman | Blaster shot (neutral special) | grounded: special frame 9, shoulder height; aerial: frame 14, hip height, cancelled by landing (8 frames of landing lag) | speed 36, 60 frames | flinch without knockback, 3 frames of hitstun per damage: grounded 3 (9), aerial 3 (9) |
 | Rifleman | Recoil blast (up special) | frame 4, downward | 8 frames | 5, launches downward |
-| Illidan | Mana Burn (neutral special) | frame 16, one out at a time | speed 12, 90 frames, at the shield's centre height | 5, electric, flinch and a stun of 20-80 frames by percent; cancels an opposing traveling projectile ([roster](roster.md#mana-burn-neutral-special)) |
+| Illidan | Eye Beam (neutral special) | grounded: special frame 23; aerial: frame 13, cancelled by landing (4 frames of landing lag); his eye line, 140 up; one out at a time | speed 48, 15 frames (720 units) | 3, fire, set knockback 5 (growth 100, Sakurai angle), never tumbles; EX 3.75 ([roster](roster.md#eye-beam-neutral-special)) |
 
 Each fighter holds up to 16 projectiles; a full owner fires nothing. A
 raise-timed powershield reflects a projectile during the shield's first 2

@@ -48,7 +48,7 @@ const NO_TRAITS: TraitSet = {};
 /** The special a running action belongs to; undefined while no special runs (an ordinary move). */
 export function traitMove(action: SpecialAction): TraitMove | undefined {
   switch (action) {
-    case SpecialAction.heroNeutral: case SpecialAction.riflemanBlaster: case SpecialAction.demonHunterManaBurn: return "neutral";
+    case SpecialAction.heroNeutral: case SpecialAction.riflemanBlaster: case SpecialAction.demonHunterEyeBeam: return "neutral";
     case SpecialAction.heroSide: case SpecialAction.riflemanBear: case SpecialAction.demonHunterFelRush: return "side";
     case SpecialAction.heroUp: case SpecialAction.riflemanRecovery: case SpecialAction.demonHunterWingAscent: return "up";
     case SpecialAction.heroDown: case SpecialAction.riflemanTrap: case SpecialAction.demonHunterImmolate: return "down";

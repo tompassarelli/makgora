@@ -14,6 +14,7 @@ import { authoredThrowEffect } from "../src/game/sim/grabs";
 import { BEAR_SWIPE, BEAR_SWIPE_EX } from "../src/game/sim/summons";
 import { originalProjectileEffect } from "../src/game/sim/projectiles";
 import * as specials from "../src/game/sim/specials";
+import { EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT } from "../src/game/sim/eyeBeam";
 import { currentKit } from "./balanceKit";
 import type { FeelValues, FeelSample } from "./balanceKit";
 
@@ -96,11 +97,11 @@ export function currentFeel(character: Character): FeelValues {
     const firstProjectile = createFighter(character, 0, 1).projectiles[0];
     if (firstProjectile === undefined) throw new Error("Original fighter has no projectile slot");
     const projectile = { ...firstProjectile };
-    for (const kind of character === Character.rifleman ? [ProjectileKind.blaster, ProjectileKind.recoil] : [ProjectileKind.manaBurn]) {
+    for (const kind of character === Character.rifleman ? [ProjectileKind.blaster, ProjectileKind.recoil] : [ProjectileKind.eyeBeam]) {
       projectile.kind = kind;
       projectile.damageMultiplier = 1;
-      const duration = kind === ProjectileKind.blaster ? number("RIFLEMAN_BLASTER_GROUND_FRAMES") : kind === ProjectileKind.recoil ? number("RIFLEMAN_RECOVERY_FRAMES") : specials.DEMONHUNTER_MANA_BURN_STARTUP + specials.DEMONHUNTER_MANA_BURN_RECOVERY;
-      const spawn = kind === ProjectileKind.blaster ? number("RIFLEMAN_BLASTER_GROUND_SHOT_FRAME") : kind === ProjectileKind.recoil ? specials.RIFLEMAN_RECOVERY_STARTUP_FRAMES : specials.DEMONHUNTER_MANA_BURN_STARTUP;
+      const duration = kind === ProjectileKind.blaster ? number("RIFLEMAN_BLASTER_GROUND_FRAMES") : kind === ProjectileKind.recoil ? number("RIFLEMAN_RECOVERY_FRAMES") : EYE_BEAM_GROUND_FRAMES;
+      const spawn = kind === ProjectileKind.blaster ? number("RIFLEMAN_BLASTER_GROUND_SHOT_FRAME") : kind === ProjectileKind.recoil ? specials.RIFLEMAN_RECOVERY_STARTUP_FRAMES : EYE_BEAM_GROUND_SHOT;
       out[`special.projectile.${kind}`] = sample(originalProjectileEffect(projectile), duration - spawn, false);
     }
     if (character === Character.rifleman) {

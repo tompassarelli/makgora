@@ -5,7 +5,7 @@
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { addFloat32, roundToFloat32, toInt } from "wisp/src/sim/binary32";
-import { floorDiv, floorMod } from "wisp/src/sim/intMath";
+import { floorMod } from "wisp/src/sim/intMath";
 import { advanceMash, clearMash } from "./mash";
 import { aerialJumps } from "./itemBuffs";
 import type { Fighter } from "./fighter";
@@ -13,7 +13,6 @@ import { type AttackBuffer, clearAttackBuffer } from "../input/attackBuffer";
 import { type Controls, copyControls, neutralControls } from "./roster";
 import { cancelAttack, cancelSpecialState } from "./transitions";
 import { HERO_STATUS_GROUPS, HeroStatusKind, type HeroStatusGroup, SpecialAction } from "./codes";
-import { ROSTER_MANA, drainMana } from "./mana";
 import { capPercent } from "./percent";
 
 
@@ -83,18 +82,10 @@ export interface AppliedStatus {
 
 
 
-  readonly drain?: { readonly mana: number; readonly emptyFrames: number } | undefined;
 }
 
 const rules = (f: Readonly<Fighter>): StatusRules | undefined => RULES[f.status.condition];
 
-/** The status's duration on a fighter left with `mana`; integer division keeps Lua32 and the host equal. */
-function heroStatusFrames(status: Readonly<AppliedStatus>, mana: number): number {
-  const { drain } = status;
-  if (drain === undefined) return status.frames;
-  const empty = ROSTER_MANA.max - min(ROSTER_MANA.max, max(0, mana));
-  return status.frames + floorDiv(drain.emptyFrames * empty, ROSTER_MANA.max);
-}
 
 
 export function heroStatusMashes(f: Readonly<Fighter>): boolean {
@@ -123,10 +114,9 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
     return;
   }
   if (state.out) return;
-  if (status.drain !== undefined) drainMana(f, status.drain.mana);
   if ((state.conditionImmunity[status.group] ?? 0) > 0) return;
   state.condition = status.kind;
-  state.conditionFrames = heroStatusFrames(status, f.mana.points);
+  state.conditionFrames = status.frames;
   if (RULES[status.kind]?.mashMinimum !== undefined) clearMash(f.grab);
   state.conditionGroup = status.group;
   state.conditionImmunityFrames = status.immunityFrames;

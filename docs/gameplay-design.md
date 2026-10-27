@@ -1087,7 +1087,7 @@ every newly registered fighter too.
 | Fighter | EX neutral (mana) | EX side (mana) | Upgrade on both |
 |---|---|---|---|
 | Rifleman | Blaster (28) | Bear (50) | One 8% hit armored on frames 1–6 |
-| Illidan | Mana Burn (35) | Fel Rush (37) | One 8% hit armored on frames 1–6 |
+| Illidan | Eye Beam (35) | Fel Rush (37) | One 8% hit armored on frames 1–6 |
 | Blademaster | Wind Cutter (25) | Wind Walk (43) | One 8% hit armored on frames 1–6 |
 | Mountain King | Storm Bolt (33) | Storm Rush (43) | One 8% hit armored on frames 1–6 |
 | Warden | Shadow Strike (30) | Shadow Pursuit (40) | One 8% hit armored on frames 1–6 |
@@ -1595,8 +1595,8 @@ recommended work (#82), rather than recorded as independently chosen by Tom:
 
 - Warcraft's stock spell and impact art carries Melee's event vocabulary;
   the descriptive mapping is in smashcraft:docs/design/melee/hit-effects.md.
-  Demon Hunter melee contacts use Cleave, Immolation uses fire and
-  Mana Burn uses lightning; those element choices change presentation only.
+  Demon Hunter melee contacts use Cleave, Immolation and Eye Beam use
+  fire; those element choices change presentation only.
 - Strength has three sizes (0.75, 1.0, 1.25), at knockback 80 and 180.
   The upper threshold follows Melee's strong normal spark; 80 and the sizes
   are authored readability defaults. No random extra spark obscures strength.
@@ -2072,10 +2072,9 @@ table; a press that only parries does not count as a reflection). Swift
 Arrow's visible draw and recovery (#172) leave it punishable by shield grab
 at 60 units, and its repeat interval keeps at most two arrows in flight.
 
-One move-specific projectile clash exists (#116). Illidan's Mana Burn orb
-and any opposing traveling projectile it meets cancel each other. Other
-projectiles pass through each other
-([Mana Burn](design/roster.md#mana-burn-neutral-special)).
+Traveling projectiles pass through each other; the one clash, Illidan's
+Mana Burn orb (#116), left with that move on 2026-10-28
+([Eye Beam](design/roster.md#eye-beam-neutral-special)).
 
 ## Items (#196)
 

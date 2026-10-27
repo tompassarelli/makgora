@@ -1,17 +1,18 @@
-# #191 Illidan mirror: a powershield returns Illidan's mana burn
+# #191 Illidan mirror: a powershield returns Illidan's Eye Beam
 # a (Illidan) fires its neutral special at 600 from x -240; b (Illidan) at x 240 powershields it with
 # one full trigger press. A reflection sends back a's own projectile: same family (a's fighter
 # code), kind and model, half damage, turned around and owned by b (the `reflect` line on b's
-# trace), and it strikes a, never b. Frames are read from this script's headless farm trace.
+# trace), and at this distance it expires before reaching a. Frames are read from this script's headless farm trace.
 # Syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick pair illidan / illidan
 600 a tap X 2
-644 b shield 1
-674 b shield 0
+629 b shield 1
+659 b shield 0
 # View held a second: a moment the parity check replays.
 721 a press VIEW
 791 a release VIEW
-# Expected (replay of this script): b's press reflects on the next frame; the projectile hits a for half its damage.
-#! expect b 645 reflect family 2 kind 4 model Abilities\Weapons\DemonHunterMissile\DemonHunterMissile.mdx direction -1 multiplier 0.500 life 59
-#! expect a 691 damage 2.500
+# Expected (replay of this script): b's press reflects on the frame the beam meets its shield; the
+# reflected beam keeps the 7 frames it had left, too few to cross the 480 units back to a, so it strikes no one.
+#! expect b 629 reflect family 2 kind 4 model Abilities\Weapons\IllidanMissile\IllidanMissile.mdx direction -1 multiplier 0.500 life 7
+#! absent a 600-721 damage
 #! absent b 600-721 damage

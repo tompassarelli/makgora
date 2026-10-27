@@ -5,8 +5,7 @@ import { max, min } from "../core/numbers";
 import { roundToFloat32 } from "wisp/src/sim/binary32";
 import { meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { f32 } from "wisp/src/sim/f32";
-import { AttackStyle, ContactKind, HeroStatusGroup, HeroStatusKind, ProjectileKind } from "./codes";
-import type { AppliedStatus } from "./heroStatus";
+import { AttackStyle, ContactKind, ProjectileKind } from "./codes";
 import { isIntangible } from "./conditions";
 import { collectDamageContact, finishDamageContacts, openDamageContacts } from "./contacts";
 import { type Fighter, PROJECTILE_CAPACITY, type Projectile } from "./fighter";
@@ -17,6 +16,7 @@ import { agesWithMove } from "./specials/engine";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
+import { EYE_BEAM_BAND_ABOVE, EYE_BEAM_BAND_BELOW, EYE_BEAM_BAND_DROP, EYE_BEAM_BAND_HALF, EYE_BEAM_DAMAGE, EYE_BEAM_SET_KNOCKBACK } from "./eyeBeam";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { SHIELD_PROJECTILE_DAMAGE_MULTIPLIER, SHIELD_PROJECTILE_SPEED_MULTIPLIER, grantParry, shieldCircleIntersects } from "./shield";
 import { at } from "wisp/src/runtime/lookup";
@@ -60,7 +60,7 @@ export function spawnProjectileMotion(owner: Fighter, kind: ProjectileKind, velo
     projectile.serial = serial;
     projectile.damageMultiplier = damageMultiplier;
     projectile.newlyReflected = false;
-    projectile.exReach = kind === ProjectileKind.manaBurn && owner.special.ex;
+    projectile.exReach = false;
     projectile.surface = undefined;
     projectile.x = f32(owner.motion.x + f32(direction * BLASTER_PROJECTILE_SPAWN_OFFSET));
     projectile.z = f32(owner.motion.z + height);
@@ -94,10 +94,6 @@ const facingOf = (owner: Fighter, direction: number): number => (direction === 0
 
 
 
-const MANA_BURN_STUN: Readonly<AppliedStatus> = {
-  kind: HeroStatusKind.stun, frames: 15, group: HeroStatusGroup.sleep, immunityFrames: 300,
-  drain: { mana: 25, emptyFrames: 45 },
-};
 
 
 const projectileHit = emptyHitEffect();
@@ -128,20 +124,30 @@ export function projectileDamage(projectile: Readonly<Projectile>): number {
   const { kind, spec } = projectile;
   const damage = kind === ProjectileKind.hero && spec !== undefined ? heroProjectileEffect(projectile, spec).damage
     : kind === ProjectileKind.blaster ? attackDamage(AttackStyle.shot)
-      : kind === ProjectileKind.recoil || kind === ProjectileKind.manaBurn ? 5.0 : 7.0;
+      : kind === ProjectileKind.eyeBeam ? EYE_BEAM_DAMAGE : kind === ProjectileKind.recoil ? 5.0 : 7.0;
   return roundToFloat32(f32(damage * projectile.damageMultiplier));
 }
 
 
 export function originalProjectileEffect(projectile: Readonly<Projectile>): Readonly<HitEffect> {
   const { kind } = projectile;
-  projectileHit.element = kind === ProjectileKind.manaBurn ? HitElement.electric : HitElement.normal;
+  projectileHit.element = kind === ProjectileKind.eyeBeam ? HitElement.fire : HitElement.normal;
   projectileHit.electric = false;
   projectileHit.carry = undefined;
   projectileHit.manaDrain = undefined;
   projectileHit.manaSteal = undefined;
+  projectileHit.strong = undefined;
+  projectileHit.fixedPower = undefined;
+  projectileHit.stunFrames = undefined;
+  projectileHit.setKnockback = kind === ProjectileKind.eyeBeam ? EYE_BEAM_SET_KNOCKBACK : undefined;
+  projectileHit.sakurai = kind === ProjectileKind.eyeBeam ? true : undefined;
   projectileHit.damage = projectileDamage(projectile);
-  if (kind === ProjectileKind.blaster || kind === ProjectileKind.manaBurn) {
+  if (kind === ProjectileKind.eyeBeam) {
+    projectileHit.growth = 100.0;
+    projectileHit.base = 0.0;
+    projectileHit.launchX = 1.0;
+    projectileHit.launchZ = 0.0;
+  } else if (kind === ProjectileKind.blaster) {
     projectileHit.growth = 0.0;
     projectileHit.base = 0.0;
     projectileHit.launchX = 0.0;
@@ -166,10 +172,9 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
   }
   const { kind } = projectile;
   const effect = originalProjectileEffect(projectile);
-  const flinch = kind === ProjectileKind.blaster || kind === ProjectileKind.manaBurn;
   collectDamageContact(world, ownerSlot, targetSlot, effect, projectile.direction,
-    flinch ? ContactKind.flinch : ContactKind.launch, false, undefined, shieldContact,
-    kind === ProjectileKind.manaBurn ? MANA_BURN_STUN : undefined, projectile.z, projectile.visualFamily);
+    kind === ProjectileKind.blaster ? ContactKind.flinch : ContactKind.launch, false, undefined, shieldContact,
+    undefined, projectile.z, projectile.visualFamily);
 }
 
 
@@ -197,7 +202,7 @@ function reflectProjectile(target: Fighter, source: Projectile): boolean {
     reflected.surface = undefined;
     source.life = 0;
     target.visuals.shieldReflect++;
-    target.visuals.shieldElectric = source.kind === ProjectileKind.manaBurn;
+    target.visuals.shieldElectric = false;
     grantParry(target);
     return true;
   }
@@ -213,6 +218,12 @@ const targets = {
 
   reflecting: [false, false, false, false],
 };
+
+
+function eyeBeamBandMeets(oldZ: number, z: number, targetZ: number, body: Readonly<{ z1: number; z2: number; radius: number }>): boolean {
+  return f32(f32(max(oldZ, z) + EYE_BEAM_BAND_ABOVE) + body.radius) >= f32(targetZ + body.z1)
+    && f32(f32(min(oldZ, z) - EYE_BEAM_BAND_BELOW) - body.radius) <= f32(targetZ + body.z2);
+}
 
 
 function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile, hit: { reflector: boolean; shield: boolean }): number | undefined {
@@ -246,11 +257,14 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
     const body = hurtCapsule(target.character);
     const targetZ = at(targets.z, targetSlot);
     const reach = f32(BLASTER_PROJECTILE_RADIUS + body.radius);
+    const eyeBeam = projectile.kind === ProjectileKind.eyeBeam;
     const height = blaster
       ? f32(max(oldZ, projectile.z) + reach) >= f32(targetZ + body.z1) && f32(min(oldZ, projectile.z) - reach) <= f32(targetZ + body.z2)
-      : centerZ >= lowZ && centerZ <= highZ;
-    const shieldContact = target.shield.raised
-      && shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, blaster ? BLASTER_PROJECTILE_RADIUS : projectile.exReach ? f32(BLASTER_PROJECTILE_RADIUS * 0.25) : 0.0);
+      : eyeBeam ? eyeBeamBandMeets(oldZ, projectile.z, targetZ, body)
+        : centerZ >= lowZ && centerZ <= highZ;
+    const shieldContact = target.shield.raised && (eyeBeam
+      ? shieldCircleIntersects(target, oldX, f32(oldZ - EYE_BEAM_BAND_DROP), projectile.x, f32(projectile.z - EYE_BEAM_BAND_DROP), 1.0, EYE_BEAM_BAND_HALF)
+      : shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, blaster ? BLASTER_PROJECTILE_RADIUS : 0.0));
     const reflector = shieldContact && at(targets.reflecting, targetSlot);
     const candidate = Math.abs(f32(targetX - oldX));
     if ((shieldContact || ((crossed || near) && height)) && (nearest === undefined || candidate < distance)) {
@@ -415,47 +429,6 @@ function projectileMeetsStage(stage: number, matchFrame: number, oldX: number, o
 }
 
 
-function projectilesMeet(a: Readonly<Projectile>, b: Readonly<Projectile>): boolean {
-  const reachX = f32(BLASTER_PROJECTILE_RADIUS + (b.spec?.radius ?? BLASTER_PROJECTILE_RADIUS));
-  const reachZ = f32(BLASTER_PROJECTILE_HALF_HEIGHT + (b.spec?.radius ?? BLASTER_PROJECTILE_HALF_HEIGHT));
-  const before = f32(a.x - b.x);
-  const after = f32(f32(a.x + a.velocityX) - f32(b.x + b.velocityX));
-  const crossed = (before <= 0 && after >= 0) || (before >= 0 && after <= 0) || Math.abs(after) <= reachX;
-  return crossed && Math.abs(f32(f32(a.z + a.velocityZ) - f32(b.z + b.velocityZ))) <= reachZ;
-}
-
-
-
-
-
-
-function clashManaBurns(world: Roster): void {
-  for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
-    if (!isActive(world, ownerSlot)) continue;
-    const owner = fighterAt(world, ownerSlot);
-    let index = -1;
-    for (const orb of owner.projectiles) {
-      index++;
-      if (orb.life <= 0 || orb.kind !== ProjectileKind.manaBurn) continue;
-      let clashed = false;
-      for (let otherSlot = 0; otherSlot < PARTICIPANT_CAPACITY && !clashed; otherSlot++) {
-        if (otherSlot === ownerSlot || !isActive(world, otherSlot)) continue;
-        const opponent = fighterAt(world, otherSlot);
-        let otherIndex = -1;
-        for (const other of opponent.projectiles) {
-          otherIndex++;
-          if (other.life <= 0 || (other.spec !== undefined && !other.spec.reflectable) || !projectilesMeet(orb, other)) continue;
-          mutableProjectile(owner, index).life = 0;
-          mutableProjectile(opponent, otherIndex).life = 0;
-          clashed = true;
-          break;
-        }
-      }
-    }
-  }
-}
-
-
 const selected = { reflector: false, shield: false };
 
 
@@ -474,7 +447,6 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
     targets.intangible[slot] = isIntangible(target);
     targets.reflecting[slot] = target.shield.reflectFrames > 0;
   }
-  clashManaBurns(world);
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);

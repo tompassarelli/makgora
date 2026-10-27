@@ -9,7 +9,8 @@ import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { attackStartupFrames, characterAttackActiveFrames, RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_FRAMES, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
 import type { Controls } from "../sim/roster";
-import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_HEIGHT, DEMONHUNTER_MANA_BURN_LIFETIME, DEMONHUNTER_MANA_BURN_SPEED, DEMONHUNTER_MANA_BURN_STARTUP } from "../sim/specials";
+import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../sim/specials";
+import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_SHOT, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_SHOT, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED } from "../sim/eyeBeam";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { BLASTER_AIR_SHOT_HEIGHT, BLASTER_PROJECTILE_HEIGHT, BLASTER_PROJECTILE_LIFETIME, BLASTER_PROJECTILE_RADIUS, BLASTER_PROJECTILE_SPAWN_OFFSET, BLASTER_PROJECTILE_SPEED, } from "../sim/projectiles";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
@@ -67,7 +68,8 @@ interface ShotWindup {
 
 const BLASTER_GROUND: ShotWindup = { spawnFrame: RIFLEMAN_BLASTER_GROUND_SHOT_FRAME, offsetX: BLASTER_PROJECTILE_SPAWN_OFFSET, offsetZ: BLASTER_PROJECTILE_HEIGHT, velocityX: BLASTER_PROJECTILE_SPEED, velocityZ: 0.0, life: BLASTER_PROJECTILE_LIFETIME, radius: BLASTER_PROJECTILE_RADIUS };
 const BLASTER_AIR: ShotWindup = { ...BLASTER_GROUND, spawnFrame: RIFLEMAN_BLASTER_AIR_SHOT_FRAME, offsetZ: BLASTER_AIR_SHOT_HEIGHT };
-const MANA_BURN: ShotWindup = { ...BLASTER_GROUND, spawnFrame: DEMONHUNTER_MANA_BURN_STARTUP, offsetZ: DEMONHUNTER_MANA_BURN_HEIGHT, velocityX: DEMONHUNTER_MANA_BURN_SPEED, life: DEMONHUNTER_MANA_BURN_LIFETIME };
+const EYE_BEAM_GROUND: ShotWindup = { ...BLASTER_GROUND, spawnFrame: EYE_BEAM_GROUND_SHOT, offsetZ: EYE_BEAM_EYE_HEIGHT, velocityX: EYE_BEAM_SPEED, life: EYE_BEAM_LIFETIME };
+const EYE_BEAM_AIR: ShotWindup = { ...EYE_BEAM_GROUND, spawnFrame: EYE_BEAM_AIR_SHOT };
 
 
 function shotFromWindup(f: Readonly<Fighter>, target: Readonly<Fighter>, shot: Readonly<ShotWindup>, stage: number, observationAge: number, endsOnLanding = false): boolean {
@@ -108,8 +110,8 @@ function specialShotComing(f: Readonly<Fighter>, target: Readonly<Fighter>, stag
   switch (target.special.action) {
     case SpecialAction.riflemanBlaster:
       return shotFromWindup(f, target, target.special.duration === RIFLEMAN_BLASTER_GROUND_FRAMES ? BLASTER_GROUND : BLASTER_AIR, stage, observationAge, true);
-    case SpecialAction.demonHunterManaBurn:
-      return shotFromWindup(f, target, MANA_BURN, stage, observationAge);
+    case SpecialAction.demonHunterEyeBeam:
+      return target.special.form === EYE_BEAM_AIR_FORM ? shotFromWindup(f, target, EYE_BEAM_AIR, stage, observationAge, true) : shotFromWindup(f, target, EYE_BEAM_GROUND, stage, observationAge);
   }
   const move = runningHeroSpecial(target);
   if (move?.projectiles === undefined) return false;

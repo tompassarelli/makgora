@@ -20,6 +20,7 @@ import { carrierDrawsMark } from "../presentation/ultimateVoice";
 import { cameraLift } from "./cameraLift";
 import { tintProjectile } from "./projectileTint";
 import { addPoolEffect, addPoolEffects } from "./projectilePoolEffects";
+import { EyeBeamLine } from "./eyeBeamLine";
 
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
@@ -92,6 +93,7 @@ export class ProjectilePresentation {
   private parked: ParkedFlags | undefined;
   private readonly aimedShot: lightning[] = [];
   private readonly lineShown: boolean[] = [];
+  private readonly eyeBeam: EyeBeamLine;
   private readonly disc: DiscLook = { lift: 0.0, radius: 0.0, red: 0, green: 0, blue: 0, alpha: 0 };
   private tracerFrame = 0;
   private tracerX = 0.0;
@@ -110,6 +112,7 @@ export class ProjectilePresentation {
       this.aimedShot.push(line);
       this.lineShown.push(false);
     }
+    this.eyeBeam = new EyeBeamLine(origin);
     const hero = heroDefinition(character) !== undefined;
     const paths = fighterProjectileModels(character);
     const ultimateOnly = paths.filter((path, index) => index > 0 && !hero && ultimateProjectiles(character).some((spec) => spec.model === path));
@@ -294,6 +297,7 @@ export class ProjectilePresentation {
 
   present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
     this.presentAimedShot(fighter, playing);
+    this.eyeBeam.present(fighter, playing);
     const parked = (this.parked ??= []);
     const taken = this.taken;
     for (let index = 0; index < this.models.length; index++) taken[index] = false;
@@ -471,6 +475,7 @@ export class ProjectilePresentation {
     this.clear();
     for (const model of this.models) DestroyEffect(model);
     for (const line of this.aimedShot) DestroyLightning(line);
+    this.eyeBeam.destroy();
     this.aimedShot.length = 0;
     this.lineShown.length = 0;
     this.models.length = 0;

@@ -22,7 +22,7 @@ function flashClips(character: number): number[] {
   if (character <= Character.demonHunter) {
     const actions = character === Character.rifleman
       ? [SpecialAction.riflemanBlaster, SpecialAction.riflemanBear, SpecialAction.riflemanTrap, SpecialAction.riflemanRecovery]
-      : [SpecialAction.demonHunterManaBurn, SpecialAction.demonHunterFelRush, SpecialAction.demonHunterWingAscent, SpecialAction.demonHunterImmolate];
+      : [SpecialAction.demonHunterEyeBeam, SpecialAction.demonHunterFelRush, SpecialAction.demonHunterWingAscent, SpecialAction.demonHunterImmolate];
     for (const action of actions) for (const grounded of [false, true]) indices.add(specialClip(character, action, grounded, !grounded).index);
     if (character === Character.demonHunter) {
       for (const index of [

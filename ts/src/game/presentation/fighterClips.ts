@@ -297,7 +297,7 @@ interface GroundingClips {
   readonly air: HeroClip;
 }
 
-const MANA_BURN: GroundingClips = { grounded: clip(dh.DEMON_HUNTER_SPECIAL_NEUTRAL_INDEX, dh.DEMON_HUNTER_SPECIAL_NEUTRAL_SECONDS), air: clip(dh.DEMON_HUNTER_SPECIAL_NEUTRAL_AIR_INDEX, dh.DEMON_HUNTER_SPECIAL_NEUTRAL_AIR_SECONDS) };
+const EYE_BEAM: GroundingClips = { grounded: clip(dh.DEMON_HUNTER_SPECIAL_NEUTRAL_INDEX, dh.DEMON_HUNTER_SPECIAL_NEUTRAL_SECONDS), air: clip(dh.DEMON_HUNTER_SPECIAL_NEUTRAL_AIR_INDEX, dh.DEMON_HUNTER_SPECIAL_NEUTRAL_AIR_SECONDS) };
 const FEL_RUSH: GroundingClips = { grounded: clip(dh.DEMON_HUNTER_SPECIAL_SIDE_INDEX, dh.DEMON_HUNTER_SPECIAL_SIDE_SECONDS), air: clip(dh.DEMON_HUNTER_SPECIAL_SIDE_AIR_INDEX, dh.DEMON_HUNTER_SPECIAL_SIDE_AIR_SECONDS) };
 const WING_ASCENT: GroundingClips = { grounded: clip(dh.DEMON_HUNTER_SPECIAL_UP_INDEX, dh.DEMON_HUNTER_SPECIAL_UP_SECONDS), air: clip(dh.DEMON_HUNTER_SPECIAL_UP_AIR_INDEX, dh.DEMON_HUNTER_SPECIAL_UP_AIR_SECONDS) };
 const IMMOLATE: GroundingClips = { grounded: clip(dh.DEMON_HUNTER_SPECIAL_DOWN_INDEX, dh.DEMON_HUNTER_SPECIAL_DOWN_SECONDS), air: clip(dh.DEMON_HUNTER_SPECIAL_DOWN_AIR_INDEX, dh.DEMON_HUNTER_SPECIAL_DOWN_AIR_SECONDS) };
@@ -351,7 +351,7 @@ export function specialClip(character: number, action: SpecialAction, grounded: 
     case SpecialAction.heroSide: return clipFor(character, grounded ? "sideSpecial" : "sideSpecialAir");
     case SpecialAction.heroUp: return clipFor(character, grounded ? "upSpecial" : "upSpecialAir");
     case SpecialAction.heroDown: return clipFor(character, grounded ? "downSpecial" : "downSpecialAir");
-    case SpecialAction.demonHunterManaBurn: return byGrounding(MANA_BURN, grounded);
+    case SpecialAction.demonHunterEyeBeam: return byGrounding(EYE_BEAM, grounded);
     case SpecialAction.demonHunterFelRush: return byGrounding(FEL_RUSH, grounded);
     case SpecialAction.demonHunterWingAscent: return byGrounding(WING_ASCENT, grounded);
     case SpecialAction.demonHunterImmolate: return byGrounding(IMMOLATE, grounded);

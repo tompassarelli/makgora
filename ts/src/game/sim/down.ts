@@ -20,6 +20,7 @@ import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_COOLDOWN_FRAMES, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
 import { heroEgg, isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
+import { EYE_BEAM_AIR_FORM } from "./eyeBeam";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 
 export const AIR_DODGE_LANDING_LAG = 10;
@@ -68,14 +69,22 @@ function damageLandingReaction(f: Fighter): DamageLanding {
 }
 
 
-function landRiflemanBlaster(f: Fighter): void {
+function airShotLandingLag(special: Readonly<Fighter["special"]>): number | undefined {
+  if (special.action === SpecialAction.riflemanBlaster && special.duration === RIFLEMAN_BLASTER_AIR_FRAMES) return RIFLEMAN_BLASTER_LANDING_LAG;
+  if (special.action === SpecialAction.demonHunterEyeBeam && special.form === EYE_BEAM_AIR_FORM) return EMPTY_LANDING_LAG;
+  return undefined;
+}
+
+
+function landAirShot(f: Fighter): void {
   const { special } = f;
-  if (special.action !== SpecialAction.riflemanBlaster || special.duration !== RIFLEMAN_BLASTER_AIR_FRAMES) return;
+  const lag = airShotLandingLag(special);
+  if (lag === undefined) return;
   special.action = SpecialAction.none;
   special.frame = 0;
   special.lockFrames = 0;
   f.attack.cooldown = 0;
-  f.landing.lag = max(f.landing.lag, RIFLEMAN_BLASTER_LANDING_LAG);
+  f.landing.lag = max(f.landing.lag, lag);
 }
 
 
@@ -159,7 +168,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
     launch.knockbackX = launch.groundKnockbackX;
   }
   if (!wasGrounded) landHeroSpecial(f);
-  if (!wasGrounded) landRiflemanBlaster(f);
+  if (!wasGrounded) landAirShot(f);
   f.special.fall = false;
   if (!isHeroSpecialAction(f.special.action)) f.special.airtimeUses = 0;
   if (f.jump.squat <= 0) f.jump.remaining = groundedJumps(f);
