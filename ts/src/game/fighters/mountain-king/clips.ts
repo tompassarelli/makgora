@@ -63,7 +63,7 @@ export function mountainKingClips(kit: KitNormals): HeroClipTable {
     run: play("Walk"),
     crouch: play("Spell Slam", 0.25),
     fall: play("Stand Ready"),
-    landing: play("Spell Slam", f32(0.3)),
+    landing: play("Stand Ready"),
     shield: play("Stand Ready"),
     airDodge: play("Stand - 3", f32(0.6)),
     smashCharge: play("Attack Slam", f32(0.3)),
