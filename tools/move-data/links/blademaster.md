@@ -62,10 +62,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | jab into dash attack | 75 | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | jab into dash attack | 100 | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | jab into dash attack | 143 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| jab into neutral air | 60 | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R | R |
-| jab into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R |
-| jab into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R |
-| jab into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | R | R |
+| jab into neutral air | 60 | · | · | · | · | · | · | · | R | R | R | R | R | R | R | R | R |
+| jab into neutral air | 75 | · | · | · | · | · | · | · | · | R | R | R | R | R | R | R | R |
+| jab into neutral air | 100 | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R | R |
+| jab into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R |
 | jab into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -78,10 +78,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | jab into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| jab into down air | 60 | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R | R |
-| jab into down air | 75 | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R | R |
-| jab into down air | 100 | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R |
-| jab into down air | 143 | · | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R |
+| jab into down air | 60 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| jab into down air | 75 | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| jab into down air | 100 | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| jab into down air | 143 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | jab into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | jab into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -344,7 +344,7 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | down tilt into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down tilt into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down tilt into neutral air | 143 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -434,10 +434,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | down tilt into dash attack | 75 | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R | R |
 | down tilt into dash attack | 100 | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R |
 | down tilt into dash attack | 143 | · | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R |
-| down tilt into neutral air | 60 | · | · | · | · | · | · | · | R | R | R | R | R | R | R | R | R |
-| down tilt into neutral air | 75 | · | · | · | · | · | · | · | · | R | R | R | R | R | R | R | R |
-| down tilt into neutral air | 100 | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R | R |
-| down tilt into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R |
+| down tilt into neutral air | 60 | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R |
+| down tilt into neutral air | 75 | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R | R |
+| down tilt into neutral air | 100 | · | · | · | · | · | · | R | R | R | R | R | R | R | R | R | R |
+| down tilt into neutral air | 143 | · | · | · | · | · | · | · | R | R | R | R | R | R | R | R | R |
 | down tilt into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -450,10 +450,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | down tilt into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down tilt into down air | 60 | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R |
-| down tilt into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R |
-| down tilt into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R |
-| down tilt into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | R |
+| down tilt into down air | 60 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down tilt into down air | 75 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down tilt into down air | 100 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down tilt into down air | 143 | · | · | · | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down tilt into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down tilt into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -992,10 +992,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | back throw into dash attack | 75 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into dash attack | 100 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into dash attack | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| back throw into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 60 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 75 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 100 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| back throw into neutral air | 143 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | back throw into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1085,10 +1085,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | up throw into dash attack | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · | · | · |
 | up throw into dash attack | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · | · | · |
 | up throw into dash attack | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | R | R | R | · | · | · |
-| up throw into neutral air | 60 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T |
-| up throw into neutral air | 75 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T |
-| up throw into neutral air | 100 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T |
-| up throw into neutral air | 143 | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T |
+| up throw into neutral air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T | T | T |
+| up throw into neutral air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T | T | T |
+| up throw into neutral air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T | T | T |
+| up throw into neutral air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | T | T | T | T | T |
 | up throw into forward air | 60 | R | R | R | R | R | R | R | DI | R | R | R | DI | DI | DI | DI | DI |
 | up throw into forward air | 75 | R | R | R | R | R | R | R | DI | R | R | R | DI | DI | DI | DI | DI |
 | up throw into forward air | 100 | R | R | R | R | R | R | R | DI | R | R | R | DI | DI | DI | DI | DI |
@@ -1101,10 +1101,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | up throw into up air | 75 | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI |
 | up throw into up air | 100 | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI |
 | up throw into up air | 143 | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI |
-| up throw into down air | 60 | R | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into down air | 75 | R | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into down air | 100 | R | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
-| up throw into down air | 143 | R | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into down air | 60 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into down air | 75 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into down air | 100 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
+| up throw into down air | 143 | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T | T |
 | up throw into neutral special | 60 | R | R | R | R | R | DI | DI | DI | R | DI | DI | DI | DI | DI | DI | DI |
 | up throw into neutral special | 75 | R | R | R | R | R | DI | DI | DI | R | DI | DI | DI | DI | DI | DI | DI |
 | up throw into neutral special | 100 | R | R | R | R | R | DI | DI | DI | R | DI | DI | DI | DI | DI | DI | DI |
@@ -1178,10 +1178,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | down throw into dash attack | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into dash attack | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down throw into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down throw into neutral air | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into neutral air | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into neutral air | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into neutral air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1194,10 +1194,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | down throw into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down throw into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down throw into down air | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down air | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down air | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down throw into down air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
 | down throw into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down throw into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1219,90 +1219,90 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 
 | Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 |
-| frame advantage | 75 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 |
-| frame advantage | 100 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 |
-| frame advantage | 143 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 | -6 |
-| launch angle | 60 | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° |
-| launch angle | 75 | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° |
-| launch angle | 100 | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° |
-| launch angle | 143 | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° | 100° |
-| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| frame advantage | 60 | +11 | +7 | +9 | +11 | +13 | +15 | +18 | +22 | +26 | +51 | +54 | +57 | +61 | +64 | +67 | +71 |
+| frame advantage | 75 | +10 | +7 | +9 | +10 | +12 | +14 | +17 | +19 | +23 | +27 | +51 | +54 | +57 | +60 | +63 | +66 |
+| frame advantage | 100 | +10 | +12 | +8 | +9 | +11 | +13 | +14 | +17 | +19 | +22 | +25 | +29 | +52 | +55 | +57 | +60 |
+| frame advantage | 143 | +10 | +11 | +7 | +8 | +10 | +11 | +12 | +14 | +15 | +17 | +19 | +22 | +24 | +27 | +30 | +53 |
+| launch angle | 60 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 75 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 100 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 143 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  | KO | KO | KO | KO |
+| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  | KO | KO | KO |
+| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | KO |
 | KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| neutral air into jab | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into jab | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into jab | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into jab | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into forward tilt | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into forward tilt | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into forward tilt | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into forward tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into up tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down tilt | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into down tilt | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into down tilt | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into down tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into forward smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| on shield | 60 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 |
+| on shield | 75 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 |
+| on shield | 100 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | -1, 6.5 | -1, 6.5 |
+| on shield | 143 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | -1, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 | 0, 6.5 |
+| neutral air into jab | 60 | DI | T | T | T | T | T | DI | DI | DI | DI | DI | · | · | · | · | · |
+| neutral air into jab | 75 | DI | T | T | T | T | T | DI | DI | DI | DI | DI | DI | · | · | · | · |
+| neutral air into jab | 100 | DI | DI | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI | · | · |
+| neutral air into jab | 143 | DI | DI | T | T | T | T | T | T | T | DI | DI | DI | DI | DI | DI | DI |
+| neutral air into forward tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · |
+| neutral air into forward tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · |
+| neutral air into forward tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · |
+| neutral air into forward tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| neutral air into up tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · |
+| neutral air into up tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · |
+| neutral air into up tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · |
+| neutral air into up tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · |
+| neutral air into down tilt | 60 | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · |
+| neutral air into down tilt | 75 | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · | · |
+| neutral air into down tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · |
+| neutral air into down tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · |
+| neutral air into forward smash | 60 | R | R | R | R | DI | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into forward smash | 75 | R | R | R | R | DI | DI | · | · | · | · | · | · | · | · | · | · |
+| neutral air into forward smash | 100 | R | R | R | R | R | DI | DI | · | · | · | · | · | · | · | · | · |
+| neutral air into forward smash | 143 | R | R | R | R | R | R | DI | DI | · | · | · | · | · | · | · | · |
 | neutral air into up smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into up smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into up smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into up smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into grab | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into grab | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into grab | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into grab | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| neutral air into dash attack | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into dash attack | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into dash attack | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into dash attack | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into forward air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down smash | 60 | R | R | DI | DI | DI | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down smash | 75 | R | R | R | DI | DI | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down smash | 100 | R | DI | R | DI | DI | DI | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down smash | 143 | R | DI | R | R | DI | DI | DI | · | · | · | · | · | · | · | · | · |
+| neutral air into grab | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · |
+| neutral air into grab | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · |
+| neutral air into grab | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · |
+| neutral air into grab | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| neutral air into dash attack | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · |
+| neutral air into dash attack | 75 | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · |
+| neutral air into dash attack | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · |
+| neutral air into dash attack | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| neutral air into neutral air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | R | R | · | · | · |
+| neutral air into neutral air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | R | R | R | · |
+| neutral air into neutral air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | R | R |
+| neutral air into neutral air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · |
+| neutral air into forward air | 60 | R | R | R | DI | DI | DI | DI | DI | DI | DI | · | R | R | R | · | · |
+| neutral air into forward air | 75 | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | · | R | R | R | · |
+| neutral air into forward air | 100 | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | R | R |
+| neutral air into forward air | 143 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | neutral air into back air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into back air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into back air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into back air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into up air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | R | R | · | · |
+| neutral air into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | R | R | · |
+| neutral air into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | R |
 | neutral air into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into neutral special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | · | · | R | R | R | · | · | · |
+| neutral air into down air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | R | R | R | · | · |
+| neutral air into down air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | R | R | R |
+| neutral air into down air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · | · |
+| neutral air into neutral special | 60 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | · | · | · |
+| neutral air into neutral special | 75 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | · | · | · |
+| neutral air into neutral special | 100 | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | · |
+| neutral air into neutral special | 143 | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
 | neutral air into side special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into side special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into side special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into side special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into up special | 60 | · | · | · | DI | DI | DI | DI | DI | · | · | · | · | · | · | · | · |
+| neutral air into up special | 75 | · | · | · | · | DI | DI | DI | DI | DI | · | · | · | · | · | · | · |
+| neutral air into up special | 100 | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | · | · | · | · | · |
+| neutral air into up special | 143 | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | DI | · | · | · |
 | neutral air into down special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into down special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1364,10 +1364,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | forward air into dash attack | 75 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
 | forward air into dash attack | 100 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
 | forward air into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · |
-| forward air into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 60 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 75 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 100 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 143 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into forward air | 60 | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into forward air | 75 | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into forward air | 100 | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1383,7 +1383,7 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | forward air into down air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down air | 143 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1457,10 +1457,10 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | forward air into dash attack | 75 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | · | · | · | · |
 | forward air into dash attack | 100 | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | · | · |
 | forward air into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI |
-| forward air into neutral air | 60 | · | R | R | R | · | R | · | · | · | · | · | · | · | · | · | · |
-| forward air into neutral air | 75 | · | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into neutral air | 100 | · | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into neutral air | 143 | · | · | R | R | R | R | R | · | R | · | · | · | · | · | · | · |
+| forward air into neutral air | 60 | · | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 75 | · | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 100 | · | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| forward air into neutral air | 143 | · | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
 | forward air into forward air | 60 | · | · | · | R | R | R | · | · | · | · | · | · | · | · | · | · |
 | forward air into forward air | 75 | · | · | · | R | R | R | R | · | · | · | · | · | · | · | · | · |
 | forward air into forward air | 100 | · | · | · | R | R | R | R | R | · | · | · | · | · | · | · | · |
@@ -1474,9 +1474,9 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | forward air into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 60 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| forward air into down air | 75 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down air | 100 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| forward air into down air | 143 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| forward air into down air | 143 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1494,70 +1494,163 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | forward air into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | forward air into down special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 
-## down air (clean)
+## down air (sweet)
 
 | Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 |
-| frame advantage | 75 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 |
-| frame advantage | 100 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 |
-| frame advantage | 143 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 | +12 |
-| launch angle | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| launch angle | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| launch angle | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| launch angle | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| frame advantage | 60 | +8 | +12 | -1 | +1 | +3 | +6 | +9 | +12 | +17 | +21 | +27 | +33 | +39 | +46 | +53 | +60 |
+| frame advantage | 75 | +8 | +11 | -2 | 0 | +2 | +4 | +7 | +10 | +13 | +17 | +22 | +26 | +32 | +38 | +44 | +50 |
+| frame advantage | 100 | +8 | +10 | +13 | -1 | +1 | +2 | +4 | +7 | +9 | +12 | +15 | +19 | +23 | +28 | +32 | +37 |
+| frame advantage | 143 | +7 | +9 | +12 | +14 | -1 | +1 | +2 | +3 | +5 | +7 | +9 | +12 | +14 | +17 | +20 | +24 |
+| launch angle | 60 |  |  | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° |
+| launch angle | 75 |  |  | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° |
+| launch angle | 100 |  |  |  | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° |
+| launch angle | 143 |  |  |  |  | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° | 114° |
 | KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| on shield | 60 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 |
-| on shield | 75 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 |
-| on shield | 100 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 |
-| on shield | 143 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 | -7, 9.8 |
-| down air into jab | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into jab | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into jab | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into jab | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into forward tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into forward tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into forward tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into forward tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into up tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into up tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into up tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into up tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down tilt | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down tilt | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down tilt | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down tilt | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into forward smash | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into forward smash | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into forward smash | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into forward smash | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| on shield | 60 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 |
+| on shield | 75 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 |
+| on shield | 100 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 |
+| on shield | 143 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 | -11, 5.9 |
+| down air into jab | 60 | DI | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · |
+| down air into jab | 75 | DI | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into jab | 100 | DI | DI | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into jab | 143 | DI | DI | DI | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward tilt | 60 | T | T | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward tilt | 75 | T | T | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward tilt | 100 | T | T | T | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward tilt | 143 | R | T | T | T | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into up tilt | 60 | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | DI | DI | · |
+| down air into up tilt | 75 | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into up tilt | 100 | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into up tilt | 143 | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI |
+| down air into down tilt | 60 | DI | DI | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | · | · |
+| down air into down tilt | 75 | DI | DI | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into down tilt | 100 | DI | DI | DI | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into down tilt | 143 | DI | DI | DI | DI | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward smash | 60 | R | R | · | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | · |
+| down air into forward smash | 75 | R | R | · | · | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward smash | 100 | R | R | R | · | · | R | R | R | R | R | DI | DI | DI | DI | DI | DI |
+| down air into forward smash | 143 | R | R | R | R | · | · | · | R | R | R | R | R | DI | DI | DI | DI |
 | down air into up smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into up smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into up smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into up smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into down smash | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down smash | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down smash | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down smash | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into grab | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into grab | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into grab | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into grab | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into dash attack | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into dash attack | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into dash attack | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into dash attack | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into neutral air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into neutral air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into neutral air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into neutral air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into forward air | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into forward air | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into forward air | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into forward air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down air into down smash | 60 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | · | · |
+| down air into down smash | 75 | R | R | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | · |
+| down air into down smash | 100 | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
+| down air into down smash | 143 | R | R | R | DI | R | R | R | R | R | R | R | DI | DI | DI | DI | DI |
+| down air into grab | 60 | T | T | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | R | DI | DI |
+| down air into grab | 75 | T | T | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | R | DI |
+| down air into grab | 100 | T | T | T | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into grab | 143 | T | T | T | T | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into dash attack | 60 | R | T | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | DI | R |
+| down air into dash attack | 75 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | R |
+| down air into dash attack | 100 | R | R | T | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into dash attack | 143 | R | R | T | T | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI |
+| down air into neutral air | 60 | R | R | · | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into neutral air | 75 | R | R | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into neutral air | 100 | R | R | R | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into neutral air | 143 | R | R | R | R | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward air | 60 | R | R | · | · | · | · | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward air | 75 | R | R | · | · | · | · | R | R | R | DI | DI | DI | DI | DI | DI | DI |
+| down air into forward air | 100 | R | R | R | · | · | · | · | R | R | R | DI | DI | DI | DI | DI | DI |
+| down air into forward air | 143 | · | R | R | R | · | · | · | · | · | R | R | R | DI | DI | DI | DI |
+| down air into back air | 60 | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | · | R |
+| down air into back air | 75 | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | · | DI | DI |
+| down air into back air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | · |
+| down air into back air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | DI |
+| down air into up air | 60 | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI |
+| down air into up air | 75 | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI |
+| down air into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI |
+| down air into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | DI | DI |
+| down air into down air | 60 | R | T | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into down air | 75 | R | T | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into down air | 100 | R | R | T | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into down air | 143 | R | R | T | T | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
+| down air into neutral special | 60 | R | R | · | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into neutral special | 75 | R | R | · | · | · | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into neutral special | 100 | R | R | R | · | · | R | R | R | R | R | DI | DI | DI | DI | DI | DI |
+| down air into neutral special | 143 | R | R | R | R | · | · | · | R | R | R | R | R | DI | DI | DI | DI |
+| down air into side special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into side special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into side special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into side special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up special | 60 | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into up special | 75 | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI | DI | DI |
+| down air into up special | 100 | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI | DI | DI |
+| down air into up special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | DI | DI | DI | DI |
+| down air into down special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into down special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into down special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+
+## down air (sour)
+
+| Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| frame advantage | 60 | -2 | -1 | 0 | +1 | +2 | +3 | +4 | 0 | +2 | +3 | +5 | +7 | +10 | +12 | +15 | +18 |
+| frame advantage | 75 | -4 | -2 | -1 | 0 | +1 | +2 | +3 | 0 | +1 | +2 | +4 | +5 | +7 | +9 | +12 | +14 |
+| frame advantage | 100 | -4 | -2 | -1 | 0 | +1 | +2 | +3 | +3 | -1 | 0 | +2 | +3 | +4 | +6 | +7 | +9 |
+| frame advantage | 143 | -3 | -2 | -1 | -1 | 0 | +1 | +1 | +2 | +3 | +4 | -1 | 0 | +1 | +2 | +3 | +5 |
+| launch angle | 60 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 75 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 100 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 143 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 60 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 75 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| down air into jab | 60 | R | R | R | R | DI | DI | DI | DI | DI | · | · | · | · | · | · | · |
+| down air into jab | 75 | R | R | R | R | DI | DI | DI | DI | DI | DI | · | · | · | · | · | · |
+| down air into jab | 100 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | · | · | · | · | · |
+| down air into jab | 143 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | · | · |
+| down air into forward tilt | 60 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
+| down air into forward tilt | 75 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
+| down air into forward tilt | 100 | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · |
+| down air into forward tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · |
+| down air into up tilt | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up tilt | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up tilt | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up tilt | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into down tilt | 60 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| down air into down tilt | 75 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
+| down air into down tilt | 100 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
+| down air into down tilt | 143 | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · |
+| down air into forward smash | 60 | · | · | · | · | · | R | R | · | · | · | · | · | · | · | · | · |
+| down air into forward smash | 75 | · | · | · | · | · | R | R | · | · | · | · | · | · | · | · | · |
+| down air into forward smash | 100 | · | · | · | · | · | · | R | R | · | · | · | · | · | · | · | · |
+| down air into forward smash | 143 | · | · | · | · | · | · | · | R | R | R | · | · | · | · | · | · |
+| down air into up smash | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into down smash | 60 | · | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| down air into down smash | 75 | · | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| down air into down smash | 100 | · | · | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
+| down air into down smash | 143 | · | · | R | R | R | R | R | R | R | R | · | · | · | · | · | · |
+| down air into grab | 60 | R | R | R | R | R | DI | DI | R | R | R | R | R | R | R | R | R |
+| down air into grab | 75 | R | R | R | R | R | DI | DI | R | R | R | R | R | R | R | R | R |
+| down air into grab | 100 | R | R | R | R | R | R | DI | DI | R | R | R | R | R | R | R | R |
+| down air into grab | 143 | R | R | R | R | R | R | R | R | DI | DI | R | R | R | R | R | R |
+| down air into dash attack | 60 | R | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI |
+| down air into dash attack | 75 | R | R | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI |
+| down air into dash attack | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | DI | DI | DI |
+| down air into dash attack | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down air into neutral air | 60 | · | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
+| down air into neutral air | 75 | · | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · |
+| down air into neutral air | 100 | · | · | R | R | R | R | R | R | R | R | R | R | · | · | · | · |
+| down air into neutral air | 143 | · | · | R | R | R | R | R | R | R | R | R | R | R | R | · | · |
+| down air into forward air | 60 | · | · | · | · | · | R | R | R | R | R | R | · | · | · | · | · |
+| down air into forward air | 75 | · | · | · | · | · | · | R | R | R | R | R | R | · | · | · | · |
+| down air into forward air | 100 | · | · | · | · | · | · | · | R | · | R | R | R | R | · | · | · |
+| down air into forward air | 143 | · | · | · | · | · | · | · | · | R | R | · | R | R | R | R | R |
 | down air into back air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into back air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into back air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1566,14 +1659,14 @@ No setup lands a hit with up tilt, up smash, back air, up air, side special, up 
 | down air into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into down air | 60 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down air | 75 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down air | 100 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into down air | 143 | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| down air into neutral special | 60 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into neutral special | 75 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into neutral special | 100 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
-| down air into neutral special | 143 | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R | R |
+| down air into down air | 60 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
+| down air into down air | 75 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
+| down air into down air | 100 | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · |
+| down air into down air | 143 | R | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · |
+| down air into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | R |
+| down air into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into neutral special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into side special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into side special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into side special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
