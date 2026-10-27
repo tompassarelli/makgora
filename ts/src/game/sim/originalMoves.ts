@@ -31,7 +31,7 @@ const ROUNDHOUSE_RECOVERY = 24;
 const HEEL_RADIUS = 13.0;
 const SHIN_RADIUS = 17.0;
 const BALL_RADIUS = 13.0;
-export const ROUNDHOUSE_HEEL = groundHit(10.0, 45, 85.0, 20.0, HitElement.normal);
+export const ROUNDHOUSE_HEEL = groundHit(10.0, 45, 85.0, 20.0, HitElement.fire);
 export const ROUNDHOUSE_SOUR = groundHit(7.0, 45, 72.0, 17.0, HitElement.normal);
 
 type Point = readonly [x: number, z: number];

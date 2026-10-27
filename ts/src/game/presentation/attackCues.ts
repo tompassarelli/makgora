@@ -13,6 +13,7 @@ import { attackStartupFrames } from "../sim/moves";
 import { HERO_ROSTER } from "../roster/kits";
 import { type Cue, fighterOwnCues, timed } from "./specialCues";
 import { DISJOINT_CUES } from "./disjointCues";
+import { FEL_CRESCENT_MODEL } from "../../generated/assets/felCrescentAssetInfo";
 
 const cue = (model: string, scale: number): Cue => ({ model, anchor: "body", scale });
 
@@ -21,6 +22,7 @@ export interface AttackCue {
   readonly name: string;
   readonly fromActive: number;
   readonly cue: Cue;
+  readonly windup?: { readonly x: number; readonly z: number } | undefined;
 }
 
 const SHEAR: readonly AttackCue[] = [{ name: "Shear", fromActive: 0, cue: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", f32(0.9)), "stand", 0.0) }];
@@ -56,6 +58,10 @@ export const ATTACK_CUES: { readonly [character: number]: { readonly [style: num
 
   [Character.demonHunter]: {
 
+    [AttackStyle.forwardSmash]: [
+      { name: "Fel smoke", fromActive: -9, windup: { x: 15.0, z: 75.0 }, cue: timed(cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", f32(0.4)), "stand", 0.0) },
+      { name: "Fel crescent", fromActive: 0, cue: { ...timed(cue(FEL_CRESCENT_MODEL, 1.0), "stand", 0.0), lingerFrames: 48 } },
+    ],
     [AttackStyle.forwardAir]: [{ name: "Twin glaives", fromActive: 0, cue: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", 1.0), "stand", 0.0) }],
 
     [AttackStyle.forwardTilt]: SHEAR,
@@ -83,6 +89,16 @@ export function attackCueState(fighter: Readonly<Fighter>, out: AttackCueState):
   const cues = ATTACK_CUES[fighter.character]?.[style];
   if (cues === undefined) return out;
   const moves = fighter.tuning.moves;
+  const startingIn = frame - attackStartupFrames(style, moves);
+  for (let entry = 0; entry < cues.length && startingIn < 0; entry++) {
+    const each = cues[entry];
+    if (each?.windup === undefined || each.fromActive > startingIn) continue;
+    out.cue = each.cue;
+    out.x = each.windup.x;
+    out.z = each.windup.z;
+    out.key = -1 - entry;
+    return out;
+  }
   const count = authoredHitRegionCount(style, moves);
   for (let index = 0; index < count; index++) {
     const region = authoredHitRegion(scratch, fighter.character, style, frame, smashChargeFrames, index, moves);
@@ -91,7 +107,7 @@ export function attackCueState(fighter: Readonly<Fighter>, out: AttackCueState):
     let chosen = 0;
     for (let entry = 0; entry < cues.length; entry++) {
       const each = cues[entry];
-      if ((each?.fromActive ?? 0) <= activeFrame) chosen = entry;
+      if (each?.windup === undefined && (each?.fromActive ?? 0) <= activeFrame) chosen = entry;
     }
     out.cue = cues[chosen]?.cue;
     out.x = f32(f32(region.minX + region.maxX) * 0.5);

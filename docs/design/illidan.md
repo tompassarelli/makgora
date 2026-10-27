@@ -501,7 +501,7 @@ attackCues.ts and elementLooks.ts):
 | Vengeful Retreat | Possession missile trailing the vault |
 | Chaos Strike (ground and air) | Moon Glaive whirl |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
-| Roundhouse kick (forward smash) | none yet; its fel crescent and heel flash are the next change |
+| Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a heel hit lands as the fire hit's green flame burst, a shin or toe hit as the normal spark |
 | Eye Blast windup / beam | Metamorphosis missile over his eyes and small green dragon flames along the floor / green dragon fire, each floor flame growing as the beam reaches it |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |
 | Twin-glaive forward air | Illidan's missile trail |

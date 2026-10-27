@@ -19,6 +19,7 @@ import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLa
 import * as shieldModels from "../../src/generated/assets/shieldAssetInfo";
 import * as candleModels from "../../src/generated/assets/candleAssetInfo";
 import * as ankhModels from "../../src/generated/assets/ankhAssetInfo";
+import * as felCrescentModels from "../../src/generated/assets/felCrescentAssetInfo";
 import { STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_GROUND_MODEL, STAGE_PLAGUE_MODEL } from "../../src/generated/stages/terrainAssetInfo";
 import { STAGE_CRAG_MODELS } from "../../src/generated/stages/cragAssetInfo";
 import { STAGE_DECK_MODELS, STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../src/generated/stages/stageAssetInfo";
@@ -108,6 +109,7 @@ export const GENERATED_MODELS: readonly { readonly list: string; readonly genera
   { list: "impact-assets/shield-imports.txt", generator: "tools/effects/shield.ts", models: Object.values(shieldModels) },
   { list: "impact-assets/candle-imports.txt", generator: "tools/effects/candle.ts", models: Object.values(candleModels) },
   { list: "impact-assets/ankh-imports.txt", generator: "tools/effects/ankh.ts", models: Object.values(ankhModels) },
+  { list: "impact-assets/crescent-imports.txt", generator: "tools/effects/felCrescent.ts", models: Object.values(felCrescentModels) },
 ];
 
 
