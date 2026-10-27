@@ -111,6 +111,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   backward, folded past its range or off its hinge, a bone stretched, an elbow or hand inside the torso) and rewrites the
   joint record ts/test/fixtures/victory-anatomy.json that `bun run test` checks (#496). Rerun it after storing a changed hero model;
   `victory-clips.ts` refuses any cheer pose that breaks the same rules.
+  Illidan's victory is his own cheer (#590): arms out in a V, the right glaive tipped 75 degrees outward, both sleeve flaps hung from the forearm so no red shard points sideways, and a lowered-arm start so the stock stand pose's glaive disc is not on screen at frame 1;
+  re-author it with `victory-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character 2`, store `illidan-animation` and run `inputs derive --fighter Illidan`.
   `bun tools/animations/grab-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]` appends
   coordinated expansion-hero reach, hold, pummel and four-direction holder/victim
   gestures or reauthors their existing indices. `--character` limits reauthoring

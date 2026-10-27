@@ -177,7 +177,7 @@ export const JOB_DONE_VOICE = "Sound\\Buildings\\Orc\\PeonJobDone.flac";
 
 const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.rifleman]: "rifleman victory",
-  [Character.demonHunter]: "spell",
+  [Character.demonHunter]: "illidan victory",
   [Character.blademaster]: "stand victory",
   [Character.mountainKing]: "mountainking victory",
   [Character.warden]: "warden victory",

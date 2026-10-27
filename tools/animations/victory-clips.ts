@@ -33,11 +33,12 @@ const alternating = (low: Arms): readonly Beat[] => [
     { frame: 64, arms: [low, 'raised'], chest: -12, head: -18, hop: 0.3 }, { frame: 76, arms: 'raised', chest: -15, head: -22, hop: 0.5 },
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
-const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number; readonly free?: Arms }>> = {
+const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number; readonly free?: Arms; readonly start?: Arms }>> = {
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
     [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25, free: 'wide' }, [Character.kobold]: { low: 'pumped', hop: 1 },
     [Character.jaina]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
     [Character.mountainKing]: { low: 'pumped', hop: 1, raise: [0.85, 0.6], tip: 25 },
+    [Character.demonHunter]: { low: 'pumped', hop: 0.35, raise: [0.95, 0.4], tip: 75, start: 'low' },
 };
 const sided = (weapon: Side, held: Arms, free: Arms): readonly [Arms, Arms] => weapon === 0 ? [held, free] : [free, held];
 const step = (weapon: Side, frame: number, held: Arms, free: Arms, chest: number, head: number, hop = 0): Beat =>
@@ -63,6 +64,7 @@ const DESIGNED: Readonly<Record<number, readonly Beat[]>> = {
 };
 const HANGING: Readonly<Record<number, readonly string[]>> = {
     [Character.warden]: ['Mesh06', 'Mesh45', 'Mesh46', 'Mesh05'],
+    [Character.demonHunter]: ['Plane12', 'Plane06'],
 };
 const BOUNCE: Readonly<Record<number, Readonly<Record<number, number>>>> = {
     [Character.murloc]: { 18: 0.4, 50: 0.35, 72: 0.35 },
@@ -87,7 +89,7 @@ for (const character of characters) {
     const existing = source.Sequences.findIndex(sequence => sequence.Name === name);
     const design = DESIGNED[character];
     const pumps = PUMPS[character], hops = BOUNCE[character], bouncing = hops !== undefined || pumps !== undefined || design !== undefined;
-    const cheer = design ?? (pumps === undefined ? CHEER : alternating(pumps.low));
+    const cheer = design ?? (pumps === undefined ? CHEER : alternating(pumps.low).map(beat => beat.arms === 'rest' && pumps.start !== undefined ? { ...beat, arms: pumps.start } : beat));
     const beats = design ?? cheer.map(beat => pumps !== undefined ? { ...beat, hop: beat.hop * pumps.hop } : bouncing ? { ...beat, hop: hops?.[beat.frame] ?? 0 } : beat);
     const stand = source.Sequences[standSequence(source)];
     ensure(stand !== undefined, `${fighter.name} has no Stand sequence`);
@@ -169,7 +171,7 @@ for (const character of characters) {
     };
     const solved = new Map<string, number[]>();
     const below = (child: mdx.Node, ancestor: mdx.Node): boolean => { let at: mdx.Node | undefined = child; while (at !== undefined && at.Parent != null && at.Parent !== -1) { if (at.Parent === ancestor.ObjectId) return true; at = model.Nodes[at.Parent]; } return false; };
-    const held = bouncing && design === undefined ? arms.flatMap(([, , hand], side) => model.Nodes.filter(candidate => candidate !== undefined && /^weapon ref$/i.test(candidate.Name.trim()) && below(candidate, hand!)).map(weapon => ({ side, hand: hand!, weapon }))).at(0) : undefined;
+    const held = bouncing && design === undefined ? arms.flatMap(([, , hand], side) => model.Nodes.filter(candidate => candidate !== undefined && /(^|_)weapon ref$/i.test(candidate.Name.trim()) && below(candidate, hand!)).map(weapon => ({ side, hand: hand!, weapon }))).at(0) : undefined;
     const direction = (from: mdx.Node, to: mdx.Node) => { const [a, b] = [pivot(from), pivot(to)]; const d = [0, 1, 2].map(i => b[i]! - a[i]!); const length = Math.hypot(...d); return d.map(v => v / length); };
     const tip = (pumps?.tip ?? 0) * Math.PI / 180;
     const upright = held === undefined ? undefined : tip !== 0 ? [0, Math.sign(shoulders[held.side]![1]! - centre) * Math.sin(tip), Math.cos(tip)] : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
@@ -244,6 +246,11 @@ for (const character of characters) {
     const hanging = (HANGING[character] ?? []).map(name => {
         const node = model.Nodes.find(candidate => candidate?.Name === name);
         ensure(node?.Rotation && node.Parent != null && node.Parent !== -1, `${fighter.name}: ${name} has no parent or rotation track to hang from`);
+        for (const { frame } of beats) if (!node.Rotation.Keys.some(key => key.Frame === time(frame))) {
+            const identity = () => new Float32Array([0, 0, 0, 1]);
+            node.Rotation.Keys.push({ Frame: time(frame), Vector: identity(), ...(node.Rotation.LineType >= mdx.LineType.Hermite ? { InTan: identity(), OutTan: identity() } : {}) });
+            settle(node.Rotation);
+        }
         renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]; renderer.update(0);
         return { node, parent: node.Parent, rest: mat4.getRotation(quat.create(), data.nodes[node.ObjectId].matrix) };
     });
