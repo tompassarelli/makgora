@@ -137,7 +137,6 @@ export interface KeyboardRollback {
   readonly stamps: CaptureStamp[];
   readonly pairedSends: boolean;
   readonly real: RealFrames;
-  paced: number;
 }
 
 
@@ -416,7 +415,7 @@ function rollback(mode: ShadowInputMode, playback: RollbackPlayback, editbox: Ed
     keyboard: mode.kind === "keyboard"
       ? {
         capture: keyboardCapture(), outgoing: new InputBatch(0), nextSend: 1, lastTarget: undefined, pairedSends: mode.pairedSends,
-        stamps: Array.from({ length: PENDING_CAPACITY }, () => ({ traced: false, callback: 0, seconds: 0.0 })), real: realFrames(), paced: 0,
+        stamps: Array.from({ length: PENDING_CAPACITY }, () => ({ traced: false, callback: 0, seconds: 0.0 })), real: realFrames(),
       }
       : undefined,
     journal: mode.kind === "journal" ? journal(mode.ingress, editbox) : undefined,
