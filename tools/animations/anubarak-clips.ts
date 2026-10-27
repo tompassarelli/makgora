@@ -59,7 +59,7 @@ interface Lunge { contact: number; x?: number; z?: number; back: number; over?: 
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
   jab2: { contact: 7, x: 64, back: 32 },
-  forwardSmash: { contact: 20, x: 48, back: 24 },
+  forwardSmash: { contact: 20, x: 48, back: 24, decay: 33 },
   upSmash: { contact: 17, z: 48, back: 24 },
   downSmash: { contact: 15, x: 10, back: 6 },
   neutralAir: { contact: 9, x: 12, back: 6 },
@@ -72,7 +72,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
 };
-interface Rake { contact: number; through: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
+interface Rake { contact: number; through: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; settle?: number; }
 const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
   windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
   strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
@@ -81,7 +81,7 @@ const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> 
 const rakes: Partial<Record<HeroPose, Rake>> = {
   jab: { contact: 5, through: 7, windup: { chest: -20, pelvis: -12, lean: -10, arm: -210, elbow: 70, wrist: 40, leftArm: -65, head: -15 }, strike: { chest: 30, pelvis: 15, lean: 12, arm: -275, elbow: 100, wrist: 60, leftArm: -80, head: 15 }, follow: { chest: 45, pelvis: 28, lean: 16, arm: -90, elbow: 110, wrist: 55, leftArm: -95, head: 15 }, carry: { frame: 13, gesture: { chest: 45, pelvis: 28, lean: 12, arm: 0, elbow: 0, wrist: 30, leftArm: -95, head: 10 } } },
   jab2: { contact: 7, through: 9, windup: { chest: -20, pelvis: -12, lean: -10, leftArm: -210, leftElbow: 70, leftWrist: 40, arm: -65, head: -15 }, strike: { chest: 25, pelvis: 15, lean: 10, leftArm: -230, leftElbow: 120, leftWrist: 40, arm: -80, head: 15 }, follow: { chest: 45, pelvis: 28, lean: 16, leftArm: -90, leftElbow: 110, leftWrist: 55, arm: -95, head: 15 }, carry: { frame: 15, gesture: { chest: 45, pelvis: 28, lean: 12, leftArm: 0, leftElbow: 0, leftWrist: 30, arm: -95, head: 10 } } },
-  forwardSmash: { contact: 19, through: 22, windup: { chest: -28, pelvis: -15, lean: -14, arm: -210, elbow: 70, wrist: 40, leftArm: -170, leftElbow: 50, head: -25 }, strike: { chest: 30, pelvis: 15, lean: 10, arm: -230, elbow: 120, wrist: 40, head: 15, leftArm: -150, leftElbow: 70 }, follow: { chest: 50, pelvis: 30, lean: 18, arm: -90, elbow: 110, wrist: 55, head: 15, leftArm: -120, leftElbow: 60 }, carry: { frame: 34, gesture: { chest: 50, pelvis: 30, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -90, leftElbow: 50 } } },
+  forwardSmash: { contact: 19, through: 22, windup: { chest: -28, pelvis: -15, lean: -14, arm: -210, elbow: 70, wrist: 40, leftArm: -170, leftElbow: 50, head: -25 }, strike: { chest: 30, pelvis: 15, lean: 10, arm: -230, elbow: 120, wrist: 40, head: 15, leftArm: -150, leftElbow: 70 }, follow: { chest: 50, pelvis: 30, lean: 18, arm: -90, elbow: 110, wrist: 55, head: 15, leftArm: -120, leftElbow: 60 }, carry: { frame: 34, gesture: { chest: 50, pelvis: 30, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -90, leftElbow: 50 } }, settle: 56 },
   downSmash: { contact: 15, through: 20, windup: { chest: -25, pelvis: -15, lean: -12, arm: -220, elbow: 80, wrist: 40, leftArm: -220, leftElbow: 80, leftWrist: 40, head: -20 }, strike: { chest: 45, pelvis: 18, lean: 18, arm: -170, elbow: 70, wrist: 80, head: 15, leftArm: -200, leftElbow: 90, leftWrist: 40, thigh: 30, knee: -40 }, follow: { chest: 30, pelvis: 20, lean: 5, yaw: 150, arm: -150, elbow: 80, wrist: 80, leftArm: -150, leftElbow: 80, leftWrist: 60, thigh: 35, knee: -45 }, carry: { frame: 30, gesture: { chest: 30, pelvis: 20, yaw: 120, arm: -60, elbow: 60, wrist: 60, leftArm: -60, leftElbow: 60, leftWrist: 60, thigh: 30, knee: -40 } } },
   forwardTiltDown: { contact: 9, through: 12, windup: { chest: -20, pelvis: -12, lean: -10, arm: -230, elbow: 70, wrist: 40, leftArm: -60, head: -20 }, strike: { chest: 55, pelvis: 18, lean: 22, arm: -150, elbow: 40, wrist: 30, head: 15, leftArm: -60, thigh: 30, knee: -40 }, follow: { chest: 45, pelvis: 28, lean: 18, arm: -80, elbow: 100, wrist: 60, head: 15, leftArm: -60, thigh: 40, knee: -50, leftThigh: -20 }, carry: { frame: 20, gesture: { chest: 40, pelvis: 28, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -60, thigh: 35, knee: -45 } } },
   downTilt: { contact: 7, through: 10, windup: { chest: -15, pelvis: -10, lean: -8, arm: -220, elbow: 80, wrist: 40, leftArm: -40, head: -15, thigh: 20, knee: -30 }, strike: { chest: 55, pelvis: 20, lean: 22, arm: -130, elbow: 40, wrist: 30, hand: 0, head: 20, thigh: 40, knee: -50, leftArm: -60 }, follow: { chest: 20, pelvis: 20, arm: -40, elbow: 60, wrist: 70, hand: 30, head: 15, thigh: 35, knee: -45, leftArm: -60 }, carry: { frame: 18, gesture: { chest: 15, pelvis: 15, lean: -5, arm: 20, wrist: 30, head: 10, thigh: 30, knee: -40, leftArm: -60 } } },
@@ -246,8 +246,8 @@ for (const [ordinal, action] of authoredActions.entries()) {
   };
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
-    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? donor.Keys[0];
-    if (!first) return;
+    const standKey = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]), first = standKey ?? donor.Keys[0]; if (!first) return;
+    const rest = /^\.(Bones|Helpers)\.\d+\.(Translation|Rotation|Scaling)$/.exec(path)?.[2], resting = rest && !standKey && rake?.settle ? new Float32Array(rest === "Rotation" ? [0, 0, 0, 1] : rest === "Scaling" ? [1, 1, 1] : [0, 0, 0]) : undefined;
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
     for (const frame of phaseFrames) {
@@ -282,7 +282,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
           : frame <= rake.through ? blend(poses[1]!, poses[2]!, (frame - rake.contact) / (rake.through - rake.contact))
           : frame <= carried ? blend(poses[2]!, poses[3]!, (frame - rake.through) / (carried - rake.through))
           : frame <= released ? poses[3]!.slice()
-          : blend(poses[3]!, first.Vector, Math.min(1, (frame - released) / (settled - released)));
+          : blend(poses[3]!, first.Vector, Math.min(1, (frame - released) / ((rake.settle ?? settled) - released)));
       } else if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }
@@ -294,7 +294,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
           : frame <= 13 ? poses[2]!.slice()
           : blend(poses[2]!, first.Vector, (frame - 13) / (action.frames - 13));
       }
-      if (action.pose === blenderPose) Vector = bakedVector?.(path, frame) ?? Vector;
+      if (resting && rake?.settle) { const from = rake.carry?.frame ?? rake.through, weight = Math.min(1, Math.max(0, (frame - from) / (rake.settle - from))); Vector = rest === "Rotation" ? blend(Vector, resting, weight) : Float32Array.from(Vector, (v, i) => v + (resting[i]! - v) * weight); } if (action.pose === blenderPose) Vector = bakedVector?.(path, frame) ?? Vector;
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(track.LineType > 1 ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
