@@ -443,7 +443,8 @@ for(const [id,poses]of Object.entries(PLAN)) {
     const blender=rigOutput||bakedKeys?blenderSkeleton(source,originals,stand,onGlobalClock):undefined;
     if(blender&&rigOutput){
       const nodes=[...source.Bones,...source.Helpers,...source.Attachments],tip=nodes.find(n=>n.Name==="Weapon Ref"&&n.Parent!=null);
-      await blender.writeRig(rigOutput,{frames:total,contact,active:special?heroCueWindows(special,1).active.last-contact+1:characterAttackActiveFrames(character,style!,moves),
+      const hits=Object.values(Object.groupBy(special?[]:moves?.normals[style!]?.regions??[],r=>r.hit.window)).map(rs=>[Math.min(...rs!.map(r=>r.firstFrame)),Math.max(...rs!.map(r=>r.lastFrame))]);
+      await blender.writeRig(rigOutput,{frames:total,contact,hits,active:special?heroCueWindows(special,1).active.last-contact+1:characterAttackActiveFrames(character,style!,moves),
         ...tip?{tip:{parent:nodes.find(n=>n.ObjectId===tip.Parent)!.Name,pivot:Array.from(source.PivotPoints[tip.ObjectId]!)}}:{}});
       console.log(`ATTACK_GESTURE_RIG ${f.name}/${pose} ${rigOutput}`);process.exit(0);
     }
@@ -474,7 +475,7 @@ for(const [id,poses]of Object.entries(PLAN)) {
     }
     if(hop)for(let frame=0;frame<=total;frame++)hop.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([0,0,frame<contact?(hops[pose]??0)*Math.sin(Math.PI*frame/contact):0])});
     const shadowLow = character === 9 && pose === "downTilt";
-    const aligned = wardenWeaponPose(character,pose) || shadowLow || character === 5 && (pose === "neutralAir" || pose === "forwardAir");
+    const aligned = baked !== undefined || wardenWeaponPose(character,pose) || shadowLow || character === 5 && (pose === "neutralAir" || pose === "forwardAir");
     if (aligned && !baked) aimWeaponContact(model,index,start,contact,total,pose,shadowLow);
     const binding=`{ index: ${index}, seconds: ${seconds((end-start)/1000)}${aligned||character===5&&pose==="downSmash"?", aligned: true":""} }`;
     bindings.push(`    ${pose}: ${binding},`);

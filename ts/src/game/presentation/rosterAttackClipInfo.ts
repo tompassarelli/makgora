@@ -13,9 +13,9 @@ export const ROSTER_ATTACK_CLIPS = {
     neutralAir: { index: 71, seconds: f32(0.583) },
     upAir: { index: 72, seconds: f32(0.533) },
     dashAttack: { index: 74, seconds: f32(0.683) },
-    forwardAir: { index: 75, seconds: f32(0.8) },
     downTilt: { index: 76, seconds: f32(0.517) },
     backAir: { index: 73, seconds: f32(0.617) },
+    forwardAir: { index: 75, seconds: f32(0.8), aligned: true },
   },
   5: {
     jab3: { index: 55, seconds: f32(0.367), aligned: true },

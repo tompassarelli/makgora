@@ -38,6 +38,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   back and down behind him through the three active frames as his chest opens to profile, carried on under his
   hip and settled, and
   `... --replace-pose backAir --keys KEYS.json` splices the keys in place.
+  His two-hit forward air follows the same three steps with `--replace-pose forwardAir` and
+  `tools/animations/mountain-king-forward-air.py`: the rig's `hits` lists the move's two active windows, and the
+  script cocks the left hammer over his shoulder and sweeps it level through the first, then raises the right hammer
+  overhead and chops it forward and down through the second, legs tucked throughout. A clip spliced from Blender
+  keys is bound `aligned`, so it plays one key per simulation frame instead of being re-timed around one strike moment.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip

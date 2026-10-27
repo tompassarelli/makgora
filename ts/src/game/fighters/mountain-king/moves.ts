@@ -79,6 +79,7 @@ export function hit(damage: number, launchClass: LaunchClass, angle: keyof typeo
 export const capsule = (x1: number, z1: number, x2: number, z2: number, radius: number): StrikeCapsule => ({ x1, z1, x2, z2, radius });
 const circle = (x: number, z: number, radius: number): StrikeCapsule => capsule(x, z, x, z, radius);
 const frame = (active: number, strike: StrikeCapsule, effect: Readonly<HitEffect>, groundedEffect?: Readonly<HitEffect>) => heroRegion(active, active, strike, effect, groundedEffect);
+const second = (active: number, strike: StrikeCapsule, effect: Readonly<HitEffect>, groundedEffect?: Readonly<HitEffect>) => heroRegion(active, active, strike, effect, groundedEffect, 2);
 
 const JAB = hit(4.322759628295898, "POKE", 35);
 const FORWARD_TILT = hit(10.806899070739746, "EDGE", 35, false, HitElement.slash);
@@ -93,6 +94,7 @@ const DOWN_SMASH_FRONT = downSmashHit(hit(17.67999839782715, "EDGE", 25));
 const DOWN_SMASH_BACK = downSmashHit(hit(17.67999839782715, "EDGE", 25, true));
 const NEUTRAL_AIR_FRONT = hit(10.806899070739746, "POKE", 50);
 const NEUTRAL_AIR_BACK = hit(10.806899070739746, "POKE", 50, true);
+const FORWARD_AIR_LINK = { ...hit(3.0, "LINK", 80), growth: 100.0, base: 0.0, setKnockback: 30.0, carry: true };
 const FORWARD_AIR_HEAD = strongHit(hit(17.291038513183594, "SPIKE", 270));
 const FORWARD_AIR_GROUNDED_HEAD = strongHit(hit(17.291038513183594, "LAUNCH", 55));
 const FORWARD_AIR_HANDLE = hit(11.887589454650879, "LAUNCH", 45);
@@ -123,7 +125,7 @@ const MOUNTAIN_KING_BODIES: FighterHurtboxes = {
       limb(13, 18, hurtPart(8.0, 40.0, 46.0, 18.0, ARM)),
       limb(19, 26, hurtPart(-8.0, 40.0, -46.0, 18.0, ARM)),
     ],
-    [AttackStyle.forwardAir]: [limb(12, 24, hurtPart(8.0, 60.0, 44.0, 48.0, ARM))],
+    [AttackStyle.forwardAir]: [limb(9, 24, hurtPart(8.0, 60.0, 44.0, 48.0, ARM))],
     [AttackStyle.backAir]: [limb(8, 17, hurtPart(-8.0, 58.0, -46.0, 50.0, ARM))],
     [AttackStyle.downAir]: [limb(10, 20, hurtPart(0.0, 20.0, 0.0, -f32(SHORT - 14.0), LEG))],
     [AttackStyle.grab]: [limb(6, 12, hurtPart(8.0, 50.0, f32(GRAB - 14.0), 24.0, ARM))],
@@ -162,13 +164,15 @@ export const MOUNTAIN_KING_MOVES: FighterMoves = {
       heroRegion(8, 10, capsule(0.0, 18.0, 0.0, 62.0, 24.0), NEUTRAL_AIR_FRONT),
       heroRegion(11, 13, capsule(0.0, 18.0, 0.0, 62.0, 24.0), NEUTRAL_AIR_BACK),
     ]),
-    [AttackStyle.forwardAir]: heroMove(16, 3, 30, 21, [
-      frame(16, circle(46.0, 46.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
-      frame(17, circle(46.0, 46.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
-      frame(18, circle(46.0, 46.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
-      frame(16, capsule(16.0, 47.0, 40.0, 55.0, 8.0), FORWARD_AIR_HANDLE),
-      frame(17, capsule(16.0, 47.0, 40.0, 55.0, 8.0), FORWARD_AIR_HANDLE),
-      frame(18, capsule(16.0, 47.0, 40.0, 55.0, 8.0), FORWARD_AIR_HANDLE),
+    [AttackStyle.forwardAir]: heroMove(11, 9, 29, 21, [
+      frame(11, capsule(30.0, 64.0, 86.0, 74.0, 13.0), FORWARD_AIR_LINK),
+      frame(12, capsule(32.0, 56.0, 84.0, 36.0, 13.0), FORWARD_AIR_LINK),
+      second(17, circle(56.0, 80.0, 16.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
+      second(18, circle(57.0, 46.0, 16.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
+      second(19, circle(42.0, 24.0, 16.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
+      second(17, capsule(20.0, 76.0, 46.0, 79.0, 8.0), FORWARD_AIR_HANDLE),
+      second(18, capsule(28.0, 66.0, 50.0, 51.0, 8.0), FORWARD_AIR_HANDLE),
+      second(19, capsule(28.0, 54.0, 38.0, 34.0, 8.0), FORWARD_AIR_HANDLE),
     ]),
     [AttackStyle.backAir]: heroMove(10, 3, 25, 15, [
       frame(10, capsule(-10.0, 73.0, -64.0, 85.0, 12.0), BACK_AIR),
