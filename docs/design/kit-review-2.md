@@ -205,7 +205,7 @@ disable that any damage ends), **Vampiric Aura** (melee lifesteal),
 26, 0.06H a frame, radius 0.18H) but lives 50 frames, and the sleep is now
 long and contested:
 
-- A grounded fighter it hits sleeps **70 frames**; an airborne one 24
+- A grounded fighter it hits sleeps **160 frames** (2026-10-27: one second longer, so a landed orb pays for the close-in read; it was 70 here and 100 in the kit); an airborne one 24
   frames, so an offstage hit is an edge-guard opening, not a KO.
 - The sleeper **mashes out** with the grab and freeze rule
   (smashcraft:ts/src/game/sim/mash.ts): each press or new stick direction

@@ -138,7 +138,7 @@ delay. Horizontal reversals are at least four frames apart.
 The measured tail can outlast a missed grab or a partly spent Sleep; those short
 windows are not guaranteed punishes. The four recorded Rifleman seeds punish
 two missed grabs. The roster still punishes missed grabs more often as Expert
-than Rookie. Sleep's full grounded duration is 100 frames. Rollback fixtures
+than Rookie. Sleep's full grounded duration is 160 frames. Rollback fixtures
 include 48 frames so the computer acts after the reaction curve's 40-frame tail.
 High-tier matches retain 43 observation frames; a Beginner or Rookie retains
 61 frames for its slower floor plus the curve's tail.
