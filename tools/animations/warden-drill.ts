@@ -81,13 +81,12 @@ const rewrite = (node: mdx.Node, pose: (frame: number, base: Quat) => Quat) => {
 
 rewrite(drill, frame => times(about([0, 1, 0], -TILT * dive(frame)), about([0, 0, 1], turn(frame))));
 
-const SPINDLE: Record<string, readonly [number, number]> = { Bone_Root: [0, 0], Bone_Pelvis: [0, 0], Bone_Chest: [6, 0], Bone_Head: [-8, 0],
+const SPINDLE: Record<string, readonly [number, number, number?]> = { Bone_Root: [0, 0], Bone_Pelvis: [0, 0], Bone_Chest: [6, 0], Bone_Head: [-8, 0],
   Bone_Leg1_R: [0, 0], Bone_Leg2_R: [0, 0], Bone_Foot_R: [50, 0], Bone_Leg1_L: [-4, 4], Bone_Leg2_L: [10, 0], Bone_Foot_L: [40, 0],
-  Bone_Arm1_R: [-155, -12], Bone_Arm1_L: [-155, 12], Bone_Arm2_R: [15, 0], Bone_Arm2_L: [15, 0] };
-for (const [name, [pitch, roll]] of Object.entries(SPINDLE)) {
+  Bone_Arm1_R: [-185, -42, 15], Bone_Arm1_L: [-185, 57, -30], Bone_Arm2_R: [15, 0, 45], Bone_Arm2_L: [-15, 45, 0], Bone_Hand_R: [15, 0, 15], Bone_Hand_L: [30, 0, 0] };
+for (const [name, [pitch, roll, yaw = 0]] of Object.entries(SPINDLE)) {
   rewrite(named(name), (frame, base) => {
-    const pulse = frame >= first && frame <= last ? Math.sin((frame - first) / (last - first) * Math.PI * TURNS * 2) : 0;
-    return blend(base, times(about([1, 0, 0], roll), about([0, 1, 0], pitch + (name.includes("Arm") ? pulse * 8 : 0))), dive(frame));
+    return blend(base, times(about([0, 0, 1], yaw), times(about([1, 0, 0], roll), about([0, 1, 0], pitch))), dive(frame));
   });
 }
 

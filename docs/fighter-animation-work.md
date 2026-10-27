@@ -1195,8 +1195,12 @@ Warden's drill is then re-authored in place by
 smashcraft:tools/animations/warden-drill.ts as Maiev's Fox-style drill (#507),
 matching her down air's hit regions on the line 30 degrees off vertical toward
 her facing. The spin pivots on her body line, so her feet stay on that line
-while she turns; only the arms carry the per-turn pulse, since a pulse on the
-hips or legs turns with the spin and swings the feet off the axis. Warden's
+while she turns; nothing pulses per turn, since a pulse on the arms, hips or
+legs turns with the spin and swings the silhouette off the axis. The arms
+hold still through the spin, raised overhead and brought in until the glaive
+and its ring sit on the spin axis above her head, inside her body line, since
+a ring hanging off one hand swings 35 to 65 units off the axis on every half
+turn (take 2 read as a rocking tilt, #507, 2026-10-27). Warden's
 `Cape_*` helpers bind no vertices: her cloth is the `Mesh` bone chains under
 her shoulders (cape strands), chest (robe panels) and head (hood tail), which
 the drill wraps in around her body line, each link lagging its parent. Cloth
