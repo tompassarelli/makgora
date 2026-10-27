@@ -23,7 +23,7 @@ const tidalRush = (air: boolean): AuthoredSpecial => ({
 const tideSpout = (speed: number, drift: number): AuthoredSpecial => ({
   endFrame: 34, oncePerAirtime: true, helpless: true, facesStick: true,
   motion: [{ ...frames(1, 5), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(6, 25), velocityX: 0.0, velocityZ: speed, driftSpeed: drift }],
-  regions: [heroRegion(6, 14, { x1: 0.0, z1: 20.0, x2: 0.0, z2: 80.0, radius: 26.0 }, murlocHit(6.244323253631592, 80, 63.15253829956055, 30.0))],
+  regions: [heroRegion(6, 14, { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 }, murlocHit(6.244323253631592, 80, 63.15253829956055, 30.0))],
 });
 
 const PLAGUE: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
