@@ -1,0 +1,11 @@
+import { loadBody, skeletonOf, sampleSpecial, gameplayPixelsPerUnit, SCORED_SPECIALS } from "./wisp/animScoreSample";
+import { meanVertexDistance } from "./wisp/animScore";
+import { assetsView, readManifest } from "./wisp/buildInputs";
+import { Effect } from "effect";
+import { Character } from "../src/game/sim/codes";
+const assets = process.argv[2] ?? assetsView(await Effect.runPromise(readManifest() as any));
+const model = await loadBody(assets, Character.anubarak);
+const s = sampleSpecial(model, skeletonOf(model, Character.anubarak), Character.anubarak, SCORED_SPECIALS.find(e => e.move === (process.argv[3] ?? "neutral-special"))!, gameplayPixelsPerUnit())!;
+const f = s.sample.frames;
+console.log("moveFrames", s.sample.moveFrames, "first", s.sample.firstActive, "last", s.sample.lastActive);
+for (let i = 0; i < f.length; i++) console.log(i, s.seconds[i]?.toFixed(4), i ? meanVertexDistance(f[i-1]!, f[i]!).toFixed(2) : "", meanVertexDistance(f[i]!, s.sample.ready).toFixed(2));
