@@ -1,0 +1,22 @@
+# #454 screen calibration: mountain-king down-special, every active frame (special frames 53-70) held with its cues shown, then concealed by -dev hide cues 0.
+#! chat -dev quick hero mountain king
+#! conceal-cues a mountain-king down-special 1470x840
+40 a move special 3 right
+91 a capture
+92 a capture
+93 a capture
+94 a capture
+95 a capture
+96 a capture
+97 a capture
+98 a capture
+99 a capture
+100 a capture
+101 a capture
+102 a capture
+103 a capture
+104 a capture
+105 a capture
+106 a capture
+107 a capture
+108 a capture

@@ -1,5 +1,7 @@
 import { writeLines } from "wisp/src/platform/fileio";
-import { CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
+import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
+import { emptyBounds, hurtBounds, screenBox, effectBounds, type PixelBox } from "../../game/presentation/screenBoxes";
+import { fighterAt, isActive } from "../../game/sim/roster";
 import { type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../../platform/captureFixtures";
 import { nativeDriverCommand } from "../../platform/nativeDriver";
 import { applyDeveloperCommand } from "./developerCommands";
@@ -13,6 +15,8 @@ const WARMUP_TICKS = 300;
 const OPENING_TICKS = 120;
 
 const HOLD_TICKS = 180;
+
+const CUE_SETTLE_TICKS = 120;
 
 const TAIL_FRAMES = 30;
 
@@ -38,6 +42,22 @@ export function restartCapture(): void { globalThis.__smashcraftCaptureRunner = 
 
 function status(line: string): void { writeLines(CAPTURE_STATUS_FILE, [line]); }
 
+const screenLines: string[] = [];
+const boxText = (box: PixelBox | undefined) => box === undefined ? "- - - -" : `${box.x} ${box.y} ${box.width} ${box.height}`;
+const bares = (silhouette: Silhouette | undefined): silhouette is Silhouette => silhouette !== undefined && silhouette.conceal !== "cues";
+
+function recordScreenBoxes(s: ShellState, fixture: CaptureFixture, slot: 0 | 1, frame: number): void {
+  if (!isActive(s.world, slot)) return;
+  const fighter = fighterAt(s.world, slot);
+  const width = BlzGetLocalClientWidth();
+  const height = BlzGetLocalClientHeight();
+  const aspect = height > 0 ? I2R(width) / I2R(height) : 16.0 / 9.0;
+  const region = screenBox(s.camera, aspect, width, height, effectBounds(fighter, hurtBounds(fighter, emptyBounds())));
+  const body = screenBox(s.camera, aspect, width, height, hurtBounds(fighter, emptyBounds()));
+  screenLines.push(`SCREEN ${fixture.name} ${frame} ${width} ${height} ${boxText(region)} ${boxText(body)}`);
+  writeLines(CAPTURE_SCREEN_FILE, screenLines);
+}
+
 function nextScript(r: Runner, fixtures: readonly CaptureFixture[]): void {
   r.script++;
   r.stage = "opening";
@@ -60,13 +80,15 @@ function openingTick(r: Runner, fixture: CaptureFixture): void {
   nativeDriverCommand(`resume ${fixture.frames[0] ?? 0}`);
 }
 
-function beginHold(s: ShellState, r: Runner, silhouette: Silhouette | undefined, target: number): void {
+function beginHold(s: ShellState, r: Runner, fixture: CaptureFixture, target: number): void {
+  const silhouette = fixture.silhouette;
   if (silhouette !== undefined && r.held === 0) {
     ClearTextMessages();
-    if (r.hidden) {
-      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
-      r.stampTick = r.ticks;
-    }
+    if (silhouette.conceal === "cues" && !r.hidden) recordScreenBoxes(s, fixture, silhouette.slot, target);
+  }
+  if (silhouette !== undefined && r.hidden && r.held === (silhouette.conceal === "cues" ? CUE_SETTLE_TICKS : 0)) {
+    paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+    r.stampTick = r.ticks;
   }
   holdAgeSeekedEffects(s);
   r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
@@ -75,7 +97,7 @@ function beginHold(s: ShellState, r: Runner, silhouette: Silhouette | undefined,
 function hidesNext(s: ShellState, r: Runner, silhouette: Silhouette | undefined): boolean {
   if (silhouette === undefined) return false;
   r.hidden = !r.hidden;
-  applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
+  applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} ${silhouette.conceal === "cues" ? "cues" : "fighter"} ${silhouette.slot}`);
   ClearTextMessages();
   if (r.hidden) r.hideTick = r.ticks;
   return r.hidden;
@@ -89,7 +111,7 @@ function nextFrame(s: ShellState, r: Runner, fixture: CaptureFixture, target: nu
     return;
   }
   r.stage = "tail";
-  if (fixture.silhouette !== undefined) bareFighter(s, fixture.silhouette.slot, false);
+  if (bares(fixture.silhouette)) bareFighter(s, fixture.silhouette.slot, false);
   r.tail = target + (fixture.tailFrames ?? TAIL_FRAMES);
   nativeDriverCommand(`resume ${r.tail}`);
 }
@@ -97,9 +119,9 @@ function nextFrame(s: ShellState, r: Runner, fixture: CaptureFixture, target: nu
 function targetTick(s: ShellState, r: Runner, fixture: CaptureFixture, now: number): void {
   const target = fixture.frames[r.frame];
   const silhouette = fixture.silhouette;
-  if (silhouette !== undefined) bareFighter(s, silhouette.slot, true);
+  if (bares(silhouette)) bareFighter(s, silhouette.slot, true);
   if (target === undefined || now !== target) return;
-  beginHold(s, r, silhouette, target);
+  beginHold(s, r, fixture, target);
   if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
   r.held = 0;
   if (!hidesNext(s, r, silhouette)) nextFrame(s, r, fixture, target);

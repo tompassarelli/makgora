@@ -19,7 +19,7 @@ export interface ScreenSample {
 }
 
 export const SCREEN_POSITIVES = ["neutral-special", "side-special", "up-special", "down-special", "ultimate"].map(move => `blademaster:${move}`);
-export const SCREEN_NEGATIVES = ["chen-stormstout:neutral-special", "murloc:side-special", "murloc:up-special", "shadow-hunter:neutral-special", "mountain-king:down-special", "thrall:down-special", "cairne:neutral-special", "lich:side-special", "lich:down-special"];
+export const SCREEN_NEGATIVES = ["chen-stormstout:neutral-special", "murloc:side-special", "murloc:up-special", "shadow-hunter:neutral-special", "mountain-king:down-special", "thrall:down-special", "cairne-bloodhoof:neutral-special", "lich:side-special", "lich:down-special"];
 const projectileUses = effectUses().filter(use => use.kind === "projectile");
 const projectileKey = (use: typeof projectileUses[number]) => `${use.fighter}:${use.move} [projectile:${effectUseDigest(use)}]`;
 const SCREEN_PROJECTILES = projectileUses.map(projectileKey);
@@ -27,6 +27,7 @@ const projectileFrames = new Map(projectileUses.map(use => [projectileKey(use), 
 export const screenRequiredFrames = (move: string) => Math.max(1, projectileFrames.get(move) ?? 1);
 export const SCREEN_MOVES = [...new Set([...SELECTABLE_CHARACTERS.flatMap(character => ["neutral-special", "side-special", "up-special", "down-special", "ultimate"].map(move => `${fighterSlug(character)}:${move}`)), ...SCREEN_PROJECTILES])];
 export const SCREEN_CHANNEL_DELTA = 24;
+export const SCREEN_LEAK_DELTA = 96;
 
 const contains = (box: PixelBox, x: number, y: number) => x >= box.x && y >= box.y && x < box.x + box.width && y < box.y + box.height;
 const validBox = (box: PixelBox, width: number, height: number) => [box.x, box.y, box.width, box.height].every(Number.isInteger) && box.x >= 0 && box.y >= 0 && box.width > 0 && box.height > 0 && box.x + box.width <= width && box.y + box.height <= height;
@@ -35,13 +36,14 @@ export function measureFootprint(shown: Frame, off: Frame, repeatedOff: Frame, r
   if ([shown, off, repeatedOff].some(image => image.width !== shown.width || image.height !== shown.height || image.rgb.length !== image.width * image.height * 3)
     || !validBox(region, shown.width, shown.height) || excluded.some(box => !validBox(box, shown.width, shown.height))) return undefined;
   let pixels = 0, contamination = 0, unstable = 0;
-  const differs = (left: Frame, right: Frame, offset: number) => [0, 1, 2].some(channel => Math.abs((left.rgb[offset + channel] ?? 0) - (right.rgb[offset + channel] ?? 0)) > SCREEN_CHANNEL_DELTA);
+  const differs = (left: Frame, right: Frame, offset: number, delta = SCREEN_CHANNEL_DELTA) => [0, 1, 2].some(channel => Math.abs((left.rgb[offset + channel] ?? 0) - (right.rgb[offset + channel] ?? 0)) > delta);
   for (let y = 0; y < shown.height; y++) for (let x = 0; x < shown.width; x++) {
     if (excluded.some(box => contains(box, x, y))) continue;
     const offset = (y * shown.width + x) * 3;
     const noise = differs(off, repeatedOff, offset);
-    const changed = differs(shown, off, offset) && differs(shown, repeatedOff, offset);
-    if (!contains(region, x, y)) {
+    const inside = contains(region, x, y), delta = inside ? SCREEN_CHANNEL_DELTA : SCREEN_LEAK_DELTA;
+    const changed = differs(shown, off, offset, delta) && differs(shown, repeatedOff, offset, delta);
+    if (!inside) {
       if (changed && !noise) contamination++;
     } else if (noise) unstable++;
     else if (changed) pixels++;
@@ -73,7 +75,7 @@ export interface ScreenCalibration { readonly pixels: number; readonly frames: n
 export function calibrateScreen(samples: readonly ScreenSample[]): { readonly calibration?: ScreenCalibration; readonly problem?: string } {
   const positives = samples.filter(sample => sample.role === "positive"), negatives = samples.filter(sample => sample.role === "negative");
   if (SCREEN_POSITIVES.some(move => !positives.some(sample => sample.move === move)) || SCREEN_NEGATIVES.some(move => !negatives.some(sample => sample.move === move))) return { problem: "native Blademaster positives and all flagged 0.0.192 negatives are required" };
-  if (positives.some(sample => !SCREEN_POSITIVES.includes(sample.move)) || negatives.some(sample => !SCREEN_NEGATIVES.includes(sample.move) || sample.version !== "0.0.192")) return { problem: "unapproved calibration reference or negative map version" };
+  if (positives.some(sample => !SCREEN_POSITIVES.includes(sample.move)) || negatives.some(sample => !SCREEN_NEGATIVES.includes(sample.move) || sample.version.split("+")[0] !== "0.0.192")) return { problem: "unapproved calibration reference or negative map version" };
   const first = positives[0];
   if (first === undefined) return { problem: "no native calibration" };
   for (const sample of [...positives, ...negatives]) {

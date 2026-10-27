@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { existsSync, realpathSync } from "node:fs";
 import { dirname, isAbsolute, join } from "node:path";
 import { BunRuntime } from "@effect/platform-bun";
 import { Console, Effect, Schema } from "effect";
@@ -7,12 +8,13 @@ import { decodePng } from "wisp/scripts/wisp/fidelity/image";
 import { frameStamp } from "./nativeCaptureVerdict";
 import { effectSourceDigest } from "./wisp/effectVisibility";
 import { CLASSIC_BUILDS } from "./wisp/classicBuilds";
+import { SILHOUETTE_HIDDEN_FRAME } from "../src/platform/captureFixtures";
 import { measureFootprint, screenReport, screenAcceptanceProblem, type ScreenSample } from "./wisp/classicEffectScreen";
 
 const Box = Schema.Struct({ x: Schema.Finite, y: Schema.Finite, width: Schema.Finite, height: Schema.Finite });
 const CaptureReference = Schema.Struct({ receipt: Schema.String, fixture: Schema.String, phase: Schema.Literals(["held", "shown", "hidden"]), file: Schema.String });
 const CaptureFrame = Schema.Struct({ frame: Schema.Finite, shown: CaptureReference, off: CaptureReference, repeatedOff: CaptureReference, region: Box, body: Box, excluded: Schema.Array(Box) });
-const CaptureSample = Schema.Struct({ move: Schema.String, role: Schema.Literals(["positive", "negative", "candidate"]), engine: Schema.String, camera: Schema.String, stage: Schema.String, source: Schema.String, version: Schema.String, manifest: Schema.String, map: Schema.String, mapSha256: Schema.String, first: Schema.Finite, last: Schema.Finite, frames: Schema.Array(CaptureFrame) });
+const CaptureSample = Schema.Struct({ move: Schema.String, role: Schema.Literals(["positive", "negative", "candidate"]), engine: Schema.String, camera: Schema.String, stage: Schema.String, source: Schema.String, version: Schema.String, manifest: Schema.String, map: Schema.String, mapSha256: Schema.String, first: Schema.Finite, last: Schema.Finite, crop: Schema.optionalKey(Box), frames: Schema.Array(CaptureFrame) });
 const CapturePack = Schema.Struct({ samples: Schema.Array(CaptureSample) });
 const Receipt = Schema.Struct({ map: Schema.String, build: Schema.Struct({ installed: Schema.String, equal: Schema.Boolean, offline: Schema.optionalKey(Schema.Boolean) }), missed: Schema.Array(Schema.Unknown), captures: Schema.Array(Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.String, file: Schema.String, width: Schema.Finite, height: Schema.Finite })) });
 const Manifest = Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite) })) });
@@ -25,7 +27,10 @@ const failure = (label: string, cause: unknown) => new ScreenEvidenceFailure({ p
 const readBytes = (path: string) => Effect.tryPromise({ try: () => Bun.file(path).bytes(), catch: cause => failure(path, cause) });
 const readText = (path: string) => Effect.tryPromise({ try: () => Bun.file(path).text(), catch: cause => failure(path, cause) });
 const readJson = <S extends Schema.Top & { readonly DecodingServices: never }>(path: string, schema: S) => readText(path).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(schema))), Effect.mapError(cause => failure(path, cause)));
-const resolve = (root: string, path: string) => isAbsolute(path) ? path : join(root, path);
+const resolve = (root: string, path: string) => {
+  const joined = isAbsolute(path) ? path : join(root, path);
+  return existsSync(joined) ? realpathSync(joined) : joined;
+};
 const sha256 = (bytes: Uint8Array | string) => createHash("sha256").update(bytes).digest("hex");
 
 export const readScreenCaptures = Effect.fnUntraced(function*(path: string) {
@@ -59,8 +64,9 @@ export const readScreenCaptures = Effect.fnUntraced(function*(path: string) {
           hashes.set(imagePath, sha256(bytes));
           const image = yield* Effect.try({ try: () => imagePath.endsWith(".png") ? decodePng(bytes) : decodePpm(bytes), catch: cause => failure(imagePath, cause) });
           if (image === undefined) return yield* new ScreenEvidenceFailure({ problem: "capture image is not valid PNG or PPM" });
-          const stamp = frameStamp(image);
-          if (stamp?.script !== fixtureIndex + 1 || stamp.frame !== frame.frame || image.width !== saved.width || image.height !== saved.height) return yield* new ScreenEvidenceFailure({ problem: "pixels have no matching native held-frame stamp or resolution" });
+          const stamp = sample.crop === undefined ? frameStamp(image) : undefined;
+          const cropped = sample.crop !== undefined && image.width === sample.crop.width && image.height === sample.crop.height;
+          if (!cropped && (stamp?.script !== fixtureIndex + 1 || stamp.frame !== frame.frame + (reference.phase === "hidden" ? SILHOUETTE_HIDDEN_FRAME : 0)) || image.width !== saved.width || image.height !== saved.height) return yield* new ScreenEvidenceFailure({ problem: "pixels have no matching native held-frame stamp or resolution" });
           if (width > 0 && (width !== image.width || height !== image.height)) return yield* new ScreenEvidenceFailure({ problem: "sample camera resolution changed" });
           width = image.width; height = image.height;
           images.push(image);

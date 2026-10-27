@@ -34,7 +34,7 @@ import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { parsePadScript } from "./integrity/padScript";
 import { STAMP_CELL } from "../src/game/core/drawnStamp";
-import { CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
+import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
 import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
 import { encodePng } from "./wisp/hurtboxView";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -59,13 +59,14 @@ const SWITCHES = new Set(["--control", "--no-audio", "--sheets"]);
 const positional = (args: readonly string[]) => args.filter((value, index) => !value.startsWith("--") && !(args[index - 1]?.startsWith("--") === true && !SWITCHES.has(args[index - 1] ?? "")));
 
 
-// `#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]`: the fighter in that slot, the move it plays and the client resolution.
+// `#! silhouette|conceal-cues a|b FIGHTER MOVE [WIDTHxHEIGHT]`: the slot whose fighter or cues the hidden grab conceals, the move it plays and the client resolution.
 export function silhouetteOf(path: string, lines: readonly string[]): Silhouette | undefined {
-  const rows = lines.filter(line => /^\s*#!\s*silhouette\b/.test(line));
+  const rows = lines.filter(line => /^\s*#!\s*(?:silhouette|conceal-cues)\b/.test(line));
   if (rows.length === 0) return undefined;
-  const match = /^\s*#!\s*silhouette\s+([ab])\s+(\S+)\s+(\S+)(?:\s+(\d+)x(\d+))?\s*$/.exec(rows[0] ?? "");
-  if (rows.length > 1 || match === null) return fail(`${path}: a silhouette line is "#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]", once`);
-  return { slot: match[1] === "a" ? 0 : 1, fighter: match[2] ?? "", move: match[3] ?? "", width: Number(match[4] ?? 1920), height: Number(match[5] ?? 1080) };
+  const match = /^\s*#!\s*(silhouette|conceal-cues)\s+([ab])\s+(\S+)\s+(\S+)(?:\s+(\d+)x(\d+))?\s*$/.exec(rows[0] ?? "");
+  if (rows.length > 1 || match === null) return fail(`${path}: a silhouette line is "#! silhouette|conceal-cues a|b FIGHTER MOVE [WIDTHxHEIGHT]", once`);
+  const silhouette: Silhouette = { slot: match[2] === "a" ? 0 : 1, fighter: match[3] ?? "", move: match[4] ?? "", width: Number(match[5] ?? 1920), height: Number(match[6] ?? 1080) };
+  return match[1] === "conceal-cues" ? { ...silhouette, conceal: "cues" } : silhouette;
 }
 
 export function fixtureOf(path: string, script: string): CaptureFixture {
@@ -117,7 +118,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
   console.log(`built ${out}: ${fixtures.length} scripts, ${fixtures.reduce((total, fixture) => total + fixture.frames.length, 0)} captures; manifest ${manifest}`);
 });
 
-const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite });
+const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite, conceal: Schema.optionalKey(Schema.Literals(["fighter", "cues"])) });
 const FixtureRecord = Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow) });
 const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.optionalKey(Schema.String), sourceRevision: Schema.optionalKey(Schema.String), fixtures: Schema.Array(FixtureRecord) }));
 const CaptureRecord = Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.Literals(["held", "shown", "hidden"]), file: Schema.String, capturedMs: Schema.Finite, width: Schema.Finite, height: Schema.Finite });
@@ -344,7 +345,9 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
     });
     if (sizes.some(size => size !== `${silhouette.width}x${silhouette.height}`)) wrongSize.push(`${fixture.name}: captured at ${sizes.join(", ")}, not the scenario's ${silhouette.width}x${silhouette.height}`);
   }
-  const result = { map: manifest.map, build: binding, captured: saved.size, wanted, missed, audio, captures: [...saved.values()], log };
+  const screenPath = join(dataDirectory(client.documents), CAPTURE_SCREEN_FILE);
+  const screen = manifest.fixtures.some(fixture => fixture.silhouette?.conceal === "cues") && existsSync(screenPath) && statSync(screenPath).mtimeMs >= started ? preloadLines(readFileSync(screenPath, "latin1")) ?? [] : undefined;
+  const result = { map: manifest.map, build: binding, captured: saved.size, wanted, missed, audio, captures: [...saved.values()], log, ...(screen === undefined ? {} : { screen }) };
   const evidence = sheets ? `${manifest.fixtures[0]?.reel?.fighter}.captures.json` : "captures.json";
   yield* attempt("write capture evidence", () => writeFileSync(join(out, evidence), `${JSON.stringify(result, null, 1)}\n`));
   const unreadable = log.filter(row => row.stamp === "unreadable").length;

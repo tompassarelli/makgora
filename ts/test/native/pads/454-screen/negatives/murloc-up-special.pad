@@ -1,0 +1,24 @@
+# #454 screen calibration: murloc up-special, every active frame (special frames 6-25) held with its cues shown, then concealed by -dev hide cues 0.
+#! chat -dev quick hero murloc
+#! conceal-cues a murloc up-special 1470x840
+40 a move special 2 right
+44 a capture
+45 a capture
+46 a capture
+47 a capture
+48 a capture
+49 a capture
+50 a capture
+51 a capture
+52 a capture
+53 a capture
+54 a capture
+55 a capture
+56 a capture
+57 a capture
+58 a capture
+59 a capture
+60 a capture
+61 a capture
+62 a capture
+63 a capture
