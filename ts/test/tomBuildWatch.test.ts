@@ -1,11 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
-import { type WatchFiles, type WatchSteps, attemptedShas, watchOnce } from "../scripts/tomBuildWatch";
+import { type WatchFiles, type WatchSteps, attemptedShas, installBuild, tidyFolder, watchOnce } from "../scripts/tomBuildWatch";
 import { FETCH_HINT } from "../scripts/wisp/buildInputs";
+import { library } from "../scripts/wisp/mapLibrary";
 
 const SHA = "1e47721".padEnd(40, "0");
 const unstored = new PlayProblem({ problem: `find build input failed for store/impact-assets/abc: impact-assets abc is not in the store; ${FETCH_HINT}` });
@@ -24,12 +25,13 @@ const landing = (fetchStores: boolean) => {
       calls.push("build");
       return stored ? Effect.succeed({ version: "0.1.0-main", source: "map.w3x", stages: [] }) : Effect.fail(unstored);
     }),
+    tidy: Effect.succeed(undefined),
     fetchInputs: Effect.suspend(() => {
       calls.push("fetch");
       stored = fetchStores;
       return fetchStores ? Effect.void : Effect.fail(new PlayProblem({ problem: "no host of gex45 stores these" }));
     }),
-    install: ({ version }) => Effect.succeed({ version, path: "Maps/00-Smashcraft/map.w3x" }),
+    install: ({ version }, _held) => Effect.succeed({ version, path: "Maps/00-Smashcraft/map.w3x" }),
     notes: () => Effect.succeed("checklist.md"),
     budget: () => Effect.void,
   };
@@ -59,5 +61,41 @@ describe("tom build watcher", () => {
     expect(calls).toEqual(["build", "fetch"]);
     expect(outcome._tag === "Failure" && outcome.failure.problem).toBe(unstored.problem);
     expect(attempted).toBe(false);
+  });
+
+  test("while a client runs, a new tip still builds and its file appears beside the untouched older builds, and the tidy into old/ waits until the client closes [k1 scenario]", () => {
+    const directory = mkdtempSync(join(tmpdir(), "tom-build-"));
+    const documents = join(directory, "documents");
+    const root = library(documents);
+    mkdirSync(root, { recursive: true });
+    const older = ["Smashcraft 0.1.3.w3x", "Smashcraft 0.1.4.w3x", "Smashcraft 0.1.5-dev.823.w3x"];
+    for (const file of older) writeFileSync(join(root, file), file);
+    const source = join(directory, "Smashcraft 0.1.5-dev.824.w3x");
+    writeFileSync(source, "next");
+    let running: string | undefined = "Warcraft III is running in Tom's prefix (pid 42)";
+    const client = Effect.sync(() => running);
+    const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted") };
+    const steps: WatchSteps<never> = {
+      ...landing(true).steps,
+      held: client,
+      build: () => Effect.succeed({ version: "0.1.5-dev.824", source, stages: [] }),
+      install: installBuild(documents),
+      tidy: tidyFolder(documents, client),
+    };
+    const names = () => readdirSync(root).filter((entry) => entry.endsWith(".w3x")).sort();
+    try {
+      expect(Effect.runSync(watchOnce(steps, files).pipe(Effect.result))._tag).toBe("Success");
+      expect(names()).toEqual([...older, "Smashcraft 0.1.5-dev.824.w3x"].sort());
+      expect(older.every((file) => readFileSync(join(root, file), "utf8") === file)).toBe(true);
+      expect(Effect.runSync(steps.tidy)).toContain("waits: Warcraft III is running");
+      expect(names()).toHaveLength(4);
+      running = undefined;
+      expect(Effect.runSync(steps.tidy)).toContain("Tidied");
+      expect(names()).toEqual(["Smashcraft 0.1.4.w3x", "Smashcraft 0.1.5-dev.824.w3x"]);
+      expect(existsSync(join(root, "old", "Smashcraft 0.1.3.w3x"))).toBe(true);
+      expect(Effect.runSync(steps.tidy)).toBeUndefined();
+    } finally {
+      rmSync(directory, { recursive: true });
+    }
   });
 });

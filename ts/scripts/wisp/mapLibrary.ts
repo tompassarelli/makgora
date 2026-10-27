@@ -45,20 +45,43 @@ const releaseRank = (file: string) => {
   return [...version, candidate ?? Infinity];
 };
 
-const newerRelease = (a: string, b: string) => releaseRank(b).reduce((order, part, index) => order !== 0 ? order : part - (releaseRank(a)[index] ?? 0), 0);
+const devRank = (file: string) => {
+  const { version, build } = parseInstalled(file) ?? { version: [0, 0, 0] as const, build: undefined };
+  return [...version, build ?? 0];
+};
 
-function archiveOlderReleases(root: string): void {
-  const older = files(root).filter(KEPT_FILE).sort(newerRelease).slice(1);
-  if (older.length === 0) return;
-  mkdirSync(join(root, OLD_FOLDER), { recursive: true });
-  for (const entry of older) renameSync(join(root, entry), join(root, OLD_FOLDER, entry));
+const newerFirst = (rank: (file: string) => readonly number[]) => (a: string, b: string) =>
+  rank(b).reduce((order, part, index) => order !== 0 ? order : part - (rank(a)[index] ?? 0), 0);
+
+export interface Tidy {
+  readonly remove: readonly string[];
+  readonly archive: readonly string[];
 }
 
-export function installLatest(documents: string, map: string): void {
+export function pendingTidy(documents: string): Tidy {
+  const root = library(documents);
+  return {
+    remove: files(root).filter(DEV_FILE).sort(newerFirst(devRank)).slice(1),
+    archive: files(root).filter(KEPT_FILE).sort(newerFirst(releaseRank)).slice(1),
+  };
+}
+
+export function tidyLibrary(documents: string): Tidy {
+  const root = library(documents);
+  const pending = pendingTidy(documents);
+  remove(root, pending.remove);
+  if (pending.archive.length > 0) mkdirSync(join(root, OLD_FOLDER), { recursive: true });
+  for (const entry of pending.archive) renameSync(join(root, entry), join(root, OLD_FOLDER, entry));
+  return pending;
+}
+
+/** With `held` set a client may have the old maps open, so the new file is only added and the tidy waits for `tidyLibrary`. */
+export function installLatest(documents: string, map: string, held = false): void {
   if (!PLAYABLE_FILE.test(basename(map))) throw new Error(`not a playable map: ${basename(map)}`);
   const { root, name } = place(documents, map);
+  if (held) return;
   if (DEV_FILE(name)) remove(root, files(root).filter((entry) => entry !== name && !KEPT_FILE(entry)));
-  archiveOlderReleases(root);
+  tidyLibrary(documents);
 }
 
 export function installTryout(documents: string, map: string): string {

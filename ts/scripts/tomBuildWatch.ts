@@ -10,7 +10,7 @@ import { FETCH_HINT } from "./wisp/buildInputs";
 import { type LandingDecision, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
 import { type BuildStage, TOM_EDITION, currentPlaytest } from "./wisp/currentPlaytest";
-import { installLatest, library } from "./wisp/mapLibrary";
+import { installLatest, library, pendingTidy, tidyLibrary } from "./wisp/mapLibrary";
 import { PLAYTEST_PREFIX, projectRoot, tsDirectory } from "./wisp/project";
 import { clientHold, liveClients } from "./wisp/runningGames";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
@@ -87,7 +87,8 @@ export interface WatchSteps<R> {
   readonly held: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
   readonly fetchInputs: Effect.Effect<void, PlayProblem, R>;
-  readonly install: (built: Built) => Effect.Effect<Installed, PlayProblem, R>;
+  readonly tidy: Effect.Effect<string | undefined, PlayProblem, R>;
+  readonly install: (built: Built, held: string | undefined) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
   readonly budget: (sha: string, timing: Timing) => Effect.Effect<void, never, R>;
 }
@@ -122,6 +123,11 @@ export const buildLine = (sha: string, { version, path }: Installed, timing: Tim
     seconds(onMain === undefined ? undefined : onMain - landed), known(load.pressure), known(load.clients), stageField, path].join(" ");
 };
 
+const logged = (text: string) => Effect.sync(() => {
+  console.log(text);
+  return undefined;
+});
+
 export const missingInputs = ({ problem }: PlayProblem) => problem.includes(FETCH_HINT);
 
 const builtWithInputs = <R>(steps: WatchSteps<R>, sha: string) => steps.build(sha).pipe(
@@ -136,23 +142,18 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const previous = lines(files.log).at(-1)?.split(" ")[1];
   const sha = yield* steps.tip(previous);
   if (sha === undefined || attemptedShas(files).has(sha)) return undefined;
-  if ((yield* steps.held) !== undefined) return undefined;
   const decision = yield* steps.decision(sha);
-  if (decision === "wait") return undefined;
+  if (decision === "wait") return yield* logged(`Waiting on ${sha.slice(0, 7)}: its checks have not finished`);
   yield* append(files.attempts, sha);
-  if (decision === "red") return undefined;
+  if (decision === "red") return yield* logged(`Skipping ${sha.slice(0, 7)}: its checks failed`);
   const started = yield* Clock.currentTimeMillis;
   const [built, load] = yield* steps.measured(builtWithInputs(steps, sha)).pipe(
     Effect.tapError((problem) => missingInputs(problem) ? forget(files.attempts, sha) : Effect.void),
   );
-  const late = yield* steps.held;
-  if (late !== undefined) {
-    yield* forget(files.attempts, sha);
-    console.log(`Held ${sha.slice(0, 7)}: ${late}`);
-    return undefined;
-  }
+  const held = yield* steps.held;
+  if (held !== undefined) console.log(`Installing ${sha.slice(0, 7)} beside the older builds, tidy deferred: ${held}`);
   const copying = yield* Clock.currentTimeMillis;
-  const installed = yield* steps.install(built);
+  const installed = yield* steps.install(built, held);
   const finished = yield* Clock.currentTimeMillis;
   const landed = yield* steps.landedAt(sha);
   const onMain = yield* steps.onMain(sha);
@@ -168,11 +169,17 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
 });
 
 export const watch = <R>(steps: WatchSteps<R>, files: WatchFiles, current: Effect.Effect<boolean, never, R>, poll: Duration.Input = POLL) => Effect.gen(function*() {
+  let lastNote: string | undefined;
   while (yield* current) {
     const line = yield* watchOnce(steps, files).pipe(
       Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Tom build failed: ${problem}`); return undefined; })),
     );
     if (line !== undefined) console.log(line);
+    const note = yield* steps.tidy.pipe(
+      Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Tidy of Maps/00-Smashcraft failed: ${problem}`); return undefined; })),
+    );
+    if (note !== undefined && note !== lastNote) console.log(note);
+    lastNote = note;
     yield* Effect.sleep(poll);
   }
   console.log("origin/main has moved past this watcher's commit; exiting so the service restarts on the new tip");
@@ -194,6 +201,24 @@ export const newerTip = (commits: readonly string[], previous: string | undefine
   if (tip === undefined || tip === previous) return undefined;
   return previous === undefined || commits.includes(previous) ? tip : undefined;
 };
+
+export const installBuild = (documents: string) => ({ version, source }: Built, held: string | undefined) => Effect.try({
+  try: () => {
+    installLatest(documents, source, held !== undefined);
+    return { version, path: join(library(documents), basename(source)) };
+  },
+  catch: (cause) => new PlayProblem({ problem: String(cause) }),
+});
+
+export const tidyFolder = (documents: string, running: Effect.Effect<string | undefined, PlayProblem, never>) => Effect.gen(function*() {
+  const { remove, archive } = pendingTidy(documents);
+  const pending = [...remove, ...archive];
+  if (pending.length === 0) return undefined;
+  const held = yield* running;
+  if (held !== undefined) return `Tidy of ${pending.join(", ")} waits: ${held}`;
+  yield* Effect.try({ try: () => tidyLibrary(documents), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
+  return `Tidied ${pending.join(", ")}`;
+});
 
 export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.ChildProcessSpawner> => ({
   tip: (previous) => Effect.gen(function*() {
@@ -224,14 +249,8 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     Effect.tap((text) => Effect.sync(() => console.log(text.trim()))),
     Effect.mapError((cause) => new PlayProblem({ problem: `bun wisp inputs fetch: ${cause.message}` })),
   ),
-  install: ({ version, source }) => Effect.try({
-    try: () => {
-      const documents = documentsFolder(PLAYTEST_PREFIX);
-      installLatest(documents, source);
-      return { version, path: join(library(documents), basename(source)) };
-    },
-    catch: (cause) => new PlayProblem({ problem: String(cause) }),
-  }),
+  install: installBuild(documentsFolder(PLAYTEST_PREFIX)),
+  tidy: tidyFolder(documentsFolder(PLAYTEST_PREFIX), clientHold(documentsFolder(PLAYTEST_PREFIX))),
   notes: writePlaytestChecklist,
   budget: (sha, timing) => (busy(timing)
     ? Effect.sync(() => console.log(`Landing ${sha.slice(0, 7)} counts against neither budget: CPU pressure peaked at ${timing.load.pressure}% during its build, above ${BUSY_PRESSURE}%`))
