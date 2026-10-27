@@ -44,7 +44,8 @@ strike("jab3", 24, 5, 6, { bow: 85, grip: 75, elbow: 30, chest: -25, twist: -18 
 strike("forwardTilt", 31, 8, 10, { bow: 85, grip: 75, elbow: 30, chest: -25, twist: -18, knee: -40 }, { bow: -88, elbow: -16, chest: 26, twist: 28, knee: 22, yaw: 10, lean: LEAN_TILT });
 strike("forwardTiltUp", 31, 8, 10, { bow: 60, grip: 70, elbow: 25, chest: -18, yaw: -60 }, { bow: -85, elbow: -18, chest: 14, grip: 30, knee: 12, yaw: 25 });
 strike("forwardTiltDown", 31, 8, 10, { bow: 70, grip: 70, elbow: 25, chest: -18, knee: -20, yaw: -60 }, { bow: -28, elbow: 18, chest: 55, knee: 50, tuck: 0.18 });
-strike("upTilt", 30, 7, 10, { bow: 28, chest: 20, knee: 18 }, { bow: -160, elbow: -20, chest: -22, grip: -25, knee: 6 });
+const upTiltApex: Gesture = { bow: -168, elbow: -20, chest: -32, grip: -60, head: -16, knee: -10, hip: -8, height: 16 };
+add("upTilt", 30, [phase(0), phase(3, { bow: 75, grip: 50, elbow: 28, chest: 24, knee: 48, hip: 14, head: 6 }), phase(5, { bow: -70, grip: 10, elbow: 5, chest: 0, knee: 28 }), phase(7, upTiltApex), phase(13, { ...upTiltApex, bow: -156, height: 10 }), phase(21, { bow: -70, chest: 10, knee: 18 }), phase(30)]);
 strike("downTilt", 27, 6, 8, { bow: 75, grip: 70, elbow: 20, chest: -15, yaw: 90 }, { bow: -28, elbow: 18, chest: 55, knee: 50, tuck: 0.18 });
 strike("dashAttack", 35, 9, 11, { bow: 70, grip: 70, elbow: 25, chest: -25, yaw: -60 }, { bow: -82, elbow: -20, chest: 30, lean: LEAN_TILT + 6, knee: 28, yaw: 35 });
 strike("forwardSmash", 49, 16, 18, { bow: 35, grip: -105, chest: -28, twist: -32, knee: 20 }, { bow: -82, grip: 35, elbow: -24, chest: 25, twist: 34, knee: 16 }, { bow: -72, chest: 14, knee: 12 });
