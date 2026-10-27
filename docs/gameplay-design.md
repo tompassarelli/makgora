@@ -528,6 +528,31 @@ transport (wisp#110) both call it.
     ping is 436 ms, 14 one-way frames less R 6, where the 300 ms duel's
     slowest is 380 ms and agrees on 5. At 8 it holds 0, stalls 0 and keeps
     pop p95 at 107-175, so 8 is that route's expected delay.
+  - *Forced 8-frame route's median pop (27 Oct 2026, #609):* the route
+    (three humans, 600 ms, delay forced to 8) checked a median pop of at
+    most 76 units per client, one seed's (793) reading with little headroom.
+    That median is no gate. Each client lands only 35 to 160 repaired
+    corrections in the 30 s match, and 15% to 75% of them move nobody, so
+    the median sits either at 0 or out in the moving tail. Human 3 on the
+    jitter seeds alone:
+
+    | Tree | 793 | 1 | 2 | 3 | 4 | 5 | 6 |
+    | --- | --- | --- | --- | --- | --- | --- | --- |
+    | a72e56cb97, R 8 for groups | 49 | 0 | 46 | 65 | 68 | 0 | 0 |
+    | b2a84e97be, one R of 6 | 77 | 0 | 0 | 38 | 87 | 60 | 82 |
+    | 81b28b01bd less the pacing (#573) | 104 | 70 | 0 | 10 | 49 | 31 | 53 |
+
+    b2a84e97be is the change that moved seed 793 over the limit (49 to 77,
+    83 by fc5a4106a7). It leaves the route's rollback depth alone: on seed
+    793 human 3 replays 13 frames a correction (`rbf`/`rb`) at all three
+    trees, with the same peak depth (24) and stalls of 0 to 0.2. It moves
+    which corrections land while fighters are moving. Removing the pacing
+    gives 104 on seed 793 but 70 or less on the other six, a median over
+    the seven of 49 against 46 before b2a84e97be. With the pacing,
+    81b28b01bd reads 0 on every human, because its skipped callbacks land
+    more corrections that move nobody, while human 0 stalls 5.4 a second.
+    The route's pop stays guarded by its p95 of at most 680 (608 at worst over the
+    seven seeds with the pacing removed); a median pop means something only over several seeds.
 - **When delay changes:** only at match start, on the epoch every client
   begins together, from requests already exchanged through the synchronized
   channel. It never changes mid-exchange.
