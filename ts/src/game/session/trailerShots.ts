@@ -7,15 +7,16 @@ export interface TrailerShot {
 }
 
 export const TRAILER_SHOTS: readonly TrailerShot[] = [
-  { seed: 29, fighters: ["mountain-king", "lich"], stage: 10, start: 1430, end: 1907 },
-  { seed: 34, fighters: ["shadow-hunter", "beastmaster"], stage: 6, start: 5273, end: 5621 },
-  { seed: 204, fighters: ["kobold", "warden"], stage: 0, start: 619, end: 1024 },
-  { seed: 224, fighters: ["chen-stormstout", "anub'arak"], stage: 13, start: 2921, end: 3304 },
-  { seed: 279, fighters: ["kael'thas-sunstrider", "warden"], stage: 3, start: 2750, end: 3187 },
-  { seed: 304, fighters: ["goblin-tinker", "warden"], stage: 4, start: 3140, end: 3485 },
-  { seed: 314, fighters: ["blademaster", "cairne-bloodhoof"], stage: 2, start: 2967, end: 3393 },
+  { seed: 19, fighters: ["kael'thas-sunstrider", "murloc"], stage: 12, start: 7624, end: 8040 },
+  { seed: 154, fighters: ["medivh", "warden"], stage: 6, start: 4950, end: 5407 },
+  { seed: 194, fighters: ["thrall", "murloc"], stage: 2, start: 261, end: 680 },
+  { seed: 204, fighters: ["kobold", "warden"], stage: 0, start: 2399, end: 2786 },
+  { seed: 224, fighters: ["chen-stormstout", "anub'arak"], stage: 13, start: 3254, end: 3618 },
+  { seed: 234, fighters: ["rifleman", "beastmaster"], stage: 11, start: 3283, end: 3676 },
+  { seed: 294, fighters: ["shadow-hunter", "murloc"], stage: 11, start: 3462, end: 3881 },
+  { seed: 339, fighters: ["illidan", "cairne-bloodhoof"], stage: 3, start: 4723, end: 5169 },
   { seed: 349, fighters: ["lich-king", "anub'arak"], stage: 1, start: 1470, end: 1933 },
-  { seed: 359, fighters: ["grom-hellscream", "pit-lord"], stage: 7, start: 6321, end: 6788 },
+  { seed: 359, fighters: ["grom-hellscream", "pit-lord"], stage: 7, start: 5231, end: 5490 },
   { seed: 369, fighters: ["lich", "murloc"], stage: 14, start: 1248, end: 1608 },
   { seed: 389, fighters: ["anub'arak", "sylvanas-windrunner"], stage: 10, start: 1334, end: 1800 },
 ];

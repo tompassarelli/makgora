@@ -8,10 +8,10 @@ import { selectableCharacterBySlug } from "../game/roster/kits";
 import { fighterAt, isActive } from "../game/sim/roster";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum } from "../host/loop/diagnostics";
+import { drawnFrame } from "../host/loop/drawnFrame";
 import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { startMatch } from "../host/loop/matchStart";
 import { resetToStartingSelection } from "../host/loop/menus";
-import { presentedFrame } from "../host/loop/presentedMatch";
 import { type ShellState, localSlot } from "../host/loop/state";
 import { installTickProbe } from "../host/loop/tickProbe";
 
@@ -76,7 +76,7 @@ function afterTrailerTick(s: ShellState): void {
     finishShot(s, trailer, frame);
     return;
   }
-  paintDrawnStamp(TRAILER_SCRIPT, presentedFrame(s));
+  paintDrawnStamp(TRAILER_SCRIPT, drawnFrame(s).frame);
   if (!trailer.opened && frame >= 1) {
     trailer.opened = true;
     trailer.lines.push(`checksum ${frame} ${confirmedChecksum(s)}`);
