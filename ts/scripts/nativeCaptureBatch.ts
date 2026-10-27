@@ -98,15 +98,14 @@ const poolScope = (pair: number, desktop: string, capacity: string, solo: boolea
 
 const closePool = (pool: PairPool) => Scope.close(pool.scope, Exit.void);
 
-const checkpointComplete = (out: string, row: { readonly name: string; readonly mapSha256: string; readonly frames: readonly number[] }, sourceRevision: string, double: boolean) => {
+const checkpointComplete = (out: string, row: { readonly name: string; readonly mapSha256: string }, sourceRevision: string, expected: number) => {
   const path = join(out, row.name, "checkpoint.json");
   if (!existsSync(path)) return false;
   const decoded = Schema.decodeSync(Schema.fromJsonString(checkpointSchema))(readFileSync(path, "utf8"));
-  const expected = row.frames.length * (double ? 2 : 1);
   return decoded.mapSha256 === row.mapSha256 && decoded.sourceRevision === sourceRevision && decoded.captures.filter(capture => existsSync(join(out, row.name, capture.file)) && statSync(join(out, row.name, capture.file)).size > 0).length === expected;
 };
 
-const monitorDrop = (pair: number, pool: PairPool, row: { readonly name: string; readonly mapSha256: string; readonly frames: readonly number[] }, sourceRevision: string, out: string, double: boolean) => Effect.gen(function*() {
+const monitorDrop = (pair: number, pool: PairPool, row: { readonly name: string; readonly mapSha256: string }, sourceRevision: string, out: string, expected: number) => Effect.gen(function*() {
   while (true) {
     yield* Effect.sleep("2 seconds");
     if (pool.child !== undefined && pool.child.exitCode !== null) return `pair ${pair} pool exited`;
@@ -114,16 +113,16 @@ const monitorDrop = (pair: number, pool: PairPool, row: { readonly name: string;
     if (status._tag === "Failure") return `pair ${pair} status failed: ${String(status.failure)}`;
     if (status.success.clients.length !== pairClientCount(status.success) || status.success.clients.some(client => client.pid === undefined)) return `pair ${pair} has a dropped client process`;
     if (status.success.game?.phase === "playing" && status.success.game.players.some(player => !player.connected)) return `pair ${pair} has a disconnected match client`;
-    if (status.success.game?.phase === "over" && !checkpointComplete(out, row, sourceRevision, double)) return `pair ${pair} match ended before row ${row.name} completed`;
+    if (status.success.game?.phase === "over" && !checkpointComplete(out, row, sourceRevision, expected)) return `pair ${pair} match ended before row ${row.name} completed`;
   }
 });
 
-const chunkComplete = (out: string, row: { readonly name: string; readonly mapSha256: string; readonly frames: readonly number[] }, sourceRevision: string, double: boolean) => Effect.try({
-  try: () => checkpointComplete(out, row, sourceRevision, double),
+const chunkComplete = (out: string, row: { readonly name: string; readonly mapSha256: string }, sourceRevision: string, expected: number) => Effect.try({
+  try: () => checkpointComplete(out, row, sourceRevision, expected),
   catch: cause => new CaptureBatchFailure({ problem: `read ${row.name} checkpoint: ${String(cause)}` }),
 });
 
-const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readonly row: { readonly name: string; readonly map: string; readonly manifest: string; readonly mapSha256: string; readonly frames: readonly number[] }; readonly out: string; readonly sourceRevision: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly build: string; readonly minutes: number; readonly solo: boolean }) => Effect.gen(function*() {
+const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readonly row: { readonly name: string; readonly map: string; readonly manifest: string; readonly mapSha256: string; readonly frames: readonly number[] }; readonly out: string; readonly sourceRevision: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly build: string; readonly minutes: number; readonly solo: boolean; readonly expected: number }) => Effect.gen(function*() {
   const rowOut = join(args.out, args.row.name);
   yield* Effect.try({ try: () => mkdirSync(rowOut, { recursive: true }), catch: cause => new CaptureBatchFailure({ problem: `create ${rowOut}: ${String(cause)}` }) });
   const run = Effect.acquireUseRelease(
@@ -136,7 +135,7 @@ const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readon
   ).pipe(
     Effect.catch(failure => Effect.succeed({ kind: "failed" as const, reason: failure.message })),
   );
-  const monitor = args.pool.signedClients === undefined ? monitorDrop(args.pair, args.pool, args.row, args.sourceRevision, args.out, false).pipe(Effect.map(reason => ({ kind: "dropped" as const, reason }))) : Effect.never;
+  const monitor = args.pool.signedClients === undefined ? monitorDrop(args.pair, args.pool, args.row, args.sourceRevision, args.out, args.expected).pipe(Effect.map(reason => ({ kind: "dropped" as const, reason }))) : Effect.never;
   const collector = yield* Effect.forkChild(run);
   yield* Effect.sleep("3 seconds");
   const fresh = yield* wispCommand(args.pool.signedClients === undefined ? (args.solo ? ["lan", "solo", args.row.map, "--pair", String(args.pair)] : ["lan", "fresh", args.row.map, "--pair", String(args.pair), "--turn-ms", "60"]) : ["fresh", args.row.map, "--profile", "native-capture", "--no-quick", "--clients-file", args.pool.signedClients]).pipe(Effect.result);
@@ -175,9 +174,9 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
   for (const row of plan.rows) {
     const manifestText = yield* Effect.try({ try: () => readFileSync(row.manifest, "utf8"), catch: cause => new CaptureBatchFailure({ problem: `read ${row.manifest}: ${String(cause)}` }) });
     const manifest = yield* Schema.decodeEffect(rowManifest)(manifestText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: `decode ${row.manifest}: ${String(cause)}` })));
-    if (manifest.sourceRevision !== plan.sourceRevision || manifest.mapSha256 !== row.mapSha256 || manifest.map !== row.map || manifest.fixtures.length !== 1 || manifest.fixtures[0]?.name !== row.name) return yield* new CaptureBatchFailure({ problem: `${row.name}: row map identity differs from the batch plan` });
-    const double = manifest.fixtures[0]?.silhouette !== undefined;
-    if (yield* chunkComplete(out, row, plan.sourceRevision, double)) {
+    if (manifest.sourceRevision !== plan.sourceRevision || manifest.mapSha256 !== row.mapSha256 || manifest.map !== row.map || manifest.fixtures.length === 0 || (manifest.fixtures.length === 1 && manifest.fixtures[0]?.name !== row.name)) return yield* new CaptureBatchFailure({ problem: `${row.name}: row map identity differs from the batch plan` });
+    const expected = manifest.fixtures.reduce((total, fixture) => total + fixture.frames.length * (fixture.silhouette === undefined ? 1 : 2), 0);
+    if (yield* chunkComplete(out, row, plan.sourceRevision, expected)) {
       completed++;
       console.log(`row ${row.name}: already complete (${completed}/${plan.rows.length})`);
       continue;
@@ -189,9 +188,9 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
         yield* closePool(pool);
         pool = yield* acquirePool();
       }
-      const result = yield* runChunk({ pair, pool, row, out, sourceRevision: plan.sourceRevision, clientsFile: runtimeClients, client, install, build, minutes, solo }).pipe(Effect.result);
+      const result = yield* runChunk({ pair, pool, row, out, sourceRevision: plan.sourceRevision, clientsFile: runtimeClients, client, install, build, minutes, solo, expected }).pipe(Effect.result);
       stale = solo;
-      if (result._tag === "Success" && result.success.kind === "complete" && (yield* chunkComplete(out, row, plan.sourceRevision, double))) {
+      if (result._tag === "Success" && result.success.kind === "complete" && (yield* chunkComplete(out, row, plan.sourceRevision, expected))) {
         finished = true;
         completed++;
         console.log(`row ${row.name}: complete (${completed}/${plan.rows.length})`);

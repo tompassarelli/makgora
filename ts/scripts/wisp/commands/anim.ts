@@ -491,8 +491,9 @@ const jitter: Command = (args) => Effect.gen(function*() {
 export const anim: Command = ([mode, verb, ...rest]) => {
   if (mode === "jitter") return jitter(verb === undefined ? [] : [verb, ...rest]);
   if (mode === "score") return score(verb === undefined ? [] : [verb, ...rest]);
+  if (mode === "capture") return Effect.promise(() => import("../../captureQueueCommand")).pipe(Effect.flatMap((module) => module.capture(verb === undefined ? [] : [verb, ...rest])));
   const judging: Readonly<Record<string, Command>> = { fetch: () => fetchReferences.pipe(Effect.provide(BunServices.layer)), prepare, record, run: judgeRun };
   const step = mode === "judge" && verb !== undefined ? judging[verb] : undefined;
   if (step !== undefined) return step(rest);
-  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high]" }));
+  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high] | anim capture enqueue|wait|status|serve ..." }));
 };

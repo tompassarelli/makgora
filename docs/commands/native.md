@@ -138,7 +138,8 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   `capture-batch.json`. Run it with `bun scripts/nativeCapture.ts batch --plan
   DIR/capture-batch.json --out OUT --pair K --desktop PRIVATE_DESKTOP_SH
   --capacity MACHINE_CAPACITY_HELPER --clients-file FILE --client NAME
-  --install DIR`. Each row writes an atomic checkpoint keyed by its map hash
+  --install DIR`. A row map may hold several fixtures; it completes when every
+  fixture's frames are captured. Each row writes an atomic checkpoint keyed by its map hash
   and source revision. On a dropped client or incomplete row, `batch` restarts
   the offline pair and resumes from the first frame missing from that row's
   checkpoint. On 3.0.1, where the pool has no LAN provider, add `--solo`: each
@@ -253,6 +254,52 @@ The setup command runs up to 32 non-nested commands in order.
 assigns the actor's fighter or a computer to a team through the lobby rules.
 `-dev slots 1 14` selects one human fighter and three computers;
 `-dev slots 0 15` selects four computers while connected humans operate the menus.
+
+## Shared capture queue
+
+Animation lanes on gex45 get native Classic frames of their take from one
+shared queue instead of building a map and starting a pool of their own (#614).
+From the lane's `ts/`, with the take committed:
+
+```sh
+bun wisp anim capture enqueue --lane LANE --fighter SLUG --move MOVE [--rev REV] [--crop X,Y,W,H]
+bun wisp anim capture wait ID [--minutes N]
+bun wisp anim capture status
+```
+
+`MOVE` is an `anim score` move name (`up-air`, `side-special`, `ultimate`).
+`enqueue` refuses a lane with uncommitted tracked changes, because the frames
+are of the committed revision. Each job captures the move's showcase row in
+both facings at the lane's revision. `wait` prints the result: `sheet.png`
+(one row per facing, right on top), the frames folder, the map hash and the
+built source revision. Its `judge` folder holds a `batch-1.md` for
+`bun wisp anim judge run JUDGE_DIR`. Every lane clip gets its own sheet, so
+each cold viewer still judges one clip alone. `--crop` is in captured-screen
+pixels and applies to every tile.
+
+`bun wisp anim capture serve --pair K [--once] [--idle-minutes N]` runs the
+service from a checkout of main on gex45. It takes every pending job and folds
+the lanes' revisions into as few merged revisions as it can. A lane joins a
+merge only when its own changed files and its fighter's `build-inputs` entries
+are byte-identical to its revision, so the clip is exactly the lane's. Lanes
+that conflict or edit the same file get their own merged revision. For each
+merged revision the service builds one native-capture map holding every
+fixture, while the warm pool starts. It then captures every fixture in one
+client session through `nativeCapture.ts batch` (map hash and source revision
+checkpoints as above) and writes one sheet per job. The pool is
+`lan pool --foreground --pair K --queue --owner capture-queue --owner-pid
+SERVICE`: it waits its turn in wisp's line, stays warm between batches and stops
+when the service exits. The service stops after `--idle-minutes` (default 30)
+with an empty queue, or after one pass with `--once`. Stop it early with
+Ctrl-C or SIGTERM to its PID; that also stops its pool. Whoever starts it owns
+it. The queue lives in `~/.local/state/smashcraft/capture-queue`
+(`SMASHCRAFT_CAPTURE_QUEUE`): `pending/`, `taken/`, `results/ID/` and
+`batches/BATCH/log.jsonl`, which records each step's wall seconds (fold, map
+build, pool wait and clients to door, capture, each fixture). The defaults name
+gex45's pair `K` client `lanKa`, its install and the north private-desktop and
+machine-capacity helpers; override them with `--client`, `--install`,
+`--clients-file`, `--desktop` and `--capacity`. Collector runs stop after
+`--minutes` (1 to 5, default 4).
 
 ## Native batch planner
 
