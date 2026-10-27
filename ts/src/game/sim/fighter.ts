@@ -731,12 +731,12 @@ export function createFighter(character: Character, startX: number, facing: numb
   return fighter;
 }
 
-/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, a Shadow Hunter's two Big Bad Voodoo wards, or a Peon's five Tower Rush towers. */
+/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, a Shadow Hunter's two Big Bad Voodoo wards, Chen's Storm and Fire spirits, or a Peon's five Tower Rush towers. */
 export const PACK_CAPACITY = 5;
 
 function packLength(character: Character): number {
   if (character === Character.peon) return PACK_CAPACITY;
-  return character === Character.beastmaster || character === Character.shadowHunter ? 2 : 0;
+  return character === Character.beastmaster || character === Character.shadowHunter || character === Character.chen ? 2 : 0;
 }
 
 // Every fighter keeps PACK_CAPACITY placed objects for its pack, kept out of

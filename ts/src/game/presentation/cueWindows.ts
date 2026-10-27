@@ -1,4 +1,5 @@
 import type { AuthoredSpecial, FrameWindow } from "../sim/specials/schema";
+import { specialPlacements } from "../sim/specials/placements";
 
 export const ACTIVE_CUE_FRAMES = 18;
 
@@ -24,7 +25,7 @@ function widenByHits(active: Span, move: Readonly<AuthoredSpecial>): void {
 }
 
 function widenByEvents(active: Span, move: Readonly<AuthoredSpecial>): void {
-  if (move.placement !== undefined) widen(active, move.placement.frame, move.placement.frame);
+  for (const placement of specialPlacements(move)) widen(active, placement.frame, placement.frame);
   if (move.burst !== undefined) widen(active, move.burst.frame, move.burst.frame);
   if (move.ritual !== undefined) widen(active, move.ritual.frame, move.ritual.frame);
   if (move.commandGrab !== undefined) widen(active, move.commandGrab.first, move.commandGrab.last);

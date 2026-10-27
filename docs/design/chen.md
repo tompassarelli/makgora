@@ -91,7 +91,7 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 | Side special | Drunken Haze: arcing flask, 3.75% and 75 frames at 60% movement speed; shield stops it | Spawn 14, end 38; cost 12 | [Drunken Haze](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu Hadoken spacing](https://www.ssbwiki.com/Hadoken) |
 | Up special | Storm Rise: rising staff spin with steering, then helpless fall | Rise 8–29, end 40; 10%, cost 15 | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken Shoryuken](https://www.ssbwiki.com/Shoryuken) |
 | Down special | Earth stance absorbs one light hit; fresh Attack becomes Fire palm, fresh Special becomes Storm step | Armor 5–16, end 33; cost 10. Fire active 8–11, end 32, 13.75%. Storm travels 5–12, end 28, 8.75% | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Swap](https://www.ssbwiki.com/Swap) |
-| Ultimate | Storm, Earth and Fire: three spirits divide defense, movement and striking roles; currently off like roster ultimates | Design only while ultimates are disabled | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Swap](https://www.ssbwiki.com/Swap) |
+| Ultimate | Storm, Earth and Fire: Earth taunts and absorbs a hit, Storm sends cyclones and Wind Walks, Fire bursts with Immolation; see "Ultimate" below | Spirits at 12, 20 and 28, end 48; ground only | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Swap](https://www.ssbwiki.com/Swap) |
 
 ## Risk, recovery and computer
 
@@ -223,3 +223,34 @@ overhead spin, -150/142 to 140/142, beside its body capsule. Palm, elbow,
 right-hand checks, the barrel shoulder and kicks (jab, jab 3, up tilt, down
 tilt, dash attack, up smash and the four kicking aerials) are limb strikes;
 Breath of Fire and the spirits of the ultimate are spell strikes.
+
+## Ultimate: Storm, Earth and Fire (2026-10-28)
+
+Modelled on the Dreadlord's Summon Inferno: an ordinary authored special that
+places objects which then act on their own while Chen keeps fighting. It is
+ground-only, costs the whole bar and ends on frame 48. The three spirits use
+the stock Classic Earth, Storm and Fire Pandaren Brewmaster models and their
+stock birth, spell and death sequences, drawn a little smaller than Chen so they read as
+summons, and each lasts 270 frames (4.5 s),
+fading over its last 20.
+
+- Earth, frame 12, 240 ahead: taunts. Every frame it draws each foe within
+  240 toward itself by up to 3 units (walking out beats it); a launched,
+  grabbed or intangible foe is not drawn. Durability 1, so the first hit
+  breaks it and ends the taunt.
+- Storm, frame 20, 130 behind: casts a Cyclone at ages 40, 130 and 220 that
+  travels forward at 4 a frame for 70 frames, radius 50, and pops each grounded
+  foe it reaches straight up for 3% at 90 degrees (base 80, growth 15),
+  striking again every 12 frames whoever lands back in it.
+  Struck, it Wind Walks: it vanishes for 45 frames, untouchable and silent,
+  and reappears 160 farther from the striker on its own floor, never worn down.
+- Fire, frame 28, 120 ahead (between Chen and Earth): Immolation bursts at ages
+  45 and 165, radius 120 around it, 13% fire at 70 degrees (base 45, growth
+  85). Durability 20.
+
+The layout makes the spirits work together: Earth pulls foes into Fire's
+burst, and Storm's Cyclone crosses both from behind Chen. Counterplay: hit
+Earth first, walk out of the taunt, or outlast the spirits away from them.
+Spirit state lives in the fighter's placed objects (slot 0 Earth, pack slots 1
+and 2 Storm and Fire, with Wind Walk in their mode and mode frame), so it is
+snapshotted and rolls back with the rest of the fighter.

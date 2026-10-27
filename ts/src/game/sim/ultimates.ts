@@ -270,23 +270,20 @@ const CAIRNE: AuthoredSpecial = {
   intangible: frames(35, 39),
 };
 
-const SPIRIT = "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl";
+const SPIRIT_LOOK = { height: 210.0, alpha: 255, casts: true } as const;
+const SPIRIT = { radius: 40.0, height: 150.0, durability: 1.0, life: 270, crumble: 20 } as const;
+export const EARTH_SPIRIT: SpecialPlacement = { ...SPIRIT, frame: 12, offsetX: 240.0, fireAges: [30], shot: mark("Abilities\\Spells\\NightElf\\Taunt\\TauntCaster.mdx", 0, 30, 0.0, 90.0), taunt: { radius: 240.0, pull: 3.0 }, model: { ...SPIRIT_LOOK, path: "units\\creeps\\EarthPandarenBrewmaster\\EarthPandarenBrewmaster.mdl" } };
+const CYCLONE = hit(3.0, 90, 15.0, 80.0);
+export const STORM_SPIRIT: SpecialPlacement = {
+  ...SPIRIT, frame: 20, slot: 1, offsetX: -130.0, radius: 35.0, fireAges: [40, 130, 220], windWalk: { frames: 45, hop: 160.0 }, model: { ...SPIRIT_LOOK, path: "units\\creeps\\StormPandarenBrewmaster\\StormPandarenBrewmaster.mdl" },
+  shot: { ...shot(0, 60.0, 50.0, 4.0, 0.0, 70, 50.0, CYCLONE, "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx"), pool: { every: 12, growth: 0.0, maxRadius: 50.0 } },
+};
+const IMMOLATION = shot(0, 0.0, 50.0, 0.0, 0.0, 8, 120.0, hit(13.0, 70, 85.0, 45.0, HitElement.fire), "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx");
+export const FIRE_SPIRIT: SpecialPlacement = { ...SPIRIT, frame: 28, slot: 2, offsetX: 120.0, durability: 20.0, fireAges: [45, 165], aura: true, shot: IMMOLATION, model: { ...SPIRIT_LOOK, path: "units\\creeps\\FirePandarenBrewmaster\\FirePandarenBrewmaster.mdl" } };
 const CHEN: AuthoredSpecial = {
-  name: "Storm, Earth and Fire", endFrame: 64, airHoldFrames: 50,
-  projectiles: [
-    mark(SPIRIT, 2, 22, 40.0),
-    mark(SPIRIT, 10, 26, 220.0),
-    mark(SPIRIT, 18, 30, -150.0),
-    mark("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", 21, 12, 0.0),
-    mark("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx", 33, 12, 220.0),
-    mark("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx", 45, 14, -150.0),
-  ],
-  regions: [
-    heroRegion(21, 23, capsule(-120.0, 20.0, 120.0, 20.0, 50.0), hit(8.0, 80, 70.0, 40.0)),
-    heroRegion(33, 35, capsule(200.0, 30.0, 240.0, 110.0, 45.0), hit(7.0, 45, 70.0, 40.0, HitElement.electric)),
-    heroRegion(45, 48, capsule(-60.0, 50.0, -220.0, 50.0, 50.0), hit(9.0, 40, 85.0, 45.0, HitElement.fire, true)),
-  ],
-  rehits: [21, 33, 45],
+  name: "Storm, Earth and Fire", endFrame: 48, groundOnly: true,
+  projectiles: [mark("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritTarget.mdx", 2, 26, 0.0)],
+  placement: EARTH_SPIRIT, summons: [STORM_SPIRIT, FIRE_SPIRIT],
 };
 
 const WATCH_TOWER_MODEL = "buildings\\orc\\WatchTower\\WatchTower.mdx";
@@ -449,7 +446,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
   [Character.sylvanas]: "She becomes a banshee, glides low at the nearest foe, swings back round after them and passes through them. Hit her while she changes; shield, roll through her late or run away.",
   [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts; 9 frames later he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
-  [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
+  [Character.chen]: "He calls Earth, Storm and Fire one after another. Earth draws foes in and breaks on one hit; Storm sends cyclones and Wind Walks away when struck; Fire bursts twice. Hit Earth, outlast them or keep away.",
   [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",
   [Character.tinker]: "His Robo-Goblin waddles ahead and explodes. Walk away or shield the blast.",
   [Character.kaelthas]: "Embers gather behind him and a phoenix rises at his shoulder, follows him and burns anyone near it. Break it or keep away from its flames.",

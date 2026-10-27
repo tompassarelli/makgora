@@ -155,7 +155,7 @@ function step(world: Roster, input: Readonly<Controls>): void {
   advanceSpecials(world, 0, 0);
   updateProjectiles(world);
   finishDamageContacts(world);
-  advancePlacedObjects(world);
+  advancePlacedObjects(world, 0, 0);
   advanceHeroStatus(f);
 }
 

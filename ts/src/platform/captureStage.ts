@@ -75,7 +75,7 @@ function stepLane(lane: CaptureLane, input: Readonly<Controls>): void {
   startFighterSpecial(fighter, stage, 0, input, world);
   advanceSpecials(world, stage, 0);
   updateProjectiles(world, stage);
-  advancePlacedObjects(world);
+  advancePlacedObjects(world, stage, 0);
   advanceHeroStatus(fighter);
   holdAerial(lane);
 }

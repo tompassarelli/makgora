@@ -28,6 +28,7 @@ import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
+import { specialPlacements } from "./placements";
 import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZAt } from "../stage";
 import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { currentTraits } from "../identityTraits";
@@ -790,7 +791,7 @@ export function firstThreat(move: Readonly<AuthoredSpecial>): number {
   let first = move.endFrame;
   for (const region of move.regions ?? []) first = min(first, region.firstFrame + 1);
   for (const shot of move.projectiles ?? []) if (shot.effect.damage > 0.0 || shot.expiresInto !== undefined) first = min(first, shot.spawnFrame + (shot.expiresInto !== undefined && shot.effect.damage === 0.0 ? shot.life : 0));
-  if (move.placement !== undefined) first = min(first, move.placement.frame + (move.placement.fireAges[0] ?? 0));
+  for (const placement of specialPlacements(move)) first = min(first, placement.frame + (placement.fireAges[0] ?? 0));
   if (move.commandGrab !== undefined) first = min(first, move.commandGrab.first);
   if (move.guard !== undefined) first = move.guard.last;
   return first;
@@ -996,6 +997,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (inWindow(move.airStall, frame) && !f.motion.grounded) f.motion.vz = 0.0;
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, matchFrame, world);
   if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage, matchFrame);
+  for (const summon of move.summons ?? []) placeObjects(f, summon, frame, stage, matchFrame);
   if (move.command?.frame === frame) orderCompanion(f, move.command.order, move.command.slot);
   if (move.burst?.frame === frame) burstProjectiles(f, move.burst.from, move.burst.into);
   if (move.ritual?.frame === frame) {

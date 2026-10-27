@@ -90,6 +90,7 @@ import { applyAutomaticSmashDirectionalInfluence, applySmashDirectionalInfluence
 import * as stageSurfaces from "./stage";
 
 import { endCannonPass, inStageCannon, windPush } from "./stageHazards";
+import { tauntPull } from "./taunt";
 // One local for the sea: this module is near Lua's 200-local limit.
 import * as sea from "./water";
 import { stickX } from "./stick";
@@ -660,6 +661,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (buoyant) sea.floatAtSurface(f);
 
   if (!isGroundDodging(f)) moveMeleeX(f, windPush(stage, matchFrame, motion.x, motion.z));
+  moveMeleeX(f, tauntPull(world, slot));
   const frameDeltaX = f32(motion.x - oldX);
   const frameDeltaZ = f32(motion.z - oldZ);
   const edge = passThroughEdge(world, slot, stage, oldX, oldZ);

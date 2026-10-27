@@ -6,7 +6,8 @@ import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type Fighter, PACK_CAPACITY, type PlacedObject, placedObject } from "../sim/fighter";
 import type { Resting } from "../sim/fighterRest";
-import { type AuthoredSpecial, CompanionMode } from "../sim/specials/schema";
+import { type AuthoredSpecial, CompanionMode, type SpecialPlacement } from "../sim/specials/schema";
+import { specialPlacements } from "../sim/specials/placements";
 import { Character } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
 import { heroLook } from "../roster/looks";
@@ -19,19 +20,25 @@ import { bindPrototype } from "../../platform/rebind";
 const PLACED_OBJECT_MODEL = "Units\\Orc\\SerpentWard\\SerpentWard.mdx";
 const MODEL_HEIGHT = 105.0;
 const MODEL_TURN = f32(0.785398185);
-interface PlacedLook { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true; readonly turn?: number }
+interface PlacedLook { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true; readonly casts?: true; readonly turn?: number }
 const DEFAULT_LOOK: PlacedLook = { path: PLACED_OBJECT_MODEL, height: MODEL_HEIGHT, alpha: 255, turn: MODEL_TURN };
 const ANIMALS = PACK_CAPACITY + 1;
 const BIRTH_SECONDS = 60.0;
 const DEATH_SECONDS = f32(2.333);
+const SPIRIT_BIRTH_FRAMES = 30;
+const SPIRIT_BIRTH_SECONDS = f32(0.5);
+const SPIRIT_CAST_FRAMES = 30;
+const VANISHED_ALPHA = 40;
 
 function placementPaths(character: Character): string[] {
   const paths = [heroLook(character)?.placedModel?.path ?? PLACED_OBJECT_MODEL];
   const visit = (special: AuthoredSpecial | undefined): void => {
     if (special === undefined) return;
     visit(special.ex);
-    const path = special.placement?.model?.path;
-    if (path !== undefined && !paths.includes(path)) paths.push(path);
+    for (const placement of specialPlacements(special)) {
+      const path = placement.model?.path;
+      if (path !== undefined && !paths.includes(path)) paths.push(path);
+    }
     for (const followUp of special.followUps ?? []) visit(followUp.special);
     for (const variant of special.variants ?? []) visit(variant);
   };
@@ -45,6 +52,13 @@ function placementPaths(character: Character): string[] {
   }
   visit(tuning.ultimate);
   return paths;
+}
+
+function placedAlpha(placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>, look: PlacedLook): number {
+  if (placed.mode === CompanionMode.vanished) return VANISHED_ALPHA;
+  const left = f32(Math.max(0.0, placed.durability) / spec.durability);
+  const half = idiv(look.alpha, 2);
+  return half + Math.floor(f32((look.alpha - half) * left));
 }
 
 export class PlacedObjectEffects {
@@ -166,15 +180,32 @@ export class PlacedObjectEffects {
     const turn = look.turn ?? 0.0;
     BlzSetSpecialEffectYaw(model, placed.direction > 0 ? -turn : f32(f32(3.14159274) + turn));
     const bear = placed === fighter.placed ? bearState(fighter) : undefined;
-    if (spec.companion !== undefined) this.animate(model, slot, placed, bear);
+    this.pose(model, slot, placed, spec, look, bear);
+    BlzSetSpecialEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
+    BlzSetSpecialEffectAlpha(model, placedAlpha(placed, spec, look));
+  }
+
+  private pose(model: effect, slot: number, placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>, look: PlacedLook, bear: ReturnType<typeof bearState>): void {
+    if (look.casts === true) this.cast(model, slot, placed, spec.crumble ?? 0);
+    else if (spec.companion !== undefined) this.animate(model, slot, placed, bear);
     else if (spec.crumble !== undefined) this.build(model, slot, placed, spec.crumble, spec.fireAges[0] ?? 1);
     else if (look.finished === true) this.build(model, slot, placed, 0, 0);
     else this.animate(model, slot, placed, bear);
-    BlzSetSpecialEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
+  }
 
-    const left = f32(Math.max(0.0, placed.durability) / spec.durability);
-    const half = idiv(look.alpha, 2);
-    BlzSetSpecialEffectAlpha(model, half + Math.floor(f32((look.alpha - half) * left)));
+  private cast(model: effect, slot: number, placed: Resting<PlacedObject>, crumble: number): void {
+    let anim = placed.life <= crumble ? 3 : placed.age < SPIRIT_BIRTH_FRAMES ? 4 : 0;
+    let start = placed.serial;
+    if (anim === 0) for (const fire of placed.spec?.fireAges ?? []) if (placed.age >= fire && placed.age < fire + SPIRIT_CAST_FRAMES) {
+      anim = 2;
+      start = fire;
+    }
+    const attackStarts = (this.attackStarts ??= []);
+    if (this.anims[slot] === anim && attackStarts[slot] === start) return;
+    this.anims[slot] = anim;
+    attackStarts[slot] = start;
+    BlzPlaySpecialEffect(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : anim === 2 ? ANIM_TYPE_SPELL : ANIM_TYPE_STAND);
+    BlzSetSpecialEffectTimeScale(model, anim === 4 ? f32(SPIRIT_BIRTH_SECONDS / f32(SPIRIT_BIRTH_FRAMES / 60.0)) : 1.0);
   }
 
 

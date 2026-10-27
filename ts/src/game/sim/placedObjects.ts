@@ -18,6 +18,8 @@ import { projectileDamage } from "./projectiles";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { type Capsule, attackCapsule, capsulesIntersect, emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
+import { max, min } from "../core/numbers";
+import { surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 
 
 const ORIGINAL_PROJECTILE_RADIUS = 12.0;
@@ -147,6 +149,19 @@ function placedDamage(placed: PlacedObject, sourceSlot: number, source: Fighter)
   return f32(f32(normal + special) + projectiles);
 }
 
+// Wind Walk: it slips out of sight and steps away from whoever struck it, never past the end of the floor it stands on.
+function windWalk(placed: PlacedObject, spec: Readonly<SpecialPlacement>, hop: number, strikerX: number, stage: number, matchFrame: number): void {
+  const away = strikerX > placed.x ? -1 : strikerX < placed.x ? 1 : -placed.direction;
+  placed.x = f32(placed.x + f32(away * hop));
+  const surface = placed.surface;
+  if (surface !== undefined) {
+    placed.x = min(f32(surfaceRight(stage, surface, matchFrame) - spec.radius), max(f32(surfaceLeft(stage, surface, matchFrame) + spec.radius), placed.x));
+    placed.z = surfaceZAt(stage, surface, matchFrame, placed.x);
+  }
+  placed.mode = CompanionMode.vanished;
+  placed.modeFrame = 0;
+}
+
 function ownedProjectiles(f: Readonly<Fighter>): number {
   let count = 0;
   for (const projectile of f.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.hero) count++;
@@ -171,7 +186,7 @@ function towardNearestFoe(world: Roster, ownerSlot: number, placed: Resting<Plac
   return direction;
 }
 
-export function advancePlacedObjects(world: Roster): void {
+export function advancePlacedObjects(world: Roster, stage: number, matchFrame: number): void {
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);
@@ -186,11 +201,19 @@ export function advancePlacedObjects(world: Roster): void {
       }
       const crumble = spec.crumble ?? 0;
       placeBody(placed, spec);
-      for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY && placed.life > crumble; sourceSlot++) {
+      if (placed.mode === CompanionMode.vanished && spec.windWalk !== undefined && ++placed.modeFrame >= spec.windWalk.frames) {
+        placed.mode = CompanionMode.follow;
+        placed.modeFrame = 0;
+      }
+      for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY && placed.life > crumble && placed.mode !== CompanionMode.vanished; sourceSlot++) {
         if (!canHit(world, sourceSlot, ownerSlot) || !isActive(world, sourceSlot)) continue;
         const source = fighterAt(world, sourceSlot);
         if (source.status.out) continue;
         const damage = placedDamage(placed, sourceSlot, source);
+        if (damage > 0.0 && spec.windWalk !== undefined) {
+          windWalk(placed, spec, spec.windWalk.hop, source.motion.x, stage, matchFrame);
+          continue;
+        }
         if (!channeled) placed.durability = f32(placed.durability - damage);
         if (damage > 0.0) staggerCompanion(placed);
       }
@@ -200,7 +223,7 @@ export function advancePlacedObjects(world: Roster): void {
       if (placed.life <= crumble) continue;
       let scheduled = false;
       for (const age of spec.fireAges) if (age === placed.age) scheduled = true;
-      const ready = placed.mode === CompanionMode.follow || spec.aura === true && placed.mode !== CompanionMode.stunned;
+      const ready = placed.mode === CompanionMode.follow || spec.aura === true && placed.mode !== CompanionMode.stunned && placed.mode !== CompanionMode.vanished;
       const fires = scheduled && ready && !inGrabContext(owner) && owner.launch.hitstun <= 0 && !owner.status.out;
       const last = spec.fireAges[spec.fireAges.length - 1];
       const shot = spec.finalShot !== undefined && placed.age === last ? spec.finalShot : spec.shot;

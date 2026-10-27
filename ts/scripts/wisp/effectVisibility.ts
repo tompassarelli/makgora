@@ -18,6 +18,7 @@ import { ACCENT_SECONDS, ACCENT_SEQUENCE } from "../../src/game/render/hitAreaEf
 import { FIGHTER_ULTIMATES } from "../../src/game/sim/ultimates";
 import { summonClip, summonClipCount, SUMMON_BEAR } from "../../src/game/presentation/summonClipInfo";
 import type { AuthoredSpecial, SpecialProjectile } from "../../src/game/sim/specials/schema";
+import { specialPlacements } from "../../src/game/sim/specials/placements";
 import { POPCORN_CUE_MODELS } from "../../src/game/presentation/cueEmitterInfo";
 import { CLASSIC_BUILDS } from "./classicBuilds";
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
@@ -281,7 +282,7 @@ export function effectUses(): EffectUse[] {
     for (let kind = 0; kind < IMPACT_KIND_COUNT; kind++) uses.push({ fighter, move: `common impact ${kind}`, kind: "impact", model: impactModel(kind), sequence: impactAnimation(kind), seconds: impactStartSeconds(kind), timeScale: 1, travels: false, anchored: "fighter", scale: impactModelScale(kind) });
     const visit = (special: AuthoredSpecial | undefined, move: string): void => {
       if (special === undefined) return;
-      if (special.placement !== undefined) uses.push(supplemental(fighter, `${move} placed object`, special.placement.model?.path ?? heroLook(character)?.placedModel?.path ?? "Units\\Orc\\SerpentWard\\SerpentWard.mdx", "placed-object animation/lifetime is unmodeled"));
+      for (const placement of specialPlacements(special)) uses.push(supplemental(fighter, `${move} placed object`, placement.model?.path ?? heroLook(character)?.placedModel?.path ?? "Units\\Orc\\SerpentWard\\SerpentWard.mdx", "placed-object animation/lifetime is unmodeled"));
       visit(special.ex, `${move} EX`);
       for (const followUp of special.followUps ?? []) visit(followUp.special, `${move} follow-up`);
     };

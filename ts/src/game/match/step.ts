@@ -260,7 +260,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   if (bossFight) strikeBoss(game.run.boss, world, bossClock(game.matchFrame, game.startHold), game.run.player);
   advanceSpecials(world, stage, stageFrame, controls.inputs);
   updateProjectiles(world, stage, stageFrame);
-  advancePlacedObjects(world);
+  advancePlacedObjects(world, stage, stageFrame);
   strikeCandles(world);
   advanceCandleBodies(world, stage, stageFrame);
   for (const slot of PARTICIPANT_SLOTS) {

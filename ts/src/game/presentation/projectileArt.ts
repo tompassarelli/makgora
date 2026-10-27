@@ -12,6 +12,7 @@ import type { Projectile } from "../sim/fighter";
 import { HERO_ROSTER, heroDefinition } from "../roster/kits";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile } from "../sim/specials/schema";
+import { specialPlacements } from "../sim/specials/placements";
 import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
 import type { CueBirth } from "./specialCues";
 import type { Fuse } from "./discLook";
@@ -49,9 +50,7 @@ function chainProjectiles(projectile: SpecialProjectile | undefined, into: Speci
 function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProjectile[]): void {
   if (special === undefined) return;
   for (const projectile of special.projectiles ?? []) chainProjectiles(projectile, into);
-  if (special.placement?.shot !== undefined) into.push(special.placement.shot);
-  if (special.placement?.finalShot !== undefined) into.push(special.placement.finalShot);
-  if (special.placement?.mark !== undefined) into.push(special.placement.mark);
+  for (const placement of specialPlacements(special)) for (const shot of [placement.shot, placement.finalShot, placement.mark]) if (shot !== undefined) into.push(shot);
   if (special.burst !== undefined) {
     chainProjectiles(special.burst.from, into);
     chainProjectiles(special.burst.into, into);

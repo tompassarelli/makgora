@@ -25,6 +25,7 @@ import { type Fighter, placedObject, PROJECTILE_CAPACITY } from "../sim/fighter"
 import { mutableProjectile } from "../sim/fighterProjectiles";
 import { initializeInfluenceOperands } from "../sim/influenceOperands";
 import type { AuthoredSpecial, FighterSpecials, SpecialKit, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
+import { specialPlacements } from "../sim/specials/placements";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
 import { settleProjectileSlots } from "../sim/fighterProjectiles";
@@ -433,11 +434,11 @@ function authoredParts(moves: readonly AuthoredSpecial[], projectiles: Map<strin
     for (const spec of special.projectiles ?? []) projectile(spec);
     projectile(special.burst?.from);
     projectile(special.burst?.into);
-    if (special.placement !== undefined) {
-      placements.set(specialPlacementCanonical(special.placement, ""), special.placement);
-      projectile(special.placement.shot);
-      projectile(special.placement.finalShot);
-      projectile(special.placement.mark);
+    for (const placement of specialPlacements(special)) {
+      placements.set(specialPlacementCanonical(placement, ""), placement);
+      projectile(placement.shot);
+      projectile(placement.finalShot);
+      projectile(placement.mark);
     }
     for (const followUp of special.followUps ?? []) move(followUp.special);
   };

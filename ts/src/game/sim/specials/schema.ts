@@ -1,6 +1,3 @@
-
-
-
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { f32 } from "wisp/src/sim/f32";
 import type { MoveRegion, StrikeCapsule } from "../heroMoves";
@@ -205,7 +202,7 @@ export interface SpecialPlacement {
   readonly offsetZ?: number | undefined;
 
   readonly keepExisting?: boolean | undefined;
-  readonly model?: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true } | undefined;
+  readonly model?: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true; readonly casts?: true } | undefined;
 
   readonly frame: number;
   readonly offsetX: number;
@@ -230,6 +227,8 @@ export interface SpecialPlacement {
   readonly aura?: true | undefined;
 
   readonly companion?: SpecialCompanion | undefined;
+  readonly taunt?: { readonly radius: number; readonly pull: number } | undefined;
+  readonly windWalk?: { readonly frames: number; readonly hop: number } | undefined;
 }
 
 
@@ -267,7 +266,7 @@ export const CompanionOrder = { lunge: 1, return: 2 } as const;
 export type CompanionOrder = (typeof CompanionOrder)[keyof typeof CompanionOrder];
 
 
-export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3 } as const;
+export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4 } as const;
 export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
 
 
@@ -344,6 +343,7 @@ export interface AuthoredSpecial {
   readonly hurt?: readonly HurtPose[] | undefined;
 
   readonly placement?: SpecialPlacement | undefined;
+  readonly summons?: readonly SpecialPlacement[] | undefined;
 
   readonly recall?: boolean | undefined;
 

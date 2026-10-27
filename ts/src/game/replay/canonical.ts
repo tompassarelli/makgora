@@ -298,6 +298,8 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
   }
   if (spec.aimed === true) int("aimed", 1);
   if (spec.crumble !== undefined) int("crumble", spec.crumble);
+  result.push(optionalField(`${prefix}.taunt.radius`, spec.taunt?.radius, canonicalRealField), optionalField(`${prefix}.taunt.pull`, spec.taunt?.pull, canonicalRealField));
+  result.push(optionalField(`${prefix}.windWalk.frames`, spec.windWalk?.frames, canonicalInt), optionalField(`${prefix}.windWalk.hop`, spec.windWalk?.hop, canonicalRealField));
   const partner = spec.companion;
   if (partner !== undefined) {
     if (partner.behavior !== undefined) int("companion.behavior", partner.behavior === "sentry" ? 1 : 2);
@@ -413,6 +415,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int("jumpWindow.last", move.jumpWindow.last);
   }
   if (move.placement !== undefined) result.push(specialPlacementCanonical(move.placement, `${name}.placement`));
+  move.summons?.forEach((summon, index) => result.push(specialPlacementCanonical(summon, `${name}.summons[${index}]`)));
   if (move.recall === true) int("recall", 1);
   if (move.command !== undefined) {
     int("command.frame", move.command.frame);
