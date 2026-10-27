@@ -53,9 +53,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Sylvanas Windrunner | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
 | Sylvanas Windrunner | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away neutral special; missed tech forward smash; trap neutral special covers tech in place, tech away, missed tech | up throw at 40% → up air against 4/5 DI |
 | Sylvanas Windrunner | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
-| Cairne Bloodhoof | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in short hop +4, down air; tech away full hop, forward air; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Cairne Bloodhoof | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, down smash, full hop, forward air; tech in short hop +4, down air, dash, dash attack; tech away full hop, forward air; missed tech down smash, down smash, full hop, forward air; trap down smash, down smash, full hop, forward air covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Cairne Bloodhoof | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash; tech away full hop, forward air; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Cairne Bloodhoof | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash; tech away full hop, forward air; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 5/5 DI |
+| Cairne Bloodhoof | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, down smash, forward smash; tech in full hop +4, down air; tech away full hop, forward air; missed tech down smash, down smash, forward smash; trap down smash, down smash, forward smash covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 4/5 DI |
+| Cairne Bloodhoof | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash; tech away full hop, down air, jab, down smash, full hop, forward air; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 5/5 DI |
 | Chen Stormstout | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash, short hop, back air, short hop, back air; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up air against 5/5 DI |
 | Chen Stormstout | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Chen Stormstout | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 60% → up air against 5/5 DI |
@@ -275,15 +275,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Sylvanas Windrunner | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD in forward tilt, out dash, dash attack | 1/1 KD in up tilt, out dash, dash attack | 1/1 |
+| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD | 1/1 KD in dash, dash attack, out down tilt | 1/1 KD in dash, dash attack, out forward tilt |
 | Cairne Bloodhoof | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | up throw | 1/1 | 1/1 KD in up tilt, out dash, dash attack | 1/1 KD in up tilt, out dash, dash attack | 3/2 in full hop in place, down air, out dash, dash attack |
+| Cairne Bloodhoof | medium | up throw | 1/1 | 1/1 KD | 1/1 KD in dash, dash attack, out down tilt | 1/1 in dash, dash attack, out forward tilt |
 | Cairne Bloodhoof | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | heavy | up throw | 1/1 | 1/1 KD | 1/1 KD | 1/1 KD |
+| Cairne Bloodhoof | heavy | up throw | 1/1 | 1/1 KD | 1/1 KD in dash, dash attack, out down tilt | 1/1 KD in dash, dash attack, out forward tilt |
 | Cairne Bloodhoof | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | light | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
