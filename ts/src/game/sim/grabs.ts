@@ -13,7 +13,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Controls, type Roster, controlsAt, fighterAt, isActive } from "./roster";
 import { beginGrabAction, clearGrabLinks } from "./transitions";
-import { cargoCarry, carriedOffset, requestedCarryThrow } from "./cargoCarry";
+import { cargoCarry, carriedOffset, carriesOverhead, holdThrow, isCargoThrow, requestedCarryThrow } from "./cargoCarry";
 
 const PUMMEL_HIT = { damage: PUMMEL_DAMAGE, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
@@ -130,7 +130,7 @@ function resolveHeldTarget(world: Roster, ownerSlot: number): void {
     owner.launch.knockbackZ = 0.0;
   }
   const held = target.motion;
-  if (carry !== undefined) {
+  if (carry !== undefined && carriesOverhead(action)) {
     const offset = carriedOffset(carry, action, frame, grabContactFrame(action, owner.tuning.moves), carry.hoistFrames, owner.facing);
     held.x = f32(owner.motion.x + offset.x);
     held.z = f32(owner.motion.z + offset.z);
@@ -176,7 +176,7 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
     }
   }
   const carry = cargoCarry(owner);
-  const throwAction = carry === undefined ? requestedThrow(owner, ownerInput) : grab.action === GrabAction.carry ? requestedCarryThrow(owner, ownerInput) : GrabAction.none;
+  const throwAction = grab.action === GrabAction.carry ? requestedCarryThrow(owner, ownerInput) : grab.action === GrabAction.hoist ? GrabAction.none : holdThrow(owner, requestedThrow(owner, ownerInput));
   if (carry !== undefined && grab.action === GrabAction.hoist) {
     if (targetSlot === undefined) {
       grab.action = GrabAction.none;
@@ -218,7 +218,8 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
     if (grab.action === GrabAction.pummel && throwAction !== GrabAction.none) grab.queuedThrow = throwAction;
     grab.frame++;
   }
-  if (targetSlot !== undefined && grab.action >= GrabAction.pummel && grab.action <= GrabAction.throwDown && grab.frame === grabContactFrame(grab.action, owner.tuning.moves)) {
+  const strikes = (grab.action >= GrabAction.pummel && grab.action <= GrabAction.throwDown) || isCargoThrow(grab.action);
+  if (targetSlot !== undefined && strikes && grab.frame === grabContactFrame(grab.action, owner.tuning.moves)) {
     resolveHeldTarget(world, ownerSlot);
 
     if (grab.action === GrabAction.pummel) {

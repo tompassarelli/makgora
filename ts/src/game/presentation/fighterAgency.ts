@@ -95,7 +95,7 @@ export class FighterAgencyForecast {
     if (heroStatusBlocksActions(f) && f.status.conditionFrames > 1) return "none";
     if (f.grab.owner !== undefined) {
       const owner = fighterAt(world, f.grab.owner);
-      if (owner.grab.action === GrabAction.hold || owner.grab.action === GrabAction.pummel) {
+      if (owner.grab.action === GrabAction.hold || owner.grab.action === GrabAction.pummel || owner.grab.action === GrabAction.hoist || owner.grab.action === GrabAction.carry) {
         return owner.launch.hitlag > 0 || f.launch.hitlag > 0 ? "none" : "act";
       }
       const free = owner.launch.hitlag <= 0 && f.launch.hitlag <= 0;

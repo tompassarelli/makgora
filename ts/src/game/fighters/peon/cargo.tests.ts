@@ -10,7 +10,7 @@ import { peonLook } from "./look";
 import { createPacingAndPresentation } from "../../match/pacingAndPresentation";
 import { stepMatch } from "../../match/step";
 import { Phase, createMatchState } from "../../lobby/lobbyState";
-import { grabVoice } from "../../presentation/moveSounds";
+import { hoistVoice } from "../../presentation/moveSounds";
 import { presentImpactSounds } from "../../presentation/hitPresentation";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../presentation/impactEvents";
 import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../../replay/snapshot";
@@ -32,9 +32,20 @@ const mashing = (frame: number) => controls({ grabMashPressed: true, direction: 
 
 interface Carry { readonly world: Roster; readonly peon: Fighter; readonly target: Fighter; readonly hoistFrames: number }
 
-function carry(world: Roster, peon: Fighter, target: Fighter): Carry {
+const forwardThrow = (peon: Readonly<Fighter>): Controls => controls({ grabThrowX: peon.facing });
+
+function hold(world: Roster, peon: Fighter): number {
   testBeginAttacks(world, AttackStyle.grab, undefined);
-  let hoistFrames = 0;
+  let frames = 0;
+  for (let frame = 0; frame < 60 && peon.grab.action !== GrabAction.hold; frame++) stepDuel(world);
+  for (; frames < 10 && peon.grab.action === GrabAction.hold; frames++) stepDuel(world);
+  return frames;
+}
+
+function carry(world: Roster, peon: Fighter, target: Fighter): Carry {
+  hold(world, peon);
+  stepDuel(world, forwardThrow(peon));
+  let hoistFrames = peon.grab.action === GrabAction.hoist ? 1 : 0;
   for (let frame = 0; frame < 60 && peon.grab.action !== GrabAction.carry; frame++) {
     stepDuel(world);
     if (peon.grab.action === GrabAction.hoist) hoistFrames++;
@@ -57,7 +68,10 @@ function release(run: Carry, peonInput: Readonly<Controls>, targetInput: (frame:
   return frame;
 }
 
-test("Peon's grab hoists the caught fighter over his authored hoist frames into a carry, the fighter riding on his shoulder [k1 scenario]", () => {
+test("Peon's grab holds the caught fighter, and his forward throw from the hold hoists it over his authored hoist frames into a carry on his shoulder [k1 scenario]", () => {
+  const pair = duelPair(createFighter(Character.peon, 0.0, 1), createFighter(Character.rifleman, GAP, -1));
+  assertEquals(hold(pair.world, pair.owner), 10);
+  assertEquals(pair.owner.grab.action, GrabAction.hold);
   const { peon, target, hoistFrames } = carryDuel();
   assertEquals(peon.grab.action, GrabAction.carry);
   assertEquals(hoistFrames, CARRY.hoistFrames);
@@ -90,11 +104,39 @@ test("Carrying, Peon walks both ways no faster than his carry walk with the figh
 });
 
 const CARGO_THROWS = [
-  [controls({ cStickSideFlick: 1 }), GrabAction.throwForward],
-  [controls({ attackPressed: true, direction: -1 }), GrabAction.throwBack],
-  [controls({ cStickUpFlick: true }), GrabAction.throwUp],
-  [controls({ attackPressed: true, verticalDirection: -1 }), GrabAction.throwDown],
+  [controls({ cStickSideFlick: 1 }), GrabAction.cargoThrowForward],
+  [controls({ attackPressed: true, direction: -1 }), GrabAction.cargoThrowBack],
+  [controls({ cStickUpFlick: true }), GrabAction.cargoThrowUp],
+  [controls({ attackPressed: true, verticalDirection: -1 }), GrabAction.cargoThrowDown],
 ] as const;
+
+const HOLD_THROWS = [
+  [controls({ grabThrowX: -1 }), GrabAction.throwBack],
+  [controls({ grabThrowZ: 1 }), GrabAction.throwUp],
+  [controls({ grabThrowZ: -1 }), GrabAction.throwDown],
+] as const;
+
+test("From Peon's grab hold, attack pummels and the back, up and down throws launch straight out of the hold with their own authored damage, never entering a carry [k1 scenario]", () => {
+  const pummel = duelPair(createFighter(Character.peon, 0.0, 1), createFighter(Character.rifleman, GAP, -1));
+  hold(pummel.world, pummel.owner);
+  stepDuel(pummel.world, controls({ attackPressed: true }));
+  assertEquals(pummel.owner.grab.action, GrabAction.pummel);
+  for (const [input, action] of HOLD_THROWS) {
+    const { world, owner, target } = duelPair(createFighter(Character.peon, 0.0, 1), createFighter(Character.rifleman, GAP, -1));
+    hold(world, owner);
+    const damage = target.status.damage;
+    stepDuel(world, input);
+    assertEquals(owner.grab.action, action);
+    let carried = false;
+    for (let frame = 0; frame < 60 && target.grab.owner !== undefined; frame++) {
+      stepDuel(world);
+      carried ||= owner.grab.action === GrabAction.hoist || owner.grab.action === GrabAction.carry;
+    }
+    assertFalse(carried);
+    assertEquals(target.grab.owner, undefined);
+    assertEquals(target.status.damage, f32(damage + PEON_MOVES.throws[action]!.effect.damage));
+  }
+});
 
 test("Each cargo throw from the carry launches the fighter along its own authored angle, relative to Peon's facing, with its authored damage [k1 scenario]", () => {
   for (const [input, action] of CARGO_THROWS) {
@@ -127,7 +169,7 @@ test("Carrying, Peon jumps lower than his own jump with the fighter kept on his 
       height = Math.max(height, f32(peon.motion.z - floor));
       if (run === undefined) continue;
       if (!peon.motion.grounded) carried = carried && peon.grab.action === GrabAction.carry && onShoulder(peon, run.target);
-      if (thrown < 0 && peon.grab.action === GrabAction.throwUp) {
+      if (thrown < 0 && peon.grab.action === GrabAction.cargoThrowUp) {
         thrown = frame;
         assertTrue(peon.motion.grounded);
       }
@@ -146,7 +188,7 @@ test("Carrying, Peon jumps lower than his own jump with the fighter kept on his 
   assertGreaterThan(carried.thrown, 20);
 });
 
-test("A computer Peon walks the carry to within its throw gap of the nearer ledge, then throws the fighter off that side [k1 scenario]", () => {
+test("A computer Peon forward-throws its grab into the carry, walks it to within its throw gap of the nearer ledge, then cargo-throws the fighter off that side [k1 scenario]", () => {
   for (const start of [f32(mainDeckLeft(0) + 220.0), f32(mainDeckRight(0) - 220.0)]) {
     const match = createMatchState();
     match.phase = Phase.match;
@@ -159,18 +201,21 @@ test("A computer Peon walks the carry to within its throw gap of the nearer ledg
     target.status.damage = 150.0;
     const world = createRoster(3, [peon, target]);
     for (let frame = 0; frame < 3; frame++) stepDuel(world);
-    carry(world, peon, target);
-    assertEquals(peon.grab.action, GrabAction.carry);
+    hold(world, peon);
+    assertEquals(peon.grab.action, GrabAction.hold);
     const runtime = createPacingAndPresentation();
     const produced = createFrameControls();
     const ledge = side > 0 ? mainDeckRight(0) : mainDeckLeft(0);
     let gapAtThrow = -1.0;
+    let carried = false;
     for (let frame = 1; frame < 240 && target.grab.owner !== undefined; frame++) {
       produceComputerInput(match, world, runtime, 0, frame, produced.inputs[0], produced.commands[0]);
       stepDuel(world, produced.inputs[0]);
-      const throwing = peon.grab.action >= GrabAction.throwForward && peon.grab.action <= GrabAction.throwDown;
+      carried ||= peon.grab.action === GrabAction.carry;
+      const throwing = peon.grab.action >= GrabAction.cargoThrowForward && peon.grab.action <= GrabAction.cargoThrowDown;
       if (throwing && gapAtThrow < 0.0) gapAtThrow = f32(side * f32(ledge - peon.motion.x));
     }
+    assertTrue(carried);
     assertGreaterThan(gapAtThrow, 0.0);
     assertLessThan(gapAtThrow, f32(CARRY_THROW_GAP + f32(peon.tuning.physics.walkSpeed * CARRY.walkScale)));
     for (let frame = 0; frame < 20; frame++) stepDuel(world);
@@ -222,7 +267,9 @@ test("A rollback taken mid-hoist restores the hoist, and replaying the same inpu
   };
   for (let i = 0; i < 3; i++) step(idle, idle);
   testBeginAttacks(world, AttackStyle.grab, undefined);
-  while (peon.grab.action !== GrabAction.hoist && frame < 60) step(idle, idle);
+  while (peon.grab.action !== GrabAction.hold && frame < 60) step(idle, idle);
+  step(forwardThrow(peon), idle);
+  assertEquals(peon.grab.action, GrabAction.hoist);
   for (let i = 0; i < 4; i++) step(idle, idle);
   const snapshot = createReplaySnapshot();
   captureReplaySnapshot(snapshot, world, game, frameControls, runtime);
@@ -250,20 +297,21 @@ test("A rollback taken mid-hoist restores the hoist, and replaying the same inpu
   assertEquals(firstFighterDifference(expected[1]!, target, world.mask, world.mask), undefined);
 });
 
-test("Peon says his Work, work line exactly once for a grab carried and thrown, and a fighter without a grab voice says nothing [k1 scenario]", () => {
+test("Peon says his Work, work line exactly once, as his forward throw hoists the fighter, never on the catch itself, and a fighter without a hoist voice says nothing [k1 scenario]", () => {
   for (const character of [Character.peon, Character.rifleman]) {
     const { world, owner, target } = duelPair(createFighter(character, 0.0, 1), createFighter(Character.rifleman, GAP, -1));
     const events = createImpactEvents();
-    const voice = grabVoice(Character.peon)!;
+    const voice = hoistVoice(Character.peon)!;
     let spoken = 0;
     let caught = false;
     const sink = (sound: string) => { if (sound === voice) spoken++; };
     testBeginAttacks(world, AttackStyle.grab, undefined);
     for (let frame = 0; frame < 120; frame++) {
       captureImpactEventsBefore(events, owner);
-      stepDuel(world, frame === 40 ? controls({ cStickSideFlick: 1, grabThrowX: 1 }) : idle);
+      stepDuel(world, frame === 30 ? controls({ grabThrowX: 1 }) : frame === 60 ? controls({ cStickSideFlick: 1 }) : idle);
       finishImpactEventsAfter(events, owner, world);
       presentImpactSounds(events, sink);
+      if (frame === 29) assertEquals(spoken, 0);
     }
     assertEquals(target.grab.owner, undefined);
     assertEquals(spoken, character === Character.peon ? 1 : 0);
@@ -292,7 +340,7 @@ test("Carrying, Peon draws his look's carry stand clip while still and its carry
   for (let frame = 0; frame < 3; frame++) step(idle);
   testBeginAttacks(world, AttackStyle.grab, undefined);
   let shown = -1;
-  for (let frame = 0; frame < 60 && peon.grab.action !== GrabAction.carry; frame++) shown = step(idle);
+  for (let frame = 0; frame < 60 && peon.grab.action !== GrabAction.carry; frame++) shown = step(peon.grab.action === GrabAction.hold ? forwardThrow(peon) : idle);
   shown = step(idle);
   assertEquals(peon.grab.action, GrabAction.carry);
   assertEquals(shown, clipFor(Character.peon, peonLook.carry!.stand).index);

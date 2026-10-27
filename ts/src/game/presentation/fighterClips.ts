@@ -218,10 +218,14 @@ const THROW_DOWN: GrabActionPoses = { holder: "throwDown", victim: "victimThrowD
 export function grabActionPoses(action: GrabAction): GrabActionPoses | undefined {
   switch (action) {
     case GrabAction.pummel: return PUMMEL;
-    case GrabAction.throwForward: return THROW_FORWARD;
-    case GrabAction.throwBack: return THROW_BACK;
-    case GrabAction.throwUp: return THROW_UP;
-    case GrabAction.throwDown: return THROW_DOWN;
+    case GrabAction.throwForward:
+    case GrabAction.cargoThrowForward: return THROW_FORWARD;
+    case GrabAction.throwBack:
+    case GrabAction.cargoThrowBack: return THROW_BACK;
+    case GrabAction.throwUp:
+    case GrabAction.cargoThrowUp: return THROW_UP;
+    case GrabAction.throwDown:
+    case GrabAction.cargoThrowDown: return THROW_DOWN;
     default: return undefined;
   }
 }

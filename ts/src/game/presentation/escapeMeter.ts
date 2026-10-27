@@ -52,7 +52,7 @@ export function readEscapeMeter(world: Readonly<Roster>, slot: number, view: Esc
     const ownerSlot = held.grab.owner;
     if (ownerSlot === undefined || held.grab.grabbedFrames <= 0) return;
     const { grab } = fighterAt(world, ownerSlot);
-    if (grab.action !== GrabAction.hold && grab.action !== GrabAction.pummel) return;
+    if (grab.action !== GrabAction.hold && grab.action !== GrabAction.pummel && grab.action !== GrabAction.hoist && grab.action !== GrabAction.carry) return;
     view.remaining = held.grab.grabbedFrames;
     view.full = held.grab.grabbedFrames + held.grab.heldFrames;
     view.pummel = grab.action === GrabAction.pummel

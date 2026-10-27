@@ -93,9 +93,12 @@ export const PEON_MOVES: FighterMoves = {
   carry: { hoistFrames: 12, walkScale: f32(0.6), jumpScale: f32(0.7), shoulderX: -8.0, shoulderZ: 70.0, overheadRise: 40.0 },
   throws: {
     [GrabAction.pummel]: { contactFrame: 60, totalFrames: 68, effect: peonHit(3.072000026702881, 90, 0.0, 0.0) },
-    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 34, effect: peonHit(7.168000221252441, 35, 46.5, 61.0) },
     [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: peonHit(8.192000389099121, 40, 31.5, 66.0, true) },
     [GrabAction.throwUp]: { contactFrame: 12, totalFrames: 22, effect: peonHit(6.144000053405762, 85, 54.17499923706055, 50.0) },
     [GrabAction.throwDown]: { contactFrame: 17, totalFrames: 42, effect: { ...peonHit(5.119999885559082, 70, 0.0, 0.0), growth: 100.0, setKnockback: 90.0 } },
+    [GrabAction.cargoThrowForward]: { inspiredBy: "Donkey Kong's Melee cargo forward throw", contactFrame: 13, totalFrames: 34, effect: peonHit(8.192000389099121, 55, 50.0, 80.0) },
+    [GrabAction.cargoThrowBack]: { inspiredBy: "Donkey Kong's Melee cargo back throw", contactFrame: 16, totalFrames: 40, effect: peonHit(8.192000389099121, 55, 50.0, 80.0, true) },
+    [GrabAction.cargoThrowUp]: { inspiredBy: "Donkey Kong's Melee cargo up throw", contactFrame: 12, totalFrames: 22, effect: peonHit(7.168000221252441, 90, 30.0, 90.0) },
+    [GrabAction.cargoThrowDown]: { inspiredBy: "Donkey Kong's Melee cargo down throw", contactFrame: 17, totalFrames: 42, effect: peonHit(6.144000053405762, 40, 26.0, 65.0) },
   },
 };

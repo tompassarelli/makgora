@@ -64,7 +64,7 @@ function planFor(f: Readonly<Fighter>, slot: number, frame: number): Plan {
   return choice < 3 ? Plan.ground : choice < 5 ? Plan.air : Plan.range;
 }
 
-/** Carrying: walks toward the nearer ledge, then throws off it, forward when facing it and back otherwise. */
+/** Carrying: walks toward the nearer ledge, then cargo-throws off it, forward when facing it and back otherwise. */
 function carryToLedge(f: Readonly<Fighter>, stage: number, input: Controls): void {
   const left = mainDeckLeft(stage);
   const right = mainDeckRight(stage);
@@ -78,13 +78,17 @@ function carryToLedge(f: Readonly<Fighter>, stage: number, input: Controls): voi
   input.direction = side === f.facing ? 0 : -f.facing;
 }
 
-/** Holding a grab: the gameplan's throw, or each hold frame pummels, throws one of four ways, or waits. */
+/** Holding a grab: a carrier forward-throws into its carry; others take the gameplan's throw, or each hold frame pummel, throw one of four ways, or wait. */
 function followUpGrab(f: Readonly<Fighter>, held: Readonly<Fighter>, gameplan: FighterGameplan | undefined, stage: number, frame: number, input: Controls): void {
   if (f.grab.action === GrabAction.carry) {
     carryToLedge(f, stage, input);
     return;
   }
   if (f.grab.action !== GrabAction.hold) return;
+  if (f.tuning.moves?.carry !== undefined) {
+    input.grabThrowX = f.facing;
+    return;
+  }
   const planned = gameplan === undefined ? undefined : gameplanThrow(gameplan, held, f.grab.serial, botChoice);
   if (planned !== undefined) {
     if (planned === GameplanThrow.forward || planned === GameplanThrow.back) input.grabThrowX = planned === GameplanThrow.forward ? f.facing : -f.facing;

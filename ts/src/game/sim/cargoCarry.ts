@@ -22,13 +22,27 @@ export function isCarrying(f: Readonly<Fighter>): boolean {
   return f.grab.action === GrabAction.carry && f.grab.target !== undefined && f.tuning.moves?.carry !== undefined;
 }
 
+export function isCargoThrow(action: GrabAction): boolean {
+  return action >= GrabAction.cargoThrowForward && action <= GrabAction.cargoThrowDown;
+}
+
+/** Whether the held fighter rides on the carrier's shoulder: the hoist, the carry and the cargo throws out of it. */
+export function carriesOverhead(action: GrabAction): boolean {
+  return action === GrabAction.hoist || action === GrabAction.carry || isCargoThrow(action);
+}
+
+/** A carrier's forward throw from the grab hold is the hoist into the carry; its other throws stay ordinary throws. */
+export function holdThrow(owner: Readonly<Fighter>, action: GrabAction): GrabAction {
+  return action === GrabAction.throwForward && cargoCarry(owner) !== undefined ? GrabAction.hoist : action;
+}
+
 export function requestedCarryThrow(owner: Readonly<Fighter>, input: Readonly<Controls>): GrabAction {
-  if (input.cStickUpFlick) return GrabAction.throwUp;
-  if (input.cStickZ < 0) return GrabAction.throwDown;
-  if (input.cStickSideFlick !== 0) return input.cStickSideFlick === owner.facing ? GrabAction.throwForward : GrabAction.throwBack;
+  if (input.cStickUpFlick) return GrabAction.cargoThrowUp;
+  if (input.cStickZ < 0) return GrabAction.cargoThrowDown;
+  if (input.cStickSideFlick !== 0) return input.cStickSideFlick === owner.facing ? GrabAction.cargoThrowForward : GrabAction.cargoThrowBack;
   if (!input.attackPressed) return GrabAction.none;
-  if (input.verticalDirection !== 0) return input.verticalDirection > 0 ? GrabAction.throwUp : GrabAction.throwDown;
-  return input.direction === -owner.facing ? GrabAction.throwBack : GrabAction.throwForward;
+  if (input.verticalDirection !== 0) return input.verticalDirection > 0 ? GrabAction.cargoThrowUp : GrabAction.cargoThrowDown;
+  return input.direction === -owner.facing ? GrabAction.cargoThrowBack : GrabAction.cargoThrowForward;
 }
 
 export function carryThrowRequested(owner: Readonly<Fighter>, input: Readonly<Controls>): boolean {
@@ -66,17 +80,17 @@ export function carriedOffset(carry: CargoCarry, action: GrabAction, frame: numb
     const progress = min(1.0, f32(f32(frame * 1.0) / hoistFrames));
     carryOffset.x = f32(frontX + f32(f32(shoulderX - frontX) * progress));
     carryOffset.z = f32(carry.shoulderZ * progress);
-  } else if (action === GrabAction.throwUp) {
+  } else if (action === GrabAction.cargoThrowUp) {
     const progress = min(1.0, f32(f32(frame * 1.0) / contact));
     carryOffset.x = f32(shoulderX * f32(1 - progress));
     carryOffset.z = f32(carry.shoulderZ + f32(carry.overheadRise * progress));
-  } else if (action === GrabAction.throwDown) {
+  } else if (action === GrabAction.cargoThrowDown) {
     const progress = min(1.0, f32(f32(frame * 1.0) / contact));
     carryOffset.x = f32(shoulderX + f32(f32(frontX - shoulderX) * progress));
     carryOffset.z = f32(carry.shoulderZ * f32(1 - progress));
-  } else if (action === GrabAction.throwForward || action === GrabAction.throwBack) {
+  } else if (action === GrabAction.cargoThrowForward || action === GrabAction.cargoThrowBack) {
     const progress = min(1.0, f32(f32(frame * 1.0) / contact));
-    const landingX = action === GrabAction.throwForward ? frontX : -frontX;
+    const landingX = action === GrabAction.cargoThrowForward ? frontX : -frontX;
     carryOffset.x = f32(shoulderX + f32(f32(landingX - shoulderX) * progress));
     carryOffset.z = f32(carry.shoulderZ * f32(1 - f32(0.5 * progress)));
   } else {

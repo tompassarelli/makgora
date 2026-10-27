@@ -177,7 +177,7 @@ export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = 
       if (groundedEffect !== undefined) effect(`${part}.groundedHit`, groundedEffect);
     }
   }
-  for (let action = GrabAction.pummel; action <= GrabAction.throwDown; action++) {
+  for (let action = GrabAction.pummel; action <= GrabAction.cargoThrowDown; action++) {
     const move = moves.throws[action];
     if (move === undefined) continue;
     const name = `throw[${action}]`;
