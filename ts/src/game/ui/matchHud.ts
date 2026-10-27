@@ -93,7 +93,7 @@ export class FighterHud {
     BlzFrameSetEnable(this.plate, false);
     this.portrait = createBackdrop(`FighterHUDPortrait${suffix}`, parent, context + 1);
     BlzFrameSetEnable(this.portrait, false);
-    this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, 21);
+    this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, 21, 1.0);
     this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, f32(0.016), 21);
     this.damage = BlzCreateFrame("SmashcraftDamage", parent, 0, context + 2);
     BlzFrameSetEnable(this.damage, false);

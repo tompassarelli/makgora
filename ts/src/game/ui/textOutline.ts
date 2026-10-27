@@ -16,9 +16,10 @@ export function createOutline(name: string, owner: framehandle, context: number,
 }
 
 
-export function createTemplateOutline(template: string, owner: framehandle, context: number, level: number): readonly framehandle[] {
+export function createTemplateOutline(template: string, owner: framehandle, context: number, level: number, scale: number): readonly framehandle[] {
   return OFFSETS.map(() => {
     const copy = BlzCreateFrame(template, owner, 0, context);
+    BlzFrameSetScale(copy, scale);
     BlzFrameSetEnable(copy, false);
     BlzFrameSetLevel(copy, level);
     return copy;

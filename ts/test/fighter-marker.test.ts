@@ -4,7 +4,7 @@ import { Phase, fighterColor, humanFighterActive } from "../src/game/lobby/lobby
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { fighterAt, isActive } from "../src/game/sim/roster";
-import { FighterMarker } from "../src/game/ui/fighterMarker";
+import { FighterMarker, markerNumberContext } from "../src/game/ui/fighterMarker";
 import { colourCode, damageText, percentText } from "../src/game/ui/plateLayout";
 import { slotColor } from "../src/game/ui/slotColors";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
@@ -102,7 +102,7 @@ function expectMarkerText(client: HeadlessClient, slot: ParticipantSlot): void {
     human = humanFighterActive(s.game, slot);
   });
   const named = (name: string) => client.frames.snapshot({ visibleOnly: true }).find(frame => frame.name === `${name}${slot}`);
-  expect(named("FighterMarkerDamage")?.text).toBe(damageText(damage));
+  expect(client.frames.named("SmashcraftDamage", markerNumberContext(slot))?.text).toBe(damageText(damage));
   expect(named("FighterMarkerPercent")?.text).toBe(percentText(damage));
   expect(named("FighterMarkerName")?.text).toBe(`${colourCode(slotColor(color).rgb)}${human ? "Player 1" : "CPU"}|r`);
   expect(named("FighterMarkerArrow")?.texture).toBe(`war3mapImported\\MarkerArrow${color}.tga`);

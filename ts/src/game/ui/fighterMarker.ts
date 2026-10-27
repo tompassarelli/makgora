@@ -4,7 +4,7 @@ import { unitsForPixels } from "./portraitFrames";
 import { slotColor } from "./slotColors";
 import { createBackdrop, createText, consoleUi } from "./frames";
 import { MENU_FONT } from "./hudLayout";
-import { attachOutline, createOutline, setOutlineText } from "./textOutline";
+import { attachOutline, createOutline, createTemplateOutline, setOutlineText } from "./textOutline";
 
 export const MARKER_WIDTH = unitsForPixels(220);
 export const MARKER_HEIGHT = unitsForPixels(170);
@@ -19,12 +19,16 @@ const NUMBER_HEIGHT_PX = 80;
 const PERCENT_WIDTH_PX = 40;
 const PERCENT_HEIGHT_PX = 44;
 const NUMBER_RIGHT_PX = 14;
-const NUMBER_FONT = f32(0.024);
+const NUMBER_SCALE = f32(0.6);
 const PERCENT_FONT = f32(0.012);
 const NAME_FONT = f32(0.009);
 const OUTLINE_PX = 2;
 const LEVEL = 9;
 
+
+const markerContext = (slot: number): number => 1200 + slot * 20;
+
+export const markerNumberContext = (slot: number): number => markerContext(slot) + 3;
 
 export const markerName = (human: boolean, playerName: string): string => human ? playerName.substring(0, MARKER_NAME_LENGTH) : "CPU";
 
@@ -68,13 +72,13 @@ export class FighterMarker {
 
   constructor(private readonly slot: number) {
     const suffix = I2S(slot);
-    const context = 1200 + slot * 20;
+    const context = markerContext(slot);
     this.root = BlzCreateFrameByType("FRAME", `FighterMarker${suffix}`, consoleUi(), "", context);
     BlzFrameSetSize(this.root, MARKER_WIDTH, MARKER_HEIGHT);
     BlzFrameSetLevel(this.root, LEVEL);
-    this.damageOutline = createOutline(`FighterMarkerDamage${suffix}`, this.root, context + 1, MENU_FONT, NUMBER_FONT, LEVEL);
+    this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", this.root, context + 1, LEVEL, NUMBER_SCALE);
     this.percentOutline = createOutline(`FighterMarkerPercent${suffix}`, this.root, context + 2, MENU_FONT, PERCENT_FONT, LEVEL);
-    this.damage = this.text(`FighterMarkerDamage${suffix}`, context + 3, NUMBER_FONT, NUMBER_WIDTH_PX, NUMBER_HEIGHT_PX);
+    this.damage = this.number(markerNumberContext(slot));
     this.percent = this.text(`FighterMarkerPercent${suffix}`, context + 4, PERCENT_FONT, PERCENT_WIDTH_PX, PERCENT_HEIGHT_PX);
     this.name = this.text(`FighterMarkerName${suffix}`, context + 5, NAME_FONT, 220, NAME_HEIGHT_PX);
     this.arrow = createBackdrop(`FighterMarkerArrow${suffix}`, this.root, context + 6);
@@ -88,7 +92,7 @@ export class FighterMarker {
     BlzFrameSetTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     BlzFrameSetPoint(this.percent, FRAMEPOINT_BOTTOMLEFT, this.damage, FRAMEPOINT_BOTTOMRIGHT, 0.0, unitsForPixels(10));
     this.placeNumber();
-    attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+    attachOutline(this.damageOutline, this.damage, OUTLINE_PX / NUMBER_SCALE, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     BlzFrameSetVisible(this.root, false);
   }
@@ -153,6 +157,15 @@ export class FighterMarker {
     const frame = createText(name, this.root, context);
     BlzFrameSetFont(frame, MENU_FONT, size, 1);
     BlzFrameSetSize(frame, unitsForPixels(width), unitsForPixels(height));
+    BlzFrameSetEnable(frame, false);
+    BlzFrameSetLevel(frame, LEVEL);
+    return frame;
+  }
+
+  private number(context: number): framehandle {
+    const frame = BlzCreateFrame("SmashcraftDamage", this.root, 0, context);
+    BlzFrameSetScale(frame, NUMBER_SCALE);
+    BlzFrameSetSize(frame, unitsForPixels(NUMBER_WIDTH_PX) / NUMBER_SCALE, unitsForPixels(NUMBER_HEIGHT_PX) / NUMBER_SCALE);
     BlzFrameSetEnable(frame, false);
     BlzFrameSetLevel(frame, LEVEL);
     return frame;
