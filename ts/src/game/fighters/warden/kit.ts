@@ -5,6 +5,8 @@ import type { HeroDefinition } from "../../sim/heroes/hero";
 import { WARDEN_GAMEPLAN } from "./gameplan";
 import { WARDEN_MOVES } from "./moves";
 import { WARDEN_SPECIALS } from "./specials";
+import { fitMoves, fitSpecials } from "../../sim/weaponRegions";
+import { WARDEN_WEAPON_REGIONS } from "./weaponRegions";
 
 export const WARDEN_HERO: HeroDefinition = {
   character: Character.warden,
@@ -13,8 +15,8 @@ export const WARDEN_HERO: HeroDefinition = {
   purpose: "Precision mobility and edge pressure",
   weakness: "Light body and punishable teleport endpoints",
   complete: true,
-  moves: WARDEN_MOVES,
-  specials: WARDEN_SPECIALS,
+  moves: fitMoves(WARDEN_MOVES, WARDEN_WEAPON_REGIONS),
+  specials: fitSpecials(WARDEN_SPECIALS, WARDEN_WEAPON_REGIONS),
   jab: { name: "Crescent Flurry", description: "Three quick cuts of her crescent blade on repeated jabs." },
   gameplan: WARDEN_GAMEPLAN,
 };

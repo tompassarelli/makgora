@@ -399,7 +399,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   frame it also measures how deep a blade point lies inside the body (behind the body surface from
   all six axis directions), and draws the deepest frame. A blade more than 1 unit inside is
   contact, not a measurement artifact; Blizzard's own Illidan Attack reaches 8.8 (#437).
-- Weapon against hit regions (from the repository root): `bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX]`
+- Weapon against hit regions (from the repository root): `bun tools/animations/weapon-trace.ts [--fighter SLUG]... [--assets DIR] [--shift FIGHTER:MOVE:DX | --fit]`
   traces each armed fighter's weapon (its rig's weapon bone) through every active frame of every
   move and fails a move whose weapon tip leaves that frame's hit regions, or whose region's far end
   lies away from everywhere the weapon goes during the move, by more than 20 units; a weapon held
@@ -408,6 +408,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   a foot, a leg, thrown knives or a spell, not the weapon) are reported, not failed, and a pass-through
   body region (marked path) is left out of the far-end check. A forward air whose weapon tip is not at positive x, or a back air whose tip is not at negative x, in any active frame fails too (#610). It writes build/anim-score/classic-weapons.tsv worst first.
   `--shift` moves one region of one move by DX units for a mutant run (#508).
+  `--fit` refits every failing weapon move: each active frame's capsules move onto the traced grip-to-tip segment
+  (radius, frames, damage and knockback kept; several capsules on one frame keep their order along the blade),
+  written as literal numbers to the generated ts/src/game/fighters/<folder>/weaponRegions.ts, which the fighter's kit.ts
+  applies with fitMoves and fitSpecials (an ultimate with fitUltimate in ts/src/game/sim/ultimates.ts). It regenerates
+  the strike-moment table (`bun wisp view strikes`) before each round and repeats until no move fails, at most 6 rounds,
+  then prints the trace; a move it cannot map is printed as `not fitted` with its reason (#614).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);

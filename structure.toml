@@ -37,7 +37,7 @@ paths = [
   "ts/src/game/presentation/fighterViewBounds.ts",
   "ts/src/game/fighters/cairne/clips.ts", "ts/src/game/fighters/jaina/clips.ts", "ts/src/game/fighters/malfurion/clips.ts",
   "ts/src/game/fighters/medivh/clips.ts", "ts/src/game/fighters/peon/clips.ts", "ts/src/game/fighters/peon/goldSackClips.ts", "ts/src/game/fighters/sylvanas/clips.ts",
-  "ts/src/game/fighters/thrall/clips.ts", "ts/src/game/fighters/*/clipInfo.ts", "ts/src/game/fighters/*/strikeMoments.ts",
+  "ts/src/game/fighters/thrall/clips.ts", "ts/src/game/fighters/*/clipInfo.ts", "ts/src/game/fighters/*/strikeMoments.ts", "ts/src/game/fighters/*/weaponRegions.ts",
   "ts/src/game/menu/stageSilhouettes.ts", "ts/src/game/sim/heroes/releaseRoster.ts",
 ]
 responsibility = "Producer output compiled into the map: clips, asset tables, view facts, math tables, generated state ops."
@@ -208,6 +208,9 @@ producer = "tools/animations/export-original-clips.ts"
 [[generated]]
 paths = ["ts/src/generated/assets/whiteFighterModels.ts", "ts/src/generated/assets/white-models/**", "ts/src/generated/assets/whiteModelFacts.ts", "ts/src/generated/assets/white-facts/**"]
 producer = "tools/animations/white-flash-models.ts"
+[[generated]]
+paths = ["ts/src/game/fighters/*/weaponRegions.ts"]
+producer = "tools/animations/weapon-trace.ts"
 [[generated]]
 paths = ["ts/src/generated/assets/stockSoundInfo.ts"]
 producer = "tools/presentation/stock-sounds.ts"
