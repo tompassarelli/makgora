@@ -65,14 +65,16 @@ const windWalk = (air: boolean): AuthoredSpecial => ({
 
 
 const RISE_FRAMES = 14;
-const rise = (distance: number) => chargedAngleMotion(length(distance), RISE_FRAMES);
+export const RISE_STARTUP = 4;
+const RISE_AIM_FRAMES = CHARGED_AIM_FRAMES + RISE_STARTUP;
+const rise = (distance: number) => chargedAngleMotion(length(distance), RISE_FRAMES, RISE_STARTUP);
 
 
 const risingBlade: AuthoredSpecial = {
-  endFrame: 24,
-  aimFrames: CHARGED_AIM_FRAMES,
+  endFrame: 24 + RISE_STARTUP,
+  aimFrames: RISE_AIM_FRAMES,
   motion: rise(f32(4.1)),
-  regions: path(9, [
+  regions: path(RISE_AIM_FRAMES + 1, [
     capsule(74.0, 113.0, 188.0, 121.0),
     capsule(65.0, 114.0, 185.0, 121.0),
     capsule(35.0, 114.0, 141.0, 121.0),
@@ -81,9 +83,9 @@ const risingBlade: AuthoredSpecial = {
     capsule(-51.0, 108.0, -103.0, 118.0),
   ], hit(6.970690727233887, "LAUNCH", 80)),
   hurt: [
-      hurtPose(1, 8, [hurtPart(0.0, 30.0, -16.0, 115.0, 45.0), hurtPart(-25.0, 90.0, 41.0, 115.0, 30.0)]),
-      hurtPose(9, 16, [hurtPart(-4.0, 25.0, -20.0, 115.0, 40.0), hurtPart(20.0, 96.0, 36.0, 125.0, 35.0)]),
-      hurtPose(17, 23, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(1, RISE_AIM_FRAMES, [hurtPart(0.0, 30.0, -16.0, 115.0, 45.0), hurtPart(-25.0, 90.0, 41.0, 115.0, 30.0)]),
+      hurtPose(RISE_AIM_FRAMES + 1, 16 + RISE_STARTUP, [hurtPart(-4.0, 25.0, -20.0, 115.0, 40.0), hurtPart(20.0, 96.0, 36.0, 125.0, 35.0)]),
+      hurtPose(17 + RISE_STARTUP, 23 + RISE_STARTUP, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
   oncePerAirtime: true,
   helpless: true,

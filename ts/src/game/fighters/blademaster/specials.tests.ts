@@ -16,7 +16,7 @@ import { attackLandingLag } from "../../sim/moves";
 import { fighterAt } from "../../sim/roster";
 import { mainDeckZ } from "../../sim/stage";
 import { length } from "./moves";
-import { MIRROR_IMAGE_OBJECT, WIND_WALK_DASH } from "./specials";
+import { BLADEMASTER_SPECIALS, MIRROR_IMAGE_OBJECT, RISE_STARTUP, WIND_WALK_DASH } from "./specials";
 
 const BLADEMASTER_X = -200.0;
 const FOE_X = 550.0;
@@ -186,4 +186,23 @@ test("Blademaster lands from Rising Whirlwind in at least his longest aerial lan
     else if (run.lag < longestAerial) short.push(`${run.label}: lag ${run.lag}`);
   }
   assertEquals(short.join("; "), "", `landing lag under his longest aerial (${longestAerial})`);
+});
+
+const STOCK_FIRST_STRIKE_FRAME = 9;
+const STOCK_END_FRAME = 24;
+const FIRST_STRIKE_FOE_GAP = 130.0;
+const FIRST_STRIKE_FOE_HEIGHT = 60.0;
+
+test("Blademaster's Rising Whirlwind first strikes on frame 13, four frames after the stock frame 9, and ends four frames later than its stock frame 24 [k3 measure docs/gameplay-design.md]", () => {
+  const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: f32(BLADEMASTER_X + FIRST_STRIKE_FOE_GAP), facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  let first = 0;
+  for (let n = 1; n <= UP_SPECIAL_WATCH && first === 0; n++) {
+    airborne(fighter(s, 1), f32(BLADEMASTER_X + FIRST_STRIKE_FOE_GAP), f32(mainDeckZ(0) + FIRST_STRIKE_FOE_HEIGHT));
+    frame(s, n === 1 ? [Action.moveUp, Action.special] : [Action.moveRight]);
+    if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroUp, "Rising Whirlwind starts");
+    if (first === 0 && fighter(s, 1).status.damage > 0.0) first = blademaster.special.frame;
+  }
+  assertEquals(first, STOCK_FIRST_STRIKE_FRAME + RISE_STARTUP, "first strike frame");
+  assertEquals(BLADEMASTER_SPECIALS.up.ground.endFrame, STOCK_END_FRAME + RISE_STARTUP, "last frame of the move");
 });

@@ -436,12 +436,13 @@ export const frames = (first: number, last: number): FrameWindow => ({ first, la
 export const CHARGED_AIM_FRAMES = 8;
 
 
-export function chargedAngleMotion(distance: number, travelFrames: number): readonly SpecialMotion[] {
+export function chargedAngleMotion(distance: number, travelFrames: number, extraAimFrames = 0): readonly SpecialMotion[] {
   const speed = f32(distance / travelFrames);
-  const launch = CHARGED_AIM_FRAMES + 1;
-  const stop = CHARGED_AIM_FRAMES + travelFrames + 1;
+  const aim = CHARGED_AIM_FRAMES + extraAimFrames;
+  const launch = aim + 1;
+  const stop = aim + travelFrames + 1;
   return [
-    { ...frames(1, CHARGED_AIM_FRAMES), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(1, aim), velocityX: 0.0, velocityZ: 0.0 },
     { ...frames(launch, stop - 1), velocityX: 0.0, velocityZ: speed, aimedSpeed: speed },
     { ...frames(stop, stop), velocityX: 0.0, velocityZ: 0.0 },
   ];
