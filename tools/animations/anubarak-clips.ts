@@ -55,12 +55,12 @@ const burrowRake: readonly Gesture[] = [
   { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
   { chest: -40, pelvis: -25, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -20, leftThigh: 20 },
 ];
-interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; decay?: number; }
+interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; decay?: number; settle?: number; }
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
   jab2: { contact: 7, x: 64, back: 32 },
   forwardSmash: { contact: 20, x: 48, back: 24 },
-  upSmash: { contact: 17, z: 48, back: 24 },
+  upSmash: { contact: 17, z: 48, back: 24, settle: 1 },
   downSmash: { contact: 15, x: 10, back: 6 },
   neutralAir: { contact: 9, x: 12, back: 6 },
   forwardAir: { contact: 12, x: 20, back: 10, decay: 26 },
@@ -232,7 +232,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   const name = !action.pain ? `Anubarak ${action.pose}` : `Anubarak Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
-  const rake = rakes[action.pose], groundGesture = groundGestures.has(action.pose) && rake === undefined, lunge = lunges[action.pose], settled = action.frames - (rake?.settle ?? 0);
+  const rake = rakes[action.pose], groundGesture = groundGestures.has(action.pose) && rake === undefined, lunge = lunges[action.pose], settled = action.frames - (rake?.settle ?? lunge?.settle ?? 0);
   const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture || lunge || rake?.carry ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
