@@ -1,6 +1,8 @@
 import { type Frame } from "wisp/scripts/wisp/frameProbe";
 import { STAMP_CELLS, type Stamp, type StampCell, type StampVerdict, readStamp, stampVerdict } from "../src/game/core/drawnStamp";
 
+const GUARD_TOLERANCE = 24;
+
 function colourClass(red: number, green: number, blue: number): StampCell | "unclear" {
   if (red - Math.max(green, blue) > 60) return "one";
   if (blue - Math.max(red, green) > 60) return "zero";
@@ -49,9 +51,11 @@ function stampInRows(frame: Frame, rows: readonly number[]): Stamp | undefined {
       if (right.start <= left.end || side < 3) continue;
       const fits = (run: { start: number; end: number }) => Math.abs(run.end - run.start + 1 - side) <= Math.max(2, side * 0.3);
       if (!fits(left) || !fits(right)) continue;
-      const above = ((y - 1) * frame.width + left.start) * 3;
-      if (y > 0 && colourClass(frame.rgb[above] ?? 0, frame.rgb[above + 1] ?? 0, frame.rgb[above + 2] ?? 0) === "guard") continue;
-      const stamp = stampAlong(frame, y, left.start, right.end);
+      const inside = left.end - 1;
+      const same = (row: number) => [0, 1, 2].every(channel => Math.abs((frame.rgb[(row * frame.width + inside) * 3 + channel] ?? 0) - (frame.rgb[(y * frame.width + inside) * 3 + channel] ?? 0)) <= GUARD_TOLERANCE);
+      let top = y;
+      while (top > 0 && same(top - 1)) top--;
+      const stamp = stampAlong(frame, top, left.start, right.end);
       if (stamp !== undefined) return stamp;
     }
   }

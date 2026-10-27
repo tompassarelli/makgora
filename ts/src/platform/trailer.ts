@@ -3,6 +3,7 @@ import { PARTICIPANT_SLOTS } from "../game/input/participants";
 import { Phase, copyMatchState } from "../game/lobby/lobbyState";
 import { fieldMatch } from "../game/match/fieldMatch";
 import { TRAILER_SHOTS, type TrailerShot } from "../game/session/trailerShots";
+import { clearVisualCapture, holdEveryVisualFrame } from "../game/session/visualCapture";
 import { selectableCharacterBySlug } from "../game/roster/kits";
 import { fighterAt, isActive } from "../game/sim/roster";
 import { writeLines } from "wisp/src/platform/fileio";
@@ -11,8 +12,10 @@ import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { startMatch } from "../host/loop/matchStart";
 import { resetToStartingSelection } from "../host/loop/menus";
 import { presentedFrame } from "../host/loop/presentedMatch";
-import { type ShellState } from "../host/loop/state";
+import { type ShellState, localSlot } from "../host/loop/state";
 import { installTickProbe } from "../host/loop/tickProbe";
+
+const HOLD_TICKS = 5;
 
 interface Trailer {
   shot: number;
@@ -39,6 +42,7 @@ function startShot(s: ShellState, trailer: Trailer, shot: TrailerShot): void {
   }
   copyMatchState(s.game, fieldMatch(a, b, { stage: shot.stage, seed: shot.seed }).match);
   startMatch(s);
+  holdEveryVisualFrame(localSlot(), shot.start, HOLD_TICKS);
   trailer.playing = true;
   trailer.opened = false;
   for (const slot of PARTICIPANT_SLOTS) trailer.stocks[slot] = isActive(s.world, slot) ? fighterAt(s.world, slot).status.stocks : 0;
@@ -55,6 +59,7 @@ function beforeTrailerTick(s: ShellState): void {
 function finishShot(s: ShellState, trailer: Trailer, frame: number): void {
   trailer.lines.push(`checksum ${frame} ${confirmedChecksum(s)}`);
   trailer.playing = false;
+  clearVisualCapture(localSlot());
   trailer.shot++;
   if (trailer.shot >= TRAILER_SHOTS.length) trailer.lines.push(`TRAILER END shots ${trailer.shot}`);
   writeLines(TRAILER_LOG_FILE, trailer.lines);

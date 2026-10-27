@@ -384,7 +384,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
 
     const paced = journal === undefined ? undefined : resumePresentationHeld(s) ? journal.barrier.paced : pacedStop(journal.barrier);
     const speculativeStop = stopAt === undefined ? paced : paced === undefined ? stopAt : Math.min(stopAt, paced);
-    const presentationStop = s.build.responseProbe ? visualCaptureStopBefore(slot, speculativeStop) : speculativeStop;
+    const presentationStop = visualCaptureStopBefore(slot, speculativeStop);
     beginFrameSection(SPECULATIVE_SECTION);
     const skipped = keyboard !== undefined && paceSkips(keyboard, schedule.rollbackFrames() - (before - schedule.remoteThrough(slot)));
     let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, skipped ? 0 : speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);

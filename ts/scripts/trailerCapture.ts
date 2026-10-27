@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Layer } from "effect";
@@ -25,7 +25,7 @@ import { copyControls, fighterAt, isActive, neutralControls } from "../src/game/
 const WIDTH = 1920;
 const HEIGHT = 1080;
 const STRIP = 24;
-const DEFAULT_MINUTES = 25;
+const DEFAULT_MINUTES = 40;
 const attempt = <A>(operation: string, run: () => A) => Effect.try({ try: run, catch: cause => new CaptureFailure({ problem: `${operation}: ${String(cause)}` }) });
 
 const shell = (command: readonly string[]) => Effect.sync(() => Bun.spawn([...command], { stdin: "ignore", stdout: "pipe", stderr: "pipe" }));
@@ -193,6 +193,36 @@ export function windowOf(run: readonly Stamped[], shot: TrailerShot, end = shot.
   return { first: inside[0]?.index, last: inside.at(-1)?.index, missing, repeated };
 }
 
+const assembleFrames = (ffmpeg: string, span: string, picked: readonly number[], out: string) => Effect.promise(async () => {
+  const keep = new Set(picked);
+  const size = WIDTH * HEIGHT * 3 / 2;
+  const decoder = Bun.spawn([ffmpeg, "-v", "error", "-i", span, "-f", "rawvideo", "-pix_fmt", "yuv420p", "-"], { stdin: "ignore", stdout: "pipe", stderr: "ignore" });
+  const encoder = Bun.spawn([ffmpeg, "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "yuv420p", "-s", `${WIDTH}x${HEIGHT}`, "-r", "60", "-i", "-", "-c:v", "libx264", "-preset", "slow", "-crf", "10", "-pix_fmt", "yuv420p", out], { stdin: "pipe", stdout: "ignore", stderr: "ignore" });
+  let pending = new Uint8Array(0);
+  let index = 0;
+  for await (const chunk of decoder.stdout) {
+    const joined = new Uint8Array(pending.length + chunk.length);
+    joined.set(pending);
+    joined.set(chunk, pending.length);
+    let offset = 0;
+    for (; offset + size <= joined.length; offset += size, index++) {
+      if (!keep.has(index)) continue;
+      encoder.stdin.write(joined.subarray(offset, offset + size));
+      await encoder.stdin.flush();
+    }
+    pending = joined.slice(offset);
+  }
+  await decoder.exited;
+  await encoder.stdin.end();
+  await encoder.exited;
+});
+
+export function pickFrames(stamps: readonly (number | undefined)[], start: number, end: number): number[] {
+  const first = new Map<number, number>();
+  for (const [index, frame] of stamps.entries()) if (frame !== undefined && frame >= start && frame <= end && !first.has(frame)) first.set(frame, index);
+  return [...first.entries()].sort(([a], [b]) => a - b).map(([, index]) => index);
+}
+
 const judge = (args: readonly string[]) => Effect.gen(function*() {
   const directory = args.find(value => !value.startsWith("--"));
   if (directory === undefined) return yield* new CaptureFailure({ problem: "usage: judge DIR" });
@@ -220,9 +250,12 @@ const judge = (args: readonly string[]) => Effect.gen(function*() {
     const name = `shot-${String(index + 1).padStart(2, "0")}-seed-${shot.seed}.mp4`;
     let clip: { readonly frames: number; readonly missing: number; readonly repeated: number; readonly width?: number; readonly height?: number; readonly rate?: string } = { frames: 0, missing: end - shot.start + 1, repeated: 0 };
     if (window.first !== undefined && window.last !== undefined) {
-      const frames = window.last - window.first + 1;
-      const cut = yield* shell([ffmpeg, "-v", "error", "-y", "-ss", (window.first / 60).toFixed(6), "-i", video, "-frames:v", String(frames), "-r", "60", "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-pix_fmt", "yuv420p", join(directory, name)]);
+      const span = join(directory, `${name}.span.mkv`);
+      const cut = yield* shell([ffmpeg, "-v", "error", "-y", "-ss", (window.first / 60).toFixed(6), "-i", video, "-frames:v", String(window.last - window.first + 1), "-c:v", "libx264", "-preset", "ultrafast", "-crf", "0", span]);
       yield* Effect.promise(() => cut.exited);
+      const picked = pickFrames(yield* stampStrips(ffmpeg, span), shot.start, end);
+      yield* assembleFrames(ffmpeg, span, picked, join(directory, name));
+      yield* attempt("remove the span cut", () => rmSync(span));
       const clipWindow = windowOf(segments(yield* stampStrips(ffmpeg, join(directory, name))).flat(), shot, end);
       const probe = yield* shell([ffprobe, "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries", "stream=width,height,r_frame_rate,nb_read_frames", "-of", "json", join(directory, name)]);
       const probed = JSON.parse(yield* Effect.promise(() => new Response(probe.stdout).text())) as { streams?: { width?: number; height?: number; r_frame_rate?: string; nb_read_frames?: string }[] };

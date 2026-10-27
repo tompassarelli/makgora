@@ -13,7 +13,8 @@ export function serviceVisualCapture(s: ShellState): void {
   const held = state?.held;
   if (state === undefined || held === undefined) return;
   state.ticks++;
-  if (s.game.phase !== Phase.match || state.ticks >= 600 || readChunk(visualReleaseFile(state.token, slot, held.frame)) === state.token) {
+  const released = state.every === undefined ? readChunk(visualReleaseFile(state.token, slot, held.frame)) === state.token : state.ticks >= state.every.releaseTicks;
+  if (s.game.phase !== Phase.match || state.ticks >= 600 || released) {
     releaseVisualFrame(slot);
     if (s.game.phase !== Phase.match) clearVisualCapture(slot);
     pauseMatchPresentation(s, s.session.paused);
@@ -22,7 +23,7 @@ export function serviceVisualCapture(s: ShellState): void {
 
 
 export function holdPresentedCapture(s: ShellState): void {
-  if (!s.build.responseProbe || s.game.phase !== Phase.match || heldVisualFrame(localSlot()) !== undefined) return;
+  if (visualCapture(localSlot()) === undefined || s.game.phase !== Phase.match || heldVisualFrame(localSlot()) !== undefined) return;
   const { epoch, frame } = drawnFrame(s);
   if (holdVisualFrame(localSlot(), epoch, frame)) {
     if (resumePresentationHeld(s)) pauseMatchPresentation(s, false, true);
