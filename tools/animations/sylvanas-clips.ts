@@ -11,13 +11,14 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const painOnly = process.argv.includes("pain");
+const inPlaceNames = process.argv.slice(4);
+const inPlace = inPlaceNames.length > 0;
 const project = resolve(import.meta.dir, "../..");
 ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/sylvanas-clips.ts STOCK_SYLVANAS.mdx|SHIPPED_SYLVANAS.mdx PRIVATE_OUTPUT [pain]");
 mkdirSync(join(output, "hero-models"), { recursive: true });
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseSource(originalBytes);
-ensure(painOnly ? source.Sequences.some(s => s.Name === "Sylvanas pain00") : source.Sequences.length === 11, painOnly ? "Use the shipped Sylvanas model" : "Use the unmodified stock Sylvanas model");
+ensure(inPlace ? source.Sequences.some(s => s.Name === "Sylvanas pain00") : source.Sequences.length === 11, inPlace ? "Use the shipped Sylvanas model" : "Use the unmodified stock Sylvanas model");
 const model = structuredClone(source), stand = source.Sequences[9];
 ensure(stand?.Name === "Stand Ready", "Sylvanas stock sequence order changed");
 
@@ -136,10 +137,11 @@ function joint(name: string, g: Gesture): [number,number] {
 }
 const painActions = actions.filter(a => a.pain);
 const keyAt = (track: mdx.AnimVector, Frame: number) => { const key = track.Keys.find(k => k.Frame === Frame); ensure(key, `missing key at ${Frame}`); return key; };
-function snapPain(cells: readonly number[], motion: mdx.AnimVector) {
+type Placed = readonly (readonly [Action, number])[];
+function snapPain(placed: Placed, motion: mdx.AnimVector) {
   const body = new PainBody(generateMDX(model), Character.sylvanas), rest = body.floor(9, 0);
-  for (const [cell, index] of cells.entries()) {
-    const action = painActions[cell]!, [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+  for (const [action, index] of placed) {
+    const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
     for (let f = 0; f <= action.frames; f++) keyAt(motion, Math.round(start + f * (end - start) / action.frames)).Vector[2]! -= body.floor(index, f / 60) - rest;
   }
 }
@@ -148,18 +150,37 @@ function requirePainGate(bytes: ArrayBuffer, cells: readonly number[]) {
   console.log(report);
   ensure(pass, "Sylvanas pain gate failed");
 }
-async function painSheets(bytes: ArrayBuffer, cells: readonly number[]) {
+function snapGround(placed: Placed, motion: mdx.AnimVector) {
+  const drawn = new DrawnModel(generateMDX(model), 1);
+  for (const [action, index] of placed) {
+    const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+    const floors = Array.from({ length: action.frames + 1 }, (_, f) => {
+      const vertices = drawn.triangles(index, f / 60, 1); let lowest = Infinity;
+      for (let i = 1; i < vertices.length; i += 2) lowest = Math.min(lowest, vertices[i]!);
+      ensure(Number.isFinite(lowest), `${action.name}: missing body`);
+      return lowest - (poseAt(action, f).height ?? 0);
+    });
+    for (const [f, lowest] of floors.entries()) keyAt(motion, Math.round(start + f * (end - start) / action.frames)).Vector[2]! -= lowest;
+  }
+}
+async function clipSheets(bytes: ArrayBuffer, placed: Placed) {
   const drawn = new DrawnModel(bytes, 1);
-  for (const [cell, index] of cells.entries()) {
-    const action = painActions[cell]!, moments = action.phases.map(p => Math.round(p.at));
+  for (const [action, index] of placed) {
+    const moments = action.phases.map(p => Math.round(p.at));
     const capture = sheet(`Sylvanas ${action.name}`, drawn, [1, -1].flatMap(facing => moments.map(frame => ({ frame, facing, clip: index, seconds: frame / 60, phase: AttackPhase.active, x: 0, z: 0, parts: [], strikes: [] }))), moments.length);
     await Bun.write(join(output, `${action.name}.png`), capture.png);
   }
 }
-if (painOnly) {
+if (inPlace) {
   const motion = model.Helpers.find(h => h.Name === "Sylvanas Motion");
   ensure(motion?.Rotation && motion.Translation && motion.Scaling, "Shipped Sylvanas has no motion helper");
-  const cells = painActions.map(action => {
+  const chosen = inPlaceNames.flatMap(name => {
+    if (name === "pain") return painActions;
+    const action = actions.find(a => a.name === name);
+    ensure(action && !action.hold, `${name}: no timed clip of that name`);
+    return [action];
+  });
+  const placed: Placed = chosen.map(action => {
     const index = model.Sequences.findIndex(s => s.Name === `Sylvanas ${action.name}`);
     ensure(index >= 0, `${action.name}: shipped sequence missing`);
     const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
@@ -182,18 +203,22 @@ if (painOnly) {
       keyAt(motion.Scaling!, Frame).Vector = new Float32Array([1, 1, 1 - (g.tuck ?? 0)]);
       keyAt(motion.Translation!, Frame).Vector = new Float32Array([0, 0, g.height ?? 0]);
     }
-    return index;
+    return [action, index] as const;
   });
-  snapPain(cells, motion.Translation!);
+  const pain = placed.filter(([a]) => a.pain);
+  ensure(pain.length === 0 || pain.length === painActions.length, "Re-author all nine pain clips together");
+  snapPain(pain, motion.Translation!);
+  snapGround(placed.filter(([a]) => !a.pain && !a.air), motion.Translation!);
+  const cells = placed.map(([, index]) => index);
   const bytes = encodeVerified(parseSource(generateMDX(model))), before = new DrawnModel(originalBytes, 1), after = new DrawnModel(bytes, 1), authored = new Set(cells);
   for (const [index, sequence] of source.Sequences.entries()) if (!authored.has(index)) for (const part of [0, 0.5, 1]) {
     const time = (sequence.Interval[1]! - sequence.Interval[0]!) * part / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
     ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${sequence.Name}: shipped pose changed`);
   }
-  await painSheets(bytes, cells);
+  await clipSheets(bytes, placed);
   const modelPath = join(output, "evilsylvanas.mdx"); await Bun.write(modelPath, bytes); chmodSync(modelPath, 0o644);
-  requirePainGate(bytes, cells);
-  console.log(`SYLVANAS_PAIN_PASS: 9 pain cells re-authored in place; ${source.Sequences.length - cells.length} other sequences unchanged; ${bytes.byteLength} model bytes`);
+  if (pain.length) requirePainGate(bytes, pain.map(([, index]) => index));
+  console.log(`SYLVANAS_IN_PLACE_PASS: ${cells.length} clips re-authored in place; ${source.Sequences.length - cells.length} other sequences unchanged; ${bytes.byteLength} model bytes`);
   process.exit(0);
 }
 const id = model.Nodes.length;
@@ -244,7 +269,7 @@ for(const action of actions) {
   bindings.set(action.name,{index,seconds:(end-start)/1000,...(action.contact?{contact:action.contact}:{})});
 }
 const painCells = painActions.map(a => bindings.get(a.name)!.index);
-snapPain(painCells, helper.Translation!);
+snapPain(painActions.map(a => [a, bindings.get(a.name)!.index] as const), helper.Translation!);
 const beforeRetime = new DrawnModel(generateMDX(model), 1);
 const victimPummel = bindings.get("victimPummel")!;
 const victimSequence = model.Sequences[victimPummel.index]!;

@@ -358,10 +358,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/sylvanas-clips.ts STOCK_SYLVANAS.mdx PRIVATE_OUTPUT`
   appends bow attacks, casts, recovery, paired grabs and nine damage reactions
   to the classic undead Sylvanas rig, preserving its stock sequences.
-  `bun tools/animations/sylvanas-clips.ts SHIPPED_SYLVANAS.mdx PRIVATE_OUTPUT pain`
-  re-authors only the nine pain clips of the shipped model in place, sets each on
-  the floor by her body without the bow, requires the pain gate and every other
-  clip unchanged, and writes `evilsylvanas.mdx` for the `hero-models` shard.
+  `bun tools/animations/sylvanas-clips.ts SHIPPED_SYLVANAS.mdx PRIVATE_OUTPUT CLIP...`
+  re-authors only the named timed clips of the shipped model in place (`pain` names
+  the nine pain clips, set on the floor by her body without the bow under the pain
+  gate; other ground clips are set on the floor by their lowest vertex), requires
+  every other clip unchanged, and writes `evilsylvanas.mdx` for the `hero-models` shard.
 
 - Cairne animation authoring (from the repository root):
   `bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx PRIVATE_OUTPUT`
