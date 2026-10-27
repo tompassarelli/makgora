@@ -23,7 +23,7 @@ ensure(stand?.Name === "Stand Ready", "Peon stock sequence order changed");
 interface Gesture {
   readonly chest?: number; readonly head?: number; readonly axe?: number; readonly elbow?: number;
   readonly grip?: number; readonly knee?: number; readonly twist?: number; readonly lean?: number;
-  readonly roll?: number; readonly yaw?: number; readonly tuck?: number; readonly height?: number; readonly ahead?: number;
+  readonly roll?: number; readonly yaw?: number; readonly tuck?: number; readonly height?: number; readonly ahead?: number; readonly kick?: number;
 }
 interface Phase { readonly at: number; readonly pose: Gesture }
 interface Action { readonly name: string; readonly frames: number; readonly phases: readonly Phase[]; readonly air?: boolean; readonly hold?: boolean; readonly contact?: number; readonly pain?: boolean }
@@ -42,12 +42,13 @@ strike("forwardTiltUp", 29, 7, 9, { axe: 15, chest: 18, knee: 14 }, { axe: -55, 
 strike("forwardTiltDown", 29, 7, 9, { axe: -110, chest: -20 }, { axe: -25, elbow: 0, chest: 32, knee: 30 });
 strike("upTilt", 30, 6, 9, { axe: 18, chest: 20, knee: 15 }, { axe: -105, elbow: -10, chest: -10, grip: -80, knee: 0 });
 strike("downTilt", 27, 5, 7, { axe: -155, chest: -15, yaw: 60 }, { axe: -45, elbow: -15, chest: 35, knee: 42, tuck: 0.16 });
-const prone = { ahead: 40, lean: 88, chest: -10, head: -42, axe: -122, grip: -118, elbow: 0, knee: 28 };
-add("dashAttack", 38, [phase(0), phase(2, { ahead: -2, lean: 14, chest: -8, head: -15, axe: 45, grip: 35, elbow: 15, knee: 40 }),
-  phase(4, { ahead: -6, lean: 30, chest: -28, head: -35, axe: 125, grip: 115, elbow: 35, knee: 90 }), phase(6, { ahead: 24, lean: 66, chest: -16, head: -36, axe: -120, grip: -115, elbow: 10, knee: 20 }),
-  phase(8, prone), phase(11, { ...prone, ahead: 52, lean: 92, chest: -18, axe: -128, knee: 85 }), phase(15, { ...prone, ahead: 58, chest: -28, head: -30, axe: -165, grip: -150, elbow: 70, knee: 15 }),
-  phase(19, { ahead: 50, lean: 78, chest: 14, head: -26, axe: -118, grip: -100, elbow: 20, knee: 40 }), phase(24, { ahead: 36, lean: 60, chest: 22, head: -20, axe: -98, grip: -80, elbow: 18, knee: 62 }),
-  phase(29, { ahead: 21, lean: 40, chest: 18, head: -10, axe: -66, grip: -56, elbow: 10, knee: 52, tuck: 0.08 }), phase(33, { ahead: 9, lean: 20, chest: 8, head: -4, axe: -36, grip: -30, elbow: 5, knee: 26, tuck: 0.03 }), phase(38)]);
+const prone = { ahead: 40, lean: 88, chest: -10, head: -42, axe: -122, grip: -118, elbow: 0, knee: 4 };
+const flail = { ahead: -10, lean: -24, chest: -20, head: -34, axe: -215, grip: -205, elbow: -10, knee: 28, kick: 60 };
+add("dashAttack", 38, [phase(0), phase(2, { ...flail, ahead: -5, lean: -10, axe: -160, grip: -155, knee: 20, kick: 35 }), phase(4, flail), phase(5, { ...flail, lean: -22, kick: 70 }),
+  phase(6, { ahead: 26, lean: 70, chest: -16, head: -38, axe: -150, grip: -145, elbow: 0, knee: 10 }), phase(8, prone), phase(9, { ...prone, ahead: 44, chest: -24, head: -48, knee: 30 }),
+  phase(11, { ...prone, ahead: 52, lean: 90, chest: -4, head: -18, axe: -140, knee: 110 }), phase(14, { ...prone, ahead: 57, lean: 86, chest: -38, head: -24, axe: -150, grip: -150, elbow: 56, knee: 14 }),
+  phase(20, { ahead: 42, lean: 62, chest: 4, head: -22, axe: -106, grip: -106, elbow: 26, knee: 56, twist: 16 }), phase(25, { ahead: 32, lean: 49, chest: 14, head: -18, axe: -86, grip: -85, elbow: 18, knee: 60, twist: 20 }),
+  phase(30, { ahead: 18, lean: 31, chest: 12, head: -8, axe: -54, grip: -52, elbow: 8, knee: 44, tuck: 0.05, twist: 8 }), phase(34, { ahead: 9, lean: 18, chest: 7, head: -3, axe: -32, grip: -30, knee: 28, tuck: 0.03, twist: 3 }), phase(38)]);
 strike("forwardSmash", 59, 21, 23, { axe: -175, grip: -120, chest: -24, knee: 26 }, { axe: -75, grip: -60, elbow: 10, chest: 30, knee: 28 }, { axe: 40, chest: 28, knee: 20 }, false, { axe: -40, grip: -40, elbow: 10, chest: 38, knee: 30 });
 strike("upSmash", 51, 16, 19, { axe: 10, chest: 30, knee: 35 }, { axe: -115, grip: -110, elbow: -10, chest: -12, knee: 0, height: 12 }, { axe: -150, grip: -140, elbow: -20, chest: 20, knee: 32, tuck: 0.12 }, false, { axe: -175, grip: -155, elbow: -22, chest: -26, knee: 0, height: 8 });
 add("downSmash", 54, [phase(0), phase(14, { axe: -160, knee: 25, chest: -15 }), phase(17, { axe: 5, chest: 40, knee: 35 }), phase(19, { axe: 15, chest: 40, knee: 35, yaw: 20 }), phase(20, { axe: 5, yaw: 180, chest: 40, knee: 35 }), phase(21, { axe: 15, yaw: 195, chest: 40, knee: 35 }), phase(26, { axe: 55, yaw: 195, knee: 20 }), phase(40, { yaw: 300 }), phase(54, { yaw: 360 })]);
@@ -133,8 +134,9 @@ function joint(name: string, g: Gesture): [number,number] {
   if(name === "Bone_Arm2_R") return [g.elbow ?? 0, 0];
   if(name === "Bone_Arm2_L") return [-(g.elbow ?? 0)*0.5, 0];
   if(name === "Bone_Leg1_L") return [-(g.knee ?? 0)*0.85,0];
-  if(name === "Bone_Leg1_R") return [-(g.knee ?? 0)*0.35,0];
-  if(/^Bone_Leg2_[LR]$/.test(name)) return [g.knee ?? 0,0];
+  if(name === "Bone_Leg1_R") return [-(g.knee ?? 0)*0.35 + (g.kick ?? 0),0];
+  if(name === "Bone_Leg2_R") return [(g.knee ?? 0) + (g.kick ?? 0)*0.8,0];
+  if(name === "Bone_Leg2_L") return [g.knee ?? 0,0];
   return [0,0];
 }
 const snapPain = (bytes: ArrayBuffer, index: number, frames: number, translations: readonly mdx.AnimKeyframe[]) => {

@@ -155,3 +155,19 @@ stab the floor ahead, and judges read the risen body as a hunched, cluttered
 mass. On the Blender take that scored 3/4/3/3/4; on the generator clip, which
 keeps its windup and contact, 3/4/4/3/4. Lines 1–4 pass; three fresh judges
 give the shipped clip medians 4/4/4/3/4.
+
+Peon's dash attack is a trip-and-dive (2026-10-28), keyed as gestures in
+`tools/animations/peon-clips.ts` with its `reauthor` pass: a forward root
+offset (`ahead`) carries the drawn body about 58 units out through the slide,
+so the hit regions sit on the drawn pickaxe, and a one-leg `kick` throws the
+tripped leg up behind him. The `tuck` squash scales along his own body axis,
+so on a prone body it shortens him instead of flattening him; a belly-flop
+squash cost 13 units of reach and was dropped. Five takes moved the judges
+from 3/3/3/3/3 to 4/4/3/3/4 by giving each judged tile its own shape: arms
+flung overhead and behind as he rocks back, a flat superman at contact, heels
+kicked up mid-slide and a chest lift on the last active frame. Anticipation
+stays at 3 in every take, the judges reading the trip as "a stumble rather
+than a pull-back"; a trip is the move's premise, so the coil rule above and
+this move pull against each other. Follow-through stays at 3 with "drifts
+slowly upright": the return-ratio line keeps the rise even, and a faster rise
+fails it.
