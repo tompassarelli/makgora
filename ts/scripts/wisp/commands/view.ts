@@ -26,7 +26,7 @@ import { CHARACTER_NAMES, FIGHTER_MODELS, STYLE_NAMES, loadDrawnModel, sampleAtt
 import { characterModelScale } from "../../../src/game/presentation/modelScale";
 import { type DrawnReachRow, REACH_CHECKED, drawnReachSource, measureDrawnReach } from "../drawnReach";
 import { DRAWN_REACH } from "../drawnReachInfo";
-import { measureStrikeMoments, staleStrikeFighters, strikeMomentSource } from "../strikeMoments";
+import { STRIKE_FILE_GLOB, measureStrikeMoments, staleStrikeFighters, strikeMomentSources } from "../strikeMoments";
 import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
 import { checkoutInputs } from "../buildInputs";
 import { BODY_HEIGHT, type ReachCueRow, measureReachCue, measuredStyles, reachCueSource, showsReachCue } from "../reachCues";
@@ -156,7 +156,19 @@ const hurtboxes = (args: readonly string[]) => Effect.gen(function*() {
   });
 });
 
-const STRIKE_TABLE = join(import.meta.dir, "../../../src/game/presentation/heroStrikeMomentInfo.ts");
+const STRIKE_GAME = join(import.meta.dir, "../../../src/game");
+
+const differingStrikeFiles = (sources: ReadonlyMap<string, string>) => Effect.tryPromise({
+  try: async () => {
+    const differing = [...new Bun.Glob(STRIKE_FILE_GLOB).scanSync(STRIKE_GAME)].filter((path) => !sources.has(path));
+    for (const [path, source] of sources) {
+      const file = Bun.file(join(STRIKE_GAME, path));
+      if (!(await file.exists()) || await file.text() !== source) differing.push(path);
+    }
+    return differing.sort();
+  },
+  catch: (cause) => new MapBuildFailure({ operation: "read strike moments", path: STRIKE_GAME, cause }),
+});
 
 
 
@@ -188,17 +200,26 @@ const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*(
   }
   const moments = yield* Effect.tryPromise({
     try: () => measureStrikeMoments((model) => Bun.file(files.get(model) ?? "").arrayBuffer()),
-    catch: (cause) => new MapBuildFailure({ operation: "measure strike moments", path: STRIKE_TABLE, cause }),
+    catch: (cause) => new MapBuildFailure({ operation: "measure strike moments", path: STRIKE_GAME, cause }),
   });
-  const source = strikeMomentSource(moments);
+  const sources = strikeMomentSources(moments);
+  const differing = yield* differingStrikeFiles(sources);
   if (check) {
-    const committed = yield* Effect.tryPromise({ try: () => Bun.file(STRIKE_TABLE).text(), catch: (cause) => new MapBuildFailure({ operation: "read strike moments", path: STRIKE_TABLE, cause }) });
-    if (committed === source) return yield* Console.log(`${moments.length} strike moments match the committed models: ${STRIKE_TABLE}`);
+    if (differing.length === 0) return yield* Console.log(`${moments.length} strike moments in ${sources.size} files match the committed models: ${STRIKE_GAME}`);
     const stale = staleStrikeFighters(moments, HERO_STRIKE_MOMENTS, HERO_ROSTER.map(({ character }) => character)).map(fighterSlug);
-    return yield* new MapBuildFailure({ operation: "check strike moments", path: STRIKE_TABLE, cause: `the committed strike table differs from what ${stale.length > 0 ? stale.join(", ") : "the roster"} measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the table` });
+    return yield* new MapBuildFailure({ operation: "check strike moments", path: STRIKE_GAME, cause: `the committed strike tables ${differing.join(", ")} differ from what ${stale.length > 0 ? stale.join(", ") : "the roster"} measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the tables` });
   }
-  yield* Effect.tryPromise({ try: () => Bun.write(STRIKE_TABLE, source), catch: (cause) => new MapBuildFailure({ operation: "write strike moments", path: STRIKE_TABLE, cause }) });
-  yield* Console.log(`${moments.length} strike moments: ${STRIKE_TABLE}`);
+  yield* Effect.tryPromise({
+    try: async () => {
+      for (const path of differing) {
+        const source = sources.get(path);
+        if (source === undefined) rmSync(join(STRIKE_GAME, path));
+        else await Bun.write(join(STRIKE_GAME, path), source);
+      }
+    },
+    catch: (cause) => new MapBuildFailure({ operation: "write strike moments", path: STRIKE_GAME, cause }),
+  });
+  yield* Console.log(`${moments.length} strike moments in ${sources.size} files, ${differing.length} rewritten: ${STRIKE_GAME}`);
 }));
 
 const REACH_TABLE = join(import.meta.dir, "../drawnReachInfo.ts");

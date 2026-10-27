@@ -78,7 +78,7 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   });
   const staleStrikes = plans.filter(({ fighter }) => staleStrikeFighters(measured, HERO_STRIKE_MOMENTS, [fighter.character]).length > 0).map(({ fighter }) => fighter.slug);
   if (staleStrikes.length > 0) {
-    return yield* new MapBuildFailure({ operation: "check strike moments", path: "ts/src/game/presentation/heroStrikeMomentInfo.ts", cause: `the committed strike table differs from what ${staleStrikes.join(", ")} measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the table` });
+    return yield* new MapBuildFailure({ operation: "check strike moments", path: "ts/src/game/fighters", cause: `the committed strike tables of ${staleStrikes.join(", ")} differ from what they measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the tables` });
   }
   if (differing.length === 0) return console.log(`${plans.length} fighters reproduce their committed pins and generated files from this checkout's producers`);
   return yield* new MapBuildFailure({ operation: "check derived fighter art", path: MANIFEST, cause: `these committed outputs differ from what this checkout's producers derive; run bun wisp inputs derive --fighter NAME for each and commit the result:\n${differing.join("\n")}` });

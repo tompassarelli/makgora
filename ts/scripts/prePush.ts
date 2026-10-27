@@ -102,7 +102,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
       { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
     ] : []),
     ...(strikeMoments ? [
-      { name: "strike moments match the committed models", directory: "ts", args: ["scripts/wisp.ts", "view", "strikes", "--check"], fix: "regenerate the table with bun wisp view strikes --assets \"$(bun wisp inputs path assets)\" from ts/ and commit it (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
+      { name: "strike moments match the committed models", directory: "ts", args: ["scripts/wisp.ts", "view", "strikes", "--check"], fix: "regenerate the tables with bun wisp view strikes --assets \"$(bun wisp inputs path assets)\" from ts/ and commit them (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
     ] : []),
     ...(animation ? [
       { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md).", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },

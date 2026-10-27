@@ -18,7 +18,7 @@ never changes:
 - A hero's sequence plays by its measured strike moment: `bun wisp view
   strikes --assets DIR` measures where the drawn model reaches farthest
   toward the move's first hit region, and pose selection lands that moment on
-  the first active frame (heroStrikeMomentInfo.ts, #144). Then `bun wisp view
+  the first active frame (fighters/<folder>/strikeMoments.ts, #144). Then `bun wisp view
   reach --assets DIR --character ID` re-measures the drawn reach test.
 - Rifleman and Illidan have no measured moments: the entry is
   `aligned` with seconds = strike × total frames ÷ first active frame, the

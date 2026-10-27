@@ -1123,7 +1123,7 @@ hero-models or imported-models. Without packaged assets,
 imported heroes require `--assets DIR`. The command
 records, per normal and per special that strikes, shoots or places, the clip second where the silhouette reaches farthest
 toward the move's first hit region, into
-smashcraft:ts/src/game/presentation/heroStrikeMomentInfo.ts. Pose selection
+one generated smashcraft:ts/src/game/fighters/<folder>/strikeMoments.ts per hero, so lanes refitting different heroes never edit one file, gathered by presentation/heroStrikeMomentInfo.ts. Pose selection
 (`strikeAlignedRate` in presentation/fighterPose.ts; specials through `specialRate`, their active window read from the kit) then plays the wind-up
 over the startup so that moment lands on the first active frame (at most 4x;
 a pooled clip starts past a wind-up longer than that), catches up over the

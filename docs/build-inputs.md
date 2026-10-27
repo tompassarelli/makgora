@@ -116,10 +116,10 @@ code:
    hero-models or imported-models pins, which feed every fighter's step keys
    (smashcraft:ts/scripts/wisp/fighterArtChanges.ts). It also measures each
    checked fighter's strike moments from its committed model and fails when
-   `heroStrikeMomentInfo.ts` holds different rows for him; regenerate them with
+   his `fighters/<folder>/strikeMoments.ts` holds different rows; regenerate them with
    `bun wisp view strikes --assets "$(bun wisp inputs path assets)"`. Pre-push also
    runs `bun wisp view strikes --check` over every fighter when a landing changes a
-   pin, the measurement's imports (move data, clip tables, looks) or the table itself
+   pin, the measurement's imports (move data, clip tables, looks) or the tables themselves
    (smashcraft:ts/scripts/prePush.ts, `strikeInputs`).
    A derive that fails keeps its step logs in derive/run-*/ beside the store;
    `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
