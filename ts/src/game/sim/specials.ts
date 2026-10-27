@@ -30,7 +30,7 @@ import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
-import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
+import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
@@ -255,14 +255,21 @@ function secondRecoilShot(owner: Fighter, input: Readonly<Controls>): boolean {
 
 
 
+function immolateCancelOpen(owner: Readonly<Fighter>): boolean {
+  const { special } = owner;
+  return owner.character === Character.demonHunter && owner.launch.hitlag <= 0 && special.action === SpecialAction.demonHunterImmolate && special.form === 0 && special.frame >= DEMONHUNTER_IMMOLATE_JUMP_CANCEL;
+}
+
+/** Strong + up on the ground from a down special's jump-cancel frame ends it so the up smash starts that frame, as a jump cancel would. */
+export function cancelShineForUpSmash(owner: Fighter): void {
+  if (owner.motion.grounded && (immolateCancelOpen(owner) || heroSpecialCancelOpen(owner))) endCancelledSpecial(owner);
+}
+
 export function demonHunterJumpOrAttackBranch(owner: Fighter, input: Readonly<Controls>): void {
   const { special } = owner;
   if (owner.character !== Character.demonHunter || owner.launch.hitlag > 0) return;
-  if (input.jumpPressed && special.action === SpecialAction.demonHunterImmolate && special.form === 0 && special.frame >= DEMONHUNTER_IMMOLATE_JUMP_CANCEL) {
-    special.action = SpecialAction.none;
-    special.frame = 0;
-    special.lockFrames = 0;
-    owner.attack.cooldown = 0;
+  if (input.jumpPressed && immolateCancelOpen(owner)) {
+    endCancelledSpecial(owner);
     return;
   }
   if (input.attackPressed && special.action === SpecialAction.demonHunterFelRush) {

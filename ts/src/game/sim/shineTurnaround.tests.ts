@@ -6,7 +6,7 @@ import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { createReplaySnapshot } from "../replay/snapshot";
 import { copyFighterState } from "../../generated/state/fighterState";
-import { Character, SpecialAction } from "./codes";
+import { AttackStyle, Character, SpecialAction } from "./codes";
 import type { Fighter } from "./fighter";
 import { createFighter } from "./fighter";
 import { setWorldMotionValue } from "./motion";
@@ -21,13 +21,14 @@ const FOE_X = 600.0;
 const TURN_TICK = 3;
 const JUMP_TICK = 6;
 
-type Press = "shine" | "shineBack" | "back" | "jump" | "none";
+type Press = "shine" | "shineBack" | "back" | "jump" | "strongUp" | "none";
 
 function row(press: Press): InputRow {
   const fields = press === "shine" ? { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 }
     : press === "shineBack" ? { held: maskOf(Action.moveDown, Action.moveLeft, Action.special), pressed: maskOf(Action.special), axisX: -127, axisZ: -127, specialX: -1, specialZ: -1 }
     : press === "back" ? { held: maskOf(Action.moveLeft), axisX: -127 }
     : press === "jump" ? { held: maskOf(Action.jump), pressed: maskOf(Action.jump) }
+    : press === "strongUp" ? { held: maskOf(Action.moveUp, Action.strong), pressed: maskOf(Action.moveUp, Action.strong), axisZ: 127 }
     : {};
   const built = inputRow(fields);
   if (built === undefined) throw new Error(`${press} input row`);
@@ -100,4 +101,42 @@ for (const shine of SHINES) {
       assertEquals(user.facing, -1, "the jump keeps the new facing");
     });
   }
+}
+
+const LAST_TICK = 12;
+
+function cancelTick(character: Character, press: Press): number {
+  for (let tick = 2; tick <= LAST_TICK; tick++) {
+    const { user, step } = shineScene(character, false);
+    step(1, "shine");
+    for (let before = 2; before < tick; before++) step(before, "none");
+    step(tick, press);
+    if (user.special.action === SpecialAction.none) return tick;
+  }
+  return LAST_TICK + 1;
+}
+
+for (const shine of SHINES) {
+  test(`${shine.name} on the ground is cancelled into an up smash on the first frame Strong + up is pressed once the jump cancel opens, the same frame a jump press cancels it [k1 scenario]`, () => {
+    const opens = cancelTick(shine.character, "jump");
+    assertEquals(opens <= LAST_TICK, true, "a jump press cancels it within the probe");
+    const { user, step } = shineScene(shine.character, false);
+    step(1, "shine");
+    for (let tick = 2; tick < opens; tick++) step(tick, "none");
+    step(opens, "strongUp");
+    assertEquals(user.special.action, SpecialAction.none, "the down special ends");
+    assertEquals(user.attack.style, AttackStyle.upSmash, "the up smash starts that frame");
+  });
+
+  test(`${shine.name} on the ground ignores Strong + up before the jump cancel opens, with the down special still running [k1 scenario]`, () => {
+    const opens = cancelTick(shine.character, "jump");
+    for (let tick = 2; tick < opens; tick++) {
+      const { user, step } = shineScene(shine.character, false);
+      step(1, "shine");
+      for (let before = 2; before < tick; before++) step(before, "none");
+      step(tick, "strongUp");
+      assertEquals(user.special.action, shine.action, `tick ${tick}: the down special runs on`);
+      assertEquals(user.attack.style, undefined, `tick ${tick}: no attack starts`);
+    }
+  });
 }

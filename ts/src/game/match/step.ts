@@ -19,7 +19,7 @@ import { advanceCandleBodies, settleCandles } from "../fighters/kobold/candle";
 import { strikeCandles } from "../fighters/kobold/candleStrikes";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
-import { advanceSpecials, startFighterSpecial } from "../sim/specials";
+import { advanceSpecials, cancelShineForUpSmash, startFighterSpecial } from "../sim/specials";
 import { advanceHeroStatus, prepareBansheeContacts } from "../sim/specials/engine";
 import { advanceItemBuff } from "../sim/itemBuffs";
 import { advanceFighterMotion } from "../sim/step";
@@ -241,6 +241,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
 
     if (f.launch.hitlag > 0 && commands.pending?.style === AttackStyle.jab && nextJab(f.attack.style) !== undefined) holdAttack(commands, frame);
     if (commands.pending?.style === AttackStyle.grab && f.shield.raised && (f.launch.hitlag > 0 || f.shield.stun > 0 || f.shield.drainResumePending)) holdAttack(commands, frame);
+    if (commands.pending?.mayCharge === true && requestedStyle(commands.pending.style) === AttackStyle.upSmash && hasPendingAttack(commands, frame)) cancelShineForUpSmash(f);
     const command = takeAttack(commands, frame, canStartAttackStyle(f, requestedStyle(commands.pending?.style)));
     const dashGrabInput = f.motion.grounded && f.ground.dashFrame > 0 && f.tuning.dashGrab.startupFrames > 0 && command?.style === AttackStyle.grab;
     const catchDash = f.ground.dashGrabWindow > 0 && command?.style === AttackStyle.grab && f.tuning.dashGrab.startupFrames > 0;

@@ -1326,11 +1326,20 @@ export function faceHeldStick(f: Fighter, input: Readonly<Controls> | undefined)
 }
 
 
-export function jumpCancelHeroSpecial(f: Fighter, input: Readonly<Controls>): void {
+export function heroSpecialCancelOpen(f: Readonly<Fighter>): boolean {
   const move = runningHeroSpecial(f);
-  if (move?.jumpCancelFrame === undefined || !input.jumpPressed || f.launch.hitlag > 0 || f.special.frame < move.jumpCancelFrame) return;
+  return move?.jumpCancelFrame !== undefined && f.launch.hitlag <= 0 && f.special.frame >= move.jumpCancelFrame;
+}
+
+
+export function endCancelledSpecial(f: Fighter): void {
   f.special.action = SpecialAction.none;
   f.special.frame = 0;
   f.special.lockFrames = 0;
   f.attack.cooldown = 0;
+}
+
+
+export function jumpCancelHeroSpecial(f: Fighter, input: Readonly<Controls>): void {
+  if (input.jumpPressed && heroSpecialCancelOpen(f)) endCancelledSpecial(f);
 }
