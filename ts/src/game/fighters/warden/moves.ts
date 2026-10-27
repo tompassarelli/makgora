@@ -3,29 +3,29 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { AttackStyle, GrabAction, HitElement, LAST_ATTACK_STYLE } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroMove, heroRegion, type AuthoredMove, type FighterMoves, type MoveRegion, type StrikeCapsule, jabStep, travelThrough } from "../../sim/heroMoves";
-import { groundHit, swing, held, splitsMove, type GroundKit } from "../../sim/heroes/groundNormals";
+import { groundHit, swing, splitsMove, tipped, type GroundKit } from "../../sim/heroes/groundNormals";
 import type { HitEffect } from "../../sim/hitRegions";
 import { strongHit } from "../../sim/strongHits";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, hurtPart, hurtPose } from "../../sim/hurtboxes";
 import { type Strike, linkAt, multiHit } from "../../sim/heroes/multiHit";
 import { ANGLES, type Angle, capsuleOf, makeHit, path } from "../../sim/heroes/authoring";
-import { wardenSpinBlade, wardenSpinSectors } from "./spin";
 
 const WD = HitElement.slash;
 const wardenThrust = (angle: Angle) => groundHit(8.0, angle, 75.0, 18.0, WD);
 export const WARDEN_GROUND: GroundKit = {
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(2, 2, 11, 0, swing(2, [[18.0, 46.0, 66.0, 46.0], [18.0, 48.0, 66.0, 48.0]], 6.0, groundHit(3.0, 70, 40.0, 30.0, WD)))),
-    [AttackStyle.jab2]: jabStep(heroMove(2, 2, 12, 0, swing(2, [[18.0, 50.0, 68.0, 52.0], [18.0, 50.0, 68.0, 50.0]], 6.0, groundHit(3.0, 70, 30.0, 26.0, WD)))),
-    [AttackStyle.jab3]: heroMove(4, 3, 16, 0, swing(4, [[18.0, 46.0, 86.0, 50.0], [18.0, 46.0, 90.0, 46.0], [18.0, 44.0, 84.0, 42.0]], 6.0, groundHit(4.0, 40, 90.0, 22.0, WD))),
-    [AttackStyle.forwardTilt]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 50.0, 119.0, 52.0], [18.0, 50.0, 119.0, 50.0], [18.0, 48.0, 110.0, 46.0]], 6.0, wardenThrust(35))),
-    [AttackStyle.forwardTiltUp]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 58.0, 105.0, 100.0], [18.0, 60.0, 110.0, 95.0], [18.0, 58.0, 100.0, 88.0]], 6.0, wardenThrust(55))),
+    [AttackStyle.jab]: jabStep(heroMove(2, 2, 11, 0, swing(2, [[18.0, 78.0, 103.0, 93.0], [18.0, 75.0, 118.0, 91.0]], 6.0, groundHit(3.0, 70, 40.0, 30.0, WD)))),
+    [AttackStyle.jab2]: jabStep(heroMove(2, 2, 12, 0, swing(2, [[18.0, 88.0, 90.0, 129.0], [18.0, 83.0, 107.0, 130.0]], 6.0, groundHit(3.0, 70, 30.0, 26.0, WD)))),
+    [AttackStyle.jab3]: heroMove(4, 3, 16, 0, swing(4, [[18.0, 74.0, 124.0, 94.0], [18.0, 73.0, 139.0, 90.0], [18.0, 73.0, 136.0, 89.0]], 6.0, groundHit(4.0, 40, 90.0, 22.0, WD))),
+    [AttackStyle.forwardTilt]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 72.0, 126.0, 95.0], [18.0, 71.0, 138.0, 91.0], [18.0, 70.0, 142.0, 87.0]], 6.0, wardenThrust(35))),
+    [AttackStyle.forwardTiltUp]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 98.0, 48.0, 187.0], [18.0, 94.0, 59.0, 191.0], [18.0, 93.0, 62.0, 193.0]], 6.0, wardenThrust(55))),
     [AttackStyle.forwardTiltDown]: heroMove(5, 3, 17, 0, swing(5, [[18.0, 40.0, 110.0, 10.0], [18.0, 38.0, 119.0, 4.0], [18.0, 36.0, 105.0, 0.0]], 6.0, wardenThrust(20))),
     [AttackStyle.upTilt]: heroMove(4, 4, 16, 0, swing(4, [[3.0, 126.0, -4.0, 185.0], [13.0, 129.0, 5.0, 187.0], [16.0, 130.0, -7.0, 183.0], [13.0, 129.0, -11.0, 182.0]], 12.0,
       groundHit(6.0, 90, 60.0, 32.0, WD))),
     [AttackStyle.downTilt]: heroMove(3, 2, 9, 0, swing(3, [[24.0, 22.0, 93.0, 10.0], [36.0, 17.0, 93.0, 9.0]], 12.0, groundHit(3.0, 0, 20.0, 32.0, WD))),
-    [AttackStyle.dashAttack]: travelThrough(heroMove(5, 10, 21, 0, [...swing(5, [[18.0, 30.0, 105.0, 40.0], [18.0, 40.0, 105.0, 52.0], [18.0, 50.0, 100.0, 62.0]], 6.0,
-      groundHit(7.0, 50, 70.0, 24.0, WD)), held(8, 14, [18.0, 50.0, 100.0, 62.0], 6.0, groundHit(5.0, 50, 60.0, 20.0, WD))], 179.0, true), 14),
+    [AttackStyle.dashAttack]: travelThrough(heroMove(5, 10, 21, 0, [...swing(5, [[7.0, 88.0, 65.0, 69.0], [18.0, 74.0, 101.0, 58.0], [18.0, 71.0, 127.0, 55.0]], 6.0,
+      groundHit(7.0, 50, 70.0, 24.0, WD)), ...swing(8, [[18.0, 70.0, 133.0, 52.0], [18.0, 69.0, 136.0, 50.0], [18.0, 69.0, 136.0, 49.0], [18.0, 70.0, 133.0, 51.0], [18.0, 71.0, 129.0, 67.0], [18.0, 72.0, 124.0, 82.0], [18.0, 74.0, 116.0, 97.0]], 6.0,
+      groundHit(5.0, 50, 60.0, 20.0, WD))], 179.0, true), 14),
   },
   reaches: {},
 };
@@ -33,7 +33,6 @@ export const WARDEN_GROUND: GroundKit = {
 
 const S = f32(HERO_REFERENCE_HEIGHT * f32(0.55));
 const M = f32(HERO_REFERENCE_HEIGHT * f32(0.80));
-const L = f32(HERO_REFERENCE_HEIGHT * f32(1.10));
 const GRAB = f32(HERO_REFERENCE_HEIGHT * f32(0.48));
 const BLADE_RADIUS = 6.0;
 
@@ -56,50 +55,27 @@ export const wardenHit = makeHit({
 const blade = capsuleOf(BLADE_RADIUS);
 
 
-function cut(first: number, heights: readonly number[], reach: number, inner: Readonly<HitEffect>, tip?: Readonly<HitEffect>): readonly MoveRegion[] {
-  const regions: MoveRegion[] = [];
-  const end = f32(reach - BLADE_RADIUS);
-  const boundary = f32(reach - 30.0);
-  for (let index = 0; index < heights.length; index++) {
-    const height = heights[index];
-    if (height === undefined) continue;
-    const frame = first + index;
-    const rise = f32(height - 45.0);
-    const zAt = (x: number) => f32(45.0 + f32(rise * f32(x / end)));
-    if (tip !== undefined) {
-      const tipStart = f32(boundary + BLADE_RADIUS);
-      regions.push(heroRegion(frame, frame, blade(tipStart, zAt(tipStart), end, height), strongHit(tip)));
-    }
-    const innerEnd = tip === undefined ? end : boundary;
-    regions.push(heroRegion(frame, frame, blade(18.0, zAt(18.0), innerEnd, zAt(innerEnd)), inner));
-  }
-  return regions;
-}
-
-/** One blade per 45-degree sector the spinning tip passes through on each active frame. */
-function spin(first: number, active: number, effect: Readonly<HitEffect>): readonly MoveRegion[] {
-  const regions: MoveRegion[] = [];
-  for (let frame = 0; frame < active; frame++) {
-    const [from, to] = wardenSpinSectors(frame, active);
-    for (let sector = from; sector <= to; sector++) {
-      const { x1, z1, x2, z2 } = wardenSpinBlade(sector, 18.0, f32(M - BLADE_RADIUS));
-      regions.push(heroRegion(first + frame, first + frame, blade(x1, z1, x2, z2), effect));
-    }
-  }
-  return regions;
-}
-
 function throwMove(release: number, recovery: number, effect: Readonly<HitEffect>) {
   return { contactFrame: release, totalFrames: release + recovery, effect };
 }
 
 const FORWARD_AIR = wardenHit(7.6326799392700195, "EDGE", 40);
 const BACK_AIR = wardenHit(8.39594841003418, "KILL", 35, -1.0);
+const NEUTRAL_AIR_EFFECT = wardenHit(6.106143951416016, "SLIDE", 0);
+const NEUTRAL_AIR: readonly MoveRegion[] = [
+  ...swing(5, [[18.0, 72.0, 83.0, 44.0], [-4.0, 94.0, 38.0, 136.0], [-33.0, 67.0, -60.0, 120.0], [-18.0, 31.0, -77.0, 22.0], [18.0, 43.0, 15.0, -24.0]], BLADE_RADIUS, NEUTRAL_AIR_EFFECT),
+  ...swing(5, [[93.0, 52.0, 83.0, 44.0], [83.0, 44.0, 38.0, 136.0], [38.0, 136.0, -60.0, 120.0], [-60.0, 120.0, -77.0, 22.0], [-77.0, 22.0, 15.0, -24.0]], BLADE_RADIUS, NEUTRAL_AIR_EFFECT),
+];
+
+const FORWARD_AIR_SLASH: readonly MoveRegion[] = [
+  ...swing(8, [[2.0, 91.0, 30.0, 146.0], [18.0, 79.0, 75.0, 102.0], [4.0, 50.0, 18.0, -6.0]], BLADE_RADIUS, FORWARD_AIR),
+  ...swing(8, [[19.0, 156.0, 30.0, 146.0], [30.0, 146.0, 75.0, 102.0], [75.0, 102.0, 18.0, -6.0]], BLADE_RADIUS, FORWARD_AIR),
+];
 
 const SKY_LIFT: readonly Strike[] = [
-  [blade(0.0, 48.0, 0.0, f32(M - BLADE_RADIUS), 10.0), linkAt(2.0, 8.0, 90, HitElement.normal)],
-  [blade(16.0, 40.0, 30.0, f32(M - 20.0), 10.0), linkAt(2.0, 8.0, 95, HitElement.normal)],
-  [blade(-16.0, 40.0, -30.0, f32(M - 20.0), 10.0), linkAt(2.0, 8.0, 85, HitElement.normal)],
+  [blade(0.0, 48.0, -8.0, 172.0, 10.0), linkAt(2.0, 8.0, 90, HitElement.normal)],
+  [blade(16.0, 40.0, 0.0, 150.0, 10.0), linkAt(2.0, 8.0, 95, HitElement.normal)],
+  [blade(-16.0, 40.0, -18.0, 150.0, 10.0), linkAt(2.0, 8.0, 85, HitElement.normal)],
 ];
 
 
@@ -147,7 +123,7 @@ const GRAB_EFFECT = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ
 /** Maiev is modelled on Fox (docs/design/maiev.md), so each aerial auto-cancels in Fox's window for the same aerial (references/melee-frame-data/fightcore.csv). */
 const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     ...WARDEN_GROUND.normals,
-    [AttackStyle.forwardSmash]: heroMove(15, 3, 30, 0, cut(15, [64.0, 45.0, 26.0], L, wardenHit(9.159215927124023, "KILL", 40), wardenHit(12.212287902832031, "KILL", 40))),
+    [AttackStyle.forwardSmash]: heroMove(15, 3, 30, 0, tipped(15, [[18.0, 69.0, 135.0, 85.0], [18.0, 68.0, 145.0, 79.0], [18.0, 68.0, 150.0, 75.0]], BLADE_RADIUS, 30.0, wardenHit(12.212287902832031, "KILL", 40), wardenHit(9.159215927124023, "KILL", 40))),
     [AttackStyle.upSmash]: heroMove(13, 4, 27, 0, path(13, [
       blade(-14.0, 131.0, -8.0, 191.0, 12.0),
       blade(-12.0, 138.0, -8.0, 199.0, 12.0),
@@ -159,18 +135,8 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       front: { ...downSmashHit(wardenHit(12.0, "EDGE", 25)), element: HitElement.normal },
       back: { ...downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0)), element: HitElement.normal },
     }),
-    [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, spin(5, 5, wardenHit(6.106143951416016, "SLIDE", 0))), autoCancel: { before: 4, from: 36 } },
-    [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, [
-      heroRegion(8, 8, blade(37.662445068359375, 146.75, 58.328670501708984, 135.1438751220703), FORWARD_AIR),
-      heroRegion(8, 8, blade(58.328670501708984, 135.1438751220703, 76.17012023925781, 114.24028778076172), FORWARD_AIR),
-      heroRegion(8, 8, blade(76.17012023925781, 114.24028778076172, 87.3436279296875, 88.04920959472656), FORWARD_AIR),
-      heroRegion(8, 8, blade(87.3436279296875, 88.04920959472656, 89.89668273925781, 60.60640335083008), FORWARD_AIR),
-      heroRegion(9, 9, blade(89.89668273925781, 60.60640335083008, 79.29962921142578, 31.376171112060547), FORWARD_AIR),
-      heroRegion(9, 9, blade(79.29962921142578, 31.376171112060547, 56.640132904052734, 7.324544906616211), FORWARD_AIR),
-      heroRegion(9, 9, blade(56.640132904052734, 7.324544906616211, 27.074600219726562, -6.831627368927002), FORWARD_AIR),
-      heroRegion(9, 9, blade(27.074600219726562, -6.831627368927002, 0.05732898414134979, -8.744290351867676), FORWARD_AIR),
-      heroRegion(10, 10, blade(0.05732898414134979, -8.744290351867676, 0.05732898414134979, -8.744290351867676), FORWARD_AIR),
-    ]), autoCancel: { before: 6, from: 48 } },
+    [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, NEUTRAL_AIR), autoCancel: { before: 4, from: 36 } },
+    [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, FORWARD_AIR_SLASH), autoCancel: { before: 6, from: 48 } },
 
     [AttackStyle.backAir]: { ...heroMove(7, 3, 22, 12, [
       heroRegion(7, 7, blade(-30.5, 66.0, -74.0, 141.0, 8.0), BACK_AIR),
@@ -181,7 +147,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 7, multiHit([
       { first: 5, last: 6, strikes: SKY_LIFT },
       { first: 8, last: 9, strikes: SKY_LIFT },
-      { first: 11, last: 13, strikes: [[blade(0.0, 48.0, 0.0, f32(M - BLADE_RADIUS), 10.0), wardenHit(3.8163399696350098, "CHASE", 90, 1.0, HitElement.normal)]] },
+      { first: 11, last: 13, strikes: [[blade(0.0, 48.0, -8.0, 172.0, 10.0), wardenHit(3.8163399696350098, "CHASE", 90, 1.0, HitElement.normal)]] },
     ])), autoCancel: { before: 8, from: 25 } },
     [AttackStyle.downAir]: FALLING_KNIVES,
     [AttackStyle.grab]: heroMove(6, 2, 23, 0, [heroRegion(6, 7,
