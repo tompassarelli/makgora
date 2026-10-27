@@ -656,8 +656,19 @@ repository root, run Blender with `--python tools/animations/illidan-locomotion.
 -- PRIVATE_FIGHTER.blend PRIVATE_AUTHORED`, then `bun
 tools/animations/illidan-locomotion.ts PRIVATE_ASSETS PRIVATE_AUTHORED PRIVATE_OUTPUT`.
 The source is the existing private `demonhunter-fighter.blend`; output stays
-outside the checkout. `Locomotion Walk` alternates grounded steps with a short
-returning-foot lift. `Locomotion Run` leans forward, drives longer alternating
+outside the checkout. Naming clips after PRIVATE_OUTPUT (`"Locomotion Walk"`)
+re-keys those clips in place in the shipped model at their own indices and
+lengths, and checks every other clip unchanged; the Blender scene is the one
+from 7 October, so pass `WC3_MDL_ADDON` when the exporter is not at its
+default path. `Locomotion Walk` takes long alternating steps (50 units either side)
+centred under the hips with each sole held flat, and swings each arm from the
+ready stance so the glaives keep their angle: its drawn stride is 193 units a
+second, so a full walk plays at 2.89 cycles a second, below the run's 3.34.
+The October 7 walk centred 24-unit steps 20 units ahead of the hips and
+tipped each foot with its shin, so its drawn stride (131) overstated its
+ankle travel (96): a full walk played it at 4.25 times with the planted feet
+sliding, and its arm solve turned the glaives from flat to flared twice a
+cycle (2026-10-28). `Locomotion Run` leans forward, drives longer alternating
 steps and keeps the glaives beside the body. `Locomotion Initial Dash Burst`
 compresses into a push-off, then feeds the run. The ten authored burst frames
 are retimed over the simulation's thirteen dash frames; run starts on frame 14.

@@ -63,12 +63,12 @@ def limb(side, kind, target, pole):
     aim(upper, elbow, joint)
     aim(lower, end.matrix.translation.copy(), pivot + axis*length)
 
-def foot(phase, span, lift, side):
+def foot(phase, span, lift, side, center=0):
     phase %= 1
 
     x = span*(1 - 4*phase) if phase < .5 else -span*cos((phase - .5)*2*pi)
     z = 23 + (lift*sin((phase - .5)*2*pi) if phase >= .5 else 0)
-    return Vector((x, -15 if side == 'R' else 15, z))
+    return Vector((center + x, -15 if side == 'R' else 15, z))
 
 def pose(kind, frame, frames):
     for name, matrix in base.items():
@@ -77,20 +77,26 @@ def pose(kind, frame, frames):
     phase = frame/frames
     running = kind != 'Walk'
     lean = 19 if running else 5
-    crouch = 9 + 2*sin(phase*4*pi) if running else 3 + sin(phase*4*pi)
+    crouch = 9 + 2*sin(phase*4*pi) if running else 8 + 1.5*sin(phase*4*pi)
     if kind == 'Initial Dash Burst':
         lean = 10 + 17*sin(min(1, phase*2)*pi/2)
         crouch = 13 - 5*phase
         phase = .18 + phase*.32
+    flat = {side: rig.pose.bones[f'Bone_Foot_{side}'].matrix.to_3x3().to_4x4() for side in 'RL'}
     rotate('Bone_Chest', lean)
     for name in ('Bone_Chest', 'Bone_Pelvis'):
         rig.pose.bones[name].matrix = Matrix.Translation((0, 0, -crouch)) @ rig.pose.bones[name].matrix
     bpy.context.view_layer.update()
+    hips = 0 if running else sum(rig.pose.bones[f'Bone_Leg1_{side}'].matrix.translation.x for side in 'RL')/2
     for side, offset in [('R', 0), ('L', .5)]:
         p = phase + offset
-        limb(side, 'leg', foot(p, 40 if running else 24, 36 if running else 12, side), Vector((80, -15 if side == 'R' else 15, 65)))
+        limb(side, 'leg', foot(p, 40 if running else 50, 36 if running else 14, side, hips), Vector((hips + 80, -15 if side == 'R' else 15, 65)))
         swing = sin(p*2*pi)
-        limb(side, 'arm', Vector((-20 + 15*swing if running else 8 + 9*swing, -28 if side == 'R' else 28, 82 + 5*swing)), Vector((-15, -70 if side == 'R' else 70, 90)))
+        if running: limb(side, 'arm', Vector((-20 + 15*swing, -28 if side == 'R' else 28, 82 + 5*swing)), Vector((-15, -70 if side == 'R' else 70, 90)))
+        else:
+            rotate(f'Bone_Arm1_{side}', 10*cos(p*2*pi))
+            sole = rig.pose.bones[f'Bone_Foot_{side}']
+            sole.matrix = Matrix.Translation(sole.matrix.translation) @ flat[side]
     bpy.context.view_layer.update()
 
 for kind, frames in [('Walk', 60), ('Run', 36), ('Initial Dash Burst', 10)]:

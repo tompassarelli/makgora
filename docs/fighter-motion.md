@@ -6,7 +6,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | --- | --- | --- | ---: | ---: | --- |
 | Rifleman | walk | 54: Walk | 75.6 | 23.6 | forward; 66.5/74.8 |
 | Rifleman | dash | 54: Walk | 75.6 | 23.4 | forward; 66.5/74.2 |
-| Rifleman | run | 54: Walk | 85.7 | 18.2 | forward; 85.0/83.9 |
+| Rifleman | run | 54: Walk | 86.4 | 18.4 | forward; 85.8/83.8 |
 | Rifleman | turn | 55: Recovery turn | 143.6 | 27.5 | back; 60.1/143.6 |
 | Rifleman | brake | 56: Recovery stop | 23.4 | 9.3 | in place; 10.6/17.1 |
 | Rifleman | jump-squat | 57: Recovery jumpSquat | 29.8 | 13.5 | down; 29.6/21.8 |
@@ -17,14 +17,14 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Rifleman | tech | 59: Recovery tech | 94.0 | 37.7 | in place; 68.1/48.1 |
 | Rifleman | tech-forward | 60: Recovery techForward | 124.8 | 55.8 | forward; 86.3/74.5 |
 | Rifleman | tech-back | 61: Recovery techBackward | 115.1 | 64.9 | back; 85.2/74.5 |
-| Rifleman | get-up | 21: Get Up | 111.1 | 37.0 | up; 86.9/47.3 |
+| Rifleman | get-up | 21: Get Up | 77.7 | 34.5 | up; 62.1/50.4 |
 | Rifleman | get-up-forward | 62: Recovery getUpRollForward | 124.7 | 55.6 | forward; 86.2/74.5 |
 | Rifleman | get-up-back | 63: Recovery getUpRollBackward | 115.0 | 64.9 | back; 85.4/74.5 |
-| Rifleman | get-up-attack | 22: Get Up Attack | 113.1 | 39.4 | both; 112.9/61.4 |
+| Rifleman | get-up-attack | 22: Get Up Attack | 95.0 | 37.4 | both; 67.3/61.4 |
 | Rifleman | ledge-get-up | 28: Ledge Climb | 64.7 | 7.9 | up; 27.7/64.2 |
 | Rifleman | ledge-roll | 32: Roll Forward | 116.8 | 45.4 | forward; 72.0/116.4 |
-| Rifleman | ledge-attack | 22: Get Up Attack | 113.1 | 39.4 | both; 112.9/61.4 |
-| Illidan | walk | 119: Locomotion Walk | 76.8 | 18.0 | forward; 76.4/76.0 |
+| Rifleman | ledge-attack | 22: Get Up Attack | 95.3 | 37.4 | both; 67.3/61.4 |
+| Illidan | walk | 119: Locomotion Walk | 101.1 | 18.2 | forward; 100.8/100.7 |
 | Illidan | dash | 121: Locomotion Initial Dash Burst | 81.1 | 19.7 | forward; 72.9/57.8 |
 | Illidan | run | 120: Locomotion Run | 111.4 | 23.8 | forward; 108.7/95.2 |
 | Illidan | turn | 97: Turnaround | 95.2 | 23.1 | back; 77.5/83.4 |
@@ -46,7 +46,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Illidan | ledge-attack | 52: Ledge Attack | 146.8 | 28.2 | both; 130.6/126.0 |
 | Blademaster | walk | 6: Walk | 117.9 | 47.6 | forward; 112.1/115.9 |
 | Blademaster | dash | 6: Walk | 114.9 | 46.1 | forward; 110.8/112.2 |
-| Blademaster | run | 6: Walk | 121.9 | 37.8 | forward; 117.5/121.8 |
+| Blademaster | run | 6: Walk | 94.0 | 40.3 | forward; 92.6/85.2 |
 | Blademaster | turn | 14: Recovery turn | 137.4 | 31.9 | back; 137.2/96.1 |
 | Blademaster | brake | 15: Recovery stop | 148.3 | 28.1 | in place; 143.0/56.9 |
 | Blademaster | jump-squat | 16: Recovery jumpSquat | 165.2 | 29.7 | down; 111.1/28.0 |
@@ -64,69 +64,69 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Blademaster | ledge-get-up | 28: Recovery ledgeClimb | 136.7 | 86.3 | up; 122.8/60.7 |
 | Blademaster | ledge-roll | 29: Recovery ledgeRoll | 194.1 | 64.8 | forward; 149.2/142.8 |
 | Blademaster | ledge-attack | 30: Recovery ledgeAttack | 194.6 | 92.1 | both; 114.1/194.2 |
-| Mountain King | walk | 7: Walk | 84.3 | 28.2 | forward; 71.0/79.3 |
-| Mountain King | dash | 7: Walk | 82.9 | 27.6 | forward; 70.9/77.8 |
-| Mountain King | run | 7: Walk | 80.2 | 21.0 | forward; 71.4/76.6 |
-| Mountain King | turn | 27: Recovery turn | 87.0 | 23.1 | back; 84.1/87.0 |
-| Mountain King | brake | 28: Recovery stop | 20.9 | 8.6 | in place; 13.4/15.7 |
-| Mountain King | jump-squat | 29: Recovery jumpSquat | 30.4 | 11.6 | down; 30.4/13.7 |
-| Mountain King | roll-forward | 36: Recovery rollForward | 114.3 | 49.0 | forward; 97.0/105.8 |
-| Mountain King | roll-back | 37: Recovery rollBackward | 114.5 | 49.5 | back; 105.7/97.4 |
-| Mountain King | spot-dodge | 38: Recovery spotDodge | 38.3 | 14.1 | in place; 25.1/24.0 |
-| Mountain King | air-dodge | 30: Recovery airDodge | 37.8 | 12.6 | in place; 23.0/21.5 |
-| Mountain King | tech | 31: Recovery tech | 87.5 | 32.0 | in place; 75.0/48.3 |
-| Mountain King | tech-forward | 32: Recovery techForward | 109.9 | 43.5 | forward; 71.1/83.5 |
-| Mountain King | tech-back | 33: Recovery techBackward | 110.8 | 44.1 | back; 69.7/85.8 |
-| Mountain King | get-up | 39: Recovery getUp | 81.5 | 31.3 | up; 59.0/78.2 |
-| Mountain King | get-up-forward | 34: Recovery getUpRollForward | 110.0 | 42.8 | forward; 70.9/83.4 |
-| Mountain King | get-up-back | 35: Recovery getUpRollBackward | 110.9 | 44.1 | back; 69.7/85.8 |
-| Mountain King | get-up-attack | 40: Recovery getUpAttack | 124.6 | 56.8 | both; 106.3/109.5 |
-| Mountain King | ledge-get-up | 41: Recovery ledgeClimb | 112.3 | 64.2 | up; 110.7/0.0 |
-| Mountain King | ledge-roll | 42: Recovery ledgeRoll | 109.9 | 43.3 | forward; 71.0/83.6 |
-| Mountain King | ledge-attack | 43: Recovery ledgeAttack | 185.5 | 83.0 | both; 110.7/106.4 |
-| Warden | walk | 2: Walk | 89.2 | 21.5 | forward; 88.6/85.0 |
-| Warden | dash | 2: Walk | 82.3 | 21.1 | forward; 76.2/82.3 |
-| Warden | run | 2: Walk | 97.1 | 23.5 | forward; 95.7/79.7 |
-| Warden | turn | 12: Recovery turn | 128.1 | 27.2 | back; 128.1/90.5 |
-| Warden | brake | 13: Recovery stop | 25.9 | 13.8 | in place; 18.8/20.4 |
-| Warden | jump-squat | 14: Recovery jumpSquat | 42.8 | 19.4 | down; 41.8/22.1 |
-| Warden | roll-forward | 21: Recovery rollForward | 165.5 | 69.1 | forward; 151.6/88.5 |
-| Warden | roll-back | 22: Recovery rollBackward | 165.5 | 68.9 | back; 88.8/151.8 |
-| Warden | spot-dodge | 23: Recovery spotDodge | 62.8 | 20.1 | in place; 50.1/36.3 |
-| Warden | air-dodge | 15: Recovery airDodge | 52.9 | 18.6 | in place; 46.1/32.9 |
-| Warden | tech | 16: Recovery tech | 120.3 | 52.0 | in place; 93.9/71.4 |
-| Warden | tech-forward | 17: Recovery techForward | 157.1 | 61.6 | forward; 105.6/138.9 |
-| Warden | tech-back | 18: Recovery techBackward | 165.6 | 69.6 | back; 105.9/137.5 |
-| Warden | get-up | 24: Recovery getUp | 129.0 | 52.0 | up; 108.2/99.9 |
-| Warden | get-up-forward | 19: Recovery getUpRollForward | 157.4 | 62.1 | forward; 105.5/139.0 |
-| Warden | get-up-back | 20: Recovery getUpRollBackward | 165.6 | 69.6 | back; 106.1/137.5 |
-| Warden | get-up-attack | 25: Recovery getUpAttack | 185.3 | 81.1 | both; 171.8/148.7 |
-| Warden | ledge-get-up | 26: Recovery ledgeClimb | 135.3 | 75.0 | up; 120.3/23.3 |
-| Warden | ledge-roll | 27: Recovery ledgeRoll | 157.1 | 61.0 | forward; 105.5/138.6 |
-| Warden | ledge-attack | 28: Recovery ledgeAttack | 192.7 | 94.7 | both; 170.1/88.9 |
-| Lich | walk | 4: Walk | 70.7 | 11.0 | forward; 49.7/20.6 |
-| Lich | dash | 4: Walk | 57.3 | 9.2 | forward; 45.0/19.5 |
-| Lich | run | 4: Walk | 78.6 | 12.5 | forward; 37.7/20.7 |
-| Lich | turn | 10: Recovery turn | 216.3 | 43.1 | back; 216.1/88.4 |
-| Lich | brake | 11: Recovery stop | 51.6 | 20.2 | in place; 51.4/27.6 |
-| Lich | jump-squat | 12: Recovery jumpSquat | 59.8 | 36.6 | down; 57.1/40.5 |
-| Lich | roll-forward | 19: Recovery rollForward | 205.5 | 102.6 | forward; 195.4/96.8 |
-| Lich | roll-back | 20: Recovery rollBackward | 207.0 | 103.7 | back; 92.9/204.8 |
-| Lich | spot-dodge | 21: Recovery spotDodge | 106.7 | 35.4 | in place; 106.4/39.3 |
-| Lich | air-dodge | 13: Recovery airDodge | 101.5 | 27.0 | in place; 96.7/34.6 |
-| Lich | tech | 14: Recovery tech | 153.6 | 97.2 | in place; 102.4/65.5 |
-| Lich | tech-forward | 15: Recovery techForward | 179.2 | 119.3 | forward; 118.7/164.0 |
-| Lich | tech-back | 16: Recovery techBackward | 205.4 | 120.8 | back; 117.9/144.2 |
-| Lich | get-up | 22: Recovery getUp | 152.5 | 89.1 | up; 136.7/146.6 |
-| Lich | get-up-forward | 17: Recovery getUpRollForward | 179.4 | 119.2 | forward; 118.9/164.1 |
-| Lich | get-up-back | 18: Recovery getUpRollBackward | 205.3 | 120.7 | back; 117.8/144.2 |
-| Lich | get-up-attack | 23: Recovery getUpAttack | 215.1 | 129.6 | both; 180.8/144.1 |
-| Lich | ledge-get-up | 24: Recovery ledgeClimb | 147.3 | 101.3 | up; 136.9/82.2 |
-| Lich | ledge-roll | 25: Recovery ledgeRoll | 179.3 | 121.3 | forward; 118.8/164.2 |
-| Lich | ledge-attack | 26: Recovery ledgeAttack | 175.6 | 125.6 | both; 110.6/108.8 |
+| Muradin Bronzebeard | walk | 7: Walk | 84.3 | 28.2 | forward; 71.0/79.3 |
+| Muradin Bronzebeard | dash | 7: Walk | 82.9 | 27.6 | forward; 70.9/77.8 |
+| Muradin Bronzebeard | run | 7: Walk | 77.4 | 23.8 | forward; 69.7/59.5 |
+| Muradin Bronzebeard | turn | 27: Recovery turn | 87.0 | 23.1 | back; 84.1/87.0 |
+| Muradin Bronzebeard | brake | 28: Recovery stop | 20.9 | 8.6 | in place; 13.4/15.7 |
+| Muradin Bronzebeard | jump-squat | 29: Recovery jumpSquat | 30.4 | 11.6 | down; 30.4/13.7 |
+| Muradin Bronzebeard | roll-forward | 36: Recovery rollForward | 114.3 | 49.0 | forward; 97.0/105.8 |
+| Muradin Bronzebeard | roll-back | 37: Recovery rollBackward | 114.5 | 49.5 | back; 105.7/97.4 |
+| Muradin Bronzebeard | spot-dodge | 38: Recovery spotDodge | 38.3 | 14.1 | in place; 25.1/24.0 |
+| Muradin Bronzebeard | air-dodge | 30: Recovery airDodge | 37.8 | 12.6 | in place; 23.0/21.5 |
+| Muradin Bronzebeard | tech | 31: Recovery tech | 87.5 | 32.0 | in place; 75.0/48.3 |
+| Muradin Bronzebeard | tech-forward | 32: Recovery techForward | 109.9 | 43.5 | forward; 71.1/83.5 |
+| Muradin Bronzebeard | tech-back | 33: Recovery techBackward | 110.8 | 44.1 | back; 69.7/85.8 |
+| Muradin Bronzebeard | get-up | 39: Recovery getUp | 81.5 | 31.3 | up; 59.0/78.2 |
+| Muradin Bronzebeard | get-up-forward | 34: Recovery getUpRollForward | 110.0 | 42.8 | forward; 70.9/83.4 |
+| Muradin Bronzebeard | get-up-back | 35: Recovery getUpRollBackward | 110.9 | 44.1 | back; 69.7/85.8 |
+| Muradin Bronzebeard | get-up-attack | 40: Recovery getUpAttack | 124.6 | 56.8 | both; 106.3/109.5 |
+| Muradin Bronzebeard | ledge-get-up | 41: Recovery ledgeClimb | 112.3 | 64.2 | up; 110.7/0.0 |
+| Muradin Bronzebeard | ledge-roll | 42: Recovery ledgeRoll | 109.9 | 43.3 | forward; 71.0/83.6 |
+| Muradin Bronzebeard | ledge-attack | 43: Recovery ledgeAttack | 185.5 | 83.0 | both; 110.7/106.4 |
+| Maiev Shadowsong | walk | 2: Walk | 89.2 | 21.5 | forward; 88.6/85.0 |
+| Maiev Shadowsong | dash | 2: Walk | 82.3 | 21.1 | forward; 76.2/82.3 |
+| Maiev Shadowsong | run | 2: Walk | 66.4 | 26.4 | forward; 55.6/58.6 |
+| Maiev Shadowsong | turn | 12: Recovery turn | 128.1 | 27.2 | back; 128.1/90.5 |
+| Maiev Shadowsong | brake | 13: Recovery stop | 25.9 | 13.8 | in place; 18.8/20.4 |
+| Maiev Shadowsong | jump-squat | 14: Recovery jumpSquat | 42.8 | 19.4 | down; 41.8/22.1 |
+| Maiev Shadowsong | roll-forward | 21: Recovery rollForward | 165.5 | 69.1 | forward; 151.6/88.5 |
+| Maiev Shadowsong | roll-back | 22: Recovery rollBackward | 165.5 | 68.9 | back; 88.8/151.8 |
+| Maiev Shadowsong | spot-dodge | 23: Recovery spotDodge | 62.8 | 20.1 | in place; 50.1/36.3 |
+| Maiev Shadowsong | air-dodge | 15: Recovery airDodge | 52.9 | 18.6 | in place; 46.1/32.9 |
+| Maiev Shadowsong | tech | 16: Recovery tech | 120.3 | 52.0 | in place; 93.9/71.4 |
+| Maiev Shadowsong | tech-forward | 17: Recovery techForward | 157.1 | 61.6 | forward; 105.6/138.9 |
+| Maiev Shadowsong | tech-back | 18: Recovery techBackward | 165.6 | 69.6 | back; 105.9/137.5 |
+| Maiev Shadowsong | get-up | 24: Recovery getUp | 129.0 | 52.0 | up; 108.2/99.9 |
+| Maiev Shadowsong | get-up-forward | 19: Recovery getUpRollForward | 157.4 | 62.1 | forward; 105.5/139.0 |
+| Maiev Shadowsong | get-up-back | 20: Recovery getUpRollBackward | 165.6 | 69.6 | back; 106.1/137.5 |
+| Maiev Shadowsong | get-up-attack | 25: Recovery getUpAttack | 185.3 | 81.1 | both; 171.8/148.7 |
+| Maiev Shadowsong | ledge-get-up | 26: Recovery ledgeClimb | 135.3 | 75.0 | up; 120.3/23.3 |
+| Maiev Shadowsong | ledge-roll | 27: Recovery ledgeRoll | 157.1 | 61.0 | forward; 105.5/138.6 |
+| Maiev Shadowsong | ledge-attack | 28: Recovery ledgeAttack | 192.7 | 94.7 | both; 170.1/88.9 |
+| Kel'Thuzad | walk | 4: Walk | 70.7 | 11.0 | forward; 49.7/20.6 |
+| Kel'Thuzad | dash | 4: Walk | 57.3 | 9.2 | forward; 45.0/19.5 |
+| Kel'Thuzad | run | 4: Walk | 78.3 | 14.1 | forward; 29.3/35.9 |
+| Kel'Thuzad | turn | 10: Recovery turn | 216.3 | 43.1 | back; 216.1/88.4 |
+| Kel'Thuzad | brake | 11: Recovery stop | 51.6 | 20.2 | in place; 51.4/27.6 |
+| Kel'Thuzad | jump-squat | 12: Recovery jumpSquat | 59.8 | 36.6 | down; 57.1/40.5 |
+| Kel'Thuzad | roll-forward | 19: Recovery rollForward | 205.5 | 102.6 | forward; 195.4/96.8 |
+| Kel'Thuzad | roll-back | 20: Recovery rollBackward | 207.0 | 103.7 | back; 92.9/204.8 |
+| Kel'Thuzad | spot-dodge | 21: Recovery spotDodge | 106.7 | 35.4 | in place; 106.4/39.3 |
+| Kel'Thuzad | air-dodge | 13: Recovery airDodge | 101.5 | 27.0 | in place; 96.7/34.6 |
+| Kel'Thuzad | tech | 14: Recovery tech | 153.6 | 97.2 | in place; 102.4/65.5 |
+| Kel'Thuzad | tech-forward | 15: Recovery techForward | 179.2 | 119.3 | forward; 118.7/164.0 |
+| Kel'Thuzad | tech-back | 16: Recovery techBackward | 205.4 | 120.8 | back; 117.9/144.2 |
+| Kel'Thuzad | get-up | 22: Recovery getUp | 152.5 | 89.1 | up; 136.7/146.6 |
+| Kel'Thuzad | get-up-forward | 17: Recovery getUpRollForward | 179.4 | 119.2 | forward; 118.9/164.1 |
+| Kel'Thuzad | get-up-back | 18: Recovery getUpRollBackward | 205.3 | 120.7 | back; 117.8/144.2 |
+| Kel'Thuzad | get-up-attack | 23: Recovery getUpAttack | 215.1 | 129.6 | both; 180.8/144.1 |
+| Kel'Thuzad | ledge-get-up | 24: Recovery ledgeClimb | 147.3 | 101.3 | up; 136.9/82.2 |
+| Kel'Thuzad | ledge-roll | 25: Recovery ledgeRoll | 179.3 | 121.3 | forward; 118.8/164.2 |
+| Kel'Thuzad | ledge-attack | 26: Recovery ledgeAttack | 175.6 | 125.6 | both; 110.6/108.8 |
 | Forsaken Paladin | walk | 12: Walk 1 | 85.8 | 20.7 | forward; 82.9/75.0 |
 | Forsaken Paladin | dash | 12: Walk 1 | 85.6 | 20.0 | forward; 82.7/74.3 |
-| Forsaken Paladin | run | 12: Walk 1 | 94.3 | 21.9 | forward; 81.3/93.4 |
+| Forsaken Paladin | run | 12: Walk 1 | 70.6 | 17.0 | forward; 66.1/66.1 |
 | Forsaken Paladin | turn | 50: Forsaken Paladin turn | 130.3 | 29.1 | back; 128.8/65.5 |
 | Forsaken Paladin | brake | 51: Forsaken Paladin stop | 41.9 | 10.5 | in place; 27.6/16.1 |
 | Forsaken Paladin | jump-squat | 52: Forsaken Paladin jumpSquat | 50.3 | 9.5 | down; 44.7/19.2 |
@@ -144,29 +144,29 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Forsaken Paladin | ledge-get-up | 60: Forsaken Paladin ledgeClimb | 124.5 | 27.0 | up; 64.5/77.6 |
 | Forsaken Paladin | ledge-roll | 91: Forsaken Paladin ledgeRoll | 212.7 | 92.6 | forward; 86.5/205.6 |
 | Forsaken Paladin | ledge-attack | 61: Forsaken Paladin ledgeAttack | 49.7 | 11.2 | both; 38.0/19.1 |
-| Dreadlord | walk | 5: Walk | 114.2 | 38.3 | forward; 114.1/109.4 |
-| Dreadlord | dash | 5: Walk | 113.5 | 37.5 | forward; 113.4/108.0 |
-| Dreadlord | run | 5: Walk | 121.4 | 41.7 | forward; 112.0/109.1 |
-| Dreadlord | turn | 12: Recovery turn | 115.8 | 48.2 | back; 75.0/115.3 |
-| Dreadlord | brake | 13: Recovery stop | 32.6 | 12.6 | in place; 23.7/32.1 |
-| Dreadlord | jump-squat | 14: Recovery jumpSquat | 56.2 | 22.7 | down; 54.5/16.7 |
-| Dreadlord | roll-forward | 21: Recovery rollForward | 171.6 | 82.8 | forward; 100.3/125.2 |
-| Dreadlord | roll-back | 22: Recovery rollBackward | 171.9 | 83.3 | back; 126.4/97.3 |
-| Dreadlord | spot-dodge | 23: Recovery spotDodge | 59.0 | 25.0 | in place; 47.8/39.2 |
-| Dreadlord | air-dodge | 15: Recovery airDodge | 58.8 | 22.9 | in place; 42.6/35.1 |
-| Dreadlord | tech | 16: Recovery tech | 122.4 | 60.8 | in place; 114.7/77.9 |
-| Dreadlord | tech-forward | 17: Recovery techForward | 146.3 | 71.0 | forward; 124.9/130.9 |
-| Dreadlord | tech-back | 18: Recovery techBackward | 146.8 | 72.1 | back; 118.7/134.9 |
-| Dreadlord | get-up | 24: Recovery getUp | 134.0 | 64.9 | up; 125.3/94.8 |
-| Dreadlord | get-up-forward | 19: Recovery getUpRollForward | 146.3 | 70.8 | forward; 124.7/130.8 |
-| Dreadlord | get-up-back | 20: Recovery getUpRollBackward | 147.4 | 71.9 | back; 118.7/134.9 |
-| Dreadlord | get-up-attack | 25: Recovery getUpAttack | 197.7 | 97.0 | both; 193.7/170.3 |
-| Dreadlord | ledge-get-up | 26: Recovery ledgeClimb | 146.1 | 90.2 | up; 136.5/12.4 |
-| Dreadlord | ledge-roll | 27: Recovery ledgeRoll | 146.5 | 70.8 | forward; 124.9/130.7 |
-| Dreadlord | ledge-attack | 28: Recovery ledgeAttack | 209.7 | 109.2 | both; 203.6/81.6 |
+| Mal'Ganis | walk | 5: Walk | 117.4 | 38.1 | forward; 107.5/105.7 |
+| Mal'Ganis | dash | 5: Walk | 114.4 | 36.3 | forward; 106.7/105.0 |
+| Mal'Ganis | run | 5: Walk | 128.5 | 45.2 | forward; 124.4/110.5 |
+| Mal'Ganis | turn | 12: Recovery turn | 115.8 | 48.2 | back; 75.0/115.3 |
+| Mal'Ganis | brake | 13: Recovery stop | 32.6 | 12.6 | in place; 23.7/32.1 |
+| Mal'Ganis | jump-squat | 14: Recovery jumpSquat | 56.2 | 22.7 | down; 54.5/16.7 |
+| Mal'Ganis | roll-forward | 21: Recovery rollForward | 171.6 | 82.8 | forward; 100.3/125.2 |
+| Mal'Ganis | roll-back | 22: Recovery rollBackward | 171.9 | 83.3 | back; 126.4/97.3 |
+| Mal'Ganis | spot-dodge | 23: Recovery spotDodge | 59.0 | 25.0 | in place; 47.8/39.2 |
+| Mal'Ganis | air-dodge | 15: Recovery airDodge | 58.8 | 22.9 | in place; 42.6/35.1 |
+| Mal'Ganis | tech | 16: Recovery tech | 122.4 | 60.8 | in place; 114.7/77.9 |
+| Mal'Ganis | tech-forward | 17: Recovery techForward | 146.3 | 71.0 | forward; 124.9/130.9 |
+| Mal'Ganis | tech-back | 18: Recovery techBackward | 146.8 | 72.1 | back; 118.7/134.9 |
+| Mal'Ganis | get-up | 24: Recovery getUp | 134.0 | 64.9 | up; 125.3/94.8 |
+| Mal'Ganis | get-up-forward | 19: Recovery getUpRollForward | 146.3 | 70.8 | forward; 124.7/130.8 |
+| Mal'Ganis | get-up-back | 20: Recovery getUpRollBackward | 147.4 | 71.9 | back; 118.7/134.9 |
+| Mal'Ganis | get-up-attack | 25: Recovery getUpAttack | 197.7 | 97.0 | both; 193.7/170.3 |
+| Mal'Ganis | ledge-get-up | 26: Recovery ledgeClimb | 146.1 | 90.2 | up; 136.5/12.4 |
+| Mal'Ganis | ledge-roll | 27: Recovery ledgeRoll | 146.5 | 70.8 | forward; 124.9/130.7 |
+| Mal'Ganis | ledge-attack | 28: Recovery ledgeAttack | 209.7 | 109.2 | both; 203.6/81.6 |
 | Shadow Hunter | walk | 0: Walk | 173.0 | 44.3 | forward; 157.4/166.5 |
 | Shadow Hunter | dash | 0: Walk | 171.9 | 35.9 | forward; 157.1/164.3 |
-| Shadow Hunter | run | 0: Walk | 157.1 | 33.4 | forward; 150.0/130.5 |
+| Shadow Hunter | run | 0: Walk | 142.8 | 38.4 | forward; 130.1/138.5 |
 | Shadow Hunter | turn | 14: Recovery turn | 133.2 | 48.2 | back; 128.1/133.2 |
 | Shadow Hunter | brake | 15: Recovery stop | 26.6 | 10.8 | in place; 15.0/18.5 |
 | Shadow Hunter | jump-squat | 16: Recovery jumpSquat | 30.3 | 13.5 | down; 28.6/18.6 |
@@ -186,7 +186,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Shadow Hunter | ledge-attack | 30: Recovery ledgeAttack | 265.1 | 117.2 | both; 184.2/115.4 |
 | Pit Lord | walk | 1: Walk | 103.7 | 21.6 | forward; 99.4/98.7 |
 | Pit Lord | dash | 3: Walk Fast | 149.6 | 39.7 | forward; 145.9/91.5 |
-| Pit Lord | run | 3: Walk Fast | 158.4 | 40.0 | forward; 158.1/104.0 |
+| Pit Lord | run | 3: Walk Fast | 129.0 | 45.3 | forward; 110.7/121.8 |
 | Pit Lord | turn | 17: Recovery turn | 355.7 | 95.8 | back; 347.8/298.0 |
 | Pit Lord | brake | 18: Recovery stop | 158.7 | 43.6 | in place; 59.0/91.4 |
 | Pit Lord | jump-squat | 19: Recovery jumpSquat | 160.1 | 40.0 | down; 159.8/111.8 |
@@ -204,29 +204,29 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Pit Lord | ledge-get-up | 31: Recovery ledgeClimb | 227.5 | 95.5 | up; 226.6/141.8 |
 | Pit Lord | ledge-roll | 32: Recovery ledgeRoll | 383.6 | 161.1 | forward; 252.3/222.9 |
 | Pit Lord | ledge-attack | 33: Recovery ledgeAttack | 231.9 | 118.7 | both; 152.7/83.3 |
-| Beastmaster | walk | 0: walk | 181.5 | 54.1 | forward; 149.1/180.8 |
-| Beastmaster | dash | 0: walk | 181.5 | 53.6 | forward; 148.2/180.8 |
-| Beastmaster | run | 0: walk | 181.1 | 49.4 | forward; 159.7/176.1 |
-| Beastmaster | turn | 10: Recovery turn | 164.7 | 41.7 | back; 103.9/164.7 |
-| Beastmaster | brake | 11: Recovery stop | 33.4 | 23.5 | in place; 21.8/24.2 |
-| Beastmaster | jump-squat | 12: Recovery jumpSquat | 57.7 | 34.0 | down; 57.7/13.4 |
-| Beastmaster | roll-forward | 19: Recovery rollForward | 187.0 | 91.2 | forward; 101.0/165.1 |
-| Beastmaster | roll-back | 20: Recovery rollBackward | 186.8 | 91.4 | back; 165.1/100.8 |
-| Beastmaster | spot-dodge | 21: Recovery spotDodge | 74.4 | 37.9 | in place; 41.0/36.9 |
-| Beastmaster | air-dodge | 13: Recovery airDodge | 58.6 | 25.4 | in place; 36.7/33.2 |
-| Beastmaster | tech | 14: Recovery tech | 123.8 | 60.7 | in place; 106.2/93.5 |
-| Beastmaster | tech-forward | 15: Recovery techForward | 146.2 | 80.8 | forward; 120.4/130.3 |
-| Beastmaster | tech-back | 16: Recovery techBackward | 150.6 | 75.6 | back; 120.7/126.2 |
-| Beastmaster | get-up | 22: Recovery getUp | 123.8 | 61.8 | up; 114.2/103.9 |
-| Beastmaster | get-up-forward | 17: Recovery getUpRollForward | 146.3 | 80.4 | forward; 120.3/130.2 |
-| Beastmaster | get-up-back | 18: Recovery getUpRollBackward | 150.9 | 75.4 | back; 120.9/126.1 |
-| Beastmaster | get-up-attack | 23: Recovery getUpAttack | 271.9 | 97.0 | both; 192.0/164.1 |
-| Beastmaster | ledge-get-up | 24: Recovery ledgeClimb | 146.7 | 77.7 | up; 145.7/12.9 |
-| Beastmaster | ledge-roll | 25: Recovery ledgeRoll | 146.2 | 80.6 | forward; 120.2/130.2 |
-| Beastmaster | ledge-attack | 26: Recovery ledgeAttack | 279.6 | 95.6 | both; 171.8/113.6 |
+| Rexxar | walk | 0: walk | 181.5 | 54.1 | forward; 149.1/180.8 |
+| Rexxar | dash | 0: walk | 181.5 | 53.6 | forward; 148.2/180.8 |
+| Rexxar | run | 0: walk | 166.8 | 47.1 | forward; 126.0/162.1 |
+| Rexxar | turn | 10: Recovery turn | 164.7 | 41.7 | back; 103.9/164.7 |
+| Rexxar | brake | 11: Recovery stop | 33.4 | 23.5 | in place; 21.8/24.2 |
+| Rexxar | jump-squat | 12: Recovery jumpSquat | 57.7 | 34.0 | down; 57.7/13.4 |
+| Rexxar | roll-forward | 19: Recovery rollForward | 187.0 | 91.2 | forward; 101.0/165.1 |
+| Rexxar | roll-back | 20: Recovery rollBackward | 186.8 | 91.4 | back; 165.1/100.8 |
+| Rexxar | spot-dodge | 21: Recovery spotDodge | 74.4 | 37.9 | in place; 41.0/36.9 |
+| Rexxar | air-dodge | 13: Recovery airDodge | 58.6 | 25.4 | in place; 36.7/33.2 |
+| Rexxar | tech | 14: Recovery tech | 123.8 | 60.7 | in place; 106.2/93.5 |
+| Rexxar | tech-forward | 15: Recovery techForward | 146.2 | 80.8 | forward; 120.4/130.3 |
+| Rexxar | tech-back | 16: Recovery techBackward | 150.6 | 75.6 | back; 120.7/126.2 |
+| Rexxar | get-up | 22: Recovery getUp | 123.8 | 61.8 | up; 114.2/103.9 |
+| Rexxar | get-up-forward | 17: Recovery getUpRollForward | 146.3 | 80.4 | forward; 120.3/130.2 |
+| Rexxar | get-up-back | 18: Recovery getUpRollBackward | 150.9 | 75.4 | back; 120.9/126.1 |
+| Rexxar | get-up-attack | 23: Recovery getUpAttack | 271.9 | 97.0 | both; 192.0/164.1 |
+| Rexxar | ledge-get-up | 24: Recovery ledgeClimb | 146.7 | 77.7 | up; 145.7/12.9 |
+| Rexxar | ledge-roll | 25: Recovery ledgeRoll | 146.2 | 80.6 | forward; 120.2/130.2 |
+| Rexxar | ledge-attack | 26: Recovery ledgeAttack | 279.6 | 95.6 | both; 171.8/113.6 |
 | Lich King | walk | 2: Walk | 90.9 | 24.8 | forward; 89.3/85.8 |
 | Lich King | dash | 10: Walk Fast | 98.4 | 35.4 | forward; 83.5/89.3 |
-| Lich King | run | 10: Walk Fast | 143.3 | 41.0 | forward; 141.3/142.7 |
+| Lich King | run | 10: Walk Fast | 116.9 | 31.8 | forward; 112.7/101.1 |
 | Lich King | turn | 66: Turn | 72.8 | 19.5 | back; 68.1/40.5 |
 | Lich King | brake | 67: Stop | 96.4 | 20.0 | in place; 47.6/69.3 |
 | Lich King | jump-squat | 68: Jump Squat | 75.6 | 12.9 | down; 68.0/15.2 |
@@ -246,7 +246,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Lich King | ledge-attack | 59: Ledge Attack | 283.7 | 51.2 | both; 150.1/170.1 |
 | Thrall | walk | 2: Walk | 159.2 | 34.4 | forward; 157.1/139.3 |
 | Thrall | dash | 2: Walk | 159.1 | 30.4 | forward; 156.9/100.0 |
-| Thrall | run | 2: Walk | 150.0 | 32.3 | forward; 150.0/140.2 |
+| Thrall | run | 2: Walk | 107.1 | 37.5 | forward; 94.8/84.4 |
 | Thrall | turn | 29: Thrall turn | 85.9 | 21.5 | back; 85.7/77.8 |
 | Thrall | brake | 30: Thrall stop | 45.3 | 16.6 | in place; 14.2/21.9 |
 | Thrall | jump-squat | 31: Thrall jumpSquat | 55.7 | 19.0 | down; 7.7/42.5 |
@@ -266,7 +266,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Thrall | ledge-attack | 40: Thrall ledgeAttack | 51.5 | 6.8 | both; 45.8/13.1 |
 | Jaina Proudmoore | walk | 6: Walk | 104.8 | 21.9 | forward; 95.9/103.1 |
 | Jaina Proudmoore | dash | 6: Walk | 103.4 | 21.3 | forward; 94.9/101.4 |
-| Jaina Proudmoore | run | 6: Walk | 67.1 | 15.0 | forward; 57.1/60.5 |
+| Jaina Proudmoore | run | 6: Walk | 99.4 | 19.8 | forward; 97.1/93.7 |
 | Jaina Proudmoore | turn | 31: Jaina turn | 69.5 | 14.7 | back; 69.4/56.9 |
 | Jaina Proudmoore | brake | 32: Jaina stop | 33.1 | 4.1 | in place; 29.3/19.2 |
 | Jaina Proudmoore | jump-squat | 33: Jaina jumpSquat | 59.0 | 9.3 | down; 21.2/42.9 |
@@ -280,13 +280,13 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Jaina Proudmoore | get-up | 45: Jaina getUp | 102.7 | 62.4 | up; 100.6/46.2 |
 | Jaina Proudmoore | get-up-forward | 68: Jaina getUpRollForward | 130.4 | 76.1 | forward; 86.8/87.8 |
 | Jaina Proudmoore | get-up-back | 72: Jaina getUpRollBackward | 130.0 | 77.6 | back; 87.8/86.6 |
-| Jaina Proudmoore | get-up-attack | 46: Jaina getUpAttack | 121.7 | 65.7 | both; 113.0/121.3 |
+| Jaina Proudmoore | get-up-attack | 46: Jaina getUpAttack | 116.0 | 66.0 | both; 101.0/107.8 |
 | Jaina Proudmoore | ledge-get-up | 41: Jaina ledgeClimb | 176.4 | 20.1 | up; 176.0/78.2 |
 | Jaina Proudmoore | ledge-roll | 69: Jaina ledgeRoll | 128.9 | 74.8 | forward; 87.0/87.8 |
-| Jaina Proudmoore | ledge-attack | 42: Jaina ledgeAttack | 73.7 | 11.0 | both; 54.9/21.8 |
+| Jaina Proudmoore | ledge-attack | 42: Jaina ledgeAttack | 76.6 | 11.1 | both; 55.2/26.2 |
 | Sylvanas Windrunner | walk | 8: Walk | 100.5 | 32.0 | forward; 99.8/82.5 |
 | Sylvanas Windrunner | dash | 8: Walk | 99.8 | 31.2 | forward; 99.7/81.5 |
-| Sylvanas Windrunner | run | 8: Walk | 101.9 | 24.3 | forward; 93.6/98.6 |
+| Sylvanas Windrunner | run | 8: Walk | 97.3 | 25.5 | forward; 91.5/93.2 |
 | Sylvanas Windrunner | turn | 32: Sylvanas turn | 98.9 | 27.2 | back; 55.2/98.9 |
 | Sylvanas Windrunner | brake | 33: Sylvanas stop | 21.7 | 8.5 | in place; 21.3/13.0 |
 | Sylvanas Windrunner | jump-squat | 34: Sylvanas jumpSquat | 63.9 | 27.0 | down; 56.7/18.8 |
@@ -306,7 +306,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Sylvanas Windrunner | ledge-attack | 55: Sylvanas ledgeAttack | 167.2 | 81.4 | both; 99.3/134.8 |
 | Cairne Bloodhoof | walk | 3: Walk | 109.3 | 40.8 | forward; 100.9/109.1 |
 | Cairne Bloodhoof | dash | 3: Walk | 105.1 | 35.3 | forward; 100.3/75.0 |
-| Cairne Bloodhoof | run | 3: Walk | 118.4 | 36.0 | forward; 116.8/96.4 |
+| Cairne Bloodhoof | run | 3: Walk | 106.4 | 35.9 | forward; 106.3/89.1 |
 | Cairne Bloodhoof | turn | 34: Cairne turn | 289.4 | 78.0 | back; 289.3/163.5 |
 | Cairne Bloodhoof | brake | 35: Cairne stop | 121.0 | 43.2 | in place; 28.8/15.2 |
 | Cairne Bloodhoof | jump-squat | 36: Cairne jumpSquat | 64.3 | 17.5 | down; 26.1/43.2 |
@@ -320,13 +320,13 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Cairne Bloodhoof | get-up | 48: Cairne getUp | 199.0 | 87.8 | up; 166.6/199.0 |
 | Cairne Bloodhoof | get-up-forward | 73: Cairne getUpRollForward | 285.3 | 131.4 | forward; 275.3/193.8 |
 | Cairne Bloodhoof | get-up-back | 74: Cairne getUpRollBackward | 285.6 | 131.1 | back; 193.7/275.3 |
-| Cairne Bloodhoof | get-up-attack | 49: Cairne getUpAttack | 329.2 | 116.9 | both; 287.7/92.2 |
+| Cairne Bloodhoof | get-up-attack | 49: Cairne getUpAttack | 357.5 | 115.0 | both; 297.6/167.4 |
 | Cairne Bloodhoof | ledge-get-up | 44: Cairne ledgeClimb | 113.1 | 45.4 | up; 110.9/59.8 |
 | Cairne Bloodhoof | ledge-roll | 75: Cairne ledgeRoll | 285.5 | 131.1 | forward; 275.0/193.8 |
-| Cairne Bloodhoof | ledge-attack | 45: Cairne ledgeAttack | 357.7 | 93.5 | both; 355.0/105.8 |
+| Cairne Bloodhoof | ledge-attack | 45: Cairne ledgeAttack | 355.0 | 88.7 | both; 352.5/105.4 |
 | Chen Stormstout | walk | 0: walk | 116.8 | 40.1 | forward; 116.4/112.8 |
 | Chen Stormstout | dash | 0: walk | 116.8 | 37.8 | forward; 116.3/99.7 |
-| Chen Stormstout | run | 0: walk | 124.7 | 33.7 | forward; 124.6/107.8 |
+| Chen Stormstout | run | 0: walk | 94.1 | 35.9 | forward; 94.0/91.7 |
 | Chen Stormstout | turn | 35: Chen turn | 284.9 | 63.8 | back; 274.9/157.3 |
 | Chen Stormstout | brake | 36: Chen stop | 57.0 | 25.0 | in place; 36.2/11.0 |
 | Chen Stormstout | jump-squat | 37: Chen jumpSquat | 39.1 | 17.6 | down; 31.1/34.0 |
@@ -346,7 +346,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Chen Stormstout | ledge-attack | 46: Chen ledgeAttack | 64.0 | 16.6 | both; 52.8/18.0 |
 | Peon | walk | 1: Walk | 81.6 | 32.3 | forward; 73.3/81.5 |
 | Peon | dash | 1: Walk | 81.2 | 32.0 | forward; 71.5/81.1 |
-| Peon | run | 1: Walk | 59.4 | 25.0 | forward; 58.8/59.0 |
+| Peon | run | 1: Walk | 61.4 | 26.0 | forward; 61.3/60.5 |
 | Peon | turn | 42: Peon turn | 104.2 | 26.8 | back; 60.5/104.2 |
 | Peon | brake | 43: Peon stop | 17.2 | 7.5 | in place; 8.7/13.6 |
 | Peon | jump-squat | 44: Peon jumpSquat | 39.0 | 19.5 | down; 34.9/9.3 |
@@ -366,7 +366,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Peon | ledge-attack | 65: Peon ledgeAttack | 171.7 | 70.6 | both; 71.1/44.3 |
 | Goblin Tinker | walk | 0: Walk | 97.4 | 30.3 | forward; 94.3/94.7 |
 | Goblin Tinker | dash | 0: Walk | 97.5 | 29.8 | forward; 94.2/93.8 |
-| Goblin Tinker | run | 0: Walk | 95.8 | 24.8 | forward; 95.7/65.9 |
+| Goblin Tinker | run | 0: Walk | 99.8 | 27.3 | forward; 99.6/78.7 |
 | Goblin Tinker | turn | 53: Tinker turn | 152.7 | 41.2 | back; 116.5/152.7 |
 | Goblin Tinker | brake | 54: Tinker stop | 32.8 | 14.9 | in place; 25.1/10.6 |
 | Goblin Tinker | jump-squat | 55: Tinker jumpSquat | 60.7 | 16.6 | down; 40.5/54.9 |
@@ -384,9 +384,9 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Goblin Tinker | ledge-get-up | 78: Tinker ledgeClimb | 149.0 | 75.6 | up; 125.2/9.4 |
 | Goblin Tinker | ledge-roll | 71: Tinker ledgeRoll | 199.7 | 85.9 | forward; 95.1/191.2 |
 | Goblin Tinker | ledge-attack | 79: Tinker ledgeAttack | 153.4 | 79.3 | both; 124.5/22.6 |
-| Kael'thas Sunstrider | walk | 2: Walk | 92.0 | 25.1 | forward; 90.3/92.0 |
-| Kael'thas Sunstrider | dash | 2: Walk | 90.4 | 24.7 | forward; 89.6/90.3 |
-| Kael'thas Sunstrider | run | 2: Walk | 99.4 | 21.9 | forward; 96.2/99.4 |
+| Kael'thas Sunstrider | walk | 2: Walk | 92.3 | 25.1 | forward; 90.7/92.2 |
+| Kael'thas Sunstrider | dash | 2: Walk | 86.9 | 24.2 | forward; 75.2/86.5 |
+| Kael'thas Sunstrider | run | 2: Walk | 76.8 | 20.2 | forward; 68.1/76.4 |
 | Kael'thas Sunstrider | turn | 33: Kaelthas turn | 119.5 | 28.3 | back; 68.2/117.4 |
 | Kael'thas Sunstrider | brake | 34: Kaelthas stop | 83.3 | 10.3 | in place; 74.9/27.1 |
 | Kael'thas Sunstrider | jump-squat | 35: Kaelthas jumpSquat | 55.2 | 13.5 | down; 7.1/41.5 |
@@ -406,7 +406,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Kael'thas Sunstrider | ledge-attack | 44: Kaelthas ledgeAttack | 68.1 | 11.1 | both; 55.2/19.3 |
 | Murloc | walk | 1: Walk | 126.7 | 32.7 | forward; 117.6/125.3 |
 | Murloc | dash | 1: Walk | 126.8 | 30.7 | forward; 110.1/125.1 |
-| Murloc | run | 1: Walk | 90.6 | 30.0 | forward; 54.8/87.6 |
+| Murloc | run | 1: Walk | 106.0 | 32.6 | forward; 101.1/88.5 |
 | Murloc | turn | 31: Murloc turn | 165.1 | 44.8 | back; 149.2/32.1 |
 | Murloc | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
 | Murloc | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
@@ -426,7 +426,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Murloc | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
 | Grom Hellscream | walk | 5: Walk | 121.9 | 50.4 | forward; 118.7/111.2 |
 | Grom Hellscream | dash | 5: Walk | 121.9 | 49.0 | forward; 118.7/109.6 |
-| Grom Hellscream | run | 5: Walk | 135.0 | 39.9 | forward; 129.6/134.9 |
+| Grom Hellscream | run | 5: Walk | 135.2 | 46.2 | forward; 134.4/132.1 |
 | Grom Hellscream | turn | 38: Grom turn | 138.7 | 28.0 | back; 66.8/137.9 |
 | Grom Hellscream | brake | 39: Grom stop | 107.4 | 18.9 | in place; 104.3/28.8 |
 | Grom Hellscream | jump-squat | 40: Grom jumpSquat | 70.9 | 20.1 | down; 12.7/49.3 |
@@ -444,12 +444,12 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Grom Hellscream | ledge-get-up | 48: Grom ledgeClimb | 112.9 | 31.5 | up; 112.9/61.4 |
 | Grom Hellscream | ledge-roll | 76: Grom ledgeRoll | 253.0 | 106.6 | forward; 187.6/117.0 |
 | Grom Hellscream | ledge-attack | 49: Grom ledgeAttack | 86.3 | 20.0 | both; 33.0/13.0 |
-| Kobold | walk | 1: Walk | 71.5 | 23.9 | forward; 60.8/62.6 |
-| Kobold | dash | 1: Walk | 70.7 | 23.1 | forward; 60.4/62.4 |
-| Kobold | run | 1: Walk | 74.0 | 19.7 | forward; 52.5/65.3 |
+| Kobold | walk | 1: Walk | 71.6 | 23.8 | forward; 60.8/62.6 |
+| Kobold | dash | 91: Kobold dash | 24.1 | 2.7 | forward; 19.0/17.7 |
+| Kobold | run | 90: Kobold run | 23.8 | 3.8 | forward; 20.5/18.0 |
 | Kobold | turn | 31: Kobold turn | 79.4 | 25.8 | back; 79.0/58.8 |
-| Kobold | brake | 32: Kobold stop | 59.8 | 17.0 | in place; 37.0/20.4 |
-| Kobold | jump-squat | 33: Kobold jumpSquat | 37.2 | 11.1 | down; 8.5/37.2 |
+| Kobold | brake | 32: Kobold stop | 96.1 | 25.9 | in place; 27.3/35.2 |
+| Kobold | jump-squat | 33: Kobold jumpSquat | 19.1 | 7.7 | down; 10.4/14.0 |
 | Kobold | roll-forward | 66: Kobold rollForward | 129.3 | 53.0 | forward; 103.6/88.9 |
 | Kobold | roll-back | 70: Kobold rollBackward | 129.8 | 50.5 | back; 88.9/103.5 |
 | Kobold | spot-dodge | 47: Kobold spotDodge | 74.1 | 24.7 | in place; 39.9/31.9 |
@@ -460,13 +460,13 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Kobold | get-up | 45: Kobold getUp | 77.8 | 33.1 | up; 57.1/75.7 |
 | Kobold | get-up-forward | 68: Kobold getUpRollForward | 107.7 | 54.8 | forward; 87.6/87.6 |
 | Kobold | get-up-back | 72: Kobold getUpRollBackward | 107.4 | 50.7 | back; 90.5/87.6 |
-| Kobold | get-up-attack | 46: Kobold getUpAttack | 97.6 | 40.0 | both; 57.3/67.8 |
-| Kobold | ledge-get-up | 41: Kobold ledgeClimb | 96.5 | 26.5 | up; 88.2/33.6 |
+| Kobold | get-up-attack | 46: Kobold getUpAttack | 97.6 | 40.0 | both; 57.3/72.5 |
+| Kobold | ledge-get-up | 41: Kobold ledgeClimb | 110.5 | 26.1 | up; 110.4/40.4 |
 | Kobold | ledge-roll | 69: Kobold ledgeRoll | 129.2 | 52.9 | forward; 103.6/89.1 |
-| Kobold | ledge-attack | 42: Kobold ledgeAttack | 76.2 | 14.8 | both; 23.5/29.0 |
+| Kobold | ledge-attack | 42: Kobold ledgeAttack | 76.2 | 14.8 | both; 28.0/30.0 |
 | Malfurion Stormrage | walk | 7: Walk | 126.8 | 28.0 | forward; 117.7/126.1 |
 | Malfurion Stormrage | dash | 7: Walk | 126.6 | 26.6 | forward; 117.7/125.8 |
-| Malfurion Stormrage | run | 7: Walk | 98.4 | 19.9 | forward; 85.5/89.6 |
+| Malfurion Stormrage | run | 7: Walk | 123.8 | 22.9 | forward; 82.3/120.3 |
 | Malfurion Stormrage | turn | 30: Malfurion turn | 135.9 | 35.5 | back; 135.7/91.3 |
 | Malfurion Stormrage | brake | 31: Malfurion stop | 61.8 | 8.8 | in place; 58.0/27.9 |
 | Malfurion Stormrage | jump-squat | 32: Malfurion jumpSquat | 81.1 | 13.7 | down; 11.8/56.5 |
@@ -486,7 +486,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Malfurion Stormrage | ledge-attack | 41: Malfurion ledgeAttack | 74.0 | 16.1 | both; 68.2/25.6 |
 | Medivh | walk | 1: Walk | 102.3 | 25.6 | forward; 98.7/82.2 |
 | Medivh | dash | 1: Walk | 101.2 | 25.4 | forward; 98.8/81.1 |
-| Medivh | run | 1: Walk | 112.6 | 21.5 | forward; 104.2/111.6 |
+| Medivh | run | 1: Walk | 106.6 | 23.1 | forward; 106.0/106.0 |
 | Medivh | turn | 44: Medivh turn | 80.0 | 28.5 | back; 79.2/67.6 |
 | Medivh | brake | 45: Medivh stop | 58.1 | 9.4 | in place; 51.9/43.3 |
 | Medivh | jump-squat | 46: Medivh jumpSquat | 72.6 | 15.3 | down; 8.8/66.0 |
@@ -506,7 +506,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Medivh | ledge-attack | 55: Medivh ledgeAttack | 120.8 | 22.3 | both; 111.0/33.0 |
 | Anub'arak | walk | 2: Walk | 131.4 | 21.7 | forward; 129.5/74.1 |
 | Anub'arak | dash | 2: Walk | 130.0 | 21.3 | forward; 128.4/74.0 |
-| Anub'arak | run | 2: Walk | 117.1 | 17.7 | forward; 107.1/70.4 |
+| Anub'arak | run | 2: Walk | 120.9 | 20.4 | forward; 118.7/86.3 |
 | Anub'arak | turn | 39: Anubarak turn | 177.1 | 44.6 | back; 140.6/176.6 |
 | Anub'arak | brake | 40: Anubarak stop | 110.4 | 19.1 | in place; 108.3/31.7 |
 | Anub'arak | jump-squat | 41: Anubarak jumpSquat | 67.9 | 14.2 | down; 39.9/30.1 |

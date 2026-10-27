@@ -5,8 +5,9 @@ import { generateMDL, generateMDX, parseMDL, parseMDX, type model as mdx } from 
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
-const [assets, authored, output] = process.argv.slice(2).map(p => resolve(p));
-ensure(assets && authored && output, "usage: bun tools/animations/illidan-locomotion.ts PRIVATE_ASSETS AUTHORED_DIR PRIVATE_OUTPUT");
+const [assetsArg, authoredArg, outputArg, ...rekeyed] = process.argv.slice(2);
+ensure(assetsArg && authoredArg && outputArg, "usage: bun tools/animations/illidan-locomotion.ts PRIVATE_ASSETS AUTHORED_DIR PRIVATE_OUTPUT [CLIP_NAME...]");
+const [assets, authored, output] = [assetsArg, authoredArg, outputArg].map(p => resolve(p));
 ensure(relative(resolve(import.meta.dir, "../.."), output).startsWith(".."), "Illidan art stays outside the checkout");
 mkdirSync(output, { recursive: true });
 cpSync(join(assets, "illidan-animation"), output, { recursive: true, dereference: true });
@@ -18,9 +19,30 @@ ensure(donor, "Illidan has no combat idle donor");
 const originals = new Map<string, mdx.AnimVector>();
 tracks(source, (track, path) => originals.set(path, track));
 const names = ["Locomotion Walk", "Locomotion Run", "Locomotion Initial Dash Burst"];
+const authoredKeys = (path: string, sequence: mdx.Sequence) => {
+  const skeletal = /^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation|Scaling)$/.exec(path);
+  const node = skeletal ? source[skeletal[1] as "Bones" | "Helpers"][Number(skeletal[2])] : undefined;
+  const authoredNode = node ? motion.Nodes.find(n => n?.Name === node.Name) : undefined;
+  const authoredTrack = skeletal && authoredNode ? authoredNode[skeletal[3] as "Rotation" | "Translation" | "Scaling"] : undefined;
+  const run = authoredTrack?.Keys.filter(k => k.Frame >= sequence.Interval[0] && k.Frame <= sequence.Interval[1]);
+  return node && authoredTrack && run?.length ? { name: node.Name, lineType: authoredTrack.LineType, run } : undefined;
+};
+for (const name of rekeyed) {
+  ensure(names.includes(name), `${name}: not a locomotion clip`);
+  const sequence = motion.Sequences.find(s => s.Name === name), shipped = model.Sequences.find(s => s.Name === name);
+  ensure(sequence && shipped, `${name}: re-keying in place needs the clip in both the Blender export and the shipped model`);
+  const [start = 0, end = 0] = shipped.Interval;
+  ensure(end - start === sequence.Interval[1] - sequence.Interval[0], `${name}: a re-keyed clip keeps its length`);
+  tracks(model, (track, path) => {
+    const keys = authoredKeys(path, sequence);
+    if (!keys) return;
+    ensure(track.LineType === keys.lineType, `${keys.name}: interpolation differs from shipped rig`);
+    track.Keys = [...track.Keys.filter(k => k.Frame < start || k.Frame > end), ...keys.run.map(k => ({ ...k, Frame: start + k.Frame - sequence.Interval[0] }))].sort((a, b) => a.Frame - b.Frame);
+  });
+}
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const clips = await Bun.file(join(output, "clips.json")).json() as { name: string; seconds: number }[];
-for (const name of names) {
+for (const name of rekeyed.length > 0 ? [] : names) {
   ensure(!source.Sequences.some(s => s.Name === name), "Author against the input preceding the locomotion suffix");
   const sequence = motion.Sequences.find(s => s.Name === name);
   ensure(sequence, `${name}: Blender export missing`);
@@ -31,14 +53,10 @@ for (const name of names) {
   tracks(model, (track, path) => {
     const original = originals.get(path);
     if (!original || onGlobalClock(original)) return;
-    const skeletal = /^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation|Scaling)$/.exec(path);
-    const node = skeletal ? source[skeletal[1] as "Bones" | "Helpers"][Number(skeletal[2])] : undefined;
-    const authoredNode = node ? motion.Nodes.find(n => n?.Name === node.Name) : undefined;
-    const authoredTrack = skeletal && authoredNode ? authoredNode[skeletal[3] as "Rotation" | "Translation" | "Scaling"] : undefined;
-    const run = authoredTrack?.Keys.filter(k => k.Frame >= sequence.Interval[0] && k.Frame <= sequence.Interval[1]);
-    if (node && run?.length) {
-      ensure(track.LineType === authoredTrack?.LineType, `${node.Name}: interpolation differs from shipped rig`);
-      track.Keys.push(...run.map(k => ({ ...k, Frame: start + k.Frame - sequence.Interval[0] })));
+    const keys = authoredKeys(path, sequence);
+    if (keys) {
+      ensure(track.LineType === keys.lineType, `${keys.name}: interpolation differs from shipped rig`);
+      track.Keys.push(...keys.run.map(k => ({ ...k, Frame: start + k.Frame - sequence.Interval[0] })));
     } else {
       const first = original.Keys.find(k => k.Frame >= donor.Interval[0] && k.Frame <= donor.Interval[1]);
       if (!first) return;
@@ -48,16 +66,16 @@ for (const name of names) {
   clips.push({ name, seconds: length / 1000 });
 }
 const bytes = generateMDX(model), before = new DrawnModel(sourceBytes, 1), after = new DrawnModel(bytes, 1);
-for (const [index, sequence] of source.Sequences.entries()) for (const progress of [0, .5, 1]) {
+for (const [index, sequence] of source.Sequences.entries()) for (const progress of rekeyed.includes(sequence.Name) ? [] : [0, .5, 1]) {
   const seconds = (sequence.Interval[1] - sequence.Interval[0]) * progress / 1000;
   const a = before.triangles(index, seconds, 1), b = after.triangles(index, seconds, 1);
   ensure(a.length === b.length && a.every((v, i) => Math.abs(v - (b[i] ?? Infinity)) < .001), `${sequence.Name}: older pose changed`);
 }
 const packaged = parseMDX(bytes);
-ensure(packaged.Sequences.length === source.Sequences.length + 3, "Three motion clips must append");
+ensure(packaged.Sequences.length === source.Sequences.length + (rekeyed.length > 0 ? 0 : 3), "Three motion clips append, or re-keyed clips stay in place");
 for (const file of ["DemonHunterFighter.mdx", "demonhunter-fighter.mdl", "clips.json", "bindings.json"]) chmodSync(join(output, file), 0o644);
 await Bun.write(join(output, "DemonHunterFighter.mdx"), bytes);
 await Bun.write(join(output, "demonhunter-fighter.mdl"), generateMDL(packaged));
 await Bun.write(join(output, "clips.json"), JSON.stringify(clips, null, 2));
 await Bun.write(join(output, "bindings.json"), JSON.stringify(clips.map(c => ({ ...c, index: model.Sequences.findIndex(s => s.Name === c.name) })), null, 2));
-console.log("ILLIDAN_LOCOMOTION_PASS", source.Sequences.length, "old clips preserved; appended", names.join(", "));
+console.log("ILLIDAN_LOCOMOTION_PASS", source.Sequences.length, "old clips preserved;", rekeyed.length > 0 ? `re-keyed in place: ${rekeyed.join(", ")}` : `appended ${names.join(", ")}`);

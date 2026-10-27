@@ -251,7 +251,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 
 - Illidan locomotion authoring (from the repository root): run Blender with
   `--python tools/animations/illidan-locomotion.py -- PRIVATE_FIGHTER.blend PRIVATE_AUTHORED`,
-  then `bun tools/animations/illidan-locomotion.ts PRIVATE_ASSETS PRIVATE_AUTHORED PRIVATE_OUTPUT`.
+  then `bun tools/animations/illidan-locomotion.ts PRIVATE_ASSETS PRIVATE_AUTHORED PRIVATE_OUTPUT [CLIP_NAME...]`;
+  named clips are re-keyed in place at their indices, otherwise the three clips append.
   Package with `bun tools/animations/package-illidan.ts PRIVATE_OUTPUT --metadata-only`,
   store `illidan-animation`, and refresh the original clip pool.
 
