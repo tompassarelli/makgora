@@ -1518,7 +1518,7 @@ above; damage and launch classes are provisional. The move list
 | Forward air | 14/4/30, land 20 | 13 | 1.25H | Kills; reaches less than the forward tilt |
 | Back air | 11/4/26, land 18 | 13 | 1.1H | His strongest aerial |
 | Up air | 10/5/25, land 16 | 12 | arc to 1.45H | |
-| Down air, Frostmourne Plunge | 18/5/33, land 26 | 14 | 0.55H below | Spikes in the air, 55 degrees on the ground |
+| Down air, Frostmourne Plunge | 14/5/37, land 26 | 14 | 0.55H below | Spikes in the air, 55 degrees on the ground |
 
 Grab 9/2/30. Throws: forward 10 (EDGE), back 12 (KILL), up 8 (JUGGLE), and
 **Harvest Soul**, the down throw: 6 (CHASE).

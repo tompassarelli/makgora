@@ -139,11 +139,11 @@ function aerials(kit: Kit): Clip[] {
             strike: { ...TUCK, lean: -14, handR: [10, -26, 140], aim: 92, handL: [-10, 26, 120] },
             follow: { ...TUCK, lean: -18, handR: [-16, -26, 128], aim: 150 },
         }), AIR),
-        author(kit, "Aerial Down", swing(zero(18), 5, 55, {
+        author(kit, "Aerial Down", swing(zero(14), 5, 55, {
             start: FALL, wind: { ...TUCK, lean: -8, handR: [14, -24, 140], aim: 92, handL: [12, -6, 138] },
             strike: { footR: [10, -16, 30], footL: [-10, 14, 26], lean: 10, handR: [16, -22, 76], aim: -90, handL: [14, -8, 80] },
             follow: { footR: [10, -16, 28], footL: [-10, 14, 24], lean: 8, handR: [16, -22, 78], aim: -88, handL: [14, -8, 82] },
-            windAt: 10, followAt: zero(22) + 10,
+            windAt: 8, followAt: zero(18) + 10,
         }), AIR),
     ];
 }

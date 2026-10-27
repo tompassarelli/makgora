@@ -73,7 +73,7 @@ const LICH_KING_BODY: FighterHurtboxes = {
     [AttackStyle.forwardAir]: reaching(14, 4, arm(20.0, 96.0, 70.0, 86.0)),
     [AttackStyle.backAir]: reaching(11, 4, BACK_ARM),
     [AttackStyle.upAir]: reaching(10, 5, RAISED_ARM),
-    [AttackStyle.downAir]: reaching(18, 5, arm(6.0, 60.0, 10.0, 8.0)),
+    [AttackStyle.downAir]: reaching(14, 5, arm(6.0, 60.0, 10.0, 8.0)),
     [AttackStyle.getupAttack]: [
       hurtPose(0, 2, [hurtPart(30.0, 28.0, 30.0, 28.0, 56.0)]),
       hurtPose(3, 5, [hurtPart(24.0, 24.0, 24.0, 24.0, 60.0)]),
@@ -236,7 +236,7 @@ export const LICH_KING_MOVES: FighterMoves = {
       capsule(-2.0, 128.0, -15.0, 246.0),
     ], hit(15.0, "LAUNCH", 85))),
 
-    [AttackStyle.downAir]: heroMove(18, 5, 33, 23, path(18, [
+    [AttackStyle.downAir]: heroMove(14, 5, 37, 23, path(14, [
       capsule(8.0, 30.0, 8.0, -46.0, 14.0),
       capsule(6.0, 30.0, 6.0, -52.0, 14.0),
       capsule(4.0, 30.0, 4.0, -56.0, 14.0),
