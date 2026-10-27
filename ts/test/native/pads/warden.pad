@@ -35,11 +35,11 @@
 #! expect b 230 damage 3.816
 #! expect b 290 damage 4.816 hitlag 0 hitstun 0
 #! expect a 290 special 14 form 4
-#! expect b 307 damage 12.449
-#! expect a 333 special 0 form 4 action-frame 0 x 143.315
+#! expect b 311 damage 12.449
+#! expect a 337 special 0 form 4 action-frame 0 x 143.315
 #! expect a 440 special 14 form 0
-# #273 made Pursuit Lunge cut through what it passes; #487 holds its windup through frame 13, so the lunge on 440 meets b on 453, stuns it and turns a to face it from its far side.
-#! expect b 453 damage 20.082
+# #273 made Pursuit Lunge cut through what it passes; the side special holds its windup through frame 17, so the lunge on 440 meets b on 457, stuns it and turns a to face it from its far side.
+#! expect b 457 damage 20.082
 #! expect a 600 special 16 form 0
 # #272 gave Fan of Knives Immolate's frames 4-7 and a set knockback at a low angle, so it hits on 603 and poisons from there.
 #! expect b 603 damage 26.188

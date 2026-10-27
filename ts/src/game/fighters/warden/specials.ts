@@ -29,7 +29,7 @@ const SHADOW_STRIKE: AuthoredSpecial = {
 
 
 const LUNGE_TRAVEL_FRAMES = 10;
-const LUNGE_FIRST = 14;
+const LUNGE_FIRST = 18;
 const LUNGE_LAST = LUNGE_FIRST + LUNGE_TRAVEL_FRAMES - 1;
 const LUNGE_SPEED = f32(H / f32(LUNGE_TRAVEL_FRAMES));
 const LUNGE_STUN_FRAMES = 52;
@@ -55,7 +55,7 @@ const PURSUIT_REACH = f32(H * f32(2.5));
 const SHADOW_PURSUIT: AuthoredSpecial = {
   endFrame: 40,
   motion: [{ ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, relocate: Relocation.behindMark, relocateReach: PURSUIT_REACH }],
-  regions: [heroRegion(18, 20, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(PURSUIT_STUN_FRAMES))],
+  regions: [heroRegion(22, 24, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(PURSUIT_STUN_FRAMES))],
 };
 
 

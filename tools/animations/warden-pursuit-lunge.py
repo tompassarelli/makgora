@@ -1,4 +1,4 @@
-"""Blender boundary: author Maiev's Pursuit Lunge (#487), a held glaive windup driven into a lunge on frame 14.
+"""Blender boundary: author Maiev's Pursuit Lunge (#487), a held glaive windup driven into a lunge on frame 18.
 
 The rig comes from `attack-gesture-clips.ts PRIVATE_ASSETS OUT --character 5 --replace-pose sideSpecial --rig RIG.json`:
 every node becomes a bone with identity rest orientation, so a bone's local rotation and location are the model's
