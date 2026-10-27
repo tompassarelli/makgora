@@ -15,4 +15,5 @@ export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
   medivh: ["side-special", "up-special", "down-special", "ultimate"],
   "chen-stormstout": ["neutral-special", "ultimate"],
   "pit-lord": ["neutral-special", "up-special"],
+  "sylvanas-windrunner": ["side-special", "ultimate"],
 };
