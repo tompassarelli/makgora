@@ -57,3 +57,23 @@ export function judgeCrop(frames: readonly (ScoreFrame | undefined)[], heights: 
   const x = Math.max(0, Math.floor(left - MARGIN_PIXELS)), y = Math.max(0, Math.floor(top - MARGIN_PIXELS));
   return { width: Math.min(FRAME_WIDTH, Math.ceil(right + MARGIN_PIXELS)) - x, height: Math.min(FRAME_HEIGHT, Math.ceil(bottom + MARGIN_PIXELS)) - y, x, y };
 }
+
+export interface JudgeFacing {
+  readonly sign: number;
+  readonly yaw: number;
+  readonly caption: string;
+  readonly pose: (pose: ScoreFrame | undefined) => ScoreFrame | undefined;
+  readonly cues: (cues: readonly SampledCue[]) => SampledCue[];
+}
+
+const facing = (sign: number): JudgeFacing => ({
+  sign,
+  yaw: sign < 0 ? Math.PI : 0,
+  caption: sign < 0 ? " Here the fighter faces left." : "",
+  pose: (pose) => pose && { ...pose, vertices: pose.vertices.map((value, index) => index % 2 === 0 ? sign * value : value) },
+  cues: (cues) => cues.map((cue) => ({ ...cue, x: sign * cue.x })),
+});
+
+const SIDES: Readonly<Record<string, JudgeFacing>> = { right: facing(1), left: facing(-1) };
+
+export const judgeFacing = (side = "right"): JudgeFacing | undefined => Object.hasOwn(SIDES, side) ? SIDES[side] : undefined;

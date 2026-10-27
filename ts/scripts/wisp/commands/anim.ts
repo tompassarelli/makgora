@@ -23,7 +23,7 @@ import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, type ScoreFrame, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type SampledCue, type SampledMove, SCORED_NORMALS, SCORED_SPECIALS, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
-import { CAMERA_LIFT, heldOffset, judgeCamera, judgeCrop, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
+import { CAMERA_LIFT, heldOffset, judgeCamera, judgeCrop, judgeFacing, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, JUMP_LINES, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGE_LINES, clipIdentity, judgePanel, judgedLine, judgementKey, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { JUDGE_MAX_GAP, judgeKeyFrames } from "../animJudgeFrames";
@@ -317,10 +317,8 @@ const fetchReferences = Effect.gen(function*() {
 
 const prepare = (args: readonly string[]) => Effect.gen(function*() {
   const flags = parseFlags(args, ["--fighter", "--move", "--out", "--assets", "--facing"]);
-  const out = flags?.get("--out")?.[0], look = "classic", side = flags?.get("--facing")?.[0] ?? "right";
-  if (flags === undefined || out === undefined || (side !== "right" && side !== "left")) return yield* new UsageFailure({ problem: "anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... [--facing right|left]" });
-  const facing = side === "left" ? -1 : 1;
-  const mirrored = (pose: ScoreFrame | undefined): ScoreFrame | undefined => pose && { ...pose, vertices: pose.vertices.map((value, index) => index % 2 === 0 ? facing * value : value) };
+  const out = flags?.get("--out")?.[0], look = "classic", facing = judgeFacing(flags?.get("--facing")?.[0]);
+  if (flags === undefined || out === undefined || facing === undefined) return yield* new UsageFailure({ problem: "anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... [--facing right|left]" });
   const output = resolve(out);
   if (!relative(projectRoot, output).startsWith("..")) return yield* new UsageFailure({ problem: "judge renders stay outside the repository (their references are private)" });
   const wanted = flags.get("--move");
@@ -337,8 +335,8 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (sampled === undefined) continue;
     const reference = referenceFor(references, row.fighter, row.move);
     const indices = judgeKeyFrames(judgeKeys(row));
-    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), travels: indices.map((index) => facing * (sampled.travels[index] ?? 0)), cues: indices.map((index) => (sampled.cues[index] ?? []).map((cue) => ({ ...cue, x: facing * cue.x }))), poses: indices.map((index) => mirrored(sampled.sample.frames[index])), labels: indices.map((index) => judgeFrameLabel(judgeKeys(row), index)),
-      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}${row.score.keys.hitWindups.length > 0 ? `, each later hit's windup on ${row.score.keys.hitWindups.join(", ")}` : ""}` : ""}, last active, recovery, end of ${row.frames.end}, with active and recovery frames between them at most ${JUDGE_MAX_GAP} frames apart). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.${sampled.cues.some((frame) => frame.length > 0) ? " The flare at the hit is the move's own spell effect, drawn as in a match." : ""}${facing < 0 ? " Here the fighter faces left." : ""}`, movement: false });
+    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), travels: indices.map((index) => facing.sign * (sampled.travels[index] ?? 0)), cues: indices.map((index) => facing.cues(sampled.cues[index] ?? [])), poses: indices.map((index) => facing.pose(sampled.sample.frames[index])), labels: indices.map((index) => judgeFrameLabel(judgeKeys(row), index)),
+      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}${row.score.keys.hitWindups.length > 0 ? `, each later hit's windup on ${row.score.keys.hitWindups.join(", ")}` : ""}` : ""}, last active, recovery, end of ${row.frames.end}, with active and recovery frames between them at most ${JUDGE_MAX_GAP} frames apart). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.${sampled.cues.some((frame) => frame.length > 0) ? " The flare at the hit is the move's own spell effect, drawn as in a match." : ""}${facing.caption}`, movement: false });
   }
   for (const entry of wanted ?? []) {
     const [slug = "", move = ""] = entry.split(":");
@@ -371,7 +369,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
       scenes.push({
         ...base, frame: id, units: [], ui: [], textTags: [],
         camera: { ...base.camera, x: strip.movement ? 0 : heldOffset(strip.travels, index, judgePixelsPerUnit()), y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: FLOOR_HEIGHT + (strip.movement ? 0 : heldOffset(strip.heights, index, judgePixelsPerUnit())) + CAMERA_LIFT, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
-        effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: strip.travels[index] ?? 0, y: 0, z, yaw: facing < 0 ? Math.PI : 0, teamColor: 0, alpha: 255 },
+        effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: strip.travels[index] ?? 0, y: 0, z, yaw: facing.yaw, teamColor: 0, alpha: 255 },
           ...(strip.cues[index] ?? []).flatMap((placed) => {
             const cue = DISJOINT_CUES[character];
             return cue === undefined ? [] : [{ ...bodyEffect, model: cue.model, animation: cue.sequence ?? ACCENT_SEQUENCE, animationElapsed: (cue.seconds ?? ACCENT_SECONDS) + (cue.timeScale ?? 0.0) * placed.age / 60, animationClock: 0, timeScale: 0, x: placed.x, y: CUE_FRONT, z: FLOOR_HEIGHT + placed.z, yaw: 0, pitch: 0, scale: placed.scale * (cue.scale ?? 0.5), teamColor: 0, alpha: 255 }];
