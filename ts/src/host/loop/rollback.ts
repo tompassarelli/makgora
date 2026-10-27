@@ -28,7 +28,7 @@ import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame, presentPredictedHits } from "./frame";
 import { ownConfirmedState } from "./confirmedState";
-import { noteCallbackClockRow } from "./callbackClock";
+import { noteCallbackClockRemoteRow, noteCallbackClockRow } from "./callbackClock";
 import { pollLocalKeys } from "./inputs";
 import { beginFrameSection, endFrameSection } from "wisp/src/map/frameSections";
 import { CONFIRMED_SECTION, RECONCILE_SECTION, SPECULATIVE_SECTION } from "./frameSections";
@@ -417,6 +417,7 @@ function receivePacket(s: ShellState, rollback: Rollback, sender: number, packet
     if (receipt === "accepted") {
       probeInput(probe, "receive", packet.epoch, sender, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
       if (local) probeTransportReceive(probe, packet.epoch, frame);
+      else noteCallbackClockRemoteRow(sender, frame, row.pressed);
     }
     if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, sender, local, frame, schedule.speculativeFrame());
     if (trace.active && local) recordEcho(trace, packet.epoch, frame, receivedCallback, receivedSeconds);

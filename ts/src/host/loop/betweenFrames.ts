@@ -60,13 +60,24 @@ export function beginPresentedFrame(moving: boolean): void {
 }
 
 
+export function burstAlpha(): number {
+  const { tick } = state();
+  if (tick === undefined) return -1.0;
+  const ticks = TimerGetElapsed(tick) / FRAME_SECONDS;
+  return ticks - Math.floor(ticks);
+}
+
+
+export function drawnAlpha(): number {
+  return state().drawnAlpha;
+}
+
+
 export function drawBetweenFrames(): void {
   const frames = state();
   frames.drawsSinceTick++;
-  const { tick } = frames;
-  if (tick === undefined) return;
-  const ticks = TimerGetElapsed(tick) / FRAME_SECONDS;
-  const alpha = ticks - Math.floor(ticks);
+  if (frames.tick === undefined) return;
+  const alpha = burstAlpha();
   if (alpha >= frames.drawnAlpha && alpha < frames.drawnAlpha + DRAW_STEP) return;
   frames.drawnAlpha = alpha;
   effectMotion().draw(alpha);

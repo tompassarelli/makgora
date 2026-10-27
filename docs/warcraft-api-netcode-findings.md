@@ -1602,3 +1602,74 @@ on both clients: median 5.00 ms against 6.04 predicted (+21%), p95
 against 34.24. It exits FAIL on its 20% median and p95 rule. The
 prediction comes from `perf bot`'s bot-only match, not from this two-human
 match with one CPU.
+
+## Remote key events against remote sync rows, and drawing at burst game time (smashcraft#419, 27 October 2026)
+
+Asked (#14, N3 and N4): does a client see the opponent's synchronized key
+event or the opponent's frame-stamped input row first, and how far does the
+picture trail each burst's game time with and without `-dev smooth-draw`?
+Measured on Warcraft III 3.0.0.24268 (Classic, offline LAN pair 0 on gex45,
+60 fps cap, Wisp's LAN host deadline-paced at 25 ms turns), integrity build
+of this commit, Rifleman quick match with nine stocks, light scripted taps of
+`c` for 50–90 ms every 280–520 ms on both clients through private-desktop
+XTEST. One match: 20 s of taps thrown away, then an 80 s capture with
+`-dev smooth-draw on` and an 80 s capture with `-dev smooth-draw off`. The
+host relayed every turn with no desync. Other sessions' LAN pairs ran on the
+same host; `/proc/pressure/cpu` some avg60 read 37–53% around the captures,
+and both clients stalled for stretches of the match.
+
+Method. `-dev callback-clock` (v=3, smashcraft:ts/src/host/loop/callbackClock.ts)
+now also records, on `os.clock`, every remote key-down and key-up of the probe
+key (`D`, `U`), every accepted remote input row that carries a press (`s`,
+with its frame), and one `b` token per turn burst: the burst's last Lua
+callback, the game time of a probe timer, the burst's frame phase
+(smashcraft:ts/src/host/loop/betweenFrames.ts `burstAlpha`), the drawn phase
+(`drawnAlpha`), and the burst's draw and tick callbacks. A burst ends at a
+gap of 2 ms or more between Lua callbacks. N3 pairs taps exactly: the
+receiver's k-th remote key-down is the sender's k-th tap (both clients see the
+same synchronized events in the same order); on the sender's own clock its
+pressed-row captures are aligned in order to its own key-down echoes, a tap
+with no captured row being skipped; and the receiver's `s` row with the same
+frame is that tap's row. N4 takes each burst's game time against what it
+presents: with smooth-draw on, a point between the last two simulation frames
+at the drawn phase (one frame behind by design); with it off, the latest
+simulation frame.
+
+**N3: the key event arrives first.** Not one of 718 paired taps had its row
+arrive before its key event:
+
+| Run | Sender to receiver | Taps | Taps with a pressed row | Key event first | Same burst | Row first | Row after key p10/p50/p90/max ms | p50 by fifth of the run, ms | Callbacks p50 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| smooth-draw on | b to a | 192 | 171 | 169 | 2 | 0 | 133 / 1,746 / 2,515 / 3,410 | 160, 1,093, 2,099, 1,951, 2,130 | 102 |
+| smooth-draw on | a to b | 187 | 178 | 175 | 3 | 0 | 25 / 208 / 2,007 / 3,224 | 1,872, 228, 147, 139, 112 | 9 |
+| smooth-draw off | b to a | 192 | 192 | 187 | 5 | 0 | 16 / 83 / 825 / 1,875 | 873, 74, 74, 56, 47 | 6 |
+| smooth-draw off | a to b | 187 | 178 | 177 | 0 | 0 | 82 / 1,415 / 2,031 / 2,819 | 82, 398, 1,677, 1,553, 1,829 | 83 |
+
+In steady stretches the row trails its key event by 47–228 ms at the median;
+in stretches where the sender's rows back up, by 1–2 seconds, and the
+receiver's speculative frame then runs 72–125 frames ahead of its confirmed
+frame (24–30 in steady stretches, the `r` checkpoints). The key event carries
+no frame, so it can tell rollback that a press is coming, not on which frame.
+Taps with no pressed row (21, 9, 0 and 9 of them) are the dropped taps of
+smashcraft#218: the stalled sender's pressed-row capture never saw them.
+
+**N4: drawing at burst game time trades about 1.6 ms of median latency for
+even steps.** Game minus presented time per burst, and how far each burst's
+presented step differs from its game step:
+
+| Run | Client | Bursts | Game minus presented p10/p50/p90/max ms | Presented step minus game step p50/p90/p99 ms | Bursts with no draw after their tick |
+| --- | --- | --- | --- | --- | --- |
+| smooth-draw on | a | 6,723 | 17.6 / 17.6 / 19.6 / 20.6 | 1.0 / 2.9 / 2.9 | 101 |
+| smooth-draw on | b | 6,150 | 17.6 / 17.6 / 18.6 / 20.6 | 0.0 / 2.0 / 2.9 | 93 |
+| smooth-draw off | a | 5,638 | 7.6 / 16.1 / 16.6 / 16.6 | 0.1 / 12.7 / 15.9 | 0 |
+| smooth-draw off | b | 6,200 | 4.0 / 15.9 / 16.5 / 16.6 | 4.9 / 13.7 / 16.2 | 0 |
+
+Each capture ran 4,800 frames. Off, the picture holds the last simulation
+frame, so it trails game time by anything from 0 to one frame and a burst's
+step on screen misses its game step by up to a frame (p90 12.7–13.7 ms).
+On, the picture trails by one frame plus 0.9–3.9 ms and each step matches its
+game step within 2.9 ms at p99. That misses the 0.5 ms a burst that
+docs/high-refresh.md asks before players' builds turn it on, and these are
+placements from Lua, not drawn pixels, so the default stays off. Bursts with
+no draw after their tick (1.5%) keep the placement from before the tick and
+are left out of the on rows.
