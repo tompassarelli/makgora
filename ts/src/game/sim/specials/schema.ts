@@ -372,6 +372,8 @@ export interface AuthoredSpecial {
   /** Its user gets back her air jump and air-once specials whenever it ends, as a landing would give. */
   readonly refreshesAir?: true | undefined;
 
+  readonly refire?: FrameWindow | undefined;
+
   readonly jumpCancelFrame?: number | undefined;
 
   readonly jumpWindow?: FrameWindow | undefined;

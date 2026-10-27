@@ -20,6 +20,7 @@ import { DamagePose, contactDamageClip, damagePose } from "./damagePose";
 import * as dh from "./demonHunterAssetInfo";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
+import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
 import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
@@ -338,7 +339,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
       pose.clipTime = peonRestClipTime(f.special.frame);
       return 0.0;
     }
-    playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}`, fighterSpecialClip(f).index);
+    playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}${refireKey(f)}`, fighterSpecialClip(f).index);
     return rate;
   }
   if (holdsSpecialEnd(pose, f)) return 0.0;
@@ -734,7 +735,7 @@ function fighterSpecialClip(f: Readonly<Fighter>): HeroClip {
     return clips.clipFor(f.character, f.motion.grounded ? "sideSpecialFollowUp" : "sideSpecialFollowUpAir");
   }
   const aerialShot = f.special.duration === RIFLEMAN_BLASTER_AIR_FRAMES;
-  return clips.specialClip(f.character, f.special.action, f.motion.grounded, aerialShot, playsFollowUpPose(f), f.special.form >= FOLLOW_UP_FORM ? idiv(f.special.form, FOLLOW_UP_FORM) - 1 : 0);
+  return refiredClip(f, clips.specialClip(f.character, f.special.action, f.motion.grounded, aerialShot, playsFollowUpPose(f), f.special.form >= FOLLOW_UP_FORM ? idiv(f.special.form, FOLLOW_UP_FORM) - 1 : 0));
 }
 
 function damageClipPose(reaction: DamagePose): HeroPose {
@@ -796,7 +797,7 @@ function locomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion): number
 
 function specialRate(f: Readonly<Fighter>): number {
   const clip = fighterSpecialClip(f);
-  const even = clipRate(clip.seconds, f.special.duration);
+  const even = clipRate(clip.seconds, refireClipFrames(f));
   const { action, frame } = f.special;
   const move = playsFollowUpPose(f) ? undefined : runningHeroSpecial(f);
   if (move === undefined) return even;

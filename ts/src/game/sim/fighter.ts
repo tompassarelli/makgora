@@ -277,6 +277,8 @@ interface Special {
   /** Frames banked by a charging special; kept through other actions until a swing spends it. */
   charge: number;
 
+  refire: boolean;
+  refires: number;
   guarded: boolean;
   egg: boolean;
 }
@@ -680,6 +682,8 @@ export function createFighter(character: Character, startX: number, facing: numb
       grabFrame: 0,
       seekTarget: 0,
       charge: 0,
+      refire: false,
+      refires: 0,
       guarded: false,
       egg: false,
     },

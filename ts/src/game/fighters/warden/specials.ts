@@ -19,12 +19,13 @@ const blade = (x1: number, z1: number, x2: number, z2: number, radius = KNIFE_RA
 export const POISON: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
 const SHADOW_STRIKE_SPAWN_FRAME = 10;
 const SHADOW_STRIKE_FRAMES = 36;
+const SHADOW_STRIKE_REFIRE = frames(4, 13);
 const SHADOW_STRIKE: AuthoredSpecial = {
-  endFrame: SHADOW_STRIKE_FRAMES,
+  endFrame: SHADOW_STRIKE_FRAMES, refire: SHADOW_STRIKE_REFIRE,
   projectiles: [{
     model: "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx",
     spawnFrame: SHADOW_STRIKE_SPAWN_FRAME, offsetX: 30.0, offsetZ: 50.0, velocityX: f32(H * f32(0.11)), velocityZ: 0.0,
-    life: 30, radius: f32(H * f32(0.13)), effect: wardenHit(3.8163399696350098, "POKE", 35, 1.0, HitElement.poison), reflectable: true, limit: 2, status: POISON,
+    life: 30, radius: f32(H * f32(0.13)), effect: wardenHit(3.8163399696350098, "POKE", 35, 1.0, HitElement.poison), reflectable: true, limit: 3, status: POISON,
   }],
 };
 const SHADOW_STRIKE_AIR: AuthoredSpecial = { ...SHADOW_STRIKE, landingLag: 0 };
@@ -102,7 +103,7 @@ const FAN_OF_KNIVES_AIR: AuthoredSpecial = {
 };
 
 export const WARDEN_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target; it leaves on frame 10 of 36, on the ground or in the air, and landing in the air cuts the rest short.", ground: SHADOW_STRIKE, air: SHADOW_STRIKE_AIR }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target; it leaves on frame 10 of 36, on the ground or in the air; press again from frame 4 to throw another 10 frames later, so a short hop throws two, and landing in the air cuts the rest short.", ground: SHADOW_STRIKE, air: SHADOW_STRIKE_AIR }, { damage: 1.25 }),
   side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a Pursuit Lunge that cuts through them and turns to face them. Either hit stuns in place for a grab or Fan of Knives; a second stun within two seconds only knocks them away.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { damage: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
   down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, marking and poisoning them; on the ground it pushes them away along a low angle with shine's knockback at every percent, so a light foe tumbles and a heavy one does not, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. On the ground she slides on the speed she had, slowing only by traction, and in the air she stops sideways as it starts. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),

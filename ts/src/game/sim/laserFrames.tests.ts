@@ -1,4 +1,5 @@
 import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
 import { airborne, fighter, frame, scene } from "../match/padScene";
 import { Character } from "./codes";
@@ -36,6 +37,7 @@ interface Moment {
   readonly grounded: boolean;
   readonly landed: number | undefined;
   readonly lastStart: number | undefined;
+  readonly shots: number;
 }
 
 interface Played {
@@ -49,7 +51,7 @@ interface Played {
 type Hop = "none" | "short" | "full" | "drop";
 
 /** Steps one fighter through a hop (or none), pressing neutral special on the ticks `press` names, fast falling from the apex when asked. */
-function play(character: Character, hop: Hop, fastFall: boolean, press: (moment: Moment) => boolean): Played {
+function play(character: Character, hop: Hop, fastFall: boolean | ((moment: Moment) => boolean), press: (moment: Moment) => boolean): Played {
   const s = scene(0, [{ character, x: 0.0, facing: 1 }, { character: Character.blademaster, x: FOE_DISTANCE, facing: -1 }]);
   const user = fighter(s);
   if (hop === "drop") airborne(user, 0.0, DROP_HEIGHT);
@@ -66,8 +68,9 @@ function play(character: Character, hop: Hop, fastFall: boolean, press: (moment:
     const held: Action[] = [];
     if (tick === 1 && (hop === "short" || hop === "full")) held.push(hop === "short" ? Action.shortHop : Action.jump);
     const lastStart = starts[starts.length - 1];
-    if (press({ tick, airTicks, grounded, landed, lastStart })) held.push(Action.special);
-    if (fastFall && airTicks > 0 && !grounded && user.motion.vz <= 0.0) held.push(Action.moveDown);
+    const moment: Moment = { tick, airTicks, grounded, landed, lastStart, shots: spawns.length };
+    if (press(moment)) held.push(Action.special);
+    if ((typeof fastFall === "boolean" ? fastFall : fastFall(moment)) && airTicks > 0 && !grounded && user.motion.vz <= 0.0) held.push(Action.moveDown);
     frame(s, held);
     if (user.special.action !== 0 && user.special.frame === 1) starts.push(tick);
     user.projectiles.forEach((projectile, slot) => {
@@ -143,4 +146,31 @@ test("A full hop mashing the laser on every frame it is allowed fires one every 
     assertEquals(run.spawns.join(","), [...airShots, run.landed + groundShot].join(","), `${laser.name} full hop shots`);
     assertGreaterThan(airShots.length, 0);
   }
+});
+
+/** Fox's Blaster loops while B is pressed again: another shot every 10 frames from the first, a repeat press counting from frame 4 (meleeframedata.com/fox; SmashWiki Fox (SSBM)/Neutral special repeat window). */
+const FOX_REFIRE = { firstPress: 4, every: 10 };
+
+test("Shadow Strike short-hop double lasers as Fox does: B on the takeoff frame and again on the earliest refire frame throws two daggers before landing, Fox's refire apart, then lands with no lag, fast falling after the second or not [k4 reference melee]", () => {
+  const shot = FOX.airShot;
+  for (const fastFall of [false, true]) {
+    const run = play(Character.warden, "short", (moment) => fastFall && moment.shots >= 2,
+      (moment) => takeoff(moment) || (moment.lastStart !== undefined && moment.tick === moment.lastStart + FOX_REFIRE.firstPress - 1));
+    const label = fastFall ? "fast fall" : "no fast fall";
+    assertEquals(run.starts.length, 1, `${label}: one cast`);
+    const start = run.starts[0]!;
+    assertEquals(run.spawns.join(","), [start + shot - 1, start + shot - 1 + FOX_REFIRE.every].join(","), `${label}: daggers`);
+    assertGreaterThan(run.landed, run.spawns[1]!);
+    assertEquals(run.landingLag, 0, `${label}: landing lag`);
+    assertEquals(run.specialOnLanding, 0, `${label}: special on landing`);
+  }
+});
+
+test("Mashing Shadow Strike on the ground throws a dagger every 10 frames, Fox's Blaster rate, and a press before frame 4 does not loop it [k4 reference melee]", () => {
+  const mashed = play(Character.warden, "none", false, (moment) => floorMod(moment.tick, 2) === 1 && moment.tick <= 60);
+  const first = FOX.groundShot;
+  assertEquals(mashed.starts[0], 1);
+  assertEquals(mashed.spawns.slice(0, 5).join(","), [0, 1, 2, 3, 4].map((n) => first + n * FOX_REFIRE.every).join(","), "mashed daggers");
+  const early = play(Character.warden, "none", false, (moment) => moment.tick === 1 || moment.tick === FOX_REFIRE.firstPress - 1);
+  assertEquals(early.spawns.join(","), String(first), "a press on frame 3 does not loop");
 });

@@ -50,6 +50,7 @@ export type HeroStatePose = "dash" | "run" | "crouch" | "fall" | "landing" | "sh
 
 export type HeroFollowUpPose =
   | "neutralSpecialFollowUp" | "sideSpecialFollowUp" | "upSpecialFollowUp" | "downSpecialFollowUp"
+  | "neutralSpecialRefire" | "neutralSpecialRefireAir"
   | "neutralSpecialFollowUpAir" | "sideSpecialFollowUpAir" | "upSpecialFollowUpAir" | "downSpecialFollowUpAir";
 
 

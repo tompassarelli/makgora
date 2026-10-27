@@ -17,6 +17,7 @@ import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
 import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
+import { advanceRefire } from "./refire";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
@@ -983,6 +984,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move === undefined) return;
   if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
   if (holdSteeredShot(f, move, input)) return;
+  advanceRefire(f, move.refire, input);
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
