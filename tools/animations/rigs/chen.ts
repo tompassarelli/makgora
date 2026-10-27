@@ -15,6 +15,5 @@ export const classic = {
     'hip.R': 'Bone_Leg1_R',
     'knee.R': 'Bone_Leg2_R',
     'ankle.R': 'Bone_Foot_R',
-    weapon: 'Mesh10',
-    'weapon.L': 'Box02',
+    weapon: 'Mesh33',
 } as const;

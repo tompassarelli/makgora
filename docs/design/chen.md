@@ -153,13 +153,12 @@ clip start plus `sampleAttack` pose time. Measurements agree exactly after
 mirroring both facings. Staff measurements use the three distal solid-shaft
 vertices 118, 119 and 121, directly weighted to Mesh33; the hanging rope and
 flask are separate props. Limb measurements use the forward-most right-hand
-vertex 353; forward tilt also covers the raised hand extremity 349.
+vertex 353.
 
 The original live regions remain covered. Added connected capsules keep the
 original radii and effects. Jab 2 needs a different extension endpoint on each
 of its two active frames to cover the moving tip without increasing its radius.
-Forward tilt also follows the raised free hand to 59/114, using radius 12,
-so each jab has both less reach and less active area than the forward tilt.
+Each jab has both less reach and less active area than the forward tilt.
 Grab keeps its original authored declaration and shared standing, dash and
 pivot producers; staff geometry never extends its contact.
 
@@ -172,7 +171,7 @@ vertices over every active frame. Limb gaps use the forward-most tip.
 | jab | 4–5 / 3–4 | 11 | 108.99–108.99 / 105.89–105.89 | 61.99 | -11.91 | 109/106, r12 |
 | jab2 | 5–6 / 4–5 | 12 | 129.45–132.75 / 60.22–82.70 | 61.70 | -1.99 | 132/69 then 133/76, r11 |
 | jab3 | 7–9 / 6–8 | 13 | 111.49–111.52 / 90.85–90.93 | 54.36 | -13.80 | 112/91, r14 |
-| forwardTilt | 9–11 / 8–10 | 14 | 140.52–143.96 / 66.73–83.57 | 39.34 | -2.76 | 144/75 and hand 59/114, r12 |
+| forwardTilt | 9–11 / 8–10 | 14 | 140.52–143.96 / 66.73–83.57 | 39.34 | -2.76 | 144/75, r12 |
 | forwardTiltUp | 9–11 / 8–10 | 15 | 137.95–144.47 / 96.73–112.41 | 37.87 | -1.82 | 145/104, r12 |
 | forwardTiltDown | 9–11 / 8–10 | 16 | 141.92–145.20 / 45.57–62.61 | 48.21 | -3.11 | 146/54, r12 |
 | dashAttack | 10–14 / 9–13 | 19 | 108.78–108.80 / 105.67–105.88 | 44.27 | -23.84 | 109/106, r24 |
@@ -181,3 +180,17 @@ All authored extension coordinates are whole integers. Startup, recovery,
 damage, knockback, shield behavior, hurt poses, clips and private input pins
 are unchanged. Grab retains its original authored two-frame declaration and
 the shared producer's three live frames with zero hit effects.
+
+## Regions on the staff (#596)
+
+The weapon trace (#508) follows the staff shaft, Mesh33 in the left hand;
+Mesh10, which the rig named before, is the right sleeve. Staff moves keep
+their frames, damage and knockback with regions moved onto the drawn shaft:
+forward tilt drops the raised-hand capsule, up air lifts its region to the
+staff above the hat (-8/138 to 36/172), down smash follows the sweep frame by
+frame (front 36/63 to 115/48, under 11/41 to 70/-9 and -33/44 to -28/-31,
+back -55/78 to -111/21), and Storm Rise adds a radius 12 capsule across the
+overhead spin, -150/142 to 140/142, beside its body capsule. Palm, elbow,
+right-hand checks, the barrel shoulder and kicks (jab, jab 3, up tilt, down
+tilt, dash attack, up smash and the four kicking aerials) are limb strikes;
+Breath of Fire and the spirits of the ultimate are spell strikes.

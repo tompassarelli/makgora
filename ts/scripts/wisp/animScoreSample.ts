@@ -63,9 +63,6 @@ export const SCORED_SPECIALS: readonly { readonly move: string; readonly x: numb
 const PELVIS = [/^bone_pelvis/i, /^pelvis_bind_jnt$/i, /^pelvis$/i, /^hips$/i, /^bone rider waist$/i, /^bone koto waist/i, /^bone_butt$/i, /^spine_c0_0_jnt$/i, /^root$/i, /^bone_root/i];
 const CHEST = [/^bone_chest/i, /^chest$/i, /^bone neck$/i, /^bone_neck$/i, /^spine_c0_1_jnt$/i];
 
-
-
-
 const LIMBS: readonly (readonly [string, string, string])[] = [
   ["arm", "^bone_arm1_?{S}$", "^bone_hand_?{S}$"],
   ["arm", "^bone_upperarm{S}$", "^bone_hand{S}$"],
@@ -90,10 +87,12 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   warden: ["down-tilt"],
   "cairne-bloodhoof": ["down-special"],
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
+  "chen-stormstout": ["jab", "jab3", "up-tilt", "down-tilt", "dash-attack", "up-smash", "neutral-air", "forward-air", "back-air", "down-air"],
 };
 
 export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
   thrall: ["neutral-special", "down-special"],
+  "chen-stormstout": ["neutral-special", "ultimate"],
 };
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
