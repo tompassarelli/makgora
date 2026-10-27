@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { heroRegion, type StrikeCapsule } from "../../sim/heroMoves";
 import { withExKit } from "../../sim/exSpecialAuthoring";
@@ -19,20 +20,23 @@ const fireball = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 26, landingLag, hurt: kaelCastBody(6, 18, 44.0, 58.0), projectiles: [FIREBALL],
 });
 
-// FlameStrike1.mdx draws its column only in birth, from about 1.0 s to 4.7 s; its stand is fully transparent.
-const FLAME_STRIKE_PILLAR_SECONDS = 1.25;
-const FLAME_STRIKE_BURN_SECONDS = 2.0;
+// FlameStrike1.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the pillar plays that stretch across its burst and burn frames.
+export const FLAME_STRIKE_BURST_FRAMES = 6;
+export const FLAME_STRIKE_BURN_FRAMES = 30;
+export const FLAME_STRIKE_COLUMN_SECONDS = { from: f32(1.05), to: f32(5.1) } as const;
+export const FLAME_STRIKE_COLUMN_RATE = (FLAME_STRIKE_COLUMN_SECONDS.to - FLAME_STRIKE_COLUMN_SECONDS.from) / ((FLAME_STRIKE_BURST_FRAMES + FLAME_STRIKE_BURN_FRAMES) / 60);
+const FLAME_STRIKE_BURN_SEEK = FLAME_STRIKE_COLUMN_SECONDS.from + FLAME_STRIKE_COLUMN_RATE * FLAME_STRIKE_BURST_FRAMES / 60;
 export const FLAME_STRIKE_BURN: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 155.0, modelOffsetZ: -50.0,
-  modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_BURN_SECONDS, activeSeconds: FLAME_STRIKE_BURN_SECONDS },
+  modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_BURN_SEEK, activeSeconds: FLAME_STRIKE_BURN_SEEK, rate: FLAME_STRIKE_COLUMN_RATE },
   spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 48, radius: 45.0, effect: kaelHit(2.0, 80, 0.0, 0.0), burn: { every: 8 }, reflectable: false, limit: 1,
+  life: FLAME_STRIKE_BURN_FRAMES, radius: 45.0, effect: kaelHit(2.0, 80, 0.0, 0.0), burn: { every: 8 }, reflectable: false, limit: 1,
 };
 export const FLAME_STRIKE_BURST: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 155.0, modelOffsetZ: -50.0,
-  modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_PILLAR_SECONDS, activeSeconds: FLAME_STRIKE_PILLAR_SECONDS },
+  modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_COLUMN_SECONDS.from, activeSeconds: FLAME_STRIKE_COLUMN_SECONDS.from, rate: FLAME_STRIKE_COLUMN_RATE },
   spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 6, radius: 45.0, effect: kaelHit(14.0, 80, 90.30785369873047, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
+  life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(14.0, 80, 90.30785369873047, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
 };
 export const FLAME_STRIKE_RUNE: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx",

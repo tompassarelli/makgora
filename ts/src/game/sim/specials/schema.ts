@@ -133,7 +133,7 @@ export interface SpecialProjectile {
 
   readonly model?: string | undefined;
 
-  readonly modelAnimation?: { readonly sequence: string; readonly warningSeconds: number; readonly activeSeconds: number } | undefined;
+  readonly modelAnimation?: { readonly sequence: string; readonly warningSeconds: number; readonly activeSeconds: number; readonly rate?: number | undefined } | undefined;
 
 
   readonly returns?: { readonly age: number; readonly speed: number } | undefined;

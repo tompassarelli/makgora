@@ -7,7 +7,8 @@ import type { SpecialProjectile } from "../../sim/specials/schema";
 import { CARRIED_TEST_STAGE, mainDeckRight, mainDeckZ, surfaceZ } from "../../sim/stage";
 import { duelPair, lift, stepDuel } from "../../sim/testDuel";
 import { controls } from "../../sim/testWorld";
-import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURN, FLAME_STRIKE_BURST, FLAME_STRIKE_RUNE } from "./specials";
+import { projectedProjectile } from "../../presentation/projectilePose";
+import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURN, FLAME_STRIKE_BURST, FLAME_STRIKE_COLUMN_RATE, FLAME_STRIKE_COLUMN_SECONDS, FLAME_STRIKE_RUNE } from "./specials";
 
 const press = controls({ specialPressed: true, specialX: 1, specialHeld: true });
 const hold = controls({ specialHeld: true });
@@ -181,4 +182,34 @@ test("A rune held off a moving deck stays where it lands while the deck carries 
   const on = cast(0);
   assertEquals(on.runeZ, deckZ, "a tapped rune lands on the deck");
   assertTrue(on.drift > 30.0);
+});
+
+test("The pillar bursts about 0.6 s after its rune and burns out 0.6 s later, and its column model plays its whole fade across exactly those frames [k3 measure docs/design/kaelthas.md]", () => {
+  const { kael, world } = kaelDuel();
+  stepDuel(world, press);
+  stepUntil(world, kael, FLAME_STRIKE_RUNE);
+  let warning = 0;
+  let burstFrames = 0;
+  let burnFrames = 0;
+  const seconds: number[] = [];
+  for (let frame = 0; frame < 160 && (live(kael, FLAME_STRIKE_RUNE) !== undefined || live(kael, FLAME_STRIKE_BURST) !== undefined || live(kael, FLAME_STRIKE_BURN) !== undefined); frame++) {
+    if (live(kael, FLAME_STRIKE_RUNE) !== undefined) warning++;
+    for (const spec of [FLAME_STRIKE_BURST, FLAME_STRIKE_BURN]) {
+      const projectile = live(kael, spec);
+      if (projectile === undefined) continue;
+      if (spec === FLAME_STRIKE_BURST) burstFrames++; else burnFrames++;
+      seconds.push(projectedProjectile(kael, kael.projectiles.indexOf(projectile), true).animationSeconds ?? -1);
+    }
+    stepDuel(world, idle);
+  }
+  assertEquals(warning + 1, 34, "the rune warns for 34 frames, about 0.6 s");
+  assertEquals(burstFrames, 6, "the burst hits for 6 frames");
+  assertEquals(burnFrames, 30, "the burn lingers 30 frames, so the pillar's active window is 36 frames, 0.6 s");
+  assertEquals(seconds.length, burstFrames + burnFrames);
+  assertEquals(seconds[0], f32(FLAME_STRIKE_COLUMN_SECONDS.from), "the column starts at its fade-in");
+  for (let i = 1; i < seconds.length; i++) assertTrue(seconds[i]! > seconds[i - 1]!);
+  const span = f32(FLAME_STRIKE_COLUMN_RATE * (burstFrames + burnFrames) / 60);
+  assertTrue(Math.abs(span - (FLAME_STRIKE_COLUMN_SECONDS.to - FLAME_STRIKE_COLUMN_SECONDS.from)) < f32(0.001));
+  const last = seconds[seconds.length - 1]!;
+  assertTrue(last > f32(4.9) && last <= FLAME_STRIKE_COLUMN_SECONDS.to);
 });

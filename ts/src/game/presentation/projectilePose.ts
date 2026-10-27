@@ -43,8 +43,8 @@ export function projectedProjectile(fighter: Readonly<Fighter> | undefined, inde
   const armed = spec !== undefined && age >= first;
   const animation = spec?.modelAnimation;
   const animationSeconds = animation === undefined ? undefined : armed
-    ? f32(animation.activeSeconds + f32((age - first) / 60))
-    : f32(animation.warningSeconds + f32(Math.max(0, age - 1) / 60));
+    ? f32(animation.activeSeconds + f32(f32((age - first) / 60) * (animation.rate ?? 1.0)))
+    : f32(animation.warningSeconds + f32(f32(Math.max(0, age - 1) / 60) * (animation.rate ?? 1.0)));
   return {
     visible: true,
     x: projectile.x,
