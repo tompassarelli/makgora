@@ -5,7 +5,7 @@ import { Character, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, type MoveRegion, type StrikeCapsule, heroRegion } from "../../sim/heroMoves";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, type SpecialMotion, type SpecialProjectile, type SpecialFollowUp, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../../sim/specials/schema";
-import { MEDIUM, SHORT, capsule, hit } from "./moves";
+import { SHORT, capsule, hit } from "./moves";
 
 
 
@@ -38,7 +38,7 @@ const leap = (distance: number): readonly SpecialMotion[] => chargedAngleMotion(
   index === 0 ? { ...segment, last: segment.last + LEAP_DELAY } : { ...segment, first: segment.first + LEAP_DELAY, last: segment.last + LEAP_DELAY });
 const FULL_LEAP = leap(heights(f32(2.7)));
 const THUNDER_LEAP = hit(8.645519256591797, "LAUNCH", 80, false, HitElement.electric);
-const LEAP_HAMMER = capsule(10.0, 60.0, 30.0, f32(MEDIUM + 20.0), 16.0);
+const LEAP_HAMMER = capsule(26.0, 41.0, 110.0, -5.0, 16.0);
 
 
 

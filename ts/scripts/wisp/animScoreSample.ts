@@ -32,7 +32,6 @@ import { capture, type PoseFrame } from "./hurtboxView";
 import { hitStarts } from "./animJudgeFrames";
 
 
-
 export const SCORED_NORMALS: readonly { readonly move: string; readonly style: AttackStyle; readonly moveClass: MoveClass; readonly aerial: boolean }[] = [
   { move: "jab", style: AttackStyle.jab, moveClass: "jab", aerial: false },
   { move: "jab2", style: AttackStyle.jab2, moveClass: "jab", aerial: false },
@@ -87,10 +86,12 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   warden: ["down-tilt", "down-smash", "down-air", "down-special"],
   "cairne-bloodhoof": ["down-special"],
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
+  "mountain-king": ["down-air"],
   "chen-stormstout": ["jab", "jab3", "up-tilt", "down-tilt", "dash-attack", "up-smash", "neutral-air", "forward-air", "back-air", "down-air"],
 };
 
 export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
+  "mountain-king": ["down-special", "ultimate"],
   thrall: ["neutral-special", "down-special"],
   "chen-stormstout": ["neutral-special", "ultimate"],
   "pit-lord": ["neutral-special", "up-special"],
