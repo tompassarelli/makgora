@@ -170,11 +170,11 @@ export interface SampledMove {
   readonly travels: readonly number[];
   readonly cues: readonly (readonly SampledCue[])[];
   readonly strikes: readonly (readonly Capsule[])[];
-  readonly regionFrames: readonly number[];
+  readonly regionFrames: readonly (number | undefined)[];
   readonly regionOwners: readonly (RegionOwner | undefined)[];
 }
 
-export interface RegionOwner { readonly regions?: readonly MoveRegion[] | undefined }
+export interface RegionOwner { readonly regions?: readonly MoveRegion[] | undefined; readonly beam?: unknown }
 
 export interface SampledCue { readonly x: number; readonly z: number; readonly scale: number; readonly age: number }
 
@@ -270,7 +270,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const activeFrames: number[] = [];
   const windows: number[][] = [];
   const strikes: Capsule[][] = [];
-  const regionFrames: number[] = [];
+  const regionFrames: (number | undefined)[] = [];
   const regionOwners: (RegionOwner | undefined)[] = [];
   let strike: { x: number; z: number } | undefined;
   let moveFrames = 0;
@@ -292,7 +292,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
       const placed = move?.placement?.frame === frame + 1 ? move.placement : undefined;
       windows[frames.length] = (move?.regions ?? []).filter((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined).map((candidate) => candidate.hit.window);
       regionFrames[frames.length] = frame;
-      regionOwners[frames.length] = move?.beam === undefined ? move : undefined;
+      regionOwners[frames.length] = move;
       strikes[frames.length] = move?.regionOrigin !== undefined ? [] : (move?.regions ?? []).flatMap((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined ? [{ ...candidate.hit.strike }] : []);
       if (region !== undefined || projectile !== undefined || grab !== undefined || placed !== undefined) {
         activeFrames.push(frames.length);
@@ -317,7 +317,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   if (ready === undefined) return undefined;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z), travels: travels(frames), cues: frames.map(() => []), strikes: frames.map((_, index) => strikes[index] ?? []),
-    regionFrames: frames.map((_, index) => regionFrames[index] ?? -1), regionOwners: frames.map((_, index) => regionOwners[index]),
+    regionFrames: frames.map((_, index) => regionFrames[index]), regionOwners: frames.map((_, index) => regionOwners[index]),
     sample: { moveClass: "special", limbStrike: isLimbStrike(character, entry.move), frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, regions: [], pixelsPerUnit },
   };
 }

@@ -87,7 +87,7 @@ function onBlade(capsules: readonly Capsule[], edge: Edge): (readonly number[])[
 
 export function fitMove(character: Character, sampled: SampledMove, frames: readonly number[], edges: readonly (readonly Edge[])[]): MoveFit | string {
   const owner = sampled.regionOwners[frames[0] ?? 0];
-  if (owner === undefined || frames.some(frame => sampled.regionOwners[frame] !== owner)) return 'its regions come from more than one move, a beam or no authored list';
+  if (owner === undefined || owner.beam !== undefined || frames.some(frame => sampled.regionOwners[frame] !== owner)) return 'its regions come from more than one move, a beam or no authored list';
   const key = ownerKey(character, sampled.move, owner);
   if (key === undefined) return 'its regions belong to no normal, special or ultimate of this fighter';
   const out: Record<number, (readonly number[])[]> = {};
