@@ -72,7 +72,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
 };
-interface Rake { contact: number; through: number; settle?: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
+interface Rake { contact: number; through: number; settle?: number; cock?: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
 const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
   windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
   strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
@@ -92,7 +92,7 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
   neutralSpecialAir: { contact: 18, through: 26, ...scythe(35, 15) },
   downSpecial: { contact: 21, through: 31, settle: 2, ...scythe(35, 15) },
   downSpecialAir: { contact: 21, through: 31, settle: 2, ...scythe(35, 15) },
-  ultimate: { contact: 17, through: 25, ...scythe(33, 14) },
+  ultimate: { contact: 17, through: 25, settle: 2, cock: 9, ...scythe(33, 14) },
 };
 const swings: Partial<Record<HeroPose, readonly [windup: number, follow: number]>> = {
   upSpecial: [0.8, 1],
@@ -276,7 +276,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
       }
       if (node && rake) {
         const poses = [rake.windup, rake.strike, rake.follow, rake.carry?.gesture ?? rake.follow].map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
-        const cocked = Math.max(1, rake.contact - 3), carried = rake.carry?.frame ?? rake.through, released = Math.min(action.frames - 1, rake.carry ? carried : rake.through + 2);
+        const cocked = Math.max(1, rake.contact - (rake.cock ?? 3)), carried = rake.carry?.frame ?? rake.through, released = Math.min(action.frames - 1, rake.carry ? carried : rake.through + 2);
         Vector = frame <= cocked ? blend(first.Vector, poses[0]!, frame / cocked)
           : frame <= rake.contact ? blend(poses[0]!, poses[1]!, (frame - cocked) / (rake.contact - cocked))
           : frame <= rake.through ? blend(poses[1]!, poses[2]!, (frame - rake.contact) / (rake.through - rake.contact))
