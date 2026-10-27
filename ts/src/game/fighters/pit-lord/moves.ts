@@ -197,7 +197,7 @@ export const PIT_LORD_MOVES: FighterMoves = {
     [AttackStyle.upAir]: heroMove(11, 4, 28, 18, path(11, along([[70, 111, 75, 283], [69, 106, 87, 277], [67, 100, 99, 271], [65, 96, 110, 263]], 18.0),
       hit(14.43239974975586, "LAUNCH", 85, 1.0, HitElement.normal))),
 
-    [AttackStyle.downAir]: heroMove(20, 5, 38, 28, path(20, along([[83, 136, -5, 277], [83, 135, -5, 277], [83, 135, -5, 277], [83, 135, -5, 277], [83, 135, -5, 277]], 18.0),
+    [AttackStyle.downAir]: heroMove(18, 5, 38, 28, path(18, along([[-15, 50, -38, -42], [-15, 50, -38, -42], [-15, 50, -38, -42], [-15, 50, -38, -42], [-15, 50, -38, -42]], 18.0),
       hit(21.64859962463379, "SPIKE", 270, 1.0, HitElement.normal), hit(21.64859962463379, "SPIKE", 55, 1.0, HitElement.normal))),
 
     [AttackStyle.grab]: heroMove(10, 3, 32, 0, [heroRegion(10, 12,

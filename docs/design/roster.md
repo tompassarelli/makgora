@@ -1136,7 +1136,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Forward air — Falling Cleaver | 19/4/36; L25 | 19 | XL, 40, KILL | Large slow arc, no meteor |
 | Back air — Tail Lash | 14/4/31; L20 | 15 | L, 35, EDGE | Body hurtbox covers the drawn tail within the legible-hurtbox reach |
 | Up air — Horn Thrust | 11/4/28; L18 | 12 | M, 85, LAUNCH | Narrow overhead body attack |
-| Down air — Four Hooves | 20/5/38; L28 | 18 | L, 270, SPIKE | No landing shockwave or bounce |
+| Down air — Glaive Plunge | 18/5/38; L28 | 18 | L, 270, SPIKE | Glaive raised overhead drives straight down under him; no landing shockwave or bounce |
 
 ### B specials
 
@@ -1176,7 +1176,7 @@ classes use provisional coefficients. Deliberate differences:
 - The standing grab is 10/3/32, one frame earlier than 11/3/31 with the
   same total, so it still catches a jump out of shield in the early-ascent
   window (#107).
-- Down air's hooves reach about 60 below his feet; his hurtboxes are fitted
+- Down air's glaive tip reaches about 45 below his feet, just behind his centre; his hurtboxes are fitted
   to the drawn body (weapon excluded) inside the legible-hurtbox limits, Tail
   Lash included, with no rule-6 departure (smashcraft:docs/gameplay-design.md).
 - His shield is the reference shield scaled by his 1.35 height (centre and

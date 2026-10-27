@@ -21,7 +21,7 @@ downward contact and recovery poses, fitted to the existing move frames.
 | Forsaken Paladin | -12…17 | -41.8…-32.5 / 45.4 | Down Air Hammer Drop #52 | Melee Link thrust, adapted to hammer | Fail → Pass: hammer down, opposite knee tucked |
 | Dreadlord | 0…12 | -47.8 / 53.5 | Down Air Claw Dive #51 | Melee Ganondorf contact below torso, adapted to claws | Fail → Pass: claws driven down from coil |
 | Shadow Hunter | -45.09…45.09 | -42 / 53.2 | Drill Down Air #40 | Melee Fox drill, adapted to glaive | Pass → Pass: leading leg below torso |
-| Pit Lord | -20…20 | -26 / 53.5 | Down Air Four Hooves #56 | Melee Ganondorf stomp, adapted to four hooves | Fail → Pass: cleave replaced by hoof stomp |
+| Pit Lord | -27 | 4 / 53.5 | Down Air Glaive Plunge #56 | Melee Link downward sword, adapted to glaive | Fail → Pass: the hoof stomp drew no strike below him (hooves 6 above the feet at contact, blade overhead); the glaive now drives down under him (2026-10-28) |
 | Beastmaster | -7.5…15 | -35.3…-32.8 / 59.56 | Down Air Twin Axe Drop #49 | Melee Link thrust, adapted to axes | Fail → Pass: axe heads below torso |
 | Lich King | 4…8 | -20…-15 / 60.28 | Aerial Down #40 | Melee Link downward sword | Pass → Pass: authored downward blade |
 
@@ -47,7 +47,7 @@ in `bun scripts/lua-tests.ts`. This repair changes no combat values.
 
 From the root, `bun tools/animations/down-air-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
 appends seven clips and generates downAirClipInfo.ts. Store hero-models, then
-Use `--character 6` to reauthor only Lich while keeping later appended clips and all other fighters unchanged.
+Use `--character 6` (Lich) or `--character 10` (Pit Lord) to reauthor that fighter alone, at the move's current length, while keeping later appended clips and all other fighters unchanged.
 refresh the original clip pool through the existing exporter.
 `bun tools/animations/down-air-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` samples
 the real simulation and pose selection at preparation, first/middle/last active

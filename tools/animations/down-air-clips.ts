@@ -11,7 +11,7 @@ import { fighters } from "../../ts/scripts/heroModelSource";
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const characterAt = process.argv.indexOf("--character");
 const selected = characterAt < 0 ? undefined : Number(process.argv[characterAt + 1]);
-ensure(selected === undefined || selected === Character.lich, "--character supports Lich's contact repair (6)");
+ensure(selected === undefined || selected === Character.lich || selected === Character.pitLord, "--character supports Lich (6) and Pit Lord (10)");
 const project = resolve(import.meta.dir, "../..");
 ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/down-air-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT");
 mkdirSync(output, {recursive:true});
@@ -22,7 +22,7 @@ const gestures = [
   {character:Character.mountainKing,name:"Boot Stomp",chest:-15,wrist:0,arm:-65,knee:0},
   {character:Character.lich,name:"Frost Press",chest:48,wrist:45,arm:20,knee:0},
   {character:Character.dreadlord,name:"Claw Dive",chest:45,wrist:40,arm:25,knee:70},
-  {character:Character.pitLord,name:"Four Hooves",chest:-15,wrist:0,arm:-70,knee:0},
+  {character:Character.pitLord,name:"Glaive Plunge",was:"Four Hooves",chest:30,wrist:90,arm:30,knee:0},
   {character:Character.beastmaster,name:"Twin Axe Drop",chest:35,wrist:90,arm:-15,knee:65},
 ];
 function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array<ArrayBuffer> {
@@ -56,7 +56,7 @@ for(const g of gestures){
   const f=fighters.get(g.character)!,hero=heroDefinition(g.character),move=hero?.moves.normals[AttackStyle.downAir];ensure(f&&move,"missing fighter move");
   const source=parseSource(await Bun.file(join(input,f.source)).arrayBuffer()),model=structuredClone(source);
   const stand=source.Sequences.find(s=>/^stand(?:\s*-?\s*1)?$/i.test(s.Name))??source.Sequences.find(s=>/^stand ready$/i.test(s.Name));ensure(stand,"missing stand");
-  const name=`Down Air ${g.name}`,existing=source.Sequences.findIndex(s=>s.Name===name);
+  const name=`Down Air ${g.name}`,existing=source.Sequences.findIndex(s=>s.Name===name||("was" in g&&s.Name===`Down Air ${g.was}`));
   if (selected !== undefined && g.character !== selected) {
     ensure(existing >= 0, `${f.name}: retained down air missing`);
     const sequence = source.Sequences[existing]!;
@@ -64,7 +64,8 @@ for(const g of gestures){
     continue;
   }
   const index=existing<0?source.Sequences.length:existing,start=existing<0?Math.max(...source.Sequences.map(s=>s.Interval[1]))+100:source.Sequences[index]!.Interval[0];
-  const end=existing<0?start+Math.round(move.totalFrames*1000/60):source.Sequences[existing]!.Interval[1];
+  const end=start+Math.round(move.totalFrames*1000/60),cleared=existing<0?end:Math.max(end,source.Sequences[existing]!.Interval[1]);
+  ensure(existing<0||end<=source.Sequences[existing]!.Interval[1]||source.Sequences.every(s=>s.Interval[0]<start||s.Interval[0]>cleared||s===source.Sequences[existing]),`${f.name}: longer down air overlaps the next clip`);
   model.Sequences[index]={...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,
     MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400};
   const originals=new Map<string,mdx.AnimVector>();tracks(source,(t,p)=>originals.set(p,t));
@@ -72,7 +73,7 @@ for(const g of gestures){
   tracks(model,(track,path)=>{
     const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;
     const first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);if(!first)return;
-    track.Keys=track.Keys.filter(k=>k.Frame<start||k.Frame>end);
+    track.Keys=track.Keys.filter(k=>k.Frame<start||k.Frame>cleared);
     const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
     if(node&&joint(node.Name,g,false)!==0)joints++;
     for(const [frame,coil]of [[0,false],[Math.max(1,move.startupFrames-3),true],[move.startupFrames,false],[move.startupFrames+move.activeFrames,false],[move.totalFrames,false]] as const){

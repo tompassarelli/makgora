@@ -15,7 +15,7 @@ export const pitLordStrikeMoments = {
   13: { clip: 62, seconds: f32(0.350), end: f32(0.967) },
   14: { clip: 15, seconds: f32(0.933), end: f32(1.667) },
   15: { clip: 63, seconds: f32(0.550), end: f32(0.700) },
-  16: { clip: 56, seconds: f32(0.183), end: f32(1.033) },
+  16: { clip: 56, seconds: f32(0.000), end: f32(1.000) },
   19: { clip: 13, seconds: f32(0.667), end: f32(1.666) },
   20: { clip: 7, seconds: f32(0.833), end: f32(1.500) },
   100: { clip: 57, seconds: f32(0.200), end: f32(0.767) },

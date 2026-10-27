@@ -73,7 +73,6 @@ test("Every fighter short hops each of the five aerials, pressed on the takeoff 
 });
 
 const DOWN_AIR_PRESS_FRAMES = 4;
-const DOWN_AIR_DEPARTURES: ReadonlySet<Character> = new Set([Character.pitLord, Character.lichKing]);
 
 function standingHeight(character: Character): number {
   return fighterHurtParts(createFighter(character, 0.0, 1)).reduce((top, part) => Math.max(top, part.z1 + part.radius, part.z2 + part.radius), 0.0);
@@ -106,8 +105,7 @@ test("Every fighter's short hop down air, pressed on the takeoff frame or any of
       const misses: number[] = [];
       for (let delay = 0; delay < DOWN_AIR_PRESS_FRAMES; delay++) if (!shortHopDownAirHits(character, foe, facing, delay)) misses.push(delay);
       const side = `${fighterName(character)} down air facing ${facing > 0 ? "right" : "left"}`;
-      if (misses.length > 0 && !DOWN_AIR_DEPARTURES.has(character)) failures.push(`${side}: pressed ${misses.join(", ")} frames after takeoff, landed before hitting a standing ${fighterName(foe)}`);
-      if (misses.length === 0 && DOWN_AIR_DEPARTURES.has(character)) failures.push(`${side}: hits from every press now, so it leaves DOWN_AIR_DEPARTURES`);
+      if (misses.length > 0) failures.push(`${side}: pressed ${misses.join(", ")} frames after takeoff, landed before hitting a standing ${fighterName(foe)}`);
     }
   }
   assertEquals(failures.join("\n"), "");
