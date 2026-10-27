@@ -2,15 +2,15 @@ import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runt
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
 import { type Scene, airborne, fighter, frame, solo } from "../match/padScene";
-import { Character } from "./codes";
+import { Character, GroundAction } from "./codes";
 import { type Fighter } from "./fighter";
 
 const STAGE = 0;
 const START_X = -200.0;
 const RUN_FRAMES = 40;
-const LATE_DASH_FRAMES = 12;
 const LANDING_HEIGHT = 3.0;
 const FRAME_LIMIT = 90;
+const SHIELD_HOLD_FRAMES = 10;
 const RIGHT = [Action.moveRight] as const;
 const SHIELD = [Action.rightTrigger] as const;
 
@@ -18,7 +18,6 @@ interface Entry { readonly name: string; readonly approach: (s: Scene) => void }
 
 const ENTRIES: readonly Entry[] = [
   { name: "run", approach: s => { for (let i = 0; i < RUN_FRAMES; i++) frame(s, RIGHT); } },
-  { name: "late dash", approach: s => { for (let i = 0; i < LATE_DASH_FRAMES; i++) frame(s, RIGHT); } },
   {
     name: "landing at full air speed", approach: s => {
       const f = fighter(s);
@@ -35,7 +34,7 @@ function meleeDrag(f: Readonly<Fighter>, vx: number): number {
   return vx > 0 ? Math.max(0.0, f32(vx - drag)) : Math.min(0.0, f32(vx + drag));
 }
 
-test("Shield momentum: out of a run, a late dash or a landing, every grounded frame of a held shield loses Melee's traction, doubled above walk speed, until it stops [k4 reference melee]", () => {
+test("Shield momentum: out of a run or a landing, every grounded frame of a held shield loses Melee's traction, doubled above walk speed, until it stops [k4 reference melee]", () => {
   for (const character of [Character.rifleman, Character.jaina]) {
     for (const entry of ENTRIES) {
       const s = solo(STAGE, character, START_X);
@@ -55,6 +54,42 @@ test("Shield momentum: out of a run, a late dash or a landing, every grounded fr
       assertEquals(f.motion.vx, 0.0, `${entry.name}, character ${character} stops`);
       assertGreaterThan(shielded, 0);
       assertTrue(entry.name.startsWith("landing") || doubled > 0);
+    }
+  }
+});
+
+function lastInitialDashFrame(character: Character): number {
+  const s = solo(STAGE, character, START_X);
+  const f = fighter(s);
+  let frames = 0;
+  for (let n = 0; n < FRAME_LIMIT; n++) {
+    frame(s, RIGHT);
+    if (f.ground.action !== GroundAction.dash) return frames;
+    frames++;
+  }
+  return frames;
+}
+
+test("Shield stop: a shield raised on the first, third or last frame of the initial dash stops dead on its first frame and holds still while held [k4 reference melee]", () => {
+  for (const character of [Character.rifleman, Character.jaina]) {
+    const last = lastInitialDashFrame(character);
+    assertGreaterThan(last, 3);
+    for (const dashFrames of [1, 3, last]) {
+      const s = solo(STAGE, character, START_X);
+      const f = fighter(s);
+      for (let i = 0; i < dashFrames; i++) frame(s, RIGHT);
+      const label = `character ${character}, ${dashFrames} dash frames`;
+      assertEquals(f.ground.action, GroundAction.dash, label);
+      assertTrue(f.motion.vx > 0);
+      frame(s, SHIELD);
+      assertTrue(f.shield.raised);
+      assertEquals(f.motion.vx, 0.0, label);
+      const x = f.motion.x;
+      for (let n = 0; n < SHIELD_HOLD_FRAMES; n++) {
+        frame(s, SHIELD);
+        assertEquals(f.motion.vx, 0.0, `${label}, held frame ${n}`);
+        assertEquals(f.motion.x, x, `${label}, held frame ${n}`);
+      }
     }
   }
 });

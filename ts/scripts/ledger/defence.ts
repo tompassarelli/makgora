@@ -150,6 +150,20 @@ function probedShieldSlide(character: Character): Slide {
 const shieldSlides = (slide: (character: Character) => Slide): string =>
   `out of a run: ${SHIELD_SLIDE_FIGHTERS.map((character) => slideText(character, slide(character))).join("; ")}`;
 
+const SHIELD_STOP_DASH_FRAMES = 3;
+
+function shieldStopSpeed(character: Character): number {
+  const s = solo(0, character, -200.0);
+  const f = fighter(s, 0);
+  for (let n = 0; n < SHIELD_STOP_DASH_FRAMES; n++) frame(s, [Action.moveRight]);
+  frame(s, [Action.rightTrigger]);
+  if (!f.shield.raised) throw new Error("the shield-stop probe never raised a shield");
+  return f.motion.vx;
+}
+
+const shieldStops = (speed: (character: Character) => number): string =>
+  `out of the initial dash: ${SHIELD_SLIDE_FIGHTERS.map((character) => `${fighterName(character)} speed ${shortNumber(speed(character))} on the first shield frame`).join("; ")}`;
+
 const THROW_PROBE_WEIGHTS = [75.0, THROW_KNOCKBACK_WEIGHT, 127.0];
 
 function throwLaunchSpeed(weight: number): number {
@@ -350,6 +364,12 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     melee: { value: shieldSlides(meleeShieldSlide), source: wiki("Traction") }, ours: () => shieldSlides(probedShieldSlide),
     anchor: { file: "ts/src/game/sim/groundMovement.ts", symbol: "restingTraction" },
     checkedBy: { file: "ts/src/game/sim/shieldMomentum.tests.ts", symbol: "meleeDrag" }, status: PARITY,
+  },
+  {
+    id: "shield-stop", family: "defence", name: "Shield stop out of the initial dash, probed headless on its third frame",
+    melee: { value: shieldStops(() => 0.0), source: wiki("Shield_stop") }, ours: () => shieldStops(shieldStopSpeed),
+    anchor: { file: "ts/src/game/sim/step.ts", symbol: "advanceGuard" },
+    checkedBy: { file: "ts/src/game/sim/shieldMomentum.tests.ts", symbol: "lastInitialDashFrame" }, status: PARITY,
   },
   {
     id: "out-of-shield", family: "defence", name: "Jump and grab out of shield, probed headless",

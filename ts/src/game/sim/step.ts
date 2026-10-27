@@ -291,6 +291,7 @@ function advanceGuard(f: Fighter, input: Readonly<Controls>, forcedShield: boole
   }
   const lateDashGuardEntry = wantsShield && !shield.raised && motion.grounded
     && (ground.action === GroundAction.run || (ground.action === GroundAction.dash && ground.actionFrame > DASH_GUARD_EARLY_FRAMES));
+  const initialDashGuardEntry = wantsShield && !shield.raised && motion.grounded && ground.action === GroundAction.dash;
   if (wantsShield && !shield.raised) shield.perfectActionFrames = 0;
   else if (wantsShield && !forcedShield && shield.perfectActionFrames > 0) shield.perfectActionFrames--;
   else if (!wantsShield && shield.releaseLag <= 0) shield.perfectActionFrames = 0;
@@ -310,6 +311,7 @@ function advanceGuard(f: Fighter, input: Readonly<Controls>, forcedShield: boole
   }
   if (wantsShield && input.shield && !forcedShield && !shield.drainResumePending) shield.strength = input.shieldStrength;
   if (lateDashGuardEntry) ground.dashGrabWindow = LATE_DASH_GUARD_GRAB_WINDOW;
+  if (initialDashGuardEntry) motion.vx = 0.0;
   return wantsShield;
 }
 
