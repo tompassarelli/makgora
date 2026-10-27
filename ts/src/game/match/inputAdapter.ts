@@ -4,6 +4,7 @@ import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { groundState } from "../sim/groundMovement";
+import { isSmashAttack } from "../sim/moves";
 import { squareRoot } from "../sim/warcraftMath";
 import { stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
 import { GroundOption, GroundState, SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE, groundOptionAllowed } from "../sim/stickZones";
@@ -59,6 +60,14 @@ function strongSmashOpen(fighter: Readonly<Fighter>, style: AttackStyle): boolea
   // The sim advances the dash clock before it gates the attack, so the dash-smash window is judged on the next dash frame.
   const frame = state === GroundState.dash ? fighter.ground.actionFrame + 1 : fighter.ground.actionFrame;
   return groundOptionAllowed(state, frame, option, fighter.tuning.ground.runBrakeTurnCommandEndFrame);
+}
+
+/** Whether held Strong still holds the smash the fighter is charging: only while its starting direction stays aimed; a smash not begun yet follows Strong alone. */
+function strongHoldsSmash(fighter: Readonly<Fighter>, aimX: number, aimZ: number): boolean {
+  const style = fighter.attack.style;
+  if (style === undefined || !isSmashAttack(style)) return true;
+  if (normalAttackStyle(aimX, aimZ, false, true, false) !== style) return false;
+  return style !== AttackStyle.forwardSmash || aimX === fighter.facing;
 }
 
 export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, frame: number, destination: Controls, attacks: AttackBuffer): void {
@@ -135,7 +144,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.getupDirectionPressed = destination.getupDirection !== 0;
   destination.cStickUpFlick = (pressed & SMASH_UP_BIT) !== 0;
   destination.cStickSideFlick = edgePair(pressed, Action.smashLeft, Action.smashRight);
-  destination.attackHeld = (held & (ATTACK_BIT | STRONG_BIT)) !== 0;
+  destination.attackHeld = (held & ATTACK_BIT) !== 0 || ((held & STRONG_BIT) !== 0 && strongHoldsSmash(fighter, aimX, aimZ));
   destination.specialHeld = (held & SPECIAL_BIT) !== 0;
   const leftShield = (held & LEFT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerLeft);
   const rightShield = (held & RIGHT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerRight);
