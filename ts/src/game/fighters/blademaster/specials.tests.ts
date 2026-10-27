@@ -16,7 +16,7 @@ import { attackLandingLag } from "../../sim/moves";
 import { fighterAt } from "../../sim/roster";
 import { mainDeckZ } from "../../sim/stage";
 import { length } from "./moves";
-import { BLADEMASTER_SPECIALS, MIRROR_IMAGE_OBJECT, RISE_STARTUP, WIND_WALK_DASH } from "./specials";
+import { BLADEMASTER_SPECIALS, IMAGE_STARTUP, MIRROR_IMAGE_OBJECT, RISE_STARTUP, WIND_WALK_DASH } from "./specials";
 
 const BLADEMASTER_X = -200.0;
 const FOE_X = 550.0;
@@ -205,4 +205,27 @@ test("Blademaster's Rising Whirlwind first strikes on frame 13, four frames afte
   }
   assertEquals(first, STOCK_FIRST_STRIKE_FRAME + RISE_STARTUP, "first strike frame");
   assertEquals(BLADEMASTER_SPECIALS.up.ground.endFrame, STOCK_END_FRAME + RISE_STARTUP, "last frame of the move");
+});
+
+const STOCK_IMAGE_FRAME = 8;
+const IMAGE_WATCH = 40;
+
+test("Blademaster's Mirror Image, grounded and from a hop, places its image on frame 12 and moves back from frame 13, four frames after the stock frames 8 and 9 [k3 measure docs/gameplay-design.md]", () => {
+  const measured: string[] = [];
+  for (const air of [false, true]) {
+    const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
+    const blademaster = fighter(s, 0);
+    if (air) airborne(blademaster, BLADEMASTER_X, f32(mainDeckZ(0) + UP_SPECIAL_HOP));
+    let placed = 0;
+    let stepped = 0;
+    for (let n = 1; n <= IMAGE_WATCH && (placed === 0 || stepped === 0); n++) {
+      frame(s, n === 1 ? [Action.moveDown, Action.special] : []);
+      if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroDown, "Mirror Image starts");
+      if (placed === 0 && placedObject(blademaster).life > 0) placed = n;
+      if (stepped === 0 && blademaster.motion.x !== BLADEMASTER_X) stepped = n;
+    }
+    measured.push(`${air ? "aerial" : "grounded"}: image ${placed}, step ${stepped}`);
+  }
+  assertEquals(measured.join("; "), `grounded: image ${STOCK_IMAGE_FRAME + IMAGE_STARTUP}, step ${STOCK_IMAGE_FRAME + IMAGE_STARTUP + 1}; aerial: image ${STOCK_IMAGE_FRAME + IMAGE_STARTUP}, step ${STOCK_IMAGE_FRAME + IMAGE_STARTUP + 1}`);
+  assertEquals(BLADEMASTER_SPECIALS.down.ground.endFrame, STOCK_END_FRAME + IMAGE_STARTUP, "last frame of the move");
 });

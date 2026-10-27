@@ -97,19 +97,20 @@ const risingBlade: AuthoredSpecial = {
 
 
 const IMAGE_STEP_SPEED = f32(-f32(length(f32(1.0)) / 4));
-export const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 210, fireAges: [] };
+export const IMAGE_STARTUP = 4;
+export const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8 + IMAGE_STARTUP, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 210, fireAges: [] };
 const mirrorImage: AuthoredSpecial = {
-  endFrame: 24,
+  endFrame: 24 + IMAGE_STARTUP,
   hurt: [
-      hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      hurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      hurtPose(17, 23, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(1, 8 + IMAGE_STARTUP, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(9 + IMAGE_STARTUP, 16 + IMAGE_STARTUP, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(17 + IMAGE_STARTUP, 23 + IMAGE_STARTUP, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
   facesStick: true,
   placement: MIRROR_IMAGE_OBJECT,
   motion: [
-    { ...frames(8, 11), velocityX: IMAGE_STEP_SPEED, velocityZ: 0.0 },
-    { ...frames(12, 12), ...STOP },
+    { ...frames(8 + IMAGE_STARTUP, 11 + IMAGE_STARTUP), velocityX: IMAGE_STEP_SPEED, velocityZ: 0.0 },
+    { ...frames(12 + IMAGE_STARTUP, 12 + IMAGE_STARTUP), ...STOP },
   ],
 };
 
