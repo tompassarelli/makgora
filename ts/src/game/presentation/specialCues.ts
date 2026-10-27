@@ -10,6 +10,7 @@ import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } f
 import { type AuthoredSpecial, FOLLOW_UP_FORM, type FrameWindow, SpecialForm } from "../sim/specials/schema";
 import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/engine";
+import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
 import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
@@ -575,7 +576,7 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
     return { cues: PEON_REST_CUES, phase: frame <= REST_SOUR_FRAME ? "startup" : "active" };
   }
   if (fighter.character === Character.dreadlord && action === SpecialAction.heroSide && fighter.special.grabFrame > 0) {
-    return frame <= fighter.special.grabFrame + 16 ? { cues: DREADLORD_BITE_CUES, phase: "active" } : NONE;
+    return commandGrabHolding(fighter, runningHeroSpecial(fighter)) ? { cues: DREADLORD_BITE_CUES, phase: "active" } : NONE;
   }
   if (fighter.character === Character.kaelthas && action === SpecialAction.heroUp && fighter.special.form < FOLLOW_UP_FORM) {
     if (frame > PHOENIX_STARTUP_FRAMES && frame <= PHOENIX_STARTUP_FRAMES + PHOENIX_BURN_FRAMES) return { cues: KAEL_PHOENIX_FORM, phase: "active" };

@@ -4,7 +4,7 @@ import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
-import { FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
+import { type CommandGrab, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 
 import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES, WALL_TECH_STARTUP_FRAMES, attackPhase, inGrabContext, isForwardGroundRoll, isGroundDodging } from "../sim/conditions";
 import { DOWN_BOUND_FRAMES, DOWN_DAMAGE_FRAMES, DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
@@ -231,6 +231,13 @@ const holdsSpecialEnd = (pose: Readonly<FighterPose>, f: Readonly<Fighter>): boo
   && pose.animation.startsWith("special") && pose.animation !== "specialfall";
 
 
+/** A caught phase shorter than its clip plays the clip faster to fit. */
+function commandGrabSqueeze(clipSeconds: number, grab: Readonly<CommandGrab>, holding: boolean, caught: boolean): number {
+  const phaseFrames = holding ? grab.holdFrames : caught ? grab.recovery : 0;
+  return phaseFrames > 0 ? max(1.0, clipRate(clipSeconds, phaseFrames)) : 1.0;
+}
+
+
 function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean {
   if (f.special.action === SpecialAction.none || f.grab.owner !== undefined || f.launch.hitstun !== 0) return false;
   const clips = heroLook(f.character)?.commandGrab;
@@ -244,7 +251,7 @@ function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean
   const phase = holding ? "hold" : recovering ? "recovery" : "travel";
   const first = holding ? caught : recovering ? caught > 0 ? caught + grab.holdFrames : charge + 1 : 1;
   playIndex(pose, `commandGrab-${phase}`, clips[phase].index);
-  pose.clipTime = f32(Math.max(0, f.special.frame - first) * FRAME_SECONDS);
+  pose.clipTime = f32(f32(Math.max(0, f.special.frame - first) * FRAME_SECONDS) * commandGrabSqueeze(clips[phase].seconds, grab, holding, caught > 0));
   return true;
 }
 

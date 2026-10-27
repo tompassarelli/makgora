@@ -1,4 +1,5 @@
 import { canHit, sameTeam } from "../teams";
+import { releaseCommandGrabLock } from "./commandGrabLock";
 
 
 
@@ -849,6 +850,7 @@ function endHeroSpecial(f: Fighter, move: Readonly<AuthoredSpecial>): void {
   refreshAirOnExit(f);
   f.special.action = SpecialAction.none;
   f.special.frame = 0;
+  releaseCommandGrabLock(f, move);
 }
 
 

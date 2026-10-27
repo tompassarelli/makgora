@@ -47,7 +47,7 @@ const SLEEP_ORB: AuthoredSpecial = {
 
 
 const POUNCE_GRAB: StrikeCapsule = { x1: 14.0, z1: 40.0, x2: f32(h(f32(0.45)) - 12.0), z2: 40.0, radius: 12.0 };
-const POUNCE_BITE = dreadlordHit(11.75, "EDGE", 40);
+const POUNCE_BITE = { ...dreadlordHit(11.75, "EDGE", 90), growth: 12.0, base: 110.0 };
 const POUNCE_BODY = [
   hurtPose(7, 9, [hurtPart(8.0, 60.0, 8.0, 60.0, 45.0), hurtPart(18.0, 132.0, 18.0, 132.0, 45.0), hurtPart(40.0, 182.0, 40.0, 182.0, 21.0), hurtPart(8.0, 60.0, 18.0, 132.0, 8.0), hurtPart(18.0, 132.0, 40.0, 182.0, 8.0)]),
   hurtPose(10, 12, [hurtPart(9.0, 48.0, 9.0, 48.0, 45.0), hurtPart(20.0, 120.0, 20.0, 120.0, 45.0), hurtPart(35.0, 175.0, 35.0, 175.0, 21.0), hurtPart(9.0, 48.0, 20.0, 120.0, 8.0), hurtPart(20.0, 120.0, 35.0, 175.0, 8.0)]),
@@ -56,7 +56,7 @@ const POUNCE_BODY = [
 const NIGHT_POUNCE: AuthoredSpecial = {
   endFrame: 53,
   motion: [{ ...frames(1, 16), velocityX: h(f32(0.14)), velocityZ: 0.0, stopsAtBody: true }, { ...frames(17, 17), velocityX: 0.0, velocityZ: 0.0 }],
-  commandGrab: { ...frames(17, 19), strike: POUNCE_GRAB, holdFrames: 16, effect: POUNCE_BITE, recovery: 28, heal: { heal: 4.0 } },
+  commandGrab: { ...frames(1, 19), strike: POUNCE_GRAB, holdFrames: 4, effect: POUNCE_BITE, recovery: 8, heal: { heal: 4.0 } },
   hurt: POUNCE_BODY,
 };
 const NIGHT_POUNCE_AIR: AuthoredSpecial = {
