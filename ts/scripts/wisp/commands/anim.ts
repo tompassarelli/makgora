@@ -30,6 +30,7 @@ import { JUDGE_MAX_GAP, judgeKeyFrames } from "../animJudgeFrames";
 import { judgeFrameLabel, judgeImageStem, judgeParts, judgeStrip } from "../animJudgeStrip";
 import { assetsView, readManifest } from "../buildInputs";
 import { borderlineNotice, judgeRun } from "./animJudgeRun";
+import { prescreenCommand } from "./animPrescreen";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
 import { createStandaloneSession, NEUTRAL_INPUT } from "../standalone";
@@ -489,11 +490,11 @@ const jitter: Command = (args) => Effect.gen(function*() {
 }).pipe(Effect.provide(BunServices.layer));
 
 export const anim: Command = ([mode, verb, ...rest]) => {
-  const modes: Readonly<Record<string, Command>> = { jitter, score, capture: (args) => Effect.promise(() => import("../../captureQueueCommand")).pipe(Effect.flatMap((module) => module.capture(args))) };
+  const modes: Readonly<Record<string, Command>> = { jitter, score, prescreen: prescreenCommand(prepare, selectFighters), capture: (args) => Effect.promise(() => import("../../captureQueueCommand")).pipe(Effect.flatMap((module) => module.capture(args))) };
   const direct = mode === undefined ? undefined : modes[mode];
   if (direct !== undefined) return direct(verb === undefined ? [] : [verb, ...rest]);
   const judging: Readonly<Record<string, Command>> = { fetch: () => fetchReferences.pipe(Effect.provide(BunServices.layer)), prepare, record, run: judgeRun };
   const step = mode === "judge" && verb !== undefined ? judging[verb] : undefined;
   if (step !== undefined) return step(rest);
-  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high] | anim capture enqueue|wait|status|serve ..." }));
+  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl... | anim judge run PRIVATE_DIR [--model haiku|sonnet|opus] [--effort low|medium|high] | anim prescreen --fighter SLUG --move MOVE [--threshold N] | anim capture enqueue|wait|status|serve ..." }));
 };
