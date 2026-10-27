@@ -1,5 +1,4 @@
 import { floatVector } from './animVector';
-
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
@@ -58,6 +57,7 @@ const burrowRake: readonly Gesture[] = [
 interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; decay?: number; }
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
+  forwardTilt: { contact: 9, x: Number(process.env.LX ?? 8), back: Number(process.env.LB ?? 4), over: Number(process.env.LO ?? 0.5) },
   jab2: { contact: 7, x: 64, back: 32 },
   forwardSmash: { contact: 20, x: 48, back: 24 },
   upSmash: { contact: 17, z: 48, back: 24 },
@@ -94,6 +94,7 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
   downSpecialAir: { contact: 21, through: 31, ...scythe(35, 15) },
   ultimate: { contact: 17, through: 25, ...scythe(33, 14) },
 };
+const followThroughs: Partial<Record<HeroPose, { over: number; frames: number }>> = { forwardTilt: { over: Number(process.env.OVER ?? 0.35), frames: Number(process.env.FT ?? 2) } };
 const swings: Partial<Record<HeroPose, readonly [windup: number, follow: number]>> = {
   upSpecial: [0.8, 1],
   upSpecialAir: [0.8, 1],
@@ -329,7 +330,6 @@ for (const [ordinal, action] of authoredActions.entries()) {
     const contact = rotations.map((node, i) => { const [y, z] = joint(node.Name, action.gesture); return rotated(base[i]!, y * contactAmount, z * contactAmount); });
     const preparation = rotations.map((node, i) => { const [y, z] = joint(node.Name, action.gesture); return rotated(base[i]!, y * preparationAmount, z * preparationAmount); });
     if (!["jab", "jab2"].includes(action.pose)) {
-
       const chain = ["Bone_Arm1R", "Bone_Arm2R", "Bone_Arm3R"].map(name => [...model.Bones, ...model.Helpers].find(n => n.Name === name)!);
       for (const node of chain) if (!rotations.includes(node)) {
         rotations.push(node); base.push(node.Rotation!.Keys.find(k => k.Frame === at(0))!.Vector.slice());
@@ -367,13 +367,14 @@ for (const [ordinal, action] of authoredActions.entries()) {
       }
       chain.forEach((node, i) => { contact[rotations.indexOf(node)] = blend(before[i]!, solution[i]!, best); });
     }
-    const anticipation = Math.max(1, action.contact - 2);
+    const anticipation = Math.max(1, action.contact - 2), through = followThroughs[action.pose], peak = action.contact + (through?.frames ?? 3);
+    const beyond = through ? contact.map((pose, i) => blend(preparation[i]!, pose, 1 + through.over)) : contact;
     for (const frame of phaseFrames) rotations.forEach((node, i) => {
       const key = node.Rotation!.Keys.find(k => k.Frame === at(frame))!;
-
       key.Vector = frame < anticipation ? blend(base[i]!, preparation[i]!, frame / anticipation)
         : frame <= action.contact ? blend(preparation[i]!, contact[i]!, (frame - anticipation) / (action.contact - anticipation))
-        : blend(base[i]!, contact[i]!, frame < action.contact + 3 ? 1 : Math.max(0, 1 - (frame - action.contact - 3) / (action.frames - action.contact - 3)));
+        : frame < peak ? (through ? blend(contact[i]!, beyond[i]!, (frame - action.contact) / through.frames) : blend(base[i]!, contact[i]!, 1))
+        : blend(base[i]!, beyond[i]!, Math.max(0, 1 - (frame - peak) / (action.frames - peak)));
       if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
     });
   }

@@ -57,7 +57,7 @@ export const ANUBARAK_CLIPS = { idle: ANUBARAK_FALLBACK, walk: { index: 2, secon
   victimThrowForward: { index: 67, seconds: 1.0, aligned: true, contact: 0.5 },
   throwBack: { index: 68, seconds: f32(0.767), aligned: true, contact: f32(0.31666666666666665) },
   victimThrowBack: { index: 69, seconds: 1.0, aligned: true, contact: 0.5 },
-  throwUp: { index: 70, seconds: f32(0.6), aligned: true, contact: 0.25 },
+  throwUp: { index: 70, seconds: f32(0.467), aligned: true, contact: 0.25 },
   victimThrowUp: { index: 71, seconds: 1.0, aligned: true, contact: 0.5 },
   throwDown: { index: 72, seconds: f32(0.8), aligned: true, contact: f32(0.35) },
   victimThrowDown: { index: 73, seconds: 1.0, aligned: true, contact: 0.5 },
