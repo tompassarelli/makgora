@@ -101,6 +101,32 @@ holds its double jump and up special and reaches the ledge or the stage, as a
 Melee shine spike only gimps a foe who has spent its jump. The #272 rows were
 for the straight-down spike it replaced.
 
+## Leg kicks (2026-10-28)
+
+Tom asked on 2026-10-28, while playtesting, for her back air to read as a
+spinning back kick like Illidan's roundhouse and for her down tilt to read as
+an unmistakable low leg sweep, since her legs had hidden under her cloak. Both
+are authored by `tools/animations/leg-sweep.py` (beats in
+`tools/animations/leg-sweeps/warden-back-kick.json` and `warden.json`) and
+spliced by `rekey-clip.ts`; frame data, damage, angle and knockback are
+unchanged.
+
+- Back air: her hips turn as she chambers the right knee to her chest, then the
+  leg snaps out straight behind her at hip height with the heel leading,
+  held through frames 7 to 9. The three glaive capsules (which reached up to
+  141 high) are replaced by one capsule per active frame along the drawn shin
+  to the heel, radius 10, between 62 and 67 high; the heel end reaches 101,
+  100 and 96 behind her on frames 7, 8 and 9 (the glaive reached 82, 104 and
+  103), so a test holds each strike behind her at hip height (45 to 80 above
+  her origin) with its heel end 95 to 105 back. The strike moment the clip
+  plays against stays at 0.100 s.
+- Down tilt: from her crouch she drops low with her torso held back over the
+  trailing leg, sweeps the right leg straight out along the floor and carries
+  it across before folding back up. Her front skirt flaps fold backward and up
+  and her arm-hung cloak lifts off the floor, so the leg shows clear of the
+  cloak. The two floor capsules are unchanged (reach 105), and 92% of her
+  drawn lower leg sits inside them on both active frames.
+
 ## Identity guard
 
 What she keeps, so she does not become Fox in a costume:

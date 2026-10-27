@@ -27,11 +27,6 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/warden-pursuit-lunge.py -- RIG.json KEYS.json`
   bakes one key per frame: a crouched hold with the glaive ring kept face-on to the camera, a lunge on the first
   active frame and a downward cut, and `... --replace-pose sideSpecial --keys KEYS.json` splices the keys in place.
-  Warden's back air is authored in Blender too (#550): `... --character 5 --replace-pose backAir --rig RIG.json`
-  writes her skeleton and timing, `blender ... --python tools/animations/warden-back-air.py -- RIG.json KEYS.json`
-  bakes a tucked windup, the glaive thrown over her shoulder and whipped down behind her through the three active
-  frames with her legs off the floor, and `... --replace-pose backAir --keys KEYS.json` splices the keys in place.
-  Its three hit capsules run along the drawn glaive on frames 7 to 9.
   Muradin's back air is authored the same way (#569): `... --character 4 --replace-pose backAir --rig RIG.json`,
   then `blender ... --python tools/animations/mountain-king-back-air.py -- RIG.json KEYS.json` bakes the axe wound
   across his front with his chest kept toward his facing, lifted overhead through a mid-arc frame and whipped
@@ -164,7 +159,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   takes `jab`, `jab2`, `forwardTilt` or `forwardTiltDown`, solves his shoulder and elbow each
   startup and active frame so the spear tip rides a straight line along the hit direction, and splices the same way.
   Both scripts share the rig, pose vocabulary and bake in `tools/animations/murloc_rig.py`.
-  Illidan's and Maiev's down tilts are leg sweeps authored in Blender (#517):
+  Illidan's and Maiev's down tilts are leg sweeps authored in Blender (#517); Maiev's back air is a spinning back kick
+  authored the same way with `--pose backAir` and the beats in `tools/animations/leg-sweeps/warden-back-kick.json`.
+  A beats file's `clear` list folds listed cloth clear of the floor and its `sides` map fixes the way a listed piece
+  turns (`1` swings a hanging piece backward), which keeps Maiev's front skirt flaps off her swept leg.
+  Re-keying a clip played strike-aligned is refused unless its re-measured strike moment is unchanged, so the move keeps its timing.
   `bun tools/animations/rekey-clip.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose downTilt --limb R --rig RIG.json`
   writes the fighter's skeleton, canonical joints and per-frame hit regions, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER`

@@ -243,7 +243,7 @@ BEATS = OWN['beats']
 MARGIN = OWN.get('margin', 0)
 MARGIN_DROP = 10
 SETTLE = 3
-SIDES = {}
+SIDES = dict(OWN.get('sides', {}))
 POINTS = spec['points']
 rest()
 REST_LOW = {node: lowest(bones[node]) for node, _ in OWN.get('clear', [])}

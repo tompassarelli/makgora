@@ -4,6 +4,7 @@ import type { model as mdx } from "war3-model";
 import { generateModelMDX as generateMDX } from "../../ts/scripts/mdxCodec";
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { measureStrikeMoments, staleStrikeFighters } from "../../ts/scripts/wisp/strikeMoments";
 import { capture, type PoseFrame, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { clipFor, smashClipsFor } from "../../ts/src/game/presentation/fighterClips";
 import { advanceFighterPose, createFighterPose } from "../../ts/src/game/presentation/fighterPose";
@@ -37,7 +38,6 @@ ensure(fighter && rig, `no fighter or canonical rig for character ${character}`)
 ensure(style !== undefined, `${pose}: not an attack style`);
 
 const clip = clipFor(character, pose), moment = HERO_STRIKE_MOMENTS[character]?.[style];
-ensure(clip.aligned === true || moment?.clip !== clip.index, `${fighter.name} ${pose}: clip ${clip.index} plays strike-aligned, so re-keyed frames would retime it`);
 const frames = sampleAttack(character, style, 1, pose.endsWith("Air"));
 ensure(frames.every((f) => f.clip === clip.index), `${fighter.name} ${pose}: the move does not play clip ${clip.index} throughout`);
 const active = frames.flatMap((f, i) => f.phase === AttackPhase.active && f.strikes.length > 0 ? [i] : []);
@@ -104,6 +104,10 @@ if (smash !== undefined) {
 const rekeyed = new Set([clip.index, ...smash === undefined ? [] : [smash.charge.index, smash.release.index]]);
 
 const bytes = encodeVerified(parseSource(generateMDX(model)));
+if (clip.aligned !== true && moment?.clip === clip.index) {
+  const measured = await measureStrikeMoments(async () => bytes, new Set([character]));
+  ensure(staleStrikeFighters(measured, HERO_STRIKE_MOMENTS, [character]).length === 0, `${fighter.name} ${pose}: clip ${clip.index} plays strike-aligned at ${moment.seconds}s and the re-keyed clip strikes at ${measured.find((m) => m.style === style)?.seconds}s, which would retime it`);
+}
 const before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);
 for (const [index, other] of source.Sequences.entries()) for (const fraction of [0, 0.5, 1]) {
   if (rekeyed.has(index)) continue;
@@ -126,9 +130,10 @@ for (const at of active) {
   const strikes = f.strikes.map((s) => ({ ...s, x1: s.x1 - f.x, z1: s.z1 - f.z, x2: s.x2 - f.x, z2: s.z2 - f.z }));
   const leg = Array.from(legVertices.entries()).filter(([v, on]) => on === 1 && shown[v] === 1).map(([v]) => [vertices[v * 2]!, vertices[v * 2 + 1]!] as const);
   const inside = leg.filter(([x, z]) => strikes.some((s) => distance(x, z, s) <= 0)).length / Math.max(1, leg.length);
-  const tip = leg.reduce((far, point) => point[0] > far[0] ? point : far, [-Infinity, 0] as readonly [number, number]);
+  const ahead = Math.sign(strikes.reduce((sum, s) => sum + s.x1 + s.x2, 0)) || 1;
+  const tip = leg.reduce((far, point) => point[0] * ahead > far[0] * ahead ? point : far, [-Infinity * ahead, 0] as readonly [number, number]);
   const tipIn = strikes.some((s) => distance(tip[0], tip[1], s) <= 0);
-  console.log(`REKEY_LIMB ${fighter.name} ${pose} frame ${at}: ${(inside * 100).toFixed(1)}% of the ${side} lower leg inside the hit region, foot tip (${tip[0].toFixed(1)}, ${tip[1].toFixed(1)}) ${tipIn ? "inside" : "outside"}, leg x ${Math.min(...leg.map((p) => p[0])).toFixed(1)}..${tip[0].toFixed(1)} z ${Math.min(...leg.map((p) => p[1])).toFixed(1)}..${Math.max(...leg.map((p) => p[1])).toFixed(1)}`);
+  console.log(`REKEY_LIMB ${fighter.name} ${pose} frame ${at}: ${(inside * 100).toFixed(1)}% of the ${side} lower leg inside the hit region, foot tip (${tip[0].toFixed(1)}, ${tip[1].toFixed(1)}) ${tipIn ? "inside" : "outside"}, leg x ${Math.min(...leg.map((p) => p[0])).toFixed(1)}..${Math.max(...leg.map((p) => p[0])).toFixed(1)} z ${Math.min(...leg.map((p) => p[1])).toFixed(1)}..${Math.max(...leg.map((p) => p[1])).toFixed(1)}`);
   if (inside < LIMB_INSIDE || !tipIn) outside.push(`the ${side} lower leg leaves the hit region on frame ${at}`);
 }
 const standPose = new DrawnModel(generateMDX(source), scale).triangles(source.Sequences.indexOf(stand), 0, 1).filter((_, i) => i % 2 === 1);

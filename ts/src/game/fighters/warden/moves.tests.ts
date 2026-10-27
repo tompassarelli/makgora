@@ -41,3 +41,32 @@ test("Maiev's down air drills feet first: every hit's strikes sit on her body's 
     }
   }
 });
+
+const BACK_AIR_FRAMES = [7, 8, 9];
+const HEEL_REACH_MIN = 95.0;
+const HEEL_REACH_MAX = 105.0;
+const HIP_LOW = 45.0;
+const HIP_HIGH = 80.0;
+
+test("Maiev's back air kicks with her heel: each active frame has one strike behind her at hip height, from her shin back to a heel end 95 to 105 units behind her, for either facing [k3 measure docs/design/maiev.md]", () => {
+  const region = emptyHitRegion();
+  const placed: Capsule = { x1: 0.0, z1: 0.0, x2: 0.0, z2: 0.0, radius: 0.0 };
+  for (const facing of [1, -1]) {
+    for (const frame of BACK_AIR_FRAMES) {
+      let strikes = 0;
+      for (let index = 0; index < authoredHitRegionCount(AttackStyle.backAir, WARDEN_MOVES); index++) {
+        authoredHitRegion(region, Character.warden, AttackStyle.backAir, frame - 1, 0, index, WARDEN_MOVES);
+        if (region.strike === undefined) continue;
+        strikes++;
+        placeCapsule(placed, region.strike, ORIGIN_X, ORIGIN_Z, facing);
+        const back1 = f32(f32(ORIGIN_X - placed.x1) * facing);
+        const back2 = f32(f32(ORIGIN_X - placed.x2) * facing);
+        assertTrue(back1 > 0.0 && back2 > 0.0);
+        const heel = f32(Math.max(back1, back2) + placed.radius);
+        assertTrue(heel >= HEEL_REACH_MIN && heel <= HEEL_REACH_MAX);
+        for (const z of [placed.z1, placed.z2]) assertTrue(f32(z - ORIGIN_Z) >= HIP_LOW && f32(z - ORIGIN_Z) <= HIP_HIGH);
+      }
+      assertEquals(strikes, 1);
+    }
+  }
+});

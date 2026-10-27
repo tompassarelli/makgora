@@ -139,9 +139,9 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, FORWARD_AIR_SLASH), autoCancel: { before: 6, from: 48 } },
 
     [AttackStyle.backAir]: { ...heroMove(7, 3, 22, 12, [
-      heroRegion(7, 7, blade(-30.5, 66.0, -74.0, 141.0, 8.0), BACK_AIR),
-      heroRegion(8, 8, blade(-17.5, 52.5, -96.0, 89.5, 8.0), BACK_AIR),
-      heroRegion(9, 9, blade(-8.0, 41.0, -94.5, 48.5, 8.0), BACK_AIR),
+      heroRegion(7, 7, blade(-56.0, 62.0, -91.0, 66.0, 10.0), BACK_AIR),
+      heroRegion(8, 8, blade(-55.0, 62.0, -90.0, 66.0, 10.0), BACK_AIR),
+      heroRegion(9, 9, blade(-54.0, 62.0, -86.0, 67.0, 10.0), BACK_AIR),
     ]), autoCancel: { before: 4, from: 22 } },
 
     [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 7, multiHit([
