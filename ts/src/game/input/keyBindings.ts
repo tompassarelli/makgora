@@ -34,6 +34,7 @@ export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
 
 const EMPTY = 0;
 const SPACE = 32;
+const MINUS = 189;
 const EQUALS = 187;
 const SEMICOLON = 186;
 const COMMA = 188;
@@ -44,7 +45,7 @@ const code = (character: string) => character.charCodeAt(0);
 
 
 
-const RESERVED_KEYS: readonly number[] = [8, 13, 27, 89, 112, 116, 117, 118, 187];
+const RESERVED_KEYS: readonly number[] = [8, 13, 27, 89, 112, 116, 117, 118];
 
 const RESERVED_REASONS: Readonly<Record<number, string>> = {
   8: "Backspace is reserved for Pause",
@@ -55,7 +56,6 @@ const RESERVED_REASONS: Readonly<Record<number, string>> = {
   116: "F5 is reserved for Warcraft shortcuts",
   117: "F6 is reserved for Warcraft shortcuts",
   118: "F7 is reserved for Warcraft shortcuts",
-  187: "= is reserved for saving a moment",
 };
 
 export const CLEAR_KEY = 0x2e;
@@ -357,6 +357,7 @@ export function keyLabel(key: number | undefined): string {
   if (key === undefined) return "—";
   if (key === SPACE) return "SPACE";
   if (key === SLASH) return "/";
+  if (key === MINUS) return "-";
   if (key === EQUALS) return "=";
   if (key === SEMICOLON) return ";";
   if (key === COMMA) return ",";

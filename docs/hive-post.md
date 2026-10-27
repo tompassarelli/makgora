@@ -23,7 +23,7 @@
 - **Chat in select screens:** player chat and the chat box now draw over character and stage select.
 - **Percent display:** whole percents with a stock row on a mirrored HUD panel, a marker over each fighter with percent, name and slot colour, and damage stops at 999%.
 - **Battle.net names:** the fighter marker shows your name without the #number tag.
-- **= key:** save a moment with the = key instead of K, so K can be bound to an action.
+- **-clip command:** type -clip in chat to save a moment, and = and - are ordinary keys you can bind.
 - **Smashes and aerials:** every smash holds full charge for 120 more frames, every aerial now has Melee's auto-cancel windows, and short hopping lets you land an aerial's first active frame.
 - **Melee feel:** every fighter gets Melee's movement and body numbers, throws launch as if the victim weighed 100, tech rolls are intangible for 20 frames, and wall techs hold until they end.
 - **Banish:** attacks pass through a Banished fighter, as in Warcraft III.
@@ -69,7 +69,7 @@ New here? Place only your own fighter chip and press Y to practice alone.
 - Jump: **Space** or **8**. Shield and air dodge: **Q**. Light shield: **0**. Grab: **O**
 - Attack: **N**, with a direction for tilts. Hold Strong (**9**) and press **N** for smashes: up, down, or forward with a side direction or none. Special: **U**, with a direction
 - EX special: **9 + U** with a direction, which costs one meter segment. Ultimate: **N + U** together at a full meter
-- Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: **=**
+- Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: type **-clip**
 
 Rebind any key on the Controls screen, or press **F1** before a match. The full guide is in the GitHub repository: [smashcraft/docs/player-guide.md at main · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/blob/main/docs/player-guide.md)
 Controllers work through a separate, experimental helper, [padbridge](https://github.com/tompassarelli/padbridge/releases/latest), which turns a pad into keys while Warcraft III is in front.
@@ -93,7 +93,7 @@ Controllers work through a separate, experimental helper, [padbridge](https://gi
 - Most testing was on Linux. Tell us if anything differs on Windows or macOS.
 
 ## Feedback
-Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/issues). Say which fighters, which stage and what happened. Pressing = in a match saves its last ten seconds to `smashcraft-repro-*.txt` in Warcraft III's CustomMapData folder; attach it to the report.
+Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/issues). Say which fighters, which stage and what happened. Typing -clip in chat during a match saves its last ten seconds to `smashcraft-repro-*.txt` in Warcraft III's CustomMapData folder; attach it to the report.
 
 ## Credits
 - Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License).

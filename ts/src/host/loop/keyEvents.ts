@@ -20,7 +20,7 @@ export const KEYBOARD_PAUSE_PREFIX = "SC_KP";
 
 
 export const Key = {
-  backspace: 0x08, enter: 0x0d, escape: 0x1b, g: 0x47, h: 0x48, j: 0x4a, n: 0x4e, r: 0x52, t: 0x54, u: 0x55, w: 0x57, y: 0x59, f1: 0x70, f2: 0x71, f9: 0x78, equal: 0xbb,
+  backspace: 0x08, enter: 0x0d, escape: 0x1b, g: 0x47, h: 0x48, j: 0x4a, n: 0x4e, r: 0x52, t: 0x54, u: 0x55, w: 0x57, y: 0x59, f1: 0x70, f2: 0x71, f9: 0x78,
 } as const;
 
 export interface KeyEventPolicy {
@@ -57,9 +57,9 @@ export function keyEventAllowed(policy: Readonly<KeyEventPolicy>, key: number, b
 }
 
 
-export function registerKey(s: Readonly<ShellState>, trigger: trigger, key: number, down: boolean, meta: number = 0): void {
+export function registerKey(s: Readonly<ShellState>, trigger: trigger, key: number, down: boolean): void {
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), meta, down);
+    if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), 0, down);
   }
 }
 
@@ -70,10 +70,6 @@ function registerKeys(s: ShellState): void {
       if (key === Key.y || key === Key.enter || key === Key.backspace) continue;
       registerKey(s, down, key, true);
       registerKey(s, up, key, false);
-      if (key === 0xbb) {
-        registerKey(s, down, key, true, 1);
-        registerKey(s, up, key, false, 1);
-      }
     }
   }, (down, up) => {
     TriggerAddAction(down, trampoline(KEY_DOWN));

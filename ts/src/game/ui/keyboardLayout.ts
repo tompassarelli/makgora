@@ -8,18 +8,18 @@ export interface KeyCap {
 }
 
 const ROWS: readonly (readonly [indent: number, keys: string])[] = [
-  [0, "1234567890"],
+  [0, "1234567890-="],
   [0.5, "QWERTYUIOP"],
   [0.75, "ASDFGHJKL;"],
   [1.25, "ZXCVBNM,./"],
 ];
 
-const SYMBOLS: Readonly<Record<string, number>> = { ";": 186, ",": 188, ".": 190, "/": 191 };
+const SYMBOLS: Readonly<Record<string, number>> = { "-": 189, "=": 187, ";": 186, ",": 188, ".": 190, "/": 191 };
 const SPACE = 32;
 
 export const KEY_CAP_HEIGHT = f32(0.042);
-const KEY_CAP_WIDTH = f32(0.05);
-const PITCH = f32(0.054);
+const KEY_CAP_WIDTH = f32(0.046);
+const PITCH = f32(0.05);
 const ROW_PITCH = f32(0.048);
 
 export function keyboardCaps(left: number, top: number): KeyCap[] {

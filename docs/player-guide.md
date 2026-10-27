@@ -89,7 +89,7 @@ rebind. Reset to layout brings back the defaults of the layout you picked.
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
-bring back your saved ones. Y (Start), Backspace (Pause) and = (save a moment) are reserved; F6 and F7
+bring back your saved ones. Y (Start) and Backspace (Pause) are reserved; F6 and F7
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
 is refused and the screen names what it is reserved for. Ctrl+T starts a developer input trace.
 
@@ -99,7 +99,7 @@ change it), How to play (stocks, shield, recovery) and Commands entries; F9 on
 the Controls screen closes it so the quest log shows. A line at the start of
 each game says so.
 
-Saw something wrong? Press K, or hold View on a controller for a second: the
+Saw something wrong? Type -clip in chat, or hold View on a controller for a second: the
 last ten seconds of the match are saved for a bug report on your computer, in
 Warcraft III's CustomMapData folder as smashcraft-repro-*.txt, and "Moment
 saved" appears. The match goes on undisturbed.

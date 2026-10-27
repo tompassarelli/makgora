@@ -1,4 +1,5 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
+import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
 import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, reservedReason, unboundActions } from "../input/keyBindings";
 import {
@@ -13,11 +14,13 @@ import {
   initializeBindingSettings,
   resetToLayout,
 } from "./bindingSettings";
+import { keyboardCaps } from "./keyboardLayout";
 
 const BACKSPACE = 0x08;
 const F6 = 0x75;
 const F7 = 0x76;
 const EQUALS = 0xbb;
+const MINUS = 0xbd;
 const code = (character: string) => character.charCodeAt(0);
 
 function customSettings(): BindingSettings {
@@ -60,7 +63,7 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(encodeBindings(settings.bindings), before, "clearing an unbound key");
 
   beginBindingCapture(settings, Action.attack, 0);
-  for (const key of [code("Y"), BACKSPACE, EQUALS, F6, F7]) {
+  for (const key of [code("Y"), BACKSPACE, F6, F7]) {
     assertEquals(captureBinding(settings, key), true);
     assertEquals(settings.message, `${reservedReason(key)}. Press another key.`);
     assertEquals(encodeBindings(settings.bindings), before, `reserved ${keyLabel(key)}`);
@@ -69,7 +72,8 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   cancelBindingCapture(settings);
   assertEquals(settings.capture, undefined);
   assertEquals(settings.message, "Rebind cancelled.");
-  assertEquals(reservedReason(EQUALS), "= is reserved for saving a moment");
+  assertEquals(reservedReason(EQUALS), undefined);
+  assertEquals(reservedReason(MINUS), undefined);
   assertEquals(reservedReason(code("K")), undefined);
   beginBindingCapture(settings, Action.attack, 0);
   assertEquals(captureBinding(settings, code("K")), true);
@@ -78,4 +82,20 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   resetToLayout(settings);
   assertEquals(encodeBindings(settings.bindings), encodeBindings(presetBindings("custom")), "Reset to layout");
   assertEquals(settings.message, `${PRESET_NAMES.custom} defaults restored. Save to keep them.`);
+});
+
+test("the = and - keys capture as bindings, are named, and have a cap on the controls screen's keyboard [k2 property]", () => {
+  const settings = customSettings();
+  beginBindingCapture(settings, Action.attack, 0);
+  assertEquals(captureBinding(settings, EQUALS), true);
+  beginBindingCapture(settings, Action.walk, 0);
+  assertEquals(captureBinding(settings, MINUS), true);
+  assertEquals(slots(settings, Action.attack), "= —", "Attack after binding =");
+  assertEquals(slots(settings, Action.walk), "- —", "Tilt after binding -");
+  assertEquals(keyLabel(EQUALS), "=");
+  assertEquals(keyLabel(MINUS), "-");
+  const caps = keyboardCaps(f32(0.12), f32(0.465));
+  for (const key of [EQUALS, MINUS]) assertEquals(caps.filter(cap => cap.key === key).length, 1, `cap for ${keyLabel(key)}`);
+  const rightEdge = Math.max(...caps.map(cap => cap.x + cap.width));
+  assertEquals(rightEdge < f32(0.09) + f32(0.66), true, "keyboard stays inside the controls panel");
 });

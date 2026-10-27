@@ -72,6 +72,7 @@ const INPUT = "shell.input";
 const DEV_COMMAND = "shell.devCommand";
 const CONTROLS_COMMAND = "shell.controlsCommand";
 const SAVE_CONTROLS = "-save";
+const SAVE_MOMENT_COMMAND = "-clip";
 const LOAD_CONTROLS = "-load";
 const RESTART = "shell.restart";
 const TRACE = "shell.trace";
@@ -297,9 +298,6 @@ function createTriggers(s: ShellState): void {
   registerKey(s, pauseDown, Key.backspace, true);
   TriggerAddAction(pauseDown, trampoline(KEY_PAUSE_DOWN));
   syncTrigger(s, KEYBOARD_PAUSE_PREFIX, KEYBOARD_PAUSE, true);
-  const moment = CreateTrigger();
-  registerKey(s, moment, Key.equal, true);
-  TriggerAddAction(moment, trampoline(SAVE_MOMENT));
   syncKeyEvents(s);
   const { rollback } = s;
   if (rollback !== undefined) syncTrigger(s, INPUT_PREFIX, INPUT, true);
@@ -320,6 +318,9 @@ function createTriggers(s: ShellState): void {
     TriggerRegisterPlayerChatEvent(controls, Player(slot), LOAD_CONTROLS, true);
   }
   TriggerAddAction(controls, trampoline(CONTROLS_COMMAND));
+  const clip = CreateTrigger();
+  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(clip, Player(slot), SAVE_MOMENT_COMMAND, true);
+  TriggerAddAction(clip, trampoline(SAVE_MOMENT));
   syncTrigger(s, PLAYTEST_PREFIX, PLAYTEST, true);
   syncTrigger(s, STAGE_READY_PREFIX, STAGE_READY, true);
   const leave = CreateTrigger();
