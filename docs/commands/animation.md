@@ -183,6 +183,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   changed length; every other clip, and the `... Motion` roots later passes added, stays
   byte-identical, so a move whose sim timing is unchanged is reworked without regenerating the
   clips that later passes edited (#459).
+  Its down air keys three poses from smashcraft:tools/animations/anubarak-gestures.ts on the move's own timing: claws overhead
+  with the legs tucked, both claws driven straight down under the shell on the first active frame, then carried
+  back under him through the active frames before easing to the fall pose; `--rekey downAir` re-authors it alone.
   A Blender take of his dash attack (#339, judged but not yet shipped): `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --rig RIG.json`
   writes his skeleton, stand pose and the move's timing, then
   `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/anubarak-dash-attack.py -- RIG.json KEYS.json`

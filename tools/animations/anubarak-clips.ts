@@ -16,6 +16,7 @@ import { blenderOptions, blenderSkeleton } from "./blender-keys";
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
 import { rekeySequences } from "./sequence-rekey";
 import { eased, lungeAt, type Lunge } from "./root-lunge";
+import { back, brace, burrowRake, cast, forward, type Gesture, low, overhead, plunge, upperAir } from "./anubarak-gestures";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -40,24 +41,7 @@ if (source.Sequences.length > 17) {
 const model = structuredClone(source);
 ensure(source.Sequences.length === 17 && source.Helpers.some(b => b.Name === "Bone_ArmClawR"), "Expected original classic Crypt Lord");
 const stand = source.Sequences[0]!;
-interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; wrist?: number; hand?: number; leftArm?: number; leftElbow?: number; leftWrist?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; frontThigh?: number; leftFrontThigh?: number; frontKnee?: number; leftFrontKnee?: number; shield?: number; leftShield?: number; shieldTwist?: number; leftShieldTwist?: number; yaw?: number; lean?: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
-const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
-const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
-const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
-const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20, yaw: 105 };
-const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
-const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
-const upperAir: readonly Gesture[] = [
-  { chest: 55, pelvis: 25, lean: 25, arm: -185, elbow: 20, leftArm: -185, head: -25, thigh: 65, knee: -80, leftThigh: -55 },
-  { chest: -35, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -25, leftThigh: 25 },
-  { chest: -30, pelvis: -20, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -35, leftThigh: 35 },
-];
-const burrowRake: readonly Gesture[] = [
-  { chest: 75, pelvis: 35, lean: 25, arm: -185, elbow: 20, leftArm: -185, head: -25, thigh: 65, knee: -80, leftThigh: -55 },
-  { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
-  { chest: -40, pelvis: -25, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -20, leftThigh: 20 },
-];
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
   jab2: { contact: 7, x: 64, back: 32 },
@@ -68,7 +52,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   forwardAir: { contact: 12, x: 20, back: 10, decay: 26 },
   backAir: { contact: 10, x: -70, back: 35, over: 0, peak: 9, hold: 0, snap: { frames: 3, keep: 0.3 }, decay: 27 },
   dashAttack: { contact: 8, x: 56, back: 26, over: 0.4, ramp: 11, decay: 21 },
-  downAir: { contact: 16, z: -12, back: 6 },
+  downAir: { contact: ANUBARAK_MOVES.normals[AttackStyle.downAir]!.startupFrames, z: -20, back: 10, hold: 4 },
   neutralSpecial: { contact: 17, x: 32, back: 16, over: 0.4, ramp: 8 },
   upSpecial: { contact: 8, z: 34, back: 24 },
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
@@ -99,7 +83,6 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
 const swings: Partial<Record<HeroPose, readonly [windup: number, follow: number]>> = {
   upSpecial: [0.8, 1],
   upSpecialAir: [0.8, 1],
-  downAir: [0.6, 1.3],
 };
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, number]][] = [
@@ -282,6 +265,14 @@ for (const [ordinal, action] of authoredActions.entries()) {
           : frame <= 11 ? blend(poses[1]!, poses[2]!, (frame - 8) / 3)
           : frame <= 13 ? poses[2]!.slice()
           : blend(poses[2]!, first.Vector, (frame - 13) / (action.frames - 13));
+      }
+      if (node && action.pose === "downAir") {
+        const poses = plunge.map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
+        const cocked = action.contact - 4, held = action.contact + ANUBARAK_MOVES.normals[AttackStyle.downAir]!.activeFrames - 1;
+        Vector = frame <= cocked ? blend(first.Vector, poses[0]!, eased(frame / cocked, 1.6))
+          : frame <= action.contact ? blend(poses[0]!, poses[1]!, (frame - cocked) / (action.contact - cocked))
+          : frame <= held ? blend(poses[1]!, poses[2]!, (frame - action.contact) / (held - action.contact))
+          : blend(poses[2]!, first.Vector, eased((frame - held) / (action.frames - held), 1.4));
       }
       if (action.pose === blenderPose) Vector = bakedVector?.(path, frame) ?? Vector;
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);

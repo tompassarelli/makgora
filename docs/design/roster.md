@@ -2052,7 +2052,7 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 | Forward air — Royal Skewer | 13/4/27; L20 | 13 | Claw raised overhead scythes forward and down through the target |
 | Back air — Hindclaw | 11/4/27; L20 | 14 | Shell drives backward as the claws rake through behind it |
 | Up air — Horn of the King | 9/4/23; L16 | 10 | Coiled rise that lifts both claws in a rising overhead rake |
-| Down air — Tombstone | 17/4/30; L24 | 15 | Head-first downward shell strike; airborne spike |
+| Down air — Tombstone | 14/5/32; L24 | 15 | Both claws raised overhead drive straight down under his shell; airborne spike |
 
 ### Four specials and EX
 

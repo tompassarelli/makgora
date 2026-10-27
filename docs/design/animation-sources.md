@@ -331,3 +331,11 @@ Stock attack and cast sequences: "Attack Spell", "Attack - 1".
 | Grab, pummel, throws | grab: murloc grab; pummel: murloc pummel; f-throw: murloc throwforward; b-throw: murloc throwback; u-throw: murloc throwup; d-throw: murloc throwdown | Keep: paired holder and victim gestures meet on a contact frame; no stock sequence holds a victim |
 | Get-up, ledge attacks | get-up: murloc getupattack; ledge: murloc ledgeattack | Keep: they start lying down or hanging; no stock sequence does |
 | Specials | N: murloc neutralspecial; N air: murloc neutralspecialair; S: murloc sidespecial; S air: murloc sidespecialair; U: murloc upspecial; U air: murloc upspecialair; D: murloc downspecial; D air: murloc downspecialair | Keep: each special has its own authored gesture; the model has one generic cast ("Spell" or "Spell Slam"), not one per special |
+
+### Anub'arak
+
+Stock attack and cast sequences: "Attack", "Attack - 2", "Attack Alternate", "Spell", "Spell Alternate", "Spell Channel", "Spell Throw".
+
+| Moves | Clip in use | Verdict |
+| --- | --- | --- |
+| Aerials | dair: anubarak downAir | Keep authored: every stock attack stands on the ground. The down air (2026-10-27) raises both claws overhead with the legs tucked, drives them straight down under his shell through the active frames 14-18, then eases back to the fall pose; no stock sequence strikes below his feet |

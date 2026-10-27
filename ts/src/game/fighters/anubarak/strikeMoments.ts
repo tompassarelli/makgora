@@ -16,7 +16,7 @@ export const anubarakStrikeMoments = {
   13: { clip: 29, seconds: f32(0.183), end: f32(0.717) },
   14: { clip: 30, seconds: f32(0.150), end: f32(0.683) },
   15: { clip: 31, seconds: f32(0.183), end: f32(0.583) },
-  16: { clip: 32, seconds: f32(0.267), end: f32(0.833) },
+  16: { clip: 32, seconds: f32(0.233), end: f32(0.833) },
   17: { clip: 54, seconds: f32(0.817), end: f32(0.817) },
   19: { clip: 24, seconds: f32(0.150), end: f32(0.683) },
   20: { clip: 18, seconds: f32(0.133), end: f32(0.500) },
