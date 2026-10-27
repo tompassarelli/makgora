@@ -219,7 +219,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Jab, Second jab | BattleNetWooshStereo1 | MetalLightChopFlesh | MetalHeavyChopFlesh + AxeMediumChopWood | MetalLightChopMetal |  |
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavyChopFlesh | MetalHeavyChopFlesh + AxeMediumChopWood | MetalHeavyChopMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalHeavyChopFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
-| Neutral special: Lumber Toss | AxeMissileLaunch | AxeMediumChopWood | AxeMediumChopWood + AxeMediumChopWood | MetalMediumChopMetal |  |
+| Neutral special: Gold Sack |  | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Side special: Log Heave | AxeMediumChopWood | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Up special: Worksite Launch | CatapultAttack1 | WoodMediumBashFlesh | WoodMediumBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Down special: Rest | CreepSleep | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |

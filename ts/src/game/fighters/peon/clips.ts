@@ -26,7 +26,7 @@ export const PEON_CLIPS = {
   upAir: { index: 36, seconds: f32(0.55), aligned: true },
   downAir: { index: 37, seconds: 0.75, aligned: true },
   neutralSpecial: { index: 38, seconds: f32(0.8), aligned: true },
-  sideSpecial: { index: 39, seconds: f32(0.867), aligned: true },
+  sideSpecial: { index: 39, seconds: 0.5, aligned: true },
   upSpecial: { index: 40, seconds: f32(0.467), aligned: true },
   downSpecial: { index: 41, seconds: f32(0.633), aligned: true },
   turn: { index: 42, seconds: f32(0.133), aligned: true },
@@ -77,7 +77,7 @@ export const PEON_CLIPS = {
   damageShield: { index: 43, seconds: f32(0.133), aligned: true },
   smashCharge: { index: 49, seconds: 0.5, aligned: true },
   neutralSpecialAir: { index: 38, seconds: f32(0.8), aligned: true },
-  sideSpecialAir: { index: 39, seconds: f32(0.867), aligned: true },
+  sideSpecialAir: { index: 39, seconds: 0.5, aligned: true },
   upSpecialAir: { index: 40, seconds: f32(0.467), aligned: true },
   downSpecialAir: { index: 41, seconds: f32(0.633), aligned: true },
 } as const satisfies HeroClipTable;

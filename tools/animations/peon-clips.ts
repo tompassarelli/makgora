@@ -9,9 +9,11 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const painOnly = process.argv.includes("pain"), lumberOnly = process.argv.includes("lumber"), shipped = painOnly || lumberOnly;
+const painOnly = process.argv.includes("pain"), lumberOnly = process.argv.includes("lumber");
+const reauthorNames = process.argv.includes("reauthor") ? process.argv.slice(process.argv.indexOf("reauthor") + 1) : [];
+const shipped = painOnly || lumberOnly || reauthorNames.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/peon-clips.ts STOCK_PEON.mdx|SHIPPED_PEON.mdx PRIVATE_OUTPUT [pain|lumber]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/peon-clips.ts STOCK_PEON.mdx|SHIPPED_PEON.mdx PRIVATE_OUTPUT [pain|lumber|reauthor ACTION...]");
 mkdirSync(join(output, "hero-models"), { recursive: true });
 const source = parseSource(await Bun.file(input).arrayBuffer());
 ensure(source.Sequences.length === (shipped ? 90 : 22), shipped ? "Use the shipped 90-sequence Peon model" : "Use the unmodified stock Peon model");
@@ -50,7 +52,11 @@ add("backAir", 35, [phase(0), phase(5, { axe: -35, grip: -105, chest: 22, yaw: 6
 strike("upAir", 33, 7, 9, { axe: -20, chest: 20, knee: 42 }, { axe: -110, grip: -100, elbow: -10, chest: 0, knee: 20 }, {}, true, { axe: -175, grip: -135, elbow: -22, chest: -24, knee: 10 });
 strike("downAir", 45, 13, 16, { axe: -160, chest: -20, knee: 60 }, { axe: 25, elbow: 0, chest: 15, knee: 65 }, { axe: 25, chest: 15, knee: 50 }, true, { axe: 45, elbow: 0, chest: 15, knee: 65 });
 strike("neutralSpecial", 42, 18, 20, { grip: -145, chest: -20, twist: -25, knee: 20 }, { grip: -80, axe: -35, chest: 32, twist: 30, knee: 12 });
-strike("sideSpecial", 52, 26, 29, { axe: -135, chest: 20, knee: 32 }, { axe: 50, grip: -70, chest: 40, knee: 35 });
+const shouldered = { chest: 6, knee: 12, axe: -160, grip: -150, elbow: -45, head: 6 };
+add("sideSpecial", 30, [phase(0), phase(8, { chest: 48, knee: 52, tuck: 0.2, axe: 20, grip: -20, elbow: 8, head: -8 }), phase(12, { chest: 56, knee: 62, tuck: 0.25, axe: 28, grip: -12, elbow: 10, head: -12 }),
+  phase(14, { chest: 30, knee: 34, tuck: 0.1, axe: -35, grip: -55, elbow: 0 }), phase(15, { chest: 10, knee: 18, axe: -80, grip: -90, elbow: -10 }),
+  phase(17, { chest: -18, knee: 4, axe: -135, grip: -125, elbow: -20, head: 10, height: 4 }), phase(20, shouldered), phase(25, shouldered),
+  phase(27, { chest: -12, knee: 10, axe: -178, grip: -172, elbow: -10, head: 4 }), phase(30)]);
 add("upSpecial", 28, [phase(0), phase(6, { chest: 35, knee: 65, axe: 40, tuck: 0.2 }), phase(8, { chest: -15, axe: -155, grip: -110, knee: 10 }), phase(18, { chest: -25, axe: -170, grip: -150, knee: 45 }), phase(28, { chest: 15, knee: 50, axe: -75 })], { air: true });
 add("downSpecial", 38, [phase(0), phase(3, { chest: 35, knee: 55, axe: -85, grip: -65, tuck: 0.16 }), phase(7, { chest: 38, knee: 55, axe: -95, grip: -70, tuck: 0.16 }), phase(18, { chest: 20, knee: 25, axe: 20, grip: -25 }), phase(38)]);
 
@@ -157,18 +163,21 @@ if (lumberOnly) {
   console.log(`PEON_LUMBER_PASS: lumber geoset ${LUMBER_GEOSET} hidden in sequences ${CARGO.join(" and ")}; ${source.Sequences.length - CARGO.length} sequences unchanged; ${bytes.byteLength} model bytes`);
   process.exit(0);
 }
-if (painOnly) {
+const literal = (b: { index: number, seconds: number, contact?: number }) => `{ index: ${b.index}, seconds: ${seconds(b.seconds)}, aligned: true${b.contact ? `, contact: ${seconds(b.contact)}` : ""} }`;
+const aliases: Record<string, string> = { doubleJump: "jump", wallJump: "jump", wallTech: "tech", fallSpecial: "fall", downDamage: "knockdown", damageTumble: "knockdown", damageGround: "pain11", damageAir: "pain11", damageShield: "stop", smashCharge: "shield", neutralSpecialAir: "neutralSpecial", sideSpecialAir: "sideSpecial", upSpecialAir: "upSpecial", downSpecialAir: "downSpecial" };
+const reauthorInPlace = (targets: readonly Action[], resize: boolean) => {
   const motion = model.Helpers.find(h => h.Name === "Peon Motion");
   ensure(motion !== undefined, "Shipped Peon lacks its motion helper");
   const donors = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => donors.set(p, t));
   const motionIndex = model.Helpers.indexOf(motion), added = (path: string) => { const helper = /^\.Helpers\.(\d+)\./.exec(path); return helper !== null && Number(helper[1]) >= motionIndex; };
-  const pains = actions.filter(a => a.pain), indices: number[] = [], moves: mdx.AnimKeyframe[][] = [];
-  for (const action of pains) {
+  const indices: number[] = [], moves: mdx.AnimKeyframe[][] = [];
+  for (const action of targets) {
     const index = model.Sequences.findIndex(s => s.Name === `Peon ${action.name}`);
     ensure(index >= 0, `Peon ${action.name}: shipped sequence missing`);
     const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
-    ensure(end - start === Math.round(action.frames * 1000 / 60), `Peon ${action.name}: timing changed`);
-    const at = (f: number) => Math.round(start + f * (end - start) / action.frames);
+    const length = Math.round(action.frames * 1000 / 60);
+    ensure(resize ? end - start >= length : end - start === length, `Peon ${action.name}: timing changed`);
+    const at = (f: number) => Math.round(start + f * length / action.frames);
     tracks(model, (track, path) => {
       if (onGlobalClock(track)) return;
       if (added(path)) { if (path.startsWith(`.Helpers.${motionIndex}.`)) track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end); return; }
@@ -192,25 +201,50 @@ if (painOnly) {
       const key = { Frame, Vector: new Float32Array([0, 0, g.height ?? 0]) }; translations.push(key); motion.Translation!.Keys.push(key);
     }
     for (const track of [motion.Rotation!, motion.Scaling!, motion.Translation!]) track.Keys.sort((a, b) => a.Frame - b.Frame);
+    model.Sequences[index]!.Interval = new Uint32Array([start, start + length]);
     indices.push(index); moves.push(translations);
   }
   const unsnapped = generateMDX(model);
-  for (const [cell, action] of pains.entries()) snapPain(unsnapped, indices[cell]!, action.frames, moves[cell]!);
+  for (const [cell, action] of targets.entries()) snapPain(unsnapped, indices[cell]!, action.frames, moves[cell]!);
   const bytes = encodeVerified(parseSource(generateMDX(model))), before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);
   for (const [index, s] of source.Sequences.entries()) if (!indices.includes(index)) for (const t of [0, 0.5, 1]) {
     const a = before.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1), b = after.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1);
     ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${s.Name}: shipped pose changed`);
   }
-  const gate = painGate(bytes, PEON, 9, indices);
-  console.log(gate.report);
-  ensure(gate.pass, "Peon pain poses fail the pain gate");
-  for (const [cell, action] of pains.entries()) {
+  return { bytes, after, indices };
+};
+const sheets = async (targets: readonly Action[], after: DrawnModel, indices: readonly number[]) => {
+  for (const [cell, action] of targets.entries()) {
     const moments = action.phases.map(p => Math.round(p.at));
     const capture = sheet(`Peon ${action.name}`, after, [1, -1].flatMap(facing => moments.map(frame => ({ frame, facing, clip: indices[cell]!, seconds: frame / 60, phase: AttackPhase.active, x: 0, z: 0, parts: [], strikes: [] }))), moments.length);
     await Bun.write(join(output, `${action.name}.png`), capture.png);
   }
+};
+if (painOnly) {
+  const pains = actions.filter(a => a.pain);
+  const { bytes, after, indices } = reauthorInPlace(pains, false);
+  const gate = painGate(bytes, PEON, 9, indices);
+  console.log(gate.report);
+  ensure(gate.pass, "Peon pain poses fail the pain gate");
+  await sheets(pains, after, indices);
   const modelPath = join(output, "hero-models/peon.mdx"); await Bun.write(modelPath, bytes); chmodSync(modelPath, 0o644);
   console.log(`PEON_PAIN_PASS: 9 pain cells re-authored in place; ${source.Sequences.length - 9} shipped sequences preserved; ${bytes.byteLength} model bytes`);
+  process.exit(0);
+}
+if (reauthorNames.length > 0) {
+  const targets = reauthorNames.map(name => { const action = actions.find(a => a.name === name && !a.pain); ensure(action !== undefined, `${name}: no such Peon action`); return action; });
+  const { bytes, after, indices } = reauthorInPlace(targets, true);
+  await sheets(targets, after, indices);
+  const modelPath = join(output, "hero-models/peon.mdx"); await Bun.write(modelPath, bytes); chmodSync(modelPath, 0o644);
+  const clipsPath = join(project, "ts/src/game/fighters/peon/clips.ts");
+  let clips = await Bun.file(clipsPath).text();
+  for (const [cell, action] of targets.entries()) for (const name of [action.name, ...Object.keys(aliases).filter(alias => aliases[alias] === action.name)]) {
+    const row = new RegExp(`^  ${name}: \\{ index: ${indices[cell]}, [^\\n]*\\},$`, "m");
+    ensure(row.test(clips), `${name}: clip row missing`);
+    clips = clips.replace(row, `  ${name}: ${literal({ index: indices[cell]!, seconds: action.frames / 60, ...(action.contact ? { contact: action.contact } : {}) })},`);
+  }
+  await Bun.write(clipsPath, clips);
+  console.log(`PEON_REAUTHOR_PASS: ${reauthorNames.join(", ")} re-authored in place; ${source.Sequences.length - targets.length} shipped sequences preserved; ${bytes.byteLength} model bytes`);
   process.exit(0);
 }
 const id = model.Nodes.length;
@@ -319,8 +353,6 @@ const idle=before.triangles(9,0,1),pain=actions.filter(a=>a.pain).map(a=>after.t
 for(const [cell,p] of pain.entries())ensure(p.some((v,i)=>Math.abs(v-idle[i]!)>=8),`Pain ${cell}: insufficient recoil`);
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++)ensure(pain[a]!.some((v,i)=>Math.abs(v-pain[b]![i]!)>2),`Pain ${a}/${b}: same pose`);
 const modelPath=join(output,"hero-models/peon.mdx");await Bun.write(modelPath,bytes);chmodSync(modelPath,0o644);
-const literal=(b:{index:number,seconds:number,contact?:number})=>`{ index: ${b.index}, seconds: ${seconds(b.seconds)}, aligned: true${b.contact?`, contact: ${seconds(b.contact)}`:""} }`;
-const aliases:Record<string,string>={doubleJump:"jump",wallJump:"jump",wallTech:"tech",fallSpecial:"fall",downDamage:"knockdown",damageTumble:"knockdown",damageGround:"pain11",damageAir:"pain11",damageShield:"stop",smashCharge:"shield",neutralSpecialAir:"neutralSpecial",sideSpecialAir:"sideSpecial",upSpecialAir:"upSpecial",downSpecialAir:"downSpecial"};
 await Bun.write(join(project,"ts/src/game/fighters/peon/clips.ts"),[
   "// Generated by tools/animations/peon-clips.ts; regenerate instead of editing.",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClipTable, HeroClip } from "../../sim/heroes/hero";',
