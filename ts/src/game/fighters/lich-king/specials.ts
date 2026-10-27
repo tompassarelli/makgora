@@ -91,7 +91,7 @@ function ascension(height: number, steer: number): AuthoredSpecial {
     endFrame: 46,
     facesStick: true,
     motion: [{ ...frames(8, 30), velocityX: 0.0, velocityZ: f32(h(height) / ASCENT_FRAMES), driftSpeed: f32(h(steer) / ASCENT_FRAMES) }],
-    regions: [heroRegion(8, 30, capsule(0.0, 50.0, 0.0, 110.0, 62.0), hit(11.25, "LAUNCH", 80))],
+    regions: [heroRegion(8, 30, capsule(0.0, 50.0, 0.0, 190.0, 62.0), hit(11.25, "LAUNCH", 80))],
     oncePerAirtime: true,
     helpless: true,
   };
