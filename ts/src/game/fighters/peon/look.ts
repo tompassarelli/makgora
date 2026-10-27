@@ -10,7 +10,7 @@ export const peonLook: HeroLook = {
   model: "units\\orc\\Peon\\Peon.mdl",
   objectId: 0x6d667065,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNPeon.blp",
-  clips: { ...PEON_CLIPS, neutralSpecial: GOLD_CARRY, neutralSpecialAir: GOLD_CARRY },
+  clips: PEON_CLIPS,
   followUpClips: { neutralSpecialFollowUp: SACK_BONKS, neutralSpecialFollowUpAir: SACK_BONKS },
   damageClips: PEON_PAIN_CLIPS,
   fallback: PEON_FALLBACK_CLIP, defeat: "death",

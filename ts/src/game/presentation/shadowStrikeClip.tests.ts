@@ -4,7 +4,7 @@ import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 import { Character, SpecialAction } from "../sim/codes";
 import { SpecialForm, specialForm } from "../sim/specials/schema";
 import { specialClip } from "./fighterClips";
-import { FRAME_SECONDS } from "./fighterPose";
+import { FRAME_SECONDS } from "./frameClock";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 

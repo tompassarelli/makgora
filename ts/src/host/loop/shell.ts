@@ -10,7 +10,7 @@ import { ownConfirmedState } from "./confirmedState";
 import { startKeyUp } from "../../game/match/controls";
 import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, participantLeft, startComputerChoices, updateConnectedHumans } from "../../game/lobby/lobbyState";
 import { chooseScenarioCharacters } from "../../game/session/scenarios";
-import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
+import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { holdGameSpeed } from "./gameSpeed";
 import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import { type MapBuild, journalIngress } from "../../game/session/build";

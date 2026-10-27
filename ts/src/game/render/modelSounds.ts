@@ -6,7 +6,8 @@ import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalC
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount } from "../../generated/assets/modelSoundInfo";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { FRAME_SECONDS, type FighterPose } from "../presentation/fighterPose";
+import type { FighterPose } from "../presentation/fighterPose";
+import { FRAME_SECONDS } from "../presentation/frameClock";
 import { f32 } from "wisp/src/sim/f32";
 import { toInt } from "wisp/src/sim/binary32";
 import type { Fighter } from "../sim/fighter";

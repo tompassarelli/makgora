@@ -29,6 +29,7 @@ interface PeonCueState<Rest> {
 export const GOLD_SACK_MODEL = "Objects\\InventoryItems\\PotofGold\\PotofGold.mdx";
 export const GOLD_SACK_SCALES: readonly number[] = [f32(0.6), f32(0.75), f32(0.9), f32(1.05), f32(1.3)];
 const GOLD_CLINK = "ReceiveGold";
+const GOLD_SACK_SWUNG_SCALE = f32(1.5);
 export const GOLD_SACK_ON_BACK = { x: -14.0, z: 84.0 } as const;
 const SACK_ON_BACK = Array.from({ length: 40 }, () => GOLD_SACK_ON_BACK);
 
@@ -37,7 +38,7 @@ export const goldSackStage = (charge: number): number => chargeStage(GOLD_SACK_C
 const goldSackCues = (scale: number, clink: boolean): SackCues => ({
   spell: "Gold Sack",
   startup: { model: GOLD_SACK_MODEL, anchor: "behind", scale, drawn: true, sound: clink ? GOLD_CLINK : undefined, anchorFrames: SACK_ON_BACK },
-  active: { model: GOLD_SACK_MODEL, anchor: "ahead", scale, drawn: true },
+  active: { model: GOLD_SACK_MODEL, anchor: "ahead", scale: f32(scale * GOLD_SACK_SWUNG_SCALE), drawn: true },
 });
 export const GOLD_SACK_CUES: readonly SackCues[] = GOLD_SACK_SCALES.map((scale, stage) => goldSackCues(scale, stage > 0));
 export const EMPTY_GOLD_SACK_CUES: SackCues = goldSackCues(f32(0.6), false);

@@ -26,6 +26,8 @@ import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./cueWindows";
+import { FRAME_SECONDS } from "./frameClock";
+import { peonSpecialPose } from "./peonPose";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { heroLook } from "../roster/looks";
 import {
@@ -36,7 +38,7 @@ import {
 
 const playsFollowUpPose = (f: Readonly<Fighter>): boolean => f.special.form >= FOLLOW_UP_FORM || f.special.form === SpecialForm.recall;
 
-export const FRAME_SECONDS = f32(0.016666667);
+
 const REACTION_CLIP_FRAMES = 24;
 const JUMP_CLIP_FRAMES = 24;
 const DOUBLE_JUMP_CLIP_FRAMES = 30;
@@ -334,9 +336,10 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     return rate;
   }
   if (f.special.action !== SpecialAction.none && f.launch.hitstun === 0) {
-    if (character === Character.peon && f.special.action === SpecialAction.heroDown) {
-      playIndex(pose, "rest", clips.clipFor(character, "ko").index);
-      pose.clipTime = peonRestClipTime(f.special.frame);
+    const peon = peonSpecialPose(f);
+    if (peon !== undefined) {
+      playIndex(pose, peon.key, peon.clip);
+      pose.clipTime = peon.time;
       return 0.0;
     }
     playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}${refireKey(f)}`, fighterSpecialClip(f).index);
@@ -719,13 +722,6 @@ function groundDodgeClip(f: Readonly<Fighter>): HeroClip {
   return clips.clipFor(f.character, isForwardGroundRoll(f) ? "rollForward" : "rollBackward");
 }
 
-const PEON_REST_JOLT_SECONDS = f32(0.2);
-const PEON_REST_ASLEEP_SECONDS = f32(1.4);
-
-
-export function peonRestClipTime(frame: number): number {
-  return Math.min(PEON_REST_ASLEEP_SECONDS, f32(PEON_REST_JOLT_SECONDS + f32(Math.max(0, frame - 1) * FRAME_SECONDS)));
-}
 
 const wingBranch = (f: Readonly<Fighter>): boolean => f.special.action === SpecialAction.demonHunterWingAscent && f.special.form !== 0;
 

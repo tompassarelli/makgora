@@ -3,7 +3,8 @@ import { Character } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";
 import { createRoster, neutralControls } from "../src/game/sim/roster";
 import { advanceFighter } from "../src/game/sim/step";
-import { FRAME_SECONDS, advanceFighterPose, createFighterPose } from "../src/game/presentation/fighterPose";
+import { advanceFighterPose, createFighterPose } from "../src/game/presentation/fighterPose";
+import { FRAME_SECONDS } from "../src/game/presentation/frameClock";
 
 const WALK_SECONDS = 1.0;
 const PLANTED_HEEL_SPEED = 225.0;

@@ -1,5 +1,5 @@
 import { trampoline } from "wisp/src/platform/dispatch";
-import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
+import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { effectMotion } from "../../game/render/effects";
 
 
