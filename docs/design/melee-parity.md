@@ -603,8 +603,8 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Air speed `chen-stormstout-air-speed` | 1.12 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Air acceleration `chen-stormstout-air-acceleration` | 0.08 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
 | Air friction `chen-stormstout-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137) `AUTHORED_PHYSICS` | parity |
-| Initial dash speed `chen-stormstout-dash` | 1.38182 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
-| Run speed `chen-stormstout-run` | 1.6 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Initial dash speed `chen-stormstout-dash` | 1.9 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Run speed `chen-stormstout-run` | 2.2 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Walk speed `chen-stormstout-walk` | 1.16364 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `chen-stormstout-traction` | 0.065 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 

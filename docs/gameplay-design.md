@@ -1691,7 +1691,7 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Jaina | Neutral air (arcane burst) | Timing |
 | Sylvanas | Forward smash (blade point) | Position |
 | Cairne | Forward smash (halberd head) | Position |
-| Chen | Neutral air (flying kick) | Timing |
+| Chen | Forward air (flying kick heel) | Position |
 | Peon | Forward smash (pick point) | Position |
 | Tinker | Forward smash (claw at full extension) | Position |
 | Kael'thas | Forward smash (phoenix flame at the tip) | Position |
@@ -1863,9 +1863,6 @@ reason. Current departures:
 - **Mountain King's down air (Double Boot), rule 6.** The boots are the
   strike, so the leg volume follows the whole downward strike, about 70 units
   below his feet, past a limb's reach. It is body, not weapon, and can be hit.
-- **Chen's down air (downward boot), rule 6.** The boot is the strike, so
-  the extended leg stays hittable through its full 71-unit downward reach.
-  The staff remains disjoint.
 - **Dreadlord's wings and claws, rule 6** (down smash, forward smash, forward
   air, back air, down air). The roster keeps hurtboxes on attached body parts;
   the wings reach about 0.83 of his height sideways and the claws about half

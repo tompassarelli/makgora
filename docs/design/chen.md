@@ -8,6 +8,35 @@ The engine converts run and air units through `melee`; body multipliers are
 103/75, 1.6/2.2 and 1.12. His original silhouette is 1.18 wide and 1.04 tall.
 Jump, gravity, dodge and ledge rules remain the roster's common rules.
 
+## Aerials and movement (rework, 2026-10-28)
+
+Tom's rework direction (2026-10-28) is drunken boxing with a Captain Falcon
+influence: honest startup, hits that land hard, and fast ground movement so
+he can carry a juggle once he starts one. Falcon's public attributes
+(references/melee-frame-data/character-attributes.csv: dash 2.0, run 2.3)
+and his public aerial frame data (references/melee-frame-data/fightcore.csv)
+set the timing relations; every region, damage and angle is original.
+
+- Movement: dash 11.4 and run 13.2 engine units (1.9 and 2.2 Melee units),
+  just under Falcon's 2.0 and 2.3, which Warden already carries; walk, air
+  speed and weight are unchanged.
+- Forward air is the knee's structure: a radius-7 heel sweetspot exists only
+  on the two clean frames, electric, 20%, launching at 35°; the leg on those
+  frames and the whole kick from frame 16 to 30 are the 6% sourspot.
+- Down air is the stomp's structure: the keg's base spikes straight down on
+  frames 16–18; the rim, and the base on frames 19–20, deal 9% down and
+  forward. A grounded target pops up instead (80° and 75°), so a short-hop
+  stomp starts a juggle.
+- Neutral air spins the staff twice: hit one (frames 7–9) is a fixed 30
+  knockback carry that holds the target in hitstun into hit two (frames
+  15–18), which launches at 40°.
+- Up air scoops the staff from just below level in front (frame 6) through
+  overhead (frames 9–10) to behind his back (frames 11–13); the first two
+  frames are the clean hit.
+- Hitstun uses the shared rule (0.4 frames per knockback unit). His combo
+  game comes from up-angled hits whose knockback stays inside his fast run,
+  jump and aerial frame advantage, not from a separate hitstun multiplier.
+
 ## Sources and decisions
 
 [Wowpedia's Warcraft III Pandaren Brewmaster](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29)
@@ -49,11 +78,11 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 | Forward smash | Two-handed staff sweep, 118-unit reach | 19/4/34/0; 22.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu forward smash](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Up smash | Rising barrel shoulder | 15/4/31/0; 17% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken up smash](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Down smash | Low staff sweep front then back; one hit total | 15/6/32/0; 17.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu down smash](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
-| Neutral air | Open knee and belly cover both sides | 7/5/22/14; 10% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu neutral air](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
-| Forward air | Extended front kick | 11/4/27/17; 15% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu forward air](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
+| Neutral air | Spinning staff: a carrying first hit links into a launching second | 7–9 and 15–18 / 22 / 15; 4% then 9% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon neutral air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
+| Forward air | Drunken flying kick: a tiny electric heel sweetspot on its two clean frames kills; the leg and the late kick shove | 14/17/8/19; heel 20% electric (14–15), leg and late 6% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Knee Smash](https://www.ssbwiki.com/Knee_Smash) |
 | Back air | Heel behind the barrel | 8/3/23/14; 13.75% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken back air](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
-| Up air | Staff lifted above the hat | 7/4/22/14; 10% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu up air](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
-| Down air | Downward boot; grounded targets bounce upward | 14/4/30/21; 15% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu down air](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
+| Up air | Staff scoop: from level in front, up over the hat to behind him | 6/8/20/15; 12% clean (6–7), 9% late | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon up air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
+| Down air | Keg slam: the keg's base spikes on its clean frames; the rim and the late slam knock away weakly; grounded targets pop up | 16/5/24/24; base 15% spike (16–18), rim and late 9% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon down air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
 | Grab / shield grab | Free hand reaches 64 units; misses recover | 7/2/24/0 | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu grab](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Pummel | Short knee, one fresh press | Shared pummel timing; 3% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken pummel](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Forward / back throw | Shoulder toss / turn-and-toss | Contact 12/16, total 33/39; 10/11.25% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu throws](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
@@ -139,7 +168,7 @@ Expert gameplan: Manage drink commitments and mix flame routes, close confirms a
 
 ## Signature strong/weak move (#389)
 
-Neutral air, split by timing: strong hit clean, frames 7-8, 10%; weak hit late, frames 9-11, 7%. A drunken flying kick: hit early to punish, let it linger to cover a landing.
+Forward air, split by position: the radius-7 heel sweetspot on frames 14-15 is the strong hit, 20% electric; the leg on those frames and the whole kick on frames 16-30 are the 6% weak hit. A drunken flying kick: land the heel to kill, let the leg or the lingering kick shove.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 ## Measured normal reach

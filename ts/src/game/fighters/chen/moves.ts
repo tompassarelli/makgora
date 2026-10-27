@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction, HitElement } from "../../sim/codes";
 import { hurtCapsule } from "../../sim/geometry/contactGeometry";
-import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type StrikeCapsule, cleanLateMove } from "../../sim/heroMoves";
+import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type StrikeCapsule } from "../../sim/heroMoves";
 import { hurtPart, type HurtPose } from "../../sim/hurtboxes";
 import type { HitEffect } from "../../sim/hitRegions";
 
@@ -19,6 +19,31 @@ const body = hurtPart(torso.x1, torso.z1, torso.x2, torso.z2, torso.radius);
 const reach = (first: number, last: number, x: number, z: number): readonly HurtPose[] =>
   [heroHurtPose(first, last, [body, hurtPart(x < 0 ? -12.0 : 12.0, 60.0, x, z, 11.0)])];
 const tilt = (height: number, length: number, tip: number) => heroMove(9, 3, 21, 0, [region(9, 11, 22.0, 58.0, 96.0, height, 12.0, poke(8.43317985534668)), region(9, 11, 96, height, length, tip, 12, poke(8.43317985534668))]);
+const aerial = (damage: number, growth: number, base: number, x: number, z: number, element: HitElement = HitElement.normal): Readonly<HitEffect> =>
+  ({ damage, growth, base, launchX: f32(x), launchZ: f32(z), electric: element === HitElement.electric, element });
+export const NEUTRAL_AIR_SPIN = { first: 7, last: 9 } as const;
+export const NEUTRAL_AIR_SWEEP = { first: 15, last: 18 } as const;
+export const NEUTRAL_AIR_LINK: Readonly<HitEffect> = { ...aerial(4.0, 0.0, 30.0, 0.0, 1.0), carry: true };
+export const NEUTRAL_AIR_LAUNCH = aerial(9.0, 92.0, 32.0, f32(0.766044), f32(0.642788));
+export const FORWARD_AIR_CLEAN = { first: 14, last: 15 } as const;
+export const FORWARD_AIR_LAST = 30;
+export const FORWARD_AIR_SWEETSPOT: Readonly<HitEffect> = { ...aerial(20.0, 100.0, 26.0, f32(0.819152), f32(0.573576), HitElement.electric), strong: true };
+export const FORWARD_AIR_SOURSPOT = aerial(6.0, 80.0, 18.0, f32(0.707107), f32(0.707107));
+export const UP_AIR_FIRST = 6;
+export const UP_AIR_CLEAN_LAST = 7;
+export const UP_AIR_CLEAN = aerial(12.0, 84.0, 24.0, f32(0.173648), f32(0.984808));
+export const UP_AIR_LATE = aerial(9.0, 80.0, 20.0, 0.0, 1.0);
+const UP_AIR_STAFF: readonly (readonly [number, number, number, number])[] = [
+  [32, 66, 111, 38], [33, 83, 114, 105], [26, 96, 85, 155], [13, 103, 35, 184], [1, 104, -13, 186], [-20, 86, -99, 114], [-20, 86, -99, 114], [-22, 76, -106, 76],
+];
+export const DOWN_AIR_CLEAN = { first: 16, last: 18 } as const;
+export const DOWN_AIR_LAST = 20;
+export const DOWN_AIR_SPIKE: Readonly<HitEffect> = { ...aerial(15.0, 82.0, 30.0, 0.0, -1.0), strong: true };
+export const DOWN_AIR_SOURSPOT = aerial(9.0, 70.0, 18.0, f32(0.342020), -f32(0.939693));
+export const DOWN_AIR_GROUNDED_SPIKE = aerial(15.0, 30.0, 80.0, f32(0.087156), f32(0.996195));
+export const DOWN_AIR_GROUNDED_SOURSPOT = aerial(9.0, 40.0, 30.0, f32(0.258819), f32(0.965926));
+const KEG_BOTTOM = chenCapsule(10.0, -4.0, 12.0, -30.0, 13.0);
+const KEG_RIM = chenCapsule(-30.0, 14.0, 52.0, 14.0, 14.0);
 
 export const CHEN_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -29,9 +54,10 @@ export const CHEN_MOVES: FighterMoves = {
       [AttackStyle.upTilt]: reach(5, 13, 20.0, 104.0), [AttackStyle.downTilt]: reach(5, 12, 70.0, 20.0),
       [AttackStyle.dashAttack]: reach(6, 22, 54.0, 50.0), [AttackStyle.forwardSmash]: reach(16, 26, 58.0, 60.0),
       [AttackStyle.upSmash]: reach(12, 22, 14.0, 116.0), [AttackStyle.downSmash]: [...reach(12, 17, 46.0, 24.0), ...reach(18, 24, -46.0, 24.0)],
-      [AttackStyle.neutralAir]: [heroHurtPose(5, 14, [body, hurtPart(-56.0, 44.0, 58.0, 48.0, 12.0)])],
-      [AttackStyle.forwardAir]: [...reach(6, 8, 40.0, 48.0), ...reach(9, 17, 78.0, 48.0), ...reach(18, 20, 40.0, 48.0)], [AttackStyle.backAir]: reach(6, 14, -76.0, 44.0),
-      [AttackStyle.upAir]: reach(5, 13, 12.0, 106.0), [AttackStyle.downAir]: reach(11, 21, 12.0, -60.0),
+      [AttackStyle.neutralAir]: [heroHurtPose(NEUTRAL_AIR_SPIN.first, NEUTRAL_AIR_SWEEP.last, [body])],
+      [AttackStyle.forwardAir]: [heroHurtPose(FORWARD_AIR_CLEAN.first - 2, FORWARD_AIR_LAST, [body, hurtPart(12.0, 52.0, 84.0, 46.0, 11.0)])], [AttackStyle.backAir]: reach(6, 14, -76.0, 44.0),
+      [AttackStyle.upAir]: [heroHurtPose(UP_AIR_FIRST, UP_AIR_FIRST + UP_AIR_STAFF.length - 1, [body])],
+      [AttackStyle.downAir]: [heroHurtPose(DOWN_AIR_CLEAN.first - 4, DOWN_AIR_LAST, [body, hurtPart(10.0, 20.0, 12.0, -6.0, 13.0)])],
       [AttackStyle.grab]: reach(5, 12, 52.0, 48.0),
     },
   },
@@ -46,11 +72,19 @@ export const CHEN_MOVES: FighterMoves = {
     [AttackStyle.forwardSmash]: heroMove(19, 4, 34, 0, [region(19, 22, 24.0, 66.0, 104.0, 48.0, 14.0, finish(16.86635971069336))]),
     [AttackStyle.upSmash]: heroMove(15, 4, 31, 0, [region(15, 18, 12.0, 62.0, 8.0, 122.0, 24.0, chenHit(13.5, 115.80342864990234, 30.0, 0.0, 1.0))]),
     [AttackStyle.downSmash]: heroMove(15, 6, 32, 0, [region(15, 15, 36, 63, 115, 48, 13.0, finish(13.118280410766602)), region(16, 16, 11, 41, 70, -9, 13.0, finish(13.118280410766602)), region(17, 17, -33, 44, -28, -31, 13.0, finish(13.118280410766602)), region(18, 20, -55, 78, -111, 21, 13.0, finish(13.118280410766602, true))]),
-    [AttackStyle.neutralAir]: cleanLateMove(heroMove(7, 5, 22, 14, [region(7, 11, -55.0, 42.0, 58.0, 48.0, 15.0, poke(7.49616003036499))]), 2),
-    [AttackStyle.forwardAir]: heroMove(11, 4, 27, 17, [region(11, 14, 16.0, 45.0, 78.0, 50.0, 13.0, finish(11.244239807128906))]),
+    [AttackStyle.neutralAir]: heroMove(NEUTRAL_AIR_SPIN.first, NEUTRAL_AIR_SWEEP.last - NEUTRAL_AIR_SPIN.first + 1, 22, 8, [
+      heroRegion(NEUTRAL_AIR_SPIN.first, NEUTRAL_AIR_SPIN.last, chenCapsule(-64.0, 54.0, 68.0, 58.0, 15.0), NEUTRAL_AIR_LINK, undefined, 1),
+      heroRegion(NEUTRAL_AIR_SWEEP.first, NEUTRAL_AIR_SWEEP.last, chenCapsule(-62.0, 74.0, 70.0, 34.0, 16.0), NEUTRAL_AIR_LAUNCH, undefined, 2)]),
+    [AttackStyle.forwardAir]: heroMove(FORWARD_AIR_CLEAN.first, FORWARD_AIR_LAST - FORWARD_AIR_CLEAN.first + 1, 8, 10, [
+      region(FORWARD_AIR_CLEAN.first, FORWARD_AIR_CLEAN.last, 84.0, 46.0, 92.0, 46.0, 7.0, FORWARD_AIR_SWEETSPOT),
+      region(FORWARD_AIR_CLEAN.first, FORWARD_AIR_LAST, 22.0, 52.0, 90.0, 46.0, 12.0, FORWARD_AIR_SOURSPOT)]),
     [AttackStyle.backAir]: heroMove(8, 3, 23, 14, [region(8, 10, -18.0, 42.0, -76.0, 45.0, 13.0, finish(10.307220458984375, true))]),
-    [AttackStyle.upAir]: heroMove(7, 4, 22, 14, [region(7, 10, -8, 138, 36, 172, 13.0, lift(7.49616003036499))]),
-    [AttackStyle.downAir]: heroMove(14, 4, 30, 21, [heroRegion(14, 17, chenCapsule(12.0, 6.0, 12.0, -32.0, 13.0), chenHit(11.244239807128906, 101.86412811279297, 24.0, 0.0, -1.0), lift(11.244239807128906))]),
+    [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_STAFF.length, 20, 8, UP_AIR_STAFF.map(([x1, z1, x2, z2], index) =>
+      region(UP_AIR_FIRST + index, UP_AIR_FIRST + index, x1, z1, x2, z2, 13.0, UP_AIR_FIRST + index <= UP_AIR_CLEAN_LAST ? UP_AIR_CLEAN : UP_AIR_LATE))),
+    [AttackStyle.downAir]: heroMove(DOWN_AIR_CLEAN.first, DOWN_AIR_LAST - DOWN_AIR_CLEAN.first + 1, 24, 13, [
+      heroRegion(DOWN_AIR_CLEAN.first, DOWN_AIR_CLEAN.last, KEG_BOTTOM, DOWN_AIR_SPIKE, DOWN_AIR_GROUNDED_SPIKE),
+      heroRegion(DOWN_AIR_CLEAN.last + 1, DOWN_AIR_LAST, KEG_BOTTOM, DOWN_AIR_SOURSPOT, DOWN_AIR_GROUNDED_SOURSPOT),
+      heroRegion(DOWN_AIR_CLEAN.first, DOWN_AIR_LAST, KEG_RIM, DOWN_AIR_SOURSPOT, DOWN_AIR_GROUNDED_SOURSPOT)]),
     [AttackStyle.grab]: heroMove(7, 2, 24, 0, [region(7, 8, 18.0, 50.0, 52.0, 48.0, 12.0, chenHit(0.0, 0.0, 0.0, 0.0, 0.0))]),
   },
   throws: {
