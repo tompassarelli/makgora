@@ -18,6 +18,7 @@
     "src/host/entries/frameCostMain.ts",
     "src/host/entries/integrityMain.ts",
     "src/host/entries/playableMain.ts",
+    "src/host/entries/playableSingleSendsMain.ts",
     "src/host/entries/soakPlayableMain.ts",
     "src/host/entries/soakIntegrityMain.ts",
     "src/host/entries/nativePerfMain.ts",

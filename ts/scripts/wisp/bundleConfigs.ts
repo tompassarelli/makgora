@@ -33,6 +33,7 @@ export const bundleConfigs = {
   integrity: { entry: "src/host/entries/integrityMain.ts", bundle: "integrity.lua" },
   "pause-probe": { entry: "src/host/entries/pauseProbeMain.ts", bundle: "pause-probe.lua" },
   playable: { entry: "src/host/entries/playableMain.ts", bundle: "playable.lua" },
+  "playable-single-sends": { entry: "src/host/entries/playableSingleSendsMain.ts", bundle: "playable-single-sends.lua" },
   "soak-playable": { entry: "src/host/entries/soakPlayableMain.ts", bundle: "soak-playable.lua" },
   "soak-integrity": { entry: "src/host/entries/soakIntegrityMain.ts", bundle: "soak-integrity.lua" },
   "native-input": { entry: "src/host/entries/nativeInputMain.ts", bundle: "native-input.lua" },

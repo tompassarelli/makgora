@@ -14,6 +14,9 @@
   setup and the response probe (Ctrl+G records, Ctrl+H exports); its rendered
   marker identifies the callback actually captured in pixels. Report that
   diagnostic overhead; journal integrity is a separate input path.
+  `--profile playable-single-sends` is the playable map with each input row
+  sent alone instead of in pairs, for a same-gateway paired/single comparison
+  of the rates file's `send`, `lt`, `echo` and `rb` fields (#418).
   `--profile pause-probe` runs the integrity map's unchanged input path and
   starts its response probe at match setup. The first pause and resume emit
   `pause-boundary` rows; resume exports the positions presented in that callback
