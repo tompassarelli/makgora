@@ -11,7 +11,7 @@ import { Clock, Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
-import { buildOnce } from "./buildInputs";
+import { FETCH_HINT, buildOnce } from "./buildInputs";
 import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
 import { PREDICT_COST, installName } from "./greenBuilds";
@@ -23,10 +23,16 @@ const builds = join(inputsRoot, "play-current");
 const locks = join(inputsRoot, "locks");
 const playProblem = (cause: unknown) => new PlayProblem({ problem: String(cause) });
 
+export const preparationFailure = (program: string, detail: string) => {
+  const hint = detail.split("\n").find((line) => line.includes(FETCH_HINT));
+  return playProblem(new Error(`${program} failed while preparing the current build${hint === undefined ? "" : `: ${hint.trim()}`}`));
+};
+
 const run = (cwd: string, [program = "", ...args]: readonly string[]) =>
-  runProcess(ChildProcess.make(program, args, { cwd, stdin: "ignore", stdout: "inherit", stderr: "inherit" })).pipe(
+  runProcess(ChildProcess.make(program, args, { cwd, stdin: "ignore", stdout: "inherit" })).pipe(
+    Effect.tapError((cause) => Effect.sync(() => console.error(cause.message))),
     Effect.asVoid,
-    Effect.mapError(() => playProblem(new Error(`${program} failed while preparing the current build`))),
+    Effect.mapError((cause) => preparationFailure(program, cause.message)),
   );
 
 const capture = (cwd: string, [program = "", ...args]: readonly string[]) =>
