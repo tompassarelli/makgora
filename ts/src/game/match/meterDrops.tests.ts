@@ -1,12 +1,12 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { idiv } from "wisp/src/sim/intMath";
 import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
-import { Character } from "../sim/codes";
+import { Character, DownState } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { ROSTER_MANA } from "../sim/mana";
 import { createRoster } from "../sim/roster";
 import { createBufferedFrameControls } from "./controls";
-import { DROP_INTERVAL_SECONDS, meterDropPoint, scheduleMeterDrops } from "./meterDrops";
+import { DROP_HEIGHT, DROP_INTERVAL_SECONDS, meterDropPoint, scheduleMeterDrops } from "./meterDrops";
 import { matchSpawnX, stepMatch } from "./step";
 
 const HOLD = 30;
@@ -97,6 +97,26 @@ test("Taking a drop grants dropGain up to the full bar and leaves the next spawn
   assertEquals(b.first.mana.points, ROSTER_MANA.max);
   assertTrue(b.second.mana.points < ROSTER_MANA.dropGain);
   assertEquals(b.game.drops.nextSpawnFrame, nextSpawn);
+});
+
+test("A tumbling fighter past hitstun passes over a drop and takes it once back on its feet [k1 scenario]", () => {
+  const b = bout(true);
+  playTo(b, DROP_FRAMES - 1);
+  const point = meterDropPoint(b.game.stageChoice, b.game.drops.nextPoint);
+  b.first.motion.x = point.x;
+  b.first.motion.z = point.z + DROP_HEIGHT / 2;
+  b.first.motion.grounded = false;
+  b.first.down.state = DownState.tumble;
+  b.first.launch.hitstun = 0;
+  b.first.launch.hitlag = 0;
+  b.step();
+  assertEquals(b.first.down.state, DownState.tumble);
+  assertEquals(b.game.drops.pickupSerial, 0);
+  assertTrue(b.game.drops.point >= 0);
+  b.first.down.state = DownState.none;
+  b.step();
+  assertEquals(b.game.drops.pickupSerial, 1);
+  assertEquals(b.game.drops.lastTaker, 0);
 });
 
 test("Training and Classic or lore runs schedule no drops and fill the bar from the trickle alone [k1 scenario]", () => {

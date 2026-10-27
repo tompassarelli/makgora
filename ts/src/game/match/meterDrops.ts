@@ -3,6 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { DownState, LedgeState } from "../sim/codes";
+import { isTumbling } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { ROSTER_MANA, gainMana } from "../sim/mana";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
@@ -154,7 +155,7 @@ function touchesDrop(f: Readonly<Fighter>, point: DropPoint): boolean {
 
 function takesDrop(f: Readonly<Fighter>): boolean {
   const rolling = (f.dodge.groundFrame > 0 && f.dodge.groundDirection !== 0) || f.down.state === DownState.roll || f.down.state === DownState.techRoll || f.ledge.state === LedgeState.roll;
-  return !f.status.out && !rolling && f.launch.hitlag <= 0 && f.launch.hitstun <= 0;
+  return !f.status.out && !rolling && !isTumbling(f) && f.launch.hitlag <= 0 && f.launch.hitstun <= 0;
 }
 
 export function advanceMeterDrops(game: MatchState, world: Roster): void {
