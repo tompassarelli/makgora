@@ -6,7 +6,7 @@ import { stepMatch } from "./step";
 import { AttackStyle, Character, GroundAction } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
-import { DASH_SMASH_LAST_FRAME } from "../sim/stickZones";
+import { DASH_ATTACK_LAST_FRAME, DASH_SMASH_LAST_FRAME } from "../sim/stickZones";
 import { lift } from "../sim/testDuel";
 import { Action, bit } from "../input/actions";
 import { adaptInput } from "./inputAdapter";
@@ -201,6 +201,36 @@ test("Strong + A inside the dash-smash window gives that direction's smash [k1 s
     press(R | key | S | A);
     assertEquals(owner.attack.style, smashFor(key));
   }
+});
+
+function dashFrame(frames: number): Keyboard {
+  const dash = keyboard();
+  for (let i = 0; i < frames; i++) dash.press(R);
+  return dash;
+}
+
+const FORWARD_TILTS: readonly AttackStyle[] = [AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown];
+
+test("A with a direction on every dash frame through the dash attack's last frame gives the dash attack and never a forward tilt, up or down [k1 scenario]", () => {
+  const reference = keyboard();
+  reference.press(R);
+  runUntil(reference, R, running);
+  reference.press(R | A);
+  const dashAttack = reference.owner.attack.style;
+  assertTrue(dashAttack !== undefined);
+  assertFalse(dashAttack !== undefined && FORWARD_TILTS.includes(dashAttack));
+  let dashFrames = 0;
+  for (let frames = 1; frames < DASH_ATTACK_LAST_FRAME; frames++) {
+    for (const key of [0, U, D]) {
+      const { owner, press } = dashFrame(frames);
+      if (owner.ground.action !== GroundAction.dash) continue;
+      if (key === 0) dashFrames++;
+      if (frames < DASH_SMASH_LAST_FRAME) assertTrue(inDashSmash(owner));
+      press(R | key | A);
+      assertEquals(owner.attack.style, dashAttack);
+    }
+  }
+  assertTrue(dashFrames > DASH_SMASH_LAST_FRAME);
 });
 
 test("Strong + A in a run gives what A gives without Strong, the dash attack, for forward and down, and Strong + up + A gives the up smash [k1 scenario]", () => {

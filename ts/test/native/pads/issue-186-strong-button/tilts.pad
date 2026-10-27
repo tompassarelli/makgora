@@ -1,18 +1,18 @@
-# #186: with smashes on the strong button, a direction + A is always a tilt, a flick in the old
-# dash-smash window included, and A out of a dash past that window or out of a run is the dash attack.
+# #186: with smashes on the strong button, a direction + A from stand is a tilt, a flick in the old
+# dash-smash window not included: A with a direction out of any dash frame or a run is the dash attack.
 # Thrall a; styles: 6 forward tilt, 8 down tilt, 19 dash attack; 2-4 are the smashes.
 #! chat -dev quick hero thrall
-# A fresh full flick and A on one frame from standing: the forward tilt.
-60 a stick 1 0
+# A half stick forward and A on one frame from standing: the forward tilt.
+60 a stick 0.6 0
 60 a tap A 2
 62 a stick 0 0
 #! expect a 60-63 applied attack 1 style 6
-# Flick back, A a frame later, on dash frame 1-3 where A used to give the forward smash: the forward tilt.
+# Flick back, A a frame later, on dash frame 1-3 where A used to give the forward smash: the dash attack, no forward tilt.
 150 a stick -1 0
 151 a tap A 2
 153 a stick 0 0
 #! expect a 150 ground action 1
-#! expect a 151-154 applied attack 2 style 6
+#! expect a 151-154 applied attack 2 style 19
 # Down + A from a crouch: the down tilt.
 250 a stick 0 -1
 258 a tap A 2

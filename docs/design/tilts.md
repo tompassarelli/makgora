@@ -413,8 +413,9 @@ Each now has one role:
 | Pit Lord | Kill charge, no armor | 15/6/32 | 0.30H | 16 | 40, 110/26 | Ganondorf and Bowser dash attacks |
 | Beastmaster | Heaves the victim behind him | 11/5/28 | 0.50H | 12 | 135, 95/20 | Ultimate's reverse-launch dash attacks |
 
-A dash attack is A with the stick back at neutral during a dash; A with the
-stick still held is a forward smash.
+A dash attack is A during a dash through frame 20, with or without a direction
+held, and A out of a run; no forward tilt comes out of a dash (Tom, 2026-10-28).
+Strong + a direction on dash frames 1–3 is the forward or down smash.
 
 **Balance record (#359, 9 Oct 2026, defect fixes).** Measured from the
 centre of stage 0 with no DI against Rifleman:
