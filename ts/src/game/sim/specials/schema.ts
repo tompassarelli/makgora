@@ -359,6 +359,9 @@ export interface AuthoredSpecial {
 
   readonly turnsAround?: true | undefined;
 
+  /** Started on the ground it keeps the ground speed it had and slides on traction; started in the air it stops horizontally. */
+  readonly groundMomentum?: true | undefined;
+
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
 }
@@ -446,6 +449,11 @@ export function chargedAngleMotion(distance: number, travelFrames: number, extra
     { ...frames(launch, stop - 1), velocityX: 0.0, velocityZ: speed, aimedSpeed: speed },
     { ...frames(stop, stop), velocityX: 0.0, velocityZ: 0.0 },
   ];
+}
+
+
+export function stopsSidewaysOnStart(move: Readonly<AuthoredSpecial>, grounded: boolean): boolean {
+  return move.groundMomentum === true ? !grounded : grounded && !movementSpecial(move);
 }
 
 

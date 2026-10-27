@@ -13,7 +13,7 @@ import {
   RIFLEMAN_BLASTER_GROUND_SHOT_FRAME,
 } from "./moves";
 import { HitElement, type HitEffect, type HitRegion, NO_HIT_REGION } from "./hitRegions";
-import { heroSpecialMove, movementSpecial } from "./specials/schema";
+import { heroSpecialMove, stopsSidewaysOnStart } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
 import { ROSTER_MANA, spendMana } from "./mana";
@@ -561,6 +561,7 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     special.cooldowns[action] = 24;
     special.hit = false;
     owner.status.invincible = max(owner.status.invincible, 2);
+    if (!motion.grounded) motion.vx = 0.0;
     stallImmolate(owner);
     return true;
   }
@@ -626,7 +627,8 @@ function turnForSpecial(owner: Fighter, input: Readonly<Controls>): void {
 
 
 function originalMovementSpecial(action: SpecialAction): boolean {
-  return action === SpecialAction.riflemanRecovery || action === SpecialAction.demonHunterFelRush || action === SpecialAction.demonHunterWingAscent;
+  return action === SpecialAction.riflemanRecovery || action === SpecialAction.demonHunterFelRush || action === SpecialAction.demonHunterWingAscent
+    || action === SpecialAction.demonHunterImmolate;
 }
 
 function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, world: Roster | undefined): boolean {
@@ -649,7 +651,7 @@ function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, worl
   startSpecialAction(owner, heroAction(action), move.endFrame, specialDirection(input, owner.facing));
   cancelJumpSquat(owner);
   enterExSpecial(owner, input);
-  if (!movementSpecial(enterHeroSpecial(owner, chosen, input)) && owner.motion.grounded) owner.motion.vx = 0.0;
+  if (stopsSidewaysOnStart(enterHeroSpecial(owner, chosen, input), owner.motion.grounded)) owner.motion.vx = 0.0;
   return true;
 }
 

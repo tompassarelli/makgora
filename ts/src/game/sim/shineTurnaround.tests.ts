@@ -6,7 +6,8 @@ import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { createReplaySnapshot } from "../replay/snapshot";
 import { copyFighterState } from "../../generated/state/fighterState";
-import { AttackStyle, Character, SpecialAction } from "./codes";
+import { f32 } from "wisp/src/sim/f32";
+import { AttackStyle, Character, GroundAction, SpecialAction } from "./codes";
 import type { Fighter } from "./fighter";
 import { createFighter } from "./fighter";
 import { setWorldMotionValue } from "./motion";
@@ -21,12 +22,13 @@ const FOE_X = 600.0;
 const TURN_TICK = 3;
 const JUMP_TICK = 6;
 
-type Press = "shine" | "shineBack" | "back" | "jump" | "strongUp" | "none";
+type Press = "shine" | "shineBack" | "back" | "forward" | "jump" | "strongUp" | "none";
 
 function row(press: Press): InputRow {
   const fields = press === "shine" ? { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 }
     : press === "shineBack" ? { held: maskOf(Action.moveDown, Action.moveLeft, Action.special), pressed: maskOf(Action.special), axisX: -127, axisZ: -127, specialX: -1, specialZ: -1 }
     : press === "back" ? { held: maskOf(Action.moveLeft), axisX: -127 }
+    : press === "forward" ? { held: maskOf(Action.moveRight), axisX: 127 }
     : press === "jump" ? { held: maskOf(Action.jump), pressed: maskOf(Action.jump) }
     : press === "strongUp" ? { held: maskOf(Action.moveUp, Action.strong), pressed: maskOf(Action.moveUp, Action.strong), axisZ: 127 }
     : {};
@@ -44,11 +46,11 @@ function lift(fighter: Fighter): void {
   setWorldMotionValue(fighter.motion.meleeVelocityZ, fighter.motion.vz);
 }
 
-function shineScene(character: Character, airborne: boolean) {
+function shineScene(character: Character, airborne: boolean, foeX = FOE_X) {
   const state = createReplaySnapshot();
   const user = fighterAt(state.world, 0);
   copyFighterState(user, createFighter(character, 0.0, 1), 3);
-  copyFighterState(fighterAt(state.world, 1), createFighter(Character.warden, FOE_X, -1), 3);
+  copyFighterState(fighterAt(state.world, 1), createFighter(Character.warden, foeX, -1), 3);
   if (airborne) lift(user);
   state.match.phase = Phase.match;
   state.match.stageChoice = 0;
@@ -138,5 +140,50 @@ for (const shine of SHINES) {
       assertEquals(user.special.action, shine.action, `tick ${tick}: the down special runs on`);
       assertEquals(user.attack.style, undefined, `tick ${tick}: no attack starts`);
     }
+  });
+}
+
+const DASH_TICKS = 2;
+const RUN_TICKS = 30;
+const SLIDE_TICKS = 8;
+const DRIFT_TICKS = 6;
+
+function approach(character: Character, ticks: number) {
+  const scene = shineScene(character, false, -FOE_X);
+  for (let tick = 1; tick <= ticks; tick++) scene.step(tick, "forward");
+  return scene;
+}
+
+for (const shine of SHINES) {
+  for (const gait of [{ name: "dash", ticks: DASH_TICKS, action: GroundAction.dash }, { name: "run", ticks: RUN_TICKS, action: GroundAction.run }] as const) {
+    test(`${shine.name} pressed out of a ${gait.name} on the ground slides forward, losing only traction each frame [k1 scenario]`, () => {
+      const { user, step } = approach(shine.character, gait.ticks);
+      assertEquals(user.ground.action, gait.action, `the approach is a ${gait.name}`);
+      const traction = user.tuning.physics.traction;
+      let speed = user.motion.vx;
+      let x = user.motion.x;
+      assertEquals(speed > traction * SLIDE_TICKS, true, "the approach carries enough speed to slide for the probe");
+      for (let tick = gait.ticks + 1; tick <= gait.ticks + SLIDE_TICKS; tick++) {
+        step(tick, tick === gait.ticks + 1 ? "shine" : "none");
+        assertEquals(user.special.action, shine.action, `tick ${tick}: the down special runs`);
+        assertEquals(user.motion.vx, Math.max(0.0, f32(speed - traction)), `tick ${tick}: speed falls by traction alone`);
+        assertEquals(user.motion.x > x, true, `tick ${tick}: it keeps sliding forward`);
+        speed = user.motion.vx;
+        x = user.motion.x;
+      }
+    });
+  }
+
+  test(`${shine.name} pressed in the air with forward drift stops horizontally from its first frame [k1 scenario]`, () => {
+    const { user, step } = shineScene(shine.character, true);
+    for (let tick = 1; tick <= DRIFT_TICKS; tick++) step(tick, "forward");
+    assertEquals(user.motion.vx > 0.0 && !user.motion.grounded, true, "it drifts forward in the air before the press");
+    step(DRIFT_TICKS + 1, "shine");
+    assertEquals(user.special.action, shine.action, "the down special starts");
+    assertEquals(user.motion.vx, 0.0, "horizontal speed is zero on its first frame");
+    const x = user.motion.x;
+    step(DRIFT_TICKS + 2, "none");
+    assertEquals(user.motion.vx, 0.0, "it stays zero");
+    assertEquals(user.motion.x, x, "it does not move sideways");
   });
 }
