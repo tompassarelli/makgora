@@ -4,7 +4,7 @@ import { Phase, fighterColor, humanFighterActive } from "../src/game/lobby/lobby
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { fighterAt, isActive } from "../src/game/sim/roster";
-import { FighterMarker, markerNumberContext } from "../src/game/ui/fighterMarker";
+import { FighterMarker, markerName, markerNumberContext } from "../src/game/ui/fighterMarker";
 import { colourCode, damageText, percentText } from "../src/game/ui/plateLayout";
 import { slotColor } from "../src/game/ui/slotColors";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
@@ -115,4 +115,10 @@ test("a CPU match shows each fighter's marker with the HUD's whole percent and c
   expect(shown.close).toBeGreaterThan(0);
   expect(shown.checksum).not.toBe("");
   expect(shown.checksum).toBe(hidden.checksum);
+});
+
+test("a marker shows a Battle.net name without its #number tag [k5 boundary battlenet-name-tag]", () => {
+  expect(markerName(true, "Pilot#1234")).toBe("Pilot");
+  expect(markerName(true, "Player 1")).toBe("Player 1");
+  expect(markerName(false, "Pilot#1234")).toBe("CPU");
 });

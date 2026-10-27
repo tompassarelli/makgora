@@ -30,7 +30,7 @@ const markerContext = (slot: number): number => 1200 + slot * 20;
 
 export const markerNumberContext = (slot: number): number => markerContext(slot) + 3;
 
-export const markerName = (human: boolean, playerName: string): string => human ? playerName.substring(0, MARKER_NAME_LENGTH) : "CPU";
+export const markerName = (human: boolean, playerName: string): string => human ? (playerName.split("#")[0] ?? "").substring(0, MARKER_NAME_LENGTH) : "CPU";
 
 
 export function spreadMarkers(x: number[], y: readonly number[], shown: readonly boolean[]): void {
