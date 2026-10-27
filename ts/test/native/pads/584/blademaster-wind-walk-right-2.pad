@@ -1,0 +1,34 @@
+# #584 Wind Walk cold read: a jabs b as in blademaster-cues.pad, Wind Walks right through b at 195 and back left at 300; captures 209 211 214 220 230 240.
+#! chat -dev quick hero blademaster
+40 b stick -1 0
+42 b stick 0 0
+50 a stick 1 0
+52 a stick 0 0
+80 a press LB
+80 a stick 1 0
+90 a stick 0 0
+90 a release LB
+100 a tap A 2
+120 a tap A 2
+135 a press LB
+135 a stick 1 0
+160 a stick 0 0
+160 a release LB
+165 a tap A 2
+195 a stick 1 0
+195 a tap X 2
+196 a stick 0 0
+209 a capture
+211 a capture
+214 a capture
+220 a capture
+230 a capture
+240 a capture
+300 a stick -1 0
+300 a tap X 2
+301 a stick 0 0
+380 a press VIEW
+450 a release VIEW
+#! expect a 195 special 14 form 0
+#! expect a 300 special 14 form 0
+#! scene a InvisibilityTarget
