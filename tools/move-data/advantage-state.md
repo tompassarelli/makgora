@@ -47,9 +47,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Thrall | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Thrall | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 60% → up air against 4/5 DI |
 | Thrall | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
-| Jaina Proudmoore | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away neutral special; missed tech forward smash; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Jaina Proudmoore | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away neutral special; missed tech forward smash; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Jaina Proudmoore | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Jaina Proudmoore | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away neutral special; missed tech short hop, forward air; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Jaina Proudmoore | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away neutral special; missed tech short hop, down air; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Jaina Proudmoore | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Sylvanas Windrunner | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
 | Sylvanas Windrunner | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away neutral special; missed tech forward smash; trap neutral special covers tech in place, tech away, missed tech | up throw at 40% → up air against 4/5 DI |
 | Sylvanas Windrunner | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
@@ -195,11 +195,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Shadow Hunter | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Shadow Hunter | medium | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
 | Shadow Hunter | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Shadow Hunter | medium | up throw | 1/1 KD | 1/1 KD in up smash, out down smash | 1/1 in up smash, out forward smash | 1/1 in up smash, out forward tilt |
+| Shadow Hunter | medium | up throw | 1/1 KD | 1/1 KD | 1/1 in down smash, out forward smash | 1/1 KD in down smash, out forward tilt |
 | Shadow Hunter | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Shadow Hunter | heavy | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
 | Shadow Hunter | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Shadow Hunter | heavy | up throw | 1/1 in short hop, back air, out forward tilt | 1/1 KD in up smash, out down smash | 1/1 KD | 1/1 in short hop, back air, out forward tilt |
+| Shadow Hunter | heavy | up throw | 1/1 in short hop, back air, out forward tilt | 1/1 KD in up smash, out down smash | 2/1 | 1/1 in short hop, back air, out forward tilt |
 | Shadow Hunter | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Pit Lord | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Pit Lord | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -251,15 +251,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Thrall | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Jaina Proudmoore | light | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 KD in short hop, back air, out down smash | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in short hop, forward air, out down smash |
+| Jaina Proudmoore | light | up throw | 1/1 | 1/1 KD in down smash, out short hop, forward air | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 |
 | Jaina Proudmoore | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Jaina Proudmoore | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 KD in up smash, out down smash | 1/1 KD in forward tilt, out dash, dash attack | 1/1 |
+| Jaina Proudmoore | medium | up throw | 1/1 | 1/1 in up smash, out dash, dash attack | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in forward smash, out short hop, forward air |
 | Jaina Proudmoore | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Jaina Proudmoore | heavy | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 KD in up smash, out down smash | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in up smash, out down smash |
+| Jaina Proudmoore | heavy | up throw | 1/1 | 1/1 KD in up smash, out short hop, forward air | 1/1 KD | 1/1 in up smash, out short hop, forward air |
 | Jaina Proudmoore | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
