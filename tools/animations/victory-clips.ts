@@ -9,7 +9,7 @@ import { fighters } from '../../ts/scripts/heroModelSource';
 import { AttackPhase, Character } from '../../ts/src/game/sim/codes';
 import { mat4, quat } from 'gl-matrix';
 import { ensure, onGlobalClock, rotated, tracks } from './original-clips';
-import { carriedKey, carryOffset } from './carry';
+import { carryOffset, carryThrough } from './carry';
 import { bodyJoint, followers, limbJoint, type Limb, type Side } from '../../ts/scripts/wisp/victoryJoints';
 import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts/wisp/victoryTorso';
 import { anatomyFindings } from '../../ts/scripts/wisp/victoryAnatomy';
@@ -264,17 +264,9 @@ for (const character of characters) {
                 key.Vector = new Float32Array(quat.normalize(q, q));
                 if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
             }
-            for (const { node, hand, offset } of carried) {
-                const { rotation, translation } = carriedKey(model, data, node, hand, offset);
-                for (const [track, vector] of [[node.Rotation, rotation], [node.Translation, translation]] as const) {
-                    ensure(track, `${fighter.name}: ${node.Name} has no track to follow the hand`);
-                    const key = track.Keys.find(candidate => candidate.Frame === time(beat.frame));
-                    ensure(key, `${fighter.name}: ${node.Name} key ${beat.frame} missing`);
-                    key.Vector = vector;
-                    if (key.InTan) { key.InTan = track === node.Rotation ? vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
-                }
-            }
         }
+        const frames = Array.from({ length: FRAMES + 1 }, (_, frame) => time(frame));
+        for (const { node, hand, offset } of carried) carryThrough(model, data, frame => { renderer.setSequence(index); data.frame = frame; renderer.update(0); }, node, hand, offset, frames);
     };
     follow();
     const raisedLean = torsoLean(model, index, Math.round(RAISED_FRAME * 1000 / 60), renderer);

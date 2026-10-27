@@ -5,7 +5,7 @@ import { FIGHTER_RIGS } from "./rigs";
 import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { clipFor } from "../../ts/src/game/presentation/fighterClips";
 import type { HeroClipTable } from "../../ts/src/game/sim/heroes/hero";
-import { model as mdx } from "war3-model";
+import { ModelRenderer, model as mdx } from "war3-model";
 import { generateModelMDX as generateMDX } from "../../ts/scripts/mdxCodec";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
@@ -15,6 +15,8 @@ import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { ensureMotionHelper } from "../../ts/scripts/motionHelper";
+import { followers, limbJoint } from "../../ts/scripts/wisp/victoryJoints";
+import { carryOffset, carryThrough } from "./carry";
 
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
@@ -172,6 +174,7 @@ for (const gesture of gestures) {
   bindings.push(`  ${gesture.character}: {`);
   const authored = { ...tables[gesture.character] };
   let replacedIndex = -1;
+  const authoredClips: { index: number; frames: number[] }[] = [];
   for (const pose of gesture.poses) {
     const frames = pose === "doubleJump" ? 30 : 24;
     const previous = selected && clipFor(gesture.character, "doubleJump").index !== clipFor(gesture.character, "jump").index ? source.Sequences.findIndex(s => s.Name === "Jump Motion doubleJump") : -1;
@@ -217,11 +220,22 @@ for (const gesture of gestures) {
     }
     helper.Rotation?.Keys.sort((a, b) => a.Frame - b.Frame);
     ensure(articulated >= 2, `${fighter.name}: missing jump articulation`);
+    authoredClips.push({ index, frames: Array.from({ length: frames + 1 }, (_, frame) => start + Math.round(frame * 1000 / 60)) });
     authored[pose] = { index, seconds: Math.fround((end - start) / 1000) };
     bindings.push(`    ${pose}: { index: ${index}, seconds: ${seconds(Math.fround((end - start) / 1000))} },`);
   }
   bindings.push("  },");
   tables[gesture.character] = authored;
+  const renderer = new ModelRenderer(model), pose = Reflect.get(renderer, "rendererData");
+  const evaluate = (sequence: number, frame: number) => { renderer.setSequence(sequence); pose.frame = frame; renderer.update(0); };
+  const below = (child: mdx.Node, ancestor: mdx.Node): boolean => child.Parent != null && child.Parent !== -1 && (child.Parent === ancestor.ObjectId || below(model.Nodes[child.Parent]!, ancestor));
+  for (const { node, side } of followers(model)) {
+    const hand = limbJoint(model, "hand", side); ensure(hand, `${fighter.name}: no hand carries ${node.Name}`);
+    if (below(node, hand)) continue;
+    evaluate(source.Sequences.indexOf(stand), stand.Interval[0]!);
+    const offset = carryOffset(pose, hand, node);
+    for (const { index, frames } of authoredClips) carryThrough(model, pose, frame => evaluate(index, frame), node, hand, offset, frames);
+  }
   const bytes = encodeVerified(parseSource(generateMDX(model))), after = new DrawnModel(bytes, 1);
   for (const [index, sequence] of source.Sequences.entries()) for (const fraction of [0, 0.5, 1]) {
     if (index === replacedIndex) continue;

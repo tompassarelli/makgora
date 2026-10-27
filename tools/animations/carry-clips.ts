@@ -5,7 +5,7 @@ import { ModelRenderer, model as mdx } from 'war3-model';
 import { mat4, vec3 } from 'gl-matrix';
 import { fighters } from '../../ts/scripts/heroModelSource';
 import type { Character } from '../../ts/src/game/sim/codes';
-import { carriedKey, carryOffset } from './carry';
+import { carryOffset, carryThrough } from './carry';
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from './original-clips';
 import { FIGHTER_RIGS } from './rigs';
 
@@ -51,20 +51,19 @@ const intervals = names.map(name => {
     const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
     const frames = new Set([start, end]);
     for (const driver of drivers) for (const track of [driver.Rotation, driver.Translation, driver.Scaling]) if (track && !onGlobalClock(track)) for (const key of track.Keys) if (key.Frame >= start && key.Frame <= end) frames.add(key.Frame);
-    const keys = props.map(prop => [...frames].sort((a, b) => a - b).map(frame => { evaluate(index, frame); return { frame, ...carriedKey(model, data, prop.node, prop.hand, prop.offset) }; }));
-    return { name, index, start, end, keys };
+    return { name, index, start, end, frames: [...frames] };
 });
-const rekey = (track: mdx.AnimVector, start: number, end: number, inside: readonly { readonly Frame: number; readonly Vector: Float32Array }[], rotation = false) => {
+const rekey = (track: mdx.AnimVector, start: number, end: number, inside: readonly { readonly Frame: number; readonly Vector: Float32Array }[]) => {
     const outside = track.Keys.filter(key => key.Frame < start || key.Frame > end), at = outside.findIndex(key => key.Frame > end);
-    const keys = inside.map(key => ({ ...key, ...(track.LineType > mdx.LineType.Linear ? { InTan: rotation ? key.Vector.slice() : new Float32Array(key.Vector.length), OutTan: rotation ? key.Vector.slice() : new Float32Array(key.Vector.length) } : {}) }));
+    const keys = inside.map(key => ({ ...key, ...(track.LineType > mdx.LineType.Linear ? { InTan: new Float32Array(key.Vector.length), OutTan: new Float32Array(key.Vector.length) } : {}) }));
     track.Keys = at < 0 ? [...outside, ...keys] : [...outside.slice(0, at), ...keys, ...outside.slice(at)];
 };
 const hold = (track: mdx.AnimVector, start: number, end: number, vector: Float32Array) => {
     if (track.Keys.every(key => key.Frame < start || key.Frame > end || key.Vector.every((value, at) => Math.abs(value - vector[at]!) < 1e-6))) return;
     rekey(track, start, end, [{ Frame: start, Vector: vector }, { Frame: end, Vector: vector }]);
 };
-for (const { start, end, keys } of intervals) for (const [prop, { node, scaling }] of props.entries()) {
-    for (const [track, field] of [[node.Rotation!, 'rotation'], [node.Translation!, 'translation']] as const) rekey(track, start, end, keys[prop]!.map(key => ({ Frame: key.frame, Vector: key[field] })), field === 'rotation');
+for (const { index, start, end, frames } of intervals) for (const { node, hand, offset, scaling } of props) {
+    carryThrough(model, data, frame => evaluate(index, frame), node, hand, offset, frames);
     if (node.Scaling !== undefined && !onGlobalClock(node.Scaling)) hold(node.Scaling, start, end, scaling);
 }
 const shown = model.GeosetAnims.flatMap(anim => {
