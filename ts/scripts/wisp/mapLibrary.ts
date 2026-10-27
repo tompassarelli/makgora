@@ -20,7 +20,7 @@ export const insideTomsLibrary = (path: string) => {
   return from === "" || (!from.startsWith("..") && !isAbsolute(from));
 };
 
-export const RELEASE_FILE = /^Smashcraft \d+\.\d+\.\d+\.w3x$/;
+export const RELEASE_FILE = /^Smashcraft \d+\.\d+(?:\.\d+)?\.w3x$/;
 const DEV_FILE = (file: string) => parseInstalled(file)?.build !== undefined;
 const KEPT_FILE = (file: string) => PLAYABLE_FILE.test(file) && !DEV_FILE(file);
 

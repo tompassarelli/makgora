@@ -41,16 +41,17 @@ against a computer. The match plays on the keyboard; a pad the service finds
 presses the same keys, and without one play says "keyboard" and goes on. It reuses the signed-in Battle.net launcher and never signs
 in, logs out or switches accounts.
 
-Maps/00-Smashcraft keeps at its top level the latest release `Smashcraft X.Y.Z.w3x` (online hosting picks it) and the newest installed main build
-`Smashcraft X.Y.Z-dev.N.w3x` (the file and in-game title carry the same name). Installing a main build (`play`, `playtest:build`,
-the Tom build watcher, `play --install-green`) removes every older dev build; every earlier release moves to old/, none is deleted. Only releases are public, so X.Y.Z is the next release, never a build
-counter: the patch after the newest `vX.Y.Z` tag reachable from the commit
-(`git describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`),
+Maps/00-Smashcraft keeps at its top level the latest release `Smashcraft X.Y.w3x` (online hosting picks it) and the newest installed main build
+`Smashcraft X.Y-dev.N.w3x` (the file and in-game title carry the same name). Installing a main build (`play`, `playtest:build`,
+the Tom build watcher, `play --install-green`) removes every older dev build; every earlier release moves to old/, none is deleted. Only releases are public, so X.Y is the next release, never a build
+counter: the minor after the newest `vX.Y` tag reachable from the commit (`v0.1.5` makes 0.2, `v0.2` makes 0.3;
+tags up to v0.1.5 carry a patch, later releases do not)
+(`git describe --tags --match 'v[0-9]*.[0-9]*' --exclude 'v*-*'`),
 and N counts the first-parent commits on main since that tag
-(`git rev-list --first-parent --count vX.Y.Z..COMMIT`), so it only grows along main and
-the newest build is the highest N: `Smashcraft 0.1.1-dev.830`. The map description names the full commit. When Tom calls a release candidate, a
-`v0.1.1-rc.N` tag on its commit names the build `Smashcraft 0.1.1 RC-N`
-(the highest N), and the `v0.1.1` release tag names it `Smashcraft 0.1.1`. At
+(`git rev-list --first-parent --count vX.Y..COMMIT`), so it only grows along main and
+the newest build is the highest N: `Smashcraft 0.2-dev.830`. The map description names the full commit. When Tom calls a release candidate, a
+`v0.2-rc.N` tag on its commit names the build `Smashcraft 0.2 RC-N`
+(the highest N), and the `v0.2` release tag names it `Smashcraft 0.2`. At
 most one lane or test build for Tom to try sits beside the dev build (lane builds below,
 `play --lobby-only MAP.w3x`); it replaces any earlier one and goes when the next
 main build installs. Test, integrity, capture and diagnostic builds go to a
@@ -91,7 +92,7 @@ version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft X.Y.Z-dev.N` file at the top of Maps/00-Smashcraft and replaces the previous dev build and any
+`Smashcraft X.Y-dev.N` file at the top of Maps/00-Smashcraft and replaces the previous dev build and any
 lane build there; releases are left alone.
 While Warcraft III runs in Tom's prefix the watcher still builds and copies each new dev build, under its new
 file name, and moves or removes no file the game could have open; it logs that the
@@ -129,12 +130,12 @@ are in `journalctl --user -u smashcraft-tom-build`.
 From a lane's worktree, `cd ts && bun scripts/laneBuild.ts` runs `bun run check`
 and the lane's own tests (test files changed since its merge base with
 origin/main, uncommitted ones included), then builds the lane's working tree
-with the play build (no Lua prediction) as `Smashcraft X.Y.Z-LANE.w3x` in
+with the play build (no Lua prediction) as `Smashcraft X.Y-LANE.w3x` in
 `~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
 newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
-to try. X.Y.Z is the next release; LANE is the branch's last segment without `land-`
+to try. X.Y is the next release; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
-`Smashcraft X.Y.Z-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
+`Smashcraft X.Y-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
 explicitly. An installed lane map replaces any other lane or test map in the
 folder and leaves the main build alone; builds of one lane wait for each other.
 Main's numbering ignores lane maps, and the next main build to install removes

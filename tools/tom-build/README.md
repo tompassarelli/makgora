@@ -44,5 +44,5 @@ missing from the local store runs `bun wisp inputs fetch` for the store hosts in
 input is still missing, the watcher forgets the sha so the next poll tries again.
 
 Each install replaces the previous build in Maps/00-Smashcraft and removes any
-`Smashcraft X.Y.Z-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
+`Smashcraft X.Y-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
 smashcraft:docs/play.md).

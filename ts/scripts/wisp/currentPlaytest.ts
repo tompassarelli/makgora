@@ -40,10 +40,13 @@ const capture = (cwd: string, [program = "", ...args]: readonly string[]) =>
 const tryPlay = <A>(run: () => A) => Effect.try({ try: run, catch: playProblem });
 
 
+export const RELEASE_TAG_PATTERN = "v[0-9]*.[0-9]*";
+
 export function releaseTarget(described: string | undefined): string | undefined {
-  const match = /^v(\d+)\.(\d+)\.(\d+)(-\d+-g[0-9a-f]+)?$/.exec(described?.trim() ?? "");
+  const match = /^v(\d+)\.(\d+)(\.\d+)?(-\d+-g[0-9a-f]+)?$/.exec(described?.trim() ?? "");
   if (match === null) return undefined;
-  return `${match[1]}.${match[2]}.${Number(match[3]) + (match[4] === undefined ? 0 : 1)}`;
+  if (match[4] === undefined) return `${match[1]}.${match[2]}${match[3] ?? ""}`;
+  return `${match[1]}.${Number(match[2]) + 1}`;
 }
 
 export function buildName(tags: readonly string[], target: string, build: number): string {
@@ -59,16 +62,16 @@ export function buildName(tags: readonly string[], target: string, build: number
 const tagsAt = (revision: string, repo: string) =>
   capture(repo, ["git", "tag", "--points-at", revision]).pipe(Effect.map((text) => (text ?? "").split("\n").map((tag) => tag.trim()).filter((tag) => tag !== "")));
 
-/** The release `revision` builds toward: its own vX.Y.Z tag, else the patch after the newest one it descends from. */
+/** The release `revision` builds toward: its own vX.Y tag (vX.Y.Z on tags before 0.2), else the minor after the newest one it descends from. */
 export const playTarget = (revision: string, repo = projectRoot) => Effect.gen(function*() {
-  const target = releaseTarget(yield* capture(repo, ["git", "describe", "--tags", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]));
-  if (target === undefined) return yield* playProblem(new Error(`no vX.Y.Z release tag is reachable from ${revision.slice(0, 12)}`));
+  const target = releaseTarget(yield* capture(repo, ["git", "describe", "--tags", "--match", RELEASE_TAG_PATTERN, "--exclude", "v*-*", revision]));
+  if (target === undefined) return yield* playProblem(new Error(`no vX.Y release tag is reachable from ${revision.slice(0, 12)}`));
   return target;
 }).pipe(Effect.provide(BunServices.layer));
 
 /** The first-parent commits `revision` is past the newest release tag it descends from: the number a dev build carries, which only grows along main. */
 export const devBuild = (revision: string, repo = projectRoot) => Effect.gen(function*() {
-  const tag = (yield* capture(repo, ["git", "describe", "--tags", "--abbrev=0", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]))?.trim();
+  const tag = (yield* capture(repo, ["git", "describe", "--tags", "--abbrev=0", "--match", RELEASE_TAG_PATTERN, "--exclude", "v*-*", revision]))?.trim();
   const count = tag === undefined ? undefined : (yield* capture(repo, ["git", "rev-list", "--first-parent", "--count", `${tag}..${revision}`]))?.trim();
   if (count === undefined || !/^\d+$/.test(count)) return yield* playProblem(new Error(`can't count first-parent commits past the newest release tag for ${revision.slice(0, 12)}`));
   return Number(count);
