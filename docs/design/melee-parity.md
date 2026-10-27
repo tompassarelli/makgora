@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-508 rows: 454 parity, 36 deviations, 18 open.
+509 rows: 455 parity, 36 deviations, 18 open.
 
 ## Deviations from Melee
 
@@ -184,6 +184,7 @@ deviation's reason, issue and decision date are written.
 | Shield release lag `shield-release` | 11 | [15](https://www.ssbwiki.com/Shield) | [shield.ts:26](../../ts/src/game/sim/shield.ts#L26) `SHIELD_RELEASE_LAG_FRAMES` | deviation: Melee's 15 makes dropping shield almost never worth it; Ultimate's 11, the starting point, makes it a real option beside jumping or rolling out (docs/gameplay-design.md, Principles) (Tom 2026-10-06, #100) |
 | Powershield `powershield` | a parry: no shield damage, no shieldstun, no release lag | [first 4 frames of shield on a hit: no shield damage, more pushback, same shieldstun; first 2 reflect projectiles](https://www.ssbwiki.com/Powershield) | [shield.ts:148](../../ts/src/game/sim/shield.ts#L148) `grantParry` | deviation: a true parry whose reward is the defender's own punish (docs/gameplay-design.md, Powershield and parry) (Tom 2026-10-06, #102) |
 | Shield drop through a platform `platform-shield-drop` | none: a raised shield stays on the platform | [down while shielding drops through](https://www.ssbwiki.com/Shield_dropping) | [platformMoves.ts:82](../../ts/src/game/sim/platformMoves.ts#L82) `dropFromPlatform` | deviation: shielded fighters keep their jump, dodge or release choices (docs/gameplay-design.md, Platform shield drop) (Tom 2026-10-14, #103) |
+| Shield momentum out of a run, probed headless on each fighter's own traction, walk and run speed `shield-momentum` | out of a run: Rifleman 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units | [out of a run: Rifleman 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units](https://www.ssbwiki.com/Traction) | [groundMovement.ts:139](../../ts/src/game/sim/groundMovement.ts#L139) `restingTraction`; checked by [shieldMomentum.tests.ts:32](../../ts/src/game/sim/shieldMomentum.tests.ts#L32) `meleeDrag` | parity |
 | Jump and grab out of shield, probed headless `out-of-shield` | jump and grab | [jump and grab](https://www.ssbwiki.com/Out_of_shield) | [conditions.ts:113](../../ts/src/game/sim/conditions.ts#L113) `canShieldGrab` | parity |
 | Up special out of shield, probed headless `up-special-out-of-shield` | from jump squat | [from jump squat](https://www.ssbwiki.com/Out_of_shield) | [conditions.ts:138](../../ts/src/game/sim/conditions.ts#L138) `canStartSpecial` | parity |
 | Standing grab, total frames, fightcore.csv `grab-frames` | 36, active from 5 for 3, every fighter | [Fox 30; 5 of 25 fighters differ: Bowser, Link, Samus, Yoshi, Young Link; 30-94](https://www.fightcore.gg) | [moves.ts:214](../../ts/src/game/sim/moves.ts#L214) `attackStartupFrames` | open: one shared profile for every fighter against Melee's per-fighter values (#293) |

@@ -1,7 +1,9 @@
 import { resolve } from "node:path";
 import { FIGHTCORE_URL, type FightCoreRow, readFightCore } from "../../../references/melee-frame-data/fightcore";
+import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../../src/game/input/actions";
 import { fighter, frame, framesUntil, scene, solo, tumbling } from "../../src/game/match/padScene";
+import { fighterName } from "../../src/game/roster/kits";
 import { AttackStyle, Character, ContactKind, GrabAction, SpecialAction, SurfaceContact } from "../../src/game/sim/codes";
 import {
   DOWN_ATTACK_INTANGIBLE_FRAMES_DOWN, DOWN_ATTACK_INTANGIBLE_FRAMES_UP, DOWN_RECOVERY_INTANGIBLE_FRAMES, DOWN_ROLL_INTANGIBLE_FRAMES_BACK_DOWN,
@@ -9,7 +11,7 @@ import {
 } from "../../src/game/sim/conditions";
 import { DOWN_BOUND_FRAMES, DOWN_DAMAGE_RESET_THRESHOLD, DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, DOWN_WAIT_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../../src/game/sim/down";
 import { beginDamageContacts, collectDamageContact, finishDamageContacts } from "../../src/game/sim/contacts";
-import { SHIELD_MAX } from "../../src/game/sim/fighter";
+import { SHIELD_MAX, createFighter } from "../../src/game/sim/fighter";
 import { authoredThrowEffect } from "../../src/game/sim/grabs";
 import { TECH_REPEAT_MINIMUM_AGE_FRAMES, TECH_WINDOW_FRAMES } from "../../src/game/sim/geometry/techInput";
 import { THROW_KNOCKBACK_WEIGHT, damageLevelForKnockback } from "../../src/game/sim/knockback";
@@ -24,7 +26,7 @@ import {
 } from "../../src/game/sim/shield";
 import { mainDeckRight } from "../../src/game/sim/stage";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES } from "../../src/game/sim/surfaces";
-import { AUTHORED_TECH_TIMING } from "../../src/game/sim/tuning";
+import { AUTHORED_TECH_TIMING, WORLD_UNITS_PER_MELEE_UNIT } from "../../src/game/sim/tuning";
 import { type LedgerRow, PARITY, type Value, probe, range, shortNumber } from "./row";
 
 const wiki = (page: string): string => `https://www.ssbwiki.com/${page}`;
@@ -108,6 +110,45 @@ function pummels(): string {
   const count = fighter(s, 0).grab.pummels;
   return count > 1 ? `repeatable, ${shortNumber(PUMMEL_DAMAGE)}%` : `${count} a grab, ${shortNumber(PUMMEL_DAMAGE)}%`;
 }
+
+const SHIELD_SLIDE_FIGHTERS = [Character.rifleman, Character.jaina] as const;
+const SHIELD_SLIDE_RUN_FRAMES = 40;
+const SHIELD_SLIDE_FRAME_LIMIT = 120;
+
+interface Slide { readonly frames: number; readonly distance: number }
+
+const slideText = (character: Character, slide: Slide): string =>
+  `${fighterName(character)} ${slide.frames} frames, ${(slide.distance / WORLD_UNITS_PER_MELEE_UNIT).toFixed(2)} units`;
+
+function meleeShieldSlide(character: Character): Slide {
+  const { traction, walkSpeed, runSpeed } = createFighter(character, 0.0, 1).tuning.physics;
+  let speed = runSpeed;
+  let frames = 0;
+  let distance = 0.0;
+  while (speed > 0) {
+    speed = Math.max(0.0, f32(speed - (speed > walkSpeed ? f32(traction * 2.0) : traction)));
+    distance = f32(distance + speed);
+    frames++;
+  }
+  return { frames, distance };
+}
+
+function probedShieldSlide(character: Character): Slide {
+  const s = solo(0, character, -200.0);
+  const f = fighter(s, 0);
+  for (let n = 0; n < SHIELD_SLIDE_RUN_FRAMES; n++) frame(s, [Action.moveRight]);
+  const start = f.motion.x;
+  let frames = 0;
+  while (f.motion.vx !== 0 && frames < SHIELD_SLIDE_FRAME_LIMIT) {
+    frame(s, [Action.rightTrigger]);
+    frames++;
+  }
+  if (!f.shield.raised) throw new Error("the shield-momentum probe never raised a shield");
+  return { frames, distance: f32(f.motion.x - start) };
+}
+
+const shieldSlides = (slide: (character: Character) => Slide): string =>
+  `out of a run: ${SHIELD_SLIDE_FIGHTERS.map((character) => slideText(character, slide(character))).join("; ")}`;
 
 const THROW_PROBE_WEIGHTS = [75.0, THROW_KNOCKBACK_WEIGHT, 127.0];
 
@@ -303,6 +344,12 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
     melee: { value: "down while shielding drops through", source: wiki("Shield_dropping") }, ours: () => "none: a raised shield stays on the platform",
     anchor: { file: "ts/src/game/sim/platformMoves.ts", symbol: "dropFromPlatform" },
     status: { kind: "deviation", reason: "shielded fighters keep their jump, dodge or release choices (docs/gameplay-design.md, Platform shield drop)", decided: "2026-10-14", issue: 103, elsewhere: "Removed in Ultimate; Project+ keeps it" },
+  },
+  {
+    id: "shield-momentum", family: "defence", name: "Shield momentum out of a run, probed headless on each fighter's own traction, walk and run speed",
+    melee: { value: shieldSlides(meleeShieldSlide), source: wiki("Traction") }, ours: () => shieldSlides(probedShieldSlide),
+    anchor: { file: "ts/src/game/sim/groundMovement.ts", symbol: "restingTraction" },
+    checkedBy: { file: "ts/src/game/sim/shieldMomentum.tests.ts", symbol: "meleeDrag" }, status: PARITY,
   },
   {
     id: "out-of-shield", family: "defence", name: "Jump and grab out of shield, probed headless",
