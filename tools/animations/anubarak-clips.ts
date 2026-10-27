@@ -57,7 +57,7 @@ const burrowRake: readonly Gesture[] = [
 ];
 interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; decay?: number; }
 const lunges: Partial<Record<HeroPose, Lunge>> = {
-  jab: { contact: 5, x: 64, back: 32 },
+  jab: { contact: 5, x: 64, back: 32, decay: 16 },
   jab2: { contact: 7, x: 64, back: 32 },
   forwardSmash: { contact: 20, x: 48, back: 24 },
   upSmash: { contact: 17, z: 48, back: 24 },
@@ -79,7 +79,7 @@ const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> 
   follow: { chest: chest + 18, pelvis: 32, lean: lean + 6, arm: 100, elbow: 20, leftArm: 60 },
 });
 const rakes: Partial<Record<HeroPose, Rake>> = {
-  jab: { contact: 5, through: 7, windup: { chest: -20, pelvis: -12, lean: -10, arm: -210, elbow: 70, wrist: 40, leftArm: -65, head: -15 }, strike: { chest: 30, pelvis: 15, lean: 12, arm: -275, elbow: 100, wrist: 60, leftArm: -80, head: 15 }, follow: { chest: 45, pelvis: 28, lean: 16, arm: -90, elbow: 110, wrist: 55, leftArm: -95, head: 15 }, carry: { frame: 13, gesture: { chest: 45, pelvis: 28, lean: 12, arm: 0, elbow: 0, wrist: 30, leftArm: -95, head: 10 } } },
+  jab: { contact: 5, through: 7, settle: 1, windup: { chest: -20, pelvis: -12, lean: -10, arm: -210, elbow: 70, wrist: 40, leftArm: -65, head: -15 }, strike: { chest: 30, pelvis: 15, lean: 12, arm: -275, elbow: 100, wrist: 60, leftArm: -80, head: 15 }, follow: { chest: 45, pelvis: 28, lean: 16, arm: -90, elbow: 110, wrist: 55, leftArm: -95, head: 15 }, carry: { frame: 13, gesture: { chest: 45, pelvis: 28, lean: 12, arm: 0, elbow: 0, wrist: 30, leftArm: -95, head: 10 } } },
   jab2: { contact: 7, through: 9, windup: { chest: -20, pelvis: -12, lean: -10, leftArm: -210, leftElbow: 70, leftWrist: 40, arm: -65, head: -15 }, strike: { chest: 25, pelvis: 15, lean: 10, leftArm: -230, leftElbow: 120, leftWrist: 40, arm: -80, head: 15 }, follow: { chest: 45, pelvis: 28, lean: 16, leftArm: -90, leftElbow: 110, leftWrist: 55, arm: -95, head: 15 }, carry: { frame: 15, gesture: { chest: 45, pelvis: 28, lean: 12, leftArm: 0, leftElbow: 0, leftWrist: 30, arm: -95, head: 10 } } },
   forwardSmash: { contact: 19, through: 22, windup: { chest: -28, pelvis: -15, lean: -14, arm: -210, elbow: 70, wrist: 40, leftArm: -170, leftElbow: 50, head: -25 }, strike: { chest: 30, pelvis: 15, lean: 10, arm: -230, elbow: 120, wrist: 40, head: 15, leftArm: -150, leftElbow: 70 }, follow: { chest: 50, pelvis: 30, lean: 18, arm: -90, elbow: 110, wrist: 55, head: 15, leftArm: -120, leftElbow: 60 }, carry: { frame: 34, gesture: { chest: 50, pelvis: 30, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -90, leftElbow: 50 } } },
   downSmash: { contact: 15, through: 20, windup: { chest: -25, pelvis: -15, lean: -12, arm: -220, elbow: 80, wrist: 40, leftArm: -220, leftElbow: 80, leftWrist: 40, head: -20 }, strike: { chest: 45, pelvis: 18, lean: 18, arm: -170, elbow: 70, wrist: 80, head: 15, leftArm: -200, leftElbow: 90, leftWrist: 40, thigh: 30, knee: -40 }, follow: { chest: 30, pelvis: 20, lean: 5, yaw: 150, arm: -150, elbow: 80, wrist: 80, leftArm: -150, leftElbow: 80, leftWrist: 60, thigh: 35, knee: -45 }, carry: { frame: 30, gesture: { chest: 30, pelvis: 20, yaw: 120, arm: -60, elbow: 60, wrist: 60, leftArm: -60, leftElbow: 60, leftWrist: 60, thigh: 30, knee: -40 } } },
