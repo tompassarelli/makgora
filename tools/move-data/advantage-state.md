@@ -195,7 +195,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Shadow Hunter | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Shadow Hunter | medium | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
 | Shadow Hunter | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Shadow Hunter | medium | up throw | 1/1 KD | 1/1 KD | 1/1 in down smash, out forward smash | 1/1 KD in down smash, out forward tilt |
+| Shadow Hunter | medium | up throw | 1/1 KD | 1/1 KD in up smash, out down smash | 1/1 in up smash, out forward smash | 1/1 in up smash, out forward tilt |
 | Shadow Hunter | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Shadow Hunter | heavy | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
 | Shadow Hunter | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
