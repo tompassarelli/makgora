@@ -80,9 +80,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Malfurion Stormrage | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away side special; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Malfurion Stormrage | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash, dash attack; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Malfurion Stormrage | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away side special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
-| Medivh | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Medivh | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, forward smash; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Medivh | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Medivh | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up tilt against 4/5 DI |
+| Medivh | medium | yes | yes | **no** | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up smash at 60% → up tilt against 2/5 DI |
+| Medivh | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash, dash, dash attack; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap forward smash, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in full hop, down air, short hop, down air, forward smash; tech away side special; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
 | Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Anub'arak | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
@@ -383,13 +383,13 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Malfurion Stormrage | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Medivh | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Medivh | light | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
+| Medivh | light | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
 | Medivh | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Medivh | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Medivh | medium | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 in forward tilt, out dash, dash attack |
+| Medivh | medium | up throw | 1/1 in up tilt, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 | 1/1 in up tilt, out dash, dash attack |
 | Medivh | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Medivh | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
+| Medivh | heavy | forward throw | 0/0 | 0/0 | 1/1 | 0/0 KD |
 | Medivh | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 in up tilt, out dash, dash attack |
 | Medivh | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
