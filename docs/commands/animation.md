@@ -102,7 +102,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   only that to the shipped model, checking every other sequence draws unchanged.
   `SHIPPED_PEON.mdx PRIVATE_OUTPUT reauthor ACTION...` re-keys the named actions in place on the
   shipped model, shortening a sequence whose action got shorter, updates their rows in
-  peon/clips.ts and checks every other sequence draws unchanged (Log Heave, 2026-10-28).
+  peon/clips.ts and checks every other sequence draws unchanged (Log Heave, 2026-10-28); re-authoring sideSpecial also keys the drawn log, a stretched copy of his lumber geoset on its own bone, along the heave's hit capsules.
   `bun tools/animations/peon-pool.ts AUTHORED_PEON.mdx PRIVATE_OUTPUT` prepares
   Peon's checked pooled clips and a retained record for the final roster export.
   `bun tools/animations/warden-fan-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors

@@ -58,11 +58,17 @@ add("backAir", 35, [phase(0), phase(5, { axe: -35, grip: -105, chest: 22, yaw: 6
 strike("upAir", 33, 7, 9, { axe: -20, chest: 20, knee: 42 }, { axe: -110, grip: -100, elbow: -10, chest: 0, knee: 20 }, {}, true, { axe: -175, grip: -135, elbow: -22, chest: -24, knee: 10 });
 strike("downAir", 45, 13, 16, { axe: -160, chest: -20, knee: 60 }, { axe: 25, elbow: 0, chest: 15, knee: 65 }, { axe: 25, chest: 15, knee: 50 }, true, { axe: 45, elbow: 0, chest: 15, knee: 65 });
 strike("neutralSpecial", 42, 18, 20, { grip: -145, chest: -20, twist: -25, knee: 20 }, { grip: -80, axe: -35, chest: 32, twist: 30, knee: 12 });
-const shouldered = { chest: 6, knee: 12, axe: -160, grip: -150, elbow: -45, head: 6 };
-add("sideSpecial", 30, [phase(0), phase(8, { chest: 48, knee: 52, tuck: 0.2, axe: 20, grip: -20, elbow: 8, head: -8 }), phase(12, { chest: 56, knee: 62, tuck: 0.25, axe: 28, grip: -12, elbow: 10, head: -12 }),
-  phase(14, { chest: 30, knee: 34, tuck: 0.1, axe: -35, grip: -55, elbow: 0 }), phase(15, { chest: 10, knee: 18, axe: -80, grip: -90, elbow: -10 }),
-  phase(17, { chest: -18, knee: 4, axe: -135, grip: -125, elbow: -20, head: 10, height: 4 }), phase(20, shouldered), phase(25, shouldered),
-  phase(27, { chest: -12, knee: 10, axe: -178, grip: -172, elbow: -10, head: 4 }), phase(30)]);
+const shouldered = { chest: 18, knee: 32, tuck: 0.08, axe: -160, grip: -150, elbow: -45, head: 4 };
+add("sideSpecial", 30, [phase(0), phase(6, { chest: 40, knee: 42, tuck: 0.15, axe: 25, grip: -15, elbow: 8, head: -6 }), phase(12, { chest: 64, knee: 72, tuck: 0.28, axe: 35, grip: -5, elbow: 10, head: -16 }),
+  phase(14, { chest: 26, knee: 30, tuck: 0.08, axe: -40, grip: -60, elbow: 0, height: 4 }), phase(15, { chest: 0, knee: 8, axe: -90, grip: -95, elbow: -10, height: 8 }),
+  phase(17, { chest: -32, knee: 0, axe: -150, grip: -140, elbow: -20, head: 16, height: 10 }), phase(19, { chest: -6, knee: 18, axe: -165, grip: -150, elbow: -35, head: 8, height: 2 }),
+  phase(20, shouldered), phase(23, { ...shouldered, knee: 38, chest: 22 }), phase(25, shouldered),
+  phase(27, { chest: -20, knee: 12, twist: -20, axe: -178, grip: -172, elbow: -10, head: 4 }), phase(30)]);
+const LOG_PATH: readonly (readonly [frame: number, x: number, z: number, angle: number])[] = [
+  [0, 12, 6, -2], [7, 12, 6, -2], [12, 10, 10, -8], [13, 14, 14, -6], [14, 22, 18, -4.3], [15, 22, 30, 12.6], [16, 20, 44, 33.7], [17, 16, 60, 55.9],
+  [18, 12, 72, 85], [19, 16, 78, 125], [20, 26, 66, 168], [23, 26, 62, 170], [25, 26, 65, 168], [26, 14, 62, 178], [27, -4, 44, 192], [28, -12, 14, 184], [29, -14, 7, 180], [30, -14, 6, 180],
+];
+const LOG_STRETCH = new Float32Array([2.0, 1.8, 1.8]);
 add("upSpecial", 28, [phase(0), phase(6, { chest: 35, knee: 65, axe: 40, tuck: 0.2 }), phase(8, { chest: -15, axe: -155, grip: -110, knee: 10 }), phase(18, { chest: -25, axe: -170, grip: -150, knee: 45 }), phase(28, { chest: 15, knee: 50, axe: -75 })], { air: true });
 add("downSpecial", 38, [phase(0), phase(3, { chest: 35, knee: 55, axe: -85, grip: -65, tuck: 0.16 }), phase(7, { chest: 38, knee: 55, axe: -95, grip: -70, tuck: 0.16 }), phase(18, { chest: 20, knee: 25, axe: 20, grip: -25 }), phase(38)]);
 
@@ -172,6 +178,39 @@ if (lumberOnly) {
 }
 const literal = (b: { index: number, seconds: number, contact?: number }) => `{ index: ${b.index}, seconds: ${seconds(b.seconds)}, aligned: true${b.contact ? `, contact: ${seconds(b.contact)}` : ""} }`;
 const aliases: Record<string, string> = { doubleJump: "jump", wallJump: "jump", wallTech: "tech", fallSpecial: "fall", downDamage: "knockdown", damageTumble: "knockdown", damageGround: "pain11", damageAir: "pain11", damageShield: "stop", smashCharge: "shield", neutralSpecialAir: "neutralSpecial", sideSpecialAir: "sideSpecial", upSpecialAir: "upSpecial", downSpecialAir: "downSpecial" };
+const plantLog = (targets: readonly Action[], indices: readonly number[]) => {
+  const cell = targets.findIndex(a => a.name === "sideSpecial");
+  if (cell < 0) return;
+  const index = indices[cell]!;
+  const motion = model.Helpers.find(h => h.Name === "Peon Motion"), lumber = model.Bones.find(b => b.Name === "Lumber");
+  const anim = model.GeosetAnims.find(a => a.GeosetId === LUMBER_GEOSET), geoset = model.Geosets[LUMBER_GEOSET];
+  ensure(motion !== undefined && lumber !== undefined && anim !== undefined && typeof anim.Alpha !== "number" && geoset !== undefined, "Peon lumber geoset or motion helper missing");
+  const butt = new Float32Array([-15, 15, 91]);
+  let log = model.Bones.find(b => b.Name === "Peon Log");
+  if (log === undefined) {
+    const id = model.Nodes.length;
+    log = { ...structuredClone(lumber), Name: "Peon Log", ObjectId: id, Parent: motion.Parent, PivotPoint: butt, GeosetId: model.Geosets.length, GeosetAnimId: model.GeosetAnims.length,
+      Rotation: { LineType: 1, GlobalSeqId: -1, Keys: [] }, Translation: { LineType: 1, GlobalSeqId: -1, Keys: [] }, Scaling: { LineType: 1, GlobalSeqId: -1, Keys: [] } };
+    model.Bones.push(log); model.Nodes.push(log); model.PivotPoints.push(butt);
+    const copy = structuredClone(geoset);
+    copy.Groups = [[id]]; copy.TotalGroupsCount = 1; copy.VertexGroup = new Uint8Array(copy.Vertices.length / 3);
+    const shown = { ...structuredClone(anim), GeosetId: model.Geosets.length };
+    if (typeof shown.Alpha !== "number") shown.Alpha.Keys = model.Sequences.flatMap(s => Array.from(s.Interval, Frame => ({ Frame, Vector: new Float32Array([0]) })));
+    model.Geosets.push(copy); model.GeosetAnims.push(shown);
+  }
+  const alpha = model.GeosetAnims.find(a => a.GeosetId === model.Geosets.length - 1)?.Alpha;
+  ensure(alpha !== undefined && typeof alpha !== "number", "Peon log geoset lacks its alpha track");
+  const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+  alpha.Keys = [...alpha.Keys.filter(k => k.Frame < start || k.Frame > end), { Frame: start, Vector: new Float32Array([1]) }, { Frame: end, Vector: new Float32Array([1]) }].sort((a, b) => a.Frame - b.Frame);
+  for (const track of [log.Rotation!, log.Translation!, log.Scaling!]) track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
+  for (const [frame, x, z, angle] of LOG_PATH) {
+    const Frame = start + Math.round(frame * 1000 / 60), half = -angle * Math.PI / 360;
+    log.Translation!.Keys.push({ Frame, Vector: new Float32Array([x - butt[0]!, -butt[1]!, z - butt[2]!]) });
+    log.Rotation!.Keys.push({ Frame, Vector: new Float32Array([0, Math.sin(half), 0, Math.cos(half)]) });
+    log.Scaling!.Keys.push({ Frame, Vector: LOG_STRETCH.slice() });
+  }
+  for (const track of [log.Rotation!, log.Translation!, log.Scaling!]) track.Keys.sort((a, b) => a.Frame - b.Frame);
+};
 const reauthorInPlace = (targets: readonly Action[], resize: boolean) => {
   const motion = model.Helpers.find(h => h.Name === "Peon Motion");
   ensure(motion !== undefined, "Shipped Peon lacks its motion helper");
@@ -211,6 +250,7 @@ const reauthorInPlace = (targets: readonly Action[], resize: boolean) => {
     model.Sequences[index]!.Interval = new Uint32Array([start, start + length]);
     indices.push(index); moves.push(translations);
   }
+  plantLog(targets, indices);
   const unsnapped = generateMDX(model);
   for (const [cell, action] of targets.entries()) snapPain(unsnapped, indices[cell]!, action.frames, moves[cell]!);
   const bytes = encodeVerified(parseSource(generateMDX(model))), before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);

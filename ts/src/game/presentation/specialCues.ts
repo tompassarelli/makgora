@@ -195,6 +195,8 @@ const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTarget
 const KOBOLD_BURROW_TRAIL: MoveCues = { spell: "Burrow trail", startup: BURROW, active: BURROW };
 
 
+const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 112.0, z: 6.0 }));
+
 export const PEON_REST_CUES: MoveCues = {
   spell: "Rest",
   startup: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)),
@@ -248,7 +250,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.peon]: {
     neutral: EMPTY_GOLD_SACK_CUES,
-    side: { spell: "Log Heave", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
+    side: { spell: "Log Heave", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: { ...timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.4)), "stand", 0.0), anchorFrames: LOG_TEAR_DUST } },
     up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
     down: PEON_REST_CUES,
   },
