@@ -291,8 +291,8 @@ for (const [ordinal, action] of authoredActions.entries()) {
         Vector = frame <= 6 ? blend(first.Vector, poses[0]!, frame / 6)
           : frame <= 8 ? blend(poses[0]!, poses[1]!, (frame - 6) / 2)
           : frame <= 11 ? blend(poses[1]!, poses[2]!, (frame - 8) / 3)
-          : frame <= 13 ? poses[2]!.slice()
-          : blend(poses[2]!, first.Vector, (frame - 13) / (action.frames - 13));
+          : frame <= 12 ? poses[2]!.slice()
+          : blend(poses[2]!, first.Vector, Math.min(1, (frame - 12) / (action.frames - 13)));
       }
       if (action.pose === blenderPose) Vector = bakedVector?.(path, frame) ?? Vector;
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
@@ -385,7 +385,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   }
   if (action.pose === "upAir") for (const frame of phaseFrames) {
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
-    const drive = frame <= 6 ? -frame / 6 : frame <= 8 ? -1 + 2 * (frame - 6) / 2 : Math.max(0, (18 - frame) / 10);
+    const drive = frame <= 6 ? -frame / 6 : frame <= 8 ? -1 + 2 * (frame - 6) / 2 : frame <= 11 ? 1 + 0.8 * (frame - 8) / 3 : 1.8 * Math.max(0, (action.frames - 1 - frame) / (action.frames - 12));
     key.Vector[2] += 30 * drive;
     if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
   }
