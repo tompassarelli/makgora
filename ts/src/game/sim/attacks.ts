@@ -14,6 +14,7 @@ import { applyAttackHit } from "./hits";
 import { isEthereal } from "./heroStatus";
 import { hangsOnLedge } from "./ledge";
 import { belowStandingPlatform } from "./platformMoves";
+import { spendParasol } from "./parasol";
 import { isAerialAttack, isJab } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { spawnProjectile } from "./projectiles";
@@ -183,6 +184,7 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
     const pivot = action === AttackStyle.grab && fighter.ground.action === GroundAction.turnRun;
     const smashFromDash = grounded && fighter.ground.action === GroundAction.dash && isGroundSmash(action);
     beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge);
+    if (aerial) spendParasol(fighter);
     if (smashFromDash) fighter.motion.vx = 0.0;
     fighter.attack.pivotGrab = pivot;
   }

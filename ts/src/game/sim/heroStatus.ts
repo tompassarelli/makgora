@@ -79,6 +79,9 @@ export interface AppliedStatus {
 
   readonly tick?: { readonly every: number; readonly damage: number } | undefined;
 
+  readonly soak?: { readonly level: number; readonly slow: AppliedStatus } | undefined;
+  readonly ignite?: { readonly damage: readonly number[]; readonly frames: readonly number[]; readonly every: number; readonly tick: number } | undefined;
+
 
 
 
@@ -113,6 +116,17 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
     state.poisonDamage = status.tick?.damage ?? 0.0;
     return;
   }
+  if (status.kind === HeroStatusKind.soak) {
+    if (state.out) return;
+    state.soakFrames = status.frames;
+    state.soakLevel = status.soak?.level ?? 1;
+    if (status.soak !== undefined) applyHeroStatus(f, status.soak.slow);
+    return;
+  }
+  if (status.kind === HeroStatusKind.ignite) {
+    igniteSoaked(f, status.ignite);
+    return;
+  }
   if (state.out) return;
   if ((state.conditionImmunity[status.group] ?? 0) > 0) return;
   state.condition = status.kind;
@@ -125,6 +139,19 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
     cancelAttack(f);
     cancelSpecialState(f);
   }
+}
+
+
+function igniteSoaked(f: Fighter, ignite: Readonly<AppliedStatus>["ignite"]): void {
+  const { status } = f;
+  if (status.out || status.soakFrames <= 0 || ignite === undefined) return;
+  const level = min(status.soakLevel, ignite.damage.length - 1);
+  status.damage = capPercent(addFloat32(roundToFloat32(status.damage), ignite.damage[level] ?? 0.0));
+  status.poisonFrames = ignite.frames[level] ?? 0;
+  status.poisonEvery = ignite.every;
+  status.poisonDamage = ignite.tick;
+  status.soakFrames = 0;
+  status.soakLevel = 0;
 }
 
 
@@ -156,6 +183,10 @@ export function advanceHeroConditions(f: Fighter): void {
     status.poisonFrames--;
     if (floorMod(status.poisonFrames, status.poisonEvery) === 0) status.damage = capPercent(addFloat32(roundToFloat32(status.damage), status.poisonDamage));
   }
+  if (status.soakFrames > 0) {
+    status.soakFrames--;
+    if (status.soakFrames === 0) status.soakLevel = 0;
+  }
   for (let group = 0; group < HERO_STATUS_GROUPS; group++) {
     const left = status.conditionImmunity[group] ?? 0;
     if (left > 0) status.conditionImmunity[group] = left - 1;
@@ -176,6 +207,8 @@ export function clearHeroStatus(f: Fighter): void {
   status.poisonFrames = 0;
   status.poisonEvery = 0;
   status.poisonDamage = 0.0;
+  status.soakFrames = 0;
+  status.soakLevel = 0;
 }
 
 const NEUTRAL = neutralControls();

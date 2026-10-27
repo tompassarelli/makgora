@@ -3,7 +3,7 @@
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
-import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
+import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ParasolState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
 import { type CommandGrab, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 
 import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES, WALL_TECH_STARTUP_FRAMES, attackPhase, inGrabContext, isForwardGroundRoll, isGroundDodging } from "../sim/conditions";
@@ -329,6 +329,10 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   }
   if (f.special.fall) {
     playIndex(pose, "specialfall", clips.clipFor(character, "fallSpecial").index);
+    return rate;
+  }
+  if (f.special.parasol === ParasolState.open && f.attack.style === undefined) {
+    playIndex(pose, "parasol", clips.clipFor(character, "upSpecialAir").index);
     return rate;
   }
   if (isGroundDodging(f)) {

@@ -9,7 +9,6 @@ import type { HurtPose } from "../hurtboxes";
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
 export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
 
-
 export const SpecialForm = { ground: 0, air: 1, recall: 3, marked: 4 } as const;
 export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 
@@ -284,6 +283,7 @@ export interface SpecialCharge {
   readonly hold: number;
   readonly full: number;
   readonly stages: number;
+  readonly drops?: true | undefined;
 }
 
 export interface AuthoredSpecial {
@@ -330,6 +330,7 @@ export interface AuthoredSpecial {
   readonly helpless?: boolean | undefined;
 
   readonly helplessOnMiss?: boolean | undefined;
+  readonly parasol?: true | undefined;
 
   readonly landingLag?: number | undefined;
 

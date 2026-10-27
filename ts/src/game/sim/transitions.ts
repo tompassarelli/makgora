@@ -7,7 +7,7 @@ import { floorDiv } from "wisp/src/sim/intMath";
 import { mutableProjectile, restProjectiles } from "./fighterProjectiles";
 import { aerialJumps } from "./itemBuffs";
 import { max } from "../core/numbers";
-import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
+import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ParasolState, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
 import { cancelsJumpSquat, isTumbling } from "./conditions";
 import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, mutablePlacedObject, placedObject } from "./fighter";
 import { clearDash } from "./groundMovement";
@@ -123,6 +123,7 @@ export function cancelSpecialState(f: Fighter): void {
     }
   }
   special.fall = false;
+  special.parasol = ParasolState.none;
   special.ex = false;
   special.exArmorUsed = false;
   special.variant = 0;

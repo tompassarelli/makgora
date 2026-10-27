@@ -156,7 +156,7 @@ export const HitElement = { normal: 0, fire: 1, electric: 2, slash: 3, ice: 5, d
 export type HitElement = (typeof HitElement)[keyof typeof HitElement];
 
 // Append only: these status codes are serialized in replay text.
-export const HeroStatusKind = { none: 0, sleep: 1, poison: 2, hex: 3, stun: 4, chill: 5, carried: 7, silence: 8, root: 9, banish: 11 } as const;
+export const HeroStatusKind = { none: 0, sleep: 1, poison: 2, hex: 3, stun: 4, chill: 5, carried: 7, silence: 8, root: 9, banish: 11, soak: 12, ignite: 13 } as const;
 export type HeroStatusKind = (typeof HeroStatusKind)[keyof typeof HeroStatusKind];
 
 
@@ -167,6 +167,9 @@ export type HeroStatusKind = (typeof HeroStatusKind)[keyof typeof HeroStatusKind
 export const HeroStatusGroup = { sleep: 0, silence: 1, chill: 2 } as const;
 export type HeroStatusGroup = (typeof HeroStatusGroup)[keyof typeof HeroStatusGroup];
 export const HERO_STATUS_GROUPS = 3;
+
+export const ParasolState = { none: 0, open: 1, closed: 2, spent: 3 } as const;
+export type ParasolState = (typeof ParasolState)[keyof typeof ParasolState];
 
 export const STUN_REPEAT_FRAMES = 120;
 

@@ -272,6 +272,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   special.charge = sourceSpecial.charge;
   special.refire = sourceSpecial.refire;
   special.refires = sourceSpecial.refires;
+  special.parasol = sourceSpecial.parasol;
   special.guarded = sourceSpecial.guarded;
   special.egg = sourceSpecial.egg;
   copyFighterProjectiles(target, source);
@@ -449,6 +450,8 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.poisonFrames = sourceStatus.poisonFrames;
   status.poisonEvery = sourceStatus.poisonEvery;
   status.poisonDamage = sourceStatus.poisonDamage;
+  status.soakFrames = sourceStatus.soakFrames;
+  status.soakLevel = sourceStatus.soakLevel;
   const mana = target.mana;
   const sourceMana = source.mana;
   mana.points = sourceMana.points;
@@ -807,6 +810,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = special.charge, b = sourceSpecial.charge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.refire !== sourceSpecial.refire) return false;
   { const a = special.refires, b = sourceSpecial.refires; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.parasol, b = sourceSpecial.parasol; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.guarded !== sourceSpecial.guarded) return false;
   if (special.egg !== sourceSpecial.egg) return false;
   if (!sameFighterProjectiles(target, source)) return false;
@@ -950,6 +954,8 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.poisonFrames, b = sourceStatus.poisonFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.poisonEvery, b = sourceStatus.poisonEvery; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.poisonDamage, b = sourceStatus.poisonDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.soakFrames, b = sourceStatus.soakFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.soakLevel, b = sourceStatus.soakLevel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.divineFrames, b = sourceStatus.divineFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buff, b = sourceStatus.buff; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buffFrames, b = sourceStatus.buffFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1478,6 +1484,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     if (special.charge !== 0) sink.int(prefix, "specialCharge", special.charge);
     if (special.refire) sink.int(prefix, "specialRefire", 1);
     if (special.refires !== 0) sink.int(prefix, "specialRefires", special.refires);
+    if (special.parasol !== 0) sink.int(prefix, "specialParasol", special.parasol);
     sink.int(prefix, "specialGuarded", special.guarded ? 1 : 0);
     sink.int(prefix, "specialEgg", special.egg ? 1 : 0);
     if (status.divineFrames !== 0) sink.int(prefix, "divineFrames", status.divineFrames);
@@ -1500,6 +1507,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     sink.int(prefix, "poisonEvery", status.poisonEvery);
     sink.real(prefix, "poisonDamage", status.poisonDamage);
   }
+  if (status.soakFrames !== 0) sink.int(prefix, "soakFrames", status.soakFrames);
+  if (status.soakLevel !== 0) sink.int(prefix, "soakLevel", status.soakLevel);
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
     if (projectile.spec !== undefined) sink.text(kits.projectileSpec(projectile.spec, `${prefix}.projectileSpec[${i}]`));
@@ -1780,4 +1789,6 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.poisonFrames = 0;
   status.poisonEvery = 0;
   status.poisonDamage = 0.0;
+  status.soakFrames = 0;
+  status.soakLevel = 0;
 }

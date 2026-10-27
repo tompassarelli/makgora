@@ -43,6 +43,7 @@ import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOption
 import { GroundOption } from "./stickZones";
 import { heroEgg, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
+import { closeParasol, endParasolAerial, parasolFall } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpOrAttackBranch } from "./specials";
@@ -206,6 +207,7 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
     attack.frame++;
     if (attack.frame >= attack.duration) {
       attack.style = undefined;
+      endParasolAerial(f);
       attack.frame = 0;
       attack.hit = false;
       attack.dashGrab = false;
@@ -645,6 +647,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     buoyant = true;
     sea.applyBuoyancy(f);
   } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredHeight) {
+    closeParasol(f, downHeld);
     if (!motion.grounded && !motion.fastFalling && !f.platform.dropConsumed && downHeld && motion.fastFallInputAge < FAST_FALL_INPUT_WINDOW && input.direction === 0
       && down.state === DownState.none && launch.hitstun <= 0 && motion.vz < 0) {
       motion.fastFalling = true;
@@ -653,7 +656,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     if (drill?.speedZ !== undefined) motion.vz = drill.speedZ;
     else if (egg !== undefined) motion.vz = -egg.fallSpeed;
     else if (motion.fastFalling) motion.vz = -heavyFall(f, f32(physics.fastFallSpeed * heroStatusFall(f)));
-    else applyMeleeGravity(f, heroStatusFall(f));
+    else applyMeleeGravity(f, f32(heroStatusFall(f) * parasolFall(f)));
   }
   moveMeleeVerticalVelocity(f);
   moveMeleeZ(f, divideFloat32(launch.knockbackZ, WORLD_UNITS_PER_MELEE_UNIT));

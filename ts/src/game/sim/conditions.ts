@@ -3,6 +3,7 @@
 import { AttackPhase, AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "./codes";
 import type { Fighter } from "./fighter";
 import { meleeHandling } from "./meleeHandling";
+import { parasolBlocksActions } from "./parasol";
 import { attackStartupFrames, characterAttackActiveFrames, jabChainFrom, nextJab } from "./moves";
 
 export const GROUND_ROLL_FRAMES = 31;
@@ -136,7 +137,7 @@ export function cancelsJumpSquat(style: AttackStyle | undefined): boolean {
 
 /** An up special pressed in grounded jump squat starts there, as Melee's jump-cancelled up special out of shield. */
 export function canStartSpecial(attacker: Fighter, specialZ: number): boolean {
-  return canAttack(attacker, specialZ > 0 && attacker.motion.grounded);
+  return !parasolBlocksActions(attacker) && canAttack(attacker, specialZ > 0 && attacker.motion.grounded);
 }
 
 

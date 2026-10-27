@@ -1,14 +1,29 @@
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../../sim/codes";
-import { CHILL } from "../../sim/chill";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, frames } from "../../sim/specials/schema";
+import { igniteStatus, soakStatus } from "../../sim/soak";
+import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, type SpecialCharge, type SpecialFollowUp, frames } from "../../sim/specials/schema";
 import { chenCapsule, chenHit } from "./moves";
+
+export const KEG_CHARGE: SpecialCharge = { hold: 10, full: 45, stages: 3, drops: true };
+export const KEG_STAGES = [0, 1, 2, 3] as const;
+export const KEG_SOAK_FRAMES = [120, 180, 240, 300] as const;
+export const KEG_SLOW_FRAMES = [30, 50, 70, 90] as const;
+const KEG_DAMAGE = [3.0, 4.0, 5.0, 6.0] as const;
+export const IGNITE_DAMAGE = [0.0, 3.0, 5.0, 7.0, 10.0] as const;
+export const IGNITE_BURN_FRAMES = [0, 60, 90, 120, 180] as const;
+export const IGNITE_BURN_EVERY = 20;
+
+export const chenSoak = (level: number) => soakStatus(level, KEG_SOAK_FRAMES[level - 1] ?? 120, KEG_SLOW_FRAMES[level - 1] ?? 30);
+
+export const CHEN_IGNITE = igniteStatus(IGNITE_DAMAGE, IGNITE_BURN_FRAMES, IGNITE_BURN_EVERY, 1.0);
+
+const electric = (effect: ReturnType<typeof chenHit>): ReturnType<typeof chenHit> => ({ ...effect, electric: true });
 
 const fire = chenHit(6.0, 55.0, 20.0, f32(0.906308), f32(0.422618), HitElement.fire);
 const breath = (air: boolean): AuthoredSpecial => ({
-  endFrame: 48, landingLag: air ? 20 : undefined,
+  endFrame: 48, landingLag: air ? 20 : undefined, strikeStatus: CHEN_IGNITE,
   regions: [
     heroRegion(18, 28, chenCapsule(36.0, 62.0, 76.0, 62.0, 27.0), fire),
     heroRegion(18, 28, chenCapsule(76.0, 62.0, 136.0, 62.0, 40.0), fire),
@@ -16,36 +31,46 @@ const breath = (air: boolean): AuthoredSpecial => ({
     heroRegion(18, 28, chenCapsule(196.0, 62.0, 256.0, 62.0, 70.0), fire),
   ],
 });
-const haze = (air: boolean): AuthoredSpecial => ({
-  endFrame: 38, landingLag: air ? 20 : undefined,
-  projectiles: [{ spawnFrame: 14, offsetX: 40.0, offsetZ: 60.0, velocityX: 8.0, velocityZ: 0.5, gravity: f32(0.08),
-    life: 38, radius: 22.0, effect: chenHit(2.8110599517822266, 35.0, 17.156063079833984, f32(0.819152), f32(0.573576)), reflectable: true, limit: 1,
-    model: "Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdx",
-    status: CHILL,
-  }],
-});
-const stormRise = (height: number, drift: number): AuthoredSpecial => ({
-  endFrame: 40, oncePerAirtime: true, helpless: true, facesStick: true,
-  motion: [{ ...frames(1, 7), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(8, 29), velocityX: 0.0, velocityZ: f32(f32(HERO_REFERENCE_HEIGHT * height) / 22.0), driftSpeed: f32(f32(HERO_REFERENCE_HEIGHT * drift) / 22.0) }],
-  regions: [heroRegion(8, 22, chenCapsule(0.0, 42.0, 0.0, 106.0, 42.0), chenHit(7.49616003036499, 80.0, 27.878604888916016, f32(0.34202), f32(0.939693))),
-    heroRegion(8, 22, chenCapsule(-150.0, 142.0, 140.0, 142.0, 12.0), chenHit(7.49616003036499, 80.0, 27.878604888916016, f32(0.34202), f32(0.939693)))],
-});
-const FIRE_PALM: AuthoredSpecial = { name: "Fire Palm", endFrame: 32, landingLag: 20,
-  regions: [heroRegion(8, 11, chenCapsule(24.0, 58.0, 94.0, 60.0, 22.0), chenHit(10.307220458984375, 90.0, 25.73409652709961, f32(0.819152), f32(0.573576), HitElement.fire))] };
-const STORM_STEP: AuthoredSpecial = { name: "Storm Step", endFrame: 28, landingLag: 20, facesStick: true,
-  motion: [{ ...frames(5, 12), velocityX: 10.0, velocityZ: 0.0, stopsAtShield: true }],
-  regions: [heroRegion(5, 12, chenCapsule(20.0, 48.0, 60.0, 56.0, 18.0), chenHit(6.559140205383301, 75.0, 23.589588165283203, f32(0.642788), f32(0.766044)))] };
-const earth = (air: boolean): AuthoredSpecial => ({
-  name: "Earth Stance", endFrame: 33, landingLag: air ? 20 : undefined,
-  armor: { ...frames(5, 16), maxDamage: 9.0 },
-  followUps: [
-    { window: frames(10, 22), input: FollowUpInput.attack, special: FIRE_PALM },
-    { window: frames(10, 22), input: FollowUpInput.special, facesStick: true, special: STORM_STEP },
+
+export const BODY_SLAM_FIRST = 10;
+export const BODY_SLAM_LAST = 24;
+const slam = chenHit(9.0, 60.0, 50.0, f32(0.173648), f32(0.984808));
+export const BODY_SLAM_LANDED_END = 14;
+const slamLanded = (air: boolean): AuthoredSpecial => ({ name: "Body Slam", endFrame: BODY_SLAM_LANDED_END, landingLag: air ? 10 : undefined,
+  motion: [{ ...frames(1, 4), velocityX: 0.0, velocityZ: 0.0 }] });
+const bodySlam = (air: boolean): AuthoredSpecial => ({
+  endFrame: 50, landingLag: air ? 22 : undefined, oncePerAirtime: air ? true : undefined, facesStick: true,
+  motion: [
+    { ...frames(1, BODY_SLAM_FIRST - 1), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(BODY_SLAM_FIRST, BODY_SLAM_LAST), velocityX: 9.0, velocityZ: 0.0, stopsAtBody: true, stopsAtShield: true },
   ],
+  regions: [heroRegion(BODY_SLAM_FIRST, BODY_SLAM_LAST, chenCapsule(14.0, 46.0, 58.0, 50.0, 26.0), slam)],
+  followUps: [{ window: frames(BODY_SLAM_FIRST, BODY_SLAM_LAST + 1), input: FollowUpInput.contact, special: slamLanded(air) }],
 });
+
+const kegThrow = (stage: number, air: boolean): AuthoredSpecial => ({
+  name: "Keg Toss", endFrame: 24, landingLag: air ? 18 : undefined, spendsCharge: true,
+  projectiles: [{ spawnFrame: 6, offsetX: 30.0, offsetZ: 74.0, velocityX: f32(5.0 + 0.5 * stage), velocityZ: 5.5, gravity: f32(0.35),
+    life: 70, radius: f32(20.0 + 3.0 * stage), effect: chenHit(KEG_DAMAGE[stage] ?? 3.0, 40.0, 30.0, f32(0.707107), f32(0.707107)), reflectable: true, limit: 1,
+    model: "Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdx", modelRadius: f32(20.0 + 3.0 * stage), status: chenSoak(stage + 1) }],
+});
+const KEG_WINDOW = frames(1, KEG_CHARGE.hold + 1);
+const keg = (air: boolean): AuthoredSpecial => ({
+  name: "Brew Keg", endFrame: KEG_CHARGE.hold + 2, landingLag: air ? 18 : undefined, charge: KEG_CHARGE,
+  followUps: KEG_STAGES.map((stage): SpecialFollowUp => ({ window: KEG_WINDOW, chargeStage: stage, special: kegThrow(stage, air) })),
+});
+
+const storm = electric(chenHit(7.49616003036499, 80.0, 27.878604888916016, f32(0.34202), f32(0.939693), HitElement.electric));
+const stormRise = (height: number, drift: number): AuthoredSpecial => ({
+  endFrame: 40, oncePerAirtime: true, parasol: true, facesStick: true,
+  motion: [{ ...frames(1, 7), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(8, 29), velocityX: 0.0, velocityZ: f32(f32(HERO_REFERENCE_HEIGHT * height) / 22.0), driftSpeed: f32(f32(HERO_REFERENCE_HEIGHT * drift) / 22.0) }],
+  regions: [heroRegion(8, 22, chenCapsule(0.0, 42.0, 0.0, 106.0, 42.0), storm),
+    heroRegion(8, 22, chenCapsule(-150.0, 142.0, 140.0, 142.0, 12.0), storm)],
+});
+
 export const CHEN_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Breath of Fire", description: "Breathe a long, fanning cone of flame; jump above its widening tip.", ground: breath(false), air: breath(true) }, { reach: 1.25 }),
-  side: withExKit({ name: "Drunken Haze", description: "Lob a flask that briefly slows an enemy's movement.", ground: haze(false), air: haze(true) }, { reach: 1.25 }),
-  up: withExKit({ name: "Storm Rise", description: "Rise with a spinning staff, steer toward safety, then fall helplessly.", ground: stormRise(f32(3.0), 1.0) }, { travel: 1.25 }),
-  down: withExKit({ name: "Threefold Stance", description: "Brace as Earth; press Attack for Fire Palm or Special for Storm Step.", ground: earth(false), air: earth(true) }, { armorDamage: 1.25, damage: 1.25 }),
+  neutral: withExKit({ name: "Breath of Fire", description: "Breathe a long, fanning cone of flame; a soaked foe takes extra damage and burns.", ground: breath(false), air: breath(true) }, { reach: 1.25 }),
+  side: withExKit({ name: "Body Slam", description: "Belly-charge forward; stop at the first body or shield and pop the foe up. A miss leaves him open.", ground: bodySlam(false), air: bodySlam(true) }, { travel: 1.25 }),
+  up: withExKit({ name: "Storm Rise", description: "Rise in a crackling storm, then open the parasol: float and steer, hold down to close it, and swing one aerial before falling helplessly.", ground: stormRise(f32(3.0), 1.0) }, { travel: 1.25 }),
+  down: withExKit({ name: "Brew Keg", description: "Pour ale into the keg in three glugs, then press special to lob it; a fuller keg slows and soaks longer and feeds Breath of Fire more.", ground: keg(false), air: keg(true) }, { reach: 1.25 }),
 };

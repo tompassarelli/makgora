@@ -8,6 +8,7 @@ import { jumpBuffed } from "./itemBuffs";
 import { DIAGONAL_UNIT } from "./knockback";
 import { meleeHandling } from "./meleeHandling";
 import { observeActionDecision, observeActionStart } from "./observations";
+import { parasolBlocksActions } from "./parasol";
 import { clearDownState } from "./transitions";
 import { melee } from "./tuning";
 
@@ -67,7 +68,7 @@ export function beginJump(f: Fighter, horizontal: number, shortHop = false, thro
 
 export function beginAirDodge(f: Fighter, horizontal: number, vertical: number, bufferedDuringJumpSquat = false): void {
   const { motion, launch, dodge } = f;
-  if (lockedOut(f) || motion.grounded || dodge.airDodging || dodge.airUsed || dodge.airMotionFrames > 0) return;
+  if (lockedOut(f) || parasolBlocksActions(f) || motion.grounded || dodge.airDodging || dodge.airUsed || dodge.airMotionFrames > 0) return;
   observeActionDecision(DODGE_BITS);
   motion.fastFalling = false;
   const dx = sign(horizontal);

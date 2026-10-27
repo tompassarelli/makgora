@@ -10,7 +10,7 @@ import { type Roster, fighterAt, isActive } from "./roster";
 import { SEA_SURFACE_Z, TIDE_SPEED, hasTide, inSea, tideDirection, tidePush } from "./stageHazards";
 import { moveMeleeX, setWorldMotionValue } from "./motion";
 import { melee } from "./tuning";
-import { SurfaceContact } from "./codes";
+import { ParasolState, SurfaceContact } from "./codes";
 import { aerialJumps, jumpBuffed } from "./itemBuffs";
 import { JUMP_BIT, lockedOut } from "./jumpsAndDodges";
 import { observeActionDecision, observeActionStart } from "./observations";
@@ -52,6 +52,7 @@ export function applyBuoyancy(f: Fighter): void {
   f.motion.vz = min(WATER_RISE_CAP, f32(f.motion.vz + WATER_BUOYANCY));
   f.motion.fastFalling = false;
   f.special.fall = false;
+  f.special.parasol = ParasolState.none;
 }
 
 

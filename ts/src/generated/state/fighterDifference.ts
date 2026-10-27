@@ -175,6 +175,8 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.poisonFrames !== actual.status.poisonFrames) return "poisonFrames";
   if (expected.status.poisonEvery !== actual.status.poisonEvery) return "poisonEvery";
   if (expected.status.poisonDamage !== actual.status.poisonDamage) return "poisonDamage";
+  if (expected.status.soakFrames !== actual.status.soakFrames) return "soakFrames";
+  if (expected.status.soakLevel !== actual.status.soakLevel) return "soakLevel";
   if (expected.mana.points !== actual.mana.points) return "manaPoints";
   if (expected.visuals.manaDenied !== actual.visuals.manaDenied) return "manaDeniedSerial";
   if (expected.candle.heat !== actual.candle.heat) return "candleHeat";
@@ -206,6 +208,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.special.charge !== actual.special.charge) return "specialCharge";
   if (expected.special.refire !== actual.special.refire) return "specialRefire";
   if (expected.special.refires !== actual.special.refires) return "specialRefires";
+  if (expected.special.parasol !== actual.special.parasol) return "specialParasol";
   if (expected.special.guarded !== actual.special.guarded) return "specialGuarded";
   if (expected.special.egg !== actual.special.egg) return "specialEgg";
   if (expected.status.divineFrames !== actual.status.divineFrames) return "divineFrames";

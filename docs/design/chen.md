@@ -53,11 +53,15 @@ set the timing relations; every region, damage and angle is original.
 ## Sources and decisions
 
 [Wowpedia's Warcraft III Pandaren Brewmaster](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29)
-provides Breath of Fire, Drunken Haze, Drunken Brawler and Storm, Earth and
-Fire. Haze slows the approach into the fire cone. It keeps Warcraft's
-movement slow through the shared chill rules: 75 frames at 60% walk, run and
-air-drift speed, followed by 120 frames of immunity. The opponent keeps attack,
-jump, shield and dodge control. No outside code or animation is reused.
+provides Breath of Fire, Drunken Brawler and Storm, Earth and Fire. The keg
+soaks a foe so the fire cone lands harder: a soaked foe is briefly slowed
+through the shared chill rules (60% walk, run and air-drift speed, with no
+immunity after) and stays soaked for a few seconds; Breath of Fire on a
+soaked foe adds damage and a burn and dries the soak. The opponent keeps
+attack, jump, shield and dodge control. Tom reshaped the specials on
+2026-10-28: a League of Legends Gragas-style Body Slam on side special, a
+fill-and-throw keg on down special, and a parasol float after Storm Rise in
+the manner of Peach's up special in Ultimate. No outside code or animation is reused.
 
 The Smash references establish decisions rather than copied hitboxes:
 [Bowser's Fire Breath](https://www.ssbwiki.com/Fire_Breath) establishes a
@@ -65,10 +69,11 @@ close fire wall that can be jumped over;
 [Ryu](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) and
 [Ken](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) establish short checks,
 planted kicks, uppercuts and footwork;
-[Swap](https://www.ssbwiki.com/Swap) establishes giving up one option to take
-another. Chen's Threefold Stance begins as Earth and can become a Fire palm
-or Storm step with a fresh press. These are brief forms within one action, not three extra
-fighters. His ultimate retains the full three-spirit fantasy, following the
+[Peach's Parasol](https://www.ssbwiki.com/Peach_Parasol) establishes a slow,
+steerable float after a recovery, and
+[Donkey Kong's Giant Punch](https://www.ssbwiki.com/Giant_Punch) a staged
+charge released by a second press; unlike Donkey Kong (and Peon's Gold Sack),
+the keg is never stored: a fill ends in a throw or is lost. His ultimate retains the full three-spirit fantasy, following the
 roster's existing rule that ultimates are named designs and currently off.
 
 Every number below is original, provisional tuning. Frames count the entry
@@ -100,10 +105,10 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 | Pummel | Short knee, one fresh press | Shared pummel timing; 3% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken pummel](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Forward / back throw | Shoulder toss / turn-and-toss | Contact 12/16, total 33/39; 10/11.25% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu throws](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Up / down throw | Staff lift / barrel slam into tech chase | Contact 14/18, total 25/42; 8.75/7.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken throws](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
-| Neutral special | Breath of Fire: finite long fanning cone, one hit, jump above its wide tip or whiff-punish | Active 18–28, end 48; 12.5%, cost 10 | [Breath of Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Fire Breath](https://www.ssbwiki.com/Fire_Breath) |
-| Side special | Drunken Haze: arcing flask, 3.75% and 75 frames at 60% movement speed; shield stops it | Spawn 14, end 38; cost 12 | [Drunken Haze](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu Hadoken spacing](https://www.ssbwiki.com/Hadoken) |
-| Up special | Storm Rise: rising staff spin with steering, then helpless fall | Rise 8–29, end 40; 10%, cost 15 | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken Shoryuken](https://www.ssbwiki.com/Shoryuken) |
-| Down special | Earth stance absorbs one light hit; fresh Attack becomes Fire palm, fresh Special becomes Storm step | Armor 5–16, end 33; cost 10. Fire active 8–11, end 32, 13.75%. Storm travels 5–12, end 28, 8.75% | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Swap](https://www.ssbwiki.com/Swap) |
+| Neutral special | Breath of Fire: finite long fanning cone, one hit, jump above its wide tip or whiff-punish; on a soaked foe it adds damage and a burn of 1% every 20 frames, by soak stage 1–4: +3/5/7/10% and 60/90/120/180 burn frames | Active 18–28, end 48; 12.5%, cost 10 | [Breath of Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Fire Breath](https://www.ssbwiki.com/Fire_Breath) |
+| Side special | Body Slam: a drunken belly-charge forward that stops at the first body or shield and pops the foe up; a miss is punishable | Wind-up 1–9, charge and active 10–24 at 9 units a frame, end 50 (26 frames after a whiff); a hit ends it 14 frames after the hit, leaving Chen +12 at 0%, +24 at 50% and +36 at 100% on Rifleman; 11.25%, 80° launch, base 50, growth 60; air form once per airtime with 22 landing frames | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Gragas Body Slam](https://wiki.leagueoflegends.com/en-us/Gragas) |
+| Up special | Storm Rise: rising electric staff spin with steering, then the parasol: a slow steerable float at 30% of his fall speed; holding down closes it into a normal fall; he may swing one aerial out of it, then falls helpless; no special, jump or air dodge out of it | Rise 8–29, end 40; 10%, electric | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken Shoryuken](https://www.ssbwiki.com/Shoryuken), [Peach Parasol](https://www.ssbwiki.com/Peach_Parasol) |
+| Down special | Brew Keg: pour ale into the keg in three stages (a swelling keg), press special to lob it; a full keg throws itself; getting hit drops it, and nothing is stored | Fill holds frame 10 for up to 45 frames, a stage every 15; the throw spawns on its frame 6 and ends on 24 (18 landing frames in the air). By stage 0–3: 3.75/5/6.25/7.5%, soak 120/180/240/300 frames, slow 30/50/70/90 frames | [Drunken Haze](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Giant Punch](https://www.ssbwiki.com/Giant_Punch) |
 | Ultimate | Storm, Earth and Fire: Earth taunts and absorbs a hit, Storm sends cyclones and Wind Walks, Fire bursts with Immolation; see "Ultimate" below | Spirits at 12, 20 and 28, end 48; ground only | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Swap](https://www.ssbwiki.com/Swap) |
 
 ## Risk, recovery and computer
@@ -120,11 +125,13 @@ units per unit of scale (the stock model draws its fire that far behind its
 origin), so the fire centres on each capsule and fans out from the mouth to the
 tip; EX scales with the capsules.
 
-Fire has 20 exit frames; Haze has 24 frames after release. Neither gains
-extra shield damage. Ground and air fire/haze use the same strikes, with
-20 landing frames in the air. Storm Rise moves 2.1 reference heights up and
-at most 1.0 sideways; the free form reaches 1.45 up and 0.7 sideways without
-a hit. Both consume the aerial jump and finish helpless. Edgeguards can
+Fire has 20 exit frames; the keg throw has 18 frames after release. Neither
+gains extra shield damage. Ground and air fire and keg use the same strikes,
+with 20 and 18 landing frames in the air. Storm Rise moves 2.1 reference
+heights up and at most 1.0 sideways; the free form reaches 1.45 up and 0.7
+sideways without a hit. Both consume the aerial jump; the parasol then trades
+the helpless fall for a slow drift that edgeguards can read and punish, and
+one aerial out of it ends helpless. Edgeguards can
 cover its predictable late rise; leaving a ledge without jumping retains the
 ordinary aerial jump.
 
@@ -133,10 +140,10 @@ follow-up is promised as guaranteed. DI, shield, jump and tech choices remain
 ordinary simulation inputs. Throws use the common hold, release, escape and
 one-pummel rules.
 
-The CPU favors running into short checks and jumping with kicks, uses Haze
-occasionally while approaching, checks with tilt/fire, uses
-Earth against an expected strike, branches its stance when a strike reaches,
-and reserves Storm Rise for recovery. Stock loss and rematch clear the
+The CPU favors running into short checks and jumping with kicks, lobs the
+keg occasionally from range and follows a soaking hit with Breath of Fire,
+runs in with Body Slam from mid range, checks with tilt/fire, shields, rolls
+or jumps against an expected strike, and reserves Storm Rise for recovery. Stock loss and rematch clear the
 shared meter, projectiles and special state.
 
 Relative to today's roster: Rifleman outrange him; Illidan and
@@ -145,8 +152,8 @@ heavy commitments; Lich controls farther away; Forsaken Paladin holds longer def
 space; Dreadlord has better air pursuit; Shadow Hunter establishes safer
 ranged pressure; Pit Lord reaches farther with slower swings; Beastmaster
 has independent bodies; Lich King controls zones and controls frost zones. Chen trades
-those tools for fast short checks, staff finishers and a branching defensive
-stance.
+those tools for fast short checks, staff finishers, a punishable body
+charge and a keg-and-fire combo.
 
 Presentation uses the installed Warcraft III Pandaren Brewmaster model,
 icon, sounds and fire/cloud effects. Original staff, kick, stumble, paired

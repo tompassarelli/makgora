@@ -1,7 +1,7 @@
 
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
-import { AttackStyle, Character, DownState, LedgeState, ShieldBreak, SpecialAction } from "./codes";
+import { AttackStyle, Character, DownState, LedgeState, ParasolState, ShieldBreak, SpecialAction } from "./codes";
 import { inGrabContext, isTumbling } from "./conditions";
 import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
@@ -209,6 +209,7 @@ function catchLedge(f: Fighter, stage: number, side: number): void {
   launch.groundKnockbackX = 0.0;
   launch.knockbackZ = 0.0;
   f.special.fall = false;
+  f.special.parasol = ParasolState.none;
   f.dodge.airDodging = false;
   f.dodge.airFrame = 0;
   f.dodge.airMotionFrames = 0;

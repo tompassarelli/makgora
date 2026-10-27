@@ -11,6 +11,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "../itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "../heroStatus";
 import { AttackStyle, Character, ProjectileKind, SpecialAction } from "../codes";
+import { openParasol } from "../parasol";
 import { specialVariant } from "../../fighters/kobold/candle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
@@ -198,6 +199,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   if (move.replacesLive === true) endLiveCasts(f, specialKit(specials, chosen.slot));
   if (move.oncePerAirtime === true) special.airtimeUses |= 1 << chosen.slot;
   if (move.recallsProjectiles === true) recallProjectiles(f);
+  if (move.charge?.drops === true) special.charge = 0;
   applyWindows(f, move, 0);
   swingFullCharge(f, move);
   return move;
@@ -224,6 +226,13 @@ function holdCharge(f: Fighter, charge: Readonly<SpecialCharge> | undefined): bo
   special.lockFrames++;
   f.attack.cooldown++;
   return true;
+}
+
+function throwFullDroppingCharge(f: Fighter, move: Readonly<AuthoredSpecial>): boolean {
+  const charge = move.charge;
+  if (charge?.drops !== true || f.special.form >= FOLLOW_UP_FORM || f.special.frame !== charge.hold + 1 || f.special.charge < charge.full) return false;
+  swingFullCharge(f, move);
+  return f.special.form >= FOLLOW_UP_FORM;
 }
 
 function chargeStageOpen(f: Readonly<Fighter>, charge: Readonly<SpecialCharge> | undefined, followUp: Readonly<SpecialFollowUp>): boolean {
@@ -857,6 +866,7 @@ function endHeroSpecial(f: Fighter, move: Readonly<AuthoredSpecial>): void {
     f.jump.remaining = 0;
   }
   refreshAirOnExit(f);
+  openParasol(f, move.parasol === true);
   f.special.action = SpecialAction.none;
   f.special.frame = 0;
   releaseCommandGrabLock(f, move);
@@ -986,6 +996,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
   if (holdSteeredShot(f, move, input)) return;
   advanceRefire(f, move.refire, input);
+  if (throwFullDroppingCharge(f, move)) return;
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);

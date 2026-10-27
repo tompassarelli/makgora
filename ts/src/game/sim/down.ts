@@ -2,7 +2,7 @@
 import { max, min } from "../core/numbers";
 import { roundToFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, DamageLanding, DownState, SpecialAction } from "./codes";
+import { Character, DamageLanding, DownState, ParasolState, SpecialAction } from "./codes";
 import { isFloorTeching, isTumbling } from "./conditions";
 import { type Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
@@ -175,6 +175,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   if (!wasGrounded) landHeroSpecial(f);
   if (!wasGrounded) landAirShot(f);
   f.special.fall = false;
+  f.special.parasol = ParasolState.none;
   if (!isHeroSpecialAction(f.special.action)) f.special.airtimeUses = 0;
   if (f.jump.squat <= 0) f.jump.remaining = groundedJumps(f);
   if (hatchEgg(f)) return;

@@ -269,9 +269,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.chen]: {
     neutral: { spell: "Breath of Fire", startup: BREW, active: { ...timed(cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", "breath", 1.0), "birth", 0.0), roll: f32(1.570796327), birth: { eachFrame: true, strike: 0, strikes: 4, strikeRadius: 70.0, trail: 150.0, taper: true, voices: 24, lingerFrames: 6 } } },
-    side: { spell: "Drunken Haze", startup: BREW, active: cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterTarget.mdx", "hand", f32(0.7)) },
+    side: { spell: "Body Slam", startup: BEAST, active: cue(IMPACT_DUST_MODEL, "ahead", f32(0.3)) },
     up: { spell: "Storm Rise", startup: STORM, active: cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.6)) },
-    down: { spell: "Threefold Stance", startup: BREW, active: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", f32(0.6)) },
+    down: { spell: "Brew Keg", startup: { ...cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdx", "hand", f32(0.35)), scaleEnd: f32(1.0), scaleFrames: 45 }, active: cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterTarget.mdx", "hand", f32(0.5)) },
   },
   [Character.tinker]: {
     neutral: { spell: "Cluster Rockets", startup: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body"), active: drawn("Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl", "hand") },
@@ -430,10 +430,8 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     down: { recall: branch("Recall Water Elemental", ARCANE, cue("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", "body", 0.5)) },
   },
   [Character.chen]: {
-    down: { followUps: [
-      branch("Fire Palm", BEAST, timed(cue("Abilities\\Spells\\Items\\AIfb\\AIfbSpecialArt.mdx", "ahead", f32(0.8)), "birth", 0.0)),
-      branch("Storm Step", STORM, cue("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx", "body", f32(0.5))),
-    ] },
+    side: { followUps: [branch("Body Slam", BEAST, cue(IMPACT_DUST_MODEL, "ahead", f32(0.4)))] },
+    down: { followUps: [0, 1, 2, 3].map(() => branch("Keg Toss", BREW, cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterTarget.mdx", "ahead", f32(0.6)))) },
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {
