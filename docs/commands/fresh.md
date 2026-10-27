@@ -28,6 +28,16 @@ client that still cannot leave it.
   frame 150 after both players' scripted jab. `bun tools/animations/pain-pads.ts`
   from the repository root generates its 117 native parity scripts.
 
+- Warm capture stage, in a match on a development map: `-dev capture FIGHTER MOVE left|right [SLOT]`
+  hides the match fighters and stands FIGHTER (a `fighterSlug`, or its first word when unique,
+  such as `jaina`) in SLOT 0-3 (default 0) at x = -450, -150, 150 or 450, looping MOVE (an anim score
+  sample name such as `forward-air`, `up-tilt` or `side-special`) with a 30-frame hold between plays;
+  aerials hover 220 units up and every slot keeps its x, so each sheet crops by slot. Several slots
+  stand side by side without a reload; `-dev capture clear` removes them all and shows the match
+  fighters again. Each accepted command writes the dev command receipt; an unknown fighter or move,
+  or a move the fighter lacks, writes none. The staged fighters run a private presentation-only copy
+  of the move (smashcraft:ts/src/platform/captureStage.ts), never the match, rollback or hit state.
+  `bun wisp accept --only '614-*'` is its native check.
 - Item setup at fighter selection: `-dev items on|off` controls whether pickups appear;
   `-dev item speed|heavy on|off` controls each kind. The normal selection
   buttons show Items (off by default) and, once Items is on, Speed item and

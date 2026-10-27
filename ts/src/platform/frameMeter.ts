@@ -31,9 +31,10 @@ const CAPTURE_COMMAND = "-dev capture ";
 const CAPTURE_HANDLER = "frameMeter.capture";
 
 function captureCommand(): void {
+  const text = GetEventPlayerChatString().substring(CAPTURE_COMMAND.length);
+  if (text === "clear" || text.includes(" ")) return;
   const state = shellState();
   if (state === undefined || state.game.phase !== Phase.match) throw new Error("start a match before capturing frame cost");
-  const text = GetEventPlayerChatString().substring(CAPTURE_COMMAND.length);
   const frames = parseDecimal(text);
   if (frames === undefined || `${frames}` !== text) throw new Error("capture needs a whole frame count");
   const run = startFrameCostCapture(frames);

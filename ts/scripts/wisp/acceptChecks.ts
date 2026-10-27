@@ -2,6 +2,7 @@ import { SHIELD_ENERGY_SETUP } from "../../src/game/session/shieldEnergyCapture"
 import { teamResultsCheck } from "./teamResultsCheck";
 import { loserPoseChecks } from "./loserPoseChecks";
 import { showcaseChecks } from "./showcaseChecks";
+import { captureStageChecks } from "./captureStageChecks";
 import { winCountChecks } from "./winCountChecks";
 import { koboldDirectionChecks } from "./koboldDirectionChecks";
 import { murlocStabChecks } from "./murlocStabChecks";
@@ -415,6 +416,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     teamResultsCheck([NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT]),
     ...loserPoseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...showcaseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
+    ...captureStageChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...murlocStabChecks(heroProfile("Murloc"), [NO_IMPORT_FAILURES, NO_ERRORS]),

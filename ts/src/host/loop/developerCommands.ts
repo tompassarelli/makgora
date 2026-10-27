@@ -9,7 +9,7 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { ROSTER_MANA } from "../../game/sim/mana";
 import { fighterAt, isActive } from "../../game/sim/roster";
-import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
+import { METER_COMMAND, captureRequest, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterKey } from "../../game/roster/kits";
 import { devReceiptFile } from "../../game/session/journalFiles";
 import { applyFighterSetup } from "../../game/session/fighterSetup";
@@ -26,6 +26,7 @@ import { journalIdentity } from "./journal";
 import { startBodyFit } from "./bodyFit";
 import { startAgencyFixture } from "./agencyFixture";
 import { applyShowcaseCommand } from "./showcase";
+import { applyCaptureCommand, clearCaptureStage } from "./captureStage";
 import { showcaseRequest } from "../../game/session/showcase";
 import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
 import { resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
@@ -60,6 +61,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
 }
 
 function resetDeveloperPresentation(s: ShellState): void {
+  clearCaptureStage(s);
   s.promoHudHidden = false;
   clearVisualCapture(localSlot());
   for (const slot of PARTICIPANT_SLOTS) s.hiddenFighters[slot] = undefined;
@@ -121,6 +123,8 @@ type DeveloperRequests = ReturnType<typeof developerRequests>;
 function sessionReceipt(s: ShellState, actor: number, message: string, requests: DeveloperRequests): string | undefined {
   const { fighterSetup, showcase, lore, classic } = requests;
   if (fighterSetup !== undefined) return fighterSetup;
+  const capture = captureRequest(message);
+  if (capture !== undefined) return applyCaptureCommand(s, capture);
   if (message === "-dev trace") return "dev: trace";
   if (message === "-dev soak") return startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
   if (showcase !== undefined) return applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));

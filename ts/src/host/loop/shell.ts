@@ -55,6 +55,7 @@ import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../game/session/pau
 import { clearMatchEffects, createUi, recreateUi, views } from "./ui";
 import { resultsView } from "../../game/presentation/matchCues";
 import * as view from "./view";
+import { renderCaptureStage } from "./captureStage";
 import { resultMessage } from "../../game/session/messages";
 import { beforeNativeDriverTick, afterNativeDriverTick, captureNativeDriverInputs } from "../../platform/nativeDriver";
 import { fighterAt, isActive } from "../../game/sim/roster";
@@ -146,6 +147,7 @@ function gameTick(s: ShellState): void {
   if (!held) {
     beginFrameSection(PRESENTATION_SECTION);
     view.renderPersistentPresentation(s);
+    renderCaptureStage(s);
     endFrameSection(PRESENTATION_SECTION);
     beginFrameSection(CAMERA_SECTION);
     view.lockArenaCamera(s);

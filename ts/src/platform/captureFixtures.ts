@@ -42,3 +42,9 @@ export const CAPTURE_FIXTURES: readonly CaptureFixture[] = [
   { name: "control-other", frames: [30, 62, 100], script: OTHER },
   { name: "control-walk-again", frames: [30, 31, 62, 100, 101], script: WALK },
 ];
+
+export function captureStageCommand(character: Character, move: string, facing: "right" | "left", slot = 0): string {
+  return `-dev capture ${fighterSlug(character)} ${move} ${facing} ${slot}`;
+}
+
+export const CAPTURE_STAGE_CLEAR = "-dev capture clear";

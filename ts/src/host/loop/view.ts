@@ -51,6 +51,7 @@ import { loreClears } from "../../game/classic/loreClears";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera, probeWaiting } from "./responseProbe";
 import { clockSeconds } from "./trace";
+import { frameCaptureStage } from "../../platform/captureStage";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -525,6 +526,7 @@ export function lockArenaCamera(s: ShellState): void {
   if (s.viewExtreme !== undefined) ClearTextMessages();
   if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
   if (game.phase !== Phase.result && s.showcaseFocus === undefined && (!s.session.paused || s.pauseCamera === undefined)) fitFighterFrames(s.camera, world, game.stageChoice, aspect);
+  frameCaptureStage(s.capture, s.camera, game.phase === Phase.match, game.stageChoice, aspect);
   const { x: centerX, y: centerY } = s.origin;
   const framing = s.camera;
   if (game.phase === Phase.match && game.run.active && game.run.boss.kind !== 0 && !s.session.paused) {

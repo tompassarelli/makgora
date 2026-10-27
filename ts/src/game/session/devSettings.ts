@@ -10,7 +10,7 @@ import { scheduleMeterDrops } from "../match/meterDrops";
 import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../netcode/fixedSchedule";
 import { parseDecimal } from "../netcode/journal/decimal";
 import { MAX_BATCH } from "../netcode/journal/transport";
-import { PARTICIPANT_SLOTS } from "../input/participants";
+import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../input/participants";
 import {
   type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, requestStart, returnToCharacters,
   selectCharacter, selectCpuCharacter, selectStage, setStocks, computerActive, cycleSlotMode, setCpuOpponent, setCpuTier, setHitAreas, setPartnerDamage, setTraining, stepPartnerBehaviour,
@@ -21,7 +21,7 @@ import { selectableStage } from "../menu/stageCatalog";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../roster/kits";
+import { SELECTABLE_CHARACTERS, fighterName, fighterKey, fighterSlug } from "../roster/kits";
 import { isScenario, type Scenario } from "./build";
 
 export interface DevSettings {
@@ -350,4 +350,31 @@ export function prepareQuickPromo(game: MatchState, pair: readonly [Character, C
   setTraining(game, first, false);
   setHitAreas(game, first, false);
   return true;
+}
+
+
+export const CAPTURE_COMMAND = "-dev capture ";
+export const CAPTURE_CLEAR_COMMAND = "-dev capture clear";
+
+export type CaptureRequest =
+  | { readonly kind: "clear" }
+  | { readonly kind: "stage"; readonly character: Character; readonly move: string; readonly facing: "left" | "right"; readonly slot: ParticipantSlot };
+
+function captureFighter(slug: string): Character | undefined {
+  const exact = SELECTABLE_CHARACTERS.find(candidate => fighterSlug(candidate) === slug);
+  if (exact !== undefined) return exact;
+  const named = SELECTABLE_CHARACTERS.filter(candidate => fighterSlug(candidate).startsWith(`${slug}-`));
+  return named.length === 1 ? named[0] : undefined;
+}
+
+export function captureRequest(message: string): CaptureRequest | undefined {
+  if (message === CAPTURE_CLEAR_COMMAND) return { kind: "clear" };
+  if (!message.startsWith(CAPTURE_COMMAND)) return undefined;
+  const words = message.substring(CAPTURE_COMMAND.length).split(" ");
+  if (words.length < 3 || words.length > 4) return undefined;
+  const [slug, move, facing, slotText] = words;
+  const character = slug === undefined ? undefined : captureFighter(slug);
+  const slot = slotText === undefined ? 0 : commandInteger(slotText);
+  if (character === undefined || move === undefined || move.length === 0 || (facing !== "left" && facing !== "right") || slot === undefined || !isParticipantSlot(slot)) return undefined;
+  return { kind: "stage", character, move, facing, slot };
 }
