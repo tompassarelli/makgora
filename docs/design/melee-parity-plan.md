@@ -244,8 +244,9 @@ Built on the existing headless sim and search, not beside them.
   of `ts/scripts/agencyBranch.ts:34`, it records per follow-up the attacker's
   frame advantage, whether the follow-up reaches (lands within its active
   frames from the best input `ts/scripts/comboExplorer.ts` finds), and a class:
-  true (every option is hit), DI-dependent (only some DI escapes), read
-  (another option escapes), none. Output `tools/move-data/links/<fighter>.jsonl`
+  true (every option is hit), DI-dependent (every option is hit under some
+  DI), read (it lands under some DI, but under each another option escapes),
+  none; finding another input never lowers a class (#541). Output `tools/move-data/links/<fighter>.jsonl`
   and a page; byte-identical across runs.
 - Fox fixture (#310, #295, #296): FightCore's export for all 26 fighters
   (`references/melee-frame-data/fightcore.csv`, per-hitbox angle, base, growth

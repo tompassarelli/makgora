@@ -481,15 +481,15 @@ beats read. The DIs listed must not escape.
 | down special (Immolate) | 0-60 | down air | DI-dependent | in, none | the pillar: shine into down air | holds |
 | down special (Immolate) | 60-100 | back air | DI-dependent | in, none | "back aerial is good out of a shine at higher percents" | holds |
 | down air | 0-40 | down special (Immolate) | true | | the pillar: down air into shine | holds |
-| down air | 60-100 | down special (Immolate) | DI-dependent | in, none | the pillar at higher percents | holds; a read at 50, unchecked |
+| down air | 60-100 | down special (Immolate) | DI-dependent | in, none | the pillar at higher percents | holds; DI-dependent at 50, DI out escaping and the others teching, unchecked |
 | down air | 60-100 | forward smash | DI-dependent | in, none | a grounded down air into forward smash | holds |
 | down tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | down tilt leads into shine | holds |
 | up tilt | 0-40 | down special (Immolate) | DI-dependent | in, none | up tilt segues into more shines | holds |
-| up throw | 40-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | holds; a read at 20-30, unchecked |
+| up throw | 40-80 | up air | DI-dependent | in, none | up throw starts up air strings; DI out escapes higher | holds; DI-dependent at 20-30, where only DI in, and up at 30, is hit by every option, unchecked |
 | down throw | 0-40 | down tilt | read | | down throw into down tilt, a tech chase | holds |
-| up air | 10-30 | up air | read | | up air strings, before the foe flies high enough | holds |
+| up air | 10-30 | up air | read | | up air strings, before the foe flies high enough | holds, DI-dependent since #541: DI in is hit by every option |
 | up air | 40-50 | up air | DI-dependent | in, none | up air strings | holds |
-| up air | 60-100 | up air | read | | the string ends in a read | holds |
+| up air | 60-100 | up air | read | | the string ends in a read | holds, DI-dependent: DI out and down escape |
 
 ### Edge-guard targets
 

@@ -11,7 +11,7 @@ import { totalVelocityZ } from "../src/game/sim/motion";
 import { floorBelow } from "../src/game/sim/stage";
 import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { DEFAULT_POLICY, VICTIM_OPTIONS, type VictimOption } from "./agencyBranch";
-import { LINK_GROUND_MODES, PIVOT_MODES, jumpCancelFrame, modeStarts } from "./comboLinkModes";
+import { LINK_GROUND_MODES, jumpCancelFrame, modeStarts } from "./comboLinkModes";
 import { type BranchStick, branchFollowUps, branchMove, branchOpen } from "./comboLinkBranches";
 import { type Region, REGIONS, landedRegion } from "./comboLinkRegions";
 import { onShield } from "./comboLinkShield";
@@ -121,7 +121,7 @@ function approachRows(attacker: Character, approaches: readonly Approach[], regi
   if (first === undefined) return [];
   return first.map((row, index) => rest.reduce((best, rows) => {
     const other = rows[index];
-    return other !== undefined && CLASS_RANK[other.class] > CLASS_RANK[best.class] ? other : best;
+    return other !== undefined && (CLASS_RANK[other.class] > CLASS_RANK[best.class] || (other.class === best.class && other.diEscapes.length < best.diEscapes.length)) ? other : best;
   }, row));
 }
 
@@ -223,10 +223,10 @@ interface Candidate {
   readonly loose: boolean;
   readonly attacker: readonly number[];
   readonly grab: boolean;
-  readonly pivot: boolean;
+  readonly run: string;
 }
 
-function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move: Move, window: number): Candidate | undefined {
+function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, start: number, move: Move, window: number): Candidate | undefined {
   const saved = track.saved[k];
   if (saved === undefined) return undefined;
   sim.load(saved);
@@ -239,7 +239,7 @@ function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move
   const grab = move.kind === "grab";
   const found = (n: number): Candidate => ({
     followUp: move === DASH_GRAB ? "grab" : move.name, input: `${mode.name}, ${move.name} pressed ${k} frames after the hit`,
-    k, contact: n, loose, attacker, grab, pivot: PIVOT_MODES.includes(mode),
+    k, contact: n, loose, attacker, grab, run: `${mode.name} from ${start}`,
   });
   for (let n = k; n <= window; n++) {
     const a = sim.a;
@@ -260,6 +260,15 @@ function strike(sim: Sim, d: Defender, track: Track, k: number, mode: Mode, move
   return undefined;
 }
 
+function branchStrikes(sim: Sim, d: Defender, idle: Idle, sticks: readonly BranchStick[], add: (found: Candidate | undefined) => void): void {
+  const firstBranch = idle.branch.findIndex((open) => open === true);
+  if (firstBranch <= 0) return;
+  for (let k = firstBranch; k <= idle.window; k += k < firstBranch + FINE_FRAMES ? 1 : 2) {
+    if (idle.branch[k] !== true) continue;
+    for (const stick of sticks) add(strike(sim, d, idle, k, STAND, firstBranch, branchMove(stick), idle.window));
+  }
+}
+
 function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle, sticks: readonly BranchStick[]): Map<string, Candidate[]> {
   sim.load(from);
   const byFollowUp = new Map<string, Candidate[]>();
@@ -269,13 +278,7 @@ function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle, sticks: read
     own.push(found);
     byFollowUp.set(found.followUp, own);
   };
-  const firstBranch = idle.branch.findIndex((open) => open === true);
-  if (firstBranch > 0) {
-    for (let k = firstBranch; k <= idle.window; k += k < firstBranch + FINE_FRAMES ? 1 : 2) {
-      if (idle.branch[k] !== true) continue;
-      for (const stick of sticks) add(strike(sim, d, idle, k, STAND, branchMove(stick), idle.window));
-    }
-  }
+  branchStrikes(sim, d, idle, sticks, add);
   const modes = !idle.actionable ? [] : sim.a.motion.grounded || idle.grounded[idle.start] === true ? LINK_GROUND_MODES : AIR_MODES;
   for (const [mode, start] of modeStarts(modes, idle.start, idle.jumpCancel)) {
     sim.load(from);
@@ -296,7 +299,7 @@ function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle, sticks: read
           const ahead = f32((track.ax[k] ?? 0) + f32((track.avx[k] ?? 0) * startup));
           if (Math.abs((idle.bx[contact] ?? 0) - ahead) > GATE_X || Math.abs((idle.bz[contact] ?? 0) - (track.az[k] ?? 0)) > GATE_Z) continue;
         }
-        add(strike(sim, d, track, k, mode, move, idle.window));
+        add(strike(sim, d, track, k, mode, start, move, idle.window));
       }
     }
     if (track !== idle) release(track);
@@ -377,7 +380,7 @@ interface CellLinks {
 }
 
 const shortlist = (own: readonly Candidate[]): Candidate[] =>
-  [...own.filter((candidate) => !candidate.pivot).slice(0, CANDIDATES), ...own.filter((candidate) => candidate.pivot).slice(0, CANDIDATES)].sort((x, y) => x.contact - y.contact);
+  [...Map.groupBy(own, (candidate) => candidate.run).values()].flatMap((run) => run.slice(0, CANDIDATES)).sort((x, y) => x.contact - y.contact);
 
 function linkCell(sim: Sim, from: Saved, d: Defender, sticks: readonly BranchStick[]): CellLinks | undefined {
   const idle = idleTrack(sim, from, d);
@@ -402,9 +405,10 @@ function linkCell(sim: Sim, from: Saved, d: Defender, sticks: readonly BranchSti
 
 function classOf(outcomes: ReadonlyMap<Di, DiOutcome | undefined>, surviving: readonly Di[]): LinkClass {
   const reaching = surviving.filter((di) => outcomes.get(di) !== undefined);
-  if (reaching.length === 0) return "none";
-  if (reaching.some((di) => (outcomes.get(di)?.escapes.length ?? 0) > 0)) return "read";
-  return reaching.length === surviving.length ? "true" : "DI-dependent";
+  const clean = reaching.filter((di) => outcomes.get(di)?.escapes.length === 0);
+  if (clean.length > 0 && clean.length === surviving.length) return "true";
+  if (clean.length > 0) return "DI-dependent";
+  return reaching.length > 0 ? "read" : "none";
 }
 
 const launchAngle = (sim: Sim): number | undefined => {
@@ -458,7 +462,7 @@ function cellRows(attacker: Character, { setup, opener }: Approach, region: Regi
       reach: own !== undefined,
       ...(own === undefined ? {} : { contact: own.contact, input: own.input }),
       class: classOf(outcomes, surviving),
-      diEscapes: surviving.filter((di) => outcomes.get(di) === undefined),
+      diEscapes: surviving.filter((di) => outcomes.get(di)?.escapes.length !== 0),
       optionEscapes: VICTIM_OPTIONS.map((option) => option.id).filter((id) => escapes.has(id)),
     };
   });
