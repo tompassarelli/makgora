@@ -130,7 +130,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.peon]: {
     weapon: Weapon.axe, strong: "AxeMediumChopWood",
-    specials: [s("AxeMissileLaunch", "AxeMediumChopWood"), s("AxeMediumChopWood", "WyvernSpearMissile"), s("CatapultAttack1", "WoodMediumBashFlesh"), s("CreepSleep", "WoodHeavyBashFlesh")],
+    specials: [s(undefined, "WoodHeavyBashFlesh"), s("AxeMediumChopWood", "WyvernSpearMissile"), s("CatapultAttack1", "WoodMediumBashFlesh"), s("CreepSleep", "WoodHeavyBashFlesh")],
     grabVoice: "Units\\Orc\\Peon\\PeonYes3.flac",
   },
   [Character.tinker]: {

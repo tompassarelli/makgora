@@ -116,7 +116,7 @@ its active time. Status durations and healing caps stay unchanged.
 | Sylvanas | Black Arrow deals 25% more damage. | Silence has 25% more reach, with unchanged silence duration. | Banshee Flight travels 25% farther. | Life Drain deals 25% more damage, with the same heal cap. |
 | Cairne | Shockwave deals 25% more damage. | Bloodhoof Gore deals 25% more damage. | Spirit Lift travels 25% farther. | War Stomp's armor absorbs a hit 50% heavier and its reach, ring included, grows 20%. |
 | Chen | Breath of Fire has 25% more reach. | Drunken Haze has 25% more reach, with unchanged slow. | Storm Rise travels 25% farther. | Earth Stance absorbs a hit 25% heavier; Fire Palm/Storm Step deal 25% more damage. |
-| Peon | Lumber Toss deals 25% more damage. | Burrow has 25% more durability and spear damage; Pack Up gains four protected entry frames. | Worksite Launch travels 25% farther. | Rest's sweetspot and sourspot are 25% wider. |
+| Peon | Gold Sack bonks deal 25% more damage. | Burrow has 25% more durability and spear damage; Pack Up gains four protected entry frames. | Worksite Launch travels 25% farther. | Rest's sweetspot and sourspot are 25% wider. |
 | Tinker | Cluster Rockets deal 25% more damage. | Laser deals 25% more damage and reaches 25% farther. | Rocket Boots travels 25% farther. | Pocket Factory has 25% more durability and goblin damage; recall gains four protected entry frames. |
 | Kael'thas | Fireball deals 25% more damage. | Flame Strike deals 25% more damage. | Phoenix travels 25% farther. | Banish has 25% more reach. |
 | Murloc | Ensnare has 25% more reach, with unchanged slow. | Tidal Rush deals 25% more damage. | Tide Spout travels 25% farther. | Disease Cloud has 25% more reach, with unchanged poison duration and tick rate. |

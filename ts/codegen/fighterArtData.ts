@@ -50,6 +50,7 @@ function flashClips(character: number): number[] {
   }
   const grab = heroLook(character)?.commandGrab;
   if (grab !== undefined) for (const clip of [grab.travel, grab.hold, grab.recovery]) indices.add(clip.index);
+  for (const clips of Object.values(heroLook(character)?.followUpClips ?? {})) for (const clip of clips ?? []) indices.add(clip.index);
   return [...indices].sort((a, b) => a - b);
 }
 

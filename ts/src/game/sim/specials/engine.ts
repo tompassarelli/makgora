@@ -16,7 +16,7 @@ import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
@@ -197,7 +197,35 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   if (move.oncePerAirtime === true) special.airtimeUses |= 1 << chosen.slot;
   if (move.recallsProjectiles === true) recallProjectiles(f);
   applyWindows(f, move, 0);
+  swingFullCharge(f, move);
   return move;
+}
+
+function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): void {
+  const charge = move.charge;
+  const followUps = move.followUps;
+  if (charge === undefined || followUps === undefined || f.special.charge < charge.full) return;
+  for (let index = 0; index < followUps.length; index++) {
+    const followUp = at(followUps, index);
+    if (followUp.chargeStage !== charge.stages || (followUp.input ?? FollowUpInput.special) !== FollowUpInput.special) continue;
+    f.special.form += FOLLOW_UP_FORM * (index + 1);
+    enterFollowUp(f, followUp.special);
+    return;
+  }
+}
+
+function holdCharge(f: Fighter, charge: Readonly<SpecialCharge> | undefined): boolean {
+  const { special } = f;
+  if (charge === undefined || special.form >= FOLLOW_UP_FORM || special.frame !== charge.hold + 1 || special.charge >= charge.full) return false;
+  special.charge++;
+  special.frame = charge.hold;
+  special.lockFrames++;
+  f.attack.cooldown++;
+  return true;
+}
+
+function chargeStageOpen(f: Readonly<Fighter>, charge: Readonly<SpecialCharge> | undefined, followUp: Readonly<SpecialFollowUp>): boolean {
+  return followUp.chargeStage === undefined || (charge !== undefined && chargeStage(charge, f.special.charge) === followUp.chargeStage);
 }
 
 const inWindow = (window: { readonly first: number; readonly last: number } | undefined, frame: number): boolean =>
@@ -906,7 +934,7 @@ export function aimedProjectile(f: Readonly<Fighter>): Readonly<Projectile> | un
 export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Controls>, world?: Roster, matchFrame = 0): void {
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
-  if (holdAim(f, move, input, stage, matchFrame)) return;
+  if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
@@ -1263,10 +1291,11 @@ function followUpPressed(f: Readonly<Fighter>, followUp: Readonly<SpecialFollowU
 
 export function followUpHeroSpecial(f: Fighter, input: Readonly<Controls>): boolean {
   const { special } = f;
-  const followUps = runningHeroSpecial(f)?.followUps;
+  const move = runningHeroSpecial(f);
+  const followUps = move?.followUps;
   if (followUps === undefined || special.form >= FOLLOW_UP_FORM || f.launch.hitlag > 0 || f.launch.hitstun > 0) return false;
   let index = 0;
-  while (index < followUps.length && !(inWindow(at(followUps, index).window, special.frame + 1) && followUpPressed(f, at(followUps, index), input))) index++;
+  while (index < followUps.length && !(inWindow(at(followUps, index).window, special.frame + 1) && chargeStageOpen(f, move?.charge, at(followUps, index)) && followUpPressed(f, at(followUps, index), input))) index++;
   if (index >= followUps.length) return false;
   const followUp = at(followUps, index);
   const next = followUp.special;
@@ -1284,6 +1313,7 @@ export function enterFollowUp(f: Fighter, next: Readonly<AuthoredSpecial>): void
   special.frame = 0;
   special.duration = next.endFrame;
   special.lockFrames = next.endFrame;
+  if (next.spendsCharge === true) special.charge = 0;
 
   f.attack.cooldown = next.endFrame;
   for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;

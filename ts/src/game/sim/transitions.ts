@@ -146,6 +146,7 @@ export function clearSpecialOnStock(f: Fighter): void {
   for (let action = 0; action < special.cooldowns.length; action++) special.cooldowns[action] = 0;
   special.direction = 0;
   special.seekTarget = 0;
+  special.charge = 0;
   for (let index = 0; index < f.projectileSlots; index++) {
     const projectile = mutableProjectile(f, index);
     projectile.life = 0;

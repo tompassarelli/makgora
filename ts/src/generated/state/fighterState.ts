@@ -269,6 +269,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   special.airtimeUses = sourceSpecial.airtimeUses;
   special.grabFrame = sourceSpecial.grabFrame;
   special.seekTarget = sourceSpecial.seekTarget;
+  special.charge = sourceSpecial.charge;
   special.guarded = sourceSpecial.guarded;
   special.egg = sourceSpecial.egg;
   copyFighterProjectiles(target, source);
@@ -801,6 +802,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = special.airtimeUses, b = sourceSpecial.airtimeUses; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = special.grabFrame, b = sourceSpecial.grabFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.seekTarget !== sourceSpecial.seekTarget) return false;
+  { const a = special.charge, b = sourceSpecial.charge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.guarded !== sourceSpecial.guarded) return false;
   if (special.egg !== sourceSpecial.egg) return false;
   if (!sameFighterProjectiles(target, source)) return false;
@@ -1469,6 +1471,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
       }
       sink.text(kits.placedSpec(`${prefix}.${animalName}Spec`, placed.spec));
     }
+    if (special.charge !== 0) sink.int(prefix, "specialCharge", special.charge);
     sink.int(prefix, "specialGuarded", special.guarded ? 1 : 0);
     sink.int(prefix, "specialEgg", special.egg ? 1 : 0);
     if (status.divineFrames !== 0) sink.int(prefix, "divineFrames", status.divineFrames);

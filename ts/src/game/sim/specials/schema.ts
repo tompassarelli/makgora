@@ -270,6 +270,13 @@ export interface SpecialGuard extends FrameWindow {
   readonly counter?: boolean | undefined;
 }
 
+/** Holds frame `hold` while the fighter's charge climbs to `full`; the charge outlasts the move until a swing spends it. */
+export interface SpecialCharge {
+  readonly hold: number;
+  readonly full: number;
+  readonly stages: number;
+}
+
 export interface AuthoredSpecial {
 
   readonly ex?: AuthoredSpecial | undefined;
@@ -364,6 +371,10 @@ export interface AuthoredSpecial {
 
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
+
+  readonly charge?: SpecialCharge | undefined;
+
+  readonly spendsCharge?: true | undefined;
 }
 
 export interface SpecialFollowUp {
@@ -375,6 +386,9 @@ export interface SpecialFollowUp {
   readonly facesStick?: boolean | undefined;
 
   readonly stick?: { readonly x: number; readonly z: number } | undefined;
+
+  /** Opens only at this stage of the move's charge. */
+  readonly chargeStage?: number | undefined;
 }
 
 
@@ -434,6 +448,11 @@ export function heroSpecialMove(specials: Readonly<FighterSpecials>, chosen: { r
 
 
 export const frames = (first: number, last: number): FrameWindow => ({ first, last });
+
+
+export function chargeStage(charge: Readonly<SpecialCharge>, banked: number): number {
+  return banked >= charge.full ? charge.stages : idiv(banked * charge.stages, charge.full);
+}
 
 
 export const CHARGED_AIM_FRAMES = 8;

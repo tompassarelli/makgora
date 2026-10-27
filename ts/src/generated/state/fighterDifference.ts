@@ -203,6 +203,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.special.airtimeUses !== actual.special.airtimeUses) return "specialAirtimeUses";
   if (expected.special.grabFrame !== actual.special.grabFrame) return "specialGrabFrame";
   if (expected.special.seekTarget !== actual.special.seekTarget) return "specialSeekTarget";
+  if (expected.special.charge !== actual.special.charge) return "specialCharge";
   if (expected.special.guarded !== actual.special.guarded) return "specialGuarded";
   if (expected.special.egg !== actual.special.egg) return "specialEgg";
   if (expected.status.divineFrames !== actual.status.divineFrames) return "divineFrames";

@@ -274,6 +274,9 @@ interface Special {
   /** The slot plus one of the foe a seeking move locked onto; 0 before it locks. */
   seekTarget: number;
 
+  /** Frames banked by a charging special; kept through other actions until a swing spends it. */
+  charge: number;
+
   guarded: boolean;
   egg: boolean;
 }
@@ -676,6 +679,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       airtimeUses: 0,
       grabFrame: 0,
       seekTarget: 0,
+      charge: 0,
       guarded: false,
       egg: false,
     },

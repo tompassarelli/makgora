@@ -16,7 +16,7 @@ import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
 import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
-import { REST_SOUR_FRAME } from "../fighters/peon/specials";
+import { EMPTY_GOLD_SACK_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
   CHAOS_STRIKE_AIR_FORM,
   CHAOS_STRIKE_FIRST,
@@ -202,6 +202,7 @@ export const PEON_REST_CUES: MoveCues = {
 };
 
 
+
 export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]: MoveCues } } = {
   [Character.malfurion]: {
     neutral: { spell: "Entangling Roots", startup: NATURE, active: cue("Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", "ahead", f32(0.35)) },
@@ -246,7 +247,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "War Stomp", startup: QUIET_BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.5)) },
   },
   [Character.peon]: {
-    neutral: { spell: "Lumber Toss", startup: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand"), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
+    neutral: EMPTY_GOLD_SACK_CUES,
     side: { spell: "Burrow", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
     up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
     down: PEON_REST_CUES,
@@ -529,9 +530,8 @@ const NONE: CueState = { cues: undefined, phase: "none" };
 export function specialCueState(fighter: Readonly<Fighter>): CueState {
   const { action, frame } = fighter.special;
   if (action === SpecialAction.none || fighter.status.out) return NONE;
-  if (fighter.character === Character.peon && action === SpecialAction.heroDown) {
-    return { cues: PEON_REST_CUES, phase: frame <= REST_SOUR_FRAME ? "startup" : "active" };
-  }
+  const peon = fighter.character === Character.peon ? peonCueState(fighter, PEON_REST_CUES) : undefined;
+  if (peon !== undefined) return peon;
   if (fighter.character === Character.dreadlord && action === SpecialAction.heroSide && fighter.special.grabFrame > 0) {
     return commandGrabHolding(fighter, runningHeroSpecial(fighter)) ? { cues: DREADLORD_BITE_CUES, phase: "active" } : NONE;
   }
@@ -583,7 +583,7 @@ export function fighterMoveCues(character: Character): readonly MoveCues[] {
 
 
 export function fighterCueList(character: Character): readonly Cue[] {
-  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.kobold ? [KOBOLD_BURROW_TRAIL] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : [])].flatMap((cues) => [cues.startup, cues.active]);
+  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.kobold ? [KOBOLD_BURROW_TRAIL] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
 }
 
 
