@@ -58,7 +58,15 @@ const fists = (weapon: Side): readonly Beat[] => [
     step(weapon, 15, 'rest', 'overhead', -12, -22, 0.35), step(weapon, 30, 'rest', 'pumped', -6, -10), step(weapon, 45, 'rest', 'overhead', -12, -22, 0.35),
     step(weapon, 60, 'rest', 'pumped', -6, -10), step(weapon, 75, 'rest', 'overhead', -12, -22, 0.35), step(weapon, 90, 'rest', 'rest', 0, 0),
 ];
+const raisedFist = (fist: Side): readonly Beat[] => [
+    step(fist, 0, 'rest', 'rest', 0, 0), step(fist, 10, 'low', 'low', 20, 12),
+    step(fist, 20, 'pumped', 'wide', -14, -20, 0.15), step(fist, 30, 'pumped', 'wide', -10, -14),
+    step(fist, 40, 'chest', 'low', 15, 8), step(fist, 50, 'pumped', 'chest', -14, -22, 0.12),
+    step(fist, 60, 'chest', 'low', 15, 8), step(fist, 70, 'pumped', 'wide', -14, -20, 0.15),
+    step(fist, 80, 'pumped', 'wide', -6, -8), step(fist, 90, 'rest', 'rest', 0, 0),
+];
 const DESIGNED: Readonly<Record<number, readonly Beat[]>> = {
+    [Character.kaelthas]: raisedFist(0),
     [Character.warden]: dab(0),
     [Character.sylvanas]: fists(1),
 };
