@@ -116,9 +116,9 @@ as Ultimate's does. The whole damage percent is large with a small percent sign
 after it: the simulation keeps fractional damage, but every readout (HUD,
 results, training) shows the whole percent. Its colour blends continuously
 white → yellow (50%) → red (100%) → dark red (150% and above). It shakes for 14
-rendered frames on each hit, harder for bigger hits, and past 100% it trembles
-by 2 to 4 reference pixels, more as the percent rises (local presentation on the
-render clock only). The mana bar fills the track under the percent, the name
+rendered frames on each hit, harder for bigger hits, and is otherwise at rest at
+every percent: it never trembles on its own (Tom's correction, 2026-10-27;
+local presentation on the render clock only). The mana bar fills the track under the percent, the name
 sits on the strip under it, and the stock row under the name shows one 38 px
 head render per remaining stock, as Rivals does: up to five, then one icon and
 the count. smashcraft:ts/src/game/ui/plateLayout.ts holds every box in plate
@@ -129,7 +129,7 @@ plate and on dark stages.
 ## Overhead marker
 
 Above each fighter in a match, as in Rivals, a marker repeats the whole percent
-in the HUD's colour, outline and tremble, the player's name (the Warcraft
+in the HUD's colour, outline and hit shake, the player's name (the Warcraft
 player name, or CPU) in the slot colour under it, and a slot-colour triangle
 (`MarkerArrow`) pointing down at the fighter. It sits a fixed 16 reference
 pixels above the top of the fighter's standing hurtbox (higher while an escape

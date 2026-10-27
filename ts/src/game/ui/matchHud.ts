@@ -157,7 +157,7 @@ export class FighterHud {
     });
     placeBox(this.stockCount, left, panel.stockCount);
     BlzFrameSetTextAlignment(this.stockCount, TEXT_JUSTIFY_MIDDLE, inner);
-    this.placeNumber(unitsForPixels(this.jolt.dx), unitsForPixels(this.jolt.dy));
+    this.placeNumber(0.0, 0.0);
   }
 
 

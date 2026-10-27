@@ -149,54 +149,26 @@ export const shakeX = (strength: number, frame: number): number => shake(SHAKE_X
 export const shakeY = (strength: number, frame: number): number => shake(SHAKE_Y, strength, frame);
 
 
-export const TREMBLE_FROM = 100;
-const TREMBLE_FULL_AT = 200;
-export const TREMBLE_MIN_PX = 2;
-export const TREMBLE_MAX_PX = 4;
-const TREMBLE_X = [1, -1, 0, 1, -1, 1, 0, -1] as const;
-const TREMBLE_Y = [0, 1, -1, 0, 1, -1, 1, 0] as const;
-const TREMBLE_HOLD_FRAMES = 2;
-
-
-export function trembleStrength(damage: number): number {
-  const whole = shownPercent(damage);
-  if (whole <= TREMBLE_FROM) return 0.0;
-  const over = Math.min(whole - TREMBLE_FROM, TREMBLE_FULL_AT - TREMBLE_FROM);
-  return TREMBLE_MIN_PX + ((TREMBLE_MAX_PX - TREMBLE_MIN_PX) * over) / (TREMBLE_FULL_AT - TREMBLE_FROM);
-}
-
-const tremble = (pattern: readonly number[], strength: number, frame: number): number =>
-  strength * (pattern[imod(idiv(frame, TREMBLE_HOLD_FRAMES), pattern.length)] ?? 0);
-
-export const trembleX = (strength: number, frame: number): number => tremble(TREMBLE_X, strength, frame);
-export const trembleY = (strength: number, frame: number): number => tremble(TREMBLE_Y, strength, frame);
-
-
 export interface NumberJolt {
   damage: number;
   shakeFrame: number;
   shakeStrength: number;
-  trembleFrame: number;
   dx: number;
   dy: number;
 }
 
-export const numberJolt = (): NumberJolt => ({ damage: 0.0, shakeFrame: SHAKE_FRAMES, shakeStrength: 0.0, trembleFrame: 0, dx: 0.0, dy: 0.0 });
+export const numberJolt = (): NumberJolt => ({ damage: 0.0, shakeFrame: SHAKE_FRAMES, shakeStrength: 0.0, dx: 0.0, dy: 0.0 });
 
 
 export function stepJolt(jolt: NumberJolt, visible: boolean, damage: number): boolean {
   const added = damage - jolt.damage;
   jolt.damage = damage;
-  const trembling = visible ? trembleStrength(damage) : 0.0;
   if (visible && added > 0.0) {
     jolt.shakeFrame = 0;
     jolt.shakeStrength = shakeStrength(added);
-  } else if (jolt.shakeFrame < SHAKE_FRAMES) jolt.shakeFrame++;
-  jolt.trembleFrame = trembling === 0.0 ? 0 : jolt.trembleFrame + 1;
-  const dx = shakeX(jolt.shakeStrength, jolt.shakeFrame) + trembleX(trembling, jolt.trembleFrame);
-  const dy = shakeY(jolt.shakeStrength, jolt.shakeFrame) + trembleY(trembling, jolt.trembleFrame);
-  if (dx === jolt.dx && dy === jolt.dy) return false;
-  jolt.dx = dx;
-  jolt.dy = dy;
+  } else if (jolt.shakeFrame >= SHAKE_FRAMES) return false;
+  else jolt.shakeFrame++;
+  jolt.dx = shakeX(jolt.shakeStrength, jolt.shakeFrame);
+  jolt.dy = shakeY(jolt.shakeStrength, jolt.shakeFrame);
   return true;
 }

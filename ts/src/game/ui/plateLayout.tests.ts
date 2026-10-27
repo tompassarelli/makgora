@@ -1,4 +1,4 @@
-import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv, imod } from "wisp/src/sim/intMath";
@@ -9,7 +9,7 @@ import { trainingReadout } from "../session/messages";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { Phase, requestStageSelect, selectCharacter } from "../lobby/lobbyState";
-import { DAMAGE_DARK_FROM, SHAKE_FRAMES, TREMBLE_FROM, TREMBLE_MAX_PX, damageColour, damageText, numberJolt, percentText, stepJolt, trembleStrength } from "./plateLayout";
+import { DAMAGE_DARK_FROM, SHAKE_FRAMES, damageColour, damageText, numberJolt, percentText, stepJolt } from "./plateLayout";
 
 const channels = (colour: number): readonly number[] => [imod(idiv(colour, 65536), 256), imod(idiv(colour, 256), 256), imod(colour, 256)];
 const plain = (text: string): string => text.substring(10, text.length - 2);
@@ -37,7 +37,7 @@ test("every damage readout shows the whole percent, 5.4 as 5 and 99.9 as 99, whi
   }
 });
 
-test("the percent blends white at 0, yellow near 50, red at 100 and dark red from 150 with no colour jump, and trembles only past 100 by a few pixels [k3 measure #570]", () => {
+test("the percent blends white at 0, yellow near 50, red at 100 and dark red from 150 with no colour jump [k3 measure #570]", () => {
   assertEquals(damageColour(0.0), 0xffffff);
   const [yellowRed, yellowGreen, yellowBlue] = channels(damageColour(50.0));
   assertTrue((yellowRed ?? 0) > 240 && (yellowGreen ?? 0) > 200 && (yellowBlue ?? 255) < 100);
@@ -54,28 +54,21 @@ test("the percent blends white at 0, yellow near 50, red at 100 and dark red fro
     previous = colour;
   }
   assertEquals(damageColour(f32(99.9)), damageColour(99.0));
-  for (let percent = 0; percent <= TREMBLE_FROM; percent++) assertEquals(trembleStrength(percent), 0.0, `still at ${percent}`);
-  assertEquals(trembleStrength(f32(100.9)), 0.0, "still at 100.9");
-  let shaken = 0.0;
-  for (let percent = TREMBLE_FROM + 1; percent <= 400; percent++) {
-    const strength = trembleStrength(percent);
-    assertGreaterThan(strength, 0.0);
-    assertTrue(strength >= shaken && strength <= TREMBLE_MAX_PX);
-    shaken = strength;
-  }
 });
 
-test("the percent comes to rest on its home spot once a hit's shake or a past-100 tremble ends, however many frames the tremble ran before a KO dropped it [k2 property]", () => {
-  for (let trembled = SHAKE_FRAMES; trembled < SHAKE_FRAMES + 8; trembled++) {
-    const jolt = numberJolt();
-    for (let frame = 0; frame < trembled; frame++) stepJolt(jolt, true, 150.0);
-    stepJolt(jolt, true, 0.0);
-    assertEquals(jolt.dx, 0.0, `KO after ${trembled} trembling frames`);
-    assertEquals(jolt.dy, 0.0, `KO after ${trembled} trembling frames`);
-    stepJolt(jolt, true, f32(12.5));
-    for (let frame = 0; frame < SHAKE_FRAMES; frame++) stepJolt(jolt, true, f32(12.5));
-    assertEquals(jolt.dx, 0.0, `quiet after a hit, ${trembled}`);
-    assertEquals(jolt.dy, 0.0, `quiet after a hit, ${trembled}`);
-    assertTrue(!stepJolt(jolt, true, f32(12.5)));
+test("a fighter at 150% that takes no hit keeps its percent at rest on every frame, a hit shakes it, and it returns to rest after the shake [k1 scenario]", () => {
+  const jolt = numberJolt();
+  stepJolt(jolt, true, 150.0);
+  for (let frame = 0; frame < 30; frame++) {
+    stepJolt(jolt, true, 150.0);
+    assertEquals(jolt.dx, 0.0, `no hit, frame ${frame} dx`);
+    assertEquals(jolt.dy, 0.0, `no hit, frame ${frame} dy`);
   }
+  assertTrue(stepJolt(jolt, true, 162.5));
+  assertTrue(jolt.dx !== 0.0 && jolt.dy !== 0.0);
+  for (let frame = 1; frame < SHAKE_FRAMES; frame++) stepJolt(jolt, true, 162.5);
+  stepJolt(jolt, true, 162.5);
+  assertEquals(jolt.dx, 0.0, "rest after the shake dx");
+  assertEquals(jolt.dy, 0.0, "rest after the shake dy");
+  assertTrue(!stepJolt(jolt, true, 162.5));
 });
