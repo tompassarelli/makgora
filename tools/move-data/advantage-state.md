@@ -41,9 +41,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Rexxar | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in up smash, dash, dash attack; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Rexxar | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Rexxar | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 5/5 DI |
-| Lich King | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
-| Lich King | medium | yes | yes | **no** | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 60% → up tilt against 3/5 DI |
-| Lich King | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
+| Lich King | light | yes | yes | **no** | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, missed tech | up throw at 20% → up tilt against 1/5 DI |
+| Lich King | medium | yes | yes | **no** | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 1/5 DI |
+| Lich King | heavy | yes | yes | **no** | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 1/5 DI |
 | Thrall | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Thrall | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 60% → up air against 4/5 DI |
 | Thrall | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
@@ -227,15 +227,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Rexxar | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Lich King | light | up throw | 1/1 | 1/1 KD | 1/1 KD in short hop, back air, out forward tilt | 1/1 KD in up special, out dash, dash attack |
+| Lich King | light | up throw | 1/1 | 1/1 in up tilt, out forward tilt | 1/1 KD in short hop, back air, out forward tilt | 1/1 in up tilt, out dash, dash attack |
 | Lich King | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Lich King | medium | up throw | 1/1 | 1/1 KD | 1/1 KD in up special, out forward tilt | 1/1 KD in up special, out dash, dash attack |
+| Lich King | medium | up throw | 1/1 | 1/1 KD in dash, dash attack, out forward tilt | 1/1 KD in dash, dash attack, out forward tilt | 1/1 in up tilt, out forward tilt |
 | Lich King | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Lich King | heavy | up throw | 1/1 | 1/1 | 1/1 KD in short hop, back air, out forward tilt | 1/1 KD in forward tilt, out dash, dash attack |
+| Lich King | heavy | up throw | 1/1 | 1/1 | 1/1 in short hop, back air, out forward tilt | 1/1 KD in up tilt, out dash, dash attack |
 | Lich King | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Thrall | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Thrall | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
