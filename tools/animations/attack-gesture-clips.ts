@@ -181,7 +181,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
           }
           continue;
         }
-        const arc = frame < contact ? 75 : 75-75*(frame-contact), angle = arc*Math.PI/180;
+        const arc = frame < contact ? 75+60*Math.sin(Math.PI*frame/(contact-1)) : 75-75*(frame-contact), angle = arc*Math.PI/180;
         const b = position(body), handTarget = [b[0]!+36*Math.cos(angle),-62,85+36*Math.sin(angle)], tipTarget = [b[0]!+96*Math.cos(angle),-62,85+96*Math.sin(angle)];
         const weight = Math.min(1,frame/Math.max(1,contact-1)), initial = [...arm,hand].map(node => node.Rotation!.Keys.find(k => k.Frame === at)!.Vector.slice());
         for (let iteration = 0; iteration < 20; iteration++) for (const node of arm) aim(node,handTarget,hand);
