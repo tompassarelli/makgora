@@ -174,6 +174,14 @@ the thin spear crossing his crest and his round body, properties of the
 model rather than the motion (#497). A cold read of the native Classic clips
 still has to call each a forward stab with no broken limb.
 
+Grom's dash attack ships with line 5 at 3: the judge medians on readability,
+weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
+lines 1 to 4 pass (#344). The take limit is spent; take B and the later
+cold-judge lane did not beat the shipped clip's medians, so it is the best
+judged. Tom's standing delegation of pending decisions to the recommendation
+(2026-10-26) was applied on 2026-10-27 by the smashcraft triage lead, which
+recommended shipping it as a named exception.
+
 ## Thresholds
 
 The 9 October calibration uses 25 moves: five jabs, tilts, smashes, aerials
