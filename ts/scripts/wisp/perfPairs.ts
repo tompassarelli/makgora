@@ -24,17 +24,23 @@ export function parsePairs(text: string): PairWorst[] {
   });
 }
 
-// Names every pair of `run` whose worst frame rises more than `margin` over the fixture's, and every
-// pair the fixture lacks; pairs the run did not measure are not judged.
+// Names every pair of `run` whose worst frame rises more than `margin` over the fixture's; a pair the
+// fixture lacks, a fighter added since, is judged against the fixture's costliest pair, and pairs the run
+// did not measure are not judged.
 export function comparePairs(fixture: readonly PairWorst[], run: readonly PairWorst[], margin = PAIR_MARGIN): string[] {
   const known = new Map(fixture.map((row) => [row.pair, row]));
+  const costliest: PairWorst = {
+    pair: "the fixture's costliest pair",
+    instructions: Math.max(0, ...fixture.map((row) => row.instructions)),
+    allocatedKb: Math.max(0, ...fixture.map((row) => row.allocatedKb)),
+  };
   const percent = (before: number, after: number) => (before === 0 ? "new" : `+${((after / before - 1) * 100).toFixed(1)}%`);
   return run.flatMap((row) => {
-    const before = known.get(row.pair);
-    if (before === undefined) return [`${row.pair} has no fixture row`];
+    const before = known.get(row.pair) ?? costliest;
+    const against = before === costliest ? ` over ${costliest.pair}` : "";
     const problems: string[] = [];
-    if (row.instructions > before.instructions * (1 + margin)) problems.push(`${row.pair} worst-frame instructions ${before.instructions} -> ${row.instructions} (${percent(before.instructions, row.instructions)})`);
-    if (row.allocatedKb > before.allocatedKb * (1 + margin)) problems.push(`${row.pair} worst-frame allocation ${before.allocatedKb.toFixed(1)} -> ${row.allocatedKb.toFixed(1)} KB (${percent(before.allocatedKb, row.allocatedKb)})`);
+    if (row.instructions > before.instructions * (1 + margin)) problems.push(`${row.pair} worst-frame instructions ${before.instructions} -> ${row.instructions} (${percent(before.instructions, row.instructions)}${against})`);
+    if (row.allocatedKb > before.allocatedKb * (1 + margin)) problems.push(`${row.pair} worst-frame allocation ${before.allocatedKb.toFixed(1)} -> ${row.allocatedKb.toFixed(1)} KB (${percent(before.allocatedKb, row.allocatedKb)}${against})`);
     return problems;
   });
 }

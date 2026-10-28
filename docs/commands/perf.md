@@ -47,7 +47,8 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   PRIOR_PAIRS FILE` fails when any pair's worst frame
   rises more than 10% (`PAIR_MARGIN` in smashcraft:ts/scripts/wisp/perfPairs.ts)
   over the prior run, naming the pair. Pairs the run skipped are not judged; a
-  pair without a prior row fails. Background sweeps checks full roster coverage
+  pair without a prior row, a fighter added since, fails when it rises more
+  than the margin over the prior's costliest pair (#682). Background sweeps checks full roster coverage
   and fetches pairs from a successful Background run on the nearest first-parent
   main commit in the last 60 commits, excluding the current run. Without a prior
   artifact it warns and passes drift comparison; coverage and absolute frame
