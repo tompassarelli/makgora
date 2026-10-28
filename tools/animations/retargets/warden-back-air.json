@@ -1,0 +1,263 @@
+{
+  "from": 2,
+  "to": 5,
+  "pose": "backAir",
+  "carry": [
+    "Bone_Root"
+  ],
+  "cloth": {
+    "Cape_Dummy02": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Cape_Dummy03": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece01": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece02": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece03": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece04": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece11": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece12": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece13": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece14": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece15": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece16": {
+      "lag": 2,
+      "weight": 0.6,
+      "overlap": 1
+    },
+    "Cape_Piece18": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Cape_Piece20": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Cape_Piece21": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Cape_Piece23": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Cape_Piece24": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Mesh41": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh44": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh32": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh33": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh42": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh43": {
+      "lag": 2,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Mesh37": {
+      "lag": 2,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Mesh38": {
+      "lag": 2,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Mesh22": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Mesh13": {
+      "lag": 1,
+      "weight": 0.5,
+      "overlap": 1
+    },
+    "Mesh06": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh29": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh30": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh45": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh48": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh34": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh46": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh47": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh36": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh05": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh09": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh35": {
+      "lag": 2,
+      "weight": 0.7,
+      "overlap": 1
+    },
+    "Mesh18": {
+      "lag": 2,
+      "weight": 0.8,
+      "overlap": 1
+    },
+    "Mesh24": {
+      "lag": 2,
+      "weight": 0.8,
+      "overlap": 1
+    },
+    "Mesh02": {
+      "lag": 2,
+      "weight": 0.8,
+      "overlap": 1
+    },
+    "Object01": {
+      "lag": 2,
+      "weight": 0.8,
+      "overlap": 1
+    }
+  },
+  "clear": {
+    "Cape_Dummy02": {
+      "follow": "Bone_Leg1_L",
+      "weight": 0.5,
+      "lift": [
+        0,
+        0,
+        0
+      ]
+    },
+    "Mesh42": {
+      "follow": "Bone_Leg1_L",
+      "weight": 0,
+      "lift": [
+        40,
+        0,
+        0
+      ]
+    },
+    "Mesh41": {
+      "follow": "Bone_Leg1_L",
+      "weight": 0,
+      "lift": [
+        -40,
+        0,
+        0
+      ]
+    },
+    "Mesh43": {
+      "follow": "Bone_Leg1_L",
+      "weight": 0,
+      "lift": [
+        0,
+        -60,
+        0
+      ]
+    }
+  }
+}

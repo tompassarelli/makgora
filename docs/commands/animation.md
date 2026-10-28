@@ -167,8 +167,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   takes `jab`, `jab2`, `forwardTilt` or `forwardTiltDown`, solves his shoulder and elbow each
   startup and active frame so the spear tip rides a straight line along the hit direction, and splices the same way.
   Both scripts share the rig, pose vocabulary and bake in `tools/animations/murloc_rig.py`.
-  Illidan's and Maiev's down tilts are leg sweeps authored in Blender (#517); Maiev's back air is a spinning back kick
-  authored the same way with `--pose backAir` and the beats in `tools/animations/leg-sweeps/warden-back-kick.json`.
+  Illidan's and Maiev's down tilts are leg sweeps authored in Blender (#517). Maiev's back air is Illidan's, retargeted:
+  `... rekey-clip.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character 5 --pose backAir --limb L --rig RIG.json`, then
+  `bun tools/animations/retarget-clip.ts PRIVATE_ASSETS RIG.json KEYS.json tools/animations/retargets/warden-back-air.json`
+  copies the source fighter's clip rotations onto the target's matching rig bones frame by frame (both must share the move's
+  frame data), scales the source's root translation by hip-to-ankle height, trails each listed cloth node behind its
+  ancestors' turn (`lag`, `weight`, `overlap` frames per chain link) and turns each `clear` node with a followed bone
+  (`weight`) plus a `lift` in degrees scaled by that bone's swing; `... --keys KEYS.json` splices it.
+  A rejected re-key writes the rejected model with every reason, the strike moment included.
   A beats file's `clear` list folds listed cloth clear of the floor and its `sides` map fixes the way a listed piece
   turns (`1` swings a hanging piece backward), which keeps Maiev's front skirt flaps off her swept leg.
   Re-keying a clip played strike-aligned is refused unless its re-measured strike moment is unchanged, so the move keeps its timing.

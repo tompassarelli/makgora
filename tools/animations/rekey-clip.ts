@@ -104,9 +104,10 @@ if (smash !== undefined) {
 const rekeyed = new Set([clip.index, ...smash === undefined ? [] : [smash.charge.index, smash.release.index]]);
 
 const bytes = encodeVerified(parseSource(generateMDX(model)));
+const outside: string[] = [];
 if (clip.aligned !== true && moment?.clip === clip.index) {
   const measured = await measureStrikeMoments(async () => bytes, new Set([character]));
-  ensure(staleStrikeFighters(measured, HERO_STRIKE_MOMENTS, [character]).length === 0, `${fighter.name} ${pose}: clip ${clip.index} plays strike-aligned at ${moment.seconds}s and the re-keyed clip strikes at ${measured.find((m) => m.style === style)?.seconds}s, which would retime it`);
+  if (staleStrikeFighters(measured, HERO_STRIKE_MOMENTS, [character]).length > 0) outside.push(`${fighter.name} ${pose}: clip ${clip.index} plays strike-aligned at ${moment.seconds}s and the re-keyed clip strikes at ${measured.find((m) => m.style === style)?.seconds}s, which would retime it`);
 }
 const before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);
 for (const [index, other] of source.Sequences.entries()) for (const fraction of [0, 0.5, 1]) {
@@ -124,7 +125,7 @@ const distance = (x: number, z: number, s: PoseFrame["strikes"][number]) => {
   const dx = s.x2 - s.x1, dz = s.z2 - s.z1, t = Math.max(0, Math.min(1, ((x - s.x1) * dx + (z - s.z1) * dz) / (dx * dx + dz * dz || 1)));
   return Math.hypot(x - s.x1 - dx * t, z - s.z1 - dz * t) - s.radius;
 };
-const outside: string[] = [];
+
 for (const at of active) {
   const f = frames[at]!, { vertices, drawn: shown } = drawn.posed(clip.index, f.seconds, 1);
   const strikes = f.strikes.map((s) => ({ ...s, x1: s.x1 - f.x, z1: s.z1 - f.z, x2: s.x2 - f.x, z2: s.z2 - f.z }));

@@ -60,7 +60,7 @@ function throwMove(release: number, recovery: number, effect: Readonly<HitEffect
 }
 
 const FORWARD_AIR = wardenHit(7.6326799392700195, "EDGE", 40);
-const BACK_AIR = wardenHit(8.39594841003418, "KILL", 35, -1.0);
+const BACK_AIR: HitEffect = { damage: 13.0, growth: 100.0, base: 10.0, launchX: f32(-0.9399999976158142), launchZ: f32(0.3400000035762787), electric: false, element: HitElement.normal };
 const NEUTRAL_AIR_EFFECT = wardenHit(6.106143951416016, "SLIDE", 0);
 const NEUTRAL_AIR: readonly MoveRegion[] = [
   ...swing(5, [[18.0, 72.0, 83.0, 44.0], [-4.0, 94.0, 38.0, 136.0], [-33.0, 67.0, -60.0, 120.0], [-18.0, 31.0, -77.0, 22.0], [18.0, 43.0, 15.0, -24.0]], BLADE_RADIUS, NEUTRAL_AIR_EFFECT),
@@ -138,11 +138,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     [AttackStyle.neutralAir]: { ...heroMove(5, 5, 18, 7, NEUTRAL_AIR), autoCancel: { before: 4, from: 36 } },
     [AttackStyle.forwardAir]: { ...heroMove(8, 3, 20, 12, FORWARD_AIR_SLASH), autoCancel: { before: 6, from: 48 } },
 
-    [AttackStyle.backAir]: { ...heroMove(7, 3, 22, 12, [
-      heroRegion(7, 7, blade(-56.0, 62.0, -91.0, 66.0, 10.0), BACK_AIR),
-      heroRegion(8, 8, blade(-55.0, 62.0, -90.0, 66.0, 10.0), BACK_AIR),
-      heroRegion(9, 9, blade(-54.0, 62.0, -86.0, 67.0, 10.0), BACK_AIR),
-    ]), autoCancel: { before: 4, from: 22 } },
+    [AttackStyle.backAir]: { ...heroMove(4, 16, 18, 8, [heroRegion(4, 19, blade(-38.0, 66.0, -76.0, 75.0, 13.0), BACK_AIR)]), autoCancel: { before: 4, from: 28 } },
 
     [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 7, multiHit([
       { first: 5, last: 6, strikes: SKY_LIFT },

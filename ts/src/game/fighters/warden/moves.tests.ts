@@ -42,31 +42,35 @@ test("Maiev's down air drills feet first: every hit's strikes sit on her body's 
   }
 });
 
-const BACK_AIR_FRAMES = [7, 8, 9];
-const HEEL_REACH_MIN = 95.0;
-const HEEL_REACH_MAX = 105.0;
-const HIP_LOW = 45.0;
-const HIP_HIGH = 80.0;
+const BACK_AIR_FIRST = 4;
+const BACK_AIR_LAST = 19;
+const DRAWN_HEEL_BACK = 80.0;
+const DRAWN_HEEL_Z = 80.5;
+const DRAWN_KNEE_BACK = 37.0;
+const DRAWN_KNEE_Z = 64.5;
 
-test("Maiev's back air kicks with her heel: each active frame has one strike behind her at hip height, from her shin back to a heel end 95 to 105 units behind her, for either facing [k3 measure docs/design/maiev.md]", () => {
+function insideStrike(placed: Readonly<Capsule>, x: number, z: number): boolean {
+  const dx = f32(placed.x2 - placed.x1), dz = f32(placed.z2 - placed.z1);
+  const t = Math.max(0.0, Math.min(1.0, f32(f32(f32(f32(x - placed.x1) * dx) + f32(f32(z - placed.z1) * dz)) / f32(f32(dx * dx) + f32(dz * dz)))));
+  return Math.hypot(f32(x - f32(placed.x1 + f32(dx * t))), f32(z - f32(placed.z1 + f32(dz * t)))) <= placed.radius;
+}
+
+test("Maiev's back air is Illidan's held back kick on her drawn leg: every frame from 4 to 19 has one strike behind her covering her drawn heel and knee, and the frames around it none, for either facing [k3 measure docs/design/maiev.md]", () => {
   const region = emptyHitRegion();
   const placed: Capsule = { x1: 0.0, z1: 0.0, x2: 0.0, z2: 0.0, radius: 0.0 };
   for (const facing of [1, -1]) {
-    for (const frame of BACK_AIR_FRAMES) {
+    for (let frame = BACK_AIR_FIRST - 1; frame <= BACK_AIR_LAST + 1; frame++) {
       let strikes = 0;
       for (let index = 0; index < authoredHitRegionCount(AttackStyle.backAir, WARDEN_MOVES); index++) {
         authoredHitRegion(region, Character.warden, AttackStyle.backAir, frame - 1, 0, index, WARDEN_MOVES);
         if (region.strike === undefined) continue;
         strikes++;
         placeCapsule(placed, region.strike, ORIGIN_X, ORIGIN_Z, facing);
-        const back1 = f32(f32(ORIGIN_X - placed.x1) * facing);
-        const back2 = f32(f32(ORIGIN_X - placed.x2) * facing);
-        assertTrue(back1 > 0.0 && back2 > 0.0);
-        const heel = f32(Math.max(back1, back2) + placed.radius);
-        assertTrue(heel >= HEEL_REACH_MIN && heel <= HEEL_REACH_MAX);
-        for (const z of [placed.z1, placed.z2]) assertTrue(f32(z - ORIGIN_Z) >= HIP_LOW && f32(z - ORIGIN_Z) <= HIP_HIGH);
+        assertTrue(insideStrike(placed, f32(ORIGIN_X - f32(DRAWN_HEEL_BACK * facing)), f32(ORIGIN_Z + DRAWN_HEEL_Z)));
+        assertTrue(insideStrike(placed, f32(ORIGIN_X - f32(DRAWN_KNEE_BACK * facing)), f32(ORIGIN_Z + DRAWN_KNEE_Z)));
+        assertTrue(!insideStrike(placed, f32(ORIGIN_X + f32(DRAWN_KNEE_BACK * facing)), f32(ORIGIN_Z + DRAWN_KNEE_Z)));
       }
-      assertEquals(strikes, 1);
+      assertEquals(strikes, frame >= BACK_AIR_FIRST && frame <= BACK_AIR_LAST ? 1 : 0);
     }
   }
 });

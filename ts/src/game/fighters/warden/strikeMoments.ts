@@ -13,7 +13,7 @@ export const wardenStrikeMoments = {
   10: { clip: 56, seconds: f32(0.100), end: f32(0.400) },
   12: { clip: 71, seconds: f32(0.050), end: f32(0.450) },
   13: { clip: 70, seconds: f32(0.100), end: f32(0.500) },
-  14: { clip: 58, seconds: f32(0.100), end: f32(0.517) },
+  14: { clip: 58, seconds: f32(0.017), end: f32(0.517) },
   15: { clip: 61, seconds: f32(0.117), end: f32(0.467) },
   16: { clip: 38, seconds: f32(0.183), end: f32(0.450) },
   19: { clip: 59, seconds: f32(0.100), end: f32(0.417) },

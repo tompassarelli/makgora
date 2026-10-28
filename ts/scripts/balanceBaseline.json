@@ -5620,38 +5620,6 @@
    "authored.moves.normals.13.regions.2.hit.effect.base": 22,
    "authored.moves.normals.13.regions.2.hit.effect.launchX": 0.7660444378852844,
    "authored.moves.normals.13.regions.2.hit.effect.launchZ": 0.6427876353263855,
-   "authored.moves.normals.14.startupFrames": 6,
-   "authored.moves.normals.14.activeFrames": 3,
-   "authored.moves.normals.14.totalFrames": 31,
-   "authored.moves.normals.14.landingLag": 12,
-   "authored.moves.normals.14.regions.0.firstFrame": 6,
-   "authored.moves.normals.14.regions.0.lastFrame": 6,
-   "authored.moves.normals.14.regions.0.hit.effect.damage": 11,
-   "authored.moves.normals.14.regions.0.hit.effect.growth": 110,
-   "authored.moves.normals.14.regions.0.hit.effect.base": 26,
-   "authored.moves.normals.14.regions.0.hit.effect.launchX": -0.8191520571708679,
-   "authored.moves.normals.14.regions.0.hit.effect.launchZ": 0.5735764503479004,
-   "authored.moves.normals.14.regions.1.firstFrame": 7,
-   "authored.moves.normals.14.regions.1.lastFrame": 7,
-   "authored.moves.normals.14.regions.1.hit.effect.damage": 11,
-   "authored.moves.normals.14.regions.1.hit.effect.growth": 110,
-   "authored.moves.normals.14.regions.1.hit.effect.base": 26,
-   "authored.moves.normals.14.regions.1.hit.effect.launchX": -0.8191520571708679,
-   "authored.moves.normals.14.regions.1.hit.effect.launchZ": 0.5735764503479004,
-   "authored.moves.normals.14.regions.2.firstFrame": 8,
-   "authored.moves.normals.14.regions.2.lastFrame": 8,
-   "authored.moves.normals.14.regions.2.hit.effect.damage": 11,
-   "authored.moves.normals.14.regions.2.hit.effect.growth": 110,
-   "authored.moves.normals.14.regions.2.hit.effect.base": 26,
-   "authored.moves.normals.14.regions.2.hit.effect.launchX": -0.8191520571708679,
-   "authored.moves.normals.14.regions.2.hit.effect.launchZ": 0.5735764503479004,
-   "authored.moves.normals.14.regions.3.firstFrame": 6,
-   "authored.moves.normals.14.regions.3.lastFrame": 8,
-   "authored.moves.normals.14.regions.3.hit.effect.damage": 11,
-   "authored.moves.normals.14.regions.3.hit.effect.growth": 110,
-   "authored.moves.normals.14.regions.3.hit.effect.base": 26,
-   "authored.moves.normals.14.regions.3.hit.effect.launchX": -0.8191520571708679,
-   "authored.moves.normals.14.regions.3.hit.effect.launchZ": 0.5735764503479004,
    "authored.moves.normals.15.startupFrames": 4,
    "authored.moves.normals.15.activeFrames": 9,
    "authored.moves.normals.15.totalFrames": 28,
@@ -6573,7 +6541,18 @@
    "throw.6.effect.launchX": 0.9063078165054321,
    "throw.6.effect.launchZ": 0.4226182699203491,
    "throw.6.contactFrame": 14,
-   "throw.6.totalFrames": 34
+   "throw.6.totalFrames": 34,
+   "authored.moves.normals.14.startupFrames": 3,
+   "authored.moves.normals.14.activeFrames": 16,
+   "authored.moves.normals.14.totalFrames": 37,
+   "authored.moves.normals.14.landingLag": 8,
+   "authored.moves.normals.14.regions.0.firstFrame": 3,
+   "authored.moves.normals.14.regions.0.lastFrame": 18,
+   "authored.moves.normals.14.regions.0.hit.effect.damage": 13,
+   "authored.moves.normals.14.regions.0.hit.effect.growth": 100,
+   "authored.moves.normals.14.regions.0.hit.effect.base": 10,
+   "authored.moves.normals.14.regions.0.hit.effect.launchX": -0.9399999976158142,
+   "authored.moves.normals.14.regions.0.hit.effect.launchZ": 0.3400000035762787
   },
   "play": "{\"range\":{\"near\":92.4000015258789,\"far\":184.8000030517578},\"spacing\":[{\"move\":33,\"near\":85.79999542236328,\"far\":171.59999084472656},{\"move\":6,\"near\":52.79999923706055,\"far\":132},{\"move\":9,\"near\":52.79999923706055,\"far\":132},{\"move\":10,\"near\":52.79999923706055,\"far\":132},{\"move\":31,\"near\":118.79999542236328,\"far\":237.59999084472656}],\"approach\":[{\"via\":\"run\",\"moves\":[19,31,5],\"weight\":2},{\"via\":\"jump\",\"moves\":[13,12,14],\"weight\":2}],\"defense\":[\"spotDodge\",\"roll\",\"jump\",\"shield\"],\"combos\":[{\"starter\":7,\"followUps\":[15,2]},{\"starter\":8,\"followUps\":[13,7]},{\"starter\":15,\"followUps\":[15]},{\"starter\":42,\"followUps\":[15]},{\"starter\":43,\"followUps\":[13,15]}],\"kills\":[{\"move\":14,\"fromPercent\":90},{\"move\":4,\"fromPercent\":95},{\"move\":2,\"fromPercent\":110},{\"move\":13,\"fromPercent\":120},{\"move\":3,\"fromPercent\":110}],\"recovery\":{\"aim\":\"mixed\",\"upSpecial\":\"last\"},\"avoid\":[\"far\",\"below\"]}",
   "feel": {
@@ -6732,22 +6711,6 @@
    "normal.13.hit.2": {
     "advantage": -5,
     "killPercent": 96
-   },
-   "normal.14.hit.0": {
-    "advantage": -4,
-    "killPercent": 70
-   },
-   "normal.14.hit.1": {
-    "advantage": -4,
-    "killPercent": 70
-   },
-   "normal.14.hit.2": {
-    "advantage": -4,
-    "killPercent": 70
-   },
-   "normal.14.hit.3": {
-    "advantage": -4,
-    "killPercent": 70
    },
    "normal.15.hit.0": {
     "advantage": -7
@@ -7038,6 +7001,10 @@
    "throw.6": {
     "advantage": 0,
     "killPercent": 269
+   },
+   "normal.14.hit.0": {
+    "advantage": 1,
+    "killPercent": 78
    }
   }
  },

@@ -103,23 +103,30 @@ for the straight-down spike it replaced.
 
 ## Leg kicks (2026-10-28)
 
-Tom asked on 2026-10-28, while playtesting, for her back air to read as a
-spinning back kick like Illidan's roundhouse and for her down tilt to read as
-an unmistakable low leg sweep, since her legs had hidden under her cloak. Both
-are authored by `tools/animations/leg-sweep.py` (beats in
-`tools/animations/leg-sweeps/warden-back-kick.json` and `warden.json`) and
-spliced by `rekey-clip.ts`; frame data, damage, angle and knockback are
-unchanged.
+Tom asked on 2026-10-28, while playtesting, for her down tilt to read as an
+unmistakable low leg sweep, since her legs had hidden under her cloak. It is
+authored by `tools/animations/leg-sweep.py` (beats in
+`tools/animations/leg-sweeps/warden.json`) and spliced by `rekey-clip.ts`;
+its frame data, damage, angle and knockback are unchanged.
 
-- Back air: her hips turn as she chambers the right knee to her chest, then the
-  leg snaps out straight behind her at hip height with the heel leading,
-  held through frames 7 to 9. The three glaive capsules (which reached up to
-  141 high) are replaced by one capsule per active frame along the drawn shin
-  to the heel, radius 10, between 62 and 67 high; the heel end reaches 101,
-  100 and 96 behind her on frames 7, 8 and 9 (the glaive reached 82, 104 and
-  103), so a test holds each strike behind her at hip height (45 to 80 above
-  her origin) with its heel end 95 to 105 back. The strike moment the clip
-  plays against stays at 0.100 s.
+- Back air: Illidan's back air, shared Fox/Falco style (Tom, 2026-10-28: the
+  separately authored kick looked wrong, and Melee gives Fox and Falco the same
+  move). `tools/animations/retarget-clip.ts` copies his clip's rotations onto
+  her matching bones (root, pelvis, chest, head, arms, legs) on the same move
+  timeline, with his root translation scaled by her hip-to-ankle height (0.854
+  of his), per `tools/animations/retargets/warden-back-air.json`; her skirt,
+  cloak, sleeves and hood trail the body turn (one to two frames behind, one
+  more per link down a chain), her skirt follows the kicking thigh halfway and
+  her front flaps fold forward away from it, so the leg shows behind her on
+  every active frame. She takes his frames, damage, angle and knockback: first
+  active 4, active through 19, 37 frames, landing lag 8, auto-cancel before 4
+  and from 28, 13% at growth 100 and base 10 launching 20 degrees back. One
+  capsule, radius 12 (his 14 scaled to her leg), runs from her drawn knee at
+  37 behind and 64.5 high to her heel at 80 behind and 80.5 high, which hold
+  through the active frames; all of her drawn lower leg sits inside it. Her
+  clip plays linearly over the move (strike moment 0.017 s, under the
+  alignment floor), as his does. The balance baseline's back-air rows carry
+  the new values for this reason.
 - Down tilt: from her crouch she drops low with her torso held back over the
   trailing leg, sweeps the right leg straight out along the floor and carries
   it across before folding back up. Her front skirt flaps fold backward and up
