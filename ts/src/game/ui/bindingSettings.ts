@@ -139,10 +139,7 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
   settings.persistence.load(settings.owner, (result) => {
     const saved = result.kind === "loaded" ? decodeSaved(result.encoded) : undefined;
     if (saved !== undefined) {
-      const profile = saved.layouts[saved.active];
-      settings.layouts.custom = profile;
-      settings.layout = "custom";
-      settings.bindings = profile;
+      adopt(settings, saved);
       settings.capture = undefined;
       settings.revision++;
       settings.profile = "saved";

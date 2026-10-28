@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { type BindingPreset, ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
+import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -13,7 +13,9 @@ import {
   createBindingSettings,
   customizeLayout,
   initializeBindingSettings,
+  loadProfile,
   loadSavedBindings,
+  pickBindingPreset,
   resetToLayout,
   saveBindingSettings,
 } from "./bindingSettings";
@@ -241,7 +243,7 @@ test("saving keeps all three layouts and the active one, and a new session reope
   assertEquals(slots(reopened, Action.attack), "N —", "WASD keys");
 });
 
-test("a one-set save from before layouts loads as the active layout's keys, and Load profile puts a profile on Custom [k2 property]", () => {
+test("a one-set save from before layouts loads as the active layout's keys, and Load profile reopens it on Custom [k2 property]", () => {
   const keys = presetBindings("wasd");
   keys.keys[slotIndex(Action.attack, 0)] = code("B");
   const old = encodeBindings(keys);
@@ -272,4 +274,28 @@ test("a one-set save still on the old WASD defaults opens on WASD with Strong on
   const own = persistedSettings({ encoded: encodeBindings(edited) });
   assertEquals(own.layout, "custom", "edited keys land on Custom");
   assertEquals(slots(own, Action.strong), "Y —", "edited Strong stays");
+});
+
+test("each layout shows the same keys however the screen reaches it: opening on a save from before the layout defaults moved, then clicking layouts and Load profile in any order [k2 property]", () => {
+  const own = presetBindings("standard");
+  own.keys[slotIndex(Action.attack, 0)] = code("B");
+  const old = encodeLayouts({ layouts: { wasd: { keys: previousDefaultKeys("wasd") }, standard: { keys: previousDefaultKeys("standard") }, custom: own }, active: "wasd" });
+  const shown = (settings: Readonly<BindingSettings>) => encodeBindings(settings.bindings);
+  for (const clicks of [["custom", "wasd", "profile", "custom"], ["standard", "profile", "custom", "wasd"], ["profile", "standard", "custom", "profile", "wasd"]]) {
+    const stored = { encoded: old as string | undefined };
+    const settings = persistedSettings(stored);
+    const seen: Partial<Record<BindingPreset, string>> = { [settings.layout]: shown(settings) };
+    for (const click of [...clicks, "wasd", "standard", "custom"]) {
+      if (click === "profile") loadProfile(settings);
+      else pickBindingPreset(settings, click as BindingPreset);
+      const keys = shown(settings);
+      assertEquals(keys, seen[settings.layout] ??= keys, `${PRESET_NAMES[settings.layout]} after ${clicks.join(", ")} then ${click}`);
+    }
+    assertEquals(slots(settings, Action.attack), "B —", `Custom keeps its own keys after ${clicks.join(", ")}`);
+    const reopened = persistedSettings(stored);
+    for (const preset of BINDING_PRESETS) {
+      applyBindingPreset(reopened, preset);
+      assertEquals(shown(reopened), seen[preset], `${PRESET_NAMES[preset]} saved after ${clicks.join(", ")}`);
+    }
+  }
 });
