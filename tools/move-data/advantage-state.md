@@ -83,6 +83,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in full hop +4, down air, short hop, down air, forward smash; tech away side special; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
 | Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Anub'arak | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
+| Lady Vashj | light | yes | **no** | **no** | **no** | **no** | down smash at 20%: tech in place uncovered; tech in forward smash; tech away uncovered; missed tech uncovered | up smash at 40% → up air against 3/5 DI |
+| Lady Vashj | medium | **no** | **no** | **no** | **no** | **no** | down smash at 20%: tech in place uncovered; tech in down smash; tech away uncovered; missed tech uncovered | none |
+| Lady Vashj | heavy | yes | **no** | yes | yes | yes | back throw at 20%: tech in place dash, dash attack; tech in up smash, up smash, up smash, forward smash; tech away uncovered; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 40% → up tilt against 4/5 DI |
 | Archimonde the Defiler | light | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
 | Archimonde the Defiler | medium | yes | **no** | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away uncovered; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Archimonde the Defiler | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
@@ -393,6 +396,18 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Anub'arak | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | heavy | up throw | 1/1 | 1/1 | 1/1 | 1/1 in full hop, back air, out full hop, down air |
 | Anub'arak | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Lady Vashj | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Lady Vashj | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Lady Vashj | light | up throw | 1/1 | 1/0 | 2/1 | 2/1 |
+| Lady Vashj | light | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Lady Vashj | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Lady Vashj | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Lady Vashj | medium | up throw | 1/0 | 1/0 | 2/1 | 2/1 KD |
+| Lady Vashj | medium | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Lady Vashj | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Lady Vashj | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Lady Vashj | heavy | up throw | 1/1 | 1/1 | 2/1 in up tilt, out forward tilt | 2/1 in up tilt, out forward tilt |
+| Lady Vashj | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
 | Archimonde the Defiler | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Archimonde the Defiler | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Archimonde the Defiler | light | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
