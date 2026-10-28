@@ -2345,16 +2345,16 @@ mod linux {
             held |= RIGHT_STICK_TILT_HOLD;
         }
         if cx < 0 {
-            held |= SMASH_LEFT;
+            held |= C_LEFT;
         }
         if cx > 0 {
-            held |= SMASH_RIGHT;
+            held |= C_RIGHT;
         }
         if cy < 0 {
-            held |= SMASH_UP;
+            held |= C_UP;
         }
         if cy > 0 {
-            held |= SMASH_DOWN;
+            held |= C_DOWN;
         }
         held
     }
@@ -2826,13 +2826,13 @@ mod linux {
         let held = |cx, cy| action_state(State { cx, cy, ..State::default() });
         assert_eq!(held(16_384, 0), 0);
         assert_eq!(held(22_937, 0), 0);
-        assert_eq!(held(26_500, 0), SMASH_RIGHT);
-        assert_eq!(held(-26_500, 0), SMASH_LEFT);
+        assert_eq!(held(26_500, 0), C_RIGHT);
+        assert_eq!(held(-26_500, 0), C_LEFT);
         assert_eq!(held(0, -19_660), 0);
-        assert_eq!(held(0, -22_937), SMASH_UP);
-        assert_eq!(held(0, 22_937), SMASH_DOWN);
+        assert_eq!(held(0, -22_937), C_UP);
+        assert_eq!(held(0, 22_937), C_DOWN);
         let tom = |cx, cy| action_state(State { right_stick: padbridge::model::RightStick::Tilt, cx, cy, ..State::default() });
-        assert_eq!(tom(26_500, 0), WALK | SMASH_RIGHT);
+        assert_eq!(tom(26_500, 0), WALK | C_RIGHT);
         assert_eq!(tom(22_937, 0), 0);
     }
 
@@ -3357,10 +3357,10 @@ mod linux {
             (MOVE_RIGHT, 1, 0),
             (MOVE_DOWN, 0, -1),
             (MOVE_UP, 0, 1),
-            (SMASH_LEFT, -1, 0),
-            (SMASH_RIGHT, 1, 0),
-            (SMASH_DOWN, 0, -1),
-            (SMASH_UP, 0, 1),
+            (C_LEFT, -1, 0),
+            (C_RIGHT, 1, 0),
+            (C_DOWN, 0, -1),
+            (C_UP, 0, 1),
         ] {
             if edge.pressed & bit != 0 {
                 e.throw_x = (e.throw_x + x).clamp(-127, 127);
