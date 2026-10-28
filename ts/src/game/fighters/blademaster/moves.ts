@@ -8,7 +8,7 @@ import type { HitEffect } from "../../sim/hitRegions";
 import { strongHit } from "../../sim/strongHits";
 import { linkAt } from "../../sim/heroes/multiHit";
 import { squareRoot } from "../../sim/warcraftMath";
-import { ANGLES, type Angle, capsuleOf, makeHit, path } from "../../sim/heroes/authoring";
+import { capsuleOf, makeHit, path } from "../../sim/heroes/authoring";
 
 const BM = HitElement.slash;
 const forwardTilt = (segments: readonly Segment[]): AuthoredMove => heroMove(7, 3, 23, 0, tipped(7, segments, 6.0, 26.0,
@@ -147,36 +147,19 @@ const TORSO = hurtPart(0.0, 4.0, 0.0, f32(94.6), 24.0);
 const ARM_RADIUS = 9.0;
 const arm = (x1: number, z1: number, x2: number, z2: number): readonly HurtPart[] => [TORSO, hurtPart(x1, z1, x2, z2, ARM_RADIUS)];
 const SHOULDER_X = 6.0;
-const SHOULDER_Z = 90.0;
+export const SHOULDER_Z = 90.0;
 
 export const reach = (handX: number, handZ: number) => arm(SHOULDER_X, SHOULDER_Z, handX, handZ);
 export const HEAD = hurtPart(0.0, 95.0, 0.0, 95.0, 25.0);
 
 export const SWORD_LENGTH = length(f32(0.75));
-const UP_AIR_GRIP = 40.0;
-const UP_AIR_TIP = f32(UP_AIR_GRIP + SWORD_LENGTH);
-const UP_AIR_FIRST = 6;
 
 export interface Blade { readonly gripX: number; readonly gripZ: number; readonly tipX: number; readonly tipZ: number }
-
-const bladeAt = (angle: Angle, side: number): Blade => {
-  const direction = ANGLES[angle];
-  const x = f32(direction.x * side);
-  return {
-    gripX: f32(UP_AIR_GRIP * x), gripZ: f32(SHOULDER_Z + f32(UP_AIR_GRIP * direction.z)),
-    tipX: f32(UP_AIR_TIP * x), tipZ: f32(SHOULDER_Z + f32(UP_AIR_TIP * direction.z)),
-  };
-};
-
-const UP_AIR_SWEEP: readonly (readonly Blade[])[] = [
-  [bladeAt(20, 1.0), bladeAt(40, 1.0), bladeAt(60, 1.0)],
-  [bladeAt(70, 1.0), bladeAt(90, 1.0), bladeAt(70, -1.0)],
-  [bladeAt(60, -1.0), bladeAt(40, -1.0), bladeAt(20, -1.0)],
+export const UP_AIR_FIRST = 5;
+export const UP_AIR_RADIUS = 14.0;
+export const UP_AIR_SWEEP: readonly DrawnBlade[] = [
+  drawn(5, -4.199999809265137, 88.5999984741211, 163.39999389648438, 92.69999694824219), drawn(6, 8.399999618530273, 84.80000305175781, 104.4000015258789, 222.8000030517578), drawn(7, 12.699999809265137, 91.5, -28.200000762939453, 256.0), drawn(8, 9.600000381469727, 96.9000015258789, -146.60000610351562, 161.10000610351562),
 ];
-
-export const UP_AIR_BLADE: readonly Blade[] = UP_AIR_SWEEP.map(blades => blades[1] ?? bladeAt(90, 1.0));
-
-export const UP_AIR_DRAWN: readonly Segment[] = [[38.0, 121.0, 120.0, 207.0], [-9.0, 138.0, -44.0, 252.0], [-37.0, 125.0, -142.0, 184.0]];
 
 const BODY: FighterHurtboxes = {
   stand: [TORSO, hurtPart(-16.0, 110.0, 16.0, 110.0, 8.0)],
@@ -332,7 +315,7 @@ export const BLADEMASTER_MOVES: FighterMoves = {
     [AttackStyle.neutralAir]: neutralAir,
     [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, tipped(10, [[52.0, 65.0, 163.0, 72.0], [53.0, 63.0, 163.0, 51.0], [52.0, 61.0, 159.0, 30.0]], BLADE_RADIUS, TIP_LENGTH, hit(10.843297958374023, "EDGE", 40), hit(8.519732475280762, "EDGE", 40))),
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, swing(8, [[-2.0, 98.0, -129.0, 124.0], [-20.0, 95.0, -148.0, 115.0], [-30.0, 94.0, -158.0, 112.0]], BLADE_RADIUS, hit(9.294255256652832, "KILL", 35, -1.0))),
-    [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, path(UP_AIR_FIRST, blades(UP_AIR_DRAWN), hit(6.196170330047607, "LAUNCH", 85))),
+    [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, path(UP_AIR_FIRST, UP_AIR_SWEEP.map(blade => capsule(blade.gripX, blade.gripZ, blade.tipX, blade.tipZ, UP_AIR_RADIUS)), hit(6.196170330047607, "LAUNCH", 85))),
     [AttackStyle.downAir]: downAir,
     [AttackStyle.grab]: heroMove(7, 2, 22, 0, path(7, [
       capsule(18.0, 45.0, f32(S - 10.0), 45.0, 10.0),

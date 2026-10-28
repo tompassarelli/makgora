@@ -13,7 +13,7 @@ import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
 import { surfaceTopZ } from "../../sim/stage";
 import { beginAttack } from "../../sim/transitions";
-import { BLADEMASTER_MOVES, HEAD, SWORD_LENGTH, UP_AIR_DRAWN } from "./moves";
+import { BLADEMASTER_MOVES, HEAD, SHOULDER_Z, SWORD_LENGTH, UP_AIR_SWEEP } from "./moves";
 
 const RAISED_STAGE = 1;
 const PLATFORM = 2;
@@ -83,21 +83,44 @@ test("Blademaster's up air hits a foe standing on a platform above his head, abo
 test("Blademaster's up air reaches a sword length above his head, and his blade tip lies inside its hit region on every active frame [k2 property]", () => {
   assertTrue(UP_AIR !== undefined);
   if (UP_AIR === undefined) return;
-  assertTrue(UP_AIR_DRAWN.length === UP_AIR.activeFrames);
+  assertTrue(UP_AIR_SWEEP.length === UP_AIR.activeFrames);
   let top = 0.0;
   for (const region of UP_AIR.regions) top = Math.max(top, region.hit.maxZ);
   assertGreaterThan(top, f32(f32(HEAD.z2 + HEAD.radius) + SWORD_LENGTH));
   for (let index = 0; index < UP_AIR.activeFrames; index++) {
     const frame = UP_AIR.startupFrames + index;
-    const blade = UP_AIR_DRAWN[index];
+    const blade = UP_AIR_SWEEP[index];
     assertTrue(blade !== undefined);
     if (blade === undefined) continue;
     let inside = false;
     for (const region of UP_AIR.regions) {
       const strike = region.hit.strike;
       if (strike === undefined || frame < region.firstFrame || frame > region.lastFrame) continue;
-      if (squaredDistanceToStrike(blade[2], blade[3], strike) <= strike.radius * strike.radius) inside = true;
+      if (squaredDistanceToStrike(blade.tipX, blade.tipZ, strike) <= strike.radius * strike.radius) inside = true;
     }
     assertTrue(inside);
   }
+});
+
+function strikeOn(frame: number): Readonly<StrikeCapsule> | undefined {
+  if (UP_AIR === undefined) return undefined;
+  for (const region of UP_AIR.regions) if (frame >= region.firstFrame && frame <= region.lastFrame) return region.hit.strike;
+  return undefined;
+}
+
+test("Blademaster's up air starts as a level cut in front of him at shoulder height, sweeps over his head and ends behind him [k1 scenario]", () => {
+  assertTrue(UP_AIR !== undefined);
+  if (UP_AIR === undefined) return;
+  const first = strikeOn(UP_AIR.startupFrames);
+  const last = strikeOn(UP_AIR.startupFrames + UP_AIR.activeFrames - 1);
+  assertTrue(first !== undefined && last !== undefined);
+  if (first === undefined || last === undefined) return;
+  for (const x of [60.0, 100.0, 140.0]) assertTrue(squaredDistanceToStrike(x, SHOULDER_Z, first) <= first.radius * first.radius);
+  assertTrue(Math.min(last.x1, last.x2) < -120.0);
+  let overhead = false;
+  for (let index = 1; index < UP_AIR.activeFrames - 1; index++) {
+    const strike = strikeOn(UP_AIR.startupFrames + index);
+    if (strike !== undefined && Math.max(strike.z1, strike.z2) > f32(HEAD.z2 + HEAD.radius)) overhead = true;
+  }
+  assertTrue(overhead);
 });
