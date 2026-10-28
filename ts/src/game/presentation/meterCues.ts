@@ -6,7 +6,7 @@ import { type AuthoredSpecial, FOLLOW_UP_FORM } from "../sim/specials/schema";
 import type { Cue } from "./specialCues";
 
 export const EX_AURA: Cue = { model: "Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", anchor: "feet", scale: 1.0, sequence: "birth", sound: "DivineShield" };
-export const SUPER_AURA: Cue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, sequence: "stand" };
+export const SUPER_AURA: Cue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 2.0, sequence: "stand" };
 export const ULTIMATE_BURST: Cue = { model: "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", anchor: "body", scale: f32(0.6), sequence: "birth", sound: "FlameStrike" };
 export const METER_CUES: readonly Cue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
 export const METER_CUE_MOVES: readonly (readonly [string, Cue])[] = [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate flame burst", ULTIMATE_BURST]];
