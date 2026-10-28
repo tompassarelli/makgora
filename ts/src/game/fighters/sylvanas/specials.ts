@@ -7,13 +7,13 @@ import { hurtPose } from "../../sim/hurtboxes";
 import { sylvanasHit, sylvanasReach, sylvanasStrike } from "./moves";
 
 const BLACK_ARROW: AuthoredSpecial = {
-  endFrame: 40,
+  endFrame: 34,
   projectiles: [{
     model: "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl",
-    spawnFrame: 16, offsetX: 44.0, offsetZ: 60.0, velocityX: 17.0, velocityZ: 0.0, upVelocityZ: 5.0,
+    spawnFrame: 10, offsetX: 44.0, offsetZ: 60.0, velocityX: 17.0, velocityZ: 0.0, upVelocityX: 17.0, upVelocityZ: 5.0,
     life: 36, radius: 10.0, effect: sylvanasHit(8.748000144958496, 35, 72.16999816894531, 16.0), reflectable: true, limit: 1,
   }],
-  hurt: [hurtPose(12, 22, sylvanasReach(44.0, 60.0))],
+  hurt: [hurtPose(6, 16, sylvanasReach(44.0, 60.0))],
 };
 const SILENCE: AuthoredSpecial = {
   endFrame: 48,
@@ -33,7 +33,7 @@ const LIFE_DRAIN: AuthoredSpecial = {
 };
 
 export const SYLVANAS_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Black Arrow", description: "A dark arrow that charges her next bow strike. Hold up to fire upward.", ground: BLACK_ARROW, air: { ...BLACK_ARROW, landingLag: 16 } }, { range: 1.25 }),
+  neutral: withExKit({ name: "Black Arrow", description: "A dark arrow that charges her next bow strike. It leaves on frame 10 of 34, on the ground or in the air, so a short hop fires it before she lands. Hold up to fire upward.", ground: BLACK_ARROW, air: { ...BLACK_ARROW, landingLag: 16 } }, { range: 1.25 }),
   side: withExKit({ name: "Silence", description: "A short curse that stops offensive specials. Movement, attacks and recovery still work.", ground: SILENCE, air: { ...SILENCE, landingLag: 20 } }, { reach: 1.25 }),
   up: withExKit({ name: "Banshee Flight", description: "Rise as a spirit, steering toward the stage, then fall helpless.", ground: flight(f32(2.6), f32(2.6)) }, { travel: 1.25 }),
   down: withExKit({ name: "Life Drain", description: "Catch a nearby foe through their shield and drain a little life. A missed reach leaves her open.", ground: LIFE_DRAIN, air: { ...LIFE_DRAIN, groundOnly: false } }, { reach: 1.25 }),

@@ -40,6 +40,7 @@ import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { GROM_BLOODLUST_MODEL, MURLOC_SWAMP_MIST_MODEL } from "../assets/importedModelInfo";
 import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
 import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
+import { SYLVANAS_SPECIALS } from "../fighters/sylvanas/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
 
@@ -160,6 +161,8 @@ const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\T
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
 // Her own Shadow Strike vortex loops on her body through the 20-frame hold, following the crouch that draws her model back from her position, so the dash reads apart from Fel Rush's green coil.
 const SHADOW_DASH_TELL: Cue = { ...cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "body", f32(1.1)), anchorFrames: [0.0, -9.0, -18.0, -27.0, ...Array.from({ length: 16 }, () => -36.0)].map((x) => ({ x, z: 50.0 })) };
+const BLACK_ARROW_FRAMES = SYLVANAS_SPECIALS.neutral.ground.endFrame;
+const BLACK_ARROW_SHOT = SYLVANAS_SPECIALS.neutral.ground.projectiles?.[0]?.spawnFrame ?? BLACK_ARROW_FRAMES;
 const GLAIVE_GLINT: Cue = { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), anchorFrames: Array.from({ length: WARDEN_SPECIALS.side.ground.endFrame }, () => ({ x: -70.0, z: 62.0 })), color: [200, 230, 255], sound: "MetalLightSliceMetal" };
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
@@ -260,7 +263,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Doomhammer Slam", startup: STORM, active: timed(cue("Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdx", "feet", f32(0.95)), "death", f32(0.3)) },
   },
   [Character.sylvanas]: {
-    neutral: { spell: "Black Arrow", startup: { ...SHADOW, scale: f32(0.25), scaleEnd: f32(0.45), scaleFrames: 15, anchorFrames: Array.from({ length: 40 }, () => ({ x: 44.0, z: 60.0 })) }, active: { ...cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.18)), anchorFrames: Array.from({ length: 40 }, () => ({ x: 44.0, z: 60.0 })) } },
+    neutral: { spell: "Black Arrow", startup: { ...SHADOW, scale: f32(0.25), scaleEnd: f32(0.45), scaleFrames: BLACK_ARROW_SHOT - 1, anchorFrames: Array.from({ length: BLACK_ARROW_FRAMES }, () => ({ x: 44.0, z: 60.0 })) }, active: { ...cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.18)), anchorFrames: Array.from({ length: BLACK_ARROW_FRAMES }, () => ({ x: 44.0, z: 60.0 })) } },
     side: { spell: "Silence", startup: { ...SHADOW, scale: f32(0.3), scaleEnd: f32(0.6), scaleFrames: 18 }, active: { ...cue("Abilities\\Spells\\Other\\Silence\\SilenceTarget.mdx", "ahead", f32(0.85)), birth: { eachFrame: false, strike: 0 } } },
     up: { spell: "Banshee Flight", startup: SHADOW, active: cue("Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx", "body", f32(0.7)) },
     // Classic draws DrainCaster's particles at full reach whatever its scale, so the grab frames show only the drain beam drawn on the grab region (#582).
