@@ -14,6 +14,7 @@ export interface ExUpgrade {
   readonly armorDamage?: number;
   readonly range?: number;
   readonly shieldSafe?: true;
+  readonly guardFrames?: number;
 }
 
 
@@ -66,6 +67,7 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial) => AuthoredSpecia
       beam: move.beam === undefined ? undefined : { ...move.beam, range: f32(f32(move.beam.range * reach) * range) },
       burst: move.burst === undefined ? undefined : { ...move.burst, from: projectile(move.burst.from), into: projectile(move.burst.into) },
       armor: move.armor === undefined ? undefined : { ...move.armor, maxDamage: f32(move.armor.maxDamage * (upgrade.armorDamage ?? 1.0)) },
+      guard: move.guard === undefined ? undefined : { ...move.guard, last: move.guard.last + (upgrade.guardFrames ?? 0) },
       commandGrab: move.commandGrab === undefined ? undefined : { ...move.commandGrab, effect: hit(move.commandGrab.effect),
         strike: { ...move.commandGrab.strike, x1: f32(move.commandGrab.strike.x1 * reach), x2: f32(move.commandGrab.strike.x2 * reach), radius: f32(move.commandGrab.strike.radius * reach) } },
       placement: placement === undefined ? undefined : { ...placement,

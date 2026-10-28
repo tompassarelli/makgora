@@ -119,6 +119,9 @@ those headlines, one per EX:
   before it breaks.
 - **Armor** (`armorDamage`): only where armor is the move's identity, the
   armor holds against heavier hits.
+- **Guard** (`guardFrames`): only for a counter, whose window is its
+  identity: the guard holds longer; startup, the counterattack and the whiff
+  stay.
 
 Each EX keeps the base move's startup, active windows, recovery, landing lag,
 entity limits, status immunity, once-per-airtime limit and helpless ending;
