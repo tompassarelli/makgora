@@ -126,6 +126,13 @@ it points behind him; the action ends on frame 28. In the air the step is
 sideways only, with no rise, once per airtime; he is not helpless, and
 landing mid-move ends it with 20 frames of lag.
 
+**Aim** (added 28 Oct 2026 at Tom's request): the side-B input sets which way
+he faces; the stick held left or right during the aim frames (1–11) sets which
+way he steps, so side-B right then hold left steps him left while he stays
+facing right. Holding nothing, the same side, or only up or down steps him the
+side-B way. The image stays where he stood; frames, distance and the air
+rules are unchanged.
+
 **Swap** (side special while the image stands, no mana): frames 1–5 the image
 flashes; frame 6 he swaps to the image's place; a slash on frames 8–10 at 10%
 EDGE 40° facing the way the image faces; ends on frame 30. The image is gone.

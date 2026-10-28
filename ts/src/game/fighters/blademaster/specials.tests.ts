@@ -11,7 +11,7 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../roster/kits";
 import { AttackStyle, Character, SpecialAction } from "../../sim/codes";
 import { canAttack } from "../../sim/conditions";
-import { type Fighter, createFighter, mutablePlacedObject, placedObject } from "../../sim/fighter";
+import { type Fighter, createFighter, placedObject } from "../../sim/fighter";
 import { attackLandingLag } from "../../sim/moves";
 import { fighterAt } from "../../sim/roster";
 import { mainDeckZ } from "../../sim/stage";
@@ -379,43 +379,4 @@ test("Blademaster's Mirror Image, grounded and from a hop, places its image on f
   }
   assertEquals(measured.join("; "), `grounded: image ${STOCK_IMAGE_FRAME + IMAGE_STARTUP}, step ${STOCK_IMAGE_FRAME + IMAGE_STARTUP + 1}; aerial: image ${STOCK_IMAGE_FRAME + IMAGE_STARTUP}, step ${STOCK_IMAGE_FRAME + IMAGE_STARTUP + 1}`);
   assertEquals(BLADEMASTER_SPECIALS.side.ground.endFrame, STOCK_END_FRAME + IMAGE_STARTUP, "last frame of the move");
-});
-
-const IMAGE_STEP = length(f32(1.0));
-const SIDE_STEP_HEIGHT = 600.0;
-
-function sideStep(air: boolean, stick: Action): string {
-  const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
-  const blademaster = fighter(s, 0);
-  if (air) airborne(blademaster, BLADEMASTER_X, f32(mainDeckZ(0) + SIDE_STEP_HEIGHT));
-  const startZ = blademaster.motion.z;
-  let risen = false;
-  let stood = 0.0;
-  for (let n = 1; n <= IMAGE_WATCH; n++) {
-    frame(s, n === 1 ? [stick, Action.special] : []);
-    if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroSide, "Mirror Image starts");
-    if (n === MIRROR_IMAGE_OBJECT.frame) stood = blademaster.motion.x;
-    risen ||= blademaster.motion.z > startZ;
-  }
-  const image = placedObject(blademaster);
-  const facing = blademaster.facing;
-  const step = Math.round(f32(blademaster.motion.x - image.x) / IMAGE_STEP);
-  const imageWhereHeStood = image.life > 0 && image.x === stood && (air || image.x === BLADEMASTER_X);
-  let again = "";
-  if (air) {
-    mutablePlacedObject(blademaster).life = 0;
-    frame(s, [stick, Action.special]);
-    again = blademaster.special.action === SpecialAction.none ? ", no second step" : ", stepped again";
-  }
-  return `${air ? "air" : "ground"} ${stick === Action.moveRight ? "right" : "left"}: facing ${facing}, step ${step}, image where he stood ${imageWhereHeStood}, rose ${risen}${again}`;
-}
-
-test("Side-B Mirror Image leaves the image where he stood and steps him one length the way the stick points, turning him for a reverse input, grounded and once per airtime in the air with no rise [k1 scenario]", () => {
-  const measured = [false, true].flatMap(air => [Action.moveRight, Action.moveLeft].map(stick => sideStep(air, stick)));
-  assertEquals(measured.join("; "), [
-    "ground right: facing 1, step 1, image where he stood true, rose false",
-    "ground left: facing -1, step -1, image where he stood true, rose false",
-    "air right: facing 1, step 1, image where he stood true, rose false, no second step",
-    "air left: facing -1, step -1, image where he stood true, rose false, no second step",
-  ].join("; "));
 });

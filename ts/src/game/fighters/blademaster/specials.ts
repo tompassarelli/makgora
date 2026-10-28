@@ -137,6 +137,8 @@ const mirrorImage: AuthoredSpecial = {
       hurtPose(17 + IMAGE_STARTUP, 23 + IMAGE_STARTUP, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
     ],
   facesStick: true,
+  aimFrames: 7 + IMAGE_STARTUP,
+  aimsSideways: true,
   placement: MIRROR_IMAGE_OBJECT,
   motion: [
     { ...frames(8 + IMAGE_STARTUP, 11 + IMAGE_STARTUP), velocityX: IMAGE_STEP_SPEED, velocityZ: 0.0 },
@@ -164,7 +166,7 @@ const onceInAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...inAir(spe
 
 export const BLADEMASTER_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { range: 1.25 }),
-  side: withExKit({ name: "Mirror Image", description: "Step the way you point and leave an image where you stood; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImageStanding, air: onceInAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
+  side: withExKit({ name: "Mirror Image", description: "Step the way you point, or hold the other way as he gathers to step there while still facing where you pressed, and leave an image where you stood; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImageStanding, air: onceInAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
   up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
   down: withExKit({ name: "Wind Walk", description: "Fade into a parry; a strike in the window freezes the attacker and he steps out behind them with a kick straight up. A miss leaves him wide open.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),
 };
