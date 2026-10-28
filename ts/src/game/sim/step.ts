@@ -43,7 +43,7 @@ import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOption
 import { GroundOption } from "./stickZones";
 import { heroEgg, heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
-import { closeParasol, endParasolAerial, parasolFall } from "./parasol";
+import { closeParasol, endParasolAerial, parasolFall, reopenParasol } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpCancel } from "./specials";
@@ -652,6 +652,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     sea.applyBuoyancy(f);
   } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredHeight) {
     closeParasol(f, downHeld);
+    reopenParasol(f, input.verticalDirection > 0);
     if (!motion.grounded && !motion.fastFalling && !f.platform.dropConsumed && downHeld && motion.fastFallInputAge < FAST_FALL_INPUT_WINDOW && input.direction === 0
       && down.state === DownState.none && launch.hitstun <= 0 && motion.vz < 0) {
       motion.fastFalling = true;

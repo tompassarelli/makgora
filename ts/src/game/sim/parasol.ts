@@ -4,7 +4,7 @@ export const PARASOL_FALL = 0.30000001192092896;
 
 interface ParasolBody {
   readonly special: { parasol: ParasolState; fall: boolean };
-  readonly motion: { readonly grounded: boolean };
+  readonly motion: { readonly grounded: boolean; fastFalling: boolean };
   readonly jump: { remaining: number };
   readonly launch: { readonly hitstun: number };
   readonly attack: { readonly style: unknown };
@@ -19,6 +19,12 @@ export function openParasol(f: ParasolBody, opens: boolean): boolean {
 
 export function parasolFall(f: Readonly<ParasolBody>): number {
   return f.special.parasol === ParasolState.open && f.launch.hitstun <= 0 && f.attack.style === undefined ? PARASOL_FALL : 1.0;
+}
+
+export function reopenParasol(f: ParasolBody, upHeld: boolean): void {
+  if (!upHeld || f.motion.grounded || f.special.parasol !== ParasolState.closed) return;
+  f.special.parasol = ParasolState.open;
+  f.motion.fastFalling = false;
 }
 
 export function closeParasol(f: ParasolBody, downHeld: boolean): void {

@@ -1,4 +1,4 @@
-import { assertEquals, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertNear, test } from "wisp/src/runtime/testing";
 import { Action } from "../../input/actions";
 import { f32 } from "wisp/src/sim/f32";
 import { airborne, fighter, frame, scene } from "../../match/padScene";
@@ -45,4 +45,51 @@ test("The parasol hides when Chen lands out of the float [k3 measure docs/design
   assertEquals(chen.motion.grounded, true, "he lands");
   assertEquals(parasolShown(chen), false, "landing closes and hides it");
   assertEquals(shown.join(), open.join(), "shown on exactly the open frames");
+});
+
+test("Up reopens a closed parasol any number of times with the open fall speed until Chen lands, and an aerial still spends it [k3 measure docs/design/chen.md]", () => {
+  const { chen, step, shown, open } = floatOver(900.0);
+  for (let n = 1; n <= CHEN_SPECIALS.up.ground.endFrame + 1; n++) step(UP_B(n));
+  const fallPerFrame = (actions: readonly Action[]) => {
+    const before = chen.motion.z;
+    for (let n = 0; n < 6; n++) step(actions);
+    return f32(before - chen.motion.z) / 6;
+  };
+  for (let n = 0; n < 20; n++) step();
+  const openFall = fallPerFrame([]);
+  for (let round = 0; round < 3; round++) {
+    step([Action.moveDown]);
+    step([Action.moveDown]);
+    assertEquals(chen.special.parasol, ParasolState.closed, `down closes it, round ${round}`);
+    assertEquals(parasolShown(chen), false, "hidden while closed");
+    step([Action.moveUp]);
+    assertEquals(chen.special.parasol, ParasolState.open, `up reopens it, round ${round}`);
+    assertEquals(parasolShown(chen), true, "shown again");
+  }
+  assertEquals(chen.jump.remaining, 0, "reopening grants no jump");
+  const reopenedFall = fallPerFrame([]);
+  assertNear(reopenedFall, openFall, f32(0.01));
+  step([Action.moveDown]);
+  step([Action.moveDown]);
+  const closedFall = fallPerFrame([]);
+  assertEquals(closedFall > openFall, true, "closed falls faster than open");
+  step([Action.moveUp]);
+  step([Action.attack]);
+  assertEquals(chen.special.parasol, ParasolState.spent, "an aerial spends the reopened parasol");
+  step([Action.moveUp]);
+  assertEquals(chen.special.parasol === ParasolState.open, false, "a spent parasol does not reopen");
+  assertEquals(shown.join(), open.join(), "shown on exactly the open frames");
+});
+
+test("A parasol closed then reopened is cleared when Chen lands [k3 measure docs/design/chen.md]", () => {
+  const { chen, step } = floatOver(260.0);
+  for (let n = 1; n <= CHEN_SPECIALS.up.ground.endFrame + 1; n++) step(UP_B(n));
+  step([Action.moveDown]);
+  step([Action.moveDown]);
+  step([Action.moveUp]);
+  assertEquals(chen.special.parasol, ParasolState.open, "reopened");
+  for (let n = 0; n < 900 && !chen.motion.grounded; n++) step();
+  step();
+  assertEquals(chen.motion.grounded, true, "he lands");
+  assertEquals(chen.special.parasol, ParasolState.none, "landing clears it");
 });

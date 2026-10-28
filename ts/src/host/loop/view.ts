@@ -253,7 +253,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   if (body === undefined || !isActive(s.world, slot)) return;
   const fighter = fighterAt(s.world, slot);
   renderDizzy(body, fighter, s.game.phase === Phase.match, s.origin);
-  renderParasol(body, fighter, s.game.phase === Phase.match, s.origin, s.game.stageChoice);
+  renderParasol(body, fighter, s.game.phase === Phase.match, s.origin, s.game.stageChoice, s.runtime.simulationFrame);
   colorFighterBody(body, slot, fighterColor(s.game, slot));
   const hidden = s.hiddenFighters[slot];
   const cloaked = hidden?.body === true;

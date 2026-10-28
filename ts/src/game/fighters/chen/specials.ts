@@ -75,6 +75,6 @@ const stormRise = (height: number, drift: number): AuthoredSpecial => ({
 export const CHEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Breath of Fire", description: "Breathe a long, fanning cone of flame; a soaked foe takes extra damage and burns.", ground: breath(false), air: breath(true) }, { reach: 1.25 }),
   side: withExKit({ name: "Body Slam", description: "Belly-charge forward; stop at the first body or shield and pop the foe up. A miss leaves him open.", ground: bodySlam(false), air: bodySlam(true) }, { travel: 1.25 }),
-  up: withExKit({ name: "Storm Rise", description: "Rise in a crackling storm, then open the parasol: float and steer, hold down to close it, and swing one aerial before falling helplessly.", ground: stormRise(f32(3.0), 1.0) }, { travel: 1.25 }),
+  up: withExKit({ name: "Storm Rise", description: "Rise in a crackling storm, then open the parasol: float and steer, hold down to close it and up to open it again, and swing one aerial before falling helplessly.", ground: stormRise(f32(3.0), 1.0) }, { travel: 1.25 }),
   down: withExKit({ name: "Brew Keg", description: "Pour ale into the keg in three glugs, then press special to lob it; a fuller keg slows and soaks longer and feeds Breath of Fire more.", ground: keg(false), air: keg(true) }, { reach: 1.25 }),
 };
