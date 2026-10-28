@@ -12,6 +12,8 @@ import { controls } from "../../sim/testWorld";
 import { type ShockwaveRing, shockwaveRing } from "../../presentation/shockwaveRing";
 import { HOWL_FIRST, HOWL_REACH, PIT_LORD_SPECIALS, TERRIFIED } from "./specials";
 import { fillMeter } from "../../sim/meter";
+import { heroCueWindows } from "../../presentation/cueWindows";
+import { HERO_CUES } from "../../presentation/specialCues";
 
 const H = HERO_REFERENCE_HEIGHT;
 const NEUTRAL_B = controls({ specialPressed: true });
@@ -89,7 +91,7 @@ test("A shield blocks the terror but takes the roar's heavy shield damage and is
 
 test("An airborne foe is pushed away from Pit Lord on either side at 45 degrees and is never terrified [k3 measure docs/design/pit-lord.md]", () => {
   for (const side of [1.0, -1.0]) {
-    const { target } = roar(f32(side * f32(H * f32(1.0))), 0.0, (foe) => { lift(foe, f32(H * f32(1.0))); });
+    const { target } = roar(f32(side * f32(H * f32(1.0))), 0.0, (foe) => { lift(foe, f32(H * f32(1.6))); });
     assertEquals(target.status.condition, HeroStatusKind.none);
     assertEquals(target.status.damage, HOWL_DAMAGE);
     assertTrue(f32(target.motion.vx * side) > 0.0 || f32(target.launch.knockbackX * side) > 0.0);
@@ -106,7 +108,7 @@ test("The drawn shockwave ring is the live hit region on every active frame and 
     let widest = 0.0;
     let drawn = 0;
     stepDuel(world, NEUTRAL_B);
-    for (let frame = 1; frame < 34; frame++) {
+    for (let frame = 1; frame < 40; frame++) {
       const move = runningHeroSpecial(pitLord);
       const active = move?.regions?.find((region) => pitLord.special.frame - 1 >= region.firstFrame && pitLord.special.frame - 1 <= region.lastFrame);
       const pose = shockwaveRing(ring, pitLord);
@@ -126,4 +128,24 @@ test("The drawn shockwave ring is the live hit region on every active frame and 
     assertEquals(widest, HOWL_REACH);
     assertEquals(HOWL_REACH, f32(H * f32(1.6)));
   }
+});
+
+test("The first ring is active on frame 18 and not before, and the roar sounds on frame 1 under a glow held through frames 1-17 [k3 measure docs/design/pit-lord.md]", () => {
+  assertEquals(HOWL_FIRST, 18);
+  const pitLord = createFighter(Character.pitLord, 0.0, 1);
+  fillMeter(pitLord);
+  const target = createFighter(Character.rifleman, f32(H * f32(0.8)), -1);
+  const { world } = duelPair(pitLord, target);
+  stepDuel(world, NEUTRAL_B);
+  let firstHit = 0;
+  for (let frame = 1; frame < 40 && firstHit === 0; frame++) {
+    if (target.status.damage > 0.0) firstHit = pitLord.special.frame;
+    else stepDuel(world);
+  }
+  assertEquals(firstHit, HOWL_FIRST);
+  const { startup } = heroCueWindows(PIT_LORD_SPECIALS.neutral.ground);
+  assertEquals(startup.first, 1);
+  assertTrue(startup.last >= HOWL_FIRST - 1);
+  assertEquals(PIT_LORD_SPECIALS.neutral.ground.endFrame, 40);
+  assertEquals(HERO_CUES[Character.pitLord]?.neutral.startup.sound, "HowlOfTerror");
 });
