@@ -78,7 +78,7 @@ deviation's reason, issue and decision date are written.
   - Ours: off: jump is its own button; Melee: stick up jumps, always
   - Other games: Optional from Brawl onward ("Stick Jump" in Ultimate; [SmashWiki](https://www.ssbwiki.com/Tap_jump))
 - Tilt or smash, probed on a full forward press `tilt-versus-smash`: smashes come from the Strong button, after Rivals of Aether's strong attack (docs/gameplay-design.md, Ground states) (Tom 2026-10-24, #186)
-  - Ours: the Strong button or C-stick; a full stick press alone is a tilt; Melee: stick speed: a flick smashes, a slower press tilts
+  - Ours: the Strong button; the C-stick and a full stick press alone are tilts; Melee: stick speed: a flick smashes, a slower press tilts
 - Tilt modifier stick values `tilt-modifier`: a box controller's modifier, one stick unit inside roll, tap jump and crouch (Tom 2026-10-25, #282)
   - Ours: x 0.6875, up 0.65, down 0.675; Melee: none
 - Air dodge `air-dodge`: the air dodge works as in Smash (Tom 2026-10-06, #100)
@@ -240,7 +240,7 @@ deviation's reason, issue and decision date are written.
 | Crouch stick threshold `stick-crouch` | 0.6875 | [0.6875](https://www.ssbwiki.com/Crouch) | [stickZones.ts:18](../../ts/src/game/sim/stickZones.ts#L18) `CROUCH_STICK_THRESHOLD` | parity |
 | Tap jump stick threshold, used by the platform bands `stick-tap-jump` | 0.6625 | [0.6625](https://www.ssbwiki.com/Tap_jump) | [stickZones.ts:15](../../ts/src/game/sim/stickZones.ts#L15) `TAP_JUMP_STICK_THRESHOLD` | parity |
 | Tap jump `tap-jump` | off: jump is its own button | [stick up jumps, always](https://www.ssbwiki.com/Tap_jump) | [stickZones.ts:17](../../ts/src/game/sim/stickZones.ts#L17) `TAP_JUMP_WINDOW` | deviation: jump is its own button (Tom 2026-10-06, #49) |
-| Tilt or smash, probed on a full forward press `tilt-versus-smash` | the Strong button or C-stick; a full stick press alone is a tilt | [stick speed: a flick smashes, a slower press tilts](https://www.ssbwiki.com/Smash_attack) | [combat.ts:33](../../ts/src/game/input/combat.ts#L33) `normalAttackStyle` | deviation: smashes come from the Strong button, after Rivals of Aether's strong attack (docs/gameplay-design.md, Ground states) (Tom 2026-10-24, #186) |
+| Tilt or smash, probed on a full forward press `tilt-versus-smash` | the Strong button; the C-stick and a full stick press alone are tilts | [stick speed: a flick smashes, a slower press tilts](https://www.ssbwiki.com/Smash_attack) | [combat.ts:33](../../ts/src/game/input/combat.ts#L33) `normalAttackStyle` | deviation: smashes come from the Strong button, after Rivals of Aether's strong attack (docs/gameplay-design.md, Ground states) (Tom 2026-10-24, #186) |
 | Tilt modifier stick values `tilt-modifier` | x 0.6875, up 0.65, down 0.675 | [none](https://www.ssbwiki.com/Control_stick) | [stick.ts:11](../../ts/src/game/sim/stick.ts#L11) `TILT_STICK_X` | deviation: a box controller's modifier, one stick unit inside roll, tap jump and crouch (Tom 2026-10-25, #282) |
 | Air dodge `air-dodge` | once per airtime, ending actionable; refreshed on landing, ledge catch and being hit | [directional; ends in helpless fall until landing](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:69](../../ts/src/game/sim/jumpsAndDodges.ts#L69) `beginAirDodge` | deviation: the air dodge works as in Smash (Tom 2026-10-06, #100) |
 | Air dodge speed decay a frame `air-dodge-decay` | 0.9 | [0.9](https://www.ssbwiki.com/Air_dodge) | [jumpsAndDodges.ts:17](../../ts/src/game/sim/jumpsAndDodges.ts#L17) `AIR_DODGE_DECAY` | parity |

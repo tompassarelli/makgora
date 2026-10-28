@@ -355,7 +355,6 @@ function firstStart(plans: Plans): number {
 
 const towardOf = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.moveRight : Action.moveLeft);
 const awayOf = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.moveLeft : Action.moveRight);
-const smashToward = (self: Fighter, other: Fighter): Action => (other.motion.x >= self.motion.x ? Action.cRight : Action.cLeft);
 
 const press = (name: string, kind: StartKind, held: (self: Fighter, other: Fighter) => Held): Option =>
   ({ name, kind, input: (i, self, other) => (i === 0 ? held(self, other) : []) });
@@ -370,9 +369,9 @@ const JAB = attack("jab", AttackStyle.jab, () => [Action.attack]);
 const FTILT = attack("forward tilt", AttackStyle.forwardTilt, (self, other) => [Action.walk, towardOf(self, other), Action.attack]);
 const UTILT = attack("up tilt", AttackStyle.upTilt, () => [Action.walk, Action.moveUp, Action.attack]);
 const DTILT = attack("down tilt", AttackStyle.downTilt, () => [Action.walk, Action.moveDown, Action.attack]);
-const FSMASH = attack("forward smash", AttackStyle.forwardSmash, (self, other) => [smashToward(self, other)]);
-const USMASH = attack("up smash", AttackStyle.upSmash, () => [Action.cUp]);
-const DSMASH = attack("down smash", AttackStyle.downSmash, () => [Action.cDown]);
+const FSMASH = attack("forward smash", AttackStyle.forwardSmash, (self, other) => [Action.strong, towardOf(self, other)]);
+const USMASH = attack("up smash", AttackStyle.upSmash, () => [Action.strong, Action.moveUp]);
+const DSMASH = attack("down smash", AttackStyle.downSmash, () => [Action.strong, Action.moveDown]);
 const GRAB = attack("grab", AttackStyle.grab, () => [Action.grab]);
 const SHIELD: Option = { name: "shield", kind: "shield", input: () => [Action.rightTrigger] };
 const SPOT_DODGE = press("spot dodge", "dodge", () => [Action.rightTrigger, Action.moveDown]);

@@ -71,7 +71,7 @@ export function controllerContract() {
     thresholds: {
       stickDeadzone: STICK_DEADZONE,
       tapJump: TAP_JUMP_STICK_THRESHOLD,
-      cStickSmash: DASH_STICK_THRESHOLD,
+      cStickFlick: DASH_STICK_THRESHOLD,
       triggerPress: TRIGGER_PRESS_LEVEL,
       triggerFull: TRIGGER_FULL_LEVEL,
     },

@@ -178,8 +178,10 @@ Where Smashcraft keeps its own rule, and why:
   of a run, is the dash attack, and only Strong + a direction smashes on dash frames 1–3.
   Strong + B with a direction is the special's EX form; A + B at a full ultimate meter
   stays the ultimate, Strong held or not, and below a full meter it is the
-  plain special. The C-stick keeps its smashes (tilts with the walk
-  modifier or its tilt setting).
+  plain special. On the ground the C-stick gives tilts, not smashes (Tom,
+  2026-10-28): C-left and C-right are the forward tilt, turning to face that side
+  first, C-up the up tilt and C-down the down tilt, with or without the walk
+  modifier; in the air it gives the aerials. Smashes come only from Strong.
 - A held stick at full deflection (keyboard keys and a pad at the rim) still
   dashes when it was not a fresh flick, keeping the walk modifier's release
   to a dash (smashcraft:docs/physics.md); a pad held at 0.8–0.99 walks fast.
@@ -1556,8 +1558,8 @@ The descriptive basis is [fighting-game language](design/fighting-games.md),
 | Offstage air-dodge buffering | Do not add a general held-input air-dodge buffer. Retain fresh dodge presses and the deliberate dodge press queued during jump squat; a fresh offstage press still works when legal. | Avoid accidental automatic dodges while preserving explicit player commands. |
 | Platforms | Down past crouch depth mounts instantly while rising without an aerial; otherwise rise through. A fresh hard-down press drops immediately and is consumed before fast fall; no transit frames or shield drop ([Platforms](#platforms)). | Tom’s final playtest rule, 14 Oct 2026, replaces #103/#392. |
 | Short hop and jump squat | Keep release-during-squat short hops, without a jump+attack macro or a new mandatory binding. Jump squat remains per fighter within #69's 3–5 frames: Rifleman 5, Illidan 4. | Preserves current controls and physical differences inside the accepted execution bounds. |
-| Input buffer and priority | Keep the 6-frame human attack grace. Same-frame attack requests prefer grab, unchargeable C-stick smash, chargeable smash, tilt, then the established style ordering; conflicting equal requests leave facing neutral. Existing action locks and fresh-input rules remain authoritative. | Deterministic input intent without a new universal hold buffer or callback-order priority. |
-| Right stick with Tilt | A C-stick press while Tilt is held makes the matching tilt on the ground and the matching aerial in the air. With the controller's Right stick setting at Tilt attacks, padbridge holds Tilt with every right-stick deflection, so the right stick tilts and throws aerials in any layout; at Smash attacks (the default) it smashes. | Tom's decision, a controller setting since 11 Oct 2026 (was his pad profile), without widening the 18-action input wire. |
+| Input buffer and priority | Keep the 6-frame human attack grace. Same-frame attack requests prefer grab, unchargeable smash, chargeable smash, tilt, then the established style ordering; conflicting equal requests leave facing neutral. Existing action locks and fresh-input rules remain authoritative. | Deterministic input intent without a new universal hold buffer or callback-order priority. |
+| Right stick | A C-stick press makes the matching tilt on the ground (C-left and C-right the forward tilt, turning to face that side first) and the matching aerial in the air, with or without the Tilt modifier; the right stick never smashes, and Strong + a direction is the ground smash. The controller's Right stick setting (Smash or Tilt attacks) now differs only in holding Tilt with every right-stick deflection. | Tom's decision, 28 Oct 2026, replacing the 11 Oct 2026 controller setting that chose between smashes and tilts. |
 | Wall movement | Keep existing wall tech and authored wall-jump eligibility. No wall climbing or free refresh of jumps, recovery specials or ledge protection. | Movement should respect the visible stage walls without granting an unlimited recovery loop. |
 | Ledges | Keep exclusive occupancy/edgehogging, first-grab catch intangibility of 30 frames (shrinking by 8 per regrab until the stage is touched, #386) and the 30-frame regrab lock. No trump or extra two-frame catch vulnerability. | Retains the current Melee-derived ledge system within #69's accepted bounds. |
 | DI, crouch and ASDI | Retain 18° maximum continuous DI rotation, crouch cancelling and ASDI-down landing behaviour. SDI/ASDI travel uses the selected bounded-SDI design when #70 is implemented. | Keep useful defensive positioning while addressing teleport distance at its chosen seam. |

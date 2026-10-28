@@ -24,8 +24,10 @@
 435 a capture
 490 a stick -1 0
 510 a stick 0 0
-540 a cstick -1 0
-541 a cstick 0 0
+540 a stick -1 0
+540 a press LB
+541 a stick 0 0
+541 a release LB
 557 a capture
 620 a press VIEW
 690 a release VIEW

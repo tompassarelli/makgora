@@ -2,8 +2,10 @@
 #! chat -dev setup quick pair mountain king / mountain king;percent 1 45
 20 b stick -1 0
 52 b stick 0 0
-92 b cstick 0 1
-94 b cstick 0 0
+92 b stick 0 1
+92 b press LB
+94 b stick 0 0
+94 b release LB
 184 a capture
 188 a capture
 192 a capture

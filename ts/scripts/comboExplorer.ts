@@ -63,19 +63,19 @@ const SPECIAL = bit(Action.special);
 const JUMP = bit(Action.jump);
 const GRAB = bit(Action.grab);
 const WALK = bit(Action.walk);
+const STRONG = bit(Action.strong);
 const LEFT = bit(Action.moveLeft);
 const RIGHT = bit(Action.moveRight);
 const UP = bit(Action.moveUp);
 const DOWN = bit(Action.moveDown);
 const SHIELD = bit(Action.rightTrigger);
-const SMASH_LEFT = bit(Action.cLeft);
-const SMASH_RIGHT = bit(Action.cRight);
-const SMASH_UP = bit(Action.cUp);
-const SMASH_DOWN = bit(Action.cDown);
+const C_LEFT = bit(Action.cLeft);
+const C_RIGHT = bit(Action.cRight);
+const C_UP = bit(Action.cUp);
+const C_DOWN = bit(Action.cDown);
 
 const toward = (self: Readonly<Fighter>, other: Readonly<Fighter>): number => (other.motion.x >= self.motion.x ? RIGHT : LEFT);
 const away = (self: Readonly<Fighter>, other: Readonly<Fighter>): number => (other.motion.x >= self.motion.x ? LEFT : RIGHT);
-const smashToward = (self: Readonly<Fighter>, other: Readonly<Fighter>): number => (other.motion.x >= self.motion.x ? SMASH_RIGHT : SMASH_LEFT);
 const forward = (self: Readonly<Fighter>): number => (self.facing > 0 ? RIGHT : LEFT);
 const backward = (self: Readonly<Fighter>): number => (self.facing > 0 ? LEFT : RIGHT);
 
@@ -100,9 +100,9 @@ const GROUND_MOVES: readonly Move[] = [
   ground("forward tilt", AttackStyle.forwardTilt, (a, b) => WALK | toward(a, b) | ATTACK),
   ground("up tilt", AttackStyle.upTilt, () => WALK | UP | ATTACK),
   ground("down tilt", AttackStyle.downTilt, () => WALK | DOWN | ATTACK),
-  ground("forward smash", AttackStyle.forwardSmash, smashToward),
-  ground("up smash", AttackStyle.upSmash, () => SMASH_UP),
-  ground("down smash", AttackStyle.downSmash, () => SMASH_DOWN),
+  ground("forward smash", AttackStyle.forwardSmash, (a, b) => STRONG | toward(a, b)),
+  ground("up smash", AttackStyle.upSmash, () => STRONG | UP),
+  ground("down smash", AttackStyle.downSmash, () => STRONG | DOWN),
 ];
 const GRAB_MOVE: Move = { name: "grab", kind: "grab", style: AttackStyle.grab, press: () => GRAB };
 
@@ -110,10 +110,10 @@ const DASH_ATTACK: Move = { name: "dash attack", kind: "dash", style: AttackStyl
 const DASH_GRAB: Move = { name: "dash grab", kind: "grab", style: AttackStyle.grab, press: (a, b) => toward(a, b) | GRAB };
 const AERIALS: readonly Move[] = [
   aerial("neutral air", AttackStyle.neutralAir, () => ATTACK),
-  aerial("forward air", AttackStyle.forwardAir, (a) => (a.facing > 0 ? SMASH_RIGHT : SMASH_LEFT)),
-  aerial("back air", AttackStyle.backAir, (a) => (a.facing > 0 ? SMASH_LEFT : SMASH_RIGHT)),
-  aerial("up air", AttackStyle.upAir, () => SMASH_UP),
-  aerial("down air", AttackStyle.downAir, () => SMASH_DOWN),
+  aerial("forward air", AttackStyle.forwardAir, (a) => (a.facing > 0 ? C_RIGHT : C_LEFT)),
+  aerial("back air", AttackStyle.backAir, (a) => (a.facing > 0 ? C_LEFT : C_RIGHT)),
+  aerial("up air", AttackStyle.upAir, () => C_UP),
+  aerial("down air", AttackStyle.downAir, () => C_DOWN),
 ];
 const SPECIALS: readonly Move[] = [
   special("neutral special", SpecialSlot.neutral, () => SPECIAL),

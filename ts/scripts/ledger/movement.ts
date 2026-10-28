@@ -123,7 +123,7 @@ function tractionAboveWalk(): string {
 function strongAttack(): string {
   const press = normalAttackStyle(1, 0, false, false, false);
   const strong = normalAttackStyle(1, 0, false, true, false);
-  if (press === AttackStyle.forwardTilt && strong === AttackStyle.forwardSmash) return "the Strong button or C-stick; a full stick press alone is a tilt";
+  if (press === AttackStyle.forwardTilt && strong === AttackStyle.forwardSmash) return "the Strong button; the C-stick and a full stick press alone are tilts";
   return `full press gives style ${press}, Strong gives ${strong}`;
 }
 

@@ -1,10 +1,12 @@
-# #432 row 18: a presses jump, then up smash on the C-stick during jump squat; the up smash comes out of the squat and a never leaves the ground.
+# #432 row 18: a presses jump, then up smash on Strong + up during jump squat; the up smash comes out of the squat and a never leaves the ground.
 #! chat -dev quick hero mountain king stocks 3
 60 a tap B 2
 60 a capture
-61 a cstick 0 1
+61 a stick 0 1
+61 a press LB
 61 a capture
-63 a cstick 0 0
+63 a stick 0 0
+63 a release LB
 64 a capture
 70 a capture
 80 a capture

@@ -62,8 +62,8 @@ function afterReset(name: string, presses: readonly Press[], frames: number, exp
 export const approachStep = (slot: number, frames: number): SmokeStep => ({ name: "approach", presses: [{ at: 0, keys: [key(Action.walk), key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft)], hold: frames }], frames });
 
 export const strikeStep = (slot: number, approach: number): SmokeStep => {
-  const smash = key(facingOf(slot) > 0 ? Action.cRight : Action.cLeft);
-  return { name: "strike", presses: Array.from({ length: STRIKES }, (_, strike): Press => ({ at: approach + 4 + strike * STRIKE_EVERY, keys: [smash], hold: 4 })), frames: approach + 4 + STRIKES * STRIKE_EVERY };
+  const toward = key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft);
+  return { name: "strike", presses: Array.from({ length: STRIKES }, (_, strike): Press => ({ at: approach + 4 + strike * STRIKE_EVERY, keys: [key(Action.strong), toward], hold: 4 })), frames: approach + 4 + STRIKES * STRIKE_EVERY };
 };
 
 function charge(slot: number, approaches: readonly [number, number]): SmokeStep[] {
@@ -97,9 +97,9 @@ export function smokeMoves(facing: 1 | -1): readonly SmokeStep[] {
     move("Forward tilt", [tap([walk, key(toward), key(Action.attack)])], attack(AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown)),
     move("Up tilt", [tap([walk, key(Action.moveUp), key(Action.attack)])], attack(AttackStyle.upTilt)),
     move("Down tilt", [tap([walk, key(Action.moveDown), key(Action.attack)])], attack(AttackStyle.downTilt)),
-    move("Forward smash", [tap([key(smashToward)])], attack(AttackStyle.forwardSmash)),
-    move("Up smash", [tap([key(Action.cUp)])], attack(AttackStyle.upSmash)),
-    move("Down smash", [tap([key(Action.cDown)])], attack(AttackStyle.downSmash)),
+    move("Forward smash", [tap([key(Action.strong), key(toward)])], attack(AttackStyle.forwardSmash)),
+    move("Up smash", [tap([key(Action.strong), key(Action.moveUp)])], attack(AttackStyle.upSmash)),
+    move("Down smash", [tap([key(Action.strong), key(Action.moveDown)])], attack(AttackStyle.downSmash)),
     move("Grab", [tap([key(Action.grab)])], attack(AttackStyle.grab)),
     move("Dash attack", [{ at: 0, keys: [key(away)], hold: 34 }, { at: 18, keys: [key(Action.attack)], hold: 4 }, { at: 26, keys: [key(Action.attack)], hold: 4 }], attack(AttackStyle.dashAttack, AttackStyle.demonHunterDashAttack)),
     aerial("Neutral air", Action.attack, AttackStyle.neutralAir),

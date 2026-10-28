@@ -23,8 +23,8 @@
   Input lines are `FRAME WORD...`: the words are held from that frame until
   the next line (an empty line body or `neutral` releases everything); `left
   right up down` push the stick fully, `x=N z=N` set it between -127 and 127,
-  `attack special jump grab shield walk short-hop smash-left smash-right
-  smash-up smash-down` press buttons, and a trailing `!` holds a button for
+  `attack special jump grab shield strong walk short-hop c-left c-right
+  c-up c-down` press buttons, and a trailing `!` holds a button for
   that one frame. A command stated at frame F reaches the fighter at frame F
   plus `--delay` (default 4). The whole input is read before the match starts,
   so an agent that plays turn by turn re-runs the match with the file grown by

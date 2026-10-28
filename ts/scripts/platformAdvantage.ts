@@ -28,7 +28,7 @@ const NEUTRAL: Held = [];
 
 
 function belowPlans(): Plan[] {
-  const plans: Plan[] = [(n) => (n === 1 ? [Action.cUp] : []), (n) => (n === 1 ? [Action.walk, Action.moveUp, Action.attack] : [])];
+  const plans: Plan[] = [(n) => (n === 1 ? [Action.strong, Action.moveUp] : []), (n) => (n === 1 ? [Action.walk, Action.moveUp, Action.attack] : [])];
   for (const full of [true, false]) {
     for (const aerial of [UP_AIR, TILT_UP_AIR, NEUTRAL_AIR]) {
       for (let at = 2; at <= LATEST_AERIAL; at++) {

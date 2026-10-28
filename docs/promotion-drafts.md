@@ -29,7 +29,7 @@ This is the first public version; it's early, expect rough edges, tell us what f
 | LT (left trigger) | Shield / air-dodge | Shield / air-dodge |
 | RT (right trigger) | Shield / air-dodge | Shield / air-dodge |
 | Left stick | Move; up aims, down crouches / fast-falls / drops through platforms | Same |
-| Right stick | Directional smash attacks on the ground; aerial attacks in the air | Directional tilts on the ground; aerial attacks in the air |
+| Right stick | Directional tilts on the ground; aerial attacks in the air | Same |
 | Start | Confirm selections; pause / resume | Same |
 
 Tap a jump button for a short hop or hold it for a full hop. Stick-up does not jump unless you enable Tap jump. In fighter and stage menus, the left stick moves the pointer, A chooses, B goes back and Start confirms. Start with Training and try each trigger separately; either one shields on the ground and air-dodges in the air.
