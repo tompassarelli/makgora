@@ -145,7 +145,7 @@ const rise = (distance: number) => chargedAngleMotion(length(distance), RISE_FRA
 const risingBlade: AuthoredSpecial = {
   endFrame: 24 + RISE_STARTUP,
   aimFrames: RISE_AIM_FRAMES,
-  motion: rise(f32(4.1)),
+  motion: rise(f32(4.4)),
   regions: path(RISE_AIM_FRAMES + 1, [
     capsule(74.0, 113.0, 188.0, 121.0),
     capsule(65.0, 114.0, 185.0, 121.0),
