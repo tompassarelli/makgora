@@ -287,7 +287,7 @@ function probeReceipt(s: ShellState, actor: number, message: string, requests: D
   }
   if (message === DESYNC_COMMAND) return desyncReceipt(actor);
   if (setup !== undefined) {
-    makePreview(s);
+    if (s.game.phase !== Phase.match) makePreview(s);
     return setup;
   }
   return startAgencyFixture(s, message) ?? startBodyFit(s, message) ?? applyDevCommand(s.dev, message);
