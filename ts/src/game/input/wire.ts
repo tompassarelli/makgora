@@ -21,7 +21,7 @@ const MAX_EPOCH = 2147483647;
 export const HEADER_MIN_BYTES = 5;
 const HEADER_MAX_BYTES = 17;
 export const RECORD_MIN_BYTES = 1;
-const RECORD_MAX_BYTES = 21;
+const RECORD_MAX_BYTES = 33;
 export const PACKET_MAX_BYTES = HEADER_MAX_BYTES + 2 * RECORD_MAX_BYTES;
 
 export interface InputPacket {
@@ -32,6 +32,9 @@ export interface InputPacket {
 }
 
 const Flag = { held: 1, edges: 2, axes: 4, triggers: 8, metadata: 16, throws: 32 } as const;
+
+// Companion rows carry 18 action bits in three digits; a wider mask is escaped as zero digits then four digits, which no canonical narrow row writes.
+const NARROW_ACTIONS = 64 * 64 * 64 - 1;
 
 
 const validPacket = (epoch: number, firstFrame: number, rows: number) => epoch >= 0 && firstFrame >= 1 && firstFrame <= INPUT_LAST_FRAME
@@ -76,6 +79,16 @@ const directionDigit = (value: Direction) => (value < 0 ? 1 : value * 2);
 const signedDigit = (value: number) => (value < 0 ? -2 * value - 1 : 2 * value);
 const signedValue = (digit: number) => (floorMod(digit, 2) === 1 ? -floorDiv(digit + 1, 2) : floorDiv(digit, 2));
 
+function heldGroup(held: number): string {
+  return held > NARROW_ACTIONS ? digits(0, 3) + digits(held, 4) : digits(held, 3);
+}
+
+function edgeGroup(pressed: number, released: number): string {
+  return pressed > NARROW_ACTIONS || released > NARROW_ACTIONS
+    ? digits(0, 6) + digits(pressed, 4) + digits(released, 4)
+    : digits(pressed, 3) + digits(released, 3);
+}
+
 function encodeRecord(row: Readonly<InputRow>): string {
   let flags = 0;
   let body = "";
@@ -83,8 +96,8 @@ function encodeRecord(row: Readonly<InputRow>): string {
     flags |= flag;
     body += text;
   };
-  if (row.held !== 0) group(Flag.held, digits(row.held, 3));
-  if (row.pressed !== 0 || row.released !== 0) group(Flag.edges, digits(row.pressed, 3) + digits(row.released, 3));
+  if (row.held !== 0) group(Flag.held, heldGroup(row.held));
+  if (row.pressed !== 0 || row.released !== 0) group(Flag.edges, edgeGroup(row.pressed, row.released));
   const axes = signedDigit(row.axisX) * 255 + signedDigit(row.axisZ);
   if (axes !== 0) group(Flag.axes, digits(axes, 3));
   const triggers = row.triggerLeft * 256 + row.triggerRight;
@@ -158,6 +171,26 @@ class Reader {
   }
 
 
+  /** Reads count action masks, narrow or escaped wide, into masks; false when malformed or not canonical. */
+  actions(masks: number[], count: number): boolean {
+    let wide = true;
+    for (let i = 0; i < count; i++) {
+      const mask = this.digits(3);
+      if (mask === undefined) return false;
+      masks[i] = mask;
+      if (mask !== 0) wide = false;
+    }
+    if (!wide) return true;
+    let largest = 0;
+    for (let i = 0; i < count; i++) {
+      const mask = this.digits(4);
+      if (mask === undefined || mask > ALL_ACTIONS) return false;
+      masks[i] = mask;
+      if (mask > largest) largest = mask;
+    }
+    return largest > NARROW_ACTIONS;
+  }
+
   group(width: number, maximum: number): number | undefined {
     const value = this.digits(width);
     return value !== undefined && value > 0 && value <= maximum ? value : undefined;
@@ -166,26 +199,36 @@ class Reader {
 
 const direction = (metadata: number, place: number) => signedValue(floorMod(floorDiv(metadata, place), 3));
 
+const MASKS = [0, 0];
+
+/** Reads the record's held and edge masks into row; an edge group needs a press or a release. */
+function readActions(reader: Reader, flags: number, row: InputRow): boolean {
+  row.held = 0;
+  row.pressed = 0;
+  row.released = 0;
+  if ((flags & Flag.held) !== 0) {
+    if (!reader.actions(MASKS, 1)) return false;
+    row.held = at(MASKS, 0);
+  }
+  if ((flags & Flag.edges) !== 0) {
+    if (!reader.actions(MASKS, 2)) return false;
+    row.pressed = at(MASKS, 0);
+    row.released = at(MASKS, 1);
+  }
+  return true;
+}
+
 /** Reads one record into row, which holds garbage when it fails. */
 function readRecord(reader: Reader, row: InputRow): boolean {
   const flags = reader.digit();
-  if (flags === undefined) return false;
-  const edges = (flags & Flag.edges) !== 0;
-  const held = (flags & Flag.held) !== 0 ? reader.group(3, ALL_ACTIONS) : 0;
-  const pressed = edges ? reader.digits(3) : 0;
-  const released = edges ? reader.digits(3) : 0;
+  if (flags === undefined || !readActions(reader, flags, row)) return false;
   const axes = (flags & Flag.axes) !== 0 ? reader.group(3, 65024) : 0;
   const triggers = (flags & Flag.triggers) !== 0 ? reader.group(3, 65535) : 0;
   const metadata = (flags & Flag.metadata) !== 0 ? reader.group(2, 2186) : 0;
   const throws = (flags & Flag.throws) !== 0 ? reader.group(3, 65024) : 0;
-  if (held === undefined || pressed === undefined || released === undefined || axes === undefined
-    || triggers === undefined || metadata === undefined || throws === undefined) return false;
-  if (edges && pressed === 0 && released === 0) return false;
+  if (axes === undefined || triggers === undefined || metadata === undefined || throws === undefined) return false;
   const sdiX = direction(metadata, 81);
   const sdiZ = direction(metadata, 243);
-  row.held = held;
-  row.pressed = pressed;
-  row.released = released;
   row.axisX = signedValue(floorDiv(axes, 255));
   row.axisZ = signedValue(floorMod(axes, 255));
   row.triggerLeft = floorDiv(triggers, 256);
