@@ -10,6 +10,7 @@ import { canBeGrabbed, inGrabContext, isIntangible } from "./conditions";
 import { queueDamageContact } from "./contacts";
 import type { Fighter } from "./fighter";
 import { runningHeroSpecial } from "./specials/engine";
+import { repelSpell } from "./specials/spellImmunity";
 import { applyHeroStatus } from "./heroStatus";
 import { applyCurse } from "./curses";
 import { currentTraits } from "./identityTraits";
@@ -37,7 +38,7 @@ function caughtTarget(world: Roster, slot: number, owner: Readonly<Fighter>): nu
     if (!canHit(world, slot, target) || !isActive(world, target)) continue;
     const victim = fighterAt(world, target);
     if (victim.status.out || (isIntangible(victim) && victim.status.divineFrames <= 0) || !canBeGrabbed(victim) || inGrabContext(victim)) continue;
-    if (!grabTouchesBody(strike, victim)) continue;
+    if (!grabTouchesBody(strike, victim) || repelSpell(victim)) continue;
     const distance = Math.abs(f32(victim.motion.x - owner.motion.x));
     if (best === undefined || distance < bestDistance) {
       best = target;

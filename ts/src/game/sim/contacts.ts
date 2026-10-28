@@ -27,6 +27,7 @@ import {
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Controls, type Roster, fighterAt, isActive } from "./roster";
 import { becomeEgg, hatchesOnHit } from "./specials/engine";
+import { repelSpell } from "./specials/spellImmunity";
 import {
   SHIELD_BREAK_RESTORED_ENERGY,
   SHIELD_HIT_WEIGHT_MULTIPLIER,
@@ -140,6 +141,7 @@ export function collectDamageContact(
   if (sourceSlot !== targetSlot && !canHit(world, sourceSlot, targetSlot)) return;
   const source = fighterAt(world, sourceSlot);
   const target = fighterAt(world, targetSlot);
+  if (sourceSlot !== targetSlot && contactIsSpell(source, kind, direct) && repelSpell(target)) return;
   const ethereal = sourceSlot !== targetSlot && isEthereal(target);
   const spell = ethereal && contactIsSpell(source, kind, direct);
   if (ethereal && !spell) return;

@@ -235,6 +235,7 @@ function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Reado
   visuals.shield = sourceVisuals.shield;
   visuals.shieldReflect = sourceVisuals.shieldReflect;
   visuals.poisonBursts = sourceVisuals.poisonBursts;
+  visuals.spellPass = sourceVisuals.spellPass;
 }
 
 function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Readonly<Record<number, number | undefined>>): void {
@@ -775,6 +776,7 @@ function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = visuals.shieldReflect, b = sourceVisuals.shieldReflect; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.manaDrained, b = sourceVisuals.manaDrained; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.poisonBursts, b = sourceVisuals.poisonBursts; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.spellPass, b = sourceVisuals.spellPass; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   return true;
 }
 
@@ -1439,6 +1441,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "meterEx", meter.ex);
   sink.int(prefix, "meterUltimate", meter.ultimate);
   if (visuals.poisonBursts !== 0) sink.int(prefix, "poisonBursts", visuals.poisonBursts);
+  if (visuals.spellPass !== 0) sink.int(prefix, "spellPassVisualSerial", visuals.spellPass);
   if (fighter.character === Character.kobold) {
     sink.int(prefix, "candleHeat", candle.heat);
     sink.int(prefix, "candleState", candle.state);

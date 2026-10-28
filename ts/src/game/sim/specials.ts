@@ -16,6 +16,7 @@ import { HitElement, type HitEffect, type HitRegion, NO_HIT_REGION } from "./hit
 import { heroSpecialMove, stopsSidewaysOnStart } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
+import { regionAgainst } from "./specials/spellImmunity";
 import { shieldSafeEffect } from "./exSpecialAuthoring";
 import { fillEx, spendUltimate, ultimateCharged } from "./meter";
 import { cancelAttack, cancelJumpSquat } from "./transitions";
@@ -832,9 +833,10 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
       if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
       const target = fighterAt(world, targetSlot);
-      contacts[ownerSlot * PARTICIPANT_CAPACITY + targetSlot] = belowStandingPlatform(owner, target, stage) ? NO_HIT_REGION
+      const region = belowStandingPlatform(owner, target, stage) ? NO_HIT_REGION
         : isHeroSpecialAction(owner.special.action) ? heroSpecialContact(owner, target, specialAlreadyHit(owner, targetSlot))
         : demonHunterSpecialContact(owner, targetSlot, target);
+      contacts[ownerSlot * PARTICIPANT_CAPACITY + targetSlot] = regionAgainst(region, target);
     }
   }
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {

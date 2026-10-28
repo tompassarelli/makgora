@@ -13,6 +13,7 @@ import { mutableProjectile } from "./fighterProjectiles";
 import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import type { SpecialProjectile } from "./specials/schema";
 import { agesWithMove } from "./specials/engine";
+import { repelSpell } from "./specials/spellImmunity";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -269,7 +270,9 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
       : shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, blaster ? radius : 0.0));
     const reflector = shieldContact && at(targets.reflecting, targetSlot);
     const candidate = Math.abs(f32(targetX - oldX));
-    if ((shieldContact || ((crossed || near) && height)) && (nearest === undefined || candidate < distance)) {
+    const touching = shieldContact || ((crossed || near) && height);
+    if (touching && repelSpell(target)) continue;
+    if (touching && (nearest === undefined || candidate < distance)) {
       nearest = targetSlot;
       distance = candidate;
       hit.reflector = reflector;
@@ -373,6 +376,7 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
     const candidate = Math.abs(f32(targetX - oldX));
     const bodyContact = (crossed || near) && height
       && capsulesIntersect(heroFlight, placeCapsule(heroTarget, body, targetX, targetZ, target.facing));
+    if ((shieldContact || bodyContact) && repelSpell(target)) continue;
     if ((shieldContact || bodyContact) && (nearest === undefined || candidate < distance)) {
       nearest = targetSlot;
       distance = candidate;

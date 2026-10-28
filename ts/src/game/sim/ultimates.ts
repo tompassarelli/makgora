@@ -71,7 +71,7 @@ const BLADESTORM_TICK = hit(2.5, 80, 20.0, 35.0, HitElement.slash);
 const BLADESTORM_SWORD: readonly (readonly [number, number, number, number, number])[] = [[17, 74.0, 113.0, 188.0, 121.0], [18, 73.0, 112.0, 189.0, 121.0], [35, -67.0, 108.0, -145.0, 118.0],
   [36, -71.0, 108.0, -157.0, 121.0], [44, -60.0, 114.0, -179.0, 121.0], [45, -54.0, 114.0, -171.0, 121.0]];
 const BLADEMASTER: AuthoredSpecial = {
-  name: "Bladestorm", endFrame: 104, jumpWindow: frames(17, 74), airStall: frames(17, 74), airFloat: { sink: BLADESTORM_FLOAT_SPEED, rise: BLADESTORM_FLOAT_SPEED },
+  name: "Bladestorm", endFrame: 104, jumpWindow: frames(17, 74), spellImmune: frames(1, 78), airStall: frames(17, 74), airFloat: { sink: BLADESTORM_FLOAT_SPEED, rise: BLADESTORM_FLOAT_SPEED },
   hurt: [
       hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       hurtPose(9, 16, [hurtPart(0.0, 24.0, 16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
@@ -436,7 +436,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
 const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined } = {
   [Character.rifleman]: "Kneel and aim: a red line shows the shot, then one bullet crosses the stage. Jump or shield it.",
   [Character.demonHunter]: "Fel fire burns around him as he becomes a demon: a burst launches nearby foes, then he moves faster for 8 seconds.",
-  [Character.blademaster]: "A steerable whirlwind of cuts ending in a strong slash, then he is dizzy. He can jump while it spins. Shield or outrun it.",
+  [Character.blademaster]: "A steerable whirlwind of cuts ending in a strong slash, then he is dizzy. He can jump while it spins and no opponent special or ultimate affects him until it ends. Shield or outrun it.",
   [Character.mountainKing]: "He turns to stone with a stomp: heavier for 10 seconds. Hit him while he changes.",
   [Character.warden]: "The Avatar of Vengeance rises behind her and throws four ghostly glaives. Break it or dodge the glaives.",
   [Character.lich]: "A frost wyrm sweeps straight ahead at body height. Jump or shield it.",

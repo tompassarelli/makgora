@@ -29,19 +29,15 @@ export interface SpecialMotion extends FrameWindow {
   readonly velocityZ: number;
   readonly aimedSpeed?: number | undefined;
 
-
   readonly model?: string | undefined;
   readonly aimedTilt?: { readonly x: number; readonly z: number } | undefined;
-
 
   readonly driftSpeed?: number | undefined;
   readonly liftSpeed?: number | undefined;
 
-
   readonly stopsAtBody?: boolean | undefined;
 
   readonly stopsAtShield?: boolean | undefined;
-
 
   readonly relocate?: Relocation | undefined;
 
@@ -59,7 +55,6 @@ export interface SpecialMotion extends FrameWindow {
 
   readonly steer?: SpecialSteer | undefined;
 }
-
 
 export interface SpecialSteer {
   readonly launchSpeed: number;
@@ -84,7 +79,6 @@ export interface SpecialEgg {
   readonly hatchFrames: number;
 }
 
-
 export interface SpecialCurse { readonly every: number; readonly damage: number; readonly summonDelay: number; readonly portal: SpecialProjectile; readonly summon: SpecialPlacement }
 export interface CommandGrab extends FrameWindow {
   readonly strike: StrikeCapsule;
@@ -96,7 +90,6 @@ export interface CommandGrab extends FrameWindow {
   readonly status?: AppliedStatus | undefined;
   readonly curse?: SpecialCurse | undefined;
 }
-
 
 export interface SpecialProjectile {
   readonly spawnFrame: number;
@@ -130,11 +123,9 @@ export interface SpecialProjectile {
 
   readonly modelOffsetZ?: number | undefined;
 
-
   readonly model?: string | undefined;
 
   readonly modelAnimation?: { readonly sequence: string; readonly warningSeconds: number; readonly activeSeconds: number; readonly rate?: number | undefined } | undefined;
-
 
   readonly returns?: { readonly age: number; readonly speed: number } | undefined;
 
@@ -176,19 +167,16 @@ export interface SpecialArmor extends FrameWindow {
 
   readonly maxDamage: number;
 
-
   readonly shell?: boolean | undefined;
 
   readonly chillsStriker?: boolean | undefined;
 }
-
 
 interface ProjectilePool {
   readonly every: number;
   readonly growth: number;
   readonly maxRadius: number;
 }
-
 
 export interface SpecialPlacement {
 
@@ -225,7 +213,6 @@ export interface SpecialPlacement {
   readonly windWalk?: { readonly frames: number; readonly hop: number } | undefined;
 }
 
-
 export interface SpecialCompanion {
 
   readonly behavior?: "sentry" | "flying" | undefined;
@@ -255,14 +242,11 @@ export interface SpecialCompanion {
   readonly leashFrames: number;
 }
 
-
 export const CompanionOrder = { lunge: 1, return: 2 } as const;
 export type CompanionOrder = (typeof CompanionOrder)[keyof typeof CompanionOrder];
 
-
 export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4 } as const;
 export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
-
 
 export interface SpecialGuard extends FrameWindow {
   readonly heal: number;
@@ -286,7 +270,6 @@ export interface AuthoredSpecial {
 
   readonly ex?: AuthoredSpecial | undefined;
   readonly variants?: readonly AuthoredSpecial[] | undefined;
-
 
   readonly name?: string | undefined;
 
@@ -338,7 +321,6 @@ export interface AuthoredSpecial {
   readonly aimsSideways?: true | undefined;
   readonly facesStick?: boolean | undefined;
 
-
   readonly hurt?: readonly HurtPose[] | undefined;
 
   readonly placement?: SpecialPlacement | undefined;
@@ -355,9 +337,7 @@ export interface AuthoredSpecial {
 
   readonly cleanseFrame?: number | undefined;
 
-
   readonly followUps?: readonly SpecialFollowUp[] | undefined;
-
 
   readonly burst?: { readonly frame: number; readonly from: SpecialProjectile; readonly into: SpecialProjectile } | undefined;
 
@@ -378,6 +358,9 @@ export interface AuthoredSpecial {
   readonly jumpCancelFrame?: number | undefined;
 
   readonly jumpWindow?: FrameWindow | undefined;
+
+  /** Opponents' specials and ultimates pass through its user over these frames: no damage, knockback, hitlag or status, and a projectile flies on. */
+  readonly spellImmune?: FrameWindow | undefined;
 
   readonly turnsAround?: true | undefined;
   readonly radial?: true | undefined;
@@ -409,7 +392,6 @@ export interface SpecialFollowUp {
   readonly chargeStage?: number | undefined;
 }
 
-
 export interface SpecialKit {
 
   readonly name: string;
@@ -420,7 +402,6 @@ export interface SpecialKit {
   readonly air?: AuthoredSpecial | undefined;
 
   readonly recall?: AuthoredSpecial | undefined;
-
 
   readonly recallWhile?: "projectile" | "armor" | undefined;
 
@@ -439,7 +420,6 @@ export function specialKit(specials: Readonly<FighterSpecials>, slot: number): S
   return slot === SpecialSlot.side ? specials.side : slot === SpecialSlot.up ? specials.up : slot === SpecialSlot.down ? specials.down : specials.neutral;
 }
 
-
 export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false, variant = 0): AuthoredSpecial {
   if (form >= FOLLOW_UP_FORM) {
     const base = specialForm(kit, imod(form, FOLLOW_UP_FORM), ex, variant);
@@ -451,27 +431,21 @@ export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false,
   return ex ? chosen.ex ?? chosen : chosen;
 }
 
-
 export function ultimateForm(ultimate: Readonly<AuthoredSpecial>, form: number): AuthoredSpecial {
   return form >= FOLLOW_UP_FORM ? ultimate.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1]?.special ?? ultimate : ultimate;
 }
-
 
 export function heroSpecialMove(specials: Readonly<FighterSpecials>, chosen: { readonly slot: number; readonly form: number; readonly variant: number }): AuthoredSpecial {
   return specialForm(specialKit(specials, chosen.slot), chosen.form, false, chosen.variant);
 }
 
-
 export const frames = (first: number, last: number): FrameWindow => ({ first, last });
-
 
 export function chargeStage(charge: Readonly<SpecialCharge>, banked: number): number {
   return banked >= charge.full ? charge.stages : idiv(banked * charge.stages, charge.full);
 }
 
-
 export const CHARGED_AIM_FRAMES = 8;
-
 
 export function chargedAngleMotion(distance: number, travelFrames: number, extraAimFrames = 0): readonly SpecialMotion[] {
   const speed = f32(distance / travelFrames);
@@ -485,11 +459,9 @@ export function chargedAngleMotion(distance: number, travelFrames: number, extra
   ];
 }
 
-
 export function stopsSidewaysOnStart(move: Readonly<AuthoredSpecial>, grounded: boolean): boolean {
   return move.groundMomentum === true ? !grounded : grounded && !movementSpecial(move);
 }
-
 
 export function movementSpecial(move: Readonly<AuthoredSpecial>): boolean {
   for (const segment of move.motion ?? []) {

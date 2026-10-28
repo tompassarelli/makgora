@@ -179,6 +179,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.meter.ex !== actual.meter.ex) return "meterEx";
   if (expected.meter.ultimate !== actual.meter.ultimate) return "meterUltimate";
   if (expected.visuals.poisonBursts !== actual.visuals.poisonBursts) return "poisonBursts";
+  if (expected.visuals.spellPass !== actual.visuals.spellPass) return "spellPassVisualSerial";
   if (expected.candle.heat !== actual.candle.heat) return "candleHeat";
   if (expected.candle.state !== actual.candle.state) return "candleState";
   if (expected.candle.lit !== actual.candle.lit) return "candleLit";
