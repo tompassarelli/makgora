@@ -991,11 +991,6 @@ function shortenOnPress(f: Fighter, window: Readonly<FrameWindow> | undefined, i
   if (window !== undefined && input?.specialPressed === true && inWindow(window, f.special.frame)) skipSpecialTo(f, window.last + 1);
 }
 
-function recoverOnHit(f: Fighter, move: Readonly<AuthoredSpecial>): void {
-  const recovery = move.hitRecovery;
-  if (recovery !== undefined && f.special.hit && f.special.frame > recovery.from) skipSpecialTo(f, move.endFrame - recovery.frames);
-}
-
 
 export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Controls>, world?: Roster, matchFrame = 0): void {
   const move = runningHeroSpecial(f);
@@ -1004,7 +999,6 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (holdSteeredShot(f, move, input)) return;
   advanceRefire(f, move.refire, input);
   shortenOnPress(f, move.shorten, input);
-  recoverOnHit(f, move);
   if (throwFullDroppingCharge(f, move)) return;
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;

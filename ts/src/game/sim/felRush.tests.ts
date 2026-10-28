@@ -1,5 +1,6 @@
 import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
+import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import { Character, LedgeState, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { type Controls, type Roster } from "./roster";
@@ -11,11 +12,12 @@ import { PHANTASM_TRAVEL_FRAMES } from "./specials/phantasmDash";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { surfaceLeft, surfaceRight, surfaceZ } from "./stage";
 import { controls } from "./testWorld";
-import { duelPair, lift, stepDuel } from "./testDuel";
+import { duelPair, lift, specialToEnd, stepDuel } from "./testDuel";
 
 const HEIGHT = 900.0;
 const RUSH_LENGTH = f32(FEL_RUSH_SPEED * (FEL_RUSH_LAST - FEL_RUSH_FIRST + 1));
 const sideB = (x: number): Controls => controls({ specialPressed: true, specialX: x, direction: x });
+const holdShield = controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0 });
 const held = (x: number, z: number): Controls => controls({ direction: x, verticalDirection: z, down: z < 0 });
 const DIRECTIONS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]] as const;
 
@@ -336,11 +338,27 @@ test("Fel Rush: a rush shortened mid-travel replays identically from a rollback 
   assertGreaterThan(live.target.status.damage, 0.0);
 });
 
-test("Fel Rush: a rush that strikes a grounded foe skips to its last 14 frames, so Illidan acts before the knocked-down foe can [k3 measure docs/design/illidan.md]", () => {
+test("Fel Rush: a rush that strikes a grounded foe runs every frame to its end, skipping none [k3 measure docs/design/illidan.md]", () => {
   const { world, owner, target } = struckBy(0.0, undefined, 300.0);
   assertEquals(target.status.damage, 7.0);
-  assertLessThan(runOut(world, owner), FEL_RUSH_FRAMES - FEL_RUSH_LAST);
+  assertEquals(specialToEnd(world, owner).jump, 1);
   assertEquals(owner.attack.cooldown, groundedRun().owner.attack.cooldown);
   assertEquals(owner.special.lockFrames, 0);
   assertFalse(canAttack(target));
+});
+
+function shieldRun(gap: number, shielded: boolean): { last: number; jump: number } {
+  const { world, owner, target } = duelPair(createFighter(Character.demonHunter, 0.0, 1), createFighter(Character.rifleman, gap, -1));
+  target.shield.raised = shielded;
+  const hold = shielded ? holdShield : controls();
+  stepDuel(world, sideB(1), hold);
+  return specialToEnd(world, owner, hold);
+}
+
+test("Fel Rush into a shield runs every frame to the whiff's end, skipping none of its end lag [k3 measure docs/design/illidan.md]", () => {
+  const whiff = shieldRun(f32(HERO_REFERENCE_HEIGHT * 6.0), false);
+  const shielded = shieldRun(f32(HERO_REFERENCE_HEIGHT * f32(0.3)), true);
+  assertEquals(whiff.jump, 1);
+  assertEquals(shielded.jump, 1);
+  assertEquals(shielded.last, whiff.last);
 });

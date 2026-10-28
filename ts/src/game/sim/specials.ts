@@ -40,7 +40,7 @@ import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import { FEL_RUSH_AIMED_AIRTIME, FEL_RUSH_AIRTIME, FEL_RUSH_EARNED, FEL_RUSH_FROM_AIR, FEL_RUSH_STRUCK } from "./felRushAirtime";
-import { PHANTASM_AIR_LANDING_LAG, PHANTASM_DISTANCE_HEIGHTS, PHANTASM_END_FRAME, PHANTASM_FIRST_TRAVEL_FRAME, PHANTASM_HIT_RECOVERY, PHANTASM_LAST_TRAVEL_FRAME, PHANTASM_SHORTEN, PHANTASM_TRAVEL_FRAMES } from "./specials/phantasmDash";
+import { PHANTASM_AIR_LANDING_LAG, PHANTASM_DISTANCE_HEIGHTS, PHANTASM_END_FRAME, PHANTASM_FIRST_TRAVEL_FRAME, PHANTASM_LAST_TRAVEL_FRAME, PHANTASM_SHORTEN, PHANTASM_TRAVEL_FRAMES } from "./specials/phantasmDash";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_LIFETIME, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED, eyeBeamShotFrame } from "./eyeBeam";
 
 
@@ -345,7 +345,7 @@ function advanceFelRush(owner: Fighter, input: Readonly<Controls> | undefined): 
     special.lockFrames = 0;
     owner.attack.cooldown = 0;
     owner.landing.lag = max(owner.landing.lag, FEL_RUSH_LANDING_LAG);
-  } else if (frame > FEL_RUSH_LAST && (special.airtimeUses & FEL_RUSH_STRUCK) !== 0 && frame < FEL_RUSH_FRAMES - PHANTASM_HIT_RECOVERY) skipFelRushTo(owner, FEL_RUSH_FRAMES - PHANTASM_HIT_RECOVERY);
+  }
 }
 
 
