@@ -96,10 +96,10 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   else bind(Action.rightTrigger, code("7"));
   bind(Action.cLeft, code("J"));
   bind(Action.cRight, code("L"));
-  bind(Action.cUp, MINUS);
+  bind(Action.cUp, custom ? MINUS : code("0"));
   bind(Action.cDown, code("P"));
   bind(Action.walk, code("K"));
-  bind(Action.lightShield, code(custom ? "A" : "0"));
+  bind(Action.lightShield, code(wasd ? "E" : "A"));
   bind(Action.shortHop, code("I"));
   if (custom) bind(Action.strong, code("0"));
   else bind(Action.strong, code("9"), START_KEY);
@@ -128,16 +128,23 @@ export function previousStandardKeys(): number[] {
 
 type StockPreset = "wasd" | "standard";
 
-export function previousDefaultKeys(preset: StockPreset): number[] {
+function earlierDefaultKeys(preset: StockPreset, cUp: number, strong: number, secondStrong: number): number[] {
   const keys = presetBindings(preset).keys.slice();
-  keys[slotIndex(Action.cUp, 0)] = code("9");
-  keys[slotIndex(Action.strong, 0)] = START_KEY;
-  keys[slotIndex(Action.strong, 1)] = EMPTY;
+  keys[slotIndex(Action.cUp, 0)] = cUp;
+  keys[slotIndex(Action.lightShield, 0)] = code("0");
+  keys[slotIndex(Action.strong, 0)] = strong;
+  keys[slotIndex(Action.strong, 1)] = secondStrong;
   return keys;
 }
 
+export function previousDefaultKeys(preset: StockPreset): number[] {
+  return earlierDefaultKeys(preset, code("9"), START_KEY, EMPTY);
+}
+
+const earlierDefaults = (preset: StockPreset): number[][] => [previousDefaultKeys(preset), earlierDefaultKeys(preset, MINUS, code("9"), START_KEY)];
+
 export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly StockPreset[] = ["wasd", "standard"]): void {
-  const preset = presets.find((stock) => previousDefaultKeys(stock).every((key, index) => bindings.keys[index] === key));
+  const preset = presets.find((stock) => earlierDefaults(stock).some((earlier) => earlier.every((key, index) => bindings.keys[index] === key)));
   if (preset !== undefined) bindings.keys = presetBindings(preset).keys;
 }
 
