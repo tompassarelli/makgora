@@ -71,6 +71,7 @@ const CHAT_CLOSED = "shell.chatClosed";
 const INPUT = "shell.input";
 const DEV_COMMAND = "shell.devCommand";
 const CONTROLS_COMMAND = "shell.controlsCommand";
+const CHAT_LINE = "shell.chatLine";
 const SAVE_CONTROLS = "-save";
 const LOAD_CONTROLS = "-load";
 const RESTART = "shell.restart";
@@ -314,6 +315,9 @@ function createTriggers(s: ShellState): void {
     for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), "-dev ", false);
     TriggerAddAction(chat, trampoline(DEV_COMMAND));
   }
+  const lines = CreateTrigger();
+  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(lines, Player(slot), "", false);
+  TriggerAddAction(lines, trampoline(CHAT_LINE));
   const controls = CreateTrigger();
   for (const slot of PARTICIPANT_SLOTS) {
     TriggerRegisterPlayerChatEvent(controls, Player(slot), SAVE_CONTROLS, true);
@@ -428,6 +432,7 @@ export function installShell(): void {
   on(EDITBOX_ENTER, withShell(journalPause.chatEntered));
   on(DEV_COMMAND, withShell(onDevCommand));
   on(CONTROLS_COMMAND, withShell(controlsCommand));
+  on(CHAT_LINE, withShell(s => s.frames.chat.push(GetPlayerName(GetTriggerPlayer()), GetEventPlayerChatString())));
   on(HELP_EVENT, helpCommand);
   on(PLAYER_LEFT, withShell(playerLeft));
   on(RESTART, withShell(onDeveloperRestart));

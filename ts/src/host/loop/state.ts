@@ -5,6 +5,7 @@ import { type SessionWins, createSessionWins } from "../../game/session/sessionW
 
 
 import type { CryGate } from "../../game/presentation/hurtVoice";
+import type { SelectChat } from "../../game/ui/selectChat";
 import type { StageLoad } from "../../game/session/stageLoad";
 import type { CameraExtreme } from "../../game/presentation/arenaCamera";
 import type { Action } from "../../game/input/actions";
@@ -226,6 +227,7 @@ export interface Rollback {
 export interface StatusFrames {
   readonly help: framehandle;
   readonly notice: framehandle;
+  readonly chat: SelectChat;
 }
 
 interface StatusLine {

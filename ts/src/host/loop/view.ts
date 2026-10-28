@@ -1,4 +1,5 @@
 import { layerChat } from "../../game/ui/chatLayer";
+import { SelectChat } from "../../game/ui/selectChat";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
 import { writeLines } from "wisp/src/platform/fileio";
 import { computerActive } from "../../game/lobby/lobbyState";
@@ -99,6 +100,7 @@ export function createStatusFrames(): StatusFrames {
   return {
     help: frameText("MeleeHelp", MATCH_HELP_BOX.left, MATCH_HELP_BOX.top, MATCH_HELP_BOX.width, MATCH_HELP_BOX.height, f32(0.01)),
     notice: frameText("MeleeNotice", MATCH_NOTICE_BOX.left, MATCH_NOTICE_BOX.top, MATCH_NOTICE_BOX.width, MATCH_NOTICE_BOX.height, f32(0.019)),
+    chat: new SelectChat(),
   };
 }
 
@@ -645,4 +647,5 @@ export function renderUi(s: ShellState): void {
   }
   ui.stage.update(game);
   layerChat(s.frames, selecting);
+  s.frames.chat.update(selecting);
 }
