@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
@@ -21,17 +21,20 @@ const project = (tree: string) => join(tree, "ts");
 const results = new Map<string, Results>(trees.map((tree) => [tree, new Map()]));
 
 const literals = (name: string) => ['"', "'"].map((quote) => quote + name.replaceAll("\\", "\\\\").replaceAll(quote, `\\${quote}`) + quote);
-const declaring = (pattern: string, ignore: (file: string) => boolean) => {
-  const files = [...new Bun.Glob(pattern).scanSync(project(change))].filter((file) => !ignore(file)).sort();
+const testFiles = (pattern: string, ignore: (file: string) => boolean) => [...new Bun.Glob(pattern).scanSync(project(change))].filter((file) => !ignore(file)).sort();
+const declaring = (files: readonly string[]) => {
   const texts = new Map(files.map((file) => [file, readFileSync(join(project(change), file), "utf8")]));
   return (name: string) => files.filter((file) => literals(name).some((literal) => texts.get(file)!.includes(literal)));
 };
-const gameModulesOf = declaring("src/**/*.tests.ts", () => false);
-const hostFilesOf = declaring("**/*{.test,_test,.spec,_spec}.{js,jsx,ts,tsx}",
+const gameModulesOf = declaring(testFiles("src/**/*.tests.ts", () => false));
+const hostFiles = testFiles("**/*{.test,_test,.spec,_spec}.{js,jsx,ts,tsx}",
   (file) => file.startsWith("build/") || file.split("/").some((part) => part === "node_modules" || part === ".git"));
-const gameNames = names.filter((name) => gameModulesOf(name).length > 0);
-const hostNames = names.filter((name) => !gameNames.includes(name) && hostFilesOf(name).length > 0);
-for (const name of names.filter((name) => !gameNames.includes(name) && !hostNames.includes(name))) {
+const hostFilesOf = declaring(hostFiles);
+const filesNamed = (name: string) => hostFiles.filter((file) => basename(file) === name);
+const fileNames = names.filter((name) => filesNamed(name).length > 0);
+const gameNames = names.filter((name) => !fileNames.includes(name) && gameModulesOf(name).length > 0);
+const hostNames = names.filter((name) => !fileNames.includes(name) && !gameNames.includes(name) && hostFilesOf(name).length > 0);
+for (const name of names.filter((name) => !fileNames.includes(name) && !gameNames.includes(name) && !hostNames.includes(name))) {
   console.log(`mutant tests: no game or host test file declares ${JSON.stringify(name)}`);
 }
 
@@ -143,23 +146,35 @@ const gameTests = Effect.gen(function*() {
 });
 
 const xmlText = (text: string) => text.replaceAll("&quot;", '"').replaceAll("&apos;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+const testCases = (junit: string) => [...readText(junit).matchAll(/<testcase\b([^>]*?)(?:\/>|>([\s\S]*?)<\/testcase>)/g)]
+  .map(([, attributes = "", body = ""]) => ({
+    name: xmlText(/\bname="([^"]*)"/.exec(attributes)?.[1] ?? ""),
+    file: basename(xmlText(/\bfile="([^"]*)"/.exec(attributes)?.[1] ?? "")),
+    verdict: /<skipped\b/.test(body) ? undefined : /<(failure|error)\b/.test(body) ? "fail" as const : "pass" as const,
+  }));
 const hostTests = (tree: string) => Effect.gen(function*() {
-  const files = [...new Set(hostNames.flatMap(hostFilesOf))].sort();
-  const junit = join(tree, ".mutant-junit.xml");
+  const whole = [...new Set(fileNames.flatMap(filesNamed))];
+  const titled = [...new Set(hostNames.flatMap(hostFilesOf))].filter((file) => !whole.includes(file));
   const pattern = hostNames.map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-  yield* exitCode(process.execPath, ["test", "--reporter=junit", `--reporter-outfile=${junit}`, "-t", pattern, ...files], project(tree));
-  const xml = readText(junit);
-  for (const [, attributes = "", body = ""] of xml.matchAll(/<testcase\b([^>]*?)(?:\/>|>([\s\S]*?)<\/testcase>)/g)) {
-    const name = xmlText(/\bname="([^"]*)"/.exec(attributes)?.[1] ?? "");
-    if (!hostNames.includes(name) || /<skipped\b/.test(body)) continue;
-    results.get(tree)!.set(name, /<(failure|error)\b/.test(body) ? "fail" : "pass");
+  const cases: ReturnType<typeof testCases> = [];
+  for (const [kind, files, filter] of [["titled", titled, ["-t", pattern]], ["files", whole, []]] as const) {
+    if (files.length === 0) continue;
+    const junit = join(tree, `.mutant-${kind}-junit.xml`);
+    yield* exitCode(process.execPath, ["test", "--reporter=junit", `--reporter-outfile=${junit}`, ...filter, ...files], project(tree));
+    cases.push(...testCases(junit));
+  }
+  for (const { name, verdict } of cases) if (hostNames.includes(name) && verdict !== undefined) results.get(tree)!.set(name, verdict);
+  for (const name of fileNames) {
+    const verdicts = cases.filter((test) => test.file === name).map((test) => test.verdict);
+    if (verdicts.includes("fail")) results.get(tree)!.set(name, "fail");
+    else if (verdicts.includes("pass")) results.get(tree)!.set(name, "pass");
   }
 });
 
 BunRuntime.runMain(Effect.gen(function*() {
   yield* Effect.all([
     ...(gameNames.length > 0 ? [gameTests] : []),
-    ...(hostNames.length > 0 ? trees.map(hostTests) : []),
+    ...(hostNames.length > 0 || fileNames.length > 0 ? trees.map(hostTests) : []),
   ], { concurrency: "unbounded" });
   for (const [tree, verdicts] of results) {
     writeFileSync(join(tree, ".mutant-results"), [...verdicts].map(([name, verdict]) => `${verdict}\t${name}\n`).join(""));
