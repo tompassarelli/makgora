@@ -78,6 +78,9 @@ const SKY_LIFT: readonly Strike[] = [
   [blade(-16.0, 40.0, -18.0, 150.0, 10.0), linkAt(2.0, 8.0, 85, HitElement.normal)],
 ];
 
+const SKY_FINISH_EFFECT: HitEffect = { damage: 13.0, growth: 116.0, base: 40.0, launchX: ANGLES[85].x, launchZ: ANGLES[85].z, electric: false, element: HitElement.normal };
+const SKY_FINISH: readonly Strike[] = SKY_LIFT.map(([strike]) => [strike, SKY_FINISH_EFFECT]);
+
 
 
 
@@ -118,18 +121,39 @@ const FALLING_KNIVES: AuthoredMove = {
   fall: [{ firstFrame: 6, lastFrame: 12, speedZ: -9.0 }],
   autoCancel: { before: 5, from: 33 },
 };
+export interface DrawnGlaive { readonly frame: number; readonly elbowX: number; readonly elbowZ: number; readonly gripX: number; readonly gripZ: number; readonly ringX1: number; readonly ringZ1: number; readonly ringX2: number; readonly ringZ2: number }
+const glaive = (frame: number, elbowX: number, elbowZ: number, gripX: number, gripZ: number, ringX1: number, ringZ1: number, ringX2: number, ringZ2: number): DrawnGlaive =>
+  ({ frame, elbowX, elbowZ, gripX, gripZ, ringX1, ringZ1, ringX2, ringZ2 });
+
+export const UP_SMASH_GLAIVE: readonly DrawnGlaive[] = [
+  glaive(7, 18.0, 60.0, 35.0, 56.0, 42.0, 68.0, 63.0, 43.0), glaive(8, 11.0, 89.0, 24.0, 100.0, 19.0, 113.0, 52.0, 114.0),
+  glaive(9, -4.0, 102.0, -2.0, 119.0, -15.0, 123.0, 5.0, 148.0), glaive(10, -15.0, 101.0, -20.0, 117.0, -34.0, 144.0, -33.0, 111.0),
+  glaive(11, -22.0, 94.0, -35.0, 104.0, -61.0, 119.0, -42.0, 92.0), glaive(12, -23.0, 91.0, -36.0, 100.0, -64.0, 111.0, -42.0, 88.0),
+  glaive(13, -22.0, 90.0, -38.0, 92.0, -68.0, 97.0, -41.0, 79.0), glaive(14, -23.0, 87.0, -39.0, 82.0, -69.0, 78.0, -38.0, 68.0),
+  glaive(15, -24.0, 79.0, -40.0, 72.0, -68.0, 61.0, -35.0, 59.0), glaive(16, -25.0, 76.0, -40.0, 68.0, -67.0, 55.0, -34.0, 56.0),
+];
+export const UP_SMASH_CLEAN_LAST = 9;
+const UP_SMASH_TOTAL = 41;
+export const UP_SMASH_RING_RADIUS = 24.0;
+const UP_SMASH_ARM_RADIUS = 10.0;
+export const UP_SMASH_TIPPER: HitEffect = { damage: 18.0, growth: 112.0, base: 30.0, launchX: ANGLES[80].x, launchZ: ANGLES[80].z, electric: false, element: HitElement.slash };
+const UP_SMASH_INNER: HitEffect = { damage: 15.0, growth: 100.0, base: 30.0, launchX: ANGLES[80].x, launchZ: ANGLES[80].z, electric: false, element: HitElement.slash };
+const UP_SMASH_LATE: HitEffect = { damage: 13.0, growth: 100.0, base: 10.0, launchX: ANGLES[100].x, launchZ: ANGLES[100].z, electric: false, element: HitElement.slash };
+const UP_SMASH_FIRST = UP_SMASH_GLAIVE[0]?.frame ?? 7;
+const UP_SMASH_LAST = UP_SMASH_GLAIVE.at(-1)?.frame ?? 7;
+const UP_SMASH: AuthoredMove = heroMove(UP_SMASH_FIRST, UP_SMASH_LAST - UP_SMASH_FIRST + 1, UP_SMASH_TOTAL - UP_SMASH_LAST, 0, UP_SMASH_GLAIVE.flatMap(g => {
+  const ring = blade(g.ringX1, g.ringZ1, g.ringX2, g.ringZ2, UP_SMASH_RING_RADIUS), arm = blade(g.elbowX, g.elbowZ, g.gripX, g.gripZ, UP_SMASH_ARM_RADIUS);
+  if (g.frame > UP_SMASH_CLEAN_LAST) return [heroRegion(g.frame, g.frame, ring, UP_SMASH_LATE), heroRegion(g.frame, g.frame, arm, UP_SMASH_LATE)];
+  return [heroRegion(g.frame, g.frame, ring, strongHit(UP_SMASH_TIPPER)), heroRegion(g.frame, g.frame, arm, UP_SMASH_INNER)];
+}));
+
 const GRAB_EFFECT = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 /** Maiev is modelled on Fox (docs/design/maiev.md), so each aerial auto-cancels in Fox's window for the same aerial (references/melee-frame-data/fightcore.csv). */
 const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     ...WARDEN_GROUND.normals,
     [AttackStyle.forwardSmash]: heroMove(15, 3, 30, 0, tipped(15, [[18.0, 69.0, 135.0, 85.0], [18.0, 68.0, 145.0, 79.0], [18.0, 68.0, 150.0, 75.0]], BLADE_RADIUS, 30.0, wardenHit(12.212287902832031, "KILL", 40), wardenHit(9.159215927124023, "KILL", 40))),
-    [AttackStyle.upSmash]: heroMove(13, 4, 27, 0, path(13, [
-      blade(-14.0, 131.0, -8.0, 191.0, 12.0),
-      blade(-12.0, 138.0, -8.0, 199.0, 12.0),
-      blade(-12.0, 141.0, -8.0, 202.0, 12.0),
-      blade(-13.0, 141.0, -10.0, 201.0, 12.0),
-    ], wardenHit(10.685750961303711, "KILL", 90))),
+    [AttackStyle.upSmash]: UP_SMASH,
     [AttackStyle.downSmash]: splitsMove({
       firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 10.0, reach: f32(S + 6.0), height: 10.0, radius: 10.0,
       front: { ...downSmashHit(wardenHit(12.0, "EDGE", 25)), element: HitElement.normal },
@@ -140,10 +164,10 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
 
     [AttackStyle.backAir]: { ...heroMove(4, 16, 18, 8, [heroRegion(4, 19, blade(-38.0, 66.0, -76.0, 75.0, 13.0), BACK_AIR)]), autoCancel: { before: 4, from: 28 } },
 
-    [AttackStyle.upAir]: { ...heroMove(5, 9, 15, 7, multiHit([
+    [AttackStyle.upAir]: { ...heroMove(5, 10, 14, 7, multiHit([
       { first: 5, last: 6, strikes: SKY_LIFT },
       { first: 8, last: 9, strikes: SKY_LIFT },
-      { first: 11, last: 13, strikes: [[blade(0.0, 48.0, -8.0, 172.0, 10.0), wardenHit(3.8163399696350098, "CHASE", 90, 1.0, HitElement.normal)]] },
+      { first: 11, last: 14, strikes: SKY_FINISH },
     ])), autoCancel: { before: 8, from: 25 } },
     [AttackStyle.downAir]: FALLING_KNIVES,
     [AttackStyle.grab]: heroMove(6, 2, 23, 0, [heroRegion(6, 7,

@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 
 export const wardenStrikeMoments = {
   0: { clip: 64, seconds: f32(0.033), end: f32(0.233) },
-  2: { clip: 60, seconds: f32(0.233), end: f32(0.717) },
+  2: { clip: 60, seconds: f32(0.117), end: f32(0.683) },
   3: { clip: 75, seconds: f32(0.133), end: f32(0.733) },
   4: { clip: 67, seconds: f32(0.267), end: f32(0.783) },
   6: { clip: 66, seconds: f32(0.100), end: f32(0.400) },

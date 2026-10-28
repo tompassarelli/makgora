@@ -170,7 +170,7 @@ function mergeLaunchAxis(existing: number, incoming: number): number {
 }
 
 
-export function installDamageLaunch(target: Fighter, knockback: number, directionX: number, directionZ: number, wasGrounded: boolean): void {
+export function installDamageLaunch(target: Fighter, knockback: number, directionX: number, directionZ: number, wasGrounded: boolean, stacks = true): void {
   const { launch, motion } = target;
   launch.damageLevel = damageLevelForKnockback(knockback);
   const speed = f32(knockback * KNOCKBACK_LAUNCH_SCALE);
@@ -188,7 +188,7 @@ export function installDamageLaunch(target: Fighter, knockback: number, directio
     target.jump.remaining = aerialJumps(target);
     target.special.airtimeUses = 0;
   }
-  if (!motion.grounded && launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
+  if (stacks && !motion.grounded && launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
     launch.knockbackX = mergeLaunchAxis(launch.knockbackX, launchX);
     launch.knockbackZ = mergeLaunchAxis(launch.knockbackZ, launchZ);
   } else {
