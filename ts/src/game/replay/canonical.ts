@@ -711,7 +711,6 @@ export function writeObservations(writer: ObservationWriter, opponents: Slots<Re
     writer.number(f.attack.cooldown);
     writer.number(f.special.action);
     if (f.special.ex) writer.number(197);
-    if (f.special.exArmorUsed) writer.number(198);
     writer.number(f.special.frame);
     writer.number(f.special.duration);
     writer.number(f.special.lockFrames);

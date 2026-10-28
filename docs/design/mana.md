@@ -88,40 +88,162 @@ ordinary specials are free; the trickle and meter drops build one bar (#484), an
 segment buys one EX with Shield + Special in any direction. #335 owns the bar's
 earning rules and display. This section owns the move upgrades.
 
-Each EX keeps the base move's startup, active windows, recovery, landing lag,
-entity limits, status immunity, once-per-airtime limit and helpless ending.
-It also keeps the existing one-light-hit protection at entry. The upgrade
-below adds reach, damage or utility to that same move; it does not turn a
-special into an ultimate. Damage upgrades leave launch base and growth alone.
-Travel upgrades scale the authored motion, including steering, while retaining
-collision stops. Reach upgrades enlarge the existing strike/projectile, not
-its active time. Status durations and healing caps stay unchanged.
+### EX design principles (2026-10-28)
 
-| Fighter | Neutral EX | Side EX | Up EX | Down EX |
+Tom set the EX design rules on 28 October 2026; in paraphrase:
+
+- An EX is a natural upgrade of the same move, never a different move. It is
+  stronger but never game-defining.
+- Its frame data stays the move's own: never faster, never slower.
+- It carries no super armor or invulnerability unless armor is already the
+  move's identity.
+- It has one headline change, ideally one that beats the move's usual
+  answer: safe on shield (beats shielding), more range or a bigger hit
+  (beats spacing or jumping over), or an after-effect hitbox that works as a
+  frame trap.
+- Every EX shows the same distinct EX flash.
+
+The shared levers in smashcraft:ts/src/game/sim/exSpecialAuthoring.ts carry
+those headlines, one per EX:
+
+- **Range** (`range`): projectiles fly 25% longer (life x1.25), beams reach
+  25% farther; size, speed and damage stay.
+- **Reach** (`reach`): strikes, projectiles, pools and triggers grow 25%.
+- **Travel** (`travel`): movement and recoveries carry 25% farther over the
+  same frames.
+- **Shield-safe** (`shieldSafe`): a blocked hit holds the shield in shieldstun
+  for at least the attacker's remaining frames of the move, so the move is no
+  worse than even on shield. The attacker's own frames are unchanged.
+- **Durability** (`durability`): a placed object or summon takes more damage
+  before it breaks.
+- **Armor** (`armorDamage`): only where armor is the move's identity, the
+  armor holds against heavier hits.
+
+Each EX keeps the base move's startup, active windows, recovery, landing lag,
+entity limits, status immunity, once-per-airtime limit and helpless ending;
+smashcraft:ts/src/game/roster/exSpecials.tests.ts checks every roster EX
+form against its base. Damage upgrades are gone: 25% more damage beat no
+answer, so it failed the headline rule everywhere it was the whole EX.
+The one-light-hit entry armor every EX used to carry (8% for six frames)
+was removed for the no-armor rule. Status durations and healing caps stay
+unchanged.
+
+The EX flash is shared by every fighter and every special: an EX cast raises
+the cyan Tome of Retraining pillar at the caster's feet for 30 frames with its
+own sound ([ultimates.md](ultimates.md), smashcraft:ts/src/game/presentation/meterCues.ts).
+A follow-up of an EX cast never raises a second one.
+
+### EX audit (2026-10-28)
+
+Verdict reasons: **damage** = the whole EX was 25% more damage, which beats no
+answer; **two** = more than one headline; **armor** = added armor or
+invulnerability; **other move** = a different move, not an upgrade.
+Rows marked *next batch* keep their old EX until their batch lands.
+
+| Fighter | Special | EX before | Verdict | EX now |
 |---|---|---|---|---|
-| Rifleman | Blaster deals 25% more damage. | Bear's strike deals 25% more damage. | Recoil travels 25% farther, including its second shot. | Freeze Trap has 25% more trigger reach, with the same freeze and f22 placement/f38 end. |
-| Illidan | On the ground, Eye Blast: a 24-frame marked windup, then a floor beam to 645 (#379, docs/design/illidan.md); in the air or below a full bar, Eye Beam deals 25% more damage (3.75%). | Fel Rush and its branches deal 25% more damage. | Wing Ascent rises 25% farther; glide choices stay intact. | Immolation deals 25% more damage. |
-| Blademaster | Wind Cutter deals 25% more damage. | Wind Walk dashes 25% farther. | Rising Whirlwind travels 25% farther. | Mirror Image has twice the durability; Image Swap deals 25% more damage. |
-| Mountain King | Storm Bolt deals 25% more damage. | Storm Rush and Hammerfall deal 25% more damage. | Thunder Leap travels 25% farther. | Thunder Clap and its charged forms have 25% more reach. |
-| Warden | Shadow Strike deals 25% more damage. | Pursuit Lunge/marked slash deals 25% more damage. | Blink travels 25% farther. | Fan of Knives has 25% more reach. |
-| Lich | Frost Nova orb/burst has 25% more reach. | Death and Decay deals 25% more damage. | Spectral Ascent travels 25% farther. | Frost Armor absorbs a hit 25% heavier; Dark Ritual gains four protected entry frames. |
-| Forsaken Paladin | Cleansing Sword deals 25% more damage. | Righteous Fury deals 25% more damage. | Ascension travels 25% farther. | Consecration has 25% more reach. |
-| Dreadlord | Carrion Swarm has 25% more reach. | Vampiric Pounce's bite deals 25% more damage, with the same heal cap. | Bat Ascension travels 25% farther. | Sleep orb has 25% more reach, with unchanged sleep and immunity. |
-| Shadow Hunter | Spirit Glaive deals 25% more damage in both directions. | Serpent Ward shots deal 25% more damage; recall gains four protected entry frames. | Loa Vault travels 25% farther. | Hex orb has 25% more reach, with unchanged Hex and immunity. |
-| Pit Lord | Howl of Terror has 25% more reach. | Ruin Charge deals 25% more damage. | Abyssal Leap travels 25% farther. | Rain of Fire deals 25% more damage. |
-| Beastmaster | Wild Axes deal 25% more damage. | Bear has 25% more durability and bite damage; Stampede deals 25% more damage. | Hawk has 25% more durability; Hawk Lift travels 25% farther; grounded dive command gains four protected entry frames. | Quilbeast has 25% more durability and shot damage; volley command gains four protected entry frames. |
-| Lich King | Howling Blast, deals 25% more damage. | Val'kyr Shadowguard deals 25% more damage. | Ascension of the Damned travels 25% farther. | Defile's radius, radial growth and maximum radius increase 25%; its tick rate stays unchanged. |
-| Thrall | Chain Lightning deals 25% more damage. | Feral Spirit wolves deal 25% more damage. | Far Sight travels 25% farther. | Doomhammer Slam has 25% more reach. |
-| Jaina | Frostbolt deals 25% more damage. | Blizzard deals 25% more damage. | Blink travels 25% farther. | Water Elemental has 25% more durability and shot damage; recall gains four protected entry frames. |
-| Sylvanas | Black Arrow deals 25% more damage. | Silence has 25% more reach, with unchanged silence duration. | Banshee Flight travels 25% farther. | Life Drain deals 25% more damage, with the same heal cap. |
-| Cairne | Shockwave deals 25% more damage. | Bloodhoof Gore deals 25% more damage. | Spirit Lift travels 25% farther. | War Stomp's armor absorbs a hit 50% heavier and its reach, ring included, grows 20%. |
-| Chen | Breath of Fire has 25% more reach. | Drunken Haze has 25% more reach, with unchanged slow. | Storm Rise travels 25% farther. | Earth Stance absorbs a hit 25% heavier; Fire Palm/Storm Step deal 25% more damage. |
-| Peon | Gold Sack bonks deal 25% more damage. | Log Heave deals 25% more damage. | Worksite Launch travels 25% farther. | Rest's sweetspot and sourspot are 25% wider. |
-| Tinker | Cluster Rockets deal 25% more damage. | Laser deals 25% more damage and reaches 25% farther. | Rocket Boots travels 25% farther. | Pocket Factory has 25% more durability and goblin damage; recall gains four protected entry frames. |
-| Kael'thas | Pyroblast deals 25% more damage. | Flame Strike deals 25% more damage. | Phoenix travels 25% farther. | Banish has 25% more reach. |
-| Murloc | Ensnare has 25% more reach, with unchanged slow. | Tidal Rush deals 25% more damage. | Tide Spout travels 25% farther. | Disease Cloud has 25% more reach, with unchanged poison duration and tick rate. |
-| Grom | Warsong Cry deals 25% more damage with 15% more reach. | Gorehowl Rush deals 25% more damage and travels 25% farther. | Blood Leap rises and steers 25% farther. | Mannoroth's Bane deals 25% more damage. |
-| Kobold | Wick Flick deals 25% more damage, on top of the candle level's flame. | Panic Dig deals 25% more damage, on top of the candle level's dig. | Candle Escape rises and steers 25% farther; the candle never changes it. | Mine! has 25% more reach on both sides, on top of the candle level's sweep. |
+| All | Every EX | One light hit (8% or less) absorbed on frames 1-6 | Fail: armor | No entry armor |
+| Rifleman | Blaster | +25% damage | Fail: damage | Shot 25% larger, so it is harder to jump or crouch under |
+| Rifleman | Bear | +25% swipe damage | Fail: damage | Bear runs 25% longer (75 frames), reaching foes who spaced it |
+| Rifleman | Recoil | Travels 25% farther | Pass | Unchanged |
+| Rifleman | Freeze Trap | 25% more trigger reach | Pass | Unchanged |
+| Illidan | Eye Beam | Ground: Eye Blast, a 24-frame windup and a floor beam to 645; air: +25% damage | Fail: other move, slower; damage | Beam flies 25% farther (19 frames, 912 units) in both forms |
+| Illidan | Fel Rush | +25% damage, branches too | Fail: damage | Shield-safe, branches too |
+| Illidan | Wing Ascent | Rises 25% farther | Pass | Unchanged |
+| Illidan | Immolation | Reach 116 to 140 | Pass | Unchanged |
+| Blademaster | Wind Cutter | +25% damage | Fail: damage | Range |
+| Blademaster | Wind Walk | Travel | Pass | Unchanged |
+| Blademaster | Rising Whirlwind | Travel | Pass | Unchanged |
+| Blademaster | Mirror Image | x2 durability and +25% swap damage | Fail: two | x2 durability |
+| Mountain King | Storm Bolt | +25% damage | Fail: damage | Range |
+| Mountain King | Storm Rush | +25% damage | Fail: damage | Shield-safe |
+| Mountain King | Thunder Leap | Travel, and +25% Hammerfall damage | Fail: two | Travel, Hammerfall dive included |
+| Mountain King | Thunder Clap | Reach | Pass | Unchanged |
+| Warden | Shadow Strike | +25% damage | Fail: damage | Range |
+| Warden | Shadow Pursuit | +25% damage | Fail: damage | Shield-safe |
+| Warden | Blink | Travel | Pass | Unchanged |
+| Warden | Fan of Knives | +25% damage | Fail: damage | Reach |
+| Lich | Frost Nova | Reach | Pass | Unchanged |
+| Lich | Death and Decay | +25% damage | Fail: damage | *next batch* |
+| Lich | Spectral Ascent | Travel | Pass | Unchanged |
+| Lich | Frost Armor | Armor holds a 25% heavier hit; Dark Ritual 4 invulnerable entry frames | Fail: two, armor | Armor holds a 25% heavier hit (armor is the move); invulnerable entry removed |
+| Forsaken Paladin | Cleansing Sword | +25% damage | Fail: damage | *next batch* |
+| Forsaken Paladin | Righteous Fury | +25% damage | Fail: damage | *next batch* |
+| Forsaken Paladin | Ascension | Travel | Pass | Unchanged |
+| Forsaken Paladin | Consecration | Reach | Pass | Unchanged |
+| Dreadlord | Carrion Swarm | Reach | Pass | Unchanged |
+| Dreadlord | Vampiric Pounce | +25% bite damage | Fail: damage | *next batch* |
+| Dreadlord | Bat Ascension | Travel | Pass | Unchanged |
+| Dreadlord | Sleep | Reach | Pass | Unchanged |
+| Shadow Hunter | Spirit Glaive | +25% damage | Fail: damage | *next batch* |
+| Shadow Hunter | Serpent Ward | +25% shot damage; recall 4 invulnerable frames | Fail: damage, two, armor | Invulnerable recall removed; *next batch* |
+| Shadow Hunter | Loa Vault | Travel | Pass | Unchanged |
+| Shadow Hunter | Hex | Reach | Pass | Unchanged |
+| Pit Lord | Howl of Terror | Reach | Pass | Unchanged |
+| Pit Lord | Ruin Charge | +25% damage | Fail: damage | *next batch* |
+| Pit Lord | Abyssal Leap | Travel | Pass | Unchanged |
+| Pit Lord | Rain of Fire | +25% damage | Fail: damage | *next batch* |
+| Beastmaster | Wild Axes | +25% damage | Fail: damage | *next batch* |
+| Beastmaster | Summon Bear | +25% durability and damage | Fail: two | *next batch* |
+| Beastmaster | Summon Hawk | Travel, +25% durability, dive 4 invulnerable frames | Fail: two, armor | Invulnerable dive removed; *next batch* |
+| Beastmaster | Summon Quilbeast | +25% durability and damage; volley 4 invulnerable frames | Fail: two, armor | Invulnerable volley removed; *next batch* |
+| Lich King | Howling Blast | +25% damage | Fail: damage | *next batch* |
+| Lich King | Val'kyr Shadowguard | +25% damage | Fail: damage | *next batch* |
+| Lich King | Ascension of the Damned | Travel | Pass | Unchanged |
+| Lich King | Defile | Reach | Pass | Unchanged |
+| Thrall | Chain Lightning | +25% damage | Fail: damage | *next batch* |
+| Thrall | Feral Spirit | +25% damage | Fail: damage | *next batch* |
+| Thrall | Far Sight | Travel | Pass | Unchanged |
+| Thrall | Doomhammer Slam | Reach | Pass | Unchanged |
+| Jaina | Frostbolt | +25% damage | Fail: damage | *next batch* |
+| Jaina | Blizzard | +25% damage | Fail: damage | *next batch* |
+| Jaina | Blink | Travel | Pass | Unchanged |
+| Jaina | Water Elemental | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | Invulnerable recall removed; *next batch* |
+| Sylvanas | Black Arrow | +25% damage | Fail: damage | *next batch* |
+| Sylvanas | Silence | Reach | Pass | Unchanged |
+| Sylvanas | Banshee Flight | Travel | Pass | Unchanged |
+| Sylvanas | Life Drain | +25% damage | Fail: damage | *next batch* |
+| Cairne | Shockwave | +25% damage | Fail: damage | *next batch* |
+| Cairne | Bloodhoof Gore | +25% damage | Fail: damage | *next batch* |
+| Cairne | Spirit Lift | Travel | Pass | Unchanged |
+| Cairne | War Stomp | Armor 50% heavier and 20% more reach | Fail: two | *next batch* |
+| Chen | Breath of Fire | Reach | Pass | Unchanged |
+| Chen | Body Slam | Travel | Pass | Unchanged |
+| Chen | Storm Rise | Travel | Pass | Unchanged |
+| Chen | Brew Keg | Reach | Pass | Unchanged |
+| Peon | Gold Sack | +25% damage | Fail: damage | *next batch* |
+| Peon | Log Heave | +25% damage | Fail: damage | *next batch* |
+| Peon | Worksite Launch | Travel | Pass | Unchanged |
+| Peon | Rest | Reach | Pass | Unchanged |
+| Tinker | Cluster Rockets | +25% damage | Fail: damage | *next batch* |
+| Tinker | Laser | +25% damage and reach | Fail: two | *next batch* |
+| Tinker | Rocket Boots | Travel | Pass | Unchanged |
+| Tinker | Pocket Factory | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | Invulnerable recall removed; *next batch* |
+| Kael'thas | Pyroblast | +25% damage | Fail: damage | *next batch* |
+| Kael'thas | Flame Strike | +25% damage | Fail: damage | *next batch* |
+| Kael'thas | Phoenix | Travel | Pass | Unchanged |
+| Kael'thas | Banish | Reach | Pass | Unchanged |
+| Murloc | Ensnare | Reach | Pass | Unchanged |
+| Murloc | Tidal Rush | +25% damage | Fail: damage | *next batch* |
+| Murloc | Tide Spout | Travel | Pass | Unchanged |
+| Murloc | Disease Cloud | Reach | Pass | Unchanged |
+| Grom | Warsong Cry | +25% damage and 15% reach | Fail: two | *next batch* |
+| Grom | Gorehowl Rush | +25% damage and travel | Fail: two | *next batch* |
+| Grom | Blood Leap | Travel | Pass | Unchanged |
+| Grom | Mannoroth's Bane | +25% damage | Fail: damage | *next batch* |
+| Kobold | Wick Flick | +25% damage | Fail: damage | *next batch* |
+| Kobold | Panic Dig | +25% damage | Fail: damage | *next batch* |
+| Kobold | Candle Escape | Travel | Pass | Unchanged |
+| Kobold | Mine! | Reach | Pass | Unchanged |
+| Malfurion | Entangling Roots | +25% damage and reach | Fail: two | *next batch* |
+| Malfurion | Side special | +25% damage and travel | Fail: two | *next batch* |
+| Malfurion | Up special | Travel | Pass | Unchanged |
+| Malfurion | Down special | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | Invulnerable recall removed; *next batch* |
+| Medivh | All four | Hand-authored EX forms | *next batch* | *next batch* |
+| Anub'arak | Impale | Larger spines (28 from 18), +84% damage, more knockback | Fail: two | Reach |
+| Anub'arak | Burrow Hunt | Burrows 4 frames longer and faster, erupts 4 frames later, larger, +33% damage | Fail: slower, two | Travel |
+| Anub'arak | Crypt Eruption | 60% farther, larger, +50% damage | Fail: two | Travel |
+| Anub'arak | Carrion Beetle | x1.5 durability, a fourth beetle, +40% damage; recall 4 invulnerable frames | Fail: two, armor | x1.5 durability |
 
 Ground, air, marked and recall forms use their matching upgrade. A
 follow-up keeps the EX cast's upgrade and never buys a second EX. Authored EX

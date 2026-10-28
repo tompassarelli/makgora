@@ -331,7 +331,7 @@ At most one copy of each status per target; reapplication refreshes duration but
 
 ### EX specials
 
-There are no ultimates. Shield + neutral/side Special requests EX: pay the chosen normal form's cost plus 25 for one 8% hit of armor on frames 1–6. If EX is unaffordable, use the normal form. Ordinary timing and recovery remain. The rates, input and per-fighter table are in [gameplay-design.md](../gameplay-design.md#build-and-spend-mana-and-ex-specials). Earlier ultimate proposals below are historical design references, with no gameplay action.
+There are no ultimates. Shield + neutral/side Special requests EX: pay the chosen normal form's cost plus 25 for one 8% hit of armor on frames 1–6 (superseded: EX specials carry no armor since 2026-10-28, mana.md). If EX is unaffordable, use the normal form. Ordinary timing and recovery remain. The rates, input and per-fighter table are in [gameplay-design.md](../gameplay-design.md#build-and-spend-mana-and-ex-specials). Earlier ultimate proposals below are historical design references, with no gameplay action.
 
 ## Baseline fighter properties
 
@@ -918,8 +918,8 @@ in [Forsaken Paladin](forsaken-paladin.md); production frame data lives in forsa
 | Down B | **Consecration:** fixed, jumpable holy patch, radius 60, 70 units ahead. Life 120 frames, 1.7 damage at most every 45 frames; one patch and 150-frame recast interval. Ground only. | Pool f16, end f42; 20 mana |
 
 **Sacred Aura:** three blocked hits make the next non-throw launch 20% weaker.
-Shared EX neutral/side costs 25 extra mana for six startup frames of one-hit
-armor. There are no ultimates in the adopted mana system.
+Shared EX neutral/side cost 25 extra mana for six startup frames of one-hit
+armor (superseded 2026-10-28: EX specials carry no armor, mana.md). There are no ultimates in the adopted mana system.
 
 Direct hammer hits retain three extra hitlag frames and the volume-127 heavy
 bash. The 0.80 damage multiplier applies to authored damage and preserves
@@ -1697,7 +1697,7 @@ Rifleman / Murloc / Cairne: uncharged forward smash kills from 145 / 137 /
 unchanged at 77 / 76 / 114%. 9 Oct, #379: forward smash became Fel Lunge,
 a short lunge with no beam (uncharged 128 / 122 / 171%, fully charged 94 /
 90 / 125%), and Eye Blast moved to his full-meter EX neutral special
-(smashcraft:docs/design/illidan.md). Dash attack kills from 115 / 115 / 170%
+(smashcraft:docs/design/illidan.md; removed 2026-10-28 for the EX principles in mana.md). Dash attack kills from 115 / 115 / 170%
 before and 145 / 135 / 190% after; at 120% it now sends Rifleman 180 units
 up (39 before) with Illidan 22 frames ahead.
 
@@ -2023,14 +2023,14 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 
 ### Four specials and EX
 
-All four ordinary specials are free. Shield + any Special spends the full universal bar for its EX form; no beetle count or burrow meter is shown or banked. EX keeps the ordinary startup and recovery unless the row names its extra commitment.
+All four ordinary specials are free. Shield + any Special spends the full universal bar for its EX form; no beetle count or burrow meter is shown or banked. EX keeps the ordinary frames and changes one thing (mana.md).
 
 | Input | Ordinary move | EX form | Counterplay |
 |---|---|---|---|
-| Neutral — **Impale** | Stamp at f18; a floor-level spine line travels at 10 units/frame for 36 frames, 9%, upward launch; end f48. Air cast sends the same line forward at foot height, L24. | Wider line, 13%, stronger upward launch; same end. | Jump over the low line, shield or punish the stamp |
-| Side — **Burrow Hunt** | Coil f1–9, burrow f10–25 while moving 10 units/frame, erupt with a 12% launcher f26–29; end f64. Ground only. | Burrow f10–29 at 13 units/frame; wider 16% eruption f30–33, end f64. | Track the moving mound and meet the slow eruption with shield or a jump |
-| Up — **Crypt Eruption** | Charge aim f1–8, launch along the chosen direction for 28 frames over a 400-unit route; narrow 8% horn hit f9–16, stop then fall helpless; end f46. | 640-unit route and 12% wider horn, same helpless finish. | The broad shell is exposed before launch and during helpless fall |
-| Down — **Carrion Beetle** | Plant a beetle nest f22, end f46; one fragile 24-HP nest lasts 180 frames and sends three floor-running beetles (5% each) at ages 1/49/97. Down again recalls it. | 36-HP nest, four 7% beetles at ages 1/37/73/109; same 180-frame life. | Destroy the nest, jump the beetles or reflect a beetle back; block the first beetle up close and punish the cast |
+| Neutral — **Impale** | Stamp at f18; a floor-level spine line travels at 10 units/frame for 36 frames, 9%, upward launch; end f48. Air cast sends the same line forward at foot height, L24. | Spines 25% larger (reach); same damage, launch and end (mana.md, 2026-10-28). | Jump over the low line, shield or punish the stamp |
+| Side — **Burrow Hunt** | Coil f1–9, burrow f10–25 while moving 10 units/frame, erupt with a 12% launcher f26–29; end f64. Ground only. | Burrows 25% farther over the same f10–25 (travel); same eruption f26–29, end f64. | Track the moving mound and meet the slow eruption with shield or a jump |
+| Up — **Crypt Eruption** | Charge aim f1–8, launch along the chosen direction for 28 frames over a 400-unit route; narrow 8% horn hit f9–16, stop then fall helpless; end f46. | 500-unit route (travel); same horn and helpless finish. | The broad shell is exposed before launch and during helpless fall |
+| Down — **Carrion Beetle** | Plant a beetle nest f22, end f46; one fragile 24-HP nest lasts 180 frames and sends three floor-running beetles (5% each) at ages 1/49/97. Down again recalls it. | 36-HP nest (durability); the same three beetles and 180-frame life. | Destroy the nest, jump the beetles or reflect a beetle back; block the first beetle up close and punish the cast |
 
 ### Grab and throws
 

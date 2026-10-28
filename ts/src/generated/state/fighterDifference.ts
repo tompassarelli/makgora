@@ -143,10 +143,8 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   for (let i = 0; i < SPECIAL_ACTION_CAPACITY; i++) if (at(expected.special.cooldowns, i) !== at(actual.special.cooldowns, i)) return `specialCooldowns[${i}]`;
   if (expected.special.direction !== actual.special.direction) return "specialDirection";
   if (expected.special.ex !== actual.special.ex) return "specialEx";
-  if (expected.special.exArmorUsed !== actual.special.exArmorUsed) return "specialExArmorUsed";
   if (expected.special.hit !== actual.special.hit) return "specialHit";
   if (expected.bear.life !== actual.bear.life) return "bearLife";
-  if (expected.bear.exDamage !== actual.bear.exDamage) return "bearExDamage";
   if (expected.bear.x !== actual.bear.x) return "bearX";
   if (expected.bear.z !== actual.bear.z) return "bearZ";
   if (expected.bear.velocityX !== actual.bear.velocityX) return "bearVelocityX";

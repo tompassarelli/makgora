@@ -50,9 +50,9 @@ import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal }
 import { gainMana } from "./mana";
 import { capPercent } from "./percent";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "../fighters/kobold/candle";
-import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactIsSpell, contactTraits } from "./identityTraits";
 import { meleeHandling } from "./meleeHandling";
+import { exRecoveryFrames } from "./exSpecials";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "../fighters/forsaken-paladin/sword";
 
 
@@ -277,7 +277,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.direct) source.launch.hitlag = max(source.launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
     if (contact.blocked) {
       if (contact.kind === ContactKind.damageOnly) continue;
-      if (!perfectShield) shield.stun = max(shield.stun, shieldstunFrames(shieldHit, shield.strength, contact.sourceAerial));
+      if (!perfectShield) shield.stun = max(max(shield.stun, shieldstunFrames(shieldHit, shield.strength, contact.sourceAerial)), contact.effect.shieldSafe === true ? exRecoveryFrames(source) : 0);
       launch.hitlag = max(launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
       const pushback = shieldContactPushback(shieldHit, shield.strength, perfectShield);
       shieldPushback = max(shieldPushback, pushback);
@@ -363,10 +363,6 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   }
   const chosenIndex = winner ?? flinch;
   if (chosenIndex === undefined) return;
-  if (exArmorActive(target) && contactAt(chosenIndex).kind !== ContactKind.throw) {
-    target.special.exArmorUsed = true;
-    if (armorDamage <= EX_ARMOR_DAMAGE) return;
-  }
 
   if (status.armorFrames > 0 && contactAt(chosenIndex).kind !== ContactKind.throw) {
     status.armorFrames = 0;

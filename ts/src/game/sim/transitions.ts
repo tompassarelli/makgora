@@ -125,7 +125,6 @@ export function cancelSpecialState(f: Fighter): void {
   special.fall = false;
   special.parasol = ParasolState.none;
   special.ex = false;
-  special.exArmorUsed = false;
   special.variant = 0;
   special.action = SpecialAction.none;
   special.frame = 0;

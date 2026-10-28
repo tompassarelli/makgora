@@ -1,6 +1,6 @@
 # #186: computer players still start smashes and cast EX specials now that a human's smash needs
 # Strong + A and EX needs Strong + Special. A Wren Expert computer (slot c, Illidan) against a and b,
-# who stand. Illidan's computer casts Eye Blast (9) as an EX from its spacing kit (botKitOptions)
+# who stand. Illidan's computer casts an EX Eye Beam from its spacing kit (botKitOptions)
 # while it holds a segment, so the setup gives every fighter two; Thrall's computer only upgrades a
 # special when its opponent attacks. Style 3 is the down smash.
 #! chat -dev setup quick cpu wren expert hero Illidan;meter 66

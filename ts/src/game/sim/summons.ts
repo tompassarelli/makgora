@@ -15,6 +15,7 @@ import { cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, clear
 import { mutableBear, mutableFreezeTrap } from "./fighterRest";
 
 export const RIFLEMAN_BEAR_LIFETIME = 60;
+export const RIFLEMAN_BEAR_EX_LIFETIME = 75;
 const RIFLEMAN_BEAR_SWIPE_INTERVAL = 20;
 const FREEZE_TRAP_ARMING_FRAMES = 23;
 const FREEZE_TRAP_LIFETIME_FRAMES = 480;
@@ -24,7 +25,6 @@ const FREEZE_TRAP_COOLDOWN_FRAMES = 90;
 const FREEZE_TRAP_TRIGGER_RADIUS = 42.0;
 
 export const BEAR_SWIPE = { damage: 7.0, growth: 104.0, base: 18.0, launchX: DIAGONAL_UNIT, launchZ: 0.3499999940395355, electric: false } as const;
-export const BEAR_SWIPE_EX = { ...BEAR_SWIPE, damage: f32(BEAR_SWIPE.damage * 1.25) } as const;
 
 export function specialAlreadyHit(owner: Fighter, targetSlot: number): boolean {
   for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) {
@@ -193,7 +193,7 @@ export function advanceBear(world: Roster, ownerSlot: number, stage: number, mat
       const target = fighterAt(world, targetSlot);
       if (target.status.out || isIntangible(target) || Math.abs(f32(target.motion.x - bear.x)) > 70 || Math.abs(f32(target.motion.z - bear.z)) > 100) continue;
       hit = true;
-      applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, bear.velocityX < 0 ? -1 : 1, bear.exDamage ? BEAR_SWIPE_EX : BEAR_SWIPE, false, target.shield.raised, undefined);
+      applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, bear.velocityX < 0 ? -1 : 1, BEAR_SWIPE, false, target.shield.raised, undefined);
     }
     if (hit) {
       bear.swipeCooldown = RIFLEMAN_BEAR_SWIPE_INTERVAL;

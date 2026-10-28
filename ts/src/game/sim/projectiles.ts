@@ -24,6 +24,7 @@ import { solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceLi
 
 export const BLASTER_PROJECTILE_SPEED = 36.0;
 export const BLASTER_PROJECTILE_LIFETIME = 60;
+export const EX_BLASTER_SCALE = 1.25;
 export const BLASTER_PROJECTILE_HEIGHT = 75.0;
 export const BLASTER_AIR_SHOT_HEIGHT = 30.0;
 const BLASTER_PROJECTILE_HALF_HEIGHT = 36.0;
@@ -76,8 +77,9 @@ export function spawnProjectileMotion(owner: Fighter, kind: ProjectileKind, velo
 
 
 export function spawnBlasterShot(owner: Fighter, serial: number, grounded: boolean): void {
-  spawnProjectileMotion(owner, ProjectileKind.blaster, f32(owner.facing * BLASTER_PROJECTILE_SPEED), 0.0, BLASTER_PROJECTILE_LIFETIME, serial,
-    f32((grounded ? RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER : 1.0) * (owner.special.ex ? 1.25 : 1.0)), grounded ? BLASTER_PROJECTILE_HEIGHT : BLASTER_AIR_SHOT_HEIGHT);
+  const shot = spawnProjectileMotion(owner, ProjectileKind.blaster, f32(owner.facing * BLASTER_PROJECTILE_SPEED), 0.0, BLASTER_PROJECTILE_LIFETIME, serial,
+    grounded ? RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER : 1.0, grounded ? BLASTER_PROJECTILE_HEIGHT : BLASTER_AIR_SHOT_HEIGHT);
+  if (shot !== undefined) shot.exReach = owner.special.ex;
 }
 
 
@@ -239,10 +241,10 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
   projectile.z = f32(oldZ + velocityZ);
   projectile.life--;
   const direction = velocityX < 0 ? -1 : 1;
-  const radius = f32(BLASTER_PROJECTILE_RADIUS * (projectile.exReach ? 1.25 : 1.0));
-  const halfHeight = f32(BLASTER_PROJECTILE_HALF_HEIGHT * (projectile.exReach ? 1.25 : 1.0));
-  const lowZ = f32(min(oldZ, projectile.z) - halfHeight);
-  const highZ = f32(max(oldZ, projectile.z) + halfHeight);
+  const wide = projectile.exReach && projectile.kind === ProjectileKind.blaster ? EX_BLASTER_SCALE : 1.0;
+  const radius = f32(BLASTER_PROJECTILE_RADIUS * wide);
+  const lowZ = f32(min(oldZ, projectile.z) - BLASTER_PROJECTILE_HALF_HEIGHT);
+  const highZ = f32(max(oldZ, projectile.z) + BLASTER_PROJECTILE_HALF_HEIGHT);
   let nearest: number | undefined;
   let distance = 0.0;
   for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
@@ -256,7 +258,7 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
     const blaster = projectile.kind === ProjectileKind.blaster;
     const body = hurtCapsule(target.character);
     const targetZ = at(targets.z, targetSlot);
-    const reach = f32(BLASTER_PROJECTILE_RADIUS + body.radius);
+    const reach = f32(radius + body.radius);
     const eyeBeam = projectile.kind === ProjectileKind.eyeBeam;
     const height = blaster
       ? f32(max(oldZ, projectile.z) + reach) >= f32(targetZ + body.z1) && f32(min(oldZ, projectile.z) - reach) <= f32(targetZ + body.z2)
@@ -264,7 +266,7 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
         : centerZ >= lowZ && centerZ <= highZ;
     const shieldContact = target.shield.raised && (eyeBeam
       ? shieldCircleIntersects(target, oldX, f32(oldZ - EYE_BEAM_BAND_DROP), projectile.x, f32(projectile.z - EYE_BEAM_BAND_DROP), 1.0, EYE_BEAM_BAND_HALF)
-      : shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, blaster ? BLASTER_PROJECTILE_RADIUS : 0.0));
+      : shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, blaster ? radius : 0.0));
     const reflector = shieldContact && at(targets.reflecting, targetSlot);
     const candidate = Math.abs(f32(targetX - oldX));
     if ((shieldContact || ((crossed || near) && height)) && (nearest === undefined || candidate < distance)) {

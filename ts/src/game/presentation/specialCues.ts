@@ -29,9 +29,6 @@ import {
   DEMONHUNTER_IMMOLATE_ACTIVE,
   DEMONHUNTER_IMMOLATE_STARTUP,
   DEMONHUNTER_WING_STARTUP,
-  EYE_BLAST_FIRST,
-  EYE_BLAST_FORM,
-  EYE_BLAST_LAST,
   FEL_RUSH_FIRST,
   FEL_RUSH_LAST,
   RIFLEMAN_BEAR_CAST_FRAMES,
@@ -389,7 +386,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
 const FEL_TELL = timed(cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "body", 0.5), "stand", f32(0.3));
 
 
-export const EYE_BLAST_EYES: Cue = { model: "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", anchor: "overhead", scale: f32(0.9), sequence: "stand", seconds: 0.0 };
+export const EYE_BEAM_EYES: Cue = { model: "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", anchor: "overhead", scale: f32(0.9), sequence: "stand", seconds: 0.0 };
 const FEL_FLAMES = "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx";
 
 
@@ -398,7 +395,7 @@ export const ORIGINAL_CUES: { readonly [action: number]: MoveCues } = {
   [SpecialAction.riflemanBear]: { spell: "Summon Bear", startup: cue("Abilities\\Spells\\NightElf\\BattleRoar\\RoarTarget.mdx", "body", f32(0.7)), active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritTarget.mdx", "ahead", f32(0.8)) },
   [SpecialAction.riflemanRecovery]: { spell: "Recoil Shot", startup: cue("Abilities\\Spells\\Human\\FlakCannons\\FlakTarget.mdx", "feet", f32(0.8)), active: timed(cue("Abilities\\Weapons\\Mortar\\MortarMissile.mdx", "feet", f32(0.4)), "death", 0.0) },
   [SpecialAction.riflemanTrap]: { spell: "Frost Trap", startup: FROST_TRAP, active: FROST_TRAP },
-  [SpecialAction.demonHunterEyeBeam]: { spell: "Eye Beam", startup: EYE_BLAST_EYES, active: { ...EYE_BLAST_EYES, scale: f32(1.3) } },
+  [SpecialAction.demonHunterEyeBeam]: { spell: "Eye Beam", startup: EYE_BEAM_EYES, active: { ...EYE_BEAM_EYES, scale: f32(1.3) } },
 
   [SpecialAction.demonHunterFelRush]: { spell: "Fel Rush", startup: FEL_TELL, active: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", "body", 1.0), "stand", 0.0) },
   [SpecialAction.demonHunterWingAscent]: { spell: "Metamorphosis wings", startup: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0), active: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0) },
@@ -474,9 +471,6 @@ const CHAOS_STRIKE_CUES: OriginalBranch = { cues: branch("Chaos Strike", FEL_TEL
 
 
 export const ORIGINAL_BRANCH_CUES: { readonly [action: number]: { readonly [form: number]: OriginalBranch } } = {
-  [SpecialAction.demonHunterEyeBeam]: {
-    [EYE_BLAST_FORM]: { cues: branch("Eye Blast", EYE_BLAST_EYES, timed(cue("Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx", "breath", f32(0.9)), "birth", 0.0)), first: EYE_BLAST_FIRST, last: EYE_BLAST_LAST },
-  },
   [SpecialAction.demonHunterFelRush]: {
 
     [VENGEFUL_RETREAT_FORM]: { cues: branch("Vengeful Retreat", FEL_TELL, timed(cue("Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx", "body", 1.0), "stand", 0.0)), first: 1, last: VENGEFUL_RETREAT_MOVE_LAST },

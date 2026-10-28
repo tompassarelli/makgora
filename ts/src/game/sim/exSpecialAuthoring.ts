@@ -2,31 +2,36 @@ import { f32 } from "wisp/src/sim/f32";
 import type { HitEffect } from "./hitRegions";
 import type { AuthoredSpecial, SpecialKit, SpecialProjectile } from "./specials/schema";
 
+export function shieldSafeEffect(effect: Readonly<HitEffect>): HitEffect {
+  return { ...effect, shieldSafe: true };
+}
+
 export interface ExUpgrade {
   readonly damage?: number;
   readonly reach?: number;
   readonly travel?: number;
   readonly durability?: number;
   readonly armorDamage?: number;
-  readonly guardFrames?: number;
-
-  readonly recallProtection?: number;
+  readonly range?: number;
+  readonly shieldSafe?: true;
 }
 
 
-function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) => AuthoredSpecial {
+function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial) => AuthoredSpecial {
   const damage = upgrade.damage ?? 1.0;
   const reach = upgrade.reach ?? 1.0;
   const travel = upgrade.travel ?? 1.0;
+  const range = upgrade.range ?? 1.0;
   const originals: SpecialProjectile[] = [];
   const upgraded: SpecialProjectile[] = [];
   const hit = (effect: Readonly<HitEffect>): HitEffect => ({ ...effect, damage: f32(effect.damage * damage) });
+  const safe = (effect: HitEffect): HitEffect => upgrade.shieldSafe === true ? shieldSafeEffect(effect) : effect;
   const projectile = (spec: SpecialProjectile): SpecialProjectile => {
     for (let index = 0; index < originals.length; index++) {
       if (originals[index] === spec) return upgraded[index] ?? spec;
     }
     const result: SpecialProjectile = {
-      ...spec, radius: f32(spec.radius * reach), effect: hit(spec.effect),
+      ...spec, life: Math.round(spec.life * range), radius: f32(spec.radius * reach), effect: hit(spec.effect),
       returnEffect: spec.returnEffect === undefined ? undefined : hit(spec.returnEffect),
       pool: spec.pool === undefined ? undefined : { ...spec.pool, growth: f32(spec.pool.growth * reach), maxRadius: f32(spec.pool.maxRadius * reach) },
       burstInto: spec.burstInto === undefined ? undefined : projectile(spec.burstInto),
@@ -36,11 +41,8 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) 
     upgraded.push(result);
     return result;
   };
-  const exMove = (move: AuthoredSpecial, recall: boolean): AuthoredSpecial => {
+  const exMove = (move: AuthoredSpecial): AuthoredSpecial => {
     const placement = move.placement;
-    const guard = move.guard;
-    const guardFrames = guard === undefined ? 0 : upgrade.guardFrames ?? 0;
-    const protection = recall ? upgrade.recallProtection ?? 0 : 0;
     return {
       ...move,
       regions: move.regions?.map(region => ({ ...region, hit: { ...region.hit,
@@ -49,7 +51,7 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) 
         maxZ: f32(region.hit.maxZ + f32((region.hit.strike?.radius ?? 0.0) * f32(reach - 1.0))),
         strike: region.hit.strike === undefined ? undefined : { ...region.hit.strike,
           x1: f32(region.hit.strike.x1 * reach), x2: f32(region.hit.strike.x2 * reach), radius: f32(region.hit.strike.radius * reach) },
-        effect: hit(region.hit.effect), groundedEffect: region.hit.groundedEffect === undefined ? undefined : hit(region.hit.groundedEffect),
+        effect: safe(hit(region.hit.effect)), groundedEffect: region.hit.groundedEffect === undefined ? undefined : safe(hit(region.hit.groundedEffect)),
       } })),
       motion: move.motion?.map(motion => ({ ...motion,
         velocityX: f32(motion.velocityX * travel), velocityZ: f32(motion.velocityZ * travel),
@@ -61,19 +63,16 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) 
         relocateReach: motion.relocateReach === undefined ? undefined : f32(motion.relocateReach * travel),
       })),
       projectiles: move.projectiles?.map((each) => projectile(each)),
-      beam: move.beam === undefined ? undefined : { ...move.beam, range: f32(move.beam.range * reach) },
+      beam: move.beam === undefined ? undefined : { ...move.beam, range: f32(f32(move.beam.range * reach) * range) },
       burst: move.burst === undefined ? undefined : { ...move.burst, from: projectile(move.burst.from), into: projectile(move.burst.into) },
       armor: move.armor === undefined ? undefined : { ...move.armor, maxDamage: f32(move.armor.maxDamage * (upgrade.armorDamage ?? 1.0)) },
-      intangible: move.intangible === undefined ? (protection > 0 ? { first: 1, last: protection } : undefined)
-        : { ...move.intangible, last: move.intangible.last + guardFrames },
-      guard: guard === undefined ? undefined : { ...guard, last: guard.last + guardFrames },
       commandGrab: move.commandGrab === undefined ? undefined : { ...move.commandGrab, effect: hit(move.commandGrab.effect) },
       placement: placement === undefined ? undefined : { ...placement,
         durability: f32(placement.durability * (upgrade.durability ?? 1.0)),
         shot: placement.shot === undefined ? undefined : projectile(placement.shot),
         companion: placement.companion === undefined ? undefined : { ...placement.companion, biteEffect: hit(placement.companion.biteEffect) },
       },
-      followUps: move.followUps?.map(branch => ({ ...branch, special: exMove(branch.special, false) })),
+      followUps: move.followUps?.map(branch => ({ ...branch, special: exMove(branch.special) })),
     };
   };
   return exMove;
@@ -81,24 +80,24 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) 
 
 
 export function upgradeSpecial(move: AuthoredSpecial, upgrade: ExUpgrade): AuthoredSpecial {
-  return upgrader(upgrade)(move, false);
+  return upgrader(upgrade)(move);
 }
 
 
 export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
   const exMove = upgrader(upgrade);
-  const withEx = (move: AuthoredSpecial, recall: boolean): AuthoredSpecial => {
+  const withEx = (move: AuthoredSpecial): AuthoredSpecial => {
     const base = { ...move };
     base.variants = undefined;
     return move.variants === undefined
-      ? { ...move, ex: exMove(base, recall) }
-      : { ...move, ex: exMove(base, recall), variants: move.variants.map(variant => ({ ...variant, ex: exMove(variant, recall) })) };
+      ? { ...move, ex: exMove(base) }
+      : { ...move, ex: exMove(base), variants: move.variants.map(variant => ({ ...variant, ex: exMove(variant) })) };
   };
-  const form = (move: AuthoredSpecial | undefined, recall = false): AuthoredSpecial | undefined =>
-    move === undefined ? undefined : withEx(move, recall);
+  const form = (move: AuthoredSpecial | undefined): AuthoredSpecial | undefined =>
+    move === undefined ? undefined : withEx(move);
   return {
-    ...kit, ground: withEx(kit.ground, false),
-    air: form(kit.air), recall: form(kit.recall, true),
-    marked: kit.marked === undefined ? undefined : { ...kit.marked, special: withEx(kit.marked.special, false) },
+    ...kit, ground: withEx(kit.ground),
+    air: form(kit.air), recall: form(kit.recall),
+    marked: kit.marked === undefined ? undefined : { ...kit.marked, special: withEx(kit.marked.special) },
   };
 }

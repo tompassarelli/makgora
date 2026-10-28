@@ -4,7 +4,7 @@ import { hurtCapsule } from "../../sim/geometry/contactGeometry";
 import { Character, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, type MoveRegion, type StrikeCapsule, heroRegion } from "../../sim/heroMoves";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, type SpecialMotion, type SpecialProjectile, type SpecialFollowUp, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../../sim/specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialMotion, type SpecialProjectile, type SpecialFollowUp, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../../sim/specials/schema";
 import { SHORT, capsule, hit } from "./moves";
 
 
@@ -132,17 +132,6 @@ const CHARGED_CLAP: AuthoredSpecial = {
 const AIR_CLAP = hit(10.806899070739746, "LAUNCH", 70, false, HitElement.electric);
 
 
-function withHammerfallEx(kit: SpecialKit): SpecialKit {
-  const upgraded = withExKit(kit, { travel: 1.25 });
-  const ex = upgraded.ground.ex;
-  if (ex === undefined) return upgraded;
-  return { ...upgraded, ground: { ...upgraded.ground, ex: { ...ex,
-    followUps: ex.followUps?.map(branch => ({ ...branch,
-      special: withExKit({ ...kit, ground: branch.special }, { damage: 1.25 }).ground.ex ?? branch.special,
-    })),
-  } } };
-}
-
 export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
   neutral: withExKit({
     name: "Storm Bolt",
@@ -156,7 +145,7 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       }],
       landingLag: 20,
     },
-  }, { damage: 1.25 }),
+  }, { range: 1.25 }),
   side: withExKit({
     name: "Storm Rush",
     description: "A shoulder charge that stops dead at a body or shield.",
@@ -174,8 +163,8 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       oncePerAirtime: true,
       helpless: true,
     },
-  }, { damage: 1.25 }),
-  up: withHammerfallEx({
+  }, { shieldSafe: true }),
+  up: withExKit({
     name: "Thunder Leap",
     description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, change direction at the top and he dives hammer first that way on his own as Hammerfall, in any of the eight directions other than the one he leapt. Keep the stick where it was, or let it go, and he falls helpless instead.",
     ground: {
@@ -191,7 +180,7 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       followUps: HAMMERFALL_DIVES,
     },
 
-  }),
+  }, { travel: 1.25 }),
   down: withExKit({
     name: "Thunder Clap",
     description: "Raise the hammer and slam: early for a small clap, late for a ring with shockwaves. Shield drops the charge.",

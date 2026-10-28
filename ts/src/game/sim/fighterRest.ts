@@ -13,7 +13,6 @@ export const RESTING_GROUPS = REST_BEAR | REST_FREEZE_TRAP | REST_CANNON | REST_
 export type Resting<T> = { readonly [K in keyof T]: T[K] extends readonly (infer E)[] ? readonly E[] : T[K] };
 
 export interface Bear {
-  exDamage: boolean;
   life: number;
   x: number;
   z: number;
@@ -114,7 +113,7 @@ export function mutableFreezeTrap(fighter: RestingGroups): FreezeTrap {
 }
 
 export function bearResting(bear: Readonly<Bear>): boolean {
-  return !bear.exDamage && positiveZero(bear.life) && positiveZero(bear.x) && positiveZero(bear.z) && positiveZero(bear.velocityX) && positiveZero(bear.velocityZ)
+  return positiveZero(bear.life) && positiveZero(bear.x) && positiveZero(bear.z) && positiveZero(bear.velocityX) && positiveZero(bear.velocityZ)
     && positiveZero(bear.swipeCooldown) && positiveZero(bear.hitSerial) && bear.surface === undefined;
 }
 
@@ -126,7 +125,6 @@ export function freezeTrapResting(trap: Readonly<FreezeTrap>): boolean {
 export function restBear(fighter: RestingGroups): void {
   if ((fighter.restingGroups & REST_BEAR) !== 0) return;
   const bear: Bear = fighter.bear;
-  bear.exDamage = false;
   bear.life = 0;
   bear.x = 0.0;
   bear.z = 0.0;

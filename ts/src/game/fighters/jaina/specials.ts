@@ -50,5 +50,5 @@ export const JAINA_SPECIALS: FighterSpecials = {
   down: withExKit({ name: "Summon Water Elemental", description: "Summon a fragile ally that fires four water bolts. Press again to recall it.", ground: SUMMON,
     air: { endFrame: SUMMON.endFrame, landingLag: 20, hurt: SUMMON.hurt,
       projectiles: [{ ...WATER_SHOT, spawnFrame: 27, offsetZ: 0.0, velocityX: 0.0, velocityZ: -h(f32(0.1)) }] },
-    recall: { endFrame: 26, recall: true } }, { damage: 1.25, durability: 1.25, recallProtection: 4 }),
+    recall: { endFrame: 26, recall: true } }, { damage: 1.25, durability: 1.25 }),
 };

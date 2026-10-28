@@ -249,7 +249,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   hitTargetsCopy[3] = keep[sourceHitTargetsCopy[3] as number];
   special.action = sourceSpecial.action;
   special.ex = sourceSpecial.ex;
-  special.exArmorUsed = sourceSpecial.exArmorUsed;
   special.frame = sourceSpecial.frame;
   special.duration = sourceSpecial.duration;
   special.lockFrames = sourceSpecial.lockFrames;
@@ -280,7 +279,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   if ((source.restingGroups & REST_BEAR) === 0) {
     const sourceBear = source.bear;
     bear.life = sourceBear.life;
-    bear.exDamage = sourceBear.exDamage;
     bear.x = sourceBear.x;
     bear.z = sourceBear.z;
     bear.velocityX = sourceBear.velocityX;
@@ -290,7 +288,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
     bear.surface = sourceBear.surface;
   } else if ((target.restingGroups & REST_BEAR) === 0) {
     bear.life = 0;
-    bear.exDamage = false;
     bear.x = 0.0;
     bear.z = 0.0;
     bear.velocityX = 0.0;
@@ -781,7 +778,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   const sourceSpecial = source.special;
   { const a = special.action, b = sourceSpecial.action; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.ex !== sourceSpecial.ex) return false;
-  if (special.exArmorUsed !== sourceSpecial.exArmorUsed) return false;
   { const a = special.variant, b = sourceSpecial.variant; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = special.frame, b = sourceSpecial.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = special.duration, b = sourceSpecial.duration; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -821,7 +817,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   if ((target.restingGroups & source.restingGroups & REST_BEAR) === 0) {
     const bear = target.bear;
     const sourceBear = source.bear;
-    if (bear.exDamage !== sourceBear.exDamage) return false;
     { const a = bear.life, b = sourceBear.life; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = bear.x, b = sourceBear.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = bear.z, b = sourceBear.z; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1253,7 +1248,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   }
   sink.int(prefix, "specialAction", special.action);
   if (special.ex) sink.bool(prefix, "specialEx", true);
-  if (special.exArmorUsed) sink.bool(prefix, "specialExArmorUsed", true);
   sink.int(prefix, "specialFrame", special.frame);
   sink.int(prefix, "specialDuration", special.duration);
   sink.int(prefix, "specialLockFrames", special.lockFrames);
@@ -1265,7 +1259,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "specialDirection", special.direction);
   sink.bool(prefix, "specialHit", special.hit);
   sink.int(prefix, "bearLife", bear.life);
-  if (bear.exDamage) sink.int(prefix, "bearExDamage", 1);
   sink.real(prefix, "bearX", bear.x);
   sink.real(prefix, "bearZ", bear.z);
   sink.real(prefix, "bearVelocityX", bear.velocityX);

@@ -132,7 +132,7 @@ layers, and each layer is a native sound with alternatives:
   - His Phoenix charge and flight keep the Phoenix launch with his battle cry.
   - Banish keeps Banish and Feedback.
   - Illidan's lunging forward smash plays the blade swing and heavy slice, and
-    Eye Blast as his EX neutral plays his neutral special's sounds.
+    his EX Eye Beam plays his neutral special's sounds.
 - **Native first.** Every sound is a stock Warcraft III sound, so the map
   carries no audio bytes. `tools/presentation/stock-sounds.ts` resolves each
   label to its files in the installed game. `moveSounds.tests.ts` fails any

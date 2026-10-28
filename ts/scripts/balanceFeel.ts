@@ -11,7 +11,7 @@ import { authoredTuning } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion, type HitEffect } from "../src/game/sim/hitRegions";
 import { attackStartupFrames, attackDurationFramesForGrounding, attackLandingLag } from "../src/game/sim/moves";
 import { authoredThrowEffect } from "../src/game/sim/grabs";
-import { BEAR_SWIPE, BEAR_SWIPE_EX } from "../src/game/sim/summons";
+import { BEAR_SWIPE } from "../src/game/sim/summons";
 import { originalProjectileEffect } from "../src/game/sim/projectiles";
 import * as specials from "../src/game/sim/specials";
 import { EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT } from "../src/game/sim/eyeBeam";
@@ -106,7 +106,7 @@ export function currentFeel(character: Character): FeelValues {
     }
     if (character === Character.rifleman) {
       out["special.bear"] = sample(BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
-      out["special.bear.ex"] = sample(BEAR_SWIPE_EX, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
+      out["special.bear.ex"] = sample(BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
     } else {
       for (const ex of [false,true]) {
         const rush = specials.felRushRegion(0, specials.FEL_RUSH_FIRST, ex);

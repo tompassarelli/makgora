@@ -35,45 +35,44 @@ const down_special_air_hurt = [
   heroHurtPose(34, 41, [hurtPart(-13.0, 33.0, -13.0, 33.0, 44.0), hurtPart(4.0, 103.0, 4.0, 103.0, 44.0), hurtPart(-23.0, 123.0, -23.0, 123.0, 37.0)]),
   heroHurtPose(42, 47, [hurtPart(-21.0, 33.0, -21.0, 33.0, 44.0), hurtPart(-5.0, 102.0, -5.0, 102.0, 44.0), hurtPart(-28.0, 123.0, -28.0, 123.0, 37.0)])
 ];
-const impale = (air: boolean, ex: boolean): AuthoredSpecial => ({
+const impale = (air: boolean, ex = false): AuthoredSpecial => ({
   endFrame: 48, hurt: air ? neutral_special_air_hurt : neutral_special_ground_hurt, landingLag: air ? 24 : undefined,
   projectiles: [{ model: "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl",
     spawnFrame: 18, offsetX: 40.0, offsetZ: 32.0, velocityX: 10.0, velocityZ: 0.0,
-    life: 36, radius: ex ? 28.0 : 18.0, effect: anubarakHit(ex ? 16.103879928588867 : 8.75, 80, ex ? 82.73651885986328 : 68.3475570678711, 40.0), reflectable: true, limit: 1,
+    life: 36, radius: ex ? 22.5 : 18.0, effect: anubarakHit(8.75, 80, 68.3475570678711, 40.0), reflectable: true, limit: 1,
   }],
   ...(ex ? {} : { ex: impale(air, true) }),
 });
-const burrow = (ex: boolean): AuthoredSpecial => ({
+const burrow = (ex = false): AuthoredSpecial => ({
   endFrame: 64, groundOnly: true, facesStick: true,
-  motion: [{ ...frames(10, ex ? 29 : 25), velocityX: ex ? 13.0 : 10.0, velocityZ: 0.0, stopsAtShield: true }],
-  hurt: [heroHurtPose(10, ex ? 29 : 25, [hurtPart(-20.0, 2.0, 20.0, 8.0, 14.0)])],
-  regions: [heroRegion(ex ? 30 : 26, ex ? 33 : 29, { x1: -28.0, z1: 20.0, x2: 44.0, z2: 110.0, radius: ex ? 32.0 : 24.0 }, anubarakHit(ex ? 19.820161819458008 : 14.865119934082031, 80, 82.73651885986328, 38.0))],
+  motion: [{ ...frames(10, 25), velocityX: ex ? 12.5 : 10.0, velocityZ: 0.0, stopsAtShield: true }],
+  hurt: [heroHurtPose(10, 25, [hurtPart(-20.0, 2.0, 20.0, 8.0, 14.0)])],
+  regions: [heroRegion(26, 29, { x1: -28.0, z1: 20.0, x2: 44.0, z2: 110.0, radius: 24.0 }, anubarakHit(14.865119934082031, 80, 82.73651885986328, 38.0))],
   ...(ex ? {} : { ex: burrow(true) }),
 });
-const eruption = (ex: boolean): AuthoredSpecial => ({
+const eruption = (ex = false): AuthoredSpecial => ({
   endFrame: 46, oncePerAirtime: true, helpless: true, aimFrames: CHARGED_AIM_FRAMES,
-  motion: chargedAngleMotion(ex ? 640.0 : 400.0, 28),
-  regions: [heroRegion(9, 16, { x1: 0.0, z1: 70.0, x2: 0.0, z2: 150.0, radius: ex ? 31.0 : 21.0 }, anubarakHit(ex ? 14.865119934082031 : 9.910080909729004, 80, 76.44135284423828, 28.0))],
+  motion: chargedAngleMotion(ex ? 500.0 : 400.0, 28),
+  regions: [heroRegion(9, 16, { x1: 0.0, z1: 70.0, x2: 0.0, z2: 150.0, radius: 21.0 }, anubarakHit(9.910080909729004, 80, 76.44135284423828, 28.0))],
   ...(ex ? {} : { ex: eruption(true) }),
 });
-const beetleShot = (ex: boolean) => ({ model: "Units\\Undead\\Scarab\\Scarab.mdl", spawnFrame: 0, offsetX: 24.0, offsetZ: 32.0,
-      velocityX: 7.0, velocityZ: 0.0, life: 55, radius: 16.0, effect: anubarakHit(ex ? 8.671319961547852 : 6.19379997253418, 35, 58.45515060424805, 20.0), reflectable: true, limit: 4 });
-const aerialBeetles = (ex: boolean): AuthoredSpecial => ({
+const BEETLE_SHOT = { model: "Units\\Undead\\Scarab\\Scarab.mdl", spawnFrame: 0, offsetX: 24.0, offsetZ: 32.0,
+      velocityX: 7.0, velocityZ: 0.0, life: 55, radius: 16.0, effect: anubarakHit(6.19379997253418, 35, 58.45515060424805, 20.0), reflectable: true, limit: 4 };
+const AERIAL_BEETLES: AuthoredSpecial = {
   endFrame: 46, hurt: down_special_air_hurt, landingLag: 24,
-  projectiles: [{ ...beetleShot(ex), spawnFrame: 22, offsetZ: 0.0, velocityX: 0.0, velocityZ: -7.0 }],
-  ...(ex ? {} : { ex: aerialBeetles(true) }),
-});
-const beetles = (ex: boolean): AuthoredSpecial => ({
+  projectiles: [{ ...BEETLE_SHOT, spawnFrame: 22, offsetZ: 0.0, velocityX: 0.0, velocityZ: -7.0 }],
+};
+const beetles = (ex = false): AuthoredSpecial => ({
   endFrame: 46, hurt: down_special_ground_hurt, groundOnly: true,
   placement: { frame: 22, offsetX: 55.0, radius: 24.0, height: 35.0, durability: ex ? 36.0 : 24.0, life: 180,
-    fireAges: ex ? [1, 37, 73, 109] : [1, 49, 97],
-    shot: beetleShot(ex),
+    fireAges: [1, 49, 97],
+    shot: BEETLE_SHOT,
   },
   ...(ex ? {} : { ex: beetles(true) }),
 });
 export const ANUBARAK_SPECIALS: FighterSpecials = {
-  neutral: { name: "Impale", description: "Drive a line of spines along the floor. Jump the line or block the stamp.", ground: impale(false, false), air: impale(true, false) },
-  side: { name: "Burrow Hunt", description: "Scuttle beneath the floor and erupt. Follow the mound and punish the emergence.", ground: burrow(false) },
-  up: { name: "Crypt Eruption", description: "Choose a direction and launch the crown, then fall helpless.", ground: eruption(false) },
-  down: { name: "Carrion Beetle", description: "Plant a fragile nest that sends beetles along the ground. Press again to recall it.", ground: beetles(false), air: aerialBeetles(false), recall: { endFrame: 24, recall: true, ex: { endFrame: 24, recall: true, intangible: { first: 1, last: 4 } } } },
+  neutral: { name: "Impale", description: "Drive a line of spines along the floor. Jump the line or block the stamp.", ground: impale(false), air: impale(true) },
+  side: { name: "Burrow Hunt", description: "Scuttle beneath the floor and erupt. Follow the mound and punish the emergence.", ground: burrow() },
+  up: { name: "Crypt Eruption", description: "Choose a direction and launch the crown, then fall helpless.", ground: eruption() },
+  down: { name: "Carrion Beetle", description: "Plant a fragile nest that sends beetles along the ground. Press again to recall it.", ground: beetles(), air: AERIAL_BEETLES, recall: { endFrame: 24, recall: true } },
 };

@@ -53,6 +53,8 @@ export interface HitEffect {
   shieldDamage?: number | undefined;
 
   sakurai?: boolean | undefined;
+
+  shieldSafe?: boolean | undefined;
 }
 
 export interface HitRegion {
@@ -91,6 +93,7 @@ export function copyHitEffect(target: HitEffect, source: Readonly<HitEffect>): v
   target.stunFrames = source.stunFrames;
   target.shieldDamage = source.shieldDamage;
   target.sakurai = source.sakurai;
+  target.shieldSafe = source.shieldSafe;
 }
 
 export function copyHitRegion(target: HitRegion, source: Readonly<HitRegion>): void {

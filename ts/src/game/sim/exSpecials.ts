@@ -1,10 +1,8 @@
 import type { Fighter } from "./fighter";
 import type { Controls } from "./roster";
 import { SpecialAction } from "./codes";
+import { max } from "../core/numbers";
 import { ROSTER_MANA, spendMana } from "./mana";
-
-export const EX_ARMOR_DAMAGE = 8.0;
-export const EX_ARMOR_FRAMES = 6;
 
 export function exSpecialPressed(input: Readonly<Controls>): boolean {
   return input.specialPressed && input.exPressed;
@@ -17,10 +15,9 @@ export function exSpecialAffordable(f: Readonly<Fighter>): boolean {
 
 export function enterExSpecial(f: Fighter, input: Readonly<Controls>): void {
   f.special.ex = exSpecialPressed(input) && exSpecialAffordable(f);
-  f.special.exArmorUsed = false;
   if (f.special.ex) spendMana(f, ROSTER_MANA.exCost);
 }
 
-export function exArmorActive(f: Readonly<Fighter>): boolean {
-  return f.special.ex && !f.special.exArmorUsed && f.special.action !== SpecialAction.none && f.special.frame <= EX_ARMOR_FRAMES;
+export function exRecoveryFrames(f: Readonly<Fighter>): number {
+  return f.special.action === SpecialAction.none ? 0 : max(0, f.special.duration - f.special.frame);
 }

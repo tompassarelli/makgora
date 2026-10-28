@@ -1,3 +1,4 @@
+import { EYE_BEAM_EX_REACH, EYE_BEAM_REACH } from "../sim/eyeBeam";
 
 
 
@@ -70,8 +71,6 @@ const RUSH_FAR = 230.0;
 const CHAOS_REACH = 110.0;
 
 
-const EYE_BLAST_NEAR = 240.0;
-const EYE_BLAST_FAR = 600.0;
 
 const ANTI_AIR_GAP = 140.0;
 const ANTI_AIR_RISE = 160.0;
@@ -364,7 +363,7 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
     }
     case Character.demonHunter: {
 
-      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap >= EYE_BLAST_NEAR && gap <= EYE_BLAST_FAR && exSpecialAffordable(f) && affords(f, SpecialAction.demonHunterEyeBeam)
+      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap > EYE_BEAM_REACH && gap <= EYE_BEAM_EX_REACH && exSpecialAffordable(f) && affords(f, SpecialAction.demonHunterEyeBeam)
         && Math.abs(f32(target.motion.z - motion.z)) <= 40.0 && takes(skill, floorDiv(frame, 30), f.character * 7 + 24) && botChoice(floorDiv(frame, 30), f.character * 7 + 25, 3) === 0) {
         pressSlot(input, SpecialSlot.neutral, 0);
         input.exPressed = true;

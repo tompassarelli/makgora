@@ -43,5 +43,5 @@ export const MALFURION_SPECIALS: FighterSpecials = {
   down: withExKit({ name: "Force of Nature", description: "Plant a fragile treant that throws four branches. Press again to recall it.", ground: TREANT,
     air: { endFrame: TREANT.endFrame, landingLag: 20, hurt: TREANT.hurt,
       projectiles: [{ ...BRANCH, spawnFrame: 26, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0 }] },
-    recall: { endFrame: 26, recall: true } }, { damage: 1.25, durability: 1.25, recallProtection: 4 }),
+    recall: { endFrame: 26, recall: true } }, { damage: 1.25, durability: 1.25 }),
 };

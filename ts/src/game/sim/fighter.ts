@@ -245,7 +245,6 @@ interface VisualSerials {
 interface Special {
   action: SpecialAction;
   ex: boolean;
-  exArmorUsed: boolean;
   variant: number;
   frame: number;
   duration: number;
@@ -673,7 +672,6 @@ export function createFighter(character: Character, startX: number, facing: numb
     special: {
       action: SpecialAction.none,
       ex: false,
-      exArmorUsed: false,
       variant: 0,
       frame: 0,
       duration: 0,
@@ -701,7 +699,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     },
     projectiles: repeat(PROJECTILE_CAPACITY, () => emptyProjectile()),
     projectileSlots: 0,
-    bear: { exDamage: false, life: 0, x: 0.0, z: 0.0, velocityX: 0.0, velocityZ: 0.0, swipeCooldown: 0, hitSerial: 0, surface: undefined },
+    bear: { life: 0, x: 0.0, z: 0.0, velocityX: 0.0, velocityZ: 0.0, swipeCooldown: 0, hitSerial: 0, surface: undefined },
     freezeTrap: { exReach: false, life: 0, arming: 0, x: 0.0, z: 0.0, surface: undefined, serial: 0, cooldown: 0 },
     restingGroups: RESTING_GROUPS,
     dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },

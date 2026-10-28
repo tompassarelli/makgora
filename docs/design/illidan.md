@@ -5,7 +5,7 @@ what his side/forward B does at all. Look at how Demon Hunters work in modern
 World of Warcraft and how Illidan works as a raid boss, and come up with
 interesting design improvements to how he plays and functions." Same day,
 his expressive actions carry the identity: warglaive chains, Fel Rush branches,
-wing dive, plunge and Eye Blast. Tom revised the resource rule on 9 Oct
+wing dive and plunge. Tom revised the resource rule on 9 Oct
 (#148/#335): ordinary hits and throws no longer drain another fighter's
 meter; all fighters use the same damage-dealt/taken gain rules. Named spells
 remain deliberate actions.
@@ -212,7 +212,7 @@ and its mana-scaled stun are gone; no other move used the stun's drain rule.
   from firing its second beam until the first was spent; both are gone. The
   scenario tests in sim/laserFrames.tests.ts replay the short-hop laser, the
   short-hop double laser and a full-hop mash against Falco's frames.
-- **Windup:** fel fire (his Metamorphosis missile, Eye Blast's eye cue) burns
+- **Windup:** fel fire (his Metamorphosis missile) burns
   over his eyes from frame 1 to the shot and flares on the shot frame.
 - **Beam:** a horizontal fel bolt along his facing from 140 above his feet, his
   eye line, at 48 units a frame for 15 frames: 720 units, 120 Melee units at
@@ -232,9 +232,10 @@ and its mana-scaled stun are gone; no other move used the stun's drain rule.
   standing Shadow Hunter (124 tall, the roster median); shorter fighters need
   it fired lower in the hop, and a full-jump beam passes over everyone
   standing.
-- **EX (Shield + Special, air or below a full bar):** 25% more damage, 3.75%,
-  same frames, as every EX keeps its base frames (mana.md). On the ground with
-  a full bar the press is Eye Blast, unchanged.
+- **EX (Shield + Special):** the beam flies a quarter farther, 19 frames of
+  flight instead of 15 (912 units instead of 720), on the ground and in the
+  air, with the same frames and damage, as every EX keeps its base frames
+  (mana.md). It outranges the spacing that waits outside an ordinary beam.
 
 Counterplay: the 23-frame ground windup is a reaction window to jump it or
 close in; a shield holds it and a powershield reflects it; crouching short
@@ -369,32 +370,11 @@ Fel Lunge history (#379, 9 Oct): the earlier Eye Blast forward smash became a
 (startup 6, total 36, 40-70 units of travel). Eye Blast moved into his
 meter-gated special.
 
-### EX neutral special: Eye Blast (picked, #379)
-
-The issue first placed Eye Blast inside Metamorphosis; the lead corrected
-it (9 Oct): Smashcraft has no ultimate system, only the one super meter that
-buys EX specials (#335), so Eye Blast is Illidan's EX neutral special under
-those rules. Shield + Special with no direction on a full 100-point bar, on
-the ground, starts Eye Blast in place of Eye Beam's 25% damage EX and spends
-the whole bar. Below a full bar, or in the air, the press is the ordinary or
-EX Eye Beam.
-
-- **Frames 1–24, the windup:** he stands rooted; fel fire burns over his
-  eyes (his Metamorphosis missile) and eight small green dragon flames stand
-  just above the floor from 60 to 645 units ahead, brightening and growing
-  over the windup: the ground marker of where the beam will run. A hit
-  interrupts it; the bar stays spent.
-- **Frames 25–34, the beam:** reaching 195 on frame 25 and 50 further each
-  frame to 645 on frame 34, low (60 below his feet to 45 above): 13% at 30°
-  (base 24, growth 90), drain 10, one hit per target. Each flame burns
-  to full size as the beam passes it.
-- **Frames 35–60:** recovery; he acts on frame 61.
-
-Counterplay: 24 frames of windup with the whole path marked is a reaction
-for every fighter: a short hop clears the low beam, a shield holds it, and
-anyone near him punishes the windup. Alternatives: **B, Eye Blast as the
-ordinary neutral special** (rejected at the time: Mana Burn was kept as his drain
-identity); **C, a beam on every forward smash** (rejected: #379).
+Eye Blast history (#379, 2026-10-28): from 9 Oct a full-bar ground EX neutral
+special was Eye Blast, a 24-frame marked windup and then a floor beam swept
+out to 645 units. The EX design principles of 2026-10-28 (mana.md) ask that an
+EX upgrade the same move with the same frames, so it was removed and the EX
+Eye Beam now flies farther instead.
 
 ### Down special in the air: Immolate (picked)
 
@@ -502,7 +482,6 @@ attackCues.ts and elementLooks.ts):
 | Chaos Strike (ground and air) | Moon Glaive whirl |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
 | Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a heel hit lands as the fire hit's green flame burst, a shin or toe hit as the normal spark |
-| Eye Blast windup / beam | Metamorphosis missile over his eyes and small green dragon flames along the floor / green dragon fire, each floor flame growing as the beam reaches it |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |
 | Twin-glaive forward air | Illidan's missile trail |
 | Drain on hit (any victim) | Mana Burn target over the victim's head through that hit's hitlag and hitstun |
@@ -607,9 +586,8 @@ What he keeps, so he does not become Falco in a costume:
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
   eight-way dive, which starts by itself on frame 19 when the stick changes zone. Since #519 the ascent aims and starts like Fire Bird, but it
   takes no charge and does not hit.
-- Eye Blast and Eye Beam: Eye Blast stays the meter-gated EX special; since
-  Tom's 2026-10-28 request the neutral special is Eye Beam, a Falco-timed
-  laser from his eyes.
+- Eye Beam: since the 2026-10-28 request the neutral special is Eye Beam, a
+  Falco-timed laser from his eyes; its EX flies farther (Eye Blast removed).
 - Drain on hit: every landed hit still drains mana.
 - Immolate stays a shine, not a loop: Immolate into Immolate stays below true,
   and no waveshine infinite.

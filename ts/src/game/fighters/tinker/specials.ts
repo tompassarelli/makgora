@@ -52,5 +52,5 @@ export const TINKER_SPECIALS: FighterSpecials = {
     } },
     air: { endFrame: 36, projectiles: [goblinDrop], landingLag: 16 },
     recall: { endFrame: 36, groundOnly: true, recall: true },
-  }, { damage: 1.25, durability: 1.25, recallProtection: 4 }),
+  }, { damage: 1.25, durability: 1.25 }),
 };

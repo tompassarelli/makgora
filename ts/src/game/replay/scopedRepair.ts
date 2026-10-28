@@ -23,7 +23,6 @@ import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegi
 import { type HurtPart, type HurtPose, shippedHurtboxes } from "../sim/hurtboxes";
 import type { AuthoredSpecial } from "../sim/specials/schema";
 import { SMASH_MAX_CHARGE_FRAMES, attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { EYE_BLAST_FORM, EYE_BLAST_REACH } from "../sim/specials";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { shieldReach } from "../sim/shieldTilt";
 
@@ -175,8 +174,7 @@ function rosterReach(): Extent {
 
 /**
  * Farther apart than this on an axis, a fighter's strikes, specials, grabs
- * and summons can't reach another this frame, except Eye Blast's beam and
- * tracking beams (`strikeReach`). A special that moves its caster next to another fighter is
+ * and summons can't reach another this frame, except tracking beams (`strikeReach`). A special that moves its caster next to another fighter is
  * caught by the same test on the states after the frame.
  */
 export const SCOPE_REACH: Readonly<Extent> = rosterReach();
@@ -185,7 +183,6 @@ const SCOPE_BODY = 150.0;
 
 const BODY_EXTENT: Readonly<Extent> = { x: SCOPE_BODY, z: SCOPE_BODY };
 
-const EYE_BLAST_EXTENT: Readonly<Extent> = { x: Math.max(EYE_BLAST_REACH, SCOPE_REACH.x), z: Math.max(EYE_BLAST_REACH, SCOPE_REACH.z) };
 const BEAM_EXTENT: Readonly<Extent> = { x: Math.max(beamReach.x, SCOPE_REACH.x), z: Math.max(beamReach.z, SCOPE_REACH.z) };
 
 const apart = (ax: number, az: number, bx: number, bz: number, distance: Readonly<Extent>): boolean =>
@@ -200,9 +197,8 @@ function reaching(f: Readonly<Fighter>): boolean {
     || f.ledge.state !== LedgeState.none || f.cannon.held !== undefined;
 }
 
-/** How far `f` may act on another fighter this frame: Eye Blast's whole beam, a tracking beam and its aim, any other reaching action, or a body push. */
+/** How far `f` may act on another fighter this frame: a tracking beam and its aim, any other reaching action, or a body push. */
 function strikeReach(f: Readonly<Fighter>): Readonly<Extent> {
-  if (f.special.action === SpecialAction.demonHunterEyeBeam && f.special.form === EYE_BLAST_FORM) return EYE_BLAST_EXTENT;
   if (runningHeroSpecial(f)?.beam !== undefined) return BEAM_EXTENT;
   if (f.attack.style !== undefined && f.special.action === SpecialAction.none
     && f.grab.owner === undefined && f.grab.target === undefined && !inGrabContext(f)

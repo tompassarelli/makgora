@@ -22,8 +22,7 @@ import { attackActive, attackStartup } from "../sim/conditions";
 import { min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../sim/specials";
-import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
-import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkCue, parkOnce, placeEffect } from "./effects";
+import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
 import { beamSegment, runningHeroSpecial } from "../sim/specials/engine";
 import { emptyCapsule } from "../sim/geometry/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
@@ -51,7 +50,6 @@ interface SpecialSlot {
   laserShown: boolean;
   lastX: number;
   lastZ: number;
-  readonly eyeBlast: readonly effect[];
 
   readonly cursor: ImpactPresentationCursor;
   previousSpecial: SpecialAction;
@@ -70,8 +68,7 @@ const FROG = 6;
 export const HEX_FROG_MODEL = "units\\critters\\Frog\\Frog.mdx";
 const SILENCE = 7;
 const CURSE = 8;
-const EYE_BLAST = 9;
-const SLOT_EFFECTS = EYE_BLAST + EYE_BLAST_MARKS;
+const SLOT_EFFECTS = 9;
 /** Warcraft's Drain Mana lightning, the Blood Mage's own Siphon Mana beam. */
 const SIPHON_LIGHTNING = "DRAM";
 const LASER_LIGHTNING = "AFOD";
@@ -109,14 +106,12 @@ export class SpecialEffects {
       SetLightningColor(laser, 1.0, 1.0, 1.0, 0.0);
       const chain = AddLightningEx(CHAIN_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       SetLightningColor(chain, 1.0, 1.0, 1.0, 0.0);
-      const eyeBlast: effect[] = [];
-      for (let mark = 0; mark < EYE_BLAST_MARKS; mark++) eyeBlast.push(AddSpecialEffect(STOCK_MODELS.greenDragonMissile, x, y));
       BlzSetSpecialEffectTimeScale(aura, 0.0);
       BlzSetSpecialEffectTimeScale(wingTrail, 0.0);
       BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
+        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -142,7 +137,6 @@ export class SpecialEffects {
       this.park(slot.frog, index, FROG);
       this.hideSiphon(slot);
       this.hideLaser(slot);
-      this.parkEyeBlast(slot, index);
       slot.previousSpecial = SpecialAction.none;
       slot.previousSpecialFrame = 0;
       this.releaseImmolationLoop(slot);
@@ -151,34 +145,6 @@ export class SpecialEffects {
 
   private park(model: effect, slot: number, effect: number): void {
     parkOnce(model, this.origin, (this.parked ??= []), SLOT_EFFECTS * slot + effect);
-  }
-
-  private parkMark(model: effect, slot: number, effect: number): void {
-    parkCue(model, this.origin, (this.parked ??= []), SLOT_EFFECTS * slot + effect);
-  }
-
-  private parkEyeBlast(slot: SpecialSlot, index: number): void {
-    for (let mark = 0; mark < EYE_BLAST_MARKS; mark++) {
-      const model = slot.eyeBlast[mark];
-      if (model !== undefined) this.parkMark(model, index, EYE_BLAST + mark);
-    }
-  }
-
-  private presentEyeBlast(slot: SpecialSlot, index: number, fighter: Readonly<Fighter>): void {
-    for (let mark = 0; mark < EYE_BLAST_MARKS; mark++) {
-      const model = slot.eyeBlast[mark];
-      if (model === undefined) continue;
-      const pose = eyeBlastMark(fighter, mark);
-      if (pose === undefined) {
-        this.parkMark(model, index, EYE_BLAST + mark);
-        continue;
-      }
-      this.placed(index, EYE_BLAST + mark);
-      placeEffect(model, this.origin.x + pose.x, this.front, this.origin.z + pose.z);
-      BlzSetSpecialEffectScale(model, pose.scale);
-      BlzSetSpecialEffectAlpha(model, pose.alpha);
-      BlzSetSpecialEffectTimeScale(model, 1.0);
-    }
   }
 
   private releaseImmolationLoop(slot: SpecialSlot): void {
@@ -291,14 +257,12 @@ export class SpecialEffects {
       this.park(effects.aura, slot, AURA);
       this.park(effects.wingTrail, slot, WING_TRAIL);
       this.park(effects.drainFlash, slot, DRAIN_FLASH);
-      this.parkEyeBlast(effects, slot);
       return;
     }
     effects.lastX = fighter.motion.x;
     effects.lastZ = fighter.motion.z;
     this.presentSiphon(effects, fighter);
     this.presentLaser(effects, fighter);
-    this.presentEyeBlast(effects, slot, fighter);
     this.applyStatic(effects.aura, slot, AURA, projectSpecialEffect(state, fighter, slot, STATIC_AURA, this.pose));
     this.applyStatic(effects.wingTrail, slot, WING_TRAIL, projectSpecialEffect(state, fighter, slot, STATIC_WING_TRAIL, this.pose));
     this.applyStatic(effects.drainFlash, slot, DRAIN_FLASH, projectSpecialEffect(state, fighter, slot, STATIC_DRAIN_FLASH, this.pose));
@@ -407,7 +371,7 @@ export class SpecialEffects {
       this.releaseImmolationLoop(slot);
       KillSoundWhenDone(slot.immolationLoop);
       slot.bear.destroy();
-      for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog, ...slot.eyeBlast]) DestroyEffect(model);
+      for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog]) DestroyEffect(model);
       DestroyLightning(slot.siphon);
       DestroyLightning(slot.laser);
       DestroyLightning(slot.chain);

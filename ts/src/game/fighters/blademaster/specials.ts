@@ -131,8 +131,8 @@ const imageSwap: AuthoredSpecial = {
 const inAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...special, landingLag: AIR_LANDING_LAG });
 
 export const BLADEMASTER_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { range: 1.25 }),
   side: withExKit({ name: "Wind Walk", description: "Fade, then dash through bodies untouchable, and stand open after.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),
   up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
-  down: withExKit({ name: "Mirror Image", description: "Step back and leave an image; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImage, air: inAir(mirrorImage), recall: imageSwap }, { damage: 1.25, durability: 2.0 }),
+  down: withExKit({ name: "Mirror Image", description: "Step back and leave an image; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImage, air: inAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
 };
