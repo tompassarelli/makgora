@@ -660,21 +660,15 @@ outside the checkout. Naming clips after PRIVATE_OUTPUT (`"Locomotion Walk"`)
 re-keys those clips in place in the shipped model at their own indices and
 lengths, and checks every other clip unchanged; the Blender scene is the one
 from 7 October, so pass `WC3_MDL_ADDON` when the exporter is not at its
-default path. `Locomotion Walk` takes the longest steps his legs reach (62 units
-either side) centred under hips sat 15 units lower, with the torso upright (the chest bone turned back 18 degrees from the ready stance's forward lean), each
-heel striking toes-up, rolling flat and lifting at push-off, one foot always
-down (stance 54% of the cycle), and each arm swinging 16 degrees from the ready
-stance so the glaives keep their angle. Its drawn stride is 231 units a second,
-so a full walk plays at 2.41 cycles a second (4.8 steps), below the run's 3.34
-(6.7 steps): his walk speed is near his run speed, so the legs' reach caps how
-slow a walk without foot slide can be, and the pose, not the cadence, tells the
-walk from the run (2026-10-28). fighterLocomotion.tests.ts pins the cadence.
-The October 7 walk centred 24-unit steps 20 units ahead of the hips and
-tipped each foot with its shin, so its drawn stride (131) overstated its
-ankle travel (96): a full walk played it at 4.25 times with the planted feet
-sliding, and its arm solve turned the glaives from flat to flared twice a
-cycle (2026-10-28). `Locomotion Run` leans forward, drives longer alternating
-steps and keeps the glaives beside the body. `Locomotion Initial Dash Burst`
+default path. His walk and run play neither `Locomotion Walk` nor
+`Locomotion Run`: Tom rejected each hand-authored take of both in play
+(2026-10-28), so both gaits play the Classic Demon Hunter's stock `Walk`
+(sequence 107, 0.875 s, two stride cycles). The gait enters it at a planted
+contact (0.76 s) and plays it at his ground speed over its planted-foot speed,
+890 units a second (vertices within 2 to 8 units of the floor sweep back at a
+median 885 to 905), so his walk (558 units a second) plays it at 0.63 times
+and his run (666) at 0.75 with the planted feet holding the ground.
+ts/test/illidan-gait.test.ts pins the clip and both rates. `Locomotion Initial Dash Burst`
 compresses into a push-off, then feeds the run. The ten authored burst frames
 are retimed over the simulation's thirteen dash frames; run starts on frame 14.
 The simulation still supplies all movement speeds and frame data.

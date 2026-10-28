@@ -369,6 +369,11 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   }
   if (illidan) {
     const { motion } = pose.motion;
+    const gait = motion === IllidanLocomotion.walk || motion === IllidanLocomotion.run ? groundLocomotionClip(character, motion) : undefined;
+    if (gait !== undefined) {
+      playLocomotionIndex(pose, motionKey(motion), gait.index, gait.entry);
+      return groundLocomotionRate(f, motion, gait);
+    }
     playIndex(pose, motionKey(motion), locomotionClipIndex(motion));
     return locomotionRate(f, motion);
   }
@@ -756,8 +761,6 @@ function grabClipIndex(character: Character, action: GrabAction, victim: boolean
 
 function locomotionClipIndex(motion: IllidanLocomotion): number {
   switch (motion) {
-    case IllidanLocomotion.walk: return dh.DEMON_HUNTER_WALK_FORWARD_INDEX;
-    case IllidanLocomotion.run: return dh.DEMON_HUNTER_RUN_FORWARD_INDEX;
     case IllidanLocomotion.dash: return dh.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX;
     case IllidanLocomotion.turn: return dh.DEMON_HUNTER_TURNAROUND_INDEX;
     case IllidanLocomotion.stop: return dh.DEMON_HUNTER_STOP_INDEX;

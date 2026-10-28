@@ -24,9 +24,9 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Rifleman | ledge-get-up | 28: Ledge Climb | 64.7 | 7.9 | up; 27.7/64.2 |
 | Rifleman | ledge-roll | 32: Roll Forward | 116.8 | 45.4 | forward; 72.0/116.4 |
 | Rifleman | ledge-attack | 22: Get Up Attack | 95.3 | 37.4 | both; 67.3/61.4 |
-| Illidan | walk | 119: Locomotion Walk | 138.8 | 20.8 | forward; 129.0/138.6 |
+| Illidan | walk | 107: Walk | 92.0 | 15.0 | forward; 79.7/84.3 |
 | Illidan | dash | 121: Locomotion Initial Dash Burst | 81.1 | 19.7 | forward; 72.9/57.8 |
-| Illidan | run | 120: Locomotion Run | 111.4 | 23.8 | forward; 108.7/95.2 |
+| Illidan | run | 107: Walk | 91.3 | 14.5 | forward; 91.0/62.4 |
 | Illidan | turn | 97: Turnaround | 95.2 | 23.1 | back; 77.5/83.4 |
 | Illidan | brake | 89: Stop | 22.3 | 9.4 | in place; 22.3/10.4 |
 | Illidan | jump-squat | 47: Jump Squat | 73.7 | 11.1 | down; 36.1/26.9 |

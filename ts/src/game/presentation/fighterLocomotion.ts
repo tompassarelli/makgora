@@ -18,15 +18,14 @@ const named = (character: Character, name: string): HeroClip | undefined => {
 const ORIGINAL_WALKS: Readonly<Record<number, (HeroClip | undefined)>> = {
   1: named(Character.rifleman, "walk"),
 };
-const ILLIDAN_WALK: HeroClip = { index: dh.DEMON_HUNTER_WALK_FORWARD_INDEX, seconds: 1.0 };
-const ILLIDAN_RUN: HeroClip = { index: dh.DEMON_HUNTER_RUN_FORWARD_INDEX, seconds: f32(0.6) };
+const STOCK_WALK = named(Character.demonHunter, "walk");
+const ILLIDAN_GAIT: HeroClip | undefined = STOCK_WALK === undefined ? undefined : { ...STOCK_WALK, entry: f32(0.76), stance: 890.0 };
 const ILLIDAN_DASH: HeroClip = { index: dh.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX, seconds: dh.DEMON_HUNTER_INITIAL_DASH_BURST_SECONDS };
 
 
 export function groundLocomotionClip(character: Character, motion: IllidanLocomotion, table: Readonly<HeroClipTable> = characterClips(character)): HeroClip | undefined {
   if (character === Character.demonHunter) {
-    if (motion === IllidanLocomotion.walk) return ILLIDAN_WALK;
-    if (motion === IllidanLocomotion.run) return ILLIDAN_RUN;
+    if (motion === IllidanLocomotion.walk || motion === IllidanLocomotion.run) return ILLIDAN_GAIT;
     if (motion === IllidanLocomotion.dash) return ILLIDAN_DASH;
     return undefined;
   }
