@@ -61,6 +61,7 @@ const burrowRake: readonly Gesture[] = [
 const lunges: Partial<Record<HeroPose, Lunge>> = {
   jab: { contact: 5, x: 64, back: 32 },
   jab2: { contact: 7, x: 64, back: 32 },
+  forwardTilt: { contact: 9, x: Number(process.env.LX ?? 10), back: Number(process.env.LB ?? 5), over: Number(process.env.LO ?? 0.5) },
   forwardSmash: { contact: 20, x: 48, back: 24 },
   upSmash: { contact: 17, z: 48, back: 24 },
   downSmash: { contact: 15, x: 10, back: 6 },
