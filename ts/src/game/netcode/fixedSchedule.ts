@@ -10,10 +10,10 @@ import { FrameRing } from "./frameRing";
 import { InputLedger, LEDGER_CAPACITY, type Receipt } from "./ledger";
 import { at } from "wisp/src/runtime/lookup";
 
-/** The input delays a schedule supports: past 16 frames a fighter stops feeling playable. */
+/** The input delays a schedule supports: an 8-frame rollback window needs 20 on a 600 ms round trip, and past that a fighter stops feeling playable. */
 export type FixedDelay = number;
 
-export const MAX_INPUT_DELAY = 16;
+export const MAX_INPUT_DELAY = 20;
 
 export function isFixedDelay(value: number): value is FixedDelay {
   return Math.floor(value) === value && value >= 0 && value <= MAX_INPUT_DELAY;

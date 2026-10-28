@@ -199,7 +199,7 @@ jobs:
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;
             rollback)
-              check "four-fighter 24-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf' ;;
+              check "four-fighter 8-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf' ;;
             parity)
               # Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
               check "parity tapes and numeric" sh -c 'bun wisp parity tapes && bun wisp parity numeric'

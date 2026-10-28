@@ -4,7 +4,7 @@ import { MAX_INPUT_DELAY } from "./fixedSchedule";
 // Integer milliseconds and frames only, so Bun and both Lua32 modes decide alike.
 
 export const DEFAULT_DELAY = 2;
-export const ROLLBACK_BUDGET = 6;
+export const TURN_TAIL_FRAMES = 10;
 export const MAX_FIXED_DELAY = MAX_INPUT_DELAY;
 export const HIGH_DELAY_FRAMES = 8;
 export const TIME_SYNC_INTERVAL = 60;
@@ -16,8 +16,8 @@ export interface DelayPolicy {
   readonly budget: number;
 }
 
-export function delayPolicy(window: number, ceiling: number = MAX_FIXED_DELAY, budget: number = ROLLBACK_BUDGET, floor: number = DEFAULT_DELAY): DelayPolicy {
-  return { floor, ceiling: Math.max(floor, ceiling), window, budget: Math.min(budget, window - 1) };
+export function delayPolicy(window: number, ceiling: number = MAX_FIXED_DELAY, tail: number = TURN_TAIL_FRAMES, floor: number = DEFAULT_DELAY): DelayPolicy {
+  return { floor, ceiling: Math.max(floor, ceiling), window, budget: window - tail };
 }
 
 export interface RttEstimate {
@@ -115,6 +115,8 @@ export function correctDelay(policy: DelayPolicy, correction: DelayCorrection, d
   correction.cleanSeconds = 0;
   correction.value = clampDelay(policy, Math.min(correction.value, delay) - 1);
 }
+
+export const raisedDelay = (policy: DelayPolicy, delay: number, proposal: number): number => clampDelay(policy, Math.max(delay + 1, proposal));
 
 export const correctedDelay = (policy: DelayPolicy, correction: Readonly<DelayCorrection>, pingDelay: number): number =>
   clampDelay(policy, Math.max(pingDelay, correction.value));

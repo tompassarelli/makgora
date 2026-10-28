@@ -44,7 +44,7 @@ import { makePreview } from "./preview";
 import { HELP_EVENT, helpCommand, serviceHelp, startHelp } from "./help";
 import { preloadStageAssets } from "./stageScenery";
 import * as probe from "./responseProbe";
-import { checksumRow, delayRow, receiveInput, rollbackTick } from "./rollback";
+import { checksumRow, delayRow, raiseMatchDelay, receiveInput, rollbackTick } from "./rollback";
 import { floorMod } from "wisp/src/sim/intMath";
 import * as netDelay from "./netDelay";
 import { SAVE_MOMENT, momentKey, serviceMomentRequest, serviceMomentSave } from "./moment";
@@ -385,6 +385,7 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
 function serviceDelay(s: ShellState, rollback: Rollback): void {
   const local = localSlot();
   netDelay.serviceNetDelay(rollback.net, s.game, local, rollback.delay, s.game.phase === Phase.match, rollback.predictionHeld || rollback.stalled > 0);
+  raiseMatchDelay(s, rollback);
   if (s.game.phase !== Phase.characterMenu || floorMod(rollback.net.ticks, 30) !== 0) return;
   const net = netDelay.lobbyNet(rollback.net, s.game);
   for (const panel of views(s).selections) panel.showDelay(net);
