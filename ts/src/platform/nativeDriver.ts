@@ -231,6 +231,8 @@ export function nativeDriverCommand(text: string): void {
 }
 
 
+const scriptedMana = (kind: string): number => kind === "ultimate" ? ROSTER_MANA.max : ROSTER_MANA.max - 1;
+
 export function startScriptedMove(s: ShellState, slot: number, kind: string | undefined, code: string, facing: string | undefined): void {
   if (s.build.inputProfile !== "native-driver") return;
   const fighter = fighterAt(s.world, slot);
@@ -252,7 +254,7 @@ export function startScriptedMove(s: ShellState, slot: number, kind: string | un
     const direction = whole(code);
     input.specialX = direction === 1 ? fighter.facing : 0;
     input.specialZ = direction === 2 ? 1 : direction === 3 ? -1 : 0;
-    fighter.mana.points = ROSTER_MANA.max;
+    fighter.mana.points = scriptedMana(kind);
     if (!startFighterSpecial(fighter, s.game.stageChoice, frame, input, s.world)) throw new Error("native driver: move did not start");
   } else throw new Error("native driver: move needs normal, special or ultimate");
 }

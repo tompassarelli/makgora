@@ -42,7 +42,8 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
 
 export function showcaseFrames(move: ShowcaseMove): number[] {
   const duration = Math.max(8, move.end);
-  const samples = [1, Math.max(2, floorDiv(move.first, 2)), move.first, Math.round(duration / 3), Math.round(duration * 2 / 3), duration, duration + 2, duration + (move.kind === "ultimate" ? 300 : 4)];
+  const samples = move.kind === "ultimate" ? [1, Math.max(2, floorDiv(move.first, 2)), move.first, Math.round(duration / 3), Math.round(duration * 2 / 3), duration, duration + 2, duration + 300]
+    : [1, Math.max(2, floorDiv(move.first, 2)), move.first - 2, move.first, move.first + 1, move.first + 3, Math.round((move.first + 3 + duration) / 2), duration];
   const frames: number[] = [];
   for (const sample of samples.sort((a, b) => a - b)) frames.push(Math.max(SHOWCASE_FIRST_FRAME + sample, (frames[frames.length - 1] ?? SHOWCASE_FIRST_FRAME) + 1));
   return frames;

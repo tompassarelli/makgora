@@ -61,12 +61,13 @@ add("backAir", 35, [phase(0), phase(5, { axe: -35, grip: -105, chest: 22, yaw: 6
 strike("upAir", 33, 7, 9, { axe: -20, chest: 20, knee: 42 }, { axe: -110, grip: -100, elbow: -10, chest: 0, knee: 20 }, {}, true, { axe: -175, grip: -135, elbow: -22, chest: -24, knee: 10 });
 strike("downAir", 45, 13, 16, { axe: -160, chest: -20, knee: 60 }, { axe: 25, elbow: 0, chest: 15, knee: 65 }, { axe: 25, chest: 15, knee: 50 }, true, { axe: 45, elbow: 0, chest: 15, knee: 65 });
 strike("neutralSpecial", 42, 18, 20, { grip: -145, chest: -20, twist: -25, knee: 20 }, { grip: -80, axe: -35, chest: 32, twist: 30, knee: 12 });
-const shouldered = { chest: 18, knee: 32, tuck: 0.08, axe: -160, grip: -150, elbow: -45, head: 4 };
-add("sideSpecial", 30, [phase(0), phase(6, { chest: 40, knee: 42, tuck: 0.15, axe: 25, grip: -15, elbow: 8, head: -6 }), phase(12, { chest: 64, knee: 72, tuck: 0.28, axe: 35, grip: -5, elbow: 10, head: -16 }),
-  phase(14, { chest: 26, knee: 30, tuck: 0.08, axe: -40, grip: -60, elbow: 0, height: 4 }), phase(15, { chest: 0, knee: 8, axe: -90, grip: -95, elbow: -10, height: 8 }),
-  phase(17, { chest: -32, knee: 0, axe: -150, grip: -140, elbow: -20, head: 16, height: 10 }), phase(19, { chest: -6, knee: 18, axe: -165, grip: -150, elbow: -35, head: 8, height: 2 }),
-  phase(20, shouldered), phase(23, { ...shouldered, knee: 38, chest: 22 }), phase(25, shouldered),
-  phase(27, { chest: -20, knee: 12, twist: -20, axe: -178, grip: -172, elbow: -10, head: 4 }), phase(30)]);
+const coiled = { chest: 48, knee: 84, tuck: 0.3, lean: 22, ahead: 8, axe: 48, grip: 12, elbow: 16, head: -28 };
+const heaved = { chest: -24, lean: -10, knee: 10, tuck: 0, axe: -188, grip: -172, elbow: -40, head: 22, height: 10 };
+add("sideSpecial", 30, [phase(0), phase(3, { chest: 34, knee: 44, tuck: 0.14, lean: 12, axe: 12, grip: -8, head: -10 }), phase(6, coiled), phase(12, { ...coiled, chest: 54, knee: 90, lean: 26 }),
+  phase(14, { chest: 28, knee: 40, tuck: 0.1, lean: 10, axe: -32, grip: -52, elbow: 0, height: 10, head: -6 }), phase(15, { chest: 0, knee: 4, lean: -8, axe: -88, grip: -96, elbow: -10, height: 18, head: 6 }),
+  phase(16, { chest: -20, knee: 0, lean: -10, axe: -132, grip: -126, elbow: -16, height: 22, head: 18 }), phase(17, { chest: -30, knee: 0, lean: -14, axe: -166, grip: -152, elbow: -26, head: 26, height: 20 }),
+  phase(19, heaved), phase(23, { ...heaved, knee: 18, lean: -8, height: 6 }), phase(25, heaved),
+  phase(27, { chest: -12, knee: 14, twist: -20, axe: -178, grip: -172, elbow: -10, head: 4 }), phase(30)]);
 const LOG_PATH: readonly (readonly [frame: number, x: number, z: number, angle: number])[] = [
   [0, 12, 6, -2], [7, 12, 6, -2], [12, 10, 10, -8], [13, 14, 14, -6], [14, 22, 18, -4.3], [15, 22, 30, 12.6], [16, 20, 44, 33.7], [17, 16, 60, 55.9],
   [18, 12, 72, 85], [19, 16, 78, 125], [20, 26, 66, 168], [23, 26, 62, 170], [25, 26, 65, 168], [26, 14, 62, 178], [27, -4, 44, 192], [28, -12, 14, 184], [29, -14, 7, 180], [30, -14, 6, 180],
