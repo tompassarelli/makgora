@@ -330,7 +330,7 @@ export const BLADEMASTER_MOVES: FighterMoves = {
 
     [AttackStyle.neutralAir]: neutralAir,
     [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, tipped(10, [[52.0, 65.0, 163.0, 72.0], [53.0, 63.0, 163.0, 51.0], [52.0, 61.0, 159.0, 30.0]], BLADE_RADIUS, TIP_LENGTH, hit(10.843297958374023, "EDGE", 40), hit(8.519732475280762, "EDGE", 40))),
-    [AttackStyle.backAir]: heroMove(8, 3, 23, 13, swing(8, [[-48.0, 121.0, -130.0, 205.0], [-44.0, 120.0, -127.0, 205.0], [-41.0, 120.0, -123.0, 205.0]], BLADE_RADIUS, hit(9.294255256652832, "KILL", 35, -1.0))),
+    [AttackStyle.backAir]: heroMove(8, 3, 23, 13, swing(8, [[-2.0, 98.0, -129.0, 124.0], [-20.0, 95.0, -148.0, 115.0], [-30.0, 94.0, -158.0, 112.0]], BLADE_RADIUS, hit(9.294255256652832, "KILL", 35, -1.0))),
     [AttackStyle.upAir]: heroMove(UP_AIR_FIRST, UP_AIR_SWEEP.length, 19, 11, path(UP_AIR_FIRST, blades(UP_AIR_DRAWN), hit(6.196170330047607, "LAUNCH", 85))),
     [AttackStyle.downAir]: downAir,
     [AttackStyle.grab]: heroMove(7, 2, 22, 0, path(7, [

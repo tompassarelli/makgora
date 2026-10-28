@@ -92,7 +92,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`; Chen's hang turns his left wrist rather than the staff, since the staff's own pivot is off the grip and turning it pulls the shaft out of his fist (#525).
-  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace aerials|up-air|forward-air]`
+  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace aerials|up-air|forward-air|counter|back-air]`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the double-jump flip, and re-authors two clips in place from the move's own blade tables:
   the Down Air Sword Plunge sequence as the down air's crescent sweep under him, and the
@@ -100,7 +100,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   move frames and scaled onto its clip, which plays frame-aligned. `--replace aerials` or `--replace up-air` re-authors only those clips on the shipped
   model, checking every other clip is unchanged. `--replace forward-air` plays the stock
   Attack Slam as the forward air, retimed so its level cut lands on the first active frame,
-  under the airborne legs and root of the clip it replaces (#502).
+  under the airborne legs and root of the clip it replaces (#502). `--replace back-air`
+  re-keys the Air Turning Back Cut sequence in place, frame-aligned: he twirls the katana
+  into a reverse grip (the sword turned 180 degrees about his fist, blade back along the
+  forearm), drives it level behind his hip on the active frames and twirls it back to guard.
   `bun tools/animations/peon-clips.ts STOCK_PEON.mdx PRIVATE_OUTPUT` appends
   Peon's tool strikes, movement, recovery, paired grabs and nine pain poses,
   preserves the 22 stock sequences and writes both-facing silhouette sheets.

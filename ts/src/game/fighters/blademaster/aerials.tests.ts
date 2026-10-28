@@ -5,7 +5,8 @@ import { type Scene, airborne, fighter, frame, scene } from "../../match/padScen
 import { AttackStyle, Character } from "../../sim/codes";
 import type { Fighter } from "../../sim/fighter";
 import { landsInAutoCancel } from "../../sim/moves";
-import { BLADEMASTER_MOVES, DOWN_AIR_SOURSPOT, DOWN_AIR_TIPPER, NEUTRAL_AIR_LAUNCH, NEUTRAL_AIR_LINK } from "./moves";
+import { squareRoot } from "../../sim/warcraftMath";
+import { BLADE_RADIUS, BLADEMASTER_MOVES, DOWN_AIR_SOURSPOT, DOWN_AIR_TIPPER, NEUTRAL_AIR_LAUNCH, NEUTRAL_AIR_LINK, SWORD_LENGTH } from "./moves";
 
 const REPLACED_DOWN_AIR_FRAMES = 46;
 const DOWN_AIR_ACTIONABLE_FRAME = 44;
@@ -19,6 +20,9 @@ const AIR_Z = 400.0;
 const FOE_AHEAD = 80.0;
 const TIP_AT = { ahead: 100.0, below: 40.0 } as const;
 const INNER_AT = { ahead: 40.0, below: 40.0 } as const;
+const BACK_AIR_FOE_BEHIND = 150.0;
+const BACK_AIR_THINNESS = 12.0;
+const BACK_AIR_LEVEL_SLOPE = 0.25;
 
 interface Contact { readonly damage: number; readonly heldInHitstun: boolean; readonly knockbackZ: number }
 
@@ -141,4 +145,33 @@ test("Blademaster's down air auto-cancels its landing before frame 6 and from fr
   assertFalse(cancels(DOWN_AIR_EARLY_CANCEL_BEFORE));
   assertFalse(cancels(DOWN_AIR_LATE_CANCEL_FRAME - 1));
   assertTrue(cancels(DOWN_AIR_LATE_CANCEL_FRAME));
+});
+
+test("Blademaster's back air strikes with one long thin capsule along the blade drawn level behind him on every active frame, hitting a foe out at the blade tip behind him and not one in front, facing either way [k1 scenario]", () => {
+  const move = BLADEMASTER_MOVES.normals[AttackStyle.backAir];
+  assertTrue(move !== undefined);
+  if (move === undefined) return;
+  for (let active = move.startupFrames; active < move.startupFrames + move.activeFrames; active++) {
+    const live = move.regions.filter(region => region.firstFrame <= active && active <= region.lastFrame);
+    assertEquals(live.length, 1);
+    const blade = live[0]?.hit.strike;
+    assertTrue(blade !== undefined);
+    if (blade === undefined) continue;
+    const dx = blade.x2 - blade.x1, dz = blade.z2 - blade.z1, reach = squareRoot(dx * dx + dz * dz);
+    assertGreaterThan(reach, f32(SWORD_LENGTH * f32(0.9)));
+    assertTrue(blade.radius <= BLADE_RADIUS);
+    assertGreaterThan(reach / blade.radius, BACK_AIR_THINNESS);
+    assertLessThan(Math.max(blade.x1, blade.x2), 0.0);
+    assertLessThan(Math.abs(blade.z2 - blade.z1), reach * BACK_AIR_LEVEL_SLOPE);
+  }
+  for (const facing of [1, -1]) {
+    const back = facing > 0 ? Action.cLeft : Action.cRight;
+    for (const [at, landed] of [[-facing * BACK_AIR_FOE_BEHIND, 1], [facing * FOE_AHEAD, 0]] as const) {
+      const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing }, { character: Character.warden, x: at, facing: -facing }]);
+      const user = fighter(s), foe = fighter(s, 1);
+      airborne(user, 0.0, AIR_Z);
+      airborne(foe, at, AIR_Z);
+      assertEquals(contacts(s, user, foe, once(back)).length, landed);
+    }
+  }
 });
