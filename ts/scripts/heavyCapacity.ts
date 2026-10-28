@@ -36,11 +36,16 @@ class CapacityFailure extends Schema.TaggedError<CapacityFailure>()("CapacityFai
 
 
 
+export type CapacityClass = "moderate" | "heavy" | "critical";
+
+export const admitted = (capacityClass: CapacityClass, owner: string, timeoutSeconds: number, command: readonly string[]): string[] => admitsThroughHelper()
+  ? [process.execPath, capacityHelper, "run", "--class", capacityClass, "--owner", owner, "--timeout-seconds", String(timeoutSeconds), "--", ...command]
+  : [...command];
+
 export const admit = (capacityClass: "moderate" | "heavy", owner: string, timeoutSeconds: number) => Effect.gen(function*() {
   if (!admitsThroughHelper()) return undefined;
   return yield* Effect.tryPromise({
-    try: () => Bun.spawn([process.execPath, capacityHelper, "run", "--class", capacityClass, "--owner", owner,
-      "--timeout-seconds", String(timeoutSeconds), "--", process.execPath, ...process.argv.slice(1)], {
+    try: () => Bun.spawn(admitted(capacityClass, owner, timeoutSeconds, [process.execPath, ...process.argv.slice(1)]), {
       stdin: "inherit", stdout: "inherit", stderr: "inherit",
     }).exited,
     catch: (cause) => new CapacityFailure({ problem: String(cause) }),

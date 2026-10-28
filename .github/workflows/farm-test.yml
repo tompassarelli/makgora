@@ -111,10 +111,6 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      LUA_BUILD: '^(ts/(src|plugins|vendor)/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|\.github/workflows/farm-test\.yml$)'
-      COMPILER_ONLY: '^ts/scripts/(compiler-benchmark|hostProcess)\.ts$'
-      TYPES: '^(ts/|contracts/|repos/effect|effect-kit\.json$|typescript-toolchain\.lock$|\.github/workflows/farm-test\.yml$)'
     strategy:
       fail-fast: false
       matrix:
@@ -178,57 +174,15 @@ jobs:
         timeout-minutes: 20
         env:
           GROUP: ${{ matrix.group }}
-          CI_TIMING: report
+          CHECKS: ${{ inputs.checks }}
+        # The group's checks and their selection are smashcraft:ts/scripts/landingChecks.ts, which safe-push's landing gate runs on its own machine.
         run: |
           set +e
-          mkdir -p build
-          failed=0
-          touched() { [ "$(cat "$RUNNER_TEMP/changed")" = unknown ] || grep -qE "$1" "$RUNNER_TEMP/changed"; }
-          check() {
-            local name="$1" started code
-            shift
-            started=$(date +%s)
-            echo "::group::$name"
-            "$@" > build/check.log 2>&1
-            code=$?
-            cat build/check.log
-            echo "::endgroup::"
-            printf '%s\t%s\tcheck: %s\n' "$([ "$code" = 0 ] && echo pass || echo fail)" "$(( $(date +%s) - started ))" "$name" >> build/checks.tsv
-            if [ "$code" != 0 ]; then
-              failed=1
-              echo "check: $name exited $code: $(sed 's/\x1b\[[0-9;]*m//g' build/check.log | grep -v '^\s*$' | tail -n 6 | tr '\n' ' ' | cut -c1-700)" >> "problems-check-$GROUP.txt"
-            fi
-          }
-          case "$GROUP" in
-            perf)
-              check "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf'
-              if [ -f build/playable-bot-four.perf ]; then
-                bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
-              fi ;;
-            rollback)
-              check "four-fighter 7-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf' ;;
-            parity-*)
-              # Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
-              shard=${GROUP#parity-}
-              check "parity tapes $shard/3" env TAPES_SHARD="$shard/3" bun wisp parity tapes
-              if [ "$shard" = 0 ]; then
-                check "parity numeric" bun wisp parity numeric
-                check "stack-trace profile TypeScript frames" env LUA_TESTS_STEP=stack bun scripts/lua-tests.ts
-              fi ;;
-            corpus)
-              # Every native recording replays headless with 0 divergent frames, each on the source that recorded it (wisp#69).
-              check "parity corpus: every native recording replays headless with 0 divergent frames" bun wisp parity corpus test/corpus
-              if touched "$LUA_BUILD|$COMPILER_ONLY"; then
-                check "compiler affected-module and output-equivalence checks" env COMPILER_TIMINGS=1 bun scripts/compiler-benchmark.ts
-              fi
-              check "cue models and Classic effect record current for this tree" bun scripts/cueModels.ts
-              if touched "$TYPES"; then
-                check "effect-kit check" sh -c 'git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && cd .. && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check'
-              fi
-              check "every selectable computer fighter is active" bun scripts/cpuCoverage.ts ;;
-            types)
-              check "type-check edit loop and dependency validation" bun scripts/typecheck-benchmark.ts ;;
-          esac
+          bun scripts/landingRun.ts farm "$GROUP" "$RUNNER_TEMP/changed" "$CHECKS"
+          failed=$?
+          if [ "$GROUP" = perf ] && [ -f build/playable-bot-four.perf ]; then
+            bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
           bun node_modules/wisp/host/farm/farmShards.ts lua --shard 0 --exit-code "$failed" build/checks.tsv > "result-check-$GROUP.json"
           exit "$failed"
       - if: ${{ !cancelled() && steps.scope.outputs.run == 'true' }}

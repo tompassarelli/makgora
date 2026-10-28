@@ -2,8 +2,8 @@
 // (wisp:docs/testing.md), then a report of its CPU (scripts/testCost.ts,
 // docs/commands/testing.md).
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { availableParallelism, tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { Cause, Effect, Exit, Layer, Schema } from "effect";
@@ -17,6 +17,7 @@ import { refuseUntagged } from "./oracleTags";
 import { refuseLiteralCopies } from "./literalCopies";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { ensureGenerated } from "./generated";
+import { usableCpus } from "./usableCpus";
 
 const project = resolve(import.meta.dir, "..");
 process.chdir(project);
@@ -76,28 +77,6 @@ const groupCost = (group: Group) => group.env?.GAME_MODULES === undefined
   ? group.files.reduce((sum, file) => sum + fileCost(file), 0)
   : group.env.GAME_MODULES.split(",").reduce((sum, module) => sum + fileCost(`src/${module}`), 0);
 
-/**
- * The CPUs this process may use: the tightest cgroup v2 `cpu.max` quota on its
- * path (a capacity scope's CPUQuota), else every core it may run on.
- */
-function usableCpus(): number {
-  let cpus = availableParallelism();
-  let group: string | undefined;
-  try {
-    group = readFileSync("/proc/self/cgroup", "utf8").split("\n").find((line) => line.startsWith("0::"))?.slice(3);
-  } catch {
-    return cpus;
-  }
-  for (let dir = group; dir !== undefined && dir !== "/" && dir !== ""; dir = dirname(dir)) {
-    try {
-      const [quota, period] = readFileSync(join("/sys/fs/cgroup", dir, "cpu.max"), "utf8").trim().split(" ");
-      if (quota !== undefined && quota !== "max" && Number(period) > 0) cpus = Math.min(cpus, Number(quota) / Number(period));
-    } catch {
-      // No cpu controller at this level.
-    }
-  }
-  return Math.max(1, Math.floor(cpus));
-}
 
 // Each Bun process also runs compiler threads; leave half the CPUs for them.
 const slots = Math.min(groups.length, 8, Math.max(1, Math.floor(usableCpus() / 2)));

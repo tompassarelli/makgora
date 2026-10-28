@@ -21,6 +21,7 @@ import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { generateTapes } from "../acceptanceTapes";
 import { luaRuntimes } from "../luaRuntimes";
 import { runProcess } from "../../hostProcess";
+import { usableCpus } from "../../usableCpus";
 
 const ts = join(import.meta.dir, "../../..");
 const build = join(ts, "build", "tapes");
@@ -29,8 +30,23 @@ const build = join(ts, "build", "tapes");
 
 
 interface Run {
-  readonly records: string[];
+  readonly records: readonly string[];
   readonly error: string | undefined;
+}
+
+// A Bun replay child ends each tape's record lines with one line opening with NUL, then the tape's error if it stopped.
+const TAPE_END = "\u0000";
+
+function bunRunsOf(output: string): Run[] {
+  const runs: Run[] = [];
+  let records: string[] = [];
+  for (const line of output.split("\n")) {
+    if (line.startsWith(TAPE_END)) {
+      runs.push({ records, error: line.length > TAPE_END.length ? line.slice(TAPE_END.length) : undefined });
+      records = [];
+    } else if (line.length > 0) records.push(line);
+  }
+  return runs;
 }
 
 const recordsOf = (output: string) => output.split("\n").filter(line => line.length > 0);
@@ -78,16 +94,32 @@ const compileTypeScriptLua = Effect.gen(function*() {
 });
 
 
-export const replayInLua = (files: readonly string[], executable: string) =>
+export const replayInLua = (files: readonly string[], executable: string, concurrency: number) =>
   Effect.forEach(files, (file) =>
     captureProcess("replay in 32-bit Lua", file, [executable, tapesLua], { env: { ...process.env, TAPE_FILE: file } }).pipe(
       Effect.map(({ stdout, stderr, exitCode }): Run => ({
         records: recordsOf(stdout), error: exitCode === 0 ? undefined : stderr.trim() || `exit ${exitCode}`,
       })),
       Effect.mapError((cause) => new TapesFailure({ problem: describeCause(cause) })),
-    ), { concurrency: 2 });
+    ), { concurrency });
+
+const replayInBun = (tapes: readonly Tape[], parts: number) =>
+  Effect.forEach(Array.from({ length: parts }, (_, index) => tapeShard(tapes, { index, count: parts })), (part) =>
+    captureProcess("replay in Bun", part.map(({ file }) => file).join(" "), [process.execPath, import.meta.path, ...part.map(({ file }) => file)]).pipe(
+      Effect.mapError((cause) => new TapesFailure({ problem: describeCause(cause) })),
+      Effect.flatMap(({ stdout, stderr, exitCode }) => exitCode === 0
+        ? Effect.succeed(bunRunsOf(stdout))
+        : Effect.fail(new TapesFailure({ problem: `replay in Bun: ${stderr.trim() || `exit ${exitCode}`}` }))),
+      Effect.map((runs) => part.map(({ file }, index): [string, Run] => [file, runs[index] ?? { records: [], error: "no run" }])),
+    ), { concurrency: parts }).pipe(Effect.map((parts) => new Map(parts.flat())));
+
+const longestFirst = (tapes: readonly Tape[]) => tapes.toSorted((a, b) => b.text.length - a.text.length).map(({ file }) => file);
+
+const inOrder = (files: readonly string[], runs: readonly Run[]) => new Map(files.map((file, index): [string, Run] => [file, runs[index] ?? { records: [], error: "no run" }]));
 
 
+
+interface Tape { readonly name: string; readonly text: string; readonly file: string }
 
 export interface TapeShard { readonly index: number; readonly count: number }
 
@@ -167,14 +199,17 @@ export const tapes: Command = (args) => Effect.gen(function*() {
   }).pipe(step("record tapes"));
   yield* compileTypeScriptLua.pipe(Effect.provide(BunServices.layer), step("compile TypeScript Lua"));
 
-  const files = tapes.map(({ file }) => file);
+  const cpus = usableCpus();
+  const bunParts = Math.max(1, Math.min(4, Math.floor(cpus / 4)));
+  const luaSlots = Math.max(2, Math.floor((cpus - bunParts) / 2));
+  const files = longestFirst(tapes);
   const replays = yield* Effect.all({
-    "ts-lua32": replayInLua(files, luas.nearest).pipe(step("replay in ts-lua32")),
-    "ts-lua32-toward-zero": replayInLua(files, luas.towardZero).pipe(step("replay in ts-lua32-toward-zero")),
-    "bun": attempt("replay in Bun", () => tapes.map(({ text }) => runInBun(text))).pipe(step("replay in bun")),
+    "ts-lua32": replayInLua(files, luas.nearest, luaSlots).pipe(Effect.map((runs) => inOrder(files, runs)), step("replay in ts-lua32")),
+    "ts-lua32-toward-zero": replayInLua(files, luas.towardZero, luaSlots).pipe(Effect.map((runs) => inOrder(files, runs)), step("replay in ts-lua32-toward-zero")),
+    "bun": replayInBun(tapes, bunParts).pipe(step("replay in bun")),
   }, { concurrency: 3 });
-  const runs = new Map(tapes.map(({ name }, index): [string, Record<RuntimeName, Run>] => {
-    const byRuntime = (runtime: RuntimeName): Run => replays[runtime][index] ?? { records: [], error: "no run" };
+  const runs = new Map(tapes.map(({ name, file }): [string, Record<RuntimeName, Run>] => {
+    const byRuntime = (runtime: RuntimeName): Run => replays[runtime].get(file) ?? { records: [], error: "no run" };
     return [name, { bun: byRuntime("bun"), "ts-lua32": byRuntime("ts-lua32"), "ts-lua32-toward-zero": byRuntime("ts-lua32-toward-zero") }];
   }));
 
@@ -212,3 +247,14 @@ export const tapes: Command = (args) => Effect.gen(function*() {
   }
   if (failed) return yield* new TapesFailure({ problem: "the runtimes disagree or one stopped" });
 });
+
+if (import.meta.main) {
+  const out = Bun.stdout.writer();
+  for (const file of process.argv.slice(2)) {
+    const { records, error } = runInBun(await Bun.file(file).text());
+    for (const record of records) out.write(`${record}\n`);
+    out.write(`${TAPE_END}${(error ?? "").replaceAll("\n", " ")}\n`);
+    await out.flush();
+  }
+  await out.end();
+}

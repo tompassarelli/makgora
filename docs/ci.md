@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); every landing on main, pushed by `safe-push` or dispatched by Autoland, also runs the smoke job (the Classic frame budget, the same budget on the four-fighter 7-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the filtered-checks job (parity tapes and numeric, the stack-trace profile, the compiler and type-check benchmarks and effect-kit, unfiltered), so main gets the full suite after each landing (see Landing) |
 | Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
-| Farm test (smashcraft:.github/workflows/farm-test.yml) | `safe-push --to main` with `checks`, `bun wisp farm test`, autoland | the check groups CI's checks fall into (perf, rollback, parity-0 to parity-2, corpus, types), each only when the `checks` input names it or, without one, when a changed path reaches it (see Landing); inside corpus the compiler benchmark runs only for the Lua build's paths or the benchmark itself, and effect-kit for any `ts/`, `contracts/`, effect-kit.json or `repos/effect` path (the clean room runs in the pre-push hook on every candidate); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
+| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (smashcraft:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (perf, rollback, parity-0 to parity-2, corpus, types), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; the clean room runs in the pre-push hook on every candidate); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most three jobs at once: every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); without one in the last 60 commits, drift comparison warns and passes while roster coverage and absolute frame budgets still apply; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
@@ -30,30 +30,26 @@ such a rehash into a measured move reads as a pair regression (#197).
 
 Tom asked for small changes to reach main in one to two minutes rather than
 about six, by checking before landing only what a change can affect and
-running the full suite on main afterwards (2026-10-29). So `safe-push --to
-main` lands a local lane straight on main under the landing lock (the
-repository's .safe-push sets `landing.queue = lock`; Autoland still lands
-cloud workers' `claude/**` pushes):
+running the full suite on main afterwards (2026-10-29), then for a gameplay
+change to land in 90 s or less (#689). So `safe-push --to main` lands a local
+lane straight on main under the landing lock (the repository's .safe-push sets
+`landing.queue = lock`; Autoland still lands cloud workers' `claude/**`
+pushes), and the landing gate runs on the landing machine rather than on the
+farm:
 
 1. **Before landing.** The pre-push hook (smashcraft:ts/scripts/prePush.ts)
-   runs its local checks, then selects the farm check groups the lane's diff
-   against main can affect (`selectGroups` in
-   smashcraft:ts/scripts/landingChecks.ts) and prints each with the path and
-   rule that selected it, and the skipped ones. A path in `ts/src`,
-   `ts/codegen` or `build-inputs/` selects every Lua-build group; a script
-   selects a group when it is in the static import closure of that group's
-   entry (`ts/scripts/wisp.ts`, the parity command, `lua-tests.ts`); any
-   `ts/` path selects `corpus` (effect-kit, cue models, computer coverage)
-   and `types` (the type-check benchmark); a shared root (the lockfiles,
-   `package.json`, tsconfigs, `ts/plugins`, `ts/vendor`, the toolchain
-   lock, farm-test.yml, the selection module itself) or an unknown base
-   selects all of them. `LAND_FULL_SUITE=1 safe-push --to main` forces every
-   group. The hook pushes the commit to `farm/SHA`, dispatches farm-test.yml
-   with `checks` naming the groups, polls its jobs every 5 s and refuses
-   the landing on the first failed group (cancelling the rest, with the
-   group's failing log lines), including a check main already fails. A lane
-   that selects no group, such as a docs change, lands on the local checks
-   alone.
+   selects the landing checks the lane's diff against main can reach
+   (`landingSelection` in smashcraft:ts/scripts/landingChecks.ts, which names
+   every check, its command and the paths that reach it) and prints each with
+   the path and rule that selected it, the ones left to main's CI and the
+   skipped ones. It runs them with its local checks at once, through
+   machine-capacity (critical while it holds the landing lock), with
+   smashcraft:ts/scripts/landingRun.ts, and refuses the landing on the first
+   failure, printing the failing check's last lines, including a check main
+   already fails. The compiler and type-check benchmarks edit the working tree,
+   so each runs alone afterwards. A lane no check can reach, such as a docs
+   change, lands on the local checks alone. `LAND_FULL_SUITE=1 safe-push --to
+   main` forces every check.
 2. **After landing.** The push to main runs CI's smoke, filtered-checks,
    development-loop and code-health jobs, one run per landed commit (CI's
    concurrency is per SHA on main), plus Background sweeps, Auto-close and
@@ -63,12 +59,46 @@ cloud workers' `claude/**` pushes):
    sheriff and the "main is red" issue (see Sheriff); the lane whose
    landing first failed owns the fix.
 
-The farm's check groups are perf, rollback, parity-0 to parity-2 (one third
+What reaches each check:
+
+- A shared root (the lockfiles, `package.json`, tsconfigs, `ts/plugins`,
+  `ts/vendor`, the toolchain lock, farm-test.yml, landingChecks.ts and
+  landingRun.ts) or an unknown base reaches every check, the frame budgets
+  included.
+- A path in `ts/src`, `ts/codegen` or `build-inputs/` reaches the parity
+  tapes, parity numeric and the stack-trace profile; a tape input or a script
+  in the static import closure of the wisp CLI, the parity command or
+  lua-tests.ts reaches them too. Computer coverage runs for its own import
+  closure, which holds most of the game.
+- The two four-fighter frame budgets (perf, and rollback under lag spikes)
+  run for the Lua build's paths and the wisp CLI's imports, one after the
+  other since they share the playable build. Rollback is one single-threaded
+  32-bit Lua run of about 110 s for its four clients in one process, the
+  slowest check a gameplay lane reaches. A check marked `afterLanding` runs on
+  main's CI instead unless a shared root reaches it.
+- The native corpus replays each recording on the source that recorded it
+  (wisp#69), so only a recording, the replay command or the replay header
+  parse in `ts/src/game/replay/` reaches it.
+- The compiler benchmark compares the incremental compiler with a full compile
+  after an edit to `ts/src/host/loop/diagnostics.ts`, so only that file, the
+  benchmark and its imports reach it. The type-check benchmark checks that a
+  changed shared signature fails at its host and game consumers, so only the
+  files it edits or expects to fail and the benchmark reach it (the pre-push
+  hook type-checks every `ts/` change itself).
+- The cue models and effect-kit are the pre-push hook's own local checks, so
+  the landing gate never runs them twice.
+
+The parity tapes replay longest first on every usable core, with the Bun
+replays in their own processes; the longest tape, orbs (5180 frames with a
+computer player), takes about 40 s in each 32-bit Lua, which bounds them.
+
+Farm test (farm-test.yml) runs the same checks for Autoland and `bun wisp farm
+test`, grouped into its jobs perf, rollback, parity-0 to parity-2 (one third
 of the replay tapes each, balanced by tape length with `TAPES_SHARD`; parity-0
-also runs parity numeric and the stack-trace profile), corpus and types. On
-2026-10-28 a gameplay change's slowest group was rollback, measured while it
-still rolled back 24 frames: one single-threaded Lua process of about 96 s on
-a hosted runner, after a 25 s compile.
+also runs parity numeric and the stack-trace profile), corpus and types. A job
+runs when the `checks` input names it or a changed path reaches one of its
+checks, and then runs its checks the changed paths reach (all of them when
+`checks` names it).
 
 ## Autoland
 

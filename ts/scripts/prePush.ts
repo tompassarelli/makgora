@@ -12,15 +12,16 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { Console, type Duration, Effect, Option, Schema, type Scope } from "effect";
-import { currentRepo, dispatch, resolveRef, runTag } from "wisp/scripts/wisp/farm";
-import { FULL_SUITE_VARIABLE, type Group, importClosure, selectGroups, selectionLines } from "./landingChecks";
+import { Console, Effect, Option, Schema } from "effect";
+import { admitted } from "./heavyCapacity";
+import { FULL_SUITE_VARIABLE, type LandingCheck, importClosure, landingSelection, selectionLines } from "./landingChecks";
 import { issueTests, redTitle } from "./mainRed";
 import { effectPlaybackInputs } from "./wisp/effectVisibility";
 import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
 import { derivedStepCode } from "./wisp/fighterArt";
 import { changedFighters } from "./wisp/fighterArtChanges";
 import { LOCOMOTION_RECORD, LOCOMOTION_TRAILER } from "./locomotionRecord";
+import { type Finished, runGroup } from "./processGroups";
 
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
@@ -102,53 +103,8 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
 }
 
 
-const liveGroups = new Set<number>();
-
-const signalGroup = (group: number, signal: NodeJS.Signals) => {
-  try {
-    process.kill(-group, signal);
-  } catch {
-
-  }
-};
-
-
-export function killChildren(): void {
-  for (const group of liveGroups) signalGroup(group, "SIGKILL");
-  liveGroups.clear();
-}
-
-
-
-
-
-
-
-export const run = (command: readonly string[], cwd: string, stdout: "pipe" | "ignore" = "pipe") => Effect.acquireUseRelease(
-  Effect.try({
-    try: () => {
-      const child = Bun.spawn([...command], { cwd, stdin: "ignore", stdout, stderr: "pipe", detached: true });
-      liveGroups.add(child.pid);
-      return child;
-    },
-    catch: (cause) => new PrePushRefusal({ problem: `pre-push: could not start ${command[0]}: ${String(cause)}` }),
-  }),
-  (child) => Effect.promise(async () => {
-    const output = Promise.all([child.stdout === null ? "" : new Response(child.stdout).text(), new Response(child.stderr).text()]);
-    const exitCode = await child.exited;
-    signalGroup(child.pid, "SIGKILL");
-    const [out, err] = await output;
-    return { exitCode, stdout: out, stderr: err };
-  }),
-  (child) => Effect.promise(async () => {
-    if (child.exitCode === null && child.signalCode === null) {
-      signalGroup(child.pid, "SIGTERM");
-      await Promise.race([child.exited, Bun.sleep(1000)]);
-    }
-    signalGroup(child.pid, "SIGKILL");
-    liveGroups.delete(child.pid);
-    await child.exited;
-  }),
+export const run = (command: readonly string[], cwd: string, stdout: "pipe" | "ignore" = "pipe") => runGroup(command, { cwd, stdout }).pipe(
+  Effect.mapError((failure) => new PrePushRefusal({ problem: `pre-push: ${failure.message}` })),
 );
 
 
@@ -262,7 +218,7 @@ const landingQueue = run(["git", "config", "--file", join(root, ".safe-push"), "
   Effect.map(({ exitCode, stdout }) => (exitCode === 0 ? stdout.trim() : "")),
 );
 
-export const prePush = (input: string, landing: { readonly gate: (head: string, paths: readonly string[]) => Effect.Effect<void, PrePushRefusal>; readonly queue: typeof landingQueue; readonly notice?: Effect.Effect<void> } = { gate: landingGate, queue: landingQueue }, local: Local = laptop) => Effect.gen(function*() {
+export const prePush = (input: string, landing: { readonly gate: (head: string, paths: readonly string[], alongside: Effect.Effect<void, PrePushRefusal>) => Effect.Effect<void, PrePushRefusal>; readonly queue: typeof landingQueue; readonly notice?: Effect.Effect<void> } = { gate: landingGate, queue: landingQueue }, local: Local = laptop) => Effect.gen(function*() {
   yield* landing.notice ?? mainRedNotice;
   const pushed = input.split("\n").flatMap((line) => {
     const [, commit, remoteRef, remote] = line.trim().split(/\s+/);
@@ -282,96 +238,35 @@ export const prePush = (input: string, landing: { readonly gate: (head: string, 
     return yield* new PrePushRefusal({ problem: `pre-push: the checks read the working tree, so push the clean checked-out commit (HEAD ${head.slice(0, 12)}).\n${dirty}` });
   }
   if (deferred.length > 0) yield* Console.error(`pre-push: Autoland's build runs ${deferred.map(({ name }) => name).join(", ")} in this hook on the rebased candidate before it lands`);
+  if (toMain && !lands) return yield* landing.gate(head, paths, runChecks(checks, local));
   yield* runChecks(checks, local);
-  if (!toMain) return;
-  if (lands) return yield* Console.error("pre-push: Autoland runs the farm suite on the rebased candidate before it lands, so this push waits for no farm run");
-  yield* landing.gate(head, paths);
+  if (lands) yield* Console.error("pre-push: Autoland runs the farm suite on the rebased candidate before it lands, so this push waits for no farm run");
 });
 
-const FARM_TIMEOUT_MINUTES = 30;
+const GATE_TIMEOUT_SECONDS = 1200;
 
-export interface FarmJob { readonly name: string; readonly status: string; readonly conclusion: string; readonly databaseId: number }
-export type ChecksVerdict = { readonly state: "pending" } | { readonly state: "green" } | { readonly state: "red"; readonly failed: readonly FarmJob[] } | { readonly state: "infra"; readonly missing: readonly string[] };
+export type GateRunner = (checks: readonly LandingCheck[]) => Effect.Effect<Finished, PrePushRefusal>;
 
-const FAILED = new Set(["failure", "cancelled", "timed_out", "startup_failure"]);
+export const localRunner: GateRunner = (checks) => run(admitted(process.env.SAFE_PUSH_LOCK_HELD === undefined ? "heavy" : "critical", "land-check", GATE_TIMEOUT_SECONDS,
+  [process.execPath, "scripts/landingRun.ts", "here", ...checks.map(({ name }) => name)]), join(root, "ts"));
 
+const phase = (runner: GateRunner, checks: readonly LandingCheck[], head: string) => checks.length === 0 ? Effect.void : runner(checks).pipe(
+  Effect.flatMap((finished) => Effect.gen(function*() {
+    const lines = finished.stderr.split("\n").filter((line) => line.trim() !== "");
+    if (finished.exitCode === 0) return yield* Effect.forEach(lines.filter((line) => line.startsWith("landing check: ")), (line) => Console.error(`pre-push: ${line}`), { discard: true });
+    return yield* new PrePushRefusal({ problem: `${finished.stdout}${finished.stderr}\npre-push: a landing check failed on ${head.slice(0, 12)}; main lands only on green checks, including ones main already fails` });
+  })),
+);
 
-export function checksVerdict(jobs: readonly FarmJob[], groups: readonly Group[], runCompleted: boolean): ChecksVerdict {
-  const selected = jobs.filter(({ name }) => groups.some((group) => name === group));
-  const failed = selected.filter(({ conclusion }) => FAILED.has(conclusion));
-  if (failed.length > 0) return { state: "red", failed };
-  const passed = new Set(selected.filter(({ status, conclusion }) => status === "completed" && conclusion === "success").map(({ name }) => name));
-  if (groups.every((group) => passed.has(group))) return { state: "green" };
-  return runCompleted ? { state: "infra", missing: groups.filter((group) => !passed.has(group)) } : { state: "pending" };
-}
-
-export interface FarmRun { readonly id: number; readonly url: string }
-export interface FarmChecks {
-  readonly poll: Duration.Input;
-  readonly start: (head: string, groups: readonly Group[]) => Effect.Effect<FarmRun, PrePushRefusal, Scope.Scope>;
-  readonly state: (run: FarmRun) => Effect.Effect<{ readonly completed: boolean; readonly jobs: readonly FarmJob[] }, PrePushRefusal>;
-  readonly cancel: (run: FarmRun) => Effect.Effect<void>;
-  readonly failedLog: (job: FarmJob) => Effect.Effect<string>;
-}
-
-const RunJobs = Schema.fromJsonString(Schema.Struct({
-  status: Schema.String,
-  jobs: Schema.Array(Schema.Struct({ name: Schema.String, status: Schema.String, conclusion: Schema.String, databaseId: Schema.Finite })),
-}));
-
-const infra = (what: string) => (failure: { readonly message: string }) => new PrePushRefusal({ problem: `pre-push: INFRA, not a red check: ${what}: ${failure.message}; NOT landed, re-run safe-push` });
-
-export const githubFarm: FarmChecks = {
-  poll: "5 seconds",
-  start: (head, groups) => Effect.gen(function*() {
-    const repo = yield* currentRepo.pipe(Effect.mapError(infra("reading the repository")));
-    const { ref, scratch } = yield* resolveRef(head, repo).pipe(Effect.mapError(infra("pushing the scratch branch")));
-    const base = yield* git("merge-base", head, "origin/main");
-    const found = yield* dispatch(repo, "farm-test.yml", { ref, base, checks: groups.join(","), tag: runTag() }, scratch ?? "main").pipe(Effect.mapError(infra("starting the farm run")));
-    return { id: found.databaseId, url: found.url };
-  }),
-  state: (farm) => run(["gh", "run", "view", String(farm.id), "--json", "status,jobs"], root).pipe(
-    Effect.flatMap(({ exitCode, stdout, stderr }) => exitCode === 0
-      ? Schema.decodeEffect(RunJobs)(stdout).pipe(Effect.mapError((cause) => infra(`reading run ${farm.id}`)({ message: String(cause) })))
-      : Effect.fail(infra(`reading run ${farm.id}`)({ message: stderr.trim() }))),
-    Effect.retry({ times: 3 }),
-    Effect.map(({ status, jobs }) => ({ completed: status === "completed", jobs })),
-  ),
-  cancel: (farm) => run(["gh", "run", "cancel", String(farm.id)], root).pipe(Effect.ignore),
-  failedLog: (job) => run(["gh", "run", "view", "--job", String(job.databaseId), "--log-failed"], root).pipe(
-    Effect.map(({ stdout }) => stdout.split("\n").map((line) => line.split("\t").slice(2).join("\t")).filter((line) => line.trim() !== "").slice(-40).join("\n")),
-    Effect.orElseSucceed(() => ""),
-  ),
-};
-
-const watchChecks = (farm: FarmChecks, head: string, groups: readonly Group[]) => Effect.scoped(Effect.gen(function*() {
-  const started = yield* farm.start(head, groups);
-  yield* Console.error(`pre-push: farm run ${started.url} checks ${groups.join(", ")} on ${head.slice(0, 12)}`);
-  for (;;) {
-    const state = yield* farm.state(started);
-    const verdict = checksVerdict(state.jobs, groups, state.completed);
-    if (verdict.state === "red" && !state.completed) yield* farm.cancel(started);
-    if (verdict.state !== "pending") return { run: started, verdict };
-    yield* Effect.sleep(farm.poll);
-  }
-}));
-
-export const landingGate = (head: string, paths: readonly string[], farm: FarmChecks = githubFarm) => Effect.gen(function*() {
-  const selected = selectGroups(paths, process.env[FULL_SUITE_VARIABLE] === "1");
-  for (const line of selectionLines(paths, selected)) yield* Console.error(`pre-push: ${line}`);
-  const groups = selected.map(({ group }) => group);
-  if (groups.length === 0) return yield* Console.error(`pre-push: no farm check can be affected, so ${head.slice(0, 12)} lands on the local checks; main's CI runs the full suite after it lands`);
+export const landingGate = (head: string, paths: readonly string[], alongside: Effect.Effect<void, PrePushRefusal> = Effect.void, runner: GateRunner = localRunner) => Effect.gen(function*() {
+  const landing = landingSelection(paths, process.env[FULL_SUITE_VARIABLE] === "1");
+  for (const line of selectionLines(paths, landing)) yield* Console.error(`pre-push: ${line}`);
+  const checks = landing.run.map(({ check }) => check);
   const started = performance.now();
-  const outcome = yield* watchChecks(farm, head, groups).pipe(Effect.timeoutOption(`${FARM_TIMEOUT_MINUTES} minutes`));
+  yield* Effect.all([alongside, phase(runner, checks.filter(({ here }) => here === "beside"), head)], { concurrency: "unbounded", discard: true });
+  yield* Effect.forEach(checks.filter(({ here }) => here === "alone"), (check) => phase(runner, [check], head), { discard: true });
   const seconds = ((performance.now() - started) / 1000).toFixed(0);
-  if (Option.isNone(outcome)) return yield* new PrePushRefusal({ problem: `pre-push: the farm checks on ${head.slice(0, 12)} didn't finish within ${FARM_TIMEOUT_MINUTES} minutes; NOT landed` });
-  const { run: farmRun, verdict } = outcome.value;
-  if (verdict.state === "infra") {
-    return yield* new PrePushRefusal({ problem: `pre-push: INFRA, not a red check: farm run ${farmRun.url} ended without a result for ${verdict.missing.join(", ")} (${seconds} s); NOT landed, re-run safe-push` });
-  }
-  if (verdict.state === "red") {
-    const logs = yield* Effect.forEach(verdict.failed, (job) => farm.failedLog(job).pipe(Effect.map((log) => `--- ${job.name} (${job.conclusion})\n${log}`)));
-    return yield* new PrePushRefusal({ problem: `${logs.join("\n")}\npre-push: ${verdict.failed.map(({ name }) => name).join(", ")} failed on ${head.slice(0, 12)} (${seconds} s, ${farmRun.url}); main lands only on green checks, including ones main already fails` });
-  }
-  yield* Console.error(`pre-push: ${groups.join(", ")} passed on ${head.slice(0, 12)} (${seconds} s, ${farmRun.url})`);
+  yield* Console.error(checks.length === 0
+    ? `pre-push: no landing check can be affected, so ${head.slice(0, 12)} lands on the local checks; main's CI runs the full suite after it lands`
+    : `pre-push: ${checks.length} landing check${checks.length === 1 ? "" : "s"} and the local checks passed on ${head.slice(0, 12)} (${seconds} s)`);
 });
