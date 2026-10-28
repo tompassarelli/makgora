@@ -22,6 +22,35 @@ const TURN_RUN_ZERO_VELOCITY_THRESHOLD = melee(0.009999999776482582);
 /** only the Dash-to-Guard branch uses this early/late split. */
 export const DASH_GUARD_EARLY_FRAMES = 20;
 
+export function landWavedash(f: Fighter): void {
+  const { landing, motion } = f;
+  landing.wavedash = true;
+  landing.dashBuffer = 0;
+  landing.heldSide = motion.previousStickSide;
+}
+
+export function readWavedashExit(f: Fighter, stickSide: number, horizontalStick: number): void {
+  const { landing, motion } = f;
+  if (stickSide !== landing.heldSide) landing.heldSide = 0;
+  if (!landing.wavedash) return;
+  if (landing.lag <= 0) {
+    landing.wavedash = false;
+    landing.dashBuffer = 0;
+  } else if (landing.heldSide === 0 && motion.stickSideAge < DASH_FLICK_SAMPLES && Math.abs(horizontalStick) >= DASH_STICK_THRESHOLD) {
+    landing.dashBuffer = stickSide;
+  } else if (stickSide !== landing.dashBuffer) {
+    landing.dashBuffer = 0;
+  }
+}
+
+function wavedashDashBuffered(f: Readonly<Fighter>, direction: number): boolean {
+  return f.landing.wavedash && f.landing.dashBuffer !== 0 && f.landing.dashBuffer === direction;
+}
+
+function holdsWavedashSide(f: Readonly<Fighter>): boolean {
+  return f.landing.heldSide !== 0;
+}
+
 export function groundState(f: Readonly<Fighter>): GroundState {
   if (f.motion.crouching) return GroundState.crouch;
   switch (f.ground.action) {
@@ -202,7 +231,8 @@ export function advanceGroundMovement(f: Fighter, direction: number, walking: bo
     direction = runStickDirection(horizontalStick === 0 ? direction : horizontalStick, f.facing);
   }
   const strongStick = Math.abs(horizontalStick) >= DASH_STICK_THRESHOLD;
-  const freshFlick = motion.stickSideAge < DASH_FLICK_SAMPLES || (ground.action !== GroundAction.dash && Math.abs(horizontalStick) >= 1.0);
+  const freshFlick = wavedashDashBuffered(f, direction) || motion.stickSideAge < DASH_FLICK_SAMPLES
+    || (ground.action !== GroundAction.dash && !holdsWavedashSide(f) && Math.abs(horizontalStick) >= 1.0);
   const speedScale = stickSpeedScale(horizontalStick === 0 ? direction : horizontalStick, walking);
 
   const pivotWindow = ground.action === GroundAction.turnRun ? ground.actionFrame < 2

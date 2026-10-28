@@ -279,7 +279,7 @@ function createObservation(): ObservationFighter {
     status: { ...EMPTY.status, out: f.status.out, stocks: f.status.stocks, damage: f.status.damage,
       invincible: f.status.invincible, frozenFrames: f.status.frozenFrames, condition: f.status.condition,
       conditionFrames: f.status.conditionFrames, poisonFrames: f.status.poisonFrames },
-    landing: { lag: f.landing.lag },
+    landing: { ...EMPTY.landing, lag: f.landing.lag },
     down: { ...EMPTY.down, state: f.down.state, frame: f.down.frame, direction: f.down.direction, faceUp: f.down.faceUp },
     grab: { ...EMPTY.grab, owner: f.grab.owner, target: f.grab.target, action: f.grab.action },
     ledge: { ...EMPTY.ledge, state: f.ledge.state, side: f.ledge.side, intangible: f.ledge.intangible },

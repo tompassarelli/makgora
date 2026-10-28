@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, DamageLanding, DownState, ParasolState, SpecialAction } from "./codes";
 import { isFloorTeching, isTumbling } from "./conditions";
 import { type Fighter } from "./fighter";
-import { clearDash } from "./groundMovement";
+import { clearDash, landWavedash } from "./groundMovement";
 import { MAX_GROUNDED_KNOCKBACK_ON_LANDING, airborneDamageLandingReaction, decayKnockback } from "./knockback";
 import { RIFLEMAN_BLASTER_AIR_FRAMES, RIFLEMAN_BLASTER_LANDING_LAG, attackLandingLag, isAerialAttack, landsInAutoCancel, landsIntoAttack } from "./moves";
 import { clearMotionValue, setWorldMotionValue, totalVelocityX } from "./motion";
@@ -155,6 +155,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   landExWavedash(f);
   if (dodge.airDodging) {
     landingState.lag = AIR_DODGE_LANDING_LAG;
+    landWavedash(f);
     dodge.airDodging = false;
     dodge.airFrame = 0;
   }
