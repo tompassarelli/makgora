@@ -59,7 +59,7 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
 
   clearKey(settings, code("K"));
   assertEquals(slots(settings, Action.strong), "— —", "Strong after its x");
-  assertEquals(settings.message, `K cleared from ${ACTION_LABELS[Action.strong]}.`);
+  assertEquals(settings.message, `${ACTION_LABELS[Action.strong]} is now unbound.`);
   assertEquals(unbound(settings), `${Action.walk},${Action.strong}`);
   const before = encodeBindings(settings.bindings);
   clearKey(settings, code("C"));
@@ -167,7 +167,7 @@ test("each layout keeps its own edits when switching, and only Reset to layout r
   bindAttack(settings, code("K"));
   applyBindingPreset(settings, "wasd");
   applyBindingPreset(settings, "standard");
-  assertEquals(slots(settings, Action.attack), "K —", "Hitbox keeps its edit");
+  assertEquals(slots(settings, Action.attack), "K —", "Box keeps its edit");
 });
 
 test("saving keeps all three layouts and the active one, and a new session reopens on them [k2 property]", () => {
@@ -184,18 +184,18 @@ test("saving keeps all three layouts and the active one, and a new session reope
   assertEquals(reopened.layout, "custom", "active layout");
   assertEquals(slots(reopened, Action.attack), "L —", "Custom keys");
   applyBindingPreset(reopened, "standard");
-  assertEquals(slots(reopened, Action.attack), "K —", "Hitbox keys");
+  assertEquals(slots(reopened, Action.attack), "K —", "Box keys");
   applyBindingPreset(reopened, "wasd");
   assertEquals(slots(reopened, Action.attack), "N —", "WASD keys");
 });
 
 test("a one-set save from before layouts loads as the active layout's keys, and Load profile puts a profile on Custom [k2 property]", () => {
   const keys = presetBindings("wasd");
-  keys.keys[slotIndex(Action.attack, 0)] = code("L");
+  keys.keys[slotIndex(Action.attack, 0)] = code("B");
   const old = encodeBindings(keys);
   const settings = persistedSettings({ encoded: old });
   assertEquals(settings.layout, "custom", "own keys land on Custom");
-  assertEquals(slots(settings, Action.attack), "L —", "old save keys");
+  assertEquals(slots(settings, Action.attack), "B —", "old save keys");
   applyBindingPreset(settings, "wasd");
   assertEquals(slots(settings, Action.attack), "N —", "WASD is still stock");
 
@@ -205,16 +205,16 @@ test("a one-set save from before layouts loads as the active layout's keys, and 
   applyBindingPreset(settings, "standard");
   loadSavedBindings(settings, () => undefined);
   assertEquals(settings.layout, "custom", "Load profile selects Custom");
-  assertEquals(slots(settings, Action.attack), "L —", "Custom gets the profile");
+  assertEquals(slots(settings, Action.attack), "B —", "Custom gets the profile");
   applyBindingPreset(settings, "standard");
-  assertEquals(slots(settings, Action.attack), "N —", "Hitbox is untouched by Load profile");
+  assertEquals(slots(settings, Action.attack), "N —", "Box is untouched by Load profile");
 });
 
-test("a one-set save still on the old WASD defaults opens on WASD with Strong on 9 and C-up on -, while an edited one stays Custom [k2 property]", () => {
+test("a one-set save still on the old WASD defaults opens on WASD with Strong on 9 and C-up on 0, while an edited one stays Custom [k2 property]", () => {
   const stock = persistedSettings({ encoded: encodeBindings({ keys: previousDefaultKeys("wasd") }) });
   assertEquals(stock.layout, "wasd", "an old stock save opens on its layout");
   assertEquals(slots(stock, Action.strong), "9 Y", "Strong moved");
-  assertEquals(slots(stock, Action.cUp), "- —", "C-up moved");
+  assertEquals(slots(stock, Action.cUp), "0 —", "C-up moved");
   const edited = { keys: previousDefaultKeys("wasd") };
   edited.keys[slotIndex(Action.attack, 0)] = code("B");
   const own = persistedSettings({ encoded: encodeBindings(edited) });

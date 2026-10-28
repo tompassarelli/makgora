@@ -35,7 +35,7 @@ const STICK_JUMP = "stick-up";
 SOURCES.set(STICK_JUMP, Action.jump);
 
 const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "8", JUMP_ALT = padSource(Action.jump), ATTACK = "N", SPECIAL = "U",
-  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = padSource(Action.rightTrigger), LIGHT_SHIELD = "0", C_LEFT = "J", C_LEFT_ALT = padSource(Action.cLeft), C_RIGHT = "L", C_UP = "-",
+  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = padSource(Action.rightTrigger), LIGHT_SHIELD = "A", C_LEFT = "J", C_LEFT_ALT = padSource(Action.cLeft), C_RIGHT = "L", C_UP = "0",
   C_DOWN = "P", WALK = "K", SHORT_HOP = "I", STRONG = "9", STRONG_SECOND = "Y", STRONG_ALT = padSource(Action.strong), MOD_X = ";";
 
 

@@ -12,10 +12,11 @@
 - **EX wavedash:** hold Strong while air dodging into the ground to spend one EX charge and slide about 40% farther, with blue dust along the slide.
 - **Wavedash exit:** holding a direction through a wavedash's landing lag now walks out of it, from the slide speed down or up to walk pace, instead of dashing on the first free frame. A dash comes only from a fresh press during the lag, which buffers and starts on the first free frame.
 - **Ultimates:** retuned to deal about 25-30% in total. Seventeen weak ones were raised, among them Mountain King's Avatar, Illidan's Metamorphosis and Cairne's Reincarnation, and Dreadlord's Summon Inferno was cut.
-- **Strong is 9** on WASD and Hitbox, the key right of full hop, with Y kept as a second Strong, and C-up is the minus key on every layout. A saved WASD or Hitbox layout still on the old defaults moves to the new ones; one you edited stays yours. Y still confirms on the select screens, and it can now be bound to any action on the Controls screen.
+- **Strong is 9** on WASD and Box, the key right of full hop, with Y kept as a second Strong, and C-up is the minus key on every layout. A saved WASD or Box layout still on the old defaults moves to the new ones; one you edited stays yours. Y still confirms on the select screens, and it can now be bound to any action on the Controls screen.
 - **C-stick:** the smash keys are now C-up, C-down, C-left and C-right. On the ground they give tilts (C-left and C-right the forward tilt, turning you first, C-up the up tilt, C-down the down tilt) and in the air the aerials; smashes come only from Strong plus a direction. A C-stick press out of a dash, a run or a run brake stops you and tilts at once, while attack plus a direction there stays the dash attack.
 - **Default layout:** the WASD layout's C-stick and walk keys moved to the right hand: C-left is J, C-right L, C-up -, C-down P and Walk K. A layout you edited is not migrated, so Reset to layout applies the new defaults. The tilt-shortening control is now labelled Walk instead of Tilt.
-- **Layout saves:** WASD, Hitbox and Custom each keep their own keys, switching between them shows that layout's saved keys, only Reset to layout restores a layout's defaults, and the save holds all three plus the active layout. Load profile fills Custom.
+- **Controls cleanup:** the Z, X and G keys are gone from the Custom layout and from saved layouts, where an old upgrade had added them as a second key for jump, Strong and Shield R; a key you bound yourself as a first key stays. On the WASD layout Space is now Up with W, and Jump is 8 alone. A saved WASD or Custom layout still on the earlier defaults moves to the new one on load.
+- **Layout saves:** WASD, Box and Custom each keep their own keys, switching between them shows that layout's saved keys, only Reset to layout restores a layout's defaults, and the save holds all three plus the active layout. Load profile fills Custom.
 - **Mod X:** a bindable modifier on ; in every layout. Hold it with up and a side for the shallow up-diagonal of a box controller, about 23 degrees above horizontal, for both facings. Saves from before load with every old key unchanged and ; on Mod X when it is free.
 - **Dash attack:** a direction plus attack on any frame of a dash is the dash attack, never a forward tilt.
 - **Saving a moment:** type -clip in chat instead of pressing =. The = and - keys are ordinary bindable keys.
@@ -103,8 +104,8 @@
 New here? Place only your own fighter chip and press Y to practice alone.
 
 ## Default controls (WASD)
-- Move: **A**/**D**. Aim up: **W**. Crouch, fast-fall and drop through platforms: **S**
-- Jump: **Space** or **8**. Shield and air dodge: **Q**. Light shield: **0**. Grab: **O**
+- Move: **A**/**D**. Aim up: **W** or **Space**. Crouch, fast-fall and drop through platforms: **S**
+- Jump: **8**. Shield and air dodge: **Q**. Light shield: **E**. Grab: **O**
 - Attack: **N**, with a direction for tilts. Hold Strong (**9** or **Y**) with a direction for smashes: up, down, or forward. The C-stick keys give tilts on the ground and aerials in the air. Special: **U**, with a direction
 - EX special: **9 + U** with a direction, which spends the EX charge. Ultimate: **N + U** together at a full ultimate meter
 - Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: type **-clip**

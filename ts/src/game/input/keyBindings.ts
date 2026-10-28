@@ -24,12 +24,12 @@ export const DEFAULT_PRESET: BindingPreset = "wasd";
 
 export const BINDING_PRESETS: readonly BindingPreset[] = ["wasd", "standard", "custom"];
 
-export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WASD", standard: "Hitbox (Space = up)", custom: "Custom" };
+export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WASD", standard: "Box", custom: "Custom" };
 
 export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
-  wasd: "Recommended if you're new",
+  wasd: "Recommended if you're new. W or Space is up, 8 jumps",
   standard: "Leverless controller style",
-  custom: "Hitbox with 9 jump, 8 shield and - C-up",
+  custom: "Box with 9 jump, 8 shield and - C-up",
 };
 
 const EMPTY = 0;
@@ -84,16 +84,14 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.moveLeft, code(wasd ? "A" : "W"));
   bind(Action.moveRight, code(wasd ? "D" : "R"));
   bind(Action.moveDown, code(wasd ? "S" : "E"));
-  bind(Action.moveUp, wasd ? code("W") : SPACE);
-  if (wasd) bind(Action.jump, SPACE, code("8"));
-  else if (custom) bind(Action.jump, code("Z"), code("9"));
-  else bind(Action.jump, code("8"));
+  if (wasd) bind(Action.moveUp, code("W"), SPACE);
+  else bind(Action.moveUp, SPACE);
+  bind(Action.jump, code(custom ? "9" : "8"));
   bind(Action.attack, code("N"));
   bind(Action.special, code("U"));
   bind(Action.grab, code("O"));
   bind(Action.leftTrigger, code("Q"));
-  if (custom) bind(Action.rightTrigger, code("8"), code("G"));
-  else bind(Action.rightTrigger, code("7"));
+  bind(Action.rightTrigger, code(custom ? "8" : "7"));
   bind(Action.cLeft, code("J"));
   bind(Action.cRight, code("L"));
   bind(Action.cUp, custom ? MINUS : code("0"));
@@ -128,22 +126,39 @@ export function previousStandardKeys(): number[] {
 
 type StockPreset = "wasd" | "standard";
 
-function earlierDefaultKeys(preset: StockPreset, cUp: number, strong: number, secondStrong: number): number[] {
+type KeyChange = readonly [action: Action, first: number, second?: number];
+
+const withKeys = (preset: BindingPreset, changes: readonly KeyChange[]): number[] => {
   const keys = presetBindings(preset).keys.slice();
-  keys[slotIndex(Action.cUp, 0)] = cUp;
-  keys[slotIndex(Action.lightShield, 0)] = code("0");
-  keys[slotIndex(Action.strong, 0)] = strong;
-  keys[slotIndex(Action.strong, 1)] = secondStrong;
+  for (const [action, first, second = EMPTY] of changes) {
+    keys[slotIndex(action, 0)] = first;
+    keys[slotIndex(action, 1)] = second;
+  }
   return keys;
+};
+
+const PREVIOUS_STOCK_CHANGES: readonly KeyChange[] = [[Action.cUp, code("9")], [Action.lightShield, code("0")], [Action.strong, START_KEY]];
+
+const EARLIER_STOCK_CHANGES: readonly (readonly KeyChange[])[] = [
+  PREVIOUS_STOCK_CHANGES,
+  [[Action.cUp, MINUS], [Action.lightShield, code("0")], [Action.strong, code("9"), START_KEY]],
+];
+
+const EARLIER_WASD_JUMP: readonly KeyChange[] = [[Action.moveUp, code("W")], [Action.jump, SPACE, code("8")]];
+
+const EARLIER_CUSTOM_JUMP: readonly KeyChange[] = [[Action.jump, code("Z"), code("9")]];
+
+const earlierStockKeys = (preset: StockPreset, changes: readonly KeyChange[]): number[] => withKeys(preset, preset === "wasd" ? [...changes, ...EARLIER_WASD_JUMP] : changes);
+
+function earlierDefaults(preset: BindingPreset): number[][] {
+  if (preset === "custom") return [withKeys(preset, EARLIER_CUSTOM_JUMP)];
+  const earlier = EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes));
+  return preset === "wasd" ? [...earlier, earlierStockKeys(preset, [])] : earlier;
 }
 
-export function previousDefaultKeys(preset: StockPreset): number[] {
-  return earlierDefaultKeys(preset, code("9"), START_KEY, EMPTY);
-}
+export const previousDefaultKeys = (preset: StockPreset): number[] => earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES);
 
-const earlierDefaults = (preset: StockPreset): number[][] => [previousDefaultKeys(preset), earlierDefaultKeys(preset, MINUS, code("9"), START_KEY)];
-
-export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly StockPreset[] = ["wasd", "standard"]): void {
+export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly BindingPreset[] = BINDING_PRESETS): void {
   const preset = presets.find((stock) => earlierDefaults(stock).some((earlier) => earlier.every((key, index) => bindings.keys[index] === key)));
   if (preset !== undefined) bindings.keys = presetBindings(preset).keys;
 }
@@ -266,6 +281,14 @@ function readKey(saved: string, offset: number): number | undefined {
 }
 
 
+const OLD_AUTO_BOUND_KEYS: readonly (readonly [Action, string])[] = [[Action.jump, "Z"], [Action.strong, "X"], [Action.rightTrigger, "G"]];
+
+function dropOldAutoBoundKeys({ keys }: KeyBindings): void {
+  for (const [action, character] of OLD_AUTO_BOUND_KEYS) {
+    if (keys[slotIndex(action, 1)] === code(character)) keys[slotIndex(action, 1)] = EMPTY;
+  }
+}
+
 function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
   if (version < FIRST_SAVE_WITH_START) {
     if (version !== "KA") upgradeToPreviousKeys(bindings, version);
@@ -281,10 +304,6 @@ function bindModXDefault(bindings: KeyBindings): void {
 
 function upgradeToPreviousKeys(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
-  if (keyFor(bindings, Action.strong, 0) === code("X") && keyFor(bindings, Action.strong, 1) === undefined) {
-    keys[slotIndex(Action.strong, 0)] = EMPTY;
-    keys[slotIndex(Action.strong, 1)] = code("X");
-  }
   upgradeDefaults(bindings, version);
   if (keyFor(bindings, Action.strong, 0) === undefined) {
     const ex = keyFor(bindings, Action.jump, 1) === code("9") ? code("0") : code("9");
@@ -303,12 +322,7 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
     return;
   }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
-  if (keyFor(bindings, Action.rightTrigger, 1) === undefined && free(code("G"))) rebind(bindings, Action.rightTrigger, 1, code("G"));
-  if (keyFor(bindings, Action.strong, 1) === undefined && free(code("X"))) rebind(bindings, Action.strong, 1, code("X"));
-  if (first(Action.shortHop) === undefined) {
-    const hop = first(Action.jump) === code("I") ? code("Z") : code("I");
-    if (free(hop)) rebind(bindings, Action.shortHop, 0, hop);
-  }
+  if (first(Action.shortHop) === undefined && free(code("I"))) rebind(bindings, Action.shortHop, 0, code("I"));
   if (version === "K1" && free(code("P"))) rebind(bindings, Action.walk, 0, code("P"));
 
   if (first(Action.grab) === code("L") && free(code("O"))) rebind(bindings, Action.grab, 0, code("O"));
@@ -322,10 +336,6 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
     rebind(bindings, Action.leftTrigger, 0, code("Q"));
   }
 
-  if (first(Action.jump) === code("I") && first(Action.shortHop) === code("Z")) {
-    keys[slotIndex(Action.jump, 0)] = code("Z");
-    keys[slotIndex(Action.shortHop, 0)] = code("I");
-  }
   if ((first(Action.lightShield) === undefined || first(Action.lightShield) === code("9") || first(Action.lightShield) === code("0")) && keyFor(bindings, Action.lightShield, 1) === code("T") && free(code("A"))) {
     keys[slotIndex(Action.lightShield, 0)] = code("A");
     keys[slotIndex(Action.lightShield, 1)] = EMPTY;
@@ -349,6 +359,7 @@ export function decodeBindings(saved: string): KeyBindings | undefined {
   }
   const bindings = { keys };
   if (version !== CURRENT_SAVE) upgradeToCurrentKeys(bindings, version);
+  dropOldAutoBoundKeys(bindings);
   return bindings;
 }
 
@@ -382,7 +393,7 @@ export function decodeLayouts(saved: string): LayoutSave | undefined {
     const end = start + 2 + SAVED_KEY_DIGITS * slots;
     const bindings = decodeBindings(saved.slice(start, end));
     if (bindings === undefined) return undefined;
-    if (preset !== "custom") replacePreviousDefaults(bindings, [preset]);
+    replacePreviousDefaults(bindings, [preset]);
     layouts[preset] = bindings;
     start = end;
   }
