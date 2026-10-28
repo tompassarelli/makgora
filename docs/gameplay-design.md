@@ -378,7 +378,8 @@ transport (wisp#110) both call it.
     match waits for it, and error correction raises the next match's delay.
   - Character select shows "Input delay: N frames", red from 8, and a match
     at 8 or more shows "Laggy connection: N frames of input delay" in the
-    network indicator.
+    network indicator, ahead of the poor-connection line (whose frames-behind
+    count it keeps), above the players' cards so the cards do not cover it.
   - Measured headless (smashcraft:ts/test/online-rollback.test.ts, two humans
     and a computer, match 793's inputs over Battle.net's measured turn
     jitter, 20 s matches, R 4): agreed delay 2, 4, 7, 3, 13, 28 and 57 frames

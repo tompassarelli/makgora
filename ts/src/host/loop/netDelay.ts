@@ -106,8 +106,6 @@ export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchSta
   return warnings.length === 0 ? "" : `|cffffcc00${warnings.join(" · ")}|r`;
 }
 
-export const laggyLine = (delay: number): string => highDelay(delay) ? `|cffff4040Laggy connection: ${I2S(delay)} frames of input delay|r` : "";
-
 export const echoMs =(estimate: Readonly<RttEstimate>): number => estimate.samples === 0 ? -1 : floorDiv(smoothedRttMs(estimate), 2);
 
 export interface DelayMessage {
@@ -286,7 +284,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   if (floorMod(net.ticks, SECOND) !== 0) return;
   if (net.indicator === undefined) {
     net.indicator = createText("SmashcraftNetIndicator", gameUi(), 0);
-    placeTopLeft(net.indicator, f32(0.01), f32(0.03));
+    placeTopLeft(net.indicator, f32(0.01), f32(0.145));
     BlzFrameSetSize(net.indicator, f32(0.5), f32(0.016));
     BlzFrameSetVisible(net.indicator, false);
   }
@@ -296,7 +294,9 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);
   const slow = inMatch ? slowMachineLine(net, game) : "";
-  const text = slow !== "" ? slow : !inMatch || !online ? "" : poor ? `|cffff4040Connection poor|r · input delay ${I2S(delay)} · ${I2S(net.shownDepth)} frames behind` : laggyLine(delay);
+  const behind = poor ? ` · ${I2S(net.shownDepth)} frames behind` : "";
+  const network = highDelay(delay) ? `|cffff4040Laggy connection: ${I2S(delay)} frames of input delay|r${behind}` : poor ? `|cffff4040Connection poor|r · input delay ${I2S(delay)}${behind}` : "";
+  const text = slow !== "" ? slow : !inMatch || !online ? "" : network;
   if (text === net.shownText) return;
   net.shownText = text;
   BlzFrameSetText(net.indicator, text);
