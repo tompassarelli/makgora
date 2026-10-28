@@ -1477,7 +1477,7 @@ mod linux {
                 } else if input.start_only {
                     (pressed == 1 << 31).then_some("y")
                 } else {
-                    [(MOVE_LEFT, "["), (MOVE_RIGHT, "]"), (MOVE_UP, ";"), (MOVE_DOWN, "'"), (ATTACK, "c"), (SPECIAL, "v"), (1 << 31, "y")]
+                    [(MOVE_LEFT, "["), (MOVE_RIGHT, "]"), (MOVE_UP, "="), (MOVE_DOWN, "'"), (ATTACK, "c"), (SPECIAL, "v"), (1 << 31, "y")]
                         .into_iter().find(|(bit, _)| pressed == *bit).map(|(_, key)| key)
                 };
                 assert_eq!(input.press(physical, after, start, start_after, at), expected, "run {run}: {physical:?} -> {after:?}");

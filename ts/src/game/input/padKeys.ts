@@ -20,7 +20,7 @@ export const PAD_LAYER: readonly PadKey[] = [
   { action: Action.strong, key: "`", code: 0xc0 },
   { action: Action.moveLeft, key: "[", code: 0xdb },
   { action: Action.moveRight, key: "]", code: 0xdd },
-  { action: Action.moveUp, key: ";", code: 0xba },
+  { action: Action.moveUp, key: "=", code: 0xbb },
   { action: Action.moveDown, key: "'", code: 0xde },
   { action: Action.cLeft, key: ",", code: 0xbc },
   { action: Action.cRight, key: ".", code: 0xbe },

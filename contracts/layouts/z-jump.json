@@ -134,8 +134,8 @@
     {
       "control": "left_up",
       "press": "key",
-      "key": ";",
-      "code": 186,
+      "key": "=",
+      "code": 187,
       "action": "moveUp",
       "label": "Up (aim, up special)"
     },
