@@ -68,6 +68,15 @@ export function agreedDelay(requests: readonly number[], fallback: number = DEFA
   return agreed < 0 ? fallback : agreed;
 }
 
+export const AUTO_DELAY = -1;
+
+export const chosenDelay = (requests: readonly number[], manual: number): number => manual === AUTO_DELAY ? agreedDelay(requests) : manual;
+
+export function stepManualDelay(manual: number, auto: number, direction: -1 | 1): number {
+  const from = manual === AUTO_DELAY ? auto : manual;
+  return Math.min(MAX_INPUT_DELAY, Math.max(0, from + direction));
+}
+
 export function timeSyncWait(localAdvantage: number, remoteAdvantage: number, framesSinceWait: number): boolean {
   return framesSinceWait >= TIME_SYNC_INTERVAL && localAdvantage - remoteAdvantage >= 2;
 }

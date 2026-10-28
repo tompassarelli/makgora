@@ -386,7 +386,7 @@ function serviceDelay(s: ShellState, rollback: Rollback): void {
   const local = localSlot();
   netDelay.serviceNetDelay(rollback.net, s.game, local, rollback.delay, s.game.phase === Phase.match, rollback.predictionHeld || rollback.stalled > 0);
   if (s.game.phase !== Phase.characterMenu || floorMod(rollback.net.ticks, 30) !== 0) return;
-  const net = netDelay.lobbyNet(rollback.net, s.game);
+  const net = netDelay.lobbyNet(rollback.net, s.game, local);
   for (const panel of views(s).selections) panel.showDelay(net);
 }
 
@@ -422,7 +422,7 @@ export function installShell(): void {
   on(KEY_PAUSE_DOWN, withShell(onPauseKeyDown));
   on(KEYBOARD_PAUSE, withShell(onKeyboardPause));
   on(INPUT, withShell(receiveInput));
-  on(netDelay.DELAY_RECEIVED, withShell(s => { if (s.rollback !== undefined) netDelay.receiveDelayProposal(s.rollback.net); }));
+  on(netDelay.DELAY_RECEIVED, withShell(s => { if (s.rollback !== undefined) netDelay.receiveDelayProposal(s.rollback.net, s.game); }));
   on(CONTROL_ACK, withShell(journalPause.receiveControlAckEvent));
   on(PAUSE_REQUEST, withShell(journalPause.pauseRequestEvent));
   on(CHAT_CLOSED, withShell(journalPause.chatClosedEvent));

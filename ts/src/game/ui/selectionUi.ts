@@ -1,6 +1,6 @@
 import { SELECT_LEVELS } from "./chatLayer";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
-import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
+import { DELAY_CONTROLS, RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
@@ -57,7 +57,7 @@ import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showT
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, createCard, menuFocusList, presentCardChip, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
-import { type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createMatchRules } from "./selectionRules";
+import { type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules } from "./selectionRules";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
@@ -66,6 +66,7 @@ import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus,
 type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
   | { kind: "moves" } | { kind: "movesBack" } | { kind: "movesStep"; direction: -1 | 1 } | TutorialButton;
 
+const DELAY_TEXT_SIZE = f32(0.0095);
 const CPU_DEFAULTS: CpuDefaults = { opponent: CPU_OPPONENT_CHOICE_DEFAULT, tier: CPU_TIER_DEFAULT };
 
 function rulesKey(game: Readonly<MatchState>, clears: LoreClears, fighter: number): string {
@@ -154,7 +155,8 @@ export class SelectionPanel {
   private readonly movesTitle: framehandle;
   private readonly movesBody: framehandle;
   private readonly delayLine: framehandle;
-  private net: LobbyNet = { delayText: "", echoes: PARTICIPANT_SLOTS.map(() => "") };
+  private readonly delayControls: readonly framehandle[];
+  private net: LobbyNet = { delayText: "", hostControl: false, echoes: PARTICIPANT_SLOTS.map(() => "") };
 
   private readonly modeLabel: framehandle;
   private readonly rules: RuleFrames;
@@ -232,7 +234,9 @@ export class SelectionPanel {
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
     const { inputDelay } = RULE_BUTTONS;
     art(root, `MeleeDelayArt${suffix}`, "war3mapImported\\SelectionAction.tga", inputDelay.x, inputDelay.y, inputDelay.width, inputDelay.height);
-    this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(inputDelay.x + f32(0.006)), f32(inputDelay.y - f32(0.002)), f32(inputDelay.width - f32(0.012)), f32(inputDelay.height - f32(0.004)), MENU_STYLE.headerSize);
+    const { auto } = DELAY_CONTROLS;
+    this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(auto.x + f32(0.002)), f32(auto.y - f32(0.002)), f32(auto.width - f32(0.004)), f32(auto.height - f32(0.004)), DELAY_TEXT_SIZE);
+    BlzFrameSetTextAlignment(this.delayLine, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height);
     this.movesLabel = label(root, `MeleeMovesLabel${suffix}`, f32(MOVES_BOX.x + f32(0.006)), f32(MOVES_BOX.y - f32(0.002)), f32(MOVES_BOX.width - f32(0.012)), f32(MOVES_BOX.height - f32(0.004)), f32(0.011));
     setFrameText(this.movesLabel, "Moves");
@@ -271,6 +275,8 @@ export class SelectionPanel {
     this.cpu = createCpuSettings(participantId, (frame, target, text) => this.clicks.add(frame, target, text, "native"));
     const ruleClick = (frame: framehandle, target: RuleButton) => this.clicks.add(frame, target, undefined, "native");
     const matchRules = createMatchRules(root, suffix, ruleClick);
+    this.delayControls = createDelayControls(root, ruleClick);
+    for (const frame of this.delayControls) BlzFrameSetVisible(frame, false);
     this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target) => this.clicks.add(frame, target,
       target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native"));
     this.credits = new CreditsMenu(gameUi(), root, suffix, version, participantId);
@@ -552,6 +558,7 @@ export class SelectionPanel {
   showDelay(net: LobbyNet): void {
     this.net = net;
     setFrameText(this.delayLine, net.delayText);
+    for (const frame of this.delayControls) BlzFrameSetVisible(frame, net.hostControl);
   }
 
   update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, sessionWins: Readonly<Slots<number>>): void {

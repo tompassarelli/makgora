@@ -45,6 +45,14 @@ export const RULE_BUTTONS = {
   harderClassic: stepBox(f32(0.72), ROW_1),
 } as const;
 
+const DELAY_STEP_WIDTH = f32(0.02);
+
+export const DELAY_CONTROLS = {
+  less: { x: RULE_BUTTONS.inputDelay.x, y: ROW_3, width: DELAY_STEP_WIDTH, height: RULE_HEIGHT },
+  more: { x: f32(RULE_BUTTONS.inputDelay.x + RULE_BUTTONS.inputDelay.width - DELAY_STEP_WIDTH), y: ROW_3, width: DELAY_STEP_WIDTH, height: RULE_HEIGHT },
+  auto: { x: f32(RULE_BUTTONS.inputDelay.x + DELAY_STEP_WIDTH), y: ROW_3, width: f32(RULE_BUTTONS.inputDelay.width - DELAY_STEP_WIDTH - DELAY_STEP_WIDTH), height: RULE_HEIGHT },
+} as const;
+
 
 export type TrainingSetting = "behaviour" | "escape" | "tech" | "damage";
 

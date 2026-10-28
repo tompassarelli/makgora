@@ -1,6 +1,9 @@
 import { assertEquals, assertLessThan, test } from "wisp/src/runtime/testing";
 import { PLAYABLE_BUILD } from "../session/currentBuild";
-import { agreedDelay, autoDelay, delayPolicy, observeRtt, rttEstimate } from "./delayPolicy";
+import { createMatchState, setHumanCount } from "../lobby/lobbyState";
+import { createNetDelay, hostDelayFrom, matchDelay } from "../../host/loop/netDelay";
+import { MAX_INPUT_DELAY } from "./fixedSchedule";
+import { AUTO_DELAY, agreedDelay, autoDelay, delayPolicy, observeRtt, rttEstimate, stepManualDelay } from "./delayPolicy";
 
 const window = PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.rollback : 0;
 
@@ -20,4 +23,28 @@ test("online rollback repairs at most 7 frames with 4 frames of rollback budget 
   assertEquals(settledDelay(2000), 56);
   assertLessThan(settledDelay(2000), delayPolicy(window).ceiling);
   assertEquals(agreedDelay([2, 26, 11]), 26);
+});
+
+test("a host-set input delay overrides Auto for every client, including values above 60, and only the host can set it [k3 measure #679]", () => {
+  const game = createMatchState();
+  setHumanCount(game, 2);
+  const clients = [createNetDelay(window), createNetDelay(window)];
+  for (const net of clients) {
+    net.proposals[0] = 3;
+    net.proposals[1] = 26;
+    assertEquals(matchDelay(net, game), 26);
+  }
+  for (const manual of [2, 0, 70, MAX_INPUT_DELAY]) {
+    for (const net of clients) {
+      hostDelayFrom(net, game, 1, 9);
+      hostDelayFrom(net, game, 0, manual);
+      assertEquals(matchDelay(net, game), manual);
+    }
+  }
+  for (const net of clients) {
+    hostDelayFrom(net, game, 0, AUTO_DELAY);
+    assertEquals(matchDelay(net, game), 26);
+  }
+  assertEquals(stepManualDelay(AUTO_DELAY, 26, 1), 27);
+  assertEquals(stepManualDelay(0, 26, -1), 0);
 });

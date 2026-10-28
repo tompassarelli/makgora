@@ -2,10 +2,10 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { type MatchState, humanActive, humanCount } from "../../game/lobby/lobbyState";
+import { type MatchState, firstHumanSlot, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
-  DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
-  delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rttEstimate, smoothedRttMs,
+  AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, type RttEstimate, agreedDelay, chosenDelay, connectionPoor, correctDelay,
+  correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rttEstimate, smoothedRttMs, stepManualDelay,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
@@ -23,6 +23,9 @@ const DELAY_MARK = "d";
 const ECHO_MARK = "e";
 const RATE_MARK = "r";
 const SLOW_MARK = "s";
+const HOST_MARK = "h";
+const NO_HOST_DELAY = -2;
+const FREEZING_TEXT = "|cffffcc00Freezing: inputs late, host can raise input delay|r";
 const SECOND = 60;
 export const POP_UNITS = 20;
 const POP_BUCKETS = 1024;
@@ -62,6 +65,7 @@ export interface NetDelay {
   readonly correction: DelayCorrection;
   readonly second: { held: number; arrivals: number; deep: number };
   pingDelay: number;
+  manual: number;
 }
 
 export function createNetDelay(window: number): NetDelay {
@@ -71,7 +75,7 @@ export function createNetDelay(window: number): NetDelay {
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
     echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, deepest: 0,
-    popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0,
+    popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0, manual: AUTO_DELAY,
   };
 }
 
@@ -81,14 +85,32 @@ export function requestFor(net: Readonly<NetDelay>, game: Readonly<MatchState>, 
   return isOnline(game) ? at(net.proposals, slot) : DEFAULT_DELAY;
 }
 
-export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>): FixedDelay {
+function humanRequests(net: Readonly<NetDelay>, game: Readonly<MatchState>): number[] {
   const requests: number[] = [];
   for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot)) requests.push(requestFor(net, game, slot));
-  const agreed = agreedDelay(requests);
-  return isFixedDelay(agreed) ? agreed : DEFAULT_DELAY;
+  return requests;
 }
 
-export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>): LobbyNet {
+export const autoMatchDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>): number => agreedDelay(humanRequests(net, game));
+
+export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>): FixedDelay {
+  const chosen = chosenDelay(humanRequests(net, game), isOnline(game) ? net.manual : AUTO_DELAY);
+  return isFixedDelay(chosen) ? chosen : DEFAULT_DELAY;
+}
+
+export const isHost = (game: Readonly<MatchState>, slot: number): boolean => isOnline(game) && firstHumanSlot(game) === slot;
+
+export function hostDelayFrom(net: NetDelay, game: Readonly<MatchState>, sender: number, manual: number): void {
+  if (isHost(game, sender) && (manual === AUTO_DELAY || isFixedDelay(manual))) net.manual = manual;
+}
+
+export const nextManualDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, direction: -1 | 1): number => stepManualDelay(net.manual, autoMatchDelay(net, game), direction);
+
+export function sendHostDelay(manual: number): void {
+  BlzSendSyncData(DELAY_PREFIX, `${HOST_MARK}${I2S(manual)}`);
+}
+
+export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, local: number): LobbyNet {
   const online = isOnline(game);
   const delay = matchDelay(net, game);
   const echoes = PARTICIPANT_SLOTS.map((slot) => {
@@ -96,7 +118,9 @@ export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>): L
     if (!online || !humanActive(game, slot) || echo < 0) return "";
     return at(net.slotSlow, slot) ? ` · echo |cffff4040${I2S(echo)} ms|r` : ` · echo ${I2S(echo)} ms`;
   });
-  return { delayText: `Input delay: ${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${I2S(delay)} frames|r`, echoes };
+  const shown = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${I2S(delay)}`;
+  const delayText = !online ? `Input delay: ${shown} frames|r` : net.manual === AUTO_DELAY ? `Input delay: Auto (${shown}|r)` : `Input delay: ${shown}|r (Auto ${I2S(autoMatchDelay(net, game))})`;
+  return { delayText, echoes, hostControl: isHost(game, local) };
 }
 
 export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {
@@ -114,6 +138,7 @@ export interface DelayMessage {
   readonly echo: number;
   readonly fps: number;
   readonly slow: boolean;
+  readonly host: number;
 }
 
 export function delayMessage(ping: number, delay: number, echo: number, fps = -1, slow = false): string {
@@ -132,6 +157,7 @@ export function parseDelayMessage(data: string): DelayMessage {
   let echo = -1;
   let fps = -1;
   let slow = false;
+  let host = NO_HOST_DELAY;
   for (const token of data.split(" ")) {
     const mark = token.substring(0, 1);
     const value = S2I(token.substring(1));
@@ -140,8 +166,9 @@ export function parseDelayMessage(data: string): DelayMessage {
     else if (mark === ECHO_MARK) echo = value;
     else if (mark === RATE_MARK) fps = value;
     else if (mark === SLOW_MARK) slow = value === 1;
+    else if (mark === HOST_MARK) host = value;
   }
-  return { ping, delay, echo, fps, slow };
+  return { ping, delay, echo, fps, slow, host };
 }
 
 export function noteSent(net: NetDelay, frame: number): void {
@@ -289,6 +316,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
     BlzFrameSetVisible(net.indicator, false);
   }
   const online = isOnline(game);
+  const freezing = net.second.held >= HELD_ERROR_CALLBACKS;
   proposeDelay(net, humanCount(game), online && humanActive(game, local), inMatch, delay);
   net.shownDepth = net.depth;
   net.depth = 0;
@@ -296,16 +324,20 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   const slow = inMatch ? slowMachineLine(net, game) : "";
   const behind = poor ? ` · ${I2S(net.shownDepth)} frames behind` : "";
   const network = highDelay(delay) ? `|cffff4040Laggy connection: ${I2S(delay)} frames of input delay|r${behind}` : poor ? `|cffff4040Connection poor|r · input delay ${I2S(delay)}${behind}` : "";
-  const text = slow !== "" ? slow : !inMatch || !online ? "" : network;
+  const text = slow !== "" ? slow : !inMatch || !online ? "" : freezing ? FREEZING_TEXT : network;
   if (text === net.shownText) return;
   net.shownText = text;
   BlzFrameSetText(net.indicator, text);
   BlzFrameSetVisible(net.indicator, text !== "");
 }
 
-export function receiveDelayProposal(net: NetDelay): void {
+export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>): void {
   const slot = GetPlayerId(GetTriggerPlayer());
   const message = parseDelayMessage(BlzGetTriggerSyncData());
+  if (message.host !== NO_HOST_DELAY) {
+    hostDelayFrom(net, game, slot, message.host);
+    return;
+  }
   if (message.ping >= 0 && GetTriggerPlayer() === GetLocalPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - message.ping) * 100, 3));
   if (slot < 0 || slot >= net.proposals.length) return;
   if (isFixedDelay(message.delay)) net.proposals[slot] = Math.max(DEFAULT_DELAY, message.delay);

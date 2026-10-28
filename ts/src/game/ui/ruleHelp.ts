@@ -42,7 +42,7 @@ const TRAINING_HELP = {
   speed: "Game speed: slow the whole game to half or quarter speed to study moves.",
 } as const;
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: "Input delay: the same for every player. Online, the slowest connection sets it, and each card shows that player's ping, red when their connection or machine is slow. Against computers it stays at 2 frames." };
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: "Input delay: the same for every player. Online, Auto follows the slowest connection; the host (the first player) can set a number with − and +, and click it to go back to Auto. Against computers it stays at 2 frames." };
 
 const isRule = (name: string): name is RuleName => name in RULE_BUTTONS;
 

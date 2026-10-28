@@ -354,6 +354,23 @@ transport (wisp#110) both call it.
   loads its keys and drops the code. Each client proposes Auto from its
   measured echo, with no ceiling (see *Rollback window and no delay cap*).
   Local matches use the default.
+- **Host-set delay (Tom, 29 Oct 2026):** the host, the first human slot,
+  may set the lobby's input delay; this reverses the 20 Oct rule for the
+  host only, and delay stays one value for everyone. Character select's
+  input-delay box shows "Input delay: Auto (N)" by default, the delay the
+  lobby agrees from proposals. Only the host sees − and + on it: either one
+  leaves Auto at the current Auto value one frame lower or higher, and
+  clicking the value returns to Auto. Online, a manual value shows as
+  "Input delay: N (Auto M)", where M is what Auto would pick now. Any value
+  from 0 plays, up to the schedule's 102-frame limit, with no lower cap.
+  The host's client sends the choice on the synchronized delay channel
+  (`SC_DY`, mark `h`, -1 for Auto); every client keeps the last value the
+  host sent and starts each match at it, so all clients run the same delay.
+  In a match, a second in which prediction held at the window edge for at
+  least 2 callbacks shows "Freezing: inputs late, host can raise input
+  delay" in place of the laggy-connection line, so the host knows to raise
+  it for the next game. On a development build the host can also type
+  `-dev hostdelay N` or `-dev hostdelay auto`, which sends the same message.
 - **Rollback window and no delay cap (Tom, 29 Oct 2026, #679):** a
   correction never replays more than 7 frames, Slippi's window, so every
   build's prediction window is 7 (first set at 8, then lowered the same

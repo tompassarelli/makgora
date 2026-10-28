@@ -38,7 +38,9 @@ import { startMatch } from "./matchStart";
 import { cancelStageLoad, requestStageLoad, stageLoading } from "./stageLoad";
 import { endReplaySegment } from "./replays";
 import { makePreview } from "./preview";
-import { type ShellState, cancelPendingPlaytest, keepShellMomentEnd, shell } from "./state";
+import { type ShellState, cancelPendingPlaytest, keepShellMomentEnd, localSlot, shell } from "./state";
+import { AUTO_DELAY } from "../../game/netcode/delayPolicy";
+import { isHost, nextManualDelay, sendHostDelay } from "./netDelay";
 import type { PanelActions } from "./ui";
 import { clearMatchEffects, views } from "./ui";
 import { announce, pauseMatchPresentation, setStatus } from "./view";
@@ -217,6 +219,10 @@ export function startPlaytest(s: ShellState, request: PlaytestRequest): boolean 
 }
 
 
+const hostSetsDelay = (s: ShellState, slot: ParticipantSlot): boolean =>
+  s.rollback !== undefined && s.game.phase === Phase.characterMenu && slot === localSlot() && isHost(s.game, slot);
+
+
 function withSlot(participant: number, act: (s: ShellState, slot: ParticipantSlot) => void): void {
   if (isParticipantSlot(participant)) act(shell(), participant);
 }
@@ -327,6 +333,9 @@ export function panelActions(): PanelActions {
       }),
       closeTutorial: participant => withSlot(participant, (s, slot) => {
         if (controlsAvailable(s, slot)) setTutorialLesson(s.game, slot, NO_LESSON, LESSONS.length);
+      }),
+      changeInputDelay: (participant, step) => withSlot(participant, (s, slot) => {
+        if (hostSetsDelay(s, slot) && s.rollback !== undefined) sendHostDelay(step === 0 ? AUTO_DELAY : nextManualDelay(s.rollback.net, s.game, step));
       }),
     },
     stage: {

@@ -1,16 +1,16 @@
-import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type RuleBox, type TrainingSetting } from "./ruleButtons";
+import { DELAY_CONTROLS, RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type RuleBox, type TrainingSetting } from "./ruleButtons";
 import { f32 } from "wisp/src/sim/f32";
 import type { MatchState } from "../lobby/lobbyState";
 import { MENU_STYLE } from "./hudLayout";
 import { ItemKind, itemBit } from "../sim/codes";
 import { type TutorialMenuFrames, showTutorialLesson } from "./tutorialMenu";
 import { placeTopLeft, setFrameText } from "./frames";
-import { label } from "./selectionFrames";
+import { hotspot, label } from "./selectionFrames";
 import type { SelectionActions } from "./selectionActions";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "training" } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
-  | { kind: "classicTier"; direction: -1 | 1 };
+  | { kind: "classicTier"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 };
 
 type AddRule = (frame: framehandle, target: RuleButton) => framehandle;
 
@@ -106,6 +106,15 @@ export function createClassicRules(root: framehandle, suffix: string, add: AddRu
   return { ...match, classicFrames, classicTierValue, classicRoute, matchRuleFrames };
 }
 
+export function createDelayControls(root: framehandle, add: AddRule): readonly framehandle[] {
+  const { less, more, auto } = DELAY_CONTROLS;
+  return [
+    ruleButton(root, add, less, { kind: "inputDelay", step: -1 }, "−"),
+    ruleButton(root, add, more, { kind: "inputDelay", step: 1 }, "+"),
+    add(hotspot(root, auto.x, auto.y, auto.width, auto.height), { kind: "inputDelay", step: 0 }),
+  ];
+}
+
 export function applyRuleButton(actions: SelectionActions, participantId: number, button: RuleButton): void {
   if (button.kind === "teamBattle") actions.toggleTeamBattle(participantId);
   else if (button.kind === "friendlyFire") actions.toggleFriendlyFire(participantId);
@@ -120,5 +129,6 @@ export function applyRuleButton(actions: SelectionActions, participantId: number
   else if (button.kind === "partner") actions.stepTraining(participantId, button.setting, button.direction);
   else if (button.kind === "hitAreas") actions.toggleHitAreas(participantId);
   else if (button.kind === "speed") actions.stepSpeed(participantId);
+  else if (button.kind === "inputDelay") actions.changeInputDelay(participantId, button.step);
   else actions.toggleAutomaticRematch(participantId);
 }

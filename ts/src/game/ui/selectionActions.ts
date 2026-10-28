@@ -4,6 +4,7 @@ import type { TrainingSetting } from "./ruleButtons";
 
 export interface LobbyNet {
   readonly delayText: string;
+  readonly hostControl: boolean;
   readonly echoes: readonly string[];
 }
 
@@ -34,4 +35,5 @@ export interface SelectionActions {
   stepTutorial(participantId: number, direction: -1 | 1): void;
   startTutorial(participantId: number): void;
   closeTutorial(participantId: number): void;
+  changeInputDelay(participantId: number, step: -1 | 0 | 1): void;
 }

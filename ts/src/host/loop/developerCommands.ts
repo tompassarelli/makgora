@@ -33,6 +33,9 @@ import { resetToStartingSelection, startDevClassic, startDevLore, startQuickMatc
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";
 import { type ShellState, localSlot } from "./state";
+import { AUTO_DELAY } from "../../game/netcode/delayPolicy";
+import { MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/fixedSchedule";
+import { isHost, sendHostDelay } from "./netDelay";
 import { views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } from "./view";
@@ -44,6 +47,15 @@ export function onDevCommand(s: ShellState): void {
 
 
 const CINE_OFF_SUFFIX = " |cine off";
+const HOST_DELAY_COMMAND = "-dev hostdelay ";
+
+function hostDelayCommand(s: ShellState, actor: number, text: string): string {
+  const manual = text === "auto" ? AUTO_DELAY : S2I(text);
+  const valid = manual === AUTO_DELAY || (isFixedDelay(manual) && I2S(manual) === text);
+  if (s.rollback === undefined || s.game.phase !== Phase.characterMenu || !isHost(s.game, actor) || !valid) return `dev: hostdelay takes auto or 0 to ${MAX_INPUT_DELAY} from the host on character select`;
+  if (actor === localSlot()) sendHostDelay(manual);
+  return `dev: hostdelay ${text}`;
+}
 
 
 export function applyDeveloperCommand(s: ShellState, actor: number, original: string): void {
@@ -126,6 +138,7 @@ function sessionReceipt(s: ShellState, actor: number, message: string, requests:
   const capture = captureRequest(message);
   if (capture !== undefined) return applyCaptureCommand(s, capture);
   if (message === "-dev trace") return "dev: trace";
+  if (message.startsWith(HOST_DELAY_COMMAND)) return hostDelayCommand(s, actor, message.substring(HOST_DELAY_COMMAND.length));
   if (message === "-dev soak") return startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
   if (showcase !== undefined) return applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));
   if (message === LORE_WIN_COMMAND) {
