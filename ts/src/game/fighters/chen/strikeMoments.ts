@@ -7,7 +7,7 @@ export const chenStrikeMoments = {
   3: { clip: 22, seconds: f32(0.167), end: f32(0.867) },
   4: { clip: 20, seconds: f32(0.233), end: f32(0.933) },
   6: { clip: 14, seconds: f32(0.117), end: f32(0.533) },
-  7: { clip: 17, seconds: f32(0.100), end: f32(0.500) },
+  7: { clip: 17, seconds: f32(0.000), end: f32(0.433) },
   8: { clip: 18, seconds: f32(0.100), end: f32(0.483) },
   9: { clip: 15, seconds: f32(0.133), end: f32(0.533) },
   10: { clip: 16, seconds: f32(0.133), end: f32(0.533) },
