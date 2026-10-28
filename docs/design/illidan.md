@@ -128,8 +128,12 @@ stick picks the side).
   is the airtime's rush, whether it started in the air or ran off a ledge.
   If it strikes a fighter, shortened or not, he earns one more rush this
   airtime; the earned rush earns no third, so offstage rush chains stop at
-  two. An air rush that strikes nobody ends in helpless fall until he lands
-  or grabs a ledge; a grounded rush that strikes nobody ends normally.
+  two. A rush that ends in the air, whether it started on the ground or in
+  the air, ends in helpless fall until he lands or grabs a ledge, like
+  Falco's Phantasm, unless it was a first rush that struck: that one leaves
+  him free to use the earned rush, and the earned rush then ends helpless. A
+  grounded rush that stays on the ground ends normally (Tom asked,
+  2026-10-28).
   Landing, a ledge grab and being hit give the airtime back. Maiev's Illusion
   has no earned rush.
 - **The earned second rush is aimed:** the stick held on its last tell
@@ -146,7 +150,7 @@ stick picks the side).
 **Counterplay.** The tell is 17 frames, so the rush is a read at any range;
 from its full 462 units it arrives on frame 21. A raised shield stops it
 and the rush sits in 38 frames of recovery: punishable. A jump over the low
-rush leaves him in recovery below; a whiffed air rush leaves him helpless.
+rush leaves him in recovery below; a rush that ends in the air with no hit leaves him helpless.
 The defender's read is the shortened stop: Illidan can stop in front of a
 shield or just past a dodger, so holding shield late beats a full rush, and
 a roll away beats a short one.

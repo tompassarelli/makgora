@@ -163,7 +163,7 @@ test("Fel Rush: an air rush that hits nobody, plain or EX, ends in helpless fall
   }
 });
 
-test("Fel Rush: a grounded rush carried off a ledge counts as the airtime's rush, so a whiff leaves no air rush but no helpless either [k3 measure #554]", () => {
+test("Fel Rush: a grounded rush carried off a ledge counts as the airtime's rush and ends in helpless fall, so a whiff leaves no air rush [k3 measure #554]", () => {
   const { world, owner } = illidan(0.0);
   owner.motion.x = f32(EDGE - 40.0);
   stepDuel(world);
@@ -172,7 +172,8 @@ test("Fel Rush: a grounded rush carried off a ledge counts as the airtime's rush
   assertTrue(pressed(owner));
   runOut(world, owner);
   assertFalse(owner.motion.grounded);
-  assertFalse(owner.special.fall);
+  assertTrue(owner.special.fall);
+  assertEquals(owner.jump.remaining, 0);
   lift(owner, HEIGHT);
   settle(world, owner, HEIGHT);
   assertFalse(pressAgain(world, owner));
@@ -183,7 +184,7 @@ test("Fel Rush: an air rush that hits earns exactly one more, usable at once and
   hittingAirRush(world, owner, target);
   assertFalse(owner.special.fall);
   hittingAirRush(world, owner, target);
-  assertFalse(owner.special.fall);
+  assertTrue(owner.special.fall);
   settle(world, owner, HEIGHT);
   assertFalse(pressAgain(world, owner));
 });
@@ -199,9 +200,12 @@ test("Fel Rush: a hit by the ledge-carried grounded rush earns one more air rush
   });
   assertGreaterThan(target.status.damage, 0.0);
   assertFalse(owner.motion.grounded);
+  assertFalse(owner.special.fall);
+  owner.motion.x = 0.0;
   lift(owner, HEIGHT);
   assertTrue(pressAgain(world, owner));
   runOut(world, owner);
+  assertTrue(owner.special.fall);
   settle(world, owner, HEIGHT);
   assertFalse(pressAgain(world, owner));
 });

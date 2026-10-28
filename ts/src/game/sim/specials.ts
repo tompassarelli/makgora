@@ -348,7 +348,7 @@ function advanceFelRush(owner: Fighter, input: Readonly<Controls> | undefined): 
 }
 
 
-/** A rush ending airborne is the airtime's rush; one that struck earns one more, and an air rush that struck nobody ends helpless. */
+/** A rush ending airborne is the airtime's rush; one that struck earns one more, and a rush that ends airborne without a hit, or the aimed second rush, ends helpless. */
 function endFelRush(owner: Fighter): void {
   const { special } = owner;
   const uses = special.airtimeUses;
@@ -360,7 +360,7 @@ function endFelRush(owner: Fighter): void {
   const struck = (uses & FEL_RUSH_STRUCK) !== 0;
   special.airtimeUses |= FEL_RUSH_AIRTIME;
   if (struck && (uses & FEL_RUSH_AIMED_AIRTIME) === 0) special.airtimeUses |= FEL_RUSH_EARNED;
-  endSpecialAction(owner, !struck && (uses & FEL_RUSH_FROM_AIR) !== 0);
+  endSpecialAction(owner, !struck || (uses & FEL_RUSH_AIMED_AIRTIME) !== 0);
 }
 
 function markFelRushStrike(owner: Fighter): void {
