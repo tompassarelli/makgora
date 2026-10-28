@@ -1537,7 +1537,7 @@ Grab 9/2/30. Throws: forward 10 (EDGE), back 12 (KILL), up 8 (JUGGLE), and
 - **Val'kyr Shadowguard** (side, 20 mana): a Val'kyr flies out on frame 14
   and seizes the first body she reaches (a shield stops her; she can't be
   reflected). The victim is carried 3 units a frame the way she flew, rising,
-  for 80 frames, with no control. Mashing frees them, never before frame 20;
+  for 100 frames, with no control. Mashing frees them, never before frame 20;
   any damaging hit, his own included, drops the carry; then 240 frames immune.
   (Tom delegated, 7 Oct): she carries toward the edge he faces rather than the
   nearest one, so the player aims the drop and the victim can read it.

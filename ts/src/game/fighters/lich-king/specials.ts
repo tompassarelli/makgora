@@ -63,7 +63,7 @@ const howlingBlast = (projectile: SpecialProjectile, landingLag: number | undefi
 
 
 
-const CARRIED: AppliedStatus = { kind: HeroStatusKind.carried, frames: 80, group: HeroStatusGroup.sleep, immunityFrames: 240 };
+const CARRIED: AppliedStatus = { kind: HeroStatusKind.carried, frames: 100, group: HeroStatusGroup.sleep, immunityFrames: 240 };
 
 
 
@@ -72,7 +72,7 @@ const CARRIED: AppliedStatus = { kind: HeroStatusKind.carried, frames: 80, group
 const valkyrProjectile = (speed: number): SpecialProjectile => ({
   model: VALKYR_MODEL,
   spawnFrame: 26, offsetX: 40.0, offsetZ: f32(CHEST + 10.0), velocityX: speed, velocityZ: 0.0,
-  life: 40, radius: h(f32(0.2)), effect: { damage: 5.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
+  life: 60, radius: h(f32(0.2)), effect: { damage: 5.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
   reflectable: true, limit: 1, status: CARRIED,
 });
 const VALKYR = valkyrProjectile(5.0);
