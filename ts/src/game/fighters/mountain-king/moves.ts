@@ -100,8 +100,7 @@ const FORWARD_AIR_GROUNDED_HEAD = strongHit(hit(17.291038513183594, "LAUNCH", 55
 const FORWARD_AIR_HANDLE = hit(11.887589454650879, "LAUNCH", 45);
 const BACK_AIR = hit(14.048970222473145, "KILL", 35, true, HitElement.slash);
 const UP_AIR = hit(10.806899070739746, "LAUNCH", 85);
-const DOWN_AIR = hit(14.048970222473145, "SPIKE", 270);
-const DOWN_AIR_GROUNDED = hit(14.048970222473145, "LAUNCH", 55);
+export const DOWN_AIR: Readonly<HitEffect> = { ...hit(11.736000061035156, "POKE", 45, false, HitElement.electric), electric: true, growth: 102.5, base: 20.0 };
 const GRAB_CONTACT = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 
@@ -127,7 +126,6 @@ const MOUNTAIN_KING_BODIES: FighterHurtboxes = {
     ],
     [AttackStyle.forwardAir]: [limb(9, 24, hurtPart(8.0, 60.0, 44.0, 48.0, ARM))],
     [AttackStyle.backAir]: [limb(8, 17, hurtPart(-8.0, 58.0, -46.0, 50.0, ARM))],
-    [AttackStyle.downAir]: [limb(10, 20, hurtPart(0.0, 20.0, 0.0, -f32(SHORT - 14.0), LEG))],
     [AttackStyle.grab]: [limb(6, 12, hurtPart(8.0, 50.0, f32(GRAB - 14.0), 24.0, ARM))],
   },
 };
@@ -155,6 +153,27 @@ const neutralAir: AuthoredMove = {
     return [frame(hammer.frame, capsule(hammer.gripX, hammer.gripZ, hammer.headX, hammer.headZ, NEUTRAL_AIR_HEAD), effect), frame(hammer.frame, NEUTRAL_AIR_BODY, effect)];
   })),
   autoCancel: { before: 7, from: 38 },
+};
+
+export const DOWN_AIR_TOTAL = 46;
+export const DOWN_AIR_BODY = 18.0;
+export interface DrawnDrill extends DrawnHammer { readonly crownX: number; readonly crownZ: number; readonly feetX: number; readonly feetZ: number }
+const drilled = (frame: number, gripX: number, gripZ: number, headX: number, headZ: number, crownX: number, crownZ: number, feetX: number, feetZ: number): DrawnDrill => ({ frame, gripX, gripZ, headX, headZ, crownX, crownZ, feetX, feetZ });
+export const DOWN_AIR_DRILL: readonly DrawnDrill[] = [
+  drilled(12, 15.0, 6.0, 8.0, 6.0, 5.0, -2.0, 3.0, 60.0), drilled(13, 30.0, 6.0, 44.0, 6.0, 0.0, -2.0, 2.0, 60.0), drilled(14, 21.0, 6.0, 43.0, 6.0, -3.0, -2.0, 1.0, 60.0),
+  drilled(15, -4.0, 6.0, 7.0, 6.0, -2.0, -2.0, 1.0, 60.0), drilled(16, -25.0, 6.0, -33.0, 6.0, 3.0, -2.0, 2.0, 60.0), drilled(17, -22.0, 6.0, -43.0, 6.0, 7.0, -2.0, 3.0, 60.0),
+  drilled(18, 2.0, 6.0, -14.0, 6.0, 7.0, -2.0, 3.0, 60.0), drilled(19, 25.0, 6.0, 29.0, 6.0, 3.0, -2.0, 3.0, 60.0), drilled(20, 29.0, 6.0, 49.0, 6.0, -2.0, -2.0, 2.0, 60.0),
+  drilled(21, 9.0, 6.0, 28.0, 6.0, -3.0, -2.0, 1.0, 60.0), drilled(22, -17.0, 6.0, -15.0, 6.0, 0.0, -2.0, 1.0, 60.0), drilled(23, -26.0, 6.0, -43.0, 6.0, 5.0, -2.0, 2.0, 60.0),
+  drilled(24, -12.0, 6.0, -32.0, 6.0, 8.0, -2.0, 3.0, 60.0),
+];
+const DOWN_AIR_FIRST = DOWN_AIR_DRILL[0]?.frame ?? 12;
+const DOWN_AIR_LAST = DOWN_AIR_DRILL.at(-1)?.frame ?? 12;
+const downAir: AuthoredMove = {
+  ...heroMove(DOWN_AIR_FIRST, DOWN_AIR_LAST - DOWN_AIR_FIRST + 1, DOWN_AIR_TOTAL - DOWN_AIR_LAST, 20, DOWN_AIR_DRILL.flatMap(drill => [
+    frame(drill.frame, capsule(drill.gripX, drill.gripZ, drill.headX, drill.headZ, NEUTRAL_AIR_HEAD), DOWN_AIR),
+    frame(drill.frame, capsule(drill.crownX, drill.crownZ, drill.feetX, drill.feetZ, DOWN_AIR_BODY), DOWN_AIR),
+  ])),
+  autoCancel: { before: 1, from: 36 },
 };
 
 export const MOUNTAIN_KING_MOVES: FighterMoves = {
@@ -204,9 +223,7 @@ export const MOUNTAIN_KING_MOVES: FighterMoves = {
     [AttackStyle.upAir]: heroMove(7, 4, 22, 13, [
       heroRegion(7, 10, capsule(0.0, 52.0, 0.0, f32(SHORT - 12.0), 12.0), UP_AIR),
     ]),
-    [AttackStyle.downAir]: heroMove(12, 5, 29, 20, [
-      heroRegion(12, 16, capsule(0.0, 22.0, 0.0, -2.0, 14.0), DOWN_AIR, DOWN_AIR_GROUNDED),
-    ]),
+    [AttackStyle.downAir]: downAir,
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [
       heroRegion(8, 9, capsule(14.0, 14.0, f32(GRAB - 14.0), 24.0, 14.0), GRAB_CONTACT),
     ]),

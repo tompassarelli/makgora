@@ -15,7 +15,7 @@ export const mountainKingStrikeMoments = {
   13: { clip: 75, seconds: f32(0.167), end: f32(0.800) },
   14: { clip: 73, seconds: f32(0.150), end: f32(0.617) },
   15: { clip: 72, seconds: f32(0.350), end: f32(0.533) },
-  16: { clip: 66, seconds: f32(0.000), end: f32(0.750) },
+  16: { clip: 82, seconds: f32(0.183), end: f32(0.767) },
   19: { clip: 74, seconds: f32(0.433), end: f32(0.683) },
   20: { clip: 68, seconds: f32(0.133), end: f32(0.433) },
   100: { clip: 9, seconds: f32(0.517), end: f32(1.366) },

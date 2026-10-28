@@ -263,9 +263,9 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | up tilt into up air | 100 | · | · | · | · | · | · | R | DI | DI | DI | DI | DI | · | · | · | · |
 | up tilt into up air | 143 | · | · | · | · | · | · | · | R | R | DI | DI | DI | DI | DI | DI | · |
 | up tilt into down air | 60 | · | · | · | · | R | R | DI | DI | DI | R | · | · | · | · | · | · |
-| up tilt into down air | 75 | · | · | · | · | · | R | DI | DI | DI | DI | R | · | · | · | · | · |
-| up tilt into down air | 100 | · | · | · | · | · | R | R | DI | DI | DI | DI | R | · | · | · | · |
-| up tilt into down air | 143 | · | · | · | · | · | · | R | R | R | DI | DI | DI | DI | DI | R | · |
+| up tilt into down air | 75 | · | · | · | · | R | R | DI | DI | DI | DI | R | · | · | · | · | · |
+| up tilt into down air | 100 | · | · | · | · | · | R | R | DI | DI | DI | DI | DI | · | · | · | · |
+| up tilt into down air | 143 | · | · | · | · | · | · | R | R | R | DI | DI | DI | DI | DI | DI | · |
 | up tilt into neutral special | 60 | · | · | · | · | · | · | R | R | DI | DI | · | · | · | · | · | · |
 | up tilt into neutral special | 75 | · | · | · | · | · | · | R | R | DI | DI | DI | · | · | · | · | · |
 | up tilt into neutral special | 100 | · | · | · | · | · | · | · | R | R | R | DI | DI | DI | · | · | · |
@@ -355,8 +355,8 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | down tilt into up air | 75 | · | · | · | · | · | · | · | · | R | R | DI | DI | DI | DI | DI | DI |
 | down tilt into up air | 100 | · | · | · | · | · | · | · | · | · | · | R | R | DI | DI | DI | DI |
 | down tilt into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | R | R | R | DI |
-| down tilt into down air | 60 | · | · | · | · | · | R | · | R | R | R | DI | DI | DI | DI | · | · |
-| down tilt into down air | 75 | · | · | · | · | · | · | · | · | R | R | R | DI | DI | DI | DI | R |
+| down tilt into down air | 60 | · | · | · | · | · | R | · | R | R | DI | DI | DI | DI | DI | · | · |
+| down tilt into down air | 75 | · | · | · | · | · | · | · | R | R | R | DI | DI | DI | DI | DI | DI |
 | down tilt into down air | 100 | · | · | · | · | · | · | · | · | · | R | R | R | DI | DI | DI | DI |
 | down tilt into down air | 143 | · | · | · | · | · | · | · | · | R | · | · | R | R | R | R | DI |
 | down tilt into neutral special | 60 | · | · | · | · | · | · | · | · | · | R | R | DI | DI | DI | DI | DI |
@@ -634,10 +634,10 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | up smash into up air | 75 | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
 | up smash into up air | 100 | · | · | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | up smash into up air | 143 | · | · | · | R | R | R | · | · | · | · | · | · | · | · | · | · |
-| up smash into down air | 60 | · | R | DI | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| up smash into down air | 75 | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| up smash into down air | 100 | · | · | R | DI | R | · | · | · | · | · | · | · | · | · | · | · |
-| up smash into down air | 143 | · | · | · | R | DI | R | · | · | · | · | · | · | · | · | · | · |
+| up smash into down air | 60 | · | R | DI | DI | · | · | · | · | · | · | · | · | · | · | · | · |
+| up smash into down air | 75 | · | · | R | DI | · | · | · | · | · | · | · | · | · | · | · | · |
+| up smash into down air | 100 | · | · | R | DI | DI | · | · | · | · | · | · | · | · | · | · | · |
+| up smash into down air | 143 | · | · | · | R | DI | DI | · | · | · | · | · | · | · | · | · | · |
 | up smash into neutral special | 60 | · | · | R | DI | · | · | · | · | · | · | · | · | · | · | · | · |
 | up smash into neutral special | 75 | · | · | R | R | DI | · | · | · | · | · | · | · | · | · | · | · |
 | up smash into neutral special | 100 | · | · | · | R | DI | DI | · | · | · | · | · | · | · | · | · | · |
@@ -820,9 +820,9 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | dash attack into up air | 75 | · | · | · | · | R | DI | DI | DI | · | · | · | · | · | · | · | · |
 | dash attack into up air | 100 | · | · | · | · | · | R | DI | DI | DI | DI | · | · | · | · | · | · |
 | dash attack into up air | 143 | · | · | · | · | · | · | R | DI | DI | DI | DI | DI | · | · | · | · |
-| dash attack into down air | 60 | · | · | · | R | R | DI | DI | R | · | · | · | · | · | · | · | · |
+| dash attack into down air | 60 | · | · | · | R | R | DI | DI | DI | · | · | · | · | · | · | · | · |
 | dash attack into down air | 75 | · | · | · | · | R | DI | DI | DI | R | · | · | · | · | · | · | · |
-| dash attack into down air | 100 | · | · | · | · | · | R | DI | DI | DI | R | · | · | · | · | · | · |
+| dash attack into down air | 100 | · | · | · | · | · | R | DI | DI | DI | DI | · | · | · | · | · | · |
 | dash attack into down air | 143 | · | · | · | · | · | · | R | R | DI | DI | DI | DI | R | · | · | · |
 | dash attack into neutral special | 60 | · | · | · | · | R | R | DI | DI | R | · | · | · | · | · | · | · |
 | dash attack into neutral special | 75 | · | · | · | · | · | R | DI | DI | R | R | · | · | · | · | · | · |
@@ -1099,10 +1099,10 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | up throw into up air | 75 | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | up throw into up air | 100 | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | up throw into up air | 143 | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down air | 60 | R | R | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down air | 75 | R | R | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down air | 100 | R | R | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
-| up throw into down air | 143 | R | R | DI | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down air | 60 | R | R | T | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down air | 75 | R | R | T | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down air | 100 | R | R | T | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
+| up throw into down air | 143 | R | R | T | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI |
 | up throw into neutral special | 60 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | T |
 | up throw into neutral special | 75 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | T |
 | up throw into neutral special | 100 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | T |
@@ -1285,10 +1285,10 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | neutral air into up air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into up air | 100 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into up air | 143 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 60 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 75 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 100 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| neutral air into down air | 143 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down air | 60 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down air | 75 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down air | 100 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| neutral air into down air | 143 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
 | neutral air into neutral special | 60 | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | neutral air into neutral special | 100 | · | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1566,8 +1566,8 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | up air into up air | 143 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | DI | R |
 | up air into down air | 60 | R | R | R | R | DI | DI | DI | DI | DI | R | R | · | · | · | · | · |
 | up air into down air | 75 | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | · | · | · | · |
-| up air into down air | 100 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | R | · | · |
-| up air into down air | 143 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | R | R |
+| up air into down air | 100 | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R | · | · |
+| up air into down air | 143 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | R |
 | up air into neutral special | 60 | · | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | · | · | · |
 | up air into neutral special | 75 | · | · | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | · | · |
 | up air into neutral special | 100 | · | · | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | R | R |
@@ -1589,22 +1589,22 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 
 | Link | Weight | 0% | 10% | 20% | 30% | 40% | 50% | 60% | 70% | 80% | 90% | 100% | 110% | 120% | 130% | 140% | 150% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| frame advantage | 60 | -3 | +1 | -1 | +5 | +12 | +21 | +40 | +46 | +52 | +58 | +64 | +70 | KO | KO | KO | KO |
-| frame advantage | 75 | -3 | 0 | -2 | +2 | +8 | +16 | +25 | +41 | +47 | +52 | +58 | +63 | +69 | KO | KO | KO |
-| frame advantage | 100 | -4 | -1 | -3 | 0 | +4 | +10 | +16 | +25 | +40 | +45 | +50 | +55 | +60 | +64 | +69 | KO |
-| frame advantage | 143 | -5 | -2 | 0 | -3 | 0 | +4 | +8 | +13 | +19 | +26 | +40 | +44 | +48 | +52 | +56 | +60 |
-| launch angle | 60 | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° |
-| launch angle | 75 | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° |
-| launch angle | 100 | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° |
-| launch angle | 143 | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° | 55° |
-| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  | KO | KO | KO | KO | KO | KO | KO |
-| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  | KO | KO | KO | KO | KO | KO |
-| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  | KO | KO | KO | KO | KO |
-| KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | KO | KO |
-| on shield | 60 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 |
-| on shield | 75 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 |
-| on shield | 100 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 |
-| on shield | 143 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 | -10, 9.8 |
+| frame advantage | 60 | -4 | -1 | +1 | -2 | +1 | +4 | +8 | +13 | +19 | +44 | +49 | +54 | +58 | +63 | KO | KO |
+| frame advantage | 75 | -4 | -2 | 0 | -2 | 0 | +2 | +6 | +9 | +14 | +20 | +45 | +49 | +53 | +57 | +62 | KO |
+| frame advantage | 100 | -4 | -2 | 0 | +1 | -2 | 0 | +3 | +5 | +9 | +13 | +18 | +42 | +46 | +50 | +53 | +57 |
+| frame advantage | 143 | -5 | -3 | -2 | 0 | +2 | -2 | 0 | +2 | +4 | +6 | +9 | +12 | +16 | +20 | +43 | +47 |
+| launch angle | 60 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 75 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 100 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| launch angle | 143 | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° | 45° |
+| KO at the ledge | 60 |  |  |  |  |  |  |  |  |  |  |  | KO | KO | KO | KO | KO |
+| KO at the ledge | 75 |  |  |  |  |  |  |  |  |  |  |  |  | KO | KO | KO | KO |
+| KO at the ledge | 100 |  |  |  |  |  |  |  |  |  |  |  |  |  | KO | KO | KO |
+| KO at the ledge | 143 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| on shield | 60 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 |
+| on shield | 75 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 |
+| on shield | 100 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 |
+| on shield | 143 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 | -12, 8.2 |
 | down air into jab | 60 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into jab | 75 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into jab | 100 | R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1633,22 +1633,22 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | down air into down smash | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down smash | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down smash | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into grab | 60 | R | R | R | R | DI | DI | DI | R | · | · | · | · | · | · | · | · |
-| down air into grab | 75 | R | R | R | R | DI | DI | DI | DI | · | · | · | · | · | · | · | · |
-| down air into grab | 100 | R | R | R | R | R | DI | DI | DI | DI | R | · | · | · | · | · | · |
-| down air into grab | 143 | R | R | R | R | R | R | DI | DI | DI | DI | DI | R | · | · | · | · |
-| down air into dash attack | 60 | R | R | R | R | · | DI | R | · | · | · | · | · | · | · | · | · |
-| down air into dash attack | 75 | R | R | R | R | R | DI | R | · | · | · | · | · | · | · | · | · |
-| down air into dash attack | 100 | R | R | R | R | R | R | DI | R | R | · | · | · | · | · | · | · |
-| down air into dash attack | 143 | R | R | R | R | R | R | R | DI | DI | R | R | · | · | · | · | · |
+| down air into grab | 60 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| down air into grab | 75 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| down air into grab | 100 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
+| down air into grab | 143 | R | R | R | R | R | R | R | R | R | R | R | · | · | · | · | · |
+| down air into dash attack | 60 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
+| down air into dash attack | 75 | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · |
+| down air into dash attack | 100 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
+| down air into dash attack | 143 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
 | down air into neutral air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into neutral air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into neutral air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into neutral air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into forward air | 60 | · | R | · | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into forward air | 75 | · | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into forward air | 100 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| down air into forward air | 143 | · | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · |
+| down air into forward air | 60 | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into forward air | 75 | · | · | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into forward air | 100 | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into forward air | 143 | · | · | · | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | down air into back air | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into back air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into back air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1661,18 +1661,18 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | down air into down air | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
-| down air into neutral special | 60 | · | · | · | · | · | · | R | R | R | · | · | · | · | · | · | · |
-| down air into neutral special | 75 | · | · | · | · | · | · | R | R | · | R | · | · | · | · | · | · |
-| down air into neutral special | 100 | · | · | · | · | · | · | · | R | R | · | R | R | · | · | · | · |
-| down air into neutral special | 143 | · | · | · | · | · | · | · | · | · | R | R | R | · | R | R | · |
-| down air into side special | 60 | R | R | R | R | DI | · | · | · | · | · | · | · | · | · | · | · |
-| down air into side special | 75 | · | R | R | R | R | DI | · | · | · | · | · | · | · | · | · | · |
-| down air into side special | 100 | · | R | · | R | R | DI | · | · | · | · | · | · | · | · | · | · |
-| down air into side special | 143 | · | R | R | R | R | R | R | DI | · | · | · | · | · | · | · | · |
-| down air into up special | 60 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
-| down air into up special | 75 | R | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · |
-| down air into up special | 100 | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · | · |
-| down air into up special | 143 | R | R | R | R | R | R | R | R | R | · | · | · | · | · | · | · |
+| down air into neutral special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into neutral special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into neutral special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into neutral special | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into side special | 60 | R | R | R | · | R | · | · | · | · | · | · | · | · | · | · | · |
+| down air into side special | 75 | · | R | R | · | R | R | · | · | · | · | · | · | · | · | · | · |
+| down air into side special | 100 | · | R | R | R | · | R | R | · | · | · | · | · | · | · | · | · |
+| down air into side special | 143 | · | R | R | R | R | · | R | R | · | · | · | · | · | · | · | · |
+| down air into up special | 60 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up special | 75 | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up special | 100 | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · | · |
+| down air into up special | 143 | R | R | R | R | R | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down special | 60 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down special | 75 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
 | down air into down special | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · |
@@ -1936,9 +1936,9 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | up special into up air | 75 | · | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R | · |
 | up special into up air | 100 | · | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | DI | R |
 | up special into up air | 143 | · | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI |
-| up special into down air | 60 | R | R | R | R | R | R | DI | DI | DI | DI | DI | R | R | · | · | · |
-| up special into down air | 75 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | R | R | · |
-| up special into down air | 100 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R |
+| up special into down air | 60 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | R | · | · | · |
+| up special into down air | 75 | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | R | R | · |
+| up special into down air | 100 | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI | DI | R |
 | up special into down air | 143 | R | R | R | R | R | R | R | R | R | DI | DI | DI | DI | DI | DI | DI |
 | up special into neutral special | 60 | · | · | · | · | · | · | R | DI | DI | DI | DI | DI | R | DI | R | R |
 | up special into neutral special | 75 | · | · | · | · | · | · | · | R | DI | DI | DI | DI | DI | DI | DI | DI |
@@ -2065,10 +2065,10 @@ Classes, over the DIs the opener does not kill through: T true (every DI and eve
 | down special into up air | 75 | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R |
 | down special into up air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | · | R | R | R |
 | down special into up air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | R |
-| down special into down air | 60 | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R | · |
-| down special into down air | 75 | · | · | · | · | · | · | · | · | · | · | R | R | R | R | R | R |
-| down special into down air | 100 | · | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R |
-| down special into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | · | · | · | R | R |
+| down special into down air | 60 | · | · | · | · | · | · | · | R | R | DI | DI | DI | R | R | R | · |
+| down special into down air | 75 | · | · | · | · | · | · | · | · | R | R | DI | DI | DI | R | R | R |
+| down special into down air | 100 | · | · | · | · | · | · | · | · | · | R | R | R | DI | DI | DI | R |
+| down special into down air | 143 | · | · | · | · | · | · | · | · | · | · | · | R | R | R | R | DI |
 | down special into neutral special | 60 | · | · | · | · | · | · | · | R | R | DI | DI | DI | DI | R | R | R |
 | down special into neutral special | 75 | · | · | · | · | · | · | · | · | R | R | DI | DI | DI | DI | DI | R |
 | down special into neutral special | 100 | · | · | · | · | · | · | · | · | · | R | R | R | DI | DI | DI | DI |

@@ -15,7 +15,7 @@ downward contact and recovery poses, fitted to the existing move frames.
 | Rifleman | 0 | -95 / 32.5 | Aerial Down #1 | Melee Link thrust, adapted to rifle | Pass → Pass: muzzle-first stamp |
 | Illidan | 0 | -100 / 68.875 | Aerial Down #1 | Melee Link thrust, adapted to glaives | Pass → Pass: blades below torso |
 | Blademaster | -42.24…42.24 | -51 / 49.30 | Down Air Sword Plunge #54 | Melee Link downward sword | Fail → Pass: horizontal spin replaced by downward sword |
-| Mountain King | 0 | -26.8 / 33.7 | Down Air Boot Stomp #66 | Melee Ganondorf double-foot stomp | Fail → Pass: cast replaced by boots driven down |
+| Mountain King | -43…49 | 21 / 33.7 | Attack Gesture downAir #82 | Melee Pikachu head-first drill | Pass → Pass: head-down drill with the hammer swept round him replaces the boot stomp (2026-10-28) |
 | Warden | -37.19…37.19 | -37 / 48.4 | Drill Down Air #38 | Melee Fox drill | Pass → Pass: leading leg down, opposite knee folded |
 | Lich | 0 | -53.8 / 66.88 | Down Air Frost Press #49 | Ultimate Ivysaur burst below body | Fail → Pass: coiled hands and body dive into a downward cast |
 | Forsaken Paladin | -12…17 | -41.8…-32.5 / 45.4 | Down Air Hammer Drop #52 | Melee Link thrust, adapted to hammer | Fail → Pass: hammer down, opposite knee tucked |

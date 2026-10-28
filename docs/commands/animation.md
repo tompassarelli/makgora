@@ -38,13 +38,16 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   script cocks the left hammer over his shoulder and sweeps it level through the first, then raises the right hammer
   overhead and chops it forward and down through the second, legs tucked throughout. A clip spliced from Blender
   keys is bound `aligned`, so it plays one key per simulation frame instead of being re-timed around one strike moment.
-  His neutral air bakes its keys in TypeScript, not Blender: `... --character 4 --replace-pose neutralAir --rig RIG.json`,
-  then `bun tools/animations/mountain-king-neutral-air.ts RIG.json KEYS.json [--debug]` solves the same side-view arm and
-  leg targets with gl-matrix: he tucks with the right hammer drawn back over his shoulder, flings it out at arm's length as
+  His neutral and down air bake their keys in TypeScript, not Blender: `... --character 4 --replace-pose neutralAir|downAir --rig RIG.json`,
+  then `bun tools/animations/mountain-king-aerials.ts neutralAir|downAir RIG.json KEYS.json [--debug]` solves the same side-view arm and
+  leg targets with gl-matrix. For the neutral air he tucks with the right hammer drawn back over his shoulder, flings it out at arm's length as
   the window opens and turns one front flip about his middle through the window, so the hammer head circles him in front,
   under, behind and over, then opens out to ready; `--debug` prints each frame's hand and hammer head, which are the
-  `NEUTRAL_AIR_HAMMER` table in smashcraft:ts/src/game/fighters/mountain-king/moves.ts, and
-  `... --replace-pose neutralAir --keys KEYS.json` splices the keys in place.
+  `NEUTRAL_AIR_HAMMER` table in smashcraft:ts/src/game/fighters/mountain-king/moves.ts. For the down air he coils, flips
+  head-down with his legs straight up and his body dropped 26 units through the startup, then drills two turns about his
+  vertical axis through the window with the right hammer held out, so it sweeps in front of and behind him, and flips the
+  rest of the way upright; `--debug` adds his crown and feet, the `DOWN_AIR_DRILL` table. `... --replace-pose POSE --keys KEYS.json`
+  splices either in place (the down air was first appended with `--pose downAir`).
   Mal'Ganis's forward and back air are authored the same way: `... --character 8 --replace-pose backAir|forwardAir --rig RIG.json`,
   then `blender ... --python tools/animations/dreadlord-aerials.py -- backAir|forwardAir RIG.json KEYS.json` bakes either
   a two-hoof back kick (hooves coiled up behind his hips, chest pitched forward, both driven level straight back at

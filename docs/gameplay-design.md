@@ -1862,9 +1862,6 @@ and each registered hero, by smashcraft:ts/src/game/sim/hurtboxLegibility.tests.
 to break a rule lists a named departure there and in this section, with its
 reason. Current departures:
 
-- **Mountain King's down air (Double Boot), rule 6.** The boots are the
-  strike, so the leg volume follows the whole downward strike, about 70 units
-  below his feet, past a limb's reach. It is body, not weapon, and can be hit.
 - **Dreadlord's wings and claws, rule 6** (down smash, forward smash, forward
   air, back air, down air). The roster keeps hurtboxes on attached body parts;
   the wings reach about 0.83 of his height sideways and the claws about half

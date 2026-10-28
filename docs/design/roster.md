@@ -584,7 +584,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Forward air — Hammer Drop | 16/3/30; L21 | 16 | M, 270, SPIKE | Hammer head spikes; handle launches 45 degrees for 11 |
 | Back air — Backhand Axe | 10/3/25; L15 | 13 | M, 35, KILL | Strong short rear swing |
 | Up air — Headbutt | 7/4/22; L13 | 10 | S, 85, LAUNCH | Body hurtbox stays exposed |
-| Down air — Double Boot | 12/5/29; L20 | 13 | S, 270, SPIKE | No automatic stall or bounce |
+| Down air — Storm Drill | 12/13/22; 46 total; L20 | 12, electric | head-down body plus hammer; 45, base 20, growth 100 | He flips head-down and drills about his vertical axis with the right hammer held out, so the head and hammer strike under and round him; one hit, no stall or bounce. After Melee Pikachu's down air (14–26, 12% electric, 57 total, actionable 48, 20 L-cancelled, auto-cancel from 38), two frames sooner so his short hop reaches a standing foe; auto-cancel only from 36 |
 
 ### B specials
 
@@ -613,7 +613,7 @@ Standing grab 8/2/25, reach 0.50H. Pummel: helmet headbutt.
 **Implemented kit** (smashcraft:ts/src/game/fighters/mountain-king/moves.ts, mountainKingSpecials.ts, fighters/mountain-king/clips.ts). Every row above is implemented; nothing is omitted. Deliberate additions and choices where the table is silent:
 
 - Forward tilt also has up- and down-angled paths with the same timing and damage.
-- Hammer Drop's head and Double Boot launch grounded targets at 55 degrees (the shared grounded spike rule).
+- Hammer Drop's head launches grounded targets at 55 degrees (the shared grounded spike rule).
 - Air Thunder Clap reuses 10 damage and 70-degree LAUNCH on its 0.55H under-hammer path.
 - Thunder Clap is a ground-level ring 30 units tall, so a jump clears it while it still covers both sides; its release and shield cancel are follow-up branches (`followUps`), and the waves start just past the ring.
 - Thunder Leap puts half its exact rise into the f9-14 hit window and eases over f15-28 so it peaks at the listed height; the free form peaks at 1.3H with 0.5H drift.
