@@ -18,8 +18,7 @@ const named = (character: Character, name: string): HeroClip | undefined => {
 const ORIGINAL_WALKS: Readonly<Record<number, (HeroClip | undefined)>> = {
   1: named(Character.rifleman, "walk"),
 };
-const STOCK_WALK = named(Character.demonHunter, "walk");
-const ILLIDAN_GAIT: HeroClip | undefined = STOCK_WALK === undefined ? undefined : { ...STOCK_WALK, entry: f32(0.76), stance: 890.0 };
+const ILLIDAN_GAIT: HeroClip = { index: dh.DEMON_HUNTER_WALK_FORWARD_INDEX, seconds: 1.0, stance: 372.0 };
 const ILLIDAN_RUN: HeroClip = { index: dh.DEMON_HUNTER_RUN_FORWARD_INDEX, seconds: f32(0.6) };
 const ILLIDAN_DASH: HeroClip = { index: dh.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX, seconds: dh.DEMON_HUNTER_INITIAL_DASH_BURST_SECONDS };
 

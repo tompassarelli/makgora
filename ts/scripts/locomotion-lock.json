@@ -1,13 +1,13 @@
 {
   "illidan": {
     "walk": {
-      "sequence": "Walk",
-      "clip": 107,
-      "frames": 875,
+      "sequence": "Locomotion Walk",
+      "clip": 119,
+      "frames": 1000,
       "looping": true,
-      "keys": 6339,
-      "poseDigest": "baa8e3e9bcf1b7ecf8d0e902b55f2e60d45a228f7b306eb81b46b07b4b3da440",
-      "stride": 890
+      "keys": 43198,
+      "poseDigest": "b7fd95465d799b7b9a78e71a19a6f0f2f32bf366487815a72ae16f20c8dc661d",
+      "stride": 372
     },
     "run": {
       "sequence": "Locomotion Run",

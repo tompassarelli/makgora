@@ -7,9 +7,9 @@ import { advanceFighterPose, createFighterPose } from "../src/game/presentation/
 import { FRAME_SECONDS } from "../src/game/presentation/frameClock";
 import { IllidanLocomotion } from "../src/game/presentation/illidanMotion";
 
-const STOCK_WALK = 107;
-const WALK_SECONDS = 0.875;
-const PLANTED_FOOT_SPEED = 890.0;
+const LOCOMOTION_WALK = 119;
+const WALK_SECONDS = 1.0;
+const WALK_STRIDE = 372.0;
 const LOCOMOTION_RUN = 120;
 const RUN_STRIDE = 332.739;
 
@@ -29,13 +29,13 @@ function gait(walking: boolean): { readonly motion: IllidanLocomotion; readonly 
   return frames;
 }
 
-function expectPlantedStockWalk(frames: ReturnType<typeof gait>): void {
+function expectLocomotionWalk(frames: ReturnType<typeof gait>): void {
   const moving = frames.filter(frame => frame.motion === IllidanLocomotion.walk && frame.ground > 1.0);
   expect(moving.length).toBeGreaterThan(10);
   let previous: number | undefined;
   for (const frame of moving) {
-    expect(frame.clip).toBe(STOCK_WALK);
-    expect(Math.abs(frame.rate * PLANTED_FOOT_SPEED - frame.ground) / frame.ground).toBeLessThan(0.02);
+    expect(frame.clip).toBe(LOCOMOTION_WALK);
+    expect(Math.abs(frame.rate * WALK_STRIDE - frame.ground) / frame.ground).toBeLessThan(0.02);
     if (previous !== undefined) {
       const advanced = (frame.time - previous + WALK_SECONDS) % WALK_SECONDS;
       expect(advanced).toBeGreaterThan(0.0);
@@ -45,10 +45,10 @@ function expectPlantedStockWalk(frames: ReturnType<typeof gait>): void {
   }
 }
 
-test("Illidan walks on the Demon Hunter's stock Walk with its planted foot sweeping back at his ground speed, and runs on his Locomotion Run at its drawn stride, faster than the walk [k3 measure docs/fighter-animation-work.md]", () => {
+test("Illidan walks on his Locomotion Walk at three steps a second at full walk speed, and runs on his Locomotion Run at its drawn stride, faster than the walk [k3 measure docs/fighter-animation-work.md]", () => {
   const walk = gait(true);
   const run = gait(false);
-  expectPlantedStockWalk(walk);
+  expectLocomotionWalk(walk);
   const running = run.filter(frame => frame.motion === IllidanLocomotion.run && frame.ground > 1.0);
   expect(running.length).toBeGreaterThan(10);
   for (const frame of running) {
