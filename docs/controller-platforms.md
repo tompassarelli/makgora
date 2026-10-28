@@ -21,7 +21,7 @@ drivers use the hidden **script** preset (B/Y jump, X special, LB walk, both
 triggers shield). Holding walk, on a pad or the keyboard, shortens the stick
 like a box controller's modifier: a full press sends x = ±0.6875, up 0.65 and
 down −0.675, just inside roll and spot dodge, tap jump and crouch (#282,
-smashcraft:docs/gameplay-design.md, "Stick zones"). Holding **Mod X** (`/` on the keyboard, in every layout) with up and a side sends the box controller's shallow up-diagonal, x = ±0.7375 and up 0.3125 (about 23 degrees above horizontal, `MOD_X_UP_DIAGONAL` in `ts/src/game/sim/stick.ts`), for up-forward and up-back alike; it changes no other direction, and with walk held the walk scaling applies to those two values. A pad has no Mod X key: its stick already sends any angle. A GameCube pad maps by its printed letters only in the SDL
+smashcraft:docs/gameplay-design.md, "Stick zones"). Holding **Mod X** (`;` on the keyboard, in every layout) with up and a side sends the box controller's shallow up-diagonal, x = ±0.7375 and up 0.3125 (about 23 degrees above horizontal, `MOD_X_UP_DIAGONAL` in `ts/src/game/sim/stick.ts`), for up-forward and up-back alike; it changes no other direction, and with walk held the walk scaling applies to those two values. A pad has no Mod X key: its stick already sends any angle, and the pad's Up is typed on `=` so `;` stays free for Mod X. A GameCube pad maps by its printed letters only in the SDL
 helper; the service reads evdev and does not tell GameCube pads apart yet.
 
 ## 1. Controller acquisition

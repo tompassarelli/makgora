@@ -42,7 +42,7 @@ const PERIOD = 190;
 const SLASH = 191;
 const OPEN_BRACKET = 219;
 const CLOSE_BRACKET = 221;
-const MOD_X_KEY = SLASH;
+const MOD_X_KEY = SEMICOLON;
 
 const code = (character: string) => character.charCodeAt(0);
 

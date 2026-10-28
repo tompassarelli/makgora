@@ -139,8 +139,8 @@
       "action": "moveRight"
     },
     {
-      "key": ";",
-      "code": 186,
+      "key": "=",
+      "code": 187,
       "action": "moveUp"
     },
     {
