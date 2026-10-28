@@ -7,8 +7,8 @@ import { controls } from "./testWorld";
 import { duelPair, lift, stepDuel } from "./testDuel";
 
 const RECOVERY_FLIGHT_FRAMES = 240;
-const STRAIGHT_UP_APEX = f32(417.6);
-const DIAGONAL_REACH = 213.0;
+const STRAIGHT_UP_APEX = f32(465.2);
+const DIAGONAL_REACH = 237.0;
 
 interface Flight { readonly apex: number; readonly reach: number; readonly landingLag: number; readonly owner: Fighter }
 
@@ -42,7 +42,7 @@ function landingLagAfterLift(): number {
   return landingLag;
 }
 
-test("Rifleman's up special with its speed values at 0.9: straight up apexes at 417.6 and a diagonal reaches 213.0 across, down from 517.4 and 263.3 [k1 scenario]", () => {
+test("Rifleman's up special with its speed values at 0.949: straight up apexes at 465.2 and a diagonal reaches 237.0 across, down from 517.4 and 263.3 [k1 scenario]", () => {
   const up = recoveryFlight(0, 1);
   assertNear(up.apex, STRAIGHT_UP_APEX, 0.5);
   const diagonal = recoveryFlight(1, 1);
