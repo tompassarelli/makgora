@@ -29,6 +29,8 @@ import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./cueWindows";
 import { FRAME_SECONDS } from "./frameClock";
+import { selectCrouchClip } from "./crouchPose";
+import { type PoseClip, selectFighterClipIndex, selectFighterClipName } from "./poseClip";
 import { peonSpecialPose } from "./peonPose";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { heroLook } from "../roster/looks";
@@ -42,7 +44,6 @@ import {
 const REACTION_CLIP_FRAMES = 24;
 const JUMP_CLIP_FRAMES = 24;
 const DOUBLE_JUMP_CLIP_FRAMES = 30;
-export const CROUCH_CLIP_FRAMES = 24;
 const SHIELD_RAISE_FRAMES = 4;
 
 
@@ -50,21 +51,14 @@ const SHIELD_RAISE_FRAMES = 4;
 
 
 
-export interface FighterPose {
-
-  animation: string;
+export interface FighterPose extends PoseClip {
   jumpAnimationRemaining: number;
   doubleJumpAnimation: boolean;
 
   landingAnimationRate: number;
   readonly motion: IllidanMotion;
 
-  clipIndex: number | undefined;
-  clipName: string;
-  clipTime: number;
   rate: number;
-
-  selectionSerial: number;
 }
 
 export function createFighterPose(): FighterPose {
@@ -116,19 +110,6 @@ export function firstFighterPoseDifference(
   return firstIllidanMotionDifference(expected.motion, actual.motion, world, actualWorld);
 }
 
-export function selectFighterClipIndex(pose: FighterPose, index: number): void {
-  pose.clipIndex = index;
-  pose.clipName = "";
-  pose.clipTime = 0.0;
-  pose.selectionSerial++;
-}
-
-export function selectFighterClipName(pose: FighterPose, name: string): void {
-  pose.clipIndex = undefined;
-  pose.clipName = name;
-  pose.clipTime = 0.0;
-  pose.selectionSerial++;
-}
 
 
 const MOTION_KEYS: Record<number, string | undefined> = {};
@@ -370,6 +351,8 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     pose.animation = "";
     return rate;
   }
+  const crouched = selectCrouchClip(pose, f, pose.motion.motion === IllidanLocomotion.crouch, pose.motion.motion === IllidanLocomotion.idle);
+  if (crouched !== undefined) return crouched;
   if (illidan) {
     const { motion } = pose.motion;
     const gait = motion === IllidanLocomotion.walk ? groundLocomotionClip(character, motion) : undefined;
@@ -523,7 +506,6 @@ function tableLocomotion(table: Readonly<HeroClipTable>, motion: IllidanLocomoti
     case IllidanLocomotion.run: return table.run;
     case IllidanLocomotion.turn: return table.turn;
     case IllidanLocomotion.stop: return table.stop;
-    case IllidanLocomotion.crouch: return table.crouch;
     case IllidanLocomotion.fall:
     case IllidanLocomotion.fastFall: return table.fall;
     default: return undefined;
@@ -768,7 +750,6 @@ function locomotionClipIndex(motion: IllidanLocomotion): number {
     case IllidanLocomotion.dash: return dh.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX;
     case IllidanLocomotion.turn: return dh.DEMON_HUNTER_TURNAROUND_INDEX;
     case IllidanLocomotion.stop: return dh.DEMON_HUNTER_STOP_INDEX;
-    case IllidanLocomotion.crouch: return dh.DEMON_HUNTER_CROUCH_INDEX;
     case IllidanLocomotion.fastFall: return dh.DEMON_HUNTER_FAST_FALL_INDEX;
     case IllidanLocomotion.fall: return dh.DEMON_HUNTER_FALL_INDEX;
     default: return dh.DEMON_HUNTER_COMBAT_IDLE_INDEX;
@@ -779,7 +760,6 @@ function locomotionClipIndex(motion: IllidanLocomotion): number {
 function tableLocomotionRate(clip: HeroClip, motion: IllidanLocomotion): number {
   if (motion === IllidanLocomotion.dash) return clipRate(clip.seconds, INITIAL_DASH_FRAMES);
   if (motion === IllidanLocomotion.turn || motion === IllidanLocomotion.stop) return clipRate(clip.seconds, TRANSITION_FRAMES);
-  if (motion === IllidanLocomotion.crouch) return clipRate(clip.seconds, CROUCH_CLIP_FRAMES);
   return 0.0;
 }
 
@@ -789,7 +769,6 @@ function locomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion): number
     case IllidanLocomotion.dash: return clipRate(dh.DEMON_HUNTER_INITIAL_DASH_BURST_SECONDS, INITIAL_DASH_FRAMES);
     case IllidanLocomotion.turn: return clipRate(dh.DEMON_HUNTER_TURNAROUND_SECONDS, TRANSITION_FRAMES);
     case IllidanLocomotion.stop: return clipRate(dh.DEMON_HUNTER_STOP_SECONDS, TRANSITION_FRAMES);
-    case IllidanLocomotion.crouch: return clipRate(dh.DEMON_HUNTER_CROUCH_SECONDS, CROUCH_CLIP_FRAMES);
     case IllidanLocomotion.fall:
     case IllidanLocomotion.fastFall: return 0.0;
     case IllidanLocomotion.walk:
