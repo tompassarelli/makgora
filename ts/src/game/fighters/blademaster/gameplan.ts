@@ -26,7 +26,7 @@ export const BLADEMASTER_GAMEPLAN: FighterGameplan = {
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.forwardTilt, AttackStyle.dashAttack, AttackStyle.grab] },
     { starter: AttackStyle.upTilt, followUps: [AttackStyle.upAir, AttackStyle.upSmash] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
-    { starter: GameplanSpecial.side, followUps: [AttackStyle.upAir] },
+    { starter: GameplanSpecial.down, followUps: [AttackStyle.upAir] },
   ],
   kills: [
     { move: AttackStyle.forwardSmash, fromPercent: 80.0 },
@@ -34,6 +34,6 @@ export const BLADEMASTER_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.upSmash, fromPercent: 100.0 },
   ],
 
-  recovery: { aim: "ledge", upSpecial: "last" },
+  recovery: { aim: "ledge", upSpecial: "last", sideSpecial: true },
   avoid: ["edge", "far", "below"],
 };

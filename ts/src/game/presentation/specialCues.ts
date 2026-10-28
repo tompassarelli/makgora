@@ -319,9 +319,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.blademaster]: {
     neutral: { spell: "Wind Cutter", startup: WIND_GATHER, active: cue("Abilities\\Spells\\Other\\Tornado\\Tornado_Target.mdx", "hand", f32(0.6)) },
-    side: { spell: "Wind Walk", startup: WIND_WALK, active: WIND_WALK, body: WIND_WALK_BODY },
+    side: { spell: "Mirror Image", startup: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), active: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageDeathCaster.mdx", "body", 1.0) },
     up: { spell: "Rising Whirlwind", startup: WIND_GATHER, active: cue("Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", "body", f32(0.6)) },
-    down: { spell: "Mirror Image", startup: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), active: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageDeathCaster.mdx", "body", 1.0) },
+    down: { spell: "Wind Walk", startup: WIND_WALK, active: WIND_WALK, body: WIND_WALK_BODY },
   },
   [Character.mountainKing]: {
     neutral: { spell: "Storm Bolt", startup: STORM, active: cue("Abilities\\Spells\\Other\\ForkedLightning\\ForkedLightningTarget.mdx", "hand", f32(0.8)) },
@@ -437,8 +437,8 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {
-    side: { followUps: [branch("Wind Walk Kick", WIND_WALK_COUNTER, WIND_WALK_COUNTER)] },
-    down: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },
+    side: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },
+    down: { followUps: [branch("Wind Walk Kick", WIND_WALK_COUNTER, WIND_WALK_COUNTER)] },
   },
   [Character.mountainKing]: {
     up: { followUps: [HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES] },

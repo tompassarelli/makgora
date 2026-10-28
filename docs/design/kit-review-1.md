@@ -114,9 +114,39 @@ Identity kept: spacing and whiff punishment, weak at range. The redesign
 gives him Warcraft's two tricks: Wind Walk's vanish behind the foe and Mirror Image's
 second body.
 
-### Side B: Wind Walk (picked)
+### Side B: Mirror Image (picked)
 
-Rebuilt twice. For #523 (2026-10-27, north gate 78) the walk with its Backstab
+Moved from down B to side B on 28 Oct 2026, when Tom asked for Wind Walk on
+down B, where Marth's Counter sits, and for Mirror Image to step the way the
+stick points. 15 mana. Frames 1–11 a tell, and a grounded press stops his
+run on frame 1; frame 12 leaves an **image** where he stood (a placed object
+with 1 durability: any hit or projectile shatters it; it lasts 210 frames)
+and he steps 1.0H the way side B points over frames 12–15, turning first when
+it points behind him; the action ends on frame 28. In the air the step is
+sideways only, with no rise, once per airtime; he is not helpless, and
+landing mid-move ends it with 20 frames of lag.
+
+**Swap** (side special while the image stands, no mana): frames 1–5 the image
+flashes; frame 6 he swaps to the image's place; a slash on frames 8–10 at 10%
+EDGE 40° facing the way the image faces; ends on frame 30. The image is gone.
+
+Counterplay: the image is a fixed, visible anchor: stand by it and hit the
+flash, or break it with any hit to deny the swap; the slash is punishable on
+shield. Reward: a second position to threaten from, a disengage that keeps
+pressure, an edge-guard (leave the image at the ledge, swap there), and one
+length of sideways travel offstage before an angled Rising Whirlwind. The
+computer recovers with both: from 700 units past the ledge at deck height
+with no jump left, the step is what gets him back
+(smashcraft:ts/src/game/fighters/blademaster/recovery.tests.ts).
+
+Rejected: an image that attacks on its own (an autonomous clone is a second
+fighter's worth of pressure for 15 mana; the roster forbids autonomous clone
+attacks).
+
+### Down B: Wind Walk (picked)
+
+Rebuilt twice, and moved from side B to down B on 28 Oct 2026 to sit where
+Marth's Counter does. For #523 (2026-10-27, north gate 78) the walk with its Backstab
 and step-out branches became a quick dash through the opponent; Tom asked on
 28 Oct 2026 for a Marth-style parry instead, a hard read on offence with a big
 punish when it pays and a wide-open whiff when it does not, and dropped the
@@ -167,26 +197,6 @@ shields beat it outright, since only a strike is countered.
 
 Rejected for #523 and later replaced: the dash through the opponent (no hit,
 so a read gained position only).
-
-### Down B: Mirror Image (picked)
-
-15 mana. Frames 1–7 a tell; frame 8 leaves an **image** where he stood (a
-placed object with 1 durability: any hit or projectile shatters it; it lasts
-150 frames) and he steps 1.0H back (down held with a side: toward that side)
-over frames 8–13; the action ends on frame 24.
-
-**Swap** (down special while the image stands, no mana): frames 1–5 the image
-flashes; frame 6 he swaps to the image's place; a slash on frames 8–10 at 10%
-EDGE 40° facing the way the image faces; ends on frame 30. The image is gone.
-
-Counterplay: the image is a fixed, visible anchor: stand by it and hit the
-flash, or break it with any hit to deny the swap; the slash is punishable on
-shield. Reward: a second position to threaten from, a disengage that keeps
-pressure, and an edge-guard (leave the image at the ledge, swap there).
-
-Rejected: an image that attacks on its own (an autonomous clone is a second
-fighter's worth of pressure for 15 mana; the roster forbids autonomous clone
-attacks).
 
 ## Mountain King (#125)
 

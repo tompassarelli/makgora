@@ -132,10 +132,10 @@ const SPIN = -150, LIFT = 60;
 const kick = {...figure(22,8,0,{left:[10,20],right:[0,0],drop:0,offhand:-95}),spin:SPIN,drop:LIFT};
 const kickRise = {...figure(20,30,30,{left:[40,60],right:[30,40],drop:0,offhand:-95}),spin:SPIN*0.6,drop:LIFT*0.5};
 const counterGestures = [
-  {key:"sideSpecial",name:"Wind Walk Guard",style:undefined,keys:[
+  {key:"downSpecial",name:"Wind Walk Guard",style:undefined,keys:[
     [0,guard],[4,parry],[29,parry],[36,{...parry,lean:6,knee:24}],[59,guard],
   ]},
-  {key:"sideSpecialFollowUp",name:"Wind Walk Kick",style:undefined,keys:[
+  {key:"downSpecialFollowUp",name:"Wind Walk Kick",style:undefined,keys:[
     [0,parry],[5,kickGuard],[8,plant],[10,plant],[11,kickRise],[13,kick],[22,kick],[29,kickRise],[37,kickGuard],[46,guard],
   ]},
 ] as const;
@@ -260,7 +260,7 @@ for(const g of replaceOnly==="counter"?counterGestures:[]){
   const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[existing]!.Interval[0]:cursor,end=start+Math.round(total*1000/60);
   if(existing<0){model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});cursor=end+100;}
   const controlFrames=author(g,index,start,end,0,0,total);replaced.add(index);
-  const strike=g.key==="sideSpecial"?4:16;
+  const strike=g.key==="downSpecial"?4:16;
   records.push({pose:g.key,name,index,first:strike,last:strike,total,seconds:(end-start)/1000,strikeSeconds:Math.round(strike*1000/60)/1000,controlFrames});
 }
 const inPlace=replaceOnly==="forward-air"||replaceOnly==="counter"?[]:replaceOnly==="up-air"?gestures.filter(g=>g.style===AttackStyle.upAir).map(g=>({g,name:`Sword Gesture ${g.name}`,matchesMove:false})):replacements.map(g=>({g,name:g.name,matchesMove:true}));

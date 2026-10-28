@@ -68,7 +68,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.blademaster]: {
     weapon: Weapon.blade, swing: ["HeroBladeMasterAttack1", "HeroBladeMasterAttack2"], strong: "CriticalStrike",
-    specials: [s("HeroBladeMasterAttack2", "MetalMediumSliceFlesh"), s("WindWalk", "CriticalStrike"), s("HeroBladeMasterAttack1", "MetalMediumSliceFlesh"), s("MirrorImage", "MetalMediumSliceFlesh")],
+    specials: [s("HeroBladeMasterAttack2", "MetalMediumSliceFlesh"), s("MirrorImage", "MetalMediumSliceFlesh"), s("HeroBladeMasterAttack1", "MetalMediumSliceFlesh"), s("WindWalk", "CriticalStrike")],
   },
   [Character.mountainKing]: {
     weapon: Weapon.hammer, swing: ["HeroMountainKingAttack1"], strong: "StormBolt",

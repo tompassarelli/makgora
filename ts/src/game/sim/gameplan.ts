@@ -68,6 +68,7 @@ export interface KillMove {
 export interface RecoveryRoute {
   readonly aim: "ledge" | "deck" | "mixed";
   readonly upSpecial: "first" | "last" | "mixed";
+  readonly sideSpecial?: boolean | undefined;
 }
 
 

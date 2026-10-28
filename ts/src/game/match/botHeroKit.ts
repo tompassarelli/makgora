@@ -11,7 +11,7 @@ import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { changesAimZone, launchZoneX, launchZoneZ } from "../sim/specials/aimZone";
 import { chooseHeroSpecial, isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/engine";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialForm, specialKit } from "../sim/specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialForm, SpecialSlot, specialForm, specialKit } from "../sim/specials/schema";
 import { type Controls, neutralControls } from "../sim/roster";
 import { floorFriction, floorTraction } from "../sim/stage";
 import { deckUnder, heightAhead, safeAt } from "./botFooting";
@@ -254,6 +254,16 @@ export function heroStanceLater(f: Readonly<Fighter>, arrival: number): boolean 
 export function upSpecialStartable(f: Readonly<Fighter>, cooldownReady: boolean): boolean {
   const specials = f.tuning.specials;
   return specials === undefined ? cooldownReady : startableForm(f, specials, SpecialSlot.up) !== undefined;
+}
+
+
+export function sideStepStartable(f: Readonly<Fighter>, towardX: number): boolean {
+  const specials = f.tuning.specials;
+  if (specials === undefined) return false;
+  press.specialPressed = true;
+  press.specialX = towardX;
+  press.specialZ = 0;
+  return chooseHeroSpecial(f, specials, press, refusal)?.form === SpecialForm.air;
 }
 
 

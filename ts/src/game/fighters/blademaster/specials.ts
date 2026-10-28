@@ -126,7 +126,7 @@ const risingBlade: AuthoredSpecial = {
 
 
 
-const IMAGE_STEP_SPEED = f32(-f32(length(f32(1.0)) / 4));
+const IMAGE_STEP_SPEED = f32(f32(length(f32(1.0)) / 4));
 export const IMAGE_STARTUP = 4;
 export const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8 + IMAGE_STARTUP, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 210, fireAges: [] };
 const mirrorImage: AuthoredSpecial = {
@@ -143,6 +143,7 @@ const mirrorImage: AuthoredSpecial = {
     { ...frames(12 + IMAGE_STARTUP, 12 + IMAGE_STARTUP), ...STOP },
   ],
 };
+const mirrorImageStanding: AuthoredSpecial = { ...mirrorImage, motion: [{ ...frames(1, 1), ...STOP }, ...mirrorImage.motion ?? []] };
 
 
 
@@ -159,10 +160,11 @@ const imageSwap: AuthoredSpecial = {
 };
 
 const inAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...special, landingLag: AIR_LANDING_LAG });
+const onceInAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...inAir(special), oncePerAirtime: true });
 
 export const BLADEMASTER_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { range: 1.25 }),
-  side: withExKit({ name: "Wind Walk", description: "Fade into a parry; a strike in the window freezes the attacker and he steps out behind them with a kick straight up. A miss leaves him wide open.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),
+  side: withExKit({ name: "Mirror Image", description: "Step the way you point and leave an image where you stood; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImageStanding, air: onceInAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
   up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
-  down: withExKit({ name: "Mirror Image", description: "Step back and leave an image; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImage, air: inAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
+  down: withExKit({ name: "Wind Walk", description: "Fade into a parry; a strike in the window freezes the attacker and he steps out behind them with a kick straight up. A miss leaves him wide open.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),
 };

@@ -3,7 +3,7 @@
 
 import { lavaLeft, lavaRight, overLava } from "../sim/lava";
 import { runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine";
-import { upSpecialStartable } from "./botHeroKit";
+import { sideStepStartable, upSpecialStartable } from "./botHeroKit";
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { toInt } from "wisp/src/sim/binary32";
@@ -344,6 +344,10 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
     if (fighter.jump.remaining > 0 && fighter.attack.cooldown === 0 && !specialFirst) {
       input.jumpPressed = true;
       input.jumpHeld = true;
+    } else if (gameplan?.recovery.sideSpecial === true && outside > 0 && z >= floor && sideStepStartable(fighter, -side)) {
+      input.specialPressed = true;
+      input.direction = -side;
+      input.specialX = -side;
     } else if (z < f32(floor + 50)) {
       input.specialPressed = true;
       input.specialX = input.direction;

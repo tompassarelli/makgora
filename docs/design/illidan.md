@@ -75,7 +75,7 @@ above all, the hero who empties casters: Mana Burn is why he is picked.
   branch ([fighting-game language](fighting-games.md)).
 - Fox's and Falco's Illusion and Phantasm leave an afterimage line along
   the dash: the path is visible after the fact, so the move teaches itself.
-- Blademaster's Wind Walk ([kit review 1](kit-review-1.md#side-b-wind-walk-picked))
+- Blademaster's Wind Walk ([kit review 1](kit-review-1.md#down-b-wind-walk-picked))
   shows the house pattern: a tell, travel that stops at a raised shield, and
   attack and special branches.
 - #97's legibility rule (smashcraft:docs/gameplay-design.md, "Legible

@@ -40,9 +40,9 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 + HeroBladeMasterAttack1 / HeroBladeMasterAttack2 | MetalHeavySliceFlesh | MetalHeavySliceFlesh + CriticalStrike | MetalHeavySliceMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 + HeroBladeMasterAttack1 / HeroBladeMasterAttack2 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Neutral special: Wind Cutter | HeroBladeMasterAttack2 | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
-| Side special: Wind Walk | WindWalk | CriticalStrike | CriticalStrike + CriticalStrike | MetalMediumSliceMetal |  |
+| Side special: Mirror Image | MirrorImage | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Up special: Rising Whirlwind | HeroBladeMasterAttack1 | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
-| Down special: Mirror Image | MirrorImage | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
+| Down special: Wind Walk | WindWalk | CriticalStrike | CriticalStrike + CriticalStrike | MetalMediumSliceMetal |  |
 
 ## Muradin Bronzebeard
 

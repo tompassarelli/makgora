@@ -120,18 +120,18 @@ export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<He
   neutralSpecial: sequence("Attack", aligned(CUT, 18, 1, 22)),
   neutralSpecialAir: sequence("Attack", aligned(CUT, 18, 1, 22)),
 
-  sideSpecial: BLADEMASTER_AUTHORED_CLIPS.sideSpecial,
-  sideSpecialAir: BLADEMASTER_AUTHORED_CLIPS.sideSpecialAir,
-  sideSpecialFollowUp: BLADEMASTER_AUTHORED_CLIPS.sideSpecialFollowUp,
-  sideSpecialFollowUpAir: BLADEMASTER_AUTHORED_CLIPS.sideSpecialFollowUpAir,
+  sideSpecial: sequence("Stand - 4", f32(0.6)),
+  sideSpecialAir: sequence("Stand - 4", f32(0.6)),
+  sideSpecialFollowUp: sequence("Attack 2", aligned(THRUST, 8, 3, 20)),
+  sideSpecialFollowUpAir: sequence("Attack 2", aligned(THRUST, 8, 3, 20)),
   upSpecial: sequence("Attack Walk Stand Spin", f32(2.0 * SPIN_TURN)),
   upSpecialAir: sequence("Attack Walk Stand Spin", f32(2.0 * SPIN_TURN)),
 
-  downSpecial: sequence("Stand - 4", f32(0.6)),
-  downSpecialAir: sequence("Stand - 4", f32(0.6)),
+  downSpecial: BLADEMASTER_AUTHORED_CLIPS.downSpecial,
+  downSpecialAir: BLADEMASTER_AUTHORED_CLIPS.downSpecialAir,
 
-  downSpecialFollowUp: sequence("Attack 2", aligned(THRUST, 8, 3, 20)),
-  downSpecialFollowUpAir: sequence("Attack 2", aligned(THRUST, 8, 3, 20)),
+  downSpecialFollowUp: BLADEMASTER_AUTHORED_CLIPS.downSpecialFollowUp,
+  downSpecialFollowUpAir: BLADEMASTER_AUTHORED_CLIPS.downSpecialFollowUpAir,
   ...RECOVERY_CLIPS[Character.blademaster],
 };
 

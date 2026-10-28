@@ -19,7 +19,7 @@ cancelling.
 |---|---|---|---|---|---|
 | Rifleman | Freeze Trap tossed in the air falls and arms on deck contact | A8 W22 L31/E38 | A8 W22 L13/E38 | A8 W22 L3/E38 | A8 W22 L—/E38 |
 | Illidan | Immolate in the air, a Falco-style shine that holds him in place and a jump cancels | A12 W1 L37/E15 | A12 W1 L36/E15 | A12 W1 L21/E15 | A12 W1 L—/E15 |
-| Blademaster | Mirror Image placed in the air, then a backward step | S1 W8 L34/E24 | S1 W8 L25/E24 | S1 W8 L3/E24 | S1 W8 L—/E24 |
+| Blademaster | Wind Walk's counter guard in the air, with no travel | S1 W5 L16/E16 | S1 W5 L21/E21 | S1 W5 L7/E7 | S1 W5 L—/E59 |
 | Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W15 L27/E27 | S1 W— L15/E15 | S1 W50 L3/E78 | S1 W15 L—/E50 |
 | Warden | Fan of Knives in the air, a ring of knives with a shine-like semi-spike that nearly stops her fall and a jump cancels | S1 W4 L46/E27 | S1 W4 L44/E27 | S1 W4 L16/E27 | S1 W4 L—/E27 |
 | Lich | Frost Armor cast in the air; lands into the grounded cast | S0 W21 L27/E27 | S0 W21 L15/E45 | S0 W21 L3/E45 | S0 W21 L—/E45 |

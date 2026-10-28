@@ -11,7 +11,7 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../roster/kits";
 import { AttackStyle, Character, SpecialAction } from "../../sim/codes";
 import { canAttack } from "../../sim/conditions";
-import { type Fighter, createFighter, placedObject } from "../../sim/fighter";
+import { type Fighter, createFighter, mutablePlacedObject, placedObject } from "../../sim/fighter";
 import { attackLandingLag } from "../../sim/moves";
 import { fighterAt } from "../../sim/roster";
 import { mainDeckZ } from "../../sim/stage";
@@ -52,8 +52,8 @@ function windWalkWhiffPunished(character: Character, punish: Punish): boolean {
   const foe = fighter(s, 1);
   fillMeter(blademaster);
   for (let n = 1; n <= WIND_WALK_WATCH; n++) {
-    frame(s, n === 1 ? [Action.moveRight, Action.special] : [], n >= PUNISH_PRESS ? punish(foe, blademaster, n - PUNISH_PRESS) : []);
-    if (n === 1 && blademaster.special.action !== SpecialAction.heroSide) return false;
+    frame(s, n === 1 ? [Action.moveDown, Action.special] : [], n >= PUNISH_PRESS ? punish(foe, blademaster, n - PUNISH_PRESS) : []);
+    if (n === 1 && blademaster.special.action !== SpecialAction.heroDown) return false;
     if (blademaster.special.form >= FOLLOW_UP_FORM) return false;
     if (blademaster.status.damage > 0.0 || blademaster.grab.owner !== undefined) return true;
     if (n > 1 && blademaster.special.action === SpecialAction.none && canAttack(blademaster)) return false;
@@ -95,7 +95,6 @@ function counter(press: number, foeFacing: number, air: boolean, ex = false, sta
     airborne(blademaster, blademasterX, f32(mainDeckZ(0) + COUNTER_HEIGHT));
     airborne(foe, foeX, f32(mainDeckZ(0) + COUNTER_HEIGHT));
   }
-  const side = foeFacing < 0 ? Action.moveRight : Action.moveLeft;
   let guardFrame = 0;
   let frozen = 0;
   let parryFrame = 0;
@@ -106,7 +105,7 @@ function counter(press: number, foeFacing: number, air: boolean, ex = false, sta
   let launchX = 0.0;
   let launchZ = 0.0;
   for (let n = 1; n <= COUNTER_WATCH; n++) {
-    const own = n === start ? [side, Action.special, ...(ex ? [Action.strong] : [])] : [];
+    const own = n === start ? [Action.moveDown, Action.special, ...(ex ? [Action.strong] : [])] : [];
     frame(s, own, n === press ? [Action.attack] : []);
     struck ||= blademaster.status.damage > 0.0;
     if (guardFrame === 0 && blademaster.special.form >= FOLLOW_UP_FORM) {
@@ -142,7 +141,7 @@ function counterWindow(ex: boolean): string {
 test("Blademaster's Wind Walk counters a strike that lands on frames 5-29, EX or not [k4 reference melee]", () => {
   assertEquals(counterWindow(false), `${WIND_WALK_GUARD.first}-${WIND_WALK_GUARD.last}`, "counter window");
   assertEquals(counterWindow(true), `${WIND_WALK_GUARD.first}-${WIND_WALK_GUARD.last}`, "EX counter window");
-  assertEquals(BLADEMASTER_SPECIALS.side.ground.endFrame, WIND_WALK_END, "whiff total");
+  assertEquals(BLADEMASTER_SPECIALS.down.ground.endFrame, WIND_WALK_END, "whiff total");
 });
 
 test("A countered strike freezes the attacker 11 frames, then Blademaster stands behind them facing their back and kicks them straight up, both facings, grounded and in the air [k4 reference melee]", () => {
@@ -179,8 +178,8 @@ test("Blademaster's air Wind Walk whiff travels no farther sideways than 0.1H of
   airborne(blademaster, 0.0, f32(mainDeckZ(0) + AIR_WHIFF_HEIGHT));
   let ended = 0;
   for (let n = 1; n <= WIND_WALK_END + 1 && ended === 0; n++) {
-    frame(s, n === 1 ? [Action.moveRight, Action.special] : []);
-    if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroSide, "air Wind Walk starts");
+    frame(s, n === 1 ? [Action.moveDown, Action.special] : []);
+    if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroDown, "air Wind Walk starts");
     if (blademaster.special.action === SpecialAction.none) ended = n;
   }
   assertLessThan(Math.abs(blademaster.motion.x), AIR_WHIFF_DRIFT);
@@ -201,11 +200,11 @@ test("A rollback from inside a Wind Walk counter's freeze replays the same step 
   state.match.items.on = false;
   state.match.timeLimitMinutes = 0;
   state.match.ultimatesOff = true;
-  const held = (tick: number, slot: number): number => slot === 0 ? (tick === 1 ? maskOf(Action.moveRight, Action.special) : 0) : tick === 10 ? maskOf(Action.attack) : 0;
+  const held = (tick: number, slot: number): number => slot === 0 ? (tick === 1 ? maskOf(Action.moveDown, Action.special) : 0) : tick === 10 ? maskOf(Action.attack) : 0;
   const tickOnce = (tick: number) => {
     for (const slot of [0, 1]) {
       const mask = held(tick, slot);
-      const row = inputRow({ held: mask, pressed: mask, axisX: slot === 0 && tick === 1 ? 127 : 0, specialX: slot === 0 && tick === 1 ? 1 : 0 });
+      const row = inputRow({ held: mask, pressed: mask, axisZ: slot === 0 && tick === 1 ? -127 : 0, specialZ: slot === 0 && tick === 1 ? -1 : 0 });
       if (row === undefined) throw new Error("input row");
       adaptInput(row, fighterAt(state.world, slot), tick, at(state.controls.inputs, slot), at(state.controls.commands, slot));
     }
@@ -237,7 +236,7 @@ function kickKills(percent: number): boolean {
   const foe = fighter(s, 1);
   foe.status.damage = percent;
   for (let n = 1; n <= KICK_WATCH; n++) {
-    frame(s, n === 1 ? [Action.moveRight, Action.special] : [], n === 10 ? [Action.attack] : []);
+    frame(s, n === 1 ? [Action.moveDown, Action.special] : [], n === 10 ? [Action.attack] : []);
     if (foe.status.out) return true;
   }
   return false;
@@ -262,12 +261,12 @@ test("Mirror Image still stands on frame 209 after placement and is gone on fram
   state.match.ultimatesOff = true;
   let lastAge = 0;
   for (let tick = 1; tick <= MIRROR_IMAGE_OBJECT.frame + IMAGE_LIFE_FRAMES; tick++) {
-    const row = inputRow({ held: tick === 1 ? maskOf(Action.moveDown, Action.special) : 0,
-      pressed: tick === 1 ? maskOf(Action.special) : 0, axisZ: tick === 1 ? -127 : 0, specialZ: tick === 1 ? -1 : 0 });
+    const row = inputRow({ held: tick === 1 ? maskOf(Action.moveRight, Action.special) : 0,
+      pressed: tick === 1 ? maskOf(Action.special) : 0, axisX: tick === 1 ? 127 : 0, specialX: tick === 1 ? 1 : 0 });
     if (row === undefined) throw new Error("Blademaster input row");
     adaptInput(row, blademaster, tick, state.controls.inputs[0], state.controls.commands[0]);
     stepMatch(state.match, state.world, state.controls, tick);
-    if (tick === 1) assertEquals(blademaster.special.action, SpecialAction.heroDown, "Blademaster starts Mirror Image");
+    if (tick === 1) assertEquals(blademaster.special.action, SpecialAction.heroSide, "Blademaster starts Mirror Image");
     const image = placedObject(blademaster);
     if (image.age === lastAge) continue;
     assertEquals(image.age, lastAge + 1, `tick ${tick}: the image ages one frame`);
@@ -362,7 +361,7 @@ test("Blademaster's Rising Whirlwind first strikes on frame 13, four frames afte
 const STOCK_IMAGE_FRAME = 8;
 const IMAGE_WATCH = 40;
 
-test("Blademaster's Mirror Image, grounded and from a hop, places its image on frame 12 and moves back from frame 13, four frames after the stock frames 8 and 9 [k3 measure docs/gameplay-design.md]", () => {
+test("Blademaster's Mirror Image, grounded and from a hop, places its image on frame 12 and steps forward from frame 13, four frames after the stock frames 8 and 9 [k3 measure docs/gameplay-design.md]", () => {
   const measured: string[] = [];
   for (const air of [false, true]) {
     const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
@@ -371,13 +370,52 @@ test("Blademaster's Mirror Image, grounded and from a hop, places its image on f
     let placed = 0;
     let stepped = 0;
     for (let n = 1; n <= IMAGE_WATCH && (placed === 0 || stepped === 0); n++) {
-      frame(s, n === 1 ? [Action.moveDown, Action.special] : []);
-      if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroDown, "Mirror Image starts");
+      frame(s, n === 1 ? [Action.moveRight, Action.special] : []);
+      if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroSide, "Mirror Image starts");
       if (placed === 0 && placedObject(blademaster).life > 0) placed = n;
-      if (stepped === 0 && blademaster.motion.x !== BLADEMASTER_X) stepped = n;
+      if (stepped === 0 && placed !== 0 && blademaster.motion.x !== placedObject(blademaster).x) stepped = n;
     }
     measured.push(`${air ? "aerial" : "grounded"}: image ${placed}, step ${stepped}`);
   }
   assertEquals(measured.join("; "), `grounded: image ${STOCK_IMAGE_FRAME + IMAGE_STARTUP}, step ${STOCK_IMAGE_FRAME + IMAGE_STARTUP + 1}; aerial: image ${STOCK_IMAGE_FRAME + IMAGE_STARTUP}, step ${STOCK_IMAGE_FRAME + IMAGE_STARTUP + 1}`);
-  assertEquals(BLADEMASTER_SPECIALS.down.ground.endFrame, STOCK_END_FRAME + IMAGE_STARTUP, "last frame of the move");
+  assertEquals(BLADEMASTER_SPECIALS.side.ground.endFrame, STOCK_END_FRAME + IMAGE_STARTUP, "last frame of the move");
+});
+
+const IMAGE_STEP = length(f32(1.0));
+const SIDE_STEP_HEIGHT = 600.0;
+
+function sideStep(air: boolean, stick: Action): string {
+  const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  if (air) airborne(blademaster, BLADEMASTER_X, f32(mainDeckZ(0) + SIDE_STEP_HEIGHT));
+  const startZ = blademaster.motion.z;
+  let risen = false;
+  let stood = 0.0;
+  for (let n = 1; n <= IMAGE_WATCH; n++) {
+    frame(s, n === 1 ? [stick, Action.special] : []);
+    if (n === 1) assertEquals(blademaster.special.action, SpecialAction.heroSide, "Mirror Image starts");
+    if (n === MIRROR_IMAGE_OBJECT.frame) stood = blademaster.motion.x;
+    risen ||= blademaster.motion.z > startZ;
+  }
+  const image = placedObject(blademaster);
+  const facing = blademaster.facing;
+  const step = Math.round(f32(blademaster.motion.x - image.x) / IMAGE_STEP);
+  const imageWhereHeStood = image.life > 0 && image.x === stood && (air || image.x === BLADEMASTER_X);
+  let again = "";
+  if (air) {
+    mutablePlacedObject(blademaster).life = 0;
+    frame(s, [stick, Action.special]);
+    again = blademaster.special.action === SpecialAction.none ? ", no second step" : ", stepped again";
+  }
+  return `${air ? "air" : "ground"} ${stick === Action.moveRight ? "right" : "left"}: facing ${facing}, step ${step}, image where he stood ${imageWhereHeStood}, rose ${risen}${again}`;
+}
+
+test("Side-B Mirror Image leaves the image where he stood and steps him one length the way the stick points, turning him for a reverse input, grounded and once per airtime in the air with no rise [k1 scenario]", () => {
+  const measured = [false, true].flatMap(air => [Action.moveRight, Action.moveLeft].map(stick => sideStep(air, stick)));
+  assertEquals(measured.join("; "), [
+    "ground right: facing 1, step 1, image where he stood true, rose false",
+    "ground left: facing -1, step -1, image where he stood true, rose false",
+    "air right: facing 1, step 1, image where he stood true, rose false, no second step",
+    "air left: facing -1, step -1, image where he stood true, rose false, no second step",
+  ].join("; "));
 });

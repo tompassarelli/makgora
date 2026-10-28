@@ -975,7 +975,7 @@ One rule for every fighter's four specials
 | --- | --- |
 | Rifleman | up: recoil shot (recovery) |
 | Illidan | side: Fel Rush (rush); up: Wing Ascent (recovery) |
-| Blademaster | side: Wind Walk's counter kick (relocation behind the attacker); up: Rising Whirlwind (recovery); down: Mirror Image (back-step relocation) |
+| Blademaster | side: Mirror Image (relocation the way side B points); up: Rising Whirlwind (recovery); down: Wind Walk's counter kick (relocation behind the attacker) |
 | Mountain King | side: Storm Rush (rush); up: Thunder Leap (recovery) |
 | Warden | side: Shadow Pursuit (lunge, teleport when marked); up: Blink (teleport) |
 | Lich | up: Spectral Ascent (recovery) |
@@ -1087,7 +1087,7 @@ every newly registered fighter too.
 |---|---|---|---|
 | Rifleman | Blaster (28) | Bear (50) | One 8% hit armored on frames 1–6 |
 | Illidan | Eye Beam (35) | Fel Rush (37) | One 8% hit armored on frames 1–6 |
-| Blademaster | Wind Cutter (25) | Wind Walk (43) | One 8% hit armored on frames 1–6 |
+| Blademaster | Wind Cutter (25) | Mirror Image (40) | One 8% hit armored on frames 1–6 |
 | Mountain King | Storm Bolt (33) | Storm Rush (43) | One 8% hit armored on frames 1–6 |
 | Warden | Shadow Strike (30) | Shadow Pursuit (40) | One 8% hit armored on frames 1–6 |
 | Lich | Frost Nova (35) | Death and Decay (50) | One 8% hit armored on frames 1–6 |
