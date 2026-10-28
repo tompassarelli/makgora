@@ -5,6 +5,8 @@
 
 **Best in Classic graphics.**
 
+Join the [Discord](https://discord.gg/JQGZs2UJR) if you'd like to play games sometime and/or contribute.
+
 ## New in 0.2
 - **Two meters and orbs:** an EX charge that refills in 12 seconds and an ultimate meter that fills over 2 minutes, with orbs at centre stage that top them up.
 - **Melee feel:** Melee's movement and body numbers for every fighter, Melee auto-cancel windows, wavedash exits that walk, and an EX wavedash.
