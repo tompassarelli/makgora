@@ -138,6 +138,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Weapons\\Bolt\\BoltImpact.mdx": { scale: 0.5 },
   "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { scale: f32(1.2) },

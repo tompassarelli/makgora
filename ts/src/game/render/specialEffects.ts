@@ -100,8 +100,7 @@ export class SpecialEffects {
       const wingTrail = AddSpecialEffect(IMPACT_DUST_MODEL, x, y);
       const drainFlash = AddSpecialEffect(IMPACT_TECH_MODEL, x, y);
       const silence = AddSpecialEffect(STOCK_MODELS.silenceTarget, x, y);
-      const curse = AddSpecialEffect(STOCK_MODELS.curseTarget, x, y);
-      BlzSetSpecialEffectColor(curse, 120, 255, 80);
+      const curse = AddSpecialEffect(STOCK_MODELS.doomTarget, x, y);
       const frog = AddSpecialEffect(HEX_FROG_MODEL, x, y);
       const siphon = AddLightningEx(SIPHON_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       SetLightningColor(siphon, 1.0, 1.0, 1.0, 0.0);
