@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, reservedReason, unboundActions } from "../input/keyBindings";
+import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -12,7 +12,9 @@ import {
   clearKey,
   createBindingSettings,
   initializeBindingSettings,
+  loadSavedBindings,
   resetToLayout,
+  saveBindingSettings,
 } from "./bindingSettings";
 import { keyboardCaps } from "./keyboardLayout";
 
@@ -139,4 +141,72 @@ test("every cap on the controls screen's keyboard captures as a binding and show
     assertEquals(keyFor(settings.bindings, Action.attack, 1), key, `cap ${key} binds`);
     assertEquals(keyLabel(key).startsWith("KEY "), false, `cap ${key} is named`);
   }
+});
+
+function persistedSettings(stored: { encoded: string | undefined }): BindingSettings {
+  const result = (): BindingLoadResult => stored.encoded === undefined ? { kind: "empty" } : { kind: "loaded", encoded: stored.encoded };
+  const settings = createBindingSettings(0, { load: (_owner, complete) => complete(result()), readLocal: () => result(), save: (_owner, encoded) => { stored.encoded = encoded; } });
+  initializeBindingSettings(settings);
+  return settings;
+}
+
+function bindAttack(settings: BindingSettings, key: number): void {
+  beginBindingCapture(settings, Action.attack, 0);
+  captureBinding(settings, key);
+}
+
+test("each layout keeps its own edits when switching, and only Reset to layout restores the defaults [k2 property]", () => {
+  const settings = customSettings();
+  bindAttack(settings, code("L"));
+  applyBindingPreset(settings, "wasd");
+  assertEquals(slots(settings, Action.attack), "N —", "WASD keeps its stock Attack");
+  applyBindingPreset(settings, "custom");
+  assertEquals(slots(settings, Action.attack), "L —", "Custom keeps the edit after switching back");
+  resetToLayout(settings);
+  assertEquals(slots(settings, Action.attack), "N —", "Reset to layout");
+  applyBindingPreset(settings, "standard");
+  bindAttack(settings, code("K"));
+  applyBindingPreset(settings, "wasd");
+  applyBindingPreset(settings, "standard");
+  assertEquals(slots(settings, Action.attack), "K —", "Hitbox keeps its edit");
+});
+
+test("saving keeps all three layouts and the active one, and a new session reopens on them [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  applyBindingPreset(settings, "custom");
+  bindAttack(settings, code("L"));
+  applyBindingPreset(settings, "standard");
+  bindAttack(settings, code("K"));
+  applyBindingPreset(settings, "custom");
+  saveBindingSettings(settings);
+
+  const reopened = persistedSettings(stored);
+  assertEquals(reopened.layout, "custom", "active layout");
+  assertEquals(slots(reopened, Action.attack), "L —", "Custom keys");
+  applyBindingPreset(reopened, "standard");
+  assertEquals(slots(reopened, Action.attack), "K —", "Hitbox keys");
+  applyBindingPreset(reopened, "wasd");
+  assertEquals(slots(reopened, Action.attack), "N —", "WASD keys");
+});
+
+test("a one-set save from before layouts loads as the active layout's keys, and Load profile puts a profile on Custom [k2 property]", () => {
+  const keys = presetBindings("wasd");
+  keys.keys[slotIndex(Action.attack, 0)] = code("L");
+  const old = encodeBindings(keys);
+  const settings = persistedSettings({ encoded: old });
+  assertEquals(settings.layout, "custom", "own keys land on Custom");
+  assertEquals(slots(settings, Action.attack), "L —", "old save keys");
+  applyBindingPreset(settings, "wasd");
+  assertEquals(slots(settings, Action.attack), "N —", "WASD is still stock");
+
+  const stock = persistedSettings({ encoded: encodeBindings(presetBindings("standard")) });
+  assertEquals(stock.layout, "standard", "a stock old save opens on its layout");
+
+  applyBindingPreset(settings, "standard");
+  loadSavedBindings(settings, () => undefined);
+  assertEquals(settings.layout, "custom", "Load profile selects Custom");
+  assertEquals(slots(settings, Action.attack), "L —", "Custom gets the profile");
+  applyBindingPreset(settings, "standard");
+  assertEquals(slots(settings, Action.attack), "N —", "Hitbox is untouched by Load profile");
 });

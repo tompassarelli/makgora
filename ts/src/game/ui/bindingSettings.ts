@@ -10,9 +10,13 @@ import {
   PRESET_NAMES,
   type KeyBindings,
   type KeySlot,
+  type LayoutBindings,
+  type LayoutSave,
   decodeBindings,
-  encodeBindings,
+  decodeLayouts,
+  encodeLayouts,
   presetBindings,
+  presetLayouts,
   presetOf,
   actionFor,
   assignKey,
@@ -49,6 +53,7 @@ export type SavedProfile = "unknown" | "saved" | "none" | "unavailable";
 export interface BindingSettings {
   readonly owner: number;
   readonly persistence: BindingPersistence;
+  layouts: LayoutBindings;
   bindings: KeyBindings;
 
   ready: boolean;
@@ -63,7 +68,8 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), ready: false, profile: "unknown", fromProfile: false, capture: undefined, layout: DEFAULT_PRESET, revision: 0, message: "Loading controls..." };
+  const layouts = presetLayouts();
+  return { owner, persistence, layouts, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", fromProfile: false, capture: undefined, layout: DEFAULT_PRESET, revision: 0, message: "Loading controls..." };
 }
 
 
@@ -74,17 +80,37 @@ function storedBindings(encoded: string): string {
   return at >= 0 && encoded.charAt(at) === OLD_DELAY_MARK ? encoded.slice(0, at) : encoded;
 }
 
+function adopt(settings: BindingSettings, save: LayoutSave): void {
+  settings.layouts = save.layouts;
+  settings.layout = save.active;
+  settings.bindings = save.layouts[save.active];
+}
+
+function resetLayouts(settings: BindingSettings): void {
+  adopt(settings, { layouts: presetLayouts(), active: DEFAULT_PRESET });
+}
+
+function decodeSaved(encoded: string): LayoutSave | undefined {
+  const stored = storedBindings(encoded);
+  const layouts = decodeLayouts(stored);
+  if (layouts !== undefined) return layouts;
+  const bindings = decodeBindings(stored);
+  if (bindings === undefined) return undefined;
+  const active = presetOf(bindings) ?? "custom";
+  const all = presetLayouts();
+  all[active] = bindings;
+  return { layouts: all, active };
+}
+
 function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult): void {
-  const saved = result.kind === "loaded" ? decodeBindings(storedBindings(result.encoded)) : undefined;
+  const saved = result.kind === "loaded" ? decodeSaved(result.encoded) : undefined;
   if (saved !== undefined) {
-    settings.bindings = saved;
-    settings.layout = presetOf(saved) ?? settings.layout;
+    adopt(settings, saved);
     settings.profile = "saved";
     settings.fromProfile = true;
     settings.message = "Saved profile loaded. Press Done to choose a fighter.";
   } else {
-    settings.bindings = presetBindings(DEFAULT_PRESET);
-    settings.layout = DEFAULT_PRESET;
+    resetLayouts(settings);
     settings.profile = result.kind === "unavailable" ? "unavailable" : "none";
     settings.fromProfile = false;
     settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready. Pick a layout, then press Done.`;
@@ -94,7 +120,7 @@ function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult)
 }
 
 export function initializeBindingSettings(settings: BindingSettings): void {
-  settings.bindings = presetBindings(DEFAULT_PRESET);
+  resetLayouts(settings);
   settings.persistence.load(settings.owner, result => applyStartingLoad(settings, result));
 }
 
@@ -109,10 +135,12 @@ export function previewStartingBindings(settings: Readonly<BindingSettings>): Bi
 export function loadSavedBindings(settings: BindingSettings, done: (message: string) => void): void {
   if (!settings.ready) return;
   settings.persistence.load(settings.owner, (result) => {
-    const saved = result.kind === "loaded" ? decodeBindings(storedBindings(result.encoded)) : undefined;
+    const saved = result.kind === "loaded" ? decodeSaved(result.encoded) : undefined;
     if (saved !== undefined) {
-      settings.bindings = saved;
-      settings.layout = presetOf(saved) ?? settings.layout;
+      const profile = saved.layouts[saved.active];
+      settings.layouts.custom = profile;
+      settings.layout = "custom";
+      settings.bindings = profile;
       settings.capture = undefined;
       settings.revision++;
       settings.profile = "saved";
@@ -128,15 +156,15 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
 
 
 export function useDefaultBindings(settings: BindingSettings): void {
-  settings.bindings = presetBindings(DEFAULT_PRESET);
+  resetLayouts(settings);
   settings.ready = true;
   settings.revision++;
 }
 
 export function applyBindingPreset(settings: BindingSettings, preset: BindingPreset): void {
   if (!settings.ready) return;
-  settings.bindings = presetBindings(preset);
   settings.layout = preset;
+  settings.bindings = settings.layouts[preset];
   settings.revision++;
   settings.fromProfile = false;
   settings.capture = undefined;
@@ -195,13 +223,14 @@ export function bindFirstUnbound(settings: BindingSettings): void {
 export function resetToLayout(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.bindings = presetBindings(settings.layout);
+  settings.layouts[settings.layout] = settings.bindings;
   edited(settings, `${PRESET_NAMES[settings.layout]} defaults restored. Save to keep them.`);
 }
 
 export function saveBindingSettings(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.capture = undefined;
-  settings.persistence.save(settings.owner, encodeBindings(settings.bindings));
+  settings.persistence.save(settings.owner, encodeLayouts({ layouts: settings.layouts, active: settings.layout }));
   settings.profile = "saved";
   settings.fromProfile = true;
   settings.message = "Controls saved for next time.";

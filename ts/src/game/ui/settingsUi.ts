@@ -209,7 +209,7 @@ export class SettingsPanel {
     if (!this.local || !this.open) return;
     const { settings } = this;
     const { capture } = settings;
-    const signature = `${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}`;
+    const signature = `${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     BlzFrameSetVisible(this.root, true);
@@ -219,12 +219,13 @@ export class SettingsPanel {
 
   private renderHeader(settings: Readonly<BindingSettings>): void {
     const { capture } = settings;
-    const selected = settings.fromProfile ? undefined : presetOf(settings.bindings);
+    const selected = settings.fromProfile ? undefined : settings.layout;
+    const stock = presetOf(settings.bindings);
     for (const [preset, frame] of this.presets) setFrameText(frame, preset === selected ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
     setFrameText(this.profileButton, settings.profile !== "saved" ? `|cff808080${NO_SAVED_PROFILE}|r` : settings.fromProfile ? `${MENU_STYLE.gold}Load profile|r` : "Load profile");
     const unbound = unboundActions(settings.bindings);
     const unboundText = unbound.map(action => ACTION_KEY_LABELS[action]).join(", ");
-    BlzFrameSetText(this.hint, unbound.length > 0 ? `${MENU_STYLE.gold}Unbound: ${unboundText}.|r Save to keep these keys.` : settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : selected === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[selected]}|r`);
+    BlzFrameSetText(this.hint, unbound.length > 0 ? `${MENU_STYLE.gold}Unbound: ${unboundText}.|r Save to keep these keys.` : settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : stock === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[stock]}|r`);
     BlzFrameSetText(this.help, capture === undefined ? `Click a lit key, then press its new key; its x clears it. ${START_HINT}` : "Press the new key for the flashing action. Delete clears it, Escape cancels.");
     const first = unbound[0];
     for (const frame of this.bindButton.frames) BlzFrameSetVisible(frame, first !== undefined);

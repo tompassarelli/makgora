@@ -316,6 +316,39 @@ export function decodeBindings(saved: string): KeyBindings | undefined {
 }
 
 
+export type LayoutBindings = Record<BindingPreset, KeyBindings>;
+
+export interface LayoutSave {
+  readonly layouts: LayoutBindings;
+  readonly active: BindingPreset;
+}
+
+const LAYOUT_SAVE = "KL";
+const SET_LENGTH = 2 + SAVED_KEY_DIGITS * KEY_SLOT_COUNT;
+
+export function presetLayouts(): LayoutBindings {
+  return { wasd: presetBindings("wasd"), standard: presetBindings("standard"), custom: presetBindings("custom") };
+}
+
+export function encodeLayouts({ layouts, active }: LayoutSave): string {
+  return LAYOUT_SAVE + BINDING_PRESETS.indexOf(active) + BINDING_PRESETS.map((preset) => encodeBindings(layouts[preset])).join("");
+}
+
+export function decodeLayouts(saved: string): LayoutSave | undefined {
+  if (saved.slice(0, 2) !== LAYOUT_SAVE || saved.length !== 3 + SET_LENGTH * BINDING_PRESETS.length) return undefined;
+  const active = BINDING_PRESETS[DIGITS.indexOf(saved.charAt(2))];
+  if (active === undefined) return undefined;
+  const layouts = presetLayouts();
+  for (let index = 0; index < BINDING_PRESETS.length; index++) {
+    const preset = BINDING_PRESETS[index];
+    const start = 3 + index * SET_LENGTH;
+    const bindings = decodeBindings(saved.slice(start, start + SET_LENGTH));
+    if (preset === undefined || bindings === undefined) return undefined;
+    layouts[preset] = bindings;
+  }
+  return { layouts, active };
+}
+
 
 export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.moveLeft]: "Move left",
