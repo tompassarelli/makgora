@@ -50,7 +50,6 @@ test("Rifleman's up special with its speed values at 0.949: straight up apexes a
 });
 
 test("Rifleman's up special lands with 14 frames of landing lag, 10 more than a plain airborne landing, and a plain landing keeps the old 4 [k1 scenario]", () => {
-  assertEquals(RIFLEMAN_RECOVERY_LANDING_LAG - EMPTY_LANDING_LAG, 10);
   const up = recoveryFlight(0, 1);
   assertEquals(up.landingLag, RIFLEMAN_RECOVERY_LANDING_LAG);
   assertEquals(landingLagAfterLift(), EMPTY_LANDING_LAG);

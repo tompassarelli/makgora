@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Action, maskOf } from "../input/actions";
 import { adaptInput } from "../match/inputAdapter";
@@ -16,7 +17,7 @@ import { advanceFighterPose, createFighterPose } from "./fighterPose";
 
 const AIR_HEIGHT = 3000.0;
 const HELD_TICKS = 60;
-const AFTER_RELEASE = 30;
+const AFTER_RELEASE = 45;
 const STANCE_SECONDS = BLADEMASTER_CLIPS.neutralSpecial.held;
 
 interface Frame { readonly tick: number; readonly cutting: boolean; readonly clip: number | undefined; readonly time: number; readonly rate: number }
@@ -69,5 +70,8 @@ for (const airborne of [false, true]) {
     assertTrue(cut.length > 0);
     assertTrue(cut.every((frame) => frame.tick > (stance[stance.length - 1]?.tick ?? 0)));
     assertTrue(cut.some((frame) => frame.time > (STANCE_SECONDS ?? 0)));
+    const release = BLADEMASTER_CLIPS.neutralSpecialFollowUp;
+    for (const frame of [...stance, ...cut]) assertEquals(frame.clip, release.index, `tick ${frame.tick}: stance and cut share the crescent draw clip`);
+    assertTrue((cut[cut.length - 1]?.time ?? 0) >= f32(f32(release.seconds * 17) / 20));
   });
 }
