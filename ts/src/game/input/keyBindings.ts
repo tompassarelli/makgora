@@ -34,6 +34,9 @@ export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
 
 const EMPTY = 0;
 const SPACE = 32;
+export const SHIFT = 16;
+export const LEFT_SHIFT = 160;
+export const RIGHT_SHIFT = 161;
 const MINUS = 189;
 const EQUALS = 187;
 const SEMICOLON = 186;
@@ -445,17 +448,15 @@ export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
   [Action.modX]: "Mod X",
 };
 
+const KEY_NAMES: Readonly<Record<number, string>> = {
+  [SPACE]: "SPACE", [SHIFT]: "SHIFT", [LEFT_SHIFT]: "L-SHIFT", [RIGHT_SHIFT]: "R-SHIFT", [SLASH]: "/", [MINUS]: "-", [EQUALS]: "=", [SEMICOLON]: ";",
+  [COMMA]: ",", [PERIOD]: ".", [OPEN_BRACKET]: "[", [CLOSE_BRACKET]: "]",
+};
+
 export function keyLabel(key: number | undefined): string {
   if (key === undefined) return "—";
-  if (key === SPACE) return "SPACE";
-  if (key === SLASH) return "/";
-  if (key === MINUS) return "-";
-  if (key === EQUALS) return "=";
-  if (key === SEMICOLON) return ";";
-  if (key === COMMA) return ",";
-  if (key === PERIOD) return ".";
-  if (key === OPEN_BRACKET) return "[";
-  if (key === CLOSE_BRACKET) return "]";
+  const named = KEY_NAMES[key];
+  if (named !== undefined) return named;
   if ((key >= code("A") && key <= code("Z")) || (key >= code("0") && key <= code("9"))) return String.fromCharCode(key);
   return `KEY ${key}`;
 }

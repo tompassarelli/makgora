@@ -57,9 +57,14 @@ export function keyEventAllowed(policy: Readonly<KeyEventPolicy>, key: number, b
 }
 
 
+const META_NONE = 0;
+const META_SHIFT = 1;
+const KEY_META_MASKS: readonly number[] = [META_NONE, META_SHIFT];
+
 export function registerKey(s: Readonly<ShellState>, trigger: trigger, key: number, down: boolean): void {
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), 0, down);
+    if (!humanActive(s.game, slot)) continue;
+    for (const meta of KEY_META_MASKS) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), meta, down);
   }
 }
 

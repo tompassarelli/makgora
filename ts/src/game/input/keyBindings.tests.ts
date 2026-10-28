@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action, ACTION_ORDER } from "./actions";
 import { PAD_LAYER, padLayerAction } from "./padKeys";
-import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, actionFor, decodeBindings, decodeLayouts, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, presetLayouts, previousDefaultKeys, slotIndex } from "./keyBindings";
+import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, decodeLayouts, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, presetLayouts, previousDefaultKeys, slotIndex } from "./keyBindings";
 
 const code = (character: string) => character.charCodeAt(0);
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
@@ -186,3 +186,18 @@ test("an old save that already uses ; for another action keeps it there and leav
   assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), "0,0");
 });
 
+
+test("Left and Right Shift are labelled, bind to any action such as Shield, and survive a save and load in each layout [k2 property]", () => {
+  assertEquals([SHIFT, LEFT_SHIFT, RIGHT_SHIFT].map((key) => keyLabel(key)).join(), ["SHIFT", "L-SHIFT", "R-SHIFT"].join());
+  const layouts = presetLayouts();
+  for (const preset of BINDING_PRESETS) {
+    const bindings = layouts[preset];
+    assertEquals(assignKey(bindings, Action.leftTrigger, 0, LEFT_SHIFT).kind, "bound", `${preset} binds Left Shift`);
+    assertEquals(assignKey(bindings, Action.rightTrigger, 1, RIGHT_SHIFT).kind, "bound", `${preset} binds Right Shift`);
+    assertEquals(keyFor(bindings, Action.leftTrigger, 0), LEFT_SHIFT);
+    const loaded = decodeBindings(encodeBindings(bindings));
+    assertEquals(loaded?.keys.join(","), bindings.keys.join(","), `${preset} single save`);
+  }
+  const saved = decodeLayouts(encodeLayouts({ layouts, active: "standard" }));
+  for (const preset of BINDING_PRESETS) assertEquals(saved?.layouts[preset].keys.join(","), layouts[preset].keys.join(","), `${preset} layout save`);
+});
