@@ -29,7 +29,7 @@
 362 a stick 0 0
 362 a release LB
 #! expect a 360-363 special 14
-#! expect a 360-363 special EX 14 mana 67
+#! expect a 360-363 special EX 14
 # B + forward alone: the free side special.
 480 a stick 1 0
 480 a tap B 2

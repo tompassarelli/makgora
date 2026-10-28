@@ -51,7 +51,7 @@ function strikeLands(fighters: readonly [Character, Character], walker: number, 
   const striking = keyboardRows(heldMasks([strike], SMOKE_BINDINGS));
   let landed = false;
   replayMatch(recorded(fighters[0], fighters[1], strike.frames, walker === 0 ? [walking, striking] : [striking, walking]), (state) => {
-    landed ||= fighterAt(state.world, striker).mana.points > 0;
+    landed ||= fighterAt(state.world, walker).status.damage > 0;
   });
   return landed;
 }

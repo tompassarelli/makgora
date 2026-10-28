@@ -235,7 +235,6 @@ function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Reado
   visuals.shieldElectric = sourceVisuals.shieldElectric;
   visuals.shield = sourceVisuals.shield;
   visuals.shieldReflect = sourceVisuals.shieldReflect;
-  visuals.manaDenied = sourceVisuals.manaDenied;
 }
 
 function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Readonly<Record<number, number | undefined>>): void {
@@ -454,9 +453,10 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.poisonDamage = sourceStatus.poisonDamage;
   status.soakFrames = sourceStatus.soakFrames;
   status.soakLevel = sourceStatus.soakLevel;
-  const mana = target.mana;
-  const sourceMana = source.mana;
-  mana.points = sourceMana.points;
+  const meter = target.meter;
+  const sourceMeter = source.meter;
+  meter.ex = sourceMeter.ex;
+  meter.ultimate = sourceMeter.ultimate;
   const candle = target.candle as Candle;
   if ((source.restingGroups & REST_CANDLE) === 0) {
     const sourceCandle = source.candle;
@@ -770,7 +770,6 @@ function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = visuals.shield, b = sourceVisuals.shield; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.shieldReflect, b = sourceVisuals.shieldReflect; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.manaDrained, b = sourceVisuals.manaDrained; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-  { const a = visuals.manaDenied, b = sourceVisuals.manaDenied; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   return true;
 }
 
@@ -964,9 +963,10 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.summonX, b = sourceStatus.summonX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buff, b = sourceStatus.buff; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buffFrames, b = sourceStatus.buffFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-  const mana = target.mana;
-  const sourceMana = source.mana;
-  { const a = mana.points, b = sourceMana.points; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meter = target.meter;
+  const sourceMeter = source.meter;
+  { const a = meter.ex, b = sourceMeter.ex; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meter.ultimate, b = sourceMeter.ultimate; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if ((target.restingGroups & source.restingGroups & REST_CANDLE) === 0) {
     const candle = target.candle;
     const sourceCandle = source.candle;
@@ -1070,7 +1070,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   const cannon = fighter.cannon;
   const water = fighter.water;
   const status = fighter.status;
-  const mana = fighter.mana;
+  const meter = fighter.meter;
   const candle = fighter.candle;
   sink.int(prefix, "ceilingTechImpulseFrame", tuning.tech.ceilingImpulseFrame);
   sink.int(prefix, "ceilingTechAnimationEndFrame", tuning.tech.ceilingAnimationEndFrame);
@@ -1424,8 +1424,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.real(prefix, "surfacePhysics.wallJumpMinimumApproach", tuning.surface.wallJumpMinimumApproach);
   sink.bool(prefix, "surfacePhysics.canWallJump", tuning.surface.canWallJump);
   sink.text(kits.specials(`${prefix}.specials`, tuning.specials));
-  sink.int(prefix, "manaPoints", mana.points);
-  sink.int(prefix, "manaDeniedSerial", visuals.manaDenied);
+  sink.int(prefix, "meterEx", meter.ex);
+  sink.int(prefix, "meterUltimate", meter.ultimate);
   if (fighter.character === Character.kobold) {
     sink.int(prefix, "candleHeat", candle.heat);
     sink.int(prefix, "candleState", candle.state);

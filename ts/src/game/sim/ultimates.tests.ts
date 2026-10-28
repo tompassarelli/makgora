@@ -8,7 +8,7 @@ import { createReplaySnapshot, type ReplayState } from "../replay/snapshot";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { Character, SpecialAction } from "./codes";
 import { createFighter, type Fighter } from "./fighter";
-import { ROSTER_MANA } from "./mana";
+import { fillMeter } from "./meter";
 import { setWorldMotionValue } from "./motion";
 import { fighterAt } from "./roster";
 import { airHoldEnd } from "./specials/engine";
@@ -46,7 +46,7 @@ function duel(foeX: number): Duel {
   state.match.hazards = false;
   state.match.items.on = false;
   state.match.timeLimitMinutes = 0;
-  blademaster.mana.points = ROSTER_MANA.max;
+  fillMeter(blademaster);
   return { state, blademaster, foe, tick: 0 };
 }
 

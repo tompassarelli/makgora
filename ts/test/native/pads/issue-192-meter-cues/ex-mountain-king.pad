@@ -9,8 +9,8 @@
 150 b tap B 2
 300 a press VIEW
 370 a release VIEW
-#! expect a 0-59 meter-cue super-aura on mana 100
-#! expect b 0-59 meter-cue super-aura on mana 100
+#! expect a 0-59 meter-cue super-aura on ultimate 100
+#! expect b 0-59 meter-cue super-aura on ultimate 100
 #! expect a 60 special EX
 #! expect a 60 meter-cue super-aura off
 #! expect a 60 meter-cue ex-sound DivineShield

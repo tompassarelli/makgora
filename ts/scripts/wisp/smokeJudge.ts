@@ -73,7 +73,7 @@ function traceFrame(trace: SlotTrace, state: Readonly<ReplayState>, slot: number
   const f = fighterAt(state.world, slot);
   trace.fighter = fighterName(f.character);
   trace.held[frame] = held;
-  trace.state[frame] = `phase ${state.match.phase}${state.match.training ? " training" : ""} x ${Math.round(f.motion.x)} z ${Math.round(f.motion.z)}${f.motion.grounded ? "" : " airborne"} stocks ${f.status.stocks}${f.launch.hitstun > 0 ? " hitstun" : ""} special ${f.special.action} mana ${f.mana.points}`;
+  trace.state[frame] = `phase ${state.match.phase}${state.match.training ? " training" : ""} x ${Math.round(f.motion.x)} z ${Math.round(f.motion.z)}${f.motion.grounded ? "" : " airborne"} stocks ${f.status.stocks}${f.launch.hitstun > 0 ? " hitstun" : ""} special ${f.special.action} ex ${f.meter.ex} ultimate ${f.meter.ultimate}`;
   if (trace.serial !== undefined && f.attack.serial !== trace.serial && f.attack.style !== undefined) trace.starts.push({ frame, label: normalName(f.attack.style), style: f.attack.style });
   trace.serial = f.attack.serial;
   if (f.special.action === trace.action) return;

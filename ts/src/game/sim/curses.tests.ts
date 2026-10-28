@@ -10,7 +10,7 @@ import { copyFighterState } from "../../generated/state/fighterState";
 import { Character } from "./codes";
 import { applyCurse, curseOf, summonAlive } from "./curses";
 import { createFighter, type Fighter, placedObject } from "./fighter";
-import { ROSTER_MANA } from "./mana";
+import { fillMeter } from "./meter";
 import { setWorldMotionValue } from "./motion";
 import { fighterAt } from "./roster";
 import { CompanionMode, type SpecialCurse } from "./specials/schema";
@@ -43,7 +43,7 @@ function duel(foeX = FOE_AHEAD): Duel {
   state.match.hazards = false;
   state.match.items.on = false;
   state.match.timeLimitMinutes = 0;
-  pitLord.mana.points = ROSTER_MANA.max;
+  fillMeter(pitLord);
   return { state, pitLord, foe, doom: assertDefined(curseOf(pitLord), "Doom's curse"), tick: 0 };
 }
 

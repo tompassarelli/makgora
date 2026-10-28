@@ -8,7 +8,7 @@ import { createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, placedObject, type Fighter } from "../../sim/fighter";
-import { ROSTER_MANA } from "../../sim/mana";
+import { fillMeter } from "../../sim/meter";
 import { fighterAt } from "../../sim/roster";
 import { SUMMON_PHOENIX_FRAME } from "../../sim/ultimates";
 
@@ -40,7 +40,7 @@ function step(state: ReplayState, kael: Fighter, tick: number, pressed: number):
 test("Kael'thas's ultimate summons a phoenix companion after a short cast [k1 scenario]", () => {
   const { state, kael } = kaelMatch();
   state.match.ultimatesOff = false;
-  kael.mana.points = ROSTER_MANA.max;
+  fillMeter(kael);
   step(state, kael, 1, maskOf(Action.attack, Action.special));
   assertEquals(kael.special.action, SpecialAction.heroUltimate, "Summon Phoenix starts");
   for (let tick = 2; tick < SUMMON_PHOENIX_FRAME; tick++) {

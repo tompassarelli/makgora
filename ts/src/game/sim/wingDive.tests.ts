@@ -2,7 +2,7 @@ import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } fro
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import { ROSTER_MANA } from "./mana";
+import { fillMeter } from "./meter";
 import { type Controls, type Roster } from "./roster";
 import {
   DEMONHUNTER_BACKFLIP_FORM, DEMONHUNTER_BACKFLIP_FRAMES, DEMONHUNTER_DIVE_FORM, DEMONHUNTER_DIVE_FRAME, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_LANDING_LAG, DEMONHUNTER_DIVE_SPEED,
@@ -19,7 +19,7 @@ const ZONES = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, 
 function ascending(z: number, ex = false): { world: Roster; owner: Fighter; target: Fighter } {
   const pair = duelPair(createFighter(Character.demonHunter, 0.0, 1), createFighter(Character.rifleman, -500.0, 1));
   if (z > 0.0) lift(pair.owner, z);
-  if (ex) pair.owner.mana.points = ROSTER_MANA.max;
+  if (ex) fillMeter(pair.owner);
   stepDuel(pair.world, upB(ex));
   return pair;
 }

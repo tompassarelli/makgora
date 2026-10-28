@@ -17,9 +17,9 @@
 857 a capture
 890 a press VIEW
 960 a release VIEW
-#! expect a 0-839 meter-cue super-aura on mana 100
+#! expect a 0-839 meter-cue super-aura on ultimate 100
 #! expect a 841 special 17
-#! expect a 841 meter-cue super-aura off mana 0
+#! expect a 841 meter-cue super-aura off ultimate 0
 #! expect a 841 meter-cue ultimate-sound FlameStrike action-frame 1 first-own-effect 2
 #! expect a 841 meter-cue ultimate-burst on action-frame 1
 #! expect a 857 meter-cue ultimate-burst off action-frame 17

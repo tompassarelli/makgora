@@ -12,6 +12,7 @@ import { type Controls, type Roster, createRoster, neutralControls } from "../ga
 import { advanceSpecials, startFighterSpecial } from "../game/sim/specials";
 import { advanceHeroStatus } from "../game/sim/specials/engine";
 import { advanceFighter } from "../game/sim/step";
+import { fillMeter } from "../game/sim/meter";
 
 export const CAPTURE_SLOT_X: Readonly<Slots<number>> = [-450.0, -150.0, 150.0, 450.0];
 export const CAPTURE_AERIAL_HEIGHT = 220.0;
@@ -82,7 +83,7 @@ function stepLane(lane: CaptureLane, input: Readonly<Controls>): void {
 
 function startLane(lane: CaptureLane): boolean {
   const fighter = createFighter(lane.character, CAPTURE_SLOT_X[lane.slot], lane.facing);
-  fighter.mana.points = 100;
+  fillMeter(fighter);
   lane.fighter = fighter;
   lane.world = createRoster(1, [fighter]);
   lane.pose = createFighterPose();

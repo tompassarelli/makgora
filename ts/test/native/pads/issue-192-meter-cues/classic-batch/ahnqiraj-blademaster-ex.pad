@@ -17,7 +17,7 @@
 864 a capture
 886 a press VIEW
 956 a release VIEW
-#! expect a 0-839 meter-cue super-aura on mana 100
+#! expect a 0-839 meter-cue super-aura on ultimate 100
 #! expect a 840 special EX
 #! expect a 840 meter-cue super-aura off
 #! expect a 840 meter-cue ex-sound DivineShield

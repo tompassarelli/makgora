@@ -16,8 +16,8 @@ import {
 } from "../presentation/matchCues";
 import { mainDeckZAt } from "../sim/stage";
 import { confirmedItemCues, createItemCueObservation, observeItemCues } from "../presentation/itemLook";
-import { confirmedDropCues, createDropCueObservation, observeDropCues } from "../presentation/dropLook";
-import { meterDropPoint } from "../match/meterDrops";
+import { confirmedOrbCues, createOrbCueObservation, observeOrbCues } from "../presentation/orbLook";
+import { orbPoint, warnedOrb } from "../sim/orbs";
 import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { coverScreen, createBackdrop, createText, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
@@ -45,7 +45,7 @@ const createItemSounds = (): sound[] => [MatchCue.lastStock, MatchCue.itemSpawn,
     return sound;
   });
 
-const createDropSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady, MatchCue.confirm].map(cue => {
+const createOrbSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady, MatchCue.confirm].map(cue => {
     const path = cueSound(cue);
     const sound = CreateSound(path, false, true, true, 10, 10, "DefaultEAXON");
     SetSoundDuration(sound, GetSoundFileDuration(path));
@@ -70,13 +70,13 @@ export interface ResultsDisplay {
 export class MatchPresentation {
 
   itemObservation = createItemCueObservation();
-  dropObservation = createDropCueObservation();
+  orbObservation = createOrbCueObservation();
   readonly observation = createCueObservation();
   readonly tally = createMatchTally();
   private readonly cues: MatchCue[] = [];
   private readonly cueSerials: number[] = [];
   private itemSounds = createItemSounds();
-  private dropSounds = createDropSounds();
+  private orbSounds = createOrbSounds();
   private readonly menu = createMenuObservation();
   private readonly menuCues = createMenuCues();
   // Hover differs by client; create its handle at shared startup on every client.
@@ -193,8 +193,8 @@ export class MatchPresentation {
     observeForCues(this.observation, game, world);
     this.itemSounds ??= createItemSounds();
     observeItemCues(this.itemObservation ??= createItemCueObservation(), game.items, game.matchFrame);
-    this.dropSounds ??= createDropSounds();
-    observeDropCues(this.dropObservation ??= createDropCueObservation(), game.drops, game.matchFrame);
+    this.orbSounds ??= createOrbSounds();
+    observeOrbCues(this.orbObservation ??= createOrbCueObservation(), game.orbs, warnedOrb(game));
     this.playMusic(stageMusic);
   }
 
@@ -203,8 +203,8 @@ export class MatchPresentation {
     observeForCues(this.observation, game, world);
     this.itemSounds ??= createItemSounds();
     observeItemCues(this.itemObservation ??= createItemCueObservation(), game.items, game.matchFrame);
-    this.dropSounds ??= createDropSounds();
-    observeDropCues(this.dropObservation ??= createDropCueObservation(), game.drops, game.matchFrame);
+    this.orbSounds ??= createOrbSounds();
+    observeOrbCues(this.orbObservation ??= createOrbCueObservation(), game.orbs, warnedOrb(game));
   }
 
 
@@ -218,11 +218,11 @@ export class MatchPresentation {
       SetSoundPosition(sound, this.origin.x, this.origin.y, this.origin.z + mainDeckZAt(game.stageChoice, 0.0));
       StartSound(sound);
     }
-    const dropCues = confirmedDropCues(this.dropObservation, game.drops, game.matchFrame);
-    for (let index = 0; index < this.dropSounds.length; index++) {
-      if ((dropCues & (1 << index)) === 0) continue;
-      const sound = at(this.dropSounds, index);
-      const point = meterDropPoint(game.stageChoice, Math.max(0, index === 0 ? game.drops.nextPoint : game.drops.point));
+    const orbCues = confirmedOrbCues(this.orbObservation, game.orbs, warnedOrb(game));
+    const point = orbPoint(game.stageChoice);
+    for (let index = 0; index < this.orbSounds.length; index++) {
+      if ((orbCues & (1 << index)) === 0) continue;
+      const sound = at(this.orbSounds, index);
       StopSound(sound, false, false);
       SetSoundPosition(sound, this.origin.x + point.x, this.origin.y, this.origin.z + point.z);
       StartSound(sound);

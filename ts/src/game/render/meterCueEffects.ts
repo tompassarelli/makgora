@@ -1,4 +1,6 @@
 import { type Character, SpecialAction } from "../sim/codes";
+import { floorDiv } from "wisp/src/sim/intMath";
+import { ULTIMATE_FRAMES_PER_PERCENT } from "../sim/meter";
 import type { Fighter } from "../sim/fighter";
 import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, type MeterCue, type MeterCueFit, type MeterCueState, type MeterCueView, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
@@ -128,13 +130,13 @@ export class MeterCueEffects {
     }
     if (view.superAura !== this.traced.superAura) {
       this.traced.superAura = view.superAura;
-      const line = `super-aura ${view.superAura ? "on" : "off"} mana ${fighter.mana.points}`;
+      const line = `super-aura ${view.superAura ? "on" : "off"} ultimate ${floorDiv(fighter.meter.ultimate, ULTIMATE_FRAMES_PER_PERCENT)}`;
       this.lit = view.superAura ? { frame, line } : undefined;
       trace?.(line);
     }
     if (view.exReady !== this.traced.exReady) {
       this.traced.exReady = view.exReady;
-      trace?.(`ex-ready ${view.exReady ? "on" : "off"} mana ${fighter.mana.points}`);
+      trace?.(`ex-ready ${view.exReady ? "on" : "off"}`);
     }
     this.confirmUltimate(view, fighter, trace);
     this.confirmEx(view, fighter, trace);

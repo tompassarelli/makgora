@@ -19,7 +19,7 @@ import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../input/participants";
 import {
   type MatchState, Phase, computerActive, cycleSlotMode, humanActive, humanFighterActive, selectCharacter, selectCpuCharacter, setAutomaticRematch,
-  setTeamBattle, cycleTeam, setHitAreas, setItemsOn, setMeterDropsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
+  setTeamBattle, cycleTeam, setHitAreas, setItemsOn, setOrbsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
 } from "../lobby/lobbyState";
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
@@ -39,7 +39,7 @@ export const PARTNER_COMMAND = "-dev partner ";
 export const SPEED_COMMAND = "-dev speed ";
 export const ITEMS_COMMAND = "-dev items ";
 export const ULTIMATES_COMMAND = "-dev ultimates ";
-export const DROPS_COMMAND = "-dev drops ";
+export const ORBS_COMMAND = "-dev orbs ";
 export const ITEM_COMMAND = "-dev item ";
 export const ITEM_DROP_COMMAND = "-dev item drop ";
 
@@ -145,7 +145,7 @@ export function applySetupCommand(game: MatchState, actor: number, message: stri
   if (message.startsWith(HIT_AREAS_COMMAND)) return toggle(HIT_AREAS_COMMAND, on => setHitAreas(game, actor, on), () => game.trainer.showHitAreas, "hit-areas");
   if (message.startsWith(ULTIMATES_COMMAND)) return toggle(ULTIMATES_COMMAND, on => setUltimatesOn(game, actor, on), () => !game.ultimatesOff, "ultimates");
   if (message.startsWith(ITEMS_COMMAND)) return toggle(ITEMS_COMMAND, on => setItemsOn(game, actor, on), () => game.items.on, "items");
-  if (message.startsWith(DROPS_COMMAND)) return toggle(DROPS_COMMAND, on => setMeterDropsOn(game, actor, on), () => game.drops.on, "drops");
+  if (message.startsWith(ORBS_COMMAND)) return toggle(ORBS_COMMAND, on => setOrbsOn(game, actor, on), () => game.orbs.on, "orbs");
   if (message.startsWith(ITEM_DROP_COMMAND)) {
     const kind = itemCommandKind(message.substring(ITEM_DROP_COMMAND.length));
     if (kind === undefined || game.phase !== Phase.match) return refused("item drop");

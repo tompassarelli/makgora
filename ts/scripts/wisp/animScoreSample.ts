@@ -3,6 +3,7 @@
 
 import { join } from "node:path";
 import { LIMB_STRIKES } from "./animStrikeKinds";
+import { fillMeter } from "../../src/game/sim/meter";
 import { originalClip, originalClipNames } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
@@ -255,7 +256,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
 export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, character: Character, entry: (typeof SCORED_SPECIALS)[number], pixelsPerUnit: number): SampledMove | undefined {
   if (!HERO_ROSTER.some((hero) => hero.character === character)) return undefined;
   const f: Fighter = createFighter(character, 0.0, 1);
-  f.mana.points = 100;
+  fillMeter(f);
   const world = createRoster(1, [f]);
   const p = createFighterPose();
   const idle = neutralControls();

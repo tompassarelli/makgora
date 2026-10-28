@@ -17,7 +17,7 @@ import { heroSpecialMove, stopsSidewaysOnStart } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
 import { shieldSafeEffect } from "./exSpecialAuthoring";
-import { ROSTER_MANA, spendMana } from "./mana";
+import { fillEx, spendUltimate, ultimateCharged } from "./meter";
 import { cancelAttack, cancelJumpSquat } from "./transitions";
 import { applyAttackHit } from "./hits";
 import { meleeHitIntersectsShield } from "./attacks";
@@ -633,15 +633,15 @@ function replaceableForUltimate(owner: Readonly<Fighter>): boolean {
   return attack.style === undefined || (attack.frame <= ULTIMATE_INPUT_LENIENCY && !attack.hit);
 }
 
-/** Starts the ultimate at a full bar; anything else leaves the press to the ordinary special. */
+/** Starts the ultimate at a full ultimate meter; anything else leaves the press to the ordinary special. */
 export function startUltimate(owner: Fighter, input: Readonly<Controls>, stage: number, matchFrame: number): boolean {
   const ultimate = owner.tuning.ultimate;
-  if (!input.ultimatePressed || ultimate === undefined || owner.mana.points < ROSTER_MANA.max) return false;
+  if (!input.ultimatePressed || ultimate === undefined || !ultimateCharged(owner)) return false;
   if (!owner.motion.grounded && (ultimate.groundOnly === true || (ultimate.needsFloorBelow === true && floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) === undefined))) return false;
   if (!replaceableForUltimate(owner)) return false;
   const { special } = owner;
   if (special.action !== SpecialAction.none) {
-    if (special.ex) owner.mana.points = min(ROSTER_MANA.max, owner.mana.points + ROSTER_MANA.exCost);
+    if (special.ex) fillEx(owner);
     special.action = SpecialAction.none;
     special.lockFrames = 0;
     owner.attack.cooldown = 0;
@@ -649,11 +649,11 @@ export function startUltimate(owner: Fighter, input: Readonly<Controls>, stage: 
     cancelAttack(owner);
     owner.attack.cooldown = 0;
   }
-  if (special.lockFrames > 0 || !canAttack(owner) || owner.mana.points < ROSTER_MANA.max) return false;
+  if (special.lockFrames > 0 || !canAttack(owner) || !ultimateCharged(owner)) return false;
   observeActionDecision(SPECIAL_ACTION_BIT);
   turnForSpecial(owner, input);
   startSpecialAction(owner, SpecialAction.heroUltimate, ultimate.endFrame, owner.facing);
-  spendMana(owner, ROSTER_MANA.max);
+  spendUltimate(owner);
   enterUltimate(owner, input);
   holdHoveringUltimate(owner);
   return true;

@@ -13,7 +13,7 @@ import type { Fighter } from "../sim/fighter";
 import { countsOffscreen } from "../sim/offscreenDamage";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { cannonOn, hasTide } from "../sim/stageHazards";
-import { firstMeterDropsDifference } from "../match/meterDrops";
+import { firstOrbsDifference } from "../sim/orbState";
 import { AttackStyle, LAST_ATTACK_STYLE } from "../sim/codes";
 import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { authoredTuning } from "../sim/tuning";
@@ -262,7 +262,7 @@ export function scopedStepHeld(slot: number, game: Readonly<MatchState>, world: 
   const was = after.items;
   if (items.kind !== was.kind || items.nextSpawnFrame !== was.nextSpawnFrame || items.nextKind !== was.nextKind || items.draws !== was.draws
     || items.spawnSerial !== was.spawnSerial || items.pickupSerial !== was.pickupSerial || items.lastTaker !== was.lastTaker) return false;
-  if (firstMeterDropsDifference(game.drops, after.drops) !== undefined) return false;
+  if (firstOrbsDifference(game.orbs, after.orbs) !== undefined) return false;
   for (const other of PARTICIPANT_SLOTS) {
     if (other === slot || !isActive(world, other)) continue;
     const { x, z } = fighterAt(world, other).motion;

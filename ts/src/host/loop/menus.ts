@@ -12,7 +12,7 @@ import {
   DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
   setTeamBattle, setFriendlyFire, cycleTeam, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
-  returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setMeterDropsOn, setStocks, setTimeLimit, updateConnectedHumans,
+  returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
   type MatchState, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
 } from "../../game/lobby/lobbyState";
 import { resetMomentRecorder } from "../../game/replay/moment";
@@ -346,8 +346,8 @@ export function panelActions(): PanelActions {
       toggleHazards: participant => withSlot(participant, (s, slot) => {
         if (!stageLoading(s)) setHazards(s.game, slot, !s.game.hazards);
       }),
-      toggleDrops: participant => withSlot(participant, (s, slot) => {
-        if (!stageLoading(s)) setMeterDropsOn(s.game, slot, !s.game.drops.on);
+      toggleOrbs: participant => withSlot(participant, (s, slot) => {
+        if (!stageLoading(s)) setOrbsOn(s.game, slot, !s.game.orbs.on);
       }),
     },
     settings: {

@@ -15,6 +15,7 @@ import type { CpuOpponentId, CpuTier } from "./cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
 import { createMatchState, Phase } from "../lobby/lobbyState";
+import { fillMeter } from "../sim/meter";
 
 const STAGE = 0;
 export const LEDGE_X = mainDeckRight(STAGE);
@@ -73,7 +74,7 @@ function duel(victim: Character, guarder: Character, guardX: number, guardZ: num
   v.motion.z = -START_DEPTH;
   v.jump.remaining = 0;
   v.status.damage = GIMP_DAMAGE;
-  v.mana.points = 100;
+  fillMeter(v);
   if (cpu === undefined) {
     g.motion.grounded = false;
     g.motion.surface = undefined;

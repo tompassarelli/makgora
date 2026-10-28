@@ -24,7 +24,8 @@ import { AttackStyle, DownState } from "../game/sim/codes";
 import { beginFighterAttack } from "../game/sim/attacks";
 import { startFighterSpecial } from "../game/sim/specials";
 import { isAerialAttack } from "../game/sim/moves";
-import { ROSTER_MANA } from "../game/sim/mana";
+import { fillMeter, spendUltimate } from "../game/sim/meter";
+import type { Fighter } from "../game/sim/fighter";
 import { beginAttack, beginDownState } from "../game/sim/transitions";
 import { selectScriptedAttackClip } from "../game/presentation/fighterPose";
 import { at } from "wisp/src/runtime/lookup";
@@ -231,7 +232,10 @@ export function nativeDriverCommand(text: string): void {
 }
 
 
-const scriptedMana = (kind: string): number => kind === "ultimate" ? ROSTER_MANA.max : ROSTER_MANA.max - 1;
+function chargeScriptedMeter(fighter: Fighter, kind: string): void {
+  fillMeter(fighter);
+  if (kind !== "ultimate") spendUltimate(fighter);
+}
 
 export function startScriptedMove(s: ShellState, slot: number, kind: string | undefined, code: string, facing: string | undefined): void {
   if (s.build.inputProfile !== "native-driver") return;
@@ -254,7 +258,7 @@ export function startScriptedMove(s: ShellState, slot: number, kind: string | un
     const direction = whole(code);
     input.specialX = direction === 1 ? fighter.facing : 0;
     input.specialZ = direction === 2 ? 1 : direction === 3 ? -1 : 0;
-    fighter.mana.points = scriptedMana(kind);
+    chargeScriptedMeter(fighter, kind);
     if (!startFighterSpecial(fighter, s.game.stageChoice, frame, input, s.world)) throw new Error("native driver: move did not start");
   } else throw new Error("native driver: move needs normal, special or ultimate");
 }

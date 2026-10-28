@@ -20,6 +20,7 @@ import { BLADEMASTER_SPECIALS, IMAGE_STARTUP, MIRROR_IMAGE_OBJECT, RISE_STARTUP,
 import { FOLLOW_UP_FORM } from "../../sim/specials/schema";
 import { canonicalState } from "../../replay/canonical";
 import { at } from "wisp/src/runtime/lookup";
+import { fillMeter } from "../../sim/meter";
 
 const BLADEMASTER_X = -200.0;
 const FOE_X = 550.0;
@@ -48,7 +49,7 @@ function windWalkWhiffPunished(character: Character, punish: Punish): boolean {
   const s = scene(0, [{ character: Character.blademaster, x: WIND_WALK_START, facing: 1 }, { character, x: 0.0, facing: -1 }]);
   const blademaster = fighter(s, 0);
   const foe = fighter(s, 1);
-  blademaster.mana.points = 100;
+  fillMeter(blademaster);
   for (let n = 1; n <= WIND_WALK_WATCH; n++) {
     frame(s, n === 1 ? [Action.moveRight, Action.special] : [], n >= PUNISH_PRESS ? punish(foe, blademaster, n - PUNISH_PRESS) : []);
     if (n === 1 && blademaster.special.action !== SpecialAction.heroSide) return false;
@@ -88,7 +89,7 @@ function counter(press: number, foeFacing: number, air: boolean, ex = false, sta
   const s = scene(0, [{ character: Character.blademaster, x: blademasterX, facing: -foeFacing }, { character: Character.rifleman, x: foeX, facing: foeFacing }]);
   const blademaster = fighter(s, 0);
   const foe = fighter(s, 1);
-  blademaster.mana.points = 100;
+  fillMeter(blademaster);
   if (air) {
     airborne(blademaster, blademasterX, f32(mainDeckZ(0) + COUNTER_HEIGHT));
     airborne(foe, foeX, f32(mainDeckZ(0) + COUNTER_HEIGHT));
@@ -287,7 +288,7 @@ interface UpSpecialRun {
 function upSpecialRun(air: boolean, ex: boolean, aim: readonly Action[]): UpSpecialRun {
   const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);
   const blademaster = fighter(s, 0);
-  blademaster.mana.points = 100;
+  fillMeter(blademaster);
   if (air) airborne(blademaster, BLADEMASTER_X, f32(mainDeckZ(0) + UP_SPECIAL_HOP));
   const label = `${air ? "aerial" : "grounded"}${ex ? " EX" : ""} aim actions ${aim.join("+")}`;
   let helplessAtEnd: boolean | undefined;

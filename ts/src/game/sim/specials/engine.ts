@@ -22,7 +22,7 @@ import { advanceRefire } from "./refire";
 import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
-import { gainMana } from "../mana";
+import { gainUltimate, ultimatePercent } from "../meter";
 import { endDivineShield, refreshAirOnExit } from "../transitions";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "../shield";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
@@ -1014,7 +1014,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.ritual?.frame === frame) {
     f.status.armorFrames = 0;
     f.status.armorChills = false;
-    gainMana(f, move.ritual.mana);
+    gainUltimate(f, ultimatePercent(move.ritual.mana));
   }
   applyWindows(f, move, frame);
   if (frame >= heroSpecialEndFrame(f, move)) {

@@ -7,7 +7,7 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import { EYE_BEAM_AIR_FRAMES, EYE_BEAM_AIR_SHOT, EYE_BEAM_DAMAGE, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { type Fighter, createFighter } from "./fighter";
 import { KNOCKBACK_LAUNCH_SPEED, TUMBLE_KNOCKBACK } from "./knockback";
-import { ROSTER_MANA } from "./mana";
+import { fillMeter } from "./meter";
 import { originalProjectileEffect } from "./projectiles";
 import { fighterAt } from "./roster";
 import { testWorld } from "./testWorld";
@@ -26,7 +26,7 @@ interface Shot {
 function fireEyeBeam(air: boolean, ex = false): Shot {
   const s = scene(0, [{ character: Character.demonHunter, x: 0.0, facing: 1 }, { character: Character.blademaster, x: 1800.0, facing: -1 }]);
   const user = fighter(s);
-  user.mana.points = ROSTER_MANA.max;
+  fillMeter(user);
   if (air) {
     frame(s, [Action.jump]);
     for (let tick = 0; tick < FRAME_LIMIT && (user.motion.grounded || user.motion.vz > 0.0); tick++) frame(s, [Action.jump]);

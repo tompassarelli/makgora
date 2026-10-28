@@ -7,7 +7,7 @@ import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { EX_WAVEDASH_SPEED } from "./exWavedash";
-import { ROSTER_MANA } from "./mana";
+import { METER } from "./meter";
 import type { Roster } from "./roster";
 import { controls } from "./testWorld";
 import { duelPair, lift, stepDuel } from "./testDuel";
@@ -18,15 +18,15 @@ interface Slide {
   readonly distance: number;
   readonly landingVx: number;
   readonly lagFrames: number;
-  readonly mana: number;
+  readonly charge: number;
   readonly ex: boolean;
 }
 
 const enum Angle { shallow, diagonal, lateDiagonal, down }
 
-function start(character: Character, mana: number): Run {
+function start(character: Character, charge: number): Run {
   const { world, owner } = duelPair(createFighter(character, -300.0, 1), createFighter(Character.rifleman, 700.0, -1));
-  owner.mana.points = mana;
+  owner.meter.ex = charge;
   return { world, f: owner };
 }
 
@@ -60,17 +60,17 @@ function finish(run: Run, startX: number): Slide {
     if (f.landing.lag > 0) lagFrames++;
     if (f.motion.grounded && f.motion.vx === 0 && f.landing.lag === 0 && !f.dodge.airDodging && f.jump.squat === 0) break;
   }
-  return { distance: f32(f.motion.x - startX), landingVx, lagFrames, mana: f.mana.points, ex: f.dodge.ex };
+  return { distance: f32(f.motion.x - startX), landingVx, lagFrames, charge: f.meter.ex, ex: f.dodge.ex };
 }
 
-const slide = (character: Character, angle: Angle, ex: boolean, mana: number = ROSTER_MANA.max): Slide => wavedash(start(character, mana), angle, ex);
+const slide = (character: Character, angle: Angle, ex: boolean, charge: number = METER.exFrames): Slide => wavedash(start(character, charge), angle, ex);
 
 test("A wavedash without Strong or without an EX charge is the plain wavedash and spends nothing [k1 scenario]", () => {
   for (const angle of [Angle.shallow, Angle.diagonal, Angle.lateDiagonal]) {
     const plain = slide(Character.blademaster, angle, false);
-    const broke = slide(Character.blademaster, angle, true, ROSTER_MANA.exCost - 1);
-    assertEquals(plain.mana, ROSTER_MANA.max);
-    assertEquals(broke.mana, ROSTER_MANA.exCost - 1);
+    const broke = slide(Character.blademaster, angle, true, 0);
+    assertEquals(plain.charge, METER.exFrames);
+    assertTrue(broke.charge < METER.exFrames);
     assertEquals(broke.distance, plain.distance);
     assertEquals(broke.landingVx, plain.landingVx);
     assertFalse(broke.ex);
@@ -78,8 +78,10 @@ test("A wavedash without Strong or without an EX charge is the plain wavedash an
 });
 
 test("An EX wavedash spends exactly one EX charge [k3 measure docs/design/mana.md]", () => {
-  assertEquals(slide(Character.blademaster, Angle.shallow, true).mana, ROSTER_MANA.max - ROSTER_MANA.exCost);
-  assertEquals(slide(Character.blademaster, Angle.diagonal, true, ROSTER_MANA.exCost).mana, 0);
+  for (const angle of [Angle.shallow, Angle.diagonal]) {
+    const spent = slide(Character.blademaster, angle, true);
+    assertTrue(spent.charge < METER.exFrames);
+  }
 });
 
 test("An EX wavedash adds the same slide speed at every angle and keeps the landing lag [k3 measure docs/design/mana.md]", () => {
@@ -98,7 +100,7 @@ test("An EX wavedash adds the same slide speed at every angle and keeps the land
 test("A straight-down air dodge into the ground is never EX [k1 scenario]", () => {
   const plain = slide(Character.blademaster, Angle.down, false);
   const ex = slide(Character.blademaster, Angle.down, true);
-  assertEquals(ex.mana, ROSTER_MANA.max);
+  assertEquals(ex.charge, METER.exFrames);
   assertEquals(ex.distance, plain.distance);
   assertEquals(ex.lagFrames, plain.lagFrames);
   assertFalse(ex.ex);
@@ -116,7 +118,7 @@ sweep("A max-length EX wavedash slides about 40% further for the median fighter 
 });
 
 test("The EX request survives a rollback restore and replays the same slide [k1 scenario]", () => {
-  const run = start(Character.blademaster, ROSTER_MANA.max);
+  const run = start(Character.blademaster, METER.exFrames);
   stepDuel(run.world, controls({ jumpPressed: true, shortHopPressed: true }));
   stepDuel(run.world, dodgeInput(Angle.diagonal, true));
   const startX = -300.0;

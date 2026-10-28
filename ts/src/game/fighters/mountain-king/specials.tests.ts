@@ -12,7 +12,7 @@ import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
-import { ROSTER_MANA } from "../../sim/mana";
+import { fillMeter } from "../../sim/meter";
 import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
 import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
@@ -157,7 +157,7 @@ interface Leap {
 
 function startLeap(aim: Direction, ex = false, foeX = FOE_AWAY): Leap {
   const { state, king, foe } = leapMatch(foeX);
-  if (ex) king.mana.points = ROSTER_MANA.max;
+  if (ex) fillMeter(king);
   const leap: Leap = { state, king, foe, trail: [], tick: 1, dived: false };
   step(state, king, leap.tick, aim.x, aim.z, true, true, ex);
   assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");

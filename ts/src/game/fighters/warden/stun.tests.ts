@@ -9,6 +9,7 @@ import { applyHeroStatus } from "../../sim/heroStatus";
 import { lift, duelPair, stepDuel } from "../../sim/testDuel";
 import { controls } from "../../sim/testWorld";
 import { POISON, WARDEN_SPECIALS } from "./specials";
+import { fillMeter } from "../../sim/meter";
 
 const H = HERO_REFERENCE_HEIGHT;
 const MIN_ADVANTAGE = 14;
@@ -31,7 +32,7 @@ const actionable = (f: Fighter): boolean => !f.status.out && (canAttack(f) || ca
 
 function sideSpecial(gap: number, percent: number, setUp: (maiev: Fighter, target: Fighter) => void = () => {}): Outcome {
   const maiev = createFighter(Character.warden, 0.0, 1);
-  maiev.mana.points = 100;
+  fillMeter(maiev);
   const target = createFighter(Character.rifleman, gap, -1);
   const { world } = duelPair(maiev, target);
   target.status.damage = percent;
@@ -97,7 +98,7 @@ test("Pursuit Lunge passes through a close or mid-range foe, stuns it and ends b
 test("Pursuit Lunge holds its windup in place through frame 17, travels from frame 18 and first cuts a close foe on frame 18 [k3 measure #487]", () => {
   const firstFrames = (gap: number): { readonly moved: number; readonly hit: number } => {
     const maiev = createFighter(Character.warden, 0.0, 1);
-    maiev.mana.points = 100;
+    fillMeter(maiev);
     const target = createFighter(Character.rifleman, gap, -1);
     const { world } = duelPair(maiev, target);
     stepDuel(world, side);
@@ -124,7 +125,7 @@ test("An airborne foe barely drifts from the stun, and a second stun within 120 
   assertTrue(air.drift <= BODY_WIDTH);
 
   const maiev = createFighter(Character.warden, 0.0, 1);
-  maiev.mana.points = 100;
+  fillMeter(maiev);
   const target = createFighter(Character.rifleman, f32(H * f32(0.9)), -1);
   const { world } = duelPair(maiev, target);
   stepDuel(world, side);
@@ -132,7 +133,7 @@ test("An airborne foe barely drifts from the stun, and a second stun within 120 
   const firstStun = target.launch.hitstun;
   while (!actionable(maiev)) stepDuel(world);
   const before = target.status.damage;
-  maiev.mana.points = 100;
+  fillMeter(maiev);
   stepDuel(world, controls({ specialPressed: true, specialX: maiev.facing }));
   let launched = false;
   for (let frame = 0; frame < 40 && !launched; frame++) {

@@ -4,7 +4,7 @@ import { Character, LedgeState, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { type Controls, type Roster } from "./roster";
 import { snapToLedge } from "./ledge";
-import { ROSTER_MANA } from "./mana";
+import { fillMeter } from "./meter";
 import { CHAOS_STRIKE_AIR_FORM, FEL_RUSH_BRANCH_FIRST, FEL_RUSH_FIRST, FEL_RUSH_FRAMES, FEL_RUSH_LAST, FEL_RUSH_SPEED, FEL_RUSH_TELL_LAST, VENGEFUL_RETREAT_FORM } from "./specials";
 import { surfaceRight, surfaceZ } from "./stage";
 import { controls } from "./testWorld";
@@ -147,7 +147,7 @@ const branchPress = (attack: boolean) => (owner: Readonly<Fighter>): Controls =>
 test("Fel Rush: an air rush that hits nobody, plain or EX, ends in helpless fall, and no second press before landing starts another [k3 measure #554]", () => {
   for (const ex of [false, true]) {
     const { world, owner } = illidan(HEIGHT);
-    owner.mana.points = ROSTER_MANA.max;
+    fillMeter(owner);
     stepDuel(world, controls({ specialPressed: true, specialX: 1, direction: 1, exPressed: ex }));
     assertTrue(pressed(owner));
     assertEquals(owner.special.ex, ex);

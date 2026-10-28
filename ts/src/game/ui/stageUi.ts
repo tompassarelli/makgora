@@ -12,7 +12,7 @@ import { type MatchState, Phase, humanActive } from "../lobby/lobbyState";
 import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
 import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
-import { dropsSetting, hazardsSetting, rulesSummary } from "../session/messages";
+import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { StageCard } from "./stageCard";
@@ -27,14 +27,14 @@ export interface StageActions {
   start(participantId: number): void;
   back(participantId: number): void;
   toggleHazards(participantId: number): void;
-  toggleDrops(participantId: number): void;
+  toggleOrbs(participantId: number): void;
 }
 
-type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } | { kind: "drops" } | { kind: "start" } | { kind: "back" } | { kind: "poolOpen" } | { kind: "poolClose" } | { kind: "poolMode" } | { kind: "poolStage"; choice: number };
+type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } | { kind: "orbs" } | { kind: "start" } | { kind: "back" } | { kind: "poolOpen" } | { kind: "poolClose" } | { kind: "poolMode" } | { kind: "poolStage"; choice: number };
 
 export const BACK_BUTTON = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
 export const HAZARDS_BUTTON = { x: f32(0.445), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
-export const DROPS_BUTTON = { x: f32(0.625), y: HEADER_BUTTON_TOP, width: f32(0.13), height: HEADER_BUTTON_HEIGHT } as const;
+export const ORBS_BUTTON = { x: f32(0.625), y: HEADER_BUTTON_TOP, width: f32(0.13), height: HEADER_BUTTON_HEIGHT } as const;
 export const STAGE_POOL_BUTTON = { x: f32(0.49), y: f32(0.518), width: f32(0.298), height: f32(0.027) } as const;
 
 
@@ -67,7 +67,7 @@ export class StagePanel {
   private readonly ruleLabel: framehandle;
   private readonly chip: framehandle;
   private readonly hazardsToggle: framehandle;
-  private readonly dropsToggle: framehandle;
+  private readonly orbsToggle: framehandle;
   private readonly startButton: framehandle;
   private readonly clicks: ButtonClicks<StageButton>;
   private readonly tileNames: framehandle[] = [];
@@ -82,7 +82,7 @@ export class StagePanel {
   private lastChoice: number | undefined;
   private lastRules: string | undefined;
   private lastHazards: boolean | undefined;
-  private lastDrops: boolean | undefined;
+  private lastOrbs: boolean | undefined;
 
   constructor(
     private actions: StageActions,
@@ -141,7 +141,7 @@ export class StagePanel {
     this.startButton = dialogButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
     dialogButton(root, BACK_BUTTON.x, BACK_BUTTON.y, BACK_BUTTON.width, BACK_BUTTON.height, journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
     this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
-    this.dropsToggle = dialogButton(root, DROPS_BUTTON.x, DROPS_BUTTON.y, DROPS_BUTTON.width, DROPS_BUTTON.height, "", { kind: "drops" });
+    this.orbsToggle = dialogButton(root, ORBS_BUTTON.x, ORBS_BUTTON.y, ORBS_BUTTON.width, ORBS_BUTTON.height, "", { kind: "orbs" });
     this.sync = createSyncTrigger("ui.stage.drop", "stage-drop", PARTICIPANT_SLOTS, (sender, data) => {
       const choice = S2I(data);
       if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
@@ -195,7 +195,7 @@ export class StagePanel {
     if (button.kind === "stage") this.actions.selectStage(actor, button.choice);
     else if (button.kind === "start") this.actions.start(actor);
     else if (button.kind === "hazards") this.actions.toggleHazards(actor);
-    else if (button.kind === "drops") this.actions.toggleDrops(actor);
+    else if (button.kind === "orbs") this.actions.toggleOrbs(actor);
     else if (button.kind === "back") this.actions.back(actor);
     else if (button.kind === "poolOpen") this.poolOpen = true;
     else if (button.kind === "poolClose") this.poolOpen = false;
@@ -230,9 +230,9 @@ export class StagePanel {
       setFrameText(this.hazardsToggle, hazardsSetting(game.hazards));
       this.lastHazards = game.hazards;
     }
-    if (this.lastDrops !== game.drops.on) {
-      setFrameText(this.dropsToggle, dropsSetting(game.drops.on));
-      this.lastDrops = game.drops.on;
+    if (this.lastOrbs !== game.orbs.on) {
+      setFrameText(this.orbsToggle, orbsSetting(game.orbs.on));
+      this.lastOrbs = game.orbs.on;
     }
     const rules = rulesSummary(game);
     if (this.lastRules !== rules) {

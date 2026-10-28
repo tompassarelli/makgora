@@ -11,6 +11,7 @@ import { ELECTRIC_IMPACT_MODEL } from "./hitPresentation";
 import { ELEMENT_LOOKS } from "./elementLooks";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "./impactEvents";
 import { IMPACT_ELECTRIC_SHIELD, IMPACT_SLASH_HIT, createImpactState, emitImpacts } from "./impactState";
+import { setMeterPercent } from "../sim/meter";
 
 const SHEAR_ANGLES = [AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown];
 const ELECTRIC_MODELS = [ELECTRIC_IMPACT_MODEL, ELEMENT_LOOKS[HitElement.electric].victim, "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdx"];
@@ -26,7 +27,7 @@ interface ShearContact {
 
 function shear(style: AttackStyle, shielding: boolean, targetMana: number, facing: 1 | -1): ShearContact | undefined {
   const { world, owner, target } = duelPair(createFighter(Character.demonHunter, 0.0, facing), createFighter(Character.pitLord, facing * 70.0, -facing as 1 | -1));
-  target.mana.points = targetMana;
+  setMeterPercent(target, targetMana);
   const guard = controls({ shield: shielding });
   for (let frame = 0; frame < 8; frame++) stepDuel(world, controls(), guard);
   beginAttack(owner, style, false);

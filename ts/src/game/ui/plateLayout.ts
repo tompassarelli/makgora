@@ -17,7 +17,7 @@ export interface PlateBox {
   readonly height: number;
 }
 
-export const MANA_BAR_HEIGHT_PX = 12;
+export const METER_BAR_HEIGHT_PX = 12;
 export const STOCK_ICON_PX = 64;
 export const STOCK_ICONS_SHOWN = 5;
 const STOCK_SHOWN_PX = 38;
@@ -31,7 +31,7 @@ export interface PanelLayout {
   readonly doom: PlateBox;
   readonly name: PlateBox;
   readonly slot: PlateBox;
-  readonly mana: PlateBox;
+  readonly meter: PlateBox;
   readonly stocks: readonly PlateBox[];
   readonly stockCount: PlateBox;
 }
@@ -43,7 +43,7 @@ const PERCENT: PlateBox = { x: 436, y: 34, width: 60, height: 70 };
 const DOOM: PlateBox = { x: 444, y: -8, width: 44, height: 44 };
 const NAME: PlateBox = { x: 244, y: 148, width: 228, height: 30 };
 const SLOT: PlateBox = { x: 472, y: 148, width: 40, height: 30 };
-const MANA: PlateBox = { x: 256, y: 120, width: 270, height: 16 };
+const METER: PlateBox = { x: 256, y: 120, width: 270, height: 16 };
 const STOCK_LEFT_PX = 246;
 const STOCK_TOP_PX = 186;
 
@@ -56,7 +56,7 @@ function stockBox(index: number): PlateBox {
 const STOCKS: readonly PlateBox[] = [0, 1, 2, 3, 4].map(index => stockBox(index));
 const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHOWN_PX };
 
-const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, doom: DOOM, name: NAME, slot: SLOT, mana: MANA, stocks: STOCKS, stockCount: STOCK_COUNT };
+const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, doom: DOOM, name: NAME, slot: SLOT, meter: METER, stocks: STOCKS, stockCount: STOCK_COUNT };
 
 const MIRRORED_PERCENT_X = 236;
 const GROUP_LEFT = MIRRORED_PERCENT_X - PERCENT.x + DAMAGE.x;
@@ -69,7 +69,7 @@ const RIGHT_PANEL: PanelLayout = {
   doom: { ...DOOM, x: MIRRORED_PERCENT_X + DOOM.x - PERCENT.x },
   name: flip(NAME),
   slot: flip(SLOT),
-  mana: flip(MANA),
+  meter: flip(METER),
   stocks: STOCKS.map(box => flip(box)),
   stockCount: flip(STOCK_COUNT),
 };

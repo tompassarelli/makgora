@@ -1,6 +1,7 @@
 import { stageBounds } from "../src/game/sim/stageBounds";
 import { partitionWork } from "./balanceShards";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
+import { ULTIMATE_FRAMES_PER_PERCENT } from "../src/game/sim/meter";
 
 
 
@@ -23,7 +24,6 @@ import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatch
 import { type PacingAndPresentation, createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
 import { MATCH_TICKS_PER_SECOND, type MatchState, Phase } from "../src/game/lobby/lobbyState";
 import { fieldMatch, fieldSpawnX } from "../src/game/match/fieldMatch";
-import { scheduleMeterDrops } from "../src/game/match/meterDrops";
 import { produceComputerInput } from "../src/game/match/botPlay";
 import { CORNER_BAND, cornered, insideLip } from "../src/game/match/botCorner";
 import { recoveringBelow } from "../src/game/match/botEdgeGuard";
@@ -43,7 +43,6 @@ import soak from "./wisp/soak";
 import { admitsThroughHelper, runAdmitted } from "./heavyCapacity";
 import { spamOnly } from "./spamPolicy";
 import { campInput, campOf } from "./campPolicy";
-import { type DropVariant, advanceDropVariant, endDropVariant, startDropVariant } from "./dropVariants";
 import baseline from "./balanceBaseline.json";
 import { currentKit, currentComputerCode } from "./balanceKit";
 import { currentFeel } from "./balanceFeel";
@@ -112,10 +111,8 @@ interface SideRecord {
   hitsLanded: number;
   damageDealt: number;
 
-  manaSpent: number;
+  meterSpent: number;
   specialsStarted: number;
-
-  specialsRefused: number;
 
   stocksPlayed: number;
   readonly stockLosses: { readonly frame: number; readonly sinceHit: number | undefined; readonly selfDestruct: boolean; readonly blast?: "top" | "side" | "bottom"; readonly percent?: number; readonly recovering?: boolean }[];
@@ -204,7 +201,7 @@ export interface MatchRecord {
   readonly apartFrames: number;
   readonly apartOnStageFrames: number;
   readonly bothInFrames: number;
-  readonly dropsTaken: readonly [number, number];
+  readonly orbsTaken: readonly [number, number];
   /** Frames each side spent camping under FieldOptions.camp. */
   readonly campFrames: readonly [number, number];
   readonly ended?: boolean;
@@ -257,15 +254,13 @@ export interface FieldOptions {
 
   readonly spam?: Readonly<Partial<Record<string, number>>>;
 
-  readonly drops?: boolean;
+  readonly orbs?: boolean;
 
   readonly bufferedAttacks?: boolean;
 
   readonly frameCap?: number;
 
   readonly checksumEvery?: number;
-  /** A field-only change to the drops (dropVariants.ts); the shipped rule when absent. */
-  readonly dropVariant?: DropVariant;
   /** The fighter ahead on stocks camps (campPolicy.ts). */
   readonly camp?: boolean;
   /** Field-only: "melee" restores full ledge intangibility on every grab (no #386 decay). */
@@ -279,8 +274,8 @@ interface Watch {
   serial: number;
   special: number;
   specialForm: number;
-  mana: number;
-  denied: number;
+  ex: boolean;
+  ultimate: number;
   specialFrame: number;
   hits: number;
   damage: number;
@@ -325,7 +320,7 @@ interface Punish {
 
 const watchOf = (f: Readonly<Fighter>): Watch => ({
   down: f.down.state,
-  serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, mana: f.mana.points, denied: f.visuals.manaDenied, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
+  serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, ex: f.special.ex, ultimate: f.meter.ultimate, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
   grounded: f.motion.grounded, lagging: false, cornered: false, recovering: false, edgeGuarded: false, ledgeUntil: -1,
 });
 
@@ -387,7 +382,6 @@ export interface FieldMatch {
   readonly produced: FrameControls;
   readonly runtime: PacingAndPresentation;
   readonly row: MatchFrameInput;
-  readonly dropRule: ReturnType<typeof startDropVariant> | undefined;
   readonly opponents: readonly [CpuOpponentId, CpuOpponentId];
   readonly tiers: readonly [CpuTier, CpuTier];
 }
@@ -401,21 +395,20 @@ export function openFieldMatch(a: Character, b: Character, stageName: string, va
   if (xs.some((x) => x <= mainDeckLeft(stage) + 40 || x >= mainDeckRight(stage) - 40)) return undefined;
   const opponents = options.opponents ?? ["wren", "wren"];
   const tiers = options.tiers ?? ["expert", "expert"];
-  const { match, world } = fieldMatch(a, b, { stage, seed, shift, opponents, tiers, stocks: options.stocks, minutes: options.minutes, drops: options.drops });
-  const dropRule = options.dropVariant === undefined || !match.drops.on ? undefined : startDropVariant(options.dropVariant, match);
+  const { match, world } = fieldMatch(a, b, { stage, seed, shift, opponents, tiers, stocks: options.stocks, minutes: options.minutes, orbs: options.orbs });
   const controls = options.bufferedAttacks === true ? createBufferedFrameControls() : createFrameControls();
   const produced = options.bufferedAttacks === true ? createBufferedFrameControls() : createFrameControls();
   const runtime = createPacingAndPresentation();
   const row = createMatchFrameInput();
-  return { stage, match, world, controls, produced, runtime, row, dropRule, opponents, tiers };
+  return { stage, match, world, controls, produced, runtime, row, opponents, tiers };
 }
 
 export function playCpuMatch(a: Character, b: Character, stageName: string, variant: number, options: FieldOptions = {}, seed = 0): MatchRecord | undefined {
   const opened = openFieldMatch(a, b, stageName, variant, options, seed);
   if (opened === undefined) return undefined;
-  const { stage, match, world, controls, produced, runtime, row, dropRule, opponents, tiers } = opened;
+  const { stage, match, world, controls, produced, runtime, row, opponents, tiers } = opened;
   const side = (character: Character): SideRecord => ({
-    fighter: fighterSlug(character), moves: {}, hitsLanded: 0, damageDealt: 0, manaSpent: 0, specialsStarted: 0, specialsRefused: 0, stocksPlayed: 0, stockLosses: [],
+    fighter: fighterSlug(character), moves: {}, hitsLanded: 0, damageDealt: 0, meterSpent: 0, specialsStarted: 0, stocksPlayed: 0, stockLosses: [],
     damageByMove: {}, kosByMove: {}, rangedDamage: 0, approachFrames: 0, retreatFrames: 0, punishes: emptyPunishes(), edges: emptyEdgePlay(), hitDistances: {},
     ledge: { belowFrames: 0, inFrames: 0, ledgeLanded: 0, ledgeTaken: 0, stageLanded: 0, stageTaken: 0 },
   });
@@ -467,11 +460,10 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
       }
       if (!captureFrame(row, frame, world.mask, produced, runtime)) throw new Error(`capture refused frame ${frame}`);
       if (!executeMatchFrame(row, match, world, controls, runtime, frame)) throw new Error(`execution refused frame ${frame}`);
-      if (dropRule !== undefined) advanceDropVariant(dropRule, match, world);
       if (options.ledgeRule === "melee") for (const slot of [0, 1] as const) fighterAt(world, slot).ledge.grabs = 0;
-      if (match.drops.pickupSerial !== pickups) {
-        pickups = match.drops.pickupSerial;
-        if (match.drops.lastTaker === 0 || match.drops.lastTaker === 1) takes[match.drops.lastTaker]++;
+      if (match.orbs.pickupSerial !== pickups) {
+        pickups = match.orbs.pickupSerial;
+        if (match.orbs.lastTaker === 0 || match.orbs.lastTaker === 1) takes[match.orbs.lastTaker]++;
       }
       const first = fighterAt(world, 0), second = fighterAt(world, 1);
       if (!first.status.out && !second.status.out) {
@@ -507,8 +499,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
           else own.retreatFrames++;
         }
         const branched = special !== undefined && f.special.action === seen.special && f.special.form !== seen.specialForm;
-        if ((startedSpecial || branched) && f.mana.points < seen.mana) own.manaSpent += seen.mana - f.mana.points;
-        own.specialsRefused += f.visuals.manaDenied - seen.denied;
+        if ((startedSpecial || branched) && ((f.special.ex && !seen.ex) || f.meter.ultimate < seen.ultimate - ULTIMATE_FRAMES_PER_PERCENT)) own.meterSpent++;
         const hit = f.visuals.hit !== seen.hits && (options.playtest !== true || fighterContact[slot] === true);
         const ledge = own.ledge;
         if (f.ledge.state !== LedgeState.none) seen.ledgeUntil = frame + LEDGE_PLAY_FRAMES;
@@ -617,8 +608,8 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
         seen.special = f.special.action;
         seen.specialFrame = f.special.frame;
         seen.specialForm = f.special.form;
-        seen.mana = f.mana.points;
-        seen.denied = f.visuals.manaDenied;
+        seen.ex = f.special.ex;
+        seen.ultimate = f.meter.ultimate;
         seen.hits = f.visuals.hit;
         if (f.status.damage !== seen.damage || f.status.out !== seen.out) {
           if (frame - lastChange > quiet.frames) quiet = { from: lastChange, frames: frame - lastChange };
@@ -641,12 +632,11 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
   }
   if (frame - lastChange > quiet.frames) quiet = { from: lastChange, frames: frame - lastChange };
   if (checksumEvery > 0) checksumNow(frame);
-  if (dropRule !== undefined) endDropVariant(dropRule, match);
   for (const slot of [0, 1] as const) sides[slot].stocksPlayed = sides[slot].stockLosses.length + (fighterAt(world, slot).status.stocks > 0 ? 1 : 0);
   return {
     stage: stageName, variant, seed, opponents, tiers, skillOverrides: options.skills, fighters: [sides[0].fighter, sides[1].fighter],
     winner: match.winner === 0 || match.winner === 1 ? match.winner : null, timedOut: match.timedOut, frames: frame, sides,
-    apartFrames, apartOnStageFrames, bothInFrames, dropsTaken: takes, campFrames: camps === undefined ? [0, 0] : [camps[0].frames, camps[1].frames],
+    apartFrames, apartOnStageFrames, bothInFrames, orbsTaken: takes, campFrames: camps === undefined ? [0, 0] : [camps[0].frames, camps[1].frames],
     ended: match.phase !== Phase.match, ...(checksumEvery > 0 ? { checksums } : {}), strings,
     ...(combos === undefined ? {} : { combos, quiet }),
   };
@@ -714,9 +704,8 @@ export interface FighterSummary {
   readonly noHitShare: number;
   readonly damagePerHit: number;
 
-  readonly manaPerStock: number;
+  readonly meterPerStock: number;
 
-  readonly refusedShare: number;
   readonly moves: readonly MoveUse[];
   readonly style: StyleSummary;
 }
@@ -994,7 +983,7 @@ function summarizeField(records: readonly MatchRecord[]): FighterSummary[] {
   names.sort((x, y) => order.indexOf(x) - order.indexOf(y));
   return names.map((fighter) => {
     let matches = 0, wins = 0, losses = 0, ties = 0, timeOuts = 0, hits = 0, damage = 0, stockLosses = 0, noHit = 0, selfDestructs = 0;
-    let manaSpent = 0, stocksPlayed = 0, specialsStarted = 0, specialsRefused = 0;
+    let meterSpent = 0, stocksPlayed = 0;
     const versus = new Map<string, { wins: number; decisive: number; matches: number }>();
     for (const record of records) {
       const slot = record.fighters.indexOf(fighter);
@@ -1016,10 +1005,8 @@ function summarizeField(records: readonly MatchRecord[]): FighterSummary[] {
         } else losses++;
       }
       hits += side.hitsLanded;
-      manaSpent += side.manaSpent;
+      meterSpent += side.meterSpent;
       stocksPlayed += side.stocksPlayed;
-      specialsStarted += side.specialsStarted;
-      specialsRefused += side.specialsRefused;
       damage += side.damageDealt;
       for (const loss of side.stockLosses) {
         stockLosses++;
@@ -1038,8 +1025,7 @@ function summarizeField(records: readonly MatchRecord[]): FighterSummary[] {
     return {
       fighter, matches, wins, losses, ties, timeOuts, winRate: wins + losses === 0 ? Number.NaN : wins / (wins + losses), against, played, decisive,
       stockLosses, selfDestructs, selfDestructShare: stockLosses === 0 ? 0 : selfDestructs / stockLosses, noHitLosses: noHit, noHitShare: stockLosses === 0 ? 0 : noHit / stockLosses, damagePerHit: hits === 0 ? Number.NaN : damage / hits,
-      manaPerStock: stocksPlayed === 0 ? Number.NaN : manaSpent / stocksPlayed,
-      refusedShare: specialsStarted + specialsRefused === 0 ? 0 : specialsRefused / (specialsStarted + specialsRefused),
+      meterPerStock: stocksPlayed === 0 ? Number.NaN : meterSpent / stocksPlayed,
       moves: moveUsage(records, fighter),
       style: styleSummary(records, fighter),
     };
@@ -1104,12 +1090,12 @@ export function edgePlayLines(records: readonly MatchRecord[]): string[] {
 
 function fieldTable(summaries: readonly FighterSummary[], records: readonly MatchRecord[]): string {
   const lines = [
-    "| Fighter | Matches | Wins | Losses | Ties | Time-outs | Win rate vs field | Stock losses | Self-destructs (share) | Lost over 3 s after a hit (share) | Damage per hit | Mana spent per stock | Specials refused for mana (share of presses) | Top moves (share of moves started) |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: | --- |",
+    "| Fighter | Matches | Wins | Losses | Ties | Time-outs | Win rate vs field | Stock losses | Self-destructs (share) | Lost over 3 s after a hit (share) | Damage per hit | EX and ultimates spent per stock | Top moves (share of moves started) |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: | --- |",
   ];
   for (const s of summaries) {
     const top = s.moves.slice(0, 6).map((use) => `${use.name} ${percent(use.share)}`).join(", ");
-    lines.push(`| ${s.fighter} | ${s.matches} | ${s.wins} | ${s.losses} | ${s.ties} | ${s.timeOuts} | ${percent(s.winRate)} | ${s.stockLosses} | ${s.selfDestructs} (${percent(s.selfDestructShare)}) | ${s.noHitLosses} (${percent(s.noHitShare)}) | ${s.damagePerHit.toFixed(2)} | ${s.manaPerStock.toFixed(0)} | ${s.refusedShare === 0 ? "0%" : `${(100 * s.refusedShare).toFixed(1)}%`} | ${top} |`);
+    lines.push(`| ${s.fighter} | ${s.matches} | ${s.wins} | ${s.losses} | ${s.ties} | ${s.timeOuts} | ${percent(s.winRate)} | ${s.stockLosses} | ${s.selfDestructs} (${percent(s.selfDestructShare)}) | ${s.noHitLosses} (${percent(s.noHitShare)}) | ${s.damagePerHit.toFixed(2)} | ${s.meterPerStock.toFixed(2)} | ${top} |`);
   }
   const names = summaries.map((s) => s.fighter);
   lines.push("", `| Row's win rate vs (matches) | ${names.join(" | ")} |`, `| --- |${names.map(() => " ---: |").join("")}`);

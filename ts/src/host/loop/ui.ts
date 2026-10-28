@@ -20,15 +20,15 @@ import { SpecialEffects } from "../../game/render/specialEffects";
 import { Character } from "../../game/sim/codes";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
-import { FighterHud, MatchClock, plateManaSlot } from "../../game/ui/matchHud";
+import { FighterHud, MatchClock, plateMeterSlot } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
 import { TerrorPresentation } from "../../game/render/terrorPresentation";
 import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
 import { FighterMarker } from "../../game/ui/fighterMarker";
-import { ManaBar } from "../../game/ui/manaBar";
-import { MANA_BAR_HEIGHT_PX } from "../../game/ui/plateLayout";
+import { MeterBar } from "../../game/ui/meterBar";
+import { METER_BAR_HEIGHT_PX } from "../../game/ui/plateLayout";
 import { unitsForPixels } from "../../game/ui/portraitFrames";
 import { ButtonClicks, gameUi } from "../../game/ui/frames";
 import { ResultsBanner } from "../../game/ui/resultsBanner";
@@ -39,7 +39,7 @@ import { type StageActions, StagePanel } from "../../game/ui/stageUi";
 import type { ShellState } from "./state";
 import { bindPrototype } from "../../platform/rebind";
 import { ItemPresentation } from "../../game/render/itemPresentation";
-import { MeterDropPresentation } from "../../game/render/meterDropPresentation";
+import { OrbPresentation } from "../../game/render/orbPresentation";
 import { CandlePresentation } from "../../game/render/candlePresentation";
 import { GoldSackPresentation } from "../../game/render/goldSackPresentation";
 import { SpherePresentation } from "../../game/render/spherePresentation";
@@ -75,7 +75,7 @@ interface FighterRenderers {
 export interface UiObjects {
   pause: PauseMenu;
   items: ItemPresentation;
-  drops: MeterDropPresentation;
+  orbs: OrbPresentation;
   readonly clock: MatchClock;
   readonly training: TrainingReadout;
   readonly huds: Slots<FighterHud>;
@@ -83,7 +83,7 @@ export interface UiObjects {
   markers: Slots<FighterMarker>;
   readonly escapeMeters: Slots<EscapeMeter>;
 
-  manaBars: Slots<ManaBars>;
+  meterBars: Slots<MeterBars>;
   readonly selections: Slots<SelectionPanel>;
   readonly settings: Slots<SettingsPanel>;
   readonly stage: StagePanel;
@@ -117,13 +117,12 @@ export function views(s: Readonly<ShellState>): UiObjects {
 
 const each = <T>(create: (slot: ParticipantSlot) => T): Slots<T> => [create(0), create(1), create(2), create(3)];
 
-export interface ManaBars {
-  readonly hud: ManaBar;
+export interface MeterBars {
+  readonly hud: MeterBar;
 }
 
-const createManaBars = (slot: ParticipantSlot): ManaBars => ({
-
-  hud: new ManaBar("Hud", slot, gameUi(), 1300 + slot * 20, unitsForPixels(MANA_BAR_HEIGHT_PX), 0.0),
+const createMeterBars = (slot: ParticipantSlot): MeterBars => ({
+  hud: new MeterBar("Hud", slot, gameUi(), 1300 + slot * 20, unitsForPixels(METER_BAR_HEIGHT_PX)),
 });
 
 function menuControls(s: Readonly<ShellState>): MenuControls {
@@ -139,14 +138,14 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     results,
     pause: new PauseMenu(selectPause),
     items: new ItemPresentation(s.origin),
-    drops: new MeterDropPresentation(s.origin),
+    orbs: new OrbPresentation(s.origin),
     clock: new MatchClock(),
     training: new TrainingReadout(),
     huds: each(slot => new FighterHud(slot, 4)),
     bubbles: each(slot => new OffscreenBubble(slot)),
     markers: each(slot => new FighterMarker(slot)),
     escapeMeters: each(slot => new EscapeMeter(slot)),
-    manaBars: each(createManaBars),
+    meterBars: each(createMeterBars),
     stage: new StagePanel(actions.stage, controls),
     selections: each(slot => new SelectionPanel(actions.selection, slot, controls)),
     settings: each(slot => new SettingsPanel(s.participants[slot].bindings, actions.settings, slot)),
@@ -230,8 +229,8 @@ export function layoutHuds(s: ShellState): void {
   const active = PARTICIPANT_SLOTS.filter(slot => isActive(s.world, slot));
   active.forEach((slot, position) => {
     ui.huds[slot].layout(position, active.length);
-    const { left, centerY, width } = plateManaSlot(position, active.length);
-    ui.manaBars[slot].hud.place(left, centerY, width);
+    const { left, centerY, width } = plateMeterSlot(position, active.length);
+    ui.meterBars[slot].hud.place(left, centerY, width);
   });
 }
 
@@ -247,9 +246,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   const retainedItems: { readonly items?: ItemPresentation } = ui;
   if (retainedItems.items === undefined) ui.items = new ItemPresentation(s.origin);
   else bindPrototype(ui.items, ItemPresentation.prototype);
-  const retainedDrops: { readonly drops?: MeterDropPresentation } = ui;
-  if (retainedDrops.drops === undefined) ui.drops = new MeterDropPresentation(s.origin);
-  else bindPrototype(ui.drops, MeterDropPresentation.prototype);
+  const retainedOrbs: { readonly orbs?: OrbPresentation } = ui;
+  if (retainedOrbs.orbs === undefined) ui.orbs = new OrbPresentation(s.origin);
+  else bindPrototype(ui.orbs, OrbPresentation.prototype);
   const retainedMarkers: { readonly markers?: Slots<FighterMarker> } = ui;
   if (retainedMarkers.markers === undefined) ui.markers = each(slot => new FighterMarker(slot));
   else for (const slot of PARTICIPANT_SLOTS) bindPrototype(ui.markers[slot], FighterMarker.prototype);
@@ -278,10 +277,10 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   bindPrototype(ui.special, SpecialEffects.prototype);
   ui.special.bindNestedCode();
   ui.sounds = modelSoundPresentation(s.origin, ui.combat.sounds);
-  const retainedBars: { readonly manaBars?: Slots<ManaBars> } = ui;
-  if (retainedBars.manaBars === undefined) ui.manaBars = each(createManaBars);
+  const retainedBars: { readonly meterBars?: Slots<MeterBars> } = ui;
+  if (retainedBars.meterBars === undefined) ui.meterBars = each(createMeterBars);
   else for (const slot of PARTICIPANT_SLOTS) {
-    bindPrototype(ui.manaBars[slot].hud, ManaBar.prototype);
+    bindPrototype(ui.meterBars[slot].hud, MeterBar.prototype);
   }
 
   const retained: { readonly match?: MatchPresentation } = ui;

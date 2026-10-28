@@ -56,7 +56,7 @@ type MenuRequest = "stage-select" | "start" | "rematch";
 export type TapeOperation =
   | { readonly kind: "test-air"; readonly line: number; readonly slot: number; readonly x: number; readonly z: number }
   | { readonly kind: "test-stage"; readonly line: number; readonly stage: number }
-  | { readonly kind: "test-meter"; readonly line: number; readonly slot: number; readonly points: number }
+  | { readonly kind: "test-meter"; readonly line: number; readonly slot: number; readonly percent: number }
   | { readonly kind: "input"; readonly line: number; readonly slot: ParticipantSlot; readonly controls: readonly ControlAssignment[]; readonly attacks: readonly AttackCommand[] }
   | { readonly kind: "frame" | "predict" | "correct"; readonly line: number; readonly frame: number }
   | { readonly kind: "rollback"; readonly line: number; readonly first: number; readonly last: number }
@@ -149,7 +149,7 @@ function decodeLine(line: number, text: string): Decoded<TapeOperation> | undefi
         ? { ok: true, value: { kind: "test-air", line, slot: first, x, z } } : fail("test-air takes SLOT X Z");
     }
     case "test-meter":
-      return pair && isParticipantSlot(first) ? { ok: true, value: { kind: "test-meter", line, slot: first, points: second } } : fail("test-meter takes SLOT POINTS");
+      return pair && isParticipantSlot(first) ? { ok: true, value: { kind: "test-meter", line, slot: first, percent: second } } : fail("test-meter takes SLOT PERCENT");
     case "test-stage":
       return single ? { ok: true, value: { kind: "test-stage", line, stage: first } } : fail("test-stage takes a stage number");
     case "input":

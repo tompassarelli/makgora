@@ -16,6 +16,7 @@ import { type Controls, type Roster, copyControls, createRoster } from "./roster
 import { mainDeckLeft, mainDeckRight, mainDeckZ } from "./stage";
 import { lift } from "./testDuel";
 import { contactBatch, controls, hitEffect } from "./testWorld";
+import { fillMeter } from "./meter";
 
 const H = HERO_REFERENCE_HEIGHT;
 const FAR = f32(H * f32(6.0));
@@ -122,7 +123,7 @@ test("A Banished fighter's jab, grab and shield inputs do nothing, a raised shie
 
 function struck(attacker: Character, banished: boolean, gap: number, act: (b: Bout) => void): { damage: number; hitlag: boolean; held: boolean; touched: boolean } {
   const b = bout(attacker, Character.rifleman, gap);
-  b.first.mana.points = 100;
+  fillMeter(b.first);
   if (banished) applyHeroStatus(b.second, BANISH);
   let damage = 0.0;
   let hitlag = false;

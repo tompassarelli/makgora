@@ -7,7 +7,7 @@ import { type MatchCamera, createMatchCamera, copyMatchCamera } from "../sim/mat
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantMask, isParticipantSlot, participantActive } from "../input/participants";
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { scheduleMatchItems } from "../match/centreItem";
-import { type MatchMeterDrops, copyMatchMeterDrops, createMatchMeterDrops, scheduleMeterDrops } from "../match/meterDrops";
+import { type MatchOrbs, copyMatchOrbs, createMatchOrbs, resetMatchOrbs } from "../sim/orbState";
 import { lobbyMatchSeed, nextMatchSeed } from "../match/botRandom";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, drawCpuFighter, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
@@ -83,7 +83,7 @@ export interface MatchState {
   readonly items: MatchItems;
 
   ultimatesOff: boolean;
-  readonly drops: MatchMeterDrops;
+  readonly orbs: MatchOrbs;
 
   classic: boolean;
   classicTier: number;
@@ -112,7 +112,7 @@ export function createMatchState(): MatchState {
     stageChoice: 2, hazards: true, stageResolved: false, stagePool: createStagePool(), winner: undefined, stockCount: 3, timeLimitMinutes: 7, endless: false, automaticRematch: false, rematchCountdown: 0,
 
     remainingFrames: 7 * 60 * MATCH_TICKS_PER_SECOND, startHold: 0, matchFrame: 0, timedOut: false, practice: false,
-    training: false, trainer: createTrainingState(), items: createMatchItems(), drops: createMatchMeterDrops(), ultimatesOff: false,
+    training: false, trainer: createTrainingState(), items: createMatchItems(), orbs: createMatchOrbs(), ultimatesOff: false,
     classic: false, classicTier: CLASSIC_TIER_DEFAULT, lore: false, loreBattle: 0, run: createConfiguredRun(),
   };
 }
@@ -263,7 +263,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   copyTrainingState(target.trainer, source.trainer);
   copyMatchItems(target.items, source.items);
   target.ultimatesOff = source.ultimatesOff;
-  copyMatchMeterDrops(target.drops, source.drops);
+  copyMatchOrbs(target.orbs, source.orbs);
   target.classic = source.classic;
   target.classicTier = source.classicTier;
   target.lore = source.lore;
@@ -560,8 +560,8 @@ export function setUltimatesOn(game: MatchState, slot: number, on: boolean): voi
 }
 
 
-export function setMeterDropsOn(game: MatchState, slot: number, on: boolean): void {
-  if ((game.phase === Phase.characterMenu || game.phase === Phase.stageMenu) && humanActive(game, slot)) game.drops.on = on;
+export function setOrbsOn(game: MatchState, slot: number, on: boolean): void {
+  if ((game.phase === Phase.characterMenu || game.phase === Phase.stageMenu) && humanActive(game, slot)) game.orbs.on = on;
 }
 
 
@@ -601,7 +601,7 @@ function beginMatch(game: MatchState, keepCpuFighters = false): void {
   game.matchFrame = 0;
   game.phase = Phase.match;
   scheduleMatchItems(game);
-  scheduleMeterDrops(game);
+  resetMatchOrbs(game.orbs);
 }
 
 

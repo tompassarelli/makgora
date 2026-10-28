@@ -22,6 +22,7 @@ import { ReplayCorrections, ReplayHistory } from "./history";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "./limits";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "./snapshot";
 import { type TapeOperation, applyControls } from "./tape";
+import { setMeterPercent } from "../sim/meter";
 
 type TapeResult =
   | { readonly ok: true; readonly frames: number }
@@ -143,7 +144,7 @@ function perform(session: TapeSession, operation: TapeOperation): { result: stri
     }
     case "test-meter":
       if (!isActive(live.world, operation.slot)) return { refused: "test-meter needs an active fighter" };
-      fighterAt(live.world, operation.slot).mana.points = operation.points;
+      setMeterPercent(fighterAt(live.world, operation.slot), operation.percent);
       return { result: "-" };
     case "test-stage":
       game.stageChoice = operation.stage;

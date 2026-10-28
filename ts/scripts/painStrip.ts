@@ -10,7 +10,7 @@ import { SELECTABLE_CHARACTERS, fighterKey } from "../src/game/roster/kits";
 import { contactDamageClips } from "../src/game/presentation/damagePose";
 import { PAIN_ENTRY_BLEND_FRAMES } from "../src/game/presentation/damageBlend";
 import { PAIN_SCENARIOS } from "../src/game/session/painFixture";
-import { DROPS_COMMAND, HAZARDS_COMMAND, ITEMS_COMMAND } from "../src/game/session/sessionSetup";
+import { ORBS_COMMAND, HAZARDS_COMMAND, ITEMS_COMMAND } from "../src/game/session/sessionSetup";
 import { PREDICTED_HEADLESS } from "./wisp/headless";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import * as platformMain from "../src/platform/main";
@@ -28,7 +28,7 @@ const CHAT_FRAME = 30;
 const FIRST_OBSERVED = 40;
 const HELD_FRAMES = 14;
 const SCENES_PER_RENDER = 6;
-const QUIET_ARENA = [`${HAZARDS_COMMAND}off`, `${ITEMS_COMMAND}off`, `${DROPS_COMMAND}off`];
+const QUIET_ARENA = [`${HAZARDS_COMMAND}off`, `${ITEMS_COMMAND}off`, `${ORBS_COMMAND}off`];
 const LAST_OBSERVED = 420;
 const SHEET_ORDER = ["high-small", "high-medium", "high-large", "middle-small", "middle-medium", "middle-large", "low-small", "low-medium", "low-large"];
 

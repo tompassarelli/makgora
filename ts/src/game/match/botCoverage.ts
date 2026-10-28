@@ -27,7 +27,6 @@ export interface BotCoverage {
   readonly specials: { neutral: number; side: number; up: number; down: number };
   defense: number;
   recovery: number;
-  manaDenied: number;
   defenseDecisions: number;
   recoveryDecisions: number;
   readonly companions: { bear: number; quilbeast: number; hawk: number };
@@ -37,7 +36,7 @@ export interface BotCoverage {
 
 export function fighterCoverage(index: number, opponent?: Character, choices: readonly Character[] = SELECTABLE_CHARACTERS, seeds = 8, seedOffset = 0): BotCoverage {
   const character = at(choices, index);
-  const result: BotCoverage = { fighter: fighterName(character), matches: 0, movement: 0, attacks: 0, kit: 0, specials: { neutral: 0, side: 0, up: 0, down: 0 }, defense: 0, recovery: 0, manaDenied: 0, defenseDecisions: 0, recoveryDecisions: 0, companions: { bear: 0, quilbeast: 0, hawk: 0 }, missing: [] };
+  const result: BotCoverage = { fighter: fighterName(character), matches: 0, movement: 0, attacks: 0, kit: 0, specials: { neutral: 0, side: 0, up: 0, down: 0 }, defense: 0, recovery: 0, defenseDecisions: 0, recoveryDecisions: 0, companions: { bear: 0, quilbeast: 0, hawk: 0 }, missing: [] };
   const plan = gameplanOf(character);
   if (plan === undefined) result.missing.push("character gameplan");
   else {
@@ -119,7 +118,6 @@ export function fighterCoverage(index: number, opponent?: Character, choices: re
       specialFrame = f.special.frame;
       specialForm = f.special.form;
     }
-    result.manaDenied += fighterAt(world, 0).visuals.manaDenied;
     result.matches++;
   }
   if (character === Character.beastmaster) {

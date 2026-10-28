@@ -11,7 +11,7 @@ import { fighterAt, isActive } from "../sim/roster";
 import { firstTrainingDifference } from "../match/trainingState";
 import { firstRunDifference } from "../classic/runState";
 import { firstItemsDifference } from "../match/items";
-import { firstMeterDropsDifference } from "../match/meterDrops";
+import { firstOrbsDifference } from "../sim/orbState";
 import { firstBotMemoryDifference, sameBotMemory } from "../match/botPerception";
 import { botStrategyValues, sameBotStrategy } from "../match/botStrategy";
 import { type MatchState, ResultPick } from "../lobby/lobbyState";
@@ -114,8 +114,8 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
   if (e.startHold !== a.startHold) return "match.startHold";
   const items = firstItemsDifference(e.items, a.items);
   if (items !== undefined) return items;
-  const drops = firstMeterDropsDifference(e.drops, a.drops);
-  if (drops !== undefined) return drops;
+  const orbs = firstOrbsDifference(e.orbs, a.orbs);
+  if (orbs !== undefined) return orbs;
   if (e.timedOut !== a.timedOut) return "match.timedOut";
   return undefined;
 }

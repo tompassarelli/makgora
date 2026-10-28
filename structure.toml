@@ -46,7 +46,7 @@ may_use = ["core"]
 # ---------- core ----------
 [[module]]
 name = "core"
-paths = ["ts/src/game/core/**", "ts/src/game/sim/codes.ts", "ts/src/game/input/participants.ts", "ts/src/runtime/numbers.ts",
+paths = ["ts/src/game/core/**", "ts/src/game/sim/codes.ts", "ts/src/game/sim/orbState.ts", "ts/src/game/input/participants.ts", "ts/src/runtime/numbers.ts",
          "ts/src/sim/**", "ts/src/game/sim/mathTables.ts", "ts/src/game/sim/mathTableData.ts"]
 responsibility = "Ids, participant slot constants, number helpers and trig tables (mathTableData is generated, see below); no game logic."
 may_use = []

@@ -7,7 +7,7 @@ import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
-import { ROSTER_MANA } from "../../game/sim/mana";
+import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { METER_COMMAND, captureRequest, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterKey } from "../../game/roster/kits";
@@ -177,9 +177,9 @@ function shieldEnergyReceipt(s: ShellState, message: string): string | undefined
 
 function meterReceipt(s: ShellState, message: string): string | undefined {
   const points = S2I(message.substring(METER_COMMAND.length));
-  if (s.game.phase !== Phase.match || points < 0 || points > ROSTER_MANA.max) return undefined;
+  if (s.game.phase !== Phase.match || points < 0 || points > 100) return undefined;
   prepareDevState(s);
-  for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) fighterAt(s.world, slot).mana.points = points;
+  for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) setMeterPercent(fighterAt(s.world, slot), points);
   commitDevState(s);
   return `dev: meter ${points}`;
 }

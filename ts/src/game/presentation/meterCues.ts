@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { type Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
-import { ROSTER_MANA } from "../sim/mana";
+import { exCharged, ultimateCharged } from "../sim/meter";
 import { type AuthoredSpecial, FOLLOW_UP_FORM } from "../sim/specials/schema";
 import type { Cue } from "./specialCues";
 import { heroLook } from "../roster/looks";
@@ -90,11 +90,11 @@ export function clearMeterCueState(state: MeterCueState): void {
 }
 
 export function ultimateReady(fighter: Readonly<Fighter>, ultimatesOff: boolean): boolean {
-  return !ultimatesOff && fighter.tuning.ultimate !== undefined && !fighter.status.out && fighter.mana.points >= ROSTER_MANA.max && fighter.special.action !== SpecialAction.heroUltimate;
+  return !ultimatesOff && fighter.tuning.ultimate !== undefined && !fighter.status.out && ultimateCharged(fighter) && fighter.special.action !== SpecialAction.heroUltimate;
 }
 
-export function exReady(fighter: Readonly<Fighter>, ultimatesOff: boolean): boolean {
-  return !fighter.status.out && fighter.mana.points >= ROSTER_MANA.exCost && fighter.special.action !== SpecialAction.heroUltimate && !ultimateReady(fighter, ultimatesOff);
+export function exReady(fighter: Readonly<Fighter>): boolean {
+  return !fighter.status.out && exCharged(fighter) && fighter.special.action !== SpecialAction.heroUltimate;
 }
 
 /** Reads one confirmed frame of the fighter into the meter cues it shows; sounds are true only on the frame their cast starts. */
@@ -113,7 +113,7 @@ export function observeMeterCues(state: MeterCueState, fighter: Readonly<Fighter
   view.burst = ultimate && frame <= ULTIMATE_BURST_FRAMES;
   view.exAura = ex && !ultimate && action !== SpecialAction.none && form < FOLLOW_UP_FORM && frame <= EX_AURA_FRAMES;
   view.superAura = ultimateReady(fighter, ultimatesOff);
-  view.exReady = exReady(fighter, ultimatesOff);
+  view.exReady = exReady(fighter);
   return view;
 }
 

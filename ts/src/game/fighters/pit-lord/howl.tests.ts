@@ -11,6 +11,7 @@ import { duelPair, lift, stepDuel } from "../../sim/testDuel";
 import { controls } from "../../sim/testWorld";
 import { type ShockwaveRing, shockwaveRing } from "../../presentation/shockwaveRing";
 import { HOWL_FIRST, HOWL_REACH, PIT_LORD_SPECIALS, TERRIFIED } from "./specials";
+import { fillMeter } from "../../sim/meter";
 
 const H = HERO_REFERENCE_HEIGHT;
 const NEUTRAL_B = controls({ specialPressed: true });
@@ -24,7 +25,7 @@ interface Roar {
 
 function roar(gap: number, percent: number, setUp: (target: Fighter) => void = () => {}, hold = controls()): Roar {
   const pitLord = createFighter(Character.pitLord, 0.0, 1);
-  pitLord.mana.points = 100;
+  fillMeter(pitLord);
   const target = createFighter(Character.rifleman, gap, gap > 0.0 ? -1 : 1);
   const { world } = duelPair(pitLord, target);
   target.status.damage = percent;
@@ -62,14 +63,14 @@ test("A foe just terrified resists the next roar for 300 frames, then can be ter
   for (let frame = 0; frame < 60; frame++) stepDuel(world);
   assertEquals(target.status.condition, HeroStatusKind.none);
   assertTrue((target.status.conditionImmunity[HeroStatusGroup.sleep] ?? 0) > 200);
-  pitLord.mana.points = 100;
+  fillMeter(pitLord);
   stepDuel(world, NEUTRAL_B);
   for (let frame = 1; frame < HOWL_FIRST + 6; frame++) stepDuel(world);
   assertTrue(target.status.damage > HOWL_DAMAGE);
   assertEquals(target.status.condition, HeroStatusKind.none);
   for (let frame = 0; frame < 300; frame++) stepDuel(world);
   assertEquals(target.status.conditionImmunity[HeroStatusGroup.sleep] ?? 0, 0);
-  pitLord.mana.points = 100;
+  fillMeter(pitLord);
   stepDuel(world, NEUTRAL_B);
   for (let frame = 1; frame < HOWL_FIRST + 6; frame++) stepDuel(world);
   assertEquals(target.status.condition, HeroStatusKind.fear);
@@ -98,7 +99,7 @@ test("An airborne foe is pushed away from Pit Lord on either side at 45 degrees 
 test("The drawn shockwave ring is the live hit region on every active frame and reaches 1.6H [k3 measure docs/design/pit-lord.md]", () => {
   for (const facing of [1, -1]) {
     const pitLord = createFighter(Character.pitLord, 0.0, facing);
-    pitLord.mana.points = 100;
+    fillMeter(pitLord);
     const { world } = duelPair(pitLord, createFighter(Character.rifleman, f32(H * f32(8.0)), -1));
     const ring: ShockwaveRing = { x: 0.0, z: 0.0, radius: 0.0, alpha: 0 };
     const placed = emptyCapsule();

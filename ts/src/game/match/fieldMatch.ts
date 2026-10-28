@@ -4,7 +4,7 @@ import type { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { type Roster, createRoster } from "../sim/roster";
 import type { CpuOpponentId, CpuTier } from "./cpuProfiles";
-import { scheduleMeterDrops } from "./meterDrops";
+import { resetMatchOrbs } from "../sim/orbState";
 import { initializeMatchFighters, matchSpawnX } from "./step";
 
 export interface FieldMatchRules {
@@ -15,7 +15,7 @@ export interface FieldMatchRules {
   readonly tiers?: readonly [CpuTier, CpuTier];
   readonly stocks?: number | undefined;
   readonly minutes?: number | undefined;
-  readonly drops?: boolean | undefined;
+  readonly orbs?: boolean | undefined;
 }
 
 export const fieldSpawnX = (slot: 0 | 1, shift = 0.0): number => f32(matchSpawnX(slot) + shift);
@@ -38,8 +38,8 @@ export function fieldMatch(a: Character, b: Character, rules: FieldMatchRules): 
   match.timeLimitMinutes = rules.minutes ?? 4;
   match.remainingFrames = match.timeLimitMinutes * 60 * MATCH_TICKS_PER_SECOND;
   match.phase = Phase.match;
-  match.drops.on = rules.drops === true;
-  scheduleMeterDrops(match);
+  match.orbs.on = rules.orbs === true;
+  resetMatchOrbs(match.orbs);
   const world = createRoster(3, [createFighter(a, fieldSpawnX(0, rules.shift), 1), createFighter(b, fieldSpawnX(1, rules.shift), -1)]);
   initializeMatchFighters(match, world);
   return { match, world };

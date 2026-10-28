@@ -16,7 +16,7 @@ export class MeterGlow {
   }
 
   present(fighter: Readonly<Fighter> | undefined, pose: Readonly<FighterPose>, stage: number, frame: number, camera: Readonly<MatchCamera>, ultimatesOff: boolean): void {
-    const color = fighter === undefined ? undefined : meterGlowColor(fighter, ultimatesOff);
+    const color = fighter === undefined ? undefined : meterGlowColor(fighter, ultimatesOff, frame);
     if (fighter === undefined || color === undefined || !this.model.pose(fighter, pose, stage, camera, -METER_GLOW_DEPTH, METER_GLOW_GROW, this.height)) {
       this.model.hide();
       return;

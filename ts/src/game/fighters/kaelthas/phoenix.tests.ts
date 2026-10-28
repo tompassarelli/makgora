@@ -16,6 +16,7 @@ import { Action, bit } from "../../input/actions";
 import { HEIGHT_PROBE_OUT, RECOVERY_BANDS, SPECIAL, TOWARD, UP, playKeys, recovered, recoveryRun } from "../../match/recoveryEnvelope";
 import { PHOENIX_BURN_FRAMES, PHOENIX_EGG_FALL_SPEED, PHOENIX_EGG_HATCH_FRAMES, PHOENIX_STARTUP_FRAMES } from "./specials";
 import { kaelHit } from "./moves";
+import { fillMeter } from "../../sim/meter";
 
 const TURN_COS = f32(0.996);
 const upB = (ex = false): Controls => controls({ specialPressed: true, specialZ: 1, verticalDirection: 1, exPressed: ex });
@@ -24,7 +25,7 @@ const hold = (x: number, z: number): Controls => controls({ direction: x, vertic
 function flight(z: number, ex = false): { world: Roster; kael: Fighter; foe: Fighter } {
   const pair = duelPair(createFighter(Character.kaelthas, 0.0, 1), createFighter(Character.rifleman, -500.0, 1));
   const kael = pair.owner;
-  kael.mana.points = 100;
+  fillMeter(kael);
   lift(kael, z);
   stepDuel(pair.world, upB(ex));
   while (kael.special.frame < PHOENIX_STARTUP_FRAMES) stepDuel(pair.world, hold(0, 1));

@@ -59,7 +59,7 @@ export const timeSetting = (minutes: number) => (minutes === 0 ? "No time limit"
 export const endlessSetting = (endless: boolean) => `Endless play: ${endless ? "On" : "Off"}`;
 export const automaticRematchSetting = (automatic: boolean) => `Automatic rematch: ${automatic ? "On" : "Off"}`;
 export const hazardsSetting = (on: boolean) => `Hazards: ${on ? "On" : "Off"}`;
-export const dropsSetting = (on: boolean) => `Drops: ${on ? "On" : "Off"}`;
+export const orbsSetting = (on: boolean) => `Orbs: ${on ? "On" : "Off"}`;
 export const itemsSetting = (on: boolean) => `Items: ${on ? "On" : "Off"}`;
 export const ultimatesSetting = (on: boolean) => `Ultimates: ${on ? "On" : "Off"}`;
 export const itemKindSetting = (kind: ItemKind, on: boolean) => `${kind === ItemKind.speed ? "Speed" : "Heavy"} item: ${on ? "On" : "Off"}`;
@@ -87,8 +87,8 @@ export function rulesSummary(game: Readonly<MatchState>): string {
 }
 
 const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Backspace");
-const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash. Strong + Special + direction: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.";
-const PLAYING_HELP_BACKSPACE = "Backspace: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash. Strong + Special + direction: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.";
+const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash. Strong + Special + direction: EX special (EX charge).\nAttack + Special (A + X): Ultimate (full ultimate meter).\nShield then Left/Right: roll; Down: dodge.";
+const PLAYING_HELP_BACKSPACE = "Backspace: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash. Strong + Special + direction: EX special (EX charge).\nAttack + Special (A + X): Ultimate (full ultimate meter).\nShield then Left/Right: roll; Down: dodge.";
 export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
 
 

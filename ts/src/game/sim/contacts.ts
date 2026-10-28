@@ -47,7 +47,7 @@ import { CHILL } from "./chill";
 import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
-import { gainMana } from "./mana";
+import { drainUltimate, gainUltimate, ultimatePercent } from "./meter";
 import { capPercent } from "./percent";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "../fighters/kobold/candle";
 import { contactIsSpell, contactTraits } from "./identityTraits";
@@ -226,9 +226,9 @@ function applyAirborneShieldRecoil(source: Fighter, target: Fighter, contact: Re
 }
 
 
-function drainMana(target: Fighter, drain: number | undefined): void {
-  if (drain === undefined || drain <= 0 || target.mana.points <= 0) return;
-  target.mana.points = max(0, target.mana.points - drain);
+function drainMeter(target: Fighter, frames: number): void {
+  if (frames <= 0 || target.meter.ultimate <= 0) return;
+  drainUltimate(target, frames);
   target.visuals.manaDrained++;
 }
 
@@ -290,11 +290,11 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     }
     if (contact.kind === ContactKind.throw) target.visuals.throw++;
     visualContact ??= index;
-    drainMana(target, contact.effect.manaDrain);
-    const stolen = min(target.mana.points, contact.effect.manaSteal ?? 0);
+    drainMeter(target, ultimatePercent(contact.effect.manaDrain ?? 0));
+    const stolen = min(target.meter.ultimate, ultimatePercent(contact.effect.manaSteal ?? 0));
     if (stolen > 0) {
-      drainMana(target, stolen);
-      gainMana(source, stolen);
+      drainMeter(target, stolen);
+      gainUltimate(source, stolen);
     }
     if (damage > 0 && source !== target) candleHeat[contact.source] = at(candleHeat, contact.source) + candleHeatGain(source, damage);
     if (damage > 0 && contact.kind !== ContactKind.pummel) {

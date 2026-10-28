@@ -23,6 +23,7 @@ export const STOCK_MODELS = {
   greenDragonMissile: "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx",
   massTeleportTarget: "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx",
   frostWyrmMissile: "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx",
+  fireBallMissile: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx",
 } as const;
 
 const HALF_TURN = f32(3.141592654);

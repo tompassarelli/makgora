@@ -14,7 +14,6 @@ import { toInt } from "wisp/src/sim/binary32";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { AttackStyle, Character, DownState, HeroStatusKind, ProjectileKind, SpecialAction } from "../sim/codes";
 import { canAttack } from "../sim/conditions";
-import { exSpecialAffordable } from "../sim/exSpecials";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
@@ -32,7 +31,7 @@ import { HeroSpecialUse, autoFollowUpDue, heroSpecialUse, holdFirstPartZone, sta
 import { aheadX, moveReachAhead } from "./botMoves";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
-import { ROSTER_MANA } from "../sim/mana";
+import { ULTIMATE_FRAMES_PER_PERCENT, exCharged, ultimateCharged, ultimatePercent } from "../sim/meter";
 import { ULTIMATE_REACH } from "../sim/ultimates";
 
 
@@ -86,7 +85,7 @@ const HERO_SLOTS = [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, Speci
 const takes = (skill: CpuSkill, first: number, second: number): boolean => botChance(first, second, skill.kitTenths, 10);
 
 
-const actionSeed = (f: Readonly<Fighter>): number => f.attack.serial * 37 + f.mana.points * 11 + toInt(f.status.damage);
+const actionSeed = (f: Readonly<Fighter>): number => f.attack.serial * 37 + floorDiv(f.meter.ultimate, ULTIMATE_FRAMES_PER_PERCENT) * 11 + (exCharged(f) ? 7 : 0) + toInt(f.status.damage);
 
 const towardOf = (f: Readonly<Fighter>, x: number): number => (x === f.motion.x ? f.facing : x > f.motion.x ? 1 : -1);
 
@@ -225,7 +224,7 @@ function pressRecall(f: Readonly<Fighter>, target: Readonly<Fighter>, move: Read
   }
   if (move.ritual !== undefined) {
 
-    const cash = (f.mana.points < RITUAL_MANA && Math.abs(f32(motion.x - f.motion.x)) >= RITUAL_GAP) || f.status.armorFrames <= RITUAL_LAST_FRAMES;
+    const cash = (f.meter.ultimate < ultimatePercent(RITUAL_MANA) && Math.abs(f32(motion.x - f.motion.x)) >= RITUAL_GAP) || f.status.armorFrames <= RITUAL_LAST_FRAMES;
     if (!cash || !takes(skill, floorDiv(frame, 30), f.character * 7 + 7)) return false;
     pressSlot(input, slot, 0);
     return true;
@@ -317,7 +316,7 @@ export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, s
   const reach = ULTIMATE_REACH[f.character];
   const move = f.tuning.ultimate;
   if (reach === undefined || move === undefined || reach.far <= 0.0 || skill.tier === "rookie" || skill.kitTenths <= 0) return false;
-  if (f.mana.points < ROSTER_MANA.max || !canAttack(f) || f.special.action !== SpecialAction.none || f.launch.hitstun > 0) return false;
+  if (!ultimateCharged(f) || !canAttack(f) || f.special.action !== SpecialAction.none || f.launch.hitstun > 0) return false;
   const base = ultimateBaseZ(f, move, stage, stageFrame);
   if (base === undefined) return false;
   const dx = f32(target.motion.x - f.motion.x);
@@ -363,7 +362,7 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
     }
     case Character.demonHunter: {
 
-      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap > EYE_BEAM_REACH && gap <= EYE_BEAM_EX_REACH && exSpecialAffordable(f) && affords(f, SpecialAction.demonHunterEyeBeam)
+      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap > EYE_BEAM_REACH && gap <= EYE_BEAM_EX_REACH && exCharged(f) && affords(f, SpecialAction.demonHunterEyeBeam)
         && Math.abs(f32(target.motion.z - motion.z)) <= 40.0 && takes(skill, floorDiv(frame, 30), f.character * 7 + 24) && botChoice(floorDiv(frame, 30), f.character * 7 + 25, 3) === 0) {
         pressSlot(input, SpecialSlot.neutral, 0);
         input.exPressed = true;

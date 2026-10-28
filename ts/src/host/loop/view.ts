@@ -55,6 +55,7 @@ import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera, probeWaiting } from "./responseProbe";
 import { clockSeconds } from "./trace";
 import { frameCaptureStage } from "../../platform/captureStage";
+import { exReady, ultimateReady } from "../../game/presentation/meterCues";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -559,7 +560,7 @@ export function lockArenaCamera(s: ShellState): void {
     SetCameraPosition(centerX, centerY);
   }
   views(s).items.present(game, world);
-  views(s).drops.present(game);
+  views(s).orbs.present(game, game.stageChoice, game.phase === Phase.match);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
@@ -602,10 +603,10 @@ export function renderUi(s: ShellState): void {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
       ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined);
-      ui.manaBars[slot].hud.update(showMatch, fighter.mana.points, fighter.visuals.manaDenied, fighter.visuals.manaDrained);
+      ui.meterBars[slot].hud.update(showMatch, fighter.meter.ex, fighter.meter.ultimate, exReady(fighter), ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained);
     } else {
       ui.huds[slot].update(false, Character.rifleman, slot, 0.0, 0);
-      ui.manaBars[slot].hud.update(false, 0, 0, 0);
+      ui.meterBars[slot].hud.update(false, 0, 0, false, false, 0);
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
     ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), s.sessionWins.counts);

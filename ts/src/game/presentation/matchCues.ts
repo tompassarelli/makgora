@@ -7,7 +7,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { fighterName } from "../roster/kits";
 import { MatchCue } from "./matchAudio";
-import { ROSTER_MANA } from "../sim/mana";
+import { METER, ultimateCharged } from "../sim/meter";
 import { TEAM_NAMES } from "../sim/teams";
 import { cpuProfileLabel } from "../match/cpuProfiles";
 import type { Character } from "../sim/codes";
@@ -31,7 +31,7 @@ export function createCueObservation(): CueObservation {
 export function observeForCues(observation: CueObservation, game: Readonly<MatchState>, world: Readonly<Roster>): void {
   observation.phase = game.phase;
   for (const slot of PARTICIPANT_SLOTS) observation.out[slot] = isActive(world, slot) && fighterAt(world, slot).status.out;
-  for (const slot of PARTICIPANT_SLOTS) observation.meter[slot] = isActive(world, slot) ? fighterAt(world, slot).mana.points : 0;
+  for (const slot of PARTICIPANT_SLOTS) observation.meter[slot] = isActive(world, slot) ? fighterAt(world, slot).meter.ultimate : 0;
   for (const slot of PARTICIPANT_SLOTS) {
     const candle = isActive(world, slot) ? fighterAt(world, slot).candle : undefined;
     observation.candleDrops[slot] = candle?.dropSerial ?? 0;
@@ -92,7 +92,7 @@ export function confirmedFrameCues(before: Readonly<CueObservation>, game: Reado
   if (countdown !== undefined) cues.push(countdown);
   tallyCombat(before.combat, world, tally.combat);
   for (const slot of PARTICIPANT_SLOTS) {
-    if (isActive(world, slot) && before.meter[slot] < ROSTER_MANA.max && fighterAt(world, slot).mana.points >= ROSTER_MANA.max) cues.push(MatchCue.meterReady);
+    if (isActive(world, slot) && before.meter[slot] < METER.ultimateFrames && ultimateCharged(fighterAt(world, slot))) cues.push(MatchCue.meterReady);
   }
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot) || before.out[slot]) continue;

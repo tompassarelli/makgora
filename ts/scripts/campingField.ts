@@ -4,17 +4,12 @@ import { ChildProcess } from "effect/process";
 import { parseArgs } from "node:util";
 import { runProcess } from "./hostProcess";
 import { type FieldOptions, type MatchRecord, playCpuField } from "./cpuField";
-import { DROP_VARIANTS, type DropVariant, isDropVariant } from "./dropVariants";
 import { SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 
-// #385's camping field: the fighter ahead on stocks camps, with drops off,
-// the shipped drops and each field variant, on the same matches. Shards run
-// as child processes (--workers, 4 by default) over interleaved fighter pairs.
-
-export const CAMPING_RULES = ["off", ...DROP_VARIANTS] as const;
+export const CAMPING_RULES = ["off", "orbs"] as const;
 export type CampingRule = (typeof CAMPING_RULES)[number];
-const isCampingRule = (value: string): value is CampingRule => value === "off" || isDropVariant(value);
+const isCampingRule = (value: string): value is CampingRule => CAMPING_RULES.some(rule => rule === value);
 
 export interface CampingMatch {
   readonly key: string;
@@ -23,7 +18,7 @@ export interface CampingMatch {
   readonly apartFrames: number;
   readonly bothInFrames: number;
   readonly campFrames: number;
-  readonly dropsTaken: number;
+  readonly orbsTaken: number;
 }
 
 function isShardOutput(value: unknown): value is Record<string, CampingMatch[]> {
@@ -34,17 +29,17 @@ function isShardOutput(value: unknown): value is Record<string, CampingMatch[]> 
 const compact = (record: MatchRecord): CampingMatch => ({
   key: `${record.fighters[0]}/${record.fighters[1]}/${record.stage}/${record.seed}/${record.variant}`,
   fighters: record.fighters, winner: record.winner, apartFrames: record.apartFrames, bothInFrames: record.bothInFrames,
-  campFrames: record.campFrames[0] + record.campFrames[1], dropsTaken: record.dropsTaken[0] + record.dropsTaken[1],
+  campFrames: record.campFrames[0] + record.campFrames[1], orbsTaken: record.orbsTaken[0] + record.orbsTaken[1],
 });
 
-const ruleOptions = (rule: CampingRule): Pick<FieldOptions, "drops" | "dropVariant"> =>
-  rule === "off" ? { drops: false } : rule === "shipped" ? { drops: true } : { drops: true, dropVariant: rule };
+const ruleOptions = (rule: CampingRule): Pick<FieldOptions, "orbs"> =>
+  ({ orbs: rule === "orbs" });
 
 export interface CampingSummary {
   readonly matches: number;
   readonly apartShare: number;
   readonly campShare: number;
-  readonly dropsPerMatch: number;
+  readonly orbsPerMatch: number;
   readonly winRates: Readonly<Record<string, number>>;
   readonly winSpread: number;
   readonly winRange: readonly [number, number];
@@ -70,17 +65,17 @@ function winRates(matches: readonly CampingMatch[]): Record<string, number> {
 
 /** The win spread is the standard deviation of the per-fighter win rates. */
 export function summarizeCamping(matches: readonly CampingMatch[]): CampingSummary {
-  let apart = 0, both = 0, camp = 0, drops = 0;
+  let apart = 0, both = 0, camp = 0, orbs = 0;
   for (const match of matches) {
     apart += match.apartFrames;
     both += match.bothInFrames;
     camp += match.campFrames;
-    drops += match.dropsTaken;
+    orbs += match.orbsTaken;
   }
   const rates = winRates(matches);
   const values = Object.values(rates);
   return {
-    matches: matches.length, apartShare: both === 0 ? 0 : apart / both, campShare: both === 0 ? 0 : camp / both, dropsPerMatch: drops / Math.max(1, matches.length),
+    matches: matches.length, apartShare: both === 0 ? 0 : apart / both, campShare: both === 0 ? 0 : camp / both, orbsPerMatch: orbs / Math.max(1, matches.length),
     winRates: rates, winSpread: values.length === 0 ? 0 : deviation(values), winRange: values.length === 0 ? [0, 0] : [Math.min(...values), Math.max(...values)],
   };
 }
@@ -138,7 +133,7 @@ const playShards = (rules: readonly CampingRule[], values: Record<string, string
 if (import.meta.main) {
   const { values } = parseArgs({ options: OPTIONS });
   const rules = (values.rules?.split(",") ?? [...CAMPING_RULES]).map(rule => {
-    if (!isCampingRule(rule)) throw new Error(`no drop rule ${rule}; one of ${CAMPING_RULES.join(", ")}`);
+    if (!isCampingRule(rule)) throw new Error(`no orb rule ${rule}; one of ${CAMPING_RULES.join(", ")}`);
     return rule;
   });
   if (values.shard !== undefined) {
@@ -161,7 +156,7 @@ if (import.meta.main) {
       const pp = (n: number) => `${n >= 0 ? "+" : ""}${(100 * n).toFixed(1)}`;
       const off = by.off;
       console.log(`camping field: ${by[rules[0] ?? "off"]?.length ?? 0} matches per rule (every pair of ${values.fighters?.split(",").length ?? SELECTABLE_CHARACTERS.length} fighters, both sides, stages ${values.stages ?? "frozen-throne,hellfire"}, ${values.seeds ?? 1} seed(s), ${values.tier ?? "expert"} vs ${values.tier ?? "expert"}, ${values.minutes ?? 4} min), ${workers} workers, ${((performance.now() - started) / 1000).toFixed(0)} s`);
-      console.log("| rule | apart | Δ apart vs off (95% CI) | win spread (SD) | Δ spread vs off (95% CI) | win range | camping | drops/match |");
+      console.log("| rule | apart | Δ apart vs off (95% CI) | win spread (SD) | Δ spread vs off (95% CI) | win range | camping | orbs/match |");
       console.log("|---|---|---|---|---|---|---|---|");
       for (const rule of rules) {
         const matches = by[rule] ?? [];
@@ -169,7 +164,7 @@ if (import.meta.main) {
         const ci = off === undefined || rule === "off" ? undefined : pairedIntervals(off, matches);
         const delta = (now: number, before: number, interval: readonly [number, number] | undefined) => interval === undefined ? "—" : `${pp(now - before)} pp [${pp(interval[0])}, ${pp(interval[1])}]`;
         const before = off === undefined ? undefined : summarizeCamping(off);
-        console.log(`| ${rule} | ${pct(summary.apartShare)} | ${delta(summary.apartShare, before?.apartShare ?? 0, ci?.apart)} | ${(100 * summary.winSpread).toFixed(1)} pp | ${delta(summary.winSpread, before?.winSpread ?? 0, ci?.spread)} | ${pct(summary.winRange[0])}–${pct(summary.winRange[1])} | ${pct(summary.campShare)} | ${summary.dropsPerMatch.toFixed(1)} |`);
+        console.log(`| ${rule} | ${pct(summary.apartShare)} | ${delta(summary.apartShare, before?.apartShare ?? 0, ci?.apart)} | ${(100 * summary.winSpread).toFixed(1)} pp | ${delta(summary.winSpread, before?.winSpread ?? 0, ci?.spread)} | ${pct(summary.winRange[0])}–${pct(summary.winRange[1])} | ${pct(summary.campShare)} | ${summary.orbsPerMatch.toFixed(1)} |`);
       }
     }), Effect.provide(BunServices.layer)));
   }

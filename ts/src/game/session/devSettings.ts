@@ -1,6 +1,6 @@
 import type { ShieldEnergyCapture } from "./shieldEnergyCapture";
 import { scheduleMatchItems } from "../match/centreItem";
-import { scheduleMeterDrops } from "../match/meterDrops";
+import { resetMatchOrbs } from "../sim/orbState";
 
 
 
@@ -232,7 +232,7 @@ export function prepareQuickMatch(game: MatchState, stage = 0, character?: Chara
 
   game.startHold = 0;
   scheduleMatchItems(game);
-  scheduleMeterDrops(game);
+  resetMatchOrbs(game.orbs);
   return true;
 }
 

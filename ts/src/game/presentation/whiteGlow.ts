@@ -1,5 +1,5 @@
 import { floorMod } from "wisp/src/sim/intMath";
-import { ROSTER_MANA } from "../sim/mana";
+import { ultimateCharged } from "../sim/meter";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { runningHeroSpecial } from "../sim/specials/engine";
@@ -14,19 +14,20 @@ export interface WhiteGlowState {
   remaining: number;
   total: number;
   frame: number;
-  meter: number;
+  charged: boolean;
   readyUntil: number;
 }
 
 export function createWhiteGlowState(): WhiteGlowState {
-  return { hit: 0, remaining: 0, total: 0, frame: -1, meter: 0, readyUntil: -1 };
+  return { hit: 0, remaining: 0, total: 0, frame: -1, charged: false, readyUntil: -1 };
 }
 
 
 export function whiteGlowAlpha(state: WhiteGlowState, fighter: Readonly<Fighter>, frame: number): number {
   const remaining = fighter.launch.hitlag;
-  if (fighter.mana.points >= ROSTER_MANA.max && state.meter < ROSTER_MANA.max) state.readyUntil = frame + 12;
-  state.meter = fighter.mana.points;
+  const charged = ultimateCharged(fighter);
+  if (charged && !state.charged) state.readyUntil = frame + 12;
+  state.charged = charged;
   if (remaining <= 0 || fighter.status.out) state.total = 0;
   else if (state.hit !== fighter.visuals.hit || remaining > state.remaining || frame < state.frame) state.total = remaining;
   state.hit = fighter.visuals.hit;

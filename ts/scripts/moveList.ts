@@ -47,7 +47,7 @@ export function moveListMarkdown(): string {
     "normals are named by their input (forward tilt, forward air, down smash,",
     "pummel, up throw). A normal's",
     "\"inspired by\" note is a design reference, not a name. An ultimate is",
-    "Attack + Special together at a full bar (docs/design/ultimates.md), unless",
+    "Attack + Special together at a full ultimate meter (docs/design/ultimates.md), unless",
     "the match's Ultimates rule is off. Ground movement is in Melee units a frame,",
     "inside Melee's roster spread (smashcraft:docs/gameplay-design.md,",
     "\"Ground states and the stick map\").",

@@ -13,5 +13,5 @@ export const meterRimChecks = (rules: readonly Rule[]): NativeCheck[] => MORPHS.
   setup: [{ waitMs: 3000 }, { chat: "-dev meter 100" }, { waitMs: 1200 }, { keys: [keys], client: "a" }],
   capture: [{ kind: "frames", name: id, client: "a", count: 40, everyMs: 50 }],
   pass: [...rules],
-  look: `${look}. With a full bar both fighters wear a breathing gold outline. While he is in the other form, no gold outline of his normal body shows round it; on the frames after he is back in his own model the gold outline is round him again.`,
+  look: `${look}. With a full ultimate meter both fighters wear a breathing gold outline. While he is in the other form, no gold outline of his normal body shows round it; on the frames after he is back in his own model the gold outline is round him again.`,
 }));

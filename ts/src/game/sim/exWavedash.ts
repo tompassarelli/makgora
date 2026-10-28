@@ -1,7 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
-import { exSpecialAffordable } from "./exSpecials";
 import type { Fighter } from "./fighter";
-import { ROSTER_MANA, spendMana } from "./mana";
+import { exCharged, spendEx } from "./meter";
 import { melee } from "./tuning";
 
 export const EX_WAVEDASH_SPEED = melee(f32(0.625));
@@ -9,9 +8,9 @@ export const EX_WAVEDASH_SPEED = melee(f32(0.625));
 export function landExWavedash(f: Fighter): void {
   const { dodge, motion } = f;
   if (motion.grounded) return;
-  dodge.ex = dodge.airDodging && dodge.ex && motion.vx !== 0 && exSpecialAffordable(f);
+  dodge.ex = dodge.airDodging && dodge.ex && motion.vx !== 0 && exCharged(f);
   if (!dodge.ex) return;
-  spendMana(f, ROSTER_MANA.exCost);
+  spendEx(f);
   motion.vx = f32(motion.vx + (motion.vx > 0 ? EX_WAVEDASH_SPEED : -EX_WAVEDASH_SPEED));
 }
 

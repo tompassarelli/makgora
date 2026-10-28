@@ -1,5 +1,5 @@
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/participants";
-import { Phase, firstHumanSlot, setEndless, setItemsOn, setMeterDropsOn, setParticipants, setUltimatesOn, stageClock, updateConnectedHumans } from "../../game/lobby/lobbyState";
+import { Phase, firstHumanSlot, setEndless, setItemsOn, setOrbsOn, setParticipants, setUltimatesOn, stageClock, updateConnectedHumans } from "../../game/lobby/lobbyState";
 import { SHOWCASE_PAD_X, type ShowcasePads, type ShowcaseRequest, applyShowcaseRequest, copyShowcasePads, createShowcasePads, padName, showcaseMask } from "../../game/session/showcase";
 import { STAGE_EDGE_LIGHT_MODEL } from "../../game/presentation/stageEdgeLights";
 import { Character } from "../../game/sim/codes";
@@ -38,7 +38,7 @@ export function applyShowcaseSetup(s: ShellState, pads: Readonly<ShowcasePads>):
   updateConnectedHumans(game, 15);
   setEndless(game, actor, true);
   setItemsOn(game, actor, false);
-  setMeterDropsOn(game, actor, false);
+  setOrbsOn(game, actor, false);
   setUltimatesOn(game, actor, true);
   game.hazards = false;
   startQuickMatch(s, SHOWCASE_STAGE, s.build.scenario, pads.fighters.map(character => character ?? Character.rifleman));

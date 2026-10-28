@@ -13,6 +13,7 @@ import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_HIT, createImpactState, emit
 import { impactColour } from "./hitPresentation";
 import { type SpherePose, emptySpherePose, fighterOrbit, spherePose, thrownSphere } from "./sphereOrbit";
 import { eggShown, emptyFlightPose, fighterFlight, flightFlamesPose } from "./flightLook";
+import { fillMeter } from "../sim/meter";
 
 function sparkKind(element: HitElement): number {
   const state = createImpactState();
@@ -22,7 +23,7 @@ function sparkKind(element: HitElement): number {
 
 function kael(z = 0.0) {
   const pair = duelPair(createFighter(Character.kaelthas, 0.0, 1), createFighter(Character.rifleman, -600.0, 1));
-  pair.owner.mana.points = 100;
+  fillMeter(pair.owner);
   if (z > 0.0) lift(pair.owner, z);
   return pair;
 }

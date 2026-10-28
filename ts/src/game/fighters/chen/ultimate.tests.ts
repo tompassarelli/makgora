@@ -9,7 +9,7 @@ import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../r
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, SpecialAction } from "../../sim/codes";
 import { type Fighter, createFighter, placedObject } from "../../sim/fighter";
-import { ROSTER_MANA } from "../../sim/mana";
+import { fillMeter } from "../../sim/meter";
 import { fighterAt } from "../../sim/roster";
 import { CompanionMode } from "../../sim/specials/schema";
 import { EARTH_SPIRIT, FIRE_SPIRIT, STORM_SPIRIT } from "../../sim/ultimates";
@@ -39,7 +39,7 @@ function duel(foeX: number, foeFacing = -1): Duel {
   state.match.hazards = false;
   state.match.items.on = false;
   state.match.timeLimitMinutes = 0;
-  chen.mana.points = ROSTER_MANA.max;
+  fillMeter(chen);
   return { state, chen, foe, tick: 0 };
 }
 

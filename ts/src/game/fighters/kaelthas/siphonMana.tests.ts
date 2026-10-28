@@ -8,6 +8,7 @@ import { duelPair, stepDuel } from "../../sim/testDuel";
 import { controls, testBeginAttacks } from "../../sim/testWorld";
 import { KAELTHAS_MOVES } from "./moves";
 import { SELECTABLE_CHARACTERS } from "../../roster/kits";
+import { setMeterPercent } from "../../sim/meter";
 
 const TETHER_GAP = 150.0;
 const WHIFF_GAP = 400.0;
@@ -55,14 +56,14 @@ test("Siphon Mana's pummel deals damage and nothing else: no heal, no mana beyon
   for (let frame = 0; frame < 40 && target.grab.owner === undefined; frame++) stepDuel(world);
   assertEquals(target.grab.owner, 0);
   while (kael.grab.action !== GrabAction.hold) stepDuel(world);
-  target.mana.points = 50;
-  const before = { kaelDamage: kael.status.damage, targetDamage: target.status.damage, kaelMana: kael.mana.points, targetMana: target.mana.points };
+  setMeterPercent(target, 50);
+  const before = { kaelDamage: kael.status.damage, targetDamage: target.status.damage, kaelMeter: kael.meter.ultimate, targetMeter: target.meter.ultimate };
   stepDuel(world, controls({ attackPressed: true }));
   for (let frame = 0; frame < 12 && target.status.damage === before.targetDamage; frame++) stepDuel(world);
   const dealt = f32(target.status.damage - before.targetDamage);
   assertTrue(dealt > 0.0);
   assertEquals(kael.status.damage, before.kaelDamage);
-  assertEquals(kael.mana.points - before.kaelMana, target.mana.points - before.targetMana);
+  assertEquals(kael.meter.ultimate - before.kaelMeter, target.meter.ultimate - before.targetMeter);
   assertEquals(target.grab.owner, 0);
   assertEquals(target.launch.knockbackX, 0.0);
   assertEquals(target.launch.knockbackZ, 0.0);

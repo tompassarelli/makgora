@@ -8,7 +8,7 @@ import { PunishKind, type PunishWindow, punishWindow } from "./botPunish";
 import { BURN_MEMORY_FRAMES, type BotStrategy } from "./botStrategy";
 
 const BURN_MARGIN = 30.0;
-// Only a move that hits twice running is kept clear of (#412): after one hit the computer plays on, so a full bar still goes to its ultimate (#382).
+// Only a move that hits twice running is kept clear of (#412): after one hit the computer plays on, so a full ultimate meter still goes to its ultimate (#382).
 const BURN_REPEATS = 2;
 const opening: PunishWindow = { frames: 0, kind: PunishKind.none, elapsed: 0, key: 0, earliest: 0 };
 

@@ -1,6 +1,7 @@
 /// <reference types="lua-types/5.3" />
 /// <reference path="../../node_modules/wisp/src/natives/warcraft.d.ts" />
 import { homedir } from "node:os";
+import { fillMeter } from "../../src/game/sim/meter";
 import { join } from "node:path";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { BunServices } from "@effect/platform-bun";
@@ -42,9 +43,10 @@ import { beginDownState } from "../../src/game/sim/transitions";
 import { DOWN_WAIT_FRAMES } from "../../src/game/sim/down";
 import { snapToLedge } from "../../src/game/sim/ledge";
 import { advanceFighter } from "../../src/game/sim/step";
-import { DROP_TELEGRAPH_FRAMES, advanceMeterDrops, meterDropPoint } from "../../src/game/match/meterDrops";
+import { advanceOrbs } from "../../src/game/match/orbs";
+import { ORB_INTERVAL_FRAMES, ORB_WARNING_FRAMES, orbPoint } from "../../src/game/sim/orbs";
 import { Phase, createMatchState } from "../../src/game/lobby/lobbyState";
-import { MeterDropPresentation } from "../../src/game/render/meterDropPresentation";
+import { OrbPresentation } from "../../src/game/render/orbPresentation";
 import { CandlePresentation } from "../../src/game/render/candlePresentation";
 import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL } from "../../src/game/fighters/kobold/candle";
 import { CombatEffects } from "../../src/game/render/combatEffects";
@@ -78,7 +80,7 @@ export interface CueMove {
   readonly air?: boolean;
   readonly ex?: boolean;
   readonly ultimate?: true;
-  readonly drop?: boolean;
+  readonly orb?: boolean;
   readonly spark?: "strong" | "weak";
   readonly candleHeat?: number;
 }
@@ -150,7 +152,7 @@ export function cueMoves(): CueMove[] {
     for (const { form, air, label } of specialForms(character, slot)) for (const ex of [false, true]) moves.push({ character, name: `${fighterSlug(character)}:${special.slot}-special${label}${ex ? "-ex" : ""}`, special, form, air, ex });
   }
   for (const character of Object.values(Character)) moves.push({ character, name: `${fighterSlug(character)}:ultimate`, ultimate: true });
-  moves.push({ character: Character.rifleman, name: "meter-drop:telegraph-and-orb", drop: true });
+  moves.push({ character: Character.rifleman, name: "orb:warning-and-orb", orb: true });
   for (const level of [0, CANDLE_MAX_LEVEL]) moves.push({ character: Character.kobold, name: `kobold:candle-level${level}`, candleHeat: level * CANDLE_LEVEL_HEAT });
   for (const spark of ["strong", "weak"] as const) moves.push({ character: Character.blademaster, name: `blademaster:forwardSmash-${spark}-spark`, style: AttackStyle.forwardSmash, spark });
   return moves;
@@ -292,31 +294,29 @@ function aimNear(x: number, z: number): void {
   SetCameraPosition(x, PLAYABLE_BOUNDS.centreY);
 }
 
-function dropScenes(): ReturnType<typeof cueScenes> {
+function orbScenes(): ReturnType<typeof cueScenes> {
   const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
     clients.start();
     const origin = { x: 0.0, y: PLAYABLE_BOUNDS.centreY, z: FLOOR_HEIGHT };
-    let drops: MeterDropPresentation | undefined;
-    client.run(() => { drops = new MeterDropPresentation(origin); });
-    if (drops === undefined) throw new Error("missing drop renderer");
+    let orbs: OrbPresentation | undefined;
+    client.run(() => { orbs = new OrbPresentation(origin); });
+    if (orbs === undefined) throw new Error("missing orb renderer");
     const game = createMatchState();
     game.phase = Phase.match;
     game.stageChoice = 0;
-    game.drops.nextSpawnFrame = DROP_TELEGRAPH_FRAMES + 1;
-    game.drops.nextPoint = 0;
-    game.drops.draws = 1;
+    const first = ORB_INTERVAL_FRAMES - ORB_WARNING_FRAMES - 1;
     const world = createRoster(1, [createFighter(Character.rifleman, 1000.0, 1)]);
-    const point = meterDropPoint(0, 0);
+    const point = orbPoint(0);
     const scenes: RenderScene[] = [];
     let empty: RenderScene | undefined;
     for (let tick = 0; tick < LIMIT; tick++) {
-      game.matchFrame = tick + 1;
-      advanceMeterDrops(game, world);
-      const shown = drops;
-      client.run(() => { shown.present(game); aimNear(origin.x + point.x, point.z); });
+      game.matchFrame = first + tick;
+      advanceOrbs(game, world);
+      const shown = orbs;
+      client.run(() => { shown.present(game, game.stageChoice, true); aimNear(origin.x + point.x, point.z); });
       clients.frames(1);
       const scene = captureScene(client, { visibleOnly: true });
       empty ??= { ...scene, frame: -1, effects: [] };
@@ -355,7 +355,7 @@ function candleScenes(heat: number): ReturnType<typeof cueScenes> {
 }
 
 export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback?: string; readonly expected?: readonly string[] } {
-  if (move.drop === true) return dropScenes();
+  if (move.orb === true) return orbScenes();
   if (move.spark !== undefined) return sparkScenes(move);
   if (move.candleHeat !== undefined) return candleScenes(move.candleHeat);
   const runtime = installHeadless(SMASHCRAFT_HEADLESS);
@@ -377,7 +377,7 @@ export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; read
     const f = createFighter(move.character, 0.0, 1);
     const specialState = createSpecialEffectState();
     const summonState = createSummonState();
-    f.mana.points = 100;
+    fillMeter(f);
     const world = createRoster(1, [f]);
     const idle = neutralControls();
     for (let frame = 0; frame < 3; frame++) step(world, idle);

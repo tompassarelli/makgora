@@ -16,7 +16,7 @@ import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProject
 import type { HitEffect } from "../sim/hitRegions";
 import { type HurtPart, HurtState } from "../sim/hurtboxes";
 import { writeMatchItems } from "../match/items";
-import { writeMatchMeterDrops } from "../match/meterDrops";
+import { writeMatchOrbs } from "../sim/orbState";
 import type { Fighter } from "../sim/fighter";
 import { CONTROL_FIELDS, fighterAt, isActive } from "../sim/roster";
 import { writeTrainingState } from "../match/trainingState";
@@ -852,7 +852,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   if (match.startHold !== 0) int("match.startHold", match.startHold);
   writeMatchItems(match.items, int, bool);
   if (match.ultimatesOff) bool("match.ultimatesOff", true);
-  writeMatchMeterDrops(match.drops, int, bool);
+  writeMatchOrbs(match.orbs, int, bool);
   bool("match.timedOut", match.timedOut);
   bool("match.practice", match.practice);
 

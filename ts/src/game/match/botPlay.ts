@@ -9,12 +9,13 @@ import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS, type ParticipantSlot, type Slo
 import { DownState, GrabAction, ShieldBreak } from "../sim/codes";
 import { heroStatusBlocksActions, heroStatusMashes } from "../sim/heroStatus";
 import type { Fighter } from "../sim/fighter";
-import { exSpecialAffordable } from "../sim/exSpecials";
 import { Character, SpecialAction } from "../sim/codes";
 import { isSmashAttack } from "../sim/moves";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, surfacePass } from "../sim/stage";
-import { DROP_TELEGRAPH_FRAMES, contestedDropPoint, meterDropPoint } from "./meterDrops";
+import { ORB_WARNING_FRAMES, orbPoint, orbWarningFrames, orbsActive, warnedOrb } from "../sim/orbs";
+import { OrbKind } from "../sim/orbState";
+import { exCharged } from "../sim/meter";
 import { type FighterGameplan, GameplanThrow } from "../sim/gameplan";
 import { SPACE_PLAN, avoids, gameplanGoal, gameplanOf, gameplanPlan, gameplanThrow, jumpsIn, keptGap, onAnotherDeck, plansRanged, spacingAerialAt } from "./botGameplan";
 import { steerInAir, steerOnGround } from "./botFooting";
@@ -166,14 +167,18 @@ function approachByGameplan(f: Readonly<Fighter>, target: Readonly<Fighter>, sta
   }
 }
 
-const DROP_STEP = 40.0;
+const CLIMB_STEP = 40.0;
 
-export function dropContest(game: Readonly<MatchState>, fighter: Readonly<Fighter>, slot: ParticipantSlot, skill: CpuSkill): number {
-  const { drops } = game;
-  const point = contestedDropPoint(drops, game.matchFrame);
-  if (point < 0 || game.training) return -1;
-  if (drops.point < 0 && game.matchFrame < drops.nextSpawnFrame - DROP_TELEGRAPH_FRAMES + skill.contestDelay) return -1;
-  return botChance(drops.draws, slot * 29 + fighter.character, skill.contestTenths, 10) ? point : -1;
+export function orbContest(game: Readonly<MatchState>, fighter: Readonly<Fighter>, slot: ParticipantSlot, skill: CpuSkill): boolean {
+  const { orbs } = game;
+  if (!orbsActive(game)) return false;
+  if (orbs.live === OrbKind.none) {
+    if (warnedOrb(game) === OrbKind.none) return false;
+    const left = orbWarningFrames(game);
+    if (orbs.held === OrbKind.none && left !== undefined && left > ORB_WARNING_FRAMES - skill.contestDelay) return false;
+  }
+  const serial = orbs.live === OrbKind.none ? orbs.spawnSerial + 1 : orbs.spawnSerial;
+  return botChance(serial, slot * 29 + fighter.character, skill.contestTenths, 10);
 }
 
 export function approachPoint(f: Readonly<Fighter>, stage: number, x: number, z: number, frame: number, input: Controls): void {
@@ -182,7 +187,7 @@ export function approachPoint(f: Readonly<Fighter>, stage: number, x: number, z:
   const dz = f32(z - motion.z);
   if (!motion.grounded) {
     steerInAir(f, stage, x, input);
-    if (dz > DROP_STEP && motion.vz < 0 && f.jump.remaining > 0 && Math.abs(dx) < 200) {
+    if (dz > CLIMB_STEP && motion.vz < 0 && f.jump.remaining > 0 && Math.abs(dx) < 200) {
       input.jumpPressed = true;
       input.jumpHeld = true;
     }
@@ -190,14 +195,14 @@ export function approachPoint(f: Readonly<Fighter>, stage: number, x: number, z:
   }
   steerOnGround(f, stage, x, input);
   if (f.jump.squat > 0) {
-    input.jumpHeld = dz > DROP_STEP;
+    input.jumpHeld = dz > CLIMB_STEP;
     return;
   }
-  if (motion.surface !== undefined && surfacePass(stage, motion.surface) && dz < -DROP_STEP) {
+  if (motion.surface !== undefined && surfacePass(stage, motion.surface) && dz < -CLIMB_STEP) {
     input.down = floorMod(frame, 8) < 4;
     return;
   }
-  if (dz > DROP_STEP && Math.abs(dx) < 260) {
+  if (dz > CLIMB_STEP && Math.abs(dx) < 260) {
     input.jumpPressed = true;
     input.jumpHeld = true;
   }
@@ -297,7 +302,7 @@ const negativeZero = (value: number): boolean => value === 0 && 1 / value < 0;
  * it did from `before`, so it decides the same. It reads the match seed, the
  * slot's identity and tier, training, the stage and its clock, the time
  * limit, the slot's own fighter, its perceived sample and committed
- * direction, its strategy, its attack delay and the meter drop it contests;
+ * direction, its strategy, its attack delay and the orb it contests;
  * its candle play reads only its own fighter and that perceived sample;
  * a new read joins this list.
  * `fighterSame` says the slot's fighter is known to equal the earlier one.
@@ -312,7 +317,7 @@ export function sameComputerInputs(game: Readonly<MatchState>, world: Readonly<R
   const fighter = fighterAt(world, slot);
   const skill = cpuSkill(opponent, tier);
   useMatchSeed(game.matchSeed);
-  const contest = dropContest(game, fighter, slot, skill) === dropContest(before, fighterAt(beforeWorld, slot), slot, skill);
+  const contest = orbContest(game, fighter, slot, skill) === orbContest(before, fighterAt(beforeWorld, slot), slot, skill);
   useMatchSeed(0);
   if (!contest) return false;
   const attackDelay = runtime.botAttackDelays[slot];
@@ -353,7 +358,7 @@ export function repeatComputerInput(world: Readonly<Roster>, runtime: BotRuntime
 export function upgradeThreatenedSpecial(fighter: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {
   if (target === undefined || !input.specialPressed || fighter.special.action !== SpecialAction.none
     || target.attack.style === undefined || Math.abs(f32(target.motion.x - fighter.motion.x)) > 140.0
-    || Math.abs(f32(target.motion.z - fighter.motion.z)) > 140.0 || !exSpecialAffordable(fighter)) return;
+    || Math.abs(f32(target.motion.z - fighter.motion.z)) > 140.0 || !exCharged(fighter)) return;
   if (fighter.character === Character.demonHunter && input.specialX === 0 && input.specialZ === 0) return;
   input.exPressed = true;
 }
@@ -431,7 +436,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     return;
   }
   const targetOnStage = target.motion.x >= mainDeckLeft(stage) && target.motion.x <= mainDeckRight(stage) && target.motion.z >= 0.0;
-  const drop = targetOnStage ? dropContest(game, fighter, slot, skill) : -1;
+  const contest = targetOnStage && orbContest(game, fighter, slot, skill);
   if (gameplan === undefined) {
     const plan = planFor(fighter, slot, frame);
     if (delay <= 0 && chooseAttack(fighter, target, stage, stageFrame, frame, plan === Plan.range, input, commands, slot, SPACE_PLAN, skill, observationAge, { strategy: runtime.botStrategies[slot], policy: skill.decision, game })) {
@@ -439,7 +444,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
       if (!fighter.motion.grounded) steerInAir(fighter, stage, target.motion.x, input);
       return;
     }
-    if (drop >= 0) approachPoint(fighter, stage, meterDropPoint(stage, drop).x, meterDropPoint(stage, drop).z, frame, input);
+    if (contest) approachPoint(fighter, stage, orbPoint(stage).x, orbPoint(stage).z, frame, input);
     else if (pressing) steerOnGround(fighter, stage, pokeGoal(target), input);
     else approach(fighter, target, stage, plan, frame, input);
     return;
@@ -450,7 +455,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     if (!fighter.motion.grounded) steerInAir(fighter, stage, gameplanGoal(gameplan, fighter, target, stage, gameplan.range.near), input);
     return;
   }
-  if (drop >= 0) approachPoint(fighter, stage, meterDropPoint(stage, drop).x, meterDropPoint(stage, drop).z, frame, input);
+  if (contest) approachPoint(fighter, stage, orbPoint(stage).x, orbPoint(stage).z, frame, input);
   else if (pressing) steerOnGround(fighter, stage, pokeGoal(target), input);
   else if (delay <= 0 && lastChoicePassedForVariety()) approach(fighter, target, stage, Plan.ground, frame, input);
   else approachByGameplan(fighter, target, stage, gameplan, slot, planIndex, frame, input, skill);

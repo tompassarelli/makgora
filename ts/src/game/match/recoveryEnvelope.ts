@@ -15,6 +15,7 @@ import { ledgeCatchBox } from "../sim/ledge";
 import { mainDeckRight } from "../sim/stage";
 import { captureNetworkFrame, executeMatchFrame } from "./frameInput";
 import { type TestMatch, testMatch } from "./testMatch";
+import { setMeterPercent } from "../sim/meter";
 
 
 const STAGE_CHOICE = 0;
@@ -67,7 +68,7 @@ export interface RecoveryRun {
 }
 
 
-export function recoveryRun(character: Character, mana: number, x: number, z: number): RecoveryRun {
+export function recoveryRun(character: Character, meterPercent: number, x: number, z: number): RecoveryRun {
   const match = testMatch(3, character);
   match.game.stageChoice = STAGE_CHOICE;
   const fighter = createFighter(character, x, -1);
@@ -77,7 +78,7 @@ export function recoveryRun(character: Character, mana: number, x: number, z: nu
   fighter.motion.surface = undefined;
   fighter.motion.z = z;
   fighter.jump.remaining = 1;
-  fighter.mana.points = mana;
+  setMeterPercent(fighter, meterPercent);
   return { match, fighter, capture: keyboardCapture() };
 }
 
@@ -108,8 +109,8 @@ export const recovered = (f: Fighter): boolean => f.ledge.state !== LedgeState.n
 const busy = (f: Fighter): boolean => f.special.action !== SpecialAction.none || f.dodge.airDodging;
 
 
-export function recovers(character: Character, mana: number, x: number, z: number, plan: Readonly<RecoveryPlan>): boolean {
-  const run = recoveryRun(character, mana, x, z);
+export function recovers(character: Character, meterPercent: number, x: number, z: number, plan: Readonly<RecoveryPlan>): boolean {
+  const run = recoveryRun(character, meterPercent, x, z);
   const f = run.fighter;
   const lowest = f32(-ledgeCatchBox(character).highest - 30.0);
 
@@ -157,12 +158,12 @@ export function recovers(character: Character, mana: number, x: number, z: numbe
 }
 
 
-function anyRecovers(character: Character, mana: number, x: number, z: number, hint: { index: number }): boolean {
+function anyRecovers(character: Character, meterPercent: number, x: number, z: number, hint: { index: number }): boolean {
   const count = RECOVERY_PLANS.length;
   for (let k = 0; k < count; k++) {
     let index = hint.index + k;
     if (index >= count) index -= count;
-    if (recovers(character, mana, x, z, assertDefined(RECOVERY_PLANS[index], "plan"))) {
+    if (recovers(character, meterPercent, x, z, assertDefined(RECOVERY_PLANS[index], "plan"))) {
       hint.index = index;
       return true;
     }
@@ -192,11 +193,11 @@ interface RecoveryEnvelope {
 }
 
 
-export function recoveryEnvelope(character: Character, mana: number): RecoveryEnvelope {
+export function recoveryEnvelope(character: Character, meterPercent: number): RecoveryEnvelope {
   const hint = { index: 0 };
-  const height = search(MAX_DEPTH, (depth) => anyRecovers(character, mana, f32(LEDGE_X + HEIGHT_PROBE_OUT), -depth, hint));
+  const height = search(MAX_DEPTH, (depth) => anyRecovers(character, meterPercent, f32(LEDGE_X + HEIGHT_PROBE_OUT), -depth, hint));
   hint.index = 0;
-  const reach = search(MAX_REACH, (out) => anyRecovers(character, mana, f32(LEDGE_X + out), -REACH_PROBE_DEPTH, hint));
+  const reach = search(MAX_REACH, (out) => anyRecovers(character, meterPercent, f32(LEDGE_X + out), -REACH_PROBE_DEPTH, hint));
   return { height, reach };
 }
 
@@ -212,8 +213,8 @@ const ROUTE_X = 700.0;
 const ROUTE_Z = 300.0;
 
 
-function route(character: Character, mana: number, hold: (frame: number) => number): UpSpecialRoute {
-  const run = recoveryRun(character, mana, ROUTE_X, ROUTE_Z);
+function route(character: Character, meterPercent: number, hold: (frame: number) => number): UpSpecialRoute {
+  const run = recoveryRun(character, meterPercent, ROUTE_X, ROUTE_Z);
   const f = run.fighter;
   f.facing = 1;
   f.jump.remaining = 0;
@@ -230,11 +231,11 @@ function route(character: Character, mana: number, hold: (frame: number) => numb
 }
 
 
-export function upSpecialRoute(character: Character, mana: number): UpSpecialRoute {
-  const rise = route(character, mana, () => UP).rise;
+export function upSpecialRoute(character: Character, meterPercent: number): UpSpecialRoute {
+  const rise = route(character, meterPercent, () => UP).rise;
   let reach = 0.0;
   for (const plan of [() => AWAY | UP, () => AWAY, (frame: number) => frame === 20 ? AWAY | SPECIAL : AWAY, (frame: number) => frame === 20 ? AWAY | UP | SPECIAL : AWAY]) {
-    const across = route(character, mana, plan).reach;
+    const across = route(character, meterPercent, plan).reach;
     if (across > reach) reach = across;
   }
   return { rise: Math.round(rise), reach: Math.round(reach) };

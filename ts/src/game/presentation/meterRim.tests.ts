@@ -3,7 +3,7 @@ import { Character, HeroStatusGroup, HeroStatusKind, SpecialAction } from "../si
 import { type Fighter, createFighter } from "../sim/fighter";
 import { applyHeroStatus } from "../sim/heroStatus";
 import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
-import { ROSTER_MANA } from "../sim/mana";
+import { fillMeter } from "../sim/meter";
 import type { Roster } from "../sim/roster";
 import { becomeEgg } from "../sim/specials/engine";
 import { duelPair, lift, stepDuel } from "../sim/testDuel";
@@ -20,7 +20,7 @@ function fullPair(character: Character, z = 0.0) {
 }
 
 function rim(fighter: Readonly<Fighter>): string {
-  const color = meterGlowColor(fighter, false);
+  const color = meterGlowColor(fighter, false, 0);
   assertTrue(color === undefined || color === FULL_GLOW);
   return color === undefined ? HIDDEN : SHOWN;
 }
@@ -28,12 +28,12 @@ function rim(fighter: Readonly<Fighter>): string {
 function trace(world: Roster, owner: Fighter, first: ReturnType<typeof controls>, morphed: (fighter: Readonly<Fighter>) => boolean, limit = 400): { rim: string; morph: string } {
   let rims = "", morphs = "";
   for (let frame = 0; frame < limit; frame++) {
-    owner.mana.points = ROSTER_MANA.max;
+    fillMeter(owner);
     rims += rim(owner);
     morphs += morphed(owner) ? HIDDEN : SHOWN;
     stepDuel(world, frame === 0 ? first : controls());
   }
-  owner.mana.points = ROSTER_MANA.max;
+  fillMeter(owner);
   rims += rim(owner);
   morphs += morphed(owner) ? HIDDEN : SHOWN;
   return { rim: rims, morph: morphs };
@@ -50,7 +50,7 @@ function assertHiddenThroughMorph(run: { rim: string; morph: string }): void {
   assertEquals(run.rim, run.morph);
 }
 
-test("The meter rim hides on the first frame of every model-swapping state and returns on the first frame back in the normal model, at a full bar [k3 measure #499]", () => {
+test("The meter rim hides on the first frame of every model-swapping state and returns on the first frame back in the normal model, at full meters [k3 measure #499]", () => {
   const stag = fullPair(Character.malfurion);
   assertHiddenThroughMorph(trace(stag.world, stag.owner, controls({ specialPressed: true, specialX: 1 }), (f) => f.special.action === SpecialAction.heroSide && specialCueState(f).phase === "active"));
 
