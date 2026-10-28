@@ -101,6 +101,5 @@ export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
   return {
     ...kit, ground: withEx(kit.ground),
     air: form(kit.air), recall: form(kit.recall),
-    marked: kit.marked === undefined ? undefined : { ...kit.marked, special: withEx(kit.marked.special) },
   };
 }

@@ -130,12 +130,6 @@ export function ordinaryHitstunFrames(knockback: number): number {
   return max(1, toInt(f32(knockback * HITSTUN_FRAMES_PER_KNOCKBACK)));
 }
 
-export const STUN_KNOCKBACK = 10.0;
-const STUN_FRAMES_PER_PERCENT = 0.10000000149011612;
-
-export function stunHitstunFrames(stunFrames: number, postHitPercent: number): number {
-  return stunFrames + toInt(multiplyFloat32(STUN_FRAMES_PER_PERCENT, roundToFloat32(postHitPercent)));
-}
 
 export function damageLevelForKnockback(knockback: number): number {
   if (knockback >= TUMBLE_KNOCKBACK) return 3;

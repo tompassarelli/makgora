@@ -318,7 +318,7 @@ After the baseline (#303-#308). Her targets come from Fox's ground game
 (neutral air and jab into grab at low percent, down air into her down special,
 up throw into up air by DI) and his up air strings, written as objectives;
 the Falco-style vertical game is Illidan's (#457). The identity guard
-keeps her Maiev: marks, poison, Blink, Shadow Pursuit stun and Fan of Knives;
+keeps her Maiev: poison, Blink, Shadow Dash and Fan of Knives;
 no reflector-like shine loop, no laser. Order: targets (Tom approves), her own
 physics record inside the Melee spread, aerials, ground game and throws, edge
 guard, then a balance field.

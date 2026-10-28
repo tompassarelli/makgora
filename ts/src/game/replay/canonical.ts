@@ -349,7 +349,6 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
     + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "")
     + optionalField(`${prefix}.manaSteal`, hit.manaSteal, canonicalInt)
     + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
-    + optionalField(`${prefix}.stunFrames`, hit.stunFrames, canonicalInt)
     + optionalField(`${prefix}.shieldDamage`, hit.shieldDamage, canonicalRealField);
 }
 
@@ -362,7 +361,7 @@ export function fighterSpecialsCanonical(specials: Readonly<FighterSpecials> | u
     const kit = at(kits, slot);
     if (kit.recallGroundOnly === true) result.push(canonicalInt(`${prefix}.kit[${slot}].recallGroundOnly`, 1));
     if (kit.recallWhile !== undefined) result.push(canonicalInt(`${prefix}.kit[${slot}].recallWhile`, kit.recallWhile === "armor" ? 2 : 1));
-    const forms = [kit.ground, kit.air, kit.recall, kit.marked?.special];
+    const forms = [kit.ground, kit.air, kit.recall];
     // Use the fixed count because Lua length skips undefined forms.
     for (let form = 0; form < 6; form++) {
       const move = forms[form];
@@ -370,7 +369,6 @@ export function fighterSpecialsCanonical(specials: Readonly<FighterSpecials> | u
       const name = `${prefix}.kit[${slot}].form[${form}]`;
       result.push(specialMoveCanonical(move, name));
     }
-    if (kit.marked !== undefined) result.push(canonicalRealField(`${prefix}.kit[${slot}].markedRange`, kit.marked.range));
   }
   return result.join("");
 }
@@ -416,6 +414,14 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
   if (move.jumpWindow !== undefined) {
     int("jumpWindow.first", move.jumpWindow.first);
     int("jumpWindow.last", move.jumpWindow.last);
+  }
+  if (move.shorten !== undefined) {
+    int("shorten.first", move.shorten.first);
+    int("shorten.last", move.shorten.last);
+  }
+  if (move.hitRecovery !== undefined) {
+    int("hitRecovery.from", move.hitRecovery.from);
+    int("hitRecovery.frames", move.hitRecovery.frames);
   }
   if (move.placement !== undefined) result.push(specialPlacementCanonical(move.placement, `${name}.placement`));
   move.summons?.forEach((summon, index) => result.push(specialPlacementCanonical(summon, `${name}.summons[${index}]`)));
@@ -1064,7 +1070,6 @@ export function prepareKitDigests(): void {
       const forms: AuthoredSpecial[] = [kit.ground];
       if (kit.air !== undefined) forms.push(kit.air);
       if (kit.recall !== undefined) forms.push(kit.recall);
-      if (kit.marked !== undefined) forms.push(kit.marked.special);
       for (const branch of kit.ground.followUps ?? []) forms.push(branch.special);
       for (const branch of kit.air?.followUps ?? []) forms.push(branch.special);
       for (const form of forms) {

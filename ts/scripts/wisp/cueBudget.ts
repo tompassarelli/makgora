@@ -170,7 +170,6 @@ function specialForms(character: Character, slot: number): { readonly form: numb
     { form: SpecialForm.ground, air: false, label: "" },
     ...(kit.air === undefined ? [] : [{ form: SpecialForm.air, air: true, label: "-air" }]),
     ...(kit.recall === undefined ? [] : [{ form: SpecialForm.recall, air: false, label: "-recall" }]),
-    ...(kit.marked === undefined ? [] : [{ form: SpecialForm.marked, air: false, label: "-marked" }]),
   ];
   return bases.flatMap((base) => [base, ...(specialForm(kit, base.form).followUps ?? []).map((_, index) => ({ form: base.form + FOLLOW_UP_FORM * (index + 1), air: base.air, label: `${base.label}-followup${index + 1}` }))]);
 }

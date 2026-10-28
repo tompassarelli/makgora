@@ -59,15 +59,13 @@ acts again on N+1. It may author:
   displacement (Warden's Blink) ends at the deck body or lands on the deck.
   `aimedSpeed` replaces the direction with one of eight aimed directions;
   `aimedTilt` turns a horizontal heading to a fixed angle for an up or down
-  aim (Pursuit Lunge's 20 degrees); `driftSpeed` adds the live stick's x at
+  aim; `driftSpeed` adds the live stick's x at
   that many units per frame (Spectral Ascent's steering); `stopsAtBody`
   clamps forward travel to end just short of a raised shield or another
   fighter's body (Storm Rush), and `stopsAtShield` only at a raised shield,
   passing bodies (Storm Step); `relocate` moves the fighter at once on the
-  window's first frame, onto its placed object (Mirror Image's swap) or just
-  behind the nearest marked opponent within `relocateReach`, spending the mark
-  (Shadow Pursuit); a kit's `marked` form is chosen while a poisoned opponent
-  is within its range, and `strikeStatus` applies a status with each strike
+  window's first frame, onto its placed object (Mirror Image's swap), and
+  `strikeStatus` applies a status with each strike
   that reaches a body (Howl of Terror's Terror);
 - `aimFrames`: through this frame a held stick re-chooses the aim, so an up
   special can still be aimed sideways or down; without it the aim is the

@@ -326,7 +326,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.warden]: {
     neutral: { spell: "Shadow Strike", startup: cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "hand", f32(0.7)), active: timed(cue("Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", "hand", 1.0), "stand", 0.0) },
-    side: { spell: "Pursuit Lunge", startup: GLAIVE_GLINT, active: cue("Abilities\\Weapons\\GlaiveMissile\\GlaiveMissileTarget.mdx", "ahead", 1.0) },
+    side: { spell: "Shadow Dash", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
     up: { spell: "Blink", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
     down: { spell: "Fan of Knives", startup: SHADOW, active: { ...cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)), roll: f32(1.570796327), lingerFrames: ACTIVE_CUE_FRAMES } },
   },
@@ -410,7 +410,6 @@ export type BranchCue = MoveCues | "slot" | "none";
 
 export interface HeroBranchCues {
   readonly recall?: BranchCue | undefined;
-  readonly marked?: BranchCue | undefined;
   readonly followUps?: readonly BranchCue[] | undefined;
 }
 
@@ -440,9 +439,6 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     up: { followUps: [HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES, HAMMERFALL_CUES] },
 
     down: { followUps: [branch("Small Clap", STORM, { ...cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.255)), sound: "ThunderClap" }), "slot", "none"] },
-  },
-  [Character.warden]: {
-    side: { marked: branch("Shadow Pursuit", SHADOW, cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "body", f32(0.7))) },
   },
   [Character.lich]: {
     neutral: { recall: branch("Frost Nova burst", FROST, timed(cue("Abilities\\Spells\\Other\\BreathOfFrost\\BreathOfFrostTarget.mdx", "hand", f32(0.6)), "death", 0.0)) },
@@ -578,7 +574,6 @@ export function fighterBranchCues(character: Character): readonly MoveCues[] {
   for (const slot of SPECIAL_SLOTS) {
     const branches = HERO_BRANCH_CUES[character]?.[slot];
     add(branches?.recall);
-    add(branches?.marked);
     for (const cue of branches?.followUps ?? []) add(cue);
   }
   for (const action of ORIGINAL_ACTIONS[character] ?? []) for (const branch of Object.values(ORIGINAL_BRANCH_CUES[action] ?? {})) add(branch.cues);
@@ -604,7 +599,6 @@ export function fighterOwnCues(character: Character): readonly Cue[] {
 export function heroBranchCue(branches: Readonly<HeroBranchCues> | undefined, form: number): BranchCue | undefined {
   if (form >= FOLLOW_UP_FORM) return branches?.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1];
   if (form === SpecialForm.recall) return branches?.recall;
-  if (form === SpecialForm.marked) return branches?.marked;
   return undefined;
 }
 

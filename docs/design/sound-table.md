@@ -64,7 +64,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalHeavySliceMetal | WardenAttack |
 | Forward tilt, Up tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
 | Neutral special: Shadow Strike | ShadowStrikeMissileBirth | ShadowStrikeBirth | ShadowStrikeBirth + FanOfKnivesHit | MetalMediumSliceMetal |  |
-| Side special: Shadow Pursuit | BlinkCaster | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
+| Side special: Shadow Dash | BlinkCaster | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
 | Up special: Blink | BlinkTarget | MetalLightSliceFlesh | MetalLightSliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
 | Down special: Fan of Knives | FanOfKnives | FanOfKnivesHit | FanOfKnivesHit + FanOfKnivesHit | MetalMediumSliceMetal |  |
 

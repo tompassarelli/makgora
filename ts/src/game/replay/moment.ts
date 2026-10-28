@@ -464,7 +464,6 @@ function rebindAuthoredKit(fighter: Fighter): void {
       add(kit.ground);
       add(kit.air);
       add(kit.recall);
-      add(kit.marked?.special);
     }
   }
   const decoded = fighter.tuning.ultimate;

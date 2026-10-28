@@ -59,7 +59,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.launch.meleeKnockbackZ !== actual.launch.meleeKnockbackZ && (expected.launch.meleeKnockbackZ.original !== actual.launch.meleeKnockbackZ.original || expected.launch.meleeKnockbackZ.published !== actual.launch.meleeKnockbackZ.published)) return "motionKnockbackZ";
   if (expected.launch.groundKnockbackX !== actual.launch.groundKnockbackX) return "groundKnockbackX";
   if ((expected.launch.knockbackAge ?? -1) !== (actual.launch.knockbackAge ?? -1)) return "knockbackAgeFrames";
-  if (expected.launch.stunAge !== actual.launch.stunAge) return "stunAge";
   if (expected.launch.damageLevel !== actual.launch.damageLevel) return "damageLevel";
   if (expected.shield.pushbackX !== actual.shield.pushbackX) return "shieldPushbackX";
   if (expected.shield.recoilX !== actual.shield.recoilX) return "shieldRecoilX";

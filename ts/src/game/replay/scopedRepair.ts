@@ -142,11 +142,9 @@ function rosterReach(): Extent {
         widenSpecial(strike, kit.ground);
         widenSpecial(strike, kit.air);
         widenSpecial(strike, kit.recall);
-        widenSpecial(strike, kit.marked?.special);
         widenHurtPoses(body, kit.ground.hurt);
         widenHurtPoses(body, kit.air?.hurt);
         widenHurtPoses(body, kit.recall?.hurt);
-        widenHurtPoses(body, kit.marked?.special.hurt);
       }
     }
     widenHurtPoses(body, tuning.ultimate?.hurt);

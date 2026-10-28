@@ -3,7 +3,8 @@
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT, heroRegion, type MoveRegion, type StrikeCapsule } from "../../sim/heroMoves";
-import { CHARGED_AIM_FRAMES, Relocation, frames, type AuthoredSpecial, type FighterSpecials } from "../../sim/specials/schema";
+import { ILLUSION_AIR_LANDING_LAG, ILLUSION_DISTANCE_HEIGHTS, ILLUSION_END_FRAME, ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_HIT_RECOVERY, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_SHORTEN, ILLUSION_TRAVEL_FRAMES } from "../../sim/specials/illusionDash";
+import { CHARGED_AIM_FRAMES, frames, type AuthoredSpecial, type FighterSpecials } from "../../sim/specials/schema";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import type { AppliedStatus } from "../../sim/heroStatus";
 import { wardenHit } from "./moves";
@@ -32,41 +33,24 @@ const SHADOW_STRIKE_AIR: AuthoredSpecial = { ...SHADOW_STRIKE, landingLag: 0 };
 
 
 
-const LUNGE_TRAVEL_FRAMES = 10;
-const LUNGE_FIRST = 18;
-const LUNGE_LAST = LUNGE_FIRST + LUNGE_TRAVEL_FRAMES - 1;
-const LUNGE_SPEED = f32(H / f32(LUNGE_TRAVEL_FRAMES));
-const LUNGE_STUN_FRAMES = 52;
-const PURSUIT_STUN_FRAMES = 40;
-const pursuitHit = (stunFrames: number) => ({ ...wardenHit(7.6326799392700195, "POKE", 35), stunFrames });
-const LUNGE_PASS_RADIUS = 20.0;
-const LUNGE_BLADE: readonly (readonly [number, number, number, number])[] = [
-  [18.0, 69.0, 165.0, 34.0], [18.0, 68.0, 171.0, 21.0], [18.0, 66.0, 128.0, -11.0], [18.0, 62.0, 73.0, -21.0], [18.0, 64.0, 104.0, 93.0],
-  [18.0, 66.0, 134.0, 3.0], [18.0, 70.0, 25.0, 65.0], [18.0, 77.0, 90.0, 150.0], [18.0, 71.0, 143.0, 85.0], [18.0, 64.0, 157.0, -7.0],
-];
-const lungeRegions = (): readonly MoveRegion[] => [
-  ...LUNGE_BLADE.map(([x1, z1, x2, z2], index) => heroRegion(LUNGE_FIRST + index, LUNGE_FIRST + index, blade(x1, z1, x2, z2), pursuitHit(LUNGE_STUN_FRAMES))),
-  heroRegion(LUNGE_FIRST, LUNGE_LAST, { x1: 0.0, z1: 48.0, x2: 0.0, z2: 48.0, radius: LUNGE_PASS_RADIUS, path: true }, pursuitHit(LUNGE_STUN_FRAMES)),
-];
-const PURSUIT_LUNGE: AuthoredSpecial = {
-  name: "Pursuit Lunge", endFrame: LUNGE_LAST + 26, regions: lungeRegions(),
-  motion: [{ ...frames(LUNGE_FIRST, LUNGE_LAST), velocityX: LUNGE_SPEED, velocityZ: 0.0 }, { ...frames(LUNGE_LAST + 1, LUNGE_LAST + 1), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
-};
-
-
-
-const PURSUIT_REACH = f32(H * f32(2.5));
-const SHADOW_PURSUIT: AuthoredSpecial = {
-  endFrame: 40,
-  motion: [{ ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, relocate: Relocation.behindMark, relocateReach: PURSUIT_REACH }],
-  regions: [heroRegion(22, 24, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(PURSUIT_STUN_FRAMES))],
-};
-
-
-const LUNGE_TILT = { x: f32(0.939692621), z: f32(0.342020143) };
-const PURSUIT_LUNGE_AIR: AuthoredSpecial = {
-  ...PURSUIT_LUNGE, oncePerAirtime: true, helpless: true, landingLag: 12, aimFrames: 4,
-  motion: [{ ...frames(LUNGE_FIRST, LUNGE_LAST), velocityX: LUNGE_SPEED, velocityZ: 0.0, aimedTilt: LUNGE_TILT }, { ...frames(LUNGE_LAST + 1, LUNGE_LAST + 1), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
+const ILLUSION_LAUNCH = { x: f32(0.173648178), z: f32(0.984807753) };
+const illusionHit = (growth: number) => ({ damage: 7.0, growth, base: 74.0, launchX: ILLUSION_LAUNCH.x, launchZ: ILLUSION_LAUNCH.z, electric: false, element: HitElement.slash });
+const ILLUSION_PATH_Z = 48.0;
+const ILLUSION_PATH_RADIUS = 24.0;
+export const SHADOW_DASH_DISTANCE = f32(H * f32(ILLUSION_DISTANCE_HEIGHTS));
+const shadowDash = (growth: number): AuthoredSpecial => ({
+  endFrame: ILLUSION_END_FRAME, shorten: ILLUSION_SHORTEN,
+  hitRecovery: { from: ILLUSION_LAST_TRAVEL_FRAME + 1, frames: ILLUSION_HIT_RECOVERY },
+  motion: [
+    { ...frames(1, ILLUSION_FIRST_TRAVEL_FRAME - 1), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME), velocityX: f32(SHADOW_DASH_DISTANCE / f32(ILLUSION_TRAVEL_FRAMES)), velocityZ: 0.0 },
+    { ...frames(ILLUSION_LAST_TRAVEL_FRAME + 1, ILLUSION_LAST_TRAVEL_FRAME + 1), velocityX: 0.0, velocityZ: 0.0 },
+  ],
+  regions: [heroRegion(ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME, { x1: 0.0, z1: ILLUSION_PATH_Z, x2: 0.0, z2: ILLUSION_PATH_Z, radius: ILLUSION_PATH_RADIUS, path: true }, illusionHit(growth))],
+});
+const SHADOW_DASH = shadowDash(40.0);
+const SHADOW_DASH_AIR: AuthoredSpecial = {
+  ...shadowDash(60.0), oncePerAirtime: true, helpless: true, landingLag: ILLUSION_AIR_LANDING_LAG, airStall: frames(1, ILLUSION_LAST_TRAVEL_FRAME),
 };
 
 
@@ -104,7 +88,7 @@ const FAN_OF_KNIVES_AIR: AuthoredSpecial = {
 
 export const WARDEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target; it leaves on frame 10 of 36, on the ground or in the air; press again from frame 4 to throw another 10 frames later, so a short hop throws two, and landing in the air cuts the rest short.", ground: SHADOW_STRIKE, air: SHADOW_STRIKE_AIR }, { range: 1.25 }),
-  side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a Pursuit Lunge that cuts through them and turns to face them. Either hit stuns in place for a grab or Fan of Knives; a second stun within two seconds only knocks them away.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { shieldSafe: true }),
+  side: withExKit({ name: "Shadow Dash", description: "A fast straight blink dash that cuts through foes and leaves her afterimages along the path; it travels on frames 21-25 of 63, and pressing special again while she travels stops her where she is, and a shortened dash still hits. The slash pops foes up at 80 degrees with no stun, and a hit cuts her end lag short for a follow-up. In the air it holds her up through the dash, once per airtime, and leaves her helpless.", ground: SHADOW_DASH, air: SHADOW_DASH_AIR }, { travel: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
-  down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, marking and poisoning them; on the ground it pushes them away along a low angle with shine's knockback at every percent, so a light foe tumbles and a heavy one does not, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. On the ground she slides on the speed she had, slowing only by traction, and in the air she stops sideways as it starts. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { reach: 1.25 }),
+  down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, poisoning them; on the ground it pushes them away along a low angle with shine's knockback at every percent, so a light foe tumbles and a heavy one does not, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. On the ground she slides on the speed she had, slowing only by traction, and in the air she stops sideways as it starts. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { reach: 1.25 }),
 };

@@ -8,7 +8,7 @@ import type { HurtPose } from "../hurtboxes";
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
 export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
 
-export const SpecialForm = { ground: 0, air: 1, recall: 3, marked: 4 } as const;
+export const SpecialForm = { ground: 0, air: 1, recall: 3 } as const;
 export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 
 export const FOLLOW_UP_FORM = 6;
@@ -16,7 +16,7 @@ export const FOLLOW_UP_FORM = 6;
 export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4, guard: 5, release: 6 } as const;
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
-export const Relocation = { placed: 1, behindMark: 2, floorBelow: 3, behindLocked: 4 } as const;
+export const Relocation = { placed: 1, floorBelow: 3, behindLocked: 4 } as const;
 export type Relocation = (typeof Relocation)[keyof typeof Relocation];
 
 export interface FrameWindow {
@@ -371,6 +371,8 @@ export interface AuthoredSpecial {
   readonly refreshesAir?: true | undefined;
 
   readonly refire?: FrameWindow | undefined;
+  readonly shorten?: FrameWindow | undefined;
+  readonly hitRecovery?: { readonly from: number; readonly frames: number } | undefined;
 
   readonly jumpCancelFrame?: number | undefined;
 
@@ -423,8 +425,6 @@ export interface SpecialKit {
 
   readonly recallGroundOnly?: boolean | undefined;
 
-
-  readonly marked?: { readonly special: AuthoredSpecial; readonly range: number } | undefined;
 }
 
 export interface FighterSpecials {
@@ -445,7 +445,6 @@ export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false,
     return base.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1]?.special ?? base;
   }
   const move = form === SpecialForm.recall ? kit.recall ?? kit.ground
-    : form === SpecialForm.marked ? kit.marked?.special ?? kit.ground
     : form === SpecialForm.air ? kit.air ?? kit.ground : kit.ground;
   const chosen = variant > 0 ? move.variants?.[variant - 1] ?? move : move;
   return ex ? chosen.ex ?? chosen : chosen;

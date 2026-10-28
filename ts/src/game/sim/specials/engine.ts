@@ -17,7 +17,7 @@ import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, type FrameWindow, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
 import { airCastVariant, castFloating, floatsNow, stallAir } from "./airFloat";
 import { advanceRefire } from "./refire";
 import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
@@ -68,20 +68,6 @@ function ownedCount(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | un
 }
 
 
-export function markedTarget(world: Roster, f: Readonly<Fighter>, range: number): Fighter | undefined {
-  let nearest: Fighter | undefined;
-  let distance = 0.0;
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
-    if (!isActive(world, slot)) continue;
-    const other = fighterAt(world, slot);
-    if (other === f || sameTeam(world, world.fighters.indexOf(f), slot) || other.status.out || other.status.poisonFrames <= 0) continue;
-    const dx = Math.abs(f32(other.motion.x - f.motion.x));
-    if (dx > range || Math.abs(f32(other.motion.z - f.motion.z)) > range || (nearest !== undefined && dx >= distance)) continue;
-    nearest = other;
-    distance = dx;
-  }
-  return nearest;
-}
 
 
 function recallProjectiles(f: Fighter): void {
@@ -144,8 +130,7 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   const kit = specialKit(specials, slot);
   const airborne = !f.motion.grounded;
   const recalls = kit.recall !== undefined && recallHolds(f, kit);
-  const marks = kit.marked !== undefined && world !== undefined && markedTarget(world, f, kit.marked.range) !== undefined;
-  const form: SpecialForm = recalls ? SpecialForm.recall : marks ? SpecialForm.marked : airborne && kit.air !== undefined ? SpecialForm.air : SpecialForm.ground;
+  const form: SpecialForm = recalls ? SpecialForm.recall : airborne && kit.air !== undefined ? SpecialForm.air : SpecialForm.ground;
   const variant = specialVariant(f);
   const move = specialForm(kit, form, false, variant);
   if (move.groundOnly === true && airborne) {
@@ -992,12 +977,32 @@ export function aimedProjectile(f: Readonly<Fighter>): Readonly<Projectile> | un
 }
 
 
+function skipSpecialTo(f: Fighter, frame: number): void {
+  const skipped = frame - f.special.frame;
+  if (skipped <= 0) return;
+  f.special.frame = frame;
+  f.special.lockFrames = max(0, f.special.lockFrames - skipped);
+  f.attack.cooldown = max(0, f.attack.cooldown - skipped);
+}
+
+function shortenOnPress(f: Fighter, window: Readonly<FrameWindow> | undefined, input: Readonly<Controls> | undefined): void {
+  if (window !== undefined && input?.specialPressed === true && inWindow(window, f.special.frame)) skipSpecialTo(f, window.last + 1);
+}
+
+function recoverOnHit(f: Fighter, move: Readonly<AuthoredSpecial>): void {
+  const recovery = move.hitRecovery;
+  if (recovery !== undefined && f.special.hit && f.special.frame > recovery.from) skipSpecialTo(f, move.endFrame - recovery.frames);
+}
+
+
 export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Controls>, world?: Roster, matchFrame = 0): void {
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
   if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
   if (holdSteeredShot(f, move, input)) return;
   advanceRefire(f, move.refire, input);
+  shortenOnPress(f, move.shorten, input);
+  recoverOnHit(f, move);
   if (throwFullDroppingCharge(f, move)) return;
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
@@ -1178,7 +1183,6 @@ export function stopHeroMotionAtBodies(world: Roster, slot: number): void {
 }
 
 
-const BEHIND_MARK = 60.0;
 
 
 
@@ -1205,26 +1209,22 @@ function moveToRelocation(world: Roster, f: Fighter, segment: Readonly<SpecialMo
     if (anchor === undefined) return false;
     f.motion.x = anchor.x;
     f.motion.z = anchor.z;
-  } else if (segment.relocate === Relocation.placed) {
+  } else {
     if (f.placed.life <= 0) return false;
     const placed = mutablePlacedObject(f);
     f.motion.x = placed.x;
     f.motion.z = placed.z;
     f.facing = placed.direction;
     placed.life = 0;
-  } else {
-
-    const target = markedTarget(world, f, segment.relocateReach ?? 0.0);
-    if (target === undefined) return false;
-    stepBehind(f, target);
-    target.status.poisonFrames = 0;
   }
   return true;
 }
 
+const BEHIND_TARGET = 60.0;
+
 function stepBehind(f: Fighter, target: Readonly<Fighter>): void {
   const back = target.facing < 0 ? 1 : -1;
-  f.motion.x = f32(target.motion.x + f32(back * BEHIND_MARK));
+  f.motion.x = f32(target.motion.x + f32(back * BEHIND_TARGET));
   f.motion.z = target.motion.z;
   f.facing = -back;
 }

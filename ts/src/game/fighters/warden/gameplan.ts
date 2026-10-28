@@ -19,7 +19,7 @@ export const WARDEN_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardTiltUp, near: h(f32(0.4)), far: h(f32(1.0)) },
     { move: AttackStyle.forwardTiltDown, near: h(f32(0.4)), far: h(f32(1.0)) },
 
-    { move: GameplanSpecial.side, near: h(f32(0.9)), far: h(f32(1.8)) },
+    { move: GameplanSpecial.side, near: h(f32(1.0)), far: h(f32(3.0)) },
   ],
   approach: [
     { via: "run", moves: [AttackStyle.dashAttack, GameplanSpecial.side, AttackStyle.grab], weight: 2 },
@@ -32,7 +32,7 @@ export const WARDEN_GAMEPLAN: FighterGameplan = {
     { starter: AttackStyle.upAir, followUps: [AttackStyle.upAir] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
     { starter: GameplanThrow.down, followUps: [AttackStyle.forwardAir, AttackStyle.upAir] },
-    { starter: GameplanSpecial.side, followUps: [AttackStyle.grab, GameplanSpecial.down] },
+    { starter: GameplanSpecial.side, followUps: [AttackStyle.upAir, AttackStyle.upTilt] },
   ],
   kills: [
     { move: AttackStyle.backAir, fromPercent: 90 },
@@ -42,6 +42,6 @@ export const WARDEN_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardAir, fromPercent: 120 },
     { move: AttackStyle.downSmash, fromPercent: 110 },
   ],
-  recovery: { aim: "mixed", upSpecial: "last" },
+  recovery: { aim: "mixed", upSpecial: "last", sideSpecial: true },
   avoid: ["far", "below"],
 };

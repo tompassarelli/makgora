@@ -24,7 +24,6 @@ function forms(kit: SpecialKit): readonly (readonly [string, AuthoredSpecial])[]
   add("ground", kit.ground);
   add("air", kit.air);
   add("recall", kit.recall);
-  add("marked", kit.marked?.special);
   return all;
 }
 

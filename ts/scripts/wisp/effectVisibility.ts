@@ -291,7 +291,7 @@ export function effectUses(): EffectUse[] {
     const specials = heroDefinition(character)?.specials;
     if (specials !== undefined) for (const slot of SPECIAL_SLOTS) {
       const kit = specials[slot];
-      visit(kit.ground, `${slot} ground`); visit(kit.air, `${slot} air`); visit(kit.recall, `${slot} recall`); visit(kit.marked?.special, `${slot} marked`);
+      visit(kit.ground, `${slot} ground`); visit(kit.air, `${slot} air`); visit(kit.recall, `${slot} recall`);
     }
     visit(FIGHTER_ULTIMATES[character], "ultimate");
     uses.push(...meterCueMoves(character).map(([move, cue]) => cueUse(fighter, move, "presentation effect", { ...cue, scale: meterCueFit(cue, character).scale })));

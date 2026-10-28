@@ -29,8 +29,7 @@ beats read. The DIs listed must not escape.
 | down air | 0-60 | grab | true | | Fox true | holds |
 | up throw | 30-90 | up air | DI-dependent | in, none | Fox DI-dependent, out escapes | holds (#306) |
 | up air | 10-60 | up air | DI-dependent | in, none | Fox DI-dependent 10-60 | holds (#580): DI-dependent, the short-hop up air lands 25 frames after the hit and DI out and down escape |
-| side special (Shadow Pursuit) | 0-150 | grab | true | | her stun (#273) | holds |
-| side special (Shadow Pursuit) | 0-150 | forward smash | true | | her stun (#273) | holds |
+| side special (Shadow Dash) | 0-40 | up air | DI-dependent | | Fox Illusion pop-up into up air | to measure (Shadow Dash, 2026-10-28) |
 
 Three rows dropped to the read they measured on 2026-10-27 (#493): back on
 Fox's falls (#456) she lands from a short-hop neutral air or up air 3 frames
@@ -138,9 +137,9 @@ its frame data, damage, angle and knockback are unchanged.
 
 What she keeps, so she does not become Fox in a costume:
 
-- marks and poison: her neutral special, Shadow Strike, is one slow dagger
-  that marks and poisons, not a laser; its value is the mark and the poison,
-  not chip damage or a stream. Since Tom's 2026-10-28 request it takes Fox's
+- poison: her neutral special, Shadow Strike, is one slow dagger that
+  poisons, not a laser; its value is the poison, not a mark, chip damage or a
+  stream, and no other move reads it. Since 2026-10-28 it takes Fox's
   laser frames: the dagger leaves on frame 10 of 36 standing and in the air,
   she acts on frame 37, and landing in the air ends the cast with no landing
   lag (fightcore.csv and records.jsonl: first active 10, total 36, aerial
@@ -148,13 +147,19 @@ What she keeps, so she does not become Fox in a costume:
   fires its second blade on landing. Up to two daggers may be out, because the
   next cast can start on frame 37 while the dagger from frame 10 flies until
   frame 40, and a short-hop double has its first blade in flight on landing.
-  The dagger's speed, damage, mark and poison are unchanged, and the mark is
-  the reason to throw it, not the stream.
+  The dagger's speed is unchanged.
 - Blink: her up special teleports in eight directions to a punishable spot,
   not a charged fire dash.
-- Shadow Pursuit stun (side special, #273): a set stun that opens grab, smash
-  or Fan of Knives, with a second stun inside two seconds only knocking away;
-  it has no Melee analogue and stays a recorded deviation.
+- Shadow Dash (side special, Tom's 2026-10-28 rework): Fox's Illusion with
+  her Blink art, a straight dash on frames 21-25 of 63 that special cuts
+  short and whose slash pops the foe up at 80 degrees (growth 40 standing
+  and 60 in the air, fightcore.csv's Illusion row). Two recorded deviations
+  make the pop-up start combos: base 74 instead of Illusion's 68, so a foe
+  tumbles from 0%, and a hit skips her end lag to 14 frames, so she acts on
+  frame 45 instead of 64 and is +4 to +7 at 0% while a whiff keeps Melee's
+  63 frames (probed headless on Rifleman, 2026-10-28). It never homes,
+  never teleports behind anyone and never stuns: the stun and mark forms are
+  gone. EX dashes 25% farther and changes nothing else.
 - Fan of Knives (down special, #272, #494): a frame-4 ring of knives with set
   knockback, a shine-like semi-spike in the air, that she can jump out of, so
   it sits near shine and must stay apart from it: it reflects nothing, it

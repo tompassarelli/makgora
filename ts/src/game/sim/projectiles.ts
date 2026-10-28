@@ -140,7 +140,6 @@ export function originalProjectileEffect(projectile: Readonly<Projectile>): Read
   projectileHit.manaSteal = undefined;
   projectileHit.strong = undefined;
   projectileHit.fixedPower = undefined;
-  projectileHit.stunFrames = undefined;
   projectileHit.setKnockback = kind === ProjectileKind.eyeBeam ? EYE_BEAM_SET_KNOCKBACK : undefined;
   projectileHit.sakurai = kind === ProjectileKind.eyeBeam ? true : undefined;
   projectileHit.damage = projectileDamage(projectile);

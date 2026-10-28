@@ -272,7 +272,7 @@ function projectileSlot(character: Character, spec: Readonly<SpecialProjectile> 
   if (spec === undefined || specials === undefined) return 0;
   for (let slot = 0; slot < 4; slot++) {
     const kit = specialKit(specials, slot);
-    if (firesProjectile(kit.ground, spec) || firesProjectile(kit.air, spec) || firesProjectile(kit.recall, spec) || firesProjectile(kit.marked?.special, spec)) return slot;
+    if (firesProjectile(kit.ground, spec) || firesProjectile(kit.air, spec) || firesProjectile(kit.recall, spec)) return slot;
   }
   return 0;
 }

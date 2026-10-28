@@ -40,7 +40,7 @@ ground and in the air. Fan of Knives now:
 - In the air every frame holds her vertical speed at zero while her air
   drift and gravity still act, so she sinks one frame of gravity a frame.
 - Jump-cancellable from frame 4, 27 frames uncancelled, no intangible frame.
-- Anyone hit is still marked and poisoned for Shadow Pursuit.
+- Anyone hit is still poisoned.
 - EX: 25% more damage.
 
 From #272 until #494 it struck only ahead of her on the ground (the front
@@ -54,7 +54,7 @@ Until #272 Fan of Knives copied the Falco shape:
 - One active frame, frame 1, on both sides of her body: 8% at 85 degrees
   with the CHASE knockback (base 75, growth about 50), a pop of about 0.6
   fighter heights with 34 frames of hitstun at 0%. It reaches 0.7 fighter
-  heights. Anyone hit is still marked and poisoned for Shadow Pursuit.
+  heights. Anyone hit is still poisoned.
 - Her first frame is intangible.
 - A jump press from frame 4 ends it and jumps (her double jump in the air).
 - In the air it holds her in place for its 27 frames, as Immolate does.

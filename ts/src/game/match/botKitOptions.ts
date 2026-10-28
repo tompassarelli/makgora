@@ -52,7 +52,6 @@ const RITUAL_MANA = 25;
 const RITUAL_GAP = 200.0;
 const RITUAL_LAST_FRAMES = 30;
 
-const BEHIND_MARK_ROOM = 60.0;
 
 
 const SHOT_NEAR = 180.0;
@@ -265,13 +264,6 @@ function pressHeroOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
   for (const slot of HERO_SLOTS) {
     const kit = specialKit(specials, slot);
 
-    const marked = kit.marked;
-    if (marked !== undefined && ready && target.status.poisonFrames > 0 && gap <= marked.range && Math.abs(f32(target.motion.z - f.motion.z)) <= marked.range
-      && safeAt(stage, f32(target.motion.x - f32(target.facing * BEHIND_MARK_ROOM)), 0.0)
-      && takes(skill, floorDiv(frame, 20), f.character * 7 + 8)) {
-      pressSlot(input, slot, toward);
-      return true;
-    }
     const move = startableForm(f, specials, slot);
     if (move === undefined) continue;
     if (move === kit.recall) {

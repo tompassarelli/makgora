@@ -185,7 +185,7 @@ invulnerability; **other move** = a different move, not an upgrade.
 | Mountain King | Thunder Leap | Travel, and +25% Hammerfall damage | Fail: two | Travel, Hammerfall dive included |
 | Mountain King | Thunder Clap | Reach | Pass | Unchanged |
 | Warden | Shadow Strike | +25% damage | Fail: damage | Range |
-| Warden | Shadow Pursuit | +25% damage | Fail: damage | Shield-safe |
+| Warden | Shadow Dash | Shield-safe (as Shadow Pursuit) | Move replaced 2026-10-28 | Travel: the dash goes 25% farther |
 | Warden | Blink | Travel | Pass | Unchanged |
 | Warden | Fan of Knives | +25% damage | Fail: damage | Reach |
 | Lich | Frost Nova | Reach | Pass | Unchanged |

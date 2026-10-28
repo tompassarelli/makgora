@@ -50,7 +50,6 @@ function placementPaths(character: Character): string[] {
     visit(kit.ground);
     visit(kit.air);
     visit(kit.recall);
-    visit(kit.marked?.special);
   }
   visit(tuning.ultimate);
   return paths;

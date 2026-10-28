@@ -979,7 +979,7 @@ One rule for every fighter's four specials
 | Illidan | side: Fel Rush (rush); up: Wing Ascent (recovery) |
 | Blademaster | side: Mirror Image (relocation the way side B points); up: Rising Whirlwind (recovery); down: Wind Walk's counter kick (relocation behind the attacker) |
 | Mountain King | side: Storm Rush (rush); up: Thunder Leap (recovery) |
-| Warden | side: Shadow Pursuit (lunge, teleport when marked); up: Blink (teleport) |
+| Warden | side: Shadow Dash (Illusion dash); up: Blink (teleport) |
 | Lich | up: Spectral Ascent (recovery) |
 | Forsaken Paladin | side: Righteous Fury (rush); up: Ascension (recovery) |
 | Dreadlord | side: Vampiric Pounce (lunge); up: Bat Ascension (recovery) |
@@ -1091,7 +1091,7 @@ every newly registered fighter too.
 | Illidan | Eye Beam (35) | Fel Rush (37) | One 8% hit armored on frames 1–6 |
 | Blademaster | Quickdraw (25) | Mirror Image (40) | One 8% hit armored on frames 1–6 |
 | Mountain King | Storm Bolt (33) | Storm Rush (43) | One 8% hit armored on frames 1–6 |
-| Warden | Shadow Strike (30) | Shadow Pursuit (40) | One 8% hit armored on frames 1–6 |
+| Warden | Shadow Strike (30) | Shadow Dash (63) | One 8% hit armored on frames 1–6 |
 | Lich | Frost Nova (35) | Death and Decay (50) | One 8% hit armored on frames 1–6 |
 | Forsaken Paladin | Cleansing Sword (35) | Righteous Fury (50) | One 8% hit armored on frames 1–6 |
 | Dreadlord | Carrion Swarm (30) | Vampiric Pounce (45) | One 8% hit armored on frames 1–6 |

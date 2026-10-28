@@ -48,7 +48,6 @@ export interface HitEffect {
 
   fixedPower?: number | undefined;
 
-  stunFrames?: number | undefined;
 
   shieldDamage?: number | undefined;
 
@@ -90,7 +89,6 @@ export function copyHitEffect(target: HitEffect, source: Readonly<HitEffect>): v
   target.strong = source.strong;
   target.setKnockback = source.setKnockback;
   target.fixedPower = source.fixedPower;
-  target.stunFrames = source.stunFrames;
   target.shieldDamage = source.shieldDamage;
   target.sakurai = source.sakurai;
   target.shieldSafe = source.shieldSafe;

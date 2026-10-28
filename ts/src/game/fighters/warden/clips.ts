@@ -98,7 +98,7 @@ export function wardenClips(kit: KitNormals) {
     throwDown: s.spellSlam,
 
     shadowStrike: s.spellThrow,
-    pursuitLunge: s.attack2,
+    shadowDash: s.attack2,
     blink: s.dissipate,
     fanOfKnives: s.spell,
   } as const;

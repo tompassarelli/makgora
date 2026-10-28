@@ -171,7 +171,6 @@ export const HERO_STATUS_GROUPS = 3;
 export const ParasolState = { none: 0, open: 1, closed: 2, spent: 3 } as const;
 export type ParasolState = (typeof ParasolState)[keyof typeof ParasolState];
 
-export const STUN_REPEAT_FRAMES = 120;
 
 // Append only: these pickup codes are serialized in replay text.
 export const ItemKind = { none: 0, speed: 1, heavy: 3 } as const;
