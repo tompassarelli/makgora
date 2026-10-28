@@ -38,11 +38,11 @@ export const ROSTER_ATTACK_CLIPS = {
     neutralSpecialAir: { index: 74, seconds: f32(0.95), aligned: true },
     neutralSpecialFollowUp: { index: 74, seconds: f32(0.95), aligned: true },
     neutralSpecialFollowUpAir: { index: 74, seconds: f32(0.95), aligned: true },
-    downSmash: { index: 75, seconds: f32(0.733), aligned: true },
     sideSpecial: { index: 68, seconds: f32(0.817), aligned: true },
     sideSpecialAir: { index: 68, seconds: f32(0.817), aligned: true },
     sideSpecialFollowUp: { index: 68, seconds: f32(0.817), aligned: true },
     sideSpecialFollowUpAir: { index: 68, seconds: f32(0.817), aligned: true },
+    downSmash: { index: 75, seconds: 0.75, aligned: true },
   },
   6: {
     forwardTiltDown: { index: 51, seconds: f32(0.567) },
