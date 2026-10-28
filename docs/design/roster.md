@@ -13,7 +13,7 @@ points where his opponent ought to stand, closes that space with roots and a
 treant, then dismisses them with his staff. A space-trapping zoner, distinct
 from Jaina's falling spells, Lich's frost bursts and Shadow Hunter's crossfire.
 He has no stacks or second resource. All four ordinary specials are
-free; a full EX charge empowers anyone's next special, including his.
+free, and he gains no resource beyond the shared ultimate meter.
 
 **Body:** weight 94, run 10.8 units/frame, air 5.7 units/frame, standing hurt
 capsule endpoints at heights 4 and 101.2, radius 24. Slow feet and a tall exposed body make failed setup
@@ -29,12 +29,12 @@ Neutral air circles the staff (8, 8); forward/back air push it away (12/9,
 Landing lag is 16/18/16/16/22 before the shared automatic halving. Down tilt
 and up throw launch into canopy follow-ups; down throw creates a tech chase.
 
-| Special | Ordinary action and counterplay | Full-charge EX |
-|---|---|---|
-| Entangling Roots, neutral | Mark a low patch 180 units ahead on frame 8; roots hit once after 20 telegraph frames for 8 damage and a 24-frame movement bind. Jump or shield the patch. 42 total frames. | A 25% wider root patch, same damage (mana.md, 2026-10-28). |
-| Stag Charge, side | Coil, then bound forward for frames 12–20 with a branching staff strike for 11 damage. Shield stops the charge; 43 total leaves a whiff punish. Air charge ends helpless. | Shield-safe: a blocked charge holds the shield through his recovery. |
-| Dream Ascent, up | Rise diagonally on frames 10–23 with a 7-damage canopy strike, spending the aerial jump and ending helpless. 40 total; exposed above and after the rise. | 25% farther rise. |
-| Force of Nature, down | Plant one fragile treant on frame 26, 20 durability, 240-frame life; four branch bolts do 5 damage each. Setup takes 50 frames. Destroy or jump the treant; repeat down special recalls it. | 25 durability; the same bolts. |
+| Special | Ordinary action and counterplay |
+|---|---|
+| Entangling Roots, neutral | Mark a low patch 180 units ahead on frame 8; roots hit once after 20 telegraph frames for 8 damage and a 24-frame movement bind. Jump or shield the patch. 42 total frames. |
+| Stag Charge, side | Coil, then bound forward for frames 12–20 with a branching staff strike for 11 damage. Shield stops the charge; 43 total leaves a whiff punish. Air charge ends helpless. |
+| Dream Ascent, up | Rise diagonally on frames 10–23 with a 7-damage canopy strike, spending the aerial jump and ending helpless. 40 total; exposed above and after the rise. |
+| Force of Nature, down | Plant one fragile treant on frame 26, 20 durability, 240-frame life; four branch bolts do 5 damage each. Setup takes 50 frames. Destroy or jump the treant; repeat down special recalls it. |
 
 **Grabs:** shared standing/dash/pivot envelope. One staff-butt pummel uses the
 shared 3-damage escape window. Forward throw dismisses the victim (8 damage,
@@ -121,7 +121,7 @@ Build order is a recommendation, not permission to delete or overwrite ongoing w
 
 Use logical actions rather than hardcoded physical keys. A is normal attack; direction and the existing tilt modifier choose tilts versus smashes. In the air, A plus direction selects neutral, forward, back, up, or down aerial. B is special: neutral B, side B, up B, and down B. Grab is the existing grab binding. Throws are forward, back, up, or down after grabbing. Ultimate is the existing dedicated logical action, not a new overloaded B combination.
 
-Every fighter has jab, three tilts, dash attack, three smashes, five aerials, standing and dash grab, pummel, four throws, four specials, and EX neutral/side specials. Preserve the existing jump, shield, roll, dodge, ledge, tech, DI, and fastfall rules. No attack L-cancel requirement. Do not invent one-frame links as a requirement for a basic kit to function.
+Every fighter has jab, three tilts, dash attack, three smashes, five aerials, standing and dash grab, pummel, four throws, and four specials. Preserve the existing jump, shield, roll, dodge, ledge, tech, DI, and fastfall rules. No attack L-cancel requirement. Do not invent one-frame links as a requirement for a basic kit to function.
 
 ### Timing and geometry notation
 
@@ -141,11 +141,11 @@ Use the project’s existing knockback, hitlag, hitstun, DI, shieldstun, and sta
 
 Calibrate classes in an empty test stage against a reference weight at 60 percent, no DI and no walls. Indicative displacement along the launch direction after 30 ticks: LINK 0.6–1.2H; POKE 1.2–2.0H; LAUNCH 2.0–3.0H; EDGE 2.5–3.5H; KILL 3.5–5.0H; SPIKE downward 2.5–3.5H before gravity. These are test bands, not a second knockback formula. Publish the actual coefficients and measured outcomes once calibrated. Adjust hitstun separately through the established formula rather than assuming distance proves a true combo. LINK never guarantees a follow-up without testing DI, percentage, weight, and move timing.
 
-No critical-hit RNG, random evasion, chance-on-hit stuns, or automatic spell counters. Every fighter is distinctive through expressive standard actions, designed case by case (Tom, 9 Oct 2026, #148). Fighters have no passives (Tom, 9 Oct 2026, #384). Floats, extra jumps and visible double-jump armour are movement properties, like weight and air speed, and are learned by playing. Two universal meters, an EX charge and an ultimate meter (#335; two meters since 2026-10-28); no character stacks, charges, resource timers or further bars. Ordinary move durations, cooldowns, statuses and placed-object HP remain action state. Damage is Smash-style percent damage; a healing move lowers it directly. Damage-over-time ticks do not cause hitlag, hitstun or knockback. A status applies only on an actual body hit, not on shield.
+No critical-hit RNG, random evasion, chance-on-hit stuns, or automatic spell counters. Every fighter is distinctive through expressive standard actions, designed case by case (Tom, 9 Oct 2026, #148). Fighters have no passives (Tom, 9 Oct 2026, #384). Floats, extra jumps and visible double-jump armour are movement properties, like weight and air speed, and are learned by playing. One universal meter, the ultimate meter, filled only by centre-stage orbs (#335; one meter since 2026-10-29); no character stacks, charges, resource timers or further bars. Ordinary move durations, cooldowns, statuses and placed-object HP remain action state. Damage is Smash-style percent damage; a healing move lowers it directly. Damage-over-time ticks do not cause hitlag, hitstun or knockback. A status applies only on an actual body hit, not on shield.
 
 ### Proposed resource profile
 
-Every fighter carries two meters, an EX charge and an ultimate meter; their rules, numbers and display are in [mana.md](mana.md). Regular specials are free and no move deducts a cost on entry; a press below a full meter starts the ordinary special.
+Every fighter carries one meter, the ultimate meter; its rules, numbers and display are in [mana.md](mana.md). Regular specials are free and no move deducts a cost on entry; a press below a full meter starts the ordinary special.
 
 Every up B has a weaker zero-mana version described in its kit; being depleted must not remove basic recovery. If current mana is below the full up B cost, automatically select the free version and spend zero mana; this is the explicit exception to the unaffordable-move rule. If sufficient mana exists, use the full version. Full-strength up B uses its listed cost. One up B use per airtime; it resets only on grounded actionable state or stock respawn, not on ledge regrab. Up B and mobility specials marked helpless prohibit attacks, specials, and double jump until landing or the existing hitstun escape rules. They do not confer ledge invulnerability. Non-mobility specials never refresh jumps or recovery availability.
 
@@ -173,9 +173,9 @@ Armor, when explicitly listed, absorbs hit reaction from one hit up to its liste
 
 At most one copy of each status per target; reapplication refreshes duration but does not stack strength. Hex and sleep count down in simulation frames, not wall time. Their timers, active source IDs, immunity windows, and any damage counters belong in snapshots. No status disables ordinary jumping, shielding, DI, or recovery unless its exact short effect states otherwise. Hex is the one that does: it takes every control but DI (Tom, 2026-10-26, #521), and its mash-out, never before frame 36, is what keeps it from removing recovery.
 
-### EX specials
+### The ultimate meter
 
-There are no ultimates. Shield + neutral/side Special requests EX: pay the chosen normal form's cost plus 25 for one 8% hit of armor on frames 1–6 (superseded: EX specials carry no armor since 2026-10-28, mana.md). If EX is unaffordable, use the normal form. Ordinary timing and recovery remain. The rates, input and per-fighter table are in [gameplay-design.md](../gameplay-design.md#build-and-spend-mana-and-ex-specials). Earlier ultimate proposals below are historical design references, with no gameplay action.
+Every special is free; Strong + Special is the ordinary special. The ultimate (Attack + Special) needs the full ultimate meter, which only centre-stage orbs fill. The rules and input are in [gameplay-design.md](../gameplay-design.md#build-and-spend-mana-and-the-ultimate-meter) and [mana.md](mana.md). Earlier ultimate proposals below are historical design references, with no gameplay action.
 
 ## Baseline fighter properties
 
@@ -345,7 +345,7 @@ The individual hero sections below specify all attacks. Their counterplay descri
 
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
-| Neutral B | **Quickdraw** (Tom, 2026-10-28; after Melee Marth's Shield Breaker and Roy's Flare Blade): hold special to crouch in an iaido stance with the blade sheathed while the hilt glows brighter, then release to draw. Uncharged it is a quick cut with a 0.3H step; each further 1/17 of the charge adds 1% and speed, up to a 2.2H dash slash at full charge that passes through the foe and leaves him behind them. 7–24 damage at 80 degrees, growth 108.6, base 40, so the foe pops up as he blurs past (a low-charge draw leads into up air; a full one kills off the top); shield damage 1.5 times the damage. Each foe is struck once per draw, and every hit pops a red Warcraft III critical-strike number of the damage dealt, sized by it. In the air the stance neither stalls nor lifts him, and the draw's horizontal dash happens once per airtime. EX: the dash travels 1.25 times as far at every charge. | Stance f1–8, charge up to 60 frames held at f8, auto-draw at full; draw: dash and hit from f13 for 6 (uncharged) to 10 (full) frames, stop, end 16 frames later (f34 uncharged, f38 full); 0 mana |
+| Neutral B | **Quickdraw** (Tom, 2026-10-28; after Melee Marth's Shield Breaker and Roy's Flare Blade): hold special to crouch in an iaido stance with the blade sheathed while the hilt glows brighter, then release to draw. Uncharged it is a quick cut with a 0.3H step; each further 1/17 of the charge adds 1% and speed, up to a 2.2H dash slash at full charge that passes through the foe and leaves him behind them. 7–24 damage at 80 degrees, growth 108.6, base 40, so the foe pops up as he blurs past (a low-charge draw leads into up air; a full one kills off the top); shield damage 1.5 times the damage. Each foe is struck once per draw, and every hit pops a red Warcraft III critical-strike number of the damage dealt, sized by it. In the air the stance neither stalls nor lifts him, and the draw's horizontal dash happens once per airtime. | Stance f1–8, charge up to 60 frames held at f8, auto-draw at full; draw: dash and hit from f13 for 6 (uncharged) to 10 (full) frames, stop, end 16 frames later (f34 uncharged, f38 full); 0 mana |
 | Side B | **Mirror Image** (#124): after a visible tell, an image stays where he stood (one hit of any kind shatters it; 210 frames, 3.5 s) and he steps 1.0H the way side B points, turning first when it points behind him; holding left or right during frames 1–11 sets the side he steps instead while he keeps the facing side B gave him; in the air the step is sideways only, once per airtime, with no rise. Side special while the image stands **swaps**: he takes the image's place facing its way and slashes for 10 damage at 40 degrees, EDGE. The image never attacks; no intangibility. | Image and step f12, end f28, 15 mana;
 | Up B | **Rising Whirlwind:** sword extended through a charged spin dash, in the chosen direction, meeting the [#252 long-route recovery band](../gameplay-design.md#recovery-and-edgeguarding); one hit for 9 damage at 80 degrees, LAUNCH. No intangibility. Mana-free version meets the 240-unit route floor with no attack. | Aim f1–8, hit f9–14, dash f9–22, stop f23, then helpless; 15 mana |
 | Down B | **Wind Walk** (#124, #523, smashcraft:docs/design/kit-review-1.md): Marth's Counter. He fades see-through; a strike that meets him in the window freezes its attacker 11 frames while he steps out behind them and kicks them straight up from a hand plant, 7% at 90 degrees, base 30, growth 170 (kills Rifleman at centre stage from 160%). A whiff stands wide open; in the air it is the same whiff, with no travel and no helpless fall. | Counter f5–29, end f59 (acts f60); kick: behind on f8, hit f14–20, end f46; 18 mana | swap f6, slash f8–10, end f30, free |
@@ -527,10 +527,10 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
-| Side B | **Shadow Dash** (Tom's 2026-10-28 rework, Fox's Melee Illusion): a straight horizontal dash with her Blink afterimages along the path, holding still on f1–20 and covering 3.5H on f21–25; pressing special again on f21–24 stops her where she is, and the shortened dash still slashes everyone on the path it covered. The slash is 7 damage at 80 degrees, growth 40 standing and 60 in the air (fightcore.csv's Illusion rows) with base 74 (Illusion's 68 raised so a foe tumbles from 0%), a hit, a shield and a whiff all keep the same 63 frames; a pop-up that starts her strings at low percent; no stun, no homing, no teleport. In the air she hangs through the dash and uses it once per airtime, landing lag 20; a dash that ends in the air, from the ground or the air, leaves her helpless. EX: 25% farther dash. Shared with Fel Rush through smashcraft:ts/src/game/sim/specials/illusionDash.ts. | f21–25 travel, end f63; 15 mana |
-| Neutral B | **Shadow Strike:** one slow thrown blade; 2 impact damage, flinchless (Tom 2026-10-28): no knockback, hitstun, launch, hitlag or interruption of the victim's action, as Fox's laser, while a raised shield still blocks it as before. Each hit adds one **poison stack** (cap 5) and refreshes a 120-frame timer; when the timer runs out the stacks burst for 1 damage each, flinchless, with a poison-burst effect and sound, and clear (EX multiplies only the direct hit). A glow over the victim's head grows with the stack count. Fan of Knives keeps its own ticking poison. Speed 0.11H/frame, life 30, radius 0.13H. Reflectable; the stacks and their burst never flinch. Timed as Fox's laser (2026-10-28): the blade leaves on frame 10 of 36 standing and in the air, she acts on frame 37, a second blade may follow while the first still flies, and landing in the air ends the cast at once with no landing lag. | Spawn f10, end f36, air landing lag 0; 5 mana |
+| Side B | **Shadow Dash** (Tom's 2026-10-28 rework, Fox's Melee Illusion): a straight horizontal dash with her Blink afterimages along the path, holding still on f1–20 and covering 3.5H on f21–25; pressing special again on f21–24 stops her where she is, and the shortened dash still slashes everyone on the path it covered. The slash is 7 damage at 80 degrees, growth 40 standing and 60 in the air (fightcore.csv's Illusion rows) with base 74 (Illusion's 68 raised so a foe tumbles from 0%), a hit, a shield and a whiff all keep the same 63 frames; a pop-up that starts her strings at low percent; no stun, no homing, no teleport. In the air she hangs through the dash and uses it once per airtime, landing lag 20; a dash that ends in the air, from the ground or the air, leaves her helpless. Shared with Fel Rush through smashcraft:ts/src/game/sim/specials/illusionDash.ts. | f21–25 travel, end f63; 15 mana |
+| Neutral B | **Shadow Strike:** one slow thrown blade; 2 impact damage, flinchless (Tom 2026-10-28): no knockback, hitstun, launch, hitlag or interruption of the victim's action, as Fox's laser, while a raised shield still blocks it as before. Each hit adds one **poison stack** (cap 5) and refreshes a 120-frame timer; when the timer runs out the stacks burst for 1 damage each, flinchless, with a poison-burst effect and sound, and clear. A glow over the victim's head grows with the stack count. Fan of Knives keeps its own ticking poison. Speed 0.11H/frame, life 30, radius 0.13H. Reflectable; the stacks and their burst never flinch. Timed as Fox's laser (2026-10-28): the blade leaves on frame 10 of 36 standing and in the air, she acts on frame 37, a second blade may follow while the first still flies, and landing in the air ends the cast at once with no landing lag. | Spawn f10, end f36, air landing lag 0; 5 mana |
 | Up B | **Blink:** choose one of eight directions from held input at entry, travel up to 3.5H; f1–7 vulnerable, f8–10 intangible, endpoint vulnerable from f11. No hitbox. A path entering the main-deck lip within 0.5H below its top may pass: an endpoint above stays there, an endpoint within 0.5H of a free ledge catches, and one farther in lands. A taken ledge leaves her outside; deeper entry stops against the stage. Free version travels 1.9H in the chosen direction, with no intangibility. | Displacement f9; f11–30 endpoint recovery then helpless; 20 mana |
-| Down B | **Fan of Knives**, a ring of knives around her (#494): f4–7, two mirrored knife capsules ahead of and behind her that each launch the foe away from her. On the ground 6.1 damage pushes the foe away at 15 degrees with shine's set knockback of 80 at every percent, so it stuns for as many frames as shine and tumbles only foes light enough for shine to tumble (Tom, 27 Oct); in the air it hits like Fox's Melee shine, 5 damage with a set knockback of 80 on a fixed horizontal semi-spike away from her, and her vertical speed is held at zero, so she nearly stops falling. Jump-cancellable from f4; every body hit is poisoned. EX: 25% more damage ([design](warden-fan-of-knives.md)). | f4–7 active, end f27; 18 mana |
+| Down B | **Fan of Knives**, a ring of knives around her (#494): f4–7, two mirrored knife capsules ahead of and behind her that each launch the foe away from her. On the ground 6.1 damage pushes the foe away at 15 degrees with shine's set knockback of 80 at every percent, so it stuns for as many frames as shine and tumbles only foes light enough for shine to tumble (Tom, 27 Oct); in the air it hits like Fox's Melee shine, 5 damage with a set knockback of 80 on a fixed horizontal semi-spike away from her, and her vertical speed is held at zero, so she nearly stops falling. Jump-cancellable from f4; every body hit is poisoned. ([design](warden-fan-of-knives.md)). | f4–7 active, end f27; 18 mana |
 
 ### Grab and throws
 
@@ -667,7 +667,7 @@ Standing grab 8/3/25, reach 0.60H. Pummel: belly bump.
 | Neutral B | **Frost Nova** (#130, [kit review 2](kit-review-2.md#lich-130)): a slow orb, speed 0.09H/frame, life 80, radius 0.16H; 9 damage, POKE at 35 degrees and Chill on a body. Neutral B again while it flies stops it on the gesture's frame 4; 6 frames later it bursts for 3 frames: radius 0.7H, 10 damage, LAUNCH at 70 degrees, Chill. One orb, reflectable until burst. **Chill:** 75 frames at 60% walk, dash, run and air-drift top speed; a shield stops it; 120 frames of immunity. | Orb f18, end f41 (two frames longer since 15 Oct traction slides a shield out of grab range; projectile rule 2 keeps a three-frame shield-grab window); 10 mana. Burst gesture end f14, free |
 | Side B | **Death and Decay** (#130): a field placed 1.5H ahead (a backward press turns Lich first, as every side special does), only with line of sight; radius 0.75H. It strikes the first body or shield in it from f30 (5 damage, POKE at 80 degrees) and again from f70 (9 damage, LAUNCH at 70 degrees), and is gone after f97. Interrupting Lich before f30 removes it. | Field f8, end f50; 25 mana |
 | Up B | **Spectral Ascent:** visible upward glide, 2.1H height and up to 0.4H lateral drift, no hitbox or intangibility. Free version 1.4H. | Movement f10–34, helpless afterward; 15 mana |
-| Down B | **Frost Armor** (#130): f22 cast grants a 240-frame shell that absorbs the hit reaction of one hit of at most 8 damage and chills the melee striker. Damage still applies; grabs bypass it. **Dark Ritual:** down B while the shell holds shatters it on f6 into a 0.6H burst around Lich (5 damage, POKE at 60 degrees) and restores 30 mana. | Cast f22, end f45; 20 mana. Ritual end f24, free |
+| Down B | **Frost Armor** (#130): f22 cast grants a 240-frame shell that absorbs the hit reaction of one hit of at most 8 damage and chills the melee striker. Damage still applies; grabs bypass it. **Dark Ritual:** down B while the shell holds shatters it on f6 into a 0.6H burst around Lich (5 damage, POKE at 60 degrees) and gains no meter (Tom removed the gain, 2026-10-29). | Cast f22, end f45; 20 mana. Ritual end f24, free |
 
 ### Grab and throws
 
@@ -766,9 +766,6 @@ in [Forsaken Paladin](forsaken-paladin.md); production frame data lives in forsa
 | Down B | **Consecration:** fixed, jumpable holy patch, radius 60, 70 units ahead. Life 120 frames, 1.7 damage at most every 45 frames; one patch and 150-frame recast interval. Ground only. | Pool f16, end f42; 20 mana |
 
 **Sacred Aura:** three blocked hits make the next non-throw launch 20% weaker.
-Shared EX neutral/side cost 25 extra mana for six startup frames of one-hit
-armor (superseded 2026-10-28: EX specials carry no armor, mana.md). There are no ultimates in the adopted mana system.
-
 Direct hammer hits retain three extra hitlag frames and the volume-127 heavy
 bash. The 0.80 damage multiplier applies to authored damage and preserves
 original hitlag strength. Normal hit regions, hurt capsules and throws remain
@@ -1528,7 +1525,7 @@ Fel Rush ([Illidan](illidan.md), #147). His down special, Immolate, is
 Maiev's former Fan of Knives shape (#272): one frame-one burst on both sides
 of him that pops foes upward (85 degrees, base 75, growth 50) for 7 damage on
 the ground and 9 in the air, with an intangible first frame; it holds him in
-place in the air, a jump cancels it from frame 4, and EX reaches 25% farther. **Weakness:** his light hits make
+place in the air, a jump cancels it from frame 4. **Weakness:** his light hits make
 him land more of them to take a stock.
 
 **Gameplan** (smashcraft:ts/src/game/sim/illidanGameplan.ts): he fights in
@@ -1547,8 +1544,8 @@ Rifleman / Murloc / Cairne: uncharged forward smash kills from 145 / 137 /
 190% before and 131 / 124 / 173% after; fully charged Eye Blast is
 unchanged at 77 / 76 / 114%. 9 Oct, #379: forward smash became Fel Lunge,
 a short lunge with no beam (uncharged 128 / 122 / 171%, fully charged 94 /
-90 / 125%), and Eye Blast moved to his full-meter EX neutral special
-(smashcraft:docs/design/illidan.md; removed 2026-10-28 for the EX principles in mana.md). Dash attack kills from 115 / 115 / 170%
+90 / 125%), and Eye Blast moved to his neutral special
+(smashcraft:docs/design/illidan.md; removed 2026-10-28). Dash attack kills from 115 / 115 / 170%
 before and 145 / 135 / 190% after; at 120% it now sends Rifleman 180 units
 up (39 before) with Illidan 22 frames ahead.
 
@@ -1789,15 +1786,15 @@ his edge-guard weakness.
 
 ### B specials
 
-All four base specials are free. A full EX charge buys any one EX;
+All four base specials are free;
 there is no Grom-specific resource or cooldown.
 
-| Input | Base move | EX |
-|---|---|---|
-| Neutral | **Warsong Cry:** brace and roar; a close body burst at frames 12–15 launches foes upward for a chase, ending frame 34. Air version lands with 20 lag. | 25% greater reach, same burst (mana.md, 2026-10-28) |
-| Side | **Gorehowl Rush:** run axe-first on frames 8–20, hit at 10–17, stop at shields and recover through frame 40. Air version is once per airtime and ends helpless. | Shield-safe: a blocked rush holds the shield through his recovery |
-| Up | **Blood Leap:** spring upward on frames 7–22, axe rising through 7–14; ends frame 36 in helpless fall. No invulnerability. | 25% more travel |
-| Down | **Mannoroth's Bane:** visible two-handed execution, active 20–23, recovery through frame 50; ground and air cleave, 24 landing lag. | A 25% longer chop |
+| Input | Base move |
+|---|---|
+| Neutral | **Warsong Cry:** brace and roar; a close body burst at frames 12–15 launches foes upward for a chase, ending frame 34. Air version lands with 20 lag. |
+| Side | **Gorehowl Rush:** run axe-first on frames 8–20, hit at 10–17, stop at shields and recover through frame 40. Air version is once per airtime and ends helpless. |
+| Up | **Blood Leap:** spring upward on frames 7–22, axe rising through 7–14; ends frame 36 in helpless fall. No invulnerability. |
+| Down | **Mannoroth's Bane:** visible two-handed execution, active 20–23, recovery through frame 50; ground and air cleave, 24 landing lag. |
 
 ### Grab and throws
 
@@ -1872,16 +1869,16 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 | Up air — Horn of the King | 9/4/23; L16 | 10 | Coiled rise that lifts both claws in a rising overhead rake |
 | Down air — Tombstone | 14/5/32; L24 | 15 | Both claws raised overhead drive straight down under his shell; airborne spike |
 
-### Four specials and EX
+### Four specials
 
-All four ordinary specials are free. Shield + any Special spends the EX charge for its EX form; no beetle count or burrow meter is shown or banked. EX keeps the ordinary frames and changes one thing (mana.md).
+All four specials are free; no beetle count or burrow meter is shown or banked.
 
-| Input | Ordinary move | EX form | Counterplay |
-|---|---|---|---|
-| Neutral — **Impale** | Stamp at f18; a floor-level spine line travels at 10 units/frame for 36 frames, 9%, upward launch; end f48. Air cast sends the same line forward at foot height, L24. | Spines 25% larger (reach); same damage, launch and end (mana.md, 2026-10-28). | Jump over the low line, shield or punish the stamp |
-| Side — **Burrow Hunt** | Coil f1–9, burrow f10–25 while moving 10 units/frame, erupt with a 12% launcher f26–29; end f64. Ground only. | Burrows 25% farther over the same f10–25 (travel); same eruption f26–29, end f64. | Track the moving mound and meet the slow eruption with shield or a jump |
-| Up — **Crypt Eruption** | Charge aim f1–8, launch along the chosen direction for 28 frames over a 400-unit route; narrow 8% horn hit f9–16, stop then fall helpless; end f46. | 500-unit route (travel); same horn and helpless finish. | The broad shell is exposed before launch and during helpless fall |
-| Down — **Carrion Beetle** | Plant a beetle nest f22, end f46; one fragile 24-HP nest lasts 180 frames and sends three floor-running beetles (5% each) at ages 1/49/97. Down again recalls it. | 36-HP nest (durability); the same three beetles and 180-frame life. | Destroy the nest, jump the beetles or reflect a beetle back; block the first beetle up close and punish the cast |
+| Input | Ordinary move | Counterplay |
+|---|---|---|
+| Neutral — **Impale** | Stamp at f18; a floor-level spine line travels at 10 units/frame for 36 frames, 9%, upward launch; end f48. Air cast sends the same line forward at foot height, L24. | Jump over the low line, shield or punish the stamp |
+| Side — **Burrow Hunt** | Coil f1–9, burrow f10–25 while moving 10 units/frame, erupt with a 12% launcher f26–29; end f64. Ground only. | Track the moving mound and meet the slow eruption with shield or a jump |
+| Up — **Crypt Eruption** | Charge aim f1–8, launch along the chosen direction for 28 frames over a 400-unit route; narrow 8% horn hit f9–16, stop then fall helpless; end f46. | The broad shell is exposed before launch and during helpless fall |
+| Down — **Carrion Beetle** | Plant a beetle nest f22, end f46; one fragile 24-HP nest lasts 180 frames and sends three floor-running beetles (5% each) at ages 1/49/97. Down again recalls it. | Destroy the nest, jump the beetles or reflect a beetle back; block the first beetle up close and punish the cast |
 
 ### Grab and throws
 
@@ -1963,7 +1960,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 
 Move healing restores its authored amount on a successful action, capped by
 current damage; it keeps no hidden per-stock bank.
-Which special carries which trait (a status, a heal, meter drain or steal) is
+Which special carries which trait (a status, a heal or a meter drain) is
 one table, smashcraft:ts/src/game/sim/identityTraits.ts;
 contacts, command grabs, guards and armour read it, so an ordinary move, throw
 or pummel carries no trait. The same file classifies every contact for
@@ -1977,7 +1974,7 @@ kept actions in Bun and emitted Lua.
 
 ## Lady Vashj (#663)
 
-**Identity:** an imperious serpent queen who lets her foes exhaust themselves against her. A zoner with meter as armour: Mana Shield spends EX charge before percent, cold arrows chill, and a bouncing water serpent steals charge back. Slow and wide up close. Kit, frame data, play-style profile and ceiling plan: [lady-vashj.md](lady-vashj.md).
+**Identity:** an imperious serpent queen who lets her foes exhaust themselves against her. A zoner with meter as armour: Mana Shield pays half of each hit from her ultimate meter before her percent, cold arrows chill, and a bouncing water serpent drains the foe's ultimate meter. Slow and wide up close. Kit, frame data, play-style profile and ceiling plan: [lady-vashj.md](lady-vashj.md).
 
 ## Medivh (#343)
 
@@ -2005,12 +2002,12 @@ No charge system, second resource or automatic counter.
 | Down air | Pointed staff plunge; airborne spike | 15/3/29; 11; landing 20 |
 | Get-up / ledge attack | Staff sweep / climbing shove | 17/3/30, 17/3/21; 7 |
 
-| Special | Ordinary version (all free) | EX (one EX charge) |
-| --- | --- | --- |
-| Neutral: Arcane Omen | f12 launches one slow purple bolt, 9 damage, 40-frame cast. Shield or jump it. | A 25% larger bolt at the same speed and damage; same cast commitment (mana.md, 2026-10-28). |
-| Side: Vanishing Act | f10 blink 180 units forward, f12–14 staff strike for 7, end f38; intangible only f9–10. Read the arrival and punish recovery. | Blink 225 units; same strike and exposed arrival. |
-| Up: Raven Flight | Compress f1–8, raven-form aimed flight f9–28 at 16 units/frame, 5-damage wing contact f9–15; end f36 helpless, spends air jump. | Flight 25% farther; same contact and helpless landing. |
-| Down: Last Word | f10 blink 120 units backwards, f13–15 outward arcane burst for 5, end f38; intangible f9–10. Bait the pursuit or lose ground. | A 25% larger burst; same retreat and damage. |
+| Special | Ordinary version (all free) |
+| --- | --- |
+| Neutral: Arcane Omen | f12 launches one slow purple bolt, 9 damage, 40-frame cast. Shield or jump it. |
+| Side: Vanishing Act | f10 blink 180 units forward, f12–14 staff strike for 7, end f38; intangible only f9–10. Read the arrival and punish recovery. |
+| Up: Raven Flight | Compress f1–8, raven-form aimed flight f9–28 at 16 units/frame, 5-damage wing contact f9–15; end f36 helpless, spends air jump. |
+| Down: Last Word | f10 blink 120 units backwards, f13–15 outward arcane burst for 5, end f38; intangible f9–10. Bait the pursuit or lose ground. |
 
 **Grab and throws:** shared grab envelope; one 3-damage staff pummel. Forward
 throw pushes at f14 for 7; back throw vanishes behind the victim then sweeps at

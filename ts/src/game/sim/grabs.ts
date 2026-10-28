@@ -83,7 +83,6 @@ export function authoredThrowEffect(action: GrabAction, moves?: FighterMoves): R
   throwHit.carry = undefined;
   throwHit.electric = false;
   throwHit.manaDrain = undefined;
-  throwHit.manaSteal = undefined;
   throwHit.setKnockback = down ? 90.0 : undefined;
   throwHit.fixedPower = undefined;
   const authored = moves?.throws[action];

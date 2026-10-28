@@ -10,7 +10,10 @@ import { Action } from "../input/actions";
 import { type KeyBindings, keyNames } from "../input/keyBindings";
 import { GroundAction, SpecialAction } from "../sim/codes";
 import { traitMove } from "../sim/identityTraits";
-import { METER, fillEx, gainUltimate, ultimateCharged } from "../sim/meter";
+import { ultimateCharged } from "../sim/meter";
+import { ORB_INTERVAL_FRAMES } from "../sim/orbs";
+import type { MatchOrbs } from "../sim/orbState";
+import { spawnOrb } from "./orbs";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
 import {
@@ -19,7 +22,7 @@ import {
 } from "../lobby/lobbyState";
 
 
-export const LessonAction = { dash: 0, doubleJump: 1, hit: 2, special: 3, dodge: 4, throw: 5, ledge: 6, knockout: 7, exSpecial: 8, ultimate: 9 } as const;
+export const LessonAction = { dash: 0, doubleJump: 1, hit: 2, special: 3, dodge: 4, throw: 5, ledge: 6, knockout: 7, orb: 8, ultimate: 9 } as const;
 export type LessonAction = (typeof LessonAction)[keyof typeof LessonAction];
 
 export interface Lesson {
@@ -35,9 +38,7 @@ export interface Lesson {
 
 const SPECIAL_SLOTS = ["neutral", "side", "up", "down"] as const;
 
-const EX_SECONDS = floorDiv(METER.exFrames, MATCH_TICKS_PER_SECOND);
-
-const ULTIMATE_MINUTES = floorDiv(METER.ultimateFrames, MATCH_TICKS_PER_SECOND * 60);
+const ORB_SECONDS = floorDiv(ORB_INTERVAL_FRAMES, MATCH_TICKS_PER_SECOND);
 
 const ULTIMATE_LANDING_FRAMES = 4 * MATCH_TICKS_PER_SECOND;
 
@@ -46,8 +47,8 @@ export const LESSONS: readonly Lesson[] = [
   { name: "Jump and double jump", instruction: key => `Press jump (${key(Action.jump)}), then press it again in the air to jump a second time. ${key(Action.shortHop)}, or LB in the tom pad layout, always short hops, even held.`, counted: "Double jumps", action: LessonAction.doubleJump, goal: 3, partnerDamage: 0 },
   { name: "Attacks", instruction: key => `Walk up to your partner and press attack (${key(Action.attack)}). Hold a direction to change the attack; hold strong (${key(Action.strong)}) as well for a smash.`, counted: "Hits", action: LessonAction.hit, goal: 5, partnerDamage: 0 },
   { name: "Specials", instruction: key => `Every fighter has four specials, and they are free. Press special (${key(Action.special)}) alone for the neutral special, or with ${key(Action.moveLeft)} or ${key(Action.moveRight)} for the side special, ${key(Action.moveUp)} for the up special and ${key(Action.moveDown)} for the down special. Try all four.`, counted: "Specials tried", action: LessonAction.special, goal: SPECIAL_SLOTS.length, partnerDamage: 0 },
-  { name: "EX specials", instruction: key => `Hold strong (${key(Action.strong)}) and press special (${key(Action.special)}) for an EX special, a stronger version that spends your EX charge. The small cell beside your damage shows it: lit when charged, dark once spent, and it refills in ${EX_SECONDS} seconds.`, counted: "EX specials", action: LessonAction.exSpecial, goal: 2, partnerDamage: 0 },
-  { name: "Ultimate", instruction: key => `The bar under your damage is your ultimate meter. It fills over ${ULTIMATE_MINUTES} minutes of play, and by half from each orange orb at centre stage. When it is full your fighter glows gold. Hold attack (${key(Action.attack)}) and press special (${key(Action.special)}) to fire your ultimate. Yours is full now: hit your partner with it.`, counted: "Ultimates landed", action: LessonAction.ultimate, goal: 1, partnerDamage: 0 },
+  { name: "Ultimate orbs", instruction: () => `The thin bar under your damage is your ultimate meter, and only orbs fill it. In a match an orb appears above centre stage every ${ORB_SECONDS} seconds; each fills half the bar. Touch the orb, or hit it with a normal attack, to take it. Specials, air dodges and ultimates pass through it. Take two.`, counted: "Orbs collected", action: LessonAction.orb, goal: 2, partnerDamage: 0 },
+  { name: "Ultimate", instruction: key => `With a full meter your fighter glows gold. Hold attack (${key(Action.attack)}) and press special (${key(Action.special)}) to fire your ultimate, and hit your partner with it. Take orbs until the bar is full.`, counted: "Ultimates landed", action: LessonAction.ultimate, goal: 1, partnerDamage: 0 },
   { name: "Shield and dodge", instruction: key => `${key(Action.leftTrigger)}: full shield; ${key(Action.lightShield)}: light shield. ${key(Action.leftTrigger)} + ${key(Action.moveLeft)} or ${key(Action.moveRight)} rolls; ${key(Action.leftTrigger)} + ${key(Action.moveDown)} dodges. Tap ${key(Action.leftTrigger)} before landing to tech; hold ${key(Action.moveLeft)} or ${key(Action.moveRight)} to tech roll.`, counted: "Dodges", action: LessonAction.dodge, goal: 3, partnerDamage: 0 },
   { name: "Grab and throw", instruction: key => `Stand next to your partner and press grab (${key(Action.grab)}). Then push a direction to throw.`, counted: "Throws", action: LessonAction.throw, goal: 2, partnerDamage: 0 },
   { name: "Get back to the ledge", instruction: key => `Jump off, then double jump (${key(Action.jump)}) and up special (${key(Action.moveUp)} + ${key(Action.special)}) to the ledge. ${key(Action.moveUp)} or toward the stage climbs; ${key(Action.jump)} leaps; ${key(Action.leftTrigger)} rolls; ${key(Action.attack)} strikes; ${key(Action.moveDown)} or away lets go.`, counted: "Ledge grabs", action: LessonAction.ledge, goal: 2, partnerDamage: 0 },
@@ -86,18 +87,6 @@ export function beginLesson(state: TrainingState, world: Roster, playerMask: num
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (participantActive(computerMask, slot)) f.status.damage = f32(info.partnerDamage);
-    else if (participantActive(playerMask, slot) && info.action === LessonAction.exSpecial) fillEx(f);
-  }
-  refillUltimates(state, info, world, playerMask);
-}
-
-
-function refillUltimates(state: Readonly<TrainingState>, lesson: Readonly<Lesson>, world: Roster, playerMask: number): void {
-  if (lesson.action !== LessonAction.ultimate || state.lessonWindow > 0) return;
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot) || !participantActive(playerMask, slot)) continue;
-    const f = fighterAt(world, slot);
-    if (!ultimateCharged(f) && f.special.action !== SpecialAction.heroUltimate) gainUltimate(f, METER.ultimateFrames);
   }
 }
 
@@ -111,8 +100,10 @@ const beforeAirDodge: Slots<boolean> = [false, false, false, false];
 const beforeThrow: Slots<number> = [0, 0, 0, 0];
 const beforeLedge: Slots<number> = [0, 0, 0, 0];
 const beforeOut: Slots<boolean> = [false, false, false, false];
+let beforePickup = 0;
 
-export function captureTutorialBefore(world: Roster): void {
+export function captureTutorialBefore(world: Roster, orbs: Readonly<MatchOrbs>): void {
+  beforePickup = orbs.pickupSerial;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
@@ -145,8 +136,8 @@ function newSpecial(state: TrainingState, special: SpecialAction): number {
   return 1;
 }
 
-function countAction(state: TrainingState, action: LessonAction, world: Roster, playerMask: number, computerMask: number): number {
-  let count = 0;
+function countAction(state: TrainingState, action: LessonAction, world: Roster, playerMask: number, computerMask: number, orbs: Readonly<MatchOrbs>): number {
+  let count = action === LessonAction.orb && orbs.pickupSerial !== beforePickup && orbs.lastTaker >= 0 && participantActive(playerMask, orbs.lastTaker) ? 1 : 0;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
@@ -157,8 +148,7 @@ function countAction(state: TrainingState, action: LessonAction, world: Roster, 
     const started = f.special.action !== SpecialAction.none && beforeSpecial[slot] === SpecialAction.none;
     if (player && action === LessonAction.dash && f.ground.action === GroundAction.dash && beforeGround[slot] !== GroundAction.dash) count++;
     else if (player && action === LessonAction.doubleJump && f.jump.serial !== beforeJump[slot] && f.jump.isDouble) count++;
-    else if (player && action === LessonAction.special && started && !f.special.ex) count += newSpecial(state, f.special.action);
-    else if (player && action === LessonAction.exSpecial && started && f.special.ex) count++;
+    else if (player && action === LessonAction.special && started) count += newSpecial(state, f.special.action);
     else if (player && action === LessonAction.ultimate && started && f.special.action === SpecialAction.heroUltimate) state.lessonWindow = ULTIMATE_LANDING_FRAMES;
     else if (partner && action === LessonAction.ultimate && f.visuals.hit !== beforeHit[slot] && state.lessonWindow > 0 && !playersOtherwiseAttacking(world, playerMask)) count++;
     else if (player && action === LessonAction.dodge && ((f.dodge.groundFrame > 0 && beforeGroundDodge[slot] === 0) || (f.dodge.airDodging && !beforeAirDodge[slot]))) count++;
@@ -171,7 +161,14 @@ function countAction(state: TrainingState, action: LessonAction, world: Roster, 
 }
 
 
-export function advanceTutorial(state: TrainingState, world: Roster, playerMask: number, computerMask: number): void {
+function wantsOrb(lesson: Readonly<Lesson>, world: Roster, playerMask: number): boolean {
+  if (lesson.action === LessonAction.orb) return true;
+  if (lesson.action !== LessonAction.ultimate) return false;
+  return PARTICIPANT_SLOTS.some(slot => isActive(world, slot) && participantActive(playerMask, slot) && !ultimateCharged(fighterAt(world, slot)) && fighterAt(world, slot).special.action !== SpecialAction.heroUltimate);
+}
+
+
+export function advanceTutorial(state: TrainingState, world: Roster, playerMask: number, computerMask: number, orbs: MatchOrbs): void {
   if (state.lessonCheer > 0) {
     state.lessonCheer--;
     if (state.lessonCheer === 0) beginLesson(state, world, playerMask, computerMask, state.lesson + 1);
@@ -179,10 +176,10 @@ export function advanceTutorial(state: TrainingState, world: Roster, playerMask:
   }
   const lesson = LESSONS[state.lesson];
   if (lesson === undefined) return;
-  state.lessonCount = Math.min(lesson.goal, state.lessonCount + countAction(state, lesson.action, world, playerMask, computerMask));
+  state.lessonCount = Math.min(lesson.goal, state.lessonCount + countAction(state, lesson.action, world, playerMask, computerMask, orbs));
   if (state.lessonCount >= lesson.goal) state.lessonCheer = LESSON_CHEER_FRAMES;
   if (state.lessonWindow > 0) state.lessonWindow--;
-  if (state.lessonCount < lesson.goal) refillUltimates(state, lesson, world, playerMask);
+  if (state.lessonCount < lesson.goal && !orbs.live && wantsOrb(lesson, world, playerMask)) spawnOrb(orbs);
 }
 
 

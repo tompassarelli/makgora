@@ -2,8 +2,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { type Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
-import { exCharged, ultimateCharged } from "../sim/meter";
-import { type AuthoredSpecial, FOLLOW_UP_FORM } from "../sim/specials/schema";
+import { ultimateCharged } from "../sim/meter";
+import type { AuthoredSpecial } from "../sim/specials/schema";
 import type { Cue } from "./specialCues";
 import { heroLook } from "../roster/looks";
 
@@ -12,9 +12,8 @@ export interface MeterCue extends Cue {
   readonly alpha?: number | undefined;
 }
 
-export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdx", anchor: "feet", scale: f32(0.7), lift: 0.0, alpha: 150, sequence: "birth", sound: "DivineShield" };
 export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
-export const METER_CUES: readonly MeterCue[] = [EX_AURA, ULTIMATE_BURST];
+export const METER_CUES: readonly MeterCue[] = [ULTIMATE_BURST];
 
 export function ultimateBurst(character: Character): MeterCue {
   const burst = heroLook(character)?.ultimateBurst;
@@ -22,7 +21,7 @@ export function ultimateBurst(character: Character): MeterCue {
 }
 
 export function meterCueMoves(character: Character): readonly (readonly [string, MeterCue])[] {
-  return [["EX aura", EX_AURA], ["ultimate burst", ultimateBurst(character)]];
+  return [["ultimate burst", ultimateBurst(character)]];
 }
 
 export const METER_CUE_UNIT_RADIUS = 22.0;
@@ -41,9 +40,7 @@ export function meterCueFit(cue: MeterCue, character: Character): MeterCueFit {
   return { scale: f32(cue.scale * size), x: 0.0, z: f32(top * cue.lift) };
 }
 
-export const EX_AURA_FRAMES = 30;
 export const ULTIMATE_BURST_FRAMES = 16;
-export const EX_CAST_VOLUME = 110;
 export const ULTIMATE_CAST_VOLUME = 127;
 
 export const meterCueSoundLabels = (): string[] => {
@@ -61,11 +58,8 @@ export function ultimateFirstEffectFrame(move: Readonly<AuthoredSpecial> | undef
 }
 
 export interface MeterCueView {
-  exAura: boolean;
-  exReady: boolean;
   superAura: boolean;
   burst: boolean;
-  exSound: boolean;
   ultimateSound: boolean;
 }
 
@@ -75,26 +69,19 @@ export interface MeterCueState {
 }
 
 export function createMeterCueState(): MeterCueState {
-  return { action: SpecialAction.none, view: { exAura: false, exReady: false, superAura: false, burst: false, exSound: false, ultimateSound: false } };
+  return { action: SpecialAction.none, view: { superAura: false, burst: false, ultimateSound: false } };
 }
 
 export function clearMeterCueState(state: MeterCueState): void {
   state.action = SpecialAction.none;
   const { view } = state;
-  view.exAura = false;
-  view.exReady = false;
   view.superAura = false;
   view.burst = false;
-  view.exSound = false;
   view.ultimateSound = false;
 }
 
 export function ultimateReady(fighter: Readonly<Fighter>, ultimatesOff: boolean): boolean {
   return !ultimatesOff && fighter.tuning.ultimate !== undefined && !fighter.status.out && ultimateCharged(fighter) && fighter.special.action !== SpecialAction.heroUltimate;
-}
-
-export function exReady(fighter: Readonly<Fighter>): boolean {
-  return !fighter.status.out && exCharged(fighter) && fighter.special.action !== SpecialAction.heroUltimate;
 }
 
 /** Reads one confirmed frame of the fighter into the meter cues it shows; sounds are true only on the frame their cast starts. */
@@ -104,27 +91,17 @@ export function observeMeterCues(state: MeterCueState, fighter: Readonly<Fighter
     clearMeterCueState(state);
     return view;
   }
-  const { action, ex, form, frame } = fighter.special;
+  const { action, frame } = fighter.special;
   const started = action !== SpecialAction.none && action !== state.action;
   state.action = action;
   const ultimate = action === SpecialAction.heroUltimate;
   view.ultimateSound = started && ultimate;
-  view.exSound = started && !ultimate && ex;
   view.burst = ultimate && frame <= ULTIMATE_BURST_FRAMES;
-  view.exAura = ex && !ultimate && action !== SpecialAction.none && form < FOLLOW_UP_FORM && frame <= EX_AURA_FRAMES;
   view.superAura = ultimateReady(fighter, ultimatesOff);
-  view.exReady = exReady(fighter);
   return view;
 }
 
 export const NO_CAST = -1;
-
-/** The first frame of the EX cast the fighter's state holds on `frame`, or NO_CAST. */
-export function exCastFrame(fighter: Readonly<Fighter> | undefined, frame: number): number {
-  if (fighter === undefined || fighter.status.out) return NO_CAST;
-  const { action, ex, form } = fighter.special;
-  return ex && action !== SpecialAction.none && action !== SpecialAction.heroUltimate && form < FOLLOW_UP_FORM ? frame - fighter.special.frame + 1 : NO_CAST;
-}
 
 /** The first frame of the ultimate the fighter's state holds on `frame`, or NO_CAST. */
 export function ultimateCastFrame(fighter: Readonly<Fighter> | undefined, frame: number): number {

@@ -66,7 +66,7 @@ export function beginJump(f: Fighter, horizontal: number, shortHop = false, thro
 
 
 
-export function beginAirDodge(f: Fighter, horizontal: number, vertical: number, bufferedDuringJumpSquat = false, ex = false): void {
+export function beginAirDodge(f: Fighter, horizontal: number, vertical: number, bufferedDuringJumpSquat = false): void {
   const { motion, launch, dodge } = f;
   if (lockedOut(f) || parasolBlocksActions(f) || motion.grounded || dodge.airDodging || dodge.airUsed || dodge.airMotionFrames > 0) return;
   observeActionDecision(DODGE_BITS);
@@ -87,7 +87,6 @@ export function beginAirDodge(f: Fighter, horizontal: number, vertical: number, 
   dodge.airMotionFrames = AIR_DODGE_DECAY_FRAMES;
   dodge.airDodging = true;
   dodge.airUsed = true;
-  dodge.ex = ex && dx !== 0;
   observeActionStart(DODGE_BITS);
   motion.crouching = false;
   dodge.airFrame = 0;

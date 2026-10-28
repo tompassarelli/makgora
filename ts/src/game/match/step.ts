@@ -37,7 +37,7 @@ import type { FrameControls } from "./controls";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { type MatchState, Phase, advanceClock, holdingStart, humanFighterActive, keepsStocks, resolveStocks, stageClock } from "../lobby/lobbyState";
 import { advanceItems } from "./centreItem";
-import { advanceMeterRegen, advanceOrbs } from "./orbs";
+import { advanceOrbs } from "./orbs";
 
 import { bossClock, collectBossContacts, strikeBoss } from "../classic/bosses";
 import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../classic/configuredMatch";
@@ -164,7 +164,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (tutorialOn(game.trainer)) {
 
       if (game.matchFrame === 1) beginLesson(game.trainer, world, game.humanFighterMask, game.computerMask, game.trainer.lesson);
-      captureTutorialBefore(world);
+      captureTutorialBefore(world, game.orbs);
     }
   }
   const mask = world.mask;
@@ -209,7 +209,6 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   }
   advanceWater(world, stage, game.matchFrame, game.hazards);
   advanceItems(game, world, controls, frame);
-  advanceMeterRegen(game, world);
   advanceOrbs(game, world);
   advanceStageCannon(world, stage, stageFrame, controls.inputs);
 
@@ -295,7 +294,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   else advanceMatchCamera(game.camera, world, game.stageChoice);
   advanceOffscreenDamage(world, game.camera, game.practice || game.training, scope === undefined ? mask : 1 << scope.slot);
   if (game.training) advanceTrainingReadout(game.trainer, world, game.humanFighterMask, game.computerMask);
-  if (game.training && tutorialOn(game.trainer)) advanceTutorial(game.trainer, world, game.humanFighterMask, game.computerMask);
+  if (game.training && tutorialOn(game.trainer)) advanceTutorial(game.trainer, world, game.humanFighterMask, game.computerMask, game.orbs);
   advanceClock(game, world);
   if (game.run.active) {
     trackConfiguredFrame(game, world);

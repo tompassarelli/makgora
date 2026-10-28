@@ -2,7 +2,6 @@
 
 
 
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, type SpecialProjectile, CHARGED_AIM_FRAMES, chargedAngleMotion, frames } from "../../sim/specials/schema";
@@ -92,8 +91,8 @@ const SERPENT_WARD_CAST: AuthoredSpecial = { endFrame: 52, groundOnly: true, mot
 const SERPENT_WARD_RECALL: AuthoredSpecial = { endFrame: 52, groundOnly: true, recall: true, motion: SERPENT_WARD_STOP };
 
 export const SHADOW_HUNTER_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Spirit Glaive", description: "A glaive that flies out and back, pulling its target toward him on the return.", ground: spiritGlaive(false), air: spiritGlaive(true) }, { reach: 1.25 }),
-  side: withExKit({ name: "Serpent Ward", description: "Place a ward that fires on its own; press again to recall it.", ground: SERPENT_WARD_CAST, recall: SERPENT_WARD_RECALL }, { durability: 1.25 }),
-  up: withExKit({ name: "Loa Vault", description: "Hold a direction as the spirits gather, then a vault that way and a helpless fall.", ground: loaVault(f32(3.55)) }, { travel: 1.25 }),
-  down: withExKit({ name: "Hex", description: "A short orb that turns its target into a frog that hops about helplessly, with no control but DI, until it mashes out.", ground: hex(false), air: hex(true) }, { reach: 1.25 }),
+  neutral: { name: "Spirit Glaive", description: "A glaive that flies out and back, pulling its target toward him on the return.", ground: spiritGlaive(false), air: spiritGlaive(true) },
+  side: { name: "Serpent Ward", description: "Place a ward that fires on its own; press again to recall it.", ground: SERPENT_WARD_CAST, recall: SERPENT_WARD_RECALL },
+  up: { name: "Loa Vault", description: "Hold a direction as the spirits gather, then a vault that way and a helpless fall.", ground: loaVault(f32(3.55)) },
+  down: { name: "Hex", description: "A short orb that turns its target into a frog that hops about helplessly, with no control but DI, until it mashes out.", ground: hex(false), air: hex(true) },
 };

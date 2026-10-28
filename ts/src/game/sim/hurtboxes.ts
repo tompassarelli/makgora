@@ -152,7 +152,7 @@ function specialHurtPoses(f: Readonly<Fighter>): readonly HurtPose[] | undefined
   }
   const specials = f.tuning.specials;
   if (specials === undefined || action < SpecialAction.heroNeutral || action > SpecialAction.heroDown) return undefined;
-  return specialForm(specialKit(specials, action - SpecialAction.heroNeutral), form, false, variant).hurt;
+  return specialForm(specialKit(specials, action - SpecialAction.heroNeutral), form, variant).hurt;
 }
 
 function specialHurtParts(f: Readonly<Fighter>): readonly HurtPart[] | undefined {

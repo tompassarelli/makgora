@@ -1,4 +1,3 @@
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
@@ -33,8 +32,8 @@ const LIFE_DRAIN: AuthoredSpecial = {
 };
 
 export const SYLVANAS_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Black Arrow", description: "A dark arrow that charges her next bow strike. It leaves on frame 10 of 34, on the ground or in the air, so a short hop fires it before she lands. Hold up to fire upward.", ground: BLACK_ARROW, air: { ...BLACK_ARROW, landingLag: 16 } }, { range: 1.25 }),
-  side: withExKit({ name: "Silence", description: "A short curse that stops offensive specials. Movement, attacks and recovery still work.", ground: SILENCE, air: { ...SILENCE, landingLag: 20 } }, { reach: 1.25 }),
-  up: withExKit({ name: "Banshee Flight", description: "Rise as a spirit, steering toward the stage, then fall helpless.", ground: flight(f32(2.6), f32(2.6)) }, { travel: 1.25 }),
-  down: withExKit({ name: "Life Drain", description: "Catch a nearby foe through their shield and drain a little life. A missed reach leaves her open.", ground: LIFE_DRAIN, air: { ...LIFE_DRAIN, groundOnly: false } }, { reach: 1.25 }),
+  neutral: { name: "Black Arrow", description: "A dark arrow that charges her next bow strike. It leaves on frame 10 of 34, on the ground or in the air, so a short hop fires it before she lands. Hold up to fire upward.", ground: BLACK_ARROW, air: { ...BLACK_ARROW, landingLag: 16 } },
+  side: { name: "Silence", description: "A short curse that stops offensive specials. Movement, attacks and recovery still work.", ground: SILENCE, air: { ...SILENCE, landingLag: 20 } },
+  up: { name: "Banshee Flight", description: "Rise as a spirit, steering toward the stage, then fall helpless.", ground: flight(f32(2.6), f32(2.6)) },
+  down: { name: "Life Drain", description: "Catch a nearby foe through their shield and drain a little life. A missed reach leaves her open.", ground: LIFE_DRAIN, air: { ...LIFE_DRAIN, groundOnly: false } },
 };

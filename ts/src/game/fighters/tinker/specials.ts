@@ -1,5 +1,4 @@
 import { f32 } from "wisp/src/sim/f32";
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { HitElement } from "../../sim/codes";
 import { heroRegion, type MoveRegion } from "../../sim/heroMoves";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
@@ -38,13 +37,13 @@ const clockwerk = (velocityZ: number, gravity?: number): SpecialProjectile => ({
 const goblinDrop: SpecialProjectile = { ...clockwerk(-3.0, f32(0.25)), spawnFrame: 10, velocityX: 3.0, life: 40 };
 
 export const TINKER_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Cluster Rockets", description: "Three rockets cover the approach and charge the next claw hit.", ground: rockets }, { range: 1.25 }),
-  side: withExKit({
+  neutral: { name: "Cluster Rockets", description: "Three rockets cover the approach and charge the next claw hit.", ground: rockets },
+  side: {
     name: "Laser", description: "His mechanical arms glow with laser light, then a beam tracks the nearest foe in front of him; shield it on reaction and punish the end lag.",
     ground: laser,
-  }, { reach: 1.25 }),
-  up: withExKit({ name: "Rocket Boots", description: "Blast off, burn upward and steer left or right, then fall helplessly.", ground: boots(18.0, 7.0) }, { travel: 1.25 }),
-  down: withExKit({
+  },
+  up: { name: "Rocket Boots", description: "Blast off, burn upward and steer left or right, then fall helplessly.", ground: boots(18.0, 7.0) },
+  down: {
     name: "Pocket Factory", description: "Build a breakable factory that sends out Clockwerk Goblins; press again to recall it. In the air he drops one goblin.",
     ground: { endFrame: 48, groundOnly: true, placement: {
       frame: 24, offsetX: 88.0, radius: 24.0, height: 65.0, durability: 24.0, life: 240,
@@ -52,5 +51,5 @@ export const TINKER_SPECIALS: FighterSpecials = {
     } },
     air: { endFrame: 36, projectiles: [goblinDrop], landingLag: 16 },
     recall: { endFrame: 36, groundOnly: true, recall: true },
-  }, { durability: 1.25 }),
+  },
 };

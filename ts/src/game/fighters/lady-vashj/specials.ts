@@ -7,9 +7,7 @@ import { ladyVashjHit, ladyVashjReach, ladyVashjStrike } from "./moves";
 
 const ARROW_SPEED = 20.0;
 const arrow = (velocityX: number, velocityZ: number) => ({ velocityX: f32(ARROW_SPEED * velocityX), velocityZ: f32(ARROW_SPEED * velocityZ) });
-const TEN = arrow(f32(0.984807753), f32(0.173648178));
 const TWELVE = arrow(f32(0.978147601), f32(0.207911691));
-const TWENTY = arrow(f32(0.939692621), f32(0.342020143));
 const down = (shot: { readonly velocityX: number; readonly velocityZ: number }) => ({ velocityX: shot.velocityX, velocityZ: -shot.velocityZ });
 const ARROW_MODEL = "Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl";
 const coldArrow = (fan?: SpecialProjectile["fan"]): SpecialProjectile => ({
@@ -19,17 +17,16 @@ const coldArrow = (fan?: SpecialProjectile["fan"]): SpecialProjectile => ({
 });
 const CENTRE_ARROW = coldArrow();
 const SIDE_ARROWS = coldArrow([TWELVE, down(TWELVE)]);
-const EX_SIDE_ARROWS = coldArrow([TEN, down(TEN), TWENTY, down(TWENTY)]);
 const multiShot = (sides: SpecialProjectile, landingLag?: number): AuthoredSpecial => ({
   endFrame: 40, landingLag, projectiles: [CENTRE_ARROW, sides],
   hurt: [hurtPose(12, 26, ladyVashjReach(58.0, 92.0))],
 });
 
-const serpent = (bounces: number, steal: number): SpecialProjectile => ({
+const serpent = (bounces: number, drain: number): SpecialProjectile => ({
   spawnFrame: 16, offsetX: 46.0, offsetZ: 46.0, velocityX: 12.0, velocityZ: 0.0, life: 27, radius: 18.0,
   effect: ladyVashjHit(6.0, 40, 50.0, 30.0), reflectable: false, limit: 1,
   model: "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdl",
-  bounce: { count: bounces, range: 300.0, falloff: f32(0.8), speed: 14.0, steal },
+  bounce: { count: bounces, range: 300.0, falloff: f32(0.8), speed: 14.0, drain },
 });
 const tidalSerpent = (shot: SpecialProjectile, landingLag?: number): AuthoredSpecial => ({
   endFrame: 52, landingLag, projectiles: [shot],
@@ -48,12 +45,12 @@ const MANA_SHIELD: AuthoredSpecial = { endFrame: 12, manaShield: { frame: 6 } };
 export const LADY_VASHJ_SPECIALS: FighterSpecials = {
   neutral: {
     name: "Multi-Shot", description: "Three cold arrows in a fan; the centre one chills. Shield or reflect them. Only one volley flies at a time.",
-    ground: { ...multiShot(SIDE_ARROWS), ex: multiShot(EX_SIDE_ARROWS) }, air: { ...multiShot(SIDE_ARROWS, 18), ex: multiShot(EX_SIDE_ARROWS, 18) },
+    ground: multiShot(SIDE_ARROWS), air: multiShot(SIDE_ARROWS, 18),
   },
   side: {
-    name: "Tidal Serpent", description: "A water serpent that steals EX charge and bounces to the next foe, or back to her to hand over what it stole. Jump or shield it.",
-    ground: { ...tidalSerpent(serpent(3, 108)), ex: tidalSerpent(serpent(4, 180)) }, air: { ...tidalSerpent(serpent(3, 108), 20), ex: tidalSerpent(serpent(4, 180), 20) },
+    name: "Tidal Serpent", description: "A water serpent that drains ultimate meter and bounces to the next foe, or back to her. Jump or shield it.",
+    ground: tidalSerpent(serpent(3, 108)), air: tidalSerpent(serpent(3, 108), 20),
   },
-  up: { name: "Tidal Surge", description: "A water column lifts her and pops up anyone above. Falls helpless after.", ground: { ...tidalSurge(SURGE_RISE), ex: tidalSurge(f32(SURGE_RISE * f32(1.15))) } },
-  down: { name: "Mana Shield", description: "Toggle: hits take half from her EX charge instead of her percent, and EX neither fills nor spends while it is up. It breaks into a stagger when the charge runs dry; throws go through it.", ground: MANA_SHIELD },
+  up: { name: "Tidal Surge", description: "A water column lifts her and pops up anyone above. Falls helpless after.", ground: tidalSurge(SURGE_RISE) },
+  down: { name: "Mana Shield", description: "Toggle: hits take half from her ultimate meter instead of her percent. It breaks into a stagger when the meter runs dry; throws go through it.", ground: MANA_SHIELD },
 };

@@ -102,13 +102,17 @@ for native sessions: `-dev training on`, `-dev hit-areas on`,
 
 The basic tutorial (#306) runs as a training match on the Sky Deck with the
 partner standing: ten lessons (move and dash, double jump, attacks, the four
-specials, EX specials, the ultimate, shield and dodge, grab and throw, back to
+specials, ultimate orbs, the ultimate, shield and dodge, grab and throw, back to
 the ledge, knock out the partner), each with one instruction in the readout's
 place and a count the sim keeps (smashcraft:ts/src/game/match/tutorial.ts).
-The specials lesson counts each of neutral, side, up and down once; the EX
-lesson starts with a full EX charge and counts Strong + special; the ultimate
-lesson turns ultimates on, fills the meter, refills it after a miss, and passes
-when an ultimate hits the partner (#677). A lesson passes when its
+The specials lesson counts each of neutral, side, up and down once; the orbs
+lesson (lesson 5, "Ultimate orbs", since 2026-10-29)
+hangs an orb above centre stage whenever the player's meter is not full and
+none is live, and counts "Orbs collected" to a goal of 2: the player collects
+an orb by touching it or hitting it with a normal attack, while specials and
+air dodges pass through; the ultimate lesson turns ultimates on and no longer
+hands the meter over: orbs keep appearing until it is full, and it passes when
+the ultimate then hits the partner (#677). A lesson passes when its
 count reaches its goal; "Well done!" shows for two seconds and the next lesson
 starts. The lesson, its count and that pause are training state, folded into
 the checksum only while a tutorial runs. Leaving a finished tutorial (pause, then

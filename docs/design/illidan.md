@@ -147,9 +147,6 @@ stick picks the side).
   flies level in his facing. The press itself still picks the side, since an
   up or down press is Wing Ascent or Immolate. Meeting the floor during a
   downward rush lands him and the horizontal part carries on.
-- **EX:** shield-safe (a blocked rush holds the shield in shieldstun for the
-  rest of his frames), the roster's rush headline in
-  [mana](mana.md); same frames, no armor, no extra speed.
 - **Cost:** the mana lane's side-special cost (12).
 
 **Counterplay.** The tell is 17 frames, so the rush is a read at any range;
@@ -182,7 +179,7 @@ Shield (#131) already owns the defensive-special slot in the roster.
 
 ## Drain on hit: what his attacks do
 
-Every attack Illidan lands drains the target's mana as part of the hit, as the
+Every attack Illidan lands drains the target's ultimate meter as part of the hit, as the
 Warcraft III Demon Hunter empties casters. The drain is a property of each
 move in his kit data (`manaDrain` on the move's hit effect,
 smashcraft:ts/src/game/sim/hitRegions.ts and specials.ts), scaled so combo
@@ -199,14 +196,14 @@ enders and big hits drain more:
 | Eye Beam | 0 | | |
 
 A shielded hit drains nothing; pummels, get-up and ledge attacks drain
-nothing; mana never goes below 0 and Illidan gains none. Each drain flashes
-the victim's mana readout fel purple, so the meter visibly drops with the
+nothing; the meter never goes below 0 and Illidan gains none. Each drain flashes
+the victim's ultimate bar fel purple, so the meter visibly drops with the
 hit (the flash rises over the drained fighter's head). A forward air into forward smash drains 14; a throw into an up air
 string about 14–18.
 
 Counterplay: drain needs a landed hit, so the answer is the ordinary one,
-not getting hit; a fighter who spends mana freely has less left for EX specials, and a
-fighter who keeps its mana gives up specials.
+not getting hit; a foe who is drained loses part of the orb meter they
+need for an ultimate.
 
 **Alternative B, a separate always-on Mana Break at a flat 3 per hit
 (superseded).** Tom's refinement: drain is what his hits do, not a
@@ -259,11 +256,6 @@ and its mana-scaled stun are gone; no other move used the stun's drain rule.
   standing Shadow Hunter (124 tall, the roster median); shorter fighters need
   it fired lower in the hop, and a full-jump beam passes over everyone
   standing.
-- **EX (Shield + Special):** the beam flies a quarter farther, 19 frames of
-  flight instead of 15 (912 units instead of 720), on the ground and in the
-  air, with the same frames and damage, as every EX keeps its base frames
-  (mana.md). It outranges the spacing that waits outside an ordinary beam.
-
 Counterplay: the 23-frame ground windup is a reaction window to jump it or
 close in; a shield holds it and a powershield reflects it; crouching short
 fighters still take it, but a full-hop foe is over it. Source:
@@ -405,13 +397,11 @@ is out, so a disjointed poke beats it. Alternatives: **B, keep Fel Lunge**
 Fel Lunge history (#379, 9 Oct): the earlier Eye Blast forward smash became a
 645-unit floor beam when charged, so it turned into a lunge like Fel Rush
 (startup 6, total 36, 40-70 units of travel). Eye Blast moved into his
-meter-gated special.
+special.
 
-Eye Blast history (#379, 2026-10-28): from 9 Oct a full-bar ground EX neutral
+Eye Blast history (#379, 2026-10-28): from 9 Oct a full-bar ground
 special was Eye Blast, a 24-frame marked windup and then a floor beam swept
-out to 645 units. The EX design principles of 2026-10-28 (mana.md) ask that an
-EX upgrade the same move with the same frames, so it was removed and the EX
-Eye Beam now flies farther instead.
+out to 645 units. It was removed on 2026-10-28.
 
 ### Down special in the air: Immolate (picked)
 
@@ -426,7 +416,7 @@ Crash:
   smashcraft:docs/gameplay-design.md#special-momentum).
 - Its strike since #272 is Fan of Knives' former shape on both sides of him:
   a foe whose feet are within 116 to either side and 104 below to 108 above
-  (140, 114 and 118 for EX) is popped away from him at 85 degrees, base 108,
+  is popped away from him at 85 degrees, base 108,
   growth 18; 7% on the ground, 9% in the air, drain 6. Those bounds are Fan
   of Knives' knife capsule (0.7 fighter heights out, 0.3 radius, centred 48
   up) grown by a reference body, since Immolate tests the foe's feet and Fan
@@ -629,8 +619,8 @@ What he keeps, so he does not become Falco in a costume:
   eight-way dive, which starts by itself on frame 19 when the stick changes zone. Since #519 the ascent aims and starts like Fire Bird, but it
   takes no charge and does not hit.
 - Eye Beam: since the 2026-10-28 request the neutral special is Eye Beam, a
-  Falco-timed laser from his eyes; its EX flies farther (Eye Blast removed).
-- Drain on hit: every landed hit still drains mana.
+  Falco-timed laser from his eyes (Eye Blast removed).
+- Drain on hit: every landed hit still drains the foe's ultimate meter.
 - Immolate stays a shine, not a loop: Immolate into Immolate stays below true,
   and no waveshine infinite.
 

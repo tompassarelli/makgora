@@ -13,9 +13,7 @@ import { Character, SpecialAction } from "../sim/codes";
 import { isSmashAttack } from "../sim/moves";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, surfacePass } from "../sim/stage";
-import { ORB_WARNING_FRAMES, orbPoint, orbWarningFrames, orbsActive, warnedOrb } from "../sim/orbs";
-import { OrbKind } from "../sim/orbState";
-import { exCharged } from "../sim/meter";
+import { ORB_WARNING_FRAMES, orbPoint, orbWarningFrames, orbsActive, orbWarned } from "../sim/orbs";
 import { type FighterGameplan, GameplanThrow } from "../sim/gameplan";
 import { SPACE_PLAN, avoids, gameplanGoal, gameplanOf, gameplanPlan, gameplanThrow, jumpsIn, keptGap, onAnotherDeck, plansRanged, spacingAerialAt } from "./botGameplan";
 import { steerInAir, steerOnGround } from "./botFooting";
@@ -171,12 +169,12 @@ const CLIMB_STEP = 40.0;
 export function orbContest(game: Readonly<MatchState>, fighter: Readonly<Fighter>, slot: ParticipantSlot, skill: CpuSkill): boolean {
   const { orbs } = game;
   if (!orbsActive(game)) return false;
-  if (orbs.live === OrbKind.none) {
-    if (warnedOrb(game) === OrbKind.none) return false;
+  if (!orbs.live) {
+    if (!orbWarned(game)) return false;
     const left = orbWarningFrames(game);
-    if (orbs.held === OrbKind.none && left !== undefined && left > ORB_WARNING_FRAMES - skill.contestDelay) return false;
+    if (!orbs.held && left !== undefined && left > ORB_WARNING_FRAMES - skill.contestDelay) return false;
   }
-  const serial = orbs.live === OrbKind.none ? orbs.spawnSerial + 1 : orbs.spawnSerial;
+  const serial = orbs.live ? orbs.spawnSerial : orbs.spawnSerial + 1;
   return botChance(serial, slot * 29 + fighter.character, skill.contestTenths, 10);
 }
 
@@ -284,7 +282,6 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   decide(game, world, runtime, slot, frame, input, commands, skillOverride === undefined ? perceivedCpuSkill(opponent, tier) : { ...skill, reactionFrames: 0 }, target, reactionFrames);
   if (!game.training) steerEdgeCancel(fighter, target, game.stageChoice, skill, input);
   const execution = executeBotTechnique(fighter, input, commands, frame, slot, skill.decision);
-  upgradeThreatenedSpecial(fighter, target, input);
   if (fighter.launch.hitlag <= 0 && fighter.launch.hitstun > 0) chooseHitlagInput(fighter, slot, frame, skill, input);
   if (!game.training) applyAerialExecutionNoise(fighter, target, slot, skill, input);
   // DI and escape mashing are reactions to the fighter's own state, not steering.
@@ -350,15 +347,6 @@ export function repeatComputerInput(world: Readonly<Roster>, runtime: BotRuntime
   copyBotStrategy(runtime.botStrategies[slot], after.botStrategies[slot]);
   runtime.botMemory.directions[slot] = after.botMemory.directions[slot];
   runtime.botMemory.directionFrames[slot] = after.botMemory.directionFrames[slot];
-}
-
-/** The delayed opponent observation decides whether a cast needs startup armor. */
-export function upgradeThreatenedSpecial(fighter: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {
-  if (target === undefined || !input.specialPressed || fighter.special.action !== SpecialAction.none
-    || target.attack.style === undefined || Math.abs(f32(target.motion.x - fighter.motion.x)) > 140.0
-    || Math.abs(f32(target.motion.z - fighter.motion.z)) > 140.0 || !exCharged(fighter)) return;
-  if (fighter.character === Character.demonHunter && input.specialX === 0 && input.specialZ === 0) return;
-  input.exPressed = true;
 }
 
 /** Half a second: a computer that idles stands still this long. */

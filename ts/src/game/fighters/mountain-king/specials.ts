@@ -1,4 +1,3 @@
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { hurtCapsule } from "../../sim/geometry/contactGeometry";
 import { Character, HitElement } from "../../sim/codes";
@@ -133,7 +132,7 @@ const AIR_CLAP = hit(10.806899070739746, "LAUNCH", 70, false, HitElement.electri
 
 
 export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
-  neutral: withExKit({
+  neutral: {
     name: "Storm Bolt",
     description: "A hammer thrown straight ahead that flies until it hits or its flight ends; it never comes back. Landing before the throw leaves keeps the cast going on the ground.",
     ground: {
@@ -145,8 +144,8 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       }],
       landingLag: 20, swingsThroughLanding: true,
     },
-  }, { range: 1.25 }),
-  side: withExKit({
+  },
+  side: {
     name: "Storm Rush",
     description: "A shoulder charge that stops dead at a body or shield.",
     ground: {
@@ -163,8 +162,8 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       oncePerAirtime: true,
       helpless: true,
     },
-  }, { shieldSafe: true }),
-  up: withExKit({
+  },
+  up: {
     name: "Thunder Leap",
     description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, change direction at the top and he dives hammer first that way on his own as Hammerfall, in any of the eight directions other than the one he leapt. Keep the stick where it was, or let it go, and he falls helpless instead.",
     ground: {
@@ -180,8 +179,8 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       followUps: HAMMERFALL_DIVES,
     },
 
-  }, { travel: 1.25 }),
-  down: withExKit({
+  },
+  down: {
     name: "Thunder Clap",
     description: "Raise the hammer and slam: early for a small clap, late for a ring with shockwaves. Shield drops the charge.",
     ground: CHARGED_CLAP,
@@ -190,5 +189,5 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
       regions: [heroRegion(15, 18, capsule(10.0, 10.0, f32(SHORT - 14.0), -20.0, 14.0), AIR_CLAP)],
       landingLag: 20,
     },
-  }, { reach: 1.25 }),
+  },
 };

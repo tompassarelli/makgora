@@ -57,7 +57,7 @@ export function runningHeroSpecial(f: Readonly<Fighter>): AuthoredSpecial | unde
   }
   const specials = f.tuning.specials;
   if (specials === undefined || !isHeroSpecialAction(f.special.action)) return undefined;
-  return specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), f.special.form, f.special.ex, f.special.variant);
+  return specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), f.special.form, f.special.variant);
 }
 
 function requestedSlot(input: Readonly<Controls>): SpecialSlot {
@@ -85,9 +85,7 @@ function projectilesFit(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): 
   if (ownedCount(f, undefined) + projectiles.length > HERO_PROJECTILE_CAP) return false;
   for (let index = 0; index < projectiles.length; index++) {
     const spec = at(projectiles, index);
-    const upgraded = move.ex?.projectiles?.[index];
-    const exCount = upgraded === undefined || upgraded === spec ? 0 : ownedCount(f, upgraded);
-    if (ownedCount(f, spec) + exCount >= spec.limit) return false;
+    if (ownedCount(f, spec) >= spec.limit) return false;
   }
   return true;
 }
@@ -97,8 +95,7 @@ function recallHolds(f: Readonly<Fighter>, kit: Readonly<SpecialKit>): boolean {
   if (kit.recallWhile === "armor") return f.status.armorFrames > 0;
   if (kit.recallWhile === "projectile") {
     const spec = kit.ground.projectiles?.[0];
-    const exSpec = kit.ground.ex?.projectiles?.[0];
-    return (spec !== undefined && ownedCount(f, spec) > 0) || (exSpec !== undefined && ownedCount(f, exSpec) > 0);
+    return spec !== undefined && ownedCount(f, spec) > 0;
   }
   return (kit.recallGroundOnly !== true || f.motion.grounded) && placedObject(f, kit.ground.placement?.slot).life > 0;
 }
@@ -160,7 +157,7 @@ export function steerHeroSpecial(f: Fighter, input: Readonly<Controls>): void {
 export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>, input: Readonly<Controls>): AuthoredSpecial {
   const specials = f.tuning.specials;
   if (specials === undefined) throw new Error("hero special without a kit");
-  const move = specialForm(specialKit(specials, chosen.slot), chosen.form, f.special.ex, chosen.variant);
+  const move = specialForm(specialKit(specials, chosen.slot), chosen.form, chosen.variant);
   const { special } = f;
   endDivineShield(f);
   special.form = chosen.form;
@@ -366,7 +363,6 @@ export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProj
     projectile.serial = serial;
     projectile.damageMultiplier = 1.0;
     projectile.newlyReflected = false;
-    projectile.exReach = false;
     projectile.poolHits = 0;
     projectile.poolWait = 0;
     clearBounce(projectile);
@@ -866,19 +862,17 @@ function endHeroSpecial(f: Fighter, move: Readonly<AuthoredSpecial>): void {
 function burstProjectiles(f: Fighter, from: Readonly<SpecialProjectile>, into: Readonly<SpecialProjectile>): void {
   const specials = f.tuning.specials;
   const kit = specials === undefined || f.special.action === SpecialAction.heroUltimate ? undefined : specialKit(specials, f.special.action - SpecialAction.heroNeutral);
-  const ordinary = kit === undefined ? undefined : specialForm(kit, f.special.form, false, f.special.variant).burst;
-  const upgraded = kit === undefined ? undefined : specialForm(kit, f.special.form, true, f.special.variant).burst;
+  const ordinary = kit === undefined ? undefined : specialForm(kit, f.special.form, f.special.variant).burst;
   let index = -1;
   for (const before of f.projectiles) {
     index++;
     if (before.life <= 0 || before.kind !== ProjectileKind.hero
-      || (before.spec !== from && before.spec !== ordinary?.from && before.spec !== upgraded?.from)) continue;
-    const result = upgraded !== undefined && before.spec === upgraded.from ? upgraded.into : into;
+      || (before.spec !== from && before.spec !== ordinary?.from)) continue;
     const projectile = mutableProjectile(f, index);
-    projectile.spec = result;
+    projectile.spec = into;
     projectile.velocityX = 0.0;
     projectile.velocityZ = 0.0;
-    projectile.life = result.life;
+    projectile.life = into.life;
   }
 }
 
@@ -900,7 +894,7 @@ function endLiveCasts(f: Fighter, kit: Readonly<SpecialKit>): void {
     index++;
     const spec = projectile.spec;
     if (projectile.life <= 0 || projectile.kind !== ProjectileKind.hero || spec === undefined) continue;
-    if (castMakes(kit.ground, spec) || castMakes(kit.ground.ex, spec) || castMakes(kit.air, spec) || castMakes(kit.air?.ex, spec)) mutableProjectile(f, index).life = 0;
+    if (castMakes(kit.ground, spec) || castMakes(kit.air, spec)) mutableProjectile(f, index).life = 0;
   }
 }
 
@@ -1020,7 +1014,6 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.ritual?.frame === frame) {
     f.status.armorFrames = 0;
     f.status.armorChills = false;
-    gainUltimate(f, ultimatePercent(move.ritual.mana));
   }
   applyWindows(f, move, frame);
   if (frame >= heroSpecialEndFrame(f, move)) {
@@ -1041,7 +1034,7 @@ function landFromSpecialFall(f: Fighter): void {
   if (specials === undefined) return;
   for (let slot = SpecialSlot.neutral; slot <= SpecialSlot.down; slot++) {
     if ((f.special.airtimeUses & (1 << slot)) === 0) continue;
-    const lag = specialForm(specialKit(specials, slot), SpecialForm.air, f.special.ex, f.special.variant).fallLandingLag;
+    const lag = specialForm(specialKit(specials, slot), SpecialForm.air, f.special.variant).fallLandingLag;
     if (lag !== undefined) f.landing.lag = max(f.landing.lag, lag);
   }
 }
@@ -1058,7 +1051,7 @@ export function landHeroSpecial(f: Fighter): boolean {
   if (move?.landingLag === undefined) return false;
   const specials = f.tuning.specials;
   if (carriesChargeAcrossLanding(f) && specials !== undefined) {
-    const ground = specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), SpecialForm.ground, f.special.ex, f.special.variant);
+    const ground = specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), SpecialForm.ground, f.special.variant);
     f.special.form = SpecialForm.ground;
     f.special.duration = ground.endFrame;
     applyWindows(f, ground, f.special.frame);
@@ -1067,7 +1060,7 @@ export function landHeroSpecial(f: Fighter): boolean {
   if (f.character === Character.cairne && f.special.action === SpecialAction.heroNeutral
     && f.special.form === SpecialForm.air && specials !== undefined
     && f.special.frame < (move.projectiles?.[0]?.spawnFrame ?? 0)) {
-    const ground = specialForm(specials.neutral, SpecialForm.ground, f.special.ex, f.special.variant);
+    const ground = specialForm(specials.neutral, SpecialForm.ground, f.special.variant);
     f.special.form = SpecialForm.ground;
     f.special.duration = ground.endFrame;
     f.landing.lag = max(f.landing.lag, f.special.lockFrames);
@@ -1076,7 +1069,7 @@ export function landHeroSpecial(f: Fighter): boolean {
   }
   if (f.special.action === SpecialAction.heroDown && specials !== undefined
     && (f.special.form === SpecialForm.ground || f.special.form === SpecialForm.air)) {
-    const ground = specialForm(specials.down, SpecialForm.ground, f.special.ex, f.special.variant);
+    const ground = specialForm(specials.down, SpecialForm.ground, f.special.variant);
     let firstEffect = move.endFrame;
     let groundFirstEffect = ground.endFrame;
     for (const form of [move, ground]) {

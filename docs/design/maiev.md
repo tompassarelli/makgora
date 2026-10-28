@@ -153,7 +153,7 @@ What she keeps, so she does not become Fox in a costume:
   dashing or airborne keeps doing it, and a shield blocks it as before. Each
   hit adds a poison stack (cap 5) and refreshes a 120-frame timer; when it
   runs out the stacks burst for 1 damage each, flinchless, with a burst effect
-  and sound, and clear. The EX multiplier applies to the direct hit only. A
+  and sound, and clear. A
   glow over the foe grows with the stacks. Fan of Knives keeps its own ticking
   poison. The stacks are the reason to throw it, not the stream.
 - Blink: her up special teleports in eight directions to a punishable spot,
@@ -169,7 +169,7 @@ What she keeps, so she does not become Fox in a costume:
   33 frames of hitstun end 13 frames before she acts (probed headless on
   Rifleman, 2026-10-28). It never homes,
   never teleports behind anyone and never stuns: the stun and mark forms are
-  gone. EX dashes 25% farther and changes nothing else. Like Fox's, it catches
+  gone. Like Fox's, it catches
   a ledge she faces during its travel and end lag, and its helpless fall
   catches one like any fall (playtest report, 2026-10-28).
 - Fan of Knives (down special, #272, #494): a frame-4 ring of knives with set

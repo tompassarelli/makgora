@@ -16,12 +16,12 @@ export class MeterGlow {
   }
 
   present(fighter: Readonly<Fighter> | undefined, draw: Readonly<FighterDraw>, drawn: boolean, frame: number, camera: Readonly<MatchCamera>, ultimatesOff: boolean): void {
-    const color = fighter === undefined ? undefined : meterGlowColor(fighter, ultimatesOff, frame);
+    const color = fighter === undefined ? undefined : meterGlowColor(fighter, ultimatesOff);
     if (fighter === undefined || color === undefined || !drawn || !this.model.pose(draw, camera, -METER_GLOW_DEPTH, METER_GLOW_GROW, this.height)) {
       this.model.hide();
       return;
     }
-    this.model.tint(meterGlowAlpha(color, frame), color.red, color.green, color.blue);
+    this.model.tint(meterGlowAlpha(frame), color.red, color.green, color.blue);
   }
 
   drawnEffects(into: effect[]): void {

@@ -24,8 +24,8 @@ This is the first public version; it's early, expect rough edges, tell us what f
 | B | Special | Grab |
 | X | Jump | Special |
 | Y | Jump | Jump |
-| LB | Strong: hold with A for a smash, with B for an EX special | Short hop, even when held |
-| RB | Grab | Strong: hold with A for a smash, with X for an EX special |
+| LB | Strong: hold with A for a smash | Short hop, even when held |
+| RB | Grab | Strong: hold with A for a smash |
 | LT (left trigger) | Shield / air-dodge | Shield / air-dodge |
 | RT (right trigger) | Shield / air-dodge | Shield / air-dodge |
 | Left stick | Move; up aims, down crouches / fast-falls / drops through platforms | Same |
@@ -63,9 +63,9 @@ Use native 1080p60 Expert computer-vs-computer footage in Classic. Keep the matc
 | 0–5 s | Wide stage view, then two fighters enter | Smashcraft 0.1.0 |
 | 5–17 s | Three short exchanges on different stages | A Warcraft III platform fighter |
 | 17–29 s | Grom, Anub'arak, Malfurion and Medivh in action | 26 fighters |
-| 29–43 s | Two EX moves, a shield exchange and a recovery | None |
+| 29–43 s | Two special moves, a shield exchange and a recovery | None |
 | 43–55 s | Classic gameplay on two more stages | Classic graphics |
 | 55–67 s | Two readable KOs, one close finish | None |
 | 67–75 s | Key art with download destination | First public version. Early; expect rough edges. Created by Tompas. |
 
-Choose 8–10 stills from those clips: one per new fighter, two different stages with a clear exchange, one EX move and one KO. Avoid debug overlays. Use the stock-fighter lineup from #317 as the key art. Reference capture paths and approval belong in #346; keep game captures private until Tom posts them.
+Choose 8–10 stills from those clips: one per new fighter, two different stages with a clear exchange, one special move and one KO. Avoid debug overlays. Use the stock-fighter lineup from #317 as the key art. Reference capture paths and approval belong in #346; keep game captures private until Tom posts them.

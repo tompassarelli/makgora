@@ -1,5 +1,5 @@
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { METER } from "../sim/meter";
+import { ULTIMATE_METER_FRAMES } from "../sim/meter";
 
 export const METER_DRAIN_UPDATES = 20;
 
@@ -24,9 +24,7 @@ export function advanceMeterFeedback(feedback: MeterFeedback, drains: number): v
 
 export const meterDrainLit = (feedback: Readonly<MeterFeedback>): boolean => feedback.drainLeft > 0;
 
-export const exFill = (ex: number): number => Math.min(1.0, Math.max(0.0, ex / METER.exFrames));
-
-export const ultimateFill = (ultimate: number): number => Math.min(1.0, Math.max(0.0, ultimate / METER.ultimateFrames));
+export const ultimateFill = (ultimate: number): number => Math.min(1.0, Math.max(0.0, ultimate / ULTIMATE_METER_FRAMES));
 
 const PULSE_STEP_UPDATES = 4;
 const PULSE_STEPS = 12;
@@ -39,11 +37,9 @@ export const ultimatePulse = (tick: number): number => {
 };
 
 export interface MeterDisplay {
-  readonly exCell: { readonly fill: number; readonly lit: boolean };
   readonly ultimateBar: { readonly fill: number; readonly pulse: number };
 }
 
-export const meterDisplay = (ex: number, ultimate: number, exReady: boolean, ultimateReady: boolean, tick: number): MeterDisplay => ({
-  exCell: { fill: exFill(ex), lit: exReady },
+export const meterDisplay = (ultimate: number, ultimateReady: boolean, tick: number): MeterDisplay => ({
   ultimateBar: { fill: ultimateFill(ultimate), pulse: ultimateReady ? ultimatePulse(tick) : 0 },
 });

@@ -22,7 +22,7 @@ function numericLeaves(value: unknown, path: string, out: Record<string, number>
 }
 
 
-const originalNumericSources = ["specials.ts", "projectiles.ts", "summons.ts", "grabs.ts", "moves.ts", "hitRegions.ts", "exSpecials.ts", "eyeBeam.ts"];
+const originalNumericSources = ["specials.ts", "projectiles.ts", "summons.ts", "grabs.ts", "moves.ts", "hitRegions.ts", "eyeBeam.ts"];
 function originalNumbers(out: Record<string, number>): void {
   for (const file of originalNumericSources) {
     const source = ts.createSourceFile(file, readFileSync(`${import.meta.dir}/../src/game/sim/${file}`, "utf8"), ts.ScriptTarget.Latest, true);

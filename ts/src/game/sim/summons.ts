@@ -16,7 +16,6 @@ import { mutableBear, mutableFreezeTrap } from "./fighterRest";
 import { repelSpell, spellImmune } from "./specials/spellImmunity";
 
 export const RIFLEMAN_BEAR_LIFETIME = 60;
-export const RIFLEMAN_BEAR_EX_LIFETIME = 75;
 const RIFLEMAN_BEAR_SWIPE_INTERVAL = 20;
 const FREEZE_TRAP_ARMING_FRAMES = 23;
 const FREEZE_TRAP_LIFETIME_FRAMES = 480;
@@ -60,7 +59,6 @@ export function startFreezeTrap(owner: Fighter, stage: number, matchFrame: numbe
   }
   const trap = mutableFreezeTrap(owner);
   trap.x = motion.x;
-  trap.exReach = owner.special.ex;
   motion.crouching = false;
   trap.surface = motion.grounded ? motion.surface : undefined;
   trap.z = trap.surface === undefined ? motion.z : surfaceZAt(stage, trap.surface, matchFrame, trap.x);
@@ -75,7 +73,7 @@ function trapCanContact(owner: Fighter, target: Fighter): boolean {
   const trap = owner.freezeTrap;
   return trap.life > 0 && trap.surface !== undefined && trap.arming === 0 && !owner.status.out && !target.status.out && target.status.frozenFrames === 0 && target.status.freezeImmunityFrames === 0
     && target.motion.grounded && target.motion.surface === trap.surface && !isIntangible(target) && !spellImmune(target)
-    && Math.abs(f32(target.motion.x - trap.x)) <= f32(FREEZE_TRAP_TRIGGER_RADIUS * (trap.exReach ? 1.25 : 1.0));
+    && Math.abs(f32(target.motion.x - trap.x)) <= FREEZE_TRAP_TRIGGER_RADIUS;
 }
 
 function freezeFromTrap(world: Roster, slot: number): void {

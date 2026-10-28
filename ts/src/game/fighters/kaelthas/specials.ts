@@ -1,7 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { heroRegion, type StrikeCapsule } from "../../sim/heroMoves";
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, type SpecialSteeredShot } from "../../sim/specials/schema";
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { kaelCastBody, kaelHit } from "./moves";
@@ -85,12 +84,12 @@ const phoenix: AuthoredSpecial = {
 };
 
 export const KAELTHAS_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Pyroblast", description: "A slow, heavy fireball he steers with the stick while he stands rooted; special or shield lets it go. It hits hard and cracks shields, but a miss leaves him open. One at a time.",
-    ground: pyroblast }, { reach: 1.25 }),
-  side: withExKit({ name: "Flame Strike", description: "Hold to slide a rune outward, release to call a pillar of fire onto it; the pillar lingers and burns. Over open air it stands at Kael's height. One at a time.",
-    ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) }, { reach: 1.25 }),
-  up: withExKit({ name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
-    ground: phoenix }, { travel: 1.25 }),
-  down: withExKit({ name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
-    ground: banish(undefined), air: banish(18) }, { reach: 1.25 }),
+  neutral: { name: "Pyroblast", description: "A slow, heavy fireball he steers with the stick while he stands rooted; special or shield lets it go. It hits hard and cracks shields, but a miss leaves him open. One at a time.",
+    ground: pyroblast },
+  side: { name: "Flame Strike", description: "Hold to slide a rune outward, release to call a pillar of fire onto it; the pillar lingers and burns. Over open air it stands at Kael's height. One at a time.",
+    ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) },
+  up: { name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
+    ground: phoenix },
+  down: { name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
+    ground: banish(undefined), air: banish(18) },
 };

@@ -49,11 +49,10 @@ import type { AppliedStatus } from "./appliedStatus";
 import { applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
 import { MANA_SHIELD_BREAK, shieldedDamage } from "./manaShield";
 import { isPetrified, petrifiedDamage } from "./gaze";
-import { drainUltimate, gainUltimate, ultimatePercent } from "./meter";
+import { drainUltimate, ultimatePercent } from "./meter";
 import { capPercent } from "./percent";
 import { contactIsSpell, contactTraits } from "./identityTraits";
 import { meleeHandling } from "./meleeHandling";
-import { exRecoveryFrames } from "./exSpecials";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "../fighters/forsaken-paladin/sword";
 
 
@@ -154,7 +153,6 @@ export function collectDamageContact(
   const traits = contactTraits(source, kind, direct);
   if (traits.mana !== true) {
     contact.effect.manaDrain = undefined;
-    contact.effect.manaSteal = undefined;
   }
   if (spell) contact.effect.damage = f32(contact.effect.damage * BANISH_SPELL_DAMAGE);
   contact.facing = facing;
@@ -294,7 +292,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.direct) source.launch.hitlag = max(source.launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
     if (contact.blocked) {
       if (contact.kind === ContactKind.damageOnly) continue;
-      if (!perfectShield) shield.stun = max(max(shield.stun, shieldstunFrames(shieldHit, shield.strength, contact.sourceAerial)), contact.effect.shieldSafe === true ? exRecoveryFrames(source) : 0);
+      if (!perfectShield) shield.stun = max(shield.stun, shieldstunFrames(shieldHit, shield.strength, contact.sourceAerial));
       launch.hitlag = max(launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
       const pushback = shieldContactPushback(shieldHit, shield.strength, perfectShield);
       shieldPushback = max(shieldPushback, pushback);
@@ -308,11 +306,6 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.kind === ContactKind.throw) target.visuals.throw++;
     visualContact ??= index;
     drainMeter(target, ultimatePercent(contact.effect.manaDrain ?? 0));
-    const stolen = min(target.meter.ultimate, ultimatePercent(contact.effect.manaSteal ?? 0));
-    if (stolen > 0) {
-      drainMeter(target, stolen);
-      gainUltimate(source, stolen);
-    }
     if (damage > 0 && contact.kind !== ContactKind.pummel) {
       if (!isPetrified(target)) thawFighter(target);
       damageEndsHeroStatus(target);

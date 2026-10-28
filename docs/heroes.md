@@ -172,12 +172,12 @@ added to `AuthoredSpecial` and executed here, with a focused test.
 
 ## Meters
 
-Every fighter has two meters, an EX charge and an ultimate meter (`sim/meter.ts`); their rules, numbers
-and display are in smashcraft:docs/design/mana.md. An EX or ultimate press
+Every fighter has one meter, the ultimate meter (`sim/meter.ts`), filled only by centre-stage orbs; its rules, numbers
+and display are in smashcraft:docs/design/mana.md. An ultimate press
 without its full meter starts the ordinary free special. The entry form and aim,
 airtime uses, armor, each hero projectile's record and the placed object are
 fighter state: rollback copies them, replay difference compares them, and the
-canonical replay text includes them for fighters with a hero kit (the two meters
+canonical replay text includes them for fighters with a hero kit (the ultimate meter
 for every fighter).
 
 The shared contracts are in `ts/src/game/sim/heroSpecials.tests.ts`.

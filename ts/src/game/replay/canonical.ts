@@ -347,7 +347,6 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
     + canonicalRealField(`${prefix}.base`, hit.base) + canonicalRealField(`${prefix}.launchX`, hit.launchX)
     + canonicalRealField(`${prefix}.launchZ`, hit.launchZ) + canonicalInt(`${prefix}.electric`, hit.electric ? 1 : 0)
     + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "") + (hit.flinchless === true ? canonicalInt(`${prefix}.flinchless`, 1) : "")
-    + optionalField(`${prefix}.manaSteal`, hit.manaSteal, canonicalInt)
     + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
     + optionalField(`${prefix}.shieldDamage`, hit.shieldDamage, canonicalRealField);
 }
@@ -375,7 +374,6 @@ export function fighterSpecialsCanonical(specials: Readonly<FighterSpecials> | u
 
 export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): string {
   const result: string[] = [];
-  if (move.ex !== undefined) result.push(specialMoveCanonical(move.ex, `${name}.ex`));
   const variants = move.variants ?? [];
   for (let index = 0; index < variants.length; index++) result.push(specialMoveCanonical(at(variants, index), `${name}.variant[${index + 1}]`));
   const int = (field: string, value: number) => { result.push(canonicalInt(`${name}.${field}`, value)); };
@@ -408,7 +406,6 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
   }
   if (move.ritual !== undefined) {
     int("ritual.frame", move.ritual.frame);
-    int("ritual.mana", move.ritual.mana);
   }
   if (move.cleanseFrame !== undefined) int("cleanseFrame", move.cleanseFrame);
   if (move.refreshesAir === true) int("refreshesAir", 1);
@@ -722,7 +719,6 @@ export function writeObservations(writer: ObservationWriter, opponents: Slots<Re
     writer.number(f.attack.serial);
     writer.number(f.attack.cooldown);
     writer.number(f.special.action);
-    if (f.special.ex) writer.number(197);
     writer.number(f.special.frame);
     writer.number(f.special.duration);
     writer.number(f.special.lockFrames);
@@ -1084,7 +1080,6 @@ export function prepareKitDigests(): void {
       for (const branch of kit.air?.followUps ?? []) forms.push(branch.special);
       for (const form of forms) {
         kitDigestField("placedSpec", form.placement, PLACEMENT_DIGESTS, placedSpecCanonical);
-        kitDigestField("placedSpec", form.ex?.placement, PLACEMENT_DIGESTS, placedSpecCanonical);
       }
     }
   }

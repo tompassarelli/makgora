@@ -2,7 +2,6 @@
 
 
 
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../../sim/specials/schema";
@@ -90,12 +89,12 @@ const DARK_RITUAL: AuthoredSpecial = {
   endFrame: 24,
   landingLag: AIR_LANDING_LAG,
   regions: [heroRegion(6, 8, { x1: -1.0, z1: CHEST, x2: 1.0, z2: CHEST, radius: h(f32(0.6)) }, hit(6.23394775390625, "POKE", 60))],
-  ritual: { frame: 6, mana: 30 },
+  ritual: { frame: 6 },
 };
 
 export const LICH_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Frost Nova", description: "A slow orb that chills; press again to burst it where it is.", ground: frostNova(undefined), air: frostNova(AIR_LANDING_LAG), recall: frostNovaBurst(undefined), recallWhile: "projectile" }, { reach: 1.25 }),
-  side: withExKit({ name: "Death and Decay", description: "A rotting field ahead that strikes twice, small then strong; walk or jump out.", ground: DEATH_AND_DECAY }, { reach: 1.25 }),
-  up: withExKit({ name: "Spectral Ascent", description: "A steerable rise, then a helpless fall.", ground: ascent(f32(3.7), f32(1.0)) }, { travel: 1.25 }),
-  down: withExKit({ name: "Frost Armor", description: "A shell that takes the knockback of one light hit and chills the attacker; press again for Dark Ritual: shatter it for mana.", ground: FROST_ARMOR, recall: DARK_RITUAL, recallWhile: "armor" }, { armorDamage: 1.25 }),
+  neutral: { name: "Frost Nova", description: "A slow orb that chills; press again to burst it where it is.", ground: frostNova(undefined), air: frostNova(AIR_LANDING_LAG), recall: frostNovaBurst(undefined), recallWhile: "projectile" },
+  side: { name: "Death and Decay", description: "A rotting field ahead that strikes twice, small then strong; walk or jump out.", ground: DEATH_AND_DECAY },
+  up: { name: "Spectral Ascent", description: "A steerable rise, then a helpless fall.", ground: ascent(f32(3.7), f32(1.0)) },
+  down: { name: "Frost Armor", description: "A shell that takes the knockback of one light hit and chills the attacker; press again for Dark Ritual: shatter it in a burst.", ground: FROST_ARMOR, recall: DARK_RITUAL, recallWhile: "armor" },
 };

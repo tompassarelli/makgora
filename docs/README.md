@@ -84,7 +84,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 - [Hurtbox legibility](design/hurtbox-legibility.md): why Ultimate players report losing with correct spacing (hurtbox shapes per animation, interpolation, hit-pose shifts, glancing blows, randomness) and Melee's comparable cases, with sources.
 - [Projectiles](design/projectiles.md): Ultimate's projectile properties players blame, Melee's powershield and laser answers, other platform fighters, and Smashcraft's current projectiles.
 - [Kit review 1](design/kit-review-1.md): Blademaster, Mountain King, Warden, Rifleman's recovery and Illidan scored for decisions, mixups, reads and counterplay, with redesigned specials, frame data and counterplay.
-- [Two meters](design/mana.md): every fighter's EX charge (12 s) and ultimate meter (2 min), filled on the match clock and by centre-stage orbs; ready signals; drains; open questions; the EX upgrade table.
+- [The ultimate meter](design/mana.md): every fighter's one ultimate meter, filled only by centre-stage orbs every 30 s; pickup and tie rules; ready signal; drains; open questions.
 - [Tilts and dash attacks](design/tilts.md): each fighter's jab, forward/up/down tilt and dash attack by identity, Melee's timing distribution, Ultimate's angled forward-tilt rule (straight strikes angle, vertical swings do not) and the down-tilt and dash-attack roles.
 - [Interaction graph](design/interaction-graph.md): for each situation, Smashcraft's options, what beats what by how many frames, and the punish windows, computed per fighter from its move data.
 - [Match flow](design/match-flow.md): match rules, endless play and automatic rematch, with Slippi and other platform-fighter prior art.

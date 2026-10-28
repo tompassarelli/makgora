@@ -1,6 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { heroRegion } from "../../sim/heroMoves";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
 import { malfurionCastBody, malfurionHit } from "./moves";
@@ -37,11 +36,11 @@ const TREANT: AuthoredSpecial = {
     life: 240, fireAges: [4, 52, 100, 148], shot: BRANCH },
 };
 export const MALFURION_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Entangling Roots", description: "Mark the ground ahead. Jump or shield before the roots close.", ground: ROOTS }, { reach: 1.25 }),
-  side: withExKit({ name: "Stag Charge", description: "Bound forward with branching antlers. A shield stops the charge.", ground: stag(false), air: stag(true) }, { shieldSafe: true }),
-  up: withExKit({ name: "Dream Ascent", description: "Rise through the canopy, then fall helpless.", ground: ASCENT }, { travel: 1.25 }),
-  down: withExKit({ name: "Force of Nature", description: "Plant a fragile treant that throws four branches. Press again to recall it.", ground: TREANT,
+  neutral: { name: "Entangling Roots", description: "Mark the ground ahead. Jump or shield before the roots close.", ground: ROOTS },
+  side: { name: "Stag Charge", description: "Bound forward with branching antlers. A shield stops the charge.", ground: stag(false), air: stag(true) },
+  up: { name: "Dream Ascent", description: "Rise through the canopy, then fall helpless.", ground: ASCENT },
+  down: { name: "Force of Nature", description: "Plant a fragile treant that throws four branches. Press again to recall it.", ground: TREANT,
     air: { endFrame: TREANT.endFrame, landingLag: 20, hurt: TREANT.hurt,
       projectiles: [{ ...BRANCH, spawnFrame: 26, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0 }] },
-    recall: { endFrame: 26, recall: true } }, { durability: 1.25 }),
+    recall: { endFrame: 26, recall: true } },
 };

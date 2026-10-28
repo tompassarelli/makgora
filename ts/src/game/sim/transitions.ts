@@ -125,7 +125,6 @@ export function cancelSpecialState(f: Fighter): void {
   }
   special.fall = false;
   special.parasol = ParasolState.none;
-  special.ex = false;
   special.variant = 0;
   special.action = SpecialAction.none;
   special.frame = 0;
@@ -163,7 +162,6 @@ export function clearSpecialOnStock(f: Fighter): void {
     projectile.serial = 0;
     projectile.damageMultiplier = 1.0;
     projectile.newlyReflected = false;
-    projectile.exReach = false;
     projectile.spec = undefined;
     projectile.surface = undefined;
   }
@@ -182,7 +180,6 @@ export function clearOwnedFreezeTrap(f: Fighter): void {
   if ((f.restingGroups & REST_FREEZE_TRAP) !== 0) return;
   const trap = mutableFreezeTrap(f);
   trap.life = 0;
-  trap.exReach = false;
   trap.arming = 0;
   trap.x = 0.0;
   trap.z = 0.0;

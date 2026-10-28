@@ -35,6 +35,6 @@ export const envelope: Command = (args) => Effect.gen(function*() {
   }
   const top = values.top === undefined ? found.length : Number(values.top);
   const t = reference.tolerances;
-  yield* Console.log(`Genre envelope (advisory): ${found.length} of ${rows.length} moves outside their class envelope. Tolerance ±${t.frames} frames, ±${t.shieldAdvantage} on shield, ±${Math.round(100 * t.killPercentShare)}% kill percent; specials ±${t.special.frames}/±${t.special.shieldAdvantage}/±${Math.round(100 * t.special.killPercentShare)}%, EX ±${t.ex.frames}/±${t.ex.shieldAdvantage}/±${Math.round(100 * t.ex.killPercentShare)}%. Distance is the excess over the allowance; above 1 is outside.`);
+  yield* Console.log(`Genre envelope (advisory): ${found.length} of ${rows.length} moves outside their class envelope. Tolerance ±${t.frames} frames, ±${t.shieldAdvantage} on shield, ±${Math.round(100 * t.killPercentShare)}% kill percent; specials ±${t.special.frames}/±${t.special.shieldAdvantage}/±${Math.round(100 * t.special.killPercentShare)}%. Distance is the excess over the allowance; above 1 is outside.`);
   for (const outlier of found.slice(0, top)) yield* Console.log(describe(outlier));
 });

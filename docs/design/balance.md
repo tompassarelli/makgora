@@ -494,8 +494,7 @@ Goblin Tinker's forward tilts (7.5), dash attack (9.375), forward smash
 Mountain King's forward tilts and dash attack (13.75) deal more; Pit Lord's
 forward tilt and dash attack recover 2 frames sooner. Tinker's laser keeps
 6.85, since any more gives it a kill below 300%, and Forsaken Paladin's
-Righteous Fury keeps its damage, since its EX would kill earlier than the
-15% bound. Every changed kill percent stays within 15% of the fixed baseline
+Righteous Fury keeps its damage. Every changed kill percent stays within 15% of the fixed baseline
 and every change inside its ±25% and ±3-frame bounds.
 
 24 Oct 2026 (#45 pass 3, 45–55% Wren field, frames only). After the #223

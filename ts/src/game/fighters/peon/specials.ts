@@ -1,4 +1,3 @@
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, type SpecialCharge, type SpecialFollowUp, frames } from "../../sim/specials/schema";
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
@@ -103,8 +102,8 @@ const REST: AuthoredSpecial = {
 };
 
 export const PEON_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Gold Sack", description: "Hold to stuff gold into the sack and release to bonk: a tap bonks at once, a longer hold bonks harder, and a full sack lunges forward and kills. Shield keeps the charge for the next press.", ground: GOLD_SACK }, { shieldSafe: true }),
-  side: withExKit({ name: "Log Heave", description: "Grab a huge log by its end and heave it up and over, on the ground or once in the air: its far end pops a foe up and back toward the Peon; the butt end barely moves them.", ground: LOG_HEAVE, air: LOG_HEAVE_AIR }, { reach: 1.25 }),
-  up: withExKit({ name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) }, { travel: 1.25 }),
-  down: withExKit({ name: "Rest", description: "Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds.", ground: REST }, { reach: 1.25 }),
+  neutral: { name: "Gold Sack", description: "Hold to stuff gold into the sack and release to bonk: a tap bonks at once, a longer hold bonks harder, and a full sack lunges forward and kills. Shield keeps the charge for the next press.", ground: GOLD_SACK },
+  side: { name: "Log Heave", description: "Grab a huge log by its end and heave it up and over, on the ground or once in the air: its far end pops a foe up and back toward the Peon; the butt end barely moves them.", ground: LOG_HEAVE, air: LOG_HEAVE_AIR },
+  up: { name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) },
+  down: { name: "Rest", description: "Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds.", ground: REST },
 };

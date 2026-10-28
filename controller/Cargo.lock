@@ -343,8 +343,8 @@ dependencies = [
 
 [[package]]
 name = "padbridge"
-version = "0.4.0"
-source = "git+https://github.com/tompassarelli/padbridge?rev=139118aba2cff83282a880dc5d542ce6b9e0f5e5#139118aba2cff83282a880dc5d542ce6b9e0f5e5"
+version = "0.4.1"
+source = "git+https://github.com/tompassarelli/padbridge?rev=58c0eaf55f321964cb05514f31200a10f0d06da7#58c0eaf55f321964cb05514f31200a10f0d06da7"
 dependencies = [
  "ctrlc",
  "enigo",
@@ -365,7 +365,7 @@ dependencies = [
 [[package]]
 name = "padbridge-model"
 version = "0.4.0"
-source = "git+https://github.com/tompassarelli/padbridge?rev=139118aba2cff83282a880dc5d542ce6b9e0f5e5#139118aba2cff83282a880dc5d542ce6b9e0f5e5"
+source = "git+https://github.com/tompassarelli/padbridge?rev=58c0eaf55f321964cb05514f31200a10f0d06da7#58c0eaf55f321964cb05514f31200a10f0d06da7"
 dependencies = [
  "serde",
  "serde_json",

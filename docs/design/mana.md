@@ -1,90 +1,94 @@
-# Two meters: EX and ultimate
+# The ultimate meter
 
-Tom replaced special costs with one super meter on 8 October 2026 (#335) and
-rebuilt how it fills on 26 October 2026 (#484). On 28 October 2026 Tom replaced
-that single 100-point bar, its clock trickle and its 20 s meter drops at
-rotating stage points (#385) with two meters and orbs at the centre of the
-stage. Every regular special is free, including its full recovery form.
-Normals, grabs and throws remain free. Shield + Special requests the EX
-version in any of the four directions, and the ultimate
-([ultimates.md](ultimates.md)) keeps its own input.
+Tom replaced special costs with one super meter on 8 October 2026 (#335). On
+29 October 2026 Tom removed EX and the match-clock fill to simplify the game.
+Every special is free and starts the same way with or without Strong (Strong
+still makes smashes). The ultimate ([ultimates.md](ultimates.md)) is the
+one thing the meter buys.
 
-Each fighter carries two independent meters, `fighter.meter.ex` and
-`fighter.meter.ultimate`. Both are frame counters, part of replay and
-rollback state, and both are kept through a KO and respawn. The rules live in
-smashcraft:ts/src/game/sim/meter.ts and sim/exSpecials.ts; the match step
-runs the regeneration and the orbs (smashcraft:ts/src/game/match/orbs.ts), whose
-rules and record live in smashcraft:ts/src/game/sim/orbs.ts and sim/orbState.ts.
+Each fighter carries one meter, `fighter.meter.ultimate`. It is a frame counter,
+part of replay and rollback state, and is kept through a KO and respawn. The
+rules live in smashcraft:ts/src/game/sim/meter.ts; the match step schedules the
+orbs and runs the pickup (smashcraft:ts/src/game/match/orbs.ts), whose rules and
+record live in smashcraft:ts/src/game/sim/orbs.ts and sim/orbState.ts.
 
-No meter comes from damage, taken or dealt: gain from taking damage rewarded
-the player who guessed wrong, and gain from dealing it was win-more. Both
-meters fill on the pure match clock, and the stage's orb gives the player who
-wins the centre a bonus on top of that clock, as Dota 2's power runes reward
-the team that reaches the river
+Only ultimate orbs fill the meter. Nothing comes from damage, taken or dealt
+(gain from taking damage rewarded the player who guessed wrong, and gain from
+dealing it was win-more), and nothing from the match clock. The orb at centre
+stage is the one source, so the player who wins the centre earns the ultimate,
+as Dota 2's power runes reward the team that reaches the river
 ([gameplay design](../gameplay-design.md#centre-stage-orbs)).
 
 | Rule | Value |
 |---|---|
-| EX meter | One charge. Fills 1 frame per frame from GO and is full at 720 frames (12 s); it stops while full, with no overflow. A match starts empty, so the first charge arrives at 0:12. |
-| Ultimate meter | Fills 1 frame per frame from GO and is full at 7200 frames (2 min); it stops while full. |
-| Regeneration clock | The pure match clock after GO, for every fighter in every mode (versus, Training, Classic, lore runs), including while KO'd. Nothing runs during the start hold. |
-| Damage dealt or taken | 0. |
-| Idle, movement, shielding, shield damage or parry | Nothing beyond the clock. |
-| Stock loss | Both meters keep their value through the KO and respawn. |
+| Ultimate meter | 7200 frames (2 min of gain at one frame per frame), shown as a percent. A match starts empty. |
+| Gain | Ultimate orbs only: each adds half a meter (3600 frames), so two orbs make an ultimate. No gain from the clock, damage dealt or taken, idle, movement, shielding, shield damage or parry. |
+| Stock loss | The meter keeps its value through the KO and respawn. |
 | Regular special | Free; always chooses its full ground or air form. Existing cooldowns, airtime limits and entity limits still apply. |
-| EX special | Needs a full EX charge and spends only it, emptying the EX meter; regeneration restarts from zero. The ultimate meter is untouched. |
-| Ultimate | Needs a full ultimate meter and spends only it, emptying the ultimate meter. The EX charge is untouched. |
-| EX not full, or ultimate not full | The ordinary free special starts. No refusal or partial spend. |
-| Ultimate pressed over an EX special | If the ultimate replaces an EX special within its first leniency frames, the EX charge is refunded. |
-| Interrupted or missed EX | The charge stays spent. Follow-up inputs do not spend it again. |
-| Orb | An EX orb fills the EX charge. An ultimate orb adds half an ultimate meter (3600 frames). Taken into an already full meter, the orb is wasted. Schedule and pickup are in [gameplay design](../gameplay-design.md#centre-stage-orbs); Training, Classic and lore runs have no orbs, so the clock alone fills both meters there. |
+| Ultimate | Needs a full meter and spends all of it. Input is Attack + Special together; below a full meter, or with ultimates off, the ordinary special starts instead, with no refusal or partial spend. |
+| Orb | One orb appears above centre stage every 30 seconds of play (0:30, 1:00, 1:30 ...), with a 3-second warning before each. A fighter respawning when it is due makes it wait until the respawn ends. Taken into a full meter, it is wasted. Training, Classic and lore runs and matches with orbs off have no scheduled orbs, so nobody gains meter there. |
 
-Examples: with the clock alone a fighter holds a charge at 0:12, and after
-spending it the charge returns 12 s later. A fighter who spends the EX charge
-when an EX orb is due at 0:15 has the charge back at 0:27, 3 s before the
-orb at 0:30, so the orb is only worth taking if the other fighter should not
-have it. A fighter who spends at 0:14 and wins the 0:15 orb holds a bonus
-charge to hold or spend at once, 12 s ahead of the opponent's regeneration.
-The ultimate fills in 2 min by the clock alone, and the orb on the minute mark
-is worth half of it: the fighter who takes the 1:00 orb has a full ultimate
-meter at 1:00, and the other waits for the clock at 2:00.
+## Pickup
+
+A fighter collects the orb by touching it: its body (the hurt capsule) or the
+active hitbox of a normal attack (jab, tilts, smashes, aerials, dash attack)
+overlapping the orb. It must be in a regular state: standing, walking, running,
+jumping, falling, shielding or in a normal attack.
+
+It is not collected while the fighter is in a special, an ultimate or an air
+dodge (the wavedash landing slide included), nor while rolling, tumbling, in
+hitstun or hitlag, KO'd or respawn-invincible; in those states the orb passes
+through. Projectiles never collect it.
+
+When several fighters touch it on the same frame, the one whose body centre is
+horizontally nearest the orb takes it; on an exact tie the lowest player slot
+takes it. The step is deterministic and identical on every client (Bun and
+Lua32).
+
+Examples: one orb is worth half the meter, so the fighter who takes both the
+0:30 and 1:00 orbs holds a full ultimate at 1:00, and a fighter who takes only
+one waits for the 1:30 orb or for the foe to feed them. A fighter who air
+dodges through the orb gets nothing from it, and a fighter in the middle of a
+special does not either; a jab or an aerial that reaches the orb takes it.
 
 ## Ready signal
 
-The fighter's rim of light shows what is ready (`presentation/meterGlow.ts`).
-A full EX charge wears a cool blue rim. A full ultimate meter, with ultimates
-on, wears a warm gold rim breathing slowly. With both ready the rim alternates
-between the two every 40 frames. The white 12-frame fighter flash and
-Warcraft's stock `Sound\Interface\ItemReceived.flac` mark the ultimate meter
-becoming ready, once on the confirmed frame (GameFound until #361: a
-7.5-second fanfare that was heard mid-match as a stray music clip). Replay and
-prediction never play the sound.
+The fighter's rim of light shows what is ready (`presentation/meterGlow.ts`). A
+full ultimate meter, with ultimates on, wears a warm gold rim breathing slowly.
+The white 12-frame fighter flash and Warcraft's stock
+`Sound\Interface\ItemReceived.flac` mark the ultimate meter becoming ready, once
+on the confirmed frame. Replay and prediction never play the sound.
 
-The HUD plate shows the two meters as two different displays, so neither is
-mistaken for the other (`presentation/meterBar.ts`, `ui/meterBar.ts`, boxes in
-`ui/plateLayout.ts`). The EX meter is one small square cell beside the damage
-percent: a blue fill rises from the bottom over the 12 s regen, dim while it
-charges, and a full charge turns the fill bright EX blue inside a blue halo.
-An orb pickup fills it at once. The ultimate meter is a long thin gold bar in
-the recessed slot under the damage number: it fills left to right over its
-2 min build and, when full with ultimates on, breathes between gold and orange.
-Cell and bar are always on the inner side of the plate, mirrored for the
-right-hand plates, and clear of the name, player tag and stocks. The existing
-purple flash over the bar marks a drain. The HUD is the only meter display;
-fighters carry no duplicate overhead bar or pips.
+The HUD shows the meter as a long thin gold bar in the recessed slot under the
+damage number (`presentation/meterBar.ts`, `ui/meterBar.ts`, boxes in
+`ui/plateLayout.ts`): it fills left to right as the meter fills and, when full
+with ultimates on, pulses between gold and orange. The bar is on the inner side
+of the plate, mirrored for the right-hand plates, and clear of the name, player
+tag and stocks. The existing purple flash over the bar marks a drain. The HUD is
+the only meter display; fighters carry no duplicate overhead bar or pips. The
+single orb shown in the match is the gold and orange ultimate orb.
 
 These cues reuse the game's white fighter flash and stock sounds; they add no
 imported art or audio. match/orbs.tests.ts and presentation/meterRim.tests.ts
-pin the resource, orb and glow rules in Bun and Lua32.
+pin the orb and glow rules in Bun and Lua32.
 
-## Drain and refunds
+## Drains
 
-Authored damage drains and steals (Illidan's hit drains and steals, Lich's
-Dark Ritual gain) act only on the ultimate meter; their authored numbers are
-read as a percent of an ultimate meter, 72 frames per percent. The EX charge
-cannot be drained. No status reads the meter: Illidan's Mana Burn stun, the
-one that did, left his kit with Eye Beam (2026-10-28). Hero-specific spell
-refunds remain authored move effects; they never make an ordinary special
+Authored damage drains act on the ultimate meter; their authored numbers are
+read as a percent of an ultimate meter, 72 frames per percent. Illidan's and
+fire hits drain the struck foe's meter (`manaDrain`); no move steals meter, and
+nothing an attacker does adds to their own. Two kits spend or drain the meter
+beyond the ultimate:
+
+- Lady Vashj's Mana Shield pays half of each hit from her ultimate meter at 72
+  frames per 1% (one orb's half meter absorbs 50%) and breaks into its 20-frame
+  stagger when the meter runs dry; with an empty meter it breaks on the first
+  hit ([lady-vashj.md](lady-vashj.md)).
+- Her Tidal Serpent drains 108 frames (1.5%) of the struck foe's ultimate meter
+  and hands nothing back to her.
+
+Lich's Dark Ritual gains no meter. No status reads the meter. Hero-specific
+spell refunds remain authored move effects; they never make an ordinary special
 cost meter.
 
 ## Open questions (to test)
@@ -93,213 +97,15 @@ cost meter.
   whether the wait reads as fair or as a stall.
 - Pickup height with the shortest and tallest fighters in play: whether both
   reach the orb as easily as a standing hurt capsule suggests.
-- Lining the warning cue up with the 3 s window in which a spent EX charge
-  returns.
-- The orb interval against full shield regeneration.
-- Whether the EX and ultimate glows read at a glance, alone and together.
-- Whether a 12 s EX regeneration is too frequent.
-- Whether regeneration should pause while a fighter is KO'd.
-- Whether drains should act on the ultimate meter.
-- Ultimates aim at about 25-30% damage; the current values are being
-  tabulated separately.
-
-## Every special has an EX form (#329)
-
-Tom's 8 October super-bar decision (#335): ordinary specials are free, and a
-full EX charge buys one EX with Shield + Special in any direction. The two
-meters replaced the single bar on 28 October 2026; the sections above own the
-earning rules and display. This section owns the move upgrades.
-
-### EX design principles (2026-10-28)
-
-Tom set the EX design rules on 28 October 2026; in paraphrase:
-
-- An EX is a natural upgrade of the same move, never a different move. It is
-  stronger but never game-defining.
-- Its frame data stays the move's own: never faster, never slower.
-- It carries no super armor or invulnerability unless armor is already the
-  move's identity.
-- It has one headline change, ideally one that beats the move's usual
-  answer: safe on shield (beats shielding), more range or a bigger hit
-  (beats spacing or jumping over), or an after-effect hitbox that works as a
-  frame trap.
-- Every EX shows the same distinct EX flash.
-
-The shared levers in smashcraft:ts/src/game/sim/exSpecialAuthoring.ts carry
-those headlines, one per EX:
-
-- **Range** (`range`): projectiles fly 25% longer (life x1.25), beams reach
-  25% farther; size, speed and damage stay.
-- **Reach** (`reach`): strikes, projectiles, pools, triggers and command
-  grabs grow 25%.
-- **Travel** (`travel`): movement and recoveries carry 25% farther over the
-  same frames.
-- **Shield-safe** (`shieldSafe`): a blocked hit holds the shield in shieldstun
-  for at least the attacker's remaining frames of the move, so the move is no
-  worse than even on shield. The attacker's own frames are unchanged.
-- **Durability** (`durability`): a placed object or summon takes more damage
-  before it breaks.
-- **Armor** (`armorDamage`): only where armor is the move's identity, the
-  armor holds against heavier hits.
-- **Guard** (`guardFrames`): only for a counter, whose window is its
-  identity: the guard holds longer; startup, the counterattack and the whiff
-  stay.
-
-Each EX keeps the base move's startup, active windows, recovery, landing lag,
-entity limits, status immunity, once-per-airtime limit and helpless ending;
-smashcraft:ts/src/game/roster/exSpecials.tests.ts checks every roster EX
-form against its base. Damage upgrades are gone: 25% more damage beat no
-answer, so it failed the headline rule everywhere it was the whole EX.
-The one-light-hit entry armor every EX used to carry (8% for six frames)
-was removed for the no-armor rule. Status durations and healing caps stay
-unchanged.
-
-The EX flash is shared by every fighter and every special: an EX cast raises
-the cyan Tome of Retraining pillar at the caster's feet for 30 frames with its
-own sound ([ultimates.md](ultimates.md), smashcraft:ts/src/game/presentation/meterCues.ts).
-A follow-up of an EX cast never raises a second one.
-
-### EX audit (2026-10-28)
-
-Verdict reasons: **damage** = the whole EX was 25% more damage, which beats no
-answer; **two** = more than one headline; **armor** = added armor or
-invulnerability; **other move** = a different move, not an upgrade.
-
-| Fighter | Special | EX before | Verdict | EX now |
-|---|---|---|---|---|
-| All | Every EX | One light hit (8% or less) absorbed on frames 1-6 | Fail: armor | No entry armor |
-| Rifleman | Blaster | +25% damage | Fail: damage | Shot 25% larger, so it is harder to jump or crouch under |
-| Rifleman | Bear | +25% swipe damage | Fail: damage | Bear runs 25% longer (75 frames), reaching foes who spaced it |
-| Rifleman | Recoil | Travels 25% farther | Pass | Unchanged |
-| Rifleman | Freeze Trap | 25% more trigger reach | Pass | Unchanged |
-| Illidan | Eye Beam | Ground: Eye Blast, a 24-frame windup and a floor beam to 645; air: +25% damage | Fail: other move, slower; damage | Beam flies 25% farther (19 frames, 912 units) in both forms |
-| Illidan | Fel Rush | +25% damage, branches too | Fail: damage | Shield-safe (branches removed 2026-10-28) |
-| Illidan | Wing Ascent | Rises 25% farther | Pass | Unchanged |
-| Illidan | Immolation | Reach 116 to 140 | Pass | Unchanged |
-| Blademaster | Quickdraw (Wind Cutter until 2026-10-28) | Travel | Pass | Travel: the dash goes 1.25 times as far at every charge, so a shorter charge already passes through the foe; no faster startup and no armour |
-| Blademaster | Wind Walk | Travel (the dash, before the 2026-10-28 counter rework) | Pass | Travel: the counter steps out behind an attacker up to 3.1H away instead of 2.5H, beating a strike spaced at the tip |
-| Blademaster | Rising Whirlwind | Travel | Pass | Unchanged |
-| Blademaster | Mirror Image | x2 durability and +25% swap damage | Fail: two | x2 durability |
-| Mountain King | Storm Bolt | +25% damage | Fail: damage | Range |
-| Mountain King | Storm Rush | +25% damage | Fail: damage | Shield-safe |
-| Mountain King | Thunder Leap | Travel, and +25% Hammerfall damage | Fail: two | Travel, Hammerfall dive included |
-| Mountain King | Thunder Clap | Reach | Pass | Unchanged |
-| Warden | Shadow Strike | +25% damage | Fail: damage | Range |
-| Warden | Shadow Dash | Shield-safe (as Shadow Pursuit) | Move replaced 2026-10-28 | Travel: the dash goes 25% farther |
-| Warden | Blink | Travel | Pass | Unchanged |
-| Warden | Fan of Knives | +25% damage | Fail: damage | Reach |
-| Lich | Frost Nova | Reach | Pass | Unchanged |
-| Lich | Death and Decay | +25% damage | Fail: damage | Reach: the clouds are 25% larger |
-| Lich | Spectral Ascent | Travel | Pass | Unchanged |
-| Lich | Frost Armor | Armor holds a 25% heavier hit; Dark Ritual 4 invulnerable entry frames | Fail: two, armor | Armor holds a 25% heavier hit (armor is the move); invulnerable entry removed |
-| Forsaken Paladin | Cleansing Sword | +25% damage | Fail: damage | Shield-safe |
-| Forsaken Paladin | Righteous Fury | +25% damage | Fail: damage | Shield-safe |
-| Forsaken Paladin | Ascension | Travel | Pass | Unchanged |
-| Forsaken Paladin | Consecration | Reach | Pass | Unchanged |
-| Dreadlord | Carrion Swarm | Reach | Pass | Unchanged |
-| Dreadlord | Vampiric Pounce | +25% bite damage | Fail: damage | Travel: the pounce carries 25% farther; same bite and heal cap |
-| Dreadlord | Bat Ascension | Travel | Pass | Unchanged |
-| Dreadlord | Sleep | Reach | Pass | Unchanged |
-| Shadow Hunter | Spirit Glaive | +25% damage | Fail: damage | Reach: a 25% larger glaive both ways |
-| Shadow Hunter | Serpent Ward | +25% shot damage; recall 4 invulnerable frames | Fail: damage, two, armor | x1.25 ward durability; invulnerable recall removed |
-| Shadow Hunter | Loa Vault | Travel | Pass | Unchanged |
-| Shadow Hunter | Hex | Reach | Pass | Unchanged |
-| Pit Lord | Howl of Terror | Reach | Pass | Unchanged |
-| Pit Lord | Ruin Charge | +25% damage | Fail: damage | Shield-safe |
-| Pit Lord | Abyssal Leap | Travel | Pass | Unchanged |
-| Pit Lord | Rain of Fire | +25% damage | Fail: damage | Reach: 25% larger fireballs |
-| Beastmaster | Wild Axes | +25% damage | Fail: damage | Reach: 25% larger axes |
-| Beastmaster | Summon Bear | +25% durability and damage | Fail: two | x1.25 bear durability |
-| Beastmaster | Summon Hawk | Travel, +25% durability, dive 4 invulnerable frames | Fail: two, armor | x1.25 hawk durability in both forms; invulnerable dive removed |
-| Beastmaster | Summon Quilbeast | +25% durability and damage; volley 4 invulnerable frames | Fail: two, armor | x1.25 quilbeast durability; invulnerable volley removed |
-| Lich King | Howling Blast | +25% damage | Fail: damage | Range |
-| Lich King | Val'kyr Shadowguard | +25% damage | Fail: damage | Range |
-| Lich King | Ascension of the Damned | Travel | Pass | Unchanged |
-| Lich King | Defile | Reach | Pass | Unchanged |
-| Thrall | Chain Lightning | +25% damage | Fail: damage | Reach: a 25% wider bolt |
-| Thrall | Feral Spirit | +25% damage | Fail: damage | Range: the wolves run 25% farther |
-| Thrall | Far Sight | Travel | Pass | Unchanged |
-| Thrall | Doomhammer Slam | Reach | Pass | Unchanged |
-| Jaina | Frostbolt | +25% damage | Fail: damage | Reach: a 25% larger bolt |
-| Jaina | Blizzard | +25% damage | Fail: damage | Reach: a 25% wider patch |
-| Jaina | Blink | Travel | Pass | Unchanged |
-| Jaina | Water Elemental | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | x1.25 elemental durability; invulnerable recall removed |
-| Sylvanas | Black Arrow | +25% damage | Fail: damage | Range |
-| Sylvanas | Silence | Reach | Pass | Unchanged |
-| Sylvanas | Banshee Flight | Travel | Pass | Unchanged |
-| Sylvanas | Life Drain | +25% damage | Fail: damage | Reach: the drain grabs 25% farther; same heal cap |
-| Cairne | Shockwave | +25% damage | Fail: damage | Range: the wave runs 25% farther |
-| Cairne | Bloodhoof Gore | +25% damage | Fail: damage | Reach: the horns catch 25% farther |
-| Cairne | Spirit Lift | Travel | Pass | Unchanged |
-| Cairne | War Stomp | Armor 50% heavier and 20% more reach | Fail: two | Reach: the stomp and ring grow 25%; the armor is unchanged |
-| Chen | Breath of Fire | Reach | Pass | Unchanged |
-| Chen | Body Slam | Travel | Pass | Unchanged |
-| Chen | Storm Rise | Travel | Pass | Unchanged |
-| Chen | Brew Keg | Reach | Pass | Unchanged |
-| Peon | Gold Sack | +25% damage | Fail: damage | Shield-safe bonks |
-| Peon | Log Heave | +25% damage | Fail: damage | Reach: a 25% longer log |
-| Peon | Worksite Launch | Travel | Pass | Unchanged |
-| Peon | Rest | Reach | Pass | Unchanged |
-| Tinker | Cluster Rockets | +25% damage | Fail: damage | Range |
-| Tinker | Laser | +25% damage and reach | Fail: two | Reach: a 25% longer beam |
-| Tinker | Rocket Boots | Travel | Pass | Unchanged |
-| Tinker | Pocket Factory | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | x1.25 factory durability; invulnerable recall removed |
-| Kael'thas | Pyroblast | +25% damage | Fail: damage | Reach: a 25% larger fireball |
-| Kael'thas | Flame Strike | +25% damage | Fail: damage | Reach: a 25% wider pillar |
-| Kael'thas | Phoenix | Travel | Pass | Unchanged |
-| Kael'thas | Banish | Reach | Pass | Unchanged |
-| Murloc | Ensnare | Reach | Pass | Unchanged |
-| Murloc | Tidal Rush | +25% damage | Fail: damage | Shield-safe |
-| Murloc | Tide Spout | Travel | Pass | Unchanged |
-| Murloc | Disease Cloud | Reach | Pass | Unchanged |
-| Grom | Warsong Cry | +25% damage and 15% reach | Fail: two | Reach: a 25% wider roar, same damage |
-| Grom | Gorehowl Rush | +25% damage and travel | Fail: two | Shield-safe |
-| Grom | Blood Leap | Travel | Pass | Unchanged |
-| Grom | Mannoroth's Bane | +25% damage | Fail: damage | Reach: a 25% longer chop |
-| Malfurion | Entangling Roots | +25% damage and reach | Fail: two | Reach: 25% wider roots |
-| Malfurion | Stag Charge | +25% damage and travel | Fail: two | Shield-safe |
-| Malfurion | Dream Ascent | Travel | Pass | Unchanged |
-| Malfurion | Force of Nature | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | x1.25 treant durability; invulnerable recall removed |
-| Medivh | Arcane Omen | 37% faster, 25% larger, +33% damage | Fail: two | Reach: a 25% larger omen |
-| Medivh | Vanishing Act | Blinks 39% farther, +40% and +57% damage | Fail: two | Travel: blinks 25% farther |
-| Medivh | Raven Flight | 33% faster flight, +60% damage | Fail: two | Travel: flies 25% farther |
-| Medivh | Last Word | Blinks 33% farther, 43% larger burst, +80% damage | Fail: two | Reach: a 25% larger burst |
-| Anub'arak | Impale | Larger spines (28 from 18), +84% damage, more knockback | Fail: two | Reach |
-| Anub'arak | Burrow Hunt | Burrows 4 frames longer and faster, erupts 4 frames later, larger, +33% damage | Fail: slower, two | Travel |
-| Anub'arak | Crypt Eruption | 60% farther, larger, +50% damage | Fail: two | Travel |
-| Anub'arak | Carrion Beetle | x1.5 durability, a fourth beetle, +40% damage; recall 4 invulnerable frames | Fail: two, armor | x1.5 durability |
-
-Ground, air, marked and recall forms use their matching upgrade. A
-follow-up keeps the EX cast's upgrade and never buys a second EX. Authored EX
-data is immutable; the existing replayed `special.ex` selects it. Projectiles
-and placed objects retain the selected authored data after the cast ends.
-The native models, sounds and animations remain the move's existing ones;
-there are no new imports.
-
-## EX wavedash
-
-Tom asked for an EX wavedash on 28 October 2026: hold Strong while air
-dodging into the ground, the input that makes an EX special. When the dodge
-lands as a wavedash or waveland with horizontal speed and the fighter holds
-the EX charge, it spends the charge once on the landing frame and adds a fixed
-`EX_WAVEDASH_SPEED` of 0.625 Melee units a frame (3.75 world units) to the
-slide in its direction (smashcraft:ts/src/game/sim/exWavedash.ts). Every
-fighter and every angle gets the same speed, so a 45-degree EX wavedash is the
-45-degree slide plus the same push and a max-length one is the longest slide
-plus it. Landing lag (10 frames) and every animation keep their timing; only
-the distance changes. Without Strong or without the EX charge, and for a dodge with no
-horizontal part (straight down), the landing is the ordinary wavedash and
-nothing is spent, so the ordinary wavedash keeps all its angles and lengths.
-
-The speed is sized so the median fighter's longest wavedash (the 18-degree
-dodge buffered in jump squat) slides 40% further: 228.5 to 321.0 world units,
-with the roster spread 1.35x to 1.46x.
-`dodge.ex` holds the request through the dodge and marks the slide, and is
-replay and rollback state. While it lasts the wavedash's own dust puffs, at
-their usual places and times, are tinted the EX glow's blue, with the EX cast
-flash on the first slide frame and blue mana sparkles every third slide frame.
+- Whether a normal attack that reaches the orb makes the centre too easy to take
+  from a fighter standing under it.
+- Whether the 30-second interval is too slow for an ultimate to arrive in a
+  short match.
+- Whether the gold glow reads at a glance.
+- Ultimates aim at about 25-30% damage; the current values are being tabulated
+  separately.
 
 ## Ultimates
 
-[ultimates.md](ultimates.md) owns the ultimate moves. They spend only the
-ultimate meter; the EX charge is a separate meter and is never touched.
+[ultimates.md](ultimates.md) owns the ultimate moves. They spend the whole
+ultimate meter.

@@ -243,7 +243,6 @@ interface VisualSerials {
 
 interface Special {
   action: SpecialAction;
-  ex: boolean;
   variant: number;
   frame: number;
   duration: number;
@@ -297,7 +296,6 @@ export interface Projectile {
   damageMultiplier: number;
 
   newlyReflected: boolean;
-  exReach: boolean;
 
   poolHits: number;
 
@@ -309,7 +307,6 @@ export interface Projectile {
 
   bounces: number;
   homeward: boolean;
-  carriedEx: number;
   lastStruck: number | undefined;
 }
 
@@ -321,7 +318,6 @@ interface Dodge {
   airUsed: boolean;
 
   airMotionFrames: number;
-  ex: boolean;
   groundFrame: number;
   groundDirection: number;
   groundEntryFacing: number;
@@ -467,7 +463,6 @@ interface Status {
 
 
 interface Meter {
-  ex: number;
   ultimate: number;
 }
 
@@ -542,14 +537,12 @@ function emptyProjectile(): Projectile {
     serial: 0,
     damageMultiplier: 1.0,
     newlyReflected: false,
-    exReach: false,
     poolHits: 0,
     poolWait: 0,
     spec: undefined,
     surface: undefined,
     bounces: 0,
     homeward: false,
-    carriedEx: 0,
     lastStruck: undefined,
   };
 }
@@ -691,7 +684,6 @@ export function createFighter(character: Character, startX: number, facing: numb
     visuals: { grab: 0, throw: 0, hit: 0, hitElectric: false, hitElement: HitElement.normal, hitStrength: 0, hitStrong: false, hitHeight: 1, hitPummel: false, shieldElectric: false, shield: 0, shieldReflect: 0, manaDrained: 0, poisonBursts: 0, spellPass: 0, armorAbsorbs: 0 },
     special: {
       action: SpecialAction.none,
-      ex: false,
       variant: 0,
       frame: 0,
       duration: 0,
@@ -720,9 +712,9 @@ export function createFighter(character: Character, startX: number, facing: numb
     projectiles: repeat(PROJECTILE_CAPACITY, () => emptyProjectile()),
     projectileSlots: 0,
     bear: { life: 0, x: 0.0, z: 0.0, velocityX: 0.0, velocityZ: 0.0, swipeCooldown: 0, hitSerial: 0, surface: undefined },
-    freezeTrap: { exReach: false, life: 0, arming: 0, x: 0.0, z: 0.0, surface: undefined, serial: 0, cooldown: 0 },
+    freezeTrap: { life: 0, arming: 0, x: 0.0, z: 0.0, surface: undefined, serial: 0, cooldown: 0 },
     restingGroups: RESTING_GROUPS,
-    dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, ex: false, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },
+    dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },
     landing: { lag: 0, wavedash: false, dashBuffer: 0, heldSide: 0 },
     down: { state: DownState.none, frame: 0, direction: 0, waitRemaining: 0, faceUp: true, attackQueued: false },
     tech: { ...emptyTechInput(), window: 0 },
@@ -751,7 +743,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     cannon: { held: undefined, firing: undefined, cooldown: 0, passing: false },
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorKnockback: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, summonFrames: 0, summonX: 0.0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0, manaShield: false, petrifyIn: 0, petrified: false, petrifyDamage: 0.0 },
-    meter: { ex: 0, ultimate: 0 },
+    meter: { ultimate: 0 },
     placed: createPlacedObject(),
     pack: packFrom(spares, packLength(character)),
   };

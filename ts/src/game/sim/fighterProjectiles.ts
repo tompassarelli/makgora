@@ -12,7 +12,7 @@ const positiveZero = (value: number) => value === 0 && 1 / value > 0;
 
 function resting(projectile: Readonly<Projectile>, family: Character): boolean {
   return projectile.life === 0 && projectile.direction === 0 && projectile.kind === ProjectileKind.blaster && projectile.visualFamily === family
-    && projectile.serial === 0 && projectile.damageMultiplier === 1.0 && !projectile.newlyReflected && !projectile.exReach
+    && projectile.serial === 0 && projectile.damageMultiplier === 1.0 && !projectile.newlyReflected
     && projectile.poolHits === 0 && projectile.poolWait === 0 && projectile.spec === undefined && projectile.surface === undefined
     && positiveZero(projectile.x) && positiveZero(projectile.z) && positiveZero(projectile.velocityX) && positiveZero(projectile.velocityZ);
 }

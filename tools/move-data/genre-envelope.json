@@ -6,8 +6,7 @@
     "frames": 3,
     "shieldAdvantage": 3,
     "killPercentShare": 0.15,
-    "special": { "frames": 10, "shieldAdvantage": 10, "killPercentShare": 0.3 },
-    "ex": { "frames": 15, "shieldAdvantage": 15, "killPercentShare": 0.4 }
+    "special": { "frames": 10, "shieldAdvantage": 10, "killPercentShare": 0.3 }
   },
   "sources": {
     "melee": { "game": "Super Smash Bros. Melee", "url": "https://meleeframedata.com/", "via": "references/melee-frame-data/records.jsonl (meleeWebProject characters.db at ec5155149faeed24b5e5781d7efe17387cc9ee3d; all 26 Melee characters)" },

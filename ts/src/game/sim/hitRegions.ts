@@ -38,8 +38,6 @@ export interface HitEffect {
 
   manaDrain?: number | undefined;
 
-  manaSteal?: number | undefined;
-
   carry?: boolean | undefined;
 
   strong?: boolean | undefined;
@@ -52,8 +50,6 @@ export interface HitEffect {
   shieldDamage?: number | undefined;
 
   sakurai?: boolean | undefined;
-
-  shieldSafe?: boolean | undefined;
 
   flinchless?: boolean | undefined;
 }
@@ -86,14 +82,12 @@ export function copyHitEffect(target: HitEffect, source: Readonly<HitEffect>): v
   target.electric = source.electric;
   target.element = source.element;
   target.manaDrain = source.manaDrain;
-  target.manaSteal = source.manaSteal;
   target.carry = source.carry;
   target.strong = source.strong;
   target.setKnockback = source.setKnockback;
   target.fixedPower = source.fixedPower;
   target.shieldDamage = source.shieldDamage;
   target.sakurai = source.sakurai;
-  target.shieldSafe = source.shieldSafe;
   target.flinchless = source.flinchless;
 }
 

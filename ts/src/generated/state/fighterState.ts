@@ -33,14 +33,12 @@ function copyFighterProjectiles(target: Fighter, source: Readonly<Fighter>): voi
     to.velocityX = from.velocityX;
     to.velocityZ = from.velocityZ;
     to.serial = from.serial;
-    to.exReach = from.exReach;
     to.poolHits = from.poolHits;
     to.poolWait = from.poolWait;
     to.spec = from.spec;
     to.surface = from.surface;
     to.bounces = from.bounces;
     to.homeward = from.homeward;
-    to.carriedEx = from.carriedEx;
     to.lastStruck = from.lastStruck;
   }
   const rest = sources[PROJECTILE_CAPACITY - 1];
@@ -253,7 +251,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   hitTargetsCopy[2] = keep[sourceHitTargetsCopy[2] as number];
   hitTargetsCopy[3] = keep[sourceHitTargetsCopy[3] as number];
   special.action = sourceSpecial.action;
-  special.ex = sourceSpecial.ex;
   special.frame = sourceSpecial.frame;
   special.duration = sourceSpecial.duration;
   special.lockFrames = sourceSpecial.lockFrames;
@@ -305,7 +302,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   if ((source.restingGroups & REST_FREEZE_TRAP) === 0) {
     const sourceTrap = source.freezeTrap;
     trap.life = sourceTrap.life;
-    trap.exReach = sourceTrap.exReach;
     trap.arming = sourceTrap.arming;
     trap.x = sourceTrap.x;
     trap.z = sourceTrap.z;
@@ -314,7 +310,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
     trap.cooldown = sourceTrap.cooldown;
   } else if ((target.restingGroups & REST_FREEZE_TRAP) === 0) {
     trap.life = 0;
-    trap.exReach = false;
     trap.arming = 0;
     trap.x = 0.0;
     trap.z = 0.0;
@@ -328,7 +323,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   dodge.airDodging = sourceDodge.airDodging;
   dodge.airFrame = sourceDodge.airFrame;
   dodge.airUsed = sourceDodge.airUsed;
-  dodge.ex = sourceDodge.ex;
   dodge.groundFrame = sourceDodge.groundFrame;
   dodge.groundDirection = sourceDodge.groundDirection;
   dodge.groundEntryFacing = sourceDodge.groundEntryFacing;
@@ -471,7 +465,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.petrifyDamage = sourceStatus.petrifyDamage;
   const meter = target.meter;
   const sourceMeter = source.meter;
-  meter.ex = sourceMeter.ex;
   meter.ultimate = sourceMeter.ultimate;
   const pack = target.pack as PlacedObject[];
   const sourcePack = source.pack;
@@ -548,7 +541,7 @@ function sameFighterProjectiles(target: Readonly<Fighter>, source: Readonly<Figh
     const b = sources[index];
     if (a === undefined || b === undefined) return false;
     if (a === b) continue;
-    if (a.life !== b.life || a.serial !== b.serial || a.kind !== b.kind || a.direction !== b.direction || a.visualFamily !== b.visualFamily || a.newlyReflected !== b.newlyReflected || a.exReach !== b.exReach || a.poolHits !== b.poolHits || a.poolWait !== b.poolWait || a.spec !== b.spec || a.surface !== b.surface || a.bounces !== b.bounces || a.homeward !== b.homeward || a.carriedEx !== b.carriedEx || a.lastStruck !== b.lastStruck) return false;
+    if (a.life !== b.life || a.serial !== b.serial || a.kind !== b.kind || a.direction !== b.direction || a.visualFamily !== b.visualFamily || a.newlyReflected !== b.newlyReflected || a.poolHits !== b.poolHits || a.poolWait !== b.poolWait || a.spec !== b.spec || a.surface !== b.surface || a.bounces !== b.bounces || a.homeward !== b.homeward || a.lastStruck !== b.lastStruck) return false;
     if (!sameReal(a.x, b.x) || !sameReal(a.z, b.z) || !sameReal(a.velocityX, b.velocityX) || !sameReal(a.velocityZ, b.velocityZ) || !sameReal(a.damageMultiplier, b.damageMultiplier)) return false;
   }
   return live >= PROJECTILE_CAPACITY || targets[PROJECTILE_CAPACITY - 1]?.visualFamily === sources[PROJECTILE_CAPACITY - 1]?.visualFamily;
@@ -750,7 +743,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   const special = target.special;
   const sourceSpecial = source.special;
   { const a = special.action, b = sourceSpecial.action; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-  if (special.ex !== sourceSpecial.ex) return false;
   { const a = special.variant, b = sourceSpecial.variant; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = special.frame, b = sourceSpecial.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = special.duration, b = sourceSpecial.duration; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -802,7 +794,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   if ((target.restingGroups & source.restingGroups & REST_FREEZE_TRAP) === 0) {
     const trap = target.freezeTrap;
     const sourceTrap = source.freezeTrap;
-    if (trap.exReach !== sourceTrap.exReach) return false;
     { const a = trap.life, b = sourceTrap.life; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = trap.arming, b = sourceTrap.arming; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = trap.x, b = sourceTrap.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -817,7 +808,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = dodge.airFrame, b = sourceDodge.airFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (dodge.airUsed !== sourceDodge.airUsed) return false;
   { const a = dodge.airMotionFrames, b = sourceDodge.airMotionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-  if (dodge.ex !== sourceDodge.ex) return false;
   { const a = dodge.groundFrame, b = sourceDodge.groundFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = dodge.groundDirection, b = sourceDodge.groundDirection; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = dodge.groundEntryFacing, b = sourceDodge.groundEntryFacing; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -948,7 +938,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.petrifyDamage, b = sourceStatus.petrifyDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const meter = target.meter;
   const sourceMeter = source.meter;
-  { const a = meter.ex, b = sourceMeter.ex; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = meter.ultimate, b = sourceMeter.ultimate; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (target.pack.length !== source.pack.length || (target.pack.length === 0 && 1 / target.pack.length !== 1 / source.pack.length)) return false;
   if ((target.restingGroups & source.restingGroups & REST_PLACED) === 0) {
@@ -1197,15 +1186,10 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "manaDrainedSerial", visuals.manaDrained);
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
-    if (projectile.exReach) sink.int(prefix, `projectileExReach[${i}]`, 1);
-  }
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
-    const projectile = at(fighter.projectiles, i);
     if (projectile.poolHits !== 0) sink.int(prefix, `projectilePoolHits[${i}]`, projectile.poolHits);
     if (projectile.poolWait !== 0) sink.int(prefix, `projectilePoolWait[${i}]`, projectile.poolWait);
   }
   sink.int(prefix, "specialAction", special.action);
-  if (special.ex) sink.bool(prefix, "specialEx", true);
   sink.int(prefix, "specialFrame", special.frame);
   sink.int(prefix, "specialDuration", special.duration);
   sink.int(prefix, "specialLockFrames", special.lockFrames);
@@ -1225,7 +1209,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "bearHitSerial", bear.hitSerial);
   sink.int(prefix, "bearSurface", bear.surface ?? -1);
   sink.int(prefix, "freezeTrapLife", trap.life);
-  if (trap.exReach) sink.int(prefix, "freezeTrapExReach", 1);
   sink.int(prefix, "freezeTrapArming", trap.arming);
   sink.real(prefix, "freezeTrapX", trap.x);
   sink.real(prefix, "freezeTrapZ", trap.z);
@@ -1272,7 +1255,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.bool(prefix, "airDodging", dodge.airDodging);
   sink.int(prefix, "airDodgeFrame", dodge.airFrame);
   sink.bool(prefix, "airDodgeUsed", dodge.airUsed);
-  if (dodge.ex) sink.bool(prefix, "airDodgeEx", true);
   sink.int(prefix, "groundDodgeFrame", dodge.groundFrame);
   sink.int(prefix, "groundDodgeDirection", dodge.groundDirection);
   sink.int(prefix, "groundDodgeEntryFacing", dodge.groundEntryFacing);
@@ -1383,7 +1365,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.real(prefix, "surfacePhysics.wallJumpMinimumApproach", tuning.surface.wallJumpMinimumApproach);
   sink.bool(prefix, "surfacePhysics.canWallJump", tuning.surface.canWallJump);
   sink.text(kits.specials(`${prefix}.specials`, tuning.specials));
-  sink.int(prefix, "meterEx", meter.ex);
   sink.int(prefix, "meterUltimate", meter.ultimate);
   if (visuals.poisonBursts !== 0) sink.int(prefix, "poisonBursts", visuals.poisonBursts);
   if (visuals.spellPass !== 0) sink.int(prefix, "spellPassVisualSerial", visuals.spellPass);
@@ -1481,10 +1462,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
     if (projectile.homeward) sink.bool(prefix, `projectileHomeward[${i}]`, true);
-  }
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
-    const projectile = at(fighter.projectiles, i);
-    if (projectile.carriedEx !== 0) sink.int(prefix, `projectileCarriedEx[${i}]`, projectile.carriedEx);
   }
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
@@ -1700,7 +1677,6 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   dodge.airDodging = false;
   dodge.airFrame = 0;
   dodge.airUsed = false;
-  dodge.ex = false;
   dodge.groundFrame = 0;
   dodge.groundDirection = 0;
   dodge.groundEntryFacing = 0;

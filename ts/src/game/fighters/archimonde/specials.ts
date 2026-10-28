@@ -16,28 +16,26 @@ const mark = (model: string, spawnFrame: number, life: number, offsetX: number):
 export const FINGER_STRIKE_FRAME = 32;
 const FINGER_LINE: SpecialProjectile = { ...mark("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", 1, FINGER_STRIKE_FRAME + 6, 0.0), atFoe: true };
 const FINGER_COLUMN: SpecialProjectile = { ...mark("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx", FINGER_STRIKE_FRAME, 12, 0.0), atMark: FINGER_LINE };
-const fingerOfDeath = (ex: boolean, air: boolean): AuthoredSpecial => ({
+const fingerOfDeath = (air: boolean): AuthoredSpecial => ({
   endFrame: 58, landingLag: air ? AIR_LANDING_LAG : undefined,
   hurt: archimondeCastBody(4, 40, 90.0, 230.0),
   projectiles: [FINGER_LINE, FINGER_COLUMN],
   regionOrigin: FINGER_LINE,
-  regions: [heroRegion(FINGER_STRIKE_FRAME, FINGER_STRIKE_FRAME + 5, capsule(0.0, -160.0, 0.0, 460.0, ex ? f32(22.0 * f32(1.3)) : 22.0),
+  regions: [heroRegion(FINGER_STRIKE_FRAME, FINGER_STRIKE_FRAME + 5, capsule(0.0, -160.0, 0.0, 460.0, 22.0),
     { ...hit(16.0, "KILL", 70, 1.0, HitElement.dark), growth: 102.0 })],
 });
 
 const PILLAR_HIT = hit(9.0, "POKE", 80, 1.0, HitElement.fire);
-const PILLARS = [{ frame: 24, x: 170.0 }, { frame: 36, x: 310.0 }, { frame: 48, x: 450.0 }] as const;
-const LAST_PILLAR = { normal: 36, ex: 48 } as const;
+const PILLARS = [{ frame: 24, x: 170.0 }, { frame: 36, x: 310.0 }] as const;
+const LAST_PILLAR = 36;
 const PILLAR_WARNING = 14;
-const rainOfFire = (ex: boolean, air: boolean): AuthoredSpecial => {
-  const pillars = ex ? PILLARS : PILLARS.slice(0, 2);
-  const last = ex ? LAST_PILLAR.ex : LAST_PILLAR.normal;
+const rainOfFire = (air: boolean): AuthoredSpecial => {
   return {
-    endFrame: last + 22, landingLag: air ? AIR_LANDING_LAG : undefined,
-    hurt: archimondeCastBody(4, last + 4, 70.0, 220.0),
-    projectiles: pillars.map(({ frame, x }) => ({ ...mark("Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx", frame - PILLAR_WARNING, PILLAR_WARNING + 16, x), dropsToFloor: true })),
-    regions: pillars.map(({ frame, x }) => heroRegion(frame, frame + 3, capsule(x, -400.0, x, 900.0, 44.0), PILLAR_HIT)),
-    rehits: pillars.slice(1).map(({ frame }) => frame),
+    endFrame: LAST_PILLAR + 22, landingLag: air ? AIR_LANDING_LAG : undefined,
+    hurt: archimondeCastBody(4, LAST_PILLAR + 4, 70.0, 220.0),
+    projectiles: PILLARS.map(({ frame, x }) => ({ ...mark("Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx", frame - PILLAR_WARNING, PILLAR_WARNING + 16, x), dropsToFloor: true })),
+    regions: PILLARS.map(({ frame, x }) => heroRegion(frame, frame + 3, capsule(x, -400.0, x, 900.0, 44.0), PILLAR_HIT)),
+    rehits: PILLARS.slice(1).map(({ frame }) => frame),
   };
 };
 
@@ -71,11 +69,11 @@ const BASH_AIR: AuthoredSpecial = {
 
 export const ARCHIMONDE_SPECIALS: FighterSpecials = {
   neutral: { name: "Finger of Death", description: "A violet line marks the foe where they stand; a moment later lightning strikes it. Step off the line, or punish his long cast up close.",
-    ground: { ...fingerOfDeath(false, false), ex: fingerOfDeath(true, false) }, air: { ...fingerOfDeath(false, true), ex: fingerOfDeath(true, true) } },
+    ground: fingerOfDeath(false), air: fingerOfDeath(true) },
   side: { name: "Rain of Fire", description: "Two fire pillars fall ahead, near then far, as tall as the sky. Wait them out or rush in under his cast.",
-    ground: { ...rainOfFire(false, false), ex: rainOfFire(true, false) }, air: { ...rainOfFire(false, true), ex: rainOfFire(true, true) } },
+    ground: rainOfFire(false), air: rainOfFire(true) },
   up: { name: "Fel Ascent", description: "He rises a short way on a column of fel fire that burns anyone below, then falls helpless. Guard the ledge against him.",
-    ground: { ...felAscent(ASCENT_RISE), ex: felAscent(f32(ASCENT_RISE * f32(1.25))) } },
+    ground: felAscent(ASCENT_RISE) },
   down: { name: "Bash", description: "A hammer-fist into the ground holds a grounded foe close by in place; in the air it drives them down. Shield it or jump it.",
-    ground: { ...bash(90.0), ex: bash(120.0) }, air: BASH_AIR },
+    ground: bash(90.0), air: BASH_AIR },
 };

@@ -16,18 +16,16 @@ import { Action, bit } from "../../input/actions";
 import { HEIGHT_PROBE_OUT, RECOVERY_BANDS, SPECIAL, TOWARD, UP, playKeys, recovered, recoveryRun } from "../../match/recoveryEnvelope";
 import { PHOENIX_BURN_FRAMES, PHOENIX_EGG_FALL_SPEED, PHOENIX_EGG_HATCH_FRAMES, PHOENIX_STARTUP_FRAMES } from "./specials";
 import { kaelHit } from "./moves";
-import { fillMeter } from "../../sim/meter";
 
 const TURN_COS = f32(0.996);
-const upB = (ex = false): Controls => controls({ specialPressed: true, specialZ: 1, verticalDirection: 1, exPressed: ex });
+const UP_B: Controls = controls({ specialPressed: true, specialZ: 1, verticalDirection: 1 });
 const hold = (x: number, z: number): Controls => controls({ direction: x, verticalDirection: z });
 
-function flight(z: number, ex = false): { world: Roster; kael: Fighter; foe: Fighter } {
+function flight(z: number): { world: Roster; kael: Fighter; foe: Fighter } {
   const pair = duelPair(createFighter(Character.kaelthas, 0.0, 1), createFighter(Character.rifleman, -500.0, 1));
   const kael = pair.owner;
-  fillMeter(kael);
   lift(kael, z);
-  stepDuel(pair.world, upB(ex));
+  stepDuel(pair.world, UP_B);
   while (kael.special.frame < PHOENIX_STARTUP_FRAMES) stepDuel(pair.world, hold(0, 1));
   return { world: pair.world, kael, foe: pair.target };
 }
@@ -92,7 +90,7 @@ test("Phoenix: the flames burn down over a fixed flight, then he falls helpless 
 test("Phoenix: struck mid-flight he becomes an egg that falls faster than his fall, ignores every input, misses the ledge and hatches on landing [k3 measure #360]", () => {
   const early = duelPair(createFighter(Character.kaelthas, 0.0, 1), createFighter(Character.rifleman, -500.0, 1));
   lift(early.owner, 250.0);
-  stepDuel(early.world, upB());
+  stepDuel(early.world, UP_B);
   stepDuel(early.world, hold(0, 1));
   strike(early.world);
   stepDuel(early.world);
@@ -142,7 +140,7 @@ test("Phoenix: struck mid-flight he becomes an egg that falls faster than his fa
   }
 });
 
-test("Phoenix: from the long band's depth, a jump and a Phoenix held up still reach the ledge, and EX flies a quarter farther [k3 measure #360]", () => {
+test("Phoenix: from the long band's depth, a jump and a Phoenix held up still reach the ledge [k3 measure #360]", () => {
   const band = RECOVERY_BANDS[0];
   if (band === undefined || band.name !== "long") throw new Error("long band");
   const run = recoveryRun(Character.kaelthas, 0, f32(mainDeckRight(0) + HEIGHT_PROBE_OUT), -band.heightMin);
@@ -153,16 +151,6 @@ test("Phoenix: from the long band's depth, a jump and a Phoenix held up still re
   playKeys(run, TOWARD | UP | SPECIAL);
   for (frame = 0; frame < 240 && !recovered(f) && !f.status.out; frame++) playKeys(run, UP);
   assertTrue(recovered(f));
-
-  const rise = (ex: boolean): number => {
-    const { world, kael } = flight(300.0, ex);
-    const startZ = kael.motion.z;
-    while (kael.special.action === SpecialAction.heroUp) stepDuel(world, hold(0, 0));
-    return f32(kael.motion.z - startZ);
-  };
-  const ratio = f32(rise(true) / rise(false));
-  assertGreaterThan(ratio, f32(1.2));
-  assertLessThan(ratio, f32(1.3));
 });
 
 test("Phoenix: an egg that drops into the sea keeps falling at its egg speed and is lost, where a helpless fall floats [k3 measure #360]", () => {

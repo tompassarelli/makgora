@@ -147,17 +147,15 @@ function originalSpecialMeasures(character: Character): Readonly<Record<string, 
     return {
       [`special.projectile.${ProjectileKind.blaster}`]: specialMeasures(shot, shot, number("RIFLEMAN_BLASTER_GROUND_FRAMES")),
       [`special.projectile.${ProjectileKind.recoil}`]: specialMeasures(specials.RIFLEMAN_RECOVERY_STARTUP_FRAMES, specials.RIFLEMAN_RECOVERY_STARTUP_FRAMES, number("RIFLEMAN_RECOVERY_FRAMES")),
-      "special.bear": bear, "special.bear.ex": bear,
+      "special.bear": bear,
     };
   }
   const rows: Record<string, Measures> = {
     [`special.projectile.${ProjectileKind.eyeBeam}`]: specialMeasures(EYE_BEAM_GROUND_SHOT, EYE_BEAM_GROUND_SHOT, EYE_BEAM_GROUND_FRAMES),
     "special.dive": specialMeasures(specials.DEMONHUNTER_BACKFLIP_FRAMES + 1, specials.DEMONHUNTER_BACKFLIP_FRAMES + specials.DEMONHUNTER_DIVE_FRAMES - 1, specials.DEMONHUNTER_BACKFLIP_FRAMES + specials.DEMONHUNTER_DIVE_FRAMES),
   };
-  for (const ex of [false, true]) {
-    rows[`special.rush.${ex}`] = specialMeasures(specials.FEL_RUSH_FIRST, specials.FEL_RUSH_LAST, specials.FEL_RUSH_FRAMES);
-    for (const grounded of [false, true]) rows[`special.immolate.${grounded}.${ex}`] = specialMeasures(specials.DEMONHUNTER_IMMOLATE_STARTUP, specials.DEMONHUNTER_IMMOLATE_STARTUP + specials.DEMONHUNTER_IMMOLATE_ACTIVE - 1, specials.DEMONHUNTER_IMMOLATE_DURATION);
-  }
+  rows["special.rush"] = specialMeasures(specials.FEL_RUSH_FIRST, specials.FEL_RUSH_LAST, specials.FEL_RUSH_FRAMES);
+  for (const grounded of [false, true]) rows[`special.immolate.${grounded}`] = specialMeasures(specials.DEMONHUNTER_IMMOLATE_STARTUP, specials.DEMONHUNTER_IMMOLATE_STARTUP + specials.DEMONHUNTER_IMMOLATE_ACTIVE - 1, specials.DEMONHUNTER_IMMOLATE_DURATION);
   return rows;
 }
 

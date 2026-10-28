@@ -154,11 +154,11 @@ victim off with a holy push (8%). Back throw is a hip toss (10%), his kill
 throw. Up throw lifts them on a column of light and starts juggles (7%,
 90°). Down throw slams them to the floor for a tech chase (6%).
 
-**Specials** (every ordinary special is free; full-charge EX follows mana.md):
-- Neutral, **Holy Light:** a golden column bursts at a spot one body-width ahead on frame 16 (`HolyBoltSpecialArt`), 10% at 80°. A hit heals Uther 2%, capped at 6% per stock. 44 frames total, punishable on a whiff. EX: 25% wider column, and the heal doubles within the same cap.
-- Side, **Devotion Aura:** a golden ring (`DevotionAura`) as he steps forward with armour against hits up to 8% on frames 6-22, ending in a hammer bash (11%). Shield stops it; grabs and strong hits beat the armour. EX: the threshold rises to 12%.
+**Specials** (every special is free):
+- Neutral, **Holy Light:** a golden column bursts at a spot one body-width ahead on frame 16 (`HolyBoltSpecialArt`), 10% at 80°. A hit heals Uther 2%, capped at 6% per stock. 44 frames total, punishable on a whiff.
+- Side, **Devotion Aura:** a golden ring (`DevotionAura`) as he steps forward with armour against hits up to 8% on frames 6-22, ending in a hammer bash (11%). Shield stops it; grabs and strong hits beat the armour.
 - Up, **Hammer of the Righteous:** a rising two-handed hammer arc that climbs 2.4 body heights with light steering and hits 8% on frames 8-14. It spends the aerial jump and ends helpless.
-- Down, **Divine Shield:** a golden bubble (`DivineShieldTarget`) makes him intangible to strikes and projectiles on frames 4-26. Grabs beat it, he cannot act inside it, and 24 frames of recovery follow. It is a read, not a reflector, since Tyrande owns the reflector. EX: intangible through frame 34, and a melee hit absorbed during the bubble heals him 3%.
+- Down, **Divine Shield:** a golden bubble (`DivineShieldTarget`) makes him intangible to strikes and projectiles on frames 4-26. Grabs beat it, he cannot act inside it, and 24 frames of recovery follow. It is a read, not a reflector, since Tyrande owns the reflector.
 - Ultimate, **Resurrection:** after a 24-frame telegraph, rings of golden light (`ResurrectTarget`) rise across 1.6 stage-body-widths on both sides, launching foes upward (26% total within ultimates.md's damage target), and Uther heals 10%. This is a tier-2 reading: Warcraft's Resurrection raises allies, so here the light raises him and throws the living up. It is distinct from Cairne's Reincarnation, which triggers on death. Shield or dodge the telegraph.
 
 **Assets and animation:** the stock Uther model needs no import. Its rig maps
@@ -181,7 +181,7 @@ opponent as beneath notice and lets them exhaust themselves against her.
 
 **Role:** zoner with meter as armour, slow on the ground and in the air.
 Unlike Sylvanas, Jaina, Lich, Malfurion or Rifleman, she wins attrition rather
-than spacing: her Mana Shield spends her EX charge before her percent, so she
+than spacing: her Mana Shield pays half of each hit from her ultimate meter, so she
 outlasts pressure while her volleys and serpent wear the foe down. Up close
 she is weak, and a foe who drains her meter finds a slow, wide target.
 **Melee anchor:** Samus, the zoner that sits back with projectiles,
@@ -211,10 +211,10 @@ Forward throw: the tail uncoils forward (8%). Back throw: a tail pivot toss
 coil release for a tech chase (6%).
 
 **Specials:**
-- Neutral, **Multi-Shot:** three cold arrows (`NagaColdArrowMissile`) at 0° and ±12° on frame 18, 3% each. The centre arrow chills (ground acceleration −10% for 60 frames, reusing Lich's chill). Shields stop them, the arrows can be reflected, and only one volley may be in flight. 40 frames total. This keeps Frost Arrows from Tom's first list. EX: five arrows across ±20°.
-- Side, **Tidal Serpent:** a water serpent (`SerpentWardMissile` body) that travels 320 units. On a hit it deals 6%, steals 15% of the foe's EX charge and bounces to the nearest other target within 300 units (another foe, a summon or a ward). It makes up to three bounces and loses 20% damage on each. In a duel, its last bounce turns back towards Vashj, and catching it adds the stolen charge to hers. Jump it or shield it; a whiff is a long recovery. EX: one more bounce and a 25% steal.
+- Neutral, **Multi-Shot:** three cold arrows (`NagaColdArrowMissile`) at 0° and ±12° on frame 18, 3% each. The centre arrow chills (ground acceleration −10% for 60 frames, reusing Lich's chill). Shields stop them, the arrows can be reflected, and only one volley may be in flight. 40 frames total. This keeps Frost Arrows from Tom's first list.
+- Side, **Tidal Serpent:** a water serpent (`SerpentWardMissile` body) that travels 320 units. On a hit it deals 6%, drains 1.5% (108 frames) of the struck foe's ultimate meter, hands nothing back to Vashj, and bounces to the nearest other target within 300 units (another foe, a summon or a ward). It makes up to three bounces and loses 20% damage on each. In a duel, its last bounce turns back towards Vashj, and catching it gives nothing. Jump it or shield it; a whiff is a long recovery.
 - Up, **Tidal Surge:** a water column (`CrushingWaveDamage`) lifts her 2.0 body heights with 0.3 of drift, hitting 7% on frames 12-18. It spends the aerial jump and ends helpless.
-- Down, **Mana Shield** (`ManaShieldCaster`), a toggle: switching it on or off takes 12 frames. While it is on, each hit takes half its damage from her percent and drains the other half from her EX charge (1% of damage costs 1/10 of a full charge), and knockback is computed from her real, lower percent. She cannot spend EX while it is on, and her charge does not grow. When the charge runs dry the shield breaks into a 20-frame stagger. Counterplay: grabs and throws bypass it, and a foe who strings hits until it breaks gets a free punish. Toggle state, charge and break timer are rollback state.
+- Down, **Mana Shield** (`ManaShieldCaster`), a toggle: switching it on or off takes 12 frames. While it is on, each hit takes half its damage from her percent and pays the other half from her ultimate meter (1% of damage costs 72 frames, so one orb's half meter absorbs 50%), and knockback is computed from her real, lower percent. When the meter runs dry the shield breaks into a 20-frame stagger; with an empty meter it breaks on the first hit. Counterplay: grabs and throws bypass it, and a foe who strings hits until it breaks gets a free punish. Toggle state, meter and break timer are rollback state.
 - Ultimate, **Gaze of Azshara:** her eyes and head snakes glow for 20 frames of telegraph, then a cone 600 units ahead and 300 tall checks every foe's facing on frames 21-60. A foe facing her is slowed by 40% for 40 frames, then petrified for 60 frames under a grey tint, using the shared frozen status (`status.frozenFrames`). A petrified foe takes hits but is not launched until it ends, and a 26% cap holds the payoff within ultimates.md's target. A foe facing away, dodging or outside the cone is untouched, so turning around is the counterplay. Assets: `CurseTarget` for the slow, plus the grey tint.
 
 Tom's first list also named Tornado. Gaze of Azshara takes the ultimate
@@ -269,10 +269,10 @@ throw. Up throw: a hurl skyward (8%). Down throw: he crushes them into the
 floor for a tech chase (7%).
 
 **Specials:**
-- Neutral, **Finger of Death:** on frame 1 he locks the foe's x and draws a thin violet line there. On frame 32 a purple lightning column strikes it (the boss's Finger of Death, made fair): 16% at 70° with high growth, a ranged kill threat. Step off the line; the whole action lasts 58 frames, punishable from close. This matches the Classic-mode boss (35/6/45), so players already know the counter. EX: the column is 30% wider.
-- Side, **Rain of Fire:** two fire pillars (`RainOfFireTarget`) are marked ahead, near and far, and fall on frames 24 and 36. Each covers the full stage height at its x, 9%. These pillars deny air approaches, where Pit Lord's three rocks close a ground lane. EX: a third, farther pillar.
+- Neutral, **Finger of Death:** on frame 1 he locks the foe's x and draws a thin violet line there. On frame 32 a purple lightning column strikes it (the boss's Finger of Death, made fair): 16% at 70° with high growth, a ranged kill threat. Step off the line; the whole action lasts 58 frames, punishable from close. This matches the Classic-mode boss (35/6/45), so players already know the counter.
+- Side, **Rain of Fire:** two fire pillars (`RainOfFireTarget`) are marked ahead, near and far, and fall on frames 24 and 36. Each covers the full stage height at its x, 9%. These pillars deny air approaches, where Pit Lord's three rocks close a ground lane.
 - Up, **Fel Ascent:** he rises on a column of fel fire (`DoomDeath`) 1.8 body heights with little steering. The column hits below him (7%, frames 10-20). It spends the aerial jump and ends helpless. This is the roster's shortest heavy recovery, his designed weakness.
-- Down, **Bash:** a hammer-fist driven into the ground. A grounded foe within 90 units is held for 30 frames in the shared frozen status (`status.frozenFrames`) (12%); in the air the fist is a downward meteor (12%). 46 frames total. Shield it or jump it. EX: the stun reaches 120 units.
+- Down, **Bash:** a hammer-fist driven into the ground. A grounded foe within 90 units is held for 30 frames in the shared frozen status (`status.frozenFrames`) (12%); in the air the fist is a downward meteor (12%). 46 frames total. Shield it or jump it.
 - Ultimate, **Rain of Chaos:** circles mark the foe's x and ±220 units for 40 frames, then three infernals (`InfernalBirth`) crash in sequence (26% total for a foe caught by all three). Unlike Dreadlord's Summon Inferno, nothing stays afterwards: the meteors crash and vanish. Dark Portal stays Medivh's.
 
 **Assets and animation:** the stock model needs no import. A biped with tail
@@ -317,8 +317,8 @@ away (6%). Back throw: a spin toss (9%). Up throw: an arrow fired up into
 them (5% + 3%). Down throw: a floor plant for a tech chase (5%).
 
 **Specials:**
-- Neutral, **Searing Arrows:** a fast flaming arrow (`SearingArrowMissile`), 3% with low hitstun and a 22-frame life, also fired in the air without stalling. Shield and reflectors answer it. EX: two arrows in quick succession.
-- Side, **Trueshot Aura:** a 14-frame moonlit stance (`TrueshotAura`) that empowers her next three Searing Arrows within 300 frames: each pierces one target and deals 6%. The stance is the cost, and a foe who reads it gets a free hit. EX: no stance; the aura starts at once.
+- Neutral, **Searing Arrows:** a fast flaming arrow (`SearingArrowMissile`), 3% with low hitstun and a 22-frame life, also fired in the air without stalling. Shield and reflectors answer it.
+- Side, **Trueshot Aura:** a 14-frame moonlit stance (`TrueshotAura`) that empowers her next three Searing Arrows within 300 frames: each pierces one target and deals 6%. The stance is the cost, and a foe who reads it gets a free hit.
 - Up, **Moonlight Leap:** a star-trailed leap (`MoonWellCasterArt`) of 2.2 body heights with wide steering and a light hit (5%). It spends the aerial jump and ends helpless.
 - Down, **Elune's Grace:** the roster's reflector. A silver shimmer reflects projectiles on frames 4-12, and its frame-4 hit (2%) pushes a close foe. It can be jump-cancelled from frame 4, as Fox's and Falco's reflectors can, but a 24-frame cooldown keeps it from being chained. Illidan's Immolate is a jump-cancellable hit, not a reflector.
 - Ultimate, **Starfall:** after a 20-frame channel, stars (`StarfallTarget`) fall on evenly spaced lanes across her side of the stage for 90 frames, 26% total for a foe who stays in. Each lane is marked before it falls. This is the Priestess of the Moon's tier-1 ultimate.
@@ -377,7 +377,7 @@ input-insensitive loops applies, so the carry keeps the shared mash escape
 and a 60-frame cap.
 
 **Specials:**
-- Neutral, **Meat Hook:** on frame 14 he flings the hook (`MeatwagonMissile` head, with a chain-lightning line along the chain bones) 420 units straight ahead over 16 frames. A hit latches and reels the foe to him in 14 frames into his grab hold, where any throw follows. The hook is a projectile command grab: shields stop it, it can be reflected, and a whiff leaves 40 frames of recovery. The latch, reel and grab states are rollback state. EX: 25% longer reach.
+- Neutral, **Meat Hook:** on frame 14 he flings the hook (`MeatwagonMissile` head, with a chain-lightning line along the chain bones) 420 units straight ahead over 16 frames. A hit latches and reels the foe to him in 14 frames into his grab hold, where any throw follows. The hook is a projectile command grab: shields stop it, it can be reflected, and a whiff leaves 40 frames of recovery. The latch, reel and grab states are rollback state.
 - Side, **Butcher's Charge:** a belly-led rush with armour on frames 8-20 against hits up to 5% plus 1% per Flesh Heap stack, ending in a bump (11%). Shield stops it.
 - Up, **Hook Swing:** the hook flies diagonally upward. If it touches a ledge in its first 20 frames, it tethers and reels him to the ledge into ledge hang. Otherwise it is a short rise with a hit (6%) that ends helpless. The ledge tether is new in the engine: a sim/ledge.ts state, rollback-snapshotted, with bot recovery support in match/botRecovery.ts.
 - Down, **Rot**, a toggle with a 10-frame switch: a poison cloud (`PlagueCloudCaster`) around him hurts foes within 90 units 1% every 10 frames and slows their ground speed by 15%, and it costs him 1% every 20 frames. The toggle's on state is rollback state. Counterplay: keep out of the cloud, since he bleeds while it runs.
@@ -481,7 +481,7 @@ other two accounts finish inside that span. Uther moves to the front of
 account b if Forsaken Paladin must leave the select screen sooner.
 
 Why these sizes: each recent fighter's first playable pass took one agent
-one to three hours (Kobold's kit, sim and EX forms landed between 1:47 and
+one to three hours (Kobold's kit and sim landed between 1:47 and
 2:55 on 9 October, per its commits). Every fighter then took 11-24 commits
 of its own animation work over the next three weeks to reach the
 finished-move bar under native capture (by commit count against

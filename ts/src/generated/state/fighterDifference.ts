@@ -129,7 +129,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).velocityX !== at(actual.projectiles, i).velocityX) return `projectileVelocityX[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).velocityZ !== at(actual.projectiles, i).velocityZ) return `projectileVelocityZ[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).serial !== at(actual.projectiles, i).serial) return `projectileSerial[${i}]`;
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).exReach !== at(actual.projectiles, i).exReach) return `projectileExReach[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).poolHits !== at(actual.projectiles, i).poolHits) return `projectilePoolHits[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).poolWait !== at(actual.projectiles, i).poolWait) return `projectilePoolWait[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).surface !== at(actual.projectiles, i).surface) return `projectileSurface[${i}]`;
@@ -141,7 +140,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.special.fall !== actual.special.fall) return "specialFall";
   for (let i = 0; i < SPECIAL_ACTION_CAPACITY; i++) if (at(expected.special.cooldowns, i) !== at(actual.special.cooldowns, i)) return `specialCooldowns[${i}]`;
   if (expected.special.direction !== actual.special.direction) return "specialDirection";
-  if (expected.special.ex !== actual.special.ex) return "specialEx";
   if (expected.special.hit !== actual.special.hit) return "specialHit";
   if (expected.bear.life !== actual.bear.life) return "bearLife";
   if (expected.bear.x !== actual.bear.x) return "bearX";
@@ -152,7 +150,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.bear.hitSerial !== actual.bear.hitSerial) return "bearHitSerial";
   if (expected.bear.surface !== actual.bear.surface) return "bearSurface";
   if (expected.freezeTrap.life !== actual.freezeTrap.life) return "freezeTrapLife";
-  if (expected.freezeTrap.exReach !== actual.freezeTrap.exReach) return "freezeTrapExReach";
   if (expected.freezeTrap.arming !== actual.freezeTrap.arming) return "freezeTrapArming";
   if (expected.freezeTrap.x !== actual.freezeTrap.x) return "freezeTrapX";
   if (expected.freezeTrap.z !== actual.freezeTrap.z) return "freezeTrapZ";
@@ -177,7 +174,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.soakLevel !== actual.status.soakLevel) return "soakLevel";
   if (expected.status.poisonStacks !== actual.status.poisonStacks) return "poisonStacks";
   if (expected.status.poisonStackFrames !== actual.status.poisonStackFrames) return "poisonStackFrames";
-  if (expected.meter.ex !== actual.meter.ex) return "meterEx";
   if (expected.meter.ultimate !== actual.meter.ultimate) return "meterUltimate";
   if (expected.visuals.poisonBursts !== actual.visuals.poisonBursts) return "poisonBursts";
   if (expected.visuals.spellPass !== actual.visuals.spellPass) return "spellPassVisualSerial";
@@ -297,7 +293,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.dodge.airDodging !== actual.dodge.airDodging) return "airDodging";
   if (expected.dodge.airFrame !== actual.dodge.airFrame) return "airDodgeFrame";
   if (expected.dodge.airUsed !== actual.dodge.airUsed) return "airDodgeUsed";
-  if (expected.dodge.ex !== actual.dodge.ex) return "airDodgeEx";
   if (expected.dodge.groundFrame !== actual.dodge.groundFrame) return "groundDodgeFrame";
   if (expected.dodge.groundDirection !== actual.dodge.groundDirection) return "groundDodgeDirection";
   if (expected.dodge.groundEntryFacing !== actual.dodge.groundEntryFacing) return "groundDodgeEntryFacing";
@@ -348,7 +343,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.petrifyDamage !== actual.status.petrifyDamage) return "petrifyDamage";
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).bounces !== at(actual.projectiles, i).bounces) return `projectileBounces[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).homeward !== at(actual.projectiles, i).homeward) return `projectileHomeward[${i}]`;
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).carriedEx !== at(actual.projectiles, i).carriedEx) return `projectileCarriedEx[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).lastStruck !== at(actual.projectiles, i).lastStruck) return `projectileLastStruck[${i}]`;
   return undefined;
 }

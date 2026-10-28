@@ -287,7 +287,7 @@ function addCloseSpecials(f: Readonly<Fighter>, target: Readonly<Fighter>, stage
     case Character.demonHunter: {
       const localX = f32(aheadX(f, target, DEMONHUNTER_IMMOLATE_STARTUP, undefined, observationAge) * f.facing);
       const localZ = aheadZ(f, target, DEMONHUNTER_IMMOLATE_STARTUP);
-      const region = immolationRegion(motion.grounded, false, localX < 0);
+      const region = immolationRegion(motion.grounded, localX < 0);
 
       if (localX >= region.minX && localX <= region.maxX && localZ >= region.minZ && localZ <= region.maxZ && (motion.grounded || safeAt(stage, motion.x, 0.0)) && specialReady(f, DOWN_SPECIAL)) options[added++] = DOWN_SPECIAL;
       break;

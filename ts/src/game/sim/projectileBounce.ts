@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { max, min } from "../core/numbers";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Projectile } from "./fighter";
-import { METER } from "./meter";
+import { drainUltimate } from "./meter";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { canHit, sameTeam } from "./teams";
 
@@ -11,7 +11,6 @@ const CENTRE_HEIGHT = 45.0;
 export function clearBounce(projectile: Projectile): void {
   projectile.bounces = 0;
   projectile.homeward = false;
-  projectile.carriedEx = 0;
   projectile.lastStruck = undefined;
 }
 
@@ -42,9 +41,10 @@ export function bounceAfterHit(world: Roster, ownerSlot: number, projectile: Pro
   const bounce = spec?.bounce;
   if (spec === undefined || bounce === undefined) return false;
   const struck = fighterAt(world, struckSlot);
-  const stolen = min(struck.meter.ex, bounce.steal);
-  struck.meter.ex -= stolen;
-  projectile.carriedEx += stolen;
+  if (struck.meter.ultimate > 0 && bounce.drain > 0) {
+    drainUltimate(struck, bounce.drain);
+    struck.visuals.manaDrained++;
+  }
   projectile.lastStruck = struckSlot;
   projectile.damageMultiplier = f32(projectile.damageMultiplier * bounce.falloff);
   if (projectile.bounces < bounce.count && nextTarget(world, ownerSlot, projectile, bounce.range) !== undefined) projectile.bounces++;
@@ -68,7 +68,6 @@ export function steerBounce(world: Roster, ownerSlot: number, projectile: Projec
   const owner = fighterAt(world, ownerSlot);
   const homeZ = f32(owner.motion.z + CENTRE_HEIGHT);
   if (owner.status.out || (Math.abs(f32(owner.motion.x - projectile.x)) <= bounce.speed && Math.abs(f32(homeZ - projectile.z)) <= bounce.speed)) {
-    if (!owner.status.out) owner.meter.ex = min(METER.exFrames, owner.meter.ex + projectile.carriedEx);
     projectile.life = 0;
     return true;
   }

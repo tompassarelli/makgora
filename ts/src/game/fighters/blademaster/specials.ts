@@ -1,7 +1,6 @@
 
 
 
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialCharge, type SpecialFollowUp, type SpecialPlacement, CHARGED_AIM_FRAMES, FollowUpInput, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
@@ -206,8 +205,8 @@ const inAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...special, land
 const onceInAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...inAir(special), oncePerAirtime: true });
 
 export const BLADEMASTER_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Quickdraw", description: "Hold to crouch in an iaido stance with the blade sheathed as it glows brighter, then release to draw: a quick cut with a small step, or after a longer charge a dash slash that strikes harder and passes through the foe to land behind them. A full charge draws on its own.", ground: iaidoStance(false), air: iaidoStance(true) }, { travel: 1.25 }),
-  side: withExKit({ name: "Mirror Image", description: "Face the way you press and step back away from it, leaving an image where you stood; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImageStanding, air: onceInAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
-  up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
-  down: withExKit({ name: "Wind Walk", description: "Fade into a parry; a strike in the window freezes the attacker and he steps out behind them with a kick straight up. A miss leaves him wide open.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),
+  neutral: { name: "Quickdraw", description: "Hold to crouch in an iaido stance with the blade sheathed as it glows brighter, then release to draw: a quick cut with a small step, or after a longer charge a dash slash that strikes harder and passes through the foe to land behind them. A full charge draws on its own.", ground: iaidoStance(false), air: iaidoStance(true) },
+  side: { name: "Mirror Image", description: "Face the way you press and step back away from it, leaving an image where you stood; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImageStanding, air: onceInAir(mirrorImage), recall: imageSwap },
+  up: { name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade },
+  down: { name: "Wind Walk", description: "Fade into a parry; a strike in the window freezes the attacker and he steps out behind them with a kick straight up. A miss leaves him wide open.", ground: windWalk(false), air: windWalk(true) },
 };

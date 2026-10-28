@@ -24,7 +24,6 @@ import { carriesChargeAcrossLanding, heroEgg, isHeroSpecialAction, landHeroSpeci
 import { landsBeforeSwing } from "./specials/landing";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
-import { landExWavedash } from "./exWavedash";
 
 export const AIR_DODGE_LANDING_LAG = 10;
 export const EMPTY_LANDING_LAG = 4;
@@ -153,7 +152,6 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   dodge.airUsed = false;
   dodge.airMotionFrames = 0;
   f.ledge.grabs = 0;
-  landExWavedash(f);
   if (dodge.airDodging) {
     landingState.lag = AIR_DODGE_LANDING_LAG;
     landWavedash(f);

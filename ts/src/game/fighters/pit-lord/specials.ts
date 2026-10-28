@@ -1,7 +1,6 @@
 
 
 
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
@@ -123,8 +122,8 @@ const howl = (air: boolean): AuthoredSpecial => ({
 });
 
 export const PIT_LORD_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Howl of Terror", description: "Inhale, then roar: a fel shockwave expands on both sides. Grounded foes it reaches cower in terror, longer at higher damage, then resist it for five seconds; airborne foes are pushed away, and a shield takes a heavy blow and a big push instead.", ground: howl(false), air: howl(true) }, { reach: 1.25 }),
-  side: withExKit({ name: "Ruin Charge", description: "A slow charge whose armor shrugs off one light hit; it stops at a shield.", ground: RUIN_CHARGE, air: RUIN_CHARGE_AIR }, { shieldSafe: true }),
-  up: withExKit({ name: "Abyssal Leap", description: "A slow arcing leap you steer, with a hoof strike, then a helpless fall.", ground: abyssalLeap(h(f32(3.5)), h(f32(0.5)), h(f32(1.15))) }, { travel: 1.25 }),
-  down: withExKit({ name: "Rain of Fire", description: "Three waves of fire fall ahead; rush underneath or tilt your shield up.", ground: rain(false), air: rain(true) }, { reach: 1.25 }),
+  neutral: { name: "Howl of Terror", description: "Inhale, then roar: a fel shockwave expands on both sides. Grounded foes it reaches cower in terror, longer at higher damage, then resist it for five seconds; airborne foes are pushed away, and a shield takes a heavy blow and a big push instead.", ground: howl(false), air: howl(true) },
+  side: { name: "Ruin Charge", description: "A slow charge whose armor shrugs off one light hit; it stops at a shield.", ground: RUIN_CHARGE, air: RUIN_CHARGE_AIR },
+  up: { name: "Abyssal Leap", description: "A slow arcing leap you steer, with a hoof strike, then a helpless fall.", ground: abyssalLeap(h(f32(3.5)), h(f32(0.5)), h(f32(1.15))) },
+  down: { name: "Rain of Fire", description: "Three waves of fire fall ahead; rush underneath or tilt your shield up.", ground: rain(false), air: rain(true) },
 };

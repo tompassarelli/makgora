@@ -234,8 +234,7 @@ export function layoutHuds(s: ShellState): void {
   const active = PARTICIPANT_SLOTS.filter(slot => isActive(s.world, slot));
   active.forEach((slot, position) => {
     ui.huds[slot].layout(position, active.length);
-    const { exCell, ultimateBar } = meterPlacement(position, active.length);
-    ui.meterBars[slot].hud.place(exCell, ultimateBar);
+    ui.meterBars[slot].hud.place(meterPlacement(position, active.length));
   });
 }
 

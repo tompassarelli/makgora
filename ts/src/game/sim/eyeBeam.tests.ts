@@ -7,7 +7,6 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import { EYE_BEAM_AIR_FRAMES, EYE_BEAM_AIR_SHOT, EYE_BEAM_DAMAGE, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { type Fighter, createFighter } from "./fighter";
 import { KNOCKBACK_LAUNCH_SPEED, TUMBLE_KNOCKBACK } from "./knockback";
-import { fillMeter } from "./meter";
 import { originalProjectileEffect } from "./projectiles";
 import { fighterAt } from "./roster";
 import { testWorld } from "./testWorld";
@@ -23,15 +22,14 @@ interface Shot {
 }
 
 /** Presses neutral special on frame 1 (in the air from a full jump's apex when `air`) and records the special frame the beam appears on. */
-function fireEyeBeam(air: boolean, ex = false): Shot {
+function fireEyeBeam(air: boolean): Shot {
   const s = scene(0, [{ character: Character.demonHunter, x: 0.0, facing: 1 }, { character: Character.blademaster, x: 1800.0, facing: -1 }]);
   const user = fighter(s);
-  fillMeter(user);
   if (air) {
     frame(s, [Action.jump]);
     for (let tick = 0; tick < FRAME_LIMIT && (user.motion.grounded || user.motion.vz > 0.0); tick++) frame(s, [Action.jump]);
   }
-  frame(s, ex ? [Action.special, Action.strong] : [Action.special]);
+  frame(s, [Action.special]);
   const duration = user.special.duration;
   for (let tick = 0; tick < FRAME_LIMIT && user.special.action === SpecialAction.demonHunterEyeBeam; tick++) {
     const beam = user.projectiles.find((projectile) => projectile.life > 0 && projectile.kind === ProjectileKind.eyeBeam);
@@ -50,13 +48,6 @@ test("Eye Beam fires on frame 23 and lasts 57 frames standing, fires on frame 13
   assertEquals(air.shotFrame, EYE_BEAM_AIR_SHOT);
   assertEquals(air.duration, EYE_BEAM_AIR_FRAMES);
   assertEquals([EYE_BEAM_AIR_SHOT, EYE_BEAM_AIR_FRAMES].join(" "), "13 42");
-});
-
-test("EX Eye Beam in the air fires on the same frame and deals 25% more damage, 3.75% [k3 measure docs/design/mana.md]", () => {
-  const ex = fireEyeBeam(true, true);
-  assertEquals(ex.shotFrame, EYE_BEAM_AIR_SHOT);
-  assertNear(ex.damage, 3.75, f32(0.001));
-  assertNear(fireEyeBeam(true).damage, 3.0, f32(0.001));
 });
 
 interface ShortHopBeam {

@@ -5,7 +5,7 @@
 import { Character, ContactKind, SpecialAction } from "./codes";
 import type { Fighter } from "./fighter";
 
-/** status: an applied hero status (chill, poison, silence, banish, stun...); heal: the move lowers its owner's damage; mana: drains or steals meter. */
+/** status: an applied hero status (chill, poison, silence, banish, stun...); heal: the move lowers its owner's damage; mana: drains meter. */
 export type Trait = "status" | "heal" | "mana";
 export const TRAITS: readonly Trait[] = ["status", "heal", "mana"];
 export type TraitSet = Readonly<Partial<Record<Trait, true>>>;

@@ -109,11 +109,8 @@ body hits 4% at 55° once per target. The egg falls at 24 a frame against a
 30 frames of landing lag. The computer steers up beside the ledge, then in
 over the stage.
 
-**Meter and EX.** Kael keeps the universal meter and strong-button EX (strong
-+ B is the EX special, strong + A the smashes, #186). Nothing of his feeds
-or drains meter. EX Pyroblast deals a quarter more, EX Flame Strike's burst
-deals a quarter more, EX Banish reaches a quarter farther and EX Phoenix
-flies a quarter farther.
+**Meter.** Kael keeps the universal ultimate meter (strong + B is the ordinary
+special, strong + A the smashes, #186). Nothing of his feeds or drains meter.
 
 **Ultimate: Summon Phoenix.** The Blood Mage's Warcraft III ultimate: a
 phoenix companion with a burning aura that fights beside him, reusing the

@@ -430,7 +430,6 @@ function authoredParts(moves: readonly AuthoredSpecial[], projectiles: Map<strin
   };
   const move = (special: AuthoredSpecial | undefined): void => {
     if (special === undefined) return;
-    move(special.ex);
     for (const spec of special.projectiles ?? []) projectile(spec);
     projectile(special.burst?.from);
     projectile(special.burst?.into);

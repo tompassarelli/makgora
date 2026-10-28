@@ -34,7 +34,6 @@ function placementPaths(character: Character): string[] {
   const paths = [heroLook(character)?.placedModel?.path ?? PLACED_OBJECT_MODEL];
   const visit = (special: AuthoredSpecial | undefined): void => {
     if (special === undefined) return;
-    visit(special.ex);
     for (const placement of specialPlacements(special)) {
       const path = placement.model?.path;
       if (path !== undefined && !paths.includes(path)) paths.push(path);

@@ -146,23 +146,19 @@ function hittingAirRush(world: Roster, owner: Fighter, target: Fighter): void {
   assertGreaterThan(target.status.damage, before);
 }
 
-test("Fel Rush: an air rush that hits nobody, plain or EX, ends in helpless fall, and no second press before landing starts another [k3 measure #554]", () => {
-  for (const ex of [false, true]) {
-    const { world, owner } = illidan(HEIGHT);
-    fillMeter(owner);
-    stepDuel(world, controls({ specialPressed: true, specialX: 1, direction: 1, exPressed: ex }));
-    assertTrue(pressed(owner));
-    assertEquals(owner.special.ex, ex);
-    runOut(world, owner);
-    assertFalse(owner.motion.grounded);
-    assertTrue(owner.special.fall);
-    assertEquals(owner.jump.remaining, 0);
-    settle(world, owner, HEIGHT);
-    assertFalse(pressAgain(world, owner));
-    owner.special.fall = false;
-    settle(world, owner, HEIGHT);
-    assertFalse(pressAgain(world, owner));
-  }
+test("Fel Rush: an air rush that hits nobody ends in helpless fall, and no second press before landing starts another [k3 measure #554]", () => {
+  const { world, owner } = illidan(HEIGHT);
+  stepDuel(world, controls({ specialPressed: true, specialX: 1, direction: 1 }));
+  assertTrue(pressed(owner));
+  runOut(world, owner);
+  assertFalse(owner.motion.grounded);
+  assertTrue(owner.special.fall);
+  assertEquals(owner.jump.remaining, 0);
+  settle(world, owner, HEIGHT);
+  assertFalse(pressAgain(world, owner));
+  owner.special.fall = false;
+  settle(world, owner, HEIGHT);
+  assertFalse(pressAgain(world, owner));
 });
 
 test("Fel Rush: a grounded rush carried off a ledge counts as the airtime's rush and ends in helpless fall, so a whiff leaves no air rush [k3 measure #554]", () => {

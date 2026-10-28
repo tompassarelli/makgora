@@ -106,13 +106,10 @@ export function currentFeel(character: Character): FeelValues {
     }
     if (character === Character.rifleman) {
       out["special.bear"] = sample(BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
-      out["special.bear.ex"] = sample(BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
     } else {
-      for (const ex of [false,true]) {
-        const rush = specials.felRushRegion(specials.FEL_RUSH_FIRST, ex);
-        out[`special.rush.${ex}`] = sample(rush.effect, specials.FEL_RUSH_FRAMES - specials.FEL_RUSH_FIRST, false);
-        for (const grounded of [false,true]) out[`special.immolate.${grounded}.${ex}`] = sample(specials.immolationRegion(grounded, ex).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
-      }
+      const rush = specials.felRushRegion(specials.FEL_RUSH_FIRST);
+      out["special.rush"] = sample(rush.effect, specials.FEL_RUSH_FRAMES - specials.FEL_RUSH_FIRST, false);
+      for (const grounded of [false,true]) out[`special.immolate.${grounded}`] = sample(specials.immolationRegion(grounded).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
       out["special.dive"] = sample(specials.wingDiveRegion(specials.DEMONHUNTER_DIVE_FORM, 0).effect, specials.DEMONHUNTER_DIVE_FRAMES, false);
     }
   }

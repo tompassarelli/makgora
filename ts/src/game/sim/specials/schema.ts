@@ -276,7 +276,6 @@ export interface SpecialCharge {
 
 export interface AuthoredSpecial {
 
-  readonly ex?: AuthoredSpecial | undefined;
   readonly variants?: readonly AuthoredSpecial[] | undefined;
 
   readonly name?: string | undefined;
@@ -352,7 +351,7 @@ export interface AuthoredSpecial {
 
   readonly burst?: { readonly frame: number; readonly from: SpecialProjectile; readonly into: SpecialProjectile } | undefined;
 
-  readonly ritual?: { readonly frame: number; readonly mana: number } | undefined;
+  readonly ritual?: { readonly frame: number } | undefined;
 
   /** Frames on which each target may be struck again. */
   readonly rehits?: readonly number[] | undefined;
@@ -432,15 +431,14 @@ export function specialKit(specials: Readonly<FighterSpecials>, slot: number): S
   return slot === SpecialSlot.side ? specials.side : slot === SpecialSlot.up ? specials.up : slot === SpecialSlot.down ? specials.down : specials.neutral;
 }
 
-export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false, variant = 0): AuthoredSpecial {
+export function specialForm(kit: Readonly<SpecialKit>, form: number, variant = 0): AuthoredSpecial {
   if (form >= FOLLOW_UP_FORM) {
-    const base = specialForm(kit, imod(form, FOLLOW_UP_FORM), ex, variant);
+    const base = specialForm(kit, imod(form, FOLLOW_UP_FORM), variant);
     return base.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1]?.special ?? base;
   }
   const move = form === SpecialForm.recall ? kit.recall ?? kit.ground
     : form === SpecialForm.air ? kit.air ?? kit.ground : kit.ground;
-  const chosen = variant > 0 ? move.variants?.[variant - 1] ?? move : move;
-  return ex ? chosen.ex ?? chosen : chosen;
+  return variant > 0 ? move.variants?.[variant - 1] ?? move : move;
 }
 
 export function ultimateForm(ultimate: Readonly<AuthoredSpecial>, form: number): AuthoredSpecial {
@@ -448,7 +446,7 @@ export function ultimateForm(ultimate: Readonly<AuthoredSpecial>, form: number):
 }
 
 export function heroSpecialMove(specials: Readonly<FighterSpecials>, chosen: { readonly slot: number; readonly form: number; readonly variant: number }): AuthoredSpecial {
-  return specialForm(specialKit(specials, chosen.slot), chosen.form, false, chosen.variant);
+  return specialForm(specialKit(specials, chosen.slot), chosen.form, chosen.variant);
 }
 
 export const frames = (first: number, last: number): FrameWindow => ({ first, last });

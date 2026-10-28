@@ -8,21 +8,21 @@
 Join the [Discord](https://discord.gg/JQGZs2UJR) if you'd like to play games sometime and/or contribute.
 
 ## New in 0.2
-- **Two meters and orbs:** an EX charge that refills in 12 seconds and an ultimate meter that fills over 2 minutes, with orbs at centre stage that top them up.
-- **Melee feel:** Melee's movement and body numbers for every fighter, Melee auto-cancel windows, wavedash exits that walk, and an EX wavedash.
+- **One meter and orbs:** a single ultimate meter, filled only by orbs that appear at centre stage every 30 seconds. Touch an orb or hit it with a normal attack; two make an ultimate.
+- **Melee feel:** Melee's movement and body numbers for every fighter, Melee auto-cancel windows and wavedash exits that walk.
 - **Controls:** WASD and Box layouts with Strong on 9, light shield on E (WASD) or A (Box), C-stick on J, L, 0 and P, Mod X on ;, and Shift bindable. Changing a key saves it to Custom.
 - **Fighters:** big reworks for Blademaster, Illidan, Maiev, Chen, Peon, Pit Lord and Kael'thas, and changes across most of the roster.
 
 **Full release notes:** [Smashcraft 0.2 on GitHub](https://github.com/tompassarelli/smashcraft/releases/tag/v0.2). Earlier versions: [all releases](https://github.com/tompassarelli/smashcraft/releases).
 
 ## What is in the game
-- **26 fighters**, each with a ground game, aerials, grabs and throws, four specials, EX specials and an ultimate.
+- **26 fighters**, each with a ground game, aerials, grabs and throws, four specials and an ultimate.
 - **10 stages** plus Random.
 - **1 to 4 players**: stocks or time, an endless option and rematches.
 - **Computer opponents:** six personalities at five difficulties.
 - **Training mode** with frame data, hit areas and slow motion.
 - **Classic**, a six-fight route ending in a boss, and **Lore Battles**, covering 21 of the 26 fighters.
-- Two meters for EX specials and ultimates, with orbs at centre stage.
+- One ultimate meter, filled by orbs at centre stage every 30 seconds.
 
 ## How to play
 1. Download **Smashcraft 0.2.w3x** from this page and put it in your Warcraft III **Maps** folder.
@@ -36,7 +36,7 @@ New here? Place only your own fighter chip and press Y to practice alone.
 - Move: **A**/**D**. Aim up: **W** or **Space**. Crouch, fast-fall and drop through platforms: **S**
 - Jump: **8**. Shield and air dodge: **Q**. Light shield: **E**. Grab: **O**
 - Attack: **N**, with a direction for tilts. Hold Strong (**9** or **Y**) with a direction for smashes: up, down, or forward. The C-stick keys give tilts on the ground and aerials in the air. Special: **U**, with a direction
-- EX special: **9 + U** with a direction, which spends the EX charge. Ultimate: **N + U** together at a full ultimate meter
+- Ultimate: **N + U** together at a full ultimate meter (two orbs)
 - Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: type **-clip**
 
 Rebind any key on the Controls screen, or press **F1** before a match. The full guide is in the GitHub repository: [smashcraft/docs/player-guide.md at main · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/blob/main/docs/player-guide.md)

@@ -136,7 +136,7 @@ layers, and each layer is a native sound with alternatives:
   - His Phoenix charge and flight keep the Phoenix launch with his battle cry.
   - Banish keeps Banish and Feedback.
   - Illidan's lunging forward smash plays the blade swing and heavy slice, and
-    his EX Eye Beam plays his neutral special's sounds.
+    his Eye Beam plays his neutral special's sounds.
 - **Native first.** Every sound is a stock Warcraft III sound, so the map
   carries no audio bytes. `tools/presentation/stock-sounds.ts` resolves each
   label to its files in the installed game. `moveSounds.tests.ts` fails any
@@ -157,7 +157,6 @@ Volumes are Warcraft's 0–127:
 | Element sweetener | 100 |
 | Shield | 100, over Defend at 90 |
 | Voice | 100 |
-| EX cast (Divine Shield) | 110 |
 | Ultimate cast (Flame Strike) | 127 |
 
 Hits are always louder than swings, following SF4's rebalance [19]. A frame
@@ -166,14 +165,12 @@ plays at most four move layers:
 - **perform:** whoosh, model swing and voice;
 - **strong hit:** body, strong sweetener and element.
 
-**Meter casts (#192).** An EX special and an ultimate each add one
-fighter-wide cast sound on the cast's first confirmed frame, over the special's
-own perform layer: Divine Shield for EX, a bright chime no move uses, under its blue light pillar, and Flame
-Strike's eruption for the ultimate, matching its fire tower
-(smashcraft:ts/src/game/presentation/meterCues.ts). They are the same for
-every fighter, so a player learns one sound for each, and they play outside the
-four move layers and the voice budget, like the special cues' own sounds.
-A fighter whose ultimate has its own sound row replaces the ultimate cast and
+**Meter casts (#192).** An ultimate adds one fighter-wide cast sound on the
+cast's first confirmed frame, over the move's own perform layer: Flame
+Strike's eruption, matching its fire tower
+(smashcraft:ts/src/game/presentation/meterCues.ts). It is the same for
+every fighter, so a player learns one sound, and it plays outside the
+four move layers and the voice budget, like the special cues' own sounds.A fighter whose ultimate has its own sound row replaces the ultimate cast and
 hit: Sylvanas's Banshee Form casts with the Possession launch and strikes with
 the Possession hit, so the move sounds like her own spell, not Flame Strike and
 Death Coil (#53).

@@ -1,5 +1,4 @@
 
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
@@ -84,9 +83,9 @@ const hawkLift = (rise: number, drift: number, steer: number): AuthoredSpecial =
   placement: { ...HAWK_PLACEMENT, frame: 10 },
 });
 export const BEASTMASTER_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Wild Axes", description: "Throw two axes; move to guide their return through the enemy.", ground: wildAxes(false), air: wildAxes(true) }, { reach: 1.25 }),
-  side: withExKit({ name: "Summon Bear", description: "Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede.", ground: SUMMON_BEAR, recall: BEAR_COMMAND }, { durability: 1.25 }),
-  up: withExKit({ name: "Summon Hawk", description: "Call Hawk, then command a fast dive that stuns whoever it strikes. In the air, Hawk carries him up.", ground: SUMMON_HAWK, recall: HAWK_DIVE, recallGroundOnly: true, air: hawkLift(h(f32(3.48)), h(f32(0.3)), h(f32(3.02))) }, { durability: 1.25 }),
-  down: withExKit({ name: "Summon Quilbeast", description: "Set a large Quilbeast firing position; press again for a three-quill volley from it.", ground: SUMMON_QUILBEAST, air: { endFrame: SUMMON_QUILBEAST.endFrame, landingLag: AIR_SPECIAL_LANDING_LAG,
-    projectiles: [18, 22, 26].map(spawnFrame => ({ ...QUILL, spawnFrame, offsetZ: 0.0, velocityX: h(f32(0.035)), velocityZ: -h(f32(0.14)) })) }, recall: QUILL_VOLLEY }, { durability: 1.25 }),
+  neutral: { name: "Wild Axes", description: "Throw two axes; move to guide their return through the enemy.", ground: wildAxes(false), air: wildAxes(true) },
+  side: { name: "Summon Bear", description: "Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede.", ground: SUMMON_BEAR, recall: BEAR_COMMAND },
+  up: { name: "Summon Hawk", description: "Call Hawk, then command a fast dive that stuns whoever it strikes. In the air, Hawk carries him up.", ground: SUMMON_HAWK, recall: HAWK_DIVE, recallGroundOnly: true, air: hawkLift(h(f32(3.48)), h(f32(0.3)), h(f32(3.02))) },
+  down: { name: "Summon Quilbeast", description: "Set a large Quilbeast firing position; press again for a three-quill volley from it.", ground: SUMMON_QUILBEAST, air: { endFrame: SUMMON_QUILBEAST.endFrame, landingLag: AIR_SPECIAL_LANDING_LAG,
+    projectiles: [18, 22, 26].map(spawnFrame => ({ ...QUILL, spawnFrame, offsetZ: 0.0, velocityX: h(f32(0.035)), velocityZ: -h(f32(0.14)) })) }, recall: QUILL_VOLLEY },
 };

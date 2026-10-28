@@ -92,7 +92,6 @@ function widenSpecial(extent: Extent, special: Readonly<AuthoredSpecial> | undef
   if (special === undefined) return;
   for (const region of special.regions ?? []) widenRegion(special.beam === undefined ? extent : beamReach, undefined, region.hit);
   if (special.commandGrab !== undefined) widenCapsule(extent, special.commandGrab.strike);
-  widenSpecial(extent, special.ex);
   for (const followUp of special.followUps ?? []) widenSpecial(extent, followUp.special);
 }
 

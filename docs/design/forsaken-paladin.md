@@ -52,9 +52,7 @@ carries it into a third special. Consecration does not follow Forsaken Paladin, 
 hit airborne opponents. Cleansing Sword removes poison/chill only, leaving
 silence, sleep, stun and carries alone. **Sacred Aura** retains the existing
 three-block reward: the next non-throw launch is 20% weaker, adapting the
-source’s middle-rank resistance to the launch system. Shared EX costs 25 extra
-mana for its existing six-frame one-hit armor. There are no ultimates.
-
+source’s middle-rank resistance to the launch system.
 The CPU approaches into 50–150 sword spacing, charges from 170–270, lays
 Consecration near a grounded opponent, shields/dodges threats and recovers
 with Ascension. Its four primary spacing tools remain forward tilt (6),

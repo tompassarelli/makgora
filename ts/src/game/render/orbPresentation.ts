@@ -1,31 +1,26 @@
-import { ORB_HEIGHT, type OrbClock, orbPoint, orbWarningFrames, warnedOrb } from "../sim/orbs";
-import { OrbKind } from "../sim/orbState";
-import { ORB_MARKER_SCALE_END, type OrbSighting, createOrbSighting, orbMarkerAlpha, orbMarkerScale, orbScale, sightOrb } from "../presentation/orbLook";
+import { ORB_HEIGHT, type OrbClock, orbPoint, orbWarned, orbWarningFrames } from "../sim/orbs";
+import { ORB_MARKER_SCALE_END, ORB_SCALE, type OrbSighting, createOrbSighting, orbMarkerAlpha, orbMarkerScale, sightOrb } from "../presentation/orbLook";
 import { hideEffect, STOCK_MODELS, type WorldOrigin } from "./effects";
 
 export class OrbPresentation {
   private readonly marker: effect;
-  private readonly exOrb: effect;
-  private readonly ultimateOrb: effect;
+  private readonly orb: effect;
   private markerShown = false;
-  private shown: OrbKind = OrbKind.none;
+  private shown = false;
   private bursting = false;
   private shownStage = -1;
   private sighting?: OrbSighting;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     this.marker = AddSpecialEffect(STOCK_MODELS.massTeleportTarget, origin.x, origin.y);
-    this.exOrb = AddSpecialEffect(STOCK_MODELS.frostWyrmMissile, origin.x, origin.y);
-    this.ultimateOrb = AddSpecialEffect(STOCK_MODELS.fireBallMissile, origin.x, origin.y);
+    this.orb = AddSpecialEffect(STOCK_MODELS.fireBallMissile, origin.x, origin.y);
     hideEffect(this.marker, origin);
-    hideEffect(this.exOrb, origin);
-    hideEffect(this.ultimateOrb, origin);
+    hideEffect(this.orb, origin);
   }
 
   present(game: Readonly<OrbClock>, stage: number, playing: boolean): void {
     const point = orbPoint(stage);
-    const warned = playing ? warnedOrb(game) : OrbKind.none;
-    if (warned !== OrbKind.none) {
+    if (playing && orbWarned(game)) {
       const left = orbWarningFrames(game);
       BlzSetSpecialEffectPosition(this.marker, this.origin.x + point.x, this.origin.y, this.origin.z + point.z);
       BlzSetSpecialEffectScale(this.marker, left === undefined ? ORB_MARKER_SCALE_END : orbMarkerScale(left));
@@ -37,22 +32,17 @@ export class OrbPresentation {
     }
     const seen = this.sighting ??= createOrbSighting();
     sightOrb(seen, game.orbs, game.matchFrame);
-    const live = playing ? seen.shown : OrbKind.none;
-    const bursting = live !== OrbKind.none && seen.bursting;
+    const live = playing && seen.shown;
+    const bursting = live && seen.bursting;
     if (live === this.shown && bursting === this.bursting && stage === this.shownStage) return;
-    if (this.shown !== OrbKind.none && live !== this.shown) hideEffect(this.orb(this.shown), this.origin);
-    if (live !== OrbKind.none) {
-      const orb = this.orb(live);
-      BlzSetSpecialEffectPosition(orb, this.origin.x + point.x, this.origin.y, this.origin.z + point.z + ORB_HEIGHT);
-      BlzSetSpecialEffectScale(orb, orbScale(live));
-      BlzPlaySpecialEffect(orb, bursting ? ANIM_TYPE_DEATH : live === OrbKind.ultimate ? ANIM_TYPE_STAND : ANIM_TYPE_BIRTH);
+    if (this.shown && !live) hideEffect(this.orb, this.origin);
+    if (live) {
+      BlzSetSpecialEffectPosition(this.orb, this.origin.x + point.x, this.origin.y, this.origin.z + point.z + ORB_HEIGHT);
+      BlzSetSpecialEffectScale(this.orb, ORB_SCALE);
+      BlzPlaySpecialEffect(this.orb, bursting ? ANIM_TYPE_DEATH : ANIM_TYPE_STAND);
     }
     this.shown = live;
     this.bursting = bursting;
     this.shownStage = stage;
-  }
-
-  private orb(kind: OrbKind): effect {
-    return kind === OrbKind.ultimate ? this.ultimateOrb : this.exOrb;
   }
 }

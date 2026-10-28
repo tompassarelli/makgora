@@ -92,7 +92,7 @@ advisory: `--ranges` prints the envelope, `--json` the outliers. The suite
 gates the frame data under the reviewed #427 ruling: every hit move has
 nonnegative integral startup, active and end lag that sum to its total; no
 frame field exceeds its class range by more than three tier allowances
-(9 normal, 30 special, 45 EX frames). Shield advantage and kill percent
+(9 normal, 30 special frames). Shield advantage and kill percent
 remain advisory. A fighter balance-profile block can exempt a frame field
 with `envelope: MOVE FIELD REASON`; exemptions fail once that field returns
 inside its class range. They never exempt invalid frame structure.
@@ -124,8 +124,7 @@ active frame, and landing lag is the lag actually taken. Shield advantage
 and kill percent are the balance feel measurements (smashcraft:ts/scripts/balanceFeel.ts).
 The tolerance outside the range is ±3 frames, ±3 on shield and ±15% kill
 percent, matching #355's kit bounds. Specials get ±10 / ±10 / ±30%, because
-genre specials vary most and ours carry mana. EX specials get ±15 / ±15 / ±40%,
-because they are deliberately stronger than any reference move. A smash that
+genre specials vary most and ours carry mana. A smash that
 doesn't kill within 300% is an outlier. Distance is the excess over the
 allowance; anything above 1 is outside the envelope.
 

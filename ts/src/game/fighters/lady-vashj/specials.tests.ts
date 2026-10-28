@@ -11,7 +11,7 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, HeroStatusKind, ProjectileKind } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { fighterAt } from "../../sim/roster";
-import { METER } from "../../sim/meter";
+import { ULTIMATE_METER_FRAMES } from "../../sim/meter";
 import { MANA_SHIELD_FRAMES_PER_PERCENT } from "../../sim/manaShield";
 
 type Press = "shield" | "serpent" | "jab" | "none";
@@ -37,8 +37,8 @@ function duel(foeAhead: number, charge: number): Duel {
   const foe = fighterAt(state.world, 1);
   copyFighterState(vashj, createFighter(Character.ladyVashj, 0.0, 1), 3);
   copyFighterState(foe, createFighter(Character.medivh, foeAhead, -1), 3);
-  vashj.meter.ex = charge;
-  foe.meter.ex = METER.exFrames;
+  vashj.meter.ultimate = charge;
+  foe.meter.ultimate = ULTIMATE_METER_FRAMES;
   state.match.phase = Phase.match;
   state.match.stageChoice = 0;
   state.match.matchSeed = 1;
@@ -96,27 +96,27 @@ function replayFrom(foeAhead: number, charge: number, script: Script, end: numbe
   return { expected, replayed: canonicalState(run.state) };
 }
 
-test("Mana Shield turns on, takes half of each hit from her EX charge, breaks into a stagger when the charge runs dry, and turns off again [k3 measure docs/design/lady-vashj.md]", () => {
+test("Mana Shield turns on, takes half of each hit from her ultimate meter, breaks into a stagger when the meter runs dry, and turns off again [k3 measure docs/design/lady-vashj.md]", () => {
   const d = duel(60.0, SHIELD_CHARGE);
-  let firstHit: { readonly percent: number; readonly ex: number } | undefined;
+  let firstHit: { readonly percent: number; readonly meter: number } | undefined;
   let broke = false;
   let staggered = false;
   let heldWhileOn = true;
   for (let tick = 1; tick <= SHIELD_END; tick++) {
-    const ex = d.vashj.meter.ex;
+    const meter = d.vashj.meter.ultimate;
     const percent = d.vashj.status.damage;
     const on = d.vashj.status.manaShield;
     step(d, shieldScript(tick));
-    if (on && d.vashj.status.manaShield && d.vashj.meter.ex > ex) heldWhileOn = false;
-    if (firstHit === undefined && on && d.vashj.status.damage > percent) firstHit = { percent: d.vashj.status.damage - percent, ex: ex - d.vashj.meter.ex };
+    if (on && d.vashj.status.manaShield && d.vashj.meter.ultimate > meter) heldWhileOn = false;
+    if (firstHit === undefined && on && d.vashj.status.damage > percent) firstHit = { percent: d.vashj.status.damage - percent, meter: meter - d.vashj.meter.ultimate };
     if (on && !d.vashj.status.manaShield && tick < 440) broke = true;
     if (broke && d.vashj.status.condition === HeroStatusKind.stun) staggered = true;
     if (tick === 460) assertTrue(d.vashj.status.manaShield);
   }
   assertTrue(firstHit !== undefined);
   if (firstHit !== undefined) {
-    assertGreaterThan(firstHit.ex, 0);
-    assertLessThan(Math.abs(firstHit.percent * MANA_SHIELD_FRAMES_PER_PERCENT - firstHit.ex), 1.5);
+    assertGreaterThan(firstHit.meter, 0);
+    assertLessThan(Math.abs(firstHit.percent * MANA_SHIELD_FRAMES_PER_PERCENT - firstHit.meter), 1.5);
   }
   assertTrue(heldWhileOn);
   assertTrue(broke);
@@ -124,31 +124,26 @@ test("Mana Shield turns on, takes half of each hit from her EX charge, breaks in
   assertEquals(d.vashj.status.manaShield, false);
 });
 
-test("Tidal Serpent steals the foe's EX charge, turns back with no other foe, and hands the charge over on the catch [k3 measure docs/design/lady-vashj.md]", () => {
+test("Tidal Serpent drains 108 frames of the foe's ultimate meter, turns back with no other foe, and gives her nothing on the catch [k3 measure docs/design/lady-vashj.md]", () => {
   const d = duel(200.0, 0);
-  let carried = 0;
+  let drained = 0;
   let caught = false;
-  let foeLost = 0;
+  let homeward = false;
   for (let tick = 1; tick <= SERPENT_END; tick++) {
-    const before = d.vashj.meter.ex;
-    const foeBefore = d.foe.meter.ex;
-    const flying = serpent(d.vashj);
-    const wasCarried = flying?.carriedEx ?? 0;
+    const foeBefore = d.foe.meter.ultimate;
+    const wasHomeward = serpent(d.vashj)?.homeward === true;
     step(d, serpentScript(tick));
     const live = serpent(d.vashj);
-    if (live !== undefined && live.carriedEx > 0 && carried === 0) {
-      carried = live.carriedEx;
-      foeLost = foeBefore - d.foe.meter.ex;
-      assertTrue(live.homeward);
+    if (foeBefore > d.foe.meter.ultimate) {
+      drained += foeBefore - d.foe.meter.ultimate;
+      homeward = live?.homeward === true;
     }
-    if (wasCarried > 0 && live === undefined) {
-      caught = true;
-      assertGreaterThan(d.vashj.meter.ex - before, wasCarried - 2);
-    }
+    if (wasHomeward && live === undefined) caught = true;
   }
-  assertEquals(carried, 108);
-  assertGreaterThan(foeLost, 100);
+  assertEquals(drained, 108);
+  assertTrue(homeward);
   assertTrue(caught);
+  assertEquals(d.vashj.meter.ultimate, 0);
 });
 
 test("A rollback replays Mana Shield on, through a break and off to the live checksum [k1 scenario]", () => {
@@ -158,8 +153,8 @@ test("A rollback replays Mana Shield on, through a break and off to the live che
   }
 });
 
-test("A rollback replays Tidal Serpent through a steal and a catch to the live checksum [k1 scenario]", () => {
-  for (const save of [10, serpentTick((live) => live !== undefined) + 1, 30, serpentTick((live) => (live?.carriedEx ?? 0) > 0) + 2, 60, 90]) {
+test("A rollback replays Tidal Serpent through a drain and a catch to the live checksum [k1 scenario]", () => {
+  for (const save of [10, serpentTick((live) => live !== undefined) + 1, 30, serpentTick((live) => live?.homeward === true) + 2, 60, 90]) {
     const replay = replayFrom(200.0, 0, serpentScript, SERPENT_END, save);
     assertEquals(replay.replayed, replay.expected);
   }

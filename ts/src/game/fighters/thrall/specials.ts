@@ -1,4 +1,3 @@
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion, type MoveRegion } from "../../sim/heroMoves";
@@ -35,8 +34,8 @@ const DOOMHAMMER_SLAM: AuthoredSpecial = {
   };
 
 export const THRALL_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Chain Lightning", description: "Call down a crackling bolt of lightning at where the nearest foe in front of him stood when he began; it does not follow them, so jump or shield it and punish the slow cast.", ground: CHAIN_LIGHTNING }, { reach: 1.25 }),
-  side: withExKit({ name: "Feral Spirit", description: "Send two spirit wolves running low, one after the other.", ground: wolves(false), air: wolves(true) }, { range: 1.25 }),
-  up: withExKit({ name: "Far Sight", description: "Let the spirits guide a rising leap; steer toward the ledge, then fall helpless.", ground: sight(f32(3.1)) }, { travel: 1.25 }),
-  down: withExKit({ name: "Doomhammer Slam", description: "Slam the ground on both sides to launch nearby foes; a jump clears it.", ground: DOOMHAMMER_SLAM, air: { ...DOOMHAMMER_SLAM, groundOnly: false, landingLag: 20 } }, { reach: 1.25 }),
+  neutral: { name: "Chain Lightning", description: "Call down a crackling bolt of lightning at where the nearest foe in front of him stood when he began; it does not follow them, so jump or shield it and punish the slow cast.", ground: CHAIN_LIGHTNING },
+  side: { name: "Feral Spirit", description: "Send two spirit wolves running low, one after the other.", ground: wolves(false), air: wolves(true) },
+  up: { name: "Far Sight", description: "Let the spirits guide a rising leap; steer toward the ledge, then fall helpless.", ground: sight(f32(3.1)) },
+  down: { name: "Doomhammer Slam", description: "Slam the ground on both sides to launch nearby foes; a jump clears it.", ground: DOOMHAMMER_SLAM, air: { ...DOOMHAMMER_SLAM, groundOnly: false, landingLag: 20 } },
 };

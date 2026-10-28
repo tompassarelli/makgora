@@ -1,7 +1,6 @@
 
 
 
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
@@ -124,24 +123,24 @@ const DEFILE: AuthoredSpecial = {
 };
 
 export const LICH_KING_SPECIALS: FighterSpecials = {
-  neutral: withExKit({
+  neutral: {
     name: "Howling Blast",
     description: "A wide frost gust that travels toward the foe.",
     ground: HOWLING_BLAST_CAST,
-  }, { range: 1.25 }),
-  side: withExKit({
+  },
+  side: {
     name: "Val'kyr Shadowguard",
     description: "A Val'kyr seizes the first foe she reaches and carries them toward the edge; mash to break free.",
     ground: shadowguard(VALKYR, undefined),
     air: shadowguard(VALKYR, AIR_LANDING_LAG),
-  }, { range: 1.25 }),
-  up: withExKit({
+  },
+  up: {
     name: "Ascension of the Damned",
     description: "An ice column lifts him in a frost vortex, then a helpless fall.",
     ground: ascension(f32(2.7), f32(1.15)),
 
-  }, { travel: 1.25 }),
-  down: withExKit({
+  },
+  down: {
     name: "Defile",
     description: "Plant Frostmourne to spread a shadow pool; hurting a grounded foe grows it and flashes the edge. Jump out; recasts must wait.",
     ground: DEFILE,
@@ -149,5 +148,5 @@ export const LICH_KING_SPECIALS: FighterSpecials = {
       projectiles: [{ model: DEFILE_POOL.model, modelRadius: DEFILE_POOL.modelRadius, spawnFrame: DEFILE_POOL.spawnFrame,
         offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0, life: 24,
         radius: DEFILE_POOL.radius, effect: DEFILE_POOL.effect, reflectable: DEFILE_POOL.reflectable, limit: DEFILE_POOL.limit }] },
-  }, { reach: 1.25 }),
+  },
 };

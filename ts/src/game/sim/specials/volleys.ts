@@ -10,7 +10,7 @@ export interface ProjectileBounce {
   readonly range: number;
   readonly falloff: number;
   readonly speed: number;
-  readonly steal: number;
+  readonly drain: number;
 }
 
 export interface SpecialGaze {

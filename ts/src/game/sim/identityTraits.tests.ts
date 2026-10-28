@@ -7,7 +7,6 @@ import { authoredTuning } from "./tuning";
 function statusMoves(special: AuthoredSpecial | undefined, found: string[], label: string): void {
   if (special === undefined) return;
   if (special.strikeStatus !== undefined || special.commandGrab?.status !== undefined) found.push(label);
-  statusMoves(special.ex, found, label);
   for (const variant of special.variants ?? []) statusMoves(variant, found, label);
   for (const branch of special.followUps ?? []) statusMoves(branch.special, found, label);
 }

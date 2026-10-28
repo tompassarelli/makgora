@@ -37,7 +37,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 | 10 | Goblin Tinker (setplay) / Mountain King (heavy) | Gryphon Aerie (11) | tinker-laser.pad | 60-140 | match camera, HUD on | Tinker Laser: the arms glow from the side special (70) and the beam catches Mountain King (92). |
 | 11 | Shadow Hunter (setplay) / Beastmaster (setplay) | Naxxramas (4) | shadow-hunter-hex.pad | 50-320 | match camera, HUD on | Shadow Hunter's Hex (60) shuts down Beastmaster's mashed attacks, a forward smash lands (143-153), then Beastmaster calls Bear (260). |
 | 12 | Peon (grappler) / Grom Hellscream (rushdown) | Blackrock (12) | peon-grab-throw.pad | 40-115 | match camera, HUD on | Peon dashes in, grabs Grom (70) and throws him (84). |
-| 13 | Mountain King (heavy) / Cairne Bloodhoof (heavy), both EX charges full | Durotar Skies (3) | ex-thunder-clap.pad | 250-340 | match camera, HUD on (the meters matter) | EX: both fighters wear the EX-charge glow; Mountain King spends the EX charge on EX Thunder Clap (260), its EX aura burning to 290. |
+| 13 | Mountain King (heavy) / Cairne Bloodhoof (heavy), both ultimate meters full | Durotar Skies (3) | ex-thunder-clap.pad | 250-340 | match camera, HUD on (the meters matter) | Both fighters wear the gold full-meter glow; Mountain King casts Thunder Clap (260). |
 | 14 | Kael'thas Sunstrider (trapper) / Grom Hellscream (rushdown), both meters full | Ahn'Qiraj (13) | ultimate-phoenix.pad | 80-280 | match camera, HUD on (the ultimate meter empties) | Ultimate: Kael'thas spends the whole ultimate meter (91) and its burn hits Grom every 30 frames from 140 to 260. |
 | 15 | Grom Hellscream (rushdown) / Thrall (heavy), two players online | Hellfire Citadel (14) | online-rollback.pad | 40-300 | match camera, client a (host) | Online with rollback at 124 ms round trip: Grom grabs Thrall (70) and throws him (85) with both sides in checksum agreement. |
 
@@ -50,7 +50,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
   Beastmaster, Peon) carry the scripted shots.
 - Systems: Expert computers on both sides of every promo shot (the CPU);
   knockouts, a failed recovery and edge-guards (shots 1-7); ledge play
-  (8, 9); signature specials and a throw (10-12); EX (13); an ultimate
+  (8, 9); signature specials and a throw (10-12); a Thunder Clap exchange (13); an ultimate
   (14); online with rollback (15).
 
 ## Replaying a shot headless
@@ -81,8 +81,7 @@ The same scripts drive pool clients through `bun wisp pad SCRIPT|DIR
 --helper HELPER --out DIR --map MAP.w3x --pair K`, one game per batch with
 `-dev reset` between scripts ([pad](commands/pad.md)); its native-vs-headless
 comparison is the proof that the capture shows the stated frames. Shot 13 is
-the only script on the `melee` pad preset (the `script` preset has no Strong
-button, so it cannot cast an EX special), and a batch refuses mixed presets,
+the only script on the `melee` pad preset, and a batch refuses mixed presets,
 so play it as its own batch. Scripted ultimate casts have failed to fire in
 `nativeCapture.ts` capture maps (2026-10-25); play shot 14 through `bun wisp
 pad`, whose parity report shows whether the cast landed.

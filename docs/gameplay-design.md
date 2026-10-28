@@ -164,19 +164,19 @@ Where Smashcraft keeps its own rule, and why:
   what A gives without Strong (the dash attack in a run or past the window).
   Standing still (stand or crouch), Strong works like a C-stick
   (#325): while it is held, the directions do not move the fighter (no walk,
-  dash, crouch or tap jump) until Strong is released. Shield, Special (the EX
-  chord) and the air leave the directions as movement. Rivals
+  dash, crouch or tap jump) until Strong is released. Shield, Special (Strong +
+  Special is the ordinary special) and the air leave the directions as movement. Rivals
   needs no A for this either: its Strong button with a direction is the strong attack
   in that direction, out of a run too ([Mizuumi controls](https://mizuumi.wiki/w/Rivals_Of_Aether/Controls),
   [Hit Box guide](https://www.hitboxarcade.com/blogs/hit-box/getting-started-with-rivals-of-aether-on-hit-box)).
   A smash in the dash-smash window (dash frames 1–3, up and down smashes too)
   starts in place, with the dash's speed dropped. Rivals' Strong alone, with no direction, is
   the forward strong; ours needs A for it, so that holding Strong to aim and
-  holding Strong for the EX chord do not start a forward smash.
+  holding Strong with Special do not start a forward smash.
   A direction + A is a tilt from stand, walk or crouch. A fresh flick dashes on its first frame
   and no tilt comes out of a dash (Tom, 2026-10-28): a direction + A on any dash frame, like out
   of a run, is the dash attack, and only Strong + a direction smashes on dash frames 1–3.
-  Strong + B with a direction is the special's EX form; A + B at a full ultimate meter
+  Strong + B with a direction is the ordinary special; A + B at a full ultimate meter
   stays the ultimate, Strong held or not, and below a full meter it is the
   plain special. On the ground the C-stick gives tilts, not smashes (Tom,
   2026-10-28): C-left and C-right are the forward tilt, turning to face that side
@@ -1107,75 +1107,30 @@ The specification answers these design questions for the expansion:
 | --- | --- |
 | Physical differences | Use each hero's relative weight, run and air-speed table as initial tuning. The complete candidate table spans weight 0.85–1.28, run 0.80–1.14 and air 0.75–1.22 (of 1.00 Melee units a frame since #190). Jump velocity and gravity initially inherit the reference. |
 | Archetypes | State each fighter's purpose and exploitable weakness before building its moves. |
-| Meter | Two independent meters, EX and ultimate, filled on the pure match clock and by centre-stage orbs, never by damage (#484, replaced 2026-10-28); specials are free and EX and ultimates spend their own meter (smashcraft:docs/design/mana.md). |
-| EX specials | Strong + Special spends a full EX charge for one-hit startup armor. See the EX table below. A + Special at a full ultimate meter is the ultimate. Existing per-move cooldowns remain part of each kit. |
+| Meter | One ultimate meter per fighter, filled only by centre-stage ultimate orbs, never by damage or the clock (#484; the second meter and the clock fill removed 2026-10-29); specials are free and the ultimate spends the whole meter (smashcraft:docs/design/mana.md). A + Special at a full ultimate meter is the ultimate. Existing per-move cooldowns remain part of each kit. |
 
-### Build-and-spend mana and EX specials
+### Build-and-spend mana and the ultimate meter
 
 Since #484 (26 Oct 2026) no meter comes from damage dealt or taken. On
-28 Oct 2026 Tom replaced the single bar and its meter drops with two meters:
-the EX charge fills in 12 s and the ultimate meter in 2 min, both on the pure
-match clock for every fighter, and an orb at the centre of the stage
-([centre-stage orbs](#centre-stage-orbs)) gives a bonus charge or half an
-ultimate meter. Both meters keep their value through a KO
+29 Oct 2026 Tom removed EX and the match-clock fill to simplify the game, so
+the one ultimate meter fills only from the orb at the centre of the stage
+([centre-stage orbs](#centre-stage-orbs)): one every 30 s, each worth half a
+meter, so two orbs make an ultimate. The meter keeps its value through a KO
 (smashcraft:docs/design/mana.md). Recovery remains available through the
 existing free up-special forms.
 
-Hold Strong and press Special to request EX, on the same frame as an
-ordinary special; with A also held the press asks for the ultimate instead,
-and a declined ultimate is the ordinary special. It cannot cancel hitstun,
-shieldstun, release lag, attacks or other action locks. Follow-up inputs
-retain their ordinary behavior. The EX form needs a full EX charge and spends
-only it; below a full charge the same press starts its ordinary version. The
-HUD plate lights the EX cell beside the damage percent when it is charged. The match help
+Strong + Special is the ordinary special; Strong still makes smashes. Hold
+Attack and press Special for the ultimate; below a full meter, or with
+ultimates off, the same press is the ordinary special. It cannot cancel
+hitstun, shieldstun, release lag, attacks or other action locks. Follow-up
+inputs retain their ordinary behavior. The HUD plate shows a thin gold bar
+under the damage number that pulses when the meter is full. The match help
 names the chord.
 
-Every EX neutral/side has one upgrade: one hit of at most 8% can deal its
-damage and hitlag without interrupting the first six action frames. The
-armor is consumed by that hit. A larger hit, a throw, a second hit or a hit
-after frame six interrupts normally. Existing authored armor is independent.
-Startup, contact windows, damage, launch, projectile limits, cooldowns,
-landing lag and recovery keep their ordinary values. Thus spacing, grabs
-and delayed attacks still punish the commitment; no move gains a cinematic
-pause or an invulnerable reversal. The shared upgrade makes the extra cost
-readable while the existing kits supply the different rewards and risks.
-
-Ground entry costs below include the extra 25; air, recall and marked
-forms use their authored normal cost plus 25. The shared rule applies to
-every newly registered fighter too.
-
-| Fighter | EX neutral (mana) | EX side (mana) | Upgrade on both |
-|---|---|---|---|
-| Rifleman | Blaster (28) | Bear (50) | One 8% hit armored on frames 1–6 |
-| Illidan | Eye Beam (35) | Fel Rush (37) | One 8% hit armored on frames 1–6 |
-| Blademaster | Quickdraw (25) | Mirror Image (40) | One 8% hit armored on frames 1–6 |
-| Mountain King | Storm Bolt (33) | Storm Rush (43) | One 8% hit armored on frames 1–6 |
-| Warden | Shadow Strike (30) | Shadow Dash (63) | One 8% hit armored on frames 1–6 |
-| Lich | Frost Nova (35) | Death and Decay (50) | One 8% hit armored on frames 1–6 |
-| Forsaken Paladin | Cleansing Sword (35) | Righteous Fury (50) | One 8% hit armored on frames 1–6 |
-| Dreadlord | Carrion Swarm (30) | Vampiric Pounce (45) | One 8% hit armored on frames 1–6 |
-| Shadow Hunter | Spirit Glaive (25) | Serpent Ward (45) | One 8% hit armored on frames 1–6 |
-| Pit Lord | Howl of Terror (37) | Ruin Charge (47) | One 8% hit armored on frames 1–6 |
-| Beastmaster | Wild Axes (25) | Summon Bear (45) | One 8% hit armored on frames 1–6 |
-| Lich King | Howling Blast (40) | Val'kyr Shadowguard (45) | One 8% hit armored on frames 1–6 |
-| Thrall | Chain Lightning (35) | Feral Spirit (43) | One 8% hit armored on frames 1–6 |
-| Jaina Proudmoore | Frostbolt (31) | Blizzard (43) | One 8% hit armored on frames 1–6 |
-| Sylvanas Windrunner | Black Arrow (33) | Silence (45) | One 8% hit armored on frames 1–6 |
-| Cairne Bloodhoof | Shockwave (40) | Bloodhoof Gore (33) | One 8% hit armored on frames 1–6 |
-| Chen Stormstout | Breath of Fire (35) | Drunken Haze (37) | One 8% hit armored on frames 1–6 |
-| Peon | Gold Sack (25) | Log Heave (33) | One 8% hit armored on frames 1–6 |
-| Goblin Tinker | Cluster Rockets (35) | Laser (45) | One 8% hit armored on frames 1–6 |
-| Kael'thas Sunstrider | Pyroblast | Flame Strike | One 8% hit armored on frames 1–6 |
-| Murloc | Ensnare (35) | Tidal Rush (35) | One 8% hit armored on frames 1–6 |
-
-Prior art informs the decision, not these original numbers:
-[Capcom's EX manual](https://game.capcom.com/manual/sfv/en-us/page.html?cat=2&subcat=2)
-establishes spending a gauge on a stronger ordinary special;
-[Capcom's EX Pac-Dash](https://game.capcom.com/manual/sfxtk/en-UK/page-44.html)
-is an explicit example of a one-hit armored EX.
+Prior art informs the decision, not these original numbers.
 [Street Fighter 6's Drive](https://news.capcomusa.com/2022/06/02/street-fighter-6-redefines-the-genre-in-2023/)
-keeps the budget shared between offensive and defensive choices; Smashcraft
-uses its EX charge and ultimate meter instead of adding another gauge.
+keeps a separate gauge for defensive and offensive choices; Smashcraft keeps
+only the ultimate gauge instead of adding another.
 [Rivals' roster](https://rivalsofaether.com/characters/) shows different
 special decisions built from elemental setups, while its
 [Shovel Knight update](https://rivalsofaether.com/patch-1-4-0-for-shovelry/)
@@ -1184,7 +1139,7 @@ illustrates authored armor windows rather than universal invulnerability.
 rewards Instant Block with extra Tension; that supports paying precise
 defense here. The rejected alternative was one-button ultimates with idle
 refill: saving for a single large event would replace the exchange-by-exchange
-choice between an ordinary special and an armored commitment.
+choice of contesting the centre for the next orb.
 | Disjoints | Weapon extensions only; attached body parts keep hurtboxes. |
 | Throw escape | Mashing; retain the existing escape system and use the brief's fallback only where none exists. |
 | Simultaneous grabs | Both break, with symmetric separation and 12 frames of recovery. |
@@ -1275,12 +1230,10 @@ Factory moved from side to down special unchanged. The numbers and why:
   even in the worst case; a whiff leaves the same 27 frames. At long range
   shield pushback and distance turn the punish into a dash-in, the price of
   the range.
-- **EX:** 25% more damage and range.
 
 smashcraft:ts/src/game/fighters/tinker/tinker.tests.ts checks the frame-20 contact,
 the range and behind cut-offs, tracking against the fastest tech roll and an
-air dodge, the shield punish, the shield stop, the aim bound and the EX
-upgrade.
+air dodge, the shield punish, the shield stop and the aim bound.
 
 ## Historical character trade-offs and move evaluation
 
@@ -1625,7 +1578,7 @@ The descriptive basis is [fighting-game language](design/fighting-games.md),
 | Tech chases and platforms | Preserve current floor-tech and tech-roll timing on the surface actually contacted; pass-through platforms catch from above and do not become walls or ceilings. Extensions can require reads; only call a response reaction-based when its visible cue meets #69's budget. | Gives platforms a real escape/landing role and supports the short-combo, chained-read direction without promising a guaranteed human reaction chase. |
 | Launchers and recovery routes | Each fighter has at least one deliberate launcher into a juggle, tech chase or ledge situation and at least two meaningfully different recovery choices through path, drift, ledge/stage destination or timing. A second recovery special is not required. | Makes follow-up reads and offstage counterplay part of each kit; the roster already requires a weaker free recovery. |
 | Physical spread and dash dancing | Keep existing per-fighter gravity, fall/air/run speed and weight; the authored dash window and stick tolerance follow [Dash dancing](#dash-dancing). Expansion fighters use the adopted relative-property table as starting tuning, with reference jump velocity/gravity until deliberately authored otherwise. | No forced common weight/speed profile and no heavy-must-be-slow rule; each strength needs its stated cost. |
-| Rage, meter and cooldowns | No percent-dependent rage bonus. Build-and-spend mana, EX neutral/side specials and free recovery use the adopted roster contract. There are no ultimates or new common cooldowns. | Predictable knockback and explicit resources, consistent with the removed stale/freshness layer and adopted expansion defaults. |
+| Rage, meter and cooldowns | No percent-dependent rage bonus. Build-and-spend mana, free specials and free recovery use the adopted roster contract. There are no ultimates or new common cooldowns. | Predictable knockback and explicit resources, consistent with the removed stale/freshness layer and adopted expansion defaults. |
 | Interaction-graph requirements | Use the existing contextual option-count, reachable-punish and reward/risk model above, plus #83's accepted combo targets. Keep distinct defensive answers in ordinary neutral; do not impose one payoff ratio or option count on every forced state. | A locked interval can be honest, while an ordinary neutral option needs a reachable counter. The measured sample is not a guarantee about every matchup. |
 
 ## Stage defaults
@@ -2466,13 +2419,12 @@ climb 25, tilt startup and travel about 16).
 ## Centre-stage orbs
 
 Tom directed on 9 Oct 2026 that, in a game with meter, meter is advantage and
-should have a place on the stage (#385), and on 28 Oct 2026 replaced the single
-super bar, its clock trickle and the 20 s meter drops at rotating stage points
-(#484, #385) with two meters and an orb at the centre of the stage
-([two meters](design/mana.md)). The orb appears at a known place on a known
-clock with a short warning, so players fight over a space instead of stalling;
-a player who runs away cedes the orb. It replaces a stalling penalty and is
-not an item.
+should have a place on the stage (#385), and on 29 Oct 2026 made the orb the
+only source of the one ultimate meter, with one orb every 30 s at the centre
+of the stage (#484, #385; [the ultimate meter](design/mana.md)). The orb
+appears at a known place on a known clock with a short warning, so players
+fight over a space instead of stalling; a player who runs away cedes the orb.
+It replaces a stalling penalty and is not an item.
 
 ### Precedent
 
@@ -2508,39 +2460,42 @@ amount never varies.
   when solid ground is there, otherwise the point of a fixed, solid
   (non-moving, non-pass-through) deck nearest the centre. The orb floats 10
   Melee units (60 world units, `ORB_HEIGHT`) above that deck point.
-- **Pickup.** A circle of radius 10 Melee units (`ORB_REACH`) plus the
-  fighter's hurt-capsule radius, tested against the fighter's standing hurt
-  capsule. Every fighter standing under the orb reaches it (from the shortest,
-  Murloc, to the tallest, Illidan, about 159), and so does a
-  jump through it. The taker must be in control: not KO'd, rolling, tumbling,
-  in hitlag or in hitstun. If two fighters touch it on the same frame, the one
-  nearer the orb in x takes it.
-- **Schedule.** An orb is due every 900 frames (15 s) after GO. Every fourth,
-  on each minute mark, is an ultimate orb in place of that EX orb; the others,
-  at 0:15, 0:30 and 0:45 past each minute, are EX orbs. An EX orb fills the
-  EX charge; an ultimate orb adds half an ultimate meter (3600 frames).
-  Taking an orb into an already full meter wastes it. At most one orb is out:
-  a new spawn replaces an untaken one.
+- **Pickup.** A fighter collects the orb by touching it: its body (the hurt
+  capsule) or the active hitbox of a normal attack (jab, tilts, smashes,
+  aerials, dash attack) overlapping the orb, a circle of radius 10 Melee units
+  (`ORB_REACH`), while in a regular state: standing, walking, running,
+  jumping, falling, shielding or in a normal attack. It is not collected in a
+  special, an ultimate or an air dodge (the wavedash landing slide included),
+  nor while rolling, tumbling, in hitstun or hitlag, KO'd or
+  respawn-invincible; in those states the orb passes through. Projectiles
+  never collect it. Every fighter standing under the orb reaches it (from the
+  shortest, Murloc, to the tallest, Illidan, about 159), and so does a jump
+  through it. If several fighters touch it on the same frame, the one whose
+  body centre is horizontally nearest the orb takes it; on an exact tie the
+  lowest player slot takes it. The step is deterministic and identical on
+  every client (Bun and Lua32).
+- **Schedule.** An orb is due every 1800 frames (30 s) of play after GO: 0:30,
+  1:00, 1:30 and so on. It adds half an ultimate meter (3600 frames), so two
+  orbs make an ultimate. Taking an orb into an already full meter wastes it.
+  At most one orb is out: a new spawn replaces an untaken one.
 - **Respawn hold.** A due orb waits while any fighter is out with a stock left
   or still has invincibility after respawning (90 frames), and spawns on the
   first frame none does. The clock does not shift: later orbs stay on their
-  15 s marks.
+  30 s marks.
 - **Warning.** 3 s (180 frames) before each scheduled spawn, and for as long as
   a held orb waits, Mass Teleport's arrival marker grows and pulses at the orb
   point, with the stock item-spawn sound when it starts. The spawn plays the
   meter-ready sound, and a pickup that is not wasted plays the confirm sound.
-  The EX orb is a Frost Wyrm missile (blue) and the ultimate orb a larger Fire
-  Ball missile (orange), both Classic stock models with no imports.
+  The one orb is the larger Fire Ball missile (gold and orange), a Classic
+  stock model with no imports.
   Fighters standing at centre often take an orb on the frame it spawns, so
   every pickup, wasted or not, plays the orb's Death burst at the orb point
-  for half a second (presentation/orbLook.ts `sightOrb`); a CPU match on
-  2026-10-28 took 6 of its first 10 orbs on their spawn frame, which drew
-  nothing before.
+  for half a second (presentation/orbLook.ts `sightOrb`).
 - **Rule.** Orbs are on in the standard ruleset; the stage menu's "Orbs:
   On/Off" button, or `-dev orbs on|off`, turns them off. They never appear in
-  Training or in Classic and lore runs. `-dev meter N` and the tape op
-  `test-meter SLOT PERCENT` set both meters to N percent, with the EX charge
-  full only at 100.
+  Training or in Classic and lore runs, so nobody gains meter there outside
+  the tutorial. `-dev meter N` and the tape op `test-meter SLOT PERCENT` set
+  the ultimate meter to N percent.
 - **Computers** contest an orb after their reaction delay from the start of
   the warning, choosing per orb at their judgment: Expert contests every orb,
   Rookie about one in three (smashcraft:ts/src/game/match/cpuSkill.ts,

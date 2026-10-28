@@ -115,8 +115,8 @@ first body or shield); a field only ever strikes twice.
   Frost Armor slows attackers).
 - **Dark Ritual:** down B while the shell is up is a 24-frame ritual: on
   frame 6 the shell shatters into a frost burst around Lich (radius 0.6H,
-  5%, POKE at 60 degrees) and he gains 30 mana. Kept, the shell trades one
-  hit; spent, it is a close-range escape that pays for the next Frost Nova.
+  5%, POKE at 60 degrees); the ritual gains no meter (changed 2026-10-29).
+  Kept, the shell trades one hit; spent, it is a close-range escape.
 - **Counterplay:** big hits and grabs ignore the shell; the ritual's 5-frame
   startup and 18-frame recovery lose to a shield grab; the striker's chill
   is the cost of attacking an armored Lich, not a stun.

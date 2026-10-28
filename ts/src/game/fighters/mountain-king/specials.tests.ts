@@ -13,7 +13,6 @@ import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
-import { fillMeter } from "../../sim/meter";
 import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
 import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
@@ -112,8 +111,8 @@ function directionMask(x: number, z: number): number {
   return (x < 0 ? maskOf(Action.moveLeft) : x > 0 ? maskOf(Action.moveRight) : 0) | (z < 0 ? maskOf(Action.moveDown) : z > 0 ? maskOf(Action.moveUp) : 0);
 }
 
-function step(state: ReplayState, king: Fighter, tick: number, x: number, z: number, special: boolean, upSpecial = false, strong = false): void {
-  const held = directionMask(x, z) | (special ? maskOf(Action.special) : 0) | (strong ? maskOf(Action.strong) : 0);
+function step(state: ReplayState, king: Fighter, tick: number, x: number, z: number, special: boolean, upSpecial = false): void {
+  const held = directionMask(x, z) | (special ? maskOf(Action.special) : 0);
   const row = inputRow({ held, pressed: special ? maskOf(Action.special) : 0, axisX: x * STICK, axisZ: z * STICK, specialZ: upSpecial ? 1 : 0 });
   if (row === undefined) throw new Error("Mountain King input row");
   adaptInput(row, king, tick, state.controls.inputs[0], state.controls.commands[0]);
@@ -156,13 +155,11 @@ interface Leap {
   dived: boolean;
 }
 
-function startLeap(aim: Direction, ex = false, foeX = FOE_AWAY): Leap {
+function startLeap(aim: Direction, foeX = FOE_AWAY): Leap {
   const { state, king, foe } = leapMatch(foeX);
-  if (ex) fillMeter(king);
   const leap: Leap = { state, king, foe, trail: [], tick: 1, dived: false };
-  step(state, king, leap.tick, aim.x, aim.z, true, true, ex);
+  step(state, king, leap.tick, aim.x, aim.z, true, true);
   assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");
-  assertEquals(king.special.ex, ex, "the leap is the EX leap only when asked");
   return leap;
 }
 
@@ -177,8 +174,8 @@ function advance(leap: Leap, aim: Direction, input: (frame: number) => Held, sto
   }
 }
 
-function leapToTop(aim: Direction, input: (frame: number) => Held = () => REST, ex = false, foeX = FOE_AWAY): Leap {
-  const leap = startLeap(aim, ex, foeX);
+function leapToTop(aim: Direction, input: (frame: number) => Held = () => REST, foeX = FOE_AWAY): Leap {
+  const leap = startLeap(aim, foeX);
   advance(leap, aim, input, FIRE_STEP_FRAME);
   assertEquals(leap.king.special.frame, FIRE_STEP_FRAME, "he reaches the step before the top");
   assertEquals(leap.dived, false, "nothing dives before the top");
@@ -221,24 +218,21 @@ test("Thunder Leap's top does nothing without a change of direction: the stick a
   }
 });
 
-test("Thunder Leap dives on frame 27 on its own, plain or EX, in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
-  for (const ex of [false, true]) {
-    for (const direction of DIRECTIONS) {
-      if (direction === UP) continue;
-      const early = leapToTop(UP, frame => frame === FIRE_STEP_FRAME - 1 ? holding(direction, true) : REST, ex);
-      step(early.state, early.king, ++early.tick, 0, 0, true);
-      finish(early, UP);
-      assertEquals(early.dived, false, `${direction.name}: a change held only on the frame before the top starts no dive`);
-      const late = leapToTop(UP, () => REST, ex);
-      step(late.state, late.king, ++late.tick, 0, 0, false);
-      step(late.state, late.king, ++late.tick, direction.x, direction.z, true);
-      assertEquals(late.king.special.form >= FOLLOW_UP_FORM, false, `${direction.name}: a change on the frame after the top starts no dive`);
-      const leap = leapToTop(UP, () => holding(direction), ex);
-      step(leap.state, leap.king, ++leap.tick, direction.x, direction.z, false);
-      assertEquals(leap.king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the held change starts the dive with no press`);
-      assertEquals(leap.king.special.ex, ex, `${direction.name}: the dive keeps the leap's EX`);
-      if (direction.x !== 0) assertEquals(leap.king.facing, direction.x, `${direction.name}: he turns along the dive`);
-    }
+test("Thunder Leap dives on frame 27 on its own in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
+  for (const direction of DIRECTIONS) {
+    if (direction === UP) continue;
+    const early = leapToTop(UP, frame => frame === FIRE_STEP_FRAME - 1 ? holding(direction, true) : REST);
+    step(early.state, early.king, ++early.tick, 0, 0, true);
+    finish(early, UP);
+    assertEquals(early.dived, false, `${direction.name}: a change held only on the frame before the top starts no dive`);
+    const late = leapToTop(UP, () => REST);
+    step(late.state, late.king, ++late.tick, 0, 0, false);
+    step(late.state, late.king, ++late.tick, direction.x, direction.z, true);
+    assertEquals(late.king.special.form >= FOLLOW_UP_FORM, false, `${direction.name}: a change on the frame after the top starts no dive`);
+    const leap = leapToTop(UP, () => holding(direction));
+    step(leap.state, leap.king, ++leap.tick, direction.x, direction.z, false);
+    assertEquals(leap.king.special.form >= FOLLOW_UP_FORM, true, `${direction.name}: the held change starts the dive with no press`);
+    if (direction.x !== 0) assertEquals(leap.king.facing, direction.x, `${direction.name}: he turns along the dive`);
   }
 });
 
@@ -362,9 +356,8 @@ interface BoltFlight {
   readonly replayed?: string;
 }
 
-function playBoltFromHop(height: number, ex: boolean, rollBackFrom?: number): BoltFlight {
+function playBoltFromHop(height: number, rollBackFrom?: number): BoltFlight {
   const { state, king } = leapMatch(-FOE_AWAY);
-  if (ex) fillMeter(king);
   lift(king, height);
   const snapshot = createReplaySnapshot();
   let landFrame = -1;
@@ -374,8 +367,7 @@ function playBoltFromHop(height: number, ex: boolean, rollBackFrom?: number): Bo
   let ended = 0;
   const play = (from: number): void => {
     for (let tick = from; tick <= BOLT_WATCH_FRAMES && ended === 0; tick++) {
-      step(state, king, tick, 0, 0, tick === 1, false, ex && tick === 1);
-      if (tick === 1) assertEquals(king.special.ex, ex, "Storm Bolt is EX only when asked");
+      step(state, king, tick, 0, 0, tick === 1, false);
       if (landFrame < 0 && king.motion.grounded) {
         landFrame = king.special.frame;
         landTick = tick;
@@ -398,8 +390,8 @@ function playBoltFromHop(height: number, ex: boolean, rollBackFrom?: number): Bo
   return { landFrame, landTick, landingLag, spawned, ended, groundedAtEnd: king.motion.grounded, final: expected, replayed: canonicalState(state) };
 }
 
-function assertShortHopBolt(ex: boolean): void {
-  const flight = playBoltFromHop(SHORT_HOP_HEIGHT, ex);
+function assertShortHopBolt(): void {
+  const flight = playBoltFromHop(SHORT_HOP_HEIGHT);
   assertEquals(flight.landFrame, BOLT_LANDING_FRAME, "he lands during the wind-up");
   assertEquals(flight.landingLag, 0, "landing adds no lag");
   assertEquals(flight.spawned, 23, "the hammer first exists on frame 23");
@@ -407,25 +399,23 @@ function assertShortHopBolt(ex: boolean): void {
   assertEquals(flight.groundedAtEnd, true, "he finishes the cast on the ground");
 }
 
-test("A Storm Bolt cast in a short hop that lands on frame 10 still throws the hammer on frame 23 and ends on the ground on frame 61, with no landing lag [k3 measure #547]", () => assertShortHopBolt(false));
-test("An EX Storm Bolt cast in a short hop that lands on frame 10 still throws the hammer on frame 23 and ends on the ground on frame 61, with no landing lag [k3 measure #547]", () => assertShortHopBolt(true));
+test("A Storm Bolt cast in a short hop that lands on frame 10 still throws the hammer on frame 23 and ends on the ground on frame 61, with no landing lag [k3 measure #547]", () => assertShortHopBolt());
 
 test("A Storm Bolt landed from after the hammer is out ends with its landing lag, as before [k3 measure #547]", () => {
-  const flight = playBoltFromHop(HIGH_HOP_HEIGHT, false);
+  const flight = playBoltFromHop(HIGH_HOP_HEIGHT);
   assertEquals(flight.landTick > flight.spawned, true, "he lands after the throw");
   assertEquals(flight.landingLag, 20, "landing after the throw keeps its landing lag");
 });
 
-function assertBoltRollbackThroughLanding(ex: boolean): void {
-  const flight = playBoltFromHop(SHORT_HOP_HEIGHT, ex, BOLT_LANDING_FRAME - 2);
+function assertBoltRollbackThroughLanding(): void {
+  const flight = playBoltFromHop(SHORT_HOP_HEIGHT, BOLT_LANDING_FRAME - 2);
   assertEquals(flight.replayed, flight.final, "replayed state");
   assertEquals(flight.landFrame, BOLT_LANDING_FRAME, "the replay lands on the same frame");
   assertEquals(flight.spawned, 23, "the replay throws on the same frame");
   assertEquals(flight.ended, 61, "the replay ends on the same frame");
 }
 
-test("A rollback from the frame before landing replays a Storm Bolt through the landing to the same state [k1 scenario]", () => assertBoltRollbackThroughLanding(false));
-test("A rollback from the frame before landing replays an EX Storm Bolt through the landing to the same state [k1 scenario]", () => assertBoltRollbackThroughLanding(true));
+test("A rollback from the frame before landing replays a Storm Bolt through the landing to the same state [k1 scenario]", () => assertBoltRollbackThroughLanding());
 
 const LANDING_WATCH_FRAMES = 400;
 

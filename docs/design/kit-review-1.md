@@ -193,10 +193,6 @@ guard by frame 46 (smashcraft:tools/animations/blademaster-clips.ts,
 `--replace counter`). The attacker's own momentum stops when it is
 countered, so the kick also meets an attacker that was falling fast.
 
-EX steps out behind an attacker up to 3.1H away instead of 2.5H (the shared
-travel lever), so a strike spaced at the tip of a long blade is still answered
-from behind; its frames are the ordinary ones.
-
 Counterplay: the fade is the cue. Wait it out: every fighter's dash attack or
 running grab pressed the frame after the window closes lands before he can act
 (smashcraft:ts/src/game/fighters/blademaster/specials.tests.ts). Grabs and

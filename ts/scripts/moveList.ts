@@ -27,10 +27,9 @@ function pathHitRows(specials: FighterSpecials | undefined): string[] {
       (move.regions ?? []).forEach((region, at) => {
         if (region.hit.strike?.path !== true) return;
         const { damage, launchX, launchZ, base, growth } = region.hit.effect;
-        const ex = move.ex?.regions?.[at]?.hit.effect.damage;
         const angle = Math.round(Math.atan2(launchZ, Math.abs(launchX)) * 180 / Math.PI);
         const frames = region.firstFrame === region.lastFrame ? `frame ${region.firstFrame + 1}` : `frames ${region.firstFrame + 1}-${region.lastFrame + 1}`;
-        rows.push(`| ${SPECIAL_INPUTS[index] ?? "Special"}, path${where} | ${cell(kit.name)} | Hits each opponent its travel crosses once, ${frames}: ${percent(damage)}${ex === undefined ? "" : ` (EX ${percent(ex)})`}, launch ${angle}°, base ${one(base)}, growth ${one(growth)}. |`);
+        rows.push(`| ${SPECIAL_INPUTS[index] ?? "Special"}, path${where} | ${cell(kit.name)} | Hits each opponent its travel crosses once, ${frames}: ${percent(damage)}, launch ${angle}°, base ${one(base)}, growth ${one(growth)}. |`);
       });
     }
   });

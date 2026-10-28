@@ -716,8 +716,6 @@
    "original.source.hitRegions.ts.0.launchX": 0,
    "original.source.hitRegions.ts.0.launchZ": 0,
    "original.source.hitRegions.ts.0.DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES": 4,
-   "original.source.exSpecials.ts.0.EX_ARMOR_DAMAGE": 8,
-   "original.source.exSpecials.ts.0.EX_ARMOR_FRAMES": 6,
    "original.specials.CHAOS_STRIKE_FRAMES": 30,
    "original.specials.DEMONHUNTER_IMMOLATE_ACTIVE": 4,
    "original.specials.DEMONHUNTER_IMMOLATE_STARTUP": 4,
@@ -922,10 +920,6 @@
    "special.bear": {
     "advantage": -12,
     "killPercent": 180
-   },
-   "special.bear.ex": {
-    "advantage": -12,
-    "killPercent": 149
    }
   }
  },
@@ -1275,8 +1269,6 @@
    "original.source.hitRegions.ts.0.launchX": 0,
    "original.source.hitRegions.ts.0.launchZ": 0,
    "original.source.hitRegions.ts.0.DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES": 4,
-   "original.source.exSpecials.ts.0.EX_ARMOR_DAMAGE": 8,
-   "original.source.exSpecials.ts.0.EX_ARMOR_FRAMES": 6,
    "original.specials.CHAOS_STRIKE_FRAMES": 30,
    "original.specials.DEMONHUNTER_IMMOLATE_ACTIVE": 4,
    "original.specials.DEMONHUNTER_IMMOLATE_STARTUP": 4,
@@ -1419,35 +1411,24 @@
    "special.projectile.4": {
     "advantage": -31
    },
-   "special.rush.false": {
+   "special.rush": {
     "advantage": -19
    },
    "special.chaos.false": {
     "advantage": -19,
     "killPercent": 93
    },
-   "special.immolate.false.false": {
+   "special.immolate.false": {
     "advantage": -17,
     "killPercent": 262
    },
-   "special.immolate.true.false": {
+   "special.immolate.true": {
     "advantage": -18,
     "killPercent": 157
-   },
-   "special.rush.true": {
-    "advantage": -18
    },
    "special.chaos.true": {
     "advantage": -18,
     "killPercent": 76
-   },
-   "special.immolate.false.true": {
-    "advantage": -17,
-    "killPercent": 218
-   },
-   "special.immolate.true.true": {
-    "advantage": -18,
-    "killPercent": 139
    },
    "special.dive": {
     "advantage": -7,

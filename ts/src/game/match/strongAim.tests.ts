@@ -18,7 +18,7 @@ const R = bit(Action.moveRight), L = bit(Action.moveLeft), U = bit(Action.moveUp
 
 interface Keyboard {
   readonly owner: Fighter;
-  readonly press: (this: void, held: number) => { readonly queued: boolean; readonly ex: boolean; readonly direction: number };
+  readonly press: (this: void, held: number) => { readonly queued: boolean; readonly special: boolean; readonly direction: number };
 }
 
 function keyboard(): Keyboard {
@@ -34,7 +34,7 @@ function keyboard(): Keyboard {
     sampleKeys(capture, held);
     adaptInput(capture.row, owner, frame, frameControls.inputs[0], frameControls.commands[0]);
     commitEdges(capture);
-    const result = { queued: hasPendingAttack(frameControls.commands[0], frame), ex: frameControls.inputs[0].exPressed, direction: frameControls.inputs[0].direction };
+    const result = { queued: hasPendingAttack(frameControls.commands[0], frame), special: frameControls.inputs[0].specialPressed, direction: frameControls.inputs[0].direction };
     stepMatch(game, world, frameControls, frame);
     return result;
   };
@@ -353,7 +353,7 @@ test("While Strong is held on the ground a held direction does not move the figh
   assertTrue(owner.motion.vx > 0.0);
 });
 
-test("With Strong held the tilt modifier still tilts with A, shield still rolls, grab still grabs and Special casts the EX without a smash [k1 scenario]", () => {
+test("With Strong held the tilt modifier still tilts with A, shield still rolls, grab still grabs and Special casts the special without a smash [k1 scenario]", () => {
   const tilt = keyboard();
   tilt.press(W | R | A);
   assertEquals(tilt.owner.attack.style, AttackStyle.forwardTilt);
@@ -369,10 +369,10 @@ test("With Strong held the tilt modifier still tilts with A, shield still rolls,
   grab.press(S | G);
   assertEquals(grab.owner.attack.style, AttackStyle.grab);
   for (const key of [0, R, U, D]) {
-    const ex = keyboard();
-    ex.press(S);
-    const cast = ex.press(S | key | B);
-    assertTrue(cast.ex);
+    const special = keyboard();
+    special.press(S);
+    const cast = special.press(S | key | B);
+    assertTrue(cast.special);
     assertFalse(cast.queued);
   }
 });

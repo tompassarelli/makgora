@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { ORB_WARNING_FRAMES } from "../sim/orbs";
-import { type MatchOrbs, OrbKind } from "../sim/orbState";
+import type { MatchOrbs } from "../sim/orbState";
 
 export interface OrbCueObservation {
   warned: boolean;
@@ -13,15 +13,15 @@ export const createOrbCueObservation = (): OrbCueObservation => ({ warned: false
 
 export const OrbCue = { warning: 1, spawn: 2, pickup: 4 } as const;
 
-export function observeOrbCues(before: OrbCueObservation, orbs: Readonly<MatchOrbs>, warned: OrbKind): void {
-  before.warned = warned !== OrbKind.none;
+export function observeOrbCues(before: OrbCueObservation, orbs: Readonly<MatchOrbs>, warned: boolean): void {
+  before.warned = warned;
   before.spawnSerial = orbs.spawnSerial;
   before.pickupSerial = orbs.pickupSerial;
 }
 
-export function confirmedOrbCues(before: Readonly<OrbCueObservation>, orbs: Readonly<MatchOrbs>, warned: OrbKind): number {
+export function confirmedOrbCues(before: Readonly<OrbCueObservation>, orbs: Readonly<MatchOrbs>, warned: boolean): number {
   let cues = 0;
-  if (warned !== OrbKind.none && !before.warned) cues |= OrbCue.warning;
+  if (warned && !before.warned) cues |= OrbCue.warning;
   if (before.spawnSerial !== orbs.spawnSerial) cues |= OrbCue.spawn;
   if (before.pickupSerial !== orbs.pickupSerial && !orbs.lastWasted) cues |= OrbCue.pickup;
   return cues;
@@ -29,8 +29,7 @@ export function confirmedOrbCues(before: Readonly<OrbCueObservation>, orbs: Read
 
 export const ORB_MARKER_SCALE_START = f32(0.2);
 export const ORB_MARKER_SCALE_END = f32(0.45);
-export const EX_ORB_SCALE = f32(0.8);
-export const ULTIMATE_ORB_SCALE = f32(1.1);
+export const ORB_SCALE = f32(1.1);
 export const ORB_PULSE_FRAMES = 30;
 
 export function orbMarkerScale(left: number): number {
@@ -43,27 +42,23 @@ export function orbMarkerAlpha(left: number): number {
   return phase < ORB_PULSE_FRAMES / 2 ? 255 : 140;
 }
 
-export const orbScale = (kind: OrbKind): number => kind === OrbKind.ultimate ? ULTIMATE_ORB_SCALE : EX_ORB_SCALE;
-
 export const ORB_BURST_FRAMES = 30;
 
 export interface OrbSighting {
-  shown: OrbKind;
+  shown: boolean;
   bursting: boolean;
   pickupSerial: number;
-  burstKind: OrbKind;
   burstEnd: number;
 }
 
-export const createOrbSighting = (): OrbSighting => ({ shown: OrbKind.none, bursting: false, pickupSerial: 0, burstKind: OrbKind.none, burstEnd: 0 });
+export const createOrbSighting = (): OrbSighting => ({ shown: false, bursting: false, pickupSerial: 0, burstEnd: 0 });
 
 export function sightOrb(seen: OrbSighting, orbs: Readonly<MatchOrbs>, frame: number): void {
   if (orbs.pickupSerial !== seen.pickupSerial) {
     seen.pickupSerial = orbs.pickupSerial;
-    seen.burstKind = orbs.pickupSerial > 0 ? orbs.lastKind : OrbKind.none;
-    seen.burstEnd = frame + ORB_BURST_FRAMES;
+    seen.burstEnd = orbs.pickupSerial > 0 ? frame + ORB_BURST_FRAMES : 0;
   }
-  const bursting = orbs.live === OrbKind.none && seen.burstKind !== OrbKind.none && frame < seen.burstEnd && frame >= seen.burstEnd - ORB_BURST_FRAMES;
-  seen.shown = orbs.live !== OrbKind.none ? orbs.live : bursting ? seen.burstKind : OrbKind.none;
+  const bursting = !orbs.live && frame < seen.burstEnd && frame >= seen.burstEnd - ORB_BURST_FRAMES;
+  seen.shown = orbs.live || bursting;
   seen.bursting = bursting;
 }

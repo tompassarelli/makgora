@@ -1,4 +1,3 @@
-import { EYE_BEAM_EX_REACH, EYE_BEAM_REACH } from "../sim/eyeBeam";
 
 
 
@@ -31,7 +30,7 @@ import { HeroSpecialUse, autoFollowUpDue, heroSpecialUse, holdFirstPartZone, sta
 import { aheadX, moveReachAhead } from "./botMoves";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
-import { ULTIMATE_FRAMES_PER_PERCENT, exCharged, ultimateCharged, ultimatePercent } from "../sim/meter";
+import { ULTIMATE_FRAMES_PER_PERCENT, ultimateCharged, ultimatePercent } from "../sim/meter";
 import { ULTIMATE_REACH } from "./botUltimateReach";
 
 
@@ -48,8 +47,6 @@ const ARMOR_GAP = 240.0;
 const PARTNER_BITE_REACH = 60.0;
 const PARTNER_STRAY = f32(0.2);
 
-const RITUAL_MANA = 25;
-const RITUAL_GAP = 200.0;
 const RITUAL_LAST_FRAMES = 30;
 
 
@@ -83,7 +80,7 @@ const HERO_SLOTS = [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, Speci
 const takes = (skill: CpuSkill, first: number, second: number): boolean => botChance(first, second, skill.kitTenths, 10);
 
 
-const actionSeed = (f: Readonly<Fighter>): number => f.attack.serial * 37 + floorDiv(f.meter.ultimate, ULTIMATE_FRAMES_PER_PERCENT) * 11 + (exCharged(f) ? 7 : 0) + toInt(f.status.damage);
+const actionSeed = (f: Readonly<Fighter>): number => f.attack.serial * 37 + floorDiv(f.meter.ultimate, ULTIMATE_FRAMES_PER_PERCENT) * 11 + toInt(f.status.damage);
 
 const towardOf = (f: Readonly<Fighter>, x: number): number => (x === f.motion.x ? f.facing : x > f.motion.x ? 1 : -1);
 
@@ -221,9 +218,7 @@ function pressRecall(f: Readonly<Fighter>, target: Readonly<Fighter>, move: Read
     return true;
   }
   if (move.ritual !== undefined) {
-
-    const cash = (f.meter.ultimate < ultimatePercent(RITUAL_MANA) && Math.abs(f32(motion.x - f.motion.x)) >= RITUAL_GAP) || f.status.armorFrames <= RITUAL_LAST_FRAMES;
-    if (!cash || !takes(skill, floorDiv(frame, 30), f.character * 7 + 7)) return false;
+    if (f.status.armorFrames > RITUAL_LAST_FRAMES || !takes(skill, floorDiv(frame, 30), f.character * 7 + 7)) return false;
     pressSlot(input, slot, 0);
     return true;
   }
@@ -352,14 +347,6 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
       return true;
     }
     case Character.demonHunter: {
-
-      if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap > EYE_BEAM_REACH && gap <= EYE_BEAM_EX_REACH && exCharged(f) && affords(f, SpecialAction.demonHunterEyeBeam)
-        && Math.abs(f32(target.motion.z - motion.z)) <= 40.0 && takes(skill, floorDiv(frame, 30), f.character * 7 + 24) && botChoice(floorDiv(frame, 30), f.character * 7 + 25, 3) === 0) {
-        pressSlot(input, SpecialSlot.neutral, 0);
-        input.exPressed = true;
-        return true;
-      }
-
       const rush = f32(FEL_RUSH_SPEED * (FEL_RUSH_LAST - FEL_RUSH_FIRST + 1));
       if (!free || !ready || !motion.grounded || toward !== f.facing || gap < RUSH_NEAR || gap > rush || Math.abs(f32(target.motion.z - motion.z)) > 60.0
         || !safeAt(stage, f32(motion.x + f32(f.facing * rush)), 0.0) || !affords(f, SpecialAction.demonHunterFelRush)

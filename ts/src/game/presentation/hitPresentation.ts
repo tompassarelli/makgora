@@ -10,17 +10,14 @@ import { hoistVoice, moveSoundLabels, playFuse, playHit, playImpact, playPerform
 import { VoiceClass } from "./voiceBudget";
 import { Character } from "../sim/codes";
 import { JOB_DONE_VOICE } from "./matchAudio";
-import { EX_AURA } from "./meterCues";
-import { EX_GLOW } from "./meterGlow";
 import { ELEMENTS } from "./elementLooks";
 import { tierSoundPaths } from "./moveTiers";
 import { STRONG_SPARK_SCALE } from "./moveTiers";
-import { IMPACT_EX_DUST, IMPACT_EX_FLASH, IMPACT_EX_SPARK, IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL } from "./impactState";
+import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL } from "./impactState";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_JUMP_MODEL, IMPACT_SHIELD_MODEL, IMPACT_HIT_MODEL, IMPACT_KO_MODEL } from "../assets/impactAssetInfo";
 
 
 export const ELECTRIC_IMPACT_MODEL = "Abilities\\Spells\\Orc\\LightningShield\\LightningShieldTarget.mdx";
-const EX_SPARK_MODEL = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdx";
 
 
 export function impactModel(kind: number): string {
@@ -46,9 +43,6 @@ export function impactModel(kind: number): string {
     case IMPACT_SLASH_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_ARCANE_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_ICE_HIT: return "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
-    case IMPACT_EX_DUST: return IMPACT_DUST_MODEL;
-    case IMPACT_EX_FLASH: return EX_AURA.model;
-    case IMPACT_EX_SPARK: return EX_SPARK_MODEL;
     default: return "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx";
   }
 }
@@ -58,11 +52,9 @@ const PLAIN_SPARK_COLOUR: readonly number[] = [255, 255, 255];
 const FIRE_SPARK_COLOUR: readonly number[] = [255, 100, 25];
 const ARCANE_SPARK_COLOUR: readonly number[] = [190, 110, 255];
 export const STRONG_SPARK_COLOUR: readonly number[] = [255, 205, 40];
-const EX_COLOUR: readonly number[] = [EX_GLOW.red, EX_GLOW.green, EX_GLOW.blue];
 
 
 export function impactColour(kind: number, strength: number): readonly number[] | undefined {
-  if (kind === IMPACT_EX_DUST || kind === IMPACT_EX_FLASH || kind === IMPACT_EX_SPARK) return EX_COLOUR;
   if (kind !== 0 && kind !== IMPACT_SLASH_HIT && kind !== IMPACT_FIRE_HIT && kind !== IMPACT_ARCANE_HIT) return undefined;
   if (strength === STRONG_SPARK_SCALE) return STRONG_SPARK_COLOUR;
   return kind === IMPACT_FIRE_HIT ? FIRE_SPARK_COLOUR : kind === IMPACT_ARCANE_HIT ? ARCANE_SPARK_COLOUR : PLAIN_SPARK_COLOUR;
@@ -70,7 +62,7 @@ export function impactColour(kind: number, strength: number): readonly number[] 
 
 
 export function impactAnimation(kind: number): string {
-  return kind === 0 || kind === 1 || kind === 2 || kind === 3 || kind === IMPACT_EX_DUST || kind === 4 || kind === 6 || kind === 7 || kind === 8 || kind === 9 || kind === 10
+  return kind === 0 || kind === 1 || kind === 2 || kind === 3 || kind === 4 || kind === 6 || kind === 7 || kind === 8 || kind === 9 || kind === 10
     || kind === 11 || kind === 12 || kind === 14 || kind === 15 || kind === IMPACT_FIRE_HIT || kind === IMPACT_PUMMEL
     || kind === IMPACT_SLASH_HIT || kind === IMPACT_ARCANE_HIT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD ? "Stand" : "Birth";
 }

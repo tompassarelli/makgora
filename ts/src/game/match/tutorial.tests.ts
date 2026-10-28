@@ -8,7 +8,7 @@ import { type ReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
-import { exCharged, ultimateCharged } from "../sim/meter";
+import { ULTIMATE_METER_FRAMES, ultimateCharged } from "../sim/meter";
 import { fighterAt } from "../sim/roster";
 import { adaptInput } from "./inputAdapter";
 import { LESSONS, LessonAction } from "./tutorial";
@@ -52,7 +52,7 @@ const idle = (frames: number): RowFields[] => Array.from({ length: frames }, () 
 const special = (held: number, aim: RowFields = {}): RowFields[] => [{ held, pressed: held, ...aim }, ...idle(SETTLE)];
 const ULTIMATE: readonly RowFields[] = [{ held: A, pressed: A }, { held: A | S, pressed: S }];
 
-test("the Specials lesson counts each of the four specials once, neutral, side, up and down, and not an EX special [k1 scenario]", () => {
+test("the Specials lesson counts each of the four specials once, neutral, side, up and down, and a Strong + special is the same special [k1 scenario]", () => {
   const l = lesson(LessonAction.special, Character.rifleman, 900);
   play(l, idle(5));
   play(l, special(S));
@@ -68,26 +68,31 @@ test("the Specials lesson counts each of the four specials once, neutral, side, 
   assertTrue(l.state.match.trainer.lessonCheer > 0);
 });
 
-test("the EX specials lesson starts with a full EX charge and counts Strong + special, never a plain special [k1 scenario]", () => {
-  const l = lesson(LessonAction.exSpecial, Character.rifleman, 900);
+test("the Ultimate orbs lesson hangs an orb at centre stage, fills half a meter per orb the player touches, and passes after two [k1 scenario]", () => {
+  const l = lesson(LessonAction.orb, Character.rifleman, 900);
   play(l, idle(2));
-  assertTrue(exCharged(fighterAt(l.state.world, 0)));
-  play(l, special(S));
-  assertEquals(l.state.match.trainer.lessonCount, 0);
-  play(l, special(Y | S));
+  const player = fighterAt(l.state.world, 0);
   assertEquals(l.state.match.trainer.lessonCount, 1);
+  assertEquals(player.meter.ultimate, ULTIMATE_METER_FRAMES / 2);
+  play(l, idle(2));
+  assertEquals(l.state.match.trainer.lessonCount, 2);
+  assertTrue(ultimateCharged(player));
+  assertTrue(l.state.match.trainer.lessonCheer > 0);
 });
 
-test("the Ultimate lesson fills the meter, refills it after a miss, and passes on an ultimate that hits the partner, during the cast or from a summon after it [k1 scenario]", () => {
+test("the Ultimate lesson fills the meter only from orbs, refills it from orbs after a miss, and passes on an ultimate that hits the partner, during the cast or from a summon after it [k1 scenario]", () => {
   const away = lesson(LessonAction.ultimate, Character.rifleman, 3000);
-  play(away, idle(2));
+  play(away, idle(1));
+  assertEquals(fighterAt(away.state.world, 0).meter.ultimate, 0);
+  play(away, idle(3));
   assertTrue(ultimateCharged(fighterAt(away.state.world, 0)));
+  assertEquals(away.state.match.orbs.pickupSerial, 2);
   play(away, [...ULTIMATE, ...idle(300)]);
   assertEquals(away.state.match.trainer.lessonCount, 0);
   assertTrue(ultimateCharged(fighterAt(away.state.world, 0)));
   for (const character of [Character.rifleman, Character.dreadlord, Character.chen]) {
     const near = lesson(LessonAction.ultimate, character, 250);
-    play(near, [...idle(2), ...ULTIMATE]);
+    play(near, [...idle(4), ...ULTIMATE]);
     for (let frame = 0; frame < 200 && near.state.match.trainer.lessonCheer === 0; frame++) play(near, idle(1));
     assertEquals(near.state.match.trainer.lessonCount, 1);
   }

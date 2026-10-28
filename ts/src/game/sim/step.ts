@@ -45,10 +45,8 @@ import { heroEgg, heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSp
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { closeParasol, endParasolAerial, parasolFall, reopenParasol } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
-import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpCancel } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
-import { settleExWavedash } from "./exWavedash";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
@@ -242,7 +240,7 @@ function advanceJumpSquat(f: Fighter, input: Readonly<Controls>, squatBeforeInpu
   jump.isDouble = false;
   if (jump.dodgeQueued) {
     jump.dodgeQueued = false;
-    beginAirDodge(f, jump.dodgeX, jump.dodgeZ, true, f.dodge.ex);
+    beginAirDodge(f, jump.dodgeX, jump.dodgeZ, true);
     jump.dodgeX = 0;
     jump.dodgeZ = 0;
   }
@@ -268,13 +266,6 @@ function advanceGroundDodge(f: Fighter, groundDodgeStarted: boolean): void {
 
 function advanceGuard(f: Fighter, input: Readonly<Controls>, forcedShield: boolean): boolean {
   const { shield, motion, ground } = f;
-  if (!forcedShield && exSpecialPressed(input) && canStartAttack(f)) {
-    shield.raised = false;
-    shield.heldFrames = 0;
-    shield.perfectFrames = 0;
-    shield.reflectFrames = 0;
-    return false;
-  }
   const shieldCanStart = (input.shield || input.shieldPressed) && (shield.raised || shield.energy > 0) && f.down.state === DownState.none
     && f.launch.hitstun <= 0 && motion.grounded && !isGroundDodging(f) && shield.stun <= 0 && f.landing.lag <= 0
     && shield.releaseLag <= 0 && f.attack.cooldown <= 0 && f.jump.squat <= 0
@@ -532,21 +523,20 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if ((input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && !waterJumped) beginJump(f, input.direction, input.shortHopPressed, heroSpecialJumps(f));
   if (carrying && input.jumpPressed) beginCarryJump(f, input.shortHopPressed);
   if (jump.squat > 0 && launch.hitlag === 0 && (f.character === Character.demonHunter || squatBeforeInput !== 1)) jump.held = jump.held && input.jumpHeld;
-  if (input.airDodgePressed && !exSpecialPressed(input)) {
+  if (input.airDodgePressed) {
     if (motion.grounded && jump.squat > 0) {
       jump.dodgeQueued = true;
-      f.dodge.ex = input.exDodgePressed;
       jump.dodgeX = input.dodgeX;
       jump.dodgeZ = input.dodgeZ;
     } else {
-      beginAirDodge(f, input.dodgeX, input.dodgeZ, false, input.exDodgePressed);
+      beginAirDodge(f, input.dodgeX, input.dodgeZ, false);
     }
   }
   if (jump.dodgeQueued && (input.direction !== 0 || input.verticalDirection !== 0)) {
     jump.dodgeX = input.direction;
     jump.dodgeZ = input.verticalDirection;
   }
-  const dodgePressed = input.groundDodgePressed && input.shield && !exSpecialPressed(input);
+  const dodgePressed = input.groundDodgePressed && input.shield;
   if ((dodgePressed || parryOption === ParryBuffer.groundDodge) && !input.jumpPressed && canBeginGroundDodge(f)) {
     beginGroundDodge(f, dodgePressed ? input.groundDodgeDirection : parryDirection);
     groundDodgeStarted = true;
@@ -625,7 +615,6 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     const drag = motion.grounded ? restingTraction(f, stageSurfaces.floorTraction(physics.traction, stageSurfaces.floorFriction(stage, motion))) : physics.airFriction;
     motion.vx = motion.vx > 0 ? max(0.0, f32(motion.vx - drag)) : min(0.0, f32(motion.vx + drag));
   }
-  settleExWavedash(f, canSteer, direction);
 
 
   platforms.dropFromPlatform(f, stage, matchFrame, input);

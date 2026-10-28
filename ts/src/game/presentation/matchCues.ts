@@ -7,7 +7,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { fighterName } from "../roster/kits";
 import { MatchCue } from "./matchAudio";
-import { METER, ultimateCharged } from "../sim/meter";
+import { ULTIMATE_METER_FRAMES, ultimateCharged } from "../sim/meter";
 import { TEAM_NAMES } from "../sim/teams";
 import { cpuProfileLabel } from "../match/cpuProfiles";
 import type { Character } from "../sim/codes";
@@ -77,7 +77,7 @@ export function confirmedFrameCues(before: Readonly<CueObservation>, game: Reado
   if (countdown !== undefined) cues.push(countdown);
   tallyCombat(before.combat, world, tally.combat);
   for (const slot of PARTICIPANT_SLOTS) {
-    if (isActive(world, slot) && before.meter[slot] < METER.ultimateFrames && ultimateCharged(fighterAt(world, slot))) cues.push(MatchCue.meterReady);
+    if (isActive(world, slot) && before.meter[slot] < ULTIMATE_METER_FRAMES && ultimateCharged(fighterAt(world, slot))) cues.push(MatchCue.meterReady);
   }
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot) || before.out[slot]) continue;

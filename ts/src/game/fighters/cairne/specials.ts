@@ -1,4 +1,3 @@
-import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { heroRegion } from "../../sim/heroMoves";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
@@ -40,9 +39,9 @@ const lift = (): AuthoredSpecial => ({
 });
 
 export const CAIRNE_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Shockwave", description: "Plant the halberd and send one low wave along the ground.", ground: shockwave(false), air: shockwave(true) }, { range: 1.25 }),
-  side: withExKit({ name: "Bloodhoof Gore", description: "Paw the ground, then charge with lowered horns; a catch hoists the foe through any shield and flings it away.", ground: gore(false), air: gore(true) }, { reach: 1.25 }),
-  up: withExKit({ name: "Spirit Lift", description: "Rise behind the halberd, then fall helplessly with exposed sides.", ground: lift() }, { travel: 1.25 }),
-  down: withExKit({ name: "War Stomp", description: "Endurance armor shrugs off light hits without flinching until the stomp, then pops nearby foes straight up; heavy hits break through, and the long recovery is punishable.",
-    ground: WAR_STOMP, air: { ...WAR_STOMP, landingLag: 26 } }, { reach: 1.25 }),
+  neutral: { name: "Shockwave", description: "Plant the halberd and send one low wave along the ground.", ground: shockwave(false), air: shockwave(true) },
+  side: { name: "Bloodhoof Gore", description: "Paw the ground, then charge with lowered horns; a catch hoists the foe through any shield and flings it away.", ground: gore(false), air: gore(true) },
+  up: { name: "Spirit Lift", description: "Rise behind the halberd, then fall helplessly with exposed sides.", ground: lift() },
+  down: { name: "War Stomp", description: "Endurance armor shrugs off light hits without flinching until the stomp, then pops nearby foes straight up; heavy hits break through, and the long recovery is punishable.",
+    ground: WAR_STOMP, air: { ...WAR_STOMP, landingLag: 26 } },
 };

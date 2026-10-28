@@ -138,13 +138,13 @@ The cone leaves Chen's mouth (Tom, 2026-10-28): four connected capsules whose
 centreline starts at the front of his face, measured on the shipped model at
 x58, z96 on the ground and z92 in the air on the active frames, and runs along
 his facing to x260, sloping 26 units down so the far tip still sits low enough
-to jump. Radii are 27, 40, 55 and 70; the final rounded tip reaches x330; EX keeps its 1.25× reach upgrade.
+to jump. Radii are 27, 40, 55 and 70; the final rounded tip reaches x330.
 Active frames 18–28 (six more startup frames than the first cone) and end frame 48
 keep its 20 exit frames; damage, cost and landing lag are unchanged. Each active frame births one stock Breath of Fire flame per
 capsule, scaled by the square of its radius over 70 and shifted forward by 150
 units per unit of scale (the stock model draws its fire that far behind its
 origin), so the fire centres on each capsule and fans out from the mouth to the
-tip; EX scales with the capsules.
+tip.
 
 Fire has 20 exit frames; the keg throw has 18 frames after release. Neither
 gains extra shield damage. Ground and air fire and keg use the same strikes,

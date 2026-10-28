@@ -277,7 +277,7 @@ The hero definition gave the same `MoveTable` to `moves.table` and
 What the simulation read from the table for a fighter that had one: every
 normal's startup, active, total, landing lag, jab chain, startup travel, hit
 rows and hurt poses; every throw's contact frame, length and effect; every
-special form, EX form and follow-up's form choice (air, recall while a bolt
+special form and follow-up's form choice (air, recall while a bolt
 flies), end frame, landing lag, flags, aim frames, cooldown, motion rows,
 body-stop rows, hit rows (contact, guard threat, placed-object strikes),
 projectile spawn frames and limits, follow-up windows and inputs, and hurt

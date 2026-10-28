@@ -22,7 +22,6 @@ export interface Bear {
 }
 
 export interface FreezeTrap {
-  exReach: boolean;
   life: number;
   arming: number;
   x: number;
@@ -96,7 +95,7 @@ export function bearResting(bear: Readonly<Bear>): boolean {
 }
 
 export function freezeTrapResting(trap: Readonly<FreezeTrap>): boolean {
-  return !trap.exReach && positiveZero(trap.life) && positiveZero(trap.arming) && positiveZero(trap.x) && positiveZero(trap.z) && trap.surface === undefined
+  return positiveZero(trap.life) && positiveZero(trap.arming) && positiveZero(trap.x) && positiveZero(trap.z) && trap.surface === undefined
     && positiveZero(trap.serial) && positiveZero(trap.cooldown);
 }
 
@@ -117,7 +116,6 @@ export function restBear(fighter: RestingGroups): void {
 export function restFreezeTrap(fighter: RestingGroups): void {
   if ((fighter.restingGroups & REST_FREEZE_TRAP) !== 0) return;
   const trap: FreezeTrap = fighter.freezeTrap;
-  trap.exReach = false;
   trap.life = 0;
   trap.arming = 0;
   trap.x = 0.0;

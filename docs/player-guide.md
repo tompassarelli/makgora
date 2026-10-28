@@ -154,8 +154,7 @@ Custom uses 8. T is unbound by default.
 
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). Strong + U
-with a direction casts that special's EX
-form (press U with the direction or before it, since Strong and a direction alone smash), spending the EX charge, which fills in 12 s. At a full ultimate meter (2 min),
+with a direction is the same ordinary special (press U with the direction or before it, since Strong and a direction alone smash). Each fighter has one ultimate meter, filled only by the orb that appears above centre stage every 30 s (0:30, 1:00, 1:30 and so on): touch it with your body or hit it with a normal attack, but not from a special, an ultimate or an air dodge, which pass through it. Each orb gives half a meter, so two make an ultimate. At a full ultimate meter,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate, Strong held or not (below a full ultimate meter it is the plain special); the
 Ultimates rule at fighter selection turns them off.
 

@@ -23,7 +23,6 @@ export const STOCK_MODELS = {
   manaBurnTarget: "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdx",
   greenDragonMissile: "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx",
   massTeleportTarget: "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx",
-  frostWyrmMissile: "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx",
   fireBallMissile: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx",
 } as const;
 

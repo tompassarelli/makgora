@@ -41,7 +41,6 @@ ground and in the air. Fan of Knives now:
   drift and gravity still act, so she sinks one frame of gravity a frame.
 - Jump-cancellable from frame 4, 27 frames uncancelled, no intangible frame.
 - Anyone hit is still poisoned.
-- EX: 25% more damage.
 
 From #272 until #494 it struck only ahead of her on the ground (the front
 capsule above), a reach a reference body touches exactly when its feet are
@@ -59,7 +58,6 @@ Until #272 Fan of Knives copied the Falco shape:
 - A jump press from frame 4 ends it and jumps (her double jump in the air).
 - In the air it holds her in place for its 27 frames, as Immolate does.
 - Uncancelled it lasts 27 frames, so a whiffed shine is punishable.
-- EX: 25% more reach, as before.
 
 It looks like the stock cast: Warcraft's FanOfKnivesCaster effect at scale
 0.6, so its knives stop about 450 units out instead of flying about 750 units

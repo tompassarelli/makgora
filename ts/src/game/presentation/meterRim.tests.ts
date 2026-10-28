@@ -20,7 +20,7 @@ function fullPair(character: Character, z = 0.0) {
 }
 
 function rim(fighter: Readonly<Fighter>): string {
-  const color = meterGlowColor(fighter, false, 0);
+  const color = meterGlowColor(fighter, false);
   assertTrue(color === undefined || color === FULL_GLOW);
   return color === undefined ? HIDDEN : SHOWN;
 }

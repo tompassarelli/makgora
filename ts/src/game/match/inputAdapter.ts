@@ -107,7 +107,6 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   const strong = ((held | pressed) & STRONG_BIT) !== 0;
   destination.specialPressed = (pressed & SPECIAL_BIT) !== 0;
   destination.ultimatePressed = ((pressed & SPECIAL_BIT) !== 0 && ((held | pressed) & ATTACK_BIT) !== 0) || ((pressed & ATTACK_BIT) !== 0 && (held & SPECIAL_BIT) !== 0);
-  destination.exPressed = destination.specialPressed && strong && !destination.ultimatePressed;
   destination.specialX = destination.specialPressed && !((held & WALK_BIT) !== 0 && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
   destination.down = (held & MOVE_DOWN_BIT) !== 0 && (held & WALK_BIT) === 0;
@@ -136,7 +135,6 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   }
   const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && (pressed & WALK_BIT) !== 0 && ((held | pressed) & C_STICK) === 0;
   destination.airDodgePressed = destination.shieldPressed || tiltDodge;
-  destination.exDodgePressed = destination.airDodgePressed && strong;
   destination.dodgeX = destination.shieldPressed ? row.dodgeX : tiltDodge ? destination.direction : 0;
   destination.dodgeZ = destination.shieldPressed ? row.dodgeZ : tiltDodge ? destination.verticalDirection : 0;
   destination.mashPressed = pressed !== 0;

@@ -99,7 +99,7 @@ export class PauseMenu {
     const sides = `${keyNames(bindings, Action.moveLeft)}/${keyNames(bindings, Action.moveRight)}`;
     BlzFrameSetText(this.controls, MENU_STYLE.text + `${keyNames(bindings, Action.leftTrigger)}: full shield · ${keyNames(bindings, Action.lightShield)}: light shield · ${keyNames(bindings, Action.walk)}: walk · ${keyNames(bindings, Action.shortHop)}: short hop · ${keyNames(bindings, Action.strong)}: strong\n`
       + `${shield} just before landing: tech (hold ${sides} to roll)\n`
-      + `${strong} + direction: smash · ${strong} + ${special}: EX (EX charge) · ${attack} + ${special}: Ultimate (full ultimate meter)\n`
+      + `${strong} + direction: smash · ${attack} + ${special}: Ultimate (full meter; touch or hit the centre orb to fill it)\n`
       + `${shield} + ${sides}: roll · ${shield} + ${down}: dodge\n`
       + `Downed: ${attack}/${special}: strike · ${up}/${jump}/${shield}: stand · ${sides}: roll\n`
       + `Ledge: ${up}/toward: climb · ${jump}: leap · ${shield}: roll · ${attack}: strike · ${down}/away: let go`

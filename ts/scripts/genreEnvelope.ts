@@ -2,14 +2,14 @@ export const MOVE_CLASSES = ["jab", "tilt", "dash-attack", "smash", "aerial", "s
 export type MoveClass = (typeof MOVE_CLASSES)[number];
 export const FIELDS = ["startup", "active", "endLag", "landingLag", "shieldAdvantage", "killPercent", "total"] as const;
 export type Field = (typeof FIELDS)[number];
-export type Tier = "normal" | "special" | "ex";
+export type Tier = "normal" | "special";
 
 export type Measures = Partial<Record<Field, number>>;
 export interface Range { readonly low: number; readonly high: number }
 export type Envelope = Partial<Record<MoveClass, Partial<Record<Field, Range>>>>;
 
 export interface Tolerance { readonly frames: number; readonly shieldAdvantage: number; readonly killPercentShare: number }
-export interface Tolerances extends Tolerance { readonly special: Tolerance; readonly ex: Tolerance }
+export interface Tolerances extends Tolerance { readonly special: Tolerance }
 
 export interface Sample { readonly source: string; readonly moveClass: MoveClass; readonly measures: Measures }
 export interface MoveRow { readonly fighter: string; readonly move: string; readonly measures: Measures }
@@ -32,7 +32,7 @@ export function classify(move: string): { readonly moveClass: MoveClass; readonl
     const moveClass = NORMAL_CLASSES[rest[0] ?? ""];
     return moveClass === undefined ? undefined : { moveClass, tier: moveClass === "special" ? "special" : "normal" };
   }
-  if (head === "special") return { moveClass: "special", tier: rest.some((part) => part === "ex" || part === "true") ? "ex" : "special" };
+  if (head === "special") return { moveClass: "special", tier: "special" };
   if (head === "throw") return { moveClass: "throw", tier: "normal" };
   if (head === "grab") return { moveClass: "grab", tier: "normal" };
   const universal = MOVE_CLASSES.find((name) => name === move);
@@ -75,7 +75,7 @@ export function buildEnvelope(samples: readonly Sample[], fixed: readonly { read
 }
 
 export function allowance(field: Field, range: Range, tier: Tier, tolerances: Tolerances): number {
-  const tolerance = tier === "ex" ? tolerances.ex : tier === "special" ? tolerances.special : tolerances;
+  const tolerance = tier === "special" ? tolerances.special : tolerances;
   if (field === "shieldAdvantage") return tolerance.shieldAdvantage;
   if (field === "killPercent") return tolerance.killPercentShare * Math.max(Math.abs(range.low), Math.abs(range.high));
   return tolerance.frames;

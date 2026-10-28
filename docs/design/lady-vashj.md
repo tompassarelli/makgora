@@ -1,9 +1,9 @@
 # Lady Vashj: the Serpent Queen
 
-Lady Vashj wins attrition rather than spacing. Her Mana Shield spends EX
-charge before percent, so she outlasts pressure while cold arrows and a
-bouncing water serpent wear the foe down. Up close she is slow and wide, and
-a foe who drains her charge finds an easy target. She replaces Kobold in code
+Lady Vashj wins attrition rather than spacing. Her Mana Shield pays half
+of each hit from her ultimate meter, so she outlasts pressure while cold
+arrows and a bouncing water serpent wear the foe down. Up close she is slow
+and wide, and a foe who drains her meter finds an easy target. She replaces Kobold in code
 28 (Tom asked, 2026-10-28; plan in [roster-next.md](roster-next.md#lady-vashj-replaces-kobold)).
 
 Numbers are provisional Smashcraft tuning. Frames count entry as frame 1 with
@@ -48,16 +48,16 @@ tail joins the hurt volume on every tail move.
 
 | Input | Contract and counterplay |
 | --- | --- |
-| Neutral: **Multi-Shot** | Three cold arrows (`NagaColdArrowMissile`) at 0° and ±12° on frame 18 of 40, 3% each, speed 20, life 30. The centre arrow chills (the shared chill, 60 frames; the plan's −10% acceleration is the shared 40% speed slow instead). Shields stop them and they reflect. One volley in flight; the volley counts as two of the three hero-projectile slots, so the serpent can fly beside it. EX: five arrows across ±20°. |
-| Side: **Tidal Serpent** | A water serpent (`SerpentWardMissile`) on frame 16 of 52, speed 12, 27 frames (about 320 units). A body hit deals 6%, steals 108 frames of EX charge (15%) and bounces to the nearest other foe within 300 units, up to three bounces at 80% damage each. With no other foe it turns back to her, and catching it adds the stolen charge to hers. Shields stop it without a steal; it does not reflect. EX: four bounces, 180 frames (25%). Summons and wards are not bounce targets yet. |
-| Up: **Tidal Surge** | A water column lifts her 2.0H over frames 10-33 with 0.3H of drift, hitting 7% at 80° on frames 12-18. Once per airtime, ends helpless; helpless fall leaves no aerial jump. EX rises 15% higher. |
-| Down: **Mana Shield** | A toggle that switches on frame 6 of 12. While it is on, each hit except throws and pummels takes half its damage from her percent and drains the other half from her EX charge at 72 frames per 1%; knockback uses her real, lower percent. Her charge does not grow and EX specials are refused while it is on; the toggle itself never spends EX. When the charge runs dry the shield breaks into a 20-frame stun. Toggle, charge and stun are rollback state. |
+| Neutral: **Multi-Shot** | Three cold arrows (`NagaColdArrowMissile`) at 0° and ±12° on frame 18 of 40, 3% each, speed 20, life 30. The centre arrow chills (the shared chill, 60 frames; the plan's −10% acceleration is the shared 40% speed slow instead). Shields stop them and they reflect. One volley in flight; the volley counts as two of the three hero-projectile slots, so the serpent can fly beside it. |
+| Side: **Tidal Serpent** | A water serpent (`SerpentWardMissile`) on frame 16 of 52, speed 12, 27 frames (about 320 units). A body hit deals 6%, drains 108 frames (1.5%) of the struck foe's ultimate meter, hands nothing back to her, and bounces to the nearest other foe within 300 units, up to three bounces at 80% damage each. With no other foe it turns back to her, and catching it gives nothing. Shields stop it without a drain; it does not reflect. Summons and wards are not bounce targets yet. |
+| Up: **Tidal Surge** | A water column lifts her 2.0H over frames 10-33 with 0.3H of drift, hitting 7% at 80° on frames 12-18. Once per airtime, ends helpless; helpless fall leaves no aerial jump. |
+| Down: **Mana Shield** | A toggle that switches on frame 6 of 12. While it is on, each hit except throws and pummels takes half its damage from her percent and pays the other half from her ultimate meter at 72 frames per 1% (one orb's half meter absorbs 50%); knockback uses her real, lower percent. When the meter runs dry the shield breaks into a 20-frame stagger; with an empty meter it breaks on the first hit. Toggle, meter and stagger are rollback state. |
 | Ultimate: **Gaze of Azshara** | 20 frames of telegraph (`CurseTarget` over her head), then frames 21-60 check a cone 600 ahead that widens to 300 tall. A foe in the cone facing her, not intangible and not already frozen, is slowed by 40% for 40 frames, then petrified for 60 frames under a grey tint using the shared frozen status. A petrified foe takes hits without thawing or launching, and at most 26% in total. Turning away is the counterplay. |
 
 ## Roster role and presentation
 
 Sylvanas, Jaina, Lich, Malfurion and Rifleman win by spacing. Vashj wins
-by attrition: her arrows chill, her serpent steals meter for her shield, and
+by attrition: her arrows chill, orb meter funds her shield, her serpent drains the foe's meter, and
 she stays out of reach while the shield holds. Grabs bypass the shield, and a
 foe who strings hits until it breaks gets a free punish.
 
@@ -89,7 +89,7 @@ basic-moves: neutral-special,forward-tilt,back-air
 
 Basic gameplan: Shoot volleys from range and lash with the tail when a foe closes. Keep one approach, use the listed moves, no read-based punishes or advanced kit sequences. Recovery keeps the normal up special.
 
-Expert gameplan: Trade meter for safety with Mana Shield, steal charge back with the serpent, and petrify a foe who rushes in facing her. Use the full authored kit and gameplan at the same CPU skill.
+Expert gameplan: Spend orb meter for safety with Mana Shield, drain the foe's meter with the serpent, and petrify a foe who rushes in facing her. Use the full authored kit and gameplan at the same CPU skill.
 
 ## Signature strong/weak move (#389)
 

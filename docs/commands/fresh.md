@@ -47,5 +47,4 @@ client that still cannot leave it.
 - Orb setup at fighter or stage selection: `-dev orbs on|off` controls
   whether centre-stage orbs appear; the stage menu's "Orbs: On/Off" button does
   the same (smashcraft:docs/gameplay-design.md, "Centre-stage orbs").
-- Meter setup: `-dev meter N` sets both meters to N percent of an ultimate
-  meter, with the EX charge full only at 100.
+- Meter setup: `-dev meter N` sets the ultimate meter to N percent.

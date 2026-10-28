@@ -16,10 +16,8 @@ import { HitElement, type HitEffect, type HitRegion, NO_HIT_REGION } from "./hit
 import { heroSpecialMove, stopsSidewaysOnStart } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { advanceHeroTargetedStrike } from "./heroTargetedStrike";
-import { enterExSpecial } from "./exSpecials";
 import { regionAgainst } from "./specials/spellImmunity";
-import { shieldSafeEffect } from "./exSpecialAuthoring";
-import { fillEx, spendUltimate, ultimateCharged } from "./meter";
+import { spendUltimate, ultimateCharged } from "./meter";
 import { cancelAttack, cancelJumpSquat } from "./transitions";
 import { applyAttackHit } from "./hits";
 import { meleeHitIntersectsShield } from "./attacks";
@@ -30,7 +28,7 @@ import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralC
 import { floorBelow, surfaceZAt } from "./stage";
 import { belowStandingPlatform } from "./platformMoves";
 import { advanceCompanion } from "./companions";
-import { RIFLEMAN_BEAR_EX_LIFETIME, RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
+import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
 import { changesAimZone, chargedAimX, chargedAimZ } from "./specials/aimZone";
@@ -42,7 +40,7 @@ import { squareRoot } from "./warcraftMath";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import { FEL_RUSH_AIMED_AIRTIME, FEL_RUSH_AIRTIME, FEL_RUSH_EARNED, FEL_RUSH_FROM_AIR, FEL_RUSH_STRUCK } from "./felRushAirtime";
 import { PHANTASM_AIR_LANDING_LAG, PHANTASM_DISTANCE_HEIGHTS, PHANTASM_END_FRAME, PHANTASM_FIRST_TRAVEL_FRAME, PHANTASM_LAST_TRAVEL_FRAME, PHANTASM_SHORTEN, PHANTASM_TRAVEL_FRAMES } from "./specials/phantasmDash";
-import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_LIFETIME, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED, eyeBeamShotFrame } from "./eyeBeam";
+import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED, eyeBeamShotFrame } from "./eyeBeam";
 
 
 
@@ -63,7 +61,6 @@ const FEL_RUSH_AIR_CARRY = 5.0;
 export const DEMONHUNTER_WING_STARTUP = 7;
 export const DEMONHUNTER_WING_DURATION = 32;
 const DEMONHUNTER_WING_SPEED = 30.0;
-const DEMONHUNTER_WING_EX_SPEED = 37.5;
 
 
 export const DEMONHUNTER_DIVE_FRAME = 19;
@@ -119,7 +116,6 @@ function startSpecialAction(owner: Fighter, action: SpecialAction, duration: num
   owner.motion.fastFalling = false;
   owner.motion.crouching = false;
   special.action = action;
-  special.ex = false;
   special.variant = 0;
   special.frame = 0;
 
@@ -208,9 +204,8 @@ function fireRecoil(owner: Fighter, aimX: number, aimZ: number, speed: number, s
   const z = aimZ < 0 ? -1 : aimZ > 0 || x === 0 ? 1 : 0;
   const scale = x !== 0 && z !== 0 ? AIM_DIAGONAL : 1.0;
   spawnProjectileMotion(owner, ProjectileKind.recoil, f32(f32(-x * RIFLEMAN_RECOIL_SHOT_SPEED) * scale), f32(f32(-z * RIFLEMAN_RECOIL_SHOT_SPEED) * scale), 8, serial);
-  const travelSpeed = f32(speed * (owner.special.ex ? 1.25 : 1.0));
-  owner.motion.vx = f32(f32(x * travelSpeed) * scale);
-  owner.motion.vz = f32(f32(z * travelSpeed) * scale);
+  owner.motion.vx = f32(f32(x * speed) * scale);
+  owner.motion.vz = f32(f32(z * speed) * scale);
 }
 
 
@@ -390,8 +385,7 @@ function aimWingAscent(owner: Fighter, input: Readonly<Controls> | undefined): v
 }
 
 export function wingAscentSpeed(owner: Readonly<Fighter>, frame: number): number {
-  const launch = owner.special.ex ? DEMONHUNTER_WING_EX_SPEED : DEMONHUNTER_WING_SPEED;
-  return max(0.0, f32(launch - f32((frame - DEMONHUNTER_WING_STARTUP + 1) * heavyFall(owner, owner.tuning.physics.gravity))));
+  return max(0.0, f32(DEMONHUNTER_WING_SPEED - f32((frame - DEMONHUNTER_WING_STARTUP + 1) * heavyFall(owner, owner.tuning.physics.gravity))));
 }
 
 export function wingAscentReach(owner: Readonly<Fighter>): number {
@@ -451,7 +445,7 @@ function summonBear(owner: Fighter, stage: number, matchFrame: number): void {
   const { motion, special } = owner;
   const bear = mutableBear(owner);
   const moveX = special.direction;
-  bear.life = special.ex ? RIFLEMAN_BEAR_EX_LIFETIME : RIFLEMAN_BEAR_LIFETIME;
+  bear.life = RIFLEMAN_BEAR_LIFETIME;
   bear.x = f32(motion.x + f32(moveX * 45));
   bear.z = motion.grounded && motion.surface !== undefined ? surfaceZAt(stage, motion.surface, matchFrame, bear.x) : motion.z;
   bear.velocityX = f32(moveX * 14.0);
@@ -554,7 +548,6 @@ function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, worl
   const action = SpecialAction.heroNeutral + chosen.slot;
   startSpecialAction(owner, heroAction(action), move.endFrame, specialDirection(input, owner.facing));
   cancelJumpSquat(owner);
-  enterExSpecial(owner, input, move.ex !== undefined);
   if (stopsSidewaysOnStart(enterHeroSpecial(owner, chosen, input), owner.motion.grounded)) owner.motion.vx = 0.0;
   return true;
 }
@@ -579,7 +572,6 @@ export function startUltimate(owner: Fighter, input: Readonly<Controls>, stage: 
   if (!replaceableForUltimate(owner)) return false;
   const { special } = owner;
   if (special.action !== SpecialAction.none) {
-    if (special.ex) fillEx(owner);
     special.action = SpecialAction.none;
     special.lockFrames = 0;
     owner.attack.cooldown = 0;
@@ -625,7 +617,6 @@ export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: n
   if (started) {
     cancelJumpSquat(owner);
     if (grounded && !originalMovementSpecial(requested)) owner.motion.vx = 0.0;
-    enterExSpecial(owner, input);
   }
   else owner.facing = facing;
   return started;
@@ -677,8 +668,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   if (special.action === SpecialAction.riflemanTrap && special.frame === TRAP_APPEAR_FRAME) startFreezeTrap(owner, stage, matchFrame);
   if (special.action === SpecialAction.riflemanBear && special.frame === RIFLEMAN_BEAR_CAST_FRAMES) summonBear(owner, stage, matchFrame);
   if (special.action === SpecialAction.demonHunterEyeBeam && special.frame === eyeBeamShotFrame(special.form)) {
-    const beam = spawnProjectileMotion(owner, ProjectileKind.eyeBeam, f32(owner.facing * EYE_BEAM_SPEED), 0.0, special.ex ? EYE_BEAM_EX_LIFETIME : EYE_BEAM_LIFETIME, shotSerial, 1.0, EYE_BEAM_EYE_HEIGHT);
-    if (beam !== undefined) beam.exReach = special.ex;
+    spawnProjectileMotion(owner, ProjectileKind.eyeBeam, f32(owner.facing * EYE_BEAM_SPEED), 0.0, EYE_BEAM_LIFETIME, shotSerial, 1.0, EYE_BEAM_EYE_HEIGHT);
   }
   if (special.action === SpecialAction.riflemanRecovery) {
     if (special.frame === RIFLEMAN_RECOVERY_STARTUP_FRAMES) {
@@ -687,8 +677,8 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
       if (aimX === 0 && aimZ >= 0) {
 
         spawnProjectileMotion(owner, ProjectileKind.recoil, f32(owner.facing * 2.0), -RIFLEMAN_RECOIL_SHOT_SPEED, 8, shotSerial);
-        motion.vx = f32(f32(special.direction * f32(7.592)) * (special.ex ? 1.25 : 1.0));
-        motion.vz = f32(RIFLEMAN_RECOIL_SPEED * (special.ex ? 1.25 : 1.0));
+        motion.vx = f32(special.direction * f32(7.592));
+        motion.vz = RIFLEMAN_RECOIL_SPEED;
       } else {
         fireRecoil(owner, aimX, aimZ, RIFLEMAN_RECOIL_SPEED, shotSerial);
       }
@@ -719,7 +709,6 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
 }
 
 const IMMOLATE_REACH = 116.0;
-const IMMOLATE_REACH_EX = 140.0;
 
 function immolateRegion(damage: number, reach: number, minZ: number, maxZ: number, facing: number): Readonly<HitRegion> {
   return {
@@ -733,16 +722,9 @@ const immolateSides = (damage: number, reach: number, minZ: number, maxZ: number
   [immolateRegion(damage, reach, minZ, maxZ, 1.0), immolateRegion(damage, reach, minZ, maxZ, -1.0)];
 const IMMOLATE_GROUND = immolateSides(7.0, IMMOLATE_REACH, -104.0, 108.0);
 const IMMOLATE_AIR = immolateSides(9.0, IMMOLATE_REACH, -104.0, 108.0);
-const IMMOLATE_GROUND_EX = immolateSides(7.0, IMMOLATE_REACH_EX, -114.0, 118.0);
-const IMMOLATE_AIR_EX = immolateSides(9.0, IMMOLATE_REACH_EX, -114.0, 118.0);
 
-function exShieldSafeRegion(region: Readonly<HitRegion>): Readonly<HitRegion> {
-  return { ...region, effect: shieldSafeEffect(region.effect), groundedEffect: region.groundedEffect === undefined ? undefined : shieldSafeEffect(region.groundedEffect) };
-}
-
-
-export const immolationRegion = (grounded: boolean, ex = false, behind = false): Readonly<HitRegion> =>
-  at(grounded ? ex ? IMMOLATE_GROUND_EX : IMMOLATE_GROUND : ex ? IMMOLATE_AIR_EX : IMMOLATE_AIR, behind ? 1 : 0);
+export const immolationRegion = (grounded: boolean, behind = false): Readonly<HitRegion> =>
+  at(grounded ? IMMOLATE_GROUND : IMMOLATE_AIR, behind ? 1 : 0);
 
 
 
@@ -773,15 +755,14 @@ const FEL_RUSH_PASS: Readonly<HitRegion> = {
   groundedEffect: { damage: 7.0, growth: 60.0, base: 74.0, launchX: 0.9396926164627075, launchZ: 0.3420201539993286, electric: false, element: HitElement.fire, manaDrain: 4 },
   window: 1,
 };
-const FEL_RUSH_PASS_EX = exShieldSafeRegion(FEL_RUSH_PASS);
 
 
-export function felRushRegion(frame: number, ex = false): Readonly<HitRegion> {
-  return frame >= FEL_RUSH_FIRST && frame <= FEL_RUSH_LAST ? ex ? FEL_RUSH_PASS_EX : FEL_RUSH_PASS : NO_HIT_REGION;
+export function felRushRegion(frame: number): Readonly<HitRegion> {
+  return frame >= FEL_RUSH_FIRST && frame <= FEL_RUSH_LAST ? FEL_RUSH_PASS : NO_HIT_REGION;
 }
 
 function felRushContact(owner: Fighter, targetSlot: number, target: Fighter): Readonly<HitRegion> {
-  const region = felRushRegion(owner.special.frame, owner.special.ex);
+  const region = felRushRegion(owner.special.frame);
   if (region.window <= 0 || specialAlreadyHit(owner, targetSlot) || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const localX = f32(f32(target.motion.x - owner.motion.x) * owner.facing);
   const localZ = f32(target.motion.z - owner.motion.z);
@@ -800,7 +781,7 @@ function demonHunterSpecialContact(owner: Fighter, targetSlot: number, target: F
   if (special.frame >= DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const localX = f32(f32(target.motion.x - owner.motion.x) * owner.facing);
   const localZ = f32(target.motion.z - owner.motion.z);
-  const contact = immolationRegion(owner.motion.grounded, special.ex, localX < 0);
+  const contact = immolationRegion(owner.motion.grounded, localX < 0);
   const inside = localX >= contact.minX && localX <= contact.maxX && localZ >= contact.minZ && localZ <= contact.maxZ;
   return inside ? contact : NO_HIT_REGION;
 }

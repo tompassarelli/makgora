@@ -835,7 +835,7 @@ frames so the 240-frame treant ends inside the measurement.
 On 26 Oct 2026 (#376): Illidan's Eye Blast (neutral form 1) beam 1.5 to
 0.9 and its lit hit-line marks 1.0 to 0.6, the marks parking with
 `parkCue` (8.4% and 22 frames of linger to 3.9% and 2); Immolation's
-striking Fel Flames 2.0 to 1.8 (down EX, 4.3% to 3.2%). Rifleman's side
+striking Fel Flames 2.0 to 1.8 (down, 4.3% to 3.2%). Rifleman's side
 (1.7-1.8%) and down (0.1%) specials already sat inside the budget.
 
 The check also plays an orb (#385) as `orb:warning-and-orb`:

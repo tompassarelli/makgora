@@ -34,11 +34,10 @@ const controls: Readonly<Record<string, readonly [number, number]>> = {
   "axis leftx": [EV_ABS, ABS_X], "axis lefty": [EV_ABS, ABS_Y], "axis rightx": [EV_ABS, ABS_RX], "axis righty": [EV_ABS, ABS_RY],
   "axis lefttrigger": [EV_ABS, ABS_Z], "axis righttrigger": [EV_ABS, ABS_RZ],
 };
-// padbridge's pinned contract/bindings.json still names the strong action exSpecial.
 const actions: Readonly<Record<string, Action>> = {
   attack: Action.attack, special: Action.special, jump: Action.jump, grab: Action.grab,
   shield: Action.leftTrigger, rightTrigger: Action.rightTrigger, lightShield: Action.lightShield,
-  shortHop: Action.shortHop, exSpecial: Action.strong, moveLeft: Action.moveLeft, moveRight: Action.moveRight,
+  shortHop: Action.shortHop, strong: Action.strong, moveLeft: Action.moveLeft, moveRight: Action.moveRight,
   moveUp: Action.moveUp, moveDown: Action.moveDown, cLeft: Action.cLeft,
   cRight: Action.cRight, cUp: Action.cUp, cDown: Action.cDown,
 };

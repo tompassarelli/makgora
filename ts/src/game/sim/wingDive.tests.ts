@@ -2,7 +2,6 @@ import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } fro
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import { fillMeter } from "./meter";
 import { type Controls, type Roster } from "./roster";
 import {
   DEMONHUNTER_BACKFLIP_FORM, DEMONHUNTER_BACKFLIP_FRAMES, DEMONHUNTER_DIVE_FORM, DEMONHUNTER_DIVE_FRAME, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_LANDING_LAG, DEMONHUNTER_DIVE_SPEED,
@@ -11,16 +10,15 @@ import {
 import { controls } from "./testWorld";
 import { duelPair, lift, stepDuel } from "./testDuel";
 
-const upB = (ex: boolean): Controls => controls({ specialPressed: true, specialZ: 1, verticalDirection: 1, exPressed: ex });
+const UP_B: Controls = controls({ specialPressed: true, specialZ: 1, verticalDirection: 1 });
 const held = (x: number, z: number): Controls => controls({ direction: x, verticalDirection: z, down: z < 0 });
 const DIVE_LENGTH = f32(DEMONHUNTER_DIVE_SPEED * DEMONHUNTER_DIVE_FRAMES);
 const ZONES = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]] as const;
 
-function ascending(z: number, ex = false): { world: Roster; owner: Fighter; target: Fighter } {
+function ascending(z: number): { world: Roster; owner: Fighter; target: Fighter } {
   const pair = duelPair(createFighter(Character.demonHunter, 0.0, 1), createFighter(Character.rifleman, -500.0, 1));
   if (z > 0.0) lift(pair.owner, z);
-  if (ex) fillMeter(pair.owner);
-  stepDuel(pair.world, upB(ex));
+  stepDuel(pair.world, UP_B);
   return pair;
 }
 
@@ -35,8 +33,8 @@ function fireAt(world: Roster, owner: Fighter, stick: Readonly<Controls>): void 
   stepDuel(world, stick);
 }
 
-function dive(x: number, z: number, ex = false): { started: boolean; flip: number; dx: number; dz: number; helpless: boolean; owner: Fighter } {
-  const { world, owner } = ascending(900.0, ex);
+function dive(x: number, z: number): { started: boolean; flip: number; dx: number; dz: number; helpless: boolean; owner: Fighter } {
+  const { world, owner } = ascending(900.0);
   fireAt(world, owner, held(x, z));
   const started = owner.special.form === DEMONHUNTER_BACKFLIP_FORM;
   let flip = 0;
@@ -46,21 +44,18 @@ function dive(x: number, z: number, ex = false): { started: boolean; flip: numbe
   return { started, flip, dx: f32(owner.motion.x - startX), dz: f32(owner.motion.z - startZ), helpless: owner.special.fall, owner };
 }
 
-test("Wing Dive: with no special press, a stick in any zone but the launch's on frame 19 of Wing Ascent backflips him about 6 frames and then dives that way a fixed distance, plain or EX, ending helpless; held on frames 8-18 it starts nothing [k1 scenario]", () => {
-  for (const ex of [false, true]) {
-    for (const [x, z] of ZONES) {
-      if (x === 0 && z === 1) continue;
-      const result = dive(x, z, ex);
-      assertTrue(result.started);
-      assertEquals(result.owner.special.ex, ex);
-      assertTrue(Math.abs(result.flip - DEMONHUNTER_BACKFLIP_FRAMES) <= 1);
-      assertTrue(result.helpless);
-      const length = Math.sqrt(result.dx * result.dx + result.dz * result.dz);
-      assertGreaterThan(length, f32(DIVE_LENGTH * f32(0.85)));
-      assertLessThan(length, f32(DIVE_LENGTH * f32(1.15)));
-      assertGreaterThan(f32(f32(result.dx * x) + f32(result.dz * z)), f32(f32(length * f32(0.95)) * (x !== 0 && z !== 0 ? f32(Math.SQRT2) : 1.0)));
-      if (x !== 0) assertEquals(result.owner.facing, x);
-    }
+test("Wing Dive: with no special press, a stick in any zone but the launch's on frame 19 of Wing Ascent backflips him about 6 frames and then dives that way a fixed distance, ending helpless; held on frames 8-18 it starts nothing [k1 scenario]", () => {
+  for (const [x, z] of ZONES) {
+    if (x === 0 && z === 1) continue;
+    const result = dive(x, z);
+    assertTrue(result.started);
+    assertTrue(Math.abs(result.flip - DEMONHUNTER_BACKFLIP_FRAMES) <= 1);
+    assertTrue(result.helpless);
+    const length = Math.sqrt(result.dx * result.dx + result.dz * result.dz);
+    assertGreaterThan(length, f32(DIVE_LENGTH * f32(0.85)));
+    assertLessThan(length, f32(DIVE_LENGTH * f32(1.15)));
+    assertGreaterThan(f32(f32(result.dx * x) + f32(result.dz * z)), f32(f32(length * f32(0.95)) * (x !== 0 && z !== 0 ? f32(Math.SQRT2) : 1.0)));
+    if (x !== 0) assertEquals(result.owner.facing, x);
   }
 });
 

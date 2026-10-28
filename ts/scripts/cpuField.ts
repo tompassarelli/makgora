@@ -274,7 +274,6 @@ interface Watch {
   serial: number;
   special: number;
   specialForm: number;
-  ex: boolean;
   ultimate: number;
   specialFrame: number;
   hits: number;
@@ -320,7 +319,7 @@ interface Punish {
 
 const watchOf = (f: Readonly<Fighter>): Watch => ({
   down: f.down.state,
-  serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, ex: f.special.ex, ultimate: f.meter.ultimate, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
+  serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, ultimate: f.meter.ultimate, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
   grounded: f.motion.grounded, lagging: false, cornered: false, recovering: false, edgeGuarded: false, ledgeUntil: -1,
 });
 
@@ -499,7 +498,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
           else own.retreatFrames++;
         }
         const branched = special !== undefined && f.special.action === seen.special && f.special.form !== seen.specialForm;
-        if ((startedSpecial || branched) && ((f.special.ex && !seen.ex) || f.meter.ultimate < seen.ultimate - ULTIMATE_FRAMES_PER_PERCENT)) own.meterSpent++;
+        if ((startedSpecial || branched) && f.meter.ultimate < seen.ultimate - ULTIMATE_FRAMES_PER_PERCENT) own.meterSpent++;
         const hit = f.visuals.hit !== seen.hits && (options.playtest !== true || fighterContact[slot] === true);
         const ledge = own.ledge;
         if (f.ledge.state !== LedgeState.none) seen.ledgeUntil = frame + LEDGE_PLAY_FRAMES;
@@ -608,7 +607,6 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
         seen.special = f.special.action;
         seen.specialFrame = f.special.frame;
         seen.specialForm = f.special.form;
-        seen.ex = f.special.ex;
         seen.ultimate = f.meter.ultimate;
         seen.hits = f.visuals.hit;
         if (f.status.damage !== seen.damage || f.status.out !== seen.out) {

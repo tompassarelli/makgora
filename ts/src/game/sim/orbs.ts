@@ -1,17 +1,18 @@
 import { f32 } from "wisp/src/sim/f32";
-import { floorDiv, floorMod, idiv } from "wisp/src/sim/intMath";
+import { floorDiv, idiv } from "wisp/src/sim/intMath";
+import { AttackStyle, DownState, LedgeState, SpecialAction } from "./codes";
+import { isTumbling } from "./conditions";
 import type { Fighter } from "./fighter";
-import { hurtCapsule } from "./geometry/contactGeometry";
-import { METER } from "./meter";
-import { type MatchOrbs, OrbKind } from "./orbState";
+import { type Capsule, attackCapsule, capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule } from "./geometry/contactGeometry";
+import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
+import { ULTIMATE_METER_FRAMES } from "./meter";
+import type { MatchOrbs } from "./orbState";
 import { STAGE_AT_REST, mainDeckZAt, surfaceCount, surfaceLeft, surfaceMoves, surfacePass, surfaceRight, surfaceZ } from "./stage";
 import { melee } from "./tuning";
 
 const FRAMES_PER_SECOND = 60;
 
-export const ORB_INTERVAL_FRAMES = 15 * FRAMES_PER_SECOND;
-
-export const ORBS_PER_MINUTE = 4;
+export const ORB_INTERVAL_FRAMES = 30 * FRAMES_PER_SECOND;
 
 export const ORB_WARNING_FRAMES = 3 * FRAMES_PER_SECOND;
 
@@ -19,7 +20,7 @@ export const ORB_HEIGHT = melee(10.0);
 
 export const ORB_REACH = melee(10.0);
 
-export const ULTIMATE_ORB_GAIN = idiv(METER.ultimateFrames, 2);
+export const ORB_GAIN = idiv(ULTIMATE_METER_FRAMES, 2);
 
 export interface OrbPoint {
   readonly x: number;
@@ -59,10 +60,6 @@ export const orbsActive = (clock: Readonly<OrbClock>): boolean => clock.orbs.on 
 
 export const playedFrames = (clock: Readonly<OrbClock>): number => clock.matchFrame - clock.startHold;
 
-export function scheduledOrb(spawnIndex: number): OrbKind {
-  return floorMod(spawnIndex, ORBS_PER_MINUTE) === 0 ? OrbKind.ultimate : OrbKind.ex;
-}
-
 export function nextOrbIndex(played: number): number {
   return floorDiv(played, ORB_INTERVAL_FRAMES) + 1;
 }
@@ -75,24 +72,47 @@ export function orbWarningFrames(clock: Readonly<OrbClock>): number | undefined 
   return left <= ORB_WARNING_FRAMES ? left : undefined;
 }
 
-export function warnedOrb(clock: Readonly<OrbClock>): OrbKind {
-  if (clock.orbs.held !== OrbKind.none) return clock.orbs.held;
-  return orbWarningFrames(clock) === undefined ? OrbKind.none : scheduledOrb(nextOrbIndex(playedFrames(clock)));
-}
+export const orbWarned = (clock: Readonly<OrbClock>): boolean => clock.orbs.held || orbWarningFrames(clock) !== undefined;
 
 export function respawning(f: Readonly<Fighter>): boolean {
   return (f.status.out && f.status.stocks > 0) || (!f.status.out && f.status.invincible > 0);
 }
 
-export function touchesOrb(f: Readonly<Fighter>, point: OrbPoint): boolean {
-  const body = hurtCapsule(f.character);
+export function collectsOrb(f: Readonly<Fighter>): boolean {
+  const rolling = (f.dodge.groundFrame > 0 && f.dodge.groundDirection !== 0) || f.down.state === DownState.roll || f.down.state === DownState.techRoll || f.ledge.state === LedgeState.roll;
+  const dodging = f.dodge.airDodging || (f.landing.wavedash && f.landing.lag > 0);
+  return !f.status.out && f.special.action === SpecialAction.none && !dodging && !rolling && !isTumbling(f) && f.launch.hitlag <= 0 && f.launch.hitstun <= 0;
+}
+
+const orbCapsule = emptyCapsule();
+const reachCapsule = emptyCapsule();
+const strikeRegion = emptyHitRegion();
+
+function placeOrb(point: OrbPoint): Readonly<Capsule> {
   const centreZ = f32(point.z + ORB_HEIGHT);
-  const reach = f32(ORB_REACH + body.radius);
-  const dx = f32(f.motion.x - point.x);
-  if (dx > reach || dx < -reach) return false;
-  const low = f32(f.motion.z + body.z1);
-  const high = f32(f.motion.z + body.z2);
-  const nearestZ = centreZ < low ? low : centreZ > high ? high : centreZ;
-  const dz = f32(centreZ - nearestZ);
-  return f32(f32(dx * dx) + f32(dz * dz)) <= f32(reach * reach);
+  orbCapsule.x1 = point.x;
+  orbCapsule.z1 = centreZ;
+  orbCapsule.x2 = point.x;
+  orbCapsule.z2 = centreZ;
+  orbCapsule.radius = ORB_REACH;
+  return orbCapsule;
+}
+
+function strikeTouchesOrb(f: Readonly<Fighter>, orb: Readonly<Capsule>): boolean {
+  const { style } = f.attack;
+  if (style === undefined || style === AttackStyle.grab || style === AttackStyle.shot) return false;
+  for (let index = 0; index < authoredHitRegionCount(style, f.tuning.moves); index++) {
+    authoredHitRegion(strikeRegion, f.character, style, f.attack.frame, f.attack.smashChargeFrames, index, f.tuning.moves);
+    if (strikeRegion.window <= 0) continue;
+    attackCapsule(reachCapsule, style, strikeRegion);
+    placeCapsule(reachCapsule, reachCapsule, f.motion.x, f.motion.z, f.facing);
+    if (capsulesIntersect(reachCapsule, orb)) return true;
+  }
+  return false;
+}
+
+export function touchesOrb(f: Readonly<Fighter>, point: OrbPoint): boolean {
+  const orb = placeOrb(point);
+  placeCapsule(reachCapsule, hurtCapsule(f.character), f.motion.x, f.motion.z, f.facing);
+  return capsulesIntersect(reachCapsule, orb) || strikeTouchesOrb(f, orb);
 }

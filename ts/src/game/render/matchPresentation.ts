@@ -17,7 +17,7 @@ import {
 import { mainDeckZAt } from "../sim/stage";
 import { confirmedItemCues, createItemCueObservation, observeItemCues } from "../presentation/itemLook";
 import { confirmedOrbCues, createOrbCueObservation, observeOrbCues } from "../presentation/orbLook";
-import { orbPoint, warnedOrb } from "../sim/orbs";
+import { orbPoint, orbWarned } from "../sim/orbs";
 import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { coverScreen, createBackdrop, createText, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
@@ -193,7 +193,7 @@ export class MatchPresentation {
     this.itemSounds ??= createItemSounds();
     observeItemCues(this.itemObservation ??= createItemCueObservation(), game.items, game.matchFrame);
     this.orbSounds ??= createOrbSounds();
-    observeOrbCues(this.orbObservation ??= createOrbCueObservation(), game.orbs, warnedOrb(game));
+    observeOrbCues(this.orbObservation ??= createOrbCueObservation(), game.orbs, orbWarned(game));
     this.playMusic(stageMusic);
   }
 
@@ -203,7 +203,7 @@ export class MatchPresentation {
     this.itemSounds ??= createItemSounds();
     observeItemCues(this.itemObservation ??= createItemCueObservation(), game.items, game.matchFrame);
     this.orbSounds ??= createOrbSounds();
-    observeOrbCues(this.orbObservation ??= createOrbCueObservation(), game.orbs, warnedOrb(game));
+    observeOrbCues(this.orbObservation ??= createOrbCueObservation(), game.orbs, orbWarned(game));
   }
 
 
@@ -217,7 +217,7 @@ export class MatchPresentation {
       SetSoundPosition(sound, this.origin.x, this.origin.y, this.origin.z + mainDeckZAt(game.stageChoice, 0.0));
       StartSound(sound);
     }
-    const orbCues = confirmedOrbCues(this.orbObservation, game.orbs, warnedOrb(game));
+    const orbCues = confirmedOrbCues(this.orbObservation, game.orbs, orbWarned(game));
     const point = orbPoint(game.stageChoice);
     for (let index = 0; index < this.orbSounds.length; index++) {
       if ((orbCues & (1 << index)) === 0) continue;
