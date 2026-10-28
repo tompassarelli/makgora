@@ -13,7 +13,7 @@ import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { fighterAt } from "../sim/roster";
 import { advanceFighterPose, createFighterPose } from "./fighterPose";
-import { CROUCH_KEY, CROUCH_RISE_FRAMES, CROUCH_RISE_KEY, crouchClip } from "./crouchPose";
+import { CROUCH_KEY, CROUCH_RISE_FRAMES, CROUCH_RISE_KEY, crouchClip, crouchLoops } from "./crouchPose";
 import { FRAME_SECONDS } from "./frameClock";
 
 const PRESS = 31;
@@ -50,7 +50,7 @@ function heldCrouch(character: Character, jumpTick: number): readonly Frame[] {
   return frames;
 }
 
-for (const jumpTick of [0, PRESS - 4]) test(`Every fighter holding down plays the crouch once into a still held crouch while the stick shuffles in the down zone, and rises back to standing through the same clip without a pop${jumpTick > 0 ? ", also when down is held through a landing" : ""} [k1 scenario]`, () => {
+for (const jumpTick of [0, PRESS - 4]) test(`Every fighter holding down plays its crouch without a restart while the stick shuffles in the down zone, a one-shot crouch holding its last pose and rising back through the same clip, a looping crouch standing at once${jumpTick > 0 ? ", also when down is held through a landing" : ""} [k1 scenario]`, () => {
   for (const character of Object.values(Character)) {
     const probe = createFighter(character, 0.0, 1);
     const clip = crouchClip(probe);
@@ -61,6 +61,7 @@ for (const jumpTick of [0, PRESS - 4]) test(`Every fighter holding down plays th
     const start = frames.find((frame) => frame.animation === CROUCH_KEY)?.tick ?? RELEASE;
     assertEquals(start < RELEASE - 60, true, `fighter ${character}: crouches while down is held, from tick ${start}`);
     const held = frames.filter((frame) => frame.tick > start && frame.tick < RELEASE);
+    const loops = crouchLoops(probe, clip);
     const first = held[0];
     if (first === undefined) throw new Error("no held frames");
     for (let index = 0; index < held.length; index++) {
@@ -71,12 +72,17 @@ for (const jumpTick of [0, PRESS - 4]) test(`Every fighter holding down plays th
       assertEquals(frame.animation, CROUCH_KEY, `${at}: crouch key`);
       assertEquals(frame.clip, clip.index, `${at}: crouch clip`);
       assertEquals(frame.serial, first.serial, `${at}: the crouch clip never restarts`);
-      assertEquals(frame.time < clip.seconds, true, `${at}: the crouch holds before its clip end`);
       const before = held[index - 1];
+      if (loops) continue;
+      assertEquals(frame.time < clip.seconds, true, `${at}: the crouch holds before its clip end`);
       if (before !== undefined) assertEquals(frame.time >= before.time, true, `${at}: crouch time never runs back`);
     }
-    assertEquals(held[held.length - 1]?.time, f32(clip.seconds - FRAME_SECONDS), `fighter ${character}: the held crouch rests on its last pose`);
     const after = frames.filter((frame) => frame.tick >= RELEASE);
+    if (loops) {
+      assertEquals(after[0]?.animation === CROUCH_KEY || after[0]?.animation === CROUCH_RISE_KEY, false, `fighter ${character}: a looping crouch stands on release`);
+      continue;
+    }
+    assertEquals(held[held.length - 1]?.time, f32(clip.seconds - FRAME_SECONDS), `fighter ${character}: the held crouch rests on its last pose`);
     const stand = after.findIndex((frame) => frame.animation !== CROUCH_RISE_KEY);
     assertEquals(stand > 0 && stand <= CROUCH_RISE_FRAMES + 1, true, `fighter ${character}: the rise lasts ${stand} frames`);
     for (let index = 0; index < stand; index++) {
