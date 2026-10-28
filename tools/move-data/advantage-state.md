@@ -135,7 +135,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Muradin Bronzebeard | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Muradin Bronzebeard | medium | up throw | 1/1 | 1/1 in short hop, down air, out forward tilt | 1/1 in forward tilt, out dash, dash attack | 1/1 in short hop, back air, out dash, dash attack |
+| Muradin Bronzebeard | medium | up throw | 1/1 | 1/1 | 1/1 in forward tilt, out dash, dash attack | 1/1 in short hop, back air, out dash, dash attack |
 | Muradin Bronzebeard | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
