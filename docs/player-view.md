@@ -143,15 +143,19 @@ checks it explicitly because the headless frame recorder stores requested
 points without reproducing the native clipping. A fresh map creates the
 correct parents; hot reload retains the parents of existing native handles.
 
-The character and stage select backdrops have the same fullscreen parent.
-On Classic 3.0.0.24268, showing a `ConsoleUIBackdrop` child draws it over
-Warcraft's chat lines and chat entry box until the level of
-`ORIGIN_FRAME_CHAT_MSG` is set again, whatever that level is. Select shows
-its backdrop on every frame, so `layerChat`
-(smashcraft:ts/src/game/ui/chatLayer.ts) sets the chat level on every select
-frame. Pool pair 1 probes on 2026-10-28 found that chat drew over fighter
-select with the backdrop hidden, or with the level set each frame at 0 or at
-110, and did not draw with the level set once (#566).
+The character and stage select backdrops need a fullscreen parent too, but
+not `ConsoleUIBackdrop` itself. On Classic 3.0.0.24268, showing a
+`ConsoleUIBackdrop` child draws it over Warcraft's chat
+lines and chat entry box (#566). Raising `ORIGIN_FRAME_CHAT_MSG`'s level
+lifted chat back over select, but games that then ended with chat lines
+on screen crashed Warcraft with an ACCESS_VIOLATION writing address 0x31
+(#681): on pool pair 1 on 2026-10-28, typing a chat line at fighter select
+and starting the next game crashed both clients 2 times in 2, and the same
+build without the level change ran 5 such game ends clean. The backdrops
+are therefore children of `ConsoleUIBackdrop`'s parent (`screenLayer`,
+smashcraft:ts/src/game/ui/frames.ts): chat draws over them, they cover the
+screen as before, and the map never changes the chat frame
+(smashcraft:ts/test/engineFrames.test.ts).
 
 ## Below the deck
 

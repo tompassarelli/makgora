@@ -1,4 +1,4 @@
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { DELAY_CONTROLS, RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
@@ -55,7 +55,7 @@ import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
 import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
-import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, screenLayer, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, createCard, menuFocusList, presentCardChip, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules } from "./selectionRules";
@@ -195,7 +195,7 @@ export class SelectionPanel {
     this.clicks = new ButtonClicks(`ui.selection.${suffix}.click`, (button, clicker) => this.click(button, clicker), button => this.highlight(button));
     const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
     this.root = root;
-    this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, consoleUi(), 400 + participantId);
+    this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, screenLayer(), 400 + participantId);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
     const grid = this.roster.grid;

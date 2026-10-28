@@ -2,7 +2,7 @@
 
 
 
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { stageInPool, stagePoolCount } from "../menu/stagePool";
 import { f32 } from "wisp/src/sim/f32";
@@ -13,7 +13,7 @@ import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
 import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
-import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, screenLayer, setFrameText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { StageCard } from "./stageCard";
 import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
@@ -94,7 +94,7 @@ export class StagePanel {
       this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
     const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
-    this.backdrop = createBackdrop("MeleeStageBackdrop", consoleUi(), 800);
+    this.backdrop = createBackdrop("MeleeStageBackdrop", screenLayer(), 800);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
     stageText(root, "MeleeStageTitle", f32(0.055), f32(0.558), f32(0.2), f32(0.032), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);

@@ -1,5 +1,4 @@
 import { presentDrawnBody } from "./fighterDrawView";
-import { layerChat } from "../../game/ui/chatLayer";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
 import { writeLines } from "wisp/src/platform/fileio";
 import { computerActive } from "../../game/lobby/lobbyState";
@@ -649,5 +648,4 @@ export function renderUi(s: ShellState): void {
     }
   }
   ui.stage.update(game);
-  layerChat(s.frames, selecting);
 }

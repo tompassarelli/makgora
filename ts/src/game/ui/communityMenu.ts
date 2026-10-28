@@ -1,4 +1,4 @@
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
 import { COMMUNITY_TITLE, communityBody } from "./community";
 import { PANEL_TEXTURE } from "./hudLayout";

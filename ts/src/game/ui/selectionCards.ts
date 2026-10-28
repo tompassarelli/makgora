@@ -1,4 +1,4 @@
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import type { CpuDefaults } from "./selectionCpuSettings";
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { cpuSettingsBox, teamSettingsBox } from "./ruleButtons";

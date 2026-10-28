@@ -3,7 +3,7 @@
 
 
 
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
 import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { type MatchState, humanCount } from "../lobby/lobbyState";

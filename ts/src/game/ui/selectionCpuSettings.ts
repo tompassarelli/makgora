@@ -1,4 +1,4 @@
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import { type MatchState, canChooseComputer } from "../lobby/lobbyState";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";

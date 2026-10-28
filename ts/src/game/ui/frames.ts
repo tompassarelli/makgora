@@ -19,6 +19,11 @@ export function consoleUi(): framehandle {
   return BlzGetFrameByName("ConsoleUIBackdrop", 0);
 }
 
+// Engine: a ConsoleUIBackdrop child draws over chat, and raising the chat frame's level instead crashes Warcraft when the game ends.
+export function screenLayer(): framehandle {
+  return BlzFrameGetParent(consoleUi());
+}
+
 export function createBackdrop(name: string, owner: framehandle, context: number): framehandle {
   return BlzCreateFrameByType("BACKDROP", name, owner, "", context);
 }

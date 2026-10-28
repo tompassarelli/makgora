@@ -1,4 +1,4 @@
-import { SELECT_LEVELS } from "./chatLayer";
+import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
 import { CREDITS_TITLE, creditsBody } from "./credits";
 import { PANEL_TEXTURE } from "./hudLayout";
