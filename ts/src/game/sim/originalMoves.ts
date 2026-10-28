@@ -5,7 +5,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction, HitElement } from "./codes";
 import { downSmashHit } from "./downMoveValues";
-import { type FighterMoves, type MoveRegion, heroMove, heroRegion, strongRegion } from "./heroMoves";
+import { HERO_REFERENCE_HEIGHT, type FighterMoves, type MoveRegion, heroHurtPose, heroMove, heroRegion, strongRegion } from "./heroMoves";
 import { hurtCapsule } from "./geometry/contactGeometry";
 import { RIFLEMAN_GROUND, type GroundKit, groundHit, splitsMove } from "./heroes/groundNormals";
 import { DEMON_HUNTER_HURTBOXES, type HurtPose, hurtPart, hurtPose, shippedHurtboxes } from "./hurtboxes";
@@ -67,8 +67,33 @@ function roundhouseHurtPoses(): readonly HurtPose[] {
   ];
 }
 
+type DownAirEffect = MoveRegion["hit"]["effect"];
+const FALCO_BODY_MELEE_HEIGHT = 22.0;
+const FALCO_DOWN_AIR_RADIUS_MELEE = f32(5.9878978729);
+export const DOWN_AIR_FIRST_ACTIVE = 5;
+export const DOWN_AIR_CLEAN_LAST = 14;
+export const DOWN_AIR_LAST_ACTIVE = 24;
+export const DOWN_AIR_TOTAL_FRAMES = 49;
+export const DOWN_AIR_LANDING_LAG = 9;
+export const DOWN_AIR_AUTO_CANCEL = { before: 5, from: 29 } as const;
+const DOWN_AIR_RADIUS = f32(HERO_REFERENCE_HEIGHT * f32(FALCO_DOWN_AIR_RADIUS_MELEE / FALCO_BODY_MELEE_HEIGHT));
+const DOWN_AIR_LEGS = { x1: 10.0, z1: 72.0, x2: 45.0, z2: 20.0, radius: DOWN_AIR_RADIUS };
+const SPIKE_X = f32(0.3420201433256687);
+const SPIKE_Z = f32(-0.9396926207859084);
+export const DOWN_AIR_CLEAN: DownAirEffect = { damage: 12.0, growth: 100.0, base: 10.0, launchX: SPIKE_X, launchZ: SPIKE_Z, electric: false, element: HitElement.normal, strong: true };
+export const DOWN_AIR_LATE: DownAirEffect = { damage: 9.0, growth: 100.0, base: 20.0, launchX: SPIKE_X, launchZ: SPIKE_Z, electric: false, element: HitElement.normal };
+const DOWN_AIR_RECOVERY = DOWN_AIR_TOTAL_FRAMES - (DOWN_AIR_FIRST_ACTIVE - 1) - (DOWN_AIR_LAST_ACTIVE - DOWN_AIR_FIRST_ACTIVE + 1);
+const DOWN_AIR_HURT_PARTS = DEMON_HUNTER_HURTBOXES.attacks[AttackStyle.downAir]?.[0]?.parts ?? [];
+
 export const ILLIDAN_MOVES: FighterMoves = {
   normals: {
+    [AttackStyle.downAir]: {
+      ...heroMove(DOWN_AIR_FIRST_ACTIVE, DOWN_AIR_LAST_ACTIVE - DOWN_AIR_FIRST_ACTIVE + 1, DOWN_AIR_RECOVERY, DOWN_AIR_LANDING_LAG, [
+        heroRegion(DOWN_AIR_FIRST_ACTIVE, DOWN_AIR_CLEAN_LAST, DOWN_AIR_LEGS, DOWN_AIR_CLEAN),
+        heroRegion(DOWN_AIR_CLEAN_LAST + 1, DOWN_AIR_LAST_ACTIVE, DOWN_AIR_LEGS, DOWN_AIR_LATE),
+      ]),
+      autoCancel: DOWN_AIR_AUTO_CANCEL,
+    },
     [AttackStyle.forwardSmash]: { ...heroMove(ROUNDHOUSE_FIRST_ACTIVE, ROUNDHOUSE_LEG.length, ROUNDHOUSE_RECOVERY, 0, roundhouseRegions(), ROUNDHOUSE_STEP, true), travelStopsAtLedge: true },
     [AttackStyle.downSmash]: splitsMove({
       firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 12.0, reach: 92.0, height: 12.0, radius: 13.0,
@@ -77,7 +102,14 @@ export const ILLIDAN_MOVES: FighterMoves = {
   },
   throws: {},
   dashAttack: AttackStyle.demonHunterDashAttack,
-  hurtboxes: { ...DEMON_HUNTER_HURTBOXES, attacks: { ...DEMON_HUNTER_HURTBOXES.attacks, [AttackStyle.forwardSmash]: roundhouseHurtPoses() } },
+  hurtboxes: {
+    ...DEMON_HUNTER_HURTBOXES,
+    attacks: {
+      ...DEMON_HUNTER_HURTBOXES.attacks,
+      [AttackStyle.forwardSmash]: roundhouseHurtPoses(),
+      [AttackStyle.downAir]: [heroHurtPose(DOWN_AIR_FIRST_ACTIVE - 2, DOWN_AIR_LAST_ACTIVE + 3, DOWN_AIR_HURT_PARTS)],
+    },
+  },
 };
 
 export function originalFighterMoves(character: Character): FighterMoves | undefined {

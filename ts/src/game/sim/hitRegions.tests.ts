@@ -10,9 +10,10 @@ import { AttackStyle, Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { type Capsule, hurtCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
-import { attackActiveFrames, attackStartupFrames } from "./moves";
+import { attackStartupFrames, characterAttackActiveFrames } from "./moves";
 import { setWorldMotionValue } from "./motion";
 import { fighterAt } from "./roster";
+import { authoredTuning } from "./tuning";
 import { beginAttack } from "./transitions";
 
 const TAN_25_DEGREES = f32(0.466307658);
@@ -29,30 +30,36 @@ function airborne(fighter: Fighter, z: number): void {
   setWorldMotionValue(fighter.motion.meleeVelocityZ, fighter.motion.vz);
 }
 
-test("Illidan's down air strikes once along his legs tilted about 30 degrees off vertical, feet leading down and toward his facing, for either facing [k3 measure #512]", () => {
+test("Illidan's down air strikes once a frame along his legs tilted about 30 degrees off vertical, feet leading down and toward his facing, for either facing [k3 measure #512]", () => {
   const body = hurtCapsule(Character.demonHunter);
   const lowQuarter = f32(f32(body.z1 + body.z2) * 0.25);
-  const startup = attackStartupFrames(AttackStyle.downAir);
+  const moves = authoredTuning(Character.demonHunter).moves;
+  const startup = attackStartupFrames(AttackStyle.downAir, moves);
+  const active = characterAttackActiveFrames(Character.demonHunter, AttackStyle.downAir, moves);
   const region = emptyHitRegion();
   const placed: Capsule = { x1: 0.0, z1: 0.0, x2: 0.0, z2: 0.0, radius: 0.0 };
-  assertEquals(authoredHitRegionCount(AttackStyle.downAir), 1);
+  assertEquals(authoredHitRegionCount(AttackStyle.downAir, moves), 2);
   for (const facing of [1, -1]) {
-    for (let frame = startup; frame < startup + attackActiveFrames(AttackStyle.downAir); frame++) {
-      authoredHitRegion(region, Character.demonHunter, AttackStyle.downAir, frame, 0, 0);
-      assertEquals(region.window, 1);
-      assertTrue(region.strike !== undefined);
-      if (region.strike === undefined) return;
-      placeCapsule(placed, region.strike, ORIGIN_X, ORIGIN_Z, facing);
-      const feetFirst = placed.z2 < placed.z1;
-      const footX = feetFirst ? placed.x2 : placed.x1;
-      const footZ = feetFirst ? placed.z2 : placed.z1;
-      const hipX = feetFirst ? placed.x1 : placed.x2;
-      const hipZ = feetFirst ? placed.z1 : placed.z2;
-      const forward = f32(f32(footX - hipX) * facing);
-      const down = f32(hipZ - footZ);
-      assertTrue(down > 0.0 && forward > 0.0);
-      assertTrue(forward >= f32(down * TAN_25_DEGREES) && forward <= f32(down * TAN_40_DEGREES));
-      assertLessThan(f32(footZ - ORIGIN_Z), lowQuarter);
+    for (let frame = startup; frame < startup + active; frame++) {
+      let striking = 0;
+      for (let index = 0; index < authoredHitRegionCount(AttackStyle.downAir, moves); index++) {
+        authoredHitRegion(region, Character.demonHunter, AttackStyle.downAir, frame, 0, index, moves);
+        if (region.strike === undefined) continue;
+        striking++;
+        assertEquals(region.window, 1);
+        placeCapsule(placed, region.strike, ORIGIN_X, ORIGIN_Z, facing);
+        const feetFirst = placed.z2 < placed.z1;
+        const footX = feetFirst ? placed.x2 : placed.x1;
+        const footZ = feetFirst ? placed.z2 : placed.z1;
+        const hipX = feetFirst ? placed.x1 : placed.x2;
+        const hipZ = feetFirst ? placed.z1 : placed.z2;
+        const forward = f32(f32(footX - hipX) * facing);
+        const down = f32(hipZ - footZ);
+        assertTrue(down > 0.0 && forward > 0.0);
+        assertTrue(forward >= f32(down * TAN_25_DEGREES) && forward <= f32(down * TAN_40_DEGREES));
+        assertLessThan(f32(footZ - ORIGIN_Z), lowQuarter);
+      }
+      assertEquals(striking, 1);
     }
   }
 });
@@ -88,6 +95,6 @@ test("Illidan's down air lands a single spiking hit on a foe at his feet [k3 mea
     }
   }
   assertEquals(hits, 1);
-  assertEquals(damage, 9.0);
+  assertEquals(damage, 12.0);
   assertLessThan(launchZ, 0.0);
 });
