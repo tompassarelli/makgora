@@ -45,7 +45,9 @@ registeredTests.forEach(({ name }, index) => {
 
 
 const sweeps = os.getenv("SWEEPS") === "1";
-const mine = registeredTests.filter(({ name }) => selectSweep(name, sweeps, os.getenv("SWEEP_PLACEMENT"))
+const named = new Set(readText(os.getenv("LUA_TEST_NAMES")).split("\n").filter((name) => name !== ""));
+const mine = registeredTests.filter(({ name }) => named.size > 0 ? named.has(name)
+  : selectSweep(name, sweeps, os.getenv("SWEEP_PLACEMENT"))
   && (shardSpec === undefined || (planned.get(name) ?? hashShard(name)) === shard));
 // Counts are deterministic for one runtime and test order, unlike CPU seconds (#394).
 const HOOK_STEP = 1000;

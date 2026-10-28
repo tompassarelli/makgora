@@ -28,6 +28,7 @@ import { LUA_TEST_CEILING_INSTRUCTIONS, LUA_TEST_CEILING_S, addLuaCost, judgeLua
 import { bundleConfig } from "./wisp/bundleConfigs";
 import { stockLua } from "./wisp/luaRuntimes";
 import { refuseUntagged } from "./oracleTags";
+import { luaTestIndex } from "./luaTestIndex";
 
 const processCode = (command: string, args: readonly string[], env?: Record<string, string | undefined>) => Effect.scoped(Effect.gen(function*() {
   const child = yield* ChildProcess.make(command, args, { stdout: "inherit", stderr: "inherit", ...(env === undefined ? {} : { env }) });
@@ -92,16 +93,7 @@ const loaded = modules;
 refuseUntagged(".", loaded);
 await runAdmitted("moderate", "smashcraft:lua-tests", 1800);
 const lua = await Effect.runPromise(stockLua);
-await Bun.write("test/lua/index.ts", [
-  'import { registeredTests } from "wisp/src/runtime/testing";',
-  "export const testModules: [number, string][] = [];",
-
-  "const mark = (module: string): void => {",
-  "  testModules.push([registeredTests.length, module]);",
-  "};",
-  ...loaded.map((module) => `mark("${module}");\nrequire("../../${module.replace(/\.ts$/, "")}");`),
-  "",
-].join("\n"));
+await Bun.write("test/lua/index.ts", luaTestIndex(loaded));
 const steps = only === "compile" ? [compile("tsconfig.lua-tests.json")]
   : only === "stack" ? [compile(bundleConfig("lua-stack")), run("build/lua-stack/stack.lua")]
   : [

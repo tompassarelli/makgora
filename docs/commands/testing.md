@@ -76,6 +76,16 @@
   title that breaks this (smashcraft:ts/scripts/oracleTags.ts), so titles stay
   literal text (#243).
 
+- Mutant kills: make each mutant in the lane, save it with `mutant record ID`,
+  revert, and name it in a `Test-kind: TITLE KIND kills ID` trailer; do not
+  run tests per mutant yourself. `safe-push` hands every claim to
+  `ts/scripts/mutantTests.ts` (`.safe-push` `mutant.run`) under one capacity
+  lease: it compiles the change to Lua once, re-emits only each mutant's
+  changed files (every file when a changed file's exports change), runs just
+  the named tests in 32-bit Lua, and refuses a claim unless its test passes on
+  the change and fails on its mutant. A verified kill is cached by the lane's
+  patch-id, so a rebase does not rerun it.
+
 - Literal copies: an expectation reads a tunable constant instead of
   restating its value, so retuning it breaks no unrelated test (#394).
   `bun run literal-copies` lists every `assertEquals` whose expected literal

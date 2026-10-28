@@ -3,3 +3,6 @@
 	queue = autoland
 [ci]
 	budget = farm-test.yml 600
+[mutant]
+	run = cd ts && bun scripts/mutantTests.ts
+	link = ts/node_modules
