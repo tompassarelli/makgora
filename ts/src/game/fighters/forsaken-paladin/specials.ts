@@ -87,8 +87,8 @@ const CONSECRATION: AuthoredSpecial = {
 };
 
 export const FORSAKEN_PALADIN_AUTHORING_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Cleansing Sword", description: "Strike upward with the sword; its holy impact cleanses your poison and movement slow.", ground: cleansingSword(undefined), air: cleansingSword(18) }, { damage: 1.25 }),
-  side: withExKit({ name: "Righteous Fury", description: "Charge sword-first. A body hit briefly slows movement; a blocked charge leaves you exposed.", ground: RIGHTEOUS_FURY, air: RIGHTEOUS_FURY_AIR }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Cleansing Sword", description: "Strike upward with the sword; its holy impact cleanses your poison and movement slow.", ground: cleansingSword(undefined), air: cleansingSword(18) }, { shieldSafe: true }),
+  side: withExKit({ name: "Righteous Fury", description: "Charge sword-first. A body hit briefly slows movement; a blocked charge leaves you exposed.", ground: RIGHTEOUS_FURY, air: RIGHTEOUS_FURY_AIR }, { shieldSafe: true }),
   up: withExKit({ name: "Ascension", description: "A rising sword strike you steer, then a helpless fall.", ground: ascension(f32(2.9)) }, { travel: 1.25 }),
   down: withExKit({ name: "Consecration", description: "Plant the sword to bless a small patch of ground. It pulses beneath grounded foes; jumping clears it.", ground: CONSECRATION, air: { ...CONSECRATION, groundOnly: false, landingLag: 20,
     projectiles: CONSECRATION.projectiles?.map(shot => ({ model: shot.model, modelRadius: shot.modelRadius,

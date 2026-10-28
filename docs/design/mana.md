@@ -164,25 +164,25 @@ Rows marked *next batch* keep their old EX until their batch lands.
 | Warden | Blink | Travel | Pass | Unchanged |
 | Warden | Fan of Knives | +25% damage | Fail: damage | Reach |
 | Lich | Frost Nova | Reach | Pass | Unchanged |
-| Lich | Death and Decay | +25% damage | Fail: damage | *next batch* |
+| Lich | Death and Decay | +25% damage | Fail: damage | Reach: the clouds are 25% larger |
 | Lich | Spectral Ascent | Travel | Pass | Unchanged |
 | Lich | Frost Armor | Armor holds a 25% heavier hit; Dark Ritual 4 invulnerable entry frames | Fail: two, armor | Armor holds a 25% heavier hit (armor is the move); invulnerable entry removed |
-| Forsaken Paladin | Cleansing Sword | +25% damage | Fail: damage | *next batch* |
-| Forsaken Paladin | Righteous Fury | +25% damage | Fail: damage | *next batch* |
+| Forsaken Paladin | Cleansing Sword | +25% damage | Fail: damage | Shield-safe |
+| Forsaken Paladin | Righteous Fury | +25% damage | Fail: damage | Shield-safe |
 | Forsaken Paladin | Ascension | Travel | Pass | Unchanged |
 | Forsaken Paladin | Consecration | Reach | Pass | Unchanged |
 | Dreadlord | Carrion Swarm | Reach | Pass | Unchanged |
-| Dreadlord | Vampiric Pounce | +25% bite damage | Fail: damage | *next batch* |
+| Dreadlord | Vampiric Pounce | +25% bite damage | Fail: damage | Travel: the pounce carries 25% farther; same bite and heal cap |
 | Dreadlord | Bat Ascension | Travel | Pass | Unchanged |
 | Dreadlord | Sleep | Reach | Pass | Unchanged |
-| Shadow Hunter | Spirit Glaive | +25% damage | Fail: damage | *next batch* |
-| Shadow Hunter | Serpent Ward | +25% shot damage; recall 4 invulnerable frames | Fail: damage, two, armor | Invulnerable recall removed; *next batch* |
+| Shadow Hunter | Spirit Glaive | +25% damage | Fail: damage | Reach: a 25% larger glaive both ways |
+| Shadow Hunter | Serpent Ward | +25% shot damage; recall 4 invulnerable frames | Fail: damage, two, armor | x1.25 ward durability; invulnerable recall removed |
 | Shadow Hunter | Loa Vault | Travel | Pass | Unchanged |
 | Shadow Hunter | Hex | Reach | Pass | Unchanged |
 | Pit Lord | Howl of Terror | Reach | Pass | Unchanged |
-| Pit Lord | Ruin Charge | +25% damage | Fail: damage | *next batch* |
+| Pit Lord | Ruin Charge | +25% damage | Fail: damage | Shield-safe |
 | Pit Lord | Abyssal Leap | Travel | Pass | Unchanged |
-| Pit Lord | Rain of Fire | +25% damage | Fail: damage | *next batch* |
+| Pit Lord | Rain of Fire | +25% damage | Fail: damage | Reach: 25% larger fireballs |
 | Beastmaster | Wild Axes | +25% damage | Fail: damage | *next batch* |
 | Beastmaster | Summon Bear | +25% durability and damage | Fail: two | *next batch* |
 | Beastmaster | Summon Hawk | Travel, +25% durability, dive 4 invulnerable frames | Fail: two, armor | Invulnerable dive removed; *next batch* |
