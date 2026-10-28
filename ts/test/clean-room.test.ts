@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { creditsSection } from "../src/game/ui/credits";
+import { DISCORD_INVITE, GITHUB_PAGE, discordInviteLine } from "../src/game/ui/community";
 import { reachProblems } from "../scripts/cleanRoom";
 
 const refused = (text: string, path = "ts/src/game/sim/example.ts") => reachProblems([{ path, line: 1, text }]).length > 0;
@@ -54,3 +55,11 @@ test("the Hive post's Credits section is the in-game credits list, so the two ca
   const end = post.indexOf("\n## ", start + 1);
   expect(post.slice(start, end).trimEnd()).toBe(creditsSection());
 });
+
+test("the Hive post holds the Community panel's Discord invite line and GitHub page from the shared source, so they cannot drift [k2 property]", () => {
+  const post = readFileSync(join(import.meta.dir, "../../docs/hive-post.md"), "utf8");
+  expect(post).toContain(discordInviteLine());
+  expect(post).toContain(`https://${GITHUB_PAGE}`);
+  expect(post).toContain(`https://${DISCORD_INVITE}`);
+});
+

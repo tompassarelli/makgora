@@ -1,7 +1,9 @@
+import { GITHUB_PAGE, communityUrl } from "./community";
+
 export const CREDITS_TITLE = "Credits";
 
 export const CREDITS_MARKDOWN: readonly string[] = [
-  "Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License).",
+  `Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](${communityUrl(GITHUB_PAGE)}) (MIT License).`,
   "The Lich King model by [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/)).",
   "The menu cursors, wordmark and stage-select art are Smashcraft originals; the pinching-hand cursor was made with AI assistance.",
   "Music: Before the First Strike by Tom Passarelli, made with Google Lyria.",
@@ -31,17 +33,3 @@ export function creditsBody(version: string): string {
 }
 
 export const creditsSection = (): string => ["## Credits", ...CREDITS_MARKDOWN.map(line => `- ${line}`)].join("\n");
-
-export class CreditsPanelState {
-  isOpen = false;
-
-  open(): void {
-    this.isOpen = true;
-  }
-
-  close(): boolean {
-    const was = this.isOpen;
-    this.isOpen = false;
-    return was;
-  }
-}

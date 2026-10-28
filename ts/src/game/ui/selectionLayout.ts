@@ -6,13 +6,15 @@ export const HEADER_BUTTON_HEIGHT = f32(0.023);
 
 export const START_BUTTON = { x: f32(0.055), y: HEADER_BUTTON_TOP, width: f32(0.2), height: HEADER_BUTTON_HEIGHT } as const;
 
-export const MOVES_BOX = { x: f32(0.445), y: HEADER_BUTTON_TOP, width: f32(0.12), height: HEADER_BUTTON_HEIGHT } as const;
+export const MOVES_BOX = { x: f32(0.384), y: HEADER_BUTTON_TOP, width: f32(0.09), height: HEADER_BUTTON_HEIGHT } as const;
 
-export const SETTINGS_BOX = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
+export const SETTINGS_BOX = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.115), height: HEADER_BUTTON_HEIGHT } as const;
 
-export const TUTORIAL_BOX = { x: f32(0.575), y: HEADER_BUTTON_TOP, width: f32(0.12), height: HEADER_BUTTON_HEIGHT } as const;
+export const TUTORIAL_BOX = { x: f32(0.478), y: HEADER_BUTTON_TOP, width: f32(0.1), height: HEADER_BUTTON_HEIGHT } as const;
 
-export const CREDITS_BOX = { x: f32(0.705), y: HEADER_BUTTON_TOP, width: f32(0.12), height: HEADER_BUTTON_HEIGHT } as const;
+export const CREDITS_BOX = { x: f32(0.582), y: HEADER_BUTTON_TOP, width: f32(0.1), height: HEADER_BUTTON_HEIGHT } as const;
+
+export const COMMUNITY_BOX = { x: f32(0.686), y: HEADER_BUTTON_TOP, width: f32(0.1), height: HEADER_BUTTON_HEIGHT } as const;
 
 export const boxContains = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }, x: number, y: number): boolean =>
   x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);

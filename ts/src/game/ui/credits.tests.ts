@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
-import { CREDITS_MARKDOWN, CreditsPanelState, creditsBody, creditsVersionLine } from "./credits";
+import { CREDITS_MARKDOWN, creditsBody, creditsVersionLine } from "./credits";
+import { InfoPanelState } from "./infoPanelState";
 import { CREDITS_BOX, TUTORIAL_BOX, boxContains } from "./selectionLayout";
 
 test("The Credits button sits directly right of Tutorial at its size and on its row, and hits only its own box [k2 property]", () => {
@@ -15,7 +16,7 @@ test("The Credits button sits directly right of Tutorial at its size and on its 
 });
 
 test("Opening the credits panel shows the creator line, an imported-asset credit and the version, and Close or Escape closes it [k2 property]", () => {
-  const panel = new CreditsPanelState();
+  const panel = new InfoPanelState();
   assertFalse(panel.isOpen);
   assertFalse(panel.close());
   panel.open();

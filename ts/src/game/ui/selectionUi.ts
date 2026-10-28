@@ -53,6 +53,7 @@ import { type LoreClears, loreClears } from "../classic/loreClears";
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
+import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
@@ -172,6 +173,7 @@ export class SelectionPanel {
   private readonly menuPrompt = createMenuPrompt();
   private readonly tutorial: TutorialMenuFrames;
   readonly credits: CreditsMenu;
+  readonly community: CommunityMenu;
 
   private tutorialOpen = false;
   private tutorialOffered = false;
@@ -280,6 +282,9 @@ export class SelectionPanel {
     this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target) => this.clicks.add(frame, target,
       target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native"));
     this.credits = new CreditsMenu(gameUi(), root, suffix, version, participantId);
+    this.community = new CommunityMenu(gameUi(), root, suffix, participantId);
+    this.credits.onOpen = () => this.community.close();
+    this.community.onOpen = () => this.credits.close();
     this.rules = createClassicRules(root, suffix, ruleClick, matchRules);
     this.help = createBackdrop(`MeleeRuleHelp${suffix}`, root, 0);
     BlzFrameSetTexture(this.help, PANEL_TEXTURE, 0, true);
@@ -308,6 +313,7 @@ export class SelectionPanel {
     bindPrototype(this.clicks, ButtonClicks.prototype);
     this.clicks.bindHandler((button, clicker) => this.click(button, clicker), button => this.highlight(button));
     this.credits.bindActions();
+    this.community.bindActions();
     const suffix = I2S(this.participantId);
     bindSyncHandler(`ui.selection.${suffix}.drop`, (_, data) => this.acceptDrop(data));
     bindSyncHandler(`ui.selection.${suffix}.cpuDrop`, (_, data) => this.acceptCpuDrop(data));
@@ -322,6 +328,7 @@ export class SelectionPanel {
     BlzDestroyFrame(this.modeLabel);
     BlzDestroyFrame(this.tutorial.root);
     this.credits.destroy();
+    this.community.destroy();
     BlzDestroyFrame(this.hand);
     if (this.cpu.root !== undefined) BlzDestroyFrame(this.cpu.root);
     BlzDestroyFrame(this.root);
@@ -602,6 +609,7 @@ export class SelectionPanel {
     }
     BlzFrameSetVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
     this.credits.show(visible);
+    this.community.show(visible);
     BlzFrameSetVisible(this.tutorial.open, tutorialAvailable(game));
     BlzFrameSetVisible(this.cpu.root, cpuOpen);
     BlzFrameSetVisible(this.root, visible);
