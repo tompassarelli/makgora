@@ -11,7 +11,7 @@ export const CHEN_CLIPS = { idle: CHEN_FALLBACK_CLIP, walk: {index: 0, seconds: 
   forwardTilt: { index: 14, seconds: f32(0.533), aligned: true },
   forwardTiltUp: { index: 15, seconds: f32(0.533), aligned: true },
   forwardTiltDown: { index: 16, seconds: f32(0.533), aligned: true },
-  upTilt: { index: 17, seconds: 0.5, aligned: true },
+  upTilt: { index: 17, seconds: f32(0.433), aligned: true },
   downTilt: { index: 18, seconds: f32(0.483), aligned: true },
   dashAttack: { index: 19, seconds: f32(0.683), aligned: true },
   forwardSmash: { index: 20, seconds: f32(0.933), aligned: true },

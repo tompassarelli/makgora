@@ -11,7 +11,7 @@ import { CHEN_MOVES } from "../../ts/src/game/fighters/chen/moves";
 import { CHEN_SPECIALS } from "../../ts/src/game/fighters/chen/specials";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { seconds } from "./asset-info";
-import { AERIAL_BEATS, type Beat, type Gesture } from "./chen-aerial-beats";
+import { CHEN_BEATS, type Beat, type Gesture } from "./chen-beats";
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 import type { Character } from "../../ts/src/game/sim/codes";
 
@@ -22,13 +22,14 @@ const painOnly = process.argv.includes("pain");
 const specialsOnly = process.argv.includes("specials");
 const aerialsOnly = process.argv.includes("aerials");
 const parasolOnly = process.argv.includes("parasol");
-const inPlace = painOnly || specialsOnly || aerialsOnly || parasolOnly;
+const upTiltOnly = process.argv.includes("upTilt");
+const inPlace = painOnly || specialsOnly || aerialsOnly || parasolOnly || upTiltOnly;
 const SPECIAL_POSES: ReadonlySet<string> = new Set(["neutralSpecial", "sideSpecial", "downSpecial", "downSpecialFollowUp", "sideSpecialFollowUp"].flatMap(pose => [pose, `${pose}Air`]));
 const AERIAL_POSES: ReadonlySet<string> = new Set(["neutralAir", "forwardAir", "upAir", "downAir"]);
-const rework = specialsOnly ? SPECIAL_POSES : aerialsOnly ? AERIAL_POSES : parasolOnly ? new Set(["specialFloat"]) : undefined;
+const rework = specialsOnly ? SPECIAL_POSES : aerialsOnly ? AERIAL_POSES : parasolOnly ? new Set(["specialFloat"]) : upTiltOnly ? new Set(["upTilt"]) : undefined;
 const project = resolve(import.meta.dir, "../..");
 function ensure(ok: unknown, why: string): asserts ok { if (!ok) throw new Error(why); }
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/chen-clips.ts STOCK_CHEN.mdx|SHIPPED_CHEN.mdx PRIVATE_OUTPUT [pain|specials|aerials|parasol]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/chen-clips.ts STOCK_CHEN.mdx|SHIPPED_CHEN.mdx PRIVATE_OUTPUT [pain|specials|aerials|parasol|upTilt]");
 const source = parseMDX(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure((inPlace ? source.Sequences.some(s => s.Name === "Chen Damage 0 0") : source.Sequences.length === 11) && source.Helpers.some(n => n.Name === "Bone Rope"), "Expected original classic Pandaren Brewmaster");
 const stand = source.Sequences[9]!;
@@ -62,7 +63,7 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
   ["forwardTilt", AttackStyle.forwardTilt, thrust],
   ["forwardTiltUp", AttackStyle.forwardTiltUp, {...thrust, staff: -115, chest: -8}],
   ["forwardTiltDown", AttackStyle.forwardTiltDown, {...low, staff: -95}],
-  ["upTilt", AttackStyle.upTilt, {...overhead, staff: -25, palm: -165, elbow: 60}],
+  ["upTilt", AttackStyle.upTilt, overhead],
   ["downTilt", AttackStyle.downTilt, {...kick, chest: 35, front: -85, knee: 5, back: -45, backKnee: 65}],
   ["dashAttack", AttackStyle.dashAttack, {...belly, lean: 35, chest: -40}],
   ["forwardSmash", AttackStyle.forwardSmash, {...thrust, chest: 38, staff: -115, wrist: 65, waist: 35, palm: -120}],
@@ -77,7 +78,7 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
 ];
 for (const [pose, style, gesture] of normals) {
   const move = CHEN_MOVES.normals[style]; ensure(move, `${pose}: missing move timing`);
-  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, active: move.activeFrames, gesture, air: pose.endsWith("Air"), keys: AERIAL_BEATS[pose],
+  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, active: move.activeFrames, gesture, air: pose.endsWith("Air"), keys: CHEN_BEATS[pose],
     ...(pose === "downSmash" ? {rear: {...low, staff: 80, palm: 65, waist: -55}, active: 6} : {}) });
 }
 const extra: readonly [HeroPose, number, number, Gesture][] = [
@@ -200,7 +201,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
   }
   const frameSet = action.keys ? [0, ...action.keys.map(beat => beat.at), action.frames] : action.hold ? [0, action.frames] : [0, Math.max(1, action.contact - 3), action.contact,
     Math.min(action.frames - 1, action.contact + (action.active ?? 4) - 1), action.frames];
-  const shortNormal=["jab","jab2","jab3","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack"].includes(action.pose);
+  const shortNormal=!action.keys&&["jab","jab2","jab3","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack"].includes(action.pose);
   if(shortNormal)frameSet.push(action.contact+(action.active??4));
   if (action.rear) frameSet.push(action.contact + 3);
   if (action.spin || action.roll) for (let f = 0; f < action.frames; f += 2) frameSet.push(f);
@@ -233,18 +234,18 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
 
 
   const staffTargets: Partial<Record<HeroPose, readonly [number, number]>> = {
-    jab: [-30,160], jab2: [112,58], jab3: [-30,160], upTilt: [-30,160], downTilt: [-30,160], dashAttack: [-30,160],
+    jab: [-30,160], jab2: [112,58], jab3: [-30,160], downTilt: [-30,160], dashAttack: [-30,160],
     forwardTilt: [180,65], forwardTiltUp: [170,98], forwardTiltDown: [175,28],
     forwardSmash: [125,62], upAir: [15,160], downSmash: [115,26],
     getUpAttack: [105,40], ledgeAttack: [110,70],
   };
   const handTargets: Partial<Record<HeroPose, readonly [number, number]>> = {
-    jab: [85,80], jab3: [90,65], dashAttack: [95,75], upTilt: [25,185], specialFloat: [10,175], grab: [62,72], grabHold: [62,72],
+    jab: [85,80], jab3: [90,65], dashAttack: [95,75], specialFloat: [10,175], grab: [62,72], grabHold: [62,72],
     throwForward: [65,80], throwBack: [-70,85], throwUp: [15,140], throwDown: [65,35],
     neutralSpecial: [40,65], neutralSpecialAir: [40,65],
     downSpecialFollowUp: [70,75], downSpecialFollowUpAir: [70,75],
   };
-  const shortHand = !action.keys && ["jab", "jab3", "upTilt", "dashAttack"].includes(action.pose);
+  const shortHand = !action.keys && ["jab", "jab3", "dashAttack"].includes(action.pose);
   if (shortHand) {
     const arm=model.Helpers.find(n=>n.Name==="Bone_Arm1_R");ensure(arm,"Chen keg arm missing");
     if (!arm.Scaling) arm.Scaling={LineType:mdx.LineType.Linear,GlobalSeqId: NO_GLOBAL_SEQ,
@@ -252,7 +253,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
     for(const frame of phaseFrames){
       const activeEnd=action.contact+(action.active??4)-1;
       const amount=frame===0||frame===action.frames?0:frame<action.contact?0:frame<=activeEnd?1:Math.max(0,(action.frames-frame)/(action.frames-activeEnd));
-      const scale=1+amount*(action.pose==="upTilt"?0.9:0.5),Vector=new Float32Array([scale,scale,scale]);
+      const scale=1+amount*0.5,Vector=new Float32Array([scale,scale,scale]);
       arm.Scaling.Keys.push({Frame:start+Math.round(frame*1000/60),Vector,...arm.Scaling.LineType>1?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}});
     }
   }

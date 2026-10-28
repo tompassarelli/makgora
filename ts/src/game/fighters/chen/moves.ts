@@ -19,29 +19,34 @@ const body = hurtPart(torso.x1, torso.z1, torso.x2, torso.z2, torso.radius);
 const reach = (first: number, last: number, x: number, z: number): readonly HurtPose[] =>
   [heroHurtPose(first, last, [body, hurtPart(x < 0 ? -12.0 : 12.0, 60.0, x, z, 11.0)])];
 const tilt = (height: number, length: number, tip: number) => heroMove(9, 3, 21, 0, [region(9, 11, 22.0, 58.0, 96.0, height, 12.0, poke(8.43317985534668)), region(9, 11, 96, height, length, tip, 12, poke(8.43317985534668))]);
-const aerial = (damage: number, growth: number, base: number, x: number, z: number, element: HitElement = HitElement.normal): Readonly<HitEffect> =>
+const exactHit = (damage: number, growth: number, base: number, x: number, z: number, element: HitElement = HitElement.normal): Readonly<HitEffect> =>
   ({ damage, growth, base, launchX: f32(x), launchZ: f32(z), electric: element === HitElement.electric, element });
 export const NEUTRAL_AIR_SPIN = { first: 7, last: 9 } as const;
 export const NEUTRAL_AIR_SWEEP = { first: 15, last: 18 } as const;
-export const NEUTRAL_AIR_LINK: Readonly<HitEffect> = { ...aerial(4.0, 0.0, 30.0, 0.0, 1.0), carry: true };
-export const NEUTRAL_AIR_LAUNCH = aerial(9.0, 92.0, 32.0, f32(0.766044), f32(0.642788));
+export const NEUTRAL_AIR_LINK: Readonly<HitEffect> = { ...exactHit(4.0, 0.0, 30.0, 0.0, 1.0), carry: true };
+export const NEUTRAL_AIR_LAUNCH = exactHit(9.0, 92.0, 32.0, f32(0.766044), f32(0.642788));
 export const FORWARD_AIR_CLEAN = { first: 14, last: 15 } as const;
 export const FORWARD_AIR_LAST = 30;
-export const FORWARD_AIR_SWEETSPOT: Readonly<HitEffect> = { ...aerial(20.0, 100.0, 26.0, f32(0.819152), f32(0.573576), HitElement.electric), strong: true };
-export const FORWARD_AIR_SOURSPOT = aerial(6.0, 80.0, 18.0, f32(0.707107), f32(0.707107));
+export const FORWARD_AIR_SWEETSPOT: Readonly<HitEffect> = { ...exactHit(20.0, 100.0, 26.0, f32(0.819152), f32(0.573576), HitElement.electric), strong: true };
+export const FORWARD_AIR_SOURSPOT = exactHit(6.0, 80.0, 18.0, f32(0.707107), f32(0.707107));
+export const UP_TILT_FIRST = 6;
+export const UP_TILT_SCOOP = exactHit(8.0, 55.0, 90.0, f32(0.087156), f32(0.996195));
+export const UP_TILT_STAFF: readonly (readonly [number, number, number, number])[] = [
+  [47, 66, 124, 48], [58, 74, 135, 90], [55, 111, 115, 160], [-2, 154, 49, 201], [-33, 142, -69, 188], [-78, 118, -125, 110],
+];
 export const UP_AIR_FIRST = 6;
 export const UP_AIR_CLEAN_LAST = 7;
-export const UP_AIR_CLEAN = aerial(12.0, 70.0, 80.0, 0.0, 1.0);
-export const UP_AIR_LATE = aerial(9.0, 70.0, 75.0, 0.0, 1.0);
+export const UP_AIR_CLEAN = exactHit(12.0, 70.0, 80.0, 0.0, 1.0);
+export const UP_AIR_LATE = exactHit(9.0, 70.0, 75.0, 0.0, 1.0);
 const UP_AIR_STAFF: readonly (readonly [number, number, number, number])[] = [
   [32, 66, 111, 38], [33, 83, 114, 105], [26, 96, 85, 155], [13, 103, 35, 184], [1, 104, -13, 186], [-20, 86, -99, 114], [-20, 86, -99, 114], [-22, 76, -106, 76],
 ];
 export const DOWN_AIR_CLEAN = { first: 14, last: 16 } as const;
 export const DOWN_AIR_LAST = 18;
-export const DOWN_AIR_SPIKE: Readonly<HitEffect> = { ...aerial(15.0, 82.0, 30.0, 0.0, -1.0), strong: true };
-export const DOWN_AIR_SOURSPOT = aerial(9.0, 70.0, 18.0, f32(0.342020), -f32(0.939693));
-export const DOWN_AIR_GROUNDED_SPIKE = aerial(15.0, 30.0, 100.0, f32(0.087156), f32(0.996195));
-export const DOWN_AIR_GROUNDED_SOURSPOT = aerial(9.0, 40.0, 30.0, f32(0.258819), f32(0.965926));
+export const DOWN_AIR_SPIKE: Readonly<HitEffect> = { ...exactHit(15.0, 82.0, 30.0, 0.0, -1.0), strong: true };
+export const DOWN_AIR_SOURSPOT = exactHit(9.0, 70.0, 18.0, f32(0.342020), -f32(0.939693));
+export const DOWN_AIR_GROUNDED_SPIKE = exactHit(15.0, 30.0, 100.0, f32(0.087156), f32(0.996195));
+export const DOWN_AIR_GROUNDED_SOURSPOT = exactHit(9.0, 40.0, 30.0, f32(0.258819), f32(0.965926));
 const KEG_BOTTOM = chenCapsule(10.0, -4.0, 12.0, -30.0, 13.0);
 const KEG_RIM = chenCapsule(-30.0, 14.0, 52.0, 14.0, 14.0);
 
@@ -51,7 +56,7 @@ export const CHEN_MOVES: FighterMoves = {
     stand: [body], attacks: {
       [AttackStyle.jab]: reach(3, 8, 48.0, 64.0), [AttackStyle.jab2]: reach(4, 9, 50.0, 58.0), [AttackStyle.jab3]: reach(6, 12, 44.0, 52.0),
       [AttackStyle.forwardTilt]: reach(7, 14, 49.0, 58.0), [AttackStyle.forwardTiltUp]: reach(7, 14, 49.0, 80.0), [AttackStyle.forwardTiltDown]: reach(7, 14, 49.0, 34.0),
-      [AttackStyle.upTilt]: reach(5, 13, 20.0, 104.0), [AttackStyle.downTilt]: reach(5, 12, 70.0, 20.0),
+      [AttackStyle.upTilt]: [heroHurtPose(UP_TILT_FIRST, UP_TILT_FIRST + UP_TILT_STAFF.length - 1, [body])], [AttackStyle.downTilt]: reach(5, 12, 70.0, 20.0),
       [AttackStyle.dashAttack]: reach(6, 22, 54.0, 50.0), [AttackStyle.forwardSmash]: reach(16, 26, 58.0, 60.0),
       [AttackStyle.upSmash]: reach(12, 22, 14.0, 116.0), [AttackStyle.downSmash]: [...reach(12, 17, 46.0, 24.0), ...reach(18, 24, -46.0, 24.0)],
       [AttackStyle.neutralAir]: [heroHurtPose(NEUTRAL_AIR_SPIN.first, NEUTRAL_AIR_SWEEP.last, [body])],
@@ -66,7 +71,8 @@ export const CHEN_MOVES: FighterMoves = {
     [AttackStyle.jab2]: jabStep(heroMove(5, 2, 13, 0, [region(5, 6, 18.0, 56.0, 62.0, 58.0, 11.0, tap(2.8110599517822266)), region(5, 5, 62, 58, 132, 69, 11, tap(2.8110599517822266)), region(6, 6, 62, 58, 133, 76, 11, tap(2.8110599517822266))])),
     [AttackStyle.jab3]: heroMove(7, 3, 18, 0, [region(7, 9, 20.0, 50.0, 54.0, 54.0, 14.0, poke(4.685100078582764)), region(7, 9, 54, 54, 112, 91, 14, poke(4.685100078582764))]),
     [AttackStyle.forwardTilt]: tilt(58.0, 144, 75), [AttackStyle.forwardTiltUp]: tilt(88.0, 145, 104), [AttackStyle.forwardTiltDown]: tilt(26.0, 146, 54),
-    [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, [region(7, 10, 18.0, 72.0, 26.0, 112.0, 15.0, lift(6.559140205383301))]),
+    [AttackStyle.upTilt]: heroMove(UP_TILT_FIRST, UP_TILT_STAFF.length, 15, 0, UP_TILT_STAFF.map(([x1, z1, x2, z2], index) =>
+      region(UP_TILT_FIRST + index, UP_TILT_FIRST + index, x1, z1, x2, z2, 13.0, UP_TILT_SCOOP))),
     [AttackStyle.downTilt]: heroMove(7, 3, 20, 0, [region(7, 9, 14.0, 22.0, 70.0, 16.0, 13.0, lift(5.622119903564453))]),
     [AttackStyle.dashAttack]: heroMove(8, 12, 19, 0, [region(8, 19, 16.0, 42.0, 52.0, 68.0, 24.0, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152))), region(8, 19, 52, 68, 109, 106, 24, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152)))]),
     [AttackStyle.forwardSmash]: heroMove(19, 4, 34, 0, [region(19, 22, 24.0, 66.0, 104.0, 48.0, 14.0, finish(16.86635971069336))]),
