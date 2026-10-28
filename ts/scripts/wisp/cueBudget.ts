@@ -52,7 +52,7 @@ import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL } from "../../src/game/fighters/kob
 import { CombatEffects } from "../../src/game/render/combatEffects";
 import { advanceImpacts, createImpactState, emitImpacts } from "../../src/game/presentation/impactState";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../src/game/presentation/impactEvents";
-import { presentImpactSounds } from "../../src/game/presentation/hitPresentation";
+import { presentFighterSounds } from "../../src/game/presentation/hitPresentation";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion, type HitEffect } from "../../src/game/sim/hitRegions";
 import { authoredTuning } from "../../src/game/sim/tuning";
 
@@ -213,7 +213,7 @@ export function sparkScenes(move: CueMove): { readonly scenes: RenderScene[]; re
   finishDamageContacts(world);
   finishImpactEventsAfter(events, victim, world);
   const sounds: string[] = [];
-  presentImpactSounds(events, (sound, _x, _z, volume) => { sounds.push(`${sound.split("\\").at(-1)} volume ${volume}`); });
+  presentFighterSounds(events, (sound, _x, _z, volume) => { sounds.push(`${sound.split("\\").at(-1)} volume ${volume}`); });
   const feedback = `damage ${effect.damage.toFixed(1)}%, hitlag ${victim.launch.hitlagFrames} victim/${attacker.launch.hitlag} attacker, tier ${events.tier}, sound ${sounds.join(" + ") || "none"}`;
   const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {

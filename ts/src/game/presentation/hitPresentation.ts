@@ -127,11 +127,20 @@ export type ImpactSoundSink = (sound: string, x: number, z: number, volume: numb
 const fileSink = (sink: ImpactSoundSink, x: number, z: number, cls: VoiceClass) => (path: string, volume: number, pitch: number) => sink(path, x, z, volume, pitch, true, cls);
 
 
-export function presentImpactSounds(events: Readonly<ImpactEvents>, sink: ImpactSoundSink): void {
-  // Labels go straight to the sink: closures per call allocated about 1 KB a fighter every frame (#400).
+export function presentFighterSounds(events: Readonly<ImpactEvents>, sink: ImpactSoundSink): void {
+  presentStartSounds(events, sink);
+  presentImpactSounds(events, sink);
+}
+
+export function presentStartSounds(events: Readonly<ImpactEvents>, sink: ImpactSoundSink): void {
   const { x, z } = events;
   if (events.perform >= 0) playPerform(events.character, events.perform, events.performSerial, fileSink(sink, x, z, VoiceClass.special));
   else if (events.swing >= 0) sink(SWING_SOUND, x, z, at(TIER_SWING_VOLUME, events.swing), at(TIER_SWING_PITCH, events.swing), true, VoiceClass.special);
+}
+
+export function presentImpactSounds(events: Readonly<ImpactEvents>, sink: ImpactSoundSink): void {
+  // Labels go straight to the sink: closures per call allocated about 1 KB a fighter every frame (#400).
+  const { x, z } = events;
   if (events.impact >= 0) playImpact(events.character, events.impact, events.performSerial, fileSink(sink, x, z, VoiceClass.hit));
   if (events.fuse >= 0) playFuse(events.character, events.fuse, events.fuseSerial, fileSink(sink, events.fuseX, events.fuseZ, VoiceClass.special));
   if (events.throwRelease) sink("BlinkTarget", x, z, 100, 1.0, false, VoiceClass.hit);

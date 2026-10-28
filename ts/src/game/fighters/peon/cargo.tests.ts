@@ -11,7 +11,7 @@ import { createPacingAndPresentation } from "../../match/pacingAndPresentation";
 import { stepMatch } from "../../match/step";
 import { Phase, createMatchState } from "../../lobby/lobbyState";
 import { hoistVoice } from "../../presentation/moveSounds";
-import { presentImpactSounds } from "../../presentation/hitPresentation";
+import { presentFighterSounds } from "../../presentation/hitPresentation";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../presentation/impactEvents";
 import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../../replay/snapshot";
 import { AttackStyle, Character, GrabAction } from "../../sim/codes";
@@ -389,7 +389,7 @@ test("Peon says his Work, work line exactly once, as his forward throw hoists th
       captureImpactEventsBefore(events, owner);
       stepDuel(world, frame === 30 ? controls({ grabThrowX: 1 }) : frame === 60 ? controls({ cStickSideFlick: 1 }) : idle);
       finishImpactEventsAfter(events, owner, world);
-      presentImpactSounds(events, sink);
+      presentFighterSounds(events, sink);
       if (frame === 29) assertEquals(spoken, 0);
     }
     assertEquals(target.grab.owner, undefined);

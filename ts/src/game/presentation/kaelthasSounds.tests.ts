@@ -8,7 +8,7 @@ import { controls, testBeginAttacks } from "../sim/testWorld";
 import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURST, FLAME_STRIKE_RUNE } from "../fighters/kaelthas/specials";
 import { KAELTHAS_MOVES } from "../fighters/kaelthas/moves";
 import { type ImpactEvents, captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "./impactEvents";
-import { presentImpactSounds } from "./hitPresentation";
+import { presentFighterSounds } from "./hitPresentation";
 import { soundFiles } from "./moveSounds";
 
 const press = controls({ specialPressed: true, specialX: 1, specialHeld: true });
@@ -40,8 +40,8 @@ function step(run: SoundReplay, input: Readonly<Controls>): { readonly own: stri
   finishImpactEventsAfter(run.own, run.kael, run.world);
   finishImpactEventsAfter(run.struck, run.target, run.world);
   const own: string[] = [], struck: string[] = [];
-  presentImpactSounds(run.own, (sound) => { own.push(sound); });
-  presentImpactSounds(run.struck, (sound) => { struck.push(sound); });
+  presentFighterSounds(run.own, (sound) => { own.push(sound); });
+  presentFighterSounds(run.struck, (sound) => { struck.push(sound); });
   return { own, struck };
 }
 

@@ -28,7 +28,7 @@ import {
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { impactAnimation, impactColour, impactModel, impactModelScale, impactSoundNames, impactStartSeconds, presentImpactSounds, type ImpactSoundSink } from "../presentation/hitPresentation";
+import { impactAnimation, impactColour, impactModel, impactModelScale, impactSoundNames, impactStartSeconds, presentImpactSounds, presentStartSounds, type ImpactSoundSink } from "../presentation/hitPresentation";
 import { VOICE_CAP, VoiceClass, admitVoice, createVoiceBudget, liveVoices, resetVoiceBudget } from "../presentation/voiceBudget";
 import { SoundBank, SoundKind } from "./soundBank";
 import { tierSoundPaths } from "../presentation/moveTiers";
@@ -58,6 +58,8 @@ const shieldSerial = (events: Readonly<ImpactEvents>): number => (events.shieldH
 
 const impactSerial = (events: Readonly<ImpactEvents>): number => (events.impact >= 0 ? events.performSerial : -1);
 
+const startSerial = (events: Readonly<ImpactEvents>): number => (events.perform >= 0 ? events.performSerial * 256 + events.perform : events.swing >= 0 ? -2 - events.swing : -1);
+
 
 export function fighterModel(character: number): string {
   const look = heroLook(character);
@@ -72,14 +74,15 @@ export class CombatEffects {
 
   private soundFrames: number[] = [];
 
-  private soundsFrom: "every" | "hits" | "notHits" = "every";
+  private soundsFrom: "every" | "early" | "late" = "every";
 
-  private hitSoundTried = false;
+  private earlySoundTried = false;
 
   private earlyHitFrames: number[] = [];
   private earlyHitSerials: number[] = [];
   private earlyShieldSerials: number[] = [];
   private earlyPerformSerials: number[] = [];
+  private earlyStartSerials: number[] = [];
 
   private readonly voices = createVoiceBudget();
 
@@ -162,6 +165,7 @@ export class CombatEffects {
     this.earlyHitSerials = [];
     this.earlyShieldSerials = [];
     this.earlyPerformSerials = [];
+    this.earlyStartSerials = [];
     resetVoiceBudget(this.voices);
     for (let slot = 0; slot < VOICE_CAP; slot++) this.voiceHandles[slot] = undefined;
     this.shownEmissions = [];
@@ -244,32 +248,37 @@ export class CombatEffects {
     const previous = this.soundFrames[slot];
     if (previous !== undefined && frame <= previous) return;
     this.soundFrames[slot] = frame;
-    this.presentSounds(frame, events, this.startedEarly(frame, slot, events) ? "notHits" : "every", soundPlayed);
+    this.presentSounds(frame, events, this.startedEarly(frame, slot, events) ? "late" : "every", soundPlayed);
   }
 
 
   presentPredicted(frame: number, slot: number, events: Readonly<ImpactEvents>, soundPlayed?: (sound: string, volume: number, pitch: number, cls: number, slot: number, live: number) => void): void {
     if (this.startedEarly(frame, slot, events)) return;
-    this.hitSoundTried = false;
-    this.presentSounds(frame, events, "hits", soundPlayed);
-    if (!this.hitSoundTried) return;
+    this.earlySoundTried = false;
+    this.presentSounds(frame, events, "early", soundPlayed);
+    if (!this.earlySoundTried) return;
     const index = slot * DRAWN_FRAMES + floorMod(frame, DRAWN_FRAMES);
     this.earlyHitFrames[index] = frame;
     this.earlyHitSerials[index] = events.variant;
     this.earlyShieldSerials[index] = shieldSerial(events);
     this.earlyPerformSerials[index] = impactSerial(events);
+    this.earlyStartSerials[index] = startSerial(events);
   }
 
   private startedEarly(frame: number, slot: number, events: Readonly<ImpactEvents>): boolean {
     const index = slot * DRAWN_FRAMES + floorMod(frame, DRAWN_FRAMES);
     return this.earlyHitFrames[index] === frame && this.earlyHitSerials[index] === events.variant
-      && this.earlyShieldSerials[index] === shieldSerial(events) && this.earlyPerformSerials[index] === impactSerial(events);
+      && this.earlyShieldSerials[index] === shieldSerial(events) && this.earlyPerformSerials[index] === impactSerial(events) && this.earlyStartSerials[index] === startSerial(events);
   }
 
-  private presentSounds(frame: number, events: Readonly<ImpactEvents>, from: "every" | "hits" | "notHits", soundPlayed: ((sound: string, volume: number, pitch: number, cls: number, slot: number, live: number) => void) | undefined): void {
+  private presentSounds(frame: number, events: Readonly<ImpactEvents>, from: "every" | "early" | "late", soundPlayed: ((sound: string, volume: number, pitch: number, cls: number, slot: number, live: number) => void) | undefined): void {
     this.soundFrame = frame;
-    this.soundsFrom = from;
     this.soundPlayed = soundPlayed;
+    if (from !== "late") {
+      if (from === "early" && startSerial(events) !== -1) this.earlySoundTried = true;
+      presentStartSounds(events, this.playSound);
+    }
+    this.soundsFrom = from;
     presentImpactSounds(events, this.playSound);
     this.soundPlayed = undefined;
     this.soundsFrom = "every";
@@ -279,8 +288,8 @@ export class CombatEffects {
   private soundPlayed: ((sound: string, volume: number, pitch: number, cls: number, slot: number, live: number) => void) | undefined;
   // One sink for every call, so presenting sounds allocates no closure a frame (#400).
   private readonly playSound: ImpactSoundSink = (sound, x, z, volume, pitch, file, cls) => {
-    if (this.soundsFrom === "hits" ? cls !== VoiceClass.hit : this.soundsFrom === "notHits" && cls === VoiceClass.hit) return;
-    if (cls === VoiceClass.hit) this.hitSoundTried = true;
+    if (this.soundsFrom === "early" ? cls !== VoiceClass.hit : this.soundsFrom === "late" && cls === VoiceClass.hit) return;
+    if (cls === VoiceClass.hit) this.earlySoundTried = true;
     const admitted = admitVoice(this.voices, this.soundFrame, cls, sound);
     if (!admitted.play) return;
     const evicted = this.voiceHandles[admitted.slot];

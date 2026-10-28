@@ -38,6 +38,7 @@ const METAL: readonly (readonly string[])[] = [
 interface SpecialSound {
   readonly perform: string | undefined;
   readonly performVolume?: number | undefined;
+  readonly onset?: string | undefined;
   readonly hit: string;
   readonly impact?: string | undefined;
   readonly fuse?: string | undefined;
@@ -76,7 +77,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.warden]: {
     weapon: Weapon.blade, effort: ["WardenAttack"], strong: "FanOfKnivesHit",
-    specials: [s("ShadowStrikeMissileBirth", "ShadowStrikeBirth"), { ...s("ShadowStrikeBirth", "MetalHeavySliceFlesh", 127), impact: "BlinkCaster" }, s("BlinkTarget", "MetalLightSliceFlesh"), s("FanOfKnives", "FanOfKnivesHit")],
+    specials: [s("ShadowStrikeMissileBirth", "ShadowStrikeBirth"), { ...s("ShadowStrikeBirth", "MetalHeavySliceFlesh", 90), onset: "MetalHeavySliceMetal", impact: "BlinkCaster" }, s("BlinkTarget", "MetalLightSliceFlesh"), s("FanOfKnives", "FanOfKnivesHit")],
   },
   [Character.lich]: {
     weapon: Weapon.blunt, effort: ["HeroLichAttack1"], strong: "LichMissile",
@@ -187,6 +188,7 @@ export interface MoveSound {
 const VOICE_TAKES = 3;
 const VOICE_VOLUME = 100;
 const PERFORM_VOLUME = 110;
+const MAX_VOLUME = 127;
 const MODEL_SWING_VOLUME: readonly number[] = [0, 80, 100];
 const SWEETENER_VOLUME = 100;
 const SHIELD_VOLUME = 100;
@@ -213,7 +215,10 @@ function resolveSpecial(fighter: FighterSound, move: number): MoveSound | undefi
   if (special === undefined) return undefined;
   const { weapon } = fighter;
   return {
-    perform: special.perform === undefined ? [] : [layer([special.perform], special.performVolume ?? PERFORM_VOLUME)],
+    perform: [
+      ...(special.onset === undefined ? [] : [layer([special.onset], MAX_VOLUME)]),
+      ...(special.perform === undefined ? [] : [layer([special.perform], special.performVolume ?? PERFORM_VOLUME)]),
+    ],
     hit: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.medium))],
     strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
     shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],

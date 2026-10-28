@@ -1,7 +1,7 @@
 import { HitElement } from "../sim/hitRegions";
 import { SurfaceContact } from "../sim/codes";
 import { type ImpactEvents, ImpactLanding, JumpCue, createImpactEvents } from "../presentation/impactEvents";
-import { presentImpactSounds } from "../presentation/hitPresentation";
+import { presentFighterSounds } from "../presentation/hitPresentation";
 import { ELEMENTS } from "../presentation/elementLooks";
 
 
@@ -44,6 +44,6 @@ export const HIT_PRESENTATION_CASES = [
 export function hitPresentationSoundLabels(): string[] {
   const labels = new Set<string>();
   const cues: Partial<ImpactEvents>[] = [...HIT_PRESENTATION_CASES.map(({ cue }) => cue), ...ELEMENTS.map((element) => ({ hit: true, element }))];
-  for (const cue of cues) presentImpactSounds({ ...createImpactEvents(), ...cue }, (label, _x, _z, _volume, _pitch, file) => { if (!file) labels.add(label); });
+  for (const cue of cues) presentFighterSounds({ ...createImpactEvents(), ...cue }, (label, _x, _z, _volume, _pitch, file) => { if (!file) labels.add(label); });
   return [...labels].sort();
 }
