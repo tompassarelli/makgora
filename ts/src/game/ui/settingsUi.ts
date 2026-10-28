@@ -108,7 +108,7 @@ export class SettingsPanel {
     });
     this.profileButton = button("MeleeSettingsProfile", LOAD_PROFILE.x, LOAD_PROFILE.y, LOAD_PROFILE.width, LOAD_PROFILE.height, NO_SAVED_PROFILE, { kind: "profile" }).label;
     this.hint = line("MeleeSettingsHint", f32(0.12), f32(0.51), f32(0.6), f32(0.018));
-    this.help = line("MeleeSettingsHelp", f32(0.12), f32(0.489), f32(0.6), f32(0.018), f32(0.0095));
+    this.help = line("MeleeSettingsHelp", f32(0.12), f32(0.4815), f32(0.6), f32(0.014), f32(0.0095));
     this.keys = keyboardCaps(f32(0.12), f32(0.465)).map(({ key, x, y, width }): KeyButton => {
       const { art } = button(`MeleeSettingsKey${I2S(key)}`, x, y, width, KEY_CAP_HEIGHT, "", { kind: "key", key });
       const clear = this.clearCross(root, key, f32(f32(x + width) - CLEAR_SIZE), y);
