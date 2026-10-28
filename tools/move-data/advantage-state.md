@@ -86,6 +86,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in full hop +4, down air, short hop, down air, forward smash; tech away side special; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
 | Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Anub'arak | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
+| Archimonde the Defiler | light | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
+| Archimonde the Defiler | medium | yes | **no** | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away uncovered; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
+| Archimonde the Defiler | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
 
 ## True combos from each throw
 
@@ -405,4 +408,16 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Anub'arak | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Anub'arak | heavy | up throw | 1/1 | 1/1 | 1/1 | 1/1 in full hop, back air, out full hop, down air |
 | Anub'arak | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | light | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
+| Archimonde the Defiler | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | medium | up throw | 1/1 | 1/1 in down tilt, out forward tilt | 1/1 in dash, dash attack, out forward tilt | 1/1 |
+| Archimonde the Defiler | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Archimonde the Defiler | heavy | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
+| Archimonde the Defiler | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 
