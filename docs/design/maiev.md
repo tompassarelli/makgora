@@ -161,11 +161,13 @@ What she keeps, so she does not become Fox in a costume:
 - Shadow Dash (side special, Tom's 2026-10-28 rework): Fox's Illusion with
   her Blink art, a straight dash on frames 21-25 of 63 that special cuts
   short and whose slash pops the foe up at 80 degrees (growth 40 standing
-  and 60 in the air, fightcore.csv's Illusion row). Two recorded deviations
-  make the pop-up start combos: base 74 instead of Illusion's 68, so a foe
-  tumbles from 0%, and a hit skips her end lag to 14 frames, so she acts on
-  frame 45 instead of 64 and is +4 to +7 at 0% while a whiff keeps Melee's
-  63 frames (probed headless on Rifleman, 2026-10-28). It never homes,
+  and 60 in the air, fightcore.csv's Illusion row). One recorded deviation
+  makes the pop-up start combos: base 74 instead of Illusion's 68, so a foe
+  tumbles from 0%. A hit, a shield and a whiff keep the same 63 frames: after
+  a shield she acts 46 frames after contact, 10 frames after the foe's
+  shieldstun ends (-36; -14 with the old end-lag skip), and at 0% the foe's
+  33 frames of hitstun end 13 frames before she acts (probed headless on
+  Rifleman, 2026-10-28). It never homes,
   never teleports behind anyone and never stuns: the stun and mark forms are
   gone. EX dashes 25% farther and changes nothing else. Like Fox's, it catches
   a ledge she faces during its travel and end lag, and its helpless fall

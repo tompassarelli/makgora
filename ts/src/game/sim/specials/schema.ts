@@ -350,7 +350,6 @@ export interface AuthoredSpecial {
 
   readonly refire?: FrameWindow | undefined;
   readonly shorten?: FrameWindow | undefined;
-  readonly hitRecovery?: { readonly from: number; readonly frames: number } | undefined;
 
   readonly jumpCancelFrame?: number | undefined;
 

@@ -4,7 +4,7 @@ import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer } from "../input/
 import { type FrameControls, createBufferedFrameControls, createFrameControls } from "../match/controls";
 import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
-import { Character } from "./codes";
+import { Character, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { type Controls, type Roster, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
@@ -87,4 +87,17 @@ export function duelPair<Owner extends Fighter, Target extends Fighter>(owner: O
   const world = createRoster(3, [owner, target]);
   for (let i = 0; i < settle; i++) stepDuel(world, controls(), controls(), stage);
   return { world, owner, target };
+}
+
+/** Steps `owner`'s running special to its end; `jump` is the largest frame gain in one step, so more than one means frames were skipped. */
+export function specialToEnd(world: Roster, owner: Fighter, second: Readonly<Controls> = controls()): { last: number; jump: number } {
+  let last = owner.special.frame;
+  let jump = 0;
+  for (let steps = 0; steps < 120; steps++) {
+    stepDuel(world, controls(), second);
+    if (owner.special.action === SpecialAction.none) break;
+    jump = Math.max(jump, owner.special.frame - last);
+    last = owner.special.frame;
+  }
+  return { last, jump };
 }

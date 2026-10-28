@@ -119,10 +119,13 @@ stick picks the side).
   the air; its grounded angle is steeper, lowered here so the grounded hit
   sends low as Tom asked. The rush passes through bodies and stops just
   short of a raised shield, and the strike meets the shield.
-- **Frames 22–59:** recovery; he acts on frame 60. A rush that strikes a
-  fighter (not a shield) skips to its last 14 frames, as Maiev's Illusion
-  does, so a grounded hit leaves him acting while the foe lies knocked down:
-  a tech chase. An air rush that lands before then ends with 20 frames of
+- **Frames 22–59:** recovery; he acts on frame 60 after a hit, a shield or a
+  whiff alike, with no end-lag skip (Melee's Phantasm has none). Negative
+  frame advantage means he acts after the foe: on a shield it is -36 (the
+  foe's shieldstun ends 10 frames after contact, and he acts 46 frames after
+  it), and at 0% the foe's 35 frames of hitstun end 11 frames before he acts,
+  so the foe moves first (about +12 with the old skip). Probed headless on
+  Rifleman, 2026-10-28. An air rush that lands before then ends with 20 frames of
   landing lag.
 - **One rush per airtime, plus one earned (#554):** a rush that ends airborne
   is the airtime's rush, whether it started in the air or ran off a ledge.

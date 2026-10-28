@@ -7,7 +7,7 @@ import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
 import { ordinaryHitstunFrames, TUMBLE_KNOCKBACK } from "../../sim/knockback";
 import { ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_TRAVEL_FRAMES } from "../../sim/specials/illusionDash";
 import { SHADOW_DASH_DISTANCE } from "./specials";
-import { duelPair, lift, stepDuel } from "../../sim/testDuel";
+import { duelPair, lift, specialToEnd, stepDuel } from "../../sim/testDuel";
 import { surfaceRight } from "../../sim/stage";
 import { controls } from "../../sim/testWorld";
 
@@ -19,6 +19,7 @@ const FULL_DASH = f32(H * f32(3.5));
 const TAN_80 = f32(5.67128182);
 const side = controls({ specialPressed: true, specialX: 1 });
 const again = controls({ specialPressed: true });
+const holdShield = controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0 });
 
 interface Dash {
   readonly maiev: Fighter;
@@ -125,4 +126,22 @@ test("A rollback to mid-dash replays the shortened dash and its hit exactly [k1 
   copyFighterState(maiev, savedMaiev, 3);
   copyFighterState(target, savedTarget, 3);
   assertEquals(run().join(","), first.join(","));
+});
+
+function dashRun(gap: number, shielded: boolean): { last: number; jump: number } {
+  const maiev = createFighter(Character.warden, 0.0, 1);
+  const target = createFighter(Character.rifleman, gap, -1);
+  const { world } = duelPair(maiev, target);
+  target.shield.raised = shielded;
+  const hold = shielded ? holdShield : controls();
+  stepDuel(world, side, hold);
+  return specialToEnd(world, maiev, hold);
+}
+
+test("Shadow Dash into a shield runs every frame to the whiff's end, skipping none of its end lag [k3 measure docs/design/maiev.md]", () => {
+  const whiff = dashRun(FAR, false);
+  const shielded = dashRun(f32(H * f32(0.9)), true);
+  assertEquals(whiff.jump, 1);
+  assertEquals(shielded.jump, 1);
+  assertEquals(shielded.last, whiff.last);
 });

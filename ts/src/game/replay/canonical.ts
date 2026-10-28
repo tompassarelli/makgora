@@ -422,10 +422,6 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int("shorten.first", move.shorten.first);
     int("shorten.last", move.shorten.last);
   }
-  if (move.hitRecovery !== undefined) {
-    int("hitRecovery.from", move.hitRecovery.from);
-    int("hitRecovery.frames", move.hitRecovery.frames);
-  }
   if (move.placement !== undefined) result.push(specialPlacementCanonical(move.placement, `${name}.placement`));
   move.summons?.forEach((summon, index) => result.push(specialPlacementCanonical(summon, `${name}.summons[${index}]`)));
   if (move.recall === true) int("recall", 1);

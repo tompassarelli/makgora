@@ -3,7 +3,7 @@
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT, heroRegion, type MoveRegion, type StrikeCapsule } from "../../sim/heroMoves";
-import { ILLUSION_AIR_LANDING_LAG, ILLUSION_DISTANCE_HEIGHTS, ILLUSION_END_FRAME, ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_HIT_RECOVERY, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_SHORTEN, ILLUSION_TRAVEL_FRAMES } from "../../sim/specials/illusionDash";
+import { ILLUSION_AIR_LANDING_LAG, ILLUSION_DISTANCE_HEIGHTS, ILLUSION_END_FRAME, ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_SHORTEN, ILLUSION_TRAVEL_FRAMES } from "../../sim/specials/illusionDash";
 import { CHARGED_AIM_FRAMES, frames, type AuthoredSpecial, type FighterSpecials } from "../../sim/specials/schema";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import type { AppliedStatus } from "../../sim/heroStatus";
@@ -43,7 +43,6 @@ const ILLUSION_PATH_RADIUS = 24.0;
 export const SHADOW_DASH_DISTANCE = f32(H * f32(ILLUSION_DISTANCE_HEIGHTS));
 const shadowDash = (growth: number): AuthoredSpecial => ({
   endFrame: ILLUSION_END_FRAME, shorten: ILLUSION_SHORTEN, helpless: true, catchesLedge: true,
-  hitRecovery: { from: ILLUSION_LAST_TRAVEL_FRAME + 1, frames: ILLUSION_HIT_RECOVERY },
   motion: [
     { ...frames(1, ILLUSION_FIRST_TRAVEL_FRAME - 1), velocityX: 0.0, velocityZ: 0.0 },
     { ...frames(ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME), velocityX: f32(SHADOW_DASH_DISTANCE / f32(ILLUSION_TRAVEL_FRAMES)), velocityZ: 0.0 },
