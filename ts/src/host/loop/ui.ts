@@ -21,6 +21,7 @@ import { SpecialEffects } from "../../game/render/specialEffects";
 import { Character } from "../../game/sim/codes";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
+import { sourceVersion } from "../../game/shell/sourceVersion";
 import { FighterHud, MatchClock } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
@@ -152,7 +153,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     escapeMeters: each(slot => new EscapeMeter(slot)),
     meterBars: each(createMeterBars),
     stage: new StagePanel(actions.stage, controls),
-    selections: each(slot => new SelectionPanel(actions.selection, slot, controls)),
+    selections: each(slot => new SelectionPanel(actions.selection, slot, controls, sourceVersion())),
     settings: each(slot => new SettingsPanel(s.participants[slot].bindings, actions.settings, slot)),
     combat: combat = new CombatEffects(s.origin),
     criticals: new CriticalStrikeText(s.origin),
@@ -269,7 +270,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     bindPrototype(ui.selections[slot], SelectionPanel.prototype);
     if (!ui.selections[slot].hasCpuSettingsFrames()) {
       ui.selections[slot].destroy();
-      ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s));
+      ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s), sourceVersion());
     } else ui.selections[slot].bindActions(actions.selection);
     bindPrototype(ui.settings[slot], SettingsPanel.prototype);
     const retainedSettings: { readonly root?: framehandle } = ui.settings[slot];

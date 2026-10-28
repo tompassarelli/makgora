@@ -155,6 +155,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     captureBinding(bindings, key);
     return;
   }
+  if (key === Key.escape && views(s).selections[slot].credits.close()) return;
   if (key === Key.f1) return;
   if (!bindings.ready) return;
   if (key === 13 && s.game.phase !== Phase.match) return;

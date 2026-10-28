@@ -21,6 +21,7 @@ export const SMASHCRAFT_DEV: DevProject = {
       "scripts/greenBuilds.test.ts": [],
       "test/autoland-sweep.test.ts": ["test/fixtures/autoland-backlog.json", "scripts/autoland.ts", "scripts/autolandCore.ts", "scripts/autolandSuperseded.ts", "../.github/workflows/autoland.yml", "../.github/workflows/autoland-sweep.yml"],
       "test/classic-effect-screen.test.ts": ["src/**", "../build-inputs/**", "../typescript-toolchain.lock"],
+      "test/clean-room.test.ts": ["../docs/hive-post.md", "src/game/ui/credits.ts"],
       "test/drawn-size.test.ts": ["../build-inputs/**"],
       "test/driver-move-normal.test.ts": ["src/**", "scripts/wisp/botMatch.ts", "test/rematch/journalHelper.ts", "../build-inputs/**"],
       "test/element-looks.test.ts": ["test/fixtures/stock-sound-labels.txt", "scripts/wisp/model-facts/**"],

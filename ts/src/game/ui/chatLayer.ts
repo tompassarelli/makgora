@@ -1,4 +1,4 @@
-export const SELECT_LEVELS = { cardChip: 10, ruleHelp: 20, tutorial: 20, hand: 30, stagePool: 30, cpuSettings: 100 } as const;
+export const SELECT_LEVELS = { cardChip: 10, ruleHelp: 20, tutorial: 20, credits: 20, hand: 30, stagePool: 30, cpuSettings: 100 } as const;
 export const CHAT_LEVELS = { select: 110, match: 0 } as const;
 
 // Keyed by each client's own view object, so clients sharing one process each make their own native pair.
