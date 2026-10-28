@@ -268,7 +268,7 @@
   "thresholds": {
     "stickDeadzone": 0.2800000011920929,
     "tapJump": 0.6625000238418579,
-    "cStickSmash": 0.800000011920929,
+    "cStickFlick": 0.800000011920929,
     "triggerPress": 4000,
     "triggerFull": 32767
   }

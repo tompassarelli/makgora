@@ -1020,7 +1020,7 @@ separate unfinished tuning.
 
 Holding Walk with horizontal input selects forward tilt; adding Up or Down
 selects its angled variant. Vertical input alone keeps up/down tilt, and
-C-stick smashes retain priority over a normal tilt on the same frame.
+a same-frame Strong smash outranks a tilt, and the C-stick gives a tilt on the ground.
 All three forward tilts deal 10 damage with 145 horizontal reach. Their
 vertical hit coverage is centered at 0 / +65 / -65 relative to the fighter,
 with the existing 130-unit vertical tolerance. These are prototype hit shapes,

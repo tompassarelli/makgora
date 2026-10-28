@@ -145,7 +145,7 @@
       "key": "-",
       "code": 189,
       "action": "cUp",
-      "label": "Up smash",
+      "label": "Up tilt / up air",
       "when": {
         "setting": "rightStick",
         "value": "smash"
@@ -172,7 +172,7 @@
       "key": "\\",
       "code": 220,
       "action": "cDown",
-      "label": "Down smash",
+      "label": "Down tilt / down air",
       "when": {
         "setting": "rightStick",
         "value": "smash"
@@ -199,7 +199,7 @@
       "key": ",",
       "code": 188,
       "action": "cLeft",
-      "label": "Smash left",
+      "label": "Tilt left / air left",
       "when": {
         "setting": "rightStick",
         "value": "smash"
@@ -226,7 +226,7 @@
       "key": ".",
       "code": 190,
       "action": "cRight",
-      "label": "Smash right",
+      "label": "Tilt right / air right",
       "when": {
         "setting": "rightStick",
         "value": "smash"

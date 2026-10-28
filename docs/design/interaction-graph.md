@@ -90,7 +90,7 @@ them. Every situation is a mirror match on the flat stage at 0%.
   keeps the state at the start of every frame, and replays each option pair from
   the first frame an option starts.
 - **Option.** An input script that starts on a frame: a press (jab, a tilt with
-  walk held, a smash on the C-stick, grab, a dodge with the shield held), or a
+  walk held, a smash with Strong held, grab, a dodge with the shield held), or a
   short sequence (jump out of shield with the aerial buffered in jump squat).
 - **Option start.** The first frame on which pressing the option starts it on
   that same frame, found by searching press frames. A start counts only when the

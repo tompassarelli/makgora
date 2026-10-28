@@ -2,8 +2,10 @@
 #! chat -dev setup quick pair beastmaster / pit lord;percent 1 45
 20 b stick -1 0
 52 b stick 0 0
-80 b cstick 0 1
-82 b cstick 0 0
+80 b stick 0 1
+80 b press LB
+82 b stick 0 0
+82 b release LB
 188 a capture
 192 a capture
 196 a capture

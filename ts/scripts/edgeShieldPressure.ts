@@ -25,10 +25,10 @@ const RIGHT = bit(Action.moveRight);
 const UP = bit(Action.moveUp);
 const DOWN = bit(Action.moveDown);
 const SHIELD = bit(Action.rightTrigger);
-const SMASH_LEFT = bit(Action.cLeft);
-const SMASH_RIGHT = bit(Action.cRight);
-const SMASH_UP = bit(Action.cUp);
-const SMASH_DOWN = bit(Action.cDown);
+const C_LEFT = bit(Action.cLeft);
+const C_RIGHT = bit(Action.cRight);
+const C_UP = bit(Action.cUp);
+const C_DOWN = bit(Action.cDown);
 
 export interface Aerial {
   readonly name: string;
@@ -38,10 +38,10 @@ export interface Aerial {
 
 export const AERIALS: readonly Aerial[] = [
   { name: "neutral air", mask: ATTACK, facing: 1 },
-  { name: "forward air", mask: SMASH_RIGHT, facing: 1 },
-  { name: "back air", mask: SMASH_RIGHT, facing: -1 },
-  { name: "up air", mask: SMASH_UP, facing: 1 },
-  { name: "down air", mask: SMASH_DOWN, facing: 1 },
+  { name: "forward air", mask: C_RIGHT, facing: 1 },
+  { name: "back air", mask: C_RIGHT, facing: -1 },
+  { name: "up air", mask: C_UP, facing: 1 },
+  { name: "down air", mask: C_DOWN, facing: 1 },
 ];
 
 export interface FollowUp {

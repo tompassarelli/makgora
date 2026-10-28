@@ -3,9 +3,11 @@
 #! cue 248-256 glaives: effect=DemonHunterMissile
 200 a stick 1 0
 202 a stick 0 0
-240 a cstick 0 -1
+240 a stick 0 -1
+240 a press LB
 240 a capture
-244 a cstick 0 0
+244 a stick 0 0
+244 a release LB
 #! expect a 240 applied attack 2 style 3
 248 a capture
 250 a capture

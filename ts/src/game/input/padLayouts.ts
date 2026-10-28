@@ -41,9 +41,9 @@ const shields: readonly PadBinding[] = [
   when("rightShield", "light", bind("rt", Action.lightShield, "Light shield")),
 ];
 
-const rightStick = (control: PadControl, action: Action, smash: string, tilt: string): PadBinding[] => [
-  when("rightStick", "smash", bind(control, action, smash)),
-  { ...when("rightStick", "tilt", bind(control, action, tilt)), hold: [Action.walk] },
+const rightStick = (control: PadControl, action: Action, label: string): PadBinding[] => [
+  when("rightStick", "smash", bind(control, action, label)),
+  { ...when("rightStick", "tilt", bind(control, action, label)), hold: [Action.walk] },
 ];
 
 const shared: readonly PadBinding[] = [
@@ -53,10 +53,10 @@ const shared: readonly PadBinding[] = [
   bind("left_right", Action.moveRight, "Move right"),
   bind("left_down", Action.moveDown, "Crouch / fast fall"),
   bind("left_up", Action.moveUp, "Up (aim, up special)"),
-  ...rightStick("right_up", Action.cUp, "Up smash", "Up tilt / up air"),
-  ...rightStick("right_down", Action.cDown, "Down smash", "Down tilt / down air"),
-  ...rightStick("right_left", Action.cLeft, "Smash left", "Tilt left / air left"),
-  ...rightStick("right_right", Action.cRight, "Smash right", "Tilt right / air right"),
+  ...rightStick("right_up", Action.cUp, "Up tilt / up air"),
+  ...rightStick("right_down", Action.cDown, "Down tilt / down air"),
+  ...rightStick("right_left", Action.cLeft, "Tilt left / air left"),
+  ...rightStick("right_right", Action.cRight, "Tilt right / air right"),
 ];
 
 export const PAD_LAYOUTS: readonly PadLayout[] = [

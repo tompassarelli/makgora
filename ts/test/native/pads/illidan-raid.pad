@@ -12,11 +12,15 @@
 92 a tap X 2
 93 a stick 0 0
 # Roundhouse kick (forward smash).
-260 a cstick 1 0
-264 a cstick 0 0
+260 a stick 1 0
+260 a press LB
+264 a stick 0 0
+264 a release LB
 # Flames of Azzinoth (down smash).
-440 a cstick 0 -1
-444 a cstick 0 0
+440 a stick 0 -1
+440 a press LB
+444 a stick 0 0
+444 a release LB
 # Expected, frame by frame (headless run of this script):
 #! expect a 92 special 12 form 0
 #! expect a 260 applied attack 1 style 4
