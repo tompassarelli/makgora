@@ -95,3 +95,20 @@ Expert gameplan: Trade meter for safety with Mana Shield, steal charge back with
 
 Forward smash, split by position: the wave breaks at the water spear's tip
 (18%); the shaft only pushes, so she kills at full reach.
+
+## Measured balance (2026-10-28)
+
+The first balance field (wren expert, 400 matches a pair, probe of the landed
+kit, GitHub run 40760239779) puts her at **15% wins**, outside the 40-60% band.
+Against the profile above:
+
+- archetype zoner; air share of normals 19% (band 15-45)
+- aerials n/f/b/u/d 25/23/32/7/13% (all inside their bands)
+- approach share of movement 73% (band 20-50: the bot walks in instead of zoning)
+- ranged share of damage 7% (band 30-70)
+- specials n/s/u/d 21/14/11/0% of moves (up special over its 0-8 band; Mana Shield never used)
+
+Half of her stock losses (52%) come with no hit landed. Her kills come from
+forward smash (41%) and back air (26%). The next pass makes the gameplan keep
+range, makes arrows and the serpent carry ranged damage, and gets the bot to
+use Mana Shield.
