@@ -191,7 +191,7 @@ const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTarget
 const KOBOLD_BURROW_TRAIL: MoveCues = { spell: "Burrow trail", startup: BURROW, active: BURROW };
 
 
-const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 112.0, z: 6.0 }));
+const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 165.0, z: 6.0 }));
 
 export const PEON_REST_CUES: MoveCues = {
   spell: "Rest",

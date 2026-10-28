@@ -7,6 +7,7 @@ import { AttackPhase, type Character } from "../../ts/src/game/sim/codes";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
+import { LOG_GRIP, LOG_LENGTH, LOG_PATH } from "../../ts/src/game/fighters/peon/logPath";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain"), lumberOnly = process.argv.includes("lumber");
@@ -61,18 +62,14 @@ add("backAir", 35, [phase(0), phase(5, { axe: -35, grip: -105, chest: 22, yaw: 6
 strike("upAir", 33, 7, 9, { axe: -20, chest: 20, knee: 42 }, { axe: -110, grip: -100, elbow: -10, chest: 0, knee: 20 }, {}, true, { axe: -175, grip: -135, elbow: -22, chest: -24, knee: 10 });
 strike("downAir", 45, 13, 16, { axe: -160, chest: -20, knee: 60 }, { axe: 25, elbow: 0, chest: 15, knee: 65 }, { axe: 25, chest: 15, knee: 50 }, true, { axe: 45, elbow: 0, chest: 15, knee: 65 });
 strike("neutralSpecial", 42, 18, 20, { grip: -145, chest: -20, twist: -25, knee: 20 }, { grip: -80, axe: -35, chest: 32, twist: 30, knee: 12 });
-const coiled = { chest: 48, knee: 84, tuck: 0.3, lean: 22, ahead: 8, axe: 48, grip: 12, elbow: 16, head: -28 };
-const heaved = { chest: -24, lean: -10, knee: 10, tuck: 0, axe: -188, grip: -172, elbow: -40, head: 22, height: 10 };
-add("sideSpecial", 30, [phase(0), phase(3, { chest: 34, knee: 44, tuck: 0.14, lean: 12, axe: 12, grip: -8, head: -10 }), phase(6, coiled), phase(12, { ...coiled, chest: 54, knee: 90, lean: 26 }),
-  phase(14, { chest: 28, knee: 40, tuck: 0.1, lean: 10, axe: -32, grip: -52, elbow: 0, height: 10, head: -6 }), phase(15, { chest: 0, knee: 4, lean: -8, axe: -88, grip: -96, elbow: -10, height: 18, head: 6 }),
-  phase(16, { chest: -20, knee: 0, lean: -10, axe: -132, grip: -126, elbow: -16, height: 22, head: 18 }), phase(17, { chest: -30, knee: 0, lean: -14, axe: -166, grip: -152, elbow: -26, head: 26, height: 20 }),
-  phase(19, heaved), phase(23, { ...heaved, knee: 18, lean: -8, height: 6 }), phase(25, heaved),
+const coiled = { chest: 56, knee: 88, tuck: 0.32, lean: 30, ahead: 8, axe: -25, grip: -45, elbow: 0, head: -28 };
+const heaved = { chest: -16, lean: -8, knee: 12, tuck: 0, axe: -158, grip: -150, elbow: -55, head: 18 };
+add("sideSpecial", 30, [phase(0), phase(3, { chest: 34, knee: 44, tuck: 0.14, lean: 12, axe: -10, grip: -25, head: -10 }), phase(6, coiled), phase(12, { ...coiled, chest: 58, knee: 90, lean: 32 }),
+  phase(13, { chest: 40, knee: 64, tuck: 0.2, lean: 20, axe: -45, grip: -60, elbow: 0, head: -18 }), phase(14, { chest: 24, knee: 36, tuck: 0.08, lean: 10, axe: -55, grip: -66, elbow: 0, head: -6 }),
+  phase(15, { chest: 4, knee: 12, lean: -4, axe: -80, grip: -90, elbow: -8, head: 6 }), phase(16, { chest: -16, knee: 0, lean: -10, axe: -128, grip: -124, elbow: -16, head: 18 }),
+  phase(17, { chest: -28, knee: 0, lean: -14, axe: -160, grip: -150, elbow: -26, head: 26 }), phase(19, heaved), phase(23, { ...heaved, knee: 18, lean: -6 }), phase(25, heaved),
   phase(27, { chest: -12, knee: 14, twist: -20, axe: -178, grip: -172, elbow: -10, head: 4 }), phase(30)]);
-const LOG_PATH: readonly (readonly [frame: number, x: number, z: number, angle: number])[] = [
-  [0, 12, 6, -2], [7, 12, 6, -2], [12, 10, 10, -8], [13, 14, 14, -6], [14, 22, 18, -4.3], [15, 22, 30, 12.6], [16, 20, 44, 33.7], [17, 16, 60, 55.9],
-  [18, 12, 72, 85], [19, 16, 78, 125], [20, 26, 66, 168], [23, 26, 62, 170], [25, 26, 65, 168], [26, 14, 62, 178], [27, -4, 44, 192], [28, -12, 14, 184], [29, -14, 7, 180], [30, -14, 6, 180],
-];
-const LOG_STRETCH = new Float32Array([2.0, 1.8, 1.8]);
+const LOG_THICKNESS = 1.8, LOG_GRIP_REACH = 6;
 add("upSpecial", 28, [phase(0), phase(6, { chest: 35, knee: 65, axe: 40, tuck: 0.2 }), phase(8, { chest: -15, axe: -155, grip: -110, knee: 10 }), phase(18, { chest: -25, axe: -170, grip: -150, knee: 45 }), phase(28, { chest: 15, knee: 50, axe: -75 })], { air: true });
 add("downSpecial", 38, [phase(0), phase(3, { chest: 35, knee: 55, axe: -85, grip: -65, tuck: 0.16 }), phase(7, { chest: 38, knee: 55, axe: -95, grip: -70, tuck: 0.16 }), phase(18, { chest: 20, knee: 25, axe: 20, grip: -25 }), phase(38)]);
 
@@ -150,7 +147,7 @@ function joint(name: string, g: Gesture): [number,number] {
   return [0,0];
 }
 const snapPain = (bytes: ArrayBuffer, index: number, frames: number, translations: readonly mdx.AnimKeyframe[]) => {
-  const body = new PainBody(bytes, PEON), floor = body.floor(9, 0);
+  const body = new PainBody(bytes, PEON, ["Peon Log"]), floor = body.floor(9, 0);
   for (let f = 0; f <= frames; f++) translations[f]!.Vector[2]! -= body.floor(index, f / 60) - floor;
 };
 const CARGO = [16, 19], LUMBER_GEOSET = 3;
@@ -189,13 +186,14 @@ const plantLog = (targets: readonly Action[], indices: readonly number[]) => {
   const motion = model.Helpers.find(h => h.Name === "Peon Motion"), lumber = model.Bones.find(b => b.Name === "Lumber");
   const anim = model.GeosetAnims.find(a => a.GeosetId === LUMBER_GEOSET), geoset = model.Geosets[LUMBER_GEOSET];
   ensure(motion !== undefined && lumber !== undefined && anim !== undefined && typeof anim.Alpha !== "number" && geoset !== undefined, "Peon lumber geoset or motion helper missing");
-  const butt = new Float32Array([-15, 15, 91]);
+  const low = [0, 1, 2].map(k => Math.min(...geoset.Vertices.filter((_, i) => i % 3 === k))), high = [0, 1, 2].map(k => Math.max(...geoset.Vertices.filter((_, i) => i % 3 === k)));
+  const butt = new Float32Array([low[0]!, (low[1]! + high[1]!) / 2, (low[2]! + high[2]!) / 2]), stretch = new Float32Array([LOG_LENGTH / (high[0]! - low[0]!), LOG_THICKNESS, LOG_THICKNESS]);
   let log = model.Bones.find(b => b.Name === "Peon Log");
   if (log === undefined) {
     const id = model.Nodes.length;
     log = { ...structuredClone(lumber), Name: "Peon Log", ObjectId: id, Parent: motion.Parent, PivotPoint: butt, GeosetId: model.Geosets.length, GeosetAnimId: model.GeosetAnims.length,
       Rotation: { LineType: 1, GlobalSeqId: -1, Keys: [] }, Translation: { LineType: 1, GlobalSeqId: -1, Keys: [] }, Scaling: { LineType: 1, GlobalSeqId: -1, Keys: [] } };
-    model.Bones.push(log); model.Nodes.push(log); model.PivotPoints.push(butt);
+    model.Bones.push(log); model.Nodes.push(log); model.PivotPoints.push(log.PivotPoint);
     const copy = structuredClone(geoset);
     copy.Groups = [[id]]; copy.TotalGroupsCount = 1; copy.VertexGroup = new Uint8Array(copy.Vertices.length / 3);
     const shown = { ...structuredClone(anim), GeosetId: model.Geosets.length };
@@ -205,15 +203,31 @@ const plantLog = (targets: readonly Action[], indices: readonly number[]) => {
   const alpha = model.GeosetAnims.find(a => a.GeosetId === model.Geosets.length - 1)?.Alpha;
   ensure(alpha !== undefined && typeof alpha !== "number", "Peon log geoset lacks its alpha track");
   const [start, end] = model.Sequences[index]!.Interval as unknown as [number, number];
+  const pivot = log.PivotPoint;
+  pivot.set(butt);
+  anim.Alpha.Keys = [...anim.Alpha.Keys.filter(k => k.Frame < start || k.Frame > end), { Frame: start, Vector: new Float32Array([0]) }, { Frame: end, Vector: new Float32Array([0]) }].sort((a, b) => a.Frame - b.Frame);
   alpha.Keys = [...alpha.Keys.filter(k => k.Frame < start || k.Frame > end), { Frame: start, Vector: new Float32Array([1]) }, { Frame: end, Vector: new Float32Array([1]) }].sort((a, b) => a.Frame - b.Frame);
   for (const track of [log.Rotation!, log.Translation!, log.Scaling!]) track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
-  for (const [frame, x, z, angle] of LOG_PATH) {
+  for (const { frame, x, z, angle } of LOG_PATH) {
     const Frame = start + Math.round(frame * 1000 / 60), half = -angle * Math.PI / 360;
     log.Translation!.Keys.push({ Frame, Vector: new Float32Array([x - butt[0]!, -butt[1]!, z - butt[2]!]) });
     log.Rotation!.Keys.push({ Frame, Vector: new Float32Array([0, Math.sin(half), 0, Math.cos(half)]) });
-    log.Scaling!.Keys.push({ Frame, Vector: LOG_STRETCH.slice() });
+    log.Scaling!.Keys.push({ Frame, Vector: stretch.slice() });
   }
   for (const track of [log.Rotation!, log.Translation!, log.Scaling!]) track.Keys.sort((a, b) => a.Frame - b.Frame);
+};
+const checkGrip = (drawn: DrawnModel, targets: readonly Action[], indices: readonly number[]) => {
+  const cell = targets.findIndex(a => a.name === "sideSpecial");
+  if (cell < 0) return;
+  const nodes = drawn.nodes(), node = (name: string) => nodes.findIndex(n => n.name === name);
+  const hands = [node("Bone_Hand_L"), node("Bone_Hand_R")], log = node("Peon Log");
+  const misses: string[] = [];
+  for (let frame = LOG_GRIP.first; frame <= LOG_GRIP.last; frame++) {
+    const { nodes: at } = drawn.posed(indices[cell]!, frame / 60, 1);
+    const gap = Math.hypot((at[hands[0]! * 2]! + at[hands[1]! * 2]!) / 2 - at[log * 2]!, (at[hands[0]! * 2 + 1]! + at[hands[1]! * 2 + 1]!) / 2 - at[log * 2 + 1]!);
+    if (gap > LOG_GRIP_REACH) misses.push(`f${frame} ${gap.toFixed(1)} (hands ${hands.map(h => `${at[h * 2]!.toFixed(0)},${at[h * 2 + 1]!.toFixed(0)}`).join(" ")} log ${at[log * 2]!.toFixed(0)},${at[log * 2 + 1]!.toFixed(0)})`);
+  }
+  ensure(misses.length === 0, `Log Heave hands miss the log's near end: ${misses.join("; ")}`);
 };
 const reauthorInPlace = (targets: readonly Action[], resize: boolean) => {
   const motion = model.Helpers.find(h => h.Name === "Peon Motion");
@@ -258,6 +272,7 @@ const reauthorInPlace = (targets: readonly Action[], resize: boolean) => {
   const unsnapped = generateMDX(model);
   for (const [cell, action] of targets.entries()) snapPain(unsnapped, indices[cell]!, action.frames, moves[cell]!);
   const bytes = encodeVerified(parseSource(generateMDX(model))), before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);
+  checkGrip(after, targets, indices);
   for (const [index, s] of source.Sequences.entries()) if (!indices.includes(index)) for (const t of [0, 0.5, 1]) {
     const a = before.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1), b = after.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1);
     ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${s.Name}: shipped pose changed`);

@@ -61,5 +61,6 @@ function goldSackCueState(fighter: Readonly<Fighter>): PeonCueState<never> {
 export function peonCueState<Rest>(fighter: Readonly<Fighter>, rest: Rest): PeonCueState<Rest> | undefined {
   const { action, frame } = fighter.special;
   if (action === SpecialAction.heroDown) return { cues: rest, phase: frame <= REST_SOUR_FRAME ? "startup" : "active" };
+  if (action === SpecialAction.heroSide && !fighter.motion.grounded) return { cues: rest, phase: "none" };
   return action === SpecialAction.heroNeutral ? goldSackCueState(fighter) : undefined;
 }

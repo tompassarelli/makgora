@@ -70,3 +70,14 @@ scale); frames, speeds and the carry's limits are ours.
 - **CPU.** A computer Peon forward-throws every grab into the carry, walks it
   toward the nearer ledge and cargo-throws off it within 90 units of the edge,
   or after 60 carry frames short of it.
+
+## Log Heave
+
+Tom asked for a longer log that lies on the floor and visibly gets picked up,
+and for an air form (2026-10-28). The log is 156 units long; it lies flat ahead
+of him, he grips its near end, lifts it and heaves it over onto his shoulder.
+The hit capsules run along the drawn log from his hands, so the tipper reaches
+about 125–185 units out. The air form is the same heave and hit regions, once
+per airtime, with no stall: he keeps falling with his momentum, and landing
+mid-move ends it with 15 frames of landing lag. Frame data and values are in
+smashcraft:docs/design/peasant.md.
