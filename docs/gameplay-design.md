@@ -2651,7 +2651,7 @@ Expert field.
 
 | Fighter | Up special | Startup | Intangible | Top speed | Rise / reach | Route control | Opening | Beaten by | Mixed returns |
 |---|---|---:|---:|---:|---:|---|---:|---|---:|
-| Rifleman | Recoil Shot | 4 | 8 | 34 | 523 / 870 | aimed (8-way, 4 frames), second shot re-aims | 31 | read down air (offstage launch, KO at 40%), reaction aerial | 208/208 |
+| Rifleman | Recoil Shot | 4 | 6 | 31 | 407 / 744 | aimed (8-way, 4 frames), second shot re-aims | 11 | read down air (offstage launch, KO at 40%) | 151/208 |
 | Illidan | Wing Ascent | 7 | 4 | 29 | 379 / 688 | aimed (any angle, frame 7), aimed dive branch (8-way) | 41 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
 | Blademaster | Rising Whirlwind | 13 | 0 | 55 | 540 / 544 | aimed (8-way, 12 frames) | 67 | read down air (offstage launch, KO at 40%), reaction aerial | 192/208 |
 | Mountain King | Thunder Leap | 9 | 0 | 32 | 355 / 359 | aimed (8-way, 8 frames) | 41 | read down air (offstage launch, KO at 40%), reaction aerial | 207/208 |

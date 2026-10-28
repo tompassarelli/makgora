@@ -28,6 +28,7 @@ import { landExWavedash } from "./exWavedash";
 
 export const AIR_DODGE_LANDING_LAG = 10;
 export const EMPTY_LANDING_LAG = 4;
+export const RIFLEMAN_RECOVERY_LANDING_LAG = EMPTY_LANDING_LAG + 10;
 export const GROUND_ROLL_SPEED = 8.0;
 export const GROUND_ROLL_MOVE_START = 4;
 export const GROUND_ROLL_MOVE_END = 19;
@@ -76,6 +77,12 @@ function airShotLandingLag(special: Readonly<Fighter["special"]>): number | unde
   if (special.action === SpecialAction.riflemanBlaster && special.duration === RIFLEMAN_BLASTER_AIR_FRAMES) return RIFLEMAN_BLASTER_LANDING_LAG;
   if (special.action === SpecialAction.demonHunterEyeBeam && special.form === EYE_BEAM_AIR_FORM) return EYE_BEAM_LANDING_LAG;
   return undefined;
+}
+
+
+function emptyLandingLag(f: Readonly<Fighter>): number {
+  const recovering = f.character === Character.rifleman && (f.special.fall || f.special.action === SpecialAction.riflemanRecovery);
+  return recovering ? RIFLEMAN_RECOVERY_LANDING_LAG : EMPTY_LANDING_LAG;
 }
 
 
@@ -140,7 +147,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   const damageLanding = !wasGrounded && !fromAsdi && launch.hitstun > 0 && !isTumbling(f) ? damageLandingReaction(f) : undefined;
   if (!motion.grounded) clearDash(f);
   if (!motion.grounded && !dodge.airDodging && !isAerialAttack(f.attack.style) && f.down.state === DownState.none && launch.hitstun <= 0 && !fromAsdi && !landsWithoutLag(f)) {
-    landingState.lag = max(landingState.lag, EMPTY_LANDING_LAG);
+    landingState.lag = max(landingState.lag, emptyLandingLag(f));
   }
   dodge.airUsed = false;
   dodge.airMotionFrames = 0;
