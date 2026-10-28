@@ -69,7 +69,7 @@ const blink = (distance: number): AuthoredSpecial => ({
   ],
   intangible: frames(8, 10),
 });
-const BLINK = blink(f32(H * f32(3.5)));
+const BLINK = blink(f32(H * f32(3.85)));
 
 
 const FAN_FRAMES = 27;
