@@ -352,7 +352,7 @@ transport (wisp#110) both call it.
   universal and never a player choice, so the Controls screen has no delay
   button and profiles save only keys; a profile saved with an old delay code
   loads its keys and drops the code. Each client proposes Auto from its
-  measured echo, capped at 20 frames (333 ms); past that a connection holds
+  measured echo, capped at 16 frames (267 ms); past that a connection holds
   prediction at the window edge instead. Local matches use the default.
 - **Lobby agreement:** each player sees every proposal on character select.
   The match uses the highest proposal for everyone. Character select shows it
@@ -379,7 +379,7 @@ transport (wisp#110) both call it.
   time (59.98 on a laptop pair whose game clock gave 59.86 callbacks, #18),
   so 55 stays clear of them.
 - **Auto, online:** the higher of a ping target and an error-corrected value,
-  capped at 20.
+  capped at 16.
   - *Ping target:* round trip comes from the echo of each sent input row in
     a match and, on the menus before it, of a one-per-second ping on the
     delay channel, so the first match of a session already uses a measured
@@ -390,25 +390,24 @@ transport (wisp#110) both call it.
     carries the safety margin, so the target is the least delay that should
     play clean. On the relay harness a two-deviation guard, inflated by the
     few menu pings before the first match, chose 12-15 frames at 300 ms,
-    where 4 already played 60 frames a second with no holds. R is the
-    rollback window less Battle.net's turn tail, 8 − 10 = −2 frames, so the
-    target is the one-way trip plus 2 frames (see *Rollback window of 8*);
-    it was 6 with the 24-frame window (see *Choosing R*), when ordinary
-    connections kept 2 frames.
+    where 4 already played 60 frames a second with no holds. R, the rollback
+    budget, is 6 frames in every match, one under Slippi's
+    `ROLLBACK_MAX_FRAMES` (see *Choosing R*). The target rises above 2 only
+    past 2 + R one-way frames (about 270 ms round trip), so ordinary
+    connections keep 2 frames.
     It raises at once but lowers only when one more frame of round trip
     would still allow the lower value, so jitter cannot flip it back and
     forth.
   - *Error correction:* each second of a match counts the callbacks whose
     prediction was held or stalled, the remote rows that arrived, and those
-    that arrived within one frame of the rollback window's edge (deep). A
+    that arrived more than R frames behind the speculative cursor (deep). A
     second is errored when 2 or more callbacks held or more than half the
     rows came in deep; when 3 of a 5-second window are errored, the
     corrected value becomes one more than the higher of itself and the
     current delay. A second is clean when nothing held and at most 5% of the
     rows came in deep; 30 clean seconds in a row lower it to one below the
     lower of itself and the current delay. The new value applies at the next
-    match; an errored second also raises the running match's delay (see
-    *When delay changes*). Measured on the relay harness (smashcraft:ts/test/online-pacing.test.ts,
+    match. Measured on the relay harness (smashcraft:ts/test/online-pacing.test.ts,
     match 793's inputs, three humans and a computer): at 300 and 600 ms
     round trip the Auto delay holds 60 sim frames a second with no errored
     seconds; a 1 s relay outage errors at most 2 seconds, so it does not
@@ -418,7 +417,7 @@ transport (wisp#110) both call it.
     third of rows deep, none held), and a clean second needing every row
     within R never ran 30 seconds even at 300 ms, so the value could only
     rise.
-  - *Choosing R (19 Oct 2026, superseded by the 8-frame window below):* R was swept over 5, 6, 7, 8 and 10 on the
+  - *Choosing R (19 Oct 2026):* R was swept over 5, 6, 7, 8 and 10 on the
     relay harness (match 793's inputs, three jitter seeds) with correction
     pop: the largest distance, in world units, that a landed correction moved
     any fighter (the rates `pop` field). Most corrections move nobody (median
@@ -559,57 +558,9 @@ transport (wisp#110) both call it.
     more corrections that move nobody, while human 0 stalls 5.4 a second.
     The route's pop stays guarded by its p95 of at most 680 (608 at worst over the
     seven seeds with the pacing removed); a median pop means something only over several seeds.
-  - *Rollback window of 8 (29 Oct 2026, #679):* Tom decided, after an online
-    match at about 500 ms that jittered at the 16-frame delay ceiling, that
-    a correction never replays more than 8 frames and input delay covers the
-    rest of the trip. Every playable and journal build's window is 8
-    (smashcraft:ts/src/game/session/currentBuild.ts); prediction holds at
-    the window's edge instead of running further ahead, so no correction
-    can be deeper. Whether a row fits the window depends on its lateness,
-    not the mean trip: a remote row reaches the speculative cursor
-    one-way + send wait + turn wait − D frames late. The playable build
-    sends rows in pairs, a wait of at most 1 frame (the journal builds' 6
-    callback cadence waits up to 5). Battle.net delivers each message on a
-    25 ms turn and adds 0 to 8 extra turns (wisp:docs/network-model.md):
-    the 24-frame harness at 500 ms put the latest rows 10 frames past the
-    mean one-way trip the echo measures. So D ≥ one-way + 10 − 8 = one-way
-    + 2. At 500 ms one-way is 15 frames, and the slower of the duel's two
-    harness links (115%) measures about 600 ms, 18 frames, so the agreed
-    delay is 17 to 20: over the old 16-frame ceiling, which is now 20
-    (smashcraft:ts/src/game/netcode/fixedSchedule.ts). 20 covers a 600 ms
-    round trip; past it a connection holds prediction and shows
-    "connection poor". Measured on the harness (two humans and a computer,
-    match 793's inputs, window 8), held callbacks a second for each
-    client at each delay:
-    - 500 ms: delay 11 (the old budget of 6) held 23 and 22; 13 held 20
-      and 18; 15 held 12 and 5; 17 held 6 and 1.5; 19 held 1.6 and 0.4;
-      21 held 0.2 and 0.
-    - 160 ms: delay 2 held 23 and 22 (53 sim frames a second); 7 held 6
-      and 3; 9 held 3 and 1.
-    - 300 ms: delay 5 held 24 and 22; 11 held 6 and 2; 13 held 2 and 0.6.
-    With the policy as built (target one-way + 2, raises on errored
-    seconds), the 500 ms route agrees on 19, raises to 20 within 3
-    seconds, holds 0.4 and 0.2 a second, and its deepest correction is 8
-    (smashcraft:ts/test/online-rollback.test.ts). The 160 ms route settles
-    at 12 and the 300 ms route at 16, holding 0.2 a second or less. The
-    window costs low-ping links delay as well: Battle.net's turn tail is
-    the same at every round trip, so a 160 ms duel plays at about 12
-    frames where it played at 2 with the 24-frame window.
-- **When delay changes:** at match start, on the epoch every client begins
-  together, from requests already exchanged through the synchronized
-  channel; and it rises, never falls, within a match. A client whose match
-  second is errored sends, with its proposal, a raise to the higher of one
-  more than the current delay and its ping target. Every client receives
-  the same raise on the same turn and takes the highest any human sent.
-  Each client then assigns its next sample to the new delay's frame and
-  fills the frames it skips with its last row held, edges dropped, so every
-  frame keeps one synchronized row per player and no frame repeats a press
-  (smashcraft:ts/src/game/netcode/shadowSchedule.ts `raiseDelay`). A round
-  trip that jumps from 160 to 500 ms raises the delay in the second after
-  prediction first holds and reaches 20 within 4 seconds. A raise follows
-  held seconds, not the smoothed ping: raised on every rise of the
-  smoothed ping, Battle.net's turn jitter ratcheted a 160 ms match from 9
-  to 15 frames in 4 seconds.
+- **When delay changes:** only at match start, on the epoch every client
+  begins together, from requests already exchanged through the synchronized
+  channel. It never changes mid-exchange.
 - **Time sync (GGPO-style, pause-free):** the client that runs ahead by two
   or more frames of advantage waits one frame, at most once per second, so
   rollback depth stays even on both sides (`timeSyncWait`). Wisp's
@@ -618,12 +569,11 @@ transport (wisp#110) both call it.
   the same turn, so neither client runs ahead, and a local wait would only
   make the two clients' predicted drawing differ.
 - **Network indicator:** online matches show the current delay and rollback
-  depth. If the one-way trip exceeds the delay less 2 frames, the turn
-  tail the window can't absorb, it shows "connection poor" instead of
-  desyncing.
-- **Rollback window:** 8 frames (Tom, 29 Oct 2026, #679). The replay
-  history allows up to 24 (smashcraft:ts/src/game/replay/limits.ts), which
-  `-dev rb` may still select for a measurement.
+  depth. If the one-way trip exceeds the window plus the delay, it shows
+  "connection poor" instead of desyncing.
+- **Rollback window:** 24 frames, the hard stall limit
+  (smashcraft:ts/src/game/replay/limits.ts). It is not the budget: deeper
+  corrections look like teleports and cost more replay.
 
 Prior art, read from source on 9 Oct 2026:
 - GGPO: `MAX_PREDICTION_FRAMES 8` (pond3r/ggpo src/lib/ggpo/sync.h). Its time
@@ -642,7 +592,7 @@ Prior art, read from source on 9 Oct 2026:
   defaults; that is not confirmed from an official source.
 
 The journal integrity diagnostic and the playable keyboard build both start
-at delay 2 with the 8-frame window. The capture-to-first-prediction check
+at delay 2 with the 24-frame window. The capture-to-first-prediction check
 measures map admission, which does not establish press-to-screen time.
 
 ## Bounded SDI

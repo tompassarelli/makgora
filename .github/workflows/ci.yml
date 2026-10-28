@@ -44,7 +44,7 @@ jobs:
       - name: four-fighter p99 <= 10 ms and worst <= 14 ms in Classic
         run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf
         working-directory: ts
-      - name: four-fighter 8-frame rollback p99 <= 10 ms and worst <= 14 ms
+      - name: four-fighter 24-frame rollback p99 <= 10 ms and worst <= 14 ms
         if: ${{ !cancelled() }}
         run: bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf
         working-directory: ts

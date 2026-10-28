@@ -43,7 +43,7 @@ import { visualCaptureStopBefore } from "../../game/session/visualCapture";
 import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
 import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
-import { beginNetEpoch, matchDelay, matchRaise, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
+import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
 
 
 const STALL_NOTICE_CALLBACKS = 20;
@@ -64,17 +64,6 @@ export function delayRow(s: ShellState, rollback: Rollback): string {
   return `delay ${rollback.epoch} ${rollback.delay} ${requests.join(",")}`;
 }
 
-const agreesDelay = (s: ShellState, rollback: Rollback): boolean => rollback.keyboard !== undefined && !(s.build.devConsole && s.dev.delay !== rollback.mode.delay);
-
-export function raiseMatchDelay(s: ShellState, rollback: Rollback): void {
-  const { keyboard, schedule, epoch } = rollback;
-  if (keyboard === undefined || !rollback.active || s.game.phase !== Phase.match || !agreesDelay(s, rollback)) return;
-  const agreed = matchRaise(rollback.net, s.game);
-  if (agreed <= rollback.delay) return;
-  if (!schedule.raiseDelay(epoch, agreed, keyboard.lastTarget ?? rollback.delay, keyboard.capture.row)) return;
-  rollback.delay = agreed;
-}
-
 export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   if (s.pad !== undefined) {
     s.pad.rows.length = 0;
@@ -85,7 +74,8 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   }
   const { schedule, speculative } = rollback;
   rollback.epoch++;
-  rollback.delay = agreesDelay(s, rollback) ? matchDelay(rollback.net, s.game) : s.dev.delay;
+  const devDelay = s.build.devConsole && s.dev.delay !== rollback.mode.delay;
+  rollback.delay = rollback.keyboard === undefined || devDelay ? s.dev.delay : matchDelay(rollback.net, s.game);
   beginNetEpoch(rollback.net);
   rollback.window = s.dev.rollback;
   rollback.batch = s.dev.batch;

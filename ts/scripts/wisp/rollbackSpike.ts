@@ -10,6 +10,7 @@ export interface LagSpikes {
 
 export const DEEP_ROLLBACK_SPIKES: LagSpikes = { first: 230, period: 301, hold: 40 };
 
+export const DEEP_ROLLBACK_DEPTHS: readonly number[] = [24, 24, 24, 23];
 
 export function lagSpikeDelivery(base: SyncDelivery, spikes: LagSpikes, senders: number): SyncDelivery {
   const last = new Map<number, number>();

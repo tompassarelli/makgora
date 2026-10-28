@@ -11,7 +11,7 @@ import { PARTICIPANT_CAPACITY, type ParticipantInputs, participantInputs } from 
 import { INPUT_LAST_FRAME, type InputPacket } from "../input/wire";
 import { REPLAY_HISTORY_CAPACITY, REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import { Capture } from "./capture";
-import { type FixedDelay, FixedInputSchedule, fixedCaptureTarget, isFixedDelay } from "./fixedSchedule";
+import { type FixedDelay, FixedInputSchedule, fixedCaptureTarget } from "./fixedSchedule";
 import { FrameRing } from "./frameRing";
 import { FUTURE_LIMIT, type Receipt } from "./ledger";
 import { at } from "wisp/src/runtime/lookup";
@@ -29,7 +29,6 @@ export class ShadowInputSchedule {
   private readonly pendingRows = new FrameRing(PENDING_CAPACITY);
   // Preallocated, rewritten every speculative frame: each slot's last resolved row, its prediction basis.
   private readonly previous = participantInputs();
-  private readonly hold = emptyInput();
   private current: number | undefined;
   private fixedDelay: FixedDelay = 0;
   private window = 0;
@@ -69,23 +68,6 @@ export class ShadowInputSchedule {
 
   delay(): FixedDelay {
     return this.fixedDelay;
-  }
-
-  /**
-   * Raises D within the epoch. The local frames the higher delay skips past
-   * `lastCaptured` hold `held`, edges dropped, so every frame keeps exactly
-   * one local row and the confirmed world never sees a gap.
-   */
-  raiseDelay(epoch: number, delay: FixedDelay, lastCaptured: number, held: Readonly<InputRow>): boolean {
-    if (epoch !== this.current || !isFixedDelay(delay) || delay <= this.fixedDelay) return false;
-    predictInto(this.hold, held);
-    const through = this.nextSpeculative + delay - 1;
-    for (let frame = Math.max(lastCaptured, this.nextConfirmed - 1) + 1; frame <= through; frame++) {
-      const capture = this.captureLocalAt(epoch, frame, this.hold);
-      if (capture !== Capture.captured && capture !== Capture.alreadyCaptured) return false;
-    }
-    this.fixedDelay = delay;
-    return true;
   }
 
   rollbackFrames(): number {

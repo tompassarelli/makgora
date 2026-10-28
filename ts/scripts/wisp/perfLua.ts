@@ -22,7 +22,7 @@ import { profileRun } from "./censusProfile";
 import type { LuaHeadlessMap } from "wisp/src/headless/lua";
 import type { SyncDelivery } from "wisp/src/headless/lockstep";
 import { SMASHCRAFT_NOOPS, smashcraftNativeBehavior } from "./headlessNatives";
-import { DEEP_ROLLBACK_SPIKES, confirmedLag, deepestRollback, framesRun, lagSpikeDelivery } from "./rollbackSpike";
+import { DEEP_ROLLBACK_DEPTHS, DEEP_ROLLBACK_SPIKES, confirmedLag, deepestRollback, framesRun, lagSpikeDelivery } from "./rollbackSpike";
 import { CATCH_UP_FRAMES } from "../../src/game/session/playback";
 
 declare const arg: Readonly<Record<number, string | undefined>>;
@@ -119,7 +119,8 @@ else if (bot !== undefined) {
         const most = debts.reduce((worst, callbacks) => Math.max(worst, callbacks), 0);
         const mean = debts.reduce((total, callbacks) => total + callbacks, 0) / Math.max(1, debts.length);
         depths.push(`p${client.slot} cleared ${debts.length} confirmed debts of ${CATCH_UP_FRAMES} frames in ${mean.toFixed(2)} callbacks mean, ${most} most${indebted[index] === undefined ? "" : ", one unpaid at the end"}`);
-        if (depth.deepest < depth.window) lines.push(`p${client.slot} deepest rollback ${depth.deepest} never reached the ${depth.window}-frame window`);
+        const reached = DEEP_ROLLBACK_DEPTHS[index] ?? depth.window;
+        if (depth.deepest < reached) lines.push(`p${client.slot} deepest rollback ${depth.deepest} never reached ${reached} frames`);
       }
     });
     return { problems: lines.length, lines };
