@@ -185,7 +185,7 @@ const SHADOW_HUNTER: AuthoredSpecial = {
 const DOOM_GUARD_WAVE: SpecialProjectile = shot(0, 70.0, 20.0, 8.0, 0.0, 30, 34.0, hit(6.0, 60, 60.0, 40.0, HitElement.fire), "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx");
 const DOOM_GUARD: SpecialCompanion = { followSpeed: 2.0, followBehind: 80.0, returnSpeed: 3.0, engage: 150.0, lungeStartup: 26, lungeActive: 6, lungeRecovery: 58, lungeTravel: 30.0, waveFrame: 32, bite: capsule(20.0, 30.0, 160.0, 90.0, 60.0), biteEffect: hit(14.0, 40, 85.0, 50.0, HitElement.slash), stunFrames: 40, leash: 4000.0, leashFrames: 600, };
 const DOOM: SpecialCurse = {
-  every: 60, damage: 1.0, summonDelay: 180, portal: { ...mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 0, 77, 0.0), ...ON_FLOOR },
+  every: 60, damage: 1.0, summonDelay: 60, portal: { ...mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 0, 77, 0.0), ...ON_FLOOR },
   summon: { frame: 0, offsetX: 0.0, radius: 50.0, height: 220.0, durability: 40.0, life: 480, fireAges: [], shot: DOOM_GUARD_WAVE, companion: DOOM_GUARD, model: { path: "Units\\Demon\\DoomGuard\\DoomGuard.mdl", height: 260.0, alpha: 255 }, },
 };
 const PIT_LORD: AuthoredSpecial = {

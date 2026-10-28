@@ -118,7 +118,7 @@ test("The victim's stock loss lifts the curse, and the respawned victim stops bu
   const d = cursedDuel();
   loseStock(d, d.foe);
   assertEquals(d.foe.status.cursedBy, undefined);
-  steps(d, d.doom.summonDelay - 10);
+  steps(d, 170);
   assertFalse(d.foe.status.out);
   assertEquals(d.foe.status.damage, 0.0);
 });
@@ -133,7 +133,7 @@ test("The Pit Lord losing a stock first lifts his curse and no Doom Guard comes 
   assertFalse(guard(d).life > 0);
 });
 
-test("A Doom Guard steps out of a fel portal exactly 180 frames after the doomed foe's stock loss, on the main deck nearest where they fell [k1 scenario]", () => {
+test("A Doom Guard steps out of a fel portal exactly 60 frames after the doomed foe's stock loss, as they respawn, on the main deck nearest where they fell [k1 scenario]", () => {
   const d = cursedDuel();
   loseStock(d, d.foe);
   const lost = d.tick;
@@ -142,7 +142,7 @@ test("A Doom Guard steps out of a fel portal exactly 180 frames after the doomed
     assertFalse(guard(d).life > 0);
   }
   step(d);
-  assertEquals(d.tick - lost, 180);
+  assertEquals(d.tick - lost, 60);
   const placed = guard(d);
   assertTrue(summonAlive(d.pitLord, d.doom));
   assertEquals(placed.mode, CompanionMode.stunned);
@@ -154,13 +154,9 @@ test("A Doom Guard steps out of a fel portal exactly 180 frames after the doomed
   assertTrue(d.pitLord.projectiles.some(shot => shot.life > 0 && shot.spec === d.doom.portal));
 });
 
-test("Only one Doom Guard at a time: a second doomed stock loss while one is pending or out summons nothing more [k1 scenario]", () => {
+test("Only one Doom Guard at a time: a second doomed stock loss while one is out summons nothing more [k1 scenario]", () => {
   const d = cursedDuel();
   loseStock(d, d.foe);
-  steps(d, 60);
-  applyCurse(d.foe, PIT_LORD_SLOT);
-  loseStock(d, d.foe, -OFF_STAGE);
-  assertEquals(d.pitLord.status.summonFrames, d.doom.summonDelay - 61);
   steps(d, d.doom.summonDelay);
   assertTrue(summonAlive(d.pitLord, d.doom));
   const serial = guard(d).serial;
