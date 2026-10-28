@@ -33,6 +33,9 @@ export const ATTACK_CUES: { readonly [character: number]: { readonly [style: num
   [Character.grom]: {
     [AttackStyle.neutralAir]: [{ name: "Axe Whirl", fromActive: 0, cue: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(0.7)) }],
   },
+  [Character.mountainKing]: {
+    [AttackStyle.upAir]: [{ name: "Crown Spark", fromActive: 0, cue: cue("Abilities\\Spells\\Other\\ForkedLightning\\ForkedLightningTarget.mdx", f32(0.9)) }],
+  },
   [Character.warden]: {
     [AttackStyle.downAir]: [{ name: "Falling Knives", fromActive: 0, cue: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx", f32(0.3)) }],
     [AttackStyle.upAir]: [{ name: "Sky Crescent", fromActive: 0, cue: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(0.45)) }],
