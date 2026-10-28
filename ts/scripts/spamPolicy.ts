@@ -84,12 +84,12 @@ function press(f: Readonly<Fighter>, target: Readonly<Fighter>, move: number, fr
   }
   if (f.motion.grounded) {
     const style = move === AttackStyle.dashAttack ? AttackStyle.jab : move;
-    queueAttack(commands, { style, facing: toward, frame, mayCharge: false });
+    queueAttack(commands, { style, facing: toward, frame, mayCharge: false, cStick: false });
     return;
   }
   const request = move === AttackStyle.neutralAir ? AttackStyle.jab : move === AttackStyle.upAir ? AttackStyle.upTilt
     : move === AttackStyle.downAir ? AttackStyle.downTilt : AttackStyle.forwardTilt;
-  queueAttack(commands, { style: request, facing: move === AttackStyle.backAir ? (f.facing < 0 ? 1 : -1) : f.facing < 0 ? -1 : 1, frame, mayCharge: false });
+  queueAttack(commands, { style: request, facing: move === AttackStyle.backAir ? (f.facing < 0 ? 1 : -1) : f.facing < 0 ? -1 : 1, frame, mayCharge: false, cStick: false });
 }
 
 

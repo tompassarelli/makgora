@@ -125,7 +125,7 @@ export function pressEdgeCancel(f: Fighter, target: Readonly<Fighter>, stage: nu
   }
   if (f.attack.style !== undefined || f.motion.vz > CARRY_PRESS_RISE || inside > CARRY_REACH) return false;
   // Facing out it is a forward air; facing the stage, a back air: both drift out.
-  queueAttack(commands, { style: AttackStyle.forwardTilt, facing: side, frame, mayCharge: false });
+  queueAttack(commands, { style: AttackStyle.forwardTilt, facing: side, frame, mayCharge: false, cStick: false });
   input.direction = side;
   return true;
 }

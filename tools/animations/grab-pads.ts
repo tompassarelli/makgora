@@ -33,7 +33,7 @@ function play(character: Character, targetCharacter: Character, holder: number, 
     ensure(moving && holding, "Missing player input");
     if (frame >= 40 && frame < 40 + runFrames) moving.direction = -facing;
     if (action !== undefined) {
-      if (frame === 150) queueAttack(controls.commands[holder], { style: AttackStyle.grab, facing: 0, frame, mayCharge: false });
+      if (frame === 150) queueAttack(controls.commands[holder], { style: AttackStyle.grab, facing: 0, frame, mayCharge: false, cStick: false });
       if (frame === 180) holding.attackPressed = true;
       if (frame === 200) {
         if (action === GrabAction.throwUp || action === GrabAction.throwDown) holding.grabThrowZ = action === GrabAction.throwUp ? 1 : -1;

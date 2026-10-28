@@ -807,6 +807,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
     int(`commands[${slot}].consumedFacing`, command.consumedFacing);
     bool(`commands[${slot}].mayCharge`, command.mayCharge);
     bool(`commands[${slot}].consumedMayCharge`, command.consumedMayCharge);
+    if (command.cStick) bool(`commands[${slot}].cStick`, true);
   }
   int("match.phase", match.phase);
   bool("match.camera.initialized", match.camera.initialized);
@@ -923,6 +924,10 @@ function foldHash(value: number): void {
 }
 
 // An integer in [-2^31, 2^31) as two 16-bit halves, each below the modulus, so no two integers fold alike.
+function foldFlag(value: boolean): void {
+  foldHash(value ? -7 : -8);
+}
+
 function foldHashWide(value: number): void {
   foldHash(floorDiv(value, 65536) + 32768);
   foldHash(floorMod(value, 65536));
@@ -986,7 +991,7 @@ function foldHashName(prefix: string, name: string): void {
 
 const HASH_SINK: StateSink = {
   int: (prefix, name, value) => { foldHash(-6); foldHashName(prefix, name); foldHashValue(value); },
-  bool: (prefix, name, value) => { foldHash(value ? -7 : -8); foldHashName(prefix, name); },
+  bool: (prefix, name, value) => { foldFlag(value); foldHashName(prefix, name); },
   real: (prefix, name, value) => { foldHash(-9); foldHashName(prefix, name); foldHashValue(value); },
   text: fragment => foldHashText(fragment),
   observation: (_name, sample) => writeObservations(HASH_OBSERVATIONS, sample.opponents),
@@ -999,12 +1004,12 @@ function foldHashRuntime(runtime: Readonly<PacingAndPresentation>): void {
     foldHashValue(runtime.observedLegal[slot]);
     foldHashValue(runtime.observedStarted[slot]);
     const decision = runtime.botDecisions[slot];
-    foldHash(decision.decided ? -7 : -8);
+    foldFlag(decision.decided);
     if (!decision.decided) continue;
     for (const field of CONTROL_FIELDS) {
       const value = decision.input[field];
       if (value === undefined) foldHash(-12);
-      else if (typeof value === "boolean") foldHash(value ? -7 : -8);
+      else if (typeof value === "boolean") foldFlag(value);
       else foldHashValue(value);
     }
     const command = attackBufferCanonicalState(decision.commands);
@@ -1013,8 +1018,8 @@ function foldHashRuntime(runtime: Readonly<PacingAndPresentation>): void {
     foldHashValue(command.facing);
     foldHashValue(command.targetFrame);
     foldHashValue(command.consumedFacing);
-    foldHash(command.mayCharge ? -7 : -8);
-    foldHash(command.consumedMayCharge ? -7 : -8);
+    foldFlag(command.mayCharge);
+    foldFlag(command.consumedMayCharge);
   }
 }
 

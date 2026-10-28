@@ -59,9 +59,9 @@ export function runFrameCostBenchmark(clock: () => number): FrameCostBenchmarkRe
     secondInput.sdiX = floorMod(phase, 2) === 0 ? 1 : -1;
     clearAttackBuffer(firstRequests);
     clearAttackBuffer(secondRequests);
-    if (frame === 1 || frame === 40) queueAttack(firstRequests, { style: 0, facing: 1, frame, mayCharge: false });
-    if (phase >= 80 && floorMod(phase, 32) === 16) queueAttack(firstRequests, { style: 1, facing: 1, frame, mayCharge: false });
-    if (phase === 160) queueAttack(secondRequests, { style: 6, facing: -1, frame, mayCharge: false });
+    if (frame === 1 || frame === 40) queueAttack(firstRequests, { style: 0, facing: 1, frame, mayCharge: false, cStick: false });
+    if (phase >= 80 && floorMod(phase, 32) === 16) queueAttack(firstRequests, { style: 1, facing: 1, frame, mayCharge: false, cStick: false });
+    if (phase === 160) queueAttack(secondRequests, { style: 6, facing: -1, frame, mayCharge: false, cStick: false });
     if (frame >= 3000 && frame < 3300) {
       secondInput.direction = 1;
       clearAttackBuffer(secondRequests);

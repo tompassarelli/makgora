@@ -94,6 +94,6 @@ export function guardOffstage(f: Readonly<Fighter>, target: Readonly<Fighter>, s
   if (f.attack.style !== undefined || !canAttack(f)) return true;
   const forward = forwardAirTool(f.character);
   const inReach = forward ? dx >= -30.0 && dx <= 100.0 && dz >= -90.0 && dz <= 70.0 : dx >= -REACH_X && dx <= REACH_X && dz >= -70.0 && dz <= 10.0;
-  if (inReach) queueAttack(commands, { style: forward ? AttackStyle.forwardTilt : AttackStyle.downTilt, facing: side, frame, mayCharge: false });
+  if (inReach) queueAttack(commands, { style: forward ? AttackStyle.forwardTilt : AttackStyle.downTilt, facing: side, frame, mayCharge: false, cStick: false });
   return true;
 }

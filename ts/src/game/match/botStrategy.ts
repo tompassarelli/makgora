@@ -349,7 +349,7 @@ export function pressBotRead(state: BotStrategy, own: Readonly<Fighter>, target:
   }
   if (state.readActed) {
     if (state.readActionFrame < 0 || frame - state.readActionFrame > 6 || own.attack.serial !== state.readActionSerial) return false;
-    queueAttack(commands, { style: state.readActionStyle, facing: state.readActionFacing, frame: state.readActionFrame, mayCharge: false });
+    queueAttack(commands, { style: state.readActionStyle, facing: state.readActionFacing, frame: state.readActionFrame, mayCharge: false, cStick: false });
     input.attackHeld = true;
     return true;
   }
@@ -366,7 +366,7 @@ export function pressBotRead(state: BotStrategy, own: Readonly<Fighter>, target:
   if (ahead < -4 || !slideStaysOnDeck(own, stage, matchFrame)) return false;
   const anticipatedZ = state.readChoice === HabitChoice.jump ? 70.0 : state.readChoice === HabitChoice.landing ? 0.0 : f32(target.motion.z - own.motion.z);
   if (!moveReaches(own.character, style, target, Math.abs(dx), anticipatedZ, own.tuning.moves)) return false;
-  queueAttack(commands, { style, facing: toward, frame, mayCharge: false });
+  queueAttack(commands, { style, facing: toward, frame, mayCharge: false, cStick: false });
   input.attackHeld = true;
   state.readActed = true;
   state.readActionFrame = frame;

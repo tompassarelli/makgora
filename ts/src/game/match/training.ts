@@ -217,7 +217,7 @@ export function trainingPartnerInput(state: Readonly<TrainingState>, world: Rost
       input.jumpPressed = f.motion.grounded && canAttack(f);
       return true;
     case PartnerBehaviour.attack:
-      if (f.motion.grounded && canAttack(f)) queueAttack(commands, { style: AttackStyle.jab, facing: towardAttacker(world, slot), frame, mayCharge: false });
+      if (f.motion.grounded && canAttack(f)) queueAttack(commands, { style: AttackStyle.jab, facing: towardAttacker(world, slot), frame, mayCharge: false, cStick: false });
       return true;
     default:
       return true;

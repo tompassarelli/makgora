@@ -146,7 +146,7 @@ function reads(profile: CpuProfile, seed: number, trial: number, into: Calibrati
       const target = perceivedOpponent(runtime.botMemory, played.own, 0, frame, profile.reactionFrames, played.state.world.mask);
       if (target !== undefined) pressBotRead(commitment, played.own, target, 0, played.state.match.matchFrame, frame, controls.inputs[0], controls.commands[0]);
       if (frame === expectedFrame) {
-        queueAttack(controls.commands[1], { style: switched ? AttackStyle.grab : AttackStyle.jab, facing: -1, frame, mayCharge: false });
+        queueAttack(controls.commands[1], { style: switched ? AttackStyle.grab : AttackStyle.jab, facing: -1, frame, mayCharge: false, cStick: false });
       }
       if (!captureFrame(row, frame, played.state.world.mask, controls, runtime)
         || !executeMatchFrame(row, played.state.match, played.state.world, played.state.controls, runtime, frame)) throw new Error("calibration read frame rejected");
@@ -341,7 +341,7 @@ function enduringFlaw(profile: CpuProfile, seed: number, trial: number, into: Ca
     if (guarded ? next === counterFrame : elapsed === 0) {
       response.shield = guarded;
       if (!guarded && profile.opponent === "wren") response.direction = -1;
-      queueAttack(produced.commands[1], { style: guarded ? AttackStyle.grab : AttackStyle.jab, facing: profile.opponent === "kite" ? 1 : -1, frame: next, mayCharge: false });
+      queueAttack(produced.commands[1], { style: guarded ? AttackStyle.grab : AttackStyle.jab, facing: profile.opponent === "kite" ? 1 : -1, frame: next, mayCharge: false, cStick: false });
     }
     if (!captureFrame(row, next, state.world.mask, produced, state.runtime)
       || !executeMatchFrame(row, state.match, state.world, state.controls, state.runtime, next)) throw new Error("calibration enduring-flaw frame rejected");

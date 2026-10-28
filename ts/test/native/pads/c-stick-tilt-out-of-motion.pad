@@ -1,0 +1,34 @@
+# Rifleman a; a C-stick press out of a dash, a run or a run brake is the tilt it names, and A with a direction in a run stays the dash attack (2026-10-28).
+# Styles: 6 forward tilt, 7 up tilt, 8 down tilt, 19 dash attack.
+#! chat -dev quick hero rifleman
+# Run right, then C-right: the forward tilt, stopped.
+60 a stick 1 0
+92 a cstick 1 0
+94 a cstick 0 0
+#! expect a 75-78 ground action 2
+#! expect a 92-95 applied attack 1 style 6
+96 a capture
+100 a capture
+130 a stick 0 0
+# Dash left, then C-up on dash frame 3: the up tilt.
+200 a stick -1 0
+202 a cstick 0 1
+204 a cstick 0 0
+#! expect a 202-205 applied attack 2 style 7
+205 a capture
+230 a stick 0 0
+# Run right, release into the run brake, then C-down: the down tilt.
+300 a stick 1 0
+335 a stick 0 0
+336 a cstick 0 -1
+338 a cstick 0 0
+#! expect a 336-339 applied attack 3 style 8
+340 a capture
+# Run right, then A: still the dash attack.
+420 a stick 1 0
+452 a tap A 2
+460 a stick 0 0
+#! expect a 452-455 applied attack 4 style 19
+456 a capture
+560 a press VIEW
+630 a release VIEW

@@ -113,7 +113,7 @@ function decodeInput(line: number, slot: ParticipantSlot, rest: readonly string[
       if (style === undefined || facing === undefined || !isDirection(facing) || frame === undefined || (charge !== 0 && charge !== 1)) {
         return fail("attack takes STYLE,FACING,FRAME,CHARGE");
       }
-      attacks.push({ style, facing, frame, mayCharge: charge === 1 });
+      attacks.push({ style, facing, frame, mayCharge: charge === 1, cStick: false });
       index += 5;
     } else if (isFlagField(name)) {
       const value = parseInteger(rest[index + 1]);

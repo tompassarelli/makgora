@@ -42,7 +42,7 @@ function bout(first: Character, second: Character, gap: number): Bout {
     frame++;
     copyControls(frameControls.inputs[0], one);
     copyControls(frameControls.inputs[1], two);
-    if (attack !== undefined) queueAttack(frameControls.commands[0], { style: attack, facing: 1, frame, mayCharge: false });
+    if (attack !== undefined) queueAttack(frameControls.commands[0], { style: attack, facing: 1, frame, mayCharge: false, cStick: false });
     stepMatch(game, world, frameControls, frame);
   };
   for (let settle = 0; settle < 3; settle++) step();

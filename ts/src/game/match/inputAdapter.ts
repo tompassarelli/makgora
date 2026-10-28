@@ -165,12 +165,12 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
     const shieldGrab = fighter.motion.grounded && (fighter.shield.raised || destination.shield);
     queueAttack(attacks, {
       style: normalAttackStyle(aimX, aimZ, destination.walking, strong, shieldGrab),
-      facing: sign(aimX), frame, mayCharge: true,
+      facing: sign(aimX), frame, mayCharge: true, cStick: false,
     });
   }
-  if ((pressed & GRAB_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.grab, facing: 0, frame, mayCharge: false });
-  if ((pressed & C_LEFT_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.forwardTilt, facing: -1, frame, mayCharge: false });
-  if ((pressed & C_RIGHT_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.forwardTilt, facing: 1, frame, mayCharge: false });
-  if ((pressed & C_UP_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.upTilt, facing: 0, frame, mayCharge: false });
-  if ((pressed & C_DOWN_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.downTilt, facing: 0, frame, mayCharge: false });
+  if ((pressed & GRAB_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.grab, facing: 0, frame, mayCharge: false, cStick: false });
+  if ((pressed & C_LEFT_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.forwardTilt, facing: -1, frame, mayCharge: false, cStick: true });
+  if ((pressed & C_RIGHT_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.forwardTilt, facing: 1, frame, mayCharge: false, cStick: true });
+  if ((pressed & C_UP_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.upTilt, facing: 0, frame, mayCharge: false, cStick: true });
+  if ((pressed & C_DOWN_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.downTilt, facing: 0, frame, mayCharge: false, cStick: true });
 }

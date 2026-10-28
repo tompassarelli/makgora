@@ -4,7 +4,7 @@ import { canHit } from "./teams";
 
 import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, AttackStyle, Character, DASH_GRAB_REQUEST, GroundAction } from "./codes";
-import { groundState } from "./groundMovement";
+import { groundOptionOpen, groundState } from "./groundMovement";
 import { GroundOption, GroundState, groundOptionAllowed } from "./stickZones";
 import { attackPhase, attackStartup, attackActive, canBeGrabbed, canStartAttackStyle, inEarlyAscent, inGrabContext, isIntangible, jabChainStep } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
@@ -149,9 +149,9 @@ function groundOption(style: AttackStyle): GroundOption | undefined {
 }
 
 
-export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle): AttackStyle | undefined {
+export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle, cStick = false): AttackStyle | undefined {
   const option = groundOption(style);
-  if (option === undefined) return style;
+  if (option === undefined || (cStick && option === GroundOption.tilt)) return style;
   const state = groundState(f);
   const frame = f.ground.actionFrame;
   const turnEnd = f.tuning.ground.runBrakeTurnCommandEndFrame;
@@ -162,7 +162,7 @@ export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle): Atta
 }
 
 
-export function beginFighterAttack(world: Roster, slot: number, style: AttackStyle | undefined, mayCharge: boolean): void {
+export function beginFighterAttack(world: Roster, slot: number, style: AttackStyle | undefined, mayCharge: boolean, cStick = false): void {
   if (style === undefined) return;
   const fighter = fighterAt(world, slot);
   const { grounded } = fighter.motion;
@@ -171,7 +171,7 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
     beginAttack(fighter, chained, false);
     return;
   }
-  const gated = grounded ? groundGatedStyle(fighter, style) : style;
+  const gated = grounded ? groundGatedStyle(fighter, style, cStick) : style;
   if (gated === undefined) return;
   const action = fighter.tuning.moves !== undefined && gated === AttackStyle.dashAttack
     ? fighter.tuning.moves.dashAttack
@@ -183,9 +183,10 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
   if (((groundAttack && grounded) || action === AttackStyle.shot || (aerial && !grounded)) && canStartAttackStyle(fighter, action)) {
     const pivot = action === AttackStyle.grab && fighter.ground.action === GroundAction.turnRun;
     const smashFromDash = grounded && fighter.ground.action === GroundAction.dash && isGroundSmash(action);
+    const tiltFromMotion = grounded && cStick && groundOption(action) === GroundOption.tilt && !groundOptionOpen(fighter, GroundOption.tilt);
     beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge);
     if (aerial) spendParasol(fighter);
-    if (smashFromDash) fighter.motion.vx = 0.0;
+    if (smashFromDash || tiltFromMotion) fighter.motion.vx = 0.0;
     fighter.attack.pivotGrab = pivot;
   }
 }

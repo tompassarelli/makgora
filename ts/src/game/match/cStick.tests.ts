@@ -85,17 +85,28 @@ test("Strong + A + each direction is still that direction's smash on the ground,
   }
 });
 
-test("a C-stick press out of a run gives what A gives there, never a smash [k1 scenario]", () => {
-  for (const key of [CR, CU, CD]) {
-    const c = keyboard(1), a = keyboard(1);
-    for (const keys of [c, a]) {
-      keys.press(R);
-      for (let i = 0; i < 60 && keys.owner.ground.action !== GroundAction.run; i++) keys.press(R);
-      assertEquals(keys.owner.ground.action, GroundAction.run);
+test("a C-stick press out of a dash, a run or a run brake is the tilt it names: the fighter stops and tilts on the press frame, and A with a direction there stays the dash attack [k1 scenario]", () => {
+  for (const key of [CR, CL, CU, CD]) {
+    for (const run of [1, 60]) {
+      const { owner, press } = keyboard(1);
+      press(R);
+      for (let i = 1; i < run && owner.ground.action !== GroundAction.run; i++) press(R);
+      assertEquals(owner.ground.action, run === 1 ? GroundAction.dash : GroundAction.run);
+      press(R | key);
+      assertEquals(owner.attack.style, groundTilt(key));
+      assertEquals(owner.attack.frame, 0);
+      assertEquals(owner.motion.vx, 0.0);
+      assertEquals(owner.facing, key === CL ? -1 : 1);
     }
-    c.press(R | key);
-    a.press(R | (key === CU ? U : key === CD ? D : 0) | A);
-    assertEquals(c.owner.attack.style, a.owner.attack.style);
-    assertTrue(c.owner.attack.style !== undefined);
+    const brake = keyboard(1);
+    for (let i = 0; i < 60 && brake.owner.ground.action !== GroundAction.run; i++) brake.press(R);
+    brake.press(0);
+    assertEquals(brake.owner.ground.action, GroundAction.runBrake);
+    brake.press(key);
+    assertEquals(brake.owner.attack.style, groundTilt(key));
   }
+  const a = keyboard(1);
+  for (let i = 0; i < 60 && a.owner.ground.action !== GroundAction.run; i++) a.press(R);
+  a.press(R | A);
+  assertEquals(a.owner.attack.style, AttackStyle.dashAttack);
 });

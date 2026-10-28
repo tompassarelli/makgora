@@ -43,7 +43,7 @@ export function pressCandleContest(training: boolean, stage: number, fighter: Re
   const { candle } = target;
   const side = candle.x < f32(f32(mainDeckLeft(stage) + mainDeckRight(stage)) * 0.5) ? -1 : 1;
   if (inCandleReach(fighter, candle, side)) {
-    queueAttack(commands, { style: play === CandlePlay.snuff ? AttackStyle.downTilt : AttackStyle.jab, facing: side, frame, mayCharge: false });
+    queueAttack(commands, { style: play === CandlePlay.snuff ? AttackStyle.downTilt : AttackStyle.jab, facing: side, frame, mayCharge: false, cStick: false });
   } else approachPoint(fighter, stage, f32(candle.x - f32(side * CANDLE_STRIKE_GAP)), candle.state === CandleState.resting ? candle.z : fighter.motion.z, frame, input);
   return true;
 }

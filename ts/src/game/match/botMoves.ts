@@ -317,14 +317,14 @@ function perform(f: Readonly<Fighter>, target: Readonly<Fighter>, option: number
 
     const smash = option === AttackStyle.upSmash || option === AttackStyle.downSmash || option === AttackStyle.forwardSmash;
     const charge = smash && botChoice(f.attack.serial + 1, f.character, 4) > 0;
-    queueAttack(commands, { style: option, facing: toward, frame, mayCharge: charge });
+    queueAttack(commands, { style: option, facing: toward, frame, mayCharge: charge, cStick: false });
     input.attackHeld = charge;
     return;
   }
 
   const request = option === AttackStyle.neutralAir ? AttackStyle.jab : option === AttackStyle.upAir ? AttackStyle.upTilt
     : option === AttackStyle.downAir ? AttackStyle.downTilt : AttackStyle.forwardTilt;
-  queueAttack(commands, { style: request, facing: option === AttackStyle.backAir ? (facing < 0 ? 1 : -1) : facing, frame, mayCharge: false });
+  queueAttack(commands, { style: request, facing: option === AttackStyle.backAir ? (facing < 0 ? 1 : -1) : facing, frame, mayCharge: false, cStick: false });
 }
 
 

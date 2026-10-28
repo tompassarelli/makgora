@@ -30,6 +30,7 @@ function firstCommandDifference(expected: Readonly<AttackBuffer>, actual: Readon
   if (e.consumedFacing !== a.consumedFacing) return "consumedFacing";
   if (e.mayCharge !== a.mayCharge) return "mayCharge";
   if (e.consumedMayCharge !== a.consumedMayCharge) return "consumedMayCharge";
+  if (e.cStick !== a.cStick) return "cStick";
   return undefined;
 }
 

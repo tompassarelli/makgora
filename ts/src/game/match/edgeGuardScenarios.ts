@@ -162,7 +162,7 @@ function settle(d: Duel, plan: Readonly<RecoveryPlan>, guard: Guard, minHit: num
 function pressTool(guarder: Fighter, frame: number, press: number, commands: AttackBuffer): void {
   if (frame !== press) return;
   const forward = edgeGuardTool(guarder.character) === EdgeGuardTool.forwardAir;
-  queueAttack(commands, { style: forward ? AttackStyle.forwardTilt : AttackStyle.downTilt, facing: 1, frame, mayCharge: false });
+  queueAttack(commands, { style: forward ? AttackStyle.forwardTilt : AttackStyle.downTilt, facing: 1, frame, mayCharge: false, cStick: false });
 }
 
 export function playScenario(victim: Character, scenario: Readonly<EdgeGuardScenario>, guarded: boolean): Outcome {

@@ -271,7 +271,7 @@ export function choosePunish(f: Readonly<Fighter>, target: Readonly<Fighter>, st
   const dx = aheadX(f, target, 0, undefined, observationAge, stage, matchFrame);
   const toward = dx === 0 ? (f.facing < 0 ? -1 : 1) : dx > 0 ? 1 : -1;
   if (best !== undefined) {
-    queueAttack(commands, { style: best, facing: toward, frame, mayCharge: false });
+    queueAttack(commands, { style: best, facing: toward, frame, mayCharge: false, cStick: false });
     input.attackHeld = false;
     input.shield = false;
     if (shielding && best === AttackStyle.upSmash) {

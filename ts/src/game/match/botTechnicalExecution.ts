@@ -37,7 +37,7 @@ export function executeBotTechnique(fighter: Readonly<Fighter>, input: Controls,
   if (aerial) {
     const command = commands.pending;
     if (substitute && command !== undefined && command.style !== AttackStyle.neutralAir) {
-      queueAttack(commands, { style: AttackStyle.neutralAir, facing: command.facing, frame: command.frame, mayCharge: false });
+      queueAttack(commands, { style: AttackStyle.neutralAir, facing: command.facing, frame: command.frame, mayCharge: false, cStick: false });
       return "wrongOption";
     }
     clearAttackBuffer(commands);
@@ -45,7 +45,7 @@ export function executeBotTechnique(fighter: Readonly<Fighter>, input: Controls,
   if (special) {
     input.specialPressed = false;
     if (substitute && !aerial) {
-      queueAttack(commands, { style: fighter.motion.grounded ? AttackStyle.jab : AttackStyle.neutralAir, facing: fighter.facing < 0 ? -1 : 1, frame, mayCharge: false });
+      queueAttack(commands, { style: fighter.motion.grounded ? AttackStyle.jab : AttackStyle.neutralAir, facing: fighter.facing < 0 ? -1 : 1, frame, mayCharge: false, cStick: false });
       return "wrongOption";
     }
   }

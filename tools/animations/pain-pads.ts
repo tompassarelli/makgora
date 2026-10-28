@@ -30,7 +30,7 @@ for (const character of SELECTABLE_CHARACTERS) for (const [index, scenario] of P
   const runtime = createPacingAndPresentation();
   const expectations: string[] = [];
   for (let frame = 1; frame <= 180; frame++) {
-    if (frame === 146) for (const slot of [0, 1]) queueAttack(controls.commands[slot], { style: AttackStyle.jab, facing: 0, frame, mayCharge: false });
+    if (frame === 146) for (const slot of [0, 1]) queueAttack(controls.commands[slot], { style: AttackStyle.jab, facing: 0, frame, mayCharge: false, cStick: false });
     ensure(captureFrame(row, frame, world.mask, controls, runtime) && executeMatchFrame(row, game, world, controls, runtime, frame), "Pain fixture frame refused");
     if (frame === 149) for (const slot of [0, 1]) ensure(fighterAt(world, slot).attack.style === AttackStyle.jab, `${fighterName(character)}: no jab to interrupt`);
     if (frame === 150) for (const slot of [0, 1]) {

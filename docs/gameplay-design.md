@@ -181,7 +181,11 @@ Where Smashcraft keeps its own rule, and why:
   plain special. On the ground the C-stick gives tilts, not smashes (Tom,
   2026-10-28): C-left and C-right are the forward tilt, turning to face that side
   first, C-up the up tilt and C-down the down tilt, with or without the walk
-  modifier; in the air it gives the aerials. Smashes come only from Strong.
+  modifier, and also out of a dash, a run or a run brake, where the fighter
+  stops and tilts on the press frame while A with a direction stays the dash
+  attack (Tom's keyboard playtest, 2026-10-28: a held direction key is a
+  full stick, so tilting while moving otherwise gave the dash attack); in the
+  air it gives the aerials. Smashes come only from Strong.
 - A held stick at full deflection (keyboard keys and a pad at the rim) still
   dashes when it was not a fresh flick, keeping the walk modifier's release
   to a dash (smashcraft:docs/physics.md); a pad held at 0.8–0.99 walks fast.
