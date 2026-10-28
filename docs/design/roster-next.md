@@ -38,8 +38,8 @@ Sequence and bone lists come from each file's `SEQS` and `BONE` chunks.
 | Lady Vashj | `units\naga\LadyVashj\LadyVashj.mdl` (portrait `LadyVashj_portrait`); byte-identical to `HeroNagaSeaWitch` | Naga: five tail bones and no legs, four arms, `Bow`, `Arrow`, two head snakes | Stand, Walk, Stand Ready, Attack, Spell, Death, and swim variants of each |
 | Archimonde | `units\demon\Warlock\Warlock.mdl` (portrait `Warlock_portrait`), the model Classic mode's Archimonde boss already draws at 2.6× | Biped with a four-bone tail and cape, 47 bones | Stand ×2, Walk, Attack ×2, Spell, Spell Slam, Death |
 | the Butcher | `units\undead\Abomination\Abomination.mdl` (portrait `Abomination_portrait`) | 36 bones. Only `Leg_L`, `Leg_R`, `Head` and the two `Chain` bones are named; the arms, cleaver and hook sit on `Mesh*` and `Object*` nodes that need mapping by hand | Stand ×3, Walk, Attack ×2, Stand Channel, Death, Decay |
-| Tyrande | Hive: `TyrandeDismountedSD.mdx` (below). Stock Tyrande is the mounted `HeroMoonPriestess`; there is no stock `units\nightelf\Tyrande` model | To read on download | To read on download |
-| Thrall | Hive: `WarchiefThrallDismountedV2.mdx` (below), replacing the mounted `units\orc\Thrall\Thrall.mdl` | Built on a Grom Hellscream base, so expected to be a full biped; confirm on download | To read on download |
+| Tyrande | Hive: `TyrandeDismountedSD.mdx` (below). Stock Tyrande is the mounted `HeroMoonPriestess`; there is no stock `units\nightelf\Tyrande` model | Read on download (H1 intake below): night-elf biped, 76 nodes and 58 bones; named `Bone_Root`, `Pelvis`, `Chest`, `Head`, both arm pairs, `Hand_L`, both leg chains and feet. No `Bone_Hand_R`: the bow hand and bow sit on `Object*` and `Mesh*` nodes, with `Arrow` and `Arrow01` nodes | Stand, Stand - 2, Stand - 3, Stand - 5, Stand Ready, Stand Victory, Stand Hit, Walk, Attack - 1, Attack - 2, Spell, Death, Dissipate |
+| Thrall | Hive: `WarchiefThrallDismountedV2.mdx` (below), replacing the mounted `units\orc\Thrall\Thrall.mdl` | Built on a Grom Hellscream base, and confirmed a full biped on download (H1 intake below): 73 nodes and 45 bones, with `Bone_Root`, `Pelvis`, `Chest`, `Head`, both arm chains with hands, both leg chains with feet, `Bone_Sword` and `axe`, plus portrait face nodes, attachment refs (`Weapon Ref`, `Hand Right Ref` and the rest) and two collision spheres | Stand - 1..3, Stand Alternate - 1..3, Stand Ready, Stand Ready Alternate, Walk, Attack - 1..3, Attack Alternate - 1..4, Attack Slam Alternate, Spell, Spell Second, Spell Slam, Spell Throw, Stand Channel, Spell Channel, Death, Dissipate, and six Portrait sequences. No Stand Victory or Stand Hit |
 
 Command icons resolve as `.dds` in Classic storage: `BTNHeroPaladin`
 (Uther), `BTNNagaSeaWitch` (Vashj), `BTNArchimonde`, `BTNPriestessOfTheMoon`
@@ -79,6 +79,22 @@ a decision from Tom.
   - File: `TyrandeDismountedSD.mdx`, 287 polygons. It includes no texture of its own, so it draws the stock textures. The author notes it has no portrait, and a reply notes it has no channel animation.
   - Thread note: one reply compared it with another author's dismounted Tyrande. A Hive regular answered that Retera's reputation makes theft unlikely and that the models differ. We use Retera's file as published.
   - Credit line: "Tyrande Dismounted SD by Retera (Hive Workshop), open source."
+
+### H1 intake (29 October 2026)
+
+Both models were downloaded through a plain headful Chrome on gex45's private
+desktop, because Hive's Cloudflare check rejected the automation-driven Chrome
+even with a delivered click. They were published together as the
+`imported-models` family, hash
+`4b8aadf58e647b9c4d3c3e0591d2dad229f3dadebc861adbeed16aff3251a10a`, which adds
+two files to the previous pin and changes none of its other files. The
+lanes still register them in `IMPORTED_MODEL_FILES` and fetch the family to
+other hosts with `bun wisp inputs fetch gex45`.
+
+- `WarchiefThrallDismountedV2.mdx`, 199,216 bytes, sha256 `50255045638034e21314f85ce94d41d552c1a7f6ca3f6a74ba9a664d640f83b9`; textures `Units\Orc\Thrall\Thrall.blp` plus replaceable team colour and glow, and `Textures\RibbonBlur1.blp`; 19 geosets.
+- `TyrandeDismountedSD.mdx`, 155,793 bytes, sha256 `53780a2d190fc8bdd94b7fe9993c2e33db9fa463226e9186eb6aeb6d692a1388`; textures stock `PriestessOfTheMoon.blp` and `Textures\HeroRanger.blp` plus replaceable team colour; 8 geosets.
+- The unused files in the Thrall bundle were not published.
+- A headless check reads both from the store with the repo's `war3-model` parser and lists each file's sequences, nodes and textures (`parseMDX`, `Sequences` and `Nodes`).
 
 Both credits go into roster.md's Credits section, README's Credits and the
 Credits section of docs/hive-post.md in the same change that imports each model. The
