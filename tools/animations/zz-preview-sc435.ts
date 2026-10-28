@@ -1,0 +1,11 @@
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
+import { AttackPhase } from "../../ts/src/game/sim/codes";
+import { generateHdBody, parseHdBody } from "./hd-body";
+const [file, out] = process.argv.slice(2);
+const model = parseHdBody(await Bun.file(file!).arrayBuffer());
+const index = model.Sequences.findIndex(s => s.Name === "Forsaken Paladin dashAttack");
+const drawn = new DrawnModel(generateHdBody(model), 1.2);
+const frames = (process.env.FRAMES ?? "0,8,11,12,13,14,18,23,27,31,36,40").split(",").map(Number);
+const panels: PoseFrame[] = frames.map(frame => ({ frame, phase: frame < 11 ? AttackPhase.startup : frame <= 14 ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing: 1, parts: [], strikes: [], clip: index, seconds: frame / 60 }));
+await Bun.write(out!, sheet("preview", drawn, panels, 6).png);

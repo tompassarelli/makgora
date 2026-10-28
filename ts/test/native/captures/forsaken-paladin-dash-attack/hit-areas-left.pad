@@ -1,0 +1,28 @@
+# Forsaken Paladin's dash attack facing left with hit areas shown: he coils with the sword raised overhead, springs into a forward somersault that wheels the blade over the top and down onto the floor ahead through the active frames, lands crouched and rises to ready (#435).
+#! chat -dev quick hero forsaken paladin hit-areas
+#! expect a 516 applied attack 2 style 19
+500 a stick -1 0
+516 a tap A 2
+516 a capture
+518 a stick 0 0
+518 a capture
+520 a capture
+522 a capture
+524 a capture
+526 a capture
+528 a capture
+530 a capture
+532 a capture
+534 a capture
+536 a capture
+538 a capture
+540 a capture
+542 a capture
+544 a capture
+546 a capture
+548 a capture
+550 a capture
+552 a capture
+554 a capture
+556 a capture
+558 a capture
