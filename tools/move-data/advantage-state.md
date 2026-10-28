@@ -117,7 +117,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Illidan | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | heavy | up throw | 1/1 in up smash, out down smash | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out short hop, down air |
 | Illidan | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Blademaster | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Blademaster | light | forward throw | 1/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Blademaster | light | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | light | up throw | 1/1 | 1/1 KD | 1/1 in up smash, out forward smash | 1/1 in down smash, out forward smash |
 | Blademaster | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -125,7 +125,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Blademaster | medium | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | medium | up throw | 1/1 in down smash, out short hop, down air | 1/1 KD | 1/1 KD | 1/1 in down smash, out forward smash |
 | Blademaster | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Blademaster | heavy | forward throw | 1/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Blademaster | heavy | forward throw | 1/1 | 1/0 in short hop, neutral air, out short hop, up air | 0/0 KD | 0/0 KD |
 | Blademaster | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | heavy | up throw | 1/1 in down smash, out short hop, down air | 1/1 in down smash, out short hop, down air | 1/1 KD | 1/1 in up smash, out forward smash |
 | Blademaster | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
