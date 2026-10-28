@@ -15,7 +15,7 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   MountainKing: part('Bone_Head', ['1Cylinder04', '1Cylinder03'], ['Bone_Hand_R', 'Bone_Hand_L']),
   Warden: part('Bone_Head', ['Object08'], ['Bone_Hand_R']),
   Lich: part('Bone_Head', [], []),
-  ForsakenPaladin: part('bone_head', ['Wep01_R0_0_jnt'], ['arm_R0_end_jnt']),
+  Uther: part('Bone_Head', ['Hammer'], ['HandR']),
   Dreadlord: part('Bone_Head', [], []),
   ShadowHunter: part('Bone_Head', ['Object11'], ['Bone_Hand_R']),
   PitLord: part('Bone_Head', ['Real BLADE'], ['Bone_Hand_R']),

@@ -407,7 +407,6 @@ export class ProjectilePresentation {
       }
       const boundaries = pool?.boundaries[pool.effects.indexOf(slot)] ?? [];
       for (let layer = 0; layer < boundaries.length; layer++) {
-        if (fighter?.character === Character.forsakenPaladin && projectile?.spec?.pool === undefined) continue;
         const boundarySlot = boundaries[layer];
         const boundary = boundarySlot === undefined ? undefined : this.models[boundarySlot];
         if (boundary === undefined || boundarySlot === undefined || pose.dangerRadius <= 0.0) continue;

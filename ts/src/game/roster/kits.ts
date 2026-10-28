@@ -14,7 +14,7 @@ import { JAINA_HERO } from "../fighters/jaina/kit";
 import { MOUNTAIN_KING_HERO } from "../fighters/mountain-king/kit";
 import { PIT_LORD_HERO } from "../fighters/pit-lord/kit";
 import { SHADOW_HUNTER_HERO } from "../fighters/shadow-hunter/kit";
-import { FORSAKEN_PALADIN_HERO } from "../fighters/forsaken-paladin/kit";
+import { UTHER_HERO } from "../fighters/uther/kit";
 import { WARDEN_HERO } from "../fighters/warden/kit";
 import { SYLVANAS_HERO } from "../fighters/sylvanas/kit";
 import { THRALL_HERO } from "../fighters/thrall/kit";
@@ -32,7 +32,7 @@ import { HIDDEN_FIGHTERS } from "../sim/heroes/releaseRoster";
 import { ANUBARAK_HERO } from "../fighters/anubarak/kit";
 
 export const HERO_ROSTER: readonly HeroDefinition[] = [
-  BLADEMASTER_HERO, MOUNTAIN_KING_HERO, WARDEN_HERO, LICH_HERO, FORSAKEN_PALADIN_HERO, DREADLORD_HERO, SHADOW_HUNTER_HERO, PIT_LORD_HERO, BEASTMASTER_HERO, LICH_KING_HERO, THRALL_HERO, JAINA_HERO, SYLVANAS_HERO,
+  BLADEMASTER_HERO, MOUNTAIN_KING_HERO, WARDEN_HERO, LICH_HERO, UTHER_HERO, DREADLORD_HERO, SHADOW_HUNTER_HERO, PIT_LORD_HERO, BEASTMASTER_HERO, LICH_KING_HERO, THRALL_HERO, JAINA_HERO, SYLVANAS_HERO,
   CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO, LADY_VASHJ_HERO, ARCHIMONDE_HERO,
 ];
 
@@ -43,7 +43,7 @@ const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined }
   [Character.mountainKing]: MOUNTAIN_KING_HERO,
   [Character.warden]: WARDEN_HERO,
   [Character.lich]: LICH_HERO,
-  [Character.forsakenPaladin]: FORSAKEN_PALADIN_HERO,
+  [Character.uther]: UTHER_HERO,
   [Character.dreadlord]: DREADLORD_HERO,
   [Character.shadowHunter]: SHADOW_HUNTER_HERO,
   [Character.pitLord]: PIT_LORD_HERO,

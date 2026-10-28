@@ -2,7 +2,7 @@
 
 - Follow README's "Principles": if a task seems to need memory reads, disassembly, decompiled code or Blizzard's or Nintendo's files in the repo, stop and measure from outside instead.
 - Keep Wisp changes in Wisp; consume its published pin via the updater. Never edit installed dependencies or add a framework copy.
-- The roster holds at 26 until every fighter feels good; each has a specific personality; prefer Warcraft models.
+- The roster holds at 29 (Tom, 28 October 2026; docs/design/roster-next.md) until every fighter feels good; each has a specific personality; prefer Warcraft models.
 - Classic models only: never add Definitive Edition support, code, assets, checks or docs (see docs/design/roster.md).
 - Every frame must sustain 60 fps; the map’s own work gates at p99 ≤ 10 ms and worst frame ≤ 14 ms (Warcraft draws inside 16.7 ms), and a gate miss remains unfinished work. A worst frame over 10 ms and up to 14 ms is a soft target: it lands with a `Target-debt:` trailer.
 - Keep every mutable gameplay field in deterministic snapshots/replay; local presentation stays separate and shared handles are created consistently.

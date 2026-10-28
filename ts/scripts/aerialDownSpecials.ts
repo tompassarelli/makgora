@@ -32,7 +32,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.mountainKing]: "aerial Thunder Clap; lands into the grounded clap",
   [Character.warden]: "Fan of Knives in the air, a ring of knives with a shine-like semi-spike that nearly stops her fall and a jump cancels",
   [Character.lich]: "Frost Armor cast in the air; lands into the grounded cast",
-  [Character.forsakenPaladin]: "downward holy pulse with the Consecration hit",
+  [Character.uther]: "Divine Shield in the air; lands into the grounded bubble",
   [Character.dreadlord]: "aerial Sleep orb; lands into the grounded cast",
   [Character.shadowHunter]: "aerial Hex orb; lands into the grounded cast",
   [Character.pitLord]: "aerial Rain of Fire; lands into the grounded cast",

@@ -130,8 +130,6 @@ src/game/fighters/chen/moves.tests.ts	3	0.005
 src/game/fighters/dreadlord/specials.tests.ts	12	0.048
 src/game/sim/heroes/exCoreHeroes.tests.ts	8	0.020
 src/game/sim/heroes/fighterArt.tests.ts	1	0.002
-src/game/fighters/forsaken-paladin/moves.tests.ts	10	0.012
-src/game/fighters/forsaken-paladin/specials.tests.ts	14	0.183
 src/game/sim/heroes/grom.tests.ts	6	0.380
 src/game/sim/heroes/jaina.tests.ts	8	0.015
 src/game/sim/heroes/kaelthas.tests.ts	11	0.057

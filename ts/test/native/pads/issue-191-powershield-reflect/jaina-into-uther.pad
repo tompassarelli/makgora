@@ -1,0 +1,17 @@
+# #191 Jaina into Uther: the returned frost bolt keeps Jaina's damage
+# a (Jaina) fires its neutral special at 600 from x -240; b (Uther) at x 240 powershields it with
+# one full trigger press. A reflection sends back a's own projectile: same family (a's fighter
+# code), kind and model, half damage, turned around and owned by b (the `reflect` line on b's
+# trace), and it strikes a, never b. Frames are read from this script's headless farm trace.
+# Syntax and checks: smashcraft:docs/native-bot-session.md.
+#! chat -dev quick pair jaina proudmoore / uther
+600 a tap X 2
+637 b shield 1
+667 b shield 0
+# View held a second: a moment the parity check replays.
+702 a press VIEW
+772 a release VIEW
+# Expected (replay of this script): b's press reflects on the next frame; the projectile hits a for half its damage.
+#! expect b 638 reflect family 14 kind 5 model Abilities\Spells\Other\FrostBolt\FrostBoltMissile.mdx direction -1 multiplier 0.500 life 41
+#! expect a 672 damage 3.070
+#! absent b 600-702 damage

@@ -13,7 +13,7 @@ import { blademasterLook } from "../fighters/blademaster/look";
 import { cairneLook } from "../fighters/cairne/look";
 import { chenLook } from "../fighters/chen/look";
 import { dreadlordLook } from "../fighters/dreadlord/look";
-import { forsakenPaladinLook } from "../fighters/forsaken-paladin/look";
+import { utherLook } from "../fighters/uther/look";
 import { gromLook } from "../fighters/grom/look";
 import { jainaLook } from "../fighters/jaina/look";
 import { kaelthasLook } from "../fighters/kaelthas/look";
@@ -40,7 +40,7 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
   [Character.cairne]: cairneLook,
   [Character.chen]: chenLook,
   [Character.dreadlord]: dreadlordLook(DREADLORD_GROUND),
-  [Character.forsakenPaladin]: forsakenPaladinLook,
+  [Character.uther]: utherLook,
   [Character.grom]: gromLook,
   [Character.jaina]: jainaLook,
   [Character.kaelthas]: kaelthasLook,

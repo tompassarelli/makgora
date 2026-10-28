@@ -23,9 +23,9 @@ import * as gromHellscream from "./white-facts/grom-hellscream";
 import * as malfurionStormrage from "./white-facts/malfurion-stormrage";
 import * as medivh from "./white-facts/medivh";
 import * as anubarak from "./white-facts/anub'arak";
-import * as forsakenPaladin from "./white-facts/forsaken-paladin";
 import * as cairneBloodhoof from "./white-facts/cairne-bloodhoof";
 import * as shadowHunter from "./white-facts/shadow-hunter";
+import * as uther from "./white-facts/uther";
 import * as ladyVashj from "./white-facts/lady-vashj";
 import * as archimonde from "./white-facts/archimonde";
 export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
@@ -51,9 +51,9 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...malfurionStormrage.whiteModelFacts,
   ...medivh.whiteModelFacts,
   ...anubarak.whiteModelFacts,
-  ...forsakenPaladin.whiteModelFacts,
   ...cairneBloodhoof.whiteModelFacts,
   ...shadowHunter.whiteModelFacts,
+  ...uther.whiteModelFacts,
   ...ladyVashj.whiteModelFacts,
   ...archimonde.whiteModelFacts,
 };

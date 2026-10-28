@@ -21,7 +21,6 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.mountainKing]: {},
   [Character.warden]: { neutral: { status: true }, down: { status: true } },
   [Character.lich]: { neutral: { status: true }, down: { status: true }, ultimate: { status: true } },
-  [Character.forsakenPaladin]: { side: { status: true } },
   [Character.dreadlord]: { side: { heal: true }, down: { status: true } },
   [Character.shadowHunter]: { down: { status: true } },
   [Character.pitLord]: { neutral: { status: true }, ultimate: { status: true } },
@@ -40,6 +39,7 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.anubarak]: {},
   [Character.malfurion]: { neutral: { status: true } },
   [Character.medivh]: {},
+  [Character.uther]: { down: { heal: true } },
   [Character.ladyVashj]: { neutral: { status: true }, side: { mana: true }, ultimate: { status: true } },
   [Character.archimonde]: { down: { status: true } },
 };

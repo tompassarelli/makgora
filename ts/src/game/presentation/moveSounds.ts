@@ -84,9 +84,9 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     weapon: Weapon.blunt, effort: ["HeroLichAttack1"], strong: "LichMissile",
     specials: [s("ZigguratFrostMissileLaunch", "FrostNova"), s("DeathAndDecayTarget", "DeathAndDecayTarget"), s("DarkRitual", "LichMissile"), s("FrostArmor", "FrostBoltHit")],
   },
-  [Character.forsakenPaladin]: {
-    weapon: Weapon.blade, whoosh: false, strong: "MetalHeavySliceMetal",
-    specials: [s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalMediumSliceFlesh"), s(undefined, "WoodLightBashFlesh")],
+  [Character.uther]: {
+    weapon: Weapon.hammer, swing: ["HeroPaladinAttack1", "HeroPaladinAttack2"], strong: "MetalHeavyBashFlesh",
+    specials: [s("HolyBolt", "HolyBolt"), s("HeroPaladinAttack2", "MetalHeavyBashFlesh"), s("HeroPaladinAttack1", "MetalMediumBashFlesh"), s("DivineShield", "MetalHeavyBashMetal")],
   },
   [Character.dreadlord]: {
     weapon: Weapon.claw, strong: "CarrionSwarmDamage",

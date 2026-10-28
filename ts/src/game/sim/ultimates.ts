@@ -121,20 +121,18 @@ const LICH: AuthoredSpecial = {
   ],
 };
 
-const JUDGMENT_CIRCLE = { ...mark("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", 2, 75, 220.0), ...ON_FLOOR };
-const FORSAKEN_PALADIN: AuthoredSpecial = {
-  name: "Light's Judgment", endFrame: 70,
+const RESURRECTION_RING = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx";
+const UTHER: AuthoredSpecial = {
+  name: "Resurrection", endFrame: 64,
   projectiles: [
-    JUDGMENT_CIRCLE,
-    { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 0.0), atMark: JUDGMENT_CIRCLE },
+    { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdx", 2, 24, 0.0), ...ON_FLOOR },
+    ...[-150.0, -80.0, 80.0, 150.0].map((offsetX) => ({ ...mark(RESURRECTION_RING, 25, 24, offsetX), ...ON_FLOOR })),
   ],
   regions: [
-    heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 150.0, 100.0), hit(27.5, 75, 90.0, 45.0, HitElement.holy)),
-    heroRegion(52, 52, capsule(-110.0, 10.0, 110.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
-    heroRegion(64, 64, capsule(-110.0, 10.0, 110.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
+    heroRegion(26, 28, capsule(-170.0, 20.0, 170.0, 20.0, 45.0), hit(14.0, 85, 60.0, 50.0, HitElement.holy)),
+    heroRegion(34, 36, capsule(-170.0, 70.0, 170.0, 70.0, 55.0), hit(12.0, 90, 88.0, 50.0, HitElement.holy)),
   ],
-  regionOrigin: JUDGMENT_CIRCLE,
-  rehits: [52, 64],
+  rehits: [34],
 };
 
 const INFERNAL_RADIUS = 50.0;
@@ -422,7 +420,6 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.mountainKing]: MOUNTAIN_KING,
   [Character.warden]: WARDEN,
   [Character.lich]: LICH,
-  [Character.forsakenPaladin]: FORSAKEN_PALADIN,
   [Character.dreadlord]: DREADLORD,
   [Character.shadowHunter]: SHADOW_HUNTER,
   [Character.pitLord]: PIT_LORD,
@@ -441,6 +438,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.anubarak]: ANUBARAK,
   [Character.malfurion]: MALFURION,
   [Character.medivh]: MEDIVH,
+  [Character.uther]: UTHER,
   [Character.ladyVashj]: LADY_VASHJ,
   [Character.archimonde]: ARCHIMONDE,
 };
@@ -452,7 +450,6 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.mountainKing]: "He turns to stone with a stomp: heavier for 10 seconds. Hit him while he changes.",
   [Character.warden]: "The Avatar of Vengeance rises behind her and throws four ghostly glaives. Break it or dodge the glaives.",
   [Character.lich]: "A frost wyrm sweeps straight ahead at body height. Jump or shield it.",
-  [Character.forsakenPaladin]: "A golden circle marks where the Light's judgment will fall, then blesses the ground twice. Leave the circle.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead, then fights at your side. Break it or keep away from its flames.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
   [Character.pitLord]: "Marks the nearest foe in range with Doom, then a fel bolt lands on them through any shield: they burn 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal where they fell and fights for him. Dodge as the bolt lands or get out of range; smash him through his armor; kill him first to lift the curse.",
@@ -471,6 +468,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.anubarak]: "A slow cloud of beetles drifts ahead, stinging anyone standing in it. Jump or shield.",
   [Character.malfurion]: "A slow wall of wisps drifts forward and detonates on whoever it reaches.",
   [Character.medivh]: "A dark portal opens ahead, drawing foes in, then erupts. Walk away before it bursts.",
+  [Character.uther]: "Golden light gathers around him, then rings of it rise on both sides and throw everyone near him upward. Shield or roll away during the gathering.",
   [Character.ladyVashj]: "Her eyes and head snakes glow, then her gaze sweeps a cone ahead: a foe facing her slows, then turns to stone and takes hits without flying until it ends. Turn away from her.",
   [Character.archimonde]: "Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles.",
 };

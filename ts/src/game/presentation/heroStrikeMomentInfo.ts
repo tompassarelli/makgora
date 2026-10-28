@@ -7,7 +7,6 @@ import { blademasterStrikeMoments } from "../fighters/blademaster/strikeMoments"
 import { cairneStrikeMoments } from "../fighters/cairne/strikeMoments";
 import { chenStrikeMoments } from "../fighters/chen/strikeMoments";
 import { dreadlordStrikeMoments } from "../fighters/dreadlord/strikeMoments";
-import { forsakenPaladinStrikeMoments } from "../fighters/forsaken-paladin/strikeMoments";
 import { gromStrikeMoments } from "../fighters/grom/strikeMoments";
 import { jainaStrikeMoments } from "../fighters/jaina/strikeMoments";
 import { kaelthasStrikeMoments } from "../fighters/kaelthas/strikeMoments";
@@ -24,6 +23,7 @@ import { shadowHunterStrikeMoments } from "../fighters/shadow-hunter/strikeMomen
 import { sylvanasStrikeMoments } from "../fighters/sylvanas/strikeMoments";
 import { thrallStrikeMoments } from "../fighters/thrall/strikeMoments";
 import { tinkerStrikeMoments } from "../fighters/tinker/strikeMoments";
+import { utherStrikeMoments } from "../fighters/uther/strikeMoments";
 import { wardenStrikeMoments } from "../fighters/warden/strikeMoments";
 
 /**
@@ -38,7 +38,6 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.cairne]: cairneStrikeMoments,
   [Character.chen]: chenStrikeMoments,
   [Character.dreadlord]: dreadlordStrikeMoments,
-  [Character.forsakenPaladin]: forsakenPaladinStrikeMoments,
   [Character.grom]: gromStrikeMoments,
   [Character.jaina]: jainaStrikeMoments,
   [Character.kaelthas]: kaelthasStrikeMoments,
@@ -55,5 +54,6 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.sylvanas]: sylvanasStrikeMoments,
   [Character.thrall]: thrallStrikeMoments,
   [Character.tinker]: tinkerStrikeMoments,
+  [Character.uther]: utherStrikeMoments,
   [Character.warden]: wardenStrikeMoments,
 };

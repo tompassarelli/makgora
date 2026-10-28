@@ -37,7 +37,7 @@
     "Muradin Bronzebeard": { "forward": "positional", "back": "kill throw", "up": "combo starter", "down": "tech-chase starter" },
     "Maiev Shadowsong": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Kel'Thuzad": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
-    "Forsaken Paladin": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
+    "Uther": { "forward": "positional", "back": "kill throw", "up": "combo starter", "down": "tech-chase starter" },
     "Mal'Ganis": { "forward": "positional", "back": "kill throw", "up": "combo starter", "down": "tech-chase starter" },
     "Shadow Hunter": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Pit Lord": { "forward": "positional", "back": "kill throw", "up": "combo starter", "down": "tech-chase starter" },

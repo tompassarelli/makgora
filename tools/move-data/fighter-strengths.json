@@ -69,14 +69,14 @@
    "drafted": true
   },
   {
-   "fighter": "forsaken-paladin",
-   "source": "docs/design/forsaken-paladin.md",
+   "fighter": "uther",
+   "source": "docs/design/uther.md",
    "stated": true,
-   "kill": "top",
+   "kill": "side",
    "edgeGuard": "average",
    "recovery": "exploitable",
-   "range": "close",
-   "note": "Heavy sword; Beacon Strike up smash, Cleansing Sword strikes upward; Ascension falls helpless",
+   "range": "mid",
+   "note": "All-rounder hammer: forward smash and back throw kill, up tilt and up throw start juggles, forward air meteors; slow air drift makes his recovery readable",
    "drafted": false
   },
   {

@@ -15,6 +15,7 @@ export const VICTORY_SEAM_DEBT: Readonly<Record<string, string>> = {
     'Shadow Hunter': 'his raised arms pull out of the shoulders through the cheer',
     'Goblin Tinker': 'his raised arm pulls out of its shoulder',
     Medivh: 'his raised arm pulls out of its shoulder',
+    Uther: 'the stock Stand Victory lifts his right arm 0.32 shoulder widths out of its pauldron',
 };
 
 export interface VictoryAnatomyRecord { readonly fighter: string; readonly clip: string; readonly rest: BodyPose; readonly samples: readonly PoseSample[] }

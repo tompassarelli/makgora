@@ -13,7 +13,6 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/ga
 import { createRoster, fighterAt } from "../../ts/src/game/sim/roster";
 import { initializePainScenario, PAIN_SCENARIOS } from "../../ts/src/game/session/painFixture";
 import { contactDamageClips } from "../../ts/src/game/presentation/damagePose";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/fighters/forsaken-paladin/sword";
 import { parsePadScript } from "../../ts/scripts/integrity/padScript";
 import { ensure } from "./original-clips";
 
@@ -36,7 +35,7 @@ for (const character of SELECTABLE_CHARACTERS) for (const [index, scenario] of P
     if (frame === 150) for (const slot of [0, 1]) {
       const fighter = fighterAt(world, slot);
       const clip = contactDamageClips(character)?.[index]?.index;
-      const damage = character === Character.forsakenPaladin ? Math.fround(8 * FORSAKEN_PALADIN_DAMAGE_MULTIPLIER) : 8;
+      const damage = 8;
       ensure(fighter.status.damage === damage && fighter.visuals.hitHeight === Math.floor(index / 3) && fighter.visuals.hitStrength === index % 3 && runtime.poses[slot].clipIndex === clip,
         `${fighterName(character)}/${scenario}/${slot}: damage ${fighter.status.damage}, want ${damage}; height ${fighter.visuals.hitHeight}, want ${Math.floor(index / 3)}; strength ${fighter.visuals.hitStrength}, want ${index % 3}; clip ${runtime.poses[slot].clipIndex}, want ${clip}`);
       expectations.push(`#! expect ${slot === 0 ? "a" : "b"} 150 damage ${damage.toFixed(3)} hitlag ${fighter.launch.hitlag} hitstun ${fighter.launch.hitstun} height ${fighter.visuals.hitHeight} strength ${fighter.visuals.hitStrength} clip ${clip}`);

@@ -23,7 +23,7 @@ cancelling.
 | Muradin Bronzebeard | aerial Thunder Clap; lands into the grounded clap | S1 W15 L27/E27 | S1 W— L15/E15 | S1 W50 L3/E78 | S1 W15 L—/E50 |
 | Maiev Shadowsong | Fan of Knives in the air, a ring of knives with a shine-like semi-spike that nearly stops her fall and a jump cancels | S1 W4 L46/E27 | S1 W4 L44/E27 | S1 W4 L16/E27 | S1 W4 L—/E27 |
 | Kel'Thuzad | Frost Armor cast in the air; lands into the grounded cast | S0 W21 L27/E27 | S0 W21 L15/E45 | S0 W21 L3/E45 | S0 W21 L—/E45 |
-| Forsaken Paladin | downward holy pulse with the Consecration hit | S1 W16 L27/E27 | S1 W16 L15/E42 | S1 W16 L3/E42 | S1 W16 L—/E42 |
+| Uther | Divine Shield in the air; lands into the grounded bubble | S1 W4 L27/E27 | S1 W4 L15/E15 | S1 W4 L3/E50 | S1 W4 L—/E50 |
 | Mal'Ganis | aerial Sleep orb; lands into the grounded cast | S1 W26 L27/E27 | S1 W26 L15/E58 | S1 W26 L3/E58 | S1 W26 L—/E58 |
 | Shadow Hunter | aerial Hex orb; lands into the grounded cast | S1 W24 L27/E27 | S1 W24 L15/E40 | S1 W24 L3/E40 | S1 W24 L—/E40 |
 | Pit Lord | aerial Rain of Fire; lands into the grounded cast | S1 W25 L31/E31 | S1 W25 L15/E60 | S1 W25 L3/E60 | S1 W25 L—/E60 |
@@ -43,6 +43,7 @@ cancelling.
 | Medivh | Last Word holds height, blinks back and bursts | S0 W13 L59/E38 | S0 W13 L57/E38 | S0 W13 L43/E38 | S0 W13 L—/E38 |
 | Anub'arak | downward beetle; recall works while falling | S1 W22 L27/E27 | S1 W22 L15/E46 | S1 W22 L3/E46 | S1 W22 L—/E46 |
 | Lady Vashj | Mana Shield toggles in the air as on the ground | S0 W— L27/E12 | S0 W— L15/E12 | S0 W— L3/E12 | S0 W— L—/E12 |
+| Archimonde the Defiler | aerial Bash, a hammer-fist that drives a foe below him down | S1 W16 L27/E27 | S1 W16 L15/E46 | S1 W16 L3/E46 | S1 W16 L—/E46 |
 
 26 fighters, 104 presses, 5 dead inputs.
 

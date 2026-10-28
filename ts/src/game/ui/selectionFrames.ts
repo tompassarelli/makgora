@@ -15,7 +15,7 @@ export const portraitTexture = (choice: number | undefined, tile: boolean, slot?
 export const nameText = (choice: number | undefined) => choice === RANDOM_FIGHTER ? "Random" : fighterName(choice ?? Character.rifleman);
 export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.mountainKing]: "Muradin",
-  [Character.forsakenPaladin]: "Paladin",
+  [Character.uther]: "Uther",
   [Character.shadowHunter]: "S. Hunter",
   [Character.blademaster]: "Blade",
   [Character.beastmaster]: "Rexxar",

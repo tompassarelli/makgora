@@ -21,7 +21,7 @@ const CRIES: { readonly [character: number]: CryClips | undefined } = {
   [Character.mountainKing]: { cry: 8, standIn: 1 },
   [Character.warden]: { cry: 3, standIn: 4 },
   [Character.lich]: { cry: 8, standIn: 1 },
-  [Character.forsakenPaladin]: { cry: 6, standIn: 10 },
+  [Character.uther]: { cry: 7, standIn: 2 },
   [Character.dreadlord]: { cry: 7, standIn: 1 },
   [Character.shadowHunter]: { cry: 4, standIn: 9 },
 

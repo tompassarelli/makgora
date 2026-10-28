@@ -2,7 +2,7 @@ import { canHit } from "./teams";
 
 import { max, min } from "../core/numbers";
 import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFloat32, toInt } from "wisp/src/sim/binary32";
-import { Character, ContactKind, DownState, HeroStatusKind } from "./codes";
+import { ContactKind, DownState, HeroStatusKind } from "./codes";
 import { f32 } from "wisp/src/sim/f32";
 
 /** A Banished fighter takes this much more damage from any fighter's spells. */
@@ -53,7 +53,6 @@ import { drainUltimate, ultimatePercent } from "./meter";
 import { capPercent } from "./percent";
 import { contactIsSpell, contactTraits } from "./identityTraits";
 import { meleeHandling } from "./meleeHandling";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "../fighters/forsaken-paladin/sword";
 
 
 interface DamageContact {
@@ -131,7 +130,7 @@ export function openDamageContacts(): boolean {
 export function collectDamageContact(
   world: Roster, sourceSlot: number, targetSlot: number, effect: Readonly<HitEffect>, facing: number,
   kind: ContactKind, direct: boolean, throwInput: Readonly<Controls> | undefined, shieldContact: boolean,
-  status?: Readonly<AppliedStatus>, contactZ?: number, family?: Character,
+  status?: Readonly<AppliedStatus>, contactZ?: number,
 ): void {
   if (sourceSlot !== targetSlot && !canHit(world, sourceSlot, targetSlot)) return;
   const source = fighterAt(world, sourceSlot);
@@ -158,7 +157,7 @@ export function collectDamageContact(
   contact.facing = facing;
   contact.kind = kind;
   contact.direct = direct;
-  contact.strong = kind === ContactKind.launch && (effect.strong === true || forsakenPaladinSwordContact(source, effect.damage, direct));
+  contact.strong = kind === ContactKind.launch && effect.strong === true;
   contact.strongHitlag = contact.strong && !meleeHandling.strongHitsAddNoHitlag ? STRONG_HIT_EXTRA_HITLAG : 0;
   contact.blocked = !unblockable && shieldContact;
   if (effect.flinchless === true && !contact.blocked && contact.kind === ContactKind.launch) contact.kind = ContactKind.damageOnly;
@@ -193,7 +192,6 @@ export function collectDamageContact(
   }
 
   contact.hitlagDamage = contact.effect.damage;
-  if ((family ?? source.character) === Character.forsakenPaladin) contact.effect.damage = multiplyFloat32(contact.effect.damage, FORSAKEN_PALADIN_DAMAGE_MULTIPLIER);
 }
 
 

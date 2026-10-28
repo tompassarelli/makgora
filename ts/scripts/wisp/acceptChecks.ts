@@ -347,7 +347,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     {
       id: "meter-orbs-hud",
       closes: "the two-meter HUD and readiness glows (docs/design/mana.md)",
-      map: heroProfile("Forsaken Paladin"),
+      map: heroProfile("Uther"),
       setup: [{ waitMs: 3000 }, { chat: "-dev meter 100" }, { waitMs: 1200 }],
       capture: [{ kind: "frames", name: "full", client: "a", count: 4, everyMs: 400 }, { kind: "frames", name: "full", client: "b" }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],

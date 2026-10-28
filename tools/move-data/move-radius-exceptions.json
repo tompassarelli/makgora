@@ -118,26 +118,6 @@
     "reason": "Hit capsules of 7 to 26 game units against a 137-unit shield, 0.05 to 0.19 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
   },
   {
-    "fighter": "forsaken-paladin",
-    "moves": [
-      "jab",
-      "forward tilt",
-      "up tilt",
-      "down tilt",
-      "dash attack",
-      "forward smash",
-      "up smash",
-      "down smash",
-      "neutral air",
-      "forward air",
-      "back air",
-      "up air",
-      "down air"
-    ],
-    "issue": "#320",
-    "reason": "Hit capsules of 8 to 18 game units against a 108-unit shield, 0.07 to 0.17 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
-  },
-  {
     "fighter": "dreadlord",
     "moves": [
       "jab",

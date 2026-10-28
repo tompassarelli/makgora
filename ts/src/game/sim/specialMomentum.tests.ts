@@ -16,7 +16,7 @@ const SLOTS = [
 const MOVEMENT_SPECIALS = [
   "rifleman up", "demonHunter side", "demonHunter up",
   "blademaster side", "blademaster up", "blademaster down", "mountainKing side", "mountainKing up", "warden side", "warden up",
-  "lich up", "forsakenPaladin side", "forsakenPaladin up", "dreadlord side", "dreadlord up", "shadowHunter up",
+  "lich up", "uther side", "uther up", "dreadlord side", "dreadlord up", "shadowHunter up",
   "pitLord side", "pitLord up", "lichKing up", "thrall up", "jaina up", "sylvanas up", "cairne side", "cairne up",
   "chen up", "peon up", "tinker up", "kaelthas up", "murloc side", "murloc up", "grom side", "grom up",
   "anubarak side", "anubarak up", "malfurion side", "malfurion up", "medivh side", "medivh up", "medivh down",

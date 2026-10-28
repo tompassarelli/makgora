@@ -26,9 +26,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Kel'Thuzad | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in short hop, back air; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kel'Thuzad | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in full hop, back air; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 40% → up tilt against 4/5 DI |
 | Kel'Thuzad | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash, grab, back throw; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Forsaken Paladin | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in short hop, side special; tech away side special; missed tech side special; trap side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Forsaken Paladin | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away dash, dash attack; missed tech side special; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Forsaken Paladin | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away side special; missed tech side special; trap side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Uther | light | yes | **no** | yes | **no** | yes | back throw at 20%: tech in place dash, dash attack; tech in up smash, forward smash; tech away uncovered; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Uther | medium | yes | **no** | **no** | **no** | yes | back throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in up smash, up smash, up smash, forward smash; tech away uncovered; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 3/5 DI |
+| Uther | heavy | yes | yes | yes | yes | yes | back throw at 0%: tech in place dash, dash attack; tech in up smash, short hop, back air, dash grab, back throw, dash, dash attack; tech away dash, dash attack; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Mal'Ganis | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in up smash, side special, forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Mal'Ganis | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in dash grab, back throw, dash grab, back throw, dash, dash attack; tech away dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Mal'Ganis | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
@@ -168,18 +168,18 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Kel'Thuzad | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Kel'Thuzad | heavy | up throw | 1/1 | 1/1 | 1/1 KD in short hop, back air, out short hop, forward air | 1/1 in short hop, back air, out forward tilt |
 | Kel'Thuzad | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | light | up throw | 1/1 in forward tilt, out neutral special | 1/1 in short hop, back air, out neutral special | 1/1 in short hop, back air, out side special | 1/1 in short hop, side special, out side special |
-| Forsaken Paladin | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | medium | up throw | 1/1 in forward tilt, out neutral special | 1/1 in forward tilt, out neutral special | 1/1 KD in forward tilt, out side special | 1/1 in short hop, neutral special, out side special |
-| Forsaken Paladin | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Forsaken Paladin | heavy | up throw | 1/1 | 1/1 in forward tilt, out side special | 1/1 KD in up smash, out side special | 1/1 in up smash, out side special |
-| Forsaken Paladin | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Uther | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Uther | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Uther | light | up throw | 1/1 | 1/1 KD | 1/1 KD | 1/1 |
+| Uther | light | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Uther | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Uther | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Uther | medium | up throw | 1/0 | 1/1 KD | 1/1 KD | 1/1 KD |
+| Uther | medium | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Uther | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Uther | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Uther | heavy | up throw | 1/1 in up tilt, out down tilt | 1/1 | 1/1 KD | 1/1 KD |
+| Uther | heavy | down throw | 1/1 | 1/1 | 1/1 | 1/1 |
 | Mal'Ganis | light | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mal'Ganis | light | up throw | 1/1 | 1/1 | 2/1 KD | 1/1 in short hop, back air, out short hop, forward air |

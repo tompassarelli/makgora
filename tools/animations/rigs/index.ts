@@ -6,7 +6,7 @@ import * as blademaster from './blademaster';
 import * as mountainking from './mountainking';
 import * as warden from './warden';
 import * as lich from './lich';
-import * as forsakenpaladin from './forsakenpaladin';
+import * as uther from './uther';
 import * as dreadlord from './dreadlord';
 import * as shadowhunter from './shadowhunter';
 import * as pitlord from './pitlord';
@@ -30,6 +30,6 @@ import * as archimonde from './archimonde';
 
 /** Every fighter's Classic mapping onto the canonical rig, by character (#366). */
 export const FIGHTER_RIGS: ReadonlyMap<Character, FighterRig> = new Map([
-    rifleman, illidan, blademaster, mountainking, warden, lich, forsakenpaladin, dreadlord, shadowhunter, pitlord, beastmaster, lichking, thrall,
+    rifleman, illidan, blademaster, mountainking, warden, lich, uther, dreadlord, shadowhunter, pitlord, beastmaster, lichking, thrall,
     jaina, sylvanas, cairne, chen, peon, tinker, kaelthas, murloc, grom, anubarak, malfurion, medivh, ladyvashj, archimonde,
 ].map(rig => [rig.character, rig as FighterRig]));

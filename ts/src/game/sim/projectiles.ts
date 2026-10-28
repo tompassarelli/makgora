@@ -168,14 +168,14 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
   if (projectile.kind === ProjectileKind.hero && spec !== undefined) {
     copyHitEffect(projectileHit, heroProjectileEffect(projectile, spec));
     projectileHit.damage = projectileDamage(projectile);
-    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, spec.burn === undefined ? ContactKind.launch : ContactKind.damageOnly, false, undefined, shieldContact, spec.status, projectile.z, projectile.visualFamily);
+    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, spec.burn === undefined ? ContactKind.launch : ContactKind.damageOnly, false, undefined, shieldContact, spec.status, projectile.z);
     return;
   }
   const { kind } = projectile;
   const effect = originalProjectileEffect(projectile);
   collectDamageContact(world, ownerSlot, targetSlot, effect, projectile.direction,
     kind === ProjectileKind.blaster ? ContactKind.flinch : ContactKind.launch, false, undefined, shieldContact,
-    undefined, projectile.z, projectile.visualFamily);
+    undefined, projectile.z);
 }
 
 

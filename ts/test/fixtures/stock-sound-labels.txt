@@ -270,7 +270,6 @@ ForgottenOneTentacleDeath
 ForsakenApothecaryDeath1
 ForsakenDeathguardDeath1
 ForsakenGarekDeath1
-ForsakenPaladinDeath1
 ForsakenRangerDeath1
 FountainOfLifeLoop
 FragShards

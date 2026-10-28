@@ -49,7 +49,7 @@ Controllers work through a separate, experimental helper, [padbridge](https://gi
 
 ## Known issues
 - Some effects are still hard to read, for example Lich King's down special and ultimate.
-- Forsaken Paladin's attacks and Thrall's down-special slam still need animation work.
+- Thrall's down-special slam still needs animation work.
 - Some animations are stiff, such as Mal'Ganis, Cairne's normals and Sylvanas's kicks.
 - Some hit areas do not match the drawn weapon exactly, for example Peon, Chen and Grom.
 - Murloc's Disease Cloud and a few other effects borrow another unit's look.

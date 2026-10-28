@@ -124,26 +124,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Kel'Thuzad | ledge-get-up | 24: Recovery ledgeClimb | 147.3 | 101.3 | up; 136.9/82.2 |
 | Kel'Thuzad | ledge-roll | 25: Recovery ledgeRoll | 179.3 | 121.3 | forward; 118.8/164.2 |
 | Kel'Thuzad | ledge-attack | 26: Recovery ledgeAttack | 175.6 | 125.6 | both; 110.6/108.8 |
-| Forsaken Paladin | walk | 12: Walk 1 | 85.8 | 20.7 | forward; 82.9/75.0 |
-| Forsaken Paladin | dash | 12: Walk 1 | 85.6 | 20.0 | forward; 82.7/74.3 |
-| Forsaken Paladin | run | 12: Walk 1 | 70.6 | 17.0 | forward; 66.1/66.1 |
-| Forsaken Paladin | turn | 50: Forsaken Paladin turn | 130.3 | 29.1 | back; 128.8/65.5 |
-| Forsaken Paladin | brake | 51: Forsaken Paladin stop | 41.9 | 10.5 | in place; 27.6/16.1 |
-| Forsaken Paladin | jump-squat | 52: Forsaken Paladin jumpSquat | 50.3 | 9.5 | down; 44.7/19.2 |
-| Forsaken Paladin | roll-forward | 85: Forsaken Paladin rollForward | 212.3 | 92.3 | forward; 86.5/205.4 |
-| Forsaken Paladin | roll-back | 86: Forsaken Paladin rollBackward | 212.4 | 92.1 | back; 205.7/86.4 |
-| Forsaken Paladin | spot-dodge | 66: Forsaken Paladin spotDodge | 39.8 | 13.2 | in place; 30.6/14.5 |
-| Forsaken Paladin | air-dodge | 48: Forsaken Paladin airDodge | 46.6 | 14.7 | in place; 33.6/16.1 |
-| Forsaken Paladin | tech | 67: Forsaken Paladin tech | 139.2 | 28.7 | in place; 64.2/115.3 |
-| Forsaken Paladin | tech-forward | 87: Forsaken Paladin techForward | 212.3 | 92.9 | forward; 86.6/205.6 |
-| Forsaken Paladin | tech-back | 88: Forsaken Paladin techBackward | 212.4 | 92.9 | back; 205.6/86.6 |
-| Forsaken Paladin | get-up | 64: Forsaken Paladin getUp | 180.3 | 48.7 | up; 93.5/81.3 |
-| Forsaken Paladin | get-up-forward | 89: Forsaken Paladin getUpRollForward | 212.8 | 92.6 | forward; 86.4/205.6 |
-| Forsaken Paladin | get-up-back | 90: Forsaken Paladin getUpRollBackward | 212.7 | 92.4 | back; 205.4/86.5 |
-| Forsaken Paladin | get-up-attack | 65: Forsaken Paladin getUpAttack | 242.0 | 64.8 | both; 210.3/90.5 |
-| Forsaken Paladin | ledge-get-up | 60: Forsaken Paladin ledgeClimb | 124.5 | 27.0 | up; 64.5/77.6 |
-| Forsaken Paladin | ledge-roll | 91: Forsaken Paladin ledgeRoll | 212.7 | 92.6 | forward; 86.5/205.6 |
-| Forsaken Paladin | ledge-attack | 61: Forsaken Paladin ledgeAttack | 49.7 | 11.2 | both; 38.0/19.1 |
+| Uther | walk | 12: Walk | 116.5 | 48.6 | forward; 104.4/116.3 |
+| Uther | dash | 12: Walk | 116.1 | 47.5 | forward; 104.4/116.0 |
+| Uther | run | 12: Walk | 102.4 | 43.4 | forward; 87.9/101.8 |
+| Uther | turn | 35: Uther turn | 169.2 | 27.3 | back; 95.1/169.1 |
+| Uther | brake | 36: Uther stop | 43.4 | 11.2 | in place; 41.0/18.5 |
+| Uther | jump-squat | 37: Uther jumpSquat | 61.6 | 20.0 | down; 26.0/38.5 |
+| Uther | roll-forward | 70: Uther rollForward | 191.2 | 108.1 | forward; 142.7/100.4 |
+| Uther | roll-back | 74: Uther rollBackward | 191.0 | 106.5 | back; 96.6/142.9 |
+| Uther | spot-dodge | 51: Uther spotDodge | 46.7 | 14.8 | in place; 42.3/17.3 |
+| Uther | air-dodge | 32: Uther airDodge | 45.7 | 12.4 | in place; 41.9/12.8 |
+| Uther | tech | 52: Uther tech | 89.6 | 47.9 | in place; 67.2/88.9 |
+| Uther | tech-forward | 71: Uther techForward | 191.7 | 106.5 | forward; 141.8/103.2 |
+| Uther | tech-back | 75: Uther techBackward | 191.6 | 105.2 | back; 96.5/142.9 |
+| Uther | get-up | 49: Uther getUp | 98.3 | 60.6 | up; 90.7/48.2 |
+| Uther | get-up-forward | 72: Uther getUpRollForward | 191.5 | 109.5 | forward; 140.4/103.1 |
+| Uther | get-up-back | 76: Uther getUpRollBackward | 191.4 | 106.8 | back; 96.6/142.6 |
+| Uther | get-up-attack | 50: Uther getUpAttack | 152.6 | 68.9 | both; 152.5/102.4 |
+| Uther | ledge-get-up | 45: Uther ledgeClimb | 187.5 | 34.3 | up; 183.4/75.7 |
+| Uther | ledge-roll | 73: Uther ledgeRoll | 192.0 | 108.7 | forward; 140.1/103.6 |
+| Uther | ledge-attack | 46: Uther ledgeAttack | 105.8 | 22.6 | both; 90.4/32.4 |
 | Mal'Ganis | walk | 5: Walk | 117.4 | 38.1 | forward; 107.5/105.7 |
 | Mal'Ganis | dash | 5: Walk | 114.4 | 36.3 | forward; 106.7/105.0 |
 | Mal'Ganis | run | 5: Walk | 128.5 | 45.2 | forward; 124.4/110.5 |

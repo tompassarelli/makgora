@@ -1,8 +1,8 @@
 # Smashcraft roster
 
-> **Frozen (26 October 2026):** Forsaken Paladin is frozen pending replacement. No issue, audit, design change or worker task is opened for him until Tom permits it; `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, lists him. The planned additions, Uther (his replacement) and Lady Vashj, come with Archimonde, Tyrande, the Butcher and a dismounted Thrall in [roster-next.md](roster-next.md) (28 October 2026).
+> **Frozen (26 October 2026):** Forsaken Paladin was frozen pending replacement, and Uther replaced him on 28 October 2026 ([uther.md](uther.md)). `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, keeps listing him until Tom lifts it. The remaining planned additions, Tyrande, the Butcher and a dismounted Thrall, are in [roster-next.md](roster-next.md) (28 October 2026).
 
-Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 26 fighters, Melee’s size, until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343). No further additions are planned.
+Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 29 fighters (Tom, 28 October 2026, [roster-next.md](roster-next.md)) until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343). No further additions are planned.
 
 We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.
 
@@ -98,7 +98,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | 3 | Warden | Precision mobility and edge pressure | Light body and punishable teleport endpoints |
 | 4 | Pandaren Brewmaster | Staff brawler with brew and fire combinations | Slow commitments and limited ranged reach |
 | 5 | Lich | Deliberate projectile placement | Frail body and slow attacks at close range |
-| 6 | Forsaken Paladin | Forsaken sword fighter holding holy ground | Slow feet and committed recovery |
+| 6 | Uther the Lightbringer | The Silver Hand's hammer, an all-rounder with an answer for every situation | Slow air drift and no long-range pressure |
 | 7 | Dreadlord | Air movement, grabs, and close pressure | Large hurtbox and no safe long-range approach |
 | 8 | Shadow Hunter | Totem placement and angles | Setup can be destroyed or bypassed |
 | 9 | Pit Lord | Extreme heavy with long cleaves | Very large target and slow recovery |
@@ -216,7 +216,7 @@ Weight is relative to the current reference fighter at 1.00. Run speed is a mult
 | Warden | 0.88 | 1.14 | 1.10 | 0.90 | 1.00 |
 | Brewmaster | 1.13 | 0.98 | 0.90 | 1.20 | 1.10 |
 | Lich | 0.85 | 0.90 | 0.95 | 0.90 | 1.28 |
-| Forsaken Paladin | 1.10 | 0.92 | 0.88 | 1.08 | 1.02 |
+| Uther | 1.41 | 0.86 | 0.84 | 1.08 | 1.02 |
 | Dreadlord | 1.24 | 1.10 | 1.22 | 1.10 | 1.15 |
 | Shadow Hunter | 0.94 | 1.04 | 1.00 | 0.92 | 1.08 |
 | Pit Lord | 1.28 | 0.80 | 0.75 | 1.65 | 1.35 |
@@ -251,7 +251,7 @@ its capsule's top.
 | Mountain King | Hmkg | 1.00 | 1.00 | 1.00 |
 | Warden | Ewar | 1.00 | 1.00 | 1.00 |
 | Lich | Ulic | 1.00 | 1.00 | 0.80 |
-| Forsaken Paladin | Hpal | 1.00 | 1.00 | 1.00 |
+| Uther | Huth | 1.10 | 1.10 | 1.10 |
 | Dreadlord | Udre | 1.00 | 1.00 | 1.00 |
 | Shadow Hunter | Oshd | 1.00 | 1.00 | 1.00 |
 | Pit Lord | Nplh | 1.00 | 1.00 | 0.95 |
@@ -748,52 +748,13 @@ Forward smash, split by position: strong hit sweetspot, frames 18-20, 18%; weak 
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 
-## Forsaken Paladin
+## Uther the Lightbringer
 
-> Frozen pending replacement; no work until Tom permits it.
-
-**Identity:** a Forsaken Paladin with his stock sword, a short slowing
-charge and a small holy patch that contests grounded landings. His slow feet
-and deliberate recovery reward spacing and permit a shield or whiff punish.
-The current move identities, sources, contracts and roster distinctions are
-in [Forsaken Paladin](forsaken-paladin.md); production frame data lives in forsakenPaladinMoves.ts.
-
-| Input | Move and behavior | Timing and cost |
-| --- | --- | --- |
-| Neutral B | **Cleansing Sword:** overhead launcher, 11.05 damage at 80°, growth 70/base 42. Removes his poison and movement slow on contact frame, even on a miss. Air drifts with 18 landing frames. | Active f14–16, end f38; 10 mana |
-| Side B | **Righteous Fury:** held-sword charge, 0.75H travel, 11.9 damage at 40°. Body hit slows movement 40% for 75 frames, then 120 immunity. Ground armor absorbs one hit up to 5 damage on f15–18. Air has no armor, one use, 20 landing frames and helpless finish. | Sword/travel f15–20, end f49; 25 mana |
-| Up B | **Ascension:** steerable sword rise in the [#252 heavy recovery band](../gameplay-design.md#recovery-and-edgeguarding), with the free route reaching at least 240 units on either axis; 0.2H forward and up to 1.6H steering. Paid form hits once for 6.8 damage at 80°. Jump spent, one use per airtime, helpless finish. | Hit f10–15, travel f8–28, stop/end f29; 15 mana or free |
-| Down B | **Consecration:** fixed, jumpable holy patch, radius 60, 70 units ahead. Life 120 frames, 1.7 damage at most every 45 frames; one patch and 150-frame recast interval. Ground only. | Pool f16, end f42; 20 mana |
-
-**Sacred Aura:** three blocked hits make the next non-throw launch 20% weaker.
-Direct hammer hits retain three extra hitlag frames and the volume-127 heavy
-bash. The 0.80 damage multiplier applies to authored damage and preserves
-original hitlag strength. Normal hit regions, hurt capsules and throws remain
-in forsakenPaladinMoves.ts; this revision changes Forsaken Paladin specials and their computer use.
-
-Presentation uses Blizzard's 3.0.1 Classic Forsaken body, head and sword.
-The stock game path is `Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx`.
-In the installed archive, it is
-`war3.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx`.
-The fighter's
-source path is `Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx`,
-selecting private `hero-models/heroforsakenpaladin.mdx`. Match and victory bodies
-use our authored clips pooled from that stock rig, retaining our weapon marker
-metadata. Selection, HUD, stock and ending portraits use
-the `FighterTile`, `FighterBust`, `FighterStock` and `FighterCard` Forsaken Paladin
-cutouts, including each player's outfit, rendered from that same body.
-Its version-1800 skin addresses bone matrices directly. The shipped authored
-actions retain their sequence indices and joint transforms on that stock rig.
-
-**Counterplay:** shield the bonk or charge and punish recovery; jump or step
-out of Consecration; edge-guard Ascension from its exposed sides. Cleansing
-Hammer cannot remove silence, sleep, stun or a forced carry.
-
-**Computer:** close hammer spacing, Righteous Fury for an approach,
-Consecration near grounded opponents, ordinary shield/dodge for defense,
-then ledge-oriented Ascension for recovery. Coverage counts all four specials.
-
-**Balance** (#249, his own 20-pair computer field, Wren Expert, 408/pair): damage multiplier 0.85 → 0.80: field win rate 61% (6d0b5a2c, run 37736075431) → 50% (0b0d4ced, run 37741856017); side special is 22% of his moves and 29% of his damage.
+**Identity:** the Silver Hand's stern, unhurried paladin and the roster's first
+all-rounder: a hammer for every range and a holy answer for every situation,
+none of them the best in its class. He replaced Forsaken Paladin on
+28 October 2026 (Tom's request); the full kit is in [Uther](uther.md) and
+production frame data lives in fighters/uther/moves.ts and specials.ts.
 
 ## Dreadlord
 
@@ -1626,7 +1587,7 @@ Every model needs a verified animation map: action, native clip/index if availab
 2. **Reusable primitives:** confirm or add frame-defined melee volumes, projectile motion, swept hits, grabs/throws, per-airtime recovery flags, short statuses, and deterministic owned entities. Do not add every future mechanic at once.
 3. **First complete hero:** Blademaster, using the full base kit and basic cosmetic effects. Ultimates stay disabled. Validate normals, shield interaction, throws, recovery, death, replay, and model alignment.
 4. **Second contrasting hero:** Mountain King. Compare a compact heavy against the existing ranged fighters and Blademaster; do not tune only a mirror matchup.
-5. **Mobility and defense:** Warden, Brewmaster, Forsaken Paladin. Exercise teleport endpoints, temporary intangibility, armor, and healing caps.
+5. **Mobility and defense:** Warden, Brewmaster, Uther. Exercise teleport endpoints, temporary intangibility, armor, and healing caps.
 6. **Caster kits:** Lich, Dreadlord, Shadow Hunter, then Pit Lord. Introduce a status or summon only after the required common primitive passes replay checks.
 7. **More complex setup characters:** Tinker, Alchemist, Naga, Beastmaster, Dark Ranger, Firelord. Keep each behind an explicit development toggle until playable and verified.
 8. **Optional ultimates and visual polish:** only after base kits pass. No production-ready label for untested ultimates.
@@ -1938,7 +1899,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Mountain King | Hammer-and-axe chain, hammer lift and Thunder Leap | Counted Bash hitstun bonus |
 | Warden | Fan of Knives, glaive drill and chosen Blink | Aerial-hit jump refund |
 | Lich | Frost zones, deliberate ice armour and hovering cast poses | Counted reactive Frost Armour |
-| Forsaken Paladin | Sword spacing, deliberate guard and Divine Shield | Counted launch reduction |
+| Uther | Hammer spacing, Devotion Aura armour and Divine Shield | Counted launch reduction |
 | Dreadlord | Corkscrew bite and wing-led close moves | Counted automatic lifesteal |
 | Shadow Hunter | Glaive drill, ward placement and crossfire | Banked Voodoo damage |
 | Pit Lord | Wide cleaver swings and armoured charge move | Third-contact cleave bonus |

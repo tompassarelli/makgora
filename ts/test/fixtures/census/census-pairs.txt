@@ -4,7 +4,7 @@ pair	blademaster vs rifleman	instructions=229000	alloc-kb=43.3
 pair	mountain-king vs rifleman	instructions=209800	alloc-kb=44.7
 pair	warden vs rifleman	instructions=229600	alloc-kb=45.0
 pair	lich vs rifleman	instructions=187700	alloc-kb=44.9
-pair	forsaken-paladin vs rifleman	instructions=241200	alloc-kb=43.3
+pair	uther vs rifleman	instructions=200000	alloc-kb=28.4
 pair	dreadlord vs rifleman	instructions=236100	alloc-kb=43.5
 pair	shadow-hunter vs rifleman	instructions=235700	alloc-kb=25.5
 pair	pit-lord vs rifleman	instructions=238100	alloc-kb=39.4

@@ -15,7 +15,6 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [4, { name: "MountainKing", slug: "mountain-king", source: "hero-models/heromountainking.mdx", stock: "war3.w3mod:units/human/heromountainking/heromountainking.mdx", model: "units\\human\\HeroMountainKing\\HeroMountainKing.mdl" }],
   [5, { name: "Warden", slug: "warden", source: "hero-models/herowarden.mdx", stock: "war3.w3mod:units/nightelf/herowarden/herowarden.mdx", model: "Units\\NightElf\\HeroWarden\\HeroWarden.mdx" }],
   [6, { name: "Lich", slug: "lich", source: "hero-models/herolich.mdx", stock: "war3.w3mod:units/undead/herolich/herolich.mdx", model: "units\\undead\\HeroLich\\HeroLich.mdl" }],
-  [7, { name: "ForsakenPaladin", slug: "forsaken-paladin", source: "hero-models/heroforsakenpaladin.mdx", stock: "war3.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx", model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx" }],
   [8, { name: "Dreadlord", slug: "dreadlord", source: "hero-models/herodreadlord.mdx", stock: "war3.w3mod:units/undead/herodreadlord/herodreadlord.mdx", model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl" }],
   [9, { name: "ShadowHunter", slug: "shadow-hunter", source: "hero-models/heroshadowhunter.mdx", stock: "war3.w3mod:units/orc/heroshadowhunter/heroshadowhunter.mdx", model: "units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl" }],
   [10, { name: "PitLord", slug: "pit-lord", source: "hero-models/heropitlord.mdx", stock: "war3.w3mod:units/demon/heropitlord/heropitlord.mdx", model: "units\\demon\\HeroPitLord\\HeroPitLord.mdl" }],
@@ -34,6 +33,7 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [23, { name: "Anubarak", slug: "anub'arak", source: "hero-models/herocryptlord.mdx", stock: "war3.w3mod:units/undead/herocryptlord/herocryptlord.mdx", model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl" }],
   [24, { name: "MalfurionStormrage", slug: "malfurion-stormrage", source: "hero-models/furion.mdx", stock: "war3.w3mod:units/nightelf/furion/furion.mdx", model: "units\\nightelf\\Furion\\Furion.mdl" }],
   [25, { name: "Medivh", slug: "medivh", source: "hero-models/medivh.mdx", stock: "war3.w3mod:units/creeps/medivh/medivh.mdx", model: "units\\creeps\\Medivh\\Medivh.mdl" }],
+  [27, { name: "Uther", slug: "uther", source: "hero-models/uther.mdx", stock: "war3.w3mod:units/human/uther/uther.mdx", model: "units\\human\\Uther\\Uther.mdl" }],
   [28, { name: "LadyVashj", slug: "lady-vashj", source: "hero-models/ladyvashj.mdx", stock: "war3.w3mod:units/naga/ladyvashj/ladyvashj.mdx", model: "units\\naga\\LadyVashj\\LadyVashj.mdl" }],
   [29, { name: "Archimonde", slug: "archimonde", source: "hero-models/warlock.mdx", stock: "war3.w3mod:units/demon/warlock/warlock.mdx", model: "units\\demon\\Warlock\\Warlock.mdl" }],
 ]);

@@ -15,7 +15,7 @@ export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
   [Character.mountainKing]: { left: -47, right: 93, bottom: 0, top: 119 },
   [Character.warden]: { left: -99, right: 85, bottom: -4, top: 164 },
   [Character.lich]: { left: -112, right: 64, bottom: -13, top: 181 },
-  [Character.forsakenPaladin]: { left: -30, right: 87, bottom: -1, top: 111 },
+  [Character.uther]: { left: -89, right: 33, bottom: -3, top: 110 },
   [Character.dreadlord]: { left: -132, right: 105, bottom: -15, top: 217 },
   [Character.shadowHunter]: { left: -77, right: 72, bottom: -3, top: 146 },
   [Character.pitLord]: { left: -166, right: 191, bottom: -8, top: 189 },

@@ -41,7 +41,7 @@ const legacy = [
 // Blademaster keeps the #230 front flip authored by blademaster-clips.ts.
 const STYLES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "cannonball", [Character.demonHunter]: "wing beat", [Character.mountainKing]: "cannonball",
-  [Character.warden]: "back flip", [Character.lich]: "float", [Character.forsakenPaladin]: "front flip",
+  [Character.warden]: "back flip", [Character.lich]: "float", [Character.uther]: "front flip",
   [Character.dreadlord]: "wing beat", [Character.pitLord]: "heave",
   [Character.beastmaster]: "back flip", [Character.lichKing]: "float", [Character.thrall]: "front flip",
   [Character.jaina]: "back flip", [Character.sylvanas]: "back flip", [Character.cairne]: "knee lift",

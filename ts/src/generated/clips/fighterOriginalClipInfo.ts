@@ -23,8 +23,8 @@ import * as kaelthasSunstrider from "./kael'thas-sunstrider";
 import * as warden from "./warden";
 import * as anubarak from "./anub'arak";
 import * as rifleman from "./rifleman";
-import * as forsakenPaladin from "./forsaken-paladin";
 import * as cairneBloodhoof from "./cairne-bloodhoof";
+import * as uther from "./uther";
 import * as ladyVashj from "./lady-vashj";
 import * as goblinTinker from "./goblin-tinker";
 import * as shadowHunter from "./shadow-hunter";
@@ -64,8 +64,8 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   5: warden,
   23: anubarak,
   1: rifleman,
-  7: forsakenPaladin,
   16: cairneBloodhoof,
+  27: uther,
   28: ladyVashj,
   19: goblinTinker,
   9: shadowHunter,

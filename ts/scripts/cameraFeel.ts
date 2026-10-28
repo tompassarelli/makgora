@@ -25,7 +25,7 @@ type CameraScenario = Pick<ComputerMatch, "fighters" | "stage" | "shift">;
 export const CAMERA_SCENARIOS: readonly CameraScenario[] = [
   { fighters: ["illidan", "blademaster"], stage: 0, shift: 0.0 },
   { fighters: ["rifleman", "mountain-king"], stage: 0, shift: -60.0 },
-  { fighters: ["illidan", "forsaken-paladin"], stage: 1, shift: 0.0 },
+  { fighters: ["illidan", "uther"], stage: 1, shift: 0.0 },
   { fighters: ["warden", "lich"], stage: 1, shift: 60.0 },
   { fighters: ["dreadlord", "shadow-hunter"], stage: 2, shift: 0.0 },
   { fighters: ["blademaster", "illidan"], stage: 2, shift: -60.0 },
@@ -33,7 +33,7 @@ export const CAMERA_SCENARIOS: readonly CameraScenario[] = [
 
 export const FOUR_PLAYER_CAMERA_SCENARIOS: readonly CameraScenario[] = [
   { fighters: ["illidan", "blademaster", "rifleman", "mountain-king"], stage: 0, shift: 0.0 },
-  { fighters: ["warden", "lich", "forsaken-paladin", "shadow-hunter"], stage: 1, shift: 0.0 },
+  { fighters: ["warden", "lich", "uther", "shadow-hunter"], stage: 1, shift: 0.0 },
   { fighters: ["dreadlord", "illidan", "blademaster", "warden"], stage: 2, shift: 0.0 },
 ];
 

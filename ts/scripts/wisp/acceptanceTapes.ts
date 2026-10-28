@@ -508,8 +508,8 @@ const DREADLORD: MatchScript = {
 };
 
 
-const FORSAKEN_PALADIN: MatchScript = {
-  characters: [Character.forsakenPaladin, Character.demonHunter], stage: 0, stocks: 3, minutes: 0, frames: 540,
+const UTHER: MatchScript = {
+  characters: [Character.uther, Character.demonHunter], stage: 0, stocks: 3, minutes: 0, frames: 540,
   holds: [[
     [20, 2, SPECIAL], [80, 4, TOWARD], [81, 2, SPECIAL], [140, 4, DOWN], [141, 2, SPECIAL], [200, 4, TOWARD],
     [201, 2, SPECIAL], [260, 4, AWAY], [261, 2, SPECIAL], [320, 3, JUMP], [332, 4, UP], [333, 2, SPECIAL],
@@ -542,7 +542,7 @@ const WARDEN: MatchScript = {
 
 const ULTIMATE_PAIRS: readonly (readonly [keyof typeof Character, keyof typeof Character])[] = [
   ["murloc", "grom"], ["cairne", "pitLord"], ["lichKing", "sylvanas"], ["tinker", "kaelthas"], ["shadowHunter", "warden"], ["mountainKing", "demonHunter"],
-  ["rifleman", "blademaster"], ["lich", "forsakenPaladin"], ["dreadlord", "beastmaster"], ["thrall", "jaina"], ["chen", "peon"], ["anubarak", "malfurion"], ["medivh", "ladyVashj"],
+  ["rifleman", "blademaster"], ["lich", "uther"], ["dreadlord", "beastmaster"], ["thrall", "jaina"], ["chen", "peon"], ["anubarak", "malfurion"], ["medivh", "ladyVashj"],
 ];
 
 export function generateTapes(): Map<string, string> {
@@ -627,7 +627,7 @@ export function generateTapes(): Map<string, string> {
     ["lich-king", recordTape("The Lich King's blast, soul-banking jabs, a Val'kyr carry mashed against, Defile, Ascension, Harvest Soul and Quake against the Illidan, with replays.", [LICH_KING])],
     ["beastmaster", recordTape("Beastmaster's bear summoned, commanded, recalled and followed, his axe, Hawk Lift, normals and a throw against the Illidan, with replays.", [BEASTMASTER])],
     ["warden", recordTape("Warden's specials with poison and an aimed Blink, normals and a throw against the Illidan, with replays.", [WARDEN])],
-    ["forsaken-paladin", recordTape("Forsaken Paladin's specials, guard, free recovery and normals against the Illidan, with replays.", [FORSAKEN_PALADIN])],
+    ["uther", recordTape("Uther's Holy Light, Devotion Aura armour, Divine Shield, free Hammer of the Righteous and normals against the Illidan, with replays.", [UTHER])],
     ["moving-platforms", recordTape("Moving decks, jumping, dropping through, predictions and rollback over complete path cycles.", [{
       characters: [Character.demonHunter, Character.rifleman], stage: 3, stocks: 3, minutes: 0, frames: 620,
       holds: [[[1, 20, RIGHT, WALK], [30, 10, JUMP], [180, 3, DOWN], [240, 10, JUMP], [400, 10, JUMP]], [[1, 10, JUMP], [140, 3, DOWN], [300, 10, JUMP]]],

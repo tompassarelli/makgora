@@ -8,7 +8,6 @@ import { originalClip } from "../../ts/src/generated/clips/fighterOriginalClipIn
 import { contactDamageClip } from "../../ts/src/game/presentation/damagePose";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/game/roster/kits";
 import { Character } from "../../ts/src/game/sim/codes";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/fighters/forsaken-paladin/sword";
 import { fighterAt } from "../../ts/src/game/sim/roster";
 import { shell } from "../../ts/src/host/loop/state";
 import { ensure, parseSource, tracks } from "./original-clips";
@@ -39,7 +38,7 @@ await Effect.runPromise(Effect.gen(function*() {
         session.client.run(() => {
           const state = shell(), fighter = fighterAt(state.world, 0), pose = state.runtime.poses[0];
           if (frame === 150) {
-            const damage = character === Character.forsakenPaladin ? Math.fround(8 * FORSAKEN_PALADIN_DAMAGE_MULTIPLIER) : 8;
+            const damage = 8;
             ensure(fighter.status.damage === damage && fighter.launch.hitstun > 0, `${fighterName(character)}: contact missing, damage ${fighter.status.damage}, want ${damage}, hitstun ${fighter.launch.hitstun}`);
             selected = contactDamageClip(fighter).index;
             ensure(pose.clipIndex === selected && pose.clipTime === 0 && pose.rate === 0, `${fighterName(character)}: contact pose not held`);

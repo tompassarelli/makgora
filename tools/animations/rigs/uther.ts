@@ -1,0 +1,22 @@
+export const character = 27;
+export const classic = {
+    root: 'Root',
+    pelvis: 'Pelvis',
+    chest: 'Bone_Chest',
+    head: 'Bone_Head',
+    'clavicle.L': 'ShoulderL',
+    'shoulder.L': 'UpArmL',
+    'elbow.L': 'LowArmL',
+    'wrist.L': 'HandL',
+    'hip.L': 'UpperLegL',
+    'knee.L': 'LowerLegL',
+    'ankle.L': 'FootL',
+    'clavicle.R': 'ShoulderR',
+    'shoulder.R': 'UpArmR',
+    'elbow.R': 'LowArmR',
+    'wrist.R': 'HandR',
+    'hip.R': 'UpperLegR',
+    'knee.R': 'LowerLegR',
+    'ankle.R': 'FootR',
+    weapon: 'Hammer',
+} as const;

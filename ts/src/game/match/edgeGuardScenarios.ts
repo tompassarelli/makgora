@@ -258,7 +258,7 @@ export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> =
   [Character.mountainKing]: { guarder: Character.mountainKing, out: 164.0, z: -68.0, press: 3 },
   [Character.warden]: { guarder: Character.warden, out: 163.0, z: -68.0, press: 9 },
   [Character.lich]: { guarder: Character.lich, out: 97.0, z: -84.0, press: 6 },
-  [Character.forsakenPaladin]: { guarder: Character.forsakenPaladin, out: 98.0, z: -84.0, press: 6 },
+  [Character.uther]: { guarder: Character.uther, out: 98.0, z: -84.0, press: 6 },
   [Character.dreadlord]: { guarder: Character.dreadlord, out: 96.0, z: -84.0, press: 6 },
   [Character.shadowHunter]: { guarder: Character.shadowHunter, out: 163.0, z: -68.0, press: 6 },
   [Character.pitLord]: { guarder: Character.pitLord, out: 160.0, z: -134.0, press: 3 },

@@ -87,8 +87,8 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
     speaker: "Chen Stormstout", intro: "Someone drank my thunder brew. Now someone gets a lesson!",
   }),
   battle({
-    id: "culling", title: "The Culling of Stratholme", player: C.forsakenPaladin, against: [C.dreadlord], tier: "beginner", stage: 6,
-    win: koWithinClock, minutes: 2, playerStocks: 2, opponentStocks: 1, speaker: "Arthas", intro: "This entire city must be purged.",
+    id: "culling", title: "The Culling of Stratholme", player: C.uther, against: [C.dreadlord], tier: "beginner", stage: 6,
+    win: koWithinClock, minutes: 2, playerStocks: 2, opponentStocks: 1, speaker: "Uther the Lightbringer", intro: "I will not purge this city, Arthas. Its demon answers to me instead.",
   }),
   battle({
     id: "frostmourne", title: "Frostmourne", player: C.lichKing, against: [C.mountainKing], tier: "beginner", stage: 2,

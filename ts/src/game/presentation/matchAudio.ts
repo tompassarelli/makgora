@@ -80,7 +80,6 @@ const RACES: Readonly<Record<Character, Race>> = {
   4: Race.human,
   5: Race.nightElf,
   6: Race.undead,
-  7: Race.human,
   8: Race.undead,
   9: Race.orc,
   10: Race.undead,
@@ -98,6 +97,7 @@ const RACES: Readonly<Record<Character, Race>> = {
   22: Race.orc,
   24: Race.nightElf,
   25: Race.human,
+  27: Race.human,
   29: Race.undead,
 };
 
@@ -132,7 +132,6 @@ const VOICES: Readonly<Record<Exclude<Character, DialogueVoiced>, readonly [stri
   4: ["Units\\Human\\HeroMountainKing\\", "HeroMountainKing"],
   5: ["Units\\NightElf\\HeroWarden\\", "HeroWarden"],
   6: ["Units\\Undead\\HeroLich\\", "HeroLich"],
-  7: ["Units\\Undead\\HeroDeathKnight\\", "DeathKnight"],
   8: ["Units\\Undead\\HeroDreadLord\\", "HeroDreadLord"],
   9: ["Units\\Orc\\HeroShadowHunter\\", "ShadowHunter"],
   10: ["Units\\Demon\\HeroPitLord\\", "HPitLord"],
@@ -150,6 +149,7 @@ const VOICES: Readonly<Record<Exclude<Character, DialogueVoiced>, readonly [stri
   28: ["Units\\Naga\\LadyVashj\\", "LadyVashj"],
   22: ["Units\\Orc\\Hellscream\\", "Grom"],
   24: ["Units\\NightElf\\Furion\\", "Furion", "What"],
+  27: ["Units\\Human\\HeroPaladin\\", "HeroPaladin"],
 };
 
 const MURLOC_MOVE_TAKES = 3;
@@ -181,7 +181,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.mountainKing]: "mountainking victory",
   [Character.warden]: "warden victory",
   [Character.lich]: "lich victory",
-  [Character.forsakenPaladin]: "forsakenpaladin victory",
+  [Character.uther]: "stand victory",
   [Character.dreadlord]: "dreadlord victory",
   [Character.shadowHunter]: "shadowhunter victory",
   [Character.pitLord]: "spell",

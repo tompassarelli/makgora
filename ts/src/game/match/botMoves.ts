@@ -224,9 +224,6 @@ function addHeroSpecials(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
         || Math.abs(aheadX(f, target, 0, undefined, observationAge)) <= moveReachAhead(f.character, AttackStyle.forwardTilt, target, f.tuning.moves)
         || f32(target.motion.deltaX * f.facing) <= 0.0)) continue;
 
-    if (f.character === Character.forsakenPaladin && at(HERO_SLOTS, index) === SpecialSlot.side
-      && Math.abs(aheadX(f, target, 0, undefined, observationAge)) > moveReachAhead(f.character, AttackStyle.forwardTilt, target, f.tuning.moves)
-      && f32(target.motion.deltaX * f.facing) <= 0.0) continue;
     options[added++] = at(SLOT_OPTIONS, index);
     if (f.character !== Character.thrall || at(HERO_SLOTS, index) !== SpecialSlot.neutral) options[added++] = at(SLOT_OPTIONS, index);
   }

@@ -451,28 +451,20 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   apart, about his right hand (#447). `... SHIPPED_TAUREN.mdx PRIVATE_OUTPUT grip` re-keys only
   the halberd in the shipped clips whose ease had swung it about the model origin, up to 54 units off his hand.
 
-- Forsaken Paladin animation authoring (from the repository root):
-  `bun tools/animations/forsaken-paladin-clips.ts STOCK_FORSAKEN_PALADIN.mdx PRIVATE_OUTPUT`
-  keeps the stock Forsaken body, sword and rig, and
-  authors his strikes, recovery, paired throws and nine pain poses.
-  Given the shipped model and pose names (or `pain` for the nine pain cells)
-  instead, it re-authors only those clips in place at their indices and lengths.
-  `bun tools/animations/stock-forsaken-model.ts STOCK_CLASSIC_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
-  restores the stock Classic mesh and version-1800 skin while retaining the shipped motion.
-  `bun tools/animations/forsaken-paladin-weapon-clips.ts STOCK_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT`
-  replaces normal and special motion at the canonical indices with the stock Attack 1,
-  Attack Slam and Spell Slam sequences. It remaps their wind-up, strike and recovery
-  to the existing move frames, keeps the pummel's held left arm, and writes measured
-  weapon contact geometry through `forsakenPaladinWeaponGeometry.ts`. The authoring
-  move tables provide the contact targets; shipped collision follows the measured
-  grip and blade. Run the original clip export, timeline export
-  and Character 7 white-copy export afterward. Other fighter inputs stay unchanged.
-  His sword joint hangs from the root rather than his hand, so later arm passes left it
-  up to 64 units out of his fist (#515).
-  `bun tools/animations/weapon-grip.ts SHIPPED.mdx PRIVATE_OUTPUT CHARACTER FIRST_AUTHORED_SEQUENCE`
-  re-keys only the weapon joint, at 60 Hz, in each authored clip whose grip strays more than
-  2.5 units from the wrist, sliding the weapon back to 2.5 units without turning it, and
-  checks every other track and clip is unchanged; run it with `7 28` on his shipped model.
+- Uther animation authoring (from the repository root):
+  `bun tools/animations/uther-clips.ts STOCK_UTHER.mdx PRIVATE_OUTPUT`
+  appends his hammer strikes, specials, movement, recovery, paired throws and nine pain
+  clips to the stock Classic Uther, preserving its 13 stock sequences, and writes
+  both-facing silhouette sheets. Every hammer move is keyed from the swing table in
+  smashcraft:ts/src/game/fighters/uther/moves.ts (`UTHER_HAMMER_SWINGS`, and
+  `UTHER_SPECIAL_SWINGS` in specials.ts), the same table his hit regions come from: on each
+  active frame the right arm puts his hand at the swing's grip and turns the hammer head
+  along the swing's angle, the left hand holds the haft behind it, and a wind-up and a
+  follow-through frame frame the arc. The hammer slides half way through his fist for
+  tilts and aerials and all the way for smashes, as the stock Attack - 2 slides it.
+  Given the shipped model and pose names instead, it re-authors only those clips in
+  place at their indices and lengths. Store `hero-models` with `--fighter uther`, then
+  run `bun wisp inputs derive --fighter Uther`.
 
 - Chen animation authoring (from the repository root):
   `bun tools/animations/chen-clips.ts STOCK_CHEN.mdx PRIVATE_OUTPUT` authors

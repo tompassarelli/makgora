@@ -3,7 +3,6 @@ import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/engine";
-import { forsakenPaladinSwordAttack } from "../fighters/forsaken-paladin/sword";
 import { type Cue, type CueBirth } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, immolationRegion, wingDiveRegion } from "../sim/specials";
@@ -24,7 +23,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.mountainKing]: NEUTRAL_FLARE,
   [Character.warden]: NEUTRAL_FLARE,
   [Character.lich]: FROST_FLARE,
-  [Character.forsakenPaladin]: HOLY_FLARE,
+  [Character.uther]: HOLY_FLARE,
   [Character.dreadlord]: NEUTRAL_FLARE,
   [Character.shadowHunter]: NEUTRAL_FLARE,
   [Character.pitLord]: FIRE_FLARE,
@@ -55,11 +54,7 @@ export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly Att
 };
 
 
-const FORSAKEN_SWORD_NORMALS: readonly AttackStyle[] = Object.values(AttackStyle).filter(style => forsakenPaladinSwordAttack(Character.forsakenPaladin, style));
-
-
 export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
-  if (fighter.character === Character.forsakenPaladin) return FORSAKEN_SWORD_NORMALS;
   if (DISJOINT_CUES[fighter.character] === undefined) return [];
   const reach = REACH_CUE_NORMALS[fighter.character] ?? [], signature = SIGNATURE_CUE_NORMALS[fighter.character] ?? [];
   return signature.length === 0 ? reach : [...reach, ...signature.filter(style => !reach.includes(style))];

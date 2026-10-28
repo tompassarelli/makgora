@@ -20,7 +20,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Warden | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Maiev hunts Illidan to the Broken Isles and into the Tomb of Sargeras. |
 | Malfurion Stormrage | Tomb of Sargeras | 7 | Malfurion follows Illidan and Maiev through the Broken Isles in TFT. |
 | Lich | Naxxramas | 4 | Kel'Thuzad, raised as a lich in RoC, rules the Scourge necropolis Naxxramas. |
-| Forsaken Paladin | Stratholme | 6 | RoC's "The Culling": Lordaeron's paladins refuse to purge Stratholme and leave Arthas at its gates. |
+| Uther | Stratholme | 6 | RoC's "The Culling": Uther refuses to purge Stratholme and leaves Arthas at its gates. |
 | Dreadlord | Stratholme | 6 | RoC's "The Culling": the dreadlord Mal'Ganis waits for Arthas in the plagued city. |
 | Shadow Hunter | Durotar Skies | 3 | Vol'jin's Darkspear trolls settle Durotar's coast beside Thrall's orcs. |
 | Pit Lord | Hellfire Citadel | 14 | Magtheridon, the pit lord who holds the citadel until Illidan takes it. |
@@ -44,7 +44,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 Ahn'Qiraj and Sky Deck (test) are home to no fighter. A stage may host
 several fighters, as Smash's do; Durotar Skies hosts several Horde fighters.
 
-Stratholme (6) and Tomb of Sargeras (7) were added for this table: Forsaken Paladin,
+Stratholme (6) and Tomb of Sargeras (7) were added for this table: Uther (then Forsaken Paladin),
 Dreadlord and Warden had no stage from their campaigns.
 
 Both stages are selectable. Stratholme uses cobbled slopes and three rooftop

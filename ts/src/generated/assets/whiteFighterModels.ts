@@ -6,7 +6,6 @@ import * as blademaster from "./white-models/blademaster";
 import * as mountainKing from "./white-models/mountain-king";
 import * as warden from "./white-models/warden";
 import * as lich from "./white-models/lich";
-import * as forsakenPaladin from "./white-models/forsaken-paladin";
 import * as dreadlord from "./white-models/dreadlord";
 import * as shadowHunter from "./white-models/shadow-hunter";
 import * as pitLord from "./white-models/pit-lord";
@@ -25,6 +24,7 @@ import * as gromHellscream from "./white-models/grom-hellscream";
 import * as anubarak from "./white-models/anub'arak";
 import * as malfurionStormrage from "./white-models/malfurion-stormrage";
 import * as medivh from "./white-models/medivh";
+import * as uther from "./white-models/uther";
 import * as ladyVashj from "./white-models/lady-vashj";
 import * as archimonde from "./white-models/archimonde";
 export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
@@ -34,7 +34,6 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   4: mountainKing.whiteModel,
   5: warden.whiteModel,
   6: lich.whiteModel,
-  7: forsakenPaladin.whiteModel,
   8: dreadlord.whiteModel,
   9: shadowHunter.whiteModel,
   10: pitLord.whiteModel,
@@ -53,6 +52,7 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   23: anubarak.whiteModel,
   24: malfurionStormrage.whiteModel,
   25: medivh.whiteModel,
+  27: uther.whiteModel,
   28: ladyVashj.whiteModel,
   29: archimonde.whiteModel,
 };

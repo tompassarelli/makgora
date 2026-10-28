@@ -21,33 +21,33 @@ Gap = mean Melee advantage (five references) minus mean ours (26 fighters), in f
 
 | Throw | Victim % | Ours | Melee | Gap | Knockback values | Weight in knockback | Thrower end lag | Weight-dependent timing |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| forward | 0 | 7.2 | 9.1 | 1.9 | -0.6 | 0 | 0.5 | 1.9 |
-| forward | 30 | 11.3 | 12.7 | 1.4 | -1.1 | 0 | 0.5 | 1.9 |
-| forward | 60 | 15.3 | 16.3 | 1 | -1.5 | 0 | 0.5 | 1.9 |
-| forward | 90 | 19.3 | 20.1 | 0.9 | -1.7 | 0.1 | 0.5 | 1.9 |
-| forward | all | 13.3 | 14.6 | 1.3 | -1.2 | 0 | 0.5 | 1.9 |
-| back | 0 | 5.9 | 4.7 | -1.2 | -0.1 | 0 | -5.9 | 4.7 |
-| back | 30 | 10.4 | 8.7 | -1.7 | -0.5 | 0 | -5.9 | 4.7 |
-| back | 60 | 14.9 | 12.7 | -2.2 | -1.1 | 0 | -5.9 | 4.7 |
-| back | 90 | 19.3 | 16.3 | -2.9 | -1.9 | 0.1 | -5.9 | 4.7 |
-| back | all | 12.6 | 10.6 | -2 | -0.9 | 0 | -5.9 | 4.7 |
-| up | 0 | 12.9 | 9.4 | -3.4 | 11.2 | 0 | -19.3 | 4.6 |
-| up | 30 | 17.6 | 12.8 | -4.7 | 9.9 | 0 | -19.3 | 4.6 |
-| up | 60 | 22.2 | 16.8 | -5.4 | 9.2 | 0.1 | -19.3 | 4.6 |
-| up | 90 | 26.7 | 20.8 | -5.8 | 8.7 | 0.1 | -19.3 | 4.6 |
-| up | all | 19.8 | 15 | -4.8 | 9.8 | 0.1 | -19.3 | 4.6 |
-| down | 0 | 7 | 27.8 | 20.8 | 7.7 | 3.9 | 6.3 | 2.8 |
-| down | 30 | 7 | 29.6 | 22.6 | 9.5 | 3.9 | 6.3 | 2.8 |
-| down | 60 | 7 | 31.6 | 24.6 | 11.5 | 3.9 | 6.3 | 2.8 |
-| down | 90 | 7 | 33.4 | 26.4 | 13.3 | 3.9 | 6.3 | 2.8 |
-| down | all | 7 | 30.6 | 23.6 | 10.5 | 3.9 | 6.3 | 2.8 |
-| all | all | 13.2 | 17.7 | 4.5 | 4.6 | 1 | -4.6 | 3.5 |
+| forward | 0 | 7.3 | 9.1 | 1.8 | -0.6 | 0 | 0.5 | 1.9 |
+| forward | 30 | 11.4 | 12.7 | 1.3 | -1.1 | 0 | 0.5 | 1.9 |
+| forward | 60 | 15.5 | 16.3 | 0.9 | -1.5 | 0 | 0.5 | 1.9 |
+| forward | 90 | 19.4 | 20.1 | 0.7 | -1.7 | 0 | 0.5 | 1.9 |
+| forward | all | 13.4 | 14.6 | 1.2 | -1.2 | 0 | 0.5 | 1.9 |
+| back | 0 | 6 | 4.7 | -1.3 | -0.1 | 0 | -5.9 | 4.7 |
+| back | 30 | 10.7 | 8.7 | -1.9 | -0.8 | 0 | -5.9 | 4.7 |
+| back | 60 | 15.4 | 12.7 | -2.7 | -1.5 | 0 | -5.9 | 4.7 |
+| back | 90 | 20 | 16.3 | -3.6 | -2.5 | 0 | -5.9 | 4.7 |
+| back | all | 13 | 10.6 | -2.4 | -1.2 | 0 | -5.9 | 4.7 |
+| up | 0 | 12.6 | 9.4 | -3.2 | 11.2 | 0 | -19 | 4.6 |
+| up | 30 | 17.4 | 12.8 | -4.5 | 9.8 | 0 | -19 | 4.6 |
+| up | 60 | 22.1 | 16.8 | -5.3 | 9.1 | 0 | -19 | 4.6 |
+| up | 90 | 26.6 | 20.8 | -5.8 | 8.6 | 0 | -19 | 4.6 |
+| up | all | 19.7 | 15 | -4.7 | 9.7 | 0 | -19 | 4.6 |
+| down | 0 | 7.1 | 27.8 | 20.7 | 7.9 | 3.9 | 6.1 | 2.8 |
+| down | 30 | 7.1 | 29.6 | 22.5 | 9.7 | 3.9 | 6.1 | 2.8 |
+| down | 60 | 7.1 | 31.6 | 24.5 | 11.7 | 3.9 | 6.1 | 2.8 |
+| down | 90 | 7.1 | 33.4 | 26.3 | 13.5 | 3.9 | 6.1 | 2.8 |
+| down | all | 7.1 | 30.6 | 23.5 | 10.7 | 3.9 | 6.1 | 2.8 |
+| all | all | 13.3 | 17.7 | 4.4 | 4.5 | 1 | -4.6 | 3.5 |
 
-Mean hitstun after a throw is 34.5 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.4 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 4.5 frames (knockback values 102%, weight in knockback 22%, thrower end lag -102%, weight-dependent timing 78%).
+Mean hitstun after a throw is 34.7 frames for ours and 40.1 for Melee's; mean thrower end lag is 21.4 and 22.4. Our throw hitstun is shorter than Melee's, and our shorter end lag hides it in the mean: over every throw and percent the advantage gap is only 4.4 frames (knockback values 102%, weight in knockback 23%, thrower end lag -105%, weight-dependent timing 80%).
 
-Where ours trails Melee (8 of 16 throw and percent cells: forward 0%, forward 30%, forward 60%, forward 90%, down 0%, down 30%, down 60%, down 90%), the gap sums to 99.6 frames: knockback values 37%, weight in knockback 16%, thrower end lag 27%, weight-dependent timing 19%.
+Where ours trails Melee (8 of 16 throw and percent cells: forward 0%, forward 30%, forward 60%, forward 90%, down 0%, down 30%, down 60%, down 90%), the gap sums to 98.7 frames: knockback values 38%, weight in knockback 16%, thrower end lag 27%, weight-dependent timing 19%.
 
-Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 313 of 428 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
+Release position does not enter the frame advantage, but it decides whether the victim reaches the ground first: in 311 of 428 of our rows the victim, released level with the thrower's feet on forward, back and down throws, tumbles and lands in knockdown before its hitstun ends (median 21 frames after the release), so it can tech before the thrower acts.
 
 ## Melee references
 
@@ -234,22 +234,22 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Kel'Thuzad | down | 30 | 5 | 32 | 27 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Kel'Thuzad | down | 60 | 5 | 32 | 27 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Kel'Thuzad | down | 90 | 5 | 32 | 27 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Forsaken Paladin | forward | 0 | 5 | 29 | 24 | 14 | 8.3, 0 | 73.1 at 40° |
-| Forsaken Paladin | forward | 30 | 8 | 32 | 24 | 14 | 8.3, 0 | 80.5 at 40°, tumble, knockdown at +15 |
-| Forsaken Paladin | forward | 60 | 11 | 35 | 24 | 14 | 8.3, 0 | 88 at 40°, tumble, knockdown at +16 |
-| Forsaken Paladin | forward | 90 | 14 | 38 | 24 | 14 | 8.3, 0 | 95.5 at 40°, tumble, knockdown at +18 |
-| Forsaken Paladin | back | 0 | 3 | 30 | 27 | 18 | -8.3, 0 | 75.2 at 140° |
-| Forsaken Paladin | back | 30 | 5 | 32 | 27 | 18 | -8.3, 0 | 80.5 at 140°, tumble, knockdown at +15 |
-| Forsaken Paladin | back | 60 | 7 | 34 | 27 | 18 | -8.3, 0 | 85.9 at 140°, tumble, knockdown at +16 |
-| Forsaken Paladin | back | 90 | 9 | 36 | 27 | 18 | -8.3, 0 | 91.2 at 140°, tumble, knockdown at +17 |
-| Forsaken Paladin | up | 0 | 14 | 24 | 10 | 16 | 8.3, 10.8 | 60.5 at 90° |
-| Forsaken Paladin | up | 30 | 17 | 27 | 10 | 16 | 8.3, 10.8 | 68.6 at 90° |
-| Forsaken Paladin | up | 60 | 20 | 30 | 10 | 16 | 8.3, 10.8 | 76.7 at 90° |
-| Forsaken Paladin | up | 90 | 23 | 33 | 10 | 16 | 8.3, 10.8 | 84.8 at 90°, tumble, knockdown at +29 |
-| Forsaken Paladin | down | 0 | 5 | 32 | 27 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Forsaken Paladin | down | 30 | 5 | 32 | 27 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Forsaken Paladin | down | 60 | 5 | 32 | 27 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Forsaken Paladin | down | 90 | 5 | 32 | 27 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Uther | forward | 0 | 7 | 29 | 22 | 13 | 8.3, 0 | 72.6 at 40° |
+| Uther | forward | 30 | 10 | 32 | 22 | 13 | 8.3, 0 | 82.1 at 40°, tumble, knockdown at +15 |
+| Uther | forward | 60 | 14 | 36 | 22 | 13 | 8.3, 0 | 91.5 at 40°, tumble, knockdown at +17 |
+| Uther | forward | 90 | 18 | 40 | 22 | 13 | 8.3, 0 | 101 at 40°, tumble, knockdown at +19 |
+| Uther | back | 0 | 5 | 32 | 27 | 16 | -8.3, 0 | 80.6 at 140°, tumble, knockdown at +15 |
+| Uther | back | 30 | 13 | 40 | 27 | 16 | -8.3, 0 | 100.2 at 140°, tumble, knockdown at +19 |
+| Uther | back | 60 | 20 | 47 | 27 | 16 | -8.3, 0 | 119.9 at 140°, tumble, knockdown at +23 |
+| Uther | back | 90 | 28 | 55 | 27 | 16 | -8.3, 0 | 139.6 at 140°, tumble, knockdown at +30 |
+| Uther | up | 0 | 7 | 25 | 18 | 15 | 8.3, 10.8 | 64 at 90° |
+| Uther | up | 30 | 12 | 30 | 18 | 15 | 8.3, 10.8 | 75.7 at 90° |
+| Uther | up | 60 | 17 | 35 | 18 | 15 | 8.3, 10.8 | 87.5 at 90°, tumble, knockdown at +30 |
+| Uther | up | 90 | 21 | 39 | 18 | 15 | 8.3, 10.8 | 99.3 at 90°, tumble, knockdown at +36 |
+| Uther | down | 0 | 7 | 30 | 23 | 18 | 8.3, 0 | 75.4 at 70° |
+| Uther | down | 30 | 7 | 30 | 23 | 18 | 8.3, 0 | 75.4 at 70° |
+| Uther | down | 60 | 7 | 30 | 23 | 18 | 8.3, 0 | 75.4 at 70° |
+| Uther | down | 90 | 7 | 30 | 23 | 18 | 8.3, 0 | 75.4 at 70° |
 | Mal'Ganis | forward | 0 | 8 | 29 | 21 | 12 | 8.3, 0 | 74.8 at 35° |
 | Mal'Ganis | forward | 30 | 14 | 35 | 21 | 12 | 8.3, 0 | 88.2 at 35°, tumble, knockdown at +15 |
 | Mal'Ganis | forward | 60 | 19 | 40 | 21 | 12 | 8.3, 0 | 101.6 at 35°, tumble, knockdown at +17 |

@@ -28,7 +28,7 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.mountainKing]: { ...body(f32(1.12), f32(0.88), f32(0.82), f32(1.10), f32(0.85)), traction: f32(0.065) },
   [Character.warden]: { ...body(f32(1.00), f32(1.14), f32(0.83), f32(0.90), f32(1.00)), runSpeed: 13.799999237060547, dashSpeed: 12.0, traction: f32(0.08) },
   [Character.lich]: { ...body(f32(1.04), f32(0.90), f32(0.95), f32(0.90), f32(1.28)), traction: f32(0.06) },
-  [Character.forsakenPaladin]: { ...body(f32(1.22), f32(0.92), f32(0.88), f32(1.08), f32(1.02)), traction: f32(0.065) },
+  [Character.uther]: { ...body(f32(106.0 / 75.0), f32(0.86), f32(0.84), f32(1.08), f32(1.02)), traction: f32(0.065) },
   [Character.dreadlord]: { ...body(f32(1.27), f32(1.10), f32(1.22), f32(1.10), f32(1.15)), runSpeed: f32(13.76), dashSpeed: f32(11.928), traction: f32(0.06) },
   [Character.shadowHunter]: { ...body(f32(0.94), f32(1.04), f32(1.00), f32(0.92), f32(1.08)), traction: f32(0.06) },
 
@@ -64,7 +64,7 @@ const FIGHTER_SHIELDS: { readonly [character: number]: FighterShield | undefined
   [Character.mountainKing]: { centerZ: f32(44.9), radius: 91.0 },
   [Character.warden]: { centerZ: f32(57.2), radius: 107.0 },
   [Character.lich]: { centerZ: f32(75.67999), radius: 137.0 },
-  [Character.forsakenPaladin]: { centerZ: f32(56.36), radius: 108.0 },
+  [Character.uther]: { centerZ: f32(60.0), radius: 112.0 },
   [Character.dreadlord]: { centerZ: 75.5, radius: 144.0 },
   [Character.shadowHunter]: { centerZ: f32(62.240005), radius: 115.0 },
   [Character.pitLord]: { centerZ: f32(71.3), radius: 142.0 },
