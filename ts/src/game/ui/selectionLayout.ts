@@ -12,6 +12,8 @@ export const SETTINGS_BOX = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.
 
 export const TUTORIAL_BOX = { x: f32(0.575), y: HEADER_BUTTON_TOP, width: f32(0.12), height: HEADER_BUTTON_HEIGHT } as const;
 
+export const CREDITS_BOX = { x: f32(0.705), y: HEADER_BUTTON_TOP, width: f32(0.12), height: HEADER_BUTTON_HEIGHT } as const;
+
 export const boxContains = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }, x: number, y: number): boolean =>
   x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);
 

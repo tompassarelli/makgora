@@ -1,4 +1,7 @@
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { creditsSection } from "../src/game/ui/credits";
 import { reachProblems } from "../scripts/cleanRoom";
 
 const refused = (text: string, path = "ts/src/game/sim/example.ts") => reachProblems([{ path, line: 1, text }]).length > 0;
@@ -43,4 +46,11 @@ test("allows a listed file only for its listed rule [k2 property]", () => {
   expect(refused("read from the decompilation", "docs/delivery-goal.md")).toBe(false);
   expect(refused("main.dol", "docs/delivery-goal.md")).toBe(true);
   expect(refused("`coll_data` (Melee `MapCollData`)", "docs/physics.md")).toBe(true);
+});
+
+test("the Hive post's Credits section is the in-game credits list, so the two cannot drift [k2 property]", () => {
+  const post = readFileSync(join(import.meta.dir, "../../docs/hive-post.md"), "utf8");
+  const start = post.indexOf("## Credits\n");
+  const end = post.indexOf("\n## ", start + 1);
+  expect(post.slice(start, end).trimEnd()).toBe(creditsSection());
 });

@@ -122,10 +122,12 @@ Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](ht
 
 ## Credits
 - Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License).
-- The Lich King model by Kwaliti, from Hive Workshop: [The Lich King](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits: [Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/) ([Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/)).
+- The Lich King model by [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/)).
 - The menu cursors, wordmark and stage-select art are Smashcraft originals; the pinching-hand cursor was made with AI assistance.
 - Music: Before the First Strike by Tom Passarelli, made with Google Lyria.
 - Murloc sound from World of Warcraft, Blizzard Entertainment.
+- Warcraft III, its unit models, icons and sounds belong to Blizzard Entertainment. Smashcraft is an independent fan project, not affiliated with or endorsed by Blizzard Entertainment or Nintendo.
+- Melee's feel comes from public frame data: [SmashWiki](https://www.ssbwiki.com/) and [Smashboards](https://smashboards.com/).
 - Built with Wisp, TypeScript, TypeScriptToLua, Effect, Bun and Lua 5.3.
 
 ## Fan project and IP statement
