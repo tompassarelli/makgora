@@ -65,12 +65,13 @@ const ILLIDAN: AuthoredSpecial = {
   buff: { frame: 31, kind: ItemKind.speed, frames: 480 },
 };
 
+const BLADESTORM_FLOAT_SPEED = f32(4.2);
 const BLADESTORM_TICKS = [17, 26, 35, 44, 53, 62] as const;
 const BLADESTORM_TICK = hit(2.5, 80, 20.0, 35.0, HitElement.slash);
 const BLADESTORM_SWORD: readonly (readonly [number, number, number, number, number])[] = [[17, 74.0, 113.0, 188.0, 121.0], [18, 73.0, 112.0, 189.0, 121.0], [35, -67.0, 108.0, -145.0, 118.0],
   [36, -71.0, 108.0, -157.0, 121.0], [44, -60.0, 114.0, -179.0, 121.0], [45, -54.0, 114.0, -171.0, 121.0]];
 const BLADEMASTER: AuthoredSpecial = {
-  name: "Bladestorm", endFrame: 104, jumpWindow: frames(17, 74),
+  name: "Bladestorm", endFrame: 104, jumpWindow: frames(17, 74), airStall: frames(17, 74), airFloat: { sink: BLADESTORM_FLOAT_SPEED, rise: BLADESTORM_FLOAT_SPEED },
   hurt: [
       hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       hurtPose(9, 16, [hurtPart(0.0, 24.0, 16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),

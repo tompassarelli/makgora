@@ -41,7 +41,7 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroEgg, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
+import { heroEgg, heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { closeParasol, endParasolAerial, parasolFall } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
@@ -583,7 +583,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
 
   hopHeroStatus(f, slot, stage, matchFrame);
   const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
-  const authoredHeight = authoredMotion || demonHunterHoldsHeight(f);
+  const authoredHeight = authoredMotion || demonHunterHoldsHeight(f) || heroFloats(f);
   const egg = heroEgg(f);
   const canSteer = !authoredMotion && egg === undefined && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused

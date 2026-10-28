@@ -116,6 +116,10 @@ acts again on N+1. It may author:
   jump without ending it; off the floor from the window's first frame its
   motion segments give way to gravity and air drift, and landing keeps it
   running (Bladestorm);
+- an `airFloat` with an `airStall` window: an ultimate cast in the air holds
+  its caster at his height, sinking while down is held and rising while jump
+  is held, at `sink` and `rise` a frame, with no gravity or jump window until
+  the window ends or he lands (Bladestorm);
 - `placement`: the fighter's one placed object (`SpecialPlacement`, such as
   Serpent Ward), standing `offsetX` ahead of the caster's feet from the
   placement frame, which is its age 1. `sim/placedObjects.ts` runs it after

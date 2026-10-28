@@ -1,10 +1,12 @@
+import { f32 } from "wisp/src/sim/f32";
 import { assertDefined, assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { Action, maskOf } from "../input/actions";
 import { adaptInput } from "../match/inputAdapter";
 import { inputRow } from "../input/inputRow";
 import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
-import { createReplaySnapshot, type ReplayState } from "../replay/snapshot";
+import { canonicalState } from "../replay/canonical";
+import { copyReplayState, createReplaySnapshot, type ReplayState } from "../replay/snapshot";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { Character, SpecialAction } from "./codes";
 import { createFighter, type Fighter } from "./fighter";
@@ -50,9 +52,9 @@ function duel(foeX: number): Duel {
   return { state, blademaster, foe, tick: 0 };
 }
 
-function step(d: Duel, held: number, pressed: number): void {
+function step(d: Duel, held: number, pressed: number, axisX = 0): void {
   d.tick++;
-  const row = inputRow({ held: held | pressed, pressed });
+  const row = inputRow({ held: held | pressed, pressed, axisX });
   if (row === undefined) throw new Error("Bladestorm input row");
   adaptInput(row, d.blademaster, d.tick, d.state.controls.inputs[0], d.state.controls.commands[0]);
   stepMatch(d.state.match, d.state.world, d.state.controls, d.tick);
@@ -207,4 +209,140 @@ test("A foe 140 above the floor clears the grounded spin but not his full hop; 4
   assertTrue(strikesAt(Hop.full, FULL_HOP_TICK, CLEARS_GROUNDED_SPIN));
   assertFalse(strikesAt(Hop.full, FULL_HOP_TICK, CLEARS_FULL_HOP_SPIN));
   assertTrue(strikesAt(Hop.fullThenAir, AIR_JUMP_TICK, CLEARS_FULL_HOP_SPIN));
+});
+
+const MOVE_DOWN = maskOf(Action.moveDown);
+const MOVE_RIGHT = maskOf(Action.moveRight);
+const JUMP = maskOf(Action.jump);
+const SHORT_HOP = maskOf(Action.shortHop);
+const FLOAT_TOLERANCE = f32(0.001);
+const PRESS_FRAME = 20;
+
+function castInAir(d: Duel): void {
+  const f = d.blademaster;
+  step(d, JUMP, JUMP);
+  while (f.motion.grounded || f.motion.vz > 0.0) step(d, JUMP, 0);
+  step(d, 0, ULTIMATE);
+  assertTrue(spinning(f));
+}
+
+function floatWindow(f: Readonly<Fighter>): FrameWindow {
+  return assertDefined(bladestorm(f).airStall, "Bladestorm's float window");
+}
+
+function axisOf(held: number): number {
+  return held === MOVE_RIGHT ? 127 : 0;
+}
+
+function floatFor(d: Duel, held: number, pressed: number): number[] {
+  const f = d.blademaster;
+  const heights = [f.motion.z];
+  const last = floatWindow(f).last;
+  while (spinning(f) && f.special.frame < last) {
+    step(d, held, f.special.frame === PRESS_FRAME ? pressed : 0, axisOf(held));
+    heights.push(f.motion.z);
+  }
+  return heights;
+}
+
+test("Cast in the air with nothing held, Bladestorm hovers at the height it was cast for the whole spin, then he falls with his air jump kept [k1 scenario]", () => {
+  const d = duel(FOE_FAR);
+  const f = d.blademaster;
+  castInAir(d);
+  const jumpsLeft = f.jump.remaining;
+  const heights = floatFor(d, 0, 0);
+  assertGreaterThan(heights.length, floatWindow(f).last - 2);
+  for (const height of heights) assertLessThan(Math.abs(height - heights[0]!), FLOAT_TOLERANCE);
+  assertEquals(f.jump.remaining, jumpsLeft);
+  const spinEnd = f.motion.z;
+  let fell = false;
+  while (!f.motion.grounded) {
+    const z = f.motion.z;
+    step(d, 0, 0);
+    fell ||= f.motion.z < z;
+    assertFalse(f.special.fall);
+    if (!f.motion.grounded) assertEquals(f.jump.remaining, jumpsLeft);
+  }
+  assertTrue(fell);
+  assertLessThan(f.motion.z, spinEnd);
+});
+
+test("Cast in the air, Bladestorm sinks at a quarter of his terminal fall speed while down is held, and rises at that speed while jump is held or pressed [k1 scenario]", () => {
+  const f = duel(FOE_FAR).blademaster;
+  const quarter = f.tuning.physics.terminalSpeed / 4.0;
+  assertLessThan(Math.abs(bladestorm(f).airFloat!.sink - quarter), FLOAT_TOLERANCE);
+  assertLessThan(Math.abs(bladestorm(f).airFloat!.rise - quarter), FLOAT_TOLERANCE);
+  const sunk = duel(FOE_FAR);
+  castInAir(sunk);
+  const sinkHeights = floatFor(sunk, MOVE_DOWN, 0);
+  const rose = duel(FOE_FAR);
+  castInAir(rose);
+  const jumps = rose.blademaster.jump.remaining;
+  const riseHeights = floatFor(rose, JUMP, JUMP);
+  assertEquals(rose.blademaster.jump.remaining, jumps);
+  const tapped = duel(FOE_FAR);
+  castInAir(tapped);
+  const tapHeights = floatFor(tapped, 0, SHORT_HOP);
+  const held = bladestorm(f).airFloat!.sink;
+  let sunkFrames = 0;
+  for (let index = 20; index < sinkHeights.length && sinkHeights[index]! > 0.0; index++) {
+    assertLessThan(Math.abs(sinkHeights[index - 1]! - sinkHeights[index]! - held), FLOAT_TOLERANCE);
+    sunkFrames++;
+  }
+  assertGreaterThan(sunkFrames, 30);
+  for (let index = 20; index < riseHeights.length; index++) assertLessThan(Math.abs(riseHeights[index]! - riseHeights[index - 1]! - held), FLOAT_TOLERANCE);
+  assertLessThan(Math.abs(tapHeights[PRESS_FRAME]! - tapHeights[PRESS_FRAME - 1]!), FLOAT_TOLERANCE);
+  assertLessThan(Math.abs(tapHeights[PRESS_FRAME + 1]! - tapHeights[PRESS_FRAME]! - held), FLOAT_TOLERANCE);
+  assertLessThan(Math.abs(tapHeights[tapHeights.length - 1]! - tapHeights[PRESS_FRAME + 1]!), FLOAT_TOLERANCE);
+  assertEquals(tapped.blademaster.jump.remaining, rose.blademaster.jump.remaining);
+});
+
+test("Cast in the air, Bladestorm lets him drift sideways while he floats [k1 scenario]", () => {
+  const still = duel(FOE_FAR);
+  castInAir(still);
+  const startX = still.blademaster.motion.x;
+  floatFor(still, 0, 0);
+  const drifting = duel(FOE_FAR);
+  castInAir(drifting);
+  floatFor(drifting, MOVE_RIGHT, 0);
+  assertLessThan(Math.abs(still.blademaster.motion.x - startX), FLOAT_TOLERANCE);
+  assertGreaterThan(drifting.blademaster.motion.x - startX, 50.0);
+});
+
+test("Cast on the floor, Bladestorm does not float: his full hop mid-spin still carries him up, over a foe, and back down [k1 scenario]", () => {
+  const d = duel(FOE_FAR);
+  step(d, 0, ULTIMATE);
+  assertEquals(d.blademaster.special.variant, 0);
+  const hop = duel(FOE_AHEAD);
+  const spin = spinWithHop(hop, Hop.full);
+  assertEquals(hop.blademaster.special.variant, 0);
+  assertGreaterThan(spin.peak, 0.0);
+  assertGreaterThan(spin.airborneHits, 0);
+  assertGreaterThan(spin.hitsAfterLanding, 0);
+});
+
+function floatRun(d: Duel, cast: number, to: number): void {
+  while (d.tick < to) {
+    const age = d.tick + 1 - cast;
+    const held = age < 14 ? 0 : age < 28 ? MOVE_DOWN : age < 42 ? JUMP : age < 56 ? MOVE_RIGHT : 0;
+    step(d, held, 0, axisOf(held));
+  }
+}
+
+test("A rollback from mid-float replays the same spin [k1 scenario]", () => {
+  const d = duel(FOE_FAR);
+  castInAir(d);
+  const cast = d.tick;
+  const saveTick = cast + 30;
+  floatRun(d, cast, saveTick);
+  const snapshot = createReplaySnapshot();
+  copyReplayState(snapshot, d.state);
+  floatRun(d, cast, saveTick + 70);
+  const expected = canonicalState(d.state);
+  const finalZ = d.blademaster.motion.z;
+  copyReplayState(d.state, snapshot);
+  d.tick = saveTick;
+  floatRun(d, cast, saveTick + 70);
+  assertEquals(canonicalState(d.state), expected);
+  assertEquals(d.blademaster.motion.z, finalZ);
 });

@@ -26,7 +26,6 @@ export interface FrameWindow {
   readonly last: number;
 }
 
-
 export interface SpecialMotion extends FrameWindow {
   readonly velocityX: number;
   readonly velocityZ: number;
@@ -311,6 +310,7 @@ export interface AuthoredSpecial {
   readonly intangible?: FrameWindow | undefined;
 
   readonly airStall?: FrameWindow | undefined;
+  readonly airFloat?: { readonly sink: number; readonly rise: number } | undefined;
   readonly armor?: SpecialArmor | undefined;
   readonly guard?: SpecialGuard | undefined;
 

@@ -18,6 +18,7 @@ import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
 import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
+import { airCastVariant, castFloating, floatsNow, stallAir } from "./airFloat";
 import { advanceRefire } from "./refire";
 import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
@@ -662,7 +663,12 @@ function fallsFreely(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, fram
 export function heroSpecialJumps(f: Readonly<Fighter>): boolean {
   if (!isHeroSpecialAction(f.special.action)) return false;
   const move = runningHeroSpecial(f);
-  return move !== undefined && f.launch.hitlag <= 0 && inWindow(move.jumpWindow, f.special.frame);
+  return move !== undefined && f.launch.hitlag <= 0 && inWindow(move.jumpWindow, f.special.frame) && !castFloating(f, move);
+}
+
+export function heroFloats(f: Readonly<Fighter>): boolean {
+  const move = runningHeroSpecial(f);
+  return move !== undefined && floatsNow(f, move);
 }
 
 function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
@@ -1005,7 +1011,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
   applyMotion(f, move, frame, input, world);
-  if (inWindow(move.airStall, frame) && !f.motion.grounded) f.motion.vz = 0.0;
+  stallAir(f, move, frame, input);
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, matchFrame, world);
   if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage, matchFrame);
   for (const summon of move.summons ?? []) placeObjects(f, summon, frame, stage, matchFrame);
@@ -1339,6 +1345,7 @@ export function enterUltimate(f: Fighter, input: Readonly<Controls>): AuthoredSp
   const { special } = f;
   endDivineShield(f);
   special.form = 0;
+  special.variant = airCastVariant(f, move);
   special.grabFrame = 0;
   const aimX = input.specialX !== 0 ? input.specialX : input.direction;
   const aimZ = input.specialZ !== 0 ? input.specialZ : input.verticalDirection;
