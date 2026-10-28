@@ -40,7 +40,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
   2: {
     specials: [
       { action: SpecialAction.demonHunterEyeBeam, name: "Eye Beam", description: "His eyes burn fel green, then fire a fast beam that makes the target flinch; short hop and fast fall to fire it low. Its EX beam flies a quarter farther." },
-      { action: SpecialAction.demonHunterFelRush, name: "Fel Rush", description: "A quick fel dash, Falco's Phantasm, through anyone in your path; press special again to stop short, and a stopped rush still strikes. It sends a grounded foe low and spikes an airborne one, and a hit earns one more rush you aim with the stick. A rush that ends in the air leaves you helpless, the aimed one always. Its EX rush is shield-safe." },
+      { action: SpecialAction.demonHunterFelRush, name: "Fel Rush", description: "A fast fel dash through anyone in your path; press special again to stop short, and a stopped rush still strikes. It sends a grounded foe low and spikes an airborne one, and a hit in the air earns one more rush you aim with the stick. Its EX rush is shield-safe." },
       {
         action: SpecialAction.demonHunterWingAscent, name: "Wing Ascent", description: "Spread his wings, then launch the way you hold, straight up by default; change direction partway up and he flips back and dives that way on his own. Keep the stick where it was, or let it go, and he climbs on.",
         forms: [{ form: DEMONHUNTER_BACKFLIP_FORM, name: "Backflip" }, { form: DEMONHUNTER_DIVE_FORM, name: "Wing Dive" }],

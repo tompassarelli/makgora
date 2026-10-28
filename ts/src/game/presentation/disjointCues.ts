@@ -13,7 +13,7 @@ const NEUTRAL_FLARE: Cue = { model: "Abilities\\Weapons\\FlyingMachine\\FlyingMa
 const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", seconds: f32(0.2), timeScale: 1.0, birth: { eachFrame: false } };
 const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
 const ARCANE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", scale: f32(0.9), seconds: f32(0.3), timeScale: 1.0, birth: { eachFrame: false } };
-const NATURE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", scale: f32(0.9) };
+const NATURE_FLARE: Cue = { ...FIRE_FLARE, model: "Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx" };
 const IMPALE_SPIKES: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", scale: f32(1.0), sequence: "birth", seconds: f32(0.4) };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
 

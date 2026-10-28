@@ -39,7 +39,7 @@ import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import { FEL_RUSH_AIMED_AIRTIME, FEL_RUSH_AIRTIME, FEL_RUSH_EARNED, FEL_RUSH_FROM_AIR, FEL_RUSH_STRUCK } from "./felRushAirtime";
-import { PHANTASM_AIR_LANDING_LAG, PHANTASM_DISTANCE_HEIGHTS, PHANTASM_END_FRAME, PHANTASM_FIRST_TRAVEL_FRAME, PHANTASM_HIT_RECOVERY, PHANTASM_LAST_TRAVEL_FRAME, PHANTASM_SHORTEN, PHANTASM_TRAVEL_FRAMES } from "./specials/phantasmDash";
+import { ILLUSION_AIR_LANDING_LAG, ILLUSION_DISTANCE_HEIGHTS, ILLUSION_END_FRAME, ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_HIT_RECOVERY, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_SHORTEN, ILLUSION_TRAVEL_FRAMES } from "./specials/illusionDash";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_LIFETIME, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED, eyeBeamShotFrame } from "./eyeBeam";
 
 
@@ -49,13 +49,13 @@ import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_LIFETIME, EYE_BEAM_
 
 
 
-export const FEL_RUSH_FIRST = PHANTASM_FIRST_TRAVEL_FRAME;
+export const FEL_RUSH_FIRST = ILLUSION_FIRST_TRAVEL_FRAME;
 export const FEL_RUSH_TELL_LAST = FEL_RUSH_FIRST - 1;
-export const FEL_RUSH_LAST = PHANTASM_LAST_TRAVEL_FRAME;
-export const FEL_RUSH_FRAMES = PHANTASM_END_FRAME;
-export const FEL_RUSH_DISTANCE = f32(HERO_REFERENCE_HEIGHT * PHANTASM_DISTANCE_HEIGHTS);
-export const FEL_RUSH_SPEED = f32(FEL_RUSH_DISTANCE / PHANTASM_TRAVEL_FRAMES);
-const FEL_RUSH_LANDING_LAG = PHANTASM_AIR_LANDING_LAG;
+export const FEL_RUSH_LAST = ILLUSION_LAST_TRAVEL_FRAME;
+export const FEL_RUSH_FRAMES = ILLUSION_END_FRAME;
+export const FEL_RUSH_DISTANCE = f32(HERO_REFERENCE_HEIGHT * ILLUSION_DISTANCE_HEIGHTS);
+export const FEL_RUSH_SPEED = f32(FEL_RUSH_DISTANCE / ILLUSION_TRAVEL_FRAMES);
+const FEL_RUSH_LANDING_LAG = ILLUSION_AIR_LANDING_LAG;
 
 const FEL_RUSH_AIR_CARRY = 5.0;
 export const DEMONHUNTER_WING_STARTUP = 7;
@@ -298,7 +298,7 @@ function skipFelRushTo(owner: Fighter, frame: number): void {
 function shortenFelRush(owner: Fighter): boolean {
   const { special } = owner;
   const next = special.frame + 1;
-  if (next < PHANTASM_SHORTEN.first - 1 || next > PHANTASM_SHORTEN.last - 1 || owner.launch.hitlag > 0 || owner.launch.hitstun > 0) return false;
+  if (next < ILLUSION_SHORTEN.first - 1 || next > ILLUSION_SHORTEN.last - 1 || owner.launch.hitlag > 0 || owner.launch.hitstun > 0) return false;
   skipFelRushTo(owner, FEL_RUSH_LAST - 1);
   observeActionDecision(SPECIAL_ACTION_BIT);
   return true;
@@ -344,11 +344,11 @@ function advanceFelRush(owner: Fighter, input: Readonly<Controls> | undefined): 
     special.lockFrames = 0;
     owner.attack.cooldown = 0;
     owner.landing.lag = max(owner.landing.lag, FEL_RUSH_LANDING_LAG);
-  } else if (frame > FEL_RUSH_LAST && (special.airtimeUses & FEL_RUSH_STRUCK) !== 0 && frame < FEL_RUSH_FRAMES - PHANTASM_HIT_RECOVERY) skipFelRushTo(owner, FEL_RUSH_FRAMES - PHANTASM_HIT_RECOVERY);
+  } else if (frame > FEL_RUSH_LAST && (special.airtimeUses & FEL_RUSH_STRUCK) !== 0 && frame < FEL_RUSH_FRAMES - ILLUSION_HIT_RECOVERY) skipFelRushTo(owner, FEL_RUSH_FRAMES - ILLUSION_HIT_RECOVERY);
 }
 
 
-/** A rush ending airborne is the airtime's rush; one that struck earns one more, and a rush that ends airborne without a hit, or the aimed second rush, ends helpless. */
+/** A rush ending airborne is the airtime's rush; one that struck earns one more, and an air rush that struck nobody ends helpless. */
 function endFelRush(owner: Fighter): void {
   const { special } = owner;
   const uses = special.airtimeUses;
@@ -360,7 +360,7 @@ function endFelRush(owner: Fighter): void {
   const struck = (uses & FEL_RUSH_STRUCK) !== 0;
   special.airtimeUses |= FEL_RUSH_AIRTIME;
   if (struck && (uses & FEL_RUSH_AIMED_AIRTIME) === 0) special.airtimeUses |= FEL_RUSH_EARNED;
-  endSpecialAction(owner, !struck || (uses & FEL_RUSH_AIMED_AIRTIME) !== 0);
+  endSpecialAction(owner, !struck && (uses & FEL_RUSH_FROM_AIR) !== 0);
 }
 
 function markFelRushStrike(owner: Fighter): void {
