@@ -87,7 +87,8 @@ function emptyLandingLag(f: Readonly<Fighter>): number {
 
 
 function landsWithoutLag(f: Readonly<Fighter>): boolean {
-  return airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0 || carriesChargeAcrossLanding(f);
+  return airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0 || carriesChargeAcrossLanding(f)
+    || landsBeforeSwing(runningHeroSpecial(f), f.special.frame);
 }
 
 
