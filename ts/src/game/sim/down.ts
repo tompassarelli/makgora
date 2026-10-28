@@ -20,7 +20,7 @@ import { squareRoot } from "./warcraftMath";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_COOLDOWN_FRAMES, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
-import { heroEgg, isHeroSpecialAction, landHeroSpecial, runningHeroSpecial } from "./specials/engine";
+import { carriesChargeAcrossLanding, heroEgg, isHeroSpecialAction, landHeroSpecial, runningHeroSpecial } from "./specials/engine";
 import { landsBeforeSwing } from "./specials/landing";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
@@ -87,7 +87,7 @@ function emptyLandingLag(f: Readonly<Fighter>): number {
 
 
 function landsWithoutLag(f: Readonly<Fighter>): boolean {
-  return airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0;
+  return airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0 || carriesChargeAcrossLanding(f);
 }
 
 

@@ -310,6 +310,7 @@ export interface AuthoredSpecial {
 
   readonly landingLag?: number | undefined;
   readonly swingsThroughLanding?: true | undefined;
+  readonly carriesChargeOnLanding?: true | undefined;
 
   readonly fallLandingLag?: number | undefined;
 
