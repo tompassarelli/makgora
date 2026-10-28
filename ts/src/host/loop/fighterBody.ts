@@ -5,13 +5,12 @@ import { ShieldBreak } from "../../game/sim/codes";
 import { fighterPoseFacing } from "../../game/sim/conditions";
 import type { Fighter } from "../../game/sim/fighter";
 import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
-import { placeEffect, effectMotion, type WorldOrigin } from "../../game/render/effects";
+import type { WorldOrigin } from "../../game/render/effects";
 import type { FighterBody } from "./state";
 import { FIGHTER_OBJECTS } from "../../game/objectData";
 import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { characterModelScale } from "../../game/presentation/modelScale";
-import { PARASOL_FOLD_FRAMES, PARASOL_GRIP, PARASOL_MODEL, parasolShown } from "../../game/presentation/parasolLook";
 
 
 const CROW_FORM = 0x416d7266;
@@ -49,7 +48,7 @@ export function createFighterBody(owner: player, fighter: Readonly<Fighter>, ori
   UnitRemoveAbility(unit, CROW_FORM);
   UnitAddAbility(unit, LOCUST);
   PauseUnit(unit, true);
-  const body: FighterBody = { unit, dizzy: undefined, parasol: undefined, parasolFoldFrame: undefined, renderedSelection: 0, color: -1 };
+  const body: FighterBody = { unit, dizzy: undefined, renderedSelection: 0, color: -1 };
   placeFighterBody(body, fighter, origin);
   return body;
 }
@@ -72,50 +71,7 @@ export function renderDizzy(body: FighterBody, fighter: Readonly<Fighter>, playi
   BlzSetSpecialEffectPosition(body.dizzy, x, origin.y, f32(origin.z + fighter.motion.z + 115));
 }
 
-function removeParasol(body: FighterBody): void {
-  const parasol = body.parasol;
-  if (parasol === undefined) return;
-  effectMotion().release(parasol);
-  BlzSetSpecialEffectScale(parasol, 0.0);
-  DestroyEffect(parasol);
-  body.parasol = undefined;
-  body.parasolFoldFrame = undefined;
-}
-
-function placeParasol(parasol: effect, fighter: Readonly<Fighter>, origin: WorldOrigin, stage: number): void {
-  fitFighterPlacement(placement, fighter, stage);
-  const scale = characterModelScale(fighter.character);
-  const x = f32(origin.x + placement.x + f32(fighterPoseFacing(fighter) * f32(PARASOL_GRIP.x * scale)));
-  BlzSetSpecialEffectScale(parasol, scale);
-  placeEffect(parasol, x, origin.y, f32(origin.z + placement.z + f32(PARASOL_GRIP.z * scale)));
-}
-
-export function renderParasol(body: FighterBody, fighter: Readonly<Fighter>, playing: boolean, origin: WorldOrigin, stage: number, frame: number): void {
-  const live = playing && !fighter.status.out;
-  if (live && parasolShown(fighter)) {
-    if (body.parasolFoldFrame !== undefined) removeParasol(body);
-    body.parasol ??= AddSpecialEffect(PARASOL_MODEL, origin.x, origin.y);
-    placeParasol(body.parasol, fighter, origin, stage);
-    return;
-  }
-  const parasol = body.parasol;
-  if (parasol === undefined) return;
-  if (!live) {
-    removeParasol(body);
-    return;
-  }
-  if (body.parasolFoldFrame === undefined) {
-    BlzPlaySpecialEffect(parasol, ANIM_TYPE_DEATH);
-    body.parasolFoldFrame = frame;
-  } else if (frame - body.parasolFoldFrame >= PARASOL_FOLD_FRAMES) {
-    removeParasol(body);
-    return;
-  }
-  placeParasol(parasol, fighter, origin, stage);
-}
-
 export function removeFighterBody(body: FighterBody): void {
   clearDizzy(body);
-  removeParasol(body);
   RemoveUnit(body.unit);
 }

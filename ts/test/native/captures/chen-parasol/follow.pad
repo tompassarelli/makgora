@@ -1,7 +1,7 @@
-# Chen's parasol native proof of following, folding and reopening: Storm Rise, then he drifts right under the open parasol held at his raised hand; down closes it and it folds at his hand while he moves, leaving nothing hanging in the air; up opens it again at his hand.
+# Chen's parasol native proof of following, folding and reopening: Storm Rise, then he drifts right under the open parasol held at his raised hand; down closes it and it folds at his hand while he moves, leaving nothing hanging in the air; up opens it again at his hand, and he drifts back left under it.
 #! chat -dev setup quick pair chen stormstout / mountain king
 #! cue 90-130 float: effect=Parasol
-#! cue 146-164 reopened: effect=Parasol
+#! cue 146-180 reopened: effect=Parasol
 60 a stick 0 1
 60 a tap X 2
 61 a stick 0 0
@@ -29,3 +29,9 @@
 152 a capture
 156 a capture
 160 a capture
+162 a stick -1 0
+164 a capture
+166 a capture
+170 a capture
+176 a capture
+180 a capture

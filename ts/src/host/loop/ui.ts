@@ -41,6 +41,7 @@ import { bindPrototype } from "../../platform/rebind";
 import { ItemPresentation } from "../../game/render/itemPresentation";
 import { OrbPresentation } from "../../game/render/orbPresentation";
 import { CandlePresentation } from "../../game/render/candlePresentation";
+import { ParasolPresentation } from "../../game/render/parasolPresentation";
 import { GoldSackPresentation } from "../../game/render/goldSackPresentation";
 import { SpherePresentation } from "../../game/render/spherePresentation";
 import { FlightPresentation } from "../../game/render/flightPresentation";
@@ -67,6 +68,7 @@ interface FighterRenderers {
   readonly draw: FighterDraw;
   readonly candle: CandlePresentation | undefined;
   readonly goldSack: GoldSackPresentation | undefined;
+  readonly parasol: ParasolPresentation | undefined;
   readonly spheres: SpherePresentation | undefined;
   readonly flight: FlightPresentation | undefined;
 
@@ -178,6 +180,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.glow.destroy();
   renderers?.candle?.destroy();
   renderers?.goldSack?.destroy();
+  renderers?.parasol?.destroy();
   renderers?.spheres?.destroy();
   renderers?.flight?.destroy();
   renderers?.hitAreas?.destroy();
@@ -213,6 +216,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin), draw: createFighterDraw(),
     candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     goldSack: character === Character.peon ? new GoldSackPresentation(s.origin) : undefined,
+    parasol: character === Character.chen ? new ParasolPresentation(s.origin) : undefined,
     spheres: orbit === undefined ? undefined : new SpherePresentation(orbit, s.origin),
     flight: flight === undefined ? undefined : new FlightPresentation(flight, s.origin),
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
@@ -321,6 +325,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     bindPrototype(renderers.glow, MeterGlow.prototype);
     if (renderers.candle !== undefined) bindPrototype(renderers.candle, CandlePresentation.prototype);
     if (renderers.goldSack !== undefined) bindPrototype(renderers.goldSack, GoldSackPresentation.prototype);
+    if (renderers.parasol !== undefined) bindPrototype(renderers.parasol, ParasolPresentation.prototype);
     if (renderers.spheres !== undefined) bindPrototype(renderers.spheres, SpherePresentation.prototype);
     if (renderers.flight !== undefined) bindPrototype(renderers.flight, FlightPresentation.prototype);
     bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
@@ -346,6 +351,7 @@ export function clearMatchEffects(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.meter?.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.candle?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.goldSack?.hide();
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.parasol?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.spheres?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.flight?.hide();
   ui.classic?.endMatch();

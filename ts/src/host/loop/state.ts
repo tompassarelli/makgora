@@ -63,8 +63,6 @@ export interface StageDrifter {
 export interface FighterBody {
   readonly unit: unit;
   dizzy: effect | undefined;
-  parasol: effect | undefined;
-  parasolFoldFrame: number | undefined;
 
   renderedSelection: number;
   color: number;
