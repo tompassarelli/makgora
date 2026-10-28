@@ -108,6 +108,8 @@ def aim(solved, seed):
         for joint in ('arm', 'elbow', 'hand', 'arm', 'elbow', 'hand'):
             centre = solved[joint]
             solved[joint] = min((centre + k * step for k in range(-6, 7)), key=lambda angle: (solved.__setitem__(joint, angle), miss())[1])
+    for joint in ('arm', 'elbow', 'hand'):
+        solved[joint] -= 360 * round((solved[joint] - seed.get(joint, 0)) / 360)
 
 
 def blend(a, b, t):
@@ -122,10 +124,14 @@ def glide(t, ramp=0.2):
 READY = {}
 KEYS = {
     0: dict(chest=10, lean=8, head=-8, leftArm=25, thigh=-26, knee=40, leftThigh=24, leftKnee=46),
-    2: dict(chest=-8, lean=-6, head=6, twist=-15, leftArm=-40, thigh=-36, knee=6, foot=14, leftThigh=16, leftKnee=46, travel=-12),
-    contact - 2: dict(chest=-30, pelvis=8, lean=-18, head=24, twist=-50, leftArm=-95, leftElbow=-35,
-                      thigh=-30, knee=8, foot=22, leftThigh=32, leftKnee=88, leftFoot=-34, travel=-32,
-                      aim=(-14, 26, -70, 75)),
+    2: dict(chest=-14, lean=-8, head=8, twist=-20, leftArm=-50, thigh=-30, knee=10, foot=14, leftThigh=20, leftKnee=50, travel=-14,
+            aim=(8, 30, -10, 92)),
+    contact - 2: dict(chest=-36, pelvis=10, lean=-24, head=24, twist=-40, leftArm=-110, leftElbow=-40,
+                      thigh=-20, knee=6, foot=24, leftThigh=36, leftKnee=92, leftFoot=-36, travel=-38,
+                      aim=(-8, 44, -62, 82)),
+    contact - 1: dict(chest=-6, pelvis=2, lean=6, head=0, twist=5, leftArm=-40, leftElbow=-30,
+                      thigh=-60, knee=40, foot=14, leftThigh=30, leftKnee=40, leftFoot=-10, travel=-6,
+                      aim=(22, 34, 70, 84)),
     contact: dict(chest=36, pelvis=-12, lean=38, head=-42, twist=45, leftArm=40, leftElbow=-20,
                   thigh=-94, knee=68, foot=8, leftThigh=20, leftKnee=6, travel=36,
                   aim=(26, -14, 114, -20)),
@@ -134,19 +140,46 @@ KEYS = {
                                 aim=(24, -6, 110, 6)),
     last: dict(chest=58, pelvis=-20, lean=48, head=-57, twist=62, leftArm=60, leftElbow=-10,
                thigh=34, knee=12, foot=8, leftThigh=-114, leftKnee=100, leftFoot=8, travel=70,
-               aim=(24, -32, 100, -58)),
-    last + 4: dict(chest=50, pelvis=-17, lean=39, head=-47, twist=55, leftArm=52, leftElbow=-14,
-                   thigh=16, knee=34, foot=6, leftThigh=-100, leftKnee=92, leftFoot=6, travel=68,
-                   aim=(6, -16, 56, 34)),
-    last + 7: dict(chest=40, pelvis=-14, lean=28, head=-34, twist=48, leftArm=45, leftElbow=-18,
-                   thigh=-4, knee=62, foot=4, leftThigh=-74, leftKnee=78, leftFoot=4, travel=66,
-                   aim=(6, -8, 40, 74)),
+               aim=(24, -28, 102, -44)),
 }
+DRAG = dict(chest=24, pelvis=-8, lean=14, head=-16, twist=20, leftArm=20, leftElbow=-10,
+                   thigh=20, knee=30, foot=6, leftThigh=-88, leftKnee=86, leftFoot=6, travel=64,
+            aim=(8, -18, -22, -4))
 keys, seed = {}, {}
 for frame in sorted(KEYS):
     keys[frame] = seed = reach(KEYS[frame], seed)
-settle = max(KEYS)
-keys.update({frame: blend(keys[settle], READY, glide((frame - settle) / (frames - settle))) for frame in range(settle + 1, frames + 1)})
+DRAG = reach(DRAG, dict(keys[last]))
+BEHIND = reach(dict(chest=8, pelvis=-2, lean=4, head=-4, twist=6, leftArm=8, thigh=-14, knee=24, leftThigh=-10, leftKnee=26, travel=24,
+                    aim=(0, -20, -40, -10)), DRAG)
+TRACKED = ('axe', 'Bone_Hand_R', 'Bone_Hand_L', 'Bone_Head', 'Bone_Chest', 'Bone_Foot_L', 'Bone_Foot_R')
+
+
+def marks(p):
+    pose(p)
+    return [bones[name].head.copy() for name in TRACKED]
+
+
+PULL = reach(dict(keys[last], aim=(18, -12, 62, -2)), keys[last])
+def unwind(poses):
+    out = [dict(poses[-1])]
+    for p in reversed(poses[:-1]):
+        q = dict(p)
+        for joint in ('arm', 'elbow', 'hand'):
+            q[joint] = q.get(joint, 0) - 360 * round((q.get(joint, 0) - out[0].get(joint, 0)) / 360)
+        out.insert(0, q)
+    return tuple(out)
+
+
+LEGS = unwind((keys[last], PULL, DRAG, BEHIND, READY))
+SAMPLES = [blend(a, b, i / 16) for a, b in zip(LEGS, LEGS[1:]) for i in range(16)] + [READY]
+TRAIL = [marks(p) for p in SAMPLES]
+REACHED = [0.0]
+for before, after in zip(TRAIL, TRAIL[1:]):
+    REACHED.append(REACHED[-1] + sum((x - y).length for x, y in zip(before, after)))
+for frame in range(last + 1, frames + 1):
+    goal = glide((frame - last) / (frames - last)) * REACHED[-1]
+    i = next(i for i in range(1, len(REACHED)) if REACHED[i] >= goal)
+    keys[frame] = blend(SAMPLES[i - 1], SAMPLES[i], (goal - REACHED[i - 1]) / max(1e-9, REACHED[i] - REACHED[i - 1]))
 
 posed = {}
 for frame in sorted(keys):
