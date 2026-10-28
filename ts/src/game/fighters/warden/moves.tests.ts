@@ -52,7 +52,8 @@ const DRAWN_KNEE_Z = 64.5;
 function insideStrike(placed: Readonly<Capsule>, x: number, z: number): boolean {
   const dx = f32(placed.x2 - placed.x1), dz = f32(placed.z2 - placed.z1);
   const t = Math.max(0.0, Math.min(1.0, f32(f32(f32(f32(x - placed.x1) * dx) + f32(f32(z - placed.z1) * dz)) / f32(f32(dx * dx) + f32(dz * dz)))));
-  return Math.hypot(f32(x - f32(placed.x1 + f32(dx * t))), f32(z - f32(placed.z1 + f32(dz * t)))) <= placed.radius;
+  const ox = f32(x - f32(placed.x1 + f32(dx * t))), oz = f32(z - f32(placed.z1 + f32(dz * t)));
+  return f32(f32(ox * ox) + f32(oz * oz)) <= f32(placed.radius * placed.radius);
 }
 
 test("Maiev's back air is Illidan's held back kick on her drawn leg: every frame from 4 to 19 has one strike behind her covering her drawn heel and knee, and the frames around it none, for either facing [k3 measure docs/design/maiev.md]", () => {
