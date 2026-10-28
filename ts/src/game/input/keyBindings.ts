@@ -29,7 +29,7 @@ export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WA
 export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
   wasd: "Recommended if you're new",
   standard: "Leverless controller style",
-  custom: "Hitbox with 9 jump, 8 shield and 0 C-up",
+  custom: "Hitbox with 9 jump, 8 shield and - C-up",
 };
 
 const EMPTY = 0;
@@ -96,12 +96,13 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   else bind(Action.rightTrigger, code("7"));
   bind(Action.cLeft, code("J"));
   bind(Action.cRight, code("L"));
-  bind(Action.cUp, custom ? MINUS : code("9"));
+  bind(Action.cUp, MINUS);
   bind(Action.cDown, code("P"));
   bind(Action.walk, code("K"));
   bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
-  bind(Action.strong, custom ? code("0") : START_KEY);
+  if (custom) bind(Action.strong, code("0"));
+  else bind(Action.strong, code("9"), START_KEY);
   bind(Action.modX, MOD_X_KEY);
   return { keys };
 }
@@ -123,6 +124,21 @@ export function previousStandardKeys(): number[] {
   bind(Action.strong, code("9"), code("X"));
   bind(Action.modX, EMPTY, EMPTY);
   return keys;
+}
+
+type StockPreset = "wasd" | "standard";
+
+export function previousDefaultKeys(preset: StockPreset): number[] {
+  const keys = presetBindings(preset).keys.slice();
+  keys[slotIndex(Action.cUp, 0)] = code("9");
+  keys[slotIndex(Action.strong, 0)] = START_KEY;
+  keys[slotIndex(Action.strong, 1)] = EMPTY;
+  return keys;
+}
+
+export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly StockPreset[] = ["wasd", "standard"]): void {
+  const preset = presets.find((stock) => previousDefaultKeys(stock).every((key, index) => bindings.keys[index] === key));
+  if (preset !== undefined) bindings.keys = presetBindings(preset).keys;
 }
 
 function replacePreviousPreset(bindings: KeyBindings): void {
@@ -359,6 +375,7 @@ export function decodeLayouts(saved: string): LayoutSave | undefined {
     const end = start + 2 + SAVED_KEY_DIGITS * slots;
     const bindings = decodeBindings(saved.slice(start, end));
     if (bindings === undefined) return undefined;
+    if (preset !== "custom") replacePreviousDefaults(bindings, [preset]);
     layouts[preset] = bindings;
     start = end;
   }

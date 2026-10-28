@@ -12,6 +12,8 @@ import { passStartControls } from "../scripts/wisp/startControls";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
+const NINE = 0x39;
+
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 test("Y starts from fighter and stage select and is Strong, even as a tap between polls, once the match begins [k1 scenario]", () => {
@@ -41,6 +43,12 @@ test("Y starts from fighter and stage select and is Strong, even as a tap betwee
   expect(strongHeld()).toBe(false);
   clients.press(0, Key.y);
   until("the match", () => phase() === Phase.match);
+  expect(strongHeld()).toBe(false);
+  clients.key(0, NINE, 0, true);
+  clients.frames(2);
+  expect(strongHeld()).toBe(true);
+  clients.key(0, NINE, 0, false);
+  clients.frames(2);
   expect(strongHeld()).toBe(false);
   clients.key(0, Key.y, 0, true);
   clients.frames(2);

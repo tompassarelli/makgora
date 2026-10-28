@@ -1,24 +1,37 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action, ACTION_ORDER } from "./actions";
 import { PAD_LAYER } from "./padKeys";
-import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, decodeBindings, decodeLayouts, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, presetLayouts, slotIndex } from "./keyBindings";
+import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, decodeBindings, decodeLayouts, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, presetLayouts, previousDefaultKeys, slotIndex } from "./keyBindings";
 
 const code = (character: string) => character.charCodeAt(0);
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
-test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to 9 (- on Custom), and Strong to Y (0 on Custom) [k2 property]", () => {
+test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to -, and Strong to 9 with Y second (0 on Custom) [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
     assertEquals(slots(preset, Action.cLeft), "J —", `${preset} C-left`);
     assertEquals(slots(preset, Action.cRight), "L —", `${preset} C-right`);
     assertEquals(slots(preset, Action.cDown), "P —", `${preset} C-down`);
     assertEquals(slots(preset, Action.walk), "K —", `${preset} Walk`);
   }
-  assertEquals(slots("wasd", Action.cUp), "9 —");
-  assertEquals(slots("standard", Action.cUp), "9 —");
-  assertEquals(slots("custom", Action.cUp), "- —");
-  assertEquals(slots("wasd", Action.strong), "Y —");
-  assertEquals(slots("standard", Action.strong), "Y —");
+  for (const preset of BINDING_PRESETS) assertEquals(slots(preset, Action.cUp), "- —", `${preset} C-up`);
+  assertEquals(slots("wasd", Action.strong), "9 Y");
+  assertEquals(slots("standard", Action.strong), "9 Y");
   assertEquals(slots("custom", Action.strong), "0 —");
+});
+
+test("a saved WASD or Hitbox layout still on the old defaults (Strong Y, C-up 9) upgrades on load, and one the player edited stays as saved [k2 property]", () => {
+  const previous = (preset: "wasd" | "standard") => ({ keys: previousDefaultKeys(preset) });
+  const stock = { layouts: { wasd: previous("wasd"), standard: previous("standard"), custom: presetBindings("custom") }, active: "wasd" as BindingPreset };
+  const upgraded = decodeLayouts(encodeLayouts(stock));
+  for (const preset of ["wasd", "standard"] as const) assertEquals(upgraded?.layouts[preset].keys.join(","), presetBindings(preset).keys.join(","), `${preset} upgraded`);
+  const edited = previousDefaultKeys("wasd");
+  edited[slotIndex(Action.attack, 0)] = code("B");
+  const kept = decodeLayouts(encodeLayouts({ ...stock, layouts: { ...stock.layouts, wasd: { keys: edited } } }));
+  assertEquals(kept?.layouts.wasd.keys.join(","), edited.join(","), "edited WASD stays");
+  assertEquals(kept?.layouts.standard.keys.join(","), presetBindings("standard").keys.join(","), "stock Hitbox still upgrades");
+  const swapped = previousDefaultKeys("wasd");
+  const wasdInHitbox = decodeLayouts(encodeLayouts({ ...stock, layouts: { ...stock.layouts, standard: { keys: swapped } } }));
+  assertEquals(wasdInHitbox?.layouts.standard.keys.join(","), swapped.join(","), "WASD defaults in the Hitbox slot are not Hitbox defaults");
 });
 
 test("no preset binds one key to two actions, and each survives a save and load unchanged [k2 property]", () => {

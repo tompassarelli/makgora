@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
+import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -208,4 +208,16 @@ test("a one-set save from before layouts loads as the active layout's keys, and 
   assertEquals(slots(settings, Action.attack), "L —", "Custom gets the profile");
   applyBindingPreset(settings, "standard");
   assertEquals(slots(settings, Action.attack), "N —", "Hitbox is untouched by Load profile");
+});
+
+test("a one-set save still on the old WASD defaults opens on WASD with Strong on 9 and C-up on -, while an edited one stays Custom [k2 property]", () => {
+  const stock = persistedSettings({ encoded: encodeBindings({ keys: previousDefaultKeys("wasd") }) });
+  assertEquals(stock.layout, "wasd", "an old stock save opens on its layout");
+  assertEquals(slots(stock, Action.strong), "9 Y", "Strong moved");
+  assertEquals(slots(stock, Action.cUp), "- —", "C-up moved");
+  const edited = { keys: previousDefaultKeys("wasd") };
+  edited.keys[slotIndex(Action.attack, 0)] = code("B");
+  const own = persistedSettings({ encoded: encodeBindings(edited) });
+  assertEquals(own.layout, "custom", "edited keys land on Custom");
+  assertEquals(slots(own, Action.strong), "Y —", "edited Strong stays");
 });

@@ -16,6 +16,7 @@ import {
   decodeLayouts,
   encodeLayouts,
   presetBindings,
+  replacePreviousDefaults,
   presetLayouts,
   presetOf,
   actionFor,
@@ -96,6 +97,7 @@ function decodeSaved(encoded: string): LayoutSave | undefined {
   if (layouts !== undefined) return layouts;
   const bindings = decodeBindings(stored);
   if (bindings === undefined) return undefined;
+  replacePreviousDefaults(bindings);
   const active = presetOf(bindings) ?? "custom";
   const all = presetLayouts();
   all[active] = bindings;
