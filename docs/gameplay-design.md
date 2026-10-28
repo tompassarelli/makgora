@@ -975,7 +975,7 @@ One rule for every fighter's four specials
 | --- | --- |
 | Rifleman | up: recoil shot (recovery) |
 | Illidan | side: Fel Rush (rush); up: Wing Ascent (recovery) |
-| Blademaster | side: Wind Walk (rush); up: Rising Whirlwind (recovery); down: Mirror Image (back-step relocation) |
+| Blademaster | side: Wind Walk's counter kick (relocation behind the attacker); up: Rising Whirlwind (recovery); down: Mirror Image (back-step relocation) |
 | Mountain King | side: Storm Rush (rush); up: Thunder Leap (recovery) |
 | Warden | side: Shadow Pursuit (lunge, teleport when marked); up: Blink (teleport) |
 | Lich | up: Spectral Ascent (recovery) |

@@ -1,4 +1,4 @@
-import { canHit, sameTeam } from "../teams";
+import { sameTeam } from "../teams";
 import { releaseCommandGrabLock } from "./commandGrabLock";
 import { changesAimZone, chargedAimX, chargedAimZ } from "./aimZone";
 
@@ -10,23 +10,23 @@ import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "../itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "../heroStatus";
-import { AttackStyle, Character, ProjectileKind, SpecialAction } from "../codes";
+import { Character, ProjectileKind, SpecialAction } from "../codes";
 import { openParasol } from "../parasol";
 import { specialVariant } from "../../fighters/kobold/candle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
 import { advanceRefire } from "./refire";
-import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
+import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
 import { gainMana } from "../mana";
 import { endDivineShield, refreshAirOnExit } from "../transitions";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "../shield";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
-import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
+import { type Capsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { specialPlacements } from "./placements";
@@ -1145,88 +1145,6 @@ export function heroSpecialContact(owner: Readonly<Fighter>, target: Readonly<Fi
 }
 
 
-const guardRegion = emptyHitRegion();
-const guardStrike = emptyCapsule();
-
-const ORIGINAL_PROJECTILE_RADIUS = 24.0;
-
-
-function threatensBody(attacker: Readonly<Fighter>, target: Readonly<Fighter>): boolean {
-  if (attacker.status.out) return false;
-  const { attack } = attacker;
-  if (attack.style !== undefined && attack.style !== AttackStyle.grab) {
-    const moves = attacker.tuning.moves;
-    for (let index = 0; index < authoredHitRegionCount(attack.style, moves); index++) {
-      authoredHitRegion(guardRegion, attacker.character, attack.style, attack.frame, attack.smashChargeFrames, index, moves);
-      if (guardRegion.window <= 0 || guardRegion.effect.damage <= 0) continue;
-      attackCapsule(guardStrike, attack.style, guardRegion);
-      placeCapsule(guardStrike, guardStrike, attacker.motion.x, attacker.motion.z, attacker.facing);
-      if (strikeHurtContact(guardStrike, target) !== HurtContact.none) return true;
-    }
-  }
-
-  const special = runningHeroSpecial(attacker);
-  const origin = heroRegionOrigin(attacker);
-  for (const region of special?.regions ?? []) {
-    const strike = region.hit.strike;
-    if (strike === undefined || attacker.special.frame < region.firstFrame || attacker.special.frame > region.lastFrame || region.hit.effect.damage <= 0) continue;
-    placeHeroStrike(guardStrike, attacker, strike, origin.x, origin.z);
-    if (strikeHurtContact(guardStrike, target) !== HurtContact.none) return true;
-  }
-  for (const projectile of attacker.projectiles) {
-    if (projectile.life <= 0) continue;
-    guardStrike.x1 = projectile.x;
-    guardStrike.z1 = projectile.z;
-    guardStrike.x2 = f32(projectile.x + projectile.velocityX);
-    guardStrike.z2 = f32(projectile.z + projectile.velocityZ);
-    guardStrike.radius = projectile.spec?.radius ?? ORIGINAL_PROJECTILE_RADIUS;
-    if (strikeHurtContact(guardStrike, target) !== HurtContact.none) return true;
-  }
-  return false;
-}
-
-function guardSucceeds(f: Fighter, guard: Readonly<SpecialGuard>): void {
-  const { status } = f;
-  f.special.guarded = true;
-  if (guard.counter === true) {
-    const next = runningHeroSpecial(f)?.followUps?.[0]?.special;
-    if (next !== undefined) {
-      f.special.form += FOLLOW_UP_FORM;
-      enterFollowUp(f, next);
-      status.invincible = max(status.invincible, 2);
-      return;
-    }
-  }
-  if (currentTraits(f).heal === true) {
-    const heal = min(guard.heal, max(0.0, status.damage));
-    status.damage = f32(status.damage - heal);
-  }
-  if (guard.shieldFrames !== undefined) {
-    status.invincible = max(status.invincible, guard.shieldFrames);
-    status.divineFrames = guard.shieldFrames;
-  }
-}
-
-
-
-
-
-
-
-export function resolveHeroGuards(world: Roster): void {
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
-    if (!isActive(world, slot)) continue;
-    const f = fighterAt(world, slot);
-    const guard = runningHeroSpecial(f)?.guard;
-    if (guard === undefined || f.special.guarded || !inWindow(guard, f.special.frame + 1)) continue;
-    for (let other = 0; other < PARTICIPANT_CAPACITY; other++) {
-      if (!canHit(world, other, slot) || !isActive(world, other) || !threatensBody(fighterAt(world, other), f)) continue;
-      guardSucceeds(f, guard);
-      break;
-    }
-  }
-}
-
 
 export function advanceHeroStatus(f: Fighter): void {
   if (f.status.armorFrames > 0) f.status.armorFrames--;
@@ -1296,13 +1214,36 @@ function moveToRelocation(world: Roster, f: Fighter, segment: Readonly<SpecialMo
 
     const target = markedTarget(world, f, segment.relocateReach ?? 0.0);
     if (target === undefined) return false;
-    const back = target.facing < 0 ? 1 : -1;
-    f.motion.x = f32(target.motion.x + f32(back * BEHIND_MARK));
-    f.motion.z = target.motion.z;
-    f.facing = -back;
+    stepBehind(f, target);
     target.status.poisonFrames = 0;
   }
   return true;
+}
+
+function stepBehind(f: Fighter, target: Readonly<Fighter>): void {
+  const back = target.facing < 0 ? 1 : -1;
+  f.motion.x = f32(target.motion.x + f32(back * BEHIND_MARK));
+  f.motion.z = target.motion.z;
+  f.facing = -back;
+}
+
+function standBesideTarget(f: Fighter, target: Readonly<Fighter>): void {
+  const { motion } = f;
+  motion.vx = 0.0;
+  motion.vz = 0.0;
+  motion.fastFalling = false;
+  motion.grounded = target.motion.grounded;
+  motion.surface = target.motion.surface;
+  setWorldMotionValue(motion.meleeZ, motion.z);
+  clearMotionValue(motion.meleeVelocityZ);
+}
+
+function lockedTarget(world: Roster, f: Readonly<Fighter>, range: number): Fighter | undefined {
+  const slot = f.special.seekTarget - 1;
+  if (slot < 0 || !isActive(world, slot)) return undefined;
+  const target = fighterAt(world, slot);
+  if (target.status.out || Math.abs(f32(target.motion.x - f.motion.x)) > range || Math.abs(f32(target.motion.z - f.motion.z)) > range) return undefined;
+  return target;
 }
 
 export function relocateHeroSpecial(world: Roster, slot: number, stage: number, matchFrame: number): void {
@@ -1313,6 +1254,13 @@ export function relocateHeroSpecial(world: Roster, slot: number, stage: number, 
     if ((segment.relocate === undefined && segment.relocateProjectile === undefined) || f.special.frame !== segment.first) continue;
     if (segment.relocate === Relocation.floorBelow) {
       settleOnFloorBelow(f, stage, matchFrame);
+      return;
+    }
+    if (segment.relocate === Relocation.behindLocked) {
+      const target = lockedTarget(world, f, segment.relocateReach ?? 0.0);
+      if (target === undefined) return;
+      stepBehind(f, target);
+      standBesideTarget(f, target);
       return;
     }
     if (!moveToRelocation(world, f, segment)) return;

@@ -33,7 +33,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
 import { changesAimZone, chargedAimX, chargedAimZ } from "./specials/aimZone";
 import { heroContactFacing } from "./specials/radial";
-import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followUpOnContact, enterUltimate, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
+import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followUpOnContact, enterUltimate, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, faceHeldStick, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
@@ -882,7 +882,6 @@ const specialScratch = {
 export function advanceSpecials(world: Roster, stage: number, matchFrame: number, inputs?: readonly Readonly<Controls>[]): void {
   const ownsBatch = openDamageContacts();
   const { contacts, facings, active } = specialScratch;
-  resolveHeroGuards(world);
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     advanceSpecialAction(fighterAt(world, slot), stage, matchFrame, inputs?.[slot], world);

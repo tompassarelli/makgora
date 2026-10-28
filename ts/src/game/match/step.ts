@@ -21,6 +21,7 @@ import { strikeCandles } from "../fighters/kobold/candleStrikes";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, cancelShineForUpSmash, startFighterSpecial } from "../sim/specials";
+import { resolveHeroGuards } from "../sim/specials/guards";
 import { advanceHeroStatus, prepareBansheeContacts } from "../sim/specials/engine";
 import { advanceItemBuff } from "../sim/itemBuffs";
 import { advanceFighterMotion } from "../sim/step";
@@ -258,6 +259,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (hadDashGrabWindow[slot] && f.ground.dashGrabWindow > 0 && !f.attack.dashGrab) f.ground.dashGrabWindow = Math.max(0, f.ground.dashGrabWindow - 1);
   }
   for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) prepareBansheeContacts(fighterAt(world, slot));
+  resolveHeroGuards(world);
   resolveAttacks(world, stage);
   if (bossFight) strikeBoss(game.run.boss, world, bossClock(game.matchFrame, game.startHold), game.run.player);
   advanceSpecials(world, stage, stageFrame, controls.inputs);

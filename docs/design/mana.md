@@ -152,7 +152,7 @@ Rows marked *next batch* keep their old EX until their batch lands.
 | Illidan | Wing Ascent | Rises 25% farther | Pass | Unchanged |
 | Illidan | Immolation | Reach 116 to 140 | Pass | Unchanged |
 | Blademaster | Wind Cutter | +25% damage | Fail: damage | Range |
-| Blademaster | Wind Walk | Travel | Pass | Unchanged |
+| Blademaster | Wind Walk | Travel (the dash, before the 2026-10-28 counter rework) | Pass | Travel: the counter steps out behind an attacker up to 3.1H away instead of 2.5H, beating a strike spaced at the tip |
 | Blademaster | Rising Whirlwind | Travel | Pass | Unchanged |
 | Blademaster | Mirror Image | x2 durability and +25% swap damage | Fail: two | x2 durability |
 | Mountain King | Storm Bolt | +25% damage | Fail: damage | Range |
