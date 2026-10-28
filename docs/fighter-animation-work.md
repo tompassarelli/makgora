@@ -660,15 +660,17 @@ outside the checkout. Naming clips after PRIVATE_OUTPUT (`"Locomotion Walk"`)
 re-keys those clips in place in the shipped model at their own indices and
 lengths, and checks every other clip unchanged; the Blender scene is the one
 from 7 October, so pass `WC3_MDL_ADDON` when the exporter is not at its
-default path. His walk and run play neither `Locomotion Walk` nor
-`Locomotion Run`: Tom rejected each hand-authored take of both in play
-(2026-10-28), so both gaits play the Classic Demon Hunter's stock `Walk`
-(sequence 107, 0.875 s, two stride cycles). The gait enters it at a planted
-contact (0.76 s) and plays it at his ground speed over its planted-foot speed,
-890 units a second (vertices within 2 to 8 units of the floor sweep back at a
-median 885 to 905), so his walk (558 units a second) plays it at 0.63 times
-and his run (666) at 0.75 with the planted feet holding the ground.
-ts/test/illidan-gait.test.ts pins the clip and both rates. `Locomotion Initial Dash Burst`
+default path. His walk plays neither `Locomotion Walk` nor its hand-authored
+retakes: Tom rejected each take in play (2026-10-28), so the walk plays the
+Classic Demon Hunter's stock `Walk` (sequence 107, 0.875 s, two stride cycles).
+The walk enters it at a planted contact (0.76 s) and plays it at his ground
+speed over its planted-foot speed, 890 units a second (vertices within 2 to 8
+units of the floor sweep back at a median 885 to 905), so his walk (558 units a
+second) plays it at 0.63 times with the planted feet holding the ground. Tom
+asked for the run back as it was before the walk work (2026-10-28): it plays
+`Locomotion Run` (sequence 120, 0.6 s) at its drawn stride of 332.739 units a
+second, its keys byte-identical to the model of ed12325435^.
+ts/test/illidan-gait.test.ts pins both clips and both rates. `Locomotion Initial Dash Burst`
 compresses into a push-off, then feeds the run. The ten authored burst frames
 are retimed over the simulation's thirteen dash frames; run starts on frame 14.
 The simulation still supplies all movement speeds and frame data.
