@@ -1,6 +1,6 @@
 # Smashcraft roster
 
-> **Frozen (26 October 2026):** Kobold and Forsaken Paladin are frozen pending replacement. No issue, audit, design change or worker task is opened for either until Tom permits it; `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, lists them.
+> **Frozen (26 October 2026):** Kobold and Forsaken Paladin are frozen pending replacement. No issue, audit, design change or worker task is opened for either until Tom permits it; `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, lists them. Their replacements, Uther and Lady Vashj, are planned with Archimonde, Tyrande, the Butcher and a dismounted Thrall in [roster-next.md](roster-next.md) (28 October 2026).
 
 Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 26 fighters, Melee’s size, until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343), and [Kobold (#344)](https://github.com/tompassarelli/smashcraft/issues/344). No further additions are planned.
 
