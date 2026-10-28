@@ -28,7 +28,7 @@ interface PeonCueState<Rest> {
 }
 
 export const GOLD_SACK_MODEL = "Objects\\InventoryItems\\PotofGold\\PotofGold.mdx";
-export const GOLD_SACK_SCALES: readonly number[] = [f32(0.6), f32(0.75), f32(0.9), f32(1.05), f32(1.3)];
+export const GOLD_SACK_FULL_SCALE = f32(1.3);
 const GOLD_CLINK = "ReceiveGold";
 export const GOLD_SACK_ON_BACK = { x: -14.0, z: 84.0 } as const;
 const GOLD_SACK_GLINT = "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdx";
@@ -42,6 +42,10 @@ const SACK_MOUTH = Array.from({ length: GOLD_SACK_CHARGE.hold + 12 }, () => ({ x
 const STRUCK = Array.from({ length: 40 }, () => ({ x: 62.0, z: 80.0 }));
 
 export const goldSackStage = (charge: number): number => chargeStage(GOLD_SACK_CHARGE, charge);
+export const goldSackFull = (charge: number): boolean => goldSackStage(charge) === GOLD_SACK_CHARGE.stages;
+
+export const goldSackStored = (fighter: Readonly<Fighter>): boolean =>
+  !fighter.status.out && goldSackFull(fighter.special.charge) && fighter.special.action !== SpecialAction.heroNeutral;
 
 const goldSackCues = (stage: number): SackCues => ({
   spell: "Gold Sack",
@@ -61,7 +65,7 @@ function goldSackCueState(fighter: Readonly<Fighter>): PeonCueState<never> {
   if (branch > GOLD_SACK_CHARGE.stages) return { cues: undefined, phase: "none" };
   if (branch < 0) {
     const stage = goldSackStage(fighter.special.charge);
-    return stage === 0 ? { cues: undefined, phase: "none" } : { cues: at(GOLD_SACK_CUES, stage - 1), phase: "startup" };
+    return goldSackFull(fighter.special.charge) ? { cues: at(GOLD_SACK_CUES, stage - 1), phase: "startup" } : { cues: undefined, phase: "none" };
   }
   return { cues: GOLD_SACK_SLOT_CUES, phase: hit && frame >= (GOLD_SACK_FIRST_ACTIVE[branch] ?? 0) ? "active" : "none" };
 }
