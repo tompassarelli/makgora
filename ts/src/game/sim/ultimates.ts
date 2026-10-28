@@ -206,8 +206,8 @@ const BEASTMASTER: AuthoredSpecial = {
 
 const RISEN = shot(0, 0.0, 40.0, 0.0, 0.0, 4, 90.0, hit(26.0, 85, 90.0, 45.0, HitElement.dark), "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx");
 const LICH_KING: AuthoredSpecial = {
-  name: "Animate Dead", endFrame: 64,
-  projectiles: [mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 2, 38, 0.0, 0.0, true, RISEN)],
+  name: "Animate Dead", endFrame: 56,
+  projectiles: [mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 2, 30, 0.0, 0.0, true, RISEN)],
 };
 
 const tremor = (direction: number): SpecialProjectile => ({
