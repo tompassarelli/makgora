@@ -13,20 +13,20 @@ import { VALKYR_MODEL } from "../../assets/importedModelInfo";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
 
 const HOWLING_BODY = [
-  hurtPose(1, 3, [hurtPart(4.0, 47.0, 4.0, 93.0, 50.0)]),
-  hurtPose(4, 6, [hurtPart(27.0, 43.0, 27.0, 100.0, 48.0)]),
-  hurtPose(7, 9, [hurtPart(46.0, 47.0, 46.0, 99.0, 52.0)]),
-  hurtPose(10, 12, [hurtPart(52.0, 45.0, 52.0, 101.0, 50.0)]),
-  hurtPose(13, 15, [hurtPart(61.0, 45.0, 61.0, 101.0, 48.0)]),
-  hurtPose(16, 18, [hurtPart(61.0, 52.0, 61.0, 93.0, 55.0)]),
-  hurtPose(19, 21, [hurtPart(57.0, 56.0, 57.0, 90.0, 59.0)]),
-  hurtPose(22, 24, [hurtPart(63.0, 50.0, 63.0, 94.0, 53.0)]),
-  hurtPose(25, 27, [hurtPart(63.0, 50.0, 63.0, 94.0, 53.0)]),
-  hurtPose(28, 30, [hurtPart(51.0, 52.0, 51.0, 92.0, 55.0)]),
-  hurtPose(31, 33, [hurtPart(39.0, 40.0, 39.0, 102.0, 43.0)]),
-  hurtPose(34, 36, [hurtPart(30.0, 36.0, 30.0, 107.0, 37.0)]),
-  hurtPose(37, 39, [hurtPart(20.0, 35.0, 20.0, 107.0, 36.0)]),
-  hurtPose(40, 44, [hurtPart(-2.0, 32.0, -2.0, 92.0, 49.0)]),
+  hurtPose(1, 2, [hurtPart(4.0, 47.0, 4.0, 93.0, 50.0)]),
+  hurtPose(3, 5, [hurtPart(27.0, 43.0, 27.0, 100.0, 48.0)]),
+  hurtPose(6, 7, [hurtPart(46.0, 47.0, 46.0, 99.0, 52.0)]),
+  hurtPose(8, 9, [hurtPart(52.0, 45.0, 52.0, 101.0, 50.0)]),
+  hurtPose(10, 12, [hurtPart(61.0, 45.0, 61.0, 101.0, 48.0)]),
+  hurtPose(13, 14, [hurtPart(61.0, 52.0, 61.0, 93.0, 55.0)]),
+  hurtPose(15, 16, [hurtPart(57.0, 56.0, 57.0, 90.0, 59.0)]),
+  hurtPose(17, 19, [hurtPart(63.0, 50.0, 63.0, 94.0, 53.0)]),
+  hurtPose(20, 21, [hurtPart(63.0, 50.0, 63.0, 94.0, 53.0)]),
+  hurtPose(22, 24, [hurtPart(51.0, 52.0, 51.0, 92.0, 55.0)]),
+  hurtPose(25, 27, [hurtPart(39.0, 40.0, 39.0, 102.0, 43.0)]),
+  hurtPose(28, 30, [hurtPart(30.0, 36.0, 30.0, 107.0, 37.0)]),
+  hurtPose(31, 33, [hurtPart(20.0, 35.0, 20.0, 107.0, 36.0)]),
+  hurtPose(34, 38, [hurtPart(-2.0, 32.0, -2.0, 92.0, 49.0)]),
 ];
 
 const h = (fraction: number): number => f32(HERO_REFERENCE_HEIGHT * fraction);
@@ -39,16 +39,20 @@ const AIR_LANDING_LAG = 20;
 
 
 
+export const HOWLING_BLAST_SPAWN_FRAME = 22;
+export const HOWLING_BLAST_SPEED = h(f32(0.072));
+export const HOWLING_BLAST_LIFE = 53;
+
 const blastProjectile = (radius: number, damage: number, status: AppliedStatus | undefined): SpecialProjectile => ({
   model: "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx",
-  spawnFrame: 28, offsetX: 50.0, offsetZ: CHEST, velocityX: h(f32(0.08)), velocityZ: 0.0,
-  life: 36, radius, effect: hit(damage, "POKE", 40), reflectable: true, limit: 1, status,
+  spawnFrame: HOWLING_BLAST_SPAWN_FRAME, offsetX: 50.0, offsetZ: CHEST, velocityX: HOWLING_BLAST_SPEED, velocityZ: 0.0,
+  life: HOWLING_BLAST_LIFE, radius, effect: hit(damage, "POKE", 40), reflectable: true, limit: 1, status,
 });
-const HOWLING_BLAST = blastProjectile(h(f32(0.22)), 7.5, undefined);
+export const HOWLING_BLAST = blastProjectile(h(f32(0.22)), 7.5, undefined);
 const howlingBlast = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 56,
+  endFrame: 50,
   hurt: HOWLING_BODY,
-  armor: { ...frames(10, 28), maxDamage: 8.0 },
+  armor: { ...frames(10, HOWLING_BLAST_SPAWN_FRAME), maxDamage: 8.0 },
   landingLag,
   projectiles: [projectile],
 });

@@ -1527,8 +1527,9 @@ Grab 9/2/30. Throws: forward 10 (EDGE), back 12 (KILL), up 8 (JUGGLE), and
 
 ### B specials
 
-- **Howling Blast** (neutral, 15 mana): a wide frost gust leaves on frame 16
-  and travels about 2.9H; reflectable.
+- **Howling Blast** (neutral, 15 mana): a wide frost gust leaves on frame 22
+  at 0.072H a frame and flies 53 frames, about 3.7H (35% farther than the
+  frame-28, 0.08H, 36-frame version); end lag 28 frames; reflectable.
 - **Val'kyr Shadowguard** (side, 20 mana): a Val'kyr flies out on frame 14
   and seizes the first body she reaches (a shield stops her; she can't be
   reflected). The victim is carried 3 units a frame the way she flew, rising,
