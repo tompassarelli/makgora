@@ -838,9 +838,9 @@ On 26 Oct 2026 (#376): Illidan's Eye Blast (neutral form 1) beam 1.5 to
 striking Fel Flames 2.0 to 1.8 (down EX, 4.3% to 3.2%). Rifleman's side
 (1.7-1.8%) and down (0.1%) specials already sat inside the budget.
 
-The check also plays a meter drop (#385) as `meter-drop:telegraph-and-orb`:
-three seconds of telegraph, then the orb, measured for coverage only (a drop
-stays until taken). On 10 Oct 2026, near camera at 640x360, Classic marker
+The check also plays an orb (#385) as `orb:warning-and-orb`:
+three seconds of warning, then the orb, measured for coverage only (an orb
+stays until taken or replaced; renamed 2026-10-28). On 10 Oct 2026, near camera at 640x360, Classic marker
 (MassTeleportTarget, 0.45) 0.81% and orb (FrostWyrmMissile, 0.8) 1.20%.
 
 ## How the numbers are taken

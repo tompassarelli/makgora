@@ -13,7 +13,7 @@ points where his opponent ought to stand, closes that space with roots and a
 treant, then dismisses them with his staff. A space-trapping zoner, distinct
 from Jaina's falling spells, Lich's frost bursts and Shadow Hunter's crossfire.
 He has no stacks or second resource. All four ordinary specials are
-free; a full universal super bar empowers anyone's next special, including his.
+free; a full EX charge empowers anyone's next special, including his.
 
 **Body:** weight 94, run 10.8 units/frame, air 5.7 units/frame, standing hurt
 capsule endpoints at heights 4 and 101.2, radius 24. Slow feet and a tall exposed body make failed setup
@@ -29,7 +29,7 @@ Neutral air circles the staff (8, 8); forward/back air push it away (12/9,
 Landing lag is 16/18/16/16/22 before the shared automatic halving. Down tilt
 and up throw launch into canopy follow-ups; down throw creates a tech chase.
 
-| Special | Ordinary action and counterplay | Full-bar EX |
+| Special | Ordinary action and counterplay | Full-charge EX |
 |---|---|---|
 | Entangling Roots, neutral | Mark a low patch 180 units ahead on frame 8; roots hit once after 20 telegraph frames for 8 damage and a 24-frame movement bind. Jump or shield the patch. 42 total frames. | A 25% wider root patch, same damage (mana.md, 2026-10-28). |
 | Stag Charge, side | Coil, then bound forward for frames 12–20 with a branching staff strike for 11 damage. Shield stops the charge; 43 total leaves a whiff punish. Air charge ends helpless. | Shield-safe: a blocked charge holds the shield through his recovery. |
@@ -297,11 +297,11 @@ Use the project’s existing knockback, hitlag, hitstun, DI, shieldstun, and sta
 
 Calibrate classes in an empty test stage against a reference weight at 60 percent, no DI and no walls. Indicative displacement along the launch direction after 30 ticks: LINK 0.6–1.2H; POKE 1.2–2.0H; LAUNCH 2.0–3.0H; EDGE 2.5–3.5H; KILL 3.5–5.0H; SPIKE downward 2.5–3.5H before gravity. These are test bands, not a second knockback formula. Publish the actual coefficients and measured outcomes once calibrated. Adjust hitstun separately through the established formula rather than assuming distance proves a true combo. LINK never guarantees a follow-up without testing DI, percentage, weight, and move timing.
 
-No critical-hit RNG, random evasion, chance-on-hit stuns, or automatic spell counters. Every fighter is distinctive through expressive standard actions, designed case by case (Tom, 9 Oct 2026, #148). Fighters have no passives (Tom, 9 Oct 2026, #384). Floats, extra jumps and visible double-jump armour are movement properties, like weight and air speed, and are learned by playing. One universal super meter (#335); no character stacks, charges, resource timers or second bars. Ordinary move durations, cooldowns, statuses and placed-object HP remain action state. Damage is Smash-style percent damage; a healing move lowers it directly. Damage-over-time ticks do not cause hitlag, hitstun or knockback. A status applies only on an actual body hit, not on shield.
+No critical-hit RNG, random evasion, chance-on-hit stuns, or automatic spell counters. Every fighter is distinctive through expressive standard actions, designed case by case (Tom, 9 Oct 2026, #148). Fighters have no passives (Tom, 9 Oct 2026, #384). Floats, extra jumps and visible double-jump armour are movement properties, like weight and air speed, and are learned by playing. Two universal meters, an EX charge and an ultimate meter (#335; two meters since 2026-10-28); no character stacks, charges, resource timers or further bars. Ordinary move durations, cooldowns, statuses and placed-object HP remain action state. Damage is Smash-style percent damage; a healing move lowers it directly. Damage-over-time ticks do not cause hitlag, hitstun or knockback. A status applies only on an actual body hit, not on shield.
 
 ### Proposed resource profile
 
-Mana is every fighter's one resource for specials; its rules, numbers and bar are in [mana.md](mana.md): 100, full each stock, earned by landing normals and throws, perfect shields/parries and (capped) by taking hits, plus a one-point-per-second trickle. Each B row lists its total cost, deducted once on move entry with no refund on interruption. An unaffordable move does not start or consume input as an attack, and the bar flashes once per press.
+Every fighter carries two meters, an EX charge and an ultimate meter; their rules, numbers and display are in [mana.md](mana.md). Regular specials are free and no move deducts a cost on entry; a press below a full meter starts the ordinary special.
 
 Every up B has a weaker zero-mana version described in its kit; being depleted must not remove basic recovery. If current mana is below the full up B cost, automatically select the free version and spend zero mana; this is the explicit exception to the unaffordable-move rule. If sufficient mana exists, use the full version. Full-strength up B uses its listed cost. One up B use per airtime; it resets only on grounded actionable state or stock respawn, not on ledge regrab. Up B and mobility specials marked helpless prohibit attacks, specials, and double jump until landing or the existing hitstun escape rules. They do not confer ledge invulnerability. Non-mobility specials never refresh jumps or recovery availability.
 
@@ -1938,7 +1938,7 @@ his edge-guard weakness.
 
 ### B specials
 
-All four base specials are free. A full universal bar buys any one EX;
+All four base specials are free. A full EX charge buys any one EX;
 there is no Grom-specific resource or cooldown.
 
 | Input | Base move | EX |
@@ -2023,7 +2023,7 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 
 ### Four specials and EX
 
-All four ordinary specials are free. Shield + any Special spends the full universal bar for its EX form; no beetle count or burrow meter is shown or banked. EX keeps the ordinary frames and changes one thing (mana.md).
+All four ordinary specials are free. Shield + any Special spends the EX charge for its EX form; no beetle count or burrow meter is shown or banked. EX keeps the ordinary frames and changes one thing (mana.md).
 
 | Input | Ordinary move | EX form | Counterplay |
 |---|---|---|---|
@@ -2150,7 +2150,7 @@ No charge system, second resource or automatic counter.
 | Down air | Pointed staff plunge; airborne spike | 15/3/29; 11; landing 20 |
 | Get-up / ledge attack | Staff sweep / climbing shove | 17/3/30, 17/3/21; 7 |
 
-| Special | Ordinary version (all free) | EX (one full universal bar) |
+| Special | Ordinary version (all free) | EX (one EX charge) |
 | --- | --- | --- |
 | Neutral: Arcane Omen | f12 launches one slow purple bolt, 9 damage, 40-frame cast. Shield or jump it. | A 25% larger bolt at the same speed and damage; same cast commitment (mana.md, 2026-10-28). |
 | Side: Vanishing Act | f10 blink 180 units forward, f12–14 staff strike for 7, end f38; intangible only f9–10. Read the arrival and punish recovery. | Blink 225 units; same strike and exposed arrival. |

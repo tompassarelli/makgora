@@ -44,6 +44,8 @@ client that still cannot leave it.
   Heavy item. In a match, `-dev item drop speed|heavy` starts the 10 s
   warning for that item at centre stage.
 
-- Meter drop setup at fighter or stage selection: `-dev drops on|off` controls
-  whether meter drops appear; the stage menu's Drops button does the same
-  (smashcraft:docs/gameplay-design.md, "Meter drops").
+- Orb setup at fighter or stage selection: `-dev orbs on|off` controls
+  whether centre-stage orbs appear; the stage menu's "Orbs: On/Off" button does
+  the same (smashcraft:docs/gameplay-design.md, "Centre-stage orbs").
+- Meter setup: `-dev meter N` sets both meters to N percent of an ultimate
+  meter, with the EX charge full only at 100.

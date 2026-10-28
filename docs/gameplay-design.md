@@ -176,8 +176,8 @@ Where Smashcraft keeps its own rule, and why:
   A direction + A is a tilt from stand, walk or crouch. A fresh flick dashes on its first frame
   and no tilt comes out of a dash (Tom, 2026-10-28): a direction + A on any dash frame, like out
   of a run, is the dash attack, and only Strong + a direction smashes on dash frames 1–3.
-  Strong + B with a direction is the special's EX form; A + B at a full bar
-  stays the ultimate, Strong held or not, and below a full bar it is the
+  Strong + B with a direction is the special's EX form; A + B at a full ultimate meter
+  stays the ultimate, Strong held or not, and below a full meter it is the
   plain special. The C-stick keeps its smashes (tilts with the walk
   modifier or its tilt setting).
 - A held stick at full deflection (keyboard keys and a pad at the rim) still
@@ -1046,28 +1046,28 @@ The specification answers these design questions for the expansion:
 | --- | --- |
 | Physical differences | Use each hero's relative weight, run and air-speed table as initial tuning. The complete candidate table spans weight 0.85–1.28, run 0.80–1.14 and air 0.75–1.22 (of 1.00 Melee units a frame since #190). Jump velocity and gravity initially inherit the reference. |
 | Archetypes | State each fighter's purpose and exploitable weakness before building its moves. |
-| Meter | One 100-point bar filled by a trickle on a pure clock and by meter drops, never by damage (#484); specials are free and EX and ultimates spend it (smashcraft:docs/design/mana.md). |
-| EX specials | Strong + Special spends the normal cost plus 25 mana for one-hit startup armor. See the EX table below. A + Special at a full bar is the ultimate. Existing per-move cooldowns remain part of each kit. |
+| Meter | Two independent meters, EX and ultimate, filled on the pure match clock and by centre-stage orbs, never by damage (#484, replaced 2026-10-28); specials are free and EX and ultimates spend their own meter (smashcraft:docs/design/mana.md). |
+| EX specials | Strong + Special spends a full EX charge for one-hit startup armor. See the EX table below. A + Special at a full ultimate meter is the ultimate. Existing per-move cooldowns remain part of each kit. |
 
 ### Build-and-spend mana and EX specials
 
-Since #484 (26 Oct 2026) no meter comes from damage dealt or taken. Both
-players fill at the same fixed rate on a pure clock, and meter drops on a fixed
-20 s clock give about half of each player's meter
-(smashcraft:docs/design/mana.md, [meter drops](#meter-drops-385)). Every gain
-caps at 100, and points are kept through a KO. Recovery remains available
-through the existing free up-special forms.
+Since #484 (26 Oct 2026) no meter comes from damage dealt or taken. On
+28 Oct 2026 Tom replaced the single bar and its meter drops with two meters:
+the EX charge fills in 12 s and the ultimate meter in 2 min, both on the pure
+match clock for every fighter, and an orb at the centre of the stage
+([centre-stage orbs](#centre-stage-orbs)) gives a bonus charge or half an
+ultimate meter. Both meters keep their value through a KO
+(smashcraft:docs/design/mana.md). Recovery remains available through the
+existing free up-special forms.
 
 Hold Strong and press Special to request EX, on the same frame as an
 ordinary special; with A also held the press asks for the ultimate instead,
 and a declined ultimate is the ordinary special. It cannot cancel hitstun,
 shieldstun, release lag, attacks or other action locks. Follow-up inputs
-retain their ordinary behavior. If the chosen
-form's cost plus 25 is unaffordable, the same press starts its ordinary
-version and pays its ordinary cost; if that is also unaffordable, the
-existing refusal applies. Recalls and alternate forms pay their own cost
-plus 25. The HUD shows **EX Neutral**, **EX Side**, or **EX Neutral + Side** beside the bar
-when that ground/air cast can be paid. The match help names the chord.
+retain their ordinary behavior. The EX form needs a full EX charge and spends
+only it; below a full charge the same press starts its ordinary version. The
+HUD plate shows the EX cell charged beside the ultimate bar. The match help
+names the chord.
 
 Every EX neutral/side has one upgrade: one hit of at most 8% can deal its
 damage and hitlag without interrupting the first six action frames. The
@@ -1114,7 +1114,7 @@ establishes spending a gauge on a stronger ordinary special;
 is an explicit example of a one-hit armored EX.
 [Street Fighter 6's Drive](https://news.capcomusa.com/2022/06/02/street-fighter-6-redefines-the-genre-in-2023/)
 keeps the budget shared between offensive and defensive choices; Smashcraft
-uses its existing mana instead of adding another gauge.
+uses its EX charge and ultimate meter instead of adding another gauge.
 [Rivals' roster](https://rivalsofaether.com/characters/) shows different
 special decisions built from elemental setups, while its
 [Shovel Knight update](https://rivalsofaether.com/patch-1-4-0-for-shovelry/)
@@ -2406,13 +2406,16 @@ getup and the hang limit ends a hanger who never moves. Test: the Expert
 computer hits a climber within 45 frames of the getup press (input delay 4,
 climb 25, tilt startup and travel about 16).
 
-## Meter drops (#385)
+## Centre-stage orbs
 
-Owner direction, 9 Oct 2026: in a game with meter, meter is advantage, so give
-it a place on the stage. Meter energy appears at known stage points with a
-short telegraph, so players fight over a space instead of stalling; a player
-who runs away cedes the drop. It replaces a stalling penalty, adds no second
-meter and is not an item.
+Tom directed on 9 Oct 2026 that, in a game with meter, meter is advantage and
+should have a place on the stage (#385), and on 28 Oct 2026 replaced the single
+super bar, its clock trickle and the 20 s meter drops at rotating stage points
+(#484, #385) with two meters and an orb at the centre of the stage
+([two meters](design/mana.md)). The orb appears at a known place on a known
+clock with a short warning, so players fight over a space instead of stalling;
+a player who runs away cedes the orb. It replaces a stalling penalty and is
+not an item.
 
 ### Precedent
 
@@ -2439,56 +2442,55 @@ Rivals of Aether 2 has neither items nor meter, so it offers no precedent
 here.
 
 Smashcraft keeps the timing and the place public and removes the random
-parts: the schedule is a fixed clock, the place comes from a fixed
-rotation, and the amount never varies.
+parts: the schedule is a fixed clock, the place is always the centre, and the
+amount never varies.
 
 ### Rules
 
-Tom decided, 9 Oct (delegated in #385):
+- **Place.** One orb point per stage, at the centre: x = 0 on the main deck
+  when solid ground is there, otherwise the point of a fixed, solid
+  (non-moving, non-pass-through) deck nearest the centre. The orb floats 10
+  Melee units (60 world units, `ORB_HEIGHT`) above that deck point.
+- **Pickup.** A circle of radius 10 Melee units (`ORB_REACH`) plus the
+  fighter's hurt-capsule radius, tested against the fighter's standing hurt
+  capsule. Every fighter standing under the orb reaches it (the shortest
+  Kobold, top about 72 units, to the tallest Illidan, about 159), and so does a
+  jump through it. The taker must be in control: not KO'd, rolling, tumbling,
+  in hitlag or in hitstun. If two fighters touch it on the same frame, the one
+  nearer the orb in x takes it.
+- **Schedule.** An orb is due every 900 frames (15 s) after GO. Every fourth,
+  on each minute mark, is an ultimate orb in place of that EX orb; the others,
+  at 0:15, 0:30 and 0:45 past each minute, are EX orbs. An EX orb fills the
+  EX charge; an ultimate orb adds half an ultimate meter (3600 frames).
+  Taking an orb into an already full meter wastes it. At most one orb is out:
+  a new spawn replaces an untaken one.
+- **Respawn hold.** A due orb waits while any fighter is out with a stock left
+  or still has invincibility after respawning (90 frames), and spawns on the
+  first frame none does. The clock does not shift: later orbs stay on their
+  15 s marks.
+- **Warning.** 3 s (180 frames) before each scheduled spawn, and for as long as
+  a held orb waits, Mass Teleport's arrival marker grows and pulses at the orb
+  point, with the stock item-spawn sound when it starts. The spawn plays the
+  meter-ready sound, and a pickup that is not wasted plays the confirm sound.
+  The EX orb is a Frost Wyrm missile (blue) and the ultimate orb a larger Fire
+  Ball missile (orange), both Classic stock models with no imports.
+- **Rule.** Orbs are on in the standard ruleset; the stage menu's "Orbs:
+  On/Off" button, or `-dev orbs on|off`, turns them off. They never appear in
+  Training or in Classic and lore runs. `-dev meter N` and the tape op
+  `test-meter SLOT PERCENT` set both meters to N percent, with the EX charge
+  full only at 100.
+- **Computers** contest an orb after their reaction delay from the start of
+  the warning, choosing per orb at their judgment: Expert contests every orb,
+  Rookie about one in three (smashcraft:ts/src/game/match/cpuSkill.ts,
+  `contestTenths`). `bun scripts/campingField.ts` from ts/ plays a seeded
+  field with the rule `off` and `orbs` and measures how the fighter ahead on
+  stocks camps away from the centre.
 
-- **Telegraph.** A blue marker (Mass Teleport's arrival column) grows and
-  pulses at the point for 3 s (180 frames) before the orb appears, which is a
-  blue Frost Wyrm missile at scale 0.8, about 60 px wide at 640x360 on the near
-  match camera. Classic Wisp frames, effects alone: marker 0.8%, orb 1.1% of
-  the screen, under #380's 4%; the marker hides when the orb appears. A
-  sound plays at the point when the telegraph starts, when the orb appears and when it is taken.
-- **Schedule.** Tom fixed the clock on 26 Oct 2026 (#484), as Dota 2's power
-  runes spawn: a drop appears every 20 s after GO (20 s, 40 s, 60 s, …) whether
-  or not the last was taken. An untaken orb vanishes when the next appears, so
-  at most one orb is ever out, and the next one's telegraph can start while
-  the last is still out.
-- **Points.** The first drop is at the centre of the main deck. Later drops
-  rotate through the stage's fixed points in a fixed order (centre, then each
-  static platform centred within 150 units of the stage centre, in deck
-  order), starting from a seeded offset, so the points are learnable but the
-  next one is not always the same. Side and moving platforms hold no point: a
-  side point let one fighter take the drop near a ledge while the other stayed
-  at the far edge, which raised the time fighters spent apart in the computer
-  field; a fighter on the centre line is never more than half a stage from an
-  opponent on the main deck. Each stage's points are listed in
-  [stages](design/stages.md#meter-drop-points).
-- **Amount.** Touching the orb (the body within 48 units sideways, from
-  60 units above the point down to the fighter's height below it) grants
-  18 points (`ROSTER_MANA.dropGain`, sized with the trickle so drops give about
-  half of each player's meter, [super meter](design/mana.md)) to the nearest
-  touching fighter, capped at full. A full fighter still takes the orb and denies it.
-- **Rule.** Drops are on in the standard ruleset; the Drops button on the
-  stage menu (or `-dev drops on|off`) turns them off. They never appear in
-  training or in Classic and lore runs.
-- **Computers** contest a drop after their reaction delay from the start of
-  the telegraph, choosing per drop at their judgment: Expert contests every
-  drop, Rookie about one in three (smashcraft:ts/src/game/match/cpuSkill.ts,
-  `contestTenths`). While the opponent is off the main deck they keep chasing
-  it instead. `bun scripts/meterDropField.ts` from ts/ plays a seeded field
-  with drops off and on and prints the share of frames the fighters spend more
-  than half a stage apart, each fighter's win rate and the win-rate spread
-  (max minus min). `--camp` makes the fighter ahead on stocks retreat to the far
-  side of the stage and wait (measurement only, not default play); `--shard K/N`
-  with `--json` and `--merge` splits the field across cores.
-
-The drop state (schedule, point, serials, last taker) is part of the match
+The orb state (live and held orb, serials, last taker) is part of the match
 snapshot, its checksum and its replay
-(smashcraft:ts/src/game/match/meterDrops.ts).
+(smashcraft:ts/src/game/sim/orbState.ts). The cue-budget scene
+`orb:warning-and-orb` and the acceptance tape `orbs` cover the warning, the
+spawn and the pickup.
 
 ## Recovery and edgeguarding
 

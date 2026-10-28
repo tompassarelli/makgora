@@ -152,8 +152,8 @@ Custom uses 8. T is unbound by default.
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). Strong + U
 with a direction casts that special's EX
-form (press U with the direction or before it, since Strong and a direction alone smash), costing one of the super bar's three segments. At a full bar,
-N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate, Strong held or not (below a full bar it is the plain special); the
+form (press U with the direction or before it, since Strong and a direction alone smash), spending the EX charge, which fills in 12 s. At a full ultimate meter (2 min),
+N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate, Strong held or not (below a full ultimate meter it is the plain special); the
 Ultimates rule at fighter selection turns them off.
 
 Kobold carries a candle. Every hit he lands makes it burn brighter, up to

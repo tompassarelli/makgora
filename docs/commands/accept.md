@@ -44,7 +44,7 @@
   hazards off on the stage screen (a match whose replay shows hazards on fails
   its setup), then plays its fighter pair from fighter select: each standard
   keyboard key once, every normal, aerial and special after a training reset,
-  and the ultimate after both fighters charge their mana. In each charge cycle
+  and the ultimate after both fighters charge their ultimate meter. In each charge cycle
   the walker stops at the middle of the approach lengths for which the
   striker's smash lands on that opponent headless, so a frame of key timing
   either way still lands it. The match ends from
@@ -77,7 +77,7 @@
   counted, and a special or ultimate fails when the next rest is brighter than
   the rest before it by more than three times the largest rest-to-rest change
   of the normals (smashcraft:ts/scripts/wisp/specialsSpot.ts). Training mode
-  drops no meter orb and the count skips the HUD band, so the orb never counts.
+  has no orbs and the count skips the HUD band.
   `--map MAP.w3x` uses that already-built candidate for the selected checks
   without rebuilding it; select checks needing the same build profile. Each
   shard receives the same immutable map. Use revision-specific private paths.

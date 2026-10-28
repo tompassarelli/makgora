@@ -1,7 +1,7 @@
 # Ultimates
 
 Tom, 9 October 2026 (#382): every Warcraft III hero has an ultimate, so every
-Smashcraft fighter gets one. It is a real move bought with the full super bar,
+Smashcraft fighter gets one. It is a real move bought with the full ultimate meter,
 never a cutscene. A match rule turns ultimates off. All frame, damage and
 launch values below are original, provisional Smashcraft tuning.
 
@@ -12,7 +12,7 @@ launch values below are original, provisional Smashcraft tuning.
   stock of meter is a spend-now-or-save choice. A super is an ordinary move
   with frame data: blockable, punishable, and its startup is known.
 - **Street Fighter 6:** splits Drive (EX, parries, rushes) from the Super Art
-  bar. Smashcraft keeps one bar: the spend-or-save choice is the point.
+  bar. Smashcraft splits them too, into an EX charge and an ultimate meter that never spend each other (2026-10-28), and keeps the spend-or-save choice.
 - **Smash Ultimate Final Smash meter:** fills over time, its cinematic hits
   cannot be answered, and it hands out comebacks; tournaments switch it off.
   Smash Balls are random. Rivals of Aether has no supers at all.
@@ -23,11 +23,11 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 
 | Rule | Value |
 | --- | --- |
-| Cost | The whole bar (100 points). EX specials cost one 33/33/34 segment (docs/design/mana.md). |
-| Gain | The trickle and meter drops (docs/design/mana.md, #484); nothing from damage. |
-| Input | Attack + Special together (hold Attack, press Special; controller A + X), any direction, from any state a special could start. Below a full bar, or with ultimates off, the ordinary special starts instead. |
+| Cost | The whole ultimate meter (7200 frames, 2 min on the clock alone); it spends nothing from the EX charge (docs/design/mana.md). |
+| Gain | The match clock after GO, half a meter from each ultimate orb at centre stage, and Lich's Dark Ritual (docs/design/mana.md, replaced 2026-10-28); nothing from damage. |
+| Input | Attack + Special together (hold Attack, press Special; controller A + X), any direction, from any state a special could start. Below a full ultimate meter, or with ultimates off, the ordinary special starts instead; an ultimate press that replaces an EX special in its first leniency frames refunds the EX charge. |
 | Flash | At most 4 frames of white fighter flash and the ready sound. No camera cut, no freeze of the opponent. |
-| Readiness (#192, #253, #255) | The meter shows as a rim of light round the fighter's own silhouette, a ki-aura feel Tom chose over separate EX and full-bar effects (2026-10-25): a second white copy of the fighter's model, held on its pose every frame, grown 9% round the body's middle and set 14 units behind it, so only its edge shows. A fighter holding at least one EX segment (33 points) below a full bar wears a faint cool blue rim; a full bar with the ultimate on turns it warm gold, breathing slowly (alpha 110 to 210 over 2 s) with no restart until the bar is spent; below one segment there is none (smashcraft:ts/src/game/presentation/meterGlow.ts). Each fighter owns one rim model, made once and hidden when unused. Casting the ultimate plays a Doom fire tower at its feet for 16 frames and the ultimate sound, ahead of or with the move's own first effect; an EX special raises a cyan Tome of Retraining light pillar from the caster's feet for 30 frames with its own sound, cold blue so it reads apart from both fires on every stage (native cold-viewer check, 2026-10-24), at 0.7 of its first size and partly transparent (chosen 2026-10-25) (docs/design/sound.md). The tower and pillar are sized to the hurt body (the larger of its height and width against a unit body), so they wrap every fighter size on every stage. Presentation only: sounds follow confirmed frames; the tower or pillar starts on the first presented or confirmed frame that holds the cast (at once for the caster; online, as soon as the opponent confirms the received cast, even while a rollback is still repairing the presented frame), plays its full length from there whatever the move's frame by then, stops if a rollback removes a cast no confirmed frame held, and never restarts for the same cast. |
+| Readiness (#192, #253, #255) | The meter shows as a rim of light round the fighter's own silhouette, a ki-aura feel Tom chose over separate EX and full-bar effects (2026-10-25): a second white copy of the fighter's model, held on its pose every frame, grown 9% round the body's middle and set 14 units behind it, so only its edge shows. A fighter holding a full EX charge wears a faint cool blue rim; a full ultimate meter with the ultimate on wears a warm gold rim, breathing slowly (alpha 110 to 210 over 2 s) with no restart until the meter is spent; with both ready the rim alternates between the two every 40 frames (28 October 2026); with neither there is none (smashcraft:ts/src/game/presentation/meterGlow.ts). Each fighter owns one rim model, made once and hidden when unused. Casting the ultimate plays a Doom fire tower at its feet for 16 frames and the ultimate sound, ahead of or with the move's own first effect; an EX special raises a cyan Tome of Retraining light pillar from the caster's feet for 30 frames with its own sound, cold blue so it reads apart from both fires on every stage (native cold-viewer check, 2026-10-24), at 0.7 of its first size and partly transparent (chosen 2026-10-25) (docs/design/sound.md). The tower and pillar are sized to the hurt body (the larger of its height and width against a unit body), so they wrap every fighter size on every stage. Presentation only: sounds follow confirmed frames; the tower or pillar starts on the first presented or confirmed frame that holds the cast (at once for the caster; online, as soon as the opponent confirms the received cast, even while a rollback is still repairing the presented frame), plays its full length from there whatever the move's frame by then, stops if a rollback removes a cast no confirmed frame held, and never restarts for the same cast. |
 | Telegraph | Every ultimate shows its area, line or target before its first active frame. Startup is at least 16 frames. |
 | Counterplay | Each can be shielded or dodged on its startup frames, or escaped by movement, and leaves the user punishable on a whiff. |
 | Payoff | Strong, never a guaranteed stock: none kills from 0%. Below 100%, an ultimate and its true follow-ups stay within #83's 30% (gameplay-design.md, "Combo structure"). |
@@ -172,7 +172,7 @@ Frames count from the input frame (frame 1 is the first frame after it).
 - A `jumpWindow` (Bladestorm, f17–74) lets the caster jump and air jump
   mid-move; past the air hold he falls and drifts as in any jump while it
   runs, and a landing keeps it going (#503).
-- Computer fighters press it at a full bar when the target is inside the
+- Computer fighters press it at a full ultimate meter when the target is inside the
   move's authored reach (ULTIMATE_REACH), as often as their kit options;
   Rookie never does, Lich presses it at a target in the air within 600, a
   raised shield stops the press, and Cairne presses it at a level foe

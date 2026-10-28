@@ -27,7 +27,7 @@
 - **Smashes and aerials:** every smash holds full charge for 120 more frames, every aerial now has Melee's auto-cancel windows, and short hopping lets you land an aerial's first active frame.
 - **Melee feel:** every fighter gets Melee's movement and body numbers, throws launch as if the victim weighed 100, tech rolls are intangible for 20 frames, and wall techs hold until they end.
 - **Banish:** attacks pass through a Banished fighter, as in Warcraft III.
-- **Meter:** the super meter fills from a trickle over time and shows as a coloured rim, with an EX aura and a flame cue at a full bar.
+- **Meter:** two meters, an EX charge (12 s) and an ultimate meter (2 min), fill over time and from orbs at centre stage; a coloured rim shows which is ready, blue for EX and gold for the ultimate.
 - **CPU slots and edges:** new CPU slots default to a Random fighter, and fighters lean over the drop when teetering at a stage edge.
 
 ## New in 0.1.4
@@ -54,7 +54,7 @@
 - **Computer opponents:** six personalities at five difficulties.
 - **Training mode** with frame data, hit areas and slow motion.
 - **Classic**, a six-fight route ending in a boss, and **Lore Battles**, covering 21 of the 26 fighters.
-- A super meter for EX specials and ultimates.
+- Two meters for EX specials and ultimates, with orbs at centre stage.
 
 ## How to play
 1. Download **Smashcraft 0.1.5.w3x** from this page and put it in your Warcraft III **Maps** folder.
@@ -68,7 +68,7 @@ New here? Place only your own fighter chip and press Y to practice alone.
 - Move: **A**/**D**. Aim up: **W**. Crouch, fast-fall and drop through platforms: **S**
 - Jump: **Space** or **8**. Shield and air dodge: **Q**. Light shield: **0**. Grab: **O**
 - Attack: **N**, with a direction for tilts. Hold Strong (**9**) and press **N** for smashes: up, down, or forward with a side direction or none. Special: **U**, with a direction
-- EX special: **9 + U** with a direction, which costs one meter segment. Ultimate: **N + U** together at a full meter
+- EX special: **9 + U** with a direction, which spends the EX charge. Ultimate: **N + U** together at a full ultimate meter
 - Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: type **-clip**
 
 Rebind any key on the Controls screen, or press **F1** before a match. The full guide is in the GitHub repository: [smashcraft/docs/player-guide.md at main · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/blob/main/docs/player-guide.md)

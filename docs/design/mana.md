@@ -1,91 +1,107 @@
-# Super meter
+# Two meters: EX and ultimate
 
-Tom replaced special costs with one super meter on 8 October 2026 (#335).
-Every regular special is free, including its full recovery form. Normals,
-grabs and throws remain free. Shield + Special requests the EX version in
-any of the four directions. The bar has three segments (33/33/34 points,
-#382): an EX costs one segment and an ultimate ([ultimates.md](ultimates.md))
-costs the full bar.
+Tom replaced special costs with one super meter on 8 October 2026 (#335) and
+rebuilt how it fills on 26 October 2026 (#484). On 28 October 2026 Tom replaced
+that single 100-point bar, its clock trickle and its 20 s meter drops at
+rotating stage points (#385) with two meters and orbs at the centre of the
+stage. Every regular special is free, including its full recovery form.
+Normals, grabs and throws remain free. Shield + Special requests the EX
+version in any of the four directions, and the ultimate
+([ultimates.md](ultimates.md)) keeps its own input.
 
-The simulation stores the bar in each fighter's `mana.points`; meter is part
-of replay and rollback state. The rules live in
-smashcraft:ts/src/game/sim/mana.ts and sim/exSpecials.ts; the match step runs
-the trickle and smashcraft:ts/src/game/match/meterDrops.ts the drops.
+Each fighter carries two independent meters, `fighter.meter.ex` and
+`fighter.meter.ultimate`. Both are frame counters, part of replay and
+rollback state, and both are kept through a KO and respawn. The rules live in
+smashcraft:ts/src/game/sim/meter.ts and sim/exSpecials.ts; the match step
+runs the regeneration and the orbs (smashcraft:ts/src/game/match/orbs.ts), whose
+rules and record live in smashcraft:ts/src/game/sim/orbs.ts and sim/orbState.ts.
 
-Tom rebuilt how the bar fills on 26 October 2026 (#484): no meter comes from
-damage, taken or dealt. Gain from taking damage rewarded the player who guessed
-wrong, and gain from dealing it was win-more. The bar now fills from two
-sources: a trickle that both players earn at the same rate on a pure clock
-(as Street Fighter 6's Drive gauge regenerates), and meter drops on a fixed
-20 s clock (as Dota 2's power runes spawn,
-[gameplay design](../gameplay-design.md#meter-drops-385)). In an even match
-about half of each player's meter comes from each, so the player who wins the
-drops earns about one extra ultimate a match.
+No meter comes from damage, taken or dealt: gain from taking damage rewarded
+the player who guessed wrong, and gain from dealing it was win-more. Both
+meters fill on the pure match clock, and the stage's orb gives the player who
+wins the centre a bonus on top of that clock, as Dota 2's power runes reward
+the team that reaches the river
+([gameplay design](../gameplay-design.md#centre-stage-orbs)).
 
 | Rule | Value |
 |---|---|
-| Bar size | 100 integer points, one bar in three segments at 33 and 66. A new match starts at 0. |
-| Trickle | 1 point every 150 frames (2.5 s, `ROSTER_MANA.trickleFrames`) for each fighter in the match, counted from GO on a pure clock with no conditions: none in the start hold or while KO'd. 24 points a minute. |
-| Meter drop | 18 points (`ROSTER_MANA.dropGain`) to the fighter who takes it; one drop every 20 s on a fixed clock. |
-| Damage dealt or taken | 0 points. |
-| Idle, movement or shielding | Nothing beyond the trickle. |
-| Shield damage or parry | 0 points. |
-| Stock loss | Keep the current points through the KO and respawn. |
-| Regular special | 0 points; always chooses its full ground or air form. Existing cooldowns, airtime limits and entity limits still apply. |
-| EX special | Needs one segment (33 points); pays 33 once when the action starts. A full bar buys three. |
-| Ultimate | Needs all 100 points; pays 100 once when it starts, leaving 0. |
-| EX below 33, or ultimate below 100 | The ordinary free special starts. No refusal or partial spend. |
-| Interrupted or missed EX | The bar stays spent. Follow-up inputs do not spend it again. |
-| Full bar | Further gain stops at 100; no second bar or stored overflow. |
+| EX meter | One charge. Fills 1 frame per frame from GO and is full at 720 frames (12 s); it stops while full, with no overflow. A match starts empty, so the first charge arrives at 0:12. |
+| Ultimate meter | Fills 1 frame per frame from GO and is full at 7200 frames (2 min); it stops while full. |
+| Regeneration clock | The pure match clock after GO, for every fighter in every mode (versus, Training, Classic, lore runs), including while KO'd. Nothing runs during the start hold. |
+| Damage dealt or taken | 0. |
+| Idle, movement, shielding, shield damage or parry | Nothing beyond the clock. |
+| Stock loss | Both meters keep their value through the KO and respawn. |
+| Regular special | Free; always chooses its full ground or air form. Existing cooldowns, airtime limits and entity limits still apply. |
+| EX special | Needs a full EX charge and spends only it, emptying the EX meter; regeneration restarts from zero. The ultimate meter is untouched. |
+| Ultimate | Needs a full ultimate meter and spends only it, emptying the ultimate meter. The EX charge is untouched. |
+| EX not full, or ultimate not full | The ordinary free special starts. No refusal or partial spend. |
+| Ultimate pressed over an EX special | If the ultimate replaces an EX special within its first leniency frames, the EX charge is refunded. |
+| Interrupted or missed EX | The charge stays spent. Follow-up inputs do not spend it again. |
+| Orb | An EX orb fills the EX charge. An ultimate orb adds half an ultimate meter (3600 frames). Taken into an already full meter, the orb is wasted. Schedule and pickup are in [gameplay design](../gameplay-design.md#centre-stage-orbs); Training, Classic and lore runs have no orbs, so the clock alone fills both meters there. |
 
-Examples: the trickle alone fills one EX segment in 82.5 s and a full bar in
-250 s. A player who takes two drops and trickles for a minute holds 60 points.
-A fighter at 99 that takes a drop holds 100.
-
-The values come from `bun scripts/meterRate.ts` (from ts/): a seeded field of
-Expert CPUs over every pair of the roster, 3 stocks on Frozen Throne. Over 325
-matches (median 2.3 minutes, 2.5 stocks lost per player), 150 frames per
-trickle point and 18 points per drop earned 0.50 full bars per stock lost
-(one ultimate per two stocks lost if EX is unspent). 49% of all meter came
-from drops. The fighter ahead on stocks took 16% of drops, the fighter behind
-25%, and 58% were taken with stocks level (#484).
-
-Training and Classic and lore runs have no drops, so the trickle alone fills
-the bar there.
+Examples: with the clock alone a fighter holds a charge at 0:12, and after
+spending it the charge returns 12 s later. A fighter who spends the EX charge
+when an EX orb is due at 0:15 has the charge back at 0:27, 3 s before the
+orb at 0:30, so the orb is only worth taking if the other fighter should not
+have it. A fighter who spends at 0:14 and wins the 0:15 orb holds a bonus
+charge to hold or spend at once, 12 s ahead of the opponent's regeneration.
+The ultimate fills in 2 min by the clock alone, and the orb on the minute mark
+is worth half of it: the fighter who takes the 1:00 orb has a full ultimate
+meter at 1:00, and the other waits for the clock at 2:00.
 
 ## Ready signal
 
-A thin segmented blue bar sits on each fighter's HUD plate. Two marks
-divide it into its three segments, one EX each. The HUD is the only meter display;
-fighters carry no duplicate overhead bar or pips.
+The fighter's rim of light shows what is ready (`presentation/meterGlow.ts`).
+A full EX charge wears a cool blue rim. A full ultimate meter, with ultimates
+on, wears a warm gold rim breathing slowly. With both ready the rim alternates
+between the two every 40 frames. The white 12-frame fighter flash and
+Warcraft's stock `Sound\Interface\ItemReceived.flac` mark the ultimate meter
+becoming ready, once on the confirmed frame (GameFound until #361: a
+7.5-second fanfare that was heard mid-match as a stray music clip). Replay and
+prediction never play the sound.
 
-At 100 points the bar glows gold continuously until the bar is spent or
-drained. Crossing from below 100 to 100 flashes the fighter white for 12
-frames and plays Warcraft's stock `Sound\Interface\ItemReceived.flac` once on
-the confirmed frame (GameFound until #361: a 7.5-second fanfare that was
-heard mid-match as a stray music clip). Replay and prediction never play the sound. A rise of
-at least 3 points also gives the bar a short 12-update glow. The old
-“EX Neutral + Side” affordability label is removed: a full bar pays for any
-direction, so its glow carries the whole message. The full-bar glow is
-also the ultimate's ready signal.
+The HUD plate carries both meters (`presentation/meterBar.ts`,
+`ui/meterBar.ts`). A small EX cell sits on the left: a blue fill rises over
+12 s and a teal glow marks a charged cell. An ultimate bar sits to its right
+with an orange fill and a yellow glow when full. The existing purple flash
+marks a drain. The HUD is the only meter display; fighters carry no
+duplicate overhead bar or pips.
 
-These cues reuse the game's white fighter flash and stock sound; they add
-no imported art or audio. sim/mana.tests.ts and sim/exSpecials.tests.ts pin
-the resource rules in Bun and Lua32. test/mana-bar.test.ts checks the Wisp
-frames, fighter flash and ready sound log.
+These cues reuse the game's white fighter flash and stock sounds; they add no
+imported art or audio. match/orbs.tests.ts and presentation/meterRim.tests.ts
+pin the resource, orb and glow rules in Bun and Lua32.
 
 ## Drain and refunds
 
-Authored damage drains and steals operate on the same 100-point bar; gain still comes only from the trickle and drops. No status reads the bar:
-Illidan's Mana Burn stun, the one that did, left his kit with Eye Beam (2026-10-28).
-Hero-specific spell refunds remain authored move effects; they never make
-an ordinary special cost meter.
+Authored damage drains and steals (Illidan's hit drains and steals, Lich's
+Dark Ritual gain) act only on the ultimate meter; their authored numbers are
+read as a percent of an ultimate meter, 72 frames per percent. The EX charge
+cannot be drained. No status reads the meter: Illidan's Mana Burn stun, the
+one that did, left his kit with Eye Beam (2026-10-28). Hero-specific spell
+refunds remain authored move effects; they never make an ordinary special
+cost meter.
+
+## Open questions (to test)
+
+- Holding the orb while a player respawns until their invincibility ends:
+  whether the wait reads as fair or as a stall.
+- Pickup height with the shortest and tallest fighters in play: whether both
+  reach the orb as easily as a standing hurt capsule suggests.
+- Lining the warning cue up with the 3 s window in which a spent EX charge
+  returns.
+- The orb interval against full shield regeneration.
+- Whether the EX and ultimate glows read at a glance, alone and together.
+- Whether a 12 s EX regeneration is too frequent.
+- Whether regeneration should pause while a fighter is KO'd.
+- Whether drains should act on the ultimate meter.
+- Ultimates aim at about 25-30% damage; the current values are being
+  tabulated separately.
 
 ## Every special has an EX form (#329)
 
-Tom's 8 October super-bar decision (#335), with the #382 segments:
-ordinary specials are free; the trickle and meter drops build one bar (#484), and one
-segment buys one EX with Shield + Special in any direction. #335 owns the bar's
+Tom's 8 October super-bar decision (#335): ordinary specials are free, and a
+full EX charge buys one EX with Shield + Special in any direction. The two
+meters replaced the single bar on 28 October 2026; the sections above own the
 earning rules and display. This section owns the move upgrades.
 
 ### EX design principles (2026-10-28)
@@ -265,14 +281,14 @@ there are no new imports.
 
 Tom asked for an EX wavedash on 28 October 2026: hold Strong while air
 dodging into the ground, the input that makes an EX special. When the dodge
-lands as a wavedash or waveland with horizontal speed and the fighter can pay
-an EX, it pays one EX once on the landing frame and adds a fixed
+lands as a wavedash or waveland with horizontal speed and the fighter holds
+the EX charge, it spends the charge once on the landing frame and adds a fixed
 `EX_WAVEDASH_SPEED` of 0.625 Melee units a frame (3.75 world units) to the
 slide in its direction (smashcraft:ts/src/game/sim/exWavedash.ts). Every
 fighter and every angle gets the same speed, so a 45-degree EX wavedash is the
 45-degree slide plus the same push and a max-length one is the longest slide
 plus it. Landing lag (10 frames) and every animation keep their timing; only
-the distance changes. Without Strong or without an EX, and for a dodge with no
+the distance changes. Without Strong or without the EX charge, and for a dodge with no
 horizontal part (straight down), the landing is the ordinary wavedash and
 nothing is spent, so the ordinary wavedash keeps all its angles and lengths.
 
@@ -286,5 +302,5 @@ flash on the first slide frame and blue mana sparkles every third slide frame.
 
 ## Ultimates
 
-[ultimates.md](ultimates.md) owns the ultimate moves. They spend the whole
-shared bar; there is no second resource.
+[ultimates.md](ultimates.md) owns the ultimate moves. They spend only the
+ultimate meter; the EX charge is a separate meter and is never touched.
