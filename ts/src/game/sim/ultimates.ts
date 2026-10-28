@@ -61,7 +61,7 @@ const RIFLEMAN: AuthoredSpecial = {
 const ILLIDAN: AuthoredSpecial = {
   name: "Metamorphosis", endFrame: 50,
   projectiles: [mark("Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx", 2, 30, 0.0), mark("Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx", 2, 30, 0.0)],
-  regions: [heroRegion(31, 33, capsule(-160.0, 60.0, 160.0, 60.0, 70.0), hit(12.0, 70, 80.0, 45.0, HitElement.fire))],
+  regions: [heroRegion(31, 33, capsule(-160.0, 60.0, 160.0, 60.0, 70.0), hit(26.0, 70, 80.0, 45.0, HitElement.fire))],
   buff: { frame: 31, kind: ItemKind.speed, frames: 480 },
 };
 
@@ -99,7 +99,7 @@ const BLADEMASTER: AuthoredSpecial = {
 const MOUNTAIN_KING: AuthoredSpecial = {
   name: "Avatar", endFrame: 50,
   projectiles: [mark("Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx", 16, 34, 0.0), mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 33, 14, 0.0)],
-  regions: [heroRegion(33, 35, capsule(-180.0, 30.0, 180.0, 30.0, 50.0), hit(8.25, 75, 75.0, 40.0))],
+  regions: [heroRegion(33, 35, capsule(-180.0, 30.0, 180.0, 30.0, 50.0), hit(26.0, 75, 75.0, 40.0))],
   buff: { frame: 33, kind: ItemKind.heavy, frames: 600 },
 };
 
@@ -107,7 +107,7 @@ const WARDEN: AuthoredSpecial = {
   name: "Vengeance", endFrame: 40,
   placement: {
     frame: 22, offsetX: -60.0, radius: 40.0, height: 140.0, durability: 30.0, life: 90, fireAges: [2, 17, 32, 47],
-    shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(5.0, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx"),
+    shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(6.5, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx"),
     model: { path: "Units\\NightElf\\SpiritOfVengeance\\SpiritOfVengeance.mdx", height: 150.0, alpha: 255 },
   },
 };
@@ -116,7 +116,7 @@ const LICH: AuthoredSpecial = {
   name: "Frost Wyrm", endFrame: 60,
   projectiles: [
     mark("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathTargetArt.mdx", 2, 29, -600.0, 95.0),
-    { ...shot(31, -600.0, 95.0, 28.0, 0.0, 70, 45.0, hit(16.0, 60, 85.0, 45.0, HitElement.ice), "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx"), status: CHILL },
+    { ...shot(31, -600.0, 95.0, 28.0, 0.0, 70, 45.0, hit(26.0, 60, 85.0, 45.0, HitElement.ice), "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx"), status: CHILL },
   ],
 };
 
@@ -128,7 +128,7 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 0.0), atMark: JUDGMENT_CIRCLE },
   ],
   regions: [
-    heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 150.0, 100.0), hit(18.0, 75, 90.0, 45.0, HitElement.holy)),
+    heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 150.0, 100.0), hit(27.5, 75, 90.0, 45.0, HitElement.holy)),
     heroRegion(52, 52, capsule(-110.0, 10.0, 110.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
     heroRegion(64, 64, capsule(-110.0, 10.0, 110.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
   ],
@@ -139,11 +139,11 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
 const INFERNAL_RADIUS = 50.0;
 const INFERNO_MARK = { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 37, 260.0), ...ON_FLOOR, ledgeInset: INFERNAL_RADIUS };
 const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 0.0), atMark: INFERNO_MARK };
-const INFERNAL_IMMOLATION: SpecialProjectile = shot(0, 0.0, 70.0, 0.0, 0.0, 6, 75.0, hit(1.5, 70, 15.0, 20.0, HitElement.fire), "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx");
+const INFERNAL_IMMOLATION: SpecialProjectile = shot(0, 0.0, 70.0, 0.0, 0.0, 6, 75.0, hit(0.5, 70, 15.0, 20.0, HitElement.fire), "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx");
 const INFERNAL: SpecialCompanion = {
   followSpeed: 2.5, followBehind: 80.0, returnSpeed: 4.0, engage: 120.0,
   lungeStartup: 16, lungeActive: 6, lungeRecovery: 44, lungeTravel: 50.0,
-  bite: capsule(10.0, 30.0, 120.0, 60.0, 55.0), biteEffect: hit(9.0, 45, 72.0, 40.0, HitElement.fire),
+  bite: capsule(10.0, 30.0, 120.0, 60.0, 55.0), biteEffect: hit(3.0, 45, 72.0, 40.0, HitElement.fire),
   stunFrames: 24, leash: 900.0, leashFrames: 120,
 };
 const INFERNAL_PLACEMENT: SpecialPlacement = {
@@ -197,20 +197,20 @@ const BEASTMASTER: AuthoredSpecial = {
   name: "Stampede", endFrame: 70, groundOnly: true,
   projectiles: [
     mark("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx", 2, 22, -100.0),
-    shot(25, -150.0, 25.0, 22.0, 0.0, 60, 30.0, hit(9.0, 40, 80.0, 40.0), "units\\creeps\\QuillBeast\\QuillBeast.mdl"),
-    shot(40, -150.0, 70.0, 22.0, 0.0, 60, 45.0, hit(9.0, 40, 80.0, 40.0), "units\\creeps\\GrizzlyBear\\GrizzlyBear.mdl"),
-    shot(55, -150.0, 190.0, 22.0, 0.0, 60, 30.0, hit(9.0, 40, 80.0, 40.0), "units\\creeps\\WarEagle\\WarEagle.mdl"),
+    shot(25, -150.0, 25.0, 22.0, 0.0, 60, 30.0, hit(13.0, 40, 80.0, 40.0), "units\\creeps\\QuillBeast\\QuillBeast.mdl"),
+    shot(40, -150.0, 70.0, 22.0, 0.0, 60, 45.0, hit(13.0, 40, 80.0, 40.0), "units\\creeps\\GrizzlyBear\\GrizzlyBear.mdl"),
+    shot(55, -150.0, 190.0, 22.0, 0.0, 60, 30.0, hit(13.0, 40, 80.0, 40.0), "units\\creeps\\WarEagle\\WarEagle.mdl"),
   ],
 };
 
-const RISEN = shot(0, 0.0, 40.0, 0.0, 0.0, 4, 90.0, hit(15.0, 85, 90.0, 45.0, HitElement.dark), "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx");
+const RISEN = shot(0, 0.0, 40.0, 0.0, 0.0, 4, 90.0, hit(26.0, 85, 90.0, 45.0, HitElement.dark), "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx");
 const LICH_KING: AuthoredSpecial = {
   name: "Animate Dead", endFrame: 64,
   projectiles: [mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 2, 38, 0.0, 0.0, true, RISEN)],
 };
 
 const tremor = (direction: number): SpecialProjectile => ({
-  ...shot(27, direction * 40.0, 25.0, direction * 16.0, 0.0, 50, 50.0, hit(15.0, 70, 85.0, 40.0), "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx"),
+  ...shot(27, direction * 40.0, 25.0, direction * 16.0, 0.0, 50, 50.0, hit(26.0, 70, 85.0, 40.0), "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx"),
   pool: { every: 60, growth: 0.0, maxRadius: 50.0 },
 });
 const THRALL: AuthoredSpecial = {
@@ -250,7 +250,7 @@ const SYLVANAS: AuthoredSpecial = {
     { ...frames(99, 99), velocityX: 0.0, velocityZ: 0.0 },
   ],
   intangible: frames(19, 98),
-  regions: [heroRegion(19, 98, capsule(0.0, 45.0, 0.0, 75.0, 32.0), hit(14.0, 45, 72.0, 45.0, HitElement.dark))],
+  regions: [heroRegion(19, 98, capsule(0.0, 45.0, 0.0, 75.0, 32.0), hit(26.0, 45, 72.0, 45.0, HitElement.dark))],
   followUps: [{ window: frames(19, 99), input: FollowUpInput.contact, special: BANSHEE_CARRY }],
   refreshesAir: true,
 };
@@ -268,7 +268,7 @@ const CAIRNE: AuthoredSpecial = {
     { ...mark("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", 28, 24, 0.0), cancelOnInterrupt: true },
   ],
   regionOrigin: CAIRNE_ANKH,
-  regions: [heroRegion(25, 27, capsule(-140.0, 50.0, 140.0, 50.0, 50.0), hit(12.0, 85, 60.0, 55.0, HitElement.holy))],
+  regions: [heroRegion(25, 27, capsule(-140.0, 50.0, 140.0, 50.0, 50.0), hit(26.0, 85, 60.0, 55.0, HitElement.holy))],
   motion: [{ ...frames(34, 34), velocityX: 0.0, velocityZ: 0.0, relocateProjectile: CAIRNE_ANKH }],
   // The engine primes intangibility one frame ahead, so arrival protection starts at teleport frame 34.
   intangible: frames(35, 39),
@@ -305,7 +305,7 @@ const PEON: AuthoredSpecial = {
   },
 };
 
-const OVERDRIVE_BLAST = shot(0, 0.0, 30.0, 0.0, 0.0, 4, 150.0, hit(18.0, 55, 90.0, 45.0, HitElement.fire), "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx");
+const OVERDRIVE_BLAST = shot(0, 0.0, 30.0, 0.0, 0.0, 4, 150.0, hit(23.0, 55, 90.0, 45.0, HitElement.fire), "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx");
 const TINKER: AuthoredSpecial = {
   name: "Robo-Goblin Overdrive", endFrame: 50, needsFloorBelow: true,
   projectiles: [{ ...shot(20, 60.0, 30.0, 6.0, 0.0, 60, 40.0, hit(3.0, 30, 20.0, 30.0), "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl"), expiresInto: OVERDRIVE_BLAST, ...ON_FLOOR }],
@@ -329,7 +329,7 @@ const KAELTHAS: AuthoredSpecial = {
 
 const MURLOC_MODEL = "units\\creeps\\Murloc\\Murloc.mdl";
 const swarm = (offsetX: number): SpecialProjectile => ({
-  ...shot(20, offsetX, 20.0, 30.0, 0.0, 45, 40.0, hit(2.0, 25, 10.0, 30.0), MURLOC_MODEL),
+  ...shot(20, offsetX, 20.0, 30.0, 0.0, 45, 40.0, hit(4.0, 25, 10.0, 30.0), MURLOC_MODEL),
   pool: { every: 6, growth: 0.0, maxRadius: 40.0 }, modelRadius: 70.0,
 });
 const MURLOC: AuthoredSpecial = {
@@ -337,7 +337,7 @@ const MURLOC: AuthoredSpecial = {
   projectiles: [
     mark("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", 2, 18, -520.0),
     swarm(-520.0), swarm(-560.0), swarm(-600.0),
-    { ...shot(20, -660.0, 20.0, 30.0, 0.0, 45, 40.0, hit(10.0, 40, 90.0, 45.0), MURLOC_MODEL), modelRadius: 70.0 },
+    { ...shot(20, -660.0, 20.0, 30.0, 0.0, 45, 40.0, hit(22.0, 40, 90.0, 45.0), MURLOC_MODEL), modelRadius: 70.0 },
   ],
 };
 
@@ -348,7 +348,7 @@ const GROM: AuthoredSpecial = {
   name: "Blood of Mannoroth", endFrame: 70,
   projectiles: [mark("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", 1, 16, 0.0)],
   motion: [{ ...frames(17, 40), velocityX: 22.0, velocityZ: 0.0 }, { ...frames(41, 41), velocityX: 0.0, velocityZ: 0.0 }],
-  commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(11.5, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
+  commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(26.0, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
   hurt: [
     pose(1, 7, [part(-14.0, -8.0, -34.0, 141.0, 48.0)]),
     pose(8, 13, [part(-18.0, 28.0, -26.0, 52.0, 27.0), part(-58.0, 104.0, -58.0, 104.0, 36.0), part(-94.0, 132.0, -94.0, 169.0, 20.0)]),
@@ -362,7 +362,7 @@ const LOCUST = "Units\\Undead\\Locust\\Locust.mdx";
 const ANUBARAK: AuthoredSpecial = {
   name: "Locust Swarm", endFrame: 60, groundOnly: true,
   projectiles: [
-    { ...shot(17, 60.0, 60.0, 5.0, 0.0, 90, 90.0, hit(2.0, 80, 10.0, 25.0, HitElement.poison), LOCUST), pool: { every: 12, growth: 0.0, maxRadius: 90.0 } },
+    { ...shot(17, 60.0, 60.0, 5.0, 0.0, 90, 90.0, hit(6.5, 80, 10.0, 25.0, HitElement.poison), LOCUST), pool: { every: 12, growth: 0.0, maxRadius: 90.0 } },
     ...[{ x: 5.0, z: 105.0 }, { x: 115.0, z: 85.0 }, { x: 95.0, z: 15.0 }].map(({ x, z }) => ({ ...mark(LOCUST, 17, 90, x, z), velocityX: 5.0 })),
   ],
 };
@@ -371,7 +371,7 @@ const MALFURION: AuthoredSpecial = {
   name: "Wisps of Hyjal", endFrame: 50,
   projectiles: [
     mark("Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx", 2, 26, 0.0),
-    shot(29, 60.0, 70.0, 7.0, 0.0, 120, 70.0, hit(20.0, 50, 90.0, 45.0, HitElement.holy), "Units\\NightElf\\Wisp\\Wisp.mdx"),
+    shot(29, 60.0, 70.0, 7.0, 0.0, 120, 70.0, hit(26.0, 50, 90.0, 45.0, HitElement.holy), "Units\\NightElf\\Wisp\\Wisp.mdx"),
   ],
 };
 
@@ -386,7 +386,7 @@ const MEDIVH: AuthoredSpecial = {
       heroRegion(first, first, capsule(-200.0, 50.0, -40.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark)),
       heroRegion(first, first, capsule(40.0, 50.0, 200.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark, true)),
     ]),
-    heroRegion(64, 66, capsule(0.0, 20.0, 0.0, 120.0, 110.0), hit(12.0, 60, 90.0, 45.0, HitElement.dark)),
+    heroRegion(64, 66, capsule(0.0, 20.0, 0.0, 120.0, 110.0), hit(23.0, 60, 90.0, 45.0, HitElement.dark)),
   ],
   rehits: [...PULL, 64],
 };
@@ -399,7 +399,7 @@ const KOBOLD: AuthoredSpecial = {
   intangible: frames(8, 54),
   projectiles: [{ ...mark("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", 8, 12, 0.0), ...ON_FLOOR }],
   motion: [{ ...frames(KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST), velocityX: 10.0, velocityZ: 0.0, driftSpeed: 6.0, stopsAtBody: true, relocate: Relocation.floorBelow }, { ...frames(55, 58), velocityX: 0.0, velocityZ: 12.0 }],
-  regions: [heroRegion(55, 58, capsule(20.0, 0.0, 20.0, 120.0, 50.0), hit(16.0, 85, 85.0, 45.0))],
+  regions: [heroRegion(55, 58, capsule(20.0, 0.0, 20.0, 120.0, 50.0), hit(26.0, 85, 85.0, 45.0))],
 };
 
 /** Every fighter's ultimate, by character. */
