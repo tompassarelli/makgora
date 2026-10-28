@@ -1277,6 +1277,14 @@ The desync guard (smashcraft:ts/test/desync-guard.test.ts) pins the input
 trace's start this way. Its lockstep compare flags any synchronized native a
 one-client call makes.
 
+Presented and confirmed frames are such moments too: each client paces them by
+its own `os.clock` and its own prediction. Chen's parasol was created and
+destroyed on presented frames, and two 0.2 Battle.net games desynced on the
+first match with Chen (#681). Make a presentation's effects with the fighter's
+renderers and only show and hide them afterwards.
+smashcraft:ts/test/online-handles.test.ts drifts one client's clock and compares
+handle births and deaths per turn while Chen opens and folds his parasol.
+
 If one client creates a handle a turn earlier than the other, the two
 clients' birth counters and free-list heads differ at that turn's checksum.
 That is a desync, even though both clients end with the same objects a turn

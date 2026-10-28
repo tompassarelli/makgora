@@ -2,13 +2,18 @@ import { characterModelScale } from "../presentation/modelScale";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { PARASOL_FOLD_FRAMES, PARASOL_GRIP, PARASOL_MODEL, parasolShown } from "../presentation/parasolLook";
 import type { Fighter } from "../sim/fighter";
-import { effectMotion, placeEffect, type WorldOrigin } from "./effects";
+import { hideEffect, placeEffect, type WorldOrigin } from "./effects";
 
 export class ParasolPresentation {
-  private parasol: effect | undefined;
+  // Online, Warcraft handles must be born on the same turn on every client, so the parasol is made at setup and only shown and hidden on presented frames.
+  private readonly parasol: effect;
+  private shown = false;
   private foldFrame: number | undefined;
 
-  constructor(private readonly origin: Readonly<WorldOrigin>) {}
+  constructor(private readonly origin: Readonly<WorldOrigin>) {
+    this.parasol = AddSpecialEffect(PARASOL_MODEL, origin.x, origin.y);
+    hideEffect(this.parasol, origin);
+  }
 
   /** Placed from the body's own draw on the presented frame, so it moves with the drawn model. */
   present(fighter: Readonly<Fighter> | undefined, draw: Readonly<FighterDraw>, drawn: boolean, frame: number): void {
@@ -18,43 +23,41 @@ export class ParasolPresentation {
     }
     if (parasolShown(fighter)) {
       if (this.foldFrame !== undefined) this.hide();
-      this.parasol ??= AddSpecialEffect(PARASOL_MODEL, this.origin.x, this.origin.y);
-      this.place(this.parasol, fighter, draw);
+      if (!this.shown) BlzPlaySpecialEffect(this.parasol, ANIM_TYPE_BIRTH);
+      this.shown = true;
+      this.place(fighter, draw);
       return;
     }
-    const parasol = this.parasol;
-    if (parasol === undefined) return;
+    if (!this.shown) return;
     if (this.foldFrame === undefined) {
-      BlzPlaySpecialEffect(parasol, ANIM_TYPE_DEATH);
+      BlzPlaySpecialEffect(this.parasol, ANIM_TYPE_DEATH);
       this.foldFrame = frame;
     } else if (frame < this.foldFrame || frame - this.foldFrame >= PARASOL_FOLD_FRAMES) {
       this.hide();
       return;
     }
-    this.place(parasol, fighter, draw);
+    this.place(fighter, draw);
   }
 
-  private place(parasol: effect, fighter: Readonly<Fighter>, draw: Readonly<FighterDraw>): void {
+  private place(fighter: Readonly<Fighter>, draw: Readonly<FighterDraw>): void {
     const scale = characterModelScale(fighter.character);
-    BlzSetSpecialEffectScale(parasol, scale);
-    placeEffect(parasol, this.origin.x + draw.x + draw.facing * PARASOL_GRIP.x * scale, this.origin.y + draw.y, this.origin.z + draw.z + PARASOL_GRIP.z * scale);
+    BlzSetSpecialEffectScale(this.parasol, scale);
+    placeEffect(this.parasol, this.origin.x + draw.x + draw.facing * PARASOL_GRIP.x * scale, this.origin.y + draw.y, this.origin.z + draw.z + PARASOL_GRIP.z * scale);
   }
 
   drawnEffects(into: effect[]): void {
-    if (this.parasol !== undefined) into.push(this.parasol);
+    if (this.shown) into.push(this.parasol);
   }
 
   hide(): void {
-    const parasol = this.parasol;
     this.foldFrame = undefined;
-    if (parasol === undefined) return;
-    effectMotion().release(parasol);
-    BlzSetSpecialEffectScale(parasol, 0.0);
-    DestroyEffect(parasol);
-    this.parasol = undefined;
+    if (!this.shown) return;
+    this.shown = false;
+    hideEffect(this.parasol, this.origin);
   }
 
   destroy(): void {
     this.hide();
+    DestroyEffect(this.parasol);
   }
 }

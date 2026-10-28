@@ -62,7 +62,8 @@ export interface StageDrifter {
 
 export interface FighterBody {
   readonly unit: unit;
-  dizzy: effect | undefined;
+  readonly dizzy: effect;
+  dizzyShown: boolean;
 
   renderedSelection: number;
   color: number;

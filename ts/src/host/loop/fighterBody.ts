@@ -5,7 +5,7 @@ import { ShieldBreak } from "../../game/sim/codes";
 import { fighterPoseFacing } from "../../game/sim/conditions";
 import type { Fighter } from "../../game/sim/fighter";
 import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
-import type { WorldOrigin } from "../../game/render/effects";
+import { type WorldOrigin, hideEffect } from "../../game/render/effects";
 import type { FighterBody } from "./state";
 import { FIGHTER_OBJECTS } from "../../game/objectData";
 import { applyFighterObject } from "../../platform/objectData";
@@ -48,30 +48,33 @@ export function createFighterBody(owner: player, fighter: Readonly<Fighter>, ori
   UnitRemoveAbility(unit, CROW_FORM);
   UnitAddAbility(unit, LOCUST);
   PauseUnit(unit, true);
-  const body: FighterBody = { unit, dizzy: undefined, renderedSelection: 0, color: -1 };
+  // Online, Warcraft handles must be born on the same turn on every client, so the dizzy stars are made with the body and only shown and hidden on drawn frames.
+  const dizzy = AddSpecialEffect(DIZZY_MODEL, origin.x, origin.y);
+  hideEffect(dizzy, origin);
+  const body: FighterBody = { unit, dizzy, dizzyShown: false, renderedSelection: 0, color: -1 };
   placeFighterBody(body, fighter, origin);
   return body;
 }
 
-function clearDizzy(body: FighterBody): void {
-  if (body.dizzy === undefined) return;
-  BlzSetSpecialEffectScale(body.dizzy, 0.0);
-  DestroyEffect(body.dizzy);
-  body.dizzy = undefined;
+function clearDizzy(body: FighterBody, origin: WorldOrigin): void {
+  if (!body.dizzyShown) return;
+  body.dizzyShown = false;
+  hideEffect(body.dizzy, origin);
 }
 
 
 export function renderDizzy(body: FighterBody, fighter: Readonly<Fighter>, playing: boolean, origin: WorldOrigin): void {
   if (fighter.shield.breakState !== ShieldBreak.dizzy || fighter.status.out || !playing) {
-    clearDizzy(body);
+    clearDizzy(body, origin);
     return;
   }
   const x = origin.x + fighter.motion.x;
-  body.dizzy ??= AddSpecialEffect(DIZZY_MODEL, x, origin.y);
+  if (!body.dizzyShown) BlzSetSpecialEffectScale(body.dizzy, 1.0);
+  body.dizzyShown = true;
   BlzSetSpecialEffectPosition(body.dizzy, x, origin.y, f32(origin.z + fighter.motion.z + 115));
 }
 
 export function removeFighterBody(body: FighterBody): void {
-  clearDizzy(body);
+  DestroyEffect(body.dizzy);
   RemoveUnit(body.unit);
 }

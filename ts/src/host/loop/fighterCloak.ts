@@ -13,8 +13,8 @@ const drawn: effect[] = [];
 function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   drawn.length = 0;
   const renderers = s.ui?.fighters[slot];
-  const dizzy = s.participants[slot].body?.dizzy;
-  if (dizzy !== undefined) drawn.push(dizzy);
+  const body = s.participants[slot].body;
+  if (body?.dizzyShown === true) drawn.push(body.dizzy);
   if (renderers === undefined) return drawn;
   renderers.pool?.drawnEffects(drawn);
   renderers.flash.drawnEffects(drawn);
@@ -63,7 +63,7 @@ export function hideFighter(s: ShellState, slot: ParticipantSlot, hidden: boolea
   if (was === undefined || !was.body) return true;
   s.hiddenFighters[slot] = was.bare ? { unitShown: was.unitShown, body: false, bare: true } : undefined;
   ShowUnit(body.unit, was.unitShown);
-  if (body.dizzy !== undefined) BlzSetSpecialEffectScale(body.dizzy, 1.0);
+  if (body.dizzyShown) BlzSetSpecialEffectScale(body.dizzy, 1.0);
   s.ui?.fighters[slot]?.pool?.redraw();
   return true;
 }
