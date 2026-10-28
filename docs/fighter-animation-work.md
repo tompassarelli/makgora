@@ -661,11 +661,11 @@ re-keys those clips in place in the shipped model at their own indices and
 lengths, and checks every other clip unchanged; the Blender scene is the one
 from 7 October, so pass `WC3_MDL_ADDON` when the exporter is not at its
 default path. `Locomotion Walk` takes the longest steps his legs reach (62 units
-either side) centred under hips sat 15 units lower, with the torso upright, each
+either side) centred under hips sat 15 units lower, with the torso upright (the chest bone turned back 18 degrees from the ready stance's forward lean), each
 heel striking toes-up, rolling flat and lifting at push-off, one foot always
 down (stance 54% of the cycle), and each arm swinging 16 degrees from the ready
-stance so the glaives keep their angle. Its drawn stride is 233 units a second,
-so a full walk plays at 2.40 cycles a second (4.8 steps), below the run's 3.34
+stance so the glaives keep their angle. Its drawn stride is 231 units a second,
+so a full walk plays at 2.41 cycles a second (4.8 steps), below the run's 3.34
 (6.7 steps): his walk speed is near his run speed, so the legs' reach caps how
 slow a walk without foot slide can be, and the pose, not the cadence, tells the
 walk from the run (2026-10-28). fighterLocomotion.tests.ts pins the cadence.

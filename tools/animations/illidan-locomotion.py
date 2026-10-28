@@ -94,7 +94,7 @@ def pose(kind, frame, frames):
     bpy.context.view_layer.update()
     phase = frame/frames
     running = kind != 'Walk'
-    lean = 19 if running else 0
+    lean = 19 if running else -18
     crouch = 9 + 2*sin(phase*4*pi) if running else WALK_CROUCH + 1.5*sin(phase*4*pi)
     if kind == 'Initial Dash Burst':
         lean = 10 + 17*sin(min(1, phase*2)*pi/2)
