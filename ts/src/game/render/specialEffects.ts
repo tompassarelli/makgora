@@ -31,6 +31,7 @@ import { characterModelScale } from "../presentation/modelScale";
 import { IMMOLATE_SOUNDS } from "../presentation/elementLooks";
 import { SummonPresentation } from "./summonPresentation";
 import { PoisonStackPresentation } from "./poisonStackPresentation";
+import { SpellPassPresentation } from "./spellPassPresentation";
 import { SoundBank, SoundKind } from "./soundBank";
 import { bindPrototype } from "../../platform/rebind";
 
@@ -81,6 +82,7 @@ export class SpecialEffects {
   private parked: ParkedFlags | undefined;
   private readonly sounds = new SoundBank();
   private readonly stackPresentation: PoisonStackPresentation;
+  private readonly spellPass: SpellPassPresentation;
 
   private readonly front: number;
   private readonly beamLine = emptyCapsule();
@@ -91,6 +93,7 @@ export class SpecialEffects {
     this.front = y - 8.0;
     this.sounds.prepare(SoundKind.label, [IMMOLATE_SOUNDS.start, IMMOLATE_SOUNDS.end]);
     this.stackPresentation = new PoisonStackPresentation(origin);
+    this.spellPass = new SpellPassPresentation(origin);
     this.slots = PARTICIPANT_SLOTS.map((participant) => {
       const cursor = createImpactPresentationCursor();
       const bear = new SummonPresentation(SUMMON_BEAR, origin);
@@ -124,10 +127,12 @@ export class SpecialEffects {
   bindNestedCode(): void {
     for (const slot of this.slots) bindPrototype(slot.bear, SummonPresentation.prototype);
     bindPrototype(this.stackPresentation, PoisonStackPresentation.prototype);
+    bindPrototype(this.spellPass, SpellPassPresentation.prototype);
   }
 
   clear(): void {
     this.stackPresentation.clear();
+    this.spellPass.clear();
     this.slots.forEach((slot, index) => {
       resetImpactPresentationCursor(slot.cursor);
       slot.bear.hide();
@@ -162,6 +167,7 @@ export class SpecialEffects {
   setPaused(paused: boolean): void {
     const scale = paused ? 0.0 : 1.0;
     this.stackPresentation.setPaused(paused);
+    this.spellPass.setPaused(paused);
     for (const { felFlames, manaHand, silence } of this.slots) {
       BlzSetSpecialEffectTimeScale(felFlames, scale);
       BlzSetSpecialEffectTimeScale(manaHand, scale);
@@ -217,6 +223,7 @@ export class SpecialEffects {
     else this.park(slot.silence, index, SILENCE);
     this.showCurse(fighter, slot, index);
     this.stackPresentation.present(fighter, index);
+    this.spellPass.present(fighter, index);
     if (!fighter.status.out && fighter.status.condition === HeroStatusKind.hex) {
       this.show(slot.frog, index, FROG, fighter, 0.0, 0.0, f32(1.6));
       BlzSetSpecialEffectYaw(slot.frog, facingYaw(fighter.facing));
@@ -374,6 +381,7 @@ export class SpecialEffects {
 
   destroy(): void {
     this.stackPresentation.destroy();
+    this.spellPass.destroy();
     for (const slot of this.slots) {
       this.releaseImmolationLoop(slot);
       KillSoundWhenDone(slot.immolationLoop);

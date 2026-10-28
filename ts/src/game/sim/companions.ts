@@ -7,6 +7,7 @@ import { AttackStyle } from "./codes";
 import { inGrabContext, isIntangible } from "./conditions";
 import { type Fighter, type PlacedObject, mutablePlacedObject, placedObject } from "./fighter";
 import { runningHeroSpecial, spawnHeroProjectileAt } from "./specials/engine";
+import { repelSpell } from "./specials/spellImmunity";
 import { CompanionMode, type SpecialCompanion } from "./specials/schema";
 import { applyAttackHit } from "./hits";
 import { HurtContact, strikeHurtContact } from "./hurtboxes";
@@ -47,6 +48,7 @@ function biteOpponents(world: Roster, ownerSlot: number, placed: PlacedObject, p
     if (target.status.out || isIntangible(target)) continue;
     const shielded = target.shield.raised && shieldCircleIntersects(target, bite.x1, bite.z1, bite.x2, bite.z2, 1.0, bite.radius);
     if (!shielded && strikeHurtContact(bite, target) !== HurtContact.hit) continue;
+    if (repelSpell(target)) continue;
     placed.bitten |= bit;
     applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, placed.direction, partner.biteEffect, false, shielded, partner.biteStatus);
   }

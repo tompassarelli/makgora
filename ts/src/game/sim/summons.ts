@@ -13,6 +13,7 @@ import { type Roster, fighterAt, isActive } from "./roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceCount, surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 import { cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, clearLedge, clearOwnedFreezeTrap } from "./transitions";
 import { mutableBear, mutableFreezeTrap } from "./fighterRest";
+import { repelSpell, spellImmune } from "./specials/spellImmunity";
 
 export const RIFLEMAN_BEAR_LIFETIME = 60;
 export const RIFLEMAN_BEAR_EX_LIFETIME = 75;
@@ -73,7 +74,7 @@ export function startFreezeTrap(owner: Fighter, stage: number, matchFrame: numbe
 function trapCanContact(owner: Fighter, target: Fighter): boolean {
   const trap = owner.freezeTrap;
   return trap.life > 0 && trap.surface !== undefined && trap.arming === 0 && !owner.status.out && !target.status.out && target.status.frozenFrames === 0 && target.status.freezeImmunityFrames === 0
-    && target.motion.grounded && target.motion.surface === trap.surface && !isIntangible(target)
+    && target.motion.grounded && target.motion.surface === trap.surface && !isIntangible(target) && !spellImmune(target)
     && Math.abs(f32(target.motion.x - trap.x)) <= f32(FREEZE_TRAP_TRIGGER_RADIUS * (trap.exReach ? 1.25 : 1.0));
 }
 
@@ -191,7 +192,7 @@ export function advanceBear(world: Roster, ownerSlot: number, stage: number, mat
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
       if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
       const target = fighterAt(world, targetSlot);
-      if (target.status.out || isIntangible(target) || Math.abs(f32(target.motion.x - bear.x)) > 70 || Math.abs(f32(target.motion.z - bear.z)) > 100) continue;
+      if (target.status.out || isIntangible(target) || Math.abs(f32(target.motion.x - bear.x)) > 70 || Math.abs(f32(target.motion.z - bear.z)) > 100 || repelSpell(target)) continue;
       hit = true;
       applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, bear.velocityX < 0 ? -1 : 1, BEAR_SWIPE, false, target.shield.raised, undefined);
     }

@@ -1,4 +1,5 @@
 import { writeStrikeTraits } from "./strikeCanonical";
+import { writeWindow } from "./windowCanonical";
 import { type FighterFieldSink, type FighterKitText, writeFighterFields } from "../../generated/state/fighterState";
 
 
@@ -415,6 +416,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int("jumpWindow.first", move.jumpWindow.first);
     int("jumpWindow.last", move.jumpWindow.last);
   }
+  writeWindow(int, "spellImmune", move.spellImmune);
   if (move.shorten !== undefined) {
     int("shorten.first", move.shorten.first);
     int("shorten.last", move.shorten.last);

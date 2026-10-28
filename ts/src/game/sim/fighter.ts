@@ -238,6 +238,7 @@ interface VisualSerials {
   manaDrained: number;
 
   poisonBursts: number;
+  spellPass: number;
 }
 
 interface Special {
@@ -670,7 +671,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       lastAttackSerial: undefined,
       lastWindow: 0,
     },
-    visuals: { grab: 0, throw: 0, hit: 0, hitElectric: false, hitElement: HitElement.normal, hitStrength: 0, hitStrong: false, hitHeight: 1, hitPummel: false, shieldElectric: false, shield: 0, shieldReflect: 0, manaDrained: 0, poisonBursts: 0 },
+    visuals: { grab: 0, throw: 0, hit: 0, hitElectric: false, hitElement: HitElement.normal, hitStrength: 0, hitStrong: false, hitHeight: 1, hitPummel: false, shieldElectric: false, shield: 0, shieldReflect: 0, manaDrained: 0, poisonBursts: 0, spellPass: 0 },
     special: {
       action: SpecialAction.none,
       ex: false,
