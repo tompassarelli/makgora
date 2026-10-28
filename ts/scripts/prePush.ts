@@ -28,7 +28,7 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
   }
 }
 
-export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean; readonly machineTool?: boolean }
+export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly localFix?: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean; readonly machineTool?: boolean }
 
 
 const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/modelTracks.ts", "ts/scripts/poseError.ts", "ts/scripts/wisp/animJitter.ts"];
@@ -96,7 +96,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
     ] : []),
     ...(cueModels ? [
-      { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true },
+      { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true, localFix: true },
     ] : []),
     ...(fighterArt.length > 0 ? [
       { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
@@ -282,8 +282,8 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
   const lands = handsOff ? autolandLands(yield* landing.queue, paths) : false;
-  const checks = lands ? selected.filter(({ hosted }) => !hosted) : selected;
-  const deferred = lands ? selected.filter(({ hosted }) => hosted) : [];
+  const checks = lands ? selected.filter(({ hosted, localFix }) => !hosted || localFix === true) : selected;
+  const deferred = lands ? selected.filter(({ hosted, localFix }) => hosted && localFix !== true) : [];
   if (checks.length === 0 && !toMain) return;
   const head = yield* local.head;
   const dirty = checks.length === 0 ? "" : yield* local.dirty(checks.some(({ privateStore, machineTool }) => privateStore || machineTool) ? ["."] : [...new Set(checks.map(({ directory }) => directory))]);

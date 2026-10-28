@@ -39,7 +39,10 @@ checkout, smashcraft:docs/typescript.md#host-tools); every hosted check it selec
 smashcraft:ts/scripts/prePush.ts: clean room, kind tags and type-check, suite
 parity, cue models) runs instead in this same hook when Autoland's build
 pushes the rebased candidate to `farm/autoland-SHA`, and a refusal there fails
-the lane. Suite parity fails when that push skips the hook. A check that stays
+the lane. A hosted check whose fix needs this machine (`localFix`: cue models
+and the Classic effect record, refreshed from the local Warcraft III install)
+runs in both, so a stale record stops the push instead of coming back from
+Autoland as "local refresh required". Suite parity fails when that push skips the hook. A check that stays
 local is skipped when it passed before on the same key: its name, the git tree
 of its input paths (the whole tree when it names none, and only while they are
 clean) and the hash of ts/bun.lock, recorded under
