@@ -80,6 +80,7 @@ function playMatch(markers: boolean): Seen {
       spread++;
     }
     if (markers) expectMarkerText(client, first);
+    if (markers) expect(client.frames.snapshot({ visibleOnly: true }).filter(frame => /^P\d+$/.test(frame.text ?? "")).map(frame => frame.name)).toEqual([]);
     expect(client.errors).toEqual([]);
     let checksum = "";
     client.run(() => {

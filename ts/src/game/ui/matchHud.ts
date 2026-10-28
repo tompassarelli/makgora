@@ -56,7 +56,6 @@ export class FighterHud {
   private readonly damage: framehandle;
   private readonly percent: framehandle;
   private readonly name: framehandle;
-  private readonly slotLabel: framehandle;
   private readonly stocks: readonly framehandle[];
 
   private readonly stockCount: framehandle;
@@ -101,10 +100,6 @@ export class FighterHud {
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
     BlzFrameSetFont(this.name, MENU_FONT, f32(0.0072), 1);
     BlzFrameSetEnable(this.name, false);
-    this.slotLabel = createText(`FighterHUDSlot${suffix}`, parent, context + 4);
-    BlzFrameSetFont(this.slotLabel, MENU_FONT, f32(0.0085), 1);
-    BlzFrameSetText(this.slotLabel, `P${I2S(slot + 1)}`);
-    BlzFrameSetEnable(this.slotLabel, false);
     const stocks: framehandle[] = [];
     for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
       const icon = createBackdrop(`FighterHUDStock${suffix}_${I2S(index)}`, parent, context + 5 + index);
@@ -118,7 +113,7 @@ export class FighterHud {
     this.doomMark = createBackdrop(`FighterHUDDoom${suffix}`, parent, context + 8 + STOCK_ICONS_SHOWN);
     BlzFrameSetTexture(this.doomMark, DOOM_MARK_TEXTURE, 0, true);
     BlzFrameSetEnable(this.doomMark, false);
-    this.body = [this.plate, this.portrait, this.damage, this.percent, this.name, this.slotLabel];
+    this.body = [this.plate, this.portrait, this.damage, this.percent, this.name];
     for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark]) BlzFrameSetLevel(frame, 21);
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
@@ -142,7 +137,6 @@ export class FighterHud {
     this.left = left;
     this.panel = panel;
     const inner = panel.mirrored ? TEXT_JUSTIFY_RIGHT : TEXT_JUSTIFY_LEFT;
-    const outer = panel.mirrored ? TEXT_JUSTIFY_LEFT : TEXT_JUSTIFY_RIGHT;
     placeTopLeft(this.plate, left, PLATE_TOP);
     placeBox(this.portrait, left, panel.bust);
     placeBox(this.damage, left, panel.damage);
@@ -151,8 +145,6 @@ export class FighterHud {
     placeBox(this.doomMark, left, panel.doom);
     placeBox(this.name, left, panel.name);
     BlzFrameSetTextAlignment(this.name, TEXT_JUSTIFY_MIDDLE, inner);
-    placeBox(this.slotLabel, left, panel.slot);
-    BlzFrameSetTextAlignment(this.slotLabel, TEXT_JUSTIFY_MIDDLE, outer);
     this.stocks.forEach((icon, index) => {
       const box = panel.stocks[index];
       if (box !== undefined) placeBox(icon, left, box);

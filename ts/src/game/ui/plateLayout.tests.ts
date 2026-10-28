@@ -92,9 +92,9 @@ test("the EX cell is a small square beside the damage percent and the ultimate b
       assertEquals(bar.top <= cell.bottom || bar.right <= cell.left || bar.left >= cell.right, true, `${where}: bar is not beside the cell`);
       const left = plateLeft(position, count);
       const panel = panelLayout(position, count);
-      for (const other of [panel.name, panel.slot, panel.doom, panel.stockCount, ...panel.stocks]) {
+      for (const other of [panel.name, panel.doom, panel.stockCount, ...panel.stocks]) {
         const box = boxSpan(left, other);
-        assertEquals(!overlaps(cell, box) && !overlaps(bar, box), true, `${where}: no overlap with name, slot, stocks or doom`);
+        assertEquals(!overlaps(cell, box) && !overlaps(bar, box), true, `${where}: no overlap with name, stocks or doom`);
       }
       const percent = boxSpan(left, panel.percent);
       assertEquals(cell.top <= percent.top && cell.bottom >= percent.bottom, true, `${where}: cell sits in the percent's rows`);

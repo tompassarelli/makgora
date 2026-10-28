@@ -29,7 +29,6 @@ export interface PanelLayout {
   readonly percent: PlateBox;
   readonly doom: PlateBox;
   readonly name: PlateBox;
-  readonly slot: PlateBox;
   readonly exCell: PlateBox;
   readonly ultimateBar: PlateBox;
   readonly stocks: readonly PlateBox[];
@@ -42,7 +41,6 @@ const DAMAGE: PlateBox = { x: 150, y: -4, width: 284, height: 124 };
 const PERCENT: PlateBox = { x: 436, y: 34, width: 60, height: 70 };
 const DOOM: PlateBox = { x: 444, y: -8, width: 44, height: 44 };
 const NAME: PlateBox = { x: 244, y: 148, width: 228, height: 30 };
-const SLOT: PlateBox = { x: 472, y: 148, width: 40, height: 30 };
 const EX_CELL: PlateBox = { x: 466, y: 68, width: 34, height: 34 };
 const ULTIMATE_BAR: PlateBox = { x: 260, y: 123, width: 262, height: 10 };
 const STOCK_LEFT_PX = 246;
@@ -57,7 +55,7 @@ function stockBox(index: number): PlateBox {
 const STOCKS: readonly PlateBox[] = [0, 1, 2, 3, 4].map(index => stockBox(index));
 const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHOWN_PX };
 
-const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, doom: DOOM, name: NAME, slot: SLOT, exCell: EX_CELL, ultimateBar: ULTIMATE_BAR, stocks: STOCKS, stockCount: STOCK_COUNT };
+const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, doom: DOOM, name: NAME, exCell: EX_CELL, ultimateBar: ULTIMATE_BAR, stocks: STOCKS, stockCount: STOCK_COUNT };
 
 const MIRRORED_PERCENT_X = 236;
 const GROUP_LEFT = MIRRORED_PERCENT_X - PERCENT.x + DAMAGE.x;
@@ -69,7 +67,6 @@ const RIGHT_PANEL: PanelLayout = {
   percent: { ...PERCENT, x: MIRRORED_PERCENT_X },
   doom: { ...DOOM, x: MIRRORED_PERCENT_X + DOOM.x - PERCENT.x },
   name: flip(NAME),
-  slot: flip(SLOT),
   exCell: { ...EX_CELL, x: MIRRORED_PERCENT_X + EX_CELL.x - PERCENT.x },
   ultimateBar: flip(ULTIMATE_BAR),
   stocks: STOCKS.map(box => flip(box)),
