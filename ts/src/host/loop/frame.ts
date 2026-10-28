@@ -14,7 +14,7 @@ import { resultMessage } from "../../game/session/messages";
 import { produceScenarioComputerInput } from "../../game/session/scenarios";
 import { canAttack } from "../../game/sim/conditions";
 import { influenceOperands } from "../../game/sim/knockback";
-import { canonicalReal } from "../../game/replay/canonical";
+import { canonicalReal } from "../../game/replay/canonicalNumbers";
 import type { Fighter } from "../../game/sim/fighter";
 import { projectileModelOf } from "../../game/presentation/projectileArt";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";

@@ -1,7 +1,8 @@
 // Histories retain shared observations. Storage is reused only after every
 // live input and replay snapshot has released that sample.
 import { at } from "wisp/src/runtime/lookup";
-import { botObservationCanonical, realParts, splitFiniteReal, writeCanonicalNumber, writeObservations } from "../replay/canonical";
+import { botObservationCanonical, forgetObservationText, writeObservations } from "../replay/canonical";
+import { realParts, splitFiniteReal, writeCanonicalNumber } from "../replay/canonicalNumbers";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
@@ -619,6 +620,7 @@ export function observeOpponents(memory: BotMemory, world: Roster, frame: number
   }
   entry.sample.checksumFirst = UNSETTLED;
   entry.sample.checksumSecond = UNSETTLED;
+  forgetObservationText(entry.sample);
   storage.entries.push(entry);
   storage.history.push(entry.sample);
   memory.history = storage.history;

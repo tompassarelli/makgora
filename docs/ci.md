@@ -93,8 +93,14 @@ What reaches each check:
   the landing gate never runs them twice.
 
 The parity tapes replay longest first on every usable core, with the Bun
-replays in their own processes; the longest tape, orbs (5180 frames with a
-computer player), takes about 40 s in each 32-bit Lua, which bounds them.
+replays in their own processes. Building each operation's canonical state text,
+not the simulation, is most of a tape's cost in 32-bit Lua: the longest tape,
+orbs (5180 frames with a computer player), simulates in about 3 s of its 41 s.
+Canonical numbers are built from whole-number text rather than one byte per
+call, each field's text is built in one expression, and each bot observation
+sample's text is built once while a history holds it
+(smashcraft:ts/src/game/replay/canonical.ts), which brings orbs to about 12 s
+with every tape's records unchanged.
 
 Farm test (farm-test.yml) runs the same checks for Autoland and `bun wisp farm
 test`, grouped into its jobs perf, rollback, parity-0 to parity-2 (one third

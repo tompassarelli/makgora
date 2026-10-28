@@ -1,6 +1,7 @@
 import { writeStrikeTraits } from "./strikeCanonical";
 import { writeWindow } from "./windowCanonical";
 import { writeEmpowered, writePierce } from "./empowerCanonical";
+import { canonicalInt, canonicalNumber, canonicalReal, canonicalRealField, realParts, splitFiniteReal, writeCanonicalNumber } from "./canonicalNumbers";
 import { type FighterFieldSink, type FighterKitText, writeFighterFields } from "../../generated/state/fighterState";
 
 
@@ -36,91 +37,6 @@ const REPLAY_CHECKSUM_MODULUS = 1_000_003;
 const bit = (flag: boolean | undefined): number => (flag === true ? 1 : 0);
 
 
-function writeIntegerBytes(emit: (code: number) => void, value: number): void {
-  if (value < -2147483648 || value > 2147483647) {
-    const text = `${value}`;
-    for (let index = 0; index < text.length; index++) emit(text.charCodeAt(index));
-    return;
-  }
-  if (value < 0) emit(45);
-  let remaining = value > 0 ? -value : value;
-  let divisor = 1;
-  while (divisor < 1_000_000_000 && remaining <= -10 * divisor) divisor *= 10;
-  while (divisor > 0) {
-    const digit = -floorDiv(remaining, divisor) - (floorMod(remaining, divisor) === 0 ? 0 : 1);
-    emit(48 + digit);
-    remaining += digit * divisor;
-    divisor = floorDiv(divisor, 10);
-  }
-}
-
-
-export function writeCanonicalNumber(emit: (code: number) => void, value: number, integer = true): void {
-  if (integer && Math.floor(value) === value) { writeIntegerBytes(emit, Math.floor(value)); return; }
-  if (value !== value) { emit(110); emit(97); emit(110); return; }
-  const negative = value < 0;
-  if (!negative && !(value > 0)) { emit(48); return; }
-  emit(negative ? 45 : 43);
-  if (!splitFiniteReal(negative ? -value : value)) { emit(105); emit(110); emit(102); return; }
-  writeIntegerBytes(emit, realParts.exponent);
-  emit(58);
-  writeIntegerBytes(emit, realParts.high);
-  emit(58);
-  writeIntegerBytes(emit, realParts.low);
-}
-
-
-export const realParts = { exponent: 0, high: 0, low: 0 };
-
-
-export function splitFiniteReal(positive: number): boolean {
-  let magnitude = positive;
-  if (magnitude * 2 === magnitude) return false;
-  let exponent = 0;
-  while (magnitude >= 2) {
-    magnitude /= 2;
-    exponent++;
-  }
-  while (magnitude < 1) {
-    magnitude *= 2;
-    exponent--;
-  }
-  const fraction = (magnitude - 1) * 67108864;
-  const high = Math.floor(fraction);
-  realParts.exponent = exponent;
-  realParts.high = high;
-  realParts.low = Math.floor((fraction - high) * 67108864);
-  return true;
-}
-
-
-export function canonicalReal(value: number): string {
-  const parts: string[] = [];
-  writeCanonicalNumber(code => { parts.push(String.fromCharCode(code)); }, value, false);
-  return parts.join("");
-}
-
-// Lua prints integral floats with .0; floor them to integers to match Wurst I2S.
-
-
-
-
-function integerText(value: number): string {
-  const whole = Math.floor(value);
-  return whole === value ? `${whole}` : canonicalReal(value);
-}
-
-export function canonicalInt(name: string, value: number): string {
-  return `|${name}=${integerText(value)}`;
-}
-
-export function canonicalBoolean(name: string, value: boolean): string {
-  return `|${name}=${value ? 1 : 0}`;
-}
-
-export function canonicalRealField(name: string, value: number): string {
-  return `|${name}=${canonicalReal(value)}`;
-}
 
 
 export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = "moves"): string {
@@ -598,13 +514,12 @@ interface StateSink extends FighterFieldSink {
   observation(name: string, sample: Readonly<BotObservationFrame>): void;
 }
 
-const fieldName = (prefix: string, name: string) => (prefix === "" ? name : `${prefix}.${name}`);
 
 function textSink(emit: Emit): StateSink {
   return {
-    int: (prefix, name, value) => emit(canonicalInt(fieldName(prefix, name), value)),
-    bool: (prefix, name, value) => emit(canonicalBoolean(fieldName(prefix, name), value)),
-    real: (prefix, name, value) => emit(canonicalRealField(fieldName(prefix, name), value)),
+    int: (prefix, name, value) => emit(prefix === "" ? `|${name}=${canonicalNumber(value)}` : `|${prefix}.${name}=${canonicalNumber(value)}`),
+    bool: (prefix, name, value) => emit(prefix === "" ? `|${name}=${value ? 1 : 0}` : `|${prefix}.${name}=${value ? 1 : 0}`),
+    real: (prefix, name, value) => emit(prefix === "" ? `|${name}=${canonicalReal(value)}` : `|${prefix}.${name}=${canonicalReal(value)}`),
     text: fragment => emit(fragment),
     observation: (name, sample) => emit(`|${name}=${botObservationCanonical(sample)}`),
   };
@@ -787,14 +702,25 @@ export function writeObservations(writer: ObservationWriter, opponents: Slots<Re
 }
 
 
+const observationTexts = new WeakMap<Readonly<BotObservationFrame>, string>();
+
+/** Drops a sample's text when its storage is reused; a history never changes a sample it holds (settleObservationChecksum). */
+export function forgetObservationText(sample: Readonly<BotObservationFrame>): void {
+  observationTexts.delete(sample);
+}
+
 export function botObservationCanonical(sample: Readonly<BotObservationFrame>): string {
+  const known = observationTexts.get(sample);
+  if (known !== undefined) return known;
   const parts: string[] = [];
   const byte = (code: number) => { parts.push(String.fromCharCode(code)); };
   writeObservations({ byte,
-    number: value => { byte(44); writeCanonicalNumber(byte, value); },
+    number: value => { parts.push(`,${canonicalNumber(value)}`); },
     text: (text, repetitions) => { parts.push(text.repeat(repetitions)); },
   }, sample.opponents);
-  return parts.join("");
+  const text = parts.join("");
+  observationTexts.set(sample, text);
+  return text;
 }
 
 function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
