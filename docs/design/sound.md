@@ -221,13 +221,16 @@ combat sounds start; `CombatEffects` plays what it admits.
 
 ## Imported murloc gurgle
 
-Murloc's entrance and victory play a one-second clip of World of Warcraft's own murloc aggro
-sound (`sound/creature/murloc/mmurlocaggroa.ogg`, file 555997 in the community file list),
-fetched from wago.tools, which serves the game's CASC files unchanged. It is not a fan
-re-record. Tom chose on 2026-10-28 to import it because Hive Workshop's map-submission rule 8
+Murloc's entrance and victory play a 1.7-second clip of World of Warcraft's own murloc aggro
+sound (`sound/creature/murloc/mmurlocaggroold.ogg`, file 556000 in the community file list),
+fetched from wago.tools, which serves the game's CASC files unchanged. It is the one file in
+the `MurlocAggro` sound kit (ID 416, the "Mrglglgl" sound addons play), as Wowhead's sound
+page and wago.tools' SoundKitEntry table both show; the first take imported, `mmurlocaggroa`,
+was a different aggro variant and not the famous one. It is not a fan re-record. Tom chose on
+2026-10-28 to import it because Hive Workshop's map-submission rule 8
 says material created by Blizzard Entertainment can safely be used. The earlier rule that
 Smashcraft ships no Blizzard sound files gives way for this clip only. The clip is converted to
-a 22,050 Hz mono mp3 (10,101 bytes) and imported through the map build's imported-files list
+a 22,050 Hz mono mp3 (11,041 bytes at 48 kbps) and imported through the map build's imported-files list
 (`ts/src/game/assets/importedVoiceInfo.ts`, the same route as the imported music) from the
 `imported-models` build-input family, so it stays out of Git. Credit is in
 [hive-post.md](../hive-post.md). His moves keep Warcraft III's own gurgles

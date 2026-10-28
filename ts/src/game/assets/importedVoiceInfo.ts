@@ -1,9 +1,9 @@
 export const IMPORTED_MURLOC_GURGLE = {
-  path: "war3mapImported\\MurlocGurgle-fc4e445515d8.mp3",
-  file: "MurlocGurgle-fc4e445515d8.mp3",
-  sha256: "fc4e445515d88d66bde9f5807932e98401b1a9a99678da4b0ae7615489098a60",
-  bytes: 10101,
-  durationMilliseconds: 1592,
+  path: "war3mapImported\\MurlocGurgle-8fea87315583.mp3",
+  file: "MurlocGurgle-8fea87315583.mp3",
+  sha256: "8fea87315583184516717bf67fe8e6fb942f16a31d28fd560a8080bf494d2af8",
+  bytes: 11041,
+  durationMilliseconds: 1747,
   sampleRate: 22050,
   channels: 1,
 } as const;
