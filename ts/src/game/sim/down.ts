@@ -21,6 +21,7 @@ import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
 import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_COOLDOWN_FRAMES, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
 import { heroEgg, isHeroSpecialAction, landHeroSpecial, runningHeroSpecial } from "./specials/engine";
+import { landsBeforeSwing } from "./specials/landing";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_LANDING_LAG } from "./eyeBeam";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 import { landExWavedash } from "./exWavedash";
@@ -175,7 +176,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
     launch.groundKnockbackX = max(-MAX_GROUNDED_KNOCKBACK_ON_LANDING, min(MAX_GROUNDED_KNOCKBACK_ON_LANDING, launch.knockbackX));
     launch.knockbackX = launch.groundKnockbackX;
   }
-  if (!wasGrounded) landHeroSpecial(f);
+  if (!wasGrounded && !landsBeforeSwing(runningHeroSpecial(f), f.special.frame)) landHeroSpecial(f);
   if (!wasGrounded) landAirShot(f);
   f.special.fall = false;
   f.special.parasol = ParasolState.none;

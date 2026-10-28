@@ -330,6 +330,7 @@ export interface AuthoredSpecial {
   readonly parasol?: true | undefined;
 
   readonly landingLag?: number | undefined;
+  readonly swingsThroughLanding?: true | undefined;
 
   readonly fallLandingLag?: number | undefined;
 

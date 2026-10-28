@@ -10,15 +10,16 @@ export const GOLD_SACK_DAMAGE = [8.0, 11.0, 14.0, 17.0, 24.0] as const;
 const GOLD_SACK_GROWTH = [65.0, 68.0, 70.0, 72.0, 72.0] as const;
 const GOLD_SACK_BASE = [8.0, 10.0, 11.0, 12.0, 12.0] as const;
 export const GOLD_SACK_FIRST_ACTIVE = [12, 12, 12, 12, 9] as const;
-const GOLD_SACK_ARC = [[0.0, 74.0, 34.0, 104.0], [8.0, 82.0, 62.0, 86.0], [14.0, 70.0, 72.0, 44.0]] as const;
-const GOLD_SACK_WINDOW = frames(GOLD_SACK_CHARGE.hold + 1, GOLD_SACK_CHARGE.hold + 1);
+export const GOLD_SACK_ARC = [[0.0, 74.0, 34.0, 104.0], [8.0, 82.0, 62.0, 86.0], [14.0, 70.0, 72.0, 44.0]] as const;
+const GOLD_SACK_END = GOLD_SACK_CHARGE.hold + 12;
+const GOLD_SACK_WINDOW = frames(GOLD_SACK_CHARGE.hold + 1, GOLD_SACK_END);
 
 const goldSackSwing = (stage: number): AuthoredSpecial => {
   const first = GOLD_SACK_FIRST_ACTIVE[stage] ?? 12;
   const radius = 14.0 + 2.0 * stage;
   const effect = peonHit(GOLD_SACK_DAMAGE[stage] ?? 8.0, 40, GOLD_SACK_GROWTH[stage] ?? 80.0, GOLD_SACK_BASE[stage] ?? 20.0);
   return {
-    name: "Gold Sack Bonk", endFrame: first + 26, landingLag: 14, spendsCharge: true,
+    name: "Gold Sack Bonk", endFrame: first + 26, landingLag: 14, swingsThroughLanding: true, spendsCharge: true,
     regions: GOLD_SACK_ARC.map(([x1, z1, x2, z2], index) => heroRegion(first + index, first + index, { x1, z1, x2, z2, radius }, effect)),
   };
 };
@@ -28,7 +29,7 @@ const goldSackFollowUps: readonly SpecialFollowUp[] = [
   { window: GOLD_SACK_WINDOW, input: FollowUpInput.shield, special: { name: "Gold Sack Store", endFrame: 8 } },
 ];
 
-const GOLD_SACK: AuthoredSpecial = { endFrame: GOLD_SACK_CHARGE.hold + 12, charge: GOLD_SACK_CHARGE, followUps: goldSackFollowUps };
+const GOLD_SACK: AuthoredSpecial = { endFrame: GOLD_SACK_END, charge: GOLD_SACK_CHARGE, followUps: goldSackFollowUps };
 
 export const LOG_HEAVE_FIRST_ACTIVE = 14;
 export const LOG_ON_SHOULDER = frames(20, 25);

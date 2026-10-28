@@ -144,3 +144,23 @@ test("The Gold Sack charge survives a rollback snapshot copy and empties on stoc
   clearSpecialOnStock(copy);
   assertEquals(copy.special.charge, 0);
 });
+
+test("An air Gold Sack bonk that lands before its first active frame still swings and hits, and the sack is spent on a swing that came out [k3 measure docs/design/peasant.md]", () => {
+  const d = duel(IN_REACH);
+  lift(d.peon, 40.0);
+  d.peon.special.charge = FULL;
+  step(d, "special");
+  idle(d, 40);
+  assertEquals(d.foe.status.damage, f32(GOLD_SACK_DAMAGE[4]), "the full bonk lands on the ground");
+  assertEquals(d.peon.special.charge, 0);
+});
+
+test("A press in the frames after the sack fills on its own swings the full sack [k3 measure docs/design/peasant.md]", () => {
+  const d = duel(IN_REACH);
+  step(d, "special");
+  idle(d, GOLD_SACK_CHARGE.hold + FULL + 2);
+  assertEquals(d.peon.special.action, SpecialAction.heroNeutral, "still putting the full sack away");
+  step(d, "special");
+  idle(d, 40);
+  assertEquals(d.foe.status.damage, f32(GOLD_SACK_DAMAGE[4]), "the press swings the full sack");
+});
