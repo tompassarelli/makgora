@@ -351,7 +351,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     pose.animation = "";
     return rate;
   }
-  const crouched = selectCrouchClip(pose, f, pose.motion.motion === IllidanLocomotion.crouch, pose.motion.motion === IllidanLocomotion.idle);
+  const crouched = selectCrouchClip(pose, f, pose.motion.motion === IllidanLocomotion.crouch);
   if (crouched !== undefined) return crouched;
   if (illidan) {
     const { motion } = pose.motion;

@@ -12,9 +12,7 @@ import { IllidanLocomotion } from "./illidanMotion";
 import { type PoseClip, selectFighterClipIndex } from "./poseClip";
 
 export const CROUCH_CLIP_FRAMES = 24;
-export const CROUCH_RISE_FRAMES = 10;
 export const CROUCH_KEY = `motion${IllidanLocomotion.crouch}`;
-export const CROUCH_RISE_KEY = "crouch-rise";
 
 const clipRate = (seconds: number, frames: number): number => f32(seconds / f32(frames * FRAME_SECONDS));
 
@@ -25,22 +23,16 @@ export function crouchClip(f: Readonly<Fighter>): HeroClip | undefined {
 
 export const crouchLoops = (f: Readonly<Fighter>, clip: Readonly<HeroClip>): boolean => originalClip(f.character, clip.index)?.looping === true;
 
-export function selectCrouchClip(pose: PoseClip, f: Readonly<Fighter>, crouching: boolean, idle: boolean): number | undefined {
+export function selectCrouchClip(pose: PoseClip, f: Readonly<Fighter>, crouching: boolean): number | undefined {
   const clip = crouchClip(f);
-  if (clip === undefined) return undefined;
-  const shown = (pose.animation === CROUCH_KEY || pose.animation === CROUCH_RISE_KEY) && pose.clipIndex === clip.index;
-  if (crouching) {
-    if (!shown) selectFighterClipIndex(pose, clip.index);
-    pose.animation = CROUCH_KEY;
-    if (crouchLoops(f, clip)) return clipRate(clip.seconds, CROUCH_CLIP_FRAMES);
-    const held = f32(clip.seconds - FRAME_SECONDS);
-    if (pose.clipTime >= held) {
-      pose.clipTime = held;
-      return 0.0;
-    }
-    return min(clipRate(clip.seconds, CROUCH_CLIP_FRAMES), f32(f32(held - pose.clipTime) / FRAME_SECONDS));
+  if (clip === undefined || !crouching) return undefined;
+  if (pose.animation !== CROUCH_KEY || pose.clipIndex !== clip.index) selectFighterClipIndex(pose, clip.index);
+  pose.animation = CROUCH_KEY;
+  if (crouchLoops(f, clip)) return clipRate(clip.seconds, CROUCH_CLIP_FRAMES);
+  const held = f32(clip.seconds - FRAME_SECONDS);
+  if (pose.clipTime >= held) {
+    pose.clipTime = held;
+    return 0.0;
   }
-  if (!idle || !shown || pose.clipTime <= 0.0 || crouchLoops(f, clip)) return undefined;
-  pose.animation = CROUCH_RISE_KEY;
-  return -min(clipRate(clip.seconds, CROUCH_RISE_FRAMES), f32(pose.clipTime / FRAME_SECONDS));
+  return min(clipRate(clip.seconds, CROUCH_CLIP_FRAMES), f32(f32(held - pose.clipTime) / FRAME_SECONDS));
 }
