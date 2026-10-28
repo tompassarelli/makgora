@@ -1,9 +1,34 @@
-# Smashcraft 0.1.5
+# Smashcraft 0.2
 *A platform fighter inside Warcraft III*
 
 **Pick a Warcraft hero, fight across floating stages and knock your opponents off the screen.** Smashcraft is a free fan-made platform fighter inspired by Super Smash Bros. Melee, built as a custom map for Warcraft III, with rollback netcode for online games. It is early: tell us what feels off.
 
 **Best in Classic graphics.**
+
+## New in 0.2
+- **Meter and orbs:** the single super bar is now two meters that fill by themselves. The EX charge refills in 12 seconds and pays for EX specials and the EX wavedash; the ultimate meter fills over 2 minutes. Damage builds neither, and a KO keeps both. Orbs appear above the stage near centre, warned 3 seconds ahead by a Mass Teleport marker: a blue orb at 15, 30 and 45 seconds past each minute refills your EX charge, an orange orb on the minute adds half an ultimate meter, and any fighter under it or jumping through it takes it. The rim glows blue with an EX charge and gold at a full ultimate.
+- **HUD:** a small square EX cell beside the damage percent fills upward and lights bright blue when charged, and a thin gold ultimate bar under the number fills and pulses when full.
+- **EX specials:** each is now the same move with one clear upgrade, such as a farther beam or a shield-safe rush, instead of 25% more damage, and none carries armor.
+- **EX wavedash:** hold Strong while air dodging into the ground to spend one EX charge and slide about 40% farther, with blue dust along the slide.
+- **Ultimates:** retuned to deal about 25-30% in total. Seventeen weak ones were raised, among them Mountain King's Avatar, Illidan's Metamorphosis and Cairne's Reincarnation, and Dreadlord's Summon Inferno was cut.
+- **Strong is Y** on every layout (Custom keeps X as a second Strong). Y still confirms on the select screens, and it can now be bound to any action on the Controls screen.
+- **C-stick:** the smash keys are now C-up, C-down, C-left and C-right. On the ground they give tilts (C-left and C-right the forward tilt, turning you first, C-up the up tilt, C-down the down tilt) and in the air the aerials; smashes come only from Strong plus a direction.
+- **Dash attack:** a direction plus attack on any frame of a dash is the dash attack, never a forward tilt.
+- **Saving a moment:** type -clip in chat instead of pressing =. The = and - keys are ordinary bindable keys.
+- **Select screens:** the Controls button now sits left of Moves, and a Random CPU keeps its fighter through Rematch and automatic rematches; New Match and character select draw again.
+- **Short-hop down air:** every fighter's down air now hits a standing opponent from a short hop, which Pit Lord and Lich King could not do before.
+- **Up specials:** Mountain King's Thunder Leap dive and Illidan's Wing Ascent dive start on their own when you move the stick to a different direction, with no second special press.
+- **Ground momentum:** Maiev's Fan of Knives and Illidan's Immolate keep your ground speed like Fox's shine and stop you dead sideways in the air.
+- **Blademaster:** Quickdraw replaces Wind Cutter as his neutral special: hold special in a sheathed iaido stance as the hilt glows and release to cut. Longer charges hit for 7-24%, dash from 0.3 to 2.2 body heights and pass through the foe to land behind them, and each hit pops a red Critical Strike number. Wind Walk is now a Marth-style counter on down special: a strike in its window freezes the attacker and he steps out behind them with a handstand kick straight up, but a whiff leaves him wide open. Mirror Image moved to side special and steps the way the stick points while he gathers, leaving the image where he stood. Bladestorm cast in the air floats: hover with nothing held, sink with down, rise with jump. His down air ends in 44 frames instead of 59 so he can down air off stage and still recover, and his back air is a reverse-grip back stab.
+- **Illidan:** Fel Rush is now Falco's Phantasm beside Maiev's Shadow Dash: a long dash that a second special press stops short, sending grounded foes low into a tech chase and spiking airborne ones, with the aimed second rush kept and Vengeful Retreat and Chaos Strike gone. The forward smash is a stepping spinning roundhouse kick whose heel is the sweetspot, with a fel crescent behind it. The down air has Falco's frame data and hit, Eye Beam refires like Falco's laser, and he walks on the Demon Hunter's own walk.
+- **Maiev:** the side special is Shadow Dash, a Fox Illusion-style blink dash that special cuts short and whose slash pops the foe up; the mark and stun mechanics are gone. Shadow Strike loops like Fox's Blaster, so a short hop throws two daggers. Each dagger is a flinchless 2% hit that adds a poison stack, up to 5, which bursts for 1% a stack when the timer runs out. The down air is a feet-first 45-degree drill, the down tilt a low leg sweep, and the back air is Illidan's back air fitted to her rig.
+- **Mountain King:** a Pikachu-style single-flip neutral air with one hit, strong early and weak late, and a Pikachu-style down air where he flips head-down and drills with the hammer held out.
+- **Chen:** a drunken-boxing rework with Captain Falcon's influence: near-Falcon ground speed, a keg-slam spike down air, an electric flying-kick forward air with a sweetspot, a two-hit staff spin and a staff scoop, and an up air that juggles straight up, so a combo can carry from 0%. Body Slam is the side special, Brew Keg the down special (fill it in three glugs, then lob it to soak and slow a foe), Breath of Fire ignites a soaked foe, and Storm Rise is electric and opens a parasol float. Storm, Earth and Fire summons the three Brewmaster spirits in turn.
+- **Peon:** Log Heave replaces the Burrow as his side special: he heaves a huge log whose far end tips foes up and back toward him, while the near end barely moves them. Gold Sack replaces Lumber Toss: charge it like Donkey Kong's Giant Punch, keep the charge with shield, and a full sack kills. His grab follows Donkey Kong's cargo carry: pummel and throw from the hold, hoist forward onto his shoulder with "Work, work.", walk and jump while carrying, and throw four ways from the carry. His dash attack is a trip-and-dive belly flop.
+- **Pit Lord:** Howl of Terror is a fear roar: a fel-red shockwave that grows on both sides and leaves grounded foes cowering, longer at higher damage. Doom curses the grabbed foe at 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal where they fell. His down air is driven straight down under him.
+- **Lich King:** Howling Blast leaves his hand sooner, 6 frames earlier, and carries 35% farther.
+- **Kael'thas:** Pyroblast replaces Fireball: a slow heavy fireball you steer with the stick while rooted, which kills off the side at high percent and leaves long end lag on a miss. Flame Strike's pillar is shorter, and his victory cheer is a raised fist.
+- **Tinker:** a Laser or Cluster Rockets cast started in the air carries through a landing instead of being cut off.
 
 ## New in 0.1.5
 - **Blademaster:** a new Marth-style two-hit neutral air and down air, a Marth-style up air arc, a quick Wind Walk dash through the opponent, Bladestorm castable in the air, a longer Mirror Image, and more startup and landing lag on Rising Whirlwind and Mirror Image.
@@ -57,9 +82,9 @@
 - Two meters for EX specials and ultimates, with orbs at centre stage.
 
 ## How to play
-1. Download **Smashcraft 0.1.5.w3x** from this page and put it in your Warcraft III **Maps** folder.
+1. Download **Smashcraft 0.2.w3x** from this page and put it in your Warcraft III **Maps** folder.
 2. In Warcraft III's options set **Graphics to Classic**, and restart the game if you just changed it.
-3. Open **Custom Game**, **Local Area Network** or **Battle.net** custom games and pick Smashcraft 0.1.5.
+3. Open **Custom Game**, **Local Area Network** or **Battle.net** custom games and pick Smashcraft 0.2.
 4. Choose your controls, your fighter and a stage, then press **Y**.
 
 New here? Place only your own fighter chip and press Y to practice alone.
@@ -67,8 +92,8 @@ New here? Place only your own fighter chip and press Y to practice alone.
 ## Default controls (WASD)
 - Move: **A**/**D**. Aim up: **W**. Crouch, fast-fall and drop through platforms: **S**
 - Jump: **Space** or **8**. Shield and air dodge: **Q**. Light shield: **0**. Grab: **O**
-- Attack: **N**, with a direction for tilts. Hold Strong (**9**) and press **N** for smashes: up, down, or forward with a side direction or none. Special: **U**, with a direction
-- EX special: **9 + U** with a direction, which spends the EX charge. Ultimate: **N + U** together at a full ultimate meter
+- Attack: **N**, with a direction for tilts. Hold Strong (**Y**) with a direction for smashes: up, down, or forward. The C-stick keys give tilts on the ground and aerials in the air. Special: **U**, with a direction
+- EX special: **Y + U** with a direction, which spends the EX charge. Ultimate: **N + U** together at a full ultimate meter
 - Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: type **-clip**
 
 Rebind any key on the Controls screen, or press **F1** before a match. The full guide is in the GitHub repository: [smashcraft/docs/player-guide.md at main · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/blob/main/docs/player-guide.md)
