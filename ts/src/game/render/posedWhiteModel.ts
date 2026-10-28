@@ -1,21 +1,17 @@
 import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels";
 import { ARENA_CAMERA, FLOOR_HEIGHT } from "../presentation/arenaCamera";
-import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
-import { fitFighterPlacement } from "../presentation/fighterPlacement";
-import type { FighterPose } from "../presentation/fighterPose";
+import { originalClip } from "../../generated/clips/fighterOriginalClipInfo";
+import type { FighterDraw } from "../presentation/fighterDraw";
 import { characterModelScale } from "../presentation/modelScale";
 import type { Character } from "../sim/codes";
-import { fighterPoseFacing } from "../sim/conditions";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { squareRoot } from "../sim/warcraftMath";
-import type { Fighter } from "../sim/fighter";
 import type { MatchCamera } from "../sim/matchCamera";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
 
 /** A white copy of the fighter's model held on the fighter's pose, moved `lift` units toward the camera (away when negative) and grown by `grow` round the body's middle. */
 export class PosedWhiteModel {
   private readonly model: effect;
-  private readonly placement = { x: 0.0, z: 0.0 };
   private shown = false;
 
   constructor(private readonly character: Character, private readonly origin: WorldOrigin) {
@@ -26,19 +22,13 @@ export class PosedWhiteModel {
     hideEffect(this.model, origin);
   }
 
-  pose(fighter: Readonly<Fighter>, pose: Readonly<FighterPose>, stage: number, camera: Readonly<MatchCamera>, lift: number, grow: number, height: number): boolean {
-    const index = pose.clipIndex ?? originalClipNamed(this.character, pose.clipName);
+  pose(draw: Readonly<FighterDraw>, camera: Readonly<MatchCamera>, lift: number, grow: number, height: number): boolean {
+    const index = draw.index;
     const clip = index === undefined ? undefined : originalClip(this.character, index);
-    if (index === undefined || clip === undefined) return false;
-    fitFighterPlacement(this.placement, fighter, stage);
-    let seconds = Math.max(0.0, pose.clipTime);
-    const duration = clip.endSeconds - clip.startSeconds;
-    if (duration <= 0.0) seconds = 0.0;
-    else if (clip.looping) seconds -= I2R(R2I(seconds / duration)) * duration;
-    else seconds = Math.min(seconds, duration);
-    BlzSetSpecialEffectTime(this.model, clip.startSeconds + seconds);
-    BlzSetSpecialEffectYaw(this.model, facingYaw(fighterPoseFacing(fighter)));
-    const x = this.origin.x + this.placement.x, y = this.origin.y, z = this.origin.z + this.placement.z - (grow - 1.0) * height * 0.5;
+    if (clip === undefined) return false;
+    BlzSetSpecialEffectTime(this.model, clip.startSeconds + draw.seconds);
+    BlzSetSpecialEffectOrientation(this.model, facingYaw(draw.facing), draw.pitch, 0.0);
+    const x = this.origin.x + draw.x, y = this.origin.y + draw.y, z = this.origin.z + draw.z - (grow - 1.0) * height * 0.5;
     const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
     const distance = camera.distance;
     const towardX = this.origin.x + camera.x - cosineTurns(yaw) * cosineTurns(pitch) * distance - x;
@@ -47,7 +37,7 @@ export class PosedWhiteModel {
     const length = squareRoot(towardX * towardX + towardY * towardY + towardZ * towardZ);
     const toward = length > Math.abs(lift) * 2.0 ? lift / length : 0.0;
     placeEffect(this.model, x + towardX * toward, y + towardY * toward, z + towardZ * toward);
-    BlzSetSpecialEffectScale(this.model, characterModelScale(fighter.character) * (1.0 - toward) * grow);
+    BlzSetSpecialEffectScale(this.model, characterModelScale(this.character) * (1.0 - toward) * grow);
     this.shown = true;
     return true;
   }

@@ -1,6 +1,6 @@
 import { HEAVY_SHEEN, HEAVY_SHEEN_ALPHA, heavySheen } from "../presentation/itemLook";
 import { fighterModelReplaced } from "../presentation/fighterForm";
-import type { FighterPose } from "../presentation/fighterPose";
+import type { FighterDraw } from "../presentation/fighterDraw";
 import { createWhiteGlowState, whiteGlowAlpha } from "../presentation/whiteGlow";
 import { GOLD_SACK_GLOW, goldSackGlowAlpha } from "../presentation/peonPose";
 import type { Character } from "../sim/codes";
@@ -19,13 +19,13 @@ export class BodyFlash {
     this.model = new PosedWhiteModel(character, origin);
   }
 
-  present(fighter: Readonly<Fighter> | undefined, pose: Readonly<FighterPose>, stage: number, frame: number, camera: Readonly<MatchCamera>): void {
+  present(fighter: Readonly<Fighter> | undefined, draw: Readonly<FighterDraw>, drawn: boolean, frame: number, camera: Readonly<MatchCamera>): void {
     const glow = fighter === undefined ? 0 : whiteGlowAlpha(this.state, fighter, frame);
     const gold = glow === 0 && fighter !== undefined ? goldSackGlowAlpha(fighter) : 0;
     const sheen = glow === 0 && gold === 0 && fighter !== undefined && heavySheen(fighter);
     const alpha = sheen ? HEAVY_SHEEN_ALPHA : gold > 0 ? gold : glow;
     const tint = sheen ? HEAVY_SHEEN : gold > 0 ? GOLD_SACK_GLOW : undefined;
-    if (fighter === undefined || alpha === 0 || fighterModelReplaced(fighter) || !this.model.pose(fighter, pose, stage, camera, FLASH_LIFT, 1.0, 0.0)) {
+    if (fighter === undefined || alpha === 0 || fighterModelReplaced(fighter) || !drawn || !this.model.pose(draw, camera, FLASH_LIFT, 1.0, 0.0)) {
       this.model.hide();
       return;
     }

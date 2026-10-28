@@ -48,6 +48,7 @@ import { fighterOrbit } from "../../game/presentation/sphereOrbit";
 import { fighterFlight } from "../../game/presentation/flightLook";
 import { BodyFlash } from "../../game/render/bodyFlash";
 import { MeterGlow } from "../../game/render/meterGlow";
+import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
 import { ClassicPresentation } from "../../game/render/classicPresentation";
 import { PauseMenu } from "../../game/ui/pauseMenu";
 
@@ -63,6 +64,7 @@ interface FighterRenderers {
   readonly agency: AgencyMarker;
   readonly flash: BodyFlash;
   readonly glow: MeterGlow;
+  readonly draw: FighterDraw;
   readonly candle: CandlePresentation | undefined;
   readonly goldSack: GoldSackPresentation | undefined;
   readonly spheres: SpherePresentation | undefined;
@@ -208,7 +210,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
   const orbit = fighterOrbit(character), flight = fighterFlight(character);
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin),
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin), draw: createFighterDraw(),
     candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     goldSack: character === Character.peon ? new GoldSackPresentation(s.origin) : undefined,
     spheres: orbit === undefined ? undefined : new SpherePresentation(orbit, s.origin),

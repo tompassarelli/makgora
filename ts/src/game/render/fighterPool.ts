@@ -11,24 +11,18 @@ import {
   ORIGINAL_LIGHT_INACTIVE_ANIMATION,
   originalClip,
   originalClipCount,
-  originalClipNamed,
   originalLightPath,
 } from "../../generated/clips/fighterOriginalClipInfo";
-import type { FighterPose } from "../presentation/fighterPose";
 import { type Character, HeroStatusKind } from "../sim/codes";
-import { fighterPoseFacing, isIntangible } from "../sim/conditions";
+import { isIntangible } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { type WorldOrigin, FIGHTER_PHASE_ALPHA, facingYaw, hideEffect, placeEffect } from "./effects";
 import { damageTint } from "../presentation/hitPresentation";
-import { heroCueWindows } from "../presentation/cueWindows";
 import { specialCueState } from "../presentation/specialCues";
 import { fighterModelReplaced } from "../presentation/fighterForm";
-import { runningHeroSpecial } from "../sim/specials/engine";
-import { specialClip } from "../presentation/fighterClips";
 import { characterModelScale } from "../presentation/modelScale";
-import { fitFighterPlacement } from "../presentation/fighterPlacement";
+import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
-import { teeterPitch } from "../presentation/teeterLean";
 
 export class FighterPoolPresentation {
   private readonly clips: effect[] = [];
@@ -48,7 +42,6 @@ export class FighterPoolPresentation {
   private blendFrom: number | undefined;
   private blendStart = 0;
   private blendFrames = 0;
-  private readonly placement = { x: 0.0, z: 0.0 };
 
   missingSelections = 0;
 
@@ -122,16 +115,13 @@ export class FighterPoolPresentation {
     }
   }
 
-  /** `frame` is the presented simulation frame, which times pose blends; `matchFrame` places moving decks. */
-  present(fighter: Readonly<Fighter>, pose: Readonly<FighterPose>, stage: number, frame: number, matchFrame: number): void {
+  /** `frame` is the presented simulation frame, which times pose blends. */
+  present(fighter: Readonly<Fighter>, draw: Readonly<FighterDraw>, drawn: boolean, frame: number): void {
     if (this.clips.length === 0) return;
-    const special = specialCueState(fighter);
-    const startup = special.phase === "startup"
-      ? specialClip(this.character, fighter.special.action, fighter.motion.grounded, false).classicStartup : undefined;
-    const index = startup?.index ?? pose.clipIndex ?? originalClipNamed(this.character, pose.clipName);
+    const index = draw.index;
     const model = index === undefined ? undefined : this.clips[index];
     const clip = index === undefined ? undefined : originalClip(this.character, index);
-    if (fighter.status.out || index === undefined || model === undefined || clip === undefined) {
+    if (!drawn || index === undefined || model === undefined || clip === undefined) {
       if (!fighter.status.out) this.missingSelections++;
       this.hide();
       return;
@@ -152,21 +142,12 @@ export class FighterPoolPresentation {
       } else if (shown !== undefined) hideEffect(shown, this.origin);
       this.visible = index;
     }
-    const duration = clip.endSeconds - clip.startSeconds;
-    const move = startup === undefined ? undefined : runningHeroSpecial(fighter);
-    let seconds = startup === undefined ? Math.max(0.0, pose.clipTime)
-      : (startup.startSeconds ?? 0.0) + startup.seconds * Math.max(0, fighter.special.frame - 1) / Math.max(1, move === undefined ? 1 : heroCueWindows(move).startup.last - 1);
-    if (duration <= 0.0) seconds = 0.0;
-    else if (clip.looping) seconds -= I2R(R2I(seconds / duration)) * duration;
-    else if (seconds > duration) seconds = duration;
-    fitFighterPlacement(this.placement, fighter, stage);
-    const x = this.origin.x + this.placement.x;
-
-    const y = this.origin.y - (fighter.grab.target === undefined ? 0.0 : 80.0);
-    const z = this.origin.z + this.placement.z;
-    const facing = fighterPoseFacing(fighter);
-    const yaw = facingYaw(facing);
-    const pitch = teeterPitch(fighter, stage, matchFrame, frame, facing);
+    const seconds = draw.seconds;
+    const x = this.origin.x + draw.x;
+    const y = this.origin.y + draw.y;
+    const z = this.origin.z + draw.z;
+    const yaw = facingYaw(draw.facing);
+    const pitch = draw.pitch;
     placeEffect(model, x, y, z);
     if (changed || this.yaw !== yaw || this.pitch !== pitch) {
       // Native yaw can discard an earlier effect scale (#360's floes), so the scale follows every yaw.

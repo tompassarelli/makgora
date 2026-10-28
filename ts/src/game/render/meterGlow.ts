@@ -1,4 +1,4 @@
-import type { FighterPose } from "../presentation/fighterPose";
+import type { FighterDraw } from "../presentation/fighterDraw";
 import { METER_GLOW_DEPTH, METER_GLOW_GROW, meterGlowAlpha, meterGlowColor, meterGlowHeight } from "../presentation/meterGlow";
 import type { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
@@ -15,9 +15,9 @@ export class MeterGlow {
     this.height = meterGlowHeight(character);
   }
 
-  present(fighter: Readonly<Fighter> | undefined, pose: Readonly<FighterPose>, stage: number, frame: number, camera: Readonly<MatchCamera>, ultimatesOff: boolean): void {
+  present(fighter: Readonly<Fighter> | undefined, draw: Readonly<FighterDraw>, drawn: boolean, frame: number, camera: Readonly<MatchCamera>, ultimatesOff: boolean): void {
     const color = fighter === undefined ? undefined : meterGlowColor(fighter, ultimatesOff, frame);
-    if (fighter === undefined || color === undefined || !this.model.pose(fighter, pose, stage, camera, -METER_GLOW_DEPTH, METER_GLOW_GROW, this.height)) {
+    if (fighter === undefined || color === undefined || !drawn || !this.model.pose(draw, camera, -METER_GLOW_DEPTH, METER_GLOW_GROW, this.height)) {
       this.model.hide();
       return;
     }

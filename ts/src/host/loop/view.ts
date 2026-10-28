@@ -1,3 +1,4 @@
+import { presentDrawnBody } from "./fighterDrawView";
 import { layerChat } from "../../game/ui/chatLayer";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
 import { writeLines } from "wisp/src/platform/fileio";
@@ -452,14 +453,9 @@ export function renderPersistentPresentation(s: ShellState): void {
       const body = s.participants[slot].body;
       if (body !== undefined) ShowUnit(body.unit, false);
     }
-    if (renderers?.pool !== undefined) {
-      if (fighter !== undefined && game.phase !== Phase.result && ui.match.posing !== slot) renderers.pool.present(fighter, runtime.poses[slot], stage, runtime.simulationFrame, matchFrame);
-      else renderers.pool.hide();
-    }
     const live = playing ? fighter : undefined;
     const posed = ui.match.posing === slot ? undefined : live;
-    renderers?.flash.present(posed, runtime.poses[slot], stage, runtime.simulationFrame, game.camera);
-    renderers?.glow.present(posed, runtime.poses[slot], stage, runtime.simulationFrame, game.camera, game.ultimatesOff);
+    if (renderers !== undefined) presentDrawnBody(renderers, fighter, game.phase !== Phase.result && ui.match.posing !== slot, posed, runtime.poses[slot], stage, runtime.simulationFrame, matchFrame, game.camera, game.ultimatesOff);
     renderers?.candle?.present(posed, stage, runtime.simulationFrame);
     renderers?.goldSack?.present(posed, stage);
     renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
