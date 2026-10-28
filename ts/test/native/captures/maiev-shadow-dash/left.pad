@@ -1,0 +1,22 @@
+# Maiev's Shadow Dash facing left: her Shadow Strike vortex loops on her body through the 20 still frames (60-79) and ShadowStrikeBirth plays on frame 1 (60), a sound Fel Rush's launch does not share; she travels on frames 21-25 (80-84), BlinkBirth sounding as the travel begins (79) and the Blink flash made on 80 and shown from 81.
+#! chat -dev setup quick pair mountain king / warden
+#! cue 60-60 start: sound=ShadowStrikeBirth1
+#! cue 60-79 tell: effect=ShadowStrike
+#! cue 79-79 travel: sound=BlinkBirth1
+#! cue 80-97 dash: effect=BlinkCaster
+20 b stick -1 0
+32 b stick 0 0
+60 b stick -1 0
+60 b tap X 2
+60 a capture
+62 b stick 0 0
+63 a capture
+66 a capture
+70 a capture
+75 a capture
+79 a capture
+81 a capture
+84 a capture
+88 a capture
+96 a capture
+112 a capture

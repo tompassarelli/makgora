@@ -158,6 +158,8 @@ const STORM = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "hand", 1.0);
 // Warcraft discards the first seek after selecting an animation, so this held stand ring keeps its default sequence.
 const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / f32(187.05800313601685))), sequence: undefined, pitch: 0.0, timeScale: 0.0, sound: "ThunderClap" };
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
+// Her own Shadow Strike vortex loops on her body through the 20-frame hold, following the crouch that draws her model back from her position, so the dash reads apart from Fel Rush's green coil.
+const SHADOW_DASH_TELL: Cue = { ...cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "body", f32(1.1)), anchorFrames: [0.0, -9.0, -18.0, -27.0, ...Array.from({ length: 16 }, () => -36.0)].map((x) => ({ x, z: 50.0 })) };
 const GLAIVE_GLINT: Cue = { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), anchorFrames: Array.from({ length: WARDEN_SPECIALS.side.ground.endFrame }, () => ({ x: -70.0, z: 62.0 })), color: [200, 230, 255], sound: "MetalLightSliceMetal" };
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
@@ -326,7 +328,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.warden]: {
     neutral: { spell: "Shadow Strike", startup: cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "hand", f32(0.7)), active: timed(cue("Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", "hand", 1.0), "stand", 0.0) },
-    side: { spell: "Shadow Dash", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
+    side: { spell: "Shadow Dash", startup: SHADOW_DASH_TELL, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
     up: { spell: "Blink", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
     down: { spell: "Fan of Knives", startup: SHADOW, active: { ...cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)), roll: f32(1.570796327), lingerFrames: ACTIVE_CUE_FRAMES } },
   },

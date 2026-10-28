@@ -76,7 +76,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.warden]: {
     weapon: Weapon.blade, effort: ["WardenAttack"], strong: "FanOfKnivesHit",
-    specials: [s("ShadowStrikeMissileBirth", "ShadowStrikeBirth"), s("BlinkCaster", "MetalHeavySliceFlesh"), s("BlinkTarget", "MetalLightSliceFlesh"), s("FanOfKnives", "FanOfKnivesHit")],
+    specials: [s("ShadowStrikeMissileBirth", "ShadowStrikeBirth"), { ...s("ShadowStrikeBirth", "MetalHeavySliceFlesh", 127), impact: "BlinkCaster" }, s("BlinkTarget", "MetalLightSliceFlesh"), s("FanOfKnives", "FanOfKnivesHit")],
   },
   [Character.lich]: {
     weapon: Weapon.blunt, effort: ["HeroLichAttack1"], strong: "LichMissile",
