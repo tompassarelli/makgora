@@ -106,3 +106,8 @@ the full-charge lunge are in smashcraft:docs/design/peasant.md.
 Donkey Kong's Melee Giant Punch hits on frame 24 uncharged and 17 fully
 charged, over 24–29 and 17–21, in animations of 51 and 44 frames
 ([SmashWiki](https://www.ssbwiki.com/Donkey_Kong_(SSBM)/Neutral_special)).
+
+The drawn bonk reaches as far as the hit: the sack rides the end of a long pole held in
+his hands, and on every active frame its centre sits on the far end of that frame's
+hit capsule (about 70, 125 and 145 units out), checked when the clips are generated
+(smashcraft:tools/animations/peon-sack.ts; Tom reported the drawn sack stopping short of the doubled reach, 2026-10-28).

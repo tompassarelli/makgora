@@ -9,7 +9,7 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 import { LOG_GRIP, LOG_LENGTH, LOG_PATH } from "../../ts/src/game/fighters/peon/logPath";
 import { type Action, type Gesture, type Phase, phase } from "./peon-gesture";
-import { SACK_ACTIONS, SACK_MOMENTS, appendSackSequences, carrySack, sackStrikes, writeSackClips } from "./peon-sack";
+import { SACK_ACTIONS, SACK_MOMENTS, appendSackSequences, carrySack, checkSackReach, sackStrikes, writeSackClips } from "./peon-sack";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain"), lumberOnly = process.argv.includes("lumber");
@@ -142,7 +142,7 @@ function joint(name: string, g: Gesture): [number,number] {
   return [0,0];
 }
 const snapPain = (bytes: ArrayBuffer, index: number, frames: number, translations: readonly mdx.AnimKeyframe[]) => {
-  const body = new PainBody(bytes, PEON, ["Peon Log", "Peon Sack"]), floor = body.floor(9, 0);
+  const body = new PainBody(bytes, PEON, ["Peon Log", "Peon Sack", "Peon Pole"]), floor = body.floor(9, 0);
   for (let f = 0; f <= frames; f++) translations[f]!.Vector[2]! -= body.floor(index, f / 60) - floor;
 };
 const CARGO = [16, 19], LUMBER_GEOSET = 3;
@@ -290,6 +290,7 @@ if (sackOnly) {
     const a = before.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1), b = after.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1);
     ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${s.Name}: shipped pose changed`);
   }
+  console.log(checkSackReach(after, indices));
   for (const [cell, action] of SACK_ACTIONS.entries()) {
     const moments = SACK_MOMENTS(cell);
     const capture = sheet(`Peon ${action.name}`, after, [1, -1].flatMap(facing => moments.map(frame => ({ frame, facing, clip: indices[cell]!, seconds: frame / 60, phase: AttackPhase.active, x: 0, z: 0, parts: [], strikes: sackStrikes(cell, frame, facing) }))), moments.length);

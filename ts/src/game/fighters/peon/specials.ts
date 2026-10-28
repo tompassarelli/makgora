@@ -11,7 +11,7 @@ export const GOLD_SACK_DAMAGE = [8.0, 11.0, 14.0, 17.0, 24.0] as const;
 const GOLD_SACK_GROWTH = [65.0, 68.0, 70.0, 72.0, 72.0] as const;
 const GOLD_SACK_BASE = [8.0, 10.0, 11.0, 12.0, 12.0] as const;
 export const GOLD_SACK_FIRST_ACTIVE = [24, 22, 21, 19, 17] as const;
-const GOLD_SACK_ACTIVE = [6, 6, 6, 5, 5] as const;
+export const GOLD_SACK_ACTIVE = [6, 6, 6, 5, 5] as const;
 const GOLD_SACK_ENDS = [51, 49, 48, 46, 44] as const;
 export const GOLD_SACK_ARC = [[0.0, 78.0, 68.0, 138.0], [16.0, 94.0, 124.0, 102.0], [28.0, 70.0, 144.0, 18.0]] as const;
 const GOLD_SACK_LUNGE = { speed: 3.0, first: 2, last: 14 } as const;
@@ -19,7 +19,7 @@ const GOLD_SACK_WINDOW = frames(1, GOLD_SACK_CHARGE.hold + 1);
 
 const lerp = (from: number, to: number, share: number): number => f32(from + f32(f32(to - from) * share));
 
-const sackArcAt = (index: number, count: number): StrikeCapsule => {
+export const goldSackArcAt = (index: number, count: number): StrikeCapsule => {
   const along = f32(f32(index * (GOLD_SACK_ARC.length - 1)) / Math.max(1, count - 1));
   const from = Math.min(GOLD_SACK_ARC.length - 2, Math.floor(along));
   const share = f32(along - from);
@@ -36,7 +36,7 @@ const goldSackSwing = (stage: number): AuthoredSpecial => {
   return {
     name: "Gold Sack Bonk", endFrame: GOLD_SACK_ENDS[stage] ?? 51, landingLag: 14, swingsThroughLanding: true, spendsCharge: true,
     motion: stage === GOLD_SACK_CHARGE.stages ? [{ ...frames(GOLD_SACK_LUNGE.first, GOLD_SACK_LUNGE.last), velocityX: GOLD_SACK_LUNGE.speed, velocityZ: 0.0 }] : undefined,
-    regions: Array.from({ length: count }, (_, index) => heroRegion(first + index, first + index, { ...sackArcAt(index, count), radius }, effect)),
+    regions: Array.from({ length: count }, (_, index) => heroRegion(first + index, first + index, { ...goldSackArcAt(index, count), radius }, effect)),
   };
 };
 
