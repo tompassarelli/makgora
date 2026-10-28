@@ -1,14 +1,9 @@
-import { at } from "wisp/src/runtime/lookup";
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import { characterModelScale } from "../presentation/modelScale";
-import { GOLD_SACK_MODEL, GOLD_SACK_ON_BACK, GOLD_SACK_SCALES, goldSackStage } from "../presentation/peonCues";
-import { SpecialAction } from "../sim/codes";
+import { GOLD_SACK_MODEL, GOLD_SACK_FULL_SCALE, GOLD_SACK_ON_BACK, goldSackStored } from "../presentation/peonCues";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-
-const storedSack = (fighter: Readonly<Fighter> | undefined): boolean =>
-  fighter !== undefined && !fighter.status.out && fighter.special.charge > 0 && fighter.special.action !== SpecialAction.heroNeutral;
 
 export class GoldSackPresentation {
   private readonly sack: effect;
@@ -21,7 +16,7 @@ export class GoldSackPresentation {
   }
 
   present(fighter: Readonly<Fighter> | undefined, stage: number): void {
-    if (fighter === undefined || !storedSack(fighter)) {
+    if (fighter === undefined || !goldSackStored(fighter)) {
       this.hide();
       return;
     }
@@ -31,7 +26,7 @@ export class GoldSackPresentation {
     fitFighterPlacement(this.placement, fighter, stage);
     placeEffect(this.sack, this.origin.x + this.placement.x + GOLD_SACK_ON_BACK.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + GOLD_SACK_ON_BACK.z * scale);
     BlzSetSpecialEffectYaw(this.sack, facingYaw(facing));
-    BlzSetSpecialEffectScale(this.sack, at(GOLD_SACK_SCALES, goldSackStage(fighter.special.charge)) * scale);
+    BlzSetSpecialEffectScale(this.sack, GOLD_SACK_FULL_SCALE * scale);
   }
 
   drawnEffects(into: effect[]): void {
