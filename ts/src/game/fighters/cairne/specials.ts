@@ -40,9 +40,9 @@ const lift = (): AuthoredSpecial => ({
 });
 
 export const CAIRNE_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Shockwave", description: "Plant the halberd and send one low wave along the ground.", ground: shockwave(false), air: shockwave(true) }, { damage: 1.25 }),
-  side: withExKit({ name: "Bloodhoof Gore", description: "Paw the ground, then charge with lowered horns; a catch hoists the foe through any shield and flings it away.", ground: gore(false), air: gore(true) }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Shockwave", description: "Plant the halberd and send one low wave along the ground.", ground: shockwave(false), air: shockwave(true) }, { range: 1.25 }),
+  side: withExKit({ name: "Bloodhoof Gore", description: "Paw the ground, then charge with lowered horns; a catch hoists the foe through any shield and flings it away.", ground: gore(false), air: gore(true) }, { reach: 1.25 }),
   up: withExKit({ name: "Spirit Lift", description: "Rise behind the halberd, then fall helplessly with exposed sides.", ground: lift() }, { travel: 1.25 }),
   down: withExKit({ name: "War Stomp", description: "Endurance armor shrugs off one light hit, then a stomp around him pops nearby foes straight up.",
-    ground: WAR_STOMP, air: { ...WAR_STOMP, landingLag: 26 } }, { armorDamage: 1.5, reach: f32(1.2) }),
+    ground: WAR_STOMP, air: { ...WAR_STOMP, landingLag: 26 } }, { reach: 1.25 }),
 };

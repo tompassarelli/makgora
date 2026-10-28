@@ -59,8 +59,8 @@ const litMine = (air: boolean): AuthoredSpecial => ({ ...mine(air), variants: [
 ] });
 
 export const KOBOLD_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Wick Flick", description: "Flick candle flame forward. Jump or shield it, then punish the recovery. Brighter candle, longer flame; at full flame it leaves an ember.", ground: litWick(false), air: litWick(true) }, { damage: 1.25 }),
-  side: withExKit({ name: "Panic Dig", description: "Scurry forward behind the pick. A raised shield stops the charge. Brighter candle, longer dig; bright enough, little hits no stop him.", ground: litDig(false), air: litDig(true) }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Wick Flick", description: "Flick candle flame forward. Jump or shield it, then punish the recovery. Brighter candle, longer flame; at full flame it leaves an ember.", ground: litWick(false), air: litWick(true) }, { range: 1.25 }),
+  side: withExKit({ name: "Panic Dig", description: "Scurry forward behind the pick. A raised shield stops the charge. Brighter candle, longer dig; bright enough, little hits no stop him.", ground: litDig(false), air: litDig(true) }, { shieldSafe: true }),
   up: withExKit({ name: "Candle Escape", description: "Spring upward in a panic, steer, then fall helpless.", ground: escape, air: escape }, { travel: 1.25 }),
   down: withExKit({ name: "Mine!", description: "Protect the candle with a two-sided ankle sweep. Jump over the pick. Brighter candle, wider sweep; full flame hits harder.", ground: litMine(false), air: litMine(true) }, { reach: 1.25 }),
 };

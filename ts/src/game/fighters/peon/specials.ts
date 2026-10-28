@@ -82,8 +82,8 @@ const REST: AuthoredSpecial = {
 };
 
 export const PEON_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Gold Sack", description: "Stuff gold into the sack, then press again to bonk; shield keeps the charge. A full sack kills.", ground: GOLD_SACK }, { damage: 1.25 }),
-  side: withExKit({ name: "Log Heave", description: "Bend down and heave up a huge log: its far end pops a foe up and back toward the Peon; the butt end barely moves them.", ground: LOG_HEAVE }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Gold Sack", description: "Stuff gold into the sack, then press again to bonk; shield keeps the charge. A full sack kills.", ground: GOLD_SACK }, { shieldSafe: true }),
+  side: withExKit({ name: "Log Heave", description: "Bend down and heave up a huge log: its far end pops a foe up and back toward the Peon; the butt end barely moves them.", ground: LOG_HEAVE }, { reach: 1.25 }),
   up: withExKit({ name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) }, { travel: 1.25 }),
   down: withExKit({ name: "Rest", description: "Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds.", ground: REST }, { reach: 1.25 }),
 };

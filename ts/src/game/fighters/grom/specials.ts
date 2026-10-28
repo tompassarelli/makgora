@@ -17,8 +17,8 @@ const leap: AuthoredSpecial = {
 };
 const bane: AuthoredSpecial = { endFrame: 50, regions: [heroRegion(20, 23, { x1: 24.0, z1: 94.0, x2: 124.0, z2: 20.0, radius: 16.0 }, gromHit(15.930286407470703, 35, 131.55047607421875, 27.0))] };
 export const GROM_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Warsong Cry", description: "Roar in their face and launch them upward. Rush after them.", ground: cry, air: { ...cry, landingLag: 20, hurt: [hurtPose(1, 12, [hurtPart(8.0, 8.0, -7.0, 141.0, 52.0), hurtPart(-32.0, 90.0, -28.0, 117.0, 29.0)]), hurtPose(13, 33, [hurtPart(8.0, 8.0, 4.0, 148.0, 44.0), hurtPart(-16.0, 90.0, -12.0, 109.0, 21.0)])] } }, { damage: 1.25, reach: 1.1500000953674316 }),
-  side: withExKit({ name: "Gorehowl Rush", description: "Charge axe-first. A shield stops the rush; a miss leaves you open.", ground: rush(false), air: rush(true) }, { damage: 1.25, travel: 1.25 }),
+  neutral: withExKit({ name: "Warsong Cry", description: "Roar in their face and launch them upward. Rush after them.", ground: cry, air: { ...cry, landingLag: 20, hurt: [hurtPose(1, 12, [hurtPart(8.0, 8.0, -7.0, 141.0, 52.0), hurtPart(-32.0, 90.0, -28.0, 117.0, 29.0)]), hurtPose(13, 33, [hurtPart(8.0, 8.0, 4.0, 148.0, 44.0), hurtPart(-16.0, 90.0, -12.0, 109.0, 21.0)])] } }, { reach: 1.25 }),
+  side: withExKit({ name: "Gorehowl Rush", description: "Charge axe-first. A shield stops the rush; a miss leaves you open.", ground: rush(false), air: rush(true) }, { shieldSafe: true }),
   up: withExKit({ name: "Blood Leap", description: "Haul Gorehowl upward as you leap, then fall helpless.", ground: leap }, { travel: 1.25 }),
-  down: withExKit({ name: "Mannoroth's Bane", description: "Commit to a furious two-handed execution chop.", ground: bane, air: { ...bane, landingLag: 24 } }, { damage: 1.25 }),
+  down: withExKit({ name: "Mannoroth's Bane", description: "Commit to a furious two-handed execution chop.", ground: bane, air: { ...bane, landingLag: 24 } }, { reach: 1.25 }),
 };

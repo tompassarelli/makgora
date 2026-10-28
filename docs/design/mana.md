@@ -139,7 +139,6 @@ A follow-up of an EX cast never raises a second one.
 Verdict reasons: **damage** = the whole EX was 25% more damage, which beats no
 answer; **two** = more than one headline; **armor** = added armor or
 invulnerability; **other move** = a different move, not an upgrade.
-Rows marked *next batch* keep their old EX until their batch lands.
 
 | Fighter | Special | EX before | Verdict | EX now |
 |---|---|---|---|---|
@@ -204,43 +203,46 @@ Rows marked *next batch* keep their old EX until their batch lands.
 | Sylvanas | Silence | Reach | Pass | Unchanged |
 | Sylvanas | Banshee Flight | Travel | Pass | Unchanged |
 | Sylvanas | Life Drain | +25% damage | Fail: damage | Reach: the drain grabs 25% farther; same heal cap |
-| Cairne | Shockwave | +25% damage | Fail: damage | *next batch* |
-| Cairne | Bloodhoof Gore | +25% damage | Fail: damage | *next batch* |
+| Cairne | Shockwave | +25% damage | Fail: damage | Range: the wave runs 25% farther |
+| Cairne | Bloodhoof Gore | +25% damage | Fail: damage | Reach: the horns catch 25% farther |
 | Cairne | Spirit Lift | Travel | Pass | Unchanged |
-| Cairne | War Stomp | Armor 50% heavier and 20% more reach | Fail: two | *next batch* |
+| Cairne | War Stomp | Armor 50% heavier and 20% more reach | Fail: two | Reach: the stomp and ring grow 25%; the armor is unchanged |
 | Chen | Breath of Fire | Reach | Pass | Unchanged |
 | Chen | Body Slam | Travel | Pass | Unchanged |
 | Chen | Storm Rise | Travel | Pass | Unchanged |
 | Chen | Brew Keg | Reach | Pass | Unchanged |
-| Peon | Gold Sack | +25% damage | Fail: damage | *next batch* |
-| Peon | Log Heave | +25% damage | Fail: damage | *next batch* |
+| Peon | Gold Sack | +25% damage | Fail: damage | Shield-safe bonks |
+| Peon | Log Heave | +25% damage | Fail: damage | Reach: a 25% longer log |
 | Peon | Worksite Launch | Travel | Pass | Unchanged |
 | Peon | Rest | Reach | Pass | Unchanged |
-| Tinker | Cluster Rockets | +25% damage | Fail: damage | *next batch* |
-| Tinker | Laser | +25% damage and reach | Fail: two | *next batch* |
+| Tinker | Cluster Rockets | +25% damage | Fail: damage | Range |
+| Tinker | Laser | +25% damage and reach | Fail: two | Reach: a 25% longer beam |
 | Tinker | Rocket Boots | Travel | Pass | Unchanged |
-| Tinker | Pocket Factory | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | Invulnerable recall removed; *next batch* |
-| Kael'thas | Pyroblast | +25% damage | Fail: damage | *next batch* |
-| Kael'thas | Flame Strike | +25% damage | Fail: damage | *next batch* |
+| Tinker | Pocket Factory | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | x1.25 factory durability; invulnerable recall removed |
+| Kael'thas | Pyroblast | +25% damage | Fail: damage | Reach: a 25% larger fireball |
+| Kael'thas | Flame Strike | +25% damage | Fail: damage | Reach: a 25% wider pillar |
 | Kael'thas | Phoenix | Travel | Pass | Unchanged |
 | Kael'thas | Banish | Reach | Pass | Unchanged |
 | Murloc | Ensnare | Reach | Pass | Unchanged |
-| Murloc | Tidal Rush | +25% damage | Fail: damage | *next batch* |
+| Murloc | Tidal Rush | +25% damage | Fail: damage | Shield-safe |
 | Murloc | Tide Spout | Travel | Pass | Unchanged |
 | Murloc | Disease Cloud | Reach | Pass | Unchanged |
-| Grom | Warsong Cry | +25% damage and 15% reach | Fail: two | *next batch* |
-| Grom | Gorehowl Rush | +25% damage and travel | Fail: two | *next batch* |
+| Grom | Warsong Cry | +25% damage and 15% reach | Fail: two | Reach: a 25% wider roar, same damage |
+| Grom | Gorehowl Rush | +25% damage and travel | Fail: two | Shield-safe |
 | Grom | Blood Leap | Travel | Pass | Unchanged |
-| Grom | Mannoroth's Bane | +25% damage | Fail: damage | *next batch* |
-| Kobold | Wick Flick | +25% damage | Fail: damage | *next batch* |
-| Kobold | Panic Dig | +25% damage | Fail: damage | *next batch* |
+| Grom | Mannoroth's Bane | +25% damage | Fail: damage | Reach: a 25% longer chop |
+| Kobold | Wick Flick | +25% damage | Fail: damage | Range: the flame flies 25% longer at every candle level |
+| Kobold | Panic Dig | +25% damage | Fail: damage | Shield-safe at every candle level |
 | Kobold | Candle Escape | Travel | Pass | Unchanged |
 | Kobold | Mine! | Reach | Pass | Unchanged |
-| Malfurion | Entangling Roots | +25% damage and reach | Fail: two | *next batch* |
-| Malfurion | Side special | +25% damage and travel | Fail: two | *next batch* |
-| Malfurion | Up special | Travel | Pass | Unchanged |
-| Malfurion | Down special | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | Invulnerable recall removed; *next batch* |
-| Medivh | All four | Hand-authored EX forms | *next batch* | *next batch* |
+| Malfurion | Entangling Roots | +25% damage and reach | Fail: two | Reach: 25% wider roots |
+| Malfurion | Stag Charge | +25% damage and travel | Fail: two | Shield-safe |
+| Malfurion | Dream Ascent | Travel | Pass | Unchanged |
+| Malfurion | Force of Nature | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | x1.25 treant durability; invulnerable recall removed |
+| Medivh | Arcane Omen | 37% faster, 25% larger, +33% damage | Fail: two | Reach: a 25% larger omen |
+| Medivh | Vanishing Act | Blinks 39% farther, +40% and +57% damage | Fail: two | Travel: blinks 25% farther |
+| Medivh | Raven Flight | 33% faster flight, +60% damage | Fail: two | Travel: flies 25% farther |
+| Medivh | Last Word | Blinks 33% farther, 43% larger burst, +80% damage | Fail: two | Reach: a 25% larger burst |
 | Anub'arak | Impale | Larger spines (28 from 18), +84% damage, more knockback | Fail: two | Reach |
 | Anub'arak | Burrow Hunt | Burrows 4 frames longer and faster, erupts 4 frames later, larger, +33% damage | Fail: slower, two | Travel |
 | Anub'arak | Crypt Eruption | 60% farther, larger, +50% damage | Fail: two | Travel |

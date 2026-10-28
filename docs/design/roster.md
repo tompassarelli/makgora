@@ -31,10 +31,10 @@ and up throw launch into canopy follow-ups; down throw creates a tech chase.
 
 | Special | Ordinary action and counterplay | Full-bar EX |
 |---|---|---|
-| Entangling Roots, neutral | Mark a low patch 180 units ahead on frame 8; roots hit once after 20 telegraph frames for 8 damage and a 24-frame movement bind. Jump or shield the patch. 42 total frames. | 10 damage and a wider root patch. |
-| Stag Charge, side | Coil, then bound forward for frames 12–20 with a branching staff strike for 11 damage. Shield stops the charge; 43 total leaves a whiff punish. Air charge ends helpless. | 13.75 damage and 25% farther travel. |
+| Entangling Roots, neutral | Mark a low patch 180 units ahead on frame 8; roots hit once after 20 telegraph frames for 8 damage and a 24-frame movement bind. Jump or shield the patch. 42 total frames. | A 25% wider root patch, same damage (mana.md, 2026-10-28). |
+| Stag Charge, side | Coil, then bound forward for frames 12–20 with a branching staff strike for 11 damage. Shield stops the charge; 43 total leaves a whiff punish. Air charge ends helpless. | Shield-safe: a blocked charge holds the shield through his recovery. |
 | Dream Ascent, up | Rise diagonally on frames 10–23 with a 7-damage canopy strike, spending the aerial jump and ending helpless. 40 total; exposed above and after the rise. | 25% farther rise. |
-| Force of Nature, down | Plant one fragile treant on frame 26, 20 durability, 240-frame life; four branch bolts do 5 damage each. Setup takes 50 frames. Destroy or jump the treant; repeat down special recalls it. | 25 durability, 6.25-damage bolts. |
+| Force of Nature, down | Plant one fragile treant on frame 26, 20 durability, 240-frame life; four branch bolts do 5 damage each. Setup takes 50 frames. Destroy or jump the treant; repeat down special recalls it. | 25 durability; the same bolts. |
 
 **Grabs:** shared standing/dash/pivot envelope. One staff-butt pummel uses the
 shared 3-damage escape window. Forward throw dismisses the victim (8 damage,
@@ -222,8 +222,8 @@ recording every hit he landed (0.34 hits a second, 3.2% dealt a second).
 
 | Special | Ordinary move and counterplay | EX expression |
 | --- | --- | --- |
-| Neutral: Wick Flick | Flick a tiny flame on frame 12; 5%, 36 total frames. Jump or shield the short projectile; punish his recovery. The flame grows with the candle level. Bare, it is the "You No Take Candle!" flail. | 25% more damage on the current level's flame. |
-| Side: Panic Dig | Ground-level 11-unit/frame scurry on frames 8–22; 10%, 32 total. In air, swing the pick forward. Shield stops the scurry. Travels farther with each level and gains armor from level 2. | 25% more damage on the current level's dig; shield still stops it. |
+| Neutral: Wick Flick | Flick a tiny flame on frame 12; 5%, 36 total frames. Jump or shield the short projectile; punish his recovery. The flame grows with the candle level. Bare, it is the "You No Take Candle!" flail. | The current level's flame flies 25% longer (mana.md, 2026-10-28). |
+| Side: Panic Dig | Ground-level 11-unit/frame scurry on frames 8–22; 10%, 32 total. In air, swing the pick forward. Shield stops the scurry. Travels farther with each level and gains armor from level 2. | Shield-safe on the current level's dig. |
 | Up: Candle Escape | Panic spring upward on frame 6, 16-unit/frame rise through 25; 5% on frames 6–14. One use per airtime; helpless after. Never changes with the candle. | 20-unit/frame rise and 25% farther steering; same 5% pick and helpless ending. |
 | Down: Mine! | Hunch over the candle, then sweep the pick across both ankles on frames 10–13; 8.7%, 34 total. Jump over or punish the whiff. Wider with each level. | 25% wider sweep on both sides of the current level's sweep. |
 
@@ -1943,10 +1943,10 @@ there is no Grom-specific resource or cooldown.
 
 | Input | Base move | EX |
 |---|---|---|
-| Neutral | **Warsong Cry:** brace and roar; a close body burst at frames 12–15 launches foes upward for a chase, ending frame 34. Air version lands with 20 lag. | 25% stronger burst and 15% greater reach |
-| Side | **Gorehowl Rush:** run axe-first on frames 8–20, hit at 10–17, stop at shields and recover through frame 40. Air version is once per airtime and ends helpless. | 25% more travel and damage |
+| Neutral | **Warsong Cry:** brace and roar; a close body burst at frames 12–15 launches foes upward for a chase, ending frame 34. Air version lands with 20 lag. | 25% greater reach, same burst (mana.md, 2026-10-28) |
+| Side | **Gorehowl Rush:** run axe-first on frames 8–20, hit at 10–17, stop at shields and recover through frame 40. Air version is once per airtime and ends helpless. | Shield-safe: a blocked rush holds the shield through his recovery |
 | Up | **Blood Leap:** spring upward on frames 7–22, axe rising through 7–14; ends frame 36 in helpless fall. No invulnerability. | 25% more travel |
-| Down | **Mannoroth's Bane:** visible two-handed execution, active 20–23, recovery through frame 50; ground and air cleave, 24 landing lag. | 25% more damage |
+| Down | **Mannoroth's Bane:** visible two-handed execution, active 20–23, recovery through frame 50; ground and air cleave, 24 landing lag. | A 25% longer chop |
 
 ### Grab and throws
 
@@ -2152,10 +2152,10 @@ No charge system, second resource or automatic counter.
 
 | Special | Ordinary version (all free) | EX (one full universal bar) |
 | --- | --- | --- |
-| Neutral: Arcane Omen | f12 launches one slow purple bolt, 9 damage, 40-frame cast. Shield or jump it. | Faster larger 12-damage bolt; same cast commitment. |
-| Side: Vanishing Act | f10 blink 180 units forward, f12–14 staff strike for 7, end f38; intangible only f9–10. Read the arrival and punish recovery. | Blink 250 units, 11-damage strike; same exposed arrival. |
-| Up: Raven Flight | Compress f1–8, raven-form aimed flight f9–28 at 16 units/frame, 5-damage wing contact f9–15; end f36 helpless, spends air jump. | Flight speed 20 and 8-damage contact; same helpless landing. |
-| Down: Last Word | f10 blink 120 units backwards, f13–15 outward arcane burst for 5, end f38; intangible f9–10. Bait the pursuit or lose ground. | Retreat 160 units and 9-damage wider burst. |
+| Neutral: Arcane Omen | f12 launches one slow purple bolt, 9 damage, 40-frame cast. Shield or jump it. | A 25% larger bolt at the same speed and damage; same cast commitment (mana.md, 2026-10-28). |
+| Side: Vanishing Act | f10 blink 180 units forward, f12–14 staff strike for 7, end f38; intangible only f9–10. Read the arrival and punish recovery. | Blink 225 units; same strike and exposed arrival. |
+| Up: Raven Flight | Compress f1–8, raven-form aimed flight f9–28 at 16 units/frame, 5-damage wing contact f9–15; end f36 helpless, spends air jump. | Flight 25% farther; same contact and helpless landing. |
+| Down: Last Word | f10 blink 120 units backwards, f13–15 outward arcane burst for 5, end f38; intangible f9–10. Bait the pursuit or lose ground. | A 25% larger burst; same retreat and damage. |
 
 **Grab and throws:** shared grab envelope; one 3-damage staff pummel. Forward
 throw pushes at f14 for 7; back throw vanishes behind the victim then sweeps at

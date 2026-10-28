@@ -86,9 +86,9 @@ const phoenix: AuthoredSpecial = {
 
 export const KAELTHAS_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Pyroblast", description: "A slow, heavy fireball he steers with the stick while he stands rooted; special or shield lets it go. It hits hard and cracks shields, but a miss leaves him open. One at a time.",
-    ground: pyroblast }, { damage: 1.25 }),
+    ground: pyroblast }, { reach: 1.25 }),
   side: withExKit({ name: "Flame Strike", description: "Hold to slide a rune outward, release to call a pillar of fire onto it; the pillar lingers and burns. Over open air it stands at Kael's height. One at a time.",
-    ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) }, { damage: 1.25 }),
+    ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) }, { reach: 1.25 }),
   up: withExKit({ name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
     ground: phoenix }, { travel: 1.25 }),
   down: withExKit({ name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
