@@ -57,11 +57,11 @@
 # Howl of Terror on the ground and in the air.
 600 a tap X 2
 602 a capture
-615 a capture
+621 a capture
 680 a tap B 8
 686 a tap X 2
 688 a capture
-701 a capture
+707 a capture
 # Ruin Charge in the air.
 860 a tap B 8
 866 a stick 1 0

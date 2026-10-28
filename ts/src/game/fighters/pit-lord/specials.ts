@@ -16,10 +16,10 @@ const perFrame = (distance: number, first: number, last: number): number => f32(
 
 const AIR_SPECIAL_LANDING_LAG = 24;
 const HOWL_HURT = [
-    hurtPose(1, 33, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
+    hurtPose(1, 39, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
 ];
 const HOWL_AIR_HURT = [
-    hurtPose(1, 33, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
+    hurtPose(1, 39, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
 ];
 const CHARGE_HURT = [
     hurtPose(1, 63, [hurtPart(-37.0, 34.0, 40.0, 87.0, 56.0)]),
@@ -100,7 +100,7 @@ const abyssalLeap = (rise: number, drift: number, steer: number): AuthoredSpecia
 
 
 
-export const HOWL_FIRST = 12;
+export const HOWL_FIRST = 18;
 export const HOWL_REACH = h(f32(1.6));
 const HOWL_HEIGHT = h(f32(0.6));
 const HOWL_RINGS = [f32(0.5), f32(0.625), f32(0.75), f32(0.875), 1.0] as const;
@@ -113,7 +113,7 @@ export const TERRIFIED: NonNullable<AuthoredSpecial["strikeStatus"]> = {
   perPercent: { frames: 0.4000000059604645, cap: 90 }, groundedOnly: true,
 };
 const howl = (air: boolean): AuthoredSpecial => ({
-  endFrame: 34,
+  endFrame: 40,
   hurt: air ? HOWL_AIR_HURT : HOWL_HURT,
   regions: HOWL_RINGS.map((share, index) =>
     heroRegion(HOWL_FIRST + index, HOWL_FIRST + index, capsule(0.0, HOWL_HEIGHT, 0.0, HOWL_HEIGHT, f32(HOWL_REACH * share)), HOWL_HIT, HOWL_GROUNDED_HIT)),

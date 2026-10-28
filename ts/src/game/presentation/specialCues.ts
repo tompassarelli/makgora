@@ -180,8 +180,8 @@ const BANSHEE_FORM: MoveCues = {
 const DREADLORD_BITE_CUES: MoveCues = { spell: "Healing bite", startup: VAMPIRIC, active: cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0) };
 const VOODOO = cue("Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx", "hand", f32(0.7));
 const FEL = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.7));
-const HOWL_INHALE: Cue = { ...FEL, scale: f32(0.25), scaleEnd: f32(0.9), scaleFrames: HOWL_FIRST - 1, color: [255, 40, 20], anchorFrames: Array.from({ length: HOWL_FIRST }, () => ({ x: 38.0, z: 118.0 })) };
-const HOWL_ROAR: Cue = { ...cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "feet", f32(HOWL_REACH / f32(440.0))), color: [255, 60, 30], sound: "HowlOfTerror" };
+const HOWL_INHALE: Cue = { ...FEL, scale: f32(0.25), scaleEnd: f32(1.2), scaleFrames: HOWL_FIRST - 1, color: [160, 20, 10], sound: "HowlOfTerror", anchorFrames: Array.from({ length: HOWL_FIRST }, () => ({ x: 38.0, z: 118.0 })) };
+const HOWL_ROAR: Cue = { ...cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "feet", f32(HOWL_REACH / f32(440.0))), color: [255, 60, 30] };
 const MURGUL = cue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx", "hand", f32(0.6));
 const BEAST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", "hand", f32(0.6));
 const QUIET_BEAST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.6));
