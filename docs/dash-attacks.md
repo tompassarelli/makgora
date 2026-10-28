@@ -167,7 +167,18 @@ from 3/3/3/3/3 to 4/4/3/3/4 by giving each judged tile its own shape: arms
 flung overhead and behind as he rocks back, a flat superman at contact, heels
 kicked up mid-slide and a chest lift on the last active frame. Anticipation
 stays at 3 in every take, the judges reading the trip as "a stumble rather
-than a pull-back"; a trip is the move's premise, so the coil rule above and
-this move pull against each other. Follow-through stays at 3 with "drifts
-slowly upright": the return-ratio line keeps the rise even, and a faster rise
-fails it.
+than a pull-back" and, once the windup is a rock-back on bent knees, as "a
+small, short crouch-back"; a trip is the move's premise, so the coil rule
+above and this move pull against each other. Swinging the pickaxe further
+round (`axe` -250) hides it in front of the body and reads worse.
+Follow-through reached 4 from two of three judges (2026-10-28) with a held
+landing inside the return-ratio line: the body skids flat for three frames
+after the last active frame (`L` to `L + 3`, about 0.1 of the mean step,
+so line 3 still counts it as part of the return), drops onto a braced arm
+with the pickaxe flat on the floor, then pushes up and settles. Line 3 caps
+the largest step at 1.4 times the mean over the whole end lag, so a hold
+leaves fewer frames for the rise; keep the hold to three frames and space the
+rise keys by how far each pose travels, not evenly in time, which held the
+ratio at 1.28 and line 2's largest jump at 0.05. Lowering the body more than
+about 11 units moves the pickaxe tip along the strike direction and makes
+the reach peak late (`p` past `L + 2`), so the arm folds back as it drops.
