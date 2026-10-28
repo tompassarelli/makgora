@@ -81,3 +81,28 @@ about 125–185 units out. The air form is the same heave and hit regions, once
 per airtime, with no stall: he keeps falling with his momentum, and landing
 mid-move ends it with 15 frames of landing lag. Frame data and values are in
 smashcraft:docs/design/peasant.md.
+
+## Gold Sack
+
+Tom asked for the bonk to fire on release, with Donkey Kong's Giant Punch
+frames and double the reach (2026-10-28). Holding special stuffs the sack and
+releasing it swings at the charge reached: a one-frame tap swings the empty
+sack, a longer hold swings the stage reached, and a sack held past full stays
+ready until release. Shield with special still held stores the charge, and the
+next special press swings it at once. It reuses the release follow-up Quickdraw
+draws with (`FollowUpInput.release`); the charge's `releases` flag keeps the
+full sack held instead of dropping it and swings a stored charge at its stage
+when the move starts. The air form is the same move. Frames, damage, reach and
+the full-charge lunge are in smashcraft:docs/design/peasant.md.
+
+| Stage | First active | Active frames | End |
+| --- | ---: | ---: | ---: |
+| Empty | 24 | 6 | 51 |
+| 1 handful | 22 | 6 | 49 |
+| 2 handfuls | 21 | 6 | 48 |
+| 3 handfuls | 19 | 5 | 46 |
+| Full | 17 | 5 | 44 |
+
+Donkey Kong's Melee Giant Punch hits on frame 24 uncharged and 17 fully
+charged, over 24–29 and 17–21, in animations of 51 and 44 frames
+([SmashWiki](https://www.ssbwiki.com/Donkey_Kong_(SSBM)/Neutral_special)).

@@ -1,35 +1,51 @@
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, type SpecialCharge, type SpecialFollowUp, frames } from "../../sim/specials/schema";
+import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { heroRegion, type MoveRegion, type StrikeCapsule } from "../../sim/heroMoves";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
 import { peonHit } from "./moves";
 
-export const GOLD_SACK_CHARGE: SpecialCharge = { hold: 6, full: 80, stages: 4 };
+export const GOLD_SACK_CHARGE: SpecialCharge = { hold: 6, full: 80, stages: 4, releases: true };
 export const GOLD_SACK_DAMAGE = [8.0, 11.0, 14.0, 17.0, 24.0] as const;
 const GOLD_SACK_GROWTH = [65.0, 68.0, 70.0, 72.0, 72.0] as const;
 const GOLD_SACK_BASE = [8.0, 10.0, 11.0, 12.0, 12.0] as const;
-export const GOLD_SACK_FIRST_ACTIVE = [12, 12, 12, 12, 9] as const;
-export const GOLD_SACK_ARC = [[0.0, 74.0, 34.0, 104.0], [8.0, 82.0, 62.0, 86.0], [14.0, 70.0, 72.0, 44.0]] as const;
-const GOLD_SACK_END = GOLD_SACK_CHARGE.hold + 12;
-const GOLD_SACK_WINDOW = frames(GOLD_SACK_CHARGE.hold + 1, GOLD_SACK_END);
+export const GOLD_SACK_FIRST_ACTIVE = [24, 22, 21, 19, 17] as const;
+const GOLD_SACK_ACTIVE = [6, 6, 6, 5, 5] as const;
+const GOLD_SACK_ENDS = [51, 49, 48, 46, 44] as const;
+export const GOLD_SACK_ARC = [[0.0, 78.0, 68.0, 138.0], [16.0, 94.0, 124.0, 102.0], [28.0, 70.0, 144.0, 18.0]] as const;
+const GOLD_SACK_LUNGE = { speed: 3.0, first: 2, last: 14 } as const;
+const GOLD_SACK_WINDOW = frames(1, GOLD_SACK_CHARGE.hold + 1);
+
+const lerp = (from: number, to: number, share: number): number => f32(from + f32(f32(to - from) * share));
+
+const sackArcAt = (index: number, count: number): StrikeCapsule => {
+  const along = f32(f32(index * (GOLD_SACK_ARC.length - 1)) / Math.max(1, count - 1));
+  const from = Math.min(GOLD_SACK_ARC.length - 2, Math.floor(along));
+  const share = f32(along - from);
+  const a = at(GOLD_SACK_ARC, from);
+  const b = at(GOLD_SACK_ARC, from + 1);
+  return { x1: lerp(a[0], b[0], share), z1: lerp(a[1], b[1], share), x2: lerp(a[2], b[2], share), z2: lerp(a[3], b[3], share), radius: 0.0 };
+};
 
 const goldSackSwing = (stage: number): AuthoredSpecial => {
-  const first = GOLD_SACK_FIRST_ACTIVE[stage] ?? 12;
+  const first = GOLD_SACK_FIRST_ACTIVE[stage] ?? 24;
+  const count = GOLD_SACK_ACTIVE[stage] ?? 6;
   const radius = 14.0 + 2.0 * stage;
   const effect = peonHit(GOLD_SACK_DAMAGE[stage] ?? 8.0, 40, GOLD_SACK_GROWTH[stage] ?? 80.0, GOLD_SACK_BASE[stage] ?? 20.0);
   return {
-    name: "Gold Sack Bonk", endFrame: first + 26, landingLag: 14, swingsThroughLanding: true, spendsCharge: true,
-    regions: GOLD_SACK_ARC.map(([x1, z1, x2, z2], index) => heroRegion(first + index, first + index, { x1, z1, x2, z2, radius }, effect)),
+    name: "Gold Sack Bonk", endFrame: GOLD_SACK_ENDS[stage] ?? 51, landingLag: 14, swingsThroughLanding: true, spendsCharge: true,
+    motion: stage === GOLD_SACK_CHARGE.stages ? [{ ...frames(GOLD_SACK_LUNGE.first, GOLD_SACK_LUNGE.last), velocityX: GOLD_SACK_LUNGE.speed, velocityZ: 0.0 }] : undefined,
+    regions: Array.from({ length: count }, (_, index) => heroRegion(first + index, first + index, { ...sackArcAt(index, count), radius }, effect)),
   };
 };
 
 const goldSackFollowUps: readonly SpecialFollowUp[] = [
-  ...[0, 1, 2, 3, 4].map((stage): SpecialFollowUp => ({ window: GOLD_SACK_WINDOW, chargeStage: stage, special: goldSackSwing(stage) })),
+  ...[0, 1, 2, 3, 4].map((stage): SpecialFollowUp => ({ window: GOLD_SACK_WINDOW, input: FollowUpInput.release, chargeStage: stage, special: goldSackSwing(stage) })),
   { window: GOLD_SACK_WINDOW, input: FollowUpInput.shield, special: { name: "Gold Sack Store", endFrame: 8 } },
 ];
 
-const GOLD_SACK: AuthoredSpecial = { endFrame: GOLD_SACK_END, charge: GOLD_SACK_CHARGE, followUps: goldSackFollowUps };
+const GOLD_SACK: AuthoredSpecial = { endFrame: GOLD_SACK_CHARGE.hold + 2, charge: GOLD_SACK_CHARGE, followUps: goldSackFollowUps };
 
 export const LOG_HEAVE_FIRST_ACTIVE = 14;
 export const LOG_ON_SHOULDER = frames(20, 25);
@@ -87,7 +103,7 @@ const REST: AuthoredSpecial = {
 };
 
 export const PEON_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Gold Sack", description: "Stuff gold into the sack, then press again to bonk; shield keeps the charge. A full sack kills.", ground: GOLD_SACK }, { shieldSafe: true }),
+  neutral: withExKit({ name: "Gold Sack", description: "Hold to stuff gold into the sack and release to bonk: a tap bonks at once, a longer hold bonks harder, and a full sack lunges forward and kills. Shield keeps the charge for the next press.", ground: GOLD_SACK }, { shieldSafe: true }),
   side: withExKit({ name: "Log Heave", description: "Grab a huge log by its end and heave it up and over, on the ground or once in the air: its far end pops a foe up and back toward the Peon; the butt end barely moves them.", ground: LOG_HEAVE, air: LOG_HEAVE_AIR }, { reach: 1.25 }),
   up: withExKit({ name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) }, { travel: 1.25 }),
   down: withExKit({ name: "Rest", description: "Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds.", ground: REST }, { reach: 1.25 }),

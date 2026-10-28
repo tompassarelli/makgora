@@ -267,6 +267,8 @@ export interface SpecialCharge {
   readonly full: number;
   readonly stages: number;
   readonly drops?: true | undefined;
+  /** Keeps holding at full until a release follow-up swings, and swings a charge left stored at its stage the moment the move starts. */
+  readonly releases?: true | undefined;
 }
 
 export interface AuthoredSpecial {

@@ -19,7 +19,7 @@ import { goldSackGlowAlpha } from "./peonPose";
 import { rules } from "../../generated/fighter-art/peon";
 
 const HELD_TICKS = 110;
-const FIRE_TICK = 130;
+const RELEASE_TICK = HELD_TICKS + 1;
 const FULL_BONK = GOLD_SACK_BONK_CLIPS[GOLD_SACK_CHARGE.stages]?.index;
 const FULL_CHARGE_SECONDS = f32((GOLD_SACK_CHARGE.hold + GOLD_SACK_CHARGE.full) * FRAME_SECONDS);
 const FULL_FIRST_ACTIVE = GOLD_SACK_FIRST_ACTIVE[GOLD_SACK_CHARGE.stages] ?? 0;
@@ -40,9 +40,9 @@ function heldGoldSack(): readonly Frame[] {
   const pose = createFighterPose();
   const special = maskOf(Action.special);
   const frames: Frame[] = [];
-  for (let tick = 1; tick <= FIRE_TICK + 40; tick++) {
-    const held = tick <= HELD_TICKS || (tick >= FIRE_TICK && tick < FIRE_TICK + 8);
-    const row = inputRow(held ? { held: special, pressed: tick === 1 || tick === FIRE_TICK ? special : 0 } : {});
+  for (let tick = 1; tick <= RELEASE_TICK + 60; tick++) {
+    const held = tick <= HELD_TICKS;
+    const row = inputRow(held ? { held: special, pressed: tick === 1 ? special : 0 } : {});
     if (row === undefined) throw new Error("Gold Sack input row");
     adaptInput(row, peon, tick, state.controls.inputs[0], state.controls.commands[0]);
     stepMatch(state.match, state.world, state.controls, tick);
@@ -55,7 +55,7 @@ function heldGoldSack(): readonly Frame[] {
   return frames;
 }
 
-test("Holding Gold Sack plays the stuffing clip one frame per banked charge frame to a held full sack that flashes gold, and the stored full sack swings its own bonk clip to strike on its first active frame [k1 scenario]", () => {
+test("Holding Gold Sack plays the stuffing clip one frame per banked charge frame to a held full sack that flashes gold, and the release swings the full bonk clip to strike on its first active frame [k1 scenario]", () => {
   const frames = heldGoldSack();
   const charging = frames.filter((frame) => frame.action === SpecialAction.heroNeutral && !frame.swinging);
   const swing = frames.filter((frame) => frame.action === SpecialAction.heroNeutral && frame.swinging);
@@ -71,7 +71,7 @@ test("Holding Gold Sack plays the stuffing clip one frame per banked charge fram
     assertEquals(frame.glow > 0, frame.charge >= GOLD_SACK_CHARGE.full, `tick ${frame.tick}: gold flash only at full charge`);
     if (frame.charge >= GOLD_SACK_CHARGE.full) assertEquals(frame.time, FULL_CHARGE_SECONDS, `tick ${frame.tick}: the full pose is held`);
   }
-  assertTrue(swing.length > FULL_FIRST_ACTIVE && swing[0]?.tick === FIRE_TICK);
+  assertTrue(swing.length > FULL_FIRST_ACTIVE && swing[0]?.tick === RELEASE_TICK);
   for (let index = 0; index < swing.length; index++) {
     const frame = swing[index];
     if (frame === undefined) continue;
