@@ -116,6 +116,8 @@ export interface ImpactEvents {
   launchTrail: boolean;
   dodgeTrail: boolean;
   airDodge: boolean;
+  exSlide: boolean;
+  exWavedash: boolean;
   respawn: boolean;
   jump: JumpCue;
 
@@ -153,7 +155,7 @@ export function createImpactEvents(): ImpactEvents {
     element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, fuse: -1, fuseSerial: 0, fuseX: 0.0, fuseZ: 0.0, previousFuseSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
     shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false,
-    movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false,
+    movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false, exSlide: false, exWavedash: false,
     respawn: false, jump: JumpCue.none, jumpOriginX: 0.0, jumpOriginZ: 0.0, character: 1, facing: 1,
     koDirectionX: 0, koDirectionZ: 0, landing: ImpactLanding.none, dodge: DodgeCue.none, direction: 0, x: 0.0, z: 0.0,
     surface: SurfaceContact.none, surfaceMissedTech: false, contactX: 0.0, contactZ: 0.0,
@@ -215,6 +217,8 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.launchTrail = false;
   events.dodgeTrail = false;
   events.airDodge = false;
+  events.exSlide = false;
+  events.exWavedash = false;
   events.respawn = false;
   events.swing = -1;
   events.perform = -1;
@@ -444,6 +448,8 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.jumpOriginZ = events.previousZ;
   }
   events.airDodge = present && !events.previouslyAirDodging && dodge.airDodging;
+  events.exSlide = present && dodge.ex && !dodge.airDodging && motion.grounded && down.state === DownState.none;
+  events.exWavedash = events.exSlide && !events.previouslyGrounded;
   if (present && launch.hitlag === 0) {
     const moved = Math.abs(f32(motion.x - events.previousX)) > f32(0.1) || Math.abs(f32(motion.z - events.previousZ)) > f32(0.1);
     if (motion.grounded && down.state === DownState.none && !isGroundDodging(fighter)) {

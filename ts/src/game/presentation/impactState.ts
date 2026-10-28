@@ -32,9 +32,12 @@ export const IMPACT_ICE_HIT = 20;
 export const IMPACT_ELECTRIC_SHIELD = 21;
 export const IMPACT_PUMMEL = 22;
 export const IMPACT_ARCANE_HIT = 23;
+export const IMPACT_EX_DUST = 24;
+export const IMPACT_EX_FLASH = 25;
+export const IMPACT_EX_SPARK = 26;
 
 export const IMPACTS_PER_KIND = 8;
-export const IMPACT_KIND_COUNT = 24;
+export const IMPACT_KIND_COUNT = 27;
 export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
 export const KO_STAR_FRAMES = 108;
@@ -209,6 +212,20 @@ export const ELECTRIC_CONTACT_FRAMES = 24;
 
 
 export function impactLifetime(kind: number): number {
+  return kind >= IMPACT_EX_DUST ? exImpactLifetime(kind) : baseImpactLifetime(kind);
+}
+
+
+function exImpactLifetime(kind: number): number {
+  switch (kind) {
+    case IMPACT_EX_DUST: return 32;
+    case IMPACT_EX_FLASH: return 24;
+    default: return 20;
+  }
+}
+
+
+function baseImpactLifetime(kind: number): number {
   switch (kind) {
     case IMPACT_STAR_KO: return KO_STAR_FRAMES;
     case IMPACT_SCREEN_KO: return KO_SCREEN_FRAMES;
@@ -299,10 +316,13 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
     surfaceFlash(state, IMPACT_MISSED_TECH, events);
     surfaceFlash(state, IMPACT_DUST, events);
   }
+  const dust = events.exSlide ? IMPACT_EX_DUST : IMPACT_DUST;
   if (events.ordinaryLanding) {
-    spawn(state, IMPACT_DUST, f32(x - 12.0), f32(z + 2.0), -1, f32(0.7));
-    spawn(state, IMPACT_DUST, f32(x + 12.0), f32(z + 2.0), 1, f32(0.7));
+    spawn(state, dust, f32(x - 12.0), f32(z + 2.0), -1, f32(0.7));
+    spawn(state, dust, f32(x + 12.0), f32(z + 2.0), 1, f32(0.7));
   }
+  if (events.exWavedash) spawn(state, IMPACT_EX_FLASH, x, f32(z + 2.0), 0, 1.0);
+  if (events.exSlide && imod(frame, 3) === 0) spawn(state, IMPACT_EX_SPARK, x, f32(z + 6.0), 0, f32(0.5));
   if (events.jump === JumpCue.ground) {
     spawn(state, IMPACT_DUST, f32(events.jumpOriginX - 12.0), f32(events.jumpOriginZ + 2.0), -1, f32(0.7));
     spawn(state, IMPACT_DUST, f32(events.jumpOriginX + 12.0), f32(events.jumpOriginZ + 2.0), 1, f32(0.7));
@@ -313,7 +333,7 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
   }
   if (events.airDodge) spawn(state, IMPACT_DODGE, x, f32(z + 50.0), 0, f32(0.6));
   if (events.movementDust || events.dodgeTrail || (events.runningDust && (events.footstep === "run" || imod(frame, 8) === 0))) {
-    spawn(state, IMPACT_DUST, f32(x - events.direction * 12), f32(z + 2.0), -events.direction, f32(0.45));
+    spawn(state, dust, f32(x - events.direction * 12), f32(z + 2.0), -events.direction, f32(0.45));
   }
   if (events.launchTrail) spawn(state, IMPACT_DUST, x, f32(z + 45.0), 0, f32(0.6));
   if (events.koDirectionX === 0 && events.koDirectionZ > 0) {
@@ -358,13 +378,14 @@ export function projectImpact(state: Readonly<ImpactState>, i: number, out?: Imp
   const strength = at(state.strength, i);
   const progress = f32(f32(age * 1.0) / impactLifetime(kind));
   let scale = f32(1.0 + f32(progress * 0.25));
-  if (kind === IMPACT_DUST) scale = f32(0.75 + f32(progress * f32(1.1)));
+  const dust = kind === IMPACT_DUST || kind === IMPACT_EX_DUST;
+  if (dust) scale = f32(0.75 + f32(progress * f32(1.1)));
   else if (kind === IMPACT_MISSED_TECH) scale = f32(f32(0.7) + f32(progress * 0.5));
   const fade = f32(1.0 - progress);
-  const opacity = kind === IMPACT_DUST ? f32(220 * strength) : 255.0;
+  const opacity = dust ? f32(220 * strength) : 255.0;
   // Stock particles ignore alpha; keep live slots drawn until parked.
   return impactPose(out, max(1, toInt(f32(f32(opacity * fade) * fade))), f32(scale * strength), f32(originX + travel(drift, age)),
-    f32(f32(originZ + travel(at(state.driftZ, i), age)) + (kind === IMPACT_DUST ? f32(progress * 9) : 0.0)), at(state.pitch, i));
+    f32(f32(originZ + travel(at(state.driftZ, i), age)) + (dust ? f32(progress * 9) : 0.0)), at(state.pitch, i));
 }
 
 function impactPose(out: ImpactPose | undefined, alpha: number, scale: number, x: number, z: number, pitch: number): ImpactPose {

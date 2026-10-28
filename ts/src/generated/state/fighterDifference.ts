@@ -305,6 +305,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.dodge.airDodging !== actual.dodge.airDodging) return "airDodging";
   if (expected.dodge.airFrame !== actual.dodge.airFrame) return "airDodgeFrame";
   if (expected.dodge.airUsed !== actual.dodge.airUsed) return "airDodgeUsed";
+  if (expected.dodge.ex !== actual.dodge.ex) return "airDodgeEx";
   if (expected.dodge.groundFrame !== actual.dodge.groundFrame) return "groundDodgeFrame";
   if (expected.dodge.groundDirection !== actual.dodge.groundDirection) return "groundDodgeDirection";
   if (expected.dodge.groundEntryFacing !== actual.dodge.groundEntryFacing) return "groundDodgeEntryFacing";

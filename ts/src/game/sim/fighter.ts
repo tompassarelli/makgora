@@ -317,6 +317,7 @@ interface Dodge {
   airUsed: boolean;
 
   airMotionFrames: number;
+  ex: boolean;
   groundFrame: number;
   groundDirection: number;
   groundEntryFacing: number;
@@ -702,7 +703,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     bear: { life: 0, x: 0.0, z: 0.0, velocityX: 0.0, velocityZ: 0.0, swipeCooldown: 0, hitSerial: 0, surface: undefined },
     freezeTrap: { exReach: false, life: 0, arming: 0, x: 0.0, z: 0.0, surface: undefined, serial: 0, cooldown: 0 },
     restingGroups: RESTING_GROUPS,
-    dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },
+    dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, ex: false, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },
     landing: { lag: 0 },
     down: { state: DownState.none, frame: 0, direction: 0, waitRemaining: 0, faceUp: true, attackQueued: false },
     tech: { ...emptyTechInput(), window: 0 },

@@ -87,6 +87,7 @@ export interface Controls {
   jumpPressed: boolean;
   shortHopPressed: boolean;
   exPressed: boolean;
+  exDodgePressed: boolean;
   airDodgePressed: boolean;
   techPressed: boolean;
   mashPressed: boolean;
@@ -141,6 +142,7 @@ export function neutralControls(): Controls {
     jumpPressed: false,
     shortHopPressed: false,
     exPressed: false,
+    exDodgePressed: false,
     airDodgePressed: false,
     techPressed: false,
     mashPressed: false,
@@ -193,6 +195,7 @@ export function copyControls(target: Controls, source: Readonly<Controls>): void
   target.jumpPressed = source.jumpPressed;
   target.shortHopPressed = source.shortHopPressed;
   target.exPressed = source.exPressed;
+  target.exDodgePressed = source.exDodgePressed;
   target.airDodgePressed = source.airDodgePressed;
   target.techPressed = source.techPressed;
   target.mashPressed = source.mashPressed;
@@ -227,7 +230,7 @@ export function controlsAt(controls: readonly Readonly<Controls>[], slot: number
 
 export const CONTROL_FIELDS = [
   "driftStickX",
-  "direction", "verticalDirection", "diStickValid", "diStickX", "diStickZ", "sdiPulse", "sdiX", "sdiZ", "cStickX", "cStickZ", "attackRequested", "specialPressed", "ultimatePressed", "specialX", "specialZ", "down", "shield", "shieldPressed", "shieldTriggerActive", "shieldStrength", "jumpPressed", "shortHopPressed", "exPressed", "airDodgePressed", "techPressed", "mashPressed", "attackPressed", "grabMashPressed", "grabThrowX", "grabThrowZ", "groundDodgePressed", "groundDodgeDirection", "getupAttackPressed", "ledgeVerticalPressed", "getupStandPressed", "getupDirectionPressed", "getupDirection", "cStickUpFlick", "cStickSideFlick", "dodgeX", "dodgeZ", "jumpHeld", "walking", "attackHeld", "specialHeld", "resetPressed"
+  "direction", "verticalDirection", "diStickValid", "diStickX", "diStickZ", "sdiPulse", "sdiX", "sdiZ", "cStickX", "cStickZ", "attackRequested", "specialPressed", "ultimatePressed", "specialX", "specialZ", "down", "shield", "shieldPressed", "shieldTriggerActive", "shieldStrength", "jumpPressed", "shortHopPressed", "exPressed", "exDodgePressed", "airDodgePressed", "techPressed", "mashPressed", "attackPressed", "grabMashPressed", "grabThrowX", "grabThrowZ", "groundDodgePressed", "groundDodgeDirection", "getupAttackPressed", "ledgeVerticalPressed", "getupStandPressed", "getupDirectionPressed", "getupDirection", "cStickUpFlick", "cStickSideFlick", "dodgeX", "dodgeZ", "jumpHeld", "walking", "attackHeld", "specialHeld", "resetPressed"
 ] as const satisfies readonly (keyof Controls)[];
 
 export function sameControls(a: Readonly<Controls>, b: Readonly<Controls>): boolean {

@@ -323,6 +323,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   dodge.airDodging = sourceDodge.airDodging;
   dodge.airFrame = sourceDodge.airFrame;
   dodge.airUsed = sourceDodge.airUsed;
+  dodge.ex = sourceDodge.ex;
   dodge.groundFrame = sourceDodge.groundFrame;
   dodge.groundDirection = sourceDodge.groundDirection;
   dodge.groundEntryFacing = sourceDodge.groundEntryFacing;
@@ -844,6 +845,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = dodge.airFrame, b = sourceDodge.airFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (dodge.airUsed !== sourceDodge.airUsed) return false;
   { const a = dodge.airMotionFrames, b = sourceDodge.airMotionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  if (dodge.ex !== sourceDodge.ex) return false;
   { const a = dodge.groundFrame, b = sourceDodge.groundFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = dodge.groundDirection, b = sourceDodge.groundDirection; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = dodge.groundEntryFacing, b = sourceDodge.groundEntryFacing; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1311,6 +1313,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.bool(prefix, "airDodging", dodge.airDodging);
   sink.int(prefix, "airDodgeFrame", dodge.airFrame);
   sink.bool(prefix, "airDodgeUsed", dodge.airUsed);
+  if (dodge.ex) sink.bool(prefix, "airDodgeEx", true);
   sink.int(prefix, "groundDodgeFrame", dodge.groundFrame);
   sink.int(prefix, "groundDodgeDirection", dodge.groundDirection);
   sink.int(prefix, "groundDodgeEntryFacing", dodge.groundEntryFacing);
@@ -1723,6 +1726,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   dodge.airDodging = false;
   dodge.airFrame = 0;
   dodge.airUsed = false;
+  dodge.ex = false;
   dodge.groundFrame = 0;
   dodge.groundDirection = 0;
   dodge.groundEntryFacing = 0;

@@ -48,6 +48,7 @@ import { hopHeroStatus } from "./hexHop";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpOrAttackBranch } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
+import { settleExWavedash } from "./exWavedash";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
@@ -239,7 +240,7 @@ function advanceJumpSquat(f: Fighter, input: Readonly<Controls>, squatBeforeInpu
   jump.isDouble = false;
   if (jump.dodgeQueued) {
     jump.dodgeQueued = false;
-    beginAirDodge(f, jump.dodgeX, jump.dodgeZ, true);
+    beginAirDodge(f, jump.dodgeX, jump.dodgeZ, true, f.dodge.ex);
     jump.dodgeX = 0;
     jump.dodgeZ = 0;
   }
@@ -530,10 +531,11 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (input.airDodgePressed && !exSpecialPressed(input)) {
     if (motion.grounded && jump.squat > 0) {
       jump.dodgeQueued = true;
+      f.dodge.ex = input.exDodgePressed;
       jump.dodgeX = input.dodgeX;
       jump.dodgeZ = input.dodgeZ;
     } else {
-      beginAirDodge(f, input.dodgeX, input.dodgeZ, false);
+      beginAirDodge(f, input.dodgeX, input.dodgeZ, false, input.exDodgePressed);
     }
   }
   if (jump.dodgeQueued && (input.direction !== 0 || input.verticalDirection !== 0)) {
@@ -619,6 +621,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     const drag = motion.grounded ? restingTraction(f, stageSurfaces.floorTraction(physics.traction, stageSurfaces.floorFriction(stage, motion))) : physics.airFriction;
     motion.vx = motion.vx > 0 ? max(0.0, f32(motion.vx - drag)) : min(0.0, f32(motion.vx + drag));
   }
+  settleExWavedash(f, canSteer, direction);
 
 
   platforms.dropFromPlatform(f, stage, matchFrame, input);

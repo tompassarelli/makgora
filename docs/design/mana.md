@@ -255,6 +255,29 @@ level stack: the level is chosen first, then EX upgrades that form
 The native models, sounds and animations remain the move's existing ones;
 there are no new imports.
 
+## EX wavedash
+
+Tom asked for an EX wavedash on 28 October 2026: hold Strong while air
+dodging into the ground, the input that makes an EX special. When the dodge
+lands as a wavedash or waveland with horizontal speed and the fighter can pay
+an EX, it pays one EX once on the landing frame and adds a fixed
+`EX_WAVEDASH_SPEED` of 0.625 Melee units a frame (3.75 world units) to the
+slide in its direction (smashcraft:ts/src/game/sim/exWavedash.ts). Every
+fighter and every angle gets the same speed, so a 45-degree EX wavedash is the
+45-degree slide plus the same push and a max-length one is the longest slide
+plus it. Landing lag (10 frames) and every animation keep their timing; only
+the distance changes. Without Strong or without an EX, and for a dodge with no
+horizontal part (straight down), the landing is the ordinary wavedash and
+nothing is spent, so the ordinary wavedash keeps all its angles and lengths.
+
+The speed is sized so the median fighter's longest wavedash (the 18-degree
+dodge buffered in jump squat) slides 40% further: 228.5 to 321.0 world units,
+with the roster spread 1.35x to 1.46x.
+`dodge.ex` holds the request through the dodge and marks the slide, and is
+replay and rollback state. While it lasts the wavedash's own dust puffs, at
+their usual places and times, are tinted the EX glow's blue, with the EX cast
+flash on the first slide frame and blue mana sparkles every third slide frame.
+
 ## Ultimates
 
 [ultimates.md](ultimates.md) owns the ultimate moves. They spend the whole

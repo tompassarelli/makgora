@@ -130,6 +130,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   }
   const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && (pressed & WALK_BIT) !== 0 && ((held | pressed) & SMASHES) === 0;
   destination.airDodgePressed = destination.shieldPressed || tiltDodge;
+  destination.exDodgePressed = destination.airDodgePressed && strong;
   destination.dodgeX = destination.shieldPressed ? row.dodgeX : tiltDodge ? destination.direction : 0;
   destination.dodgeZ = destination.shieldPressed ? row.dodgeZ : tiltDodge ? destination.verticalDirection : 0;
   destination.mashPressed = pressed !== 0;
