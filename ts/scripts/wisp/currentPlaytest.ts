@@ -68,8 +68,7 @@ export const playName = (revision: string) => Effect.gen(function*() {
 
 const mainCheckoutOf = Effect.gen(function*() {
   const registry = yield* capture(projectRoot, ["git", "worktree", "list", "--porcelain"]);
-  const mainBlock = registry?.split("\n\n").find((block) => block.split("\n").includes("branch refs/heads/main"));
-  const mainCheckout = mainBlock?.split("\n").find((line) => line.startsWith("worktree "))?.slice(9);
+  const mainCheckout = registry?.split("\n\n")[0]?.split("\n").find((line) => line.startsWith("worktree "))?.slice(9);
   if (mainCheckout === undefined) return yield* playProblem(new Error("couldn't locate the main checkout"));
   return mainCheckout;
 });

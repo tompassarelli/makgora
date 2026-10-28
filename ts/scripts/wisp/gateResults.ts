@@ -18,17 +18,16 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../../src/game/ui/resultsBanner";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
-import { PICKER_DONE } from "../../src/game/ui/settingsUi";
 import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
+import { reachFighterSelect } from "./gateIntro";
 import { type StockCursor, loadStockCursor, stockCursorAt } from "./stockCursor";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
 const CURSOR_THRESHOLD = 24;
 const STOCK_STEPS = 10;
-const FIRST_RUN_PANELS = 3;
 const START_PRESSES = 8;
 const STAGE_WAIT_SECONDS = 3;
 const MATCH_WAIT_SECONDS = 15;
@@ -90,17 +89,7 @@ type Menu = Effect.Success<ReturnType<Driver["menu"]>>;
 
 export const dismissFirstRunPanels = (d: Driver, client: Client) => Effect.gen(function*() {
   yield* focus(client).pipe(Effect.mapError(fail("results gate setup")));
-  for (let pass = 0; pass <= FIRST_RUN_PANELS; pass++) {
-    const seen = yield* d.words(client, yield* d.shot(client));
-    const notNow = seen.find(word => word.text === "Not");
-    const picker = seen.some(word => /^Recalibrate/i.test(word.text));
-    if (notNow === undefined && !picker) return;
-    if (pass === FIRST_RUN_PANELS) return yield* new AcceptFailure({ operation: "results gate first-run panels", problem: `${client.name} still shows ${picker ? "the controls picker" : "the tutorial offer"} after ${FIRST_RUN_PANELS} dismissals` });
-    const region = yield* d.view(client);
-    const target = notNow === undefined ? yield* d.at(client, PICKER_DONE.x + PICKER_DONE.width / 2, PICKER_DONE.y - PICKER_DONE.height / 2) : { x: region.x + notNow.x, y: region.y + notNow.y };
-    yield* click(client, target.x, target.y).pipe(Effect.mapError(fail("results gate first-run panels")));
-    yield* Effect.sleep("400 millis");
-  }
+  yield* reachFighterSelect(client, yield* d.view(client));
 });
 
 const oneStock = (d: Driver, host: Client) => Effect.gen(function*() {
