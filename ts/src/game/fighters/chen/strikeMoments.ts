@@ -12,7 +12,7 @@ export const chenStrikeMoments = {
   9: { clip: 15, seconds: f32(0.133), end: f32(0.533) },
   10: { clip: 16, seconds: f32(0.133), end: f32(0.533) },
   12: { clip: 23, seconds: f32(0.217), end: f32(0.667) },
-  13: { clip: 24, seconds: f32(0.117), end: f32(0.633) },
+  13: { clip: 24, seconds: f32(0.000), end: f32(0.633) },
   14: { clip: 25, seconds: f32(0.133), end: f32(0.550) },
   15: { clip: 26, seconds: f32(0.000), end: f32(0.550) },
   16: { clip: 27, seconds: f32(0.283), end: f32(0.733) },

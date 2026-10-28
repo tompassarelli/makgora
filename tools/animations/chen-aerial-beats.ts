@@ -10,7 +10,7 @@ export interface Beat { at: number; g: Gesture; staff?: readonly [number, number
 const spin = (at: number, hand: number): Beat => ({at, g: {staff: -75, wrist: 10, palm: -35, chest: 12, front: -55, knee: 95, back: -25, backKnee: 85, lean: -8, hand}});
 const kegLift: Gesture = {chest: -22, head: -15, staff: -165, palm: -165, elbow: -15, front: -55, knee: 90, back: -45, backKnee: 95};
 const kegSlam: Gesture = {chest: 38, head: 22, staff: 125, wrist: 20, palm: 10, front: -100, knee: 125, back: -85, backKnee: 125};
-const kickOut: Gesture = {lean: -22, chest: -10, head: -10, back: 45, backKnee: 85, staff: 40, palm: 45};
+const kickOut: Gesture = {lean: -28, chest: -12, head: -10, back: 50, backKnee: 90, staff: 115, wrist: 30, palm: 60};
 const scoop: Gesture = {chest: -12, lean: -8, head: -15, front: -30, knee: 60, back: 15, backKnee: 55, palm: 20};
 export const AERIAL_BEATS: Partial<Record<HeroPose, readonly Beat[]>> = {
   downAir: [
@@ -23,13 +23,13 @@ export const AERIAL_BEATS: Partial<Record<HeroPose, readonly Beat[]>> = {
     {at: 34, g: {chest: 12, front: -40, knee: 60, back: -30, backKnee: 60}, keg: [-20, 0, 70], kegScale: 1.3},
   ],
   forwardAir: [
-    {at: 5, g: {chest: 15, lean: 5, front: -70, knee: 110, back: 20, backKnee: 50, staff: -40, palm: -40}},
-    {at: 10, g: {chest: 25, lean: 10, front: -105, knee: 140, back: 30, backKnee: 70, staff: -20, palm: -20}},
+    {at: 5, g: {chest: 15, lean: 5, front: -70, knee: 110, back: 20, backKnee: 50, staff: 50, wrist: 20, palm: 30}},
+    {at: 10, g: {chest: 25, lean: 10, front: -115, knee: 145, back: 30, backKnee: 70, staff: 80, wrist: 25, palm: 45}},
     {at: 13, g: kickOut, foot: [90, 46], legScale: 1.5},
     {at: 14, g: kickOut, foot: [90, 46], legScale: 1.5},
     {at: 22, g: kickOut, foot: [86, 45], legScale: 1.45},
     {at: 29, g: kickOut, foot: [82, 44], legScale: 1.4},
-    {at: 33, g: {chest: 15, front: -80, knee: 100, back: 20, backKnee: 50}},
+    {at: 33, g: {chest: 15, front: -80, knee: 100, back: 20, backKnee: 50, staff: 60, palm: 30}},
   ],
   neutralAir: [
     {at: 2, g: {staff: -60, palm: -30, chest: 5, front: -30, knee: 55, back: -15, backKnee: 50, hand: -120}},
