@@ -1,0 +1,190 @@
+{
+  "excluded": [
+    {
+      "x": 0,
+      "y": 750,
+      "width": 1470,
+      "height": 90
+    }
+  ],
+  "regionMargin": 100,
+  "bodyMargin": 4,
+  "samples": [
+    {
+      "move": "blademaster:neutral-special",
+      "role": "positive",
+      "version": "main",
+      "source": "8ec2b33db2a52f22dd88157bc6e8abf96bf9c4377e6fcf06e43b4edde39ade0b",
+      "fixture": "positives-blademaster-neutral-special",
+      "manifest": "evidence/main-positives.captures.json",
+      "runs": [
+        "evidence/positives-1/captures.json",
+        "evidence/positives-2/captures.json"
+      ]
+    },
+    {
+      "move": "blademaster:side-special",
+      "role": "positive",
+      "version": "main",
+      "source": "8ec2b33db2a52f22dd88157bc6e8abf96bf9c4377e6fcf06e43b4edde39ade0b",
+      "fixture": "positives-blademaster-side-special",
+      "manifest": "evidence/main-positives.captures.json",
+      "runs": [
+        "evidence/positives-1/captures.json",
+        "evidence/positives-2/captures.json"
+      ]
+    },
+    {
+      "move": "blademaster:up-special",
+      "role": "positive",
+      "version": "main",
+      "source": "8ec2b33db2a52f22dd88157bc6e8abf96bf9c4377e6fcf06e43b4edde39ade0b",
+      "fixture": "positives-blademaster-up-special",
+      "manifest": "evidence/main-positives.captures.json",
+      "runs": [
+        "evidence/positives-1/captures.json",
+        "evidence/positives-2/captures.json"
+      ],
+      "regionMargin": 300
+    },
+    {
+      "move": "blademaster:down-special",
+      "role": "positive",
+      "version": "main",
+      "source": "8ec2b33db2a52f22dd88157bc6e8abf96bf9c4377e6fcf06e43b4edde39ade0b",
+      "fixture": "positives-blademaster-down-special",
+      "manifest": "evidence/main-positives.captures.json",
+      "runs": [
+        "evidence/positives-1/captures.json",
+        "evidence/positives-2/captures.json"
+      ]
+    },
+    {
+      "move": "blademaster:ultimate",
+      "role": "positive",
+      "version": "main",
+      "source": "8ec2b33db2a52f22dd88157bc6e8abf96bf9c4377e6fcf06e43b4edde39ade0b",
+      "fixture": "positives-blademaster-ultimate",
+      "manifest": "evidence/main-positives.captures.json",
+      "runs": [
+        "evidence/positives-1/captures.json",
+        "evidence/positives-2/captures.json"
+      ],
+      "regionMargin": 2000
+    },
+    {
+      "move": "chen-stormstout:neutral-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-chen-stormstout-neutral-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "murloc:side-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-murloc-side-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "murloc:up-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-murloc-up-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "shadow-hunter:neutral-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-shadow-hunter-neutral-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "mountain-king:down-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-mountain-king-down-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "thrall:down-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-thrall-down-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "cairne-bloodhoof:neutral-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-cairne-bloodhoof-neutral-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "lich:side-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-lich-side-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "lich:down-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-26",
+      "source": "180d962",
+      "fixture": "negatives-lich-down-special",
+      "manifest": "evidence/v192-negatives.captures.json",
+      "runs": [
+        "evidence/negatives-1/captures.json",
+        "evidence/negatives-2/captures.json"
+      ]
+    }
+  ],
+  "crop": {
+    "x": 245,
+    "y": 140,
+    "width": 1470,
+    "height": 840
+  }
+}
