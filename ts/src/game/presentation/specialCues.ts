@@ -16,7 +16,7 @@ import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
 import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
-import { EMPTY_GOLD_SACK_CUES, peonCueState, peonExtraCues } from "./peonCues";
+import { GOLD_SACK_SLOT_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
   DEMONHUNTER_BACKFLIP_FORM,
   DEMONHUNTER_BACKFLIP_FRAMES,
@@ -248,7 +248,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "War Stomp", startup: QUIET_BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.5)) },
   },
   [Character.peon]: {
-    neutral: EMPTY_GOLD_SACK_CUES,
+    neutral: GOLD_SACK_SLOT_CUES,
     side: { spell: "Log Heave", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: { ...timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.4)), "stand", 0.0), anchorFrames: LOG_TEAR_DUST } },
     up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
     down: PEON_REST_CUES,

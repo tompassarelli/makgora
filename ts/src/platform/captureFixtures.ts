@@ -29,7 +29,9 @@ export const SHOWCASE_HOLD_TICKS = 6;
 export function showcaseFixtures(character: Character, holdTicks = SHOWCASE_HOLD_TICKS): CaptureFixture[] {
   const fighter = fighterSlug(character);
   return showcaseRows(character).map(({ row, move, facing, frames }) => {
-    const script = `#! chat -dev quick hero ${fighterKey(character).toLowerCase()} stocks 9\n#! reel ${fighter} ${row} ${move.slot} ${facing} ${holdTicks}\n${SHOWCASE_FIRST_FRAME} a move ${move.kind} ${move.code} ${facing}${move.gap === undefined ? "" : ` ${move.gap}`}\n${frames.map(frame => `${frame} a capture`).join("\n")}\n`;
+    const again = move.again === undefined ? undefined : { frame: SHOWCASE_FIRST_FRAME + move.again.frame, line: `${SHOWCASE_FIRST_FRAME + move.again.frame} a move ${move.kind} ${move.code} ${facing} ${move.again.gap}` };
+    const timed = [...frames.map(frame => ({ frame, line: `${frame} a capture` })), ...(again === undefined ? [] : [{ ...again, frame: again.frame - 0.5 }])].sort((a, b) => a.frame - b.frame);
+    const script = `#! chat -dev quick hero ${fighterKey(character).toLowerCase()} stocks 9\n#! reel ${fighter} ${row} ${move.slot} ${facing} ${holdTicks}\n${SHOWCASE_FIRST_FRAME} a move ${move.kind} ${move.code} ${facing}${move.gap === undefined ? "" : ` ${move.gap}`}\n${timed.map(entry => entry.line).join("\n")}\n`;
     return { name: `${fighter}-${row}`, frames, script, holdTicks, openingTicks: 1, tailFrames: 0, reel: { fighter, row, slot: move.slot, facing } };
   });
 }

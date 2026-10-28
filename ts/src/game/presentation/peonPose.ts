@@ -1,19 +1,17 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod, idiv } from "wisp/src/sim/intMath";
+import { at } from "wisp/src/runtime/lookup";
 import { max, min } from "../core/numbers";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { FOLLOW_UP_FORM } from "../sim/specials/schema";
 import { GOLD_SACK_CHARGE, GOLD_SACK_FIRST_ACTIVE } from "../fighters/peon/specials";
+import { GOLD_SACK_BONK_CLIPS, GOLD_SACK_BONK_FRAMES, GOLD_SACK_CHARGE_CLIP, GOLD_SACK_STRIKE_FRAME } from "../fighters/peon/goldSackClips";
 import { PEON_CLIPS } from "../fighters/peon/clips";
 import { FRAME_SECONDS } from "./frameClock";
 
-export const GOLD_SACK_WINDUP_SECONDS = f32(0.25);
-export const GOLD_SACK_STRIKE_SECONDS = f32(0.283);
 export const GOLD_SACK_GLOW = { red: 255, green: 190, blue: 30 } as const;
-const GOLD_SACK_END_SECONDS = PEON_CLIPS.neutralSpecial.seconds;
-const WINDUP_FRAMES = GOLD_SACK_CHARGE.hold + GOLD_SACK_CHARGE.full;
-const HANDFUL_FRAMES = idiv(GOLD_SACK_CHARGE.full, GOLD_SACK_CHARGE.stages);
+const CHARGE_FRAMES = GOLD_SACK_CHARGE.hold + GOLD_SACK_CHARGE.full;
 const FULL_PULSE_FRAMES = 6;
 const PEON_REST_JOLT_SECONDS = f32(0.2);
 const PEON_REST_ASLEEP_SECONDS = f32(1.4);
@@ -32,22 +30,20 @@ const goldSackMove = (fighter: Readonly<Fighter>): boolean =>
 const bonkStage = (fighter: Readonly<Fighter>): number =>
   fighter.special.form >= FOLLOW_UP_FORM ? idiv(fighter.special.form, FOLLOW_UP_FORM) - 1 : -1;
 
-const windup = (frames: number): number =>
-  f32(GOLD_SACK_WINDUP_SECONDS * min(1.0, f32(frames / WINDUP_FRAMES)));
+const clipSeconds = (frames: number): number => f32(frames * FRAME_SECONDS);
 
-const between = (from: number, to: number, done: number, total: number): number =>
-  f32(from + f32(f32(to - from) * min(1.0, f32(max(0, done) / max(1, total)))));
+export function goldSackBonkFrame(frame: number, first: number): number {
+  if (frame <= first) return f32(f32(max(0, frame) * GOLD_SACK_STRIKE_FRAME) / first);
+  return min(GOLD_SACK_BONK_FRAMES, GOLD_SACK_STRIKE_FRAME + frame - first);
+}
 
 export function goldSackClipTime(fighter: Readonly<Fighter>): number | undefined {
   if (!goldSackMove(fighter)) return undefined;
-  const { frame, charge, duration } = fighter.special;
+  const { frame, charge } = fighter.special;
   const stage = bonkStage(fighter);
-  if (stage < 0) return windup(min(frame, GOLD_SACK_CHARGE.hold) + charge);
+  if (stage < 0) return clipSeconds(min(CHARGE_FRAMES, min(frame, GOLD_SACK_CHARGE.hold) + charge));
   if (stage > GOLD_SACK_CHARGE.stages) return undefined;
-  const first = GOLD_SACK_FIRST_ACTIVE[stage] ?? 12;
-  const start = windup(GOLD_SACK_CHARGE.hold + stage * HANDFUL_FRAMES);
-  if (frame <= first) return between(start, GOLD_SACK_STRIKE_SECONDS, frame - 1, first - 1);
-  return between(GOLD_SACK_STRIKE_SECONDS, GOLD_SACK_END_SECONDS, frame - first, duration - first);
+  return clipSeconds(goldSackBonkFrame(frame, GOLD_SACK_FIRST_ACTIVE[stage] ?? GOLD_SACK_STRIKE_FRAME));
 }
 
 export function goldSackGlowAlpha(fighter: Readonly<Fighter>): number {
@@ -74,5 +70,6 @@ export function peonSpecialPose(fighter: Readonly<Fighter>): Readonly<PeonSpecia
   if (fighter.character !== Character.peon) return undefined;
   if (fighter.special.action === SpecialAction.heroDown) return scrubbed("rest", PEON_CLIPS.ko.index, peonRestClipTime(fighter.special.frame));
   const time = goldSackClipTime(fighter);
-  return time === undefined ? undefined : scrubbed(bonkStage(fighter) < 0 ? "gold-sack-charge" : "gold-sack-bonk", PEON_CLIPS.neutralSpecial.index, time);
+  const stage = bonkStage(fighter);
+  return time === undefined ? undefined : stage < 0 ? scrubbed("special-gold-sack-charge", GOLD_SACK_CHARGE_CLIP.index, time) : scrubbed("special-gold-sack-bonk", at(GOLD_SACK_BONK_CLIPS, stage).index, time);
 }

@@ -11,14 +11,16 @@ import { Character, SpecialAction } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { fighterAt } from "../sim/roster";
 import { FOLLOW_UP_FORM } from "../sim/specials/schema";
-import { PEON_CLIPS } from "../fighters/peon/clips";
+import { GOLD_SACK_BONK_CLIPS, GOLD_SACK_CHARGE_CLIP, GOLD_SACK_STRIKE_FRAME } from "../fighters/peon/goldSackClips";
 import { GOLD_SACK_CHARGE, GOLD_SACK_FIRST_ACTIVE } from "../fighters/peon/specials";
 import { advanceFighterPose, createFighterPose } from "./fighterPose";
-import { GOLD_SACK_STRIKE_SECONDS, GOLD_SACK_WINDUP_SECONDS, goldSackGlowAlpha } from "./peonPose";
+import { FRAME_SECONDS } from "./frameClock";
+import { goldSackGlowAlpha } from "./peonPose";
 
 const HELD_TICKS = 110;
 const FIRE_TICK = 130;
-const BONK = PEON_CLIPS.neutralSpecial.index;
+const FULL_BONK = GOLD_SACK_BONK_CLIPS[GOLD_SACK_CHARGE.stages]?.index;
+const FULL_CHARGE_SECONDS = f32((GOLD_SACK_CHARGE.hold + GOLD_SACK_CHARGE.full) * FRAME_SECONDS);
 const FULL_FIRST_ACTIVE = GOLD_SACK_FIRST_ACTIVE[GOLD_SACK_CHARGE.stages] ?? 0;
 
 interface Frame { readonly tick: number; readonly action: SpecialAction; readonly swinging: boolean; readonly special: number; readonly charge: number; readonly clip: number | undefined; readonly time: number; readonly rate: number; readonly glow: number }
@@ -52,7 +54,7 @@ function heldGoldSack(): readonly Frame[] {
   return frames;
 }
 
-test("Holding Gold Sack winds the bonk clip steadily back to a held full pose that flashes gold, and the stored sack's bonk swings on from it to strike on its first active frame [k1 scenario]", () => {
+test("Holding Gold Sack plays the stuffing clip one frame per banked charge frame to a held full sack that flashes gold, and the stored full sack swings its own bonk clip to strike on its first active frame [k1 scenario]", () => {
   const frames = heldGoldSack();
   const charging = frames.filter((frame) => frame.action === SpecialAction.heroNeutral && !frame.swinging);
   const swing = frames.filter((frame) => frame.action === SpecialAction.heroNeutral && frame.swinging);
@@ -60,26 +62,25 @@ test("Holding Gold Sack winds the bonk clip steadily back to a held full pose th
   for (let index = 0; index < charging.length; index++) {
     const frame = charging[index];
     if (frame === undefined) continue;
-    assertEquals(frame.clip, BONK, `tick ${frame.tick}: the charge plays the bonk clip`);
+    assertEquals(frame.clip, GOLD_SACK_CHARGE_CLIP.index, `tick ${frame.tick}: the charge plays the stuffing clip`);
     assertEquals(frame.rate, 0.0, `tick ${frame.tick}: the charge pose is scrubbed, not free-running`);
     const before = charging[index - 1];
     if (before !== undefined && frame.charge > before.charge) assertTrue(frame.time > before.time);
     if (before !== undefined) assertTrue(frame.time >= before.time);
     assertEquals(frame.glow > 0, frame.charge >= GOLD_SACK_CHARGE.full, `tick ${frame.tick}: gold flash only at full charge`);
-    if (frame.charge >= GOLD_SACK_CHARGE.full) assertEquals(frame.time, GOLD_SACK_WINDUP_SECONDS, `tick ${frame.tick}: the full pose is held`);
+    if (frame.charge >= GOLD_SACK_CHARGE.full) assertEquals(frame.time, FULL_CHARGE_SECONDS, `tick ${frame.tick}: the full pose is held`);
   }
   assertTrue(swing.length > FULL_FIRST_ACTIVE && swing[0]?.tick === FIRE_TICK);
   for (let index = 0; index < swing.length; index++) {
     const frame = swing[index];
     if (frame === undefined) continue;
-    assertEquals(frame.clip, BONK, `tick ${frame.tick}: the bonk plays the bonk clip`);
+    assertEquals(frame.clip, FULL_BONK, `tick ${frame.tick}: the full bonk plays the full sack.s clip`);
     assertEquals(frame.charge, 0, `tick ${frame.tick}: the bonk spends the sack`);
     const before = swing[index - 1];
     if (before !== undefined) assertTrue(frame.time > before.time);
   }
-  assertEquals(swing[0]?.time, GOLD_SACK_WINDUP_SECONDS, "the stored sack's bonk starts from the full windup pose");
   const strike = swing.find((frame) => frame.special === FULL_FIRST_ACTIVE);
-  assertEquals(strike?.time, GOLD_SACK_STRIKE_SECONDS, "the overhead bonk lands on its first active frame");
+  assertEquals(strike?.time, f32(GOLD_SACK_STRIKE_FRAME * FRAME_SECONDS), "the overhead bonk lands on its first active frame");
   assertTrue((strike?.glow ?? 0) > 0);
-  assertTrue(swing.some((frame) => frame.time >= f32(0.7)));
+  assertTrue(swing.some((frame) => frame.time > f32(GOLD_SACK_STRIKE_FRAME * FRAME_SECONDS)));
 });

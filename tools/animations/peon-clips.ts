@@ -8,29 +8,24 @@ import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
 import { LOG_GRIP, LOG_LENGTH, LOG_PATH } from "../../ts/src/game/fighters/peon/logPath";
+import { type Action, type Gesture, type Phase, phase } from "./peon-gesture";
+import { SACK_ACTIONS, SACK_MOMENTS, appendSackSequences, carrySack, sackStrikes, writeSackClips } from "./peon-sack";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain"), lumberOnly = process.argv.includes("lumber");
+const sackOnly = process.argv.includes("sack");
 const reauthorNames = process.argv.includes("reauthor") ? process.argv.slice(process.argv.indexOf("reauthor") + 1) : [];
-const shipped = painOnly || lumberOnly || reauthorNames.length > 0;
+const shipped = painOnly || lumberOnly || sackOnly || reauthorNames.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/peon-clips.ts STOCK_PEON.mdx|SHIPPED_PEON.mdx PRIVATE_OUTPUT [pain|lumber|reauthor ACTION...]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/peon-clips.ts STOCK_PEON.mdx|SHIPPED_PEON.mdx PRIVATE_OUTPUT [pain|lumber|sack|reauthor ACTION...]");
 mkdirSync(join(output, "hero-models"), { recursive: true });
 const source = parseSource(await Bun.file(input).arrayBuffer());
-ensure(source.Sequences.length === (shipped ? 90 : 22), shipped ? "Use the shipped 90-sequence Peon model" : "Use the unmodified stock Peon model");
+ensure(shipped ? source.Sequences.length >= 90 : source.Sequences.length === 22, shipped ? "Use the shipped 90-sequence Peon model" : "Use the unmodified stock Peon model");
 const model = structuredClone(source), stand = source.Sequences[9], PEON = 18 as Character;
 ensure(stand?.Name === "Stand Ready", "Peon stock sequence order changed");
 
-interface Gesture {
-  readonly chest?: number; readonly head?: number; readonly axe?: number; readonly elbow?: number;
-  readonly grip?: number; readonly knee?: number; readonly twist?: number; readonly lean?: number;
-  readonly roll?: number; readonly yaw?: number; readonly tuck?: number; readonly height?: number; readonly ahead?: number; readonly kick?: number;
-}
-interface Phase { readonly at: number; readonly pose: Gesture }
-interface Action { readonly name: string; readonly frames: number; readonly phases: readonly Phase[]; readonly air?: boolean; readonly hold?: boolean; readonly contact?: number; readonly pain?: boolean }
 const actions: Action[] = [];
 const add = (name: string, frames: number, phases: readonly Phase[], options: Partial<Action> = {}) => actions.push({ name, frames, phases, ...options });
-const phase = (at: number, pose: Gesture = {}): Phase => ({ at, pose });
 const strike = (name: string, frames: number, first: number, last: number, coil: Gesture, hit: Gesture, exit: Gesture = {}, air = false, through: Gesture = { ...hit, axe: (hit.axe ?? 0) + 12 }) =>
   add(name, frames, [phase(0), phase(Math.max(0, first - 3), coil), phase(first, hit), phase(last, through), phase(Math.min(frames - 1, last + 9), exit), phase(frames)], { air });
 
@@ -147,7 +142,7 @@ function joint(name: string, g: Gesture): [number,number] {
   return [0,0];
 }
 const snapPain = (bytes: ArrayBuffer, index: number, frames: number, translations: readonly mdx.AnimKeyframe[]) => {
-  const body = new PainBody(bytes, PEON, ["Peon Log"]), floor = body.floor(9, 0);
+  const body = new PainBody(bytes, PEON, ["Peon Log", "Peon Sack"]), floor = body.floor(9, 0);
   for (let f = 0; f <= frames; f++) translations[f]!.Vector[2]! -= body.floor(index, f / 60) - floor;
 };
 const CARGO = [16, 19], LUMBER_GEOSET = 3;
@@ -286,6 +281,25 @@ const sheets = async (targets: readonly Action[], after: DrawnModel, indices: re
     await Bun.write(join(output, `${action.name}.png`), capture.png);
   }
 };
+if (sackOnly) {
+  appendSackSequences(model);
+  const { indices } = reauthorInPlace(SACK_ACTIONS, false);
+  carrySack(model, indices);
+  const bytes = encodeVerified(parseSource(generateMDX(model))), before = new DrawnModel(generateMDX(source), 1), after = new DrawnModel(bytes, 1);
+  for (const [index, s] of source.Sequences.entries()) if (!indices.includes(index)) for (const t of [0, 0.5, 1]) {
+    const a = before.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1), b = after.triangles(index, (s.Interval[1]! - s.Interval[0]!) * t / 1000, 1);
+    ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${s.Name}: shipped pose changed`);
+  }
+  for (const [cell, action] of SACK_ACTIONS.entries()) {
+    const moments = SACK_MOMENTS(cell);
+    const capture = sheet(`Peon ${action.name}`, after, [1, -1].flatMap(facing => moments.map(frame => ({ frame, facing, clip: indices[cell]!, seconds: frame / 60, phase: AttackPhase.active, x: 0, z: 0, parts: [], strikes: sackStrikes(cell, frame, facing) }))), moments.length);
+    await Bun.write(join(output, `${action.name}.png`), capture.png);
+  }
+  const modelPath = join(output, "hero-models/peon.mdx"); await Bun.write(modelPath, bytes); chmodSync(modelPath, 0o644);
+  await writeSackClips(project, indices);
+  console.log(`PEON_SACK_PASS: ${SACK_ACTIONS.map(a => a.name).join(", ")} at ${indices.join(", ")}; ${source.Sequences.length} shipped sequences preserved; ${bytes.byteLength} model bytes`);
+  process.exit(0);
+}
 if (painOnly) {
   const pains = actions.filter(a => a.pain);
   const { bytes, after, indices } = reauthorInPlace(pains, false);
