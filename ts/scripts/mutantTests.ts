@@ -84,7 +84,8 @@ const gameTests = Effect.gen(function*() {
   const lua = yield* stockLua;
   const config = tstl.parseConfigFileWithSystem(join(changeProject, "tsconfig.lua-tests.json"));
   const host = ts.createCompilerHost(config.options);
-  const clean = ts.createProgram({ rootNames: config.fileNames, options: config.options, host });
+  const rootNames = config.fileNames.filter((file) => !file.endsWith(".tests.ts") || modules.some((module) => file === resolve(changeProject, module)));
+  const clean = ts.createProgram({ rootNames, options: config.options, host });
   const { plugins } = getPlugins(clean);
   const transpiler = new VariantTranspiler();
   const transpile = (program: ts.Program, sourceFiles?: ts.SourceFile[]) =>
@@ -95,7 +96,7 @@ const gameTests = Effect.gen(function*() {
     for (const plugin of plugins) diagnostics.push(...plugin.beforeEmit?.(program, program.getCompilerOptions(), ts.sys, plan) ?? []);
     if (errors(diagnostics).length > 0 || plan.length === 0) {
       report(tree, errors(diagnostics));
-      return Effect.void;
+      return undefined;
     }
     for (const { outputPath, code } of plan) {
       const target = join(tree, outputPath.slice(change.length));
@@ -105,7 +106,9 @@ const gameTests = Effect.gen(function*() {
     return luaRun(lua, tree, namesFile);
   };
   const cleanResult = transpile(clean);
-  const runs = [emit(change, clean, cleanResult)];
+  const cleanRun = emit(change, clean, cleanResult);
+  if (cleanRun === undefined) return;
+  const runs = [cleanRun];
   for (const tree of trees.slice(1)) {
     const inTree = (fileName: string) => fileName.startsWith(`${change}/`) ? join(tree, fileName.slice(change.length)) : fileName;
     const variantHost: ts.CompilerHost = {
@@ -121,7 +124,7 @@ const gameTests = Effect.gen(function*() {
         return old !== undefined && old.text === text ? old : ts.createSourceFile(fileName, text, languageVersion);
       },
     };
-    const variant = ts.createProgram({ rootNames: config.fileNames, options: config.options, host: variantHost, oldProgram: clean });
+    const variant = ts.createProgram({ rootNames, options: config.options, host: variantHost, oldProgram: clean });
     const changed = variant.getSourceFiles().filter((file) => clean.getSourceFile(file.fileName) !== file);
     const local = changed.every((file) => {
       const old = clean.getSourceFile(file.fileName);
@@ -134,7 +137,7 @@ const gameTests = Effect.gen(function*() {
       ? { diagnostics: fresh.diagnostics, transpiledFiles: cleanResult.transpiledFiles.map((file) => replaced.get(file.fileName) ?? file) }
       : fresh;
     console.log(`mutant tests: ${tree} changes ${changed.map((file) => file.fileName.slice(changeProject.length + 1)).join(", ") || "no compiled file"}; ${local ? "re-emitted those files" : "re-emitted every file"}`);
-    runs.push(emit(tree, variant, transpiled));
+    runs.push(emit(tree, variant, transpiled) ?? Effect.void);
   }
   yield* Effect.all(runs, { concurrency: "unbounded" });
 });
