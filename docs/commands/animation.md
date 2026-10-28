@@ -95,7 +95,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`; Chen's hang turns his left wrist rather than the staff, since the staff's own pivot is off the grip and turning it pulls the shaft out of his fist (#525).
-  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace aerials|up-air|forward-air|counter|back-air]`
+  `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace aerials|up-air|forward-air|counter|back-air|quickdraw]`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the double-jump flip, and re-authors two clips in place from the move's own blade tables:
   the Down Air Sword Plunge sequence as the down air's crescent sweep under him, and the
@@ -107,6 +107,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   re-keys the Air Turning Back Cut sequence in place, frame-aligned: he twirls the katana
   into a reverse grip (the sword turned 180 degrees about his fist, blade back along the
   forearm), drives it level behind his hip on the active frames and twirls it back to guard.
+  `--replace quickdraw` appends, or re-keys in place, the Quickdraw Crescent Draw: frame 0 is
+  the sheathed iaido stance (blade level behind his hip), held as the charge pose; on release
+  the blade draws from low in front up over his head in a rising crescent from the first dash
+  frame, flicks down and slides back into the sheathed pose by the clip's end.
   `bun tools/animations/peon-clips.ts STOCK_PEON.mdx PRIVATE_OUTPUT` appends
   Peon's tool strikes, movement, recovery, paired grabs and nine pain poses,
   preserves the 22 stock sequences and writes both-facing silhouette sheets.
