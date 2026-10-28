@@ -44,7 +44,8 @@ export class BearFeedback {
   }
 
   confirm(frame: number, fighter: Readonly<Fighter>, index: number): void {
-    for (const animal of [0, 2]) this.confirmAnimal(frame, fighter, index * 2 + (animal === 0 ? 0 : 1), animal);
+    this.confirmAnimal(frame, fighter, index * 2, 0);
+    this.confirmAnimal(frame, fighter, index * 2 + 1, 2);
   }
 
   private confirmAnimal(frame: number, fighter: Readonly<Fighter>, index: number, animal: number): void {
@@ -52,18 +53,16 @@ export class BearFeedback {
     if (slot === undefined || animal > fighter.pack.length) return;
     const placed = placedObject(fighter, animal);
     const cues = advanceBearFeedback(slot.cursor, fighter, frame, animal);
-    const play = (label: string): void => {
-      this.sounds.playAt(SoundKind.label, label, this.origin.x + placed.x, this.origin.y, this.origin.z + placed.z, 127);
-    };
     if (cues.hit) {
-      play("MetalHeavySliceFlesh");
+      this.sounds.playAt(SoundKind.label, "MetalHeavySliceFlesh", this.origin.x + placed.x, this.origin.y, this.origin.z + placed.z, 127);
       BlzSetSpecialEffectAnimation(slot.impact, "Birth");
       BlzSetSpecialEffectTime(slot.impact, 0.0);
     }
   }
 
   present(fighter: Readonly<Fighter>, index: number): void {
-    for (const animal of [0, 2]) this.presentAnimal(fighter, index * 2 + (animal === 0 ? 0 : 1), animal);
+    this.presentAnimal(fighter, index * 2, 0);
+    this.presentAnimal(fighter, index * 2 + 1, 2);
   }
 
   private presentAnimal(fighter: Readonly<Fighter>, index: number, animal: number): void {

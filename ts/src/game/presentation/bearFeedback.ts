@@ -29,15 +29,18 @@ export interface BearFeedbackCursor {
 export const createBearFeedbackCursor = (): BearFeedbackCursor => ({ frame: -1, placement: -1, command: -1, bitten: 0, impactFrame: -100, impactX: 0.0, impactZ: 0.0 });
 
 
-export function advanceBearFeedback(cursor: BearFeedbackCursor, fighter: Readonly<Fighter>, frame: number, animal = 0): { roar: boolean; hit: boolean } {
-  if (frame <= cursor.frame) return { roar: false, hit: false };
+const NO_CUES: Readonly<{ roar: boolean; hit: boolean }> = { roar: false, hit: false };
+const cues = { roar: false, hit: false };
+
+export function advanceBearFeedback(cursor: BearFeedbackCursor, fighter: Readonly<Fighter>, frame: number, animal = 0): Readonly<{ roar: boolean; hit: boolean }> {
+  if (frame <= cursor.frame) return NO_CUES;
   cursor.frame = frame;
   const state = bearState(fighter, animal);
   const bear = placedObject(fighter, animal);
   if (state === undefined || bear.mode !== CompanionMode.lunge) {
     cursor.command = -1;
     cursor.bitten = 0;
-    return { roar: false, hit: false };
+    return NO_CUES;
   }
   const command = bear.age - bear.modeFrame;
   const entered = cursor.placement !== bear.serial || cursor.command !== command;
@@ -52,7 +55,9 @@ export function advanceBearFeedback(cursor: BearFeedbackCursor, fighter: Readonl
     cursor.impactX = bear.x + bear.direction * ((bite?.x1 ?? 0.0) + (bite?.x2 ?? 0.0)) * 0.5;
     cursor.impactZ = bear.z + ((bite?.z1 ?? 0.0) + (bite?.z2 ?? 0.0)) * 0.5;
   }
-  return { roar: entered && state === "CHARGING", hit };
+  cues.roar = entered && state === "CHARGING";
+  cues.hit = hit;
+  return cues;
 }
 
 export const BEAR_ROAR_MODEL = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarTarget.mdx";
