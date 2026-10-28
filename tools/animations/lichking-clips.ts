@@ -139,11 +139,11 @@ function aerials(kit: Kit): Clip[] {
             strike: { ...TUCK, lean: -14, handR: [10, -26, 140], aim: 92, handL: [-10, 26, 120] },
             follow: { ...TUCK, lean: -18, handR: [-16, -26, 128], aim: 150 },
         }), AIR),
-        author(kit, "Aerial Down", swing(zero(14), 5, 55, {
+        author(kit, "Aerial Down", swing(zero(18), 5, 55, {
             start: FALL, wind: { ...TUCK, lean: -8, handR: [14, -24, 140], aim: 92, handL: [12, -6, 138] },
             strike: { footR: [10, -16, 30], footL: [-10, 14, 26], lean: 10, handR: [16, -22, 76], aim: -90, handL: [14, -8, 80] },
             follow: { footR: [10, -16, 28], footL: [-10, 14, 24], lean: 8, handR: [16, -22, 78], aim: -88, handL: [14, -8, 82] },
-            windAt: 8, followAt: zero(18) + 10,
+            windAt: 10, followAt: zero(22) + 10,
         }), AIR),
     ];
 }
@@ -244,10 +244,10 @@ const BLAST_FOLLOW: Beat = { ...BLAST_STRIDE, step: [68, -24], lean: 40, twist: 
 function specials(kit: Kit): Clip[] {
     return [
         author(kit, "Special Neutral", beats({
-            0: {}, 5: { step: [16, -2], lean: -4, twist: 12, handR: [10, -32, 104], aim: 80, footR: [26, -24, 22] },
-            12: BLAST_COIL, [zero(29) - 4]: { ...BLAST_COIL, step: [40, -14], lean: -22, twist: 38, handR: [-8, -34, 120], aim: 150 },
-            [zero(29)]: BLAST_RELEASE, 34: BLAST_FOLLOW,
-            47: { step: [8, -2], lean: 2, handR: [22, -30, 90], aim: 30, footR: [6, -26, 16] }, 56: {},
+            0: {}, 4: { step: [16, -2], lean: -4, twist: 12, handR: [10, -32, 104], aim: 80, footR: [26, -24, 22] },
+            9: BLAST_COIL, [zero(23) - 4]: { ...BLAST_COIL, step: [40, -14], lean: -22, twist: 38, handR: [-8, -34, 120], aim: 150 },
+            [zero(23)]: BLAST_RELEASE, 28: BLAST_FOLLOW,
+            41: { step: [8, -2], lean: 2, handR: [22, -30, 90], aim: 30, footR: [6, -26, 16] }, 50: {},
         }), { copyOf: "Spell Throw" }),
         author(kit, "Special Down", beats({
             0: {}, 9: DEFILE_WIND, 14: DEFILE_WIND, [zero(20)]: DEFILE_CAST, 25: DEFILE_CAST,
