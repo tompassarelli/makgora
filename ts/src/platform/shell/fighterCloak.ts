@@ -1,5 +1,6 @@
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/participants";
 import { isActive } from "../../game/sim/roster";
+import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
 
 export interface HiddenFighter {
@@ -12,7 +13,8 @@ export interface HiddenFighter {
 export type CloakPart = "fighter" | "cues";
 
 const drawn: effect[] = [];
-const concealedCues: { readonly models: effect[]; readonly scales: number[] }[] = PARTICIPANT_SLOTS.map(() => ({ models: [], scales: [] }));
+interface Placement { readonly scale: number; readonly x: number; readonly y: number; readonly z: number }
+const concealedCues: { readonly models: effect[]; readonly places: Placement[] }[] = PARTICIPANT_SLOTS.map(() => ({ models: [], places: [] }));
 
 function fighterEffects(s: ShellState, slot: ParticipantSlot, everything: boolean): effect[] {
   drawn.length = 0;
@@ -50,11 +52,12 @@ function concealCues(s: ShellState, slot: ParticipantSlot): void {
     const scale = BlzGetSpecialEffectScale(model);
     if (scale === 0.0) continue;
     const index = concealed.models.indexOf(model);
+    const place = { scale, x: BlzGetLocalSpecialEffectX(model), y: BlzGetLocalSpecialEffectY(model), z: BlzGetLocalSpecialEffectZ(model) };
     if (index < 0) {
       concealed.models.push(model);
-      concealed.scales.push(scale);
-    } else concealed.scales[index] = scale;
-    BlzSetSpecialEffectScale(model, 0.0);
+      concealed.places.push(place);
+    } else concealed.places[index] = place;
+    hideEffect(model, s.origin);
   }
 }
 
@@ -62,11 +65,13 @@ function revealCues(s: ShellState, slot: ParticipantSlot): void {
   const concealed = concealedCues[slot];
   if (concealed === undefined) return;
   for (const model of cueEffects(s, slot)) {
-    const index = concealed.models.indexOf(model);
-    if (index >= 0) BlzSetSpecialEffectScale(model, concealed.scales[index] ?? 1.0);
+    const place = concealed.places[concealed.models.indexOf(model)];
+    if (place === undefined) continue;
+    BlzSetSpecialEffectPosition(model, place.x, place.y, place.z);
+    BlzSetSpecialEffectScale(model, place.scale);
   }
   concealed.models.length = 0;
-  concealed.scales.length = 0;
+  concealed.places.length = 0;
 }
 
 export function concealFighter(s: ShellState, slot: ParticipantSlot): void {

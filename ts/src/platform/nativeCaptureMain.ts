@@ -107,10 +107,10 @@ export function captureTick(fixtures: readonly CaptureFixture[]): void {
   if (silhouette !== undefined && r.held === 0) {
     ClearTextMessages();
     if (cues && !r.hidden) recordScreenBoxes(s, fixture, silhouette.slot, target);
-    if (r.hidden) {
-      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
-      r.stampTick = r.ticks;
-    }
+  }
+  if (silhouette !== undefined && r.hidden && r.held === (cues ? 120 : 0)) {
+    paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+    r.stampTick = r.ticks;
   }
   r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
   if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
