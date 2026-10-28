@@ -1,5 +1,6 @@
 # Pit Lord Howl of Terror native proof, with his body hidden so it cannot cover her: he walks in and roars at the Warden; the fel ring sweeps out, she is hit while grounded and cowers in terror with the fear art over her head until it wears off.
-#! chat -dev setup quick pair pit lord / warden;stocks 3;hide fighter 0
+#! chat -dev setup quick pair pit lord / warden;lives 2 3;hide fighter 0
+#! scene a HowlTarget
 60 a stick 1 0
 88 a stick 0 0
 94 a tap X 2

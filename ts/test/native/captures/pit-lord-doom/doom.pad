@@ -1,5 +1,9 @@
 # Pit Lord Doom native proof: he runs in and grabs the Warden with Doom; the fel curse hangs over her head and the Doom mark sits by her percent while she burns; she runs off the right edge and falls; 180 frames after her stock loss a fel portal opens at the right of the main deck, a Doom Guard steps out, walks at her after she respawns and cleaves after its wind-up.
-#! chat -dev setup quick pair pit lord / warden;stocks 3;meter 100
+#! chat -dev setup quick pair pit lord / warden;lives 2 3;meter 100
+#! scene a DarkPortalTarget
+#! scene a DoomGuard
+#! scene b DoomGuard
+#! scene a DoomTarget
 60 a stick 1 0
 84 a stick 0 0
 84 a press A
