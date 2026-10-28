@@ -31,7 +31,7 @@ test("Y pressed during a rebind on the controls screen binds to Strong, and stil
   for (let frame = 0; frame < 240 && !controlsGreeted(host); frame++) clients.frames(1);
   expect(controlsGreeted(host)).toBe(true);
   host.run(() => {
-    clearKey(settings(), Key.y);
+    for (const slot of [1, 0] as const) clearKey(settings(), keyFor(settings().bindings, Action.strong, slot) ?? 0);
     bindFirstUnbound(settings());
   });
   expect(read(() => settings().capture?.action)).toBe(Action.strong);
