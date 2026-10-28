@@ -4,20 +4,22 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { floorMod } from "wisp/src/sim/intMath";
+import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
 import { Action } from "../input/actions";
 import { type KeyBindings, keyNames } from "../input/keyBindings";
 import { GroundAction, SpecialAction } from "../sim/codes";
+import { traitMove } from "../sim/identityTraits";
+import { METER, fillEx, gainUltimate, ultimateCharged } from "../sim/meter";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
 import {
-  type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectCpuCharacter, selectStage,
-  setTraining, setTutorialLesson,
+  MATCH_TICKS_PER_SECOND, type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectCpuCharacter, selectStage,
+  setTraining, setTutorialLesson, setUltimatesOn,
 } from "../lobby/lobbyState";
 
 
-export const LessonAction = { dash: 0, doubleJump: 1, hit: 2, special: 3, dodge: 4, throw: 5, ledge: 6, knockout: 7 } as const;
+export const LessonAction = { dash: 0, doubleJump: 1, hit: 2, special: 3, dodge: 4, throw: 5, ledge: 6, knockout: 7, exSpecial: 8, ultimate: 9 } as const;
 export type LessonAction = (typeof LessonAction)[keyof typeof LessonAction];
 
 export interface Lesson {
@@ -31,11 +33,21 @@ export interface Lesson {
   readonly partnerDamage: number;
 }
 
+const SPECIAL_SLOTS = ["neutral", "side", "up", "down"] as const;
+
+const EX_SECONDS = floorDiv(METER.exFrames, MATCH_TICKS_PER_SECOND);
+
+const ULTIMATE_MINUTES = floorDiv(METER.ultimateFrames, MATCH_TICKS_PER_SECOND * 60);
+
+const ULTIMATE_LANDING_FRAMES = 4 * MATCH_TICKS_PER_SECOND;
+
 export const LESSONS: readonly Lesson[] = [
   { name: "Move and dash", instruction: key => `Push left or right (${key(Action.moveLeft)} or ${key(Action.moveRight)}) to walk. Tap it quickly to dash.`, counted: "Dashes", action: LessonAction.dash, goal: 3, partnerDamage: 0 },
   { name: "Jump and double jump", instruction: key => `Press jump (${key(Action.jump)}), then press it again in the air to jump a second time. ${key(Action.shortHop)}, or LB in the tom pad layout, always short hops, even held.`, counted: "Double jumps", action: LessonAction.doubleJump, goal: 3, partnerDamage: 0 },
   { name: "Attacks", instruction: key => `Walk up to your partner and press attack (${key(Action.attack)}). Hold a direction to change the attack; hold strong (${key(Action.strong)}) as well for a smash.`, counted: "Hits", action: LessonAction.hit, goal: 5, partnerDamage: 0 },
-  { name: "Specials", instruction: key => `Press special (${key(Action.special)}); hold a direction to change the move. Specials are free. ${key(Action.strong)} + ${key(Action.special)}: EX special (EX charge). ${key(Action.attack)} + ${key(Action.special)}: Ultimate (full ultimate meter).`, counted: "Specials", action: LessonAction.special, goal: 3, partnerDamage: 0 },
+  { name: "Specials", instruction: key => `Every fighter has four specials, and they are free. Press special (${key(Action.special)}) alone for the neutral special, or with ${key(Action.moveLeft)} or ${key(Action.moveRight)} for the side special, ${key(Action.moveUp)} for the up special and ${key(Action.moveDown)} for the down special. Try all four.`, counted: "Specials tried", action: LessonAction.special, goal: SPECIAL_SLOTS.length, partnerDamage: 0 },
+  { name: "EX specials", instruction: key => `Hold strong (${key(Action.strong)}) and press special (${key(Action.special)}) for an EX special, a stronger version that spends your EX charge. The small cell beside your damage shows it: lit when charged, dark once spent, and it refills in ${EX_SECONDS} seconds.`, counted: "EX specials", action: LessonAction.exSpecial, goal: 2, partnerDamage: 0 },
+  { name: "Ultimate", instruction: key => `The bar under your damage is your ultimate meter. It fills over ${ULTIMATE_MINUTES} minutes of play, and by half from each orange orb at centre stage. When it is full your fighter glows gold. Hold attack (${key(Action.attack)}) and press special (${key(Action.special)}) to fire your ultimate. Yours is full now: hit your partner with it.`, counted: "Ultimates landed", action: LessonAction.ultimate, goal: 1, partnerDamage: 0 },
   { name: "Shield and dodge", instruction: key => `${key(Action.leftTrigger)}: full shield; ${key(Action.lightShield)}: light shield. ${key(Action.leftTrigger)} + ${key(Action.moveLeft)} or ${key(Action.moveRight)} rolls; ${key(Action.leftTrigger)} + ${key(Action.moveDown)} dodges. Tap ${key(Action.leftTrigger)} before landing to tech; hold ${key(Action.moveLeft)} or ${key(Action.moveRight)} to tech roll.`, counted: "Dodges", action: LessonAction.dodge, goal: 3, partnerDamage: 0 },
   { name: "Grab and throw", instruction: key => `Stand next to your partner and press grab (${key(Action.grab)}). Then push a direction to throw.`, counted: "Throws", action: LessonAction.throw, goal: 2, partnerDamage: 0 },
   { name: "Get back to the ledge", instruction: key => `Jump off, then double jump (${key(Action.jump)}) and up special (${key(Action.moveUp)} + ${key(Action.special)}) to the ledge. ${key(Action.moveUp)} or toward the stage climbs; ${key(Action.jump)} leaps; ${key(Action.leftTrigger)} rolls; ${key(Action.attack)} strikes; ${key(Action.moveDown)} or away lets go.`, counted: "Ledge grabs", action: LessonAction.ledge, goal: 2, partnerDamage: 0 },
@@ -58,17 +70,35 @@ export function leaveTutorial(game: MatchState): void {
 }
 
 
-export function beginLesson(state: TrainingState, world: Roster, computerMask: number, lesson: number): void {
+export function beginLesson(state: TrainingState, world: Roster, playerMask: number, computerMask: number, lesson: number): void {
   state.lesson = lesson;
   state.lessonCount = 0;
   state.lessonCheer = 0;
+  state.lessonMoves = 0;
+  state.lessonWindow = 0;
   state.behaviour = PartnerBehaviour.stand;
   state.escape = PartnerEscape.none;
   state.tech = PartnerTech.none;
   const info = LESSONS[lesson];
   if (info === undefined) return;
   state.damage = info.partnerDamage;
-  for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot) && participantActive(computerMask, slot)) fighterAt(world, slot).status.damage = f32(info.partnerDamage);
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (!isActive(world, slot)) continue;
+    const f = fighterAt(world, slot);
+    if (participantActive(computerMask, slot)) f.status.damage = f32(info.partnerDamage);
+    else if (participantActive(playerMask, slot) && info.action === LessonAction.exSpecial) fillEx(f);
+  }
+  refillUltimates(state, info, world, playerMask);
+}
+
+
+function refillUltimates(state: Readonly<TrainingState>, lesson: Readonly<Lesson>, world: Roster, playerMask: number): void {
+  if (lesson.action !== LessonAction.ultimate || state.lessonWindow > 0) return;
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (!isActive(world, slot) || !participantActive(playerMask, slot)) continue;
+    const f = fighterAt(world, slot);
+    if (!ultimateCharged(f) && f.special.action !== SpecialAction.heroUltimate) gainUltimate(f, METER.ultimateFrames);
+  }
 }
 
 
@@ -99,17 +129,38 @@ export function captureTutorialBefore(world: Roster): void {
 }
 
 
-function countAction(action: LessonAction, world: Roster, playerMask: number, computerMask: number): number {
+function playersOtherwiseAttacking(world: Roster, playerMask: number): boolean {
+  return PARTICIPANT_SLOTS.some(slot => {
+    if (!isActive(world, slot) || !participantActive(playerMask, slot)) return false;
+    const f = fighterAt(world, slot);
+    return f.attack.style !== undefined || (f.special.action !== SpecialAction.none && f.special.action !== SpecialAction.heroUltimate);
+  });
+}
+
+function newSpecial(state: TrainingState, special: SpecialAction): number {
+  const move = traitMove(special);
+  const bit = 1 << SPECIAL_SLOTS.findIndex(slot => slot === move);
+  if (bit < 1 || (state.lessonMoves & bit) !== 0) return 0;
+  state.lessonMoves |= bit;
+  return 1;
+}
+
+function countAction(state: TrainingState, action: LessonAction, world: Roster, playerMask: number, computerMask: number): number {
   let count = 0;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
     const player = participantActive(playerMask, slot);
     const partner = participantActive(computerMask === 0 ? playerMask : computerMask, slot);
-    const byPlayer = f.hits.lastAttacker !== undefined && f.hits.lastAttacker !== slot && participantActive(playerMask, f.hits.lastAttacker);
+    const attacker = f.hits.lastAttacker;
+    const byPlayer = attacker !== undefined && attacker !== slot && participantActive(playerMask, attacker);
+    const started = f.special.action !== SpecialAction.none && beforeSpecial[slot] === SpecialAction.none;
     if (player && action === LessonAction.dash && f.ground.action === GroundAction.dash && beforeGround[slot] !== GroundAction.dash) count++;
     else if (player && action === LessonAction.doubleJump && f.jump.serial !== beforeJump[slot] && f.jump.isDouble) count++;
-    else if (player && action === LessonAction.special && f.special.action !== SpecialAction.none && beforeSpecial[slot] === SpecialAction.none) count++;
+    else if (player && action === LessonAction.special && started && !f.special.ex) count += newSpecial(state, f.special.action);
+    else if (player && action === LessonAction.exSpecial && started && f.special.ex) count++;
+    else if (player && action === LessonAction.ultimate && started && f.special.action === SpecialAction.heroUltimate) state.lessonWindow = ULTIMATE_LANDING_FRAMES;
+    else if (partner && action === LessonAction.ultimate && f.visuals.hit !== beforeHit[slot] && state.lessonWindow > 0 && !playersOtherwiseAttacking(world, playerMask)) count++;
     else if (player && action === LessonAction.dodge && ((f.dodge.groundFrame > 0 && beforeGroundDodge[slot] === 0) || (f.dodge.airDodging && !beforeAirDodge[slot]))) count++;
     else if (player && action === LessonAction.ledge && f.ledge.serial !== beforeLedge[slot]) count++;
     else if (partner && byPlayer && action === LessonAction.hit && f.visuals.hit !== beforeHit[slot]) count++;
@@ -123,13 +174,15 @@ function countAction(action: LessonAction, world: Roster, playerMask: number, co
 export function advanceTutorial(state: TrainingState, world: Roster, playerMask: number, computerMask: number): void {
   if (state.lessonCheer > 0) {
     state.lessonCheer--;
-    if (state.lessonCheer === 0) beginLesson(state, world, computerMask, state.lesson + 1);
+    if (state.lessonCheer === 0) beginLesson(state, world, playerMask, computerMask, state.lesson + 1);
     return;
   }
   const lesson = LESSONS[state.lesson];
   if (lesson === undefined) return;
-  state.lessonCount = Math.min(lesson.goal, state.lessonCount + countAction(lesson.action, world, playerMask, computerMask));
+  state.lessonCount = Math.min(lesson.goal, state.lessonCount + countAction(state, lesson.action, world, playerMask, computerMask));
   if (state.lessonCount >= lesson.goal) state.lessonCheer = LESSON_CHEER_FRAMES;
+  if (state.lessonWindow > 0) state.lessonWindow--;
+  if (state.lessonCount < lesson.goal) refillUltimates(state, lesson, world, playerMask);
 }
 
 
@@ -173,6 +226,7 @@ export function prepareTutorial(game: MatchState, slot: number): boolean {
   if (first === undefined || game.phase !== Phase.characterMenu || !humanPresent(game, slot)) return false;
   addTutorialPartner(game, first);
   setTraining(game, slot, true);
+  setUltimatesOn(game, slot, true);
   setTutorialLesson(game, slot, game.trainer.lesson < 0 || game.trainer.lesson >= LESSONS.length ? 0 : game.trainer.lesson, LESSONS.length);
   for (const other of PARTICIPANT_SLOTS) if (humanFighterActive(game, other) && humanPresent(game, other)) selectCharacter(game, other, characterFor(game, other) ?? game.characterChoices[other]);
   if (!requestStageSelect(game, slot)) return false;

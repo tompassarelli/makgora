@@ -165,7 +165,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     captureTrainingBefore(world);
     if (tutorialOn(game.trainer)) {
 
-      if (game.matchFrame === 1) beginLesson(game.trainer, world, game.computerMask, game.trainer.lesson);
+      if (game.matchFrame === 1) beginLesson(game.trainer, world, game.humanFighterMask, game.computerMask, game.trainer.lesson);
       captureTutorialBefore(world);
     }
   }

@@ -93,6 +93,8 @@ export interface TrainingState {
   lesson: number;
   lessonCount: number;
   lessonCheer: number;
+  lessonMoves: number;
+  lessonWindow: number;
 }
 
 export function createTrainingState(): TrainingState {
@@ -102,7 +104,7 @@ export function createTrainingState(): TrainingState {
     moveStyle: -1, moveSpecial: -1, moveForm: 0, moveCharacter: 0, moveSlot: -1, moveStartup: 0, moveActive: 0, moveTotal: 0,
     measureFrames: -1, measureAttacker: -1, measureDefender: -1, measureKind: Advantage.none, attackerReady: -1, defenderReady: -1,
     advantage: 0, advantageKind: Advantage.none, comboDefender: -1, comboOpen: false, comboHits: 0, comboDamage: 0.0,
-    lesson: -1, lessonCount: 0, lessonCheer: 0,
+    lesson: -1, lessonCount: 0, lessonCheer: 0, lessonMoves: 0, lessonWindow: 0,
   };
 }
 
@@ -112,7 +114,7 @@ const INT_FIELDS = [
   "advantage", "advantageKind", "comboDefender", "comboHits",
 ] as const;
 
-const TUTORIAL_FIELDS = ["lesson", "lessonCount", "lessonCheer"] as const;
+const TUTORIAL_FIELDS = ["lesson", "lessonCount", "lessonCheer", "lessonMoves", "lessonWindow"] as const;
 
 export function copyTrainingState(target: TrainingState, source: Readonly<TrainingState>): void {
   target.speed = source.speed;
@@ -146,6 +148,8 @@ export function copyTrainingState(target: TrainingState, source: Readonly<Traini
   target.lesson = source.lesson;
   target.lessonCount = source.lessonCount;
   target.lessonCheer = source.lessonCheer;
+  target.lessonMoves = source.lessonMoves;
+  target.lessonWindow = source.lessonWindow;
 }
 
 
