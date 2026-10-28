@@ -275,3 +275,18 @@ test("An orb taken on the frame it spawns is still seen: it bursts at centre, an
   assertEquals(b.state.match.orbs.live, OrbKind.ex);
   assertEquals(`${seen.shown}${seen.bursting ? "b" : ""}`, `${OrbKind.ex}`);
 });
+
+test("EX spent on an orb's spawn frame is back on the frame the next orb's warning starts [k1 scenario]", () => {
+  const b = bout();
+  playTo(b, ORB_INTERVAL_FRAMES);
+  spendEx(b.first);
+  let chargedAt = -1;
+  let warnedAt = -1;
+  while (played(b) < 2 * ORB_INTERVAL_FRAMES && (chargedAt < 0 || warnedAt < 0)) {
+    step(b);
+    if (chargedAt < 0 && exCharged(b.first)) chargedAt = played(b);
+    if (warnedAt < 0 && orbWarningFrames(b.state.match) !== undefined) warnedAt = played(b);
+  }
+  assertEquals(warnedAt, 2 * ORB_INTERVAL_FRAMES - ORB_WARNING_FRAMES);
+  assertEquals(chargedAt, warnedAt);
+});
