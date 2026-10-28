@@ -11,22 +11,21 @@ on:
 permissions:
   contents: read
 
-# Lanes land on main every few minutes. One run per ref finishes; a newer push
-# replaces only the queued run, so the newest commit is always the next verified.
+# Every landing on main gets its own run, so a red run names the landing that broke it;
+# on other refs a newer push replaces only the queued run.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
   cancel-in-progress: false
 
-# Autoland lands only a candidate the farm test (farm-test.yml) passed, which runs
-# every check below that its changed paths can affect; its dispatch after a landing
-# runs the smoke job and the checks the farm test skips for unrelated changes.
+# A landing runs only the farm checks its changed paths can affect (farm-test.yml),
+# so every landing on main, pushed by safe-push or dispatched by Autoland, runs every job below.
 env:
   SWEEP_PLACEMENT: gate
 
 jobs:
   # This commit's p95 frame cost, allocation and map script size on main, in the job summary and log (`grep commit-metrics`).
   smoke:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -59,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          for run in $(gh run list --workflow ci.yml --branch main --event workflow_dispatch --status completed -L 20 --json databaseId -q '.[].databaseId'); do
+          for run in $(gh run list --workflow ci.yml --branch main --status completed -L 20 --json databaseId -q '.[].databaseId'); do
             [ "$run" != "$GITHUB_RUN_ID" ] || continue
             rm -rf build/previous
             gh run download "$run" -n main-perf -D build/previous 2>/dev/null && [ -f build/previous/playable-human-four.perf ] && break
@@ -92,7 +91,7 @@ jobs:
         working-directory: ts
 
   filtered-checks:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -119,7 +118,6 @@ jobs:
         run: git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check
 
   development-loop:
-    if: github.event_name != 'workflow_dispatch' || github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

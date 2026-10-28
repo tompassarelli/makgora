@@ -9,10 +9,12 @@
 
 
 
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, relative } from "node:path";
-import { Console, Effect, Option, Schema } from "effect";
+import { join } from "node:path";
+import { Console, type Duration, Effect, Option, Schema, type Scope } from "effect";
+import { currentRepo, dispatch, resolveRef, runTag } from "wisp/scripts/wisp/farm";
+import { FULL_SUITE_VARIABLE, type Group, importClosure, selectGroups, selectionLines } from "./landingChecks";
 import { issueTests, redTitle } from "./mainRed";
 import { effectPlaybackInputs } from "./wisp/effectVisibility";
 import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
@@ -46,23 +48,6 @@ const SCRIPT_INPUTS = ["ts/scripts", "ts/src", "ts/package.json", "ts/bunfig.tom
 const EFFECT_KIT_INPUTS = /^(ts\/|contracts\/|repos\/effect|effect-kit\.json$|typescript-toolchain\.lock$)/;
 export const NORTH = join(homedir(), "code/north/main");
 export const EFFECT_KIT = join(NORTH, "agent-machinery/scripts/effect-kit.mjs");
-
-function importClosure(entry: string): string[] {
-  const transpiler = new Bun.Transpiler({ loader: "ts" });
-  const seen = new Set<string>();
-  const visit = (file: string) => {
-    if (seen.has(file) || !existsSync(file)) return;
-    seen.add(file);
-    for (const { path, kind } of transpiler.scanImports(readFileSync(file, "utf8"))) {
-      if (kind === "dynamic-import" || !path.startsWith(".")) continue;
-      const base = join(dirname(file), path);
-      const found = [base, `${base}.ts`, `${base}.tsx`, join(base, "index.ts")].find((candidate) => existsSync(candidate) && candidate.match(/\.tsx?$/));
-      if (found !== undefined) visit(found);
-    }
-  };
-  visit(join(root, entry));
-  return [...seen].map((file) => relative(root, file));
-}
 
 export function cueInputs(): Set<string> {
   return new Set([CUE_MODEL_RECORD, ...effectPlaybackInputs(root), ...importClosure(CUE_CHECK)]);
@@ -277,7 +262,7 @@ const landingQueue = run(["git", "config", "--file", join(root, ".safe-push"), "
   Effect.map(({ exitCode, stdout }) => (exitCode === 0 ? stdout.trim() : "")),
 );
 
-export const prePush = (input: string, landing: { readonly gate: typeof farmGate; readonly queue: typeof landingQueue; readonly notice?: Effect.Effect<void> } = { gate: farmGate, queue: landingQueue }, local: Local = laptop) => Effect.gen(function*() {
+export const prePush = (input: string, landing: { readonly gate: (head: string, paths: readonly string[]) => Effect.Effect<void, PrePushRefusal>; readonly queue: typeof landingQueue; readonly notice?: Effect.Effect<void> } = { gate: landingGate, queue: landingQueue }, local: Local = laptop) => Effect.gen(function*() {
   yield* landing.notice ?? mainRedNotice;
   const pushed = input.split("\n").flatMap((line) => {
     const [, commit, remoteRef, remote] = line.trim().split(/\s+/);
@@ -300,65 +285,93 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
   yield* runChecks(checks, local);
   if (!toMain) return;
   if (lands) return yield* Console.error("pre-push: Autoland runs the farm suite on the rebased candidate before it lands, so this push waits for no farm run");
-  yield* landing.gate(head);
+  yield* landing.gate(head, paths);
 });
 
 const FARM_TIMEOUT_MINUTES = 30;
-const FarmRuns = Schema.fromJsonString(Schema.Array(Schema.Struct({ displayTitle: Schema.String, conclusion: Schema.String, url: Schema.String })));
+
+export interface FarmJob { readonly name: string; readonly status: string; readonly conclusion: string; readonly databaseId: number }
+export type ChecksVerdict = { readonly state: "pending" } | { readonly state: "green" } | { readonly state: "red"; readonly failed: readonly FarmJob[] } | { readonly state: "infra"; readonly missing: readonly string[] };
+
+const FAILED = new Set(["failure", "cancelled", "timed_out", "startup_failure"]);
 
 
-export function greenFarmRun(runs: readonly { readonly displayTitle: string; readonly conclusion: string; readonly url: string }[], sha: string): string | undefined {
-  return runs.find(({ displayTitle, conclusion }) => conclusion === "success" && displayTitle.startsWith(`Farm test ${sha} `))?.url;
+export function checksVerdict(jobs: readonly FarmJob[], groups: readonly Group[], runCompleted: boolean): ChecksVerdict {
+  const selected = jobs.filter(({ name }) => groups.some((group) => name === group));
+  const failed = selected.filter(({ conclusion }) => FAILED.has(conclusion));
+  if (failed.length > 0) return { state: "red", failed };
+  const passed = new Set(selected.filter(({ status, conclusion }) => status === "completed" && conclusion === "success").map(({ name }) => name));
+  if (groups.every((group) => passed.has(group))) return { state: "green" };
+  return runCompleted ? { state: "infra", missing: groups.filter((group) => !passed.has(group)) } : { state: "pending" };
 }
 
+export interface FarmRun { readonly id: number; readonly url: string }
+export interface FarmChecks {
+  readonly poll: Duration.Input;
+  readonly start: (head: string, groups: readonly Group[]) => Effect.Effect<FarmRun, PrePushRefusal, Scope.Scope>;
+  readonly state: (run: FarmRun) => Effect.Effect<{ readonly completed: boolean; readonly jobs: readonly FarmJob[] }, PrePushRefusal>;
+  readonly cancel: (run: FarmRun) => Effect.Effect<void>;
+  readonly failedLog: (job: FarmJob) => Effect.Effect<string>;
+}
 
-export const FARM_RUN_URL = /https:\/\/github\.com\/[^\s]+\/actions\/runs\/(\d+)/;
+const RunJobs = Schema.fromJsonString(Schema.Struct({
+  status: Schema.String,
+  jobs: Schema.Array(Schema.Struct({ name: Schema.String, status: Schema.String, conclusion: Schema.String, databaseId: Schema.Finite })),
+}));
 
-export type FarmStart = (head: string) => Effect.Effect<CheckRun, PrePushRefusal>;
-export type FarmVerdict = "green" | "red" | "infra";
-export type FarmConclusion = (runId: string) => Effect.Effect<FarmVerdict, PrePushRefusal>;
-const RunConclusion = Schema.fromJsonString(Schema.Struct({ status: Schema.String, conclusion: Schema.String }));
+const infra = (what: string) => (failure: { readonly message: string }) => new PrePushRefusal({ problem: `pre-push: INFRA, not a red check: ${what}: ${failure.message}; NOT landed, re-run safe-push` });
 
-const farmStart: FarmStart = (head) => run([process.execPath, "wisp", "farm", "test", "--ref", head, "--wait"], join(root, "ts"));
-const farmConclusion: FarmConclusion = (runId) => Effect.gen(function*() {
-  yield* run(["gh", "run", "watch", runId, "--interval", "30"], root, "ignore");
-  const viewed = yield* run(["gh", "run", "view", runId, "--json", "status,conclusion"], root);
-  const state = viewed.exitCode === 0 ? yield* Schema.decodeEffect(RunConclusion)(viewed.stdout).pipe(Effect.orElseSucceed(() => undefined)) : undefined;
-  return state?.status !== "completed" ? "infra" : state.conclusion === "success" ? "green" : "red";
-});
+export const githubFarm: FarmChecks = {
+  poll: "5 seconds",
+  start: (head, groups) => Effect.gen(function*() {
+    const repo = yield* currentRepo.pipe(Effect.mapError(infra("reading the repository")));
+    const { ref, scratch } = yield* resolveRef(head, repo).pipe(Effect.mapError(infra("pushing the scratch branch")));
+    const base = yield* git("merge-base", head, "origin/main");
+    const found = yield* dispatch(repo, "farm-test.yml", { ref, base, checks: groups.join(","), tag: runTag() }, scratch ?? "main").pipe(Effect.mapError(infra("starting the farm run")));
+    return { id: found.databaseId, url: found.url };
+  }),
+  state: (farm) => run(["gh", "run", "view", String(farm.id), "--json", "status,jobs"], root).pipe(
+    Effect.flatMap(({ exitCode, stdout, stderr }) => exitCode === 0
+      ? Schema.decodeEffect(RunJobs)(stdout).pipe(Effect.mapError((cause) => infra(`reading run ${farm.id}`)({ message: String(cause) })))
+      : Effect.fail(infra(`reading run ${farm.id}`)({ message: stderr.trim() }))),
+    Effect.retry({ times: 3 }),
+    Effect.map(({ status, jobs }) => ({ completed: status === "completed", jobs })),
+  ),
+  cancel: (farm) => run(["gh", "run", "cancel", String(farm.id)], root).pipe(Effect.ignore),
+  failedLog: (job) => run(["gh", "run", "view", "--job", String(job.databaseId), "--log-failed"], root).pipe(
+    Effect.map(({ stdout }) => stdout.split("\n").map((line) => line.split("\t").slice(2).join("\t")).filter((line) => line.trim() !== "").slice(-40).join("\n")),
+    Effect.orElseSucceed(() => ""),
+  ),
+};
 
-export const farmOutcome = (head: string, start: FarmStart = farmStart, conclusion: FarmConclusion = farmConclusion) => Effect.gen(function*() {
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    const farm = yield* start(head);
-    if (farm.exitCode === 0) return { verdict: "green" as FarmVerdict, output: `${farm.stdout}${farm.stderr}` };
-    const output = `${farm.stdout}${farm.stderr}`;
-    const runId = FARM_RUN_URL.exec(output)?.[1];
-    if (runId !== undefined) {
-      if (/ failed on the farm: | without a summary /.test(output)) return { verdict: "red" as FarmVerdict, output };
-      const verdict = yield* conclusion(runId);
-      return { verdict, output: `${output}\npre-push: farm run ${runId} concluded ${verdict} after the farm command exited ${farm.exitCode}` };
-    }
-    if (attempt === 2) return { verdict: "infra" as FarmVerdict, output };
-    yield* Console.error(`pre-push: no farm run started on ${head.slice(0, 12)} (infrastructure, not a test result); starting it once more`);
+const watchChecks = (farm: FarmChecks, head: string, groups: readonly Group[]) => Effect.scoped(Effect.gen(function*() {
+  const started = yield* farm.start(head, groups);
+  yield* Console.error(`pre-push: farm run ${started.url} checks ${groups.join(", ")} on ${head.slice(0, 12)}`);
+  for (;;) {
+    const state = yield* farm.state(started);
+    const verdict = checksVerdict(state.jobs, groups, state.completed);
+    if (verdict.state === "red" && !state.completed) yield* farm.cancel(started);
+    if (verdict.state !== "pending") return { run: started, verdict };
+    yield* Effect.sleep(farm.poll);
   }
-  return { verdict: "infra" as FarmVerdict, output: "" };
-});
+}));
 
-const farmGate = (head: string) => Effect.gen(function*() {
-  const listed = yield* run(["gh", "run", "list", "--workflow", "farm-test.yml", "--status", "success", "--limit", "100", "--json", "displayTitle,conclusion,url"], root);
-  const runs = listed.exitCode === 0 ? yield* Schema.decodeEffect(FarmRuns)(listed.stdout).pipe(Effect.orElseSucceed(() => [])) : [];
-  const green = greenFarmRun(runs, head);
-  if (green !== undefined) return yield* Console.error(`pre-push: the farm suite is green on ${head.slice(0, 12)} (${green})`);
-  yield* Console.error(`pre-push: main lands only on a green farm suite for this exact commit; running bun wisp farm test --ref ${head.slice(0, 12)} --wait`);
+export const landingGate = (head: string, paths: readonly string[], farm: FarmChecks = githubFarm) => Effect.gen(function*() {
+  const selected = selectGroups(paths, process.env[FULL_SUITE_VARIABLE] === "1");
+  for (const line of selectionLines(paths, selected)) yield* Console.error(`pre-push: ${line}`);
+  const groups = selected.map(({ group }) => group);
+  if (groups.length === 0) return yield* Console.error(`pre-push: no farm check can be affected, so ${head.slice(0, 12)} lands on the local checks; main's CI runs the full suite after it lands`);
   const started = performance.now();
-  const farm = yield* farmOutcome(head).pipe(Effect.timeoutOption(`${FARM_TIMEOUT_MINUTES} minutes`));
-  const minutes = ((performance.now() - started) / 60000).toFixed(1);
-  if (Option.isNone(farm)) return yield* new PrePushRefusal({ problem: `pre-push: the farm suite on ${head.slice(0, 12)} didn't finish within ${FARM_TIMEOUT_MINUTES} minutes; NOT landed` });
-  if (farm.value.verdict === "infra") {
-    return yield* new PrePushRefusal({ problem: `${farm.value.output}\npre-push: INFRA, not a red suite: no farm run started on ${head.slice(0, 12)} in two tries (${minutes} min); NOT landed, re-run safe-push once GitHub accepts the scratch push` });
+  const outcome = yield* watchChecks(farm, head, groups).pipe(Effect.timeoutOption(`${FARM_TIMEOUT_MINUTES} minutes`));
+  const seconds = ((performance.now() - started) / 1000).toFixed(0);
+  if (Option.isNone(outcome)) return yield* new PrePushRefusal({ problem: `pre-push: the farm checks on ${head.slice(0, 12)} didn't finish within ${FARM_TIMEOUT_MINUTES} minutes; NOT landed` });
+  const { run: farmRun, verdict } = outcome.value;
+  if (verdict.state === "infra") {
+    return yield* new PrePushRefusal({ problem: `pre-push: INFRA, not a red check: farm run ${farmRun.url} ended without a result for ${verdict.missing.join(", ")} (${seconds} s); NOT landed, re-run safe-push` });
   }
-  if (farm.value.verdict === "red") {
-    return yield* new PrePushRefusal({ problem: `${farm.value.output}\npre-push: the farm suite failed on ${head.slice(0, 12)} (${minutes} min); main lands only on a green suite, including tests main already fails` });
+  if (verdict.state === "red") {
+    const logs = yield* Effect.forEach(verdict.failed, (job) => farm.failedLog(job).pipe(Effect.map((log) => `--- ${job.name} (${job.conclusion})\n${log}`)));
+    return yield* new PrePushRefusal({ problem: `${logs.join("\n")}\npre-push: ${verdict.failed.map(({ name }) => name).join(", ")} failed on ${head.slice(0, 12)} (${seconds} s, ${farmRun.url}); main lands only on green checks, including ones main already fails` });
   }
-  yield* Console.error(`pre-push: the farm suite passed on ${head.slice(0, 12)} (${minutes} min)`);
+  yield* Console.error(`pre-push: ${groups.join(", ")} passed on ${head.slice(0, 12)} (${seconds} s, ${farmRun.url})`);
 });

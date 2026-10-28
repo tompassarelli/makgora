@@ -1,9 +1,9 @@
 name: Farm test
 
-# Everything main's CI checks, for one commit on free hosted runners: the Bun
-# and 32-bit Lua suites with their sweeps, sharded by each test file's (Bun) or
-# test's (Lua) measured time (wisp:docs/farm.md), and CI's other checks.
-# `bun wisp farm test` dispatches it and prints the summary the merge job uploads.
+# The checks main's CI runs, for one commit on free hosted runners, each group
+# only when the change can affect it (smashcraft:ts/scripts/landingChecks.ts).
+# safe-push's landing gate dispatches it with the groups it selected; `bun wisp
+# farm test` dispatches it and prints the summary the merge job uploads.
 on:
   workflow_dispatch:
     inputs:
@@ -19,6 +19,9 @@ on:
       farm-runner:
         description: One-off runner measurement for even shard jobs; normal and retry jobs use hosted runners
         default: ""
+      checks:
+        description: Comma-separated check groups to run (safe-push's landing selection); empty runs those the changed paths reach
+        default: ""
   # Autoland (autoland.yml) runs the suites for a rebased branch inside its own run.
   workflow_call:
     inputs:
@@ -32,6 +35,9 @@ on:
         type: string
         default: ""
       farm-runner:
+        type: string
+        default: ""
+      checks:
         type: string
         default: ""
 
@@ -100,26 +106,37 @@ jobs:
   # The rest of main's CI, each check a result row of its own; a failing check
   # adds its last output lines to the summary.
   # Checks need no shard plan, so they start beside it on the dispatched ref (Autoland passes an exact SHA).
+  # A group runs when the `checks` input names it, or, without one, when a changed path reaches it
+  # (smashcraft:ts/scripts/landingChecks.ts); parity-N replays one third of the tapes.
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       LUA_BUILD: '^(ts/(src|plugins|vendor)/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|\.github/workflows/farm-test\.yml$)'
-      PARITY_ONLY: '^ts/(scripts/|codegen/|test/(tapes|replay|host-natives))'
       COMPILER_ONLY: '^ts/scripts/(compiler-benchmark|hostProcess)\.ts$'
       TYPES: '^(ts/|contracts/|repos/effect|effect-kit\.json$|typescript-toolchain\.lock$|\.github/workflows/farm-test\.yml$)'
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, rollback, parity, corpus]
+        group: [perf, rollback, parity-0, parity-1, parity-2, corpus, types]
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ hashFiles('ts/bun.lock') }}
+      - run: bun install --frozen-lockfile
+        working-directory: ts
       - id: scope
         env:
           BASE: ${{ inputs.base }}
+          CHECKS: ${{ inputs.checks }}
           GROUP: ${{ matrix.group }}
         run: |
           base=$BASE
@@ -132,12 +149,14 @@ jobs:
           fi
           if [ -n "$base" ]; then git diff --name-only "$base" HEAD > "$RUNNER_TEMP/changed"; else echo unknown > "$RUNNER_TEMP/changed"; fi
           sed 's/^/changed: /' "$RUNNER_TEMP/changed"
-          run=true
-          if [ -n "$base" ]; then
-            case "$GROUP" in
-              parity) grep -qE "$LUA_BUILD|$PARITY_ONLY" "$RUNNER_TEMP/changed" || run=false ;;
-            esac
+          if [ -n "$CHECKS" ]; then
+            selected=$(echo "$CHECKS" | tr ',' '\n')
+            echo "selected by the checks input: $CHECKS"
+          else
+            selected=$(cd ts && bun scripts/landingChecks.ts groups < "$RUNNER_TEMP/changed")
           fi
+          run=false
+          ! grep -qxF "$GROUP" <<< "$selected" || run=true
           echo "run=$run" | tee -a "$GITHUB_OUTPUT"
           echo "$GROUP filtered out by the changed paths" > "skipped-check-$GROUP.txt"
       - if: steps.scope.outputs.run == 'false'
@@ -146,18 +165,6 @@ jobs:
           name: farm-test-skipped-check-${{ matrix.group }}
           path: skipped-check-${{ matrix.group }}.txt
           retention-days: 3
-      - if: steps.scope.outputs.run == 'true'
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - if: steps.scope.outputs.run == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: bun-install-${{ hashFiles('ts/bun.lock') }}
-      - if: steps.scope.outputs.run == 'true'
-        run: bun install --frozen-lockfile
-        working-directory: ts
       # Each group keeps its own Lua32 builds: parity's include the toward-zero variant.
       - if: steps.scope.outputs.run == 'true'
         uses: actions/cache@v4
@@ -200,10 +207,14 @@ jobs:
               fi ;;
             rollback)
               check "four-fighter 7-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf' ;;
-            parity)
+            parity-*)
               # Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
-              check "parity tapes and numeric" sh -c 'bun wisp parity tapes && bun wisp parity numeric'
-              check "stack-trace profile TypeScript frames" env LUA_TESTS_STEP=stack bun scripts/lua-tests.ts ;;
+              shard=${GROUP#parity-}
+              check "parity tapes $shard/3" env TAPES_SHARD="$shard/3" bun wisp parity tapes
+              if [ "$shard" = 0 ]; then
+                check "parity numeric" bun wisp parity numeric
+                check "stack-trace profile TypeScript frames" env LUA_TESTS_STEP=stack bun scripts/lua-tests.ts
+              fi ;;
             corpus)
               # Every native recording replays headless with 0 divergent frames, each on the source that recorded it (wisp#69).
               check "parity corpus: every native recording replays headless with 0 divergent frames" bun wisp parity corpus test/corpus
@@ -213,9 +224,10 @@ jobs:
               check "cue models and Classic effect record current for this tree" bun scripts/cueModels.ts
               if touched "$TYPES"; then
                 check "effect-kit check" sh -c 'git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && cd .. && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check'
-                check "type-check edit loop and dependency validation" bun scripts/typecheck-benchmark.ts
               fi
               check "every selectable computer fighter is active" bun scripts/cpuCoverage.ts ;;
+            types)
+              check "type-check edit loop and dependency validation" bun scripts/typecheck-benchmark.ts ;;
           esac
           bun node_modules/wisp/host/farm/farmShards.ts lua --shard 0 --exit-code "$failed" build/checks.tsv > "result-check-$GROUP.json"
           exit "$failed"
@@ -269,7 +281,7 @@ jobs:
           zero='{"passed":0,"failed":0,"skipped":0,"shards":0,"slowestShardSeconds":0}'
           fallback "$zero" '"the merge step did not finish: see its log"'
           : > problems.txt
-          for group in perf rollback parity corpus; do
+          for group in perf rollback parity-0 parity-1 parity-2 corpus types; do
             [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
           done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt

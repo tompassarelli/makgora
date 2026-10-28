@@ -89,6 +89,28 @@ export const replayInLua = (files: readonly string[], executable: string) =>
 
 
 
+export interface TapeShard { readonly index: number; readonly count: number }
+
+export function parseTapeShard(text: string | undefined): TapeShard | undefined | string {
+  if (text === undefined || text === "") return undefined;
+  const match = /^(\d+)\/(\d+)$/.exec(text);
+  const index = Number(match?.[1]);
+  const count = Number(match?.[2]);
+  return match !== null && count >= 1 && index < count ? { index, count } : `TAPES_SHARD is INDEX/COUNT with INDEX below COUNT, such as 0/3, not ${text}`;
+}
+
+export function tapeShard<T extends { readonly text: string }>(tapes: readonly T[], shard: TapeShard | undefined): readonly T[] {
+  if (shard === undefined) return tapes;
+  const loads = Array.from({ length: shard.count }, () => 0);
+  const owner = new Map<T, number>();
+  for (const tape of tapes.toSorted((a, b) => b.text.length - a.text.length)) {
+    const lightest = loads.indexOf(Math.min(...loads));
+    owner.set(tape, lightest);
+    loads[lightest] = (loads[lightest] ?? 0) + tape.text.length;
+  }
+  return tapes.filter((tape) => owner.get(tape) === shard.index);
+}
+
 type RuntimeName = "bun" | "ts-lua32" | "ts-lua32-toward-zero";
 const RUNTIMES: readonly RuntimeName[] = ["bun", "ts-lua32", "ts-lua32-toward-zero"];
 const PAIRS: readonly (readonly [RuntimeName, RuntimeName])[] = [["bun", "ts-lua32"], ["bun", "ts-lua32-toward-zero"]];
@@ -133,13 +155,15 @@ const isFrame = (operation: string | undefined) => operation === "frame" || oper
 const frameCount = (run: Run) => run.records.filter(record => isFrame(record.split(" ", 2)[1])).length;
 
 export const tapes: Command = (args) => Effect.gen(function*() {
-  if (args.length > 0) return yield* new UsageFailure({ problem: "tapes takes no arguments; LUA and TOWARD_ZERO_LUA name optional 32-bit Luas" });
+  if (args.length > 0) return yield* new UsageFailure({ problem: "tapes takes no arguments; LUA and TOWARD_ZERO_LUA name optional 32-bit Luas, and TAPES_SHARD=INDEX/COUNT replays one of COUNT parts of equal tape length" });
+  const shard = parseTapeShard(process.env.TAPES_SHARD);
+  if (typeof shard === "string") return yield* new UsageFailure({ problem: shard });
   const luas = yield* luaRuntimes.pipe(Effect.mapError((problem) => new TapesFailure({ problem })));
   const tapes = yield* attempt("record tapes", async () => {
     await Bun.$`mkdir -p ${build}`;
     const recorded = [...generateTapes()].map(([name, text]) => ({ name, text, file: join(build, `${name}.tape`) }));
     for (const { file, text } of recorded) await Bun.write(file, text);
-    return recorded;
+    return tapeShard(recorded, shard);
   }).pipe(step("record tapes"));
   yield* compileTypeScriptLua.pipe(Effect.provide(BunServices.layer), step("compile TypeScript Lua"));
 

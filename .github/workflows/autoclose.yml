@@ -1,7 +1,9 @@
 name: Auto-close
 
-# After a landing, reruns each referenced issue's declared Done-when checks on the new main (smashcraft:docs/ci.md#auto-close).
+# After a landing (a safe-push to main, or Autoland's dispatch), reruns each referenced issue's declared Done-when checks on the new main (smashcraft:docs/ci.md#auto-close).
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       sha:
@@ -11,7 +13,7 @@ on:
         description: Main before the landing; the issues come from Refs/Fixes/Closes in base..sha
         required: true
 
-run-name: Auto-close ${{ inputs.sha }}
+run-name: Auto-close ${{ inputs.sha || github.sha }}
 
 permissions:
   contents: read
@@ -27,13 +29,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      SHA: ${{ inputs.sha }}
-      BASE: ${{ inputs.base }}
+      SHA: ${{ inputs.sha || github.sha }}
+      BASE: ${{ inputs.base || github.event.before }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.sha }}
+          ref: ${{ inputs.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: oven-sh/setup-bun@v2

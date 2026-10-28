@@ -1,6 +1,6 @@
 [landing]
 	exact = true
-	queue = autoland
+	queue = lock
 [ci]
 	budget = farm-test.yml 600
 [mutant]

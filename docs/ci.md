@@ -2,13 +2,14 @@
 
 | Workflow | Runs | Does |
 | --- | --- | --- |
-| CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); Autoland's dispatch after a landing runs only the smoke job (the Classic frame budget, the same budget on the four-fighter 24-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the filtered-checks job (parity tapes and numeric, the stack-trace profile, the compiler and type-check benchmarks and effect-kit, unfiltered), because the farm test already ran every other check on that commit |
+| CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); every landing on main, pushed by `safe-push` or dispatched by Autoland, also runs the smoke job (the Classic frame budget, the same budget on the four-fighter 7-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the filtered-checks job (parity tapes and numeric, the stack-trace profile, the compiler and type-check benchmarks and effect-kit, unfiltered), so main gets the full suite after each landing (see Landing) |
 | Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
-| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | every check CI runs: full Bun and Lua32 suites with their sweeps, sharded (wisp:docs/farm.md), and the stack trace, parity corpus, tapes and numeric, the Classic frame budget, parity tapes and numeric with the stack-trace profile (only when a path the Lua build or the replay reads changed: `ts/src`, `ts/scripts`, `ts/plugins`, `ts/vendor`, `ts/codegen`, the tape and replay entries, toolchain or build-input paths), the compiler benchmark (the Lua build's paths without `ts/scripts` beyond the benchmark itself), and effect-kit and the type-check benchmark (any `ts/`, `contracts/`, effect-kit.json or `repos/effect` path); a change to farm-test.yml itself, or one with no known base commit, runs all of them; effect-kit, benchmark and computer coverage checks (the clean room runs in the pre-push hook on every Autoland candidate); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
+| Farm test (smashcraft:.github/workflows/farm-test.yml) | `safe-push --to main` with `checks`, `bun wisp farm test`, autoland | the check groups CI's checks fall into (perf, rollback, parity-0 to parity-2, corpus, types), each only when the `checks` input names it or, without one, when a changed path reaches it (see Landing); inside corpus the compiler benchmark runs only for the Lua build's paths or the benchmark itself, and effect-kit for any `ts/`, `contracts/`, effect-kit.json or `repos/effect` path (the clean room runs in the pre-push hook on every candidate); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most three jobs at once: every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); without one in the last 60 commits, drift comparison warns and passes while roster coverage and absolute frame budgets still apply; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (smashcraft:docs/commands/soak.md) |
-| Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
-| Auto-close (smashcraft:.github/workflows/autoclose.yml) | each landing (Autoland dispatches it with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
+| Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
+| Reports (smashcraft:.github/workflows/reports.yml) | push to main, dispatch | regenerates the advantage-state reports and the Melee parity page on main after a `safe-push` landing and pushes them when they changed (see Landing) |
+| Auto-close (smashcraft:.github/workflows/autoclose.yml) | each landing (a push to main, or Autoland's dispatch with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
 | Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
 
@@ -25,12 +26,56 @@ table that keeps deleting and inserting keys rehashes every few thousand inserts
 and requests its whole node array in one frame; a gameplay change that moves
 such a rehash into a measured move reads as a pair regression (#197).
 
+## Landing
+
+Tom asked for small changes to reach main in one to two minutes rather than
+about six, by checking before landing only what a change can affect and
+running the full suite on main afterwards (2026-10-29). So `safe-push --to
+main` lands a local lane straight on main under the landing lock (the
+repository's .safe-push sets `landing.queue = lock`; Autoland still lands
+cloud workers' `claude/**` pushes):
+
+1. **Before landing.** The pre-push hook (smashcraft:ts/scripts/prePush.ts)
+   runs its local checks, then selects the farm check groups the lane's diff
+   against main can affect (`selectGroups` in
+   smashcraft:ts/scripts/landingChecks.ts) and prints each with the path and
+   rule that selected it, and the skipped ones. A path in `ts/src`,
+   `ts/codegen` or `build-inputs/` selects every Lua-build group; a script
+   selects a group when it is in the static import closure of that group's
+   entry (`ts/scripts/wisp.ts`, the parity command, `lua-tests.ts`); any
+   `ts/` path selects `corpus` (effect-kit, cue models, computer coverage)
+   and `types` (the type-check benchmark); a shared root (the lockfiles,
+   `package.json`, tsconfigs, `ts/plugins`, `ts/vendor`, the toolchain
+   lock, farm-test.yml, the selection module itself) or an unknown base
+   selects all of them. `LAND_FULL_SUITE=1 safe-push --to main` forces every
+   group. The hook pushes the commit to `farm/SHA`, dispatches farm-test.yml
+   with `checks` naming the groups, polls its jobs every 5 s and refuses
+   the landing on the first failed group (cancelling the rest, with the
+   group's failing log lines), including a check main already fails. A lane
+   that selects no group, such as a docs change, lands on the local checks
+   alone.
+2. **After landing.** The push to main runs CI's smoke, filtered-checks,
+   development-loop and code-health jobs, one run per landed commit (CI's
+   concurrency is per SHA on main), plus Background sweeps, Auto-close and
+   Reports (smashcraft:.github/workflows/reports.yml, which regenerates the
+   advantage-state reports and the Melee parity page and pushes them as one
+   "Regenerate reports" commit when they changed). A red CI run goes to the
+   sheriff and the "main is red" issue (see Sheriff); the lane whose
+   landing first failed owns the fix.
+
+The farm's check groups are perf, rollback, parity-0 to parity-2 (one third
+of the replay tapes each, balanced by tape length with `TAPES_SHARD`; parity-0
+also runs parity numeric and the stack-trace profile), corpus and types. On
+2026-10-28 a gameplay change's slowest group was rollback, measured while it
+still rolled back 24 frames: one single-threaded Lua process of about 96 s on
+a hosted runner, after a 25 s compile.
+
 ## Autoland
 
-Autoland is main's one landing queue. Cloud workers push to `claude/NAME`;
-`safe-push --to main` checks a local lane, pushes it to `claude/land-LANE-SHA`
-and waits for its verdict (the repository's .safe-push sets `landing.queue =
-autoland`); its pre-push gate runs no farm suite for that hand-off, since
+Autoland lands the cloud workers' pushes to `claude/NAME`. While the
+repository's .safe-push set `landing.queue = autoland`, `safe-push --to main`
+also checked a local lane, pushed it to `claude/land-LANE-SHA` and waited for
+its verdict; its pre-push gate runs no farm suite for that hand-off, since
 Autoland's suite covers every farm-test job
 (smashcraft:ts/scripts/suiteParity.ts). For that hand-off the gate also runs
 locally only the checks that need private or local inputs (generated models
@@ -68,8 +113,8 @@ else pushes main, so no landing restarts another's suites.
    the job budget rather than the slot count bounds how many run at once;
    a plan fills every free slot whose run fits 32 of the account's 40 hosted
    jobs at every moment: each run reserves the measured job profile `PROFILE`
-   left at the new run's peak (11 jobs for 2 min, then decaying to 1 by 3 min; a run with no
-   `suite /` job yet counts 11, and one whose `suite` job was skipped, such as a
+   left at the new run's peak (14 jobs for 2 min, then decaying to 1 by 3 min; a run with no
+   `suite /` job yet counts 14, and one whose `suite` job was skipped, such as a
    train landing passed-alone trees, counts only its running jobs), and logs "Autoland hosted jobs: N/32 now, M at
    the next peak"; a plan reads the runs' jobs only when a slot is free and a
    lane waits to test, since the budget decides nothing otherwise (#350). The train is never held by that budget. A lane that arrived over 60 min
@@ -170,9 +215,8 @@ The Autoland sweep below is the only automatic canceller; the laptop job watchdo
 
 ## Auto-close
 
-A local workflow-lane landing through `safe-push` for `.github` changes does
-not dispatch Auto-close; only Autoland dispatches it after landing. After a
-local workflow-lane landing, dispatch `autoclose.yml` by hand.
+Each push to main starts Auto-close with the pushed SHA and the main before it;
+Autoland's landings, pushed with the workflow token, dispatch it instead.
 
 After each landing, Auto-close reads `Refs`, `Fixes` or `Closes #N` in the
 landed commits. For each open issue opened by someone with write access, it
