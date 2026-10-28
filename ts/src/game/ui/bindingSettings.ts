@@ -186,23 +186,56 @@ function edited(settings: BindingSettings, message: string): void {
   settings.message = message;
 }
 
-function clearedMessage(settings: Readonly<BindingSettings>, action: Action, key: number | undefined): string {
-  const unbound = keyFor(settings.bindings, action, 0) === undefined && keyFor(settings.bindings, action, 1) === undefined;
+function selectCustom(settings: BindingSettings, bindings: KeyBindings): void {
+  settings.layouts.custom = bindings;
+  settings.layout = "custom";
+  settings.bindings = bindings;
+}
+
+const editableBindings = (settings: Readonly<BindingSettings>): KeyBindings => settings.layout === "custom" ? settings.bindings : { keys: settings.bindings.keys.slice() };
+
+function finishEdit(settings: BindingSettings, target: KeyBindings, message: string): void {
+  if (target === settings.bindings) {
+    edited(settings, message);
+    return;
+  }
+  const from = PRESET_NAMES[settings.layout];
+  selectCustom(settings, target);
+  edited(settings, message);
+  saveBindingSettings(settings);
+  settings.fromProfile = false;
+  settings.message = `${message} ${from} stays as it was; your keys are in Custom and saved.`;
+}
+
+export function customizeLayout(settings: BindingSettings): void {
+  if (!settings.ready) return;
+  if (settings.layout === "custom") {
+    settings.message = "Custom is already selected. Edit any key.";
+    return;
+  }
+  const from = PRESET_NAMES[settings.layout];
+  selectCustom(settings, editableBindings(settings));
+  edited(settings, `${from} copied to Custom. Edits go to Custom.`);
+}
+
+function clearedMessage(bindings: Readonly<KeyBindings>, action: Action, key: number | undefined): string {
+  const unbound = keyFor(bindings, action, 0) === undefined && keyFor(bindings, action, 1) === undefined;
   return unbound ? `${ACTION_LABELS[action]} is now unbound.` : `${keyLabel(key)} cleared from ${ACTION_LABELS[action]}.`;
 }
 
 export function captureBinding(settings: BindingSettings, key: number): boolean {
   const { capture } = settings;
   if (capture === undefined) return false;
+  const target = editableBindings(settings);
   if (key === CLEAR_KEY) {
-    const old = keyFor(settings.bindings, capture.action, capture.slot);
-    clearSlot(settings.bindings, capture.action, capture.slot);
-    edited(settings, clearedMessage(settings, capture.action, old));
+    const old = keyFor(target, capture.action, capture.slot);
+    clearSlot(target, capture.action, capture.slot);
+    finishEdit(settings, target, clearedMessage(target, capture.action, old));
     return true;
   }
-  const result = assignKey(settings.bindings, capture.action, capture.slot, key);
-  if (result.kind === "swapped") edited(settings, `Swapped with ${ACTION_LABELS[result.with]}.`);
-  else if (result.kind === "bound") edited(settings, "Binding updated.");
+  const result = assignKey(target, capture.action, capture.slot, key);
+  if (result.kind === "swapped") finishEdit(settings, target, `Swapped with ${ACTION_LABELS[result.with]}.`);
+  else if (result.kind === "bound") finishEdit(settings, target, "Binding updated.");
   else if (result.kind === "reserved") settings.message = `${result.reason}. Press another key.`;
   else settings.message = "That key can't be bound. Press another key.";
   return true;
@@ -213,8 +246,9 @@ export function clearKey(settings: BindingSettings, key: number): void {
   const action = key === 0 ? undefined : actionFor(settings.bindings, key);
   if (action === undefined) return;
   const slot = settings.bindings.keys.indexOf(key) === slotIndex(action, 0) ? 0 : 1;
-  clearSlot(settings.bindings, action, slot);
-  edited(settings, clearedMessage(settings, action, key));
+  const target = editableBindings(settings);
+  clearSlot(target, action, slot);
+  finishEdit(settings, target, clearedMessage(target, action, key));
 }
 
 export function bindFirstUnbound(settings: BindingSettings): void {

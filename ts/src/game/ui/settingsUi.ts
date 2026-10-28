@@ -7,6 +7,7 @@ import {
   bindFirstUnbound,
   cancelBindingCapture,
   clearKey,
+  customizeLayout,
   loadProfile,
   NO_SAVED_PROFILE,
   pickBindingPreset,
@@ -23,7 +24,7 @@ export interface SettingsActions {
   closeSettings(participantId: number): void;
 }
 
-type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "profile" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" };
+type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "customize" } | { kind: "profile" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" };
 
 interface KeyButton {
   readonly key: number;
@@ -34,10 +35,11 @@ interface KeyButton {
 
 export const PICKER_DONE = { x: f32(0.23), y: f32(0.155), width: f32(0.105), height: f32(0.032) } as const;
 const BUTTON_TEXTURE = "war3mapImported\\SelectionAction.tga";
-const PRESET_STEP = f32(0.148);
-const PRESET_WIDTH = f32(0.142);
-export const LOAD_PROFILE = { x: f32(0.564), y: f32(0.548), width: PRESET_WIDTH, height: f32(0.034) } as const;
+const PRESET_STEP = f32(0.122);
+const PRESET_WIDTH = f32(0.118);
 export const presetButton = (index: number) => ({ x: f32(0.12) + index * PRESET_STEP, y: f32(0.548), width: PRESET_WIDTH, height: f32(0.034) });
+const CUSTOMIZE = presetButton(BINDING_PRESETS.length);
+export const LOAD_PROFILE = presetButton(BINDING_PRESETS.length + 1);
 const DIM_KEY = 105;
 const LIT_KEY = 255;
 const CLEAR_SIZE = f32(0.012);
@@ -106,6 +108,7 @@ export class SettingsPanel {
       const { x, y, width, height } = presetButton(index);
       return [preset, button(`MeleeSettingsPreset${I2S(index)}`, x, y, width, height, PRESET_NAMES[preset], { kind: "preset", preset }).label];
     });
+    button("MeleeSettingsCustomize", CUSTOMIZE.x, CUSTOMIZE.y, CUSTOMIZE.width, CUSTOMIZE.height, "Customize", { kind: "customize" });
     this.profileButton = button("MeleeSettingsProfile", LOAD_PROFILE.x, LOAD_PROFILE.y, LOAD_PROFILE.width, LOAD_PROFILE.height, NO_SAVED_PROFILE, { kind: "profile" }).label;
     this.hint = line("MeleeSettingsHint", f32(0.12), f32(0.51), f32(0.6), f32(0.018));
     this.help = line("MeleeSettingsHelp", f32(0.12), f32(0.4815), f32(0.6), f32(0.014), f32(0.0095));
@@ -162,6 +165,7 @@ export class SettingsPanel {
     const { settings } = this;
     if (clicker !== Player(this.participantId) || !settings.ready) return;
     if (button.kind === "preset") pickBindingPreset(settings, button.preset);
+    else if (button.kind === "customize") customizeLayout(settings);
     else if (button.kind === "profile") loadProfile(settings);
     else if (button.kind === "save") saveBindingSettings(settings);
     else if (button.kind === "close") this.close();
@@ -226,7 +230,7 @@ export class SettingsPanel {
     const unbound = unboundActions(settings.bindings);
     const unboundText = unbound.map(action => ACTION_KEY_LABELS[action]).join(", ");
     BlzFrameSetText(this.hint, unbound.length > 0 ? `${MENU_STYLE.gold}Unbound: ${unboundText}.|r Save to keep these keys.` : settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : stock === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[stock]}|r`);
-    BlzFrameSetText(this.help, capture === undefined ? `Click a lit key, then press its new key; its x clears it. ${START_HINT}` : "Press the new key for the flashing action. Delete clears it, Escape cancels.");
+    BlzFrameSetText(this.help, capture === undefined ? `Click a lit key, then press its new key; its x clears it. Edits go to Custom. ${START_HINT}` : "Press the new key for the flashing action. Delete clears it, Escape cancels.");
     const first = unbound[0];
     for (const frame of this.bindButton.frames) BlzFrameSetVisible(frame, first !== undefined);
     if (first !== undefined) setFrameText(this.bindButton.label, `Bind ${ACTION_KEY_LABELS[first]}`);

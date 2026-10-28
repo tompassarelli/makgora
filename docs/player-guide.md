@@ -78,7 +78,10 @@ the pointer, A to choose and B to go back. The panel shows your current control 
 Every game opens on the Controls screen, one for each player, before fighter
 select. Pick a layout at the top: WASD (recommended if you're new), Box
 (the leverless controller style, with Space as up) or Custom; picking one saves it as
-your profile. Load profile brings back your saved setup: when you have one it
+your profile. WASD and Box never change: rebinding a key on either copies that
+layout into Custom with your edit, selects Custom and saves it, and the Customize
+button copies the selected layout into Custom without an edit, replacing what
+Custom held. Load profile brings back your saved setup: when you have one it
 is already loaded and selected, and the screen says so; without one the button
 reads "No saved profile". Below, the keyboard lights every bound key with its
 action; click a lit key, press the key you want instead, then Save. If another

@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
+import { type BindingPreset, ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -11,6 +11,7 @@ import {
   captureBinding,
   clearKey,
   createBindingSettings,
+  customizeLayout,
   initializeBindingSettings,
   loadSavedBindings,
   resetToLayout,
@@ -163,11 +164,63 @@ test("each layout keeps its own edits when switching, and only Reset to layout r
   assertEquals(slots(settings, Action.attack), "L —", "Custom keeps the edit after switching back");
   resetToLayout(settings);
   assertEquals(slots(settings, Action.attack), "N —", "Reset to layout");
+});
+
+const stockKeys = (preset: BindingPreset) => presetBindings(preset).keys.join(",");
+
+test("editing a key on WASD or Box copies that layout into Custom with the edit applied, selects Custom and saves it, and WASD and Box stay stock [k2 property]", () => {
+  for (const preset of ["wasd", "standard"] as const) {
+    const stored = { encoded: undefined as string | undefined };
+    const settings = persistedSettings(stored);
+    applyBindingPreset(settings, preset);
+    bindAttack(settings, code("B"));
+    assertEquals(settings.layout, "custom", `${preset} edit selects Custom`);
+    assertEquals(slots(settings, Action.attack), "B —", `${preset} edit applied`);
+    assertEquals(keyFor(settings.bindings, Action.jump, 0), keyFor(presetBindings(preset), Action.jump, 0), `${preset} rest copied`);
+    assertEquals(settings.layouts[preset].keys.join(","), stockKeys(preset), `${preset} stays stock in memory`);
+    const reopened = persistedSettings(stored);
+    assertEquals(reopened.layout, "custom", `${preset} saved as the active layout`);
+    assertEquals(slots(reopened, Action.attack), "B —", `${preset} saved edit`);
+    applyBindingPreset(reopened, preset);
+    assertEquals(reopened.bindings.keys.join(","), stockKeys(preset), `${preset} stays stock when reopened`);
+  }
+  const swapped = persistedSettings({ encoded: undefined });
+  beginBindingCapture(swapped, Action.attack, 0);
+  captureBinding(swapped, code("Q"));
+  assertEquals(slots(swapped, Action.attack), "Q —", "a swap edits Custom");
+  assertEquals(slots(swapped, Action.leftTrigger), "N —", "the swapped action moves in Custom");
+  assertEquals(swapped.layouts.wasd.keys.join(","), stockKeys("wasd"), "a swap leaves WASD stock");
+});
+
+test("clearing a key on a stock layout copies it into Custom with the key cleared, and a refused key changes nothing [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  beginBindingCapture(settings, Action.attack, 0);
+  captureBinding(settings, BACKSPACE);
+  assertEquals(settings.layout, "wasd", "a refused key keeps the layout");
+  assertEquals(stored.encoded, undefined, "a refused key saves nothing");
+  clearKey(settings, code("N"));
+  assertEquals(settings.layout, "custom", "clearing selects Custom");
+  assertEquals(slots(settings, Action.attack), "— —", "key cleared in Custom");
+  assertEquals(settings.layouts.wasd.keys.join(","), stockKeys("wasd"), "WASD stays stock");
+  assertEquals(persistedSettings(stored).layout, "custom", "saved");
+});
+
+test("Customize copies the selected layout into Custom and selects it without an edit or a save, replacing what Custom held, and does nothing in Custom [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  applyBindingPreset(settings, "custom");
+  bindAttack(settings, code("B"));
+  const saved = stored.encoded;
   applyBindingPreset(settings, "standard");
-  bindAttack(settings, code("K"));
-  applyBindingPreset(settings, "wasd");
-  applyBindingPreset(settings, "standard");
-  assertEquals(slots(settings, Action.attack), "K —", "Box keeps its edit");
+  customizeLayout(settings);
+  assertEquals(settings.layout, "custom", "Customize selects Custom");
+  assertEquals(settings.bindings.keys.join(","), stockKeys("standard"), "Custom is now a copy of Box");
+  assertEquals(settings.layouts.standard.keys.join(","), stockKeys("standard"), "Box stays stock");
+  assertEquals(stored.encoded, saved, "Customize saves nothing");
+  bindAttack(settings, code("B"));
+  customizeLayout(settings);
+  assertEquals(slots(settings, Action.attack), "B —", "Customize in Custom keeps its keys");
 });
 
 test("saving keeps all three layouts and the active one, and a new session reopens on them [k2 property]", () => {
@@ -176,7 +229,6 @@ test("saving keeps all three layouts and the active one, and a new session reope
   applyBindingPreset(settings, "custom");
   bindAttack(settings, code("L"));
   applyBindingPreset(settings, "standard");
-  bindAttack(settings, code("K"));
   applyBindingPreset(settings, "custom");
   saveBindingSettings(settings);
 
@@ -184,7 +236,7 @@ test("saving keeps all three layouts and the active one, and a new session reope
   assertEquals(reopened.layout, "custom", "active layout");
   assertEquals(slots(reopened, Action.attack), "L —", "Custom keys");
   applyBindingPreset(reopened, "standard");
-  assertEquals(slots(reopened, Action.attack), "K —", "Box keys");
+  assertEquals(slots(reopened, Action.attack), "N —", "Box keys");
   applyBindingPreset(reopened, "wasd");
   assertEquals(slots(reopened, Action.attack), "N —", "WASD keys");
 });
