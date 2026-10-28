@@ -417,9 +417,10 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   const sakurai = chosen.effect.sakurai === true ? sakuraiLaunchDirection(strongest, chosen.grounded) : undefined;
   const directionX = sakurai === undefined ? chosen.effect.launchX : sakurai.x;
   const directionZ = sakurai === undefined ? chosen.effect.launchZ : sakurai.z;
-  installDamageLaunch(target, strongest, multiplyFloat32(chosen.facing, directionX), directionZ, chosen.grounded);
+  const carried = chosen.direct && chosen.effect.carry === true;
+  installDamageLaunch(target, strongest, multiplyFloat32(chosen.facing, directionX), directionZ, chosen.grounded, !carried);
   if (candleDrops(target, strongest)) candleDrop[slot] = true;
-  if (chosen.direct && chosen.effect.carry === true && !target.motion.grounded) {
+  if (carried && !target.motion.grounded) {
     target.motion.vx = chosen.sourceVelocityX;
     target.motion.vz = chosen.sourceVelocityZ;
   }

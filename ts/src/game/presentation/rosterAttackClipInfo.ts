@@ -24,7 +24,6 @@ export const ROSTER_ATTACK_CLIPS = {
     downTilt: { index: 57, seconds: f32(0.217), aligned: true },
     backAir: { index: 58, seconds: f32(0.517) },
     dashAttack: { index: 59, seconds: f32(0.417), aligned: true },
-    upSmash: { index: 60, seconds: f32(0.717), aligned: true },
     upAir: { index: 61, seconds: f32(0.467), aligned: true },
     upTilt: { index: 62, seconds: f32(0.383), aligned: true },
     forwardTiltUp: { index: 63, seconds: f32(0.4), aligned: true },
@@ -44,6 +43,7 @@ export const ROSTER_ATTACK_CLIPS = {
     sideSpecialAir: { index: 68, seconds: f32(0.883), aligned: true },
     sideSpecialFollowUp: { index: 68, seconds: f32(0.883), aligned: true },
     sideSpecialFollowUpAir: { index: 68, seconds: f32(0.883), aligned: true },
+    upSmash: { index: 60, seconds: f32(0.683), aligned: true },
   },
   6: {
     forwardTiltDown: { index: 51, seconds: f32(0.567) },
