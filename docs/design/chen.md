@@ -43,6 +43,13 @@ set the timing relations; every region, damage and angle is original.
   landing with Falcon's windows: neutral air before 4 or from 34, forward air
   before 7 or from 33, up air from 21, down air before 4 or from 35. Up air
   lands in 4 frames.
+- Drawn: the down air lifts the keg from his back overhead with both arms, then
+  drives it straight down under his tucked feet on frames 14-18 and holds it there
+  into the landing; the forward air chambers the knee and snaps the heel out to the
+  sweetspot on frame 14, held through frame 30; the neutral air twirls the staff
+  from the wrist, horizontal on frame 7 and low in front on frame 15; the up air
+  scoops the staff tip along each frame's region from low in front over his head
+  to behind his back, then holds it there.
 - Zero to death: from 0% against a mirror Chen holding no direction, a
   short-hop up air, two more short-hop up airs, a full-hop up air and a
   full-hop forward air sweetspot each land in hitstun and take the stock
