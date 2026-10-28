@@ -108,7 +108,8 @@ those headlines, one per EX:
 
 - **Range** (`range`): projectiles fly 25% longer (life x1.25), beams reach
   25% farther; size, speed and damage stay.
-- **Reach** (`reach`): strikes, projectiles, pools and triggers grow 25%.
+- **Reach** (`reach`): strikes, projectiles, pools, triggers and command
+  grabs grow 25%.
 - **Travel** (`travel`): movement and recoveries carry 25% farther over the
   same frames.
 - **Shield-safe** (`shieldSafe`): a blocked hit holds the shield in shieldstun
@@ -183,26 +184,26 @@ Rows marked *next batch* keep their old EX until their batch lands.
 | Pit Lord | Ruin Charge | +25% damage | Fail: damage | Shield-safe |
 | Pit Lord | Abyssal Leap | Travel | Pass | Unchanged |
 | Pit Lord | Rain of Fire | +25% damage | Fail: damage | Reach: 25% larger fireballs |
-| Beastmaster | Wild Axes | +25% damage | Fail: damage | *next batch* |
-| Beastmaster | Summon Bear | +25% durability and damage | Fail: two | *next batch* |
-| Beastmaster | Summon Hawk | Travel, +25% durability, dive 4 invulnerable frames | Fail: two, armor | Invulnerable dive removed; *next batch* |
-| Beastmaster | Summon Quilbeast | +25% durability and damage; volley 4 invulnerable frames | Fail: two, armor | Invulnerable volley removed; *next batch* |
-| Lich King | Howling Blast | +25% damage | Fail: damage | *next batch* |
-| Lich King | Val'kyr Shadowguard | +25% damage | Fail: damage | *next batch* |
+| Beastmaster | Wild Axes | +25% damage | Fail: damage | Reach: 25% larger axes |
+| Beastmaster | Summon Bear | +25% durability and damage | Fail: two | x1.25 bear durability |
+| Beastmaster | Summon Hawk | Travel, +25% durability, dive 4 invulnerable frames | Fail: two, armor | x1.25 hawk durability in both forms; invulnerable dive removed |
+| Beastmaster | Summon Quilbeast | +25% durability and damage; volley 4 invulnerable frames | Fail: two, armor | x1.25 quilbeast durability; invulnerable volley removed |
+| Lich King | Howling Blast | +25% damage | Fail: damage | Range |
+| Lich King | Val'kyr Shadowguard | +25% damage | Fail: damage | Range |
 | Lich King | Ascension of the Damned | Travel | Pass | Unchanged |
 | Lich King | Defile | Reach | Pass | Unchanged |
-| Thrall | Chain Lightning | +25% damage | Fail: damage | *next batch* |
-| Thrall | Feral Spirit | +25% damage | Fail: damage | *next batch* |
+| Thrall | Chain Lightning | +25% damage | Fail: damage | Reach: a 25% wider bolt |
+| Thrall | Feral Spirit | +25% damage | Fail: damage | Range: the wolves run 25% farther |
 | Thrall | Far Sight | Travel | Pass | Unchanged |
 | Thrall | Doomhammer Slam | Reach | Pass | Unchanged |
-| Jaina | Frostbolt | +25% damage | Fail: damage | *next batch* |
-| Jaina | Blizzard | +25% damage | Fail: damage | *next batch* |
+| Jaina | Frostbolt | +25% damage | Fail: damage | Reach: a 25% larger bolt |
+| Jaina | Blizzard | +25% damage | Fail: damage | Reach: a 25% wider patch |
 | Jaina | Blink | Travel | Pass | Unchanged |
-| Jaina | Water Elemental | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | Invulnerable recall removed; *next batch* |
-| Sylvanas | Black Arrow | +25% damage | Fail: damage | *next batch* |
+| Jaina | Water Elemental | +25% durability and damage; recall 4 invulnerable frames | Fail: two, armor | x1.25 elemental durability; invulnerable recall removed |
+| Sylvanas | Black Arrow | +25% damage | Fail: damage | Range |
 | Sylvanas | Silence | Reach | Pass | Unchanged |
 | Sylvanas | Banshee Flight | Travel | Pass | Unchanged |
-| Sylvanas | Life Drain | +25% damage | Fail: damage | *next batch* |
+| Sylvanas | Life Drain | +25% damage | Fail: damage | Reach: the drain grabs 25% farther; same heal cap |
 | Cairne | Shockwave | +25% damage | Fail: damage | *next batch* |
 | Cairne | Bloodhoof Gore | +25% damage | Fail: damage | *next batch* |
 | Cairne | Spirit Lift | Travel | Pass | Unchanged |

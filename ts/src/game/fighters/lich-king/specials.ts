@@ -126,13 +126,13 @@ export const LICH_KING_SPECIALS: FighterSpecials = {
     description: "A wide frost gust that travels toward the foe.",
     ground: howlingBlast(HOWLING_BLAST, undefined),
     air: howlingBlast(HOWLING_BLAST, AIR_LANDING_LAG),
-  }, { damage: 1.25 }),
+  }, { range: 1.25 }),
   side: withExKit({
     name: "Val'kyr Shadowguard",
     description: "A Val'kyr seizes the first foe she reaches and carries them toward the edge; mash to break free.",
     ground: shadowguard(VALKYR, undefined),
     air: shadowguard(VALKYR, AIR_LANDING_LAG),
-  }, { damage: 1.25 }),
+  }, { range: 1.25 }),
   up: withExKit({
     name: "Ascension of the Damned",
     description: "An ice column lifts him in a frost vortex, then a helpless fall.",

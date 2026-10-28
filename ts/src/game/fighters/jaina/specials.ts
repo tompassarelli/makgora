@@ -44,11 +44,11 @@ const SUMMON: AuthoredSpecial = {
 };
 
 export const JAINA_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Frostbolt", description: "A straight frost bolt; jump it or shield it.", ground: FROSTBOLT }, { damage: 1.25 }),
-  side: withExKit({ name: "Blizzard", description: "Ice falls twice on the marked patch ahead; leave it before the first strike.", ground: BLIZZARD }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Frostbolt", description: "A straight frost bolt; jump it or shield it.", ground: FROSTBOLT }, { reach: 1.25 }),
+  side: withExKit({ name: "Blizzard", description: "Ice falls twice on the marked patch ahead; leave it before the first strike.", ground: BLIZZARD }, { reach: 1.25 }),
   up: withExKit({ name: "Blink", description: "Aim a teleport, then fall helpless.", ground: blink(f32(3.2)) }, { travel: 1.25 }),
   down: withExKit({ name: "Summon Water Elemental", description: "Summon a fragile ally that fires four water bolts. Press again to recall it.", ground: SUMMON,
     air: { endFrame: SUMMON.endFrame, landingLag: 20, hurt: SUMMON.hurt,
       projectiles: [{ ...WATER_SHOT, spawnFrame: 27, offsetZ: 0.0, velocityX: 0.0, velocityZ: -h(f32(0.1)) }] },
-    recall: { endFrame: 26, recall: true } }, { damage: 1.25, durability: 1.25 }),
+    recall: { endFrame: 26, recall: true } }, { durability: 1.25 }),
 };
