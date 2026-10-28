@@ -675,6 +675,17 @@ compresses into a push-off, then feeds the run. The ten authored burst frames
 are retimed over the simulation's thirteen dash frames; run starts on frame 14.
 The simulation still supplies all movement speeds and frame data.
 
+The walk and run are locked (Tom asked that the run stay put, 2026-10-28).
+smashcraft:ts/scripts/locomotionLock.ts steps Illidan through a steady walk and
+run, reads the clip each plays and its stride, and hashes that sequence's keys
+in the pinned `illidan-animation` model; smashcraft:ts/scripts/locomotion-lock.json
+records the result. Pre-push runs it on any landing that touches Illidan's art,
+clips or presentation code and refuses a mismatch, so regenerating his model for
+another move cannot change his locomotion. An intended walk or run change
+re-records with `bun scripts/locomotionLock.ts --record` and names the gait in a
+`Locomotion-Change: illidan run: why` trailer, without which pre-push refuses
+the new record.
+
 Run `bun tools/animations/package-illidan.ts PRIVATE_OUTPUT --metadata-only`,
 store `illidan-animation`, refresh the original clip pool, then regenerate
 stride and motion facts with `bun wisp view motion --assets PRIVATE_ASSETS`.

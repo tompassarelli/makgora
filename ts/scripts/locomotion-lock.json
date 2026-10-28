@@ -1,0 +1,22 @@
+{
+  "illidan": {
+    "walk": {
+      "sequence": "Walk",
+      "clip": 107,
+      "frames": 875,
+      "looping": true,
+      "keys": 6339,
+      "poseDigest": "baa8e3e9bcf1b7ecf8d0e902b55f2e60d45a228f7b306eb81b46b07b4b3da440",
+      "stride": 890
+    },
+    "run": {
+      "sequence": "Locomotion Run",
+      "clip": 120,
+      "frames": 600,
+      "looping": true,
+      "keys": 26326,
+      "poseDigest": "b97aa09897e3c78898c9b6bd11ddfee4aca469dbf36cc71a01b9537aadb5c59b",
+      "stride": 332.7
+    }
+  }
+}
