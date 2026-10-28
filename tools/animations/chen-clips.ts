@@ -21,13 +21,14 @@ const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const painOnly = process.argv.includes("pain");
 const specialsOnly = process.argv.includes("specials");
 const aerialsOnly = process.argv.includes("aerials");
-const inPlace = painOnly || specialsOnly || aerialsOnly;
+const parasolOnly = process.argv.includes("parasol");
+const inPlace = painOnly || specialsOnly || aerialsOnly || parasolOnly;
 const SPECIAL_POSES: ReadonlySet<string> = new Set(["neutralSpecial", "sideSpecial", "downSpecial", "downSpecialFollowUp", "sideSpecialFollowUp"].flatMap(pose => [pose, `${pose}Air`]));
 const AERIAL_POSES: ReadonlySet<string> = new Set(["neutralAir", "forwardAir", "upAir", "downAir"]);
-const rework = specialsOnly ? SPECIAL_POSES : aerialsOnly ? AERIAL_POSES : undefined;
+const rework = specialsOnly ? SPECIAL_POSES : aerialsOnly ? AERIAL_POSES : parasolOnly ? new Set(["specialFloat"]) : undefined;
 const project = resolve(import.meta.dir, "../..");
 function ensure(ok: unknown, why: string): asserts ok { if (!ok) throw new Error(why); }
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/chen-clips.ts STOCK_CHEN.mdx|SHIPPED_CHEN.mdx PRIVATE_OUTPUT [pain|specials|aerials]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/chen-clips.ts STOCK_CHEN.mdx|SHIPPED_CHEN.mdx PRIVATE_OUTPUT [pain|specials|aerials|parasol]");
 const source = parseMDX(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure((inPlace ? source.Sequences.some(s => s.Name === "Chen Damage 0 0") : source.Sequences.length === 11) && source.Helpers.some(n => n.Name === "Bone Rope"), "Expected original classic Pandaren Brewmaster");
 const stand = source.Sequences[9]!;
@@ -88,6 +89,7 @@ const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["doubleJump", 24, 7, {...kick, lean: -20}], ["wallJump", 24, 7, {...heel, lean: -25}], ["wallTech", 26, 5, crouch],
   ["fall", 30, 1, {...kick, front: -25, knee: 55, back: 40, backKnee: -20}],
   ["fallSpecial", 30, 1, {...captive, staff: -125, palm: -120, chest: 35}],
+  ["specialFloat", 30, 1, {chest: -10, head: -10, palm: -175, elbow: -10, staff: -35, wrist: 15, front: -20, knee: 30, back: 15, backKnee: 20}],
   ["ledgeHang", 30, 1, {...overhead, palm: -175, staff: -175, chest: 20}],
   ["ledgeClimb", 25, 10, {...overhead, lean: 30, front: -65, knee: 65}], ["ledgeAttack", 40, 20, thrust],
   ["knockdown", 30, 25, {...captive, lean: 88}], ["downDamage", 24, 5, {...captive, lean: 75}],
@@ -98,8 +100,8 @@ const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["grabHold", 30, 1, hold], ["grabbed", 30, 1, captive],
 ];
 for (const [pose, frames, contact, gesture] of extra) actions.push({pose, frames, contact, gesture,
-  hold: ["crouch", "shield", "smashCharge", "fall", "fallSpecial", "ledgeHang", "grabHold", "grabbed"].includes(pose),
-  air: ["airDodge", "jump", "doubleJump", "wallJump", "fall", "fallSpecial", "damageAir", "damageTumble", "ledgeHang"].includes(pose),
+  hold: ["crouch", "shield", "smashCharge", "fall", "fallSpecial", "specialFloat", "ledgeHang", "grabHold", "grabbed"].includes(pose),
+  air: ["airDodge", "jump", "doubleJump", "wallJump", "fall", "fallSpecial", "specialFloat", "damageAir", "damageTumble", "ledgeHang"].includes(pose),
   ...(pose === "getUpAttack" ? {rear: {...low, staff: 95, palm: 65, waist: -65}, active: 16} : {}) });
 for (const pose of ["rollForward", "techForward", "getUpRollForward", "ledgeRoll", "rollBackward", "techBackward", "getUpRollBackward"] as const)
   actions.push({pose, frames: pose.startsWith("tech") ? 40 : 31, contact: 10, gesture: crouch, roll: pose.endsWith("Backward") ? -1 : 1});
@@ -180,7 +182,7 @@ if (rework) {
 for (const [ordinal, action] of [...actions, ...damage].entries()) {
   const name = ordinal < actions.length ? `Chen ${action.pose}` : `Chen Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   const existing = inPlace ? model.Sequences.findIndex(s => s.Name === name) : -1;
-  ensure(!inPlace || existing >= 0, `${name}: shipped sequence missing`);
+  ensure(!inPlace || existing >= 0 || parasolOnly, `${name}: shipped sequence missing`);
   const index = existing >= 0 ? existing : model.Sequences.length, shipped = existing >= 0 ? model.Sequences[index]!.Interval.slice() : undefined;
   const length = Math.round(action.frames * 1000 / 60), moved = shipped !== undefined && shipped[1]! - shipped[0]! !== length;
   ensure(!moved || rework, `${name}: timing changed`);
@@ -237,7 +239,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
     getUpAttack: [105,40], ledgeAttack: [110,70],
   };
   const handTargets: Partial<Record<HeroPose, readonly [number, number]>> = {
-    jab: [85,80], jab3: [90,65], dashAttack: [95,75], upTilt: [25,185], grab: [62,72], grabHold: [62,72],
+    jab: [85,80], jab3: [90,65], dashAttack: [95,75], upTilt: [25,185], specialFloat: [10,175], grab: [62,72], grabHold: [62,72],
     throwForward: [65,80], throwBack: [-70,85], throwUp: [15,140], throwDown: [65,35],
     neutralSpecial: [40,65], neutralSpecialAir: [40,65],
     downSpecialFollowUp: [70,75], downSpecialFollowUpAir: [70,75],
@@ -449,8 +451,8 @@ if (rework) {
   let table = await Bun.file(clipsPath).text();
   for (const line of bindings) {
     const pose = line.trim().split(":")[0]!, pattern = new RegExp(`^  ${pose}: \\{[^\\n]*$`, "m");
-    ensure(pattern.test(table), `${pose}: binding missing from clips.ts`);
-    table = table.replace(pattern, line);
+    ensure(pattern.test(table) || parasolOnly, `${pose}: binding missing from clips.ts`);
+    table = pattern.test(table) ? table.replace(pattern, line) : table.replace(/^\} as const satisfies HeroClipTable;$/m, `${line}\n} as const satisfies HeroClipTable;`);
   }
   await Bun.write(clipsPath, table);
 }

@@ -45,7 +45,7 @@ import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
 import { localParticipantSlot, presentedCueTrace, traceParticipant } from "./diagnostics";
-import { colorFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
+import { colorFighterBody, placeFighterBody, renderDizzy, renderParasol } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { presentedMatch } from "./presentedMatch";
@@ -252,6 +252,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   if (body === undefined || !isActive(s.world, slot)) return;
   const fighter = fighterAt(s.world, slot);
   renderDizzy(body, fighter, s.game.phase === Phase.match, s.origin);
+  renderParasol(body, fighter, s.game.phase === Phase.match, s.origin, s.game.stageChoice);
   colorFighterBody(body, slot, fighterColor(s.game, slot));
   const hidden = s.hiddenFighters[slot];
   const cloaked = hidden?.body === true;

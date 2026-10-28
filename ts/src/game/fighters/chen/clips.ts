@@ -82,6 +82,7 @@ export const CHEN_CLIPS = { idle: CHEN_FALLBACK_CLIP, walk: {index: 0, seconds: 
   sideSpecialFollowUp: { index: 85, seconds: f32(0.233), aligned: true },
   downSpecialFollowUpAir: { index: 86, seconds: f32(0.4), aligned: true },
   sideSpecialFollowUpAir: { index: 87, seconds: f32(0.233), aligned: true },
+  specialFloat: { index: 99, seconds: 0.5, aligned: true },
 } as const satisfies HeroClipTable;
 export const CHEN_DAMAGE_CLIPS: readonly HeroClip[] = [
   { index: 88, seconds: f32(0.4), aligned: true },

@@ -187,6 +187,10 @@ export function clipFor(character: number, pose: HeroPose): HeroClip {
   return table[pose] ?? (pose === "jab2" || pose === "jab3" ? table.jab : undefined) ?? heroLook(character)?.fallback ?? STOCK_FALLBACK_CLIP;
 }
 
+export function parasolFloatClip(character: number): HeroClip {
+  return characterClips(character).specialFloat ?? clipFor(character, "upSpecialAir");
+}
+
 
 
 

@@ -333,7 +333,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     return rate;
   }
   if (f.special.parasol === ParasolState.open && f.attack.style === undefined) {
-    playIndex(pose, "parasol", clips.clipFor(character, "upSpecialAir").index);
+    playIndex(pose, "parasol", clips.parasolFloatClip(character).index);
     return rate;
   }
   if (isGroundDodging(f)) {

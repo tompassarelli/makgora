@@ -11,6 +11,7 @@ import { FIGHTER_OBJECTS } from "../../game/objectData";
 import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { characterModelScale } from "../../game/presentation/modelScale";
+import { PARASOL_GRIP, PARASOL_MODEL, parasolShown } from "../../game/presentation/parasolLook";
 
 
 const CROW_FORM = 0x416d7266;
@@ -48,7 +49,7 @@ export function createFighterBody(owner: player, fighter: Readonly<Fighter>, ori
   UnitRemoveAbility(unit, CROW_FORM);
   UnitAddAbility(unit, LOCUST);
   PauseUnit(unit, true);
-  const body: FighterBody = { unit, dizzy: undefined, renderedSelection: 0, color: -1 };
+  const body: FighterBody = { unit, dizzy: undefined, parasol: undefined, renderedSelection: 0, color: -1 };
   placeFighterBody(body, fighter, origin);
   return body;
 }
@@ -71,7 +72,24 @@ export function renderDizzy(body: FighterBody, fighter: Readonly<Fighter>, playi
   BlzSetSpecialEffectPosition(body.dizzy, x, origin.y, f32(origin.z + fighter.motion.z + 115));
 }
 
+export function renderParasol(body: FighterBody, fighter: Readonly<Fighter>, playing: boolean, origin: WorldOrigin, stage: number): void {
+  if (parasolShown(fighter) && playing) {
+    fitFighterPlacement(placement, fighter, stage);
+    const scale = characterModelScale(fighter.character);
+    const x = f32(origin.x + placement.x + f32(fighterPoseFacing(fighter) * f32(PARASOL_GRIP.x * scale)));
+    body.parasol ??= AddSpecialEffect(PARASOL_MODEL, x, origin.y);
+    BlzSetSpecialEffectScale(body.parasol, scale);
+    BlzSetSpecialEffectPosition(body.parasol, x, origin.y, f32(origin.z + placement.z + f32(PARASOL_GRIP.z * scale)));
+    return;
+  }
+  if (body.parasol === undefined) return;
+  DestroyEffect(body.parasol);
+  body.parasol = undefined;
+}
+
 export function removeFighterBody(body: FighterBody): void {
   clearDizzy(body);
+  if (body.parasol !== undefined) DestroyEffect(body.parasol);
+  body.parasol = undefined;
   RemoveUnit(body.unit);
 }

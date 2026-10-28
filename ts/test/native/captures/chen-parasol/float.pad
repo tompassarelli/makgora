@@ -1,0 +1,22 @@
+# Chen's parasol native proof: Storm Rise from the ground facing right, then the float with the red paper parasol open above his raised right hand; down closes and hides it into a normal fall; after landing he turns left and rises again, and the second float shows it facing left until he lands with it and it folds away.
+#! chat -dev setup quick pair chen stormstout / mountain king
+#! cue 90-160 float: effect=Parasol
+60 a stick 0 1
+60 a tap X 2
+61 a stick 0 0
+90 a capture
+102 a capture
+105 a capture
+110 a capture
+130 a capture
+160 a capture
+190 a stick 0 -1
+196 a stick 0 0
+198 a capture
+320 a stick -1 0
+326 a stick 0 1
+326 a tap X 2
+327 a stick 0 0
+372 a capture
+400 a capture
+440 a capture
