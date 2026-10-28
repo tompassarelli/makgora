@@ -18,6 +18,7 @@ import { effectPlaybackInputs } from "./wisp/effectVisibility";
 import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
 import { derivedStepCode } from "./wisp/fighterArt";
 import { changedFighters } from "./wisp/fighterArtChanges";
+import { LOCOMOTION_RECORD, LOCOMOTION_TRAILER } from "./locomotionRecord";
 
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
@@ -37,6 +38,7 @@ const MAP_INPUTS = [...MODEL_INPUTS, "ts/src/generated/clips/", "ts/scripts/preP
 
 
 const CUE_CHECK = "ts/scripts/cueModels.ts";
+const LOCOMOTION_INPUTS = ["ts/src/game/presentation/", "ts/scripts/locomotionLock.ts", LOCOMOTION_RECORD];
 const STRIKE_COMMAND = "ts/scripts/wisp/commands/view.ts";
 const STRIKE_MEASURES = ["ts/scripts/wisp/strikeMoments.ts", "ts/scripts/heroModelSource.ts", "ts/src/game/presentation/heroStrikeMomentInfo.ts"];
 const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts", "ts/scripts/prePush.ts"];
@@ -80,6 +82,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
   const effectKit = paths.some((path) => EFFECT_KIT_INPUTS.test(path));
   const fighterArt = changedFighters(paths, derivedStepCode());
+  const locomotion = fighterArt.includes("illidan") || paths.some((path) => LOCOMOTION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
     ...(ts ? [
@@ -100,6 +103,9 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
     ] : []),
     ...(fighterArt.length > 0 ? [
       { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
+    ] : []),
+    ...(locomotion ? [
+      { name: "Illidan's walk and run match their locomotion lock", directory: "ts", args: ["scripts/locomotionLock.ts"], fix: `regenerate the model from the current pinned input so the walk and run keep their keys; only an intended walk or run change re-records with bun scripts/locomotionLock.ts --record and a ${LOCOMOTION_TRAILER} trailer naming it (smashcraft:docs/fighter-animation-work.md).`, hosted: false, privateStore: true },
     ] : []),
     ...(strikeMoments ? [
       { name: "strike moments match the committed models", directory: "ts", args: ["scripts/wisp.ts", "view", "strikes", "--check"], fix: "regenerate the tables with bun wisp view strikes --assets \"$(bun wisp inputs path assets)\" from ts/ and commit them (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
