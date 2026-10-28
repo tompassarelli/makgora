@@ -352,8 +352,47 @@ transport (wisp#110) both call it.
   universal and never a player choice, so the Controls screen has no delay
   button and profiles save only keys; a profile saved with an old delay code
   loads its keys and drops the code. Each client proposes Auto from its
-  measured echo, capped at 16 frames (267 ms); past that a connection holds
-  prediction at the window edge instead. Local matches use the default.
+  measured echo, with no ceiling (see *Rollback window and no delay cap*).
+  Local matches use the default.
+- **Rollback window and no delay cap (Tom, 29 Oct 2026, #679):** a
+  correction never replays more than 7 frames, Slippi's window, so every
+  build's prediction window is 7 (first set at 8, then lowered the same
+  day); input delay covers the rest of the trip with no cap, and the game
+  tells the players. This restates the design after the first attempt
+  (31e70dffbe, reverted) added a fixed 10-frame turn tail to the ping target,
+  which put a 160 ms match at about 12 frames and felt slow. So:
+  - The ping target keeps 0.2's form, max(2, one-way frames − R), with no
+    turn tail; the lobby takes the highest proposal, and error correction
+    raises and slowly lowers it.
+  - R, the rollback budget, is 4 (6 before): the target leaves about 3 of
+    the window's 7 frames free for rows later than the mean trip, closer to
+    how Slippi players play. Settled on a steady trip, Auto is 2 frames at
+    100 and 200 ms, 5 at 300 ms, 11 at 500 ms, 26 at 1000 ms and 56 at
+    2000 ms. R is the knob to lower further if the 7-frame window holds too
+    often: each frame off R adds a frame of delay and frees one more frame of
+    the window for late rows.
+  - Delay has no policy ceiling. The schedule accepts any delay its 128-frame
+    future limit holds beside the deepest window (`MAX_INPUT_DELAY`, 102);
+    a longer trip still plays at that delay and holds prediction.
+  - A row later than delay + 7 holds prediction at the window edge: the
+    match waits for it, and error correction raises the next match's delay.
+  - Character select shows "Input delay: N frames", red from 8, and a match
+    at 8 or more shows "Laggy connection: N frames of input delay" in the
+    network indicator.
+  - Measured headless (smashcraft:ts/test/online-rollback.test.ts, two humans
+    and a computer, match 793's inputs over Battle.net's measured turn
+    jitter, 20 s matches, R 4): agreed delay 2, 4, 7, 3, 13, 28 and 57 frames
+    at 100, 200, 300, 160, 500, 1000 and 2000 ms (the lobby's echo includes
+    the turn waits, so it reads a little above the link), and deepest rollback
+    7 at every ping. The cost is holding: prediction held 20 to 26 callbacks
+    a second up to 500 ms (51 to 55 simulated frames a second), 14 to 18 at
+    1000 ms and 6 to 17 at 2000 ms, where 0.2's 24-frame window held none and
+    corrected up to 16 to 18 frames. Battle.net's turn waits put the latest
+    rows about 10 frames past the mean trip, more than the 3 frames R 4
+    leaves: at 160 ms with fixed delays and the 7-frame window, holds were 14
+    and 11 a second at delay 6, 10 and 6 at 7, 6 and 3 at 8, and 2 and 1 at
+    10. Error correction then raises the next match: with R 6, one 20 s match
+    at 160 ms carried the session from 2 to 6 frames (500 ms: 11 to 15).
 - **Lobby agreement:** each player sees every proposal on character select.
   The match uses the highest proposal for everyone. Character select shows it
   as an "Input delay: N frames" box in the rules block (red from 8 frames,
@@ -378,8 +417,7 @@ transport (wisp#110) both call it.
   simulated frames a real second since the playable build steps from real
   time (59.98 on a laptop pair whose game clock gave 59.86 callbacks, #18),
   so 55 stays clear of them.
-- **Auto, online:** the higher of a ping target and an error-corrected value,
-  capped at 16.
+- **Auto, online:** the higher of a ping target and an error-corrected value.
   - *Ping target:* round trip comes from the echo of each sent input row in
     a match and, on the menus before it, of a one-per-second ping on the
     delay channel, so the first match of a session already uses a measured
@@ -391,10 +429,10 @@ transport (wisp#110) both call it.
     play clean. On the relay harness a two-deviation guard, inflated by the
     few menu pings before the first match, chose 12-15 frames at 300 ms,
     where 4 already played 60 frames a second with no holds. R, the rollback
-    budget, is 6 frames in every match, one under Slippi's
-    `ROLLBACK_MAX_FRAMES` (see *Choosing R*). The target rises above 2 only
-    past 2 + R one-way frames (about 270 ms round trip), so ordinary
-    connections keep 2 frames.
+    budget, is 4 frames in every match since 29 October 2026 (6 before, see
+    *Rollback window and no delay cap* and *Choosing R*). The target rises
+    above 2 only past 2 + R one-way frames (about 200 ms round trip), so
+    ordinary connections keep 2 frames.
     It raises at once but lowers only when one more frame of round trip
     would still allow the lower value, so jitter cannot flip it back and
     forth.
@@ -583,8 +621,8 @@ Prior art, read from source on 9 Oct 2026:
   (backends/p2p.cpp). Smashcraft slows more gently: one frame a second at most.
 - Slippi: `ROLLBACK_MAX_FRAMES 7` (project-slippi/Ishiiruka
   Source/Core/Core/Slippi/SlippiNetplay.h). Players pick delay frames, 2 by
-  default, and rollback absorbs the rest. A duel's R = 6 sits one under Slippi;
-  a group's 8 follows GGPO.
+  default, and rollback absorbs the rest. The 7-frame window matches Slippi, and R = 4 leaves 3 of its frames for
+  late rows.
 - Rivals of Aether 2 (SnapNet) shows input and prediction frames on screen.
   Players set input frames, or the netcode adapts delay to the connection
   (edgegap.com, "Rivals of Aether 2 – How is its online experience is so
@@ -592,7 +630,7 @@ Prior art, read from source on 9 Oct 2026:
   defaults; that is not confirmed from an official source.
 
 The journal integrity diagnostic and the playable keyboard build both start
-at delay 2 with the 24-frame window. The capture-to-first-prediction check
+at delay 2 with the 7-frame window. The capture-to-first-prediction check
 measures map admission, which does not establish press-to-screen time.
 
 ## Bounded SDI

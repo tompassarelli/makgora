@@ -106,7 +106,9 @@ export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchSta
   return warnings.length === 0 ? "" : `|cffffcc00${warnings.join(" · ")}|r`;
 }
 
-export const echoMs = (estimate: Readonly<RttEstimate>): number => estimate.samples === 0 ? -1 : floorDiv(smoothedRttMs(estimate), 2);
+export const laggyLine = (delay: number): string => highDelay(delay) ? `|cffff4040Laggy connection: ${I2S(delay)} frames of input delay|r` : "";
+
+export const echoMs =(estimate: Readonly<RttEstimate>): number => estimate.samples === 0 ? -1 : floorDiv(smoothedRttMs(estimate), 2);
 
 export interface DelayMessage {
   readonly ping: number;
@@ -294,7 +296,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);
   const slow = inMatch ? slowMachineLine(net, game) : "";
-  const text = slow !== "" ? slow : !inMatch || !online || !poor ? "" : `|cffff4040Connection poor|r · input delay ${I2S(delay)} · ${I2S(net.shownDepth)} frames behind`;
+  const text = slow !== "" ? slow : !inMatch || !online ? "" : poor ? `|cffff4040Connection poor|r · input delay ${I2S(delay)} · ${I2S(net.shownDepth)} frames behind` : laggyLine(delay);
   if (text === net.shownText) return;
   net.shownText = text;
   BlzFrameSetText(net.indicator, text);

@@ -4,16 +4,16 @@
 import { type InputRow, copyInput } from "../input/inputRow";
 import { PARTICIPANT_CAPACITY, type ParticipantInputs } from "../input/participants";
 import { INPUT_LAST_FRAME, type InputPacket } from "../input/wire";
-import { REPLAY_HISTORY_CAPACITY } from "../replay/limits";
+import { REPLAY_HISTORY_CAPACITY, REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import { Capture } from "./capture";
 import { FrameRing } from "./frameRing";
-import { InputLedger, LEDGER_CAPACITY, type Receipt } from "./ledger";
+import { FUTURE_LIMIT, InputLedger, LEDGER_CAPACITY, type Receipt } from "./ledger";
 import { at } from "wisp/src/runtime/lookup";
 
-/** The input delays a schedule supports: past 16 frames a fighter stops feeling playable. */
+/** The input delays a schedule supports: any the ledger's future limit holds beside the deepest prediction window and the row captured after it. */
 export type FixedDelay = number;
 
-export const MAX_INPUT_DELAY = 16;
+export const MAX_INPUT_DELAY = FUTURE_LIMIT - REPLAY_MAX_CORRECTION_FRAMES - 2;
 
 export function isFixedDelay(value: number): value is FixedDelay {
   return Math.floor(value) === value && value >= 0 && value <= MAX_INPUT_DELAY;

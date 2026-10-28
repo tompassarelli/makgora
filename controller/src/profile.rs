@@ -128,7 +128,7 @@ pub fn keys_build(contents: &str) -> Option<String> {
     }
     let value = |label: &str| contents.split(&format!("\"{label} ")).nth(1)?.split('"').next().map(str::to_owned);
     let input = value("INPUT")?;
-    matches!(input.split_whitespace().next(), Some("callback" | "keyboard-d2-r24")).then_some(())?;
+    matches!(input.split_whitespace().next(), Some("callback" | "keyboard-d2-r7")).then_some(())?;
     value("BUILD").filter(|build| !build.is_empty())
 }
 
@@ -359,7 +359,7 @@ mod tests {
     #[test]
     fn a_ready_file_names_a_keyboard_build() {
         assert_eq!(keys_build(READY), Some("playable-0047".into()));
-        assert_eq!(keys_build(&READY.replace("INPUT callback", "INPUT keyboard-d2-r24")), Some("playable-0047".into()));
+        assert_eq!(keys_build(&READY.replace("INPUT callback", "INPUT keyboard-d2-r7")), Some("playable-0047".into()));
         // A journal build's ready file is no keyboard session; nor is a partial file.
         assert_eq!(keys_build(&READY.replace("INPUT callback", "INPUT shadow-d0-r24")), None);
         assert_eq!(keys_build(READY.trim_end_matches("endfunction\n")), None);

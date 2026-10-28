@@ -4,8 +4,7 @@ import { MAX_INPUT_DELAY } from "./fixedSchedule";
 // Integer milliseconds and frames only, so Bun and both Lua32 modes decide alike.
 
 export const DEFAULT_DELAY = 2;
-export const ROLLBACK_BUDGET = 6;
-export const MAX_FIXED_DELAY = MAX_INPUT_DELAY;
+export const ROLLBACK_BUDGET = 4;
 export const HIGH_DELAY_FRAMES = 8;
 export const TIME_SYNC_INTERVAL = 60;
 
@@ -16,7 +15,7 @@ export interface DelayPolicy {
   readonly budget: number;
 }
 
-export function delayPolicy(window: number, ceiling: number = MAX_FIXED_DELAY, budget: number = ROLLBACK_BUDGET, floor: number = DEFAULT_DELAY): DelayPolicy {
+export function delayPolicy(window: number, ceiling: number = MAX_INPUT_DELAY, budget: number = ROLLBACK_BUDGET, floor: number = DEFAULT_DELAY): DelayPolicy {
   return { floor, ceiling: Math.max(floor, ceiling), window, budget: Math.min(budget, window - 1) };
 }
 

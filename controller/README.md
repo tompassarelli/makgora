@@ -43,7 +43,7 @@ game has published a Smashcraft menu since it started, and Any map otherwise.
 
 A build that reads keyboard input (the playable build, #166)
 publishes menu phases too: its ready file `CustomMapData/wc3-melee-ready.txt` names
-the build and `INPUT keyboard-d2-r24` (the development build uses `INPUT callback`). Newer than the game's start and any different build's menu,
+the build and `INPUT keyboard-d2-r7` (the development build uses `INPUT callback`). Newer than the game's start and any different build's menu,
 it is a Smashcraft session on keys (`session=BUILD/keys/N`): the service
 runs no helper, uses the pointer in fighter, stage and results menus, and presses the pad's keys during matches through the same mapper as
 `padbridge --emit`, on the map's pad keys (contracts/controller.json `padKeys`; the default melee layout: A c, B v, X/Y t, RB 2, LB ` (meter), LT 3, RT 4; tom: A c, B 2, X v, Y t, LB 1, RB ` (meter), LT 3, RT 4;
