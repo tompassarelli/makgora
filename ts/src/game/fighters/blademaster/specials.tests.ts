@@ -361,7 +361,7 @@ test("Blademaster's Rising Whirlwind first strikes on frame 13, four frames afte
 const STOCK_IMAGE_FRAME = 8;
 const IMAGE_WATCH = 40;
 
-test("Blademaster's Mirror Image, grounded and from a hop, places its image on frame 12 and steps forward from frame 13, four frames after the stock frames 8 and 9 [k3 measure docs/gameplay-design.md]", () => {
+test("Blademaster's Mirror Image, grounded and from a hop, places its image on frame 12 and steps back from frame 13, four frames after the stock frames 8 and 9 [k3 measure docs/gameplay-design.md]", () => {
   const measured: string[] = [];
   for (const air of [false, true]) {
     const s = scene(0, [{ character: Character.blademaster, x: BLADEMASTER_X, facing: 1 }, { character: Character.rifleman, x: FOE_X, facing: -1 }]);

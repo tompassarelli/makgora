@@ -1,7 +1,7 @@
 import { sameTeam } from "../teams";
 import { chargeBanked, chargeHolds, chargeSwingFloor } from "./charge";
 import { releaseCommandGrabLock } from "./commandGrabLock";
-import { changesAimZone, chargedAimX, chargedAimZ, steerAim, stepSide } from "./aimZone";
+import { changesAimZone, chargedAimX, chargedAimZ, steerAim } from "./aimZone";
 
 
 
@@ -663,7 +663,7 @@ function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number,
   if (!ultimateHovers(f) && fallsFreely(f, move, frame)) return;
   for (const segment of move.motion ?? []) {
     if (frame < segment.first || frame > segment.last) continue;
-    let velocityX = f32(stepSide(f, move) * segment.velocityX);
+    let velocityX = f32(f.facing * segment.velocityX);
     let velocityZ = segment.velocityZ;
     if (segment.aimedSpeed !== undefined && (special.aimX !== 0 || special.aimZ !== 0)) {
       const scale = special.aimX !== 0 && special.aimZ !== 0 ? f32(segment.aimedSpeed * DIAGONAL) : segment.aimedSpeed;

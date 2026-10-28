@@ -1,4 +1,4 @@
-import { assertEquals, assertGreaterThan, assertLessThan, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertLessThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action, maskOf } from "../../input/actions";
 import { adaptInput } from "../../match/inputAdapter";
@@ -13,7 +13,7 @@ import { createFighter, mutablePlacedObject, placedObject } from "../../sim/figh
 import { fighterAt } from "../../sim/roster";
 import { mainDeckZ } from "../../sim/stage";
 import { length } from "./moves";
-import { BLADEMASTER_SPECIALS, MIRROR_IMAGE_OBJECT } from "./specials";
+import { MIRROR_IMAGE_OBJECT } from "./specials";
 import { canonicalState } from "../../replay/canonical";
 import { at } from "wisp/src/runtime/lookup";
 
@@ -51,51 +51,37 @@ function sideStep(air: boolean, stick: Action, hold: Action | undefined = undefi
   return `${air ? "air" : "ground"} ${stick === Action.moveRight ? "right" : "left"}: facing ${facing}, step ${step}, image where he stood ${imageWhereHeStood}, rose ${risen}${again}`;
 }
 
-test("Side-B Mirror Image leaves the image where he stood and steps him one length the way the stick points, turning him for a reverse input, grounded and once per airtime in the air with no rise [k1 scenario]", () => {
+test("Side-B Mirror Image faces the way side is pressed and steps him one length back away from it, leaving the image where he stood, grounded and once per airtime in the air with no rise [k1 scenario]", () => {
   const measured = [false, true].flatMap(air => [Action.moveRight, Action.moveLeft].map(stick => sideStep(air, stick)));
   assertEquals(measured.join("; "), [
-    "ground right: facing 1, step 1, image where he stood true, rose false",
-    "ground left: facing -1, step -1, image where he stood true, rose false",
-    "air right: facing 1, step 1, image where he stood true, rose false, no second step",
-    "air left: facing -1, step -1, image where he stood true, rose false, no second step",
+    "ground right: facing 1, step -1, image where he stood true, rose false",
+    "ground left: facing -1, step 1, image where he stood true, rose false",
+    "air right: facing 1, step -1, image where he stood true, rose false, no second step",
+    "air left: facing -1, step 1, image where he stood true, rose false, no second step",
   ].join("; "));
 });
 
-test("Side-B Mirror Image steps him the way the stick is held during the cast while he keeps facing where side-B was pressed, grounded and in the air [k1 scenario]", () => {
+test("Side-B Mirror Image ignores the stick held after the press, grounded and in the air [k1 scenario]", () => {
   const measured = [false, true].flatMap(air => [
     sideStep(air, Action.moveRight, Action.moveLeft),
     sideStep(air, Action.moveLeft, Action.moveRight),
-    sideStep(air, Action.moveRight, Action.moveRight),
     sideStep(air, Action.moveRight, Action.moveUp),
   ]);
   assertEquals(measured.join("; "), [
     "ground right: facing 1, step -1, image where he stood true, rose false",
     "ground left: facing -1, step 1, image where he stood true, rose false",
-    "ground right: facing 1, step 1, image where he stood true, rose false",
-    "ground right: facing 1, step 1, image where he stood true, rose false",
+    "ground right: facing 1, step -1, image where he stood true, rose false",
     "air right: facing 1, step -1, image where he stood true, rose false, no second step",
     "air left: facing -1, step 1, image where he stood true, rose false, no second step",
-    "air right: facing 1, step 1, image where he stood true, rose false, no second step",
-    "air right: facing 1, step 1, image where he stood true, rose false, no second step",
+    "air right: facing 1, step -1, image where he stood true, rose false, no second step",
   ].join("; "));
 });
 
-test("Side-B Mirror Image follows the stick only until its aim frames end [k1 scenario]", () => {
-  const aim = BLADEMASTER_SPECIALS.side.ground.aimFrames ?? 0;
-  const early = sideStep(false, Action.moveRight, Action.moveLeft, aim);
-  const late = sideStep(false, Action.moveRight, Action.moveLeft, aim + 1);
-  assertEquals(`${early}; ${late}`, [
-    "ground right: facing 1, step -1, image where he stood true, rose false",
-    "ground right: facing 1, step 1, image where he stood true, rose false",
-  ].join("; "));
-});
+const STEP_ROLLBACK_WATCH = 40;
+const STEP_ROLLBACK_SAVE = 6;
+const HOLD_LEFT = { first: 10, last: 16 };
 
-const AIM_ROLLBACK_WATCH = 40;
-const AIM_ROLLBACK_SAVE = 6;
-const AIM_HOLD_LEFT_LAST = 4;
-const AIM_HOLD_RIGHT = { first: 8, last: 10 };
-
-function aimMatch() {
+function mirrorMatch() {
   const state = createReplaySnapshot();
   copyFighterState(fighterAt(state.world, 0), createFighter(Character.blademaster, BLADEMASTER_X, 1), 3);
   copyFighterState(fighterAt(state.world, 1), createFighter(Character.rifleman, FOE_X, -1), 3);
@@ -109,34 +95,33 @@ function aimMatch() {
   return state;
 }
 
-function aimTick(state: ReturnType<typeof aimMatch>, tick: number, holdsRightLater: boolean): void {
+function mirrorTick(state: ReturnType<typeof mirrorMatch>, tick: number, holdsLeftLater: boolean): void {
   for (const slot of [0, 1]) {
     const press = slot === 0 && tick === 1;
-    const left = slot === 0 && tick > 1 && tick <= AIM_HOLD_LEFT_LAST;
-    const right = slot === 0 && holdsRightLater && tick >= AIM_HOLD_RIGHT.first && tick <= AIM_HOLD_RIGHT.last;
-    const mask = press ? maskOf(Action.moveRight, Action.special) : left ? maskOf(Action.moveLeft) : right ? maskOf(Action.moveRight) : 0;
-    const row = inputRow({ held: mask, pressed: press ? mask : 0, axisX: press || right ? 127 : left ? -127 : 0, specialX: press ? 1 : 0 });
+    const left = slot === 0 && holdsLeftLater && tick >= HOLD_LEFT.first && tick <= HOLD_LEFT.last;
+    const mask = press ? maskOf(Action.moveRight, Action.special) : left ? maskOf(Action.moveLeft) : 0;
+    const row = inputRow({ held: mask, pressed: press ? mask : 0, axisX: press ? 127 : left ? -127 : 0, specialX: press ? 1 : 0 });
     if (row === undefined) throw new Error("input row");
     adaptInput(row, fighterAt(state.world, slot), tick, at(state.controls.inputs, slot), at(state.controls.commands, slot));
   }
   stepMatch(state.match, state.world, state.controls, tick);
 }
 
-test("A rollback from inside Mirror Image's aim frames onto inputs that no longer hold right replays the step the earlier left hold chose, as straight play does [k1 scenario]", () => {
-  const reference = aimMatch();
-  for (let tick = 1; tick <= AIM_ROLLBACK_WATCH; tick++) aimTick(reference, tick, false);
+test("A rollback from inside Mirror Image's step onto inputs that no longer hold left replays the same backward step as straight play does [k1 scenario]", () => {
+  const reference = mirrorMatch();
+  for (let tick = 1; tick <= STEP_ROLLBACK_WATCH; tick++) mirrorTick(reference, tick, false);
   const referee = fighterAt(reference.world, 0);
   assertLessThan(f32(referee.motion.x - placedObject(referee).x), 0.0);
   assertEquals(referee.facing, 1, "still facing the side-B way");
 
-  const state = aimMatch();
+  const state = mirrorMatch();
   const snapshot = createReplaySnapshot();
-  for (let tick = 1; tick <= AIM_ROLLBACK_WATCH; tick++) {
-    aimTick(state, tick, true);
-    if (tick === AIM_ROLLBACK_SAVE) copyReplayState(snapshot, state);
+  for (let tick = 1; tick <= STEP_ROLLBACK_WATCH; tick++) {
+    mirrorTick(state, tick, true);
+    if (tick === STEP_ROLLBACK_SAVE) copyReplayState(snapshot, state);
   }
-  assertGreaterThan(f32(fighterAt(state.world, 0).motion.x - placedObject(fighterAt(state.world, 0)).x), 0.0);
+  assertLessThan(f32(fighterAt(state.world, 0).motion.x - placedObject(fighterAt(state.world, 0)).x), 0.0);
   copyReplayState(state, snapshot);
-  for (let tick = AIM_ROLLBACK_SAVE + 1; tick <= AIM_ROLLBACK_WATCH; tick++) aimTick(state, tick, false);
+  for (let tick = STEP_ROLLBACK_SAVE + 1; tick <= STEP_ROLLBACK_WATCH; tick++) mirrorTick(state, tick, false);
   assertEquals(canonicalState(state), canonicalState(reference), "replayed state");
 });
