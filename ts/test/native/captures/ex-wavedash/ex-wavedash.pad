@@ -1,0 +1,29 @@
+# EX wavedash native proof: Blademaster jumps and air dodges down-forward into the ground holding Strong at a full bar, so the slide pays one EX, goes further and leaves blue dust, the EX flash and mana sparkles; then he wavedashes back the other way without Strong for the ordinary grey dust and shorter slide.
+#! chat -dev setup quick pair blademaster / mountain king;stocks 3;meter 100
+#! cue 64-70 ex flash: effect=TomeOfRetrainingCaster
+#! cue 64-80 ex sparkles: effect=AImaTarget
+60 a tap B 1
+64 a press LB
+64 a stick 1 -1
+64 a shield 1
+65 a stick 0 0
+65 a shield 0
+65 a release LB
+65 a capture
+66 a capture
+68 a capture
+71 a capture
+75 a capture
+80 a capture
+88 a capture
+160 a tap B 1
+164 a stick -1 -1
+164 a shield 1
+165 a stick 0 0
+165 a shield 0
+165 a capture
+166 a capture
+168 a capture
+171 a capture
+175 a capture
+180 a capture
