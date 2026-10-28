@@ -291,7 +291,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Chen Stormstout | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Chen Stormstout | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 2/1 in up smash, out down smash | 1/1 in down smash, out forward smash |
+| Chen Stormstout | medium | up throw | 2/1 in side special, out dash, dash attack | 1/1 in side special, out dash, dash attack | 2/1 in up smash, out down smash | 1/1 in down smash, out forward smash |
 | Chen Stormstout | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
