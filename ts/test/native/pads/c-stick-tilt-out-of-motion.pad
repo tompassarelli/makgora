@@ -27,8 +27,8 @@
 # Run right, then A: still the dash attack.
 420 a stick 1 0
 452 a tap A 2
-460 a stick 0 0
 #! expect a 452-455 applied attack 4 style 19
 456 a capture
+460 a stick 0 0
 560 a press VIEW
 630 a release VIEW
