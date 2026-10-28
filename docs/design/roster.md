@@ -580,7 +580,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Forward smash — Mountain Breaker | 20/3/36 | 21 | L, 40, KILL | Heavy overhead hammer; head is sweetspot, handle 16 damage |
 | Up smash — Twin Lift | 17/5/32 | 17 | M, 85, KILL | Axe and hammer form one hit above |
 | Down smash — Stone Sweep | 16/6/34 | 16 | M, 25, EDGE | Front then back, one hit per target |
-| Neutral air — Barrel Turn | 8/6/22; L15 | 10 | M, 50, POKE | Body rotation, no disjoint |
+| Neutral air — Hammer Somersault | 7/26/11; 43 total; L8 | 12 clean (7–14), 9 late (15–32) | hammer at arm's length plus body; 45, clean base 18, late base 0, growth 100 | One front flip with the right hammer flung out, its head circling him in front, under, behind and over; one hit, strongest early. After Melee Pikachu's neutral air (3–10 clean, 11–28 late, 39 total, 7 L-cancelled), four frames later for the heavy; auto-cancel before 7 and from 38 |
 | Forward air — Hammer Drop | 16/3/30; L21 | 16 | M, 270, SPIKE | Hammer head spikes; handle launches 45 degrees for 11 |
 | Back air — Backhand Axe | 10/3/25; L15 | 13 | M, 35, KILL | Strong short rear swing |
 | Up air — Headbutt | 7/4/22; L13 | 10 | S, 85, LAUNCH | Body hurtbox stays exposed |

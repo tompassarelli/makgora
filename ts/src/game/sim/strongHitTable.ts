@@ -127,6 +127,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   [Character.mountainKing]: {
     [AttackStyle.forwardSmash]: "The storm hammer's head carries the weight; the haft only shoves.",
     [AttackStyle.forwardAir]: "The hammer head spikes; the haft only bumps.",
+    [AttackStyle.neutralAir]: "The hammer flung out at the top of the flip hits hardest; the rest of the somersault is a weak wall.",
   },
   [Character.warden]: { [AttackStyle.forwardSmash]: "The blade's far edge: a hunter who strikes at her reach." },
   [Character.lich]: { [AttackStyle.forwardSmash]: "Frost bursts at the staff's tip, so a caster who keeps distance kills at range." },
