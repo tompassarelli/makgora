@@ -15,10 +15,11 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, SpecialAction } from "../../sim/codes";
 import { type Fighter, createFighter } from "../../sim/fighter";
 import { fighterAt, neutralControls } from "../../sim/roster";
+import { runningHeroSpecial } from "../../sim/specials/engine";
 import { mainDeckZ } from "../../sim/stage";
 import { FOLLOW_UP_FORM, chargeStage } from "../../sim/specials/schema";
 import { length } from "./moves";
-import { QUICKDRAW_CHARGE, QUICKDRAW_DASH_FIRST, quickdrawDamage } from "./specials";
+import { AIR_LANDING_LAG, QUICKDRAW_CHARGE, QUICKDRAW_DASH_FIRST, quickdrawDamage } from "./specials";
 
 const FAR_FOE_X = 900.0;
 const NEAR_FOE_X = length(f32(0.8));
@@ -127,6 +128,63 @@ test("Quickdraw works once per airtime and comes back after landing [k1 scenario
   for (let n = 1; n <= 40; n++) frame(s, []);
   frame(s, [Action.special]);
   assertEquals(blademaster.special.action, SpecialAction.heroNeutral, "landing restores it");
+});
+
+const LANDING_DROP = 120.0;
+
+interface CarriedCharge { readonly blademaster: Fighter; readonly foe: Fighter; readonly landedCharge: number; readonly landedForm: number; readonly landedLag: number; readonly total: number; readonly stage: number }
+
+function carriedCharge(holdFrames: number): CarriedCharge {
+  const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing: 1 }, { character: Character.rifleman, x: NEAR_FOE_X, facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  const foe = fighter(s, 1);
+  airborne(blademaster, 0.0, f32(mainDeckZ(0) + LANDING_DROP));
+  let landedCharge = -1;
+  let landedForm = -1;
+  let landedLag = -1;
+  let total = 0;
+  let stage = -1;
+  for (let n = 1; n <= WATCH; n++) {
+    frame(s, n <= holdFrames ? [Action.special] : []);
+    if (landedCharge < 0 && blademaster.motion.grounded) {
+      landedCharge = blademaster.special.charge;
+      landedForm = blademaster.special.form;
+      landedLag = blademaster.landing.lag;
+    }
+    if (stage < 0 && blademaster.special.form >= FOLLOW_UP_FORM) {
+      stage = idiv(blademaster.special.form, FOLLOW_UP_FORM) - 1;
+      total = n;
+    }
+    if (stage >= 0 && blademaster.special.action === SpecialAction.none) break;
+  }
+  return { blademaster, foe, landedCharge, landedForm, landedLag, total, stage };
+}
+
+test("An air Quickdraw charge held through landing continues as the ground stance with its charge and no landing lag, then fires the ground draw at the summed charge [k1 scenario]", () => {
+  const air = carriedCharge(FULL_HOLD);
+  assertGreaterThan(air.landedCharge, 0);
+  assertLessThan(air.landedCharge, QUICKDRAW_CHARGE.full);
+  assertEquals(air.landedForm, 0, "the stance is the ground form on the landing frame");
+  assertEquals(air.landedLag, 0, "no landing lag");
+  const ground = draw(FULL_HOLD, NEAR_FOE_X);
+  assertEquals(air.stage, ground.stage, "the summed charge reaches the same stage as a charge held on the ground");
+  assertEquals(air.stage, QUICKDRAW_CHARGE.stages);
+  assertEquals(air.foe.status.damage, quickdrawDamage(QUICKDRAW_CHARGE.stages), "the ground release lands the full draw");
+  assertEquals(air.blademaster.landing.lag, 0, "the ground draw leaves no air landing lag");
+});
+
+test("A release in the air still fires the air Quickdraw with its landing lag, and a draw after landing keeps today's landing behavior [k1 scenario]", () => {
+  const s = scene(0, [{ character: Character.blademaster, x: 0.0, facing: 1 }, { character: Character.rifleman, x: FAR_FOE_X, facing: -1 }]);
+  const blademaster = fighter(s, 0);
+  airborne(blademaster, 0.0, f32(mainDeckZ(0) + AIR_HEIGHT));
+  for (let n = 1; n <= 40 && blademaster.special.form < FOLLOW_UP_FORM; n++) frame(s, n <= 12 ? [Action.special] : []);
+  assertTrue(blademaster.special.form >= FOLLOW_UP_FORM);
+  assertFalse(blademaster.motion.grounded);
+  assertEquals(runningHeroSpecial(blademaster)?.landingLag, AIR_LANDING_LAG, "the air draw keeps its landing lag");
+  blademaster.motion.z = f32(mainDeckZ(0) + 10.0);
+  for (let n = 1; n <= 60 && !blademaster.motion.grounded; n++) frame(s, []);
+  assertTrue(blademaster.motion.grounded);
+  assertEquals(blademaster.special.form < FOLLOW_UP_FORM ? 0 : 1, 1, "landing during the slash does not turn it into a stance");
 });
 
 test("A rollback from inside the iaido charge replays the same draw, dash and hit [k1 scenario]", () => {

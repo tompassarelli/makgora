@@ -1050,11 +1050,23 @@ function landFromSpecialFall(f: Fighter): void {
 }
 
 
+export function carriesChargeAcrossLanding(f: Readonly<Fighter>): boolean {
+  return runningHeroSpecial(f)?.carriesChargeOnLanding === true && f.special.form === SpecialForm.air;
+}
+
+
 export function landHeroSpecial(f: Fighter): boolean {
   const move = runningHeroSpecial(f);
   if (move === undefined) landFromSpecialFall(f);
   if (move?.landingLag === undefined) return false;
   const specials = f.tuning.specials;
+  if (carriesChargeAcrossLanding(f) && specials !== undefined) {
+    const ground = specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), SpecialForm.ground, f.special.ex, f.special.variant);
+    f.special.form = SpecialForm.ground;
+    f.special.duration = ground.endFrame;
+    applyWindows(f, ground, f.special.frame);
+    return true;
+  }
   if (f.character === Character.cairne && f.special.action === SpecialAction.heroNeutral
     && f.special.form === SpecialForm.air && specials !== undefined
     && f.special.frame < (move.projectiles?.[0]?.spawnFrame ?? 0)) {

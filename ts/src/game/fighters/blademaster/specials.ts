@@ -94,6 +94,7 @@ const iaidoStance = (air: boolean): AuthoredSpecial => ({
   hurt: [hurtPose(1, QUICKDRAW_CHARGE.hold + 1, [hurtPart(-8.0, 24.0, -16.0, 105.0, 37.0)])],
   followUps: quickdrawReleases(air),
   oncePerAirtime: air ? true : undefined,
+  carriesChargeOnLanding: air ? true : undefined,
   landingLag: air ? AIR_LANDING_LAG : undefined,
 });
 
