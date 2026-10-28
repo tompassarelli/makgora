@@ -236,6 +236,7 @@ function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Reado
   visuals.shieldReflect = sourceVisuals.shieldReflect;
   visuals.poisonBursts = sourceVisuals.poisonBursts;
   visuals.spellPass = sourceVisuals.spellPass;
+  visuals.armorAbsorbs = sourceVisuals.armorAbsorbs;
 }
 
 function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Readonly<Record<number, number | undefined>>): void {
@@ -435,6 +436,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.invincible = sourceStatus.invincible;
   status.armorFrames = sourceStatus.armorFrames;
   status.armorMaxDamage = sourceStatus.armorMaxDamage;
+  status.armorKnockback = sourceStatus.armorKnockback;
   status.armorChills = sourceStatus.armorChills;
   status.divineFrames = sourceStatus.divineFrames;
   status.cursedBy = sourceStatus.cursedBy;
@@ -777,6 +779,7 @@ function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = visuals.manaDrained, b = sourceVisuals.manaDrained; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.poisonBursts, b = sourceVisuals.poisonBursts; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.spellPass, b = sourceVisuals.spellPass; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.armorAbsorbs, b = sourceVisuals.armorAbsorbs; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   return true;
 }
 
@@ -951,6 +954,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.freezeImmunityFrames, b = sourceStatus.freezeImmunityFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.armorFrames, b = sourceStatus.armorFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.armorMaxDamage, b = sourceStatus.armorMaxDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.armorKnockback, b = sourceStatus.armorKnockback; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (status.armorChills !== sourceStatus.armorChills) return false;
   { const a = status.condition, b = sourceStatus.condition; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.conditionFrames, b = sourceStatus.conditionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1442,6 +1446,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "meterUltimate", meter.ultimate);
   if (visuals.poisonBursts !== 0) sink.int(prefix, "poisonBursts", visuals.poisonBursts);
   if (visuals.spellPass !== 0) sink.int(prefix, "spellPassVisualSerial", visuals.spellPass);
+  if (visuals.armorAbsorbs !== 0) sink.int(prefix, "armorAbsorbs", visuals.armorAbsorbs);
   if (fighter.character === Character.kobold) {
     sink.int(prefix, "candleHeat", candle.heat);
     sink.int(prefix, "candleState", candle.state);
@@ -1477,6 +1482,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     if (special.seekTarget !== 0) sink.int(prefix, "specialSeekTarget", special.seekTarget);
     sink.int(prefix, "armorFrames", status.armorFrames);
     sink.real(prefix, "armorMaxDamage", status.armorMaxDamage);
+    if (status.armorKnockback !== 0) sink.real(prefix, "armorKnockback", status.armorKnockback);
     if (status.armorChills) sink.int(prefix, "armorChills", 1);
     for (let animal = 0; animal <= fighter.pack.length; animal++) {
       const placed = placedObject(fighter, animal);

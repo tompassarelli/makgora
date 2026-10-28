@@ -237,6 +237,26 @@ function contactAt(index: number): DamageContact {
   return at(batch.contacts, index);
 }
 
+function armorKnockback(world: Roster, target: Fighter, chosen: DamageContact, armorDamage: number, knockback: number): number | undefined {
+  const { status } = target;
+  if (status.armorFrames <= 0 || chosen.kind === ContactKind.throw) return knockback;
+  if (status.armorKnockback > 0) {
+    const through = subtractFloat32(knockback, status.armorKnockback);
+    if (through > 0) {
+      status.armorFrames = 0;
+      return through;
+    }
+    target.visuals.armorAbsorbs++;
+    return undefined;
+  }
+  status.armorFrames = 0;
+  const armorChills = status.armorChills;
+  status.armorChills = false;
+  if (armorDamage > status.armorMaxDamage) return knockback;
+  if (armorChills && chosen.direct) applyHeroStatus(fighterAt(world, chosen.source), CHILL);
+  return undefined;
+}
+
 function resolveDamageContacts(world: Roster, slot: number): void {
   const target = fighterAt(world, slot);
   const { launch, shield, status } = target;
@@ -362,17 +382,9 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   const chosenIndex = winner ?? flinch;
   if (chosenIndex === undefined) return;
 
-  if (status.armorFrames > 0 && contactAt(chosenIndex).kind !== ContactKind.throw) {
-    status.armorFrames = 0;
-    const armorChills = status.armorChills;
-    status.armorChills = false;
-    if (armorDamage <= status.armorMaxDamage) {
-
-      const spentBy = contactAt(chosenIndex);
-      if (armorChills && spentBy.direct) applyHeroStatus(fighterAt(world, spentBy.source), CHILL);
-      return;
-    }
-  }
+  const throughArmor = armorKnockback(world, target, contactAt(chosenIndex), armorDamage, strongest);
+  if (throughArmor === undefined) return;
+  strongest = throughArmor;
 
 
   shield.pushbackX = 0.0;

@@ -163,14 +163,8 @@ export interface SpecialBeam {
   readonly chain?: true | undefined;
 }
 
-export interface SpecialArmor extends FrameWindow {
-
-  readonly maxDamage: number;
-
-  readonly shell?: boolean | undefined;
-
-  readonly chillsStriker?: boolean | undefined;
-}
+interface ArmorWindow extends FrameWindow { readonly shell?: boolean | undefined; readonly chillsStriker?: boolean | undefined }
+export type SpecialArmor = ArmorWindow & ({ readonly maxDamage: number; readonly knockback?: undefined } | { readonly knockback: number; readonly maxDamage?: undefined });
 
 interface ProjectilePool {
   readonly every: number;

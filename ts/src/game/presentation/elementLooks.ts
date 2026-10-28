@@ -62,28 +62,53 @@ export const IMMOLATE_SOUNDS = { start: "ImmolationTarget", loop: "LiquidFireLoo
 
 
 
-export const MANA_DRAIN_LOOK = {
+export interface HitCueLook {
+  readonly model: string;
+  readonly sequence: string;
+  readonly seconds: number;
+  readonly scale: number;
+  readonly z: number;
+}
+
+export const MANA_DRAIN_LOOK: HitCueLook = {
   model: "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdx",
   sequence: "birth",
   seconds: f32(0.3),
   scale: f32(0.6),
-
   z: 125.0,
-} as const;
+};
+
+export const ARMOR_ABSORB_LOOK: HitCueLook = {
+  model: "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx",
+  sequence: "birth",
+  seconds: 0.0,
+  scale: f32(0.9),
+  z: 90.0,
+};
+
+export interface HitCue {
+  readonly look: HitCueLook;
+  readonly serial: (this: void, fighter: Readonly<Fighter>) => number;
+}
+
+export const HIT_CUES: readonly HitCue[] = [
+  { look: MANA_DRAIN_LOOK, serial: (fighter) => fighter.visuals.manaDrained },
+  { look: ARMOR_ABSORB_LOOK, serial: (fighter) => fighter.visuals.armorAbsorbs },
+];
 
 
-export interface DrainSeen {
-  drains: number;
+export interface HitCueSeen {
+  serial: number;
   hit: number;
 }
 
-export const drainSeen = (): DrainSeen => ({ drains: 0, hit: -1 });
+export const hitCueSeen = (): HitCueSeen => ({ serial: 0, hit: -1 });
 
 
-export function advanceDrainSeen(seen: DrainSeen, fighter: Readonly<Fighter>): boolean {
+export function advanceHitCueSeen(seen: HitCueSeen, serial: number, fighter: Readonly<Fighter>): boolean {
   const { visuals, launch } = fighter;
-  if (visuals.manaDrained !== seen.drains) {
-    seen.drains = visuals.manaDrained;
+  if (serial !== seen.serial) {
+    seen.serial = serial;
     seen.hit = visuals.hit;
   }
   return !fighter.status.out && (launch.hitlag > 0 || launch.hitstun > 0) && seen.hit === visuals.hit;

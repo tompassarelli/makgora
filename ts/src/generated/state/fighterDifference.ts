@@ -163,6 +163,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.freezeImmunityFrames !== actual.status.freezeImmunityFrames) return "freezeImmunityFrames";
   if (expected.status.armorFrames !== actual.status.armorFrames) return "armorFrames";
   if (expected.status.armorMaxDamage !== actual.status.armorMaxDamage) return "armorMaxDamage";
+  if (expected.status.armorKnockback !== actual.status.armorKnockback) return "armorKnockback";
   if (expected.status.armorChills !== actual.status.armorChills) return "armorChills";
   if (expected.status.condition !== actual.status.condition) return "condition";
   if (expected.status.conditionFrames !== actual.status.conditionFrames) return "conditionFrames";
@@ -180,6 +181,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.meter.ultimate !== actual.meter.ultimate) return "meterUltimate";
   if (expected.visuals.poisonBursts !== actual.visuals.poisonBursts) return "poisonBursts";
   if (expected.visuals.spellPass !== actual.visuals.spellPass) return "spellPassVisualSerial";
+  if (expected.visuals.armorAbsorbs !== actual.visuals.armorAbsorbs) return "armorAbsorbs";
   if (expected.candle.heat !== actual.candle.heat) return "candleHeat";
   if (expected.candle.state !== actual.candle.state) return "candleState";
   if (expected.candle.lit !== actual.candle.lit) return "candleLit";

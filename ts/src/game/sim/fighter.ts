@@ -239,6 +239,7 @@ interface VisualSerials {
 
   poisonBursts: number;
   spellPass: number;
+  armorAbsorbs: number;
 }
 
 interface Special {
@@ -422,6 +423,7 @@ interface Status {
 
   armorFrames: number;
   armorMaxDamage: number;
+  armorKnockback: number;
 
   armorChills: boolean;
 
@@ -674,7 +676,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       lastAttackSerial: undefined,
       lastWindow: 0,
     },
-    visuals: { grab: 0, throw: 0, hit: 0, hitElectric: false, hitElement: HitElement.normal, hitStrength: 0, hitStrong: false, hitHeight: 1, hitPummel: false, shieldElectric: false, shield: 0, shieldReflect: 0, manaDrained: 0, poisonBursts: 0, spellPass: 0 },
+    visuals: { grab: 0, throw: 0, hit: 0, hitElectric: false, hitElement: HitElement.normal, hitStrength: 0, hitStrong: false, hitHeight: 1, hitPummel: false, shieldElectric: false, shield: 0, shieldReflect: 0, manaDrained: 0, poisonBursts: 0, spellPass: 0, armorAbsorbs: 0 },
     special: {
       action: SpecialAction.none,
       ex: false,
@@ -736,7 +738,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     platform: { downHeld: false, downAge: 3, dropConsumed: false },
     cannon: { held: undefined, firing: undefined, cooldown: 0, passing: false },
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
-    status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, summonFrames: 0, summonX: 0.0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0 },
+    status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorKnockback: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, summonFrames: 0, summonX: 0.0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0 },
     meter: { ex: 0, ultimate: 0 },
     candle: { heat: 0, state: CandleState.held, lit: true, x: 0.0, z: 0.0, vx: 0.0, vz: 0.0, surface: undefined, timer: 0, away: 0, guard: 0, struck: noSlots(), specialStruck: 0, dropSerial: 0, snuffSerial: 0, returnSerial: 0 },
     placed: createPlacedObject(),

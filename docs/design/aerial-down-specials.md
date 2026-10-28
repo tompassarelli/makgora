@@ -32,7 +32,7 @@ cancelling.
 | Thrall | falling two-sided Doomhammer Slam | S1 W17 L27/E27 | S1 W17 L15/E50 | S1 W17 L3/E50 | S1 W17 L—/E50 |
 | Jaina Proudmoore | downward water bolt; recall works while falling | S1 W27 L27/E52 | S1 W27 L15/E52 | S1 W27 L3/E52 | S1 W27 L—/E52 |
 | Sylvanas Windrunner | Life Drain grab while falling | S1 W16 L27/E52 | S1 W16 L15/E52 | S1 W16 L3/E52 | S1 W16 L—/E52 |
-| Cairne Bloodhoof | War Stomp: Endurance armor while falling, two-sided stomp, 26 landing frames | S1 W5 L27/E27 | S1 W5 L15/E15 | S1 W5 L3/E54 | S1 W5 L—/E54 |
+| Cairne Bloodhoof | War Stomp: Endurance armor while falling, two-sided stomp, 26 landing frames | S1 W1 L31/E31 | S1 W1 L15/E15 | S1 W1 L3/E3 | S1 W1 L—/E62 |
 | Chen Stormstout | Earth stance armor in the air; lands into the grounded stance | S1 W4 L27/E27 | S1 W4 L15/E15 | S1 W4 L3/E33 | S1 W4 L—/E33 |
 | Peon | Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing | S0 W1 L27/E— | S0 W1 L15/E— | S0 W1 L3/E— | S0 W1 L—/E65 |
 | Goblin Tinker | drops one Clockwerk Goblin; lands into the grounded factory build | S1 W10 L27/E27 | S1 W10 L15/E15 | S1 W24 L3/E48 | S1 W10 L—/E36 |

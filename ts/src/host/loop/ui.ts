@@ -301,9 +301,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   if (retained.match === undefined) ui.match = new MatchPresentation(s.origin, ui.results);
   else bindPrototype(ui.match, MatchPresentation.prototype);
 
-  const retainedElements: { readonly elements?: { readonly drains?: readonly effect[] } } = ui;
+  const retainedElements: { readonly elements?: { readonly hitCues?: readonly effect[] } } = ui;
   if (retainedElements.elements === undefined) ui.elements = new ElementEffects(s.origin);
-  else if (retainedElements.elements.drains === undefined) {
+  else if (retainedElements.elements.hitCues === undefined) {
     ui.elements.destroy();
     ui.elements = new ElementEffects(s.origin);
   } else bindPrototype(ui.elements, ElementEffects.prototype);

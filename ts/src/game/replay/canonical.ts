@@ -400,6 +400,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
   int("armor.first", move.armor?.first ?? -1);
   int("armor.last", move.armor?.last ?? -1);
   real("armor.maxDamage", move.armor?.maxDamage ?? 0.0);
+  if (move.armor?.knockback !== undefined) real("armor.knockback", move.armor.knockback);
   int("armor.shell", bit(move.armor?.shell));
   if (move.armor?.chillsStriker === true) int("armor.chillsStriker", 1);
   if (move.burst !== undefined) {

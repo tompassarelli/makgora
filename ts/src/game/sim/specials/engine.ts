@@ -17,7 +17,7 @@ import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type FighterSpecials, type AuthoredSpecial, type FrameWindow, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, type FrameWindow, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialArmor, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
 import { airCastVariant, castFloating, floatsNow, stallAir } from "./airFloat";
 import { advanceRefire } from "./refire";
 import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
@@ -241,19 +241,21 @@ function applyWindows(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number
     if (inWindow(move.intangible, frame)) status.invincible = max(status.invincible, 1);
   } else if (inWindow(move.intangible, frame + 1)) status.invincible = max(status.invincible, 2);
   else if (inWindow(move.intangible, frame)) status.invincible = max(status.invincible, 1);
-  const armor = move.armor;
-  if (armor?.shell === true) {
+  if (move.armor !== undefined) applyArmorWindow(f, move.armor, frame);
+}
 
-    if (frame + 1 === armor.first) {
-      status.armorFrames = armor.last - armor.first + 2;
-      status.armorMaxDamage = armor.maxDamage;
-      status.armorChills = armor.chillsStriker === true && currentTraits(f).status === true;
-    }
-  } else if (armor !== undefined && (inWindow(armor, frame + 1) || inWindow(armor, frame))) {
-    status.armorFrames = max(status.armorFrames, inWindow(armor, frame + 1) ? 2 : 1);
-    status.armorMaxDamage = armor.maxDamage;
+function applyArmorWindow(f: Fighter, armor: SpecialArmor, frame: number): void {
+  const { status } = f;
+  if (armor.shell === true) {
+    if (frame + 1 !== armor.first) return;
+    status.armorFrames = armor.last - armor.first + 2;
+    status.armorChills = armor.chillsStriker === true && currentTraits(f).status === true;
+  } else if (inWindow(armor, frame)) {
+    status.armorFrames = max(status.armorFrames, 2);
     status.armorChills = false;
-  }
+  } else return;
+  status.armorMaxDamage = armor.maxDamage ?? 0.0;
+  status.armorKnockback = armor.knockback ?? 0.0;
 }
 
 

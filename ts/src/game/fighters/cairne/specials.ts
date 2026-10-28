@@ -24,7 +24,7 @@ const STOMP_RING: SpecialProjectile = {
   effect: { damage: 0.0, ...NO_LAUNCH }, reflectable: false, limit: 1,
 };
 const WAR_STOMP: AuthoredSpecial = {
-  endFrame: 54, defensiveUse: true, armor: { ...frames(6, 19), maxDamage: 8.0 },
+  endFrame: 62, defensiveUse: true, armor: { ...frames(1, 19), knockback: 100.0 },
   regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(9.75, "launch", 80)),
     heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(9.75, "launch", 80, -1)),
     heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(9.75, "launch", 85))],
@@ -43,6 +43,6 @@ export const CAIRNE_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shockwave", description: "Plant the halberd and send one low wave along the ground.", ground: shockwave(false), air: shockwave(true) }, { range: 1.25 }),
   side: withExKit({ name: "Bloodhoof Gore", description: "Paw the ground, then charge with lowered horns; a catch hoists the foe through any shield and flings it away.", ground: gore(false), air: gore(true) }, { reach: 1.25 }),
   up: withExKit({ name: "Spirit Lift", description: "Rise behind the halberd, then fall helplessly with exposed sides.", ground: lift() }, { travel: 1.25 }),
-  down: withExKit({ name: "War Stomp", description: "Endurance armor shrugs off one light hit, then a stomp around him pops nearby foes straight up.",
+  down: withExKit({ name: "War Stomp", description: "Endurance armor shrugs off light hits without flinching until the stomp, then pops nearby foes straight up; heavy hits break through, and the long recovery is punishable.",
     ground: WAR_STOMP, air: { ...WAR_STOMP, landingLag: 26 } }, { reach: 1.25 }),
 };

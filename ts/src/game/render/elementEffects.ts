@@ -5,7 +5,7 @@
 
 
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { type DrainSeen, ELEMENTS, MANA_DRAIN_LOOK, advanceDrainSeen, drainSeen, elementLook } from "../presentation/elementLooks";
+import { ELEMENTS, HIT_CUES, type HitCueSeen, advanceHitCueSeen, elementLook, hitCueSeen } from "../presentation/elementLooks";
 import { characterModelScale } from "../presentation/modelScale";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
@@ -22,15 +22,15 @@ export class ElementEffects {
 
   private readonly front: number;
 
-  readonly drains: readonly effect[];
-  private readonly drainSeen: DrainSeen[] = PARTICIPANT_SLOTS.map(() => drainSeen());
+  readonly hitCues: readonly effect[];
+  private readonly hitCueSeen: HitCueSeen[] = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map(() => hitCueSeen()));
 
-  private readonly drainShown: number[] = [-1, -1, -1, -1];
+  private readonly hitCueShown: number[] = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map(() => -1));
 
   constructor(private readonly origin: WorldOrigin) {
     this.front = origin.y - 10.0;
     this.models = PARTICIPANT_SLOTS.flatMap(() => SHOWN.map((element) => AddSpecialEffect(elementLook(element).victim ?? "", origin.x, origin.y)));
-    this.drains = PARTICIPANT_SLOTS.map(() => AddSpecialEffect(MANA_DRAIN_LOOK.model, origin.x, origin.y));
+    this.hitCues = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map((cue) => AddSpecialEffect(cue.look.model, origin.x, origin.y)));
     this.clear();
   }
 
@@ -44,13 +44,13 @@ export class ElementEffects {
       const model = this.models[slot * SHOWN.length + index];
       if (model !== undefined) parkOnce(model, this.origin, parked, slot * SHOWN.length + index);
     }
-    this.hideDrain(slot);
+    for (let cue = 0; cue < HIT_CUES.length; cue++) this.hideHitCue(slot * HIT_CUES.length + cue);
   }
 
-  private hideDrain(slot: number): void {
-    const model = this.drains[slot];
-    if (model !== undefined) parkOnce(model, this.origin, (this.parked ??= []), this.models.length + slot);
-    this.drainShown[slot] = -1;
+  private hideHitCue(at: number): void {
+    const model = this.hitCues[at];
+    if (model !== undefined) parkOnce(model, this.origin, (this.parked ??= []), this.models.length + at);
+    this.hitCueShown[at] = -1;
   }
 
   present(fighter: Readonly<Fighter>, slot: number): void {
@@ -73,29 +73,36 @@ export class ElementEffects {
       BlzSetSpecialEffectAlpha(model, 255);
     }
     this.hitSerials[slot] = visuals.hit;
-    const seen = this.drainSeen[slot];
-    const drain = this.drains[slot];
-    if (seen === undefined || drain === undefined) return;
-    if (!advanceDrainSeen(seen, fighter)) {
-      if (this.drainShown[slot] !== -1) this.hideDrain(slot);
+    for (let cue = 0; cue < HIT_CUES.length; cue++) this.presentHitCue(fighter, slot, cue, scale);
+  }
+
+  private presentHitCue(fighter: Readonly<Fighter>, slot: number, cue: number, scale: number): void {
+    const at = slot * HIT_CUES.length + cue;
+    const kind = HIT_CUES[cue];
+    const seen = this.hitCueSeen[at];
+    const model = this.hitCues[at];
+    if (kind === undefined || seen === undefined || model === undefined) return;
+    if (!advanceHitCueSeen(seen, kind.serial(fighter), fighter)) {
+      if (this.hitCueShown[at] !== -1) this.hideHitCue(at);
       return;
     }
-    parked[this.models.length + slot] = false;
-    if (this.drainShown[slot] !== visuals.hit) {
-      BlzSetSpecialEffectAnimation(drain, MANA_DRAIN_LOOK.sequence);
-      BlzSetSpecialEffectTime(drain, MANA_DRAIN_LOOK.seconds);
-      this.drainShown[slot] = visuals.hit;
+    (this.parked ??= [])[this.models.length + at] = false;
+    const { look } = kind;
+    if (this.hitCueShown[at] !== fighter.visuals.hit) {
+      BlzSetSpecialEffectAnimation(model, look.sequence);
+      BlzSetSpecialEffectTime(model, look.seconds);
+      this.hitCueShown[at] = fighter.visuals.hit;
     }
-    placeEffect(drain, this.origin.x + fighter.motion.x, this.front, this.origin.z + fighter.motion.z + MANA_DRAIN_LOOK.z * scale);
-    BlzSetSpecialEffectScale(drain, MANA_DRAIN_LOOK.scale * scale);
-    BlzSetSpecialEffectAlpha(drain, 255);
+    placeEffect(model, this.origin.x + fighter.motion.x, this.front, this.origin.z + fighter.motion.z + look.z * scale);
+    BlzSetSpecialEffectScale(model, look.scale * scale);
+    BlzSetSpecialEffectAlpha(model, 255);
   }
 
   setPaused(paused: boolean): void {
-    for (const model of [...this.models, ...this.drains]) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+    for (const model of [...this.models, ...this.hitCues]) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
   }
 
   destroy(): void {
-    for (const model of [...this.models, ...this.drains]) DestroyEffect(model);
+    for (const model of [...this.models, ...this.hitCues]) DestroyEffect(model);
   }
 }
