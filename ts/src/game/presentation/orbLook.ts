@@ -44,3 +44,26 @@ export function orbMarkerAlpha(left: number): number {
 }
 
 export const orbScale = (kind: OrbKind): number => kind === OrbKind.ultimate ? ULTIMATE_ORB_SCALE : EX_ORB_SCALE;
+
+export const ORB_BURST_FRAMES = 30;
+
+export interface OrbSighting {
+  shown: OrbKind;
+  bursting: boolean;
+  pickupSerial: number;
+  burstKind: OrbKind;
+  burstEnd: number;
+}
+
+export const createOrbSighting = (): OrbSighting => ({ shown: OrbKind.none, bursting: false, pickupSerial: 0, burstKind: OrbKind.none, burstEnd: 0 });
+
+export function sightOrb(seen: OrbSighting, orbs: Readonly<MatchOrbs>, frame: number): void {
+  if (orbs.pickupSerial !== seen.pickupSerial) {
+    seen.pickupSerial = orbs.pickupSerial;
+    seen.burstKind = orbs.pickupSerial > 0 ? orbs.lastKind : OrbKind.none;
+    seen.burstEnd = frame + ORB_BURST_FRAMES;
+  }
+  const bursting = orbs.live === OrbKind.none && seen.burstKind !== OrbKind.none && frame < seen.burstEnd && frame >= seen.burstEnd - ORB_BURST_FRAMES;
+  seen.shown = orbs.live !== OrbKind.none ? orbs.live : bursting ? seen.burstKind : OrbKind.none;
+  seen.bursting = bursting;
+}

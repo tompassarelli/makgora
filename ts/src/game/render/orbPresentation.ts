@@ -1,6 +1,6 @@
 import { ORB_HEIGHT, type OrbClock, orbPoint, orbWarningFrames, warnedOrb } from "../sim/orbs";
 import { OrbKind } from "../sim/orbState";
-import { ORB_MARKER_SCALE_END, orbMarkerAlpha, orbMarkerScale, orbScale } from "../presentation/orbLook";
+import { ORB_MARKER_SCALE_END, type OrbSighting, createOrbSighting, orbMarkerAlpha, orbMarkerScale, orbScale, sightOrb } from "../presentation/orbLook";
 import { hideEffect, STOCK_MODELS, type WorldOrigin } from "./effects";
 
 export class OrbPresentation {
@@ -9,7 +9,9 @@ export class OrbPresentation {
   private readonly ultimateOrb: effect;
   private markerShown = false;
   private shown: OrbKind = OrbKind.none;
+  private bursting = false;
   private shownStage = -1;
+  private sighting?: OrbSighting;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     this.marker = AddSpecialEffect(STOCK_MODELS.massTeleportTarget, origin.x, origin.y);
@@ -33,15 +35,20 @@ export class OrbPresentation {
       hideEffect(this.marker, this.origin);
       this.markerShown = false;
     }
-    const live = playing ? game.orbs.live : OrbKind.none;
-    if (live === this.shown && stage === this.shownStage) return;
-    if (this.shown !== OrbKind.none) hideEffect(this.orb(this.shown), this.origin);
+    const seen = this.sighting ??= createOrbSighting();
+    sightOrb(seen, game.orbs, game.matchFrame);
+    const live = playing ? seen.shown : OrbKind.none;
+    const bursting = live !== OrbKind.none && seen.bursting;
+    if (live === this.shown && bursting === this.bursting && stage === this.shownStage) return;
+    if (this.shown !== OrbKind.none && live !== this.shown) hideEffect(this.orb(this.shown), this.origin);
     if (live !== OrbKind.none) {
       const orb = this.orb(live);
       BlzSetSpecialEffectPosition(orb, this.origin.x + point.x, this.origin.y, this.origin.z + point.z + ORB_HEIGHT);
       BlzSetSpecialEffectScale(orb, orbScale(live));
+      BlzPlaySpecialEffect(orb, bursting ? ANIM_TYPE_DEATH : live === OrbKind.ultimate ? ANIM_TYPE_STAND : ANIM_TYPE_BIRTH);
     }
     this.shown = live;
+    this.bursting = bursting;
     this.shownStage = stage;
   }
 

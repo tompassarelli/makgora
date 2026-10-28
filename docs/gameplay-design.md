@@ -2474,6 +2474,11 @@ amount never varies.
   meter-ready sound, and a pickup that is not wasted plays the confirm sound.
   The EX orb is a Frost Wyrm missile (blue) and the ultimate orb a larger Fire
   Ball missile (orange), both Classic stock models with no imports.
+  Fighters standing at centre often take an orb on the frame it spawns, so
+  every pickup, wasted or not, plays the orb's Death burst at the orb point
+  for half a second (presentation/orbLook.ts `sightOrb`); a CPU match on
+  2026-10-28 took 6 of its first 10 orbs on their spawn frame, which drew
+  nothing before.
 - **Rule.** Orbs are on in the standard ruleset; the stage menu's "Orbs:
   On/Off" button, or `-dev orbs on|off`, turns them off. They never appear in
   Training or in Classic and lore runs. `-dev meter N` and the tape op

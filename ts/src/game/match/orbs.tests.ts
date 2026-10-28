@@ -20,6 +20,7 @@ import {
   ORB_HEIGHT, ORB_INTERVAL_FRAMES, ORB_REACH, ORB_WARNING_FRAMES, ULTIMATE_ORB_GAIN, orbPoint, orbWarningFrames, scheduledOrb, touchesOrb, warnedOrb,
 } from "../sim/orbs";
 import { OrbKind } from "../sim/orbState";
+import { ORB_BURST_FRAMES, createOrbSighting, sightOrb } from "../presentation/orbLook";
 import { matchSpawnX, stepMatch } from "./step";
 
 const HOLD = 30;
@@ -245,4 +246,32 @@ test("Meters and orbs roll back and replay to the same state across a spawn and 
   assertEquals(firstStateDifference(straight.state, replayed.state), undefined);
   assertEquals(replayed.first.meter.ex, straight.first.meter.ex);
   assertEquals(replayed.first.meter.ultimate, straight.first.meter.ultimate);
+});
+
+test("An orb taken on the frame it spawns is still seen: it bursts at centre, and a live orb shows until taken [k1 scenario]", () => {
+  const b = bout();
+  const seen = createOrbSighting();
+  playTo(b, ORB_INTERVAL_FRAMES - 1);
+  sightOrb(seen, b.state.match.orbs, b.state.match.matchFrame);
+  assertEquals(seen.shown, OrbKind.none);
+  standAtOrb(b.first, 0);
+  step(b);
+  assertEquals(b.state.match.orbs.live, OrbKind.none);
+  assertEquals(b.state.match.orbs.pickupSerial, 1);
+  const shown: string[] = [];
+  for (let frame = 0; frame <= ORB_BURST_FRAMES; frame++) {
+    sightOrb(seen, b.state.match.orbs, b.state.match.matchFrame);
+    shown.push(`${seen.shown}${seen.bursting ? "b" : ""}`);
+    b.first.motion.x = f32(orbPoint(0).x + 400.0);
+    setWorldMotionValue(b.first.motion.meleeX, b.first.motion.x);
+    step(b);
+  }
+  assertEquals(shown.filter(entry => entry === `${OrbKind.ex}b`).length, ORB_BURST_FRAMES);
+  assertEquals(shown[ORB_BURST_FRAMES], `${OrbKind.none}`);
+  b.second.motion.x = f32(orbPoint(0).x + 400.0);
+  setWorldMotionValue(b.second.motion.meleeX, b.second.motion.x);
+  playTo(b, 2 * ORB_INTERVAL_FRAMES);
+  sightOrb(seen, b.state.match.orbs, b.state.match.matchFrame);
+  assertEquals(b.state.match.orbs.live, OrbKind.ex);
+  assertEquals(`${seen.shown}${seen.bursting ? "b" : ""}`, `${OrbKind.ex}`);
 });
