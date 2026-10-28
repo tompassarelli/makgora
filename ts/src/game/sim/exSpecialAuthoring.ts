@@ -31,7 +31,7 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial) => AuthoredSpecia
       if (originals[index] === spec) return upgraded[index] ?? spec;
     }
     const result: SpecialProjectile = {
-      ...spec, life: Math.round(spec.life * range), radius: f32(spec.radius * reach), effect: hit(spec.effect),
+      ...spec, life: Math.round(spec.life * range), radius: f32(spec.radius * reach), modelRadius: spec.modelRadius ?? (reach === 1.0 ? undefined : spec.radius), effect: hit(spec.effect),
       returnEffect: spec.returnEffect === undefined ? undefined : hit(spec.returnEffect),
       pool: spec.pool === undefined ? undefined : { ...spec.pool, growth: f32(spec.pool.growth * reach), maxRadius: f32(spec.pool.maxRadius * reach) },
       burstInto: spec.burstInto === undefined ? undefined : projectile(spec.burstInto),
