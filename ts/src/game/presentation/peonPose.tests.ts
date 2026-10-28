@@ -16,6 +16,7 @@ import { GOLD_SACK_CHARGE, GOLD_SACK_FIRST_ACTIVE } from "../fighters/peon/speci
 import { advanceFighterPose, createFighterPose } from "./fighterPose";
 import { FRAME_SECONDS } from "./frameClock";
 import { goldSackGlowAlpha } from "./peonPose";
+import { rules } from "../../generated/fighter-art/peon";
 
 const HELD_TICKS = 110;
 const FIRE_TICK = 130;
@@ -83,4 +84,10 @@ test("Holding Gold Sack plays the stuffing clip one frame per banked charge fram
   assertEquals(strike?.time, f32(GOLD_SACK_STRIKE_FRAME * FRAME_SECONDS), "the overhead bonk lands on its first active frame");
   assertTrue((strike?.glow ?? 0) > 0);
   assertTrue(swing.some((frame) => frame.time > f32(GOLD_SACK_STRIKE_FRAME * FRAME_SECONDS)));
+});
+
+test("Every clip Gold Sack plays, the stuffing and each stage's bonk, is kept on the timeline body the game draws [k1 scenario]", () => {
+  const played = new Set(heldGoldSack().filter((frame) => frame.action === SpecialAction.heroNeutral).map((frame) => frame.clip));
+  for (const clip of [GOLD_SACK_CHARGE_CLIP, ...GOLD_SACK_BONK_CLIPS]) played.add(clip.index);
+  for (const clip of played) assertEquals(clip !== undefined && rules.flashClips.includes(clip), true, `clip ${clip} is missing from Peon's drawn timeline`);
 });

@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PEON_CLIPS, PEON_FALLBACK_CLIP, PEON_PAIN_CLIPS } from "./clips";
-import { GOLD_SACK_BONK_CLIPS } from "./goldSackClips";
+import { GOLD_SACK_BONK_CLIPS, GOLD_SACK_CHARGE_CLIP } from "./goldSackClips";
 import type { HeroLook } from "../../presentation/model/look";
 import type { HeroClip } from "../../sim/heroes/hero";
 
@@ -11,7 +11,7 @@ export const peonLook: HeroLook = {
   model: "units\\orc\\Peon\\Peon.mdl",
   objectId: 0x6d667065,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNPeon.blp",
-  clips: PEON_CLIPS,
+  clips: { ...PEON_CLIPS, neutralSpecial: GOLD_SACK_CHARGE_CLIP, neutralSpecialAir: GOLD_SACK_CHARGE_CLIP },
   followUpClips: { neutralSpecialFollowUp: SACK_BONKS, neutralSpecialFollowUpAir: SACK_BONKS },
   damageClips: PEON_PAIN_CLIPS,
   fallback: PEON_FALLBACK_CLIP, defeat: "death",
