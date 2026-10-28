@@ -24,7 +24,7 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.forsakenPaladin]: { side: { status: true } },
   [Character.dreadlord]: { side: { heal: true }, down: { status: true } },
   [Character.shadowHunter]: { down: { status: true } },
-  [Character.pitLord]: { ultimate: { status: true } },
+  [Character.pitLord]: { neutral: { status: true }, ultimate: { status: true } },
   [Character.beastmaster]: {},
   [Character.lichKing]: { side: { status: true } },
   [Character.thrall]: {},

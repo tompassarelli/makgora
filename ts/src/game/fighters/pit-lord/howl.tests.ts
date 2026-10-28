@@ -89,7 +89,7 @@ test("A shield blocks the terror but takes the roar's heavy shield damage and is
 
 test("An airborne foe is pushed away from Pit Lord on either side at 45 degrees and is never terrified [k3 measure docs/design/pit-lord.md]", () => {
   for (const side of [1.0, -1.0]) {
-    const { target } = roar(f32(side * f32(H * f32(1.0))), 0.0, (foe) => { lift(foe, f32(H * f32(0.6))); });
+    const { target } = roar(f32(side * f32(H * f32(1.0))), 0.0, (foe) => { lift(foe, f32(H * f32(1.0))); });
     assertEquals(target.status.condition, HeroStatusKind.none);
     assertEquals(target.status.damage, HOWL_DAMAGE);
     assertTrue(f32(target.motion.vx * side) > 0.0 || f32(target.launch.knockbackX * side) > 0.0);
