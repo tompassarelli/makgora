@@ -37,6 +37,18 @@ set the timing relations; every region, damage and angle is original.
   frames are the clean hit (12%), the rest 9%. Both launch straight up with
   base 80 and 75 and growth 70, so the target rises into his next jump at
   low percent and outgrows the juggle by the time a forward air kills.
+- Up tilt is the same scoop from the ground (2026-10-28, replacing the close
+  elbow): the staff sweeps from low in front (frame 6) through overhead
+  (frame 9) to behind his back (frame 11), one capsule per frame on the drawn
+  shaft, so it hits a standing foe in front and anyone above him. 8% at 85°,
+  just forward of vertical, base 90, growth 55. It extends combos: since
+  landing ends hitstun, the base, not the growth, keeps a grounded foe in the
+  air until Chen can act. On Mountain King (weight 84, the roster median) it is
+  a true combo into another up tilt or an up air from 0 to 80% (20 frames of
+  advantage at 0%, 33 at 80%) and into neither from 90%; knockback is 145 at
+  100% and 166 at 150%, and it first kills from mid-stage at 315%. Floaty
+  Kael'thas drifts above the staff and escapes it. With no DI a standing
+  chain ends after three up tilts; either DI ends it after one.
 - Hitstun keeps the shared rule (0.4 frames per knockback unit); a 1.5x
   multiplier on his aerial hits was tried and dropped, because the chain below
   holds without it. Landing ends hitstun, so the combo is the up air's lift. Aerials auto-cancel on
@@ -97,7 +109,7 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 |---|---|---|---|---|
 | Jab 1 / 2 / 3 | Palm, short staff butt, belly check; fresh presses continue | 4/2/11/0, 3.75%; 5/2/13/0, 3.75%; 7/3/18/0, 6.25% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu jab](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Forward tilt / angled up / down | Planted staff thrust at chest, shoulder or knee | 9/3/21/0; 11.25% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu forward tilt](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
-| Up tilt | Close elbow lifts a jumper | 7/4/20/0; 8.75% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken up tilt](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
+| Up tilt | Staff scoop: low in front, over the hat, behind him; pops a foe straight up into another up tilt or an up air | 6/6/15/0; 8% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Captain Falcon up air](https://www.ssbwiki.com/Captain_Falcon_%28SSBM%29#Aerial_attacks) |
 | Down tilt | Low heel sweep starts a juggle | 7/3/20/0; 7.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu down tilt](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Dash attack | Belly-first stumble; punish the long exit | 10/5/27/0; 12.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken dash attack](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Forward smash | Two-handed staff sweep, 118-unit reach | 19/4/34/0; 22.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu forward smash](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
@@ -249,7 +261,7 @@ staff above the hat (-8/138 to 36/172), down smash follows the sweep frame by
 frame (front 36/63 to 115/48, under 11/41 to 70/-9 and -33/44 to -28/-31,
 back -55/78 to -111/21), and Storm Rise adds a radius 12 capsule across the
 overhead spin, -150/142 to 140/142, beside its body capsule. Palm, elbow,
-right-hand checks, the barrel shoulder and kicks (jab, jab 3, up tilt, down
+right-hand checks, the barrel shoulder and kicks (jab, jab 3, down
 tilt, dash attack, up smash and the four kicking aerials) are limb strikes;
 Breath of Fire and the spirits of the ultimate are spell strikes.
 

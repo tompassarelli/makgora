@@ -12,7 +12,10 @@ const kegLift: Gesture = {chest: -22, head: -15, staff: -165, palm: -165, elbow:
 const kegSlam: Gesture = {chest: 38, head: 22, staff: 125, wrist: 20, palm: 10, front: -100, knee: 125, back: -85, backKnee: 125};
 const kickOut: Gesture = {lean: -28, chest: -12, head: -10, back: 50, backKnee: 90, staff: 115, wrist: 30, palm: 60};
 const scoop: Gesture = {chest: -12, lean: -8, head: -15, front: -30, knee: 60, back: 15, backKnee: 55, palm: 20};
-export const AERIAL_BEATS: Partial<Record<HeroPose, readonly Beat[]>> = {
+const dip: Gesture = {chest: 30, lean: 6, head: 10, front: -30, knee: 45, back: -20, backKnee: 45, palm: -30};
+const settle: Gesture = {chest: 4, front: -5, knee: 10, back: 5, backKnee: 10};
+const rise: Gesture = {chest: -10, head: -20, front: -10, knee: 15, back: 15, backKnee: 20, palm: 20};
+export const CHEN_BEATS: Partial<Record<HeroPose, readonly Beat[]>> = {
   downAir: [
     {at: 4, g: {...kegLift, chest: -8, staff: -110, palm: -110}, keg: [-30, 0, 150], kegScale: 1.5},
     {at: 9, g: kegLift, keg: [-15, 0, 185], kegScale: 2.1},
@@ -48,5 +51,25 @@ export const AERIAL_BEATS: Partial<Record<HeroPose, readonly Beat[]>> = {
     {at: 12, g: {...scoop, chest: -26, lean: -20, head: -25}, staff: [-100, 76]},
     {at: 19, g: {...scoop, chest: -22, lean: -16, head: -20}, staff: [-96, 70]},
     {at: 27, g: {chest: -8, front: -20, knee: 40, back: 10, backKnee: 35}},
+  ],
+  upTilt: [
+    {at: 2, g: dip, staff: [64, 12]},
+    {at: 3, g: {...dip, chest: 26}, staff: [84, 16]},
+    {at: 4, g: {...dip, chest: 22}, staff: [100, 18]},
+    {at: 5, g: {...dip, chest: 14, head: 0}, staff: [112, 22]},
+    {at: 6, g: {...rise, chest: 4, head: -5}, staff: [118, 88]},
+    {at: 7, g: {...rise, chest: -4}, staff: [92, 150]},
+    {at: 8, g: rise, staff: [30, 186]},
+    {at: 9, g: {...rise, chest: -16, head: -25}, staff: [-60, 170]},
+    {at: 10, g: {...rise, chest: -20, head: -25}, staff: [-100, 104]},
+    {at: 15, g: {...rise, chest: -16, head: -20}, staff: [-98, 92]},
+    {at: 17, g: {...rise, chest: -10, head: -15}, staff: [-75, 40]},
+    {at: 19, g: {...rise, chest: -6, head: -10}, staff: [-40, 20]},
+    {at: 20, g: settle, staff: [-10, 16]},
+    {at: 21, g: settle, staff: [25, 16]},
+    {at: 22, g: settle, staff: [60, 20]},
+    {at: 23, g: settle, staff: [95, 30]},
+    {at: 24, g: settle, staff: [118, 58]},
+    {at: 25, g: settle, staff: [128, 84]},
   ],
 };
