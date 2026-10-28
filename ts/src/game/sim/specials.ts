@@ -89,11 +89,11 @@ export const DEMONHUNTER_IMMOLATE_DURATION = 15;
 
 export const RIFLEMAN_RECOVERY_STARTUP_FRAMES = 4;
 export const RIFLEMAN_RECOVERY_PROTECTION_END = 7;
-const RIFLEMAN_RECOIL_SPEED = f32(29.7);
+const RIFLEMAN_RECOIL_SPEED = f32(31.317);
 const RIFLEMAN_RECOIL_SHOT_SPEED = 28.0;
 export const RIFLEMAN_SECOND_SHOT_FIRST = 12;
 export const RIFLEMAN_SECOND_SHOT_LAST = 24;
-const RIFLEMAN_SECOND_SHOT_SPEED = f32(16.2);
+const RIFLEMAN_SECOND_SHOT_SPEED = f32(17.082);
 export const RIFLEMAN_SECOND_SHOT_FORM = 1;
 
 const AIM_DIAGONAL = 0.7071067690849304;
@@ -685,7 +685,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
       if (aimX === 0 && aimZ >= 0) {
 
         spawnProjectileMotion(owner, ProjectileKind.recoil, f32(owner.facing * 2.0), -RIFLEMAN_RECOIL_SHOT_SPEED, 8, shotSerial);
-        motion.vx = f32(f32(special.direction * f32(7.2)) * (special.ex ? 1.25 : 1.0));
+        motion.vx = f32(f32(special.direction * f32(7.592)) * (special.ex ? 1.25 : 1.0));
         motion.vz = f32(RIFLEMAN_RECOIL_SPEED * (special.ex ? 1.25 : 1.0));
       } else {
         fireRecoil(owner, aimX, aimZ, RIFLEMAN_RECOIL_SPEED, shotSerial);
