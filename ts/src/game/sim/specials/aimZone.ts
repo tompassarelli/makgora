@@ -40,13 +40,7 @@ export function changesAimZone(f: Readonly<Fighter>, x: number, z: number): bool
 export function steerAim(special: Fighter["special"], move: Readonly<AuthoredSpecial>, input: Readonly<Controls>): void {
   const x = chargedAimX(input);
   const z = chargedAimZ(input);
-  if (move.aimsSideways === true) {
-    if (x !== 0) special.aimX = x;
-    return;
-  }
   if (x === 0 && z === 0) return;
   special.aimX = x;
   special.aimZ = z;
 }
-
-export const stepSide = (f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): number => (move.aimsSideways === true && f.special.aimX !== 0 ? f.special.aimX : f.facing);

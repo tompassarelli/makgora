@@ -197,12 +197,6 @@ function aimUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: 
   aimEightWay(f, stage, side, reach, input);
 }
 
-function aimSideSpecial(f: Readonly<Fighter>, side: number, input: Controls): void {
-  if (f.special.action !== SpecialAction.heroSide) return;
-  const move = runningHeroSpecial(f);
-  if (move?.aimsSideways === true && move.aimFrames !== undefined && f.special.frame < move.aimFrames) input.direction = -side;
-}
-
 function aimEightWay(f: Readonly<Fighter>, stage: number, side: number, reach: number, input: Controls): void {
   const left = mainDeckLeft(stage);
   const right = mainDeckRight(stage);
@@ -319,7 +313,6 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
   else if (z < floor && outside < LEDGE_LINE_NEAR) input.direction = side;
   else input.direction = x < (side < 0 ? f32(left + 60) : f32(right - 60)) ? 1 : -1;
   aimUpSpecial(fighter, stage, side, input);
-  aimSideSpecial(fighter, side, input);
 
 
   if (isTumbling(fighter) && fighter.launch.hitstun <= 0 && input.direction !== 0 && fighter.motion.previousStickSide === input.direction
@@ -351,10 +344,10 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
     if (fighter.jump.remaining > 0 && fighter.attack.cooldown === 0 && !specialFirst) {
       input.jumpPressed = true;
       input.jumpHeld = true;
-    } else if (gameplan?.recovery.sideSpecial === true && outside > 0 && z >= floor && sideStepStartable(fighter, -side)) {
+    } else if (gameplan?.recovery.sideSpecial === true && outside > 0 && z >= floor && sideStepStartable(fighter, side)) {
       input.specialPressed = true;
-      input.direction = -side;
-      input.specialX = -side;
+      input.direction = side;
+      input.specialX = side;
     } else if (z < f32(floor + 50)) {
       input.specialPressed = true;
       input.specialX = input.direction;

@@ -326,7 +326,6 @@ export interface AuthoredSpecial {
   readonly fallLandingLag?: number | undefined;
 
   readonly aimFrames?: number | undefined;
-  readonly aimsSideways?: true | undefined;
   readonly facesStick?: boolean | undefined;
 
   readonly hurt?: readonly HurtPose[] | undefined;
