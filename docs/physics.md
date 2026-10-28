@@ -830,6 +830,27 @@ diagonal motion, fast swept platform contact, sliding, and the exact recovery
 boundary. Numerical speed, decay, motion duration and native feel remain
 separate calibration work.
 
+### What the wavedash landing flows into
+
+The wavedash landing flows into a dash or a walk depending on whether the stick made a fresh
+press during the 10 ticks of air-dodge landing lag (smashcraft:ts/src/game/sim/groundMovement.ts). The
+landing records the side the stick held as it touched down. Releasing that
+side, or crossing to the other, frees the stick; a press past the 0.8 dash
+threshold within three ticks of crossing the smash deadzone, at any tick of
+the lag, buffers a dash on that side (`landing.dashBuffer`), and the dash
+starts on the first actionable tick if the stick is still on that side, then
+runs on as any dash does. A stick held through the whole lag never counts as
+fresh: a full keyboard or analog press on the landing side walks out instead
+(`landing.heldSide`, cleared when the stick leaves that side). The walk starts
+from the slide's speed and uses the ordinary walk acceleration and taper: a
+slide slower than walk speed ramps up toward it, a faster one sheds speed at
+traction down to it. As in Melee, a held stick gives a walk because no smash
+input happened. Before 28 Oct a full stick (every keyboard press) held through
+the lag dashed on the first actionable tick, and an analog re-press below full
+during the lag walked unless it landed in the last three ticks. The buffer
+fields are rollback state (`landing.wavedash`, `landing.dashBuffer`,
+`landing.heldSide`).
+
 The 18-world-unit speed is an independently chosen research tuning value
 (3 times the rendering scale of 6), not a sourced Melee parameter. At the former
 speed 8, a regression starting jump from grounded, advancing six ticks total,
