@@ -14,11 +14,11 @@ The deciding evidence is broader than the C# example: SDL's device drivers; Micr
 
 The Controller page offers padbridge's presets (its README has the
 table): **melee** (default; Melee's buttons by function: A attack, B special,
-X/Y jump, RB grab, both triggers shield, no tilt or short-hop button),
+X/Y jump, RB grab, both triggers shield, no walk or short-hop button),
 **z-jump** (RB jumps, X grabs) and **tom** (Tom's own: B and RB grab, X special,
-Y and LB jump, RT tilt, LT shield, L3 short hop). Recorded pad scripts and test
-drivers use the hidden **script** preset (B/Y jump, X special, LB tilt, both
-triggers shield). Holding tilt, on a pad or the keyboard, shortens the stick
+Y and LB jump, RT walk, LT shield, L3 short hop). Recorded pad scripts and test
+drivers use the hidden **script** preset (B/Y jump, X special, LB walk, both
+triggers shield). Holding walk, on a pad or the keyboard, shortens the stick
 like a box controller's modifier: a full press sends x = ±0.6875, up 0.65 and
 down −0.675, just inside roll and spot dodge, tap jump and crouch (#282,
 smashcraft:docs/gameplay-design.md, "Stick zones"). A GameCube pad maps by its printed letters only in the SDL
