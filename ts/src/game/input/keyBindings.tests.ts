@@ -5,19 +5,19 @@ import { BINDING_PRESETS, type BindingPreset, ACTION_LABELS, decodeBindings, enc
 const code = (character: string) => character.charCodeAt(0);
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
-test("every preset binds C-down to P, Strong to Y, Tilt to H and C-up to J plus 9 (0 on Custom, which keeps X as a second Strong) [k2 property]", () => {
+test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to 9 (- on Custom), and Strong to Y (0 on Custom) [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
+    assertEquals(slots(preset, Action.cLeft), "J —", `${preset} C-left`);
+    assertEquals(slots(preset, Action.cRight), "L —", `${preset} C-right`);
     assertEquals(slots(preset, Action.cDown), "P —", `${preset} C-down`);
-    assertEquals(slots(preset, Action.walk), "H —", `${preset} Tilt`);
-    assertEquals(slots(preset, Action.cLeft).charAt(0), "B", `${preset} C-left`);
-    assertEquals(slots(preset, Action.cRight), "M —", `${preset} C-right`);
+    assertEquals(slots(preset, Action.walk), "K —", `${preset} Walk`);
   }
-  assertEquals(slots("wasd", Action.cUp), "9 J");
-  assertEquals(slots("standard", Action.cUp), "9 J");
-  assertEquals(slots("custom", Action.cUp), "0 J");
+  assertEquals(slots("wasd", Action.cUp), "9 —");
+  assertEquals(slots("standard", Action.cUp), "9 —");
+  assertEquals(slots("custom", Action.cUp), "- —");
   assertEquals(slots("wasd", Action.strong), "Y —");
   assertEquals(slots("standard", Action.strong), "Y —");
-  assertEquals(slots("custom", Action.strong), "Y X");
+  assertEquals(slots("custom", Action.strong), "0 —");
 });
 
 test("no preset binds one key to two actions, and each survives a save and load unchanged [k2 property]", () => {

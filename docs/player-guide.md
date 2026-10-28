@@ -108,7 +108,7 @@ WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop
 through platforms, Space/8 to jump, Q to shield or air-dodge, 0 for light
 shield, O to grab, N to attack, and U for a special. Hitbox moves with W/R,
 aims up with Space and down with E, jumps with 8 and shields with Q (light
-shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, / for C-left, 0 for C-up and Y/X for Strong. Shield + N or O
+shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, - for C-up and 0 for Strong. Shield + N or O
 grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
 backward, up, or down; after the pummel, throw or the opponent goes free. Mash
@@ -136,7 +136,7 @@ lasts until the dash would become a run. On keyboard, hold down together with
 the back key: the diagonal counts as a light tilt (on a platform, a fresh down
 press drops you through it).
 
-Attacks buffer for six frames, including through jump squat. Hold H to walk;
+Attacks buffer for six frames, including through jump squat. Hold K to walk;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you
 pass through; so does down with the tilt modifier held. Held down keeps you crouching; attack gives down tilt and special
@@ -144,8 +144,8 @@ gives down-B. Release down, then hard-press it to drop immediately. Analog
 inputs need a quick flick; keyboard inputs need a fresh down-key press. The
 drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
-N with a direction performs a tilt when standing, walking or crouching; out of a dash or a run N is the dash attack, a fresh flick included. The C-stick keys always give the tilt they name on the ground, even out of a dash or a run: you stop and tilt at once. Strong (Y on every layout, plus X on Custom; LB or RB on a pad) gives the smashes, after Rivals of Aether's strong button. Strong is a modifier and never attacks on its own. Strong + a direction is that direction's smash, with no N press: up, down, or forward for a side, turning to face it. Press a direction while holding Strong, or press Strong with a direction held (or just after pressing one). It works standing, walking (hold the walk modifier), crouching, in a dash's first three frames, and out of jump squat for the up smash; Strong + up is the up smash at any point of a dash or a run. Where your state allows no smash (forward or down in a run, or later in a dash), Strong + a direction does nothing and you keep moving as you would without Strong, so down in a run still crouches and a fresh direction from that crouch smashes. While Strong is held standing still, the directions aim smashes and do not move you; release Strong to move again. Strong + N still gives the smash your state allows (in a run or late in a dash, forward or down stays the dash attack), and Strong + N with no direction is the forward smash the way you face. Keep holding Strong or N to charge it. In the air, Strong + N with a direction gives that aerial, as N does. On the ground the C-stick keys give tilts, never smashes: C-left and C-right are the forward tilt (turning to face that side first), C-up the up tilt and C-down the down tilt; out of a dash or a run they give the dash attack, and in the air they give the aerials. B is
-C-left; P is C-down; 9 or J is C-up; M is C-right (0 or J is C-up on Custom). C-down air preserves
+N with a direction performs a tilt when standing, walking or crouching; out of a dash or a run N is the dash attack, a fresh flick included. The C-stick keys always give the tilt they name on the ground, even out of a dash or a run: you stop and tilt at once. Strong (Y on WASD and Hitbox, 0 on Custom; LB or RB on a pad) gives the smashes, after Rivals of Aether's strong button. Strong is a modifier and never attacks on its own. Strong + a direction is that direction's smash, with no N press: up, down, or forward for a side, turning to face it. Press a direction while holding Strong, or press Strong with a direction held (or just after pressing one). It works standing, walking (hold the walk modifier), crouching, in a dash's first three frames, and out of jump squat for the up smash; Strong + up is the up smash at any point of a dash or a run. Where your state allows no smash (forward or down in a run, or later in a dash), Strong + a direction does nothing and you keep moving as you would without Strong, so down in a run still crouches and a fresh direction from that crouch smashes. While Strong is held standing still, the directions aim smashes and do not move you; release Strong to move again. Strong + N still gives the smash your state allows (in a run or late in a dash, forward or down stays the dash attack), and Strong + N with no direction is the forward smash the way you face. Keep holding Strong or N to charge it. In the air, Strong + N with a direction gives that aerial, as N does. On the ground the C-stick keys give tilts, never smashes: C-left and C-right are the forward tilt (turning to face that side first), C-up the up tilt and C-down the down tilt; out of a dash or a run they give the dash attack, and in the air they give the aerials. J is
+C-left; P is C-down; 9 is C-up (- on Custom); L is C-right. C-down air preserves
 normal aerial momentum. WASD and Hitbox use 7 for right trigger;
 Custom uses 8. T is unbound by default.
 

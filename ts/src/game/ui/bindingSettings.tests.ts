@@ -40,14 +40,14 @@ const unbound = (settings: Readonly<BindingSettings>) => unboundActions(settings
 
 test("a rebind swaps with the action holding the key, Delete and the x clear a slot, reserved keys stay refused and Reset to layout restores the preset [k2 property]", () => {
   const settings = customSettings();
-  assertEquals(slots(settings, Action.walk), "H —", "Custom Walk");
-  assertEquals(slots(settings, Action.strong), "Y X", "Custom Strong");
+  assertEquals(slots(settings, Action.walk), "K —", "Custom Walk");
+  assertEquals(slots(settings, Action.strong), "0 —", "Custom Strong");
 
   beginBindingCapture(settings, Action.walk, 0);
   assertEquals(captureBinding(settings, code("0")), true);
   assertEquals(slots(settings, Action.walk), "0 —", "Walk after the swap");
-  assertEquals(slots(settings, Action.cUp), "H J", "C-up after the swap");
-  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.cUp]}.`);
+  assertEquals(slots(settings, Action.strong), "K —", "Strong after the swap");
+  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.strong]}.`);
   assertEquals(settings.capture, undefined);
 
   beginBindingCapture(settings, Action.walk, 0);
@@ -57,10 +57,9 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(settings.message, `${ACTION_LABELS[Action.walk]} is now unbound.`);
   assertEquals(settings.capture, undefined);
 
-  clearKey(settings, code("X"));
-  assertEquals(slots(settings, Action.strong), "Y —", "Strong after its x");
-  assertEquals(settings.message, `X cleared from ${ACTION_LABELS[Action.strong]}.`);
-  clearKey(settings, code("Y"));
+  clearKey(settings, code("K"));
+  assertEquals(slots(settings, Action.strong), "— —", "Strong after its x");
+  assertEquals(settings.message, `K cleared from ${ACTION_LABELS[Action.strong]}.`);
   assertEquals(unbound(settings), `${Action.walk},${Action.strong}`);
   const before = encodeBindings(settings.bindings);
   clearKey(settings, code("C"));
@@ -104,18 +103,18 @@ test("the = and - keys capture as bindings, are named, and have a cap on the con
   assertEquals(rightEdge < f32(0.09) + f32(0.66), true, "keyboard stays inside the controls panel");
 });
 
-test("Y captures as a binding for any action, swapping with Strong, and is no longer reserved [k2 property]", () => {
+test("Y captures as a binding for any action, swapping with the action that holds it, and is no longer reserved [k2 property]", () => {
   const settings = customSettings();
   assertEquals(reservedReason(code("Y")), undefined);
   beginBindingCapture(settings, Action.attack, 0);
   assertEquals(captureBinding(settings, code("Y")), true);
   assertEquals(slots(settings, Action.attack), "Y —", "Attack after binding Y");
-  assertEquals(slots(settings, Action.strong), "N X", "Strong after the swap");
-  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.strong]}.`);
-  clearKey(settings, code("Y"));
+  assertEquals(slots(settings, Action.strong), "0 —", "Strong before the swap");
   beginBindingCapture(settings, Action.strong, 0);
   assertEquals(captureBinding(settings, code("Y")), true);
-  assertEquals(slots(settings, Action.strong), "Y X", "Strong after binding Y");
+  assertEquals(slots(settings, Action.strong), "Y —", "Strong after binding Y");
+  assertEquals(slots(settings, Action.attack), "0 —", "Attack after the swap");
+  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.attack]}.`);
   assertEquals(settings.capture, undefined);
 });
 

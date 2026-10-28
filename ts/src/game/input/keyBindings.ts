@@ -93,14 +93,14 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.leftTrigger, code("Q"));
   if (custom) bind(Action.rightTrigger, code("8"), code("G"));
   else bind(Action.rightTrigger, code("7"));
-  bind(Action.cLeft, code("B"), custom ? SLASH : EMPTY);
-  bind(Action.cRight, code("M"));
-  bind(Action.cUp, code(custom ? "0" : "9"), code("J"));
+  bind(Action.cLeft, code("J"));
+  bind(Action.cRight, code("L"));
+  bind(Action.cUp, custom ? MINUS : code("9"));
   bind(Action.cDown, code("P"));
-  bind(Action.walk, code("H"));
+  bind(Action.walk, code("K"));
   bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
-  bind(Action.strong, START_KEY, custom ? code("X") : EMPTY);
+  bind(Action.strong, custom ? code("0") : START_KEY);
   return { keys };
 }
 
@@ -113,6 +113,7 @@ export function previousStandardKeys(): number[] {
   bind(Action.jump, code("Z"), code("8"));
   bind(Action.rightTrigger, code("7"), code("G"));
   bind(Action.cLeft, code("B"), SLASH);
+  bind(Action.cRight, code("M"), EMPTY);
   bind(Action.lightShield, code("A"), EMPTY);
   bind(Action.cUp, code("J"), EMPTY);
   bind(Action.cDown, code("H"), EMPTY);
