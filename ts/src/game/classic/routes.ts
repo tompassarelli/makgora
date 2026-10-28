@@ -341,6 +341,18 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     ],
     ending: ["The Legion's shadow has lifted. Azeroth's children chose to stand together.", "I opened the wrong door once. This time, I showed them the way home.", "My work is finished. Their future belongs to them."],
   },
+  {
+    fighter: C.archimonde, boss: BossKind.kiljaeden,
+    story: "Archimonde marches the Burning Legion up Mount Hyjal to drain the World Tree, and every champion on his road learns what defiance costs.",
+    fights: [
+      fight(C.thrall, 3, "The blood pact is broken, Defiler. The Horde will never drink from your cup again."),
+      fight(C.jaina, 11, "The Kirin Tor wrote of you in their oldest books. They never wrote how you fall."),
+      fight(C.dreadlord, 6, "Tichondrius failed you, my lord. Let me prove the nathrezim still have their uses."),
+      fight(C.medivh, 10, "I opened the door for your master once. I have come to close it on you."),
+      fight([C.malfurion, C.demonHunter], 10, "Nordrassil's roots run deep, demon. You will not drink its strength."),
+    ],
+    ending: ["Kil'jaeden thought to take my place. The Legion answers to one master.", "Hyjal is quiet now. The World Tree's strength flows into me.", "Kneel, little world. Your gods have abandoned you."],
+  },
 ];
 
 export const CLASSIC_CHARACTERS: readonly Character[] = CLASSIC_ROUTES.map(route => route.fighter);

@@ -6,7 +6,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { SpecialAction } from "./codes";
 import type { NamedMove } from "./heroes/hero";
-import { heroDefinition } from "../roster/kits";
+import { catalogHero } from "./tuning";
 import type { FighterMoves } from "./heroMoves";
 import { FOLLOW_UP_FORM, type AuthoredSpecial, type SpecialKit, SpecialForm, SpecialSlot, specialForm, specialKit } from "./specials/schema";
 import { ORIGINAL_KITS } from "./originalKits";
@@ -91,7 +91,7 @@ function heroInspirations(moves: Readonly<FighterMoves>): { move: string; note: 
 
 
 export function fighterKit(character: number): FighterKitText {
-  const hero = heroDefinition(character);
+  const hero = catalogHero(character);
   if (hero !== undefined) {
     const { specials } = hero;
     const slots = [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, SpecialSlot.down];
@@ -119,7 +119,7 @@ export function fighterKit(character: number): FighterKitText {
 
 /** The name of a running special: its named form's, else the special's. */
 export function specialName(character: number, action: number, form: number): string {
-  const hero = heroDefinition(character);
+  const hero = catalogHero(character);
   if (hero !== undefined) {
     const { specials } = hero;
     if (action === SpecialAction.heroUltimate) return ultimateText(character)?.name ?? "Special";

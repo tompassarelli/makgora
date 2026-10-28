@@ -13,7 +13,7 @@ attack, B for specials, X/Y to jump, RB to grab and LB for Strong;
 Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
 short hop and RB for Strong. In both layouts, either trigger shields or air-dodges and
 Start pauses. The current prototype includes character and stage
-selection, 26 fighters, a bot opponent, floating platforms, blast zones,
+selection, 27 fighters, a bot opponent, floating platforms, blast zones,
 stocks, rematches, and configurable controls.
 
 For solo practice, place only your own fighter chip and press Y, then choose

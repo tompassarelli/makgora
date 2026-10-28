@@ -26,6 +26,7 @@ import * as anubarak from "./white-models/anub'arak";
 import * as malfurionStormrage from "./white-models/malfurion-stormrage";
 import * as medivh from "./white-models/medivh";
 import * as kobold from "./white-models/kobold";
+import * as archimonde from "./white-models/archimonde";
 export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   1: rifleman.whiteModel,
   2: illidan.whiteModel,
@@ -53,4 +54,5 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   24: malfurionStormrage.whiteModel,
   25: medivh.whiteModel,
   26: kobold.whiteModel,
+  29: archimonde.whiteModel,
 };

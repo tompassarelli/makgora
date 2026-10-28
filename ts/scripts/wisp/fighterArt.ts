@@ -76,14 +76,21 @@ const codeDigest = (tool: string) => sha256(...stepCode(tool).flatMap((path) => 
 
 export const derivedStepCode = (): ReadonlySet<string> => new Set(STEPS.flatMap((step) => stepCode(step.tool)));
 
-const ownedFiles = (fighter: Fighter) => [`ts/src/generated/clips/${fighter.slug}.ts`, `ts/src/generated/assets/white-models/${fighter.slug}.ts`, `ts/src/generated/assets/white-facts/${fighter.slug}.ts`];
+const STEP_FILES: Readonly<Record<Step["name"], { readonly files: (slug: string) => readonly string[]; readonly facts: readonly string[] }>> = {
+  clips: { files: (slug) => [`ts/src/generated/clips/${slug}.ts`], facts: ["OriginalClip"] },
+  bodies: { files: (slug) => [`ts/src/generated/clips/${slug}.ts`], facts: ["OriginalClip", "TimelineBody"] },
+  flashes: { files: (slug) => [`ts/src/generated/assets/white-models/${slug}.ts`, `ts/src/generated/assets/white-facts/${slug}.ts`], facts: ["White-"] },
+};
 
-const ownedFacts = (fighter: Fighter) => ["OriginalClip", "TimelineBody", "White-"].map((kind) => `war3mapImported_${fighter.name}${kind}`);
+const factPrefixes = (fighter: Fighter, step: Step) => STEP_FILES[step.name].facts.map((kind) => `war3mapImported_${fighter.name}${kind}`);
 
-function generatedFiles(fighter: Fighter, root: string): string[] {
+const stepOwns = (fighter: Fighter, step: Step, path: string) =>
+  STEP_FILES[step.name].files(fighter.slug).includes(path) || factPrefixes(fighter, step).some((prefix) => path.startsWith(join(MODEL_FACTS, prefix)));
+
+function generatedFiles(fighter: Fighter, step: Step, root: string): string[] {
   const directory = join(root, MODEL_FACTS);
-  const facts = existsSync(directory) ? readdirSync(directory).filter((file) => ownedFacts(fighter).some((prefix) => file.startsWith(prefix))) : [];
-  return [...ownedFiles(fighter).filter((path) => existsSync(join(root, path))), ...facts.map((file) => join(MODEL_FACTS, file))].sort();
+  const facts = existsSync(directory) ? readdirSync(directory).filter((file) => factPrefixes(fighter, step).some((prefix) => file.startsWith(prefix))) : [];
+  return [...STEP_FILES[step.name].files(fighter.slug).filter((path) => existsSync(join(root, path))), ...facts.map((file) => join(MODEL_FACTS, file))].sort();
 }
 
 const copyFile = (from: string, to: string) => {
@@ -103,7 +110,7 @@ function saveStep(fighter: Fighter, step: Step, key: string, work: Work): void {
   mkdirSync(dirname(final), { recursive: true });
   const staging = mkdtempSync(join(dirname(final), ".add-"));
   copyTree(work[step.output], join(staging, "output"));
-  for (const path of generatedFiles(fighter, work.checkout)) {
+  for (const path of generatedFiles(fighter, step, work.checkout)) {
     mkdirSync(dirname(join(staging, "checkout", path)), { recursive: true });
     copyFileSync(join(work.checkout, path), join(staging, "checkout", path));
   }
@@ -117,8 +124,8 @@ function restoreStep(fighter: Fighter, step: Step, key: string, work: Work): voi
   mkdirSync(work[step.output], { recursive: true });
   if (existsSync(join(saved, "output"))) copyTree(join(saved, "output"), work[step.output]);
   const checkout = join(saved, "checkout"), kept = new Set(existsSync(checkout) ? listFiles(checkout) : []);
-  for (const path of kept) writeGenerated(join(work.checkout, path), readFileSync(join(checkout, path), "utf8"));
-  for (const path of generatedFiles(fighter, work.checkout)) if (!kept.has(path)) removeTree(join(work.checkout, path));
+  for (const path of kept) if (stepOwns(fighter, step, path)) writeGenerated(join(work.checkout, path), readFileSync(join(checkout, path), "utf8"));
+  for (const path of generatedFiles(fighter, step, work.checkout)) if (!kept.has(path)) removeTree(join(work.checkout, path));
 }
 
 const runTool = (fighter: Fighter, step: Step, work: Work) => Effect.gen(function*() {
@@ -181,8 +188,7 @@ const buildFighter = (plan: FighterPlan, manifest: Manifest, assets: string, roo
       for (const family of readdirSync(assets)) if (family !== FAMILY.pool && family !== HERO_MODELS) symlinkSync(join(assets, family), join(work.assets, family));
       linkHeroModels(manifest[HERO_MODELS], fighter, assets, join(work.assets, HERO_MODELS));
       symlinkSync(work.pool, join(work.assets, FAMILY.pool));
-      const restored = (["pool", "impact"] as const).map((output) => STEPS.findLastIndex((step, index) => index < cached && step.output === output));
-      for (const index of restored.filter((index) => index >= 0).sort()) restoreStep(fighter, STEPS[index]!, keys[index]!, work);
+      for (const [index, step] of STEPS.entries()) if (index < cached) restoreStep(fighter, step, keys[index]!, work);
     },
     catch: (cause) => failure("restore cached steps", directory, cause),
   });

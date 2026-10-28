@@ -28,6 +28,7 @@ import * as cairneBloodhoof from "./cairne-bloodhoof";
 import * as kobold from "./kobold";
 import * as goblinTinker from "./goblin-tinker";
 import * as shadowHunter from "./shadow-hunter";
+import * as archimonde from "./archimonde";
 
 /** The light model's animation while its fighter is shown, and while hidden. */
 export const ORIGINAL_LIGHT_ACTIVE_ANIMATION = "Stand";
@@ -68,6 +69,7 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   26: kobold,
   19: goblinTinker,
   9: shadowHunter,
+  29: archimonde,
 };
 
 /** Clips 0 to count - 1 exist for this character. */

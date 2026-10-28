@@ -403,6 +403,21 @@ const KOBOLD: AuthoredSpecial = {
   regions: [heroRegion(55, 58, capsule(20.0, 0.0, 20.0, 120.0, 50.0), hit(26.0, 85, 85.0, 45.0))],
 };
 
+const CHAOS_MARK = "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx";
+const CHAOS_CENTRE = mark(CHAOS_MARK, 2, 64, 0.0, 0.0, true);
+const CHAOS_AHEAD: SpecialProjectile = { ...mark(CHAOS_MARK, 3, 63, 220.0), atMark: CHAOS_CENTRE };
+const CHAOS_BEHIND: SpecialProjectile = { ...mark(CHAOS_MARK, 3, 63, -220.0), atMark: CHAOS_CENTRE };
+const INFERNAL_CRASH_MODEL = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
+const ARCHIMONDE: AuthoredSpecial = {
+  name: "Rain of Chaos", endFrame: 72,
+  projectiles: [
+    CHAOS_CENTRE, CHAOS_AHEAD, CHAOS_BEHIND,
+    { ...shot(42, 0.0, 40.0, 0.0, 0.0, 8, 75.0, hit(8.0, 80, 40.0, 45.0, HitElement.fire), INFERNAL_CRASH_MODEL), atMark: CHAOS_CENTRE },
+    { ...shot(50, 0.0, 40.0, 0.0, 0.0, 8, 75.0, hit(8.0, 80, 40.0, 45.0, HitElement.fire), INFERNAL_CRASH_MODEL), atMark: CHAOS_AHEAD },
+    { ...shot(58, 0.0, 40.0, 0.0, 0.0, 8, 75.0, hit(10.0, 70, 90.0, 45.0, HitElement.fire), INFERNAL_CRASH_MODEL), atMark: CHAOS_BEHIND },
+  ],
+};
+
 /** Every fighter's ultimate, by character. */
 export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial | undefined } = {
   [Character.rifleman]: RIFLEMAN,
@@ -431,6 +446,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.malfurion]: MALFURION,
   [Character.medivh]: MEDIVH,
   [Character.kobold]: KOBOLD,
+  [Character.archimonde]: ARCHIMONDE,
 };
 
 const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined } = {
@@ -460,6 +476,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.malfurion]: "A slow wall of wisps drifts forward and detonates on whoever it reaches.",
   [Character.medivh]: "A dark portal opens ahead, drawing foes in, then erupts. Walk away before it bursts.",
   [Character.kobold]: "He digs in and burrows toward the foe, then bursts up under them. Watch the dirt.",
+  [Character.archimonde]: "Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles.",
 };
 
 /** The ultimate's official name and one-line description, for the move list and Moves page. */
@@ -468,33 +485,3 @@ export function ultimateText(character: number): NamedMove | undefined {
   const description = ULTIMATE_DESCRIPTIONS[character];
   return move?.name === undefined || description === undefined ? undefined : { name: move.name, description };
 }
-
-/** Where a computer fighter presses its ultimate: the target's distance ahead, near to far; far 0 never (a counter or a high sweep it cannot aim). */
-export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: number; readonly far: number } | undefined } = {
-  [Character.rifleman]: { near: 150.0, far: 900.0 },
-  [Character.demonHunter]: { near: 0.0, far: 150.0 },
-  [Character.blademaster]: { near: 0.0, far: 120.0 },
-  [Character.mountainKing]: { near: 0.0, far: 170.0 },
-  [Character.warden]: { near: 120.0, far: 500.0 },
-  [Character.lich]: { near: 0.0, far: 600.0 },
-  [Character.forsakenPaladin]: { near: 150.0, far: 300.0 },
-  [Character.dreadlord]: { near: 190.0, far: 330.0 },
-  [Character.shadowHunter]: { near: 180.0, far: 480.0 },
-  [Character.pitLord]: { near: 0.0, far: 600.0 },
-  [Character.beastmaster]: { near: 100.0, far: 700.0 },
-  [Character.lichKing]: { near: 150.0, far: 600.0 },
-  [Character.thrall]: { near: 60.0, far: 600.0 },
-  [Character.jaina]: { near: 120.0, far: 500.0 },
-  [Character.sylvanas]: { near: 150.0, far: 600.0 },
-  [Character.cairne]: { near: 0.0, far: 1200.0 },
-  [Character.chen]: { near: 0.0, far: 240.0 },
-  [Character.peon]: { near: 0.0, far: 600.0 },
-  [Character.tinker]: { near: 80.0, far: 300.0 },
-  [Character.kaelthas]: { near: 0.0, far: 240.0 },
-  [Character.murloc]: { near: 100.0, far: 600.0 },
-  [Character.grom]: { near: 60.0, far: 400.0 },
-  [Character.anubarak]: { near: 60.0, far: 300.0 },
-  [Character.malfurion]: { near: 100.0, far: 500.0 },
-  [Character.medivh]: { near: 150.0, far: 330.0 },
-  [Character.kobold]: { near: 80.0, far: 350.0 },
-};

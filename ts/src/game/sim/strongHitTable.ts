@@ -111,6 +111,7 @@ export const SIGNATURE_STRONG_HIT: { readonly [character: number]: AttackStyle }
   [Character.kobold]: AttackStyle.forwardSmash,
   [Character.malfurion]: AttackStyle.forwardSmash,
   [Character.medivh]: AttackStyle.neutralAir,
+  [Character.archimonde]: AttackStyle.forwardSmash,
   [Character.anubarak]: AttackStyle.forwardSmash,
 };
 
@@ -156,6 +157,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   [Character.kobold]: { [AttackStyle.forwardSmash]: "The candle's flame at the end of the pick: you no take candle." },
   [Character.malfurion]: { [AttackStyle.forwardSmash]: "Wrath bursts at the staff's tip, so the druid kills at range." },
   [Character.medivh]: { [AttackStyle.neutralAir]: "An arcane ring strongest as it forms, lingering as weak cover." },
+  [Character.archimonde]: { [AttackStyle.forwardSmash]: "The fel claws at the end of the slam crush; the forearms only shove." },
   [Character.anubarak]: { [AttackStyle.forwardSmash]: "The impaling claw's point." },
 };
 

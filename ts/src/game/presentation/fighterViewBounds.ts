@@ -34,5 +34,6 @@ export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
   [Character.anubarak]: { left: -135, right: 106, bottom: -4, top: 159 },
   [Character.malfurion]: { left: -68, right: 91, bottom: -1, top: 170 },
   [Character.medivh]: { left: -47, right: 25, bottom: -2, top: 144 },
+  [Character.archimonde]: { left: -135, right: 118, bottom: 0, top: 145 },
   [Character.kobold]: { left: -54, right: 51, bottom: -6, top: 103 },
 };

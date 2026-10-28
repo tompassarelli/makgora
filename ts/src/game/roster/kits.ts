@@ -3,6 +3,7 @@
 import { floorMod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
 import type { HeroDefinition } from "../sim/heroes/hero";
+import { type FighterPhysics, type GroundMovementRules, installCheckMotion, installHeroCatalog } from "../sim/tuning";
 import { BEASTMASTER_HERO } from "../fighters/beastmaster/kit";
 import { CAIRNE_HERO } from "../fighters/cairne/kit";
 import { BLADEMASTER_HERO } from "../fighters/blademaster/kit";
@@ -23,6 +24,7 @@ import { TINKER_HERO } from "../fighters/tinker/kit";
 import { KAELTHAS_HERO } from "../fighters/kaelthas/kit";
 import { KOBOLD_HERO } from "../fighters/kobold/kit";
 import { MEDIVH_HERO } from "../fighters/medivh/kit";
+import { ARCHIMONDE_HERO } from "../fighters/archimonde/kit";
 import { MURLOC_HERO } from "../fighters/murloc/kit";
 import { MALFURION_HERO } from "../fighters/malfurion/kit";
 import { GROM_HERO } from "../fighters/grom/kit";
@@ -31,7 +33,7 @@ import { ANUBARAK_HERO } from "../fighters/anubarak/kit";
 
 export const HERO_ROSTER: readonly HeroDefinition[] = [
   BLADEMASTER_HERO, MOUNTAIN_KING_HERO, WARDEN_HERO, LICH_HERO, FORSAKEN_PALADIN_HERO, DREADLORD_HERO, SHADOW_HUNTER_HERO, PIT_LORD_HERO, BEASTMASTER_HERO, LICH_KING_HERO, THRALL_HERO, JAINA_HERO, SYLVANAS_HERO,
-  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, KOBOLD_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO,
+  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, KOBOLD_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO, ARCHIMONDE_HERO,
 ];
 
 const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined } = {
@@ -55,6 +57,7 @@ const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined }
   [Character.tinker]: TINKER_HERO,
   [Character.kaelthas]: KAELTHAS_HERO,
   [Character.medivh]: MEDIVH_HERO,
+  [Character.archimonde]: ARCHIMONDE_HERO,
   [Character.murloc]: MURLOC_HERO,
   [Character.kobold]: KOBOLD_HERO,
   [Character.grom]: GROM_HERO,
@@ -77,6 +80,19 @@ export function registerCheckHero(hero: CheckHero, look: Character): Character {
   return character;
 }
 
+export interface CheckFighter {
+  readonly hero: CheckHero;
+  readonly physics: FighterPhysics;
+  readonly ground: GroundMovementRules;
+  readonly look: Character;
+}
+
+export function registerCheckFighter({ hero, physics, ground, look }: CheckFighter): Character {
+  const character = registerCheckHero(hero, look);
+  installCheckMotion(character, { physics, ground });
+  return character;
+}
+
 function checkHero(character: number): CheckHeroEntry | undefined {
   return character < FIRST_CHECK_CHARACTER ? undefined : CHECK_HEROES[character - FIRST_CHECK_CHARACTER];
 }
@@ -88,6 +104,8 @@ export function lookCharacter(character: number): number {
 export function heroDefinition(character: number): HeroDefinition | undefined {
   return BY_CHARACTER[character] ?? checkHero(character)?.hero;
 }
+
+installHeroCatalog(heroDefinition);
 
 
 function selectableCharactersOf(roster: readonly HeroDefinition[]): readonly Character[] {

@@ -11,7 +11,6 @@ import type { FighterMoves } from "./heroMoves";
 import type { AuthoredSpecial, FighterSpecials } from "./specials/schema";
 import { FIGHTER_ULTIMATES } from "./ultimates";
 import { fighterShield, heroBody } from "./heroes/heroBodies";
-import { type CheckHero, heroDefinition, registerCheckHero } from "../roster/kits";
 import { originalFighterMoves } from "./originalMoves";
 
 export const WORLD_UNITS_PER_MELEE_UNIT = 6.0;
@@ -430,23 +429,34 @@ function heroGroundRules(character: Character): GroundMovementRules {
   return rules;
 }
 
-export interface CheckFighter {
-  readonly hero: CheckHero;
-  readonly physics: FighterPhysics;
-  readonly ground: GroundMovementRules;
-  readonly look: Character;
+/** The part of a fighter's kit the simulation reads. */
+export interface CatalogHero {
+  readonly moves: FighterMoves;
+  readonly specials?: FighterSpecials | undefined;
+  readonly jab: { readonly name: string; readonly description: string };
 }
 
-const checkMotion: ({ readonly physics: FighterPhysics; readonly ground: GroundMovementRules } | undefined)[] = [];
+export interface CheckMotion { readonly physics: FighterPhysics; readonly ground: GroundMovementRules }
 
-export function registerCheckFighter({ hero, physics, ground, look }: CheckFighter): Character {
-  const character = registerCheckHero(hero, look);
-  checkMotion[character] = { physics, ground };
-  return character;
+let heroCatalog: ((character: number) => CatalogHero | undefined) | undefined;
+const checkMotion: (CheckMotion | undefined)[] = [];
+
+/** roster/kits.ts installs the roster here, so the simulation never imports the fighters it runs. */
+export function installHeroCatalog(lookup: (character: number) => CatalogHero | undefined): void {
+  heroCatalog = lookup;
+}
+
+export function catalogHero(character: number): CatalogHero | undefined {
+  if (heroCatalog === undefined) throw new Error("no hero catalog: import roster/kits before running a fighter");
+  return heroCatalog(character);
+}
+
+export function installCheckMotion(character: Character, motion: CheckMotion): void {
+  checkMotion[character] = motion;
 }
 
 export function authoredTuning(character: Character): FighterTuning {
-  const hero = heroDefinition(character);
+  const hero = catalogHero(character);
   const check = checkMotion[character];
   return {
     moves: hero?.moves ?? originalFighterMoves(character),

@@ -22,6 +22,7 @@ import { lichLook } from "../fighters/lich/look";
 import { lichKingLook } from "../fighters/lich-king/look";
 import { malfurionLook } from "../fighters/malfurion/look";
 import { medivhLook } from "../fighters/medivh/look";
+import { archimondeLook } from "../fighters/archimonde/look";
 import { mountainKingLook } from "../fighters/mountain-king/look";
 import { murlocLook } from "../fighters/murloc/look";
 import { peonLook } from "../fighters/peon/look";
@@ -48,6 +49,7 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
   [Character.lichKing]: lichKingLook,
   [Character.malfurion]: malfurionLook,
   [Character.medivh]: medivhLook,
+  [Character.archimonde]: archimondeLook,
   [Character.mountainKing]: mountainKingLook(MOUNTAIN_KING_GROUND),
   [Character.murloc]: murlocLook,
   [Character.peon]: peonLook,

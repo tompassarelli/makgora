@@ -5,7 +5,7 @@
 // Writes the raw 1024 px renders to PRIVATE_OUTPUT/classic/ and the map's portraits
 // to PRIVATE_OUTPUT/fighter-renders/, with each Bust's Wisp portrait receipt in
 // fighter-renders/receipts/: store that folder as the fighter-renders family.
-import { mkdirSync, readdirSync, renameSync, rmSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, symlinkSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { Effect, Schema } from 'effect';
 import { captureScene, renderScenes, type RenderScene } from 'wisp/scripts/wisp/headlessRender';
@@ -496,6 +496,12 @@ await Effect.runPromise(Effect.gen(function*() {
   mkdirSync(join(assets, 'fighter-renders'), { recursive: true });
   for (const family of readdirSync(stored)) if (family !== 'fighter-renders') symlinkSync(join(stored, family), join(assets, family));
   for (const file of readdirSync(join(stored, 'fighter-renders'))) symlinkSync(join(stored, 'fighter-renders', file), join(assets, 'fighter-renders', file));
+  const portraitFile = (character: number, kind: PortraitKind, slot?: number) => fighterPortrait(character, kind, slot).replace(/^.*war3mapImported\\/, '').replace(/\.blp$/, '.tga');
+  const standIn = at(RENDERED_FIGHTERS, 0);
+  for (const character of RENDERED_FIGHTERS) for (const kind of PORTRAIT_KINDS) for (const slot of [...(kind === 'Tile' ? [undefined] : []), ...PARTICIPANT_SLOTS]) {
+    const file = portraitFile(character, kind, slot);
+    if (!existsSync(join(assets, 'fighter-renders', file))) symlinkSync(join(stored, 'fighter-renders', portraitFile(standIn, kind, slot)), join(assets, 'fighter-renders', file));
+  }
   const captured = new Map<number, RenderScene>();
   for (const character of fighters) {
     const name = fighterKey(character);

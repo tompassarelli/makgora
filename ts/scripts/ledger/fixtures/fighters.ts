@@ -5,7 +5,8 @@ import { REFERENCE_HURT_CAPSULE } from "../../../src/game/sim/geometry/contactGe
 import { type AuthoredMove, type AuthoredThrow, type FighterMoves, type MoveRegion, heroRegion, jabStep } from "../../../src/game/sim/heroMoves";
 import type { HitEffect } from "../../../src/game/sim/hitRegions";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, frames } from "../../../src/game/sim/specials/schema";
-import { AUTHORED_PHYSICS, type CheckFighter, type FighterPhysics, NTSC_FOX_GROUND_MOVEMENT_RULES, melee, registerCheckFighter } from "../../../src/game/sim/tuning";
+import { AUTHORED_PHYSICS, type FighterPhysics, NTSC_FOX_GROUND_MOVEMENT_RULES, melee } from "../../../src/game/sim/tuning";
+import { type CheckFighter, registerCheckFighter } from "../../../src/game/roster/kits";
 import { type FoxFixture, type FoxMove, type FoxMoveId, type Phase, foxFixture } from "./fox";
 
 const NORMALS: Partial<Record<FoxMoveId, AttackStyle>> = {

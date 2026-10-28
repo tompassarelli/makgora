@@ -27,6 +27,7 @@ import * as forsakenPaladin from "./white-facts/forsaken-paladin";
 import * as cairneBloodhoof from "./white-facts/cairne-bloodhoof";
 import * as kobold from "./white-facts/kobold";
 import * as shadowHunter from "./white-facts/shadow-hunter";
+import * as archimonde from "./white-facts/archimonde";
 export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...rifleman.whiteModelFacts,
   ...illidan.whiteModelFacts,
@@ -54,4 +55,5 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...cairneBloodhoof.whiteModelFacts,
   ...kobold.whiteModelFacts,
   ...shadowHunter.whiteModelFacts,
+  ...archimonde.whiteModelFacts,
 };

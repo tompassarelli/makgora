@@ -24,7 +24,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Rifleman | ledge-get-up | 28: Ledge Climb | 64.7 | 7.9 | up; 27.7/64.2 |
 | Rifleman | ledge-roll | 32: Roll Forward | 116.8 | 45.4 | forward; 72.0/116.4 |
 | Rifleman | ledge-attack | 22: Get Up Attack | 95.3 | 37.4 | both; 67.3/61.4 |
-| Illidan | walk | 107: Walk | 92.0 | 15.0 | forward; 79.7/84.3 |
+| Illidan | walk | 119: Locomotion Walk | 139.2 | 20.8 | forward; 129.1/139.0 |
 | Illidan | dash | 121: Locomotion Initial Dash Burst | 81.1 | 19.7 | forward; 72.9/57.8 |
 | Illidan | run | 120: Locomotion Run | 111.4 | 23.8 | forward; 108.7/95.2 |
 | Illidan | turn | 97: Turnaround | 95.2 | 23.1 | back; 77.5/83.4 |
@@ -325,8 +325,8 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Cairne Bloodhoof | ledge-roll | 75: Cairne ledgeRoll | 285.5 | 131.1 | forward; 275.0/193.8 |
 | Cairne Bloodhoof | ledge-attack | 45: Cairne ledgeAttack | 355.0 | 88.7 | both; 352.5/105.4 |
 | Chen Stormstout | walk | 0: walk | 116.8 | 40.1 | forward; 116.4/112.8 |
-| Chen Stormstout | dash | 0: walk | 116.8 | 37.8 | forward; 116.3/99.7 |
-| Chen Stormstout | run | 0: walk | 94.1 | 35.9 | forward; 94.0/91.7 |
+| Chen Stormstout | dash | 0: walk | 116.6 | 39.0 | forward; 116.2/112.4 |
+| Chen Stormstout | run | 0: walk | 124.6 | 34.2 | forward; 124.5/109.4 |
 | Chen Stormstout | turn | 35: Chen turn | 284.9 | 63.8 | back; 274.9/157.3 |
 | Chen Stormstout | brake | 36: Chen stop | 57.0 | 25.0 | in place; 36.2/11.0 |
 | Chen Stormstout | jump-squat | 37: Chen jumpSquat | 39.1 | 17.6 | down; 31.1/34.0 |
@@ -524,5 +524,25 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Anub'arak | ledge-get-up | 49: Anubarak ledgeClimb | 170.9 | 32.9 | up; 165.8/69.7 |
 | Anub'arak | ledge-roll | 77: Anubarak ledgeRoll | 248.0 | 120.4 | forward; 186.4/245.5 |
 | Anub'arak | ledge-attack | 50: Anubarak ledgeAttack | 81.1 | 11.6 | both; 61.7/23.5 |
+| Archimonde the Defiler | walk | 2: Walk | 160.6 | 38.6 | forward; 159.9/133.8 |
+| Archimonde the Defiler | dash | 2: Walk | 85.3 | 29.0 | forward; 80.4/45.8 |
+| Archimonde the Defiler | run | 2: Walk | 158.9 | 39.4 | forward; 124.9/157.3 |
+| Archimonde the Defiler | turn | 2: Walk | 40.2 | 10.5 | back; 22.6/20.2 |
+| Archimonde the Defiler | brake | 2: Walk | 33.4 | 8.4 | in place; 17.0/15.9 |
+| Archimonde the Defiler | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
+| Archimonde the Defiler | roll-forward | 2: Walk | 160.7 | 38.5 | forward; 160.2/133.7 |
+| Archimonde the Defiler | roll-back | 2: Walk | 160.7 | 38.5 | back; 133.7/160.2 |
+| Archimonde the Defiler | spot-dodge | 1: Stand - 2 | 36.8 | 9.0 | in place; 30.1/36.8 |
+| Archimonde the Defiler | air-dodge | 1: Stand - 2 | 36.9 | 9.0 | in place; 30.1/36.9 |
+| Archimonde the Defiler | tech | 0: Stand | 12.7 | 3.3 | in place; 12.7/8.1 |
+| Archimonde the Defiler | tech-forward | 0: Stand | 12.4 | 3.3 | forward; 12.4/8.1 |
+| Archimonde the Defiler | tech-back | 0: Stand | 12.4 | 3.3 | back; 8.1/12.4 |
+| Archimonde the Defiler | get-up | 1: Stand - 2 | 36.9 | 9.0 | up; 12.1/10.2 |
+| Archimonde the Defiler | get-up-forward | 0: Stand | 12.5 | 3.3 | forward; 12.5/8.1 |
+| Archimonde the Defiler | get-up-back | 0: Stand | 12.5 | 3.3 | back; 8.1/12.5 |
+| Archimonde the Defiler | get-up-attack | 7: Attack - 2 | 219.5 | 68.8 | both; 127.2/166.6 |
+| Archimonde the Defiler | ledge-get-up | 2: Walk | 160.5 | 38.5 | up; 96.1/63.2 |
+| Archimonde the Defiler | ledge-roll | 2: Walk | 160.7 | 38.6 | forward; 160.2/133.7 |
+| Archimonde the Defiler | ledge-attack | 6: Attack - 1 | 195.4 | 72.9 | both; 195.1/126.0 |
 
 Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale.

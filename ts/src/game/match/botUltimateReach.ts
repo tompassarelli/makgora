@@ -1,0 +1,32 @@
+import { Character } from "../sim/codes";
+
+/** Where a computer fighter presses its ultimate: the target's distance ahead, near to far; far 0 never (a counter or a high sweep it cannot aim). */
+export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: number; readonly far: number } | undefined } = {
+  [Character.rifleman]: { near: 150.0, far: 900.0 },
+  [Character.demonHunter]: { near: 0.0, far: 150.0 },
+  [Character.blademaster]: { near: 0.0, far: 120.0 },
+  [Character.mountainKing]: { near: 0.0, far: 170.0 },
+  [Character.warden]: { near: 120.0, far: 500.0 },
+  [Character.lich]: { near: 0.0, far: 600.0 },
+  [Character.forsakenPaladin]: { near: 150.0, far: 300.0 },
+  [Character.dreadlord]: { near: 190.0, far: 330.0 },
+  [Character.shadowHunter]: { near: 180.0, far: 480.0 },
+  [Character.pitLord]: { near: 0.0, far: 600.0 },
+  [Character.beastmaster]: { near: 100.0, far: 700.0 },
+  [Character.lichKing]: { near: 150.0, far: 600.0 },
+  [Character.thrall]: { near: 60.0, far: 600.0 },
+  [Character.jaina]: { near: 120.0, far: 500.0 },
+  [Character.sylvanas]: { near: 150.0, far: 600.0 },
+  [Character.cairne]: { near: 0.0, far: 1200.0 },
+  [Character.chen]: { near: 0.0, far: 240.0 },
+  [Character.peon]: { near: 0.0, far: 600.0 },
+  [Character.tinker]: { near: 80.0, far: 300.0 },
+  [Character.kaelthas]: { near: 0.0, far: 240.0 },
+  [Character.murloc]: { near: 100.0, far: 600.0 },
+  [Character.grom]: { near: 60.0, far: 400.0 },
+  [Character.anubarak]: { near: 60.0, far: 300.0 },
+  [Character.malfurion]: { near: 100.0, far: 500.0 },
+  [Character.medivh]: { near: 150.0, far: 330.0 },
+  [Character.kobold]: { near: 80.0, far: 350.0 },
+  [Character.archimonde]: { near: 100.0, far: 900.0 },
+};

@@ -32,7 +32,7 @@ import { aheadX, moveReachAhead } from "./botMoves";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
 import { ULTIMATE_FRAMES_PER_PERCENT, exCharged, ultimateCharged, ultimatePercent } from "../sim/meter";
-import { ULTIMATE_REACH } from "../sim/ultimates";
+import { ULTIMATE_REACH } from "./botUltimateReach";
 
 
 const FEINT_GAP = 110.0;

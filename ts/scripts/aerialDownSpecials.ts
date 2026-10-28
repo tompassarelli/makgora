@@ -51,6 +51,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.anubarak]: "downward beetle; recall works while falling",
   [Character.malfurion]: "downward branch; recall works while falling",
   [Character.medivh]: "Last Word holds height, blinks back and bursts",
+  [Character.archimonde]: "aerial Bash, a hammer-fist that drives a foe below him down",
   [Character.kobold]: "aerial ankle sweep; lands into the grounded sweep",
 };
 

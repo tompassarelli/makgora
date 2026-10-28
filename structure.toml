@@ -60,19 +60,19 @@ may_use = ["core"]
 # ---------- gameplay ----------
 [[module]]
 name = "fighter-kit"
-paths = ["ts/src/game/fighters/*/kit.ts", "ts/src/game/fighters/*/moves.ts", "ts/src/game/fighters/*/specials.ts", "ts/src/game/fighters/*/ultimate.ts",
+paths = ["ts/src/game/fighters/*/kit.ts", "ts/src/game/fighters/*/moves.ts", "ts/src/game/fighters/*/specials.ts", "ts/src/game/fighters/*/ultimate.ts", "ts/src/game/fighters/*/gameplan.ts",
          "ts/src/game/fighters/warden/spin.ts", "ts/src/game/fighters/forsaken-paladin/sword.ts", "ts/src/game/fighters/forsaken-paladin/weaponGeometry.ts",
          "ts/src/game/fighters/kobold/candle.ts", "ts/src/game/fighters/kobold/candleStrikes.ts", "ts/src/game/fighters/kobold/candleView.ts",
          "ts/src/game/sim/heroes/groundNormals.ts", "ts/src/game/sim/heroes/heroBodies.ts", "ts/src/game/sim/heroes/multiHit.ts",
          "ts/src/game/sim/heroes/authoring.ts", "ts/src/game/sim/heroes/hero.ts", "ts/src/game/stages/*/deck.ts"]
-responsibility = "One fighter's (or stage's) gameplay data and hooks: frame data, specials, ultimate, body, traits, deck geometry."
+responsibility = "One fighter's (or stage's) gameplay data and hooks: frame data, specials, ultimate, gameplan, body, traits, deck geometry."
 may_use = ["sim", "core", "generated"]
 
 [[module]]
 name = "ai"
-paths = ["ts/src/game/ai/**", "ts/src/game/fighters/*/gameplan.ts",
+paths = ["ts/src/game/ai/**",
          "ts/src/game/match/bot*.ts", "ts/src/game/match/cpu*.ts", "ts/src/game/match/edgeGuard*.ts", "ts/src/game/match/recoveryEnvelope.ts"]
-responsibility = "Bots, perception, CPU profiles and per-fighter gameplans."
+responsibility = "Bots, perception and CPU profiles, which play each fighter's gameplan from its kit."
 may_use = ["snapshot", "sim", "fighter-kit", "input", "core", "generated"]
 
 [[module]]

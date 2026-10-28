@@ -114,6 +114,7 @@ const RACES: Readonly<Record<Character, Race>> = {
   22: Race.orc,
   24: Race.nightElf,
   25: Race.human,
+  29: Race.undead,
 };
 
 export const characterRace = (character: Character): Race => RACES[character];
@@ -132,7 +133,14 @@ export const victoryMusic = (winner: Character | undefined): string | undefined 
 
 
 
-const VOICES: Readonly<Record<Exclude<Character, typeof Character.medivh>, readonly [string, string, string?, string?]>> = {
+type DialogueVoiced = typeof Character.medivh | typeof Character.archimonde;
+
+const DIALOGUE_VOICES: Readonly<Record<DialogueVoiced, { readonly ready: string; readonly warcry: string }>> = {
+  [Character.medivh]: { ready: "Sound\\Dialogue\\TutorialCampaign\\Tutorial01\\T01Medivh02.flac", warcry: "Sound\\Dialogue\\TutorialCampaign\\Tutorial01\\T01Medivh59.flac" },
+  [Character.archimonde]: { ready: "Sound\\Dialogue\\NightElfCampaign\\NightElf07\\N07Archimonde04.flac", warcry: "Sound\\Dialogue\\UndeadCampaign\\Undead08\\U08Archimonde20.flac" },
+};
+
+const VOICES: Readonly<Record<Exclude<Character, DialogueVoiced>, readonly [string, string, string?, string?]>> = {
   23: ["Units\\Undead\\HeroCryptLord\\", "NerubianCryptLord"],
   1: ["Units\\Human\\Rifleman\\", "Rifleman"],
   2: ["Units\\NightElf\\HeroDemonHunter\\", "HeroDemonHunter"],
@@ -167,7 +175,7 @@ export const murlocMoveVoices = (): string[] =>
 
 function voice(character: Character, line: string): string {
   if (character === Character.murloc) return IMPORTED_MURLOC_GURGLE.path;
-  if (character === Character.medivh) return `Sound\\Dialogue\\TutorialCampaign\\Tutorial01\\T01Medivh${line === "Ready" ? "02" : "59"}.flac`;
+  if (character === Character.medivh || character === Character.archimonde) return line === "Ready" ? DIALOGUE_VOICES[character].ready : DIALOGUE_VOICES[character].warcry;
   const [directory, prefix, ready, warcry] = VOICES[character];
   const spoken = line === "Ready" ? ready ?? line : line === "Warcry" ? warcry ?? line : line;
   return `${directory}${prefix}${spoken}1.flac`;
@@ -208,6 +216,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.anubarak]: "anubarak victory",
   [Character.malfurion]: "malfurionstormrage victory",
   [Character.medivh]: "medivh victory",
+  [Character.archimonde]: "spell",
   [Character.kobold]: "kobold victory",
 };
 

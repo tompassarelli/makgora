@@ -299,6 +299,12 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     up: { spell: "Raven Flight", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdx", "body", 0.75) },
     down: { spell: "Last Word", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", 0.75) },
   },
+  [Character.archimonde]: {
+    neutral: { spell: "Finger of Death", startup: FEL, active: cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", "hand", f32(0.5)) },
+    side: { spell: "Rain of Fire", startup: FEL, active: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5) },
+    up: { spell: "Fel Ascent", startup: FEL, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "feet", 1.0) },
+    down: { spell: "Bash", startup: FEL, active: cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "ahead", f32(0.5)) },
+  },
   [Character.anubarak]: {
     neutral: { spell: "Impale", startup: BURROW, active: cue("Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", "ahead", f32(0.6)) },
     side: { spell: "Burrow Hunt", startup: BURROW, active: cue("Objects\\Spawnmodels\\Undead\\UCancelDeath\\UCancelDeath.mdx", "feet", f32(0.5)) },
