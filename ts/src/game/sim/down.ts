@@ -14,6 +14,7 @@ import { floorFriction, surfaceCount, surfaceLeft, surfaceLine, surfaceRight, su
 
 import { rollTravel } from "./geometry/rollTravel";
 import { beginDownState, cancelAttack, clearDownState } from "./transitions";
+import { FEL_RUSH_IN_PROGRESS } from "./felRushAirtime";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { squareRoot } from "./warcraftMath";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
@@ -178,7 +179,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   if (!wasGrounded) landAirShot(f);
   f.special.fall = false;
   f.special.parasol = ParasolState.none;
-  if (!isHeroSpecialAction(f.special.action)) f.special.airtimeUses = 0;
+  if (!isHeroSpecialAction(f.special.action)) f.special.airtimeUses = f.tuning.specials === undefined ? f.special.airtimeUses & FEL_RUSH_IN_PROGRESS : 0;
   if (f.jump.squat <= 0) f.jump.remaining = groundedJumps(f);
   if (hatchEgg(f)) return;
   if (isTumbling(f)) {

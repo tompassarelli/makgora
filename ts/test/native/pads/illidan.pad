@@ -17,19 +17,18 @@
 340 a tap X 2
 341 a stick 0 0
 420 b shield 0
-# #147: a rush through b, then Vengeful Retreat (special on its frame 17).
+# A rush toward b stopped short by a second special press on its third travel frame.
 470 a stick 1 0
 470 a tap X 2
 471 a stick 0 0
-486 a tap X 2
-# #147: a rush through b, then Chaos Strike (attack on its frame 17).
+492 a tap X 2
+# A full-length rush back through b.
 # View held a second: the first of two moments the parity check replays.
 500 a press VIEW
 570 a release VIEW
-600 a stick 1 0
+600 a stick -1 0
 600 a tap X 2
 601 a stick 0 0
-616 a tap A 2
 # #128: Immolate cancelled by a jump on its 6th frame.
 720 a stick 0 -1
 720 a tap X 2
@@ -50,15 +49,8 @@
 #! absent b 91-230 damage
 #! absent b 232-330 damage
 #! expect a 340 special 10 form 0
-# #482's per-fighter shields (9d81faac91, f2fd55307f) are larger, so the rush into b's shield stops sooner and the next rush,
-# starting closer, also hits b at 477: probe run 39025304908 on the old 45/60 shields restores 372 x 50.719 and 606 (trace: run 39009305845).
-#! expect a 368 special 0 form 0 action-frame 0 x 36.774
 #! expect a 470 special 10 form 0
-#! expect a 486 special-form 1 action 10
 #! expect a 600 special 10 form 0
-#! expect b 477 damage 12.000
-#! expect b 611 damage 18.000
-#! expect a 616 special-form 2 action 10
 #! expect a 720 special 12 form 0
 #! expect a 725 special 0
 #! expect a 728 applied jump

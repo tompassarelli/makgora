@@ -156,7 +156,6 @@ function originalSpecialMeasures(character: Character): Readonly<Record<string, 
   };
   for (const ex of [false, true]) {
     rows[`special.rush.${ex}`] = specialMeasures(specials.FEL_RUSH_FIRST, specials.FEL_RUSH_LAST, specials.FEL_RUSH_FRAMES);
-    rows[`special.chaos.${ex}`] = specialMeasures(specials.CHAOS_STRIKE_FIRST, specials.CHAOS_STRIKE_LAST, specials.CHAOS_STRIKE_FRAMES);
     for (const grounded of [false, true]) rows[`special.immolate.${grounded}.${ex}`] = specialMeasures(specials.DEMONHUNTER_IMMOLATE_STARTUP, specials.DEMONHUNTER_IMMOLATE_STARTUP + specials.DEMONHUNTER_IMMOLATE_ACTIVE - 1, specials.DEMONHUNTER_IMMOLATE_DURATION);
   }
   return rows;

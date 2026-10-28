@@ -22,7 +22,7 @@ import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
 import {
-  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FRAME, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_JUMP_CANCEL,
+  FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FRAME, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_JUMP_CANCEL,
   RIFLEMAN_RECOVERY_STARTUP_FRAMES, RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
 import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
@@ -66,8 +66,7 @@ const LEVEL_ABOVE = 40.0;
 const DIVE_AIM_DEAD = 60.0;
 
 const RUSH_NEAR = 80.0;
-const RUSH_FAR = 230.0;
-const CHAOS_REACH = 110.0;
+const RUSH_PAST = 40.0;
 
 
 
@@ -370,7 +369,7 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
       }
 
       const rush = f32(FEL_RUSH_SPEED * (FEL_RUSH_LAST - FEL_RUSH_FIRST + 1));
-      if (!free || !ready || !motion.grounded || toward !== f.facing || gap < RUSH_NEAR || gap > RUSH_FAR || Math.abs(f32(target.motion.z - motion.z)) > 60.0
+      if (!free || !ready || !motion.grounded || toward !== f.facing || gap < RUSH_NEAR || gap > rush || Math.abs(f32(target.motion.z - motion.z)) > 60.0
         || !safeAt(stage, f32(motion.x + f32(f.facing * rush)), 0.0) || !affords(f, SpecialAction.demonHunterFelRush)
         || !takes(skill, floorDiv(frame, 30), f.character * 7 + 20) || botChoice(floorDiv(frame, 30), f.character * 7 + 21, 2) !== 0) return false;
       pressSlot(input, SpecialSlot.side, toward);
@@ -473,16 +472,10 @@ export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fight
       return true;
     }
     case SpecialAction.demonHunterFelRush: {
-
-      if (special.form !== 0 || next < FEL_RUSH_BRANCH_FIRST || next > FEL_RUSH_BRANCH_LAST || target === undefined) return false;
-      const dx = f32(target.motion.x - motion.x);
-      if ((target.shield.raised || target.attack.style !== undefined) && Math.abs(dx) <= RUSH_FAR) {
-        input.specialPressed = true;
-        return true;
-      }
-      if (Math.abs(dx) > CHAOS_REACH || Math.abs(f32(target.motion.z - motion.z)) > 70.0) return false;
-      input.attackPressed = true;
-      input.direction = dx < 0 ? -1 : 1;
+      if (next < FEL_RUSH_FIRST || next >= FEL_RUSH_LAST) return false;
+      const passed = target !== undefined && f32(f32(target.motion.x - motion.x) * f.facing) < -RUSH_PAST;
+      if (!passed && safeAt(stage, f32(motion.x + f32(f.facing * FEL_RUSH_SPEED)), 0.0)) return false;
+      input.specialPressed = true;
       return true;
     }
     case SpecialAction.demonHunterImmolate:

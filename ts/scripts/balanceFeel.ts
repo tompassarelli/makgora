@@ -109,10 +109,8 @@ export function currentFeel(character: Character): FeelValues {
       out["special.bear.ex"] = sample(BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
     } else {
       for (const ex of [false,true]) {
-        const rush = specials.felRushRegion(0, specials.FEL_RUSH_FIRST, ex);
-        const chaos = specials.felRushRegion(specials.CHAOS_STRIKE_FORM, specials.CHAOS_STRIKE_FIRST, ex);
+        const rush = specials.felRushRegion(specials.FEL_RUSH_FIRST, ex);
         out[`special.rush.${ex}`] = sample(rush.effect, specials.FEL_RUSH_FRAMES - specials.FEL_RUSH_FIRST, false);
-        out[`special.chaos.${ex}`] = sample(chaos.effect, specials.CHAOS_STRIKE_FRAMES - specials.CHAOS_STRIKE_FIRST, false);
         for (const grounded of [false,true]) out[`special.immolate.${grounded}.${ex}`] = sample(specials.immolationRegion(grounded, ex).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
       }
       out["special.dive"] = sample(specials.wingDiveRegion(specials.DEMONHUNTER_DIVE_FORM, 0).effect, specials.DEMONHUNTER_DIVE_FRAMES, false);

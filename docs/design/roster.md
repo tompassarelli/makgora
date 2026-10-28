@@ -2086,7 +2086,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Fighter | Keep: expressive actions learned in play | Cut: counted or hidden effect |
 |---|---|---|
 | Rifleman | Rifle strikes, recoil steering, bear and freeze trap | Every fourth Long Rifle shot |
-| Illidan | Warglaive chain, Fel Rush branches, wing dive and plunge | Ordinary-hit and throw meter drain |
+| Illidan | Warglaive chain, Fel Rush shortened or spiking, wing dive and plunge | Ordinary-hit and throw meter drain |
 | Blademaster | Outer-blade spacing, plunge drill and deliberate sword specials | Counted Critical Strike |
 | Mountain King | Hammer-and-axe chain, hammer lift and Thunder Leap | Counted Bash hitstun bonus |
 | Warden | Fan of Knives, glaive drill and chosen Blink | Aerial-hit jump refund |

@@ -6,7 +6,7 @@
 
 
 import { AttackStyle } from "./codes";
-import { type FighterGameplan, GameplanThrow } from "./gameplan";
+import { type FighterGameplan, GameplanSpecial, GameplanThrow } from "./gameplan";
 
 export const ILLIDAN_GAMEPLAN: FighterGameplan = {
 
@@ -15,6 +15,7 @@ export const ILLIDAN_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardAir, near: 90.0, far: 195.0 },
     { move: AttackStyle.forwardSmash, near: 90.0, far: 150.0 },
     { move: AttackStyle.forwardTilt, near: 60.0, far: 155.0 },
+    { move: GameplanSpecial.side, near: 160.0, far: 460.0 },
   ],
   approach: [
     { via: "jump", moves: [AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.neutralAir], weight: 3 },
@@ -26,6 +27,7 @@ export const ILLIDAN_GAMEPLAN: FighterGameplan = {
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.forwardAir, AttackStyle.neutralAir, AttackStyle.dashAttack] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
     { starter: AttackStyle.upAir, followUps: [AttackStyle.upAir] },
+    { starter: GameplanSpecial.side, followUps: [AttackStyle.grab, AttackStyle.dashAttack, AttackStyle.forwardTilt] },
   ],
   kills: [
     { move: AttackStyle.forwardSmash, fromPercent: 90.0 },

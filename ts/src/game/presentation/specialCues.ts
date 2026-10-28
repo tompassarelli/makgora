@@ -18,10 +18,6 @@ import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES }
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
 import { EMPTY_GOLD_SACK_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
-  CHAOS_STRIKE_AIR_FORM,
-  CHAOS_STRIKE_FIRST,
-  CHAOS_STRIKE_FORM,
-  CHAOS_STRIKE_LAST,
   DEMONHUNTER_BACKFLIP_FORM,
   DEMONHUNTER_BACKFLIP_FRAMES,
   DEMONHUNTER_DIVE_FORM,
@@ -36,8 +32,6 @@ import {
   RIFLEMAN_SECOND_SHOT_FIRST,
   RIFLEMAN_SECOND_SHOT_FORM,
   RIFLEMAN_SECOND_SHOT_LAST,
-  VENGEFUL_RETREAT_FORM,
-  VENGEFUL_RETREAT_MOVE_LAST,
 } from "../sim/specials";
 import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
@@ -470,17 +464,7 @@ export interface OriginalBranch {
 }
 
 
-const CHAOS_STRIKE_CUES: OriginalBranch = { cues: branch("Chaos Strike", FEL_TELL, timed(cue("Abilities\\Spells\\NightElf\\MoonGlaive\\MoonGlaiveCaster.mdx", "ahead", 1.0), "stand", 0.0)), first: CHAOS_STRIKE_FIRST, last: CHAOS_STRIKE_LAST };
-
-
 export const ORIGINAL_BRANCH_CUES: { readonly [action: number]: { readonly [form: number]: OriginalBranch } } = {
-  [SpecialAction.demonHunterFelRush]: {
-
-    [VENGEFUL_RETREAT_FORM]: { cues: branch("Vengeful Retreat", FEL_TELL, timed(cue("Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx", "body", 1.0), "stand", 0.0)), first: 1, last: VENGEFUL_RETREAT_MOVE_LAST },
-    [CHAOS_STRIKE_FORM]: CHAOS_STRIKE_CUES,
-    [CHAOS_STRIKE_AIR_FORM]: CHAOS_STRIKE_CUES,
-  },
-
   [SpecialAction.demonHunterWingAscent]: {
     [DEMONHUNTER_BACKFLIP_FORM]: { cues: branch("Backflip", FEL_TELL, timed(cue("Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx", "body", 1.0), "stand", 0.0)), first: 1, last: DEMONHUNTER_BACKFLIP_FRAMES },
     [DEMONHUNTER_DIVE_FORM]: { cues: branch("Wing dive", FEL_TELL, cue(FEL_FLAMES, "body", f32(0.8))), first: 1, last: DEMONHUNTER_DIVE_FRAMES - 1 },

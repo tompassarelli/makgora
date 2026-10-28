@@ -78,7 +78,7 @@ export function specialAreaRegion(fighter: Readonly<Fighter>, index: number): Re
     return frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE ? immolationRegion(fighter.motion.grounded, fighter.special.ex, index === 1) : NO_HIT_REGION;
   }
   if (index > 0) return NO_HIT_REGION;
-  if (action === SpecialAction.demonHunterFelRush) return felRushRegion(form, frame);
+  if (action === SpecialAction.demonHunterFelRush) return felRushRegion(frame);
   if (action === SpecialAction.demonHunterWingAscent) return wingDiveRegion(form, frame);
   return NO_HIT_REGION;
 }

@@ -5,15 +5,15 @@
 60 a tap X 2
 62 a capture
 76 a capture
-# Air Fel Rush toward b, Chaos Strike from the air on its frame 17.
+# Air Fel Rush toward b: its tell, then the fel streak along the rush.
 200 a tap B 8
 210 a stick 1 0
 210 a tap X 2
 211 a stick 0 0
 212 a capture
-216 a capture
-226 a tap A 2
-228 a capture
+226 a capture
+232 a capture
+236 a capture
 # Both dash in, about 75 apart.
 300 b stick -1 0
 302 b stick 0 0
@@ -27,25 +27,24 @@
 392 a capture
 394 a capture
 402 a capture
-# A rush, then Vengeful Retreat (special on its frame 17).
+# A rush stopped short by a second special press on its second travel frame.
 470 a stick 1 0
 470 a tap X 2
 471 a stick 0 0
 472 a capture
-476 a capture
-486 a tap X 2
-488 a capture
+490 a capture
+491 a tap X 2
+493 a capture
 # View held a second: the first of two moments the parity check replays.
 500 a press VIEW
 570 a release VIEW
-# A rush left toward b, then Chaos Strike on the ground (attack on its frame 17).
+# A full rush left toward b.
 600 a stick -1 0
 600 a tap X 2
 601 a stick 0 0
 602 a capture
-606 a capture
-616 a tap A 2
-618 a capture
+622 a capture
+626 a capture
 # Immolation on the ground, its whole burn.
 700 a stick 0 -1
 700 a tap X 2
@@ -70,12 +69,9 @@
 #! expect b 90 damage 3.000
 #! expect a 203 applied jump
 #! expect a 210 special 10 form 0
-#! expect a 226 special-form 3 action 10
 #! expect a 390 special 12 form 0
 #! expect a 470 special 10 form 0
-#! expect a 486 special-form 1 action 10
 #! expect a 600 special 10 form 0
-#! expect a 616 special-form 2 action 10
 #! expect a 700 special 12 form 0
 #! expect a 847 special 11 form 0
 #! expect a 863 special-form 1 action 11
@@ -84,7 +80,6 @@
 #! scene a DeathCoilSpecialArt
 #! scene a IllidanMissile
 #! scene a PossessionMissile
-#! scene a MoonGlaiveCaster
 #! scene a ImmolationTarget
 # BreathOfFireMissile is gone: c888ba8f67 gave Flame Crash RedDragonMissile, and 80fce5213e replaced Flame Crash with the air Immolate the Immolation lines check (trace: run 39009305845).
 #! scene a ImmolationDamage

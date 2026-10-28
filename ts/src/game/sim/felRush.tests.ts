@@ -4,9 +4,12 @@ import { Character, LedgeState, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { type Controls, type Roster } from "./roster";
 import { snapToLedge } from "./ledge";
+import { canAttack } from "./conditions";
 import { fillMeter } from "./meter";
-import { CHAOS_STRIKE_AIR_FORM, FEL_RUSH_BRANCH_FIRST, FEL_RUSH_FIRST, FEL_RUSH_FRAMES, FEL_RUSH_LAST, FEL_RUSH_SPEED, FEL_RUSH_TELL_LAST, VENGEFUL_RETREAT_FORM } from "./specials";
-import { surfaceRight, surfaceZ } from "./stage";
+import { FEL_RUSH_DISTANCE, FEL_RUSH_FIRST, FEL_RUSH_FRAMES, FEL_RUSH_LAST, FEL_RUSH_SPEED, FEL_RUSH_TELL_LAST } from "./specials";
+import { ILLUSION_TRAVEL_FRAMES } from "./specials/illusionDash";
+import { copyFighterState } from "../../generated/state/fighterState";
+import { surfaceLeft, surfaceRight, surfaceZ } from "./stage";
 import { controls } from "./testWorld";
 import { duelPair, lift, stepDuel } from "./testDuel";
 
@@ -18,14 +21,16 @@ const DIRECTIONS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1],
 
 interface Rush { readonly started: boolean; readonly dx: number; readonly dz: number }
 
-function illidan(z: number): { world: Roster; owner: Fighter; target: Fighter } {
-  const pair = duelPair(createFighter(Character.demonHunter, 0.0, 1), createFighter(Character.rifleman, -900.0, 1));
+const PARK = f32(surfaceLeft(0, 0, 0) + 60.0);
+
+function illidan(z: number, ownerX = 0.0, targetX = PARK): { world: Roster; owner: Fighter; target: Fighter } {
+  const pair = duelPair(createFighter(Character.demonHunter, ownerX, 1), createFighter(Character.rifleman, targetX, -1));
   if (z > 0.0) lift(pair.owner, z);
   return pair;
 }
 
 function settle(world: Roster, owner: Fighter, z: number): void {
-  for (let frame = 0; frame < 80 && (owner.special.action !== SpecialAction.none || (owner.special.cooldowns[SpecialAction.demonHunterFelRush] ?? 0) > 0); frame++) {
+  for (let frame = 0; frame < 120 && owner.special.action !== SpecialAction.none; frame++) {
     if (z > 0.0) lift(owner, z);
     stepDuel(world);
   }
@@ -57,9 +62,7 @@ function secondRush(x: number, z: number, onLine?: (target: Fighter, startX: num
   const { world, owner, target } = illidan(HEIGHT);
   const first = rush(world, owner, 1, 0, 1, () => { if (target.status.damage === 0.0) ahead(owner, target, 30.0); });
   settle(world, owner, HEIGHT);
-  target.motion.x = -900.0;
-  lift(target, 0.0);
-  target.status.damage = 0.0;
+  copyFighterState(target, createFighter(Character.rifleman, PARK, -1), 3);
   const second = rush(world, owner, 1, x, z, onLine === undefined ? undefined : (startX, startZ) => onLine(target, startX, startZ));
   settle(world, owner, HEIGHT);
   const third = rush(world, owner, 1, 0, 0);
@@ -83,7 +86,7 @@ test("Fel Rush: a neutral second air rush flies level in his facing [k3 measure 
 test("Fel Rush: the aimed second rush strikes a foe placed on its line in each of the 8 directions [k3 measure #520]", () => {
   for (const [x, z] of DIRECTIONS) {
     const scale = x !== 0 && z !== 0 ? f32(Math.SQRT1_2) : 1.0;
-    const { target } = secondRush(x, z, (foe, startX, startZ) => {
+        const { target } = secondRush(x, z, (foe, startX, startZ) => {
       foe.motion.x = f32(startX + f32(f32(x * f32(RUSH_LENGTH * 0.5)) * scale));
       lift(foe, f32(startZ + f32(f32(z * f32(RUSH_LENGTH * 0.5)) * scale)));
     });
@@ -115,7 +118,7 @@ function ahead(owner: Readonly<Fighter>, foe: Fighter, gap: number): void {
 /** Steps until the Fel Rush action ends, passing each frame's input from `input`; returns the frames it took. */
 function runOut(world: Roster, owner: Fighter, input: (owner: Fighter) => Readonly<Controls> = () => controls()): number {
   let frames = 0;
-  while (owner.special.action === SpecialAction.demonHunterFelRush && frames < 80) {
+  while (owner.special.action === SpecialAction.demonHunterFelRush && frames < 120) {
     stepDuel(world, input(owner));
     frames++;
   }
@@ -141,9 +144,6 @@ function hittingAirRush(world: Roster, owner: Fighter, target: Fighter): void {
   assertGreaterThan(target.status.damage, before);
 }
 
-const branchPress = (attack: boolean) => (owner: Readonly<Fighter>): Controls =>
-  owner.special.form === 0 && owner.special.frame + 1 === FEL_RUSH_BRANCH_FIRST ? controls(attack ? { attackPressed: true } : { specialPressed: true }) : controls();
-
 test("Fel Rush: an air rush that hits nobody, plain or EX, ends in helpless fall, and no second press before landing starts another [k3 measure #554]", () => {
   for (const ex of [false, true]) {
     const { world, owner } = illidan(HEIGHT);
@@ -157,20 +157,6 @@ test("Fel Rush: an air rush that hits nobody, plain or EX, ends in helpless fall
     assertEquals(owner.jump.remaining, 0);
     settle(world, owner, HEIGHT);
     assertFalse(pressAgain(world, owner));
-    owner.special.fall = false;
-    settle(world, owner, HEIGHT);
-    assertFalse(pressAgain(world, owner));
-  }
-});
-
-test("Fel Rush: an air rush whose Vengeful Retreat or Chaos Strike branch hits nobody ends in helpless fall with no second rush [k3 measure #554]", () => {
-  for (const attack of [false, true]) {
-    const { world, owner } = illidan(HEIGHT);
-    stepDuel(world, sideB(1));
-    assertTrue(pressed(owner));
-    runOut(world, owner, branchPress(attack));
-    assertFalse(owner.motion.grounded);
-    assertTrue(owner.special.fall);
     owner.special.fall = false;
     settle(world, owner, HEIGHT);
     assertFalse(pressAgain(world, owner));
@@ -196,28 +182,10 @@ test("Fel Rush: an air rush that hits earns exactly one more, usable at once and
   const { world, owner, target } = illidan(HEIGHT);
   hittingAirRush(world, owner, target);
   assertFalse(owner.special.fall);
-  assertEquals(owner.special.cooldowns[SpecialAction.demonHunterFelRush] ?? 0, 0);
   hittingAirRush(world, owner, target);
   assertFalse(owner.special.fall);
   settle(world, owner, HEIGHT);
   assertFalse(pressAgain(world, owner));
-});
-
-test("Fel Rush: a hit by the air rush's Chaos Strike branch earns the second rush [k3 measure #554]", () => {
-  const { world, owner, target } = illidan(HEIGHT);
-  stepDuel(world, sideB(1));
-  runOut(world, owner, (f) => {
-    if (target.status.damage === 0.0) {
-      target.motion.x = f.motion.x;
-      lift(target, f32(f.motion.z + 600.0));
-      if (f.special.form === CHAOS_STRIKE_AIR_FORM) ahead(f, target, 60.0);
-    }
-    return branchPress(true)(f);
-  });
-  assertGreaterThan(target.status.damage, 0.0);
-  assertFalse(owner.special.fall);
-  lift(owner, HEIGHT);
-  assertTrue(pressAgain(world, owner));
 });
 
 test("Fel Rush: a hit by the ledge-carried grounded rush earns one more air rush [k3 measure #554]", () => {
@@ -238,7 +206,7 @@ test("Fel Rush: a hit by the ledge-carried grounded rush earns one more air rush
   assertFalse(pressAgain(world, owner));
 });
 
-test("Fel Rush: a grounded rush that hits nobody ends as before, grounded on frame 29 with no helpless and no airtime use [k3 measure #554]", () => {
+test("Fel Rush: a grounded rush that hits nobody ends grounded on its last frame with no helpless and no airtime use [k3 measure #554]", () => {
   const { world, owner } = illidan(0.0);
   stepDuel(world, sideB(1));
   assertTrue(pressed(owner));
@@ -265,15 +233,105 @@ test("Fel Rush: landing or a ledge grab after a whiffed air rush gives the air r
     assertTrue(pressAgain(world, owner));
   }
 });
+const STEP = f32(FEL_RUSH_DISTANCE / ILLUSION_TRAVEL_FRAMES);
+const shortenOn = (travelFrame: number) => (owner: Readonly<Fighter>): Controls =>
+  owner.special.frame + 1 === travelFrame ? controls({ specialPressed: true }) : controls();
 
-test("Fel Rush: a Vengeful Retreat branched from a grounded rush still ends without helpless [k3 measure #554]", () => {
-  const { world, owner } = illidan(0.0);
+function groundedRun(shorten?: number): { owner: Fighter; target: Fighter; travelled: number; frames: number } {
+  const { world, owner, target } = illidan(0.0);
+  owner.motion.x = -400.0;
+  stepDuel(world);
+  const startX = owner.motion.x;
   stepDuel(world, sideB(1));
-  let retreated = false;
-  runOut(world, owner, (f) => {
-    retreated ||= f.special.form === VENGEFUL_RETREAT_FORM;
-    return branchPress(false)(f);
-  });
-  assertTrue(retreated);
-  assertFalse(owner.special.fall);
+  assertTrue(pressed(owner));
+  const frames = runOut(world, owner, shorten === undefined ? () => controls() : shortenOn(shorten)) + 1;
+  return { owner, target, travelled: f32(owner.motion.x - startX), frames };
+}
+
+test("Fel Rush: an unshortened rush travels Maiev's full Illusion distance over its 5 travel frames and ends on the shared Illusion end frame [k3 measure docs/design/illidan.md]", () => {
+  const { travelled, frames } = groundedRun();
+  assertEquals(FEL_RUSH_LAST - FEL_RUSH_FIRST + 1, ILLUSION_TRAVEL_FRAMES);
+  assertGreaterThan(travelled, f32(FEL_RUSH_DISTANCE - 1.0));
+  assertLessThan(travelled, f32(FEL_RUSH_DISTANCE + 1.0));
+  assertEquals(frames, FEL_RUSH_FRAMES);
+});
+
+test("Fel Rush: a special press on travel frame k stops him after k minus the tell of the 5 steps, and ends the move as many frames sooner as steps it skipped [k3 measure docs/design/illidan.md]", () => {
+  for (let travelFrame = FEL_RUSH_FIRST; travelFrame < FEL_RUSH_LAST; travelFrame++) {
+    const steps = travelFrame - FEL_RUSH_TELL_LAST;
+    const { owner, travelled, frames } = groundedRun(travelFrame);
+    assertEquals(owner.attack.cooldown, groundedRun().owner.attack.cooldown);
+    assertGreaterThan(travelled, f32(f32(steps * STEP) - 1.0));
+    assertLessThan(travelled, f32(f32(steps * STEP) + 1.0));
+    assertEquals(frames, FEL_RUSH_FRAMES - (FEL_RUSH_LAST - travelFrame));
+  }
+});
+
+test("Fel Rush: a special press during the tell or on the last travel frame does not shorten the rush [k3 measure docs/design/illidan.md]", () => {
+  for (const travelFrame of [2, FEL_RUSH_TELL_LAST, FEL_RUSH_LAST]) {
+    const { travelled, frames } = groundedRun(travelFrame);
+    assertGreaterThan(travelled, f32(FEL_RUSH_DISTANCE - 1.0));
+    assertEquals(frames, FEL_RUSH_FRAMES);
+  }
+});
+
+function struckBy(z: number, shorten: number | undefined, gap: number, startAhead?: number): { world: Roster; owner: Fighter; target: Fighter } {
+  const { world, owner, target } = illidan(z, -400.0, f32(-400.0 + gap));
+  if (z > 0.0) lift(target, z);
+  stepDuel(world);
+  stepDuel(world, sideB(1));
+  while (owner.special.action === SpecialAction.demonHunterFelRush && target.status.damage === 0.0) {
+    if (startAhead !== undefined && owner.special.frame === FEL_RUSH_TELL_LAST) target.motion.x = f32(owner.motion.x + startAhead);
+    if (z > 0.0) lift(target, z);
+    stepDuel(world, shorten === undefined ? controls() : shortenOn(shorten)(owner));
+  }
+  return { world, owner, target };
+}
+
+test("Fel Rush: a rush shortened after its first step still strikes a foe standing in the stretch it crossed, once [k3 measure docs/design/illidan.md]", () => {
+  const { world, owner, target } = struckBy(0.0, FEL_RUSH_FIRST, 300.0, 20.0);
+  assertEquals(target.status.damage, 7.0);
+  runOut(world, owner);
+  assertEquals(target.status.damage, 7.0);
+});
+
+test("Fel Rush: a grounded foe is sent low and away, and an airborne foe is spiked straight down, both for 7% fire [k3 measure docs/design/illidan.md]", () => {
+  const ground = struckBy(0.0, undefined, f32(STEP * f32(2.5))).target;
+  assertEquals(ground.status.damage, 7.0);
+  assertGreaterThan(ground.launch.knockbackX, 0.0);
+  assertGreaterThan(ground.launch.knockbackZ, 0.0);
+  assertLessThan(ground.launch.knockbackZ, f32(ground.launch.knockbackX * f32(0.5)));
+  const air = struckBy(HEIGHT, undefined, f32(STEP * f32(2.5))).target;
+  assertEquals(air.status.damage, 7.0);
+  assertLessThan(air.launch.knockbackZ, 0.0);
+  assertLessThan(Math.abs(air.launch.knockbackX), f32(Math.abs(air.launch.knockbackZ) * f32(0.05)));
+});
+
+test("Fel Rush: a rush shortened mid-travel replays identically from a rollback copy of both fighters [k3 measure docs/design/illidan.md]", () => {
+  const live = illidan(0.0, -400.0, -100.0);
+  stepDuel(live.world);
+  stepDuel(live.world, sideB(1));
+  while (live.owner.special.frame < FEL_RUSH_TELL_LAST) stepDuel(live.world, shortenOn(FEL_RUSH_FIRST + 1)(live.owner));
+  live.target.motion.x = f32(live.owner.motion.x + 20.0);
+  const copy = illidan(0.0, -400.0, -100.0);
+  copyFighterState(copy.owner, live.owner, 3);
+  copyFighterState(copy.target, live.target, 3);
+  for (let frame = 0; frame < 80; frame++) {
+    stepDuel(live.world, shortenOn(FEL_RUSH_FIRST + 1)(live.owner));
+    stepDuel(copy.world, shortenOn(FEL_RUSH_FIRST + 1)(copy.owner));
+  }
+  assertEquals(copy.owner.motion.x, live.owner.motion.x);
+  assertEquals(copy.target.motion.x, live.target.motion.x);
+  assertEquals(copy.target.motion.z, live.target.motion.z);
+  assertEquals(copy.target.status.damage, live.target.status.damage);
+  assertGreaterThan(live.target.status.damage, 0.0);
+});
+
+test("Fel Rush: a rush that strikes a grounded foe skips to its last 14 frames, so Illidan acts before the knocked-down foe can [k3 measure docs/design/illidan.md]", () => {
+  const { world, owner, target } = struckBy(0.0, undefined, 300.0);
+  assertEquals(target.status.damage, 7.0);
+  assertLessThan(runOut(world, owner), FEL_RUSH_FRAMES - FEL_RUSH_LAST);
+  assertEquals(owner.attack.cooldown, groundedRun().owner.attack.cooldown);
+  assertEquals(owner.special.lockFrames, 0);
+  assertFalse(canAttack(target));
 });

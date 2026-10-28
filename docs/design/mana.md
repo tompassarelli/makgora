@@ -167,7 +167,7 @@ invulnerability; **other move** = a different move, not an upgrade.
 | Rifleman | Recoil | Travels 25% farther | Pass | Unchanged |
 | Rifleman | Freeze Trap | 25% more trigger reach | Pass | Unchanged |
 | Illidan | Eye Beam | Ground: Eye Blast, a 24-frame windup and a floor beam to 645; air: +25% damage | Fail: other move, slower; damage | Beam flies 25% farther (19 frames, 912 units) in both forms |
-| Illidan | Fel Rush | +25% damage, branches too | Fail: damage | Shield-safe, branches too |
+| Illidan | Fel Rush | +25% damage, branches too | Fail: damage | Shield-safe (branches removed 2026-10-28) |
 | Illidan | Wing Ascent | Rises 25% farther | Pass | Unchanged |
 | Illidan | Immolation | Reach 116 to 140 | Pass | Unchanged |
 | Blademaster | Wind Cutter | +25% damage | Fail: damage | Range |

@@ -83,71 +83,84 @@ above all, the hero who empties casters: Mana Burn is why he is picked.
 
 ## Side special: Fel Rush
 
-**Alternative A, Fel Rush with Vengeful Retreat and Chaos Strike (picked).**
-Ground or air, any facing (the stick picks the side).
+**Alternative A, Fel Rush as Falco's Phantasm to Maiev's Illusion (picked
+2026-10-28).** Tom asked for Fel Rush to work like Maiev's new Illusion-style
+side special, to go about as far, and to differ from hers the way Falco's
+Phantasm differs from Fox's Illusion. Both moves read their timing and
+distance from one shared module (smashcraft:ts/src/game/sim/specials/illusionDash.ts),
+taken from Melee's Illusion (SmashWiki, [Fox (SSBM)/Side special](https://www.ssbwiki.com/Fox_(SSBM)/Side_special):
+hitbox frames 22-25, five travel frames, 63 frames in all, 20 frames of
+landing lag). Ground or air, any facing (the stick picks the side).
 
-- **Frames 1–5, the tell:** Illidan crouches and his fel aura flares green.
+- **Frames 1–20, the tell:** Illidan crouches and his fel aura flares green.
   Any hit stops it; no armor.
-- **Frames 6–15, the rush:** 20 units a frame (200 in all, 1.5H) in a
-  straight line, leaving a fel trail. In the air he flies level (gravity off),
-  as Fel Rush does in WoW. A grounded rush, and the first rush in an airtime,
-  always go level, the stick picking only the side.
+- **Frames 21–25, the rush:** 92.4 units a frame, 462 in all (3.5H, Maiev's
+  full Illusion distance), in a straight line, leaving his fel streak. In the
+  air he flies level (gravity off), as Fel Rush does in WoW. A grounded rush,
+  and the first rush in an airtime, always go level, the stick picking only
+  the side.
+- **Press special to stop short:** a special press on travel frame 21–24
+  stops him there, after 1–4 of the five steps, as Melee's Illusion shortens;
+  the move ends as many frames sooner as steps it skipped. A press during the
+  tell or on frame 25 does nothing. The strike covers the stretch he crossed
+  each frame, so a shortened rush still strikes anyone it passed, and no one
+  twice.
+- **The strike, Falco's Phantasm against Maiev's pop-up:** 7% fire, mana
+  drain 4. A grounded foe is sent low and away (20°, base 74, growth 60), a
+  tech chase or an edge-guard start; an airborne foe is spiked straight down
+  (270°, base 70, growth 70). Phantasm's own numbers (SmashWiki, [Falco
+  (SSBM)/Side special](https://www.ssbwiki.com/Falco_(SSBM)/Side_special)):
+  7%, base 74 and growth 60 on the ground, base 70 and growth 70 at 270° in
+  the air; its grounded angle is steeper, lowered here so the grounded hit
+  sends low as Tom asked. The rush passes through bodies and stops just
+  short of a raised shield, and the strike meets the shield.
+- **Frames 26–63:** recovery; he acts on frame 64. A rush that strikes a
+  fighter (not a shield) skips to its last 14 frames, as Maiev's Illusion
+  does, so a grounded hit leaves him acting while the foe lies knocked down:
+  a tech chase. An air rush that lands before then ends with 20 frames of
+  landing lag.
 - **One rush per airtime, plus one earned (#554):** a rush that ends airborne
   is the airtime's rush, whether it started in the air or ran off a ledge.
-  If that rush, or the Vengeful Retreat or Chaos Strike branched from it,
-  strikes a fighter, he earns one more rush this airtime with its cooldown
-  cleared; the earned rush earns no third, so offstage rush chains stop at
-  two. An air rush whose rush and branch strike nobody ends in helpless fall
-  until he lands or grabs a ledge; a grounded rush that strikes nobody ends
-  as before. Landing, a ledge grab and being hit give the airtime back.
+  If it strikes a fighter, shortened or not, he earns one more rush this
+  airtime; the earned rush earns no third, so offstage rush chains stop at
+  two. An air rush that strikes nobody ends in helpless fall until he lands
+  or grabs a ledge; a grounded rush that strikes nobody ends normally.
+  Landing, a ledge grab and being hit give the airtime back. Maiev's Illusion
+  has no earned rush.
 - **The earned second rush is aimed:** the stick held on its last tell
-  frame (frame 5) sends it in any of 8 directions (up, down, the diagonals,
-  either side) at the same 20 units a frame and 200 in all; with the stick
-  neutral it flies level in his facing. The press itself still picks the side,
-  since an up or down press is Wing Ascent or Immolate. Meeting the floor
-  during a downward rush lands him and the horizontal part carries on. The
-  rush passes through bodies, striking each once:
-  6% fire at 80°, base 45, growth 40, a pop-up he can follow. It stops just
-  short of a raised shield, and the strike meets the shield.
-- **Frames 16–29:** recovery; he acts on frame 30.
-- **Branches, a press in frames 10–24:** the press replaces the rest of the
-  rush:
-  - **Special: Vengeful Retreat.** He backflips away from the way he faces:
-    16 units a frame back on its frames 1–10 (about 160), rising 16 a frame
-    at the start and 1.2 less each frame (a vault about 100 high), then
-    drifting back. It ends on frame 16: from frame 17 he is airborne with his
-    aerials, air dodge and jump. No hitbox and no intangibility: an escape,
-    not a counter.
-  - **Attack: Chaos Strike.** A two-glaive slash toward the held stick
-    (held back turns him, the cross-up after passing through): active on its
-    frames 5–8, 10% fire at 40°, base 30, growth 95; ends on frame 30. In the
-    air, landing ends it with 12 frames of landing lag.
-- **Limits:** once per airtime, a second (aimed) only when the first or its
-  branch strikes a fighter (landing, a ledge catch or a hit refreshes both);
-  40-frame cooldown from the press, cleared when the second is earned; an air
-  rush that strikes nobody ends helpless.
-- **Cost:** the mana lane's side-special cost (12); the branches are free.
+  frame (frame 20) sends it in any of 8 directions (up, down, the diagonals,
+  either side) at the same speed and distance; with the stick neutral it
+  flies level in his facing. The press itself still picks the side, since an
+  up or down press is Wing Ascent or Immolate. Meeting the floor during a
+  downward rush lands him and the horizontal part carries on.
+- **EX:** shield-safe (a blocked rush holds the shield in shieldstun for the
+  rest of his frames), the roster's rush headline in
+  [mana](mana.md); same frames, no armor, no extra speed.
+- **Cost:** the mana lane's side-special cost (12).
 
-**Counterplay.** The tell is 5 frames, so up close the rush is a read, not a
-reaction; from its full 200 units it arrives on frame 15. A raised shield
-stops it, and a rush that branches into nothing sits at the shield until frame
-29: punishable. A jump over the low rush leaves him in recovery below. Against
-Vengeful Retreat the defender chases: he is airborne and unable to act on its
-frames 1–16, in range of a jump-out-of-shield aerial, a dash attack or a shot.
-Chaos Strike is punishable on shield. The defender's guess after a rush into
-shield: stay shielded (beats Chaos Strike), or let go and chase (beats the
-Retreat), while Illidan guesses which.
+**Counterplay.** The tell is 20 frames, so the rush is a read at any range;
+from its full 462 units it arrives on frame 25. A raised shield stops it
+and the rush sits in 38 frames of recovery: punishable. A jump over the low
+rush leaves him in recovery below; a whiffed air rush leaves him helpless.
+The defender's read is the shortened stop: Illidan can stop in front of a
+shield or just past a dodger, so holding shield late beats a full rush, and
+a roll away beats a short one.
 
-**Reward.** A pop-up from the rush, a cross-up Chaos Strike, a level air
-recovery under an edge-guarder (Wing Ascent covers high), and a way to
-drain mana on the way in.
+**Reward.** A low knockdown on a grounded foe to tech-chase (he recovers 14
+frames after the hit), a spike on an
+airborne one at the ledge, and a long level air recovery with an aimed
+second rush when the first one connects.
 
-**Alternative B, The Hunt (rejected).** A 20-frame cast, then a 3H lunge that
+**Alternative B, keep the Vengeful Retreat and Chaos Strike branches
+(rejected 2026-10-28).** A special press now shortens the rush, so the
+backflip branch has no input left, and Tom asked for both branches removed.
+
+**Alternative C, The Hunt (rejected).** A 20-frame cast, then a 3H lunge that
 marks for a damage-over-time and roots for 30 frames on a hit. Rejected: it
 duplicates Warden's mark-and-pursue (#126), and a root beside Mana Burn's stun
 gives him two lockdowns.
 
-**Alternative C, a legible counter stance, Blur (rejected).** Keep a counter,
+**Alternative D, a legible counter stance, Blur (rejected).** Keep a counter,
 but make it stand still with a fel shimmer on frames 4–12 and answer a strike
 with a slash behind the attacker. Rejected: counters ask Illidan to stand
 still when his identity is air speed and glaive reach, and Forsaken Paladin's Divine
@@ -168,8 +181,8 @@ enders and big hits drain more:
 | Back air | 5 | Down air (the spike) | 8 |
 | Forward smash | 10 | Up, down smash | 8 |
 | Each throw | 6 | Fel Rush pass | 4 |
-| Chaos Strike | 10 | Immolate | 6 |
-| Wing Dive | 5 | Eye Beam | 0 |
+| Wing Dive | 5 | Immolate | 6 |
+| Eye Beam | 0 | | |
 
 A shielded hit drains nothing; pummels, get-up and ledge attacks drain
 nothing; mana never goes below 0 and Illidan gains none. Each drain flashes
@@ -464,8 +477,13 @@ each), Illidan's average distance to Rifleman fell from 281.7 to 272.4
 units; his 27 charged forward-smash beams, none paid for, became 13 Eye
 Blasts, each on a full bar.
 
-The computer presses side special as before; the gameplan names the
-Fel Rush branches only once a bot lane authors them (#105 is paused). Its
+The computer rushes a grounded, level target from 80 units out to the full
+462, never when the full rush would end past the stage's safe edge, and
+presses special to stop short once it has passed the target by 40 units or
+when the next step would leave the safe stage (2026-10-28, replacing its
+Fel Rush into Chaos Strike or Vengeful Retreat play). Its gameplan spaces
+with the rush at 160-460 units and follows its low grounded launch with a
+grab, a dash attack or a forward tilt. Its
 old defence through Parry Step is gone: Illidan's planned stance answers fall
 back to shield and spot dodge.
 
@@ -476,10 +494,8 @@ attackCues.ts and elementLooks.ts):
 
 | Option | Effect |
 | --- | --- |
-| Fel Rush tell (frames 1–5), and every branch's startup | Death Coil special art |
-| Fel Rush (frames 6–15) | Illidan's Metamorphosis missile trail |
-| Vengeful Retreat | Possession missile trailing the vault |
-| Chaos Strike (ground and air) | Moon Glaive whirl |
+| Fel Rush tell (frames 1–20), and every branch's startup | Death Coil special art |
+| Fel Rush (frames 21–25, or to a shortened stop) | Illidan's Metamorphosis missile streak along the path and the green wing trail, which fade behind him; Maiev's Illusion leaves blink afterimages instead |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
 | Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a heel hit lands as the fire hit's green flame burst, a shin or toe hit as the normal spark |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |
@@ -534,6 +550,7 @@ beats read. The DIs listed must not escape.
 | up air | 10-30 | up air | read | | up air strings, before the foe flies high enough | holds, DI-dependent since #541: DI in is hit by every option |
 | up air | 40-50 | up air | DI-dependent | in, none | up air strings | holds |
 | up air | 60-100 | up air | read | | the string ends in a read | holds, DI-dependent: DI out and down escape |
+| side special (Fel Rush) | 0-60 | dash attack | read | | a grounded Phantasm knocks down low for a tech chase (added 2026-10-28 with the rework) | holds: a read at 0-60%, and grab, forward and down tilt reads too |
 
 ### Edge-guard targets
 
@@ -579,8 +596,9 @@ closes his open ledger row (`illidan-short-jump`, above Melee's 2.14).
 
 What he keeps, so he does not become Falco in a costume:
 
-- Fel Rush and its branches: his side special stays the straight fel dash
-  with Vengeful Retreat and Chaos Strike, not Falco's Phantasm.
+- Fel Rush: since 2026-10-28 his side special is Phantasm to Maiev's
+  Illusion (low and spiking where hers pops up), but it keeps the fel fire,
+  the fel streak, and the earned, aimed second rush on a hit that hers lacks.
 - Warglaives: his normals keep their glaive reach, the twin-glaive forward air
   and Azzinoth's fel fire on his split-kick down smash.
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its

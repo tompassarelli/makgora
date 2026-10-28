@@ -21,7 +21,8 @@
     { "fighter": "Illidan", "opener": "down throw", "region": "clean", "percent": [0,40], "weight": 75, "followUp": "down tilt", "class": "read" },
     { "fighter": "Illidan", "opener": "up air", "region": "clean", "percent": [10,30], "weight": 75, "followUp": "up air", "class": "read" },
     { "fighter": "Illidan", "opener": "up air", "region": "clean", "percent": [40,50], "weight": 75, "followUp": "up air", "class": "DI-dependent", "di": ["in","none"] },
-    { "fighter": "Illidan", "opener": "up air", "region": "clean", "percent": [60,100], "weight": 75, "followUp": "up air", "class": "read" }
+    { "fighter": "Illidan", "opener": "up air", "region": "clean", "percent": [60,100], "weight": 75, "followUp": "up air", "class": "read" },
+    { "fighter": "Illidan", "opener": "side special", "region": "clean", "percent": [0,60], "weight": 75, "followUp": "dash attack", "class": "read" }
   ],
   "edgeGuards": [
     { "fighter": "Maiev Shadowsong", "move": "back air", "percent": [60,150], "weight": 75, "victim": { "pastLedge": 40, "height": 0 }, "di": ["out","up","down","in","none"] },

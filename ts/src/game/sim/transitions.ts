@@ -12,6 +12,7 @@ import { cancelsJumpSquat, isTumbling } from "./conditions";
 import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, mutablePlacedObject, placedObject } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { clearMash } from "./mash";
+import { FEL_RUSH_IN_PROGRESS } from "./felRushAirtime";
 import { DOWN_ATTACK_FRAMES, attackDurationFramesForGrounding, isSmashAttack } from "./moves";
 import type { Roster } from "./roster";
 import { clearPowershield, clearShieldBreak } from "./shield";
@@ -224,7 +225,7 @@ export function interruptJumpOrDodge(f: Fighter): void {
 
 
 export function refreshOriginalAirtime(f: Fighter): void {
-  if (f.tuning.specials === undefined) f.special.airtimeUses = 0;
+  if (f.tuning.specials === undefined) f.special.airtimeUses &= FEL_RUSH_IN_PROGRESS;
 }
 
 

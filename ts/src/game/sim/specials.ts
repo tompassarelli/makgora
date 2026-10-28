@@ -37,6 +37,9 @@ import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, followU
 import { mutableBear } from "./fighterRest";
 import { heavyFall } from "./itemBuffs";
 import { squareRoot } from "./warcraftMath";
+import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
+import { FEL_RUSH_AIMED_AIRTIME, FEL_RUSH_AIRTIME, FEL_RUSH_EARNED, FEL_RUSH_FROM_AIR, FEL_RUSH_STRUCK } from "./felRushAirtime";
+import { ILLUSION_AIR_LANDING_LAG, ILLUSION_DISTANCE_HEIGHTS, ILLUSION_END_FRAME, ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_HIT_RECOVERY, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_SHORTEN, ILLUSION_TRAVEL_FRAMES } from "./specials/illusionDash";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_LIFETIME, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_FRAMES, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED, eyeBeamShotFrame } from "./eyeBeam";
 
 
@@ -46,35 +49,15 @@ import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_FRAMES, EYE_BEAM_EX_LIFETIME, EYE_BEAM_
 
 
 
-export const FEL_RUSH_TELL_LAST = 5;
-export const FEL_RUSH_FIRST = 6;
-export const FEL_RUSH_LAST = 15;
-export const FEL_RUSH_FRAMES = 29;
-export const FEL_RUSH_SPEED = 20.0;
-export const FEL_RUSH_BRANCH_FIRST = 10;
-export const FEL_RUSH_BRANCH_LAST = 24;
-export const FEL_RUSH_COOLDOWN = 40;
+export const FEL_RUSH_FIRST = ILLUSION_FIRST_TRAVEL_FRAME;
+export const FEL_RUSH_TELL_LAST = FEL_RUSH_FIRST - 1;
+export const FEL_RUSH_LAST = ILLUSION_LAST_TRAVEL_FRAME;
+export const FEL_RUSH_FRAMES = ILLUSION_END_FRAME;
+export const FEL_RUSH_DISTANCE = f32(HERO_REFERENCE_HEIGHT * ILLUSION_DISTANCE_HEIGHTS);
+export const FEL_RUSH_SPEED = f32(FEL_RUSH_DISTANCE / ILLUSION_TRAVEL_FRAMES);
+const FEL_RUSH_LANDING_LAG = ILLUSION_AIR_LANDING_LAG;
 
-// Fel Rush's airtime bits: the airtime's rush, the earned (aimed) second, the earned charge, and two for the rush in progress.
-const FEL_RUSH_AIRTIME = 2;
-const FEL_RUSH_AIMED_AIRTIME = 4;
-const FEL_RUSH_EARNED = 8;
-const FEL_RUSH_STRUCK = 16;
-const FEL_RUSH_FROM_AIR = 32;
 const FEL_RUSH_AIR_CARRY = 5.0;
-export const VENGEFUL_RETREAT_FORM = 1;
-export const CHAOS_STRIKE_FORM = 2;
-export const CHAOS_STRIKE_AIR_FORM = 3;
-
-export const VENGEFUL_RETREAT_FRAMES = 16;
-export const VENGEFUL_RETREAT_MOVE_LAST = 10;
-export const VENGEFUL_RETREAT_SPEED = 16.0;
-const VENGEFUL_RETREAT_RISE = 16.0;
-const VENGEFUL_RETREAT_FALL = 1.2000000476837158;
-export const CHAOS_STRIKE_FIRST = 5;
-export const CHAOS_STRIKE_LAST = 8;
-export const CHAOS_STRIKE_FRAMES = 30;
-const CHAOS_STRIKE_LANDING_LAG = 12;
 export const DEMONHUNTER_WING_STARTUP = 7;
 export const DEMONHUNTER_WING_DURATION = 32;
 const DEMONHUNTER_WING_SPEED = 30.0;
@@ -258,16 +241,8 @@ export function cancelShineForUpSmash(owner: Fighter): void {
   if (owner.motion.grounded && (immolateCancelOpen(owner) || heroSpecialCancelOpen(owner))) endCancelledSpecial(owner);
 }
 
-export function demonHunterJumpOrAttackBranch(owner: Fighter, input: Readonly<Controls>): void {
-  const { special } = owner;
-  if (owner.character !== Character.demonHunter || owner.launch.hitlag > 0) return;
-  if (input.jumpPressed && immolateCancelOpen(owner)) {
-    endCancelledSpecial(owner);
-    return;
-  }
-  if (input.attackPressed && special.action === SpecialAction.demonHunterFelRush) {
-    felRushBranch(owner, input, true);
-  }
+export function demonHunterJumpCancel(owner: Fighter): void {
+  if (owner.character === Character.demonHunter && owner.launch.hitlag <= 0 && immolateCancelOpen(owner)) endCancelledSpecial(owner);
 }
 
 function wingDive(owner: Fighter, input: Readonly<Controls>): boolean {
@@ -302,14 +277,9 @@ export function demonHunterHoldsHeight(f: Readonly<Fighter>): boolean {
 
 export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
   const { special } = f;
-  if (special.action === SpecialAction.demonHunterFelRush) {
-    return special.form === 0 ? special.frame < FEL_RUSH_LAST : special.form === VENGEFUL_RETREAT_FORM && special.frame < VENGEFUL_RETREAT_MOVE_LAST;
-  }
+  if (special.action === SpecialAction.demonHunterFelRush) return special.frame < FEL_RUSH_LAST;
   return special.action === SpecialAction.demonHunterWingAscent;
 }
-
-
-
 
 
 function stallImmolate(owner: Fighter): void {
@@ -317,36 +287,22 @@ function stallImmolate(owner: Fighter): void {
 }
 
 
+function skipFelRushTo(owner: Fighter, frame: number): void {
+  const { special, attack } = owner;
+  const skipped = frame - special.frame;
+  special.frame = frame;
+  special.lockFrames = max(0, special.lockFrames - skipped);
+  attack.cooldown = max(0, attack.cooldown - skipped);
+}
 
-
-
-
-function felRushBranch(owner: Fighter, input: Readonly<Controls>, attack: boolean): boolean {
-  const { special, motion } = owner;
+function shortenFelRush(owner: Fighter): boolean {
+  const { special } = owner;
   const next = special.frame + 1;
-  if (special.form !== 0 || next < FEL_RUSH_BRANCH_FIRST || next > FEL_RUSH_BRANCH_LAST || owner.launch.hitlag > 0 || owner.launch.hitstun > 0) return false;
-  for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
-  special.hit = false;
-
-  owner.attack.cooldown = 0;
-  if (attack) {
-    if (input.direction !== 0) owner.facing = input.direction < 0 ? -1 : 1;
-    startBranchPhase(owner, motion.grounded ? CHAOS_STRIKE_FORM : CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FRAMES);
-    motion.vx = motion.grounded ? 0.0 : f32(owner.facing * FEL_RUSH_AIR_CARRY);
-    return true;
-  }
-  startBranchPhase(owner, VENGEFUL_RETREAT_FORM, VENGEFUL_RETREAT_FRAMES);
-  motion.grounded = false;
-  motion.surface = undefined;
-  motion.vx = f32(-owner.facing * VENGEFUL_RETREAT_SPEED);
-  motion.vz = VENGEFUL_RETREAT_RISE;
+  if (next < ILLUSION_SHORTEN.first - 1 || next > ILLUSION_SHORTEN.last - 1 || owner.launch.hitlag > 0 || owner.launch.hitstun > 0) return false;
+  skipFelRushTo(owner, FEL_RUSH_LAST - 1);
   observeActionDecision(SPECIAL_ACTION_BIT);
   return true;
 }
-
-
-
-
 
 
 function aimFelRush(owner: Fighter, input: Readonly<Controls> | undefined): void {
@@ -380,35 +336,19 @@ function moveFelRush(owner: Fighter): void {
 function advanceFelRush(owner: Fighter, input: Readonly<Controls> | undefined): void {
   const { special, motion } = owner;
   const frame = special.frame;
-  if (special.form === 0) {
-    if (frame === FEL_RUSH_TELL_LAST) aimFelRush(owner, input);
-    moveFelRush(owner);
-    return;
-  }
-  if (special.form === VENGEFUL_RETREAT_FORM) {
-    if (motion.grounded && frame > 1) {
-      endSpecialAction(owner, false);
-      return;
-    }
-    if (frame < VENGEFUL_RETREAT_MOVE_LAST) {
-      motion.vx = f32(-owner.facing * VENGEFUL_RETREAT_SPEED);
-      motion.vz = f32(VENGEFUL_RETREAT_RISE - f32(frame * VENGEFUL_RETREAT_FALL));
-    } else if (frame === VENGEFUL_RETREAT_MOVE_LAST) {
-      motion.vx = f32(-owner.facing * FEL_RUSH_AIR_CARRY);
-    }
-    return;
-  }
-  if (special.form === CHAOS_STRIKE_AIR_FORM && motion.grounded) {
-    special.action = SpecialAction.none;
-    special.frame = 0;
+  if (frame === FEL_RUSH_TELL_LAST) aimFelRush(owner, input);
+  moveFelRush(owner);
+  if (frame > FEL_RUSH_LAST && motion.grounded && (special.airtimeUses & FEL_RUSH_FROM_AIR) !== 0) {
+    special.airtimeUses &= ~(FEL_RUSH_STRUCK | FEL_RUSH_FROM_AIR);
+    endSpecialAction(owner, false);
     special.lockFrames = 0;
     owner.attack.cooldown = 0;
-    owner.landing.lag = max(owner.landing.lag, CHAOS_STRIKE_LANDING_LAG);
-  }
+    owner.landing.lag = max(owner.landing.lag, FEL_RUSH_LANDING_LAG);
+  } else if (frame > FEL_RUSH_LAST && (special.airtimeUses & FEL_RUSH_STRUCK) !== 0 && frame < FEL_RUSH_FRAMES - ILLUSION_HIT_RECOVERY) skipFelRushTo(owner, FEL_RUSH_FRAMES - ILLUSION_HIT_RECOVERY);
 }
 
 
-/** A rush ending airborne is the airtime's rush; one that struck earns one more, cooled at once, and an air rush that struck nobody ends helpless. */
+/** A rush ending airborne is the airtime's rush; one that struck earns one more, and an air rush that struck nobody ends helpless. */
 function endFelRush(owner: Fighter): void {
   const { special } = owner;
   const uses = special.airtimeUses;
@@ -419,10 +359,7 @@ function endFelRush(owner: Fighter): void {
   }
   const struck = (uses & FEL_RUSH_STRUCK) !== 0;
   special.airtimeUses |= FEL_RUSH_AIRTIME;
-  if (struck && (uses & FEL_RUSH_AIMED_AIRTIME) === 0) {
-    special.airtimeUses |= FEL_RUSH_EARNED;
-    special.cooldowns[SpecialAction.demonHunterFelRush] = 0;
-  }
+  if (struck && (uses & FEL_RUSH_AIMED_AIRTIME) === 0) special.airtimeUses |= FEL_RUSH_EARNED;
   endSpecialAction(owner, !struck && (uses & FEL_RUSH_FROM_AIR) !== 0);
 }
 
@@ -551,7 +488,6 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     if (!motion.grounded && !first && ((uses & FEL_RUSH_EARNED) === 0 || (uses & FEL_RUSH_AIMED_AIRTIME) !== 0)) return false;
     owner.facing = moveX < 0 ? -1 : 1;
     startSpecialAction(owner, action, FEL_RUSH_FRAMES, moveX);
-    special.cooldowns[action] = FEL_RUSH_COOLDOWN;
     special.hit = false;
     special.aimX = 0;
     special.aimZ = 0;
@@ -697,7 +633,7 @@ function originalSpecialBranch(owner: Fighter, input: Readonly<Controls>): boole
   const { action } = owner.special;
   if (owner.character === Character.rifleman && action === SpecialAction.riflemanRecovery) return secondRecoilShot(owner, input);
   if (owner.character !== Character.demonHunter) return undefined;
-  if (action === SpecialAction.demonHunterFelRush) return felRushBranch(owner, input, false);
+  if (action === SpecialAction.demonHunterFelRush) return shortenFelRush(owner);
   return undefined;
 }
 
@@ -831,30 +767,26 @@ function wingDiveContact(owner: Fighter, targetSlot: number, target: Fighter): R
 
 const FEL_RUSH_PASS: Readonly<HitRegion> = {
   minX: -40.0, maxX: 60.0, minZ: -20.0, maxZ: 140.0,
-  effect: { damage: 6.0, growth: 40.0, base: 45.0, launchX: 0.1736481785774231, launchZ: 0.9848077297210693, electric: false, element: HitElement.fire, manaDrain: 4 },
-  window: 1,
-};
-const CHAOS_STRIKE: Readonly<HitRegion> = {
-  minX: 0.0, maxX: 150.0, minZ: -40.0, maxZ: 140.0,
-  effect: { damage: 10.0, growth: 95.0, base: 30.0, launchX: 0.7660444378852844, launchZ: 0.6427876353263855, electric: false, element: HitElement.fire, manaDrain: 10 },
+  effect: { damage: 7.0, growth: 70.0, base: 70.0, launchX: 0.0, launchZ: -1.0, electric: false, element: HitElement.fire, manaDrain: 4 },
+  groundedEffect: { damage: 7.0, growth: 60.0, base: 74.0, launchX: 0.9396926164627075, launchZ: 0.3420201539993286, electric: false, element: HitElement.fire, manaDrain: 4 },
   window: 1,
 };
 const FEL_RUSH_PASS_EX = exShieldSafeRegion(FEL_RUSH_PASS);
-const CHAOS_STRIKE_EX = exShieldSafeRegion(CHAOS_STRIKE);
 
 
-export function felRushRegion(form: number, frame: number, ex = false): Readonly<HitRegion> {
-  if (form === 0) return frame >= FEL_RUSH_FIRST && frame <= FEL_RUSH_LAST ? ex ? FEL_RUSH_PASS_EX : FEL_RUSH_PASS : NO_HIT_REGION;
-  if (form === CHAOS_STRIKE_FORM || form === CHAOS_STRIKE_AIR_FORM) return frame >= CHAOS_STRIKE_FIRST && frame <= CHAOS_STRIKE_LAST ? ex ? CHAOS_STRIKE_EX : CHAOS_STRIKE : NO_HIT_REGION;
-  return NO_HIT_REGION;
+export function felRushRegion(frame: number, ex = false): Readonly<HitRegion> {
+  return frame >= FEL_RUSH_FIRST && frame <= FEL_RUSH_LAST ? ex ? FEL_RUSH_PASS_EX : FEL_RUSH_PASS : NO_HIT_REGION;
 }
 
 function felRushContact(owner: Fighter, targetSlot: number, target: Fighter): Readonly<HitRegion> {
-  const region = felRushRegion(owner.special.form, owner.special.frame, owner.special.ex);
+  const region = felRushRegion(owner.special.frame, owner.special.ex);
   if (region.window <= 0 || specialAlreadyHit(owner, targetSlot) || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const localX = f32(f32(target.motion.x - owner.motion.x) * owner.facing);
   const localZ = f32(target.motion.z - owner.motion.z);
-  return localX >= region.minX && localX <= region.maxX && localZ >= region.minZ && localZ <= region.maxZ ? region : NO_HIT_REGION;
+  const crossedX = f32(owner.motion.deltaX * owner.facing);
+  const crossedZ = owner.motion.deltaZ;
+  return localX >= f32(region.minX - max(crossedX, 0.0)) && localX <= f32(region.maxX - min(crossedX, 0.0))
+    && localZ >= f32(region.minZ - max(crossedZ, 0.0)) && localZ <= f32(region.maxZ - min(crossedZ, 0.0)) ? region : NO_HIT_REGION;
 }
 
 function demonHunterSpecialContact(owner: Fighter, targetSlot: number, target: Fighter): Readonly<HitRegion> {

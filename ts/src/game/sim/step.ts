@@ -46,7 +46,7 @@ import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { closeParasol, endParasolAerial, parasolFall } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
 import { exSpecialPressed } from "./exSpecials";
-import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpOrAttackBranch } from "./specials";
+import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpCancel } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
 import { settleExWavedash } from "./exWavedash";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
@@ -520,8 +520,10 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (launch.hitlag <= 0) launch.hitstun = max(0, launch.hitstun - 1);
   if (launch.hitstun === 0) launch.throwHitstun = false;
   const squatBeforeInput = jump.squat;
-  if (input.jumpPressed || input.attackPressed) demonHunterJumpOrAttackBranch(f, input);
-  if (input.jumpPressed) jumpCancelHeroSpecial(f, input);
+  if (input.jumpPressed) {
+    demonHunterJumpCancel(f);
+    jumpCancelHeroSpecial(f, input);
+  }
 
   const wet = sea.wet(f, stage);
   const waterJumped = wet && (input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && sea.beginWaterJump(f, input.direction);

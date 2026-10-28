@@ -4,8 +4,8 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/pa
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import {
-  CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FIRST, CHAOS_STRIKE_FORM, CHAOS_STRIKE_LAST, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP,
-  DEMONHUNTER_WING_STARTUP, FEL_RUSH_FIRST, FEL_RUSH_LAST, FEL_RUSH_TELL_LAST, VENGEFUL_RETREAT_FORM, VENGEFUL_RETREAT_MOVE_LAST,
+  DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP,
+  DEMONHUNTER_WING_STARTUP, FEL_RUSH_FIRST, FEL_RUSH_LAST, FEL_RUSH_TELL_LAST,
 } from "../sim/specials";
 import { characterModelScale } from "./modelScale";
 
@@ -92,10 +92,8 @@ export function projectSpecialEffect(state: Readonly<SpecialEffectState>, fighte
     const immolate = special.action === SpecialAction.demonHunterImmolate
       && special.frame >= DEMONHUNTER_IMMOLATE_STARTUP && special.frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE;
 
-    const tell = felRush && special.form === 0 && special.frame >= 1 && special.frame <= FEL_RUSH_TELL_LAST;
-    const chaos = felRush && (special.form === CHAOS_STRIKE_FORM || special.form === CHAOS_STRIKE_AIR_FORM)
-      && special.frame >= CHAOS_STRIKE_FIRST && special.frame <= CHAOS_STRIKE_LAST;
-    out.visible = immolate || tell || chaos;
+    const tell = felRush && special.frame >= 1 && special.frame <= FEL_RUSH_TELL_LAST;
+    out.visible = immolate || tell;
     out.x = motion.x;
     out.z = f32(motion.z + f32(50 * scale));
     out.scale = f32((immolate ? f32(1.4) : f32(1.1)) * scale);
@@ -107,8 +105,7 @@ export function projectSpecialEffect(state: Readonly<SpecialEffectState>, fighte
   }
   if (kind === STATIC_WING_TRAIL) {
     const visible = (special.action === SpecialAction.demonHunterWingAscent && (special.frame >= DEMONHUNTER_WING_STARTUP || special.form !== 0))
-      || (felRush && special.form === 0 && special.frame >= FEL_RUSH_FIRST && special.frame <= FEL_RUSH_LAST)
-      || (felRush && special.form === VENGEFUL_RETREAT_FORM && special.frame <= VENGEFUL_RETREAT_MOVE_LAST);
+      || (felRush && special.frame >= FEL_RUSH_FIRST && special.frame <= FEL_RUSH_LAST);
     out.visible = visible;
     out.x = motion.x;
     out.z = f32(motion.z + f32(8 * scale));
