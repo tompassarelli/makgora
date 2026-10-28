@@ -282,9 +282,9 @@ export function captureNativeDriverInputs(s: ShellState): void {
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
     else if (edge.action === "move") {
-      const [kind, code = "", facing] = edge.args;
+      const [kind, code = "", facing, gap = "500"] = edge.args;
       fighterAt(s.world, edge.slot).motion.x = 0.0;
-      fighterAt(s.world, edge.slot === 0 ? 1 : 0).motion.x = (facing === "left" ? -1 : 1) * 500.0;
+      fighterAt(s.world, edge.slot === 0 ? 1 : 0).motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
       startScriptedMove(s, edge.slot, kind, code, facing);
     }
     else if (pad !== undefined) applyEdge(s, pad, edge);

@@ -4,7 +4,7 @@ import { AttackStyle } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
 import { heroDefinition } from "../roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../sim/moves";
-import { specialKit } from "../sim/specials/schema";
+import { type AuthoredSpecial, specialKit } from "../sim/specials/schema";
 import { heroCueWindows } from "../presentation/cueWindows";
 
 export const SHOWCASE_FIRST_FRAME = 40;
@@ -17,6 +17,7 @@ export interface ShowcaseMove {
   readonly code: number;
   readonly first: number;
   readonly end: number;
+  readonly gap?: number | undefined;
 }
 
 export interface ShowcaseRow {
@@ -34,10 +35,17 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
-    moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120 });
+    moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : radialGap(special) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame });
   return moves;
+}
+
+function radialGap(special: Readonly<AuthoredSpecial>): number | undefined {
+  if (special.radial !== true) return undefined;
+  let reach = 0.0;
+  for (const region of special.regions ?? []) reach = Math.max(reach, region.hit.strike?.radius ?? 0.0);
+  return Math.floor(reach * 0.75);
 }
 
 export function showcaseFrames(move: ShowcaseMove): number[] {
