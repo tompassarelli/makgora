@@ -4,7 +4,7 @@ import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ParasolState, ShieldBreak, SpecialAction, SurfaceContact } from "../sim/codes";
-import { type CommandGrab, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
+import { type CommandGrab, FOLLOW_UP_FORM } from "../sim/specials/schema";
 
 import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES, WALL_TECH_STARTUP_FRAMES, attackPhase, inGrabContext, isForwardGroundRoll, isGroundDodging } from "../sim/conditions";
 import { DOWN_BOUND_FRAMES, DOWN_DAMAGE_FRAMES, DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
@@ -22,6 +22,7 @@ import { disabledPose } from "./disabledPose";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
+import { heldStanceSeconds, playsFollowUpPose } from "./specialPhase";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
 import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
@@ -36,8 +37,6 @@ import {
   advanceIllidanMotion, clearIllidanMotion, copyIllidanMotion, createIllidanMotion, firstIllidanMotionDifference,
 } from "./illidanMotion";
 
-
-const playsFollowUpPose = (f: Readonly<Fighter>): boolean => f.special.form >= FOLLOW_UP_FORM || f.special.form === SpecialForm.recall;
 
 
 const REACTION_CLIP_FRAMES = 24;
@@ -347,8 +346,12 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
       pose.clipTime = peon.time;
       return 0.0;
     }
-    playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}${refireKey(f)}`, fighterSpecialClip(f).index);
-    return rate;
+    const special = fighterSpecialClip(f);
+    playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}${refireKey(f)}`, special.index);
+    const held = heldStanceSeconds(f, special);
+    if (held === undefined) return rate;
+    pose.clipTime = held;
+    return 0.0;
   }
   if (holdsSpecialEnd(pose, f)) return 0.0;
   const stateRate = illidan ? selectIllidanAction(pose, f, charging) : selectTableAction(pose, f, table, charging);

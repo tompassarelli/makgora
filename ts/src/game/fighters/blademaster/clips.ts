@@ -50,6 +50,7 @@ function sequence(name: SequenceName, seconds?: number): HeroClip {
 const THRUST = f32(0.48);
 const CUT = f32(0.36);
 const RISE = f32(0.38);
+const QUICKDRAW_STANCE_SECONDS = f32(0.1);
 const SPIN_TURN = f32(0.433);
 
 
@@ -58,7 +59,7 @@ const aligned = (strike: number, firstActive: number, active: number, recovery: 
 
 const COMBAT_STANCE = sequence("Stand Ready");
 const RECOIL = sequence("Death", f32(0.45));
-const QUICKDRAW_STANCE = sequence("Attack", aligned(CUT, QUICKDRAW_DASH_FIRST + 1, 1, 20));
+const QUICKDRAW_STANCE: HeroClip = { ...sequence("Attack", aligned(CUT, QUICKDRAW_DASH_FIRST + 1, 1, 20)), held: QUICKDRAW_STANCE_SECONDS };
 const QUICKDRAW_CUT = sequence("Attack", aligned(CUT, QUICKDRAW_DASH_FIRST, 6, 16));
 
 

@@ -24,6 +24,8 @@ export interface HeroClip {
 
   readonly stance?: number | undefined;
 
+  readonly held?: number | undefined;
+
 
 
 
