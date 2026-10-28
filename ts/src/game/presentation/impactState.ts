@@ -219,7 +219,7 @@ export function impactLifetime(kind: number): number {
 function exImpactLifetime(kind: number): number {
   switch (kind) {
     case IMPACT_EX_DUST: return 32;
-    case IMPACT_EX_FLASH: return 24;
+    case IMPACT_EX_FLASH: return 12;
     default: return 20;
   }
 }
@@ -321,7 +321,7 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
     spawn(state, dust, f32(x - 12.0), f32(z + 2.0), -1, f32(0.7));
     spawn(state, dust, f32(x + 12.0), f32(z + 2.0), 1, f32(0.7));
   }
-  if (events.exWavedash) spawn(state, IMPACT_EX_FLASH, x, f32(z + 2.0), 0, 1.0);
+  if (events.exWavedash) spawn(state, IMPACT_EX_FLASH, x, f32(z + 2.0), 0, f32(0.5));
   if (events.exSlide && imod(frame, 3) === 0) spawn(state, IMPACT_EX_SPARK, x, f32(z + 6.0), 0, f32(0.5));
   if (events.jump === JumpCue.ground) {
     spawn(state, IMPACT_DUST, f32(events.jumpOriginX - 12.0), f32(events.jumpOriginZ + 2.0), -1, f32(0.7));

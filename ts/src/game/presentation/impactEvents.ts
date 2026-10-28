@@ -448,7 +448,7 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.jumpOriginZ = events.previousZ;
   }
   events.airDodge = present && !events.previouslyAirDodging && dodge.airDodging;
-  events.exSlide = present && dodge.ex && !dodge.airDodging && motion.grounded && down.state === DownState.none;
+  events.exSlide = present && dodge.ex && !dodge.airDodging && !jump.dodgeQueued && motion.grounded && down.state === DownState.none;
   events.exWavedash = events.exSlide && !events.previouslyGrounded;
   if (present && launch.hitlag === 0) {
     const moved = Math.abs(f32(motion.x - events.previousX)) > f32(0.1) || Math.abs(f32(motion.z - events.previousZ)) > f32(0.1);
