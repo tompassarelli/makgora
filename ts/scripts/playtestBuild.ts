@@ -4,9 +4,9 @@ import { Effect, Schema } from "effect";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { PLAYTEST_PREFIX } from "./wisp/project";
-import { type Edition, currentPlaytest } from "./wisp/currentPlaytest";
+import { currentPlaytest } from "./wisp/currentPlaytest";
 import { installLatest } from "./wisp/mapLibrary";
-import { costPrediction } from "./wisp/greenBuilds";
+import { type Edition, costPrediction } from "./wisp/greenBuilds";
 import { readyPlaytest } from "./wisp/playtestReady";
 
 export const installPlaytest = (revision?: string, predictCost = false, helper = true, edition: Edition = "full") => Effect.gen(function*() {

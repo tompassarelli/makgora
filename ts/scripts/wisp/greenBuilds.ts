@@ -19,6 +19,12 @@ export const SHORT_COMMIT = 7;
 export const PREDICT_COST = "--predict-cost";
 export const costPrediction = (args: readonly string[]) => ({ predict: args.includes(PREDICT_COST), args: args.filter((arg) => arg !== PREDICT_COST) });
 
+export type Edition = "classic" | "full";
+export const TOM_EDITION: Edition = "classic";
+
+export const playableBuildArgs = (title: string, out: string, predictCost = false, edition: Edition = "full", commit?: string) =>
+  ["map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(commit === undefined ? [] : ["--commit", commit]), ...(predictCost ? [PREDICT_COST] : [])];
+
 export const LANE_FILE = /^Smashcraft (\d+\.\d+(?:\.\d+)?)-([a-z0-9]+(?:-[a-z0-9]+)*)\.w3x$/;
 export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+(?:\.\d+)?)(?:-dev\.(\d+)| RC-(\d+))?\.w3x$/;
 export const buildLabel = (file: string) => PLAYABLE_FILE.test(file) ? file.slice("Smashcraft ".length, -".w3x".length) : undefined;

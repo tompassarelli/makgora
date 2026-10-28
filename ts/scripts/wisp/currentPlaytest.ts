@@ -14,7 +14,7 @@ import { runProcess } from "../hostProcess";
 import { FETCH_HINT, buildOnce } from "./buildInputs";
 import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
-import { PREDICT_COST, installName } from "./greenBuilds";
+import { type Edition, installName, playableBuildArgs } from "./greenBuilds";
 import { MAP_FOLDER } from "./mapLibrary";
 import { projectRoot } from "./project";
 
@@ -206,11 +206,8 @@ export interface PlaytestOptions {
   readonly edition?: Edition;
 }
 
-export type Edition = "classic" | "full";
-export const TOM_EDITION: Edition = "classic";
-
 export const playableMapBuild = (title: string, out: string, predictCost = false, edition: Edition = "full", commit?: string) =>
-  ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(commit === undefined ? [] : ["--commit", commit]), ...(predictCost ? [PREDICT_COST] : [])];
+  ["bun", "wisp", ...playableBuildArgs(title, out, predictCost, edition, commit)];
 
 export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, predictCost = false, edition = "full" }: PlaytestOptions = {}) => Effect.gen(function*() {
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));

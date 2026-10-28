@@ -703,7 +703,8 @@ From smashcraft:ts/:
 From `ts/`:
 
 ```sh
-bun wisp map build [--profile NAME] --name NAME --out OUT.w3x
+bun wisp map release --name NAME --out OUT.w3x
+bun wisp map build --profile NAME --name NAME --out OUT.w3x
 ```
 
 builds with the private inputs the checkout's smashcraft:build-inputs/

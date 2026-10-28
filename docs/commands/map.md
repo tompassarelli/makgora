@@ -1,10 +1,16 @@
 # Map
 
-- Map commands: `bun wisp map build [--profile NAME] --name NAME --out OUT.w3x`
-  builds the TypeScript map from the private inputs smashcraft:build-inputs/
-  names (`--base`, `--container`, `--assets`, `--summon` override one);
+- Map commands: `bun wisp map release --name NAME --out OUT.w3x` builds the map
+  for players or Tom: the exact command line Tom's dev builds run (playable
+  profile, Classic edition), so a hand build never carries the debug build's
+  settings (it adds only `--commit SHA` and `--predict-cost`).
+  `bun wisp map build --profile NAME --name NAME --out OUT.w3x` is the build
+  for diagnostics and every other profile; it refuses to run without
+  `--profile`, and `--profile main` is the debug build.
+  Both build the TypeScript map from the private inputs smashcraft:build-inputs/
+  names (`map build`'s `--base`, `--container`, `--assets`, `--summon` override one);
   `bun wisp map rebuild MAP.w3x` replaces only its script.
-  Both commands resolve every special, attack, contact-accent and projectile
+  All three commands resolve every special, attack, contact-accent and projectile
   cue model through the renderer's real asset resolver.
   A missing path fails the build before replacing the map.
   `--profile playable --predict-cost` also writes predicted Lua cost and its

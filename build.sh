@@ -28,7 +28,7 @@ if [[ ! -x "$packager" ]]; then
 fi
 mkdir -p "$(dirname -- "$output")"
 
-exec "$bun" "$project_dir/ts/scripts/wisp.ts" map build \
+exec "$bun" "$project_dir/ts/scripts/wisp.ts" map build --profile main \
     --base "$(realpath -- "$1")" --container "$(realpath -- "$2")" \
     --assets "$project_dir/build" --summon "$private_assets/summon-original-clips" \
     --name "$map_name" --out "$output" --packager "$packager"

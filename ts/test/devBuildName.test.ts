@@ -3,8 +3,9 @@ import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync, mkdirSync 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { PLAYABLE_FILE, parseInstalled } from "../scripts/wisp/greenBuilds";
-import { playName } from "../scripts/wisp/currentPlaytest";
+import { PLAYABLE_FILE, TOM_EDITION, parseInstalled } from "../scripts/wisp/greenBuilds";
+import { build, releaseBuildArgs } from "../scripts/wisp/commands/map";
+import { playName, playableMapBuild } from "../scripts/wisp/currentPlaytest";
 import { OLD_FOLDER, installLatest, library, pendingTidy } from "../scripts/wisp/mapLibrary";
 
 const git = (repo: string, ...args: string[]) => {
@@ -83,4 +84,26 @@ test("installing a dev build leaves the latest release and the newest dev build 
     rmSync(documents, { recursive: true, force: true });
     rmSync(staging, { recursive: true, force: true });
   }
+});
+
+test("a hand release build runs the argv Tom's dev builds run, so it cannot carry the debug build's settings [k5 boundary map-release-argv]", () => {
+  const dev = playableMapBuild("Smashcraft 0.2", "/tmp/out.w3x", false, TOM_EDITION);
+  expect(dev.slice(0, 2)).toEqual(["bun", "wisp"]);
+  expect(releaseBuildArgs(["--name", "Smashcraft 0.2", "--out", "/tmp/out.w3x"])).toEqual(dev.slice(4));
+  expect(releaseBuildArgs(["--out", "/tmp/out.w3x", "--commit", "abc123", "--predict-cost", "--name", "Smashcraft 0.2"])).toEqual(
+    playableMapBuild("Smashcraft 0.2", "/tmp/out.w3x", true, TOM_EDITION, "abc123").slice(4),
+  );
+});
+
+test("a release build takes only a name, an output, a commit and the cost prediction, and an unknown option fails rather than picking another profile [k2 property]", () => {
+  expect(releaseBuildArgs(["--name", "Smashcraft 0.2"])).toBeUndefined();
+  expect(releaseBuildArgs(["--out", "/tmp/out.w3x"])).toBeUndefined();
+  expect(releaseBuildArgs(["--name", "n", "--out", "o", "--profile", "main"])).toBeUndefined();
+  expect(releaseBuildArgs(["--name", "n", "--out", "o", "--edition", "full"])).toBeUndefined();
+  expect(releaseBuildArgs(["--name", "n", "--name", "m", "--out", "o"])).toBeUndefined();
+});
+
+test("a map build without --profile is refused and points at the release build [k5 boundary map-build-bare]", async () => {
+  const outcome = await Effect.runPromise(Effect.flip(build(["--name", "Smashcraft 0.2", "--out", "/tmp/out.w3x"])));
+  expect(String(outcome.problem)).toContain("map release");
 });

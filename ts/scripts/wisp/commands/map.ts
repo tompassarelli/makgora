@@ -19,7 +19,7 @@ import { fighterUnits, fileIoAbility } from "../../objectData";
 import { POST_PROCESSING_FILE } from "../../postProcessing";
 import { checkCueModels, headlessRender } from "../headlessRender";
 import { writePlaytestCost } from "../playtestCost";
-import { PREDICT_COST, costPrediction } from "../greenBuilds";
+import { PREDICT_COST, TOM_EDITION, costPrediction, playableBuildArgs } from "../greenBuilds";
 import { insideTomsLibrary } from "../mapLibrary";
 
 
@@ -94,7 +94,26 @@ const checkMapSize = (out: string, imports: readonly ArchiveEntry[], bounded: bo
 
 const tomsLibraryOut = (path: string) => new UsageFailure({ problem: `${path} is in Tom's Maps/00-Smashcraft, which holds only installed builds; build to a private folder` });
 
+const RELEASE_OPTIONS: readonly string[] = ["--name", "--out", "--commit"];
+
+export const releaseBuildArgs = (args: readonly string[]) => {
+  const { predict, args: rest } = costPrediction(args);
+  const values = new Map<string, string>();
+  for (let index = 0; index < rest.length; index += 2) {
+    const option = rest[index];
+    const value = rest[index + 1];
+    if (option === undefined || value === undefined || !RELEASE_OPTIONS.includes(option) || values.has(option)) return undefined;
+    values.set(option, value);
+  }
+  const name = values.get("--name");
+  const out = values.get("--out");
+  return name === undefined || out === undefined ? undefined : playableBuildArgs(name, out, predict, TOM_EDITION, values.get("--commit")).slice(2);
+};
+
+const BARE_BUILD = "map build needs --profile; a map for players or Tom is `map release --name NAME --out OUT.w3x` (the playable profile and Classic edition Tom's dev builds use), and a debug build says `--profile main`";
+
 export const build: Command = (args) => Effect.gen(function*() {
+  if (!args.includes("--profile")) return yield* new UsageFailure({ problem: BARE_BUILD });
   const { predict, args: buildArgs } = costPrediction(args);
   const inputsOnly = buildArgs.includes("--inputs-only");
   const options = yield* profileOptions(buildArgs.filter((arg) => arg !== "--inputs-only"));
@@ -131,4 +150,9 @@ export const rebuild: Command = (args) => Effect.gen(function*() {
 });
 
 
-export const map: Command = ([verb, ...args]) => verb === "build" ? (args.includes("--inputs-only") ? build(args) : repairPackager().pipe(Effect.andThen(build(args)))) : verb === "rebuild" ? repairPackager().pipe(Effect.andThen(rebuild(args))) : Effect.fail(new UsageFailure({ problem: "map takes build or rebuild" }));
+const release = (args: readonly string[]) => {
+  const buildArgs = releaseBuildArgs(args);
+  return buildArgs === undefined ? Effect.fail(new UsageFailure({ problem: "map release --name NAME --out OUT.w3x [--commit SHA] [--predict-cost]" })) : repairPackager().pipe(Effect.andThen(build(buildArgs)));
+};
+
+export const map: Command = ([verb, ...args]) => verb === "release" ? release(args) : verb === "build" ? (args.includes("--inputs-only") ? build(args) : repairPackager().pipe(Effect.andThen(build(args)))) : verb === "rebuild" ? repairPackager().pipe(Effect.andThen(rebuild(args))) : Effect.fail(new UsageFailure({ problem: "map takes release, build or rebuild" }));
