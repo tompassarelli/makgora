@@ -334,17 +334,13 @@ defence. Classic route: the Night Elf campaign, ending at Archimonde.
 
 **Size: 26-36 worker-hours,** including the download and input publish (H1).
 
-## The Butcher (name: gate 105)
+## The Butcher
 
-**Name:** Pudge is the DotA hero's name. DotA was a Warcraft III map, but
-Valve now holds the Dota trademarks. Recommendation: call him **the Butcher**
-everywhere, with the code slug `butcher`. That keeps every Valve name out of
-the map and the Hive page, and the hook, the rot and the stock Abomination
-body still make him recognisable. The alternative is "Pudge": instant
-recognition for Hive's audience, at the cost of a Valve-owned character
-name on a public release and a rename sweep if it ever has to change. Tom
-decides through gate 105 (default the Butcher at 2:06 AM, 29 October); no
-code is written before it resolves.
+**Name (decided 29 October 2026):** the Butcher everywhere, with the code
+slug `butcher`. The alternative was "Pudge", the DotA hero's name, which
+Valve's Dota trademarks cover. Tom's gate took the recommended default, so
+no Valve name appears in the map or on the Hive page, and the hook, the rot
+cloud and the stock Abomination body still make him recognisable.
 
 **Personality:** gleeful and grotesque. A stitched abomination that laughs as
 he reels the foe in, and smells it.
@@ -460,7 +456,6 @@ titles only, so the new issues keep both names out of their titles.
 
 Tasks:
 - **H1, Hive inputs (1-2 h):** download both Hive models through the private browser once the capacity guard admits it, read their bones and sequences, and publish them with `bun wisp inputs add`. Thrall and Tyrande cannot start their clips before it.
-- **N1, the name (gate 105):** must resolve before the Butcher's code starts. It defaults to the Butcher at 2:06 AM, 29 October.
 - **Six fighter lanes:** Uther with Forsaken Paladin's removal, Lady Vashj with Kobold's removal, Archimonde, Tyrande, the Butcher and Thrall. They are independent of each other. All of them append rows to the same registries (sim/codes.ts, rigs/index.ts, roster/kits.ts and looks.ts, homeStages.ts) and regenerate shared files, so each lane rebases onto main before landing, and Autoland regenerates the generated files (#613).
 - **I1, roster integration (3-5 h, after the last lane):** one farm balance pass across all 29 fighters, the census and map-size baselines, the 26-to-29 text in AGENTS.md and roster.md, the Hive page's roster and credits, and one native round over the six changed fighters, each run under five minutes.
 
@@ -479,7 +474,7 @@ models ready.
 **Total size: 158-216 worker-hours** (about 187 at the midpoints) across the
 six fighters, plus 4-7 h for H1 and I1.
 
-**Critical path:** gate 105 resolves, then the Butcher (34-46 h), then Uther
+**Critical path:** the Butcher (34-46 h), then Uther
 (22-30 h) on the same account, then roster integration (3-5 h): about
 60-80 worker-hours end to end. With one lane per account in each wave, the
 other two accounts finish inside that span. Uther moves to the front of
