@@ -36,7 +36,7 @@ paths = [
   "ts/src/game/presentation/reachCueInfo.ts", "ts/src/game/presentation/cueEmitterInfo.ts", "ts/src/game/presentation/heroStrikeMomentInfo.ts",
   "ts/src/game/presentation/fighterViewBounds.ts",
   "ts/src/game/fighters/cairne/clips.ts", "ts/src/game/fighters/jaina/clips.ts", "ts/src/game/fighters/malfurion/clips.ts",
-  "ts/src/game/fighters/medivh/clips.ts", "ts/src/game/fighters/peon/clips.ts", "ts/src/game/fighters/sylvanas/clips.ts",
+  "ts/src/game/fighters/medivh/clips.ts", "ts/src/game/fighters/peon/clips.ts", "ts/src/game/fighters/peon/goldSackClips.ts", "ts/src/game/fighters/sylvanas/clips.ts",
   "ts/src/game/fighters/thrall/clips.ts", "ts/src/game/fighters/*/clipInfo.ts", "ts/src/game/fighters/*/strikeMoments.ts",
   "ts/src/game/menu/stageSilhouettes.ts", "ts/src/game/sim/heroes/releaseRoster.ts",
 ]
@@ -298,7 +298,7 @@ producer = "tools/animations/malfurion-clips.ts"
 paths = ["ts/src/game/fighters/medivh/clips.ts"]
 producer = "tools/animations/medivh-clips.ts"
 [[generated]]
-paths = ["ts/src/game/fighters/peon/clips.ts"]
+paths = ["ts/src/game/fighters/peon/clips.ts", "ts/src/game/fighters/peon/goldSackClips.ts"]
 producer = "tools/animations/peon-clips.ts"
 [[generated]]
 paths = ["ts/src/game/fighters/sylvanas/clips.ts"]

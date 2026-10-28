@@ -20,7 +20,7 @@ import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/co
 import { attackPhase } from "../../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
-import type { SpecialCharge } from "../../src/game/sim/specials/schema";
+import { sampleWithStoredCharge } from "./animScoreCharge";
 import { HERO_ROSTER, fighterSlug } from "../../src/game/roster/kits";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../src/game/sim/hitRegions";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";
@@ -270,7 +270,6 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const windows: number[][] = [];
   const strikes: Capsule[][] = [];
   let strike: { x: number; z: number } | undefined;
-  let charge: SpecialCharge | undefined;
   let moveFrames = 0;
   for (let tick = 0; tick < LIMIT; tick++) {
     const input = tick === 0 ? press : idle;
@@ -278,7 +277,6 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
     advanceFighterPose(p, f, world, input, false, false, false, false);
     const running = f.special.action !== SpecialAction.none;
     if (tick === 0 && !running) return undefined;
-    if (tick === 0) charge = runningHeroSpecial(f)?.charge;
     if (!running && f.special.lockFrames <= 0 && moveFrames === 0) moveFrames = frames.length;
     const captured = capture(f, p);
     if (running) {
@@ -308,7 +306,6 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   }
   if (moveFrames === 0) moveFrames = frames.length;
   const first = activeFrames[0], last = activeFrames.at(-1);
-  if (first === undefined && charge !== undefined && storedCharge === 0) return sampleSpecial(model, skeleton, character, entry, pixelsPerUnit, charge.full);
   if (first === undefined || last === undefined || strike === undefined || frames.some((frame) => frame.clip === undefined)) return undefined;
   const posed = frames.map((frame) => pose(model, character, frame));
   const ready = posed[moveFrames];
@@ -483,7 +480,7 @@ export function sampleFighter(model: DrawnModel, character: Character): SampledM
     if (sampled !== undefined) out.push(sampled);
   }
   for (const entry of SCORED_SPECIALS) {
-    const sampled = sampleSpecial(model, skeleton, character, entry, pixelsPerUnit);
+    const sampled = sampleWithStoredCharge(character, entry.move, (charge) => sampleSpecial(model, skeleton, character, entry, pixelsPerUnit, charge));
     if (sampled !== undefined) out.push(sampled);
   }
   return out;
