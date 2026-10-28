@@ -104,7 +104,7 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.ledgeAttack]: heroMove(17, 3, 21, 0, axe(17, [[32.0, 60.0, 32.0, 85.0, 8.0], [33.0, 51.0, 33.0, 79.0, 7.0], [36.0, 46.0, 36.0, 74.0, 5.0]], sharedHit(7.0, 20.0))),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [heroRegion(8, 9, blade(18.0, 40.0, 48.0, 40.0, 10.0), peonHit(0.0, 90, 0.0, 0.0))]),
   },
-  carry: { hoistFrames: 12, walkScale: f32(0.6), jumpScale: f32(0.7), shoulderX: -8.0, shoulderZ: 70.0, overheadRise: 40.0 },
+  carry: { hoistFrames: 12, walkScale: f32(0.6), jumpScale: f32(0.7), shoulderX: -8.0, shoulderZ: 70.0, overheadRise: 40.0, holdBaseFrames: 180, holdFramesPerPercent: 3, holdMaxFrames: 480 },
   throws: {
     [GrabAction.pummel]: { contactFrame: 60, totalFrames: 68, effect: peonHit(3.072000026702881, 90, 0.0, 0.0) },
     [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: peonHit(8.192000389099121, 40, 31.5, 66.0, true) },
