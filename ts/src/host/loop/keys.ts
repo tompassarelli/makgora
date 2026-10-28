@@ -11,7 +11,7 @@ import { type ParticipantSlot, isParticipantSlot } from "../../game/input/partic
 import { heldActions, keyDown, pressKey, releaseKey } from "../../game/input/playerKeys";
 import { startKeyDown, startKeyUp } from "../../game/match/controls";
 import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter } from "../../game/lobby/lobbyState";
-import { leaveFinishedTutorial } from "../../game/match/tutorial";
+import { leaveTutorial } from "../../game/match/tutorial";
 import { fighterName } from "../../game/roster/kits";
 import { endReplaySegment } from "./replays";
 import { pausedMessage } from "../../game/session/messages";
@@ -75,7 +75,7 @@ function exitPausedMatch(s: ShellState, title: boolean): void {
   if (s.game.run.active && s.pauseSelection !== undefined) copyMatchState(s.game, s.pauseSelection);
   s.game.phase = Phase.characterMenu;
   s.game.practice = false;
-  leaveFinishedTutorial(s.game);
+  leaveTutorial(s.game);
   s.game.run.active = false;
   s.session.paused = false;
   const menu = s.pauseMenu ??= { choice: 0, shown: false, title: false };

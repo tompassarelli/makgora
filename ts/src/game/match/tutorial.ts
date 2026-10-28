@@ -51,8 +51,8 @@ export const tutorialOn = (state: Readonly<TrainingState>): boolean => state.les
 
 export const tutorialFinished = (state: Readonly<TrainingState>): boolean => state.lesson >= LESSONS.length;
 
-export function leaveFinishedTutorial(game: MatchState): void {
-  if (!tutorialFinished(game.trainer)) return;
+export function leaveTutorial(game: MatchState): void {
+  if (!tutorialFinished(game.trainer) && !(tutorialOn(game.trainer) && humanCount(game) > 1)) return;
   game.trainer.lesson = NO_LESSON;
   game.training = false;
 }
