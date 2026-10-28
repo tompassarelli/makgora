@@ -488,10 +488,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   Chen's staff, footwork, special, recovery, paired throw and nine pain clips
   from his private stock model and regenerates his clip table
   (smashcraft:docs/design/chen.md). With `pain` and his shipped model it re-authors
-  only the nine pain clips in place and gates them with pain-gate.ts; with `specials`
-  or `aerials` it re-authors only those clips in place on the shipped model. The
-  aerials are keyed beat by beat: the up air aims the staff tip at each active
-  frame's hit region, the forward air reaches the foot to the heel sweetspot, and
+  only the nine pain clips in place and gates them with pain-gate.ts; with `specials`,
+  `aerials` or `upTilt` it re-authors only those clips in place on the shipped model.
+  These are keyed beat by beat (smashcraft:tools/animations/chen-beats.ts): the up air
+  and the up tilt aim the staff tip at each active frame's hit region (the up tilt
+  then drops it behind him and brings it forward low at his side, never back
+  over his head), the forward air reaches the foot to the heel sweetspot, and
   the down air moves and scales the keg on his back (Box06) overhead, then under his feet.
 
 - Damage reactions (from the repository root):
