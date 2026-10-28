@@ -86,6 +86,7 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
 export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   "shadow-hunter": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"],
   thrall: ["back-air"],
+  warden: ["down-smash"],
   "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
 };
 

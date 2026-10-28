@@ -32,6 +32,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   bakes a tucked windup, the glaive thrown over her shoulder and whipped down behind her through the three active
   frames with her legs off the floor, and `... --replace-pose backAir --keys KEYS.json` splices the keys in place.
   Its three hit capsules run along the drawn glaive on frames 7 to 9.
+  Warden's down smash is the splits (#518): `... --character 5 --replace-pose downSmash --rig RIG.json`
+  writes her skeleton and timing, `blender ... --python tools/animations/warden-splits.py -- RIG.json KEYS.json`
+  bakes a dip and a tall coil on her back foot through the charge, her pelvis dropped to the floor with one leg kicked straight
+  out in front and one behind on the first active frame, a slide forward on the split through the active window with the glaive
+  held forward above her legs, a fold over the front leg, her rear leg drawn in and a spring back up to ready; her chest flaps
+  and cloak drape on the floor instead of passing through it, and `... --replace-pose downSmash --keys KEYS.json` splices the keys in place.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip
