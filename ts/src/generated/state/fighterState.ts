@@ -234,6 +234,7 @@ function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Reado
   visuals.shieldElectric = sourceVisuals.shieldElectric;
   visuals.shield = sourceVisuals.shield;
   visuals.shieldReflect = sourceVisuals.shieldReflect;
+  visuals.poisonBursts = sourceVisuals.poisonBursts;
 }
 
 function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Readonly<Record<number, number | undefined>>): void {
@@ -452,6 +453,8 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.poisonDamage = sourceStatus.poisonDamage;
   status.soakFrames = sourceStatus.soakFrames;
   status.soakLevel = sourceStatus.soakLevel;
+  status.poisonStacks = sourceStatus.poisonStacks;
+  status.poisonStackFrames = sourceStatus.poisonStackFrames;
   const meter = target.meter;
   const sourceMeter = source.meter;
   meter.ex = sourceMeter.ex;
@@ -768,6 +771,7 @@ function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = visuals.shield, b = sourceVisuals.shield; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.shieldReflect, b = sourceVisuals.shieldReflect; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = visuals.manaDrained, b = sourceVisuals.manaDrained; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.poisonBursts, b = sourceVisuals.poisonBursts; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   return true;
 }
 
@@ -954,6 +958,8 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.poisonDamage, b = sourceStatus.poisonDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.soakFrames, b = sourceStatus.soakFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.soakLevel, b = sourceStatus.soakLevel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.poisonStacks, b = sourceStatus.poisonStacks; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.poisonStackFrames, b = sourceStatus.poisonStackFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.divineFrames, b = sourceStatus.divineFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.cursedBy, b = sourceStatus.cursedBy; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.curseFrames, b = sourceStatus.curseFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1423,6 +1429,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.text(kits.specials(`${prefix}.specials`, tuning.specials));
   sink.int(prefix, "meterEx", meter.ex);
   sink.int(prefix, "meterUltimate", meter.ultimate);
+  if (visuals.poisonBursts !== 0) sink.int(prefix, "poisonBursts", visuals.poisonBursts);
   if (fighter.character === Character.kobold) {
     sink.int(prefix, "candleHeat", candle.heat);
     sink.int(prefix, "candleState", candle.state);
@@ -1514,6 +1521,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   }
   if (status.soakFrames !== 0) sink.int(prefix, "soakFrames", status.soakFrames);
   if (status.soakLevel !== 0) sink.int(prefix, "soakLevel", status.soakLevel);
+  if (status.poisonStacks !== 0) sink.int(prefix, "poisonStacks", status.poisonStacks);
+  if (status.poisonStackFrames !== 0) sink.int(prefix, "poisonStackFrames", status.poisonStackFrames);
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
     if (projectile.spec !== undefined) sink.text(kits.projectileSpec(projectile.spec, `${prefix}.projectileSpec[${i}]`));
@@ -1603,6 +1612,8 @@ export function blastFighterFields(f: Fighter): void {
   status.summonX = 0.0;
   status.buff = ItemKind.none;
   status.buffFrames = 0;
+  status.poisonStacks = 0;
+  status.poisonStackFrames = 0;
 }
 
 export function respawnFighterFields(f: Fighter, startX: number): void {
@@ -1803,4 +1814,6 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.poisonDamage = 0.0;
   status.soakFrames = 0;
   status.soakLevel = 0;
+  status.poisonStacks = 0;
+  status.poisonStackFrames = 0;
 }

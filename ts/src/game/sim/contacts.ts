@@ -165,6 +165,7 @@ export function collectDamageContact(
   contact.strong = kind === ContactKind.launch && (effect.strong === true || forsakenPaladinSwordContact(source, effect.damage, direct));
   contact.strongHitlag = contact.strong && !meleeHandling.strongHitsAddNoHitlag ? STRONG_HIT_EXTRA_HITLAG : 0;
   contact.blocked = !unblockable && shieldContact;
+  if (effect.flinchless === true && !contact.blocked && contact.kind === ContactKind.launch) contact.kind = ContactKind.damageOnly;
   contact.crouching = target.motion.crouching;
   contact.grounded = target.motion.grounded;
   contact.sourceGrounded = source.motion.grounded;

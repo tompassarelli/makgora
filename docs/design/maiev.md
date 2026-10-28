@@ -137,9 +137,9 @@ its frame data, damage, angle and knockback are unchanged.
 
 What she keeps, so she does not become Fox in a costume:
 
-- poison: her neutral special, Shadow Strike, is one slow dagger that
-  poisons, not a laser; its value is the poison, not a mark, chip damage or a
-  stream, and no other move reads it. Since 2026-10-28 it takes Fox's
+- poison stacks: her neutral special, Shadow Strike, is one slow dagger
+  that stacks poison, not a laser; its value is the stacks and their burst,
+  not chip damage or a stream, and no other move reads them. Since Tom's 2026-10-28 request it takes Fox's
   laser frames: the dagger leaves on frame 10 of 36 standing and in the air,
   she acts on frame 37, and landing in the air ends the cast with no landing
   lag (fightcore.csv and records.jsonl: first active 10, total 36, aerial
@@ -147,7 +147,15 @@ What she keeps, so she does not become Fox in a costume:
   fires its second blade on landing. Up to two daggers may be out, because the
   next cast can start on frame 37 while the dagger from frame 10 flies until
   frame 40, and a short-hop double has its first blade in flight on landing.
-  The dagger's speed is unchanged.
+  The dagger's speed is unchanged. Per Tom's 2026-10-28 request it deals 2
+  damage and is flinchless like Fox's laser: no knockback, hitstun, launch,
+  hitlag or interruption of the victim's action, so a victim attacking,
+  dashing or airborne keeps doing it, and a shield blocks it as before. Each
+  hit adds a poison stack (cap 5) and refreshes a 120-frame timer; when it
+  runs out the stacks burst for 1 damage each, flinchless, with a burst effect
+  and sound, and clear. The EX multiplier applies to the direct hit only. A
+  glow over the foe grows with the stacks. Fan of Knives keeps its own ticking
+  poison. The stacks are the reason to throw it, not the stream.
 - Blink: her up special teleports in eight directions to a punishable spot,
   not a charged fire dash.
 - Shadow Dash (side special, Tom's 2026-10-28 rework): Fox's Illusion with

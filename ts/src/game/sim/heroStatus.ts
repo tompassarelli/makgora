@@ -87,6 +87,8 @@ export interface AppliedStatus {
 
   readonly groundedOnly?: true | undefined;
 
+  readonly stacks?: { readonly cap: number } | undefined;
+
 
 
 
@@ -121,6 +123,14 @@ export function isEthereal(f: Readonly<Fighter>): boolean {
 }
 
 
+function stackPoison(f: Fighter, status: Readonly<AppliedStatus>): void {
+  const { status: state } = f;
+  if (state.out) return;
+  state.poisonStacks = min(status.stacks?.cap ?? 1, state.poisonStacks + 1);
+  state.poisonStackFrames = status.frames;
+}
+
+
 export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): void {
   const { status: state } = f;
 
@@ -129,6 +139,10 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
     state.poisonFrames = status.frames;
     state.poisonEvery = status.tick?.every ?? status.frames;
     state.poisonDamage = status.tick?.damage ?? 0.0;
+    return;
+  }
+  if (status.kind === HeroStatusKind.poisonStacks) {
+    stackPoison(f, status);
     return;
   }
   if (status.kind === HeroStatusKind.soak) {
@@ -179,8 +193,19 @@ function endHeroStatus(f: Fighter): void {
 }
 
 
+export const POISON_BURST_DAMAGE = 1.0;
+
+function burstPoisonStacks(f: Fighter): void {
+  const { status } = f;
+  status.damage = capPercent(addFloat32(roundToFloat32(status.damage), multiplyFloat32(status.poisonStacks, POISON_BURST_DAMAGE)));
+  status.poisonStacks = 0;
+  f.visuals.poisonBursts++;
+}
+
 export function cleansePoisonAndSlow(f: Fighter): void {
   f.status.poisonFrames = 0;
+  f.status.poisonStacks = 0;
+  f.status.poisonStackFrames = 0;
   f.status.poisonEvery = 0;
   f.status.poisonDamage = 0.0;
   if (f.status.condition === HeroStatusKind.chill) endHeroStatus(f);
@@ -197,6 +222,10 @@ export function advanceHeroConditions(f: Fighter): void {
   if (status.poisonFrames > 0) {
     status.poisonFrames--;
     if (floorMod(status.poisonFrames, status.poisonEvery) === 0) status.damage = capPercent(addFloat32(roundToFloat32(status.damage), status.poisonDamage));
+  }
+  if (status.poisonStackFrames > 0) {
+    status.poisonStackFrames--;
+    if (status.poisonStackFrames === 0) burstPoisonStacks(f);
   }
   if (status.soakFrames > 0) {
     status.soakFrames--;
@@ -222,6 +251,8 @@ export function clearHeroStatus(f: Fighter): void {
   status.poisonFrames = 0;
   status.poisonEvery = 0;
   status.poisonDamage = 0.0;
+  status.poisonStacks = 0;
+  status.poisonStackFrames = 0;
   status.soakFrames = 0;
   status.soakLevel = 0;
 }

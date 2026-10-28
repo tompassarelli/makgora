@@ -346,7 +346,7 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
   return canonicalRealField(`${prefix}.damage`, hit.damage) + canonicalRealField(`${prefix}.growth`, hit.growth)
     + canonicalRealField(`${prefix}.base`, hit.base) + canonicalRealField(`${prefix}.launchX`, hit.launchX)
     + canonicalRealField(`${prefix}.launchZ`, hit.launchZ) + canonicalInt(`${prefix}.electric`, hit.electric ? 1 : 0)
-    + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "")
+    + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "") + (hit.flinchless === true ? canonicalInt(`${prefix}.flinchless`, 1) : "")
     + optionalField(`${prefix}.manaSteal`, hit.manaSteal, canonicalInt)
     + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
     + optionalField(`${prefix}.shieldDamage`, hit.shieldDamage, canonicalRealField);

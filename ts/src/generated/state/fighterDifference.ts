@@ -174,8 +174,11 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.poisonDamage !== actual.status.poisonDamage) return "poisonDamage";
   if (expected.status.soakFrames !== actual.status.soakFrames) return "soakFrames";
   if (expected.status.soakLevel !== actual.status.soakLevel) return "soakLevel";
+  if (expected.status.poisonStacks !== actual.status.poisonStacks) return "poisonStacks";
+  if (expected.status.poisonStackFrames !== actual.status.poisonStackFrames) return "poisonStackFrames";
   if (expected.meter.ex !== actual.meter.ex) return "meterEx";
   if (expected.meter.ultimate !== actual.meter.ultimate) return "meterUltimate";
+  if (expected.visuals.poisonBursts !== actual.visuals.poisonBursts) return "poisonBursts";
   if (expected.candle.heat !== actual.candle.heat) return "candleHeat";
   if (expected.candle.state !== actual.candle.state) return "candleState";
   if (expected.candle.lit !== actual.candle.lit) return "candleLit";

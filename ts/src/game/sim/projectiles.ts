@@ -142,6 +142,7 @@ export function originalProjectileEffect(projectile: Readonly<Projectile>): Read
   projectileHit.fixedPower = undefined;
   projectileHit.setKnockback = kind === ProjectileKind.eyeBeam ? EYE_BEAM_SET_KNOCKBACK : undefined;
   projectileHit.sakurai = kind === ProjectileKind.eyeBeam ? true : undefined;
+  projectileHit.flinchless = undefined;
   projectileHit.damage = projectileDamage(projectile);
   if (kind === ProjectileKind.eyeBeam) {
     projectileHit.growth = 100.0;
