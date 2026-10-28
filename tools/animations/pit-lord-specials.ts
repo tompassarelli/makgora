@@ -5,7 +5,7 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { type PoseFrame, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
-import { PIT_LORD_SPECIALS } from "../../ts/src/game/fighters/pit-lord/specials";
+import { HOWL_FIRST, PIT_LORD_SPECIALS } from "../../ts/src/game/fighters/pit-lord/specials";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
@@ -22,9 +22,10 @@ ensure(stand, "Pit Lord needs his standing pose");
 type Pose = Readonly<Record<string, number>>;
 const ready: Pose = {};
 const gestures = [
-  { slot: "neutral", name: "Howl of Terror", first: 15, last: 18,
-    prepare: { chest: 22, head: 15, arm: -25, elbow: 40, front: -15, shin: 30 },
-    active: { chest: -24, head: -28, arm: -95, elbow: -20, front: 12, back: -10 } },
+  { slot: "neutral", name: "Howl of Terror", first: HOWL_FIRST, last: HOWL_FIRST + 4, windup: HOWL_FIRST - 1,
+    prepare: { waist: -10, chest: -42, head: -55, arm: 20, elbow: 75, front: -20, back: 10, shin: 30 },
+    active: { waist: 12, chest: 48, head: 55, arm: -150, elbow: -35, front: 22, back: -20 },
+    settle: { waist: 4, chest: 14, head: 12, arm: -45, elbow: 15, front: 6, back: -6 } },
   { slot: "side", name: "Ruin Charge", first: 19, last: 26,
     prepare: { chest: 35, head: -10, arm: 25, elbow: 35, front: -40, back: -45, shin: 65 },
     active: { waist: 10, chest: 45, head: -30, arm: 35, elbow: 10, front: 45, back: -45, shin: -20 } },
@@ -35,6 +36,7 @@ const gestures = [
     prepare: { chest: -22, head: -30, arm: -145, elbow: 20, front: -10, back: 12 },
     active: { chest: 28, head: 15, arm: -55, elbow: 20, front: 18, back: -12 } },
 ] as const;
+const windup = (g: (typeof gestures)[number]): number => "windup" in g ? g.windup : g.first - 4;
 
 function degrees(name: string, pose: Pose): number {
   const part = name === "Bone Koto Waist01" ? "waist" : name === "Bone_Chest" ? "chest"
@@ -73,15 +75,16 @@ for (const g of gestures) {
     track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
-    const poses: readonly (readonly [number, Pose])[] = [[0, ready], [g.first - 4, g.prepare], [g.first, g.active], [g.last, g.active], [total - 5, ready], [total, ready]];
+    const poses: readonly (readonly [number, Pose])[] = "settle" in g ? [[0, ready], [windup(g), g.prepare], [g.first, g.active], [g.last, g.active], [g.last + 9, g.settle], [total, ready]] : [[0, ready], [windup(g), g.prepare], [g.first, g.active], [g.last, g.active], [total - 5, ready], [total, ready]];
     for (const [frame, pose] of poses) {
       const angle = node ? degrees(node.Name, pose) : 0;
       const Vector = angle ? pitch(first.Vector, angle) : first.Vector.slice();
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...first.InTan ? { InTan: tangent(), OutTan: tangent() } : {} });
     }
+    track.Keys.sort((a, b) => a.Frame - b.Frame);
   });
-  for (const facing of [1, -1]) for (const frame of [g.first - 4, g.first, total - 5]) frames.push({ frame, phase: frame < g.first ? AttackPhase.startup : frame <= g.last ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 });
+  for (const facing of [1, -1]) for (const frame of [windup(g), g.first, total - 5]) frames.push({ frame, phase: frame < g.first ? AttackPhase.startup : frame <= g.last ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 });
   const clip = `{ index: ${index}, seconds: ${seconds((end-start)/1000)}, aligned: true }`;
   bindings.push(`  ${g.slot}Special: ${clip}, ${g.slot}SpecialAir: ${clip},`);
 }
