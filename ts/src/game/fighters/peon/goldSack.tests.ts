@@ -168,6 +168,53 @@ for (const [label, airborne] of [["on the ground", false], ["in the air", true]]
       assertEquals(d.foe.status.damage, f32(at(GOLD_SACK_DAMAGE, chargeStage(GOLD_SACK_CHARGE, kept))), "the stored stage's damage");
     }
   });
+
+  test(`Gold Sack ${label}: holding special again over a stored partial charge resumes charging past the stored stage and the release swings the higher stage [k3 measure docs/design/peasant.md]`, () => {
+    const d = arena();
+    const banked = chargeHold(d, 45);
+    step(d, "shield");
+    idle(d, 12);
+    assertEquals(d.peon.special.action, SpecialAction.none, "shield puts the sack away");
+    const kept = d.peon.special.charge;
+    const storedStage = chargeStage(GOLD_SACK_CHARGE, kept);
+    assertGreaterThan(kept, 0);
+    assertLessThan(kept, FULL);
+    assertEquals(kept >= banked, true, "the charge is kept");
+    step(d, "press");
+    held(d, 2 * HOLD);
+    assertEquals(d.peon.special.action, SpecialAction.heroNeutral, "the press resumes charging");
+    assertEquals(swungStage(d.peon), -1, "holding does not force the swing");
+    assertGreaterThan(d.peon.special.charge, kept);
+    held(d, 30);
+    const resumed = d.peon.special.charge;
+    const resumedStage = chargeStage(GOLD_SACK_CHARGE, resumed);
+    assertGreaterThan(resumedStage, storedStage);
+    assertEquals(swungStage(d.peon), -1, "still charging past the stored stage");
+    step(d, "none");
+    assertEquals(swungStage(d.peon), resumedStage, "the release swings the stage reached");
+    assertEquals(d.peon.special.charge, 0, "the swing empties the sack");
+    if (!airborne) {
+      idle(d, 60);
+      assertEquals(d.foe.status.damage, f32(at(GOLD_SACK_DAMAGE, resumedStage)), "the higher stage's damage");
+    }
+  });
+
+  test(`Gold Sack ${label}: shield during a resumed charge stores it again [k3 measure docs/design/peasant.md]`, () => {
+    const d = arena();
+    chargeHold(d, 45);
+    step(d, "shield");
+    idle(d, 12);
+    const first = d.peon.special.charge;
+    step(d, "press");
+    held(d, 2 * HOLD + 10);
+    const resumed = d.peon.special.charge;
+    assertGreaterThan(resumed, first);
+    step(d, "shield");
+    idle(d, 12);
+    assertEquals(d.peon.special.action, SpecialAction.none, "shield puts the sack away again");
+    assertEquals(d.peon.special.charge >= resumed, true, "the resumed charge is kept");
+    assertLessThan(d.peon.special.charge, FULL);
+  });
 }
 
 test("A Gold Sack bonk deals its stage's damage and empties the sack; a stored full sack swings at once [k3 measure docs/design/peasant.md]", () => {

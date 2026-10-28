@@ -1,5 +1,5 @@
 import { sameTeam } from "../teams";
-import { chargeBanked, chargeHolds, chargeSwingFloor } from "./charge";
+import { chargeBanked, chargeHolds } from "./charge";
 import { releaseCommandGrabLock } from "./commandGrabLock";
 import { changesAimZone, chargedAimX, chargedAimZ, steerAim } from "./aimZone";
 
@@ -187,7 +187,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
 function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): void {
   const charge = move.charge;
   const followUps = move.followUps;
-  if (charge === undefined || followUps === undefined || f.special.charge < chargeSwingFloor(charge)) return;
+  if (charge === undefined || followUps === undefined || f.special.charge < charge.full) return;
   const stage = chargeStage(charge, f.special.charge);
   for (let index = 0; index < followUps.length; index++) {
     const followUp = at(followUps, index);
