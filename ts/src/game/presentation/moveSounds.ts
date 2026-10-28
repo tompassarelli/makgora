@@ -1,6 +1,6 @@
 // Variants and pitch come from hit and attack serials, never a random source, so every client and replay sounds alike.
 import { at } from "wisp/src/runtime/lookup";
-import { imod } from "wisp/src/sim/intMath";
+import { floorDiv, imod } from "wisp/src/sim/intMath";
 import { AttackStyle, Character, LAST_ATTACK_STYLE, SpecialAction } from "../sim/codes";
 import { HitElement } from "../sim/hitRegions";
 import { isSmashAttack, jabChainFrom } from "../sim/moves";
@@ -8,7 +8,7 @@ import { heroDefinition } from "../roster/kits";
 import { originalFighterMoves } from "../sim/originalMoves";
 import { VERIFIED_STOCK_SOUND_LABELS } from "../../generated/assets/stockSoundInfo";
 import { elementLook } from "./elementLooks";
-import { warcryVoice } from "./matchAudio";
+import { murlocMoveVoices, warcryVoice } from "./matchAudio";
 import { SWING_SOUND, SoundTier, TIER_HIT_VOLUME, TIER_SWING_PITCH, TIER_SWING_VOLUME, moveTier } from "./moveTiers";
 
 export const SPECIAL_MOVE = 100;
@@ -42,6 +42,7 @@ interface SpecialSound {
   readonly hit: string;
   readonly impact?: string | undefined;
   readonly fuse?: string | undefined;
+  readonly voice?: readonly string[] | undefined;
 }
 
 interface FighterSound {
@@ -144,8 +145,8 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     normals: { [AttackStyle.grab]: { perform: "SiphonManaCaster" } },
   },
   [Character.murloc]: {
-    weapon: Weapon.claw, strong: "CrushingWaveDamage",
-    specials: [s("EnsnareMissile", "Ensnare"), s("BigWaterStep", "CrushingWaveDamage"), s("CrushingWave", "WaterElementalMissile"), s("Parasite", "PoisonArrowHit")],
+    weapon: Weapon.claw, effort: murlocMoveVoices(), strong: "CrushingWaveDamage",
+    specials: [s("EnsnareMissile", "Ensnare"), { ...s("BigWaterStep", "CrushingWaveDamage"), voice: murlocMoveVoices() }, { ...s("CrushingWave", "WaterElementalMissile"), voice: murlocMoveVoices() }, s("Parasite", "PoisonArrowHit")],
   },
   [Character.grom]: {
     weapon: Weapon.axe, strong: "CriticalStrike",
@@ -224,7 +225,7 @@ function resolveSpecial(fighter: FighterSound, move: number): MoveSound | undefi
     shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],
     impact: special.impact === undefined ? [] : [layer([special.impact], at(TIER_HIT_VOLUME, SoundTier.large))],
     fuse: special.fuse === undefined ? [] : [layer([special.fuse], PERFORM_VOLUME)],
-    voice: undefined,
+    voice: special.voice === undefined ? undefined : layer(special.voice, VOICE_VOLUME),
   };
 }
 
@@ -303,7 +304,7 @@ export function playPerform(character: Character, move: number, serial: number, 
   const row = moveSound(character, move);
   if (row === undefined) return;
   playLayers(row.perform, serial, sink);
-  if (row.voice !== undefined && imod(serial, VOICE_TAKES) !== 0) playLayer(row.voice, serial, 0, sink);
+  if (row.voice !== undefined && imod(serial, VOICE_TAKES) !== 0) playLayer(row.voice, floorDiv(serial, VOICE_TAKES), 0, sink);
 }
 
 export function playHit(character: Character, move: number, strong: boolean, element: HitElement, serial: number, sink: MoveSoundSink): void {

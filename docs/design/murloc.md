@@ -43,6 +43,15 @@ hurt capsule's top at 77 units against the drawn Stand's 76: the shortest
 body in the cast (Rifleman 87, Peon 89). Shared gravity, jumps and dodge
 timing stay the roster's.
 
+## Voice
+
+His moves use the game's own Murloc unit sound set (UnitAckSounds.slk, `Units\Creeps\Murloc\`), referenced by path, nothing extracted or added to the map. The set holds `MurlocReady1`, three takes each of `MurlocWhat`, `MurlocYes`, `MurlocYesAttack` and `MurlocPissed`, and `MurlocDeath` (AnimSounds). The Mur'gul (`MurgulDeathSwim`) is a death only, and the other murloc creeps share this set.
+
+- **Smashes (up, down, forward), side special (Tidal Rush) and up special (Tide Spout):** the three `MurlocYesAttack` takes as the move's voice layer, on two of three uses, the take picked by the hit serial. Jabs, tilts, aerials, Ensnare and Disease Cloud stay silent. `MurlocYesAttack` is the set's attack gurgle; `MurlocWhat`, `MurlocYes` and `MurlocPissed` are the quieter acknowledge and annoyed lines.
+- **Entrance and victory:** the imported World of Warcraft murloc aggro clip, a Blizzard sound the map ships by Tom's choice (2026-10-28, reasons and source in [sound.md](sound.md)). Warcraft III's `MurlocReady1` and `MurlocYesAttack1` no longer play there.
+
+[sound-table.md](sound-table.md) lists the voice column; `murlocVoice.tests.ts` ties the move voices to the installed game's stored files and the moves that play them.
+
 ## Full kit
 
 Frames count entry as 1. Columns are first active / active duration / recovery;

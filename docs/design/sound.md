@@ -101,7 +101,7 @@ layers, and each layer is a native sound with alternatives:
 | Weak hit | The frame the hit lands (its hitlag starts) | The fighter's weapon striking flesh at the move's tier. A special plays its signature hit. A fire, electric, ice, dark, holy, poison or arcane hit layers that element's sound. |
 | Strong hit | As weak, when the hit is strong | The heavy weapon sound plus the fighter's strong sweetener. |
 | Shield hit | The frame a raised shield takes the hit | The weapon striking metal at the move's tier, over the shield's own Defend sound. |
-| Voice | With perform, on two of three uses | The model's effort grunt on smash attacks only. Battle cries and other unit voice lines never play on moves; they belong to character select and results (Tom, 10 Oct: voice on every special is noise). |
+| Voice | With perform, on two of three uses | The model's effort grunt on smash attacks only. Battle cries and other unit voice lines never play on moves; they belong to character select and results (Tom, 10 Oct: voice on every special is noise). Murloc is the one exception: his gurgle plays on smashes and on his side and up specials (a playtest request, 28 Oct), three takes picked by serial. |
 
 - **Whiff** is perform alone, as in Smash.
 - **Weapon families** come from the game's combat table: blade (metal slice),
@@ -218,6 +218,20 @@ combat sounds start; `CombatEffects` plays what it admits.
   jabs in a row never sound alike and that a repeated hit is identical.
 - **Voice takes.** Voice is silent on every third use, a silent take as a
   variant [7].
+
+## Imported murloc gurgle
+
+Murloc's entrance and victory play a one-second clip of World of Warcraft's own murloc aggro
+sound (`sound/creature/murloc/mmurlocaggroa.ogg`, file 555997 in the community file list),
+fetched from wago.tools, which serves the game's CASC files unchanged. It is not a fan
+re-record. Tom chose on 2026-10-28 to import it because Hive Workshop's map-submission rule 8
+says material created by Blizzard Entertainment can safely be used. The earlier rule that
+Smashcraft ships no Blizzard sound files gives way for this clip only. The clip is converted to
+a 22,050 Hz mono mp3 (10,101 bytes) and imported through the map build's imported-files list
+(`ts/src/game/assets/importedVoiceInfo.ts`, the same route as the imported music) from the
+`imported-models` build-input family, so it stays out of Git. Credit is in
+[hive-post.md](../hive-post.md). His moves keep Warcraft III's own gurgles
+([murloc.md](murloc.md)).
 
 ## Warcraft III's native library
 

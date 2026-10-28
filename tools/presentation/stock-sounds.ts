@@ -9,6 +9,7 @@ import {mkdtempSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {IMPORTED_MUSIC} from '../../ts/src/game/assets/importedMusicInfo';
+import {IMPORTED_VOICES} from '../../ts/src/game/assets/importedVoiceInfo';
 import {presentationSoundPaths} from '../../ts/src/game/presentation/matchAudio';
 import {SELECTABLE_CHARACTERS} from '../../ts/src/game/roster/kits';
 import {STAGE_CATALOG} from '../../ts/src/game/menu/stageCatalog';
@@ -81,7 +82,7 @@ for (const label of labels) if (label.includes('\\')) labelFiles.set(label, [lab
 const unknownLabels = labels.filter(label => !labelFiles.has(label));
 if (unknownLabels.length > 0) throw new Error(`not in the game's sound tables: ${unknownLabels.join(', ')}`);
 
-const paths = [...new Set([...presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id)), ...tierSoundPaths(), ...labels.flatMap(label => labelFiles.get(label) ?? [])])].filter(path => !IMPORTED_MUSIC.some(music => music.path === path));
+const paths = [...new Set([...presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id)), ...tierSoundPaths(), ...labels.flatMap(label => labelFiles.get(label) ?? [])])].filter(path => ![...IMPORTED_MUSIC, ...IMPORTED_VOICES].some(imported => imported.path === path));
 const found: (string | undefined)[] = new Array(paths.length);
 try {
   let next = 0;

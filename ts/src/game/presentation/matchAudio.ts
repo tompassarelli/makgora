@@ -4,6 +4,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { IMPORTED_MENU_MUSIC, IMPORTED_STAGE_MUSIC } from "../assets/importedMusicInfo";
+import { IMPORTED_MURLOC_GURGLE } from "../assets/importedVoiceInfo";
 import { Character } from "../sim/codes";
 import { type StageTile, selectableStage } from "../menu/stageCatalog";
 
@@ -153,13 +154,19 @@ const VOICES: Readonly<Record<Exclude<Character, typeof Character.medivh>, reado
   18: ["Units\\Orc\\Peon\\","Peon"],
   19: ["Units\\Creeps\\HeroTinker\\","HeroTinker"],
   20: ["Units\\Human\\Kael\\","Kael"],
-  21: ["Units\\Creeps\\Murloc\\", "Murloc", "Ready", "YesAttack"],
+  21: ["Units\\Creeps\\Murloc\\", "Murloc"],
   26: KOBOLD_VOICE,
   22: ["Units\\Orc\\Hellscream\\", "Grom"],
   24: ["Units\\NightElf\\Furion\\", "Furion", "What"],
 };
 
+const MURLOC_MOVE_TAKES = 3;
+
+export const murlocMoveVoices = (): string[] =>
+  Array.from({ length: MURLOC_MOVE_TAKES }, (_, take) => `${VOICES[Character.murloc][0]}MurlocYesAttack${take + 1}.flac`);
+
 function voice(character: Character, line: string): string {
+  if (character === Character.murloc) return IMPORTED_MURLOC_GURGLE.path;
   if (character === Character.medivh) return `Sound\\Dialogue\\TutorialCampaign\\Tutorial01\\T01Medivh${line === "Ready" ? "02" : "59"}.flac`;
   const [directory, prefix, ready, warcry] = VOICES[character];
   const spoken = line === "Ready" ? ready ?? line : line === "Warcry" ? warcry ?? line : line;

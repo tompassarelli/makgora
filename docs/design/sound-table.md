@@ -253,11 +253,11 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
 | Jab, Second jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalLightSliceMetal |  |
-| Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalMediumChopMetal |  |
+| Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalMediumChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalLightChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalLightChopMetal |  |
 | Neutral special: Ensnare | EnsnareMissile | Ensnare | Ensnare + CrushingWaveDamage | MetalLightChopMetal |  |
-| Side special: Tidal Rush | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal |  |
-| Up special: Tide Spout | CrushingWave | WaterElementalMissile | WaterElementalMissile + CrushingWaveDamage | MetalLightChopMetal |  |
+| Side special: Tidal Rush | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
+| Up special: Tide Spout | CrushingWave | WaterElementalMissile | WaterElementalMissile + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Down special: Disease Cloud | Parasite | PoisonArrowHit | PoisonArrowHit + CrushingWaveDamage | MetalLightChopMetal |  |
 
 ## Grom Hellscream
