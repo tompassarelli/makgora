@@ -189,9 +189,9 @@ const DOOM: SpecialCurse = {
   summon: { frame: 0, offsetX: 0.0, radius: 50.0, height: 220.0, durability: 40.0, life: 480, fireAges: [], shot: DOOM_GUARD_WAVE, companion: DOOM_GUARD, model: { path: "Units\\Demon\\DoomGuard\\DoomGuard.mdl", height: 260.0, alpha: 255 }, },
 };
 const PIT_LORD: AuthoredSpecial = {
-  name: "Doom", endFrame: 60,
-  projectiles: [mark("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", 1, 18, 60.0, 80.0)],
-  commandGrab: { ...frames(19, 22), strike: capsule(30.0, 60.0, 130.0, 60.0, 40.0), holdFrames: 30, effect: hit(10.0, 45, 85.0, 45.0, HitElement.fire), recovery: 30, curse: DOOM },
+  name: "Doom", endFrame: 60, armor: { ...frames(1, 20), knockback: 100.0 },
+  targetedStrike: { range: 600.0, frame: 20, effect: hit(10.0, 85, 30.0, 40.0, HitElement.fire), curse: DOOM,
+    glyph: mark("Abilities\\Spells\\Other\\Doom\\DoomTarget.mdx", 0, 20, 0.0, 150.0), bolt: mark("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", 0, 30, 0.0) },
 };
 
 const BEASTMASTER: AuthoredSpecial = {
@@ -443,7 +443,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.forsakenPaladin]: "A golden circle marks where the Light's judgment will fall, then blesses the ground twice. Leave the circle.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead, then fights at your side. Break it or keep away from its flames.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
-  [Character.pitLord]: "A clawed grab that ignores shields dooms the victim: they burn 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal where they fell and fights for him. Jump or roll from the grab; kill him first to lift the curse; break the Doom Guard or outlast it.",
+  [Character.pitLord]: "Marks the nearest foe in range with Doom, then a fel bolt lands on them through any shield: they burn 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal where they fell and fights for him. Dodge as the bolt lands or get out of range; smash him through his armor; kill him first to lift the curse.",
   [Character.beastmaster]: "His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low.",
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
@@ -480,7 +480,7 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.forsakenPaladin]: { near: 150.0, far: 300.0 },
   [Character.dreadlord]: { near: 190.0, far: 330.0 },
   [Character.shadowHunter]: { near: 180.0, far: 480.0 },
-  [Character.pitLord]: { near: 40.0, far: 120.0 },
+  [Character.pitLord]: { near: 0.0, far: 600.0 },
   [Character.beastmaster]: { near: 100.0, far: 700.0 },
   [Character.lichKing]: { near: 150.0, far: 600.0 },
   [Character.thrall]: { near: 60.0, far: 600.0 },

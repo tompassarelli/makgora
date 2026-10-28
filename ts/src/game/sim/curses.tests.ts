@@ -84,7 +84,7 @@ function cursedDuel(): Duel {
   return d;
 }
 
-test("Doom's grab deals its fire hit and leaves the foe cursed by the Pit Lord [k1 scenario]", () => {
+test("Doom's bolt deals its fire hit and leaves the foe cursed by the Pit Lord [k1 scenario]", () => {
   const d = duel();
   step(d, ULTIMATE);
   for (let frame = 0; frame < 120 && d.foe.status.cursedBy === undefined; frame++) step(d);

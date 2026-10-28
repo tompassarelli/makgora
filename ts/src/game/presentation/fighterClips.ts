@@ -330,7 +330,7 @@ export const illidanWingClip = (form: number): HeroClip => form === DEMONHUNTER_
 const ULTIMATE_POSES: { readonly [character: number]: HeroPose | undefined } = {
   [Character.blademaster]: "upSpecial", [Character.mountainKing]: "downSpecial", [Character.warden]: "neutralSpecial",
   [Character.lich]: "neutralSpecial", [Character.forsakenPaladin]: "downSpecial", [Character.dreadlord]: "neutralSpecial",
-  [Character.pitLord]: "grab", [Character.beastmaster]: "sideSpecial",
+  [Character.pitLord]: "neutralSpecial", [Character.beastmaster]: "sideSpecial",
   [Character.lichKing]: "downSpecial", [Character.thrall]: "downSpecial", [Character.jaina]: "neutralSpecial",
   [Character.sylvanas]: "upSpecial", [Character.cairne]: "downSpecial", [Character.chen]: "downSpecial",
   [Character.peon]: "forwardSmash", [Character.tinker]: "sideSpecial", [Character.kaelthas]: "downSpecial",

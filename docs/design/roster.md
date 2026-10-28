@@ -1164,7 +1164,7 @@ Standing grab 11/3/31, reach 0.80H. Pummel: horn jab, shared 3 damage despite hu
 | Up | Toss from the horns | 10 | f20, R29 | 85, KILL |
 | Down | Hoof pin and release | 8 | f23, R31 | 65, LINK |
 
-**Ultimate — Doom:** f32 startup, a visible straight curse projectile with speed 0.08H/frame, life 35, radius 0.25H. On body hit, 10 impact damage with LAUNCH at 60 degrees, then 10 more damage over 240 frames, no flinch and no ability lock. No instant kill or Doom Guard. It is shieldable and reflectable. Action ends f75; missing still spends the cooldown.
+**Ultimate — Doom:** a targeted curse: locks the nearest foe within 600 units, and on f20 a fel bolt lands on them through shields for 10% and the Doom curse (see [ultimates](ultimates.md) and [Pit Lord](pit-lord.md)).
 
 **Required counterplay test:** fast characters can get inside a missed cleave and punish it. Pit Lord must have a usable close escape, but cannot turn jab into a fast long-range wall. Check that size does not make standard platforms impossible to traverse.
 

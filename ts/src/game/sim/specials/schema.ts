@@ -88,6 +88,15 @@ export interface CommandGrab extends FrameWindow {
   readonly heal?: { readonly heal: number } | undefined;
 
   readonly status?: AppliedStatus | undefined;
+}
+
+/** Locks the nearest foe within `range` on frame 1, marks it with `glyph`, and on `frame` strikes it wherever it is with `bolt`: no shield blocks it and nothing reflects it; only intangibility or leaving `range` escapes it. */
+export interface TargetedStrike {
+  readonly range: number;
+  readonly frame: number;
+  readonly effect: Readonly<HitEffect>;
+  readonly glyph: SpecialProjectile;
+  readonly bolt: SpecialProjectile;
   readonly curse?: SpecialCurse | undefined;
 }
 
@@ -329,6 +338,7 @@ export interface AuthoredSpecial {
 
   readonly recallsProjectiles?: boolean | undefined;
   readonly commandGrab?: CommandGrab | undefined;
+  readonly targetedStrike?: TargetedStrike | undefined;
 
   readonly strikeStatus?: AppliedStatus | undefined;
 

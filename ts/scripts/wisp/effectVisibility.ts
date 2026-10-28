@@ -283,7 +283,7 @@ export function effectUses(): EffectUse[] {
     const visit = (special: AuthoredSpecial | undefined, move: string): void => {
       if (special === undefined) return;
       for (const placement of specialPlacements(special)) uses.push(supplemental(fighter, `${move} placed object`, placement.model?.path ?? heroLook(character)?.placedModel?.path ?? "Units\\Orc\\SerpentWard\\SerpentWard.mdx", "placed-object animation/lifetime is unmodeled"));
-      const summoned = special.commandGrab?.curse?.summon.model?.path;
+      const summoned = special.targetedStrike?.curse?.summon.model?.path;
       if (summoned !== undefined) uses.push(supplemental(fighter, `${move} curse summon`, summoned, "placed-object animation/lifetime is unmodeled"));
       visit(special.ex, `${move} EX`);
       for (const followUp of special.followUps ?? []) visit(followUp.special, `${move} follow-up`);

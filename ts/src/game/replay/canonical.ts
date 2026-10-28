@@ -473,14 +473,22 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     if (grab.heal !== undefined) {
       real("commandGrab.heal", grab.heal.heal);
     }
-    if (grab.curse !== undefined) {
-      int("commandGrab.curse.every", grab.curse.every);
-      real("commandGrab.curse.damage", grab.curse.damage);
-      int("commandGrab.curse.summonDelay", grab.curse.summonDelay);
-      result.push(specialProjectileCanonical(grab.curse.portal, `${name}.commandGrab.curse.portal`));
-      result.push(specialPlacementCanonical(grab.curse.summon, `${name}.commandGrab.curse.summon`));
-    }
     result.push(hitEffectCanonical(grab.effect, `${name}.commandGrab.effect`));
+  }
+  const strike = move.targetedStrike;
+  if (strike !== undefined) {
+    real("targetedStrike.range", strike.range);
+    int("targetedStrike.frame", strike.frame);
+    result.push(specialProjectileCanonical(strike.glyph, `${name}.targetedStrike.glyph`));
+    result.push(specialProjectileCanonical(strike.bolt, `${name}.targetedStrike.bolt`));
+    if (strike.curse !== undefined) {
+      int("targetedStrike.curse.every", strike.curse.every);
+      real("targetedStrike.curse.damage", strike.curse.damage);
+      int("targetedStrike.curse.summonDelay", strike.curse.summonDelay);
+      result.push(specialProjectileCanonical(strike.curse.portal, `${name}.targetedStrike.curse.portal`));
+      result.push(specialPlacementCanonical(strike.curse.summon, `${name}.targetedStrike.curse.summon`));
+    }
+    result.push(hitEffectCanonical(strike.effect, `${name}.targetedStrike.effect`));
   }
   const poses = move.hurt ?? [];
   for (let index = 0; index < poses.length; index++) {

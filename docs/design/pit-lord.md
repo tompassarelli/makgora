@@ -18,8 +18,15 @@ provides Rain of Fire, Howl of Terror, Cleaving Attack and Doom. Its suggested
 rain-then-cleave plan is the center of this fighter. Warcraft's damage
 reduction becomes an immediate shove here: the opponent sees what the roar
 did. Cleaving Attack remains his broad weapon strikes. Doom, his ultimate,
-keeps Warcraft's curse and its Doom Guard: the shield-ignoring grab dooms the
-thrown foe, who burns 1% a second (a fel curse over their head and a Doom mark
+keeps Warcraft's point-and-click curse and its Doom Guard (made a targeted
+curse on 2026-10-28 after playtesting found the old close grab too hard to
+land). He locks the nearest foe within 600 units, its Doom glyph shows on
+them from frame 1, and on frame 20 a fel bolt lands on them wherever they
+are: no shield blocks it and nothing reflects it. Only intangibility on that
+frame (a timed spot dodge, roll or air dodge) or being out of range escapes
+it; knockback armor (100, like War Stomp) carries him through jabs until
+then, while a smash breaks it. A hit deals 10% with a small pop up and dooms
+the foe, who burns 1% a second (a fel curse over their head and a Doom mark
 by their percent) until they lose a stock. Dooming them again changes nothing.
 Three seconds after a doomed foe loses a stock, as they respawn, a fel portal
 opens on the main deck nearest where they fell and a Doom Guard steps out to

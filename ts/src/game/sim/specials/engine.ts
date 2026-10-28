@@ -375,7 +375,7 @@ export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProj
   }
 }
 
-function seekTargetSlot(world: Roster, owner: Readonly<Fighter>): number {
+export function seekTargetSlot(world: Roster, owner: Readonly<Fighter>): number {
   let nearest = -1;
   let distance = 0.0;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
@@ -1248,7 +1248,7 @@ function standBesideTarget(f: Fighter, target: Readonly<Fighter>): void {
   clearMotionValue(motion.meleeVelocityZ);
 }
 
-function lockedTarget(world: Roster, f: Readonly<Fighter>, range: number): Fighter | undefined {
+export function lockedTarget(world: Roster, f: Readonly<Fighter>, range: number): Fighter | undefined {
   const slot = f.special.seekTarget - 1;
   if (slot < 0 || !isActive(world, slot)) return undefined;
   const target = fighterAt(world, slot);

@@ -29,6 +29,7 @@ function widenByEvents(active: Span, move: Readonly<AuthoredSpecial>): void {
   if (move.burst !== undefined) widen(active, move.burst.frame, move.burst.frame);
   if (move.ritual !== undefined) widen(active, move.ritual.frame, move.ritual.frame);
   if (move.commandGrab !== undefined) widen(active, move.commandGrab.first, move.commandGrab.last);
+  if (move.targetedStrike !== undefined) widen(active, move.targetedStrike.frame, move.targetedStrike.frame);
   if (move.guard !== undefined) widen(active, move.guard.first, move.guard.last);
   if (move.intangible !== undefined) widen(active, move.intangible.first, move.intangible.last);
   if (move.armor !== undefined) widen(active, move.armor.first, move.armor.shell === true ? move.armor.first : move.armor.last);

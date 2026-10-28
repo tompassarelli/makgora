@@ -12,7 +12,7 @@ import { mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceCount, surfaceLeft, su
 const MAIN_DECK = 0;
 
 export function curseOf(owner: Readonly<Fighter>): SpecialCurse | undefined {
-  return owner.tuning.ultimate?.commandGrab?.curse;
+  return owner.tuning.ultimate?.targetedStrike?.curse;
 }
 
 export function applyCurse(target: Fighter, ownerSlot: number): void {

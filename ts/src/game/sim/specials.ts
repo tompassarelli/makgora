@@ -15,6 +15,7 @@ import {
 import { HitElement, type HitEffect, type HitRegion, NO_HIT_REGION } from "./hitRegions";
 import { heroSpecialMove, stopsSidewaysOnStart } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
+import { advanceHeroTargetedStrike } from "./heroTargetedStrike";
 import { enterExSpecial } from "./exSpecials";
 import { regionAgainst } from "./specials/spellImmunity";
 import { shieldSafeEffect } from "./exSpecialAuthoring";
@@ -822,6 +823,7 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
     stopFelRushAtShields(world, slot);
     stopHeroMotionAtBodies(world, slot);
     advanceHeroCommandGrab(world, slot);
+    advanceHeroTargetedStrike(world, slot);
   }
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;

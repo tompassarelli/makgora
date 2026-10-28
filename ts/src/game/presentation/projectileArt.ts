@@ -11,7 +11,7 @@ import { Character, ProjectileKind } from "../sim/codes";
 import type { Projectile } from "../sim/fighter";
 import { HERO_ROSTER, heroDefinition } from "../roster/kits";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
-import type { AuthoredSpecial, FighterSpecials, SpecialProjectile } from "../sim/specials/schema";
+import type { AuthoredSpecial, FighterSpecials, SpecialProjectile, TargetedStrike } from "../sim/specials/schema";
 import { specialPlacements } from "../sim/specials/placements";
 import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
 import type { CueBirth } from "./specialCues";
@@ -47,13 +47,19 @@ function chainProjectiles(projectile: SpecialProjectile | undefined, into: Speci
   chainProjectiles(projectile.burstInto, into);
 }
 
+function strikeProjectiles(strike: Readonly<TargetedStrike> | undefined, into: SpecialProjectile[]): void {
+  if (strike === undefined) return;
+  chainProjectiles(strike.glyph, into);
+  chainProjectiles(strike.bolt, into);
+  chainProjectiles(strike.curse?.portal, into);
+  chainProjectiles(strike.curse?.summon.shot, into);
+}
+
 function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProjectile[]): void {
   if (special === undefined) return;
   for (const projectile of special.projectiles ?? []) chainProjectiles(projectile, into);
   for (const placement of specialPlacements(special)) for (const shot of [placement.shot, placement.finalShot, placement.mark]) if (shot !== undefined) into.push(shot);
-  const curse = special.commandGrab?.curse;
-  if (curse !== undefined) chainProjectiles(curse.portal, into);
-  if (curse?.summon.shot !== undefined) into.push(curse.summon.shot);
+  strikeProjectiles(special.targetedStrike, into);
   if (special.burst !== undefined) {
     chainProjectiles(special.burst.from, into);
     chainProjectiles(special.burst.into, into);
