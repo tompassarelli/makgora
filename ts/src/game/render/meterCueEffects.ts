@@ -74,7 +74,7 @@ class MeterCueModel {
     const anchor = CUE_ANCHORS[this.cue.anchor];
     this.placed.x = this.origin.x + fighter.motion.x + fighter.facing * anchor.x * scale;
     this.placed.y = front;
-    this.placed.z = this.origin.z + fighter.motion.z + anchor.z * scale;
+    this.placed.z = this.origin.z + fighter.motion.z + anchor.z * scale + (this.cue.sequence === "stand" ? 40.0 : 0.0);
     return this.placed;
   }
 

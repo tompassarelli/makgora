@@ -34,7 +34,7 @@ import * as journalPause from "./journalPause";
 import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, Key, registerKey, syncKeyEvents } from "./keyEvents";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
-import { onDevCommand } from "./developerCommands";
+import { applyDeveloperCommand, onDevCommand } from "./developerCommands";
 import { openControlsFirst, panelActions, previewControlsFirst, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
@@ -321,6 +321,7 @@ function createTriggers(s: ShellState): void {
   const tick = CreateTimer();
   TimerStart(tick, FRAME_SECONDS, true, trampoline(TICK));
   startFrameClock(tick);
+  TimerStart(CreateTimer(), 5.0, false, () => { const auto = shellState(); if (auto !== undefined) applyDeveloperCommand(auto, 0, "-dev setup quick stage 13 pair jaina proudmoore / rifleman;meter 100"); });
 }
 
 
