@@ -12,7 +12,7 @@ import type { Lockstep } from "wisp/src/headless/lockstep";
 import { deliverKey } from "./deliverKey";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { Phase, type MatchState } from "../../src/game/lobby/lobbyState";
-import { Character, SpecialAction } from "../../src/game/sim/codes";
+import { AttackStyle, Character, SpecialAction } from "../../src/game/sim/codes";
 import { Action } from "../../src/game/input/actions";
 import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { canAttack } from "../../src/game/sim/conditions";
@@ -29,7 +29,7 @@ const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
 const KEY = {
   left: bound(Action.moveLeft), right: bound(Action.moveRight), down: bound(Action.moveDown), up: bound(Action.moveUp), jump: bound(Action.shortHop),
   attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shieldLeft: bound(Action.leftTrigger), shieldRight: bound(Action.rightTrigger),
-  cLeft: bound(Action.cLeft), cRight: bound(Action.cRight), cUp: bound(Action.cUp), cDown: bound(Action.cDown), walk: bound(Action.walk),
+  cLeft: bound(Action.cLeft), cRight: bound(Action.cRight), cUp: bound(Action.cUp), cDown: bound(Action.cDown), walk: bound(Action.walk), strong: bound(Action.strong),
 } as const;
 
 
@@ -38,6 +38,7 @@ type KeyStep = readonly [at: number, key: number, kind: "tap" | "down" | "up"];
 interface CensusMove {
   readonly name: string;
   readonly keys: readonly KeyStep[];
+  readonly style?: AttackStyle;
 }
 
 const tap = (at: number, key: number): KeyStep => [at, key, "tap"];
@@ -58,12 +59,12 @@ const SPECIALS: readonly (readonly [string, number | undefined])[] = [["neutral 
 export const CENSUS_MOVES: readonly CensusMove[] = [
   { name: "jab", keys: [tap(0, KEY.attack)] },
   { name: "jab chain", keys: [tap(0, KEY.attack), tap(8, KEY.attack), tap(16, KEY.attack)] },
-  { name: "forward tilt", keys: [...hold(0, 3, KEY.walk, KEY.right), tap(2, KEY.attack)] },
-  { name: "up tilt", keys: [...hold(0, 3, KEY.walk, KEY.up), tap(2, KEY.attack)] },
-  { name: "down tilt", keys: [...hold(0, 3, KEY.walk, KEY.down), tap(2, KEY.attack)] },
-  { name: "forward smash", keys: [tap(0, KEY.cRight)] },
-  { name: "up smash", keys: [tap(0, KEY.cUp)] },
-  { name: "down smash", keys: [tap(0, KEY.cDown)] },
+  { name: "forward tilt", keys: [...hold(0, 3, KEY.walk, KEY.right), tap(2, KEY.attack)], style: AttackStyle.forwardTilt },
+  { name: "up tilt", keys: [...hold(0, 3, KEY.walk, KEY.up), tap(2, KEY.attack)], style: AttackStyle.upTilt },
+  { name: "down tilt", keys: [...hold(0, 3, KEY.walk, KEY.down), tap(2, KEY.attack)], style: AttackStyle.downTilt },
+  { name: "forward smash", keys: hold(0, 2, KEY.strong, KEY.right), style: AttackStyle.forwardSmash },
+  { name: "up smash", keys: hold(0, 2, KEY.strong, KEY.up), style: AttackStyle.upSmash },
+  { name: "down smash", keys: hold(0, 2, KEY.strong, KEY.down), style: AttackStyle.downSmash },
   { name: "dash attack", keys: [...hold(0, 11, KEY.right), tap(10, KEY.attack)] },
   { name: "neutral air", keys: [tap(0, KEY.jump), tap(JUMP_LEAD, KEY.attack)] },
   { name: "forward air", keys: [tap(0, KEY.jump), tap(JUMP_LEAD, KEY.cRight)] },
@@ -180,13 +181,14 @@ function approach(clients: Lockstep): readonly [number, number] {
   return [first, clients.frame];
 }
 
-function playMove(clients: Lockstep, move: CensusMove): readonly [number, number, number | undefined] {
+function playMove(clients: Lockstep, move: CensusMove): readonly [number, number, number | undefined, AttackStyle | undefined] {
   const first = clients.frame + 1;
   const before = fighterAt(shellOf(clients).world, 0);
   const attackSerial = before.attack.serial;
   const grabSerial = before.grab.serial;
   let action = before.special.action;
   let started: number | undefined;
+  let style: AttackStyle | undefined;
   for (let at = 0; at < MOVE_FRAMES; at++) {
     for (const [when, key, kind] of move.keys) {
       if (when !== at) continue;
@@ -196,10 +198,11 @@ function playMove(clients: Lockstep, move: CensusMove): readonly [number, number
     clients.frames(1);
     if (started !== undefined) continue;
     const { attack, grab, special } = fighterAt(shellOf(clients).world, 0);
+    if (attack.serial !== attackSerial) style = attack.style;
     if (attack.serial !== attackSerial || grab.serial !== grabSerial || (special.action !== action && special.action !== SpecialAction.none)) started = at;
     action = special.action;
   }
-  return [first, clients.frame, started];
+  return [first, clients.frame, started, style];
 }
 
 function problemsOf(clients: Lockstep): { problems: number; lines: string[] } {
@@ -212,16 +215,18 @@ function problemsOf(clients: Lockstep): { problems: number; lines: string[] } {
 export function playFighterCensus(clients: Lockstep, measure: PerfMeasure, fighter: Character, label: string): { problems: number; lines: string[] } {
   startTraining(clients, measure, fighter, CENSUS_STAGE);
   const unstarted: string[] = [];
+  const mismatched: string[] = [];
   for (const move of CENSUS_MOVES) {
     const [baseFirst, baseLast] = approach(clients);
-    const [moveFirst, moveLast, started] = playMove(clients, move);
+    const [moveFirst, moveLast, started, style] = playMove(clients, move);
     if (started === undefined) unstarted.push(move.name);
+    else if (move.style !== undefined && style !== move.style) mismatched.push(`${label}: ${move.name} started attack style ${style ?? "none"}, not ${move.style}`);
     print(`census\t${label}\t${move.name}\t${baseFirst}\t${baseLast}\t${moveFirst}\t${moveLast}\t${started ?? "never"}`);
   }
   const result = problemsOf(clients);
   const [firstUnstarted] = unstarted;
-  if (firstUnstarted === undefined) return result;
-  const lines = [...result.lines, `${label}: ${firstUnstarted} never started; ${unstarted.length} of ${CENSUS_MOVES.length} census moves never started`];
+  if (firstUnstarted === undefined && mismatched.length === 0) return result;
+  const lines = [...result.lines, ...mismatched, ...(firstUnstarted === undefined ? [] : [`${label}: ${firstUnstarted} never started; ${unstarted.length} of ${CENSUS_MOVES.length} census moves never started`])];
   return { problems: lines.length, lines };
 }
 
