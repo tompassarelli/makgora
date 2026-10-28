@@ -1,14 +1,14 @@
 import { assertEquals, assertGreaterThan, assertLessThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { imod } from "wisp/src/sim/intMath";
 import { beginFighterAttack } from "./attacks";
 import { AttackStyle, Character } from "./codes";
 import { createFighter } from "./fighter";
 import { hurtCapsule } from "./geometry/contactGeometry";
-import { ILLIDAN_MOVES, ROUNDHOUSE_STEP } from "./originalMoves";
+import { smashDamageMultiplier } from "./moves";
+import { ILLIDAN_MOVES, ROUNDHOUSE_CLEAN, ROUNDHOUSE_SOUR, ROUNDHOUSE_STEP } from "./originalMoves";
 import { type Controls } from "./roster";
 import { mainDeckLeft, mainDeckRight } from "./stage";
-import { duelPair, lift, stepDuel } from "./testDuel";
+import { duelPair, stepDuel } from "./testDuel";
 import { controls } from "./testWorld";
 
 const KICK = ILLIDAN_MOVES.normals[AttackStyle.forwardSmash]!;
@@ -16,18 +16,23 @@ const FULL_CHARGE = 60;
 const SHIELD = controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0 });
 const VICTIM_CHARACTER = Character.demonHunter;
 const VICTIM = hurtCapsule(VICTIM_CHARACTER);
-const REGIONS_PER_FRAME = 3;
-const BALL = 2;
+const CLEAN_DAMAGE = ROUNDHOUSE_CLEAN.damage;
+const SOUR_DAMAGE = ROUNDHOUSE_SOUR.damage;
+const CLOSE_GAP = 60.0;
+const TYPICAL_SHARE = 0.75;
+const BODY_SIDE_SHARE = f32(0.6);
+const SHORT_FOES = [Character.rifleman, Character.mountainKing, Character.peon];
+const SHIN_CLEARANCE = 6.0;
+const FOES = [Character.rifleman, Character.demonHunter, Character.blademaster, Character.mountainKing, Character.jaina, Character.pitLord];
 
 interface Kick { readonly damage: number; readonly hitstun: number; readonly moved: number; readonly end: number; readonly grounded: boolean; readonly frames: number }
 
-function kick(gap: number, charge = 0, victim: Readonly<Controls> = controls(), liftedTo?: number, startX = 0.0, facing = 1): Kick {
-  const { world, owner, target } = duelPair(createFighter(Character.demonHunter, startX, facing), createFighter(VICTIM_CHARACTER, f32(startX + gap * facing), -facing));
+function kick(gap: number, charge = 0, victim: Readonly<Controls> = controls(), startX = 0.0, facing = 1, foe: Character = VICTIM_CHARACTER): Kick {
+  const { world, owner, target } = duelPair(createFighter(Character.demonHunter, startX, facing), createFighter(foe, f32(startX + gap * facing), -facing));
   for (let settle = 0; settle < 12; settle++) stepDuel(world, controls(), victim);
   beginFighterAttack(world, 0, AttackStyle.forwardSmash, charge > 0);
   let grounded = true, frames = 0, hitstun = 0, furthest = 0.0;
   for (let frame = 0; frame < KICK.totalFrames + charge + 4; frame++) {
-    if (liftedTo !== undefined && target.status.damage === 0.0) lift(target, liftedTo);
     stepDuel(world, controls({ attackHeld: frame <= KICK.startupFrames + charge }), victim);
     grounded &&= owner.motion.grounded;
     furthest = Math.max(furthest, f32(f32(owner.motion.x - startX) * facing));
@@ -39,16 +44,33 @@ function kick(gap: number, charge = 0, victim: Readonly<Controls> = controls(), 
 
 const farEdge = Math.max(...KICK.regions.map((region) => region.hit.maxX));
 const reach = f32(farEdge + ROUNDHOUSE_STEP);
+const isPoint = ({ hit: { strike } }: (typeof KICK.regions)[number]): boolean => strike !== undefined && strike.x1 === strike.x2;
+const heelBackEdge = Math.min(...KICK.regions.filter((region) => region.hit.effect.damage === CLEAN_DAMAGE && isPoint(region)).map((region) => region.hit.minX));
+const shinOnlyGap = (foe: Character): number => f32(f32(f32(heelBackEdge + ROUNDHOUSE_STEP) - hurtCapsule(foe).radius) - SHIN_CLEARANCE);
+const typicalGap = (foe: Character): number => f32(f32(reach * TYPICAL_SHARE) + hurtCapsule(foe).radius);
 
-test("Illidan's roundhouse heel hit deals more damage and knockback than the ball of his foot, uncharged and fully charged [k3 measure docs/design/illidan.md]", () => {
-  const belowBall = Math.max(...KICK.regions.filter((_, index) => imod(index, REGIONS_PER_FRAME) !== BALL).map((region) => region.hit.maxZ));
-  const overHeelAndShin = f32(f32(belowBall + 2.0) - f32(VICTIM.z1 - VICTIM.radius));
+test("Illidan's roundhouse clean hit lands at typical forward-smash range on every foe tested, and on the shin and foot of a short foe standing short of the heel, at the clean damage scaled by charge [k3 measure docs/design/illidan.md]", () => {
   for (const charge of [0, FULL_CHARGE]) {
-    const heel = kick(115.0, charge);
-    const ball = kick(115.0, charge, controls(), overHeelAndShin);
-    assertGreaterThan(ball.damage, 0.0);
-    assertGreaterThan(heel.damage, ball.damage);
-    assertGreaterThan(heel.hitstun, ball.hitstun);
+    for (const foe of FOES) {
+      const spaced = kick(typicalGap(foe), charge, controls(), 0.0, 1, foe);
+      assertNear(spaced.damage, f32(CLEAN_DAMAGE * smashDamageMultiplier(charge)), f32(0.01));
+    }
+    for (const foe of SHORT_FOES) {
+      const shin = kick(shinOnlyGap(foe), charge, controls(), 0.0, 1, foe);
+      assertNear(shin.damage, f32(CLEAN_DAMAGE * smashDamageMultiplier(charge)), f32(0.01));
+    }
+  }
+});
+
+test("Illidan's roundhouse knee hit lands only beside his body, deals the sour damage and launches less than the clean hit, uncharged and fully charged [k3 measure docs/design/illidan.md]", () => {
+  const sourReach = Math.max(...KICK.regions.filter((region) => region.hit.effect.damage === SOUR_DAMAGE).map((region) => region.hit.maxX));
+  assertLessThan(sourReach, f32(farEdge * BODY_SIDE_SHARE));
+  for (const charge of [0, FULL_CHARGE]) {
+    const close = kick(CLOSE_GAP, charge);
+    const spaced = kick(typicalGap(VICTIM_CHARACTER), charge);
+    assertNear(close.damage, f32(SOUR_DAMAGE * smashDamageMultiplier(charge)), f32(0.01));
+    assertGreaterThan(spaced.damage, close.damage);
+    assertGreaterThan(spaced.hitstun, close.hitstun);
   }
 });
 
@@ -71,7 +93,7 @@ test("Illidan's roundhouse step stops at the ledge in either facing and he finis
   for (const facing of [1, -1]) {
     const edge = facing > 0 ? mainDeckRight(0) : mainDeckLeft(0);
     const start = f32(edge - 10.0 * facing);
-    const atLedge = kick(900.0, 0, controls(), undefined, start, facing);
+    const atLedge = kick(900.0, 0, controls(), start, facing);
     assertNear(atLedge.moved, 10.0, f32(0.01));
     assertNear(f32(f32(atLedge.end - start) * facing), 10.0, f32(0.01));
     assertTrue(atLedge.grounded);

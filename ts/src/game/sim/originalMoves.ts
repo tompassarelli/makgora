@@ -31,8 +31,9 @@ const ROUNDHOUSE_RECOVERY = 24;
 const HEEL_RADIUS = 13.0;
 const SHIN_RADIUS = 17.0;
 const BALL_RADIUS = 13.0;
-export const ROUNDHOUSE_HEEL = groundHit(10.0, 45, 85.0, 20.0, HitElement.fire);
-export const ROUNDHOUSE_SOUR = groundHit(7.0, 45, 72.0, 17.0, HitElement.normal);
+const KNEE_RADIUS = 8.0;
+export const ROUNDHOUSE_CLEAN = groundHit(17.0, 45, 105.0, 10.0, HitElement.fire);
+export const ROUNDHOUSE_SOUR = groundHit(14.0, 45, 105.0, 10.0, HitElement.normal);
 
 type Point = readonly [x: number, z: number];
 interface Leg { readonly knee: Point; readonly ankle: Point; readonly heel: Point; readonly toe: Point }
@@ -52,9 +53,10 @@ function roundhouseRegions(): MoveRegion[] {
   return ROUNDHOUSE_LEG.flatMap(({ knee, ankle, heel, toe }, index) => {
     const frame = ROUNDHOUSE_FIRST_ACTIVE + index;
     return [
-      strongRegion(heroRegion(frame, frame, capsule(heel, heel, HEEL_RADIUS), ROUNDHOUSE_HEEL)),
-      heroRegion(frame, frame, capsule(knee, ankle, SHIN_RADIUS), ROUNDHOUSE_SOUR),
-      heroRegion(frame, frame, capsule(ankle, toe, BALL_RADIUS), ROUNDHOUSE_SOUR),
+      heroRegion(frame, frame, capsule(knee, knee, KNEE_RADIUS), ROUNDHOUSE_SOUR),
+      strongRegion(heroRegion(frame, frame, capsule(heel, heel, HEEL_RADIUS), ROUNDHOUSE_CLEAN)),
+      strongRegion(heroRegion(frame, frame, capsule(knee, ankle, SHIN_RADIUS), ROUNDHOUSE_CLEAN)),
+      strongRegion(heroRegion(frame, frame, capsule(ankle, toe, BALL_RADIUS), ROUNDHOUSE_CLEAN)),
     ];
   });
 }

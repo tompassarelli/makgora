@@ -359,18 +359,28 @@ the follow-through and back to his stance (`ILLIDAN_MOVES` in
   stops at a body or a raised shield, and stops at the ledge, so he never kicks
   himself off the stage.
 - Hit regions follow his drawn leg on each active frame:
-  - The **heel** is the strong hit, the kill hit: 10% at 45°, base 20, growth
-    85. These are Fel Lunge's exact values, so his kill percents carry over.
-  - The **shin and the ball of the foot** are the weak hit: 7% at 45°, base 17,
-    growth 72.
+  - The **clean hit** is the kill hit and covers most of the shin, the foot
+    and the heel: 17% at 45°, base 10, growth 105, Falco's forward smash
+    numbers (17%, base 10, growth 105; his angle 361 is a 45° launch here).
+    A foe at normal forward-smash range takes it. Tom's playtest of 28 Oct
+    found the old 13-radius heel sweetspot almost never connected while the
+    shin and ball did, so the kill now sits on the part that connects.
+  - The **knee hit** is the sour hit: a small circle at the knee that wins
+    only for a foe standing against his body, 14% at 45°, base 10, growth
+    105, Falco's late hit. It beats the clean hit on any overlap, so it
+    stays on the knee.
+  - Kill percent from the repo's balance-feel measurement (a grounded
+    Rifleman at Sky Deck centre, neutral DI): clean 56% uncharged and 32%
+    fully charged (was 123% and 93% for the 10% heel); knee 72% and 47% (was
+    213% and 171% for the 7% shin and ball).
   - Damage scales with charge, like every smash.
 - Reach: the heel's far edge is 108 ahead of where he stands mid-kick, so the
   kick reaches 130 from where he starts. That is inside the roster's
   forward-smash band (62-195) and beyond Fel Lunge's 111 on its glaive
   regions. Tom's brief asked for 160-175, which his 75-unit leg cannot reach
   with a 20-25 step and the hitbox on the drawn heel. The kick sits at chest
-  height so the heel still lands on the short fighters (Rifleman, Mountain
-  King, Peon, Murloc). Only Kobold is short enough to duck the heel.
+  height so the clean hit still lands on the short fighters (Rifleman, Mountain
+  King, Peon, Murloc). Only Kobold is short enough to duck the leg.
 
 Counterplay: 11 frames of startup with an obvious chamber, and 24 frames of
 recovery after the kick for a shield to punish. The leg is a hurtbox while it
@@ -497,7 +507,7 @@ attackCues.ts and elementLooks.ts):
 | Fel Rush tell (frames 1–20), and every branch's startup | Death Coil special art |
 | Fel Rush (frames 21–25, or to a shortened stop) | Illidan's Metamorphosis missile streak along the path and the green wing trail, which fade behind him; Maiev's Illusion leaves blink afterimages instead |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
-| Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a heel hit lands as the fire hit's green flame burst, a shin or toe hit as the normal spark |
+| Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a clean hit on the shin, foot or heel lands as the fire hit's green flame burst, a knee hit as the normal spark |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |
 | Twin-glaive forward air | Illidan's missile trail |
 | Drain on hit (any victim) | Mana Burn target over the victim's head through that hit's hitlag and hitstun |
