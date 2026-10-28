@@ -221,11 +221,13 @@ export function fightersApart(a: Readonly<Fighter>, b: Readonly<Fighter>): boole
   return apartPair(a.motion.x, a.motion.z, b.motion.x, b.motion.z, strikeReach(a), strikeReach(b));
 }
 
-/** `slot` is apart from every other active fighter of `others`. */
+/** `slot` is apart from every other active fighter of `others`, and no curse links it to one: a curse ticks, lifts and summons from both fighters at any distance. */
 export function apartFromOthers(slot: number, fighter: Readonly<Fighter>, others: Readonly<Roster>): boolean {
   for (const other of PARTICIPANT_SLOTS) {
     if (other === slot || !isActive(others, other)) continue;
-    if (!fightersApart(fighter, fighterAt(others, other))) return false;
+    const target = fighterAt(others, other);
+    if (fighter.status.cursedBy === other || target.status.cursedBy === slot) return false;
+    if (!fightersApart(fighter, target)) return false;
   }
   return true;
 }
