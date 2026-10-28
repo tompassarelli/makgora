@@ -49,13 +49,12 @@ const blastProjectile = (radius: number, damage: number, status: AppliedStatus |
   life: HOWLING_BLAST_LIFE, radius, effect: hit(damage, "POKE", 40), reflectable: true, limit: 1, status,
 });
 export const HOWLING_BLAST = blastProjectile(h(f32(0.22)), 7.5, undefined);
-const howlingBlast = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
+const HOWLING_BLAST_CAST: AuthoredSpecial = {
   endFrame: 50,
   hurt: HOWLING_BODY,
   armor: { ...frames(10, HOWLING_BLAST_SPAWN_FRAME), maxDamage: 8.0 },
-  landingLag,
-  projectiles: [projectile],
-});
+  projectiles: [HOWLING_BLAST],
+};
 
 
 
@@ -128,8 +127,7 @@ export const LICH_KING_SPECIALS: FighterSpecials = {
   neutral: withExKit({
     name: "Howling Blast",
     description: "A wide frost gust that travels toward the foe.",
-    ground: howlingBlast(HOWLING_BLAST, undefined),
-    air: howlingBlast(HOWLING_BLAST, AIR_LANDING_LAG),
+    ground: HOWLING_BLAST_CAST,
   }, { range: 1.25 }),
   side: withExKit({
     name: "Val'kyr Shadowguard",
