@@ -7,7 +7,7 @@ import { snapToLedge } from "./ledge";
 import { canAttack } from "./conditions";
 import { fillMeter } from "./meter";
 import { FEL_RUSH_DISTANCE, FEL_RUSH_FIRST, FEL_RUSH_FRAMES, FEL_RUSH_LAST, FEL_RUSH_SPEED, FEL_RUSH_TELL_LAST } from "./specials";
-import { ILLUSION_TRAVEL_FRAMES } from "./specials/illusionDash";
+import { PHANTASM_TRAVEL_FRAMES } from "./specials/phantasmDash";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { surfaceLeft, surfaceRight, surfaceZ } from "./stage";
 import { controls } from "./testWorld";
@@ -233,7 +233,7 @@ test("Fel Rush: landing or a ledge grab after a whiffed air rush gives the air r
     assertTrue(pressAgain(world, owner));
   }
 });
-const STEP = f32(FEL_RUSH_DISTANCE / ILLUSION_TRAVEL_FRAMES);
+const STEP = f32(FEL_RUSH_DISTANCE / PHANTASM_TRAVEL_FRAMES);
 const shortenOn = (travelFrame: number) => (owner: Readonly<Fighter>): Controls =>
   owner.special.frame + 1 === travelFrame ? controls({ specialPressed: true }) : controls();
 
@@ -248,15 +248,20 @@ function groundedRun(shorten?: number): { owner: Fighter; target: Fighter; trave
   return { owner, target, travelled: f32(owner.motion.x - startX), frames };
 }
 
-test("Fel Rush: an unshortened rush travels Maiev's full Illusion distance over its 5 travel frames and ends on the shared Illusion end frame [k3 measure docs/design/illidan.md]", () => {
+test("Fel Rush: an unshortened rush travels 3.5H over Falco's 4 Phantasm travel frames, 18 to 21, and ends on frame 59 [k3 measure docs/design/illidan.md]", () => {
   const { travelled, frames } = groundedRun();
-  assertEquals(FEL_RUSH_LAST - FEL_RUSH_FIRST + 1, ILLUSION_TRAVEL_FRAMES);
+  assertEquals(FEL_RUSH_TELL_LAST, 17);
+  assertEquals(FEL_RUSH_FIRST, 18);
+  assertEquals(FEL_RUSH_LAST, 21);
+  assertEquals(FEL_RUSH_FRAMES, 59);
+  assertEquals(FEL_RUSH_LAST - FEL_RUSH_FIRST + 1, PHANTASM_TRAVEL_FRAMES);
+  assertEquals(FEL_RUSH_SPEED, f32(FEL_RUSH_DISTANCE / 4));
   assertGreaterThan(travelled, f32(FEL_RUSH_DISTANCE - 1.0));
   assertLessThan(travelled, f32(FEL_RUSH_DISTANCE + 1.0));
   assertEquals(frames, FEL_RUSH_FRAMES);
 });
 
-test("Fel Rush: a special press on travel frame k stops him after k minus the tell of the 5 steps, and ends the move as many frames sooner as steps it skipped [k3 measure docs/design/illidan.md]", () => {
+test("Fel Rush: a special press on travel frame k stops him after k minus the tell of the 4 steps, and ends the move as many frames sooner as steps it skipped [k3 measure docs/design/illidan.md]", () => {
   for (let travelFrame = FEL_RUSH_FIRST; travelFrame < FEL_RUSH_LAST; travelFrame++) {
     const steps = travelFrame - FEL_RUSH_TELL_LAST;
     const { owner, travelled, frames } = groundedRun(travelFrame);
