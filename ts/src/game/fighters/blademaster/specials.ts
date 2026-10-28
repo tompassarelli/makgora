@@ -3,10 +3,11 @@
 
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, CHARGED_AIM_FRAMES, FollowUpInput, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialCharge, type SpecialFollowUp, type SpecialPlacement, CHARGED_AIM_FRAMES, FollowUpInput, Relocation, chargedAngleMotion, frames } from "../../sim/specials/schema";
 import { hurtPart, hurtPose } from "../../sim/hurtboxes";
 import { L, capsule, cut, hit, length, reach } from "./moves";
 import { path } from "../../sim/heroes/authoring";
+import { idiv } from "wisp/src/sim/intMath";
 
 
 
@@ -16,30 +17,6 @@ const LOW_CUT_ARM = reach(46.0, 56.0);
 export const AIR_LANDING_LAG = 20;
 
 
-const windCutter: AuthoredSpecial = {
-  endFrame: 40,
-  hurt: [
-      hurtPose(1, 8, [hurtPart(-32.0, 56.0, -48.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      hurtPose(9, 11, [hurtPart(-56.0, 64.0, -40.0, 125.0, 35.0), hurtPart(0.0, 79.0, -8.0, 95.0, 41.0)]),
-      hurtPose(12, 16, [hurtPart(-20.0, 20.0, -4.0, 86.0, 51.0), hurtPart(-49.0, 66.0, 20.0, 100.0, 29.0)]),
-      hurtPose(17, 24, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      hurtPose(25, 32, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-      hurtPose(33, 39, [hurtPart(16.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
-    ],
-  projectiles: [{
-    model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx",
-    spawnFrame: 18,
-    offsetX: 40.0,
-    offsetZ: 45.0,
-    velocityX: length(f32(0.14)),
-    velocityZ: 0.0,
-    life: 24,
-    radius: length(f32(0.16)),
-    effect: hit(4.647127628326416, "POKE", 35),
-    reflectable: true,
-    limit: 1,
-  }],
-};
 
 
 
@@ -54,6 +31,71 @@ export const WIND_WALK_KICK = frames(WIND_WALK_FREEZE + 3, WIND_WALK_FREEZE + 9)
 export const WIND_WALK_KICK_END = WIND_WALK_FREEZE + 35;
 export const WIND_WALK_KICK_REACH = length(f32(2.5));
 const STOP = { velocityX: 0.0, velocityZ: 0.0 };
+
+export const QUICKDRAW_CHARGE: SpecialCharge = { hold: 8, full: 60, stages: 17, drops: true };
+export const QUICKDRAW_DAMAGE = { least: 7.0, most: 24.0 } as const;
+export const QUICKDRAW_TRAVEL = { least: length(f32(0.3)), most: length(f32(2.2)) } as const;
+export const QUICKDRAW_DASH_FIRST = 13;
+const QUICKDRAW_DASH_FRAMES = { least: 6, most: 10 } as const;
+const QUICKDRAW_RECOVERY = 16;
+const QUICKDRAW_REACH = length(f32(0.3));
+const QUICKDRAW_HEIGHT = 62.0;
+const QUICKDRAW_RADIUS = 34.0;
+const QUICKDRAW_SHIELD_DAMAGE = f32(1.5);
+
+const chargeShare = (stage: number, least: number, most: number): number =>
+  f32(least + f32(f32(f32(most - least) * stage) / QUICKDRAW_CHARGE.stages));
+
+export const quickdrawDamage = (stage: number): number => chargeShare(stage, QUICKDRAW_DAMAGE.least, QUICKDRAW_DAMAGE.most);
+export const quickdrawTravel = (stage: number): number => chargeShare(stage, QUICKDRAW_TRAVEL.least, QUICKDRAW_TRAVEL.most);
+export const quickdrawDashFrames = (stage: number): number =>
+  QUICKDRAW_DASH_FRAMES.least + idiv((QUICKDRAW_DASH_FRAMES.most - QUICKDRAW_DASH_FRAMES.least) * stage, QUICKDRAW_CHARGE.stages);
+
+function dashStrikes(speed: number, dash: number): ReturnType<typeof capsule>[] {
+  const strikes: ReturnType<typeof capsule>[] = [];
+  for (let frame = 0; frame < dash; frame++) strikes.push(capsule(f32(-speed), QUICKDRAW_HEIGHT, QUICKDRAW_REACH, QUICKDRAW_HEIGHT, QUICKDRAW_RADIUS));
+  return strikes;
+}
+
+const quickdraw = (stage: number, air: boolean): AuthoredSpecial => {
+  const dash = quickdrawDashFrames(stage);
+  const speed = f32(quickdrawTravel(stage) / dash);
+  const last = QUICKDRAW_DASH_FIRST + dash - 1;
+  const damage = quickdrawDamage(stage);
+  const effect = { ...hit(damage, "QUICKDRAW", 80), shieldDamage: f32(damage * QUICKDRAW_SHIELD_DAMAGE) };
+  return {
+    name: "Quickdraw",
+    endFrame: last + QUICKDRAW_RECOVERY,
+    spendsCharge: true,
+    critical: true,
+    motion: [
+      { ...frames(QUICKDRAW_DASH_FIRST, last), velocityX: speed, velocityZ: 0.0 },
+      { ...frames(last + 1, last + 1), ...STOP },
+    ],
+    regions: path(QUICKDRAW_DASH_FIRST, dashStrikes(speed, dash), effect),
+    hurt: [
+      hurtPose(1, QUICKDRAW_DASH_FIRST - 1, [hurtPart(-8.0, 24.0, -16.0, 105.0, 37.0)]),
+      hurtPose(QUICKDRAW_DASH_FIRST, last, [hurtPart(-24.0, 30.0, 24.0, 95.0, 34.0)]),
+    ],
+    landingLag: air ? AIR_LANDING_LAG : undefined,
+  };
+};
+
+const QUICKDRAW_WINDOW = frames(1, QUICKDRAW_CHARGE.hold + 1);
+function quickdrawReleases(air: boolean): readonly SpecialFollowUp[] {
+  const releases: SpecialFollowUp[] = [];
+  for (let stage = 0; stage <= QUICKDRAW_CHARGE.stages; stage++) releases.push({ window: QUICKDRAW_WINDOW, input: FollowUpInput.release, chargeStage: stage, special: quickdraw(stage, air) });
+  return releases;
+}
+const iaidoStance = (air: boolean): AuthoredSpecial => ({
+  name: "Iaido Stance",
+  endFrame: QUICKDRAW_CHARGE.hold + 2,
+  charge: QUICKDRAW_CHARGE,
+  hurt: [hurtPose(1, QUICKDRAW_CHARGE.hold + 1, [hurtPart(-8.0, 24.0, -16.0, 105.0, 37.0)])],
+  followUps: quickdrawReleases(air),
+  oncePerAirtime: air ? true : undefined,
+  landingLag: air ? AIR_LANDING_LAG : undefined,
+});
 
 const LIFT_KICK = path(WIND_WALK_KICK.first, [
   capsule(15.0, 45.0, 45.0, 150.0, 22.0),
@@ -165,7 +207,7 @@ const inAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...special, land
 const onceInAir = (special: AuthoredSpecial): AuthoredSpecial => ({ ...inAir(special), oncePerAirtime: true });
 
 export const BLADEMASTER_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Wind Cutter", description: "A short blade wave.", ground: windCutter, air: inAir(windCutter) }, { range: 1.25 }),
+  neutral: withExKit({ name: "Quickdraw", description: "Hold to crouch in an iaido stance with the blade sheathed as it glows brighter, then release to draw: a quick cut with a small step, or after a longer charge a dash slash that strikes harder and passes through the foe to land behind them. A full charge draws on its own.", ground: iaidoStance(false), air: iaidoStance(true) }, { travel: 1.25 }),
   side: withExKit({ name: "Mirror Image", description: "Step the way you point, or hold the other way as he gathers to step there while still facing where you pressed, and leave an image where you stood; press again to swap to it with a slash. One hit breaks it.", ground: mirrorImageStanding, air: onceInAir(mirrorImage), recall: imageSwap }, { durability: 2.0 }),
   up: withExKit({ name: "Rising Whirlwind", description: "Hold a direction as he gathers, then a slashing dash that way and a helpless fall.", ground: risingBlade }, { travel: 1.25 }),
   down: withExKit({ name: "Wind Walk", description: "Fade into a parry; a strike in the window freezes the attacker and he steps out behind them with a kick straight up. A miss leaves him wide open.", ground: windWalk(false), air: windWalk(true) }, { travel: 1.25 }),

@@ -15,6 +15,7 @@ export const BLADEMASTER_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardTilt, near: 110.0, far: 170.0 },
     { move: AttackStyle.downTilt, near: 80.0, far: 165.0 },
     { move: AttackStyle.forwardSmash, near: 150.0, far: 210.0 },
+    { move: GameplanSpecial.neutral, near: 60.0, far: 340.0 },
   ],
   approach: [
 
@@ -32,6 +33,7 @@ export const BLADEMASTER_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardSmash, fromPercent: 80.0 },
     { move: AttackStyle.backAir, fromPercent: 90.0 },
     { move: AttackStyle.upSmash, fromPercent: 100.0 },
+    { move: GameplanSpecial.neutral, fromPercent: 110.0 },
   ],
 
   recovery: { aim: "ledge", upSpecial: "last", sideSpecial: true },

@@ -13,13 +13,11 @@ export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 
 export const FOLLOW_UP_FORM = 6;
 
-export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4, guard: 5 } as const;
+export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4, guard: 5, release: 6 } as const;
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
-
 
 export const Relocation = { placed: 1, behindMark: 2, floorBelow: 3, behindLocked: 4 } as const;
 export type Relocation = (typeof Relocation)[keyof typeof Relocation];
-
 
 export interface FrameWindow {
   readonly first: number;
@@ -390,6 +388,8 @@ export interface AuthoredSpecial {
   readonly charge?: SpecialCharge | undefined;
 
   readonly spendsCharge?: true | undefined;
+  /** Its hits pop a red critical-strike number of the damage dealt over the struck fighter. */
+  readonly critical?: true | undefined;
 }
 
 export interface SpecialFollowUp {

@@ -51,7 +51,7 @@ Under 9 of 18 is dull; those are redesigned.
 
 | Move | D | M | R | RR | C | W | Total | Verdict |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Wind Cutter (neutral B) | 0 | 0 | 1 | 2 | 2 | 1 | 6 | Dull, but his weak ranged pressure is the stated weakness; keep. |
+| Wind Cutter (neutral B) | 0 | 0 | 1 | 2 | 2 | 1 | 6 | **Redesigned** (Tom, 2026-10-28): now Quickdraw, a charged iaido draw after Marth's Shield Breaker whose charge buys damage (7–24%), speed and travel (0.3H–2.2H), so a long charge passes through the foe and lands behind them; hits pop a red Critical Strike number. |
 | Wind Walk Strike (side B) | 0 | 0 | 1 | 1 | 2 | 1 | 5 | **Redesign.** A straight dash that stops at shield; Warcraft's Wind Walk is a backstab out of stealth, not a charge. Now a Marth-style parry that steps out behind the attacker (2026-10-28). |
 | Rising Blade (up B) | 1 | 1 | 1 | 2 | 2 | 1 | 8 | Marth's Dolphin Slash with drift; serviceable; keep. |
 | Mirror Feint (down B) | 1 | 1 | 2 | 1 | 1 | 1 | 7 | **Redesign.** A back step and an optional slash: the image is cosmetic, so Mirror Image does nothing. |

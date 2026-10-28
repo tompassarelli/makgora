@@ -208,7 +208,7 @@ function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): void {
   if (charge === undefined || followUps === undefined || f.special.charge < charge.full) return;
   for (let index = 0; index < followUps.length; index++) {
     const followUp = at(followUps, index);
-    if (followUp.chargeStage !== charge.stages || (followUp.input ?? FollowUpInput.special) !== FollowUpInput.special) continue;
+    if (followUp.chargeStage !== charge.stages) continue;
     f.special.form += FOLLOW_UP_FORM * (index + 1);
     enterFollowUp(f, followUp.special);
     return;
@@ -1292,7 +1292,7 @@ function followUpPressed(f: Readonly<Fighter>, followUp: Readonly<SpecialFollowU
   const kind = followUp.input ?? FollowUpInput.special;
   const x = chargedAimX(input);
   const z = chargedAimZ(input);
-  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special ? input.specialPressed : kind === FollowUpInput.auto && changesAimZone(f, x, z);
+  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special ? input.specialPressed : kind === FollowUpInput.release ? !input.specialHeld : kind === FollowUpInput.auto && changesAimZone(f, x, z);
   const stick = followUp.stick;
   return pressed && (stick === undefined || (Math.abs(x) === stick.x && z === stick.z));
 }

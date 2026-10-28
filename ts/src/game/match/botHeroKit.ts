@@ -11,7 +11,7 @@ import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { changesAimZone, launchZoneX, launchZoneZ } from "../sim/specials/aimZone";
 import { chooseHeroSpecial, isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/engine";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialForm, SpecialSlot, specialForm, specialKit } from "../sim/specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit } from "../sim/specials/schema";
 import { type Controls, neutralControls } from "../sim/roster";
 import { floorFriction, floorTraction } from "../sim/stage";
 import { deckUnder, heightAhead, safeAt } from "./botFooting";
@@ -283,8 +283,14 @@ export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter
   const next = f.special.frame + 1;
   const dx = f32(target.motion.x - f.motion.x);
   const localZ = f32(target.motion.z - f.motion.z);
-  for (const branch of runningHeroSpecial(f)?.followUps ?? []) {
+  const move = runningHeroSpecial(f);
+  for (const branch of move?.followUps ?? []) {
     const kind = branch.input ?? FollowUpInput.special;
+    if (kind === FollowUpInput.release) {
+      if (move?.charge === undefined || branch.chargeStage !== chargeStage(move.charge, f.special.charge)) continue;
+      input.specialHeld = !strikeMeets(branch.special, target, f32(dx * f.facing), localZ);
+      return true;
+    }
     if (kind === FollowUpInput.shield || next < branch.window.first || next > branch.window.last) continue;
     if (branch.special.helpless === true && !safeAt(stage, f.motion.x, 0.0)) continue;
     const turns = branch.facesStick === true || (branch.stick !== undefined && branch.stick.x !== 0);

@@ -17,6 +17,7 @@ import { DOWN_AIR_CLIPS } from "../../presentation/downAirClipInfo";
 import { JUMP_CLIPS } from "../../presentation/jumpClipInfo";
 import { TUMBLE_CLIPS } from "../../presentation/tumbleClipInfo";
 import type { HeroClip, HeroFollowUpPose, HeroPose } from "../../sim/heroes/hero";
+import { QUICKDRAW_DASH_FIRST } from "./specials";
 
 
 const BLADEMASTER_SEQUENCES = [
@@ -57,10 +58,12 @@ const aligned = (strike: number, firstActive: number, active: number, recovery: 
 
 const COMBAT_STANCE = sequence("Stand Ready");
 const RECOIL = sequence("Death", f32(0.45));
+const QUICKDRAW_STANCE = sequence("Attack", aligned(CUT, QUICKDRAW_DASH_FIRST + 1, 1, 20));
+const QUICKDRAW_CUT = sequence("Attack", aligned(CUT, QUICKDRAW_DASH_FIRST, 6, 16));
 
 
 
-export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate" | "specialFloat">]: HeroClip } = {
+export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "neutralSpecialFollowUp" | "neutralSpecialFollowUpAir" | "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate" | "specialFloat">]: HeroClip } = {
   idle: COMBAT_STANCE,
   walk: sequence("Walk"),
   dash: sequence("Walk"),
@@ -117,8 +120,10 @@ export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<He
   victimThrowUp: RECOIL,
   victimThrowDown: RECOIL,
 
-  neutralSpecial: sequence("Attack", aligned(CUT, 18, 1, 22)),
-  neutralSpecialAir: sequence("Attack", aligned(CUT, 18, 1, 22)),
+  neutralSpecial: QUICKDRAW_STANCE,
+  neutralSpecialAir: QUICKDRAW_STANCE,
+  neutralSpecialFollowUp: QUICKDRAW_CUT,
+  neutralSpecialFollowUpAir: QUICKDRAW_CUT,
 
   sideSpecial: sequence("Stand - 4", f32(0.6)),
   sideSpecialAir: sequence("Stand - 4", f32(0.6)),

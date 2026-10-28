@@ -6,6 +6,7 @@
 
 import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
+import { FOLLOW_UP_FORM } from "../sim/specials/schema";
 import { ATTACK_CUES, type AttackCueState, attackCueState, fighterRenderedCues } from "../presentation/attackCues";
 import { characterModelScale } from "../presentation/modelScale";
 import { CUE_ANCHORS, MISSING_CUE_MODEL, type Cue, specialCueState } from "../presentation/specialCues";
@@ -234,7 +235,7 @@ export class SpecialCueEffects {
     } else parkOnce(this.missing, this.origin, this.missingParked, 0);
     const held = fighter !== undefined && cue !== undefined && !failed && POPCORN_CUE_MODELS[cue.model] !== true ? cue : undefined;
     if (held !== undefined && fighter !== undefined) {
-      const progress = held.scaleFrames === undefined ? 0.0 : f32(Math.min(1.0, Math.max(0.0, f32((fighter.special.frame - 1) / Math.max(1, held.scaleFrames - 1)))));
+      const progress = held.scaleFrames === undefined ? 0.0 : f32(Math.min(1.0, Math.max(0.0, f32((fighter.special.frame - 1 + (fighter.special.form < FOLLOW_UP_FORM ? fighter.special.charge : 0)) / Math.max(1, held.scaleFrames - 1)))));
       const scale = held.scaleEnd === undefined ? held.scale : f32(held.scale + f32(f32(held.scaleEnd - held.scale) * progress));
       const place = this.heldPlace;
       place.x = this.origin.x + fighter.motion.x + fighter.facing * x;

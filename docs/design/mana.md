@@ -176,7 +176,7 @@ invulnerability; **other move** = a different move, not an upgrade.
 | Illidan | Fel Rush | +25% damage, branches too | Fail: damage | Shield-safe (branches removed 2026-10-28) |
 | Illidan | Wing Ascent | Rises 25% farther | Pass | Unchanged |
 | Illidan | Immolation | Reach 116 to 140 | Pass | Unchanged |
-| Blademaster | Wind Cutter | +25% damage | Fail: damage | Range |
+| Blademaster | Quickdraw (Wind Cutter until 2026-10-28) | Travel | Pass | Travel: the dash goes 1.25 times as far at every charge, so a shorter charge already passes through the foe; no faster startup and no armour |
 | Blademaster | Wind Walk | Travel (the dash, before the 2026-10-28 counter rework) | Pass | Travel: the counter steps out behind an attacker up to 3.1H away instead of 2.5H, beating a strike spaced at the tip |
 | Blademaster | Rising Whirlwind | Travel | Pass | Unchanged |
 | Blademaster | Mirror Image | x2 durability and +25% swap damage | Fail: two | x2 durability |

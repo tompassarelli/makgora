@@ -21,7 +21,7 @@
 195 a stick 1 0
 195 a tap X 2
 196 a stick 0 0
-# #144: Wind Cutter on the ground.
+# Quickdraw tapped on the ground (Wind Cutter before 2026-10-28, #144).
 260 a tap X 2
 # #523: Wind Walk back.
 300 a stick -1 0
@@ -59,11 +59,11 @@
 681 a stick 0 0
 682 a capture
 687 a capture
-# #144: Wind Cutter from the air.
+# Quickdraw tapped from the air (Wind Cutter before 2026-10-28, #144).
 760 a tap B 8
 772 a tap X 2
 # Expected, frame by frame (headless run of this script):
-# #144: every current form starts on its frame (ground 0, air 1, swap 3), and its cues and missile show.
+# #144: every current form starts on its frame (ground 0, air 1, swap 3), and its cues show.
 #! expect a 612 special 14 form 1
 #! expect a 680 special 15 form 0
 #! expect a 772 special 13 form 1

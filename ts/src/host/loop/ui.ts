@@ -3,6 +3,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import { CombatEffects } from "../../game/render/combatEffects";
+import { CriticalStrikeText } from "../../game/render/criticalStrikeText";
 import { FighterPoolPresentation } from "../../game/render/fighterPool";
 import { AgencyMarker } from "../../game/render/agencyMarker";
 import { FighterAgencyForecast } from "../../game/presentation/fighterAgency";
@@ -87,6 +88,7 @@ export interface UiObjects {
   readonly settings: Slots<SettingsPanel>;
   readonly stage: StagePanel;
   readonly combat: CombatEffects;
+  readonly criticals: CriticalStrikeText;
   readonly frost: FrostEffects;
   readonly placed: PlacedObjectEffects;
   readonly special: SpecialEffects;
@@ -149,6 +151,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     selections: each(slot => new SelectionPanel(actions.selection, slot, controls)),
     settings: each(slot => new SettingsPanel(s.participants[slot].bindings, actions.settings, slot)),
     combat: combat = new CombatEffects(s.origin),
+    criticals: new CriticalStrikeText(s.origin),
     frost: new FrostEffects(s.origin),
     placed: new PlacedObjectEffects(s.origin),
     special: new SpecialEffects(s.origin),
@@ -332,6 +335,7 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 export function clearMatchEffects(s: ShellState): void {
   const ui = views(s);
   ui.frost.clear();
+  ui.criticals.clear();
   ui.placed.clear();
   ui.elements.clear();
   ui.special.clear();

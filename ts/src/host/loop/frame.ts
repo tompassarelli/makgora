@@ -29,6 +29,7 @@ import { probedSound } from "./tickProbe";
 import { probeRecording } from "./responseProbe";
 import { MatchCue } from "../../game/presentation/matchAudio";
 import { resultsView } from "../../game/presentation/matchCues";
+import { criticalStrikeDamage } from "../../game/presentation/criticalStrike";
 import { RESULTS_DELAY_FRAMES } from "../../game/render/matchPresentation";
 import { LASTING, renderFighter, resumePresentationHeld, setStatus } from "./view";
 import { writeMatchRecord } from "./matchRecords";
@@ -166,11 +167,14 @@ export function applyFrame(s: ShellState, recorded = false): void {
   momentFrameRan(recorder, frame);
   replayFrameRan(s, frame);
   const ui = views(s);
+  ui.criticals.tick();
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const participant = s.participants[slot];
     const fighter = fighterAt(world, slot);
     reportChanges(s, slot, participant.before, fighter);
+    const critical = criticalStrikeDamage(world, slot, runtime.frameImpacts[slot].hit, participant.before.damage);
+    if (critical !== undefined) ui.criticals.show(fighter.motion.x, fighter.motion.z, critical);
     if (participant.pooled && !confirmModelSounds(s.sounds, s.sounds.epoch ?? 0, runtime.simulationFrame, slot, fighter, runtime.poses[slot], ui.sounds)) {
       traceInput(s.trace, `model sound rejected confirmed frame ${runtime.simulationFrame} slot ${slot}`);
     }

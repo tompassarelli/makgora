@@ -57,6 +57,7 @@ export const hit = makeHit({
   JUGGLE: { growth: 59.73616027832031, base: 50.0 },
   CHASE: { growth: 43.44447708129883, base: 75.0 },
   COUNTER: { growth: 170.0, base: 30.0 },
+  QUICKDRAW: { growth: 108.61119079589844, base: 40.0 },
 }, HitElement.slash);
 
 

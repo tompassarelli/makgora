@@ -25,7 +25,7 @@ The named Smash moves are visual references, not copied animation assets or shar
 
 | Fighter | Move / active form | Named reference look |
 | --- | --- | --- |
-| Blademaster | Backstab, Rising Blade, Image Swap, Wind Cutter (traveling spell) | Melee Marth forward smash |
+| Blademaster | Backstab, Rising Blade, Image Swap | Melee Marth forward smash |
 | Mountain King | Thunder Leap, Thunder Clap, Small Clap, Storm Bolt (traveling spell), Thunder Clap (traveling spell) | Ultimate Hero Kazap |
 | Warden | Pursuit Lunge, Shadow Pursuit, Fan of Knives, Shadow Strike (traveling spell) | Melee Link forward smash |
 | Lich | Dark Ritual, Frost Nova (traveling spell), Frost Nova (placed field / burst), Death and Decay (placed field / burst) | Melee Zelda magic aerials / Din’s Fire |

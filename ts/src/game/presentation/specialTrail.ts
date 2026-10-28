@@ -18,7 +18,7 @@ export interface TrailLine {
 export const emptyTrailLine = (): TrailLine => ({ x1: 0.0, z1: 0.0, x2: 0.0, z2: 0.0 });
 
 export function specialTrail(fighter: Readonly<Fighter>, out: TrailLine): boolean {
-  if (fighter.status.out || fighter.motion.grounded || specialCueState(fighter).cues?.trail !== true) return false;
+  if (fighter.status.out || specialCueState(fighter).cues?.trail !== true) return false;
   const frame = fighter.special.frame;
   const motion = runningHeroSpecial(fighter)?.motion ?? [];
   for (const segment of motion) {

@@ -41,6 +41,7 @@ import { GROM_BLOODLUST_MODEL, MURLOC_SWAMP_MIST_MODEL } from "../assets/importe
 import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
 import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
+import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -312,7 +313,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Mine!", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: timed(cue("Objects\\Spawnmodels\\Human\\FragmentationShards\\FragBoomSpawn.mdx", "feet", f32(0.3)), "birth", 0.0) },
   },
   [Character.blademaster]: {
-    neutral: { spell: "Wind Cutter", startup: WIND_GATHER, active: cue("Abilities\\Spells\\Other\\Tornado\\Tornado_Target.mdx", "hand", f32(0.6)) },
+    neutral: QUICKDRAW_STANCE_CUES,
     side: { spell: "Mirror Image", startup: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), active: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageDeathCaster.mdx", "body", 1.0) },
     up: { spell: "Rising Whirlwind", startup: WIND_GATHER, active: cue("Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", "body", f32(0.6)) },
     down: { spell: "Wind Walk", startup: WIND_WALK, active: WIND_WALK, body: WIND_WALK_BODY },
@@ -431,6 +432,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {
+    neutral: { followUps: QUICKDRAW_DRAW_CUES },
     side: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },
     down: { followUps: [branch("Wind Walk Kick", WIND_WALK_COUNTER, WIND_WALK_COUNTER)] },
   },

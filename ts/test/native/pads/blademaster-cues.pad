@@ -27,7 +27,7 @@
 203 a capture
 207 a capture
 211 a capture
-# #144: Wind Cutter on the ground.
+# Quickdraw tapped on the ground (Wind Cutter before 2026-10-28, #144).
 260 a tap X 2
 262 a capture
 278 a capture
@@ -74,24 +74,23 @@
 680 a stick 0 1
 680 a tap X 2
 681 a stick 0 0
-# #144: Wind Cutter from the air.
+# Quickdraw tapped from the air (Wind Cutter before 2026-10-28, #144).
 760 a tap B 8
 772 a tap X 2
 # Expected, frame by frame (headless run of this script):
 #! expect a 100 applied attack 1 style 0
 #! expect a 165 applied attack 3 style 0
 #! expect a 195 special 14 form 0
-# #144: every current form starts on its frame (ground 0, air 1, swap 3), and its cues and missile show.
+# #144: every current form starts on its frame (ground 0, air 1, swap 3), and its cues show.
 #! expect a 260 special 13 form 0
 #! expect a 300 special 14 form 0
 #! expect a 360 special 16 form 0
 #! expect a 400 special 16 form 3
 #! expect a 450 special 15 form 0
 #! expect a 552 special 16 form 1
-# 339199a792 (#499) gives Blademaster wind tells, not Bloodlust or Mark of Chaos: Wind Cutter gathers TornadoElementalSmall for
+# 339199a792 (#499) gives Blademaster wind tells, not Bloodlust or Mark of Chaos: the neutral special gathers TornadoElementalSmall for
 # BloodlustSpecial (trace: run 39009305845).
 #! scene a TornadoElementalSmall
-#! scene a WingedSerpentMissile
 #! scene a InvisibilityTarget
 #! scene a SunderingBlades
 #! scene a CycloneTarget

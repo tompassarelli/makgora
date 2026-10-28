@@ -1089,7 +1089,7 @@ every newly registered fighter too.
 |---|---|---|---|
 | Rifleman | Blaster (28) | Bear (50) | One 8% hit armored on frames 1–6 |
 | Illidan | Eye Beam (35) | Fel Rush (37) | One 8% hit armored on frames 1–6 |
-| Blademaster | Wind Cutter (25) | Mirror Image (40) | One 8% hit armored on frames 1–6 |
+| Blademaster | Quickdraw (25) | Mirror Image (40) | One 8% hit armored on frames 1–6 |
 | Mountain King | Storm Bolt (33) | Storm Rush (43) | One 8% hit armored on frames 1–6 |
 | Warden | Shadow Strike (30) | Shadow Pursuit (40) | One 8% hit armored on frames 1–6 |
 | Lich | Frost Nova (35) | Death and Decay (50) | One 8% hit armored on frames 1–6 |
