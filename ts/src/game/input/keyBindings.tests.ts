@@ -1,6 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action, ACTION_ORDER } from "./actions";
-import { BINDING_PRESETS, type BindingPreset, ACTION_LABELS, decodeBindings, encodeBindings, keyFor, keyLabel, presetBindings, slotIndex } from "./keyBindings";
+import { PAD_LAYER } from "./padKeys";
+import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, decodeBindings, decodeLayouts, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, presetLayouts, slotIndex } from "./keyBindings";
 
 const code = (character: string) => character.charCodeAt(0);
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
@@ -48,3 +49,46 @@ test("a custom profile saved before the C-stick rename loads with the same keys 
   assertEquals(loaded?.keys.join(","), before.join(","));
   assertEquals(ACTION_ORDER.length * 2, before.length);
 });
+
+const SLASH = 191;
+const OLD_SLOTS = (Action.strong + 1) * 2;
+const oldSave = (version: string, keys: readonly number[]) => version + keys.slice(0, OLD_SLOTS).map((key) => String(key).padStart(3, "0")).join("");
+const withoutModX = (preset: BindingPreset) => presetBindings(preset).keys.slice(0, OLD_SLOTS);
+
+test("every preset binds Mod X to / alone, which is no key the pad layer presses, and labels it Mod X on the controls screen [k2 property]", () => {
+  const padKeys = PAD_LAYER.map(({ code: padCode }) => padCode);
+  for (const preset of BINDING_PRESETS) {
+    assertEquals(slots(preset, Action.modX), "/ —", `${preset} Mod X`);
+    assertEquals(padKeys.includes(keyFor(presetBindings(preset), Action.modX, 0) ?? 0), false, `${preset} Mod X is a pad key`);
+  }
+  assertEquals(ACTION_LABELS[Action.modX], "Mod X");
+  assertEquals(ACTION_KEY_LABELS[Action.modX], "Mod X");
+});
+
+test("a saved profile from before Mod X loads with every old key unchanged and / on Mod X, in each old format and in the three-layout save [k2 property]", () => {
+  for (const preset of BINDING_PRESETS) {
+    const old = withoutModX(preset);
+    const loaded = decodeBindings(oldSave("KB", old));
+    assertEquals(loaded?.keys.slice(0, OLD_SLOTS).join(","), old.join(","), `${preset} old keys`);
+    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SLASH},0`, `${preset} Mod X`);
+  }
+  for (const version of ["KA", "K9", "K8", "K7", "K6"]) {
+    const loaded = decodeBindings(oldSave(version, withoutModX("wasd")));
+    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SLASH},0`, `${version} Mod X`);
+  }
+  const layouts = BINDING_PRESETS.map((preset) => oldSave("KB", withoutModX(preset))).join("");
+  const loaded = decodeLayouts(`KL1${layouts}`);
+  assertEquals(loaded?.active, "standard");
+  for (const preset of BINDING_PRESETS) assertEquals(loaded?.layouts[preset].keys.join(","), presetBindings(preset).keys.join(","), `${preset} layout`);
+  const current = { layouts: presetLayouts(), active: "custom" as BindingPreset };
+  assertEquals(decodeLayouts(encodeLayouts(current))?.layouts.custom.keys.join(","), presetBindings("custom").keys.join(","));
+});
+
+test("an old save that already uses / for another action keeps it there and leaves Mod X unbound [k2 property]", () => {
+  const old = withoutModX("standard");
+  old[slotIndex(Action.cDown, 1)] = SLASH;
+  const loaded = decodeBindings(oldSave("KB", old));
+  assertEquals(loaded?.keys.slice(0, OLD_SLOTS).join(","), old.join(","));
+  assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), "0,0");
+});
+

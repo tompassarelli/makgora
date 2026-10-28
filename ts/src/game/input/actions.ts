@@ -22,6 +22,7 @@ export const Action = {
   lightShield: 15,
   shortHop: 16,
   strong: 17,
+  modX: 18,
 } as const;
 
 export type Action = (typeof Action)[keyof typeof Action];

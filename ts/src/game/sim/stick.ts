@@ -12,6 +12,9 @@ export const TILT_STICK_X = f32(0.6875);
 export const TILT_STICK_UP = f32(0.65);
 export const TILT_STICK_DOWN = f32(0.675);
 
+/** Mod X holds the stick at the box controller's shallow up-diagonal: 59 and 25 Melee stick units (0.0125 each), about 23 degrees above horizontal. */
+export const MOD_X_UP_DIAGONAL = { x: f32(0.7375), z: f32(0.3125) } as const;
+
 export function tiltStickX(x: number): number {
   return f32(x * TILT_STICK_X);
 }

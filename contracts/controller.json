@@ -71,6 +71,10 @@
     {
       "name": "strong",
       "bit": 17
+    },
+    {
+      "name": "modX",
+      "bit": 18
     }
   ],
   "padKeys": [
@@ -166,7 +170,7 @@
     }
   ],
   "savedBindings": {
-    "version": "KB",
+    "version": "KC",
     "slots": {
       "K1": 28,
       "K2": 30,
@@ -178,7 +182,8 @@
       "K8": 36,
       "K9": 36,
       "KA": 36,
-      "KB": 36
+      "KB": 36,
+      "KC": 38
     },
     "keyDigits": 3,
     "empty": 0,

@@ -42,6 +42,7 @@ const PERIOD = 190;
 const SLASH = 191;
 const OPEN_BRACKET = 219;
 const CLOSE_BRACKET = 221;
+const MOD_X_KEY = SLASH;
 
 const code = (character: string) => character.charCodeAt(0);
 
@@ -101,6 +102,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
   bind(Action.strong, custom ? code("0") : START_KEY);
+  bind(Action.modX, MOD_X_KEY);
   return { keys };
 }
 
@@ -119,6 +121,7 @@ export function previousStandardKeys(): number[] {
   bind(Action.cDown, code("H"), EMPTY);
   bind(Action.walk, code("P"), EMPTY);
   bind(Action.strong, code("9"), code("X"));
+  bind(Action.modX, EMPTY, EMPTY);
   return keys;
 }
 
@@ -216,8 +219,10 @@ export function unboundActions(bindings: Readonly<KeyBindings>): Action[] {
 
 
 
-const CURRENT_SAVE = "KB";
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, K9: KEY_SLOT_COUNT, KA: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const CURRENT_SAVE = "KC";
+const FIRST_SAVE_WITH_START = "KB";
+const SLOTS_BEFORE_MOD_X = (Action.strong + 1) * 2;
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_X - 2, K5: SLOTS_BEFORE_MOD_X - 2, K6: SLOTS_BEFORE_MOD_X, K7: SLOTS_BEFORE_MOD_X, K8: SLOTS_BEFORE_MOD_X, K9: SLOTS_BEFORE_MOD_X, KA: SLOTS_BEFORE_MOD_X, KB: SLOTS_BEFORE_MOD_X, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 
@@ -239,8 +244,16 @@ function readKey(saved: string, offset: number): number | undefined {
 
 
 function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
-  if (version !== "KA") upgradeToPreviousKeys(bindings, version);
-  replacePreviousPreset(bindings);
+  if (version < FIRST_SAVE_WITH_START) {
+    if (version !== "KA") upgradeToPreviousKeys(bindings, version);
+    replacePreviousPreset(bindings);
+  }
+  bindModXDefault(bindings);
+}
+
+function bindModXDefault(bindings: KeyBindings): void {
+  const unbound = keyFor(bindings, Action.modX, 0) === undefined && keyFor(bindings, Action.modX, 1) === undefined;
+  if (unbound && !bindings.keys.includes(MOD_X_KEY)) rebind(bindings, Action.modX, 0, MOD_X_KEY);
 }
 
 function upgradeToPreviousKeys(bindings: KeyBindings, version: string): void {
@@ -308,7 +321,7 @@ export function decodeBindings(saved: string): KeyBindings | undefined {
     const key = readKey(saved, 2 + index * SAVED_KEY_DIGITS);
     if (key === undefined) return undefined;
 
-    const legacyStart = key === START_KEY && version !== CURRENT_SAVE;
+    const legacyStart = key === START_KEY && version < FIRST_SAVE_WITH_START;
     if (!legacyStart && !bindSlot(keys, index, key)) return undefined;
   }
   const bindings = { keys };
@@ -325,7 +338,6 @@ export interface LayoutSave {
 }
 
 const LAYOUT_SAVE = "KL";
-const SET_LENGTH = 2 + SAVED_KEY_DIGITS * KEY_SLOT_COUNT;
 
 export function presetLayouts(): LayoutBindings {
   return { wasd: presetBindings("wasd"), standard: presetBindings("standard"), custom: presetBindings("custom") };
@@ -336,18 +348,21 @@ export function encodeLayouts({ layouts, active }: LayoutSave): string {
 }
 
 export function decodeLayouts(saved: string): LayoutSave | undefined {
-  if (saved.slice(0, 2) !== LAYOUT_SAVE || saved.length !== 3 + SET_LENGTH * BINDING_PRESETS.length) return undefined;
+  if (saved.slice(0, 2) !== LAYOUT_SAVE) return undefined;
   const active = BINDING_PRESETS[DIGITS.indexOf(saved.charAt(2))];
   if (active === undefined) return undefined;
   const layouts = presetLayouts();
-  for (let index = 0; index < BINDING_PRESETS.length; index++) {
-    const preset = BINDING_PRESETS[index];
-    const start = 3 + index * SET_LENGTH;
-    const bindings = decodeBindings(saved.slice(start, start + SET_LENGTH));
-    if (preset === undefined || bindings === undefined) return undefined;
+  let start = 3;
+  for (const preset of BINDING_PRESETS) {
+    const slots = SAVED_SLOTS[saved.slice(start, start + 2)];
+    if (slots === undefined) return undefined;
+    const end = start + 2 + SAVED_KEY_DIGITS * slots;
+    const bindings = decodeBindings(saved.slice(start, end));
+    if (bindings === undefined) return undefined;
     layouts[preset] = bindings;
+    start = end;
   }
-  return { layouts, active };
+  return start === saved.length ? { layouts, active } : undefined;
 }
 
 
@@ -370,6 +385,7 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.lightShield]: "Light shield",
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
   [Action.strong]: "Strong (smash, EX special)",
+  [Action.modX]: "Mod X",
 };
 
 export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
@@ -391,6 +407,7 @@ export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
   [Action.lightShield]: "Light sh.",
   [Action.shortHop]: "Hop",
   [Action.strong]: "Strong",
+  [Action.modX]: "Mod X",
 };
 
 export function keyLabel(key: number | undefined): string {

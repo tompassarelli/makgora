@@ -6,7 +6,7 @@ import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { groundState } from "../sim/groundMovement";
 import { isSmashAttack } from "../sim/moves";
 import { squareRoot } from "../sim/warcraftMath";
-import { stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
+import { MOD_X_UP_DIAGONAL, stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
 import { GroundOption, GroundState, SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE, groundOptionAllowed } from "../sim/stickZones";
 import { Action, bit, has, maskOf } from "../input/actions";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "../input/attackBuffer";
@@ -22,6 +22,7 @@ const MOVE_DOWN_BIT = bit(Action.moveDown);
 const MOVE_LEFT_BIT = bit(Action.moveLeft);
 const MOVE_RIGHT_BIT = bit(Action.moveRight);
 const MOVE_UP_BIT = bit(Action.moveUp);
+const MOD_X_BIT = bit(Action.modX);
 const RIGHT_TRIGGER_BIT = bit(Action.rightTrigger);
 const SHORT_HOP_BIT = bit(Action.shortHop);
 const C_DOWN_BIT = bit(Action.cDown);
@@ -86,6 +87,11 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   if (length > 1) {
     destination.diStickX = f32(destination.diStickX / length);
     destination.diStickZ = f32(destination.diStickZ / length);
+  }
+  if ((held & MOD_X_BIT) !== 0 && aimX !== 0 && aimZ > 0) {
+    destination.diStickX = f32(aimX * MOD_X_UP_DIAGONAL.x);
+    destination.diStickZ = MOD_X_UP_DIAGONAL.z;
+    destination.driftStickX = destination.diStickX;
   }
   destination.walking = (held & WALK_BIT) !== 0;
   if (destination.walking) {

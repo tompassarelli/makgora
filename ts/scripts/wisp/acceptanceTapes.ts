@@ -36,7 +36,7 @@ SOURCES.set(STICK_JUMP, Action.jump);
 
 const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "8", JUMP_ALT = padSource(Action.jump), ATTACK = "N", SPECIAL = "U",
   GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = padSource(Action.rightTrigger), LIGHT_SHIELD = "0", C_LEFT = "J", C_LEFT_ALT = padSource(Action.cLeft), C_RIGHT = "L", C_UP = "9",
-  C_DOWN = "P", WALK = "K", SHORT_HOP = "I", STRONG = "Y", STRONG_ALT = padSource(Action.strong);
+  C_DOWN = "P", WALK = "K", SHORT_HOP = "I", STRONG = "Y", STRONG_ALT = padSource(Action.strong), MOD_X = "/";
 
 
 const TOWARD = "toward", AWAY = "away";
@@ -289,7 +289,7 @@ const ACTIONS: MatchScript = {
   characters: [Character.demonHunter, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 410,
   holds: [[
     [1, 20, SHORT_HOP],
-    [30, 2, ATTACK], [40, 10, DOWN], [42, 2, ATTACK], [70, 6, WALK, TOWARD], [72, 2, ATTACK], [86, 4, UP],
+    [30, 2, ATTACK], [40, 10, DOWN], [42, 2, ATTACK], [70, 6, WALK, TOWARD], [72, 2, ATTACK], [86, 4, UP, MOD_X],
     [87, 2, ATTACK], [100, 3, JUMP], [106, 2, ATTACK], [130, 14, JUMP_ALT], [134, 16, STICK_JUMP], [140, 2, ATTACK],
     [144, 2, DOWN], [165, 2, SPECIAL], [190, 2, GRAB], [200, 2, TOWARD], [215, 8, TOWARD], [217, 2, SPECIAL],
     [235, 20, SHIELD_LEFT], [241, 2, AWAY], [270, 12, SHIELD_RIGHT], [274, 2, DOWN], [290, 3, JUMP], [296, 6, UP],
@@ -299,7 +299,7 @@ const ACTIONS: MatchScript = {
     [1, 1, SHORT_HOP],
     [20, 24, SHIELD_RIGHT], [50, 2, ATTACK], [60, 2, GRAB], [84, 2, SHIELD_LEFT], [95, 4, JUMP], [101, 2, C_DOWN],
     [112, 2, SPECIAL], [126, 2, C_RIGHT], [150, 16, SHIELD_LEFT, SHIELD_RIGHT], [168, 14, STICK_JUMP],
-    [170, 8, JUMP_ALT], [174, 2, ATTACK], [186, 2, UP], [192, 2, ATTACK], [194, 2, SPECIAL], [196, 2, JUMP],
+    [170, 8, JUMP_ALT], [174, 2, ATTACK], [186, 2, UP, MOD_X], [192, 2, ATTACK], [194, 2, SPECIAL], [196, 2, JUMP],
     [210, 10, DOWN], [212, 2, SPECIAL], [230, 10, WALK, TOWARD], [232, 2, ATTACK], [250, 2, C_LEFT],
     [262, 2, WALK, C_LEFT_ALT], [274, 2, C_UP], [278, 2, C_UP], [286, 10, TOWARD], [288, 2, GRAB], [300, 6, AWAY], [320, 6, SHIELD_LEFT],
     [322, 2, DOWN], [334, 3, JUMP], [338, 2, SHIELD_LEFT], [350, 2, C_RIGHT], [372, 2, UP], [400, 2, SHIELD_RIGHT_ALT], [402, 2, LIGHT_SHIELD], [404, 2, STRONG, SPECIAL], [406, 2, LIGHT_SHIELD], [408, 2, STRONG_ALT, SPECIAL],
