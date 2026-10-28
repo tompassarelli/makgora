@@ -135,7 +135,7 @@ const AIR_CLAP = hit(10.806899070739746, "LAUNCH", 70, false, HitElement.electri
 export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
   neutral: withExKit({
     name: "Storm Bolt",
-    description: "A hammer thrown straight ahead that flies until it hits or its flight ends; it never comes back.",
+    description: "A hammer thrown straight ahead that flies until it hits or its flight ends; it never comes back. Landing before the throw leaves keeps the cast going on the ground.",
     ground: {
       endFrame: 61,
       projectiles: [{
@@ -143,7 +143,7 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
         spawnFrame: 23, offsetX: 32.0, offsetZ: 56.0, velocityX: BOLT_SPEED, velocityZ: 0.0,
         life: 90, radius: BOLT_RADIUS, effect: STORM_BOLT, reflectable: true, limit: 1,
       }],
-      landingLag: 20,
+      landingLag: 20, swingsThroughLanding: true,
     },
   }, { range: 1.25 }),
   side: withExKit({

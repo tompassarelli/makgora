@@ -6,7 +6,8 @@ import { adaptInput } from "../../match/inputAdapter";
 import { inputRow } from "../../input/inputRow";
 import { Phase } from "../../lobby/lobbyState";
 import { stepMatch } from "../../match/step";
-import { createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
+import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
+import { canonicalState } from "../../replay/canonical";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
@@ -345,6 +346,86 @@ test("Storm Bolt's hammer first exists on frame 23 of the move and the move ends
   assertEquals(spawned, 23, "the hammer first exists on frame 23");
   assertEquals(ended, 61, "the move ends on frame 61");
 });
+
+const SHORT_HOP_HEIGHT = 70.0;
+const BOLT_LANDING_FRAME = 10;
+const HIGH_HOP_HEIGHT = 900.0;
+
+interface BoltFlight {
+  readonly landFrame: number;
+  readonly landTick: number;
+  readonly landingLag: number;
+  readonly spawned: number;
+  readonly ended: number;
+  readonly groundedAtEnd: boolean;
+  readonly final: string;
+  readonly replayed?: string;
+}
+
+function playBoltFromHop(height: number, ex: boolean, rollBackFrom?: number): BoltFlight {
+  const { state, king } = leapMatch(-FOE_AWAY);
+  if (ex) fillMeter(king);
+  lift(king, height);
+  const snapshot = createReplaySnapshot();
+  let landFrame = -1;
+  let landTick = -1;
+  let landingLag = -1;
+  let spawned = 0;
+  let ended = 0;
+  const play = (from: number): void => {
+    for (let tick = from; tick <= BOLT_WATCH_FRAMES && ended === 0; tick++) {
+      step(state, king, tick, 0, 0, tick === 1, false, ex && tick === 1);
+      if (tick === 1) assertEquals(king.special.ex, ex, "Storm Bolt is EX only when asked");
+      if (landFrame < 0 && king.motion.grounded) {
+        landFrame = king.special.frame;
+        landTick = tick;
+        landingLag = king.landing.lag;
+      }
+      if (spawned === 0 && liveHammer(king) !== undefined) spawned = tick;
+      if (king.special.action !== SpecialAction.heroNeutral) ended = tick;
+      if (tick === rollBackFrom) copyReplayState(snapshot, state);
+    }
+  };
+  play(1);
+  if (rollBackFrom === undefined) return { landFrame, landTick, landingLag, spawned, ended, groundedAtEnd: king.motion.grounded, final: canonicalState(state) };
+  const expected = canonicalState(state);
+  copyReplayState(state, snapshot);
+  landFrame = -1;
+  landTick = -1;
+  spawned = 0;
+  ended = 0;
+  play(rollBackFrom + 1);
+  return { landFrame, landTick, landingLag, spawned, ended, groundedAtEnd: king.motion.grounded, final: expected, replayed: canonicalState(state) };
+}
+
+function assertShortHopBolt(ex: boolean): void {
+  const flight = playBoltFromHop(SHORT_HOP_HEIGHT, ex);
+  assertEquals(flight.landFrame, BOLT_LANDING_FRAME, "he lands during the wind-up");
+  assertEquals(flight.landingLag, 0, "landing adds no lag");
+  assertEquals(flight.spawned, 23, "the hammer first exists on frame 23");
+  assertEquals(flight.ended, 61, "the move ends on frame 61");
+  assertEquals(flight.groundedAtEnd, true, "he finishes the cast on the ground");
+}
+
+test("A Storm Bolt cast in a short hop that lands on frame 10 still throws the hammer on frame 23 and ends on the ground on frame 61, with no landing lag [k3 measure #547]", () => assertShortHopBolt(false));
+test("An EX Storm Bolt cast in a short hop that lands on frame 10 still throws the hammer on frame 23 and ends on the ground on frame 61, with no landing lag [k3 measure #547]", () => assertShortHopBolt(true));
+
+test("A Storm Bolt landed from after the hammer is out ends with its landing lag, as before [k3 measure #547]", () => {
+  const flight = playBoltFromHop(HIGH_HOP_HEIGHT, false);
+  assertEquals(flight.landTick > flight.spawned, true, "he lands after the throw");
+  assertEquals(flight.landingLag, 20, "landing after the throw keeps its landing lag");
+});
+
+function assertBoltRollbackThroughLanding(ex: boolean): void {
+  const flight = playBoltFromHop(SHORT_HOP_HEIGHT, ex, BOLT_LANDING_FRAME - 2);
+  assertEquals(flight.replayed, flight.final, "replayed state");
+  assertEquals(flight.landFrame, BOLT_LANDING_FRAME, "the replay lands on the same frame");
+  assertEquals(flight.spawned, 23, "the replay throws on the same frame");
+  assertEquals(flight.ended, 61, "the replay ends on the same frame");
+}
+
+test("A rollback from the frame before landing replays a Storm Bolt through the landing to the same state [k1 scenario]", () => assertBoltRollbackThroughLanding(false));
+test("A rollback from the frame before landing replays an EX Storm Bolt through the landing to the same state [k1 scenario]", () => assertBoltRollbackThroughLanding(true));
 
 const LANDING_WATCH_FRAMES = 400;
 

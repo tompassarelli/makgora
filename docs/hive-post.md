@@ -41,6 +41,7 @@
 - **Malfurion:** his disjoint flare is a green Night Elf spark, so Entangling Roots shows only on his neutral special.
 - **Kael'thas:** Pyroblast replaces Fireball: a slow heavy fireball you steer with the stick while rooted, which kills off the side at high percent and leaves long end lag on a miss. Flame Strike's pillar is shorter, and his victory cheer is a raised fist.
 - **Tinker:** a Laser or Cluster Rockets cast started in the air carries through a landing instead of being cut off.
+- **Mountain King:** a Storm Bolt cast in the air carries through a landing before the hammer leaves, so a short hop still throws it and finishes on the ground.
 
 ## New in 0.1.5
 - **Blademaster:** a new Marth-style two-hit neutral air and down air, a Marth-style up air arc, a quick Wind Walk dash through the opponent, Bladestorm castable in the air, a longer Mirror Image, and more startup and landing lag on Rising Whirlwind and Mirror Image.
