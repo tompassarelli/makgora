@@ -24,7 +24,6 @@ import * as clips from "./fighterClips";
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
 import { heldStanceSeconds, playsFollowUpPose } from "./specialPhase";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
-import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./cueWindows";
@@ -363,20 +362,19 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     playIndex(pose, motionKey(motion), locomotionClipIndex(motion));
     return locomotionRate(f, motion);
   }
-  const locomotionTable = koboldLocomotionClips(character, f.candle.state) ?? table;
-  const groundClip = groundLocomotionClip(character, pose.motion.motion, locomotionTable);
+  const groundClip = groundLocomotionClip(character, pose.motion.motion, table);
   if (groundClip !== undefined) {
     playLocomotionIndex(pose, motionKey(pose.motion.motion), groundClip.index, groundClip.entry);
     return groundLocomotionRate(f, pose.motion.motion, groundClip);
   }
-  const moving = tableLocomotion(locomotionTable, pose.motion.motion);
+  const moving = tableLocomotion(table, pose.motion.motion);
   if (moving !== undefined) {
     playIndex(pose, motionKey(pose.motion.motion), moving.index);
     return pose.motion.motion === IllidanLocomotion.run ? locomotionRate(f, pose.motion.motion) : tableLocomotionRate(moving, pose.motion.motion);
   }
   const walking = pose.motion.motion !== IllidanLocomotion.idle && f.motion.grounded && Math.abs(totalVelocityX(f)) > f32(0.1);
 
-  const locomotion = locomotionTable[walking ? "walk" : "idle"];
+  const locomotion = table[walking ? "walk" : "idle"];
   if (locomotion === undefined) playName(pose, walking ? "walk" : "stand", walking ? "walk" : "stand");
   else playLocomotionIndex(pose, walking ? "walk" : "stand", locomotion.index, walking ? locomotion.entry : 0.0);
   return walking ? min(f32(1.4), max(f32(0.2), f32(Math.abs(f.motion.vx) / f.tuning.physics.runSpeed))) : rate;

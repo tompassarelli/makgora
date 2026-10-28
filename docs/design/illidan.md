@@ -254,7 +254,7 @@ and its mana-scaled stun are gone; no other move used the stun's drain rule.
   tool, not a kill. Fire element.
 - **Reach band:** the hit volume runs from 80 below his eye line to 20 above
   it (the fel pours down toward the target), so on the ground it hits every
-  standing fighter down to Kobold (72 tall). In the air the beam from a short
+  standing fighter down to Murloc. In the air the beam from a short
   hop pressed on the takeoff frame fires 195 above the floor and hits a
   standing Shadow Hunter (124 tall, the roster median); shorter fighters need
   it fired lower in the hop, and a full-jump beam passes over everyone
@@ -272,7 +272,7 @@ sim/projectiles.ts; tests in sim/eyeBeam.tests.ts.
 
 **Alternative B, keep Mana Burn and add the beam as a separate move**
 (rejected: Tom replaced it). **Alternative C, a beam from his eyes with a
-thin hit band** (rejected: from his 140 eye line it would miss Kobold, Murloc,
+thin hit band** (rejected: from his 140 eye line it would miss Murloc,
 Peon, Rifleman, Mountain King and Tinker standing).
 
 ## Up and down specials (kept)
@@ -357,8 +357,8 @@ both sides, which is the Melee move's point).
 Tom asked on 28 Oct, while playtesting, for a forward smash with more reach,
 perhaps a roundhouse, that steps forward the way Falco's forward smash does.
 The proxy set the numbers on his behalf. Fel Lunge (below) is replaced: its
-glaive strike started 88 units up, so it passed over Rifleman, Murloc and
-Kobold, and a 40-70 unit lunge read as a second Fel Rush.
+glaive strike started 88 units up, so it passed over Rifleman and Murloc,
+and a 40-70 unit lunge read as a second Fel Rush.
 
 He chambers his right knee, turns his hips over and snaps the leg out level
 at chest height with the foot flexed, so the heel leads. Then he spins through
@@ -394,7 +394,7 @@ the follow-through and back to his stance (`ILLIDAN_MOVES` in
   regions. Tom's brief asked for 160-175, which his 75-unit leg cannot reach
   with a 20-25 step and the hitbox on the drawn heel. The kick sits at chest
   height so the clean hit still lands on the short fighters (Rifleman, Mountain
-  King, Peon, Murloc). Only Kobold is short enough to duck the leg.
+  King, Peon, Murloc). No fighter is short enough to duck the leg.
 
 Counterplay: 11 frames of startup with an obvious chamber, and 24 frames of
 recovery after the kick for a shield to punish. The leg is a hurtbox while it

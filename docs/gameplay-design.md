@@ -1048,7 +1048,6 @@ One rule for every fighter's four specials
 | Anub'arak | side: Burrow Hunt (rush); up: Crypt Eruption (recovery) |
 | Malfurion | side: Stag Charge (rush); up: Dream Ascent (recovery) |
 | Medivh | side: Vanishing Act (teleport); up: Raven Flight (recovery); down: Last Word (backward teleport) |
-| Kobold | side: Panic Dig (rush); up: Candle Escape (recovery) |
 
 Grounded specials come out of stand, walk, crouch, Dash and Run. Melee
 allows only the side special in its Initial Dash and every special in Run
@@ -1753,7 +1752,6 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Kael'thas | Forward smash (phoenix flame at the tip) | Position |
 | Murloc | Neutral air (flailing spin) | Timing |
 | Grom | Forward smash (Gorehowl's blade) | Position |
-| Kobold | Forward smash (candle at the pick's end) | Position |
 | Malfurion | Forward smash (Wrath at the staff's tip) | Position |
 | Medivh | Neutral air (arcane ring) | Timing |
 | Anub'arak | Forward smash (impaling claw) | Position |
@@ -2506,8 +2504,8 @@ amount never varies.
   Melee units (60 world units, `ORB_HEIGHT`) above that deck point.
 - **Pickup.** A circle of radius 10 Melee units (`ORB_REACH`) plus the
   fighter's hurt-capsule radius, tested against the fighter's standing hurt
-  capsule. Every fighter standing under the orb reaches it (the shortest
-  Kobold, top about 72 units, to the tallest Illidan, about 159), and so does a
+  capsule. Every fighter standing under the orb reaches it (from the shortest,
+  Murloc, to the tallest, Illidan, about 159), and so does a
   jump through it. The taker must be in control: not KO'd, rolling, tumbling,
   in hitlag or in hitstun. If two fighters touch it on the same frame, the one
   nearer the orb in x takes it.
@@ -2702,31 +2700,31 @@ Expert field.
 | Fighter | Up special | Startup | Intangible | Top speed | Rise / reach | Route control | Opening | Beaten by | Mixed returns |
 |---|---|---:|---:|---:|---:|---|---:|---|---:|
 | Rifleman | Recoil Shot | 4 | 5 | 31 | 455 / 824 | aimed (8-way, 4 frames), second shot re-aims | 41 | read down air (offstage launch, KO at 40%), reaction aerial | 173/208 |
-| Illidan | Wing Ascent | 7 | 4 | 29 | 379 / 688 | aimed (any angle, frame 7), aimed dive branch (8-way) | 41 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
+| Illidan | Wing Ascent | 7 | 4 | 29 | 425 / 685 | aimed (any angle, frame 7), aimed dive branch (8-way) | 46 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 195/208 |
 | Blademaster | Rising Whirlwind | 13 | 0 | 59 | 579 / 584 | aimed (8-way, 12 frames) | 69 | read down air (offstage launch, KO at 40%), reaction aerial | 193/208 |
-| Mountain King | Thunder Leap | 9 | 0 | 32 | 355 / 359 | aimed (8-way, 8 frames) | 41 | read down air (offstage launch, KO at 40%), reaction aerial | 207/208 |
-| Warden | Blink | 9 | 4 | 462 (teleport) | 461 / 465 | aimed (8-way, 8 frames) | 37 | read down air (spike, KO at 40%), reaction aerial | 205/208 |
-| Lich | Spectral Ascent | 10 | 0 | 20 | 522 / 439 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
-| Forsaken Paladin | Ascension | 8 | 0 | 30 | 333 / 362 | guided | 42 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 208/208 |
-| Dreadlord | Bat Ascension | 9 | 0 | 35 | 389 / 681 | guided | 61 | read down air (offstage launch, KO at 40%), reaction aerial | 202/208 |
-| Shadow Hunter | Loa Vault | 9 | 0 | 41 | 467 / 471 | aimed (8-way, 8 frames) | 46 | read down air (spike, KO at 40%), reaction aerial | 208/208 |
-| Pit Lord | Abyssal Leap | 13 | 0 | 43 | 339 / 377 | guided | 48 | read down air (offstage launch, KO at 40%), reaction aerial | 197/208 |
-| Beastmaster | Summon Hawk | 10 | 0 | 68 | 399 / 674 | guided | 55 | read down air (offstage launch, KO at 40%), reaction aerial | 199/208 |
-| Lich King | Ascension of the Damned | 8 | 0 | 22 | 386 / 380 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 192/208 |
-| Thrall | Far Sight | 9 | 0 | 19 | 505 / 471 | guided | 73 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 207/208 |
-| Jaina Proudmoore | Blink | 14 | 5 | 422 (teleport) | 421 / 425 | aimed (8-way, 13 frames) | 32 | read forward air (offstage launch, KO at 40%), reaction aerial | 204/208 |
-| Sylvanas Windrunner | Banshee Flight | 8 | 0 | 29 | 395 / 802 | guided | 65 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 208/208 |
-| Cairne Bloodhoof | Spirit Lift | 11 | 0 | 22 | 359 / 345 | guided | 56 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 202/208 |
-| Chen Stormstout | Storm Rise | 8 | 0 | 19 | 503 / 461 | guided | 71 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 205/208 |
-| Peon | Worksite Launch | 8 | 0 | 22 | 355 / 358 | guided | 55 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 205/208 |
-| Goblin Tinker | Rocket Boots | 7 | 0 | 19 | 521 / 501 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 205/208 |
-| Kael'thas Sunstrider | Phoenix Flight | 11 | 0 | 28 | 534 / 722 | aimed (8-way, 10 frames) | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 205/208 |
-| Murloc | Tide Spout | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 204/208 |
-| Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 204/208 |
-| Kobold | Candle Escape | 6 | 0 | 18 | 404 / 350 | guided | 59 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 198/208 |
-| Malfurion Stormrage | Dream Ascent | 10 | 0 | 29 | 434 / 413 | guided | 61 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 186/208 |
-| Medivh | Raven Flight | 9 | 0 | 21 | 373 / 460 | aimed (8-way, 8 frames) | 51 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 203/208 |
-| Anub'arak | Crypt Eruption | 9 | 0 | 20 | 399 / 403 | aimed (8-way, 8 frames) | 54 | read forward air (offstage launch, KO at 40%), reaction aerial, projectile | 198/208 |
+| Muradin Bronzebeard | Thunder Leap | 11 | 0 | 32 | 355 / 359 | aimed (8-way, 8 frames) | 50 | read down air (offstage launch, KO at 40%), reaction aerial | 191/208 |
+| Maiev Shadowsong | Blink | 9 | 4 | 508 (teleport) | 507 / 511 | aimed (8-way, 8 frames) | 39 | read down air (spike, KO at 40%), reaction aerial | 197/208 |
+| Kel'Thuzad | Spectral Ascent | 10 | 0 | 20 | 522 / 439 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 181/208 |
+| Forsaken Paladin | Ascension | 8 | 0 | 30 | 333 / 362 | guided | 42 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 175/208 |
+| Mal'Ganis | Bat Ascension | 9 | 0 | 40 | 466 / 732 | guided | 67 | read down air (offstage launch, KO at 40%), reaction aerial | 177/208 |
+| Shadow Hunter | Loa Vault | 9 | 0 | 41 | 467 / 471 | aimed (8-way, 8 frames) | 46 | read down air (spike, KO at 40%), reaction aerial | 194/208 |
+| Pit Lord | Abyssal Leap | 13 | 0 | 43 | 367 / 395 | guided | 54 | read down air (offstage launch, KO at 40%), reaction aerial | 152/208 |
+| Rexxar | Summon Hawk | 10 | 0 | 56 | 383 / 618 | guided | 50 | read down air (offstage launch, KO at 40%), reaction aerial | 177/208 |
+| Lich King | Ascension of the Damned | 8 | 0 | 22 | 386 / 380 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 179/208 |
+| Thrall | Far Sight | 9 | 0 | 19 | 505 / 471 | guided | 73 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 193/208 |
+| Jaina Proudmoore | Blink | 14 | 5 | 422 (teleport) | 421 / 425 | aimed (8-way, 13 frames) | 32 | read forward air (offstage launch, KO at 40%), reaction aerial | 194/208 |
+| Sylvanas Windrunner | Banshee Flight | 8 | 0 | 29 | 395 / 802 | guided | 65 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
+| Cairne Bloodhoof | Spirit Lift | 11 | 0 | 22 | 363 / 367 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 191/208 |
+| Chen Stormstout | Storm Rise | 8 | 0 | 19 | 503 / 869 | guided | 110 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 194/208 |
+| Peon | Worksite Launch | 8 | 0 | 22 | 355 / 358 | guided | 55 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
+| Goblin Tinker | Rocket Boots | 7 | 0 | 19 | 521 / 501 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
+| Kael'thas Sunstrider | Phoenix | 13 | 0 | 15 | 731 / 864 | steered (launch 8-way, 12 frames) | 121 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 191/208 |
+| Murloc | Tide Spout | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
+| Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 189/208 |
+| Malfurion Stormrage | Dream Ascent | 10 | 0 | 29 | 434 / 413 | guided | 61 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
+| Medivh | Raven Flight | 9 | 0 | 21 | 373 / 460 | aimed (8-way, 8 frames) | 51 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
+| Anub'arak | Crypt Eruption | 9 | 0 | 20 | 399 / 403 | aimed (8-way, 8 frames) | 54 | read forward air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
+| Lady Vashj | Tidal Surge | 10 | 1 | 27 | 301 / 177 | guided | 57 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 159/208 |
 
 `GAME_TESTS=edgeGuard bun test test/game.test.ts` checks Rifleman's recorded
 gimp and Recoil Shot opening, plus Thrall's and Warden's mixed plans. The

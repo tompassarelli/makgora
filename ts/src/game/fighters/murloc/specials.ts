@@ -4,7 +4,7 @@ import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { CHILL } from "../../sim/chill";
 import { heroRegion } from "../../sim/heroMoves";
 import { frames, type AuthoredSpecial, type FighterSpecials } from "../../sim/specials/schema";
-import type { AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 import { murlocHit } from "./moves";
 
 const ensnare = (air: boolean): AuthoredSpecial => ({

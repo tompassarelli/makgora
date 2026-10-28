@@ -24,6 +24,8 @@ import { characterModelScale } from "../presentation/modelScale";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
 
+const PETRIFIED_GREY = 150;
+
 export class FighterPoolPresentation {
   private readonly clips: effect[] = [];
   private readonly light: effect | undefined;
@@ -178,7 +180,11 @@ export class FighterPoolPresentation {
     let green = 255;
     let blue = 255;
     let alpha = 255;
-    if (fighter.status.frozenFrames > 0) {
+    if (fighter.status.frozenFrames > 0 && fighter.status.petrified) {
+      red = PETRIFIED_GREY;
+      green = PETRIFIED_GREY;
+      blue = PETRIFIED_GREY;
+    } else if (fighter.status.frozenFrames > 0) {
       red = 155;
       green = 210;
     } else if (tint !== undefined) {

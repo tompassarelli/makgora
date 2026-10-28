@@ -13,16 +13,16 @@ const BODY = {
 
 const LIMBS: Readonly<Record<Limb, readonly [readonly string[], readonly string[]]>> = {
     shoulder: [
-        ['Bone_Arm1_R', 'Bone_Arm1_R01', 'Bone_UpperArmR', 'Bone_Arm1R', 'arm_R0_0_jnt', 'RShoulder', 'Cylinder06', 'Bone_Arm1_RArchDruid'],
-        ['Bone_Arm1_L', 'Bone_Arm1_L01', 'Bone_UpperArmL', 'Bone_Arm1L', 'arm_L0_0_jnt', 'Lshoulder', 'Cylinder07', 'Bone_Arm1_LArchDruid'],
+        ['Bone_Arm1_R', 'Bone_Arm1_R01', 'Bone_UpperArmR', 'Bone_Arm1R', 'arm_R0_0_jnt', 'RShoulder', 'Cylinder06', 'Bone_Arm1_RArchDruid', 'Bone_ArmUpper1_Right'],
+        ['Bone_Arm1_L', 'Bone_Arm1_L01', 'Bone_UpperArmL', 'Bone_Arm1L', 'arm_L0_0_jnt', 'Lshoulder', 'Cylinder07', 'Bone_Arm1_LArchDruid', 'Bone_ArmUpper1_Left'],
     ],
     elbow: [
-        ['Bone_Arm2_R', 'Bone_Arm2_R01', 'Bone_LowerArmR', 'Bone_Arm2R', 'arm_R0_2_jnt', 'Relbow', 'Mesh04', 'Bone_Arm2_RArchDruid'],
-        ['Bone_Arm2_L', 'Bone_Arm2_L01', 'Bone_LowerArmL', 'Bone_Arm2L', 'arm_L0_2_jnt', 'Lelbow', 'Mesh05', 'Bone_Arm2_LArchDruid'],
+        ['Bone_Arm2_R', 'Bone_Arm2_R01', 'Bone_LowerArmR', 'Bone_Arm2R', 'arm_R0_2_jnt', 'Relbow', 'Mesh04', 'Bone_Arm2_RArchDruid', 'Bone_ArmLower1_Right'],
+        ['Bone_Arm2_L', 'Bone_Arm2_L01', 'Bone_LowerArmL', 'Bone_Arm2L', 'arm_L0_2_jnt', 'Lelbow', 'Mesh05', 'Bone_Arm2_LArchDruid', 'Bone_Armlower1_Left'],
     ],
     hand: [
-        ['Bone_Hand_R', 'Bone_Hand_R01', 'Bone_HandR', 'arm_R0_end_jnt', 'Rhand', 'Bone_Hand_RArchDruid', 'Hand Right Ref ', 'Hand Right Ref', 'Mesh02'],
-        ['Bone_Hand_L', 'Bone_Hand_L01', 'Bone_HandL', 'arm_L0_end_jnt', 'Lhand', 'Bone_Hand_LArchDruid', 'Hand Left Ref ', 'Hand Left Ref', 'Mesh03'],
+        ['Bone_Hand_R', 'Bone_Hand_R01', 'Bone_HandR', 'arm_R0_end_jnt', 'Rhand', 'Bone_Hand_RArchDruid', 'Hand Right Ref ', 'Hand Right Ref', 'Mesh02', 'Bone_ArmHand1_Right'],
+        ['Bone_Hand_L', 'Bone_Hand_L01', 'Bone_HandL', 'arm_L0_end_jnt', 'Lhand', 'Bone_Hand_LArchDruid', 'Hand Left Ref ', 'Hand Left Ref', 'Mesh03', 'Bone_ArmHand1_Left'],
     ],
 };
 

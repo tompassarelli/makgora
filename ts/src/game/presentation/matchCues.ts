@@ -18,26 +18,17 @@ export interface CueObservation {
   phase: Phase;
   readonly out: Slots<boolean>;
   readonly meter: Slots<number>;
-  readonly candleDrops: Slots<number>;
-  readonly candleSnuffs: Slots<number>;
-  readonly candleReturns: Slots<number>;
   readonly combat: CombatObservation;
 }
 
 export function createCueObservation(): CueObservation {
-  return { phase: Phase.characterMenu, out: [false, false, false, false], meter: [0, 0, 0, 0], candleDrops: [0, 0, 0, 0], candleSnuffs: [0, 0, 0, 0], candleReturns: [0, 0, 0, 0], combat: createCombatObservation() };
+  return { phase: Phase.characterMenu, out: [false, false, false, false], meter: [0, 0, 0, 0], combat: createCombatObservation() };
 }
 
 export function observeForCues(observation: CueObservation, game: Readonly<MatchState>, world: Readonly<Roster>): void {
   observation.phase = game.phase;
   for (const slot of PARTICIPANT_SLOTS) observation.out[slot] = isActive(world, slot) && fighterAt(world, slot).status.out;
   for (const slot of PARTICIPANT_SLOTS) observation.meter[slot] = isActive(world, slot) ? fighterAt(world, slot).meter.ultimate : 0;
-  for (const slot of PARTICIPANT_SLOTS) {
-    const candle = isActive(world, slot) ? fighterAt(world, slot).candle : undefined;
-    observation.candleDrops[slot] = candle?.dropSerial ?? 0;
-    observation.candleSnuffs[slot] = candle?.snuffSerial ?? 0;
-    observation.candleReturns[slot] = candle?.returnSerial ?? 0;
-  }
   observeCombat(observation.combat, world);
 }
 
@@ -80,14 +71,8 @@ export function countdownCue(game: Readonly<MatchState>): MatchCue | undefined {
 
 
 
-function pushCue(cues: MatchCue[], serials: number[], cue: MatchCue, serial: number): void {
-  cues.push(cue);
-  serials.push(serial);
-}
-
-export function confirmedFrameCues(before: Readonly<CueObservation>, game: Readonly<MatchState>, world: Readonly<Roster>, tally: MatchTally, cues: MatchCue[], serials: number[]): void {
+export function confirmedFrameCues(before: Readonly<CueObservation>, game: Readonly<MatchState>, world: Readonly<Roster>, tally: MatchTally, cues: MatchCue[]): void {
   cues.length = 0;
-  serials.length = 0;
   const countdown = countdownCue(game);
   if (countdown !== undefined) cues.push(countdown);
   tallyCombat(before.combat, world, tally.combat);
@@ -105,16 +90,6 @@ export function confirmedFrameCues(before: Readonly<CueObservation>, game: Reado
     if (!keepsStocks(game) && fighter.status.stocks === 1) cues.push(MatchCue.lastStock);
   }
   if (before.phase === Phase.match && game.phase === Phase.result && !game.interrupted) cues.push(game.timedOut ? MatchCue.time : MatchCue.game);
-  while (serials.length < cues.length) serials.push(0);
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
-    const candle = fighterAt(world, slot).candle;
-    if (candle.dropSerial > before.candleDrops[slot]) pushCue(cues, serials, MatchCue.candleDrop, candle.dropSerial);
-    if (candle.snuffSerial > before.candleSnuffs[slot]) pushCue(cues, serials, MatchCue.candleSnuff, candle.snuffSerial);
-    if (candle.returnSerial <= before.candleReturns[slot]) continue;
-    pushCue(cues, serials, MatchCue.candleReturn, candle.returnSerial);
-    if (candle.heat === 0) pushCue(cues, serials, MatchCue.candleRelight, candle.returnSerial);
-  }
 }
 
 

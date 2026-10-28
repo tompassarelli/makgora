@@ -6,7 +6,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "./codes";
 import type { Fighter } from "./fighter";
-import type { AppliedStatus } from "./heroStatus";
+import type { AppliedStatus } from "./appliedStatus";
 
 
 export const CHILL_SPEED_SCALE = f32(0.6);

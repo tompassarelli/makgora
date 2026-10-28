@@ -6,7 +6,7 @@ import { HERO_REFERENCE_HEIGHT, heroRegion, type MoveRegion, type StrikeCapsule 
 import { ILLUSION_AIR_LANDING_LAG, ILLUSION_DISTANCE_HEIGHTS, ILLUSION_END_FRAME, ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_SHORTEN, ILLUSION_TRAVEL_FRAMES } from "../../sim/specials/illusionDash";
 import { CHARGED_AIM_FRAMES, frames, type AuthoredSpecial, type FighterSpecials } from "../../sim/specials/schema";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
-import type { AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 import { wardenHit } from "./moves";
 
 const H = HERO_REFERENCE_HEIGHT;

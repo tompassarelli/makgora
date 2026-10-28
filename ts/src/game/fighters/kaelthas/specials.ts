@@ -3,7 +3,7 @@ import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { heroRegion, type StrikeCapsule } from "../../sim/heroMoves";
 import { withExKit } from "../../sim/exSpecialAuthoring";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, type SpecialSteeredShot } from "../../sim/specials/schema";
-import type { AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 import { kaelCastBody, kaelHit } from "./moves";
 
 const AIR_LANDING_LAG = 20;

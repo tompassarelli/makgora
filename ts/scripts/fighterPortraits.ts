@@ -206,14 +206,14 @@ const times = (a: readonly number[], b: readonly number[]) => {
 };
 
 /**
- * Classic Murloc and Kobold (the 3.0 stock models their bodies keep) hang their
+ * Classic Murloc (the 3.0 stock model his body keeps) hangs its
  * old mesh bones, every pivot collapsed to one point, under a second Bone_* rig.
  * Posed through that rig, war3-model's evaluator (Wisp's renderer, and the
  * earlier Blender importer) scatters the mesh into texture noise, so
- * these portraits hold the rig's rest pose. Neither body has a skin, so
+ * these portraits hold the rig's rest pose. The body has no skin, so
  * re-encoding is safe.
  */
-const CLASSIC_REST_POSE: readonly number[] = [Character.murloc, Character.kobold];
+const CLASSIC_REST_POSE: readonly number[] = [Character.murloc];
 function restPose(bytes: Uint8Array): Uint8Array {
   const model = parseMDX(bytes.slice().buffer);
   for (const node of [...model.Bones, ...model.Helpers]) if (node.Name.startsWith('Bone_')) { delete node.Translation; delete node.Rotation; delete node.Scaling; }

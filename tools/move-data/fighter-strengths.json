@@ -245,17 +245,6 @@
    "drafted": true
   },
   {
-   "fighter": "kobold",
-   "source": "docs/design/roster.md",
-   "stated": true,
-   "kill": "mixed",
-   "edgeGuard": "weak",
-   "recovery": "exploitable",
-   "range": "close",
-   "note": "Tiny skirmisher poking and punishing whiffs; panicked recovery; light, low-damage scraps",
-   "drafted": true
-  },
-  {
    "fighter": "malfurion-stormrage",
    "source": "docs/design/roster.md",
    "stated": true,

@@ -21,7 +21,6 @@ import {
   IMPACT_MISS_MODEL, IMPACT_RESPAWN_MODEL, IMPACT_ROLL_MODEL, IMPACT_SHIELD_MODEL, IMPACT_TECH_MODEL,
 } from "../../src/game/assets/impactAssetInfo";
 import { SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL } from "../../src/generated/assets/shieldAssetInfo";
-import { CANDLE_FLAME_MODELS, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
 import { STAGE_DECK_MODELS } from "../../src/generated/stages/stageAssetInfo";
 import { STOCK_PLATFORM_MODELS } from "../../src/game/presentation/stockPlatforms";
 import { STAGE_EDGE_LIGHT_MODEL } from "../../src/game/presentation/stageEdgeLights";
@@ -133,8 +132,6 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
     { name: "KO body", lifetime: seconds(3), models: [RIFLEMAN_MODEL_FILE, DEMON_HUNTER_MODEL_FILE, ...HERO_ROSTER.map(({ character }) => heroLook(character)!.model)] },
 
     { name: "shield bubble", lifetime: seconds(75), models: [SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL] },
-
-    { name: "candle flame", models: [...CANDLE_FLAME_MODELS, CANDLE_SMOKE.model] },
 
     { name: "freeze trap", lifetime: seconds(31), models: [FROST_TRAP_MODEL] },
     { name: "ice shell", lifetime: seconds(6), models: [FROST_ICE_MODEL] },

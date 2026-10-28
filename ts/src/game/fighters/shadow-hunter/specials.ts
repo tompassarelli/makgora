@@ -7,7 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, type SpecialProjectile, CHARGED_AIM_FRAMES, chargedAngleMotion, frames } from "../../sim/specials/schema";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
-import type { AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 import { hit } from "./moves";
 
 const H = HERO_REFERENCE_HEIGHT;

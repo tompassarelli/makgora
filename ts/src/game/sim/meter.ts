@@ -12,7 +12,7 @@ export const exCharged = (f: Readonly<Fighter>): boolean => f.meter.ex >= METER.
 export const ultimateCharged = (f: Readonly<Fighter>): boolean => f.meter.ultimate >= METER.ultimateFrames;
 
 export function regenerateMeter(f: Fighter): void {
-  if (f.meter.ex < METER.exFrames) f.meter.ex++;
+  if (f.meter.ex < METER.exFrames && !f.status.manaShield) f.meter.ex++;
   if (f.meter.ultimate < METER.ultimateFrames) f.meter.ultimate++;
 }
 

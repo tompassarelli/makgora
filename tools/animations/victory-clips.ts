@@ -35,7 +35,7 @@ const alternating = (low: Arms): readonly Beat[] => [
 ];
 const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number; readonly raise?: readonly [number, number]; readonly tip?: number; readonly free?: Arms; readonly start?: Arms }>> = {
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
-    [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25, free: 'wide' }, [Character.kobold]: { low: 'pumped', hop: 1 },
+    [Character.shadowHunter]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25 }, [Character.chen]: { low: 'pumped', hop: 1, raise: [0.7, 0.68], tip: 25, free: 'wide' },
     [Character.jaina]: { low: 'pumped', hop: 0.5, raise: [0.7, 0.68], tip: 25 },
     [Character.mountainKing]: { low: 'pumped', hop: 1, raise: [0.85, 0.6], tip: 25 },
     [Character.demonHunter]: { low: 'pumped', hop: 0.35, raise: [0.95, 0.4], tip: 75, start: 'low' },
@@ -76,7 +76,6 @@ const HANGING: Readonly<Record<number, readonly string[]>> = {
 };
 const BOUNCE: Readonly<Record<number, Readonly<Record<number, number>>>> = {
     [Character.murloc]: { 18: 0.4, 50: 0.35, 72: 0.35 },
-    [Character.kobold]: { 18: 0.6, 28: 0.45, 40: 0.55, 50: 0.6, 62: 0.55, 72: 0.6 },
 };
 
 const args = process.argv.slice(2);

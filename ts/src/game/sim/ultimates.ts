@@ -392,15 +392,11 @@ const MEDIVH: AuthoredSpecial = {
   rehits: [...PULL, 64],
 };
 
-export const KOBOLD_BURROW_FIRST = 15;
-export const KOBOLD_BURROW_LAST = 54;
 
-const KOBOLD: AuthoredSpecial = {
-  name: "You No Take Candle!", endFrame: 85, needsFloorBelow: true,
-  intangible: frames(8, 54),
-  projectiles: [{ ...mark("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", 8, 12, 0.0), ...ON_FLOOR }],
-  motion: [{ ...frames(KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST), velocityX: 10.0, velocityZ: 0.0, driftSpeed: 6.0, stopsAtBody: true, relocate: Relocation.floorBelow }, { ...frames(55, 58), velocityX: 0.0, velocityZ: 12.0 }],
-  regions: [heroRegion(55, 58, capsule(20.0, 0.0, 20.0, 120.0, 50.0), hit(26.0, 85, 85.0, 45.0))],
+const LADY_VASHJ: AuthoredSpecial = {
+  name: "Gaze of Azshara", endFrame: 72,
+  projectiles: [mark("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", 1, 20, 18.0, 150.0)],
+  gaze: { window: frames(21, 60), range: 600.0, height: 300.0, slow: { ...CHILL, frames: 40, immunityFrames: 0 } },
 };
 
 const CHAOS_MARK = "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx";
@@ -445,7 +441,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.anubarak]: ANUBARAK,
   [Character.malfurion]: MALFURION,
   [Character.medivh]: MEDIVH,
-  [Character.kobold]: KOBOLD,
+  [Character.ladyVashj]: LADY_VASHJ,
   [Character.archimonde]: ARCHIMONDE,
 };
 
@@ -475,7 +471,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.anubarak]: "A slow cloud of beetles drifts ahead, stinging anyone standing in it. Jump or shield.",
   [Character.malfurion]: "A slow wall of wisps drifts forward and detonates on whoever it reaches.",
   [Character.medivh]: "A dark portal opens ahead, drawing foes in, then erupts. Walk away before it bursts.",
-  [Character.kobold]: "He digs in and burrows toward the foe, then bursts up under them. Watch the dirt.",
+  [Character.ladyVashj]: "Her eyes and head snakes glow, then her gaze sweeps a cone ahead: a foe facing her slows, then turns to stone and takes hits without flying until it ends. Turn away from her.",
   [Character.archimonde]: "Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles.",
 };
 

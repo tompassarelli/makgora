@@ -1,4 +1,3 @@
-import { CandleState } from "./codes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { at } from "wisp/src/runtime/lookup";
 
@@ -6,9 +5,8 @@ export const REST_BEAR = 1;
 export const REST_FREEZE_TRAP = 2;
 export const REST_CANNON = 4;
 export const REST_WATER = 8;
-export const REST_CANDLE = 16;
 export const REST_PLACED = 32;
-export const RESTING_GROUPS = REST_BEAR | REST_FREEZE_TRAP | REST_CANNON | REST_WATER | REST_CANDLE | REST_PLACED;
+export const RESTING_GROUPS = REST_BEAR | REST_FREEZE_TRAP | REST_CANNON | REST_WATER | REST_PLACED;
 
 export type Resting<T> = { readonly [K in keyof T]: T[K] extends readonly (infer E)[] ? readonly E[] : T[K] };
 
@@ -32,25 +30,6 @@ export interface FreezeTrap {
   surface: number | undefined;
   serial: number;
   cooldown: number;
-}
-
-export interface Candle {
-  heat: number;
-  state: CandleState;
-  lit: boolean;
-  x: number;
-  z: number;
-  vx: number;
-  vz: number;
-  surface: number | undefined;
-  timer: number;
-  away: number;
-  guard: number;
-  readonly struck: (number | undefined)[];
-  specialStruck: number;
-  dropSerial: number;
-  snuffSerial: number;
-  returnSerial: number;
 }
 
 interface PlacedFields {
@@ -93,7 +72,6 @@ interface RestingGroups {
   readonly freezeTrap: Readonly<FreezeTrap>;
   readonly cannon: Readonly<StageCannon>;
   readonly water: Readonly<Water>;
-  readonly candle: Resting<Candle>;
   readonly placed: Resting<PlacedFields>;
   readonly pack: readonly Resting<PlacedFields>[];
 }
@@ -195,25 +173,6 @@ export function restWater(fighter: RestingGroups): void {
 }
 
 
-export function mutableCandle(fighter: RestingGroups): Candle {
-  fighter.restingGroups = fighter.restingGroups & ~REST_CANDLE;
-  return fighter.candle as Candle;
-}
-
-export function candleResting(candle: Resting<Candle>): boolean {
-  if (candle.state !== CandleState.held || (candle.state === 0 && 1 / candle.state < 0) || !candle.lit || candle.surface !== undefined) return false;
-  if (!positiveZero(candle.heat) || !positiveZero(candle.x) || !positiveZero(candle.z) || !positiveZero(candle.vx) || !positiveZero(candle.vz)) return false;
-  if (!positiveZero(candle.timer) || !positiveZero(candle.away) || !positiveZero(candle.guard) || !positiveZero(candle.specialStruck)) return false;
-  if (!positiveZero(candle.dropSerial) || !positiveZero(candle.snuffSerial) || !positiveZero(candle.returnSerial)) return false;
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (candle.struck[slot] !== undefined) return false;
-  return true;
-}
-
-export function settleCandle(fighter: RestingGroups): void {
-  if (candleResting(fighter.candle)) fighter.restingGroups = fighter.restingGroups | REST_CANDLE;
-}
-
-
 function placedObjectResting(placed: Resting<PlacedFields>): boolean {
   if (placed.spec !== undefined || placed.surface !== undefined || placed.direction !== 1) return false;
   if (!positiveZero(placed.life) || !positiveZero(placed.age) || !positiveZero(placed.x) || !positiveZero(placed.z) || !positiveZero(placed.durability)) return false;
@@ -231,6 +190,6 @@ export function placedResting(fighter: Omit<RestingGroups, "restingGroups">): bo
 
 export function settleRestingGroups(fighter: RestingGroups): void {
   fighter.restingGroups = (bearResting(fighter.bear) ? REST_BEAR : 0) | (freezeTrapResting(fighter.freezeTrap) ? REST_FREEZE_TRAP : 0)
-    | (cannonResting(fighter.cannon) ? REST_CANNON : 0) | (waterResting(fighter.water) ? REST_WATER : 0) | (candleResting(fighter.candle) ? REST_CANDLE : 0)
+    | (cannonResting(fighter.cannon) ? REST_CANNON : 0) | (waterResting(fighter.water) ? REST_WATER : 0)
     | (placedResting(fighter) ? REST_PLACED : 0);
 }

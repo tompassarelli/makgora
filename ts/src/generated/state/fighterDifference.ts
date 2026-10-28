@@ -182,22 +182,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.visuals.poisonBursts !== actual.visuals.poisonBursts) return "poisonBursts";
   if (expected.visuals.spellPass !== actual.visuals.spellPass) return "spellPassVisualSerial";
   if (expected.visuals.armorAbsorbs !== actual.visuals.armorAbsorbs) return "armorAbsorbs";
-  if (expected.candle.heat !== actual.candle.heat) return "candleHeat";
-  if (expected.candle.state !== actual.candle.state) return "candleState";
-  if (expected.candle.lit !== actual.candle.lit) return "candleLit";
-  if (expected.candle.x !== actual.candle.x) return "candleX";
-  if (expected.candle.z !== actual.candle.z) return "candleZ";
-  if (expected.candle.vx !== actual.candle.vx) return "candleVx";
-  if (expected.candle.vz !== actual.candle.vz) return "candleVz";
-  if ((expected.candle.surface ?? -1) !== (actual.candle.surface ?? -1)) return "candleSurface";
-  if (expected.candle.timer !== actual.candle.timer) return "candleTimer";
-  if (expected.candle.away !== actual.candle.away) return "candleAway";
-  if (expected.candle.guard !== actual.candle.guard) return "candleGuard";
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) if (expected.candle.struck[i] !== actual.candle.struck[i]) return `candleStruck[${i}]`;
-  if (expected.candle.specialStruck !== actual.candle.specialStruck) return "candleSpecialStruck";
-  if (expected.candle.dropSerial !== actual.candle.dropSerial) return "candleDropSerial";
-  if (expected.candle.snuffSerial !== actual.candle.snuffSerial) return "candleSnuffSerial";
-  if (expected.candle.returnSerial !== actual.candle.returnSerial) return "candleReturnSerial";
   if (expected.special.form !== actual.special.form) return "specialForm";
   if (expected.special.variant !== actual.special.variant) return "specialVariant";
   if (expected.special.aimX !== actual.special.aimX) return "specialAimX";
@@ -358,5 +342,13 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.water.hydraFrame !== actual.water.hydraFrame) return "waterHydraFrame";
   if (expected.water.hydraX !== actual.water.hydraX) return "waterHydraX";
   if (expected.water.hydraStrikeFrame !== actual.water.hydraStrikeFrame) return "waterHydraStrikeFrame";
+  if (expected.status.manaShield !== actual.status.manaShield) return "manaShield";
+  if (expected.status.petrifyIn !== actual.status.petrifyIn) return "petrifyIn";
+  if (expected.status.petrified !== actual.status.petrified) return "petrified";
+  if (expected.status.petrifyDamage !== actual.status.petrifyDamage) return "petrifyDamage";
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).bounces !== at(actual.projectiles, i).bounces) return `projectileBounces[${i}]`;
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).homeward !== at(actual.projectiles, i).homeward) return `projectileHomeward[${i}]`;
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).carriedEx !== at(actual.projectiles, i).carriedEx) return `projectileCarriedEx[${i}]`;
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).lastStruck !== at(actual.projectiles, i).lastStruck) return `projectileLastStruck[${i}]`;
   return undefined;
 }

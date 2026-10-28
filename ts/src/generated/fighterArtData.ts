@@ -34,7 +34,7 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [23, { name: "Anubarak", slug: "anub'arak", source: "hero-models/herocryptlord.mdx", stock: "war3.w3mod:units/undead/herocryptlord/herocryptlord.mdx", model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl" }],
   [24, { name: "MalfurionStormrage", slug: "malfurion-stormrage", source: "hero-models/furion.mdx", stock: "war3.w3mod:units/nightelf/furion/furion.mdx", model: "units\\nightelf\\Furion\\Furion.mdl" }],
   [25, { name: "Medivh", slug: "medivh", source: "hero-models/medivh.mdx", stock: "war3.w3mod:units/creeps/medivh/medivh.mdx", model: "units\\creeps\\Medivh\\Medivh.mdl" }],
-  [26, { name: "Kobold", slug: "kobold", source: "hero-models/kobold.mdx", stock: "war3.w3mod:units/creeps/kobold/kobold.mdx", model: "units\\creeps\\Kobold\\Kobold.mdl" }],
+  [28, { name: "LadyVashj", slug: "lady-vashj", source: "hero-models/ladyvashj.mdx", stock: "war3.w3mod:units/naga/ladyvashj/ladyvashj.mdx", model: "units\\naga\\LadyVashj\\LadyVashj.mdl" }],
   [29, { name: "Archimonde", slug: "archimonde", source: "hero-models/warlock.mdx", stock: "war3.w3mod:units/demon/warlock/warlock.mdx", model: "units\\demon\\Warlock\\Warlock.mdl" }],
 ]);
 

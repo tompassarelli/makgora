@@ -10,7 +10,7 @@ frames it is [#269](https://github.com/tompassarelli/smashcraft/issues/269).
 Researched 8 Oct 2026.
 
 Classic offers the 21 fighters with finished routes. Grom, Anub’arak,
-Malfurion, Medivh and Kobold remain available in other modes while their
+Malfurion and Medivh remain available in other modes while their
 Classic routes and Lore Battles are pending.
 
 The source of truth for the routes is smashcraft:ts/src/game/classic/routes.ts;

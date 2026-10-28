@@ -9,14 +9,9 @@ import { AttackStyle, AttackPhase, GrabAction } from "../../ts/src/game/sim/code
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { MURLOC_MOVES } from "../../ts/src/game/fighters/murloc/moves";
 import { MURLOC_SPECIALS } from "../../ts/src/game/fighters/murloc/specials";
-import { KOBOLD_MOVES } from "../../ts/src/game/fighters/kobold/moves";
-import { KOBOLD_SPECIALS } from "../../ts/src/game/fighters/kobold/specials";
 import { seconds } from "./asset-info";
 import { measureDrawnReach } from "../../ts/scripts/wisp/drawnReach";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
-import { drawnStrideSource, measureDrawnStride, type DrawnStride } from "../../ts/scripts/wisp/drawnMotion";
-import { DRAWN_STRIDES } from "../../ts/src/game/presentation/drawnStrideInfo";
-import type { Character } from "../../ts/src/game/sim/codes";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -25,22 +20,21 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
   for (const [key, child] of Object.entries(value)) if (key !== "Nodes") tracks(child, visit, `${path}.${key}`);
 }
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
-const kobold = process.argv.includes("--kobold");
-const character = kobold ? 26 : 21;
-const fighterName = kobold ? "Kobold" : "Murloc";
+const character = 21;
+const fighterName = "Murloc";
 const slug = fighterName.toLowerCase();
-const kitMoves = kobold ? KOBOLD_MOVES : MURLOC_MOVES;
-const kitSpecials = kobold ? KOBOLD_SPECIALS : MURLOC_SPECIALS;
+const kitMoves = MURLOC_MOVES;
+const kitSpecials = MURLOC_SPECIALS;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const option = (name: string) => { const at = process.argv.indexOf(name); return at < 0 ? undefined : resolve(process.argv[at + 1] ?? ""); };
 const rigOutput = option("--rig"), bakedKeys = option("--keys");
 const replaced = process.argv.slice(4).filter((arg, i, all) => !arg.startsWith("--") && !["--rig", "--keys"].includes(all[i - 1]!)), inPlace = replaced.length > 0, painOnly = replaced.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || (replaced.length === 1 && !painOnly)), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [POSE...] [--kobold] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
+ensure(input && output && relative(project, output).startsWith("..") && (!(rigOutput || bakedKeys) || (replaced.length === 1 && !painOnly)), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [POSE...] [--rig RIG.json | --keys KEYS.json] (one POSE with --rig or --keys)");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), model = structuredClone(source);
 ensure((inPlace || source.Sequences.length === 9) && source.Helpers.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Murloc Tiderunner");
-const stand = source.Sequences[kobold ? 0 : 2]!;
+const stand = source.Sequences[2]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; tx?: number; tz?: number; }
 interface Key { frame: number; g: Gesture }
 const everyFrame = (keys: readonly Key[]): Key[] => keys.flatMap((key, i) => {
@@ -81,7 +75,7 @@ for (const [pose, style, gesture, target] of normals) {
   actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture, target, air: pose.endsWith("Air") });
 }
 const couched: Gesture = { arm: -75, elbow: -120, hand: 0, pelvis: -5, leftElbow: -20 };
-if (!kobold) Object.assign(actions.find(action => action.pose === "dashAttack")!, { target: undefined, keys: everyFrame([
+Object.assign(actions.find(action => action.pose === "dashAttack")!, { target: undefined, keys: everyFrame([
   { frame: 0, g: { arm: -20, chest: 8, lean: 6, tx: 4, thigh: -20, leftThigh: 20 } },
   { frame: 3, g: { ...couched, hand: 35, chest: -10, head: 10, tx: -22, thigh: 50, knee: -80, leftThigh: 30, leftArm: -60 } },
   { frame: 5, g: { ...couched, hand: -10, chest: 25, head: -15, tx: 22, thigh: -55, knee: -50, leftThigh: 50, leftArm: 70 } },
@@ -142,8 +136,7 @@ for (const [pose, key, gesture, contact, target] of [
     const form = air ? special.air ?? special.ground : special.ground;
     const projectile = key === "neutral" ? form.projectiles?.[0] : undefined;
     const release = projectile === undefined ? contact : projectile.spawnFrame + (projectile.activeFrom ?? 1) - 1;
-    const characterGesture = kobold && key === "down" ? { ...low, yaw: 150, leftArm: 70, head: -25 } : kobold && key === "side" ? { ...low, lean: 30, leftArm: -90 } : gesture;
-    actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, frames: form.endFrame, contact: kobold && key === "down" ? 10 : release, gesture: air ? { ...characterGesture, thigh: 30, leftThigh: -35 } : characterGesture, target, air });
+    actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, frames: form.endFrame, contact: release, gesture: air ? { ...gesture, thigh: 30, leftThigh: -35 } : gesture, target, air });
   }
 }
 const damageActions: Action[] = [];
@@ -315,8 +308,8 @@ if (!inPlace) await Bun.write(join(project, `ts/src/game/fighters/${slug}/clips.
   `// Generated by tools/animations/murloc-clips.ts from the stock classic ${fighterName} rig.`,
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
   `export const ${fighterName.toUpperCase()}_MODEL_FILE = ${JSON.stringify(["units", "creeps", fighterName, `${fighterName}.mdl`].join(String.fromCharCode(92)))};`,
-  `export const ${fighterName.toUpperCase()}_FALLBACK: HeroClip = { index: ${kobold ? 0 : 2}, seconds: 1.0 };`,
-  `export const ${fighterName.toUpperCase()}_CLIPS = { idle: ${fighterName.toUpperCase()}_FALLBACK, walk: { index: 1, seconds: ${kobold ? "1.0" : "f32(0.667)"} }, dash: { index: 1, seconds: ${kobold ? "1.0" : "f32(0.667)"} }, run: { index: 1, seconds: ${kobold ? "1.0" : "f32(0.667)"} }, ko: { index: ${kobold ? 5 : 6}, seconds: f32(1.667) },`,
+  `export const ${fighterName.toUpperCase()}_FALLBACK: HeroClip = { index: 2, seconds: 1.0 };`,
+  `export const ${fighterName.toUpperCase()}_CLIPS = { idle: ${fighterName.toUpperCase()}_FALLBACK, walk: { index: 1, seconds: f32(0.667) }, dash: { index: 1, seconds: f32(0.667) }, run: { index: 1, seconds: f32(0.667) }, ko: { index: 6, seconds: f32(1.667) },`,
   ...bindings, '} as const satisfies HeroClipTable;', `export const ${fighterName.toUpperCase()}_DAMAGE_CLIPS: readonly HeroClip[] = [`, ...damageBindings, '];', "",
 ].join("\n"));
 const normalReach = [];
@@ -398,10 +391,4 @@ for (const [i, action] of [...actions, ...damageActions].entries()) {
 }
 await Bun.write(join(output, `${slug}-clips.json`), JSON.stringify({ stockSequences: source.Sequences.length, appended: records.length, measuredBothFacings: measured, records }, null, 2) + "\n");
 await Bun.write(join(output, "normal-reach.json"), JSON.stringify(normalReach, null, 2) + "\n");
-if (kobold) {
-  const strides: DrawnStride[] = Object.entries(DRAWN_STRIDES).flatMap(([id, row]) => row === undefined || Number(id) === character ? [] :
-    (["walk", "run"] as const).map(motion => ({ character: Number(id) as Character, motion, ...row[motion] })));
-  for (const motion of ["walk", "run"] as const) strides.push(measureDrawnStride(bytes, new DrawnModel(bytes, 1), character, motion, `units\\creeps\\${fighterName}\\${fighterName}.mdl`));
-  await Bun.write(join(project, "ts/src/game/presentation/drawnStrideInfo.ts"), drawnStrideSource(strides));
-}
 console.log(`MURLOC_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; ${measured} both-facing sheets; private output ${output}`);

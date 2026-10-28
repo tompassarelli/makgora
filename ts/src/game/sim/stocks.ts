@@ -1,6 +1,5 @@
 import { blastFighterFields, respawnFighterFields } from "../../generated/state/fighterState";
 import { restCannon, restFreezeTrap, restWater } from "./fighterRest";
-import { resetCandle } from "../fighters/kobold/candle";
 import { TOP_KO_MINIMUM_UPWARD_KNOCKBACK } from "./knockback";
 import { setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt } from "./roster";
@@ -20,7 +19,6 @@ export function checkBlastZone(world: Roster, slot: number, stage: number = 0): 
   clearGrabLinks(world, slot);
   clearSpecialOnStock(f);
   clearOwnedFreezeTrap(f);
-  resetCandle(f);
   blastFighterFields(f);
 }
 
@@ -29,7 +27,6 @@ export function respawnFighter(world: Roster, slot: number, startX: number): voi
   const f = fighterAt(world, slot);
   clearGrabLinks(world, slot);
   clearSpecialOnStock(f);
-  resetCandle(f);
   restCannon(f);
   restWater(f);
   restFreezeTrap(f);

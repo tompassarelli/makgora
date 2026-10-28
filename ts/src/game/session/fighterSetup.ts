@@ -2,11 +2,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { isParticipantSlot } from "../input/participants";
 import { type MatchState, Phase } from "../lobby/lobbyState";
 import { parseDecimal } from "../netcode/journal/decimal";
-import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { mutableCandle } from "../sim/fighterRest";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL, dropCandle, resetCandle } from "../fighters/kobold/candle";
 
 interface SetupTarget {
   readonly player: number;
@@ -23,19 +20,6 @@ function setupTarget(text: string): SetupTarget | undefined {
   return { player, slot, valueText, value: parseDecimal(valueText) };
 }
 
-function applyCandleSetup(fighter: Fighter, target: SetupTarget, prepare: () => void): boolean {
-  const { value, valueText } = target;
-  if (fighter.character !== Character.kobold) return false;
-  if (valueText !== "drop" && (value === undefined || `${value}` !== valueText || value < 0 || value > CANDLE_MAX_LEVEL)) return false;
-  prepare();
-  if (valueText === "drop") dropCandle(fighter);
-  else {
-    resetCandle(fighter);
-    mutableCandle(fighter).heat = value === 0 ? 0 : ((value ?? 0) + 1) * CANDLE_LEVEL_HEAT - 1;
-  }
-  return true;
-}
-
 function applyBesideSetup(world: Roster, fighter: Fighter, target: SetupTarget, prepare: () => void): boolean {
   const other = (target.value ?? 0) - 1;
   if (`${target.value}` !== target.valueText || other === target.slot || !isParticipantSlot(other) || !isActive(world, other)) return false;
@@ -47,7 +31,7 @@ function applyBesideSetup(world: Roster, fighter: Fighter, target: SetupTarget, 
   return true;
 }
 
-const SETUP_KINDS = ["percent", "lives", "candle", "beside"] as const;
+const SETUP_KINDS = ["percent", "lives", "beside"] as const;
 
 export function applyFighterSetup(game: MatchState, world: Roster, message: string, prepare: () => void): string | undefined {
   const what = SETUP_KINDS.find(kind => message.startsWith(`-dev ${kind} `));
@@ -66,8 +50,6 @@ export function applyFighterSetup(game: MatchState, world: Roster, message: stri
     if (value === undefined || value < 1 || value > 99) return refused;
     prepare();
     fighter.status.stocks = value;
-  } else if (what === "beside") {
-    if (!applyBesideSetup(world, fighter, target, prepare)) return refused;
-  } else if (!applyCandleSetup(fighter, target, prepare)) return refused;
+  } else if (!applyBesideSetup(world, fighter, target, prepare)) return refused;
   return `dev: player ${target.player} ${what} ${target.valueText}`;
 }

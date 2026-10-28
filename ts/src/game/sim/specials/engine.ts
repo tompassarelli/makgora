@@ -13,7 +13,6 @@ import { applyItemBuffFor } from "../itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "../heroStatus";
 import { Character, ProjectileKind, SpecialAction } from "../codes";
 import { openParasol } from "../parasol";
-import { specialVariant } from "../../fighters/kobold/candle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
@@ -36,6 +35,11 @@ import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt
 import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { currentTraits } from "../identityTraits";
 import { squareRoot } from "../warcraftMath";
+import type { ProjectileVelocity } from "./volleys";
+import { clearBounce } from "../projectileBounce";
+import { toggleManaShield } from "../manaShield";
+import { gazeAt } from "../gaze";
+import { ownedCount } from "./ownedProjectiles";
 
 
 const DIAGONAL = 0.7071067690849304;
@@ -60,13 +64,6 @@ function requestedSlot(input: Readonly<Controls>): SpecialSlot {
   return input.specialZ > 0 ? SpecialSlot.up : input.specialZ < 0 ? SpecialSlot.down : input.specialX !== 0 ? SpecialSlot.side : SpecialSlot.neutral;
 }
 
-function ownedCount(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): number {
-  let count = 0;
-  for (const projectile of f.projectiles) {
-    if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined || projectile.spec === spec)) count++;
-  }
-  return count;
-}
 
 
 
@@ -132,8 +129,7 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   const airborne = !f.motion.grounded;
   const recalls = kit.recall !== undefined && recallHolds(f, kit);
   const form: SpecialForm = recalls ? SpecialForm.recall : airborne && kit.air !== undefined ? SpecialForm.air : SpecialForm.ground;
-  const variant = specialVariant(f);
-  const move = specialForm(kit, form, false, variant);
+  const move = specialForm(kit, form);
   if (move.groundOnly === true && airborne) {
     out.groundOnly = true;
     return undefined;
@@ -144,7 +140,7 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   if (!projectilesFit(f, move)) return undefined;
   choice.slot = slot;
   choice.form = form;
-  choice.variant = variant;
+  choice.variant = 0;
   return choice;
 }
 
@@ -344,18 +340,20 @@ function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, 
   const z = drawn !== undefined ? f32(drawn.z + spec.offsetZ) : spec.atStageCentre === true ? f32(mainDeckZAt(stage, x) + spec.offsetZ) : foe !== undefined ? f32(foe.motion.z + spec.offsetZ) : f32(markBaseZ(owner, spec, stage, matchFrame, x) + spec.offsetZ);
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;
-  spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, riddenDeck(spec, drawn, stage, matchFrame, x, z));
+  const surface = riddenDeck(spec, drawn, stage, matchFrame, x, z);
+  if (spec.fan === undefined) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, surface);
+  else for (const velocity of spec.fan) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, false, serial, surface, velocity);
 }
 
 
-export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProjectile>, x: number, z: number, facing: number, up: boolean, serial: number, surface?: number): void {
+export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProjectile>, x: number, z: number, facing: number, up: boolean, serial: number, surface?: number, velocity?: Readonly<ProjectileVelocity>): void {
   let index = -1;
   for (const before of owner.projectiles) {
     index++;
     if (before.life > 0) continue;
     const projectile = mutableProjectile(owner, index);
-    const velocityX = up ? spec.upVelocityX ?? spec.velocityX : spec.velocityX;
-    const velocityZ = up ? spec.upVelocityZ ?? spec.velocityZ : spec.velocityZ;
+    const velocityX = velocity?.velocityX ?? (up ? spec.upVelocityX ?? spec.velocityX : spec.velocityX);
+    const velocityZ = velocity?.velocityZ ?? (up ? spec.upVelocityZ ?? spec.velocityZ : spec.velocityZ);
     projectile.kind = ProjectileKind.hero;
     projectile.spec = spec;
     projectile.visualFamily = owner.character;
@@ -371,6 +369,7 @@ export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProj
     projectile.exReach = false;
     projectile.poolHits = 0;
     projectile.poolWait = 0;
+    clearBounce(projectile);
     projectile.surface = surface;
     projectile.life = spec.life;
     return;
@@ -1005,6 +1004,8 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.turnsAround === true) faceHeldStick(f, input);
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
+  if (move.manaShield?.frame === frame) toggleManaShield(f);
+  if (move.gaze !== undefined && world !== undefined) gazeAt(world, f, move.gaze, frame);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
@@ -1200,19 +1201,6 @@ export function stopHeroMotionAtBodies(world: Roster, slot: number): void {
 
 
 
-function settleOnFloorBelow(f: Fighter, stage: number, matchFrame: number): void {
-  const { motion } = f;
-  const floor = motion.grounded ? undefined : floorSurfaceBelow(stage, matchFrame, motion.x, motion.z);
-  if (floor === undefined) return;
-  motion.grounded = true;
-  motion.surface = floor;
-  motion.z = surfaceZAt(stage, floor, matchFrame, motion.x);
-  motion.vz = 0.0;
-  motion.fastFalling = false;
-  setWorldMotionValue(motion.meleeZ, motion.z);
-  clearMotionValue(motion.meleeVelocityZ);
-}
-
 function moveToRelocation(world: Roster, f: Fighter, segment: Readonly<SpecialMotion>): boolean {
   if (segment.relocateProjectile !== undefined) {
     const anchor = projectileAnchor(f, segment.relocateProjectile);
@@ -1264,10 +1252,6 @@ export function relocateHeroSpecial(world: Roster, slot: number, stage: number, 
   if (move?.motion === undefined) return;
   for (const segment of move.motion) {
     if ((segment.relocate === undefined && segment.relocateProjectile === undefined) || f.special.frame !== segment.first) continue;
-    if (segment.relocate === Relocation.floorBelow) {
-      settleOnFloorBelow(f, stage, matchFrame);
-      return;
-    }
     if (segment.relocate === Relocation.behindLocked) {
       const target = lockedTarget(world, f, segment.relocateReach ?? 0.0);
       if (target === undefined) return;

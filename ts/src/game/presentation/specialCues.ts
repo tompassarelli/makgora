@@ -15,7 +15,6 @@ import { runningHeroSpecial } from "../sim/specials/engine";
 import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
 import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
-import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
 import { GOLD_SACK_SLOT_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
   DEMONHUNTER_BACKFLIP_FORM,
@@ -194,7 +193,6 @@ const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", 
 
 const RAIN_OF_FIRE_TARGET = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx";
 const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.4));
-const KOBOLD_BURROW_TRAIL: MoveCues = { spell: "Burrow trail", startup: BURROW, active: BURROW };
 
 
 const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 165.0, z: 6.0 }));
@@ -317,11 +315,11 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     up: { spell: "Blood Leap", startup: BLOODLUST, active: { ...BEAST, anchor: "body" } },
     down: { spell: "Mannoroth's Bane", startup: BLOODLUST, active: { ...VOODOO, anchor: "ahead" } },
   },
-  [Character.kobold]: {
-    neutral: { spell: "Wick Flick", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", f32(0.3)), active: cue("Abilities\\Weapons\\LavaSpawnMissile\\LavaSpawnMissile.mdx", "hand", f32(0.4)) },
-    side: { spell: "Panic Dig", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: cue("Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx", "feet", f32(0.25)) },
-    up: { spell: "Candle Escape", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", f32(0.3)), active: cue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", "feet", f32(0.3)) },
-    down: { spell: "Mine!", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: timed(cue("Objects\\Spawnmodels\\Human\\FragmentationShards\\FragBoomSpawn.mdx", "feet", f32(0.3)), "birth", 0.0) },
+  [Character.ladyVashj]: {
+    neutral: { spell: "Multi-Shot", startup: cue("Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl", "hand", f32(0.6)), active: cue("Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl", "hand", f32(0.6)) },
+    side: { spell: "Tidal Serpent", startup: cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "hand", f32(0.4)), active: cue("Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdl", "hand", f32(0.6)) },
+    up: { spell: "Tidal Surge", startup: cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", f32(0.6)), active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
+    down: { spell: "Mana Shield", startup: cue("Abilities\\Spells\\Human\\ManaShield\\ManaShieldCaster.mdl", "body", f32(0.8)), active: cue("Abilities\\Spells\\Human\\ManaShield\\ManaShieldCaster.mdl", "body", f32(0.8)) },
   },
   [Character.blademaster]: {
     neutral: QUICKDRAW_STANCE_CUES,
@@ -529,9 +527,6 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
     if (frame > PHOENIX_STARTUP_FRAMES && frame <= PHOENIX_STARTUP_FRAMES + PHOENIX_BURN_FRAMES) return { cues: KAEL_PHOENIX_FORM, phase: "active" };
     return frame <= PHOENIX_STARTUP_FRAMES ? { cues: KAEL_PHOENIX_CHARGE, phase: "startup" } : NONE;
   }
-  if (fighter.character === Character.kobold && action === SpecialAction.heroUltimate) {
-    return frame >= KOBOLD_BURROW_FIRST && frame <= KOBOLD_BURROW_LAST ? { cues: KOBOLD_BURROW_TRAIL, phase: "active" } : NONE;
-  }
   if (fighter.character === Character.sylvanas && action === SpecialAction.heroUltimate) {
     const seek = runningHeroSpecial(fighter)?.motion?.find((segment) => segment.seek !== undefined);
     if (seek === undefined) return NONE;
@@ -573,7 +568,7 @@ export function fighterMoveCues(character: Character): readonly MoveCues[] {
 
 
 export function fighterCueList(character: Character): readonly Cue[] {
-  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.kobold ? [KOBOLD_BURROW_TRAIL] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
+  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
 }
 
 

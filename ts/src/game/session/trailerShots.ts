@@ -9,7 +9,6 @@ export interface TrailerShot {
 export const TRAILER_SHOTS: readonly TrailerShot[] = [
   { seed: 29, fighters: ["mountain-king", "lich"], stage: 10, start: 1430, end: 1907 },
   { seed: 34, fighters: ["shadow-hunter", "beastmaster"], stage: 6, start: 5273, end: 5621 },
-  { seed: 204, fighters: ["kobold", "warden"], stage: 0, start: 619, end: 1024 },
   { seed: 224, fighters: ["chen-stormstout", "anub'arak"], stage: 13, start: 2921, end: 3304 },
   { seed: 279, fighters: ["kael'thas-sunstrider", "warden"], stage: 3, start: 2750, end: 3187 },
   { seed: 304, fighters: ["goblin-tinker", "warden"], stage: 4, start: 3140, end: 3485 },

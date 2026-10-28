@@ -31,7 +31,7 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 | Telegraph | Every ultimate shows its area, line or target before its first active frame. Startup is at least 16 frames. |
 | Counterplay | Each can be shielded or dodged on its startup frames, or escaped by movement, and leaves the user punishable on a whiff. |
 | Payoff | Strong, never a guaranteed stock: none kills from 0%. Below 100%, an ultimate and its true follow-ups stay within #83's 30% (gameplay-design.md, "Combo structure"). |
-| Air | An airborne press starts every ultimate but the floor-bound ones below; the caster holds in place until the move's first threat, then falls normally: no helpless state, air jump kept. The Dark Portal, Light's Judgment and Inferno draw their marks on the highest floor beneath the mark's spot at or below the caster, and strike there; over the void the mark stays at the caster's height. A ground or air Inferno cast whose mark would fall past the edge, by a caster standing on or above a floor, draws it on the farthest ledge ahead instead, 50 inside it (the Infernal's radius), so the meteor, crash and Infernal land at the edge (#271). Stampede, Earthquake, Tower Rush, Mrglglgl Stampede and Locust Swarm run along the floor from the caster's feet, so they refuse in the air (#98). Three have their own air versions: Chen hangs through his last strike, so his spirits strike where they were drawn around him; Tinker's robot drops to the floor beneath him and walks there; the Kobold dives into the floor beneath him and burrows along it. Robo-Goblin Overdrive and You No Take Candle! need a floor beneath the caster and refuse over the void. |
+| Air | An airborne press starts every ultimate but the floor-bound ones below; the caster holds in place until the move's first threat, then falls normally: no helpless state, air jump kept. The Dark Portal, Light's Judgment and Inferno draw their marks on the highest floor beneath the mark's spot at or below the caster, and strike there; over the void the mark stays at the caster's height. A ground or air Inferno cast whose mark would fall past the edge, by a caster standing on or above a floor, draws it on the farthest ledge ahead instead, 50 inside it (the Infernal's radius), so the meteor, crash and Infernal land at the edge (#271). Stampede, Earthquake, Tower Rush, Mrglglgl Stampede and Locust Swarm run along the floor from the caster's feet, so they refuse in the air (#98). Two have their own air versions: Chen hangs through his last strike, so his spirits strike where they were drawn around him; Tinker's robot drops to the floor beneath him and walks there. Robo-Goblin Overdrive needs a floor beneath the caster and refuses over the void. |
 | Off rule | "Ultimates off" removes the input; the match rule is part of replay state. |
 | Effects | Each ultimate's models count as one effect group under #380's budget: gone within 12 frames after its last active frame. Tower Rush's towers are active until they crumble, and their 30-frame Death animation is the exception Tom asked for. |
 
@@ -42,12 +42,12 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 2. **Tier 2:** if that cannot work, a famous ability of the character as a
    World of Warcraft raid boss or in an iconic encounter.
 3. **Unit:** fighters that are not Warcraft III heroes (Rifleman, Peon,
-   Murloc, Kobold) take the most obvious lore idea.
+   Murloc) take the most obvious lore idea.
 
 ### Variety
 
 Beams (Rifleman, Jaina), transformations (Illidan, Mountain King), rushes
-(Blademaster, Grom, Kobold), self-centred areas (Anub'arak, Chen), a channel guarded by wards (Shadow Hunter), placed or targeted areas (Dreadlord, Forsaken Paladin,
+(Blademaster, Grom), self-centred areas (Anub'arak, Chen), a channel guarded by wards (Shadow Hunter), placed or targeted areas (Dreadlord, Forsaken Paladin,
 Lich King, Medivh), sweeps and summons (Murloc, Lich, Beastmaster, Warden,
 Thrall, Peon, Tinker, Malfurion, Kael'thas), a status projectile (Sylvanas), a return to centre
 (Cairne), a targeted curse (Pit Lord) and a command throw (Grom's catch). Ground sweeps are
@@ -95,7 +95,7 @@ angles, base and growth stay, so a retuned ultimate also launches harder.
 | Anub'arak | 8 | 26 | Swarm ticks 2 to 6.5 |
 | Malfurion | 20 | 26 | Wisp wall 20 to 26 |
 | Medivh | 15 | 26 | Eruption 12 to 23 |
-| Kobold | 16 | 26 | Eruption 16 to 26 |
+| Lady Vashj | 0 | 26 | Hits on the petrified foe, capped at 26 |
 
 ## Per fighter
 
@@ -129,7 +129,7 @@ Frames count from the input frame (frame 1 is the first frame after it).
 | Anub'arak | ground only | **Locust Swarm** · Warcraft III Crypt Lord ultimate (tier 1) | Carapace opens; locusts boil out, f1–16 | f17 a beetle cloud of radius 90 drifts ahead at 5 a frame for 90 frames: 6.5% every 12 frames to grounded foes | Jump over it, outrun it, shield; punish him through f60 | The crypt king's swarm | Scarab units |
 | Malfurion | air | **Wisps of Hyjal** · Malfurion's wisps detonating at Mount Hyjal, Warcraft III's finale (tier 2: Tranquility only heals) | Wisps gather around him, f1–28 | f29 a slow wall of wisps drifts forward 7 a frame for 120 frames: 26%, 50° on contact | Shield, jump over, get behind; punish him through f50 | The archdruid's quiet, inevitable answer | Wisp units, Tranquility |
 | Medivh | air | **The Dark Portal** · Medivh opening the Dark Portal (tier 2: no hero ultimate) | A green portal opens 240 ahead, f1–24 | f25–60 it draws nearby foes in (1% every 6 frames, radius 220); f64 it erupts, radius 130: 23%, 60° | Walk out against the pull, shield, escape before f64 | The prophet's doom-laden punchline | Dark Portal target effect |
-| Kobold | air over a floor: the dust shows on the floor beneath him, he dives into it at f15 and burrows along it | **You No Take Candle!** · kobold miners guarding their candle (unit) | Dives into the dirt, f1–14 | Untouchable f8–54, he burrows toward the foe at 10 a frame (steerable), stopping under them; f55 he erupts upward: 26%, 85° | He waits under you: shield or jump at f55; punish his landing through f85 | Frantic, small and funny | Kobold, dirt spawn, candle flame |
+| Lady Vashj | air | **Gaze of Azshara** · Lady Vashj, the naga queen once Azshara's handmaiden (tier 2: her Warcraft III ultimate, Tornado, is dropped) | Eyes and head snakes glow, f1–20 | f21–60 a cone 600 ahead, widening to 300 tall, catches a foe facing her: 40% slow for 40 frames, then petrified 60 frames under a grey tint; it takes hits without thawing or flying, at most 26% | Turn away, dodge or stay out of the cone; punish her through f72 | The serpent queen's stare | Curse target effect, grey tint |
 | Archimonde | air | **Rain of Chaos** · Archimonde calling infernals down on Mount Hyjal (tier 2: Finger of Death is his neutral special) | Raises his arms; chaos circles mark the foe's position and 220 units either side, f1–40 | Three infernals crash on the marks in sequence: f42 and f50 for 8% each, f58 for 10%, all fire; nothing stays afterwards. Total 72 | Leave the circles, shield the crashes; punish him through f72 | The Defiler's rain of demons over the World Tree | Mark of Chaos target, Infernal birth |
 
 ## Implementation contract
@@ -165,8 +165,8 @@ Frames count from the input frame (frame 1 is the first frame after it).
   the move's last active frame; the summoned Infernal stays until it breaks, its
   300 frames end or its owner loses the stock.
 - An airborne caster holds until the move's first threat, or until
-  `airHoldFrames` where the move sets it (Chen). Tinker's robot and the
-  Kobold's dust are `dropsToFloor` too; past a ledge a `needsFloorBelow`
+  `airHoldFrames` where the move sets it (Chen). Tinker's robot is
+  `dropsToFloor` too; past a ledge a `needsFloorBelow`
   move's projectile takes the floor under its caster, as a standing cast's
   does. A `Relocation.floorBelow` motion sets an airborne caster down on the
   floor beneath him, grounded on that surface at once. A `needsFloorBelow`

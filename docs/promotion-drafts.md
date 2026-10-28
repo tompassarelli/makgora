@@ -62,7 +62,7 @@ Use native 1080p60 Expert computer-vs-computer footage in Classic. Keep the matc
 | --- | --- | --- |
 | 0–5 s | Wide stage view, then two fighters enter | Smashcraft 0.1.0 |
 | 5–17 s | Three short exchanges on different stages | A Warcraft III platform fighter |
-| 17–29 s | Grom, Anub'arak, Malfurion, Medivh and Kobold in action | 26 fighters |
+| 17–29 s | Grom, Anub'arak, Malfurion and Medivh in action | 26 fighters |
 | 29–43 s | Two EX moves, a shield exchange and a recovery | None |
 | 43–55 s | Classic gameplay on two more stages | Classic graphics |
 | 55–67 s | Two readable KOs, one close finish | None |

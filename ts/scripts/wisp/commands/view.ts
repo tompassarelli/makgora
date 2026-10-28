@@ -35,7 +35,6 @@ import { DRAWN_STRIDES } from "../../../src/game/presentation/drawnStrideInfo";
 import { DRAWN_MOTION } from "../drawnMotionInfo";
 import { MOTION_STATES, drawnStrideSource, measureDrawnMotion, measureDrawnStride, type DrawnStride, type DrawnMotionRow } from "../drawnMotion";
 import { AttackPhase, AttackStyle, Character } from "../../../src/game/sim/codes";
-import { KOBOLD_BARE_CLIPS } from "../../../src/game/fighters/kobold/clips";
 import { AUTHORED_SAMPLE_STYLES } from "../../../src/game/sim/hurtboxes";
 import { CUE_FRAMES, type CueMeasurement, cueMoves, measureCueMoves } from "../cueBudget";
 
@@ -318,13 +317,7 @@ const motion = (args: readonly string[]) => Effect.gen(function*() {
         const hash = new Bun.CryptoHasher("sha256").update(new Uint8Array(bytes)).digest("hex");
         const model = heroLook(character)?.model ?? `war3mapImported\\${relative.split("/").at(-1)?.replace(/\.mdx$/, "")}-${hash}.mdx`;
         const drawn = new DrawnModel(bytes, characterModelScale(character));
-        for (const state of ["walk", "run"] as const) {
-          const stride = measureDrawnStride(bytes, drawn, character, state, model);
-          if (character === Character.kobold) {
-            const bare = measureDrawnStride(bytes, drawn, character, state, model, KOBOLD_BARE_CLIPS[state]);
-            strides.push({ ...stride, alternates: { [bare.clip]: bare.speed } });
-          } else strides.push(stride);
-        }
+        for (const state of ["walk", "run"] as const) strides.push(measureDrawnStride(bytes, drawn, character, state, model));
         models.push({ character, drawn, model });
       }
       const stridePath = join(import.meta.dir, "../../../src/game/presentation/drawnStrideInfo.ts");

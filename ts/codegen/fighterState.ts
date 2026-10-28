@@ -193,7 +193,6 @@ const FIELD_GUARDS: Readonly<Partial<Record<Guard, (value: string) => string>>> 
 };
 
 const GROUP_GUARDS: Readonly<Partial<Record<Guard, () => string>>> = {
-  kobold: () => `fighter.character === ${use("Character", "sim/codes")}.kobold`,
   specials: () => "tuning.specials !== undefined",
   beamPair: () => "special.beamX !== 0 || special.beamZ !== 0 || 1 / special.beamX < 0 || 1 / special.beamZ < 0",
   buff: () => "status.buff !== 0 || status.buffFrames !== 0",

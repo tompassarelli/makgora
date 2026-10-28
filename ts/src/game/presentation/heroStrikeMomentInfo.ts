@@ -11,7 +11,7 @@ import { forsakenPaladinStrikeMoments } from "../fighters/forsaken-paladin/strik
 import { gromStrikeMoments } from "../fighters/grom/strikeMoments";
 import { jainaStrikeMoments } from "../fighters/jaina/strikeMoments";
 import { kaelthasStrikeMoments } from "../fighters/kaelthas/strikeMoments";
-import { koboldStrikeMoments } from "../fighters/kobold/strikeMoments";
+import { ladyVashjStrikeMoments } from "../fighters/lady-vashj/strikeMoments";
 import { lichStrikeMoments } from "../fighters/lich/strikeMoments";
 import { lichKingStrikeMoments } from "../fighters/lich-king/strikeMoments";
 import { malfurionStrikeMoments } from "../fighters/malfurion/strikeMoments";
@@ -42,7 +42,7 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.grom]: gromStrikeMoments,
   [Character.jaina]: jainaStrikeMoments,
   [Character.kaelthas]: kaelthasStrikeMoments,
-  [Character.kobold]: koboldStrikeMoments,
+  [Character.ladyVashj]: ladyVashjStrikeMoments,
   [Character.lich]: lichStrikeMoments,
   [Character.lichKing]: lichKingStrikeMoments,
   [Character.malfurion]: malfurionStrikeMoments,

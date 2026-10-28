@@ -152,7 +152,7 @@ test("Every fighter standing under the orb reaches it, the shortest and tallest 
     if (top(character) < top(shortest)) shortest = character;
     if (top(character) > top(tallest)) tallest = character;
   }
-  assertEquals(shortest, Character.kobold);
+  assertEquals(shortest, Character.murloc);
   assertEquals(tallest, Character.demonHunter);
   for (const stage of STAGE_CATALOG.map(info => info.id)) {
     for (const character of SELECTABLE_CHARACTERS) {

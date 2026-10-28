@@ -256,10 +256,6 @@ invulnerability; **other move** = a different move, not an upgrade.
 | Grom | Gorehowl Rush | +25% damage and travel | Fail: two | Shield-safe |
 | Grom | Blood Leap | Travel | Pass | Unchanged |
 | Grom | Mannoroth's Bane | +25% damage | Fail: damage | Reach: a 25% longer chop |
-| Kobold | Wick Flick | +25% damage | Fail: damage | Range: the flame flies 25% longer at every candle level |
-| Kobold | Panic Dig | +25% damage | Fail: damage | Shield-safe at every candle level |
-| Kobold | Candle Escape | Travel | Pass | Unchanged |
-| Kobold | Mine! | Reach | Pass | Unchanged |
 | Malfurion | Entangling Roots | +25% damage and reach | Fail: two | Reach: 25% wider roots |
 | Malfurion | Stag Charge | +25% damage and travel | Fail: two | Shield-safe |
 | Malfurion | Dream Ascent | Travel | Pass | Unchanged |
@@ -277,9 +273,6 @@ Ground, air, marked and recall forms use their matching upgrade. A
 follow-up keeps the EX cast's upgrade and never buys a second EX. Authored EX
 data is immutable; the existing replayed `special.ex` selects it. Projectiles
 and placed objects retain the selected authored data after the cast ends.
-Kobold's EX is built on every candle level's form, so EX and the candle
-level stack: the level is chosen first, then EX upgrades that form
-([roster.md](roster.md#candle)).
 The native models, sounds and animations remain the move's existing ones;
 there are no new imports.
 

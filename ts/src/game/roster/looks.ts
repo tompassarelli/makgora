@@ -17,7 +17,7 @@ import { forsakenPaladinLook } from "../fighters/forsaken-paladin/look";
 import { gromLook } from "../fighters/grom/look";
 import { jainaLook } from "../fighters/jaina/look";
 import { kaelthasLook } from "../fighters/kaelthas/look";
-import { koboldLook } from "../fighters/kobold/look";
+import { ladyVashjLook } from "../fighters/lady-vashj/look";
 import { lichLook } from "../fighters/lich/look";
 import { lichKingLook } from "../fighters/lich-king/look";
 import { malfurionLook } from "../fighters/malfurion/look";
@@ -44,7 +44,7 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
   [Character.grom]: gromLook,
   [Character.jaina]: jainaLook,
   [Character.kaelthas]: kaelthasLook,
-  [Character.kobold]: koboldLook,
+  [Character.ladyVashj]: ladyVashjLook,
   [Character.lich]: lichLook(LICH_GROUND),
   [Character.lichKing]: lichKingLook,
   [Character.malfurion]: malfurionLook,

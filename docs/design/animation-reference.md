@@ -152,7 +152,6 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | Anub'arak | heave | An insect lord: carapace pitches up and claws splay; no humanoid flip. |
 | Malfurion | front flip | A druid's forward flip over his staff, antlers and robe sweeping. |
 | Medivh | cannonball | The raven shapeshifter: he tucks like a diving bird and rolls once forward. |
-| Kobold | back flip | Small and scrappy: a quick backward tumble, candle held high. |
 
 ## Warcraft III rig and sequence boundary
 

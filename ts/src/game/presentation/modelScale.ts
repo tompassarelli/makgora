@@ -39,7 +39,7 @@ export const STOCK_MODEL_SCALES: Readonly<Record<Character, { readonly unit: str
   [Character.peon]: { unit: "opeo", scale: 1.0 },
   [Character.tinker]: { unit: "Ntin", scale: 1.0 },
   [Character.kaelthas]: { unit: "Hblm", scale: 1.0 },
-  [Character.kobold]: { unit: "nkob", scale: 1.0 },
+  [Character.ladyVashj]: { unit: "Hvsh", scale: 1.0 },
   [Character.medivh]: { unit: "nmed", scale: 1.0 },
   [Character.archimonde]: { unit: "Uwar", scale: f32(1.45) },
   [Character.murloc]: { unit: "nmrl", scale: 1.0 },

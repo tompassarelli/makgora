@@ -216,21 +216,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   level at chest height with the foot flexed so the heel leads, then spins once through the follow-through back to his
   stance. Re-keying a smash also writes its charge pose (the baked charge frame) and its release clip (the baked frames
   from the charge frame on), so a charged smash plays the same motion.
-  Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
-  recovery, throw and nine pain gestures and refresh only his clip/stride rows.
-  `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then
-  re-authors Kobold's ground normals, smash charge and crouch in place on that
-  model (hero-models/kobold.mdx) with per-move strike beats: prep, contact with
-  the pick head on the hit region's far end, follow-through past it, and a
-  settle into the idle pose; it adds a root step, lean and rise, grounds the
-  body every frame and keeps the candle upright. Every other sequence stays
-  byte-identical, and Murloc's generator output does not change.
-  `--only=ultimate` appends his ultimate's own burrow clip (#404): a pick chop
-  into the floor, a dig with only the pick and candle above the dirt, a coil and
-  a burst up through the hit, independent of Panic Dig's sequences.
-  Every clip it authors ends with a pick-clearance pass, and
   `bun tools/animations/weapon-clear.ts SHIPPED.mdx FIGHTER PRIVATE_OUTPUT SEQUENCE...`
-  runs the same pass on named clips of any shipped model with a held weapon: on each
+  runs a weapon-clearance pass on named clips of any shipped model with a held weapon: on each
   run of 60 Hz frames where the weapon comes within 2 units of the grip audit's limb
   capsules (smashcraft:tools/animations/limb-capsules.ts), it keys the smallest hand
   turn that clears them, eased in and out over 4 frames, and leaves every other clip

@@ -61,7 +61,7 @@ export class FrostEffects {
     } else {
       parkOnce(frost.trap, this.origin, parked, 2 * slot);
     }
-    if (fighter.status.frozenFrames > 0 && !out) {
+    if (fighter.status.frozenFrames > 0 && !fighter.status.petrified && !out) {
       parked[2 * slot + 1] = false;
       placeEffect(frost.ice, x + fighter.motion.x, y, z + fighter.motion.z);
       BlzSetSpecialEffectScale(frost.ice, 1.0);

@@ -8,8 +8,8 @@ export function exSpecialPressed(input: Readonly<Controls>): boolean {
   return input.specialPressed && input.exPressed;
 }
 
-export function enterExSpecial(f: Fighter, input: Readonly<Controls>): void {
-  f.special.ex = exSpecialPressed(input) && exCharged(f);
+export function enterExSpecial(f: Fighter, input: Readonly<Controls>, upgradable = true): void {
+  f.special.ex = upgradable && !f.status.manaShield && exSpecialPressed(input) && exCharged(f);
   if (f.special.ex) spendEx(f);
 }
 

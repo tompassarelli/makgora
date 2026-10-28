@@ -7,7 +7,7 @@ export const teamResultsCheck = (pass: readonly Rule[]): NativeCheck => ({
       setup: [
         { chat: "-dev reset" }, { chat: "-dev slots 0 15" }, { chat: "-dev teams on" },
         { chat: "-dev team 1 0" }, { chat: "-dev team 2 0" }, { chat: "-dev team 3 1" }, { chat: "-dev team 4 1" },
-        { chat: "-dev fighter 1 Kobold" }, { chat: "-dev fighter 2 Kobold" },
+        { chat: "-dev fighter 1 Murloc" }, { chat: "-dev fighter 2 Murloc" },
         { chat: "-dev fighter 3 Rifleman" }, { chat: "-dev fighter 4 Rifleman" },
         { chat: "-dev auto-rematch off" }, { chat: "-dev setup quick;percent 1 999;percent 3 999" },
         { receipt: "^parts [0-9]+$", client: "a", seconds: 600 }, { waitMs: 2500 },

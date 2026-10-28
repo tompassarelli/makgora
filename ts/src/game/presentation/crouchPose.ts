@@ -3,7 +3,6 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { HeroClip } from "../sim/heroes/hero";
-import { koboldLocomotionClips } from "../fighters/kobold/locomotion";
 import * as dh from "./demonHunterAssetInfo";
 import { characterClips } from "./fighterClips";
 import { originalClip } from "../../generated/clips/fighterOriginalClipInfo";
@@ -18,7 +17,7 @@ const clipRate = (seconds: number, frames: number): number => f32(seconds / f32(
 
 export function crouchClip(f: Readonly<Fighter>): HeroClip | undefined {
   if (f.character === Character.demonHunter) return { index: dh.DEMON_HUNTER_CROUCH_INDEX, seconds: dh.DEMON_HUNTER_CROUCH_SECONDS };
-  return (koboldLocomotionClips(f.character, f.candle.state) ?? characterClips(f.character)).crouch;
+  return characterClips(f.character).crouch;
 }
 
 export const crouchLoops = (f: Readonly<Fighter>, clip: Readonly<HeroClip>): boolean => originalClip(f.character, clip.index)?.looping === true;

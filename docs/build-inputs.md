@@ -26,8 +26,8 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   one pin per fighter slug and one for `shared`, and each shard is stored like a
   family under store/FAMILY/HASH/. `bun wisp inputs add` splits the folder by owner
   (smashcraft:ts/scripts/wisp/inputShards.ts): a fighter's source model, every file
-  named after the fighter (`KoboldTimelineBody-…`, `original-clips-evidence/Kobold.json`,
-  `white-flash-imports/Kobold.txt`) and every texture its white list names; the rest is
+  named after the fighter (`MurlocTimelineBody-…`, `original-clips-evidence/Murloc.json`,
+  `white-flash-imports/Murloc.txt`) and every texture its white list names; the rest is
   `shared`. The clip pool keeps one evidence record per fighter and impact-assets one
   white import list per fighter, so no file holds two fighters' data. A staged
   folder is a copy of the whole family, so a stale copy of another fighter's file

@@ -14,6 +14,7 @@ import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hit
 import type { SpecialProjectile } from "./specials/schema";
 import { agesWithMove } from "./specials/engine";
 import { repelSpell } from "./specials/spellImmunity";
+import { bounceAfterHit, clearBounce, steerBounce } from "./projectileBounce";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -63,6 +64,7 @@ export function spawnProjectileMotion(owner: Fighter, kind: ProjectileKind, velo
     projectile.damageMultiplier = damageMultiplier;
     projectile.newlyReflected = false;
     projectile.exReach = false;
+    clearBounce(projectile);
     projectile.surface = undefined;
     projectile.x = f32(owner.motion.x + f32(direction * BLASTER_PROJECTILE_SPAWN_OFFSET));
     projectile.z = f32(owner.motion.z + height);
@@ -203,6 +205,7 @@ function reflectProjectile(target: Fighter, source: Projectile): boolean {
     reflected.poolHits = 0;
     reflected.poolWait = 0;
     reflected.surface = undefined;
+    clearBounce(reflected);
     source.life = 0;
     target.visuals.shieldReflect++;
     target.visuals.shieldElectric = false;
@@ -337,6 +340,7 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
   const spec = projectile.spec;
 
   if (spec?.returns !== undefined && projectile.damageMultiplier === 1.0 && spec.life - projectile.life >= spec.returns.age && !returnToOwner(fighterAt(world, ownerSlot), projectile, spec.returns.speed)) return undefined;
+  if (steerBounce(world, ownerSlot, projectile)) return undefined;
   const oldX = projectile.x;
   const oldZ = projectile.z;
   if (spec?.homing !== undefined) homeProjectile(world, ownerSlot, projectile, spec.homing.turn, spec.homing.maxRise);
@@ -364,6 +368,7 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
     const body = hurtCapsule(target.character);
     const targetX = at(targets.x, targetSlot);
     const targetZ = at(targets.z, targetSlot);
+    if (spec.bounce !== undefined && targetSlot === projectile.lastStruck) continue;
 
     if (spec.pool !== undefined && !target.motion.grounded) continue;
     const reach = f32(radius + body.radius);
@@ -483,10 +488,12 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
         projectile.poolWait = burn.every - 1;
       } else if (nearest !== undefined) {
         const burst = projectile.kind === ProjectileKind.hero ? projectile.spec?.burstInto : undefined;
+        let bounced = false;
         if (!(selected.reflector && reflectProjectile(fighterAt(world, nearest), projectile))) {
           if (burst !== undefined) projectile.spec = burst;
           applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
           if (projectile.spec?.steered === true && projectile.damageMultiplier === 1.0) fighterAt(world, ownerSlot).special.hit = true;
+          bounced = !selected.shield && bounceAfterHit(world, ownerSlot, projectile, nearest);
           if (burst !== undefined) {
             projectile.velocityX = 0.0;
             projectile.velocityZ = 0.0;
@@ -494,7 +501,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
           }
         }
         projectile.life--;
-        if (burst === undefined || projectile.spec !== burst) projectile.life = 0;
+        if (!bounced && (burst === undefined || projectile.spec !== burst)) projectile.life = 0;
       }
       if (projectile.life <= 0) {
         projectile.life = 0;

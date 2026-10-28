@@ -53,7 +53,7 @@ left so the weapon hand and near pauldron sit behind it. The face's heading
 comes from the bind pose's
 level head-bone-to-nose (else eyes, else the head mesh's forward-most tenth)
 direction turned by the bone carrying most of the head mesh. Bodies whose head
-mesh has under 50 vertices (Murloc, Kobold and Peon) face the camera as their body does. Only the yaw
+mesh has under 50 vertices (Murloc and Peon) face the camera as their body does. Only the yaw
 turns: tilting a body to level a bowed face lays the whole card render over.
 The camera looks level through a narrow lens fitted to the silhouette, so the
 face is seen from within 4 degrees of its own height. Where that still hides
@@ -89,7 +89,7 @@ It writes `PRIVATE_OUTPUT/fighter-renders/`; store that folder with
 `bun wisp inputs add fighter-renders`. The map build imports each portrait at
 its path. The renders are proprietary derived art and stay outside the repository.
 
-Murloc and Kobold keep the 3.0 stock models, which hang the old mesh
+Murloc keeps the 3.0 stock model, which hangs the old mesh
 bones, every pivot collapsed to one point, under a second `Bone_*` rig. Posed
 through that rig, war3-model's evaluator (Wisp's renderer and the earlier
 Blender importer alike) scatters the mesh into texture noise, so their

@@ -444,25 +444,6 @@
     "reason": "Hit capsules of 8 to 24 game units against a 136-unit shield, 0.06 to 0.18 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
   },
   {
-    "fighter": "kobold",
-    "moves": [
-      "jab",
-      "forward tilt",
-      "up tilt",
-      "down tilt",
-      "dash attack",
-      "forward smash",
-      "up smash",
-      "down smash",
-      "forward air",
-      "back air",
-      "up air",
-      "down air"
-    ],
-    "issue": "#320",
-    "reason": "Hit capsules of 8 to 16 game units against a 71-unit shield, 0.11 to 0.23 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
-  },
-  {
     "fighter": "malfurion-stormrage",
     "moves": [
       "jab",
@@ -521,5 +502,25 @@
     ],
     "issue": "#320",
     "reason": "Hit capsules of 15 to 30 game units against a 148-unit shield, 0.10 to 0.20 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
+  },
+  {
+    "fighter": "lady-vashj",
+    "moves": [
+      "jab",
+      "forward tilt",
+      "up tilt",
+      "down tilt",
+      "dash attack",
+      "forward smash",
+      "up smash",
+      "down smash",
+      "neutral air",
+      "forward air",
+      "back air",
+      "up air",
+      "down air"
+    ],
+    "issue": "#663",
+    "reason": "Hit capsules of 11 to 24 game units against a 124-unit shield, 0.09 to 0.19 of it, below Melee's lower quartile: the move is a capsule swept along the bow limb, tail or head snakes, thinner than Melee's spheres, as for every other fighter. Recorded when she took character code 28 (2026-10-28); a resize or Tom's reason replaces this entry."
   }
 ]

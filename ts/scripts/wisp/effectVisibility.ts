@@ -24,7 +24,6 @@ import { CLASSIC_BUILDS } from "./classicBuilds";
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 import { STOCK_MODELS } from "../../src/game/render/effects";
-import { CANDLE_FLAME_MODELS, CANDLE_FLAME_SCALES, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
 import { headlessRender } from "./headlessRender";
@@ -259,7 +258,7 @@ export function effectUses(): EffectUse[] {
     const named = new Set(fighterMoveCues(character).flatMap((move) => [move.startup, move.active]));
     for (const [index, cue] of fighterCueList(character).entries()) if (!named.has(cue) && cue.drawn !== true) {
       const branch = fighterBranchCues(character).find((move) => move.startup === cue || move.active === cue);
-      const form = character === Character.dreadlord ? "Healing bite" : character === Character.kaelthas ? "Phoenix" : character === Character.kobold ? "Burrow trail" : `form cue ${index}`;
+      const form = character === Character.dreadlord ? "Healing bite" : character === Character.kaelthas ? "Phoenix" : `form cue ${index}`;
       uses.push(cueUse(fighter, `${branch?.spell ?? form} ${branch?.startup === cue ? "startup" : "active"}`, "special cue", cue));
     }
     for (const entries of Object.values(ATTACK_CUES[character] ?? {})) for (const entry of entries) uses.push(cueUse(fighter, entry.name, "attack cue", entry.cue));
@@ -301,8 +300,6 @@ export function effectUses(): EffectUse[] {
   uses.push(supplemental(fighterSlug(Character.pitLord), "Doom curse", STOCK_MODELS.curseTarget, "specialEffects producer playback requires an observed frame trace"));
   for (const [move, model] of [["raised skeleton", "Units\\Undead\\Skeleton\\Skeleton.mdx"], ["raised burst", "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx"], ["Defile boundary", IMPACT_DEFILE_MODEL], ["Defile frost", "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx"]] as const) uses.push(supplemental(fighterSlug(Character.lichKing), move, model, "projectilePresentation supplemental playback is unmodeled"));
   uses.push(supplemental(fighterSlug(Character.lich), "Death and Decay ground", IMPACT_DEFILE_MODEL, "projectilePresentation supplemental playback is unmodeled"));
-  for (const model of CANDLE_FLAME_MODELS) for (const [level, levelScale] of CANDLE_FLAME_SCALES.entries()) for (const anchor of ["head", "loose"]) uses.push({ fighter: fighterSlug(Character.kobold), move: `candle ${anchor} level ${level}`, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: anchor === "loose", anchored: anchor === "loose" ? "projectile" : "fighter", anchor, scale: levelScale * characterModelScale(Character.kobold) });
-  uses.push({ fighter: fighterSlug(Character.kobold), move: "candle snuffed", kind: "presentation effect", model: CANDLE_SMOKE.model, sequence: undefined, seconds: 0, timeScale: 1, travels: true, anchored: "projectile", anchor: "loose", scale: CANDLE_SMOKE.scale * characterModelScale(Character.kobold) });
   const seen = new Set<string>();
   return uses.filter((use) => {
     const key = JSON.stringify(use);

@@ -5,7 +5,7 @@ import { withExKit } from "../../sim/exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
-import { type AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../../sim/specials/schema";
 import { capsule, hit } from "./moves";
 import { VALKYR_MODEL } from "../../assets/importedModelInfo";

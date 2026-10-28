@@ -22,9 +22,9 @@ import { CHEN_HERO } from "../fighters/chen/kit";
 import { PEON_HERO } from "../fighters/peon/kit";
 import { TINKER_HERO } from "../fighters/tinker/kit";
 import { KAELTHAS_HERO } from "../fighters/kaelthas/kit";
-import { KOBOLD_HERO } from "../fighters/kobold/kit";
 import { MEDIVH_HERO } from "../fighters/medivh/kit";
 import { ARCHIMONDE_HERO } from "../fighters/archimonde/kit";
+import { LADY_VASHJ_HERO } from "../fighters/lady-vashj/kit";
 import { MURLOC_HERO } from "../fighters/murloc/kit";
 import { MALFURION_HERO } from "../fighters/malfurion/kit";
 import { GROM_HERO } from "../fighters/grom/kit";
@@ -33,7 +33,7 @@ import { ANUBARAK_HERO } from "../fighters/anubarak/kit";
 
 export const HERO_ROSTER: readonly HeroDefinition[] = [
   BLADEMASTER_HERO, MOUNTAIN_KING_HERO, WARDEN_HERO, LICH_HERO, FORSAKEN_PALADIN_HERO, DREADLORD_HERO, SHADOW_HUNTER_HERO, PIT_LORD_HERO, BEASTMASTER_HERO, LICH_KING_HERO, THRALL_HERO, JAINA_HERO, SYLVANAS_HERO,
-  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, KOBOLD_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO, ARCHIMONDE_HERO,
+  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO, LADY_VASHJ_HERO, ARCHIMONDE_HERO,
 ];
 
 const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined } = {
@@ -59,7 +59,7 @@ const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined }
   [Character.medivh]: MEDIVH_HERO,
   [Character.archimonde]: ARCHIMONDE_HERO,
   [Character.murloc]: MURLOC_HERO,
-  [Character.kobold]: KOBOLD_HERO,
+  [Character.ladyVashj]: LADY_VASHJ_HERO,
   [Character.grom]: GROM_HERO,
   [Character.malfurion]: MALFURION_HERO,
 };

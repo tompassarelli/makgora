@@ -4,7 +4,7 @@
 
 export const Character = { rifleman: 1, demonHunter: 2,
   blademaster: 3, mountainKing: 4, warden: 5, lich: 6, forsakenPaladin: 7, dreadlord: 8, shadowHunter: 9,
-  pitLord: 10, beastmaster: 11, lichKing: 12, thrall: 13, jaina: 14, sylvanas: 15, cairne: 16, chen: 17, peon: 18, tinker: 19, kaelthas: 20, murloc: 21, grom: 22, anubarak: 23, malfurion: 24, medivh: 25, kobold: 26, archimonde: 29,
+  pitLord: 10, beastmaster: 11, lichKing: 12, thrall: 13, jaina: 14, sylvanas: 15, cairne: 16, chen: 17, peon: 18, tinker: 19, kaelthas: 20, murloc: 21, grom: 22, anubarak: 23, malfurion: 24, medivh: 25, ladyVashj: 28, archimonde: 29,
 } as const;
 export type Character = (typeof Character)[keyof typeof Character];
 
@@ -36,8 +36,6 @@ export const DownState = {
 export type DownState = (typeof DownState)[keyof typeof DownState];
 
 
-export const CandleState = { held: 0, airborne: 1, resting: 2, lost: 3 } as const;
-export type CandleState = (typeof CandleState)[keyof typeof CandleState];
 
 
 export const SurfaceContact = { none: 0, wall: 1, ceiling: 2, techWall: 3, techCeiling: 4 } as const;

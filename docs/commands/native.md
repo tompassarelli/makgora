@@ -243,12 +243,9 @@ native-driver builds. Player builds refuse it. Slots are 1–4; teams are 0–3.
 `-dev percent SLOT N` sets an active fighter to a whole percent from 0–999;
 `-dev lives SLOT N` sets its remaining stocks to 1–99;
 `-dev beside SLOT OTHER` moves it onto another active fighter's position.
-`-dev candle SLOT LEVEL` sets Kobold's held candle to level 0–3 (with heat
-headroom for a one-second capture); `-dev candle SLOT drop` starts the ordinary
-loose-candle simulation, including kick, snuff, pickup and timed relight.
 These fighter commands require a running match. To apply them before frame 1,
 use one chat event such as
-`-dev setup quick hero kobold;percent 1 150;candle 1 3`.
+`-dev setup quick hero murloc;percent 1 150;lives 1 3`.
 The setup command runs up to 32 non-nested commands in order.
 `-dev teams on` enables Team Battle at character select; `-dev team SLOT T`
 assigns the actor's fighter or a computer to a team through the lobby rules.

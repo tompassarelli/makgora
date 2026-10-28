@@ -164,13 +164,14 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     weapon: Weapon.blunt, strong: "ManaFlareMissile",
     specials: [s("SorceressMissileLaunch", "SorceressMissileHit"), s("BlinkCaster", "BlinkTarget"), s("DruidOfTheTalonMorph", "DruidOfTheTalonMissileHit"), s("SorceressMissileLaunch", "ManaFlareMissile")],
   },
+  [Character.ladyVashj]: {
+    weapon: Weapon.blunt, strong: "CrushingWaveDamage",
+    specials: [s("FrostArrowLaunch", "FrostArrowHit"), s("CrushingWave", "CrushingWaveDamage"), s("CrushingWave", "CrushingWaveDamage"), s("ManaShieldCastSound", "FrostArmor")],
+    ultimate: s("Curse", "StoneFormMorphAlternate"),
+  },
   [Character.archimonde]: {
     weapon: Weapon.claw, strong: "MetalHeavyBashFlesh",
     specials: [s("ManaFlareMissile", "LightningBolt"), s("FlameStrike", "RainOfFireWave"), s("FireballLaunch", "Fireball"), s("ThunderClap", "RockHeavyBashFlesh")],
-  },
-  [Character.kobold]: {
-    weapon: Weapon.axe, strong: "MetalHeavyChopMetal",
-    specials: [s("SearingArrowLaunch", "SearingArrowHit"), s("Burrow", "MetalLightChopFlesh"), s("FireballLaunch", "WoodLightBashFlesh"), s("AxeMediumChopWood", "GoblinLandMineDeath")],
   },
 };
 

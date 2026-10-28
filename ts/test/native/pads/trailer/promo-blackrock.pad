@@ -1,4 +1,4 @@
-#! chat -dev quick promo stage 12 pair mountain king / kobold
+#! chat -dev quick promo stage 12 pair mountain king / lady vashj
 #! expect b 1524 ledge 1
 #! expect b 1569 ledge 0
 #! expect b 1577 damage 128

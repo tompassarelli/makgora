@@ -20,7 +20,6 @@ pair	goblin-tinker vs rifleman	instructions=239800	alloc-kb=31.9
 pair	kael'thas-sunstrider vs rifleman	instructions=230500	alloc-kb=25.9
 pair	murloc vs rifleman	instructions=225700	alloc-kb=26.3
 pair	grom-hellscream vs rifleman	instructions=228100	alloc-kb=24.9
-pair	kobold vs rifleman	instructions=227400	alloc-kb=48.4
 pair	malfurion-stormrage vs rifleman	instructions=182700	alloc-kb=43.2
 pair	medivh vs rifleman	instructions=222200	alloc-kb=48.6
 pair	anub'arak vs rifleman	instructions=204600	alloc-kb=30.4

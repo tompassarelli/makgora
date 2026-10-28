@@ -13,6 +13,7 @@ import { type AttackBuffer, clearAttackBuffer } from "../input/attackBuffer";
 import { type Controls, copyControls, neutralControls } from "./roster";
 import { cancelAttack, cancelSpecialState } from "./transitions";
 import { HERO_STATUS_GROUPS, HeroStatusKind, type HeroStatusGroup, SpecialAction } from "./codes";
+import type { AppliedStatus } from "./appliedStatus";
 import { capPercent } from "./percent";
 
 
@@ -69,30 +70,6 @@ const RULES: { readonly [kind: number]: StatusRules | undefined } = {
   [HeroStatusKind.carried]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 20, carry: { speed: 3.0, rise: 0.5 } },
 };
 
-
-
-export interface AppliedStatus {
-  readonly kind: HeroStatusKind;
-  readonly frames: number;
-  readonly group: HeroStatusGroup;
-
-  readonly immunityFrames: number;
-
-  readonly tick?: { readonly every: number; readonly damage: number } | undefined;
-
-  readonly soak?: { readonly level: number; readonly slow: AppliedStatus } | undefined;
-  readonly ignite?: { readonly damage: readonly number[]; readonly frames: readonly number[]; readonly every: number; readonly tick: number } | undefined;
-
-  readonly perPercent?: { readonly frames: number; readonly cap: number } | undefined;
-
-  readonly groundedOnly?: true | undefined;
-
-  readonly stacks?: { readonly cap: number } | undefined;
-
-
-
-
-}
 
 function refuses(f: Readonly<Fighter>, status: Readonly<AppliedStatus>): boolean {
   return (f.status.conditionImmunity[status.group] ?? 0) > 0 || (status.groundedOnly === true && !f.motion.grounded);

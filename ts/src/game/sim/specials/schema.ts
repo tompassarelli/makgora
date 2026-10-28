@@ -2,8 +2,9 @@ import { idiv, imod } from "wisp/src/sim/intMath";
 import { f32 } from "wisp/src/sim/f32";
 import type { MoveRegion, StrikeCapsule } from "../heroMoves";
 import type { HitEffect } from "../hitRegions";
-import type { AppliedStatus } from "../heroStatus";
+import type { AppliedStatus } from "../appliedStatus";
 import type { HurtPose } from "../hurtboxes";
+import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volleys";
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
 export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
@@ -16,7 +17,7 @@ export const FOLLOW_UP_FORM = 6;
 export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4, guard: 5, release: 6 } as const;
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
-export const Relocation = { placed: 1, floorBelow: 3, behindLocked: 4 } as const;
+export const Relocation = { placed: 1, behindLocked: 4 } as const;
 export type Relocation = (typeof Relocation)[keyof typeof Relocation];
 
 export interface FrameWindow {
@@ -162,6 +163,8 @@ export interface SpecialProjectile {
   readonly burstInto?: SpecialProjectile | undefined;
   readonly burn?: { readonly every: number } | undefined;
   readonly steered?: true | undefined;
+  readonly fan?: readonly ProjectileVelocity[] | undefined;
+  readonly bounce?: ProjectileBounce | undefined;
 }
 
 export interface SpecialBeam {
@@ -381,6 +384,8 @@ export interface AuthoredSpecial {
   readonly charge?: SpecialCharge | undefined;
 
   readonly spendsCharge?: true | undefined;
+  readonly manaShield?: { readonly frame: number } | undefined;
+  readonly gaze?: SpecialGaze | undefined;
   /** Its hits pop a red critical-strike number of the damage dealt over the struck fighter. */
   readonly critical?: true | undefined;
 }

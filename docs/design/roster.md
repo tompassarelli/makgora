@@ -1,8 +1,8 @@
 # Smashcraft roster
 
-> **Frozen (26 October 2026):** Kobold and Forsaken Paladin are frozen pending replacement. No issue, audit, design change or worker task is opened for either until Tom permits it; `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, lists them. Their replacements, Uther and Lady Vashj, are planned with Archimonde, Tyrande, the Butcher and a dismounted Thrall in [roster-next.md](roster-next.md) (28 October 2026).
+> **Frozen (26 October 2026):** Forsaken Paladin is frozen pending replacement. No issue, audit, design change or worker task is opened for him until Tom permits it; `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, lists him. The planned additions, Uther (his replacement) and Lady Vashj, come with Archimonde, Tyrande, the Butcher and a dismounted Thrall in [roster-next.md](roster-next.md) (28 October 2026).
 
-Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 26 fighters, Melee’s size, until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343), and [Kobold (#344)](https://github.com/tompassarelli/smashcraft/issues/344). No further additions are planned.
+Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 26 fighters, Melee’s size, until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343). No further additions are planned.
 
 We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.
 
@@ -113,163 +113,7 @@ Murloc ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),
 requested by Tom on 8 October 2026, is a small, light rushdown; his kit,
 body and gameplan are in [murloc.md](murloc.md).
 
-## Kobold — You no take candle! (#344)
-
-> Frozen pending replacement; no work until Tom permits it.
-
-A tiny, frantic candle-hoarder who wins scraps with a mining pick, then scurries
-away clutching his light. He is comedy through movement: anxious tiptoe runs,
-overcommitted digging and a panicked recovery. Unlike Peon's building setup or
-Murloc's sustained claw pressure, Kobold pokes, ducks underneath a reply and
-punishes a missed swing. His candle is his second resource: every hit he lands
-makes it burn brighter and his specials grow with it, and a strong hit knocks it
-out of his hands. Use the stock Kobold creep body, portrait, voice and fire/dirt
-effects.
-
-Body: weight 1.00, walk 8.64, run 12.402 and dash 10.755 world units/frame,
-air 0.918, width 0.78, height 0.66. That is about 10% slower than his first
-draft (run 13.78, dash 11.95, air 1.02); back throw lost a frame (33 total) so
-his dash grab still covers a medium-weight tech away. Short pick reach and low
-weight punish careless approaches; recovery rises for 20 frames at 16
-units/frame, then becomes helpless. The four ordinary specials cost zero;
-full-meter EX uses the shared rules from #335/#329 and stacks on the candle
-level.
-
-### Candle
-
-Constants live in ts/src/game/fighters/kobold/candle.ts.
-
-- Heat is a whole number from 0 to 300. Level is heat / 75, capped at 3:
-  level 0 is 0-74, level 1 is 75-149, level 2 is 150-224, level 3 is 225-300.
-- Gain: a hit he lands while holding the candle adds 8 heat per whole percent
-  of damage, at most 75. Normals, specials, projectiles and throws all count.
-  A solid hit (9% or more) lights one more level; a 2% jab adds a fifth of one.
-- Decay: while he holds it, heat drops 1 every third frame. That is 20 heat a
-  second, about 3.75 s per level and 15 s from full to empty. No grace period.
-- Heat is frozen while the candle is out of his hands, goes to 0 when it
-  relights in his hand, and goes to 0 when he loses a stock.
-- Drop: a hit whose knockback is 140 or more knocks a held candle out, unless
-  he picked it up or relit it in the last 180 frames. A hit his armor absorbs
-  never drops it. Throws count.
-- Pop: the candle starts 40 above him and flies toward stage centre at 2.5 a
-  frame, rising at 7. Gravity is 0.5 a frame and it falls at most 8 a frame.
-  It lands on the first surface it crosses and rides that surface if it moves.
-  Below the bottom blast line it is lost.
-- Pickup: he takes it back by touching it (within 30 units) once 20 frames
-  have passed since the drop, while not grabbed, frozen, in hitlag or in
-  hitstun. He keeps the heat it had. Picking it up starts the 180-frame guard.
-- Relight: after 300 frames (5 s) with nobody touching it, or 600 frames
-  (10 s) after the drop whatever happens, a fresh candle lights in his hand at
-  heat 0 with the 180-frame guard. A lost candle relights the same way.
-- Bare: while the candle is out, neutral special is "You No Take Candle!", a
-  panicked two-hit pick flail (frames 6-8 and 12-14, 3% each, 30 frames).
-  Panic Dig and Mine! use their level 0 form and heat cannot rise. Ground run
-  and dash speed scale by 1.1 (CANDLE_BARE_SPEED in sim/itemBuffs.ts), a
-  panicked scurry at his old speed. Air speed, walk and recovery do not
-  change.
-- Kick and snuff (designed, not yet in the game): a foe's normal, special or
-  projectile that strikes the dropped candle kicks it along the ground,
-  possibly off an edge. A down tilt, down smash, down aerial or down special
-  stamps it out instead: heat 0, it stays where it lies. Either one restarts
-  the 300-frame untouched timer; the 600-frame cap still holds. Teammates
-  never touch it.
-
-| Special | Level 0 | Level 1 | Level 2 | Level 3 |
-| --- | --- | --- | --- | --- |
-| Wick Flick (neutral) | 5% flame, radius 14, life 30: about 270 units of reach | life 36, radius 15: about 318 | life 40, radius 17, 6.2%: about 350 | life 44, radius 20, 7.5%: about 382, then leaves an ember (radius 22, 45 frames, 3% fire) where it ends or hits |
-| Panic Dig (side) | 11 units/frame on frames 8-22: 165 units, 10% | travel x1.1: 182 | travel x1.2: 198, armor on frames 8-22 against hits up to 6% | travel x1.3: 215, armor up to 10%, 12.4%; shield still stops it |
-| Mine! (down) | sweeps out to 64 a side, radius 14, 8.7% | reach x1.1 | reach x1.2 | reach x1.3: about 101 a side, 10.5% |
-| Candle Escape (up) | the same at every level and when bare | | | |
-
-Why these numbers. The curve and the drop threshold come from a measured
-probe: 12 one-minute Wren Expert matches of Kobold against six fighters,
-recording every hit he landed (0.34 hits a second, 3.2% dealt a second).
-
-- Curve. 8 heat per percent and 1 heat every third frame with no grace gave
-  32/24/25/19% of match time at levels 0/1/2/3, reaching level 3 about 3.3
-  times a minute: level 3 is a run of hits, not a resting state. A 90-frame
-  grace before decay made level 3 the normal state (40%). 6 per percent and 1
-  every second frame left him at level 0 84% of the time. The 75 cap per hit
-  keeps the rule easy to read: each solid hit lights one more flame.
-- 140 knockback. In the probe 2.25 hits a stock reached 140 and 1.25 of them
-  did not KO within 240 frames, so the candle really drops about once a stock.
-  At 80 (tumble) it would drop 7.4 times a stock; at 180 it dropped 0.94 times
-  and nearly every one KO'd him. On Kobold, 140 comes from a forward smash
-  from about 40%, an ordinary aerial from about 65%, a tilt from about 105%
-  and a charged smash almost at once. Jabs never reach it.
-- 180-frame guard. One strong hit costs one candle; a follow-up string cannot
-  knock it out again the moment he gets it back.
-- 300 untouched frames. Fetching the candle keeps its heat; waiting 5 s or
-  having it stamped out costs it. That is the choice for both players.
-- 600-frame cap. A foe who stalks the candle can stretch his bare time to 10 s
-  at most, and it costs them position. Tom chose the relight in his hand over
-  a candle that relights where it lies, which would leave his bare time
-  unbounded.
-- Up special never changes, so a bare Kobold knocked offstage is not punished
-  twice.
-
-| Action | Gesture and purpose | Startup / active / recovery; damage |
-| --- | --- | --- |
-| Jab 1 / 2 | Two nervous pick taps | 3 / 2 / 11; 2%, then 5 / 2 / 15; 4% |
-| Forward tilt (three angles) | Candle hand back, pick jabs out | 6 / 3 / 19; 8% |
-| Up tilt | Lift the pick over his precious candle; launcher | 5 / 4 / 18; 7% |
-| Down tilt | Scrape ankles with the pick; tech chase | 5 / 3 / 16; 6% |
-| Dash attack | Trip into a shoulder-and-pick shove | 7 / 5 / 26; 9% |
-| Forward / up / down smash | Big pick swing / overhead jab / two-sided scrape | 14 / 3 / 36; 16%, 11 / 4 / 34; 15%, 12 / 4 / 34; 13% |
-| Neutral / forward / back aerial | Panicky flail / pick jab / backwards kick | 5 / 6 / 20; 8%, 7 / 3 / 24; 10%, 8 / 3 / 24; 12% |
-| Up / down aerial | Lift the candle / dig straight down | 6 / 4 / 20; 9%, 12 / 3 / 28; 11% |
-| Get-up / ledge attack | Scramble and swing the pick | 17 / 3 / 30; 6%, 17 / 3 / 21; 6% |
-
-| Special | Ordinary move and counterplay | EX expression |
-| --- | --- | --- |
-| Neutral: Wick Flick | Flick a tiny flame on frame 12; 5%, 36 total frames. Jump or shield the short projectile; punish his recovery. The flame grows with the candle level. Bare, it is the "You No Take Candle!" flail. | The current level's flame flies 25% longer (mana.md, 2026-10-28). |
-| Side: Panic Dig | Ground-level 11-unit/frame scurry on frames 8–22; 10%, 32 total. In air, swing the pick forward. Shield stops the scurry. Travels farther with each level and gains armor from level 2. | Shield-safe on the current level's dig. |
-| Up: Candle Escape | Panic spring upward on frame 6, 16-unit/frame rise through 25; 5% on frames 6–14. One use per airtime; helpless after. Never changes with the candle. | 20-unit/frame rise and 25% farther steering; same 5% pick and helpless ending. |
-| Down: Mine! | Hunch over the candle, then sweep the pick across both ankles on frames 10–13; 8.7%, 34 total. Jump over or punish the whiff. Wider with each level. | 25% wider sweep on both sides of the current level's sweep. |
-
-Grab clutches the opponent's sleeve; one candle-headbutt pummel. Forward throw
-shoves them away (7%, frame 12/32 total); back throw yanks and tumbles backward
-(9%, 14/33); up throw panics and lifts them (6%, 12/26), starting a juggle;
-down throw trips them over the pick (5%, 16/38), starting a tech chase.
-Grabs use the universal envelope and mash escape; the follow-up is a read,
-with DI and tech available, rather than a guaranteed repeated throw.
-
-Play-style profile: scrappy ground skirmisher; approach 50% run / 35% jump /
-15% flame cover, aerial damage 25–35%, ranged damage 5–15%, special damage
-20–30%. Signature: Panic Dig into a spacing reset. Kill choices are committed
-pick smashes and back aerial; short range prevents safe long-range zoning.
-The first balance probe records actual shares and field win rate on #344.
-
-```balance-profile
-fighter: kobold
-archetype: skirmisher
-aerials: nair 10-35, fair 15-40, bair 15-40, uair 10-35, dair 0-20
-air-share: 25-35
-approach: 50-70
-ranged: 5-15
-specials: neutral 3-15, side 5-20, up 0-10, down 3-15
-signature: side-special 40
-```
-
-Path draft for Tom to correct (#358):
-
-```ceiling-plan
-fighter: kobold
-path: mixed
-basic-moves: forward-tilt,down-tilt,neutral-air
-```
-
-Basic gameplan: Use pick pokes and a neutral aerial. Keep one approach, use the listed moves, no read-based punishes or advanced kit sequences. Recovery keeps the normal up special.
-
-Expert gameplan: Mix candle control, mobility and fast pick conversions with recovery choices. Use the full authored kit and gameplan at the same CPU skill.
-
-
 Build order is a recommendation, not permission to delete or overwrite ongoing work. Finish or checkpoint the current synchronization milestone before integrating new gameplay into that branch. A first overnight pass should finish one or two complete heroes and reusable move primitives; it should not report all fifteen finished because character-select entries exist.
-
-### Signature strong/weak move (#389)
-
-Forward smash, split by position: strong hit sweetspot, frames 14-16, 16%; weak hit sourspot, frames 14-16, 11.2%. The candle's flame at the end of the pick: you no take candle.
-The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 ## Shared combat contract
 
@@ -2128,6 +1972,10 @@ ordinary move adds no counted damage, healing, status, meter effect or jump
 refund, and every declared trait fires on its special and matches the kit's
 data. Existing normal, special and command-grab checks continue to pin the
 kept actions in Bun and emitted Lua.
+
+## Lady Vashj (#663)
+
+**Identity:** an imperious serpent queen who lets her foes exhaust themselves against her. A zoner with meter as armour: Mana Shield spends EX charge before percent, cold arrows chill, and a bouncing water serpent steals charge back. Slow and wide up close. Kit, frame data, play-style profile and ceiling plan: [lady-vashj.md](lady-vashj.md).
 
 ## Medivh (#343)
 

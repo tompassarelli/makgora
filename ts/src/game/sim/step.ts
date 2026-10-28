@@ -105,6 +105,7 @@ import { advanceMash } from "./mash";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { aerialJumps, heavyFall, jumpBuffed, speedBuffed } from "./itemBuffs";
 import { mutableFreezeTrap } from "./fighterRest";
+import { advancePetrify } from "./gaze";
 
 const FAST_FALL_DOWN_THRESHOLD = 0.6625000238418579;
 /** the stick crosses this sideways to count as a fresh flick. */
@@ -147,6 +148,7 @@ function advanceOut(world: Roster, slot: number, respawnX: number): boolean {
 
 function advanceFreeze(f: Fighter, input: Readonly<Controls>): boolean {
   const { status } = f;
+  advancePetrify(f);
   const trap = f.freezeTrap;
   const wasFrozen = status.frozenFrames > 0;
   if (status.freezeImmunityFrames > 0) status.freezeImmunityFrames--;

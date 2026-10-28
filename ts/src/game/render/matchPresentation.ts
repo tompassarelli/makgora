@@ -74,7 +74,6 @@ export class MatchPresentation {
   readonly observation = createCueObservation();
   readonly tally = createMatchTally();
   private readonly cues: MatchCue[] = [];
-  private readonly cueSerials: number[] = [];
   private itemSounds = createItemSounds();
   private orbSounds = createOrbSounds();
   private readonly menu = createMenuObservation();
@@ -138,13 +137,13 @@ export class MatchPresentation {
     BlzFrameSetText(this.countdown, `${MENU_STYLE.gold}${text}|r`);
   }
 
-  cue(cue: MatchCue, serial = 0): void {
+  cue(cue: MatchCue): void {
     if (cue === MatchCue.hover) {
       StopSound(this.hoverSound, false, false);
       StartSound(this.hoverSound);
       return;
     }
-    this.playFile(cueSound(cue, serial));
+    this.playFile(cueSound(cue));
   }
 
 
@@ -209,7 +208,7 @@ export class MatchPresentation {
 
 
   presentConfirmed(game: Readonly<MatchState>, world: Readonly<Roster>): readonly MatchCue[] {
-    confirmedFrameCues(this.observation, game, world, this.tally, this.cues, this.cueSerials);
+    confirmedFrameCues(this.observation, game, world, this.tally, this.cues);
     const itemCues = confirmedItemCues(this.itemObservation, game.items, game.matchFrame);
     for (let index = 0; index < this.itemSounds.length; index++) {
       if ((itemCues & (1 << index)) === 0) continue;
@@ -227,7 +226,7 @@ export class MatchPresentation {
       SetSoundPosition(sound, this.origin.x + point.x, this.origin.y, this.origin.z + point.z);
       StartSound(sound);
     }
-    for (let index = 0; index < this.cues.length; index++) this.cue(at(this.cues, index), at(this.cueSerials, index));
+    for (let index = 0; index < this.cues.length; index++) this.cue(at(this.cues, index));
     return this.cues;
   }
 

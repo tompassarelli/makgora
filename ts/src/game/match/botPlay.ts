@@ -20,7 +20,6 @@ import { type FighterGameplan, GameplanThrow } from "../sim/gameplan";
 import { SPACE_PLAN, avoids, gameplanGoal, gameplanOf, gameplanPlan, gameplanThrow, jumpsIn, keptGap, onAnotherDeck, plansRanged, spacingAerialAt } from "./botGameplan";
 import { steerInAir, steerOnGround } from "./botFooting";
 import { chooseAttack, lastChoicePassedForVariety, smashChargeGoal } from "./botMoves";
-import { pressCandleContest } from "./botCandle";
 import { botChance, botChoice, useMatchSeed } from "./botRandom";
 import type { CpuTier } from "./cpuProfiles";
 import { type CpuSkill, cpuSkill, cpuReactionFloor, cpuReactionFrames, perceivedCpuSkill } from "./cpuSkill";
@@ -303,7 +302,6 @@ const negativeZero = (value: number): boolean => value === 0 && 1 / value < 0;
  * slot's identity and tier, training, the stage and its clock, the time
  * limit, the slot's own fighter, its perceived sample and committed
  * direction, its strategy, its attack delay and the orb it contests;
- * its candle play reads only its own fighter and that perceived sample;
  * a new read joins this list.
  * `fighterSame` says the slot's fighter is known to equal the earlier one.
  */
@@ -424,7 +422,6 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   if (skill.cornerPlay && skill.basicMoves === undefined && chooseLedgeTrap(fighter, target, stage, observationAge, input)) return;
   if (skill.basicMoves === undefined && pressBotRead(runtime.botStrategies[slot], fighter, target, stage, stageFrame, frame, input, commands)) return;
   if (skill.basicMoves === undefined && keepClearOfBurn(runtime.botStrategies[slot], burned, fighter, target, stage, frame, observationAge, stageFrame, input)) return;
-  if (pressCandleContest(game.training, game.stageChoice, fighter, target, slot, skill, frame, input, commands, approachPoint)) return;
   if (escapeCorner(fighter, target, stage, skill, slot, frame, input) || pressEdgeCancel(fighter, target, stage, skill, slot, frame, input, commands)) return;
   // A cornered opponent is pressed, never left to an idle stretch or a keep-away plan.
   const pressing = pressCorner(fighter, target, stage, skill);

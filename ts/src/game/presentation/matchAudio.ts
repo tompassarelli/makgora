@@ -2,7 +2,6 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
-import { floorMod } from "wisp/src/sim/intMath";
 import { IMPORTED_MENU_MUSIC, IMPORTED_STAGE_MUSIC } from "../assets/importedMusicInfo";
 import { IMPORTED_MURLOC_GURGLE } from "../assets/importedVoiceInfo";
 import { Character } from "../sim/codes";
@@ -11,7 +10,6 @@ import { type StageTile, selectableStage } from "../menu/stageCatalog";
 
 export const MatchCue = {
   three: 0, two: 1, one: 2, go: 3, game: 4, time: 5, stockLost: 6, lastStock: 7, hover: 8, confirm: 9, cheer: 10, meterReady: 11, itemSpawn: 12,
-  candleDrop: 13, candleSnuff: 14, candleReturn: 15, candleRelight: 16,
 } as const;
 export type MatchCue = (typeof MatchCue)[keyof typeof MatchCue];
 
@@ -19,41 +17,27 @@ export type MatchCue = (typeof MatchCue)[keyof typeof MatchCue];
 
 
 
-const KOBOLD_VOICE = ["Units\\Creeps\\Kobold\\", "Kobold", "What", "YesAttack"] as const;
-
-const koboldLines = (line: string, count: number): string[] =>
-  Array.from({ length: count }, (_, index) => `${KOBOLD_VOICE[0]}${KOBOLD_VOICE[1]}${line}${index + 1}.flac`);
-
-const CUE_SOUNDS: readonly (readonly string[])[] = [
-  ["Sound\\Interface\\BattleNetTick.flac"],
-  ["Sound\\Interface\\BattleNetTick.flac"],
-  ["Sound\\Interface\\BattleNetTick.flac"],
-  ["Sound\\Interface\\BattleNetTick.flac"],
-  ["Sound\\Cinematics\\BellTollAlliance.flac"],
-  ["Sound\\Cinematics\\BellTollAlliance.flac"],
-  ["Sound\\Interface\\BattleNetDeath1.flac"],
-  ["Sound\\Interface\\Warning.flac"],
-  ["Sound\\Interface\\MouseOver1.flac"],
-  ["Sound\\Interface\\BigButtonClick.flac"],
-  ["Sound\\Cinematics\\CrowdCheer1.flac"],
-  ["Sound\\Interface\\ItemReceived.flac"],
-  ["Sound\\Interface\\Hint.flac"],
-  koboldLines("Pissed", 4),
-  ["Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget1.flac"],
-  koboldLines("Yes", 3),
-  ["Abilities\\Spells\\Human\\InnerFire\\InnerFireBirth.flac"],
+const CUE_SOUNDS: readonly string[] = [
+  "Sound\\Interface\\BattleNetTick.flac",
+  "Sound\\Interface\\BattleNetTick.flac",
+  "Sound\\Interface\\BattleNetTick.flac",
+  "Sound\\Interface\\BattleNetTick.flac",
+  "Sound\\Cinematics\\BellTollAlliance.flac",
+  "Sound\\Cinematics\\BellTollAlliance.flac",
+  "Sound\\Interface\\BattleNetDeath1.flac",
+  "Sound\\Interface\\Warning.flac",
+  "Sound\\Interface\\MouseOver1.flac",
+  "Sound\\Interface\\BigButtonClick.flac",
+  "Sound\\Cinematics\\CrowdCheer1.flac",
+  "Sound\\Interface\\ItemReceived.flac",
+  "Sound\\Interface\\Hint.flac",
 ];
 
-export function cueSound(cue: MatchCue, serial = 0): string {
-  const variants = at(CUE_SOUNDS, cue);
-  return at(variants, floorMod(serial, variants.length));
+export function cueSound(cue: MatchCue): string {
+  return at(CUE_SOUNDS, cue);
 }
 
-const cueSoundPaths = (): string[] => {
-  const paths: string[] = [];
-  for (const variants of CUE_SOUNDS) paths.push(...variants);
-  return paths;
-};
+const cueSoundPaths = (): string[] => [...CUE_SOUNDS];
 
 
 
@@ -88,6 +72,7 @@ export type Race = (typeof Race)[keyof typeof Race];
 
 
 const RACES: Readonly<Record<Character, Race>> = {
+  28: Race.nightElf,
   23: Race.undead,
   1: Race.human,
   2: Race.nightElf,
@@ -110,7 +95,6 @@ const RACES: Readonly<Record<Character, Race>> = {
   19: Race.orc,
   20: Race.human,
   21: Race.nightElf,
-  26: Race.human,
   22: Race.orc,
   24: Race.nightElf,
   25: Race.human,
@@ -163,7 +147,7 @@ const VOICES: Readonly<Record<Exclude<Character, DialogueVoiced>, readonly [stri
   19: ["Units\\Creeps\\HeroTinker\\","HeroTinker"],
   20: ["Units\\Human\\Kael\\","Kael"],
   21: ["Units\\Creeps\\Murloc\\", "Murloc"],
-  26: KOBOLD_VOICE,
+  28: ["Units\\Naga\\LadyVashj\\", "LadyVashj"],
   22: ["Units\\Orc\\Hellscream\\", "Grom"],
   24: ["Units\\NightElf\\Furion\\", "Furion", "What"],
 };
@@ -216,8 +200,8 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.anubarak]: "anubarak victory",
   [Character.malfurion]: "malfurionstormrage victory",
   [Character.medivh]: "medivh victory",
+  [Character.ladyVashj]: "lady vashj victory",
   [Character.archimonde]: "spell",
-  [Character.kobold]: "kobold victory",
 };
 
 export const victoryAnimation = (character: Character): string => VICTORY_ANIMATIONS[character];

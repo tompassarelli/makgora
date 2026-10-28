@@ -3,7 +3,7 @@ export type CopyForm = "plain" | "retained" | "none";
 export type SameForm = "signedZero" | "signedZeroOptional" | "plain" | "sameReal" | "none";
 export type CanonKit = "moves" | "specials" | "placedSpec" | "projectileSpec";
 export type CanonWriter = "int" | "real" | "bool" | "boolAsInt" | "flagInt" | "flagBool" | "optionalInt" | "slotRef" | "digest" | "specText";
-export type Guard = "specials" | "companion" | "condition" | "poison" | "buff" | "beamPair" | "nonzero" | "nonzeroSigned" | "cooldownSlot" | "defined" | "kobold";
+export type Guard = "specials" | "companion" | "condition" | "poison" | "buff" | "beamPair" | "nonzero" | "nonzeroSigned" | "cooldownSlot" | "defined";
 export type ArrayLayout = "fieldMajor" | "animalMajor" | "scalarArray";
 
 export interface CanonColumn {
@@ -73,7 +73,6 @@ export const FIGHTER_CONSTANTS: Readonly<Record<string, string>> = {
   TURNAROUND_SPECIAL_WINDOW_FRAMES: "sim/fighter",
   WALL_JUMP_FLICK_FRAMES: "sim/fighter",
   WALL_TECH_JUMP_INPUT_WINDOW_FRAMES: "sim/fighter",
-  CandleState: "sim/codes",
   DownState: "sim/codes",
   GrabAction: "sim/codes",
   GroundAction: "sim/codes",
@@ -115,7 +114,6 @@ export const FIGHTER_GROUPS: readonly FighterGroup[] = [
   { key: "water", type: "Water", local: "water", rest: "REST_WATER" },
   { key: "status", type: "Status", local: "status" },
   { key: "meter", type: "Meter", local: "meter" },
-  { key: "candle", type: "Candle", local: "candle", rest: "REST_CANDLE" },
   { key: "pack", type: "PlacedObject", local: "placed", rest: "REST_PLACED" },
 ];
 
@@ -126,7 +124,6 @@ export const FIGHTER_ARRAYS: readonly FighterArray[] = [
   { path: "special.hitTargets", capacity: "PARTICIPANT_CAPACITY", layout: "scalarArray", bound: "capacity", index: "i" },
   { path: "status.conditionImmunity", capacity: "HERO_STATUS_GROUPS", layout: "scalarArray", bound: "capacity", fallback: "0", index: "i" },
   { path: "pack", capacity: "PACK_CAPACITY", layout: "animalMajor", index: "animal" },
-  { path: "candle.struck", capacity: "PARTICIPANT_CAPACITY", layout: "scalarArray", bound: "capacity", index: "slot" },
   { path: "placed.struck", capacity: "PARTICIPANT_CAPACITY", layout: "scalarArray", bound: "capacity", index: "slot" },
   { path: "pack[].struck", capacity: "PARTICIPANT_CAPACITY", layout: "scalarArray", bound: "capacity", index: "slot" },
 ];
@@ -153,9 +150,8 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "bearX", "bearZ", "bearVelocityX", "bearVelocityZ", "bearSwipeCooldown", "bearHitSerial", "bearSurface", "freezeTrapLife",
   "freezeTrapExReach", "freezeTrapArming", "freezeTrapX", "freezeTrapZ", "freezeTrapSurface", "freezeTrapSerial", "frozenFrames", "offscreenFrames",
   "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames",
-  "conditionImmunity[${i}]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "meterEx", "meterUltimate", "poisonBursts", "spellPassVisualSerial", "armorAbsorbs", "candleHeat", "candleState",
-  "candleLit", "candleX", "candleZ", "candleVx", "candleVz", "candleSurface", "candleTimer", "candleAway", "candleGuard", "candleStruck[${i}]",
-  "candleSpecialStruck", "candleDropSerial", "candleSnuffSerial", "candleReturnSerial", "specialForm", "specialVariant", "specialAimX", "specialAimZ",
+  "conditionImmunity[${i}]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "meterEx", "meterUltimate", "poisonBursts", "spellPassVisualSerial", "armorAbsorbs",
+  "specialForm", "specialVariant", "specialAimX", "specialAimZ",
   "specialBeamX", "specialBeamZ", "specialBeamLength", "specialAirtimeUses", "specialGrabFrame", "specialSeekTarget", "specialCharge", "specialRefire", "specialRefires", "specialParasol", "specialGuarded", "specialEgg",
   "divineFrames", "cursedBy", "curseFrames", "summonFrames", "summonX", "buff", "buffFrames", "projectileSpec[${i}]", "packLength", "${animalName}Life", "${animalName}Age", "${animalName}X",
   "${animalName}Z", "${animalName}Direction", "${animalName}Durability", "${animalName}Serial", "${animalName}Spec", "${animalName}Struck[${i}]",
@@ -174,7 +170,8 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "grabHeldFrames", "grabQueuedThrow", "grabSerial", "grabMashX", "grabMashZ", "grabOwner", "grabTarget", "ledgeState", "ledgeSide", "ledgeFrame",
   "ledgeSerial", "ledgeIntangible", "ledgeRegrab", "ledgeGrabs", "platformDownHeld", "platformDownAge", "platformDropConsumed", "cannonHeld",
   "cannonFiring", "cannonCooldown", "cannonPassing", "waterIn", "waterFrames", "waterEntries", "waterHydraFrame", "waterHydraX",
-  "waterHydraStrikeFrame",
+  "waterHydraStrikeFrame", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "projectileBounces[${i}]", "projectileHomeward[${i}]",
+  "projectileCarriedEx[${i}]", "projectileLastStruck[${i}]",
 ];
 
 export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -201,11 +198,10 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   platform: ["downHeld", "downAge", "dropConsumed"],
   cannon: ["held", "firing", "cooldown", "passing"],
   water: ["inWater", "frames", "entries", "hydraFrame", "hydraX", "hydraStrikeFrame"],
-  status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "summonFrames", "summonX", "buff", "buffFrames"],
+  status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "summonFrames", "summonX", "buff", "buffFrames", "manaShield", "petrifyIn", "petrified", "petrifyDamage"],
   meter: ["ex", "ultimate"],
-  candle: ["heat", "state", "lit", "x", "z", "vx", "vz", "surface", "timer", "away", "guard", "struck[]", "specialStruck", "dropSerial", "snuffSerial", "returnSerial"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "surface"],
-  projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "exReach", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier"],
+  projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "exReach", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "carriedEx", "lastStruck"],
 };
 
 // Rows run in canonical emit order, the byte-stable stateHash order; influence operands (WeakMap) and PACK_SPARES stay outside the snapshot.
@@ -531,22 +527,6 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "visuals.poisonBursts", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "poisonBursts", writer: "int", when: ["nonzero"] }, diff: "poisonBursts", respawn: "keep" },
   { path: "visuals.spellPass", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "spellPassVisualSerial", writer: "int", when: ["nonzero"] }, diff: "spellPassVisualSerial", respawn: "keep" },
   { path: "visuals.armorAbsorbs", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "armorAbsorbs", writer: "int", when: ["nonzero"] }, diff: "armorAbsorbs", respawn: "keep" },
-  { path: "candle.heat", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleHeat", writer: "int", when: ["kobold"] }, diff: "candleHeat", respawn: { blast: "0", respawn: "0", helper: "resetCandle" } },
-  { path: "candle.state", type: "enum", init: "CandleState.held", copy: "plain", same: "signedZero", canon: { name: "candleState", writer: "int", when: ["kobold"] }, diff: "candleState", respawn: { blast: "CandleState.held", respawn: "CandleState.held", helper: "resetCandle" } },
-  { path: "candle.lit", type: "bool", init: "true", copy: "plain", same: "plain", canon: { name: "candleLit", writer: "bool", when: ["kobold"] }, diff: "candleLit", respawn: { blast: "true", respawn: "true", helper: "resetCandle" } },
-  { path: "candle.x", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "candleX", writer: "real", when: ["kobold"] }, diff: "candleX", respawn: { blast: "0.0", respawn: "0.0", helper: "resetCandle" } },
-  { path: "candle.z", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "candleZ", writer: "real", when: ["kobold"] }, diff: "candleZ", respawn: { blast: "0.0", respawn: "0.0", helper: "resetCandle" } },
-  { path: "candle.vx", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "candleVx", writer: "real", when: ["kobold"] }, diff: "candleVx", respawn: { blast: "0.0", respawn: "0.0", helper: "resetCandle" } },
-  { path: "candle.vz", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "candleVz", writer: "real", when: ["kobold"] }, diff: "candleVz", respawn: { blast: "0.0", respawn: "0.0", helper: "resetCandle" } },
-  { path: "candle.surface", type: "optionalInt", init: "undefined", copy: "plain", same: "signedZeroOptional", canon: { name: "candleSurface", writer: "optionalInt", when: ["kobold"] }, diff: { name: "candleSurface", absent: -1 }, respawn: { blast: "undefined", respawn: "undefined", helper: "resetCandle" } },
-  { path: "candle.timer", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleTimer", writer: "int", when: ["kobold"] }, diff: "candleTimer", respawn: { blast: "0", respawn: "0", helper: "resetCandle" } },
-  { path: "candle.away", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleAway", writer: "int", when: ["kobold"] }, diff: "candleAway", respawn: { blast: "0", respawn: "0", helper: "resetCandle" } },
-  { path: "candle.guard", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleGuard", writer: "int", when: ["kobold"] }, diff: "candleGuard", respawn: { blast: "0", respawn: "0", helper: "resetCandle" } },
-  { path: "candle.struck[]", type: "slot", init: "noSlots()", copy: "plain", same: "plain", canon: { name: "candleStruck[${i}]", writer: "optionalInt", when: ["kobold"] }, diff: "candleStruck[${i}]", respawn: { blast: "undefined", respawn: "undefined", helper: "resetCandle" } },
-  { path: "candle.specialStruck", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleSpecialStruck", writer: "int", when: ["kobold"] }, diff: "candleSpecialStruck", respawn: { blast: "0", respawn: "0", helper: "resetCandle" } },
-  { path: "candle.dropSerial", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleDropSerial", writer: "int", when: ["kobold"] }, diff: "candleDropSerial", respawn: "keep" },
-  { path: "candle.snuffSerial", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleSnuffSerial", writer: "int", when: ["kobold"] }, diff: "candleSnuffSerial", respawn: "keep" },
-  { path: "candle.returnSerial", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "candleReturnSerial", writer: "int", when: ["kobold"] }, diff: "candleReturnSerial", respawn: "keep" },
   { path: "special.form", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "specialForm", writer: "int", when: ["specials"] }, diff: "specialForm", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
   { path: "special.variant", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "specialVariant", writer: "int", when: ["specials", "nonzero"] }, diff: "specialVariant", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
   { path: "special.aimX", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "specialAimX", writer: "real", when: ["specials"] }, diff: "specialAimX", respawn: { blast: "0.0", helper: "clearSpecialOnStock", respawn: "0.0" } },
@@ -619,4 +599,12 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "status.poisonStackFrames", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "poisonStackFrames", writer: "int", when: ["nonzero"] }, diff: "poisonStackFrames", respawn: { blast: "0", respawn: "0" } },
   { path: "projectiles[].spec", type: "optionalRef", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileSpec[${i}]", writer: "specText", when: ["defined"], kit: "projectileSpec" }, diff: "projectileSpec[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
   { path: "projectiles[].surface", type: "optionalInt", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileSurface[${i}]", writer: "optionalInt", when: ["defined"] }, diff: "projectileSurface[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
+  { path: "status.manaShield", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "manaShield", writer: "flagBool" }, diff: "manaShield", respawn: { blast: "false", respawn: "false" } },
+  { path: "status.petrifyIn", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "petrifyIn", writer: "int", when: ["nonzero"] }, diff: "petrifyIn", respawn: { blast: "0", respawn: "0" } },
+  { path: "status.petrified", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "petrified", writer: "flagBool" }, diff: "petrified", respawn: { blast: "false", respawn: "false" } },
+  { path: "status.petrifyDamage", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "petrifyDamage", writer: "real", when: ["nonzeroSigned"] }, diff: "petrifyDamage", respawn: { blast: "0.0", respawn: "0.0" } },
+  { path: "projectiles[].bounces", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectileBounces[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectileBounces[${i}]", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
+  { path: "projectiles[].homeward", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "projectileHomeward[${i}]", writer: "flagBool" }, diff: "projectileHomeward[${i}]", respawn: { blast: "false", helper: "clearSpecialOnStock", respawn: "false" } },
+  { path: "projectiles[].carriedEx", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectileCarriedEx[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectileCarriedEx[${i}]", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
+  { path: "projectiles[].lastStruck", type: "optionalInt", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileLastStruck[${i}]", writer: "optionalInt", when: ["defined"] }, diff: "projectileLastStruck[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
 ];

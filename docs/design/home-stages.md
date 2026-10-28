@@ -28,6 +28,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Lich King | Frozen Throne | 2 | TFT's final mission: Arthas climbs Icecrown and takes the Frozen Throne. |
 | Anub'arak | Frozen Throne | 2 | TFT's underground Northrend campaign brings the crypt king and Arthas through Azjol-Nerub toward Icecrown. |
 | Medivh | Nordrassil | 10 | RoC's prophet brings the human, orc and night elf leaders together to defend Mount Hyjal and its World Tree. |
+| Lady Vashj | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Lady Vashj's naga hold the Broken Isles around the Tomb of Sargeras for Illidan. |
 | Archimonde the Defiler | Nordrassil | 10 | RoC's final battle: the Burning Legion's lord climbs Mount Hyjal to take the World Tree. |
 | Thrall | Durotar Skies | 3 | Thrall leads the founding of Durotar. |
 | Jaina Proudmoore | Gryphon Aerie | 11 | Jaina leads the Alliance expedition with its human forces. |
@@ -38,7 +39,6 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Goblin Tinker | Durotar Skies | 3 | Goblin engineers supply the Horde with machinery. |
 | Kael'thas Sunstrider | Hellfire Citadel | 14 | Kael follows Illidan into Outland. |
 | Murloc | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": murlocs and the naga's mur'gul thralls hold the Broken Isles' shores around the tomb; its tide floor is their water. |
-| Kobold | Blackrock | 12 | A candle-hoarding miner belongs in the tunnels beneath the mountain. |
 | Grom Hellscream | Durotar Skies | 3 | Grom's Warsong clan fought beside Thrall's Horde in Kalimdor before his final charge at Mannoroth. |
 
 Ahn'Qiraj and Sky Deck (test) are home to no fighter. A stage may host

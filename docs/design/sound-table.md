@@ -64,7 +64,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalHeavySliceMetal | WardenAttack |
 | Forward tilt, Up tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
 | Neutral special: Shadow Strike | ShadowStrikeMissileBirth | ShadowStrikeBirth | ShadowStrikeBirth + FanOfKnivesHit | MetalMediumSliceMetal |  |
-| Side special: Shadow Dash | BlinkCaster | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
+| Side special: Shadow Dash | MetalHeavySliceMetal + ShadowStrikeBirth | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
 | Up special: Blink | BlinkTarget | MetalLightSliceFlesh | MetalLightSliceFlesh + FanOfKnivesHit | MetalMediumSliceMetal |  |
 | Down special: Fan of Knives | FanOfKnives | FanOfKnivesHit | FanOfKnivesHit + FanOfKnivesHit | MetalMediumSliceMetal |  |
 
@@ -272,18 +272,6 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Blood Leap |  | MetalMediumChopFlesh | MetalMediumChopFlesh + CriticalStrike | MetalMediumChopMetal |  |
 | Down special: Mannoroth's Bane |  | MetalHeavyChopFlesh | MetalHeavyChopFlesh + CriticalStrike | MetalMediumChopMetal |  |
 
-## Kobold
-
-| Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
-| --- | --- | --- | --- | --- | --- |
-| Jab, Second jab | BattleNetWooshStereo1 | MetalLightChopFlesh | MetalHeavyChopFlesh + MetalHeavyChopMetal | MetalLightChopMetal |  |
-| Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavyChopFlesh | MetalHeavyChopFlesh + MetalHeavyChopMetal | MetalHeavyChopMetal |  |
-| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalHeavyChopFlesh + MetalHeavyChopMetal | MetalMediumChopMetal |  |
-| Neutral special: Wick Flick | SearingArrowLaunch | SearingArrowHit | SearingArrowHit + MetalHeavyChopMetal | MetalMediumChopMetal |  |
-| Side special: Panic Dig | Burrow | MetalLightChopFlesh | MetalLightChopFlesh + MetalHeavyChopMetal | MetalMediumChopMetal |  |
-| Up special: Candle Escape | FireballLaunch | WoodLightBashFlesh | WoodLightBashFlesh + MetalHeavyChopMetal | MetalMediumChopMetal |  |
-| Down special: Mine! | AxeMediumChopWood | GoblinLandMineDeath | GoblinLandMineDeath + MetalHeavyChopMetal | MetalMediumChopMetal |  |
-
 ## Malfurion Stormrage
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
@@ -319,3 +307,27 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Side special: Burrow Hunt | Burrow | ImpaleLand | ImpaleLand + ImpaleHit | MetalLightChopMetal |  |
 | Up special: Crypt Eruption | ImpaleLand | RockHeavyBashFlesh | RockHeavyBashFlesh + ImpaleHit | MetalLightChopMetal |  |
 | Down special: Carrion Beetle | ScarabBirth | CryptFiendMissileHit | CryptFiendMissileHit + ImpaleHit | MetalLightChopMetal |  |
+
+## Lady Vashj
+
+| Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
+| --- | --- | --- | --- | --- | --- |
+| Jab, Second jab | BattleNetWooshStereo1 | WoodLightBashFlesh | WoodHeavyBashFlesh + CrushingWaveDamage | WoodLightBashMetal |  |
+| Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | WoodHeavyBashFlesh | WoodHeavyBashFlesh + CrushingWaveDamage | WoodHeavyBashMetal |  |
+| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | WoodMediumBashFlesh | WoodHeavyBashFlesh + CrushingWaveDamage | WoodMediumBashMetal |  |
+| Neutral special: Multi-Shot | FrostArrowLaunch | FrostArrowHit | FrostArrowHit + CrushingWaveDamage | WoodMediumBashMetal |  |
+| Side special: Tidal Serpent | CrushingWave | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | WoodMediumBashMetal |  |
+| Up special: Tidal Surge | CrushingWave | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | WoodMediumBashMetal |  |
+| Down special: Mana Shield | ManaShieldCastSound | FrostArmor | FrostArmor + CrushingWaveDamage | WoodMediumBashMetal |  |
+
+## Archimonde the Defiler
+
+| Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
+| --- | --- | --- | --- | --- | --- |
+| Jab, Second jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalMediumChopFlesh + MetalHeavyBashFlesh | MetalLightSliceMetal |  |
+| Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalMediumChopFlesh + MetalHeavyBashFlesh | MetalMediumChopMetal |  |
+| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalLightChopFlesh | MetalMediumChopFlesh + MetalHeavyBashFlesh | MetalLightChopMetal |  |
+| Neutral special: Finger of Death | ManaFlareMissile | LightningBolt | LightningBolt + MetalHeavyBashFlesh | MetalLightChopMetal |  |
+| Side special: Rain of Fire | FlameStrike | RainOfFireWave | RainOfFireWave + MetalHeavyBashFlesh | MetalLightChopMetal |  |
+| Up special: Fel Ascent | FireballLaunch | Fireball | Fireball + MetalHeavyBashFlesh | MetalLightChopMetal |  |
+| Down special: Bash | ThunderClap | RockHeavyBashFlesh | RockHeavyBashFlesh + MetalHeavyBashFlesh | MetalLightChopMetal |  |

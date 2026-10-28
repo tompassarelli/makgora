@@ -44,7 +44,7 @@ export interface ThrowRoleResult {
   readonly problems: readonly string[];
 }
 
-export const VICTIM = Character.kobold;
+export const VICTIM = Character.rifleman;
 export const VICTIM_WEIGHT = 75;
 const STAGE = 0;
 const SPACINGS = [40, 70, 100, 20, 140] as const;

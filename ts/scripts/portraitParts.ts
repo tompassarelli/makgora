@@ -34,7 +34,7 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   "Anub'arak": part('Bone_Head', [], [], ['Bone_Jaw']),
   MalfurionStormrage: part('Bone_Head', [], []),
   Medivh: part('Bone_Head', ['Staff'], ['Bone_Hand_R']),
-  Kobold: part('Bone_Head', ['PickAxe'], ['Bone_Hand_R']),
+  LadyVashj: part('Bone_Head', ['Bow'], ['Bone_Hand2_Left']),
   Archimonde: part('Bone_Head', [], []),
 };
 

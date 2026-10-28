@@ -5,7 +5,7 @@ import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
 import { type AuthoredSpecial, CompanionOrder, type FighterSpecials, type SpecialCompanion, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, frames } from "../../sim/specials/schema";
 import { capsule, hit } from "./moves";
-import type { AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 
 const h = (multiple: number): number => f32(HERO_REFERENCE_HEIGHT * f32(multiple));
 const AIR_SPECIAL_LANDING_LAG = 20;

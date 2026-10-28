@@ -435,7 +435,6 @@ JainaDeath
 KeeperOfTheGroveMissileHit
 KeeperOfTheGroveMissileLaunch
 KnightDeath
-KoboldDeath
 KodoBeastDeath
 KodoDrumLeft
 KodoDrumRight

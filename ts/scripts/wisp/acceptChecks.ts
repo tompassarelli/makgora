@@ -4,7 +4,6 @@ import { loserPoseChecks } from "./loserPoseChecks";
 import { showcaseChecks } from "./showcaseChecks";
 import { captureStageChecks } from "./captureStageChecks";
 import { winCountChecks } from "./winCountChecks";
-import { koboldDirectionChecks } from "./koboldDirectionChecks";
 import { murlocStabChecks } from "./murlocStabChecks";
 import { fighterSelectChecks } from "./fighterSelectChecks";
 import { homedir } from "node:os";
@@ -16,7 +15,6 @@ import { HERO_ROSTER } from "../../src/game/roster/kits";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 import { gateChecks } from "./gateChecks";
-import { specialStripChecks, specialStripMaps } from "./specialStripChecks";
 import { meterRimChecks } from "./meterRimChecks";
 import { hudChecks } from "./hudChecks";
 import { ledgerCaptureChecks } from "./ledgerCaptureChecks";
@@ -85,7 +83,6 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
     rebuild: "main",
     quick: `${QUICK_HERO_COMMAND}${name.toLowerCase()}`,
   }])),
-  ...specialStripMaps(PRESENTATION),
 };
 
 
@@ -301,7 +298,6 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "deck and fighters drawn on each client; run with client A's private desktop at 2880x1920 for the 3:2 box",
     },
     ...effectChecks,
-    ...specialStripChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...meterRimChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...stageChecks,
     ...lightingChecks,
@@ -388,7 +384,6 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...showcaseChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...captureStageChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
-    ...koboldDirectionChecks(heroProfile("Kobold"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...murlocStabChecks(heroProfile("Murloc"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...fighterSelectChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     {

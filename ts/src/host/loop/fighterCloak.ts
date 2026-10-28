@@ -21,7 +21,6 @@ function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   renderers.glow.drawnEffects(drawn);
   renderers.agency.drawnEffects(drawn);
   renderers.shield.drawnEffects(drawn);
-  renderers.candle?.drawnEffects(drawn);
   renderers.goldSack?.drawnEffects(drawn);
   renderers.parasol?.drawnEffects(drawn);
   renderers.spheres?.drawnEffects(drawn);

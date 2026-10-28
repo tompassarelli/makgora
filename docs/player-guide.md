@@ -159,16 +159,6 @@ form (press U with the direction or before it, since Strong and a direction alon
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate, Strong held or not (below a full ultimate meter it is the plain special); the
 Ultimates rule at fighter selection turns them off.
 
-Kobold carries a candle. Every hit he lands makes it burn brighter, up to
-three levels, and it slowly burns down while he holds it. A brighter candle
-gives a longer Wick Flick (an ember at full flame), a longer Panic Dig that
-shrugs off small hits from level 2, and a wider Mine!. A strong hit knocks
-the candle out of his hands. Run over it to take it back with its heat, or
-wait: after 5 seconds untouched, or 10 seconds at most, a fresh candle
-lights in his hand with no heat. Without it he scurries faster on the
-ground, but his neutral special is only a panicked flail: You no take
-candle!
-
 Use Warcraft's ordinary Quit Mission to leave and recreate a custom game.
 The map's Ctrl+R restart path is unreliable, and F5 has previously hung the
 client when returning to the menu.

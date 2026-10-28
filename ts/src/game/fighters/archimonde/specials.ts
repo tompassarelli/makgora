@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
-import type { AppliedStatus } from "../../sim/heroStatus";
+import type { AppliedStatus } from "../../sim/appliedStatus";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialMotion, type SpecialProjectile } from "../../sim/specials/schema";
 import { archimondeCastBody, capsule, hit } from "./moves";
 

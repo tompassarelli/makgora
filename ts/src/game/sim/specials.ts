@@ -554,7 +554,7 @@ function startHeroFighterSpecial(owner: Fighter, input: Readonly<Controls>, worl
   const action = SpecialAction.heroNeutral + chosen.slot;
   startSpecialAction(owner, heroAction(action), move.endFrame, specialDirection(input, owner.facing));
   cancelJumpSquat(owner);
-  enterExSpecial(owner, input);
+  enterExSpecial(owner, input, move.ex !== undefined);
   if (stopsSidewaysOnStart(enterHeroSpecial(owner, chosen, input), owner.motion.grounded)) owner.motion.vx = 0.0;
   return true;
 }

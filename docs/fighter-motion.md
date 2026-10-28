@@ -444,26 +444,6 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Grom Hellscream | ledge-get-up | 48: Grom ledgeClimb | 112.9 | 31.5 | up; 112.9/61.4 |
 | Grom Hellscream | ledge-roll | 76: Grom ledgeRoll | 253.0 | 106.6 | forward; 187.6/117.0 |
 | Grom Hellscream | ledge-attack | 49: Grom ledgeAttack | 86.3 | 20.0 | both; 33.0/13.0 |
-| Kobold | walk | 1: Walk | 71.6 | 23.8 | forward; 60.8/62.6 |
-| Kobold | dash | 91: Kobold dash | 24.1 | 2.7 | forward; 19.0/17.7 |
-| Kobold | run | 90: Kobold run | 23.8 | 3.8 | forward; 20.5/18.0 |
-| Kobold | turn | 31: Kobold turn | 79.4 | 25.8 | back; 79.0/58.8 |
-| Kobold | brake | 32: Kobold stop | 96.1 | 25.9 | in place; 27.3/35.2 |
-| Kobold | jump-squat | 33: Kobold jumpSquat | 19.1 | 7.7 | down; 10.4/14.0 |
-| Kobold | roll-forward | 66: Kobold rollForward | 129.3 | 53.0 | forward; 103.6/88.9 |
-| Kobold | roll-back | 70: Kobold rollBackward | 129.8 | 50.5 | back; 88.9/103.5 |
-| Kobold | spot-dodge | 47: Kobold spotDodge | 74.1 | 24.7 | in place; 39.9/31.9 |
-| Kobold | air-dodge | 28: Kobold airDodge | 58.4 | 12.7 | in place; 38.8/27.1 |
-| Kobold | tech | 48: Kobold tech | 62.4 | 24.9 | in place; 48.0/32.5 |
-| Kobold | tech-forward | 67: Kobold techForward | 129.5 | 53.2 | forward; 103.6/89.1 |
-| Kobold | tech-back | 71: Kobold techBackward | 128.9 | 52.2 | back; 89.1/103.6 |
-| Kobold | get-up | 45: Kobold getUp | 77.8 | 33.1 | up; 57.1/75.7 |
-| Kobold | get-up-forward | 68: Kobold getUpRollForward | 107.7 | 54.8 | forward; 87.6/87.6 |
-| Kobold | get-up-back | 72: Kobold getUpRollBackward | 107.4 | 50.7 | back; 90.5/87.6 |
-| Kobold | get-up-attack | 46: Kobold getUpAttack | 97.6 | 40.0 | both; 57.3/72.5 |
-| Kobold | ledge-get-up | 41: Kobold ledgeClimb | 110.5 | 26.1 | up; 110.4/40.4 |
-| Kobold | ledge-roll | 69: Kobold ledgeRoll | 129.2 | 52.9 | forward; 103.6/89.1 |
-| Kobold | ledge-attack | 42: Kobold ledgeAttack | 76.2 | 14.8 | both; 28.0/30.0 |
 | Malfurion Stormrage | walk | 7: Walk | 126.8 | 28.0 | forward; 117.7/126.1 |
 | Malfurion Stormrage | dash | 7: Walk | 126.6 | 26.6 | forward; 117.7/125.8 |
 | Malfurion Stormrage | run | 7: Walk | 123.8 | 22.9 | forward; 82.3/120.3 |
@@ -524,9 +504,29 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Anub'arak | ledge-get-up | 49: Anubarak ledgeClimb | 170.9 | 32.9 | up; 165.8/69.7 |
 | Anub'arak | ledge-roll | 77: Anubarak ledgeRoll | 248.0 | 120.4 | forward; 186.4/245.5 |
 | Anub'arak | ledge-attack | 50: Anubarak ledgeAttack | 81.1 | 11.6 | both; 61.7/23.5 |
+| Lady Vashj | walk | 1: Walk | 44.7 | 13.4 | forward; 41.3/44.6 |
+| Lady Vashj | dash | 78: Lady Vashj run | 121.5 | 31.0 | forward; 111.4/104.8 |
+| Lady Vashj | run | 78: Lady Vashj run | 156.8 | 35.6 | forward; 156.8/54.8 |
+| Lady Vashj | turn | 39: Lady Vashj turn | 136.4 | 33.4 | back; 135.2/114.0 |
+| Lady Vashj | brake | 40: Lady Vashj stop | 158.9 | 75.1 | in place; 118.1/118.5 |
+| Lady Vashj | jump-squat | 41: Lady Vashj jumpSquat | 125.7 | 70.7 | down; 82.1/87.2 |
+| Lady Vashj | roll-forward | 71: Lady Vashj rollForward | 273.1 | 120.0 | forward; 247.7/230.4 |
+| Lady Vashj | roll-back | 75: Lady Vashj rollBackward | 262.8 | 63.2 | back; 220.2/251.3 |
+| Lady Vashj | spot-dodge | 53: Lady Vashj spotDodge | 164.4 | 93.1 | in place; 162.4/38.4 |
+| Lady Vashj | air-dodge | 36: Lady Vashj airDodge | 239.6 | 61.7 | in place; 200.5/29.3 |
+| Lady Vashj | tech | 54: Lady Vashj tech | 169.2 | 82.7 | in place; 164.2/128.8 |
+| Lady Vashj | tech-forward | 72: Lady Vashj techForward | 273.2 | 120.0 | forward; 247.7/230.4 |
+| Lady Vashj | tech-back | 76: Lady Vashj techBackward | 261.3 | 63.3 | back; 220.2/250.5 |
+| Lady Vashj | get-up | 52: Lady Vashj getUp | 183.3 | 93.4 | up; 105.5/75.3 |
+| Lady Vashj | get-up-forward | 73: Lady Vashj getUpRollForward | 273.2 | 120.0 | forward; 247.7/230.4 |
+| Lady Vashj | get-up-back | 77: Lady Vashj getUpRollBackward | 261.3 | 63.2 | back; 220.2/250.4 |
+| Lady Vashj | get-up-attack | 31: Lady Vashj getUpAttack | 320.7 | 138.5 | both; 222.5/204.3 |
+| Lady Vashj | ledge-get-up | 49: Lady Vashj ledgeClimb | 293.9 | 103.8 | up; 263.1/168.1 |
+| Lady Vashj | ledge-roll | 74: Lady Vashj ledgeRoll | 273.2 | 120.0 | forward; 247.7/230.5 |
+| Lady Vashj | ledge-attack | 32: Lady Vashj ledgeAttack | 262.8 | 103.0 | both; 262.8/101.2 |
 | Archimonde the Defiler | walk | 2: Walk | 160.6 | 38.6 | forward; 159.9/133.8 |
 | Archimonde the Defiler | dash | 2: Walk | 85.3 | 29.0 | forward; 80.4/45.8 |
-| Archimonde the Defiler | run | 2: Walk | 158.9 | 39.4 | forward; 124.9/157.3 |
+| Archimonde the Defiler | run | 2: Walk | 178.6 | 41.3 | forward; 154.7/177.4 |
 | Archimonde the Defiler | turn | 2: Walk | 40.2 | 10.5 | back; 22.6/20.2 |
 | Archimonde the Defiler | brake | 2: Walk | 33.4 | 8.4 | in place; 17.0/15.9 |
 | Archimonde the Defiler | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |

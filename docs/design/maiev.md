@@ -83,7 +83,7 @@ not drift with percent and the tech chase reads the same at 0% and 90%.
 
 The link table measures on the stage, so these are `edgeGuards` rows in
 `tools/move-data/combo-objectives.json`, which `bun wisp combos --objectives`
-simulates (#307). Each places a weight-75 Kobold offstage past the ledge, lands
+simulates (#307). Each places a weight-75 Rifleman offstage past the ledge, lands
 the move from the nearest spot that reaches, and the victim, under each DI,
 then double jumps and up specials home. A row holds when every DI loses the
 stock at every percent of its window; reaching the ledge or the stage misses.

@@ -7,7 +7,7 @@ import { canBeGrabbed } from "./conditions";
 import { collectDamageContact } from "./contacts";
 import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
-import type { AppliedStatus } from "./heroStatus";
+import type { AppliedStatus } from "./appliedStatus";
 import type { HitEffect } from "./hitRegions";
 import { grabHoldFrames } from "./moves";
 import { type Roster, fighterAt } from "./roster";

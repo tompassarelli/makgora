@@ -8,7 +8,6 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/pa
 import { PROJECTILE_CAPACITY, createFighter, type Fighter, type Projectile } from "../sim/fighter";
 import type { Bear, StageCannon } from "../sim/fighterRest";
 import { fighterAt, isActive, type Controls, type Roster } from "../sim/roster";
-import { copyCandleView, sameCandleView } from "../fighters/kobold/candleView";
 
 import { botChoice } from "./botRandom";
 import { CPU_TIERS, type CpuTier } from "./cpuProfiles";
@@ -211,7 +210,6 @@ function sameObservation(a: Readonly<Fighter>, b: Readonly<Fighter>): boolean {
   const d2 = b.dodge;
   if (d1.groundFrame !== d2.groundFrame || d1.groundDirection !== d2.groundDirection || d1.airDodging !== d2.airDodging || d1.airFrame !== d2.airFrame) return false;
   if (a.surfaceRecovery.state !== b.surfaceRecovery.state || a.surfaceRecovery.frame !== b.surfaceRecovery.frame || !sameSlot(a.cannon.held, b.cannon.held)) return false;
-  if (!sameCandleView(a, b)) return false;
   if (a.bear.life !== b.bear.life || (a.bear.x !== b.bear.x || (a.bear.x === 0 && 1 / a.bear.x !== 1 / b.bear.x)) || (a.bear.z !== b.bear.z || (a.bear.z === 0 && 1 / a.bear.z !== 1 / b.bear.z)) || a.bear.hitSerial !== b.bear.hitSerial) return false;
   const p = a.projectiles;
   const q = b.projectiles;
@@ -287,7 +285,6 @@ function createObservation(): ObservationFighter {
       airDodging: f.dodge.airDodging, airFrame: f.dodge.airFrame },
     surfaceRecovery: { ...EMPTY.surfaceRecovery, state: f.surfaceRecovery.state, frame: f.surfaceRecovery.frame },
     cannon: { ...EMPTY.cannon, held: f.cannon.held },
-    candle: { ...EMPTY.candle },
     bear: { ...EMPTY.bear, life: f.bear.life, x: f.bear.x, z: f.bear.z, hitSerial: f.bear.hitSerial },
     projectiles: f.projectiles.map(p => ({ ...at(EMPTY.projectiles, 0),
       life: p.life, x: p.x, z: p.z, direction: p.direction, velocityX: p.velocityX, velocityZ: p.velocityZ, serial: p.serial })),
@@ -395,7 +392,6 @@ function copyObservation(target: ObservationFighter, source: Readonly<Fighter>):
   bear.x = fromBear.x;
   bear.z = fromBear.z;
   bear.hitSerial = fromBear.hitSerial;
-  copyCandleView(target, source);
   const sourceProjectiles = source.projectiles;
   const targetProjectiles = target.projectiles;
   // Both hold PROJECTILE_CAPACITY; plain indexing spares this per-step copy a lookup call per slot.

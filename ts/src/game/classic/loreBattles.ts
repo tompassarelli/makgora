@@ -144,11 +144,6 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   bossBattle("ascension", "The Ascension", C.lichKing, BossKind.lichKing, 4, 5, 2,
     "Now, champion. Shatter the ice that binds me, and we shall be one."),
   battle({
-    id: "kobold-candle", title: "You No Take Candle!", player: C.kobold, against: [C.rifleman, C.mountainKing], tier: "expert", stage: 12,
-    win: koWithinClock, minutes: 3, playerStocks: 3, opponentStocks: 1,
-    speaker: "Kobold", intro: "Humans want gold. Dwarves want mine. You no take candle!",
-  }),
-  battle({
     id: "grom-mannoroth", title: "Grom's Last Stand", player: C.grom, against: [C.pitLord], tier: "expert", stage: 3,
     win: koWithinClock, minutes: 3, playerStocks: 1, opponentStocks: 2, playerDamage: 40,
     speaker: "Grom Hellscream", intro: "Mannoroth, you chained the Warsong with your blood. Gorehowl will cut us free!",

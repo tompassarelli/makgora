@@ -25,7 +25,7 @@ import * as anubarak from "./anub'arak";
 import * as rifleman from "./rifleman";
 import * as forsakenPaladin from "./forsaken-paladin";
 import * as cairneBloodhoof from "./cairne-bloodhoof";
-import * as kobold from "./kobold";
+import * as ladyVashj from "./lady-vashj";
 import * as goblinTinker from "./goblin-tinker";
 import * as shadowHunter from "./shadow-hunter";
 import * as archimonde from "./archimonde";
@@ -66,7 +66,7 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   1: rifleman,
   7: forsakenPaladin,
   16: cairneBloodhoof,
-  26: kobold,
+  28: ladyVashj,
   19: goblinTinker,
   9: shadowHunter,
   29: archimonde,

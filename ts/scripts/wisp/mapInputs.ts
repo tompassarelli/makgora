@@ -18,7 +18,6 @@ import { IMPORTED_VOICES } from "../../src/game/assets/importedVoiceInfo";
 import { IMPORTED_MODEL_FILES } from "../../src/game/assets/importedModelInfo";
 import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLabel } from "../../src/generated/assets/modelSoundInfo";
 import * as shieldModels from "../../src/generated/assets/shieldAssetInfo";
-import * as candleModels from "../../src/generated/assets/candleAssetInfo";
 import * as ankhModels from "../../src/generated/assets/ankhAssetInfo";
 import * as felCrescentModels from "../../src/generated/assets/felCrescentAssetInfo";
 import * as parasolModels from "../../src/generated/assets/parasolAssetInfo";
@@ -109,7 +108,6 @@ export const GENERATED_MODELS: readonly { readonly list: string; readonly genera
   { list: "impact-assets/imports.txt", generator: "tools/effects/package.ts", models: Object.values(impactModels) },
   { list: "impact-assets/frost-imports.txt", generator: "tools/effects/trap.ts", models: Object.values(frostModels) },
   { list: "impact-assets/shield-imports.txt", generator: "tools/effects/shield.ts", models: Object.values(shieldModels) },
-  { list: "impact-assets/candle-imports.txt", generator: "tools/effects/candle.ts", models: Object.values(candleModels) },
   { list: "impact-assets/ankh-imports.txt", generator: "tools/effects/ankh.ts", models: Object.values(ankhModels) },
   { list: "impact-assets/crescent-imports.txt", generator: "tools/effects/felCrescent.ts", models: Object.values(felCrescentModels) },
   { list: "impact-assets/parasol-imports.txt", generator: "tools/effects/parasol.ts", models: Object.values(parasolModels) },

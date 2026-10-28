@@ -62,7 +62,6 @@ may_use = ["core"]
 name = "fighter-kit"
 paths = ["ts/src/game/fighters/*/kit.ts", "ts/src/game/fighters/*/moves.ts", "ts/src/game/fighters/*/specials.ts", "ts/src/game/fighters/*/ultimate.ts", "ts/src/game/fighters/*/gameplan.ts",
          "ts/src/game/fighters/warden/spin.ts", "ts/src/game/fighters/forsaken-paladin/sword.ts", "ts/src/game/fighters/forsaken-paladin/weaponGeometry.ts",
-         "ts/src/game/fighters/kobold/candle.ts", "ts/src/game/fighters/kobold/candleStrikes.ts", "ts/src/game/fighters/kobold/candleView.ts",
          "ts/src/game/sim/heroes/groundNormals.ts", "ts/src/game/sim/heroes/heroBodies.ts", "ts/src/game/sim/heroes/multiHit.ts",
          "ts/src/game/sim/heroes/authoring.ts", "ts/src/game/sim/heroes/hero.ts", "ts/src/game/stages/*/deck.ts"]
 responsibility = "One fighter's (or stage's) gameplay data and hooks: frame data, specials, ultimate, gameplan, body, traits, deck geometry."
@@ -117,7 +116,7 @@ may_use = ["match", "snapshot", "input", "core"]
 [[module]]
 name = "fighter-look"
 paths = ["ts/src/game/fighters/*/look.ts", "ts/src/game/fighters/*/cues.ts", "ts/src/game/fighters/*/sounds.ts", "ts/src/game/stages/*/look.ts",
-         "ts/src/game/fighters/*/clips.ts", "ts/src/game/fighters/warden/clipTable.ts", "ts/src/game/fighters/kobold/locomotion.ts",
+         "ts/src/game/fighters/*/clips.ts", "ts/src/game/fighters/warden/clipTable.ts",
          "ts/src/game/presentation/model/**",
          "ts/src/game/assets/stageLighting.ts", "ts/src/game/assets/stagePalette.ts", "ts/src/game/assets/stagePointLights.ts",
          "ts/src/game/assets/importedModelInfo.ts"]
@@ -221,8 +220,8 @@ producer = "tools/effects/package.ts"
 paths = ["ts/src/generated/assets/shieldAssetInfo.ts"]
 producer = "tools/effects/shield.ts"
 [[generated]]
-paths = ["ts/src/generated/assets/candleAssetInfo.ts"]
-producer = "tools/effects/candle.ts"
+paths = ["ts/src/game/fighters/lady-vashj/clips.ts"]
+producer = "tools/animations/lady-vashj-clips.ts"
 [[generated]]
 paths = ["ts/src/generated/assets/ankhAssetInfo.ts"]
 producer = "tools/effects/ankh.ts"

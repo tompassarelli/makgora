@@ -30,7 +30,6 @@ import { AttackPhase, AttackStyle, Character, ContactKind, DownState, SpecialAct
 import { attackPhase } from "../../src/game/sim/conditions";
 import { beginDamageContacts, finishDamageContacts, queueDamageContact } from "../../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
-import { mutableCandle } from "../../src/game/sim/fighterRest";
 import { advanceHeroStatus, enterFollowUp, runningHeroSpecial } from "../../src/game/sim/specials/engine";
 import { fighterSlug } from "../../src/game/roster/kits";
 import { isAerialAttack } from "../../src/game/sim/moves";
@@ -47,8 +46,6 @@ import { advanceOrbs } from "../../src/game/match/orbs";
 import { ORB_INTERVAL_FRAMES, ORB_WARNING_FRAMES, orbPoint } from "../../src/game/sim/orbs";
 import { Phase, createMatchState } from "../../src/game/lobby/lobbyState";
 import { OrbPresentation } from "../../src/game/render/orbPresentation";
-import { CandlePresentation } from "../../src/game/render/candlePresentation";
-import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL } from "../../src/game/fighters/kobold/candle";
 import { CombatEffects } from "../../src/game/render/combatEffects";
 import { advanceImpacts, createImpactState, emitImpacts } from "../../src/game/presentation/impactState";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../src/game/presentation/impactEvents";
@@ -82,7 +79,6 @@ export interface CueMove {
   readonly ultimate?: true;
   readonly orb?: boolean;
   readonly spark?: "strong" | "weak";
-  readonly candleHeat?: number;
 }
 
 export interface CueMeasurement {
@@ -153,7 +149,6 @@ export function cueMoves(): CueMove[] {
   }
   for (const character of Object.values(Character)) moves.push({ character, name: `${fighterSlug(character)}:ultimate`, ultimate: true });
   moves.push({ character: Character.rifleman, name: "orb:warning-and-orb", orb: true });
-  for (const level of [0, CANDLE_MAX_LEVEL]) moves.push({ character: Character.kobold, name: `kobold:candle-level${level}`, candleHeat: level * CANDLE_LEVEL_HEAT });
   for (const spark of ["strong", "weak"] as const) moves.push({ character: Character.blademaster, name: `blademaster:forwardSmash-${spark}-spark`, style: AttackStyle.forwardSmash, spark });
   return moves;
 }
@@ -326,37 +321,9 @@ function orbScenes(): ReturnType<typeof cueScenes> {
   } finally { runtime.restore(); }
 }
 
-function candleScenes(heat: number): ReturnType<typeof cueScenes> {
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
-  try {
-    const clients = runtime.clients({ install() {}, start() {} }, [0]);
-    const client = clients.client(0);
-    clients.start();
-    const origin = { x: 0.0, y: PLAYABLE_BOUNDS.centreY, z: FLOOR_HEIGHT };
-    let candle: CandlePresentation | undefined;
-    client.run(() => { candle = new CandlePresentation(origin); });
-    if (candle === undefined) throw new Error("missing candle renderer");
-    const f = createFighter(Character.kobold, 0.0, 1);
-    mutableCandle(f).heat = heat;
-    const scenes: RenderScene[] = [];
-    let empty: RenderScene | undefined;
-    for (let tick = 0; tick < LIMIT; tick++) {
-      const shown = candle;
-      client.run(() => { shown.present(f, 0, tick); aimNear(origin.x + f.motion.x, f.motion.z); });
-      clients.frames(1);
-      const scene = captureScene(client, { visibleOnly: true });
-      empty ??= { ...scene, frame: -1, effects: [] };
-      scenes.push({ ...scene, frame: tick, units: [] });
-    }
-    if (empty === undefined) throw new Error("no frames");
-    return { scenes, poses: [], lastDanger: LIMIT - 1, empty };
-  } finally { runtime.restore(); }
-}
-
 export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback?: string; readonly expected?: readonly string[] } {
   if (move.orb === true) return orbScenes();
   if (move.spark !== undefined) return sparkScenes(move);
-  if (move.candleHeat !== undefined) return candleScenes(move.candleHeat);
   const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);

@@ -16,8 +16,6 @@ import { observedActions, resetObservedActions } from "../sim/observations";
 import { updateProjectiles } from "../sim/projectiles";
 import { advancePlacedObjects } from "../sim/placedObjects";
 import { advanceCurses } from "../sim/curses";
-import { advanceCandleBodies, settleCandles } from "../fighters/kobold/candle";
-import { strikeCandles } from "../fighters/kobold/candleStrikes";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, cancelShineForUpSmash, startFighterSpecial } from "../sim/specials";
@@ -264,8 +262,6 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   advanceSpecials(world, stage, stageFrame, controls.inputs);
   updateProjectiles(world, stage, stageFrame);
   advancePlacedObjects(world, stage, stageFrame);
-  strikeCandles(world);
-  advanceCandleBodies(world, stage, stageFrame);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
@@ -274,7 +270,6 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     advanceItemBuff(f);
   }
   finishDamageContacts(world);
-  settleCandles(world, game.matchFrame);
   resolveGrabs(world);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;

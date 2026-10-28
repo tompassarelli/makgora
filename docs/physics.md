@@ -1319,7 +1319,7 @@ Each hero grips the ground by its body type, in Melee units a frame
 on frost, is the roster's Luigi; the other robed casters 0.04-0.06
 (Malfurion 0.04, Medivh 0.05, Kael'thas 0.055, Lich 0.06); Sylvanas and Peon
 0.05; Murloc 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
-Warden, Shadow Hunter, Dreadlord, Kobold, Grom); sturdy fighters 0.065
+Warden, Shadow Hunter, Dreadlord, Grom); sturdy fighters 0.065
 (Mountain King, Forsaken Paladin, Beastmaster, Lich King, Chen, Tinker);
 Thrall 0.07; Pit Lord, Cairne and Anub'arak 0.08. Rifleman and Illidan keep
 Fox's and Captain Falcon's 0.08. Melee spans 0.025 (Luigi) to 0.1 (Peach,

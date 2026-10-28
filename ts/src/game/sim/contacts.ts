@@ -45,10 +45,12 @@ import { at } from "wisp/src/runtime/lookup";
 import { CHILL } from "./chill";
 import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
-import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
+import type { AppliedStatus } from "./appliedStatus";
+import { applyHeroStatus, damageEndsHeroStatus, isEthereal } from "./heroStatus";
+import { MANA_SHIELD_BREAK, shieldedDamage } from "./manaShield";
+import { isPetrified, petrifiedDamage } from "./gaze";
 import { drainUltimate, gainUltimate, ultimatePercent } from "./meter";
 import { capPercent } from "./percent";
-import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "../fighters/kobold/candle";
 import { contactIsSpell, contactTraits } from "./identityTraits";
 import { meleeHandling } from "./meleeHandling";
 import { exRecoveryFrames } from "./exSpecials";
@@ -96,8 +98,6 @@ function emptyContact(): DamageContact {
 }
 
 const batch: { contacts: DamageContact[]; count: number; collecting: boolean } = { contacts: [], count: 0, collecting: false };
-const candleHeat: number[] = [0, 0, 0, 0];
-const candleDrop: boolean[] = [false, false, false, false];
 let damageObserver: ((source: number, target: number, damage: number) => void) | undefined;
 
 export function observeDamageContacts(observer: ((source: number, target: number, damage: number) => void) | undefined): void {
@@ -112,8 +112,6 @@ function flinchHitstunFrames(damage: number): number {
 export function beginDamageContacts(): void {
   batch.count = 0;
   batch.collecting = true;
-  candleHeat.fill(0);
-  candleDrop.fill(false);
 }
 
 
@@ -121,8 +119,6 @@ export function clearDamageContacts(): void {
   batch.contacts.length = 0;
   batch.count = 0;
   batch.collecting = false;
-  candleHeat.fill(0);
-  candleDrop.fill(false);
 }
 
 
@@ -274,6 +270,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   let strongHitlag = 0;
   let shieldPushback = 0.0;
   let shieldDirection = 1;
+  const shieldWasUp = status.manaShield;
   const perfectShield = shield.perfectFrames > 0;
   for (let index = 0; index < batch.count; index++) {
     const contact = contactAt(index);
@@ -283,7 +280,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       shieldElectric ||= contact.effect.electric || contact.effect.element === HitElement.electric;
       if (!perfectShield) shieldDamage = addFloat32(shieldDamage, contact.effect.shieldDamage ?? contact.effect.damage);
     } else {
-      totalDamage = addFloat32(totalDamage, roundToFloat32(contact.effect.damage));
+      totalDamage = addFloat32(totalDamage, roundToFloat32(petrifiedDamage(target, shieldedDamage(target, contact.effect.damage, contact.kind))));
       damageObserver?.(contact.source, contact.target, contact.effect.damage);
     }
   }
@@ -316,9 +313,8 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       drainMeter(target, stolen);
       gainUltimate(source, stolen);
     }
-    if (damage > 0 && source !== target) candleHeat[contact.source] = at(candleHeat, contact.source) + candleHeatGain(source, damage);
     if (damage > 0 && contact.kind !== ContactKind.pummel) {
-      thawFighter(target);
+      if (!isPetrified(target)) thawFighter(target);
       damageEndsHeroStatus(target);
     }
     if (contact.kind !== ContactKind.damageOnly && contact.kind !== ContactKind.throw) {
@@ -356,6 +352,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     }
   }
   status.damage = capPercent(addFloat32(roundToFloat32(status.damage), totalDamage));
+  if (shieldWasUp && !status.manaShield) applyHeroStatus(target, MANA_SHIELD_BREAK);
   if (blockedContact) {
     target.visuals.shieldElectric = shieldElectric;
     if (perfectShield) {
@@ -379,6 +376,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     shield.energy = SHIELD_BREAK_RESTORED_ENERGY;
     beginShieldBreak(world, slot);
   }
+  if (isPetrified(target)) return;
   const chosenIndex = winner ?? flinch;
   if (chosenIndex === undefined) return;
 
@@ -419,7 +417,6 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   const directionZ = sakurai === undefined ? chosen.effect.launchZ : sakurai.z;
   const carried = chosen.direct && chosen.effect.carry === true;
   installDamageLaunch(target, strongest, multiplyFloat32(chosen.facing, directionX), directionZ, chosen.grounded, !carried);
-  if (candleDrops(target, strongest)) candleDrop[slot] = true;
   if (carried && !target.motion.grounded) {
     target.motion.vx = chosen.sourceVelocityX;
     target.motion.vz = chosen.sourceVelocityZ;
@@ -453,22 +450,10 @@ function applyContactStatuses(world: Roster, slot: number): void {
 
 
 export function finishDamageContacts(world: Roster): void {
-  candleHeat.fill(0);
-  candleDrop.fill(false);
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     resolveDamageContacts(world, slot);
     applyContactStatuses(world, slot);
-  }
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
-    const gain = at(candleHeat, slot);
-    candleHeat[slot] = 0;
-    if (gain > 0) feedCandle(fighterAt(world, slot), gain);
-  }
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
-    if (!at(candleDrop, slot)) continue;
-    candleDrop[slot] = false;
-    dropCandle(fighterAt(world, slot));
   }
   batch.count = 0;
   batch.collecting = false;

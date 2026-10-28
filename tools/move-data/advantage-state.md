@@ -74,9 +74,6 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Grom Hellscream | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Grom Hellscream | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech short hop, down special, dash, dash attack; trap short hop, down special, dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
 | Grom Hellscream | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down special; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Kobold | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in up smash; tech away dash, dash attack; missed tech short hop, forward air; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 20% → up air against 4/5 DI |
-| Kobold | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away dash, dash attack; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Kobold | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, back air; tech in up smash; tech away full hop, forward air; missed tech short hop, back air; trap short hop, back air covers tech in place, tech in, missed tech | up throw at 60% → up air against 5/5 DI |
 | Malfurion Stormrage | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away side special; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Malfurion Stormrage | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash, dash attack; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Malfurion Stormrage | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away side special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
@@ -360,18 +357,6 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Grom Hellscream | heavy | back throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | heavy | up throw | 1/1 | 1/1 in forward tilt, out short hop, back air | 1/1 in short hop, back air, out forward smash | 1/1 in forward tilt, out down special |
 | Grom Hellscream | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kobold | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Kobold | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kobold | light | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in forward smash, out short hop, forward air |
-| Kobold | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kobold | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Kobold | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kobold | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in forward smash, out short hop, forward air |
-| Kobold | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kobold | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Kobold | heavy | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Kobold | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 KD in up smash, out forward smash | 1/1 in up smash, out short hop, forward air |
-| Kobold | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Malfurion Stormrage | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Malfurion Stormrage | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Malfurion Stormrage | light | up throw | 1/1 in short hop, back air, out side special | 1/1 KD in short hop, back air, out short hop, forward air | 1/1 KD in down smash, out forward smash | 1/1 KD in short hop, back air, out side special |

@@ -282,18 +282,6 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     ending: ["Mrglglglgl! MRGLGLGL!", "(The murloc has claimed the Tomb of Sargeras as its tide pool.)"],
   },
   {
-    fighter: C.kobold, boss: BossKind.archimonde,
-    story: "One kobold follows his stolen candle from the gold mines to Hyjal, where a demon wants to burn every last wick.",
-    fights: [
-      fight(C.rifleman, 11, "The mine's closed, little fella. Hand over that candle."),
-      fight(C.tinker, 3, "A candle-powered drill! Relax, pal. I'll give it back after testing."),
-      fight(C.mountainKing, 12, "Ye dug into Ironforge's vault! Put that gold back!"),
-      fight([C.lich, C.dreadlord], 4, "The dead need no candlelight. Neither will you."),
-      fight(C.peon, 12, "Me found candle in mine! Finders keepers!"),
-    ],
-    ending: ["Big demon take world tree. Kobold take candle back.", "You no take candle! ...You want borrow? One copper."],
-  },
-  {
     fighter: C.grom, boss: BossKind.archimonde,
     story: "Grom Hellscream wrestles with the blood curse, then turns Gorehowl on the Legion that enslaved his clan.",
     fights: [
@@ -340,6 +328,18 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
       fight(C.malfurion, 10, "Nordrassil shelters this world, Medivh. Prove your counsel will not betray it."),
     ],
     ending: ["The Legion's shadow has lifted. Azeroth's children chose to stand together.", "I opened the wrong door once. This time, I showed them the way home.", "My work is finished. Their future belongs to them."],
+  },
+  {
+    fighter: C.ladyVashj, boss: BossKind.kiljaeden,
+    story: "Lady Vashj rises from the Broken Isles to serve Illidan's bargain with Kil'jaeden, until the Deceiver comes to judge it.",
+    fights: [
+      fight(C.murloc, 7, "Mrrrgl! The deep queen calls the tide, the tide takes us!"),
+      fight(C.warden, 7, "Stand aside, sea witch. Your master's cell is waiting."),
+      fight(C.malfurion, 10, "You were Highborne once, Vashj. Is this all Azshara left you?"),
+      fight(C.kaelthas, 14, "My people and yours serve one master now. Prove the naga are worth the alliance."),
+      fight(C.lichKing, 2, "The Frozen Throne will not fall to a serpent of the deep."),
+    ],
+    ending: ["The Deceiver withdrew, his bargain unpaid.", "My people endured ten thousand years beneath the waves. A tournament is nothing."],
   },
   {
     fighter: C.archimonde, boss: BossKind.kiljaeden,

@@ -283,7 +283,7 @@ Built on the existing headless sim and search, not beside them.
   throws by role from [throw roles](throw-roles.md) (Rule B, #331), with the
   role's percents unless a throw gives its own. After the link rows,
   `--objectives` runs each role's test from that page's menu on the combo
-  explorer against a Kobold at weight 75 under DI none, in, out, up and down
+  explorer against a Rifleman at weight 75 under DI none, in, out, up and down
   (`ts/scripts/throwRoleObjectives.ts`), checks that each fighter covers at
   least three roles, and names every throw that misses. This part simulates,
   so it runs under heavy admission, one `--fighter` at a time for the roster.

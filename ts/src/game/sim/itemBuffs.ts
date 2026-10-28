@@ -6,7 +6,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { CandleState, Character, ItemKind } from "./codes";
+import { ItemKind } from "./codes";
 import type { Fighter } from "./fighter";
 
 
@@ -21,8 +21,6 @@ export const HEAVY_BUFF_WEIGHT_SCALE = 1.5;
 
 export const HEAVY_BUFF_FALL_SCALE = f32(1.3);
 
-export const CANDLE_BARE_SPEED = f32(1.1);
-
 
 const GROUNDED_JUMPS = 2;
 const AERIAL_JUMPS = 1;
@@ -32,10 +30,6 @@ export function speedBuffed(f: Readonly<Fighter>, speed: number): number {
   return f.status.buff === ItemKind.speed ? f32(speed * SPEED_BUFF_SCALE) : speed;
 }
 
-
-export function candleBareSpeed(f: Readonly<Fighter>, speed: number): number {
-  return f.character === Character.kobold && f.candle.state !== CandleState.held ? f32(speed * CANDLE_BARE_SPEED) : speed;
-}
 
 
 export function jumpBuffed(f: Readonly<Fighter>, speed: number): number {

@@ -274,7 +274,7 @@ export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> =
   [Character.kaelthas]: { guarder: Character.kaelthas, out: 163.0, z: -68.0, press: 3 },
   [Character.murloc]: { guarder: Character.murloc, out: 163.0, z: -68.0, press: 3 },
   [Character.grom]: { guarder: Character.grom, out: 163.0, z: -68.0, press: 1 },
-  [Character.kobold]: { guarder: Character.kobold, out: 163.0, z: -68.0, press: 3 },
+  [Character.ladyVashj]: { guarder: Character.ladyVashj, out: 163.0, z: -68.0, press: 3 },
   [Character.malfurion]: { guarder: Character.malfurion, out: 97.0, z: -84.0, press: 6 },
   [Character.medivh]: { guarder: Character.medivh, out: 163.0, z: -68.0, press: 3 },
   [Character.archimonde]: { guarder: Character.archimonde, out: 160.0, z: -134.0, press: 3 },
