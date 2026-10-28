@@ -17,6 +17,7 @@ export interface WorldOrigin {
 export const STOCK_MODELS = {
   silenceTarget: "Abilities\\Spells\\Other\\Silence\\SilenceTarget.mdx",
   curseTarget: "Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx",
+  doomTarget: "Abilities\\Spells\\Other\\Doom\\DoomTarget.mdx",
   flyingMachineMissile: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineMissile.mdx",
   immolationTarget: "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx",
   manaBurnTarget: "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdx",
