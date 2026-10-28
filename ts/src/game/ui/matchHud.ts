@@ -15,11 +15,6 @@ import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 
 
-export function plateMeterSlot(position: number, count: number): { readonly left: number; readonly centerY: number; readonly width: number } {
-  const { meter } = panelLayout(position, count);
-  return { left: boxLeft(plateLeft(position, count), meter), centerY: boxTop(meter) - unitsForPixels(meter.height) / 2, width: unitsForPixels(meter.width) };
-}
-
 export class MatchClock {
   private readonly label: framehandle;
   private shownVisible = false;

@@ -1,7 +1,5 @@
-import { f32 } from "wisp/src/sim/f32";
+import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { METER } from "../sim/meter";
-
-export const EX_CELL_SHARE = f32(0.22);
 
 export const METER_DRAIN_UPDATES = 20;
 
@@ -29,3 +27,23 @@ export const meterDrainLit = (feedback: Readonly<MeterFeedback>): boolean => fee
 export const exFill = (ex: number): number => Math.min(1.0, Math.max(0.0, ex / METER.exFrames));
 
 export const ultimateFill = (ultimate: number): number => Math.min(1.0, Math.max(0.0, ultimate / METER.ultimateFrames));
+
+const PULSE_STEP_UPDATES = 4;
+const PULSE_STEPS = 12;
+const PULSE_FLOOR = 70;
+const PULSE_RISE = 30;
+
+export const ultimatePulse = (tick: number): number => {
+  const step = floorMod(floorDiv(tick, PULSE_STEP_UPDATES), PULSE_STEPS);
+  return PULSE_FLOOR + PULSE_RISE * (step < PULSE_STEPS / 2 ? step : PULSE_STEPS - step);
+};
+
+export interface MeterDisplay {
+  readonly exCell: { readonly fill: number; readonly lit: boolean };
+  readonly ultimateBar: { readonly fill: number; readonly pulse: number };
+}
+
+export const meterDisplay = (ex: number, ultimate: number, exReady: boolean, ultimateReady: boolean, tick: number): MeterDisplay => ({
+  exCell: { fill: exFill(ex), lit: exReady },
+  ultimateBar: { fill: ultimateFill(ultimate), pulse: ultimateReady ? ultimatePulse(tick) : 0 },
+});

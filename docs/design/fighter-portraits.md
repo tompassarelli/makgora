@@ -118,7 +118,7 @@ results, training) shows the whole percent. Its colour blends continuously
 white → yellow (50%) → red (100%) → dark red (150% and above). It shakes for 14
 rendered frames on each hit, harder for bigger hits, and is otherwise at rest at
 every percent: it never trembles on its own (Tom's correction, 2026-10-27;
-local presentation on the render clock only). The EX cell and the ultimate bar fill the track under the percent, the name
+local presentation on the render clock only). The EX cell sits right of the percent, the ultimate bar fills the track under it, the name
 sits on the strip under it, and the stock row under the name shows one 38 px
 head render per remaining stock, as Rivals does: up to five, then one icon and
 the count. smashcraft:ts/src/game/ui/plateLayout.ts holds every box in plate

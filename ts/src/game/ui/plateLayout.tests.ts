@@ -9,7 +9,8 @@ import { trainingReadout } from "../session/messages";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { Phase, requestStageSelect, selectCharacter } from "../lobby/lobbyState";
-import { DAMAGE_DARK_FROM, SHAKE_FRAMES, damageColour, damageText, numberJolt, percentText, stepJolt } from "./plateLayout";
+import { DAMAGE_DARK_FROM, SHAKE_FRAMES, type PlateBox, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, percentText, plateLeft, stepJolt } from "./plateLayout";
+import { unitsForPixels } from "./portraitFrames";
 
 const channels = (colour: number): readonly number[] => [imod(idiv(colour, 65536), 256), imod(idiv(colour, 256), 256), imod(colour, 256)];
 const plain = (text: string): string => text.substring(10, text.length - 2);
@@ -71,4 +72,35 @@ test("a fighter at 150% that takes no hit keeps its percent at rest on every fra
   assertEquals(jolt.dx, 0.0, "rest after the shake dx");
   assertEquals(jolt.dy, 0.0, "rest after the shake dy");
   assertTrue(!stepJolt(jolt, true, 162.5));
+});
+
+const span = (left: number, centerY: number, width: number, height: number) => ({ left, right: left + width, top: centerY + height / 2, bottom: centerY - height / 2 });
+const boxSpan = (left: number, box: PlateBox) => span(boxLeft(left, box), boxTop(box) - unitsForPixels(box.height) / 2, unitsForPixels(box.width), unitsForPixels(box.height));
+const overlaps = (a: ReturnType<typeof span>, b: ReturnType<typeof span>) => a.left < b.right && b.left < a.right && a.bottom < b.top && b.bottom < a.top;
+
+test("the EX cell is a small square beside the damage percent and the ultimate bar is a long thin strip under it, on both sides of the screen for two to four players [k3 measure docs/design/mana.md]", () => {
+  for (let count = 1; count <= 4; count++) {
+    for (let position = 0; position < count; position++) {
+      const { exCell, ultimateBar } = meterPlacement(position, count);
+      const where = `${count} players, position ${position}`;
+      assertEquals(exCell.width, exCell.height, `${where}: EX cell is square`);
+      assertEquals(ultimateBar.width >= 8 * ultimateBar.height, true, `${where}: ultimate bar is long and thin`);
+      assertEquals(ultimateBar.width > 4 * exCell.width, true, `${where}: the bar is far longer than the cell`);
+      const cell = span(exCell.left, exCell.centerY, exCell.width, exCell.height);
+      const bar = span(ultimateBar.left, ultimateBar.centerY, ultimateBar.width, ultimateBar.height);
+      assertEquals(!overlaps(cell, bar), true, `${where}: cell and bar apart`);
+      assertEquals(bar.top <= cell.bottom || bar.right <= cell.left || bar.left >= cell.right, true, `${where}: bar is not beside the cell`);
+      const left = plateLeft(position, count);
+      const panel = panelLayout(position, count);
+      for (const other of [panel.name, panel.slot, panel.doom, panel.stockCount, ...panel.stocks]) {
+        const box = boxSpan(left, other);
+        assertEquals(!overlaps(cell, box) && !overlaps(bar, box), true, `${where}: no overlap with name, slot, stocks or doom`);
+      }
+      const percent = boxSpan(left, panel.percent);
+      assertEquals(cell.top <= percent.top && cell.bottom >= percent.bottom, true, `${where}: cell sits in the percent's rows`);
+      assertEquals(panel.mirrored ? cell.left >= percent.left : cell.left >= percent.left + unitsForPixels(20), true, `${where}: cell sits beside the percent`);
+      const damage = boxSpan(left, panel.damage);
+      assertEquals(bar.top <= damage.bottom + unitsForPixels(4), true, `${where}: bar is under the damage number`);
+    }
+  }
 });

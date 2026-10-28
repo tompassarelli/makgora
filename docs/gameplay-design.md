@@ -1068,7 +1068,7 @@ and a declined ultimate is the ordinary special. It cannot cancel hitstun,
 shieldstun, release lag, attacks or other action locks. Follow-up inputs
 retain their ordinary behavior. The EX form needs a full EX charge and spends
 only it; below a full charge the same press starts its ordinary version. The
-HUD plate shows the EX cell charged beside the ultimate bar. The match help
+HUD plate lights the EX cell beside the damage percent when it is charged. The match help
 names the chord.
 
 Every EX neutral/side has one upgrade: one hit of at most 8% can deal its

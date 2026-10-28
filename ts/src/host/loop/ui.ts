@@ -20,7 +20,7 @@ import { SpecialEffects } from "../../game/render/specialEffects";
 import { Character } from "../../game/sim/codes";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
-import { FighterHud, MatchClock, plateMeterSlot } from "../../game/ui/matchHud";
+import { FighterHud, MatchClock } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
 import { TerrorPresentation } from "../../game/render/terrorPresentation";
@@ -28,8 +28,7 @@ import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
 import { FighterMarker } from "../../game/ui/fighterMarker";
 import { MeterBar } from "../../game/ui/meterBar";
-import { METER_BAR_HEIGHT_PX } from "../../game/ui/plateLayout";
-import { unitsForPixels } from "../../game/ui/portraitFrames";
+import { meterPlacement } from "../../game/ui/plateLayout";
 import { ButtonClicks, gameUi } from "../../game/ui/frames";
 import { ResultsBanner } from "../../game/ui/resultsBanner";
 import type { SelectionActions } from "../../game/ui/selectionActions";
@@ -122,7 +121,7 @@ export interface MeterBars {
 }
 
 const createMeterBars = (slot: ParticipantSlot): MeterBars => ({
-  hud: new MeterBar("Hud", slot, gameUi(), 1300 + slot * 20, unitsForPixels(METER_BAR_HEIGHT_PX)),
+  hud: new MeterBar("Hud", slot, gameUi(), 1300 + slot * 20),
 });
 
 function menuControls(s: Readonly<ShellState>): MenuControls {
@@ -229,8 +228,8 @@ export function layoutHuds(s: ShellState): void {
   const active = PARTICIPANT_SLOTS.filter(slot => isActive(s.world, slot));
   active.forEach((slot, position) => {
     ui.huds[slot].layout(position, active.length);
-    const { left, centerY, width } = plateMeterSlot(position, active.length);
-    ui.meterBars[slot].hud.place(left, centerY, width);
+    const { exCell, ultimateBar } = meterPlacement(position, active.length);
+    ui.meterBars[slot].hud.place(exCell, ultimateBar);
   });
 }
 

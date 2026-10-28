@@ -60,12 +60,18 @@ becoming ready, once on the confirmed frame (GameFound until #361: a
 7.5-second fanfare that was heard mid-match as a stray music clip). Replay and
 prediction never play the sound.
 
-The HUD plate carries both meters (`presentation/meterBar.ts`,
-`ui/meterBar.ts`). A small EX cell sits on the left: a blue fill rises over
-12 s and a teal glow marks a charged cell. An ultimate bar sits to its right
-with an orange fill and a yellow glow when full. The existing purple flash
-marks a drain. The HUD is the only meter display; fighters carry no
-duplicate overhead bar or pips.
+The HUD plate shows the two meters as two different displays, so neither is
+mistaken for the other (`presentation/meterBar.ts`, `ui/meterBar.ts`, boxes in
+`ui/plateLayout.ts`). The EX meter is one small square cell beside the damage
+percent: a blue fill rises from the bottom over the 12 s regen, dim while it
+charges, and a full charge turns the fill bright EX blue inside a blue halo.
+An orb pickup fills it at once. The ultimate meter is a long thin gold bar in
+the recessed slot under the damage number: it fills left to right over its
+2 min build and, when full with ultimates on, breathes between gold and orange.
+Cell and bar are always on the inner side of the plate, mirrored for the
+right-hand plates, and clear of the name, player tag and stocks. The existing
+purple flash over the bar marks a drain. The HUD is the only meter display;
+fighters carry no duplicate overhead bar or pips.
 
 These cues reuse the game's white fighter flash and stock sounds; they add no
 imported art or audio. match/orbs.tests.ts and presentation/meterRim.tests.ts
