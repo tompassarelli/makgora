@@ -86,23 +86,28 @@ above all, the hero who empties casters: Mana Burn is why he is picked.
 **Alternative A, Fel Rush as Falco's Phantasm to Maiev's Illusion (picked
 2026-10-28).** Tom asked for Fel Rush to work like Maiev's new Illusion-style
 side special, to go about as far, and to differ from hers the way Falco's
-Phantasm differs from Fox's Illusion. Both moves read their timing and
-distance from one shared module (smashcraft:ts/src/game/sim/specials/illusionDash.ts),
-taken from Melee's Illusion (SmashWiki, [Fox (SSBM)/Side special](https://www.ssbwiki.com/Fox_(SSBM)/Side_special):
+Phantasm differs from Fox's Illusion. Maiev's Shadow Dash keeps Melee's
+Illusion timing (smashcraft:ts/src/game/sim/specials/illusionDash.ts; SmashWiki,
+[Fox (SSBM)/Side special](https://www.ssbwiki.com/Fox_(SSBM)/Side_special):
 hitbox frames 22-25, five travel frames, 63 frames in all, 20 frames of
-landing lag). Ground or air, any facing (the stick picks the side).
+landing lag). Fel Rush takes Phantasm's timing (smashcraft:ts/src/game/sim/specials/phantasmDash.ts;
+Melee's record in references/melee-frame-data: hitbox frames 18-21, four
+travel frames, 59 frames in all, 20 frames of landing lag) over the same
+3.5H, so each step is longer and the rush starts sooner and ends sooner
+(Tom approved the retiming, 2026-10-28). Ground or air, any facing (the
+stick picks the side).
 
-- **Frames 1–20, the tell:** Illidan crouches and his fel aura flares green.
+- **Frames 1–17, the tell:** Illidan crouches and his fel aura flares green.
   Any hit stops it; no armor.
-- **Frames 21–25, the rush:** 92.4 units a frame, 462 in all (3.5H, Maiev's
+- **Frames 18–21, the rush:** 115.5 units a frame, 462 in all (3.5H, Maiev's
   full Illusion distance), in a straight line, leaving his fel streak. In the
   air he flies level (gravity off), as Fel Rush does in WoW. A grounded rush,
   and the first rush in an airtime, always go level, the stick picking only
   the side.
-- **Press special to stop short:** a special press on travel frame 21–24
-  stops him there, after 1–4 of the five steps, as Melee's Illusion shortens;
+- **Press special to stop short:** a special press on travel frame 18–20
+  stops him there, after 1–3 of the four steps, as Melee's Phantasm shortens;
   the move ends as many frames sooner as steps it skipped. A press during the
-  tell or on frame 25 does nothing. The strike covers the stretch he crossed
+  tell or on frame 21 does nothing. The strike covers the stretch he crossed
   each frame, so a shortened rush still strikes anyone it passed, and no one
   twice.
 - **The strike, Falco's Phantasm against Maiev's pop-up:** 7% fire, mana
@@ -114,7 +119,7 @@ landing lag). Ground or air, any facing (the stick picks the side).
   the air; its grounded angle is steeper, lowered here so the grounded hit
   sends low as Tom asked. The rush passes through bodies and stops just
   short of a raised shield, and the strike meets the shield.
-- **Frames 26–63:** recovery; he acts on frame 64. A rush that strikes a
+- **Frames 22–59:** recovery; he acts on frame 60. A rush that strikes a
   fighter (not a shield) skips to its last 14 frames, as Maiev's Illusion
   does, so a grounded hit leaves him acting while the foe lies knocked down:
   a tech chase. An air rush that lands before then ends with 20 frames of
@@ -123,12 +128,18 @@ landing lag). Ground or air, any facing (the stick picks the side).
   is the airtime's rush, whether it started in the air or ran off a ledge.
   If it strikes a fighter, shortened or not, he earns one more rush this
   airtime; the earned rush earns no third, so offstage rush chains stop at
-  two. An air rush that strikes nobody ends in helpless fall until he lands
-  or grabs a ledge; a grounded rush that strikes nobody ends normally.
+  two. A rush that ends in the air, whether it started on the ground or in
+  the air, ends in helpless fall until he lands or grabs a ledge, like
+  Falco's Phantasm, unless it was a first rush that struck: that one leaves
+  him free to use the earned rush, and the earned rush then ends helpless. A
+  grounded rush that stays on the ground ends normally (Tom asked,
+  2026-10-28). Like Melee's side specials it catches a ledge it faces during
+  its travel and end lag, and its helpless fall catches one like any fall
+  (playtest report, 2026-10-28).
   Landing, a ledge grab and being hit give the airtime back. Maiev's Illusion
   has no earned rush.
 - **The earned second rush is aimed:** the stick held on its last tell
-  frame (frame 20) sends it in any of 8 directions (up, down, the diagonals,
+  frame (frame 17) sends it in any of 8 directions (up, down, the diagonals,
   either side) at the same speed and distance; with the stick neutral it
   flies level in his facing. The press itself still picks the side, since an
   up or down press is Wing Ascent or Immolate. Meeting the floor during a
@@ -138,10 +149,10 @@ landing lag). Ground or air, any facing (the stick picks the side).
   [mana](mana.md); same frames, no armor, no extra speed.
 - **Cost:** the mana lane's side-special cost (12).
 
-**Counterplay.** The tell is 20 frames, so the rush is a read at any range;
-from its full 462 units it arrives on frame 25. A raised shield stops it
+**Counterplay.** The tell is 17 frames, so the rush is a read at any range;
+from its full 462 units it arrives on frame 21. A raised shield stops it
 and the rush sits in 38 frames of recovery: punishable. A jump over the low
-rush leaves him in recovery below; a whiffed air rush leaves him helpless.
+rush leaves him in recovery below; a rush that ends in the air with no hit leaves him helpless.
 The defender's read is the shortened stop: Illidan can stop in front of a
 shield or just past a dodger, so holding shield late beats a full rush, and
 a roll away beats a short one.
@@ -504,8 +515,8 @@ attackCues.ts and elementLooks.ts):
 
 | Option | Effect |
 | --- | --- |
-| Fel Rush tell (frames 1–20), and every branch's startup | Death Coil special art |
-| Fel Rush (frames 21–25, or to a shortened stop) | Illidan's Metamorphosis missile streak along the path and the green wing trail, which fade behind him; Maiev's Illusion leaves blink afterimages instead |
+| Fel Rush tell (frames 1–17), and every branch's startup | Death Coil special art |
+| Fel Rush (frames 18–21, or to a shortened stop) | Illidan's Metamorphosis missile streak along the path and the green wing trail, which fade behind him; Maiev's Illusion leaves blink afterimages instead |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
 | Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a clean hit on the shin, foot or heel lands as the fire hit's green flame burst, a knee hit as the normal spark |
 | Down smash, the splits | the fire hit's fel burn on the foe it kicks |

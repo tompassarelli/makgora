@@ -42,7 +42,7 @@ const ILLUSION_PATH_Z = 48.0;
 const ILLUSION_PATH_RADIUS = 24.0;
 export const SHADOW_DASH_DISTANCE = f32(H * f32(ILLUSION_DISTANCE_HEIGHTS));
 const shadowDash = (growth: number): AuthoredSpecial => ({
-  endFrame: ILLUSION_END_FRAME, shorten: ILLUSION_SHORTEN,
+  endFrame: ILLUSION_END_FRAME, shorten: ILLUSION_SHORTEN, helpless: true, catchesLedge: true,
   hitRecovery: { from: ILLUSION_LAST_TRAVEL_FRAME + 1, frames: ILLUSION_HIT_RECOVERY },
   motion: [
     { ...frames(1, ILLUSION_FIRST_TRAVEL_FRAME - 1), velocityX: 0.0, velocityZ: 0.0 },
@@ -53,7 +53,7 @@ const shadowDash = (growth: number): AuthoredSpecial => ({
 });
 const SHADOW_DASH = shadowDash(40.0);
 const SHADOW_DASH_AIR: AuthoredSpecial = {
-  ...shadowDash(60.0), oncePerAirtime: true, helpless: true, landingLag: ILLUSION_AIR_LANDING_LAG, airStall: frames(1, ILLUSION_LAST_TRAVEL_FRAME),
+  ...shadowDash(60.0), oncePerAirtime: true, landingLag: ILLUSION_AIR_LANDING_LAG, airStall: frames(1, ILLUSION_LAST_TRAVEL_FRAME),
 };
 
 
@@ -91,7 +91,7 @@ const FAN_OF_KNIVES_AIR: AuthoredSpecial = {
 
 export const WARDEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that deals 2 damage and adds a poison stack, up to 5, each hit refreshing a 2-second timer; when the timer runs out the stacks burst for 1 damage each, and a glow over the foe grows with the count; it never flinches or knocks back, so a victim keeps acting through it; it leaves on frame 10 of 36, on the ground or in the air; press again from frame 4 to throw another 10 frames later, so a short hop throws two, and landing in the air cuts the rest short.", ground: SHADOW_STRIKE, air: SHADOW_STRIKE_AIR }, { range: 1.25 }),
-  side: withExKit({ name: "Shadow Dash", description: "A fast straight blink dash that cuts through foes and leaves her afterimages along the path; it travels on frames 21-25 of 63, and pressing special again while she travels stops her where she is, and a shortened dash still hits. The slash pops foes up at 80 degrees with no stun, and a hit cuts her end lag short for a follow-up. In the air it holds her up through the dash, once per airtime, and leaves her helpless.", ground: SHADOW_DASH, air: SHADOW_DASH_AIR }, { travel: 1.25 }),
+  side: withExKit({ name: "Shadow Dash", description: "A fast straight blink dash that cuts through foes and leaves her afterimages along the path; it travels on frames 21-25 of 63, and pressing special again while she travels stops her where she is, and a shortened dash still hits. The slash pops foes up at 80 degrees with no stun, and a hit cuts her end lag short for a follow-up. In the air it holds her up through the dash, once per airtime; any dash that ends in the air, from the ground or the air, leaves her helpless.", ground: SHADOW_DASH, air: SHADOW_DASH_AIR }, { travel: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
   down: withExKit({ name: "Fan of Knives", description: "A ring of knives on frames 4-7 that hits foes on either side of her, poisoning them; on the ground it pushes them away along a low angle with shine's knockback at every percent, so a light foe tumbles and a heavy one does not, and in the air it sends them away from her on a set semi-spike, like a shine, and nearly stops her fall; jump out of it from frame 4. On the ground she slides on the speed she had, slowing only by traction, and in the air she stops sideways as it starts. Hold the stick away as you press it, or on any later frame, to turn around without restarting it.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { reach: 1.25 }),
 };

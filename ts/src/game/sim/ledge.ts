@@ -15,6 +15,7 @@ import { aerialJumps, groundedJumps, jumpBuffed, speedBuffed } from "./itemBuffs
 import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformInput, clearTech, leaveLedge, refreshAirOnExit, refreshOriginalAirtime } from "./transitions";
 import { melee } from "./tuning";
 import { heroBody } from "./heroes/heroBodies";
+import { runningHeroSpecial } from "./specials/engine";
 
 export const LEDGE_CLIMB_FRAMES = 25;
 export const LEDGE_ROLL_FRAMES = 36;
@@ -139,6 +140,11 @@ export function isUpSpecialAction(action: number): boolean {
     || action === SpecialAction.riflemanRecovery || action === SpecialAction.demonHunterWingAscent;
 }
 
+function specialCatchesLedge(f: Readonly<Fighter>): boolean {
+  return f.special.action === SpecialAction.demonHunterFelRush || runningHeroSpecial(f)?.catchesLedge === true;
+}
+
+
 
 
 
@@ -147,9 +153,9 @@ export function isUpSpecialAction(action: number): boolean {
 
 function canCatchLedge(f: Fighter): boolean {
   const { attack, special, dodge, launch, down } = f;
-  const upSpecial = isUpSpecialAction(special.action);
+  const catchesMidSpecial = isUpSpecialAction(special.action) || specialCatchesLedge(f);
   return !f.status.out && !special.egg && f.status.frozenFrames <= 0 && launch.hitlag <= 0 && launch.hitstun <= 0
-    && attack.style === undefined && (upSpecial || (attack.cooldown <= 0 && special.action === SpecialAction.none && special.lockFrames <= 0))
+    && attack.style === undefined && (catchesMidSpecial || (attack.cooldown <= 0 && special.action === SpecialAction.none && special.lockFrames <= 0))
     && !dodge.airDodging && f.shield.breakState === ShieldBreak.none
     && !inGrabContext(f) && (down.state === DownState.none || isTumbling(f));
 }
@@ -160,7 +166,7 @@ function canCatchLedge(f: Fighter): boolean {
 
 function ledgeCandidate(f: Fighter, stage: number, input: Readonly<Controls>): number {
   const { motion } = f;
-  if (!canCatchLedge(f) || motion.grounded || f.ledge.regrab > 0 || input.down || motion.deltaZ >= 0) {
+  if (!canCatchLedge(f) || motion.grounded || f.ledge.regrab > 0 || input.down || motion.deltaZ > 0 || (motion.deltaZ === 0 && !specialCatchesLedge(f))) {
     return 0;
   }
   const side = -f.facing;

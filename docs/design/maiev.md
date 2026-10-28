@@ -167,7 +167,9 @@ What she keeps, so she does not become Fox in a costume:
   frame 45 instead of 64 and is +4 to +7 at 0% while a whiff keeps Melee's
   63 frames (probed headless on Rifleman, 2026-10-28). It never homes,
   never teleports behind anyone and never stuns: the stun and mark forms are
-  gone. EX dashes 25% farther and changes nothing else.
+  gone. EX dashes 25% farther and changes nothing else. Like Fox's, it catches
+  a ledge she faces during its travel and end lag, and its helpless fall
+  catches one like any fall (playtest report, 2026-10-28).
 - Fan of Knives (down special, #272, #494): a frame-4 ring of knives with set
   knockback, a shine-like semi-spike in the air, that she can jump out of, so
   it sits near shine and must stay apart from it: it reflects nothing, it

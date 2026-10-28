@@ -303,6 +303,8 @@ export interface AuthoredSpecial {
 
   readonly helpless?: boolean | undefined;
 
+  readonly catchesLedge?: true | undefined;
+
   readonly helplessOnMiss?: boolean | undefined;
   readonly parasol?: true | undefined;
 

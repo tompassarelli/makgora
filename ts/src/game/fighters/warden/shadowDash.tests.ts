@@ -8,6 +8,7 @@ import { ordinaryHitstunFrames, TUMBLE_KNOCKBACK } from "../../sim/knockback";
 import { ILLUSION_FIRST_TRAVEL_FRAME, ILLUSION_LAST_TRAVEL_FRAME, ILLUSION_TRAVEL_FRAMES } from "../../sim/specials/illusionDash";
 import { SHADOW_DASH_DISTANCE } from "./specials";
 import { duelPair, lift, stepDuel } from "../../sim/testDuel";
+import { surfaceRight } from "../../sim/stage";
 import { controls } from "../../sim/testWorld";
 
 const H = HERO_REFERENCE_HEIGHT;
@@ -91,6 +92,19 @@ test("In the air the dash leaves her helpless and works once per airtime [k4 ref
   stepDuel(world, side);
   for (let frame = 0; frame < 30; frame++) stepDuel(world);
   assertTrue(Math.abs(f32(maiev.motion.x - x)) < STEP);
+});
+
+test("A grounded dash that carries her off the ledge ends helpless in the air [k1 scenario]", () => {
+  const maiev = createFighter(Character.warden, f32(surfaceRight(0, 0, 0) - 40.0), 1);
+  const target = createFighter(Character.rifleman, f32(-FAR), -1);
+  const { world } = duelPair(maiev, target);
+  stepDuel(world);
+  assertTrue(maiev.motion.grounded);
+  stepDuel(world, side);
+  while (maiev.special.action !== 0 && maiev.special.frame < 70) stepDuel(world);
+  assertFalse(maiev.motion.grounded);
+  assertTrue(maiev.special.fall);
+  assertEquals(maiev.jump.remaining, 0);
 });
 
 test("A rollback to mid-dash replays the shortened dash and its hit exactly [k1 scenario]", () => {
