@@ -4,7 +4,7 @@ import { AttackStyle } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
 import { heroDefinition } from "../roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../sim/moves";
-import { type AuthoredSpecial, specialKit } from "../sim/specials/schema";
+import { type AuthoredSpecial, FollowUpInput, specialKit } from "../sim/specials/schema";
 import { heroCueWindows } from "../presentation/cueWindows";
 
 export const SHOWCASE_FIRST_FRAME = 40;
@@ -21,6 +21,8 @@ export interface ShowcaseMove {
   readonly gap?: number | undefined;
   readonly again?: { readonly frame: number; readonly gap: number } | undefined;
   readonly charging?: readonly number[] | undefined;
+  readonly release?: number | undefined;
+  readonly swing?: readonly number[] | undefined;
 }
 
 export interface ShowcaseRow {
@@ -47,13 +49,19 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
 
 function chargedShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove | undefined {
   const charge = special.charge;
-  const full = charge === undefined ? undefined : special.followUps?.find((followUp) => followUp.chargeStage === charge.stages && followUp.input === undefined && followUp.window.first <= charge.hold + 3 && followUp.window.last >= charge.hold + 3)?.special;
+  const released = charge?.releases === true;
+  const full = charge === undefined ? undefined : special.followUps?.find((followUp) => followUp.chargeStage === charge.stages && (released ? followUp.input === FollowUpInput.release : followUp.input === undefined && followUp.window.first <= charge.hold + 3 && followUp.window.last >= charge.hold + 3))?.special;
   if (charge === undefined || full === undefined) return undefined;
   const frame = charge.hold + charge.full + 2;
   const handful = floorDiv(charge.full, charge.stages);
+  const charging = Array.from({ length: charge.stages + 1 }, (_, stage) => charge.hold + stage * handful);
+  if (released) {
+    const hits = full.regions ?? [], first = frame + 1 + Math.min(...hits.map(region => region.firstFrame)), last = frame + 1 + Math.max(...hits.map(region => region.lastFrame));
+    return { slot, kind: "special", code, first, end: frame + full.endFrame, release: frame, charging, swing: [first + floorDiv(last - first, 2), last] };
+  }
   return {
     slot, kind: "special", code, first: frame + heroCueWindows(full).active.first, end: frame + full.endFrame, again: { frame, gap: CHARGED_SHOWCASE_GAP },
-    charging: Array.from({ length: charge.stages + 1 }, (_, stage) => charge.hold + stage * handful),
+    charging,
   };
 }
 
@@ -67,7 +75,7 @@ function radialGap(special: Readonly<AuthoredSpecial>): number | undefined {
 export function showcaseFrames(move: ShowcaseMove): number[] {
   const duration = Math.max(8, move.end);
   const samples = move.kind === "ultimate" ? [1, Math.max(2, floorDiv(move.first, 2)), move.first, Math.round(duration / 3), Math.round(duration * 2 / 3), duration, duration + 2, duration + 300]
-    : [...(move.charging ?? []), 1, Math.max(2, floorDiv(move.first, 2)), move.first - 2, move.first, move.first + 1, move.first + 3, Math.round((move.first + 3 + duration) / 2), duration];
+    : [...(move.charging ?? []), ...(move.swing ?? []), 1, Math.max(2, floorDiv(move.first, 2)), move.first - 2, move.first, move.first + 1, move.first + 3, Math.round((move.first + 3 + duration) / 2), duration];
   const frames: number[] = [];
   for (const sample of samples.sort((a, b) => a - b)) frames.push(Math.max(SHOWCASE_FIRST_FRAME + sample, (frames[frames.length - 1] ?? SHOWCASE_FIRST_FRAME) + 1));
   return frames;
