@@ -18,6 +18,10 @@ export const BLADEMASTER_AUTHORED_CLIPS = {
   backAir: { index: 69, seconds: f32(0.55) },
   upAir: { index: 70, seconds: f32(0.45) },
   throwBack: { index: 71, seconds: f32(0.617) },
+  sideSpecial: { index: 75, seconds: f32(0.983), aligned: true },
+  sideSpecialAir: { index: 75, seconds: f32(0.983), aligned: true },
+  sideSpecialFollowUp: { index: 76, seconds: f32(0.767), aligned: true },
+  sideSpecialFollowUpAir: { index: 76, seconds: f32(0.767), aligned: true },
 } as const satisfies HeroClipTable;
 
 export const BLADEMASTER_AUTHORED_CLIP_NAMES = {
@@ -37,4 +41,8 @@ export const BLADEMASTER_AUTHORED_CLIP_NAMES = {
   backAir: "Sword Gesture Air Turning Back Cut",
   upAir: "Sword Gesture Air Upward Pierce",
   throwBack: "Sword Gesture Throw Back Heave",
+  sideSpecial: "Sword Gesture Wind Walk Guard",
+  sideSpecialAir: "Sword Gesture Wind Walk Guard",
+  sideSpecialFollowUp: "Sword Gesture Wind Walk Kick",
+  sideSpecialFollowUpAir: "Sword Gesture Wind Walk Kick",
 } as const;

@@ -56,9 +56,9 @@ export const WIND_WALK_KICK_REACH = length(f32(2.5));
 const STOP = { velocityX: 0.0, velocityZ: 0.0 };
 
 const LIFT_KICK = path(WIND_WALK_KICK.first, [
-  capsule(20.0, 30.0, 90.0, 60.0, 22.0),
-  capsule(20.0, 35.0, 85.0, 110.0, 22.0),
-  capsule(15.0, 45.0, 65.0, 150.0, 22.0),
+  capsule(15.0, 45.0, 45.0, 150.0, 22.0),
+  capsule(12.0, 50.0, 42.0, 170.0, 22.0),
+  capsule(10.0, 55.0, 40.0, 180.0, 22.0),
   capsule(10.0, 55.0, 45.0, 175.0, 22.0),
   capsule(10.0, 55.0, 40.0, 180.0, 22.0),
   capsule(10.0, 55.0, 40.0, 180.0, 22.0),
@@ -77,7 +77,7 @@ const windWalkKick = (air: boolean): AuthoredSpecial => ({
   regions: LIFT_KICK,
   hurt: [
     hurtPose(WIND_WALK_STEP_FRAME, WIND_WALK_KICK.first - 1, [hurtPart(0.0, 24.0, 10.0, 70.0, 35.0)]),
-    hurtPose(WIND_WALK_KICK.first, WIND_WALK_KICK_END - 1, [hurtPart(-5.0, 24.0, 5.0, 60.0, 35.0), hurtPart(15.0, 60.0, 35.0, 150.0, 20.0)]),
+    hurtPose(WIND_WALK_KICK.first, WIND_WALK_KICK_END - 1, [hurtPart(0.0, 24.0, 10.0, 90.0, 30.0), hurtPart(10.0, 90.0, 30.0, 175.0, 20.0)]),
   ],
   landingLag: air ? AIR_LANDING_LAG : undefined,
 });

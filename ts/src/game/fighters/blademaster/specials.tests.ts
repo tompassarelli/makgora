@@ -32,6 +32,7 @@ const WIND_WALK_START = f32(-length(f32(1.1)));
 const COUNTER_GAP = 110.0;
 const COUNTER_HEIGHT = 400.0;
 const COUNTER_WATCH = 80;
+const LATE_AIR_PRESS = 18;
 const PUNISH_PRESS = WIND_WALK_GUARD.last + 1;
 const PUNISH_RUN = 2;
 const WIND_WALK_WATCH = 120;
@@ -150,7 +151,7 @@ test("A countered strike freezes the attacker 11 frames, then Blademaster stands
     for (const foeFacing of [-1, 1]) {
       const label = `${air ? "aerial" : "grounded"}, attacker facing ${foeFacing}`;
       let run: Counter | undefined;
-      for (let press = 6; press <= 24 && run === undefined; press++) {
+      for (let press = air ? LATE_AIR_PRESS : 6; press <= 24 && run === undefined; press++) {
         const each = counter(press, foeFacing, air);
         if (each.guardFrame !== 0) run = each;
       }

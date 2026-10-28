@@ -145,6 +145,17 @@ units at 200%), so the kick keeps the flat damage and takes base 30, growth
 into up air, and at centre stage it kills Blademaster from 140% and Rifleman
 from 160%.
 
+Look: through the window he holds his blade upright before him in the
+Wind Walk Guard clip, drawn see-through at Mirror Image's alpha with the
+stock Invisibility fade on him. A counter flashes Defend's caster art on
+his body with the Wind Walk sound; the attacker draws frozen. The Wind
+Walk Kick clip crouches him behind them with the sword hand planted on the
+floor, then rolls him over that hand into a handstand, legs straight up
+through the kick's capsules on frames 13-22, and brings him back to his
+guard by frame 46 (smashcraft:tools/animations/blademaster-clips.ts,
+`--replace counter`). The attacker's own momentum stops when it is
+countered, so the kick also meets an attacker that was falling fast.
+
 EX steps out behind an attacker up to 3.1H away instead of 2.5H (the shared
 travel lever), so a strike spaced at the tip of a long blade is still answered
 from behind; its frames are the ordinary ones.

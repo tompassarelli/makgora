@@ -157,6 +157,8 @@ const BLOODLUST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.8));
 // The Blademaster gathers wind and fades into Wind Walk rather than borrowing the Shaman's Bloodlust (#499).
 const WIND_GATHER = cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.4));
 const WIND_WALK = cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", f32(0.8));
+const WIND_WALK_BODY = { red: 255, green: 255, blue: 255, alpha: 120 };
+const WIND_WALK_COUNTER: Cue = { ...cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", 1.0), sound: "WindWalk" };
 const STORM = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "hand", 1.0);
 // Warcraft discards the first seek after selecting an animation, so this held stand ring keeps its default sequence.
 const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / f32(187.05800313601685))), sequence: undefined, pitch: 0.0, timeScale: 0.0, sound: "ThunderClap" };
@@ -317,7 +319,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.blademaster]: {
     neutral: { spell: "Wind Cutter", startup: WIND_GATHER, active: cue("Abilities\\Spells\\Other\\Tornado\\Tornado_Target.mdx", "hand", f32(0.6)) },
-    side: { spell: "Wind Walk", startup: WIND_WALK, active: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", "ahead", f32(0.8)) },
+    side: { spell: "Wind Walk", startup: WIND_WALK, active: WIND_WALK, body: WIND_WALK_BODY },
     up: { spell: "Rising Whirlwind", startup: WIND_GATHER, active: cue("Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", "body", f32(0.6)) },
     down: { spell: "Mirror Image", startup: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), active: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageDeathCaster.mdx", "body", 1.0) },
   },
@@ -435,6 +437,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {
+    side: { followUps: [branch("Wind Walk Kick", WIND_WALK_COUNTER, WIND_WALK_COUNTER)] },
     down: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },
   },
   [Character.mountainKing]: {

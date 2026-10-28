@@ -10,6 +10,7 @@ import { attackCapsule, emptyCapsule, placeCapsule } from "../geometry/contactGe
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { currentTraits } from "../identityTraits";
+import { clearMotionValue } from "../motion";
 import { enterFollowUp, heroRegionOrigin, placeHeroStrike, runningHeroSpecial } from "./engine";
 
 const inWindow = (window: Readonly<FrameWindow>, frame: number): boolean => frame >= window.first && frame <= window.last;
@@ -67,6 +68,14 @@ function threatensBody(attacker: Readonly<Fighter>, target: Readonly<Fighter>): 
   return projectileThreatens(attacker, target) ? Threat.projectile : Threat.none;
 }
 
+function stopMotion(f: Fighter): void {
+  const { motion } = f;
+  motion.vx = 0.0;
+  motion.vz = 0.0;
+  motion.fastFalling = false;
+  clearMotionValue(motion.meleeVelocityZ);
+}
+
 function guardSucceeds(f: Fighter, guard: Readonly<SpecialGuard>, attacker: Fighter, attackerSlot: number, threat: Threat): void {
   const { status } = f;
   f.special.guarded = true;
@@ -76,6 +85,7 @@ function guardSucceeds(f: Fighter, guard: Readonly<SpecialGuard>, attacker: Figh
       if (threat === Threat.strike && guard.freezeFrames !== undefined) {
         f.special.seekTarget = attackerSlot + 1;
         attacker.launch.hitlag = max(attacker.launch.hitlag, guard.freezeFrames);
+        stopMotion(attacker);
       }
       f.special.form += FOLLOW_UP_FORM;
       enterFollowUp(f, next);

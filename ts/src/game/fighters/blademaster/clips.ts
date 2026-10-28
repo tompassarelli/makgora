@@ -60,7 +60,7 @@ const RECOIL = sequence("Death", f32(0.45));
 
 
 
-export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate">]: HeroClip } = {
+export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate">]: HeroClip } = {
   idle: COMBAT_STANCE,
   walk: sequence("Walk"),
   dash: sequence("Walk"),
@@ -120,8 +120,10 @@ export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<He
   neutralSpecial: sequence("Attack", aligned(CUT, 18, 1, 22)),
   neutralSpecialAir: sequence("Attack", aligned(CUT, 18, 1, 22)),
 
-  sideSpecial: sequence("Walk"),
-  sideSpecialAir: sequence("Walk"),
+  sideSpecial: BLADEMASTER_AUTHORED_CLIPS.sideSpecial,
+  sideSpecialAir: BLADEMASTER_AUTHORED_CLIPS.sideSpecialAir,
+  sideSpecialFollowUp: BLADEMASTER_AUTHORED_CLIPS.sideSpecialFollowUp,
+  sideSpecialFollowUpAir: BLADEMASTER_AUTHORED_CLIPS.sideSpecialFollowUpAir,
   upSpecial: sequence("Attack Walk Stand Spin", f32(2.0 * SPIN_TURN)),
   upSpecialAir: sequence("Attack Walk Stand Spin", f32(2.0 * SPIN_TURN)),
 
