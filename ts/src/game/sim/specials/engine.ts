@@ -1,4 +1,5 @@
 import { sameTeam } from "../teams";
+import { chargeBanked, chargeHolds, chargeSwingFloor } from "./charge";
 import { releaseCommandGrabLock } from "./commandGrabLock";
 import { changesAimZone, chargedAimX, chargedAimZ, steerAim, stepSide } from "./aimZone";
 
@@ -190,10 +191,11 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
 function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): void {
   const charge = move.charge;
   const followUps = move.followUps;
-  if (charge === undefined || followUps === undefined || f.special.charge < charge.full) return;
+  if (charge === undefined || followUps === undefined || f.special.charge < chargeSwingFloor(charge)) return;
+  const stage = chargeStage(charge, f.special.charge);
   for (let index = 0; index < followUps.length; index++) {
     const followUp = at(followUps, index);
-    if (followUp.chargeStage !== charge.stages) continue;
+    if (followUp.chargeStage !== stage) continue;
     f.special.form += FOLLOW_UP_FORM * (index + 1);
     enterFollowUp(f, followUp.special);
     return;
@@ -202,8 +204,8 @@ function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): void {
 
 function holdCharge(f: Fighter, charge: Readonly<SpecialCharge> | undefined): boolean {
   const { special } = f;
-  if (charge === undefined || special.form >= FOLLOW_UP_FORM || special.frame !== charge.hold + 1 || special.charge >= charge.full) return false;
-  special.charge++;
+  if (charge === undefined || special.form >= FOLLOW_UP_FORM || special.frame !== charge.hold + 1 || !chargeHolds(charge, special.charge)) return false;
+  special.charge = chargeBanked(charge, special.charge);
   special.frame = charge.hold;
   special.lockFrames++;
   f.attack.cooldown++;

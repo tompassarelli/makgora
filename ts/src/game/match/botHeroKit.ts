@@ -288,7 +288,7 @@ export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter
     const kind = branch.input ?? FollowUpInput.special;
     if (kind === FollowUpInput.release) {
       if (move?.charge === undefined || branch.chargeStage !== chargeStage(move.charge, f.special.charge)) continue;
-      input.specialHeld = !strikeMeets(branch.special, target, f32(dx * f.facing), localZ);
+      input.specialHeld = f.special.charge < move.charge.full && !strikeMeets(branch.special, target, f32(dx * f.facing), localZ);
       return true;
     }
     if (kind === FollowUpInput.shield || next < branch.window.first || next > branch.window.last) continue;
