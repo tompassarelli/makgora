@@ -1,3 +1,4 @@
+import { toInt } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { max, min } from "../core/numbers";
 import { GrabAction } from "./codes";
@@ -98,4 +99,8 @@ export function carriedOffset(carry: CargoCarry, action: GrabAction, frame: numb
     carryOffset.z = carry.shoulderZ;
   }
   return carryOffset;
+}
+
+export function carryHoldFrames(carry: CargoCarry, percent: number): number {
+  return min(carry.holdMaxFrames, carry.holdBaseFrames + toInt(f32(percent * carry.holdFramesPerPercent)));
 }

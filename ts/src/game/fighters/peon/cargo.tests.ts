@@ -23,6 +23,7 @@ import { mainDeckLeft, mainDeckRight } from "../../sim/stage";
 import { contactBatch, controls, hitEffect, testBeginAttacks } from "../../sim/testWorld";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { firstFighterDifference } from "../../../generated/state/fighterDifference";
+import { MASH_FRAMES } from "../../sim/mash";
 import { PEON_MOVES } from "./moves";
 
 const GAP = 40.0;
@@ -234,6 +235,84 @@ test("A carried fighter that mashes breaks out before an idle one, and a carry l
     assertEquals(run.peon.grab.target, undefined);
     assertGreaterThan(run.target.launch.hitstun, 0);
   }
+});
+
+function carryAt(percent: number, remaining?: number): Carry {
+  const { world, owner, target } = duelPair(createFighter(Character.peon, 0.0, 1), createFighter(Character.rifleman, GAP, -1));
+  target.status.damage = percent;
+  hold(world, owner);
+  stepDuel(world, forwardThrow(owner));
+  if (remaining !== undefined) target.grab.grabbedFrames = remaining;
+  for (let frame = 0; frame < 60 && owner.grab.action !== GrabAction.carry; frame++) stepDuel(world);
+  return { world, peon: owner, target, hoistFrames: CARRY.hoistFrames };
+}
+
+test("Landing on Peon's back sets the carried fighter's hold timer to 180 frames plus 3 per percent, capped at 480 from 100 percent up [k1 scenario]", () => {
+  for (const [percent, frames] of [[0.0, 180], [50.0, 330], [100.0, 480], [150.0, 480], [400.0, 480]] as const) {
+    const run = carryAt(percent);
+    assertEquals(run.peon.grab.action, GrabAction.carry);
+    assertEquals(run.target.grab.grabbedFrames, frames);
+    assertEquals(run.target.grab.heldFrames, 0);
+  }
+});
+
+test("Entering the carry replaces the remaining grab hold time instead of adding to it, whether it was long or nearly spent [k1 scenario]", () => {
+  for (const remaining of [3000, 40]) {
+    const run = carryAt(50.0, remaining);
+    assertEquals(run.target.grab.grabbedFrames, 330);
+  }
+});
+
+test("The carry hold timer counts down a frame at a time, each mash input shortens it by the shared mash amount, and an idle timer escapes the carry exactly when it runs out [k1 scenario]", () => {
+  const idleRun = carryAt(50.0);
+  stepDuel(idleRun.world);
+  assertEquals(idleRun.target.grab.grabbedFrames, 329);
+  const mashed = carryAt(50.0);
+  stepDuel(mashed.world, idle, controls({ grabMashPressed: true }));
+  assertEquals(mashed.target.grab.grabbedFrames, 330 - 1 - MASH_FRAMES);
+  const timed = carryAt(0.0);
+  assertEquals(release(timed, idle), 180);
+  assertEquals(timed.peon.grab.action, GrabAction.escape);
+  assertGreaterThan(timed.target.launch.hitstun, 0);
+});
+
+test("A rollback taken mid-hoist replays the carry entry to the identical hold timer [k1 scenario]", () => {
+  const game = createMatchState();
+  game.phase = Phase.match;
+  const peon = createFighter(Character.peon, 0.0, 1);
+  const target = createFighter(Character.rifleman, GAP, -1);
+  target.status.damage = 50.0;
+  const world = createRoster(3, [peon, target]);
+  const frameControls = createBufferedFrameControls();
+  const runtime = createPacingAndPresentation();
+  let frame = 0;
+  const step = (input: Readonly<Controls>) => {
+    frame++;
+    copyControls(frameControls.inputs[0], input);
+    copyControls(frameControls.inputs[1], idle);
+    stepMatch(game, world, frameControls, frame);
+  };
+  for (let i = 0; i < 3; i++) step(idle);
+  testBeginAttacks(world, AttackStyle.grab, undefined);
+  while (peon.grab.action !== GrabAction.hold && frame < 60) step(idle);
+  step(forwardThrow(peon));
+  for (let i = 0; i < 4; i++) step(idle);
+  assertEquals(peon.grab.action, GrabAction.hoist);
+  const snapshot = createReplaySnapshot();
+  captureReplaySnapshot(snapshot, world, game, frameControls, runtime);
+  const savedFrame = frame;
+  const play = () => {
+    for (let i = 0; i < 20; i++) step(idle);
+    return target.grab.grabbedFrames;
+  };
+  const first = play();
+  assertEquals(peon.grab.action, GrabAction.carry);
+  restoreReplaySnapshot(snapshot, world, game, frameControls, runtime);
+  frame = savedFrame;
+  assertEquals(peon.grab.action, GrabAction.hoist);
+  assertEquals(play(), first);
+  assertLessThan(first, 330);
+  assertGreaterThan(first, 330 - 20);
 });
 
 test("A hit on Peon while he carries drops the carried fighter [k1 scenario]", () => {

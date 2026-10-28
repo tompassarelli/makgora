@@ -13,7 +13,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Controls, type Roster, controlsAt, fighterAt, isActive } from "./roster";
 import { beginGrabAction, clearGrabLinks } from "./transitions";
-import { cargoCarry, carriedOffset, carriesOverhead, holdThrow, isCargoThrow, requestedCarryThrow } from "./cargoCarry";
+import { cargoCarry, carriedOffset, carryHoldFrames, carriesOverhead, holdThrow, isCargoThrow, requestedCarryThrow } from "./cargoCarry";
 
 const PUMMEL_HIT = { damage: PUMMEL_DAMAGE, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
@@ -184,6 +184,9 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
     } else if (grab.frame >= carry.hoistFrames) {
       grab.action = GrabAction.carry;
       grab.frame = 0;
+      const target = fighterAt(world, targetSlot);
+      target.grab.grabbedFrames = carryHoldFrames(carry, target.status.damage);
+      target.grab.heldFrames = 0;
     } else grab.frame++;
   } else if (grab.action === GrabAction.carry) {
     const next = throwAction !== GrabAction.none ? throwAction : grab.queuedThrow;

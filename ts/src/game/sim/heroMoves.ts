@@ -100,6 +100,9 @@ export interface CargoCarry {
   readonly shoulderX: number;
   readonly shoulderZ: number;
   readonly overheadRise: number;
+  readonly holdBaseFrames: number;
+  readonly holdFramesPerPercent: number;
+  readonly holdMaxFrames: number;
 }
 
 

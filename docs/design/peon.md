@@ -46,13 +46,27 @@ scale); frames, speeds and the carry's limits are ours.
 | Cargo up | carry | 12 | 22 | 7.2 | 90 | 90 | 30 |
 | Cargo down | carry | 17 | 42 | 6.1 | 40 | 65 | 26 |
 
-- **Escape.** The held fighter mashes out on the shared grab hold timer,
-  through the hold, the hoist and the carry alike. A carry that runs out drops them as a grab
-  release.
+- **Escape.** The held fighter mashes out on the grab hold timer through the
+  hold and the hoist, as every grab does. Landing on Peon's back resets that
+  timer (Tom asked for this, 2026-10-28) to 180 frames plus 3 per percent of
+  the fighter's damage at that moment, capped at 480 frames (8 s) from 100%
+  up, so 3 s at 0%, 5.5 s at 50% and 8 s at 100% and above. The reset
+  replaces whatever hold time was left, long or short, and starts the escape
+  meter full. Each mash input then shortens the carry timer by the same 8
+  frames it takes off an ordinary grab hold, and a timer that runs out drops
+  the fighter as a grab release, the way a grab hold running out does.
+
+| Victim damage | Carry timer |
+| ---: | ---: |
+| 0% | 180 (3 s) |
+| 50% | 330 (5.5 s) |
+| 100% and up | 480 (8 s) |
+
 - **Interrupt.** A hit that puts Peon in hitstun drops the carried fighter.
 - **Rollback.** The carry adds no state: it is the grab action (hoist, carry)
   and frame, the held fighter's timer and both fighters' positions, all in the
-  snapshot already.
+  snapshot already. The timer is set from the replayed damage on entry, so a
+  rollback across the landing replays to the same value.
 - **CPU.** A computer Peon forward-throws every grab into the carry, walks it
   toward the nearer ledge and cargo-throws off it within 90 units of the edge,
   or after 60 carry frames short of it.
