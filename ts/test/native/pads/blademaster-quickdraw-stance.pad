@@ -1,0 +1,13 @@
+# Blademaster a against Blademaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Quickdraw held for 50 frames shows one still draw pose with no swing frames; the cut plays only after release (2026-10-28).
+#! chat -dev quick hero blademaster
+40 b stick -1 0
+42 b stick 0 0
+60 a press X
+75 a capture
+90 a capture
+105 a capture
+110 a release X
+113 a capture
+117 a capture
+123 a capture
