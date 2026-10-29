@@ -74,24 +74,28 @@ Where to look next:
 
 ## Credits
 
-Music: Before the First Strike by Tom Passarelli, made with Google Lyria.
+- Design & Programming: Tom Passarelli (Tompas)
+- Animation & Stages: Tom Passarelli (Tompas)
+- Music: Tom Passarelli (with Google Lyria)
+- Cursors, wordmark & stage-select art: Smashcraft originals (the pinching-hand cursor made with AI assistance)
+- Murloc sound: World of Warcraft, Blizzard Entertainment
 
-The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
+Lich King model: [The Lich King by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
 (Hive Workshop), used with credit as the author permits. Kwaliti's
 [usage terms](https://www.hiveworkshop.com/profile-posts/951524/) allow free use
 and require credit to Kwaliti and Hive Workshop as the original source.
 [Model credits and source terms](docs/design/roster.md#credits) record the details.
 
-Thrall is [Warchief Thrall Dismounted by johnwar](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/)
+Thrall model: [Warchief Thrall Dismounted by johnwar](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/)
 (Hive Workshop), built on Ujimasa Hojo's Grom Hellscream, reanimated for
 Smashcraft and used with credit to both authors and Hive Workshop.
 
-The Scourge wall behind Naxxramas is the
+Naxxramas wall model:
 [Undead Walls Pack by Kuzakani](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
 (Hive Workshop), an original model tagged open source, used with credit to
 Kuzakani and Hive Workshop.
 
-Tyrande is [Tyrande Whisperwind (Re-Classic) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
+Tyrande model: [Tyrande Whisperwind (Re-Classic) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
 (Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas
 models and kangyun's Tyrande, used with kangyun's permission, reanimated for
 Smashcraft and used with credit to every author and Hive Workshop.

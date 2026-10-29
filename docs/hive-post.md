@@ -64,13 +64,16 @@ Controllers work through a separate, experimental helper, [padbridge](https://gi
 Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/issues). Say which fighters, which stage and what happened. Typing -clip in chat during a match saves its last ten seconds to `smashcraft-repro-*.txt` in Warcraft III's CustomMapData folder; attach it to the report.
 
 ## Credits
-- Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License).
-- The Lich King model by [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/)).
-- Thrall is [Warchief Thrall Dismounted](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Grom Hellscream; we reanimated every move on it.
-- Tyrande is [Tyrande Whisperwind (Re-Classic)](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission; we reanimated every move on it.
-- The menu cursors, wordmark and stage-select art are Smashcraft originals; the pinching-hand cursor was made with AI assistance.
-- Music: Before the First Strike by Tom Passarelli, made with Google Lyria.
-- Murloc sound from World of Warcraft, Blizzard Entertainment.
+- Design & Programming: Tom Passarelli (Tompas)
+- Animation & Stages: Tom Passarelli (Tompas)
+- Music: Tom Passarelli (with Google Lyria)
+- Lich King model: [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/), used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/))
+- Thrall model: [Warchief Thrall Dismounted](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Grom Hellscream; every move reanimated for Smashcraft
+- Tyrande model: [Tyrande Whisperwind (Re-Classic)](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission; every move reanimated for Smashcraft
+- Naxxramas wall model: [Undead Walls Pack](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/) by Kuzakani, from Hive Workshop, used with credit
+- Cursors, wordmark & stage-select art: Smashcraft originals (the pinching-hand cursor made with AI assistance)
+- Murloc sound: World of Warcraft, Blizzard Entertainment
+- Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License), written in TypeScript and compiled to Warcraft III's Lua.
 - Warcraft III, its unit models, icons and sounds belong to Blizzard Entertainment. Smashcraft is an independent fan project, not affiliated with or endorsed by Blizzard Entertainment or Nintendo.
 - Melee's feel comes from public frame data: [SmashWiki](https://www.ssbwiki.com/) and [Smashboards](https://smashboards.com/).
 - Built with Wisp, TypeScript, TypeScriptToLua, Effect, Bun and Lua 5.3.

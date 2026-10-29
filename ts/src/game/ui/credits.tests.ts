@@ -22,9 +22,9 @@ test("Opening the credits panel shows the creator line, an imported-asset credit
   panel.open();
   assertTrue(panel.isOpen);
   const body = creditsBody("0.2-test");
-  assertTrue(body.includes("Created by Tompas (Tom Passarelli)"));
-  assertTrue(body.includes("The Lich King model by Kwaliti"));
-  assertTrue(body.includes("Murloc sound from World of Warcraft, Blizzard Entertainment."));
+  assertTrue(body.includes("Design & Programming: Tom Passarelli (Tompas)"));
+  assertTrue(body.includes("Lich King model: Kwaliti"));
+  assertTrue(body.includes("Murloc sound: World of Warcraft, Blizzard Entertainment"));
   assertTrue(body.includes(creditsVersionLine("0.2-test")));
   assertFalse(body.includes("https://"));
   assertTrue(panel.close());
