@@ -9,6 +9,7 @@ import { stopBunProcess } from "../hostProcess";
 import { pruneWhiteTextures } from "../whiteImports";
 import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, type Pin, assetsView, listFiles, mergeShards, publish, readManifest, removeTree, seal, storeShards, unstoredPins, writeShardPins } from "./buildInputs";
 import { stockStorage } from "./renderAssetStore";
+import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
 import { projectRoot } from "./project";
@@ -57,12 +58,6 @@ function linkHeroModels(pin: Pin, fighter: Fighter, assets: string, target: stri
   if (typeof pin === "string") return symlinkSync(join(assets, HERO_MODELS), target);
   mergeShards(heroShards(pin, fighter).map((hash) => join(INPUTS_STORE, HERO_MODELS, hash)), target);
 }
-
-const sha256 = (...parts: readonly (string | Uint8Array)[]) => {
-  const hasher = new Bun.CryptoHasher("sha256");
-  for (const part of parts) hasher.update(part).update("\0");
-  return hasher.digest("hex");
-};
 
 const failure = (operation: string, path: string, cause: unknown) => new MapBuildFailure({ operation, path, cause: cause instanceof Error ? cause.message : String(cause) });
 
@@ -173,10 +168,8 @@ export const planFighters = (names: readonly string[], rebuild: boolean) => Effe
     try: async () => {
       const bytes = await Bun.file(join(assets, fighter.source)).bytes(), source = sha256(bytes);
       const rules = readFileSync(join(projectRoot, RULES, `${fighter.slug}.ts`)), external = sha256(shared, ...heroShards(manifest[HERO_MODELS], fighter));
-      const keys: string[] = [];
-      STEPS.forEach((step, index) => keys.push(sha256(step.name, code[index]!, fighter.name, index === 0 ? source : keys[index - 1]!, index === 0 ? "" : external, rules)));
-      const missing = keys.findIndex((key, index) => !existsSync(join(DERIVED_STORE, STEPS[index]!.name, key)));
-      const cached = rebuild ? 0 : missing < 0 ? keys.length : missing;
+      const keys = stepKeys({ steps: STEPS.map((step) => step.name), code, fighter: fighter.name, source, external, rules });
+      const cached = cachedSteps(keys, (index, key) => existsSync(join(DERIVED_STORE, STEPS[index]!.name, key)), rebuild);
       return { fighter, keys, cached, sourceBytes: bytes.byteLength } satisfies FighterPlan;
     },
     catch: (cause) => failure("hash fighter source", join(assets, fighter.source), cause),

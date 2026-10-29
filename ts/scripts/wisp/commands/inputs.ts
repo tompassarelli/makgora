@@ -9,6 +9,7 @@ import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/comman
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { runAdmitted } from "../../heavyCapacity";
 import { DERIVED_PATHS, buildFighterArt, planFighters } from "../fighterArt";
+import { deriveAdmission } from "../fighterArtPlan";
 import * as fighterArtData from "../../../codegen/fighterArtData";
 import { syncGenerated } from "../../../codegen/sync";
 import { DERIVE_LEASE_SECONDS, openPaths, pruneInputs } from "../inputsPrune";
@@ -65,11 +66,10 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   if (rules.length > 0) console.log(`regenerated ${rules.join(", ")}`);
   const { manifest, assets, plans } = yield* planFighters(names, rebuild);
   const steps = plans.reduce((sum, plan) => sum + plan.keys.length - plan.cached, 0);
-  const building = plans.filter((plan) => plan.cached < plan.keys.length).length;
-  const capacity = building <= 2 ? { class: "moderate" as const, jobs: 2 } : { class: "heavy" as const, jobs: 6 };
+  const admission = deriveAdmission(plans);
   console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
-  if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
-  const differing = yield* buildFighterArt(plans, manifest, assets, capacity.jobs, !check);
+  if (admission !== undefined) yield* Effect.promise(() => runAdmitted(admission.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
+  const differing = yield* buildFighterArt(plans, manifest, assets, admission?.jobs ?? 2, !check);
   if (!check) return;
   const characters = plans.map(({ fighter }) => fighter.character);
   const measured = yield* Effect.tryPromise({
