@@ -6,6 +6,7 @@ import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
+import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
@@ -93,12 +94,13 @@ export function hotspot(parent: framehandle, x: number, y: number, width: number
 
 export const modeBox = (slot: number) => ({ x: cardRight(slot, f32(0.014)), y: cardDown(f32(0.005)), width: cardSize(f32(0.132)), height: cardSize(f32(0.027)) });
 
-export const RANDOM_FIGHTER_TILE: RosterTile = PLAYABLE_CHARACTERS.length;
-export const ROSTER_TILES = PLAYABLE_CHARACTERS.length + 1;
-export const characterOfTile = (tile: RosterTile): number => tile === RANDOM_FIGHTER_TILE ? RANDOM_FIGHTER : PLAYABLE_CHARACTERS[tile] ?? Character.rifleman;
+export const GRID_FIGHTERS: readonly Character[] = SELECT_GRID_ORDER.filter(character => PLAYABLE_CHARACTERS.includes(character));
+export const RANDOM_FIGHTER_TILE: RosterTile = GRID_FIGHTERS.length;
+export const ROSTER_TILES = GRID_FIGHTERS.length + 1;
+export const characterOfTile = (tile: RosterTile): number => tile === RANDOM_FIGHTER_TILE ? RANDOM_FIGHTER : GRID_FIGHTERS[tile] ?? Character.rifleman;
 export function tileOfCharacter(character: number): RosterTile {
   if (character === RANDOM_FIGHTER) return RANDOM_FIGHTER_TILE;
-  for (let tile = 0; tile < PLAYABLE_CHARACTERS.length; tile++) if (PLAYABLE_CHARACTERS[tile] === character) return tile;
+  for (let tile = 0; tile < GRID_FIGHTERS.length; tile++) if (GRID_FIGHTERS[tile] === character) return tile;
   return 0;
 }
 
@@ -111,6 +113,6 @@ export const decodeSlot = (data: string): number | undefined => (data === "0" ? 
 export const tileOffered = (game: Readonly<MatchState>, tile: RosterTile): boolean => tile === RANDOM_FIGHTER_TILE ? randomFighterOffered(game) : selectableMatchCharacter(game, characterOfTile(tile));
 
 export function tileLabel(tile: RosterTile): string {
-  const fighter = PLAYABLE_CHARACTERS[tile];
+  const fighter = GRID_FIGHTERS[tile];
   return fighter === undefined ? nameText(RANDOM_FIGHTER) : TILE_NAMES[fighter] ?? nameText(fighter);
 }

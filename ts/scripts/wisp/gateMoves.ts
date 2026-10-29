@@ -13,6 +13,7 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { BINDING_PRESETS } from "../../src/game/input/keyBindings";
 import { Character } from "../../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/roster/kits";
+import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { PICKER_DONE, presetButton } from "../../src/game/ui/settingsUi";
 import { HAZARDS_BUTTON } from "../../src/game/ui/stageUi";
@@ -218,7 +219,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
   yield* focus(host).pipe(Effect.mapError(fail("moves gate training")));
   yield* click(host, toggle.x, toggle.y).pipe(Effect.mapError(fail("moves gate training")));
 
-  const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
+  const grid = rosterGrid(ROSTER_TILES);
   const verdicts: { readonly fighters: readonly string[]; readonly verdict: SmokeVerdict }[] = [];
   const spots: { readonly fighters: readonly string[]; readonly results: readonly SpotResult[] }[] = [];
   let area = 0;
@@ -235,7 +236,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
   const playMatch = (index: number, pair: readonly [number, number], characters: readonly Character[]) => Effect.gen(function*() {
     for (const [slot, client] of clients.entries()) {
       const viewport = yield* input.windowRegion(client).pipe(Effect.mapError(fail("moves gate viewport")));
-      const cell = cellRect(grid, pair[slot] ?? 0);
+      const cell = cellRect(grid, tileOfCharacter(PLAYABLE_CHARACTERS[pair[slot] ?? 0] ?? 0));
       const pin = point(viewport, parkedChipCentre(slot).x, parkedChipCentre(slot).y);
       const drop = point(viewport, (cell.left + cell.right) / 2, (cell.top + cell.bottom) / 2);
       yield* focus(client).pipe(Effect.mapError(fail("moves gate pick")));

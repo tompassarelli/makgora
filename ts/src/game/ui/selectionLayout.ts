@@ -1,5 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { TextBox } from "./hudLayout";
+import { Character } from "../sim/codes";
 
 export const HEADER_BUTTON_TOP = f32(0.588);
 export const HEADER_BUTTON_HEIGHT = f32(0.023);
@@ -38,3 +39,11 @@ export const MOVES_TITLE_BOX: TextBox = { left: f32(0.12), top: f32(0.44), width
 export const MOVES_BODY_BOX: TextBox = { left: f32(0.12), top: f32(0.4), width: f32(0.56), height: f32(0.3) };
 export const MOVES_BUTTON_TOP = f32(0.075);
 export const MOVES_BUTTON_HEIGHT = f32(0.032);
+
+/** The select grid's fighters in reading order, grouped by faction (Human, Orc, Undead, Night Elf, Burning Legion, Neutral); the Random tile follows them. */
+export const SELECT_GRID_ORDER: readonly Character[] = [
+  Character.uther, Character.jaina, Character.mountainKing, Character.rifleman, Character.medivh, Character.kaelthas, Character.thrall, Character.grom,
+  Character.cairne, Character.beastmaster, Character.blademaster, Character.shadowHunter, Character.peon, Character.lichKing, Character.lich, Character.sylvanas,
+  Character.dreadlord, Character.butcher, Character.malfurion, Character.tyrande, Character.demonHunter, Character.warden, Character.archimonde, Character.pitLord,
+  Character.ladyVashj, Character.akama, Character.chen, Character.firelord, Character.tinker, Character.alchemist, Character.murloc,
+];

@@ -11,6 +11,7 @@ import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/deskto
 import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, HAND_HEIGHT, HAND_WIDTH, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
+import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { readTga, type Rgba } from "../blp";
 import { runProcess } from "../hostProcess";
 import { reachFighterSelect } from "./gateIntro";
@@ -53,7 +54,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   });
   yield* reachFighterSelect(client, region);
   const frame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
-  const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
+  const grid = rosterGrid(ROSTER_TILES);
   const samples: { file: string; sha256: string; elapsedMs: number; attempts: number; phase: string; x: number; y: number; error: number | undefined; pinched: boolean; handPixels: number; matchedHandPixels: number; chipError: number | undefined; visible: boolean }[] = [];
   const started = yield* Clock.currentTimeMillis;
   const pointer = () => runProcess(ChildProcess.make(client.tools.xdotool, ["getmouselocation", "--shell"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.map(output => ({

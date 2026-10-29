@@ -17,6 +17,7 @@ import { fighterPortrait, portraitCostumes, portraitOutfit } from '../src/game/r
 import { costumesFor } from '../src/game/roster/costumes';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';
+import { TILE_BACKGROUND } from './tileArt';
 import { STOCK_ICON_PX } from '../src/game/ui/plateLayout';
 import { NEUTRAL_TEAM_COLOR } from '../src/game/ui/slotColors';
 import { ModelRenderer, parseMDX } from 'wisp/vendor/war3-model.mjs';
@@ -442,8 +443,6 @@ const frameOf = (character: number, variant: number) => character * VARIANTS.len
 /** The scene under one light pass. */
 const lit = (scene: RenderScene, pass: LightPass): RenderScene => ({ ...scene, environment: { ...scene.environment, dayNight: { ...scene.environment.dayNight, unit: lightPath(pass) } } });
 
-/** Behind every grid tile, so the tiles read as one set. */
-const TILE_BACKGROUND = ['-size', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, 'radial-gradient:#3a5378-#0c1422'];
 const BUST_FADE = 'min(min(1, (1 - j / h) / 0.3), min(i / (w * 0.1), (w - i) / (w * 0.1)))';
 const STOCK_FADE = 'max(0, min(1, (0.5 - hypot(i / w - 0.5, j / h - 0.5)) / 0.1))';
 const fadeAlpha = (mask: string) => ['(', '+clone', '-alpha', 'extract', '(', '+clone', '-fx', mask, ')', '-compose', 'multiply', '-composite', ')', '-compose', 'CopyOpacity', '-composite'];

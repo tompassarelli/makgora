@@ -16,6 +16,7 @@ import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
+import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../../src/game/ui/resultsBanner";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { PICKER_DONE } from "../../src/game/ui/settingsUi";
@@ -119,9 +120,9 @@ const oneStock = (d: Driver, host: Client) => Effect.gen(function*() {
 });
 
 export const pickFighters = (d: Driver, clients: readonly Client[]) => Effect.gen(function*() {
-  const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
+  const grid = rosterGrid(ROSTER_TILES);
   for (const [slot, client] of clients.entries()) {
-    const tile = cellRect(grid, slot);
+    const tile = cellRect(grid, tileOfCharacter(PLAYABLE_CHARACTERS[slot] ?? 0));
     const pin = yield* d.at(client, parkedChipCentre(slot).x, parkedChipCentre(slot).y);
     const drop = yield* d.at(client, (tile.left + tile.right) / 2, (tile.top + tile.bottom) / 2);
     yield* batch(client, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 150 }, { kind: "click", ...drop, holdMillis: 200 }, { kind: "wait", millis: 300 }]).pipe(Effect.mapError(fail("results gate fighters")));
