@@ -274,10 +274,11 @@ built source revision. Its `judge` folder holds a `batch-1.md` for
 each cold viewer still judges one clip alone. `--crop` is in captured-screen
 pixels and applies to every tile.
 
-A special that reflects is staged with the dummy 300 units away. The dummy
-first fires its own neutral-special projectile, timed to arrive in the middle
-of the reflect window, so the sheet shows the reflection instead of only the
-cast.
+A special that reflects is staged with the dummy at most 300 units away, and
+closer when the dummy's neutral-special projectile could not fly there and
+back, slowed by the reflect, within its life. The dummy first fires that
+projectile, timed to arrive in the middle of the reflect window, so the sheet
+shows the shot turned back into the dummy instead of only the cast.
 
 `bun wisp anim capture serve --pair K [--once] [--idle-minutes N]` runs the
 service from a checkout of main on gex45. It takes every pending job and folds

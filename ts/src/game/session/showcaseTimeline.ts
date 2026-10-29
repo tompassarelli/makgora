@@ -8,6 +8,7 @@ import { heroDefinition } from "../roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../sim/moves";
 import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import { heroCueWindows } from "../presentation/cueWindows";
+import { SHIELD_PROJECTILE_SPEED_MULTIPLIER } from "../sim/shield";
 
 export const SHOWCASE_FIRST_FRAME = 40;
 export const SHOWCASE_SPECIAL_SLOTS: readonly string[] = ["neutral_b", "side_b", "up_b", "down_b"];
@@ -59,9 +60,11 @@ function incomingShot(special: Readonly<AuthoredSpecial>, specials: Readonly<Fig
   const window = special.reflects;
   const shot = specialKit(specials, SpecialSlot.neutral).ground?.projectiles?.find(projectile => projectile.reflectable && projectile.velocityX > 0.0);
   if (window === undefined || shot === undefined) return undefined;
-  const arrival = shot.spawnFrame + Math.ceil(f32(f32(f32(INCOMING_GAP - shot.offsetX) - INCOMING_BODY) / shot.velocityX));
+  const roundTrip = f32(f32(f32(shot.life * shot.velocityX) * SHIELD_PROJECTILE_SPEED_MULTIPLIER) / f32(1.0 + SHIELD_PROJECTILE_SPEED_MULTIPLIER));
+  const gap = Math.min(INCOMING_GAP, Math.floor(roundTrip));
+  const arrival = shot.spawnFrame + Math.ceil(f32(f32(f32(gap - shot.offsetX) - INCOMING_BODY) / shot.velocityX));
   const lead = arrival - floorDiv(window.first + window.last, 2);
-  return lead > 0 ? { lead, gap: INCOMING_GAP } : undefined;
+  return lead > 0 ? { lead, gap } : undefined;
 }
 
 function chargedShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove | undefined {
