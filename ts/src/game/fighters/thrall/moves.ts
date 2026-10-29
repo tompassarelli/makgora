@@ -45,15 +45,15 @@ export const THRALL_HAMMER_SWINGS = {
   forwardTilt: tilt(STANDING_SHOULDER, 28.0, 26.0, 8, [14.0, -4.0, -22.0]),
   forwardTiltUp: tilt(STANDING_SHOULDER, 26.0, 26.0, 8, [24.0, 44.0, 64.0]),
   forwardTiltDown: tilt(STANDING_SHOULDER, 28.0, 26.0, 8, [-26.0, -38.0, -50.0]),
-  upTilt: tilt(STANDING_SHOULDER, 20.0, 26.0, 8, [60.0, 86.0, 112.0, 138.0]),
+  upTilt: tilt(STANDING_SHOULDER, 20.0, 26.0, 8, [40.0, 64.0, 88.0, 108.0]),
   downTilt: tilt(LOW_SHOULDER, 22.0, 22.0, 6, [-12.0, -18.0, -24.0]),
   forwardSmash: smash(STANDING_SHOULDER, 22.0, 28.0, 20, [56.0, 14.0, -28.0]),
-  upSmash: tilt(STANDING_SHOULDER, 22.0, 28.0, 17, [50.0, 78.0, 106.0, 134.0]),
+  upSmash: tilt(STANDING_SHOULDER, 22.0, 28.0, 17, [36.0, 62.0, 88.0, 110.0]),
   downSmash: tilt(LOW_SHOULDER, 22.0, 24.0, 14, [-10.0, -16.0, -22.0, 190.0, 196.0, 202.0]),
   neutralAir: tilt(STANDING_SHOULDER, 18.0, 26.0, 8, [70.0, 40.0, 10.0, -20.0, -50.0]),
   forwardAir: smash(STANDING_SHOULDER, 20.0, 28.0, 13, [64.0, 20.0, -24.0]),
   backAir: tilt(STANDING_SHOULDER, 22.0, 26.0, 17, [164.0, 180.0, 196.0]),
-  upAir: tilt(STANDING_SHOULDER, 18.0, 26.0, 8, [50.0, 80.0, 110.0, 140.0]),
+  upAir: tilt(STANDING_SHOULDER, 18.0, 26.0, 8, [36.0, 62.0, 88.0, 110.0]),
   downAir: smash(STANDING_SHOULDER, 40.0, 28.0, 14, [-76.0, -82.0, -86.0, -88.0]),
 } as const satisfies Record<string, HammerSwing>;
 

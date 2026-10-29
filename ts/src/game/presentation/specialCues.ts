@@ -258,7 +258,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Chain Lightning", startup: STORM, active: cue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", "hand", 0.5) },
     side: { spell: "Feral Spirit", startup: BEAST, active: cue("units\\orc\\SpiritWolf\\SpiritWolf.mdx", "ahead", 0.5) },
     up: { spell: "Far Sight", startup: STORM, active: cue("Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdx", "body", 0.5) },
-    down: { spell: "Doomhammer Slam", startup: STORM, active: timed(cue("Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdx", "feet", f32(0.95)), "death", f32(0.3)) },
+    down: { spell: "Doomhammer Slam", startup: STORM, active: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.8)) },
   },
   [Character.sylvanas]: {
     neutral: { spell: "Black Arrow", startup: { ...SHADOW, scale: f32(0.25), scaleEnd: f32(0.45), scaleFrames: BLACK_ARROW_SHOT - 1, anchorFrames: Array.from({ length: BLACK_ARROW_FRAMES }, () => ({ x: 44.0, z: 60.0 })) }, active: { ...cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.18)), anchorFrames: Array.from({ length: BLACK_ARROW_FRAMES }, () => ({ x: 44.0, z: 60.0 })) } },

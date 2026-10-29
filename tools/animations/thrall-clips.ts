@@ -53,7 +53,7 @@ const back: Gesture = {chest:-12,arm:55,wrist:25,leftArm:-30,head:15,yaw:155,fro
 const cast: Gesture = {chest:-12,arm:-120,wrist:20,leftArm:-90,head:-15,front:10};
 const brace: Gesture = {chest:16,arm:-30,wrist:25,leftArm:-45,head:-8,front:22,back:22};
 const tuck: Gesture = {front:-55,back:35,kneeFront:95,kneeBack:85};
-const charge: Gesture = {lean:14,chest:14,head:-14,arm:40,wrist:20,leftArm:-20,leftWrist:-60,front:-55,back:40,kneeFront:60,kneeBack:30};
+const charge: Gesture = {lean:22,chest:12,head:-18,arm:55,wrist:20,leftArm:-35,leftWrist:-60,front:-45,back:45,kneeFront:55,kneeBack:15};
 const SWING_BODY: Partial<Record<HeroPose, Gesture>> = {
  jab:{chest:10,front:16,back:-10}, jab2:{chest:18,front:20,back:-14}, forwardTilt:{chest:18,front:22,back:-16,head:-10}, forwardTiltUp:{chest:8,front:20,back:-14}, forwardTiltDown:{chest:26,front:24,back:-18,head:-14},
  upTilt:{chest:-12,front:8,back:-4}, downTilt:{...low,lean:6},
@@ -61,7 +61,9 @@ const SWING_BODY: Partial<Record<HeroPose, Gesture>> = {
  neutralAir:tuck, forwardAir:{...tuck,chest:24}, backAir:{...tuck,chest:-10}, upAir:{...tuck,chest:-18,head:-18}, downAir:{front:-75,back:-55,kneeFront:115,kneeBack:105,chest:24,head:-20},
  getUpAttack:{...low}, ledgeAttack:{...low,lean:4}, downSpecial:{chest:34,waist:-6,front:30,back:-24,head:-16,kneeFront:40,kneeBack:30},
 };
-const WIND: Partial<Record<HeroPose, number>> = { downAir: 80, backAir: 120, neutralAir: 100, jab: 20, jab2: 60, forwardTilt: 150, forwardTiltUp: 170, forwardTiltDown: 140, downSpecial: 120 };
+const WIND: Partial<Record<HeroPose, number>> = { downAir: 10, backAir: 120, neutralAir: 100, jab: 20, jab2: 60, forwardTilt: 150, forwardTiltUp: -40, forwardTiltDown: 140, downSpecial: 120 };
+const FOLLOW: Partial<Record<HeroPose, number>> = { forwardTiltUp: -4, upTilt: 8, upSmash: 8, upAir: 8, downAir: 0, downSmash: 6, backAir: 10 };
+const HOLD = new Set<HeroPose>(["upTilt", "upSmash", "upAir", "forwardTiltUp", "downSmash", "backAir", "downAir"]);
 const KICK_COIL: Gesture = {...tuck,chest:30,head:-20,front:-60,back:-40,kneeBack:120,arm:-30,leftArm:-40};
 const KICK: Gesture = {chest:-25,head:15,lean:-20,front:-30,back:95,kneeFront:60,kneeBack:5,arm:-30,leftArm:-40};
 const STAND_GRIP: Point = [20, GRIP_Y, 70], STAND_UP: Point = [0.2, 0, 1];
@@ -77,7 +79,8 @@ function swingBeats(pose: HeroPose, swing: HammerSwing, total: number): Beat[] {
  const first = swing.beats[0]!, last = swing.beats.at(-1)!, sign = Math.sign(last.angle - first.angle) || -1;
  const lead = pose === "backAir" ? 3 : Math.min(6, Math.max(2, Math.round((first.frame - 1) / 2)));
  const wind = { frame: Math.max(1, first.frame - lead), angle: WIND[pose] ?? first.angle - sign * 70 };
- const follow = { frame: Math.min(total - 2, last.frame + 4), angle: last.angle + sign * 30 };
+ const follow = { frame: Math.min(total - 2, last.frame + 4), angle: last.angle + sign * (FOLLOW[pose] ?? 30) };
+ const hold = HOLD.has(pose) && total - 6 > follow.frame + 2 ? [{ frame: total - 6, angle: follow.angle }] : [];
  const body = SWING_BODY[pose] ?? {};
  const windBody = Object.fromEntries(Object.entries(body).map(([k, v]) => [k, k === "chest" || k === "lean" ? -0.4 * v : 0.6 * v])) as Gesture;
  const slide = HAMMER_SLIDE[swing.grip];
@@ -86,7 +89,7 @@ function swingBeats(pose: HeroPose, swing: HammerSwing, total: number): Beat[] {
   return { frame: Math.max(1, frame - 1), g, hand: grip, direction, offHand: [grip[0] - 14 * direction[0], OFF_Y, grip[2] - 14 * direction[2]], slide };
  };
  const kick = pose === "backAir" ? [5, 7, 8, 9].map((frame, index): Beat => ({ frame, g: index === 0 ? KICK_COIL : KICK, hand: STAND_GRIP, direction: STAND_UP, slide })) : [];
- return [...kick, beat(wind.frame, wind.angle, windBody), ...swing.beats.map(b => beat(b.frame, b.angle, body)), beat(follow.frame, follow.angle, body)];
+ return [...kick, beat(wind.frame, wind.angle, windBody), ...swing.beats.map(b => beat(b.frame, b.angle, body)), beat(follow.frame, follow.angle, body), ...hold.map(h => beat(h.frame, h.angle, body))];
 }
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
