@@ -138,3 +138,23 @@ Expert gameplan: use Trueshot Aura when the foe is far, push them into
 shield with arrows and cross up with the neutral and back air, reflect their
 projectiles with Elune's Grace and cancel it into an aerial. It uses the full
 authored kit and gameplan at the same CPU skill.
+
+## Measured balance (2026-10-29)
+
+The field ran locally with `bun scripts/cpuField.ts` at the farm balance
+settings (wren expert against wren expert, 400 matches a pair, 100 seeds, all
+28 opponents), because the GitHub balance run's plan job was timing out on
+API calls that day. The first field of the landed kit put her at 32%; a
+heavier body (92/75), more knockback growth on her kill moves and more damage
+on the down tilt, dash attack and aerials put her at **47% wins** over 11,424
+matches. Against the profile above:
+
+- archetype rushdown; air share of normals 29% (band 30-60, one point under)
+- aerials n/f/b/u/d 10/44/23/5/18% (neutral air under its 15-40 band; the rest inside)
+- approach share of movement 73% (band 45-80)
+- ranged share of damage 5% (band 5-30)
+- specials n/s/u/d 21/1/7/6% of moves (all inside their bands)
+
+Her kills come from the forward smash (49%), back air (22%) and up smash
+(11%). Her worst matchups are Chen (7%), Pit Lord (13%) and Thrall (14%);
+her best are Mountain King (89%), Lady Vashj (85%) and Warden (80%).
