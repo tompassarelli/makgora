@@ -14,7 +14,7 @@ export interface Gesture {
   readonly chest?: number; readonly head?: number; readonly bow?: number; readonly elbow?: number;
   readonly grip?: number; readonly knee?: number; readonly twist?: number; readonly lean?: number;
   readonly roll?: number; readonly yaw?: number; readonly tuck?: number; readonly height?: number;
-  readonly wrist?: number; readonly hip?: number; readonly shin?: number; readonly kick?: number;
+  readonly wrist?: number; readonly hip?: number; readonly shin?: number; readonly kick?: number; readonly kickR?: number;
 }
 export interface Phase { readonly at: number; readonly pose: Gesture }
 export interface Action { readonly name: string; readonly frames: number; readonly phases: readonly Phase[]; readonly air?: boolean; readonly hold?: boolean; readonly contact?: number; readonly pain?: boolean }
@@ -120,7 +120,7 @@ const JOINTS: Readonly<Record<string, (g: Gesture) => [number, number]>> = {
   Bone_Pelvis: g => [g.hip ?? 0, 0],
   Bone_Arm2_R: g => [-(g.elbow ?? 0)*0.5, 0],
   Bone_Leg1_L: g => [-(g.knee ?? 0)*0.85 - (g.kick ?? 0), 0],
-  Bone_Leg1_R: g => [-(g.knee ?? 0)*0.35, 0],
+  Bone_Leg1_R: g => [-(g.knee ?? 0)*0.35 - (g.kickR ?? 0), 0],
   Bone_Leg2_L: g => [(g.knee ?? 0) + (g.shin ?? 0), 0],
   Bone_Leg2_R: g => [g.knee ?? 0, 0],
 };
