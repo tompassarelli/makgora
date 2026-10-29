@@ -474,6 +474,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     else ui.placed.hideSlot(slot);
     renderers?.shield.present(fighter, playing);
     renderers?.projectiles.present(fighter, playing, s.session.paused);
+    renderers?.hookChain?.present(fighter, s.world, playing);
     renderers?.cues?.present(fighter, playing, s.session.paused);
     renderers?.meter?.present(runtime.simulationFrame, fighter, playing, presentedCueTrace(s, slot, runtime.simulationFrame));
     renderers?.hitAreas?.present(live);

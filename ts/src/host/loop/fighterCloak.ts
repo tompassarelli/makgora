@@ -23,6 +23,7 @@ function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   renderers.shield.drawnEffects(drawn);
   renderers.goldSack?.drawnEffects(drawn);
   renderers.parasol?.drawnEffects(drawn);
+  renderers.hookChain?.drawnEffects(drawn);
   renderers.spheres?.drawnEffects(drawn);
   renderers.flight?.drawnEffects(drawn);
   renderers.cues?.weaponEffects(drawn);

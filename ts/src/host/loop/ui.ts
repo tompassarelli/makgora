@@ -46,6 +46,7 @@ import { ItemPresentation } from "../../game/render/itemPresentation";
 import { AuraPresentation } from "../../game/render/auraPresentation";
 import { OrbPresentation } from "../../game/render/orbPresentation";
 import { ParasolPresentation } from "../../game/render/parasolPresentation";
+import { HookChainPresentation } from "../../game/render/hookChainPresentation";
 import { GoldSackPresentation } from "../../game/render/goldSackPresentation";
 import { SpherePresentation } from "../../game/render/spherePresentation";
 import { FlightPresentation } from "../../game/render/flightPresentation";
@@ -72,6 +73,7 @@ interface FighterRenderers {
   readonly draw: FighterDraw;
   readonly goldSack: GoldSackPresentation | undefined;
   readonly parasol: ParasolPresentation | undefined;
+  readonly hookChain: HookChainPresentation | undefined;
   readonly spheres: SpherePresentation | undefined;
   readonly flight: FlightPresentation | undefined;
 
@@ -188,6 +190,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.glow.destroy();
   renderers?.goldSack?.destroy();
   renderers?.parasol?.destroy();
+  renderers?.hookChain?.destroy();
   renderers?.spheres?.destroy();
   renderers?.flight?.destroy();
   renderers?.hitAreas?.destroy();
@@ -223,6 +226,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin), draw: createFighterDraw(),
     goldSack: character === Character.peon ? new GoldSackPresentation(s.origin) : undefined,
     parasol: character === Character.chen ? new ParasolPresentation(s.origin) : undefined,
+    hookChain: character === Character.butcher ? new HookChainPresentation(s.origin) : undefined,
     spheres: orbit === undefined ? undefined : new SpherePresentation(orbit, s.origin),
     flight: flight === undefined ? undefined : new FlightPresentation(flight, s.origin),
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
@@ -336,6 +340,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     bindPrototype(renderers.glow, MeterGlow.prototype);
     if (renderers.goldSack !== undefined) bindPrototype(renderers.goldSack, GoldSackPresentation.prototype);
     if (renderers.parasol !== undefined) bindPrototype(renderers.parasol, ParasolPresentation.prototype);
+    if (renderers.hookChain !== undefined) bindPrototype(renderers.hookChain, HookChainPresentation.prototype);
     if (renderers.spheres !== undefined) bindPrototype(renderers.spheres, SpherePresentation.prototype);
     if (renderers.flight !== undefined) bindPrototype(renderers.flight, FlightPresentation.prototype);
     bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
@@ -361,6 +366,7 @@ export function clearMatchEffects(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.meter?.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.goldSack?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.parasol?.hide();
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.hookChain?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.spheres?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.flight?.hide();
   ui.classic?.endMatch();
