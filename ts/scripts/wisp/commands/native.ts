@@ -20,6 +20,7 @@ const RunRow = Schema.Struct({ id: Schema.String, identity: Schema.String, start
 const Run = Schema.Struct({ batches: Schema.Array(RunRow) });
 const decodePlan = (text: string) => Schema.decodeEffect(Schema.fromJsonString(Plan))(text);
 const state = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
+export const plannerMapBuild = (batch: Pick<Batch, "id" | "map" | "look">): readonly string[] => ["map", "build", "--profile", "integrity", "--name", `Smashcraft native ${batch.id}`, "--out", batch.map, "--edition", batch.look === "classic" ? "classic" : "full"];
 const evidenceFiles = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
   const path = join(dir, entry.name);
   return entry.isDirectory() ? evidenceFiles(path) : statSync(path).size > 0 ? [path] : [];
@@ -108,7 +109,7 @@ const runNative = (file: string, out: string, values: NativeOptions) => Effect.g
     if (batch.executor === "capture") return yield* new UsageFailure({ problem: `build the manifest's capture map before running: ${batch.map}` });
     const skill = config.capacity === undefined ? yield* runProcess(ChildProcess.make("agents", ["path", "machine-capacity"])) : undefined;
     const capacity = config.capacity ?? join(dirname(skill ?? ""), "scripts/machine-capacity.mjs");
-    yield* runProcess(ChildProcess.make(process.execPath, [capacity, "run", "--class", "moderate", "--owner", "native-planner-build", "--timeout-seconds", "1200", "--", process.execPath, "scripts/wisp.ts", "map", "build", "--profile", "integrity", "--out", batch.map, "--edition", batch.look === "classic" ? "classic" : "full"], { cwd: resolve(import.meta.dir, "../../..") }));
+    yield* runProcess(ChildProcess.make(process.execPath, [capacity, "run", "--class", "moderate", "--owner", "native-planner-build", "--timeout-seconds", "1200", "--", process.execPath, "scripts/wisp.ts", ...plannerMapBuild(batch)], { cwd: resolve(import.meta.dir, "../../..") }));
   });
   for (const [index, batch] of plan.batches.entries()) {
     const identity = dry ? JSON.stringify(batch) : yield* attempt(() => {
