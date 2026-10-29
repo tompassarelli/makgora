@@ -1,5 +1,5 @@
-import { appendFileSync, closeSync, cpSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { closeSync, cpSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { homedir, hostname } from "node:os";
 import { join } from "node:path";
 import { Console, Effect, Fiber, Schema } from "effect";
 import { UsageFailure } from "wisp/scripts/wisp/command";
@@ -7,14 +7,9 @@ import { SELECTABLE_CHARACTERS, fighterKey, fighterName, fighterSlug } from "../
 import { CaptureQueueFailure, Job, type Result, git, queueDirectory, showcaseSlot, writeAtomic } from "./captureQueue";
 import { attachedPoolReady } from "./wisp/nativePool";
 import { projectRoot, tsDirectory } from "./wisp/projectRoot";
+import { type Slot, isLocal, leaseAnyPair, remoteCapture } from "./captureFanout";
+import { attempt, fail, logTo, option, seconds, spawnLogged } from "./captureQueueProcess";
 
-const option = (args: readonly string[], name: string) => {
-  const index = args.indexOf(name);
-  return index < 0 ? undefined : args[index + 1];
-};
-const fail = (problem: string) => new CaptureQueueFailure({ problem });
-const attempt = <A>(problem: string, run: () => A) => Effect.try({ try: run, catch: cause => fail(`${problem}: ${cause instanceof Error ? cause.message : String(cause)}`) });
-const seconds = (since: number) => Math.round((performance.now() - since) / 100) / 10;
 const HOLD_TICKS = 30;
 const TILE_HEIGHT = 270;
 const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
@@ -22,22 +17,6 @@ const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/stat
 interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly minutes: number }
 interface Group { commit: string; readonly jobs: Job[] }
 
-const logTo = (file: string) => (row: Record<string, unknown>) => Effect.sync(() => {
-  const line = JSON.stringify({ at: new Date().toISOString(), ...row });
-  appendFileSync(file, `${line}\n`);
-  console.log(line);
-});
-
-const spawnLogged = (command: readonly string[], cwd: string, logFile: string) => Effect.acquireUseRelease(
-  attempt(`start ${command.slice(0, 4).join(" ")}`, () => {
-    const fd = openSync(logFile, "a");
-    const child = Bun.spawn([...command], { cwd, stdin: "ignore", stdout: fd, stderr: fd });
-    closeSync(fd);
-    return child;
-  }),
-  child => Effect.promise(() => child.exited).pipe(Effect.flatMap(code => code === 0 ? Effect.void : Effect.fail(fail(`${command.slice(1, 4).join(" ")} exited ${code}; see ${logFile}`)))),
-  child => Effect.sync(() => { if (child.exitCode === null) child.kill("SIGINT"); }),
-);
 
 const fighterPaths = (fighter: string) => [`:(glob)build-inputs/*/${fighter}`, `:(glob)build-inputs/*/${fighter}/**`];
 
@@ -173,7 +152,7 @@ const sheetFor = (job: Job, fixtures: readonly string[], captures: readonly { re
   return { sheet, judge };
 });
 
-const captureGroup = <R>(settings: Settings, batch: string, group: Group, index: number, log: ReturnType<typeof logTo>, poolReady: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
+const captureGroup = <R>(settings: Settings, slot: Slot, batch: string, group: Group, index: number, log: ReturnType<typeof logTo>, poolReady: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
   const directory = join(queueDirectory("batches"), batch), logFile = join(directory, "run.log"), source = join(directory, `src-${index}`), sourceTs = join(source, "ts");
   yield* git(projectRoot, ["worktree", "add", "--detach", source, group.commit]);
   return yield* Effect.gen(function*() {
@@ -191,8 +170,9 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     yield* attempt("write the plan", () => writeAtomic(plan, `${JSON.stringify({ version: 1, sourceRevision: identity.sourceRevision, rows: [{ name: `g${index}`, map, manifest, mapSha256: identity.mapSha256, frames: identity.fixtures.flatMap(fixture => fixture.frames) }] })}\n`));
     yield* poolReady;
     const captured = performance.now();
-    yield* spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(settings.minutes)], tsDirectory, logFile);
-    yield* log({ step: "capture", group: index, seconds: seconds(captured) });
+    if (isLocal(slot)) yield* spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(settings.minutes)], tsDirectory, logFile);
+    else yield* remoteCapture({ slot, batch, index, directory, map, manifest, plan, minutes: settings.minutes, clientsFile: settings.clientsFile, desktop: settings.desktop, capacity: settings.capacity, install: settings.install }, logFile);
+    yield* log({ step: "capture", group: index, host: slot.host, pair: slot.pair, seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
     const captures = yield* fixtureTimes(join(frames, "checkpoint.json"), log, index);
     for (const job of group.jobs) {
@@ -213,15 +193,23 @@ const runBatch = <R>(settings: Settings, jobs: readonly Job[], ensurePool: Effec
   const groups = yield* foldLanes(projectRoot, jobs, main);
   yield* log({ step: "fold", batch, jobs: jobs.map(job => job.id), groups: groups.map(group => ({ commit: group.commit, lanes: group.jobs.map(job => job.lane) })), seconds: seconds(folded) });
   const pool = yield* Effect.forkChild(ensurePool);
-  for (const [index, group] of groups.entries()) {
-    const outcome = yield* captureGroup(settings, batch, group, index, log, Fiber.join(pool)).pipe(Effect.result);
-    if (outcome._tag === "Failure") {
-      yield* log({ step: "failed", group: index, problem: outcome.failure.message });
-      for (const job of group.jobs) yield* finish(job, { batch, status: "failed", problem: outcome.failure.message });
-    }
-  }
+  yield* Effect.forEach(groups.entries(), ([index, group]) => Effect.scoped(Effect.gen(function*() {
+    const slot = index === 0 ? { host: hostname(), pair: settings.pair } : yield* leaseAnyPair(`capture-queue-${batch}-g${index}`, LEASE_WAIT_SECONDS);
+    yield* log({ step: "lease", group: index, host: slot.host, pair: slot.pair, lanes: group.jobs.map(job => job.lane) });
+    return yield* captureGroup(pairSettings(settings, slot.pair), slot, batch, group, index, log, index === 0 ? Fiber.join(pool) : Effect.void);
+  })).pipe(Effect.result, Effect.flatMap(outcome => outcome._tag === "Success" ? Effect.void : Effect.gen(function*() {
+    yield* log({ step: "failed", group: index, problem: outcome.failure.message });
+    for (const job of group.jobs) yield* finish(job, { batch, status: "failed", problem: outcome.failure.message });
+  }))), { concurrency: "unbounded", discard: true });
   yield* log({ step: "batch", batch, seconds: seconds(folded) });
 });
+
+const LEASE_WAIT_SECONDS = 1800;
+
+const pairSettings = (settings: Settings, pair: number): Settings => pair === settings.pair ? settings : {
+  ...settings, pair, client: `lan${pair}a`,
+  install: join(homedir(), `.local/share/wisp/lan/clients/lan${pair}a/pfx/drive_c/Program Files (x86)/Warcraft III`),
+};
 
 const settingsOf = (args: readonly string[]): Settings | undefined => {
   const pair = Number(option(args, "--pair"));
