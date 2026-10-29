@@ -370,8 +370,8 @@ the follow-through and back to his stance (`ILLIDAN_MOVES` in
   so the step drives the kick. The planted foot stays where it landed until the
   kick. The step stops at a body or a raised shield, and stops at the ledge, so
   he never kicks himself off the stage. 70 is the longer of two authored
-  strides (50 and 70) and was picked because it reads as a stride at match zoom
-  where 50 reads as a lean.
+  strides (50 and 70) and was picked from world-space silhouette sheets, where
+  it shows the clearer stride; native strips at match zoom follow after landing.
 - Hit regions follow his drawn leg on each active frame:
   - The **clean hit** is the kill hit and covers most of the shin, the foot
     and the heel: 17% at 45°, base 10, growth 105, Falco's forward smash
