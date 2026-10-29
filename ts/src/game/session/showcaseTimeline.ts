@@ -10,6 +10,7 @@ import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, SpecialSlot,
 import { heroCueWindows } from "../presentation/cueWindows";
 import { SHIELD_PROJECTILE_SPEED_MULTIPLIER } from "../sim/shield";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
+import { ordinaryHitlagFrames } from "../sim/knockback";
 
 export const SHOWCASE_FIRST_FRAME = 40;
 export const SHOWCASE_SPECIAL_SLOTS: readonly string[] = ["neutral_b", "side_b", "up_b", "down_b"];
@@ -33,6 +34,7 @@ export interface ShowcaseMove {
   readonly charging?: readonly number[] | undefined;
   readonly release?: number | undefined;
   readonly swing?: readonly number[] | undefined;
+  readonly cross?: { readonly frame: number; readonly gap: number } | undefined;
 }
 
 export interface ShowcaseRow {
@@ -51,7 +53,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
-    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
+    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), swing: special === undefined ? undefined : rushSamples(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   return moves;
@@ -99,20 +101,29 @@ function channelledShowcase(slot: string, code: number, special: Readonly<Author
 const centreX = (region: MoveRegion): number => (region.hit.minX + region.hit.maxX) * 0.5;
 const centreZ = (region: MoveRegion): number => (region.hit.minZ + region.hit.maxZ) * 0.5;
 
-function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined } {
+function rushSamples(special: Readonly<AuthoredSpecial>): number[] | undefined {
+  const rush = special.motion?.find((segment) => segment.velocityX > 0.0 && segment.stopsAtBody === true);
+  return rush === undefined ? undefined : [floorDiv(rush.first + rush.last, 2), rush.last];
+}
+
+function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined; readonly cross?: { readonly frame: number; readonly gap: number } | undefined; readonly swing?: readonly number[] | undefined } {
   if (move === undefined || move.regions.length === 0) return { gap: reachGap(move) };
   if (style === AttackStyle.upTilt || style === AttackStyle.upSmash) return overheadPlacement(move, character);
   if (style !== AttackStyle.downSmash) return { gap: reachGap(move) };
   const ahead = move.regions.filter((region) => centreX(region) > 0.0), behind = move.regions.filter((region) => centreX(region) < 0.0);
   const opens = (regions: readonly MoveRegion[]) => Math.min(...regions.map((region) => region.firstFrame));
-  if (ahead.length > 0 && behind.length > 0 && opens(ahead) !== opens(behind)) return { gap: regionGap(opens(ahead) > opens(behind) ? ahead : behind, move.travelX ?? 0.0) };
-  return { gap: reachGap(move) };
+  if (ahead.length === 0 || behind.length === 0 || opens(ahead) === opens(behind)) return { gap: reachGap(move) };
+  const [early, late] = opens(ahead) < opens(behind) ? [ahead, behind] : [behind, ahead];
+  const lateGap = regionGap(late, move.travelX ?? 0.0);
+  if (lateGap === undefined || opens(late) - opens(early) < 2) return { gap: lateGap };
+  const contact = opens(late) + ordinaryHitlagFrames(Math.max(...early.map((region) => region.hit.effect.damage)));
+  return { gap: regionGap(early, move.travelX ?? 0.0), cross: { frame: opens(late) - 1, gap: lateGap }, swing: [contact, contact + 2] };
 }
 
 function overheadPlacement(move: Readonly<AuthoredMove>, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined } {
   const body = hurtCapsule(character), top = Math.max(body.z1, body.z2) + body.radius;
   const highest = move.regions.reduce((best, region) => centreZ(region) > centreZ(best) ? region : best);
-  return centreZ(highest) - top > Math.abs(centreX(highest)) ? { gap: Math.floor(centreX(highest)), lift: Math.floor(centreZ(highest) - SHOWCASE_DUMMY_MIDDLE) } : { gap: reachGap(move) };
+  return centreZ(highest) - top > Math.abs(centreX(highest)) ? { gap: Math.floor(centreX(highest)), lift: Math.floor(centreZ(highest)) } : { gap: reachGap(move) };
 }
 
 function reachGap(move: Readonly<AuthoredMove> | undefined): number | undefined {

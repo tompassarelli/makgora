@@ -69,6 +69,8 @@ const neutralPad = (): Pad => ({ buttons: 0, x: 0.0, z: 0.0, cx: 0.0, cz: 0.0, s
 const state = (): Driver => globalThis.__smashcraftNativeDriver ??= { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
 const PAD_LETTERS: readonly string[] = ["a", "b", "c", "d"];
 const BUTTONS: Readonly<Record<string, number>> ={ A: 1, B: 2, X: 4, Y: 8, LB: 16, TL: 16, RB: 32, TR: 32, START: 64, VIEW: 128 };
+const SHOWCASE_BRACE_FRAMES = 120;
+const SHOWCASE_BRACE_DAMAGE = 999.0;
 
 function whole(text: string): number {
   const result = parseDecimal(text);
@@ -99,7 +101,7 @@ function parseScript(text: string): { readonly setup: string; readonly edges: re
     previous = frame;
     if (action === "capture") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
 
-    if (action === "chat" || action === "move") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
+    if (action === "chat" || action === "move" || action === "brace" || action === "cross") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
     if (action === "press" || action === "release" || action === "tap") {
       if (BUTTONS[(args[0] ?? "").toUpperCase()] === undefined) throw new Error("native driver: unknown pad button");
       const held = action === "tap" ? args[1] === undefined ? 1 : whole(args[1]) : 0;
@@ -285,6 +287,19 @@ export function beforeNativeDriverTick(s: ShellState): boolean {
 }
 
 
+function braceTarget(target: Fighter): void {
+  target.status.armorFrames = SHOWCASE_BRACE_FRAMES;
+  target.status.armorMaxDamage = SHOWCASE_BRACE_DAMAGE;
+  target.status.armorKnockback = 0.0;
+}
+
+function crossTarget(target: Fighter, args: readonly string[]): void {
+  const [facing, gap = "0"] = args;
+  target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
+  target.motion.vx = 0.0;
+  for (const entry of target.hits.entries) entry.window = 0;
+}
+
 function stageScriptedMove(s: ShellState, slot: number, args: readonly string[]): void {
   const [kind, code = "", facing, gap = "500", lift] = args;
   const mover = fighterAt(s.world, slot), target = fighterAt(s.world, slot === 0 ? 1 : 0);
@@ -308,6 +323,8 @@ export function captureNativeDriverInputs(s: ShellState): void {
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
     else if (edge.action === "move") stageScriptedMove(s, edge.slot, edge.args);
+    else if (edge.action === "brace") braceTarget(fighterAt(s.world, edge.slot === 0 ? 1 : 0));
+    else if (edge.action === "cross") crossTarget(fighterAt(s.world, edge.slot === 0 ? 1 : 0), edge.args);
     else if (pad !== undefined) applyEdge(s, pad, edge);
     driver.next++;
   }

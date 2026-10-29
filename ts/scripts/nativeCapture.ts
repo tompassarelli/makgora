@@ -69,7 +69,7 @@ export function silhouetteOf(path: string, lines: readonly string[]): Silhouette
 }
 
 export function fixtureOf(path: string, script: string): CaptureFixture {
-  const chat = /^\s*\S+\s+[ab]\s+(?:chat|move)\s/;
+  const chat = /^\s*\S+\s+[ab]\s+(?:chat|move|brace|cross)(?:\s|$)/;
   const lines = script.split("\n");
   const silhouette = silhouetteOf(path, lines);
   if (lines.some(line => chat.test(line) && line.trim().startsWith("+"))) fail(`${path}: a chat line needs an absolute frame`);
