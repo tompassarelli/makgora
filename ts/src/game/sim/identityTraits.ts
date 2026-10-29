@@ -43,6 +43,9 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.archimonde]: { down: { status: true } },
   [Character.butcher]: { down: { status: true }, ultimate: { heal: true } },
   [Character.tyrande]: {},
+  [Character.akama]: {},
+  [Character.firelord]: {},
+  [Character.alchemist]: {},
 };
 
 const NO_TRAITS: TraitSet = {};

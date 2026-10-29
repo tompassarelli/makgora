@@ -31,6 +31,9 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Lady Vashj | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Lady Vashj's naga hold the Broken Isles around the Tomb of Sargeras for Illidan. |
 | Archimonde the Defiler | Nordrassil | 10 | RoC's final battle: the Burning Legion's lord climbs Mount Hyjal to take the World Tree. |
 | Tyrande Whisperwind | Nordrassil | 10 | RoC's night elf campaign: the High Priestess holds the passes of Hyjal until the World Tree's trap closes on Archimonde. |
+| Akama | Hellfire Citadel | 14 | TFT's "Lord of Outland": Akama's Broken join Illidan in Outland and storm Magtheridon's citadel beside him. |
+| Firelord | Blackrock | 12 | The Firelord is a mercenary of fire elementals, and Blackrock Mountain's molten forges are the hottest ground in Khaz Modan. |
+| Goblin Alchemist | Durotar Skies | 3 | Goblin merchants and alchemists sell to Thrall's Horde from Durotar's new settlements. |
 | Thrall | Durotar Skies | 3 | Thrall leads the founding of Durotar. |
 | Jaina Proudmoore | Gryphon Aerie | 11 | Jaina leads the Alliance expedition with its human forces. |
 | Sylvanas Windrunner | Naxxramas | 4 | The Dark Ranger fights the Scourge in Lordaeron. |

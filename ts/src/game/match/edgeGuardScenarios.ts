@@ -280,6 +280,9 @@ export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> =
   [Character.archimonde]: { guarder: Character.archimonde, out: 160.0, z: -134.0, press: 3 },
   [Character.butcher]: { guarder: Character.butcher, out: 160.0, z: -110.0, press: 3 },
   [Character.tyrande]: { guarder: Character.tyrande, out: 163.0, z: -68.0, press: 3 },
+  [Character.akama]: { guarder: Character.akama, out: 163.0, z: -68.0, press: 3 },
+  [Character.firelord]: { guarder: Character.firelord, out: 163.0, z: -68.0, press: 3 },
+  [Character.alchemist]: { guarder: Character.alchemist, out: 163.0, z: -68.0, press: 3 },
 };
 
 export const OPENING_MIN = 15;

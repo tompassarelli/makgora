@@ -37,6 +37,9 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   Archimonde: part('Bone_Head', [], []),
   Butcher: part('Bone_Head', [], []),
   Tyrande: part('Bone_Head', ['Cylinder02'], ['Bone_Hand_L']),
+  Akama: part('Bone_joint11', [], []),
+  Firelord: part('Bone_Head', [], []),
+  GoblinAlchemist: part('Bone_Head01', [], []),
 };
 
 /** The fighter's declared parts kept to the nodes its drawn Classic body has, and the declared nodes it lacks. */

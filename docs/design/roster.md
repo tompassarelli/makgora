@@ -111,6 +111,10 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | 14 | Dark Ranger | Marked targets and a single skeletal helper | Requires setup and must approach to cash in marks |
 | 15 | Firelord | Fire zones and one short-lived summon | Zones have startup and can be escaped vertically |
 
+Akama, the Broken Ashtongue elder of The Frozen Throne, is planned for a later kit; until then he plays as a stand-in.
+
+Akama, Firelord and Goblin Alchemist are selectable now as stand-ins on the shared placeholder moveset ([standins.md](standins.md)); the sections below are their real kits, not yet built.
+
 Murloc ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),
 requested by Tom on 8 October 2026, is a small, light rushdown; his kit,
 body and gameplan are in [murloc.md](murloc.md).
@@ -1083,6 +1087,8 @@ Standing grab 10/2/29, reach 0.80H, telescoping clamp. No tether to ledges. Pumm
 
 ## Goblin Alchemist
 
+Selectable now as a stand-in on the shared placeholder moveset ([standins.md](standins.md)); this kit is the plan for his real one.
+
 **Identity:** the ogre does the punching and throwing while the goblin prepares potions. Heavy body, large target, and short bursts of speed. Healing and Chemical Rage require commitment; no random potion outcomes.
 
 ### Normals
@@ -1273,6 +1279,8 @@ Standing grab 7/2/23, reach 0.50H. Pummel: dagger hilt, never lifesteal.
 **Required counterplay test:** her basic arrow must leave time to approach between shots. Skeleton destruction meaningfully removes pressure; silence cannot take away recovery or create a permanent status loop.
 
 ## Firelord
+
+Selectable now as a stand-in on the shared placeholder moveset ([standins.md](standins.md)); this kit is the plan for his real one.
 
 **Identity:** a caster who leaves brief fire zones and builds pressure with a single lava spawn. Flame trails are visually clear and mechanically bounded. The floating model still follows normal jumps and gravity.
 

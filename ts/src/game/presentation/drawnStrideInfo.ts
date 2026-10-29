@@ -30,4 +30,7 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   29: { walk: { clip: 2, model: "units\\demon\\Warlock\\Warlock.mdl", speed: f32(240.654) }, run: { clip: 2, model: "units\\demon\\Warlock\\Warlock.mdl", speed: f32(240.654) } },
   30: { walk: { clip: 8, model: "war3mapImported\\TyrandeDismountedV2.mdx", speed: f32(117.104) }, run: { clip: 8, model: "war3mapImported\\TyrandeDismountedV2.mdx", speed: f32(117.104) } },
   31: { walk: { clip: 1, model: "units\\undead\\Abomination\\Abomination.mdl", speed: f32(232.902) }, run: { clip: 1, model: "units\\undead\\Abomination\\Abomination.mdl", speed: f32(232.902) } },
+  32: { walk: { clip: 2, model: "units\\other\\DranaiAkama\\DranaiAkama.mdl", speed: f32(249.722) }, run: { clip: 2, model: "units\\other\\DranaiAkama\\DranaiAkama.mdl", speed: f32(249.722) } },
+  33: { walk: { clip: 2, model: "Units\\Creeps\\HeroFlameLord\\HeroFlameLord.mdl", speed: f32(53.597) }, run: { clip: 2, model: "Units\\Creeps\\HeroFlameLord\\HeroFlameLord.mdl", speed: f32(53.597) } },
+  34: { walk: { clip: 4, model: "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist.mdl", speed: f32(217.565) }, run: { clip: 4, model: "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist.mdl", speed: f32(217.565) } },
 };

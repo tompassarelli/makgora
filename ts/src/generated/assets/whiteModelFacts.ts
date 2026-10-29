@@ -29,6 +29,9 @@ import * as ladyVashj from "./white-facts/lady-vashj";
 import * as archimonde from "./white-facts/archimonde";
 import * as tyrande from "./white-facts/tyrande";
 import * as butcher from "./white-facts/butcher";
+import * as akama from "./white-facts/akama";
+import * as firelord from "./white-facts/firelord";
+import * as goblinAlchemist from "./white-facts/goblin-alchemist";
 export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...rifleman.whiteModelFacts,
   ...illidan.whiteModelFacts,
@@ -58,4 +61,7 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...archimonde.whiteModelFacts,
   ...tyrande.whiteModelFacts,
   ...butcher.whiteModelFacts,
+  ...akama.whiteModelFacts,
+  ...firelord.whiteModelFacts,
+  ...goblinAlchemist.whiteModelFacts,
 };

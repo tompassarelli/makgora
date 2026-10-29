@@ -4,21 +4,21 @@ export type Side = 0 | 1;
 export type Limb = 'shoulder' | 'elbow' | 'hand';
 
 const BODY = {
-    root: ['Bone_Root', 'Bone_Root01', 'Root', 'local_C0_0_jnt', 'Bone_RootArchDruid'],
-    pelvis: ['Bone_Pelvis', 'spine_C0_0_jnt', 'Bone_Root01', 'Bone_Root', 'Root', 'Bone Koto Waist01', 'Bone_PelvisArchDruid', 'Pelvis'],
+    root: ['Bone_Root', 'Bone_Root01', 'Root', 'local_C0_0_jnt', 'Bone_RootArchDruid', 'Bone_root'],
+    pelvis: ['Bone_Pelvis', 'spine_C0_0_jnt', 'Bone_Root01', 'Bone_Root', 'Root', 'Bone Koto Waist01', 'Bone_PelvisArchDruid', 'Pelvis', 'Bone_joint8'],
     waist: ['Bone_Waist', 'spine_C0_1_jnt', 'Stomach'],
-    chest: ['Bone_Chest', 'Bone_Chest01', 'bone_chest', 'Chest', 'Cylinder01', 'Bone_ChestArchDruid'],
-    head: ['Bone_Head', 'Bone_Head01', 'bone_head', 'Head', 'Bone_HeadArchDruid'],
+    chest: ['Bone_Chest', 'Bone_Chest01', 'bone_chest', 'Chest', 'Cylinder01', 'Bone_ChestArchDruid', 'Bone_joint10'],
+    head: ['Bone_Head', 'Bone_Head01', 'bone_head', 'Head', 'Bone_HeadArchDruid', 'Bone_joint11'],
 } as const;
 
 const LIMBS: Readonly<Record<Limb, readonly [readonly string[], readonly string[]]>> = {
     shoulder: [
-        ['Bone_Arm1_R', 'Bone_Arm1_R01', 'Bone_UpperArmR', 'Bone_Arm1R', 'arm_R0_0_jnt', 'RShoulder', 'Cylinder06', 'Bone_Arm1_RArchDruid', 'Bone_ArmUpper1_Right', 'UpArmR'],
-        ['Bone_Arm1_L', 'Bone_Arm1_L01', 'Bone_UpperArmL', 'Bone_Arm1L', 'arm_L0_0_jnt', 'Lshoulder', 'Cylinder07', 'Bone_Arm1_LArchDruid', 'Bone_ArmUpper1_Left', 'UpArmL'],
+        ['Bone_Arm1_R', 'Bone_Arm1_R01', 'Bone_UpperArmR', 'Bone_Arm1R', 'arm_R0_0_jnt', 'RShoulder', 'Cylinder06', 'Bone_Arm1_RArchDruid', 'Bone_ArmUpper1_Right', 'UpArmR', 'Bone_UpArmR'],
+        ['Bone_Arm1_L', 'Bone_Arm1_L01', 'Bone_UpperArmL', 'Bone_Arm1L', 'arm_L0_0_jnt', 'Lshoulder', 'Cylinder07', 'Bone_Arm1_LArchDruid', 'Bone_ArmUpper1_Left', 'UpArmL', 'Bone_UpArmL'],
     ],
     elbow: [
-        ['Bone_Arm2_R', 'Bone_Arm2_R01', 'Bone_LowerArmR', 'Bone_Arm2R', 'arm_R0_2_jnt', 'Relbow', 'Mesh04', 'Bone_Arm2_RArchDruid', 'Bone_ArmLower1_Right', 'LowArmR'],
-        ['Bone_Arm2_L', 'Bone_Arm2_L01', 'Bone_LowerArmL', 'Bone_Arm2L', 'arm_L0_2_jnt', 'Lelbow', 'Mesh05', 'Bone_Arm2_LArchDruid', 'Bone_Armlower1_Left', 'LowArmL'],
+        ['Bone_Arm2_R', 'Bone_Arm2_R01', 'Bone_LowerArmR', 'Bone_Arm2R', 'arm_R0_2_jnt', 'Relbow', 'Mesh04', 'Bone_Arm2_RArchDruid', 'Bone_ArmLower1_Right', 'LowArmR', 'Bone_joint003'],
+        ['Bone_Arm2_L', 'Bone_Arm2_L01', 'Bone_LowerArmL', 'Bone_Arm2L', 'arm_L0_2_jnt', 'Lelbow', 'Mesh05', 'Bone_Arm2_LArchDruid', 'Bone_Armlower1_Left', 'LowArmL', 'Bone_joint2'],
     ],
     hand: [
         ['Bone_Hand_R', 'Bone_Hand_R01', 'Bone_HandR', 'arm_R0_end_jnt', 'Rhand', 'Bone_Hand_RArchDruid', 'Hand Right Ref ', 'Hand Right Ref', 'Mesh02', 'Bone_ArmHand1_Right', 'HandR'],

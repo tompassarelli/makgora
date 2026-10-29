@@ -43,6 +43,9 @@ export const STOCK_MODEL_SCALES: Readonly<Record<Character, { readonly unit: str
   [Character.archimonde]: { unit: "Uwar", scale: f32(1.45) },
   [Character.butcher]: { unit: "uabo", scale: f32(1.15) },
   [Character.tyrande]: TYRANDE_STOCK_SCALE,
+  [Character.akama]: { unit: "Naka", scale: 1.0 },
+  [Character.firelord]: { unit: "Nfir", scale: 1.0 },
+  [Character.alchemist]: { unit: "Nalc", scale: 1.0 },
   [Character.murloc]: { unit: "nmrl", scale: 1.0 },
   [Character.grom]: { unit: "Ogrh", scale: 1.0 },
 };

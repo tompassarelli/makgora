@@ -37,6 +37,9 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [29, { name: "Archimonde", slug: "archimonde", source: "hero-models/warlock.mdx", stock: "war3.w3mod:units/demon/warlock/warlock.mdx", model: "units\\demon\\Warlock\\Warlock.mdl" }],
   [30, { name: "Tyrande", slug: "tyrande", source: "hero-models/TyrandeDismountedV2.mdx", model: "war3mapImported\\TyrandeDismountedV2.mdx" }],
   [31, { name: "Butcher", slug: "butcher", source: "hero-models/abomination.mdx", stock: "war3.w3mod:units/undead/abomination/abomination.mdx", model: "units\\undead\\Abomination\\Abomination.mdl" }],
+  [32, { name: "Akama", slug: "akama", source: "hero-models/dranaiakama.mdx", stock: "war3.w3mod:units/other/dranaiakama/dranaiakama.mdx", model: "units\\other\\DranaiAkama\\DranaiAkama.mdl" }],
+  [33, { name: "Firelord", slug: "firelord", source: "hero-models/heroflamelord.mdx", stock: "war3.w3mod:units/creeps/heroflamelord/heroflamelord.mdx", model: "Units\\Creeps\\HeroFlameLord\\HeroFlameLord.mdl" }],
+  [34, { name: "GoblinAlchemist", slug: "goblin-alchemist", source: "hero-models/herogoblinalchemist.mdx", stock: "war3.w3mod:units/creeps/herogoblinalchemist/herogoblinalchemist.mdx", model: "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist.mdl" }],
 ]);
 
 export function fighterArt(character: number): FighterArt {

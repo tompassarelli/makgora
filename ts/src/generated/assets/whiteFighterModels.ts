@@ -28,6 +28,9 @@ import * as ladyVashj from "./white-models/lady-vashj";
 import * as archimonde from "./white-models/archimonde";
 import * as tyrande from "./white-models/tyrande";
 import * as butcher from "./white-models/butcher";
+import * as akama from "./white-models/akama";
+import * as firelord from "./white-models/firelord";
+import * as goblinAlchemist from "./white-models/goblin-alchemist";
 export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   1: rifleman.whiteModel,
   2: illidan.whiteModel,
@@ -57,4 +60,7 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   29: archimonde.whiteModel,
   30: tyrande.whiteModel,
   31: butcher.whiteModel,
+  32: akama.whiteModel,
+  33: firelord.whiteModel,
+  34: goblinAlchemist.whiteModel,
 };

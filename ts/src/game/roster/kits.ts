@@ -26,6 +26,9 @@ import { MEDIVH_HERO } from "../fighters/medivh/kit";
 import { ARCHIMONDE_HERO } from "../fighters/archimonde/kit";
 import { BUTCHER_HERO } from "../fighters/butcher/kit";
 import { TYRANDE_HERO } from "../fighters/tyrande/kit";
+import { AKAMA_HERO } from "../fighters/akama/kit";
+import { FIRELORD_HERO } from "../fighters/firelord/kit";
+import { ALCHEMIST_HERO } from "../fighters/alchemist/kit";
 import { LADY_VASHJ_HERO } from "../fighters/lady-vashj/kit";
 import { MURLOC_HERO } from "../fighters/murloc/kit";
 import { MALFURION_HERO } from "../fighters/malfurion/kit";
@@ -34,7 +37,7 @@ import { HIDDEN_FIGHTERS } from "../sim/heroes/releaseRoster";
 
 export const HERO_ROSTER: readonly HeroDefinition[] = [
   BLADEMASTER_HERO, MOUNTAIN_KING_HERO, WARDEN_HERO, LICH_HERO, UTHER_HERO, DREADLORD_HERO, SHADOW_HUNTER_HERO, PIT_LORD_HERO, BEASTMASTER_HERO, LICH_KING_HERO, THRALL_HERO, JAINA_HERO, SYLVANAS_HERO,
-  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, MALFURION_HERO, MEDIVH_HERO, LADY_VASHJ_HERO, ARCHIMONDE_HERO, TYRANDE_HERO, BUTCHER_HERO,
+  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, MALFURION_HERO, MEDIVH_HERO, LADY_VASHJ_HERO, ARCHIMONDE_HERO, TYRANDE_HERO, BUTCHER_HERO, AKAMA_HERO, FIRELORD_HERO, ALCHEMIST_HERO,
 ];
 
 const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined } = {
@@ -60,6 +63,9 @@ const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined }
   [Character.archimonde]: ARCHIMONDE_HERO,
   [Character.butcher]: BUTCHER_HERO,
   [Character.tyrande]: TYRANDE_HERO,
+  [Character.akama]: AKAMA_HERO,
+  [Character.firelord]: FIRELORD_HERO,
+  [Character.alchemist]: ALCHEMIST_HERO,
   [Character.murloc]: MURLOC_HERO,
   [Character.ladyVashj]: LADY_VASHJ_HERO,
   [Character.grom]: GROM_HERO,

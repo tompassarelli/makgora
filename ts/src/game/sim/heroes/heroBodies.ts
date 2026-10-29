@@ -46,6 +46,9 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.archimonde]: { ...body(f32(118.0 / 75.0), f32(0.70), f32(0.72), f32(1.70), f32(1.60)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.butcher]: { ...body(f32(116.0 / 75.0), f32(0.70), f32(0.78), f32(1.85), f32(1.30)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.tyrande]: { ...body(f32(92.0 / 75.0), f32(1.10), f32(1.0), f32(0.90), f32(0.88)), traction: f32(0.06) },
+  [Character.akama]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
+  [Character.firelord]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
+  [Character.alchemist]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
   [Character.murloc]: { ...body(f32(0.94), f32(1.12), f32(1.06), f32(0.90), f32(0.72)), runSpeed: 13.79999828338623, dashSpeed: 11.999999046325684, traction: f32(0.055) },
   [Character.ladyVashj]: { ...body(f32(104.0 / 75.0), f32(0.70), 0.75, f32(0.95), f32(1.15)), dashRunFrame: 16, traction: f32(0.06) },
   [Character.grom]: { ...body(f32(0.98), f32(1.04), f32(0.92), f32(1.12), f32(1.10)), traction: f32(0.06) },
@@ -87,6 +90,9 @@ const FIGHTER_SHIELDS: { readonly [character: number]: FighterShield | undefined
   [Character.archimonde]: { centerZ: f32(100.0), radius: 168.0 },
   [Character.butcher]: { centerZ: f32(68.0), radius: 150.0 },
   [Character.tyrande]: { centerZ: f32(64.0), radius: 112.0 },
+  [Character.akama]: { centerZ: f32(62.6), radius: 117.0 },
+  [Character.firelord]: { centerZ: f32(62.6), radius: 117.0 },
+  [Character.alchemist]: { centerZ: f32(62.6), radius: 117.0 },
 };
 
 export function fighterShield(character: number): FighterShield | undefined {

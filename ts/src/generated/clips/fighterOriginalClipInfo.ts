@@ -30,6 +30,9 @@ import * as shadowHunter from "./shadow-hunter";
 import * as archimonde from "./archimonde";
 import * as butcher from "./butcher";
 import * as tyrande from "./tyrande";
+import * as firelord from "./firelord";
+import * as akama from "./akama";
+import * as goblinAlchemist from "./goblin-alchemist";
 
 /** The light model's animation while its fighter is shown, and while hidden. */
 export const ORIGINAL_LIGHT_ACTIVE_ANIMATION = "Stand";
@@ -72,6 +75,9 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   29: archimonde,
   31: butcher,
   30: tyrande,
+  33: firelord,
+  32: akama,
+  34: goblinAlchemist,
 };
 
 /** Clips 0 to count - 1 exist for this character. */

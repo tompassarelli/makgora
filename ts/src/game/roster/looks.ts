@@ -24,6 +24,9 @@ import { medivhLook } from "../fighters/medivh/look";
 import { archimondeLook } from "../fighters/archimonde/look";
 import { butcherLook } from "../fighters/butcher/look";
 import { tyrandeLook } from "../fighters/tyrande/look";
+import { akamaLook } from "../fighters/akama/look";
+import { firelordLook } from "../fighters/firelord/look";
+import { alchemistLook } from "../fighters/alchemist/look";
 import { mountainKingLook } from "../fighters/mountain-king/look";
 import { murlocLook } from "../fighters/murloc/look";
 import { peonLook } from "../fighters/peon/look";
@@ -52,6 +55,9 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
   [Character.archimonde]: archimondeLook,
   [Character.butcher]: butcherLook,
   [Character.tyrande]: tyrandeLook,
+  [Character.akama]: akamaLook,
+  [Character.firelord]: firelordLook,
+  [Character.alchemist]: alchemistLook,
   [Character.mountainKing]: mountainKingLook(MOUNTAIN_KING_GROUND),
   [Character.murloc]: murlocLook,
   [Character.peon]: peonLook,
