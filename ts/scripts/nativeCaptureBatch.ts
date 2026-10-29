@@ -63,6 +63,8 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
   }
 });
 
+export const poolArguments = (pair: number, desktop: string, capacity: string, network: boolean) => ["lan", "pool", "--foreground", "--queue", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])];
+
 const poolScope = (pair: number, desktop: string, capacity: string, solo: boolean, network: boolean) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
   const existing = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
@@ -71,7 +73,7 @@ const poolScope = (pair: number, desktop: string, capacity: string, solo: boolea
   if (attach && solo) return yield* new CaptureBatchFailure({ problem: `pair ${pair} is already running; a --solo batch restarts its pair between rows, so stop it first (\`bun wisp lan stop --pair ${pair}\` for a pool unit, Ctrl-C for a foreground \`lan pool\`)` });
   const child = attach ? undefined : yield* Effect.acquireRelease(
     Effect.try({
-      try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
+      try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", ...poolArguments(pair, desktop, capacity, network)], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start pair ${pair} pool: ${String(cause)}` }),
     }),
     stopPool,
