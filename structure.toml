@@ -209,10 +209,10 @@ producer = "tools/animations/export-original-clips.ts"
 paths = ["ts/src/generated/assets/whiteFighterModels.ts", "ts/src/generated/assets/white-models/**", "ts/src/generated/assets/whiteModelFacts.ts", "ts/src/generated/assets/white-facts/**"]
 producer = "tools/animations/white-flash-models.ts"
 [[generated]]
-paths = ["ts/src/game/assets/stockSoundInfo.ts"]
+paths = ["ts/src/generated/assets/stockSoundInfo.ts"]
 producer = "tools/presentation/stock-sounds.ts"
 [[generated]]
-paths = ["ts/src/game/assets/modelSoundInfo.ts"]
+paths = ["ts/src/generated/assets/modelSoundInfo.ts"]
 producer = "tools/animations/export-model-sounds.ts"
 [[generated]]
 paths = ["ts/src/game/assets/impactAssetInfo.ts"]
