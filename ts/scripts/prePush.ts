@@ -225,16 +225,45 @@ const landingQueue = run(["git", "config", "--file", join(root, ".safe-push"), "
   Effect.map(({ exitCode, stdout }) => (exitCode === 0 ? stdout.trim() : "")),
 );
 
+export const RELEASE_TAG = /^refs\/tags\/v\d+\.\d+(\.\d+)?(-rc\.\d+)?$/;
+
+const CiRuns = Schema.fromJsonString(Schema.Array(Schema.Struct({ conclusion: Schema.NullOr(Schema.String) })));
+
+/** The conclusions of main's CI runs on the commit a pushed tag or commit names, newest first. */
+export type MainCi = (commit: string) => Effect.Effect<readonly string[], PrePushRefusal>;
+
+const mainCi: MainCi = (pushed) => Effect.gen(function*() {
+  const commit = yield* git("rev-parse", `${pushed}^{commit}`);
+  const refusal = (cause: unknown) => new PrePushRefusal({ problem: `pre-push: read main's CI runs on ${commit.slice(0, 12)}: ${cause}` });
+  const { exitCode, stdout, stderr } = yield* run(["gh", "api", `repos/{owner}/{repo}/actions/workflows/ci.yml/runs?head_sha=${commit}&branch=main&per_page=20`, "--jq", "[.workflow_runs[] | {conclusion}]"], root);
+  if (exitCode !== 0) return yield* refusal(stderr.trim());
+  const runs = yield* Schema.decodeEffect(CiRuns)(stdout).pipe(Effect.mapError(refusal));
+  return runs.map(({ conclusion }) => conclusion ?? "pending");
+});
+
+/** A release or release-candidate tag goes only on a commit main's CI passed, since the parity tapes run there after landing (smashcraft:docs/ci.md, "Landing"). */
+const releaseGreen = (tag: string, commit: string, ci: MainCi) => Effect.gen(function*() {
+  const conclusions = yield* ci(commit);
+  if (conclusions.includes("success")) return;
+  return yield* new PrePushRefusal({ problem: `pre-push: ${tag.slice("refs/tags/".length)} names ${commit.slice(0, 12)}, but main's CI has not passed on it (${conclusions.length === 0 ? "no run" : conclusions.join(", ")}); a release candidate needs the parity tapes and every check main runs after landing green on its commit, so tag a commit whose CI run passed or rerun CI on this one.` });
+});
+
 export interface Landing {
   readonly gate: (head: string, paths: readonly string[], alongside: Effect.Effect<void, PrePushRefusal>) => Effect.Effect<void, PrePushRefusal>;
   readonly queue: typeof landingQueue;
   readonly notice?: Effect.Effect<void>;
+  readonly mainCi?: MainCi;
 }
 
 export const prePush = (input: string, landing: Landing = { gate: landingGate, queue: landingQueue }, local: Local = laptop) =>
   Effect.all([landing.notice ?? mainRedNotice, pushChecks(input, landing, local)], { concurrency: "unbounded", discard: true });
 
 const pushChecks = (input: string, landing: Landing, local: Local) => Effect.gen(function*() {
+  const released = input.split("\n").flatMap((line) => {
+    const [, commit, remoteRef] = line.trim().split(/\s+/);
+    return commit === undefined || remoteRef === undefined || ZERO.test(commit) || !RELEASE_TAG.test(remoteRef) ? [] : [{ commit, remoteRef }];
+  });
+  yield* Effect.forEach(released, ({ commit, remoteRef }) => releaseGreen(remoteRef, commit, landing.mainCi ?? mainCi), { discard: true });
   const pushed = input.split("\n").flatMap((line) => {
     const [, commit, remoteRef, remote] = line.trim().split(/\s+/);
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];

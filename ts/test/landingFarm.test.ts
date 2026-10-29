@@ -11,9 +11,9 @@ import { directoryCache } from "../scripts/prePush";
 
 const CODES = ["ts/src/game/sim/codes.ts"];
 
-test("a landing's farm groups are those its reached checks run in, leaving the frame budgets to main's CI unless a shared root reaches them [k2 property]", () => {
+test("a landing's farm groups are those its reached checks run in, leaving the Lua parity checks and the frame budgets to main's CI unless a shared root reaches them [k2 property]", () => {
   expect(landingGroups(["docs/ci.md"])).toEqual(["static"]);
-  expect(landingGroups(CODES)).toEqual(["parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "static"]);
+  expect(landingGroups(CODES)).toEqual(["corpus", "static"]);
   expect(landingGroups(["ts/bun.lock"])).toEqual([...GROUPS]);
   expect(landingGroups(["docs/ci.md"], true)).toEqual([...GROUPS]);
 });

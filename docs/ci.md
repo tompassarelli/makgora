@@ -42,8 +42,8 @@ fetch, rebase, scan and push:
    pre-push hook: smashcraft:ts/scripts/landingFarm.ts picks the farm-test.yml
    groups the lane's diff against main reaches (`landingGroups` in
    smashcraft:ts/scripts/landingChecks.ts, which names every check, its command
-   and the paths that reach it; the frame budgets wait for main's CI unless a
-   shared root reaches them), dispatches Farm test with the groups and the
+   and the paths that reach it; the Lua parity checks and the frame budgets wait
+   for main's CI unless a shared root reaches them), dispatches Farm test with the groups and the
    base on the `farm/SHA` branch safe-push published after its secret scan
    (`land.publish`, `SAFE_PUSH_LAND_REF`; without one it pushes the lane there
    itself), and passes once every check job has passed, polling the run every 3 s. The `static` group holds the clean
@@ -93,7 +93,14 @@ What reaches each check:
 - A path in `ts/src`, `ts/codegen` or `build-inputs/` reaches the parity
   tapes, parity numeric and the stack-trace profile; a tape input or a script
   in the static import closure of the wisp CLI, the parity command or
-  lua-tests.ts reaches them too. Computer coverage runs for its own import
+  lua-tests.ts reaches them too. They run on main's CI after landing unless a
+  shared root reaches them (decided 2026-10-30): each parity job spends about
+  15 s on runner setup, 16 s on a single-threaded TypeScript-to-Lua compile
+  and 25 to 35 s replaying tapes, so a fighter change could not land within
+  60 s while they gated it. Main's CI runs them on every landed commit, the
+  sheriff reverts a landing that turns them red, and the pre-push hook refuses
+  a release or release-candidate tag on a commit whose main CI run has not
+  passed. Computer coverage runs for its own import
   closure, which holds most of the game.
 - The two four-fighter frame budgets (perf, and rollback under lag spikes)
   run on main's CI after landing unless a shared root reaches them

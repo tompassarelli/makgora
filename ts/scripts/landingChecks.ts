@@ -93,13 +93,13 @@ export const CHECKS: readonly LandingCheck[] = [
   {
     name: "parity tapes",
     command: ["bun", "wisp", "parity", "tapes"],
-    reaches: parity, farm: ["parity-0", "parity-1", "parity-2", "parity-3"], shardVariable: "TAPES_SHARD", here: "beside",
+    reaches: parity, farm: ["parity-0", "parity-1", "parity-2", "parity-3"], shardVariable: "TAPES_SHARD", here: "beside", afterLanding: true,
   },
-  { name: "parity numeric", command: ["bun", "wisp", "parity", "numeric"], reaches: parity, farm: ["lua"], here: "beside" },
+  { name: "parity numeric", command: ["bun", "wisp", "parity", "numeric"], reaches: parity, farm: ["lua"], here: "beside", afterLanding: true },
   {
     name: "stack-trace profile TypeScript frames",
     command: ["bun", "scripts/lua-tests.ts"], env: { LUA_TESTS_STEP: "stack" },
-    reaches: parity, farm: ["lua"], here: "beside",
+    reaches: parity, farm: ["lua"], here: "beside", afterLanding: true,
   },
   // Each native recording replays on the source that recorded it (wisp#69), and any ts/src change moves this tree off every recording's version, so only the replay command and its header and part parse reach it.
   {

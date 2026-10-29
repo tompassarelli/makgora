@@ -63,3 +63,14 @@ test("the clean room scans beside the other local checks and the main-red notice
   });
   await Effect.runPromise(run.pipe(Effect.timeout("5 seconds")));
 });
+
+test("a release-candidate tag pushes only onto a commit main's CI passed, since the Lua parity tapes run there after landing [k1 scenario]", async () => {
+  const { local } = lane("");
+  const tagPush = (conclusions: readonly string[]) => prePush(`refs/tags/v0.1.2-rc.10 ${HEAD} refs/tags/v0.1.2-rc.10 ${"0".repeat(40)}\n`, {
+    gate: () => Effect.void, queue: Effect.succeed(""), notice: Effect.void, mainCi: () => Effect.succeed(conclusions),
+  }, local);
+  const refused = await Effect.runPromise(Effect.flip(tagPush(["failure"])));
+  expect(refused.problem).toContain("main's CI has not passed on it (failure)");
+  expect((await Effect.runPromise(Effect.flip(tagPush([])))).problem).toContain("(no run)");
+  await Effect.runPromise(tagPush(["failure", "success"]));
+});
