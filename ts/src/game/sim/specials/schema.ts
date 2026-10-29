@@ -5,7 +5,7 @@ import type { HitEffect } from "../hitRegions";
 import type { AppliedStatus } from "../appliedStatus";
 import type { HurtPose } from "../hurtboxes";
 import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volleys";
-import type { CastWindows, FrameWindow } from "./castWindows";
+import type { CastWindows, FrameWindow, SpecialChannel } from "./castWindows";
 export type { FrameWindow } from "./castWindows";
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
@@ -373,6 +373,7 @@ export interface AuthoredSpecial extends CastWindows {
   readonly refreshesAir?: true | undefined;
 
   readonly refire?: FrameWindow | undefined;
+  readonly channel?: SpecialChannel | undefined;
   readonly shorten?: FrameWindow | undefined;
 
   readonly jumpCancelFrame?: number | undefined;

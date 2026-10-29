@@ -976,7 +976,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Neutral B | **Howl of Terror:** visible two-sided roar, 7 damage at 35 degrees, radius 1.0H, no lingering status. | Active f15–18, end f46; 12 mana |
 | Side B | **Ruin Charge:** 1.5H grounded charge, 15 damage, EDGE at 35 degrees. One-hit armor up to 6 damage on f19–24; no armor on startup or recovery. Stops at shield. Air version travels 0.8H horizontally, no armor, helpless afterward. | Active/movement f19–26, R38; 22 mana |
 | Up B | **Abyssal Leap:** slow arcing leap in the [#252 heavy recovery band](../gameplay-design.md#recovery-and-edgeguarding), hoof hit for 10 damage at 80 degrees, LAUNCH. Free route reaches at least 240 units on either axis with no hit. | Hit f13–18, movement through f32, then helpless; 15 mana |
-| Down B | **Rain of Fire:** three visible falling meteors, 5 damage each at 70 degrees; lanes 1.8H/2.2H/2.6H ahead. Reflectable and shieldable; jump out or rush underneath. | Spawn f25/31/37, end f60; 20 mana |
+| Down B | **Rain of Fire:** a held channel; a wave of three slanting fireballs into a burning patch ahead every 18 frames, up to four waves, 2 damage each at 80 degrees. Release to recover; a hit breaks it; in the air, one wave. Shieldable, not reflectable. | Waves from f16, every 18 frames; 22-frame recovery; tap ends f55 |
 
 The sourced redesign and visual gestures are in [Pit Lord](pit-lord.md).
 
@@ -1013,8 +1013,9 @@ classes use provisional coefficients. Deliberate differences:
 - His shield is the reference shield scaled by his 1.35 height (centre and
   radius). The reference shield would leave his 1.65-wide body outside it, and
   an arcing Fel Spit then struck him through it.
-- Rain of Fire falls from 2.8H above his feet at 0.16H per frame. Each meteor
-  has radius 0.22H and life 24; shielding upward covers the falling impacts.
+- Rain of Fire's fireballs start 2.36H above the floor under them and fall
+  0.18H per frame for 12 frames with radius 0.3H, harmful only on their last 4
+  frames; shielding covers the impacts.
 - Howl of Terror's whole effect is its immediate outward hit; no damage
   reduction remains.
 - Ruin Charge's armor lapses during his own hitlag, like every special's

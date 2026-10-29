@@ -192,7 +192,6 @@ export const FROST_ARMOR_SHELL_MODEL = "Abilities\\Spells\\Undead\\FrostArmor\\F
 
 const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6));
 
-const RAIN_OF_FIRE_TARGET = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx";
 
 
 const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 165.0, z: 6.0 }));
@@ -373,7 +372,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Howl of Terror", startup: HOWL_INHALE, active: HOWL_ROAR },
     side: { spell: "Ruin Charge", startup: FEL, active: timed(cue(IMPACT_DUST_MODEL, "feet", f32(0.8)), "stand", 0.0) },
     up: { spell: "Abyssal Leap", startup: FEL, active: timed(cue("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", "feet", f32(0.42)), "birth", f32(0.2)) },
-    down: { spell: "Rain of Fire", startup: FEL, active: { ...timed(cue(RAIN_OF_FIRE_TARGET, "overhead", f32(0.5)), "birth", f32(0.8)), timeScale: 1.5 } },
+    down: { spell: "Rain of Fire", startup: FEL, active: cue("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", "overhead", f32(0.45)) },
   },
   [Character.lichKing]: {
     neutral: { spell: "Howling Blast", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdx", "hand", 1.0) },

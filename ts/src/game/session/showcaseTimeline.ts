@@ -49,7 +49,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? { gap: aerialGap(tuning.moves?.normals[code]), lift: aerialLift(tuning.moves?.normals[code]) } : { gap: reachGap(tuning.moves?.normals[code]) }) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
-    const charged = special === undefined ? undefined : chargedShowcase(slot, code, special);
+    const charged = special === undefined ? undefined : chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
     moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
@@ -83,6 +83,16 @@ function chargedShowcase(slot: string, code: number, special: Readonly<AuthoredS
     slot, kind: "special", code, first: frame + heroCueWindows(full).active.first, end: frame + full.endFrame, again: { frame, gap: CHARGED_SHOWCASE_GAP },
     charging,
   };
+}
+
+function channelledShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove | undefined {
+  const channel = special.channel;
+  if (channel === undefined) return undefined;
+  const wave = channel.last - channel.first + 1;
+  const release = channel.first + channel.rewinds * wave + floorDiv(wave, 2);
+  const impacts = Array.from({ length: channel.rewinds + 1 }, (_, index) => channel.first + index * wave + floorDiv(wave * 2, 3));
+  const falls = impacts.map(frame => frame - floorDiv(wave, 3));
+  return { slot, kind: "special", code, first: channel.first, end: release + special.endFrame - channel.last, release, charging: [...falls, ...impacts], gap: specialGap(special) };
 }
 
 function reachGap(move: Readonly<AuthoredMove> | undefined): number | undefined {

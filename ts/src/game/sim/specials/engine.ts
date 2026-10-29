@@ -19,7 +19,7 @@ import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from
 import type { StrikeCapsule } from "../heroMoves";
 import { type FighterSpecials, type AuthoredSpecial, type FrameWindow, CompanionMode, CompanionOrder, type SpecialCharge, type SpecialFollowUp, type SpecialKit, type SpecialArmor, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, type SpecialSteer, type SpecialSteeredShot, type SpecialEgg, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit, ultimateForm } from "./schema";
 import { airCastVariant, castFloating, floatsNow, stallAir } from "./airFloat";
-import { advanceRefire } from "./refire";
+import { advanceChannel, advanceRefire, skipSpecialTo } from "./refire";
 import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
@@ -42,7 +42,7 @@ import { tetherToLedge } from "./ledgeTether";
 import { toggleAuraOnFrame } from "../toggleAura";
 import { stackedArmor } from "../stackPassive";
 import { gazeAt } from "../gaze";
-import { ownedCount } from "./ownedProjectiles";
+import { decorates, neverStrikes, ownedCount } from "./ownedProjectiles";
 import { applySelfHeal } from "./selfHeal";
 import { empoweredVariant, readyEmpowered, spendEmpowered } from "./empowered";
 
@@ -87,7 +87,9 @@ function recallProjectiles(f: Fighter): void {
 function projectilesFit(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): boolean {
   const projectiles = move.projectiles ?? [];
   if (projectiles.length === 0) return true;
-  if (ownedCount(f, undefined) + projectiles.length > HERO_PROJECTILE_CAP) return false;
+  let threats = 0;
+  for (let index = 0; index < projectiles.length; index++) if (!decorates(at(projectiles, index))) threats++;
+  if (ownedCount(f, undefined) + threats > HERO_PROJECTILE_CAP) return false;
   for (let index = 0; index < projectiles.length; index++) {
     const spec = at(projectiles, index);
     if (ownedCount(f, spec) >= spec.limit) return false;
@@ -316,10 +318,6 @@ function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, 
   if (spec.dropsToFloor !== true || owner.motion.grounded) return owner.motion.z;
   const pastLedge = runningHeroSpecial(owner)?.needsFloorBelow === true ? floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) : undefined;
   return floorBelow(stage, matchFrame, x, owner.motion.z) ?? pastLedge ?? owner.motion.z;
-}
-
-function neverStrikes(spec: Readonly<SpecialProjectile>): boolean {
-  return (spec.activeFrom ?? 0) > spec.life;
 }
 
 function riddenDeck(spec: Readonly<SpecialProjectile>, drawn: Readonly<Projectile> | undefined, stage: number, matchFrame: number, x: number, z: number): number | undefined {
@@ -981,14 +979,6 @@ export function aimedProjectile(f: Readonly<Fighter>): Readonly<Projectile> | un
 }
 
 
-function skipSpecialTo(f: Fighter, frame: number): void {
-  const skipped = frame - f.special.frame;
-  if (skipped <= 0) return;
-  f.special.frame = frame;
-  f.special.lockFrames = max(0, f.special.lockFrames - skipped);
-  f.attack.cooldown = max(0, f.attack.cooldown - skipped);
-}
-
 function shortenOnPress(f: Fighter, window: Readonly<FrameWindow> | undefined, input: Readonly<Controls> | undefined): void {
   if (window !== undefined && input?.specialPressed === true && inWindow(window, f.special.frame)) skipSpecialTo(f, window.last + 1);
 }
@@ -1000,6 +990,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
   if (holdSteeredShot(f, move, input)) return;
   advanceRefire(f, move.refire, input);
+  advanceChannel(f, move.channel, input);
   shortenOnPress(f, move.shorten, input);
   if (throwFullDroppingCharge(f, move)) return;
   if (move.turnsAround === true) faceHeldStick(f, input);

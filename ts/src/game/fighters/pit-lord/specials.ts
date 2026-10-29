@@ -29,24 +29,45 @@ const CHARGE_AIR_HURT = [
 const LEAP_HURT = [
     hurtPose(1, 31, [hurtPart(-22.0, 47.0, 6.0, 113.0, 75.0)]),
 ];
+export const RAIN_CHANNEL = { first: 16, last: 33, rewinds: 3 } as const;
+export const RAIN_END = 55;
 const RAIN_HURT = [
-    hurtPose(1, 59, [hurtPart(-30.0, 27.0, 16.0, 103.0, 56.0)]),
-];
-const RAIN_AIR_HURT = [
-    hurtPose(1, 59, [hurtPart(-30.0, 27.0, 16.0, 103.0, 56.0)]),
+    hurtPose(1, RAIN_END, [hurtPart(-30.0, 27.0, 16.0, 103.0, 56.0)]),
 ];
 
-const meteor = (spawnFrame: number, offset: number): SpecialProjectile => ({
-  spawnFrame, offsetX: h(offset), offsetZ: h(f32(2.8)),
-  velocityX: 0.0, velocityZ: -h(f32(0.16)),
-  life: 24, radius: h(f32(0.22)),
-  effect: hit(6.013500213623047, "POKE", 70, 1.0, HitElement.fire), reflectable: true, limit: 1,
-  model: "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx",
+const drawnOnly = (model: string, spawnFrame: number, life: number, offsetX: number, offsetZ: number, modelRadius: number): SpecialProjectile => ({
+  model, spawnFrame, life, offsetX, offsetZ, velocityX: 0.0, velocityZ: 0.0, radius: 1.0, modelRadius, activeFrom: life + 1,
+  effect: hit(0.0, "LINK", 90), reflectable: false, limit: 4,
 });
 
-const RAIN_OF_FIRE = [meteor(25, f32(1.8)), meteor(31, f32(2.2)), meteor(37, f32(2.6))] as const;
+const METEOR_FALL = 12;
+const METEOR_DRIFT = h(f32(0.1));
+const METEOR_SINK = h(f32(0.18));
+const METEOR_CLEARANCE = h(f32(0.2));
+export const METEOR_HIT = hit(f32(2.0), "LINK", 80, 1.0, HitElement.fire);
+const IMPACT = drawnOnly("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 0, 12, 0.0, 0.0, f32(1.6));
+export const RAIN_LANDINGS = [f32(1.7), f32(2.6), f32(2.15)] as const;
+const meteor = (wave: number, landing: number): SpecialProjectile => ({
+  spawnFrame: RAIN_CHANNEL.first + wave, offsetX: f32(h(landing) - f32(METEOR_DRIFT * METEOR_FALL)), offsetZ: f32(METEOR_CLEARANCE + f32(METEOR_SINK * METEOR_FALL)),
+  velocityX: METEOR_DRIFT, velocityZ: -METEOR_SINK, life: METEOR_FALL, activeFrom: METEOR_FALL - 4, radius: h(f32(0.3)), modelRadius: h(f32(0.1)),
+  effect: METEOR_HIT, reflectable: false, limit: 1, dropsToFloor: true, cancelOnInterrupt: true, expiresInto: IMPACT,
+  model: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx",
+});
+const SCORCH = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";
+const scorch = (spawnFrame: number, life: number): SpecialProjectile[] =>
+  [f32(1.85), f32(2.45)].map(at => ({ ...drawnOnly(SCORCH, spawnFrame, life, h(at), 0.0, f32(2.2)), dropsToFloor: true, cancelOnInterrupt: true }));
+const CHANNEL_GLOW: SpecialProjectile = {
+  ...drawnOnly("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", RAIN_CHANNEL.first, RAIN_CHANNEL.last - RAIN_CHANNEL.first + 2, h(f32(0.35)), h(f32(0.9)), f32(1.4)),
+  cancelOnInterrupt: true,
+};
+
+const RAIN_OF_FIRE = [
+  ...scorch(6, 36), ...scorch(RAIN_CHANNEL.first + 10, 26), CHANNEL_GLOW,
+  ...RAIN_LANDINGS.map((landing, index) => meteor(3 * index, landing)),
+];
 const rain = (air: boolean): AuthoredSpecial => ({
-  endFrame: 60, projectiles: RAIN_OF_FIRE, hurt: air ? RAIN_AIR_HURT : RAIN_HURT,
+  endFrame: RAIN_END, projectiles: RAIN_OF_FIRE, hurt: RAIN_HURT,
+  channel: air ? undefined : RAIN_CHANNEL,
   landingLag: air ? AIR_SPECIAL_LANDING_LAG : undefined,
 });
 
@@ -125,5 +146,5 @@ export const PIT_LORD_SPECIALS: FighterSpecials = {
   neutral: { name: "Howl of Terror", description: "Inhale, then roar: a fel shockwave expands on both sides. Grounded foes it reaches cower in terror, longer at higher damage, then resist it for five seconds; airborne foes are pushed away, and a shield takes a heavy blow and a big push instead.", ground: howl(false), air: howl(true) },
   side: { name: "Ruin Charge", description: "A slow charge whose armor shrugs off one light hit; it stops at a shield.", ground: RUIN_CHARGE, air: RUIN_CHARGE_AIR },
   up: { name: "Abyssal Leap", description: "A slow arcing leap you steer, with a hoof strike, then a helpless fall.", ground: abyssalLeap(h(f32(3.5)), h(f32(0.5)), h(f32(1.15))) },
-  down: { name: "Rain of Fire", description: "Three waves of fire fall ahead; rush underneath or tilt your shield up.", ground: rain(false), air: rain(true) },
+  down: { name: "Rain of Fire", description: "Hold to channel: meteors slant down into a burning patch ahead, a wave every 18 frames, up to four waves. Let go and he recovers; a hit breaks the channel. In the air, one wave.", ground: rain(false), air: rain(true) },
 };

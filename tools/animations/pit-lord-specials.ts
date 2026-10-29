@@ -5,7 +5,7 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { type PoseFrame, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
-import { HOWL_FIRST, PIT_LORD_SPECIALS } from "../../ts/src/game/fighters/pit-lord/specials";
+import { HOWL_FIRST, PIT_LORD_SPECIALS, RAIN_CHANNEL } from "../../ts/src/game/fighters/pit-lord/specials";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
@@ -32,9 +32,11 @@ const gestures = [
   { slot: "up", name: "Abyssal Leap", first: 13, last: 18,
     prepare: { waist: 8, chest: 25, head: 15, arm: -30, elbow: 50, front: -55, back: -55, shin: 90 },
     active: { waist: -12, chest: -35, head: -15, arm: -90, elbow: 15, front: -85, back: 20, shin: -35 } },
-  { slot: "down", name: "Rain of Fire", first: 25, last: 37,
-    prepare: { chest: -22, head: -30, arm: -145, elbow: 20, front: -10, back: 12 },
-    active: { chest: 28, head: 15, arm: -55, elbow: 20, front: 18, back: -12 } },
+  { slot: "down", name: "Rain of Fire", first: RAIN_CHANNEL.first, last: RAIN_CHANNEL.last, windup: 10,
+    prepare: { chest: -22, head: -30, arm: -165, elbow: 15, front: -10, back: 12 },
+    active: { chest: -12, head: -24, arm: -128, elbow: 22, front: 6, back: -4 },
+    sway: { chest: 4, head: -8, arm: -104, elbow: 38, front: 12, back: -10 },
+    settle: { chest: 10, head: 4, arm: -40, elbow: 15, front: 4, back: -4 } },
 ] as const;
 const windup = (g: (typeof gestures)[number]): number => "windup" in g ? g.windup : g.first - 4;
 
@@ -75,7 +77,9 @@ for (const g of gestures) {
     track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
-    const poses: readonly (readonly [number, Pose])[] = "settle" in g ? [[0, ready], [windup(g), g.prepare], [g.first, g.active], [g.last, g.active], [g.last + 9, g.settle], [total, ready]] : [[0, ready], [windup(g), g.prepare], [g.first, g.active], [g.last, g.active], [total - 5, ready], [total, ready]];
+    const poses: readonly (readonly [number, Pose])[] = "sway" in g
+      ? [[0, ready], [windup(g), g.prepare], [g.first, g.active], [Math.floor((g.first + g.last + 1) / 2), g.sway], [g.last + 1, g.active], [g.last + 10, g.settle], [total, ready]]
+      : "settle" in g ? [[0, ready], [windup(g), g.prepare], [g.first, g.active], [g.last, g.active], [g.last + 9, g.settle], [total, ready]] : [[0, ready], [windup(g), g.prepare], [g.first, g.active], [g.last, g.active], [total - 5, ready], [total, ready]];
     for (const [frame, pose] of poses) {
       const angle = node ? degrees(node.Name, pose) : 0;
       const Vector = angle ? pitch(first.Vector, angle) : first.Vector.slice();

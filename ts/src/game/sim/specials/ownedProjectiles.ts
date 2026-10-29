@@ -3,12 +3,16 @@ import { ProjectileKind } from "../codes";
 import type { Fighter } from "../fighter";
 import type { SpecialProjectile } from "./schema";
 
+export const neverStrikes = (spec: Readonly<SpecialProjectile>): boolean => (spec.activeFrom ?? 0) > spec.life;
+
+export const decorates = (spec: Readonly<SpecialProjectile>): boolean => neverStrikes(spec) && spec.expiresInto === undefined;
+
 export function ownedCount(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): number {
   let count = 0;
   let index = -1;
   for (const projectile of f.projectiles) {
     index++;
-    if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined ? !laterInVolley(f, index) : projectile.spec === spec)) count++;
+    if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined ? !laterInVolley(f, index) && (projectile.spec === undefined || !decorates(projectile.spec)) : projectile.spec === spec)) count++;
   }
   return count;
 }
