@@ -8,6 +8,7 @@ export const PEON_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.downTilt, near: 40.0, far: 95.0 },
     { move: AttackStyle.grab, near: 0.0, far: 75.0 },
     { move: GameplanSpecial.side, near: 115.0, far: 180.0 },
+    { move: GameplanSpecial.neutral, near: 70.0, far: 150.0 },
   ],
   approach: [
     { via: "run", moves: [AttackStyle.downTilt, AttackStyle.grab, AttackStyle.dashAttack], weight: 12 },
@@ -23,6 +24,7 @@ export const PEON_GAMEPLAN: FighterGameplan = {
   ],
   kills: [
     { move: GameplanSpecial.down, fromPercent: 45.0 },
+    { move: GameplanSpecial.neutral, fromPercent: 80.0 },
     { move: AttackStyle.forwardSmash, fromPercent: 90.0 },
     { move: AttackStyle.upSmash, fromPercent: 105.0 },
     { move: AttackStyle.forwardAir, fromPercent: 115.0 },
