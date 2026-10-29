@@ -733,6 +733,7 @@ the tables:
 - **Spectral Ascent** steers with the live stick at up to 0.4H/25 per frame
   over its window, in place of air drift; with a neutral stick it rises
   straight up.
+- **Vertical physics** (Tom asked for a slightly floatier Lich after a playtest, 2026-10-30): gravity 0.19, terminal speed 2.4 and fast-fall speed 3.0 Melee units (the reference fighter's 0.23, 2.8 and 3.4), and full, short and aerial jump speeds the reference's scaled by sqrt(0.19 / 0.23): 3.34, 1.91 and 4.01 (3.68, 2.10 and 4.416). A full jump peaks 0.5% lower and hangs 10.7% longer (33.8 to 37.4 frames); ground speed, air speed, air acceleration, weight and every move are unchanged. Spectral Ascent's rise is a fixed velocity, so its recovery reach does not shrink. The values are `HERO_VERTICAL` in smashcraft:ts/src/game/sim/tuning.ts.
 - **Frost Armor**'s shell protects from frame 22 for 240 frames, even after
   the cast ends; any hit spends it, and only a hit of at most 8 damage loses
   its reaction. While it holds, down B is Dark Ritual.

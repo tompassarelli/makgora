@@ -257,6 +257,14 @@ export const HERO_VERTICAL: { readonly [character: number]: VerticalPhysics | un
     shortJumpSpeed: melee(1.350000023841858),
     aerialJumpSpeed: melee(2.5),
   },
+  [Character.lich]: {
+    gravity: melee(0.18999999761581421),
+    terminalSpeed: melee(2.4000000953674316),
+    fastFallSpeed: melee(3.0),
+    fullJumpSpeed: melee(3.3447272777557373),
+    shortJumpSpeed: melee(1.9086757898330688),
+    aerialJumpSpeed: melee(4.013672828674316),
+  },
   [Character.cairne]: HEAVY_VERTICAL,
   [Character.pitLord]: HEAVY_VERTICAL,
 };

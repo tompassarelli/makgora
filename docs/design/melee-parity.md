@@ -170,7 +170,7 @@ deviation's reason, issue and decision date are written.
 | Getup roll, total frames, fightcore.csv `getup-roll` | 35 | [Fox 35; 2 of 26 fighters differ: Pichu, Pikachu; 35-36](https://www.fightcore.gg) | [down.ts:42](../../ts/src/game/sim/down.ts#L42) `DOWN_ROLL_FRAMES` | open: one shared profile for every fighter against Melee's per-fighter values (#293) |
 | Getup attack, total frames (ours starts its hit on frame 16), fightcore.csv `getup-attack` | 49 | [Fox 49; 2 of 26 fighters differ: Pichu, Pikachu; 49-50](https://www.fightcore.gg) | [moves.ts:15](../../ts/src/game/sim/moves.ts#L15) `DOWN_ATTACK_FRAMES` | open: one shared profile for every fighter against Melee's per-fighter values (#293) |
 | Getup intangibility: stand, roll and attack, face up/face down `getup-intangibility` | stand 1-20; roll 1-23/1-20; attack 1-27/1-22 | [not documented: neither fightcore.csv nor SmashWiki gives getup intangibility](https://www.fightcore.gg) | [conditions.ts:19](../../ts/src/game/sim/conditions.ts#L19) `DOWN_ROLL_INTANGIBLE_FRAMES_BACK_UP` | open: ours; no public source gives Melee's value (#293) |
-| Wall tech jump, total frames, fightcore.csv `wall-tech-jump-frames` | 40 | [40](https://www.fightcore.gg) | [tuning.ts:379](../../ts/src/game/sim/tuning.ts#L379) `AUTHORED_TECH_TIMING` | parity |
+| Wall tech jump, total frames, fightcore.csv `wall-tech-jump-frames` | 40 | [40](https://www.fightcore.gg) | [tuning.ts:387](../../ts/src/game/sim/tuning.ts#L387) `AUTHORED_TECH_TIMING` | parity |
 | Wall tech, total frames, probed headless (the frame before an attack first starts) against Fox in fightcore.csv: Fox 31; 2 of 26 fighters differ: Donkey Kong, Ice Climbers; 25-31 `wall-tech-frames` | 31 | [31](https://www.fightcore.gg) | [conditions.ts:71](../../ts/src/game/sim/conditions.ts#L71) `surfaceTechLocksActions` | parity |
 | Wall and ceiling tech: hang and intangibility `wall-tech-intangibility` | 5-frame hang, intangible 14; ceiling impulse frame 14 | [not documented: SmashWiki's Tech page: a few intangible frames, with no count](https://www.ssbwiki.com/Tech) | [surfaces.ts:19](../../ts/src/game/sim/surfaces.ts#L19) `SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES` | open: ours; no public source gives Melee's value (#293) |
 | Shieldstun from a ground attack on a full shield, probed at damage 1-50 `shieldstun-ground` | ⌊(0.45d + 2)·200/201⌋ | [⌊(0.45d + 2)·200/201⌋](https://www.ssbwiki.com/Shield) | [shield.ts:78](../../ts/src/game/sim/shield.ts#L78) `shieldstunFrames` | parity |
@@ -261,7 +261,7 @@ deviation's reason, issue and decision date are written.
 Every hero but Illidan and Rifleman inherits the shared `reference` record ([tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137)): its gravity 0.23,
 fast fall 3.4 and jumps 3.68/2.1 are Fox's, and so are its terminal speed, jump squat, double jump, air acceleration
 and air friction. A hero's body in `heroBodies.ts` sets only its weight, walk, dash and run speed, air speed and traction;
-Mannoroth, Cairne Bloodhoof, Kael'thas Sunstrider instead take gravity, terminal and fast-fall speed and jump velocities from `HERO_VERTICAL`.
+Kel'Thuzad, Mannoroth, Cairne Bloodhoof, Kael'thas Sunstrider instead take gravity, terminal and fast-fall speed and jump velocities from `HERO_VERTICAL`.
 Each block compares a fighter with Melee's spread across the 26 fighters in the [character attributes](https://wiki.supercombo.gg/w/SSBM/Character_Attributes),
 in Melee units, with Fox's and Falco's values beside it; a value outside the spread is a deviation or an open row.
 
@@ -350,13 +350,13 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
 | Weight `lich-weight` | 78 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
-| Gravity `lich-gravity` | 0.23 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Terminal speed `lich-terminal` | 2.8 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Fast-fall speed `lich-fast-fall` | 3.4 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Gravity `lich-gravity` | 0.19 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:251](../../ts/src/game/sim/tuning.ts#L251) `HERO_VERTICAL` | parity |
+| Terminal speed `lich-terminal` | 2.4 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:251](../../ts/src/game/sim/tuning.ts#L251) `HERO_VERTICAL` | parity |
+| Fast-fall speed `lich-fast-fall` | 3 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:251](../../ts/src/game/sim/tuning.ts#L251) `HERO_VERTICAL` | parity |
 | Jump squat frames `lich-jump-squat` | 3 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Full jump velocity `lich-full-jump` | 3.68 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Short jump velocity `lich-short-jump` | 2.1 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Double jump velocity, against fighters with one double jump `lich-double-jump` | 4.416 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Full jump velocity `lich-full-jump` | 3.34473 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:251](../../ts/src/game/sim/tuning.ts#L251) `HERO_VERTICAL` | parity |
+| Short jump velocity `lich-short-jump` | 1.90868 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:251](../../ts/src/game/sim/tuning.ts#L251) `HERO_VERTICAL` | parity |
+| Double jump velocity, against fighters with one double jump `lich-double-jump` | 4.01367 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:251](../../ts/src/game/sim/tuning.ts#L251) `HERO_VERTICAL` | parity |
 | Air speed `lich-air-speed` | 0.95 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Air acceleration `lich-air-acceleration` | 0.08 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
 | Air friction `lich-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
