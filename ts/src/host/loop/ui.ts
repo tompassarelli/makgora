@@ -219,7 +219,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
   const orbit = fighterOrbit(character), flight = fighterFlight(character);
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin), draw: createFighterDraw(),
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin), draw: createFighterDraw(),
     goldSack: character === Character.peon ? new GoldSackPresentation(s.origin) : undefined,
     parasol: character === Character.chen ? new ParasolPresentation(s.origin) : undefined,
     spheres: orbit === undefined ? undefined : new SpherePresentation(orbit, s.origin),

@@ -35,7 +35,7 @@ export function concealFighter(s: ShellState, slot: ParticipantSlot): void {
   const body = s.participants[slot].body;
   if (body !== undefined && hidden.body) ShowUnit(body.unit, false);
   if (body !== undefined && hidden.bare) BlzShowUnitTeamGlow(body.unit, false);
-  if (hidden.body) for (const model of fighterEffects(s, slot)) BlzSetSpecialEffectScale(model, 0.0);
+  if (hidden.body || hidden.bare) for (const model of fighterEffects(s, slot)) BlzSetSpecialEffectScale(model, 0.0);
 }
 
 export function concealFighters(s: ShellState): void {

@@ -60,8 +60,6 @@ export interface MapBuild {
 
   readonly receiptsOnScreen: boolean;
 
-  readonly disjointCues: boolean;
-
 
 
 

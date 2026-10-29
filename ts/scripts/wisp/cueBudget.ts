@@ -334,7 +334,7 @@ export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; read
     const origin = { x: 0.0, y: PLAYABLE_BOUNDS.centreY, z: FLOOR_HEIGHT };
     let cues: SpecialCueEffects | undefined, shots: ProjectilePresentation | undefined, specials: SpecialEffects | undefined, frost: FrostEffects | undefined, placed: PlacedObjectEffects | undefined;
     client.run(() => {
-      cues = new SpecialCueEffects(move.character, origin, true, true);
+      cues = new SpecialCueEffects(move.character, origin, true);
       specials = new SpecialEffects(origin);
       frost = new FrostEffects(origin);
       placed = new PlacedObjectEffects(origin);

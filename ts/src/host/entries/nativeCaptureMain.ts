@@ -6,7 +6,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { CAPTURE_FIXTURES } from "../../platform/captureFixtures";
 import { captureTick } from "../loop/captureRunner";
 
-const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted", receiptsOnScreen: false, disjointCues: false };
+const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted", receiptsOnScreen: false };
 const TICK = "capture.fixtures";
 
 function tick(): void {

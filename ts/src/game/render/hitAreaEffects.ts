@@ -21,9 +21,9 @@ export class HitAreaEffects {
   private readonly region = emptyHitRegion();
   private readonly pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 1.0 };
 
-  constructor(private readonly character: Character, private readonly origin: WorldOrigin, drawn: boolean) {
+  constructor(private readonly character: Character, private readonly origin: WorldOrigin) {
     this.styles = disjointNormals(createFighter(character, 0.0, 1));
-    const cue = drawn ? DISJOINT_CUES[character] : undefined;
+    const cue = DISJOINT_CUES[character];
     if (cue !== undefined) for (let index = 0; index < HIT_AREA_EFFECT_CAPACITY; index++) this.models.push(AddSpecialEffect(cue.model, origin.x, origin.y));
     this.clear();
   }
