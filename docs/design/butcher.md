@@ -162,6 +162,26 @@ probe found a degenerate line: Butcher's Charge used alone wins 92% of 1,344
 matches against Expert, over the gate's 45% spam limit, so the charge's armour
 and bump are the next tuning target.
 
+The field on main 841c0ce75d (balance run 40951987586, same field, 11,832 of
+his matches; the run's verdict step stopped on the stand-ins' missing ceiling
+plans after the field merged) put him at 37%, under the band: 4,409 wins,
+7,423 losses. His shares against the profile:
+
+- Archetype: grappler.
+- Aerials (neutral/forward/back/up/down): 21%/12%/44%/5%/18% of his aerials;
+  back air still over its 15–40% target.
+- Air share of normals: 5% (target 10–35%).
+- Approach share of movement: 80% (target 25–55%).
+- Ranged share of damage: 4% (target 5–30%).
+- Specials (neutral/side/up/down, share of moves started): 4%/22%/5%/0%.
+- Damage by move: Butcher's Charge 32%, dash attack 19%, down tilt 14%,
+  forward tilt 10%. Stocks by move: forward smash 43%, dash attack 14%,
+  Butcher's Charge 12%.
+
+The retune follows the same rule, 13 points under 50% at about 0.6% of
+damage a point: the factors become ×0.968 on damage (×0.898 × 1.078) and
+×1.06 on knockback growth (×1.112 × (1 − 0.6 × 0.078)).
+
 Path draft for Tom to correct (#358):
 
 ```ceiling-plan

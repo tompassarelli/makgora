@@ -18,8 +18,8 @@ const authoredHit = makeHit({
   JUGGLE: { growth: 50.0, base: 50.0 },
   TOSS: { growth: 76.0, base: 56.0 },
 }, HitElement.slash);
-export const BALANCE_DAMAGE = f32(0.898);
-export const BALANCE_GROWTH = f32(1.112);
+export const BALANCE_DAMAGE = f32(0.968);
+export const BALANCE_GROWTH = f32(1.06);
 export const hit: typeof authoredHit = (damage, kind, angle, facing, element) => {
   const effect = authoredHit(f32(damage * BALANCE_DAMAGE), kind, angle, facing, element);
   return { ...effect, growth: f32(effect.growth * BALANCE_GROWTH) };
