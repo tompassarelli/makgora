@@ -225,21 +225,36 @@ const decayed: AirMotion = { x: 0.0, z: 0.0, belowCutoff: false };
 
 
 
-const DECAY_MEMO_LIMIT = 512;
-let decayMemoSize = 0;
-let decayMemoVertical: Record<number, number> = {};
-let decayMemoDecay: Record<number, number> = {};
-let decayMemoCutoff: Record<number, number> = {};
-let decayMemoX: Record<number, number> = {};
-let decayMemoZ: Record<number, number> = {};
+// A direct-mapped memo: each horizontal speed owns one slot of arrays filled at load, so a
+// new speed overwrites a slot and never grows a table. A growing table's rehash requested
+// 20 KB in one frame, and a hit landing on that frame read as a pair regression (#703).
+const DECAY_MEMO_SLOTS = 1024;
+const DECAY_MEMO_SCALE = 1024.0;
+// Lua32 floors |speed| * scale exactly below 2^24; the bound also keeps NaN and infinities out.
+const DECAY_MEMO_BOUND = 16384.0;
+const decayMemoHorizontal: number[] = [];
+const decayMemoVertical: number[] = [];
+const decayMemoDecay: number[] = [];
+const decayMemoCutoff: number[] = [];
+const decayMemoX: number[] = [];
+const decayMemoZ: number[] = [];
+for (let slot = 0; slot < DECAY_MEMO_SLOTS; slot++) {
+  decayMemoHorizontal.push(0.0);
+  decayMemoVertical.push(0.0);
+  decayMemoDecay.push(0.0);
+  decayMemoCutoff.push(0.0);
+  decayMemoX.push(0.0);
+  decayMemoZ.push(0.0);
+}
 
 
 export function decayedAirMotion(horizontal: number, vertical: number, decay: number, squaredCutoff: number): Readonly<AirMotion> {
-  // Zeros would lose their sign as keys, and NaN can't be one.
-  const memoized = horizontal !== 0 && vertical !== 0 && horizontal === horizontal;
-  if (memoized && decayMemoVertical[horizontal] === vertical && decayMemoDecay[horizontal] === decay && decayMemoCutoff[horizontal] === squaredCutoff) {
-    decayed.x = decayMemoX[horizontal] ?? 0.0;
-    decayed.z = decayMemoZ[horizontal] ?? 0.0;
+  // A zero horizontal is the empty slot's key, and would lose its sign.
+  const memoized = horizontal !== 0 && vertical !== 0 && horizontal > -DECAY_MEMO_BOUND && horizontal < DECAY_MEMO_BOUND;
+  const slot = memoized ? floorMod(Math.floor(horizontal * DECAY_MEMO_SCALE), DECAY_MEMO_SLOTS) : 0;
+  if (memoized && decayMemoHorizontal[slot] === horizontal && decayMemoVertical[slot] === vertical && decayMemoDecay[slot] === decay && decayMemoCutoff[slot] === squaredCutoff) {
+    decayed.x = decayMemoX[slot] ?? 0.0;
+    decayed.z = decayMemoZ[slot] ?? 0.0;
     decayed.belowCutoff = false;
     return decayed;
   }
@@ -256,20 +271,12 @@ export function decayedAirMotion(horizontal: number, vertical: number, decay: nu
   decayed.z = fusedMultiplyAddFloat32(-decay, meleeSin(angle), vertical);
   decayed.belowCutoff = false;
   if (memoized) {
-    if (decayMemoSize === DECAY_MEMO_LIMIT) {
-      decayMemoSize = 0;
-      decayMemoVertical = {};
-      decayMemoDecay = {};
-      decayMemoCutoff = {};
-      decayMemoX = {};
-      decayMemoZ = {};
-    }
-    if (decayMemoVertical[horizontal] === undefined) decayMemoSize++;
-    decayMemoVertical[horizontal] = vertical;
-    decayMemoDecay[horizontal] = decay;
-    decayMemoCutoff[horizontal] = squaredCutoff;
-    decayMemoX[horizontal] = decayed.x;
-    decayMemoZ[horizontal] = decayed.z;
+    decayMemoHorizontal[slot] = horizontal;
+    decayMemoVertical[slot] = vertical;
+    decayMemoDecay[slot] = decay;
+    decayMemoCutoff[slot] = squaredCutoff;
+    decayMemoX[slot] = decayed.x;
+    decayMemoZ[slot] = decayed.z;
   }
   return decayed;
 }

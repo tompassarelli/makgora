@@ -2,14 +2,19 @@ export type { CostumeTint } from "../presentation/model/costume";
 import { type Costume, DEFAULT_COSTUMES, DEFAULT_COSTUME, MAX_COSTUMES } from "../presentation/model/costume";
 import { heroLook } from "./looks";
 
+// The tint lookups run every frame, so they index the authored list in place rather than
+// copy it: a copy each call was 1.4 KB a frame on every census pair (#703).
+const authoredCostumes = (character: number): readonly Costume[] => heroLook(character)?.costumes ?? DEFAULT_COSTUMES;
+
 export function costumesFor(character: number): readonly Costume[] {
-  return (heroLook(character)?.costumes ?? DEFAULT_COSTUMES).slice(0, MAX_COSTUMES);
+  const costumes = authoredCostumes(character);
+  return costumes.length > MAX_COSTUMES ? costumes.slice(0, MAX_COSTUMES) : costumes;
 }
 
 export function costumeOf(character: number, index: number): Costume {
-  return costumesFor(character)[index] ?? DEFAULT_COSTUME;
+  return index >= 0 && index < MAX_COSTUMES ? authoredCostumes(character)[index] ?? DEFAULT_COSTUME : DEFAULT_COSTUME;
 }
 
 export function costumeIndex(character: number, index: number): number {
-  return index >= 0 && index < costumesFor(character).length ? index : 0;
+  return index >= 0 && index < MAX_COSTUMES && index < authoredCostumes(character).length ? index : 0;
 }
