@@ -47,6 +47,7 @@ import { measureStartGate } from "../gateStart";
 import { measureStartRestGate } from "../gateStartRest";
 import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
+import { measureModxGate } from "../gateModx";
 import { movesShardId, parseShardChat } from "../smokeShards";
 import { measureResultsGate } from "../gateResults";
 import { measureStagesGate } from "../gateStages";
@@ -363,6 +364,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),
       "gate:stages": (name: string) => measureStagesGate(selectedClients, evidence("gate-stages", name), controlled.start("gate-playable", "gate-stages")),
       "gate:bindings": (name: string) => measureBindingsGate(selectedClients, name, evidence("gate-bindings", name), pair?.appIds ?? new Map()),
+      "gate:modx": (name: string) => measureModxGate(selectedClients, evidence("gate-modx-held", name)),
     };
     const receiptGate = (text: string) => Object.hasOwn(receiptGates, text) ? receiptGates[text as keyof typeof receiptGates] : undefined;
     const controlled = AcceptDriver.of({

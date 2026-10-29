@@ -43,13 +43,13 @@ const NEUTRAL_SPECIAL_PAIR = [PLAYABLE_CHARACTERS.indexOf(Character.thrall), PLA
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_PRIME_ATTEMPTS = 3;
 
-const xset = Effect.suspend(() => {
+export const xset = Effect.suspend(() => {
   const found = Bun.which("xset");
   return found !== null ? Effect.succeed(found) : runProcess(ChildProcess.make("nix", ["build", "--no-link", "--print-out-paths", "nixpkgs#xorg.xset"], { stdin: "ignore" })).pipe(Effect.map(out => join(out.trim().split("\n")[0] ?? "", "bin", "xset")));
 });
 
 // Xwayland's autorepeat turns a tape key held past 660 ms into fresh presses, and every VNC connection turns it back on.
-const stopAutorepeat = (path: string, client: Client) => Effect.gen(function*() {
+export const stopAutorepeat = (path: string, client: Client) => Effect.gen(function*() {
   const run = (args: readonly string[]) => runProcess(ChildProcess.make(path, args, { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" }));
   yield* run(["r", "off"]);
   if (!/auto repeat:\s+off/.test(yield* run(["q"]))) return yield* new AcceptFailure({ operation: `moves gate autorepeat ${client.name}`, problem: "xset q still reads auto repeat on after xset r off" });
