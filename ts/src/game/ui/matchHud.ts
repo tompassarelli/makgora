@@ -166,7 +166,7 @@ export class FighterHud {
       showOutline(this.damageOutline, visible);
       showOutline(this.percentOutline, visible);
     }
-    if (this.shownCharacter !== character || this.shownColor !== color || this.shownMirrored !== this.panel.mirrored) {
+    if (this.shownCharacter !== character || this.shownCostume !== costume || this.shownColor !== color || this.shownMirrored !== this.panel.mirrored) {
       this.shownCharacter = character;
       this.shownColor = color;
       this.shownMirrored = this.panel.mirrored;
