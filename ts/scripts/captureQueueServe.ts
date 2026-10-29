@@ -228,7 +228,7 @@ const captureThere = (settings: Settings, host: RemoteHost, group: { readonly ba
   yield* fetchFolder(host, join(there, "native"), join(group.directory, `native-${group.index}`), group.logFile);
 });
 
-const runBatch = <R>(settings: Settings, hosts: Hosts, jobs: readonly Job[], ensurePool: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
+const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: readonly Job[], ensurePool: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
   const batch = `b${Date.now().toString(36)}`, directory = join(queueDirectory("batches"), batch);
   yield* attempt("create the batch folder", () => mkdirSync(directory, { recursive: true }));
   const log = logTo(join(directory, "log.jsonl"));
@@ -236,7 +236,7 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, jobs: readonly Job[], ens
   const main = (yield* git(projectRoot, ["rev-parse", "--verify", "origin/main"], true)).out || "HEAD";
   const folds = yield* foldLanes(projectRoot, jobs, main);
   const free = yield* freePairs(hosts);
-  const groups = fanGroups(folds, 1 + free);
+  const groups = fanGroups(folds, Math.min(maxPairs, 1 + free));
   yield* log({ step: "fold", batch, jobs: jobs.map(job => job.id), freePairs: free, groups: groups.map(group => ({ commit: group.commit, lanes: group.jobs.map(job => job.lane) })), seconds: seconds(folded) });
   const pool = yield* Effect.forkChild(ensurePool);
   yield* Effect.forEach(groups.entries(), ([index, group]) => Effect.scoped(Effect.gen(function*() {
@@ -302,13 +302,14 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   const pairs = given.flatMap((arg, index) => arg === "--pair" ? [index] : []);
   const auto = pairs.length === 0 || given[pairs[0]! + 1] === "auto";
   const hosts: Hosts = option(given, "--hosts") === "any" ? "any" : "local";
+  const maxPairs = Number(option(given, "--max-pairs") ?? "64");
   const leased = auto ? yield* leasePair(hosts, "capture-queue") : undefined;
   const args = leased === undefined ? given : [...given.filter((arg, index) => !(pairs.includes(index) || pairs.includes(index - 1))), "--pair", String(leased.pair)];
   const local = settingsOf(args);
   const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: yield* remoteHost(leased.host) };
   const once = args.includes("--once");
   const idleMinutes = Number(option(args, "--idle-minutes") ?? "30");
-  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--once] [--idle-minutes N] [--minutes 1..5] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
+  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0 || !Number.isInteger(maxPairs) || maxPairs < 1) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--max-pairs N] [--once] [--idle-minutes N] [--minutes 1..5] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
   yield* attempt("create the queue", () => mkdirSync(queueDirectory("batches"), { recursive: true }));
   const poolLog = join(queueDirectory("batches"), `pool-${settings.pair}.log`);
   let pool: Bun.Subprocess | undefined;
@@ -321,7 +322,7 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   while (true) {
     const jobs = yield* takePending();
     if (jobs.length > 0) {
-      yield* runBatch(settings, hosts, jobs, ensurePool);
+      yield* runBatch(settings, hosts, maxPairs, jobs, ensurePool);
       idleSince = performance.now();
       continue;
     }
