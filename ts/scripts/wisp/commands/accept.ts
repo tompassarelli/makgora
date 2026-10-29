@@ -43,6 +43,7 @@ import { runProcess } from "../../hostProcess";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { preferencesPath, videoSettings } from "wisp/scripts/warcraft/preferences";
 import { measureCursorGate } from "../gateCursor";
+import { measureHandsGate } from "../gateHands";
 import { measureStartGate } from "../gateStart";
 import { measureStartRestGate } from "../gateStartRest";
 import { measureBindingsGate } from "../gateBindings";
@@ -358,6 +359,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     const evidence = (check: string, name: string) => join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), check, name);
     const receiptGates = {
       "gate:cursor": (name: string) => measureCursorGate(selectedClients, name, evidence("gate-cursor-visible", name)),
+      "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair")),
       "gate:start": (name: string) => measureStartGate(selectedClients, name, evidence("gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")),
       "gate:start-rest": (name: string) => measureStartRestGate(selectedClients, name, evidence("gate-start-rest", name)),
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),

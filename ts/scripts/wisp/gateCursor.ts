@@ -15,6 +15,7 @@ import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { readTga, type Rgba } from "../blp";
 import { runProcess } from "../hostProcess";
 import { reachFighterSelect } from "./gateIntro";
+import { movePointer } from "./gatePointer";
 import { projectRoot } from "./project";
 import { type UiRect, pixelPoint, texturePixels } from "./uiTexture";
 
@@ -32,9 +33,6 @@ const CURSOR_DRAW_ATTEMPTS = 6;
 const CHIP_OVER_HAND: ReadonlySet<string> = new Set(["pick", "after-pick", "carrying", "drop"]);
 
 const EXPECTED_STATE: Readonly<Record<string, HandState>> = { "positive-control": "point", "before-pick": "point", carrying: "pinch", "after-drop": "fan", sweep: "fan" };
-
-// A fresh private desktop's Xwayland drops the first XTEST motion.
-const POINTER_MOVE_ATTEMPTS = 3;
 
 // The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip.
 const CLEAR_SPOT = { x: 0.03, y: 0.3 };
@@ -65,20 +63,10 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   const handExtent = handSize(grid);
   const samples: { file: string; sha256: string; elapsedMs: number; attempts: number; phase: string; x: number; y: number; error: number | undefined; state: HandState; pinched: boolean; handPixels: number; matchedHandPixels: number; chipError: number | undefined; visible: boolean }[] = [];
   const started = yield* Clock.currentTimeMillis;
-  const pointer = () => runProcess(ChildProcess.make(client.tools.xdotool, ["getmouselocation", "--shell"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.map(output => ({
-    x: Number(/^X=(\d+)$/m.exec(output)?.[1]), y: Number(/^Y=(\d+)$/m.exec(output)?.[1]),
-  })), Effect.mapError(fail("cursor gate pointer")));
-  const move = (x: number, y: number) => Effect.gen(function*() {
+  const move = (x: number, y: number) => {
     const point = pixelPoint(frame, x, y);
-    const target = { x: region.x + point.x, y: region.y + point.y };
-    let at = yield* pointer();
-    for (let attempt = 0; attempt < POINTER_MOVE_ATTEMPTS && (at.x !== target.x || at.y !== target.y); attempt++) {
-      if (attempt > 0) yield* Effect.sleep("100 millis");
-      yield* runProcess(ChildProcess.make(client.tools.xdotool, ["mousemove_relative", "--", String(target.x - at.x), String(target.y - at.y)], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail("cursor gate pointer")));
-      at = yield* pointer();
-    }
-    if (at.x !== target.x || at.y !== target.y) return yield* new AcceptFailure({ operation: "cursor gate pointer", problem: `pointer at ${at.x},${at.y}; wanted ${target.x},${target.y}` });
-  });
+    return movePointer(client, { x: region.x + point.x, y: region.y + point.y }, "cursor gate pointer");
+  };
   const drawnHand = (pixels: Frame, x: number, y: number, covered?: UiRect) => {
     const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state, handExtent, covered) }));
     const best = drawn.reduce((nearest, next) => (next.hand?.error ?? Infinity) < (nearest.hand?.error ?? Infinity) ? next : nearest);

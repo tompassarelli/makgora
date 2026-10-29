@@ -23,6 +23,11 @@ const BADGE_TEXT_SHARE = f32(0.6);
 
 const TEXTURE_NAMES: Readonly<Record<HandState, string>> = { point: "Point", fan: "Fan", pinch: "Pinch" };
 
+export function handBadgeBox(left: number, top: number, size: number): { readonly left: number; readonly top: number; readonly width: number; readonly height: number } {
+  const unit = f32(size / HAND_TEXELS);
+  return { left: f32(left + f32(BADGE_LEFT * unit)), top: f32(top - f32(BADGE_TOP * unit)), width: f32(BADGE_WIDTH * unit), height: f32(BADGE_HEIGHT * unit) };
+}
+
 export function createHandFrames(grid: RosterGrid, suffix: string, slot: number): HandFrames {
   const size = handSize(grid);
   const state = (hand: HandState) => {
@@ -36,9 +41,7 @@ export function createHandFrames(grid: RosterGrid, suffix: string, slot: number)
   BlzFrameSetLevel(badge, SELECT_LEVELS.handBadge);
   BlzFrameSetEnable(badge, false);
   BlzFrameSetVisible(badge, false);
-  const unit = f32(size / HAND_TEXELS);
-  const width = f32(BADGE_WIDTH * unit);
-  const height = f32(BADGE_HEIGHT * unit);
+  const { width, height } = handBadgeBox(0.0, 0.0, size);
   BlzFrameSetSize(badge, width, height);
   const badgeText = createText(`MeleeHandBadgeText${suffix}_${I2S(slot)}`, badge, 0);
   BlzFrameSetEnable(badgeText, false);
@@ -54,11 +57,11 @@ export function presentHand(frames: HandFrames, hand: DrawnHand | undefined, gri
   BlzFrameSetVisible(frames.badge, hand !== undefined);
   if (hand === undefined) return;
   const size = handSize(grid);
-  const unit = f32(size / HAND_TEXELS);
   const left = handLeft(hand.pose.x, hand.pose.state, size);
   const top = handTop(hand.pose.y, hand.pose.state, size);
   placeTopLeft(frames.states[hand.pose.state], left, top);
-  placeTopLeft(frames.badge, f32(left + f32(BADGE_LEFT * unit)), f32(top - f32(BADGE_TOP * unit)));
+  const badge = handBadgeBox(left, top, size);
+  placeTopLeft(frames.badge, badge.left, badge.top);
 }
 
 export function destroyHandFrames(frames: HandFrames): void {

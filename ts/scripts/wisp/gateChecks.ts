@@ -9,6 +9,11 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE cursor frames=\\d+ visible=\\d+ sweepMs=\\d+ picked=1 dropped=1 parked=1 pinch=1 states=1 pass=1$", min: 1 }],
   },
   {
+    id: "gate-select-hands", closes: "smashcraft#744 native check", map: "gate-playable", session: "gate-hands",
+    setup: [{ chat: "gate:hands", client: "a" }],
+    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE hands samples=8 own=4 remote=4 badges=8 chips=2 pass=1$", min: 1 }],
+  },
+  {
     id: "gate-start-anywhere", closes: "T7 C2", map: "gate-playable", session: "gate-start",
     setup: [{ chat: "gate:start", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE start trials=3 started=3 distinct=3 offButton=3 pass=1$", min: 1 }],
