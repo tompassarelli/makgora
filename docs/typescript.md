@@ -34,7 +34,11 @@ explains why three runtimes are compared).
 Wisp is maintained in its own repository. smashcraft:ts/wisp.lock records
 the immutable source revision and generated archive consumed by Bun. A clean
 checkout needs only `bun install --frozen-lockfile` from smashcraft:ts/;
-installing this dependency requires no private GitHub credentials.
+installing this dependency requires no private GitHub credentials. With
+`git config core.hooksPath .githooks`, smashcraft:.githooks/lane-dependencies.ts
+runs that install after every branch checkout, merge and rebase, so a lane made
+by `git worktree add` has its own ts/node_modules, and a hand-made link there is
+replaced; never link another checkout's node_modules.
 
 Wisp owns compilation, numeric helpers and guards, reload and error
 reporting, host services, and archive packaging. Smashcraft owns the map

@@ -171,7 +171,7 @@ may_use = ["classic", "session", "ui", "render", "presentation", "fighter-look",
 name = "scripts"
 thresholds = { function_lines = 150, function_complexity = 30 }
 paths = ["ts/scripts/**", "ts/commands/**", "ts/bin/**", "ts/host/**", "ts/landing/**", "ts/analysis/**", "ts/art/**", "ts/native/**",
-         "ts/testing/**", "ts/codegen/**", "ts/generated/**", "ts/plugins/**", "ts/*.ts"]
+         "ts/testing/**", "ts/codegen/**", "ts/generated/**", "ts/plugins/**", "ts/*.ts", ".githooks/**"]
 responsibility = "bun wisp verbs, landing bots, sim analysis harnesses, codegen and the test runner."
 may_use = ["host", "classic", "session", "ui", "render", "presentation", "fighter-look", "replay", "netcode", "match", "lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "core", "generated", "references"]
 
