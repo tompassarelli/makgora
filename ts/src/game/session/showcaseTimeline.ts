@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import type { Character } from "../sim/codes";
 import { AttackStyle } from "../sim/codes";
@@ -5,7 +6,7 @@ import type { AuthoredMove, MoveRegion } from "../sim/heroMoves";
 import { authoredTuning } from "../sim/tuning";
 import { heroDefinition } from "../roster/kits";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../sim/moves";
-import { type AuthoredSpecial, FollowUpInput, specialKit } from "../sim/specials/schema";
+import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import { heroCueWindows } from "../presentation/cueWindows";
 
 export const SHOWCASE_FIRST_FRAME = 40;
@@ -14,6 +15,8 @@ export const SHOWCASE_FACINGS: readonly ("right" | "left")[] = ["right", "left"]
 const CHARGED_SHOWCASE_GAP = 70;
 const SHOWCASE_DEFAULT_GAP = 500;
 const SHOWCASE_DUMMY_MIDDLE = 60;
+const INCOMING_GAP = 300;
+const INCOMING_BODY = 40;
 
 export interface ShowcaseMove {
   readonly slot: string;
@@ -23,6 +26,7 @@ export interface ShowcaseMove {
   readonly end: number;
   readonly gap?: number | undefined;
   readonly lift?: number | undefined;
+  readonly incoming?: { readonly lead: number; readonly gap: number } | undefined;
   readonly again?: { readonly frame: number; readonly gap: number } | undefined;
   readonly charging?: readonly number[] | undefined;
   readonly release?: number | undefined;
@@ -45,10 +49,19 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : chargedShowcase(slot, code, special);
-    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special) });
+    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   return moves;
+}
+
+function incomingShot(special: Readonly<AuthoredSpecial>, specials: Readonly<FighterSpecials>): { lead: number; gap: number } | undefined {
+  const window = special.reflects;
+  const shot = specialKit(specials, SpecialSlot.neutral).ground?.projectiles?.find(projectile => projectile.reflectable && projectile.velocityX > 0.0);
+  if (window === undefined || shot === undefined) return undefined;
+  const arrival = shot.spawnFrame + Math.ceil(f32(f32(f32(INCOMING_GAP - shot.offsetX) - INCOMING_BODY) / shot.velocityX));
+  const lead = arrival - floorDiv(window.first + window.last, 2);
+  return lead > 0 ? { lead, gap: INCOMING_GAP } : undefined;
 }
 
 function chargedShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove | undefined {

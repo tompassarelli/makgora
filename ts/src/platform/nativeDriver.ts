@@ -278,6 +278,17 @@ export function beforeNativeDriverTick(s: ShellState): boolean {
 }
 
 
+function stageScriptedMove(s: ShellState, slot: number, args: readonly string[]): void {
+  const [kind, code = "", facing, gap = "500", lift] = args;
+  const mover = fighterAt(s.world, slot), target = fighterAt(s.world, slot === 0 ? 1 : 0);
+  if (gap !== "-") {
+    mover.motion.x = 0.0;
+    target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
+  }
+  startScriptedMove(s, slot, kind, code, facing);
+  if (lift !== undefined && !mover.motion.grounded) liftTarget(target, f32(mover.motion.z + S2R(lift)));
+}
+
 export function captureNativeDriverInputs(s: ShellState): void {
   if (s.build.inputProfile !== "native-driver") return;
   const driver = state();
@@ -288,14 +299,7 @@ export function captureNativeDriverInputs(s: ShellState): void {
     const pad = driver.pads[edge.slot];
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
-    else if (edge.action === "move") {
-      const [kind, code = "", facing, gap = "500", lift] = edge.args;
-      const mover = fighterAt(s.world, edge.slot), target = fighterAt(s.world, edge.slot === 0 ? 1 : 0);
-      mover.motion.x = 0.0;
-      target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
-      startScriptedMove(s, edge.slot, kind, code, facing);
-      if (lift !== undefined && !mover.motion.grounded) liftTarget(target, f32(mover.motion.z + S2R(lift)));
-    }
+    else if (edge.action === "move") stageScriptedMove(s, edge.slot, edge.args);
     else if (pad !== undefined) applyEdge(s, pad, edge);
     driver.next++;
   }

@@ -313,7 +313,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Searing Arrows", startup: cue("Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl", "hand", f32(0.6)), active: cue("Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl", "hand", f32(0.6)) },
     side: { spell: "Trueshot Aura", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\TrueshotAura\\TrueshotAura.mdx", "feet", f32(0.8)) },
     up: { spell: "Moonlight Leap", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdx", "feet", f32(0.6)) },
-    down: { spell: "Elune's Grace", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "ahead", 1.0) },
+    down: { spell: "Elune's Grace", startup: ARCANE, active: cue("Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdx", "ahead", f32(1.4)) },
   },
   [Character.anubarak]: {
     neutral: { spell: "Impale", startup: BURROW, active: cue("Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", "ahead", f32(0.6)) },

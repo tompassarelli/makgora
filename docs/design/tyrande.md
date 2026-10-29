@@ -89,9 +89,9 @@ Specials:
   20 frames with wide steering, tapping anyone she passes for 5% on frames
   6-12, under a moon-well trail (`MoonWellCasterArt`). Once per airtime, it
   ends helpless with 20 landing frames.
-- **Elune's Grace** (down), the roster's reflector. She braces with her bow raised
-  before her like a shield, a shield flash (`DefendCaster`) and a silver
-  shimmer (`SpellShieldCaster`) in front of her, and turns back every reflectable projectile that touches
+- **Elune's Grace** (down), the roster's reflector. She braces with her bow held up
+  before her and her free palm out, behind a silver crescent shield
+  (`SpellShieldCaster`) raised in front of her, and turns back every reflectable projectile that touches
   her body on frames 4-12, at the shield reflector's speed and damage
   multipliers. Its frame-4 hit pushes a close foe with 2% and a set
   knockback. It can be jump-cancelled from frame 4, and a 24-frame cooldown

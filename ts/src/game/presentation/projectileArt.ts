@@ -14,6 +14,7 @@ import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile, TargetedStrike } from "../sim/specials/schema";
 import { specialPlacements } from "../sim/specials/placements";
 import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
+import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
 import type { CueBirth } from "./specialCues";
 import type { Fuse } from "./discLook";
 
@@ -164,6 +165,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Units\\Undead\\Locust\\Locust.mdx": { x: 0.0, z: 0.0, sequence: "walk" },
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { x: 0.0, z: f32(-59.4), loopFrames: 12, disc: [150, 70, 230] },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25 },
+  [ELUNE_SHIMMER]: { x: 0.0, z: 0.0, disc: [205, 225, 255], discVertical: true },
 };
 
 
