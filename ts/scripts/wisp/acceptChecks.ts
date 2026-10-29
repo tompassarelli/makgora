@@ -5,7 +5,7 @@ import { showcaseChecks } from "./showcaseChecks";
 import { captureStageChecks } from "./captureStageChecks";
 import { winCountChecks } from "./winCountChecks";
 import { murlocStabChecks } from "./murlocStabChecks";
-import { fighterSelectChecks } from "./fighterSelectChecks";
+import { felCostumeChecks, fighterSelectChecks } from "./fighterSelectChecks";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
@@ -386,6 +386,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...winCountChecks(NO_ERRORS, NO_IMPORT_FAILURES),
     ...murlocStabChecks(heroProfile("Murloc"), [NO_IMPORT_FAILURES, NO_ERRORS]),
     ...fighterSelectChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
+    ...felCostumeChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     {
       id: "c37-mount", closes: "smashcraft#10 C37N", map: "presentation", session: "c37-platforms",
       setup: [{ chat: "-dev reset" }, { chat: "-dev slots 3 0" }, { chat: "-dev quick stage 2" }, { waitMs: 4000 }, { keys: ["8"], holdMs: 150, client: "a" }],
