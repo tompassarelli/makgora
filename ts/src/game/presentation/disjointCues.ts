@@ -86,8 +86,14 @@ export interface HitAreaPose { visible: boolean; x: number; z: number; scale: nu
 
 const BODY_MIDDLE = 66.0;
 
+export const AREA_CUE_SCALES: { readonly [character: number]: { readonly [style: number]: number } } = {
+  [Character.lich]: { [AttackStyle.jab]: 2.0, [AttackStyle.jab2]: 2.0, [AttackStyle.neutralAir]: f32(0.6) },
+};
+
 export function normalAreaPose(fighter: Readonly<Fighter>, style: AttackStyle, index: number, region: HitRegion, out: HitAreaPose): HitAreaPose {
-  return hitAreaPose(fighter, authoredHitRegion(region, fighter.character, style, fighter.attack.frame, fighter.attack.smashChargeFrames, index, fighter.tuning.moves), out);
+  hitAreaPose(fighter, authoredHitRegion(region, fighter.character, style, fighter.attack.frame, fighter.attack.smashChargeFrames, index, fighter.tuning.moves), out);
+  out.scale = f32(out.scale * (AREA_CUE_SCALES[fighter.character]?.[style] ?? 1.0));
+  return out;
 }
 
 
