@@ -4,10 +4,9 @@
 import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, SpecialAction } from "../sim/codes";
-import { SpecialForm } from "../sim/specials/schema";
 import type { Fighter } from "../sim/fighter";
 import { FROST_ARMOR_SHELL_MODEL } from "../presentation/specialCues";
+import { frostShellScale } from "../presentation/frostShell";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 
 interface FrostSlot {
@@ -17,7 +16,7 @@ interface FrostSlot {
 }
 
 const SHELL_HEIGHT = 60.0;
-const SHELL_SCALE = f32(0.8);
+const SHELL_SCALE = f32(1.2);
 
 export class FrostEffects {
   private readonly slots: readonly FrostSlot[];
@@ -70,14 +69,15 @@ export class FrostEffects {
       parkOnce(frost.ice, this.origin, parked, 2 * slot + 1);
     }
     const shellIndex = 2 * this.slots.length + slot;
-    if (fighter.character === Character.lich && fighter.special.action === SpecialAction.heroDown && fighter.special.form !== SpecialForm.recall && fighter.status.armorFrames > 0 && !out) {
+    const shellScale = frostShellScale(fighter, SHELL_SCALE);
+    if (shellScale > 0.0) {
       if (parked[shellIndex] !== false) {
         BlzSetSpecialEffectAnimation(frost.shell, "stand");
         BlzSetSpecialEffectTime(frost.shell, 0.0);
       }
       parked[shellIndex] = false;
       placeEffect(frost.shell, x + fighter.motion.x, y, z + fighter.motion.z + SHELL_HEIGHT);
-      BlzSetSpecialEffectScale(frost.shell, SHELL_SCALE);
+      BlzSetSpecialEffectScale(frost.shell, shellScale);
       BlzSetSpecialEffectAlpha(frost.shell, 255);
     } else {
       parkOnce(frost.shell, this.origin, parked, shellIndex);

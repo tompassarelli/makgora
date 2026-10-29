@@ -68,6 +68,7 @@ export interface HitCueLook {
   readonly seconds: number;
   readonly scale: number;
   readonly z: number;
+  readonly sound?: string | undefined;
 }
 
 export const MANA_DRAIN_LOOK: HitCueLook = {
@@ -79,11 +80,12 @@ export const MANA_DRAIN_LOOK: HitCueLook = {
 };
 
 export const ARMOR_ABSORB_LOOK: HitCueLook = {
-  model: "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx",
+  model: "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx",
   sequence: "birth",
   seconds: 0.0,
-  scale: f32(0.9),
-  z: 90.0,
+  scale: f32(1.6),
+  z: 70.0,
+  sound: "FrostBoltHit",
 };
 
 export interface HitCue {

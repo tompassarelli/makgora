@@ -26,6 +26,7 @@ import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend"
 import { costumeClipModel } from "../roster/costumes";
 
 const PETRIFIED_GREY = 150;
+const CHILL_TINT = { red: 120, green: 190, blue: 255 };
 
 export class FighterPoolPresentation {
   private readonly clips: effect[] = [];
@@ -193,6 +194,10 @@ export class FighterPoolPresentation {
       red = tint.red;
       green = tint.green;
       blue = tint.blue;
+    } else if (fighter.status.condition === HeroStatusKind.chill) {
+      red = CHILL_TINT.red;
+      green = CHILL_TINT.green;
+      blue = CHILL_TINT.blue;
     } else {
       const shielded = fighter.shield.raised;
       const item = shielded ? undefined : itemBodyTint(fighter);
