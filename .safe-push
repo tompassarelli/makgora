@@ -2,6 +2,7 @@
 	exact = true
 	queue = lock
 [land]
+	publish = farm/
 	check = . :: cd ts && bun scripts/landingFarm.ts
 [ci]
 	budget = farm-test.yml 600

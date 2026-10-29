@@ -47,7 +47,8 @@ const awaitChecks = (repo: string, id: number) => Effect.gen(function*() {
 
 const farmRun: FarmRunner = (head, base, groups, full) => Effect.scoped(Effect.gen(function*() {
   const repo = yield* currentRepo;
-  const { ref, scratch } = yield* resolveRef(head, repo);
+  const published = process.env.SAFE_PUSH_LAND_REF ?? "";
+  const { ref, scratch } = published === "" ? yield* resolveRef(head, repo) : { ref: yield* run(["git", "rev-parse", `${head}^{commit}`]), scratch: published };
   const found = yield* dispatchRun(repo, { ref, base, checks: groups.join(","), ...(full ? { full: "1" } : {}), tag: runTag() }, scratch ?? "main");
   yield* Console.error(`landing farm: ${found.url}`);
   const started = performance.now();

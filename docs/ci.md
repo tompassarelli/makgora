@@ -43,9 +43,10 @@ fetch, rebase, scan and push:
    groups the lane's diff against main reaches (`landingGroups` in
    smashcraft:ts/scripts/landingChecks.ts, which names every check, its command
    and the paths that reach it; the frame budgets wait for main's CI unless a
-   shared root reaches them), pushes the lane to a `farm/` scratch branch
-   (the pre-push hook checks nothing on a push there), dispatches Farm test with
-   the groups and the base, and waits. The `static` group holds the clean
+   shared root reaches them), dispatches Farm test with the groups and the
+   base on the `farm/SHA` branch safe-push published after its secret scan
+   (`land.publish`, `SAFE_PUSH_LAND_REF`; without one it pushes the lane there
+   itself), and passes once every check job has passed, polling every 3 s. The `static` group holds the clean
    room, the kind-tag, ledger and type check, and the Autoland suite parity
    check. The checks that read the private stores (fighter art, stored models,
    locomotion lock, strike moments, animation jitter, map-build inputs) cannot
