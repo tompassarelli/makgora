@@ -38,12 +38,41 @@ const dispatchRun = (repo: string, inputs: Readonly<Record<string, string>> & { 
   return { databaseId: Number(id), url: `https://github.com/${repo}/actions/runs/${id}` };
 });
 
+const RunJobs = Schema.Struct({
+  status: Schema.String,
+  conclusion: Schema.NullOr(Schema.String),
+  jobs: Schema.Array(Schema.Struct({ name: Schema.String, status: Schema.String, conclusion: Schema.NullOr(Schema.String) })),
+});
+
+/** A run's state read over this process's own HTTPS connection, since a gh process per poll cost the landing machine more CPU than the rest of the landing gate. */
+const fetchRunState = (repo: string, id: number, token: string) => Effect.tryPromise({
+  try: async () => {
+    const read = async (path: string) => {
+      const response = await fetch(`https://api.github.com/repos/${repo}/actions/runs/${id}${path}`, {
+        headers: { authorization: `Bearer ${token}`, accept: "application/vnd.github+json", "user-agent": "smashcraft-landing-farm" },
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status} for run ${id}${path}`);
+      return response.json() as Promise<object>;
+    };
+    const [state, jobs] = await Promise.all([read(""), read("/jobs?per_page=100")]);
+    return JSON.stringify({ ...state, ...jobs });
+  },
+  catch: (cause) => new FarmFailure({ problem: cause instanceof Error ? cause.message : String(cause) }),
+}).pipe(
+  Effect.flatMap((text) => decoded(RunJobs, text)),
+  Effect.map(({ status, conclusion, jobs }): RunState => ({
+    status, conclusion: conclusion ?? "", jobs: jobs.map((job) => ({ ...job, conclusion: job.conclusion ?? "" })),
+  })),
+);
+
 const awaitChecks = (repo: string, id: number) => Effect.gen(function*() {
+  const token = yield* run(["gh", "auth", "token"]);
   for (;;) {
-    const verdict = checksVerdict(yield* decoded(RunState, yield* run(["gh", "run", "view", String(id), "-R", repo, "--json", "status,conclusion,jobs"]).pipe(
+    const verdict = checksVerdict(yield* fetchRunState(repo, id, token).pipe(
       // GitHub answers 404 for a just-dispatched run's jobs until it lists them.
       Effect.retry({ while: (failure) => NOT_YET.test(failure.message), schedule: Schedule.spaced(POLL).pipe(Schedule.upTo({ duration: "1 minute" })) }),
-    )));
+    ));
     if (verdict !== "pending") return verdict;
     yield* Effect.sleep(POLL);
   }
