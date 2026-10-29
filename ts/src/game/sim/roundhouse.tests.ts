@@ -83,6 +83,7 @@ test("Illidan's roundhouse reaches the far edge of his drawn foot plus its step 
 });
 
 test("Illidan's roundhouse steps forward its full step into open space, uncharged and fully charged, and stops short at a raised shield [k3 measure docs/design/illidan.md]", () => {
+  assertTrue(ROUNDHOUSE_STEP >= 50.0 && ROUNDHOUSE_STEP <= 70.0);
   for (const charge of [0, FULL_CHARGE]) assertNear(kick(900.0, charge).moved, ROUNDHOUSE_STEP, f32(0.01));
   const shielded = kick(110.0, 0, SHIELD);
   assertLessThan(shielded.moved, ROUNDHOUSE_STEP);

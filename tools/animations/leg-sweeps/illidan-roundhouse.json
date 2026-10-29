@@ -1,11 +1,15 @@
 {"beats": [
   [0, {}],
-  [4, {"drop": -5, "travel": 2, "twist": 30, "chest": -4, "foot": [6, 0, 38], "knee": 1.5, "toe": -30, "kickArm": -20, "plantArm": 25}],
-  [10, {"drop": -8, "travel": 8, "twist": 75, "chest": -10, "chestTwist": -10, "foot": [24, 0, 58], "knee": 2.5, "toe": -70, "kickArm": -35, "plantArm": 40}],
-  ["contact", {"drop": -8, "travel": 14, "twist": 95, "chest": -18, "chestTwist": -15, "foot": [78, 0, 72], "knee": 1.0, "toe": -90, "kickArm": -45, "plantArm": 50}],
-  [13, {"drop": -8, "travel": 17, "twist": 110, "chest": -22, "chestTwist": -15, "foot": [87, -4, 73], "knee": 0.5, "toe": -90, "kickArm": -50, "plantArm": 55}],
-  ["last", {"drop": -8, "travel": 16, "twist": 135, "chest": -20, "chestTwist": -15, "foot": [80, -26, 69], "knee": 0.5, "toe": -90, "kickArm": -45, "plantArm": 50}],
-  [20, {"drop": -7, "travel": 10, "twist": 200, "chest": -10, "foot": [18, -10, 58], "knee": 2.0, "toe": -40, "kickArm": -25, "plantArm": 30}],
+  [2, {"drop": -2.5, "travel": -5.6, "twist": 15, "chest": -2, "foot": [17.3,0,3], "knee": 0.8, "toe": -15, "kickArm": -10, "plantArm": 12.5, "plantX": -0.1, "plantZ": 9}],
+  [4, {"drop": -5, "travel": -2.4, "twist": 30, "chest": -4, "foot": [1.6,0,38], "knee": 1.5, "toe": -30, "kickArm": -20, "plantArm": 25, "plantX": 13, "plantZ": 18}],
+  [6, {"drop": -5.8, "travel": 5.1, "twist": 41.7, "chest": -5.6, "chestTwist": -2.6, "foot": [12.2,0,43.2], "knee": 1.8, "toe": -40.4, "kickArm": -23.9, "plantArm": 28.9, "plantX": 28.3, "plantZ": 6}],
+  [7, {"drop": -6.5, "travel": 9.4, "twist": 52.5, "chest": -7, "chestTwist": -5, "foot": [19.4,0,48], "knee": 2, "toe": -50, "kickArm": -27.5, "plantArm": 32.5, "plantX": 25.5, "plantZ": 0}],
+  [9, {"drop": -7.8, "travel": 14.2, "twist": 71.7, "chest": -9.6, "chestTwist": -9.3, "foot": [29.3,0,56.5], "knee": 2.4, "toe": -67, "kickArm": -33.9, "plantArm": 38.9, "plantX": 12.7, "plantZ": 0}, "linear"],
+  [10, {"drop": -8, "travel": 12.7, "twist": 75, "chest": -10, "chestTwist": -10, "foot": [28.7,0,58], "knee": 2.5, "toe": -70, "kickArm": -35, "plantArm": 40, "plantX": 6.4, "plantZ": 0}, "linear"],
+  ["contact", {"drop": -8, "travel": 14, "twist": 95, "chest": -18, "chestTwist": -15, "foot": [78,0,72], "knee": 1, "toe": -90, "kickArm": -45, "plantArm": 50}],
+  [13, {"drop": -8, "travel": 17, "twist": 110, "chest": -22, "chestTwist": -15, "foot": [87,-4,73], "knee": 0.5, "toe": -90, "kickArm": -50, "plantArm": 55}],
+  ["last", {"drop": -8, "travel": 16, "twist": 135, "chest": -20, "chestTwist": -15, "foot": [80,-26,69], "knee": 0.5, "toe": -90, "kickArm": -45, "plantArm": 50}],
+  [20, {"drop": -7, "travel": 10, "twist": 200, "chest": -10, "foot": [18,-10,58], "knee": 2, "toe": -40, "kickArm": -25, "plantArm": 30}],
   [28, {"drop": -3, "travel": 3, "twist": 300, "chest": -2, "kickArm": -5, "plantArm": 8}],
   ["end", {"twist": 360}]
 ]}

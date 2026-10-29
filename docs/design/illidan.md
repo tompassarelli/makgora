@@ -361,9 +361,17 @@ the follow-through and back to his stance (`ILLIDAN_MOVES` in
 - Timing: the first hit is on frame 12, the same as Falco's forward smash. The
   kick is active on frames 12-16 and the move lasts 40 frames in total. The
   charge holds on frame 11, in the chambered, turned pose.
-- Step: he steps 22 units over the windup, the same at any charge. The step
-  stops at a body or a raised shield, and stops at the ledge, so he never kicks
-  himself off the stage.
+- Step: he travels 70 units over the windup, the same at any charge, so he ends
+  the move 70 ahead of where he began. Tom asked on 30 Oct, after a playtest,
+  for a step-in like Falco's forward smash that is still his own kick: the old
+  22-unit step barely read. The windup is a stride: the rear foot holds while the
+  lead (left) foot lifts, swings out and plants on frame 7, the body glides over
+  the planted foot, and the right leg chambers and snaps the roundhouse off it,
+  so the step drives the kick. The planted foot stays where it landed until the
+  kick. The step stops at a body or a raised shield, and stops at the ledge, so
+  he never kicks himself off the stage. 70 is the longer of two authored
+  strides (50 and 70) and was picked because it reads as a stride at match zoom
+  where 50 reads as a lean.
 - Hit regions follow his drawn leg on each active frame:
   - The **clean hit** is the kill hit and covers most of the shin, the foot
     and the heel: 17% at 45°, base 10, growth 105, Falco's forward smash
@@ -381,10 +389,11 @@ the follow-through and back to his stance (`ILLIDAN_MOVES` in
     213% and 171% for the 7% shin and ball).
   - Damage scales with charge, like every smash.
 - Reach: the heel's far edge is 108 ahead of where he stands mid-kick, so the
-  kick reaches 130 from where he starts. That is inside the roster's
-  forward-smash band (62-195) and beyond Fel Lunge's 111 on its glaive
-  regions. Tom's brief asked for 160-175, which his 75-unit leg cannot reach
-  with a 20-25 step and the hitbox on the drawn heel. The kick sits at chest
+  kick reaches 178 from where he starts (130 with the old 22-unit step). That is
+  inside the roster's forward-smash band (62-195) and beyond Fel Lunge's 111 on
+  its glaive regions. Tom's first brief asked for 160-175, which the 70-unit
+  step now reaches with the hitbox still on the drawn heel; frame 12, the active
+  frames, damage, angles and kill percents are unchanged. The kick sits at chest
   height so the clean hit still lands on the short fighters (Rifleman, Mountain
   King, Peon, Murloc). No fighter is short enough to duck the leg.
 

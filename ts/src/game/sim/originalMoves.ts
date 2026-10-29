@@ -26,7 +26,7 @@ export const RIFLEMAN_MOVES: FighterMoves = originalMoves(Character.rifleman, RI
 const FEL_KICK = (behind: boolean) => downSmashHit(groundHit(13.0, 25, 95.0, 22.0, HitElement.fire, behind));
 
 export const ROUNDHOUSE_FIRST_ACTIVE = 12;
-export const ROUNDHOUSE_STEP = 22.0;
+export const ROUNDHOUSE_STEP = 70.0;
 const ROUNDHOUSE_RECOVERY = 24;
 const HEEL_RADIUS = 13.0;
 const SHIN_RADIUS = 17.0;

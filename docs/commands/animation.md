@@ -215,7 +215,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `blender ... --python tools/animations/leg-sweep.py -- RIG.json KEYS.json illidan-roundhouse` poses the beats in
   `tools/animations/leg-sweeps/illidan-roundhouse.json`: he chambers the right knee, turns his hips over, snaps the leg out
   level at chest height with the foot flexed so the heel leads, then spins once through the follow-through back to his
-  stance. Re-keying a smash also writes its charge pose (the baked charge frame) and its release clip (the baked frames
+  stance. The windup is a stride onto the lead (left) foot: a beat's `plantX` and `plantZ` place the support foot
+  (forward and up, in model units) and `travel` the body, both relative to the fighter, who the sim moves 70 units over
+  frames 1-11, so a foot planted in the world is keyed at its world offset minus the travel so far.
+  Re-keying a smash also writes its charge pose (the baked charge frame) and its release clip (the baked frames
   from the charge frame on), so a charged smash plays the same motion.
   `bun tools/animations/weapon-clear.ts SHIPPED.mdx FIGHTER PRIVATE_OUTPUT SEQUENCE...`
   runs a weapon-clearance pass on named clips of any shipped model with a held weapon: on each

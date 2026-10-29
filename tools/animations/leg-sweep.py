@@ -175,7 +175,7 @@ def pose(p, lifts=None):
     turn(BODY, Quaternion(YAW, radians(p.get('twist', 0) * TURN)) @ Quaternion(PITCH, radians(p.get('lean', 0))), pivot)
     turn(joint('chest'), Quaternion(YAW, radians(p.get('chestTwist', 0) * TURN)) @ Quaternion(PITCH, radians(p.get('chest', 0))))
     turn(joint('head'), Quaternion(PITCH, radians(p.get('head', 0))))
-    planted = ANKLE[plant] + Vector((p.get('plantX', 0), 0, 0))
+    planted = ANKLE[plant] + Vector((p.get('plantX', 0), 0, p.get('plantZ', 0)))
     reach(plant, planted, BODY.matrix.to_quaternion() @ BODY_REST @ POLE[plant] + Vector((p.get('plantKnee', 0), 0, 0)))
     fx, fy, fz = p.get('foot', (ANKLE[kick].x, 0, ANKLE[kick].z - FLOOR))
     reach(kick, Vector((fx, ANKLE[kick].y + fy * SIDE, FLOOR + fz)), BODY.matrix.to_quaternion() @ BODY_REST @ POLE[kick] + Vector((0, 0, p.get('knee', 0))))
