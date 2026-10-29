@@ -3,7 +3,7 @@ import { dirname, join, relative } from "node:path";
 
 const root = join(import.meta.dir, "../..");
 
-export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "corpus", "types", "static"] as const;
+export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "types", "static"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export const FULL_SUITE_VARIABLE = "LAND_FULL_SUITE";
@@ -95,11 +95,11 @@ export const CHECKS: readonly LandingCheck[] = [
     command: ["bun", "wisp", "parity", "tapes"],
     reaches: parity, farm: ["parity-0", "parity-1", "parity-2", "parity-3"], shardVariable: "TAPES_SHARD", here: "beside",
   },
-  { name: "parity numeric", command: ["bun", "wisp", "parity", "numeric"], reaches: parity, farm: ["parity-0"], here: "beside" },
+  { name: "parity numeric", command: ["bun", "wisp", "parity", "numeric"], reaches: parity, farm: ["lua"], here: "beside" },
   {
     name: "stack-trace profile TypeScript frames",
     command: ["bun", "scripts/lua-tests.ts"], env: { LUA_TESTS_STEP: "stack" },
-    reaches: parity, farm: ["parity-0"], here: "beside",
+    reaches: parity, farm: ["lua"], here: "beside",
   },
   // Each native recording replays on the source that recorded it (wisp#69), and any ts/src change moves this tree off every recording's version, so only the replay command and its header and part parse reach it.
   {

@@ -114,14 +114,14 @@ jobs:
   # adds its last output lines to the summary.
   # Checks need no shard plan, so they start beside it on the dispatched ref (Autoland passes an exact SHA).
   # A group runs when the `checks` input names it, or, without one, when a changed path reaches it
-  # (smashcraft:ts/scripts/landingChecks.ts); parity-N replays one quarter of the tapes by measured replay cost; static is the clean room, the kind-tag, ledger and type check, and the Autoland suite parity check.
+  # (smashcraft:ts/scripts/landingChecks.ts); parity-N replays one quarter of the tapes by measured replay cost and lua runs parity numeric and the stack-trace profile beside them; static is the clean room, the kind-tag, ledger and type check, and the Autoland suite parity check.
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, rollback, parity-0, parity-1, parity-2, parity-3, corpus, types, static]
+        group: [perf, rollback, parity-0, parity-1, parity-2, parity-3, lua, corpus, types, static]
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -261,7 +261,7 @@ jobs:
           zero='{"passed":0,"failed":0,"skipped":0,"shards":0,"slowestShardSeconds":0}'
           fallback "$zero" '"the merge step did not finish: see its log"'
           : > problems.txt
-          for group in perf rollback parity-0 parity-1 parity-2 parity-3 corpus types static; do
+          for group in perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus types static; do
             [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
           done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt
