@@ -113,6 +113,8 @@ In 3.0, Point Light Shadows, Water and Supersampling were added, Shadows
 became Environment Shadows, and the player-facing Ambient Occlusion, Bloom,
 Portrait Bloom, Particles and Spells options were removed.
 
+A pooled effect whose model carries a ribbon emitter draws a streak from its parked pose to its launch point (#735). Scale 0 does not hide such an effect: Jaina's Water Elemental bolt held at scale 0 above the floor still drew its white particle puff, and the Resurrect ring held the same way still drew vertical lines (native Classic, 2026-10-30). Holding the first launch frames at scale 0 for three frames changed nothing visible on either. Creating or destroying an effect during play desyncs Warcraft, so the answer is to park a ribbon model in a sequence whose last frame stops its ribbons (RIBBON_PARK_SEQUENCES in smashcraft:ts/src/game/presentation/projectileArt.ts); ResurrectTarget and WaterElementalMissile have no such sequence and keep the faint launch line. The pad scripts smashcraft:ts/test/native/pads/735/ hold each model's first launch frames.
+
 ### What the modern examples change
 
 [The Silent's custom DNC workflow](https://www.hiveworkshop.com/threads/custom-day-night-light-enviroments.274081/)

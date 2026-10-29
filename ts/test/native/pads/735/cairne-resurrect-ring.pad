@@ -1,0 +1,15 @@
+# #735: the Resurrect ring ribbon at its first launch frames; the ring draws 24 frames after the ultimate press, for 10 frames. Frame 80 holds the parked effect.
+#! chat -dev setup quick pair cairne bloodhoof / peon;meter 100
+80 a capture
+90 a press A
+91 a tap X 2
+93 a release A
+114 a capture
+115 a capture
+116 a capture
+117 a capture
+118 a capture
+120 a capture
+123 a capture
+200 a press VIEW
+270 a release VIEW

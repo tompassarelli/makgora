@@ -1,0 +1,16 @@
+# #735: the Water Elemental missile ribbon at its first launch frames; the bolt first draws 61 frames after the special press (headless trace), so the captures hold frames 120 to 126.
+#! chat -dev quick pair jaina proudmoore / peon
+60 a stick 0 -1
+61 a tap X 2
+64 a stick 0 0
+80 a capture
+100 a capture
+120 a capture
+121 a capture
+122 a capture
+123 a capture
+124 a capture
+125 a capture
+126 a capture
+200 a press VIEW
+270 a release VIEW
