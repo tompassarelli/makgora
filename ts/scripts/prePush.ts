@@ -32,7 +32,7 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
   }
 }
 
-export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly localFix?: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean; readonly machineTool?: boolean }
+export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly localFix?: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean; readonly machineTool?: boolean; readonly readsOnly?: boolean }
 
 
 const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/modelTracks.ts", "ts/scripts/poseError.ts", "ts/scripts/wisp/animJitter.ts"];
@@ -70,7 +70,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const fighterArt = changedFighters(paths, derivedStepCode());
   const locomotion = fighterArt.includes("illidan") || paths.some((path) => LOCOMOTION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   return [
-    ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
+    ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true, readsOnly: true }] : []),
     ...(ts ? [
       { name: "kind tags, parity ledger and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; for a ledger row, regenerate docs/design/melee-parity.md with bun wisp ledger or give the named row the status it now needs (docs/design/melee-parity-plan.md, \"Ledger\"); fix each type error.", hosted: true },
     ] : []),
@@ -175,7 +175,7 @@ export const laptop: Local = {
   cache: directoryCache(PREPUSH_CACHE),
 };
 
-export const runChecks = (checks: readonly Check[], local: Local) => Effect.forEach(checks, (check) => Effect.gen(function*() {
+const runCheckOnce = (check: Check, local: Local) => Effect.gen(function*() {
   const key = check.privateStore || check.machineTool ? Option.none<string>() : yield* local.key(check);
   if (Option.isSome(key) && (yield* local.cache.has(key.value))) return yield* Console.error(`pre-push: ${check.name} passed before on these inputs (cache ${key.value.slice(0, 12)})`);
   const started = performance.now();
@@ -186,7 +186,12 @@ export const runChecks = (checks: readonly Check[], local: Local) => Effect.forE
   }
   if (Option.isSome(key)) yield* local.cache.record(key.value);
   yield* Console.error(`pre-push: ${check.name} passed (${seconds} s)`);
-}), { discard: true });
+});
+
+export const runChecks = (checks: readonly Check[], local: Local) => Effect.all([
+  Effect.forEach(checks.filter(({ readsOnly }) => readsOnly === true), (check) => runCheckOnce(check, local), { concurrency: "unbounded", discard: true }),
+  Effect.forEach(checks.filter(({ readsOnly }) => readsOnly !== true), (check) => runCheckOnce(check, local), { discard: true }),
+], { concurrency: "unbounded", discard: true });
 
 const RedIssues = Schema.fromJsonString(Schema.Array(Schema.Struct({ number: Schema.Finite, title: Schema.String, body: Schema.String, url: Schema.String })));
 
@@ -218,8 +223,16 @@ const landingQueue = run(["git", "config", "--file", join(root, ".safe-push"), "
   Effect.map(({ exitCode, stdout }) => (exitCode === 0 ? stdout.trim() : "")),
 );
 
-export const prePush = (input: string, landing: { readonly gate: (head: string, paths: readonly string[], alongside: Effect.Effect<void, PrePushRefusal>) => Effect.Effect<void, PrePushRefusal>; readonly queue: typeof landingQueue; readonly notice?: Effect.Effect<void> } = { gate: landingGate, queue: landingQueue }, local: Local = laptop) => Effect.gen(function*() {
-  yield* landing.notice ?? mainRedNotice;
+export interface Landing {
+  readonly gate: (head: string, paths: readonly string[], alongside: Effect.Effect<void, PrePushRefusal>) => Effect.Effect<void, PrePushRefusal>;
+  readonly queue: typeof landingQueue;
+  readonly notice?: Effect.Effect<void>;
+}
+
+export const prePush = (input: string, landing: Landing = { gate: landingGate, queue: landingQueue }, local: Local = laptop) =>
+  Effect.all([landing.notice ?? mainRedNotice, pushChecks(input, landing, local)], { concurrency: "unbounded", discard: true });
+
+const pushChecks = (input: string, landing: Landing, local: Local) => Effect.gen(function*() {
   const pushed = input.split("\n").flatMap((line) => {
     const [, commit, remoteRef, remote] = line.trim().split(/\s+/);
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];

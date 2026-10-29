@@ -46,8 +46,10 @@ farm:
    machine-capacity (critical while it holds the landing lock), with
    smashcraft:ts/scripts/landingRun.ts, and refuses the landing on the first
    failure, printing the failing check's last lines, including a check main
-   already fails. The compiler and type-check benchmarks edit the working tree,
-   so each runs alone afterwards. A lane no check can reach, such as a docs
+   already fails. The local checks run one after another, except the clean room
+   (`readsOnly`), which only reads the tree and scans beside them, and the
+   main-red issue lookup runs beside everything. The compiler and type-check
+   benchmarks edit the working tree, so each runs alone afterwards. A lane no check can reach, such as a docs
    change, lands on the local checks alone. `LAND_FULL_SUITE=1 safe-push --to
    main` forces every check.
 2. **After landing.** The push to main runs CI's smoke, filtered-checks,

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { Effect, Option } from "effect";
+import { Deferred, Effect, Option } from "effect";
 import { type Check, type Local, PrePushRefusal, prePush } from "../scripts/prePush";
 
 const HEAD = "c".repeat(40);
@@ -41,4 +41,25 @@ test("a lane whose Classic effect record is stale stops at its own push with the
   const fresh = lane("");
   await Effect.runPromise(handOff(fresh.local));
   expect(fresh.ran).toContain("cue models and Classic effect record");
+});
+
+test("the clean room scans beside the other local checks and the main-red notice beside them all, so neither waits in line [k1 scenario]", async () => {
+  const run = Effect.gen(function*() {
+    const typeChecking = yield* Deferred.make<void>();
+    const scanned = yield* Deferred.make<void>();
+    const { local } = lane("");
+    const beside: Local = {
+      ...local,
+      runner: (check: Check) => Effect.gen(function*() {
+        if (check.name === "kind tags, parity ledger and type-check ts") yield* Deferred.succeed(typeChecking, undefined);
+        if (check.name === "clean room") {
+          yield* Deferred.await(typeChecking);
+          yield* Deferred.succeed(scanned, undefined);
+        }
+        return { exitCode: 0, stdout: "", stderr: "" };
+      }),
+    };
+    yield* prePush(`refs/heads/lane ${HEAD} refs/heads/lane ${"d".repeat(40)}\n`, { gate: () => Effect.void, queue: Effect.succeed(""), notice: Deferred.await(scanned) }, beside);
+  });
+  await Effect.runPromise(run.pipe(Effect.timeout("5 seconds")));
 });
