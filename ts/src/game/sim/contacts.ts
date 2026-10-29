@@ -153,6 +153,7 @@ export function collectDamageContact(
   if (traits.mana !== true) {
     contact.effect.manaDrain = undefined;
   }
+  if (traits.heal !== true) contact.effect.heal = undefined;
   if (spell) contact.effect.damage = f32(contact.effect.damage * BANISH_SPELL_DAMAGE);
   contact.facing = facing;
   contact.kind = kind;
@@ -218,6 +219,16 @@ function applyAirborneShieldRecoil(source: Fighter, target: Fighter, contact: Re
   source.shield.recoilZ = addFloat32(source.shield.recoilZ, multiplyFloat32(shieldRecoilAxis(contact.sourceDeltaZ, contact.targetDeltaZ), weightRatio));
 }
 
+
+function healStriker(source: Fighter, effect: Readonly<HitEffect>): void {
+  const heal = effect.heal ?? 0.0;
+  if (heal <= 0.0) return;
+  const { status } = source;
+  const room = effect.healPerStock === undefined ? heal : max(0.0, subtractFloat32(effect.healPerStock, status.healed));
+  const restored = min(min(heal, room), max(0.0, status.damage));
+  status.damage = subtractFloat32(status.damage, restored);
+  if (effect.healPerStock !== undefined) status.healed = addFloat32(status.healed, restored);
+}
 
 function drainMeter(target: Fighter, frames: number): void {
   if (frames <= 0 || target.meter.ultimate <= 0) return;
@@ -304,6 +315,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.kind === ContactKind.throw) target.visuals.throw++;
     visualContact ??= index;
     drainMeter(target, ultimatePercent(contact.effect.manaDrain ?? 0));
+    if (source !== target) healStriker(source, contact.effect);
     if (damage > 0 && contact.kind !== ContactKind.pummel) {
       if (!isPetrified(target)) thawFighter(target);
       damageEndsHeroStatus(target);

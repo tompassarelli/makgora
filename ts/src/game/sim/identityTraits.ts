@@ -39,7 +39,7 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.anubarak]: {},
   [Character.malfurion]: { neutral: { status: true } },
   [Character.medivh]: {},
-  [Character.uther]: { down: { heal: true } },
+  [Character.uther]: { neutral: { heal: true }, down: { heal: true }, ultimate: { heal: true } },
   [Character.ladyVashj]: { neutral: { status: true }, side: { mana: true }, ultimate: { status: true } },
   [Character.archimonde]: { down: { status: true } },
 };

@@ -123,7 +123,7 @@ const LICH: AuthoredSpecial = {
 
 const RESURRECTION_RING = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx";
 const UTHER: AuthoredSpecial = {
-  name: "Resurrection", endFrame: 64,
+  name: "Resurrection", endFrame: 64, selfHeal: { frame: 25, heal: 10.0 },
   projectiles: [
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdx", 2, 24, 0.0), ...ON_FLOOR },
     ...[-150.0, -80.0, 80.0, 150.0].map((offsetX) => ({ ...mark(RESURRECTION_RING, 25, 24, offsetX), ...ON_FLOOR })),
@@ -468,7 +468,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.anubarak]: "A slow cloud of beetles drifts ahead, stinging anyone standing in it. Jump or shield.",
   [Character.malfurion]: "A slow wall of wisps drifts forward and detonates on whoever it reaches.",
   [Character.medivh]: "A dark portal opens ahead, drawing foes in, then erupts. Walk away before it bursts.",
-  [Character.uther]: "Golden light gathers around him, then rings of it rise on both sides and throw everyone near him upward. Shield or roll away during the gathering.",
+  [Character.uther]: "Golden light gathers around him, then rings of it rise on both sides, heal him and throw everyone near him upward. Shield or roll away during the gathering.",
   [Character.ladyVashj]: "Her eyes and head snakes glow, then her gaze sweeps a cone ahead: a foe facing her slows, then turns to stone and takes hits without flying until it ends. Turn away from her.",
   [Character.archimonde]: "Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles.",
 };

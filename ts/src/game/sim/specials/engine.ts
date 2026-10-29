@@ -40,6 +40,7 @@ import { clearBounce } from "../projectileBounce";
 import { toggleManaShield } from "../manaShield";
 import { gazeAt } from "../gaze";
 import { ownedCount } from "./ownedProjectiles";
+import { applySelfHeal } from "./selfHeal";
 
 
 const DIAGONAL = 0.7071067690849304;
@@ -1002,6 +1003,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.gaze !== undefined && world !== undefined) gazeAt(world, f, move.gaze, frame);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);
+  applySelfHeal(f, move.selfHeal, frame);
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
   applyMotion(f, move, frame, input, world);

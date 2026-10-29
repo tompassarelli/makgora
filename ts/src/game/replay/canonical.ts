@@ -28,6 +28,7 @@ import type { ReplayState } from "./snapshot";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import { HERO_ROSTER } from "../roster/kits";
 import { ILLIDAN_MOVES, RIFLEMAN_MOVES } from "../sim/originalMoves";
+import { writeSelfHeal } from "../sim/specials/selfHeal";
 
 const REPLAY_CHECKSUM_MODULUS = 1_000_003;
 
@@ -347,6 +348,7 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
     + canonicalRealField(`${prefix}.base`, hit.base) + canonicalRealField(`${prefix}.launchX`, hit.launchX)
     + canonicalRealField(`${prefix}.launchZ`, hit.launchZ) + canonicalInt(`${prefix}.electric`, hit.electric ? 1 : 0)
     + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "") + (hit.flinchless === true ? canonicalInt(`${prefix}.flinchless`, 1) : "")
+    + optionalField(`${prefix}.heal`, hit.heal, canonicalRealField) + optionalField(`${prefix}.healPerStock`, hit.healPerStock, canonicalRealField)
     + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
     + optionalField(`${prefix}.shieldDamage`, hit.shieldDamage, canonicalRealField);
 }
@@ -408,6 +410,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int("ritual.frame", move.ritual.frame);
   }
   if (move.cleanseFrame !== undefined) int("cleanseFrame", move.cleanseFrame);
+  writeSelfHeal(int, real, move.selfHeal);
   if (move.refreshesAir === true) int("refreshesAir", 1);
   if (move.jumpWindow !== undefined) {
     int("jumpWindow.first", move.jumpWindow.first);

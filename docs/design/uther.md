@@ -54,7 +54,9 @@ Startup / active / recovery; damage. Holy moves carry the holy element.
 ## Specials
 
 - Neutral, **Holy Light:** a golden column bursts one step ahead on frame 16,
-  10% at 80°, 44 frames total, punishable on a whiff.
+  10% at 80°, 44 frames total, punishable on a whiff. A hit heals him 2%, at
+  most 6% in one stock. The hit effect's `heal` and `healPerStock` carry it,
+  and the fighter's `status.healed` counts the stock's heals.
 - Side, **Devotion Aura:** he steps forward with armour against hits up to 8%
   on frames 6-22 and bashes with the hammer on frames 20-23 (11%). A shield
   stops the advance; grabs and strong hits beat the armour. In the air it is
@@ -69,11 +71,9 @@ Startup / active / recovery; damage. Holy moves carry the holy element.
   read, not a reflector.
 - Ultimate, **Resurrection:** after a 24-frame gathering, rings of golden
   light rise on both sides and throw everyone near him upward in two hits
-  (14% then 12%). Shield or roll away during the gathering.
+  (14% then 12%), and he heals 10% as they rise (the special's `selfHeal`).
+  Shield or roll away during the gathering.
 
-Still to build (issue 662): Holy Light's 2% heal on a hit (capped at 6% per
-stock) and Resurrection's 10% heal need a per-stock heal
-counter in the fighter state.
 
 ## Home and Classic route
 

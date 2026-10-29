@@ -197,6 +197,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.divineFrames !== actual.status.divineFrames) return "divineFrames";
   if ((expected.status.cursedBy ?? -1) !== (actual.status.cursedBy ?? -1)) return "cursedBy";
   if (expected.status.curseFrames !== actual.status.curseFrames) return "curseFrames";
+  if (expected.status.healed !== actual.status.healed) return "healed";
   if (expected.status.summonFrames !== actual.status.summonFrames) return "summonFrames";
   if (expected.status.summonX !== actual.status.summonX) return "summonX";
   if (expected.status.buff !== actual.status.buff) return "buff";

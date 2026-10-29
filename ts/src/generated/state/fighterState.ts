@@ -439,6 +439,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.divineFrames = sourceStatus.divineFrames;
   status.cursedBy = sourceStatus.cursedBy;
   status.curseFrames = sourceStatus.curseFrames;
+  status.healed = sourceStatus.healed;
   status.summonFrames = sourceStatus.summonFrames;
   status.summonX = sourceStatus.summonX;
   status.buff = sourceStatus.buff;
@@ -928,6 +929,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.divineFrames, b = sourceStatus.divineFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.cursedBy, b = sourceStatus.cursedBy; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.curseFrames, b = sourceStatus.curseFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.healed, b = sourceStatus.healed; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.summonFrames, b = sourceStatus.summonFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.summonX, b = sourceStatus.summonX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buff, b = sourceStatus.buff; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1419,6 +1421,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   }
   if (status.cursedBy !== undefined) sink.int(prefix, "cursedBy", status.cursedBy ?? -1);
   if (status.curseFrames !== 0) sink.int(prefix, "curseFrames", status.curseFrames);
+  if (status.healed !== 0 || 1 / status.healed < 0) sink.real(prefix, "healed", status.healed);
   if (status.summonFrames !== 0) sink.int(prefix, "summonFrames", status.summonFrames);
   if (status.summonX !== 0 || 1 / status.summonX < 0) sink.real(prefix, "summonX", status.summonX);
   if (status.buff !== 0 || status.buffFrames !== 0) {
@@ -1544,6 +1547,7 @@ export function blastFighterFields(f: Fighter): void {
   recovery.wallJumpRepeat = 0;
   status.cursedBy = undefined;
   status.curseFrames = 0;
+  status.healed = 0.0;
   status.summonFrames = 0;
   status.summonX = 0.0;
   status.buff = ItemKind.none;
@@ -1744,6 +1748,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.divineFrames = 0;
   status.cursedBy = undefined;
   status.curseFrames = 0;
+  status.healed = 0.0;
   status.buff = ItemKind.none;
   status.buffFrames = 0;
   status.condition = HeroStatusKind.none;

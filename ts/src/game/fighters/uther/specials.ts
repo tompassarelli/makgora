@@ -13,7 +13,7 @@ export const HOLY_LIGHT_MODEL = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpe
 const HOLY_LIGHT_COLUMN: SpecialProjectile = {
   model: HOLY_LIGHT_MODEL, spawnFrame: 16, offsetX: 72.0, offsetZ: 52.0,
   velocityX: 0.0, velocityZ: 0.0, life: 6, radius: 40.0,
-  effect: utherHit(10.0, "LAUNCH", 80, false, HitElement.holy), reflectable: false, limit: 1,
+  effect: { ...utherHit(10.0, "LAUNCH", 80, false, HitElement.holy), heal: 2.0, healPerStock: 6.0 }, reflectable: false, limit: 1,
 };
 const holyLight = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 44,
@@ -65,7 +65,7 @@ const divineShield = (landingLag: number | undefined): AuthoredSpecial => ({
 });
 
 export const UTHER_SPECIALS: FighterSpecials = {
-  neutral: { name: "Holy Light", description: "A column of light bursts one step ahead. It punishes a whiff, so place it where they will be.", ground: holyLight(undefined), air: holyLight(18) },
+  neutral: { name: "Holy Light", description: "A column of light bursts one step ahead and heals you a little when it hits. It punishes a whiff, so place it where they will be.", ground: holyLight(undefined), air: holyLight(18) },
   side: { name: "Devotion Aura", description: "Advance behind a golden aura that shrugs off light hits, then bash with the hammer. Grabs and heavy blows break through; a shield stops you.", ground: devotionAura(false), air: devotionAura(true) },
   up: { name: "Hammer of the Righteous", description: "A rising two-handed hammer arc you can steer a little, then a helpless fall.", ground: hammerOfTheRighteous(f32(2.4)) },
   down: { name: "Divine Shield", description: "A golden bubble turns aside strikes and missiles for a moment. You cannot act inside it, and a grab breaks it.", ground: divineShield(undefined), air: divineShield(20) },

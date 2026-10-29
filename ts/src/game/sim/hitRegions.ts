@@ -38,6 +38,10 @@ export interface HitEffect {
 
   manaDrain?: number | undefined;
 
+  heal?: number | undefined;
+
+  healPerStock?: number | undefined;
+
   carry?: boolean | undefined;
 
   strong?: boolean | undefined;
@@ -82,6 +86,8 @@ export function copyHitEffect(target: HitEffect, source: Readonly<HitEffect>): v
   target.electric = source.electric;
   target.element = source.element;
   target.manaDrain = source.manaDrain;
+  target.heal = source.heal;
+  target.healPerStock = source.healPerStock;
   target.carry = source.carry;
   target.strong = source.strong;
   target.setKnockback = source.setKnockback;

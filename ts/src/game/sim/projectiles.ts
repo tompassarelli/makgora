@@ -137,6 +137,8 @@ export function originalProjectileEffect(projectile: Readonly<Projectile>): Read
   projectileHit.electric = false;
   projectileHit.carry = undefined;
   projectileHit.manaDrain = undefined;
+  projectileHit.heal = undefined;
+  projectileHit.healPerStock = undefined;
   projectileHit.strong = undefined;
   projectileHit.fixedPower = undefined;
   projectileHit.setKnockback = kind === ProjectileKind.eyeBeam ? EYE_BEAM_SET_KNOCKBACK : undefined;

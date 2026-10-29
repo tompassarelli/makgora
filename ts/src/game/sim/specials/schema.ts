@@ -254,6 +254,8 @@ export type CompanionOrder = (typeof CompanionOrder)[keyof typeof CompanionOrder
 export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4 } as const;
 export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
 
+export interface SelfHeal { readonly frame: number; readonly heal: number }
+
 export interface SpecialGuard extends FrameWindow {
   readonly heal: number;
 
@@ -379,6 +381,7 @@ export interface AuthoredSpecial {
 
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
+  readonly selfHeal?: SelfHeal | undefined;
 
   readonly charge?: SpecialCharge | undefined;
 
