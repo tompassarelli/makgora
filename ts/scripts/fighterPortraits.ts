@@ -18,8 +18,7 @@ import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';
 import { STOCK_ICON_PX } from '../src/game/ui/plateLayout';
 import { NEUTRAL_TEAM_COLOR } from '../src/game/ui/slotColors';
-import { ModelRenderer, generateMDX, parseMDX } from 'wisp/vendor/war3-model.mjs';
-import { Character } from '../src/game/sim/codes';
+import { ModelRenderer, parseMDX } from 'wisp/vendor/war3-model.mjs';
 import { originalClip, originalClipCount } from '../src/generated/clips/fighterOriginalClipInfo';
 import { at } from 'wisp/src/runtime/lookup';
 import { STAGE_LIGHTS } from '../src/game/assets/stageLighting';
@@ -117,7 +116,7 @@ const portraitScene = (scene: RenderScene, character: number, frame: { x: number
   const distance = frame.height * 1.1 / (2 * Math.tan(FOV * Math.PI / 360));
   return {
     ...scene, frame: frameOf(character, variant), client: 0, units: [], ui: [], textTags: [], filter: undefined,
-    effects: [{ ...body, x: 0, y: 0, z: 0, yaw: pose?.yaw ?? 0, teamColor: at(VARIANTS, variant).team, ...(pose?.elapsed === undefined ? {} : { animationElapsed: pose.elapsed }) }],
+    effects: [{ ...body, x: 0, y: 0, z: 0, yaw: pose?.yaw ?? 0, teamColor: at(VARIANTS, variant).team, ...(pose?.elapsed === undefined ? {} : { animationElapsed: pose.elapsed }), ...(correctionOf(character).clock === undefined ? {} : { animationClock: correctionOf(character).clock }) }],
     environment: { ...withoutFog(scene.environment), skyVisible: false, dayNight: { ...scene.environment.dayNight, unit: lightPath(at(LIGHT_PASSES, 0)) } },
     // The camera's right is (sin rotation, -cos rotation) on the ground.
     camera: { x: frame.x * Math.sin(ROTATION * Math.PI / 180), y: -frame.x * Math.cos(ROTATION * Math.PI / 180), fields: {
@@ -205,21 +204,6 @@ const times = (a: readonly number[], b: readonly number[]) => {
   return [aw * bx + ax * bw + ay * bz - az * by, aw * by - ax * bz + ay * bw + az * bx, aw * bz + ax * by - ay * bx + az * bw, aw * bw - ax * bx - ay * by - az * bz];
 };
 
-/**
- * Classic Murloc (the 3.0 stock model his body keeps) hangs its
- * old mesh bones, every pivot collapsed to one point, under a second Bone_* rig.
- * Posed through that rig, war3-model's evaluator (Wisp's renderer, and the
- * earlier Blender importer) scatters the mesh into texture noise, so
- * these portraits hold the rig's rest pose. The body has no skin, so
- * re-encoding is safe.
- */
-const CLASSIC_REST_POSE: readonly number[] = [Character.murloc];
-function restPose(bytes: Uint8Array): Uint8Array {
-  const model = parseMDX(bytes.slice().buffer);
-  for (const node of [...model.Bones, ...model.Helpers]) if (node.Name.startsWith('Bone_')) { delete node.Translation; delete node.Rotation; delete node.Scaling; }
-  return new Uint8Array(generateMDX(model));
-}
-
 type Model = ReturnType<typeof parseMDX>;
 /** An element that must exist: the typed-array and string-match counterpart of at(). */
 const item = <T>(values: ArrayLike<T>, index: number): T => { const value = values[index]; if (value === undefined) throw new Error(`no element ${index} of ${values.length}`); return value; };
@@ -244,7 +228,8 @@ interface Portrait { readonly elapsed: number; readonly yaw: number; readonly an
 
 /**
  * Per-fighter corrections where the measured pose still hides the face: `turn`
- * (degrees added to the face's yaw), `elapsed` (the Stand time, seconds),
+ * (degrees added to the face's yaw), `elapsed` (the Stand time, seconds), `clock`
+ * (the clock, seconds, that drives the model's global sequences, such as a blink),
  * `angle` (the camera's angle of attack, degrees; positive looks down from above)
  * `zoom` (the head crop's magnification) and `level` (pose at the Stand frame
  * whose face is closest to level, the camera raised or lowered to meet what
@@ -256,10 +241,10 @@ interface Portrait { readonly elapsed: number; readonly yaw: number; readonly an
  * crops moved right and down by these head sizes, centring a lopsided silhouette) and `flipped`
  * (the head bone's local up axis points down on screen, so the upright check reverses it).
  */
-interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
+interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly clock?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
 const CORRECTIONS: Readonly<Record<string, Correction>> = {
   Lich: { lift: 1.3, zoom: 1.2 },
-  Murloc: { zoom: 1.2, shift: [0.14, 0] },
+  Murloc: { zoom: 1.2, shift: [0.14, 0], clock: 1.5 },
   PitLord: { lift: 1.3 },
   MalfurionStormrage: { lift: 1.3 },
 };
@@ -520,7 +505,7 @@ await Effect.runPromise(Effect.gen(function*() {
       const correction = body === undefined ? {} : correctionOf(body);
       const resolved = await stock.resolveAsset(...args);
       if (body === undefined || resolved.bytes === undefined) return resolved;
-      const posed = args[1] === 'classic' && CLASSIC_REST_POSE.includes(body) ? restPose(resolved.bytes) : correction.rest === true ? bindPose(resolved.bytes) : resolved.bytes;
+      const posed = correction.rest === true ? bindPose(resolved.bytes) : resolved.bytes;
       return { ...resolved, bytes: withoutGlow(correction.bones === undefined ? posed : withBones(posed, correction.bones)) };
     } };
   const wide0 = { x: 0, z: 120, height: 700 };

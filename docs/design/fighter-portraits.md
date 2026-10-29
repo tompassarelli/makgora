@@ -58,7 +58,7 @@ turns: tilting a body to level a bowed face lays the whole card render over.
 The camera looks level through a narrow lens fitted to the silhouette, so the
 face is seen from within 4 degrees of its own height. Where that still hides
 the face, `CORRECTIONS` in smashcraft:ts/scripts/fighterPortraits.ts adds a
-per-fighter turn, Stand time, camera angle or crop zoom; `level` poses at the
+per-fighter turn, Stand time, global-sequence clock, camera angle or crop zoom; `level` poses at the
 Stand frame whose face is closest to level and tilts the camera (at most 35
 degrees) to meet what tilt remains. Wisp draws the same pose the script
 evaluates. The portrait is lit in four passes summed after rendering in display
@@ -89,13 +89,18 @@ It writes `PRIVATE_OUTPUT/fighter-renders/`; store that folder with
 `bun wisp inputs add fighter-renders`. The map build imports each portrait at
 its path. The renders are proprietary derived art and stay outside the repository.
 
-Murloc keeps the 3.0 stock model, which hangs the old mesh
-bones, every pivot collapsed to one point, under a second `Bone_*` rig. Posed
-through that rig, war3-model's evaluator (Wisp's renderer and the earlier
-Blender importer alike) scatters the mesh into texture noise, so their
-portraits hold that rig's rest pose. The earlier Blender set drew Forsaken
-Paladin black: Blender's MDX reader lost the textures of his version-1800
-skinned body.
+Murloc's eyelids (the green ovals, Head01 and Head02) lie over his eyes for the
+start and a few brief windows of a 7.5 s global-sequence loop and slide 3.6 units
+back to show the blue eyes for the rest, so the clock the match was sampled at
+(0) draws them shut. His `CORRECTIONS` entry holds the clock at 1.5 s, where
+both eyes are open; his Stand pose is the match's sampled frame, as for any
+fighter whose head mesh is too small to place a face (the frame with the
+highest head attachment, 4.113 s, bows his head and hides the face). Posed
+through his `Bone_*` rig, Wisp's renderer draws the stock model correctly: its
+node matrices equal the pivot-and-parent composition of the model's own tracks
+at every key.
+The earlier Blender set drew Forsaken Paladin black: Blender's MDX reader lost
+the textures of his version-1800 skinned body.
 
 Picked cards, HUD busts, stock icons and off-screen portraits use the fighter
 slot's variant; the roster grid keeps its neutral portrait.
