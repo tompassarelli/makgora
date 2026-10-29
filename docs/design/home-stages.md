@@ -13,7 +13,6 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 
 | Fighter | Home stage | Stage id | Why |
 | --- | --- | --- | --- |
-| Rifleman | Gryphon Aerie | 11 | Ironforge riflemen and Wildhammer gryphon riders fight side by side in every Alliance army, the Gryphon Aviary beside the Barracks. |
 | Illidan | Hellfire Citadel | 14 | TFT's "Lord of Outland": Illidan storms Magtheridon's citadel in Outland. |
 | Blademaster | Durotar Skies | 3 | TFT's "The Founding of Durotar": Samuro of the Burning Blade fights for Thrall's new homeland. |
 | Mountain King | Blackrock | 12 | Blackrock Mountain rises at the edge of Khaz Modan, the dwarves' homeland; its forges are held by their Dark Iron kin. |

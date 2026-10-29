@@ -42,7 +42,7 @@ import {
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, SETTINGS_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
-import { PLAYABLE_CHARACTERS, nextSelectableCharacter } from "../roster/kits";
+import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
 import {
   MOVES_HEADER, movesPage, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting,
   partnerEscapeSetting, partnerTechSetting, stockSetting, timeSetting, trainingSpeedSetting,
@@ -155,7 +155,7 @@ export class SelectionPanel {
   private hovered: SelectionButton | undefined;
 
   private movesOpen = false;
-  private movesCharacter: number = Character.rifleman;
+  private movesCharacter: number = DEFAULT_FIGHTER;
   private shownMoves = -1;
   private readonly movesFrames: readonly framehandle[];
   private readonly movesTitle: framehandle;
@@ -477,7 +477,7 @@ export class SelectionPanel {
       return true;
     }
     if (action === Action.attack && this.menuFocus !== undefined) {
-      const choice = characterFor(game, target.slot) ?? Character.rifleman;
+      const choice = characterFor(game, target.slot) ?? DEFAULT_FIGHTER;
       if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, choice);
       else this.actions.selectCpuChoice(this.participantId, target.slot, shownFighter(game, target.slot) ?? choice);
       return true;
@@ -658,7 +658,7 @@ export class SelectionPanel {
     for (const slot of PARTICIPANT_SLOTS) {
       const chip = this.chips[slot];
       if (chip !== undefined) {
-        chip.choice = tileOfCharacter(shownFighter(game, slot) ?? Character.rifleman);
+        chip.choice = tileOfCharacter(shownFighter(game, slot) ?? DEFAULT_FIGHTER);
         chip.placed = characterReady(game, slot);
       }
       if ((slot === participantId && humanFighterActive(game, slot)) || canChooseComputer(game, participantId, slot)) selectable |= 1 << slot;
@@ -711,7 +711,7 @@ export class SelectionPanel {
 
   private openMoves(): void {
     const game = this.game;
-    this.movesCharacter = (game === undefined ? undefined : characterFor(game, this.participantId)) ?? Character.rifleman;
+    this.movesCharacter = (game === undefined ? undefined : characterFor(game, this.participantId)) ?? DEFAULT_FIGHTER;
     this.movesOpen = true;
   }
 
@@ -726,7 +726,7 @@ export class SelectionPanel {
 
   private showRules(game: Readonly<MatchState>): void {
     const clears = loreClears();
-    const fighter = characterFor(game, this.participantId) ?? Character.rifleman;
+    const fighter = characterFor(game, this.participantId) ?? DEFAULT_FIGHTER;
     const rules = rulesKey(game, clears, fighter);
     if (rules === this.shownRules) return;
     this.shownRules = rules;

@@ -6,11 +6,11 @@ import { assetsView, readManifest, wholeFamily } from "./buildInputs";
 import { importedAssets } from "./mapInputs";
 import { storedPortraits } from "../portraitParts";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
-import { cueModels } from "./cueModels";
+import { mapCueModels } from "./cueModels";
 import type { Graphics, ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
 import { type RenderAssetOptions, renderAssetStore } from "./renderAssetStore";
 
-export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = cueModels()) {
+export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = mapCueModels()) {
   const missing: string[] = [];
   for (const model of models) {
     const resolved = yield* Effect.tryPromise({

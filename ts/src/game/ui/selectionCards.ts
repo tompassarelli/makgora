@@ -1,3 +1,4 @@
+import { DEFAULT_FIGHTER } from "../roster/kits";
 import { SELECT_LEVELS } from "./selectLevels";
 import type { CpuDefaults } from "./selectionCpuSettings";
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
@@ -203,7 +204,7 @@ export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag
   BlzFrameSetVisible(frames.chip, active);
   BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? "" : "CPU"}P${I2S(slot + 1)}.tga`, 0, true);
   const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
-  const chipChoice = tileOfCharacter(choice ?? Character.rifleman);
+  const chipChoice = tileOfCharacter(choice ?? DEFAULT_FIGHTER);
   const size = readyChipSize(grid);
   BlzFrameSetSize(frames.chip, size, size);
   placeTopLeft(

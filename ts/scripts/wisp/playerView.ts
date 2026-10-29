@@ -26,7 +26,6 @@ import { STOCK_PLATFORM_MODELS } from "../../src/game/presentation/stockPlatform
 import { STAGE_EDGE_LIGHT_MODEL } from "../../src/game/presentation/stageEdgeLights";
 import { STAGE_DECK_PALETTES } from "../../src/game/assets/stagePalette";
 import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunterAssetInfo";
-import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInfo";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH, arenaFraming } from "../../src/game/presentation/arenaCamera";
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL } from "../../src/game/presentation/stageHazards";
@@ -129,7 +128,7 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
       ],
     },
 
-    { name: "KO body", lifetime: seconds(3), models: [RIFLEMAN_MODEL_FILE, DEMON_HUNTER_MODEL_FILE, ...HERO_ROSTER.map(({ character }) => heroLook(character)!.model)] },
+    { name: "KO body", lifetime: seconds(3), models: [DEMON_HUNTER_MODEL_FILE, ...HERO_ROSTER.map(({ character }) => heroLook(character)!.model)] },
 
     { name: "shield bubble", lifetime: seconds(75), models: [SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL] },
 

@@ -12,7 +12,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { AttackPhase } from "../sim/codes";
 import { attackPhase } from "../sim/conditions";
 import { type Fighter, createFighter } from "../sim/fighter";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { MATCH_CHARACTERS } from "../roster/kits";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../sim/stage";
 import { CORNER_BAND, insideLip } from "./botCorner";
@@ -50,8 +50,8 @@ export const inLag = (f: Readonly<Fighter>): boolean => f.landing.lag > 0 || att
 export function playCorner(seed: number, opponent: CpuOpponentId, tier: CpuTier): CornerOutcome {
   const side = floorMod(seed, 2) === 0 ? 1 : -1;
   const lip = side > 0 ? mainDeckRight(STAGE) : mainDeckLeft(STAGE);
-  const cornered = at(SELECTABLE_CHARACTERS, floorMod(seed * 7 + 3, SELECTABLE_CHARACTERS.length));
-  const attacker = at(SELECTABLE_CHARACTERS, floorMod(seed, SELECTABLE_CHARACTERS.length));
+  const cornered = at(MATCH_CHARACTERS, floorMod(seed * 7 + 3, MATCH_CHARACTERS.length));
+  const attacker = at(MATCH_CHARACTERS, floorMod(seed, MATCH_CHARACTERS.length));
   const world = createRoster(3, [
     createFighter(cornered, f32(lip - f32(side * CORNER_START)), -side),
     createFighter(attacker, f32(lip - f32(side * ATTACKER_START)), side),

@@ -1,3 +1,4 @@
+import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { presentDrawnBody } from "./fighterDrawView";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
 import { writeLines } from "wisp/src/platform/fileio";
@@ -565,7 +566,7 @@ export function lockArenaCamera(s: ShellState): void {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
     const outside = fighter !== undefined && fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
-    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, fighterColor(game, slot), point.column, point.row, aspect, costumeTintFor(game, slot, fighter?.character), costumeFor(game, slot));
+    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? DEFAULT_FIGHTER, fighterColor(game, slot), point.column, point.row, aspect, costumeTintFor(game, slot, fighter?.character), costumeFor(game, slot));
     readEscapeMeter(world, slot, meter);
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
     const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);
@@ -605,7 +606,7 @@ export function renderUi(s: ShellState): void {
       ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character), costumeFor(game, slot));
       ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained);
     } else {
-      ui.huds[slot].update(false, Character.rifleman, slot, 0.0, 0);
+      ui.huds[slot].update(false, DEFAULT_FIGHTER, slot, 0.0, 0);
       ui.meterBars[slot].hud.update(false, 0, false, 0);
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);

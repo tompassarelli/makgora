@@ -117,7 +117,7 @@ installHeroCatalog(heroDefinition);
 
 
 function selectableCharactersOf(roster: readonly HeroDefinition[]): readonly Character[] {
-  const choices: Character[] = [ Character.rifleman, Character.demonHunter];
+  const choices: Character[] = [Character.demonHunter];
   for (const hero of roster) if (hero.complete) choices.push(hero.character);
   return choices;
 }
@@ -131,12 +131,11 @@ export function isSelectableCharacter(choice: number): choice is Character {
 }
 
 const ORIGINAL_NAMES: Readonly<Record<number, string>> = { [Character.rifleman]: "Rifleman", [Character.demonHunter]: "Illidan" };
-const ORIGINAL_DISPLAY_NAMES: Readonly<Record<number, string>> = { [Character.rifleman]: "Sniper" };
 
 
 export function fighterName(character: number): string {
   const hero = heroDefinition(character);
-  return hero?.displayName ?? hero?.name ?? ORIGINAL_DISPLAY_NAMES[character] ?? ORIGINAL_NAMES[character] ?? "Rifleman";
+  return hero?.displayName ?? hero?.name ?? ORIGINAL_NAMES[character] ?? "Rifleman";
 }
 
 export function fighterKey(character: number): string {
@@ -148,8 +147,8 @@ export function nextCharacterIn(choices: readonly Character[], current: number |
   const count = choices.length;
   let index = -1;
   for (let i = 0; i < count; i++) if (choices[i] === current) index = i;
-  if (index < 0) return choices[direction < 0 ? count - 1 : 0] ?? Character.rifleman;
-  return choices[floorMod(index + direction, count)] ?? Character.rifleman;
+  if (index < 0) return choices[direction < 0 ? count - 1 : 0] ?? DEFAULT_FIGHTER;
+  return choices[floorMod(index + direction, count)] ?? DEFAULT_FIGHTER;
 }
 
 
@@ -203,3 +202,13 @@ export function playableCharactersOf(selectable: readonly Character[], hidden: r
 
 /** The fighters players and computers choose from on the selection screen: the release roster (releaseRoster.ts). */
 export const PLAYABLE_CHARACTERS: readonly Character[] = playableCharactersOf(SELECTABLE_CHARACTERS, HIDDEN_FIGHTERS);
+
+export const DEFAULT_FIGHTER: Character = PLAYABLE_CHARACTERS[0] ?? Character.demonHunter;
+
+export const HARNESS_ONLY_FIGHTERS: readonly Character[] = [Character.rifleman];
+
+export const MATCH_CHARACTERS: readonly Character[] = [...HARNESS_ONLY_FIGHTERS, ...SELECTABLE_CHARACTERS];
+
+export const isMatchCharacter = (choice: number): choice is Character => MATCH_CHARACTERS.some((character) => character === choice);
+
+export const shipsInMap = (character: number): boolean => !HARNESS_ONLY_FIGHTERS.some((fighter) => fighter === character);

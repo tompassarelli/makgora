@@ -5,7 +5,7 @@ import { idiv, imod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
-import { fighterName } from "../roster/kits";
+import { fighterName, DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
   DOOM_MARK_TEXTURE, PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
@@ -122,7 +122,7 @@ export class FighterHud {
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     this.layout(slot, count);
-    this.update(false, Character.rifleman, slot, 0.0, 0);
+    this.update(false, DEFAULT_FIGHTER, slot, 0.0, 0);
   }
 
   destroy(): void {

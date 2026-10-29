@@ -24,7 +24,7 @@ import {
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
 import { type Character, ItemKind, itemBit } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterKey } from "../roster/kits";
+import { MATCH_CHARACTERS, fighterKey } from "../roster/kits";
 
 export const SLOTS_COMMAND = "-dev slots ";
 export const FIGHTER_COMMAND = "-dev fighter ";
@@ -58,7 +58,7 @@ function integer(text: string): number | undefined {
 
 function characterNamed(name: string): Character | undefined {
   const wanted = name.toLowerCase();
-  for (const character of SELECTABLE_CHARACTERS) if (fighterKey(character).toLowerCase() === wanted) return character;
+  for (const character of MATCH_CHARACTERS) if (fighterKey(character).toLowerCase() === wanted) return character;
   return undefined;
 }
 

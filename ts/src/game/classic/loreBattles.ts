@@ -70,7 +70,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
     win: survive, minutes: 1, playerStocks: 2, opponentStocks: 2, speaker: "Peon", intro: "Me busy. Leave me alone!",
   }),
   battle({
-    id: "exodus", title: "Exodus of the Horde", player: C.thrall, against: [C.rifleman], tier: "rookie", stage: 11,
+    id: "exodus", title: "Exodus of the Horde", player: C.thrall, against: [C.uther], tier: "rookie", stage: 11,
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 1, speaker: "Thrall", intro: "The humans have found our camps. Break through, and we sail west!",
   }),
   battle({
@@ -104,7 +104,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
     speaker: "Thrall", intro: "The blood curse is broken, Grom. Take your vengeance on Mannoroth!",
   }),
   battle({
-    id: "proudmoore", title: "The Admiral's Landing", player: C.beastmaster, against: [C.rifleman, C.mountainKing], tier: "intermediate", stage: 11,
+    id: "proudmoore", title: "The Admiral's Landing", player: C.beastmaster, against: [C.jaina, C.mountainKing], tier: "intermediate", stage: 11,
     win: ko, minutes: 3, playerStocks: 3, opponentStocks: 1, speaker: "Rexxar", intro: "Proudmoore's marines burn the Horde's shore. Misha, hunt!",
   }),
   battle({

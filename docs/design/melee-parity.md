@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-591 rows: 537 parity, 36 deviations, 18 open.
+576 rows: 522 parity, 36 deviations, 18 open.
 
 ## Deviations from Melee
 
@@ -184,8 +184,8 @@ deviation's reason, issue and decision date are written.
 | Shield release lag `shield-release` | 11 | [15](https://www.ssbwiki.com/Shield) | [shield.ts:25](../../ts/src/game/sim/shield.ts#L25) `SHIELD_RELEASE_LAG_FRAMES` | deviation: Melee's 15 makes dropping shield almost never worth it; Ultimate's 11, the starting point, makes it a real option beside jumping or rolling out (docs/gameplay-design.md, Principles) (Tom 2026-10-06, #100) |
 | Powershield `powershield` | a parry: no shield damage, no shieldstun, no release lag | [first 4 frames of shield on a hit: no shield damage, more pushback, same shieldstun; first 2 reflect projectiles](https://www.ssbwiki.com/Powershield) | [shield.ts:147](../../ts/src/game/sim/shield.ts#L147) `grantParry` | deviation: a true parry whose reward is the defender's own punish (docs/gameplay-design.md, Powershield and parry) (Tom 2026-10-06, #102) |
 | Shield drop through a platform `platform-shield-drop` | none: a raised shield stays on the platform | [down while shielding drops through](https://www.ssbwiki.com/Shield_dropping) | [platformMoves.ts:81](../../ts/src/game/sim/platformMoves.ts#L81) `dropFromPlatform` | deviation: shielded fighters keep their jump, dodge or release choices (docs/gameplay-design.md, Platform shield drop) (Tom 2026-10-14, #103) |
-| Shield momentum out of a run, probed headless on each fighter's own traction, walk and run speed `shield-momentum` | out of a run: Sniper 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units | [out of a run: Sniper 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units](https://www.ssbwiki.com/Traction) | [groundMovement.ts:167](../../ts/src/game/sim/groundMovement.ts#L167) `restingTraction`; checked by [shieldMomentum.tests.ts:31](../../ts/src/game/sim/shieldMomentum.tests.ts#L31) `meleeDrag` | parity |
-| Shield stop out of the initial dash, probed headless on its third frame `shield-stop` | out of the initial dash: Sniper speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame | [out of the initial dash: Sniper speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame](https://www.ssbwiki.com/Shield_stop) | [shield.ts:313](../../ts/src/game/sim/shield.ts#L313) `raiseShield`; checked by [shieldMomentum.tests.ts:61](../../ts/src/game/sim/shieldMomentum.tests.ts#L61) `lastInitialDashFrame` | parity |
+| Shield momentum out of a run, probed headless on each fighter's own traction, walk and run speed `shield-momentum` | out of a run: Rifleman 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units | [out of a run: Rifleman 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units](https://www.ssbwiki.com/Traction) | [groundMovement.ts:167](../../ts/src/game/sim/groundMovement.ts#L167) `restingTraction`; checked by [shieldMomentum.tests.ts:31](../../ts/src/game/sim/shieldMomentum.tests.ts#L31) `meleeDrag` | parity |
+| Shield stop out of the initial dash, probed headless on its third frame `shield-stop` | out of the initial dash: Rifleman speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame | [out of the initial dash: Rifleman speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame](https://www.ssbwiki.com/Shield_stop) | [shield.ts:313](../../ts/src/game/sim/shield.ts#L313) `raiseShield`; checked by [shieldMomentum.tests.ts:61](../../ts/src/game/sim/shieldMomentum.tests.ts#L61) `lastInitialDashFrame` | parity |
 | Jump and grab out of shield, probed headless `out-of-shield` | jump and grab | [jump and grab](https://www.ssbwiki.com/Out_of_shield) | [conditions.ts:114](../../ts/src/game/sim/conditions.ts#L114) `canShieldGrab` | parity |
 | Up special out of shield, probed headless `up-special-out-of-shield` | from jump squat | [from jump squat](https://www.ssbwiki.com/Out_of_shield) | [conditions.ts:139](../../ts/src/game/sim/conditions.ts#L139) `canStartSpecial` | parity |
 | Standing grab, total frames, fightcore.csv `grab-frames` | 36, active from 5 for 3, every fighter | [Fox 30; 5 of 25 fighters differ: Bowser, Link, Samus, Yoshi, Young Link; 30-94](https://www.fightcore.gg) | [moves.ts:204](../../ts/src/game/sim/moves.ts#L204) `attackStartupFrames` | open: one shared profile for every fighter against Melee's per-fighter values (#293) |
@@ -264,26 +264,6 @@ and air friction. A hero's body in `heroBodies.ts` sets only its weight, walk, d
 Mannoroth, Cairne Bloodhoof, Kael'thas Sunstrider instead take gravity, terminal and fast-fall speed and jump velocities from `HERO_VERTICAL`.
 Each block compares a fighter with Melee's spread across the 26 fighters in the [character attributes](https://wiki.supercombo.gg/w/SSBM/Character_Attributes),
 in Melee units, with Fox's and Falco's values beside it; a value outside the spread is a deviation or an open row.
-
-### Sniper
-
-| Row | Ours | Melee | Code | Status |
-|---|---|---|---|---|
-| Weight `rifleman-weight` | 80 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Gravity `rifleman-gravity` | 0.17 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Terminal speed `rifleman-terminal` | 3.1 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Fast-fall speed `rifleman-fast-fall` | 3.5 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Jump squat frames `rifleman-jump-squat` | 5 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Full jump velocity `rifleman-full-jump` | 4.1 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Short jump velocity `rifleman-short-jump` | 1.9 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Double jump velocity, against fighters with one double jump `rifleman-double-jump` | 3.854 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Air speed `rifleman-air-speed` | 0.83 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Air acceleration `rifleman-air-acceleration` | 0.07 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Air friction `rifleman-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Initial dash speed `rifleman-dash` | 1.9 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Run speed `rifleman-run` | 1.5 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Walk speed `rifleman-walk` | 1.4 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
-| Traction `rifleman-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
 
 ### Illidan
 

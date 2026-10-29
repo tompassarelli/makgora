@@ -13,7 +13,7 @@ attack, B for specials, X/Y to jump, RB to grab and LB for Strong;
 Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
 short hop and RB for Strong. In both layouts, either trigger shields or air-dodges and
 Start pauses. The current prototype includes character and stage
-selection, 28 fighters, a bot opponent, floating platforms, blast zones,
+selection, 27 fighters, a bot opponent, floating platforms, blast zones,
 stocks, rematches, and configurable controls.
 
 For solo practice, place only your own fighter chip and press Y, then choose
@@ -118,8 +118,7 @@ backward, up, or down; after the pummel, throw or the opponent goes free. Mash
 action buttons and alternate movement directions to escape a grab; holding one
 button does not count as mashing. The bar above a held fighter drains as the
 hold runs out and faster with mashing; the mark on it shows when a pummel would
-land. Mash and wiggle the same way to break out of Sniper's frost trap
-sooner; its bar shows how long the ice has left.
+land.
 
 I always gives the existing short hop, however long you hold it; in Tom's pad
 layout, press LB. In Melee, tap X or Y to short hop. The ordinary jump keys still full hop when held and

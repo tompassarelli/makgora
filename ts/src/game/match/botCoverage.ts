@@ -7,7 +7,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { createFighter } from "../sim/fighter";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import { attackStartupFrames } from "../sim/moves";
-import { SELECTABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { MATCH_CHARACTERS, fighterName } from "../roster/kits";
 import { createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { chooseDefense } from "./botDefense";
 import { chooseRecoveryInput } from "./botRecovery";
@@ -34,7 +34,7 @@ export interface BotCoverage {
 }
 
 
-export function fighterCoverage(index: number, opponent?: Character, choices: readonly Character[] = SELECTABLE_CHARACTERS, seeds = 8, seedOffset = 0): BotCoverage {
+export function fighterCoverage(index: number, opponent?: Character, choices: readonly Character[] = MATCH_CHARACTERS, seeds = 8, seedOffset = 0): BotCoverage {
   const character = at(choices, index);
   const result: BotCoverage = { fighter: fighterName(character), matches: 0, movement: 0, attacks: 0, kit: 0, specials: { neutral: 0, side: 0, up: 0, down: 0 }, defense: 0, recovery: 0, defenseDecisions: 0, recoveryDecisions: 0, companions: { bear: 0, quilbeast: 0, hawk: 0 }, missing: [] };
   const plan = gameplanOf(character);

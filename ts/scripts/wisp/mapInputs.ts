@@ -27,11 +27,10 @@ import { STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_
 import { STAGE_CRAG_MODELS } from "../../src/generated/stages/cragAssetInfo";
 import { STAGE_DECK_MODELS, STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../src/generated/stages/stageAssetInfo";
 import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunterAssetInfo";
-import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInfo";
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS } from "../../src/game/roster/kits";
+import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS, shipsInMap } from "../../src/game/roster/kits";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
@@ -43,7 +42,7 @@ import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
 import { UI_FRAMES } from "./uiFrames";
 import { checkCueModels } from "./headlessRender";
-import { cueModels } from "./cueModels";
+import { mapCueModels } from "./cueModels";
 import { removeGeosets, teamGlowGeosets } from "../groundPlanes";
 import { generateModelMDX, parseModelMDX } from "../mdxCodec";
 import { fighterPortrait, heroLook, portraitCostumes } from "../../src/game/roster/looks";
@@ -105,7 +104,7 @@ const importLines = (path: string) => tryMapSync("read import list", path, () =>
 
 
 export const GENERATED_MODELS: readonly { readonly list: string; readonly generator: string; readonly models: readonly string[] }[] = [
-  { list: "impact-assets/white-flash-imports", generator: "tools/animations/white-flash-models.ts", models: Object.values(WHITE_FIGHTER_MODELS) },
+  { list: "impact-assets/white-flash-imports", generator: "tools/animations/white-flash-models.ts", models: Object.entries(WHITE_FIGHTER_MODELS).filter(([character]) => shipsInMap(Number(character))).map(([, model]) => model) },
   { list: "stage-assets/imports.txt", generator: "tools/stage/package.ts", models: [...new Set([...Object.values(STAGE_DECK_MODELS).flatMap(({ main, slab, alternate }) => alternate === undefined ? [main, slab] : [main, slab, alternate]), STAGE_SNOW_MODEL, STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_GROUND_MODEL, STAGE_PLAGUE_MODEL, ...STAGE_CRAG_MODELS, ...Object.values(STAGE_POINT_LIGHT_MODELS).flat(), ...Object.values(STAGE_SKY_MODELS)])] },
   { list: "impact-assets/imports.txt", generator: "tools/effects/package.ts", models: Object.values(impactModels) },
   { list: "impact-assets/frost-imports.txt", generator: "tools/effects/trap.ts", models: Object.values(frostModels) },
@@ -125,7 +124,7 @@ const SUMMON_MODELS = Array.from({ length: summonClipCount(SUMMON_BEAR) }, (_, i
 const costumePoolFiles = (pool: string): string[] =>
   readClipRecords(pool).flatMap((record: { readonly costumes?: readonly { readonly filename: string }[] }) => record.costumes?.map(({ filename }) => filename) ?? []);
 
-export const ORIGINAL_CLIP_MODELS =[...new Set(Object.values(Character).flatMap((character) => {
+export const ORIGINAL_CLIP_MODELS =[...new Set(Object.values(Character).filter(shipsInMap).flatMap((character) => {
   const light = originalLightPath(character);
   const clips = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "");
   const costumes = Array.from({ length: MAX_COSTUMES }, (_, costume) => costumeBody(character, costume) ?? []).flat();
@@ -136,7 +135,7 @@ const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ character }) => heroLook(charact
 
 
 export const SCRIPT_MODELS: readonly string[] = [
-  RIFLEMAN_MODEL_FILE, DEMON_HUNTER_MODEL_FILE, ...IMPORTED_HERO_MODELS, ...SUMMON_MODELS, ...ORIGINAL_CLIP_MODELS,
+  DEMON_HUNTER_MODEL_FILE, ...IMPORTED_HERO_MODELS, ...SUMMON_MODELS, ...ORIGINAL_CLIP_MODELS,
   ...GENERATED_MODELS.flatMap(({ models }) => models),
 ];
 
@@ -190,7 +189,7 @@ const requireListed = (path: string, imports: readonly string[], models: readonl
 
 
 
-const carriedModels = (map: string, packager: string, models: readonly string[] = [...SCRIPT_MODELS, ...cueModels().filter(model => model.toLowerCase().startsWith("war3mapimported\\"))]) => Effect.scoped(Effect.gen(function*() {
+const carriedModels = (map: string, packager: string, models: readonly string[] = [...SCRIPT_MODELS, ...mapCueModels().filter(model => model.toLowerCase().startsWith("war3mapimported\\"))]) => Effect.scoped(Effect.gen(function*() {
   if (models.includes("")) return yield* new MapBuildFailure({ operation: "check script models", path: map, cause: EMPTY_MODEL });
   const scratch = yield* Effect.acquireRelease(
     tryMapSync("create scratch directory", tmpdir(), () => mkdtempSync(join(tmpdir(), "smashcraft-models."))),
@@ -321,7 +320,6 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     return yield* new MapBuildFailure({ operation: "check model sounds", path: "ts/src/generated/assets/modelSoundInfo.ts", cause: `${soundProblem}; export them with tools/animations/export-model-sounds.ts` });
   }
   const entries: ArchiveEntry[] = [
-    { entry: RIFLEMAN_MODEL_FILE, source: join(assets, "animation-assets/RiflemanFighter.mdx") },
     { entry: DEMON_HUNTER_MODEL_FILE, source: join(assets, "illidan-animation/DemonHunterFighter.mdx") },
     ...SELECTION_TEXTURES.map((texture) => imported(join(assets, "selection-assets"), `${texture}.tga`)),
     ...(yield* portraitImports(assets)),

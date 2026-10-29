@@ -1,12 +1,5 @@
 [
   {
-    "fighter": "rifleman",
-    "direction": "forward",
-    "rule": "range triangle",
-    "issue": "#311",
-    "reason": "Forward smash and forward tilt both hit on frame 7. Recorded when the check landed (2026-10-25); a retune or Tom's reason replaces this entry."
-  },
-  {
     "fighter": "illidan",
     "direction": "down",
     "rule": "range triangle",

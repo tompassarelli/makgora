@@ -21,7 +21,7 @@ import { selectableStage } from "../menu/stageCatalog";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName, fighterKey, fighterSlug } from "../roster/kits";
+import { MATCH_CHARACTERS, fighterName, fighterKey, fighterSlug } from "../roster/kits";
 import { costumeIndex, costumesFor } from "../roster/costumes";
 import { isScenario, type Scenario } from "./build";
 
@@ -223,7 +223,7 @@ export function quickPainHero(message: string): { readonly character: Character;
 function heroAfter(message: string, prefix: string): Character | undefined {
   if (!message.startsWith(prefix)) return undefined;
   const wanted = message.substring(prefix.length).toLowerCase();
-  for (const character of SELECTABLE_CHARACTERS) if (fighterKey(character).toLowerCase() === wanted) return character;
+  for (const character of MATCH_CHARACTERS) if (fighterKey(character).toLowerCase() === wanted) return character;
   return undefined;
 }
 
@@ -396,9 +396,9 @@ export type CaptureRequest =
   | { readonly kind: "stage"; readonly character: Character; readonly move: string; readonly facing: "left" | "right"; readonly slot: ParticipantSlot };
 
 function captureFighter(slug: string): Character | undefined {
-  const exact = SELECTABLE_CHARACTERS.find(candidate => fighterSlug(candidate) === slug);
+  const exact = MATCH_CHARACTERS.find(candidate => fighterSlug(candidate) === slug);
   if (exact !== undefined) return exact;
-  const named = SELECTABLE_CHARACTERS.filter(candidate => fighterSlug(candidate).startsWith(`${slug}-`));
+  const named = MATCH_CHARACTERS.filter(candidate => fighterSlug(candidate).startsWith(`${slug}-`));
   return named.length === 1 ? named[0] : undefined;
 }
 

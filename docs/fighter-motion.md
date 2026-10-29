@@ -4,26 +4,6 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 
 | Fighter | State | Clip | Motion | Body | Direction; toward/against |
 | --- | --- | --- | ---: | ---: | --- |
-| Sniper | walk | 54: Walk | 75.6 | 23.6 | forward; 66.5/74.8 |
-| Sniper | dash | 54: Walk | 75.6 | 23.4 | forward; 66.5/74.2 |
-| Sniper | run | 54: Walk | 86.4 | 18.4 | forward; 85.8/83.8 |
-| Sniper | turn | 55: Recovery turn | 143.6 | 27.5 | back; 60.1/143.6 |
-| Sniper | brake | 56: Recovery stop | 23.4 | 9.3 | in place; 10.6/17.1 |
-| Sniper | jump-squat | 57: Recovery jumpSquat | 29.8 | 13.5 | down; 29.6/21.8 |
-| Sniper | roll-forward | 32: Roll Forward | 116.6 | 45.3 | forward; 71.9/116.5 |
-| Sniper | roll-back | 31: Roll Backward | 116.6 | 45.3 | back; 116.5/71.9 |
-| Sniper | spot-dodge | 39: Spot Dodge | 20.3 | 7.9 | in place; 10.3/10.7 |
-| Sniper | air-dodge | 58: Recovery airDodge | 40.8 | 13.6 | in place; 17.2/20.0 |
-| Sniper | tech | 59: Recovery tech | 94.0 | 37.7 | in place; 68.1/48.1 |
-| Sniper | tech-forward | 60: Recovery techForward | 124.8 | 55.8 | forward; 86.3/74.5 |
-| Sniper | tech-back | 61: Recovery techBackward | 115.1 | 64.9 | back; 85.2/74.5 |
-| Sniper | get-up | 21: Get Up | 77.7 | 34.5 | up; 62.1/50.4 |
-| Sniper | get-up-forward | 62: Recovery getUpRollForward | 124.7 | 55.6 | forward; 86.2/74.5 |
-| Sniper | get-up-back | 63: Recovery getUpRollBackward | 115.0 | 64.9 | back; 85.4/74.5 |
-| Sniper | get-up-attack | 22: Get Up Attack | 95.0 | 37.4 | both; 67.3/61.4 |
-| Sniper | ledge-get-up | 28: Ledge Climb | 64.7 | 7.9 | up; 27.7/64.2 |
-| Sniper | ledge-roll | 32: Roll Forward | 116.8 | 45.4 | forward; 72.0/116.4 |
-| Sniper | ledge-attack | 22: Get Up Attack | 95.3 | 37.4 | both; 67.3/61.4 |
 | Illidan | walk | 119: Locomotion Walk | 139.2 | 20.8 | forward; 129.1/139.0 |
 | Illidan | dash | 121: Locomotion Initial Dash Burst | 81.1 | 19.7 | forward; 72.9/57.8 |
 | Illidan | run | 120: Locomotion Run | 111.4 | 23.8 | forward; 108.7/95.2 |

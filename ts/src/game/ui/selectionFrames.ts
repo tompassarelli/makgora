@@ -2,7 +2,7 @@ import type { SessionWinsFrames } from "./sessionWinsFrames";
 import { f32 } from "wisp/src/sim/f32";
 import { type RosterTile, cardDown, cardRight, cardSize } from "../menu/selectionDrag";
 import { NATIVE_TEXT_BASE } from "./hudLayout";
-import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { PLAYABLE_CHARACTERS, fighterName, DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
@@ -12,8 +12,8 @@ import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchC
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
 export const RANDOM_FIGHTER_TEXTURE = "war3mapImported\\SelectionRandom.tga";
-export const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number, costume = 0) => choice === RANDOM_FIGHTER ? RANDOM_FIGHTER_TEXTURE : fighterPortrait(choice ?? Character.rifleman, tile ? "Tile" : "Card", slot, costume);
-export const nameText = (choice: number | undefined) => choice === RANDOM_FIGHTER ? "Random" : fighterName(choice ?? Character.rifleman);
+export const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number, costume = 0) => choice === RANDOM_FIGHTER ? RANDOM_FIGHTER_TEXTURE : fighterPortrait(choice ?? DEFAULT_FIGHTER, tile ? "Tile" : "Card", slot, costume);
+export const nameText = (choice: number | undefined) => choice === RANDOM_FIGHTER ? "Random" : fighterName(choice ?? DEFAULT_FIGHTER);
 export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.mountainKing]: "Muradin",
   [Character.uther]: "Uther",
@@ -97,7 +97,7 @@ export const modeBox = (slot: number) => ({ x: cardRight(slot, f32(0.014)), y: c
 export const GRID_FIGHTERS: readonly Character[] = SELECT_GRID_ORDER.filter(character => PLAYABLE_CHARACTERS.includes(character));
 export const RANDOM_FIGHTER_TILE: RosterTile = GRID_FIGHTERS.length;
 export const ROSTER_TILES = GRID_FIGHTERS.length + 1;
-export const characterOfTile = (tile: RosterTile): number => tile === RANDOM_FIGHTER_TILE ? RANDOM_FIGHTER : GRID_FIGHTERS[tile] ?? Character.rifleman;
+export const characterOfTile = (tile: RosterTile): number => tile === RANDOM_FIGHTER_TILE ? RANDOM_FIGHTER : GRID_FIGHTERS[tile] ?? DEFAULT_FIGHTER;
 export function tileOfCharacter(character: number): RosterTile {
   if (character === RANDOM_FIGHTER) return RANDOM_FIGHTER_TILE;
   for (let tile = 0; tile < GRID_FIGHTERS.length; tile++) if (GRID_FIGHTERS[tile] === character) return tile;

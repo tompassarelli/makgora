@@ -15,7 +15,7 @@ import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { cannonOn, hasTide } from "../sim/stageHazards";
 import { firstOrbsDifference } from "../sim/orbState";
 import { AttackStyle, LAST_ATTACK_STYLE } from "../sim/codes";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { MATCH_CHARACTERS } from "../roster/kits";
 import { authoredTuning } from "../sim/tuning";
 import { type FighterMoves, type StrikeCapsule, moveTravelStep } from "../sim/heroMoves";
 import { attackCapsule, emptyCapsule, hurtCapsule } from "../sim/geometry/contactGeometry";
@@ -35,7 +35,7 @@ const authoredTravel: { readonly [character: number]: AuthoredTravel | undefined
 
 function buildAuthoredTravel(): { [character: number]: AuthoredTravel | undefined } {
   const result: { [character: number]: AuthoredTravel | undefined } = {};
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of MATCH_CHARACTERS) {
     const moves = authoredTuning(character).moves;
     if (moves === undefined) continue;
     const startup: number[][] = [];
@@ -111,7 +111,7 @@ function rosterReach(): Extent {
   const body = { x: 0.0, z: 0.0 };
   let shield = 0.0;
   let travel = 0.0;
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of MATCH_CHARACTERS) {
     const tuning = authoredTuning(character);
     const { moves, specials, physics } = tuning;
     const normal = { x: 0.0, z: 0.0 };
@@ -158,7 +158,7 @@ function rosterReach(): Extent {
       physics.aerialJumpHorizontalSpeed, physics.shieldBreakSpeed, physics.groundSpeedCap);
   }
   const both = f32(2.0 * travel);
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of MATCH_CHARACTERS) {
     const normal = normalReach[character];
     if (normal === undefined) continue;
     normal.x = f32(f32(normal.x + body.x) + both);

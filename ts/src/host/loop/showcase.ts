@@ -1,3 +1,4 @@
+import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/participants";
 import { Phase, firstHumanSlot, setEndless, setItemsOn, setOrbsOn, setParticipants, setUltimatesOn, stageClock, updateConnectedHumans } from "../../game/lobby/lobbyState";
 import { SHOWCASE_PAD_X, type ShowcasePads, type ShowcaseRequest, applyShowcaseRequest, copyShowcasePads, createShowcasePads, padName, showcaseMask } from "../../game/session/showcase";
@@ -41,7 +42,7 @@ export function applyShowcaseSetup(s: ShellState, pads: Readonly<ShowcasePads>):
   setOrbsOn(game, actor, false);
   setUltimatesOn(game, actor, true);
   game.hazards = false;
-  startQuickMatch(s, SHOWCASE_STAGE, s.build.scenario, pads.fighters.map(character => character ?? Character.rifleman));
+  startQuickMatch(s, SHOWCASE_STAGE, s.build.scenario, pads.fighters.map(character => character ?? DEFAULT_FIGHTER));
   if (!matchStarted(s)) return false;
   game.teamBattle = true;
   game.friendlyFire = false;

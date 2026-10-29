@@ -76,7 +76,7 @@ export const FIGHTER_OBJECTS: Readonly<Record<Character, FighterObject>> = {
   [Character.malfurion]: heroObject(Character.malfurion),
 };
 
-export const FIGHTER_OBJECT_ORDER: readonly Character[] = [ Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)];
+export const FIGHTER_OBJECT_ORDER: readonly Character[] = [Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)];
 
 
 export const FILE_IO_OBJECT = {

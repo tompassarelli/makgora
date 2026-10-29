@@ -10,7 +10,6 @@ const FACTION_ORDER = [
   "anub'arak", "butcher", "malfurion-stormrage", "tyrande", "illidan", "warden", "archimonde", "pit-lord",
   "lady-vashj", "akama", "chen-stormstout", "firelord", "goblin-tinker", "goblin-alchemist", "murloc",
 ];
-const OFF_GRID = ["rifleman"];
 
 const playableSlugs = (): string[] => PLAYABLE_CHARACTERS.map(character => fighterSlug(character));
 const expectedOrder = (): string[] => FACTION_ORDER.filter(slug => playableSlugs().includes(slug));
@@ -27,10 +26,11 @@ test("The character select grid lists Human, Orc, Undead, Night Elf, Burning Leg
 });
 
 test("Every playable fighter owns exactly one select grid tile, and each tile maps back to its own fighter [k2 property]", () => {
+  assertEquals(GRID_FIGHTERS.length, PLAYABLE_CHARACTERS.length);
   for (const character of PLAYABLE_CHARACTERS) {
     let tiles = 0;
     for (const listed of GRID_FIGHTERS) if (listed === character) tiles++;
-    assertEquals(tiles, OFF_GRID.includes(fighterSlug(character)) ? 0 : 1, fighterSlug(character));
+    assertEquals(tiles, 1, fighterSlug(character));
   }
   for (let tile = 0; tile < ROSTER_TILES; tile++) assertEquals(tileOfCharacter(characterOfTile(tile)), tile);
   assertTrue(tileOfCharacter(RANDOM_FIGHTER) === RANDOM_FIGHTER_TILE);

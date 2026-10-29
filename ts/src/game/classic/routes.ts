@@ -30,18 +30,6 @@ const fight = (rivals: Character | readonly Character[], stage: StageTile, line:
 
 export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
   {
-    fighter: C.rifleman, boss: BossKind.lichKing,
-    story: "An Ironforge marksman follows Muradin north and finds Frostmourne's master waiting.",
-    fights: [
-      fight(C.peon, 3, "Work work. Then fight fight."),
-      fight(C.shadowHunter, 3, "The Hinterlands trolls remember dwarven powder, mon."),
-      fight(C.dreadlord, 6, "Lordaeron's gunners died first. You will be no different."),
-      fight([C.lich, C.sylvanas], 4, "Northrend's dead march for their king."),
-      fight(C.mountainKing, 11, "Show the Wildhammers what Ironforge powder can do, lad!"),
-    ],
-    ending: ["The Lich King's crown rolled across the ice, and I didn't miss.", "First round at the Aerie is on Ironforge tonight."],
-  },
-  {
     fighter: C.demonHunter, boss: BossKind.lichKing,
     story: "Kil'jaeden's deadline runs short: Illidan takes Outland, then races Arthas up Icecrown.",
     fights: [
@@ -57,7 +45,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     fighter: C.blademaster, boss: BossKind.archimonde,
     story: "A Burning Blade swordsman cuts across Kalimdor to repay the demon blood of Mannoroth.",
     fights: [
-      fight(C.rifleman, 11, "Hold still, greenskin, and this'll be quick."),
+      fight(C.uther, 11, "Lay down that blade, orc, and the camps will be merciful."),
       fight(C.jaina, 11, "Theramore wants peace, but I will not let you burn the coast."),
       fight(C.mountainKing, 12, "A blade's no use against a hammer, lad."),
       fight([C.sylvanas, C.warden], 10, "Your blade will serve me better after death."),
@@ -73,7 +61,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
       fight(C.blademaster, 3, "Your hammer is slow, dwarf."),
       fight(C.dreadlord, 6, "Northrend will be your tomb, Bronzebeard."),
       fight([C.lich, C.sylvanas], 4, "The plague has come for the mountain too."),
-      fight(C.rifleman, 12, "Ironforge always fights its friends first, sir!"),
+      fight(C.uther, 12, "Ironforge and the Silver Hand always spar before a war, old friend."),
     ],
     ending: ["Frostmourne is broken, and this time it didn't take me with it.", "Pour me a stout. Make it two: one for the lad Arthas used to be."],
   },
@@ -93,7 +81,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     fighter: C.lich, boss: BossKind.archimonde,
     story: "Kel'Thuzad spreads the plague and opens Dalaran's gate for Archimonde, who has no further use for him.",
     fights: [
-      fight(C.rifleman, 11, "That's no farmer, that's a necromancer! Fire!"),
+      fight(C.mountainKing, 11, "That's no farmer, that's a necromancer! Hammers up!"),
       fight(C.uther, 6, "The Light still burns in Lordaeron, Kel'Thuzad."),
       fight(C.jaina, 11, "You will not open Dalaran to the Legion."),
       fight([C.sylvanas, C.thrall], 10, "The living and the dead both want your master gone, lich."),
@@ -156,7 +144,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
       fight(C.peon, 3, "Me not hungry. Me promise bear not hungry."),
       fight(C.chen, 3, "A brew for a traveller, then a friendly scrap!"),
       fight(C.cairne, 3, "Prove to the tauren that the wilds still trust you."),
-      fight([C.jaina, C.rifleman], 11, "Admiral Proudmoore's soldiers want Durotar's coast."),
+      fight([C.jaina, C.mountainKing], 11, "Admiral Proudmoore's soldiers want Durotar's coast."),
       fight(C.thrall, 3, "Champion of the Horde, show me your strength."),
     ],
     ending: ["Misha took a bite out of Kil'jaeden. She says he tasted of sulfur.", "The wilds are quiet again. I like them quiet."],
@@ -177,7 +165,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     fighter: C.thrall, boss: BossKind.archimonde,
     story: "The Warchief leads the Horde to Kalimdor and makes an old enemy an ally at Hyjal.",
     fights: [
-      fight(C.rifleman, 11, "No orc escapes Lordaeron's internment camps twice!"),
+      fight(C.uther, 11, "No orc escapes Lordaeron's internment camps twice!"),
       fight(C.blademaster, 3, "The Warchief must still prove he can hold a blade."),
       fight(C.cairne, 3, "The tauren will follow you, young Warchief, once I see your strength."),
       fight([C.jaina, C.warden], 10, "Humans and night elves do not trust the Horde. Yet."),
@@ -193,7 +181,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
       fight(C.lich, 4, "Dalaran's magi will join the Scourge, apprentice."),
       fight(C.lichKing, 2, "Jaina. You should not have come north."),
       fight([C.thrall, C.blademaster], 3, "The Horde will not bow to a human sorceress."),
-      fight(C.rifleman, 11, "Theramore's guard wants a word, Lady Proudmoore!"),
+      fight(C.mountainKing, 12, "Ironforge stands guard for Theramore, lass. Show me ye can hold it!"),
     ],
     ending: ["Archimonde is ash beneath Nordrassil. Theramore will have its peace.", "And the tournament will have its champion, if the paperwork clears."],
   },
@@ -238,7 +226,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     story: "One peon just wanted to chop trees and somehow ended up at the end of the world.",
     fights: [
       fight(C.tinker, 3, "Union rules, pal: goblins get the good jobs."),
-      fight(C.rifleman, 11, "Look lads, a lumber thief!"),
+      fight(C.mountainKing, 12, "Look lads, a lumber thief!"),
       fight(C.warden, 10, "That tree is sacred, orc!"),
       fight([C.blademaster, C.thrall], 3, "Peon! Back to work!"),
       fight(C.shadowHunter, 3, "Even a peon must earn his place in Durotar, mon."),
@@ -251,7 +239,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     fights: [
       fight(C.peon, 3, "Me no pay for robot!"),
       fight(C.mountainKing, 12, "Ironforge engineers don't need goblin junk."),
-      fight(C.rifleman, 11, "That contraption ain't up to code!"),
+      fight(C.jaina, 11, "Theramore bans unlicensed contraptions, goblin."),
       fight([C.pitLord, C.dreadlord], 14, "The Legion pays in fire, goblin."),
       fight(C.chen, 3, "Your gadget leaks worse than my keg!"),
     ],
@@ -285,7 +273,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     fighter: C.grom, boss: BossKind.archimonde,
     story: "Grom Hellscream wrestles with the blood curse, then turns Gorehowl on the Legion that enslaved his clan.",
     fights: [
-      fight(C.rifleman, 11, "The Warsong broke our truce. Lower that axe, Hellscream!"),
+      fight(C.jaina, 11, "The Warsong broke our truce. Lower that axe, Hellscream!"),
       fight(C.warden, 10, "Your lumber camps bleed Ashenvale. The forest remembers."),
       fight(C.blademaster, 3, "Warsong or Burning Blade, an orc must master his own rage."),
       fight([C.dreadlord, C.pitLord], 14, "Drink again, Hellscream. Your clan's strength belongs to us."),

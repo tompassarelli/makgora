@@ -1,5 +1,6 @@
 
 
+import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { characterFor, fighterMask } from "../../game/lobby/lobbyState";
 import { matchSpawnX } from "../../game/match/step";
@@ -44,7 +45,7 @@ export function makePreview(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(s.world, slot)) continue;
     const x = matchSpawnX(slot, s.world.mask);
-    const fighter = createFighter(characterFor(s.game, slot) ?? Character.rifleman, x, x < 0 ? 1 : -1);
+    const fighter = createFighter(characterFor(s.game, slot) ?? DEFAULT_FIGHTER, x, x < 0 ? 1 : -1);
     s.world.fighters[slot] = fighter;
     const body = createFighterBody(Player(slot), fighter, s.origin);
     s.participants[slot].body = body;

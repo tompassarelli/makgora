@@ -1,6 +1,6 @@
 import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
 import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumePoolStage, togglePoolMode, togglePoolStage } from "../menu/stagePool";
-import { PLAYABLE_CHARACTERS, isSelectableCharacter, nextCharacterIn } from "../roster/kits";
+import { PLAYABLE_CHARACTERS, isMatchCharacter, nextCharacterIn, DEFAULT_FIGHTER } from "../roster/kits";
 import { type CostumeTint, costumeIndex, costumeOf, costumesFor } from "../roster/costumes";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
@@ -97,7 +97,7 @@ export interface MatchState {
 }
 
 
-const defaultChoice = (index: number): Character => PLAYABLE_CHARACTERS[floorMod(index, PLAYABLE_CHARACTERS.length)] ?? Character.rifleman;
+const defaultChoice = (index: number): Character => PLAYABLE_CHARACTERS[floorMod(index, PLAYABLE_CHARACTERS.length)] ?? DEFAULT_FIGHTER;
 
 export function createMatchState(): MatchState {
   return {
@@ -294,7 +294,7 @@ export function characterReady(game: Readonly<MatchState>, slot: number): boolea
 }
 
 export function selectableMatchCharacter(game: Readonly<MatchState>, choice: number): choice is Character {
-  return isSelectableCharacter(choice) && (!game.classic || classicRoute(choice) !== undefined);
+  return isMatchCharacter(choice) && (!game.classic || classicRoute(choice) !== undefined);
 }
 
 export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number): Character {
@@ -333,9 +333,9 @@ export function selectCpuCharacter(game: MatchState, actor: number, slot: number
 export function nextCpuCharacter(game: Readonly<MatchState>, slot: number, direction: number): number {
   if (!randomFighterOffered(game)) return nextMatchCharacter(game, characterFor(game, slot), direction);
   const last = PLAYABLE_CHARACTERS.length - 1;
-  const index = cpuFighterRandom(game, slot) ? (direction > 0 ? -1 : last + 1) : PLAYABLE_CHARACTERS.indexOf(game.characterChoices[slot] ?? Character.rifleman);
+  const index = cpuFighterRandom(game, slot) ? (direction > 0 ? -1 : last + 1) : PLAYABLE_CHARACTERS.indexOf(game.characterChoices[slot] ?? DEFAULT_FIGHTER);
   const next = index + (direction > 0 ? 1 : -1);
-  return next < 0 || next > last ? RANDOM_FIGHTER : PLAYABLE_CHARACTERS[next] ?? Character.rifleman;
+  return next < 0 || next > last ? RANDOM_FIGHTER : PLAYABLE_CHARACTERS[next] ?? DEFAULT_FIGHTER;
 }
 
 function drawCpuFighters(game: MatchState): void {

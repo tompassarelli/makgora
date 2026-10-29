@@ -2,6 +2,8 @@
 
 > **Frozen (26 October 2026):** Forsaken Paladin was frozen pending replacement, and Uther replaced him on 28 October 2026 ([uther.md](uther.md)). `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, keeps listing him until Tom lifts it. The remaining planned additions, Tyrande, the Butcher and a dismounted Thrall, are in [roster-next.md](roster-next.md) (28 October 2026).
 
+> **Removed (30 October 2026):** Sniper, the original Rifleman, left the game at Tom's decision: he is on no select grid, computer, Random, Classic or Lore Battle list, and the map carries none of his art, model or object data. Character code 1 stays as the base Rifleman body that headless tests use as a fixed reference target and training dummy (`HARNESS_ONLY_FIGHTERS` in `ts/src/game/roster/kits.ts`).
+
 > **Removed (29 October 2026):** Anub'arak left the roster at Tom's decision; character code 23 is retired, never reused. His section below is kept as history.
 
 > **Select grid order (30 October 2026):** the character select grid lists the fighters by faction in reading order, Human, Orc, Undead, Night Elf, Burning Legion, then Neutral, with the Random tile last; `SELECT_GRID_ORDER` in `ts/src/game/ui/selectionLayout.ts` holds the order and `selectionFrames.tests.ts` pins it. Chen sits with the Neutral fighters (Tom, 30 October 2026).

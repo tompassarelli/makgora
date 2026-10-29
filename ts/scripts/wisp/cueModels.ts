@@ -4,12 +4,15 @@ import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/s
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { allProjectileModels } from "../../src/game/presentation/projectileArt";
 import { Character } from "../../src/game/sim/codes";
+import { shipsInMap } from "../../src/game/roster/kits";
 import { METER_CUES, ultimateBurst } from "../../src/game/presentation/meterCues";
 
 export const CUE_MODEL_RECORD = "ts/scripts/wisp/cue-models.tsv";
 export const RECORD_COMMAND = "bun scripts/cueModels.ts --record";
 
-export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...METER_CUES.map(cue => cue.model), ...Object.values(Character).map(character => ultimateBurst(character).model), MISSING_CUE_MODEL])];
+export const cueModels = (characters: readonly Character[] = Object.values(Character)) => [...new Set([...characters.flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...METER_CUES.map(cue => cue.model), ...characters.map(character => ultimateBurst(character).model), MISSING_CUE_MODEL])];
+
+export const mapCueModels = () => cueModels(Object.values(Character).filter(shipsInMap));
 
 export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<string>): boolean {
   return paths.some(path => inputs.has(path) || [...inputs].some(input => input.endsWith("/") && path.startsWith(input)));

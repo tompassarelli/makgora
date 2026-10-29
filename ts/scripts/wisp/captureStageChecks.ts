@@ -6,7 +6,7 @@ const SHOTS = { kind: "frames", client: "a", count: 8, everyMs: 150 } as const;
 export const captureStageChecks = (pass: readonly Rule[]): NativeCheck[] => [
   {
     id: "614-capture-blademaster", closes: "smashcraft#614 box 1", map: "presentation", session: SESSION,
-    setup: [{ chat: "-dev reset" }, { chat: "-dev quick hero rifleman stocks 9" }, { waitMs: 4000 }, { chat: "-dev capture blademaster forward-air right 0" }, { waitMs: 1000 }],
+    setup: [{ chat: "-dev reset" }, { chat: "-dev quick hero illidan stocks 9" }, { waitMs: 4000 }, { chat: "-dev capture blademaster forward-air right 0" }, { waitMs: 1000 }],
     capture: [{ ...SHOTS, name: "blademaster-forward-air" }],
     pass: [...pass, { kind: "receipt", pattern: "^SMASHCRAFT DEV v=1 ", min: 1 }],
     look: "The match fighters are hidden; the Blademaster alone stands in slot 0 (x=-450) facing right and loops his forward air in mid-air.",
