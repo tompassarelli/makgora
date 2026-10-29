@@ -6,12 +6,13 @@ import { type StandinEffects, standinSpecials } from "./specials";
 export interface StandinIdentity {
   readonly character: HeroDefinition["character"];
   readonly name: string;
+  readonly displayName?: string | undefined;
   readonly effects: StandinEffects;
 }
 
-export function standinHero({ character, name, effects }: StandinIdentity): HeroDefinition {
+export function standinHero({ character, name, displayName, effects }: StandinIdentity): HeroDefinition {
   return {
-    character, name, displayName: `${name} (WIP)`,
+    character, name, displayName: `${displayName ?? name} (WIP)`,
     purpose: "Work-in-progress stand-in: a plain middleweight moveset until his own kit lands",
     weakness: "No signature tools yet: every move is the shared stand-in's",
     complete: true,

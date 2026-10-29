@@ -604,25 +604,25 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Firelord (WIP) | ledge-get-up | 2: Walk | 105.7 | 41.1 | up; 50.9/61.6 |
 | Firelord (WIP) | ledge-roll | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.7 |
 | Firelord (WIP) | ledge-attack | 3: Attack | 220.7 | 66.1 | both; 129.6/220.5 |
-| Goblin Alchemist (WIP) | walk | 4: Walk 1 | 114.4 | 31.2 | forward; 107.5/108.9 |
-| Goblin Alchemist (WIP) | dash | 4: Walk 1 | 100.6 | 29.9 | forward; 91.9/93.0 |
-| Goblin Alchemist (WIP) | run | 4: Walk 1 | 98.1 | 38.0 | forward; 82.8/57.1 |
-| Goblin Alchemist (WIP) | turn | 4: Walk 1 | 58.1 | 20.6 | back; 29.5/54.8 |
-| Goblin Alchemist (WIP) | brake | 4: Walk 1 | 66.1 | 22.8 | in place; 60.9/37.5 |
-| Goblin Alchemist (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
-| Goblin Alchemist (WIP) | roll-forward | 4: Walk 1 | 114.4 | 31.1 | forward; 107.0/108.7 |
-| Goblin Alchemist (WIP) | roll-back | 4: Walk 1 | 114.4 | 31.1 | back; 108.7/107.0 |
-| Goblin Alchemist (WIP) | spot-dodge | 2: Stand 3 | 86.2 | 29.2 | in place; 85.9/31.4 |
-| Goblin Alchemist (WIP) | air-dodge | 2: Stand 3 | 86.2 | 29.3 | in place; 85.9/31.4 |
-| Goblin Alchemist (WIP) | tech | 0: Stand | 10.8 | 5.3 | in place; 3.7/3.2 |
-| Goblin Alchemist (WIP) | tech-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.4 |
-| Goblin Alchemist (WIP) | tech-back | 0: Stand | 11.0 | 5.3 | back; 3.4/3.7 |
-| Goblin Alchemist (WIP) | get-up | 2: Stand 3 | 86.3 | 29.2 | up; 29.7/56.7 |
-| Goblin Alchemist (WIP) | get-up-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.8 |
-| Goblin Alchemist (WIP) | get-up-back | 0: Stand | 11.0 | 5.3 | back; 3.8/3.7 |
-| Goblin Alchemist (WIP) | get-up-attack | 5: attack one - 2 NEW | 132.2 | 53.0 | both; 94.5/132.2 |
-| Goblin Alchemist (WIP) | ledge-get-up | 4: Walk 1 | 112.9 | 31.1 | up; 58.6/52.2 |
-| Goblin Alchemist (WIP) | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
-| Goblin Alchemist (WIP) | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
+| Alchemist (WIP) | walk | 4: Walk 1 | 114.4 | 31.2 | forward; 107.5/108.9 |
+| Alchemist (WIP) | dash | 4: Walk 1 | 100.6 | 29.9 | forward; 91.9/93.0 |
+| Alchemist (WIP) | run | 4: Walk 1 | 98.1 | 38.0 | forward; 82.8/57.1 |
+| Alchemist (WIP) | turn | 4: Walk 1 | 58.1 | 20.6 | back; 29.5/54.8 |
+| Alchemist (WIP) | brake | 4: Walk 1 | 66.1 | 22.8 | in place; 60.9/37.5 |
+| Alchemist (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
+| Alchemist (WIP) | roll-forward | 4: Walk 1 | 114.4 | 31.1 | forward; 107.0/108.7 |
+| Alchemist (WIP) | roll-back | 4: Walk 1 | 114.4 | 31.1 | back; 108.7/107.0 |
+| Alchemist (WIP) | spot-dodge | 2: Stand 3 | 86.2 | 29.2 | in place; 85.9/31.4 |
+| Alchemist (WIP) | air-dodge | 2: Stand 3 | 86.2 | 29.3 | in place; 85.9/31.4 |
+| Alchemist (WIP) | tech | 0: Stand | 10.8 | 5.3 | in place; 3.7/3.2 |
+| Alchemist (WIP) | tech-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.4 |
+| Alchemist (WIP) | tech-back | 0: Stand | 11.0 | 5.3 | back; 3.4/3.7 |
+| Alchemist (WIP) | get-up | 2: Stand 3 | 86.3 | 29.2 | up; 29.7/56.7 |
+| Alchemist (WIP) | get-up-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.8 |
+| Alchemist (WIP) | get-up-back | 0: Stand | 11.0 | 5.3 | back; 3.8/3.7 |
+| Alchemist (WIP) | get-up-attack | 5: attack one - 2 NEW | 132.2 | 53.0 | both; 94.5/132.2 |
+| Alchemist (WIP) | ledge-get-up | 4: Walk 1 | 112.9 | 31.1 | up; 58.6/52.2 |
+| Alchemist (WIP) | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
+| Alchemist (WIP) | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
 
 Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale.
