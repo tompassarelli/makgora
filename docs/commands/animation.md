@@ -419,12 +419,18 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   every other clip unchanged, and writes `evilsylvanas.mdx` for the `hero-models` shard.
 
 - Tyrande animation authoring (from the repository root):
-  `bun tools/animations/tyrande-clips.ts STOCK_TYRANDE.mdx PRIVATE_OUTPUT`
+  `bun tools/animations/tyrande-clips.ts TyrandeDismountedV2.mdx PRIVATE_OUTPUT`
+  reads johnwar's Re-Classic body from the `imported-models` family and
   appends her bow strikes, kicks (down tilt, dash knee, down smash split kick,
   neutral air, back air), the down air bow smash, casts, recovery, paired grabs
-  and nine damage reactions to Retera's `TyrandeDismountedSD.mdx`, preserving
-  its 13 stock sequences, and writes `TyrandeDismountedSD.mdx` for the `tyrande`
-  shard of `hero-models`. It rebuilds from stock, so follow it with
+  and nine damage reactions, preserving its 17 stock sequences, and writes
+  `TyrandeDismountedV2.mdx` for the `tyrande` shard of `hero-models`.
+  Her Stand Ready turns the torso, so her rig sets `sidePlane`: every joint
+  pitches about the screen's side axis rather than its parent's own axis.
+  Each bow strike names the point its top limb reaches (`aimAt`), and the arm
+  and wrist are solved from it, because the 127-unit bow's farthest point is
+  what the weapon trace holds to the hit regions; her pain reactions keep the
+  bow at a fixed tilt per row so it stays off the floor. It rebuilds from stock, so follow it with
   `victory-clips.ts ASSETS VICTORY --character 30` to re-append her victory
   (the stock Stand Victory pulls her shoulder out of its socket), store
   `VICTORY/hero-models` with `--fighter tyrande` and derive. Sylvanas and

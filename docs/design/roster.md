@@ -291,16 +291,21 @@ The map's description carries the same credits.
   The page states no usage terms (read 28 October 2026,
   smashcraft:docs/design/roster-next.md#hive-model-terms), so we credit
   every author it names, as Hive's custom asks.
-- [Tyrande Dismounted SD by Retera](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/)
-  (Hive Workshop, approved 11 November 2020): `TyrandeDismountedSD.mdx`,
-  imported as `war3mapImported\TyrandeDismountedSD.mdx` for Tyrande. It is a
-  287-polygon model built in Retera Model Studio that draws Warcraft III's own
-  `PriestessOfTheMoon` and `HeroRanger` textures, with no texture of its own.
+- [Tyrande Whisperwind (Re-Classic Pack) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
+  (Hive Workshop, approved and recommended): its dismounted body
+  `TyrandeDismountedV2.mdx`, imported as `war3mapImported\TyrandeDismountedV2.mdx`
+  for Tyrande, with every Smashcraft clip authored on it by
+  smashcraft:tools/animations/tyrande-clips.ts. It is a 5,181-polygon model
+  that draws only Warcraft III's own Classic textures, with no texture of its own.
 
-Source terms read on 28 October 2026 from the Wayback Machine's 12 February
-2026 copy of the page: the resource is tagged "Open Source", and the author
-writes that any modification is fine, so we reanimate it. The map description
-credits "Tyrande Dismounted SD by Retera (Hive Workshop), open source."
+Source terms read on 29 October 2026 from the Wayback Machine's 20 October
+2025 copy of the page: johnwar names Ujimasa Hojo's Archer, Dark Ranger,
+Sylvanas Windrunner and derivatives and kangyun's Tyrande Whisperwind (Heavy
+Mount) as the base models, and posts kangyun's permission in the thread. The
+page states no usage terms, so we credit every author it names, as Hive's
+custom asks: "Tyrande Whisperwind (Re-Classic) by johnwar (Hive Workshop),
+built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's
+Tyrande, used with kangyun's permission."
 
 Source terms read on 13 October 2026: the model resource identifies Kwaliti,
 `LichKing2.mdx` and `LichKing2_Portrait.mdx`, and asks users to give credit.

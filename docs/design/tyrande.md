@@ -2,9 +2,9 @@
 
 Tyrande is an aerial rushdown archer. Her arrows open offence rather than
 zone: they are fast, short-lived and barely stagger, so the foe holds shield
-while she closes in the air. Tom asked for her on Retera's dismounted model
-(2026-10-28); her spec is the Tyrande section of
-smashcraft:docs/design/roster-next.md. All combat values are original,
+while she closes in the air. Tom asked for her (2026-10-28) and moved
+her onto johnwar's Re-Classic dismounted model (2026-10-29); her spec is the
+Tyrande section of smashcraft:docs/design/roster-next.md. All combat values are original,
 provisional Smashcraft tuning. The Melee anchor is Falco's shape (a fast
 faller whose lasers push into offence, with a reflector), not his numbers.
 
@@ -21,26 +21,36 @@ faller whose lasers push into offence, with a reflector), not his numbers.
 
 ## Body and model
 
-- **Model.** [Tyrande Dismounted SD by Retera](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/)
-  (Hive Workshop, open source), imported as
-  `war3mapImported\TyrandeDismountedSD.mdx` from the `imported-models` input.
-  It draws the stock `PriestessOfTheMoon` and `HeroRanger` textures. Its bones
-  are biped-named and match the canonical rig like Sylvanas's: the bow is
-  `Cylinder02` under `Bone_Hand_L`, and there is no right-hand bone. It has 13
-  stock sequences (four stands, Stand Ready, Stand Victory, Stand Hit, Walk,
-  two attacks, Spell, Death, Dissipate) and no portrait, so her select and HUD
+- **Model.** The dismounted body of [Tyrande Whisperwind (Re-Classic Pack) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
+  (Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas
+  models and kangyun's Tyrande, imported as
+  `war3mapImported\TyrandeDismountedV2.mdx` from the `imported-models` input.
+  Tom chose it over Retera's 287-polygon Tyrande Dismounted SD, which he judged
+  too low in quality (2026-10-29). It has 5,181 polygons and draws only Classic
+  textures (`PriestessOfTheMoon`, `Shandris`, `UndeadArthas`, `HeroLich`,
+  `Sentinel` and stock glow and crystal textures). Its bones are biped-named
+  and match the canonical rig like Sylvanas's: the bow is `Cylinder02` under
+  `Bone_Hand_L`, and there is no right-hand bone. It has 13 stock sequences
+  (four stands, Stand Ready, Stand Victory, Stand Hit, Walk, two attacks,
+  Spell, Death, Dissipate) and four portrait sequences; her select and HUD
   busts come from the fighter-portrait renderer and her command icon is
-  `BTNPriestessOfTheMoon`.
+  `BTNPriestessOfTheMoon`. The pack's `TyrandeDismountedAV2.mdx` adds a
+  shoulder-to-shin team-colour cape on two bone chains her clips do not
+  drive, so it would hang rigid through her kicks; we use V2. The published
+  copy sets the static alpha of four geoset animations that also carry an
+  alpha track to 1.0, the value the pinned MDX codec writes, so the source
+  round-trips losslessly.
 - **Clips.** The map imports her authored copy from her `hero-models` shard:
-  smashcraft:tools/animations/tyrande-clips.ts keeps the 13 stock sequences and
+  smashcraft:tools/animations/tyrande-clips.ts keeps the 17 stock sequences and
   appends 66 clips timed to her frame data (bow strikes; kicks for down tilt,
   dash attack, down smash, neutral air, back air and down air; her four casts;
   movement, paired grabs and nine damage reactions). Its motion helper parents
   every root node, so the arrow her stock victory looses no longer counts as a
   bobbing body root.
-- **Size.** Draw scale 1.0, about 128 units tall. Weight 84, the shared
+- **Size.** Draw scale 1.0, about 116 units tall to the top of her head. Weight 84, the shared
   reference fall (the roster's fastest), run 1.10 of the reference, hurt
-  capsule 0.90 of the reference width and 0.95 of its height. Her shield sits
+  capsule 0.90 of the reference width and 0.88 of its height, refit to the
+  Re-Classic body, whose head stands 0.93 times as high as Retera's did. Her shield sits
   at height 64 with radius 112.
 - **Voice.** The Priestess of the Moon's unit voice.
 

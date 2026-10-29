@@ -31,6 +31,7 @@ export interface BowRigFighter {
   readonly constant: string;
   readonly stockClips: readonly string[];
   readonly evidence: string;
+  readonly sidePlane?: true;
 }
 
 export const phase = (at: number, pose: Gesture = {}): Phase => ({ at, pose });
@@ -85,12 +86,13 @@ export class ClipBook {
     paired("throwDown", held, { ...held, chest: -22, grip: -140, knee: 15 }, { ...held, chest: 58, grip: -45, bow: 25, knee: 48 });
     paired("victimThrowDown", captive, { ...captive, chest: -24, grip: -118, knee: 45 }, { ...captive, chest: 76, head: -8, grip: -40, bow: 36, knee: 70, twist: 25 });
   }
-  pain(lowBow = -70, lowWrist = 50): void {
+  pain(lowBow = -70, lowWrist = 50, steadyTilt?: readonly [number, number, number]): void {
     for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; strength++) {
       const gain = PAIN_GAIN[strength]!, stretch = HIGH_STRETCH[strength]!;
-      const g: Gesture = height === 0 ? { knee: 100 * gain, shin: 55 * gain, hip: 20 * gain, tuck: 0.16 * gain, chest: 12 * gain, head: -20 * gain, lean: 14 * gain, bow: lowBow * gain, wrist: lowWrist, grip: -70 * gain, elbow: 20 }
+      const swung: Gesture = height === 0 ? { knee: 100 * gain, shin: 55 * gain, hip: 20 * gain, tuck: 0.16 * gain, chest: 12 * gain, head: -20 * gain, lean: 14 * gain, bow: lowBow * gain, wrist: lowWrist, grip: -70 * gain, elbow: 20 }
         : height === 1 ? { chest: 50 * gain, head: 28 * gain, twist: 28 * gain, bow: 35 * gain, wrist: 40, grip: 55 * gain, elbow: 55 * gain, knee: 24 * gain, lean: 6 * gain }
         : { hip: -22 * stretch, chest: -25 * stretch, head: -40 * stretch, lean: -6 * stretch, knee: -10 * stretch, bow: -70 * stretch, wrist: -45, grip: -110 * stretch, elbow: 15 * stretch };
+      const g: Gesture = steadyTilt ? { ...swung, wrist: steadyTilt[height]! - (swung.lean ?? 0) - (swung.chest ?? 0) - (swung.bow ?? 0) - (swung.elbow ?? 0) } : swung;
       this.add(`pain${height}${strength}`, 24, [phase(0, g), phase(3, g), phase(12, Object.fromEntries(Object.entries(g).map(([k,v]) => [k,v * 0.85]))), phase(24, Object.fromEntries(Object.entries(g).map(([k,v]) => [k,v * 0.75])))], { air: true, pain: true });
     }
   }
@@ -102,13 +104,27 @@ function poseAt(action: Action, frame: number): Gesture {
   const t = a.at === b.at ? 0 : (frame - a.at) / (b.at - a.at);
   return Object.fromEntries([...new Set([...Object.keys(a.pose), ...Object.keys(b.pose)])].map(k => [k, (a.pose[k as keyof Gesture] ?? 0) * (1-t) + (b.pose[k as keyof Gesture] ?? 0) * t]));
 }
-function rotate(q: Float32Array | Int32Array, pitch: number, yaw = 0): Float32Array<ArrayBuffer> {
-  const y = pitch * Math.PI / 360, z = yaw * Math.PI / 360;
-  const a = [-Math.sin(y)*Math.sin(z), Math.sin(y)*Math.cos(z), Math.cos(y)*Math.sin(z), Math.cos(y)*Math.cos(z)];
+type Quat = readonly [number, number, number, number];
+type Vec3 = readonly [number, number, number];
+type Axes = ReadonlyMap<string, readonly [Vec3, Vec3]>;
+const multiply = ([ax, ay, az, aw]: Quat, [bx, by, bz, bw]: Quat): Quat =>
+  [aw*bx+ax*bw+ay*bz-az*by, aw*by-ax*bz+ay*bw+az*bx, aw*bz+ax*by-ay*bx+az*bw, aw*bw-ax*bx-ay*by-az*bz];
+const about = ([x, y, z]: Vec3, degrees: number): Quat => { const h = degrees * Math.PI / 360, s = Math.sin(h); return [x*s, y*s, z*s, Math.cos(h)]; };
+const unrotate = ([x, y, z, w]: Quat, v: Vec3): Vec3 => { const [rx, ry, rz] = multiply(multiply([-x, -y, -z, w], [...v, 0]), [x, y, z, w]); return [rx, ry, rz]; };
+function rotate(q: Float32Array | Int32Array, pitch: number, yaw = 0, [side, up]: readonly [Vec3, Vec3] = [[0, 1, 0], [0, 0, 1]]): Float32Array<ArrayBuffer> {
   const [x=0,v=0,w=0,s=1] = q;
-  const out = new Float32Array([a[3]!*x+a[0]!*s+a[1]!*w-a[2]!*v,a[3]!*v-a[0]!*w+a[1]!*s+a[2]!*x,a[3]!*w+a[0]!*v-a[1]!*x+a[2]!*s,a[3]!*s-a[0]!*x-a[1]!*v-a[2]!*w]);
+  const out = new Float32Array(multiply(multiply(about(up, yaw), about(side, pitch)), [x, v, w, s]));
   const norm = Math.hypot(...out); for (let i=0;i<4;i++) out[i] = out[i]! / norm;
   return out;
+}
+function sideAxes(model: mdx.Model, stand: mdx.Sequence): Axes {
+  const rest = (node: mdx.Node): Quat => {
+    const track = node.Rotation as mdx.AnimVector | undefined, key = track && !onGlobalClock(track) ? track.Keys.find(k => k.Frame >= stand.Interval[0]! && k.Frame <= stand.Interval[1]!) : undefined;
+    const [x = 0, y = 0, z = 0, w = 1] = key ? Array.from(key.Vector) : [];
+    return [x, y, z, w];
+  };
+  const world = (id: number | null | undefined): Quat => { const node = id == null ? undefined : model.Nodes[id]; return node ? multiply(world(node.Parent), rest(node)) : [0, 0, 0, 1]; };
+  return new Map([...model.Bones, ...model.Helpers].map(node => { const parent = world(node.Parent); return [node.Name, [unrotate(parent, [0, 1, 0]), unrotate(parent, [0, 0, 1])] as const]; }));
 }
 const JOINTS: Readonly<Record<string, (g: Gesture) => [number, number]>> = {
   Bone_Chest: g => [g.chest ?? 0, g.twist ?? 0],
@@ -138,6 +154,7 @@ interface Session {
   readonly source: mdx.Model;
   readonly model: mdx.Model;
   readonly stand: mdx.Sequence;
+  readonly axes: Axes | undefined;
 }
 
 const keyAt = (track: mdx.AnimVector, Frame: number) => { const key = track.Keys.find(k => k.Frame === Frame); ensure(key, `missing key at ${Frame}`); return key!; };
@@ -190,7 +207,7 @@ function rekeyInPlace(s: Session, motion: mdx.Helper, action: Action): readonly 
     if (node.Name.endsWith(" Motion")) return;
     const first = track.Keys.find(k => k.Frame >= s.stand.Interval[0]! && k.Frame <= s.stand.Interval[1]!); if (!first) return;
     for (let f = 0; f <= action.frames; f++) {
-      const [pitch, yaw] = joint(node.Name, poseAt(action, f)), key = keyAt(track, frameAt(f)), Vector = rotate(first.Vector, pitch, yaw);
+      const [pitch, yaw] = joint(node.Name, poseAt(action, f)), key = keyAt(track, frameAt(f)), Vector = rotate(first.Vector, pitch, yaw, s.axes?.get(node.Name));
       key.Vector = Vector; if (key.InTan) key.InTan = Vector.slice(); if (key.OutTan) key.OutTan = Vector.slice();
     }
   });
@@ -257,7 +274,7 @@ function appendAction(s: Session, helper: mdx.Helper, original: ReadonlyMap<stri
     const node=match?s.source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
     for(let f=0;f<=last;f++) {
       const [pitch,yaw]=node?joint(node.Name,poseAt(action,f)):[0,0];
-      const Vector=match?rotate(first.Vector,pitch,yaw):first.Vector.slice();
+      const Vector=match?rotate(first.Vector,pitch,yaw,node && s.axes?.get(node.Name)):first.Vector.slice();
       track.Keys.push({...first,Frame:Math.round(start+f*(end-start)/action.frames),Vector,
         ...(first.InTan?{InTan:Vector.slice()}:{}),...(first.OutTan?{OutTan:Vector.slice()}: {})});
     }
@@ -403,7 +420,7 @@ export async function authorBowRigClips(fighter: BowRigFighter, actions: readonl
   ensure(inPlace ? source.Sequences.some(seq => seq.Name === `${label} pain00`) : source.Sequences.length === fighter.stockSequences, inPlace ? `Use the shipped ${label} model` : `Use the unmodified stock ${label} model`);
   const model = structuredClone(source), stand = source.Sequences[fighter.standIndex];
   ensure(stand?.Name === "Stand Ready", `${label} stock sequence order changed`);
-  const session: Session = { fighter, actions, output: output!, input: input!, project, originalBytes, source, model, stand: stand! };
+  const session: Session = { fighter, actions, output: output!, input: input!, project, originalBytes, source, model, stand: stand!, axes: fighter.sidePlane ? sideAxes(source, stand!) : undefined };
   if (inPlace) await authorInPlace(session, inPlaceNames);
   else await authorFromStock(session, aliases);
 }

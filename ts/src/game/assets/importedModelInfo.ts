@@ -31,11 +31,11 @@ export const MURLOC_SWAMP_MIST_MODEL = "war3mapImported\\MurlocSwampMist.mdx";
 
 export const SCOURGE_WALL_MODEL = "war3mapImported\\UndeadWalls.mdx";
 
-export const TYRANDE_MODEL = "war3mapImported\\TyrandeDismountedSD.mdx";
+export const TYRANDE_MODEL = "war3mapImported\\TyrandeDismountedV2.mdx";
 
 export const TYRANDE_ICON = "ReplaceableTextures\\CommandButtons\\BTNPriestessOfTheMoon.blp";
 
-export const TYRANDE_STOCK_SCALE = { unit: "TyrandeDismountedSD", scale: 1.0 } as const;
+export const TYRANDE_STOCK_SCALE = { unit: "TyrandeDismountedV2", scale: 1.0 } as const;
 
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
@@ -52,5 +52,5 @@ export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly f
   { entry: LICH_KING_ICON, file: "BTNLichKing.blp" },
   { entry: "ReplaceableTextures\\CommandButtonsDisabled\\DISBTNLichKing.blp", file: "DISBTNLichKing.blp" },
   { entry: "ReplaceableTextures\\SSCscorescreen-hero-lichking.blp", file: "SSCscorescreen-hero-lichking.blp" },
-  { entry: TYRANDE_MODEL, file: "TyrandeDismountedSD.mdx", reanimated: true },
+  { entry: TYRANDE_MODEL, file: "TyrandeDismountedV2.mdx", reanimated: true },
 ];

@@ -91,10 +91,10 @@ The Scourge wall behind Naxxramas is the
 (Hive Workshop), an original model tagged open source, used with credit to
 Kuzakani and Hive Workshop.
 
-Tyrande is [Tyrande Dismounted SD by Retera](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/)
-(Hive Workshop), open source, built in Retera Model Studio from Warcraft III's
-own textures and reanimated by us as the author allows, with credit to Retera
-and Hive Workshop.
+Tyrande is [Tyrande Whisperwind (Re-Classic) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
+(Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas
+models and kangyun's Tyrande, used with kangyun's permission, reanimated for
+Smashcraft and used with credit to every author and Hive Workshop.
 
 ## License
 

@@ -38,7 +38,7 @@ Sequence and bone lists come from each file's `SEQS` and `BONE` chunks.
 | Lady Vashj | `units\naga\LadyVashj\LadyVashj.mdl` (portrait `LadyVashj_portrait`); byte-identical to `HeroNagaSeaWitch` | Naga: five tail bones and no legs, four arms, `Bow`, `Arrow`, two head snakes | Stand, Walk, Stand Ready, Attack, Spell, Death, and swim variants of each |
 | Archimonde | `units\demon\Warlock\Warlock.mdl` (portrait `Warlock_portrait`), the model Classic mode's Archimonde boss already draws at 2.6× | Biped with a four-bone tail and cape, 47 bones | Stand ×2, Walk, Attack ×2, Spell, Spell Slam, Death |
 | the Butcher | `units\undead\Abomination\Abomination.mdl` (portrait `Abomination_portrait`) | 36 bones. Only `Leg_L`, `Leg_R`, `Head` and the two `Chain` bones are named; the arms, cleaver and hook sit on `Mesh*` and `Object*` nodes that need mapping by hand | Stand ×3, Walk, Attack ×2, Stand Channel, Death, Decay |
-| Tyrande | Hive: `TyrandeDismountedSD.mdx` (below). Stock Tyrande is the mounted `HeroMoonPriestess`; there is no stock `units\nightelf\Tyrande` model | Read on download (H1 intake below): night-elf biped, 76 nodes and 58 bones; named `Bone_Root`, `Pelvis`, `Chest`, `Head`, both arm pairs, `Hand_L`, both leg chains and feet. No `Bone_Hand_R`: the bow hand and bow sit on `Object*` and `Mesh*` nodes, with `Arrow` and `Arrow01` nodes | Stand, Stand - 2, Stand - 3, Stand - 5, Stand Ready, Stand Victory, Stand Hit, Walk, Attack - 1, Attack - 2, Spell, Death, Dissipate |
+| Tyrande | Hive: `TyrandeDismountedV2.mdx` (below), johnwar's Re-Classic dismounted body, replacing Retera's first model (#712). Stock Tyrande is the mounted `HeroMoonPriestess`; there is no stock `units\nightelf\Tyrande` model | Read on download (Re-Classic intake below): night-elf biped, 62 nodes; `Bone_Root`, `Bone_Pelvis`, `Bone_Chest`, `Bone_Head`, both arm chains, `Bone_Hand_L`, both leg chains and feet. No `Bone_Hand_R`: the bow is `Cylinder02` under `Bone_Hand_L`, with `Arrow` and `Arrow01` nodes | Stand - 1, Stand - 2, Stand - 3, Stand - 5, Death, Attack - 1, Attack - 2, Spell, Walk, Dissipate, Stand Hit, Stand Victory, Stand Ready, and four Portrait sequences |
 | Thrall | Hive: `WarchiefThrallDismountedV2.mdx` (below), replacing the mounted `units\orc\Thrall\Thrall.mdl` | Built on a Grom Hellscream base, and confirmed a full biped on download (H1 intake below): 73 nodes and 45 bones, with `Bone_Root`, `Pelvis`, `Chest`, `Head`, both arm chains with hands, both leg chains with feet, `Bone_Sword` and `axe`, plus portrait face nodes, attachment refs (`Weapon Ref`, `Hand Right Ref` and the rest) and two collision spheres | Stand - 1..3, Stand Alternate - 1..3, Stand Ready, Stand Ready Alternate, Walk, Attack - 1..3, Attack Alternate - 1..4, Attack Slam Alternate, Spell, Spell Second, Spell Slam, Spell Throw, Stand Channel, Spell Channel, Death, Dissipate, and six Portrait sequences. No Stand Victory or Stand Hit |
 
 Command icons resolve as `.dds` in Classic storage: `BTNHeroPaladin`
@@ -73,12 +73,13 @@ a decision from Tom.
   - Conditions: the page states no usage terms, no edit ban and no credit requirement, and johnwar's own models-discussion thread (334708) lists credits but no terms. We follow Hive's custom and credit every named author.
   - File: `WarchiefThrallDismountedV2.mdx`, the "Warchief Thrall" added in update 5, 2,006 polygons, with its weapon attachment adjusted in update 6. The bundle also holds `ThrallDismountedV2.mdx`, an alternate body, the Tauer-animation version, Nazgrel and two Doomhammer missiles, all unused.
   - Credit line: "Warchief Thrall Dismounted by johnwar (Hive Workshop), built on Ujimasa Hojo's Grom Hellscream."
-- **Tyrande Dismounted SD**, https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/
-  - Author: Retera, built in Retera Model Studio. Approved and marked useful / simple ("may contain minor bugs"). Created 11 November 2020.
-  - Terms: tagged Open Source. The author writes "I am totally okay with you modifying it in any way that you like", so reanimating it is allowed.
-  - File: `TyrandeDismountedSD.mdx`, 287 polygons. It includes no texture of its own, so it draws the stock textures. The author notes it has no portrait, and a reply notes it has no channel animation.
-  - Thread note: one reply compared it with another author's dismounted Tyrande. A Hive regular answered that Retera's reputation makes theft unlikely and that the models differ. We use Retera's file as published.
-  - Credit line: "Tyrande Dismounted SD by Retera (Hive Workshop), open source."
+- **Tyrande Whisperwind (Re-Classic Pack)**, https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/
+  - Replaces Retera's 287-polygon Tyrande Dismounted SD, which Tyrande first shipped on, after Tom judged it too low in quality (2026-10-29, #712).
+  - Author: johnwar. Approved and marked recommended by the moderator ILH ("Changes made. Works in-game. Approved!"). Created 29 April 2023, updated 21 June 2025.
+  - Credits on the page: "Archer, Dark Ranger, Sylvanas Windrunner, and Derivatives by Ujimasa Hojo" and "Tyrande Whisperwind (Version#Heavy Mount) by kangyun"; in reply #24 johnwar posts kangyun's permission after a moderator asks for it.
+  - Conditions: the page states no usage terms, no edit ban and no credit requirement. We follow Hive's custom and credit every named author.
+  - File: `TyrandeDismountedV2.mdx`, 5,181 polygons. The pack also holds `TyrandeDismountedAV2.mdx` (the same body with a team-colour cape), the mounted `TyrandeV2.mdx` and `TyrandeAV2.mdx`, two portraits and two arrow missiles, all unused.
+  - Credit line: "Tyrande Whisperwind (Re-Classic) by johnwar (Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission."
 
 ### H1 intake (29 October 2026)
 
@@ -92,8 +93,25 @@ lanes still register them in `IMPORTED_MODEL_FILES` and fetch the family to
 other hosts with `bun wisp inputs fetch gex45`.
 
 - `WarchiefThrallDismountedV2.mdx`, 199,216 bytes, sha256 `50255045638034e21314f85ce94d41d552c1a7f6ca3f6a74ba9a664d640f83b9`; textures `Units\Orc\Thrall\Thrall.blp` plus replaceable team colour and glow, and `Textures\RibbonBlur1.blp`; 19 geosets.
-- `TyrandeDismountedSD.mdx`, 155,793 bytes, sha256 `53780a2d190fc8bdd94b7fe9993c2e33db9fa463226e9186eb6aeb6d692a1388`; textures stock `PriestessOfTheMoon.blp` and `Textures\HeroRanger.blp` plus replaceable team colour; 8 geosets.
+- Retera's Tyrande model, since replaced (below).
 - The unused files in the Thrall bundle were not published.
+
+### Tyrande Re-Classic intake (29 October 2026, #712)
+
+The pack was downloaded the same way, through a plain headful Chrome on gex45's
+private desktop past Hive's Cloudflare check. `TyrandeDismountedV2.mdx` from
+johnwar's zip is 269,601 bytes, sha256
+`e09008929cdf3dee57d81d5a5f9ed152c7a783b5a1611462dfffcfae9b04e4a3`. The
+published copy, sha256
+`c6efa436597655f8b54ee2db6b860471c16a6ab8abc2587c553ee150d9bde19c`, sets the
+static alpha of four geoset animations that also carry an alpha track (0.4,
+0.94, 0.4 and 0.95 on geosets 5, 8, 11 and 21) to 1.0, the value the pinned
+`war3-model` codec writes, so the source round-trips losslessly as the clip
+generators require. It replaces Retera's file in the `imported-models` family.
+
+- Nodes: the same biped names as Retera's model (`Bone_Root`, `Bone_Pelvis`, `Bone_Chest`, `Bone_Head`, both arm chains, `Bone_Hand_L`, both leg chains and feet), the bow `Cylinder02` with its string and glow planes under `Bone_Hand_L`, no `Bone_Hand_R`, `Arrow` and `Arrow01`, attachment refs and one collision shape; 62 nodes.
+- Sequences: Stand - 1, Stand - 2, Stand - 3, Stand - 5, Death, Attack - 1, Attack - 2, Spell, Walk, Dissipate, Stand Hit, Stand Victory, Stand Ready, then Portrait - 1, Portrait - 2, Portrait Talk - 1 and Portrait Talk - 2.
+- Textures, each found in the Classic storage (build 24371) with the repo's CASC extractor: `PriestessOfTheMoon`, `Shandris`, `UndeadArthas`, `blue_glow2`, `HeroLich`, `CrystalSheild` (two paths), `AnyHandleCopperMetal`, `White_64_Foam1` and `Sentinel`, plus replaceable team colour and glow; 26 geosets.
 - A headless check reads both from the store with the repo's `war3-model` parser and lists each file's sequences, nodes and textures (`parseMDX`, `Sequences` and `Nodes`).
 
 Both credits go into roster.md's Credits section, README's Credits and the

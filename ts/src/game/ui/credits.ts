@@ -6,7 +6,7 @@ export const CREDITS_MARKDOWN: readonly string[] = [
   `Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](${communityUrl(GITHUB_PAGE)}) (MIT License).`,
   "The Lich King model by [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/)).",
   "Thrall is [Warchief Thrall Dismounted](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Grom Hellscream; we reanimated every move on it.",
-  "Tyrande Dismounted SD by Retera, from [Hive Workshop](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/), open source, reanimated for Smashcraft as the author allows.",
+  "Tyrande is [Tyrande Whisperwind (Re-Classic)](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission; we reanimated every move on it.",
   "The menu cursors, wordmark and stage-select art are Smashcraft originals; the pinching-hand cursor was made with AI assistance.",
   "Music: Before the First Strike by Tom Passarelli, made with Google Lyria.",
   "Murloc sound from World of Warcraft, Blizzard Entertainment.",
