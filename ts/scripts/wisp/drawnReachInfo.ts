@@ -61,7 +61,7 @@ export const DRAWN_REACH: readonly { readonly character: number; readonly style:
   { character: 27, style: 10, model: "units\\human\\Uther\\Uther.mdl", clip: 17, swing: 93.6, peakFrame: 7, firstActive: 7, lastActive: 9, forward: 112.7 },
   { character: 27, style: 7, model: "units\\human\\Uther\\Uther.mdl", clip: 18, swing: 86.1, peakFrame: 7, firstActive: 6, lastActive: 10, forward: 68.7 },
   { character: 27, style: 8, model: "units\\human\\Uther\\Uther.mdl", clip: 19, swing: 75.1, peakFrame: 6, firstActive: 6, lastActive: 8, forward: 107.2 },
-  { character: 27, style: 19, model: "units\\human\\Uther\\Uther.mdl", clip: 20, swing: 104.5, peakFrame: 7, firstActive: 9, lastActive: 13, forward: 113.1 },
+  { character: 27, style: 19, model: "units\\human\\Uther\\Uther.mdl", clip: 20, swing: 102.0, peakFrame: 6, firstActive: 9, lastActive: 13, forward: 113.1 },
   { character: 8, style: 0, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", clip: 10, swing: 32.0, peakFrame: 3, firstActive: 3, lastActive: 5, forward: 93.6 },
   { character: 8, style: 20, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", clip: 57, swing: 49.3, peakFrame: 3, firstActive: 3, lastActive: 4, forward: 99.3 },
   { character: 8, style: 21, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", clip: 58, swing: 42.0, peakFrame: 5, firstActive: 5, lastActive: 7, forward: 86.1 },

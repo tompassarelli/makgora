@@ -359,7 +359,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.uther]: {
     neutral: { spell: "Holy Light", startup: timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), active: cue("Abilities\\Spells\\Human\\Heal\\HealTarget.mdx", "ahead", f32(0.7)) },
-    side: { spell: "Devotion Aura", startup: cue("Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", "feet", f32(0.7)), active: cue("Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", "feet", f32(0.7)) },
+    side: { spell: "Devotion Aura", startup: cue("Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", "feet", f32(1.6)), active: cue("Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", "feet", f32(1.6)) },
     up: { spell: "Hammer of the Righteous", startup: timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.4)), "birth", 0.0), active: cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.6)) },
     down: { spell: "Divine Shield", startup: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)), active: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)) },
   },

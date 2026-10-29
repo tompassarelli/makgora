@@ -41,7 +41,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const original = heroDefinition(character) === undefined;
   const normals = Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined
     || (original && code !== AttackStyle.grab && code !== AttackStyle.dashAttack));
-  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), gap: reachGap(tuning.moves?.normals[code]), lift: isAerialAttack(code) ? reachLift(tuning.moves?.normals[code]) : undefined }));
+  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? { gap: aerialGap(tuning.moves?.normals[code]), lift: aerialLift(tuning.moves?.normals[code]) } : { gap: reachGap(tuning.moves?.normals[code]) }) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : chargedShowcase(slot, code, special);
@@ -86,9 +86,18 @@ function regionGap(regions: readonly MoveRegion[], travel: number): number | und
   return reach.front ? Math.floor(travel + reach.region.hit.maxX * 0.75) : Math.floor(reach.region.hit.minX * 0.75);
 }
 
-function reachLift(move: Readonly<AuthoredMove> | undefined): number | undefined {
-  const reach = move === undefined ? undefined : furthest(move.regions);
-  return reach === undefined ? undefined : Math.floor((reach.region.hit.minZ + reach.region.hit.maxZ) / 2 - SHOWCASE_DUMMY_MIDDLE);
+function aerialContact(move: Readonly<AuthoredMove> | undefined): MoveRegion | undefined {
+  return move?.regions.reduce<MoveRegion | undefined>((last, region) => last === undefined || region.lastFrame > last.lastFrame ? region : last, undefined);
+}
+
+function aerialGap(move: Readonly<AuthoredMove> | undefined): number | undefined {
+  const region = aerialContact(move);
+  return region === undefined ? undefined : Math.floor((region.hit.minX + region.hit.maxX) * 0.5);
+}
+
+function aerialLift(move: Readonly<AuthoredMove> | undefined): number | undefined {
+  const region = aerialContact(move);
+  return region === undefined ? undefined : Math.floor((region.hit.minZ + region.hit.maxZ) / 2 - SHOWCASE_DUMMY_MIDDLE);
 }
 
 function specialGap(special: Readonly<AuthoredSpecial>): number | undefined {

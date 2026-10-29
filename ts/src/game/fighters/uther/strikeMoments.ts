@@ -18,9 +18,9 @@ export const utherStrikeMoments = {
   15: { clip: 27, seconds: f32(0.133), end: f32(0.550) },
   16: { clip: 28, seconds: f32(0.250), end: f32(0.817) },
   17: { clip: 50, seconds: f32(0.267), end: f32(0.817) },
-  19: { clip: 20, seconds: f32(0.100), end: f32(0.667) },
+  19: { clip: 20, seconds: f32(0.083), end: f32(0.667) },
   20: { clip: 14, seconds: f32(0.117), end: f32(0.417) },
   100: { clip: 77, seconds: f32(0.500), end: f32(0.733) },
-  101: { clip: 79, seconds: f32(0.267), end: f32(0.667) },
+  101: { clip: 79, seconds: f32(0.183), end: f32(0.667) },
   102: { clip: 81, seconds: f32(0.150), end: f32(0.450) },
 };
