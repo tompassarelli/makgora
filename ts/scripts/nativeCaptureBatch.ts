@@ -1,12 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import { Effect, Exit, Fiber, Schema, Scope } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
 import { attachedPoolReady, attachExistingPool, pairClientCount } from "./wisp/nativePool";
-import { alive, poolHolder } from "wisp/scripts/wisp/lan/pool";
+import { alive, pairEntryFile, poolHolder } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "./hostPoll";
 import { pairAgentStatus } from "./pairAgentStatus";
 
@@ -22,8 +21,12 @@ const option = (args: readonly string[], name: string) => {
 const rowManifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.String, sourceRevision: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), silhouette: Schema.optional(Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite })) })) }));
 const planSchema = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), sourceRevision: Schema.String, rows: Schema.Array(Schema.Struct({ name: Schema.String, map: Schema.String, manifest: Schema.String, mapSha256: Schema.String, frames: Schema.Array(Schema.Finite) })) }));
 const checkpointSchema = Schema.Struct({ version: Schema.Literals([1]), mapSha256: Schema.String, sourceRevision: Schema.String, captures: Schema.Array(Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.String, file: Schema.String, width: Schema.Finite, height: Schema.Finite })) });
-const poolRecord = Schema.fromJsonString(Schema.Struct({ pairs: Schema.Array(Schema.Struct({ id: Schema.Int, runs: Schema.Struct({ a: Schema.String, b: Schema.optionalKey(Schema.String) }) })) }));
-const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
+const pairEntry = Schema.fromJsonString(Schema.Struct({ id: Schema.Int, runs: Schema.Struct({ a: Schema.String, b: Schema.optionalKey(Schema.String) }) }));
+
+export const pairDesktops = (text: string) => Schema.decodeEffect(pairEntry)(text).pipe(
+  Effect.map(entry => entry.runs.b === undefined ? [entry.runs.a] : [entry.runs.a, entry.runs.b]),
+  Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })),
+);
 const pairStatusSchema = Schema.Struct({
   network: Schema.optionalKey(Schema.Boolean),
   clients: Schema.Array(Schema.Struct({ name: Schema.String, pid: Schema.optionalKey(Schema.Finite) })),
@@ -85,11 +88,8 @@ const poolScope = (pair: number, desktop: string, capacity: string, solo: boolea
     return attachedPoolReady(status) ? status : undefined;
   }), { every: "5 seconds", within: "8 minutes", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} did not recover its running clients` })) });
   const tools = yield* resolveTools(["xdotool"]);
-  const poolText = yield* Effect.try({ try: () => readFileSync(join(lanState, "pool.json"), "utf8"), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
-  const record = yield* Schema.decodeEffect(poolRecord)(poolText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })));
-  const entry = record.pairs.find(entry => entry.id === pair);
-  if (entry === undefined) return yield* new CaptureBatchFailure({ problem: "pair missing from pool.json" });
-  const desktops = entry.runs.b === undefined ? [entry.runs.a] : [entry.runs.a, entry.runs.b];
+  const entryText = yield* Effect.try({ try: () => readFileSync(pairEntryFile(pair), "utf8"), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
+  const desktops = yield* pairDesktops(entryText);
   yield* pollUntil(Effect.gen(function*() {
     if (child !== undefined && child.exitCode !== null) return yield* new CaptureBatchFailure({ problem: `pair ${pair} pool exited` });
     const checks = yield* Effect.forEach(desktops, run => clientWindowExists(tools.xdotool ?? "xdotool", run), { concurrency: "unbounded" });
