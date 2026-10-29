@@ -20,10 +20,11 @@ const fail = (problem: string) => new CaptureQueueFailure({ problem });
 const attempt = <A>(problem: string, run: () => A) => Effect.try({ try: run, catch: cause => fail(`${problem}: ${cause instanceof Error ? cause.message : String(cause)}`) });
 const seconds = (since: number) => Math.round((performance.now() - since) / 100) / 10;
 const HOLD_TICKS = 30;
+const captureMinutes = (scripts: number) => Math.ceil((60 + scripts * 11) / 60);
 const TILE_HEIGHT = 270;
 const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
 
-interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly minutes: number; readonly remote?: RemoteHost }
+interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly remote?: RemoteHost }
 interface Group { commit: string; readonly jobs: Job[] }
 
 const logTo = (file: string) => (row: Record<string, unknown>) => Effect.sync(() => {
@@ -200,8 +201,8 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     yield* attempt("write the plan", () => writeAtomic(plan, `${JSON.stringify({ version: 1, sourceRevision: identity.sourceRevision, rows: [{ name: `g${index}`, map, manifest, mapSha256: identity.mapSha256, frames: identity.fixtures.flatMap(fixture => fixture.frames) }] })}\n`));
     yield* poolReady;
     const captured = performance.now();
-    const ran = yield* (settings.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(settings.minutes)], tsDirectory, logFile)
-      : captureThere(settings, settings.remote, { batch, index, directory, logFile, manifest, plan, log })).pipe(Effect.result);
+    const ran = yield* (settings.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(captureMinutes(identity.fixtures.length))], tsDirectory, logFile)
+      : captureThere(settings, settings.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) })).pipe(Effect.result);
     yield* log({ step: "capture", group: index, host: settings.remote?.name ?? hostname(), seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
     const checkpoint = join(frames, "checkpoint.json");
@@ -223,7 +224,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
 });
 
 /** Runs a group's capture batch on the pair's host: its stored map goes into that host's map store under the same key, the batch runs from that host's main checkout and its frames come back to `native-INDEX`. */
-const captureThere = (settings: Settings, host: RemoteHost, group: { readonly batch: string; readonly index: number; readonly directory: string; readonly logFile: string; readonly manifest: string; readonly plan: string; readonly log: ReturnType<typeof logTo> }) => Effect.gen(function*() {
+const captureThere = (settings: Settings, host: RemoteHost, group: { readonly batch: string; readonly index: number; readonly directory: string; readonly logFile: string; readonly manifest: string; readonly plan: string; readonly log: ReturnType<typeof logTo>; readonly minutes: number }) => Effect.gen(function*() {
   const key = yield* attempt("read the map build key", () => builtMapKey(group.logFile));
   if (key === undefined) return yield* fail(`the map build of group ${group.index} logged no stored map build; see ${group.logFile}`);
   const there = join(host.home, ".local/state/smashcraft/capture-queue/remote", `${group.batch}-g${group.index}`);
@@ -238,7 +239,7 @@ const captureThere = (settings: Settings, host: RemoteHost, group: { readonly ba
   const ran = yield* runThere(host, join(host.home, "code/smashcraft/main/ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),
     "--desktop", join(north, "private-desktop-development/scripts/private-desktop.sh"), "--capacity", join(north, "machine-capacity/scripts/machine-capacity.mjs"),
     "--clients-file", join(host.home, ".local/state/wisp/lan/clients.json"), "--client", settings.client,
-    "--install", join(host.home, `.local/share/wisp/lan/clients/${settings.client}/pfx/drive_c/Program Files (x86)/Warcraft III`), "--minutes", String(settings.minutes)], group.logFile).pipe(Effect.result);
+    "--install", join(host.home, `.local/share/wisp/lan/clients/${settings.client}/pfx/drive_c/Program Files (x86)/Warcraft III`), "--minutes", String(group.minutes)], group.logFile).pipe(Effect.result);
   const fetched = fetchFolder(host, join(there, "native"), join(group.directory, `native-${group.index}`), group.logFile);
   if (ran._tag === "Success") return yield* fetched;
   yield* Effect.ignore(fetched);
@@ -269,12 +270,11 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, jobs: readonly Job[], ens
 
 const settingsOf = (args: readonly string[]): Settings | undefined => {
   const pair = Number(option(args, "--pair"));
-  const minutes = Number(option(args, "--minutes") ?? "4");
-  if (!Number.isInteger(pair) || pair < 0 || !Number.isFinite(minutes) || minutes < 1 || minutes > 5) return undefined;
+  if (!Number.isInteger(pair) || pair < 0) return undefined;
   const north = join(homedir(), "code/north/main/harness/skills");
   const client = option(args, "--client") ?? `lan${pair}a`;
   return {
-    pair, minutes, client,
+    pair, client,
     desktop: option(args, "--desktop") ?? join(north, "private-desktop-development/scripts/private-desktop.sh"),
     capacity: option(args, "--capacity") ?? join(north, "machine-capacity/scripts/machine-capacity.mjs"),
     clientsFile: option(args, "--clients-file") ?? join(lanState, "clients.json"),
@@ -312,7 +312,7 @@ const groupSettings = (settings: Settings, hosts: Hosts, owner: string) => Effec
   const slot = yield* leasePair(hosts, owner);
   const client = `lan${slot.pair}a`;
   const remote = slot.host === hostname() ? undefined : yield* remoteHost(slot.host);
-  return { pair: slot.pair, minutes: settings.minutes, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client, install: join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`), ...(remote === undefined ? {} : { remote }) } satisfies Settings;
+  return { pair: slot.pair, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client, install: join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`), ...(remote === undefined ? {} : { remote }) } satisfies Settings;
 });
 
 export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(function*() {
@@ -325,7 +325,7 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: yield* remoteHost(leased.host) };
   const once = args.includes("--once");
   const idleMinutes = Number(option(args, "--idle-minutes") ?? "30");
-  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--once] [--idle-minutes N] [--minutes 1..5] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
+  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--once] [--idle-minutes N] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
   yield* attempt("create the queue", () => mkdirSync(queueDirectory("batches"), { recursive: true }));
   const poolLog = join(queueDirectory("batches"), `pool-${settings.pair}.log`);
   let pool: Bun.Subprocess | undefined;
