@@ -2,8 +2,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Console, Effect, Exit, Option, Schema } from "effect";
-import { FarmFailure, currentRepo, dispatch, resolveRef, run, runTag, waitFor } from "wisp/scripts/wisp/farm";
-import { FULL_SUITE_VARIABLE, type Group, UNKNOWN_BASE, landingGroups } from "./landingChecks";
+import { FarmFailure, RunState, currentRepo, decoded, dispatch, resolveRef, run, runTag, waitFor } from "wisp/scripts/wisp/farm";
+import { FULL_SUITE_VARIABLE, GROUPS, type Group, UNKNOWN_BASE, landingGroups } from "./landingChecks";
 import { groupInputKey } from "./landingInputs";
 import { PREPUSH_CACHE, PrePushRefusal, type Check, checksFor, cueInputs, directoryCache, laptop, runChecks, strikeInputs } from "./prePush";
 
@@ -16,14 +16,45 @@ const needsPrivateStore = (check: Check) => check.privateStore === true
 /** The pre-push hook's checks the farm cannot run: the ones that read the private stores. */
 export const localChecks = (checks: readonly Check[]): Check[] => checks.filter(({ hosted, machineTool }) => !hosted && machineTool !== true);
 
+const WORKFLOW = "farm-test.yml";
+const POLL = "3 seconds";
+const PASSING = new Set(["success", "skipped"]);
+const RUN_URL = /\/actions\/runs\/(\d+)/;
+
+/** A landing's verdict from the check jobs alone, since the merge job only summarises them: failed once one fails, passed once all pass. */
+export function checksVerdict(state: RunState): "passed" | "failed" | "pending" {
+  const checks = state.jobs.filter(({ name }) => (GROUPS as readonly string[]).includes(name));
+  if (checks.some(({ status, conclusion }) => status === "completed" && !PASSING.has(conclusion))) return "failed";
+  if (checks.length === GROUPS.length && checks.every(({ status, conclusion }) => status === "completed" && PASSING.has(conclusion))) return "passed";
+  if (state.status === "completed") return state.conclusion === "success" ? "passed" : "failed";
+  return "pending";
+}
+
+const dispatchRun = (repo: string, inputs: Readonly<Record<string, string>> & { readonly tag: string }, workflowRef: string) => Effect.gen(function*() {
+  const printed = yield* run(["gh", "workflow", "run", WORKFLOW, "-R", repo, "--ref", workflowRef, ...Object.entries(inputs).flatMap(([name, value]) => ["-f", `${name}=${value}`])]);
+  const id = RUN_URL.exec(printed)?.[1];
+  if (id === undefined) return yield* dispatch(repo, WORKFLOW, inputs, workflowRef);
+  return { databaseId: Number(id), url: `https://github.com/${repo}/actions/runs/${id}` };
+});
+
+const awaitChecks = (repo: string, id: number) => Effect.gen(function*() {
+  for (;;) {
+    const verdict = checksVerdict(yield* decoded(RunState, yield* run(["gh", "run", "view", String(id), "-R", repo, "--json", "status,conclusion,jobs"])));
+    if (verdict !== "pending") return verdict;
+    yield* Effect.sleep(POLL);
+  }
+});
+
 const farmRun: FarmRunner = (head, base, groups, full) => Effect.scoped(Effect.gen(function*() {
   const repo = yield* currentRepo;
   const { ref, scratch } = yield* resolveRef(head, repo);
-  const found = yield* dispatch(repo, "farm-test.yml", { ref, base, checks: groups.join(","), ...(full ? { full: "1" } : {}), tag: runTag() }, scratch);
+  const found = yield* dispatchRun(repo, { ref, base, checks: groups.join(","), ...(full ? { full: "1" } : {}), tag: runTag() }, scratch ?? "main");
+  yield* Console.error(`landing farm: ${found.url}`);
   const started = performance.now();
+  const verdict = yield* awaitChecks(repo, found.databaseId);
+  const seconds = ((performance.now() - started) / 1000).toFixed(0);
+  if (verdict === "passed") return yield* Console.error(`landing farm: ${groups.join(", ")} passed on ${ref.slice(0, 12)} (${seconds} s): ${found.url}`);
   const state = yield* waitFor(repo, found.databaseId);
-  const minutes = ((performance.now() - started) / 60000).toFixed(1);
-  if (state.conclusion === "success") return yield* Console.error(`landing farm: ${groups.join(", ")} passed on ${ref.slice(0, 12)} (${minutes} min): ${found.url}`);
   const folder = mkdtempSync(join(tmpdir(), "landing-farm-"));
   const detail = yield* run(["gh", "run", "download", String(found.databaseId), "-R", repo, "-n", "farm-test-summary", "-D", folder]).pipe(
     Effect.flatMap(() => Schema.decodeEffect(Summary)(readFileSync(join(folder, "summary.json"), "utf8"))),

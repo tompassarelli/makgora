@@ -5,7 +5,7 @@ import { expect, test } from "bun:test";
 import { Effect } from "effect";
 import { GROUPS, type Group, landingGroups } from "../scripts/landingChecks";
 import { groupInputKey } from "../scripts/landingInputs";
-import { type FarmRunner, landOnFarm, localChecks } from "../scripts/landingFarm";
+import { type FarmRunner, checksVerdict, landOnFarm, localChecks } from "../scripts/landingFarm";
 import { checksFor } from "../scripts/prePush";
 import { directoryCache } from "../scripts/prePush";
 
@@ -48,4 +48,14 @@ test("a farm group is reused while the files its checks read are unchanged, howe
   expect(key("parity-0", listing("a", "s"))).not.toBe(key("parity-0", listing("a", "t")));
   expect(key("static", listing("a", "s"))).not.toBe(key("static", listing("b", "s")));
   expect(key("parity-0", listing("a", "s"))).not.toBe(key("parity-1", listing("a", "s")));
+});
+
+test("a landing passes once every check job passes, without the merge job, and fails on the first failing check job [k2 property]", () => {
+  const jobs = (done: number, last = "success") => GROUPS.map((name, index) => ({ name, status: index < done ? "completed" : "in_progress", conclusion: index < done ? (index === done - 1 ? last : "success") : "" }));
+  const state = (done: number, last?: string) => ({ status: "in_progress", conclusion: "", jobs: [{ name: "plan", status: "completed", conclusion: "success" }, ...jobs(done, last), { name: "merge", status: "queued", conclusion: "" }] });
+  expect(checksVerdict(state(GROUPS.length - 1))).toBe("pending");
+  expect(checksVerdict(state(GROUPS.length))).toBe("passed");
+  expect(checksVerdict(state(2, "failure"))).toBe("failed");
+  expect(checksVerdict(state(GROUPS.length, "skipped"))).toBe("passed");
+  expect(checksVerdict({ status: "completed", conclusion: "cancelled", jobs: [] })).toBe("failed");
 });

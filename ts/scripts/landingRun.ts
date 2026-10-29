@@ -30,15 +30,18 @@ const seconds = (value: number) => `${value.toFixed(1)} s`;
  * sharing outputs one after another), refusing on the first failure and stopping
  * the rest; an `alone` check runs by itself, since it edits the working tree.
  */
-export const runHere = (checks: readonly LandingCheck[]) => {
+const chainsOf = (checks: readonly LandingCheck[]) => {
   const chains = new Map<string, LandingCheck[]>();
   for (const check of checks) chains.set(check.outputs ?? check.name, [...(chains.get(check.outputs ?? check.name) ?? []), check]);
-  return Effect.forEach([...chains.values()], (chain) => Effect.forEach(chain, (check) => runCheck(check).pipe(
+  return [...chains.values()];
+};
+
+export const runHere = (checks: readonly LandingCheck[]) =>
+  Effect.forEach(chainsOf(checks), (chain) => Effect.forEach(chain, (check) => runCheck(check).pipe(
     Effect.tap(({ finished, seconds: took }) => finished.exitCode === 0
       ? Console.error(`landing check: ${check.name} passed (${seconds(took)})`)
       : Effect.fail(new CheckFailed({ check, finished, seconds: took }))),
   )), { concurrency: "unbounded", discard: true });
-};
 
 export function failureReport({ check, finished, seconds: took }: Ran): string {
   const tail = plain(outputOf(finished)).split("\n").filter((line) => line.trim() !== "").slice(-TAIL_LINES).join("\n");
@@ -47,20 +50,25 @@ export function failureReport({ check, finished, seconds: took }: Ran): string {
 
 const farmName = (check: LandingCheck, group: Group) => check.shardVariable === undefined ? check.name : `${check.name} ${check.farm.indexOf(group)}/${check.farm.length}`;
 
+const shardOf = (check: LandingCheck, group: Group) =>
+  check.shardVariable === undefined ? {} : { [check.shardVariable]: `${check.farm.indexOf(group)}/${check.farm.length}` };
+
 /**
- * One farm-test.yml job: its group's checks one after another, as main's CI log
- * groups, with the result rows and failing lines the merge job reads.
+ * One farm-test.yml job: its group's checks at once as the landing machine runs
+ * them (an `alone` check afterwards, by itself), each printed as its own log
+ * group, with the result rows and failing lines the merge job reads.
  */
 const runFarmGroup = (group: Group, changed: readonly string[]) => Effect.gen(function*() {
   const checks = groupChecks(group, changed);
   mkdirSync(join(ts, "build"), { recursive: true });
   appendFileSync(join(ts, "build/checks.tsv"), "");
+  const beside = yield* Effect.forEach(chainsOf(checks.filter(({ here }) => here !== "alone")),
+    (chain) => Effect.forEach(chain, (check) => runCheck(check, shardOf(check, group))), { concurrency: "unbounded" });
+  const alone = yield* Effect.forEach(checks.filter(({ here }) => here === "alone"), (check) => runCheck(check, shardOf(check, group)));
   let failed = false;
-  for (const check of checks) {
-    const name = farmName(check, group);
-    const shard = check.shardVariable === undefined ? {} : { [check.shardVariable]: `${check.farm.indexOf(group)}/${check.farm.length}` };
-    yield* Console.log(`::group::${name}`);
-    const ran = yield* runCheck(check, shard);
+  for (const ran of [...beside.flat(), ...alone]) {
+    const name = farmName(ran.check, group);
+    yield* Console.log(`::group::${name} (${seconds(ran.seconds)})`);
     yield* Console.log(outputOf(ran.finished));
     yield* Console.log("::endgroup::");
     const passed = ran.finished.exitCode === 0;
