@@ -323,7 +323,7 @@ jobs:
           out tips "${tips# }"
           if [ -z "$branches" ]; then out verdict none; exit 0; fi
           eval "$REPORTS_RUN"
-          if [ -z "$tested" ] && install_reports > ledger.log 2>&1 && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md; then
+          if install_reports > ledger.log 2>&1 && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md; then
             git commit -q -m "Regenerate the Melee parity page for $(echo $branches)" --trailer "Autoland-Reports: 1" -- docs/design/melee-parity.md
           fi
           sha=$(git rev-parse HEAD)
@@ -633,7 +633,9 @@ jobs:
               *) echo "main moved to ${main:0:10} on paths the train changes while it ran: its tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"; exit 0 ;;
             esac
             SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)
-            echo "main moved to ${main:0:10} only on paths the train doesn't change: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
+            eval "$REPORTS_RUN"
+            if (cd "$RUNNER_TEMP/past-main" && install_reports && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md && git commit -q -m "Regenerate the Melee parity page for ${branches[*]}" --trailer "Autoland-Reports: 1" -- docs/design/melee-parity.md) > page.log 2>&1; then SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD); fi
+            echo "main moved to ${main:0:10} only on paths the train doesn't change or generated records it regenerates or merges: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
           mkdir -p "$RUNNER_TEMP/autoland"
           cp ts/scripts/autoland.ts ts/scripts/autolandCore.ts "$RUNNER_TEMP/autoland/"

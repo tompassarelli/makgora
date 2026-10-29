@@ -204,20 +204,27 @@ export const looping = (descriptions: readonly string[]): boolean =>
   descriptions.filter((description) => description.startsWith(TESTING)).length >= LOOP_TESTS;
 
 export type Tree = ReadonlyMap<string, string>;
+export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv", "docs/design/melee-parity.md"];
+export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
+const generated = (path: string): boolean => GENERATED_REPORTS.includes(path) || CACHE_RECORDS.includes(path);
 const NEVER_DISJOINT = /^(?:\.github\/workflows\/|ts\/scripts\/autoland)/;
 const changed = (from: Tree, to: Tree): string[] => [...new Set([...from.keys(), ...to.keys()])].filter((path) => from.get(path) !== to.get(path));
 
 export function pastMain(base: Tree, tested: Tree, main: readonly Tree[], landed: Tree | undefined): "land" | "retest" {
   if (landed === undefined) return "retest";
   const train = new Set(changed(base, tested));
+  const merged = new Set<string>();
   let before = base;
   for (const tree of main) {
-    if (changed(before, tree).some((path) => train.has(path) || NEVER_DISJOINT.test(path))) return "retest";
+    for (const path of changed(before, tree)) {
+      if (NEVER_DISJOINT.test(path) || (train.has(path) && !generated(path))) return "retest";
+      if (train.has(path)) merged.add(path);
+    }
     before = tree;
   }
   const expected = new Map(before);
   for (const path of train) {
-    const entry = tested.get(path);
+    const entry = (merged.has(path) ? landed : tested).get(path);
     if (entry === undefined) expected.delete(path);
     else expected.set(path, entry);
   }
@@ -231,8 +238,6 @@ export function landing(solo: boolean, base: Tree, tested: Tree, main: readonly 
   return solo ? "passed" : "wait";
 }
 
-export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv", "docs/design/melee-parity.md"];
-export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
 const PIN = /^build-inputs\/([^/]+)(?:\/[^/.][^/]*)?$/;
 export const pinFamily = (path: string): string | undefined => PIN.exec(path)?.[1];
 
