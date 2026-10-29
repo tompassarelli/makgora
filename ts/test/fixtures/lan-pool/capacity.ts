@@ -8,6 +8,7 @@ if (verb === "probe") {
   process.exit(0);
 }
 const command = rest.slice(rest.indexOf("--") + 1);
+console.error(JSON.stringify({ decision: "RESERVED", reason: "RUN", owner: rest[rest.indexOf("--owner") + 1] }));
 const sessions = process.env["WISP_TEST_SESSIONS"] ?? "";
 mkdirSync(sessions, { recursive: true });
 const record = join(sessions, `${process.pid}.json`);

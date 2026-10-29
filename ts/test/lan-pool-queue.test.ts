@@ -72,16 +72,19 @@ test("two smashcraft sessions waiting on a held pair get it one at a time, in th
       await Bun.sleep(50);
     }
   };
-  const session = (name: string) => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(PAIR), "--capacity", join(fixtures, "capacity.ts"), "--desktop", join(fixtures, "desktop.sh"), "--wait", "0", "--seconds", String(HELD_SECONDS)], {
+  const session = (name: string, hold: readonly string[] = ["--seconds", String(HELD_SECONDS)]) => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(PAIR), "--capacity", join(fixtures, "capacity.ts"), "--desktop", join(fixtures, "desktop.sh"), "--wait", "0", ...hold], {
     cwd: ts, env: { ...env, NORTH_FLEET_SESSION: name }, stdout: "pipe", stderr: "pipe",
   });
 
-  const first = session("holder");
+  const holderSession = Bun.spawn(["sleep", "600"]);
+  cleanups.push(() => holderSession.kill());
+  const first = session("holder", ["--owner-pid", String(holderSession.pid)]);
   await until(() => holderOf() === "holder", "the holder's claim");
   const early = session("early");
   await until(() => waiting() === 1, "the early session's place in line");
   const late = session("late");
   await until(() => waiting() === 2, "the late session's place in line");
+  holderSession.kill();
 
   const codes = await Promise.all([first, early, late].map((child) => child.exited));
   const output = await Promise.all([first, early, late].map(async (child) => `${await new Response(child.stdout).text()}${await new Response(child.stderr).text()}`));
