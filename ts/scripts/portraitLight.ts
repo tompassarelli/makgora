@@ -112,8 +112,8 @@ export function judgeChip(name: string, { centroid, cover }: Placement): string[
 /** The player-preview frame's problems: its square off the centre of its card's preview area. */
 export function judgePreview(): string[] {
   return [false, true].flatMap((computer) => {
-    const { top, size } = cardPortrait(computer), bottom = computer ? CARD_PREVIEW.computerBottom : CARD_PREVIEW.bottom;
-    const off = (top - size / 2) - (CARD_PREVIEW.top + bottom) / 2;
+    const { top, size } = cardPortrait(computer), [areaTop, areaBottom] = computer ? [CARD_PREVIEW.computerTop, CARD_PREVIEW.computerBottom] : [CARD_PREVIEW.top, CARD_PREVIEW.bottom];
+    const off = (top - size / 2) - (areaTop + areaBottom) / 2;
     return Math.abs(off) > 1e-4 ? [`${computer ? 'computer' : 'player'} preview off its area's centre by ${off.toFixed(4)}`] : [];
   });
 }

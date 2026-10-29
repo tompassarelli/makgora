@@ -257,6 +257,9 @@ const CORRECTIONS: Readonly<Record<string, Correction>> = {
   Murloc: { zoom: 1.47, shift: [0.03, -0.46], clock: 1.5 },
   PitLord: { lift: 1.3 },
   Tyrande: { turn: -15 },
+  Illidan: { zoom: 1.35 },
+  JainaProudmoore: { zoom: 1.5 },
+  Firelord: { zoom: 1.25 },
   MalfurionStormrage: { lift: 1.3 },
 };
 const correctionOf = (character: number): Correction => CORRECTIONS[fighterRenderName(characterOf(character))] ?? {};
