@@ -306,7 +306,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.butcher]: {
     neutral: { spell: "Meat Hook", startup: cue(HOOK_MODEL, "hand", f32(0.5)), active: cue(HOOK_LINK_MODEL, "hand", f32(0.5)) },
-    side: { spell: "Butcher's Charge", startup: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.3)), active: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.45)) },
+    side: { spell: "Butcher's Charge", startup: timed(cue(IMPACT_DUST_MODEL, "feet", f32(0.4)), "stand", 0.0), active: timed(cue(IMPACT_DUST_MODEL, "feet", f32(0.8)), "stand", 0.0) },
     up: { spell: "Hook Swing", startup: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)), active: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)) },
     down: { spell: "Rot", startup: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)), active: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)) },
   },
