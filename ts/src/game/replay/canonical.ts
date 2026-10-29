@@ -515,11 +515,27 @@ interface StateSink extends FighterFieldSink {
 }
 
 
+const fieldKeys: Record<string, Record<string, string | undefined> | undefined> = {};
+
+function fieldKey(prefix: string, name: string): string {
+  let byName = fieldKeys[prefix];
+  if (byName === undefined) {
+    byName = {};
+    fieldKeys[prefix] = byName;
+  }
+  let key = byName[name];
+  if (key === undefined) {
+    key = prefix === "" ? `|${name}=` : `|${prefix}.${name}=`;
+    byName[name] = key;
+  }
+  return key;
+}
+
 function textSink(emit: Emit): StateSink {
   return {
-    int: (prefix, name, value) => emit(prefix === "" ? `|${name}=${canonicalNumber(value)}` : `|${prefix}.${name}=${canonicalNumber(value)}`),
-    bool: (prefix, name, value) => emit(prefix === "" ? `|${name}=${value ? 1 : 0}` : `|${prefix}.${name}=${value ? 1 : 0}`),
-    real: (prefix, name, value) => emit(prefix === "" ? `|${name}=${canonicalReal(value)}` : `|${prefix}.${name}=${canonicalReal(value)}`),
+    int: (prefix, name, value) => emit(fieldKey(prefix, name) + canonicalNumber(value)),
+    bool: (prefix, name, value) => emit(fieldKey(prefix, name) + (value ? "1" : "0")),
+    real: (prefix, name, value) => emit(fieldKey(prefix, name) + canonicalReal(value)),
     text: fragment => emit(fragment),
     observation: (name, sample) => emit(`|${name}=${botObservationCanonical(sample)}`),
   };
