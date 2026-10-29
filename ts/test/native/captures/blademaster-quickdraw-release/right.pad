@@ -1,0 +1,18 @@
+# Blademaster Quickdraw release native proof, facing right: held 50 frames in the sheathed stance, the release draws the blade in a rising crescent from low in front up over his head from about frame 123 and slides it back to the sheathed pose at his hip by about frame 146 (2026-10-28).
+#! chat -dev quick hero blademaster
+40 a stick 1 0
+40 b stick -1 0
+42 a stick 0 0
+42 b stick 0 0
+60 a press X
+100 a capture
+110 a release X
+116 a capture
+121 a capture
+123 a capture
+125 a capture
+127 a capture
+130 a capture
+136 a capture
+141 a capture
+147 a capture
