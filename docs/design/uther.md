@@ -84,7 +84,16 @@ plague to Stratholme and Muradin, ending at the Lich King.
 
 ## Play-style profile
 
-Provisional; the first farm probe replaces these bands with measured shares.
+Measured on the full Wren Expert field at f44e1e223b (run 40807379145, 408
+matches a pair): Uther wins 53% against the field. As an all-rounder, 12% of
+his normals are aerials, split neutral 28%, forward 9%, back 33%, up 11% and
+down 20%; approach is 79% of his movement and ranged moves deal 4% of his
+damage; specials are 7% neutral, 15% side, 10% up and 0% down of his moves.
+Dash attack deals the most damage (20%), and up smash (20%), forward smash
+(18%) and forward tilt (13%) take the most stocks. He misses these bands on
+air share (12%), approach (79%), forward air (9%), side special (15%) and up
+special (10%); spamming dash attack alone wins 75% against Expert, a
+roster-wide gap tracked in #700.
 
 ```balance-profile
 fighter: uther
