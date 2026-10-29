@@ -173,7 +173,7 @@ export class SpecialCueEffects {
   }
 
   present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
-    this.areas.present(fighter, playing);
+    this.areas.present(fighter, playing, paused);
     let cue: Cue | undefined;
     let x = 0.0;
     let z = 0.0;
@@ -372,6 +372,7 @@ export class SpecialCueEffects {
   }
 
   setPaused(paused: boolean): void {
+    this.areas.setPaused(paused);
     const parked = (this.parked ??= []);
     for (let index = 0; index < this.cues.length; index++) {
       const entry = this.cues[index];

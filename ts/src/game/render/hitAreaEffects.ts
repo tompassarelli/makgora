@@ -4,7 +4,7 @@ import { createFighter, type Fighter } from "../sim/fighter";
 import { authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { DISJOINT_CUES, disjointNormals, hitAreaPose, normalAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
-import { type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
+import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
 
 
 export const HIT_AREA_EFFECT_CAPACITY = 12;
@@ -21,7 +21,7 @@ export class HitAreaEffects {
   private readonly region = emptyHitRegion();
   private readonly pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 1.0 };
 
-  constructor(character: Character, private readonly origin: WorldOrigin, drawn: boolean) {
+  constructor(private readonly character: Character, private readonly origin: WorldOrigin, drawn: boolean) {
     this.styles = disjointNormals(createFighter(character, 0.0, 1));
     const cue = drawn ? DISJOINT_CUES[character] : undefined;
     if (cue !== undefined) for (let index = 0; index < HIT_AREA_EFFECT_CAPACITY; index++) this.models.push(AddSpecialEffect(cue.model, origin.x, origin.y));
@@ -36,7 +36,7 @@ export class HitAreaEffects {
     }
   }
 
-  present(fighter: Readonly<Fighter> | undefined, playing: boolean): void {
+  present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
     let shown = 0;
     if (fighter !== undefined && playing && !fighter.status.out && DISJOINT_CUES[fighter.character] !== undefined) {
       const style = fighter.attack.style;
@@ -64,7 +64,7 @@ export class HitAreaEffects {
           else BlzSetSpecialEffectAnimation(model, cue.sequence ?? ACCENT_SEQUENCE);
         }
         BlzSetSpecialEffectTime(model, cue?.seconds ?? ACCENT_SECONDS);
-        BlzSetSpecialEffectTimeScale(model, cue?.timeScale ?? 0.0);
+        BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : cue?.timeScale ?? 0.0);
       }
     }
     for (let index = shown; index < this.models.length; index++) {
@@ -72,6 +72,14 @@ export class HitAreaEffects {
       if (model !== undefined) parkCue(model, this.origin, this.parked, index);
     }
     this.frame = fighter?.special.frame ?? 0;
+  }
+
+  setPaused(paused: boolean): void {
+    const cue = DISJOINT_CUES[this.character];
+    for (let index = 0; index < this.models.length; index++) {
+      const model = this.models[index];
+      if (model !== undefined) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : this.parked[index] === true ? PARKED_CUE_TIME_SCALE : cue?.timeScale ?? 0.0);
+    }
   }
 
   drawnEffects(into: effect[]): void {
