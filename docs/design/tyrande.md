@@ -57,12 +57,12 @@ Normals (startup / active / recovery; damage):
   deals 16% and kills while the grip deals 12% (14/3/32).
 - Up smash: the bow swept overhead (12/4/30; 14%, then 13% behind).
 - Down smash: a split kick front then back (11/4/30; 13%).
-- Neutral air: a spinning kick, 10% clean and 6% late (4/8/18).
+- Neutral air: a split kick front and back, 10% clean and 6% late (4/8/18).
 - Forward air: a four-hit moonlit flurry, 2.5% each; the first three hold the
   foe with a set knockback and the last one launches (6/12/22).
 - Back air: a back kick (5/4/18; 13%), her strongest aerial.
 - Up air: a bow flip (6/4/18; 10%).
-- Down air: a stomp that spikes on the clean hit (8/4/24; 12%).
+- Down air: a downward bow smash that spikes on the clean hit (8/4/24; 12%).
 
 The plan names a moonglaive for the jab, forward tilt and forward smash. The
 model holds only a bow, so those strikes use the bow and moonlight instead;
