@@ -10,6 +10,7 @@ import { Effect } from '../../ts/node_modules/effect/dist/index.js';
 import { ChildProcess } from '../../ts/node_modules/effect/dist/process/index.js';
 import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-bun/dist/index.js';
 import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
+import { findExtractor, stockStorage } from '../../ts/scripts/wisp/renderAssetStore';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');
@@ -68,6 +69,13 @@ BunRuntime.runMain(Effect.gen(function*() {
   for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionThreeBridges']) {
     yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   }
+  const extractor = findExtractor();
+  if (extractor === undefined || extractor === null) return yield* Effect.fail(ioFailure('SelectionRandom needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)'));
+  const randomIcon = join(output, 'BTNSelectHeroOn.dds');
+  yield* run([extractor, stockStorage(), 'war3.w3mod:replaceabletextures/commandbuttons/btnselectheroon.dds', randomIcon]);
+  // The stock 64 px icon bevels its outer 4 px; the tile keeps only the "?" inside it.
+  yield* run(['magick', randomIcon, '-crop', '56x56+4+4', '+repage', '-resize', '64x64!', '-depth', '8', `TGA:${join(output, 'SelectionRandom.tga')}`]);
+  yield* Effect.try({ try: () => rmSync(randomIcon), catch: ioFailure });
   const files = yield* Effect.try({ try: () => [...new Bun.Glob('*.tga').scanSync(output)].sort().map((file) => join(output, file)), catch: ioFailure });
   console.log(yield* run(['magick', 'identify', ...files]));
 }).pipe(Effect.provide(BunServices.layer)));

@@ -28,7 +28,7 @@ export function tilePortrait(scale: number): number {
 }
 
 /** A player card's preview area: below its tag, above its name box, and above the CPU summary on a computer's card. */
-export const CARD_PREVIEW = { top: cardDown(f32(0.03)), bottom: cardDown(f32(0.172)), computerBottom: cardDown(f32(0.136)), computerTop: cardDown(f32(0.051)) } as const;
+export const CARD_PREVIEW = { top: cardDown(f32(0.03)), bottom: cardDown(f32(0.172)), computerBottom: cardDown(f32(0.136)), computerTop: cardDown(f32(0.06)) } as const;
 
 /** The card portrait's square, centred in its card's preview area and as large as the area and the card render allow. */
 export function cardPortrait(computer: boolean): { readonly top: number; readonly size: number } {

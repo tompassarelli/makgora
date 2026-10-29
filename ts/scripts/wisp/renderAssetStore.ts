@@ -61,7 +61,7 @@ export const readStockBuild = (storage: string) => attempt("read the stock build
   return { storage, buildInfoSha256: createHash("sha256").update(info).digest("hex"), fields: rows.find((row) => row.Active === "1") ?? rows[0] ?? {} };
 });
 
-const findExtractor = (options: RenderAssetOptions) => options.extractor ?? process.env.CASC_EXTRACTOR ?? Bun.which("casc-extract")
+export const findExtractor = (options: Pick<RenderAssetOptions, "extractor"> = {}) => options.extractor ?? process.env.CASC_EXTRACTOR ?? Bun.which("casc-extract")
       ?? Array.from(new Bun.Glob("*/build/animation-assets/casc-extract").scanSync({ cwd: dirname(INPUTS_STORE), absolute: true }))[0];
 
 const mapSources = (options: RenderAssetOptions, mapImports: ((assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) | undefined) => Effect.gen(function*() {

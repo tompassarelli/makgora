@@ -10,7 +10,7 @@ import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchC
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
-export const RANDOM_FIGHTER_TEXTURE = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
+export const RANDOM_FIGHTER_TEXTURE = "war3mapImported\\SelectionRandom.tga";
 export const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number) => choice === RANDOM_FIGHTER ? RANDOM_FIGHTER_TEXTURE : fighterPortrait(choice ?? Character.rifleman, tile ? "Tile" : "Card", slot);
 export const nameText = (choice: number | undefined) => choice === RANDOM_FIGHTER ? "Random" : fighterName(choice ?? Character.rifleman);
 export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {

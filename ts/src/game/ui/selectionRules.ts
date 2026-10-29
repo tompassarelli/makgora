@@ -1,11 +1,11 @@
-import { DELAY_CONTROLS, RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type RuleBox, type TrainingSetting } from "./ruleButtons";
+import { CLASSIC_ROUTE_BOX, DELAY_CONTROLS, RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting } from "./ruleButtons";
 import { f32 } from "wisp/src/sim/f32";
 import type { MatchState } from "../lobby/lobbyState";
 import { MENU_STYLE } from "./hudLayout";
 import { ItemKind, itemBit } from "../sim/codes";
 import { type TutorialMenuFrames, showTutorialLesson } from "./tutorialMenu";
 import { placeTopLeft, setFrameText } from "./frames";
-import { hotspot, label } from "./selectionFrames";
+import { label } from "./selectionFrames";
 import type { SelectionActions } from "./selectionActions";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
@@ -96,7 +96,7 @@ export function createMatchRules(root: framehandle, suffix: string, add: AddRule
 export function createClassicRules(root: framehandle, suffix: string, add: AddRule, match: MatchRuleFrames): RuleFrames {
   const { easierClassic, harderClassic } = RULE_BUTTONS;
   const classicTierValue = label(root, `MeleeClassicTier${suffix}`, easierClassic.x + easierClassic.width, easierClassic.y, harderClassic.x - easierClassic.x - easierClassic.width, RULE_HEIGHT, f32(0.011));
-  const classicRoute = label(root, `MeleeClassicRoute${suffix}`, f32(0.38), RULE_ROWS[1], f32(0.37), RULE_HEIGHT, f32(0.0085));
+  const classicRoute = label(root, `MeleeClassicRoute${suffix}`, CLASSIC_ROUTE_BOX.x, CLASSIC_ROUTE_BOX.y, CLASSIC_ROUTE_BOX.width, RULE_HEIGHT, f32(0.0085));
   const classicFrames = [
     ruleButton(root, add, easierClassic, { kind: "classicTier", direction: -1 }, "−"),
     ruleButton(root, add, harderClassic, { kind: "classicTier", direction: 1 }, "+"),
@@ -106,13 +106,27 @@ export function createClassicRules(root: framehandle, suffix: string, add: AddRu
   return { ...match, classicFrames, classicTierValue, classicRoute, matchRuleFrames };
 }
 
-export function createDelayControls(root: framehandle, add: AddRule): readonly framehandle[] {
+export interface DelayFrames {
+  readonly steps: readonly framehandle[];
+  readonly line: framehandle;
+}
+
+export function createDelayControls(root: framehandle, add: AddRule, textSize: number): DelayFrames {
   const { less, more, auto } = DELAY_CONTROLS;
-  return [
-    ruleButton(root, add, less, { kind: "inputDelay", step: -1 }, "−"),
-    ruleButton(root, add, more, { kind: "inputDelay", step: 1 }, "+"),
-    add(hotspot(root, auto.x, auto.y, auto.width, auto.height), { kind: "inputDelay", step: 0 }),
-  ];
+  const line = ruleButton(root, add, auto, { kind: "inputDelay", step: 0 }, "");
+  BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, textSize, 0);
+  return {
+    steps: [ruleButton(root, add, less, { kind: "inputDelay", step: -1 }, "−"), ruleButton(root, add, more, { kind: "inputDelay", step: 1 }, "+")],
+    line,
+  };
+}
+
+export function presentDelayControls(frames: DelayFrames, hostControl: boolean): void {
+  const box = hostControl ? DELAY_CONTROLS.auto : RULE_BUTTONS.inputDelay;
+  placeTopLeft(frames.line, box.x, box.y);
+  BlzFrameSetSize(frames.line, box.width, box.height);
+  BlzFrameSetEnable(frames.line, hostControl);
+  for (const frame of frames.steps) BlzFrameSetVisible(frame, hostControl);
 }
 
 export function applyRuleButton(actions: SelectionActions, participantId: number, button: RuleButton): void {

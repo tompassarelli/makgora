@@ -3,18 +3,26 @@ import type { TextBox } from "./hudLayout";
 
 export const HEADER_BUTTON_TOP = f32(0.588);
 export const HEADER_BUTTON_HEIGHT = f32(0.023);
+export const SELECT_LEFT = f32(0.055);
+export const SELECT_RIGHT = f32(0.786);
+export const SELECT_GAP = f32(0.006);
 
-export const START_BUTTON = { x: f32(0.055), y: HEADER_BUTTON_TOP, width: f32(0.2), height: HEADER_BUTTON_HEIGHT } as const;
+const headerBox = (x: number, width: number) => ({ x, y: HEADER_BUTTON_TOP, width, height: HEADER_BUTTON_HEIGHT }) as const;
+const after = (box: { readonly x: number; readonly width: number }): number => f32(f32(box.x + box.width) + SELECT_GAP);
 
-export const MOVES_BOX = { x: f32(0.384), y: HEADER_BUTTON_TOP, width: f32(0.09), height: HEADER_BUTTON_HEIGHT } as const;
+export const START_BUTTON = headerBox(SELECT_LEFT, f32(0.18));
 
-export const SETTINGS_BOX = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.115), height: HEADER_BUTTON_HEIGHT } as const;
+export const SETTINGS_BOX = headerBox(after(START_BUTTON), f32(0.115));
 
-export const TUTORIAL_BOX = { x: f32(0.478), y: HEADER_BUTTON_TOP, width: f32(0.1), height: HEADER_BUTTON_HEIGHT } as const;
+export const MOVES_BOX = headerBox(after(SETTINGS_BOX), f32(0.085));
 
-export const CREDITS_BOX = { x: f32(0.582), y: HEADER_BUTTON_TOP, width: f32(0.1), height: HEADER_BUTTON_HEIGHT } as const;
+const PANEL_BUTTON_WIDTH = f32(0.107);
 
-export const COMMUNITY_BOX = { x: f32(0.686), y: HEADER_BUTTON_TOP, width: f32(0.1), height: HEADER_BUTTON_HEIGHT } as const;
+export const TUTORIAL_BOX = headerBox(after(MOVES_BOX), PANEL_BUTTON_WIDTH);
+
+export const CREDITS_BOX = headerBox(after(TUTORIAL_BOX), PANEL_BUTTON_WIDTH);
+
+export const COMMUNITY_BOX = headerBox(f32(SELECT_RIGHT - PANEL_BUTTON_WIDTH), PANEL_BUTTON_WIDTH);
 
 export const boxContains = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }, x: number, y: number): boolean =>
   x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);
