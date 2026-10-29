@@ -197,8 +197,8 @@ Where Smashcraft keeps its own rule, and why:
 Walk, initial dash and run speeds are clamped to Melee's roster spread (walk
 0.65–1.60, initial dash 1.00–2.00, run 1.10–2.30 Melee units a frame), and the
 run-from-dash frame to 8–19 ([movement reference](design/melee/movement.md));
-`MELEE_*_SPREAD` in smashcraft:ts/src/game/sim/tuning.ts. Heavy heroes (Anub'arak,
-Pit Lord, Thrall, Cairne) run from frame 16 like Donkey Kong and Ganondorf.
+`MELEE_*_SPREAD` in smashcraft:ts/src/game/sim/tuning.ts. Heavy heroes (Pit Lord,
+Thrall, Cairne) run from frame 16 like Donkey Kong and Ganondorf.
 No hero runs earlier than frame 14: a shorter initial dash would shrink #188's
 dash-back window (first opposite sample on dash frames 1–13), which the dash-dance
 sweep holds for the roster.
@@ -1051,7 +1051,6 @@ One rule for every fighter's four specials
 | Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
 | Murloc | side: Tidal Rush (rush); up: Tide Spout (recovery) |
 | Grom | side: Gorehowl Rush (rush); up: Blood Leap (recovery) |
-| Anub'arak | side: Burrow Hunt (rush); up: Crypt Eruption (recovery) |
 | Malfurion | side: Stag Charge (rush); up: Dream Ascent (recovery) |
 | Medivh | side: Vanishing Act (teleport); up: Raven Flight (recovery); down: Last Word (backward teleport) |
 
@@ -1713,7 +1712,6 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Grom | Forward smash (Gorehowl's blade) | Position |
 | Malfurion | Forward smash (Wrath at the staff's tip) | Position |
 | Medivh | Neutral air (arcane ring) | Timing |
-| Anub'arak | Forward smash (impaling claw) | Position |
 
 ## Smash attacks against tilts
 
@@ -1884,7 +1882,7 @@ reason. Current departures:
 - **Anub'arak's side special (Burrow Hunt), rule 4.** He drops under the
   floor in one change and erupts in one change: while he travels only the low
   mound, about 22 units tall, is hittable. A halfway pose would show a body
-  the burrow doesn't have.
+  the burrow doesn't have. Anub'arak was removed on 2026-10-29; the rule is kept as history.
 
 ## Aerials on shield
 
@@ -2684,7 +2682,6 @@ Expert field.
 | Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 189/208 |
 | Malfurion Stormrage | Dream Ascent | 10 | 0 | 29 | 434 / 413 | guided | 61 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
 | Medivh | Raven Flight | 9 | 0 | 21 | 373 / 460 | aimed (8-way, 8 frames) | 51 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
-| Anub'arak | Crypt Eruption | 9 | 0 | 20 | 399 / 403 | aimed (8-way, 8 frames) | 54 | read forward air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |
 | Lady Vashj | Tidal Surge | 10 | 1 | 27 | 301 / 177 | guided | 57 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 159/208 |
 
 `GAME_TESTS=edgeGuard bun test test/game.test.ts` checks Rifleman's recorded

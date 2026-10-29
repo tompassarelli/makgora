@@ -1,6 +1,0 @@
-#! chat -dev quick promo stage 2 pair lich king / anub'arak
-#! expect a 264 damage 65
-#! expect a 322 damage 88
-#! expect a 481 damage 0.000
-510 a press VIEW
-580 a release VIEW

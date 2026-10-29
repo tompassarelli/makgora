@@ -22,7 +22,6 @@ export const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | und
   [Character.kaelthas]: "Embers gather behind him and a phoenix rises at his shoulder, follows him and burns anyone near it. Break it or keep away from its flames.",
   [Character.murloc]: "He blows a conch and a swarm of murlocs pours across the ground. Jump over it or shield.",
   [Character.grom]: "Demon blood drives a charge that catches the first foe, through a shield, for three Gorehowl chops. Jump it.",
-  [Character.anubarak]: "A slow cloud of beetles drifts ahead, stinging anyone standing in it. Jump or shield.",
   [Character.malfurion]: "A slow wall of wisps drifts forward and detonates on whoever it reaches.",
   [Character.medivh]: "A dark portal opens ahead, drawing foes in, then erupts. Walk away before it bursts.",
   [Character.uther]: "Golden light gathers around him, then rings of it rise on both sides, heal him and throw everyone near him upward. Shield or roll away during the gathering.",

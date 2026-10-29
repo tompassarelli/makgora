@@ -47,7 +47,7 @@ const STYLES: Readonly<Record<number, string>> = {
   [Character.jaina]: "back flip", [Character.sylvanas]: "back flip", [Character.cairne]: "knee lift",
   [Character.chen]: "cannonball", [Character.peon]: "scramble", [Character.tinker]: "heave",
   [Character.kaelthas]: "float", [Character.murloc]: "front flip", [Character.grom]: "front flip",
-  [Character.anubarak]: "heave", [Character.malfurion]: "front flip", [Character.medivh]: "cannonball", [Character.ladyVashj]: "float",
+  [Character.malfurion]: "front flip", [Character.medivh]: "cannonball", [Character.ladyVashj]: "float",
 };
 const TURNS: Readonly<Record<string, number>> = { "front flip": 360, "back flip": -360, cannonball: 360, scramble: 360, float: -360 };
 const LEANS: Readonly<Record<string, number>> = { cannonball: 55, heave: 40, "wing beat": 40 };

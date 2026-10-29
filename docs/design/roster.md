@@ -2,6 +2,8 @@
 
 > **Frozen (26 October 2026):** Forsaken Paladin was frozen pending replacement, and Uther replaced him on 28 October 2026 ([uther.md](uther.md)). `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, keeps listing him until Tom lifts it. The remaining planned additions, Tyrande, the Butcher and a dismounted Thrall, are in [roster-next.md](roster-next.md) (28 October 2026).
 
+> **Removed (29 October 2026):** Anub'arak left the roster at Tom's decision; character code 23 is retired, never reused. His section below is kept as history.
+
 Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 29 fighters (Tom, 28 October 2026, [roster-next.md](roster-next.md)) until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343). No further additions are planned.
 
 We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.
@@ -1826,6 +1828,8 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 ## Anub'arak (#341)
 
+> **Removed (29 October 2026):** Anub'arak left the roster at Tom's decision. His fighter, clips, art, tests and select tile are deleted and character code 23 is retired, never reused. This section is kept as design history.
+
 **Identity:** an ancient insect king who treats the stage as his crypt. He advances with a low, six-legged scuttle, skewers ankles with his tusks, disappears under the floor and erupts beneath prey. His carrion beetles do the undignified chasing for him. Heavy ground control and frightening eruptions cost slow turns, a broad body and committed recovery. No damage reflection, resource or hidden stat bonus.
 
 ### Normals
@@ -1876,7 +1880,7 @@ Standing grab starts f10, the shared 96-unit envelope is active for three frames
 
 Ground-control draft: Impale makes prey jump into the crown; beetles pressure approaches while Burrow Hunt punishes a stationary guard. Slow aerials cover space, not repeated rushdown.
 
-```balance-profile
+```text
 fighter: anub'arak
 archetype: trapper
 aerials: nair 10-35, fair 15-40, bair 10-35, uair 10-35, dair 0-25
@@ -1888,7 +1892,7 @@ specials: neutral 5-20, side 3-15, up 0-8, down 3-15
 
 Path draft for Tom to correct (#358):
 
-```ceiling-plan
+```text
 fighter: anub'arak
 path: decision
 basic-moves: forward-tilt,down-tilt,neutral-special

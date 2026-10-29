@@ -25,7 +25,6 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 
 | # | Fighters (archetype) | Stage | Pad | Frames | Camera | What it shows |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Lich King (bait-and-punish) / Anub'arak (trapper), both Expert CPUs | Frozen Throne (2) | promo-frozen-throne.pad | 230-500 | match camera, HUD hidden | Anub'arak's two strong hits (264, 322) send Lich King out at 89%; he respawns on 481. |
 | 2 | Pit Lord (heavy) / Illidan (rushdown), both Expert CPUs | Hellfire Citadel (14) | promo-hellfire-citadel.pad | 230-520 | match camera, HUD hidden | Pit Lord's heavy strikes (259, 350) knock Illidan out at 80%; respawn on 502. |
 | 3 | Blademaster (bait-and-punish) / Thrall (heavy), both Expert CPUs | Durotar Skies (3) | promo-durotar-skies.pad | 1620-1840 | match camera, HUD hidden | Blademaster at 138% spends his up special 1,300 units offstage (1678) and falls short; respawn on 1819. |
 | 4 | Cairne Bloodhoof (heavy) / Chen Stormstout (bait-and-punish), both Expert CPUs | Ahn'Qiraj (13) | promo-ahnqiraj.pad | 700-980 | match camera, HUD hidden | Chen launches Cairne at 113% (728) and Cairne never makes it back; respawn on 963. |
@@ -44,7 +43,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 ## Coverage
 
 - Stages: all ten selectable stages (smashcraft:ts/src/game/menu/stageCatalog.ts)
-  appear at least once, each as a promo shot.
+  appear at least once, each as a promo shot. Shot 1, the Frozen Throne promo (Lich King against Anub'arak), was deleted on 2026-10-29 when Anub'arak left the roster, so Frozen Throne has no promo shot until one is recorded with another fighter.
 - Roster: all 26 selectable fighters appear; the six without a promo shot
   (Kael'thas Sunstrider, Grom Hellscream, Goblin Tinker, Shadow Hunter,
   Beastmaster, Peon) carry the scripted shots.

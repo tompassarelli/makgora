@@ -27,7 +27,6 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Pit Lord | Hellfire Citadel | 14 | Magtheridon, the pit lord who holds the citadel until Illidan takes it. |
 | Beastmaster | Durotar Skies | 3 | Rexxar is the hero of TFT's bonus campaign, "The Founding of Durotar". |
 | Lich King | Frozen Throne | 2 | TFT's final mission: Arthas climbs Icecrown and takes the Frozen Throne. |
-| Anub'arak | Frozen Throne | 2 | TFT's underground Northrend campaign brings the crypt king and Arthas through Azjol-Nerub toward Icecrown. |
 | Medivh | Nordrassil | 10 | RoC's prophet brings the human, orc and night elf leaders together to defend Mount Hyjal and its World Tree. |
 | Lady Vashj | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Lady Vashj's naga hold the Broken Isles around the Tomb of Sargeras for Illidan. |
 | Archimonde the Defiler | Nordrassil | 10 | RoC's final battle: the Burning Legion's lord climbs Mount Hyjal to take the World Tree. |

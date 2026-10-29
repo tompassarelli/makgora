@@ -51,7 +51,7 @@ export const REFERENCE_FIGHTERS: Readonly<Record<string, string>> = {
   lich: "mewtwo", uther: "mario", dreadlord: "ganondorf", "shadow-hunter": "link", "pit-lord": "bowser",
   beastmaster: "link", "lich-king": "ganondorf", thrall: "bowser", "jaina-proudmoore": "zelda", "sylvanas-windrunner": "young_link", "cairne-bloodhoof": "ganondorf",
   "chen-stormstout": "captain_falcon", peon: "ness", "goblin-tinker": "samus", "kael'thas-sunstrider": "zelda", murloc: "kirby", "grom-hellscream": "roy",
-  "malfurion-stormrage": "link", medivh: "mewtwo", "anub'arak": "bowser", "lady-vashj": "samus", archimonde: "ganondorf", tyrande: "falco", butcher: "donkey_kong",
+  "malfurion-stormrage": "link", medivh: "mewtwo", "lady-vashj": "samus", archimonde: "ganondorf", tyrande: "falco", butcher: "donkey_kong",
 };
 
 export const REFERENCE_ACTIONS: Readonly<Record<string, { readonly action: string; readonly wiki: string }>> = {

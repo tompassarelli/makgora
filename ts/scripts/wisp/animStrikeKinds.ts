@@ -4,7 +4,6 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   illidan: ["down-tilt", "down-smash", "down-air", "forward-smash"],
   warden: ["down-tilt", "down-smash", "down-air", "down-special"],
   "cairne-bloodhoof": ["down-special"],
-  "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
   "mountain-king": ["down-air"],
   dreadlord: ["forward-air", "back-air"],
   "chen-stormstout": ["jab", "jab3", "down-tilt", "dash-attack", "up-smash", "neutral-air", "forward-air", "back-air", "down-air"],

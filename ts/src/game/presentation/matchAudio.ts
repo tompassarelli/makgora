@@ -73,7 +73,6 @@ export type Race = (typeof Race)[keyof typeof Race];
 
 const RACES: Readonly<Record<Character, Race>> = {
   28: Race.nightElf,
-  23: Race.undead,
   1: Race.human,
   2: Race.nightElf,
   3: Race.orc,
@@ -127,7 +126,6 @@ const DIALOGUE_VOICES: Readonly<Record<DialogueVoiced, { readonly ready: string;
 };
 
 const VOICES: Readonly<Record<Exclude<Character, DialogueVoiced>, readonly [string, string, string?, string?]>> = {
-  23: ["Units\\Undead\\HeroCryptLord\\", "NerubianCryptLord"],
   1: ["Units\\Human\\Rifleman\\", "Rifleman"],
   2: ["Units\\NightElf\\HeroDemonHunter\\", "HeroDemonHunter"],
   3: ["Units\\Orc\\HeroBladeMaster\\", "HeroBladeMaster"],
@@ -201,7 +199,6 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.kaelthas]: "kaelthassunstrider victory",
   [Character.murloc]: "murloc victory",
   [Character.grom]: "stand victory",
-  [Character.anubarak]: "anubarak victory",
   [Character.malfurion]: "malfurionstormrage victory",
   [Character.medivh]: "medivh victory",
   [Character.ladyVashj]: "lady vashj victory",

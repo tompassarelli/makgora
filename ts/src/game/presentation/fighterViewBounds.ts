@@ -30,7 +30,6 @@ export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
   [Character.kaelthas]: { left: -88, right: 36, bottom: -6, top: 144 },
   [Character.murloc]: { left: -80, right: 110, bottom: -19, top: 78 },
   [Character.grom]: { left: -78, right: 68, bottom: 0, top: 198 },
-  [Character.anubarak]: { left: -135, right: 98, bottom: -2, top: 157 },
   [Character.malfurion]: { left: -58, right: 51, bottom: -4, top: 160 },
   [Character.medivh]: { left: -47, right: 25, bottom: -2, top: 144 },
   [Character.uther]: { left: -89, right: 33, bottom: -3, top: 110 },

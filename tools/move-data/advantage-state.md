@@ -80,9 +80,6 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Medivh | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up tilt against 4/5 DI |
 | Medivh | medium | yes | yes | **no** | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up smash at 60% → up tilt against 2/5 DI |
 | Medivh | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash, dash, dash attack; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech forward smash; trap forward smash, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Anub'arak | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in full hop +4, down air, short hop, down air, forward smash; tech away side special; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
-| Anub'arak | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
-| Anub'arak | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 4/5 DI |
 | Lady Vashj | light | yes | **no** | **no** | **no** | yes | down smash at 40%: tech in place uncovered; tech in short hop, neutral special; tech away uncovered; missed tech uncovered; trap short hop, neutral special covers tech in, missed tech | up throw at 40% → up tilt against 3/5 DI |
 | Lady Vashj | medium | **no** | **no** | **no** | **no** | yes | back throw at 20%: tech in place uncovered; tech in forward smash, dash, dash attack; tech away uncovered; missed tech uncovered; trap forward smash, dash, dash attack covers tech in place, tech in, missed tech | none |
 | Lady Vashj | heavy | yes | **no** | yes | yes | yes | back throw at 20%: tech in place dash, dash attack; tech in up smash, up smash, forward smash; tech away uncovered; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech in, missed tech | up throw at 40% → up tilt against 4/5 DI |
@@ -390,18 +387,6 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Medivh | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Medivh | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 in up tilt, out dash, dash attack |
 | Medivh | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | light | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | light | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 1/1 in short hop, back air, out forward smash | 2/2 in full hop, back air, out full hop, down air KO |
-| Anub'arak | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | medium | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 1/1 | 1/1 in full hop, back air, out forward smash |
-| Anub'arak | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | heavy | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Anub'arak | heavy | up throw | 1/1 | 1/1 | 1/1 | 1/1 in full hop, back air, out full hop, down air |
-| Anub'arak | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lady Vashj | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lady Vashj | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lady Vashj | light | up throw | 1/1 | 1/0 | 2/1 | 2/1 |

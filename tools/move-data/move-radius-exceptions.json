@@ -464,26 +464,6 @@
     "reason": "Hit capsules of 10 to 25 game units against a 117-unit shield, 0.09 to 0.21 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
   },
   {
-    "fighter": "anub'arak",
-    "moves": [
-      "jab",
-      "forward tilt",
-      "up tilt",
-      "down tilt",
-      "dash attack",
-      "forward smash",
-      "up smash",
-      "down smash",
-      "neutral air",
-      "forward air",
-      "back air",
-      "up air",
-      "down air"
-    ],
-    "issue": "#320",
-    "reason": "Hit capsules of 15 to 30 game units against a 148-unit shield, 0.10 to 0.20 of it, below Melee's lower quartile: the move is a capsule swept along the limb or weapon, thinner than Melee's spheres. Recorded when the rule landed (2026-10-25); resizing is outside #320, so a resize or Tom's reason replaces this entry."
-  },
-  {
     "fighter": "lady-vashj",
     "moves": [
       "jab",

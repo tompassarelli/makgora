@@ -169,7 +169,7 @@ regardless of reach: Medivh's dash attack draws his arcane missile and
 Malfurion's bursts Entangling Roots at the staff (north gate 41, 2026-10-26).
 Anub'arak's dash attack draws Impale spikes erupting at the hit, held mid-rise
 (north gate 45, 2026-10-26), because his claws vanish against his shell at
-match size.
+match size. Anub'arak was removed on 2026-10-29.
 
 `bun wisp anim prescreen --fighter SLUG --move MOVE [--threshold N]` is an optional step before a take goes to native capture (#614): it renders the move's judge images at the match camera's framing (`anim judge prepare`), sends them to one cold viewer through the bare `anim judge run` call and prints `stop` when the mean of the viewer's five lines is below 3 (a point under the line-5 bar of 4) and `go` otherwise, with the render, viewer and wall seconds. It only stops early: a `go` passes nothing, native capture and the three cold viewers still decide the box, and it changes no scorecard line, bar, two-take rule or `judge.jsonl` record. Its results append to `build/anim-prescreen/prescreen.jsonl` and never count as judgements.
 

@@ -39,7 +39,6 @@ ensure(fighter && rig, `no fighter or canonical rig for character ${character}`)
 
 const LEG_BONES: Readonly<Partial<Record<number, readonly (readonly [string, string, string])[]>>> = {
   [Character.pitLord]: [["Bone Front L Leg01", "Bone Front L Shin01", "Bone FrontL Toe01"], ["Bone Front R Leg01", "Bone Front R Shin01", "Bone Front R Toe01"], ["Bone Back L Leg01", "Bone Back L Shin01", "Bone Toe L "], ["Bone Back R Leg01", "Bone Back R Shin01", "Bone Toe R"]],
-  [Character.anubarak]: [["Bone_LFLeg04", "Bone_LFLeg03", "Bone_LegEnd03"], ["Bone_LFLeg07", "Bone_LFLeg06", "Bone_LegEnd01"], ["Bone_LFLeg13", "Bone_LFLeg14", "Bone_LegEnd04"], ["Bone_LFLeg09", "Bone_LFLeg10", "Bone_LegEnd02"]],
 };
 const PINNED: Readonly<Partial<Record<number, Readonly<Partial<Record<Pose, Choice>>>>>> = {
   [Character.chen]: { ledgeHang: { frame: 0, shoulder: -207.5, elbow: 22.5, chest: 38, hip: -85, knee: 77.5, lean: 7.5, pelvis: -15, wrist: -67.5, head: -120 } },

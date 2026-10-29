@@ -21,7 +21,6 @@ import * as medivh from "./medivh";
 import * as thrall from "./thrall";
 import * as kaelthasSunstrider from "./kael'thas-sunstrider";
 import * as warden from "./warden";
-import * as anubarak from "./anub'arak";
 import * as rifleman from "./rifleman";
 import * as cairneBloodhoof from "./cairne-bloodhoof";
 import * as uther from "./uther";
@@ -64,7 +63,6 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   13: thrall,
   20: kaelthasSunstrider,
   5: warden,
-  23: anubarak,
   1: rifleman,
   16: cairneBloodhoof,
   27: uther,

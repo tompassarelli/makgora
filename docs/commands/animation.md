@@ -90,8 +90,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   identical. Run it after the fighter's own generator, which rebuilds from stock,
   and before `jump-clips.ts --character`; then store the family and run
   `bun wisp inputs derive --fighter NAME`. A body the shared joints can't pose (Goblin
-  Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
-  carapace and squash, Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
+  Tinker's backpack claws, Mountain King's left-hand hammer,
+  Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`; Chen's hang turns his left wrist rather than the staff, since the staff's own pivot is off the grip and turning it pulls the shaft out of his fist (#525).
@@ -222,22 +222,6 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   capsules (smashcraft:tools/animations/limb-capsules.ts), it keys the smallest hand
   turn that clears them, eased in and out over 4 frames, and leaves every other clip
   unchanged (#453).
-  `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
-  Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
-  preserving all seventeen stock clips and writing both-facing pose sheets.
-  Given the shipped model instead, `... SHIPPED_CRYPT_LORD.mdx PRIVATE_OUTPUT --rekey POSE...`
-  authors the named clips and splices their keys in at their shipped intervals, refusing a
-  changed length; every other clip, and the `... Motion` roots later passes added, stays
-  byte-identical, so a move whose sim timing is unchanged is reworked without regenerating the
-  clips that later passes edited (#459).
-  Its down air keys three poses from smashcraft:tools/animations/anubarak-gestures.ts on the move's own timing: claws overhead
-  with the legs tucked, both claws driven straight down under the shell on the first active frame, then carried
-  back under him through the active frames before easing to the fall pose; `--rekey downAir` re-authors it alone.
-  A Blender take of his dash attack (#339, judged but not yet shipped): `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --rig RIG.json`
-  writes his skeleton, stand pose and the move's timing, then
-  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/anubarak-dash-attack.py -- RIG.json KEYS.json`
-  bakes one key per attack frame, and `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --keys KEYS.json` authors every clip with
-  those keys spliced into the dash attack, set on the floor each frame (`tools/animations/blender-keys.ts`).
   `bun tools/animations/grab-pads.ts` generates the #180 mirror and unlike-height capture batch:
   every selectable fighter, four throws, both facings, with ordinary catch/pummel
   inputs and contact-frame captures in smashcraft:ts/test/native/pads/180/.

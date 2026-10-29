@@ -207,7 +207,6 @@ test/repair-natives.test.ts	1	0.607
 test/special-cues.test.ts	2	0.040
 test/stage-model.test.ts	17	0.131
 test/standalone.test.ts	4	3.288
-test/story-anubarak.test.ts	1	1.828
 test/story-medivh.test.ts	1	2.326
 test/visual-lifecycle.test.ts	12	1.668
 test/wisp.test.ts	3	0.077

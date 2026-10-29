@@ -31,7 +31,6 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   "Kael'thasSunstrider": part('Bone_Head', [], []),
   Murloc: part('Bone_Head', ['Blade'], ['Bone_Hand_R']),
   GromHellscream: part('Bone_Head', ['Bone_Sword'], ['Bone_Hand_R']),
-  "Anub'arak": part('Bone_Head', [], [], ['Bone_Jaw']),
   MalfurionStormrage: part('Bone_Head', [], []),
   Medivh: part('Bone_Head', ['Staff'], ['Bone_Hand_R']),
   LadyVashj: part('Bone_Head', ['Bow'], ['Bone_Hand2_Left']),

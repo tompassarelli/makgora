@@ -149,7 +149,6 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | Kael'thas | float | Vain prince: arms spread like the phoenix's wings as he turns once backward. |
 | Murloc | front flip | Small, wet and bouncy: a quick tumbling flip. |
 | Grom | front flip | Reckless berserker: the axe leads a forward somersault. |
-| Anub'arak | heave | An insect lord: carapace pitches up and claws splay; no humanoid flip. |
 | Malfurion | front flip | A druid's forward flip over his staff, antlers and robe sweeping. |
 | Medivh | cannonball | The raven shapeshifter: he tucks like a diving bird and rolls once forward. |
 

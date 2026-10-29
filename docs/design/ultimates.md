@@ -47,7 +47,7 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 ### Variety
 
 Beams (Rifleman, Jaina), transformations (Illidan, Mountain King), rushes
-(Blademaster, Grom), self-centred areas (Anub'arak, Chen, Uther), a channel guarded by wards (Shadow Hunter), placed or targeted areas (Dreadlord,
+(Blademaster, Grom), self-centred areas (Chen, Uther), a channel guarded by wards (Shadow Hunter), placed or targeted areas (Dreadlord,
 Lich King, Medivh), sweeps and summons (Murloc, Lich, Beastmaster, Warden,
 Thrall, Peon, Tinker, Malfurion, Kael'thas), a status projectile (Sylvanas), a return to centre
 (Cairne), a targeted curse (Pit Lord) and a command throw (Grom's catch). Ground sweeps are
@@ -92,7 +92,6 @@ angles, base and growth stay, so a retuned ultimate also launches harder.
 | Kael'thas | 26 | 26 | In band |
 | Murloc | 16 | 26 | Swarm hits 2 to 4, last murloc 10 to 22 |
 | Grom | 11.5 | 26 | Chops 11.5 to 26 total |
-| Anub'arak | 8 | 26 | Swarm ticks 2 to 6.5 |
 | Malfurion | 20 | 26 | Wisp wall 20 to 26 |
 | Medivh | 15 | 26 | Eruption 12 to 23 |
 | Lady Vashj | 0 | 26 | Hits on the petrified foe, capped at 26 |
@@ -126,7 +125,6 @@ Frames count from the input frame (frame 1 is the first frame after it).
 | Kael'thas | air | **Summon Phoenix** · Warcraft III Blood Mage ultimate (tier 1, #360) | Flame Strike embers gather at his shoulder, f1–19 | f20 a phoenix appears 40 behind and 110 above him and follows him for 180 frames; its burning aura (radius 70) deals 4.3%, 70° at ages 30, 60, 90, 120, 150 and 178; it is a special, so it is fire and hits banished fighters. Cast ends f36 | Break it (12 durability), keep away from its aura; punish him through f36 | The Blood Mage's own phoenix | Phoenix unit, Immolation, Flame Strike embers |
 | Murloc | ground only | **Mrglglgl Stampede** · Tom's decision (unit) | Blows a conch, "MRGLGLGLGL!", water splashes where the swarm enters, f1–20 | f20 four murlocs pour across from behind him at ground level, 30 a frame: three carry grounded foes with 4% hits every 6 frames, the last launches (22%, 40°) | Jump or be airborne, shield (heavy damage); off-stage is safe; Murloc is committed until the wave ends | Legible, funny, characterful | Murloc variants at small scale, splashes |
 | Grom | air | **Blood of Mannoroth** · Grom drinking the demon blood in Warcraft III's campaign (tier 2: he has no hero ultimate) | Eyes blaze red; a roar, f1–16 | f17–40 a charge, 22 a frame; the first foe reached is caught (beats shield): three Gorehowl chops, 26% total, flung at 40°. From the air the charge runs level at his height: it catches a foe whose feet are up to about 100 below his, and Grom and the caught foe hang there through the 30-frame hold before he falls | Jump over, roll through, or hit him first; a whiff skids to f70 | Reckless commitment, all or nothing | Bloodlust effects, red tint |
-| Anub'arak | ground only | **Locust Swarm** · Warcraft III Crypt Lord ultimate (tier 1) | Carapace opens; locusts boil out, f1–16 | f17 a beetle cloud of radius 90 drifts ahead at 5 a frame for 90 frames: 6.5% every 12 frames to grounded foes | Jump over it, outrun it, shield; punish him through f60 | The crypt king's swarm | Scarab units |
 | Malfurion | air | **Wisps of Hyjal** · Malfurion's wisps detonating at Mount Hyjal, Warcraft III's finale (tier 2: Tranquility only heals) | Wisps gather around him, f1–28 | f29 a slow wall of wisps drifts forward 7 a frame for 120 frames: 26%, 50° on contact | Shield, jump over, get behind; punish him through f50 | The archdruid's quiet, inevitable answer | Wisp units, Tranquility |
 | Medivh | air | **The Dark Portal** · Medivh opening the Dark Portal (tier 2: no hero ultimate) | A green portal opens 240 ahead, f1–24 | f25–60 it draws nearby foes in (1% every 6 frames, radius 220); f64 it erupts, radius 130: 23%, 60° | Walk out against the pull, shield, escape before f64 | The prophet's doom-laden punchline | Dark Portal target effect |
 | Lady Vashj | air | **Gaze of Azshara** · Lady Vashj, the naga queen once Azshara's handmaiden (tier 2: her Warcraft III ultimate, Tornado, is dropped) | Eyes and head snakes glow, f1–20 | f21–60 a cone 600 ahead, widening to 300 tall, catches a foe facing her: 40% slow for 40 frames, then petrified 60 frames under a grey tint; it takes hits without thawing or flying, at most 26% | Turn away, dodge or stay out of the cone; punish her through f72 | The serpent queen's stare | Curse target effect, grey tint |

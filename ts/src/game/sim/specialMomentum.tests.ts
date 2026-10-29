@@ -19,7 +19,7 @@ const MOVEMENT_SPECIALS = [
   "lich up", "uther side", "uther up", "dreadlord side", "dreadlord up", "shadowHunter up",
   "pitLord side", "pitLord up", "lichKing up", "thrall up", "jaina up", "sylvanas up", "cairne side", "cairne up",
   "chen up", "peon up", "tinker up", "kaelthas up", "murloc side", "murloc up", "grom side", "grom up",
-  "anubarak side", "anubarak up", "malfurion side", "malfurion up", "medivh side", "medivh up", "medivh down",
+  "malfurion side", "malfurion up", "medivh side", "medivh up", "medivh down",
 ];
 const AIR_ONLY_EXCEPTIONS = ["beastmaster up", "tinker side"];
 

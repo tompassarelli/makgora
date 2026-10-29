@@ -192,7 +192,6 @@ export const FROST_ARMOR_SHELL_MODEL = "Abilities\\Spells\\Undead\\FrostArmor\\F
 const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6));
 
 const RAIN_OF_FIRE_TARGET = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx";
-const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.4));
 
 
 const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 165.0, z: 6.0 }));
@@ -315,12 +314,6 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     up: { spell: "Moonlight Leap", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdx", "feet", f32(0.6)) },
     down: { spell: "Elune's Grace", startup: ARCANE, active: cue("Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdx", "ahead", f32(1.4)) },
   },
-  [Character.anubarak]: {
-    neutral: { spell: "Impale", startup: BURROW, active: cue("Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", "ahead", f32(0.6)) },
-    side: { spell: "Burrow Hunt", startup: BURROW, active: cue("Objects\\Spawnmodels\\Undead\\UCancelDeath\\UCancelDeath.mdx", "feet", f32(0.5)) },
-    up: { spell: "Crypt Eruption", startup: BURROW, active: cue("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", "feet", f32(0.4)) },
-    down: { spell: "Carrion Beetle", startup: BURROW, active: drawn("Units\\Undead\\Scarab\\Scarab.mdl", "ahead") },
-  },
   [Character.grom]: {
     neutral: { spell: "Warsong Cry", startup: BLOODLUST, active: cue("Abilities\\Spells\\NightElf\\BattleRoar\\RoarTarget.mdx", "body", 0.75) },
     side: { spell: "Gorehowl Rush", startup: BLOODLUST, active: BLOODLUST },
@@ -442,7 +435,6 @@ const HAMMERFALL_CUES: MoveCues = { ...branch("Hammerfall", HAMMERFALL_GLOW, HAM
 
 export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: HeroBranchCues } } = {
   [Character.malfurion]: { down: { recall: "slot" } },
-  [Character.anubarak]: { down: { recall: "slot" } },
   [Character.jaina]: {
     down: { recall: branch("Recall Water Elemental", ARCANE, cue("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", "body", 0.5)) },
   },

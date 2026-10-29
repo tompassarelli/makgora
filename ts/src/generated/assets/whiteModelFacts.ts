@@ -22,7 +22,6 @@ import * as murloc from "./white-facts/murloc";
 import * as gromHellscream from "./white-facts/grom-hellscream";
 import * as malfurionStormrage from "./white-facts/malfurion-stormrage";
 import * as medivh from "./white-facts/medivh";
-import * as anubarak from "./white-facts/anub'arak";
 import * as cairneBloodhoof from "./white-facts/cairne-bloodhoof";
 import * as shadowHunter from "./white-facts/shadow-hunter";
 import * as uther from "./white-facts/uther";
@@ -52,7 +51,6 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...gromHellscream.whiteModelFacts,
   ...malfurionStormrage.whiteModelFacts,
   ...medivh.whiteModelFacts,
-  ...anubarak.whiteModelFacts,
   ...cairneBloodhoof.whiteModelFacts,
   ...shadowHunter.whiteModelFacts,
   ...uther.whiteModelFacts,

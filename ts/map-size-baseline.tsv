@@ -10,8 +10,6 @@ war3map.mmp	16
 war3mapImported\Ankh-f66e231b935a54ee89e925a7259bf1da03b6fe724f0bca057446d97fbcdb9ea6.mdx	3555
 war3mapImported\AnkhBurst-f77ddcc23d4e1325931ec4075ce690efc795588d47dd1cc06ba97b045b82469b.mdx	4174
 war3mapImported\AnkhPalette-04b0a7176143b5cae687424cd18f9259aaad1b686c4ead769ee1c87782d41d35.tga	6270
-war3mapImported\AnubarakTimelineBody-a7394093a6ead061a975044d2c0a5337af928ae331bb6bb98402eeea5118275d.mdx	231017
-war3mapImported\AnubarakWhite-ed5e699f3908391729dcdf7c08f5150bc51545a833c96a6385ccafcded4102cb.mdx	154027
 war3mapImported\ArchimondeTimelineBody-134475e39e46a26b90c64c5d380d6bdd4d98f85a79df478575fc415bb52d026f.mdx	81386
 war3mapImported\ArchimondeWhite-c332dd55ccea9a005914b61eeb7dfb150ce9fa55d558749ca9331b83d41bf11b.mdx	79683
 war3mapImported\BearOriginalClip2-dc33c2ee5ed2a21be58d7b0d76f3bf9f9678a2f7b460fed64c85fbeabea80c6c.mdx	23819
@@ -34,10 +32,6 @@ war3mapImported\DreadlordWhite-9a1ce4b7130e92fd02bec2e0138aeb63d40551ebeebf586ce
 war3mapImported\FelCrescent-3f37c8f5ac28e33770ff1ec39e2d194d4fa11069ab1cbd98d9915105914e58ee.mdx	727
 war3mapImported\FelCrescentRibbon-9c5b19163c9eaba82d855fbd8ddc2214c43288b9981fbf941415d82488ee1cef.tga	1353
 war3mapImported\FelEmber-7046c5a17be9e01f7e0654e53c940871b9b56ee04722aaeeae9cf155a7e514ed.tga	685
-war3mapImported\FighterBustAnub'arakP1.blp	43912
-war3mapImported\FighterBustAnub'arakP2.blp	44022
-war3mapImported\FighterBustAnub'arakP3.blp	44108
-war3mapImported\FighterBustAnub'arakP4.blp	44059
 war3mapImported\FighterBustArchimondeP1.blp	41249
 war3mapImported\FighterBustArchimondeP2.blp	41804
 war3mapImported\FighterBustArchimondeP3.blp	41842
@@ -142,10 +136,6 @@ war3mapImported\FighterBustWardenP1.blp	42799
 war3mapImported\FighterBustWardenP2.blp	43478
 war3mapImported\FighterBustWardenP3.blp	43425
 war3mapImported\FighterBustWardenP4.blp	43553
-war3mapImported\FighterCardAnub'arakP1.blp	75793
-war3mapImported\FighterCardAnub'arakP2.blp	76089
-war3mapImported\FighterCardAnub'arakP3.blp	76646
-war3mapImported\FighterCardAnub'arakP4.blp	76469
 war3mapImported\FighterCardArchimondeP1.blp	67870
 war3mapImported\FighterCardArchimondeP2.blp	68184
 war3mapImported\FighterCardArchimondeP3.blp	68275
@@ -250,10 +240,6 @@ war3mapImported\FighterCardWardenP1.blp	60819
 war3mapImported\FighterCardWardenP2.blp	61266
 war3mapImported\FighterCardWardenP3.blp	61345
 war3mapImported\FighterCardWardenP4.blp	61424
-war3mapImported\FighterStockAnub'arakP1.blp	5510
-war3mapImported\FighterStockAnub'arakP2.blp	5507
-war3mapImported\FighterStockAnub'arakP3.blp	5490
-war3mapImported\FighterStockAnub'arakP4.blp	5447
 war3mapImported\FighterStockArchimondeP1.blp	5221
 war3mapImported\FighterStockArchimondeP2.blp	5271
 war3mapImported\FighterStockArchimondeP3.blp	5254
@@ -358,11 +344,6 @@ war3mapImported\FighterStockWardenP1.blp	5210
 war3mapImported\FighterStockWardenP2.blp	5238
 war3mapImported\FighterStockWardenP3.blp	5236
 war3mapImported\FighterStockWardenP4.blp	5248
-war3mapImported\FighterTileAnub'arak.blp	33737
-war3mapImported\FighterTileAnub'arakP1.blp	33820
-war3mapImported\FighterTileAnub'arakP2.blp	33777
-war3mapImported\FighterTileAnub'arakP3.blp	33736
-war3mapImported\FighterTileAnub'arakP4.blp	33827
 war3mapImported\FighterTileArchimonde.blp	34907
 war3mapImported\FighterTileArchimondeP1.blp	34594
 war3mapImported\FighterTileArchimondeP2.blp	34987

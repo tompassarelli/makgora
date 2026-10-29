@@ -335,7 +335,7 @@ const ULTIMATE_POSES: { readonly [character: number]: HeroPose | undefined } = {
   [Character.lichKing]: "downSpecial", [Character.thrall]: "downSpecial", [Character.jaina]: "neutralSpecial",
   [Character.sylvanas]: "upSpecial", [Character.cairne]: "downSpecial", [Character.chen]: "downSpecial",
   [Character.peon]: "forwardSmash", [Character.tinker]: "sideSpecial", [Character.kaelthas]: "downSpecial",
-  [Character.murloc]: "neutralSpecial", [Character.grom]: "sideSpecial", [Character.anubarak]: "neutralSpecial",
+  [Character.murloc]: "neutralSpecial", [Character.grom]: "sideSpecial",
   [Character.malfurion]: "downSpecial", [Character.medivh]: "neutralSpecial", [Character.ladyVashj]: "downSpecial", [Character.archimonde]: "downSpecial", [Character.butcher]: "forwardSmash",
   [Character.tyrande]: "sideSpecial",
 };
