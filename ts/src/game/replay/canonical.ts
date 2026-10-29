@@ -507,8 +507,6 @@ export function canonicalChecksum(text: string): string {
 }
 
 
-type Emit = (fragment: string) => void;
-
 /** Where writeState sends each field: canonical text, or the per-frame state hash. */
 interface StateSink extends FighterFieldSink {
   observation(name: string, sample: Readonly<BotObservationFrame>): void;
@@ -531,15 +529,6 @@ function fieldKey(prefix: string, name: string): string {
   return key;
 }
 
-function textSink(emit: Emit): StateSink {
-  return {
-    int: (prefix, name, value) => emit(fieldKey(prefix, name) + canonicalNumber(value)),
-    bool: (prefix, name, value) => emit(fieldKey(prefix, name) + (value ? "1" : "0")),
-    real: (prefix, name, value) => emit(fieldKey(prefix, name) + canonicalReal(value)),
-    text: fragment => emit(fragment),
-    observation: (name, sample) => emit(`|${name}=${botObservationCanonical(sample)}`),
-  };
-}
 
 
 
@@ -851,17 +840,44 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
 }
 
 
+function partsSink(parts: string[]): StateSink {
+  let count = 0;
+  return {
+    int: (prefix, name, value) => {
+      parts[count] = fieldKey(prefix, name);
+      parts[count + 1] = canonicalNumber(value);
+      count += 2;
+    },
+    bool: (prefix, name, value) => {
+      parts[count] = fieldKey(prefix, name);
+      parts[count + 1] = value ? "1" : "0";
+      count += 2;
+    },
+    real: (prefix, name, value) => {
+      parts[count] = fieldKey(prefix, name);
+      parts[count + 1] = canonicalReal(value);
+      count += 2;
+    },
+    text: fragment => {
+      parts[count] = fragment;
+      count++;
+    },
+    observation: (name, sample) => {
+      parts[count] = `|${name}=${botObservationCanonical(sample)}`;
+      count++;
+    },
+  };
+}
+
 export function canonicalState(state: Readonly<ReplayState>): string {
   const parts: string[] = [];
-  writeState(textSink(fragment => { parts.push(fragment); }), state);
+  writeState(partsSink(parts), state);
   return parts.join("");
 }
 
 
 export function stateChecksum(state: Readonly<ReplayState>): string {
-  const lanes: ChecksumLanes = { valid: true, first: 0, second: 0 };
-  writeState(textSink(fragment => foldChecksum(lanes, fragment)), state);
-  return checksumText(lanes);
+  return canonicalChecksum(canonicalState(state));
 }
 
 
