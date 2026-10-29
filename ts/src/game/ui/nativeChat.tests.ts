@@ -3,6 +3,7 @@ import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Phase } from "../lobby/lobbyState";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
+import { NET_INDICATOR_TOP } from "./hudLayout";
 import { CHAT_STYLE, MATCH_CHAT_BOX, STAGE_SELECT_CHAT_BOX, CHARACTER_SELECT_CHAT_BOX, chatBox } from "./nativeChat";
 import type { ChatBox } from "wisp/src/ui/chatPanel";
 
@@ -47,8 +48,9 @@ test("on stage select the chat panel sits left of the stage tiles and above the 
   assertTrue(extent(STAGE_SELECT_CHAT_BOX, 1).bottom >= CARD_STRIP_TOP);
 });
 
-test("in a match the chat panel sits above the fighter plates, and results, pause and menus use the match box [k1 scenario]", () => {
+test("in a match the chat panel sits above the fighter plates and the netplay warning, and results, pause and menus use the match box [k1 scenario]", () => {
   assertTrue(extent(MATCH_CHAT_BOX, 1).bottom >= HUD_PLATE_TOP);
+  assertTrue(extent(MATCH_CHAT_BOX, 1).bottom >= NET_INDICATOR_TOP);
   assertEquals(chatBox(Phase.characterMenu), CHARACTER_SELECT_CHAT_BOX);
   assertEquals(chatBox(Phase.stageMenu), STAGE_SELECT_CHAT_BOX);
   assertEquals(chatBox(Phase.match), MATCH_CHAT_BOX);

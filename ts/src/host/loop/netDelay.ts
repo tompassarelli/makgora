@@ -10,7 +10,7 @@ import {
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
-import { MENU_STYLE } from "../../game/ui/hudLayout";
+import { MENU_STYLE, NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
 import type { LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond, slowMachineText } from "../../game/netcode/machineRate";
@@ -312,7 +312,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   if (floorMod(net.ticks, SECOND) !== 0) return;
   if (net.indicator === undefined) {
     net.indicator = createText("SmashcraftNetIndicator", gameUi(), 0);
-    placeTopLeft(net.indicator, f32(0.01), f32(0.145));
+    placeTopLeft(net.indicator, f32(0.01), NET_INDICATOR_TOP);
     BlzFrameSetSize(net.indicator, f32(0.5), f32(0.016));
     BlzFrameSetVisible(net.indicator, false);
   }
