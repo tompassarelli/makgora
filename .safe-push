@@ -1,5 +1,4 @@
 [landing]
-	exact = true
 	queue = lock
 [land]
 	publish = farm/

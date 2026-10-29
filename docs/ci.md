@@ -62,10 +62,11 @@ fetch, rebase, scan and push:
    rebase onto a moved main reruns only the groups whose files changed. The
    static group's inputs are every tracked file (the clean room reads any
    path), so it reruns on each change. When origin main moves while
-   a run is in flight the exact landing reruns it on the rebased tree, up to
-   three times, then under the lock. A raw `git push` to main, which skips
-   safe-push, still runs the pre-push hook's local gate
-   (`landingSelection`, smashcraft:ts/scripts/landingRun.ts `here`).
+   a run is in flight on files the lane also changes, the landing reruns it on
+   the rebased tree, up to three times, then under the lock; a move on other
+   files keeps the verdict, since main's full suite runs after each landing. A
+   raw `git push` to main, which skips safe-push, still runs the pre-push hook's
+   local gate (`landingSelection`, smashcraft:ts/scripts/landingRun.ts `here`).
    `LAND_FULL_SUITE=1 safe-push --to main` forces every group.
    `bun scripts/landingCpu.ts run OUT.json -- safe-push --to main` from ts/
    splits a landing's local CPU seconds by stage. A scripts-only landing with
