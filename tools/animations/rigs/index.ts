@@ -27,9 +27,10 @@ import * as malfurion from './malfurion';
 import * as medivh from './medivh';
 import * as ladyvashj from './ladyvashj';
 import * as archimonde from './archimonde';
+import * as butcher from './butcher';
 
 /** Every fighter's Classic mapping onto the canonical rig, by character (#366). */
 export const FIGHTER_RIGS: ReadonlyMap<Character, FighterRig> = new Map([
     rifleman, illidan, blademaster, mountainking, warden, lich, uther, dreadlord, shadowhunter, pitlord, beastmaster, lichking, thrall,
-    jaina, sylvanas, cairne, chen, peon, tinker, kaelthas, murloc, grom, anubarak, malfurion, medivh, ladyvashj, archimonde,
+    jaina, sylvanas, cairne, chen, peon, tinker, kaelthas, murloc, grom, anubarak, malfurion, medivh, ladyvashj, archimonde, butcher,
 ].map(rig => [rig.character, rig as FighterRig]));

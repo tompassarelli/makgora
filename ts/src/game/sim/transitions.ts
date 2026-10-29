@@ -241,6 +241,7 @@ export function clearGrabLinks(world: Roster, slot: number): void {
   grab.frame = 0;
   grab.mashX = 0;
   grab.mashZ = 0;
+  grab.reel = 0;
   if (owner !== undefined && owner.grab.target === slot) {
     owner.grab.target = undefined;
     owner.grab.queuedThrow = GrabAction.none;
@@ -253,6 +254,7 @@ export function clearGrabLinks(world: Roster, slot: number): void {
     target.grab.heldFrames = 0;
     target.grab.mashX = 0;
     target.grab.mashZ = 0;
+    target.grab.reel = 0;
   }
 }
 

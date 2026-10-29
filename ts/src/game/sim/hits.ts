@@ -22,7 +22,7 @@ function stopMotion(f: Fighter): void {
 }
 
 
-function catchTarget(world: Roster, attackerSlot: number, targetSlot: number): void {
+export function catchTarget(world: Roster, attackerSlot: number, targetSlot: number): void {
   const attacker = fighterAt(world, attackerSlot);
   const target = fighterAt(world, targetSlot);
   clearGrabLinks(world, attackerSlot);

@@ -20,6 +20,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Warden | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Maiev hunts Illidan to the Broken Isles and into the Tomb of Sargeras. |
 | Malfurion Stormrage | Tomb of Sargeras | 7 | Malfurion follows Illidan and Maiev through the Broken Isles in TFT. |
 | Lich | Naxxramas | 4 | Kel'Thuzad, raised as a lich in RoC, rules the Scourge necropolis Naxxramas. |
+| the Butcher | Naxxramas | 4 | The Scourge stitches its abominations together in Naxxramas's flesh-works. |
 | Uther | Stratholme | 6 | RoC's "The Culling": Uther refuses to purge Stratholme and leaves Arthas at its gates. |
 | Dreadlord | Stratholme | 6 | RoC's "The Culling": the dreadlord Mal'Ganis waits for Arthas in the plagued city. |
 | Shadow Hunter | Durotar Skies | 3 | Vol'jin's Darkspear trolls settle Durotar's coast beside Thrall's orcs. |

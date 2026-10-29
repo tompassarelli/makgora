@@ -40,6 +40,7 @@ import { type StageActions, StagePanel } from "../../game/ui/stageUi";
 import type { ShellState } from "./state";
 import { bindPrototype } from "../../platform/rebind";
 import { ItemPresentation } from "../../game/render/itemPresentation";
+import { AuraPresentation } from "../../game/render/auraPresentation";
 import { OrbPresentation } from "../../game/render/orbPresentation";
 import { ParasolPresentation } from "../../game/render/parasolPresentation";
 import { GoldSackPresentation } from "../../game/render/goldSackPresentation";
@@ -78,6 +79,7 @@ interface FighterRenderers {
 export interface UiObjects {
   pause: PauseMenu;
   items: ItemPresentation;
+  auras: AuraPresentation;
   orbs: OrbPresentation;
   readonly clock: MatchClock;
   readonly training: TrainingReadout;
@@ -142,6 +144,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     results,
     pause: new PauseMenu(selectPause),
     items: new ItemPresentation(s.origin),
+    auras: new AuraPresentation(s.origin),
     orbs: new OrbPresentation(s.origin),
     clock: new MatchClock(),
     training: new TrainingReadout(),
@@ -250,6 +253,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   const retainedItems: { readonly items?: ItemPresentation } = ui;
   if (retainedItems.items === undefined) ui.items = new ItemPresentation(s.origin);
   else bindPrototype(ui.items, ItemPresentation.prototype);
+  const retainedAuras: { readonly auras?: AuraPresentation } = ui;
+  if (retainedAuras.auras === undefined) ui.auras = new AuraPresentation(s.origin);
+  else bindPrototype(ui.auras, AuraPresentation.prototype);
   const retainedOrbs: { readonly orbs?: OrbPresentation } = ui;
   if (retainedOrbs.orbs === undefined) ui.orbs = new OrbPresentation(s.origin);
   else bindPrototype(ui.orbs, OrbPresentation.prototype);

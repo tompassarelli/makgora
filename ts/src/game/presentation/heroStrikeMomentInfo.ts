@@ -4,6 +4,7 @@ import { anubarakStrikeMoments } from "../fighters/anubarak/strikeMoments";
 import { archimondeStrikeMoments } from "../fighters/archimonde/strikeMoments";
 import { beastmasterStrikeMoments } from "../fighters/beastmaster/strikeMoments";
 import { blademasterStrikeMoments } from "../fighters/blademaster/strikeMoments";
+import { butcherStrikeMoments } from "../fighters/butcher/strikeMoments";
 import { cairneStrikeMoments } from "../fighters/cairne/strikeMoments";
 import { chenStrikeMoments } from "../fighters/chen/strikeMoments";
 import { dreadlordStrikeMoments } from "../fighters/dreadlord/strikeMoments";
@@ -35,6 +36,7 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.archimonde]: archimondeStrikeMoments,
   [Character.beastmaster]: beastmasterStrikeMoments,
   [Character.blademaster]: blademasterStrikeMoments,
+  [Character.butcher]: butcherStrikeMoments,
   [Character.cairne]: cairneStrikeMoments,
   [Character.chen]: chenStrikeMoments,
   [Character.dreadlord]: dreadlordStrikeMoments,

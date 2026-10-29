@@ -20,6 +20,7 @@ import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { EYE_BEAM_BAND_ABOVE, EYE_BEAM_BAND_BELOW, EYE_BEAM_BAND_DROP, EYE_BEAM_BAND_HALF, EYE_BEAM_DAMAGE, EYE_BEAM_SET_KNOCKBACK } from "./eyeBeam";
 import { type Roster, fighterAt, isActive } from "./roster";
+import { latchesOn } from "./hookLatch";
 import { SHIELD_PROJECTILE_DAMAGE_MULTIPLIER, SHIELD_PROJECTILE_SPEED_MULTIPLIER, grantParry, shieldCircleIntersects } from "./shield";
 import { at } from "wisp/src/runtime/lookup";
 import { solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceLine, surfacePass, surfaceRight, surfaceZ } from "./stage";
@@ -483,6 +484,10 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
         applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
         projectile.poolWait = burn.every - 1;
       } else if (nearest !== undefined) {
+        if (latchesOn(world, ownerSlot, nearest, projectile, selected.shield)) {
+          projectile.life = 0;
+          continue;
+        }
         const burst = projectile.kind === ProjectileKind.hero ? projectile.spec?.burstInto : undefined;
         let bounced = false;
         if (!(selected.reflector && reflectProjectile(fighterAt(world, nearest), projectile))) {

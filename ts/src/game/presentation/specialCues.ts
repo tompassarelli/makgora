@@ -303,6 +303,12 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     up: { spell: "Fel Ascent", startup: FEL, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "feet", 1.0) },
     down: { spell: "Bash", startup: FEL, active: cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "ahead", f32(0.5)) },
   },
+  [Character.butcher]: {
+    neutral: { spell: "Meat Hook", startup: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)), active: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)) },
+    side: { spell: "Butcher's Charge", startup: cue("Objects\\Spawnmodels\\Undead\\UndeadLargeDeathExplode\\UndeadLargeDeathExplode.mdx", "body", f32(0.4)), active: cue("Objects\\Spawnmodels\\Undead\\UndeadLargeDeathExplode\\UndeadLargeDeathExplode.mdx", "ahead", f32(0.4)) },
+    up: { spell: "Hook Swing", startup: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)), active: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)) },
+    down: { spell: "Rot", startup: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)), active: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)) },
+  },
   [Character.anubarak]: {
     neutral: { spell: "Impale", startup: BURROW, active: cue("Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", "ahead", f32(0.6)) },
     side: { spell: "Burrow Hunt", startup: BURROW, active: cue("Objects\\Spawnmodels\\Undead\\UCancelDeath\\UCancelDeath.mdx", "feet", f32(0.5)) },

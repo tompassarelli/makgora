@@ -111,6 +111,8 @@ export interface FighterMoves {
 
   readonly throws: { readonly [action: number]: AuthoredThrow | undefined };
   readonly carry?: CargoCarry | undefined;
+  /** Stacks won by KOs and landed throws, up to `cap`, each adding `weightPerStack` of his weight; all are lost with a stock. */
+  readonly stacks?: { readonly cap: number; readonly weightPerStack: number } | undefined;
   readonly dashAttack: AttackStyle;
   readonly grabRegion?: Readonly<HitRegion> | undefined;
 

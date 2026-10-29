@@ -4,6 +4,8 @@ import { canHit } from "./teams";
 
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
+import { imod } from "wisp/src/sim/intMath";
+import type { HitEffect } from "./hitRegions";
 import { emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { ContactKind } from "./codes";
 import { canBeGrabbed, inGrabContext, isIntangible } from "./conditions";
@@ -30,7 +32,7 @@ function stopMotion(f: Fighter): void {
 }
 
 
-function caughtTarget(world: Roster, slot: number, owner: Readonly<Fighter>): number | undefined {
+function caughtTarget(world: Roster, slot: number, owner: Readonly<Fighter>, shieldable: boolean): number | undefined {
   let best: number | undefined;
   let bestDistance = 0.0;
   for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
@@ -38,6 +40,7 @@ function caughtTarget(world: Roster, slot: number, owner: Readonly<Fighter>): nu
     const victim = fighterAt(world, target);
     if (victim.status.out || (isIntangible(victim) && victim.status.divineFrames <= 0) || !canBeGrabbed(victim) || inGrabContext(victim)) continue;
     if (!grabTouchesBody(strike, victim) || repelSpell(victim)) continue;
+    if (shieldable && victim.shield.raised) continue;
     const distance = Math.abs(f32(victim.motion.x - owner.motion.x));
     if (best === undefined || distance < bestDistance) {
       best = target;
@@ -72,6 +75,17 @@ function latch(world: Roster, slot: number, targetSlot: number, holdFrames: numb
 }
 
 
+const drainHit: HitEffect = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false };
+
+function drainHeld(world: Roster, slot: number, drain: { readonly every: number; readonly damage: number }, held: number): void {
+  const owner = fighterAt(world, slot);
+  const targetSlot = owner.grab.target;
+  if (owner.launch.hitlag > 0 || held <= 0 || imod(held, drain.every) !== 0 || targetSlot === undefined || fighterAt(world, targetSlot).grab.owner !== slot) return;
+  drainHit.damage = drain.damage;
+  queueDamageContact(world, slot, targetSlot, drainHit, owner.facing, ContactKind.damageOnly, true, undefined);
+  if (currentTraits(owner).heal === true) owner.status.damage = f32(owner.status.damage - min(drain.damage, max(0.0, owner.status.damage)));
+}
+
 export function advanceHeroCommandGrab(world: Roster, slot: number): void {
   const owner = fighterAt(world, slot);
   const grab = runningHeroSpecial(owner)?.commandGrab;
@@ -81,12 +95,13 @@ export function advanceHeroCommandGrab(world: Roster, slot: number): void {
   if (special.grabFrame === 0) {
     if (frame < grab.first || frame > grab.last || owner.launch.hitlag > 0 || inGrabContext(owner)) return;
     placeCapsule(strike, grab.strike, owner.motion.x, owner.motion.z, owner.facing);
-    const target = caughtTarget(world, slot, owner);
+    const target = caughtTarget(world, slot, owner, grab.shieldable === true);
     if (target === undefined) return;
     special.grabFrame = frame;
     latch(world, slot, target, grab.holdFrames);
     return;
   }
+  if (grab.drain !== undefined && frame <= special.grabFrame + grab.holdFrames) drainHeld(world, slot, grab.drain, frame - special.grabFrame);
   if (frame !== special.grabFrame + grab.holdFrames) return;
   const targetSlot = owner.grab.target;
 

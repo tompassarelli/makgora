@@ -29,4 +29,5 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   27: { walk: { clip: 12, model: "units\\human\\Uther\\Uther.mdl", speed: f32(231.523) }, run: { clip: 12, model: "units\\human\\Uther\\Uther.mdl", speed: f32(231.523) } },
   28: { walk: { clip: 1, model: "units\\naga\\LadyVashj\\LadyVashj.mdl", speed: f32(14.918) }, run: { clip: 78, model: "units\\naga\\LadyVashj\\LadyVashj.mdl", speed: f32(205.966) } },
   29: { walk: { clip: 2, model: "units\\demon\\Warlock\\Warlock.mdl", speed: f32(240.654) }, run: { clip: 2, model: "units\\demon\\Warlock\\Warlock.mdl", speed: f32(240.654) } },
+  31: { walk: { clip: 1, model: "units\\undead\\Abomination\\Abomination.mdl", speed: f32(232.902) }, run: { clip: 1, model: "units\\undead\\Abomination\\Abomination.mdl", speed: f32(232.902) } },
 };

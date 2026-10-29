@@ -112,6 +112,7 @@ export const SIGNATURE_STRONG_HIT: { readonly [character: number]: AttackStyle }
   [Character.malfurion]: AttackStyle.forwardSmash,
   [Character.medivh]: AttackStyle.neutralAir,
   [Character.archimonde]: AttackStyle.forwardSmash,
+  [Character.butcher]: AttackStyle.forwardSmash,
   [Character.anubarak]: AttackStyle.forwardSmash,
 };
 
@@ -158,6 +159,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   [Character.malfurion]: { [AttackStyle.forwardSmash]: "Wrath bursts at the staff's tip, so the druid kills at range." },
   [Character.medivh]: { [AttackStyle.neutralAir]: "An arcane ring strongest as it forms, lingering as weak cover." },
   [Character.archimonde]: { [AttackStyle.forwardSmash]: "The fel claws at the end of the slam crush; the forearms only shove." },
+  [Character.butcher]: { [AttackStyle.forwardSmash]: "The cleaver's edge carves; the haft only clubs, so he kills by spacing the blade." },
   [Character.anubarak]: { [AttackStyle.forwardSmash]: "The impaling claw's point." },
 };
 

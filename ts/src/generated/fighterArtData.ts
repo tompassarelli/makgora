@@ -36,6 +36,7 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [27, { name: "Uther", slug: "uther", source: "hero-models/uther.mdx", stock: "war3.w3mod:units/human/uther/uther.mdx", model: "units\\human\\Uther\\Uther.mdl" }],
   [28, { name: "LadyVashj", slug: "lady-vashj", source: "hero-models/ladyvashj.mdx", stock: "war3.w3mod:units/naga/ladyvashj/ladyvashj.mdx", model: "units\\naga\\LadyVashj\\LadyVashj.mdl" }],
   [29, { name: "Archimonde", slug: "archimonde", source: "hero-models/warlock.mdx", stock: "war3.w3mod:units/demon/warlock/warlock.mdx", model: "units\\demon\\Warlock\\Warlock.mdl" }],
+  [31, { name: "Butcher", slug: "butcher", source: "hero-models/abomination.mdx", stock: "war3.w3mod:units/undead/abomination/abomination.mdx", model: "units\\undead\\Abomination\\Abomination.mdl" }],
 ]);
 
 export function fighterArt(character: number): FighterArt {

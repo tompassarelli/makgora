@@ -554,6 +554,7 @@ export function lockArenaCamera(s: ShellState): void {
     SetCameraPosition(centerX, centerY);
   }
   views(s).items.present(game, world);
+  views(s).auras.present(game.phase === Phase.match, world);
   views(s).orbs.present(game, game.stageChoice, game.phase === Phase.match);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;

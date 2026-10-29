@@ -412,6 +412,13 @@ const ARCHIMONDE: AuthoredSpecial = {
   ],
 };
 
+const BUTCHER: AuthoredSpecial = {
+  name: "Dismember", endFrame: 78,
+  motion: [{ ...frames(21, 28), velocityX: 14.0, velocityZ: 0.0, stopsAtShield: true }, { ...frames(29, 29), velocityX: 0.0, velocityZ: 0.0 }],
+  commandGrab: { ...frames(21, 28), strike: capsule(30.0, 60.0, 110.0, 70.0, 44.0), holdFrames: 90, effect: hit(0.0, 45, 0.0, 60.0, HitElement.slash), recovery: 20,
+    drain: { every: 15, damage: 4.0 }, shieldable: true },
+};
+
 /** Every fighter's ultimate, by character. */
 export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial | undefined } = {
   [Character.rifleman]: RIFLEMAN,
@@ -441,6 +448,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.uther]: UTHER,
   [Character.ladyVashj]: LADY_VASHJ,
   [Character.archimonde]: ARCHIMONDE,
+  [Character.butcher]: BUTCHER,
 };
 
 const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined } = {
@@ -471,6 +479,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.uther]: "Golden light gathers around him, then rings of it rise on both sides, heal him and throw everyone near him upward. Shield or roll away during the gathering.",
   [Character.ladyVashj]: "Her eyes and head snakes glow, then her gaze sweeps a cone ahead: a foe facing her slows, then turns to stone and takes hits without flying until it ends. Turn away from her.",
   [Character.archimonde]: "Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles.",
+  [Character.butcher]: "He raises the cleaver, then lunges: a caught foe is pinned and carved for a long moment while he heals. Shield or dodge the lunge.",
 };
 
 /** The ultimate's official name and one-line description, for the move list and Moves page. */

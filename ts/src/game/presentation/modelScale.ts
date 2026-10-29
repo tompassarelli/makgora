@@ -42,6 +42,7 @@ export const STOCK_MODEL_SCALES: Readonly<Record<Character, { readonly unit: str
   [Character.ladyVashj]: { unit: "Hvsh", scale: 1.0 },
   [Character.medivh]: { unit: "nmed", scale: 1.0 },
   [Character.archimonde]: { unit: "Uwar", scale: f32(1.45) },
+  [Character.butcher]: { unit: "uabo", scale: f32(1.15) },
   [Character.murloc]: { unit: "nmrl", scale: 1.0 },
   [Character.grom]: { unit: "Ogrh", scale: 1.0 },
 };

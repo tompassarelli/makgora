@@ -53,6 +53,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.medivh]: "Last Word holds height, blinks back and bursts",
   [Character.ladyVashj]: "Mana Shield toggles in the air as on the ground",
   [Character.archimonde]: "aerial Bash, a hammer-fist that drives a foe below him down",
+  [Character.butcher]: "Rot toggles in the air as on the ground",
 };
 
 export interface AerialDownRow {

@@ -13,6 +13,8 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Controls, type Roster, controlsAt, fighterAt, isActive } from "./roster";
 import { beginGrabAction, clearGrabLinks } from "./transitions";
+import { reelHeld } from "./hookLatch";
+import { gainStack } from "./stackPassive";
 import { cargoCarry, carriedOffset, carryHoldFrames, carriesOverhead, holdThrow, isCargoThrow, requestedCarryThrow } from "./cargoCarry";
 
 const PUMMEL_HIT = { damage: PUMMEL_DAMAGE, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
@@ -104,6 +106,7 @@ function releaseThrow(world: Roster, ownerSlot: number, targetSlot: number, targ
   const effect = authoredThrowEffect(action, owner.tuning.moves);
   const direction = authored !== undefined ? owner.facing : action === GrabAction.throwBack ? -owner.facing : owner.facing;
   queueDamageContact(world, ownerSlot, targetSlot, effect, direction, ContactKind.throw, false, targetInput);
+  gainStack(owner);
 
   target.motion.grounded = false;
   target.motion.surface = undefined;
@@ -130,6 +133,7 @@ function resolveHeldTarget(world: Roster, ownerSlot: number): void {
     owner.launch.knockbackZ = 0.0;
   }
   const held = target.motion;
+  if (target.grab.reel > 0) return;
   if (carry !== undefined && carriesOverhead(action)) {
     const offset = carriedOffset(carry, action, frame, grabContactFrame(action, owner.tuning.moves), carry.hoistFrames, owner.facing);
     held.x = f32(owner.motion.x + offset.x);
@@ -167,6 +171,7 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
   const { grab } = owner;
   if (grab.action === GrabAction.none || paused) return;
   const targetSlot = grab.target;
+  if (targetSlot !== undefined && reelHeld(owner, fighterAt(world, targetSlot))) return;
   if (targetSlot !== undefined && (grab.action === GrabAction.hold || grab.action === GrabAction.pummel || grab.action === GrabAction.hoist || grab.action === GrabAction.carry)) {
     const held = fighterAt(world, targetSlot).grab;
     held.grabbedFrames = advanceMash(held, targetInput, held.grabbedFrames, GRAB_HOLD_MINIMUM_FRAMES);

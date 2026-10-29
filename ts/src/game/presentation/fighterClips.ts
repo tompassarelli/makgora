@@ -202,6 +202,7 @@ export function ledgePose(state: LedgeState): HeroPose {
     case LedgeState.climb: return "ledgeClimb";
     case LedgeState.roll: return "ledgeRoll";
     case LedgeState.attack: return "ledgeAttack";
+    case LedgeState.tether: return "upSpecialAir";
     default: return "ledgeHang";
   }
 }
@@ -335,7 +336,7 @@ const ULTIMATE_POSES: { readonly [character: number]: HeroPose | undefined } = {
   [Character.sylvanas]: "upSpecial", [Character.cairne]: "downSpecial", [Character.chen]: "downSpecial",
   [Character.peon]: "forwardSmash", [Character.tinker]: "sideSpecial", [Character.kaelthas]: "downSpecial",
   [Character.murloc]: "neutralSpecial", [Character.grom]: "sideSpecial", [Character.anubarak]: "neutralSpecial",
-  [Character.malfurion]: "downSpecial", [Character.medivh]: "neutralSpecial", [Character.ladyVashj]: "downSpecial", [Character.archimonde]: "downSpecial",
+  [Character.malfurion]: "downSpecial", [Character.medivh]: "neutralSpecial", [Character.ladyVashj]: "downSpecial", [Character.archimonde]: "downSpecial", [Character.butcher]: "forwardSmash",
 };
 
 function ultimateClip(character: number, grounded: boolean): HeroClip {

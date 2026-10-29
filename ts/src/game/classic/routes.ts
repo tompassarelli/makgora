@@ -353,6 +353,18 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     ],
     ending: ["Kil'jaeden thought to take my place. The Legion answers to one master.", "Hyjal is quiet now. The World Tree's strength flows into me.", "Kneel, little world. Your gods have abandoned you."],
   },
+  {
+    fighter: C.butcher, boss: BossKind.lichKing,
+    story: "The Butcher lumbers out of the Naxxramas flesh-works with a fresh hook and an empty larder, and Lordaeron is full of meat.",
+    fights: [
+      fight(C.peon, 3, "Work work? No. Not for you. Never for you."),
+      fight(C.uther, 6, "The Light will cleanse what Kel'Thuzad stitched together, abomination."),
+      fight(C.dreadlord, 6, "Mind the hook, butcher. The nathrezim are not on your menu."),
+      fight(C.lich, 4, "Back to the workshop with you. Your master has other uses for that hook."),
+      fight(C.sylvanas, 2, "The Forsaken were never your larder. Turn around, or lose the other arm."),
+    ],
+    ending: ["Fresh meat, all of it. The workshop will be busy for a year.", "The Lich King wanted a servant. He got a butcher.", "Hook, reel, carve. Simple work for a simple soul."],
+  },
 ];
 
 export const CLASSIC_CHARACTERS: readonly Character[] = CLASSIC_ROUTES.map(route => route.fighter);

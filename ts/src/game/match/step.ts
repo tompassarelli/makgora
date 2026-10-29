@@ -14,6 +14,7 @@ import { resolveLedges } from "../sim/ledge";
 import { carryOnMovingDecks } from "../sim/movingDecks";
 import { observedActions, resetObservedActions } from "../sim/observations";
 import { updateProjectiles } from "../sim/projectiles";
+import { advanceAura } from "../sim/toggleAura";
 import { advancePlacedObjects } from "../sim/placedObjects";
 import { advanceCurses } from "../sim/curses";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
@@ -267,6 +268,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     regenerateShield(f);
     advanceHeroStatus(f);
     advanceItemBuff(f);
+    advanceAura(world, slot);
   }
   finishDamageContacts(world);
   resolveGrabs(world);

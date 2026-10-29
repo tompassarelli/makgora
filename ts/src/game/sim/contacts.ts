@@ -287,6 +287,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       shieldElectric ||= contact.effect.electric || contact.effect.element === HitElement.electric;
       if (!perfectShield) shieldDamage = addFloat32(shieldDamage, contact.effect.shieldDamage ?? contact.effect.damage);
     } else {
+      if (contact.source !== slot) status.struckBy = contact.source;
       totalDamage = addFloat32(totalDamage, roundToFloat32(petrifiedDamage(target, shieldedDamage(target, contact.effect.damage, contact.kind))));
       damageObserver?.(contact.source, contact.target, contact.effect.damage);
     }

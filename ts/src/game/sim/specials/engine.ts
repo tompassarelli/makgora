@@ -38,6 +38,9 @@ import { squareRoot } from "../warcraftMath";
 import type { ProjectileVelocity } from "./volleys";
 import { clearBounce } from "../projectileBounce";
 import { toggleManaShield } from "../manaShield";
+import { tetherToLedge } from "./ledgeTether";
+import { toggleAuraOnFrame } from "../toggleAura";
+import { stackedArmor } from "../stackPassive";
 import { gazeAt } from "../gaze";
 import { ownedCount } from "./ownedProjectiles";
 import { applySelfHeal } from "./selfHeal";
@@ -250,7 +253,7 @@ function applyArmorWindow(f: Fighter, armor: SpecialArmor, frame: number): void 
     status.armorFrames = max(status.armorFrames, 2);
     status.armorChills = false;
   } else return;
-  status.armorMaxDamage = armor.maxDamage ?? 0.0;
+  status.armorMaxDamage = stackedArmor(f, armor.maxDamage, armor.perStack);
   status.armorKnockback = armor.knockback ?? 0.0;
 }
 
@@ -1000,6 +1003,8 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   const frame = f.special.frame;
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
   if (move.manaShield?.frame === frame) toggleManaShield(f);
+  toggleAuraOnFrame(f, move.toggleAura, frame);
+  if (tetherToLedge(world, f, move.ledgeTether, frame, stage)) return;
   if (move.gaze !== undefined && world !== undefined) gazeAt(world, f, move.gaze, frame);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);

@@ -544,5 +544,25 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Archimonde the Defiler | ledge-get-up | 2: Walk | 160.5 | 38.5 | up; 96.1/63.2 |
 | Archimonde the Defiler | ledge-roll | 2: Walk | 160.7 | 38.6 | forward; 160.2/133.7 |
 | Archimonde the Defiler | ledge-attack | 6: Attack - 1 | 195.4 | 72.9 | both; 195.1/126.0 |
+| the Butcher | walk | 1: Walk | 155.6 | 42.4 | forward; 149.6/143.5 |
+| the Butcher | dash | 1: Walk | 154.4 | 36.5 | forward; 146.7/71.9 |
+| the Butcher | run | 1: Walk | 165.7 | 37.4 | forward; 138.6/164.6 |
+| the Butcher | turn | 1: Walk | 86.0 | 13.0 | back; 85.9/43.7 |
+| the Butcher | brake | 1: Walk | 64.5 | 10.4 | in place; 63.9/37.8 |
+| the Butcher | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
+| the Butcher | roll-forward | 1: Walk | 155.5 | 42.3 | forward; 149.8/143.5 |
+| the Butcher | roll-back | 1: Walk | 155.5 | 42.3 | back; 143.5/149.8 |
+| the Butcher | spot-dodge | 7: Stand - 3 | 359.3 | 60.1 | in place; 137.3/203.2 |
+| the Butcher | air-dodge | 7: Stand - 3 | 360.0 | 60.3 | in place; 138.6/203.2 |
+| the Butcher | tech | 0: Stand - 1 | 57.1 | 12.6 | in place; 21.1/19.6 |
+| the Butcher | tech-forward | 0: Stand - 1 | 57.1 | 12.6 | forward; 21.1/19.6 |
+| the Butcher | tech-back | 0: Stand - 1 | 57.1 | 12.6 | back; 19.6/21.1 |
+| the Butcher | get-up | 7: Stand - 3 | 359.9 | 60.2 | up; 323.1/90.9 |
+| the Butcher | get-up-forward | 0: Stand - 1 | 57.1 | 12.6 | forward; 21.1/19.6 |
+| the Butcher | get-up-back | 0: Stand - 1 | 57.1 | 12.6 | back; 19.6/21.1 |
+| the Butcher | get-up-attack | 4: Attack -2 | 397.1 | 74.2 | both; 356.8/207.5 |
+| the Butcher | ledge-get-up | 1: Walk | 155.1 | 42.3 | up; 84.3/58.4 |
+| the Butcher | ledge-roll | 1: Walk | 155.5 | 42.4 | forward; 149.4/143.6 |
+| the Butcher | ledge-attack | 2: Attack | 371.8 | 93.9 | both; 317.8/325.1 |
 
 Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale.

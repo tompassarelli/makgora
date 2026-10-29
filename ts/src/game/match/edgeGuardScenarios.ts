@@ -278,6 +278,7 @@ export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> =
   [Character.malfurion]: { guarder: Character.malfurion, out: 97.0, z: -84.0, press: 6 },
   [Character.medivh]: { guarder: Character.medivh, out: 163.0, z: -68.0, press: 3 },
   [Character.archimonde]: { guarder: Character.archimonde, out: 160.0, z: -134.0, press: 3 },
+  [Character.butcher]: { guarder: Character.butcher, out: 160.0, z: -110.0, press: 3 },
   [Character.anubarak]: { guarder: Character.anubarak, out: 165.0, z: -68.0, press: 6 },
 };
 

@@ -269,6 +269,27 @@ export function resolveLedges(world: Roster, stage: number, controls: readonly R
   }
 }
 
+export const LEDGE_TETHER_FRAMES = 12;
+
+function reelToLedge(world: Roster, slot: number, stage: number): void {
+  const f = fighterAt(world, slot);
+  const { motion, ledge } = f;
+  if (f.launch.hitstun > 0) {
+    clearLedge(f);
+    return;
+  }
+  const remaining = LEDGE_TETHER_FRAMES - ledge.frame;
+  const side = ledge.side;
+  motion.x = f32(motion.x + f32(f32(f32(ledgeX(stage, side) + f32(side * LEDGE_HANG_OUTSET)) - motion.x) / remaining));
+  motion.z = f32(motion.z + f32(f32(f32(mainDeckZ(stage) - LEDGE_HANG_DEPTH) - motion.z) / remaining));
+  motion.vx = 0.0;
+  motion.vz = 0.0;
+  ledge.frame++;
+  if (ledge.frame < LEDGE_TETHER_FRAMES) return;
+  clearLedge(f);
+  if (!snapToLedge(world, slot, stage, side)) f.special.fall = true;
+}
+
 function startLedgeOption(f: Fighter, state: LedgeState): void {
   f.ledge.state = state;
   f.ledge.frame = 0;
@@ -283,6 +304,10 @@ export function advanceLedge(world: Roster, slot: number, stage: number, input: 
   if (f.status.out || f.launch.hitlag > 0) return;
   f.status.invincible = max(0, f.status.invincible - 1);
   ledge.intangible = max(0, ledge.intangible - 1);
+  if (ledge.state === LedgeState.tether) {
+    reelToLedge(world, slot, stage);
+    return;
+  }
   if (ledge.state === LedgeState.hang) {
 
     if (ledge.frame > 0) {

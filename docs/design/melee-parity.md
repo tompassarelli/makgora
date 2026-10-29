@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-531 rows: 477 parity, 36 deviations, 18 open.
+546 rows: 492 parity, 36 deviations, 18 open.
 
 ## Deviations from Melee
 
@@ -195,7 +195,7 @@ deviation's reason, issue and decision date are written.
 | Pummel, probed headless: the code's repeatable pummel (2026-10-17, #81) is current; the older one-pummel text is corrected `pummel` | repeatable, 3% | [repeatable, 3%](https://www.ssbwiki.com/Pummel) | [moves.ts:353](../../ts/src/game/sim/moves.ts#L353) `PUMMEL_DAMAGE` | parity |
 | Grab release frames `grab-release` | victim 6 frames in release stun, grabber 10 letting go | [not documented: SmashWiki's Grab page names the release but gives no frame counts](https://www.ssbwiki.com/Grab) | [moves.ts:343](../../ts/src/game/sim/moves.ts#L343) `GRAB_RELEASE_STUN_FRAMES` | deviation: every release frees the victim 4 frames first, so no release leads to a guaranteed regrab (docs/gameplay-design.md, Grab holds and pummels) (Tom 2026-10-14) |
 | Throw knockback, probed headless: a forward throw at 50% on weight-75, 100 and 127 victims `throw-knockback` | knockback hits at weight 100 | [knockback hits at weight 100](https://www.ssbwiki.com/Throw) | [knockback.ts:30](../../ts/src/game/sim/knockback.ts#L30) `THROW_KNOCKBACK_WEIGHT` | parity |
-| Throw animation speed `throw-speed` | the same for every victim | [some throws scale by weight/100](https://www.ssbwiki.com/Throw) | [grabs.ts:71](../../ts/src/game/sim/grabs.ts#L71) `authoredThrowEffect` | open: ours plays every throw at one speed (#293) |
+| Throw animation speed `throw-speed` | the same for every victim | [some throws scale by weight/100](https://www.ssbwiki.com/Throw) | [grabs.ts:73](../../ts/src/game/sim/grabs.ts#L73) `authoredThrowEffect` | open: ours plays every throw at one speed (#293) |
 | Regrab during a throw's hitstun `throw-regrab` | refused until the throw's hitstun ends | [allowed: throws chain into grabs](https://www.ssbwiki.com/Throw) | [conditions.ts:60](../../ts/src/game/sim/conditions.ts#L60) `canBeGrabbed` | deviation: removes throw-to-regrab chains while keeping throw-to-attack combos (docs/gameplay-design.md, Throw regrabs) (Tom 2026-10-06) |
 
 ### Oracle checks
@@ -807,6 +807,26 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Run speed `archimonde-run` | 1.54 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Walk speed `archimonde-walk` | 1.12 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `archimonde-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+
+### the Butcher
+
+| Row | Ours | Melee | Code | Status |
+|---|---|---|---|---|
+| Weight `butcher-weight` | 116 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Gravity `butcher-gravity` | 0.23 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Terminal speed `butcher-terminal` | 2.8 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Fast-fall speed `butcher-fast-fall` | 3.4 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Jump squat frames `butcher-jump-squat` | 3 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Full jump velocity `butcher-full-jump` | 3.68 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Short jump velocity `butcher-short-jump` | 2.1 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Double jump velocity, against fighters with one double jump `butcher-double-jump` | 4.416 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air speed `butcher-air-speed` | 0.78 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Air acceleration `butcher-air-acceleration` | 0.08 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air friction `butcher-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Initial dash speed `butcher-dash` | 1.33 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Run speed `butcher-run` | 1.54 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Walk speed `butcher-walk` | 1.12 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Traction `butcher-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
 ## Moves against Melee's
 

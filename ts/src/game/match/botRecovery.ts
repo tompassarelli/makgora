@@ -142,6 +142,11 @@ function upSpecial(character: Character): SpecialAction {
 
 
 
+function tethersToLedge(f: Readonly<Fighter>): boolean {
+  const up = f.tuning.specials?.up;
+  return up !== undefined && (up.ground.ledgeTether ?? up.air?.ledgeTether) !== undefined;
+}
+
 function aimsForLedge(f: Readonly<Fighter>, side: number, target: Readonly<Fighter> | undefined, mixesUp: boolean): boolean {
   const taken = target !== undefined && target.ledge.state !== LedgeState.none && target.ledge.side === side;
   const spare = f.jump.remaining > 0 || upSpecialStartable(f, specialCooldownReady(f, upSpecial(f.character)));
@@ -350,6 +355,7 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
       input.specialX = side;
     } else if (z < f32(floor + 50)) {
       input.specialPressed = true;
+      if (tethersToLedge(fighter)) input.direction = -side;
       input.specialX = input.direction;
       input.specialZ = 1;
       input.verticalDirection = 1;

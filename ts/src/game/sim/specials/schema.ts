@@ -89,6 +89,10 @@ export interface CommandGrab extends FrameWindow {
   readonly heal?: { readonly heal: number } | undefined;
 
   readonly status?: AppliedStatus | undefined;
+  /** Through the hold, every `every` frames it deals `damage` and heals its user as much; there is no final throw. */
+  readonly drain?: { readonly every: number; readonly damage: number } | undefined;
+  /** A raised shield stops it, as an ordinary strike is stopped. */
+  readonly shieldable?: true | undefined;
 }
 
 /** Locks the nearest foe within `range` on frame 1, marks it with `glyph`, and on `frame` strikes it wherever it is with `bolt`: no shield blocks it and nothing reflects it; only intangibility or leaving `range` escapes it. */
@@ -165,6 +169,8 @@ export interface SpecialProjectile {
   readonly steered?: true | undefined;
   readonly fan?: readonly ProjectileVelocity[] | undefined;
   readonly bounce?: ProjectileBounce | undefined;
+  /** A body it reaches, unshielded and unreflected, is caught and reeled in over `reelFrames` into its owner's grab hold. */
+  readonly latch?: { readonly reelFrames: number } | undefined;
 }
 
 export interface SpecialBeam {
@@ -175,7 +181,7 @@ export interface SpecialBeam {
   readonly chain?: true | undefined;
 }
 
-interface ArmorWindow extends FrameWindow { readonly shell?: boolean | undefined; readonly chillsStriker?: boolean | undefined }
+interface ArmorWindow extends FrameWindow { readonly shell?: boolean | undefined; readonly chillsStriker?: boolean | undefined; readonly perStack?: number | undefined }
 export type SpecialArmor = ArmorWindow & ({ readonly maxDamage: number; readonly knockback?: undefined } | { readonly knockback: number; readonly maxDamage?: undefined });
 
 interface ProjectilePool {
@@ -253,6 +259,11 @@ export type CompanionOrder = (typeof CompanionOrder)[keyof typeof CompanionOrder
 
 export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4 } as const;
 export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
+
+export interface LedgeTether extends FrameWindow { readonly reach: StrikeCapsule }
+
+/** While on, foes within `radius` take `damage` every `every` frames and run at `slowScale` for `slowFrames`; its user takes `selfDamage` every `selfEvery`. */
+export interface ToggleAura { readonly frame: number; readonly radius: number; readonly every: number; readonly damage: number; readonly slowScale: number; readonly slowFrames: number; readonly selfEvery: number; readonly selfDamage: number }
 
 export interface SelfHeal { readonly frame: number; readonly heal: number }
 
@@ -390,6 +401,10 @@ export interface AuthoredSpecial {
   readonly gaze?: SpecialGaze | undefined;
   /** Its hits pop a red critical-strike number of the damage dealt over the struck fighter. */
   readonly critical?: true | undefined;
+  /** Over these frames a ledge inside `reach` catches the hook, and its user is reeled to hang there. */
+  readonly ledgeTether?: LedgeTether | undefined;
+  /** On `frame` it switches its user's aura on or off. */
+  readonly toggleAura?: ToggleAura | undefined;
 }
 
 export interface SpecialFollowUp {

@@ -171,7 +171,7 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "ledgeSerial", "ledgeIntangible", "ledgeRegrab", "ledgeGrabs", "platformDownHeld", "platformDownAge", "platformDropConsumed", "cannonHeld",
   "cannonFiring", "cannonCooldown", "cannonPassing", "waterIn", "waterFrames", "waterEntries", "waterHydraFrame", "waterHydraX",
   "waterHydraStrikeFrame", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "projectileBounces[${i}]", "projectileHomeward[${i}]",
-  "projectileLastStruck[${i}]",
+  "projectileLastStruck[${i}]", "grabReel", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy",
 ];
 
 export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -193,12 +193,12 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   down: ["state", "frame", "direction", "waitRemaining", "faceUp", "attackQueued"],
   tech: ["window", "pressAge", "previousPressAge", "accumulatedPress"],
   surfaceRecovery: ["state", "frame", "velocityApplied", "wallJumpQueued", "wallJumpRepeat", "wallJumpAge", "wallJumpSide", "wallJumpsUsed", "reflectCooldown", "lastReflectedSurface", "contactSerial", "contactKind", "contactApproachSpeed", "contactX", "contactZ", "contactNormalX", "contactNormalZ"],
-  grab: ["grabbedFrames", "action", "frame", "serial", "pummels", "heldFrames", "queuedThrow", "mashX", "mashZ", "owner", "target"],
+  grab: ["grabbedFrames", "action", "frame", "serial", "pummels", "heldFrames", "queuedThrow", "mashX", "mashZ", "owner", "target", "reel"],
   ledge: ["state", "side", "frame", "serial", "intangible", "regrab", "grabs"],
   platform: ["downHeld", "downAge", "dropConsumed"],
   cannon: ["held", "firing", "cooldown", "passing"],
   water: ["inWater", "frames", "entries", "hydraFrame", "hydraX", "hydraStrikeFrame"],
-  status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "healed", "summonFrames", "summonX", "buff", "buffFrames", "manaShield", "petrifyIn", "petrified", "petrifyDamage"],
+  status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "healed", "summonFrames", "summonX", "buff", "buffFrames", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy"],
   meter: ["ex", "ultimate"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "surface"],
   projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "lastStruck"],
@@ -602,4 +602,11 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "projectiles[].bounces", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectileBounces[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectileBounces[${i}]", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
   { path: "projectiles[].homeward", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "projectileHomeward[${i}]", writer: "flagBool" }, diff: "projectileHomeward[${i}]", respawn: { blast: "false", helper: "clearSpecialOnStock", respawn: "false" } },
   { path: "projectiles[].lastStruck", type: "optionalInt", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileLastStruck[${i}]", writer: "optionalInt", when: ["defined"] }, diff: "projectileLastStruck[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
+  { path: "grab.reel", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "grabReel", writer: "int", when: ["nonzero"] }, diff: "grabReel", respawn: { blast: "0", helper: "clearGrabLinks", respawn: "0" } },
+  { path: "status.aura", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "aura", writer: "flagBool" }, diff: "aura", respawn: { blast: "false", respawn: "false" } },
+  { path: "status.auraFrames", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "auraFrames", writer: "int", when: ["nonzero"] }, diff: "auraFrames", respawn: { blast: "0", respawn: "0" } },
+  { path: "status.slowFrames", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "slowFrames", writer: "int", when: ["nonzero"] }, diff: "slowFrames", respawn: { blast: "0", respawn: "0" } },
+  { path: "status.slowScale", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "slowScale", writer: "real", when: ["nonzeroSigned"] }, diff: "slowScale", respawn: { blast: "0.0", respawn: "0.0" } },
+  { path: "status.stacks", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "stacks", writer: "int", when: ["nonzero"] }, diff: "stacks", respawn: { blast: "0", respawn: "0" } },
+  { path: "status.struckBy", type: "optionalInt", init: "undefined", copy: "plain", same: "signedZeroOptional", canon: { name: "struckBy", writer: "optionalInt", when: ["defined"] }, diff: { name: "struckBy", absent: -1 }, respawn: { blast: "undefined", respawn: "undefined" } },
 ];

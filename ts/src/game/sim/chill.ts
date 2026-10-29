@@ -12,9 +12,14 @@ import type { AppliedStatus } from "./appliedStatus";
 export const CHILL_SPEED_SCALE = f32(0.6);
 
 
+function slowedSpeed(f: Readonly<Fighter>, speed: number): number {
+  return f.motion.grounded && f.status.slowFrames > 0 ? f32(speed * f.status.slowScale) : speed;
+}
+
 export function chillScaled(f: Readonly<Fighter>, speed: number): number {
   if (f.motion.grounded && f.status.condition === HeroStatusKind.root) return 0.0;
-  return f.status.condition === HeroStatusKind.chill ? f32(speed * CHILL_SPEED_SCALE) : speed;
+  const slowed = slowedSpeed(f, speed);
+  return f.status.condition === HeroStatusKind.chill ? f32(slowed * CHILL_SPEED_SCALE) : slowed;
 }
 
 

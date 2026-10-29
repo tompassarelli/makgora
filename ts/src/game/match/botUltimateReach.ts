@@ -29,4 +29,5 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.medivh]: { near: 150.0, far: 330.0 },
   [Character.ladyVashj]: { near: 80.0, far: 560.0 },
   [Character.archimonde]: { near: 100.0, far: 900.0 },
+  [Character.butcher]: { near: 0.0, far: 130.0 },
 };

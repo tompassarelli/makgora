@@ -37,9 +37,15 @@ export function jumpBuffed(f: Readonly<Fighter>, speed: number): number {
 }
 
 
+function stackedWeight(f: Readonly<Fighter>, weight: number): number {
+  const stacks = f.tuning.moves?.stacks;
+  return stacks === undefined || f.status.stacks === 0 ? weight : f32(weight * f32(1.0 + f32(f.status.stacks * stacks.weightPerStack)));
+}
+
 export function knockbackWeight(f: Readonly<Fighter>): number {
   const { weight } = f.tuning.physics;
-  return f.status.buff === ItemKind.heavy ? f32(weight * HEAVY_BUFF_WEIGHT_SCALE) : weight;
+  const stacked = stackedWeight(f, weight);
+  return f.status.buff === ItemKind.heavy ? f32(stacked * HEAVY_BUFF_WEIGHT_SCALE) : stacked;
 }
 
 

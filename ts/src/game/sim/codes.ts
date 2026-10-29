@@ -4,7 +4,7 @@
 
 export const Character = { rifleman: 1, demonHunter: 2,
   blademaster: 3, mountainKing: 4, warden: 5, lich: 6, dreadlord: 8, shadowHunter: 9,
-  pitLord: 10, beastmaster: 11, lichKing: 12, thrall: 13, jaina: 14, sylvanas: 15, cairne: 16, chen: 17, peon: 18, tinker: 19, kaelthas: 20, murloc: 21, grom: 22, anubarak: 23, malfurion: 24, medivh: 25, uther: 27, ladyVashj: 28, archimonde: 29,
+  pitLord: 10, beastmaster: 11, lichKing: 12, thrall: 13, jaina: 14, sylvanas: 15, cairne: 16, chen: 17, peon: 18, tinker: 19, kaelthas: 20, murloc: 21, grom: 22, anubarak: 23, malfurion: 24, medivh: 25, uther: 27, ladyVashj: 28, archimonde: 29, butcher: 31,
 } as const;
 export type Character = (typeof Character)[keyof typeof Character];
 
@@ -60,7 +60,7 @@ export const GrabAction = {
 } as const;
 export type GrabAction = (typeof GrabAction)[keyof typeof GrabAction];
 
-export const LedgeState = { none: 0, hang: 1, climb: 2, roll: 3, attack: 4 } as const;
+export const LedgeState = { none: 0, hang: 1, climb: 2, roll: 3, attack: 4, tether: 5 } as const;
 export type LedgeState = (typeof LedgeState)[keyof typeof LedgeState];
 
 

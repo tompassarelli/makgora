@@ -378,6 +378,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   grab.mashZ = sourceGrab.mashZ;
   grab.owner = keep[sourceGrab.owner as number];
   grab.target = keep[sourceGrab.target as number];
+  grab.reel = sourceGrab.reel;
   const ledge = target.ledge;
   const sourceLedge = source.ledge;
   ledge.state = sourceLedge.state;
@@ -464,6 +465,12 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.petrifyIn = sourceStatus.petrifyIn;
   status.petrified = sourceStatus.petrified;
   status.petrifyDamage = sourceStatus.petrifyDamage;
+  status.aura = sourceStatus.aura;
+  status.auraFrames = sourceStatus.auraFrames;
+  status.slowFrames = sourceStatus.slowFrames;
+  status.slowScale = sourceStatus.slowScale;
+  status.stacks = sourceStatus.stacks;
+  status.struckBy = sourceStatus.struckBy;
   const meter = target.meter;
   const sourceMeter = source.meter;
   meter.ultimate = sourceMeter.ultimate;
@@ -864,6 +871,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = grab.mashZ, b = sourceGrab.mashZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (grab.owner !== sourceGrab.owner) return false;
   if (grab.target !== sourceGrab.target) return false;
+  { const a = grab.reel, b = sourceGrab.reel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const ledge = target.ledge;
   const sourceLedge = source.ledge;
   { const a = ledge.state, b = sourceLedge.state; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -938,6 +946,12 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.petrifyIn, b = sourceStatus.petrifyIn; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (status.petrified !== sourceStatus.petrified) return false;
   { const a = status.petrifyDamage, b = sourceStatus.petrifyDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  if (status.aura !== sourceStatus.aura) return false;
+  { const a = status.auraFrames, b = sourceStatus.auraFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.slowFrames, b = sourceStatus.slowFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.slowScale, b = sourceStatus.slowScale; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.stacks, b = sourceStatus.stacks; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.struckBy, b = sourceStatus.struckBy; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
   const meter = target.meter;
   const sourceMeter = source.meter;
   { const a = meter.ultimate, b = sourceMeter.ultimate; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1470,6 +1484,13 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     const projectile = at(fighter.projectiles, i);
     if (projectile.lastStruck !== undefined) sink.int(prefix, `projectileLastStruck[${i}]`, projectile.lastStruck ?? -1);
   }
+  if (grab.reel !== 0) sink.int(prefix, "grabReel", grab.reel);
+  if (status.aura) sink.bool(prefix, "aura", true);
+  if (status.auraFrames !== 0) sink.int(prefix, "auraFrames", status.auraFrames);
+  if (status.slowFrames !== 0) sink.int(prefix, "slowFrames", status.slowFrames);
+  if (status.slowScale !== 0 || 1 / status.slowScale < 0) sink.real(prefix, "slowScale", status.slowScale);
+  if (status.stacks !== 0) sink.int(prefix, "stacks", status.stacks);
+  if (status.struckBy !== undefined) sink.int(prefix, "struckBy", status.struckBy ?? -1);
 }
 
 export function blastFighterFields(f: Fighter): void {
@@ -1558,6 +1579,12 @@ export function blastFighterFields(f: Fighter): void {
   status.petrifyIn = 0;
   status.petrified = false;
   status.petrifyDamage = 0.0;
+  status.aura = false;
+  status.auraFrames = 0;
+  status.slowFrames = 0;
+  status.slowScale = 0.0;
+  status.stacks = 0;
+  status.struckBy = undefined;
 }
 
 export function respawnFighterFields(f: Fighter, startX: number): void {
@@ -1767,4 +1794,10 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.petrifyIn = 0;
   status.petrified = false;
   status.petrifyDamage = 0.0;
+  status.aura = false;
+  status.auraFrames = 0;
+  status.slowFrames = 0;
+  status.slowScale = 0.0;
+  status.stacks = 0;
+  status.struckBy = undefined;
 }
