@@ -5,7 +5,7 @@ import { Console, Effect, Fiber, Schema } from "effect";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import { SELECTABLE_CHARACTERS, fighterKey, fighterName, fighterSlug } from "../src/game/roster/kits";
 import { CaptureQueueFailure, Job, type Result, git, queueDirectory, showcaseSlot, writeAtomic } from "./captureQueue";
-import { type RemoteHost, builtMapKey, fetchFolder, remoteHost, runThere, sendFile, shipStoredMap } from "./captureQueueRemote";
+import { type RemoteHost, builtMapKey, fetchFolder, manifestAt, remoteHost, runThere, sendFile, shipStoredMap } from "./captureQueueRemote";
 import { fanGroups } from "./captureQueueFan";
 import { peerSpec } from "./captureQueuePeers";
 import { pairAgentStatus } from "./pairAgentStatus";
@@ -233,7 +233,9 @@ const captureThere = (settings: Settings, host: RemoteHost, group: { readonly ba
   const plan = yield* attempt("read the plan", () => JSON.parse(readFileSync(group.plan, "utf8")) as { readonly rows: readonly Record<string, unknown>[] });
   const remotePlan = `${group.plan.replace(/\.json$/, "")}.${host.name.replaceAll(/[^\w.-]/g, "_")}.json`;
   yield* attempt("write the remote plan", () => writeAtomic(remotePlan, `${JSON.stringify({ ...plan, rows: plan.rows.map(row => ({ ...row, map, manifest: join(there, "manifest.json") })) })}\n`));
-  yield* sendFile(host, group.manifest, join(there, "manifest.json"), group.logFile);
+  const remoteManifest = `${group.manifest.replace(/\.json$/, "")}.${host.name.replaceAll(/[^\w.-]/g, "_")}.json`;
+  yield* attempt("write the remote manifest", () => writeAtomic(remoteManifest, manifestAt(readFileSync(group.manifest, "utf8"), map)));
+  yield* sendFile(host, remoteManifest, join(there, "manifest.json"), group.logFile);
   yield* sendFile(host, remotePlan, join(there, "plan.json"), group.logFile);
   const north = join(host.home, "code/north/main/harness/skills");
   const ran = yield* runThere(host, join(host.home, process.env.SMASHCRAFT_REMOTE_CHECKOUT ?? "code/smashcraft/main", "ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),

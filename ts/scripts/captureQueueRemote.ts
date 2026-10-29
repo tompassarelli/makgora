@@ -79,3 +79,5 @@ export const fetchFolder = (host: RemoteHost, from: string, to: string, logFile:
   );
   yield* Effect.try({ try: () => renameSync(staging, to), catch: cause => fail(`place ${to}: ${String(cause)}`) });
 });
+
+export const manifestAt = (manifestText: string, map: string) => `${JSON.stringify({ ...(JSON.parse(manifestText) as Record<string, unknown>), map })}\n`;
