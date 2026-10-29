@@ -108,11 +108,37 @@ export function clipJitter(model: mdx.Model, from: number, to: number): ClipJitt
 export const jitters = (jitter: ClipJitter) =>
   jitter.translation > JITTER_LIMITS.translation || jitter.scaling > JITTER_LIMITS.scaling;
 
-/** The worst back-and-forth of a root node's translation keys turning twice in a row at most `JITTER_SPAN_MS` apart: the whole body bobbing every frame. */
+const isParentless = (node: { readonly Parent?: number | null }) => node.Parent === undefined || node.Parent === null || node.Parent < 0;
+
+/** The parentless node holding the most mesh vertices below it: a detached prop (a falling shoulder piece, a steam emitter) skins far fewer than the skeleton's own root. */
+export function bodyRoot(model: mdx.Model): number | undefined {
+  const nodes = new Map<number, { readonly ObjectId: number | null; readonly Parent?: number | null }>();
+  for (const group of NODE_GROUPS) for (const node of model[group]) if (node.ObjectId !== null) nodes.set(node.ObjectId, node);
+  const rootOf = (id: number): number | undefined => {
+    let node = nodes.get(id);
+    for (let hops = 0; node !== undefined && !isParentless(node) && hops < nodes.size; hops++) node = nodes.get(node.Parent!);
+    return node !== undefined && isParentless(node) ? node.ObjectId ?? undefined : undefined;
+  };
+  const weight = new Map<number, number>();
+  for (const geoset of model.Geosets) for (const matrix of geoset.VertexGroup) {
+    const roots = new Set<number>();
+    for (const bone of geoset.Groups[matrix] ?? []) {
+      const root = rootOf(bone);
+      if (root !== undefined) roots.add(root);
+    }
+    for (const root of roots) weight.set(root, (weight.get(root) ?? 0) + 1);
+  }
+  let body: number | undefined;
+  for (const [root, count] of weight) if (count > (weight.get(body ?? -1) ?? 0)) body = root;
+  return body;
+}
+
+/** The worst back-and-forth of the body root's translation keys turning twice in a row at most `JITTER_SPAN_MS` apart: the whole body bobbing every frame. */
 export function rootBob(model: mdx.Model, from: number, to: number): TrackJitter | undefined {
   let worst: TrackJitter | undefined;
+  const body = bodyRoot(model);
   for (const group of NODE_GROUPS) for (const node of model[group]) {
-    if (node.Parent !== undefined && node.Parent !== null && node.Parent >= 0) continue;
+    if (body === undefined ? !isParentless(node) : node.ObjectId !== body) continue;
     const track = node.Translation as mdx.AnimVector | undefined;
     if (track === undefined || track.GlobalSeqId !== null && track.GlobalSeqId !== undefined && track.GlobalSeqId >= 0) continue;
     const keys = track.Keys.filter((key) => key.Frame >= from && key.Frame <= to);
