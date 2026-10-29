@@ -45,7 +45,9 @@ without knockback, then moved to the other side with its hit record cleared
 the frame before its second hit opens, and sampled at that hit after the
 first hit's hitlag, so both hits show; a command grab at its lunge plus three
 quarters of its strike. A special that rushes forward until it meets a body also
-samples the middle and last frames of its rush. `native-capture plan PAD...` exercises its requested held
+samples the middle and last frames of its rush, and the camera holds still
+from the frame before the rush to the move's end, so the travel shows.
+`native-capture plan PAD...` exercises its requested held
 frames headless; this has no native pixel verdict. Build with
 `bun wisp native-capture build --out MAP.w3x PRIVATE_DIR/FIGHTER` and launch
 that map on the assigned Classic offline pair with `bun wisp lan fresh MAP.w3x

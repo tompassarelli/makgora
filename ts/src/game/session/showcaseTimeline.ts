@@ -35,6 +35,7 @@ export interface ShowcaseMove {
   readonly release?: number | undefined;
   readonly swing?: readonly number[] | undefined;
   readonly cross?: { readonly frame: number; readonly gap: number } | undefined;
+  readonly hold?: { readonly frame: number; readonly frames: number } | undefined;
 }
 
 export interface ShowcaseRow {
@@ -53,7 +54,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
-    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), swing: special === undefined ? undefined : rushSamples(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
+    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   return moves;
@@ -101,9 +102,10 @@ function channelledShowcase(slot: string, code: number, special: Readonly<Author
 const centreX = (region: MoveRegion): number => (region.hit.minX + region.hit.maxX) * 0.5;
 const centreZ = (region: MoveRegion): number => (region.hit.minZ + region.hit.maxZ) * 0.5;
 
-function rushSamples(special: Readonly<AuthoredSpecial>): number[] | undefined {
-  const rush = special.motion?.find((segment) => segment.velocityX > 0.0 && segment.stopsAtBody === true);
-  return rush === undefined ? undefined : [floorDiv(rush.first + rush.last, 2), rush.last];
+function rushShowcase(special: Readonly<AuthoredSpecial> | undefined): Pick<ShowcaseMove, "swing" | "hold"> {
+  const rush = special?.motion?.find((segment) => segment.velocityX > 0.0 && segment.stopsAtBody === true);
+  if (special === undefined || rush === undefined) return {};
+  return { swing: [floorDiv(rush.first + rush.last, 2), rush.last], hold: { frame: rush.first - 1, frames: special.endFrame - rush.first + 1 } };
 }
 
 function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined; readonly cross?: { readonly frame: number; readonly gap: number } | undefined; readonly swing?: readonly number[] | undefined } {

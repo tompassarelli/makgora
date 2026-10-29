@@ -22,6 +22,7 @@ import { shell, type ShellState, localSlot } from "../host/loop/state";
 import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { fighterAt, neutralControls } from "../game/sim/roster";
 import { AttackStyle, DownState } from "../game/sim/codes";
+import { beginHeldCamera } from "../host/loop/heldCamera";
 import { beginFighterAttack } from "../game/sim/attacks";
 import { startFighterSpecial } from "../game/sim/specials";
 import { attackStartupFrames, isAerialAttack } from "../game/sim/moves";
@@ -101,7 +102,7 @@ function parseScript(text: string): { readonly setup: string; readonly edges: re
     previous = frame;
     if (action === "capture") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
 
-    if (action === "chat" || action === "move" || action === "brace" || action === "cross") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
+    if (action === "chat" || action === "move" || action === "brace" || action === "cross" || action === "hold") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
     if (action === "press" || action === "release" || action === "tap") {
       if (BUTTONS[(args[0] ?? "").toUpperCase()] === undefined) throw new Error("native driver: unknown pad button");
       const held = action === "tap" ? args[1] === undefined ? 1 : whole(args[1]) : 0;
@@ -312,6 +313,16 @@ function stageScriptedMove(s: ShellState, slot: number, args: readonly string[])
   else if (lift !== undefined) liftTarget(target, f32(mover.motion.z + S2R(lift)));
 }
 
+function applyShowcaseEdge(s: ShellState, edge: Edge): boolean {
+  const target = fighterAt(s.world, edge.slot === 0 ? 1 : 0);
+  if (edge.action === "move") stageScriptedMove(s, edge.slot, edge.args);
+  else if (edge.action === "brace") braceTarget(target);
+  else if (edge.action === "cross") crossTarget(target, edge.args);
+  else if (edge.action === "hold") beginHeldCamera(s, edge.frame + whole(edge.args[0] ?? "0"));
+  else return false;
+  return true;
+}
+
 export function captureNativeDriverInputs(s: ShellState): void {
   if (s.build.inputProfile !== "native-driver") return;
   const driver = state();
@@ -322,10 +333,7 @@ export function captureNativeDriverInputs(s: ShellState): void {
     const pad = driver.pads[edge.slot];
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
-    else if (edge.action === "move") stageScriptedMove(s, edge.slot, edge.args);
-    else if (edge.action === "brace") braceTarget(fighterAt(s.world, edge.slot === 0 ? 1 : 0));
-    else if (edge.action === "cross") crossTarget(fighterAt(s.world, edge.slot === 0 ? 1 : 0), edge.args);
-    else if (pad !== undefined) applyEdge(s, pad, edge);
+    else if (!applyShowcaseEdge(s, edge) && pad !== undefined) applyEdge(s, pad, edge);
     driver.next++;
   }
   for (const slot of PARTICIPANT_SLOTS) {

@@ -22,6 +22,7 @@ import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPo
 
 import { beginPauseCamera, advancePauseCamera, pauseCameraAngle, pauseHudHidden } from "./pauseCamera";
 import { type MatchCamera, copyMatchCamera } from "../../game/sim/matchCamera";
+import { applyHeldCamera } from "./heldCamera";
 
 import { advanceMatchCamera } from "../../game/sim/matchCamera";
 import { stageBounds } from "../../game/sim/stageBounds";
@@ -531,6 +532,7 @@ export function lockArenaCamera(s: ShellState): void {
   if (s.viewExtreme !== undefined) ClearTextMessages();
   if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
   if (game.phase !== Phase.result && s.showcaseFocus === undefined && (!s.session.paused || s.pauseCamera === undefined)) fitFighterFrames(s.camera, world, game.stageChoice, aspect);
+  applyHeldCamera(s);
   frameCaptureStage(s.capture, s.camera, game.phase === Phase.match, game.stageChoice, aspect);
   const { x: centerX, y: centerY } = s.origin;
   const framing = s.camera;
