@@ -57,7 +57,7 @@ import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, screenLayer, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
-import { type CardButton, type CardFrames, type MenuFocus, createCard, menuFocusList, presentCardChip, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
+import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, presentCardChip, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules } from "./selectionRules";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
@@ -128,6 +128,8 @@ function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clears: Lor
 
 export class SelectionPanel {
   private readonly tiles: framehandle[][] = [];
+  private readonly tilePortraits: framehandle[] = [];
+  private shownTilePalette: number | undefined;
   private readonly tileButtons: framehandle[] = [];
   private readonly root: framehandle;
   private readonly backdrop: framehandle;
@@ -213,6 +215,7 @@ export class SelectionPanel {
       const tileName = label(root, `MeleeTileName${name}`, x + f32(0.002) * scale, y - f32(0.106) * scale, f32(0.108) * scale, f32(0.023) * scale, NATIVE_TEXT_BASE);
       setFrameText(tileName, text);
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
+      this.tilePortraits.push(tilePortraitFrame);
       const button = BlzCreateFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
       placeTopLeft(button, x, y);
       BlzFrameSetSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
@@ -644,6 +647,11 @@ export class SelectionPanel {
   }
 
   private showTiles(game: Readonly<MatchState>): void {
+    const palette = cardPalette(game, this.participantId);
+    if (palette !== this.shownTilePalette) {
+      this.shownTilePalette = palette;
+      this.tilePortraits.forEach((frame, tile) => BlzFrameSetTexture(frame, portraitTexture(characterOfTile(tile), true, palette), 0, true));
+    }
     for (let tile = 0; tile < this.tiles.length; tile++) {
       const selectable = tileOffered(game, tile);
       for (const frame of this.tiles[tile] ?? []) BlzFrameSetVisible(frame, selectable);
@@ -679,7 +687,7 @@ export class SelectionPanel {
       const human = humanFighterActive(game, slot);
       const choice = shownFighter(game, slot);
       const teamsShown = game.teamBattle && active;
-      const palette = teamsShown ? game.teamChoices[slot] : slot;
+      const palette = cardPalette(game, slot);
       presentCardTeam(frames, game, slot, participantId, menuFocus, active, human, teamsShown, palette);
       presentCardTag(frames, game, slot, participantId, menuFocus, active, human);
       presentCardStatus(frames, game, slot, active, ready, human, choice, palette, sessionWins[slot], this.net.echoes);

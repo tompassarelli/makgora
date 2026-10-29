@@ -33,6 +33,8 @@ import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot
 
 export type CardButton = { kind: "team"; slot: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number };
 
+export const cardPalette = (game: Readonly<MatchState>, slot: number): number => game.teamBattle && fighterActive(game, slot) ? at(game.teamChoices, slot) : slot;
+
 export type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "friendlyFire"; readonly slot: number };
 export function menuFocusList(game: Readonly<MatchState>, participantId: number): MenuFocus[] {
   const focus: MenuFocus[] = [];
