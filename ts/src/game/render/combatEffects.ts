@@ -41,9 +41,11 @@ import { originalClip, originalClipNamed } from "../../generated/clips/fighterOr
 import { KO_BLUR_DISTANCE, type KoFlash, createKoFlash, endKoFlash, koFlashLevels, noteKoFlash } from "../presentation/koFlash";
 import type { Fighter } from "../sim/fighter";
 import { heroLook } from "../roster/looks";
+import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes";
 
 
-const KO_FIGHTERS = SELECTABLE_CHARACTERS.length;
+const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
+const KO_FIGHTERS = KO_VARIANTS.length;
 const KO_BODY_COUNT = IMPACTS_PER_KIND * 2 * KO_FIGHTERS;
 const STAR_KO_FIRST = IMPACT_STAR_KO * IMPACTS_PER_KIND;
 
@@ -124,6 +126,8 @@ export class CombatEffects {
   readonly y: number;
   readonly z: number;
 
+  costumeOf: (slot: number) => number = () => 0;
+
   constructor(origin: WorldOrigin) {
     this.x = origin.x;
     this.y = origin.y - 8.0;
@@ -141,11 +145,11 @@ export class CombatEffects {
       this.impacts.push(model);
     }
     for (let i = 0; i < KO_BODY_COUNT; i++) {
-      const character = at(SELECTABLE_CHARACTERS, floorMod(i, KO_FIGHTERS));
+      const { character, costume } = at(KO_VARIANTS, floorMod(i, KO_FIGHTERS));
       const index = originalClipNamed(character, "stand hit");
       const clip = index === undefined ? undefined : originalClip(character, index);
       const timeline = clip?.timeline === true ? clip : undefined;
-      const model = AddSpecialEffect(timeline?.modelPath ?? fighterModel(character), origin.x, origin.y);
+      const model = AddSpecialEffect(timeline === undefined ? fighterModel(character) : costumeClipModel(character, costume, timeline), origin.x, origin.y);
       BlzSetSpecialEffectAnimation(model, timeline === undefined ? "stand hit" : "Stand");
       BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
       BlzSetSpecialEffectTimeScale(model, 0.0);
@@ -376,7 +380,8 @@ export class CombatEffects {
       const model = this.koBodies[i];
       if (model === undefined) continue;
       const pose = projectKo(confirmed, impact);
-      if (!pose.visible || pose.character !== at(SELECTABLE_CHARACTERS, floorMod(i, KO_FIGHTERS))) {
+      const variant = at(KO_VARIANTS, floorMod(i, KO_FIGHTERS));
+      if (!pose.visible || pose.character !== variant.character || bodyCostume(pose.character, this.costumeOf(pose.owner)) !== variant.costume) {
         parkOnce(model, this, parked, IMPACT_COUNT + i);
         continue;
       }

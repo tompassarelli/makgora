@@ -46,7 +46,7 @@ import { checkCueModels } from "./headlessRender";
 import { cueModels } from "./cueModels";
 import { removeGeosets, teamGlowGeosets } from "../groundPlanes";
 import { generateModelMDX, parseModelMDX } from "../mdxCodec";
-import { fighterPortrait, heroLook } from "../../src/game/roster/looks";
+import { fighterPortrait, heroLook, portraitCostumes } from "../../src/game/roster/looks";
 const tryMapPromise = <A>(operation: string, path: string, run: () => PromiseLike<A>) => Effect.tryPromise({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const tryMapSync = <A>(operation: string, path: string, run: () => A) => Effect.try({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const EMPTY_MODEL = "the map script names an empty model path";
@@ -238,8 +238,8 @@ const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cach
 
 
 
-export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => PORTRAIT_KINDS.flatMap((kind) =>
-  [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot))));
+export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => [0, ...portraitCostumes(character)].flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
+  [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot, costume)))));
 
 const portraitImports = (assets: string) => Effect.forEach(
   MAP_PORTRAITS,

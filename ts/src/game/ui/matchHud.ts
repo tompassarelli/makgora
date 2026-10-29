@@ -68,6 +68,7 @@ export class FighterHud {
   private shownCharacter: number | undefined;
   private shownColor: number | undefined;
   private shownTint: CostumeTint | undefined;
+  private shownCostume: number | undefined;
   private shownMirrored: boolean | undefined;
 
   private shownVisible: boolean | undefined;
@@ -158,7 +159,7 @@ export class FighterHud {
   }
 
 
-  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false, tint?: CostumeTint): void {
+  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false, tint?: CostumeTint, costume = 0): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);
@@ -170,9 +171,9 @@ export class FighterHud {
       this.shownColor = color;
       this.shownMirrored = this.panel.mirrored;
       BlzFrameSetTexture(this.plate, `war3mapImported\\HudPlate${this.panel.mirrored ? "Mirror" : ""}${I2S(color)}.tga`, 0, true);
-      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color), 0, true);
+      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color, costume), 0, true);
       BlzFrameSetText(this.name, fighterName(character).toUpperCase());
-      for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color), 0, true);
+      for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color, costume), 0, true);
     }
     if (this.shownTint !== tint) {
       this.shownTint = tint;

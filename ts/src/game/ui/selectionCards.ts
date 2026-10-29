@@ -29,7 +29,7 @@ import { Character } from "../sim/codes";
 import { cardPortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";
 import { slotColor } from "./slotColors";
-import { costumesFor } from "../roster/costumes";
+import { costumeIndex, costumesFor } from "../roster/costumes";
 import { MAX_COSTUMES } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setFrameText } from "./frames";
@@ -147,7 +147,7 @@ export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>
   setFrameText(frames.status, statusText);
   placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins)}`);
   if (ready) {
-    BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, palette), 0, true);
+    BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, palette, choice === undefined || choice < 0 ? 0 : costumeIndex(choice, game.costumeChoices[slot] ?? 0)), 0, true);
     setFrameText(frames.name, nameText(choice));
   }
 }

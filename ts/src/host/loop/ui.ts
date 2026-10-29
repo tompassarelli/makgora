@@ -1,7 +1,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
+import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../../game/input/participants";
 import { CombatEffects } from "../../game/render/combatEffects";
 import { CriticalStrikeText } from "../../game/render/criticalStrikeText";
 import { FighterPoolPresentation } from "../../game/render/fighterPool";
@@ -172,6 +172,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     elements: new ElementEffects(s.origin),
     classic: new ClassicPresentation(s.origin),
   };
+  combat.costumeOf = (slot) => (isParticipantSlot(slot) ? costumeFor(s.game, slot) : 0);
   s.ui = ui;
   return ui;
 }

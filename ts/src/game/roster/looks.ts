@@ -73,9 +73,19 @@ export function heroLook(character: number): HeroLook | undefined {
   return LOOKS[lookCharacter(character)];
 }
 
-export function fighterPortrait(character: number, kind: PortraitKind, slot?: number): string {
+export function portraitCostumes(character: number): readonly number[] {
+  return (heroLook(character)?.costumes ?? []).flatMap((costume, index) => (costume.skin === undefined ? [] : [index]));
+}
+
+export function portraitOutfit(character: number, costume: number): string {
+  const skinned = heroLook(character)?.costumes?.[costume];
+  return skinned?.skin === undefined ? "" : skinned.name;
+}
+
+export function fighterPortrait(character: number, kind: PortraitKind, slot?: number, costume = 0): string {
+  const outfit = portraitOutfit(character, costume);
   for (const rendered of RENDERED_FIGHTERS) {
-    if (rendered === character) return `war3mapImported\\Fighter${kind}${fighterRenderName(character)}${slot === undefined ? "" : `P${slot + 1}`}.blp`;
+    if (rendered === character) return `war3mapImported\\Fighter${kind}${fighterRenderName(character)}${outfit}${slot === undefined ? "" : `P${slot + 1}`}.blp`;
   }
   return fighterIcon(character);
 }

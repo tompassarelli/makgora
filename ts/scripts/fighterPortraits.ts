@@ -13,7 +13,8 @@ import { createStandaloneSession, NEUTRAL_INPUT } from './wisp/standalone';
 import { headlessRender } from './wisp/headlessRender';
 import { assetsView, readManifest } from './wisp/buildInputs';
 import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/roster/kits';
-import { fighterPortrait } from '../src/game/roster/looks';
+import { fighterPortrait, portraitCostumes, portraitOutfit } from '../src/game/roster/looks';
+import { costumesFor } from '../src/game/roster/costumes';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';
 import { STOCK_ICON_PX } from '../src/game/ui/plateLayout';
@@ -101,7 +102,14 @@ PivotPoints 1 { { 0, 0, 0 }, }
 /** A narrow lens from far away, close to the Blender set's orthographic camera. */
 const FOV = 8;
 
-const fighters = RENDERED_FIGHTERS.filter((character) => only === undefined || only.includes(fighterRenderName(character)));
+/** A costume's own render is keyed by its fighter's character plus its index times this, so one number names a body in the maps below. */
+const COSTUME_STRIDE = 1000;
+const renderIds = RENDERED_FIGHTERS.flatMap((character) => [0, ...portraitCostumes(character)].map((costume) => character + costume * COSTUME_STRIDE));
+const characterOf = (id: number) => id % COSTUME_STRIDE;
+const costumeOf = (id: number) => Math.floor(id / COSTUME_STRIDE);
+const renderName = (id: number) => fighterRenderName(characterOf(id)) + portraitOutfit(characterOf(id), costumeOf(id));
+
+const fighters = renderIds.filter((id) => only === undefined || only.includes(renderName(id)));
 
 /** A fighter's portrait scene couldn't be set up. */
 class PortraitFailure extends Schema.TaggedError<PortraitFailure, { readonly brand: unique symbol }>()('PortraitFailure', { problem: Schema.String }) {}
@@ -112,7 +120,7 @@ const withoutFog = ({ fog: _fog, ...environment }: RenderScene['environment']) =
 const portraitScene = (scene: RenderScene, character: number, frame: { x: number; z: number; height: number }, variant: number, pose?: Portrait): RenderScene => {
   // Player one's fighter stands left of centre, facing right.
   const body = scene.effects.find((effect) => effect.x < -100 && Math.abs(effect.yaw) < 0.01 && !effect.model.includes('OriginalLight'));
-  if (body === undefined) throw new Error(`${fighterName(character)}: no fighter body in ${scene.effects.map((effect) => effect.model).join(', ')}`);
+  if (body === undefined) throw new Error(`${fighterName(characterOf(character))}: no fighter body in ${scene.effects.map((effect) => effect.model).join(', ')}`);
   const distance = frame.height * 1.1 / (2 * Math.tan(FOV * Math.PI / 360));
   return {
     ...scene, frame: frameOf(character, variant), client: 0, units: [], ui: [], textTags: [], filter: undefined,
@@ -248,7 +256,7 @@ const CORRECTIONS: Readonly<Record<string, Correction>> = {
   PitLord: { lift: 1.3 },
   MalfurionStormrage: { lift: 1.3 },
 };
-const correctionOf = (character: number): Correction => CORRECTIONS[fighterRenderName(character)] ?? {};
+const correctionOf = (character: number): Correction => CORRECTIONS[fighterRenderName(characterOf(character))] ?? {};
 
 type Vector = [number, number, number];
 /** A node matrix's linear part (w 0) or affine map (w 1) applied to v. */
@@ -346,7 +354,7 @@ function portraitPose(bytes: Uint8Array, character: number, animation: string | 
   const face = [/nose/i, /eye/i, /^head ref/i].map((pattern) => head.joints.filter((joint) => pattern.test(joint.name)).map((joint) => joint.id)).find((ids) => ids.length > 0) ?? [];
   const sequence = sequenceOf(model, animation);
   const length = (model.Sequences[sequence]?.Interval[1] ?? 0) - (model.Sequences[sequence]?.Interval[0] ?? 0);
-  const clip = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index))
+  const clip = Array.from({ length: originalClipCount(characterOf(character)) }, (_, index) => originalClip(characterOf(character), index))
     .find((candidate) => candidate?.timeline === true && candidate.startSeconds <= elapsed && elapsed < candidate.endSeconds);
   const [start, end] = clip === undefined ? [0, length] : [Math.ceil(clip.startSeconds * 1000), Math.floor(clip.endSeconds * 1000)];
   if (end <= start) return undefined;
@@ -480,16 +488,16 @@ await Effect.runPromise(Effect.gen(function*() {
   mkdirSync(join(assets, 'fighter-renders'), { recursive: true });
   for (const family of readdirSync(stored)) if (family !== 'fighter-renders') symlinkSync(join(stored, family), join(assets, family));
   for (const file of readdirSync(join(stored, 'fighter-renders'))) symlinkSync(join(stored, 'fighter-renders', file), join(assets, 'fighter-renders', file));
-  const portraitFile = (character: number, kind: PortraitKind, slot?: number) => fighterPortrait(character, kind, slot).replace(/^.*war3mapImported\\/, '').replace(/\.blp$/, '.tga');
+  const portraitFile = (id: number, kind: PortraitKind, slot?: number) => fighterPortrait(characterOf(id), kind, slot, costumeOf(id)).replace(/^.*war3mapImported\\/, '').replace(/\.blp$/, '.tga');
   const standIn = at(RENDERED_FIGHTERS, 0);
-  for (const character of RENDERED_FIGHTERS) for (const kind of PORTRAIT_KINDS) for (const slot of [...(kind === 'Tile' ? [undefined] : []), ...PARTICIPANT_SLOTS]) {
+  for (const character of renderIds) for (const kind of PORTRAIT_KINDS) for (const slot of [...(kind === 'Tile' ? [undefined] : []), ...PARTICIPANT_SLOTS]) {
     const file = portraitFile(character, kind, slot);
     if (!existsSync(join(assets, 'fighter-renders', file))) symlinkSync(join(stored, 'fighter-renders', portraitFile(standIn, kind, slot)), join(assets, 'fighter-renders', file));
   }
   const captured = new Map<number, RenderScene>();
   for (const character of fighters) {
-    const name = fighterKey(character);
-    const session = yield* Effect.tryPromise({ try: () => createStandaloneSession({ presentation: 'pool-confirmed', script: `#! chat -dev quick pair ${name} / ${name}` }), catch: (cause) => new PortraitFailure({ problem: `${name}: match setup failed: ${String(cause)}` }) });
+    const name = fighterKey(characterOf(character)), outfit = costumeOf(character) === 0 ? '' : ` in ${at(costumesFor(characterOf(character)), costumeOf(character)).name.toLowerCase()}`;
+    const session = yield* Effect.tryPromise({ try: () => createStandaloneSession({ presentation: 'pool-confirmed', script: `#! chat -dev quick pair ${name}${outfit} / ${name}` }), catch: (cause) => new PortraitFailure({ problem: `${name}: match setup failed: ${String(cause)}` }) });
     try {
       for (let frame = 0; frame < 90; frame++) session.step(NEUTRAL_INPUT);
       captured.set(character, captureScene(session.client, { visibleOnly: true }));
@@ -521,14 +529,14 @@ await Effect.runPromise(Effect.gen(function*() {
       const pose = found ?? { elapsed: correction.elapsed ?? body.animationElapsed, yaw: FACE_AZIMUTH + (correction.turn ?? 0) * Math.PI / 180, angle: correction.angle ?? ANGLE, zoom: correction.zoom ?? 1, lift: correction.lift ?? 1, body: correction.body === true };
       poses.set(character, pose);
       const degrees = (angle: number) => (angle * 180 / Math.PI).toFixed(1);
-      console.log(`${graphics} ${fighterRenderName(character)}: ${found === undefined ? 'no head geometry, ' : ''}Stand at ${pose.elapsed} s, yaw ${degrees(pose.yaw)}, angle ${pose.angle}, zoom ${pose.zoom}`);
+      console.log(`${graphics} ${renderName(character)}: ${found === undefined ? 'no head geometry, ' : ''}Stand at ${pose.elapsed} s, yaw ${degrees(pose.yaw)}, angle ${pose.angle}, zoom ${pose.zoom}`);
     }
     if (orientationOnly) {
       for (const character of fighters) for (const variant of VARIANTS.keys()) {
         const scene = portraitScene(required(captured.get(character), 'scene'), character, wide0, variant, poses.get(character)), body = at(scene.effects, 0);
         const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
         const found = bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, wide0.height, correctionOf(character).flipped);
-        if (found !== undefined && !found.upright) upsideDown.push(`${graphics} ${fighterRenderName(character)}${at(VARIANTS, variant).suffix}`);
+        if (found !== undefined && !found.upright) upsideDown.push(`${graphics} ${renderName(character)}${at(VARIANTS, variant).suffix}`);
       }
       continue;
     }
@@ -559,7 +567,7 @@ await Effect.runPromise(Effect.gen(function*() {
     const gammaOf = (character: number) => required(poses.get(character), 'pose').lift;
     const draw = function*(frame: number, image: string, weights: readonly number[], gamma: number, into: string, kinds?: readonly PortraitKind[]) {
       const character = Math.floor(frame / VARIANTS.length), variant = frame % VARIANTS.length;
-      const name = fighterRenderName(character), suffix = at(VARIANTS, variant).suffix;
+      const name = renderName(character), suffix = at(VARIANTS, variant).suffix;
       const raw = join(directory, `${name}${suffix}.png`);
       const summed = LIGHT_PASSES.flatMap((pass, index) => ['(', join(required(passes[pass.name], 'pass'), image), '-alpha', 'off', '-evaluate', 'multiply', String(weights[index] ?? 0), ')', ...(index === 0 ? [] : ['-compose', 'plus', '-composite'])]);
       const masks = LIGHT_PASSES.flatMap((pass, index) => ['(', join(required(passes[pass.name], 'pass'), image), '-alpha', 'off', '-fill', 'white', '+opaque', `rgb(${CLEAR.join(',')})`, '-fill', 'black', '-opaque', `rgb(${CLEAR.join(',')})`, ')', ...(index === 0 ? [] : ['-compose', 'lighten', '-composite'])]);
@@ -573,11 +581,11 @@ await Effect.runPromise(Effect.gen(function*() {
       if (!cut.upright) upsideDown.push(`${graphics} ${name}${suffix}`);
       if (graphics === 'classic' && into === portraits && kept.includes('Bust') && bytes !== undefined) {
         const nodes = new Set(parseMDX(bytes.slice().buffer).Nodes.flatMap((node) => node === undefined ? [] : [node.Name]));
-        const { parts, missing } = resolvedParts(name, nodes);
+        const { parts, missing } = resolvedParts(fighterRenderName(characterOf(character)), nodes);
         if (missing.length > 0) console.log(`${graphics} ${name}: Classic body lacks portrait parts ${missing.join(', ')}`);
         const half = DRAWN / RESOLUTION;
         const receipt: PortraitReceipt = {
-          path: fighterPortrait(character, 'Bust', variant - 1),
+          path: fighterPortrait(characterOf(character), 'Bust', variant - 1, costumeOf(character)),
           scene: { camera: scene.camera, effects: scene.effects, ...(scene.world === undefined ? {} : { world: scene.world }) }, width: DRAWN, height: DRAWN,
           crop: { x: cut.bust.left * half, y: cut.bust.top * half, width: cut.bust.size * half, height: cut.bust.size * half },
           texture: { width: TILE_TEXTURE_PX, height: TILE_TEXTURE_PX }, parts,
@@ -592,7 +600,7 @@ await Effect.runPromise(Effect.gen(function*() {
     const lighting = new Map<number, readonly number[]>();
     for (const { frame, image } of images) {
       if (at(VARIANTS, frame % VARIANTS.length).suffix !== 'P1') continue;
-      const character = Math.floor(frame / VARIANTS.length), name = fighterRenderName(character);
+      const character = Math.floor(frame / VARIANTS.length), name = renderName(character);
       const busts: Uint8Array[] = [];
       for (const [index, pass] of LIGHT_PASSES.entries()) {
         const into = join(directory, `pass-${pass.name}`);

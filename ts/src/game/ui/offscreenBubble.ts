@@ -27,6 +27,7 @@ export class OffscreenBubble {
   private character: Character | undefined;
   private color: number | undefined;
   private tint: CostumeTint | undefined;
+  private costume = 0;
 
   constructor(slot: number) {
 
@@ -43,7 +44,7 @@ export class OffscreenBubble {
     }
   }
 
-  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, tint?: CostumeTint): void {
+  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, tint?: CostumeTint, costume = 0): void {
     if (visible !== this.visible) {
       this.visible = visible;
       BlzFrameSetVisible(this.portrait, visible);
@@ -53,7 +54,7 @@ export class OffscreenBubble {
     if (this.character !== character || this.color !== color) {
       this.character = character;
       this.color = color;
-      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Tile", color), 0, true);
+      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Tile", color, costume), 0, true);
     }
     if (this.tint !== tint) {
       this.tint = tint;
