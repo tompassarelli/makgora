@@ -265,6 +265,17 @@
    "range": "mid",
    "note": "Mobility trickster, light body, strong air drift; blink endpoints have visible recovery",
    "drafted": true
+  },
+  {
+   "fighter": "anub'arak",
+   "source": "docs/design/roster.md",
+   "stated": true,
+   "kill": "bottom",
+   "edgeGuard": "average",
+   "recovery": "exploitable",
+   "range": "close",
+   "note": "Heavy ground control, eruptions beneath prey; slow turns, broad body, committed recovery",
+   "drafted": true
   }
  ]
 }

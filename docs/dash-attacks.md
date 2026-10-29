@@ -141,7 +141,7 @@ fresh judges give medians 4/4/4/4/4.
 
 Anub'arak's dash attack (#339) draws Impale spikes at the hit (north gate 45).
 His claws vanish against the shell at tile size, and no pose take scored
-readability 4 without the spikes; with them, his generator clip reaches 4. Anub'arak was removed on 2026-10-29.
+readability 4 without the spikes; with them, his generator clip reaches 4.
 Follow-through stays at 3 in every compact take: three changes to the active
 window (an even glide from the last active frame, a deeper pose at that frame,
 and a root lunge that keeps carrying forward until it) each read to the judges

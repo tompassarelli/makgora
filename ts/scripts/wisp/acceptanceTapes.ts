@@ -542,7 +542,7 @@ const WARDEN: MatchScript = {
 
 const ULTIMATE_PAIRS: readonly (readonly [keyof typeof Character, keyof typeof Character])[] = [
   ["murloc", "grom"], ["cairne", "pitLord"], ["lichKing", "sylvanas"], ["tinker", "kaelthas"], ["shadowHunter", "warden"], ["mountainKing", "demonHunter"],
-  ["rifleman", "blademaster"], ["lich", "uther"], ["dreadlord", "beastmaster"], ["thrall", "jaina"], ["chen", "peon"], ["malfurion", "archimonde"], ["medivh", "ladyVashj"],
+  ["rifleman", "blademaster"], ["lich", "uther"], ["dreadlord", "beastmaster"], ["thrall", "jaina"], ["chen", "peon"], ["anubarak", "malfurion"], ["medivh", "ladyVashj"],
 ];
 
 export function generateTapes(): Map<string, string> {

@@ -151,6 +151,11 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   bossBattle("hyjal-malfurion", "Mount Hyjal: The Horn of Cenarius", C.malfurion, BossKind.archimonde, 4, 5, 2,
     "Blow your horn, druid. When I reach Nordrassil, the last refuge of your people will burn."),
   battle({
+    id: "anubarak-ascent", title: "The Crypt Lord's Passage", player: C.anubarak, against: [C.demonHunter, C.kaelthas], tier: "expert", stage: 2,
+    win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 1,
+    speaker: "Anub'arak", intro: "The usurpers bar the way to Icecrown. Follow me, King Arthas. We shall make a passage through their bones.",
+  }),
+  battle({
     id: "medivh-warning", title: "The Guardian's Last Warning", player: C.medivh, against: [C.dreadlord, C.pitLord], tier: "expert", stage: 10,
     win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 1,
     speaker: "Medivh", intro: "At Hyjal, human, orc and night elf stand together. Demons, you will find no willing door in me again.",

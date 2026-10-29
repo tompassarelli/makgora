@@ -7,6 +7,7 @@ import { WARDEN_GROUND } from "../fighters/warden/moves";
 import { BEASTMASTER_MOVES } from "../fighters/beastmaster/moves";
 import type { HeroLook } from "../presentation/model/look";
 import { type PortraitKind, RENDERED_FIGHTERS, fighterRenderName, lookCharacter } from "./kits";
+import { anubarakLook } from "../fighters/anubarak/look";
 import { beastmasterLook } from "../fighters/beastmaster/look";
 import { blademasterLook } from "../fighters/blademaster/look";
 import { cairneLook } from "../fighters/cairne/look";
@@ -38,6 +39,7 @@ import { tinkerLook } from "../fighters/tinker/look";
 import { wardenLook } from "../fighters/warden/look";
 
 const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
+  [Character.anubarak]: anubarakLook,
   [Character.beastmaster]: beastmasterLook(BEASTMASTER_MOVES),
   [Character.blademaster]: blademasterLook,
   [Character.cairne]: cairneLook,

@@ -39,4 +39,5 @@ smash, neutral air, the four specials), kept outside the repository under
 | Kobold | 22 | 22/22 | 18/22 | 23-kobold.ogg |
 | Malfurion Stormrage | 20 | 20/20 | 16/20 | 24-malfurion-stormrage.ogg |
 | Medivh | 22 | 22/22 | 19/22 | 25-medivh.ogg |
+| Anub'arak | 22 | 22/22 | 18/22 | 26-anub-arak.ogg |
 | All | 547 | 547/547 | 461/547 | 26/26 |

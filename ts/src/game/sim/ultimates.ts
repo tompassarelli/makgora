@@ -358,6 +358,15 @@ const GROM: AuthoredSpecial = {
   ],
 };
 
+const LOCUST = "Units\\Undead\\Locust\\Locust.mdx";
+const ANUBARAK: AuthoredSpecial = {
+  name: "Locust Swarm", endFrame: 60, groundOnly: true,
+  projectiles: [
+    { ...shot(17, 60.0, 60.0, 5.0, 0.0, 90, 90.0, hit(6.5, 80, 10.0, 25.0, HitElement.poison), LOCUST), pool: { every: 12, growth: 0.0, maxRadius: 90.0 } },
+    ...[{ x: 5.0, z: 105.0 }, { x: 115.0, z: 85.0 }, { x: 95.0, z: 15.0 }].map(({ x, z }) => ({ ...mark(LOCUST, 17, 90, x, z), velocityX: 5.0 })),
+  ],
+};
+
 const MALFURION: AuthoredSpecial = {
   name: "Wisps of Hyjal", endFrame: 50,
   projectiles: [
@@ -446,6 +455,7 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.kaelthas]: KAELTHAS,
   [Character.murloc]: MURLOC,
   [Character.grom]: GROM,
+  [Character.anubarak]: ANUBARAK,
   [Character.malfurion]: MALFURION,
   [Character.medivh]: MEDIVH,
   [Character.uther]: UTHER,

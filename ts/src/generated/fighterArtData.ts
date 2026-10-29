@@ -30,6 +30,7 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [20, { name: "KaelthasSunstrider", slug: "kael'thas-sunstrider", source: "hero-models/herobloodelf.mdx", stock: "war3.w3mod:units/human/herobloodelf/herobloodelf.mdx", model: "units\\human\\HeroBloodElf\\HeroBloodElf.mdl" }],
   [21, { name: "Murloc", slug: "murloc", source: "hero-models/murloc.mdx", stock: "war3.w3mod:units/creeps/murloc/murloc.mdx", model: "units\\creeps\\Murloc\\Murloc.mdl" }],
   [22, { name: "GromHellscream", slug: "grom-hellscream", source: "hero-models/hellscream.mdx", stock: "war3.w3mod:units/orc/hellscream/hellscream.mdx", model: "units\\orc\\Hellscream\\Hellscream.mdl" }],
+  [23, { name: "Anubarak", slug: "anub'arak", source: "hero-models/herocryptlord.mdx", stock: "war3.w3mod:units/undead/herocryptlord/herocryptlord.mdx", model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl" }],
   [24, { name: "MalfurionStormrage", slug: "malfurion-stormrage", source: "hero-models/furion.mdx", stock: "war3.w3mod:units/nightelf/furion/furion.mdx", model: "units\\nightelf\\Furion\\Furion.mdl" }],
   [25, { name: "Medivh", slug: "medivh", source: "hero-models/medivh.mdx", stock: "war3.w3mod:units/creeps/medivh/medivh.mdx", model: "units\\creeps\\Medivh\\Medivh.mdl" }],
   [27, { name: "Uther", slug: "uther", source: "hero-models/uther.mdx", stock: "war3.w3mod:units/human/uther/uther.mdx", model: "units\\human\\Uther\\Uther.mdl" }],

@@ -252,6 +252,7 @@ interface Portrait { readonly elapsed: number; readonly yaw: number; readonly an
  */
 interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly clock?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
 const CORRECTIONS: Readonly<Record<string, Correction>> = {
+  "Anub'arak": { zoom: 0.6, angle: -30 },
   Lich: { lift: 1.3, zoom: 1.2 },
   ChenStormstout: { zoom: 1.3 },
   Murloc: { zoom: 1.47, shift: [0.03, -0.46], clock: 1.5 },

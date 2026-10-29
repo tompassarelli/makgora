@@ -41,6 +41,7 @@ cancelling.
 | Grom Hellscream | aerial chop; lands into the grounded chop | S1 W20 L27/E27 | S1 W20 L15/E50 | S1 W20 L3/E50 | S1 W20 L—/E50 |
 | Malfurion Stormrage | downward branch; recall works while falling | S1 W26 L27/E27 | S1 W26 L15/E80 | S1 W26 L3/E80 | S1 W26 L—/E65 |
 | Medivh | Last Word holds height, blinks back and bursts | S0 W13 L59/E38 | S0 W13 L57/E38 | S0 W13 L43/E38 | S0 W13 L—/E38 |
+| Anub'arak | downward beetle; recall works while falling | S1 W22 L27/E27 | S1 W22 L15/E46 | S1 W22 L3/E46 | S1 W22 L—/E46 |
 | Lady Vashj | Mana Shield toggles in the air as on the ground | S0 W— L27/E12 | S0 W— L15/E12 | S0 W— L3/E12 | S0 W— L—/E12 |
 | Archimonde the Defiler | aerial Bash, a hammer-fist that drives a foe below him down | S1 W16 L27/E27 | S1 W16 L15/E46 | S1 W16 L3/E46 | S1 W16 L—/E46 |
 

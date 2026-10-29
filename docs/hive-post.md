@@ -56,7 +56,7 @@ Controllers work through a separate, experimental helper, [padbridge](https://gi
 - Balance is still a first pass, and the shield bubble can differ slightly from where hits land.
 - The game runs at about 59 frames a second and can stutter briefly when your computer is busy.
 - Cairne's, Shadow Hunter's and Sylvanas's ultimates and the Gryphon Aerie moving platform are first versions.
-- Grom, Malfurion and Medivh have no Classic route or Lore Battle yet.
+- Grom, Anub'arak, Malfurion and Medivh have no Classic route or Lore Battle yet.
 - Do not restart with Ctrl+R or F5, because they can hang the game. Use New Match or Quit Mission instead.
 - Most testing was on Linux. Tell us if anything differs on Windows or macOS.
 

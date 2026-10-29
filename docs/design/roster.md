@@ -4,7 +4,7 @@
 
 > **Removed (30 October 2026):** Sniper, the original Rifleman, left the game at Tom's decision: he is on no select grid, computer, Random, Classic or Lore Battle list, and the map carries none of his art, model or object data. Character code 1 stays as the base Rifleman body that headless tests use as a fixed reference target and training dummy (`HARNESS_ONLY_FIGHTERS` in `ts/src/game/roster/kits.ts`).
 
-> **Removed (29 October 2026):** Anub'arak left the roster at Tom's decision; character code 23 is retired, never reused. His section below is kept as history.
+> **Reinstated (30 October 2026):** Tom reversed his 29 October cut and Anub'arak is back in the roster as he was before the removal, with character code 23 again his; he sits at the end of the Undead group on the select grid, after Mal'Ganis.
 
 > **Select grid order (30 October 2026):** the character select grid lists the fighters by faction in reading order, Human, Orc, Undead, Night Elf, Burning Legion, then Neutral, with the Random tile last; `SELECT_GRID_ORDER` in `ts/src/game/ui/selectionLayout.ts` holds the order and `selectionFrames.tests.ts` pins it. Chen sits with the Neutral fighters (Tom, 30 October 2026).
 
@@ -1846,8 +1846,6 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 ## Anub'arak (#341)
 
-> **Removed (29 October 2026):** Anub'arak left the roster at Tom's decision. His fighter, clips, art, tests and select tile are deleted and character code 23 is retired, never reused. This section is kept as design history.
-
 **Identity:** an ancient insect king who treats the stage as his crypt. He advances with a low, six-legged scuttle, skewers ankles with his tusks, disappears under the floor and erupts beneath prey. His carrion beetles do the undignified chasing for him. Heavy ground control and frightening eruptions cost slow turns, a broad body and committed recovery. No damage reflection, resource or hidden stat bonus.
 
 ### Normals
@@ -1898,7 +1896,7 @@ Standing grab starts f10, the shared 96-unit envelope is active for three frames
 
 Ground-control draft: Impale makes prey jump into the crown; beetles pressure approaches while Burrow Hunt punishes a stationary guard. Slow aerials cover space, not repeated rushdown.
 
-```text
+```balance-profile
 fighter: anub'arak
 archetype: trapper
 aerials: nair 10-35, fair 15-40, bair 10-35, uair 10-35, dair 0-25
@@ -1910,7 +1908,7 @@ specials: neutral 5-20, side 3-15, up 0-8, down 3-15
 
 Path draft for Tom to correct (#358):
 
-```text
+```ceiling-plan
 fighter: anub'arak
 path: decision
 basic-moves: forward-tilt,down-tilt,neutral-special

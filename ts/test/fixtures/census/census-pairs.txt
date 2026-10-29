@@ -22,3 +22,4 @@ pair	murloc vs rifleman	instructions=225700	alloc-kb=26.3
 pair	grom-hellscream vs rifleman	instructions=228100	alloc-kb=24.9
 pair	malfurion-stormrage vs rifleman	instructions=182700	alloc-kb=43.2
 pair	medivh vs rifleman	instructions=222200	alloc-kb=48.6
+pair	anub'arak vs rifleman	instructions=204600	alloc-kb=30.4

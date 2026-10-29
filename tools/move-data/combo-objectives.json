@@ -54,6 +54,7 @@
     "Murloc": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Grom Hellscream": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Malfurion Stormrage": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
-    "Medivh": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" }
+    "Medivh": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
+    "Anub'arak": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" }
   }
 }

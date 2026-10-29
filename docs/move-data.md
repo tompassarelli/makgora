@@ -188,6 +188,7 @@ models, no disjoint cited). Cairne's down air belongs to #96.
 | kael'thas-sunstrider | 16 (0.12) front | 9 (0.07) front | 1 (0.01) back | 4 (0.03) front | 4 (0.03) down |
 | murloc | 8 (0.06) back | 10 (0.08) front | 9 (0.06) back | 8 (0.06) up | 9 (0.07) down |
 | grom-hellscream | 9 (0.07) front | 13 (0.1) front | 3 (0.03) back | -34 (-0.26) up | 5 (0.04) down |
+| anub'arak | 16 (0.12) front | 20 (0.15) front | -12 (-0.09) front | -59 (-0.45) front | -8 (-0.06) down |
 | malfurion-stormrage | 9 (0.07) back | 1 (0.01) front | 1 (0.01) back | 0 (0) front | 8 (0.06) down |
 | medivh | 12 (0.09) back | -4 (-0.03) front | -1 (-0.01) back | 19 (0.15) up | -1 (-0.01) down |
 | kobold | -10 (-0.08) back | 2 (0.02) front | -1 (-0.01) back | 2 (0.01) up | 10 (0.08) down |

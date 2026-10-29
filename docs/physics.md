@@ -1325,7 +1325,7 @@ on frost, is the roster's Luigi; the other robed casters 0.04-0.06
 0.05; Murloc 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
 Warden, Shadow Hunter, Dreadlord, Grom); sturdy fighters 0.065
 (Mountain King, Forsaken Paladin, Beastmaster, Lich King, Chen, Tinker);
-Thrall 0.07; Pit Lord and Cairne 0.08. Rifleman and Illidan keep
+Thrall 0.07; Pit Lord, Cairne and Anub'arak 0.08. Rifleman and Illidan keep
 Fox's and Captain Falcon's 0.08. Melee spans 0.025 (Luigi) to 0.1 (Peach,
 Link, Zelda, Pichu) and gives its low traction to slow runners
 (smashcraft:docs/design/melee/movement.md); so do we: no hero runs faster than

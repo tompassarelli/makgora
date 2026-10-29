@@ -38,7 +38,7 @@ const DRIFT_SLACK = 8.0;
 const lipSide = (x: number): -1 | 1 => (x < 0.0 ? -1 : 1);
 
 /** Forward air for the fighters whose tool reaches out (edgeGuardScenarios.ts); down air for the rest. */
-export const forwardAirTool = (character: Character): boolean => character === Character.jaina;
+export const forwardAirTool = (character: Character): boolean => character === Character.anubarak || character === Character.jaina;
 
 /** Whether `target` is off stage below the deck, so it must recover past the lip. */
 export function recoveringBelow(target: Readonly<Fighter>, stage: number): boolean {

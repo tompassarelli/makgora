@@ -44,6 +44,6 @@ export const MOVES_BUTTON_HEIGHT = f32(0.032);
 export const SELECT_GRID_ORDER: readonly Character[] = [
   Character.uther, Character.jaina, Character.mountainKing, Character.medivh, Character.kaelthas, Character.thrall, Character.grom,
   Character.cairne, Character.beastmaster, Character.blademaster, Character.shadowHunter, Character.peon, Character.lichKing, Character.lich, Character.sylvanas,
-  Character.dreadlord, Character.butcher, Character.malfurion, Character.tyrande, Character.demonHunter, Character.warden, Character.archimonde, Character.pitLord,
+  Character.dreadlord, Character.anubarak, Character.butcher, Character.malfurion, Character.tyrande, Character.demonHunter, Character.warden, Character.archimonde, Character.pitLord,
   Character.ladyVashj, Character.akama, Character.chen, Character.firelord, Character.tinker, Character.alchemist, Character.murloc,
 ];

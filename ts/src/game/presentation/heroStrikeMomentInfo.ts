@@ -2,6 +2,7 @@
 import { Character } from "../sim/codes";
 import { akamaStrikeMoments } from "../fighters/akama/strikeMoments";
 import { alchemistStrikeMoments } from "../fighters/alchemist/strikeMoments";
+import { anubarakStrikeMoments } from "../fighters/anubarak/strikeMoments";
 import { archimondeStrikeMoments } from "../fighters/archimonde/strikeMoments";
 import { beastmasterStrikeMoments } from "../fighters/beastmaster/strikeMoments";
 import { blademasterStrikeMoments } from "../fighters/blademaster/strikeMoments";
@@ -37,6 +38,7 @@ import { wardenStrikeMoments } from "../fighters/warden/strikeMoments";
 export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [style: number]: { readonly clip: number; readonly seconds: number; readonly end: number } | undefined } | undefined } = {
   [Character.akama]: akamaStrikeMoments,
   [Character.alchemist]: alchemistStrikeMoments,
+  [Character.anubarak]: anubarakStrikeMoments,
   [Character.archimonde]: archimondeStrikeMoments,
   [Character.beastmaster]: beastmasterStrikeMoments,
   [Character.blademaster]: blademasterStrikeMoments,

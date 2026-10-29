@@ -11,6 +11,13 @@ const LOST_TO_BLADEMASTER: NativeCheck["setup"] = [
 
 export const ledgerCaptureChecks = (rules: readonly Rule[]): NativeCheck[] => [
   {
+    id: "ledger-22-anub-portrait", closes: "smashcraft#431 (ledger row 22)", map: "gate-playable", session: "ledger-select",
+    setup: [{ waitMs: 6000 }, { keys: ["Escape"], client: "a" }, { waitMs: 1500 }],
+    capture: [{ kind: "frames", name: "fighter-select", client: "a" }],
+    pass: [...rules],
+    look: "Classic candidate fighter select: Anub'arak's roster portrait shows his body in its own colours over the tile, as the neighbouring portraits do, not a flat or washed-out opaque tile.",
+  },
+  {
     id: "ledger-4a-victory", closes: "smashcraft#431 (ledger row 4a)", map: "presentation", session: "ledger-victory",
     setup: LOST_TO_BLADEMASTER,
     capture: [{ kind: "frames", name: "results", client: "a", count: 60, everyMs: 67 }],

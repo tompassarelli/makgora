@@ -283,6 +283,7 @@ export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> =
   [Character.akama]: { guarder: Character.akama, out: 163.0, z: -68.0, press: 3 },
   [Character.firelord]: { guarder: Character.firelord, out: 163.0, z: -68.0, press: 3 },
   [Character.alchemist]: { guarder: Character.alchemist, out: 163.0, z: -68.0, press: 3 },
+  [Character.anubarak]: { guarder: Character.anubarak, out: 165.0, z: -68.0, press: 6 },
 };
 
 export const OPENING_MIN = 15;

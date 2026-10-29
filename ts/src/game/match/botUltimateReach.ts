@@ -24,6 +24,7 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.kaelthas]: { near: 0.0, far: 240.0 },
   [Character.murloc]: { near: 100.0, far: 600.0 },
   [Character.grom]: { near: 60.0, far: 400.0 },
+  [Character.anubarak]: { near: 60.0, far: 300.0 },
   [Character.malfurion]: { near: 100.0, far: 500.0 },
   [Character.medivh]: { near: 150.0, far: 330.0 },
   [Character.ladyVashj]: { near: 80.0, far: 560.0 },

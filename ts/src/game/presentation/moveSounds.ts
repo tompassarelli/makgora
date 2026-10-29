@@ -152,6 +152,10 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     weapon: Weapon.axe, strong: "CriticalStrike",
     specials: [s(warcryVoice(Character.grom), "MetalMediumChopFlesh"), s("DeepFootstep2", "MetalHeavyChopFlesh"), s(undefined, "MetalMediumChopFlesh"), s(undefined, "MetalHeavyChopFlesh")],
   },
+  [Character.anubarak]: {
+    weapon: Weapon.claw, effort: ["CryptLordAttack1", "CryptLordAttack2"], strong: "ImpaleHit",
+    specials: [s("Impale", "ImpaleHit"), s("Burrow", "ImpaleLand"), s("ImpaleLand", "RockHeavyBashFlesh"), s("ScarabBirth", "CryptFiendMissileHit")],
+  },
   [Character.malfurion]: {
     weapon: Weapon.blunt, strong: "KeeperOfTheGroveMissileHit",
     specials: [s("KeeperOfTheGroveMissileLaunch", "EntanglingRoots"), s("KeeperOfTheGroveMissileLaunch", "WoodHeavyBashFlesh"), s("DruidOfTheTalonMorph", "DruidOfTheTalonMissileHit"), s("ForceOfNatureBirth", "WoodHeavyBashFlesh")],

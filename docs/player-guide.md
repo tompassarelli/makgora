@@ -126,8 +126,8 @@ short hop when released during startup. In the air, I uses your second jump.
 
 Fighters grip the ground differently. Jaina is the most slippery and slides
 furthest on a wavedash; Malfurion, Medivh, Kael'thas and Murloc slide
-further than most after a run, a dash or a moonwalk; Thrall, Mannoroth and
-Cairne stop shortest. Landing slides, wavedashes included, brake hard
+further than most after a run, a dash or a moonwalk; Thrall, Mannoroth, Cairne
+and Anub'arak stop shortest. Landing slides, wavedashes included, brake hard
 until the fighter is down to walking speed, then glide to a stop.
 
 To moonwalk, dash and then tilt the stick lightly backward without smashing

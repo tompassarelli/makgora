@@ -518,6 +518,22 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Medivh | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Medivh | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Medivh | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Anub'arak | forward | 0 | 7 | 32 | 25 | 16 | 8.3, 0 | 81.9 at 40°, tumble, knockdown at +15 |
+| Anub'arak | forward | 30 | 12 | 37 | 25 | 16 | 8.3, 0 | 94.5 at 40°, tumble, knockdown at +17 |
+| Anub'arak | forward | 60 | 17 | 42 | 25 | 16 | 8.3, 0 | 107.1 at 40°, tumble, knockdown at +20 |
+| Anub'arak | forward | 90 | 22 | 47 | 25 | 16 | 8.3, 0 | 119.6 at 40°, tumble, knockdown at +23 |
+| Anub'arak | back | 0 | 6 | 34 | 28 | 19 | -8.3, 0 | 87.2 at 140°, tumble, knockdown at +16 |
+| Anub'arak | back | 30 | 10 | 38 | 28 | 19 | -8.3, 0 | 96.2 at 140°, tumble, knockdown at +18 |
+| Anub'arak | back | 60 | 14 | 42 | 28 | 19 | -8.3, 0 | 105.2 at 140°, tumble, knockdown at +20 |
+| Anub'arak | back | 90 | 17 | 45 | 28 | 19 | -8.3, 0 | 114.1 at 140°, tumble, knockdown at +22 |
+| Anub'arak | up | 0 | 20 | 34 | 14 | 15 | 8.3, 10.8 | 85.4 at 100°, tumble, knockdown at +29 |
+| Anub'arak | up | 30 | 29 | 43 | 14 | 15 | 8.3, 10.8 | 108.2 at 100°, tumble, knockdown at +41 |
+| Anub'arak | up | 60 | 38 | 52 | 14 | 15 | 8.3, 10.8 | 131.1 at 100°, tumble |
+| Anub'arak | up | 90 | 47 | 61 | 14 | 15 | 8.3, 10.8 | 153.9 at 100°, tumble |
+| Anub'arak | down | 0 | 4 | 32 | 28 | 21 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Anub'arak | down | 30 | 4 | 32 | 28 | 21 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Anub'arak | down | 60 | 4 | 32 | 28 | 21 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Anub'arak | down | 90 | 4 | 32 | 28 | 21 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Lady Vashj | forward | 0 | 4 | 27 | 23 | 14 | 8.3, 0 | 69.4 at 35° |
 | Lady Vashj | forward | 30 | 8 | 31 | 23 | 14 | 8.3, 0 | 77.8 at 35° |
 | Lady Vashj | forward | 60 | 11 | 34 | 23 | 14 | 8.3, 0 | 86.2 at 35°, tumble, knockdown at +14 |

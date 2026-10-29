@@ -21,6 +21,7 @@ import * as goblinTinker from "./white-models/goblin-tinker";
 import * as kaelthasSunstrider from "./white-models/kael'thas-sunstrider";
 import * as murloc from "./white-models/murloc";
 import * as gromHellscream from "./white-models/grom-hellscream";
+import * as anubarak from "./white-models/anub'arak";
 import * as malfurionStormrage from "./white-models/malfurion-stormrage";
 import * as medivh from "./white-models/medivh";
 import * as uther from "./white-models/uther";
@@ -53,6 +54,7 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   20: kaelthasSunstrider.whiteModel,
   21: murloc.whiteModel,
   22: gromHellscream.whiteModel,
+  23: anubarak.whiteModel,
   24: malfurionStormrage.whiteModel,
   25: medivh.whiteModel,
   27: uther.whiteModel,

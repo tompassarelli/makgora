@@ -464,6 +464,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Medivh | ledge-get-up | 54: Medivh ledgeClimb | 99.7 | 21.8 | up; 68.6/19.8 |
 | Medivh | ledge-roll | 82: Medivh ledgeRoll | 175.5 | 85.4 | forward; 105.5/107.3 |
 | Medivh | ledge-attack | 55: Medivh ledgeAttack | 120.8 | 22.3 | both; 111.0/33.0 |
+| Anub'arak | walk | 2: Walk | 131.4 | 21.7 | forward; 129.5/74.1 |
+| Anub'arak | dash | 2: Walk | 130.0 | 21.3 | forward; 128.4/74.0 |
+| Anub'arak | run | 2: Walk | 120.9 | 20.4 | forward; 118.7/86.3 |
+| Anub'arak | turn | 39: Anubarak turn | 177.1 | 44.6 | back; 140.6/176.6 |
+| Anub'arak | brake | 40: Anubarak stop | 110.4 | 19.1 | in place; 108.3/31.7 |
+| Anub'arak | jump-squat | 41: Anubarak jumpSquat | 67.9 | 14.2 | down; 39.9/30.1 |
+| Anub'arak | roll-forward | 74: Anubarak rollForward | 248.0 | 120.5 | forward; 186.0/245.1 |
+| Anub'arak | roll-back | 78: Anubarak rollBackward | 248.4 | 121.3 | back; 245.1/183.1 |
+| Anub'arak | spot-dodge | 55: Anubarak spotDodge | 130.6 | 26.5 | in place; 127.3/37.0 |
+| Anub'arak | air-dodge | 36: Anubarak airDodge | 121.7 | 20.9 | in place; 119.5/34.8 |
+| Anub'arak | tech | 56: Anubarak tech | 112.8 | 47.0 | in place; 111.4/78.4 |
+| Anub'arak | tech-forward | 75: Anubarak techForward | 248.1 | 120.7 | forward; 186.4/245.5 |
+| Anub'arak | tech-back | 79: Anubarak techBackward | 248.2 | 121.5 | back; 245.5/186.4 |
+| Anub'arak | get-up | 53: Anubarak getUp | 181.1 | 72.2 | up; 122.7/180.8 |
+| Anub'arak | get-up-forward | 76: Anubarak getUpRollForward | 230.7 | 114.1 | forward; 201.2/178.8 |
+| Anub'arak | get-up-back | 80: Anubarak getUpRollBackward | 238.7 | 114.8 | back; 176.0/187.0 |
+| Anub'arak | get-up-attack | 54: Anubarak getUpAttack | 179.2 | 81.4 | both; 169.0/128.9 |
+| Anub'arak | ledge-get-up | 49: Anubarak ledgeClimb | 170.9 | 32.9 | up; 165.8/69.7 |
+| Anub'arak | ledge-roll | 77: Anubarak ledgeRoll | 248.0 | 120.4 | forward; 186.4/245.5 |
+| Anub'arak | ledge-attack | 50: Anubarak ledgeAttack | 81.1 | 11.6 | both; 61.7/23.5 |
 | Lady Vashj | walk | 1: Walk | 44.7 | 13.4 | forward; 41.3/44.6 |
 | Lady Vashj | dash | 78: Lady Vashj run | 121.5 | 31.0 | forward; 111.4/104.8 |
 | Lady Vashj | run | 78: Lady Vashj run | 156.8 | 35.6 | forward; 156.8/54.8 |

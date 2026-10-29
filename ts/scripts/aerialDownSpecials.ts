@@ -48,6 +48,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.kaelthas]: "Banish curse in the air; lands into the grounded cast",
   [Character.murloc]: "small plague cloud at the cast point",
   [Character.grom]: "aerial chop; lands into the grounded chop",
+  [Character.anubarak]: "downward beetle; recall works while falling",
   [Character.malfurion]: "downward branch; recall works while falling",
   [Character.medivh]: "Last Word holds height, blinks back and bursts",
   [Character.ladyVashj]: "Mana Shield toggles in the air as on the ground",

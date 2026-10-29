@@ -334,8 +334,6 @@ Stock attack and cast sequences: "Attack Spell", "Attack - 1".
 
 ### Anub'arak
 
-> Removed on 2026-10-29: Anub'arak left the roster at Tom's decision; this record is kept as history.
-
 Stock attack and cast sequences: "Attack", "Attack - 2", "Attack Alternate", "Spell", "Spell Alternate", "Spell Channel", "Spell Throw".
 
 | Moves | Clip in use | Verdict |
