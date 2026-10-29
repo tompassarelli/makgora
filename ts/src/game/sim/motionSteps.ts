@@ -25,7 +25,8 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroEgg, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
+import { heroMotionPassesPlatforms, heroSpecialJumps } from "./specials/heroMotion";
+import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
 import { demonHunterJumpCancel } from "./specials";
 import { tickEmpowered } from "./specials/empowered";
 import { heroStatusFall } from "./heroStatus";

@@ -16,7 +16,8 @@ import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES, SPOT_DODGE_INTANGIBLE_END, TECH_
 import { DOWN_BOUND_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
 import type { Fighter } from "../sim/fighter";
-import { heroSpecialEndFrame, runningHeroSpecial } from "../sim/specials/engine";
+import { heroSpecialEndFrame } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { LEDGE_CLIMB_FRAMES } from "../sim/ledge";
 import { LEDGE_ATTACK_FRAMES, attackLandingLag, attackStartupFrames, characterAttackActiveFrames, landsIntoAttack } from "../sim/moves";
 import type { Controls } from "../sim/roster";

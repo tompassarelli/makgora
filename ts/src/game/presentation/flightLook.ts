@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { max } from "../core/numbers";
 import { SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { steeredFlightLeft } from "../sim/specials/engine";
+import { steeredFlightLeft } from "../sim/specials/heroMotion";
 import { heroLook } from "../roster/looks";
 import { characterModelScale } from "./modelScale";
 import type { FlightLook } from "./model/look";

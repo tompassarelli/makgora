@@ -11,7 +11,7 @@ import { eyeBeamShotFrameWhen } from "../sim/eyeBeam";
 import { type AuthoredSpecial, FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 import { ACTIVE_CUE_FRAMES, type CueWindows, heroCueWindows } from "./cueWindows";
 import { idiv } from "wisp/src/sim/intMath";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
 import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";

@@ -1,6 +1,6 @@
 import type { Fighter } from "../fighter";
 import { NO_HIT_REGION, type HitRegion } from "../hitRegions";
-import { isHeroSpecialAction, runningHeroSpecial } from "./engine";
+import { isHeroSpecialAction, runningHeroSpecial } from "./runningMove";
 
 /** Whether opponents' specials pass through this fighter: the special it runs names a spell-immune window it is inside. */
 export function spellImmune(f: Readonly<Fighter>): boolean {

@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { decorates } from "../sim/specials/ownedProjectiles";
 
 export function holdChannelOnFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {

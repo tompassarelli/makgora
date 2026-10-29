@@ -30,7 +30,9 @@ import { AttackPhase, AttackStyle, Character, ContactKind, DownState, SpecialAct
 import { attackPhase } from "../../src/game/sim/conditions";
 import { beginDamageContacts, finishDamageContacts, queueDamageContact } from "../../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
-import { advanceHeroStatus, enterFollowUp, runningHeroSpecial } from "../../src/game/sim/specials/engine";
+import { advanceHeroStatus } from "../../src/game/sim/specials/engine";
+import { enterFollowUp } from "../../src/game/sim/specials/heroForms";
+import { runningHeroSpecial } from "../../src/game/sim/specials/runningMove";
 import { fighterSlug } from "../../src/game/roster/kits";
 import { isAerialAttack } from "../../src/game/sim/moves";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";

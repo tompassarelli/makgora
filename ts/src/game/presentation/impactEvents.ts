@@ -11,7 +11,7 @@ import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
 import { hasFuseSound, hasImpactSound, hasPerformSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
 import { heroDefinition } from "../roster/kits";

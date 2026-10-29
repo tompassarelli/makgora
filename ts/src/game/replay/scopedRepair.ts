@@ -23,7 +23,7 @@ import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegi
 import { type HurtPart, type HurtPose, shippedHurtboxes } from "../sim/hurtboxes";
 import type { AuthoredSpecial } from "../sim/specials/schema";
 import { SMASH_MAX_CHARGE_FRAMES, attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { shieldReach } from "../sim/shieldTilt";
 
 interface AuthoredTravel {

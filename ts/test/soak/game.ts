@@ -21,7 +21,7 @@ import { MATCH_TICKS_PER_SECOND, Phase } from "../../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { AttackStyle, Character, DownState, GrabAction, ProjectileKind, SpecialAction } from "../../src/game/sim/codes";
 import type { Fighter } from "../../src/game/sim/fighter";
-import { isHeroSpecialAction } from "../../src/game/sim/specials/engine";
+import { isHeroSpecialAction } from "../../src/game/sim/specials/runningMove";
 import type { SpecialProjectile } from "../../src/game/sim/specials/schema";
 import { fighterName, selectableCharacterBySlug } from "../../src/game/roster/kits";
 import { fighterAt, isActive } from "../../src/game/sim/roster";

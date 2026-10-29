@@ -1,0 +1,25 @@
+import { f32 } from "wisp/src/sim/f32";
+
+export const FEINT_GAP = 110.0;
+export const BAIT_LATEST = 40;
+export const IMAGE_NEAR = 110.0;
+export const IMAGE_FAR = 330.0;
+export const IMAGE_ROOM = 160.0;
+export const ARMOR_GAP = 240.0;
+export const PARTNER_BITE_REACH = 60.0;
+export const PARTNER_STRAY = f32(0.2);
+export const RITUAL_LAST_FRAMES = 30;
+export const SHOT_NEAR = 180.0;
+export const SHOT_FAR = 620.0;
+export const SHOT_RISE = 70.0;
+export const LEVEL_REACH = 140.0;
+export const LEVEL_BELOW = 20.0;
+export const LEVEL_ABOVE = 40.0;
+export const DIVE_AIM_DEAD = 60.0;
+export const RUSH_NEAR = 80.0;
+export const RUSH_PAST = 40.0;
+export const ANTI_AIR_GAP = 140.0;
+export const ANTI_AIR_RISE = 160.0;
+export const DASH_IN_FAR = 300.0;
+export const SHOT_AIM_DEAD = 12.0;
+export const SHOT_AIM_HEIGHT = 45.0;

@@ -12,7 +12,7 @@ import { type Fighter, PROJECTILE_CAPACITY, type Projectile } from "./fighter";
 import { mutableProjectile } from "./fighterProjectiles";
 import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import type { SpecialProjectile } from "./specials/schema";
-import { agesWithMove } from "./specials/engine";
+import { agesWithMove } from "./specials/heroProjectiles";
 import { repelSpell } from "./specials/spellImmunity";
 import { reflectsProjectiles } from "./specials/reflector";
 import { bounceAfterHit, clearBounce, steerBounce } from "./projectileBounce";

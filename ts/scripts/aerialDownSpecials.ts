@@ -9,7 +9,7 @@ import { createReplaySnapshot } from "../src/game/replay/snapshot";
 import { copyFighterState } from "../src/generated/state/fighterState";
 import { Character, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
-import { runningHeroSpecial } from "../src/game/sim/specials/engine";
+import { runningHeroSpecial } from "../src/game/sim/specials/runningMove";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { setWorldMotionValue } from "../src/game/sim/motion";
 import { fighterAt } from "../src/game/sim/roster";

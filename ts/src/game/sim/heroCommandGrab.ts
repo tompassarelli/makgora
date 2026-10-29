@@ -11,7 +11,7 @@ import { ContactKind } from "./codes";
 import { canBeGrabbed, inGrabContext, isIntangible } from "./conditions";
 import { queueDamageContact } from "./contacts";
 import type { Fighter } from "./fighter";
-import { runningHeroSpecial } from "./specials/engine";
+import { runningHeroSpecial } from "./specials/runningMove";
 import { repelSpell } from "./specials/spellImmunity";
 import { applyHeroStatus } from "./heroStatus";
 import { currentTraits } from "./identityTraits";

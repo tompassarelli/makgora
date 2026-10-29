@@ -2,7 +2,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { HeroStatusGroup, HeroStatusKind } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { type ShockwaveRing, shockwaveRing } from "./shockwaveRing";
 
 const SHAKE = [6.0, -5.0, 4.0, -3.0, 2.0, -1.0] as const;

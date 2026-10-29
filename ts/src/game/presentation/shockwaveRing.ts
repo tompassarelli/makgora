@@ -1,7 +1,8 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import type { Fighter } from "../sim/fighter";
-import { heroRegionOrigin, runningHeroSpecial } from "../sim/specials/engine";
+import { heroRegionOrigin } from "../sim/specials/heroContact";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 
 export const SHOCKWAVE_FADE_FRAMES = 8;
 

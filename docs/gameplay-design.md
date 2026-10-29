@@ -1195,7 +1195,7 @@ Factory moved from side to down special unchanged. The numbers and why:
   his arm within range; every later frame it moves at most 11 units toward
   that opponent's centre. The beam is the capsule (radius 14) from the arm
   through the aim, 360 units long, so drawn line and hitbox are one segment
-  (`beamSegment` in smashcraft:ts/src/game/sim/specials/engine.ts). The
+  (`beamSegment` in smashcraft:ts/src/game/sim/specials/heroContact.ts). The
   fastest roster tech roll averages 9.09 units a frame while it moves (Warden,
   forward), and 11 is 1.2 times that, so the aim is waiting where a roll ends
   when its 20 intangible frames run out: a tech chase. An air dodge opens at

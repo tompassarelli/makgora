@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { characterModelScale } from "./modelScale";
 import { specialCueState } from "./specialCues";
 

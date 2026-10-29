@@ -11,7 +11,7 @@ import { attackStartupFrames, characterAttackActiveFrames, RIFLEMAN_BLASTER_AIR_
 import type { Controls } from "../sim/roster";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../sim/specials";
 import { EYE_BEAM_AIR_FORM, EYE_BEAM_AIR_SHOT, EYE_BEAM_EYE_HEIGHT, EYE_BEAM_GROUND_SHOT, EYE_BEAM_LIFETIME, EYE_BEAM_SPEED } from "../sim/eyeBeam";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { BLASTER_AIR_SHOT_HEIGHT, BLASTER_PROJECTILE_HEIGHT, BLASTER_PROJECTILE_LIFETIME, BLASTER_PROJECTILE_RADIUS, BLASTER_PROJECTILE_SPAWN_OFFSET, BLASTER_PROJECTILE_SPEED, } from "../sim/projectiles";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { deckUnder, heightAhead, safeAt } from "./botFooting";

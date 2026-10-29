@@ -166,8 +166,9 @@ its hit count and wait are projectile rollback state.
 
 `sim/specials/engine.ts` executes them: `chooseHeroSpecial` selects the
 form, `enterHeroSpecial` spends and records the entry, `advanceHeroSpecial`
-runs one frame, `heroSpecialContact` selects strikes and `landHeroSpecial`
-ends a form with landing lag. A kit field a hero needs and this list lacks is
+runs one frame; its concerns sit beside it in `sim/specials/` (`heroMotion.ts`,
+`heroProjectiles.ts`, `heroContact.ts` for `heroSpecialContact`, and
+`heroForms.ts` for `landHeroSpecial`, which ends a form with landing lag). A kit field a hero needs and this list lacks is
 added to `AuthoredSpecial` and executed here, with a focused test.
 
 ## Meters

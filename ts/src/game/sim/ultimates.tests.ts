@@ -13,7 +13,7 @@ import { createFighter, type Fighter } from "./fighter";
 import { fillMeter } from "./meter";
 import { setWorldMotionValue } from "./motion";
 import { fighterAt } from "./roster";
-import { airHoldEnd } from "./specials/engine";
+import { airHoldEnd } from "./specials/heroMotion";
 import type { AuthoredSpecial, FrameWindow } from "./specials/schema";
 
 const FOE_AHEAD = 60.0;

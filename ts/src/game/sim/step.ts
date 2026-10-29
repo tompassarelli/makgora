@@ -41,7 +41,8 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroEgg, heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
+import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
+import { heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps } from "./specials/heroMotion";
 import { tickEmpowered } from "./specials/empowered";
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { closeParasol, endParasolAerial, parasolFall, reopenParasol } from "./parasol";

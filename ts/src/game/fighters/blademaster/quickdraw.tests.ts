@@ -15,7 +15,7 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, SpecialAction } from "../../sim/codes";
 import { type Fighter, createFighter } from "../../sim/fighter";
 import { fighterAt, neutralControls } from "../../sim/roster";
-import { runningHeroSpecial } from "../../sim/specials/engine";
+import { runningHeroSpecial } from "../../sim/specials/runningMove";
 import { mainDeckZ } from "../../sim/stage";
 import { FOLLOW_UP_FORM, chargeStage } from "../../sim/specials/schema";
 import { length } from "./moves";

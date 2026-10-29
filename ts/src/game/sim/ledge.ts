@@ -15,7 +15,7 @@ import { aerialJumps, groundedJumps, jumpBuffed, speedBuffed } from "./itemBuffs
 import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformInput, clearTech, leaveLedge, refreshAirOnExit, refreshOriginalAirtime } from "./transitions";
 import { melee } from "./tuning";
 import { heroBody } from "./heroes/heroBodies";
-import { runningHeroSpecial } from "./specials/engine";
+import { runningHeroSpecial } from "./specials/runningMove";
 
 export const LEDGE_CLIMB_FRAMES = 25;
 export const LEDGE_ROLL_FRAMES = 36;

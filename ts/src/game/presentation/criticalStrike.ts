@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
 
 export const CRITICAL_STRIKE_COLOUR = { red: 255, green: 0, blue: 0 } as const;

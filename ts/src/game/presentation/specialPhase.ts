@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import type { HeroClip } from "../sim/heroes/hero";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 
 export const playsFollowUpPose = (f: Readonly<Fighter>): boolean => f.special.form >= FOLLOW_UP_FORM || f.special.form === SpecialForm.recall;

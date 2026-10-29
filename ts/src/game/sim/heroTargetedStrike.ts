@@ -8,7 +8,9 @@ import type { Fighter } from "./fighter";
 import { mutableProjectile } from "./fighterProjectiles";
 import { currentTraits } from "./identityTraits";
 import { type Roster, fighterAt } from "./roster";
-import { lockedTarget, runningHeroSpecial, seekTargetSlot, spawnHeroProjectileAt } from "./specials/engine";
+import { lockedTarget, seekTargetSlot } from "./specials/heroMotion";
+import { runningHeroSpecial } from "./specials/runningMove";
+import { spawnHeroProjectileAt } from "./specials/heroProjectiles";
 import type { SpecialProjectile, TargetedStrike } from "./specials/schema";
 import { repelSpell } from "./specials/spellImmunity";
 

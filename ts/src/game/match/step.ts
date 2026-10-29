@@ -21,7 +21,8 @@ import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRos
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, cancelShineForUpSmash, startFighterSpecial } from "../sim/specials";
 import { resolveHeroGuards } from "../sim/specials/guards";
-import { advanceHeroStatus, prepareBansheeContacts } from "../sim/specials/engine";
+import { advanceHeroStatus } from "../sim/specials/engine";
+import { prepareBansheeContacts } from "../sim/specials/heroForms";
 import { advanceItemBuff } from "../sim/itemBuffs";
 import { advanceFighterMotion } from "../sim/step";
 import { maskHeroStatusControls } from "../sim/heroStatus";

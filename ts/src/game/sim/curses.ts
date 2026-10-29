@@ -5,7 +5,8 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Fighter, mutablePlacedObject, placedObject } from "./fighter";
 import { capPercent } from "./percent";
 import { type Roster, fighterAt, isActive } from "./roster";
-import { placeOne, spawnHeroProjectileAt } from "./specials/engine";
+import { placeOne } from "./specials/engine";
+import { spawnHeroProjectileAt } from "./specials/heroProjectiles";
 import { CompanionMode, type SpecialCurse } from "./specials/schema";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceCount, surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 

@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
 import { authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { DISJOINT_CUES, disjointNormals, hitAreaPose, normalAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
 import { type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
 

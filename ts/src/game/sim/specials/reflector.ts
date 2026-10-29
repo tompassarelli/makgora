@@ -1,5 +1,5 @@
 import type { Fighter } from "../fighter";
-import { isHeroSpecialAction, runningHeroSpecial } from "./engine";
+import { isHeroSpecialAction, runningHeroSpecial } from "./runningMove";
 
 export function reflectsProjectiles(f: Readonly<Fighter>): boolean {
   if (!isHeroSpecialAction(f.special.action)) return false;

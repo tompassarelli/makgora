@@ -2,7 +2,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { HeroClip } from "../sim/heroes/hero";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { characterClips } from "./fighterClips";
 
 function refireClip(f: Readonly<Fighter>): HeroClip | undefined {

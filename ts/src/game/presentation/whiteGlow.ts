@@ -2,7 +2,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { ultimateCharged } from "../sim/meter";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 
 export const WHITE_GLOW_PERIOD = 12;
 export const HEAVY_HITLAG_FRAMES = 8;

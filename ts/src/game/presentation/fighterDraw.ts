@@ -2,7 +2,7 @@ import { originalClip, originalClipNamed } from "../../generated/clips/fighterOr
 import type { Character } from "../sim/codes";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { heroCueWindows } from "./cueWindows";
 import { specialClip } from "./fighterClips";
 import { fitFighterPlacement } from "./fighterPlacement";

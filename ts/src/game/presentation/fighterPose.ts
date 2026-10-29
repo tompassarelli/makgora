@@ -31,7 +31,7 @@ import { FRAME_SECONDS } from "./frameClock";
 import { selectCrouchClip } from "./crouchPose";
 import { type PoseClip, selectFighterClipIndex, selectFighterClipName } from "./poseClip";
 import { peonSpecialPose } from "./peonPose";
-import { runningHeroSpecial } from "../sim/specials/engine";
+import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { heroLook } from "../roster/looks";
 import {
   ESCAPE_FRAMES, IllidanLocomotion, LEDGE_CATCH_FRAMES, RESPAWN_FRAMES, TRANSITION_FRAMES, type IllidanMotion,

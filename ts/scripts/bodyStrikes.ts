@@ -1,5 +1,5 @@
 import type { Fighter } from "../src/game/sim/fighter";
-import { runningHeroSpecial } from "../src/game/sim/specials/engine";
+import { runningHeroSpecial } from "../src/game/sim/specials/runningMove";
 
 export function specialBodyStrikes(f: Readonly<Fighter>): boolean {
   const move = runningHeroSpecial(f);

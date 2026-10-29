@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { toInt } from "wisp/src/sim/binary32";
@@ -16,7 +8,9 @@ import { canAttack } from "../sim/conditions";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { aimedProjectile, companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady, steeredShot } from "../sim/specials/engine";
+import { aimedProjectile, steeredShot } from "../sim/specials/heroProjectiles";
+import { companionReady, specialCooldownReady } from "../sim/specials/engine";
+import { isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/runningMove";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
@@ -33,53 +27,13 @@ import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
 import { ULTIMATE_FRAMES_PER_PERCENT, ultimateCharged, ultimatePercent } from "../sim/meter";
 import { ULTIMATE_REACH } from "./botUltimateReach";
-
-
-const FEINT_GAP = 110.0;
-
-const BAIT_LATEST = 40;
-
-const IMAGE_NEAR = 110.0;
-const IMAGE_FAR = 330.0;
-const IMAGE_ROOM = 160.0;
-
-const ARMOR_GAP = 240.0;
-
-const PARTNER_BITE_REACH = 60.0;
-const PARTNER_STRAY = f32(0.2);
-
-const RITUAL_LAST_FRAMES = 30;
-
-
-
-const SHOT_NEAR = 180.0;
-const SHOT_FAR = 620.0;
-const SHOT_RISE = 70.0;
-
-const LEVEL_REACH = 140.0;
-const LEVEL_BELOW = 20.0;
-const LEVEL_ABOVE = 40.0;
-
-const DIVE_AIM_DEAD = 60.0;
-
-const RUSH_NEAR = 80.0;
-const RUSH_PAST = 40.0;
-
-
-
-const ANTI_AIR_GAP = 140.0;
-const ANTI_AIR_RISE = 160.0;
-
-const DASH_IN_FAR = 300.0;
-
+import { FEINT_GAP, BAIT_LATEST, IMAGE_NEAR, IMAGE_FAR, IMAGE_ROOM, ARMOR_GAP, PARTNER_BITE_REACH, PARTNER_STRAY, RITUAL_LAST_FRAMES, SHOT_NEAR, SHOT_FAR, SHOT_RISE, LEVEL_REACH, LEVEL_BELOW, LEVEL_ABOVE, DIVE_AIM_DEAD, RUSH_NEAR, RUSH_PAST, ANTI_AIR_GAP, ANTI_AIR_RISE, DASH_IN_FAR, SHOT_AIM_DEAD, SHOT_AIM_HEIGHT } from "./botKitTuning";
 
 const affords = (f: Readonly<Fighter>, action: SpecialAction): boolean => specialCooldownReady(f, action);
 
 const HERO_SLOTS = [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, SpecialSlot.down] as const;
 
-
 const takes = (skill: CpuSkill, first: number, second: number): boolean => botChance(first, second, skill.kitTenths, 10);
-
 
 const actionSeed = (f: Readonly<Fighter>): number => f.attack.serial * 37 + floorDiv(f.meter.ultimate, ULTIMATE_FRAMES_PER_PERCENT) * 11 + toInt(f.status.damage);
 
@@ -101,7 +55,6 @@ function branchBy(followUps: readonly SpecialFollowUp[], kind: FollowUpInput, st
   return undefined;
 }
 
-
 function fullestBranch(followUps: readonly SpecialFollowUp[]): SpecialFollowUp | undefined {
   let fullest: SpecialFollowUp | undefined;
   for (const branch of followUps) {
@@ -110,13 +63,6 @@ function fullestBranch(followUps: readonly SpecialFollowUp[]): SpecialFollowUp |
   }
   return fullest;
 }
-
-
-
-
-
-
-
 
 export function steerHeroBranches(f: Readonly<Fighter>, target: Readonly<Fighter>, skill: CpuSkill, input: Controls): boolean {
   if (!isHeroSpecialAction(f.special.action) || f.special.form >= FOLLOW_UP_FORM || f.launch.hitstun > 0) return false;
@@ -151,7 +97,6 @@ export function steerHeroBranches(f: Readonly<Fighter>, target: Readonly<Fighter
   return true;
 }
 
-
 function ownProjectile(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined) {
   for (const projectile of f.projectiles) {
     if (projectile.life <= 0 || projectile.kind !== ProjectileKind.hero || projectile.spec === undefined) continue;
@@ -164,7 +109,6 @@ function ownProjectile(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> |
   }
   return undefined;
 }
-
 
 function pressRecall(f: Readonly<Fighter>, target: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, slot: SpecialSlot, skill: CpuSkill, frame: number, input: Controls): boolean {
   const body = hurtCapsule(target.character);
@@ -226,7 +170,6 @@ function pressRecall(f: Readonly<Fighter>, target: Readonly<Fighter>, move: Read
   return false;
 }
 
-
 function pressHeroOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, skill: CpuSkill, frame: number, ready: boolean, input: Controls): boolean {
   const specials = f.tuning.specials;
   if (specials === undefined || !canAttack(f) || f.special.action !== SpecialAction.none) return false;
@@ -234,7 +177,6 @@ function pressHeroOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
   const gap = Math.abs(dx);
   const toward = towardOf(f, target.motion.x);
   const level = Math.abs(f32(target.motion.z - f.motion.z)) <= 60.0;
-
 
   const open = f.status.divineFrames > 0 || heroStatusBlocksActions(target) || target.status.frozenFrames > 0 || target.status.condition === HeroStatusKind.hex;
   const closeReach = open ? Math.max(50.0, moveReachAhead(f.character, AttackStyle.forwardTilt, target, f.tuning.moves)) : 50.0;
@@ -289,14 +231,6 @@ function pressHeroOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
   return false;
 }
 
-
-
-
-
-
-
-
-
 function ultimateBaseZ(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, stage: number, stageFrame: number): number | undefined {
   if (f.motion.grounded) return f.motion.z;
   if (move.groundOnly === true || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage)) return undefined;
@@ -326,7 +260,6 @@ export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, s
   input.direction = toward;
   return true;
 }
-
 
 export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, skill: CpuSkill, frame: number, ready: boolean, input: Controls, commands: AttackBuffer): boolean {
   if (skill.kitTenths <= 0 || f.launch.hitstun > 0) return false;
@@ -364,13 +297,6 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
   return false;
 }
 
-
-
-
-
-
-
-
 function steerWingDive(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, floor: number, home: number, outside: number, input: Controls): boolean {
   const { special, motion } = f;
   if (special.form !== 0 || special.frame !== DEMONHUNTER_DIVE_FRAME) return false;
@@ -395,14 +321,10 @@ function aimDive(input: Controls, aimX: number, aimZ: number): void {
   input.verticalDirection = aimZ;
 }
 
-
 export function holdAimAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {
   const rune = aimedProjectile(f);
   if (rune !== undefined) input.specialHeld = target !== undefined && f32(f32(target.motion.x - rune.x) * f.facing) > 0.0;
 }
-
-const SHOT_AIM_DEAD = 12.0;
-const SHOT_AIM_HEIGHT = 45.0;
 
 export function steerShotAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): boolean {
   const shot = steeredShot(f);
@@ -475,18 +397,11 @@ export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fight
   return false;
 }
 
-
 function punishable(target: Readonly<Fighter>): boolean {
   const style = target.attack.style;
   if (target.landing.lag > 0 || target.down.state !== DownState.none) return true;
   return style !== undefined && target.attack.frame > attackStartupFrames(style, target.tuning.moves) + characterAttackActiveFrames(target.character, style, target.tuning.moves);
 }
-
-
-
-
-
-
 
 export function dashIn(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, skill: CpuSkill, frame: number, closes: boolean, input: Controls): void {
   if (skill.kitTenths <= 0 || !f.motion.grounded || (f.tuning.moves?.dashAttack === undefined && f.character !== Character.demonHunter)) return;

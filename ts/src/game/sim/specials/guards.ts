@@ -11,7 +11,9 @@ import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { currentTraits } from "../identityTraits";
 import { clearMotionValue } from "../motion";
-import { enterFollowUp, heroRegionOrigin, placeHeroStrike, runningHeroSpecial } from "./engine";
+import { enterFollowUp } from "./heroForms";
+import { heroRegionOrigin, placeHeroStrike } from "./heroContact";
+import { runningHeroSpecial } from "./runningMove";
 
 const inWindow = (window: Readonly<FrameWindow>, frame: number): boolean => frame >= window.first && frame <= window.last;
 
