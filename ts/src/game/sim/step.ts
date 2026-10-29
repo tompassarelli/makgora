@@ -105,17 +105,30 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { aerialJumps, heavyFall, jumpBuffed, speedBuffed } from "./itemBuffs";
 import { mutableFreezeTrap } from "./fighterRest";
 import { advancePetrify } from "./gaze";
+import {
+  advanceDownMotion,
+  advanceTechAndRegrab,
+  applyFrameDirectionalInfluence,
+  applyTumbleExit,
+  applyVerticalMotion,
+  beginDodgeInput,
+  beginJumpInput,
+  canSteerFrame,
+  cancelJumpStates,
+  decayMotion,
+  dragFighterMotion,
+  drainShieldEnergy,
+  readStickFrame,
+  resolveCrouch,
+  steerMotion,
+  takeParryOption,
+  tickHitlag,
+} from "./motionSteps";
 
-const FAST_FALL_DOWN_THRESHOLD = 0.6625000238418579;
-/** the stick crosses this sideways to count as a fresh flick. */
-const STICK_SMASH_DEADZONE_X = 0.25;
-/** tumble ends on a flick at least this far sideways, on the frame it crosses the deadzone. */
-const TUMBLE_EXIT_STICK_X = 0.800000011920929;
 
 const LATE_DASH_GUARD_GRAB_WINDOW = 3;
 
 const GUARD_BITS = 768;
-const STEERING_BITS = 16399;
 
 
 function attackStartupTravel(world: Roster, slot: number, stage: number, matchFrame: number): number {
@@ -406,262 +419,46 @@ function landingDeck(f: Fighter, stage: number, matchFrame: number, oldX: number
   }
   return landing;
 }
-
-
-export function advanceFighterMotion(world: Roster, slot: number, stage: number, matchFrame: number, input: Readonly<Controls>, respawnX: number): void {
-  const f = fighterAt(world, slot);
-  const { motion, launch, shield, attack, jump, dodge, down, status } = f;
-  const physics = f.tuning.physics;
-  motion.deltaX = 0.0;
-  motion.deltaZ = 0.0;
-  if (advanceOut(world, slot, respawnX)) return;
-  renewSmashDirectionalInfluenceString(f);
-  if (inStageCannon(f)) return;
-
-  const carried = motion.grounded ? motion.surface : undefined;
-  jump.inputAge =input.jumpPressed ? 0 : min(WALL_TECH_JUMP_INPUT_WINDOW_FRAMES, jump.inputAge + 1);
-  if (advanceFreeze(f, input)) {
-    checkBlastZone(world, slot, stage);
-    return;
-  }
-
-  const downHeld = (input.down ? 1.0 : 0.0) >= FAST_FALL_DOWN_THRESHOLD;
-  motion.fastFallInputAge = downHeld ? (motion.fastFallDownHeld ? min(PLATFORM_DROP_INPUT_WINDOW, motion.fastFallInputAge + 1) : 0) : PLATFORM_DROP_INPUT_WINDOW;
-  motion.fastFallDownHeld = downHeld;
-  const horizontalStick = stickX(input);
-  const stickSide = horizontalStick >= STICK_SMASH_DEADZONE_X ? 1 : horizontalStick <= -STICK_SMASH_DEADZONE_X ? -1 : 0;
-  const tumbleExitFlick = stickSide !== 0 && stickSide !== motion.previousStickSide && Math.abs(horizontalStick) >= TUMBLE_EXIT_STICK_X;
-  motion.stickSideAge = stickSide === 0 ? WALL_JUMP_FLICK_FRAMES : stickSide === motion.previousStickSide ? min(WALL_JUMP_FLICK_FRAMES, motion.stickSideAge + 1) : 0;
-  readWavedashExit(f, stickSide, horizontalStick);
-  platforms.trackPlatformInput(f, input);
-  motion.previousStickSide = stickSide;
-  if (input.direction !== 0) {
-    motion.turnaroundSide = input.direction < 0 ? -1 : 1;
-    motion.turnaroundAge = 0;
-  } else {
-    motion.turnaroundAge = min(TURNAROUND_SPECIAL_WINDOW_FRAMES + 1, motion.turnaroundAge + 1);
-  }
-
-  const hitlagBefore = launch.hitlag;
-  launch.hitlag = max(0, launch.hitlag - 1);
-  launch.hitlagEndAge = hitlagBefore > 0 ? 0 : min(16, launch.hitlagEndAge + 1);
-
-  let parryOption: ParryBuffer = ParryBuffer.none;
-  const parryDirection = shield.parryBufferDirection;
-  if (launch.hitlag > 0) {
-    if (shield.perfectActionFrames > 0) bufferParryOption(f, input);
-  } else if (shield.parryBuffer !== ParryBuffer.none) {
-    parryOption = shield.parryBuffer;
-    shield.parryBuffer = ParryBuffer.none;
-    shield.parryBufferDirection = 0;
-  }
-  advanceTechInput(f.tech, input.techPressed, launch.hitlag > 0);
-  f.tech.window = techContactWindow(f.tech);
-  if (launch.hitlag <= 0) {
-    ageKnockback(f);
-    f.ledge.regrab = max(0, f.ledge.regrab - 1);
-  }
-  if (f.ledge.state !== LedgeState.none) {
-    advanceLedge(world, slot, stage, input);
-    return;
-  }
-  if (shield.breakState !== ShieldBreak.none && advanceShieldBreak(world, slot, stage, matchFrame, input)) return;
-
-  if (launch.hitlag <= 0 && shield.raised && shieldDrainShouldResume(f, shield.stun > 0)) {
-    if (input.shield) shield.strength = input.shieldStrength;
-    shield.energy = subtractFloat32(shield.energy, shieldDrain(shield.strength));
-    if (shield.energy < 0) {
-      shield.energy = 0.0;
-      beginShieldBreak(world, slot);
-      checkBlastZone(world, slot, stage);
-      return;
-    }
-  }
-  if (launch.hitlag <= 0) {
-    f.surfaceRecovery.reflectCooldown = max(0, f.surfaceRecovery.reflectCooldown - 1);
-    endFinishedDownStates(f);
-    endFinishedAirDodge(f);
-  }
-  const wallJumped = advanceSurfaceRecovery(f, input);
-  const wallTechStartup = f.surfaceRecovery.state === SurfaceContact.techWall && f.surfaceRecovery.frame < WALL_TECH_STARTUP_FRAMES;
-  if (hitlagBefore > 0 && launch.diPending) {
-    if (launch.hitlag > 0) {
-      applySmashDirectionalInfluence(world, slot, stage, matchFrame, input);
-    } else {
-      discardPendingSmashDirectionalInfluence(launch);
-      if (!status.out) {
-        applyDirectionalInfluence(f, input);
-        applyAutomaticSmashDirectionalInfluence(world, slot, stage, matchFrame, input);
-      }
-    }
-  }
-  if (status.out) return;
-  const carrying = isCarrying(f);
-  if (wallTechStartup || (inGrabContext(f) && !carrying)) {
-    if (launch.hitlag <= 0) status.invincible = max(0, status.invincible - 1);
-    checkBlastZone(world, slot, stage);
-    return;
-  }
-  let groundDodgeStarted = false;
-  let smashChargePaused = false;
-  if (launch.hitlag <= 0) {
-    f.landing.lag = max(0, f.landing.lag - 1);
-    smashChargePaused = advanceActionClocks(f, input);
-  }
-  if (f.grab.target !== undefined && !carrying) {
-    checkBlastZone(world, slot, stage);
-    return;
-  }
-  if (launch.hitlag <= 0) launch.hitstun = max(0, launch.hitstun - 1);
-  if (launch.hitstun === 0) launch.throwHitstun = false;
-  const squatBeforeInput = jump.squat;
-  if (input.jumpPressed) {
-    demonHunterJumpCancel(f);
-    jumpCancelHeroSpecial(f, input);
-  }
-
-  const wet = sea.wet(f, stage);
-  const waterJumped = wet && (input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && sea.beginWaterJump(f, input.direction);
-  if ((input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && !waterJumped) beginJump(f, input.direction, input.shortHopPressed, heroSpecialJumps(f));
-  if (carrying && input.jumpPressed) beginCarryJump(f, input.shortHopPressed);
-  if (jump.squat > 0 && launch.hitlag === 0 && (f.character === Character.demonHunter || squatBeforeInput !== 1)) jump.held = jump.held && input.jumpHeld;
-  if (input.airDodgePressed) {
-    if (motion.grounded && jump.squat > 0) {
-      jump.dodgeQueued = true;
-      jump.dodgeX = input.dodgeX;
-      jump.dodgeZ = input.dodgeZ;
-    } else {
-      beginAirDodge(f, input.dodgeX, input.dodgeZ, false);
-    }
-  }
-  if (jump.dodgeQueued && (input.direction !== 0 || input.verticalDirection !== 0)) {
-    jump.dodgeX = input.direction;
-    jump.dodgeZ = input.verticalDirection;
-  }
-  const dodgePressed = input.groundDodgePressed && input.shield;
-  if ((dodgePressed || parryOption === ParryBuffer.groundDodge) && !input.jumpPressed && canBeginGroundDodge(f)) {
-    beginGroundDodge(f, dodgePressed ? input.groundDodgeDirection : parryDirection);
-    groundDodgeStarted = true;
-  }
-  const groundTakeoff = advanceJumpSquat(f, input, squatBeforeInput);
-  if (carrying && groundTakeoff) lowerCarryJump(f);
-  if (launch.hitlag > 0) return;
-  advanceShieldInputClocks(f, input);
-  advanceGroundDodge(f, groundDodgeStarted);
-  checkBlastZone(world, slot, stage);
-  if (status.out) return;
-  const downOldX = motion.x;
-  const downOldZ = motion.z;
-  if (advanceDownState(f, stage, matchFrame, input)) {
-    resolveDownGroundContact(f, stage, matchFrame);
-    motion.deltaX = f32(motion.x - downOldX);
-    motion.deltaZ = f32(motion.z - downOldZ);
-    checkBlastZone(world, slot, stage);
-    return;
-  }
+export function advanceShieldFrameTimers(f: Fighter, input: Readonly<Controls>, carrying: boolean): boolean {
+  const { shield, dodge, status } = f;
   const forcedShield = shield.raised && shield.stun > 0;
   shield.stun = max(0, shield.stun - 1);
   status.invincible = max(0, status.invincible - 1);
   if (dodge.airDodging) dodge.airFrame = min(AIR_DODGE_DECAY_FRAMES, dodge.airFrame + 1);
-  const dodgeActive = dodge.airMotionFrames > 0;
   dodge.airMotionFrames = max(0, dodge.airMotionFrames - 1);
   shield.releaseLag = max(0, shield.releaseLag - 1);
-  const wantsShield = !carrying && advanceGuard(f, input, forcedShield);
-  let direction = carrying && carryThrowRequested(f, input) ? 0 : input.direction;
-  if (isTumbling(f) && !motion.grounded && launch.hitstun <= 0 && launch.hitlag <= 0 && tumbleExitFlick) {
-    clearDownState(f);
-    const airSpeed = speedBuffed(f, physics.airSpeed);
-    motion.vx = max(-airSpeed, min(airSpeed, motion.vx));
+  return !carrying && advanceGuard(f, input, forcedShield);
+}
+
+export function advanceActionFrame(f: Fighter, input: Readonly<Controls>): boolean {
+  let smashChargePaused = false;
+  if (f.launch.hitlag <= 0) {
+    f.landing.lag = max(0, f.landing.lag - 1);
+    smashChargePaused = advanceActionClocks(f, input);
   }
-  let dashEntryDisplacementAdjustment = 0.0;
+  return smashChargePaused;
+}
 
-  hopHeroStatus(f, slot, stage, matchFrame);
-  const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
-  const authoredHeight = authoredMotion || demonHunterHoldsHeight(f) || heroFloats(f);
-  const egg = heroEgg(f);
-  const canSteer = !authoredMotion && egg === undefined && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
-    && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
-    && (!motion.grounded || attack.cooldown <= 0) && f.surfaceRecovery.state !== SurfaceContact.techWall;
-  motion.crouching = ((input.down || motion.crouching) && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield && !carrying
-    && attack.style === undefined && f.special.action === SpecialAction.none
-    && groundOptionOpen(f, GroundOption.crouch);
-  if (motion.crouching) direction = 0;
-  if (!canSteer || wantsShield || !motion.grounded) clearDash(f);
-  if (canSteer) {
-    if (!wantsShield) {
-      observeActionDecision(STEERING_BITS);
-      observeActionStart(STEERING_BITS);
-    }
-    if (wantsShield) direction = 0;
-    if (motion.grounded) {
-      const previousGroundVelocity = motion.vx;
-
-      if (advanceGroundMovement(f, direction, input.walking || carrying, horizontalStick, stageSurfaces.floorFriction(stage, motion))) dashEntryDisplacementAdjustment = f32(previousGroundVelocity - motion.vx);
-    } else if (direction !== 0 && !groundTakeoff) {
-
-      const driftStick = input.driftStickX ?? direction;
-      motion.vx = wet ? sea.swimVelocity(motion.vx, direction) : airDriftVelocity(f, motion.vx, driftStick === 0 ? direction : driftStick);
-    }
+export function tickRecoveryClocks(f: Fighter): void {
+  if (f.launch.hitlag <= 0) {
+    f.surfaceRecovery.reflectCooldown = max(0, f.surfaceRecovery.reflectCooldown - 1);
+    endFinishedDownStates(f);
+    endFinishedAirDodge(f);
   }
-  if (carrying) limitCarrySpeed(f);
-  if (isGroundDodging(f) && dodge.groundDirection !== 0) {
-    if (f.character === Character.demonHunter) {
-      const moving = dodge.groundFrame >= GROUND_ROLL_MOVE_START && dodge.groundFrame <= GROUND_ROLL_MOVE_END;
-      motion.vx = moving ? f32(GROUND_ROLL_SPEED * dodge.groundDirection) : 0.0;
-    } else {
-      motion.vx = f32(dodge.groundDirection * rollTravel(f.character, "roll", isForwardGroundRoll(f) ? "forward" : "back", dodge.groundFrame));
-    }
-  } else if (isGroundDodging(f)) {
-    motion.vx = 0.0;
-  } else if (!groundTakeoff && !authoredMotion && (!canSteer || direction === 0) && launch.hitstun <= 0 && (!dodgeActive || motion.grounded)) {
-    const drag = motion.grounded ? restingTraction(f, stageSurfaces.floorTraction(physics.traction, stageSurfaces.floorFriction(stage, motion))) : physics.airFriction;
-    motion.vx = motion.vx > 0 ? max(0.0, f32(motion.vx - drag)) : min(0.0, f32(motion.vx + drag));
-  }
+}
 
-
-  platforms.dropFromPlatform(f, stage, matchFrame, input);
-  const oldX = motion.x;
-  const oldZ = motion.z;
-  dashEntryDisplacementAdjustment = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot, stage, matchFrame));
-  decayKnockback(f, stageSurfaces.floorFriction(stage, motion));
-  decayShieldMotion(f, stageSurfaces.floorFriction(stage, motion));
-  if (dodgeActive && !motion.grounded) {
-    motion.vx = f32(motion.vx * AIR_DODGE_DECAY);
-    motion.vz = f32(motion.vz * AIR_DODGE_DECAY);
-  }
-  const drill = motion.grounded ? undefined : attackFall(attack.style, attack.frame, f.tuning.moves);
-  let buoyant = false;
+export function moveAlongSurface(f: Fighter, stage: number, matchFrame: number, horizontalStick: number, dashEntry: number, canSteer: boolean, wantsShield: boolean, groundTakeoff: boolean): void {
   const teeters = (canSteer || f.landing.lag > 0) && !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f);
   const pushedOnShield = shieldPressed(f);
   const grabHolds = grabHoldsEdge(f);
-  moveHorizontally(f, stage, matchFrame, dashEntryDisplacementAdjustment);
+  moveHorizontally(f, stage, matchFrame, dashEntry);
   if (grabHolds) stopGrabAtEdge(f, stage, matchFrame);
   else if (teeters) teeterAtEdge(f, stage, matchFrame, horizontalStick);
   else if (pushedOnShield) teeterShieldAtEdge(f, stage, matchFrame);
-  if (isGroundDodging(f) || (motion.grounded && jump.squat > 0)) {
-    motion.vz = 0.0;
-    motion.z = stageSurfaces.surfaceZAt(stage, motion.surface ?? 0, matchFrame, motion.x);
-  } else if (wet && egg === undefined && !waterJumped && launch.hitstun <= 0 && !dodgeActive && !authoredHeight && drill?.speedZ === undefined) {
-    buoyant = true;
-    sea.applyBuoyancy(f);
-  } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredHeight) {
-    closeParasol(f, downHeld);
-    reopenParasol(f, input.verticalDirection > 0);
-    if (!motion.grounded && !motion.fastFalling && !f.platform.dropConsumed && downHeld && motion.fastFallInputAge < FAST_FALL_INPUT_WINDOW && input.direction === 0
-      && down.state === DownState.none && launch.hitstun <= 0 && motion.vz < 0) {
-      motion.fastFalling = true;
-      motion.fastFallInputAge = PLATFORM_DROP_INPUT_WINDOW;
-    }
-    if (drill?.speedZ !== undefined) motion.vz = drill.speedZ;
-    else if (egg !== undefined) motion.vz = -egg.fallSpeed;
-    else if (motion.fastFalling) motion.vz = -heavyFall(f, f32(physics.fastFallSpeed * heroStatusFall(f)));
-    else applyMeleeGravity(f, f32(heroStatusFall(f) * parasolFall(f)));
-  }
-  moveMeleeVerticalVelocity(f);
-  moveMeleeZ(f, divideFloat32(launch.knockbackZ, WORLD_UNITS_PER_MELEE_UNIT));
-  moveMeleeZ(f, divideFloat32(shield.recoilZ, WORLD_UNITS_PER_MELEE_UNIT));
-  if (buoyant) sea.floatAtSurface(f);
+}
 
+export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, stage: number, matchFrame: number, input: Readonly<Controls>, oldX: number, oldZ: number, carried: number | undefined, horizontalStick: number): void {
+  const { motion, jump } = f;
   if (!isGroundDodging(f)) moveMeleeX(f, windPush(stage, matchFrame, motion.x, motion.z));
   moveMeleeX(f, tauntPull(world, slot));
   const frameDeltaX = f32(motion.x - oldX);
@@ -675,9 +472,6 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (landing !== undefined) {
     finishLanding(f, stage, matchFrame, input, landing, false);
   } else if (!ascending) {
-
-
-
     const bodySide = leaveMainDeckBody(f, stage);
     if (wallSide === 0 && f32(bodySide * frameDeltaX) > 0) wallSide = bodySide;
     if (motion.grounded) {
@@ -698,4 +492,84 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   checkBlastZone(world, slot, stage);
   motion.deltaX = f32(motion.x - oldX);
   motion.deltaZ = f32(motion.z - oldZ);
+}
+
+export function advanceFighterMotion(world: Roster, slot: number, stage: number, matchFrame: number, input: Readonly<Controls>, respawnX: number): void {
+  const f = fighterAt(world, slot);
+  const { motion, launch, shield, attack, jump, dodge, status } = f;
+  motion.deltaX = 0.0;
+  motion.deltaZ = 0.0;
+  if (advanceOut(world, slot, respawnX)) return;
+  renewSmashDirectionalInfluenceString(f);
+  if (inStageCannon(f)) return;
+  const carried = motion.grounded ? motion.surface : undefined;
+  jump.inputAge = input.jumpPressed ? 0 : min(WALL_TECH_JUMP_INPUT_WINDOW_FRAMES, jump.inputAge + 1);
+  if (advanceFreeze(f, input)) {
+    checkBlastZone(world, slot, stage);
+    return;
+  }
+  const horizontalStick = stickX(input);
+  const tumbleExitFlick = readStickFrame(f, input, horizontalStick);
+  const hitlagBefore = tickHitlag(f);
+  const parryDirection = shield.parryBufferDirection;
+  const parryOption = takeParryOption(f, input);
+  advanceTechAndRegrab(f, input);
+  if (f.ledge.state !== LedgeState.none) {
+    advanceLedge(world, slot, stage, input);
+    return;
+  }
+  if (shield.breakState !== ShieldBreak.none && advanceShieldBreak(world, slot, stage, matchFrame, input)) return;
+  if (drainShieldEnergy(f, world, slot, stage, input)) return;
+  tickRecoveryClocks(f);
+  const wallJumped = advanceSurfaceRecovery(f, input);
+  const wallTechStartup = f.surfaceRecovery.state === SurfaceContact.techWall && f.surfaceRecovery.frame < WALL_TECH_STARTUP_FRAMES;
+  applyFrameDirectionalInfluence(f, world, slot, stage, matchFrame, input, hitlagBefore);
+  if (status.out) return;
+  const carrying = isCarrying(f);
+  if (wallTechStartup || (inGrabContext(f) && !carrying)) {
+    if (launch.hitlag <= 0) status.invincible = max(0, status.invincible - 1);
+    checkBlastZone(world, slot, stage);
+    return;
+  }
+  const smashChargePaused = advanceActionFrame(f, input);
+  if (f.grab.target !== undefined && !carrying) {
+    checkBlastZone(world, slot, stage);
+    return;
+  }
+  if (launch.hitlag <= 0) launch.hitstun = max(0, launch.hitstun - 1);
+  if (launch.hitstun === 0) launch.throwHitstun = false;
+  const squatBeforeInput = jump.squat;
+  if (input.jumpPressed) cancelJumpStates(f, input);
+  const wet = sea.wet(f, stage);
+  const waterJumped = beginJumpInput(f, input, carrying, wallJumped, parryOption, wet, squatBeforeInput);
+  const groundDodgeStarted = beginDodgeInput(f, input, parryOption, parryDirection);
+  const groundTakeoff = advanceJumpSquat(f, input, squatBeforeInput);
+  if (carrying && groundTakeoff) lowerCarryJump(f);
+  if (launch.hitlag > 0) return;
+  advanceShieldInputClocks(f, input);
+  advanceGroundDodge(f, groundDodgeStarted);
+  checkBlastZone(world, slot, stage);
+  if (status.out) return;
+  if (advanceDownMotion(f, world, slot, stage, matchFrame, input)) return;
+  const dodgeActive = dodge.airMotionFrames > 0;
+  const wantsShield = advanceShieldFrameTimers(f, input, carrying);
+  const direction = carrying && carryThrowRequested(f, input) ? 0 : input.direction;
+  applyTumbleExit(f, tumbleExitFlick);
+  hopHeroStatus(f, slot, stage, matchFrame);
+  const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
+  const authoredHeight = authoredMotion || demonHunterHoldsHeight(f) || heroFloats(f);
+  const egg = heroEgg(f);
+  const canSteer = canSteerFrame(f, authoredMotion, egg, dodgeActive, smashChargePaused);
+  const moveDirection = resolveCrouch(f, input, direction, horizontalStick, carrying, wantsShield, canSteer);
+  const dashEntryDisplacementAdjustment = steerMotion(f, input, stage, moveDirection, horizontalStick, wantsShield, canSteer, groundTakeoff, wet, carrying);
+  dragFighterMotion(f, stage, moveDirection, wantsShield, canSteer, authoredMotion, groundTakeoff, carrying, dodgeActive);
+  platforms.dropFromPlatform(f, stage, matchFrame, input);
+  const oldX = motion.x;
+  const oldZ = motion.z;
+  const dashEntry = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot, stage, matchFrame));
+  decayMotion(f, stage, dodgeActive);
+  const drill = motion.grounded ? undefined : attackFall(attack.style, attack.frame, f.tuning.moves);
+  moveAlongSurface(f, stage, matchFrame, horizontalStick, dashEntry, canSteer, wantsShield, groundTakeoff);
+  applyVerticalMotion(f, input, stage, matchFrame, drill, egg, wet, waterJumped, dodgeActive, authoredHeight, groundTakeoff);
+  resolveSurfaceMotion(f, world, slot, stage, matchFrame, input, oldX, oldZ, carried, horizontalStick);
 }
