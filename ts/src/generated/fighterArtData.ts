@@ -20,7 +20,7 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [10, { name: "PitLord", slug: "pit-lord", source: "hero-models/heropitlord.mdx", stock: "war3.w3mod:units/demon/heropitlord/heropitlord.mdx", model: "units\\demon\\HeroPitLord\\HeroPitLord.mdl" }],
   [11, { name: "Beastmaster", slug: "beastmaster", source: "hero-models/beastmaster.mdx", stock: "war3.w3mod:units/creeps/beastmaster/beastmaster.mdx", model: "units\\creeps\\BeastMaster\\BeastMaster.mdl" }],
   [12, { name: "LichKing", slug: "lich-king", source: "imported-models/LichKing2.mdx", model: "war3mapImported\\LichKing2.mdx" }],
-  [13, { name: "Thrall", slug: "thrall", source: "hero-models/thrall.mdx", stock: "war3.w3mod:units/orc/thrall/thrall.mdx", model: "units\\orc\\Thrall\\Thrall.mdl" }],
+  [13, { name: "Thrall", slug: "thrall", source: "hero-models/WarchiefThrallDismountedV2.mdx", model: "war3mapImported\\WarchiefThrallDismountedV2.mdx" }],
   [14, { name: "JainaProudmoore", slug: "jaina-proudmoore", source: "hero-models/jaina.mdx", stock: "war3.w3mod:units/human/jaina/jaina.mdx", model: "units\\human\\Jaina\\Jaina.mdl" }],
   [15, { name: "SylvanasWindrunner", slug: "sylvanas-windrunner", source: "hero-models/evilsylvanas.mdx", stock: "war3.w3mod:units/undead/evilsylvanas/evilsylvanas.mdx", model: "Units\\Undead\\EvilSylvanas\\EvilSylvanas.mdl" }],
   [16, { name: "CairneBloodhoof", slug: "cairne-bloodhoof", source: "hero-models/herotaurenchieftain.mdx", stock: "war3.w3mod:units/orc/herotaurenchieftain/herotaurenchieftain.mdx", model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl" }],

@@ -281,6 +281,14 @@ The map's description carries the same credits.
   (Hive Workshop): LichKing2, its portrait, textures and
   [command icons](https://www.hiveworkshop.com/threads/btnlichking.154846/),
   used with credit as the author permits.
+- [Warchief Thrall Dismounted by johnwar](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/)
+  (Hive Workshop), built on Ujimasa Hojo's Grom Hellscream:
+  `WarchiefThrallDismountedV2.mdx`, imported as
+  `war3mapImported\WarchiefThrallDismountedV2.mdx` for Thrall's unit, with
+  every Smashcraft clip authored on it by smashcraft:tools/animations/thrall-clips.ts.
+  The page states no usage terms (read 28 October 2026,
+  smashcraft:docs/design/roster-next.md#hive-model-terms), so we credit
+  every author it names, as Hive's custom asks.
 
 Source terms read on 13 October 2026: the model resource identifies Kwaliti,
 `LichKing2.mdx` and `LichKing2_Portrait.mdx`, and asks users to give credit.

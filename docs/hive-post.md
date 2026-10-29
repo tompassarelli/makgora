@@ -66,6 +66,7 @@ Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](ht
 ## Credits
 - Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License).
 - The Lich King model by [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/)).
+- Thrall is [Warchief Thrall Dismounted](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Grom Hellscream; we reanimated every move on it.
 - The menu cursors, wordmark and stage-select art are Smashcraft originals; the pinching-hand cursor was made with AI assistance.
 - Music: Before the First Strike by Tom Passarelli, made with Google Lyria.
 - Murloc sound from World of Warcraft, Blizzard Entertainment.
@@ -74,7 +75,7 @@ Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](ht
 - Built with Wisp, TypeScript, TypeScriptToLua, Effect, Bun and Lua 5.3.
 
 ## Fan project and IP statement
-Smashcraft is an independent fan game, not affiliated with or endorsed by Blizzard Entertainment or Nintendo. It plays only inside your own copy of Warcraft III, using the game's own unit models with animations we authored, plus the community model credited above.
+Smashcraft is an independent fan game, not affiliated with or endorsed by Blizzard Entertainment or Nintendo. It plays only inside your own copy of Warcraft III, using the game's own unit models with animations we authored, plus the community models credited above.
 - The source contains no extracted Blizzard files and no Nintendo code or assets. The one exception is the murloc gurgle imported into the map: a short sound from World of Warcraft, kept in our private build inputs, never in the source, and credited above.
 - Behaviour is measured from the outside and from public frame data (SmashWiki, Smashboards); nothing comes from disassembly, decompilation or reading a game's memory.
 - No DRM bypass, no Battle.net emulation, no cheats. The map is free.

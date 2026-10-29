@@ -74,7 +74,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   authors a fighter's crouch or ledge hang on its shipped model through the
   canonical rig (#40): each mapped joint turns about the side-view axis, one root
   helper, reused by every later run rather than nested again, plants the ankles (or the lowest point of a legless body) on the floor
-  for the crouch and puts one wrist (Thrall: the wolf's front paws) on the ledge
+  for the crouch and puts one wrist on the ledge
   corner for the hang, and a coordinate search over the joint angles keeps the
   pose scoring best on `anim score`'s crouch or ledge line, measured against the
   standing pose the sampler shows, and that keeps every held weapon's blade 4 units clear of
@@ -89,8 +89,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   run fighters one at a time, since each run rewrites that table. Every other clip stays
   identical. Run it after the fighter's own generator, which rebuilds from stock,
   and before `jump-clips.ts --character`; then store the family and run
-  `bun wisp inputs derive --fighter NAME`. A body the shared joints can't pose (Thrall's
-  mount, Goblin Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
+  `bun wisp inputs derive --fighter NAME`. A body the shared joints can't pose (Goblin
+  Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
   carapace and squash, Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
@@ -259,23 +259,23 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/mdl-exporter4.pin`. Its archived source revision is recorded
   in `tools/animations/mdl-exporter4.source`.
 
-- Thrall stock-rig animation authoring (from the repository root):
-  `bun tools/animations/thrall-clips.ts STOCK_THRALL.mdx PRIVATE_OUTPUT [POSE...]` appends
-  mounted hammer, casting, recovery, grab and nine contact-reaction clips,
-  writes both-facing side-view sheets, and refreshes Thrall clip and stride
-  metadata. Store the generated model in `hero-models` and refresh the
-  original clip pool before building. With pose names, reauthor only those clips
-  from the existing `PRIVATE_OUTPUT/thrall.mdx`, preserving every other clip.
-  Exact `Thrall Damage HEIGHT STRENGTH` names (each number 0–2) replace only
-  the selected held pain poses; the generator requires nine distinct first poses.
-  `bun tools/animations/thrall-victory.ts PRIVATE_ASSETS PRIVATE_OUTPUT` appends
-  his victory, or re-authors it in place, on the shipped model: his rider arm is
-  one bone, so victory-clips.ts cannot solve it; the hammer and free fist rise
-  out to his sides so the front-on results view keeps them off his face (#514).
-  His back air is authored in Blender (#260): `... STOCK_THRALL.mdx PRIVATE_OUTPUT backAir --rig RIG.json`
-  writes his skeleton, stand pose, hammer head and both hits' frames, then
-  `nix shell --inputs-from . nixpkgs#blender --command blender --background --factory-startup --python tools/animations/thrall-back-air.py -- RIG.json KEYS.json`
-  bakes one key per attack frame, and `... backAir --keys KEYS.json` splices them into the existing `PRIVATE_OUTPUT/thrall.mdx`.
+- Thrall animation authoring (from the repository root):
+  `bun tools/animations/thrall-clips.ts WarchiefThrallDismountedV2.mdx PRIVATE_OUTPUT`
+  reads johnwar's model from the `imported-models` family and appends his hammer
+  strikes, specials, movement, recovery, paired throws and nine pain clips,
+  keeping its 31 stock sequences, and writes both-facing silhouette sheets and
+  `PRIVATE_OUTPUT/hero-models/WarchiefThrallDismountedV2.mdx`. Every hammer move is
+  keyed from `THRALL_HAMMER_SWINGS` in smashcraft:ts/src/game/fighters/thrall/moves.ts,
+  the table his hit regions come from, as Uther's are; the generator refuses a
+  clip whose drawn hammer head lands more than 12 units from its swing row. It
+  drops the model's portrait camera from this derivation copy, because the
+  clip and body exports carry no camera; the map imports the unmodified model as his
+  unit. Then `jump-clips.ts PRIVATE_OUTPUT JUMP --character 13` adds his front-flip
+  double jump and `victory-clips.ts JUMP VICTORY --character 13` his victory; store
+  `VICTORY/hero-models` with `--fighter thrall` and run
+  `bun wisp inputs derive --fighter Thrall`.
+  Given the shipped model and pose names instead, it re-authors only those clips in
+  place at their indices and lengths.
 
 - Illidan locomotion authoring (from the repository root): run Blender with
   `--python tools/animations/illidan-locomotion.py -- PRIVATE_FIGHTER.blend PRIVATE_AUTHORED`,

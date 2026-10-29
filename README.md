@@ -82,6 +82,10 @@ The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-k
 and require credit to Kwaliti and Hive Workshop as the original source.
 [Model credits and source terms](docs/design/roster.md#credits) record the details.
 
+Thrall is [Warchief Thrall Dismounted by johnwar](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/)
+(Hive Workshop), built on Ujimasa Hojo's Grom Hellscream, reanimated for
+Smashcraft and used with credit to both authors and Hive Workshop.
+
 The Scourge wall behind Naxxramas is the
 [Undead Walls Pack by Kuzakani](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
 (Hive Workshop), an original model tagged open source, used with credit to

@@ -244,26 +244,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Lich King | ledge-get-up | 57: Ledge Climb | 249.9 | 43.8 | up; 248.9/72.8 |
 | Lich King | ledge-roll | 58: Ledge Roll | 244.7 | 53.5 | forward; 79.4/80.3 |
 | Lich King | ledge-attack | 59: Ledge Attack | 283.7 | 51.2 | both; 150.1/170.1 |
-| Thrall | walk | 2: Walk | 159.2 | 34.4 | forward; 157.1/139.3 |
-| Thrall | dash | 2: Walk | 159.1 | 30.4 | forward; 156.9/100.0 |
-| Thrall | run | 2: Walk | 107.1 | 37.5 | forward; 94.8/84.4 |
-| Thrall | turn | 29: Thrall turn | 85.9 | 21.5 | back; 85.7/77.8 |
-| Thrall | brake | 30: Thrall stop | 45.3 | 16.6 | in place; 14.2/21.9 |
-| Thrall | jump-squat | 31: Thrall jumpSquat | 55.7 | 19.0 | down; 7.7/42.5 |
-| Thrall | roll-forward | 64: Thrall rollForward | 212.4 | 114.4 | forward; 143.7/201.5 |
-| Thrall | roll-back | 68: Thrall rollBackward | 197.4 | 112.2 | back; 180.9/180.4 |
-| Thrall | spot-dodge | 45: Thrall spotDodge | 66.4 | 21.2 | in place; 31.7/21.6 |
-| Thrall | air-dodge | 26: Thrall airDodge | 45.9 | 14.6 | in place; 24.0/21.2 |
-| Thrall | tech | 46: Thrall tech | 131.4 | 52.2 | in place; 61.3/125.5 |
-| Thrall | tech-forward | 65: Thrall techForward | 204.9 | 112.4 | forward; 98.4/190.8 |
-| Thrall | tech-back | 69: Thrall techBackward | 173.5 | 101.2 | back; 129.2/173.5 |
-| Thrall | get-up | 43: Thrall getUp | 108.9 | 41.2 | up; 97.7/26.0 |
-| Thrall | get-up-forward | 66: Thrall getUpRollForward | 212.4 | 114.3 | forward; 141.3/201.6 |
-| Thrall | get-up-back | 70: Thrall getUpRollBackward | 196.6 | 111.8 | back; 179.2/180.4 |
-| Thrall | get-up-attack | 44: Thrall getUpAttack | 96.4 | 20.6 | both; 76.8/92.8 |
-| Thrall | ledge-get-up | 39: Thrall ledgeClimb | 131.7 | 37.2 | up; 130.7/32.4 |
-| Thrall | ledge-roll | 67: Thrall ledgeRoll | 212.4 | 114.3 | forward; 140.9/201.6 |
-| Thrall | ledge-attack | 40: Thrall ledgeAttack | 51.5 | 6.8 | both; 45.8/13.1 |
+| Thrall | walk | 15: Walk | 132.9 | 46.3 | forward; 129.8/132.3 |
+| Thrall | dash | 15: Walk | 132.8 | 45.9 | forward; 128.4/132.1 |
+| Thrall | run | 15: Walk | 129.9 | 33.1 | forward; 95.6/129.8 |
+| Thrall | turn | 53: Thrall turn | 146.8 | 42.7 | back; 82.6/146.6 |
+| Thrall | brake | 54: Thrall stop | 40.5 | 8.4 | in place; 30.0/17.3 |
+| Thrall | jump-squat | 55: Thrall jumpSquat | 72.0 | 29.6 | down; 54.6/24.6 |
+| Thrall | roll-forward | 88: Thrall rollForward | 223.4 | 122.9 | forward; 80.7/140.4 |
+| Thrall | roll-back | 92: Thrall rollBackward | 224.2 | 122.3 | back; 140.2/80.8 |
+| Thrall | spot-dodge | 69: Thrall spotDodge | 51.9 | 15.5 | in place; 25.8/25.8 |
+| Thrall | air-dodge | 50: Thrall airDodge | 47.5 | 12.2 | in place; 27.9/20.2 |
+| Thrall | tech | 70: Thrall tech | 99.9 | 49.2 | in place; 61.5/97.8 |
+| Thrall | tech-forward | 89: Thrall techForward | 223.8 | 122.8 | forward; 80.7/140.5 |
+| Thrall | tech-back | 93: Thrall techBackward | 223.9 | 121.9 | back; 140.3/80.9 |
+| Thrall | get-up | 67: Thrall getUp | 115.7 | 63.2 | up; 100.2/66.7 |
+| Thrall | get-up-forward | 90: Thrall getUpRollForward | 222.8 | 122.7 | forward; 80.6/140.7 |
+| Thrall | get-up-back | 94: Thrall getUpRollBackward | 224.2 | 122.2 | back; 140.5/80.7 |
+| Thrall | get-up-attack | 68: Thrall getUpAttack | 173.7 | 72.4 | both; 115.2/104.2 |
+| Thrall | ledge-get-up | 63: Thrall ledgeClimb | 185.0 | 35.2 | up; 158.8/60.4 |
+| Thrall | ledge-roll | 91: Thrall ledgeRoll | 223.9 | 123.1 | forward; 80.7/140.6 |
+| Thrall | ledge-attack | 64: Thrall ledgeAttack | 85.4 | 48.1 | both; 51.8/47.3 |
 | Jaina Proudmoore | walk | 6: Walk | 104.8 | 21.9 | forward; 95.9/103.1 |
 | Jaina Proudmoore | dash | 6: Walk | 103.4 | 21.3 | forward; 94.9/101.4 |
 | Jaina Proudmoore | run | 6: Walk | 99.4 | 19.8 | forward; 97.1/93.7 |

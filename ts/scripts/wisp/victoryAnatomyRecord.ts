@@ -6,7 +6,6 @@ export const VICTORY_ANATOMY_RECORD = resolve(import.meta.dir, '../../test/fixtu
 
 /** Fighters whose arms have no elbow joint to bend, so the record leaves them out. */
 export const VICTORY_UNJOINTED: Readonly<Record<string, string>> = {
-    Thrall: 'his rider arm is one bone from shoulder to wrist',
 };
 
 /** Victories whose upper arm still pulls out of its shoulder seam (#496), each owed a re-authored cheer; every other rule holds for them. */

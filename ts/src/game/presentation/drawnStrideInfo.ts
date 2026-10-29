@@ -13,7 +13,7 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   10: { walk: { clip: 1, model: "units\\demon\\HeroPitLord\\HeroPitLord.mdl", speed: f32(136.792) }, run: { clip: 3, model: "units\\demon\\HeroPitLord\\HeroPitLord.mdl", speed: f32(540.598) } },
   11: { walk: { clip: 0, model: "units\\creeps\\BeastMaster\\BeastMaster.mdl", speed: f32(203.181) }, run: { clip: 0, model: "units\\creeps\\BeastMaster\\BeastMaster.mdl", speed: f32(203.181) } },
   12: { walk: { clip: 2, model: "war3mapImported\\LichKing2.mdx", speed: f32(129.361) }, run: { clip: 10, model: "war3mapImported\\LichKing2.mdx", speed: f32(265.067) } },
-  13: { walk: { clip: 2, model: "units\\orc\\Thrall\\Thrall.mdl", speed: f32(213.345) }, run: { clip: 2, model: "units\\orc\\Thrall\\Thrall.mdl", speed: f32(213.345) } },
+  13: { walk: { clip: 15, model: "war3mapImported\\WarchiefThrallDismountedV2.mdx", speed: f32(146.175) }, run: { clip: 15, model: "war3mapImported\\WarchiefThrallDismountedV2.mdx", speed: f32(146.175) } },
   14: { walk: { clip: 6, model: "units\\human\\Jaina\\Jaina.mdl", speed: f32(68.945) }, run: { clip: 6, model: "units\\human\\Jaina\\Jaina.mdl", speed: f32(68.945) } },
   15: { walk: { clip: 8, model: "Units\\Undead\\EvilSylvanas\\EvilSylvanas.mdl", speed: f32(165.056) }, run: { clip: 8, model: "Units\\Undead\\EvilSylvanas\\EvilSylvanas.mdl", speed: f32(165.056) } },
   16: { walk: { clip: 3, model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl", speed: f32(205.421) }, run: { clip: 3, model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl", speed: f32(205.421) } },

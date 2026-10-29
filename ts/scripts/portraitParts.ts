@@ -21,7 +21,7 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   PitLord: part('Bone_Head', ['Real BLADE'], ['Bone_Hand_R']),
   Beastmaster: part('Bone_Head', [], []),
   LichKing: part('Head', ['Weapon'], ['Rhand']),
-  Thrall: part('Bone_Head', ['Hammer'], ['Bone Rider R Wrist']),
+  Thrall: part('Bone_Head', ['axe'], ['Bone_Hand_R']),
   JainaProudmoore: part('Bone_Head', ['Bone_Staff'], ['Bone_Hand_RArchDruid']),
   SylvanasWindrunner: part('Bone_Head', ['Cylinder02'], ['Bone_Hand_L']),
   CairneBloodhoof: part('Bone_Head', ['Axe'], ['Bone_HandR']),

@@ -4,9 +4,10 @@ import { HERO_ROSTER } from "../src/game/roster/kits";
 import { heroLook } from "../src/game/roster/looks";
 
 
+const importedModel = (path: string) => IMPORTED_MODEL_FILES.find(({ entry }) => entry.toLowerCase() === path.toLowerCase());
+
 export function importedModelFile(path: string): string | undefined {
-  const wanted = path.toLowerCase();
-  return IMPORTED_MODEL_FILES.find(({ entry }) => entry.toLowerCase() === wanted)?.file;
+  return importedModel(path)?.file;
 }
 
 
@@ -15,8 +16,9 @@ export const stockModelPath = (model: string) => `war3.w3mod:${model.replaceAll(
 
 
 export function heroModelSource(model: string): string {
-  const imported = importedModelFile(model);
-  return imported !== undefined ? `imported-models/${imported}` : `hero-models/${stockModelPath(model).split("/").at(-1) ?? ""}`;
+  const imported = importedModel(model);
+  if (imported === undefined) return `hero-models/${stockModelPath(model).split("/").at(-1) ?? ""}`;
+  return `${imported.reanimated === true ? "hero-models" : "imported-models"}/${imported.file}`;
 }
 
 export const fighters: ReadonlyMap<Character, { readonly name: string; readonly source: string; readonly stock?: string }> = new Map([

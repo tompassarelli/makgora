@@ -38,7 +38,6 @@ const fighter = fighters.get(character), rig = FIGHTER_RIGS.get(character);
 ensure(fighter && rig, `no fighter or canonical rig for character ${character}`);
 
 const LEG_BONES: Readonly<Partial<Record<number, readonly (readonly [string, string, string])[]>>> = {
-  [Character.thrall]: [["Bone Front L Leg", "Bone Front L Shin", "Bone FrontL Toe"], ["Bone Front R Leg", "Bone_Mesh49", "Bone_Mesh48"], ["Bone Back L Leg", "Bone Back L Shin", "Bone Object67"], ["Bone Back R Leg", "Bone Back R Shin", "Bone Back R Toe"]],
   [Character.pitLord]: [["Bone Front L Leg01", "Bone Front L Shin01", "Bone FrontL Toe01"], ["Bone Front R Leg01", "Bone Front R Shin01", "Bone Front R Toe01"], ["Bone Back L Leg01", "Bone Back L Shin01", "Bone Toe L "], ["Bone Back R Leg01", "Bone Back R Shin01", "Bone Toe R"]],
   [Character.anubarak]: [["Bone_LFLeg04", "Bone_LFLeg03", "Bone_LegEnd03"], ["Bone_LFLeg07", "Bone_LFLeg06", "Bone_LegEnd01"], ["Bone_LFLeg13", "Bone_LFLeg14", "Bone_LegEnd04"], ["Bone_LFLeg09", "Bone_LFLeg10", "Bone_LegEnd02"]],
 };
@@ -102,8 +101,7 @@ const rotation = helper.Rotation!;
 const translation = helper.Translation!;
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (track, path) => originals.set(path, track));
 const gripNodes = (joints: readonly HumanoidJoint[]) => joints.flatMap((joint) => { const name = rig.classic[joint]; const id = model.Nodes.findIndex((n) => n.Name === name); return name !== undefined && id >= 0 ? [id] : []; });
-const GRIP_BONES: Readonly<Partial<Record<number, readonly string[]>>> = { [Character.thrall]: ["Bone FrontL Toe", "Bone_Mesh48"] };
-const ownGrips = (OWN.GRIP_BONES ?? GRIP_BONES[character] ?? []).map((name) => model.Nodes.findIndex((n) => n.Name === name)).filter((id) => id >= 0);
+const ownGrips = (OWN.GRIP_BONES ?? []).map((name) => model.Nodes.findIndex((n) => n.Name === name)).filter((id) => id >= 0);
 const grips = ownGrips.length > 0 ? ownGrips : gripNodes(["wrist.L", "wrist.R"]).length > 0 ? gripNodes(["wrist.L", "wrist.R"]) : gripNodes(["weapon", "weapon.L"]);
 ensure(grips.length > 0, `${fighter.name}: no hand or weapon joint to grip with`);
 const ms = (frame: number) => Math.round(frame * 1000 / 60);

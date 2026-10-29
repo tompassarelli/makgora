@@ -14,7 +14,7 @@ export const REACH_CUE_NORMALS: { readonly [character: number]: readonly AttackS
   10: [],
   11: [3, 4, 8, 10, 11],
   12: [2, 3, 6, 7, 8, 9, 10, 11],
-  13: [3, 17],
+  13: [11],
   14: [2, 3, 4, 6, 8, 9, 10, 11, 17, 19],
   15: [3, 4, 6, 9, 10, 11, 17, 19],
   16: [],

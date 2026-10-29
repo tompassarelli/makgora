@@ -32,7 +32,7 @@ export const JUMP_CLIPS = {
     doubleJump: { index: 64, seconds: 0.5 },
   },
   13: {
-    doubleJump: { index: 88, seconds: 0.5 },
+    doubleJump: { index: 112, seconds: 0.5 },
   },
   14: {
     doubleJump: { index: 90, seconds: 0.5 },

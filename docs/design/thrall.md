@@ -1,4 +1,4 @@
-# Thrall, the Far Seer
+# Thrall, the dismounted Warchief
 
 Thrall is a heavy ground-control brawler. Doomhammer threatens the space just
 outside a jab, lightning checks a retreat, and two spirit wolves make the
@@ -20,8 +20,9 @@ The body counterpart is [Ultimate King Dedede](https://www.ssbwiki.com/King_Dede
 weight 127, run speed 1.496, air speed 0.735. Smashcraft applies weight
 127/75 and run 1.496/2.2 to its reference table, and raises air speed to the
 shared 0.75 floor, with the same world-unit conversion as other fighters.
-His authored mounted silhouette is
-1.25 times the reference width and 1.15 times its height. He retains the
+He stands on foot, on johnwar's Warchief Thrall model (see Presentation), and
+his hurt capsule is refit to its drawn body: 1.12 times the reference width and
+1.10 times its height, the proportions of Grom, whose base the model shares. He retains the
 shared one aerial jump, gravity and dodge windows. Unlike Dedede, he has no
 extra jumps or armored recovery.
 
@@ -45,20 +46,20 @@ describes the three phases. Landing figures are the automatic final lag.
 | --- | --- | --- | --- | --- |
 | Jab, jab 2 | Hammer butt then short hook; close escape, not a ranged poke | 4/2/14; 7/3/18 | 5; 45°, then 6; 40° | — |
 | Forward tilt, angled up/down | Waist-height hammer hook; aim over or under a shield | 8/3/21 | 13.25; 35°/55°/20° | — |
-| Up tilt | Lift hammer over the rider; starts a juggle | 8/4/20 | 8; 85° | — |
-| Down tilt | Wolf's low paw swipe; tech-chase starter | 6/3/19 | 9.75; 70° | — |
-| Dash attack | Wolf shoulder with rider braced; exposed body travels 65 units | 11/4/25 | 13.75; 55° | — |
+| Up tilt | Doomhammer swept up over his head; starts a juggle | 8/4/20 | 8; 85° | — |
+| Down tilt | Crouched low Doomhammer sweep along the floor; tech-chase starter | 6/3/19 | 9.75; 70° | — |
+| Dash attack | Running shoulder charge with the hammer trailing behind; his exposed body travels 65 units | 9/10/23 | 13.75; 55° | — |
 | Forward smash | Planted Doomhammer hook; strongest close punish | 20/3/34 | 18; 40° | — |
 | Up smash | Hammer crown sweep; catches a landing | 17/4/29 | 15; 85° | — |
-| Down smash | Wolf swipes front then back; covers a roll with commitment | 14/6/30 | 16.25; 25° outward | — |
+| Down smash | Crouched hammer sweep in front, then behind; covers a roll with commitment | 14/6/30 | 16.25; 25° outward | — |
 | Neutral air | Compact hammer/body turn; stops a close approach | 8/5/20 | 8; 50° | 14 |
 | Forward air | Hammer across the front; spacing and edge guard | 13/3/25 | 12; 45° | 18 |
-| Back air | Ghost Wolf back-kick with the hind legs, then a reverse hammer hook behind him (#95); the kick's set knockback keeps the foe in hitstun for the hammer, which is the rear finisher | 8/12/24: kick 8–10, hammer 17–19; 43 total | Kick 6; 45° backward, set knockback (base 30, no growth); hammer 12; 35° backward | 17 |
+| Back air | His own back kick, then a reverse hammer hook behind him (#95); the kick's set knockback keeps the foe in hitstun for the hammer, which is the rear finisher | 8/12/24: kick 8–10, hammer 17–19; 43 total | Kick 6; 45° backward, set knockback (base 30, no growth); hammer 12; 35° backward | 17 |
 | Up air | Hammer held high; follows up tilt or up throw | 8/4/20 | 9; 85° | 13 |
-| Down air | Wolf's forward paw presses down; meteor only in air | 14/4/28 | 13; down, grounded 55° | 20 |
-| Grab / pummel | Reach from saddle and one hammer-butt check | 8/2/24 | 0 / shared 3 | — |
+| Down air | Doomhammer driven straight down below his feet; meteor only in air | 14/4/28 | 13; down, grounded 55° | 20 |
+| Grab / pummel | Free-hand reach and one hammer-butt check | 8/2/24 | 0 / shared 3 | — |
 | Forward throw | Shove into hammer | contact14/end34 | 8; 35° | — |
-| Back throw | Turn and toss over the saddle | contact18/end40 | 10; 40° backward | — |
+| Back throw | Turn and toss over his shoulder | contact18/end40 | 10; 40° backward | — |
 | Up throw | Lift with lightning spark | contact15/end28 | 7; 90° | — |
 | Down throw | Pin then release with a ground shove | contact19/end42 | 6; 25° | — |
 
@@ -71,22 +72,18 @@ Get-up and ledge attacks use the same hammer sweep vocabulary and shared
 action rules. Only weapon reach is disjoint; shoulder and limb attacks expose
 matching hurt volumes. Smashes use the shared charge (physics.md, "Smash charge").
 
-The rider folds forward for grounded jabs and forward tilt. Measured active
-hammer bounds are x33–54/z49–96 for jab, x37–61/z51–97 for jab 2 and
-x75–109/z59–95 for forward tilt. The short jab stays inside the longer tilt.
-Other measured hammer centres at contact are approximately (39,133) for
-forward smash, (-2,189) for up tilt, (47,128) for forward air and
-(-40,127) for back air, in world units at stock scale. Head radii are 22–25.
-Dash attack places its shoulder/head capsule from (24,45) to (65,60), radius28:
-the drawn shoulder spans x24–31/z51–86 and the head x51–84/z42–81.
-The head remains vulnerable during the rush, with the root and feet planted.
-Grounded low attacks and down air use the wolf's visible paw, spanning x52–96
-at z20–34 with radius 20–24, rather than claiming the rider's hammer touches
-the floor. Their Warcraft source is Feral Spirit and their Smash reference
-is [Duck Hunt's animal strikes](https://www.ssbwiki.com/Duck_Hunt_(SSBU)#Moveset).
-Doomhammer Slam's low region is a spell pulse cast from the saddle. The wolf's
-body and attacking paws have exposed hurt volumes. This makes the hammer
-shorter than the initial design and the low paw his longer grounded poke.
+Every hammer move is keyed from one swing table,
+`THRALL_HAMMER_SWINGS` in smashcraft:ts/src/game/fighters/thrall/moves.ts: each
+active frame names the shoulder pivot, the hand's distance from it and the
+hammer's angle, and both the hit region and the clip's hammer head come from
+that one row, so the drawn head lands within 12 units of its region on every
+active frame (the clip generator refuses more). Smashes and forward and down
+air slide the haft 26 units through his fist for reach. Low attacks swing from a
+crouched shoulder near the floor. The dash attack's shoulder region runs from
+(16,74) to (40,94), radius 26, and the back air kick's from (-24,64) to
+(-62,58), radius 18; both carry matching hurt volumes on the leading shoulder
+and kicking leg. Doomhammer Slam's low region is a spell pulse from the hammer
+striking the floor.
 
 ## Specials and ultimate
 
@@ -105,9 +102,14 @@ listed in the gameplan and counted by the existing eight-seed coverage.
 
 ## Presentation
 
-Use the classic base-game `units\\orc\\Thrall\\Thrall.mdl`, its command icon,
-stock spirit wolves, Far Seer lightning and earthquake effects, and shared
-Warcraft impact sounds. Thrall remains on the wolf with Doomhammer attached.
+Thrall stands on foot on [Warchief Thrall Dismounted by johnwar](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/)
+(Hive Workshop), built on Ujimasa Hojo's Grom Hellscream, with the stock
+`Units\Orc\Thrall\Thrall.blp` texture and his stock command icon (Tom asked
+for the change on 28 October 2026). The map imports the model as
+`war3mapImported\WarchiefThrallDismountedV2.mdx`; smashcraft:tools/animations/thrall-clips.ts
+authors every Smashcraft clip on its full biped and keeps its 31 stock
+sequences. Stock spirit wolves, Far Seer lightning and earthquake effects,
+and shared Warcraft impact sounds stay.
 Far Sight has no stock target model, so its rising spirit cue uses the
 base-game Shaman's Purge glow around the body.
 Author deliberate preparation/contact/recovery poses, both facing directions,
