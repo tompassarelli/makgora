@@ -236,7 +236,7 @@ const captureThere = (settings: Settings, host: RemoteHost, group: { readonly ba
   yield* sendFile(host, group.manifest, join(there, "manifest.json"), group.logFile);
   yield* sendFile(host, remotePlan, join(there, "plan.json"), group.logFile);
   const north = join(host.home, "code/north/main/harness/skills");
-  const ran = yield* runThere(host, join(host.home, "code/smashcraft/main/ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),
+  const ran = yield* runThere(host, join(host.home, process.env.SMASHCRAFT_REMOTE_CHECKOUT ?? "code/smashcraft/main", "ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),
     "--desktop", join(north, "private-desktop-development/scripts/private-desktop.sh"), "--capacity", join(north, "machine-capacity/scripts/machine-capacity.mjs"),
     "--clients-file", join(host.home, ".local/state/wisp/lan/clients.json"), "--client", settings.client,
     "--install", join(host.home, `.local/share/wisp/lan/clients/${settings.client}/pfx/drive_c/Program Files (x86)/Warcraft III`), "--minutes", String(group.minutes)], group.logFile).pipe(Effect.result);
