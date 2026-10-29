@@ -57,7 +57,7 @@ import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, screenLayer, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, hotspot, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
-import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, presentCardChip, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
+import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules } from "./selectionRules";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
@@ -347,6 +347,7 @@ export class SelectionPanel {
       if (this.ownsLocalClient()) this.sendPlacement({ slot: this.drag.held ?? this.participantId, tile: button.tile });
     }
     else if (button.kind === "team") this.actions.changeTeam(this.participantId, button.slot, 1);
+    else if (button.kind === "costume") this.actions.changeCostume(this.participantId, button.slot, 1);
     else if (button.kind === "mode") this.actions.cycleMode(this.participantId, button.slot);
     else if (button.kind === "start") this.actions.start(this.participantId);
     else if (button.kind === "settings") this.actions.openSettings(this.participantId);
@@ -374,9 +375,8 @@ export class SelectionPanel {
     if (boxContains(SETTINGS_BOX, x, y)) return { kind: "settings" };
     if (this.drag.hover !== undefined) return { kind: "tile", tile: this.drag.hover };
     for (const slot of PARTICIPANT_SLOTS) {
-      if (game.teamBattle && fighterActive(game, slot) && boxContains(teamSettingsBox(slot), x, y)) return { kind: "team", slot };
-      if (fighterActive(game, slot) && !humanFighterActive(game, slot) && boxContains(cpuSettingsBox(slot), x, y)) return { kind: "cpuSettings", slot };
-      if (boxContains(modeBox(slot), x, y)) return { kind: "mode", slot };
+      const card = pointedCard(game, slot, x, y);
+      if (card !== undefined) return card;
     }
     return undefined;
   }
@@ -479,6 +479,10 @@ export class SelectionPanel {
   }
 
   private chooseFocus(game: Readonly<MatchState>, target: MenuFocus, action: Action): boolean {
+    if (action === Action.jump) {
+      this.actions.changeCostume(this.participantId, target.slot, 1);
+      return true;
+    }
     if (action === Action.moveLeft || action === Action.moveRight) {
       const direction = action === Action.moveLeft ? -1 : 1;
       if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, nextMatchCharacter(game, characterFor(game, target.slot), direction));
@@ -692,6 +696,7 @@ export class SelectionPanel {
       presentCardTag(frames, game, slot, participantId, menuFocus, active, human);
       presentCardStatus(frames, game, slot, active, ready, human, choice, palette, sessionWins[slot], this.net.echoes);
       presentCardCpu(frames, game, slot, menuFocus, active, human, CPU_DEFAULTS);
+      presentCardCostume(frames, game, slot, participantId, active && ready, choice);
       if (presentCardChip(frames, this.drag, this.roster.grid, slot, active, ready, human, choice, x, y)) pinching = true;
     }
     return pinching;

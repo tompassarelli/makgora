@@ -1,6 +1,8 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
+import { floorDiv } from "wisp/src/sim/intMath";
+import type { CostumeTint } from "../../game/presentation/model/costume";
 import { ShieldBreak } from "../../game/sim/codes";
 import { fighterPoseFacing } from "../../game/sim/conditions";
 import type { Fighter } from "../../game/sim/fighter";
@@ -26,6 +28,11 @@ export function colorFighterBody(body: FighterBody, slot: number, color: number)
   body.color = color;
   SetPlayerColor(Player(slot), ConvertPlayerColor(color));
   SetUnitColor(body.unit, ConvertPlayerColor(color));
+}
+
+export function paintFighterBody(body: FighterBody, red: number, green: number, blue: number, alpha: number, tint: CostumeTint | undefined): void {
+  if (tint === undefined) SetUnitVertexColor(body.unit, red, green, blue, alpha);
+  else SetUnitVertexColor(body.unit, floorDiv(red * tint[0], 255), floorDiv(green * tint[1], 255), floorDiv(blue * tint[2], 255), alpha);
 }
 
 export function placeFighterBody(body: FighterBody, fighter: Readonly<Fighter>, origin: WorldOrigin, stage = 0): void {

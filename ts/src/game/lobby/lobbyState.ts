@@ -1,6 +1,7 @@
 import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
 import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumePoolStage, togglePoolMode, togglePoolStage } from "../menu/stagePool";
 import { PLAYABLE_CHARACTERS, isSelectableCharacter, nextCharacterIn } from "../roster/kits";
+import { type CostumeTint, costumeIndex, costumeOf, costumesFor } from "../roster/costumes";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type MatchCamera, createMatchCamera, copyMatchCamera } from "../sim/matchCamera";
@@ -34,6 +35,7 @@ export interface MatchState {
   readonly camera: MatchCamera;
   phase: Phase;
   readonly characterChoices: Slots<Character>;
+  readonly costumeChoices: Slots<number>;
   readonly cpuOpponents: Slots<CpuOpponentChoice>;
   readonly cpuRandomFighters: Slots<boolean>;
   readonly cpuTiers: Slots<CpuTier>;
@@ -100,7 +102,7 @@ const defaultChoice = (index: number): Character => PLAYABLE_CHARACTERS[floorMod
 export function createMatchState(): MatchState {
   return {
     camera: createMatchCamera(),
-    phase: Phase.characterMenu, characterChoices: [defaultChoice(0), defaultChoice(1), defaultChoice(2), defaultChoice(0)], matchSeed: 0,
+    phase: Phase.characterMenu, characterChoices: [defaultChoice(0), defaultChoice(1), defaultChoice(2), defaultChoice(0)], costumeChoices: [0, 0, 0, 0], matchSeed: 0,
     cpuOpponents: [CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT],
     cpuRandomFighters: [false, false, false, false],
     cpuTiers: [CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT],
@@ -271,6 +273,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   copyConfiguredRun(target.run, source.run);
   for (const slot of PARTICIPANT_SLOTS) {
     target.characterChoices[slot] = source.characterChoices[slot];
+    target.costumeChoices[slot] = source.costumeChoices[slot];
     target.teamChoices[slot] = source.teamChoices[slot];
     target.cpuOpponents[slot] = source.cpuOpponents[slot];
     target.cpuRandomFighters[slot] = source.cpuRandomFighters[slot];
@@ -300,8 +303,13 @@ export function nextMatchCharacter(game: Readonly<MatchState>, current: number |
 
 export function selectCharacter(game: MatchState, slot: number, choice: number): void {
   if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !humanPresent(game, slot) || !humanFighterActive(game, slot) || !selectableMatchCharacter(game, choice)) return;
-  game.characterChoices[slot] = choice;
+  chooseFighter(game, slot, choice);
   game.characterReadiness[slot] = true;
+}
+
+function chooseFighter(game: MatchState, slot: ParticipantSlot, choice: Character): void {
+  if (game.characterChoices[slot] !== choice) game.costumeChoices[slot] = 0;
+  game.characterChoices[slot] = choice;
 }
 
 export const RANDOM_FIGHTER = -1;
@@ -316,7 +324,7 @@ export function selectCpuCharacter(game: MatchState, actor: number, slot: number
   if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !canChooseComputer(game, actor, slot)) return;
   if (choice === RANDOM_FIGHTER && randomFighterOffered(game)) game.cpuRandomFighters[slot] = true;
   else if (selectableMatchCharacter(game, choice)) {
-    game.characterChoices[slot] = choice;
+    chooseFighter(game, slot, choice);
     game.cpuRandomFighters[slot] = false;
   } else return;
   game.characterReadiness[slot] = true;
@@ -419,6 +427,21 @@ export function setTeamBattle(game: MatchState, actor: number, on: boolean): voi
 
 export function setFriendlyFire(game: MatchState, actor: number, on: boolean): void {
   if (settingRules(game, actor) && game.teamBattle) game.friendlyFire = on;
+}
+
+export function costumeFor(game: Readonly<MatchState>, slot: ParticipantSlot): number {
+  return costumeIndex(game.characterChoices[slot], game.costumeChoices[slot]);
+}
+
+export function costumeTintFor(game: Readonly<MatchState>, slot: ParticipantSlot, character: Character | undefined): CostumeTint | undefined {
+  return character === undefined ? undefined : costumeOf(character, costumeFor(game, slot)).tint;
+}
+
+export function cycleCostume(game: MatchState, actor: number, slot: number, direction: number): void {
+  if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !fighterActive(game, slot) || cpuFighterRandom(game, slot)
+    || !humanPresent(game, actor) || !(actor === slot && humanFighterActive(game, slot) || canChooseComputer(game, actor, slot))) return;
+  const count = costumesFor(game.characterChoices[slot]).length;
+  game.costumeChoices[slot] = floorMod(costumeFor(game, slot) + direction, count);
 }
 
 export function fighterColor(game: Readonly<MatchState>, slot: ParticipantSlot): number {

@@ -16,7 +16,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/
 import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
-import { DEFAULT_RESULT_PICK, Phase, fighterColor, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { DEFAULT_RESULT_PICK, Phase, costumeTintFor, fighterColor, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPoint, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -45,7 +45,7 @@ import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
 import { localParticipantSlot, presentedCueTrace, traceParticipant } from "./diagnostics";
-import { colorFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
+import { colorFighterBody, paintFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { presentedMatch } from "./presentedMatch";
@@ -290,7 +290,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   const green = frozen ? 210 : tint?.green ?? (fighter.shield.raised ? 160 : item?.green ?? 255);
   const blue = frozen ? 255 : tint?.blue ?? item?.blue ?? 255;
   const alpha = !frozen && tint === undefined && isIntangible(fighter) ? FIGHTER_PHASE_ALPHA : 255;
-  SetUnitVertexColor(body.unit, red, green, blue, alpha);
+  paintFighterBody(body, red, green, blue, alpha, costumeTintFor(s.game, slot, fighter.character));
   concealFighter(s, slot);
 }
 
@@ -560,7 +560,7 @@ export function lockArenaCamera(s: ShellState): void {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
     const outside = fighter !== undefined && fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
-    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, fighterColor(game, slot), point.column, point.row, aspect);
+    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, fighterColor(game, slot), point.column, point.row, aspect, costumeTintFor(game, slot, fighter?.character));
     readEscapeMeter(world, slot, meter);
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
     const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);
@@ -597,7 +597,7 @@ export function renderUi(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined);
+      ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character));
       ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained);
     } else {
       ui.huds[slot].update(false, Character.rifleman, slot, 0.0, 0);

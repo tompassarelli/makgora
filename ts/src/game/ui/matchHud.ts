@@ -3,6 +3,8 @@
 import { f32 } from "wisp/src/sim/f32";
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
+import type { CostumeTint } from "../presentation/model/costume";
+import { paintCostume } from "./costumeTint";
 import { fighterName } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
@@ -65,6 +67,7 @@ export class FighterHud {
   private readonly body: readonly framehandle[];
   private shownCharacter: number | undefined;
   private shownColor: number | undefined;
+  private shownTint: CostumeTint | undefined;
   private shownMirrored: boolean | undefined;
 
   private shownVisible: boolean | undefined;
@@ -155,7 +158,7 @@ export class FighterHud {
   }
 
 
-  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false): void {
+  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false, tint?: CostumeTint): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);
@@ -170,6 +173,10 @@ export class FighterHud {
       BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color), 0, true);
       BlzFrameSetText(this.name, fighterName(character).toUpperCase());
       for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color), 0, true);
+    }
+    if (this.shownTint !== tint) {
+      this.shownTint = tint;
+      paintCostume(this.portrait, tint);
     }
     if (stepJolt(this.jolt, visible, damage)) this.placeNumber(unitsForPixels(this.jolt.dx), unitsForPixels(this.jolt.dy));
     this.showDamage(damage);

@@ -20,6 +20,7 @@ export interface SelectionActions {
   toggleTeamBattle(participantId: number): void;
   toggleFriendlyFire(participantId: number): void;
   changeTeam(participantId: number, fighterSlot: number, direction: -1 | 1): void;
+  changeCostume(participantId: number, fighterSlot: number, direction: -1 | 1): void;
   toggleEndless(participantId: number): void;
   toggleAutomaticRematch(participantId: number): void;
   toggleItems(participantId: number): void;

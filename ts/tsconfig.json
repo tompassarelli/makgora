@@ -49,6 +49,7 @@
     "test/menu-journey.test.ts",
     "test/lan-pool-queue.test.ts",
     "test/result-vote.test.ts",
+    "test/costume-colors.test.ts",
     "test/online-pacing.test.ts",
     "test/scenery-culling.test.ts",
     "test/anim-judge-identity.test.ts",

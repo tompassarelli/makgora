@@ -2,10 +2,11 @@ import { SELECT_LEVELS } from "./selectLevels";
 import type { CpuDefaults } from "./selectionCpuSettings";
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
+import { boxContains } from "./selectionLayout";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../input/participants";
-import { type MatchState, canChooseComputer, canCycleSlotMode, fighterActive, humanFighterActive, humanPresent } from "../lobby/lobbyState";
+import { type MatchState, canChooseComputer, canCycleSlotMode, costumeFor, fighterActive, humanFighterActive, humanPresent } from "../lobby/lobbyState";
 import {
   type SelectionDrag,
   CARD_HEIGHT,
@@ -28,10 +29,13 @@ import { Character } from "../sim/codes";
 import { cardPortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";
 import { slotColor } from "./slotColors";
+import { costumesFor } from "../roster/costumes";
+import { MAX_COSTUMES } from "../presentation/model/costume";
+import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setFrameText } from "./frames";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
 
-export type CardButton = { kind: "team"; slot: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number };
+export type CardButton = { kind: "costume"; slot: number } | { kind: "team"; slot: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number };
 
 export const cardPalette = (game: Readonly<MatchState>, slot: number): number => game.teamBattle && fighterActive(game, slot) ? at(game.teamChoices, slot) : slot;
 
@@ -63,6 +67,8 @@ export interface CardFrames {
   readonly team: framehandle;
   readonly teamLabel: framehandle;
   readonly portrait: framehandle;
+  readonly costume: framehandle;
+  readonly dots: readonly framehandle[];
   readonly name: framehandle;
   readonly status: framehandle;
   readonly wins: SessionWinsFrames;
@@ -87,6 +93,16 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   add(team, { kind: "team", slot });
   const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, cardDown(f32(0.008)), teamArea.width, cardSize(f32(0.019)), TAG_SIZE);
   const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), cardRight(slot, f32(0.029)), cardDown(f32(0.03)), cardSize(f32(0.102)), cardSize(f32(0.102)));
+  const dotArea = costumeDotsBox(slot);
+  const dotSize = cardSize(COSTUME_DOT);
+  const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
+    const dot = art(root, `MeleeCostumeDot${name}_${I2S(index)}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
+    BlzFrameSetVisible(dot, false);
+    return dot;
+  });
+  const portraitArea = costumePortraitBox(slot);
+  const costume = hotspot(root, portraitArea.x, portraitArea.y, portraitArea.width, portraitArea.height);
+  add(costume, { kind: "costume", slot });
   const name_ = label(root, `MeleeName${name}`, cardRight(slot, f32(0.008)), cardDown(f32(0.173)), cardSize(f32(0.144)), cardSize(f32(0.019)), cardSize(f32(0.011)));
   const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
   const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
@@ -101,7 +117,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   setFrameText(settingsLabel, "Opponent settings");
   add(settings, { kind: "cpuSettings", slot });
   const summary = label(root, `MeleeCpuSummary${name}`, cardRight(slot, f32(0.004)), cardDown(f32(0.136)), cardSize(f32(0.152)), cardSize(f32(0.031)), BAR_TEXT);
-  return { card, tag, mode, team, teamLabel, portrait, name: name_, status, wins, chip, summary, settings, settingsLabel };
+  return { card, tag, mode, team, teamLabel, portrait, costume, dots, name: name_, status, wins, chip, summary, settings, settingsLabel };
 }
 
 export function presentCardTeam(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, menuFocus: MenuFocus | undefined, active: boolean, human: boolean, teamsShown: boolean, palette: number): void {
@@ -133,6 +149,40 @@ export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>
   if (ready) {
     BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, palette), 0, true);
     setFrameText(frames.name, nameText(choice));
+  }
+}
+
+const COSTUME_DOT = f32(0.011);
+const COSTUME_DOT_GAP = f32(0.005);
+
+export const costumePortraitBox = (slot: number) => ({ x: cardRight(slot, f32(0.029)), y: cardDown(f32(0.03)), width: cardSize(f32(0.102)), height: cardSize(f32(0.102)) });
+
+export function costumeDotsBox(slot: number) {
+  const width = f32(MAX_COSTUMES * cardSize(f32(COSTUME_DOT + COSTUME_DOT_GAP)));
+  return { x: f32(cardX(slot) + f32(f32(CARD_WIDTH - width) / 2)), y: cardDown(f32(0.145)), width, height: cardSize(COSTUME_DOT) };
+}
+
+export function pointedCard(game: Readonly<MatchState>, slot: ParticipantSlot, x: number, y: number): CardButton | undefined {
+  const active = fighterActive(game, slot);
+  if (game.teamBattle && active && boxContains(teamSettingsBox(slot), x, y)) return { kind: "team", slot };
+  if (active && boxContains(costumePortraitBox(slot), x, y)) return { kind: "costume", slot };
+  if (active && !humanFighterActive(game, slot) && boxContains(cpuSettingsBox(slot), x, y)) return { kind: "cpuSettings", slot };
+  if (boxContains(modeBox(slot), x, y)) return { kind: "mode", slot };
+  return undefined;
+}
+
+export function presentCardCostume(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, shown: boolean, choice: number | undefined): void {
+  const costumes = choice === undefined || choice < 0 ? [] : costumesFor(choice);
+  const chosen = costumeFor(game, slot);
+  const tint = costumes[chosen]?.tint;
+  paintCostume(frames.portrait, tint);
+  BlzFrameSetEnable(frames.costume, shown && costumes.length > 1 && (slot === participantId && humanFighterActive(game, slot) || canChooseComputer(game, participantId, slot)));
+  BlzFrameSetVisible(frames.costume, shown && costumes.length > 1);
+  for (let index = 0; index < frames.dots.length; index++) {
+    const dot = frames.dots[index];
+    if (dot === undefined) continue;
+    BlzFrameSetVisible(dot, shown && costumes.length > 1 && index < costumes.length);
+    BlzFrameSetAlpha(dot, index === chosen ? 255 : 70);
   }
 }
 

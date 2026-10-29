@@ -188,7 +188,7 @@ export function presetOf({ keys }: Readonly<KeyBindings>): BindingPreset | undef
 }
 
 const ARROWS: readonly (readonly [number, Action])[] = [[0x25, Action.moveLeft], [0x26, Action.moveUp], [0x27, Action.moveRight], [0x28, Action.moveDown]];
-const MENU_ACTIONS: readonly Action[] = [Action.moveLeft, Action.moveRight, Action.moveUp, Action.moveDown, Action.attack, Action.special];
+const MENU_ACTIONS: readonly Action[] = [Action.moveLeft, Action.moveRight, Action.moveUp, Action.moveDown, Action.attack, Action.special, Action.jump];
 
 export function menuAction(bindings: Readonly<KeyBindings>, key: number): Action | undefined {
   const arrow = ARROWS.find(([arrowKey]) => arrowKey === key);
