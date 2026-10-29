@@ -8,6 +8,8 @@ and wide, and a foe who drains her meter finds an easy target. She replaces Kobo
 
 Numbers are provisional Smashcraft tuning. Frames count entry as frame 1 with
 inclusive active windows. H is the shared 132-unit design height.
+Every damage value below is authored; her live hits deal 1.2 times it with
+0.92 times its knockback growth (the balance pass of 2026-10-29, below).
 
 ## Research and body
 
@@ -48,9 +50,9 @@ tail joins the hurt volume on every tail move.
 
 | Input | Contract and counterplay |
 | --- | --- |
-| Neutral: **Multi-Shot** | Three cold arrows (`NagaColdArrowMissile`) at 0° and ±12° on frame 18 of 40, 3% each, speed 20, life 30. The centre arrow chills (the shared chill, 60 frames; the plan's −10% acceleration is the shared 40% speed slow instead). Shields stop them and they reflect. One volley in flight; the volley counts as two of the three hero-projectile slots, so the serpent can fly beside it. |
-| Side: **Tidal Serpent** | A water serpent (`SerpentWardMissile`) on frame 16 of 52, speed 12, 27 frames (about 320 units). A body hit deals 6%, drains 108 frames (1.5%) of the struck foe's ultimate meter, hands nothing back to her, and bounces to the nearest other foe within 300 units, up to three bounces at 80% damage each. With no other foe it turns back to her, and catching it gives nothing. Shields stop it without a drain; it does not reflect. Summons and wards are not bounce targets yet. |
-| Up: **Tidal Surge** | A water column lifts her 2.0H over frames 10-33 with 0.3H of drift, hitting 7% at 80° on frames 12-18. Once per airtime, ends helpless; helpless fall leaves no aerial jump. |
+| Neutral: **Multi-Shot** | Three cold arrows (`NagaColdArrowMissile`) at 0° and ±12° on frame 18 of 40, 4% each, speed 20, life 30. The centre arrow chills (the shared chill, 60 frames; the plan's −10% acceleration is the shared 40% speed slow instead). Shields stop them and they reflect. One volley in flight; the volley counts as two of the three hero-projectile slots, so the serpent can fly beside it. |
+| Side: **Tidal Serpent** | A water serpent (`SerpentWardMissile`) on frame 16 of 52, speed 12, 27 frames (about 320 units). A body hit deals 8%, drains 108 frames (1.5%) of the struck foe's ultimate meter, hands nothing back to her, and bounces to the nearest other foe within 300 units, up to three bounces at 80% damage each. With no other foe it turns back to her, and catching it gives nothing. Shields stop it without a drain; it does not reflect. Summons and wards are not bounce targets yet. |
+| Up: **Tidal Surge** | A water column lifts her 2.6H over frames 10-33 with 1.5H of drift, hitting 7% at 80° on frames 12-18. Once per airtime, ends helpless; helpless fall leaves no aerial jump. |
 | Down: **Mana Shield** | A toggle that switches on frame 6 of 12. While it is on, each hit except throws and pummels takes half its damage from her percent and pays the other half from her ultimate meter at 72 frames per 1% (one orb's half meter absorbs 50%); knockback uses her real, lower percent. When the meter runs dry the shield breaks into a 20-frame stagger; with an empty meter it breaks on the first hit. Toggle, meter and stagger are rollback state. |
 | Ultimate: **Gaze of Azshara** | 20 frames of telegraph (`CurseTarget` over her head), then frames 21-60 check a cone 600 ahead that widens to 300 tall. A foe in the cone facing her, not intangible and not already frozen, is slowed by 40% for 40 frames, then petrified for 60 frames under a grey tint using the shared frozen status. A petrified foe takes hits without thawing or launching, and at most 26% in total. Turning away is the counterplay. |
 
@@ -112,3 +114,49 @@ Half of her stock losses (52%) come with no hit landed. Her kills come from
 forward smash (41%) and back air (26%). The next pass makes the gameplan keep
 range, makes arrows and the serpent carry ranged damage, and gets the bot to
 use Mana Shield.
+
+## Balance pass (2026-10-29)
+
+Each run below is the Balance workflow's field (Wren Expert, 400 matches a
+pair) over her 25 matchups only (`--matchups`), so it is a repair comparison,
+not the full-roster gate. Shares are of her own play; approach in the farm
+rows still counts recovering, the later rows count it only over the stage.
+
+| Run | Change | Wins | Approach | Ranged | Specials n/s/u/d |
+| --- | --- | ---: | ---: | ---: | --- |
+| [40805783142](https://github.com/tompassarelli/smashcraft/actions/runs/40805783142) | main at f44e1e2, before the pass | 17% | 73% | 7% | 21/14/11/0% |
+| [40807089726](https://github.com/tompassarelli/smashcraft/actions/runs/40807089726) | gameplan keeps range, ranged share fixed | 17% | 67% | 39% | 22/12/10/0% |
+| [40809474573](https://github.com/tompassarelli/smashcraft/actions/runs/40809474573) | V1: Tidal Surge 2.6H rise, 1.5H drift | 28% | 65% | 39% | 22/12/11/0% |
+| [40809535231](https://github.com/tompassarelli/smashcraft/actions/runs/40809535231) | V1, every hit ×1.15 damage, ×0.94 growth | 38% | 66% | 39% | 22/12/11/0% |
+| [40809536985](https://github.com/tompassarelli/smashcraft/actions/runs/40809536985) | V1, arrows 4%, serpent 8% | 35% | 66% | 46% | 22/13/11/0% |
+| local, 48 a pair | V1, arrows 4%, serpent 8%, every hit ×1.2 damage, ×0.92 growth (landed) | 54% | 57% | 46% | 22/13/11/0% |
+| local, 48 a pair, `--orbs` | the same, ultimate orbs on | 62% | 57% | 48% | 23/13/10/2% |
+
+What changed:
+
+- **Gameplan.** She shoots from 220-540 units instead of 140-320, drops the
+  run-in and jump-in approaches (the only plans that closed on the foe), picks retreat
+  more often on defense, and avoids being under a foe and the ledge. When
+  every special in reach was used recently she holds her spacing (`whenStale:
+  "hold"`) instead of walking in, the shared rule that closed the gap for her.
+- **Mana Shield.** Her computer raises it from 200 units or more once its meter
+  holds a quarter (enough to absorb 25%), and drops it below 5% so it never
+  breaks into the stagger on an empty meter. The field plays with orbs off, so
+  it stays at 0% there; with `--orbs` it is 2% of her moves, and her wins
+  rise to 62%, because orbs also charge Gaze and fund the shield.
+- **Recovery.** Tidal Surge rose 2.0H with 0.3H of drift, the roster's weakest
+  return (Sylvanas 2.6H/2.6H, Thrall 3.1H/1.5H); 56% of her stocks were lost
+  more than 3 s after a hit, mostly offstage. It now rises 2.6H with 1.5H of
+  drift, and that share fell to 32%.
+- **Kit numbers.** Multi-Shot's arrows deal 4% (from 3%) and Tidal Serpent 8%
+  (from 6%), and every hit she lands deals 1.2 times its authored damage with
+  0.92 times its growth, the roster retune's method (balance.md, #414).
+- **Measurement.** The ranged share now counts a projectile hit that lands
+  while its special is still playing (Multi-Shot's arrows land inside its 40
+  frames, so they used to count as body hits), and approach counts only while a
+  fighter is over the main stage, so recovering is not approaching
+  (balance.md, "Play style").
+
+Approach stays above her 20-50 band: on the stage she still moves toward the
+foe about 55-60% of the time, from the shared computer's air drift and its rule
+of walking under a foe on a platform.

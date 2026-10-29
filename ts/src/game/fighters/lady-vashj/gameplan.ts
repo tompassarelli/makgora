@@ -2,19 +2,17 @@ import { AttackStyle } from "../../sim/codes";
 import { type FighterGameplan, GameplanSpecial, GameplanThrow } from "../../sim/gameplan";
 
 export const LADY_VASHJ_GAMEPLAN: FighterGameplan = {
-  range: { near: 140.0, far: 320.0 },
+  range: { near: 220.0, far: 540.0 },
   spacing: [
-    { move: GameplanSpecial.neutral, near: 200.0, far: 520.0 },
+    { move: GameplanSpecial.neutral, near: 200.0, far: 560.0 },
     { move: GameplanSpecial.side, near: 150.0, far: 320.0 },
     { move: AttackStyle.forwardTilt, near: 80.0, far: 130.0 },
     { move: AttackStyle.downTilt, near: 60.0, far: 120.0 },
   ],
   approach: [
-    { via: "shoot", moves: [GameplanSpecial.neutral, GameplanSpecial.side], weight: 4 },
-    { via: "jump", moves: [AttackStyle.forwardAir, AttackStyle.neutralAir], weight: 2 },
-    { via: "run", moves: [AttackStyle.forwardTilt, AttackStyle.downTilt, AttackStyle.grab], weight: 1 },
+    { via: "shoot", moves: [GameplanSpecial.neutral, GameplanSpecial.side], weight: 3 },
   ],
-  defense: ["retreat", "shield", "roll", "jump"],
+  defense: ["retreat", "retreat", "shield", "roll", "jump"],
   combos: [
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.forwardTilt, AttackStyle.grab] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
@@ -23,5 +21,6 @@ export const LADY_VASHJ_GAMEPLAN: FighterGameplan = {
   ],
   kills: [{ move: AttackStyle.forwardSmash, fromPercent: 100.0 }, { move: AttackStyle.backAir, fromPercent: 115.0 }, { move: AttackStyle.upSmash, fromPercent: 120.0 }],
   recovery: { aim: "ledge", upSpecial: "last" },
-  avoid: ["close", "edge"],
+  avoid: ["close", "below", "edge"],
+  whenStale: "hold",
 };

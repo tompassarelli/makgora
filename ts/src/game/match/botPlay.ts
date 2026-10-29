@@ -442,6 +442,6 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   }
   if (contest) approachPoint(fighter, stage, orbPoint(stage).x, orbPoint(stage).z, frame, input);
   else if (pressing) steerOnGround(fighter, stage, pokeGoal(target), input);
-  else if (delay <= 0 && lastChoicePassedForVariety()) approach(fighter, target, stage, Plan.ground, frame, input);
+  else if (delay <= 0 && lastChoicePassedForVariety() && gameplan.whenStale !== "hold") approach(fighter, target, stage, Plan.ground, frame, input);
   else approachByGameplan(fighter, target, stage, gameplan, slot, planIndex, frame, input, skill);
 }

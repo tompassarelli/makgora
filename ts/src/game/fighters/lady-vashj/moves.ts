@@ -6,8 +6,10 @@ import { hurtPart } from "../../sim/hurtboxes";
 import { groundHit } from "../../sim/heroes/groundNormals";
 import type { Angle } from "../../sim/heroes/authoring";
 
+const DAMAGE_SCALE = f32(1.2);
+const GROWTH_SCALE = f32(0.92);
 export const ladyVashjHit = (damage: number, angle: Angle, growth = 70.0, base = 20.0, behind = false, element: HitElement = HitElement.normal) =>
-  groundHit(damage, angle, growth, base, element, behind);
+  groundHit(f32(damage * DAMAGE_SCALE), angle, f32(growth * GROWTH_SCALE), base, element, behind);
 const ordinary = (damage: number, angle: Angle, growth = 70.0, base = 20.0, behind = false) => ladyVashjHit(damage, angle, growth, base, behind, HitElement.normal);
 export const ladyVashjStrike = (x1: number, z1: number, x2: number, z2: number, radius = 12.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
 const strike = ladyVashjStrike;

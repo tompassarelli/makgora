@@ -12,7 +12,7 @@ const down = (shot: { readonly velocityX: number; readonly velocityZ: number }) 
 const ARROW_MODEL = "Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl";
 const coldArrow = (fan?: SpecialProjectile["fan"]): SpecialProjectile => ({
   spawnFrame: 18, offsetX: 50.0, offsetZ: 88.0, velocityX: ARROW_SPEED, velocityZ: 0.0, life: 30, radius: 10.0,
-  effect: ladyVashjHit(3.0, 30, 40.0, 14.0), reflectable: true, limit: 1, model: ARROW_MODEL,
+  effect: ladyVashjHit(4.0, 30, 40.0, 14.0), reflectable: true, limit: 1, model: ARROW_MODEL,
   ...(fan === undefined ? { status: { ...CHILL, frames: 60 } } : { fan, velocityX: fan[0]?.velocityX ?? ARROW_SPEED, velocityZ: fan[0]?.velocityZ ?? 0.0 }),
 });
 const CENTRE_ARROW = coldArrow();
@@ -24,7 +24,7 @@ const multiShot = (sides: SpecialProjectile, landingLag?: number): AuthoredSpeci
 
 const serpent = (bounces: number, drain: number): SpecialProjectile => ({
   spawnFrame: 16, offsetX: 46.0, offsetZ: 46.0, velocityX: 12.0, velocityZ: 0.0, life: 27, radius: 18.0,
-  effect: ladyVashjHit(6.0, 40, 50.0, 30.0), reflectable: false, limit: 1,
+  effect: ladyVashjHit(8.0, 40, 50.0, 30.0), reflectable: false, limit: 1,
   model: "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdl",
   bounce: { count: bounces, range: 300.0, falloff: f32(0.8), speed: 14.0, drain },
 });
@@ -33,10 +33,10 @@ const tidalSerpent = (shot: SpecialProjectile, landingLag?: number): AuthoredSpe
   hurt: [hurtPose(10, 30, ladyVashjReach(56.0, 60.0))],
 });
 
-const SURGE_RISE = f32(f32(HERO_REFERENCE_HEIGHT * 2.0) / 24.0);
+const SURGE_RISE = f32(f32(HERO_REFERENCE_HEIGHT * f32(2.6)) / 24.0);
 const tidalSurge = (rise: number): AuthoredSpecial => ({
   endFrame: 36, oncePerAirtime: true, helpless: true, landingLag: 24,
-  motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(10, 33), velocityX: 0.0, velocityZ: rise, driftSpeed: f32(f32(HERO_REFERENCE_HEIGHT * f32(0.3)) / 24.0) }],
+  motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(10, 33), velocityX: 0.0, velocityZ: rise, driftSpeed: f32(f32(HERO_REFERENCE_HEIGHT * f32(1.5)) / 24.0) }],
   regions: [heroRegion(12, 18, ladyVashjStrike(0.0, -10.0, 0.0, 120.0, 46.0), ladyVashjHit(7.0, 80, 60.0, 40.0))],
 });
 

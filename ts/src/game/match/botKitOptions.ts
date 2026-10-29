@@ -27,6 +27,7 @@ import {
 import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
 import { safeAt, steerOnGround } from "./botFooting";
 import { HeroSpecialUse, autoFollowUpDue, heroSpecialUse, holdFirstPartZone, startableForm, strikeMeets } from "./botHeroKit";
+import { togglesManaShield } from "./botManaShield";
 import { aheadX, moveReachAhead } from "./botMoves";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
@@ -271,6 +272,11 @@ function pressHeroOption(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
       && gap >= IMAGE_NEAR && gap <= IMAGE_FAR && level && safeAt(stage, f32(f.motion.x - f32(toward * IMAGE_ROOM)), 0.0)
       && botChoice(floorDiv(frame, 45), f.character * 7 + 9, 3) === 0 && takes(skill, floorDiv(frame, 45), f.character * 7 + 10)) {
       pressSlot(input, slot, toward);
+      return true;
+    }
+
+    if (togglesManaShield(f, move, gap) && takes(skill, floorDiv(frame, 30), f.character * 7 + 13)) {
+      pressSlot(input, slot, 0);
       return true;
     }
 

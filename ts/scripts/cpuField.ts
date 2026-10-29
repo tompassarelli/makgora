@@ -28,6 +28,7 @@ import { produceComputerInput } from "../src/game/match/botPlay";
 import { CORNER_BAND, cornered, insideLip } from "../src/game/match/botCorner";
 import { recoveringBelow } from "../src/game/match/botEdgeGuard";
 import { inLag } from "../src/game/match/cornerScenarios";
+import { specialBodyStrikes } from "./bodyStrikes";
 import { isCpuOpponent, isCpuTier, type CpuOpponentId, type CpuTier } from "../src/game/match/cpuProfiles";
 import { gameplanOf } from "../src/game/match/botGameplan";
 import type { CpuSkill } from "../src/game/match/cpuSkill";
@@ -493,7 +494,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
           seen.lastStarted = special;
           seen.starts++;
         }
-        if (!f.status.out && !unactionable(f) && Math.abs(f.motion.vx) > 1.0) {
+        if (!f.status.out && !unactionable(f) && Math.abs(f.motion.vx) > 1.0 && insideLip(stage, f.motion.x) >= 0.0) {
           if (f32(f.motion.vx * f32(opponent.motion.x - f.motion.x)) > 0) own.approachFrames++;
           else own.retreatFrames++;
         }
@@ -548,7 +549,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
             seen.lastHitMove = move;
             if (dealt > 0) other.damageByMove[move] = (other.damageByMove[move] ?? 0) + dealt;
           }
-          if (striking === undefined) other.rangedDamage += dealt;
+          if (striking === undefined || !specialBodyStrikes(opponent)) other.rangedDamage += dealt;
           other.damageDealt += dealt;
         }
         // Damage over time (poison, status ticks) lands without a hit: it neither adds to the last hit nor extends the string.
@@ -1264,7 +1265,7 @@ if (import.meta.main) {
   const { values } = parseArgs({
     args: process.argv.slice(2),
     options: { variants: { type: "string" }, "per-pair": { type: "string" }, seeds: { type: "string" }, "seed-offset": { type: "string" }, opponents: { type: "string" }, tiers: { type: "string" }, stocks: { type: "string" }, minutes: { type: "string" }, json: { type: "string" }, merge: { type: "string" }, fighters: { type: "string" }, pairs: { type: "string" },
-      "probe-fighter": { type: "string" }, from: { type: "string" }, probe: { type: "string" }, "ledge-rule": { type: "string" }, partition: { type: "string" } },
+      "probe-fighter": { type: "string" }, from: { type: "string" }, probe: { type: "string" }, "ledge-rule": { type: "string" }, partition: { type: "string" }, orbs: { type: "boolean" } },
     strict: true,
   });
   const fighterNamed = (slug: string) => {
@@ -1313,6 +1314,7 @@ if (import.meta.main) {
     ...(values["per-pair"] === undefined ? {} : { perPair: Number(values["per-pair"]) }),
     ...(spam === undefined ? {} : { spam }),
     ...(values["ledge-rule"] === "melee" ? { ledgeRule: "melee" as const } : {}),
+    ...(values.orbs === true ? { orbs: true } : {}),
   };
   if (values["ledge-rule"] !== undefined && values["ledge-rule"] !== "melee") throw new Error("--ledge-rule takes melee");
   if (values.merge === undefined) {

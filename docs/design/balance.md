@@ -85,8 +85,10 @@ read after every frame (deterministic for a given commit and seed):
   move.
 - **Play style:** each aerial's share of aerials started, aerials over
   normals started, frames moving toward the opponent over frames moving
-  (while able to act), the ranged share (damage dealt while the body struck
-  nothing) and each special's share of moves started.
+  (while able to act and over the main stage, so recovering is not
+  approaching), the ranged share (damage dealt while the body struck nothing,
+  so a projectile landing during its special counts unless that special's own
+  hit region is active) and each special's share of moves started.
 - **Openings and punishes**, below.
 
 ## Openings and punishes
@@ -335,7 +337,7 @@ kept record. #355 establishes these rules; the retune follows #354's fresh field
 
 `bun wisp farm balance --wait` (from ts/) plays the field, then the spam
 probes (`--probe N` matches a pair, 0 skips them), and prints the field,
-style, conversion and balance tables with both verdicts. Locally, `--seed-offset N` selects a fresh seed range; from
+style, conversion and balance tables with both verdicts. Locally, `--seed-offset N` selects a fresh seed range and `--orbs` plays with ultimate orbs on (the gate field plays with them off, so meter-spending moves such as Mana Shield need an orbs run to show); from
 cpuField `--json` files: `bun scripts/cpuField.ts --merge FIELD_SHARDS
 --probe PROBE_FILES`; one fighter's probe is `bun scripts/cpuField.ts
 --probe-fighter SLUG --from FIELD.json --per-pair 40 --seeds 100 --json

@@ -94,6 +94,7 @@ export interface FighterGameplan {
   readonly kills: readonly KillMove[];
   readonly recovery: RecoveryRoute;
   readonly avoid: readonly GameplanSituation[];
+  readonly whenStale?: "close" | "hold" | undefined;
 }
 
 
