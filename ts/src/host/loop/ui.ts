@@ -5,6 +5,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/
 import { CombatEffects } from "../../game/render/combatEffects";
 import { CriticalStrikeText } from "../../game/render/criticalStrikeText";
 import { FighterPoolPresentation } from "../../game/render/fighterPool";
+import { costumeFor } from "../../game/lobby/lobbyState";
 import { AgencyMarker } from "../../game/render/agencyMarker";
 import { FighterAgencyForecast } from "../../game/presentation/fighterAgency";
 import { FrostEffects } from "../../game/render/frostEffects";
@@ -214,7 +215,7 @@ function opponentCharacters(s: ShellState, slot: ParticipantSlot): Character[] {
 export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, character: Character, pooled: boolean): boolean {
   const ui = views(s);
   endFighterRenderers(ui.fighters[slot]);
-  const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin) : undefined;
+  const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin, costumeFor(s.game, slot)) : undefined;
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
   const orbit = fighterOrbit(character), flight = fighterFlight(character);

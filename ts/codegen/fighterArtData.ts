@@ -94,6 +94,7 @@ export function renderFighterRules(character: number): string {
   const blade = character === Character.warden
     ? [`  blade: {`, `    neutralAir: ${wardenBlade(AttackStyle.neutralAir)},`, `    forwardAir: ${wardenBlade(AttackStyle.forwardAir)},`, `  },`]
     : [];
+  const skins = (heroLook(character)?.costumes ?? []).flatMap((costume, index) => costume.skin === undefined ? [] : [`  { index: ${index}, textures: ${JSON.stringify(costume.skin.textures)} },`]);
   return [
     PRODUCER,
     "import type { FighterRules } from \"../fighterArtData\";",
@@ -104,6 +105,12 @@ export function renderFighterRules(character: number): string {
     ...blade,
     "};",
     "",
+    ...skins.length === 0 ? [] : [
+      "export const costumeSkins: readonly { readonly index: number; readonly textures: Readonly<Record<string, string>> }[] = [",
+      ...skins,
+      "];",
+      "",
+    ],
   ].join("\n");
 }
 

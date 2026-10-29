@@ -11,6 +11,8 @@ import { UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
 import type { FighterOriginalClip } from "../../src/generated/clips/fighterOriginalClip";
 import { originalClip, originalClipCount, originalLightPath } from "../../src/generated/clips/fighterOriginalClipInfo";
+import { costumeBody } from "../../src/generated/costumes/costumeBodies";
+import { MAX_COSTUMES } from "../../src/game/presentation/model/costume";
 import * as frostModels from "../../src/generated/assets/frostAssetInfo";
 import * as impactModels from "../../src/game/assets/impactAssetInfo";
 import { IMPORTED_MUSIC } from "../../src/game/assets/importedMusicInfo";
@@ -33,7 +35,7 @@ import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS } from "../../src/game/r
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
-import { CLIP_RECORDS, clipPoolFiles } from "../clipEvidence";
+import { CLIP_RECORDS, clipPoolFiles, readClipRecords } from "../clipEvidence";
 import { importList } from "./importList";
 import { PREVIEW_CACHE, mapArtImports } from "./mapArtImports";
 import { regenerateCommand } from "../stageThumbnailSpec";
@@ -120,10 +122,14 @@ const SUMMON_MODELS = Array.from({ length: summonClipCount(SUMMON_BEAR) }, (_, i
 
 
 
-export const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap((character) => {
+const costumePoolFiles = (pool: string): string[] =>
+  readClipRecords(pool).flatMap((record: { readonly costumes?: readonly { readonly filename: string }[] }) => record.costumes?.map(({ filename }) => filename) ?? []);
+
+export const ORIGINAL_CLIP_MODELS =[...new Set(Object.values(Character).flatMap((character) => {
   const light = originalLightPath(character);
   const clips = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "");
-  return light === undefined ? clips : [...clips, light];
+  const costumes = Array.from({ length: MAX_COSTUMES }, (_, costume) => costumeBody(character, costume) ?? []).flat();
+  return [...clips, ...costumes, ...light === undefined ? [] : [light]];
 }))];
 
 const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ character }) => heroLook(character)!.model).filter((model) => importedModelFile(model) !== undefined);
@@ -303,7 +309,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   yield* requireListed(evidencePath, summonFiles, SUMMON_MODELS, "summonClipInfo.ts and the summon clips differ");
   const clipDirectory = join(assets, "original-clips-static-lights");
   const clipEvidencePath = join(clipDirectory, CLIP_RECORDS);
-  const clipFiles = (yield* tryMapSync("read clip records", clipEvidencePath, () => clipPoolFiles(clipDirectory))).filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
+  const clipFiles = (yield* tryMapSync("read clip records", clipEvidencePath, () => [...clipPoolFiles(clipDirectory), ...costumePoolFiles(clipDirectory)])).filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
   const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
   yield* requireListed(clipEvidencePath, clipFiles, ORIGINAL_CLIP_MODELS,
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +

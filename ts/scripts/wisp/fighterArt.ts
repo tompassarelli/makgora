@@ -22,7 +22,7 @@ interface Fighter { readonly character: number; readonly name: string; readonly 
 interface Work { readonly root: string; readonly checkout: string; readonly assets: string; readonly pool: string; readonly impact: string }
 
 interface Step {
-  readonly name: "clips" | "bodies" | "flashes";
+  readonly name: "clips" | "bodies" | "flashes" | "costumes";
   readonly tool: string;
   readonly output: Output;
   readonly args: (fighter: Fighter, work: Work) => readonly string[];
@@ -32,15 +32,16 @@ const STEPS: readonly Step[] = [
   { name: "clips", tool: "tools/animations/export-original-clips.ts", output: "pool", args: (fighter, work) => ["--assets", work.assets, "--out", work.pool, "--only", fighter.name] },
   { name: "bodies", tool: "tools/animations/timeline-models.ts", output: "pool", args: (fighter, work) => [work.assets, work.pool, fighter.name] },
   { name: "flashes", tool: "tools/animations/white-flash-models.ts", output: "impact", args: (fighter, work) => [work.assets, work.impact, "--character", String(fighter.character)] },
+  { name: "costumes", tool: "tools/animations/costume-bodies.ts", output: "pool", args: (fighter, work) => [work.pool, fighter.name] },
 ];
 
 const FAMILY: Readonly<Record<Output, Family>> = { pool: "original-clips-static-lights", impact: "impact-assets" };
 
-const GENERATED = [/^ts\/src\/generated\/clips\//, /^ts\/src\/generated\/assets\/white-(models|facts)\//, /^ts\/src\/generated\/assets\/white(FighterModels|ModelFacts)\.ts$/];
+const GENERATED = [/^ts\/src\/generated\/clips\//, /^ts\/src\/generated\/costumes\//, /^ts\/src\/generated\/assets\/white-(models|facts)\//, /^ts\/src\/generated\/assets\/white(FighterModels|ModelFacts)\.ts$/];
 
 const LOCKS = ["ts/package.json", "ts/bun.lock", "tools/animations/package.json", "tools/animations/bun.lock"];
 
-export const DERIVED_PATHS = ["build-inputs/original-clips-static-lights", "build-inputs/impact-assets", "ts/src/generated/clips", "ts/src/generated/assets", "ts/scripts/wisp/model-facts"];
+export const DERIVED_PATHS = ["build-inputs/original-clips-static-lights", "build-inputs/impact-assets", "ts/src/generated/clips", "ts/src/generated/costumes", "ts/src/generated/assets", "ts/scripts/wisp/model-facts"];
 
 const NODE_MODULES = ["ts/node_modules", "tools/animations/node_modules"];
 
@@ -80,6 +81,7 @@ const STEP_FILES: Readonly<Record<Step["name"], { readonly files: (slug: string)
   clips: { files: (slug) => [`ts/src/generated/clips/${slug}.ts`], facts: ["OriginalClip"] },
   bodies: { files: (slug) => [`ts/src/generated/clips/${slug}.ts`], facts: ["OriginalClip", "TimelineBody"] },
   flashes: { files: (slug) => [`ts/src/generated/assets/white-models/${slug}.ts`, `ts/src/generated/assets/white-facts/${slug}.ts`], facts: ["White-"] },
+  costumes: { files: (slug) => [`ts/src/generated/costumes/${slug}.ts`], facts: ["CostumeBody"] },
 };
 
 const factPrefixes = (fighter: Fighter, step: Step) => STEP_FILES[step.name].facts.map((kind) => `war3mapImported_${fighter.name}${kind}`);

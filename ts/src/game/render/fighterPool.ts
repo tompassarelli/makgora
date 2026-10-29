@@ -23,6 +23,7 @@ import { fighterModelReplaced } from "../presentation/fighterForm";
 import { characterModelScale } from "../presentation/modelScale";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
+import { costumeClipModel } from "../roster/costumes";
 
 const PETRIFIED_GREY = 150;
 
@@ -51,6 +52,7 @@ export class FighterPoolPresentation {
     private readonly character: Character,
     participant: number,
     private readonly origin: WorldOrigin,
+    costume: number,
   ) {
     const { x, y, z } = origin;
     this.scale = characterModelScale(character);
@@ -68,7 +70,7 @@ export class FighterPoolPresentation {
     for (let index = 0; index < count; index++) {
       const clip = originalClip(character, index);
       if (clip === undefined) break;
-      const model = AddSpecialEffect(clip.modelPath, x, y);
+      const model = AddSpecialEffect(costumeClipModel(character, costume, clip), x, y);
       BlzSetSpecialEffectColorByPlayer(model, Player(participant));
       BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
       BlzSetSpecialEffectAnimation(model, "Stand");

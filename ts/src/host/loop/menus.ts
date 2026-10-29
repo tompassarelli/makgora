@@ -175,8 +175,8 @@ export function openSettingsScreen(s: ShellState, slot: ParticipantSlot): void {
 }
 
 
-export function startQuickMatch(s: ShellState, stage = 0, scenario: Scenario = s.build.scenario, character?: Character | readonly Character[], stocks = 1, stageSettings?: QuickStageSettings): void {
-  if (prepareQuickMatch(s.game, stage, character, stocks)) {
+export function startQuickMatch(s: ShellState, stage = 0, scenario: Scenario = s.build.scenario, character?: Character | readonly Character[], stocks = 1, stageSettings?: QuickStageSettings, costumes?: readonly number[]): void {
+  if (prepareQuickMatch(s.game, stage, character, stocks, costumes)) {
     for (const panel of views(s).settings) panel.close();
     startMatch(s, scenario, stageSettings);
   }

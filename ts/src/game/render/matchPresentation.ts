@@ -5,7 +5,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
-import { MATCH_TICKS_PER_SECOND, Phase, type MatchState } from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, costumeFor } from "../lobby/lobbyState";
+import { costumeClipModel } from "../roster/costumes";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { characterModelScale } from "../presentation/modelScale";
@@ -57,6 +58,7 @@ const createOrbSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady,
 
 interface VictoryPose {
   readonly character: Character;
+  readonly costume: number;
   model: effect | undefined;
   modelPath: string | undefined;
   readonly clips: ResultClips;
@@ -186,7 +188,7 @@ export class MatchPresentation {
       VolumeGroupReset();
       this.resultEffectsMuted = false;
     }
-    this.preparePoses(world);
+    this.preparePoses(game, world);
     this.resultStage = game.stageChoice;
     clearMatchTally(this.tally);
     observeForCues(this.observation, game, world);
@@ -280,7 +282,7 @@ export class MatchPresentation {
   }
 
 
-  preparePoses(world: Readonly<Roster>): void {
+  preparePoses(game: Readonly<MatchState>, world: Readonly<Roster>): void {
     this.releasePoses();
     for (const slot of PARTICIPANT_SLOTS) {
       if (!isActive(world, slot)) continue;
@@ -293,7 +295,7 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) } };
+      this.poses[slot] = { character, costume: costumeFor(game, slot), model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) } };
     }
   }
 
@@ -304,13 +306,14 @@ export class MatchPresentation {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
       const { clip, time } = resultPoseAt(pose.clips, row.winner, I2R(this.resultFrames) / 60.0);
-      if (pose.model !== undefined && pose.modelPath !== clip.modelPath) {
+      const modelPath = costumeClipModel(pose.character, pose.costume, clip);
+      if (pose.model !== undefined && pose.modelPath !== modelPath) {
         DestroyEffect(pose.model);
         pose.model = undefined;
       }
       if (pose.model === undefined) {
-        pose.model = AddSpecialEffect(clip.modelPath, this.origin.x, this.origin.y);
-        pose.modelPath = clip.modelPath;
+        pose.model = AddSpecialEffect(modelPath, this.origin.x, this.origin.y);
+        pose.modelPath = modelPath;
         hideEffect(pose.model, this.origin);
         BlzSetSpecialEffectColorByPlayer(pose.model, Player(row.slot));
         BlzSetSpecialEffectAnimationBlendTime(pose.model, 0.0);

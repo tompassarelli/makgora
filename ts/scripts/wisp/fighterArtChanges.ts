@@ -6,11 +6,12 @@ const ROSTER = [...fighters].map(([character, { name, source }]) => ({ name, sou
 const SLUG_FILES = [
   /^build-inputs\/(?:original-clips-static-lights|impact-assets|hero-models)\/([^/]+)$/,
   /^ts\/src\/generated\/clips\/([^/]+)\.ts$/,
+  /^ts\/src\/generated\/costumes\/([^/]+)\.ts$/,
   /^ts\/src\/generated\/fighter-art\/([^/]+)\.ts$/,
   /^ts\/src\/generated\/assets\/white-(?:models|facts)\/([^/]+)\.ts$/,
 ];
 
-const FACTS_FILE = /^ts\/scripts\/wisp\/model-facts\/war3mapImported_([A-Za-z]+?)(?:TimelineBody|White|OriginalClip\d*|OriginalLight)-/;
+const FACTS_FILE = /^ts\/scripts\/wisp\/model-facts\/war3mapImported_([A-Za-z]+?)(?:TimelineBody|CostumeBody\d*|White|OriginalClip\d*|OriginalLight)-/;
 
 const WHOLE_SOURCE_FAMILY = /^build-inputs\/(animation-assets|illidan-animation)$/;
 

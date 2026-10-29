@@ -9,7 +9,8 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
-import { METER_COMMAND, captureRequest, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
+import { costumeOf } from "../../game/roster/costumes";
+import { METER_COMMAND, captureRequest, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickHeroCostume, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPairCostumes, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterKey } from "../../game/roster/kits";
 import { devReceiptFile } from "../../game/session/journalFiles";
 import { applyFighterSetup } from "../../game/session/fighterSetup";
@@ -232,17 +233,20 @@ function quickMatchReceipt(s: ShellState, actor: number, message: string, reques
     return receipt;
   }
   if (quickPair !== undefined) {
-    const receipt = `dev: quick match ${fighterKey(quickPair[0])} / ${fighterKey(quickPair[1])}`;
-    startQuickMatch(s, 0, s.build.scenario, quickPair);
+    const costumes = quickPairCostumes(message) ?? [0, 0];
+    const dressed = (slot: 0 | 1) => costumes[slot] === 0 ? fighterKey(quickPair[slot]) : `${fighterKey(quickPair[slot])} in ${costumeOf(quickPair[slot], costumes[slot]).name.toLowerCase()}`;
+    const receipt = `dev: quick match ${dressed(0)} / ${dressed(1)}`;
+    startQuickMatch(s, 0, s.build.scenario, quickPair, 1, undefined, costumes);
     return receipt;
   }
   if (quickHero !== undefined) {
-    const receipt = `dev: quick match ${fighterKey(quickHero)}`;
+    const costume = quickHeroCostume(message);
+    const receipt = costume === 0 ? `dev: quick match ${fighterKey(quickHero)}` : `dev: quick match ${fighterKey(quickHero)} in ${costumeOf(quickHero, costume).name.toLowerCase()}`;
     if (quickMatchHitAreas(message)) {
       setTraining(s.game, actor, true);
       setHitAreas(s.game, actor, true);
     }
-    startQuickMatch(s, 0, s.build.scenario, quickHero, quickMatchStocks(message));
+    startQuickMatch(s, 0, s.build.scenario, quickHero, quickMatchStocks(message), undefined, [costume]);
     return receipt;
   }
   return presentationReceipt(s, actor, message, requests);

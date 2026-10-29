@@ -22,6 +22,7 @@ import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { SELECTABLE_CHARACTERS, fighterName, fighterKey, fighterSlug } from "../roster/kits";
+import { costumeIndex, costumesFor } from "../roster/costumes";
 import { isScenario, type Scenario } from "./build";
 
 export interface DevSettings {
@@ -151,19 +152,52 @@ export function quickMatchStocks(message: string): number {
 }
 
 export function quickMatchHero(message: string): Character | undefined {
+  return quickHeroPick(message)?.character;
+}
+
+/** The first fighter's costume in a quick hero match, named after ` in `, as in `-dev quick hero grom hellscream in fel stocks 9`. */
+export function quickHeroCostume(message: string): number {
+  return quickHeroPick(message)?.costume ?? 0;
+}
+
+function quickHeroPick(message: string): QuickPick | undefined {
   const setup = quickHeroSetup(message);
-  if (setup === undefined) return undefined;
-  return heroAfter(quickMatchHitAreas(message) ? setup.substring(0, setup.length - QUICK_HIT_AREAS_SUFFIX.length) : setup, QUICK_HERO_COMMAND);
+  if (setup === undefined || !setup.startsWith(QUICK_HERO_COMMAND)) return undefined;
+  const named = quickMatchHitAreas(message) ? setup.substring(0, setup.length - QUICK_HIT_AREAS_SUFFIX.length) : setup;
+  return quickPick(named.substring(QUICK_HERO_COMMAND.length));
 }
 
 export function quickMatchPair(message: string): readonly [Character, Character] | undefined {
+  const pair = quickPairPicks(message);
+  return pair === undefined ? undefined : [pair[0].character, pair[1].character];
+}
+
+/** Each quick pair fighter's costume, named after ` in `, as in `-dev quick pair grom hellscream in fel / mountain king`. */
+export function quickPairCostumes(message: string): readonly [number, number] | undefined {
+  const pair = quickPairPicks(message);
+  return pair === undefined ? undefined : [pair[0].costume, pair[1].costume];
+}
+
+interface QuickPick { readonly character: Character; readonly costume: number }
+
+function quickPairPicks(message: string): readonly [QuickPick, QuickPick] | undefined {
   const prefix = "-dev quick pair ";
   if (!message.startsWith(prefix)) return undefined;
   const names = message.substring(prefix.length).split(" / ");
   if (names.length !== 2) return undefined;
-  const first = heroAfter(`${QUICK_HERO_COMMAND}${names[0]}`, QUICK_HERO_COMMAND);
-  const second = heroAfter(`${QUICK_HERO_COMMAND}${names[1]}`, QUICK_HERO_COMMAND);
+  const first = quickPick(names[0] ?? "");
+  const second = quickPick(names[1] ?? "");
   return first === undefined || second === undefined ? undefined : [first, second];
+}
+
+function quickPick(text: string): QuickPick | undefined {
+  const at = text.indexOf(" in ");
+  const character = heroAfter(`${QUICK_HERO_COMMAND}${at < 0 ? text : text.substring(0, at)}`, QUICK_HERO_COMMAND);
+  if (character === undefined) return undefined;
+  if (at < 0) return { character, costume: 0 };
+  const wanted = text.substring(at + 4).toLowerCase();
+  const costume = costumesFor(character).findIndex(entry => entry.name.toLowerCase() === wanted);
+  return costume < 0 ? undefined : { character, costume };
 }
 
 
@@ -212,7 +246,7 @@ export const DESYNC_COMMAND = "-dev desync";
 
 
 
-export function prepareQuickMatch(game: MatchState, stage = 0, character?: Character | readonly Character[], stocks = 1): boolean {
+export function prepareQuickMatch(game: MatchState, stage = 0, character?: Character | readonly Character[], stocks = 1, costumes?: readonly number[]): boolean {
   const first = firstHumanSlot(game);
   if (first === undefined || (game.phase !== Phase.characterMenu && game.phase !== Phase.stageMenu)) return false;
   returnToCharacters(game, first);
@@ -224,6 +258,7 @@ export function prepareQuickMatch(game: MatchState, stage = 0, character?: Chara
   for (const slot of PARTICIPANT_SLOTS) {
     if (humanFighterActive(game, slot) && humanPresent(game, slot)) selectCharacter(game, slot, typeof character === "number" ? character : character?.[slot] ?? defaults[slot]);
   }
+  if (costumes !== undefined) for (const slot of PARTICIPANT_SLOTS) game.costumeChoices[slot] = costumeIndex(game.characterChoices[slot], costumes[slot] ?? 0);
   setStocks(game, first, stocks);
   if (!requestStageSelect(game, first)) return false;
   game.stageChoice = stage;
