@@ -13,7 +13,7 @@ import { runningHeroSpecial, inWindow, applyWindows } from "./runningMove";
 export function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): void {
   const charge = move.charge;
   const followUps = move.followUps;
-  if (charge === undefined || followUps === undefined || f.special.charge < charge.full) return;
+  if (charge === undefined || followUps === undefined || (f.special.charge < charge.full && charge.throwsStored !== true)) return;
   const stage = chargeStage(charge, f.special.charge);
   for (let index = 0; index < followUps.length; index++) {
     const followUp = at(followUps, index);

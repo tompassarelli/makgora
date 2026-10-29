@@ -279,6 +279,8 @@ export interface SpecialCharge {
   readonly drops?: true | undefined;
   /** Keeps holding at full until a release follow-up swings, and swings a full charge left stored the moment the move starts; a partial one resumes charging, and a release inside the hold window swings it at its stored stage. */
   readonly releases?: true | undefined;
+  /** Starting the move swings whatever is stored, a partial charge at its stored stage, at once and without charging. */
+  readonly throwsStored?: true | undefined;
 }
 
 export interface AuthoredSpecial extends CastWindows {

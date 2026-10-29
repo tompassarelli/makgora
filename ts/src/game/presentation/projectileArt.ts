@@ -18,6 +18,7 @@ import { PILLAR_COLUMN_STRETCH, FINGER_COLUMN_WIDTH } from "../fighters/archimon
 import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
 import { HOOK_MODEL } from "../fighters/butcher/specials";
 import type { CueBirth } from "./specialCues";
+import { SPECIAL_SLOTS, type SpecialSlot } from "./slotCues";
 import type { Fuse } from "./discLook";
 
 
@@ -39,8 +40,8 @@ export const ORIGINAL_KINDS: { readonly [character: number]: readonly Exclude<Pr
 };
 
 
-export const SPECIAL_SLOTS = ["neutral", "side", "up", "down"] as const;
-export type SpecialSlot = (typeof SPECIAL_SLOTS)[number];
+export { SPECIAL_SLOTS };
+export type { SpecialSlot };
 
 
 function chainProjectiles(projectile: SpecialProjectile | undefined, into: SpecialProjectile[]): void {

@@ -44,6 +44,8 @@ import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { SYLVANAS_SPECIALS } from "../fighters/sylvanas/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
+import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
+import { slotCues } from "./slotCues";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -207,7 +209,8 @@ export const PEON_REST_CUES: MoveCues = {
 
 
 
-export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]: MoveCues } } = {
+export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: MoveCues } } = {
+  [Character.akama]: { neutral: SHURIKEN_CHARGE_CUES },
   [Character.malfurion]: {
     neutral: { spell: "Entangling Roots", startup: NATURE, active: cue("Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", "ahead", f32(0.35)) },
     side: { spell: "Stag Charge", startup: NATURE, active: { ...cue("units\\critters\\BlackStagMale\\BlackStagMale.mdx", "feet", 1.0), sequence: "walk", seconds: 0.0, replacesBody: true } },
@@ -576,7 +579,7 @@ export const ORIGINAL_ACTIONS: { readonly [character: number]: readonly SpecialA
 
 export function fighterMoveCues(character: Character): readonly MoveCues[] {
   const hero = HERO_CUES[character];
-  if (hero !== undefined) return SPECIAL_SLOTS.map((slot) => hero[slot]);
+  if (hero !== undefined) return slotCues(hero);
   return (ORIGINAL_ACTIONS[character] ?? []).flatMap((action) => ORIGINAL_CUES[action] ?? []);
 }
 

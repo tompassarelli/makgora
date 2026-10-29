@@ -17,7 +17,7 @@ import { CUE_ANCHORS, HERO_CUES, specialCueState } from "./specialCues";
 
 const AIR_HEIGHT = 300.0;
 const WATCH_TICKS = 40;
-const BURST = HERO_CUES[Character.warden]?.down.active;
+const BURST = HERO_CUES[Character.warden]?.down?.active;
 
 function row(press: "fan" | "jump" | "none"): InputRow {
   const built = inputRow(press === "fan" ? { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 }

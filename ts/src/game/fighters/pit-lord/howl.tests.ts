@@ -148,5 +148,5 @@ test("The first ring is active on frame 18 and not before, and the roar sounds o
   assertEquals(startup.first, 1);
   assertTrue(startup.last >= HOWL_FIRST - 1);
   assertEquals(PIT_LORD_SPECIALS.neutral.ground.endFrame, 40);
-  assertEquals(HERO_CUES[Character.pitLord]?.neutral.startup.sound, "HowlOfTerror");
+  assertEquals(HERO_CUES[Character.pitLord]?.neutral?.startup.sound, "HowlOfTerror");
 });

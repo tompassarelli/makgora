@@ -17,7 +17,7 @@ test("Shadow Dash holds a Night Elf body tell through the 20 still frames and pl
   const { startup } = heroCueWindows(WARDEN_SPECIALS.side.ground);
   assertEquals(startup.first, 1);
   assertTrue(startup.last >= ILLUSION_FIRST_TRAVEL_FRAME - 1);
-  const tell = HERO_CUES[Character.warden]?.side.startup;
+  const tell = HERO_CUES[Character.warden]?.side?.startup;
   assertEquals(tell?.anchor, "body");
   assertTrue(tell?.model.includes("NightElf") === true);
   const maiev = moveSound(Character.warden, SIDE);

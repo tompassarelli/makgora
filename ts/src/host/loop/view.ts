@@ -459,6 +459,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     const posed = ui.match.posing === slot ? undefined : live;
     if (renderers !== undefined) presentDrawnBody(renderers, fighter, game.phase !== Phase.result && ui.match.posing !== slot, posed, runtime.poses[slot], stage, runtime.simulationFrame, matchFrame, game.camera, game.ultimatesOff);
     renderers?.goldSack?.present(posed, stage);
+    renderers?.shurikenGlow?.present(posed, stage);
     renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
     renderers?.flight?.present(posed, stage, s.session.paused);
     if (renderers !== undefined) {

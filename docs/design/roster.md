@@ -117,6 +117,14 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 Akama, the Broken Ashtongue elder of The Frozen Throne, is planned for a later kit; until then he plays as a stand-in.
 
+### Akama, neutral B (Tom, 2026-10-30)
+
+Tom asked on 2026-10-30 for Akama's neutral B to play like Sheik's Needle Storm after playtesting. It is the first move of his own kit; his side, up and down specials and every normal stay the stand-in's ([standins.md](standins.md)). The feel comes from public Needle Storm frame data ([SmashWiki Needle Storm](https://www.ssbwiki.com/Needle_Storm), [SmashWiki Sheik (SSBU) neutral special](https://www.ssbwiki.com/Sheik_(SSBU)/Neutral_special)), scaled to our units; the shuriken is a stock Classic Warden knife missile.
+
+| Input | Move and behavior | Timing and cost |
+| --- | --- | --- |
+| Neutral B | **Shuriken Volley:** hold special to ready shurikens and release to throw what is ready. A tap readies 1 and one more is ready every 15 frames held, up to 6 at 75 frames after the stance (Needle Storm adds a needle every 15 frames from 1 to 6); holding past 6 keeps 6 until release. Shield or jump during the charge stores the count and leaves him actionable at once (4 frames to put the stance away on shield); the count is kept through landing, being hit and rollback, and a lost stock empties it. A press with a count stored resumes charging from it on the ground, and a release swings it at once. In the air the press throws the stored count at once with no charge (1 when nothing is stored), and the count is spent. Each shuriken is a reflectable projectile, 2% damage, base 4 and growth 12 on a horizontal flinch, 20 frames of life at 12 units a frame on the ground (10 units a frame and 7 down in the air, after Needle Storm's downward air throw of 30 to 35 degrees). The volley fans by 0.5 units a frame of vertical speed per shuriken, centred on the throw. Full volley of 6 deals 12%, under the 15% cap, so it never combos into a guaranteed follow-up: Akama stays in recovery until after the last hit's flinch ends. A small blue glow at his hand grows with the count, and stays while a count is stored. | First shuriken leaves on frame 6 after the release and one more every 3 frames (Needle Storm hits from frame 11, one needle every 3 frames); recovery 23 frames after the last shuriken on the ground, 17 in the air with 12 frames of landing lag (Needle Storm ends 23 frames after its last needle begins on the ground, 17 in the air; 12 frames of landing lag); 0 mana |
+
 Akama, Firelord and Goblin Alchemist are selectable now as stand-ins on the shared placeholder moveset ([standins.md](standins.md)); the sections below are their real kits, not yet built.
 
 Murloc ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),

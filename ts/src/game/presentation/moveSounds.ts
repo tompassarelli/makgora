@@ -130,6 +130,10 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     weapon: Weapon.blunt, effort: ["BrewmasterAttack1", "BrewmasterAttack2"], strong: "WoodHeavyBashMetal",
     specials: [s("BreathOfFire", "Fireball"), s("StrongDrinkMissile", "StrongDrink"), s("CycloneBirth", "WoodMediumBashFlesh"), s("Taunt", "Fireball")],
   },
+  [Character.akama]: {
+    weapon: Weapon.blade, strong: "CriticalStrike",
+    specials: [s("FanOfKnives", "FanOfKnivesHit"), s(undefined, "MetalMediumSliceFlesh"), s(undefined, "MetalMediumSliceFlesh"), s(undefined, "MetalMediumSliceFlesh")],
+  },
   [Character.peon]: {
     weapon: Weapon.axe, strong: "AxeMediumChopWood",
     specials: [{ ...s(undefined, "WoodHeavyBashFlesh"), impact: "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.flac" }, s("AxeMediumChopWood", "WoodHeavyBashFlesh"), s("CatapultAttack1", "WoodMediumBashFlesh"), s("CreepSleep", "WoodHeavyBashFlesh")],
