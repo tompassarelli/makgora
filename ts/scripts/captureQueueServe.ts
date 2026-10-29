@@ -8,6 +8,7 @@ import { CaptureQueueFailure, Job, type Result, git, queueDirectory, showcaseSlo
 import { type RemoteHost, builtMapKey, fetchFolder, remoteHost, runThere, sendFile, shipStoredMap } from "./captureQueueRemote";
 import { fanGroups } from "./captureQueueFan";
 import { peerSpec } from "./captureQueuePeers";
+import { pairAgentStatus } from "./pairAgentStatus";
 import { attachedPoolReady } from "./wisp/nativePool";
 import { projectRoot, tsDirectory } from "./wisp/projectRoot";
 
@@ -94,12 +95,10 @@ const finish = (job: Job, result: Omit<Result, "id" | "lane" | "revision" | "fig
   rmSync(join(queueDirectory("taken"), `${job.id}.json`), { force: true });
 });
 
-const pairReady = (pair: number) => Effect.promise(async () => {
-  const run = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "status", "--pair", String(pair)], { cwd: tsDirectory, stdout: "pipe", stderr: "ignore" });
-  const text = await new Response(run.stdout).text();
-  if (await run.exited !== 0) return false;
-  try { return attachedPoolReady(JSON.parse(text) as Parameters<typeof attachedPoolReady>[0]); } catch { return false; }
-});
+const pairReady = (pair: number) => pairAgentStatus(pair).pipe(
+  Effect.map(text => attachedPoolReady(JSON.parse(text) as Parameters<typeof attachedPoolReady>[0])),
+  Effect.orElseSucceed(() => false),
+);
 
 const claimedBy = (pair: number, pid: number) => {
   try { return (JSON.parse(readFileSync(join(lanState, `pair-${pair}`, "claim.json"), "utf8")) as { pid?: number }).pid === pid; } catch { return false; }
@@ -128,7 +127,7 @@ const warmPool = (settings: Settings, log: ReturnType<typeof logTo>, logFile: st
     if (deferred) admitted = undefined;
     else if (admitted === undefined && claimedBy(settings.pair, child.pid)) admitted = performance.now();
     if (admitted !== undefined && (yield* pairReady(settings.pair))) break;
-    yield* Effect.sleep("2 seconds");
+    yield* Effect.sleep("5 seconds");
   }
   yield* log({ step: "pool", pair: settings.pair, waitedSeconds: Math.round((admitted - started) / 100) / 10, clientsToDoorSeconds: seconds(admitted) });
   return child;
