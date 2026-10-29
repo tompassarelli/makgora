@@ -57,7 +57,7 @@ const ELUNE_SHIMMER = "Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldC
 const eluneGrace = (air: boolean): AuthoredSpecial => ({
   endFrame: 30, landingLag: air ? 10 : undefined, cooldownFrames: 24, jumpCancelFrame: 4,
   airStall: air ? frames(1, 12) : undefined,
-  projectiles: [mark(ELUNE_SHIMMER, 3, 12, 0.0, 30.0)],
+  projectiles: [mark(ELUNE_SHIMMER, 3, 12, 45.0, 60.0)],
   regions: [heroRegion(4, 4, capsule(-34.0, 56.0, 34.0, 56.0, 40.0), { ...hit(2.0, "LINK", 20, 1.0, HitElement.arcane), growth: 0.0, setKnockback: 60.0 })],
   reflects: ELUNE_REFLECT,
 });

@@ -89,8 +89,9 @@ Specials:
   20 frames with wide steering, tapping anyone she passes for 5% on frames
   6-12, under a moon-well trail (`MoonWellCasterArt`). Once per airtime, it
   ends helpless with 20 landing frames.
-- **Elune's Grace** (down), the roster's reflector. A silver shimmer
-  (`SpellShieldCaster`) turns back every reflectable projectile that touches
+- **Elune's Grace** (down), the roster's reflector. She braces with her bow raised
+  before her like a shield, a shield flash (`DefendCaster`) and a silver
+  shimmer (`SpellShieldCaster`) in front of her, and turns back every reflectable projectile that touches
   her body on frames 4-12, at the shield reflector's speed and damage
   multipliers. Its frame-4 hit pushes a close foe with 2% and a set
   knockback. It can be jump-cancelled from frame 4, and a 24-frame cooldown
@@ -101,7 +102,8 @@ Specials:
   64 and 94 (each lane 3 frames after the one before). A foe who stays in one
   lane takes 8.5%, 8.5% and 9%: 26%, with the first two holding them in place
   and the last one launching. Hitting her ends the channel and every star
-  still to fall.
+  still to fall. Each star strikes its lane as a falling-star burst
+  (`StarfallCaster`), so the stars read as landing ahead of her.
 
 Her home stage is Nordrassil (10), Hyjal's defence. Her Classic route ends
 at Archimonde, through Ashenvale and the Battle of Mount Hyjal.

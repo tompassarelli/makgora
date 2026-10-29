@@ -425,10 +425,9 @@ const STARFALL_WAVES = [{ frame: 34, effect: STARFALL_HOLD }, { frame: 64, effec
 const TYRANDE: AuthoredSpecial = {
   name: "Starfall", endFrame: 116, airStall: frames(1, 20),
   projectiles: [
-    { ...mark("Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdx", 2, 110, 0.0), cancelOnInterrupt: true },
     ...STARFALL_WAVES.flatMap(({ frame, effect }) => [80.0, 200.0, 320.0, 440.0].flatMap((x, lane): SpecialProjectile[] => [
       { ...mark("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", frame + 3 * lane - 12, 20, x), ...ON_FLOOR, cancelOnInterrupt: true },
-      { ...mark("Abilities\\Spells\\NightElf\\Starfall\\StarfallTarget.mdx", frame + 3 * lane, 14, x), ...ON_FLOOR, radius: 58.0, activeFrom: 8, effect, cancelOnInterrupt: true },
+      { ...mark("Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdx", frame + 3 * lane, 14, x), ...ON_FLOOR, radius: 58.0, activeFrom: 8, effect, cancelOnInterrupt: true },
     ])),
   ],
 };
