@@ -1,11 +1,11 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { Character } from "./codes";
+import { AttackStyle, Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { setWorldMotionValue } from "./motion";
 import type { Controls, Roster } from "./roster";
 import { surfaceLeft, surfaceRight, surfaceZ } from "./stage";
-import { controls } from "./testWorld";
+import { controls, testBeginAttacks } from "./testWorld";
 import { duelPair, stepDuel } from "./testDuel";
 
 const STAGE = 1;
@@ -50,6 +50,17 @@ function fallFrom(height: number, input: Readonly<Controls>): Scene {
   return s;
 }
 
+function mountFrom(input: Readonly<Controls>): Scene {
+  const s = scene();
+  place(s.f, surfaceZ(STAGE, PLATFORM, 0) - 40.0, 6.0);
+  for (let i = 0; i < 30 && !s.f.motion.grounded; i++) stepDuel(s.world, input, NEUTRAL, STAGE);
+  return s;
+}
+
+function fallThrough(s: Scene, input: Readonly<Controls>): void {
+  for (let i = 0; i < 90 && !s.f.motion.grounded; i++) stepDuel(s.world, input, NEUTRAL, STAGE);
+}
+
 function standsOnPlatform(f: Fighter): boolean {
   return f.motion.grounded && f.motion.surface === PLATFORM;
 }
@@ -70,7 +81,7 @@ test("A fighter who lands on a platform without holding down drops through on hi
 });
 
 test("A fighter who lands on a platform with down held stays on it until the stick is let go and flicked down once, which drops him [k1 scenario]", () => {
-  const landed = fallFrom(30.0, DOWN);
+  const landed = mountFrom(DOWN);
   assertTrue(standsOnPlatform(landed.f));
   hold(landed, DOWN, HOLD_FRAMES);
   assertTrue(standsOnPlatform(landed.f));
@@ -80,15 +91,37 @@ test("A fighter who lands on a platform with down held stays on it until the sti
   assertFalse(landed.f.motion.grounded);
 });
 
-test("A fighter falling onto a platform with down held, in a fast fall or not, lands on it and does not pass through [k1 scenario]", () => {
+test("A fighter falling onto a platform with down held past crouch depth, in a fast fall or not, passes through it and does not start a fast fall [k1 scenario]", () => {
   for (const input of [DOWN, FLICK_DOWN]) {
     for (const height of [30.0, 150.0]) {
       const s = fallFrom(height, input);
-      assertTrue(standsOnPlatform(s.f));
-      hold(s, input, HOLD_FRAMES);
-      assertTrue(standsOnPlatform(s.f));
+      assertFalse(standsOnPlatform(s.f));
+      assertTrue(s.f.motion.z < surfaceZ(STAGE, PLATFORM, 0));
+      assertFalse(s.f.motion.fastFalling);
+      fallThrough(s, input);
+      assertEquals(s.f.motion.surface, 0);
     }
   }
+});
+
+test("A fighter falling onto a platform with an aerial active and down held lands on it [k1 scenario]", () => {
+  for (const input of [DOWN, FLICK_DOWN]) {
+    const s = scene();
+    place(s.f, surfaceZ(STAGE, PLATFORM, 0) + 60.0, 0.0);
+    testBeginAttacks(s.world, AttackStyle.neutralAir, undefined);
+    for (let i = 0; i < 60 && !s.f.motion.grounded && s.f.motion.z > surfaceZ(STAGE, PLATFORM, 0) - 1.0; i++) stepDuel(s.world, input, NEUTRAL, STAGE);
+    assertTrue(standsOnPlatform(s.f));
+  }
+});
+
+test("A fighter who fast falls and lets the stick go to neutral before reaching a platform lands on it [k1 scenario]", () => {
+  const s = scene();
+  place(s.f, surfaceZ(STAGE, PLATFORM, 0) + 150.0, 0.0);
+  hold(s, FLICK_DOWN, 3);
+  assertTrue(s.f.motion.fastFalling);
+  assertTrue(s.f.motion.z > surfaceZ(STAGE, PLATFORM, 0) + 20.0);
+  for (let i = 0; i < 60 && !s.f.motion.grounded && s.f.motion.z > surfaceZ(STAGE, PLATFORM, 0) - 1.0; i++) stepDuel(s.world, NEUTRAL, NEUTRAL, STAGE);
+  assertTrue(standsOnPlatform(s.f));
 });
 
 test("A slow, gentle push down on a platform crouches without dropping [k1 scenario]", () => {
@@ -101,9 +134,7 @@ test("A slow, gentle push down on a platform crouches without dropping [k1 scena
 });
 
 test("Rising into a platform with down held still lands on it crouching [k1 scenario]", () => {
-  const s = scene();
-  place(s.f, surfaceZ(STAGE, PLATFORM, 0) - 40.0, 6.0);
-  for (let i = 0; i < 30 && !s.f.motion.grounded; i++) stepDuel(s.world, DOWN, NEUTRAL, STAGE);
+  const s = mountFrom(DOWN);
   assertTrue(standsOnPlatform(s.f));
   assertTrue(s.f.motion.crouching);
   hold(s, DOWN, HOLD_FRAMES);

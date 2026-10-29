@@ -1307,10 +1307,14 @@ Rising through a platform while holding Down past the deadzone, without an
 aerial, instantly stands on it and emits the ordinary landing puff; the next
 frame is actionable. Neutral rising and active aerials pass through. A fresh
 hard Down while standing drops immediately; held Down after mounting remains
-a crouch and permits down tilt or down-B. Falling with full Down passes through
-and cancels the aerial without landing lag. Drops consume Down until a neutral
-reset and fresh press, so the drop itself never starts fast fall. Ordinary
-falling contact still lands; platforms still have no walls or underside.
+a crouch and permits down tilt or down-B. Falling onto a platform with Down
+held past crouch depth (below −0.6875, so the tilt modifier's −0.675 does not
+drop) passes through, as in Melee, unless an aerial is active, which lands
+(Tom, 2026-10-30, reversing his 2026-10-28 rule; [SmashWiki, Soft
+platform](https://www.ssbwiki.com/Soft_platform)). Fast falling and letting the
+stick go before contact lands. Drops consume Down until a neutral reset and
+fresh press, so a drop never starts fast fall by itself. Other falling contact
+lands; platforms still have no walls or underside.
 
 ## Ground traction by fighter
 

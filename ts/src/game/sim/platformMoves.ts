@@ -88,6 +88,12 @@ export function dropFromPlatform(f: Fighter, stage: number, matchFrame: number, 
   return true;
 }
 
+export function beginPlatformContact(f: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, deck: number | undefined): boolean {
+  if (deck === undefined || f.motion.grounded || !intentOpen(f, stage, deck) || input.walking || stickZ(input) >= -CROUCH_STICK_THRESHOLD || isAerialAttack(f.attack.style)) return false;
+  dropPlatform(f, stage, matchFrame, deck);
+  return true;
+}
+
 export function belowStandingPlatform(attacker: Readonly<Fighter>, target: Readonly<Fighter>, stage: number | undefined): boolean {
   const { motion } = attacker;
   if (stage === undefined || !motion.grounded || motion.surface === undefined || !surfacePass(stage, motion.surface)) return false;

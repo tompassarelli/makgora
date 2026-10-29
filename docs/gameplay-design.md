@@ -902,11 +902,13 @@ animations and their frames from #103/#392.
 - The drop consumes that down input and never starts fast fall. Leave the down
   zone toward neutral, or release the keyboard key, then press down again to
   fast-fall within the existing fast-fall window.
-- Falling onto a platform with down held lands on it, as with any other
-  input; the only way down through a platform is to stand on it and give a
-  down input. Landing with down already held needs the stick let go and
-  pressed down again to drop (Tom, 2026-10-28, replacing the 14 Oct rule that
-  a fall with full down passed through).
+- Falling onto a platform with down held past crouch depth (below −0.6875;
+  the tilt modifier's −0.675 does not drop), in a fast fall or not, passes
+  through it, as in Melee, unless an aerial is active, which lands. Fast
+  falling and letting the stick go before contact lands as usual. The drop
+  consumes that down input like a standing drop and never starts a fast fall
+  (Tom, 2026-10-30, reversing his 2026-10-28 rule that a fall with down held
+  lands; [SmashWiki, Soft platform](https://www.ssbwiki.com/Soft_platform)).
 - Tom’s two-platform route is falling down air → drop → up air → drop →
   double jump → rising up air through the platform → down air.
 

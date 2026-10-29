@@ -253,9 +253,6 @@ deviation's reason, issue and decision date are written.
 
 - L-cancel, probed on every aerial `l-cancel`: 0 pass, 2 departure
   - landing: neutral aerial landing lag with no L press: Rifleman departure, Illidan departure
-- Platform drop `platform-drop`: 4 pass, 0 departure
-  - platform: falling onto a raised deck holding down: landing: Rifleman pass, Illidan pass
-  - platform: still holding down 30 frames after that landing: Rifleman pass, Illidan pass
 - Air dodge `air-dodge`: 0 pass, 2 departure
   - shield/dodge: air dodge ends in helpless fall: no attack before landing: Rifleman departure, Illidan departure
 

@@ -710,6 +710,7 @@ function downThroughDeck(character: Character): string {
 
 const PLATFORM_LINES = "platforms are floor lines that are solid only while descending; ceilings ignore them";
 const PLATFORM_PASS = "Pass needs stick y of at least 0.66 down, reached within 6 frames, on a platform";
+const PLATFORM_HELD_DOWN = "from Melee on, an airborne character drops through a soft platform by holding down, except during an aerial attack, which lands";
 
 const PLATFORMS: readonly Scenario[] = [
   { area: "hazard", name: "Whispy's first gust moves a standing fighter", cite: "wind strength 0.2; wind after blow frame 45", run: (c) => {
@@ -764,8 +765,8 @@ const PLATFORMS: readonly Scenario[] = [
     area: "platform", name: "fresh down on a raised deck: how the fighter leaves it", cite: `${PLATFORM_PASS}; the fighter enters a fall at once`,
     run: (c) => ({ expected: "falls through at once", actual: downThroughDeck(c) }),
   },
-  { area: "platform", name: "falling onto a raised deck holding down: landing", cite: `${PLATFORM_LINES}; airborne collision has no stick test`, deviation: "platform-drop", run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 0) }) },
-  { area: "platform", name: "still holding down 30 frames after that landing", cite: PLATFORM_PASS, deviation: "platform-drop", run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 30) }) },
+  { area: "platform", name: "falling onto a raised deck holding down: passes through", cite: PLATFORM_HELD_DOWN, run: (c) => ({ expected: "airborne", actual: landHoldingDown(c, 0) }) },
+  { area: "platform", name: "still holding down 30 frames after passing through: where the fighter stands", cite: PLATFORM_HELD_DOWN, run: (c) => ({ expected: "main deck", actual: landHoldingDown(c, 30) }) },
 ];
 
 
