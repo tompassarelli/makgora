@@ -12,6 +12,17 @@ export const fighterSelectChecks = (pass: readonly Rule[]): NativeCheck[] => [
   })),
   ...felGromChecks(pass),
   {
+    id: "739-portrait-chips", closes: "smashcraft#739 native check", map: "fighter-select", session: "739-portrait-chips",
+    setup: [
+      { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
+      { chat: "-dev slots 1 14" }, { chat: "-dev fighter 1 Illidan" }, { chat: "-dev fighter 2 JainaProudmoore" }, { chat: "-dev fighter 3 Firelord" }, { chat: "-dev fighter 4 Peon" },
+      { waitMs: 1500 },
+    ],
+    capture: [{ kind: "frames", name: "portrait-chips", client: "a" }],
+    pass,
+    look: "Cards 1-3 show Illidan, Jaina and the Firelord, and their roster grid tiles, each a head-and-shoulders bust at about the roster's head size, none a small figure floating in its tile or chip; the computer card's preview sits centred in its preview area above its summary.",
+  },
+  {
     id: "434-chat-fighter-select", closes: "smashcraft#566", map: "fighter-select", session: "434-chat-select",
     setup: [
       { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Rifleman", client: "b" },
