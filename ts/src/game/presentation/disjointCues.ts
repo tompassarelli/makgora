@@ -14,6 +14,7 @@ const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\F
 const ARCANE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", scale: f32(0.9), seconds: f32(0.3), timeScale: 1.0, birth: { eachFrame: false } };
 const NATURE_FLARE: Cue = { ...FIRE_FLARE, model: "Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx" };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
+const NOVA_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", scale: f32(0.38), sequence: "birth", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.rifleman]: NEUTRAL_FLARE,
@@ -21,7 +22,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.blademaster]: NEUTRAL_FLARE,
   [Character.mountainKing]: NEUTRAL_FLARE,
   [Character.warden]: NEUTRAL_FLARE,
-  [Character.lich]: FROST_FLARE,
+  [Character.lich]: NOVA_FLARE,
   [Character.uther]: HOLY_FLARE,
   [Character.dreadlord]: NEUTRAL_FLARE,
   [Character.shadowHunter]: NEUTRAL_FLARE,
@@ -50,6 +51,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
 export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly AttackStyle[] } = {
   [Character.malfurion]: [AttackStyle.dashAttack],
   [Character.medivh]: [AttackStyle.dashAttack],
+  [Character.lich]: [AttackStyle.jab, AttackStyle.jab2, AttackStyle.upSmash, AttackStyle.upTilt, AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir, AttackStyle.dashAttack],
 };
 
 
