@@ -84,3 +84,23 @@ Expert gameplan: choose which ground to deny with the column and the pillars,
 cover the foe's landing with the back air, and hold the foe in place with
 Bash into the forward smash. It uses the full authored kit and gameplan at
 the same CPU skill.
+
+## Measured balance (2026-10-29)
+
+The Balance workflow's field (Wren Expert, 400 matches a pair) over his 27
+matchups only (`--matchups`), at main f994bc7, GitHub run
+[40889015028](https://github.com/tompassarelli/smashcraft/actions/runs/40889015028),
+puts him at **34% wins**, outside the 40-60% band. This is a repair
+measurement, not the full-roster gate. Against the profile above (archetype
+bait-and-punish):
+
+- air share of normals 7% (band 10-35)
+- aerials n/f/b/u/d 27/12/42/6/13% (all inside their bands)
+- approach share of movement 82% (band 25-55: the bot walks in instead of
+  waiting to punish)
+- ranged share of damage 4% (band 20-50)
+- specials n/s/u/d 7/24/8/4% of moves (side special over its 5-20 band)
+
+His kills come from forward smash (50%), Finger of Death (11%) and dash
+attack (10%). 43% of his stocks are lost more than 3 s after a hit. His worst matchups are Chen (3%), Pit Lord (4%),
+Jaina (15%) and Cairne (17%); he beats Mountain King (76%) and Warden (72%).
