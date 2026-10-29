@@ -14,7 +14,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | input | `ts/src/game/input/` | Action vocabulary, key bindings, pad packet decode, wire; owns the controller contract | core |
 | sim | `ts/src/game/sim/` (geometry helpers in `sim/geometry/`) | Deterministic per-frame simulation; no natives, no presentation | core |
 | fighter-kit | `ts/src/game/fighters/<slug>/` (`kit.ts`, `moves.ts`, `specials.ts`), shared helpers in `ts/src/game/sim/heroes/` | One fighter's gameplay data and special hooks | sim, core |
-| snapshot | `ts/src/game/replay/{canonical,fighterState,difference,history,snapshot}.ts` | Canonical text, state hash, copy/compare/diff, rollback ring | sim, core |
+| snapshot | `ts/src/game/replay/{canonical,kitCanonical,specialCanonical,fighterState,difference,history,snapshot}.ts` | Canonical text (state, kit and special writers), state hash, copy/compare/diff, rollback ring | sim, core |
 | ai | `ts/src/game/match/bot*.ts`, `match/cpu*.ts`, `fighters/<slug>/gameplan.ts` | Bots, perception, gameplans, edge-guard scenarios | sim, snapshot, input, core |
 | roster | `ts/src/game/roster/kits.ts`, `menu/stageCatalog.ts` | The only all-fighter and all-stage lists | fighter-kit, ai, core |
 | lobby | `ts/src/game/lobby/lobbyState.ts`, `ts/src/game/menu/` | Slots, humans/CPU, character/stage select, teams, stock/timer choice | roster, core |

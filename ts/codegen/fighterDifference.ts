@@ -48,7 +48,7 @@ const differs = (row: FighterFieldRow, left: string, right: string, need: Need):
   if (row.type === "ref") {
     const kit = row.canon === "none" || row.canon.kit === undefined ? undefined : DIFF_KITS[row.canon.kit];
     if (kit === undefined) throw new Error(`${row.path}: a reference reports through a record or a canonical kit`);
-    return `${left} !== ${right} && ${need(kit, "replay/canonical")}(${left}) !== ${kit}(${right})`;
+    return `${left} !== ${right} && ${need(kit, "replay/kitCanonical")}(${left}) !== ${kit}(${right})`;
   }
   if (row.canon !== "none" && row.canon.writer === "slotRef") return `${need("differentSlot", "")}(${left}, ${right}, expectedMask, actualMask)`;
   if (typeof diff === "object" && "absent" in diff) return `(${left} ?? ${diff.absent}) !== (${right} ?? ${diff.absent})`;

@@ -31,7 +31,9 @@ import { authoredTuning } from "../sim/tuning";
 import { settleProjectileSlots } from "../sim/fighterProjectiles";
 import { settleRestingGroups } from "../sim/fighterRest";
 import { mutablePlacedObject } from "../sim/fighter";
-import { canonicalState, fighterSpecialsCanonical, specialMoveCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";
+import { canonicalState, stateChecksum } from "./canonical";
+import { fighterSpecialsCanonical, specialMoveCanonical } from "./kitCanonical";
+import { specialPlacementCanonical, specialProjectileCanonical } from "./specialCanonical";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
 
 
