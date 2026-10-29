@@ -1,4 +1,4 @@
-import { appendFileSync, closeSync, cpSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, closeSync, cpSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, hostname } from "node:os";
 import { join } from "node:path";
 import { Console, Effect, Fiber, Schema } from "effect";
@@ -163,6 +163,13 @@ const fixtureTimes = (checkpoint: string, log: ReturnType<typeof logTo>, group: 
   return captures;
 });
 
+/** The jobs whose every manifest frame is in the checkpoint: a batch that misses one clip still returns every clip it captured whole. */
+export const capturedWhole = (fixtures: ReadonlyMap<string, readonly string[]>, manifest: readonly { readonly name: string; readonly frames: readonly number[] }[], captures: readonly { readonly fixture: string; readonly frame: number }[]) => {
+  const got = new Set(captures.map(capture => `${capture.fixture}@${capture.frame}`));
+  const whole = new Set(manifest.filter(fixture => fixture.frames.every(frame => got.has(`${fixture.name}@${frame}`))).map(fixture => fixture.name));
+  return new Set([...fixtures].filter(([, own]) => own.length > 0 && own.every(name => whole.has(name))).map(([job]) => job));
+};
+
 const sheetFor = (job: Job, fixtures: readonly string[], captures: readonly { readonly fixture: string; readonly frame: number; readonly file: string }[], frames: string, logFile: string) => Effect.gen(function*() {
   const directory = join(queueDirectory("results"), job.id), judge = join(directory, "judge"), sheet = join(directory, "sheet.png");
   yield* attempt("create the result folder", () => mkdirSync(judge, { recursive: true }));
@@ -188,19 +195,27 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     const map = join(directory, `g${index}.w3x`);
     yield* spawnLogged(["bun", settings.capacity, "session", "--class", "moderate", "--owner", `capture-queue-build-${batch}`, "--", "bun", "scripts/nativeCapture.ts", "build", "--out", map, "--name", `Smashcraft capture queue ${batch} g${index}`, ...group.jobs.map(job => join(directory, `pads-${index}`, job.id))], sourceTs, logFile);
     const manifest = `${map.replace(/\.w3x$/, "")}.captures.json`;
-    const identity = yield* attempt("read the map manifest", () => JSON.parse(readFileSync(manifest, "utf8")) as { readonly mapSha256: string; readonly sourceRevision: string; readonly fixtures: readonly { readonly frames: readonly number[] }[] });
+    const identity = yield* attempt("read the map manifest", () => JSON.parse(readFileSync(manifest, "utf8")) as { readonly mapSha256: string; readonly sourceRevision: string; readonly fixtures: readonly { readonly name: string; readonly frames: readonly number[] }[] });
     yield* log({ step: "map build", group: index, lanes: group.jobs.map(job => job.lane), fixtures: [...fixtures.values()].flat().length, seconds: seconds(built), mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision });
     const plan = join(directory, `plan-${index}.json`);
     yield* attempt("write the plan", () => writeAtomic(plan, `${JSON.stringify({ version: 1, sourceRevision: identity.sourceRevision, rows: [{ name: `g${index}`, map, manifest, mapSha256: identity.mapSha256, frames: identity.fixtures.flatMap(fixture => fixture.frames) }] })}\n`));
     yield* poolReady;
     const captured = performance.now();
-    if (settings.remote === undefined) yield* spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(settings.minutes)], tsDirectory, logFile);
-    else yield* captureThere(settings, settings.remote, { batch, index, directory, logFile, manifest, plan, log });
+    const ran = yield* (settings.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(settings.minutes)], tsDirectory, logFile)
+      : captureThere(settings, settings.remote, { batch, index, directory, logFile, manifest, plan, log })).pipe(Effect.result);
     yield* log({ step: "capture", group: index, host: settings.remote?.name ?? hostname(), seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
-    const captures = yield* fixtureTimes(join(frames, "checkpoint.json"), log, index);
+    const checkpoint = join(frames, "checkpoint.json");
+    if (ran._tag === "Failure" && !existsSync(checkpoint)) return yield* ran.failure;
+    const captures = yield* fixtureTimes(checkpoint, log, index);
+    const whole = capturedWhole(fixtures, identity.fixtures, captures);
     for (const job of group.jobs) {
       const own = fixtures.get(job.id) ?? [];
+      if (ran._tag === "Failure" && !whole.has(job.id)) {
+        yield* finish(job, { batch, status: "failed", problem: ran.failure.message });
+        yield* log({ step: "failed", id: job.id, problem: ran.failure.message });
+        continue;
+      }
       const { sheet, judge } = yield* sheetFor(job, own, captures, frames, logFile);
       yield* finish(job, { batch, status: "captured", mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision, fixtures: own, sheet, judge, frames });
       yield* log({ step: "sheet", id: job.id, sheet });
@@ -221,11 +236,14 @@ const captureThere = (settings: Settings, host: RemoteHost, group: { readonly ba
   yield* sendFile(host, group.manifest, join(there, "manifest.json"), group.logFile);
   yield* sendFile(host, remotePlan, join(there, "plan.json"), group.logFile);
   const north = join(host.home, "code/north/main/harness/skills");
-  yield* runThere(host, join(host.home, "code/smashcraft/main/ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),
+  const ran = yield* runThere(host, join(host.home, "code/smashcraft/main/ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),
     "--desktop", join(north, "private-desktop-development/scripts/private-desktop.sh"), "--capacity", join(north, "machine-capacity/scripts/machine-capacity.mjs"),
     "--clients-file", join(host.home, ".local/state/wisp/lan/clients.json"), "--client", settings.client,
-    "--install", join(host.home, `.local/share/wisp/lan/clients/${settings.client}/pfx/drive_c/Program Files (x86)/Warcraft III`), "--minutes", String(settings.minutes)], group.logFile);
-  yield* fetchFolder(host, join(there, "native"), join(group.directory, `native-${group.index}`), group.logFile);
+    "--install", join(host.home, `.local/share/wisp/lan/clients/${settings.client}/pfx/drive_c/Program Files (x86)/Warcraft III`), "--minutes", String(settings.minutes)], group.logFile).pipe(Effect.result);
+  const fetched = fetchFolder(host, join(there, "native"), join(group.directory, `native-${group.index}`), group.logFile);
+  if (ran._tag === "Success") return yield* fetched;
+  yield* Effect.ignore(fetched);
+  return yield* ran.failure;
 });
 
 const runBatch = <R>(settings: Settings, hosts: Hosts, jobs: readonly Job[], ensurePool: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
