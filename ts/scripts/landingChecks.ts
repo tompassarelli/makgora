@@ -3,7 +3,7 @@ import { dirname, join, relative } from "node:path";
 
 const root = join(import.meta.dir, "../..");
 
-export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "corpus", "types"] as const;
+export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "corpus", "types", "static"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export const FULL_SUITE_VARIABLE = "LAND_FULL_SUITE";
@@ -31,6 +31,8 @@ const LUA_BUILD = /^(ts\/(src|codegen)\/|build-inputs\/)/;
 const TYPES = /^(ts\/|contracts\/|repos\/effect|effect-kit\.json$|typescript-toolchain\.lock$)/;
 const TAPES = /^ts\/test\/(tapes|replay|host-natives)/;
 const CORPUS = /^ts\/test\/corpus\//;
+const TYPE_CHECKED = /^(ts\/|typescript-toolchain\.lock$)/;
+const SUITE_FILES = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts", "ts/scripts/prePush.ts"];
 const REPLAY_HEADER = /^ts\/src\/game\/(replay\/(replayFormat|matchReplay)|core\/gameFiles)\.ts$/;
 
 const WISP_CLI = "ts/scripts/wisp.ts";
@@ -128,6 +130,16 @@ export const CHECKS: readonly LandingCheck[] = [
     command: ["bun", "scripts/cpuCoverage.ts"],
     reaches: [shared, imported(["ts/scripts/cpuCoverage.ts"])], farm: ["corpus"], here: "beside",
   },
+  // The pre-push hook's own hosted checks (smashcraft:ts/scripts/prePush.ts), which the farm runs for a landing so its machine runs none of them.
+  { name: "clean room", command: ["bun", "scripts/cleanRoom.ts"], reaches: [pattern(/./, "any changed path")], farm: ["static"] },
+  {
+    name: "kind tags, parity ledger and type-check ts",
+    command: ["bun", "run", "check"], reaches: [pattern(TYPE_CHECKED, "under ts/ or the toolchain lock")], farm: ["static"],
+  },
+  {
+    name: "Autoland suite covers the farm suite",
+    command: ["bun", "scripts/suiteParity.ts"], reaches: [files(SUITE_FILES, "an input of the suite parity check")], farm: ["static"],
+  },
   {
     name: "type-check edit loop and dependency validation",
     command: ["bun", "scripts/typecheck-benchmark.ts"],
@@ -161,12 +173,19 @@ export function selectGroups(paths: readonly string[], full = false): Selected[]
   });
 }
 
+const deferredToMain = ({ check, shared }: Reached) => check.afterLanding === true && !shared;
+
 export interface Landing { readonly run: readonly Reached[]; readonly afterLanding: readonly Reached[] }
 
 export function landingSelection(paths: readonly string[], full = false): Landing {
   const reached = reachedChecks(paths, full).filter(({ check }) => check.here !== undefined);
-  const deferred = ({ check, shared }: Reached) => check.afterLanding === true && !shared;
-  return { run: reached.filter((entry) => !deferred(entry)), afterLanding: reached.filter(deferred) };
+  return { run: reached.filter((entry) => !deferredToMain(entry)), afterLanding: reached.filter(deferredToMain) };
+}
+
+/** The farm-test.yml groups a landing needs: those of every reached check except the ones left to main's CI. */
+export function landingGroups(paths: readonly string[], full = false): Group[] {
+  const reached = reachedChecks(paths, full).filter((entry) => !deferredToMain(entry));
+  return GROUPS.filter((group) => reached.some(({ check }) => check.farm.includes(group)));
 }
 
 const located = ({ path, why }: { readonly path: string; readonly why: string }) => (path === "" ? why : `${path} is ${why}`);

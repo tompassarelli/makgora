@@ -213,7 +213,9 @@ const mainRedNotice = run(["gh", "issue", "list", "--state", "open", "--search",
 
 const WORKFLOWS = ".github/workflows/";
 
-export const HAND_OFF = "refs/heads/claude/land-";
+export const FARM_SCRATCH = "refs/heads/farm/";
+
+export const HAND_OFF ="refs/heads/claude/land-";
 
 export function autolandLands(queue: string, paths: readonly string[]): boolean {
   return queue === "autoland" && !paths.some((path) => path.startsWith(WORKFLOWS));
@@ -237,7 +239,8 @@ const pushChecks = (input: string, landing: Landing, local: Local) => Effect.gen
     const [, commit, remoteRef, remote] = line.trim().split(/\s+/);
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];
   });
-  const paths = [...new Set((yield* Effect.forEach(pushed, ({ commit, remote }) => local.changed(commit, remote))).flat())];
+  if (pushed.length > 0 && pushed.every(({ remoteRef }) => remoteRef?.startsWith(FARM_SCRATCH) === true)) return;
+  const paths = [...new Set((yield* Effect.forEach(pushed,({ commit, remote }) => local.changed(commit, remote))).flat())];
   const selected = checksFor(paths, local.cues(), local.strikes()).filter((check) => !((check.privateStore || check.machineTool) && local.hosted));
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
