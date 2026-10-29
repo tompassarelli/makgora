@@ -11,8 +11,8 @@ const PITCH_COS = 0.9848077297210693;
 const PITCH_SIN = 0.1736481785774231;
 const HUD_SHARE = 0.4399999976158142;
 
-export const FRAMING_MARGIN = { top: 80.0, bottom: 100.0, side: 15.0 } as const;
-export const CLOSEST_BODY_SHARE = 0.30000001192092896;
+export const FRAMING_MARGIN = { top: 30.0, bottom: 50.0, side: 15.0 } as const;
+export const CLOSEST_BODY_SHARE = 0.550000011920929;
 
 export function bodyFrame(character: Character): ViewBounds {
   const bounds = FIGHTER_VIEW_BOUNDS[character];

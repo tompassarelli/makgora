@@ -62,3 +62,24 @@ matches before #110 our camera matched Melee's in typical movement (pan p95
 limit or the deck underside was reached (up to 24% of the view in one frame
 vs Melee's 7%), because those limits clamped the eased view instead of its
 goal.
+
+## Framing fighter bodies
+
+After localCamera, smashcraft:ts/src/game/presentation/fighterFraming.ts
+widens the shown view, never the deterministic camera, so each fighter's
+measured Stand body fits: 40 above the head, 60 below the feet and 15 at the
+sides, and no body taller than 55% of the view. Until 2026-10-30 the cap was
+30% with margins 80 and 100, so any fighter taller than about 160 (the
+Butcher, the Lich King, the Blademaster, the Dreadlord) pushed the whole
+shot out, and a touching Butcher and Thrall settled at the stage's widest
+view (1698, 1794 on Frozen Throne) with Thrall at 13% of the frame height;
+Tom found that view too wide in a playtest.
+
+Two fighters touching at centre stage now settle at the same distance on
+every stage: 766 for mid-sized pairs such as Illidan and Uther (each about
+23–29% of the frame height), 979 for the Butcher and Thrall (51% and 22%).
+Same-facing fighters 600 apart settle at 898. These close-range heights follow
+the direction of Melee's close framing, where a large fighter next to a small
+one takes about 40% and 28% of the frame, without matching it exactly;
+spread play is unchanged. The fighterFraming tests hold touching pairs at
+1000 or closer.
