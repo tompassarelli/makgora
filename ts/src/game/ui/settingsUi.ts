@@ -11,6 +11,7 @@ import {
   cancelBindingCapture,
   clearKey,
   customizeLayout,
+  deleteProfile,
   endNaming,
   loadProfile,
   nameSlot,
@@ -30,7 +31,7 @@ export interface SettingsActions {
   closeSettings(participantId: number): void;
 }
 
-type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "customize" } | { kind: "profile" } | { kind: "slot"; slot: number } | { kind: "name" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" };
+type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "customize" } | { kind: "profile" } | { kind: "slot"; slot: number } | { kind: "name" } | { kind: "delete" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" };
 
 interface KeyButton {
   readonly key: number;
@@ -47,7 +48,7 @@ export const presetButton = (index: number) => ({ x: f32(0.12) + index * PRESET_
 const CUSTOMIZE = presetButton(BINDING_PRESETS.length);
 export const LOAD_PROFILE = presetButton(BINDING_PRESETS.length + 1);
 export const profileSlotButton = (slot: number) => ({ x: LOAD_PROFILE.x, y: [f32(0.512), f32(0.476), f32(0.44)][slot] ?? LOAD_PROFILE.y, width: LOAD_PROFILE.width, height: f32(0.034) });
-export const NAME_SLOT = { x: LOAD_PROFILE.x, y: f32(0.584), width: LOAD_PROFILE.width, height: f32(0.03) } as const;
+export const DELETE_PROFILE = { x: LOAD_PROFILE.x, y: f32(0.584), width: LOAD_PROFILE.width, height: f32(0.03) } as const;
 export const NAME_BOX = { x: f32(0.39), y: f32(0.585), width: f32(0.21), height: f32(0.032) } as const;
 const DIM_KEY = 105;
 const LIT_KEY = 255;
@@ -91,6 +92,7 @@ export class SettingsPanel {
   private readonly profileButton: framehandle;
   private readonly slotButtons: readonly SlotButton[];
   private readonly nameButton: framehandle;
+  private readonly customOnly: readonly framehandle[];
   private readonly nameBox: framehandle;
   private readonly nameEvents: trigger;
   private readonly bindButton: { readonly frames: readonly framehandle[]; readonly label: framehandle };
@@ -151,7 +153,7 @@ export class SettingsPanel {
     });
     button("MeleeSettingsCustomize", CUSTOMIZE.x, CUSTOMIZE.y, CUSTOMIZE.width, CUSTOMIZE.height, "Customize", { kind: "customize" });
     this.profileButton = button("MeleeSettingsProfile", LOAD_PROFILE.x, LOAD_PROFILE.y, LOAD_PROFILE.width, LOAD_PROFILE.height, "Load profile", { kind: "profile" }).label;
-    this.nameButton = button("MeleeSettingsName", NAME_SLOT.x, NAME_SLOT.y, NAME_SLOT.width, NAME_SLOT.height, "Name slot", { kind: "name" }).label;
+    const remove = button("MeleeSettingsDelete", DELETE_PROFILE.x, DELETE_PROFILE.y, DELETE_PROFILE.width, DELETE_PROFILE.height, "Delete profile", { kind: "delete" });
     this.nameBox = createNameBox(root, participantId);
     this.nameEvents = this.nameTrigger();
     this.slotButtons = profileSlots((slot, x, y, width, height) => button(`MeleeSettingsSlot${I2S(slot)}`, x, y, width, height, "", { kind: "slot", slot }, f32(0.011), 37));
@@ -172,8 +174,10 @@ export class SettingsPanel {
     this.status = line("MeleeSettingsStatus", f32(0.12), f32(0.218), f32(0.6), f32(0.018));
     button("MeleeSettingsSave", f32(0.12), f32(0.155), f32(0.105), f32(0.032), "Save", { kind: "save" });
     button("MeleeSettingsClose", PICKER_DONE.x, PICKER_DONE.y, PICKER_DONE.width, PICKER_DONE.height, "Done", { kind: "close" });
-    button("MeleeSettingsReset", f32(0.34), f32(0.155), f32(0.14), f32(0.032), "Reset to layout", { kind: "reset" });
-    const bind = button("MeleeSettingsBind", f32(0.49), f32(0.155), f32(0.17), f32(0.032), "", { kind: "bindUnbound" });
+    const rename = button("MeleeSettingsName", f32(0.34), f32(0.155), f32(0.105), f32(0.032), "Rename", { kind: "name" }), reset = button("MeleeSettingsReset", f32(0.45), f32(0.155), f32(0.105), f32(0.032), "Reset", { kind: "reset" });
+    this.nameButton = rename.label;
+    this.customOnly = [remove.art, remove.label, remove.hotspot, rename.art, rename.label, rename.hotspot, reset.art, reset.label, reset.hotspot];
+    const bind = button("MeleeSettingsBind", f32(0.56), f32(0.155), f32(0.17), f32(0.032), "", { kind: "bindUnbound" });
     this.bindButton = { frames: [bind.art, bind.hotspot], label: bind.label };
     BlzFrameSetVisible(root, false);
   }
@@ -243,6 +247,7 @@ export class SettingsPanel {
     else if (button.kind === "profile") loadProfile(settings);
     else if (button.kind === "slot") pickCustomSlot(settings, button.slot);
     else if (button.kind === "name") beginNaming(settings);
+    else if (button.kind === "delete") deleteProfile(settings);
     else if (button.kind === "save") saveBindingSettings(settings);
     else if (button.kind === "close") this.close();
     else if (button.kind === "clear") clearKey(settings, button.key);
@@ -326,7 +331,8 @@ export class SettingsPanel {
       const name = slotLabel(settings, slot);
       setFrameText(label, settings.layout === "custom" && slot === settings.slot ? `${MENU_STYLE.gold}${name}|r` : name);
     });
-    setFrameText(this.nameButton, settings.naming ? `${MENU_STYLE.gold}Done naming|r` : "Name slot");
+    for (const frame of this.customOnly) BlzFrameSetVisible(frame, settings.layout === "custom");
+    setFrameText(this.nameButton, settings.naming ? `${MENU_STYLE.gold}Done naming|r` : "Rename");
     this.showNameBox(settings.naming);
   }
 

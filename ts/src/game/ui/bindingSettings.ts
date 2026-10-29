@@ -361,3 +361,16 @@ export function endNaming(settings: BindingSettings): void {
   saveBindingSettings(settings);
   settings.message = `Slot ${settings.slot + 1} is named ${slotLabel(settings)} and saved.`;
 }
+
+export function deleteProfile(settings: BindingSettings): void {
+  const custom = settings.customs[settings.slot];
+  if (!settings.ready || custom === undefined) return;
+  endNaming(settings);
+  settings.picking = false;
+  const deleted = slotLabel(settings);
+  custom.name = "";
+  selectCustom(settings, presetBindings("custom"));
+  edited(settings, `${deleted} deleted.`);
+  saveBindingSettings(settings);
+  settings.message = `${deleted} deleted. ${slotLabel(settings)} is back on the Custom defaults.`;
+}

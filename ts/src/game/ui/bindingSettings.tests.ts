@@ -13,6 +13,7 @@ import {
   clearKey,
   createBindingSettings,
   customizeLayout,
+  deleteProfile,
   initializeBindingSettings,
   loadProfile,
   loadSavedBindings,
@@ -380,4 +381,33 @@ test("Load profile opens the three slots by name or Custom 1-3, and picking one 
   assertEquals([0, 1, 2].map(slot => slotLabel(settings, slot)).join(","), "Custom 1,Custom 2,Friend");
   assertEquals(persistedSettings(stored).slot, 2, "the pick is saved");
   assertEquals(slotLabel(persistedSettings(stored)), "Friend", "the name is saved");
+});
+
+test("Delete profile empties the selected Custom slot to the stock Custom keys with no name, saves it, and leaves the other slots as they were [k2 property]", () => {
+  const empty: BindingLoadResult = { kind: "empty" };
+  let saved = "";
+  const settings = createBindingSettings(0, { load: (_owner, complete) => complete(empty), readLocal: () => empty, save: (_owner, text) => { saved = text; } });
+  initializeBindingSettings(settings);
+  applyBindingPreset(settings, "custom");
+  const named = (slot: number, name: string) => {
+    pickCustomSlot(settings, slot);
+    beginNaming(settings);
+    nameSlot(settings, name);
+    endNaming(settings);
+    beginBindingCapture(settings, Action.attack, 0);
+    captureBinding(settings, code("B"));
+    saveBindingSettings(settings);
+  };
+  named(0, "Keep");
+  named(1, "Gone");
+  deleteProfile(settings);
+  assertEquals(slotLabel(settings, 1), "Custom 2");
+  assertEquals(settings.layout, "custom");
+  assertEquals(settings.bindings.keys.join(","), presetBindings("custom").keys.join(","));
+  assertEquals(slotLabel(settings, 0), "Keep");
+  assertEquals(keyLabel(keyFor(settings.customs[0]?.bindings ?? settings.bindings, Action.attack, 0)), "B");
+  const reloaded = decodeLayouts(saved);
+  assertEquals(reloaded?.customs[1]?.name, "");
+  assertEquals(reloaded?.customs[1]?.bindings.keys.join(","), presetBindings("custom").keys.join(","));
+  assertEquals(reloaded?.customs[0]?.name, "Keep");
 });

@@ -88,7 +88,7 @@ action; click a lit key, press the key you want instead, then Save. If another
 action already held that key, the two swap and the screen says "Swapped with"
 that action. Press Delete instead of a key to clear the slot, or click the small x
 on a lit key's corner; an action left with no key is listed as Unbound, and a Bind button captures a key for it. Escape cancels a
-rebind. Reset to layout brings back the defaults of the layout you picked.
+rebind. On Custom the bottom row adds Rename, which names the selected slot, and Reset, which brings back the Custom defaults, and Delete profile above Load profile empties the selected slot back to the Custom defaults with no name.
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
