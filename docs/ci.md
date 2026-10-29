@@ -58,7 +58,9 @@ fetch, rebase, scan and push:
    rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
    artifact kept 7 days that every Farm test job looks up first (so Autoland's
    suite reuses it too, logging "Autoland reusing GROUP"), so a retry or a
-   rebase onto a moved main reruns only the groups whose files changed. When origin main moves while
+   rebase onto a moved main reruns only the groups whose files changed. The
+   static group's inputs are every tracked file (the clean room reads any
+   path), so it reruns on each change. When origin main moves while
    a run is in flight the exact landing reruns it on the rebased tree, up to
    three times, then under the lock. A raw `git push` to main, which skips
    safe-push, still runs the pre-push hook's local gate
