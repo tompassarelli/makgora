@@ -45,7 +45,7 @@ on:
         description: Runner label for the shard and probe jobs for a one-off measurement; background routing is checked in this workflow
         default: ""
 
-run-name: Balance ${{ inputs.ref }} ${{ inputs.opponent }} ${{ inputs.tier }} ${{ inputs.per-pair }} a pair ${{ inputs.tag }}
+run-name: Balance ${{ inputs.ref }} ${{ inputs.lane }} ${{ inputs.opponent }} ${{ inputs.tier }} ${{ inputs.per-pair }} a pair ${{ inputs.tag }}
 
 concurrency:
   group: balance ${{ inputs.lane || 'main' }} ${{ inputs.opponent }} ${{ inputs.tier }} ${{ inputs.per-pair }} ${{ inputs.matchups && inputs.tag }} ${{ inputs.ledge-rule }}

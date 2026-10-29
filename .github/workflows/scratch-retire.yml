@@ -1,0 +1,38 @@
+name: Scratch retire
+
+# A farm/ or probe/ branch is scratch for one measurement: when a farm run completes, delete every such branch no run is using (smashcraft:docs/commands/farm.md).
+on:
+  workflow_run:
+    workflows: [Farm test, Balance, Perf, Headless pads, Memory soak]
+    types: [completed]
+  workflow_dispatch:
+
+run-name: Scratch retire
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: scratch-retire
+  cancel-in-progress: false
+
+jobs:
+  retire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: ts
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - run: bun scripts/scratchRetire.ts
+        working-directory: ts
+        env:
+          GH_TOKEN: ${{ github.token }}

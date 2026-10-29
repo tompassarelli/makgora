@@ -9,10 +9,13 @@
   with `--lane NAME` (pushed to `claude/NAME`) or on a `probe/NAME` branch
   (`safe-push --to probe/NAME`, then `--lane probe/NAME`), never on a scratch
   branch. A `probe/` branch is a candidate measured by the farm field only:
-  Autoland never lands it, and its author deletes it once the result is
-  read. Memory soaks, perf, pads and difficulty runs may also use a `farm/`
+  Autoland never lands it. Memory soaks, perf, pads and difficulty runs may also use a `farm/`
   scratch branch, the place for scratch instrumentation, since Autoland lands
   every pushed `claude/` lane, including one pushed only to be measured.
+  The Scratch retire workflow (smashcraft:.github/workflows/scratch-retire.yml)
+  runs when any of these runs completes and deletes every `farm/` and `probe/`
+  branch no active run, open pull request or push under 15 minutes old holds;
+  the deletion line prints the `git push` that restores it.
   A newer run of the same shape on the same line (main, the lane or the
   scratch commit) cancels the older one (each `--matchups` run is its own shape,
   because GitHub refuses a run whose concurrency group holds a long pair list),

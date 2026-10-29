@@ -21,7 +21,7 @@ on:
         description: Names the run so `bun wisp farm` can find the one it dispatched
         default: ""
 
-run-name: Perf ${{ inputs.ref }} ${{ inputs.tag }}
+run-name: Perf ${{ inputs.ref }} ${{ inputs.lane }} ${{ inputs.tag }}
 
 permissions:
   contents: read
