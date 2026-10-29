@@ -3,7 +3,7 @@ import { dirname, join, relative } from "node:path";
 
 const root = join(import.meta.dir, "../..");
 
-export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "corpus", "types", "static"] as const;
+export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "corpus", "types", "static"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export const FULL_SUITE_VARIABLE = "LAND_FULL_SUITE";
@@ -93,7 +93,7 @@ export const CHECKS: readonly LandingCheck[] = [
   {
     name: "parity tapes",
     command: ["bun", "wisp", "parity", "tapes"],
-    reaches: parity, farm: ["parity-0", "parity-1", "parity-2"], shardVariable: "TAPES_SHARD", here: "beside",
+    reaches: parity, farm: ["parity-0", "parity-1", "parity-2", "parity-3"], shardVariable: "TAPES_SHARD", here: "beside",
   },
   { name: "parity numeric", command: ["bun", "wisp", "parity", "numeric"], reaches: parity, farm: ["parity-0"], here: "beside" },
   {

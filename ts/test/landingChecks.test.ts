@@ -23,7 +23,7 @@ test("a landing runs no check for docs, every check for a shared root or the ful
   expect(before(["docs/ci.md"], true)).toEqual(HERE);
   expect(before(["ts/src/game/sim/codes.ts"])).toEqual(["parity tapes", "parity numeric", "stack-trace profile TypeScript frames", "every selectable computer fighter is active"]);
   expect(after(["ts/src/game/sim/codes.ts"])).toEqual([PERF, ROLLBACK]);
-  expect(groups(["ts/src/game/sim/codes.ts"])).toEqual(["perf", "rollback", "parity-0", "parity-1", "parity-2", "corpus", "static"]);
+  expect(groups(["ts/src/game/sim/codes.ts"])).toEqual(["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "corpus", "static"]);
   expect(before(["ts/scripts/wisp/commands/tapes.ts"])).toEqual(["parity tapes", "parity numeric", "stack-trace profile TypeScript frames"]);
   expect(before(["ts/test/corpus/2026-10-08T08-30-47-695Z/a/smashcraft-replay-39.txt"])).toEqual(["parity corpus: every native recording replays headless with 0 divergent frames"]);
   for (const parse of ["ts/src/game/replay/replayFormat.ts", "ts/src/game/core/gameFiles.ts"]) expect(before([parse])).toContain(CORPUS);
