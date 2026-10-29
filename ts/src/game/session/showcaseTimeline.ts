@@ -9,6 +9,7 @@ import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack }
 import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import { heroCueWindows } from "../presentation/cueWindows";
 import { SHIELD_PROJECTILE_SPEED_MULTIPLIER } from "../sim/shield";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 
 export const SHOWCASE_FIRST_FRAME = 40;
 export const SHOWCASE_SPECIAL_SLOTS: readonly string[] = ["neutral_b", "side_b", "up_b", "down_b"];
@@ -46,7 +47,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const original = heroDefinition(character) === undefined;
   const normals = Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined
     || (original && code !== AttackStyle.grab && code !== AttackStyle.dashAttack));
-  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? { gap: aerialGap(tuning.moves?.normals[code]), lift: aerialLift(tuning.moves?.normals[code]) } : { gap: reachGap(tuning.moves?.normals[code]) }) }));
+  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? { gap: aerialGap(tuning.moves?.normals[code]), lift: aerialLift(tuning.moves?.normals[code]) } : groundPlacement(tuning.moves?.normals[code], code, character)) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
@@ -95,6 +96,25 @@ function channelledShowcase(slot: string, code: number, special: Readonly<Author
   return { slot, kind: "special", code, first: channel.first, end: release + special.endFrame - channel.last, release, charging: [...falls, ...impacts], gap: specialGap(special) };
 }
 
+const centreX = (region: MoveRegion): number => (region.hit.minX + region.hit.maxX) * 0.5;
+const centreZ = (region: MoveRegion): number => (region.hit.minZ + region.hit.maxZ) * 0.5;
+
+function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined } {
+  if (move === undefined || move.regions.length === 0) return { gap: reachGap(move) };
+  if (style === AttackStyle.upTilt || style === AttackStyle.upSmash) return overheadPlacement(move, character);
+  if (style !== AttackStyle.downSmash) return { gap: reachGap(move) };
+  const ahead = move.regions.filter((region) => centreX(region) > 0.0), behind = move.regions.filter((region) => centreX(region) < 0.0);
+  const opens = (regions: readonly MoveRegion[]) => Math.min(...regions.map((region) => region.firstFrame));
+  if (ahead.length > 0 && behind.length > 0 && opens(ahead) !== opens(behind)) return { gap: regionGap(opens(ahead) > opens(behind) ? ahead : behind, move.travelX ?? 0.0) };
+  return { gap: reachGap(move) };
+}
+
+function overheadPlacement(move: Readonly<AuthoredMove>, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined } {
+  const body = hurtCapsule(character), top = Math.max(body.z1, body.z2) + body.radius;
+  const highest = move.regions.reduce((best, region) => centreZ(region) > centreZ(best) ? region : best);
+  return centreZ(highest) - top > Math.abs(centreX(highest)) ? { gap: Math.floor(centreX(highest)), lift: Math.floor(centreZ(highest) - SHOWCASE_DUMMY_MIDDLE) } : { gap: reachGap(move) };
+}
+
 function reachGap(move: Readonly<AuthoredMove> | undefined): number | undefined {
   return move === undefined ? undefined : regionGap(move.regions, move.travelX ?? 0.0);
 }
@@ -132,6 +152,8 @@ function specialGap(special: Readonly<AuthoredSpecial>): number | undefined {
   for (const segment of special.motion ?? []) travel += segment.velocityX * (segment.last - segment.first + 1);
   const projectile = special.projectiles?.[0];
   if ((special.regions ?? []).length === 0 && projectile !== undefined) return Math.floor(Math.min(SHOWCASE_DEFAULT_GAP, projectile.offsetX + Math.abs(projectile.velocityX) * projectile.life * 0.5));
+  const grab = special.commandGrab?.strike;
+  if ((special.regions ?? []).length === 0 && grab !== undefined) return Math.floor(Math.max(0.0, travel) + (Math.max(grab.x1, grab.x2) + grab.radius) * 0.75);
   return regionGap(special.regions ?? [], Math.max(0.0, travel));
 }
 

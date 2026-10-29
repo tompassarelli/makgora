@@ -15,7 +15,7 @@ export const queueDirectory = (part: "pending" | "taken" | "results" | "batches"
 
 export const Job = Schema.Struct({
   version: Schema.Literal(1), id: Schema.String, lane: Schema.String, revision: Schema.String,
-  fighter: Schema.String, move: Schema.String, crop: Schema.optionalKey(Schema.Array(Schema.Int)), submitted: Schema.String,
+  fighter: Schema.String, move: Schema.String, crop: Schema.optionalKey(Schema.Array(Schema.Int)), dummy: Schema.optionalKey(Schema.String), submitted: Schema.String,
 });
 export type Job = typeof Job.Type;
 export const Result = Schema.Struct({
@@ -51,23 +51,24 @@ const fail = (problem: string) => new CaptureQueueFailure({ problem });
 const attempt = <A>(problem: string, run: () => A | Promise<A>) =>
   Effect.tryPromise({ try: async () => run(), catch: cause => new CaptureQueueFailure({ problem: `${problem}: ${cause instanceof Error ? cause.message : String(cause)}` }) });
 
-export const newJob = (input: { readonly lane: string; readonly fighter: string; readonly move: string; readonly crop: string | undefined; readonly cwd: string; readonly rev: string; readonly now: Date }) => Effect.gen(function*() {
+export const newJob = (input: { readonly lane: string; readonly fighter: string; readonly move: string; readonly crop: string | undefined; readonly dummy?: string | undefined; readonly cwd: string; readonly rev: string; readonly now: Date }) => Effect.gen(function*() {
   if (!/^[a-z0-9][a-z0-9-]{0,40}$/.test(input.lane)) return yield* fail("--lane is a lowercase lane name such as sc-568");
   if (!SELECTABLE_CHARACTERS.some(character => fighterSlug(character) === input.fighter)) return yield* fail(`unknown fighter ${input.fighter}`);
   if (!capturableMove(input.move)) return yield* fail(`unknown move ${input.move}; use an anim score move name such as up-air or side-special`);
+  if (input.dummy !== undefined && !SELECTABLE_CHARACTERS.some(character => fighterSlug(character) === input.dummy)) return yield* fail(`unknown dummy ${input.dummy}`);
   const crop = input.crop?.split(",").map(Number);
   if (crop !== undefined && (crop.length !== 4 || !crop.every(value => Number.isInteger(value) && value >= 0))) return yield* fail("--crop takes X,Y,W,H in whole captured-screen pixels");
   const revision = (yield* git(input.cwd, ["rev-parse", "--verify", `${input.rev}^{commit}`])).out;
   if (input.rev === "HEAD" && (yield* git(input.cwd, ["status", "--porcelain", "--untracked-files=no"])).out !== "") return yield* fail("the lane has uncommitted changes to tracked files; commit the take first so the capture is of exactly that revision");
   const id = `${input.lane}-${input.fighter.replace(/[^a-z0-9]+/g, "")}-${input.move}-${input.now.getTime().toString(36)}`;
-  const job: Job = { version: 1, id, lane: input.lane, revision, fighter: input.fighter, move: input.move, ...(crop === undefined ? {} : { crop }), submitted: input.now.toISOString() };
+  const job: Job = { version: 1, id, lane: input.lane, revision, fighter: input.fighter, move: input.move, ...(crop === undefined ? {} : { crop }), ...(input.dummy === undefined ? {} : { dummy: input.dummy }), submitted: input.now.toISOString() };
   return job;
 });
 
 export const enqueue: Command = args => Effect.gen(function*() {
   const lane = option(args, "--lane"), fighter = option(args, "--fighter"), move = option(args, "--move");
-  if (lane === undefined || fighter === undefined || move === undefined) return yield* new UsageFailure({ problem: "anim capture enqueue --lane NAME --fighter SLUG --move MOVE [--rev REV] [--crop X,Y,W,H]" });
-  const job = yield* newJob({ lane, fighter, move, crop: option(args, "--crop"), cwd: process.cwd(), rev: option(args, "--rev") ?? "HEAD", now: new Date() });
+  if (lane === undefined || fighter === undefined || move === undefined) return yield* new UsageFailure({ problem: "anim capture enqueue --lane NAME --fighter SLUG --move MOVE [--rev REV] [--crop X,Y,W,H] [--dummy SLUG]" });
+  const job = yield* newJob({ lane, fighter, move, crop: option(args, "--crop"), dummy: option(args, "--dummy"), cwd: process.cwd(), rev: option(args, "--rev") ?? "HEAD", now: new Date() });
   yield* attempt("write the job", () => {
     mkdirSync(queueDirectory("pending"), { recursive: true });
     writeAtomic(join(queueDirectory("pending"), `${job.id}.json`), `${JSON.stringify(job, null, 1)}\n`);

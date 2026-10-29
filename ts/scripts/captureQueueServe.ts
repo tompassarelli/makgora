@@ -1,9 +1,9 @@
-import { appendFileSync, closeSync, cpSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync } from "node:fs";
+import { appendFileSync, closeSync, cpSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { Console, Effect, Fiber, Schema } from "effect";
 import { UsageFailure } from "wisp/scripts/wisp/command";
-import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../src/game/roster/kits";
+import { SELECTABLE_CHARACTERS, fighterKey, fighterName, fighterSlug } from "../src/game/roster/kits";
 import { CaptureQueueFailure, Job, type Result, git, queueDirectory, showcaseSlot, writeAtomic } from "./captureQueue";
 import { attachedPoolReady } from "./wisp/nativePool";
 import { projectRoot, tsDirectory } from "./wisp/projectRoot";
@@ -137,7 +137,11 @@ const movePads = (reelDirectory: string, job: Job, into: string) => attempt(`pic
   const picked = readdirSync(source).filter(name => name.endsWith(".pad")).sort().filter(name => new RegExp(`^#! reel \\S+ R\\d+ ${slot} (right|left) \\d+$`, "m").test(readFileSync(join(source, name), "utf8")));
   if (picked.length === 0) throw new Error(`${job.fighter} has no showcase row for ${job.move} (${slot}) at this revision`);
   mkdirSync(join(into, job.id), { recursive: true });
-  for (const name of picked) cpSync(join(source, name), join(into, job.id, name));
+  const dummy = job.dummy === undefined ? undefined : SELECTABLE_CHARACTERS.find(character => fighterSlug(character) === job.dummy);
+  for (const name of picked) {
+    if (dummy === undefined) cpSync(join(source, name), join(into, job.id, name));
+    else writeFileSync(join(into, job.id, name), readFileSync(join(source, name), "utf8").replace(/^#! chat -dev quick hero (.+?) stocks \d+$/m, (_, hero: string) => `#! chat -dev quick pair ${hero} / ${fighterKey(dummy).toLowerCase()}`));
+  }
   return picked.map(name => `${job.id}-${name.replace(/\.pad$/, "")}`);
 });
 

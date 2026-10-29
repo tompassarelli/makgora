@@ -24,7 +24,7 @@ import { fighterAt, neutralControls } from "../game/sim/roster";
 import { AttackStyle, DownState } from "../game/sim/codes";
 import { beginFighterAttack } from "../game/sim/attacks";
 import { startFighterSpecial } from "../game/sim/specials";
-import { isAerialAttack } from "../game/sim/moves";
+import { attackStartupFrames, isAerialAttack } from "../game/sim/moves";
 import { fillMeter, spendUltimate } from "../game/sim/meter";
 import type { Fighter } from "../game/sim/fighter";
 import { beginAttack, beginDownState } from "../game/sim/transitions";
@@ -244,6 +244,13 @@ function liftTarget(target: Fighter, z: number): void {
   target.motion.vz = 0.0;
 }
 
+function hangTarget(target: Fighter, z: number, frames: number): void {
+  const gravity = target.tuning.physics.gravity;
+  target.motion.grounded = false;
+  target.motion.z = max(0.0, f32(z - f32(gravity * f32(frames * (frames - 1) * 0.5))));
+  target.motion.vz = f32(gravity * frames);
+}
+
 export function startScriptedMove(s: ShellState, slot: number, kind: string | undefined, code: string, facing: string | undefined): void {
   if (s.build.inputProfile !== "native-driver") return;
   const fighter = fighterAt(s.world, slot);
@@ -286,7 +293,8 @@ function stageScriptedMove(s: ShellState, slot: number, args: readonly string[])
     target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
   }
   startScriptedMove(s, slot, kind, code, facing);
-  if (lift !== undefined && !mover.motion.grounded) liftTarget(target, f32(mover.motion.z + S2R(lift)));
+  if (lift !== undefined && mover.motion.grounded) hangTarget(target, S2R(lift), mover.attack.style === undefined ? 0 : attackStartupFrames(mover.attack.style, mover.tuning.moves));
+  else if (lift !== undefined) liftTarget(target, f32(mover.motion.z + S2R(lift)));
 }
 
 export function captureNativeDriverInputs(s: ShellState): void {

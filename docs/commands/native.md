@@ -34,7 +34,13 @@ refuses unless every held stamp and status equals the timeline frame for frame.
 `bun wisp native-capture reel --out PRIVATE_DIR [--fighter SLUG] [--hold-ticks N]`
 prepares Classic motion-reel pad scripts from the current roster and authored
 normals, four ground specials and ultimate. Each fighter directory is one
-capture-map batch. `native-capture plan PAD...` exercises its requested held
+capture-map batch. The timeline stands the dummy where the move's hit reads:
+a ground move at three quarters of its reach; an aerial at the middle of its
+last active region, so the whole swing shows before contact; for an up tilt
+or up smash whose highest region sits more above the head than ahead of it,
+tossed so it peaks inside that region on the first active frame; a down
+smash on the side of its later hit, so the first swing shows first; a command
+grab at its lunge plus three quarters of its strike. `native-capture plan PAD...` exercises its requested held
 frames headless; this has no native pixel verdict. Build with
 `bun wisp native-capture build --out MAP.w3x PRIVATE_DIR/FIGHTER` and launch
 that map on the assigned Classic offline pair with `bun wisp lan fresh MAP.w3x
@@ -259,7 +265,7 @@ shared queue instead of building a map and starting a pool of their own (#614).
 From the lane's `ts/`, with the take committed:
 
 ```sh
-bun wisp anim capture enqueue --lane LANE --fighter SLUG --move MOVE [--rev REV] [--crop X,Y,W,H]
+bun wisp anim capture enqueue --lane LANE --fighter SLUG --move MOVE [--rev REV] [--crop X,Y,W,H] [--dummy SLUG]
 bun wisp anim capture wait ID [--minutes N]
 bun wisp anim capture status
 ```
@@ -272,7 +278,9 @@ both facings at the lane's revision. `wait` prints the result: `sheet.png`
 built source revision. Its `judge` folder holds a `batch-1.md` for
 `bun wisp anim judge run JUDGE_DIR`. Every lane clip gets its own sheet, so
 each cold viewer still judges one clip alone. `--crop` is in captured-screen
-pixels and applies to every tile.
+pixels and applies to every tile. `--dummy SLUG` stands that fighter in as the
+target instead of a mirror of the mover, so a large fighter's silhouette does
+not merge with an identical body at the hit; it changes only the capture.
 
 A special that reflects is staged with the dummy at most 300 units away, and
 closer when the dummy's neutral-special projectile could not fly there and
