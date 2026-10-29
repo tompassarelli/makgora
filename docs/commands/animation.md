@@ -223,6 +223,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   capsules (smashcraft:tools/animations/limb-capsules.ts), it keys the smallest hand
   turn that clears them, eased in and out over 4 frames, and leaves every other clip
   unchanged (#453).
+  `bun tools/animations/fade-clear.ts SHIPPED.mdx PRIVATE_OUTPUT SEQUENCE...` holds every body geoset and layer alpha track that fades inside the named stock sequences (Death) at full opacity and leaves every other sequence unchanged; store the family with `bun wisp inputs add hero-models PRIVATE_OUTPUT --fighter SLUG` and run `bun wisp inputs derive --fighter NAME` (Archimonde, 2026-10-30).
+  `bun scripts/bodyFades.ts [--record]` (from ts/) samples every clip of every fighter's timeline body each 60 Hz frame for a body geoset dropping below the opacity it has in the first clip, prints which down, getup and roll actions fade, and writes smashcraft:ts/test/fixtures/body-fades.json for smashcraft:ts/test/bodyFades.test.ts, which names the fighters still fading.
   `bun tools/animations/grab-pads.ts` generates the #180 mirror and unlike-height capture batch:
   every selectable fighter, four throws, both facings, with ordinary catch/pummel
   inputs and contact-frame captures in smashcraft:ts/test/native/pads/180/.

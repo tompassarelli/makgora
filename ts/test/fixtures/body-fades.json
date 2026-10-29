@@ -1,0 +1,185 @@
+{
+ "rifleman": {
+  "body": "RiflemanTimelineBody-1e78b9403effafda7a8d7498ac9a6d6dad17aa4dc29e566f5fd497666b7e2814.mdx",
+  "fading": []
+ },
+ "demonHunter": {
+  "body": "IllidanTimelineBody-249910fe23bfaf0d360f901700801d085c29274e7f1e22395e0a4d7690b7f97b.mdx",
+  "fading": []
+ },
+ "blademaster": {
+  "body": "BlademasterTimelineBody-337610dc33e5183f382254fafecabc0724b10ace06b44199e172104175d869d6.mdx",
+  "fading": [
+   11,
+   12,
+   13
+  ]
+ },
+ "mountainKing": {
+  "body": "MountainKingTimelineBody-739e167078aa48d614c34aba93809893ff7567c3a7cc24bae1ace6b417475d2b.mdx",
+  "fading": []
+ },
+ "warden": {
+  "body": "WardenTimelineBody-c62ed9a09850fd87f372aa09142742bed825214becb7ce78f6158b34416c07bf.mdx",
+  "fading": [
+   8,
+   9
+  ]
+ },
+ "lich": {
+  "body": "LichTimelineBody-854ef9e8fbf26bc16474ec8404bb61fc93cc771774fe16de8b5c5a4939000697.mdx",
+  "fading": [
+   7,
+   8,
+   9,
+   10
+  ]
+ },
+ "dreadlord": {
+  "body": "DreadlordTimelineBody-d44aeeba4e4588806d494272a082d733a56a08a5eb37690dca0876f2c4fcb1cb.mdx",
+  "fading": [
+   7,
+   8,
+   11
+  ]
+ },
+ "shadowHunter": {
+  "body": "ShadowHunterTimelineBody-08ae2c2e168989794315e1525999931e4abb128482a63a975c7521083dff8354.mdx",
+  "fading": [
+   4,
+   10,
+   11,
+   12
+  ]
+ },
+ "pitLord": {
+  "body": "PitLordTimelineBody-dedcdb9eaa64c5bb4b55c3317acb3cd6b5a673726826e0aa79b20fc6fe58cd55.mdx",
+  "fading": [
+   8,
+   9,
+   10,
+   11,
+   12,
+   13
+  ]
+ },
+ "beastmaster": {
+  "body": "BeastmasterTimelineBody-5e47b79b47e036f7e806cfec65efc81265110a0bafab8452038c375a6ff9922d.mdx",
+  "fading": [
+   7,
+   8
+  ]
+ },
+ "lichKing": {
+  "body": "LichKingTimelineBody-f97c9e92dcb87b5bec05ec1aaa856ecf33f51fd39096b1400d32c4cc66651a39.mdx",
+  "fading": []
+ },
+ "thrall": {
+  "body": "ThrallTimelineBody-83b2a29c91e0702b3a223558bacfcca18d453974b27b9462a03fb73f63a9cc06.mdx",
+  "fading": []
+ },
+ "jaina": {
+  "body": "JainaProudmooreTimelineBody-97ba9adac5d8f4ff571e200dafdb20a9feba2f6c3372a6f494b54cc5912b5bf2.mdx",
+  "fading": []
+ },
+ "sylvanas": {
+  "body": "SylvanasWindrunnerTimelineBody-0d3d3a747a6be9980e1c1f701aa9e625b607eb5bf8347645ab6184a592dfb3b7.mdx",
+  "fading": [
+   10
+  ]
+ },
+ "cairne": {
+  "body": "CairneBloodhoofTimelineBody-f93bfb4873096d74802376ffed76f81a788d2a91c8e1ac502f2eca7c531072f7.mdx",
+  "fading": []
+ },
+ "chen": {
+  "body": "ChenStormstoutTimelineBody-d167f824f018efacecd4693d058fc6c507e4d65a17100784e8a7d9238fe53ee9.mdx",
+  "fading": [
+   7,
+   8
+  ]
+ },
+ "peon": {
+  "body": "PeonTimelineBody-28aa6cc2288c84d61b29dbdc16f983d8b42af0591a48caad399e1fce8c6202cf.mdx",
+  "fading": []
+ },
+ "tinker": {
+  "body": "GoblinTinkerTimelineBody-b4da6b24bdf546c3333c941965bca1411ae4ae6e34cb243ca3060f6bdc7340b1.mdx",
+  "fading": [
+   32,
+   33
+  ]
+ },
+ "kaelthas": {
+  "body": "KaelthasSunstriderTimelineBody-5a019b43e8dd754ef2c2ae69fdcded97aaa762dd673abd2d4a125182ed82e7bc.mdx",
+  "fading": []
+ },
+ "murloc": {
+  "body": "MurlocTimelineBody-4383776ca3963e86db212633595aaeef9a67c308fd0e19e196c04622ca02cec9.mdx",
+  "fading": []
+ },
+ "grom": {
+  "body": "GromHellscreamTimelineBody-e557fdf5cd9887aa20c42753b8d17c94bf4029922047a00248759cdff598771f.mdx",
+  "fading": []
+ },
+ "malfurion": {
+  "body": "MalfurionStormrageTimelineBody-b35d3eef28c2c357f7d054e270fc4e4c544f538eafff08c29c26a7a79f7f2d40.mdx",
+  "fading": [
+   5,
+   6,
+   7
+  ]
+ },
+ "medivh": {
+  "body": "MedivhTimelineBody-271a597afaeae4393924e68156080074d8c96377600008f5c997e473e46d732b.mdx",
+  "fading": [
+   90,
+   91
+  ]
+ },
+ "uther": {
+  "body": "UtherTimelineBody-3918c0ac0a8736d3fcbfc1c82848bb3b9da408ded4e4dd9e4270d8fef2494f54.mdx",
+  "fading": []
+ },
+ "ladyVashj": {
+  "body": "LadyVashjTimelineBody-c251f037c41a6b64e7dac3c59b94ed5e47458958aec5d720de5427307fc510bb.mdx",
+  "fading": []
+ },
+ "archimonde": {
+  "body": "ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx",
+  "fading": [
+   5,
+   6
+  ]
+ },
+ "tyrande": {
+  "body": "TyrandeTimelineBody-e1ef839bd37d58b95b7b0381d6140a00bb8021f8d70a6ec56a0be817bb07f630.mdx",
+  "fading": [
+   4,
+   5,
+   6,
+   7
+  ]
+ },
+ "butcher": {
+  "body": "ButcherTimelineBody-c9e9052414a75bfc63a8405cea040a5dde0835b7f1b0f7f32312fb98a8d9ccb1.mdx",
+  "fading": [
+   5
+  ]
+ },
+ "akama": {
+  "body": "AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx",
+  "fading": []
+ },
+ "firelord": {
+  "body": "FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx",
+  "fading": [
+   9,
+   10
+  ]
+ },
+ "alchemist": {
+  "body": "GoblinAlchemistTimelineBody-6b81c71b668aeb114beea093c52129efabc9fe16e5ab5271b706db21c5008c7c.mdx",
+  "fading": []
+ }
+}
