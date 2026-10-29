@@ -10,7 +10,7 @@ import { buildViewerLua } from "./viewerLua";
 
 export const CLIENT_KIT = 1;
 
-class KitFailure extends Schema.TaggedError<KitFailure>()("KitFailure", { problem: Schema.String }) {}
+class KitFailure extends Schema.TaggedError<KitFailure, { readonly brand: unique symbol }>()("KitFailure", { problem: Schema.String }) {}
 const ts = resolve(import.meta.dir, "..");
 
 export const writeClientKit = Effect.fn("writeClientKit")(function*(out: string) {

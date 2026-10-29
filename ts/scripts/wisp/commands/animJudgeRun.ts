@@ -19,7 +19,7 @@ const EFFORTS = ["low", "medium", "high"] as const;
 const SYSTEM = "You are a strict, independent animation judge. You see only the images attached to the message.";
 const REPLY = `Reply with exactly one line of JSON and nothing else: {"readability":N,"weight":N,"anticipation":N,"followThrough":N,"character":N,"note":"one sentence"}, each N an integer 1-5. The images are attached in order, so do not try to open files.`;
 
-class JudgeRunFailure extends Schema.TaggedError<JudgeRunFailure>()("JudgeRunFailure", { problem: Schema.String }) { override get message(): string { return this.problem; } }
+class JudgeRunFailure extends Schema.TaggedError<JudgeRunFailure, { readonly brand: unique symbol }>()("JudgeRunFailure", { problem: Schema.String }) { override get message(): string { return this.problem; } }
 const attempt = <A>(problem: string, run: () => Promise<A> | A) =>
   Effect.tryPromise({ try: async () => run(), catch: (cause) => new JudgeRunFailure({ problem: `${problem}: ${cause instanceof Error ? cause.message : String(cause)}` }) });
 

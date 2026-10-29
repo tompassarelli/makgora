@@ -59,7 +59,7 @@ function compareOutput(name: string, output: string): boolean {
 }
 
 
-export class NumericParityFailure extends Schema.TaggedError<NumericParityFailure>()("NumericParityFailure", {
+export class NumericParityFailure extends Schema.TaggedError<NumericParityFailure, { readonly brand: unique symbol }>()("NumericParityFailure", {
   operation: Schema.String,
   problem: Schema.String,
 }) {

@@ -16,7 +16,7 @@ const Data = Schema.Struct({ cpuSeconds: Schema.Finite, counts: Schema.Record(Sc
 interface Data { cpuSeconds: number; counts: Record<string, { wins: number; losses: number; ties: number; played: number }>; pairs: Record<string,number> }
 const RecordInput = Schema.Struct({ records: Schema.Array(Schema.Struct({ fighters: Schema.Array(Schema.String), winner: Schema.NullOr(Schema.Finite), opponents: Schema.Array(Schema.String), tiers: Schema.Array(Schema.String), skillOverrides: Schema.optional(Schema.Unknown) })) });
 const decodeRecordInput = Schema.decodeUnknownSync(RecordInput);
-class CeilingFailure extends Schema.TaggedError<CeilingFailure>()("CeilingFailure", { problem: Schema.String }) {}
+class CeilingFailure extends Schema.TaggedError<CeilingFailure, { readonly brand: unique symbol }>()("CeilingFailure", { problem: Schema.String }) {}
 const getData = (file: string) => Schema.decodeUnknownSync(Data)(JSON.parse(readFileSync(file,"utf8")));
 const fresh = (): Data => ({cpuSeconds:0,counts:{},pairs:{}});
 const countMatch = (data: Data, kind: string, fighter: string, opponent: string, won: boolean, lost: boolean) => {

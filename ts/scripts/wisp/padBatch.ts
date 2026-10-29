@@ -114,13 +114,13 @@ const seconds = (since: number) => (performance.now() - since) / 1000;
 
 const wispProgram = join(import.meta.dir, "../wisp.ts");
 
-export class BatchProcessFailure extends Schema.TaggedError<BatchProcessFailure>()("BatchProcessFailure", {
+export class BatchProcessFailure extends Schema.TaggedError<BatchProcessFailure, { readonly brand: unique symbol }>()("BatchProcessFailure", {
   command: Schema.String, log: Schema.String, code: Schema.Int, problem: Schema.String,
 }) {
   override get message(): string { return `${this.command} ${this.problem}; see ${this.log}`; }
 }
 
-class BatchRetry extends Schema.TaggedError<BatchRetry>()("BatchRetry", { script: Schema.String }) {}
+class BatchRetry extends Schema.TaggedError<BatchRetry, { readonly brand: unique symbol }>()("BatchRetry", { script: Schema.String }) {}
 
 
 export const runBatchProcess = (command: string, args: readonly string[], log: string) => Effect.scoped(Effect.gen(function*() {

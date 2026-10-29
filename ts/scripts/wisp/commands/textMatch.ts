@@ -7,7 +7,7 @@ import { selectableCharacterBySlug } from "../../../src/game/roster/kits";
 import { DEFAULT_OPTIONS, type TextMatchOptions, playTextMatch } from "../../textMatch";
 import { parseCommands } from "../../textMatchView";
 
-class TextMatchFailure extends Schema.TaggedError<TextMatchFailure>()("TextMatchFailure", { problem: Schema.String }) {
+class TextMatchFailure extends Schema.TaggedError<TextMatchFailure, { readonly brand: unique symbol }>()("TextMatchFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

@@ -1,6 +1,6 @@
 import { Effect, Schema } from "effect";
 
-export class ProcessStartFailure extends Schema.TaggedError<ProcessStartFailure>()("ProcessStartFailure", { command: Schema.String, cause: Schema.String }) {
+export class ProcessStartFailure extends Schema.TaggedError<ProcessStartFailure, { readonly brand: unique symbol }>()("ProcessStartFailure", { command: Schema.String, cause: Schema.String }) {
   override get message(): string {
     return `could not start ${this.command}: ${this.cause}`;
   }

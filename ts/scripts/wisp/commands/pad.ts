@@ -149,7 +149,7 @@ const matchEpochs = (session: HelperProcesses, logs: () => [string, string], sta
     });
   }), { every: "20 millis", within: "60 seconds", orElse: () => Effect.fail(new IntegrityFailure({ operation: "wait for match start", path: out, cause: "a helper reported no match start within 60 s" })) });
 
-export class PadReplayFailure extends Schema.TaggedError<PadReplayFailure>()("PadReplayFailure", {
+export class PadReplayFailure extends Schema.TaggedError<PadReplayFailure, { readonly brand: unique symbol }>()("PadReplayFailure", {
   operation: Schema.String,
   path: Schema.String,
   cause: Schema.String,
@@ -436,7 +436,7 @@ export const native = (options: PadOptions, appIds: ReadonlyMap<string, string>,
 
 const INVALID_RUN = "invalid native run";
 
-class InvalidNativeRun extends Schema.TaggedError<InvalidNativeRun>()("InvalidNativeRun", { attempts: Schema.Int }) {}
+class InvalidNativeRun extends Schema.TaggedError<InvalidNativeRun, { readonly brand: unique symbol }>()("InvalidNativeRun", { attempts: Schema.Int }) {}
 
 
 function invalidRun(names: readonly string[], documents: readonly string[], data: readonly string[], sinceMs: number): string[] {

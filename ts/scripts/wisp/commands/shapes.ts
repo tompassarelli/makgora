@@ -5,7 +5,7 @@ import type { Row, Shape } from "../../moveShapes";
 import type { RadiusRow } from "../../moveRadius";
 import type { DashAttackRow } from "../../dashAttackShapes";
 
-class ShapesFailure extends Schema.TaggedError<ShapesFailure>()("ShapesFailure", { problems: Schema.Array(Schema.String) }) {
+class ShapesFailure extends Schema.TaggedError<ShapesFailure, { readonly brand: unique symbol }>()("ShapesFailure", { problems: Schema.Array(Schema.String) }) {
   override get message(): string {
     return this.problems.join("\n");
   }

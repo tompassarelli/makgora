@@ -16,7 +16,7 @@ import { stockLua } from "../luaRuntimes";
 import { bundleConfig } from "../bundleConfigs";
 import { buildProject, tsDirectory } from "../project";
 
-class MemorySoakFailure extends Schema.TaggedError<MemorySoakFailure>()("MemorySoakFailure", { problem: Schema.String }) {
+class MemorySoakFailure extends Schema.TaggedError<MemorySoakFailure, { readonly brand: unique symbol }>()("MemorySoakFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

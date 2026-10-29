@@ -171,7 +171,7 @@ function describeDivergence(a: string | undefined, b: string | undefined, names:
 
 
 
-class TapesFailure extends Schema.TaggedError<TapesFailure>()("TapesFailure", {
+class TapesFailure extends Schema.TaggedError<TapesFailure, { readonly brand: unique symbol }>()("TapesFailure", {
   problem: Schema.String,
 }) {
   override get message(): string {

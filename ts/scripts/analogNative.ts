@@ -153,7 +153,7 @@ yield* command(["client", "watch", "--once", "--clients-file", clientsFile]);
 console.log(`Raw comparison records: ${out}. Reconcile helper submissions, captured rows and native desync reports before choosing a route.`);
 
 });
-class AnalogFailure extends Schema.TaggedError<AnalogFailure>()("AnalogFailure", { problem: Schema.String }) {
+class AnalogFailure extends Schema.TaggedError<AnalogFailure, { readonly brand: unique symbol }>()("AnalogFailure", { problem: Schema.String }) {
   override get message() { return this.problem; }
 }
 const analogFailure = (cause: unknown) => new AnalogFailure({ problem: cause instanceof Error ? cause.message : String(cause) });

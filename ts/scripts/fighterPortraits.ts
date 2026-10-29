@@ -104,7 +104,7 @@ const FOV = 8;
 const fighters = RENDERED_FIGHTERS.filter((character) => only === undefined || only.includes(fighterRenderName(character)));
 
 /** A fighter's portrait scene couldn't be set up. */
-class PortraitFailure extends Schema.TaggedError<PortraitFailure>()('PortraitFailure', { problem: Schema.String }) {}
+class PortraitFailure extends Schema.TaggedError<PortraitFailure, { readonly brand: unique symbol }>()('PortraitFailure', { problem: Schema.String }) {}
 
 const withoutFog = ({ fog: _fog, ...environment }: RenderScene['environment']) => environment;
 

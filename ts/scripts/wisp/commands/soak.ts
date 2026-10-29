@@ -12,7 +12,7 @@ import { SOAK_OUT } from "../soak";
 import { soakHandles } from "./soakHandles";
 import { soakMemory } from "./soakMemory";
 
-class HelperSoakFailure extends Schema.TaggedError<HelperSoakFailure>()("HelperSoakFailure", {
+class HelperSoakFailure extends Schema.TaggedError<HelperSoakFailure, { readonly brand: unique symbol }>()("HelperSoakFailure", {
   problem: Schema.String,
   cause: Schema.optional(Schema.Unknown),
 }) {

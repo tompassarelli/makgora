@@ -21,6 +21,7 @@ export const REACH_RULES: readonly { readonly name: string; readonly pattern: Re
 
 export const REACH_ALLOWLIST: readonly { readonly path: string; readonly rule: string; readonly reason: string }[] = [
   { path: "docs/delivery-goal.md", rule: "an extraction or decompilation cited as a source", reason: "states the clean-room policy and cites nothing" },
+  { path: "repos/effect/pnpm-lock.yaml", rule: "an offset-named game field", reason: "upstream Effect lockfile: a base64 integrity hash ending in x and hex-looking characters" },
 ];
 
 const allowed = (path: string, rule: string) => REACH_ALLOWLIST.some((entry) => entry.path === path && entry.rule === rule);

@@ -12,7 +12,7 @@ import {
   SLOTS, SWEEP_HEADER, capturePair, integrityResult, integrityTable, summaryJson, sweepPairs, sweepRow,
 } from "./reconcile";
 
-export class IntegrityFailure extends Schema.TaggedError<IntegrityFailure>()("IntegrityFailure", {
+export class IntegrityFailure extends Schema.TaggedError<IntegrityFailure, { readonly brand: unique symbol }>()("IntegrityFailure", {
   operation: Schema.String,
   path: Schema.String,
   cause: Schema.Unknown,

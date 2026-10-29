@@ -20,7 +20,7 @@ import { movesShardId, smokePairs, smokeShardLabel, smokeShards, specialsShardId
 export const SHARD_RUN_SECONDS = 280;
 const WISP_PROGRAM = join(import.meta.dir, "../wisp.ts");
 
-class NativeSmokeFailure extends Schema.TaggedError<NativeSmokeFailure>()("NativeSmokeFailure", { problem: Schema.String }) {
+class NativeSmokeFailure extends Schema.TaggedError<NativeSmokeFailure, { readonly brand: unique symbol }>()("NativeSmokeFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

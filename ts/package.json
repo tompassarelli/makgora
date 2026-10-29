@@ -1,16 +1,16 @@
 {
   "devDependencies": {
-    "@effect/platform-bun": "4.0.3",
-    "@effect/tsgo": "0.48.1",
+    "@effect/platform-bun": "4.0.5",
+    "@effect/tsgo": "0.53.5",
     "@types/bun": "1.4.2",
-    "effect": "4.0.3",
+    "effect": "4.0.5",
     "lua-types": "2.14.1",
     "source-map": "0.7.6",
     "typescript": "6.0.2",
     "typescript-native": "npm:typescript@7.0.2",
     "typescript-to-lua": "1.37.1",
     "war3-model": "4.0.1",
-    "wisp": "file:vendor/wisp-70b924c7bc177419e4d0ca7256767b987799a6b3.tgz"
+    "wisp": "file:vendor/wisp-df8656c9b9d975b85bbb16b31eeea9498c6a0c43.tgz"
   },
   "name": "smashcraft",
   "private": true,
@@ -32,6 +32,6 @@
     "parity": "bun wisp parity numeric"
   },
   "overrides": {
-    "@effect/platform-node-shared": "4.0.3"
+    "@effect/platform-node-shared": "4.0.6"
   }
 }

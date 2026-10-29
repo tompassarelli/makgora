@@ -5,7 +5,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { type Callback, type MatchedFrame, callbacks, joinMarkers, videoFrames } from "./cameraDraw";
 
-class StepEvennessFailure extends Schema.TaggedError<StepEvennessFailure>()("StepEvennessFailure", { problem: Schema.String }) {
+class StepEvennessFailure extends Schema.TaggedError<StepEvennessFailure, { readonly brand: unique symbol }>()("StepEvennessFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

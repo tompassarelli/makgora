@@ -3,7 +3,7 @@ import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
 
-class ThrowParityFailure extends Schema.TaggedError<ThrowParityFailure>()("ThrowParityFailure", { problem: Schema.String }) {
+class ThrowParityFailure extends Schema.TaggedError<ThrowParityFailure, { readonly brand: unique symbol }>()("ThrowParityFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

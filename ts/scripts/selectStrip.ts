@@ -9,7 +9,7 @@ import { smashcraftNativeBehavior } from "./wisp/headlessNatives";
 
 export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>> = { "SmashcraftTutorial.pld": ["seen"] };
 
-class SelectStripFailure extends Schema.TaggedError<SelectStripFailure>()("SelectStripFailure", { problem: Schema.String }) {}
+class SelectStripFailure extends Schema.TaggedError<SelectStripFailure, { readonly brand: unique symbol }>()("SelectStripFailure", { problem: Schema.String }) {}
 
 const USAGE = "usage: bun scripts/selectStrip.ts JOURNEY.json OUT_DIR --frames N... [--resolution WxH]";
 

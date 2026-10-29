@@ -8,13 +8,13 @@ import { runProcess } from "../hostProcess";
 import { projectRoot } from "./project";
 import { ensurePackager } from "wisp/scripts/wisp/mapBuild";
 
-export class NativeToolMissing extends Schema.TaggedError<NativeToolMissing>()("NativeToolMissing", {
+export class NativeToolMissing extends Schema.TaggedError<NativeToolMissing, { readonly brand: unique symbol }>()("NativeToolMissing", {
   tools: Schema.Array(Schema.String), problem: Schema.String,
 }) {
   override get message(): string { return `native tool${this.tools.length === 1 ? "" : "s"} ${this.tools.join(", ")} unavailable: ${this.problem}`; }
 }
 
-export class NativeClientInvalid extends Schema.TaggedError<NativeClientInvalid>()("NativeClientInvalid", {
+export class NativeClientInvalid extends Schema.TaggedError<NativeClientInvalid, { readonly brand: unique symbol }>()("NativeClientInvalid", {
   client: Schema.String, problem: Schema.String,
 }) {
   override get message(): string { return `client ${this.client}: ${this.problem}`; }

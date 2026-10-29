@@ -9,7 +9,7 @@ import { attachedPoolReady, attachExistingPool, pairClientCount } from "./wisp/n
 import { alive, poolHolder } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "./hostPoll";
 
-class CaptureBatchFailure extends Schema.TaggedError<CaptureBatchFailure>()("CaptureBatchFailure", { problem: Schema.String }) {
+class CaptureBatchFailure extends Schema.TaggedError<CaptureBatchFailure, { readonly brand: unique symbol }>()("CaptureBatchFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 

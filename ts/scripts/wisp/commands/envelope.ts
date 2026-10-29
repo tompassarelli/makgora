@@ -4,7 +4,7 @@ import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/com
 import { FIELDS, type Outlier, outliers } from "../../genreEnvelope";
 import { genreReference, rosterRows } from "../../genreEnvelopeData";
 
-class EnvelopeFailure extends Schema.TaggedError<EnvelopeFailure>()("EnvelopeFailure", { problem: Schema.String }) {
+class EnvelopeFailure extends Schema.TaggedError<EnvelopeFailure, { readonly brand: unique symbol }>()("EnvelopeFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

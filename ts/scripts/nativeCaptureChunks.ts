@@ -5,7 +5,7 @@ import { ChildProcess } from "effect/process";
 import { Effect, Schema } from "effect";
 import { runProcess } from "./hostProcess";
 
-class CaptureChunkFailure extends Schema.TaggedError<CaptureChunkFailure>()("CaptureChunkFailure", { problem: Schema.String }) {
+class CaptureChunkFailure extends Schema.TaggedError<CaptureChunkFailure, { readonly brand: unique symbol }>()("CaptureChunkFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 

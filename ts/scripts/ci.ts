@@ -17,7 +17,7 @@ const TIMED_ATTEMPTS = 3;
 const gateTiming = process.env.CI_TIMING !== "report";
 
 
-class CheckFailure extends Schema.TaggedError<CheckFailure>()("CheckFailure", { problem: Schema.String, exitCode: Schema.Int }) {
+class CheckFailure extends Schema.TaggedError<CheckFailure, { readonly brand: unique symbol }>()("CheckFailure", { problem: Schema.String, exitCode: Schema.Int }) {
   override get message(): string {
     return this.problem;
   }

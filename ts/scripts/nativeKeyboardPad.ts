@@ -26,7 +26,7 @@ export function keyboardPadPlan(script: string) {
 }
 
 
-class KeyboardPadFailure extends Schema.TaggedError<KeyboardPadFailure>()("KeyboardPadFailure", { problem: Schema.String }) {
+class KeyboardPadFailure extends Schema.TaggedError<KeyboardPadFailure, { readonly brand: unique symbol }>()("KeyboardPadFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

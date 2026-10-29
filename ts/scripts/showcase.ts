@@ -8,7 +8,7 @@ import { pollUntil } from "./hostPoll";
 
 const FILE_PREFIX = "smashcraft";
 
-export class ShowcaseFailure extends Schema.TaggedError<ShowcaseFailure>()("ShowcaseFailure", { problem: Schema.String }) {
+export class ShowcaseFailure extends Schema.TaggedError<ShowcaseFailure, { readonly brand: unique symbol }>()("ShowcaseFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

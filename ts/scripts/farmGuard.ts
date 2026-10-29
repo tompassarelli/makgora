@@ -69,7 +69,7 @@ export function balanceTimeouts(perPair: number, probe: number): { readonly shar
   return { shard: Math.max(minutes, Math.ceil((15 * perPair) / 400)), probe: Math.max(minutes, Math.ceil((25 * probe) / 40)) };
 }
 
-class GuardFailure extends Schema.TaggedError<GuardFailure>()("GuardFailure", { problem: Schema.String }) {
+class GuardFailure extends Schema.TaggedError<GuardFailure, { readonly brand: unique symbol }>()("GuardFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

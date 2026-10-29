@@ -232,7 +232,7 @@ yield* Effect.gen(function*() {
 yield* command(["client", "watch", "--once", "--clients-file", clientsFile]);
 });
 
-class PadCutFailure extends Schema.TaggedError<PadCutFailure>()("PadCutFailure", { problem: Schema.String }) {
+class PadCutFailure extends Schema.TaggedError<PadCutFailure, { readonly brand: unique symbol }>()("PadCutFailure", { problem: Schema.String }) {
   override get message() { return this.problem; }
 }
 const padCutFailure = (cause: unknown) => new PadCutFailure({ problem: cause instanceof Error ? cause.message : String(cause) });

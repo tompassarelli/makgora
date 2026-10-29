@@ -9,7 +9,7 @@ import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { ResponsePage } from "./wisp/boundary";
 
-class CameraDrawFailure extends Schema.TaggedError<CameraDrawFailure>()("CameraDrawFailure", { problem: Schema.String }) {
+class CameraDrawFailure extends Schema.TaggedError<CameraDrawFailure, { readonly brand: unique symbol }>()("CameraDrawFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

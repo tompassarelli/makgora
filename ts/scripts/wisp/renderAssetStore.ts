@@ -17,7 +17,7 @@ const ABSENT_SUFFIX = ".absent";
 const EXTRACT_TIMEOUT = "60 seconds";
 
 
-class RenderAssetFailure extends Schema.TaggedError<RenderAssetFailure>()("RenderAssetFailure", { problem: Schema.String }) {
+class RenderAssetFailure extends Schema.TaggedError<RenderAssetFailure, { readonly brand: unique symbol }>()("RenderAssetFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

@@ -41,7 +41,7 @@ const loadPlatform = async () => {
 };
 type Platform = Awaited<ReturnType<typeof loadPlatform>>;
 
-export class PlanFailure extends Schema.TaggedError<PlanFailure>()("PlanFailure", { problem: Schema.String }) {
+export class PlanFailure extends Schema.TaggedError<PlanFailure, { readonly brand: unique symbol }>()("PlanFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 

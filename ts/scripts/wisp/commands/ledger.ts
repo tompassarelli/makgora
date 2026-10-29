@@ -8,7 +8,7 @@ import { runOracle } from "../../meleeOracle";
 const root = join(import.meta.dir, "../../../..");
 const pageFile = join(root, PAGE_PATH);
 
-class LedgerFailure extends Schema.TaggedError<LedgerFailure>()("LedgerFailure", { problems: Schema.Array(Schema.String) }) {
+class LedgerFailure extends Schema.TaggedError<LedgerFailure, { readonly brand: unique symbol }>()("LedgerFailure", { problems: Schema.Array(Schema.String) }) {
   override get message(): string {
     return this.problems.join("\n");
   }

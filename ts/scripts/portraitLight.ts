@@ -131,7 +131,7 @@ export function judge(lights: ReadonlyMap<string, Light>): string[] {
   return problems;
 }
 
-class PixelsFailure extends Schema.TaggedError<PixelsFailure>()('PixelsFailure', { problem: Schema.String }) {}
+class PixelsFailure extends Schema.TaggedError<PixelsFailure, { readonly brand: unique symbol }>()('PixelsFailure', { problem: Schema.String }) {}
 
 export const pixels = (path: string): Effect.Effect<Uint8Array, PixelsFailure> => Effect.try({
   try: () => {

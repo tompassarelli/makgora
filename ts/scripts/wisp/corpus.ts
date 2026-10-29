@@ -27,7 +27,7 @@ import { replayInLua } from "./commands/replay";
 import { projectRoot, tsDirectory } from "./project";
 import { readReplay } from "./replayFiles";
 
-export class CorpusFailure extends Schema.TaggedError<CorpusFailure>()("CorpusFailure", {
+export class CorpusFailure extends Schema.TaggedError<CorpusFailure, { readonly brand: unique symbol }>()("CorpusFailure", {
   problem: Schema.String,
 }) {
   override get message(): string {

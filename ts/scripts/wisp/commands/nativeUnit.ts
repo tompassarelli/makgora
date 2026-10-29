@@ -11,7 +11,7 @@ const WISP_PROGRAM = join(import.meta.dir, "../../wisp.ts");
 
 export type NativeCommand = "accept" | "pad";
 
-export class NativeUnitFailure extends Schema.TaggedError<NativeUnitFailure>()("NativeUnitFailure", {
+export class NativeUnitFailure extends Schema.TaggedError<NativeUnitFailure, { readonly brand: unique symbol }>()("NativeUnitFailure", {
   command: Schema.String,
   problem: Schema.String,
 }) {

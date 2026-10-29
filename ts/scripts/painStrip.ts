@@ -21,7 +21,7 @@ import { runProcess } from "./hostProcess";
 import { shellState } from "../src/host/loop/state";
 import { fighterAt } from "../src/game/sim/roster";
 
-class PainStripFailure extends Schema.TaggedError<PainStripFailure>()("PainStripFailure", { problem: Schema.String }) {}
+class PainStripFailure extends Schema.TaggedError<PainStripFailure, { readonly brand: unique symbol }>()("PainStripFailure", { problem: Schema.String }) {}
 
 const USAGE = "usage: bun scripts/painStrip.ts OUT_DIR [--resolution WxH] [--fighters NAME,NAME...]";
 const CHAT_FRAME = 30;

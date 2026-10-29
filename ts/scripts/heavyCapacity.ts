@@ -28,7 +28,7 @@ export function insideCapacityScope(): boolean {
 
 export const admitsThroughHelper = () => existsSync(capacityHelper) && !insideCapacityScope();
 
-class CapacityFailure extends Schema.TaggedError<CapacityFailure>()("CapacityFailure", { problem: Schema.String }) {}
+class CapacityFailure extends Schema.TaggedError<CapacityFailure, { readonly brand: unique symbol }>()("CapacityFailure", { problem: Schema.String }) {}
 
 
 

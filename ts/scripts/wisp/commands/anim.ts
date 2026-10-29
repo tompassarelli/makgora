@@ -65,7 +65,7 @@ export const REFERENCE_ACTIONS: Readonly<Record<string, { readonly action: strin
   "up-special": { action: "up_b", wiki: "up special" }, "down-special": { action: "down_b", wiki: "down special" },
 };
 
-class AnimFailure extends Schema.TaggedError<AnimFailure>()("AnimFailure", { problem: Schema.String }) {
+class AnimFailure extends Schema.TaggedError<AnimFailure, { readonly brand: unique symbol }>()("AnimFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 const attempt = <A>(problem: string, run: () => Promise<A> | A) =>

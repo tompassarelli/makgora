@@ -45,3 +45,15 @@
 - Frame workload: `bun wisp map build --profile frame-cost ...` runs the
   isolated 4096-frame TypeScript executor and records its complete replay state.
   smashcraft:ts/scripts/frameCost.ts reads recorded paired benchmark results.
+
+- Shared builds: `bun wisp map build` keys its map by the hash of the checkout's
+  tree and uncommitted changes (which hold `ts/wisp.lock` and the build-input
+  pins) and every argument but `--out`, which carry the profile and edition.
+  A second request with the same key, even one running at the same time in
+  another lane, waits for the first and copies its map from
+  `~/.cache/wisp/maps`, logging `reused map build HASH`; the size check still
+  runs on the copy. `WISP_MAP_REUSE=off` builds fresh, and
+  `WISP_MAP_REUSE_STORE` and `WISP_MAP_REUSE_GIB` move and cap the store
+  (wisp:docs/compile-cache.md#map-reuse). A capture build of unchanged fixtures
+  at the same commit, such as the control map of origin/main that a before
+  capture uses, is that same reused map.

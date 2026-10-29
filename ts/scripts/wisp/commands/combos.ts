@@ -42,7 +42,7 @@ const advantagePageFile = join(moveData, "advantage-state.md");
 const objectivesFile = join(moveData, "combo-objectives.json");
 const meleeLinksDir = join(import.meta.dir, "../../../../build/links-melee");
 
-class CombosFailure extends Schema.TaggedError<CombosFailure>()("CombosFailure", { problem: Schema.String }) {
+class CombosFailure extends Schema.TaggedError<CombosFailure, { readonly brand: unique symbol }>()("CombosFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

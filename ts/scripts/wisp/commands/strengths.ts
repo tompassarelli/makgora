@@ -9,7 +9,7 @@ import { type Direction, type Intent, type ProfileMatch, contradictions, profile
 
 const STRENGTHS_FILE = join(import.meta.dir, "../../../../tools/move-data/fighter-strengths.json");
 
-class StrengthsFailure extends Schema.TaggedError<StrengthsFailure>()("StrengthsFailure", { problem: Schema.String }) {
+class StrengthsFailure extends Schema.TaggedError<StrengthsFailure, { readonly brand: unique symbol }>()("StrengthsFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

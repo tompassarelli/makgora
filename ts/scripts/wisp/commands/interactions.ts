@@ -31,7 +31,7 @@ interface FighterRows {
   readonly combos: readonly ComboRow[];
 }
 
-class InteractionsFailure extends Schema.TaggedError<InteractionsFailure>()("InteractionsFailure", { problems: Schema.Array(Schema.String) }) {
+class InteractionsFailure extends Schema.TaggedError<InteractionsFailure, { readonly brand: unique symbol }>()("InteractionsFailure", { problems: Schema.Array(Schema.String) }) {
   override get message(): string {
     return this.problems.join("\n");
   }

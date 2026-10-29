@@ -166,7 +166,7 @@ export function kitCandidates(current: KitValues, baseline: KitValues): KitValue
   return candidates;
 }
 
-export class BalanceFailure extends Schema.TaggedError<BalanceFailure>()("BalanceFailure", { problem: Schema.String }) {}
+export class BalanceFailure extends Schema.TaggedError<BalanceFailure, { readonly brand: unique symbol }>()("BalanceFailure", { problem: Schema.String }) {}
 
 export interface RoundResult { readonly kept?: KeptChange; readonly trainingFields: number; readonly record: string }
 

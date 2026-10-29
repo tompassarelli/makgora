@@ -234,11 +234,29 @@ const settingsOf = (args: readonly string[]): Settings | undefined => {
   };
 };
 
-export const serve = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
+const lanLease = (verb: "take" | "release", extra: readonly string[]) => Effect.promise(async () => {
+  const run = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "lease", verb, ...extra], { cwd: tsDirectory, stdin: "ignore", stdout: "pipe", stderr: "inherit" });
+  const text = await new Response(run.stdout).text();
+  return { code: await run.exited, text };
+});
+
+/** The next free pair on this host from the shared pair queue, held until the scope ends; the lease also ends with this process. */
+const leasePair = Effect.acquireRelease(
+  lanLease("take", ["--owner", "capture-queue", "--pid", String(process.pid)]).pipe(Effect.flatMap(({ code, text }) => {
+    const slot = code === 0 ? (JSON.parse(text.trim().split("\n").at(-1) ?? "{}") as { host?: string; pair?: number }) : undefined;
+    return slot?.host === undefined || slot.pair === undefined ? Effect.fail(fail("no free pair from the shared pair queue; see its output above")) : Effect.succeed({ host: slot.host, pair: slot.pair });
+  })),
+  slot => lanLease("release", ["--host", slot.host, "--pair", String(slot.pair)]),
+);
+
+export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(function*() {
+  const pairs = given.flatMap((arg, index) => arg === "--pair" ? [index] : []);
+  const auto = pairs.length === 0 || given[pairs[0]! + 1] === "auto";
+  const args = auto ? [...given.filter((arg, index) => !(pairs.includes(index) || pairs.includes(index - 1))), "--pair", String((yield* leasePair).pair)] : given;
   const settings = settingsOf(args);
   const once = args.includes("--once");
   const idleMinutes = Number(option(args, "--idle-minutes") ?? "30");
-  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0) return yield* new UsageFailure({ problem: "anim capture serve --pair K [--once] [--idle-minutes N] [--minutes 1..5] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
+  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--once] [--idle-minutes N] [--minutes 1..5] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
   yield* attempt("create the queue", () => mkdirSync(queueDirectory("batches"), { recursive: true }));
   const poolLog = join(queueDirectory("batches"), `pool-${settings.pair}.log`);
   let pool: Bun.Subprocess | undefined;

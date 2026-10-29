@@ -30,7 +30,7 @@ export const runMeasuredProcess = (command: readonly string[], cwd: string, env:
   );
 
 
-export class ProcessFailure extends Schema.TaggedError<ProcessFailure>()("ProcessFailure", {
+export class ProcessFailure extends Schema.TaggedError<ProcessFailure, { readonly brand: unique symbol }>()("ProcessFailure", {
   command: Schema.String,
   problem: Schema.String,
 }) {

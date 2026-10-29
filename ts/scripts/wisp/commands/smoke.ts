@@ -7,7 +7,7 @@ import { mergeVerdicts, smokeLines, smokeReceipt } from "../smokeJudge";
 import { nativeSmoke } from "../nativeSmoke";
 import { rehearseSmoke } from "../smokeRehearsal";
 
-class SmokeFailure extends Schema.TaggedError<SmokeFailure>()("SmokeFailure", { problem: Schema.String }) {
+class SmokeFailure extends Schema.TaggedError<SmokeFailure, { readonly brand: unique symbol }>()("SmokeFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

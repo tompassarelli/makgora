@@ -5,7 +5,7 @@ import { LEDGER_ROWS, departureProblems } from "../../ledger/ledger";
 import { formatOracle, oracleProblems, runOracle } from "../../meleeOracle";
 import { compareThresholds, formatThresholds } from "../../meleeThresholds";
 
-class OracleFailure extends Schema.TaggedError<OracleFailure>()("OracleFailure", { problems: Schema.Array(Schema.String) }) {
+class OracleFailure extends Schema.TaggedError<OracleFailure, { readonly brand: unique symbol }>()("OracleFailure", { problems: Schema.Array(Schema.String) }) {
   override get message(): string {
     return this.problems.join("\n");
   }

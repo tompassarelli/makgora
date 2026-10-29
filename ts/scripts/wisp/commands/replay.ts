@@ -21,7 +21,7 @@ import { readReplay } from "../replayFiles";
 const ts = join(import.meta.dir, "../../..");
 const replayLua = join(ts, "build", "lua-replay", "replay.lua");
 
-class ReplayFailure extends Schema.TaggedError<ReplayFailure>()("ReplayFailure", {
+class ReplayFailure extends Schema.TaggedError<ReplayFailure, { readonly brand: unique symbol }>()("ReplayFailure", {
   problem: Schema.String,
 }) {
   override get message(): string {

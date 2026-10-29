@@ -26,7 +26,7 @@ import { type Finished, runGroup } from "./processGroups";
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
 
-export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePushRefusal", { problem: Schema.String }) {
+export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal, { readonly brand: unique symbol }>()("PrePushRefusal", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

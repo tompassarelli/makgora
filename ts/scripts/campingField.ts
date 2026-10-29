@@ -111,7 +111,7 @@ const OPTIONS = {
   rules: { type: "string" }, workers: { type: "string" }, shard: { type: "string" },
 } as const;
 
-class CampingFailure extends Schema.TaggedError<CampingFailure>()("CampingFailure", { problem: Schema.String }) {
+class CampingFailure extends Schema.TaggedError<CampingFailure, { readonly brand: unique symbol }>()("CampingFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

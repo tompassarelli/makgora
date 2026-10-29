@@ -30,7 +30,7 @@ const MANIFEST_FILE = join(TS, "stage-thumbnails.json");
 const SILHOUETTE_FILE = join(TS, "src/generated/stages/stageSilhouettes.ts");
 const FRAME = 80;
 
-class ThumbnailFailure extends Schema.TaggedError<ThumbnailFailure>()("ThumbnailFailure", { problem: Schema.String }) {
+class ThumbnailFailure extends Schema.TaggedError<ThumbnailFailure, { readonly brand: unique symbol }>()("ThumbnailFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

@@ -9,7 +9,7 @@ import { collect } from "wisp/scripts/wisp/hostProcess";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { type CiJob, type CiStep, unmeasured } from "./autolandCore";
 
-class SheriffFailure extends Schema.TaggedError<SheriffFailure>()("SheriffFailure", { command: Schema.String, problem: Schema.String }) {
+class SheriffFailure extends Schema.TaggedError<SheriffFailure, { readonly brand: unique symbol }>()("SheriffFailure", { command: Schema.String, problem: Schema.String }) {
   override get message(): string {
     return `${this.command}: ${this.problem}`;
   }

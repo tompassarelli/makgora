@@ -15,7 +15,7 @@ import { step } from "wisp/scripts/wisp/timings";
 import { TIGHT_ESCAPE } from "../../agency";
 import { FIGHTERS, type LinkResult, REPORTED_FRAMES, STARTER_NAMES, type StarterResult, sweepComparisonLinks, sweepStarters } from "../../agencySweep";
 
-class AgencyFailure extends Schema.TaggedError<AgencyFailure>()("AgencyFailure", { problem: Schema.String }) {
+class AgencyFailure extends Schema.TaggedError<AgencyFailure, { readonly brand: unique symbol }>()("AgencyFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

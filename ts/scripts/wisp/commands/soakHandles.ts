@@ -10,7 +10,7 @@ import { stockLua } from "../luaRuntimes";
 import { bundleConfig } from "../bundleConfigs";
 import { buildProject, tsDirectory } from "../project";
 
-class HandleSoakFailure extends Schema.TaggedError<HandleSoakFailure>()("HandleSoakFailure", { problem: Schema.String }) {
+class HandleSoakFailure extends Schema.TaggedError<HandleSoakFailure, { readonly brand: unique symbol }>()("HandleSoakFailure", { problem: Schema.String }) {
   override get message(): string {
     return this.problem;
   }

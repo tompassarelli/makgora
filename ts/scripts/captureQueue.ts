@@ -6,7 +6,7 @@ import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { SCORED_NORMALS, SCORED_SPECIALS } from "./wisp/animScoreSample";
 
-export class CaptureQueueFailure extends Schema.TaggedError<CaptureQueueFailure>()("CaptureQueueFailure", { problem: Schema.String }) {
+export class CaptureQueueFailure extends Schema.TaggedError<CaptureQueueFailure, { readonly brand: unique symbol }>()("CaptureQueueFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 

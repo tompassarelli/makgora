@@ -394,7 +394,7 @@ export function effectSourceDigest(root = join(import.meta.dir, "../../..")): st
   return hash.digest("hex");
 }
 
-export class EffectCheckFailure extends Schema.TaggedError<EffectCheckFailure>()("EffectCheckFailure", { problem: Schema.String }) {
+export class EffectCheckFailure extends Schema.TaggedError<EffectCheckFailure, { readonly brand: unique symbol }>()("EffectCheckFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 // Facts read only whether a texture exists, and each cache stores a texture in its own decoded form.

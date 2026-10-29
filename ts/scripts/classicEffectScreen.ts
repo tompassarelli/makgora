@@ -17,7 +17,7 @@ const CapturePack = Schema.Struct({ samples: Schema.Array(CaptureSample) });
 const Receipt = Schema.Struct({ map: Schema.String, build: Schema.Struct({ installed: Schema.String, equal: Schema.Boolean, offline: Schema.optionalKey(Schema.Boolean) }), missed: Schema.Array(Schema.Unknown), captures: Schema.Array(Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.String, file: Schema.String, width: Schema.Finite, height: Schema.Finite })) });
 const Manifest = Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite) })) });
 
-export class ScreenEvidenceFailure extends Schema.TaggedError<ScreenEvidenceFailure>()("ScreenEvidenceFailure", { problem: Schema.String }) {
+export class ScreenEvidenceFailure extends Schema.TaggedError<ScreenEvidenceFailure, { readonly brand: unique symbol }>()("ScreenEvidenceFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 

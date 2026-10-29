@@ -17,7 +17,7 @@ import { pollUntil } from "../../hostPoll";
 import { NATIVE_SOAK_FILE, nativeChatFile } from "../../../src/game/core/gameFiles";
 import { INTEGRITY_BUILD } from "../../../src/game/session/currentBuild";
 
-class NativeSoakFailure extends Schema.TaggedError<NativeSoakFailure>()("NativeSoakFailure", { problem: Schema.String }) {
+class NativeSoakFailure extends Schema.TaggedError<NativeSoakFailure, { readonly brand: unique symbol }>()("NativeSoakFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 

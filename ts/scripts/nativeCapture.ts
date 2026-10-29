@@ -42,7 +42,7 @@ import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
 import { nativeCaptureChunks } from "./nativeCaptureChunks";
 import { frameVerdict } from "./nativeCaptureVerdict";
 
-export class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
+export class CaptureFailure extends Schema.TaggedError<CaptureFailure, { readonly brand: unique symbol }>()("CaptureFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 const fail = (problem: string): never => { throw new CaptureFailure({ problem }); };

@@ -35,7 +35,7 @@ export function releaseTreeDrift(snapshot: ReleaseSnapshot) {
   return { tree: tree.size, milestone: members.length, missing, outside };
 }
 
-class ReleaseTreeFailure extends Schema.TaggedError<ReleaseTreeFailure>()("ReleaseTreeFailure", { problem: Schema.String }) {
+class ReleaseTreeFailure extends Schema.TaggedError<ReleaseTreeFailure, { readonly brand: unique symbol }>()("ReleaseTreeFailure", { problem: Schema.String }) {
   override get message() { return this.problem; }
 }
 const repo = () => process.env.GH_REPO ?? "tompassarelli/smashcraft";
