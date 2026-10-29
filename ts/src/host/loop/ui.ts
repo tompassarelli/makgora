@@ -24,6 +24,8 @@ import type { MenuControls } from "../../game/ui/frames";
 import { sourceVersion } from "../../game/shell/sourceVersion";
 import { FighterHud, MatchClock } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
+import { ChatPanel } from "wisp/src/ui/chatPanel";
+import { CHAT_STYLE } from "../../game/ui/nativeChat";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
 import { TerrorPresentation } from "../../game/render/terrorPresentation";
 import { EscapeMeter } from "../../game/ui/escapeMeter";
@@ -102,6 +104,7 @@ export interface UiObjects {
 
   match: MatchPresentation;
   results: ResultsBanner;
+  chat: ChatPanel;
 
   elements: ElementEffects;
 
@@ -142,6 +145,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
   const results = new ResultsBanner();
   const ui: UiObjects = {
     results,
+    chat: new ChatPanel(CHAT_STYLE),
     pause: new PauseMenu(selectPause),
     items: new ItemPresentation(s.origin),
     auras: new AuraPresentation(s.origin),
@@ -264,6 +268,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   else for (const slot of PARTICIPANT_SLOTS) bindPrototype(ui.markers[slot], FighterMarker.prototype);
   bindPrototype(ui.clock, MatchClock.prototype);
   bindPrototype(ui.training, TrainingReadout.prototype);
+  const retainedChat: { readonly chat?: ChatPanel } = ui;
+  if (retainedChat.chat === undefined) ui.chat = new ChatPanel(CHAT_STYLE);
+  else bindPrototype(ui.chat, ChatPanel.prototype);
   for (const slot of PARTICIPANT_SLOTS) {
     bindPrototype(ui.huds[slot], FighterHud.prototype);
     bindPrototype(ui.bubbles[slot], OffscreenBubble.prototype);

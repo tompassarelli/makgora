@@ -32,6 +32,8 @@ import { DamagePose, damagePose } from "../../game/presentation/damagePose";
 import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
 import type { FighterPose } from "../../game/presentation/fighterPose";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
+import { chatBox } from "../../game/ui/nativeChat";
+import { hideWarcraftChat } from "../../game/ui/warcraftChat";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
 import { presentFighterMarkers } from "./fighterMarkers";
@@ -649,4 +651,6 @@ export function renderUi(s: ShellState): void {
     }
   }
   ui.stage.update(game);
+  hideWarcraftChat();
+  ui.chat.update(FRAME_SECONDS, chatBox(game.phase));
 }

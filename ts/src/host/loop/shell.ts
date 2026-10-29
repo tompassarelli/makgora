@@ -53,6 +53,7 @@ import { type Rollback, type ShellState, activeRollback, createShellState, keepS
 import { endReplaySegment, serviceReplay } from "./replays";
 import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../game/session/pauseBarrier";
 import { clearMatchEffects, createUi, recreateUi, views } from "./ui";
+import { registerChatEvents, registerChatHistoryKey } from "wisp/src/ui/chatPanel";
 import { resultsView } from "../../game/presentation/matchCues";
 import * as view from "./view";
 import { renderCaptureStage } from "./captureStage";
@@ -71,6 +72,8 @@ const PAUSE_REQUEST = "shell.pauseRequest";
 const CHAT_CLOSED = "shell.chatClosed";
 const INPUT = "shell.input";
 const DEV_COMMAND = "shell.devCommand";
+const CHAT_RECEIVED = "shell.chatReceived";
+const CHAT_HISTORY = "shell.chatHistory";
 const CONTROLS_COMMAND = "shell.controlsCommand";
 const SAVE_CONTROLS = "-save";
 const SAVE_MOMENT_COMMAND = "-clip";
@@ -314,6 +317,12 @@ function createTriggers(s: ShellState): void {
     for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), "-dev ", false);
     TriggerAddAction(chat, trampoline(DEV_COMMAND));
   }
+  const received = CreateTrigger();
+  registerChatEvents(received, PARTICIPANT_SLOTS);
+  TriggerAddAction(received, trampoline(CHAT_RECEIVED));
+  const history = CreateTrigger();
+  registerChatHistoryKey(history, PARTICIPANT_SLOTS, ConvertOsKeyType(Key.f8));
+  TriggerAddAction(history, trampoline(CHAT_HISTORY));
   const controls = CreateTrigger();
   for (const slot of PARTICIPANT_SLOTS) {
     TriggerRegisterPlayerChatEvent(controls, Player(slot), SAVE_CONTROLS, true);
@@ -432,6 +441,8 @@ export function installShell(): void {
   on(CHAT_CLOSED, withShell(journalPause.chatClosedEvent));
   on(EDITBOX_ENTER, withShell(journalPause.chatEntered));
   on(DEV_COMMAND, withShell(onDevCommand));
+  on(CHAT_RECEIVED, withShell(s => views(s).chat.receive()));
+  on(CHAT_HISTORY, withShell(s => views(s).chat.toggleHistory()));
   on(CONTROLS_COMMAND, withShell(controlsCommand));
   on(HELP_EVENT, helpCommand);
   on(PLAYER_LEFT, withShell(playerLeft));
