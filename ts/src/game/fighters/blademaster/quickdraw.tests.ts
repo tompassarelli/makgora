@@ -236,10 +236,10 @@ test("The computer keeps holding Quickdraw while its foe is beyond the current d
   frame(s, [Action.special]);
   assertEquals(blademaster.special.action, SpecialAction.heroNeutral, "the stance starts");
   const far = neutralControls();
-  assertTrue(pressHeroFollowUp(blademaster, foe, 0, far));
+  assertTrue(pressHeroFollowUp(blademaster, foe, 0, 0, far));
   assertTrue(far.specialHeld);
   foe.motion.x = NEAR_FOE_X;
   const near = neutralControls();
-  assertTrue(pressHeroFollowUp(blademaster, foe, 0, near));
+  assertTrue(pressHeroFollowUp(blademaster, foe, 0, 0, near));
   assertFalse(near.specialHeld);
 });

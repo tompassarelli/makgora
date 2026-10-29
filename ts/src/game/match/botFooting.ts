@@ -5,6 +5,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
+import type { AuthoredSpecial } from "../sim/specials/schema";
 import { restingTraction } from "../sim/groundMovement";
 import { floorFriction, floorTraction, mainDeckLeft, mainDeckRight, surfaceCount, surfaceLeft, surfaceLine, surfaceMoves, surfaceRight, surfaceZAt } from "../sim/stage";
 
@@ -229,4 +230,22 @@ function deckIndexUnder(stage: number, matchFrame: number, x: number, z: number)
 export function deckUnder(stage: number, matchFrame: number, x: number, z: number): number | undefined {
   const index = deckIndexUnder(stage, matchFrame, x, z);
   return index < 0 ? undefined : surfaceZAt(stage, index, matchFrame, x);
+}
+
+
+export function scriptedPathLands(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, facing: number, stage: number, matchFrame: number): boolean {
+  let { x, z } = f.motion;
+  let elapsed = 0;
+  for (const segment of move.motion ?? []) {
+    for (let frame = segment.first; frame <= segment.last; frame++) {
+      elapsed++;
+      const nextX = f32(x + f32(facing * segment.velocityX));
+      const nextZ = f32(z + segment.velocityZ);
+      const deck = deckUnder(stage, matchFrame + elapsed, nextX, z);
+      if (deck !== undefined && nextZ <= deck) return true;
+      x = nextX;
+      z = nextZ;
+    }
+  }
+  return deckUnder(stage, matchFrame + elapsed, x, z) !== undefined;
 }

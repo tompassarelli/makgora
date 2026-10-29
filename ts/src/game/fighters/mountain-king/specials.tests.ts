@@ -1,4 +1,4 @@
-import { assertEquals, assertFalse, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertFalse, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { Action, maskOf } from "../../input/actions";
@@ -12,7 +12,8 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
-import { fighterAt } from "../../sim/roster";
+import { type Controls, fighterAt, neutralControls } from "../../sim/roster";
+import { holdAutoFollowUpOnDeck, pressHeroFollowUp } from "../../match/botHeroKit";
 import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
 import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
@@ -91,11 +92,11 @@ const DIRECTIONS: readonly Direction[] = [
   { name: "down", x: 0, z: -1 }, { name: "down-left", x: -1, z: -1 }, { name: "left", x: -1, z: 0 }, { name: "up-left", x: -1, z: 1 },
 ];
 
-function leapMatch(foeX: number): { state: ReplayState; king: Fighter; foe: Fighter } {
+function leapMatch(foeX: number, kingX = 0.0): { state: ReplayState; king: Fighter; foe: Fighter } {
   const state = createReplaySnapshot();
   const king = fighterAt(state.world, 0);
   const foe = fighterAt(state.world, 1);
-  copyFighterState(king, createFighter(Character.mountainKing, 0.0, 1), 3);
+  copyFighterState(king, createFighter(Character.mountainKing, kingX, 1), 3);
   copyFighterState(foe, createFighter(Character.rifleman, foeX, -1), 3);
   state.match.phase = Phase.match;
   state.match.stageChoice = 0;
@@ -155,8 +156,8 @@ interface Leap {
   dived: boolean;
 }
 
-function startLeap(aim: Direction, foeX = FOE_AWAY): Leap {
-  const { state, king, foe } = leapMatch(foeX);
+function startLeap(aim: Direction, foeX = FOE_AWAY, kingX = 0.0): Leap {
+  const { state, king, foe } = leapMatch(foeX, kingX);
   const leap: Leap = { state, king, foe, trail: [], tick: 1, dived: false };
   step(state, king, leap.tick, aim.x, aim.z, true, true);
   assertEquals(king.special.action, SpecialAction.heroUp, "Thunder Leap starts");
@@ -174,8 +175,8 @@ function advance(leap: Leap, aim: Direction, input: (frame: number) => Held, sto
   }
 }
 
-function leapToTop(aim: Direction, input: (frame: number) => Held = () => REST, foeX = FOE_AWAY): Leap {
-  const leap = startLeap(aim, foeX);
+function leapToTop(aim: Direction, input: (frame: number) => Held = () => REST, foeX = FOE_AWAY, kingX = 0.0): Leap {
+  const leap = startLeap(aim, foeX, kingX);
   advance(leap, aim, input, FIRE_STEP_FRAME);
   assertEquals(leap.king.special.frame, FIRE_STEP_FRAME, "he reaches the step before the top");
   assertEquals(leap.dived, false, "nothing dives before the top");
@@ -444,4 +445,48 @@ test("Mountain King lands from Thunder Leap in 11 frames of landing lag after it
   assertEquals(lags.fall, THUNDER_LEAP_LANDING_LAG, "landing from the helpless fall");
   assertEquals(lags.midMove, THUNDER_LEAP_LANDING_LAG, "landing during the leap");
   assertEquals(lags.dive, HAMMERFALL_LANDING_LAG, "landing from the dive keeps its own lag");
+});
+
+const BOT_LEAP_XS = [-600.0, -450.0, -300.0, 0.0, 300.0, 450.0, 600.0] as const;
+const BOT_FOE_OFFSETS = [-450.0, -250.0, 0.0, 250.0, 450.0] as const;
+const BOT_FALL_LIMIT = 300;
+
+function botDiveLands(leap: Leap, input: Controls, foeX: number, foeZ: number, guarded: boolean, what: string): boolean {
+  const { state, king, foe } = leap;
+  if (guarded) holdAutoFollowUpOnDeck(king, state.match.stageChoice, leap.tick, input);
+  step(state, king, ++leap.tick, input.direction, input.verticalDirection, false);
+  if (king.special.form < FOLLOW_UP_FORM) return false;
+  for (let n = 0; n < BOT_FALL_LIMIT && !king.motion.grounded && !king.status.out; n++) {
+    place(foe, foeX, foeZ);
+    step(state, king, ++leap.tick, 0, 0, false);
+  }
+  assertEquals(king.motion.grounded, true, `${what}: the dive (${input.direction}, ${input.verticalDirection}) comes down on a deck`);
+  return true;
+}
+
+test("The computer's Hammerfall dive from the top of Thunder Leap always comes down on a deck: it never picks a dive whose path leaves every deck, even with its foe along that path, and a stick its later input steps leave pointing off the stage starts no dive (#731) [k1 scenario]", () => {
+  let picked = 0;
+  let held = 0;
+  for (const kingX of BOT_LEAP_XS) {
+    for (const offsetX of BOT_FOE_OFFSETS) for (const offsetZ of BOT_FOE_OFFSETS) {
+      if (offsetX === 0.0 && offsetZ === 0.0) continue;
+      const leap = leapToTop(UP, () => REST, FOE_AWAY, kingX);
+      const foeX = f32(leap.king.motion.x + offsetX);
+      const foeZ = f32(leap.king.motion.z + offsetZ);
+      place(leap.foe, foeX, foeZ);
+      const input = neutralControls();
+      if (!pressHeroFollowUp(leap.king, leap.foe, leap.state.match.stageChoice, leap.tick, input)) continue;
+      if (botDiveLands(leap, input, foeX, foeZ, false, `from x ${kingX}, foe at ${offsetX}, ${offsetZ}`)) picked++;
+    }
+    for (const direction of DIRECTIONS) {
+      if (direction === UP) continue;
+      const leap = leapToTop(UP, () => REST, FOE_AWAY, kingX);
+      const input = neutralControls();
+      input.direction = direction.x;
+      input.verticalDirection = direction.z;
+      if (!botDiveLands(leap, input, FOE_AWAY, 0.0, true, `from x ${kingX}, stick ${direction.name}`)) held++;
+    }
+  }
+  assertGreaterThan(picked, 20);
+  assertGreaterThan(held, 0);
 });

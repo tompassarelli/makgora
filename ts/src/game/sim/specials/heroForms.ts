@@ -153,14 +153,22 @@ function followUpPressed(f: Readonly<Fighter>, followUp: Readonly<SpecialFollowU
   return pressed && (stick === undefined || (Math.abs(x) === stick.x && z === stick.z));
 }
 
-export function followUpHeroSpecial(f: Fighter, input: Readonly<Controls>): boolean {
-  const { special } = f;
+export function pressedFollowUp(f: Readonly<Fighter>, input: Readonly<Controls>): number {
   const move = runningHeroSpecial(f);
   const followUps = move?.followUps;
-  if (followUps === undefined || special.form >= FOLLOW_UP_FORM || f.launch.hitlag > 0 || f.launch.hitstun > 0) return false;
-  let index = 0;
-  while (index < followUps.length && !(inWindow(at(followUps, index).window, special.frame + 1) && chargeStageOpen(f, move?.charge, at(followUps, index)) && followUpPressed(f, at(followUps, index), input))) index++;
-  if (index >= followUps.length) return false;
+  if (followUps === undefined || f.special.form >= FOLLOW_UP_FORM || f.launch.hitlag > 0 || f.launch.hitstun > 0) return -1;
+  for (let index = 0; index < followUps.length; index++) {
+    const followUp = at(followUps, index);
+    if (inWindow(followUp.window, f.special.frame + 1) && chargeStageOpen(f, move?.charge, followUp) && followUpPressed(f, followUp, input)) return index;
+  }
+  return -1;
+}
+
+export function followUpHeroSpecial(f: Fighter, input: Readonly<Controls>): boolean {
+  const { special } = f;
+  const followUps = runningHeroSpecial(f)?.followUps;
+  const index = pressedFollowUp(f, input);
+  if (followUps === undefined || index < 0) return false;
   const followUp = at(followUps, index);
   const next = followUp.special;
   if (followUp.facesStick === true && input.direction !== 0) f.facing = input.direction < 0 ? -1 : 1;

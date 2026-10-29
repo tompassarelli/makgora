@@ -5,17 +5,19 @@
 
 
 
+import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
-import { changesAimZone, launchZoneX, launchZoneZ } from "../sim/specials/aimZone";
+import { changesAimZone, chargedAimX, launchZoneX, launchZoneZ } from "../sim/specials/aimZone";
+import { pressedFollowUp } from "../sim/specials/heroForms";
 import { chooseHeroSpecial } from "../sim/specials/engine";
 import { isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/runningMove";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit } from "../sim/specials/schema";
 import { type Controls, neutralControls } from "../sim/roster";
 import { floorFriction, floorTraction } from "../sim/stage";
-import { deckUnder, heightAhead, safeAt } from "./botFooting";
+import { deckUnder, heightAhead, safeAt, scriptedPathLands } from "./botFooting";
 import { gameplanOf } from "./botGameplan";
 import { GameplanSpecial } from "../sim/gameplan";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
@@ -279,7 +281,7 @@ function aimsByStick(f: Readonly<Fighter>): boolean {
   return false;
 }
 
-export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, input: Controls): boolean {
+export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, matchFrame: number, input: Controls): boolean {
   if (!isHeroSpecialAction(f.special.action) || f.special.form >= FOLLOW_UP_FORM || f.launch.hitstun > 0) return false;
   const next = f.special.frame + 1;
   const dx = f32(target.motion.x - f.motion.x);
@@ -297,6 +299,7 @@ export function pressHeroFollowUp(f: Readonly<Fighter>, target: Readonly<Fighter
     const turns = branch.facesStick === true || (branch.stick !== undefined && branch.stick.x !== 0);
     const facing = turns && dx !== 0.0 ? (dx < 0 ? -1 : 1) : f.facing;
     const stickX = branch.stick === undefined || branch.stick.x === 0 ? 0 : facing;
+    if (branch.special.helpless === true && !scriptedPathLands(f, branch.special, facing, stage, matchFrame)) continue;
     if (kind === FollowUpInput.auto && !changesAimZone(f, stickX, branch.stick?.z ?? 0)) continue;
     if (!strikeMeets(branch.special, target, f32(dx * facing), localZ)) continue;
     if (kind === FollowUpInput.attack) input.attackPressed = true;
@@ -325,4 +328,16 @@ export function autoFollowUpDue(f: Readonly<Fighter>): boolean {
     if (branch.input === FollowUpInput.auto && next >= branch.window.first && next <= branch.window.last) return true;
   }
   return false;
+}
+
+export function holdAutoFollowUpOnDeck(f: Readonly<Fighter>, stage: number, matchFrame: number, input: Controls): void {
+  const followUps = runningHeroSpecial(f)?.followUps;
+  const index = pressedFollowUp(f, input);
+  if (followUps === undefined || index < 0) return;
+  const branch = at(followUps, index);
+  if (branch.input !== FollowUpInput.auto || branch.special.helpless !== true) return;
+  const sideOf = (x: number): number => (x < 0 ? -1 : 1);
+  const facing = branch.stick !== undefined && branch.stick.x !== 0 ? sideOf(chargedAimX(input))
+    : branch.facesStick === true && input.direction !== 0 ? sideOf(input.direction) : f.facing;
+  if (!scriptedPathLands(f, branch.special, facing, stage, matchFrame)) holdFirstPartZone(f, input);
 }

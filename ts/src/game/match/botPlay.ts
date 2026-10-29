@@ -29,7 +29,7 @@ import { chooseLedgeTrap } from "./botLedgeTrap";
 import { chooseRecoveryInput } from "./botRecovery";
 import { guardOffstage, waitAtLip } from "./botEdgeGuard";
 import { escapeCorner, pokeGoal, pressCorner, pressEdgeCancel, steerEdgeCancel } from "./botCorner";
-import { pressHeroFollowUp } from "./botHeroKit";
+import { holdAutoFollowUpOnDeck, pressHeroFollowUp } from "./botHeroKit";
 import { holdChannelOnFoe } from "./botChannel";
 import { dashIn, holdAimAtFoe, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial, steerShotAtFoe } from "./botKitOptions";
 import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "../lobby/lobbyState";
@@ -288,6 +288,7 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   // DI and escape mashing are reactions to the fighter's own state, not steering.
   if (fighter.launch.hitlag <= 0 && fighter.grab.owner === undefined) commitBotDirection(runtime.botMemory, slot, frame, input, tier, skill.decision);
   avoidTeamContact(game, world, slot, target, input, commands);
+  holdAutoFollowUpOnDeck(fighter, game.stageChoice, stageClock(game), input);
   useMatchSeed(0);
   return execution;
 }
@@ -391,7 +392,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     input.mashPressed = floorMod(frame, skill.grabMashFrames) === 0;
     return;
   }
-  if (skill.basicMoves === undefined && target !== undefined && (steerHeroBranches(fighter, target, skill, input) || pressHeroFollowUp(fighter, target, stage, input))) return;
+  if (skill.basicMoves === undefined && target !== undefined && (steerHeroBranches(fighter, target, skill, input) || pressHeroFollowUp(fighter, target, stage, stageFrame, input))) return;
   if (skill.basicMoves === undefined && target !== undefined && !game.training && guardOffstage(fighter, target, stage, skill, slot, frame, observationAge, input, commands)) return;
   const recovering = chooseRecoveryInput(fighter, stage, stageFrame, input, target, skill);
   if (steerRunningSpecial(fighter, target, stage, skill, input) || recovering) return;
