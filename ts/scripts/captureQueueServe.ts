@@ -10,7 +10,8 @@ import { fanGroups } from "./captureQueueFan";
 import { peerSpec } from "./captureQueuePeers";
 import { pairAgentStatus } from "./pairAgentStatus";
 import { attachedPoolReady } from "./wisp/nativePool";
-import { projectRoot, tsDirectory } from "./wisp/projectRoot";
+import { type Checkout, servingCheckout } from "./captureQueueCheckout";
+import { projectRoot } from "./wisp/projectRoot";
 
 const option = (args: readonly string[], name: string) => {
   const index = args.indexOf(name);
@@ -28,7 +29,7 @@ type Facing = keyof typeof FACING_ARROW;
 interface PadRow { readonly fixture: string; readonly facing: Facing }
 const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
 
-interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly remote?: RemoteHost }
+interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly checkout: Checkout; readonly remote?: RemoteHost }
 interface Group { commit: string; readonly jobs: Job[] }
 
 const logTo = (file: string) => (row: Record<string, unknown>) => Effect.sync(() => {
@@ -114,7 +115,7 @@ const warmPool = (settings: Settings, log: ReturnType<typeof logTo>, logFile: st
   const child = yield* Effect.acquireRelease(
     attempt("start the warm pool", () => {
       const fd = openSync(logFile, "a");
-      const spawned = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(settings.pair), "--pool-profile", "visual", "--desktop", settings.desktop, "--capacity", settings.capacity, "--queue", "--owner", "capture-queue", "--owner-pid", String(process.pid)], { cwd: tsDirectory, stdin: "ignore", stdout: fd, stderr: fd });
+      const spawned = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(settings.pair), "--pool-profile", "visual", "--desktop", settings.desktop, "--capacity", settings.capacity, "--queue", "--owner", "capture-queue", "--owner-pid", String(process.pid), "--release-idle", "0"], { cwd: settings.checkout.ts, stdin: "ignore", stdout: fd, stderr: fd });
       closeSync(fd);
       return spawned;
     }),
@@ -179,7 +180,7 @@ export const capturedWhole = (fixtures: ReadonlyMap<string, readonly string[]>, 
   return new Set([...fixtures].filter(([, own]) => own.length > 0 && own.every(name => whole.has(name))).map(([job]) => job));
 };
 
-const sheetFor = (job: Job, fixtures: readonly PadRow[], captures: readonly { readonly fixture: string; readonly frame: number; readonly file: string }[], frames: string, logFile: string) => Effect.gen(function*() {
+const sheetFor = (root: string, job: Job, fixtures: readonly PadRow[], captures: readonly { readonly fixture: string; readonly frame: number; readonly file: string }[], frames: string, logFile: string) => Effect.gen(function*() {
   const directory = join(queueDirectory("results"), job.id), judge = join(directory, "judge"), sheet = join(directory, "sheet.png");
   yield* attempt("create the result folder", () => mkdirSync(judge, { recursive: true }));
   const [left, top, width, height] = job.crop ?? BODY_CROP;
@@ -189,14 +190,14 @@ const sheetFor = (job: Job, fixtures: readonly PadRow[], captures: readonly { re
   yield* spawnLogged(["magick", ...rows.flatMap(({ facing, row }) => ["(", ...row.flatMap(capture => ["(", join(frames, capture.file), ...crop, "-resize", `x${TILE_HEIGHT}`, "-fill", "white", "-stroke", "black", "-strokewidth", "2", "-draw", `polygon ${FACING_ARROW[facing]}`, ")"]), "+append", ")"]), "-append", "+repage", sheet], directory, logFile);
   const character = SELECTABLE_CHARACTERS.find(candidate => fighterSlug(candidate) === job.fighter) ?? 0;
   const dummy = SELECTABLE_CHARACTERS.find(candidate => fighterSlug(candidate) === dummyOf(job)) ?? 0;
-  const brief = yield* attempt("read the judge brief", () => readFileSync(join(projectRoot, "docs/animation-judge-brief.md"), "utf8"));
+  const brief = yield* attempt("read the judge brief", () => readFileSync(join(root, "docs/animation-judge-brief.md"), "utf8"));
   yield* attempt("write the judge batch", () => writeAtomic(join(judge, "batch-1.md"), `${brief}\n\n## Your moves (look: classic)\n\n- ${fighterName(character)} (\`${job.fighter}\`), \`${job.move}\`: ${sheet}\n  Native Classic frames in time order, one row per facing; the arrow in each frame's corner points the way ${fighterName(character)} faces. The other fighter is a ${fighterName(dummy)} standing in as the target.\n\nWrite your scores to ${join(judge, "scores-1.jsonl")}, one JSON line per move.\n`));
   return { sheet, judge };
 });
 
 const captureGroup = <R>(settings: Settings, batch: string, group: Group, index: number, log: ReturnType<typeof logTo>, poolReady: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
   const directory = join(queueDirectory("batches"), batch), logFile = join(directory, "run.log"), source = join(directory, `src-${index}`), sourceTs = join(source, "ts");
-  yield* git(projectRoot, ["worktree", "add", "--detach", source, group.commit]);
+  yield* git(settings.checkout.root, ["worktree", "add", "--detach", source, group.commit]);
   return yield* Effect.gen(function*() {
     const built = performance.now();
     yield* spawnLogged(["bun", "install", "--frozen-lockfile"], sourceTs, logFile);
@@ -213,7 +214,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     yield* attempt("write the plan", () => writeAtomic(plan, `${JSON.stringify({ version: 1, sourceRevision: identity.sourceRevision, rows: [{ name: `g${index}`, map, manifest, mapSha256: identity.mapSha256, frames: identity.fixtures.flatMap(fixture => fixture.frames) }] })}\n`));
     yield* poolReady;
     const captured = performance.now();
-    const ran = yield* (settings.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(captureMinutes(identity.fixtures.length))], tsDirectory, logFile)
+    const ran = yield* (settings.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(captureMinutes(identity.fixtures.length))], settings.checkout.ts, logFile)
       : captureThere(settings, settings.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) })).pipe(Effect.result);
     yield* log({ step: "capture", group: index, host: settings.remote?.name ?? hostname(), seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
@@ -228,11 +229,11 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
         yield* log({ step: "failed", id: job.id, problem: ran.failure.message });
         continue;
       }
-      const { sheet, judge } = yield* sheetFor(job, pads.get(job.id) ?? [], captures, frames, logFile);
+      const { sheet, judge } = yield* sheetFor(settings.checkout.root, job, pads.get(job.id) ?? [], captures, frames, logFile);
       yield* finish(job, { batch, status: "captured", mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision, fixtures: own, sheet, judge, frames });
       yield* log({ step: "sheet", id: job.id, sheet });
     }
-  }).pipe(Effect.ensuring(git(projectRoot, ["worktree", "remove", "--force", source], true).pipe(Effect.ignore)));
+  }).pipe(Effect.ensuring(git(settings.checkout.root, ["worktree", "remove", "--force", source], true).pipe(Effect.ignore)));
 });
 
 /** Runs a group's capture batch on the pair's host: its stored map goes into that host's map store under the same key, the batch runs from that host's main checkout and its frames come back to `native-INDEX`. */
@@ -265,9 +266,9 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: r
   yield* attempt("create the batch folder", () => mkdirSync(directory, { recursive: true }));
   const log = logTo(join(directory, "log.jsonl"));
   const folded = performance.now();
-  const main = (yield* git(projectRoot, ["rev-parse", "--verify", "origin/main"], true)).out || "HEAD";
-  const folds = yield* foldLanes(projectRoot, jobs, main);
-  const free = yield* freePairs(hosts);
+  const main = (yield* git(settings.checkout.root, ["rev-parse", "--verify", "origin/main"], true)).out || "HEAD";
+  const folds = yield* foldLanes(settings.checkout.root, jobs, main);
+  const free = yield* freePairs(settings.checkout, hosts);
   const groups = fanGroups(folds, Math.min(maxPairs, 1 + free));
   yield* log({ step: "fold", batch, jobs: jobs.map(job => job.id), freePairs: free, groups: groups.map(group => ({ commit: group.commit, lanes: group.jobs.map(job => job.lane) })), seconds: seconds(folded) });
   const pool = yield* Effect.forkChild(ensurePool);
@@ -282,13 +283,13 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: r
   yield* log({ step: "batch", batch, seconds: seconds(folded) });
 });
 
-const settingsOf = (args: readonly string[]): Settings | undefined => {
+const settingsOf = (args: readonly string[], checkout: Checkout): Settings | undefined => {
   const pair = Number(option(args, "--pair"));
   if (!Number.isInteger(pair) || pair < 0) return undefined;
   const north = join(homedir(), "code/north/main/harness/skills");
   const client = option(args, "--client") ?? `lan${pair}a`;
   return {
-    pair, client,
+    pair, client, checkout,
     desktop: option(args, "--desktop") ?? join(north, "private-desktop-development/scripts/private-desktop.sh"),
     capacity: option(args, "--capacity") ?? join(north, "machine-capacity/scripts/machine-capacity.mjs"),
     clientsFile: option(args, "--clients-file") ?? join(lanState, "clients.json"),
@@ -298,10 +299,10 @@ const settingsOf = (args: readonly string[]): Settings | undefined => {
 
 type Hosts = "local" | "any";
 
-const lanLease = (verb: "take" | "release" | "status", extra: readonly string[], hosts: Hosts) => Effect.gen(function*() {
+const lanLease = (checkout: Checkout, verb: "take" | "release" | "status", extra: readonly string[], hosts: Hosts) => Effect.gen(function*() {
   const remote = hosts === "any" ? yield* peerSpec : "";
   return yield* Effect.promise(async () => {
-    const run = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "lease", verb, ...extra], { cwd: tsDirectory, stdin: "ignore", stdout: "pipe", stderr: "inherit", env: { ...process.env, WISP_PAIR_REMOTE: remote } });
+    const run = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "lease", verb, ...extra], { cwd: checkout.ts, stdin: "ignore", stdout: "pipe", stderr: "inherit", env: { ...process.env, WISP_PAIR_REMOTE: remote } });
     const text = await new Response(run.stdout).text();
     return { code: await run.exited, text };
   });
@@ -309,24 +310,24 @@ const lanLease = (verb: "take" | "release" | "status", extra: readonly string[],
 
 const LEASE_WAIT_SECONDS = 1800;
 
-const freePairs = (hosts: Hosts) => lanLease("status", [], hosts).pipe(Effect.map(({ code, text }) => {
+const freePairs = (checkout: Checkout, hosts: Hosts) => lanLease(checkout, "status", [], hosts).pipe(Effect.map(({ code, text }) => {
   try { return code === 0 ? (JSON.parse(text.trim().split("\n").at(-1) ?? "{}") as { free?: unknown[] }).free?.length ?? 0 : 0; } catch { return 0; }
 }));
 
 /** The next free pair from the shared pair queue, on this host or with `any` on another, held until the scope ends; the lease also ends with this process. */
-const leasePair = (hosts: Hosts, owner: string) => Effect.acquireRelease(
-  lanLease("take", ["--owner", owner, "--pid", String(process.pid), "--hosts", hosts, "--wait", String(LEASE_WAIT_SECONDS)], hosts).pipe(Effect.flatMap(({ code, text }) => {
+const leasePair = (checkout: Checkout, hosts: Hosts, owner: string) => Effect.acquireRelease(
+  lanLease(checkout, "take", ["--owner", owner, "--pid", String(process.pid), "--hosts", hosts, "--wait", String(LEASE_WAIT_SECONDS)], hosts).pipe(Effect.flatMap(({ code, text }) => {
     const slot = code === 0 ? (JSON.parse(text.trim().split("\n").at(-1) ?? "{}") as { host?: string; pair?: number }) : undefined;
     return slot?.host === undefined || slot.pair === undefined ? Effect.fail(fail("no free pair from the shared pair queue; see its output above")) : Effect.succeed({ host: slot.host, pair: slot.pair });
   })),
-  slot => lanLease("release", ["--host", slot.host, "--pair", String(slot.pair)], hosts).pipe(Effect.ignore),
+  slot => lanLease(checkout, "release", ["--host", slot.host, "--pair", String(slot.pair)], hosts).pipe(Effect.ignore),
 );
 
 const groupSettings = (settings: Settings, hosts: Hosts, owner: string) => Effect.gen(function*() {
-  const slot = yield* leasePair(hosts, owner);
+  const slot = yield* leasePair(settings.checkout, hosts, owner);
   const client = `lan${slot.pair}a`;
   const remote = slot.host === hostname() ? undefined : yield* remoteHost(slot.host);
-  return { pair: slot.pair, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client, install: join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`), ...(remote === undefined ? {} : { remote }) } satisfies Settings;
+  return { pair: slot.pair, checkout: settings.checkout, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client, install: join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`), ...(remote === undefined ? {} : { remote }) } satisfies Settings;
 });
 
 export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(function*() {
@@ -334,9 +335,11 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   const auto = pairs.length === 0 || given[pairs[0]! + 1] === "auto";
   const hosts: Hosts = option(given, "--hosts") === "any" ? "any" : "local";
   const maxPairs = Number(option(given, "--max-pairs") ?? "64");
-  const leased = auto ? yield* leasePair(hosts, "capture-queue") : undefined;
+  yield* attempt("create the serve folder", () => mkdirSync(queueDirectory("serve"), { recursive: true }));
+  const checkout = yield* servingCheckout(projectRoot, join(queueDirectory("serve"), `${process.pid}-${Date.now().toString(36)}`));
+  const leased = auto ? yield* leasePair(checkout, hosts, "capture-queue") : undefined;
   const args = leased === undefined ? given : [...given.filter((arg, index) => !(pairs.includes(index) || pairs.includes(index - 1))), "--pair", String(leased.pair)];
-  const local = settingsOf(args);
+  const local = settingsOf(args, checkout);
   const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: yield* remoteHost(leased.host) };
   const once = args.includes("--once");
   const idleMinutes = Number(option(args, "--idle-minutes") ?? "30");

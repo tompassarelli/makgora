@@ -11,7 +11,7 @@ export class CaptureQueueFailure extends Schema.TaggedError<CaptureQueueFailure,
 }
 
 export const queueRoot = (): string => process.env.SMASHCRAFT_CAPTURE_QUEUE ?? join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "smashcraft/capture-queue");
-export const queueDirectory = (part: "pending" | "taken" | "results" | "batches") => join(queueRoot(), part);
+export const queueDirectory = (part: "pending" | "taken" | "results" | "batches" | "serve") => join(queueRoot(), part);
 
 export const Job = Schema.Struct({
   version: Schema.Literal(1), id: Schema.String, lane: Schema.String, revision: Schema.String,

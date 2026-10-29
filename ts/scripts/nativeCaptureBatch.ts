@@ -67,7 +67,7 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
   }
 });
 
-export const poolArguments = (pair: number, desktop: string, capacity: string, network: boolean) => ["lan", "pool", "--foreground", "--queue", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])];
+export const poolArguments = (pair: number, desktop: string, capacity: string, network: boolean) => ["lan", "pool", "--foreground", "--queue", "--release-idle", "0", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])];
 
 const poolScope = (pair: number, desktop: string, capacity: string, solo: boolean, network: boolean) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
