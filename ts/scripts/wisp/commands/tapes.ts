@@ -197,17 +197,16 @@ export const tapes: Command = (args) => Effect.gen(function*() {
     for (const { file, text } of recorded) await Bun.write(file, text);
     return tapeShard(recorded, shard);
   }).pipe(step("record tapes"));
-  yield* compileTypeScriptLua.pipe(Effect.provide(BunServices.layer), step("compile TypeScript Lua"));
-
   const cpus = usableCpus();
   const bunParts = Math.max(1, Math.min(4, Math.floor(cpus / 4)));
   const luaSlots = Math.max(2, Math.floor((cpus - bunParts) / 2));
   const files = longestFirst(tapes);
-  const replays = yield* Effect.all({
+  const inLua = compileTypeScriptLua.pipe(Effect.provide(BunServices.layer), step("compile TypeScript Lua"), Effect.andThen(Effect.all({
     "ts-lua32": replayInLua(files, luas.nearest, luaSlots).pipe(Effect.map((runs) => inOrder(files, runs)), step("replay in ts-lua32")),
     "ts-lua32-toward-zero": replayInLua(files, luas.towardZero, luaSlots).pipe(Effect.map((runs) => inOrder(files, runs)), step("replay in ts-lua32-toward-zero")),
-    "bun": replayInBun(tapes, bunParts).pipe(step("replay in bun")),
-  }, { concurrency: 3 });
+  }, { concurrency: 2 })));
+  const { lua, bun } = yield* Effect.all({ lua: inLua, bun: replayInBun(tapes, bunParts).pipe(step("replay in bun")) }, { concurrency: 2 });
+  const replays = { ...lua, bun };
   const runs = new Map(tapes.map(({ name, file }): [string, Record<RuntimeName, Run>] => {
     const byRuntime = (runtime: RuntimeName): Run => replays[runtime].get(file) ?? { records: [], error: "no run" };
     return [name, { bun: byRuntime("bun"), "ts-lua32": byRuntime("ts-lua32"), "ts-lua32-toward-zero": byRuntime("ts-lua32-toward-zero") }];
