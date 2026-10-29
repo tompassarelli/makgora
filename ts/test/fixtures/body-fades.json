@@ -4,7 +4,7 @@
   "fading": []
  },
  "demonHunter": {
-  "body": "IllidanTimelineBody-249910fe23bfaf0d360f901700801d085c29274e7f1e22395e0a4d7690b7f97b.mdx",
+  "body": "IllidanTimelineBody-f385b7022065d344d42ba4373d07d67587a16e5db60e96d6ee2aaae50d5c304c.mdx",
   "fading": []
  },
  "blademaster": {
@@ -121,6 +121,12 @@
  "grom": {
   "body": "GromHellscreamTimelineBody-e557fdf5cd9887aa20c42753b8d17c94bf4029922047a00248759cdff598771f.mdx",
   "fading": []
+ },
+ "anubarak": {
+  "body": "AnubarakTimelineBody-a7394093a6ead061a975044d2c0a5337af928ae331bb6bb98402eeea5118275d.mdx",
+  "fading": [
+   83
+  ]
  },
  "malfurion": {
   "body": "MalfurionStormrageTimelineBody-b35d3eef28c2c357f7d054e270fc4e4c544f538eafff08c29c26a7a79f7f2d40.mdx",
