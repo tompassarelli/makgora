@@ -168,6 +168,7 @@ export class FighterHud {
     }
     if (this.shownCharacter !== character || this.shownCostume !== costume || this.shownColor !== color || this.shownMirrored !== this.panel.mirrored) {
       this.shownCharacter = character;
+      this.shownCostume = costume;
       this.shownColor = color;
       this.shownMirrored = this.panel.mirrored;
       BlzFrameSetTexture(this.plate, `war3mapImported\\HudPlate${this.panel.mirrored ? "Mirror" : ""}${I2S(color)}.tga`, 0, true);
