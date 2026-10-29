@@ -1,9 +1,11 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action, ACTION_ORDER } from "./actions";
 import { PAD_LAYER, padLayerAction } from "./padKeys";
-import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, decodeLayouts, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, presetLayouts, previousDefaultKeys, slotIndex } from "./keyBindings";
+import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, slotIndex } from "./keyBindings";
+import { type LayoutBindings, layoutSave, decodeLayouts, encodeLayouts, presetLayouts } from "./layoutSave";
 
 const code = (character: string) => character.charCodeAt(0);
+const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
 test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to 0 (- on Custom), and Strong to 9 with Y second (0 on Custom) [k2 property]", () => {
@@ -22,15 +24,15 @@ test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C
 test("a saved WASD or Box layout still on the old defaults (Strong Y, C-up 9) upgrades on load, and one the player edited stays as saved [k2 property]", () => {
   const previous = (preset: "wasd" | "standard") => ({ keys: previousDefaultKeys(preset) });
   const stock = { layouts: { wasd: previous("wasd"), standard: previous("standard"), custom: presetBindings("custom") }, active: "wasd" as BindingPreset };
-  const upgraded = decodeLayouts(encodeLayouts(stock));
+  const upgraded = decodeLayouts(encodeSlots(stock));
   for (const preset of ["wasd", "standard"] as const) assertEquals(upgraded?.layouts[preset].keys.join(","), presetBindings(preset).keys.join(","), `${preset} upgraded`);
   const edited = previousDefaultKeys("wasd");
   edited[slotIndex(Action.attack, 0)] = code("B");
-  const kept = decodeLayouts(encodeLayouts({ ...stock, layouts: { ...stock.layouts, wasd: { keys: edited } } }));
+  const kept = decodeLayouts(encodeSlots({ ...stock, layouts: { ...stock.layouts, wasd: { keys: edited } } }));
   assertEquals(kept?.layouts.wasd.keys.join(","), edited.join(","), "edited WASD stays");
   assertEquals(kept?.layouts.standard.keys.join(","), presetBindings("standard").keys.join(","), "stock Box still upgrades");
   const swapped = previousDefaultKeys("wasd");
-  const wasdInBox = decodeLayouts(encodeLayouts({ ...stock, layouts: { ...stock.layouts, standard: { keys: swapped } } }));
+  const wasdInBox = decodeLayouts(encodeSlots({ ...stock, layouts: { ...stock.layouts, standard: { keys: swapped } } }));
   assertEquals(wasdInBox?.layouts.standard.keys.join(","), swapped.join(","), "WASD defaults in the Box slot are not Box defaults");
 });
 
@@ -103,7 +105,7 @@ test("a saved layout with Z bound first to jump, or X or G bound first, keeps it
   keys[slotIndex(Action.rightTrigger, 0)] = code("G");
   const loaded = decodeBindings(encodeBindings({ keys }));
   assertEquals(loaded?.keys.join(","), keys.join(","));
-  const layouts = decodeLayouts(encodeLayouts({ layouts: { ...presetLayouts(), custom: { keys } }, active: "custom" }));
+  const layouts = decodeLayouts(encodeSlots({ layouts: { ...presetLayouts(), custom: { keys } }, active: "custom" }));
   assertEquals(layouts?.layouts.custom.keys.join(","), keys.join(","));
 });
 
@@ -112,10 +114,10 @@ test("a saved Custom layout still on the old defaults (Z/9 jump, G second on Shi
   oldCustom[slotIndex(Action.jump, 0)] = code("Z");
   oldCustom[slotIndex(Action.jump, 1)] = code("9");
   oldCustom[slotIndex(Action.rightTrigger, 1)] = code("G");
-  const stock = decodeLayouts(encodeLayouts({ layouts: { ...presetLayouts(), custom: { keys: oldCustom } }, active: "custom" }));
+  const stock = decodeLayouts(encodeSlots({ layouts: { ...presetLayouts(), custom: { keys: oldCustom } }, active: "custom" }));
   assertEquals(stock?.layouts.custom.keys.join(","), presetBindings("custom").keys.join(","));
   oldCustom[slotIndex(Action.attack, 0)] = code("B");
-  const edited = decodeLayouts(encodeLayouts({ layouts: { ...presetLayouts(), custom: { keys: oldCustom } }, active: "custom" }));
+  const edited = decodeLayouts(encodeSlots({ layouts: { ...presetLayouts(), custom: { keys: oldCustom } }, active: "custom" }));
   assertEquals(keyFor(edited?.layouts.custom ?? { keys: [] }, Action.jump, 0), code("Z"));
   assertEquals(keyFor(edited?.layouts.custom ?? { keys: [] }, Action.rightTrigger, 1), undefined);
 });
@@ -126,10 +128,10 @@ test("a saved WASD layout still on the earlier defaults (Space and 8 on Jump) mo
   earlier[slotIndex(Action.moveUp, 1)] = 0;
   earlier[slotIndex(Action.jump, 0)] = 32;
   earlier[slotIndex(Action.jump, 1)] = code("8");
-  const moved = decodeLayouts(encodeLayouts({ layouts: { ...presetLayouts(), wasd: { keys: earlier } }, active: "wasd" }));
+  const moved = decodeLayouts(encodeSlots({ layouts: { ...presetLayouts(), wasd: { keys: earlier } }, active: "wasd" }));
   assertEquals(moved?.layouts.wasd.keys.join(","), presetBindings("wasd").keys.join(","));
   earlier[slotIndex(Action.attack, 0)] = code("B");
-  const kept = decodeLayouts(encodeLayouts({ layouts: { ...presetLayouts(), wasd: { keys: earlier } }, active: "wasd" }));
+  const kept = decodeLayouts(encodeSlots({ layouts: { ...presetLayouts(), wasd: { keys: earlier } }, active: "wasd" }));
   assertEquals(kept?.layouts.wasd.keys.join(","), earlier.join(","));
 });
 
@@ -175,7 +177,7 @@ test("a saved profile from before Mod X loads with every old key unchanged and ;
   assertEquals(loaded?.active, "standard");
   for (const preset of BINDING_PRESETS) assertEquals(loaded?.layouts[preset].keys.join(","), presetBindings(preset).keys.join(","), `${preset} layout`);
   const current = { layouts: presetLayouts(), active: "custom" as BindingPreset };
-  assertEquals(decodeLayouts(encodeLayouts(current))?.layouts.custom.keys.join(","), presetBindings("custom").keys.join(","));
+  assertEquals(decodeLayouts(encodeSlots(current))?.layouts.custom.keys.join(","), presetBindings("custom").keys.join(","));
 });
 
 test("an old save that already uses ; for another action keeps it there and leaves Mod X unbound [k2 property]", () => {
@@ -198,6 +200,6 @@ test("Left and Right Shift are labelled, bind to any action such as Shield, and 
     const loaded = decodeBindings(encodeBindings(bindings));
     assertEquals(loaded?.keys.join(","), bindings.keys.join(","), `${preset} single save`);
   }
-  const saved = decodeLayouts(encodeLayouts({ layouts, active: "standard" }));
+  const saved = decodeLayouts(encodeSlots({ layouts, active: "standard" }));
   for (const preset of BINDING_PRESETS) assertEquals(saved?.layouts[preset].keys.join(","), layouts[preset].keys.join(","), `${preset} layout save`);
 });

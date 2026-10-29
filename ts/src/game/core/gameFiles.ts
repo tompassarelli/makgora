@@ -1,3 +1,5 @@
+import { CHUNKS_PER_FILE } from "wisp/src/runtime/gameFiles";
+
 
 export const devCommandReceiptFile = (build: string, slot: number) => `smashcraft-dev-${build}-p${slot}.txt`;
 
@@ -54,3 +56,6 @@ export const TRAILER_SCRIPT = 62;
 
 export const sessionRatesFile = (load: string, minute: number) => `smashcraft-rates-${load}-${minute}.txt`;
 export const sessionRatesHeader = (load: string, minute: number, build: string, version: string, clock: boolean) => `smashcraft-rates v=1 load=${load} minute=${minute} build=${build} version=${version} clock=${clock ? "os" : "ticks"}`;
+
+export const PLAYER_FILE_CHUNK = 200;
+export const PLAYER_FILE_CAPACITY = PLAYER_FILE_CHUNK * (CHUNKS_PER_FILE - 1);

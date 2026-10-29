@@ -6,7 +6,7 @@ import type { BindingPersistence } from "../../game/ui/bindingSettings";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { trampoline } from "wisp/src/platform/dispatch";
 import { readChunk, readChunks, writeChunks } from "wisp/src/platform/fileio";
-import { LOBBY_COUNTER_FILE } from "../../game/core/gameFiles";
+import { LOBBY_COUNTER_FILE, PLAYER_FILE_CHUNK } from "../../game/core/gameFiles";
 import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
 
 export const PLAYER_FILE_RECEIVED = "shell.playerFileReceived";
@@ -14,7 +14,7 @@ const MORE_PREFIX = "SC_FL";
 const LAST_PREFIX = "SC_FE";
 const COUNTER_END = ":";
 
-const CHUNK = 200;
+const CHUNK = PLAYER_FILE_CHUNK;
 const BINDINGS_FILE = "MeleePrototypeBindings.pld";
 
 declare global {

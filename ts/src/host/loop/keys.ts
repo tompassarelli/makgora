@@ -15,7 +15,7 @@ import { leaveTutorial } from "../../game/match/tutorial";
 import { fighterName } from "../../game/roster/kits";
 import { endReplaySegment } from "./replays";
 import { pausedMessage } from "../../game/session/messages";
-import { cancelBindingCapture, captureBinding } from "../../game/ui/bindingSettings";
+import { cancelBindingCapture, captureBinding, endNaming } from "../../game/ui/bindingSettings";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
 import { clearCapturedInputs } from "./inputs";
@@ -122,6 +122,10 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   const key = GetHandleId(BlzGetTriggerPlayerKey());
   if (!startKey && !keyEventAllowed(s.keyEvents, key, s.participants[slot].bindings.bindings)) return;
   if (journalOwnsKey(s, slot, key)) return;
+  if (s.participants[slot].bindings.naming) {
+    if (key === Key.escape) endNaming(s.participants[slot].bindings);
+    return;
+  }
   if (s.trace.active) s.trace.window.keyDown[slot]++;
   traceParticipant(s, slot, `received down ${key}`);
   const participant = s.participants[slot];

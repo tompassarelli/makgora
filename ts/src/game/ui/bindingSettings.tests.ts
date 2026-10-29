@@ -1,7 +1,8 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, encodeLayouts, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
+import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
+import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts, layoutSave } from "../input/layoutSave";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -15,10 +16,16 @@ import {
   initializeBindingSettings,
   loadProfile,
   loadSavedBindings,
+  beginNaming,
+  endNaming,
+  nameSlot,
+  pickCustomSlot,
+  slotLabel,
   pickBindingPreset,
   resetToLayout,
   saveBindingSettings,
 } from "./bindingSettings";
+import { PLAYER_FILE_CAPACITY } from "../core/gameFiles";
 import { keyboardCaps } from "./keyboardLayout";
 
 const BACKSPACE = 0x08;
@@ -29,6 +36,7 @@ const MINUS = 0xbd;
 const OPEN_BRACKET = 0xdb;
 const CLOSE_BRACKET = 0xdd;
 const code = (character: string) => character.charCodeAt(0);
+const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 
 function customSettings(): BindingSettings {
   const empty: BindingLoadResult = { kind: "empty" };
@@ -279,14 +287,17 @@ test("a one-set save still on the old WASD defaults opens on WASD with Strong on
 test("each layout shows the same keys however the screen reaches it: opening on a save from before the layout defaults moved, then clicking layouts and Load profile in any order [k2 property]", () => {
   const own = presetBindings("standard");
   own.keys[slotIndex(Action.attack, 0)] = code("B");
-  const old = encodeLayouts({ layouts: { wasd: { keys: previousDefaultKeys("wasd") }, standard: { keys: previousDefaultKeys("standard") }, custom: own }, active: "wasd" });
+  const old = encodeSlots({ layouts: { wasd: { keys: previousDefaultKeys("wasd") }, standard: { keys: previousDefaultKeys("standard") }, custom: own }, active: "wasd" });
   const shown = (settings: Readonly<BindingSettings>) => encodeBindings(settings.bindings);
   for (const clicks of [["custom", "wasd", "profile", "custom"], ["standard", "profile", "custom", "wasd"], ["profile", "standard", "custom", "profile", "wasd"]]) {
     const stored = { encoded: old as string | undefined };
     const settings = persistedSettings(stored);
     const seen: Partial<Record<BindingPreset, string>> = { [settings.layout]: shown(settings) };
     for (const click of [...clicks, "wasd", "standard", "custom"]) {
-      if (click === "profile") loadProfile(settings);
+      if (click === "profile") {
+        loadProfile(settings);
+        pickCustomSlot(settings, 0);
+      }
       else pickBindingPreset(settings, click as BindingPreset);
       const keys = shown(settings);
       assertEquals(keys, seen[settings.layout] ??= keys, `${PRESET_NAMES[settings.layout]} after ${clicks.join(", ")} then ${click}`);
@@ -298,4 +309,75 @@ test("each layout shows the same keys however the screen reaches it: opening on 
       assertEquals(shown(reopened), seen[preset], `${PRESET_NAMES[preset]} saved after ${clicks.join(", ")}`);
     }
   }
+});
+
+test("three Custom slots each keep their own keys and name through a save, and the full save fits the player file [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  const attacks = [code("B"), code("K"), code("L")];
+  attacks.forEach((key, slot) => {
+    loadProfile(settings);
+    pickCustomSlot(settings, slot);
+    bindAttack(settings, key);
+  });
+  beginNaming(settings);
+  nameSlot(settings, "Box \"tour\\ney\" kit");
+  endNaming(settings);
+  assertEquals(slotLabel(settings), "Box tourney", "a name keeps its storable characters up to the limit");
+  pickCustomSlot(settings, 1);
+
+  const reopened = persistedSettings(stored);
+  assertEquals(reopened.layout, "custom", "reopens on Custom");
+  assertEquals(reopened.slot, 1, "reopens on the last picked slot");
+  attacks.forEach((key, slot) => {
+    pickCustomSlot(reopened, slot);
+    assertEquals(keyFor(reopened.bindings, Action.attack, 0), key, `slot ${slot + 1} keys`);
+  });
+  assertEquals([0, 1, 2].map(slot => slotLabel(reopened, slot)).join(","), "Custom 1,Custom 2,Box tourney", "names");
+  applyBindingPreset(reopened, "wasd");
+  assertEquals(slots(reopened, Action.attack), "N —", "WASD stays stock");
+
+  const longest = createBindingSettings(0, { load: () => undefined, readLocal: () => undefined, save: () => undefined });
+  longest.ready = true;
+  for (const custom of longest.customs) custom.name = "W".repeat(SLOT_NAME_LIMIT);
+  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1 });
+  assertEquals(full.length <= PLAYER_FILE_CAPACITY, true, `${full.length} characters fit ${PLAYER_FILE_CAPACITY}`);
+  assertEquals(decodeLayouts(full)?.customs.map(custom => custom.name).join(","), longest.customs.map(custom => custom.name).join(","), "longest names round-trip");
+});
+
+test("an older one-Custom save loads its Custom into slot 1, and slots 2 and 3 start as stock Custom with no name [k2 property]", () => {
+  const own = presetBindings("custom");
+  own.keys[slotIndex(Action.attack, 0)] = code("B");
+  const settings = persistedSettings({ encoded: `KL${BINDING_PRESETS.indexOf("custom")}${[presetBindings("wasd"), presetBindings("standard"), own].map(bindings => encodeBindings(bindings)).join("")}` });
+  assertEquals(settings.slot, 0, "slot 1 is active");
+  assertEquals(slots(settings, Action.attack), "B —", "slot 1 holds the old Custom");
+  for (const slot of [1, 2]) {
+    pickCustomSlot(settings, slot);
+    assertEquals(settings.bindings.keys.join(","), presetBindings("custom").keys.join(","), `slot ${slot + 1} stock`);
+    assertEquals(slotLabel(settings), `Custom ${slot + 1}`, `slot ${slot + 1} name`);
+  }
+  const oneSet = persistedSettings({ encoded: encodeBindings(own) });
+  assertEquals(oneSet.slot, 0, "a one-set save lands in slot 1");
+  assertEquals(slots(oneSet, Action.attack), "B —", "one-set keys in slot 1");
+});
+
+test("Load profile opens the three slots by name or Custom 1-3, and picking one selects and saves it [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  loadProfile(settings);
+  assertEquals(settings.picking, true, "Load profile opens the slots");
+  assertEquals([0, 1, 2].map(slot => slotLabel(settings, slot)).join(","), "Custom 1,Custom 2,Custom 3");
+  pickCustomSlot(settings, 2);
+  assertEquals(settings.picking, false, "picking closes the slots");
+  assertEquals(settings.layout, "custom");
+  assertEquals(settings.slot, 2);
+  beginNaming(settings);
+  assertEquals(settings.naming, true, "naming starts");
+  nameSlot(settings, "Friend");
+  endNaming(settings);
+  assertEquals(settings.naming, false, "Enter ends naming");
+  loadProfile(settings);
+  assertEquals([0, 1, 2].map(slot => slotLabel(settings, slot)).join(","), "Custom 1,Custom 2,Friend");
+  assertEquals(persistedSettings(stored).slot, 2, "the pick is saved");
+  assertEquals(slotLabel(persistedSettings(stored)), "Friend", "the name is saved");
 });
