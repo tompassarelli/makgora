@@ -177,14 +177,22 @@ is asserted every update and the shown state is sent once when it returns.
 Matches, pause, title, results, settings, the tutorial and the CPU and moves
 panels keep the stock cursor or none.
 
-Each state is the same 64x64 texture with the cuff and palm in the same place,
-so a state change never jumps; the gauntlet is 50x62 texels at (1, 1), drawn
-square at the on-screen height of the old pinching hand (27 of its 32 rows of the stock
-HumanCursor model's 0.0239 UI quad, 38.48 pixels at 1080p; UI pixels scale with
-client height divided by 0.6). The hotspot sits exactly on the mouse position:
-texel (38.5, 1.5) for the pointing index fingertip, (42.5, 6.5) for the fanned
-hand's middle fingertip and (25.5, 9.5) for the gap between thumb and index
-tips. The hand frames hang from the game UI at frame level 200, above every
+Each state is the same 256x256 texture with the cuff and palm in the same place,
+so a state change never jumps; the gauntlet is 202x248 texels at (4, 4), the 732x900
+keyed PNGs point-scaled uniformly (202/248 against the art's 0.813). It is drawn
+square at Melee's hand-to-tile proportion (asked for 2026-10-30, from a Melee
+character-select screenshot): the gauntlet is 0.9 of a roster tile's height
+(`HAND_TILE_HEIGHT` in `selectionDrag.ts`, measured from the roster grid's cell
+height so it holds at every grid size and UI scale), about 0.87 of its width, 113 pixels
+tall against a 125-pixel tile at 1080p; the old pinch hand was 38.5 pixels. The 256x256
+canvas has texels four times finer than the old 64x64 one, so the engine's bilinear
+sampling does not smear them. The hotspot sits exactly on the mouse position:
+texel (155.5, 6) for the pointing index fingertip, (171.75, 26) for the fanned
+hand's middle fingertip and (103, 38) for the gap between thumb and index
+tips. While a chip is carried the chip frame is raised above the hand
+(`SELECT_LEVELS.carriedChip`), so the chip stays whole in the pinch instead of
+disappearing behind the larger palm. The hand frames hang from the game UI at frame level
+200, above every
 selection panel. Scaling is nearest-neighbour only.
 The selection asset build is described in smashcraft:docs/build-inputs.md.
 Warcraft has no

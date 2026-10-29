@@ -8,7 +8,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
-import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, HAND_SIZE, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
+import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
@@ -21,20 +21,27 @@ import { type UiRect, pixelPoint, texturePixels } from "./uiTexture";
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
 
-const textureError = (frame: Frame, texture: Rgba, x: number, y: number, uiWidth: number, uiHeight: number, covered: UiRect) => texturePixels(frame, texture, x, y, uiWidth, uiHeight, covered)?.error;
+const textureError = (frame: Frame, texture: Rgba, x: number, y: number, uiWidth: number, uiHeight: number, covered?: UiRect) => texturePixels(frame, texture, x, y, uiWidth, uiHeight, covered)?.error;
 
 const COVER_MARGIN = 0.004;
 
 // Warcraft draws the cursor and the hand a frame or more after a move or click.
 const CURSOR_DRAW_ATTEMPTS = 6;
 
+// The carried chip is drawn over the hand, so the hand match skips the chip while it can be carried.
+const CHIP_OVER_HAND: ReadonlySet<string> = new Set(["pick", "after-pick", "carrying", "drop"]);
+
 const EXPECTED_STATE: Readonly<Record<string, HandState>> = { "positive-control": "point", "before-pick": "point", carrying: "pinch", "after-drop": "fan", sweep: "fan" };
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_MOVE_ATTEMPTS = 3;
+
+// The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip.
+const CLEAR_SPOT = { x: 0.03, y: 0.3 };
+const AFTER_DROP_RISE = 0.01;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
-const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState) => texturePixels(frame, texture, handLeft(x, state), handTop(y, state), HAND_SIZE, HAND_SIZE);
+const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number, covered?: UiRect) => texturePixels(frame, texture, handLeft(x, state, size), handTop(y, state, size), size, size, covered);
 
 export const measureCursorGate = (clientsFile: string, name: string, directory: string) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("cursor gate clients")));
@@ -55,6 +62,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   yield* reachFighterSelect(client, region);
   const frame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
   const grid = rosterGrid(ROSTER_TILES);
+  const handExtent = handSize(grid);
   const samples: { file: string; sha256: string; elapsedMs: number; attempts: number; phase: string; x: number; y: number; error: number | undefined; state: HandState; pinched: boolean; handPixels: number; matchedHandPixels: number; chipError: number | undefined; visible: boolean }[] = [];
   const started = yield* Clock.currentTimeMillis;
   const pointer = () => runProcess(ChildProcess.make(client.tools.xdotool, ["getmouselocation", "--shell"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.map(output => ({
@@ -71,8 +79,8 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     }
     if (at.x !== target.x || at.y !== target.y) return yield* new AcceptFailure({ operation: "cursor gate pointer", problem: `pointer at ${at.x},${at.y}; wanted ${target.x},${target.y}` });
   });
-  const drawnHand = (pixels: Frame, x: number, y: number) => {
-    const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state) }));
+  const drawnHand = (pixels: Frame, x: number, y: number, covered?: UiRect) => {
+    const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state, handExtent, covered) }));
     const best = drawn.reduce((nearest, next) => (next.hand?.error ?? Infinity) < (nearest.hand?.error ?? Infinity) ? next : nearest);
     return { state: best.state, pinched: best.state === "pinch", hand: best.hand };
   };
@@ -84,15 +92,15 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     do {
       yield* Effect.sleep("50 millis");
       pixels = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
-      drawn = drawnHand(pixels, x, y);
+      drawn = drawnHand(pixels, x, y, CHIP_OVER_HAND.has(phase) ? margined(carriedChipLeft(x, readyChipSize(grid)), carriedChipTop(y, readyChipSize(grid)), readyChipSize(grid), readyChipSize(grid)) : undefined);
       attempts++;
     } while (((drawn.hand?.error ?? Infinity) > 24 || (phase !== "pick" && phase !== "drop" && drawn.pinched !== (phase === "carrying"))) && attempts < CURSOR_DRAW_ATTEMPTS);
     const elapsedMs = (yield* Clock.currentTimeMillis) - started;
     const { state, pinched, hand } = drawn;
     const error = hand?.error;
     const size = readyChipSize(grid);
-    const pointerCover = phase === "carrying" ? margined(handLeft(x, "pinch"), handTop(y, "pinch"), HAND_SIZE, HAND_SIZE) : margined(handLeft(x, "point"), handTop(y, "point"), HAND_SIZE, HAND_SIZE);
-    const chipError = phase === "carrying" ? textureError(pixels, texture.chip, carriedChipLeft(x, size), carriedChipTop(y, size), size, size, pointerCover)
+    const pointerCover = margined(handLeft(x, state, handExtent), handTop(y, state, handExtent), handExtent, handExtent);
+    const chipError = phase === "carrying" ? textureError(pixels, texture.chip, carriedChipLeft(x, size), carriedChipTop(y, size), size, size)
       : phase === "after-drop" ? textureError(pixels, texture.chip, chipX(grid, 0, 0), chipY(grid, 0, 0), size, size, pointerCover)
       : phase === "before-pick" ? textureError(pixels, texture.chip, parkedChipLeft(0, size), parkedChipTop(size), size, size, pointerCover) : undefined;
     const bytes = encodePpm(pixels);
@@ -109,18 +117,18 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     yield* Fiber.join(pressed);
   });
   const pin = { x: parkedChipLeft(0, readyChipSize(grid)) + readyChipSize(grid) / 2, y: parkedChipCentre(0).y };
-  const control = yield* sample("positive-control", 0.03, 0.3);
+  const control = yield* sample("positive-control", CLEAR_SPOT.x, CLEAR_SPOT.y);
   const controlFrame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate control")));
-  const negativeControlError = cursorPixels(controlFrame, texture.point, 0.4, 0.56, "point")?.error;
+  const negativeControlError = cursorPixels(controlFrame, texture.point, 0.4, 0.56, "point", handExtent)?.error;
   if (!control.visible || negativeControlError === undefined || negativeControlError <= 24) return yield* new AcceptFailure({ operation: "cursor gate calibration", problem: `positive error=${control.error}; negative error=${negativeControlError}` });
-  yield* sample("before-pick", pin.x, pin.y);
+  yield* sample("before-pick", CLEAR_SPOT.x, CLEAR_SPOT.y);
   yield* clickThrough("pick", pin.x, pin.y);
   yield* sample("after-pick", pin.x, pin.y);
   const first = cellRect(grid, 0);
   const drop = { x: (first.left + first.right) / 2, y: (first.top + first.bottom) / 2 };
   yield* sample("carrying", drop.x, drop.y);
   yield* clickThrough("drop", drop.x, drop.y);
-  yield* sample("after-drop", drop.x, drop.y).pipe(Effect.repeat({ schedule: Schedule.recurs(39), until: sample => sample.chipError !== undefined && sample.chipError <= 24 }));
+  yield* sample("after-drop", drop.x, first.bottom + AFTER_DROP_RISE).pipe(Effect.repeat({ schedule: Schedule.recurs(39), until: sample => sample.chipError !== undefined && sample.chipError <= 24 }));
   const sweepStarted = yield* Clock.currentTimeMillis;
   for (let index = 0; index < 100; index++) {
     const cell = cellRect(grid, index % PLAYABLE_CHARACTERS.length);
@@ -135,6 +143,6 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   const pinch = samples.every(sample => !sample.visible || sample.pinched === (sample.phase === "carrying") || sample.phase === "pick" || sample.phase === "drop");
   const modified = yield* Clock.currentTimeMillis;
   const text = `SMASHCRAFT GATE cursor frames=${samples.length} visible=${visible} sweepMs=${sweepMs} picked=${picked ? 1 : 0} dropped=${dropped ? 1 : 0} parked=${parked ? 1 : 0} pinch=${pinch ? 1 : 0} states=${states ? 1 : 0} pass=${visible === samples.length && picked && dropped && parked && pinch && states && sweepMs >= 5000 ? 1 : 0}`;
-  yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: 24, positiveControl: control.file, negativeControlError, missingFrameIds: samples.flatMap((sample, index) => sample.visible ? [] : [index]), region, handSize: HAND_SIZE, samples }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "cursor gate evidence", problem: String(cause) }) });
+  yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: 24, positiveControl: control.file, negativeControlError, missingFrameIds: samples.flatMap((sample, index) => sample.visible ? [] : [index]), region, handSize: handExtent, samples }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "cursor gate evidence", problem: String(cause) }) });
   return { name: "cursor-gate", text, modified } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

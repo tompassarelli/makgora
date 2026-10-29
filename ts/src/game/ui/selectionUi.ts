@@ -29,7 +29,7 @@ import {
   type Roster,
   type RosterChip,
   type RosterTile,
-  HAND_SIZE,
+  handSize,
   HAND_STATES,
   type HandState,
   handLeft,
@@ -225,7 +225,7 @@ export class SelectionPanel {
     }
     this.cards = PARTICIPANT_SLOTS.map(slot => createCard(root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
     const hand = (state: HandState, texture: string) => {
-      const frame = art(gameUi(), `MeleeHand${texture}${suffix}`, `war3mapImported\\SelectionHand${texture}.tga`, 0.0, 0.0, HAND_SIZE, HAND_SIZE);
+      const frame = art(gameUi(), `MeleeHand${texture}${suffix}`, `war3mapImported\\SelectionHand${texture}.tga`, 0.0, 0.0, handSize(grid), handSize(grid));
       BlzFrameSetLevel(frame, SELECT_LEVELS.hand);
       BlzFrameSetVisible(frame, false);
       return frame;
@@ -515,7 +515,7 @@ export class SelectionPanel {
   private showHand(drawn: boolean, holding: boolean, x: number, y: number): void {
     const { hand, stock } = menuCursor(this.menuCursorAllowed, drawn, holding, this.drag.hover);
     for (const state of HAND_STATES) BlzFrameSetVisible(this.hands[state], state === hand);
-    if (hand !== undefined) placeTopLeft(this.hands[hand], handLeft(x, hand), handTop(y, hand));
+    if (hand !== undefined) placeTopLeft(this.hands[hand], handLeft(x, hand, handSize(this.roster.grid)), handTop(y, hand, handSize(this.roster.grid)));
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
     if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
     this.cursorEnabled = stock;

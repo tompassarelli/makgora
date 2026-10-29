@@ -207,6 +207,7 @@ export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag
   const chipChoice = tileOfCharacter(choice ?? DEFAULT_FIGHTER);
   const size = readyChipSize(grid);
   BlzFrameSetSize(frames.chip, size, size);
+  BlzFrameSetLevel(frames.chip, carried ? SELECT_LEVELS.carriedChip : SELECT_LEVELS.cardChip);
   placeTopLeft(
     frames.chip,
     carried ? carriedChipLeft(x, size) : ready ? chipX(grid, slot, chipChoice) : parkedChipLeft(slot, size),

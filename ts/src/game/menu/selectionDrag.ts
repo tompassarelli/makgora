@@ -158,19 +158,22 @@ export const HAND_STATES = ["point", "fan", "pinch"] as const;
 
 export type HandState = (typeof HAND_STATES)[number];
 
-// SelectionHand textures are drawn square at the on-screen size of the old 27-row pinching hand.
-export const HAND_SIZE = f32(f32(0.0239) * 27 * HAND_TEXELS / (f32(0.23585) * 128 * HAND_ART_ROWS));
+// Melee draws one hand over most of a roster tile: the gauntlet is this share of a tile's height, so it holds at every grid scale and UI scale.
+export const HAND_TILE_HEIGHT = f32(0.9);
+
+// SelectionHand textures are drawn square, sized so the gauntlet rows span HAND_TILE_HEIGHT of a tile.
+export const handSize = (grid: RosterGrid): number => f32(f32(grid.cellHeight) * HAND_TILE_HEIGHT * HAND_TEXELS / HAND_ART_ROWS);
 
 // The texel that sits exactly on the mouse: the index fingertip, the middle fingertip, and the middle of the gap between thumb and index tips.
 const HAND_HOTSPOT: Readonly<Record<HandState, { readonly x: number; readonly y: number }>> = {
-  point: { x: 38.5, y: 1.5 },
-  fan: { x: 42.5, y: 6.5 },
-  pinch: { x: 25.5, y: 9.5 },
+  point: { x: 155.5, y: 6 },
+  fan: { x: 171.75, y: 26 },
+  pinch: { x: 103, y: 38 },
 };
 
-export const handLeft = (x: number, state: HandState): number => x - f32(HAND_HOTSPOT[state].x / HAND_TEXELS) * HAND_SIZE;
+export const handLeft = (x: number, state: HandState, size: number): number => x - f32(HAND_HOTSPOT[state].x / HAND_TEXELS) * size;
 
-export const handTop = (y: number, state: HandState): number => y + f32(HAND_HOTSPOT[state].y / HAND_TEXELS) * HAND_SIZE;
+export const handTop = (y: number, state: HandState, size: number): number => y + f32(HAND_HOTSPOT[state].y / HAND_TEXELS) * size;
 
 export interface MenuCursor {
   readonly hand: HandState | undefined;
