@@ -191,4 +191,6 @@ export const RIBBON_PARK_SEQUENCES: { readonly [model: string]: string | null } 
   "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl": "Death",
   "Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl": "Death",
   "Abilities\\Weapons\\WyvernSpear\\WyvernSpearMissile.mdx": "Death",
+  "Units\\Undead\\Locust\\Locust.mdx": "Death",
+  "Units\\Undead\\Scarab\\Scarab.mdl": "Death",
 };
