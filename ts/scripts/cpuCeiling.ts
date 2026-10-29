@@ -35,10 +35,11 @@ const add = (data: Data, records: readonly { readonly fighters: readonly string[
   }
 };
 const rate = (data: Data, key: string) => {const c=data.counts[key];return c===undefined||c.wins+c.losses===0?NaN:c.wins/(c.wins+c.losses);};
+export const unplannedFighters = (): string[] => {const plans=readCeilingPlans();return SELECTABLE_CHARACTERS.map(fighterSlug).filter(fighter=>!plans.has(fighter));};
 export function ceilingRows(data: Data): CeilingRow[] {
   const plans = readCeilingPlans();
   const slugs=SELECTABLE_CHARACTERS.map(fighterSlug);
-  return slugs.map(fighter => {
+  return slugs.filter(fighter=>plans.has(fighter)).map(fighter => {
     const plan=plans.get(fighter); if(plan===undefined)throw new Error(`${fighter}: no ceiling plan`);
     const kinds=[...CPU_OPPONENT_IDS,"execution","judgment","ceiling-expert","advanced","ceiling-field"];
     const complete=kinds.every(kind=>slugs.filter(s=>s!==fighter).every(opponent=>(data.pairs[`${kind}/${fighter}/${opponent}`]??0)>=(kind==="wren"?CEILING_SPEC.wrenPerPair:CPU_OPPONENT_IDS.some(id=>id===kind)?CEILING_SPEC.panelPerPair:kind==="ceiling-field"?CEILING_SPEC.finalPerPair:CEILING_SPEC.finalPerPair)))
@@ -64,7 +65,7 @@ if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
       const baseline=decodeRecordInput(JSON.parse(readFileSync(values.baseline,"utf8")));
       if(!baseline.records.every(r=>r.opponents.length===2&&r.opponents.every(id=>id==="wren")&&r.tiers.length===2&&r.tiers.every(tier=>tier==="expert")&&r.skillOverrides===undefined))throw new Error("Baseline must be unmodified Wren Expert on both sides");
       add(data,baseline.records,"wren");
-      const table=ceilingTable(ceilingRows(data),data.cpuSeconds);console.log(table);if(values.report!==undefined)writeFileSync(values.report,table+"\n");
+      const unplanned=unplannedFighters();const table=ceilingTable(ceilingRows(data),data.cpuSeconds)+(unplanned.length===0?"":`\nLeft out, no ceiling plan yet: ${unplanned.join(", ")}.`);console.log(table);if(values.report!==undefined)writeFileSync(values.report,table+"\n");
     },catch:cause=>new CeilingFailure({problem:String(cause)})});
   } else {
     yield* Effect.promise(()=>runAdmitted("moderate","smashcraft:cpuCeiling",3600));
