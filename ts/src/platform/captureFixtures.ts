@@ -1,6 +1,6 @@
 import type { Character } from "../game/sim/codes";
 import { fighterKey, fighterSlug } from "../game/roster/kits";
-import { SHOWCASE_FIRST_FRAME, showcaseRows } from "../game/session/showcaseTimeline";
+import { SHOWCASE_FIRST_FRAME, type ShowcaseMove, showcaseRows } from "../game/session/showcaseTimeline";
 
 export interface Silhouette {
   readonly slot: 0 | 1;
@@ -26,14 +26,24 @@ export const SILHOUETTE_HIDDEN_FRAME = 16384;
 
 export const SHOWCASE_HOLD_TICKS = 6;
 
+interface TimedLine { readonly frame: number; readonly line: string }
+
+const inputAt = (frame: number, line: string): TimedLine => ({ frame: SHOWCASE_FIRST_FRAME + frame - 0.5, line: `${SHOWCASE_FIRST_FRAME + frame} ${line}` });
+
+function timedInputs(move: Readonly<ShowcaseMove>, facing: "right" | "left"): TimedLine[] {
+  return [
+    ...(move.again === undefined ? [] : [inputAt(move.again.frame, `a move ${move.kind} ${move.code} ${facing} ${move.again.gap}`)]),
+    ...(move.cross === undefined ? [] : [inputAt(move.cross.frame, `a cross ${facing} ${move.cross.gap}`)]),
+    ...(move.hold === undefined ? [] : [inputAt(move.hold.frame, `a hold ${move.hold.frames}`)]),
+    ...(move.release === undefined ? [] : [inputAt(move.release, "a release X")]),
+    ...(move.aim === undefined ? [] : [inputAt(move.aim.frame, `a stick 0 ${move.aim.z}`), inputAt(move.aim.until, "a stick 0 0")]),
+  ];
+}
+
 export function showcaseFixtures(character: Character, holdTicks = SHOWCASE_HOLD_TICKS): CaptureFixture[] {
   const fighter = fighterSlug(character);
   return showcaseRows(character).map(({ row, move, facing, frames }) => {
-    const again = move.again === undefined ? undefined : { frame: SHOWCASE_FIRST_FRAME + move.again.frame, line: `${SHOWCASE_FIRST_FRAME + move.again.frame} a move ${move.kind} ${move.code} ${facing} ${move.again.gap}` };
-    const cross = move.cross === undefined ? [] : [{ frame: SHOWCASE_FIRST_FRAME + move.cross.frame - 0.5, line: `${SHOWCASE_FIRST_FRAME + move.cross.frame} a cross ${facing} ${move.cross.gap}` }];
-    const hold = move.hold === undefined ? [] : [{ frame: SHOWCASE_FIRST_FRAME + move.hold.frame - 0.5, line: `${SHOWCASE_FIRST_FRAME + move.hold.frame} a hold ${move.hold.frames}` }];
-    const release = move.release === undefined ? [] : [{ frame: SHOWCASE_FIRST_FRAME + move.release - 0.5, line: `${SHOWCASE_FIRST_FRAME + move.release} a release X` }];
-    const timed = [...frames.map(frame => ({ frame, line: `${frame} a capture` })), ...(again === undefined ? [] : [{ ...again, frame: again.frame - 0.5 }]), ...cross, ...hold, ...release].sort((a, b) => a.frame - b.frame);
+    const timed = [...frames.map(frame => ({ frame, line: `${frame} a capture` })), ...timedInputs(move, facing)].sort((a, b) => a.frame - b.frame);
     const script = `#! chat -dev quick hero ${fighterKey(character).toLowerCase()} stocks 9\n#! reel ${fighter} ${row} ${move.slot} ${facing} ${holdTicks}\n${move.incoming === undefined ? "" : `${SHOWCASE_FIRST_FRAME - move.incoming.lead} b move special 0 ${facing === "left" ? "right" : "left"} ${move.incoming.gap}\n`}${SHOWCASE_FIRST_FRAME} a move ${move.kind} ${move.code} ${facing}${move.incoming !== undefined ? " -" : move.gap === undefined && move.lift === undefined ? "" : ` ${move.gap ?? 500}`}${move.lift === undefined ? "" : ` ${move.lift}`}\n${move.cross === undefined ? "" : `${SHOWCASE_FIRST_FRAME} a brace\n`}${move.release === undefined ? "" : `${SHOWCASE_FIRST_FRAME} a press X\n`}${timed.map(entry => entry.line).join("\n")}\n`;
     return { name: `${fighter}-${row}`, frames, script, holdTicks, openingTicks: 1, tailFrames: 0, reel: { fighter, row, slot: move.slot, facing } };
   });

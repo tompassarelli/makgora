@@ -103,6 +103,8 @@ function riddenDeck(spec: Readonly<SpecialProjectile>, drawn: Readonly<Projectil
   return surface !== undefined && surfaceMoves(stage, surface) && surfaceZAt(stage, surface, matchFrame, x) === z ? surface : undefined;
 }
 
+const aimedDown = (owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>): Readonly<ProjectileVelocity> | undefined => (owner.special.aimZ < 0 ? spec.downVelocity : undefined);
+
 export function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, serial: number, stage: number, matchFrame: number, world?: Roster): void {
   const drawn = projectileAnchor(owner, spec.atMark);
   if (spec.atMark !== undefined && drawn === undefined) return;
@@ -113,7 +115,7 @@ export function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjec
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;
   const surface = riddenDeck(spec, drawn, stage, matchFrame, x, z);
-  if (spec.fan === undefined) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, surface);
+  if (spec.fan === undefined) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, surface, aimedDown(owner, spec));
   else for (const velocity of spec.fan) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, false, serial, surface, velocity);
 }
 

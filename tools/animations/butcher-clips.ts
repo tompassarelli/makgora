@@ -40,14 +40,16 @@ const both = (target: Point, ...frames: number[]): Reach[] => [...at("cleaver", 
 const crouched: Gesture = { hips: 18, chest: 30, legF: -40, legB: 30, kneeF: 70, kneeB: 60, tz: -12 };
 const reared: Gesture = { chest: -24, head: -16, legF: -18, legB: 12 };
 const tucked: Gesture = { legF: -55, legB: -35, kneeF: 90, kneeB: 80 };
+const HOOK_SPIN_FRAMES = 20;
 
 function timing(hero: HeroDefinition, style: AttackStyle): { c: number; a: number; t: number } {
   const move = hero.moves.normals[style]; ensure(move, `butcher: no attack style ${style}`);
   return { c: move.startupFrames, a: move.activeFrames, t: move.totalFrames };
 }
-function specialTiming(hero: HeroDefinition, key: "neutral" | "side", air: boolean): { c: number; t: number } {
+function specialTiming(hero: HeroDefinition, key: "neutral" | "side", air: boolean, followUp?: number): { c: number; t: number } {
   const move = hero.specials?.[key]; ensure(move, `butcher: no ${key} special`);
-  const form = air ? move.air ?? move.ground : move.ground;
+  const root = air ? move.air ?? move.ground : move.ground;
+  const form = followUp === undefined ? root : root.followUps?.[followUp]?.special; ensure(form, `butcher: no ${key} follow-up ${followUp}`);
   const contact = Math.min(...[...(form.regions?.map(r => r.firstFrame) ?? []), ...(form.motion?.filter(m => m.velocityX > 0).map(m => m.first) ?? []), ...(form.projectiles?.map(p => p.spawnFrame) ?? []), form.endFrame]);
   return { c: contact, t: form.endFrame };
 }
@@ -97,9 +99,15 @@ function authoredActions(hero: HeroDefinition): Action[] {
       [...both([10, 35, 235], lift), ...both([-5, 75, 185], hit, c + a, end)], { air: true }); }
 
   for (const air of [false, true]) {
-    const { c, t } = specialTiming(hero, "neutral", air), hit = c - 1, coilAt = Math.max(1, hit - 6), flight = c + 16, pull = Math.min(t - 10, flight + 14), coil: Gesture = { twist: 50, chest: 4, legF: -26, legB: 20, kneeF: 25, kneeB: 15 }, fling: Gesture = { twist: -35, chest: 30, head: -14, legF: -44, legB: 34, kneeF: 40, wristL: -20 };
-    add(air ? "neutralSpecialAir" : "neutralSpecial", t, c, [[0, air ? tucked : {}], [coilAt, coil], [hit, fling], [flight, { ...fling, chest: 26 }], [pull, { ...coil, twist: 20, chest: -16, head: -6 }], ...settle(pull, t, coil), [t, air ? tucked : {}]],
-      [...at("hook", [-95, 55, 80], coilAt), ...at("hook", [175, 30, 105], hit, flight), ...at("hook", [20, 50, 95], pull), ...at("cleaver", [20, -50, 95], coilAt, hit, flight, pull)], { air });
+    const lean: Gesture = { ...air ? tucked : { legF: -24, legB: 18, kneeF: 22, kneeB: 14 }, head: -8 }, spin = [[70, 70, 105], [10, 75, 165], [-55, 70, 110], [10, 65, 50]] as const;
+    add(air ? "neutralSpecialAir" : "neutralSpecial", HOOK_SPIN_FRAMES, 0, [0, 1, 2, 3, 4].map(i => [i * HOOK_SPIN_FRAMES / 4, { ...lean, chest: i % 2 ? 14 : 8, twist: i % 2 ? 26 : 16 }] as const),
+      [...spin.flatMap((target, i) => at("hook", target, i * HOOK_SPIN_FRAMES / 4)), ...at("hook", spin[0], HOOK_SPIN_FRAMES), ...at("cleaver", [20, -50, 95], 0, HOOK_SPIN_FRAMES / 2, HOOK_SPIN_FRAMES)], { air, loop: true });
+  }
+
+  for (const air of [false, true]) {
+    const { c, t } = specialTiming(hero, "neutral", air, 1), hit = c - 1, flight = c + 18, pull = Math.min(t - 10, flight + 14), coil: Gesture = { twist: 50, chest: 4, legF: -26, legB: 20, kneeF: 25, kneeB: 15 }, fling: Gesture = { twist: -35, chest: 30, head: -14, legF: -44, legB: 34, kneeF: 40, wristL: -20 };
+    add(air ? "neutralSpecialFollowUpAir" : "neutralSpecialFollowUp", t, c, [[0, air ? { ...coil, ...tucked } : coil], [hit, fling], [flight, { ...fling, chest: 26 }], [pull, { ...coil, twist: 20, chest: -16, head: -6 }], ...settle(pull, t, coil), [t, air ? tucked : {}]],
+      [...at("hook", [-95, 55, 80], 0), ...at("hook", [175, 30, 105], hit, flight), ...at("hook", [20, 50, 95], pull), ...at("cleaver", [20, -50, 95], 0, hit, flight, pull)], { air });
   }
 
   for (const air of [false, true]) {

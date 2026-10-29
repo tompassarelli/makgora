@@ -110,6 +110,7 @@ export interface SpecialProjectile {
   readonly velocityZ: number;
   readonly upVelocityX?: number | undefined;
   readonly upVelocityZ?: number | undefined;
+  readonly downVelocity?: { readonly velocityX: number; readonly velocityZ: number } | undefined;
 
   readonly gravity?: number | undefined;
   readonly life: number;

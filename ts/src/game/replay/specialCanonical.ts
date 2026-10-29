@@ -14,6 +14,11 @@ export function fieldWriters(name: string, result: string[]) {
   };
 }
 
+const downVelocityCanonical = (spec: Readonly<SpecialProjectile>, prefix: string): readonly string[] => [
+  canonicalRealField(`${prefix}.downVelocityX`, spec.downVelocity?.velocityX ?? 0.0),
+  canonicalRealField(`${prefix}.downVelocityZ`, spec.downVelocity?.velocityZ ?? 0.0),
+];
+
 export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, prefix: string): string {
   const result: string[] = [];
   const int = (name: string, value: number) => { result.push(canonicalInt(`${prefix}.${name}`, value)); };
@@ -25,6 +30,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
   real("velocityZ", spec.velocityZ);
   real("upVelocityX", spec.upVelocityX ?? 0.0);
   real("upVelocityZ", spec.upVelocityZ ?? 0.0);
+  result.push(...downVelocityCanonical(spec, prefix));
   int("life", spec.life);
   real("radius", spec.radius);
   int("activeFrom", spec.activeFrom ?? 0);

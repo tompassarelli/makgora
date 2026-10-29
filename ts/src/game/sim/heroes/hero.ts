@@ -26,6 +26,8 @@ export interface HeroClip {
 
   readonly held?: number | undefined;
 
+  readonly windUpRate?: number | undefined;
+
 
 
 

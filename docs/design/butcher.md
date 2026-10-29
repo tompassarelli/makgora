@@ -17,14 +17,15 @@ grappler with strong throws who is combo food, not his numbers.
   Stand Channel and death. Its bones are the standard Classic biped names
   (`Bone_Root` to `Bone_Hand_R`), so his rig maps like any biped; the cleaver
   rides `Bone_Hand_R` and the hook chain `Bone_Hand_L`.
-- **Authored clips.** `tools/animations/butcher-clips.ts` appends sixteen
+- **Authored clips.** `tools/animations/butcher-clips.ts` appends eighteen
   clips to the stock model, timed from his kit: the smashes and their charge
-  hold, up tilt, dash attack, every aerial, Meat Hook, Butcher's Charge and
+  hold, up tilt, dash attack, every aerial, the Meat Hook wind-up and throw, Butcher's Charge and
   Dismember. Up moves hold the cleaver overhead through their active frames,
   back air lashes the cleaver straight behind him at body height with the
   back leg kicking out, the down smash spreads both weapons low to both
-  sides, the dash attack is a belly flop and the down air a seat drop, Meat
-  Hook draws the hook back low and throws it level, and the Charge leads with
+  sides, the dash attack is a belly flop and the down air a seat drop, the Meat
+  Hook wind-up loops the hook around at his side, played faster as the
+  charge banks (up to three times), the throw draws it back low and flings it level, and the Charge leads with
   his shoulder in an upright running stride, both weapons trailing, through
   its travel. A contact
   pose is reached one frame before the first active frame, because hitstop
@@ -46,12 +47,19 @@ grab has the longest standing reach in the roster.
 
 Specials:
 
-- **Meat Hook** (neutral). On frame 14 he flings the hook 420 units straight
-  ahead over 16 frames. A body it reaches is caught: the hook latches and
+- **Meat Hook** (neutral). A charged special in the Gold Sack pattern: held
+  special winds the hook up, swinging it at his side faster the longer he
+  holds (6 frames before the charge, 60 to full, three stages), and the
+  release throws it. The hook flies at 26.25 units a frame for 14, 18, 23 or
+  28 frames by stage, so a tap reaches about 430 units from him and a full
+  hold about twice the tap's flight. The release holds for the 8-frame aim
+  window, where the stick turns the throw 30 degrees up or down, and the hook
+  leaves on its last frame. Shield during the hold stores the charge, and the
+  next press throws at the stored stage. A body it reaches is caught: the hook latches and
   reels the foe to his hand over 14 frames into his grab hold, where any
   throw or pummel follows and the shared mash escape applies. A raised shield
   stops it and takes an 8% projectile hit; a reflector sends it back as an
-  ordinary hit. A whiff leaves 40 frames of recovery (70 in all). In the air
+  ordinary hit. A whiff leaves 40 frames of recovery after the flight. In the air
   the hook only strikes (8%), since he cannot hold a foe while falling. The
   latch and the reel (`grab.reel`) are rollback state.
 - **Butcher's Charge** (side). A belly-led rush on frames 8–20 that stops at

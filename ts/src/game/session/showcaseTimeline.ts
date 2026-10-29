@@ -37,6 +37,7 @@ export interface ShowcaseMove {
   readonly cross?: { readonly frame: number; readonly gap: number } | undefined;
   readonly hold?: { readonly frame: number; readonly frames: number } | undefined;
   readonly behind?: number | undefined;
+  readonly aim?: { readonly frame: number; readonly until: number; readonly z: number } | undefined;
 }
 
 export interface ShowcaseRow {
@@ -54,8 +55,9 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? { gap: aerialGap(tuning.moves?.normals[code]), lift: aerialLift(tuning.moves?.normals[code]) } : groundPlacement(tuning.moves?.normals[code], code, character)) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
-    const charged = special === undefined ? undefined : chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
-    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), behind: special === undefined ? undefined : specialBehind(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
+    const charged = special === undefined ? undefined : heldShowcases(slot, code, special);
+    if (charged !== undefined) moves.push(...charged);
+    else moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), behind: special === undefined ? undefined : specialBehind(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   return moves;
@@ -72,6 +74,33 @@ function incomingShot(special: Readonly<AuthoredSpecial>, specials: Readonly<Fig
   return lead > 0 ? { lead, gap } : undefined;
 }
 
+function heldShowcases(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove[] | undefined {
+  const held = chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
+  return held === undefined ? undefined : [...aimedReleases(slot, code, special), held];
+}
+
+function strikeFrames(special: Readonly<AuthoredSpecial>): { readonly first: number; readonly last: number } {
+  const hits = special.regions ?? [];
+  if (hits.length > 0) return { first: Math.min(...hits.map(region => region.firstFrame)), last: Math.max(...hits.map(region => region.lastFrame)) };
+  const shots = special.projectiles ?? [];
+  return { first: Math.min(...shots.map(shot => shot.spawnFrame)), last: Math.max(...shots.map(shot => shot.spawnFrame + shot.life - 1)) };
+}
+
+function releasedShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>, frame: number, charging: readonly number[] | undefined): ShowcaseMove {
+  const strikes = strikeFrames(special), first = frame + 1 + strikes.first, last = frame + 1 + strikes.last;
+  const gap = (special.regions ?? []).length === 0 ? specialGap(special) : undefined;
+  return { slot, kind: "special", code, first, end: frame + special.endFrame, release: frame, charging, swing: [first + floorDiv(last - first, 2), last], gap };
+}
+
+function aimedReleases(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove[] {
+  const charge = special.charge;
+  const tap = charge?.releases === true ? special.followUps?.find((followUp) => followUp.chargeStage === 0 && followUp.input === FollowUpInput.release)?.special : undefined;
+  if (tap?.aimFrames === undefined) return [];
+  const thrown = releasedShowcase(slot, code, tap, 1, undefined);
+  const aimed = (z: number): ShowcaseMove => ({ ...thrown, aim: { frame: 1, until: 1 + (tap.aimFrames ?? 0), z } });
+  return [thrown, aimed(1), aimed(-1)];
+}
+
 function chargedShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove | undefined {
   const charge = special.charge;
   const released = charge?.releases === true;
@@ -80,10 +109,7 @@ function chargedShowcase(slot: string, code: number, special: Readonly<AuthoredS
   const frame = charge.hold + charge.full + 2;
   const handful = floorDiv(charge.full, charge.stages);
   const charging = Array.from({ length: charge.stages + 1 }, (_, stage) => charge.hold + stage * handful);
-  if (released) {
-    const hits = full.regions ?? [], first = frame + 1 + Math.min(...hits.map(region => region.firstFrame)), last = frame + 1 + Math.max(...hits.map(region => region.lastFrame));
-    return { slot, kind: "special", code, first, end: frame + full.endFrame, release: frame, charging, swing: [first + floorDiv(last - first, 2), last] };
-  }
+  if (released) return releasedShowcase(slot, code, full, frame, charging);
   return {
     slot, kind: "special", code, first: frame + heroCueWindows(full).active.first, end: frame + full.endFrame, again: { frame, gap: CHARGED_SHOWCASE_GAP },
     charging,

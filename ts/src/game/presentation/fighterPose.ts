@@ -22,7 +22,7 @@ import { disabledPose } from "./disabledPose";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
-import { pinnedSpecialSeconds, playsFollowUpPose } from "./specialPhase";
+import { pinnedSpecialSeconds, playsFollowUpPose, windUpRate } from "./specialPhase";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
@@ -329,7 +329,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     const special = fighterSpecialClip(f);
     playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}${wingBranch(f) ? f.special.form : ""}${refireKey(f)}`, special.index);
     const held = pinnedSpecialSeconds(f, special);
-    if (held === undefined) return rate;
+    if (held === undefined) return windUpRate(f, special) ?? rate;
     pose.clipTime = held;
     return 0.0;
   }

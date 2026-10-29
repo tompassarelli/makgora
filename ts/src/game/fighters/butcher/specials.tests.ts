@@ -16,9 +16,10 @@ import { ULTIMATE_METER_FRAMES } from "../../sim/meter";
 import { mainDeckRight } from "../../sim/stage";
 import { GRAB_HOLD_DISTANCE } from "../../sim/moves";
 import { knockbackWeight } from "../../sim/itemBuffs";
-import { HOOK_REEL_FRAMES, ROT } from "./specials";
+import { CHARGED_AIM_FRAMES } from "../../sim/specials/schema";
+import { HOOK_CHARGE, HOOK_FLIGHT_FRAMES, HOOK_REEL_FRAMES, HOOK_SPEED, ROT } from "./specials";
 
-type Press = "hook" | "rot" | "swing" | "backThrow" | "dismember" | "shield" | "none";
+type Press = "hook" | "hookHold" | "hookShield" | "aimUp" | "aimDown" | "rot" | "swing" | "backThrow" | "dismember" | "shield" | "none";
 type Script = (tick: number) => readonly [Press, Press];
 
 interface Duel {
@@ -30,6 +31,10 @@ interface Duel {
 
 const ROWS: Readonly<Record<Press, Parameters<typeof inputRow>[0]>> = {
   hook: { held: maskOf(Action.special), pressed: maskOf(Action.special) },
+  hookHold: { held: maskOf(Action.special) },
+  hookShield: { held: maskOf(Action.special, Action.rightTrigger), pressed: maskOf(Action.rightTrigger) },
+  aimUp: { held: maskOf(Action.moveUp), axisZ: 127 },
+  aimDown: { held: maskOf(Action.moveDown), axisZ: -127 },
   rot: { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 },
   swing: { held: maskOf(Action.moveUp, Action.special), pressed: maskOf(Action.special), axisZ: 127, specialZ: 1 },
   backThrow: { held: maskOf(Action.moveLeft), pressed: maskOf(Action.moveLeft), axisX: -127 },
@@ -215,4 +220,72 @@ test("A rollback replays Meat Hook's latch and reel, the Hook Swing ledge tether
       assertEquals(replayed, expected);
     }
   }
+});
+
+interface Flight {
+  readonly reach: number;
+  readonly run: number;
+  readonly climb: number;
+  readonly thrown: boolean;
+}
+
+function throwHook(holdTicks: number, aim: Press): Flight {
+  const d = duel({ foeAhead: -400.0 });
+  const start = d.butcher.motion.x;
+  const releaseTick = 3 + holdTicks;
+  let reach = 0;
+  let run = 0;
+  let climb = 0;
+  let spawn: { readonly x: number; readonly z: number } | undefined;
+  for (let tick = 1; tick <= releaseTick + 80; tick++) {
+    step(d, [tick < 3 ? "none" : tick === 3 ? "hook" : tick < releaseTick ? "hookHold" : tick < releaseTick + CHARGED_AIM_FRAMES ? aim : "none", "none"]);
+    for (const projectile of d.butcher.projectiles) {
+      if (projectile.life <= 0) continue;
+      spawn ??= { x: projectile.x, z: projectile.z };
+      reach = Math.max(reach, Math.abs(projectile.x - start));
+      run = Math.abs(projectile.x - spawn.x);
+      climb = projectile.z - spawn.z;
+    }
+  }
+  return { reach, run, climb, thrown: spawn !== undefined };
+}
+
+test("Meat Hook flies farther the longer he holds, from the tap reach to about twice that at a full hold [k3 measure docs/design/butcher.md]", () => {
+  const holds = [1, ...[1, 2, 3].map((stage) => HOOK_CHARGE.hold + idiv(stage * HOOK_CHARGE.full, HOOK_CHARGE.stages) + 4)];
+  const reaches = holds.map((hold) => throwHook(hold, "none").reach);
+  for (let index = 1; index < reaches.length; index++) assertGreaterThan(reaches[index] ?? 0.0, reaches[index - 1] ?? Infinity);
+  const tap = reaches[0] ?? 0.0;
+  const full = reaches[reaches.length - 1] ?? 0.0;
+  assertGreaterThan(tap, 60.0 + HOOK_SPEED * (HOOK_FLIGHT_FRAMES[0] - 2));
+  assertLessThan(tap, 60.0 + HOOK_SPEED * HOOK_FLIGHT_FRAMES[0]);
+  assertGreaterThan(full, tap * f32(1.7));
+  assertLessThan(full, tap * f32(2.1));
+  assertTrue(HOOK_CHARGE.stages === HOOK_FLIGHT_FRAMES.length - 1);
+});
+
+test("Meat Hook's stick, held through the aim window after the release, turns the throw up or down by at most 30 degrees [k3 measure docs/design/butcher.md]", () => {
+  const flat = throwHook(1, "none");
+  const up = throwHook(1, "aimUp");
+  const down = throwHook(1, "aimDown");
+  assertTrue(flat.thrown && up.thrown && down.thrown);
+  assertEquals(flat.climb, 0.0);
+  assertGreaterThan(up.climb, up.run * f32(0.5));
+  assertLessThan(up.climb, up.run * f32(0.6));
+  assertLessThan(down.climb, down.run * f32(-0.5));
+  assertGreaterThan(down.climb, down.run * f32(-0.6));
+});
+
+test("Shield during the hold keeps the stored charge, and the next press throws it as a full hold [k3 measure docs/design/butcher.md]", () => {
+  const d = duel({ foeAhead: -400.0 });
+  for (let tick = 1; tick <= 90; tick++) step(d, [tick < 3 ? "none" : tick === 3 ? "hook" : tick < 70 ? "hookHold" : tick === 70 ? "hookShield" : "none", "none"]);
+  assertGreaterThan(d.butcher.special.charge, HOOK_CHARGE.full - 5);
+  assertTrue(!d.butcher.projectiles.some((projectile) => projectile.life > 0));
+  const start = d.butcher.motion.x;
+  let reach = 0;
+  for (let tick = 1; tick <= 60; tick++) {
+    step(d, [tick === 1 ? "hook" : "none", "none"]);
+    for (const projectile of d.butcher.projectiles) if (projectile.life > 0) reach = Math.max(reach, Math.abs(projectile.x - start));
+  }
+  assertGreaterThan(reach, 60.0 + HOOK_SPEED * (HOOK_FLIGHT_FRAMES[3] - 2));
+  assertEquals(d.butcher.special.charge, 0);
 });

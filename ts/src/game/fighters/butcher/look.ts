@@ -14,6 +14,8 @@ const DEATH = clip(5, f32(2.167));
 const CHANNEL = clip(6, f32(1.667));
 const STAND_3 = clip(7, f32(1.667));
 const FLINCH: HeroClip = { index: 3, seconds: f32(0.4), aligned: true };
+const HOOK_WIND_UP_RATE = 2.0;
+const HOOK_THROWS = (thrown: HeroClip): readonly HeroClip[] => [thrown, thrown, thrown, thrown, STAND_3];
 
 export const butcherLook: HeroLook = {
   model: BUTCHER_MODEL_FILE, objectId: 0x6d666275,
@@ -35,7 +37,10 @@ export const butcherLook: HeroLook = {
     victimPummel: STAND_2, victimThrowForward: STAND_2, victimThrowBack: STAND_2, victimThrowUp: STAND_2, victimThrowDown: STAND_2,
     upSpecial: ATTACK_2, upSpecialAir: ATTACK_2, downSpecial: CHANNEL, downSpecialAir: CHANNEL,
     ...BUTCHER_AUTHORED_CLIPS,
+    neutralSpecial: { ...BUTCHER_AUTHORED_CLIPS.neutralSpecial, windUpRate: HOOK_WIND_UP_RATE },
+    neutralSpecialAir: { ...BUTCHER_AUTHORED_CLIPS.neutralSpecialAir, windUpRate: HOOK_WIND_UP_RATE },
   },
+  followUpClips: { neutralSpecialFollowUp: HOOK_THROWS(BUTCHER_AUTHORED_CLIPS.neutralSpecialFollowUp), neutralSpecialFollowUpAir: HOOK_THROWS(BUTCHER_AUTHORED_CLIPS.neutralSpecialFollowUpAir) },
   damageClips: Array.from({ length: 9 }, () => FLINCH),
   fallback: STAND, defeat: "death",
 };
