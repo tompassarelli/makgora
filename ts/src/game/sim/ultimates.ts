@@ -126,7 +126,7 @@ const UTHER: AuthoredSpecial = {
   name: "Resurrection", endFrame: 64, selfHeal: { frame: 25, heal: 10.0 },
   projectiles: [
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdx", 2, 24, 0.0), ...ON_FLOOR },
-    ...[-150.0, -80.0, 80.0, 150.0].map((offsetX) => ({ ...mark(RESURRECTION_RING, 25, 24, offsetX), ...ON_FLOOR })),
+    ...[-150.0, -80.0, 80.0, 150.0].map((offsetX) => ({ ...mark(RESURRECTION_RING, 25, 24, offsetX), ...ON_FLOOR, modelRadius: f32(1.0 / 3.0) })),
   ],
   regions: [
     heroRegion(26, 28, capsule(-170.0, 20.0, 170.0, 20.0, 45.0), hit(14.0, 85, 60.0, 50.0, HitElement.holy)),
