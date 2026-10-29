@@ -92,11 +92,11 @@ export class StagePanel {
     this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.hover(button));
     const dialogButton = (parent: framehandle, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
       this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
-    const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
-    this.root = root;
     this.backdrop = createBackdrop("MeleeStageBackdrop", screenLayer(), 800);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
+    const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
+    this.root = root;
     stageText(root, "MeleeStageTitle", f32(0.055), f32(0.558), f32(0.2), f32(0.032), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
     this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.265), f32(0.558), f32(0.49), f32(0.032), MENU_STYLE.headerSize, "");
     this.preview = new StageCard(root, "MeleeStagePreview", f32(0.045), f32(0.19), f32(0.19), f32(0.13), false);

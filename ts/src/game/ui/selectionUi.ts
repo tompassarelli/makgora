@@ -193,11 +193,11 @@ export class SelectionPanel {
     const headerInset = f32(0.022);
     const headerLeft = f32(headerBoxLeft + headerInset);
     this.clicks = new ButtonClicks(`ui.selection.${suffix}.click`, (button, clicker) => this.click(button, clicker), button => this.highlight(button));
-    const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
-    this.root = root;
     this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, screenLayer(), 400 + participantId);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
+    const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
+    this.root = root;
     const grid = this.roster.grid;
     const scale = f32(grid.scale);
     for (let choice = 0; choice < grid.count; choice++) {
