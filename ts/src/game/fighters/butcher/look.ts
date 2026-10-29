@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { HeroClip } from "../../sim/heroes/hero";
 import type { HeroLook } from "../../presentation/model/look";
+import { BUTCHER_AUTHORED_CLIPS } from "./clips";
 
 export const BUTCHER_MODEL_FILE = "units\\undead\\Abomination\\Abomination.mdl";
 const clip = (index: number, seconds: number): HeroClip => ({ index, seconds });
@@ -19,11 +20,9 @@ export const butcherLook: HeroLook = {
   portrait: "ReplaceableTextures\\CommandButtons\\BTNAbomination.blp",
   clips: {
     idle: STAND, walk: WALK, dash: WALK, run: WALK, crouch: STAND_3, fall: STAND, landing: STAND_3,
-    shield: STAND_3, airDodge: STAND_3, smashCharge: STAND_3, ko: DEATH, dizzy: STAND_2,
+    shield: STAND_3, airDodge: STAND_3, ko: DEATH, dizzy: STAND_2,
     jab: ATTACK_1, jab2: ATTACK_2, grab: ATTACK_2, forwardTilt: ATTACK_1, forwardTiltUp: ATTACK_1, forwardTiltDown: ATTACK_1,
-    upTilt: ATTACK_2, downTilt: ATTACK_2, dashAttack: ATTACK_2,
-    forwardSmash: ATTACK_1, upSmash: ATTACK_2, downSmash: ATTACK_2,
-    neutralAir: ATTACK_2, forwardAir: ATTACK_1, backAir: ATTACK_2, upAir: ATTACK_2, downAir: ATTACK_1,
+    downTilt: ATTACK_2,
     getUpAttack: ATTACK_2,
     ledgeHang: STAND, ledgeClimb: WALK, ledgeRoll: WALK, ledgeAttack: ATTACK_1,
     knockdown: DEATH, getUp: STAND_3, downDamage: DEATH,
@@ -34,8 +33,8 @@ export const butcherLook: HeroLook = {
     grabHold: CHANNEL, grabbed: STAND_2,
     pummel: ATTACK_1, throwForward: ATTACK_2, throwBack: ATTACK_2, throwUp: ATTACK_2, throwDown: ATTACK_1,
     victimPummel: STAND_2, victimThrowForward: STAND_2, victimThrowBack: STAND_2, victimThrowUp: STAND_2, victimThrowDown: STAND_2,
-    neutralSpecial: ATTACK_2, neutralSpecialAir: ATTACK_2, sideSpecial: WALK, sideSpecialAir: WALK,
     upSpecial: ATTACK_2, upSpecialAir: ATTACK_2, downSpecial: CHANNEL, downSpecialAir: CHANNEL,
+    ...BUTCHER_AUTHORED_CLIPS,
   },
   damageClips: Array.from({ length: 9 }, () => FLINCH),
   fallback: STAND, defeat: "death",

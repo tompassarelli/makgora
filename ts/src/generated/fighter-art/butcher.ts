@@ -3,5 +3,5 @@ import type { FighterRules } from "../fighterArtData";
 
 export const rules: FighterRules = {
   victory: "stand channel",
-  flashClips: [0, 1, 2, 3, 4, 5, 6, 7],
+  flashClips: [0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
 };

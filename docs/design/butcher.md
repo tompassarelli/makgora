@@ -16,8 +16,19 @@ grappler with strong throws who is combo food, not his numbers.
   no import. It has eight playable clips: three stands, walk, two attacks,
   Stand Channel and death. Its bones are the standard Classic biped names
   (`Bone_Root` to `Bone_Hand_R`), so his rig maps like any biped; the cleaver
-  rides `Bone_Hand_R` and the hook chain `Bone_Hand_L`. Every pose maps onto
-  a stock clip until his authored clips land.
+  rides `Bone_Hand_R` and the hook chain `Bone_Hand_L`.
+- **Authored clips.** `tools/animations/butcher-clips.ts` appends sixteen
+  clips to the stock model, timed from his kit: the smashes and their charge
+  hold, up tilt, dash attack, every aerial, Meat Hook, Butcher's Charge and
+  Dismember. Up moves hold the cleaver overhead through their active frames,
+  back air lashes the cleaver straight behind him at body height with the
+  back leg kicking out, the down smash spreads both weapons low to both
+  sides, the dash attack is a belly flop and the down air a seat drop, Meat
+  Hook draws the hook back low and throws it level, and the Charge drops his
+  shoulder into a level, running rush held through its travel. A contact
+  pose is reached one frame before the first active frame, because hitstop
+  freezes the attacker's clip at the first contact and a pose keyed on that
+  frame is caught halfway there. The rest stay on the stock attacks.
 - **Size.** Weight 116, inside Melee's weight spread; Flesh Heap carries him
   past it during a stock. The roster's widest hurt capsule (1.85 times the
   reference width, 1.30 of its height), slow run, low air speed, traction
