@@ -6,8 +6,11 @@
 // so they gate nothing here; `bun run test` (scripts/test.ts) only reports
 // them, and wall-clock budgets live in the exclusive-lease perf measurements
 // (#168).
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+
+/** The committed Lua cost shards, one per test file. */
+export const LUA_COST_RECORDS = resolve(import.meta.dir, "../../records/lua-cost");
 
 /** Bun: frames stepMatch may simulate in one test, 4 s at a farm runner's 14,500 frames/s, measured from test/projectile-rules.test.ts (28,700 frames in 1.98 s CPU) (AGENTS.md). Never raise it to fit a test. */
 export const BUN_TEST_CEILING_FRAMES = 58_000;
@@ -101,6 +104,15 @@ export function readLuaBaseline(directory: string): LuaCosts {
   return costs;
 }
 
+/** Shards whose test file is gone or whose rows name another file, as their record paths; a change that removes or moves a test removes or moves its shard. */
+export function staleLuaShards(directory: string, project: string): readonly string[] {
+  return [...new Bun.Glob("**/*.tsv").scanSync({ cwd: directory })].filter((shard) => {
+    const unit = shard.replace(/\.tsv$/, "");
+    const units = readFileSync(join(directory, shard), "utf8").split("\n").slice(1).filter((line) => line !== "").map((line) => line.split("\t")[0]);
+    return !existsSync(resolve(project, unit)) || units.some((named) => named !== unit);
+  }).map((shard) => join(directory, shard)).sort();
+}
+
 function writeLuaShard(directory: string, unit: string, cost: LuaCost): void {
   const path = shardPath(directory, unit);
   mkdirSync(dirname(path), { recursive: true });
@@ -133,14 +145,14 @@ export interface LuaJudgement {
 /**
  * Compares a Lua run's counts with the baseline shards, rewrites the shards
  * of new files and of files whose test count changed (all measured shards with
- * TEST_COST_UPDATE=1), drops shards whose file is gone, and summarizes the run.
+ * TEST_COST_UPDATE=1) and summarizes the run. It touches only measured shards,
+ * so a filtered run leaves every other record as it was.
  */
 export function judgeLua(options: {
   readonly measured: LuaCosts;
   readonly baselineDirectory: string;
-  readonly project: string;
 }): LuaJudgement {
-  const { measured, baselineDirectory, project } = options;
+  const { measured, baselineDirectory } = options;
   const baseline = readLuaBaseline(baselineDirectory);
   const rewriteAll = process.env.TEST_COST_UPDATE === "1";
   const written: LuaCosts = new Map();
@@ -164,12 +176,6 @@ export function judgeLua(options: {
     updated++;
   }
   for (const [unit, cost] of written) writeLuaShard(baselineDirectory, unit, cost);
-  for (const unit of baseline.keys()) {
-    if (!existsSync(resolve(project, unit))) {
-      rmSync(shardPath(baselineDirectory, unit), { force: true });
-      updated++;
-    }
-  }
   const heaviest = [...measured].sort(([, a], [, b]) => (b.maxInstructions ?? 0) - (a.maxInstructions ?? 0)).slice(0, 5)
     .map(([unit, cost]) => `${unit} ${megas(cost.maxInstructions ?? 0)}`).join(", ");
   const summary = `Lua32: ${megas(instructions)} instructions and ${(allocKb / 1024).toFixed(0)} MB allocated for ${tests} tests; ${megas(tests === 0 ? 0 : instructions / tests)} instructions per test (about ${(instructions / LUA_INSTRUCTIONS_PER_S).toFixed(0)} reference CPU seconds)`;

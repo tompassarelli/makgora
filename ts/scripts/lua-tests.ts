@@ -24,7 +24,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { runAdmitted } from "./heavyCapacity";
-import { LUA_TEST_CEILING_INSTRUCTIONS, LUA_TEST_CEILING_S, addLuaCost, judgeLua, type LuaCosts } from "./testCost";
+import { LUA_COST_RECORDS, LUA_TEST_CEILING_INSTRUCTIONS, LUA_TEST_CEILING_S, addLuaCost, judgeLua, type LuaCosts } from "./testCost";
 import { bundleConfig } from "./wisp/bundleConfigs";
 import { stockLua } from "./wisp/luaRuntimes";
 import { refuseUntagged } from "./oracleTags";
@@ -67,7 +67,7 @@ const budget = () => {
     }
   }
   if (savedCosts === undefined) rmSync(costDirectory, { recursive: true, force: true });
-  const judgement = judgeLua({ measured, baselineDirectory: resolve("../records/lua-cost"), project: resolve(".") });
+  const judgement = judgeLua({ measured, baselineDirectory: LUA_COST_RECORDS });
   for (const line of [...over, ...judgement.risen]) console.log(line);
   if (judgement.updated > 0) console.log(`test cost baseline: ${judgement.updated} rows updated in records/lua-cost; commit them with the tests`);
   console.log(judgement.heaviest);

@@ -51,7 +51,10 @@
   "shrink it or move it to the farm" (shrink it, or make it a `sweep()`). A
   new module or a changed test count passes under the ceiling and rewrites
   its shard: commit it with the tests. `TEST_COST_UPDATE=1` rewrites every
-  measured shard, after a cut. The farm's merge job judges every partition's rows.
+  measured shard, after a cut. A run rewrites only the shards of the modules
+  it ran, and `bun run check` (smashcraft:ts/scripts/luaCostRecordsCheck.ts)
+  refuses a shard whose test file is gone or moved, so delete or move it with
+  the test. The farm's merge job judges every partition's rows.
   Natives are counted by the frame-cost gate (`bun wisp perf compare`), not
   here. `bun run test` counts the frames stepMatch simulates in each test
   (smashcraft:ts/test/testCost.ts) and fails a test over the 58,000-frame
