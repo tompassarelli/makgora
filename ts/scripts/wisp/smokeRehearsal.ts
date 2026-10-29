@@ -4,7 +4,8 @@ import { matchSpawnX } from "../../src/game/match/step";
 import { joinReplay, parseReplayHeader, parseReplayPart, replayMatch } from "../../src/game/replay/matchReplay";
 import { TAPE_REPLAY_SERIAL, recordTapeReplay } from "../../src/game/replay/tapeReplay";
 import { Character } from "../../src/game/sim/codes";
-import { createFighter } from "../../src/game/sim/fighter";
+import { type Fighter, createFighter } from "../../src/game/sim/fighter";
+import { fillMeter } from "../../src/game/sim/meter";
 import { fighterAt } from "../../src/game/sim/roster";
 import { type SmokeVerdict, judgeSmoke } from "./smokeJudge";
 import { SMOKE_BINDINGS, type SmokeSegment, approachStep, heldMasks, keyboardRows, segmentFrames, smokeSchedule, strikeStep } from "./smokeTape";
@@ -15,12 +16,18 @@ const CONTACT_GAP = 80;
 const APPROACH_LIMIT = 240;
 const APPROACH_SEARCH = 12;
 
+function charged(character: Character, slot: number): Fighter {
+  const f = createFighter(character, matchSpawnX(slot), slot === 0 ? 1 : -1);
+  fillMeter(f);
+  return f;
+}
+
 function recorded(first: Character, second: Character, frames: number, rows: readonly (readonly InputRow[])[], hazards = false): string[] {
   const idle = emptyInput();
   const tape = recordTapeReplay(frames, 0, {
     rowAt: (slot, frame) => rows[slot]?.[frame - 1] ?? idle,
-    first: createFighter(first, matchSpawnX(0), 1),
-    second: createFighter(second, matchSpawnX(1), -1),
+    first: charged(first, 0),
+    second: charged(second, 1),
     training: true,
     hazards,
   });

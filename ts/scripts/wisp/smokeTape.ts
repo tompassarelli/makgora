@@ -117,10 +117,10 @@ export function smokeMoves(facing: 1 | -1): readonly SmokeStep[] {
 
 export function smokeSchedule(approaches: readonly [number, number]): readonly SmokeSegment[] {
   return [
+    [{ slot: 0, steps: ultimate() }, { slot: 1, steps: ultimate() }],
     [{ slot: 0, steps: bindingSweep() }, { slot: 1, steps: bindingSweep() }],
     [{ slot: 0, steps: [...smokeMoves(facingOf(0)), rest()] }, { slot: 1, steps: [...smokeMoves(facingOf(1)), rest()] }],
     [{ slot: 0, steps: charge(0, approaches) }, { slot: 1, steps: charge(1, approaches) }],
-    [{ slot: 0, steps: ultimate() }, { slot: 1, steps: ultimate() }],
   ];
 }
 
