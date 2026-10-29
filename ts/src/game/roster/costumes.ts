@@ -31,9 +31,11 @@ export interface BodyVariant {
 }
 
 export function bodyCostume(character: number, costume: number): number {
-  return costumeBody(character, costume) === undefined ? 0 : costume;
+  const body = costumeBody(character, costume);
+  for (let index = 0; index < costume; index++) if (costumeBody(character, index) === body) return index;
+  return costume;
 }
 
 export function bodyVariants(characters: readonly number[]): readonly BodyVariant[] {
-  return characters.flatMap((character) => costumesFor(character).flatMap((_, costume) => (costume === 0 || costumeBody(character, costume) !== undefined ? [{ character, costume }] : [])));
+  return characters.flatMap((character) => costumesFor(character).flatMap((_, costume) => (bodyCostume(character, costume) === costume ? [{ character, costume }] : [])));
 }

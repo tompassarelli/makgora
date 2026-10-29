@@ -97,7 +97,7 @@ export function sourceModelHash(assets: string, character: number): string {
 export function stalePortraits(assets: string, renders: string): readonly string[] {
   return RENDERED_FIGHTERS.flatMap((character) => {
     const current = sourceModelHash(assets, character);
-    return [0, ...portraitCostumes(character)].flatMap((costume) => {
+    return portraitCostumes(character).flatMap((costume) => {
       const name = fighterRenderName(character) + portraitOutfit(character, costume);
       return PARTICIPANT_SLOTS.flatMap((slot) => {
         const file = join(renders, RECEIPTS, `FighterBust${name}P${slot + 1}.json`);

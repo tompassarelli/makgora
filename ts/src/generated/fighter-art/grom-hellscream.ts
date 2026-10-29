@@ -7,5 +7,5 @@ export const rules: FighterRules = {
 };
 
 export const costumeSkins: readonly { readonly index: number; readonly textures: Readonly<Record<string, string>> }[] = [
-  { index: 1, textures: {"Units\\Orc\\Hellscream\\Hellscream.blp":"Textures\\HellscreamChaos.blp"} },
+  { index: 0, textures: {"Units\\Orc\\Hellscream\\Hellscream.blp":"Textures\\HellscreamChaos.blp"} },
 ];

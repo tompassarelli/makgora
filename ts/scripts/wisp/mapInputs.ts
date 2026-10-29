@@ -238,7 +238,7 @@ const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cach
 
 
 
-export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => [0, ...portraitCostumes(character)].flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
+export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
   [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot, costume)))));
 
 const portraitImports = (assets: string) => Effect.forEach(

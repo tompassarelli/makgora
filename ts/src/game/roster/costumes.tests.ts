@@ -1,7 +1,10 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { copyMatchState, costumeFor, createMatchState, cycleCostume, selectCharacter } from "../lobby/lobbyState";
 import { Character } from "../sim/codes";
-import { costumeClipModel, costumesFor } from "./costumes";
+import { bodyCostume, bodyVariants, costumeClipModel, costumesFor } from "./costumes";
+import { fighterPortrait } from "./looks";
+import { PORTRAIT_KINDS } from "./kits";
+import { PARTICIPANT_SLOTS } from "../input/participants";
 import { costumeBody } from "../../generated/costumes/costumeBodies";
 import { originalClip } from "../../generated/clips/fighterOriginalClipInfo";
 
@@ -37,5 +40,26 @@ test("a skinned costume draws its fighter's timeline clips on its own body at th
   if (body === undefined) throw new Error("Grom's skinned costume has no generated body");
   assertEquals(costumeClipModel(Character.grom, fel, clip), body);
   assertEquals(costumeClipModel(Character.grom, tinted, clip), clip.modelPath);
-  assertEquals(costumeClipModel(Character.grom, 0, clip), clip.modelPath);
+  const green = costumes.findIndex(costume => costume.skin === undefined && costume.tint === undefined);
+  assertEquals(costumeClipModel(Character.grom, green, clip), clip.modelPath);
+});
+
+test("Grom's default costume is Fel: costume 0 draws the fel body, KO body and fel renders, and the green look is his first alternate [k2 property]", () => {
+  const [fel, green] = costumesFor(Character.grom);
+  assertEquals(fel?.name, "Fel");
+  assertEquals(fel?.skin?.textures["Units\\Orc\\Hellscream\\Hellscream.blp"], "Textures\\HellscreamChaos.blp");
+  assertEquals(green?.skin, undefined);
+  assertEquals(green?.tint, undefined);
+  const clip = originalClip(Character.grom, 0);
+  if (clip === undefined) throw new Error("Grom needs a timeline clip");
+  assertEquals(costumeClipModel(Character.grom, 0, clip), costumeBody(Character.grom, 0));
+  assertEquals(bodyCostume(Character.grom, 0), 0);
+  assertEquals(bodyCostume(Character.grom, 1), 1);
+  assertEquals(bodyCostume(Character.grom, 2), 1);
+  assertEquals(bodyVariants([Character.grom]).map(variant => variant.costume).join(","), "0,1");
+  for (const kind of PORTRAIT_KINDS) for (const slot of [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS]) {
+    const suffix = slot === undefined ? "" : `P${slot + 1}`;
+    assertEquals(fighterPortrait(Character.grom, kind, slot, 0), `war3mapImported\\Fighter${kind}GromHellscreamFel${suffix}.blp`);
+    assertEquals(fighterPortrait(Character.grom, kind, slot, 1), `war3mapImported\\Fighter${kind}GromHellscream${suffix}.blp`);
+  }
 });

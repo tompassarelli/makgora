@@ -105,7 +105,7 @@ const FOV = 8;
 
 /** A costume's own render is keyed by its fighter's character plus its index times this, so one number names a body in the maps below. */
 const COSTUME_STRIDE = 1000;
-const renderIds = RENDERED_FIGHTERS.flatMap((character) => [0, ...portraitCostumes(character)].map((costume) => character + costume * COSTUME_STRIDE));
+const renderIds = RENDERED_FIGHTERS.flatMap((character) => portraitCostumes(character).map((costume) => character + costume * COSTUME_STRIDE));
 const characterOf = (id: number) => id % COSTUME_STRIDE;
 const costumeOf = (id: number) => Math.floor(id / COSTUME_STRIDE);
 const renderName = (id: number) => fighterRenderName(characterOf(id)) + portraitOutfit(characterOf(id), costumeOf(id));

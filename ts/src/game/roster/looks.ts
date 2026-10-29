@@ -74,7 +74,8 @@ export function heroLook(character: number): HeroLook | undefined {
 }
 
 export function portraitCostumes(character: number): readonly number[] {
-  return (heroLook(character)?.costumes ?? []).flatMap((costume, index) => (costume.skin === undefined ? [] : [index]));
+  const outfits = (heroLook(character)?.costumes ?? [undefined]).map((_, costume) => portraitOutfit(character, costume));
+  return outfits.flatMap((outfit, costume) => (outfits.indexOf(outfit) === costume ? [costume] : []));
 }
 
 export function portraitOutfit(character: number, costume: number): string {
