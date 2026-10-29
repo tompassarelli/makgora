@@ -21,7 +21,7 @@ import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueMo
 import { derivedStepCode } from "./wisp/fighterArt";
 import { changedFighters } from "./wisp/fighterArtChanges";
 import { LOCOMOTION_RECORD, LOCOMOTION_TRAILER } from "./locomotionRecord";
-import { type Finished, runGroup } from "./processGroups";
+import { type Finished, killChildren, runGroup } from "./processGroups";
 
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
@@ -286,3 +286,20 @@ export const landingGate = (head: string, paths: readonly string[], alongside: E
     ? `pre-push: no landing check can be affected, so ${head.slice(0, 12)} lands on the local checks; main's CI runs the full suite after it lands`
     : `pre-push: ${checks.length} landing check${checks.length === 1 ? "" : "s"} and the local checks passed on ${head.slice(0, 12)} (${seconds} s)`);
 });
+
+if (import.meta.main) {
+  for (const [signal, code] of [["SIGINT", 130], ["SIGTERM", 143], ["SIGHUP", 129]] as const) {
+    process.on(signal, () => {
+      killChildren();
+      process.exit(code);
+    });
+  }
+  const refused = await Effect.runPromise(prePush(await Bun.stdin.text()).pipe(
+    Effect.as(undefined),
+    Effect.catchTag("PrePushRefusal", (refusal: PrePushRefusal) => Effect.succeed(refusal.problem)),
+  ));
+  if (refused !== undefined) {
+    console.error(refused);
+    process.exit(1);
+  }
+}

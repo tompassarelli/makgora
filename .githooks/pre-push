@@ -1,21 +1,3 @@
-#!/usr/bin/env bun
-// Git's pre-push hook; the gate is smashcraft:ts/scripts/prePush.ts.
-import { Effect } from "effect";
-import { PrePushRefusal, prePush } from "../ts/scripts/prePush.ts";
-import { killChildren } from "../ts/scripts/processGroups.ts";
-
-for (const [signal, code] of [["SIGINT", 130], ["SIGTERM", 143], ["SIGHUP", 129]] as const) {
-  process.on(signal, () => {
-    killChildren();
-    process.exit(code);
-  });
-}
-
-const refused = await Effect.runPromise(prePush(await Bun.stdin.text()).pipe(
-  Effect.as(undefined),
-  Effect.catchTag("PrePushRefusal", (refusal: PrePushRefusal) => Effect.succeed(refusal.problem)),
-));
-if (refused !== undefined) {
-  console.error(refused);
-  process.exit(1);
-}
+#!/usr/bin/env bash
+# Git's pre-push hook; the gate is smashcraft:ts/scripts/prePush.ts, which resolves effect from ts/node_modules at its pinned version.
+exec bun --no-install "$(git rev-parse --show-toplevel)/ts/scripts/prePush.ts" "$@"
