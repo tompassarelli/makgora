@@ -16,7 +16,7 @@ const NINE = 0x39;
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
-test("Y starts from fighter and stage select and is Strong, even as a tap between polls, once the match begins [k1 scenario]", () => {
+test("Y starts from fighter and stage select and is not Strong once the match begins, held or as a tap between polls, while 9 is [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0]);
   const host = clients.client(0);
   const read = <T>(body: () => T): T => {
@@ -52,11 +52,11 @@ test("Y starts from fighter and stage select and is Strong, even as a tap betwee
   expect(strongHeld()).toBe(false);
   clients.key(0, Key.y, 0, true);
   clients.frames(2);
-  expect(strongHeld()).toBe(true);
+  expect(strongHeld()).toBe(false);
   clients.key(0, Key.y, 0, false);
   clients.frames(2);
   expect(strongHeld()).toBe(false);
   clients.press(0, Key.y);
-  expect(strongHeld()).toBe(true);
+  expect(strongHeld()).toBe(false);
   expect(host.errors).toEqual([]);
 });
