@@ -10,6 +10,7 @@ const after = (paths: readonly string[]) => landingSelection(paths).afterLanding
 const HERE = CHECKS.filter(({ here }) => here !== undefined).map(({ name }) => name);
 const PERF = "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic";
 const ROLLBACK = "four-fighter 7-frame rollback p99 <= 10 ms and worst <= 14 ms";
+const CORPUS = "parity corpus: every native recording replays headless with 0 divergent frames";
 
 test("a landing runs no check for docs, every check for a shared root or the full suite, and for gameplay source the parity and computer checks while the frame budgets wait for main's CI [k2 property]", () => {
   expect(before(["docs/ci.md", "tools/move-data/notes.md"])).toEqual([]);
@@ -23,6 +24,8 @@ test("a landing runs no check for docs, every check for a shared root or the ful
   expect(groups(["ts/src/game/sim/codes.ts"])).toEqual(["perf", "rollback", "parity-0", "parity-1", "parity-2", "corpus"]);
   expect(before(["ts/scripts/wisp/commands/tapes.ts"])).toEqual(["parity tapes", "parity numeric", "stack-trace profile TypeScript frames"]);
   expect(before(["ts/test/corpus/2026-10-08T08-30-47-695Z/a/smashcraft-replay-39.txt"])).toEqual(["parity corpus: every native recording replays headless with 0 divergent frames"]);
+  for (const parse of ["ts/src/game/replay/replayFormat.ts", "ts/src/game/core/gameFiles.ts"]) expect(before([parse])).toContain(CORPUS);
+  expect(before(["ts/src/game/replay/canonical.ts"])).not.toContain(CORPUS);
   expect(before(["ts/src/game/core/gameFiles.ts"])).toContain("type-check edit loop and dependency validation");
   expect(before(["ts/src/host/loop/diagnostics.ts"])).toContain("compiler affected-module and output-equivalence checks");
 });

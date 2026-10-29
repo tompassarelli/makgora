@@ -31,7 +31,7 @@ const LUA_BUILD = /^(ts\/(src|codegen)\/|build-inputs\/)/;
 const TYPES = /^(ts\/|contracts\/|repos\/effect|effect-kit\.json$|typescript-toolchain\.lock$)/;
 const TAPES = /^ts\/test\/(tapes|replay|host-natives)/;
 const CORPUS = /^ts\/test\/corpus\//;
-const REPLAY_HEADER = /^ts\/src\/game\/replay\//;
+const REPLAY_HEADER = /^ts\/src\/game\/(replay\/(replayFormat|matchReplay)|core\/gameFiles)\.ts$/;
 
 const WISP_CLI = "ts/scripts/wisp.ts";
 const LUA_TESTS = "ts/scripts/lua-tests.ts";
@@ -99,7 +99,7 @@ export const CHECKS: readonly LandingCheck[] = [
     command: ["bun", "scripts/lua-tests.ts"], env: { LUA_TESTS_STEP: "stack" },
     reaches: parity, farm: ["parity-0"], here: "beside",
   },
-  // Each native recording replays on the source that recorded it (wisp#69), so only the replay command and its header parse reach it from this tree.
+  // Each native recording replays on the source that recorded it (wisp#69), and any ts/src change moves this tree off every recording's version, so only the replay command and its header and part parse reach it.
   {
     name: "parity corpus: every native recording replays headless with 0 divergent frames",
     command: ["bun", "wisp", "parity", "corpus", "test/corpus"],

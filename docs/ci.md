@@ -79,8 +79,10 @@ What reaches each check:
   desync; main's smoke job runs both on every landed commit, and a failure
   goes to the sheriff and the "main is red" issue.
 - The native corpus replays each recording on the source that recorded it
-  (wisp#69), so only a recording, the replay command or the replay header
-  parse in `ts/src/game/replay/` reaches it.
+  (wisp#69), and any change under `ts/src` moves this tree off every
+  recording's source version, so only a recording, the replay command or the
+  header and part parse it runs from this tree (`replayFormat.ts`,
+  `matchReplay.ts`, `gameFiles.ts`) reaches it.
 - The compiler benchmark compares the incremental compiler with a full compile
   after an edit to `ts/src/host/loop/diagnostics.ts`, so only that file, the
   benchmark and its imports reach it. The type-check benchmark checks that a
