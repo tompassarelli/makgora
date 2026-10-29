@@ -224,7 +224,7 @@ export function resolveCrouch(f: Fighter, input: Readonly<Controls>, direction: 
   return motion.crouching ? 0 : direction;
 }
 
-export function steerMotion(f: Fighter, input: Readonly<Controls>, stage: number, direction: number, horizontalStick: number, wantsShield: boolean, canSteer: boolean, groundTakeoff: boolean, wet: boolean, carrying: boolean): number {
+export function steerMotion(f: Fighter, input: Readonly<Controls>, direction: number, horizontalStick: number, wantsShield: boolean, canSteer: boolean, groundTakeoff: boolean, wet: boolean, carrying: boolean): number {
   const { motion } = f;
   let dashEntryDisplacementAdjustment = 0.0;
   if (canSteer) {
@@ -235,7 +235,7 @@ export function steerMotion(f: Fighter, input: Readonly<Controls>, stage: number
     const steerDirection = wantsShield ? 0 : direction;
     if (motion.grounded) {
       const previousGroundVelocity = motion.vx;
-      if (advanceGroundMovement(f, steerDirection, input.walking || carrying, horizontalStick, stageSurfaces.floorFriction(stage, motion))) dashEntryDisplacementAdjustment = f32(previousGroundVelocity - motion.vx);
+      if (advanceGroundMovement(f, steerDirection, input.walking || carrying, horizontalStick)) dashEntryDisplacementAdjustment = f32(previousGroundVelocity - motion.vx);
     } else if (steerDirection !== 0 && !groundTakeoff) {
       const driftStick = input.driftStickX ?? steerDirection;
       motion.vx = wet ? sea.swimVelocity(motion.vx, steerDirection) : airDriftVelocity(f, motion.vx, driftStick === 0 ? steerDirection : driftStick);
@@ -244,7 +244,7 @@ export function steerMotion(f: Fighter, input: Readonly<Controls>, stage: number
   return dashEntryDisplacementAdjustment;
 }
 
-export function dragFighterMotion(f: Fighter, stage: number, direction: number, wantsShield: boolean, canSteer: boolean, authoredMotion: boolean, groundTakeoff: boolean, carrying: boolean, dodgeActive: boolean): void {
+export function dragFighterMotion(f: Fighter, direction: number, wantsShield: boolean, canSteer: boolean, authoredMotion: boolean, groundTakeoff: boolean, carrying: boolean, dodgeActive: boolean): void {
   const { motion, launch, dodge } = f;
   const physics = f.tuning.physics;
   if (carrying) limitCarrySpeed(f);
@@ -258,15 +258,15 @@ export function dragFighterMotion(f: Fighter, stage: number, direction: number, 
   } else if (isGroundDodging(f)) {
     motion.vx = 0.0;
   } else if (!groundTakeoff && !authoredMotion && (!canSteer || wantsShield || direction === 0) && launch.hitstun <= 0 && (!dodgeActive || motion.grounded)) {
-    const drag = motion.grounded ? restingTraction(f, stageSurfaces.floorTraction(physics.traction, stageSurfaces.floorFriction(stage, motion))) : physics.airFriction;
+    const drag = motion.grounded ? restingTraction(f, physics.traction) : physics.airFriction;
     motion.vx = motion.vx > 0 ? max(0.0, f32(motion.vx - drag)) : min(0.0, f32(motion.vx + drag));
   }
 }
 
-export function decayMotion(f: Fighter, stage: number, dodgeActive: boolean): void {
+export function decayMotion(f: Fighter, dodgeActive: boolean): void {
   const { motion } = f;
-  decayKnockback(f, stageSurfaces.floorFriction(stage, motion));
-  decayShieldMotion(f, stageSurfaces.floorFriction(stage, motion));
+  decayKnockback(f);
+  decayShieldMotion(f);
   if (dodgeActive && !motion.grounded) {
     motion.vx = f32(motion.vx * AIR_DODGE_DECAY);
     motion.vz = f32(motion.vz * AIR_DODGE_DECAY);

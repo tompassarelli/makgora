@@ -206,12 +206,11 @@ export function ageKnockback(f: Fighter): void {
 }
 
 
-export function decayKnockback(f: Fighter, friction = 1.0): void {
+export function decayKnockback(f: Fighter): void {
   const { launch } = f;
   if (f.motion.grounded) {
     if (launch.groundKnockbackX === 0) launch.groundKnockbackX = launch.knockbackX;
-    const ordinary = termsOfPhysics(f.tuning.physics).knockbackFriction;
-    const decay = friction === 1.0 ? ordinary : roundMeleeWorldValue(f32(ordinary * friction));
+    const decay = termsOfPhysics(f.tuning.physics).knockbackFriction;
     const sliding = launch.groundKnockbackX;
     launch.groundKnockbackX = roundMeleeWorldValue(sliding > 0 ? max(0.0, f32(sliding - decay)) : min(0.0, f32(sliding + decay)));
     launch.knockbackX = launch.groundKnockbackX;

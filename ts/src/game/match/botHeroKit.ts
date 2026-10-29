@@ -16,7 +16,6 @@ import { chooseHeroSpecial } from "../sim/specials/engine";
 import { isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/runningMove";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, SpecialForm, SpecialSlot, chargeStage, specialForm, specialKit } from "../sim/specials/schema";
 import { type Controls, neutralControls } from "../sim/roster";
-import { floorFriction, floorTraction } from "../sim/stage";
 import { deckUnder, heightAhead, safeAt, scriptedPathLands } from "./botFooting";
 import { gameplanOf } from "./botGameplan";
 import { GameplanSpecial } from "../sim/gameplan";
@@ -136,7 +135,7 @@ function travelStaysOnDeck(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>
   }
 
   if (f.motion.grounded && velocityX !== 0.0) {
-    const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, f.motion));
+    const traction = f.tuning.physics.traction;
     const speed = Math.abs(velocityX);
     const coast = f32(f32(f32(speed * speed) / f32(2.0 * traction)) + speed);
     travelX = f32(travelX + (velocityX < 0 ? -coast : coast));

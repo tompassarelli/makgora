@@ -10,7 +10,7 @@ import { AttackStyle, DownState, LedgeState } from "../sim/codes";
 import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
-import { floorFriction, floorTraction, mainDeckLeft, mainDeckRight } from "../sim/stage";
+import { mainDeckLeft, mainDeckRight } from "../sim/stage";
 import { brakingDistance, heightAhead } from "./botFooting";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
@@ -69,7 +69,7 @@ export function steerEdgeCancel(f: Fighter, target: Readonly<Fighter> | undefine
   // Aim the landing just inside the lip: the slide carries it off before the lag ends.
   const out = f32(f.motion.vx * side);
   const landing = f32(inside - f32(out * landingFrames(f)));
-  const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, MAIN_DECK));
+  const traction = f.tuning.physics.traction;
   const rest = f32(Math.max(landing, LAND_SNAP) - f32(brakingDistance(out, traction, f.tuning.physics.walkSpeed) - f32(out * 0.5)));
   input.direction = landing < LAND_NEAR ? -side : rest > LAND_PAST ? side : 0;
   return true;
@@ -80,7 +80,6 @@ const LAND_NEAR = -6.0;
 const LAND_PAST = -4.0;
 /** A landing at the lip settles the body about this far inside it. */
 const LAND_SNAP = 8.0;
-const MAIN_DECK = { grounded: true, surface: 0 } as const;
 const LANDING_SEARCH = 40;
 
 /** Frames until a fall reaches the main deck's height. */

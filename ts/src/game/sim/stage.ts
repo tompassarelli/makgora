@@ -322,24 +322,6 @@ const SLOPED_DECKS = [SLOPED_MAIN_DECK];
 
 
 
-
-export const WATER_FRICTION = 0.5;
-
-const MAIN_DECK_FRICTION: Readonly<Record<number, number | undefined>> = { [TOMB_OF_SARGERAS_STAGE]: WATER_FRICTION };
-
-
-export function floorFriction(stage: number, motion: { readonly grounded: boolean; readonly surface: number | undefined }): number {
-  return motion.grounded && motion.surface === 0 ? MAIN_DECK_FRICTION[stage] ?? 1.0 : 1.0;
-}
-
-
-export function floorTraction(traction: number, friction: number): number {
-  return friction === 1.0 ? traction : f32(traction * friction);
-}
-
-
-
-
 const DECKS_BY_STAGE: Record<number, readonly Deck[] | undefined> = {};
 
 function decks(stage: number): readonly Deck[] {

@@ -1367,33 +1367,25 @@ measured in the headless sim:
 Before, every fighter slid 54.4 units on a wavedash. The doubling alone would
 have cut that to 29-35; the lower traction spread keeps the median near the
 old length for the fast runners while the casters slide much further and
-the heaviest less. smashcraft:ts/src/game/sim/floorFriction.tests.ts
-reproduces Melee's Fox, Marth and Luigi wavedash lengths (31.0, 41.5, 83.8)
-with a 3.1 dodge, and checks that Jaina slides furthest. The computer's slide predictions
+the heaviest less. A test that reproduced Melee's Fox, Marth and Luigi wavedash
+lengths (31.0, 41.5, 83.8) with a 3.1 dodge was removed with the other unit
+tests on 2026-10-20. The computer's slide predictions
 (smashcraft:ts/src/game/match/botFooting.ts, botCorner.ts) brake landing and
 standing slides by the same doubled rule.
 
-## Slippery floors
+## Every stage grips the same
 
-A deck can have a floor friction below one; shallow water's, on Tomb of
-Sargeras's main deck (its overhanging platforms are dry), is 0.5
-(`WATER_FRICTION`, smashcraft:ts/src/game/sim/stage.ts). While a fighter
-stands on such a floor, every traction it slides against is multiplied by it:
-the run brake and dash/run stop, the neutral ground drag that carries a
-wavedash or waveland, the ground knockback slide, and shield pushback and
-recoil. Each of those slides is about twice as long on water. Acceleration,
-the dash's entry speed and authored travel (rolls, attack movement) are
-unchanged, so a fighter starts moving as on ground but stops late. In the air
-and on ordinary decks the friction is exactly one and the arithmetic is
-unchanged.
+As of 2026-10-30 every stage has the same floor. A fighter's traction comes
+only from its own table ([Ground traction by fighter](#ground-traction-by-fighter)),
+on every deck alike: the run brake, dash and run stop, the neutral ground drag
+that carries a wavedash or waveland, ground knockback, and shield pushback and
+recoil all brake by that traction. No deck, platform or water multiplies it.
 
-Melee has slippery floors too, such as Icicle Mountain's ice, where a fighter
-slides further and starts sluggishly; its water only splashes.
-Tom decided, 7 Oct (delegated): shallow water uses 0.5, so slides are clearly longer without Icicle Mountain's ice, and only the
-slowing is scaled, so water is slippery, not sticky. The computer players'
-slide prediction (smashcraft:ts/src/game/match/botFooting.ts) uses the same
-friction. smashcraft:ts/src/game/sim/floorFriction.tests.ts compares each
-slide on ordinary ground and water with the same fighter and input.
+Tomb of Sargeras's shallow water is visual only. From 2026-10-07 (#193) its
+main deck halved every ground slide; that friction was removed on 2026-10-30,
+so the sea neither slows nor slides a fighter and the Tomb plays like any
+other stage. Melee's slippery floors, such as Icicle Mountain's ice, are not
+modelled.
 
 ## Main deck walls and underside
 

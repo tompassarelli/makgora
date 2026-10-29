@@ -7,7 +7,6 @@ import { chillScaled } from "./chill";
 import { speedBuffed } from "./itemBuffs";
 import { GroundAction, SpecialAction } from "./codes";
 import type { Fighter } from "./fighter";
-import { floorTraction } from "./stage";
 import { DASH_FLICK_SAMPLES, DASH_STICK_THRESHOLD, type GroundOption, GroundState, STICK_DEADZONE, StickZone, TAP_JUMP_WINDOW, groundOptionAllowed, runStickDirection, stickSpeedScale, stickZone } from "./stickZones";
 import { stickZ } from "./stick";
 import type { Controls } from "./roster";
@@ -199,10 +198,10 @@ function taperedAcceleration(f: Fighter, multiplier: number, base: number, direc
 
 
 
-export function advanceGroundMovement(f: Fighter, direction: number, walking: boolean, horizontalStick = direction, friction = 1.0): boolean {
+export function advanceGroundMovement(f: Fighter, direction: number, walking: boolean, horizontalStick = direction): boolean {
   const { ground, motion } = f;
   const physics = f.tuning.physics;
-  const traction = floorTraction(physics.traction, friction);
+  const traction = physics.traction;
   if (ground.pivotGraceFrames > 0) {
     if (direction !== 0) {
       ground.action = ground.pivotDashFrame > 0 ? GroundAction.dash : GroundAction.none;

@@ -9,7 +9,6 @@ import { integerHitPower } from "./knockback";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
 import { AIR_RECOIL_DECAY, AIR_RECOIL_SQUARED_CUTOFF, decayedAirMotion, retainedOriginal, setMeleeRecoil } from "./motion";
 import type { Controls } from "./roster";
-import { floorTraction } from "./stage";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { squareRoot } from "./warcraftMath";
 
@@ -174,16 +173,16 @@ export function clearShieldBreak(f: Fighter): void {
 }
 
 
-export function decayShieldMotion(f: Fighter, friction = 1.0): void {
+export function decayShieldMotion(f: Fighter): void {
   const { shield } = f;
   if (f.motion.grounded) {
     if (shield.pushbackX === 0 && retainedOriginal(shield.meleeRecoilX, shield.recoilX) === 0
-      && friction === 1.0 && f.tuning.physics.traction > 0 && f.tuning.physics.traction <= WORLD_UNITS_PER_MELEE_UNIT) {
+      && f.tuning.physics.traction > 0 && f.tuning.physics.traction <= WORLD_UNITS_PER_MELEE_UNIT) {
       shield.pushbackX = 0.0;
       setMeleeRecoil(f, 0.0, 0.0);
       return;
     }
-    const defenderDecay = divideFloat32(floorTraction(f.tuning.physics.traction, friction), WORLD_UNITS_PER_MELEE_UNIT);
+    const defenderDecay = divideFloat32(f.tuning.physics.traction, WORLD_UNITS_PER_MELEE_UNIT);
     const defenderSpeed = divideFloat32(shield.pushbackX, WORLD_UNITS_PER_MELEE_UNIT);
     const pushback = defenderSpeed > 0 ? max(0.0, subtractFloat32(defenderSpeed, defenderDecay)) : min(0.0, addFloat32(defenderSpeed, defenderDecay));
     shield.pushbackX = multiplyFloat32(pushback, WORLD_UNITS_PER_MELEE_UNIT);

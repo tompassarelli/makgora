@@ -563,13 +563,13 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const egg = heroEgg(f);
   const canSteer = canSteerFrame(f, authoredMotion, egg, dodgeActive, smashChargePaused);
   const moveDirection = resolveCrouch(f, input, direction, horizontalStick, carrying, wantsShield, canSteer);
-  const dashEntryDisplacementAdjustment = steerMotion(f, input, stage, moveDirection, horizontalStick, wantsShield, canSteer, groundTakeoff, wet, carrying);
-  dragFighterMotion(f, stage, moveDirection, wantsShield, canSteer, authoredMotion, groundTakeoff, carrying, dodgeActive);
+  const dashEntryDisplacementAdjustment = steerMotion(f, input, moveDirection, horizontalStick, wantsShield, canSteer, groundTakeoff, wet, carrying);
+  dragFighterMotion(f, moveDirection, wantsShield, canSteer, authoredMotion, groundTakeoff, carrying, dodgeActive);
   platforms.dropFromPlatform(f, stage, matchFrame, input);
   const oldX = motion.x;
   const oldZ = motion.z;
   const dashEntry = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot, stage, matchFrame));
-  decayMotion(f, stage, dodgeActive);
+  decayMotion(f, dodgeActive);
   const drill = motion.grounded ? undefined : attackFall(attack.style, attack.frame, f.tuning.moves);
   moveAlongSurface(f, stage, matchFrame, horizontalStick, dashEntry, canSteer, wantsShield, groundTakeoff);
   applyVerticalMotion(f, input, stage, matchFrame, drill, egg, wet, waterJumped, dodgeActive, authoredHeight, groundTakeoff);

@@ -7,7 +7,7 @@ import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import type { AuthoredSpecial } from "../sim/specials/schema";
 import { restingTraction } from "../sim/groundMovement";
-import { floorFriction, floorTraction, mainDeckLeft, mainDeckRight, surfaceCount, surfaceLeft, surfaceLine, surfaceMoves, surfaceRight, surfaceZAt } from "../sim/stage";
+import { mainDeckLeft, mainDeckRight, surfaceCount, surfaceLeft, surfaceLine, surfaceMoves, surfaceRight, surfaceZAt } from "../sim/stage";
 
 
 
@@ -45,7 +45,7 @@ function restingX(x: number, vx: number, deceleration: number, walkSpeed = Math.
 
 export function slideStaysOnDeck(f: Readonly<Fighter>, stage: number, matchFrame: number): boolean {
   const { x, vx, surface } = f.motion;
-  const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, f.motion));
+  const traction = f.tuning.physics.traction;
   const rest = restingX(x, vx, traction, restingTraction(f, traction) === traction ? Math.abs(vx) : f.tuning.physics.walkSpeed);
   if (surface === undefined || surface === 0) return rest >= safeLeft(stage) && rest <= safeRight(stage);
   return rest >= surfaceLeft(stage, surface, matchFrame) && rest <= surfaceRight(stage, surface, matchFrame);
@@ -202,7 +202,7 @@ export function horizontalAhead(f: Readonly<Fighter>, frames: number, stage: num
   const deckZ = surfaceZAt(stage, deck, matchFrame, x);
   const landing = landingFrame(f, frames, deckZ, matchFrame);
   if (landing > frames) return straight;
-  const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, { grounded: true, surface: deck }));
+  const traction = f.tuning.physics.traction;
   const speed = Math.abs(deltaX);
   const walkSpeed = f.tuning.physics.walkSpeed;
   const slide = slideAfter(speed, traction, walkSpeed, frames - landing);

@@ -117,7 +117,6 @@ src/game/sim/downSmashes.tests.ts	12	0.080
 src/game/sim/downThrows.tests.ts	12	0.713
 src/game/sim/exCommandHeroes.tests.ts	6	0.016
 src/game/sim/exOriginals.tests.ts	8	0.010
-src/game/sim/floorFriction.tests.ts	5	0.005
 src/game/sim/fourPlayerContracts.tests.ts	3	0.001
 src/game/sim/freezeTrapContracts.tests.ts	12	0.158
 src/game/sim/grabs.tests.ts	12	0.094
