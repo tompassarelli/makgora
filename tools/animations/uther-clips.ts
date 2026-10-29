@@ -60,7 +60,7 @@ const SWING_BODY: Partial<Record<HeroPose, Gesture>> = {
  neutralAir:tuck, forwardAir:{...tuck,chest:24}, backAir:{...tuck,chest:-10}, upAir:{...tuck,chest:-18,head:-18}, downAir:{front:-35,back:-35,kneeFront:70,kneeBack:70,chest:20},
  sideSpecial:{chest:22,front:30,back:-24,head:-10}, upSpecial:{...tuck,chest:-14,head:-16},
 };
-const WIND: Partial<Record<HeroPose, number>> = { downAir: 80, backAir: 110, neutralAir: 60, jab: -40, upSpecial: -40, dashAttack: -4, forwardTilt: 160, forwardTiltUp: 170, forwardTiltDown: 150 };
+const WIND: Partial<Record<HeroPose, number>> = { downAir: 80, backAir: 0, neutralAir: 90, jab: -40, upSpecial: -40, dashAttack: -4, forwardTilt: 160, forwardTiltUp: 170, forwardTiltDown: 150 };
 const LEAD: Partial<Record<HeroPose, number>> = { sideSpecial: 14, dashAttack: 8 };
 const SWINGS: Partial<Record<HeroPose, HammerSwing>> = { ...UTHER_HAMMER_SWINGS, ...UTHER_SPECIAL_SWINGS };
 const unit = (angle: number): Point => [Math.cos(angle * Math.PI / 180), 0, Math.sin(angle * Math.PI / 180)];
