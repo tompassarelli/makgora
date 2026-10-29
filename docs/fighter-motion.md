@@ -529,21 +529,21 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Tyrande Whisperwind | run | 8: Walk | 103.4 | 39.7 | forward; 98.3/103.4 |
 | Tyrande Whisperwind | turn | 37: Tyrande turn | 123.0 | 52.8 | back; 45.2/123.0 |
 | Tyrande Whisperwind | brake | 38: Tyrande stop | 25.3 | 11.4 | in place; 25.0/12.9 |
-| Tyrande Whisperwind | jump-squat | 39: Tyrande jumpSquat | 70.2 | 35.3 | down; 60.5/16.0 |
-| Tyrande Whisperwind | roll-forward | 47: Tyrande rollForward | 171.9 | 90.7 | forward; 62.2/118.0 |
-| Tyrande Whisperwind | roll-back | 48: Tyrande rollBackward | 168.4 | 89.5 | back; 115.2/58.6 |
+| Tyrande Whisperwind | jump-squat | 39: Tyrande jumpSquat | 78.9 | 44.1 | down; 70.5/6.0 |
+| Tyrande Whisperwind | roll-forward | 47: Tyrande rollForward | 188.7 | 92.4 | forward; 62.2/118.0 |
+| Tyrande Whisperwind | roll-back | 48: Tyrande rollBackward | 187.7 | 91.9 | back; 115.2/58.6 |
 | Tyrande Whisperwind | spot-dodge | 54: Tyrande spotDodge | 148.7 | 60.5 | in place; 64.4/110.5 |
 | Tyrande Whisperwind | air-dodge | 45: Tyrande airDodge | 143.9 | 64.6 | in place; 65.6/112.0 |
-| Tyrande Whisperwind | tech | 46: Tyrande tech | 133.6 | 58.6 | in place; 82.0/79.2 |
-| Tyrande Whisperwind | tech-forward | 49: Tyrande techForward | 158.2 | 88.2 | forward; 157.9/134.9 |
-| Tyrande Whisperwind | tech-back | 50: Tyrande techBackward | 166.2 | 82.3 | back; 162.8/112.0 |
-| Tyrande Whisperwind | get-up | 56: Tyrande getUp | 126.6 | 56.1 | up; 116.6/86.9 |
-| Tyrande Whisperwind | get-up-forward | 51: Tyrande getUpRollForward | 158.3 | 88.2 | forward; 158.1/134.8 |
-| Tyrande Whisperwind | get-up-back | 52: Tyrande getUpRollBackward | 166.5 | 82.4 | back; 162.9/111.5 |
-| Tyrande Whisperwind | get-up-attack | 57: Tyrande getUpAttack | 170.9 | 91.6 | both; 144.3/126.0 |
+| Tyrande Whisperwind | tech | 46: Tyrande tech | 143.3 | 64.6 | in place; 82.0/79.2 |
+| Tyrande Whisperwind | tech-forward | 49: Tyrande techForward | 159.0 | 82.2 | forward; 157.9/134.9 |
+| Tyrande Whisperwind | tech-back | 50: Tyrande techBackward | 171.7 | 84.6 | back; 162.8/112.0 |
+| Tyrande Whisperwind | get-up | 56: Tyrande getUp | 139.0 | 63.0 | up; 130.0/73.4 |
+| Tyrande Whisperwind | get-up-forward | 51: Tyrande getUpRollForward | 158.9 | 82.2 | forward; 158.1/134.8 |
+| Tyrande Whisperwind | get-up-back | 52: Tyrande getUpRollBackward | 171.5 | 84.6 | back; 162.9/111.5 |
+| Tyrande Whisperwind | get-up-attack | 57: Tyrande getUpAttack | 178.5 | 98.0 | both; 144.3/126.0 |
 | Tyrande Whisperwind | ledge-get-up | 59: Tyrande ledgeClimb | 148.7 | 90.0 | up; 137.6/0.0 |
-| Tyrande Whisperwind | ledge-roll | 53: Tyrande ledgeRoll | 158.2 | 88.2 | forward; 157.9/134.4 |
-| Tyrande Whisperwind | ledge-attack | 60: Tyrande ledgeAttack | 187.4 | 126.6 | both; 135.2/154.0 |
+| Tyrande Whisperwind | ledge-roll | 53: Tyrande ledgeRoll | 159.1 | 82.1 | forward; 157.9/134.4 |
+| Tyrande Whisperwind | ledge-attack | 60: Tyrande ledgeAttack | 187.4 | 126.2 | both; 135.2/154.0 |
 | the Butcher | walk | 1: Walk | 155.6 | 42.4 | forward; 149.6/143.5 |
 | the Butcher | dash | 1: Walk | 154.4 | 36.5 | forward; 146.7/71.9 |
 | the Butcher | run | 1: Walk | 165.7 | 37.4 | forward; 138.6/164.6 |

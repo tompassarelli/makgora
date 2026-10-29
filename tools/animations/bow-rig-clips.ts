@@ -32,6 +32,7 @@ export interface BowRigFighter {
   readonly stockClips: readonly string[];
   readonly evidence: string;
   readonly sidePlane?: true;
+  readonly bodyFloor?: true;
 }
 
 export const phase = (at: number, pose: Gesture = {}): Phase => ({ at, pose });
@@ -172,16 +173,21 @@ function requirePainGate(s: Session, bytes: ArrayBuffer, cells: readonly number[
   console.log(report);
   ensure(pass, `${s.fighter.label} pain gate failed`);
 }
+function groundOf(s: Session, action: Action): (index: number, frame: number) => number {
+  const bytes = generateMDX(s.model);
+  if (s.fighter.bodyFloor) { const body = new PainBody(bytes, s.fighter.character); return (index, frame) => body.floor(index, frame / 60); }
+  const drawn = new DrawnModel(bytes, 1);
+  return (index, frame) => {
+    const vertices = drawn.triangles(index, frame / 60, 1); let lowest = Infinity;
+    for (let i = 1; i < vertices.length; i += 2) lowest = Math.min(lowest, vertices[i]!);
+    ensure(Number.isFinite(lowest), `${action.name}: missing body`);
+    return lowest;
+  };
+}
 function snapGround(s: Session, placed: Placed, motion: mdx.AnimVector) {
-  const drawn = new DrawnModel(generateMDX(s.model), 1);
   for (const [action, index] of placed) {
-    const [start, end] = s.model.Sequences[index]!.Interval as unknown as [number, number];
-    const floors = Array.from({ length: action.frames + 1 }, (_, f) => {
-      const vertices = drawn.triangles(index, f / 60, 1); let lowest = Infinity;
-      for (let i = 1; i < vertices.length; i += 2) lowest = Math.min(lowest, vertices[i]!);
-      ensure(Number.isFinite(lowest), `${action.name}: missing body`);
-      return lowest - (poseAt(action, f).height ?? 0);
-    });
+    const [start, end] = s.model.Sequences[index]!.Interval as unknown as [number, number], ground = groundOf(s, action);
+    const floors = Array.from({ length: action.frames + 1 }, (_, f) => ground(index, f) - (poseAt(action, f).height ?? 0));
     for (const [f, lowest] of floors.entries()) keyAt(motion, Math.round(start + f * (end - start) / action.frames)).Vector[2]! -= lowest;
   }
 }
@@ -287,13 +293,8 @@ function appendAction(s: Session, helper: mdx.Helper, original: ReadonlyMap<stri
     const key={Frame,Vector:new Float32Array([0,0,g.height??0])};translations.push(key);helper.Translation!.Keys.push(key);
   }
   if(!action.air) {
-    const drawn=new DrawnModel(generateMDX(s.model),1);
-    for(let f=0;f<=last;f++) {
-      const vertices=drawn.triangles(index,f/60,1);let lowest=Infinity;
-      for(let i=1;i<vertices.length;i+=2)lowest=Math.min(lowest,vertices[i]!);
-      ensure(Number.isFinite(lowest),`${action.name}: missing body`);
-      translations[f]!.Vector[2]-=lowest-(poseAt(action,f).height??0);
-    }
+    const ground=groundOf(s,action);
+    for(let f=0;f<=last;f++) translations[f]!.Vector[2]-=ground(index,f)-(poseAt(action,f).height??0);
   }
   return {index,seconds:(end-start)/1000,...(action.contact?{contact:action.contact}:{})};
 }

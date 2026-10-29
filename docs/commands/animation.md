@@ -430,7 +430,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   Each bow strike names the point its top limb reaches (`aimAt`), and the arm
   and wrist are solved from it, because the 127-unit bow's farthest point is
   what the weapon trace holds to the hit regions; her pain reactions keep the
-  bow at a fixed tilt per row so it stays off the floor. It rebuilds from stock, so follow it with
+  bow at a fixed tilt per row so it stays off the floor, and `bodyFloor` sets
+  her ground clips on her body rather than the bow, whose lower limb would
+  otherwise lift her root for a frame as it swings below her feet. It rebuilds from stock, so follow it with
   `victory-clips.ts ASSETS VICTORY --character 30` to re-append her victory
   (the stock Stand Victory pulls her shoulder out of its socket), store
   `VICTORY/hero-models` with `--fighter tyrande` and derive. Sylvanas and

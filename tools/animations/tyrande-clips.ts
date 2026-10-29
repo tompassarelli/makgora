@@ -38,7 +38,7 @@ book.grabs();
 book.pain(-100, 0, [60, 70, -45]);
 
 await authorBowRigClips({
-  character: Character.tyrande, label: "Tyrande", script: "tyrande-clips.ts", stockSequences: 17, standIndex: 12, sidePlane: true,
+  character: Character.tyrande, label: "Tyrande", script: "tyrande-clips.ts", stockSequences: 17, standIndex: 12, sidePlane: true, bodyFloor: true,
   modelPath: "war3mapImported\\TyrandeDismountedV2.mdx", shippedModel: "TyrandeDismountedV2.mdx",
   clipModule: "ts/src/game/fighters/tyrande/clips.ts", constant: "TYRANDE", evidence: "tyrande-clips.json",
   stockClips: [
