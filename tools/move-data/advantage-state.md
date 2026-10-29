@@ -12,8 +12,8 @@ Each fighter against a light (Kel'Thuzad), medium (Sniper) and heavy (Cairne Blo
 | Sniper | medium | yes | yes | **no** | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, forward throw, dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 1/5 DI |
 | Sniper | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Illidan | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Illidan | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, down special, forward smash, side special; tech in forward smash; tech away side special; missed tech forward smash; trap short hop, down air, down special, forward smash, side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Illidan | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, down special, forward smash; tech in up smash; tech away dash, dash attack; missed tech forward smash; trap short hop, down air, down special, forward smash covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
+| Illidan | medium | yes | yes | yes | **no** | yes | down throw at 0%: tech in place short hop, down air, down special, forward smash; tech in forward smash; tech away side special; missed tech forward smash; trap short hop, down air, down special, forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Illidan | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, down special, forward smash; tech in up smash; tech away dash, dash attack; missed tech forward smash; trap short hop, down air, down special, forward smash covers tech in place, tech in, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
 | Samuro | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash, dash, dash attack; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Samuro | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash, dash, dash attack; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Samuro | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, up tilt; tech in down smash, dash, dash attack; tech away full hop, down air; missed tech forward smash; trap short hop, down air, up tilt covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
@@ -122,15 +122,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Sniper | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | light | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Illidan | light | up throw | 1/1 in up smash, out down smash | 1/1 KD in up smash, out short hop, down air | 1/1 KD in up smash, out forward smash | 1/1 in forward smash, out dash, dash attack |
+| Illidan | light | up throw | 1/1 in up smash, out down smash | 1/1 KD in up smash, out short hop, down air | 1/1 KD in up smash, out forward smash | 1/1 in up smash, out forward smash |
 | Illidan | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Illidan | medium | up throw | 1/1 | 1/1 KD | 1/1 KD in forward smash, out dash, dash attack | 1/1 in forward smash, out short hop, down air |
+| Illidan | medium | up throw | 1/1 | 1/1 KD | 1/1 KD | 1/1 |
 | Illidan | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | heavy | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Illidan | heavy | up throw | 1/1 in up smash, out forward smash | 1/1 in up smash, out forward smash | 1/1 KD in up smash, out forward smash | 1/1 KD in up smash, out forward smash |
+| Illidan | heavy | up throw | 1/1 in up smash, out forward smash | 1/1 in up smash, out forward smash | 1/1 KD | 1/1 KD in up smash, out forward smash |
 | Illidan | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Samuro | light | forward throw | 1/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Samuro | light | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
