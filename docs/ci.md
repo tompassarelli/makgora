@@ -52,9 +52,13 @@ fetch, rebase, scan and push:
    run on a hosted runner, so they run on the landing machine beside the farm
    run; the log names each with the reason (`landing local:`), and each farm
    result with its groups and run (`landing farm:`). A failing check refuses
-   the landing, printing the summary's failing tests and checks. A passing
-   farm run is remembered by the tree and groups it checked (the pre-push
-   cache), so a retry of the same tree skips it. When origin main moves while
+   the landing, printing the summary's failing tests and checks. A group that
+   passed is remembered by the hash of its inputs (smashcraft:ts/scripts/landingInputs.ts:
+   the group, the checks it runs and the blob of every tracked file their reach
+   rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
+   artifact kept 7 days that every Farm test job looks up first (so Autoland's
+   suite reuses it too, logging "Autoland reusing GROUP"), so a retry or a
+   rebase onto a moved main reruns only the groups whose files changed. When origin main moves while
    a run is in flight the exact landing reruns it on the rebased tree, up to
    three times, then under the lock. A raw `git push` to main, which skips
    safe-push, still runs the pre-push hook's local gate

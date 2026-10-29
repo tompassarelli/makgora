@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { Console, Effect, Exit, Option, Schema } from "effect";
 import { FarmFailure, currentRepo, dispatch, resolveRef, run, runTag, waitFor } from "wisp/scripts/wisp/farm";
 import { FULL_SUITE_VARIABLE, type Group, UNKNOWN_BASE, landingGroups } from "./landingChecks";
+import { groupInputKey } from "./landingInputs";
 import { PREPUSH_CACHE, PrePushRefusal, type Check, checksFor, cueInputs, directoryCache, laptop, runChecks, strikeInputs } from "./prePush";
 
 const Summary = Schema.fromJsonString(Schema.Struct({ failures: Schema.Array(Schema.String), problems: Schema.Array(Schema.String) }));
@@ -14,8 +15,6 @@ const needsPrivateStore = (check: Check) => check.privateStore === true
 
 /** The pre-push hook's checks the farm cannot run: the ones that read the private stores. */
 export const localChecks = (checks: readonly Check[]): Check[] => checks.filter(({ hosted, machineTool }) => !hosted && machineTool !== true);
-
-const farmKey = (tree: string, groups: readonly Group[]) => new Bun.CryptoHasher("sha256").update(`farm-gate\0${tree}\0${groups.join(",")}`).digest("hex");
 
 const farmRun: FarmRunner = (head, base, groups) => Effect.scoped(Effect.gen(function*() {
   const repo = yield* currentRepo;
@@ -41,11 +40,11 @@ const farmRun: FarmRunner = (head, base, groups) => Effect.scoped(Effect.gen(fun
  */
 export type FarmRunner = (head: string, base: string, groups: readonly Group[]) => Effect.Effect<void, unknown>;
 
-export interface Gate { readonly farm: FarmRunner; readonly cache: ReturnType<typeof directoryCache>; readonly tree: (head: string) => Effect.Effect<string, unknown> }
+export interface Gate { readonly farm: FarmRunner; readonly cache: ReturnType<typeof directoryCache>; readonly listing: (head: string) => Effect.Effect<string, unknown> }
 
-const machine: Gate = { farm: farmRun, cache: directoryCache(PREPUSH_CACHE), tree: (head) => run(["git", "rev-parse", `${head}^{tree}`]) };
+const machine: Gate = { farm: farmRun, cache: directoryCache(PREPUSH_CACHE), listing: (head) => run(["git", "ls-tree", "-r", "--full-tree", head]) };
 
-export const landOnFarm = (base: string, head: string, { farm: farmer, cache, tree: treeOf }: Gate = machine) => Effect.gen(function*() {
+export const landOnFarm = (base: string, head: string, { farm: farmer, cache, listing: listingOf }: Gate = machine) => Effect.gen(function*() {
   const paths = base === "" ? [UNKNOWN_BASE] : (yield* run(["git", "diff", "--name-only", base, head])).split("\n").filter((path) => path !== "");
   const groups = landingGroups(paths, process.env[FULL_SUITE_VARIABLE] === "1");
   const here = localChecks(checksFor(paths, cueInputs(), strikeInputs()));
@@ -53,12 +52,14 @@ export const landOnFarm = (base: string, head: string, { farm: farmer, cache, tr
   for (const check of here) yield* Console.error(`landing local: ${check.name}: ${needsPrivateStore(check)}`);
   const dirty = here.length === 0 ? "" : yield* laptop.dirty(["."]);
   if (dirty !== "") return yield* new PrePushRefusal({ problem: `landing local: the checks read the working tree, so land the clean checked-out commit.\n${dirty}` });
-  const tree = yield* treeOf(head);
-
-  const key = farmKey(tree, groups);
-  const proven = groups.length === 0 || (yield* cache.has(key));
-  const farm = proven ? Console.error(groups.length === 0 ? "landing farm: no farm group is reached, so nothing runs there" : `landing farm: ${groups.join(", ")} passed before on this tree (cache ${key.slice(0, 12)})`)
-    : farmer(head, base, groups).pipe(Effect.tap(() => cache.record(key)));
+  const listing = groups.length === 0 ? "" : yield* listingOf(head);
+  const keys = new Map(groups.map((group) => [group, groupInputKey(group, paths, true, listing)] as const));
+  const proven = yield* Effect.filter(groups, (group) => cache.has(keys.get(group) ?? ""));
+  for (const group of proven) yield* Console.error(`landing farm: ${group} reused, it passed before on these inputs (${(keys.get(group) ?? "").slice(0, 12)})`);
+  const pending = groups.filter((group) => !proven.includes(group));
+  const farm = groups.length === 0 ? Console.error("landing farm: no farm group is reached, so nothing runs there")
+    : pending.length === 0 ? Effect.void
+    : farmer(head, base, pending).pipe(Effect.tap(() => Effect.forEach(pending, (group) => cache.record(keys.get(group) ?? ""), { discard: true })));
   yield* Effect.all([farm, runChecks(here, laptop)], { concurrency: "unbounded", discard: true });
 });
 
