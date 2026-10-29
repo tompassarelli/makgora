@@ -52,7 +52,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const original = heroDefinition(character) === undefined;
   const normals = Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined
     || (original && code !== AttackStyle.grab && code !== AttackStyle.dashAttack));
-  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? { gap: aerialGap(tuning.moves?.normals[code]), lift: aerialLift(tuning.moves?.normals[code]) } : groundPlacement(tuning.moves?.normals[code], code, character)) }));
+  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? aerialPlacement(tuning.moves?.normals[code], code) : groundPlacement(tuning.moves?.normals[code], code, character)) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : heldShowcases(slot, code, special);
@@ -184,18 +184,16 @@ function behindGap(regions: readonly MoveRegion[], gap: number | undefined): num
   return -back * 4 >= gap * 3 ? back : undefined;
 }
 
-function aerialContact(move: Readonly<AuthoredMove> | undefined): MoveRegion | undefined {
-  return move?.regions.reduce<MoveRegion | undefined>((last, region) => last === undefined || region.lastFrame > last.lastFrame ? region : last, undefined);
+function aerialContact(move: Readonly<AuthoredMove> | undefined, style: AttackStyle): MoveRegion | undefined {
+  const better = style === AttackStyle.upAir ? (region: MoveRegion, best: MoveRegion) => centreZ(region) > centreZ(best)
+    : style === AttackStyle.downAir ? (region: MoveRegion, best: MoveRegion) => centreZ(region) < centreZ(best)
+    : (region: MoveRegion, best: MoveRegion) => region.lastFrame > best.lastFrame;
+  return move?.regions.reduce<MoveRegion | undefined>((best, region) => best === undefined || better(region, best) ? region : best, undefined);
 }
 
-function aerialGap(move: Readonly<AuthoredMove> | undefined): number | undefined {
-  const region = aerialContact(move);
-  return region === undefined ? undefined : Math.floor((region.hit.minX + region.hit.maxX) * 0.5);
-}
-
-function aerialLift(move: Readonly<AuthoredMove> | undefined): number | undefined {
-  const region = aerialContact(move);
-  return region === undefined ? undefined : Math.floor((region.hit.minZ + region.hit.maxZ) / 2 - SHOWCASE_DUMMY_MIDDLE);
+function aerialPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle): { readonly gap: number | undefined; readonly lift: number | undefined } {
+  const region = aerialContact(move, style);
+  return region === undefined ? { gap: undefined, lift: undefined } : { gap: Math.floor(centreX(region)), lift: Math.floor(centreZ(region) - SHOWCASE_DUMMY_MIDDLE) };
 }
 
 function specialGap(special: Readonly<AuthoredSpecial>): number | undefined {

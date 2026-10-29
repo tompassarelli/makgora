@@ -10,7 +10,7 @@ Every move and every Tom-facing build meets this bar whether or not its issue sa
 | 4 | Effects despawn within their declared lifetime; nothing lingers after the move ends. | Headless property A2; native C4; native gate-specials-spot-NN (#32) |
 | 5 | The weapon stays in the hand that holds it and never passes through the fighter's own body. | Geometric check (wrist-held props, self-gouge) |
 | 6 | Idle and stand loops are the stock clip, as smooth as the stock clip: no added jerk. | Headless property A4 |
-| 7 | A cold viewer who sees only the contact sheet, with no move name, says what the move does and where it hits, and that matches the move's intent. Fighters stay legible against every stage. | Cold-viewer judge E; contrast per stage (#456) |
+| 7 | A cold viewer who sees only the contact sheet, with no move name, says what the move does and where it hits, and that matches the move's intent. Fighters stay legible against every stage. | Cold-viewer judge E, a fresh Opus viewer: Sonnet viewers call back and two-sided hits "front" even when they place both fighters correctly (#710); contrast per stage (#456) |
 
 | # | Every Tom-facing build | How the gate checks it |
 | --- | --- | --- |

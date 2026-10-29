@@ -35,8 +35,10 @@ refuses unless every held stamp and status equals the timeline frame for frame.
 prepares Classic motion-reel pad scripts from the current roster and authored
 normals, four ground specials and ultimate. Each fighter directory is one
 capture-map batch. The timeline stands the dummy where the move's hit reads:
-a ground move at three quarters of its reach; an aerial at the middle of its
-last active region, so the whole swing shows before contact; for an up tilt
+a ground move at three quarters of its reach; an up air at the middle of its
+highest region and a down air at the middle of its lowest, so the hit reads
+above or below; any other aerial at the middle of its last active region, so
+the whole swing shows before contact; for an up tilt
 or up smash whose highest region sits more above the head than ahead of it,
 tossed so it peaks with its feet at that region's middle on the first active
 frame, clear of the fighter's own model; a down smash whose sides open on
