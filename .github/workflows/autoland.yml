@@ -255,10 +255,12 @@ jobs:
           git checkout -q -B autoland "$base"
           branches=""; tips=""; count=0; tested=""; directs=""
           while IFS=$'\t' read -r -u 3 branch tip passed_base passed_tree; do
-            if [ -z "$(git rev-list "$base..$tip")" ]; then
+            held="exactly"
+            if [ -n "$(git rev-list "$base..$tip")" ]; then held=$(bun ts/scripts/autolandLanded.ts "$base" "$tip" || true); fi
+            if [ -n "$held" ]; then
               git push -q --force-with-lease="refs/heads/$branch:$tip" origin ":refs/heads/$branch"
               status "$tip" success "landed as $base"
-              echo "main already holds $branch: deleted it" >> "$GITHUB_STEP_SUMMARY"
+              echo "main already holds $branch ($held): deleted it" >> "$GITHUB_STEP_SUMMARY"
               continue
             fi
             workflows=$(git diff --name-only "$(git merge-base "$base" "$tip")" "$tip" -- .github/workflows)
