@@ -89,6 +89,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Archimonde the Defiler | light | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
 | Archimonde the Defiler | medium | yes | **no** | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away uncovered; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Archimonde the Defiler | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, forward air; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
+| the Butcher | light | yes | yes | yes | **no** | yes | down throw at 0%: tech in place down smash; tech in up smash; tech away dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 40% → up tilt against 5/5 DI |
+| the Butcher | medium | yes | yes | **no** | **no** | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 40% → up tilt against 3/5 DI |
+| the Butcher | heavy | yes | yes | yes | **no** | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up tilt against 5/5 DI |
 
 ## True combos from each throw
 
@@ -420,4 +423,16 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Archimonde the Defiler | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Archimonde the Defiler | heavy | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
 | Archimonde the Defiler | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | light | up throw | 1/1 | 1/1 | 1/1 KD | 1/0 |
+| the Butcher | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | medium | up throw | 1/0 | 1/1 | 1/1 KD | 1/0 |
+| the Butcher | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| the Butcher | heavy | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
+| the Butcher | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 
