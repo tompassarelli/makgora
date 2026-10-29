@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Console, Effect, Exit, Option, Schema } from "effect";
+import { Console, Effect, Exit, Option, Schedule, Schema } from "effect";
 import { FarmFailure, RunState, currentRepo, decoded, dispatch, resolveRef, run, runTag, waitFor } from "wisp/scripts/wisp/farm";
 import { FULL_SUITE_VARIABLE, GROUPS, type Group, UNKNOWN_BASE, landingGroups } from "./landingChecks";
 import { groupInputKey } from "./landingInputs";
@@ -20,6 +20,7 @@ const WORKFLOW = "farm-test.yml";
 const POLL = "3 seconds";
 const PASSING = new Set(["success", "skipped"]);
 const RUN_URL = /\/actions\/runs\/(\d+)/;
+const NOT_YET = /HTTP 404/;
 
 /** A landing's verdict from the check jobs alone, since the merge job only summarises them: failed once one fails, passed once all pass. */
 export function checksVerdict(state: RunState): "passed" | "failed" | "pending" {
@@ -39,7 +40,10 @@ const dispatchRun = (repo: string, inputs: Readonly<Record<string, string>> & { 
 
 const awaitChecks = (repo: string, id: number) => Effect.gen(function*() {
   for (;;) {
-    const verdict = checksVerdict(yield* decoded(RunState, yield* run(["gh", "run", "view", String(id), "-R", repo, "--json", "status,conclusion,jobs"])));
+    const verdict = checksVerdict(yield* decoded(RunState, yield* run(["gh", "run", "view", String(id), "-R", repo, "--json", "status,conclusion,jobs"]).pipe(
+      // GitHub answers 404 for a just-dispatched run's jobs until it lists them.
+      Effect.retry({ while: (failure) => NOT_YET.test(failure.message), schedule: Schedule.spaced(POLL).pipe(Schedule.upTo({ duration: "1 minute" })) }),
+    )));
     if (verdict !== "pending") return verdict;
     yield* Effect.sleep(POLL);
   }
