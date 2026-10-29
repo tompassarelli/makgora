@@ -4,7 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 export const tyrandeStrikeMoments = {
   0: { clip: 13, seconds: f32(0.033), end: f32(0.283) },
   2: { clip: 22, seconds: f32(0.200), end: f32(0.767) },
-  3: { clip: 23, seconds: f32(0.233), end: f32(0.750) },
+  3: { clip: 23, seconds: f32(0.150), end: f32(0.750) },
   4: { clip: 21, seconds: f32(0.383), end: f32(0.817) },
   6: { clip: 15, seconds: f32(0.083), end: f32(0.450) },
   7: { clip: 18, seconds: f32(0.250), end: f32(0.417) },
@@ -13,7 +13,7 @@ export const tyrandeStrikeMoments = {
   10: { clip: 17, seconds: f32(0.117), end: f32(0.450) },
   12: { clip: 24, seconds: f32(0.000), end: f32(0.500) },
   13: { clip: 25, seconds: f32(0.100), end: f32(0.667) },
-  14: { clip: 26, seconds: f32(0.167), end: f32(0.450) },
+  14: { clip: 26, seconds: f32(0.150), end: f32(0.450) },
   15: { clip: 27, seconds: f32(0.100), end: f32(0.467) },
   16: { clip: 28, seconds: f32(0.000), end: f32(0.600) },
   19: { clip: 20, seconds: f32(0.200), end: f32(0.567) },
