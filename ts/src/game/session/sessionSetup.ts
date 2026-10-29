@@ -19,15 +19,18 @@ import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../input/participants";
 import {
   type MatchState, Phase, computerActive, cycleSlotMode, humanActive, humanFighterActive, selectCharacter, selectCpuCharacter, setAutomaticRematch,
+  cycleCostume, costumeFor,
   setTeamBattle, cycleTeam, setHitAreas, setItemsOn, setOrbsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
 } from "../lobby/lobbyState";
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
 import { type Character, ItemKind, itemBit } from "../sim/codes";
 import { MATCH_CHARACTERS, fighterKey } from "../roster/kits";
+import { costumeIndex, costumesFor } from "../roster/costumes";
 
 export const SLOTS_COMMAND = "-dev slots ";
 export const FIGHTER_COMMAND = "-dev fighter ";
+export const COSTUME_COMMAND = "-dev costume ";
 export const STOCKS_COMMAND = "-dev stocks ";
 export const TIME_COMMAND = "-dev time ";
 export const AUTO_REMATCH_COMMAND = "-dev auto-rematch ";
@@ -116,6 +119,20 @@ export function applySetupCommand(game: MatchState, actor: number, message: stri
     else if (slot === actor) selectCharacter(game, slot, character);
     if (game.characterChoices[slot] !== character || !game.characterReadiness[slot]) return refused("fighter");
     return `dev: player ${player} plays ${fighterKey(character)}`;
+  }
+  if (message.startsWith(COSTUME_COMMAND)) {
+    const rest = message.substring(COSTUME_COMMAND.length);
+    const space = rest.indexOf(" ");
+    const player = integer(space < 0 ? rest : rest.substring(0, space));
+    const slot = player === undefined ? -1 : player - 1;
+    if (!isParticipantSlot(slot) || space < 0) return refused("costume");
+    const wanted = rest.substring(space + 1).toLowerCase();
+    const options = costumesFor(game.characterChoices[slot]);
+    const costume = options.findIndex(entry => entry.name.toLowerCase() === wanted);
+    if (costume < 0) return refused("costume");
+    const target = costumeIndex(game.characterChoices[slot], costume);
+    for (let step = 0; step < options.length && costumeFor(game, slot) !== target; step++) cycleCostume(game, actor, slot, 1);
+    return costumeFor(game, slot) === target ? `dev: player ${player} costume ${wanted}` : refused("costume");
   }
   if (message.startsWith(STOCKS_COMMAND)) {
     const count = integer(message.substring(STOCKS_COMMAND.length));
