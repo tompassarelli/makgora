@@ -16,7 +16,7 @@ import { clientDelay, delayTable, savedClients, withCursorOffsets } from "../../
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
 
-import { tapes } from "./tapes";
+import { tapeCosts, tapes } from "./tapes";
 import { corpus } from "../corpus";
 import { reconcileFourFighters } from "../../fourFighters";
 import { reconcilePlayable } from "../../playable";
@@ -55,7 +55,7 @@ export const parity: Command = ([mode, ...args]) => {
         step("numeric Lua parity"),
       );
     }
-    case "tapes": return tapes(args);
+    case "tapes": return args[0] === "costs" ? tapeCosts(args.slice(1)).pipe(step("tape replay costs")) : tapes(args);
     case "corpus": return corpus(args).pipe(step("native corpus replay"));
     default: return Effect.fail(new UsageFailure({ problem: "parity takes numeric, tapes or corpus" }));
   }

@@ -19,8 +19,9 @@ import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/com
 import { step } from "wisp/scripts/wisp/timings";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { generateTapes } from "../acceptanceTapes";
+import { staleTapeCosts, tapeReplayCost, unmeasuredTapes } from "../tapeCosts";
 import { luaRuntimes } from "../luaRuntimes";
-import { runProcess } from "../../hostProcess";
+import { runMeasuredProcess, runProcess } from "../../hostProcess";
 import { usableCpus } from "../../usableCpus";
 
 const ts = join(import.meta.dir, "../../..");
@@ -113,7 +114,7 @@ const replayInBun = (tapes: readonly Tape[], parts: number) =>
       Effect.map((runs) => part.map(({ file }, index): [string, Run] => [file, runs[index] ?? { records: [], error: "no run" }])),
     ), { concurrency: parts }).pipe(Effect.map((parts) => new Map(parts.flat())));
 
-const longestFirst = (tapes: readonly Tape[]) => tapes.toSorted((a, b) => b.text.length - a.text.length).map(({ file }) => file);
+const longestFirst = (tapes: readonly Tape[]) => tapes.toSorted((a, b) => tapeReplayCost(b.name) - tapeReplayCost(a.name)).map(({ file }) => file);
 
 const inOrder = (files: readonly string[], runs: readonly Run[]) => new Map(files.map((file, index): [string, Run] => [file, runs[index] ?? { records: [], error: "no run" }]));
 
@@ -131,14 +132,14 @@ export function parseTapeShard(text: string | undefined): TapeShard | undefined 
   return match !== null && count >= 1 && index < count ? { index, count } : `TAPES_SHARD is INDEX/COUNT with INDEX below COUNT, such as 0/3, not ${text}`;
 }
 
-export function tapeShard<T extends { readonly text: string }>(tapes: readonly T[], shard: TapeShard | undefined): readonly T[] {
+export function tapeShard<T extends { readonly name: string }>(tapes: readonly T[], shard: TapeShard | undefined): readonly T[] {
   if (shard === undefined) return tapes;
   const loads = Array.from({ length: shard.count }, () => 0);
   const owner = new Map<T, number>();
-  for (const tape of tapes.toSorted((a, b) => b.text.length - a.text.length)) {
+  for (const tape of tapes.toSorted((a, b) => tapeReplayCost(b.name) - tapeReplayCost(a.name))) {
     const lightest = loads.indexOf(Math.min(...loads));
     owner.set(tape, lightest);
-    loads[lightest] = (loads[lightest] ?? 0) + tape.text.length;
+    loads[lightest] = (loads[lightest] ?? 0) + tapeReplayCost(tape.name);
   }
   return tapes.filter((tape) => owner.get(tape) === shard.index);
 }
@@ -186,17 +187,42 @@ const attempt = <A>(what: string, run: () => A | PromiseLike<A>) =>
 const isFrame = (operation: string | undefined) => operation === "frame" || operation === "predict";
 const frameCount = (run: Run) => run.records.filter(record => isFrame(record.split(" ", 2)[1])).length;
 
+const recordTapes = attempt("record tapes", async () => {
+  await Bun.$`mkdir -p ${build}`;
+  const recorded = [...generateTapes()].map(([name, text]) => ({ name, text, file: join(build, `${name}.tape`) }));
+  for (const { file, text } of recorded) await Bun.write(file, text);
+  return recorded;
+});
+
+const cpuMillis = (name: string, executable: string, file: string) =>
+  runMeasuredProcess([executable, tapesLua], ts, { ...process.env, TAPE_FILE: file }, "ignore").pipe(
+    Effect.mapError((failure) => new TapesFailure({ problem: `replay ${name} in 32-bit Lua: ${failure.message}` })),
+    Effect.flatMap(({ code, cpu }) => code === 0 ? Effect.succeed(cpu * 1000) : Effect.fail(new TapesFailure({ problem: `replay ${name} in 32-bit Lua: exit ${code}` }))),
+  );
+
+export const tapeCosts: Command = (args) => Effect.gen(function*() {
+  if (args.length > 0) return yield* new UsageFailure({ problem: "parity tapes costs takes no arguments; it replays each tape alone in 32-bit Lua, counts its CPU time and rewrites scripts/wisp/tapeCosts.json" });
+  const luas = yield* luaRuntimes.pipe(Effect.mapError((problem) => new TapesFailure({ problem })));
+  const recorded = yield* recordTapes;
+  yield* compileTypeScriptLua.pipe(Effect.provide(BunServices.layer));
+  const costs: Record<string, number> = {};
+  for (const { name, file } of recorded.toSorted((a, b) => a.name.localeCompare(b.name))) {
+    costs[name] = Math.round(yield* cpuMillis(name, luas.nearest, file));
+  }
+  yield* attempt("write the tape costs", () => Bun.write(join(import.meta.dir, "../tapeCosts.json"), `${JSON.stringify(costs, null, 2)}\n`));
+  yield* Console.log(`${recorded.length} tapes, ${Object.values(costs).reduce((sum, ms) => sum + ms, 0)} ms of 32-bit Lua replay in all`);
+});
+
 export const tapes: Command = (args) => Effect.gen(function*() {
-  if (args.length > 0) return yield* new UsageFailure({ problem: "tapes takes no arguments; LUA and TOWARD_ZERO_LUA name optional 32-bit Luas, and TAPES_SHARD=INDEX/COUNT replays one of COUNT parts of equal tape length" });
+  if (args.length > 0) return yield* new UsageFailure({ problem: "tapes takes no arguments; LUA and TOWARD_ZERO_LUA name optional 32-bit Luas, and TAPES_SHARD=INDEX/COUNT replays one of COUNT parts of equal measured replay cost (tapeCosts.json); `tapes costs` re-measures them" });
   const shard = parseTapeShard(process.env.TAPES_SHARD);
   if (typeof shard === "string") return yield* new UsageFailure({ problem: shard });
   const luas = yield* luaRuntimes.pipe(Effect.mapError((problem) => new TapesFailure({ problem })));
-  const tapes = yield* attempt("record tapes", async () => {
-    await Bun.$`mkdir -p ${build}`;
-    const recorded = [...generateTapes()].map(([name, text]) => ({ name, text, file: join(build, `${name}.tape`) }));
-    for (const { file, text } of recorded) await Bun.write(file, text);
-    return tapeShard(recorded, shard);
-  }).pipe(step("record tapes"));
+  const recorded = yield* recordTapes.pipe(step("record tapes"));
+  const names = recorded.map(({ name }) => name);
+  const drift = [...unmeasuredTapes(names), ...staleTapeCosts(names)];
+  if (drift.length > 0) return yield* new TapesFailure({ problem: `tapeCosts.json does not match the recorded tapes (${drift.join(", ")}); run bun wisp parity tapes costs` });
+  const tapes = tapeShard(recorded, shard);
   const cpus = usableCpus();
   const bunParts = Math.max(1, Math.min(4, Math.floor(cpus / 4)));
   const luaSlots = Math.max(2, Math.floor((cpus - bunParts) / 2));

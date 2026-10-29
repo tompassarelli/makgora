@@ -3,6 +3,8 @@ import { Effect } from "effect";
 import { CHECKS, GROUPS, landingSelection, selectGroups } from "../scripts/landingChecks";
 import { type GateRunner, PrePushRefusal, landingGate } from "../scripts/prePush";
 import { tapeShard } from "../scripts/wisp/commands/tapes";
+import costs from "../scripts/wisp/tapeCosts.json";
+import { tapeReplayCost } from "../scripts/wisp/tapeCosts";
 
 const groups = (paths: readonly string[]) => selectGroups(paths).map(({ group }) => group);
 const before = (paths: readonly string[], full = false) => landingSelection(paths, full).run.map(({ check }) => check.name);
@@ -31,12 +33,12 @@ test("a landing runs no check for docs, every check for a shared root or the ful
 });
 
 test("the tape shards split every tape into exactly one part, each within one tape of an even share [k2 property]", () => {
-  const tapes = Array.from({ length: 46 }, (_, index) => ({ name: `tape-${index}`, text: "x".repeat(270 + ((index * 7919) % 3700)) }));
+  const tapes = Object.keys(costs).map((name) => ({ name }));
   const parts = [0, 1, 2].map((index) => tapeShard(tapes, { index, count: 3 }));
   expect(parts.flat().map(({ name }) => name).toSorted()).toEqual(tapes.map(({ name }) => name).toSorted());
-  const lengths = parts.map((part) => part.reduce((sum, { text }) => sum + text.length, 0));
-  const longest = Math.max(...tapes.map(({ text }) => text.length));
-  expect(Math.max(...lengths) - Math.min(...lengths)).toBeLessThanOrEqual(longest);
+  const loads = parts.map((part) => part.reduce((sum, { name }) => sum + tapeReplayCost(name), 0));
+  const longest = Math.max(...tapes.map(({ name }) => tapeReplayCost(name)));
+  expect(Math.max(...loads) - Math.min(...loads)).toBeLessThanOrEqual(longest);
 });
 
 const HEAD = "a".repeat(40);

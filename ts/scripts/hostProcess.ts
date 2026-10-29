@@ -16,10 +16,10 @@ export const stopBunProcess = (child: Pick<Bun.Subprocess, "exitCode" | "kill" |
 });
 
 
-export const runMeasuredProcess = (command: readonly string[], cwd: string, env: Record<string, string | undefined>) =>
+export const runMeasuredProcess = (command: readonly string[], cwd: string, env: Record<string, string | undefined>, output: "inherit" | "ignore" = "inherit") =>
   Effect.acquireUseRelease(
     Effect.try({
-      try: () => Bun.spawn([...command], { cwd, env, stdout: "inherit", stderr: "inherit" }),
+      try: () => Bun.spawn([...command], { cwd, env, stdout: output, stderr: output }),
       catch: (cause) => new ProcessFailure({ command: command[0] ?? "", problem: `could not start: ${String(cause)}` }),
     }),
     (child) => Effect.promise(() => child.exited).pipe(Effect.map((code) => {

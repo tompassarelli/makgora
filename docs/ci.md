@@ -120,12 +120,18 @@ sample's text is built once while a history holds it
 with every tape's records unchanged.
 
 Farm test (farm-test.yml) runs the same checks for Autoland and `bun wisp farm
-test`, grouped into its jobs perf, rollback, parity-0 to parity-2 (one third
-of the replay tapes each, balanced by tape length with `TAPES_SHARD`; parity-0
-also runs parity numeric and the stack-trace profile), corpus and types. A job
-runs when the `checks` input names it or a changed path reaches one of its
-checks, and then runs only its checks the changed paths reach (all of them
-when the `full` input is 1, as `LAND_FULL_SUITE=1` sets, or the base is unknown).
+test`, grouped into its jobs perf, rollback, parity-0 to parity-2 (a third of
+the replay tapes each, balanced by measured replay cost with `TAPES_SHARD`;
+parity-0 also runs parity numeric and the stack-trace profile), corpus and
+types. The costs are each tape's 32-bit Lua CPU time in
+ts/scripts/wisp/tapeCosts.json, because a tape's text length does not predict
+it (the thirteen ultimate tapes share a script and differ 2.5 times) and
+parity-0 ran twice as long as parity-1 when length balanced them; `bun wisp
+parity tapes costs` rewrites the table, and `parity tapes` refuses a table
+that misses a tape or names one that is gone. A job runs when the `checks`
+input names it or a changed path reaches one of its checks, and then runs only
+its checks the changed paths reach (all of them when the `full` input is 1, as
+`LAND_FULL_SUITE=1` sets, or the base is unknown).
 
 ## Autoland
 
