@@ -176,3 +176,8 @@ export function damageTint(fighter: Readonly<Fighter>): Readonly<{ red: number; 
   if (fighter.status.out || fighter.shield.stun > 0 || fighter.launch.hitstun <= 0 && !(fighter.launch.hitlag > 0 && fighter.visuals.hitPummel && fighter.grab.owner !== undefined)) return undefined;
   return elementLook(fighter.visuals.hitElement).tint;
 }
+
+
+export function presentStarKoTwinkle(x: number, z: number, sink: ImpactSoundSink): void {
+  sink("DispelMagic", x, z, 110, 2.0, false, VoiceClass.ko);
+}

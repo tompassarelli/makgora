@@ -29,7 +29,19 @@ A shield hit shows a shield spark rather than the element's spark, and a
 powershield its own flash and sound. A missed tech thuds and raises dust; a
 tech flashes the fighter and plays its recovery voice. A ledge catch flashes at
 the ledge lip. A blast KO bursts in the player's colour at the blast line and
-shakes the camera; a star KO and a screen KO each have their own sound.
+shakes the camera and plays ThunderClap.
+
+A top KO is a Star KO about 7 times in 8 and a Screen KO about 1 time in 8
+(SmashWiki "Screen KO" and "Star KO": the choice is mostly random, and in the
+first three games Screen KOs are considerably rarer than Star KOs; no page
+gives an exact rate, so Smashcraft uses 1 in 8, 2026-10-30). The choice is a
+hash of the KO frame, the owner slot and the character
+(`topKoKind` in smashcraft:ts/src/game/presentation/impactState.ts), so a
+replay or rollback picks the same kind. A Star KO tumbles the fighter slowly
+away into the background, shrinking toward the screen centre over 90 frames
+(1.5 s), then draws a Dispel Magic sparkle and plays a high-pitched DispelMagic
+chime (pitch 2.0) as the twinkle at the end. The Screen KO is the near fall
+through the screen centre.
 
 ## Footsteps and movement
 
@@ -62,7 +74,7 @@ not claims that Warcraft renders Melee's artwork or exact animation programs.
 | Ledge catch / recovery | Smashcraft shield star (Melee's contact spark at the lip) / Smashcraft dust (climb dust) | quiet BlinkTarget |
 | Ground jump / aerial jump | Smashcraft dust / jump ring | quiet BlinkTarget |
 | Walk / run / dash / ordinary landing | Smashcraft dust | DeepFootstep / DeepFootstep2; distinct volume and pitch |
-| Blast KO / star close / respawn | Smashcraft KO burst / Dispel Magic / Resurrection | ThunderClap for KO; original fighter death cues remain |
+| Blast KO / star close / respawn | Smashcraft KO burst / Dispel Magic / Resurrection | ThunderClap for KO, DispelMagic at pitch 2.0 for the star KO twinkle; original fighter death cues remain |
 
 Inspection command in developer builds: `-dev quick`, then `-dev effects N`.
 The numbered cases are declared in

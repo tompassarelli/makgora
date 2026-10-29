@@ -28,7 +28,7 @@ import {
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { impactAnimation, impactColour, impactModel, impactModelScale, impactSoundNames, impactStartSeconds, presentImpactSounds, presentStartSounds, type ImpactSoundSink } from "../presentation/hitPresentation";
+import { impactAnimation, impactColour, impactModel, impactModelScale, impactSoundNames, impactStartSeconds, presentImpactSounds, presentStarKoTwinkle, presentStartSounds, type ImpactSoundSink } from "../presentation/hitPresentation";
 import { VOICE_CAP, VoiceClass, admitVoice, createVoiceBudget, liveVoices, resetVoiceBudget } from "../presentation/voiceBudget";
 import { SoundBank, SoundKind } from "./soundBank";
 import { tierSoundPaths } from "../presentation/moveTiers";
@@ -354,6 +354,11 @@ export class CombatEffects {
     if (last === undefined || age !== undefined && age < last) {
       BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
       BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
+      if (kind === IMPACT_STAR_KO) {
+        this.soundFrame = frame;
+        this.soundsFrom = "every";
+        presentStarKoTwinkle(this.pose.x, this.pose.z, this.playSound);
+      }
     }
     shownAges[i] = age;
     if (age !== undefined) this.drawn(i, kind, frame - age);

@@ -303,7 +303,7 @@ and either grounded state, an active frozen state, or upward knockback above
 Smashcraft's launch threshold in smashcraft:ts/src/game/sim/, which no public
 page states for Melee. Ordinary jump velocity does not meet it. Production tests
 cover jump-only ascent, the exact launch threshold, a qualifying launch, and
-contact exactly at the top boundary. Star and screen KO selection, camera
+contact exactly at the top boundary. Camera
 constraints and death/respawn phase clocks remain open. Side and bottom
 comparisons now also require strict crossing; the six-test blast-zone group
 passes boundary-adjacent cases and the existing stock/ASDI cases. Frozen-state

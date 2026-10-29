@@ -38,6 +38,7 @@ export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
 export const KO_STAR_FRAMES = 108;
 export const KO_SCREEN_FRAMES = 100;
+export const SCREEN_KO_ONE_IN = 8;
 
 const PI = f32(3.141592654);
 const HALF_PI = f32(1.570796327);
@@ -322,7 +323,7 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
   if (events.launchTrail) spawn(state, IMPACT_DUST, x, f32(z + 45.0), 0, f32(0.6));
   if (events.koDirectionX === 0 && events.koDirectionZ > 0) {
 
-    const kind = imod(frame + events.character, 2) === 0 ? IMPACT_STAR_KO : IMPACT_SCREEN_KO;
+    const kind = topKoKind(frame, owner, events.character);
     const slot = spawn(state, kind, f32(x * f32(0.45)), min(z, 480.0), events.facing, 1.0);
     state.character[slot] = events.character;
     state.owner[slot] = owner;
@@ -338,6 +339,12 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
     spawn(state, IMPACT_DODGE, x, f32(z + 12.0), 0, 1.0);
     spawn(state, IMPACT_DUST, f32(x - events.direction * 15), f32(z + 2.0), -events.direction, f32(0.55));
   }
+}
+
+
+export function topKoKind(frame: number, owner: number, character: number): number {
+  const mixed = imod(imod(frame * 40503 + owner * 9973 + character * 7919, 65521) * 31337 + 12345, 65521);
+  return imod(idiv(mixed, 7), SCREEN_KO_ONE_IN) === 0 ? IMPACT_SCREEN_KO : IMPACT_STAR_KO;
 }
 
 
@@ -411,12 +418,12 @@ export function projectKo(state: Readonly<ImpactState>, i: number): Readonly<KoP
       owner,
       alpha: 255,
       scale: f32(remaining * remaining),
-      x: f32(originX + f32((drift * 75) * t)),
+      x: f32(originX * f32(1.0 - f32(t * f32(0.7)))),
       y: f32(1400 * t),
       z: f32(originZ + f32(180 * t)),
-      pitch: f32(f32(drift * t) * f32(18.84955592)),
+      pitch: f32(f32(drift * t) * f32(6.283185307)),
       yaw,
-      roll: f32(t * f32(12.56637061)),
+      roll: f32(t * f32(3.141592654)),
     };
   }
   const flight = min(1.0, f32(age / 24.0));
