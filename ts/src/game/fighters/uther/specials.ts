@@ -31,12 +31,12 @@ export const UTHER_SPECIAL_SWINGS = {
 } as const;
 const devotionAura = (air: boolean): AuthoredSpecial => ({
   endFrame: 40,
-  regions: swingRegions(UTHER_SPECIAL_SWINGS.sideSpecial, sameHit(utherHit(11.0, "EDGE", 40, false, HitElement.holy))),
+  regions: swingRegions(UTHER_SPECIAL_SWINGS.sideSpecial, sameHit(utherHit(9.0, "EDGE", 40, false, HitElement.holy))),
   motion: [
     { ...frames(AURA_FIRST, AURA_LAST), velocityX: AURA_STEP, velocityZ: 0.0, stopsAtBody: true, stopsAtShield: true },
     { ...frames(AURA_LAST + 1, AURA_LAST + 1), velocityX: 0.0, velocityZ: 0.0 },
   ],
-  armor: { ...frames(AURA_FIRST, AURA_LAST), maxDamage: 8.0 },
+  armor: { ...frames(AURA_FIRST, AURA_LAST), maxDamage: 6.0 },
   hurt: [hurtPose(18, 26, utherReach(44.0, 70.0))],
   ...(air ? { oncePerAirtime: true, landingLag: 18 } : {}),
 });
@@ -45,7 +45,7 @@ const RISE_FIRST = 6;
 const RISE_LAST = 27;
 const hammerOfTheRighteous = (rise: number): AuthoredSpecial => ({
   endFrame: RISE_LAST,
-  regions: swingRegions(UTHER_SPECIAL_SWINGS.upSpecial, (_, index) => utherHit(8.0, "LAUNCH", index < 3 ? 80 : 85, false, HitElement.holy)),
+  regions: swingRegions(UTHER_SPECIAL_SWINGS.upSpecial, (_, index) => utherHit(7.0, "LAUNCH", index < 3 ? 80 : 85, false, HitElement.holy)),
   motion: [
     { ...frames(RISE_FIRST, RISE_LAST - 1), velocityX: perFrame(heights(f32(0.25)), RISE_FIRST, RISE_LAST - 1), velocityZ: perFrame(heights(rise), RISE_FIRST, RISE_LAST - 1), driftSpeed: perFrame(heights(f32(1.1)), RISE_FIRST, RISE_LAST - 1) },
     { ...frames(RISE_LAST, RISE_LAST), velocityX: 0.0, velocityZ: 0.0 },

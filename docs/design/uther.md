@@ -42,7 +42,7 @@ Startup / active / recovery; damage. Holy moves carry the holy element.
   stops at the foe instead of passing through, so a shield can punish it.
 - Forward smash, his signature: a two-handed overhead blow; the head hits 18%
   as a strong hit, the haft 12% (18/3/36).
-- Up smash: a hammer upswing with a halo of light (15/5/32; 16%).
+- Up smash: a hammer upswing with a halo of light (15/5/32; 14%).
 - Down smash: a low ring, front then back (14/4/32; 14%).
 - Neutral air: a full hammer spin (7/6/22; 10%).
 - Forward air: an overhead chop; the head meteors on its last two frames (14/3/26; 13%).
@@ -58,12 +58,12 @@ Startup / active / recovery; damage. Holy moves carry the holy element.
   10% at 80°, 44 frames total, punishable on a whiff. A hit heals him 2%, at
   most 6% in one stock. The hit effect's `heal` and `healPerStock` carry it,
   and the fighter's `status.healed` counts the stock's heals.
-- Side, **Devotion Aura:** he steps forward with armour against hits up to 8%
-  on frames 6-22 and bashes with the hammer on frames 20-23 (11%). A shield
+- Side, **Devotion Aura:** he steps forward with armour against hits up to 6%
+  on frames 6-22 and bashes with the hammer on frames 20-23 (9%). A shield
   stops the advance; grabs and strong hits beat the armour. In the air it is
   once per airtime.
 - Up, **Hammer of the Righteous:** a rising two-handed hammer arc that climbs
-  2.4 reference heights with light steering, hits 8% on frames 8-14, spends
+  2.4 reference heights with light steering, hits 7% on frames 8-14, spends
   the aerial jump and ends helpless.
 - Down, **Divine Shield:** the first strike or missile that would reach him on
   frames 4-26 is turned aside and he stays intangible to strikes and missiles
