@@ -76,6 +76,10 @@ fetch, rebase, scan and push:
    landingFarm.ts process (2 s even when every group is reused, mostly module
    loading and the check selection), and about 1 in the farm poll, which reads
    the run over the gate's own HTTPS connection instead of a gh process per poll.
+   The single heaviest process was north dep-gate (1.56 CPU s, one git show per
+   manifest and lock file); it now reads a revision with one ls-tree and one
+   cat-file --batch (north 8fb73d9c19) and takes 0.20 CPU s in the same kind of
+   landing.
 2. **After landing.** The push to main runs CI's smoke, filtered-checks,
    development-loop and code-health jobs, one run per landed commit (CI's
    concurrency is per SHA on main), plus Background sweeps, Auto-close and
