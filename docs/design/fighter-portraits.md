@@ -204,6 +204,19 @@ Warcraft has no
 per-render Lua callback (smashcraft:docs/high-refresh.md), so hand and chip move
 together once per 60 Hz tick from one mouse sample.
 
+Character select draws every connected human's hand, not only the local one
+(asked for 2026-10-30, after Melee's player hands): each hand carries a P1 to P4
+badge on its cuff, tinted in that slot's Warcraft colour (red, blue, teal,
+purple), and a pinching hand's chip is drawn at the hand. Each client knows only
+its own mouse (a pad's cursor is a mouse position too), so it sends its hand's
+state, carried chip and position as a six-character `select-hand` sync
+message (`ts/src/game/ui/selectionHands.ts`), only when the encoded pose
+changes and at most 15 times a second; the position is quantised to 0.001 of a
+screen. Other clients glide each hand from where it was drawn to the new position
+over one send interval; the local hand is the mouse's own sample with no delay.
+A client that cannot show a hand (settings open, a dialog, the stage menu) sends
+the hidden pose, and a hand is drawn only for a human still present.
+
 ## Classic tile colour floor
 
 Provenance: Tom's 0.0.192 character-select finding #563 item 22, measured

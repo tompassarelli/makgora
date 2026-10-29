@@ -200,18 +200,20 @@ export function presentCardCpu(frames: CardFrames, game: Readonly<MatchState>, s
   }
 }
 
-export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag>, grid: RosterGrid, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, x: number, y: number): boolean {
+export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag>, grid: RosterGrid, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, x: number, y: number, remote: { readonly x: number; readonly y: number } | undefined): boolean {
   BlzFrameSetVisible(frames.chip, active);
   BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? "" : "CPU"}P${I2S(slot + 1)}.tga`, 0, true);
-  const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
+  const local = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
+  const carried = local || remote !== undefined;
+  const hand = remote !== undefined && !local ? remote : { x, y };
   const chipChoice = tileOfCharacter(choice ?? DEFAULT_FIGHTER);
   const size = readyChipSize(grid);
   BlzFrameSetSize(frames.chip, size, size);
   BlzFrameSetLevel(frames.chip, carried ? SELECT_LEVELS.carriedChip : SELECT_LEVELS.cardChip);
   placeTopLeft(
     frames.chip,
-    carried ? carriedChipLeft(x, size) : ready ? chipX(grid, slot, chipChoice) : parkedChipLeft(slot, size),
-    carried ? carriedChipTop(y, size) : ready ? chipY(grid, slot, chipChoice) : parkedChipTop(size),
+    carried ? carriedChipLeft(hand.x, size) : ready ? chipX(grid, slot, chipChoice) : parkedChipLeft(slot, size),
+    carried ? carriedChipTop(hand.y, size) : ready ? chipY(grid, slot, chipChoice) : parkedChipTop(size),
   );
-  return carried;
+  return local;
 }
