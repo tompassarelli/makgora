@@ -46,7 +46,8 @@ fetch, rebase, scan and push:
    for main's CI unless a shared root reaches them), dispatches Farm test with the groups and the
    base on the `farm/SHA` branch safe-push published after its secret scan
    (`land.publish`, `SAFE_PUSH_LAND_REF`; without one it pushes the lane there
-   itself), and passes once every check job has passed, polling the run every 3 s. The `static` group holds the clean
+   itself), and passes once every check job has passed, polling the run every
+   3 s. The `static` group holds the clean
    room, the kind-tag, ledger and type check, and the Autoland suite parity
    check. The checks that read the private stores (fighter art, stored models,
    locomotion lock, strike moments, animation jitter, map-build inputs) cannot
