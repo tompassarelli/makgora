@@ -1,0 +1,1469 @@
+{
+  "source": "f060921e4a15e792337180532956ebe7752223c806647f0575c46f3296cc0568",
+  "provenance": "7659a10bb49a164d5e8e88fc6477dc29e9f3ac624ea7ac0fc59def88a4a5aa59",
+  "calibration": {
+    "pixels": 4120,
+    "frames": 1,
+    "width": 1470,
+    "height": 840,
+    "positives": [
+      "blademaster:neutral-special",
+      "blademaster:side-special",
+      "blademaster:up-special",
+      "blademaster:down-special",
+      "blademaster:ultimate"
+    ],
+    "negatives": [
+      "shadow-hunter:neutral-special",
+      "lich:side-special",
+      "lich:down-special"
+    ]
+  },
+  "rows": [
+    {
+      "move": "illidan:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "illidan:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "illidan:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "illidan:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "illidan:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "blademaster:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "blademaster:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "blademaster:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "blademaster:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "blademaster:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "peon:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "peon:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "peon:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "peon:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "peon:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "grom-hellscream:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "grom-hellscream:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "grom-hellscream:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "grom-hellscream:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "grom-hellscream:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:neutral-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:side-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:up-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:down-special",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:ultimate",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "illidan:ultimate projectile [projectile:f656b494933ca6279a7720fbf394d5e7ba57a885293716fbdae86a8becb25e86]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "illidan:ultimate projectile [projectile:42052d3576903318e40b9822e00de86c50dfbd137530a7850e59db91e414914e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "blademaster:ultimate projectile [projectile:5c4eebd59c03b53203b203610aa201038a23acd07aabc722244afffa4de14f14]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:neutral-special Storm Bolt projectile [projectile:8be675afd868b2a858a6e58761b0e8b9dd38635eb622891529972d0bf8665f54]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:down-special Thunder Clap projectile [projectile:b880632333591de551821960b96c32f4c2933ae26d8a389d547b81033cd69e61]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:ultimate projectile [projectile:58af9f2d1e984ad11a397358d4ff0c17c1bb1c864f925dbbf2bdca9b0e99356c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "mountain-king:ultimate projectile [projectile:bc39f64801ecd8508c42202a897cf37921694c0bd61afe6deed41a402d674c2f]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:neutral-special Shadow Strike projectile [projectile:1a980b54d29cdd502bf62a3e4420cd0cc57d0ab64ff9a121026056a713b51f07]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "warden:ultimate projectile [projectile:e2a96cfa80b446b06dfbf10a85d85cf86dd602852fee8460e5896d3ae578e681]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:neutral-special Frost Nova projectile [projectile:4741e4c2dfe3c1d1a4cfe384bdc67d42ff1e15f76e124d978ec2c1c3d3c12050]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:neutral-special Frost Nova projectile [projectile:a8002e686e9b53c28977229c210a961789ad4a76eca85cfe4f29d1977dd16ab1]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:side-special Death and Decay projectile [projectile:96c77a283d553be1fb79aeda7313fdce2d3ded751d9d6c18697e0209f173db78]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:side-special Death and Decay projectile [projectile:44b80678b7e47d484724e164cc3a9f09e6424012f587649daf3703029dc4f8cd]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:ultimate projectile [projectile:0c3a6ee38df7e564b4626d7b0642f8c118b2e918ce0ae4f55d2edab374c2c3f2]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich:ultimate projectile [projectile:56681de21c34af5a6b4505657836c647cc26727333264fee55c8ff2bd6dff22c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:neutral-special Holy Light projectile [projectile:9589211b0d608ba8ad69739750dc9faa4760f25a41b52cc2beec0df82208bc3c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:ultimate projectile [projectile:ccaee82adaff6def38934339b0d430da3e4e7cc7dcb49c06157bcfab5d3e3248]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "uther:ultimate projectile [projectile:0a5caadbcf12790881022dd990f1523aede85660c7042be94d8c447de013f5f0]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:neutral-special Carrion Swarm projectile [projectile:d616085762c6a5a231b2a57b40cf291e340de1a4bdf6e3920a703fee1cd32437]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:down-special Sleep projectile [projectile:fc42254f83ba786bb3029446821285e1ba3d04fc5d0e22f8bffd6a0a7c3a468e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:ultimate projectile [projectile:15ab5b1b871b6c5bae2c3a01294875dac5b07be576150c5a0627d1eb4dde4d81]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:ultimate projectile [projectile:2d9470a725f4d46f9b71b7fd0f70ad3352d137feebb7c93a83ffb3dbc92362a6]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:ultimate projectile [projectile:d4ad357498442d943ba957c240f1c68b264c05eca806702288a60cfa2dd79662]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "dreadlord:ultimate projectile [projectile:8c8fc3fc841c1ab7997ff15b28c85f073182cca44fa5d5a606af7f4d797647aa]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:neutral-special Spirit Glaive projectile [projectile:c8721a3c280e21037e65ce1964d6f28bff1c10823b4dbd9fa45dd37bb4fe5cec]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:side-special Serpent Ward projectile [projectile:15731faa1348b12f599a4ac04e4d5346ab243a953fa80f3adbb2e0e39857b74e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:down-special Hex projectile [projectile:2bdbe8ef2c8ca7f7a5756118bd9e204605e283b7a3c9832e6c108d6e7ddb5edb]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:ultimate projectile [projectile:ce9f2e273ffec65d1950356c65e98fe6b6a0301b724723a59d40ed29877eb645]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:ultimate projectile [projectile:b9f0d20cecc30df00da30773d675f3b271065f9e06e5b089247ea505bcde8978]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "shadow-hunter:ultimate projectile [projectile:420560ce84c7fb23887f38faec47fa8527ba9855d003a6c7fa6d3768971cf2da]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:down-special Rain of Fire projectile [projectile:68bd9da1b8fe261ab94e142d376958c913137f46c69db7cc183d847eb84cae10]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:down-special Rain of Fire projectile [projectile:a4dad5ac716296f6d5e8ecdb5558c7cff12cf79d58bb3a7599f59a7bc3070a83]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:down-special Rain of Fire projectile [projectile:4b820bf79383a2e5cd2615d0c9181331a05fd950d7ab0d7488f887a906065475]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:down-special Rain of Fire projectile [projectile:4990d7c3c6d054406c9783e9fe3934c184eda9a2a9e8662d5c3afe019f08f298]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:down-special Rain of Fire projectile [projectile:6dce7d699757221544611ed49665ceb51a15625a1c969d8acd58e90a2deb8552]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:ultimate projectile [projectile:86ea937596ff3c1c1ce4f3a6c3a835a8d47cb0ab417fa866f68342dabb22b03d]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:ultimate projectile [projectile:d85067e8864dcf4398eb5e26fad0810abf0d23cb2bb67f8ff723573cb64f22cb]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:ultimate projectile [projectile:1f166538cf15ad28cef4648331233e41bf285dab52a00373fca2d2c077378142]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "pit-lord:ultimate projectile [projectile:3481477a87f99b974b47421716dfe2113811c94e359048681882347517acc655]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:neutral-special Wild Axes projectile [projectile:3e683b1b73a745e6ccc2ec8eca40f812cd43b08be887e515e9a92aca997e50a1]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:side-special Summon Bear projectile [projectile:c8a87093d934af36041d71a8df69fff9bd4a211400fe377cc7313d2785493d32]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:down-special Summon Quilbeast projectile [projectile:b69f578a9a09f3c7b21c9654e9952ab072a487edb54a91e0dd708670818b678d]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:ultimate projectile [projectile:771d0e404e71a103da2207aece0863690086880070b8b8b060eb14267fe7d901]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:ultimate projectile [projectile:3370b717afd1c6235381ba666519b67f9b8c262a5ecd8817e748fad9b35c1f4a]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:ultimate projectile [projectile:1a433f135eb25ca3f199c7948d4da3d9320d3790c2cc50ef76c2051ed1977a17]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "beastmaster:ultimate projectile [projectile:9df7fef6f89f3aa427f7064b23a4665b9c71b8d386dca052d781f0e5df3ed200]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:neutral-special Howling Blast projectile [projectile:2ec2dd3acad9be4deb00c5a4c226cdeac76e76b0cba41f9e5a39fd249d81d43e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:side-special Val'kyr Shadowguard projectile [projectile:f28ff354d1187efd487f150b99b31aab9581d5dbba89e607a0c4bd7d2b6becff]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:down-special Defile projectile [projectile:829e6d5d4781fd19709f4940be2777377967add7d2aca88ea27ed92fc86e97fb]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:down-special Defile projectile [projectile:d2e056dd536b29f2e6f9c74446b3c672679788807fe4956cac4d738b6d6e2cac]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:ultimate projectile [projectile:55e6cded6a787ac01c2e4186ec0ca0d20c4a3c7df8bc75d130646ee8d802659b]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lich-king:ultimate projectile [projectile:c855ca613f48f4b8af49f1fafcf05aac396450b3d51e8db18157f9d454769f6e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:side-special Feral Spirit projectile [projectile:919f9c298ae2a9797173842ec360794f75fb1dabba158af835b8afa31595bff0]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:ultimate projectile [projectile:aca01c0e9f6bed8912997503b21f47d958f0b0e6af0f885d83b99d87ba2185b6]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "thrall:ultimate projectile [projectile:e5199cdabebc4a3ce0dedadd3274771502687dc95cc91c5a9a36b876e3fd009c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:neutral-special Frostbolt projectile [projectile:866393417e3263fd36b1a232a7f4e5f175f8c0aefac3e8c245cc2f0851b4bb7c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:side-special Blizzard projectile [projectile:bfe6d8f090a0b831c44512ed93fadc122a755ce853345d7ead5bc62b108919dd]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:side-special Blizzard projectile [projectile:c1c10ffc2dc645fdc91a57cc22efe6d47d2893602804b8825e47ab4c3d215ab0]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:down-special Summon Water Elemental projectile [projectile:5e1b80f61beb8a9f91ac3ed0840ad9ae5bc569b007f86e2495cb5f0d82d8554a]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:ultimate projectile [projectile:c22004017428fca36e404754e72aa50d384d2d555c74b8edf6a2302c23bc490e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "jaina-proudmoore:ultimate projectile [projectile:7d8abd6e48b788cb664cb317a789b50ff5118c0bb905fbead6ca3e059fa7d132]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:neutral-special Black Arrow projectile [projectile:6eaa2fb0840a17e0d3ac655b81be667cc81c7aa05734bbffc51ba54bb0073e33]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "sylvanas-windrunner:ultimate projectile [projectile:1f6b4c316ab4b524019714bfd87ac0d781f633a48ed140ecbabd7ac2e437cb55]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:neutral-special Shockwave projectile [projectile:b6f31d360377e346ea8e4461b7aa4320ae829d2203b3d7131e0f449b52a36275]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:down-special War Stomp projectile [projectile:eb2e505447bf78a896b7aa6e131e78735019c58a7a4ac33fae9e8b63adde9627]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:ultimate projectile [projectile:748dc583b1fd590daca9b025a7e4fbf5552f8725b151203d07eeef44e44a01e9]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:ultimate projectile [projectile:583b9b4c7dde0e1d6a1575cc1464c220c1b35112657c963ac488a6ae53d97785]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:ultimate projectile [projectile:2cb406b299e76ee0c7b15bd39eefb02a5542d6812e3119c07933c875729d242c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:ultimate projectile [projectile:0041a718922aa6839fe63f9494bf3bdf0ed075150e9bfcba8761bc7fa55555ca]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "cairne-bloodhoof:ultimate projectile [projectile:ffac43457bf3907d104763dd0214ab976181b758708c21a71897f3c5afa6fc23]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:down-special Brew Keg projectile [projectile:539a344562be0fb5c2d9df621f66139e24a5b9050e0f7cac185357e72e0c6837]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:ultimate projectile [projectile:0979465124a955591815bc704b27de12535839924ba9fb8bad4e279f0498b8fe]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:ultimate projectile [projectile:bb115542877f864b53adec8a832a6bbf1a803d75136f98f398bf02aae5d2a1b9]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:ultimate projectile [projectile:4b1b7fdbdab7d7c8fe63744b12a552f9b060d04ae1db831b49ffa1ea60b42c38]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "chen-stormstout:ultimate projectile [projectile:a717992956b54225e1a108edf3bc729562880424f29910ca02095e98bffb3931]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "peon:ultimate projectile [projectile:429790eca49b6605622a454f865d5e152f07c63b1351391e0ecce171a0e5b517]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:neutral-special Cluster Rockets projectile [projectile:cf7db50e56aaa1cbca338147111b911a06658b43abac05027f347affe9517952]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:down-special Pocket Factory projectile [projectile:e7609d58f5c6b5cf89a7d9293a3050bf3f497b7818347cb73ecdb4609ddd14ae]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:down-special Pocket Factory projectile [projectile:5a07bb723405822854edacedcb619fe0dad7a69c85b88b523e44678fe65c2837]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:ultimate projectile [projectile:efd18c59d127bd54a5f88e99b024af438099b0a0e3e02a6bc227f1f23120d200]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-tinker:ultimate projectile [projectile:b102ff233743d3c4e2b8f89c33ca57b67c3f21e342f552b361de37ff2a962a58]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:neutral-special Pyroblast projectile [projectile:a323d4bcc171e0a216bf461b015295ee303164ceffa8012a5bd9426ac41c7adf]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:side-special Flame Strike projectile [projectile:714a83ed0ec3d13c4e7199d64c9f8aa973c4bf0dddbed73b0326fa12e9870267]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:side-special Flame Strike projectile [projectile:9942140b21ad2a7d7d8d16fb64fdf9da5c68fd6490f531e14ab9b22c6eac6037]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:side-special Flame Strike projectile [projectile:6fc28f5b0ed892288b21fa2ee39a1081339c2e746cb8e03564357987c71b9cdf]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:ultimate projectile [projectile:80dd3e08c2836a08918c39b83e0fb824d77a76ba5509c44fd52ff5db2dee74fc]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "kael'thas-sunstrider:ultimate projectile [projectile:c6d9d07556898153b5c0f4a6887c7f69cace624c7c78176d9f019f5382d4fe26]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:neutral-special Ensnare projectile [projectile:cb37284f7cdbd4d87f6605fa3728cdc4dadd03a676334864e8d757b71c13bc8c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:ultimate projectile [projectile:19892df1db9dbeae4459aab3b57c82ba428bba703f8645ad6a487c80645a6961]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "murloc:ultimate projectile [projectile:b2e8f73082cc5a5f68261621be1aa2d8c8a9c3101dc49d953ff9bf39f55735db]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "grom-hellscream:ultimate projectile [projectile:290d218d4cc2166b5f15aeca4134623d3e1d9d2c38da4e8b93502bfe232e959e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:neutral-special Entangling Roots projectile [projectile:dd49ace5cd72e71846279a8b653c0a4dcc58141cad2ec27e5c93ee997065a8fc]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:down-special Force of Nature projectile [projectile:c815c1cdf31c9449b93023484fb010292e7a7b4fa5d8a6e8007567ff5893655a]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:ultimate projectile [projectile:ab641aee6e6bf4f9c1058fc6bd81b65e5829f5d47cf17061f2e5c70a87685b02]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "malfurion-stormrage:ultimate projectile [projectile:0194db0cd323838344497403e639677dca13d8fc092bfaf1c2487cb125d91c0d]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:neutral-special Arcane Omen projectile [projectile:bbac310928dff67fea60b29deb2e79013299224901a3b35c345ecfc492e06122]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "medivh:ultimate projectile [projectile:cf08a5b19715935de81bd4c96cc6bc702efe95a75ab24cbd61a57fed08e9c5e7]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:neutral-special Impale projectile [projectile:926fde6801aa25575d7441a8432c2e06134d56792c5a859b3c9fefa38d37a918]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:down-special Carrion Beetle projectile [projectile:dd500ac760234bfad3ff55b8c5788a656b1a288abc44966a6378c085f4604a78]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "anub'arak:ultimate projectile [projectile:5a017fc3b982e452e0f0f299bd92b3c5ebe6977d3a28467409a0332951a3130b]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:neutral-special Multi-Shot projectile [projectile:4b380eecdcb18995e8f0d4f650d483952de4a8a17bf79141bf1136d10d71b8cd]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:side-special Tidal Serpent projectile [projectile:599fc064986d26eea0baf645356a061a2715e6651d0ac557119512756a56d23c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "lady-vashj:ultimate projectile [projectile:2c4bb1a02f407288362c63607774bc04bbdf68745c7ca27be926dc01ae25f69c]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:neutral-special Finger of Death projectile [projectile:dcbc428c6e620227108b8ad207e38a0a5e9bdf5689adf3d23e6736f1c100f28e]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:neutral-special Finger of Death projectile [projectile:d484664473107c480aab2d6616cd920d2943ab81ab6b665c81b21124c616af09]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:neutral-special Finger of Death projectile [projectile:1a7ef18f9c63547aa8fbfc258515ebba226cb4065c319c0b160c3797a7ccb198]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:side-special Rain of Fire projectile [projectile:c0c13ba176a4b5f0afe0a1b809fd933632c6d6b14ba72a187197aaed904f7dd5]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:side-special Rain of Fire projectile [projectile:dd18f0a8103184094dacebd6d0fa4cbec26f92c632fe4db20111c9b3a759546a]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:side-special Rain of Fire projectile [projectile:72def0d3b288de2eed9eb2f697759d35df97ff27f848020a4cc366d9a9a86e79]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:up-special Fel Ascent projectile [projectile:3e99498d848f5b8798fd4bbd4f83bcf862b65c3fa2dcb60935f11a7a575def7b]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:down-special Bash projectile [projectile:77f8848f1b80198ba0da9894f6b29480505fee6922eed6a64e313f65e32a128d]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:ultimate projectile [projectile:b4dd824a5744ffcfb359ca99b9c127ba5c5d5d2b10db96166756e4617895da89]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:ultimate projectile [projectile:25483e52dfa8e6bd290a94f16aa8903b47ee05d11d5366f8865475eef6275ce2]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "archimonde:ultimate projectile [projectile:496ee768a9db99858d0dad622fe08a2f1756644c4ba8bbd4b7ff5e90369598c9]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:neutral-special Searing Arrows projectile [projectile:6819108bacea3630f7d4ac94064c652452fcc2ec007ac93df76a9f7a342c5134]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:neutral-special Searing Arrows projectile [projectile:b447f9c4db7bc0768eb4c88ee72ca1a363837247e3a20c73d10aba8ed2180633]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:side-special Trueshot Aura projectile [projectile:f9fb0b6d00df86bfe4c844094059617f6f32ffa3ee6b0b01650dd1f0eb24eb8f]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:up-special Moonlight Leap projectile [projectile:a3305d4844adb873b37f3ac095379185de6e7ef4e4d75ea6d82551a5e5007b99]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:down-special Elune's Grace projectile [projectile:42d0743d966ce504418b9591ccae41cacbbd5915b3cb9b1d2c08a579e9f9c7ee]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:ultimate projectile [projectile:28017dbacf57a0ba99a38893802fa1774336f17892c45f14100f869acfca156f]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "tyrande:ultimate projectile [projectile:7c6048c215f7e2a10c7288079756855d5c969266fd1db9af38ff000bd4a12d0f]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:neutral-special Meat Hook projectile [projectile:89f97bd1f31cecc1f090d0a7408d21f00034c02f074d6b908dd4241f1c88c7c6]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:neutral-special Meat Hook projectile [projectile:d886681e32eea421df40e0de34ce00bace019c41a959d1145e033fff13418892]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:neutral-special Meat Hook projectile [projectile:90c1c6855e8e71387dbe1d65ecae8f6ea03cedec6968e4540e2e39b8eaca7fc3]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:neutral-special Meat Hook projectile [projectile:671a372376bc088e5e35cad879788c9747e96cd679fa4a56f5caa0a648d904e0]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "butcher:up-special Hook Swing projectile [projectile:8c6fbb671ac67adfb6ad187c93b98b113aa86acdaaf58ccd3a4e4ccea9e6c561]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:neutral-special Shuriken Volley projectile [projectile:779a54927c98d28c15dc74e96baed65839cc57100985432a148eb9599054f733]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "akama:down-special projectile [projectile:3b6da67c7334f57194e091dce95e1727dc81a157b5110fc3e42a37848feb6d4a]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:neutral-special projectile [projectile:188234a7d8b52159f1896ba48ae6b21fb467606332a28ef2bc6384d2a4f278f5]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:down-special projectile [projectile:c783a96298edfea6f4bc82f654c8ad2cedcfc33c74c15317ff5af209809300d9]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:down-special projectile [projectile:281203e1ea5e78b9df70b6ba1b26c6aab70ad320230b910675e56b51ef903252]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "firelord:down-special projectile [projectile:a5b64640868c150088bad3f30ac93bdc5f14b8b58f6ddc28eba524c2ac89f74b]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:neutral-special projectile [projectile:05ffa3655d7a9a1dc1d805fc991e84096333a4e198a749673b07a23226933d46]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    },
+    {
+      "move": "goblin-alchemist:down-special projectile [projectile:87a3e244713fb7d2a430b9aca11bbc501d20a4ae31c7b246b7d4a63b06ff52a6]",
+      "status": "unproven",
+      "reason": "native cue-on/off motion captures missing; model data cannot establish visibility"
+    }
+  ]
+}

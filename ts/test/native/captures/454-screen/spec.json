@@ -1,0 +1,127 @@
+{
+  "excluded": [
+    {
+      "x": 0,
+      "y": 725,
+      "width": 1470,
+      "height": 115
+    }
+  ],
+  "crop": {
+    "x": 245,
+    "y": 140,
+    "width": 1470,
+    "height": 840
+  },
+  "regionMargin": 100,
+  "bodyMargin": 0,
+  "samples": [
+    {
+      "move": "blademaster:neutral-special",
+      "role": "positive",
+      "version": "main+ba0a78fc0e",
+      "source": "c522b1a763dc8601dd6d60eda80e6c84c9690f704eadffb3081005204b78da6a",
+      "fixture": "positives-blademaster-neutral-special",
+      "manifest": "main-positives.captures.json",
+      "runs": [
+        "positives-1/captures.json",
+        "positives-2/captures.json"
+      ],
+      "regionMargin": 150
+    },
+    {
+      "move": "blademaster:side-special",
+      "role": "positive",
+      "version": "main+ba0a78fc0e",
+      "source": "c522b1a763dc8601dd6d60eda80e6c84c9690f704eadffb3081005204b78da6a",
+      "fixture": "positives-blademaster-side-special",
+      "manifest": "main-positives.captures.json",
+      "runs": [
+        "positives-1/captures.json",
+        "positives-2/captures.json"
+      ],
+      "regionMargin": 200
+    },
+    {
+      "move": "blademaster:up-special",
+      "role": "positive",
+      "version": "main+ba0a78fc0e",
+      "source": "c522b1a763dc8601dd6d60eda80e6c84c9690f704eadffb3081005204b78da6a",
+      "fixture": "positives-blademaster-up-special",
+      "manifest": "main-positives.captures.json",
+      "runs": [
+        "positives-1/captures.json",
+        "positives-2/captures.json"
+      ],
+      "regionMargin": 300
+    },
+    {
+      "move": "blademaster:down-special",
+      "role": "positive",
+      "version": "main+ba0a78fc0e",
+      "source": "c522b1a763dc8601dd6d60eda80e6c84c9690f704eadffb3081005204b78da6a",
+      "fixture": "positives-blademaster-down-special",
+      "manifest": "main-positives.captures.json",
+      "runs": [
+        "positives-1/captures.json",
+        "positives-2/captures.json"
+      ],
+      "regionMargin": 200
+    },
+    {
+      "move": "blademaster:ultimate",
+      "role": "positive",
+      "version": "main+ba0a78fc0e",
+      "source": "c522b1a763dc8601dd6d60eda80e6c84c9690f704eadffb3081005204b78da6a",
+      "fixture": "positives-blademaster-ultimate",
+      "manifest": "main-positives.captures.json",
+      "runs": [
+        "positives-1/captures.json",
+        "positives-2/captures.json"
+      ],
+      "regionMargin": 2000
+    },
+    {
+      "move": "shadow-hunter:neutral-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-29",
+      "source": "dc302b45e1646e71ef067777608746b577ad7fd9196c9769ef8c4467f67024e0",
+      "fixture": "negatives-shadow-hunter-neutral-special",
+      "manifest": "v192-negatives.captures.json",
+      "runs": [
+        "negatives-1/captures.json",
+        "negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "lich:side-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-29",
+      "source": "dc302b45e1646e71ef067777608746b577ad7fd9196c9769ef8c4467f67024e0",
+      "fixture": "negatives-lich-side-special",
+      "manifest": "v192-negatives.captures.json",
+      "runs": [
+        "negatives-1/captures.json",
+        "negatives-2/captures.json"
+      ]
+    },
+    {
+      "move": "lich:down-special",
+      "role": "negative",
+      "version": "0.0.192+art-2026-10-29",
+      "source": "dc302b45e1646e71ef067777608746b577ad7fd9196c9769ef8c4467f67024e0",
+      "fixture": "negatives-lich-down-special",
+      "manifest": "v192-negatives.captures.json",
+      "runs": [
+        "negatives-1/captures.json",
+        "negatives-2/captures.json"
+      ]
+    }
+  ],
+  "defender": {
+    "x": 960,
+    "y": 100,
+    "width": 510,
+    "height": 460
+  }
+}

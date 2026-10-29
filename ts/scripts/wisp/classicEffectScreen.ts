@@ -19,7 +19,7 @@ export interface ScreenSample {
 }
 
 export const SCREEN_POSITIVES = ["neutral-special", "side-special", "up-special", "down-special", "ultimate"].map(move => `blademaster:${move}`);
-export const SCREEN_NEGATIVES = ["chen-stormstout:neutral-special", "murloc:side-special", "murloc:up-special", "shadow-hunter:neutral-special", "mountain-king:down-special", "thrall:down-special", "cairne-bloodhoof:neutral-special", "lich:side-special", "lich:down-special"];
+export const SCREEN_NEGATIVES = ["shadow-hunter:neutral-special", "lich:side-special", "lich:down-special"];
 const projectileUses = effectUses().filter(use => use.kind === "projectile");
 const projectileKey = (use: typeof projectileUses[number]) => `${use.fighter}:${use.move} [projectile:${effectUseDigest(use)}]`;
 const SCREEN_PROJECTILES = projectileUses.map(projectileKey);
