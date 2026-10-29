@@ -9,6 +9,7 @@ import { BLADEMASTER_SPECIALS } from "./specials";
 export const BLADEMASTER_HERO: HeroDefinition = {
   character: Character.blademaster,
   name: "Blademaster",
+  displayName: "Samuro",
   purpose: "Grounded sword spacing and whiff punishment",
   weakness: "Exposed recoveries and weak ranged pressure",
   complete: true,

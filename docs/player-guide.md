@@ -118,7 +118,7 @@ backward, up, or down; after the pummel, throw or the opponent goes free. Mash
 action buttons and alternate movement directions to escape a grab; holding one
 button does not count as mashing. The bar above a held fighter drains as the
 hold runs out and faster with mashing; the mark on it shows when a pummel would
-land. Mash and wiggle the same way to break out of Rifleman's frost trap
+land. Mash and wiggle the same way to break out of Sniper's frost trap
 sooner; its bar shows how long the ice has left.
 
 I always gives the existing short hop, however long you hold it; in Tom's pad
@@ -127,7 +127,7 @@ short hop when released during startup. In the air, I uses your second jump.
 
 Fighters grip the ground differently. Jaina is the most slippery and slides
 furthest on a wavedash; Malfurion, Medivh, Kael'thas and Murloc slide
-further than most after a run, a dash or a moonwalk; Thrall, Pit Lord and
+further than most after a run, a dash or a moonwalk; Thrall, Mannoroth and
 Cairne stop shortest. Landing slides, wavedashes included, brake hard
 until the fighter is down to walking speed, then glide to a stop.
 

@@ -125,11 +125,12 @@ export function isSelectableCharacter(choice: number): choice is Character {
 }
 
 const ORIGINAL_NAMES: Readonly<Record<number, string>> = { [Character.rifleman]: "Rifleman", [Character.demonHunter]: "Illidan" };
+const ORIGINAL_DISPLAY_NAMES: Readonly<Record<number, string>> = { [Character.rifleman]: "Sniper" };
 
 
 export function fighterName(character: number): string {
   const hero = heroDefinition(character);
-  return hero?.displayName ?? hero?.name ?? ORIGINAL_NAMES[character] ?? "Rifleman";
+  return hero?.displayName ?? hero?.name ?? ORIGINAL_DISPLAY_NAMES[character] ?? ORIGINAL_NAMES[character] ?? "Rifleman";
 }
 
 export function fighterKey(character: number): string {

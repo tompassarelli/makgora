@@ -9,6 +9,7 @@ import { SHADOW_HUNTER_SPECIALS } from "./specials";
 export const SHADOW_HUNTER_HERO: HeroDefinition = {
   character: Character.shadowHunter,
   name: "Shadow Hunter",
+  displayName: "Rokhan",
   purpose: "Totem placement and angles",
   weakness: "Setup can be destroyed or bypassed",
   complete: true,

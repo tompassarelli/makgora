@@ -16,8 +16,8 @@ export const nameText = (choice: number | undefined) => choice === RANDOM_FIGHTE
 export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.mountainKing]: "Muradin",
   [Character.uther]: "Uther",
-  [Character.shadowHunter]: "S. Hunter",
-  [Character.blademaster]: "Blade",
+  [Character.shadowHunter]: "Rokhan",
+  [Character.blademaster]: "Samuro",
   [Character.beastmaster]: "Rexxar",
   [Character.warden]: "Maiev",
   [Character.jaina]: "Jaina",
@@ -28,6 +28,7 @@ export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.kaelthas]: "Kael'thas",
   [Character.grom]: "Grom",
   [Character.malfurion]: "Malfurion",
+  [Character.ladyVashj]: "Vashj",
 };
 
 export function art(parent: framehandle, name: string, texture: string, x: number, y: number, width: number, height: number): framehandle {

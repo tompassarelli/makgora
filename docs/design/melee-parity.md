@@ -184,8 +184,8 @@ deviation's reason, issue and decision date are written.
 | Shield release lag `shield-release` | 11 | [15](https://www.ssbwiki.com/Shield) | [shield.ts:26](../../ts/src/game/sim/shield.ts#L26) `SHIELD_RELEASE_LAG_FRAMES` | deviation: Melee's 15 makes dropping shield almost never worth it; Ultimate's 11, the starting point, makes it a real option beside jumping or rolling out (docs/gameplay-design.md, Principles) (Tom 2026-10-06, #100) |
 | Powershield `powershield` | a parry: no shield damage, no shieldstun, no release lag | [first 4 frames of shield on a hit: no shield damage, more pushback, same shieldstun; first 2 reflect projectiles](https://www.ssbwiki.com/Powershield) | [shield.ts:148](../../ts/src/game/sim/shield.ts#L148) `grantParry` | deviation: a true parry whose reward is the defender's own punish (docs/gameplay-design.md, Powershield and parry) (Tom 2026-10-06, #102) |
 | Shield drop through a platform `platform-shield-drop` | none: a raised shield stays on the platform | [down while shielding drops through](https://www.ssbwiki.com/Shield_dropping) | [platformMoves.ts:81](../../ts/src/game/sim/platformMoves.ts#L81) `dropFromPlatform` | deviation: shielded fighters keep their jump, dodge or release choices (docs/gameplay-design.md, Platform shield drop) (Tom 2026-10-14, #103) |
-| Shield momentum out of a run, probed headless on each fighter's own traction, walk and run speed `shield-momentum` | out of a run: Rifleman 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units | [out of a run: Rifleman 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units](https://www.ssbwiki.com/Traction) | [groundMovement.ts:168](../../ts/src/game/sim/groundMovement.ts#L168) `restingTraction`; checked by [shieldMomentum.tests.ts:31](../../ts/src/game/sim/shieldMomentum.tests.ts#L31) `meleeDrag` | parity |
-| Shield stop out of the initial dash, probed headless on its third frame `shield-stop` | out of the initial dash: Rifleman speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame | [out of the initial dash: Rifleman speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame](https://www.ssbwiki.com/Shield_stop) | [shield.ts:314](../../ts/src/game/sim/shield.ts#L314) `raiseShield`; checked by [shieldMomentum.tests.ts:61](../../ts/src/game/sim/shieldMomentum.tests.ts#L61) `lastInitialDashFrame` | parity |
+| Shield momentum out of a run, probed headless on each fighter's own traction, walk and run speed `shield-momentum` | out of a run: Sniper 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units | [out of a run: Sniper 18 frames, 11.90 units; Jaina Proudmoore 32 frames, 14.87 units](https://www.ssbwiki.com/Traction) | [groundMovement.ts:168](../../ts/src/game/sim/groundMovement.ts#L168) `restingTraction`; checked by [shieldMomentum.tests.ts:31](../../ts/src/game/sim/shieldMomentum.tests.ts#L31) `meleeDrag` | parity |
+| Shield stop out of the initial dash, probed headless on its third frame `shield-stop` | out of the initial dash: Sniper speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame | [out of the initial dash: Sniper speed 0 on the first shield frame; Jaina Proudmoore speed 0 on the first shield frame](https://www.ssbwiki.com/Shield_stop) | [shield.ts:314](../../ts/src/game/sim/shield.ts#L314) `raiseShield`; checked by [shieldMomentum.tests.ts:61](../../ts/src/game/sim/shieldMomentum.tests.ts#L61) `lastInitialDashFrame` | parity |
 | Jump and grab out of shield, probed headless `out-of-shield` | jump and grab | [jump and grab](https://www.ssbwiki.com/Out_of_shield) | [conditions.ts:114](../../ts/src/game/sim/conditions.ts#L114) `canShieldGrab` | parity |
 | Up special out of shield, probed headless `up-special-out-of-shield` | from jump squat | [from jump squat](https://www.ssbwiki.com/Out_of_shield) | [conditions.ts:139](../../ts/src/game/sim/conditions.ts#L139) `canStartSpecial` | parity |
 | Standing grab, total frames, fightcore.csv `grab-frames` | 36, active from 5 for 3, every fighter | [Fox 30; 5 of 25 fighters differ: Bowser, Link, Samus, Yoshi, Young Link; 30-94](https://www.fightcore.gg) | [moves.ts:204](../../ts/src/game/sim/moves.ts#L204) `attackStartupFrames` | open: one shared profile for every fighter against Melee's per-fighter values (#293) |
@@ -264,11 +264,11 @@ deviation's reason, issue and decision date are written.
 Every hero but Illidan and Rifleman inherits the shared `reference` record ([tuning.ts:137](../../ts/src/game/sim/tuning.ts#L137)): its gravity 0.23,
 fast fall 3.4 and jumps 3.68/2.1 are Fox's, and so are its terminal speed, jump squat, double jump, air acceleration
 and air friction. A hero's body in `heroBodies.ts` sets only its weight, walk, dash and run speed, air speed and traction;
-Pit Lord, Cairne Bloodhoof, Kael'thas Sunstrider instead take gravity, terminal and fast-fall speed and jump velocities from `HERO_VERTICAL`.
+Mannoroth, Cairne Bloodhoof, Kael'thas Sunstrider instead take gravity, terminal and fast-fall speed and jump velocities from `HERO_VERTICAL`.
 Each block compares a fighter with Melee's spread across the 26 fighters in the [character attributes](https://wiki.supercombo.gg/w/SSBM/Character_Attributes),
 in Melee units, with Fox's and Falco's values beside it; a value outside the spread is a deviation or an open row.
 
-### Rifleman
+### Sniper
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -308,7 +308,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `illidan-walk` | 1.55 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
 | Traction `illidan-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
 
-### Blademaster
+### Samuro
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -428,7 +428,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `dreadlord-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `dreadlord-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Shadow Hunter
+### Rokhan
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -448,7 +448,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `shadow-hunter-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `shadow-hunter-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Pit Lord
+### Mannoroth
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -488,7 +488,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `beastmaster-walk` | 1.552 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `beastmaster-traction` | 0.065 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Lich King
+### Arthas
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -808,7 +808,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `tyrande-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `tyrande-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### the Butcher
+### Butcher
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
