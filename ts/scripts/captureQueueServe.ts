@@ -274,9 +274,7 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: r
   const groups = fanGroups(folds, Math.min(maxPairs, 1 + free));
   yield* log({ step: "fold", batch, jobs: jobs.map(job => job.id), freePairs: free, groups: groups.map(group => ({ commit: group.commit, lanes: group.jobs.map(job => job.lane) })), seconds: seconds(folded) });
   const pool = yield* Effect.forkChild(ensurePool);
-  yield* Effect.forEach(groups.entries(), ([index, group]) => Effect.scoped(Effect.gen(function*() {
-    return yield* captureGroup(settings, batch, group, index, log, index === 0 ? Fiber.join(pool).pipe(Effect.as(settings)) : groupSettings(settings, hosts, `capture-queue-${batch}-g${index}`));
-  })).pipe(Effect.result, Effect.flatMap(outcome => outcome._tag === "Success" ? Effect.void : Effect.gen(function*() {
+  yield* Effect.forEach(groups.entries(), ([index, group]) => Effect.scoped(captureGroup(settings, batch, group, index, log, index === 0 ? Fiber.join(pool).pipe(Effect.as(settings)) : groupSettings(settings, hosts, `capture-queue-${batch}-g${index}`))).pipe(Effect.result, Effect.flatMap(outcome => outcome._tag === "Success" ? Effect.void : Effect.gen(function*() {
     yield* log({ step: "failed", group: index, problem: outcome.failure.message });
     for (const job of group.jobs) yield* finish(job, { batch, status: "failed", problem: outcome.failure.message });
   }))), { concurrency: "unbounded", discard: true });
