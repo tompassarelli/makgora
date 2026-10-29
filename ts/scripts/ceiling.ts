@@ -8,10 +8,12 @@ import { CEILING_SPEC, DESIGN_DOCS, readProfiles } from "./balance";
 export type CeilingPath = "execution" | "decision" | "mixed";
 export interface CeilingPlan { readonly path: CeilingPath; readonly basicMoves: readonly number[] }
 const moves: Readonly<Record<string, number>> = {
-  jab: AttackStyle.jab, "forward-tilt": AttackStyle.forwardTilt, "down-tilt": AttackStyle.downTilt,
-  "forward-smash": AttackStyle.forwardSmash, "neutral-air": AttackStyle.neutralAir,
-  "forward-air": AttackStyle.forwardAir, grab: AttackStyle.grab,
+  jab: AttackStyle.jab, "forward-tilt": AttackStyle.forwardTilt, "up-tilt": AttackStyle.upTilt, "down-tilt": AttackStyle.downTilt,
+  "dash-attack": AttackStyle.dashAttack, "forward-smash": AttackStyle.forwardSmash, "up-smash": AttackStyle.upSmash,
+  "down-smash": AttackStyle.downSmash, "neutral-air": AttackStyle.neutralAir, "forward-air": AttackStyle.forwardAir,
+  "back-air": AttackStyle.backAir, "up-air": AttackStyle.upAir, "down-air": AttackStyle.downAir, grab: AttackStyle.grab,
   "neutral-special": GameplanSpecial.neutral, "side-special": GameplanSpecial.side,
+  "up-special": GameplanSpecial.up, "down-special": GameplanSpecial.down,
 };
 
 export function readCeilingPlans(): Map<string, CeilingPlan> {
