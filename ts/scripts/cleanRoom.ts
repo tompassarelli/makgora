@@ -10,11 +10,11 @@ const REACH_SCAN_BYTES = 2_000_000;
 
 const OFFSET = String.raw`x(?!(?:11|32|64|86)(?![0-9A-F]))[0-9A-F]{2,4}`;
 
-export const REACH_RULES: readonly { readonly name: string; readonly pattern: RegExp }[] = [
+export const REACH_RULES: readonly { readonly name: string; readonly pattern: RegExp; readonly within?: RegExp }[] = [
   { name: "a game-binary address or offset", pattern: /\bRVA\b|\+0x[0-9a-fA-F]{2,}\b|\b0x0*6[fF]{3}[0-9a-fA-F]{8}\b|\b0x80(?!000000\b)[0-9a-fA-F]{6}\b|\b80(?=[0-9A-F]*[A-F])[0-9A-F]{6}\b/ },
   { name: "a decompiled symbol name", pattern: /\b(?![a-zA-Z]{2,4}_80)[a-zA-Z][a-zA-Z0-9]*_80[0-9A-F]{6}\b|\b(?:ft|gr|it|mp|cm|lb|gm|pl|ef|mn|db)[A-Z]?[A-Za-z0-9]*_[A-Z][A-Za-z0-9_]*\b/ },
   { name: "a Melee game-file name", pattern: /\bPlCo\b|\bPl[A-Z][a-z]\.dat\b|GALE01|\bmain\.dol\b/ },
-  { name: "an offset-named game field", pattern: new RegExp(String.raw`(?<![\\\w%])${OFFSET}_[A-Za-z]|[\x60"'.]${OFFSET}[\x60"']|(?<![\\\w%])x(?=[0-9A-F]{0,3}[A-F])[0-9A-F]{2,4}\b|\bftData[\s_]${OFFSET}\b`) },
+  { name: "an offset-named game field", pattern: new RegExp(String.raw`(?<![\\\w%])${OFFSET}_[A-Za-z]|[\x60"'.]${OFFSET}[\x60"']|(?<![\\\w%])x(?=[0-9A-F]{0,3}[A-F])[0-9A-F]{2,4}\b|\bftData[\s_]${OFFSET}\b`), within: /x[0-9A-F]{2}/ },
   { name: "a retail-file source", pattern: /\bcoll_data\b|\bretail-(?:roster|action-lengths)\b/ },
   { name: "an extraction or decompilation cited as a source", pattern: /\b(?:NTSC|PAL|1\.02|disc|retail|cited|Melee)\b[\w. '-]{0,24}?\bextract(?:ion|ed)\b|\b(?:from|per|cited?|via|in) (?:the |Melee's )?decomp(?:ilation|iled)?\b/i },
 ];
@@ -42,7 +42,9 @@ const reach = (root: string) => Effect.promise(async () => {
     if (file.size > REACH_SCAN_BYTES) continue;
     const bytes = await file.bytes().catch(() => new Uint8Array());
     if (bytes.includes(0)) continue;
-    new TextDecoder().decode(bytes).split("\n").forEach((text, index) => lines.push({ path, line: index + 1, text }));
+    const text = new TextDecoder().decode(bytes);
+    if (!REACH_RULES.some(({ pattern, within }) => (within?.test(text) ?? true) && pattern.test(text))) continue;
+    text.split("\n").forEach((text, index) => lines.push({ path, line: index + 1, text }));
   }
   return reachProblems(lines);
 });
