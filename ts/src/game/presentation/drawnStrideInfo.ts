@@ -8,7 +8,6 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   4: { walk: { clip: 7, model: "units\\human\\HeroMountainKing\\HeroMountainKing.mdl", speed: f32(146.888) }, run: { clip: 7, model: "units\\human\\HeroMountainKing\\HeroMountainKing.mdl", speed: f32(146.888) } },
   5: { walk: { clip: 2, model: "Units\\NightElf\\HeroWarden\\HeroWarden.mdx", speed: f32(91.814) }, run: { clip: 2, model: "Units\\NightElf\\HeroWarden\\HeroWarden.mdx", speed: f32(91.814) } },
   6: { walk: { clip: 4, model: "units\\undead\\HeroLich\\HeroLich.mdl", speed: f32(250.000) }, run: { clip: 4, model: "units\\undead\\HeroLich\\HeroLich.mdl", speed: f32(250.000) } },
-  27: { walk: { clip: 12, model: "units\\human\\Uther\\Uther.mdl", speed: f32(231.523) }, run: { clip: 12, model: "units\\human\\Uther\\Uther.mdl", speed: f32(231.523) } },
   8: { walk: { clip: 5, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", speed: f32(153.999) }, run: { clip: 5, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", speed: f32(153.999) } },
   9: { walk: { clip: 0, model: "units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl", speed: f32(303.549) }, run: { clip: 0, model: "units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl", speed: f32(303.549) } },
   10: { walk: { clip: 1, model: "units\\demon\\HeroPitLord\\HeroPitLord.mdl", speed: f32(136.792) }, run: { clip: 3, model: "units\\demon\\HeroPitLord\\HeroPitLord.mdl", speed: f32(540.598) } },
@@ -27,6 +26,7 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   23: { walk: { clip: 2, model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl", speed: f32(172.192) }, run: { clip: 2, model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl", speed: f32(172.192) } },
   24: { walk: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(208.708) }, run: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(208.708) } },
   25: { walk: { clip: 1, model: "units\\creeps\\Medivh\\Medivh.mdl", speed: f32(188.981) }, run: { clip: 1, model: "units\\creeps\\Medivh\\Medivh.mdl", speed: f32(188.981) } },
+  27: { walk: { clip: 12, model: "units\\human\\Uther\\Uther.mdl", speed: f32(231.523) }, run: { clip: 12, model: "units\\human\\Uther\\Uther.mdl", speed: f32(231.523) } },
   28: { walk: { clip: 1, model: "units\\naga\\LadyVashj\\LadyVashj.mdl", speed: f32(14.918) }, run: { clip: 78, model: "units\\naga\\LadyVashj\\LadyVashj.mdl", speed: f32(205.966) } },
   29: { walk: { clip: 2, model: "units\\demon\\Warlock\\Warlock.mdl", speed: f32(240.654) }, run: { clip: 2, model: "units\\demon\\Warlock\\Warlock.mdl", speed: f32(240.654) } },
 };
