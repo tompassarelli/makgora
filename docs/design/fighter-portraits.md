@@ -86,7 +86,9 @@ tile, and in red, blue, teal and purple for its slot outfits; files append
 `P1` through `P4`. Tiles and busts frame head and shoulders around the head mesh: the posed vertices bound to the
 head bone or its direct children, evaluated with Wisp's vendored war3-model
 (its version-1800 skin reader), not the body's bounds; stock icons frame the
-head alone.
+head alone. Every tile is cut by its bottom edge, a head and upper body filling it: Murloc, whose
+head mesh binds nearly his whole small body, and Chen take a `zoom` and `shift` in
+`CORRECTIONS` that bring their heads to about the size of the roster's others (playtest, 2026-10-29).
 The custom-game preview uses the red and blue player cards.
 
 It writes `PRIVATE_OUTPUT/fighter-renders/`; store that folder with

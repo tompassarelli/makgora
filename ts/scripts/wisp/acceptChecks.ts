@@ -255,7 +255,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       ],
       capture: [{ kind: "frames", name: "tyrande-grid", client: "a" }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
-      look: "With every chip on Illidan, Tyrande's tile in the roster grid shows the Re-Classic dismounted model: teal hair, an upright bow beside her face, eyes open, on the neutral tile background.",
+      look: "With every chip on Illidan, Tyrande's tile in the roster grid shows the Re-Classic dismounted model: teal hair, an upright bow beside her face, eyes open, on the neutral tile background. Kael'thas, Murloc and Grom are head-and-shoulders busts that fill their tiles and run off the bottom edge at about the same head size, Murloc's eyes open and spear clear; no tile shows a whole small body floating in its middle.",
     },
     {
       id: "712-tyrande-hud", closes: "smashcraft#712 portraits", map: "fighter-select", session: "712-tyrande-hud",
