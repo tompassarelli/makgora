@@ -98,9 +98,9 @@ Each fighter against a light (Kel'Thuzad), medium (Sniper) and heavy (Cairne Blo
 | Firelord (WIP) | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 40% → up air against 5/5 DI |
 | Firelord (WIP) | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Firelord (WIP) | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Goblin Alchemist (WIP) | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 40% → up air against 5/5 DI |
-| Goblin Alchemist (WIP) | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Goblin Alchemist (WIP) | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Alchemist (WIP) | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech forward smash; trap dash grab, back throw, dash, dash attack covers tech in place, tech away, missed tech | up throw at 40% → up air against 5/5 DI |
+| Alchemist (WIP) | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Alchemist (WIP) | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 
 ## True combos from each throw
 
@@ -468,16 +468,16 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Firelord (WIP) | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Firelord (WIP) | heavy | up throw | 1/1 in forward tilt, out side special | 1/1 | 1/1 KD in up smash, out forward smash | 1/1 in up smash, out down smash |
 | Firelord (WIP) | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | light | up throw | 1/1 in forward tilt, out side special | 1/1 | 2/1 KD in up smash, out forward smash | 1/1 KD in short hop, back air, out side special |
-| Goblin Alchemist (WIP) | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | medium | up throw | 1/1 in short hop, back air, out side special | 1/1 KD in short hop, back air, out short hop, forward air | 2/1 KD in up smash, out forward smash | 1/1 in down special, out down smash |
-| Goblin Alchemist (WIP) | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Goblin Alchemist (WIP) | heavy | up throw | 1/1 in forward tilt, out side special | 1/1 | 1/1 KD in up smash, out forward smash | 1/1 in up smash, out down smash |
-| Goblin Alchemist (WIP) | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | light | up throw | 1/1 in forward tilt, out side special | 1/1 | 2/1 KD in up smash, out forward smash | 1/1 KD in short hop, back air, out side special |
+| Alchemist (WIP) | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | medium | up throw | 1/1 in short hop, back air, out side special | 1/1 KD in short hop, back air, out short hop, forward air | 2/1 KD in up smash, out forward smash | 1/1 in down special, out down smash |
+| Alchemist (WIP) | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Alchemist (WIP) | heavy | up throw | 1/1 in forward tilt, out side special | 1/1 | 1/1 KD in up smash, out forward smash | 1/1 in up smash, out down smash |
+| Alchemist (WIP) | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 
