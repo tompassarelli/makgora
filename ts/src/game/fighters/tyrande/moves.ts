@@ -12,9 +12,9 @@ export const hit = makeHit({
   LINK: { growth: 46.0, base: 18.0 },
   POKE: { growth: 70.0, base: 22.0 },
   CHASE: { growth: 48.0, base: 40.0 },
-  LAUNCH: { growth: 86.0, base: 24.0 },
-  EDGE: { growth: 92.0, base: 26.0 },
-  KILL: { growth: 104.0, base: 28.0 },
+  LAUNCH: { growth: 90.0, base: 24.0 },
+  EDGE: { growth: 98.0, base: 26.0 },
+  KILL: { growth: 114.0, base: 28.0 },
   SPIKE: { growth: 88.0, base: 20.0 },
   JUGGLE: { growth: 54.0, base: 50.0 },
   TOSS: { growth: 76.0, base: 56.0 },
@@ -37,7 +37,7 @@ const throwMove = (contactFrame: number, recovery: number, effect: ReturnType<ty
 const NOTHING = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 const FORWARD_AIR: readonly MoveRegion[] = [6, 9, 12, 15].map((first, index) =>
-  heroRegion(first, first + 2, capsule(18.0, 64.0, 62.0, 54.0, 42.0), index === 3 ? hit(2.5, "POKE", 40, 1.0, MOON) : { ...hit(2.5, "TAP", 45, 1.0, MOON), growth: 0.0, setKnockback: 40.0 }, undefined, index + 1));
+  heroRegion(first, first + 2, capsule(18.0, 64.0, 62.0, 54.0, 42.0), index === 3 ? hit(3.0, "POKE", 40, 1.0, MOON) : { ...hit(3.0, "TAP", 45, 1.0, MOON), growth: 0.0, setKnockback: 40.0 }, undefined, index + 1));
 
 export const TYRANDE_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -65,10 +65,10 @@ export const TYRANDE_MOVES: FighterMoves = {
       heroRegion(5, 6, capsule(40.0, 100.0, 24.0, 128.0, 39.0), hit(7.0, "JUGGLE", 85)),
       heroRegion(7, 8, capsule(4.0, 128.0, -20.0, 116.0, 39.0), hit(7.0, "JUGGLE", 95)),
     ]),
-    [AttackStyle.downTilt]: strike(6, 3, 16, 0, [heroRegion(6, 8, capsule(16.0, 24.0, 76.0, 24.0, 34.0), hit(8.0, "CHASE", 75))]),
+    [AttackStyle.downTilt]: strike(6, 3, 16, 0, [heroRegion(6, 8, capsule(16.0, 24.0, 76.0, 24.0, 34.0), hit(9.0, "CHASE", 75))]),
     [AttackStyle.dashAttack]: heroMove(7, 5, 22, 0, [
-      heroRegion(7, 8, capsule(18.0, 56.0, 45.0, 62.0, 37.0), hit(9.0, "LAUNCH", 50)),
-      heroRegion(9, 11, capsule(18.0, 56.0, 38.0, 58.0, 35.0), hit(6.0, "POKE", 60)),
+      heroRegion(7, 8, capsule(18.0, 56.0, 45.0, 62.0, 37.0), hit(10.0, "LAUNCH", 50)),
+      heroRegion(9, 11, capsule(18.0, 56.0, 38.0, 58.0, 35.0), hit(7.0, "POKE", 60)),
     ], 70.0, true),
     [AttackStyle.forwardSmash]: strike(14, 3, 32, 0, [
       heroRegion(14, 16, capsule(70.0, 70.0, 104.0, 66.0, 35.0), strongHit(hit(16.0, "KILL", 40, 1.0, MOON))),
@@ -83,11 +83,11 @@ export const TYRANDE_MOVES: FighterMoves = {
       heroRegion(13, 14, capsule(-14.0, 30.0, -77.0, 30.0, 38.0), downSmashHit(hit(13.0, "EDGE", 25, -1.0))),
     ]),
     [AttackStyle.neutralAir]: heroMove(4, 8, 18, 12, [
-      heroRegion(4, 6, capsule(-40.0, 50.0, 40.0, 50.0, 36.0), hit(10.0, "LAUNCH", 45)),
-      heroRegion(7, 11, capsule(-34.0, 50.0, 34.0, 50.0, 33.0), hit(6.0, "POKE", 45)),
+      heroRegion(4, 6, capsule(-40.0, 50.0, 40.0, 50.0, 36.0), hit(11.0, "LAUNCH", 45)),
+      heroRegion(7, 11, capsule(-34.0, 50.0, 34.0, 50.0, 33.0), hit(7.0, "POKE", 45)),
     ]),
     [AttackStyle.forwardAir]: heroMove(6, 12, 22, 16, FORWARD_AIR),
-    [AttackStyle.backAir]: heroMove(5, 4, 18, 14, [heroRegion(5, 8, capsule(-18.0, 52.0, -70.0, 48.0, 39.0), hit(13.0, "EDGE", 40, -1.0))]),
+    [AttackStyle.backAir]: heroMove(5, 4, 18, 14, [heroRegion(5, 8, capsule(-18.0, 52.0, -70.0, 48.0, 39.0), hit(14.0, "EDGE", 40, -1.0))]),
     [AttackStyle.upAir]: heroMove(6, 4, 18, 12, [heroRegion(6, 9, capsule(-24.0, 118.0, 24.0, 118.0, 41.0), hit(10.0, "LAUNCH", 85, 1.0, MOON))]),
     [AttackStyle.downAir]: heroMove(8, 4, 24, 20, [
       heroRegion(8, 9, capsule(4.0, 4.0, 8.0, -6.0, 46.0), hit(12.0, "SPIKE", 270), hit(12.0, "LAUNCH", 60)),

@@ -812,7 +812,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
-| Weight `tyrande-weight` | 84 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Weight `tyrande-weight` | 92 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Gravity `tyrande-gravity` | 0.23 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
 | Terminal speed `tyrande-terminal` | 2.8 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
 | Fast-fall speed `tyrande-fast-fall` | 3.4 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |

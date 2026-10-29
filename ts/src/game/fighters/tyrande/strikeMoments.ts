@@ -9,7 +9,7 @@ export const tyrandeStrikeMoments = {
   6: { clip: 15, seconds: f32(0.083), end: f32(0.450) },
   7: { clip: 18, seconds: f32(0.250), end: f32(0.417) },
   8: { clip: 19, seconds: f32(0.100), end: f32(0.417) },
-  9: { clip: 16, seconds: f32(0.150), end: f32(0.450) },
+  9: { clip: 16, seconds: f32(0.183), end: f32(0.450) },
   10: { clip: 17, seconds: f32(0.117), end: f32(0.450) },
   12: { clip: 24, seconds: f32(0.000), end: f32(0.500) },
   13: { clip: 25, seconds: f32(0.100), end: f32(0.667) },
