@@ -38,7 +38,8 @@ Startup / active / recovery; damage. Holy moves carry the holy element.
 - Forward tilt (three angles): a short hammer hook (8/3/20; 11%).
 - Up tilt: an overhead arc front to back that starts juggles (7/5/20; 8%, 85°).
 - Down tilt: a crouched low sweep for tech chases (7/3/18; 9%, 70°).
-- Dash attack: a shoulder charge behind the levelled hammer (10/5/26; 11%).
+- Dash attack: a shoulder charge behind the levelled hammer (10/5/26; 9%); it
+  stops at the foe instead of passing through, so a shield can punish it.
 - Forward smash, his signature: a two-handed overhead blow; the head hits 18%
   as a strong hit, the haft 12% (18/3/36).
 - Up smash: a hammer upswing with a halo of light (15/5/32; 16%).

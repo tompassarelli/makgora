@@ -4,7 +4,7 @@ import { idiv } from "wisp/src/sim/intMath";
 import { cosineTurns, sineTurns } from "../../sim/mathTables";
 import { AttackStyle, Character, GrabAction, HitElement } from "../../sim/codes";
 import { hurtCapsule } from "../../sim/geometry/contactGeometry";
-import { heroHurtPose, heroMove, heroRegion, type FighterMoves, type MoveRegion, type StrikeCapsule, jabStep, travelThrough } from "../../sim/heroMoves";
+import { heroHurtPose, heroMove, heroRegion, type FighterMoves, type MoveRegion, type StrikeCapsule, jabStep } from "../../sim/heroMoves";
 import type { HitEffect } from "../../sim/hitRegions";
 import { strongHit } from "../../sim/strongHits";
 import { type FighterHurtboxes, type HurtPart, hurtPart } from "../../sim/hurtboxes";
@@ -111,7 +111,7 @@ const FORWARD_TILT_UP = utherHit(11.0, "EDGE", 45);
 const FORWARD_TILT_DOWN = utherHit(11.0, "EDGE", 25);
 const UP_TILT = utherHit(8.0, "POKE", 85);
 const DOWN_TILT = utherHit(9.0, "LINK", 70);
-const DASH = utherHit(11.0, "LAUNCH", 45);
+const DASH = utherHit(9.0, "LAUNCH", 45);
 const FORWARD_SMASH_HEAD = strongHit(utherHit(18.0, "KILL", 40));
 const FORWARD_SMASH_HAFT = utherHit(12.0, "KILL", 40);
 const UP_SMASH = utherHit(16.0, "KILL", 90, false, HitElement.holy);
@@ -174,10 +174,10 @@ export const UTHER_MOVES: FighterMoves = {
     [AttackStyle.forwardTiltDown]: heroMove(8, 3, 20, 0, swingRegions(S.forwardTiltDown, sameHit(FORWARD_TILT_DOWN))),
     [AttackStyle.upTilt]: heroMove(7, 5, 20, 0, swingRegions(S.upTilt, sameHit(UP_TILT))),
     [AttackStyle.downTilt]: heroMove(7, 3, 18, 0, swingRegions(S.downTilt, sameHit(DOWN_TILT))),
-    [AttackStyle.dashAttack]: travelThrough(heroMove(10, 5, 26, 0, [
+    [AttackStyle.dashAttack]: heroMove(10, 5, 26, 0, [
       ...swingRegions(S.dashAttack, sameHit(DASH)),
       heroRegion(10, 12, capsule(10.0, 70.0, 34.0, 92.0, 18.0), DASH),
-    ], 150.0, true), 14),
+    ], 90.0, true),
     [AttackStyle.forwardSmash]: heroMove(18, 3, 36, 0, [
       ...swingRegions(S.forwardSmash, sameHit(FORWARD_SMASH_HEAD), headCapsule),
       ...swingRegions(S.forwardSmash, sameHit(FORWARD_SMASH_HAFT), haftCapsule),
