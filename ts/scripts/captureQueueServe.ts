@@ -195,7 +195,8 @@ const sheetFor = (root: string, job: Job, fixtures: readonly PadRow[], captures:
   return { sheet, judge };
 });
 
-const captureGroup = <R>(settings: Settings, batch: string, group: Group, index: number, log: ReturnType<typeof logTo>, poolReady: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
+/** Builds the group's map, then takes its pair through `pairReady` only once the map is built, so no idle lease release takes the pair from a group still building, and captures it there. */
+const captureGroup = <R>(settings: Settings, batch: string, group: Group, index: number, log: ReturnType<typeof logTo>, pairReady: Effect.Effect<Settings, CaptureQueueFailure, R>) => Effect.gen(function*() {
   const directory = join(queueDirectory("batches"), batch), logFile = join(directory, "run.log"), source = join(directory, `src-${index}`), sourceTs = join(source, "ts");
   yield* git(settings.checkout.root, ["worktree", "add", "--detach", source, group.commit]);
   return yield* Effect.gen(function*() {
@@ -212,11 +213,12 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     yield* log({ step: "map build", group: index, lanes: group.jobs.map(job => job.lane), fixtures: [...fixtures.values()].flat().length, seconds: seconds(built), mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision });
     const plan = join(directory, `plan-${index}.json`);
     yield* attempt("write the plan", () => writeAtomic(plan, `${JSON.stringify({ version: 1, sourceRevision: identity.sourceRevision, rows: [{ name: `g${index}`, map, manifest, mapSha256: identity.mapSha256, frames: identity.fixtures.flatMap(fixture => fixture.frames) }] })}\n`));
-    yield* poolReady;
+    const leased = yield* pairReady;
+    yield* log({ step: "lease", group: index, host: leased.remote?.name ?? hostname(), pair: leased.pair, lanes: group.jobs.map(job => job.lane) });
     const captured = performance.now();
-    const ran = yield* (settings.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(settings.pair), "--desktop", settings.desktop, "--capacity", settings.capacity, "--clients-file", settings.clientsFile, "--client", settings.client, "--install", settings.install, "--minutes", String(captureMinutes(identity.fixtures.length))], settings.checkout.ts, logFile)
-      : captureThere(settings, settings.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) })).pipe(Effect.result);
-    yield* log({ step: "capture", group: index, host: settings.remote?.name ?? hostname(), seconds: seconds(captured) });
+    const ran = yield* (leased.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(leased.pair), "--desktop", leased.desktop, "--capacity", leased.capacity, "--clients-file", leased.clientsFile, "--client", leased.client, "--install", leased.install, "--minutes", String(captureMinutes(identity.fixtures.length))], settings.checkout.ts, logFile)
+      : captureThere(leased, leased.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) })).pipe(Effect.result);
+    yield* log({ step: "capture", group: index, host: leased.remote?.name ?? hostname(), seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
     const checkpoint = join(frames, "checkpoint.json");
     if (ran._tag === "Failure" && !existsSync(checkpoint)) return yield* ran.failure;
@@ -273,9 +275,7 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: r
   yield* log({ step: "fold", batch, jobs: jobs.map(job => job.id), freePairs: free, groups: groups.map(group => ({ commit: group.commit, lanes: group.jobs.map(job => job.lane) })), seconds: seconds(folded) });
   const pool = yield* Effect.forkChild(ensurePool);
   yield* Effect.forEach(groups.entries(), ([index, group]) => Effect.scoped(Effect.gen(function*() {
-    const own = index === 0 ? settings : yield* groupSettings(settings, hosts, `capture-queue-${batch}-g${index}`);
-    yield* log({ step: "lease", group: index, host: own.remote?.name ?? hostname(), pair: own.pair, lanes: group.jobs.map(job => job.lane) });
-    return yield* captureGroup(own, batch, group, index, log, index === 0 ? Fiber.join(pool) : Effect.void);
+    return yield* captureGroup(settings, batch, group, index, log, index === 0 ? Fiber.join(pool).pipe(Effect.as(settings)) : groupSettings(settings, hosts, `capture-queue-${batch}-g${index}`));
   })).pipe(Effect.result, Effect.flatMap(outcome => outcome._tag === "Success" ? Effect.void : Effect.gen(function*() {
     yield* log({ step: "failed", group: index, problem: outcome.failure.message });
     for (const job of group.jobs) yield* finish(job, { batch, status: "failed", problem: outcome.failure.message });
