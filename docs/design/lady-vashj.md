@@ -129,8 +129,16 @@ rows still counts recovering, the later rows count it only over the stage.
 | [40809474573](https://github.com/tompassarelli/smashcraft/actions/runs/40809474573) | V1: Tidal Surge 2.6H rise, 1.5H drift | 28% | 65% | 39% | 22/12/11/0% |
 | [40809535231](https://github.com/tompassarelli/smashcraft/actions/runs/40809535231) | V1, every hit ×1.15 damage, ×0.94 growth | 38% | 66% | 39% | 22/12/11/0% |
 | [40809536985](https://github.com/tompassarelli/smashcraft/actions/runs/40809536985) | V1, arrows 4%, serpent 8% | 35% | 66% | 46% | 22/13/11/0% |
-| local, 48 a pair | V1, arrows 4%, serpent 8%, every hit ×1.2 damage, ×0.92 growth (landed) | 54% | 57% | 46% | 22/13/11/0% |
+| local, 48 a pair | V1, arrows 4%, serpent 8%, every hit ×1.2 damage, ×0.92 growth | 54% | 57% | 46% | 22/13/11/0% |
 | local, 48 a pair, `--orbs` | the same, ultimate orbs on | 62% | 57% | 48% | 23/13/10/2% |
+| [40818616523](https://github.com/tompassarelli/smashcraft/actions/runs/40818616523) | the landed pass, 086b48e | 50% | 57% | 46% | 22/13/11/0% |
+
+On the landed run (archetype zoner): air share of normals 7% (band 15-45),
+aerials n/f/b/u/d 22/20/37/12/8% (all inside their bands), approach 57%
+(band 20-50), ranged 46% (band 30-70), and
+specials n/s/u/d 22/13/11/0% (up special over its 0-8 band; Mana Shield needs
+orbs). Her kills come from forward smash (47%), dash attack (14%) and back air
+(11%).
 
 What changed:
 
