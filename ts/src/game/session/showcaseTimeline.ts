@@ -138,6 +138,7 @@ function rushShowcase(special: Readonly<AuthoredSpecial> | undefined): Pick<Show
 function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined; readonly cross?: { readonly frame: number; readonly gap: number } | undefined; readonly swing?: readonly number[] | undefined } {
   if (move === undefined || move.regions.length === 0) return { gap: reachGap(move) };
   if (style === AttackStyle.upTilt || style === AttackStyle.upSmash) return overheadPlacement(move, character);
+  if (style === AttackStyle.forwardTiltUp) return risenPlacement(move);
   if (style !== AttackStyle.downSmash) return twoSided(move);
   const ahead = move.regions.filter((region) => centreX(region) > 0.0), behind = move.regions.filter((region) => centreX(region) < 0.0);
   const opens = (regions: readonly MoveRegion[]) => Math.min(...regions.map((region) => region.firstFrame));
@@ -153,6 +154,11 @@ function overheadPlacement(move: Readonly<AuthoredMove>, character: Character): 
   const body = hurtCapsule(character), top = Math.max(body.z1, body.z2) + body.radius;
   const highest = move.regions.reduce((best, region) => centreZ(region) > centreZ(best) ? region : best);
   return centreZ(highest) - top > Math.abs(centreX(highest)) ? { gap: Math.floor(centreX(highest)), lift: Math.floor(centreZ(highest)) } : { gap: reachGap(move) };
+}
+
+function risenPlacement(move: Readonly<AuthoredMove>): { readonly gap: number; readonly lift: number } {
+  const lowest = move.regions.reduce((best, region) => centreZ(region) < centreZ(best) ? region : best);
+  return { gap: Math.floor(centreX(lowest)), lift: Math.max(0, Math.floor(centreZ(lowest) - SHOWCASE_DUMMY_MIDDLE)) };
 }
 
 function reachGap(move: Readonly<AuthoredMove> | undefined): number | undefined {
