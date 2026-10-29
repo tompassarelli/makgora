@@ -47,6 +47,7 @@ export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
   BlzFrameGetText: "reads an existing frame's local text",
   BlzFrameGetEnable: "reads an existing frame's local state",
   BlzFrameIsVisible: "reads an existing frame's local state",
+  BlzConvertColor: "pure conversion, for the costume tint on an existing frame",
   I2S: "pure conversion",
   R2S: "pure conversion",
   R2I: "pure conversion",
