@@ -31,6 +31,11 @@ test("two online clients whose frame clocks drift apart create and destroy Warcr
   const [early, late] = clients.clients;
   if (early === undefined || late === undefined) throw new Error("two clients expected");
   for (const client of clients.clients) client.natives.os = { clock: () => client.clockSeconds() };
+  const matchFrame = () => {
+    let shown = -1;
+    early.run(() => { shown = shellState()?.game.matchFrame ?? -1; });
+    return shown;
+  };
   const phase = () => {
     let shown = -1;
     early.run(() => { shown = shellState()?.game.phase ?? -1; });
@@ -57,6 +62,11 @@ test("two online clients whose frame clocks drift apart create and destroy Warcr
       expect({ frame: clients.frame, handles: turns[1] }).toEqual({ frame: clients.frame, handles: turns[0] });
     }
   };
+  const play = (count: number) => {
+    const until = matchFrame() + count;
+    for (let frame = 0; frame < count * 4 && matchFrame() < until; frame++) step(1);
+    expect(matchFrame()).toBeGreaterThanOrEqual(until);
+  };
   clients.start();
   step(30);
   passStartControls(clients, step);
@@ -67,20 +77,20 @@ test("two online clients whose frame clocks drift apart create and destroy Warcr
   clients.press(0, Key.y);
   for (let frame = 0; frame < 240 && phase() !== Phase.match; frame++) step(1);
   expect(phase()).toBe(Phase.match);
-  step(200);
+  play(200);
   for (let attempt = 0; attempt < PARASOL_OPENS; attempt++) {
     clients.press(0, key(Action.jump));
-    step(8);
+    play(8);
     clients.key(0, key(Action.moveUp), 0, true);
     clients.key(0, key(Action.special), 0, true);
-    step(46);
+    play(46);
     clients.key(0, key(Action.special), 0, false);
-    step(30);
+    play(30);
     clients.key(0, key(Action.moveUp), 0, false);
     clients.key(0, key(Action.moveDown), 0, true);
-    step(4);
+    play(4);
     clients.key(0, key(Action.moveDown), 0, false);
-    step(OPEN_EVERY - 88);
+    play(OPEN_EVERY - 88);
   }
   expect(opens).toBe(PARASOL_OPENS);
   for (const client of clients.clients) expect(client.errors).toEqual([]);
