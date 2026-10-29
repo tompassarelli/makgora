@@ -130,25 +130,29 @@ function restoreStep(fighter: Fighter, step: Step, key: string, work: Work): voi
   for (const path of generatedFiles(fighter, step, work.checkout)) if (!kept.has(path)) removeTree(join(work.checkout, path));
 }
 
-const runTool = (fighter: Fighter, step: Step, work: Work) => Effect.gen(function*() {
-  const log = join(work.root, `${step.name}.log`);
+const INDEX_TOOL = "tools/animations/fighter-indexes.ts";
+
+const spawnTool = (label: string, tool: string, args: readonly string[], checkout: string, log: string) => Effect.gen(function*() {
   const code = yield* Effect.acquireUseRelease(
     Effect.try({
       try: () => {
         const output = openSync(log, "w");
         try {
-          return Bun.spawn([process.execPath, step.tool, ...step.args(fighter, work)], { cwd: work.checkout, stdio: ["ignore", output, output] });
+          return Bun.spawn([process.execPath, tool, ...args], { cwd: checkout, stdio: ["ignore", output, output] });
         } finally {
           closeSync(output);
         }
       },
-      catch: (cause) => failure(`run ${step.name}`, step.tool, cause),
+      catch: (cause) => failure(`run ${label}`, tool, cause),
     }),
     (child) => Effect.promise(() => child.exited),
     stopBunProcess,
   );
-  if (code !== 0) return yield* failure(`run ${step.name}`, log, `${fighter.name} exited ${code}: ${readFileSync(log, "utf8").trim().split("\n").slice(-5).join("\n")}`);
+  if (code !== 0) return yield* failure(`run ${label}`, log, `exited ${code}: ${readFileSync(log, "utf8").trim().split("\n").slice(-5).join("\n")}`);
 });
+
+const runTool = (fighter: Fighter, step: Step, work: Work) =>
+  spawnTool(`${fighter.name} ${step.name}`, step.tool, step.args(fighter, work), work.checkout, join(work.root, `${step.name}.log`));
 
 export interface FighterPlan { readonly fighter: Fighter; readonly keys: readonly string[]; readonly cached: number; readonly sourceBytes: number }
 
@@ -270,6 +274,7 @@ export const buildFighterArt = (plans: readonly FighterPlan[], manifest: Manifes
   const largestFirst = [...plans].sort((a, b) => b.sourceBytes - a.sourceBytes);
   const built = yield* Effect.forEach(largestFirst, (plan) => buildFighter(plan, manifest, assets, root, checkout).pipe(Effect.map((work) => ({ fighter: plan.fighter, work }))), { concurrency: jobs }).pipe(
     Effect.tapError(() => Effect.sync(() => console.error(`step logs kept in ${root}`))));
+  yield* spawnTool("fighter indexes", INDEX_TOOL, [], checkout, join(root, "indexes.log"));
   const rebuiltFiles: string[] = [], assembledFiles: string[] = [], rebuilt = new Set(built.map(({ fighter }) => fighter.slug));
   for (const output of ["pool", "impact"] as const) {
     const family = FAMILY[output], staging = join(root, `${family}.assembled`);

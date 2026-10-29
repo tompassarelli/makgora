@@ -17,7 +17,7 @@ import { WHITE_MODEL_FACTS } from "../../ts/src/generated/assets/whiteModelFacts
 import { thinnedModel } from "./thinned-source";
 import { timelineBody } from "./timeline-body";
 import { keepWhiteImports, pruneFighterWhites, pruneWhiteTextures, writeWhiteImports } from "../../ts/scripts/whiteImports";
-import { WHITE_FACTS, WHITE_FACT_INDEX, WHITE_MODELS, WHITE_MODEL_INDEX, shardOrder, whiteFactsFile, whiteFactsIndex, whiteModelFile, whiteModelIndex } from "./fighter-shards";
+import { WHITE_FACTS, WHITE_MODELS, whiteFactsFile, whiteModelFile, writeWhiteIndexes } from "./fighter-shards";
 import { FIGHTER_ART, fighterArt } from "../../ts/src/generated/fighterArtData";
 
 const [assetsArg, outputArg, option, characterArg] = process.argv.slice(2);
@@ -146,8 +146,7 @@ for (const character of FIGHTER_ART.keys()) {
   writeGenerated(join(WHITE_MODELS, `${fighterArt(character).slug}.ts`), whiteModelFile(path));
   writeGenerated(join(WHITE_FACTS, `${fighterArt(character).slug}.ts`), whiteFactsFile({ [key]: facts[key]! }));
 }
-writeGenerated(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, ".ts", FIGHTER_ART.keys())));
-writeGenerated(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, ".ts", FIGHTER_ART.keys())));
+writeWhiteIndexes();
 if (selected === undefined) writeModelFacts(whiteModelFactsTable(readModelFacts(), Object.values(paths), facts));
 else replaceModelFacts([`war3mapImported\\${FIGHTER_ART.get(selected)!.name}White-`], whiteModelFactsTable({}, [paths[selected]!], facts));
 console.log(`${selected === undefined ? Object.keys(paths).length : 1} white body models updated: original mesh and flashable animation keys retained on one seekable timeline, emitters/lights removed`);

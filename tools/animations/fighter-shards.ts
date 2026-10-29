@@ -3,7 +3,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import type { ModelFacts } from '../../ts/node_modules/wisp/host/models/models';
-import { fighterArt } from '../../ts/src/generated/fighterArtData';
+import { FIGHTER_ART, fighterArt } from '../../ts/src/generated/fighterArtData';
+import { writeGenerated } from '../../ts/scripts/wisp/modelFactsTable';
+import { seconds } from './asset-info';
+import { staticLightGate } from './original-clips';
 
 const ts = resolve(import.meta.dir, '../../ts');
 export const CLIPS = join(ts, 'src/generated/clips');
@@ -135,4 +138,14 @@ export function whiteFactsIndex(characters: readonly number[]): string {
         ...characters.map(character => `  ...${shardName(fighterArt(character).slug)}.whiteModelFacts,`),
         '};',
     ].join('\n') + '\n';
+}
+
+/** Rewrites the clip index from the fighter clip files present. */
+export const writeClipIndex = () =>
+    writeGenerated(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', FIGHTER_ART.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
+
+/** Rewrites the white body and white facts indexes from the fighter files present. */
+export function writeWhiteIndexes(): void {
+    writeGenerated(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, '.ts', FIGHTER_ART.keys())));
+    writeGenerated(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, '.ts', FIGHTER_ART.keys())));
 }

@@ -20,7 +20,7 @@ import {CLIP_PROVENANCE, keepClipRecords, readClipRecords, writeClipRecord} from
 import {misplacedNodes} from '../../ts/scripts/clipNodes';
 import {KEY_BOUND, savedKeyBytes, type KeyThinReport} from '../../ts/scripts/keyThin';
 import {thinnedModel} from './thinned-source';
-import {CLIPS, CLIP_INDEX, clipFile, clipIndex, clipTypeFile, shardOrder} from './fighter-shards';
+import {CLIPS, clipFile, clipTypeFile, writeClipIndex} from './fighter-shards';
 import {writeGenerated} from '../../ts/scripts/wisp/modelFactsTable';
 import {clipNames} from './clip-names';
 import { FIGHTER_ART, fighterArt } from '../../ts/src/generated/fighterArtData';
@@ -174,7 +174,7 @@ for (const [character, clips] of moduleClips.entries()) if (clips !== undefined)
     writeGenerated(join(CLIPS, `${slug}.ts`), clipFile(FIGHTER_ART.get(character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
 }
 writeGenerated(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
-writeGenerated(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', FIGHTER_ART.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
+writeClipIndex();
 if (!metadataOnly) {
     for (const record of records) writeClipRecord(output, record);
     if (only === undefined) keepClipRecords(output, new Set(records.map(record => record.fighter)));
