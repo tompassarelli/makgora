@@ -46,7 +46,7 @@ fetch, rebase, scan and push:
    shared root reaches them), dispatches Farm test with the groups and the
    base on the `farm/SHA` branch safe-push published after its secret scan
    (`land.publish`, `SAFE_PUSH_LAND_REF`; without one it pushes the lane there
-   itself), and passes once every check job has passed, polling every 3 s. The `static` group holds the clean
+   itself), and passes once every check job has passed, polling the run every 3 s. The `static` group holds the clean
    room, the kind-tag, ledger and type check, and the Autoland suite parity
    check. The checks that read the private stores (fighter art, stored models,
    locomotion lock, strike moments, animation jitter, map-build inputs) cannot
@@ -67,6 +67,13 @@ fetch, rebase, scan and push:
    safe-push, still runs the pre-push hook's local gate
    (`landingSelection`, smashcraft:ts/scripts/landingRun.ts `here`).
    `LAND_FULL_SUITE=1 safe-push --to main` forces every group.
+   `bun scripts/landingCpu.ts run OUT.json -- safe-push --to main` from ts/
+   splits a landing's local CPU seconds by stage. A scripts-only landing with
+   a 60 to 80 s farm run spent 17 to 20 CPU s (2026-10-29): about 5 to 8 s in
+   safe-push's own git calls, about 4 in its gates and scans, about 3 in the
+   landingFarm.ts process (2 s even when every group is reused, mostly module
+   loading and the check selection), and about 1 in the farm poll, which reads
+   the run over the gate's own HTTPS connection instead of a gh process per poll.
 2. **After landing.** The push to main runs CI's smoke, filtered-checks,
    development-loop and code-health jobs, one run per landed commit (CI's
    concurrency is per SHA on main), plus Background sweeps, Auto-close and
