@@ -104,9 +104,9 @@ function authoredActions(hero: HeroDefinition): Action[] {
 
   for (const air of [false, true]) {
     const { c, t } = specialTiming(hero, "side", air), hit = c - 1, low = Math.max(1, hit - 4), steps = [hit, hit + 4, hit + 8, hit + 12], last = Math.min(t - 12, hit + 15), skid = last + 5;
-    const rush = (k: number): Gesture => ({ body: 50, chest: 30, hips: -10, twist: -30, head: -50, tx: 26, legF: -24 + 46 * k, legB: 24 - 46 * k, kneeF: 55 - 15 * k, kneeB: 55 + 15 * k }), brace: Gesture = { chest: -6, hips: 6, head: -10, legF: -38, legB: 26, kneeF: 30, kneeB: 20, tx: 10 };
-    add(air ? "sideSpecialAir" : "sideSpecial", t, c, [[0, {}], [low, { ...crouched, chest: 40, twist: -20 }], ...steps.map((f, i) => [f, rush(i % 2 ? -1 : 1)] as const), [last, rush(1)], [skid, brace], ...settle(skid, t, brace), [t, {}]],
-      [...at("hook", [-25, 60, 75], low, ...steps, last), ...at("cleaver", [-25, -60, 75], low, ...steps, last), ...at("hook", [50, 55, 100], skid), ...at("cleaver", [-20, -55, 80], skid)], { air });
+    const rush = (k: number): Gesture => ({ body: 24, chest: 16, hips: -6, twist: -35, head: -22, tx: 26, legF: -10 - 45 * k, legB: 10 + 45 * k, kneeF: 37 - 22 * k, kneeB: 37 + 22 * k }), brace: Gesture = { chest: -6, hips: 6, head: -10, legF: -38, legB: 26, kneeF: 30, kneeB: 20, tx: 10 };
+    add(air ? "sideSpecialAir" : "sideSpecial", t, c, [[0, {}], [low, { body: 14, chest: 18, twist: -30, head: -10, legF: -30, legB: 22, kneeF: 40, kneeB: 30 }], ...steps.map((f, i) => [f, rush(i % 2 ? -1 : 1)] as const), [last, rush(1)], [skid, brace], ...settle(skid, t, brace), [t, {}]],
+      [...at("hook", [-35, 60, 90], low, ...steps, last), ...at("cleaver", [-35, -60, 90], low, ...steps, last), ...at("hook", [50, 55, 100], skid), ...at("cleaver", [-20, -55, 80], skid)], { air });
   }
 
   { const ultimate = FIGHTER_ULTIMATES[Character.butcher]; ensure(ultimate, "butcher: no ultimate");

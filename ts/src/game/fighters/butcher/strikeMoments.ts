@@ -21,6 +21,6 @@ export const butcherStrikeMoments = {
   19: { clip: 25, seconds: f32(0.367), end: f32(0.800) },
   20: { clip: 4, seconds: f32(0.367), end: f32(1.667) },
   100: { clip: 20, seconds: f32(0.217), end: f32(1.167) },
-  101: { clip: 22, seconds: f32(0.100), end: f32(0.733) },
+  101: { clip: 22, seconds: f32(0.433), end: f32(0.733) },
   102: { clip: 4, seconds: f32(0.467), end: f32(1.667) },
 };

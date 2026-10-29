@@ -24,8 +24,9 @@ grappler with strong throws who is combo food, not his numbers.
   back air lashes the cleaver straight behind him at body height with the
   back leg kicking out, the down smash spreads both weapons low to both
   sides, the dash attack is a belly flop and the down air a seat drop, Meat
-  Hook draws the hook back low and throws it level, and the Charge drops his
-  shoulder into a level, running rush held through its travel. A contact
+  Hook draws the hook back low and throws it level, and the Charge leads with
+  his shoulder in an upright running stride, both weapons trailing, through
+  its travel. A contact
   pose is reached one frame before the first active frame, because hitstop
   freezes the attacker's clip at the first contact and a pose keyed on that
   frame is caught halfway there. The rest stay on the stock attacks.
