@@ -1,0 +1,14 @@
+# #733: Shadow Hunter up-smashes Lich at 300% from beside it into a top KO that lands as a Star KO; Lich shrinks toward screen centre, then the sparkle draws with the high Dispel Magic twinkle on frame 168.
+#! chat -dev setup quick pair lich / shadow hunter;percent 1 300;beside 1 2;lives 1 4
+#! cue 168-175 twinkle: sound=DispelMagic effect=DispelMagicTarget
+40 b stick 0 1
+40 b press LB
+42 b stick 0 0
+42 b release LB
+79 a capture
+103 a capture
+128 a capture
+153 a capture
+168 a capture
+171 a capture
+175 a capture
