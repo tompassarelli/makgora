@@ -174,3 +174,19 @@ export function restartsStationaryField(model: string, age: number, born: boolea
   const loop = PROJECTILE_DRAW_OFFSETS[model]?.loopFrames;
   return born || (loop !== undefined && imod(age, loop) === 0);
 }
+
+// A ribbon emitter draws any move of its effect as a streak, so a parked effect waits in the sequence that stops its ribbons; null marks a model with none.
+export const RIBBON_PARK_SEQUENCES: { readonly [model: string]: string | null } = {
+  "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx": "Death",
+  "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx": "Death",
+  "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx": "Birth",
+  "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": null,
+  "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx": "Death",
+  "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx": "Birth",
+  "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": "Death",
+  "Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx": null,
+  "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdx": "Death",
+  "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl": "Death",
+  "Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl": "Death",
+  "Abilities\\Weapons\\WyvernSpear\\WyvernSpearMissile.mdx": "Death",
+};

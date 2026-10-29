@@ -9,7 +9,7 @@ import { heroDefinition } from "../roster/kits";
 import { HERO_PROJECTILE_CAP } from "../sim/specials/heroProjectiles";
 import { f32 } from "wisp/src/sim/f32";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, parkCue } from "./effects";
-import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, projectileModelOf, restartsStationaryField, ultimateProjectiles } from "../presentation/projectileArt";
+import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, projectileModelOf, restartsStationaryField, RIBBON_PARK_SEQUENCES, ultimateProjectiles } from "../presentation/projectileArt";
 import { projectedProjectile } from "../presentation/projectilePose";
 import { opponentReflectedModels } from "../presentation/reflectedProjectileArt";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
@@ -72,6 +72,7 @@ interface Risen {
 interface Pool {
   readonly path: string;
   readonly defile: boolean;
+  readonly park: string | undefined;
   readonly effects: readonly number[];
   readonly boundaries: readonly (readonly number[])[];
   readonly raised: readonly (readonly number[])[];
@@ -156,16 +157,17 @@ export class ProjectilePresentation {
           boundaries.push(layers);
         }
       }
-      this.pools.push({ path, defile: defilePool, effects, boundaries, raised });
+      this.pools.push({ path, defile: defilePool, park: RIBBON_PARK_SEQUENCES[path] ?? undefined, effects, boundaries, raised });
     });
-    for (const path of opponentReflectedModels(opponents, this.pools.map((pool) => pool.path))) this.pools.push({ path, defile: false, effects: addPoolEffects(this.models, this.visible, path, this.origin, HERO_PROJECTILE_CAP + 1), boundaries: [], raised: [] });
+    for (const path of opponentReflectedModels(opponents, this.pools.map((pool) => pool.path))) this.pools.push({ path, defile: false, park: RIBBON_PARK_SEQUENCES[path] ?? undefined, effects: addPoolEffects(this.models, this.visible, path, this.origin, HERO_PROJECTILE_CAP + 1), boundaries: [], raised: [] });
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) this.assigned.push(-1);
     this.clear();
   }
 
 
   private hide(model: effect, parked: ParkedFlags, index: number): void {
-    parkCue(model, this.origin, parked, index);
+    if (!parkCue(model, this.origin, parked, index)) return;
+    for (const pool of this.pools) if (pool.park !== undefined && pool.effects.includes(index)) BlzSetSpecialEffectAnimation(model, pool.park);
   }
 
   clear(): void {
