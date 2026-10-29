@@ -1,0 +1,18 @@
+function PreloadFiles takes nothing returns nothing
+
+	call PreloadStart()
+	call Preload( "smashcraft-replay-part 1602 8" )
+	call Preload( "digests p8igmi p8ognl p8ugoo p90gpr p96gqu p9cgrx p9igt0 p9ogu3 p9ugv6 pa0gw9 pa6gxc pacgyf paigzi paoh0l pauh1o pb0h2r pb6h3u pbch4x pbih60 pboh73 pbuh86 pc0h99 pc6hac pcchbf pcihci pcohdl pcuheo" )
+	call Preload( "digests pd0hfr pd6hgu pdchhx pdihj0 pdohk3 pduhl6 pe0hm9 pe6hnc pechof peihpi peohql peuhro pf0hsr pf6htu pfchux pfihw0 pfohx3 pfuhy6 pg0hz9 pg6i0c pgci1f pgii2i pgoi3l pgui4o ph0i5r ph6i6u phci7x" )
+	call Preload( "digests phii90 phoia3 phuib6 pi0ic9 pi6idc picief piiifi pioigl piuiho pj0iir pj6iju pjcikx" )
+	call Preload( "checkpoint 1560 18875:14193" )
+	call Preload( "rows 43:3:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" )
+	call Preload( "digests pjiim0 pjoin3 pjuio6 pk0ip9 pk6iqc pkcirf pkiisi pkoitl pkuiuo pl0ivr pl6iwu plcixx pliiz0 ploj03 pluj16 pm0j29 pm6j3c pmcj4f pmij5i pmoj6l pmuj7o pn0j8r pn6j9u pncjax pnijc0 pnojd3 pnuje6" )
+	call Preload( "digests po0jf9 po6jgc pocjhf poijii poojjl poujko pp0jlr pp6jmu ppcjnx ppijp0 ppojq3 ppujr6 pq0js9 pq6jtc pqcjuf pqijvi" )
+	call Preload( "checkpoint 1603 25190:11932" )
+	call Preload( "end 8" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

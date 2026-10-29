@@ -17,7 +17,7 @@
 
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { basename, join, relative } from "node:path";
+import { basename, join, relative, resolve } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { describeCause } from "wisp/scripts/wisp/command";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
@@ -210,6 +210,7 @@ const sourceAt = (commit: string) => Effect.gen(function*() {
   yield* run(`extract ${commit}`, projectRoot, ["git", "-C", projectRoot, "archive", "--format=tar", "-o", archive, commit, "ts"]);
   yield* run(`unpack ${commit}`, root, ["tar", "-x", "-C", root, "-f", archive]);
   rmSync(archive, { force: true });
+  yield* run(`init ${commit}`, root, ["git", "init", "--quiet", root]);
   yield* run(`install packages at ${commit}`, root, [process.execPath, "install", "--cwd", join(root, "ts"), "--frozen-lockfile"]);
   writeFileSync(ready, "");
   return join(root, "ts");
@@ -294,7 +295,7 @@ export function corpusReport(outcomes: readonly ReplayOutcome[], recordings: num
 
 export const corpus = (args: readonly string[]) => Effect.gen(function*() {
   if (args[0] === "keep") return yield* keep(args.slice(1));
-  const roots = args.length > 0 ? args : [CHECKED_IN_CORPUS, localCorpus()];
+  const roots = (args.length > 0 ? args : [CHECKED_IN_CORPUS, localCorpus()]).map((root) => resolve(root));
   const found = roots.map((root) => assembleReplays(findRecordings(root)));
   const recordings = roots.reduce((count, root) => count + findRecordings(root).length, 0);
   const replays = found.flatMap(({ replays: some }) => some);
