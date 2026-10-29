@@ -11,6 +11,7 @@ import { reproFile } from "wisp/src/runtime/repro";
 import { installNativeDriver, startNativeDriver, serviceNativeDriver, publishNativeDriverStatus } from "wisp/src/platform/nativeDriver";
 import { squareRootFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
+import { max } from "../game/core/numbers";
 import { DASH_STICK_THRESHOLD, STICK_DEADZONE, TAP_JUMP_STICK_THRESHOLD, TRIGGER_FULL_LEVEL, TRIGGER_PRESS_LEVEL } from "../game/sim/stickZones";
 import { finishInputTrace } from "../host/loop/trace";
 import { confirmedChecksum, startInputTrace } from "../host/loop/diagnostics";
@@ -237,6 +238,12 @@ function chargeScriptedMeter(fighter: Fighter, kind: string): void {
   if (kind !== "ultimate") spendUltimate(fighter);
 }
 
+function liftTarget(target: Fighter, z: number): void {
+  target.motion.grounded = false;
+  target.motion.z = max(0.0, z);
+  target.motion.vz = 0.0;
+}
+
 export function startScriptedMove(s: ShellState, slot: number, kind: string | undefined, code: string, facing: string | undefined): void {
   if (s.build.inputProfile !== "native-driver") return;
   const fighter = fighterAt(s.world, slot);
@@ -282,10 +289,12 @@ export function captureNativeDriverInputs(s: ShellState): void {
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
     else if (edge.action === "move") {
-      const [kind, code = "", facing, gap = "500"] = edge.args;
-      fighterAt(s.world, edge.slot).motion.x = 0.0;
-      fighterAt(s.world, edge.slot === 0 ? 1 : 0).motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
+      const [kind, code = "", facing, gap = "500", lift] = edge.args;
+      const mover = fighterAt(s.world, edge.slot), target = fighterAt(s.world, edge.slot === 0 ? 1 : 0);
+      mover.motion.x = 0.0;
+      target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
       startScriptedMove(s, edge.slot, kind, code, facing);
+      if (lift !== undefined && !mover.motion.grounded) liftTarget(target, f32(mover.motion.z + S2R(lift)));
     }
     else if (pad !== undefined) applyEdge(s, pad, edge);
     driver.next++;
