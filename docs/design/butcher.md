@@ -88,6 +88,32 @@ ranged: 5-30
 specials: neutral 8-25, side 3-15, up 0-8, down 2-12
 ```
 
+## Balance
+
+The first field (main 633758b596, balance run 40811020390 on its probe
+branch, Wren Expert both sides, 408 matches a pair, 11,016 matches) put him at
+67% against the field, above the 40–60% band. Measured shares against the
+profile above:
+
+- Archetype: grappler.
+- Aerials (neutral/forward/back/up/down): 21%/15%/42%/6%/15% of his aerials;
+  back air sits over its 15–40% target.
+- Air share of normals: 6% (target 10–35%).
+- Approach share of movement: 82% (target 25–55%).
+- Ranged share of damage: 4% (target 5–30%).
+- Specials (neutral/side/up/down, share of moves started): 20%/15%/8%/0%.
+- Damage by move: Butcher's Charge 24%, grab 16%, dash attack 12%, down tilt
+  11%. Stocks by move: forward smash 34%, grab 21%, dash attack 10%.
+
+The retune follows the roster retune rule (balance.md, "Roster retune"): 17
+points over 50% at about 0.6% of damage a point. Every damage he deals through
+his hit table is scaled ×0.898 and its knockback growth ×1.112, so kill
+percents stay near their baseline; the down smash keeps its damage, as its
+growth is the roster's fixed 40. The move values above are the authored rows;
+the live value is the row times the factor (`BALANCE_DAMAGE` and
+`BALANCE_GROWTH` in his moves.ts). Rot, Dismember's drain and the pummel are
+not scaled.
+
 Path draft for Tom to correct (#358):
 
 ```ceiling-plan

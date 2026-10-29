@@ -7,7 +7,7 @@ import { capsuleOf, makeHit, path } from "../../sim/heroes/authoring";
 import { downSmashHit } from "../../sim/downMoveValues";
 import { strongHit } from "../../sim/strongHits";
 
-export const hit = makeHit({
+const authoredHit = makeHit({
   LINK: { growth: 46.0, base: 14.0 },
   POKE: { growth: 64.0, base: 20.0 },
   CHASE: { growth: 44.0, base: 40.0 },
@@ -18,6 +18,12 @@ export const hit = makeHit({
   JUGGLE: { growth: 50.0, base: 50.0 },
   TOSS: { growth: 76.0, base: 56.0 },
 }, HitElement.slash);
+export const BALANCE_DAMAGE = f32(0.898);
+export const BALANCE_GROWTH = f32(1.112);
+export const hit: typeof authoredHit = (damage, kind, angle, facing, element) => {
+  const effect = authoredHit(f32(damage * BALANCE_DAMAGE), kind, angle, facing, element);
+  return { ...effect, growth: f32(effect.growth * BALANCE_GROWTH) };
+};
 export const capsule = capsuleOf(18.0);
 
 const body = hurtCapsule(Character.butcher);
@@ -71,8 +77,8 @@ export const BUTCHER_MOVES: FighterMoves = {
     [AttackStyle.forwardSmash]: heroMove(20, 3, 38, 0, FORWARD_SMASH),
     [AttackStyle.upSmash]: heroMove(17, 5, 34, 0, UP_SMASH),
     [AttackStyle.downSmash]: heroMove(16, 5, 34, 0, [
-      heroRegion(16, 17, capsule(40.0, 30.0, 134.0, 28.0, 46.0), downSmashHit(hit(15.0, "EDGE", 25))),
-      heroRegion(18, 20, capsule(-40.0, 30.0, -134.0, 28.0, 46.0), downSmashHit(hit(15.0, "EDGE", 25, -1.0))),
+      heroRegion(16, 17, capsule(40.0, 30.0, 134.0, 28.0, 46.0), downSmashHit(authoredHit(15.0, "EDGE", 25))),
+      heroRegion(18, 20, capsule(-40.0, 30.0, -134.0, 28.0, 46.0), downSmashHit(authoredHit(15.0, "EDGE", 25, -1.0))),
     ]),
     [AttackStyle.neutralAir]: heroMove(9, 6, 26, 16, [heroRegion(9, 14, capsule(-60.0, 70.0, 60.0, 70.0, 48.0), hit(10.0, "POKE", 50, 1.0, GUT))]),
     [AttackStyle.forwardAir]: heroMove(14, 3, 28, 22, FORWARD_AIR),
