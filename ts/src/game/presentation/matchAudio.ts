@@ -207,7 +207,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.ladyVashj]: "lady vashj victory",
   [Character.archimonde]: "spell",
   [Character.butcher]: "stand channel",
-  [Character.tyrande]: "stand victory",
+  [Character.tyrande]: "tyrande victory",
 };
 
 export const victoryAnimation = (character: Character): string => VICTORY_ANIMATIONS[character];
