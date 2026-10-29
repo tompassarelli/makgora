@@ -24,6 +24,7 @@ import { CLASSIC_BUILDS } from "./classicBuilds";
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 import { STOCK_MODELS } from "../../src/game/render/effects";
+import { HOWL_TARGET_MODEL, RESIST_FLASH_MODEL } from "../../src/game/render/terrorPresentation";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
 import { headlessRender } from "./headlessRender";
@@ -297,6 +298,7 @@ export function effectUses(): EffectUse[] {
   for (let clip = 0; clip < summonClipCount(SUMMON_BEAR); clip++) uses.push(supplemental(fighterSlug(Character.rifleman), `Bear summon clip ${clip}`, summonClip(SUMMON_BEAR, clip).modelPath, "summonPresentation seeking playback is unmodeled"));
   for (const [move, model] of [["Fel Rush aura", IMPACT_ROLL_MODEL], ["Immolate flames", STOCK_MODELS.immolationTarget], ["stun marker", STOCK_MODELS.manaBurnTarget], ["Wing Ascent trail", IMPACT_DUST_MODEL], ["drain flash", IMPACT_TECH_MODEL], ["silence status", STOCK_MODELS.silenceTarget]] as const) uses.push(supplemental(fighterSlug(Character.demonHunter), move, model, "specialEffects producer playback requires an observed frame trace"));
   uses.push(supplemental(fighterSlug(Character.pitLord), "Doom curse", STOCK_MODELS.curseTarget, "specialEffects producer playback requires an observed frame trace"));
+  for (const [move, model] of [["Howl of Terror fear", HOWL_TARGET_MODEL], ["Howl of Terror resist", RESIST_FLASH_MODEL]] as const) uses.push(supplemental(fighterSlug(Character.pitLord), move, model, "terrorPresentation playback requires an observed frame trace"));
   for (const [move, model] of [["raised skeleton", "Units\\Undead\\Skeleton\\Skeleton.mdx"], ["raised burst", "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx"], ["Defile boundary", IMPACT_DEFILE_MODEL], ["Defile frost", "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx"]] as const) uses.push(supplemental(fighterSlug(Character.lichKing), move, model, "projectilePresentation supplemental playback is unmodeled"));
   uses.push(supplemental(fighterSlug(Character.lich), "Death and Decay ground", IMPACT_DEFILE_MODEL, "projectilePresentation supplemental playback is unmodeled"));
   const seen = new Set<string>();
