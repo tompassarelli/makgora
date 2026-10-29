@@ -27,7 +27,7 @@ export const BINDING_PRESETS: readonly BindingPreset[] = ["wasd", "standard", "c
 export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WASD", standard: "Box", custom: "Custom" };
 
 export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
-  wasd: "Recommended if you're new. W or Space is up, 8 jumps",
+  wasd: "Recommended if you're new. W is up, 8 jumps",
   standard: "Leverless controller style",
   custom: "Box with 9 jump, 8 shield and - C-up",
 };
@@ -86,7 +86,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.moveLeft, code(wasd ? "A" : "W"));
   bind(Action.moveRight, code(wasd ? "D" : "R"));
   bind(Action.moveDown, code(wasd ? "S" : "E"));
-  if (wasd) bind(Action.moveUp, code("W"), SPACE);
+  if (wasd) bind(Action.moveUp, code("W"));
   else bind(Action.moveUp, SPACE);
   bind(Action.jump, code(custom ? "9" : "8"));
   bind(Action.attack, code("N"));
@@ -102,7 +102,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.lightShield, code(wasd ? "E" : "A"));
   bind(Action.shortHop, code("I"));
   if (custom) bind(Action.strong, code("0"));
-  else bind(Action.strong, code("9"), START_KEY);
+  else bind(Action.strong, code("9"));
   bind(Action.modX, MOD_X_KEY);
   return { keys };
 }
@@ -139,10 +139,12 @@ const withKeys = (preset: BindingPreset, changes: readonly KeyChange[]): number[
   return keys;
 };
 
-const PREVIOUS_STOCK_CHANGES: readonly KeyChange[] = [[Action.cUp, code("9")], [Action.lightShield, code("0")], [Action.strong, START_KEY]];
+const PREVIOUS_STOCK_CHANGES: readonly KeyChange[] = [[Action.strong, code("9"), START_KEY]];
+
+const PREVIOUS_WASD_UP: KeyChange = [Action.moveUp, code("W"), SPACE];
 
 const EARLIER_STOCK_CHANGES: readonly (readonly KeyChange[])[] = [
-  PREVIOUS_STOCK_CHANGES,
+  [[Action.cUp, code("9")], [Action.lightShield, code("0")], [Action.strong, START_KEY]],
   [[Action.cUp, MINUS], [Action.lightShield, code("0")], [Action.strong, code("9"), START_KEY]],
 ];
 
@@ -154,11 +156,13 @@ const earlierStockKeys = (preset: StockPreset, changes: readonly KeyChange[]): n
 
 function earlierDefaults(preset: BindingPreset): number[][] {
   if (preset === "custom") return [withKeys(preset, EARLIER_CUSTOM_JUMP)];
-  const earlier = EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes));
-  return preset === "wasd" ? [...earlier, earlierStockKeys(preset, [])] : earlier;
+  const earlier = [previousDefaultKeys(preset), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
+  return preset === "wasd" ? [...earlier, earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES)] : earlier;
 }
 
-export const previousDefaultKeys = (preset: StockPreset): number[] => earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES);
+export function previousDefaultKeys(preset: StockPreset): number[] {
+  return withKeys(preset, preset === "wasd" ? [...PREVIOUS_STOCK_CHANGES, PREVIOUS_WASD_UP] : PREVIOUS_STOCK_CHANGES);
+}
 
 export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly BindingPreset[] = BINDING_PRESETS): void {
   const preset = presets.find((stock) => earlierDefaults(stock).some((earlier) => earlier.every((key, index) => bindings.keys[index] === key)));

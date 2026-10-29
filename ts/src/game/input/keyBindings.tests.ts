@@ -8,7 +8,7 @@ const code = (character: string) => character.charCodeAt(0);
 const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
-test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to 0 (- on Custom), and Strong to 9 with Y second (0 on Custom) [k2 property]", () => {
+test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to 0 (- on Custom), and Strong to 9 alone (0 on Custom) [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
     assertEquals(slots(preset, Action.cLeft), "J —", `${preset} C-left`);
     assertEquals(slots(preset, Action.cRight), "L —", `${preset} C-right`);
@@ -16,12 +16,12 @@ test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C
     assertEquals(slots(preset, Action.walk), "K —", `${preset} Walk`);
   }
   for (const preset of BINDING_PRESETS) assertEquals(slots(preset, Action.cUp), preset === "custom" ? "- —" : "0 —", `${preset} C-up`);
-  assertEquals(slots("wasd", Action.strong), "9 Y");
-  assertEquals(slots("standard", Action.strong), "9 Y");
+  assertEquals(slots("wasd", Action.strong), "9 —");
+  assertEquals(slots("standard", Action.strong), "9 —");
   assertEquals(slots("custom", Action.strong), "0 —");
 });
 
-test("a saved WASD or Box layout still on the old defaults (Strong Y, C-up 9) upgrades on load, and one the player edited stays as saved [k2 property]", () => {
+test("a saved WASD or Box layout still on the old defaults (Y as a second Strong key) upgrades on load, and one the player edited stays as saved [k2 property]", () => {
   const previous = (preset: "wasd" | "standard") => ({ keys: previousDefaultKeys(preset) });
   const stock = { layouts: { wasd: previous("wasd"), standard: previous("standard"), custom: presetBindings("custom") }, active: "wasd" as BindingPreset };
   const upgraded = decodeLayouts(encodeSlots(stock));
@@ -78,8 +78,8 @@ test("Custom binds 9 to jump, 8 to Shield R, 0 to Strong, - to C-up and A to lig
   }
 });
 
-test("WASD binds Up to W and Space and Jump to 8 alone, and the other layouts keep Space as Up [k2 property]", () => {
-  assertEquals(slots("wasd", Action.moveUp), "W SPACE");
+test("WASD binds Up to W alone and Jump to 8 alone, and the other layouts keep Space as Up [k2 property]", () => {
+  assertEquals(slots("wasd", Action.moveUp), "W —");
   assertEquals(slots("wasd", Action.jump), "8 —");
   assertEquals(slots("standard", Action.moveUp), "SPACE —");
   assertEquals(slots("standard", Action.jump), "8 —");
