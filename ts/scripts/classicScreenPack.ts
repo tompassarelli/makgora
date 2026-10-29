@@ -11,6 +11,7 @@ const Spec = Schema.Struct({
   crop: Box,
   regionMargin: Schema.Finite,
   bodyMargin: Schema.Finite,
+  defender: Schema.optionalKey(Box),
   samples: Schema.Array(Schema.Struct({ move: Schema.String, role: Schema.Literals(["positive", "negative", "candidate"]), version: Schema.String, source: Schema.String, fixture: Schema.String, manifest: Schema.String, runs: Schema.Tuple([Schema.String, Schema.String]), regionMargin: Schema.optionalKey(Schema.Finite) })),
 });
 const Manifest = Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite) })) });
@@ -42,7 +43,7 @@ export const buildScreenPack = Effect.fnUntraced(function*(specPath: string, pac
       return { ...recorded, path, map: yield* real(dirname(join(root, path)), recorded.map) };
     });
     const runs = [yield* run(request.runs[0]), yield* run(request.runs[1])] as const;
-    const sample = yield* Effect.try({ try: () => packSample({ ...request, excluded: spec.excluded, crop: spec.crop, regionMargin: request.regionMargin ?? spec.regionMargin, bodyMargin: spec.bodyMargin }, { ...manifest, path: request.manifest, map: manifestMap }, packMap, mapSha256, runs), catch: cause => failure(request.move, cause) });
+    const sample = yield* Effect.try({ try: () => packSample({ ...request, excluded: spec.excluded, crop: spec.crop, regionMargin: request.regionMargin ?? spec.regionMargin, bodyMargin: spec.bodyMargin, defender: spec.defender }, { ...manifest, path: request.manifest, map: manifestMap }, packMap, mapSha256, runs), catch: cause => failure(request.move, cause) });
     samples.push({ ...sample, manifest: written(sample.manifest), map: written(sample.map), frames: sample.frames.map(frame => ({ ...frame, shown: rebased(frame.shown), off: rebased(frame.off), repeatedOff: rebased(frame.repeatedOff) })) });
   }
   return { samples };

@@ -21,3 +21,9 @@ test("a recorded Blademaster receipt packs into frames in order, with boxes move
   expect(first?.repeatedOff.file).toBe("two/positives-blademaster-side-special/46-hidden.png");
   expect(() => packSample(request, manifest, "main-positives.w3x", "hash", [run("one/captures.json"), run("one/captures.json")])).toThrow("second, independent capture run");
 });
+
+test("the idle defender is excluded only right of each frame's effect region, so cue pixels over it still count [k1 scenario]", () => {
+  const sample = packSample({ ...request, defender: { x: 700, y: 0, width: 100, height: 50 } }, manifest, "main-positives.w3x", "hash", [run("one/captures.json"), run("two/captures.json")]);
+  expect(sample.frames[0]?.excluded).toEqual([{ x: 723, y: 0, width: 77, height: 50 }]);
+  expect(packSample({ ...request, defender: { x: 0, y: 0, width: 600, height: 50 } }, manifest, "main-positives.w3x", "hash", [run("one/captures.json"), run("two/captures.json")]).frames[0]?.excluded).toEqual([]);
+});

@@ -18,6 +18,7 @@ export interface PackRequest {
   readonly crop: PixelBox;
   readonly regionMargin: number;
   readonly bodyMargin: number;
+  readonly defender?: PixelBox | undefined;
 }
 export interface PackReference { readonly receipt: string; readonly fixture: string; readonly phase: "shown" | "hidden"; readonly file: string }
 export interface PackFrame { readonly frame: number; readonly shown: PackReference; readonly off: PackReference; readonly repeatedOff: PackReference; readonly region: PixelBox; readonly body: PixelBox; readonly excluded: readonly PixelBox[] }
@@ -63,6 +64,11 @@ export function screenBoxes(lines: readonly string[], fixture: string, frame: nu
   return undefined;
 }
 
+export function defenderBox(defender: PixelBox, region: PixelBox): PixelBox | undefined {
+  const x = Math.max(defender.x, region.x + region.width), width = defender.x + defender.width - x;
+  return width > 0 ? { x, y: defender.y, width, height: defender.height } : undefined;
+}
+
 export function packSample(request: PackRequest, manifest: PackManifest, packMap: string, mapSha256: string, runs: readonly [PackRun, PackRun]): PackSample {
   const fail = (problem: string): never => { throw new Error(`${request.move}: ${problem}`); };
   const fixture = manifest.fixtures.find(row => row.name === request.fixture) ?? fail(`fixture ${request.fixture} is not in ${manifest.path}`);
@@ -79,7 +85,9 @@ export function packSample(request: PackRequest, manifest: PackManifest, packMap
     first: frames[0] ?? fail("no capture frames"), last: frames.at(-1) ?? 0,
     frames: frames.map(frame => {
       const boxes = screenBoxes(runs[0].screen ?? [], fixture.name, frame) ?? fail(`${runs[0].path} has no projected boxes for frame ${frame}`);
-      return { frame, shown: reference(runs[0], frame, "shown"), off: reference(runs[0], frame, "hidden"), repeatedOff: reference(runs[1], frame, "hidden"), region: grownBox(croppedBox(boxes.region, request.crop), request.regionMargin, request.crop.width, request.crop.height), body: grownBox(croppedBox(boxes.body, request.crop), request.bodyMargin, request.crop.width, request.crop.height), excluded: request.excluded };
+      const region = grownBox(croppedBox(boxes.region, request.crop), request.regionMargin, request.crop.width, request.crop.height);
+      const defender = request.defender === undefined ? undefined : defenderBox(request.defender, region);
+      return { frame, shown: reference(runs[0], frame, "shown"), off: reference(runs[0], frame, "hidden"), repeatedOff: reference(runs[1], frame, "hidden"), region, body: grownBox(croppedBox(boxes.body, request.crop), request.bodyMargin, request.crop.width, request.crop.height), excluded: defender === undefined ? request.excluded : [...request.excluded, defender] };
     }),
   };
 }
