@@ -14,6 +14,7 @@ const CLOSE_DISTANCE = 1000.0;
 const SETTLE_FRAMES = 240;
 const PAIRS: readonly (readonly [Character, Character])[] = [
   [Character.butcher, Character.thrall], [Character.demonHunter, Character.uther], [Character.butcher, Character.uther], [Character.demonHunter, Character.thrall],
+  [Character.alchemist, Character.alchemist], [Character.alchemist, Character.thrall],
 ];
 
 function touchingDistance(stage: number, left: Character, right: Character): number {
@@ -30,7 +31,7 @@ function touchingDistance(stage: number, left: Character, right: Character): num
   return view.distance;
 }
 
-test("two touching fighters at centre stage settle no wider than the close distance, at the same distance on every stage, with the Butcher, Thrall, Illidan and Uther [k3 measure docs/melee-camera.md]", () => {
+test("two touching fighters at centre stage settle no wider than the close distance, at the same distance on every stage, with the Butcher, Thrall, Illidan, Uther and the Alchemist [k3 measure docs/melee-camera.md]", () => {
   for (const [left, right] of PAIRS) {
     const first = touchingDistance(at(STAGE_CATALOG, 0).id, left, right);
     for (const stage of STAGE_CATALOG) {

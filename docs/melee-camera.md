@@ -83,3 +83,9 @@ the direction of Melee's close framing, where a large fighter next to a small
 one takes about 40% and 28% of the frame, without matching it exactly;
 spread play is unchanged. The fighterFraming tests hold touching pairs at
 1000 or closer.
+
+The Goblin Alchemist measured 609 tall until 2026-10-30 because its model's
+"Stand - 4" clip is Chemical Rage, a transformed body the game never draws;
+`bun scripts/fighterViewBounds.ts` now skips it, so the Alchemist is 215 tall
+and two touching Alchemists, or an Alchemist beside Thrall, settle at 766 on
+every stage (the pair had settled at 1835 on Frozen Throne).

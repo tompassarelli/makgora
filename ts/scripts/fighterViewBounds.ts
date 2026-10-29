@@ -4,6 +4,8 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { FIGHTER_OBJECTS } from "../src/game/objectData";
+import { FIGHTER_VIEW_BOUNDS } from "../src/game/presentation/fighterViewBounds";
+import { shipsInMap } from "../src/game/roster/kits";
 import { Character } from "../src/game/sim/codes";
 import { originalClip, originalClipNames } from "../src/generated/clips/fighterOriginalClipInfo";
 import { DrawnModel } from "./wisp/drawnModel";
@@ -11,12 +13,19 @@ import { headlessRender } from "./wisp/headlessRender";
 
 const SAMPLES = 12;
 const STAND = /^stand(\s*-?\s*\d+)?$/i;
+// Chemical Rage, the Alchemist's 609-tall transformed body, is a Stand clip the game never draws.
+const UNDRAWN_STANDS: Readonly<Partial<Record<Character, readonly string[]>>> = { [Character.alchemist]: ["stand - 4"] };
 
 const renderer = headlessRender();
 const rows: string[] = [];
 for (const [name, character] of Object.entries(Character)) {
   const object = FIGHTER_OBJECTS[character];
-  const clips = [...new Set([...originalClipNames(character)].flatMap(([clipName, index]) => STAND.test(clipName.trim()) ? [index] : []))].flatMap((index) => {
+  if (!shipsInMap(character)) {
+    const kept = FIGHTER_VIEW_BOUNDS[character];
+    rows.push(`  [Character.${name}]: { left: ${kept.left}, right: ${kept.right}, bottom: ${kept.bottom}, top: ${kept.top} },`);
+    continue;
+  }
+  const clips = [...new Set([...originalClipNames(character)].flatMap(([clipName, index]) => STAND.test(clipName.trim()) && !(UNDRAWN_STANDS[character] ?? []).includes(clipName.trim()) ? [index] : []))].flatMap((index) => {
     const clip = originalClip(character, index);
     return clip === undefined ? [] : [clip];
   });

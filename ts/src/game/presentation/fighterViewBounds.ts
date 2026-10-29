@@ -39,5 +39,5 @@ export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
   [Character.butcher]: { left: -126, right: 150, bottom: -14, top: 292 },
   [Character.akama]: { left: -30, right: 78, bottom: 0, top: 134 },
   [Character.firelord]: { left: -80, right: 80, bottom: 0, top: 174 },
-  [Character.alchemist]: { left: -93, right: 155, bottom: -6, top: 609 },
+  [Character.alchemist]: { left: -93, right: 122, bottom: -6, top: 215 },
 };
