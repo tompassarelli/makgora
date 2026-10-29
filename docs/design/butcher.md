@@ -69,6 +69,18 @@ Specials:
   reel with the caught foe at its end. It is drawn each frame from the
   fighters and adds no simulation state; enough links are made at setup for a
   full-hold throw, aimed or level.
+- **Meat Hook ledge tether** (air). Like Link's Hookshot, the air hook bites
+  a ledge: when the head's flight crosses within 40 units of the free
+  main-deck ledge it flies toward, from outside that edge, the hook ends and
+  he is reeled to the ledge over 12 frames into the normal ledge hang
+  (`LedgeState.tether`), with the usual ledge intangibility and regrab rules.
+  It needs him airborne, not helpless, and not in hitstun. Only the first
+  air hook thrown in an airborne stretch carries the tether: it is spent as
+  the hook leaves, and comes back when he lands, grabs a ledge or is hit
+  (the tether bits of `special.airtimeUses`, rollback state). A foe the hook
+  reaches first takes the strike instead, and the aim window's 30 degrees
+  aim it at a ledge above or below. The computer throws it when a tap at
+  some aim crosses the ledge, and aims it in the window.
 - **Butcher's Charge** (side). A belly-led rush on frames 8–20 that stops at
   bodies and shields, with armour over the same frames against hits up to 5%
   plus 1% per Flesh Heap stack, and a bump for 11%. 44 frames.

@@ -9,11 +9,11 @@ import { stepMatch } from "../../match/step";
 import { canonicalState } from "../../replay/canonical";
 import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
-import { Character, GrabAction, LedgeState } from "../../sim/codes";
+import { Character, GrabAction, LedgeState, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { fighterAt } from "../../sim/roster";
 import { ULTIMATE_METER_FRAMES } from "../../sim/meter";
-import { mainDeckRight } from "../../sim/stage";
+import { mainDeckLeft, mainDeckRight } from "../../sim/stage";
 import { GRAB_HOLD_DISTANCE } from "../../sim/moves";
 import { knockbackWeight } from "../../sim/itemBuffs";
 import { CHARGED_AIM_FRAMES } from "../../sim/specials/schema";
@@ -47,6 +47,7 @@ interface Setup {
   readonly foeAhead: number;
   readonly ultimates?: boolean;
   readonly offstage?: true;
+  readonly air?: { readonly side: number; readonly outside: number; readonly z: number };
 }
 
 function duel(setup: Setup): Duel {
@@ -61,6 +62,15 @@ function duel(setup: Setup): Duel {
     butcher.motion.grounded = false;
     butcher.motion.surface = undefined;
     butcher.facing = -1;
+  }
+  if (setup.air !== undefined) {
+    const { side, outside, z } = setup.air;
+    butcher.motion.x = f32(f32(side < 0 ? mainDeckLeft(0) : mainDeckRight(0)) + f32(side * outside));
+    butcher.motion.z = z;
+    butcher.motion.grounded = false;
+    butcher.motion.surface = undefined;
+    butcher.facing = -side;
+    foe.motion.x = f32(-side * 300.0);
   }
   butcher.meter.ultimate = ULTIMATE_METER_FRAMES;
   state.match.phase = Phase.match;
@@ -202,6 +212,7 @@ const SCENES: readonly Scene[] = [
   { setup: { foeAhead: 300.0 }, script: hookScript, end: 100, saves: [10, 20, 30, 40, 62, 80], shows: (d) => d.foe.grab.reel > 0 },
   { setup: { foeAhead: 300.0 }, script: hookScript, end: 100, saves: [62, 75], shows: (d) => d.butcher.status.stacks > 0 },
   { setup: { foeAhead: -300.0, offstage: true }, script: (tick) => [tick === 2 ? "swing" : "none", "none"], end: SWING_END, saves: [3, 10, 16, 24], shows: (d) => d.butcher.ledge.state === LedgeState.tether },
+  { setup: { foeAhead: 0.0, air: { side: 1, outside: 200.0, z: 0.0 } }, script: (tick) => [tick === 2 ? "hook" : "none", "none"], end: 40, saves: [3, 12, 16, 24], shows: (d) => d.butcher.ledge.state === LedgeState.tether },
   { setup: { foeAhead: 120.0 }, script: (tick) => [tick === ROT_ON || tick === 63 ? "rot" : "none", "none"], end: 90, saves: [5, 30, 64], shows: (d) => d.butcher.status.aura && d.foe.status.slowFrames > 0 },
   { setup: { foeAhead: 150.0, ultimates: true }, script: (tick) => [tick === 3 ? "dismember" : "none", "none"], end: 160, saves: [20, 40, 90, 130], shows: (d) => d.foe.grab.owner === 0 && d.butcher.special.grabFrame > 0 },
 ];
@@ -288,4 +299,58 @@ test("Shield during the hold keeps the stored charge, and the next press throws 
   }
   assertGreaterThan(reach, 60.0 + HOOK_SPEED * (HOOK_FLIGHT_FRAMES[3] - 2));
   assertEquals(d.butcher.special.charge, 0);
+});
+
+interface Tether {
+  readonly reeled: boolean;
+  readonly hung: boolean;
+  readonly side: number;
+  readonly helpless: boolean;
+  readonly z: number;
+  readonly rethrown: boolean;
+}
+
+function airHook(air: NonNullable<Setup["air"]>, aim: Press, rethrowBelow?: number): Tether {
+  const d = duel({ foeAhead: 0.0, air });
+  let reeled = false;
+  let hung = false;
+  let rethrow: number | undefined;
+  let lowest = d.butcher.motion.z;
+  for (let tick = 1; tick <= 140; tick++) {
+    if (rethrow === undefined && rethrowBelow !== undefined && tick > 10 && d.butcher.special.action === SpecialAction.none && d.butcher.motion.z <= rethrowBelow) rethrow = tick;
+    const throwTick = tick === 2 || tick === rethrow;
+    const aiming = (tick >= 3 && tick < 3 + CHARGED_AIM_FRAMES) && rethrow === undefined;
+    step(d, [throwTick ? "hook" : aiming ? aim : "none", "none"]);
+    if (d.butcher.ledge.state === LedgeState.tether) reeled = true;
+    if (d.butcher.ledge.state === LedgeState.hang) hung = true;
+    lowest = Math.min(lowest, d.butcher.motion.z);
+  }
+  return { reeled, hung, side: d.butcher.ledge.side, helpless: d.butcher.special.fall, z: lowest, rethrown: rethrow !== undefined };
+}
+
+test("The air Meat Hook tethers to a ledge beside him or below him and reels him into ledge hang, from either side [k3 measure docs/design/butcher.md]", () => {
+  for (const side of [1, -1]) {
+    for (const [z, aim] of [[0.0, "none"], [120.0, "aimDown"]] as const) {
+      const tether = airHook({ side, outside: 200.0, z }, aim);
+      assertTrue(tether.reeled);
+      assertTrue(tether.hung);
+      assertEquals(tether.side, side);
+      assertTrue(!tether.helpless);
+    }
+  }
+});
+
+test("An air Meat Hook tap whose flight ends short of the ledge leaves him falling [k3 measure docs/design/butcher.md]", () => {
+  const tether = airHook({ side: 1, outside: 600.0, z: 0.0 }, "none");
+  assertTrue(!tether.reeled);
+  assertTrue(!tether.hung);
+  assertLessThan(tether.z, -500.0);
+});
+
+test("Only the first air Meat Hook of an airborne stretch can tether: a second throw at the ledge leaves him falling [k3 measure docs/design/butcher.md]", () => {
+  const tether = airHook({ side: 1, outside: 200.0, z: 1000.0 }, "aimUp", 20.0);
+  assertTrue(tether.rethrown);
+  assertTrue(!tether.reeled);
+  assertTrue(!tether.hung);
+  assertLessThan(tether.z, -500.0);
 });

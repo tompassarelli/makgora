@@ -28,7 +28,7 @@ const hookThrow = (air: boolean, stage: number): AuthoredSpecial => {
   return {
     name: "Meat Hook Throw", endFrame: HOOK_THROW_FRAME + life + HOOK_WHIFF_RECOVERY, landingLag: air ? AIR_LANDING_LAG : undefined,
     aimFrames: CHARGED_AIM_FRAMES, spendsCharge: true, hurt: butcherReachBody(HOOK_THROW_FRAME - 4, HOOK_THROW_FRAME + life, 120.0, 90.0),
-    projectiles: [{ ...hookHead(!air, life), upVelocityX: HOOK_AIM_ALONG, upVelocityZ: HOOK_AIM_RISE, downVelocity: { velocityX: HOOK_AIM_ALONG, velocityZ: f32(-HOOK_AIM_RISE) } }],
+    projectiles: [{ ...hookHead(!air, life), latchesLedge: air ? true : undefined, upVelocityX: HOOK_AIM_ALONG, upVelocityZ: HOOK_AIM_RISE, downVelocity: { velocityX: HOOK_AIM_ALONG, velocityZ: f32(-HOOK_AIM_RISE) } }],
   };
 };
 const hookFollowUps = (air: boolean): readonly SpecialFollowUp[] => [
@@ -62,7 +62,7 @@ export const ROT: ToggleAura = { frame: 5, radius: 90.0, every: 10, damage: 1.0,
 const rot: AuthoredSpecial = { endFrame: 10, toggleAura: ROT };
 
 export const BUTCHER_SPECIALS: FighterSpecials = {
-  neutral: { name: "Meat Hook", description: "Hold to wind the hook up and release to throw: a tap flings it a short way, a full hold about twice as far, and for a moment after the release the stick angles the throw up or down. It catches the first foe it reaches and reels them into his hands. A shield stops it, and a miss leaves him wide open. Shield keeps the charge for the next press.",
+  neutral: { name: "Meat Hook", description: "Hold to wind the hook up and release to throw: a tap flings it a short way, a full hold about twice as far, and for a moment after the release the stick angles the throw up or down. It catches the first foe it reaches and reels them into his hands. A shield stops it, and a miss leaves him wide open. Shield keeps the charge for the next press. Thrown in the air, the first hook of each jump that reaches the ledge ahead reels him onto it.",
     ground: meatHook(false), air: meatHook(true) },
   side: { name: "Butcher's Charge", description: "A belly-first rush that shrugs off light hits and bowls the foe over. Shield it or hit him hard.",
     ground: butchersCharge(false), air: butchersCharge(true) },

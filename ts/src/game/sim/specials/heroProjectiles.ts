@@ -14,6 +14,7 @@ import type { ProjectileVelocity } from "./volleys";
 import { clearBounce } from "../projectileBounce";
 import { decorates, neverStrikes, ownedCount } from "./ownedProjectiles";
 import { runningHeroSpecial, projectileAnchor } from "./runningMove";
+import { armLedgeTether } from "./ledgeTether";
 
 export const HERO_PROJECTILE_CAP = 3;
 
@@ -115,6 +116,7 @@ export function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjec
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;
   const surface = riddenDeck(spec, drawn, stage, matchFrame, x, z);
+  armLedgeTether(owner, spec);
   if (spec.fan === undefined) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, surface, aimedDown(owner, spec));
   else for (const velocity of spec.fan) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, false, serial, surface, velocity);
 }

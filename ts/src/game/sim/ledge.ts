@@ -16,6 +16,7 @@ import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformInp
 import { melee } from "./tuning";
 import { heroBody } from "./heroes/heroBodies";
 import { runningHeroSpecial } from "./specials/runningMove";
+import { LEDGE_TETHER_BITS } from "./ledgeTetherAirtime";
 
 export const LEDGE_CLIMB_FRAMES = 25;
 export const LEDGE_ROLL_FRAMES = 36;
@@ -220,6 +221,7 @@ function catchLedge(f: Fighter, stage: number, side: number): void {
   f.dodge.airFrame = 0;
   f.dodge.airMotionFrames = 0;
   f.dodge.airUsed = false;
+  f.special.airtimeUses &= ~LEDGE_TETHER_BITS;
   refreshOriginalAirtime(f);
   f.jump.remaining = aerialJumps(f);
   clearPlatformInput(f);

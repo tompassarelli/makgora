@@ -5,7 +5,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { isIntangible } from "../conditions";
 import { type Fighter } from "../fighter";
 import type { StrikeCapsule } from "../heroMoves";
-import { type SpecialBeam } from "./schema";
+import type { SpecialBeam } from "./specialBeam";
 import { type HitRegion, NO_HIT_REGION } from "../hitRegions";
 import { type Roster, fighterAt, isActive } from "../roster";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "../shield";

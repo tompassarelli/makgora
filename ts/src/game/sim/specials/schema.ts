@@ -6,6 +6,7 @@ import type { AppliedStatus } from "../appliedStatus";
 import type { HurtPose } from "../hurtboxes";
 import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volleys";
 import type { CastWindows, FrameWindow, SpecialChannel } from "./castWindows";
+import type { SpecialBeam } from "./specialBeam";
 export type { FrameWindow } from "./castWindows";
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
@@ -169,15 +170,9 @@ export interface SpecialProjectile {
   readonly bounce?: ProjectileBounce | undefined;
   /** A body it reaches, unshielded and unreflected, is caught and reeled in over `reelFrames` into its owner's grab hold. */
   readonly latch?: { readonly reelFrames: number } | undefined;
+  /** The first of these thrown in an airtime, reaching a free main-deck ledge it flies toward, reels its airborne, unhelpless owner there into ledge hang. */
+  readonly latchesLedge?: true | undefined;
   readonly pierces?: true | undefined;
-}
-
-export interface SpecialBeam {
-  readonly originX: number;
-  readonly originZ: number;
-  readonly range: number;
-  readonly track: number;
-  readonly chain?: true | undefined;
 }
 
 interface ArmorWindow extends FrameWindow { readonly shell?: boolean | undefined; readonly chillsStriker?: boolean | undefined; readonly perStack?: number | undefined }

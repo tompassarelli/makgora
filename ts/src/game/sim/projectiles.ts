@@ -22,6 +22,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { EYE_BEAM_BAND_ABOVE, EYE_BEAM_BAND_BELOW, EYE_BEAM_BAND_DROP, EYE_BEAM_BAND_HALF, EYE_BEAM_DAMAGE, EYE_BEAM_SET_KNOCKBACK } from "./eyeBeam";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { latchesOn } from "./hookLatch";
+import { hookLatchesLedge } from "./specials/ledgeTether";
 import { SHIELD_PROJECTILE_DAMAGE_MULTIPLIER, SHIELD_PROJECTILE_SPEED_MULTIPLIER, grantParry, shieldCircleIntersects } from "./shield";
 import { at } from "wisp/src/runtime/lookup";
 import { solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceLine, surfacePass, surfaceRight, surfaceZ } from "./stage";
@@ -471,6 +472,10 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       const fromX = projectile.x;
       const fromZ = projectile.z;
       const nearest = projectile.kind === ProjectileKind.hero ? flyHeroProjectile(world, ownerSlot, projectile, selected) : flyProjectile(world, ownerSlot, projectile, selected);
+      if (nearest === undefined && stage !== undefined && hookLatchesLedge(world, ownerSlot, projectile, fromX, fromZ, stage)) {
+        projectile.life = 0;
+        continue;
+      }
       if (nearest === undefined && stage !== undefined && (projectile.kind === ProjectileKind.hero)
         && projectileMeetsStage(stage, matchFrame, fromX, fromZ, projectile.x, projectile.z)) {
         projectile.life = 0;

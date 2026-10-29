@@ -19,6 +19,9 @@ const downVelocityCanonical = (spec: Readonly<SpecialProjectile>, prefix: string
   canonicalRealField(`${prefix}.downVelocityZ`, spec.downVelocity?.velocityZ ?? 0.0),
 ];
 
+const ledgeLatchCanonical = (spec: Readonly<SpecialProjectile>, prefix: string): readonly string[] =>
+  spec.latchesLedge === true ? [canonicalInt(`${prefix}.latchesLedge`, 1)] : [];
+
 export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, prefix: string): string {
   const result: string[] = [];
   const int = (name: string, value: number) => { result.push(canonicalInt(`${prefix}.${name}`, value)); };
@@ -54,6 +57,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
     }
   }
   int("needsLineOfSight", bit(spec.needsLineOfSight));
+  result.push(...ledgeLatchCanonical(spec, prefix));
   if (spec.returns !== undefined) {
     int("returns.age", spec.returns.age);
     real("returns.speed", spec.returns.speed);

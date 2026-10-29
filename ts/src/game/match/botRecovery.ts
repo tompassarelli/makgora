@@ -21,6 +21,7 @@ import { mainDeckLeft, mainDeckRight, mainDeckZ, surfaceCount, surfaceLeft, surf
 import { botChance, botChoice } from "./botRandom";
 import { type CpuSkill, FULL_SKILL } from "./cpuSkill";
 import { aimsLedge, gameplanOf, upSpecialFirst } from "./botGameplan";
+import { aimLedgeHook, throwsLedgeHook } from "./botLedgeHook";
 
 
 const TECH_LEAD_FRAMES = 6;
@@ -319,6 +320,7 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
   else if (z < floor && outside < LEDGE_LINE_NEAR) input.direction = side;
   else input.direction = x < (side < 0 ? f32(left + 60) : f32(right - 60)) ? 1 : -1;
   aimUpSpecial(fighter, stage, side, input);
+  aimLedgeHook(fighter, stage, side, input);
 
 
   if (isTumbling(fighter) && fighter.launch.hitstun <= 0 && input.direction !== 0 && fighter.motion.previousStickSide === input.direction
@@ -342,6 +344,7 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
     return true;
   }
 
+  if (throwsLedgeHook(fighter, stage, side, input)) return true;
   const coin = botChoice(fighter.visuals.hit + toInt(fighter.status.damage), fighter.character * 13 + 5, 2) === 0;
   const gameplan = gameplanOf(fighter.character, skill.basicMoves);
   const specialFirst = outside <= SPECIAL_FIRST_REACH && z >= floor && upSpecialStartable(fighter, specialCooldownReady(fighter, upSpecial(fighter.character)))
