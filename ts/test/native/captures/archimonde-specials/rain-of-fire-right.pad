@@ -1,0 +1,19 @@
+# Rain of Fire facing right with hit areas: a burning ring shows on the floor at each pillar's x from match frame 259, and a flame column the width and height of the pillar's hit capsule lands on 282 (near) and 294 (far).
+#! cue 282-298 column: effect=FlameStrike
+#! chat -dev quick hero archimonde hit-areas
+250 a stick 1 0
+260 a tap X 2
+261 a capture
+262 a stick 0 0
+268 a capture
+275 a capture
+280 a capture
+281 a capture
+282 a capture
+284 a capture
+288 a capture
+292 a capture
+293 a capture
+294 a capture
+296 a capture
+298 a capture

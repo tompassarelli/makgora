@@ -1,0 +1,15 @@
+# Finger of Death facing right with hit areas: a ring on the foe builds from match frame 259, and a lightning column the width and height of the strike capsule lands on 290.
+#! cue 290-298 column: effect=MonsoonBoltTarget
+#! chat -dev quick hero archimonde hit-areas
+250 a stick 1 0
+254 a stick 0 0
+260 a tap X 2
+261 a capture
+268 a capture
+278 a capture
+286 a capture
+289 a capture
+290 a capture
+291 a capture
+294 a capture
+298 a capture
