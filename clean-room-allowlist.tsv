@@ -4,5 +4,7 @@ tools/selection/art/OpponentSettings.fdf	generated	bun scripts/wisp/uiFrames.ts 
 tools/selection/art/OpponentSettings.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/SmashcraftHUD.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/SmashcraftHUD.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/wc3-pinching-hand.png	original	Tom authored with AI and approved public shipping; source sha256 6910e57598e22ddd89343577b5902587b47b76dc678c8235cdf69b1beffab0cd (#346 item H).
+tools/selection/art/wc3-hand-point.png	original	Tom authored with AI and approved public shipping (2026-10-30); keyed from his smashcraft-hand-default.jpeg by tools/selection/key-hand-states.ts.
+tools/selection/art/wc3-hand-fan.png	original	Tom authored with AI and approved public shipping (2026-10-30); keyed from his smashcraft-hand-over-character-not-pinching.jpeg by tools/selection/key-hand-states.ts.
+tools/selection/art/wc3-hand-pinch.png	original	Tom authored with AI and approved public shipping (2026-10-30); keyed from his smashcraft-hand-pinching.jpeg by tools/selection/key-hand-states.ts.
 docs/assets/smashcraft-banner.jpg	original	Tom's own Smashcraft logo for the README, supplied by Tom 2026-10-29 (smashcraft-logo-v2)

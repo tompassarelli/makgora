@@ -29,10 +29,12 @@ import {
   type Roster,
   type RosterChip,
   type RosterTile,
-  HAND_WIDTH,
-  HAND_HEIGHT,
+  HAND_SIZE,
+  HAND_STATES,
+  type HandState,
   handLeft,
   handTop,
+  menuCursor,
   clearSelectionDrag,
   decodeCpuPlacement,
   placeHovered,
@@ -143,7 +145,7 @@ export class SelectionPanel {
   private readonly clicks: ButtonClicks<SelectionButton>;
   private readonly syncTriggers: readonly trigger[];
   private readonly drag = selectionDrag();
-  private readonly hand: framehandle;
+  private readonly hands: Readonly<Record<HandState, framehandle>>;
   private cursorEnabled: boolean | undefined;
   private menuCursorAllowed = true;
 
@@ -222,9 +224,13 @@ export class SelectionPanel {
       this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
     this.cards = PARTICIPANT_SLOTS.map(slot => createCard(root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
-    this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
-    BlzFrameSetLevel(this.hand, SELECT_LEVELS.hand);
-    BlzFrameSetVisible(this.hand, false);
+    const hand = (state: HandState, texture: string) => {
+      const frame = art(gameUi(), `MeleeHand${texture}${suffix}`, `war3mapImported\\SelectionHand${texture}.tga`, 0.0, 0.0, HAND_SIZE, HAND_SIZE);
+      BlzFrameSetLevel(frame, SELECT_LEVELS.hand);
+      BlzFrameSetVisible(frame, false);
+      return frame;
+    };
+    this.hands = { point: hand("point", "Point"), fan: hand("fan", "Fan"), pinch: hand("pinch", "Pinch") };
     const headerButton = (box: typeof START_BUTTON, text: string, target: SelectionButton) => {
       const frame = panelButton(root, box.x, box.y, box.width, box.height, "");
       setFrameText(frame, text);
@@ -311,7 +317,7 @@ export class SelectionPanel {
   }
 
   destroy(): void {
-    if (this.ownsLocalClient()) this.showHand(false, 0.0, 0.0);
+    if (this.ownsLocalClient()) this.showHand(false, false, 0.0, 0.0);
     this.clicks.destroy();
     for (const trigger of this.syncTriggers) DestroyTrigger(trigger);
     for (const frame of this.movesFrames) BlzDestroyFrame(frame);
@@ -319,7 +325,7 @@ export class SelectionPanel {
     BlzDestroyFrame(this.tutorial.root);
     this.credits.destroy();
     this.community.destroy();
-    BlzDestroyFrame(this.hand);
+    for (const state of HAND_STATES) BlzDestroyFrame(this.hands[state]);
     if (this.cpu.root !== undefined) BlzDestroyFrame(this.cpu.root);
     BlzDestroyFrame(this.root);
     BlzDestroyFrame(this.backdrop);
@@ -506,13 +512,13 @@ export class SelectionPanel {
     if (this.choosing() !== undefined && chip !== undefined) this.actions.recallChoice(this.participantId, chip);
   }
 
-  private showHand(shown: boolean, x: number, y: number): void {
-    BlzFrameSetVisible(this.hand, shown);
-    if (shown) placeTopLeft(this.hand, handLeft(x, true), handTop(y, true));
-    const enabled = !shown && this.menuCursorAllowed;
+  private showHand(drawn: boolean, holding: boolean, x: number, y: number): void {
+    const { hand, stock } = menuCursor(this.menuCursorAllowed, drawn, holding, this.drag.hover);
+    for (const state of HAND_STATES) BlzFrameSetVisible(this.hands[state], state === hand);
+    if (hand !== undefined) placeTopLeft(this.hands[hand], handLeft(x, hand), handTop(y, hand));
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
-    if (!enabled || this.cursorEnabled !== true) BlzEnableCursor(enabled);
-    this.cursorEnabled = enabled;
+    if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
+    this.cursorEnabled = stock;
   }
 
   private ownsLocalClient(): boolean {
@@ -573,25 +579,22 @@ export class SelectionPanel {
     const cpuOpen = visible && this.cpuSlot !== undefined;
 
     this.showOverlays(game, loading, visible, cpuOpen);
-    if (this.showDialog(game, visible, cpuOpen)) return;
-    this.showTiles(game);
-    if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
-    let x = 0.0;
-    let y = 0.0;
     const width = I2R(BlzGetLocalClientWidth());
     const height = I2R(BlzGetLocalClientHeight());
-    if (width > 0 && height > 0) {
-      x = pointerX(I2R(BlzGetMouseScreenPosX()), width, height);
-      y = pointerY(I2R(BlzGetMouseScreenPosY()), height);
-      this.dragChips(game, x, y);
-    }
+    const pointed = width > 0 && height > 0;
+    const x = pointed ? pointerX(I2R(BlzGetMouseScreenPosX()), width, height) : 0.0;
+    const y = pointed ? pointerY(I2R(BlzGetMouseScreenPosY()), height) : 0.0;
+    if (this.showDialog(game, visible, cpuOpen, pointed, x, y)) return;
+    this.showTiles(game);
+    if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
+    if (pointed) this.dragChips(game, x, y);
     const pinching = this.showCards(game, sessionWins, x, y);
-    this.showHand(pinching && width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y);
+    this.showHand(pointed && !settingsOpen && !this.tutorialOpen, pinching, x, y);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);
     this.clicks.refreshHover();
-    this.highlight(this.hovered ?? (width > 0 && height > 0 ? this.pointedDialog(game, x, y) : undefined), false);
+    this.highlight(this.hovered ?? (pointed ? this.pointedDialog(game, x, y) : undefined), false);
   }
 
   private showOverlays(game: Readonly<MatchState>, loading: boolean, visible: boolean, cpuOpen: boolean): void {
@@ -614,22 +617,22 @@ export class SelectionPanel {
     if (!visible || cpuOpen || this.movesOpen) this.hideHelp();
   }
 
-  private showDialog(game: Readonly<MatchState>, visible: boolean, cpuOpen: boolean): boolean {
+  private showDialog(game: Readonly<MatchState>, visible: boolean, cpuOpen: boolean, pointed: boolean, x: number, y: number): boolean {
     const { drag } = this;
     if (!visible) {
-      this.showHand(false, 0.0, 0.0);
       clearSelectionDrag(drag);
+      this.showHand(game.phase === Phase.stageMenu && pointed && !this.settingsOpen, false, x, y);
       return true;
     }
     if (cpuOpen && this.cpuSlot !== undefined) {
-      this.showHand(false, 0.0, 0.0);
+      this.showHand(false, false, 0.0, 0.0);
       BlzFrameSetVisible(this.root, false);
       clearSelectionDrag(drag);
       showCpuSettings(this.cpu, game, this.participantId, this.cpuSlot, this.cpuFocus, this.menuPrompt.text, CPU_DEFAULTS);
       return true;
     }
     if (this.movesOpen) {
-      this.showHand(false, 0.0, 0.0);
+      this.showHand(false, false, 0.0, 0.0);
       BlzFrameSetVisible(this.root, false);
       clearSelectionDrag(drag);
       this.showMoves();

@@ -166,22 +166,26 @@ UI scale. The authored chip's 237-pixel rim spans a 256-pixel canvas, so its
 visible diameter is 60.18% of a tile, within #346's 55–70% reference band.
 The pointer target follows that frame size; the P1/P2 labels keep their art.
 
-On the fighter select screen the stock Warcraft cursor (the Human gauntlet; the
-build forces every player slot to Human) stays visible. While a chip is carried
-the cursor is hidden (`BlzEnableCursor`) and the local client draws a pinching
-steel gauntlet, with the chip's top rim between thumb and fingertip. The hidden
-state is asserted every update; the shown state is sent once when it returns.
-`SelectionHandPoint` is painted but never displayed. `SelectionHandPinch`
-uses Tom's publicly approved AI-created
-smashcraft:tools/selection/art/wc3-pinching-hand.png through the same builder.
-The authored source's pinch point is (256, 288). The Classic 32x32 texture has the stock normal cursor's alpha footprint,
-29x27 at (2,4). It uses the stock
-HumanCursor model's 0.025x0.0239 UI quad over its 30.19-pixel UV region;
-UI pixels scale with client height divided by 0.6. The corresponding visible
-bounds at 1080p are 43.23x38.48 pixels; other poses are unchanged.
-The phase owner permits the stock
-cursor in stage selection, pause, title and settings menus or when a panel
-opens over the roster. Both cursors stay hidden during gameplay and results.
+The fighter select and stage menus replace the stock Warcraft cursor (the Human
+gauntlet) with Tom's steel gauntlet in three states: the default pointing hand
+(`SelectionHandPoint`) wherever the hand is neither over a fighter tile nor
+holding a chip, the open fanned hand (`SelectionHandFan`) over a fighter tile
+with no chip, and the pinch (`SelectionHandPinch`) while a chip is carried,
+with the chip's top rim between thumb and fingertip. The stock cursor is hidden
+(`BlzEnableCursor`) whenever a gauntlet is drawn, never both; the hidden state
+is asserted every update and the shown state is sent once when it returns.
+Matches, pause, title, results, settings, the tutorial and the CPU and moves
+panels keep the stock cursor or none.
+
+Each state is the same 64x64 texture with the cuff and palm in the same place,
+so a state change never jumps; the gauntlet is 50x62 texels at (1, 1), drawn
+square at the on-screen height of the old pinching hand (27 of its 32 rows of the stock
+HumanCursor model's 0.0239 UI quad, 38.48 pixels at 1080p; UI pixels scale with
+client height divided by 0.6). The hotspot sits exactly on the mouse position:
+texel (38.5, 1.5) for the pointing index fingertip, (42.5, 6.5) for the fanned
+hand's middle fingertip and (25.5, 9.5) for the gap between thumb and index
+tips. The hand frames hang from the game UI at frame level 200, above every
+selection panel. Scaling is nearest-neighbour only.
 The selection asset build is described in smashcraft:docs/build-inputs.md.
 Warcraft has no
 per-render Lua callback (smashcraft:docs/high-refresh.md), so hand and chip move

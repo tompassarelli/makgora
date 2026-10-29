@@ -5,6 +5,7 @@
 import { mkdirSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { PLAYER_COLORS } from '../../ts/src/game/ui/slotColors';
+import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_MARGIN, HAND_TEXELS } from '../../ts/src/game/core/handArt';
 import { PARTICIPANT_CAPACITY } from '../../ts/src/game/input/participants';
 import { RANDOM_ICON_PX, TILE_BACKGROUND } from '../../ts/scripts/tileArt';
 import { Effect } from '../../ts/node_modules/effect/dist/index.js';
@@ -51,15 +52,8 @@ BunRuntime.runMain(Effect.gen(function*() {
     yield* render(`MarkerArrow${slot}`, 'MarkerArrow.svg', { ARROW_COLOR: hex(color.rgb) }, false);
     yield* run(['magick', join(output, `HudPlate${slot}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `HudPlateMirror${slot}.tga`)}`]);
   }
-  const HAND_POSES = {
-    Point: { THUMB: 'M42 66 L34 50 L36 40', INDEX: 'M62 40 L32 22 L13 11', SEAMS: 'M28 25 L36 17 M42 34 L50 25', SHINE: 'M30 18 L15 9' },
-    Pinch: { THUMB: 'M40 66 L30 44 L25 30', INDEX: 'M62 40 L44 20 L28 12', SEAMS: 'M27 47 L36 43 M41 25 L49 17', SHINE: 'M29 40 L25 31 M41 17 L30 12' },
-  };
-  for (const [pose, fingers] of Object.entries(HAND_POSES)) {
-    if (pose === 'Pinch') {
-      yield* run(['magick', join(source, 'wc3-pinching-hand.png'), '-filter', 'point', '-resize', '29x27!', '-background', 'none', '-gravity', 'northwest', '-splice', '2x4', '-extent', '32x32', '-depth', '8', `TGA:${join(output, 'SelectionHandPinch.tga')}`]);
-    }
-    else yield* render(`SelectionHand${pose}`, 'SelectionHand.svg', fingers, false);
+  for (const [pose, art] of [['Point', 'point'], ['Fan', 'fan'], ['Pinch', 'pinch']] as const) {
+    yield* run(['magick', join(source, `wc3-hand-${art}.png`), '-filter', 'point', '-resize', `${HAND_ART_COLUMNS}x${HAND_ART_ROWS}!`, '-background', 'none', '-gravity', 'northwest', '-splice', `${HAND_MARGIN}x${HAND_MARGIN}`, '-extent', `${HAND_TEXELS}x${HAND_TEXELS}`, '-depth', '8', `TGA:${join(output, `SelectionHand${pose}.tga`)}`]);
   }
   yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);
   for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionThreeBridges']) {

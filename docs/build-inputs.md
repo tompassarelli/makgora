@@ -147,10 +147,14 @@ runners omit this check because they have no private store.
 Never edit a stored folder; a build reports an edit in place with the command
 that regenerates the family.
 
-The public authored `tools/selection/art/wc3-pinching-hand.png` is Tom's
-AI-created pinch pose, approved for public shipping. The normal
-`bun tools/selection/build-art.ts` converts it to `SelectionHandPinch.tga`;
-the other poses keep their existing SVG sources. Store the generated
+The public authored `tools/selection/art/wc3-hand-point.png`, `wc3-hand-fan.png`
+and `wc3-hand-pinch.png` are Tom's authored, AI-assisted gauntlet cursor art,
+approved for public shipping (2026-10-30). They come from his three JPEGs on a
+flat dark background; `bun tools/selection/key-hand-states.ts <folder of the
+JPEGs>` keys the background to transparency (outline kept), aligns the cuffs and
+writes the three PNGs on one canvas. The normal `bun tools/selection/build-art.ts`
+point-scales them into `SelectionHandPoint.tga`, `SelectionHandFan.tga` and
+`SelectionHandPinch.tga`, each a 64x64 canvas. Store the generated
 `selection-assets` family and commit its hash with the source change.
 
 ## Other shared paths

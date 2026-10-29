@@ -4,6 +4,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
+import { HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
 import { PARTICIPANT_CAPACITY, participantActive } from "../input/participants";
 import { type RosterGrid, type RosterTile, cellRect, nearestTile, tileAt } from "./selectionGrid";
 
@@ -153,17 +154,34 @@ export function placeHovered({ held, hover }: Readonly<SelectionDrag>): Placemen
 }
 
 
-export const HAND_WIDTH = f32(f32(0.025) * 32 / (f32(0.117924) * 256));
-export const HAND_HEIGHT = f32(f32(0.0239) * 32 / (f32(0.23585) * 128));
+export const HAND_STATES = ["point", "fan", "pinch"] as const;
 
-// SelectionHandPinch is one 32x32 texture; its pinch point is the middle of the gap between thumb and index tips.
-const PINCH_POINT_X = 4.25;
-const PINCH_POINT_Y = 8.75;
+export type HandState = (typeof HAND_STATES)[number];
 
-// SelectionHandPoint is one 128x128 texture; its index fingertip is (4, 6).
-export const handLeft = (x: number, pinching: boolean): number => x - f32(!pinching ? 4 / 128 : PINCH_POINT_X / 32) * HAND_WIDTH;
+// SelectionHand textures are drawn square at the on-screen size of the old 27-row pinching hand.
+export const HAND_SIZE = f32(f32(0.0239) * 27 * HAND_TEXELS / (f32(0.23585) * 128 * HAND_ART_ROWS));
 
-export const handTop = (y: number, pinching: boolean): number => y + f32(!pinching ? 6 / 128 : PINCH_POINT_Y / 32) * HAND_HEIGHT;
+// The texel that sits exactly on the mouse: the index fingertip, the middle fingertip, and the middle of the gap between thumb and index tips.
+const HAND_HOTSPOT: Readonly<Record<HandState, { readonly x: number; readonly y: number }>> = {
+  point: { x: 38.5, y: 1.5 },
+  fan: { x: 42.5, y: 6.5 },
+  pinch: { x: 25.5, y: 9.5 },
+};
+
+export const handLeft = (x: number, state: HandState): number => x - f32(HAND_HOTSPOT[state].x / HAND_TEXELS) * HAND_SIZE;
+
+export const handTop = (y: number, state: HandState): number => y + f32(HAND_HOTSPOT[state].y / HAND_TEXELS) * HAND_SIZE;
+
+export interface MenuCursor {
+  readonly hand: HandState | undefined;
+  readonly stock: boolean;
+}
+
+// The gauntlet replaces the stock cursor wherever a menu shows a cursor; the stock one only returns where the gauntlet is not drawn.
+export const menuCursor = (cursorAllowed: boolean, handDrawn: boolean, holdingChip: boolean, hover: RosterTile | undefined): MenuCursor => ({
+  hand: !handDrawn ? undefined : holdingChip ? "pinch" : hover === undefined ? "point" : "fan",
+  stock: cursorAllowed && !handDrawn,
+});
 
 export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);
 
