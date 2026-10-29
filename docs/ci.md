@@ -71,11 +71,13 @@ What reaches each check:
   lua-tests.ts reaches them too. Computer coverage runs for its own import
   closure, which holds most of the game.
 - The two four-fighter frame budgets (perf, and rollback under lag spikes)
-  run for the Lua build's paths and the wisp CLI's imports, one after the
-  other since they share the playable build. Rollback is one single-threaded
-  32-bit Lua run of about 110 s for its four clients in one process, the
-  slowest check a gameplay lane reaches. A check marked `afterLanding` runs on
-  main's CI instead unless a shared root reaches it.
+  run on main's CI after landing unless a shared root reaches them
+  (decided 2026-10-29): rollback is one single-threaded 32-bit Lua run of about
+  110 s for its four clients in one process, so neither fits a 90 s landing.
+  Both are frame costs computed from instruction counts, so a regression shows
+  the same on any machine, and each also checks that the four clients never
+  desync; main's smoke job runs both on every landed commit, and a failure
+  goes to the sheriff and the "main is red" issue.
 - The native corpus replays each recording on the source that recorded it
   (wisp#69), so only a recording, the replay command or the replay header
   parse in `ts/src/game/replay/` reaches it.

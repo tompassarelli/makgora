@@ -80,12 +80,12 @@ export const CHECKS: readonly LandingCheck[] = [
   {
     name: "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic",
     command: ["sh", "-c", "bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf"],
-    reaches: [shared, luaBuild, wispCli], farm: ["perf"], here: "beside", outputs: "playable",
+    reaches: [shared, luaBuild, wispCli], farm: ["perf"], here: "beside", afterLanding: true, outputs: "playable",
   },
   {
     name: "four-fighter 7-frame rollback p99 <= 10 ms and worst <= 14 ms",
     command: ["sh", "-c", "bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf"],
-    reaches: [shared, luaBuild, wispCli], farm: ["rollback"], here: "beside", outputs: "playable",
+    reaches: [shared, luaBuild, wispCli], farm: ["rollback"], here: "beside", afterLanding: true, outputs: "playable",
   },
   // Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
   {
