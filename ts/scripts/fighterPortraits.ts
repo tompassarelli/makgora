@@ -24,7 +24,7 @@ import { originalClip, originalClipCount } from '../src/generated/clips/fighterO
 import { at } from 'wisp/src/runtime/lookup';
 import { STAGE_LIGHTS } from '../src/game/assets/stageLighting';
 import { bustPixels, combine, exposureFor, lightOf } from './portraitLight';
-import { RECEIPTS, resolvedParts, type PortraitReceipt } from './portraitParts';
+import { RECEIPTS, resolvedParts, sourceModelHash, type PortraitReceipt } from './portraitParts';
 
 const [outputArg] = process.argv.slice(2);
 const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1]?.split(',') : undefined;
@@ -254,6 +254,7 @@ const CORRECTIONS: Readonly<Record<string, Correction>> = {
   Lich: { lift: 1.3, zoom: 1.2 },
   Murloc: { zoom: 1.2, shift: [0.14, 0], clock: 1.5 },
   PitLord: { lift: 1.3 },
+  Tyrande: { turn: -15 },
   MalfurionStormrage: { lift: 1.3 },
 };
 const correctionOf = (character: number): Correction => CORRECTIONS[fighterRenderName(characterOf(character))] ?? {};
@@ -585,7 +586,7 @@ await Effect.runPromise(Effect.gen(function*() {
         if (missing.length > 0) console.log(`${graphics} ${name}: Classic body lacks portrait parts ${missing.join(', ')}`);
         const half = DRAWN / RESOLUTION;
         const receipt: PortraitReceipt = {
-          path: fighterPortrait(characterOf(character), 'Bust', variant - 1, costumeOf(character)),
+          path: fighterPortrait(characterOf(character), 'Bust', variant - 1, costumeOf(character)), source: sourceModelHash(stored, characterOf(character)),
           scene: { camera: scene.camera, effects: scene.effects, ...(scene.world === undefined ? {} : { world: scene.world }) }, width: DRAWN, height: DRAWN,
           crop: { x: cut.bust.left * half, y: cut.bust.top * half, width: cut.bust.size * half, height: cut.bust.size * half },
           texture: { width: TILE_TEXTURE_PX, height: TILE_TEXTURE_PX }, parts,

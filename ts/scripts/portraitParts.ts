@@ -1,7 +1,11 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Portrait } from 'wisp/scripts/wisp/screenBounds';
-import { RENDERED_FIGHTERS } from '../src/game/roster/kits';
+import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
+import { RENDERED_FIGHTERS, fighterRenderName } from '../src/game/roster/kits';
+import { portraitCostumes, portraitOutfit } from '../src/game/roster/looks';
+import { fighters } from './heroModelSource';
 import { originalClip } from '../src/generated/clips/fighterOriginalClipInfo';
 
 /** Classic node names per fighter for Wisp's in-frame verdict: the head (crown margin), its face, the weapon and the hand gripping it. */
@@ -50,8 +54,8 @@ export function resolvedParts(name: string, nodes: ReadonlySet<string>): { reado
   return { parts, missing: Object.values(declared).flat().filter((node) => !nodes.has(node)) };
 }
 
-/** A Bust texture's Classic receipt, as fighterPortraits writes it to fighter-renders/receipts/. */
-export interface PortraitReceipt extends Portrait { readonly path: string }
+/** A Bust texture's Classic receipt, as fighterPortraits writes it to fighter-renders/receipts/; `source` is the SHA-256 of the fighter's source model the portrait was rendered from. */
+export interface PortraitReceipt extends Portrait { readonly path: string; readonly source: string }
 
 export const RECEIPTS = 'receipts';
 
@@ -77,7 +81,30 @@ export function storedPortraits(renders: string): Readonly<Record<string, Portra
   if (!existsSync(directory)) return {};
   const bodies = currentBodies();
   return Object.fromEntries(readdirSync(directory).filter((file) => file.endsWith('.json')).map((file) => {
-    const { path, ...portrait } = JSON.parse(readFileSync(join(directory, file), 'utf8')) as PortraitReceipt;
+    const { path, source: _source, ...portrait } = JSON.parse(readFileSync(join(directory, file), 'utf8')) as PortraitReceipt;
     return [path, withCurrentBodies(portrait, bodies)];
   }));
+}
+
+/** The SHA-256 of the fighter's source model in the assets view, the model input its portraits are rendered from. */
+export function sourceModelHash(assets: string, character: number): string {
+  const source = [...fighters].find(([id]) => id === character)?.[1].source;
+  if (source === undefined) throw new Error(`${fighterRenderName(character)}: no source model`);
+  return createHash('sha256').update(readFileSync(join(assets, source))).digest('hex');
+}
+
+/** Each stored portrait receipt, costume outfits included, that is missing or whose source-model hash differs from its fighter's current model. */
+export function stalePortraits(assets: string, renders: string): readonly string[] {
+  return RENDERED_FIGHTERS.flatMap((character) => {
+    const current = sourceModelHash(assets, character);
+    return [0, ...portraitCostumes(character)].flatMap((costume) => {
+      const name = fighterRenderName(character) + portraitOutfit(character, costume);
+      return PARTICIPANT_SLOTS.flatMap((slot) => {
+        const file = join(renders, RECEIPTS, `FighterBust${name}P${slot + 1}.json`);
+        if (!existsSync(file)) return [`${name} P${slot + 1}: no stored receipt`];
+        const { source } = JSON.parse(readFileSync(file, 'utf8')) as Partial<PortraitReceipt>;
+        return source === current ? [] : [`${name} P${slot + 1}: rendered from ${source ?? 'an unrecorded model'}, current model is ${current}`];
+      });
+    });
+  });
 }

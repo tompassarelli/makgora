@@ -44,7 +44,11 @@ names each fighter's Classic head, face, weapon and gripping-hand nodes, kept to
 the nodes its drawn body has. The headless renderer supplies them as
 `render.portraits`, so `bun wisp headless --bounds` gives each drawn bust an
 `inFrame` row (wisp#140). It points each receipt's timeline body at the one the
-map imports now, so rebuilding a body never orphans a stored receipt.
+map imports now, so rebuilding a body never orphans a stored receipt. Each
+receipt also records `source`, the SHA-256 of the fighter's source model in the
+assets view, and smashcraft:ts/test/portraitSources.test.ts fails when any
+fighter's receipts name a different hash than its current model, so a model swap
+fails until that fighter's portraits are rendered again (#712).
 Each body is posed at the frame of its Stand clip whose face
 joints (nose, else eyes, else the head attachment) stand highest above its
 head bone, so an idle that bows the head still shows the face, and turned

@@ -236,6 +236,39 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "Back retains Rook / Advanced and returns focused Opponent settings; Choose reopens it. Start closes into fighter selection without starting a match. After release, focused controls and ordinary chip dragging still work; Enter opens Warcraft chat. Check mouse Close and the settings hit target on both 16:9 and the available wider client.",
     },
     {
+      id: "712-tyrande-select", closes: "smashcraft#712 portraits", map: "fighter-select", session: "712-tyrande-portraits",
+      setup: [
+        { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
+        { chat: "-dev slots 1 14" }, { chat: "-dev fighter 1 Tyrande" }, { chat: "-dev fighter 2 Tyrande" }, { chat: "-dev fighter 3 Tyrande" }, { chat: "-dev fighter 4 Tyrande" },
+        { waitMs: 1500 },
+      ],
+      capture: [{ kind: "frames", name: "tyrande-select", client: "a" }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "The four picked cards show the Re-Classic dismounted model, a night elf with teal hair and an upright bow beside her face, eyes open, with red, blue, teal and purple clothing accents.",
+    },
+    {
+      id: "712-tyrande-grid", closes: "smashcraft#712 portraits", map: "fighter-select", session: "712-tyrande-grid",
+      setup: [
+        { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
+        { chat: "-dev slots 1 14" }, { chat: "-dev fighter 1 Illidan" }, { chat: "-dev fighter 2 Illidan" }, { chat: "-dev fighter 3 Illidan" }, { chat: "-dev fighter 4 Illidan" },
+        { waitMs: 1500 },
+      ],
+      capture: [{ kind: "frames", name: "tyrande-grid", client: "a" }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "With every chip on Illidan, Tyrande's tile in the roster grid shows the Re-Classic dismounted model: teal hair, an upright bow beside her face, eyes open, on the neutral tile background.",
+    },
+    {
+      id: "712-tyrande-hud", closes: "smashcraft#712 portraits", map: "fighter-select", session: "712-tyrande-hud",
+      setup: [
+        { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
+        { chat: "-dev slots 1 14" }, { chat: "-dev fighter 1 Tyrande" }, { chat: "-dev fighter 2 Tyrande" }, { chat: "-dev fighter 3 Tyrande" }, { chat: "-dev fighter 4 Tyrande" },
+        { waitMs: 1500 }, { chat: "-dev quick hero tyrande" }, { waitMs: 8000 },
+      ],
+      capture: [{ kind: "frames", name: "tyrande-hud", client: "a", count: 2, everyMs: 100 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Four Tyrandes in a match; each HUD panel's bust and stock icons show the Re-Classic dismounted model in the panel's slot colour (red, blue, teal, purple), not the old low-polygon model.",
+    },
+    {
       id: "161-neutral-grid-picked-outfits", closes: "smashcraft#161 box 4", map: "outfits",
       setup: [
         { chat: "-dev reset" }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Rifleman", client: "b" },
