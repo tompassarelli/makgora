@@ -31,18 +31,20 @@ is the kill throw, and his down throw sets a fixed knockback for tech chases.
 
 Specials:
 
-- **Finger of Death** (neutral). On frame 1 a violet line marks the foe's
-  position. On frame 32 a lightning column strikes it: 16% at 70°, growth
+- **Finger of Death** (neutral). On frame 1 a ring marks the foe's
+  position and heats toward the strike. On frame 32 a lightning column strikes it: 16% at 70°, growth
   102, active through frame 37. The whole action lasts 58 frames.- **Rain of Fire** (side). Two pillars, 170 and 310 units ahead, hit on
-  frames 24 and 36; each one's falling fire shows 14 frames before it hits. Each covers the full stage
+  frames 24 and 36; a burning ring marks each from frame 1 and becomes a flame column the size of its hit region on the hit frame. Each covers the full stage
   height at its x for 9%.- **Fel Ascent** (up). He rises 1.8 reference heights over frames 10–24 with
   little steering. A fel column below him hits for 7% over frames 10–20. Once
   per airtime, it ends helpless, with 28 landing frames. This is the roster's
-  shortest heavy recovery, by design.- **Bash** (down). A hammer-fist into the floor on frames 16–18. A grounded
-  foe within 90 units takes 12% and is stunned for 30 frames, with no launch.
-  The stun is the shared stun status that ends on damage, like the
-  Beastmaster hawk's, and leaves 240 frames of immunity. An airborne foe is
-  launched at 45°. In the air the fist spikes for 12%. 46 frames total.
+  shortest heavy recovery, by design.- **Bash** (down). Two hammer-fists into the floor, on frames 16–18 and
+  24–26. A grounded foe within 90 units takes 6% and is stunned for 30 frames
+  by the first, with no launch; the second takes 6% and launches them at 45°
+  out of the stun. The stun is the shared stun status that ends on damage,
+  like the Beastmaster hawk's, and leaves 240 frames of immunity, so a hold
+  never chains. An airborne foe is launched at 45°. In the air the first fist
+  spikes for 6% and the second launches for 6%. 12% in all, 46 frames total.
 - **Rain of Chaos** (ultimate). Circles mark the foe's position and 220 units
   either side. Then three infernals crash there in sequence, on frames 42, 50
   and 58, for 8%, 8% and 10%. Nothing stays afterwards.

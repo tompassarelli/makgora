@@ -179,6 +179,7 @@ const BANSHEE_FORM: MoveCues = {
 const DREADLORD_BITE_CUES: MoveCues = { spell: "Healing bite", startup: VAMPIRIC, active: cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0) };
 const VOODOO = cue("Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx", "hand", f32(0.7));
 const FEL = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.7));
+const FINGER_GLOW = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(1.3));
 const HOWL_INHALE: Cue = { ...FEL, scale: f32(0.25), scaleEnd: f32(1.2), scaleFrames: HOWL_FIRST - 1, color: [160, 20, 10], sound: "HowlOfTerror", anchorFrames: Array.from({ length: HOWL_FIRST }, () => ({ x: 38.0, z: 118.0 })) };
 const HOWL_ROAR: Cue = { ...cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "feet", f32(HOWL_REACH / f32(440.0))), color: [255, 60, 30] };
 const MURGUL = cue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx", "hand", f32(0.6));
@@ -297,7 +298,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Last Word", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", 0.75) },
   },
   [Character.archimonde]: {
-    neutral: { spell: "Finger of Death", startup: FEL, active: cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", "hand", f32(0.5)) },
+    neutral: { spell: "Finger of Death", startup: FINGER_GLOW, active: cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", "hand", f32(0.5)) },
     side: { spell: "Rain of Fire", startup: FEL, active: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5) },
     up: { spell: "Fel Ascent", startup: FEL, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "feet", 1.0) },
     down: { spell: "Bash", startup: FEL, active: cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "ahead", f32(0.5)) },
