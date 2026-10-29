@@ -174,6 +174,11 @@ with no chip, and the pinch (`SelectionHandPinch`) while a chip is carried,
 with the chip's top rim between thumb and fingertip. The stock cursor is hidden
 (`BlzEnableCursor`) whenever a gauntlet is drawn, never both; the hidden state
 is asserted every update and the shown state is sent once when it returns.
+Stage select draws no hand: its cursor is a soft bullseye, a thin glowing pale-blue
+ring with a faint crosshair inside (`SelectionBullseye`, our own SVG, after
+Melee's stage-select cursor, asked for 2026-10-30), centred on the mouse so its
+middle is the click point, on a canvas 0.75 of a roster tile tall
+(`BULLSEYE_TILE_HEIGHT`); the stock cursor is hidden with it as with a hand.
 Matches, pause, title, results, settings, the tutorial and the CPU and moves
 panels keep the stock cursor or none.
 

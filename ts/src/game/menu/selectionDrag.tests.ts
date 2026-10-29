@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
-import { carriedChipLeft, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor, readyChipSize } from "./selectionDrag";
+import { bullseyeLeft, bullseyeSize, bullseyeTop, carriedChipLeft, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor, readyChipSize } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
 
 test("The select cursor is the default hand off the tiles, the fanned hand over a tile with no chip, and the pinch with a chip, and the stock cursor shows only where no hand is drawn [k2 property]", () => {
@@ -10,13 +10,43 @@ test("The select cursor is the default hand off the tiles, the fanned hand over 
       for (const holding of [false, true]) {
         for (const hovering of [false, true]) {
           const hover = hovering ? 0 : undefined;
-          const cursor = menuCursor(allowed, drawn, holding, hover);
+          const cursor = menuCursor(allowed, drawn, holding, hover, false);
+          assertFalse(cursor.bullseye);
           assertEquals(cursor.stock, allowed && !drawn);
           if (!drawn) assertEquals(cursor.hand, undefined);
           else assertEquals(cursor.hand, holding ? "pinch" : hover === undefined ? "point" : "fan");
           assertFalse(cursor.stock && cursor.hand !== undefined);
         }
       }
+    }
+  }
+});
+
+test("Stage select draws the bullseye instead of any hand wherever a cursor is drawn, hides the stock cursor with it, and character select never draws it [k2 property]", () => {
+  for (const allowed of [false, true]) {
+    for (const drawn of [false, true]) {
+      for (const holding of [false, true]) {
+        for (const hovering of [false, true]) {
+          const hover = hovering ? 0 : undefined;
+          const stage = menuCursor(allowed, drawn, holding, hover, true);
+          assertEquals(stage.bullseye, drawn);
+          assertEquals(stage.hand, undefined);
+          assertEquals(stage.stock, allowed && !drawn);
+          assertEquals(menuCursor(allowed, drawn, holding, hover, false).bullseye, false);
+        }
+      }
+    }
+  }
+});
+
+test("The bullseye is centred on the mouse and moves one for one with it at every grid size, its ring inside the frame and under a roster tile [k2 property]", () => {
+  for (let count = 1; count <= 60; count++) {
+    const grid = rosterGrid(count);
+    const size = bullseyeSize(grid);
+    assertTrue(size > 0 && size < grid.cellHeight);
+    for (const [x, y] of [[f32(0.2), f32(0.5)], [f32(0.7), f32(0.1)]] as const) {
+      assertTrue(Math.abs(bullseyeLeft(x, size) + size / 2 - x) < f32(0.00001));
+      assertTrue(Math.abs(bullseyeTop(y, size) - size / 2 - y) < f32(0.00001));
     }
   }
 });

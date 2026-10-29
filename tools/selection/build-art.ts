@@ -56,7 +56,7 @@ BunRuntime.runMain(Effect.gen(function*() {
     yield* run(['magick', join(source, `wc3-hand-${art}.png`), '-filter', 'point', '-resize', `${HAND_ART_COLUMNS}x${HAND_ART_ROWS}!`, '-background', 'none', '-gravity', 'northwest', '-splice', `${HAND_MARGIN}x${HAND_MARGIN}`, '-extent', `${HAND_TEXELS}x${HAND_TEXELS}`, '-depth', '8', `TGA:${join(output, `SelectionHand${pose}.tga`)}`]);
   }
   yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);
-  for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionThreeBridges']) {
+  for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionBullseye', 'SelectionThreeBridges']) {
     yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   }
   const extractor = findExtractor();

@@ -154,7 +154,7 @@ flat dark background; `bun tools/selection/key-hand-states.ts <folder of the
 JPEGs>` keys the background to transparency (outline kept), aligns the cuffs and
 writes the three PNGs on one canvas. The normal `bun tools/selection/build-art.ts`
 point-scales them into `SelectionHandPoint.tga`, `SelectionHandFan.tga` and
-`SelectionHandPinch.tga`, each a 256x256 canvas. Store the generated
+`SelectionHandPinch.tga`, each a 256x256 canvas; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
 `selection-assets` family and commit its hash with the source change.
 
 ## Other shared paths

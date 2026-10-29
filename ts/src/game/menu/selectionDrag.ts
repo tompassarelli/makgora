@@ -175,15 +175,27 @@ export const handLeft = (x: number, state: HandState, size: number): number => x
 
 export const handTop = (y: number, state: HandState, size: number): number => y + f32(HAND_HOTSPOT[state].y / HAND_TEXELS) * size;
 
+// Stage select draws a soft bullseye whose ring spans about half a roster tile; its canvas is this share of a tile's height.
+export const BULLSEYE_TILE_HEIGHT = f32(0.75);
+
+export const bullseyeSize = (grid: RosterGrid): number => f32(f32(grid.cellHeight) * BULLSEYE_TILE_HEIGHT);
+
+// The bullseye texture is centred on its canvas, so the click point is the middle of the frame.
+export const bullseyeLeft = (x: number, size: number): number => x - size * f32(0.5);
+
+export const bullseyeTop = (y: number, size: number): number => y + size * f32(0.5);
+
 export interface MenuCursor {
   readonly hand: HandState | undefined;
+  readonly bullseye: boolean;
   readonly stock: boolean;
 }
 
-// The gauntlet replaces the stock cursor wherever a menu shows a cursor; the stock one only returns where the gauntlet is not drawn.
-export const menuCursor = (cursorAllowed: boolean, handDrawn: boolean, holdingChip: boolean, hover: RosterTile | undefined): MenuCursor => ({
-  hand: !handDrawn ? undefined : holdingChip ? "pinch" : hover === undefined ? "point" : "fan",
-  stock: cursorAllowed && !handDrawn,
+// The gauntlet replaces the stock cursor on character select and the bullseye does on stage select; the stock one only returns where neither is drawn.
+export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: RosterTile | undefined, stageSelect: boolean): MenuCursor => ({
+  hand: !cursorDrawn || stageSelect ? undefined : holdingChip ? "pinch" : hover === undefined ? "point" : "fan",
+  bullseye: cursorDrawn && stageSelect,
+  stock: cursorAllowed && !cursorDrawn,
 });
 
 export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);

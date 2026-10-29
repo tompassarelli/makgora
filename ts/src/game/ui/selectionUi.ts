@@ -29,6 +29,9 @@ import {
   type Roster,
   type RosterChip,
   type RosterTile,
+  bullseyeLeft,
+  bullseyeSize,
+  bullseyeTop,
   handSize,
   HAND_STATES,
   type HandState,
@@ -146,6 +149,7 @@ export class SelectionPanel {
   private readonly syncTriggers: readonly trigger[];
   private readonly drag = selectionDrag();
   private readonly hands: Readonly<Record<HandState, framehandle>>;
+  private readonly bullseye: framehandle;
   private cursorEnabled: boolean | undefined;
   private menuCursorAllowed = true;
 
@@ -231,6 +235,9 @@ export class SelectionPanel {
       return frame;
     };
     this.hands = { point: hand("point", "Point"), fan: hand("fan", "Fan"), pinch: hand("pinch", "Pinch") };
+    this.bullseye = art(gameUi(), `MeleeBullseye${suffix}`, "war3mapImported\\SelectionBullseye.tga", 0.0, 0.0, bullseyeSize(grid), bullseyeSize(grid));
+    BlzFrameSetLevel(this.bullseye, SELECT_LEVELS.hand);
+    BlzFrameSetVisible(this.bullseye, false);
     const headerButton = (box: typeof START_BUTTON, text: string, target: SelectionButton) => {
       const frame = panelButton(root, box.x, box.y, box.width, box.height, "");
       setFrameText(frame, text);
@@ -326,6 +333,7 @@ export class SelectionPanel {
     this.credits.destroy();
     this.community.destroy();
     for (const state of HAND_STATES) BlzDestroyFrame(this.hands[state]);
+    BlzDestroyFrame(this.bullseye);
     if (this.cpu.root !== undefined) BlzDestroyFrame(this.cpu.root);
     BlzDestroyFrame(this.root);
     BlzDestroyFrame(this.backdrop);
@@ -513,8 +521,10 @@ export class SelectionPanel {
   }
 
   private showHand(drawn: boolean, holding: boolean, x: number, y: number): void {
-    const { hand, stock } = menuCursor(this.menuCursorAllowed, drawn, holding, this.drag.hover);
+    const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, holding, this.drag.hover, this.game?.phase === Phase.stageMenu);
     for (const state of HAND_STATES) BlzFrameSetVisible(this.hands[state], state === hand);
+    BlzFrameSetVisible(this.bullseye, bullseye);
+    if (bullseye) placeTopLeft(this.bullseye, bullseyeLeft(x, bullseyeSize(this.roster.grid)), bullseyeTop(y, bullseyeSize(this.roster.grid)));
     if (hand !== undefined) placeTopLeft(this.hands[hand], handLeft(x, hand, handSize(this.roster.grid)), handTop(y, hand, handSize(this.roster.grid)));
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
     if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
