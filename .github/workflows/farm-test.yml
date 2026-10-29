@@ -22,6 +22,9 @@ on:
       checks:
         description: Comma-separated check groups to run (safe-push's landing selection); empty runs those the changed paths reach
         default: ""
+      full:
+        description: Set to 1 to run every check of the selected groups, not only those the changed paths reach (LAND_FULL_SUITE=1)
+        default: ""
   # Autoland (autoland.yml) runs the suites for a rebased branch inside its own run.
   workflow_call:
     inputs:
@@ -38,6 +41,9 @@ on:
         type: string
         default: ""
       checks:
+        type: string
+        default: ""
+      full:
         type: string
         default: ""
 
@@ -134,6 +140,7 @@ jobs:
         env:
           BASE: ${{ inputs.base }}
           CHECKS: ${{ inputs.checks }}
+          FULL: ${{ inputs.full }}
           GROUP: ${{ matrix.group }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -143,9 +150,9 @@ jobs:
             base=$(git merge-base FETCH_HEAD HEAD 2>/dev/null || true)
             [ "$base" != "$(git rev-parse HEAD)" ] || base=
           else
-            git -c gc.auto=0 fetch -q --depth 1 origin "$base" || base=
+            git -c gc.auto=0 fetch -q --depth 1 --filter=blob:none origin "$base" || base=
           fi
-          if [ -n "$base" ]; then git diff --name-only "$base" HEAD > "$RUNNER_TEMP/changed"; else echo unknown > "$RUNNER_TEMP/changed"; fi
+          if [ -n "$base" ] && [ "$FULL" != 1 ]; then git diff --name-only "$base" HEAD > "$RUNNER_TEMP/changed"; else echo unknown > "$RUNNER_TEMP/changed"; fi
           sed 's/^/changed: /' "$RUNNER_TEMP/changed"
           if [ -n "$CHECKS" ]; then
             selected=$(echo "$CHECKS" | tr ',' '\n')
@@ -157,7 +164,7 @@ jobs:
           ! grep -qxF "$GROUP" <<< "$selected" || run=true
           echo "$GROUP filtered out by the changed paths" > "skipped-check-$GROUP.txt"
           if [ "$run" = true ]; then
-            key=$(git ls-tree -r --full-tree HEAD | (cd ts && bun scripts/landingInputs.ts "$GROUP" "$RUNNER_TEMP/changed" "$CHECKS") 2>/dev/null) || key=
+            key=$(git ls-tree -r --full-tree HEAD | (cd ts && bun scripts/landingInputs.ts "$GROUP" "$RUNNER_TEMP/changed") 2>/dev/null) || key=
             echo "key=$key" >> "$GITHUB_OUTPUT"
             [ -z "$key" ] || passed=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=farm-pass-$GROUP-$key&per_page=100" --jq '[.artifacts[] | select(.expired | not)] | length' 2>/dev/null || echo 0)
             if [ "${passed:-0}" -gt 0 ]; then
@@ -186,11 +193,10 @@ jobs:
         timeout-minutes: 20
         env:
           GROUP: ${{ matrix.group }}
-          CHECKS: ${{ inputs.checks }}
         # The group's checks and their selection are smashcraft:ts/scripts/landingChecks.ts, which safe-push's landing gate runs on its own machine.
         run: |
           set +e
-          bun scripts/landingRun.ts farm "$GROUP" "$RUNNER_TEMP/changed" "$CHECKS"
+          bun scripts/landingRun.ts farm "$GROUP" "$RUNNER_TEMP/changed"
           failed=$?
           if [ "$GROUP" = perf ] && [ -f build/playable-bot-four.perf ]; then
             bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"

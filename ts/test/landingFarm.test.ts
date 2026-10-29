@@ -43,7 +43,7 @@ test("a failing farm check refuses the landing and a passing one is not rerun on
 
 test("a farm group is reused while the files its checks read are unchanged, however the rest of main moved [k2 property]", () => {
   const listing = (docs: string, source: string) => `100644 blob ${docs}\tdocs/ci.md\n100644 blob ${source}\tts/src/game/sim/codes.ts\n`;
-  const key = (group: Group, text: string) => groupInputKey(group, ["ts/src/game/sim/codes.ts"], true, text);
+  const key = (group: Group, text: string) => groupInputKey(group, ["ts/src/game/sim/codes.ts"], text);
   expect(key("parity-0", listing("a", "s"))).toBe(key("parity-0", listing("b", "s")));
   expect(key("parity-0", listing("a", "s"))).not.toBe(key("parity-0", listing("a", "t")));
   expect(key("static", listing("a", "s"))).not.toBe(key("static", listing("b", "s")));

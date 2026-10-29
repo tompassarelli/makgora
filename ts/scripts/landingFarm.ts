@@ -16,10 +16,10 @@ const needsPrivateStore = (check: Check) => check.privateStore === true
 /** The pre-push hook's checks the farm cannot run: the ones that read the private stores. */
 export const localChecks = (checks: readonly Check[]): Check[] => checks.filter(({ hosted, machineTool }) => !hosted && machineTool !== true);
 
-const farmRun: FarmRunner = (head, base, groups) => Effect.scoped(Effect.gen(function*() {
+const farmRun: FarmRunner = (head, base, groups, full) => Effect.scoped(Effect.gen(function*() {
   const repo = yield* currentRepo;
   const { ref, scratch } = yield* resolveRef(head, repo);
-  const found = yield* dispatch(repo, "farm-test.yml", { ref, base, checks: groups.join(","), tag: runTag() }, scratch);
+  const found = yield* dispatch(repo, "farm-test.yml", { ref, base, checks: groups.join(","), ...(full ? { full: "1" } : {}), tag: runTag() }, scratch);
   const started = performance.now();
   const state = yield* waitFor(repo, found.databaseId);
   const minutes = ((performance.now() - started) / 60000).toFixed(1);
@@ -38,7 +38,7 @@ const farmRun: FarmRunner = (head, base, groups) => Effect.scoped(Effect.gen(fun
  * The landing gate for safe-push's land.check: the farm-test.yml groups the diff reaches
  * run on GitHub's runners beside the checks that need this machine's private stores.
  */
-export type FarmRunner = (head: string, base: string, groups: readonly Group[]) => Effect.Effect<void, unknown>;
+export type FarmRunner = (head: string, base: string, groups: readonly Group[], full: boolean) => Effect.Effect<void, unknown>;
 
 export interface Gate { readonly farm: FarmRunner; readonly cache: ReturnType<typeof directoryCache>; readonly listing: (head: string) => Effect.Effect<string, unknown> }
 
@@ -46,20 +46,21 @@ const machine: Gate = { farm: farmRun, cache: directoryCache(PREPUSH_CACHE), lis
 
 export const landOnFarm = (base: string, head: string, { farm: farmer, cache, listing: listingOf }: Gate = machine) => Effect.gen(function*() {
   const paths = base === "" ? [UNKNOWN_BASE] : (yield* run(["git", "diff", "--name-only", base, head])).split("\n").filter((path) => path !== "");
-  const groups = landingGroups(paths, process.env[FULL_SUITE_VARIABLE] === "1");
+  const full = process.env[FULL_SUITE_VARIABLE] === "1";
+  const groups = landingGroups(paths, full);
   const here = localChecks(checksFor(paths, cueInputs(), strikeInputs()));
   yield* Console.error(`landing farm: ${paths.length} changed path${paths.length === 1 ? "" : "s"}; farm groups ${groups.length === 0 ? "none" : groups.join(", ")}`);
   for (const check of here) yield* Console.error(`landing local: ${check.name}: ${needsPrivateStore(check)}`);
   const dirty = here.length === 0 ? "" : yield* laptop.dirty(["."]);
   if (dirty !== "") return yield* new PrePushRefusal({ problem: `landing local: the checks read the working tree, so land the clean checked-out commit.\n${dirty}` });
   const listing = groups.length === 0 ? "" : yield* listingOf(head);
-  const keys = new Map(groups.map((group) => [group, groupInputKey(group, paths, true, listing)] as const));
+  const keys = new Map(groups.map((group) => [group, groupInputKey(group, full ? [UNKNOWN_BASE] : paths, listing)] as const));
   const proven = yield* Effect.filter(groups, (group) => cache.has(keys.get(group) ?? ""));
   for (const group of proven) yield* Console.error(`landing farm: ${group} reused, it passed before on these inputs (${(keys.get(group) ?? "").slice(0, 12)})`);
   const pending = groups.filter((group) => !proven.includes(group));
   const farm = groups.length === 0 ? Console.error("landing farm: no farm group is reached, so nothing runs there")
     : pending.length === 0 ? Effect.void
-    : farmer(head, base, pending).pipe(Effect.tap(() => Effect.forEach(pending, (group) => cache.record(keys.get(group) ?? ""), { discard: true })));
+    : farmer(head, base, pending, full).pipe(Effect.tap(() => Effect.forEach(pending, (group) => cache.record(keys.get(group) ?? ""), { discard: true })));
   yield* Effect.all([farm, runChecks(here, laptop)], { concurrency: "unbounded", discard: true });
 });
 

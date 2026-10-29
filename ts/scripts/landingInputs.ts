@@ -1,10 +1,9 @@
 import { readFileSync } from "node:fs";
 import { CHECKS, GROUPS, type Group, type LandingCheck, UNKNOWN_BASE, reachedChecks } from "./landingChecks";
 
-/** The checks a farm-test.yml group runs: all of its own when the `checks` input names it, else those a changed path reaches. */
-export function groupChecks(group: Group, paths: readonly string[], named: boolean): LandingCheck[] {
+/** The checks a farm-test.yml group runs: those of its own a changed path reaches (every one for an unknown base or the full suite). */
+export function groupChecks(group: Group, paths: readonly string[]): LandingCheck[] {
   const inGroup = CHECKS.filter((check) => check.farm.includes(group));
-  if (named) return inGroup;
   const reached = new Set(reachedChecks(paths).map(({ check }) => check));
   return inGroup.filter((check) => reached.has(check));
 }
@@ -14,8 +13,8 @@ export function groupChecks(group: Group, paths: readonly string[], named: boole
  * blob of every tracked file one of their reach rules matches (`git ls-tree -r` lines), so
  * a pass is reused wherever those files are unchanged, however the rest of the tree moved.
  */
-export function groupInputKey(group: Group, paths: readonly string[], named: boolean, listing: string): string {
-  const checks = groupChecks(group, paths, named);
+export function groupInputKey(group: Group, paths: readonly string[], listing: string): string {
+  const checks = groupChecks(group, paths);
   const rules = checks.flatMap((check) => check.reaches);
   const hasher = new Bun.CryptoHasher("sha256").update(`${group}\0${checks.map(({ name }) => name).join("\0")}\n`);
   for (const line of listing.split("\n")) {
@@ -28,10 +27,10 @@ export function groupInputKey(group: Group, paths: readonly string[], named: boo
 }
 
 if (import.meta.main) {
-  const [group, changedFile, checks = ""] = process.argv.slice(2);
+  const [group, changedFile] = process.argv.slice(2);
   const known = GROUPS.find((candidate) => candidate === group);
-  if (known === undefined || changedFile === undefined) throw new Error("usage: git ls-tree -r --full-tree HEAD | bun scripts/landingInputs.ts GROUP CHANGED-PATHS-FILE [CHECKS]");
+  if (known === undefined || changedFile === undefined) throw new Error("usage: git ls-tree -r --full-tree HEAD | bun scripts/landingInputs.ts GROUP CHANGED-PATHS-FILE");
   const changed = readFileSync(changedFile, "utf8").split("\n").map((line) => line.trim()).filter((line) => line !== "");
   const listing = await Bun.stdin.text();
-  console.log(groupInputKey(known, changed.length === 0 ? [UNKNOWN_BASE] : changed, checks.split(",").includes(known), listing));
+  console.log(groupInputKey(known, changed.length === 0 ? [UNKNOWN_BASE] : changed, listing));
 }

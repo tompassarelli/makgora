@@ -1,7 +1,8 @@
 import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Data, Effect, Exit } from "effect";
-import { CHECKS, GROUPS, type Group, type LandingCheck, UNKNOWN_BASE, reachedChecks } from "./landingChecks";
+import { CHECKS, GROUPS, type Group, type LandingCheck, UNKNOWN_BASE } from "./landingChecks";
+import { groupChecks } from "./landingInputs";
 import { type Finished, runGroup } from "./processGroups";
 
 const ts = join(import.meta.dir, "..");
@@ -50,10 +51,8 @@ const farmName = (check: LandingCheck, group: Group) => check.shardVariable === 
  * One farm-test.yml job: its group's checks one after another, as main's CI log
  * groups, with the result rows and failing lines the merge job reads.
  */
-const runFarmGroup = (group: Group, changed: readonly string[], named: boolean) => Effect.gen(function*() {
-  const inGroup = CHECKS.filter((check) => check.farm.includes(group));
-  const reached = new Set(reachedChecks(changed).map(({ check }) => check));
-  const checks = named ? inGroup : inGroup.filter((check) => reached.has(check));
+const runFarmGroup = (group: Group, changed: readonly string[]) => Effect.gen(function*() {
+  const checks = groupChecks(group, changed);
   mkdirSync(join(ts, "build"), { recursive: true });
   appendFileSync(join(ts, "build/checks.tsv"), "");
   let failed = false;
@@ -74,17 +73,17 @@ const runFarmGroup = (group: Group, changed: readonly string[], named: boolean) 
   return failed ? 1 : 0;
 });
 
-const usage = "usage: bun scripts/landingRun.ts farm GROUP CHANGED-PATHS-FILE [CHECKS] | here CHECK-NAME...";
+const usage = "usage: bun scripts/landingRun.ts farm GROUP CHANGED-PATHS-FILE | here CHECK-NAME...";
 
 if (import.meta.main) {
   const [mode, ...rest] = process.argv.slice(2);
   const program = Effect.gen(function*() {
     if (mode === "farm") {
-      const [group, changedFile, named = ""] = rest;
+      const [group, changedFile] = rest;
       const known = GROUPS.find((candidate) => candidate === group);
       if (known === undefined || changedFile === undefined) return yield* Effect.die(usage);
       const changed = readFileSync(changedFile, "utf8").split("\n").map((line) => line.trim()).filter((line) => line !== "");
-      return yield* runFarmGroup(known, changed.length === 0 ? [UNKNOWN_BASE] : changed, named.split(",").includes(known));
+      return yield* runFarmGroup(known, changed.length === 0 ? [UNKNOWN_BASE] : changed);
     }
     if (mode !== "here" || rest.length === 0) return yield* Effect.die(usage);
     const checks = rest.map((name) => CHECKS.find((check) => check.name === name) ?? name);

@@ -123,8 +123,8 @@ test`, grouped into its jobs perf, rollback, parity-0 to parity-2 (one third
 of the replay tapes each, balanced by tape length with `TAPES_SHARD`; parity-0
 also runs parity numeric and the stack-trace profile), corpus and types. A job
 runs when the `checks` input names it or a changed path reaches one of its
-checks, and then runs its checks the changed paths reach (all of them when
-`checks` names it).
+checks, and then runs only its checks the changed paths reach (all of them
+when the `full` input is 1, as `LAND_FULL_SUITE=1` sets, or the base is unknown).
 
 ## Autoland
 
