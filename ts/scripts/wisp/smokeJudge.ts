@@ -6,6 +6,7 @@ import { traitMove } from "../../src/game/sim/identityTraits";
 import { normalName } from "../../src/game/sim/moveNames";
 import { fighterName } from "../../src/game/roster/kits";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
+import { FIGHTER_ULTIMATES } from "../../src/game/sim/ultimates";
 import type { MapStall } from "./mapStalls";
 import { FRAME_MILLIS, type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, bindingSweep, keyName, tapeFrames } from "./smokeTape";
 
@@ -47,6 +48,7 @@ interface Start {
 
 interface SlotTrace {
   fighter: string;
+  ultimate: boolean;
   readonly held: number[];
   readonly state: string[];
   readonly starts: Start[];
@@ -54,7 +56,7 @@ interface SlotTrace {
   action: number;
 }
 
-const newTrace = (): SlotTrace => ({ fighter: "", held: [], state: [], starts: [], serial: undefined, action: 0 });
+const newTrace = (): SlotTrace => ({ fighter: "", ultimate: true, held: [], state: [], starts: [], serial: undefined, action: 0 });
 
 const firstPressMask = (step: SmokeStep): number => {
   const first = step.presses.find((press) => press.at === 0) ?? step.presses[0];
@@ -72,6 +74,7 @@ const matches = (expect: MoveClass, start: Start): boolean =>
 function traceFrame(trace: SlotTrace, state: Readonly<ReplayState>, slot: number, frame: number, held: number): void {
   const f = fighterAt(state.world, slot);
   trace.fighter = fighterName(f.character);
+  trace.ultimate = FIGHTER_ULTIMATES[f.character] !== undefined;
   trace.held[frame] = held;
   trace.state[frame] = `phase ${state.match.phase}${state.match.training ? " training" : ""} x ${Math.round(f.motion.x)} z ${Math.round(f.motion.z)}${f.motion.grounded ? "" : " airborne"} stocks ${f.status.stocks}${f.launch.hitstun > 0 ? " hitstun" : ""} special ${f.special.action} ultimate ${f.meter.ultimate}`;
   if (trace.serial !== undefined && f.attack.serial !== trace.serial && f.attack.style !== undefined) trace.starts.push({ frame, label: normalName(f.attack.style), style: f.attack.style });
@@ -96,7 +99,7 @@ function stepResult(slot: number, trace: SlotTrace, step: SmokeStep, anchor: num
     return result(`key ${name}`, "binding", anchor !== undefined, anchor === undefined ? `dead binding: no ${name} press reached the game near frame ${expected ?? "start"}` : `frame ${anchor}`);
   }
   const expect = step.expect;
-  if (expect === undefined) return undefined;
+  if (expect === undefined || (expect.kind === "special" && expect.move === "ultimate" && !trace.ultimate)) return undefined;
   const window = trace.starts.filter((start) => start.frame >= at && start.frame < at + step.frames);
   const hit = window.find((start) => matches(expect, start));
   if (hit !== undefined) return result(step.name, "move", true, `frame ${hit.frame}`);
