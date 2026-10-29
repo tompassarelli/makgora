@@ -1296,6 +1296,27 @@ presence ±4. Every other Desync.log section matches.
   `ipse` is Tempest/Ipse, records #1 and #2 are the presence head and births.
   Diff A against B by section and turn. One section differing names the
   subsystem.
+
+**Handle ledger (#681).** A desync seen from one client's Desync.log alone
+can't say which call split the clients. Every online client therefore keeps a
+ledger (smashcraft:ts/src/host/loop/handleLedger.ts). At install it wraps each
+native in `LEDGER_NATIVES`: the effect, lightning, frame, sound, text tag,
+timer, trigger, event-registration and location natives the map calls. It
+counts each call against the game tick it ran in, which `shell.tick` advances.
+Ticks, not confirmed frames, are the unit: game callbacks fire at the same game
+time on every client, while each client confirms frames at its own moment.
+Once every 60 ticks each human sends its count for the finished window, with
+up to 12 nonzero ticks and each tick's first native, as a ledger-only `SC_DY`
+message (`lWINDOW:TOTAL,OFFSET.COUNT.NATIVE,...`). Each client compares every
+other player's report with its own window. At the first difference it writes
+`smashcraft-handle-ledger-pSLOT-tTICK.txt` in CustomMapData, for example
+`handle ledger: p1 and p0 differ at tick 632: p1 made or freed 1 (CreateTimer)
+and p0 0 ()`. Both clients receive each other's reports, so both write the line,
+each naming its own natives for that tick. When the difference lies past the
+12 ticks a report carries, the line names the window's tick range and totals.
+smashcraft:ts/test/handleLedger.test.ts makes one of two online clients create
+one extra timer and checks that both name that tick and `CreateTimer`. Frame
+lookups (`BlzGetOriginFrame`, `BlzGetFrameByName`) aren't counted.
 ## Input sampling against the LAN host's turn interval (24 October 2026)
 
 Asked: can Smashcraft sample more than about 40 inputs a second if the host

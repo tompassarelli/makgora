@@ -15,6 +15,7 @@ import type { LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond, slowMachineText } from "../../game/netcode/machineRate";
 import { type Roster, isActive } from "../../game/sim/roster";
+import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from "./handleLedger";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
@@ -331,9 +332,20 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   BlzFrameSetVisible(net.indicator, text !== "");
 }
 
+export function sendHandleLedger(game: Readonly<MatchState>): void {
+  if (!isOnline(game)) return;
+  const report = takeLedgerReport(handleLedger());
+  if (report !== undefined) BlzSendSyncData(DELAY_PREFIX, report);
+}
+
 export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>): void {
   const slot = GetPlayerId(GetTriggerPlayer());
-  const message = parseDelayMessage(BlzGetTriggerSyncData());
+  const data = BlzGetTriggerSyncData();
+  if (data.substring(0, 1) === LEDGER_MARK) {
+    receiveLedgerReport(handleLedger(), GetPlayerId(GetLocalPlayer()), slot, data);
+    return;
+  }
+  const message = parseDelayMessage(data);
   if (message.host !== NO_HOST_DELAY) {
     hostDelayFrom(net, game, slot, message.host);
     return;

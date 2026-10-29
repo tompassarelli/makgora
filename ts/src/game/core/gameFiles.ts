@@ -25,6 +25,7 @@ export const frameCostClockFile = (slot: number) => `smashcraft-frame-cost-clock
 export const CAPTURE_STATUS_FILE = "smashcraft-capture-status.txt";
 export const callbackClockFile = (slot: number, run: number) => `smashcraft-callback-clock-p${slot}-run${run}.txt`;
 export const renderClockFile = (slot: number, run: number) => `smashcraft-render-clock-p${slot}-run${run}.txt`;
+export const handleLedgerFile = (slot: number, tick: number) => `smashcraft-handle-ledger-p${slot}-t${tick}.txt`;
 export const PHYSICS_REPORT_FILE = "smashcraft-native-physics-precision.txt";
 export const objectDataReceiptFile = (slot: number) => `smashcraft-object-data-p${slot}.txt`;
 

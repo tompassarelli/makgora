@@ -62,6 +62,7 @@ import { fighterAt, isActive } from "../../game/sim/roster";
 import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";
 import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/nativeSoak";
 import { afterProbedTick, beforeProbedTick } from "./tickProbe";
+import { advanceHandleLedger, handleLedger, installHandleLedger } from "./handleLedger";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -93,6 +94,7 @@ function serviceEpochWindow(s: ShellState, recorder: probe.ResponseProbe): void 
 }
 
 function gameTick(s: ShellState): void {
+  advanceHandleLedger(handleLedger());
   beforeNativeSoakTick(s);
   beforeProbedTick(s);
   if (!beforeNativeDriverTick(s)) {
@@ -385,6 +387,7 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
 function serviceDelay(s: ShellState, rollback: Rollback): void {
   const local = localSlot();
   netDelay.serviceNetDelay(rollback.net, s.game, local, rollback.delay, s.game.phase === Phase.match, rollback.predictionHeld || rollback.stalled > 0);
+  netDelay.sendHandleLedger(s.game);
   if (s.game.phase !== Phase.characterMenu || floorMod(rollback.net.ticks, 30) !== 0) return;
   const net = netDelay.lobbyNet(rollback.net, s.game, local);
   for (const panel of views(s).selections) panel.showDelay(net);
@@ -412,6 +415,7 @@ function completeStartingChoices(): void {
 
 
 export function installShell(): void {
+  installHandleLedger(handleLedger());
   on(PAD_MOUSE, withShell(padMouse));
   on(TICK, withShell(gameTick));
   on(DRAW_EVENT, drawBetweenFrames);
