@@ -6,6 +6,7 @@ import { UsageFailure } from "wisp/scripts/wisp/command";
 import { SELECTABLE_CHARACTERS, fighterKey, fighterName, fighterSlug } from "../src/game/roster/kits";
 import { CaptureQueueFailure, Job, type Result, git, queueDirectory, showcaseSlot, writeAtomic } from "./captureQueue";
 import { type RemoteHost, builtMapKey, fetchFolder, remoteHost, runThere, sendFile, shipStoredMap } from "./captureQueueRemote";
+import { peerSpec } from "./captureQueuePeers";
 import { attachedPoolReady } from "./wisp/nativePool";
 import { projectRoot, tsDirectory } from "./wisp/projectRoot";
 
@@ -226,7 +227,7 @@ const captureThere = (settings: Settings, host: RemoteHost, group: { readonly ba
   yield* fetchFolder(host, join(there, "native"), join(group.directory, `native-${group.index}`), group.logFile);
 });
 
-const runBatch = <R>(settings: Settings, jobs: readonly Job[], ensurePool: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
+const runBatch = <R>(settings: Settings, hosts: Hosts, jobs: readonly Job[], ensurePool: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
   const batch = `b${Date.now().toString(36)}`, directory = join(queueDirectory("batches"), batch);
   yield* attempt("create the batch folder", () => mkdirSync(directory, { recursive: true }));
   const log = logTo(join(directory, "log.jsonl"));
@@ -235,13 +236,14 @@ const runBatch = <R>(settings: Settings, jobs: readonly Job[], ensurePool: Effec
   const groups = yield* foldLanes(projectRoot, jobs, main);
   yield* log({ step: "fold", batch, jobs: jobs.map(job => job.id), groups: groups.map(group => ({ commit: group.commit, lanes: group.jobs.map(job => job.lane) })), seconds: seconds(folded) });
   const pool = yield* Effect.forkChild(ensurePool);
-  for (const [index, group] of groups.entries()) {
-    const outcome = yield* captureGroup(settings, batch, group, index, log, Fiber.join(pool)).pipe(Effect.result);
-    if (outcome._tag === "Failure") {
-      yield* log({ step: "failed", group: index, problem: outcome.failure.message });
-      for (const job of group.jobs) yield* finish(job, { batch, status: "failed", problem: outcome.failure.message });
-    }
-  }
+  yield* Effect.forEach(groups.entries(), ([index, group]) => Effect.scoped(Effect.gen(function*() {
+    const own = index === 0 ? settings : yield* groupSettings(settings, hosts, `capture-queue-${batch}-g${index}`);
+    yield* log({ step: "lease", group: index, host: own.remote?.name ?? hostname(), pair: own.pair, lanes: group.jobs.map(job => job.lane) });
+    return yield* captureGroup(own, batch, group, index, log, index === 0 ? Fiber.join(pool) : Effect.void);
+  })).pipe(Effect.result, Effect.flatMap(outcome => outcome._tag === "Success" ? Effect.void : Effect.gen(function*() {
+    yield* log({ step: "failed", group: index, problem: outcome.failure.message });
+    for (const job of group.jobs) yield* finish(job, { batch, status: "failed", problem: outcome.failure.message });
+  }))), { concurrency: "unbounded", discard: true });
   yield* log({ step: "batch", batch, seconds: seconds(folded) });
 });
 
@@ -260,25 +262,40 @@ const settingsOf = (args: readonly string[]): Settings | undefined => {
   };
 };
 
-const lanLease = (verb: "take" | "release", extra: readonly string[]) => Effect.promise(async () => {
-  const run = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "lease", verb, ...extra], { cwd: tsDirectory, stdin: "ignore", stdout: "pipe", stderr: "inherit" });
-  const text = await new Response(run.stdout).text();
-  return { code: await run.exited, text };
+type Hosts = "local" | "any";
+
+const lanLease = (verb: "take" | "release", extra: readonly string[], hosts: Hosts) => Effect.gen(function*() {
+  const remote = hosts === "any" ? yield* peerSpec : "";
+  return yield* Effect.promise(async () => {
+    const run = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "lease", verb, ...extra], { cwd: tsDirectory, stdin: "ignore", stdout: "pipe", stderr: "inherit", env: { ...process.env, WISP_PAIR_REMOTE: remote } });
+    const text = await new Response(run.stdout).text();
+    return { code: await run.exited, text };
+  });
 });
 
-/** The next free pair from the shared pair queue, on this host or with `--hosts any` on another, held until the scope ends; the lease also ends with this process. */
-const leasePair = (hosts: string) => Effect.acquireRelease(
-  lanLease("take", ["--owner", "capture-queue", "--pid", String(process.pid), "--hosts", hosts]).pipe(Effect.flatMap(({ code, text }) => {
+const LEASE_WAIT_SECONDS = 1800;
+
+/** The next free pair from the shared pair queue, on this host or with `any` on another, held until the scope ends; the lease also ends with this process. */
+const leasePair = (hosts: Hosts, owner: string) => Effect.acquireRelease(
+  lanLease("take", ["--owner", owner, "--pid", String(process.pid), "--hosts", hosts, "--wait", String(LEASE_WAIT_SECONDS)], hosts).pipe(Effect.flatMap(({ code, text }) => {
     const slot = code === 0 ? (JSON.parse(text.trim().split("\n").at(-1) ?? "{}") as { host?: string; pair?: number }) : undefined;
     return slot?.host === undefined || slot.pair === undefined ? Effect.fail(fail("no free pair from the shared pair queue; see its output above")) : Effect.succeed({ host: slot.host, pair: slot.pair });
   })),
-  slot => lanLease("release", ["--host", slot.host, "--pair", String(slot.pair)]),
+  slot => lanLease("release", ["--host", slot.host, "--pair", String(slot.pair)], hosts).pipe(Effect.ignore),
 );
+
+const groupSettings = (settings: Settings, hosts: Hosts, owner: string) => Effect.gen(function*() {
+  const slot = yield* leasePair(hosts, owner);
+  const client = `lan${slot.pair}a`;
+  const remote = slot.host === hostname() ? undefined : yield* remoteHost(slot.host);
+  return { pair: slot.pair, minutes: settings.minutes, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client, install: join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`), ...(remote === undefined ? {} : { remote }) } satisfies Settings;
+});
 
 export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(function*() {
   const pairs = given.flatMap((arg, index) => arg === "--pair" ? [index] : []);
   const auto = pairs.length === 0 || given[pairs[0]! + 1] === "auto";
-  const leased = auto ? yield* leasePair(option(given, "--hosts") === "any" ? "any" : "local") : undefined;
+  const hosts: Hosts = option(given, "--hosts") === "any" ? "any" : "local";
+  const leased = auto ? yield* leasePair(hosts, "capture-queue") : undefined;
   const args = leased === undefined ? given : [...given.filter((arg, index) => !(pairs.includes(index) || pairs.includes(index - 1))), "--pair", String(leased.pair)];
   const local = settingsOf(args);
   const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: yield* remoteHost(leased.host) };
@@ -297,7 +314,7 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   while (true) {
     const jobs = yield* takePending();
     if (jobs.length > 0) {
-      yield* runBatch(settings, jobs, ensurePool);
+      yield* runBatch(settings, hosts, jobs, ensurePool);
       idleSince = performance.now();
       continue;
     }
