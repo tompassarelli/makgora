@@ -36,6 +36,7 @@ export interface ShowcaseMove {
   readonly swing?: readonly number[] | undefined;
   readonly cross?: { readonly frame: number; readonly gap: number } | undefined;
   readonly hold?: { readonly frame: number; readonly frames: number } | undefined;
+  readonly behind?: number | undefined;
 }
 
 export interface ShowcaseRow {
@@ -54,7 +55,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : chargedShowcase(slot, code, special) ?? channelledShowcase(slot, code, special);
-    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
+    moves.push(charged ?? { slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), behind: special === undefined ? undefined : specialBehind(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   return moves;
@@ -111,10 +112,10 @@ function rushShowcase(special: Readonly<AuthoredSpecial> | undefined): Pick<Show
 function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined; readonly cross?: { readonly frame: number; readonly gap: number } | undefined; readonly swing?: readonly number[] | undefined } {
   if (move === undefined || move.regions.length === 0) return { gap: reachGap(move) };
   if (style === AttackStyle.upTilt || style === AttackStyle.upSmash) return overheadPlacement(move, character);
-  if (style !== AttackStyle.downSmash) return { gap: reachGap(move) };
+  if (style !== AttackStyle.downSmash) return twoSided(move);
   const ahead = move.regions.filter((region) => centreX(region) > 0.0), behind = move.regions.filter((region) => centreX(region) < 0.0);
   const opens = (regions: readonly MoveRegion[]) => Math.min(...regions.map((region) => region.firstFrame));
-  if (ahead.length === 0 || behind.length === 0 || opens(ahead) === opens(behind)) return { gap: reachGap(move) };
+  if (ahead.length === 0 || behind.length === 0 || opens(ahead) === opens(behind)) return twoSided(move);
   const [early, late] = opens(ahead) < opens(behind) ? [ahead, behind] : [behind, ahead];
   const lateGap = regionGap(late, move.travelX ?? 0.0);
   if (lateGap === undefined || opens(late) - opens(early) < 2) return { gap: lateGap };
@@ -145,6 +146,18 @@ function regionGap(regions: readonly MoveRegion[], travel: number): number | und
   return reach.front ? Math.floor(travel + reach.region.hit.maxX * 0.75) : Math.floor(reach.region.hit.minX * 0.75);
 }
 
+function twoSided(move: Readonly<AuthoredMove>): { readonly gap: number | undefined; readonly behind: number | undefined } {
+  const gap = reachGap(move);
+  return { gap, behind: behindGap(move.regions, gap) };
+}
+
+function behindGap(regions: readonly MoveRegion[], gap: number | undefined): number | undefined {
+  const ahead = regions.filter((region) => centreX(region) > 0.0), behind = regions.filter((region) => centreX(region) < 0.0);
+  const back = regionGap(behind, 0.0);
+  if (gap === undefined || gap <= 0 || ahead.length === 0 || back === undefined || back >= 0) return undefined;
+  return -back * 4 >= gap * 3 ? back : undefined;
+}
+
 function aerialContact(move: Readonly<AuthoredMove> | undefined): MoveRegion | undefined {
   return move?.regions.reduce<MoveRegion | undefined>((last, region) => last === undefined || region.lastFrame > last.lastFrame ? region : last, undefined);
 }
@@ -170,6 +183,12 @@ function specialGap(special: Readonly<AuthoredSpecial>): number | undefined {
   return regionGap(special.regions ?? [], Math.max(0.0, travel));
 }
 
+function specialBehind(special: Readonly<AuthoredSpecial>): number | undefined {
+  const gap = specialGap(special);
+  if (special.radial === true) return gap === undefined || gap <= 0 ? undefined : -gap;
+  return behindGap(special.regions ?? [], gap);
+}
+
 function radialGap(special: Readonly<AuthoredSpecial>): number | undefined {
   if (special.radial !== true) return undefined;
   let reach = 0.0;
@@ -190,7 +209,8 @@ export function showcaseRows(character: Character): ShowcaseRow[] {
   const rows: ShowcaseRow[] = [];
   showcaseMoves(character).forEach((move, index) => {
     SHOWCASE_FACINGS.forEach((facing, side) => {
-      rows.push({ row: `R${String(index * 2 + side + 1).padStart(2, "0")}`, move, facing, frames: showcaseFrames(move) });
+      const placed = side === 1 && move.behind !== undefined ? { ...move, gap: move.behind } : move;
+      rows.push({ row: `R${String(index * 2 + side + 1).padStart(2, "0")}`, move: placed, facing, frames: showcaseFrames(placed) });
     });
   });
   return rows;

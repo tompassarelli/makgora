@@ -44,7 +44,10 @@ different frames on the side of its first hit, braced to take that hit
 without knockback, then moved to the other side with its hit record cleared
 the frame before its second hit opens, and sampled at that hit after the
 first hit's hitlag, so both hits show; a command grab at its lunge plus three
-quarters of its strike. A special that rushes forward until it meets a body also
+quarters of its strike. A ground move or special that hits both sides at once,
+reaching at least three quarters as far behind as ahead, stands the dummy in
+front in the right-facing row and behind in the left-facing row, so the two
+rows show both sides. A special that rushes forward until it meets a body also
 samples the middle and last frames of its rush, and the camera holds still
 from the frame before the rush to the move's end, so the travel shows.
 `native-capture plan PAD...` exercises its requested held
@@ -284,10 +287,13 @@ both facings at the lane's revision. `wait` prints the result: `sheet.png`
 (one row per facing, right on top), the frames folder, the map hash and the
 built source revision. Its `judge` folder holds a `batch-1.md` for
 `bun wisp anim judge run JUDGE_DIR`. Every lane clip gets its own sheet, so
-each cold viewer still judges one clip alone. `--crop` is in captured-screen
-pixels and applies to every tile. `--dummy SLUG` stands that fighter in as the
-target instead of a mirror of the mover, so a large fighter's silhouette does
-not merge with an identical body at the hit; it changes only the capture.
+each cold viewer still judges one clip alone. Each tile carries an arrow in its
+corner pointing the way the mover faces. `--crop` is in captured-screen pixels
+and applies to every tile; without it every tile is cropped to the body
+rectangle `330,40,660,480` around the pair the camera centres. The target is a
+Peon (a Rifleman when the mover is the Peon) or the fighter `--dummy SLUG`
+names, never a mirror of the mover, so a cold viewer can tell the attacker from
+the target at the hit; it changes only the capture.
 
 A special that reflects is staged with the dummy at most 300 units away, and
 closer when the dummy's neutral-special projectile could not fly there and

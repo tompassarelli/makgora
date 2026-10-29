@@ -22,6 +22,10 @@ const seconds = (since: number) => Math.round((performance.now() - since) / 100)
 const HOLD_TICKS = 30;
 const captureMinutes = (scripts: number) => Math.ceil((60 + scripts * 11) / 60);
 const TILE_HEIGHT = 270;
+const BODY_CROP: readonly number[] = [330, 40, 660, 480];
+const FACING_ARROW = { right: "10,14 34,14 34,6 50,20 34,34 34,26 10,26", left: "50,14 26,14 26,6 10,20 26,34 26,26 50,26" } as const;
+type Facing = keyof typeof FACING_ARROW;
+interface PadRow { readonly fixture: string; readonly facing: Facing }
 const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
 
 interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly remote?: RemoteHost }
@@ -137,16 +141,21 @@ const warmPool = (settings: Settings, log: ReturnType<typeof logTo>, logFile: st
 const movePads = (reelDirectory: string, job: Job, into: string) => attempt(`pick ${job.fighter} ${job.move}`, () => {
   const slot = showcaseSlot(job.move);
   const source = join(reelDirectory, job.fighter);
-  const picked = readdirSync(source).filter(name => name.endsWith(".pad")).sort().filter(name => new RegExp(`^#! reel \\S+ R\\d+ ${slot} (right|left) \\d+$`, "m").test(readFileSync(join(source, name), "utf8")));
+  const reel = new RegExp(`^#! reel \\S+ R\\d+ ${slot} (right|left) \\d+$`, "m");
+  const facingOf = (name: string): Facing | undefined => { const facing = reel.exec(readFileSync(join(source, name), "utf8"))?.[1]; return facing === "right" || facing === "left" ? facing : undefined; };
+  const picked = readdirSync(source).filter(name => name.endsWith(".pad")).sort().filter(name => facingOf(name) !== undefined);
   if (picked.length === 0) throw new Error(`${job.fighter} has no showcase row for ${job.move} (${slot}) at this revision`);
   mkdirSync(join(into, job.id), { recursive: true });
-  const dummy = job.dummy === undefined ? undefined : SELECTABLE_CHARACTERS.find(character => fighterSlug(character) === job.dummy);
+  const dummy = SELECTABLE_CHARACTERS.find(character => fighterSlug(character) === dummyOf(job));
   for (const name of picked) {
     if (dummy === undefined) cpSync(join(source, name), join(into, job.id, name));
     else writeFileSync(join(into, job.id, name), readFileSync(join(source, name), "utf8").replace(/^#! chat -dev quick hero (.+?) stocks \d+$/m, (_, hero: string) => `#! chat -dev quick pair ${hero} / ${fighterKey(dummy).toLowerCase()}`));
   }
-  return picked.map(name => `${job.id}-${name.replace(/\.pad$/, "")}`);
+  return picked.map(name => ({ fixture: `${job.id}-${name.replace(/\.pad$/, "")}`, facing: facingOf(name) ?? "right" }));
 });
+
+/** The capture target: the job's dummy, else a fighter unlike the mover, so a cold viewer can tell the attacker from the fighter he hits. */
+export const dummyOf = (job: Pick<Job, "fighter" | "dummy">): string => job.dummy ?? (job.fighter === "peon" ? "rifleman" : "peon");
 
 const CaptureRecord = Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, file: Schema.String, capturedMs: Schema.Finite });
 const Checkpoint = Schema.fromJsonString(Schema.Struct({ captures: Schema.Array(CaptureRecord) }));
@@ -170,16 +179,18 @@ export const capturedWhole = (fixtures: ReadonlyMap<string, readonly string[]>, 
   return new Set([...fixtures].filter(([, own]) => own.length > 0 && own.every(name => whole.has(name))).map(([job]) => job));
 };
 
-const sheetFor = (job: Job, fixtures: readonly string[], captures: readonly { readonly fixture: string; readonly frame: number; readonly file: string }[], frames: string, logFile: string) => Effect.gen(function*() {
+const sheetFor = (job: Job, fixtures: readonly PadRow[], captures: readonly { readonly fixture: string; readonly frame: number; readonly file: string }[], frames: string, logFile: string) => Effect.gen(function*() {
   const directory = join(queueDirectory("results"), job.id), judge = join(directory, "judge"), sheet = join(directory, "sheet.png");
   yield* attempt("create the result folder", () => mkdirSync(judge, { recursive: true }));
-  const crop = job.crop === undefined ? [] : ["-crop", `${job.crop[2]}x${job.crop[3]}+${job.crop[0]}+${job.crop[1]}`, "+repage"];
-  const rows = fixtures.map(fixture => captures.filter(capture => capture.fixture === fixture).sort((a, b) => a.frame - b.frame));
-  if (rows.some(row => row.length === 0)) return yield* fail(`${job.id}: a fixture has no captured frames`);
-  yield* spawnLogged(["magick", ...rows.flatMap(row => ["(", ...row.flatMap(capture => ["(", join(frames, capture.file), ...crop, "-resize", `x${TILE_HEIGHT}`, ")"]), "+append", ")"]), "-append", "+repage", sheet], directory, logFile);
+  const [left, top, width, height] = job.crop ?? BODY_CROP;
+  const crop = ["-crop", `${width}x${height}+${left}+${top}`, "+repage"];
+  const rows = fixtures.map(({ fixture, facing }) => ({ facing, row: captures.filter(capture => capture.fixture === fixture).sort((a, b) => a.frame - b.frame) }));
+  if (rows.some(({ row }) => row.length === 0)) return yield* fail(`${job.id}: a fixture has no captured frames`);
+  yield* spawnLogged(["magick", ...rows.flatMap(({ facing, row }) => ["(", ...row.flatMap(capture => ["(", join(frames, capture.file), ...crop, "-resize", `x${TILE_HEIGHT}`, "-fill", "white", "-stroke", "black", "-strokewidth", "2", "-draw", `polygon ${FACING_ARROW[facing]}`, ")"]), "+append", ")"]), "-append", "+repage", sheet], directory, logFile);
   const character = SELECTABLE_CHARACTERS.find(candidate => fighterSlug(candidate) === job.fighter) ?? 0;
+  const dummy = SELECTABLE_CHARACTERS.find(candidate => fighterSlug(candidate) === dummyOf(job)) ?? 0;
   const brief = yield* attempt("read the judge brief", () => readFileSync(join(projectRoot, "docs/animation-judge-brief.md"), "utf8"));
-  yield* attempt("write the judge batch", () => writeAtomic(join(judge, "batch-1.md"), `${brief}\n\n## Your moves (look: classic)\n\n- ${fighterName(character)} (\`${job.fighter}\`), \`${job.move}\`: ${sheet}\n  Native Classic frames in time order, one row per facing (top row faces right).\n\nWrite your scores to ${join(judge, "scores-1.jsonl")}, one JSON line per move.\n`));
+  yield* attempt("write the judge batch", () => writeAtomic(join(judge, "batch-1.md"), `${brief}\n\n## Your moves (look: classic)\n\n- ${fighterName(character)} (\`${job.fighter}\`), \`${job.move}\`: ${sheet}\n  Native Classic frames in time order, one row per facing; the arrow in each frame's corner points the way ${fighterName(character)} faces. The other fighter is a ${fighterName(dummy)} standing in as the target.\n\nWrite your scores to ${join(judge, "scores-1.jsonl")}, one JSON line per move.\n`));
   return { sheet, judge };
 });
 
@@ -190,8 +201,9 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     const built = performance.now();
     yield* spawnLogged(["bun", "install", "--frozen-lockfile"], sourceTs, logFile);
     for (const fighter of new Set(group.jobs.map(job => job.fighter))) yield* spawnLogged(["bun", "scripts/nativeCapture.ts", "reel", "--out", join(directory, `reel-${index}`), "--fighter", fighter, "--hold-ticks", String(HOLD_TICKS)], sourceTs, logFile);
-    const fixtures = new Map<string, readonly string[]>();
-    for (const job of group.jobs) fixtures.set(job.id, yield* movePads(join(directory, `reel-${index}`), job, join(directory, `pads-${index}`)));
+    const pads = new Map<string, readonly PadRow[]>();
+    for (const job of group.jobs) pads.set(job.id, yield* movePads(join(directory, `reel-${index}`), job, join(directory, `pads-${index}`)));
+    const fixtures = new Map([...pads].map(([id, rows]) => [id, rows.map(row => row.fixture)]));
     const map = join(directory, `g${index}.w3x`);
     yield* spawnLogged(["bun", settings.capacity, "session", "--class", "moderate", "--owner", `capture-queue-build-${batch}`, "--", "bun", "scripts/nativeCapture.ts", "build", "--out", map, "--name", `Smashcraft capture queue ${batch} g${index}`, ...group.jobs.map(job => join(directory, `pads-${index}`, job.id))], sourceTs, logFile);
     const manifest = `${map.replace(/\.w3x$/, "")}.captures.json`;
@@ -216,7 +228,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
         yield* log({ step: "failed", id: job.id, problem: ran.failure.message });
         continue;
       }
-      const { sheet, judge } = yield* sheetFor(job, own, captures, frames, logFile);
+      const { sheet, judge } = yield* sheetFor(job, pads.get(job.id) ?? [], captures, frames, logFile);
       yield* finish(job, { batch, status: "captured", mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision, fixtures: own, sheet, judge, frames });
       yield* log({ step: "sheet", id: job.id, sheet });
     }
