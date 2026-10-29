@@ -55,7 +55,7 @@ import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
 import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
-import { ButtonClicks, type MenuControls, bindSyncHandler, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, screenLayer, setFrameText, sizeText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type DelayFrames, type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules, presentDelayControls } from "./selectionRules";
@@ -197,9 +197,7 @@ export class SelectionPanel {
     const headerInset = f32(0.022);
     const headerLeft = f32(headerBoxLeft + headerInset);
     this.clicks = new ButtonClicks(`ui.selection.${suffix}.click`, (button, clicker) => this.click(button, clicker), button => this.highlight(button));
-    this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, screenLayer(), 400 + participantId);
-    BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
-    coverScreen(this.backdrop);
+    this.backdrop = createWindowBackdrop(`MeleeSelectBackdrop${suffix}`, MENU_STYLE.panelTexture, 400 + participantId);
     const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
     this.root = root;
     const grid = this.roster.grid;
@@ -609,6 +607,7 @@ export class SelectionPanel {
     BlzFrameSetVisible(this.tutorial.open, tutorialAvailable(game));
     BlzFrameSetVisible(this.cpu.root, cpuOpen);
     BlzFrameSetVisible(this.root, visible);
+    fitToWindow(this.backdrop);
     BlzFrameSetVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));
     for (const frame of this.movesFrames) BlzFrameSetVisible(frame, visible && this.movesOpen);
     BlzFrameSetVisible(this.modeLabel, visible && this.movesOpen);

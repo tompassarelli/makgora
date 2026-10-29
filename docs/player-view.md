@@ -143,19 +143,26 @@ checks it explicitly because the headless frame recorder stores requested
 points without reproducing the native clipping. A fresh map creates the
 correct parents; hot reload retains the parents of existing native handles.
 
-The character and stage select backdrops need a fullscreen parent too, but
-not `ConsoleUIBackdrop` itself. On Classic 3.0.0.24268, showing a
-`ConsoleUIBackdrop` child draws it over Warcraft's chat
-lines and chat entry box (#566). Raising `ORIGIN_FRAME_CHAT_MSG`'s level
-lifted chat back over select, but games that then ended with chat lines
-on screen crashed Warcraft with an ACCESS_VIOLATION writing address 0x31
-(#681): on pool pair 1 on 2026-10-28, typing a chat line at fighter select
-and starting the next game crashed both clients 2 times in 2, and the same
-build without the level change ran 5 such game ends clean. The backdrops
-are therefore children of `ConsoleUIBackdrop`'s parent (`screenLayer`,
-smashcraft:ts/src/game/ui/frames.ts): chat draws over them, they cover the
-screen as before, and the map never changes the chat frame
-(smashcraft:ts/test/engineFrames.test.ts).
+The character and stage select backdrops must reach every window edge, and
+Warcraft draws no child of the game UI outside the centred 4:3 area (Wisp
+measured it at 800x600 and 1280x720), so a game UI parent leaves the world
+showing on both sides of a wider window. On 2026-10-29, Classic 3.0.0.24268,
+at 16:9, 3:2 and 4:3, a child of the world frame was cut at the 4:3 edges the
+same way, and a child of `ConsoleUIBackdrop` covered the whole window. The
+backdrops are therefore children of `ConsoleUIBackdrop`, sized from the local
+client's aspect to its full width or height plus a small bleed and refitted
+when the window resizes (`createWindowBackdrop` and `fitToWindow`,
+smashcraft:ts/src/game/ui/frames.ts). Interactive content stays in the 4:3
+area. Chat still draws over them: the lines are Wisp's chat panel, a game UI
+frame above the backdrop, and Warcraft's chat entry box showed over the
+backdrop in the same captures. Before the chat panel, a `ConsoleUIBackdrop`
+child covered Warcraft's own chat lines and entry box (#566), and raising
+`ORIGIN_FRAME_CHAT_MSG`'s level lifted chat back over select but crashed
+Warcraft with an ACCESS_VIOLATION writing address 0x31 when a game ended with
+chat lines on screen (#681): on pool pair 1 on 2026-10-28, typing a chat line
+at fighter select and starting the next game crashed both clients 2 times in
+2, and the same build without the level change ran 5 such game ends clean. The
+map never changes the chat frame (smashcraft:ts/test/engineFrames.test.ts).
 
 ## Below the deck
 

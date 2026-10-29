@@ -9,7 +9,7 @@ const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-select-backdrop" };
 
-// Engine: the select backdrops hang beside ConsoleUIBackdrop, so a game UI frame created before one is drawn under it and the select screen shows only the backdrop.
+// Engine: the select backdrops hang off ConsoleUIBackdrop, so a game UI frame created before one is drawn under it and the select screen shows only the backdrop.
 test("each select backdrop is created before every frame of its screen, so Warcraft draws the cards and buttons over it [k2 property]", () => {
   const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0]);
   clients.start();

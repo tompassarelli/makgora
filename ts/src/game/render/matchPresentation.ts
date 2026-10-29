@@ -21,7 +21,7 @@ import { confirmedOrbCues, createOrbCueObservation, observeOrbCues } from "../pr
 import { orbPoint, orbWarned } from "../sim/orbs";
 import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { coverScreen, createBackdrop, createText, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
+import { createBackdrop, createText, fitToWindow, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "../ui/hudLayout";
 import { hideEffect, type WorldOrigin } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
@@ -363,7 +363,7 @@ export class MatchPresentation {
       name: createText("StageLoadingName", parent, 0),
     });
     BlzFrameSetTexture(frames.cover, PANEL_TEXTURE, 0, true);
-    coverScreen(frames.cover);
+    fitToWindow(frames.cover);
     BlzFrameSetLevel(frames.cover, 8);
     BlzFrameSetTexture(frames.art, texture, 0, true);
     BlzFrameSetAbsPoint(frames.art, FRAMEPOINT_CENTER, f32(0.4), f32(0.35));

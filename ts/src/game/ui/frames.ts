@@ -19,11 +19,6 @@ export function consoleUi(): framehandle {
   return BlzGetFrameByName("ConsoleUIBackdrop", 0);
 }
 
-// Engine: a ConsoleUIBackdrop child draws over chat, and raising the chat frame's level instead crashes Warcraft when the game ends.
-export function screenLayer(): framehandle {
-  return BlzFrameGetParent(consoleUi());
-}
-
 export function createBackdrop(name: string, owner: framehandle, context: number): framehandle {
   return BlzCreateFrameByType("BACKDROP", name, owner, "", context);
 }
@@ -58,11 +53,25 @@ export function placeTopLeft(frame: framehandle, x: number, y: number): void {
 }
 
 
-export function coverScreen(frame: framehandle): void {
-  const height = BlzGetLocalClientHeight();
-  const width = height <= 0 ? f32(0.8) : (I2R(BlzGetLocalClientWidth()) / I2R(height)) * f32(0.6);
-  BlzFrameSetSize(frame, width, f32(0.6));
-  BlzFrameSetAbsPoint(frame, FRAMEPOINT_BOTTOM, f32(0.4), 0.0);
+const fittedSize = new Map<framehandle, number>();
+
+// Engine: Warcraft draws no child of the game UI outside the centred 4:3 area, so a full-window backdrop hangs off ConsoleUIBackdrop.
+export function createWindowBackdrop(name: string, texture: string, context: number): framehandle {
+  const frame = createBackdrop(name, consoleUi(), context);
+  BlzFrameSetTexture(frame, texture, 0, false);
+  fitToWindow(frame);
+  return frame;
+}
+
+export function fitToWindow(frame: framehandle): void {
+  const pixelWidth = BlzGetLocalClientWidth();
+  const pixelHeight = BlzGetLocalClientHeight();
+  const key = pixelWidth * 65536 + pixelHeight;
+  if (fittedSize.get(frame) === key) return;
+  fittedSize.set(frame, key);
+  const aspect = pixelHeight <= 0 ? f32(4.0 / 3.0) : I2R(pixelWidth) / I2R(pixelHeight);
+  BlzFrameSetSize(frame, f32(Math.max(f32(0.8), aspect * f32(0.6)) + f32(0.02)), f32(Math.max(f32(0.6), f32(0.8) / aspect) + f32(0.02)));
+  BlzFrameSetAbsPoint(frame, FRAMEPOINT_CENTER, f32(0.4), f32(0.3));
 }
 
 
