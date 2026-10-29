@@ -38,6 +38,8 @@ import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { GROM_BLOODLUST_MODEL, MURLOC_SWAMP_MIST_MODEL } from "../assets/importedModelInfo";
 import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
+import { HOOK_MODEL } from "../fighters/butcher/specials";
+import { HOOK_LINK_MODEL } from "./hookChain";
 import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { SYLVANAS_SPECIALS } from "../fighters/sylvanas/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
@@ -303,7 +305,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Bash", startup: FEL, active: cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "ahead", f32(0.5)) },
   },
   [Character.butcher]: {
-    neutral: { spell: "Meat Hook", startup: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)), active: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)) },
+    neutral: { spell: "Meat Hook", startup: cue(HOOK_MODEL, "hand", f32(0.5)), active: cue(HOOK_LINK_MODEL, "hand", f32(0.5)) },
     side: { spell: "Butcher's Charge", startup: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.3)), active: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.45)) },
     up: { spell: "Hook Swing", startup: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)), active: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)) },
     down: { spell: "Rot", startup: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)), active: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)) },

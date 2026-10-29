@@ -5,7 +5,7 @@ import { CHARGED_AIM_FRAMES, FollowUpInput, frames, type AuthoredSpecial, type F
 import { butcherReachBody, capsule, hit } from "./moves";
 
 const AIR_LANDING_LAG = 22;
-export const HOOK_MODEL = "Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx";
+export const HOOK_MODEL = "Abilities\\Weapons\\WyvernSpear\\WyvernSpearMissile.mdx";
 
 export const HOOK_CHARGE: SpecialCharge = { hold: 6, full: 60, stages: 3, releases: true };
 export const HOOK_THROW_FRAME = CHARGED_AIM_FRAMES;
@@ -20,7 +20,7 @@ const HOOK_WINDOW = frames(1, HOOK_CHARGE.hold + 1);
 
 const hookHead = (latches: boolean, life: number): SpecialProjectile => ({
   model: HOOK_MODEL, spawnFrame: HOOK_THROW_FRAME, offsetX: 60.0, offsetZ: 80.0, velocityX: HOOK_SPEED, velocityZ: 0.0,
-  life, radius: 22.0, effect: hit(8.0, "POKE", 40, 1.0, HitElement.slash), reflectable: true, limit: 1,
+  life, radius: 22.0, modelRadius: 13.75, effect: hit(8.0, "POKE", 40, 1.0, HitElement.slash), reflectable: true, limit: 1,
   cancelOnInterrupt: true, latch: latches ? { reelFrames: HOOK_REEL_FRAMES } : undefined,
 });
 const hookThrow = (air: boolean, stage: number): AuthoredSpecial => {

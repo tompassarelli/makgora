@@ -61,7 +61,14 @@ Specials:
   stops it and takes an 8% projectile hit; a reflector sends it back as an
   ordinary hit. A whiff leaves 40 frames of recovery after the flight. In the air
   the hook only strikes (8%), since he cannot hold a foe while falling. The
-  latch and the reel (`grab.reel`) are rollback state.
+  latch and the reel (`grab.reel`) are rollback state. The flying head is the
+  stock Wyvern Rider spear (`WyvernSpearMissile`) at 1.6 times, its barbs at
+  the hit region's front edge and pitched along the throw. A chain of stock
+  dungeon chain links (`Chain0`, rolled so its hanging plate faces away) runs
+  from his hand to the head, lengthening on the throw and shortening on the
+  reel with the caught foe at its end. It is drawn each frame from the
+  fighters and adds no simulation state; enough links are made at setup for a
+  full-hold throw, aimed or level.
 - **Butcher's Charge** (side). A belly-led rush on frames 8–20 that stops at
   bodies and shields, with armour over the same frames against hits up to 5%
   plus 1% per Flesh Heap stack, and a bump for 11%. 44 frames.

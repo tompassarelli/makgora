@@ -1,15 +1,9 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { type Roster, fighterAt } from "../sim/roster";
-import { HOOK_LINK_COUNT, HOOK_LINK_LENGTH, HOOK_LINK_MODEL, HOOK_LINK_SCALE, HOOK_LINK_SPACING, type HookChainSpan, emptyHookChainSpan, hookChainSpan } from "../presentation/hookChain";
+import { HOOK_LINK_COUNT, HOOK_LINK_LENGTH, HOOK_LINK_MODEL, HOOK_LINK_ROLL, HOOK_LINK_SCALE, HOOK_LINK_SPACING, type HookChainSpan, emptyHookChainSpan, hookChainLength, hookChainSpan, hookLinkCount } from "../presentation/hookChain";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { hideEffect, placeEffect, type WorldOrigin } from "./effects";
-
-/** Octagonal distance, within 4% of the true length, so the link count needs no platform square root. */
-const reach = (dx: number, dz: number): number => {
-  const a = Math.abs(dx), b = Math.abs(dz);
-  return f32(a > b ? f32(a + f32(b * f32(0.4))) : f32(b + f32(a * f32(0.4))));
-};
 
 /** The Butcher's hook chain: evenly spaced links from his hand to the hook, or to the foe he reels in. */
 export class HookChainPresentation {
@@ -34,9 +28,10 @@ export class HookChainPresentation {
     }
     const { fromX, fromZ, toX, toZ } = this.span;
     const dx = f32(toX - fromX), dz = f32(toZ - fromZ);
-    const length = reach(dx, dz);
-    const count = Math.min(HOOK_LINK_COUNT, Math.max(1, Math.round(length / HOOK_LINK_SPACING)));
-    const pitch = meleeAtan2(dx, dz);
+    const length = hookChainLength(this.span);
+    const count = Math.min(HOOK_LINK_COUNT, hookLinkCount(length));
+    const backward = dx < 0.0;
+    const pitch = backward ? meleeAtan2(f32(-dx), f32(-dz)) : meleeAtan2(dx, dz);
     const scale = f32(f32(length / count) / HOOK_LINK_LENGTH);
     for (let index = 0; index < HOOK_LINK_COUNT; index++) {
       const link = this.links[index];
@@ -45,9 +40,10 @@ export class HookChainPresentation {
         if (index < this.shown) hideEffect(link, this.origin);
         continue;
       }
-      const along = f32(index / count);
+      const along = f32((backward ? index + 1 : index) / count);
       BlzSetSpecialEffectScale(link, scale);
       BlzSetSpecialEffectPitch(link, pitch);
+      BlzSetSpecialEffectRoll(link, HOOK_LINK_ROLL);
       placeEffect(link, this.origin.x + f32(fromX + f32(dx * along)), this.origin.y, this.origin.z + f32(fromZ + f32(dz * along)));
     }
     this.shown = count;

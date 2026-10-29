@@ -7,6 +7,7 @@ import { HOOK_MODEL, HOOK_REACH } from "../fighters/butcher/specials";
 export const HOOK_LINK_MODEL = "Doodads\\Dungeon\\Props\\Chain\\Chain0.mdx";
 export const HOOK_LINK_LENGTH = 71.5;
 export const HOOK_LINK_PITCH = 1.0;
+export const HOOK_LINK_ROLL = f32(Math.PI);
 export const HOOK_LINK_SPACING = 48.0;
 export const HOOK_LINK_SCALE = f32(HOOK_LINK_SPACING / HOOK_LINK_LENGTH);
 export const HOOK_LINK_COUNT = Math.ceil(HOOK_REACH / HOOK_LINK_SPACING) + 2;
@@ -19,6 +20,17 @@ export interface HookChainSpan {
   toX: number;
   toZ: number;
 }
+
+/** Octagonal distance, within 4% of the true length, so the link count needs no platform square root. */
+const reach = (dx: number, dz: number): number => {
+  const a = Math.abs(dx), b = Math.abs(dz);
+  return f32(a > b ? f32(a + f32(b * f32(0.4))) : f32(b + f32(a * f32(0.4))));
+};
+
+export const hookChainLength = (span: Readonly<HookChainSpan>): number => reach(f32(span.toX - span.fromX), f32(span.toZ - span.fromZ));
+
+/** Links drawn along a chain this long, before the cap of the links made at setup. */
+export const hookLinkCount = (length: number): number => Math.max(1, Math.round(length / HOOK_LINK_SPACING));
 
 export const emptyHookChainSpan = (): HookChainSpan => ({ fromX: 0.0, fromZ: 0.0, toX: 0.0, toZ: 0.0 });
 

@@ -16,6 +16,7 @@ import { specialPlacements } from "../sim/specials/placements";
 import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
 import { PILLAR_COLUMN_STRETCH, FINGER_COLUMN_WIDTH } from "../fighters/archimonde/specials";
 import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
+import { HOOK_MODEL } from "../fighters/butcher/specials";
 import type { CueBirth } from "./specialCues";
 import type { Fuse } from "./discLook";
 
@@ -165,6 +166,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { x: 0.0, z: f32(-59.4), loopFrames: 12, disc: [150, 70, 230] },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25 },
   [ELUNE_SHIMMER]: { x: 0.0, z: 0.0, disc: [205, 225, 255], discVertical: true },
+  [HOOK_MODEL]: { x: -20.0, z: 0.0 },
 };
 
 
