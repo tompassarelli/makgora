@@ -14,7 +14,7 @@ import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile, TargetedStrike } from "../sim/specials/schema";
 import { specialPlacements } from "../sim/specials/placements";
 import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
-import { PILLAR_COLUMN_STRETCH } from "../fighters/archimonde/specials";
+import { PILLAR_COLUMN_STRETCH, FINGER_COLUMN_WIDTH } from "../fighters/archimonde/specials";
 import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
 import type { CueBirth } from "./specialCues";
 import type { Fuse } from "./discLook";
@@ -158,6 +158,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { x: 0.0, z: 0.0, sequence: "birth", height: PILLAR_COLUMN_STRETCH },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx": { x: 0.0, z: 0.0, disc: [255, 80, 20], discVertical: true, fuse: { z: FLAME_STRIKE_BURST.offsetZ, hot: [255, 245, 190] } },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx": { x: 0.0, z: 0.0, height: 2.0 },
+  "Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx": { x: 0.0, z: 0.0, width: FINGER_COLUMN_WIDTH },
   "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
   [ANKH_BURST_MODEL]: { x: 0.0, z: 0.0, sequence: "stand", reseek: true },
   "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": { x: 0.0, z: 0.0, sequence: "spell" },

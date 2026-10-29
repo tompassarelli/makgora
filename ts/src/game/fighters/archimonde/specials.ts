@@ -21,6 +21,8 @@ const FINGER_CEILING = 460.0;
 const MONSOON_ART_HEIGHT = 936.0;
 const MONSOON_ART_BASE = 15.0;
 const MONSOON_CUE_SCALE = f32(0.7);
+const FINGER_LOCK_RADIUS = 110.0;
+export const FINGER_COLUMN_WIDTH = 6.0;
 const FINGER_ART_SCALE = f32((FINGER_CEILING - FINGER_FLOOR) / MONSOON_ART_HEIGHT);
 const FINGER_COLUMN: SpecialProjectile = {
   ...mark("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx", 0, 12, 0.0),
@@ -29,7 +31,7 @@ const FINGER_COLUMN: SpecialProjectile = {
 const FINGER_LINE: SpecialProjectile = { ...mark("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", 1, FINGER_STRIKE_FRAME + 6, 0.0), atFoe: true, radius: FINGER_RADIUS, modelRadius: f32(FINGER_RADIUS / 2.0) };
 export const FINGER_LOCK: SpecialProjectile = {
   ...mark(FLAME_RING_MODEL, 1, FINGER_STRIKE_FRAME, 0.0),
-  atFoe: true, radius: FINGER_RADIUS, expiresInto: FINGER_COLUMN,
+  atFoe: true, radius: FINGER_LOCK_RADIUS, expiresInto: FINGER_COLUMN,
 };
 const fingerOfDeath = (air: boolean): AuthoredSpecial => ({
   endFrame: 58, landingLag: air ? AIR_LANDING_LAG : undefined,
@@ -49,11 +51,11 @@ const PILLAR_CEILING = 900.0;
 const PILLAR_COLUMN_LIFE = 14;
 const FLAME_ART_HEIGHT = 1105.0;
 const FLAME_ART_BASE = 86.0;
-const FLAME_ART_RADIUS = 243.0;
+const FLAME_ART_RADIUS = 190.0;
 const PILLAR_ART_SCALE = f32(PILLAR_RADIUS / FLAME_ART_RADIUS);
 export const PILLAR_COLUMN_STRETCH = f32(f32(PILLAR_CEILING - PILLAR_FLOOR) / f32(FLAME_ART_HEIGHT * PILLAR_ART_SCALE));
-// FlameStrike.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the pillar plays that stretch across its life.
-const FLAME_COLUMN_SECONDS = { from: f32(1.05), to: f32(5.1) } as const;
+// FlameStrike.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the pillar plays its widest stretch across its life, so the column is full on its first frame.
+const FLAME_COLUMN_SECONDS = { from: f32(4.0), to: f32(5.1) } as const;
 const pillarColumn = (): SpecialProjectile => ({
   ...mark("Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx", 0, PILLAR_COLUMN_LIFE, 0.0),
   radius: PILLAR_RADIUS, modelRadius: FLAME_ART_RADIUS, modelOffsetZ: f32(PILLAR_FLOOR + FLAME_ART_BASE * PILLAR_ART_SCALE * PILLAR_COLUMN_STRETCH),
