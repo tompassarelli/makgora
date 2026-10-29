@@ -1682,6 +1682,10 @@ it gold (`STRONG_SPARK_COLOUR`; size alone did not read on a single hit, since
 the ordinary star is the same white-blue) and plays
 the fighter's strong hit sound (the large-tier hit layered with its sweetener).
 A weak hit keeps the ordinary spark, sound and hitlag.
+Every contact spark draws at the hit's contact band on the victim: 0.2, 0.5
+or 0.85 of the victim's standing hurt height above its feet for a low, mid
+or high contact, the band its damage pose already uses, so a hit landed
+overhead shows overhead rather than at the victim's feet.
 
 Signature moves, with each move's regions, frames and damage in the generated
 [move list](move-list.md):

@@ -1,9 +1,11 @@
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
+import { max } from "../core/numbers";
 import { Character, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
 import { attackStartup, isFloorTeching, isGroundDodging, isTumbling } from "../sim/conditions";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { HitElement } from "../sim/hitRegions";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../sim/ledge";
 import { SMASH_MAX_CHARGE_FRAMES } from "../sim/moves";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../sim/tuning";
@@ -130,6 +132,7 @@ export interface ImpactEvents {
   direction: number;
   x: number;
   z: number;
+  hitZ: number;
   surface: SurfaceContact;
   surfaceMissedTech: boolean;
 
@@ -155,7 +158,7 @@ export function createImpactEvents(): ImpactEvents {
     shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false,
     movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false,
     respawn: false, jump: JumpCue.none, jumpOriginX: 0.0, jumpOriginZ: 0.0, character: 1, facing: 1,
-    koDirectionX: 0, koDirectionZ: 0, landing: ImpactLanding.none, dodge: DodgeCue.none, direction: 0, x: 0.0, z: 0.0,
+    koDirectionX: 0, koDirectionZ: 0, landing: ImpactLanding.none, dodge: DodgeCue.none, direction: 0, x: 0.0, z: 0.0, hitZ: 0.0,
     surface: SurfaceContact.none, surfaceMissedTech: false, contactX: 0.0, contactZ: 0.0,
     normalX: 0.0, normalZ: 0.0,
   };
@@ -329,6 +332,13 @@ function strikingMove(fighter: Readonly<Fighter>, world: Readonly<Roster> | unde
   }
 }
 
+const CONTACT_BANDS: readonly number[] = [f32(0.2), 0.5, f32(0.85)];
+
+function contactBandHeight(character: number, band: number): number {
+  const body = hurtCapsule(character);
+  return f32(f32(max(body.z1, body.z2) + body.radius) * (CONTACT_BANDS[band] ?? 0.5));
+}
+
 export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<Fighter>, world?: Readonly<Roster>): void {
   const { motion, status, ground, surfaceRecovery, visuals, jump, launch, shield, down, attack, ledge, dodge } = fighter;
   events.character = fighter.character;
@@ -376,6 +386,7 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
   events.tier = events.hit ? hitTier(fighter, world) ?? visuals.hitStrength : events.tier;
   events.variant = visuals.hit;
   events.pummel = events.hit && visuals.hitPummel;
+  if (events.hit) events.hitZ = f32(motion.z + contactBandHeight(fighter.character, visuals.hitHeight));
   if (events.hit && !events.pummel) {
     events.strong = visuals.hitStrong;
     strikingMove(fighter, world, false, events);
@@ -389,6 +400,7 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.tier = 0;
     events.hitCharacter = Character.rifleman;
     events.hitMove = specialMove(specialSlot(SpecialAction.riflemanTrap));
+    events.hitZ = f32(motion.z + contactBandHeight(fighter.character, 1));
   }
 
   const { style } = attack;

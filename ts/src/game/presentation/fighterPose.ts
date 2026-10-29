@@ -479,15 +479,16 @@ function selectTableAction(pose: FighterPose, f: Readonly<Fighter>, table: Reado
       }
       return attackRate(f, attackPhase(f));
     }
+    const resumes = release.aligned === true || (f.character === Character.lichKing && style === AttackStyle.forwardSmash);
     if (pose.animation === "smash-charge") {
       selectFighterClipIndex(pose, release.index);
       pose.animation = "smash-release";
-      if (f.character === Character.lichKing && style === AttackStyle.forwardSmash) {
+      if (resumes) {
         const startup = attackStartupFrames(style, f.tuning.moves);
         pose.clipTime = f32(strikeStart(f.character, style, release, startup) + f32(attackRate(f, AttackPhase.startup) * f32(attack.frame * FRAME_SECONDS)));
       }
     }
-    if (f.character === Character.lichKing && style === AttackStyle.forwardSmash) return attackRate(f, attackPhase(f));
+    if (resumes) return attackRate(f, attackPhase(f));
     return clipRate(release.seconds, attack.duration - attackStartupFrames(style, f.tuning.moves));
   }
   return undefined;
