@@ -57,12 +57,7 @@ BunRuntime.runMain(Effect.gen(function*() {
   };
   for (const [pose, fingers] of Object.entries(HAND_POSES)) {
     if (pose === 'Pinch') {
-      for (const [directory, bounds, visible, offset, canvas] of [
-        [output, '29x27!', '25x27+2+0', '2x4', '32x32'],
-      ] as const) {
-        yield* Effect.try({ try: () => mkdirSync(directory, { recursive: true }), catch: ioFailure });
-        yield* run(['magick', join(source, 'wc3-pinching-hand.png'), '-crop', '1315x1085+33+33', '+repage', '-resize', bounds, '-crop', visible, '+repage', '-resize', bounds, '-background', 'none', '-gravity', 'northwest', '-splice', offset, '-extent', canvas, '-depth', '8', `TGA:${join(directory, 'SelectionHandPinch.tga')}`]);
-      }
+      yield* run(['magick', join(source, 'wc3-pinching-hand.png'), '-filter', 'point', '-resize', '29x27!', '-background', 'none', '-gravity', 'northwest', '-splice', '2x4', '-extent', '32x32', '-depth', '8', `TGA:${join(output, 'SelectionHandPinch.tga')}`]);
     }
     else yield* render(`SelectionHand${pose}`, 'SelectionHand.svg', fingers, false);
   }
