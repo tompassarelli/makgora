@@ -31,6 +31,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Medivh | Nordrassil | 10 | RoC's prophet brings the human, orc and night elf leaders together to defend Mount Hyjal and its World Tree. |
 | Lady Vashj | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Lady Vashj's naga hold the Broken Isles around the Tomb of Sargeras for Illidan. |
 | Archimonde the Defiler | Nordrassil | 10 | RoC's final battle: the Burning Legion's lord climbs Mount Hyjal to take the World Tree. |
+| Tyrande Whisperwind | Nordrassil | 10 | RoC's night elf campaign: the High Priestess holds the passes of Hyjal until the World Tree's trap closes on Archimonde. |
 | Thrall | Durotar Skies | 3 | Thrall leads the founding of Durotar. |
 | Jaina Proudmoore | Gryphon Aerie | 11 | Jaina leads the Alliance expedition with its human forces. |
 | Sylvanas Windrunner | Naxxramas | 4 | The Dark Ranger fights the Scourge in Lordaeron. |

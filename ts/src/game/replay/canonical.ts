@@ -1,5 +1,6 @@
 import { writeStrikeTraits } from "./strikeCanonical";
 import { writeWindow } from "./windowCanonical";
+import { writeEmpowered, writePierce } from "./empowerCanonical";
 import { type FighterFieldSink, type FighterKitText, writeFighterFields } from "../../generated/state/fighterState";
 
 
@@ -269,6 +270,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
     real("homing.turn", spec.homing.turn);
     real("homing.maxRise", spec.homing.maxRise);
   }
+  writePierce(int, spec);
   if (spec.burstInto !== undefined) result.push(specialProjectileCanonical(spec.burstInto, `${prefix}.burstInto`));
   if (spec.expiresInto !== undefined) result.push(specialProjectileCanonical(spec.expiresInto, `${prefix}.expiresInto`));
   return result.join("");
@@ -417,6 +419,8 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int("jumpWindow.last", move.jumpWindow.last);
   }
   writeWindow(int, "spellImmune", move.spellImmune);
+  writeWindow(int, "reflects", move.reflects);
+  writeEmpowered(int, move);
   if (move.shorten !== undefined) {
     int("shorten.first", move.shorten.first);
     int("shorten.last", move.shorten.last);

@@ -27,6 +27,8 @@ import * as medivh from "./white-models/medivh";
 import * as uther from "./white-models/uther";
 import * as ladyVashj from "./white-models/lady-vashj";
 import * as archimonde from "./white-models/archimonde";
+import * as tyrande from "./white-models/tyrande";
+import * as butcher from "./white-models/butcher";
 export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   1: rifleman.whiteModel,
   2: illidan.whiteModel,
@@ -55,4 +57,6 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   27: uther.whiteModel,
   28: ladyVashj.whiteModel,
   29: archimonde.whiteModel,
+  30: tyrande.whiteModel,
+  31: butcher.whiteModel,
 };

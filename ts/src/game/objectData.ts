@@ -67,6 +67,7 @@ export const FIGHTER_OBJECTS: Readonly<Record<Character, FighterObject>> = {
   [Character.uther]: heroObject(Character.uther),
   [Character.archimonde]: heroObject(Character.archimonde),
   [Character.butcher]: heroObject(Character.butcher),
+  [Character.tyrande]: heroObject(Character.tyrande),
   [Character.murloc]: heroObject(Character.murloc),
   [Character.ladyVashj]: heroObject(Character.ladyVashj),
   [Character.grom]: heroObject(Character.grom),

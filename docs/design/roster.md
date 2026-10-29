@@ -289,6 +289,16 @@ The map's description carries the same credits.
   The page states no usage terms (read 28 October 2026,
   smashcraft:docs/design/roster-next.md#hive-model-terms), so we credit
   every author it names, as Hive's custom asks.
+- [Tyrande Dismounted SD by Retera](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/)
+  (Hive Workshop, approved 11 November 2020): `TyrandeDismountedSD.mdx`,
+  imported as `war3mapImported\TyrandeDismountedSD.mdx` for Tyrande. It is a
+  287-polygon model built in Retera Model Studio that draws Warcraft III's own
+  `PriestessOfTheMoon` and `HeroRanger` textures, with no texture of its own.
+
+Source terms read on 28 October 2026 from the Wayback Machine's 12 February
+2026 copy of the page: the resource is tagged "Open Source", and the author
+writes that any modification is fine, so we reanimate it. The map description
+credits "Tyrande Dismounted SD by Retera (Hive Workshop), open source."
 
 Source terms read on 13 October 2026: the model resource identifies Kwaliti,
 `LichKing2.mdx` and `LichKing2_Portrait.mdx`, and asks users to give credit.

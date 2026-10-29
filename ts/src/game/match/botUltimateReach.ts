@@ -30,4 +30,5 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.ladyVashj]: { near: 80.0, far: 560.0 },
   [Character.archimonde]: { near: 100.0, far: 900.0 },
   [Character.butcher]: { near: 0.0, far: 130.0 },
+  [Character.tyrande]: { near: 40.0, far: 460.0 },
 };

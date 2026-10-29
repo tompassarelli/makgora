@@ -9,6 +9,7 @@ export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   dreadlord: ["forward-air", "back-air"],
   "chen-stormstout": ["jab", "jab3", "down-tilt", "dash-attack", "up-smash", "neutral-air", "forward-air", "back-air", "down-air"],
   uther: ["jab2"],
+  tyrande: ["down-tilt", "dash-attack", "down-smash", "neutral-air", "back-air", "down-air"],
 };
 
 export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
@@ -18,6 +19,7 @@ export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
   "lady-vashj": ["side-special", "up-special", "down-special", "ultimate"],
   archimonde: ["neutral-special", "side-special", "up-special", "ultimate"],
   butcher: ["neutral-special", "side-special", "up-special", "ultimate"],
+  tyrande: ["neutral-special", "side-special", "up-special", "down-special", "ultimate"],
   "chen-stormstout": ["neutral-special", "ultimate"],
   "pit-lord": ["neutral-special", "up-special"],
   uther: ["neutral-special", "down-special", "ultimate"],

@@ -37,4 +37,5 @@ export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
   [Character.ladyVashj]: { left: -74, right: 109, bottom: -1, top: 158 },
   [Character.archimonde]: { left: -93, right: 51, bottom: -2, top: 134 },
   [Character.butcher]: { left: -126, right: 150, bottom: -14, top: 292 },
+  [Character.tyrande]: { left: -45, right: 80, bottom: 0, top: 130 },
 };

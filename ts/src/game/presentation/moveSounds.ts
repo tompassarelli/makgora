@@ -178,6 +178,11 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     specials: [s("AxeMissileLaunch", "MeatWagonMissileHit"), s("MeatWagonAttack1", "RockHeavyBashFlesh"), s("AxeMissileLaunch", "AxeMissileHit"), s("Cannibalize", "Cannibalize")],
     ultimate: s("RelentlessCleave", "Cannibalize"),
   },
+  [Character.tyrande]: {
+    weapon: Weapon.blunt, strong: "WoodHeavyBashFlesh",
+    specials: [s("ArrowLaunch", "SearingArrowHit"), s("DispelMagic", "Defend"), s("BlinkCaster", "WoodLightBashFlesh"), s("ManaShieldCastSound", "Defend")],
+    ultimate: s("RevealMap", "FrostNova"),
+  },
 };
 
 export interface SoundLayer {

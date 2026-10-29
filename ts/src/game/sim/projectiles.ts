@@ -14,6 +14,7 @@ import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hit
 import type { SpecialProjectile } from "./specials/schema";
 import { agesWithMove } from "./specials/engine";
 import { repelSpell } from "./specials/spellImmunity";
+import { reflectsProjectiles } from "./specials/reflector";
 import { bounceAfterHit, clearBounce, steerBounce } from "./projectileBounce";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
@@ -182,7 +183,7 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
 }
 
 
-function reflectProjectile(target: Fighter, source: Projectile): boolean {
+function reflectProjectile(target: Fighter, source: Projectile, parry: boolean): boolean {
   let index = -1;
   for (const before of target.projectiles) {
     index++;
@@ -207,7 +208,7 @@ function reflectProjectile(target: Fighter, source: Projectile): boolean {
     source.life = 0;
     target.visuals.shieldReflect++;
     target.visuals.shieldElectric = false;
-    grantParry(target);
+    if (parry) grantParry(target);
     return true;
   }
   return false;
@@ -221,6 +222,7 @@ const targets = {
   intangible: [false, false, false, false],
 
   reflecting: [false, false, false, false],
+  bodyReflecting: [false, false, false, false],
 };
 
 
@@ -268,9 +270,9 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
     const shieldContact = target.shield.raised && (eyeBeam
       ? shieldCircleIntersects(target, oldX, f32(oldZ - EYE_BEAM_BAND_DROP), projectile.x, f32(projectile.z - EYE_BEAM_BAND_DROP), 1.0, EYE_BEAM_BAND_HALF)
       : shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, blaster ? radius : 0.0));
-    const reflector = shieldContact && at(targets.reflecting, targetSlot);
     const candidate = Math.abs(f32(targetX - oldX));
     const touching = shieldContact || ((crossed || near) && height);
+    const reflector = (shieldContact && at(targets.reflecting, targetSlot)) || (touching && at(targets.bodyReflecting, targetSlot));
     if (touching && repelSpell(target)) continue;
     if (touching && (nearest === undefined || candidate < distance)) {
       nearest = targetSlot;
@@ -365,7 +367,7 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
     const body = hurtCapsule(target.character);
     const targetX = at(targets.x, targetSlot);
     const targetZ = at(targets.z, targetSlot);
-    if (spec.bounce !== undefined && targetSlot === projectile.lastStruck) continue;
+    if ((spec.bounce !== undefined || spec.pierces === true) && targetSlot === projectile.lastStruck) continue;
 
     if (spec.pool !== undefined && !target.motion.grounded) continue;
     const reach = f32(radius + body.radius);
@@ -374,10 +376,10 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
     const height = f32(max(oldZ, projectile.z) + reach) >= f32(targetZ + body.z1) && f32(min(oldZ, projectile.z) - reach) <= f32(targetZ + body.z2);
 
     const shieldContact = target.shield.raised && shieldCircleIntersects(target, oldX, oldZ, projectile.x, projectile.z, 1.0, radius);
-    const reflector = spec.reflectable && shieldContact && at(targets.reflecting, targetSlot);
     const candidate = Math.abs(f32(targetX - oldX));
     const bodyContact = (crossed || near) && height
       && capsulesIntersect(heroFlight, placeCapsule(heroTarget, body, targetX, targetZ, target.facing));
+    const reflector = spec.reflectable && ((shieldContact && at(targets.reflecting, targetSlot)) || (bodyContact && at(targets.bodyReflecting, targetSlot)));
     if ((shieldContact || bodyContact) && repelSpell(target)) continue;
     if ((shieldContact || bodyContact) && (nearest === undefined || candidate < distance)) {
       nearest = targetSlot;
@@ -454,6 +456,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
     targets.out[slot] = target.status.out;
     targets.intangible[slot] = isIntangible(target);
     targets.reflecting[slot] = target.shield.reflectFrames > 0;
+    targets.bodyReflecting[slot] = reflectsProjectiles(target);
   }
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;
@@ -490,11 +493,14 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
         }
         const burst = projectile.kind === ProjectileKind.hero ? projectile.spec?.burstInto : undefined;
         let bounced = false;
-        if (!(selected.reflector && reflectProjectile(fighterAt(world, nearest), projectile))) {
+        let pierced = false;
+        if (!(selected.reflector && reflectProjectile(fighterAt(world, nearest), projectile, selected.shield))) {
           if (burst !== undefined) projectile.spec = burst;
           applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
           if (projectile.spec?.steered === true && projectile.damageMultiplier === 1.0) fighterAt(world, ownerSlot).special.hit = true;
           bounced = !selected.shield && bounceAfterHit(world, ownerSlot, projectile, nearest);
+          pierced = !selected.shield && projectile.spec?.pierces === true && projectile.lastStruck === undefined;
+          if (pierced) projectile.lastStruck = nearest;
           if (burst !== undefined) {
             projectile.velocityX = 0.0;
             projectile.velocityZ = 0.0;
@@ -502,7 +508,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
           }
         }
         projectile.life--;
-        if (!bounced && (burst === undefined || projectile.spec !== burst)) projectile.life = 0;
+        if (!bounced && !pierced && (burst === undefined || projectile.spec !== burst)) projectile.life = 0;
       }
       if (projectile.life <= 0) {
         projectile.life = 0;

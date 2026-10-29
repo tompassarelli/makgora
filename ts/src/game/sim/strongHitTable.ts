@@ -113,6 +113,7 @@ export const SIGNATURE_STRONG_HIT: { readonly [character: number]: AttackStyle }
   [Character.medivh]: AttackStyle.neutralAir,
   [Character.archimonde]: AttackStyle.forwardSmash,
   [Character.butcher]: AttackStyle.forwardSmash,
+  [Character.tyrande]: AttackStyle.forwardSmash,
   [Character.anubarak]: AttackStyle.forwardSmash,
 };
 
@@ -160,6 +161,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   [Character.medivh]: { [AttackStyle.neutralAir]: "An arcane ring strongest as it forms, lingering as weak cover." },
   [Character.archimonde]: { [AttackStyle.forwardSmash]: "The fel claws at the end of the slam crush; the forearms only shove." },
   [Character.butcher]: { [AttackStyle.forwardSmash]: "The cleaver's edge carves; the haft only clubs, so he kills by spacing the blade." },
+  [Character.tyrande]: { [AttackStyle.forwardSmash]: "Moonlight gathers at the bow's tip; the grip only pushes, so she kills at full reach." },
   [Character.anubarak]: { [AttackStyle.forwardSmash]: "The impaling claw's point." },
 };
 

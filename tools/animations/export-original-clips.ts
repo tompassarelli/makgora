@@ -166,7 +166,7 @@ for (const [character, fighter] of FIGHTER_ART) {
         untrimmedSelectedBodyBytes: untrimmedBytes, bytes: fighterBytes, unthinnedBytes, keyThin: {bound: KEY_BOUND, report: thin.report}, trackFamilies,
         omittedTrackFamilies: reuse ? retainedRecord.omittedTrackFamilies : [...omittedTrackFamilies], light, clips});
     const r = thin.report;
-    console.log(`${fighter.name}: keys ${r.keysBefore} -> ${r.keysAfter}, ${unthinnedBytes - fighterBytes} bytes saved (${unthinnedBytes} -> ${fighterBytes}), max ${r.maxPosition.toFixed(3)} units, ${r.maxRotationDegrees.toFixed(3)} deg`);
+    console.log(`${fighter.name}: keys ${r.keysBefore} -> ${r.keysAfter}, ${unthinnedBytes - fighterBytes} bytes saved (${unthinnedBytes} -> ${fighterBytes}), max ${Number(r.maxPosition).toFixed(3)} units, ${Number(r.maxRotationDegrees).toFixed(3)} deg`);
     console.log(`${fighter.name}: ${clips.length} clips, ${fighterBytes} bytes; ${reuse ? 'retained source/clip hashes' : 'exact original-key and MDX checks'} PASS`);
 }
 for (const [character, clips] of moduleClips.entries()) if (clips !== undefined) {

@@ -337,6 +337,7 @@ const ULTIMATE_POSES: { readonly [character: number]: HeroPose | undefined } = {
   [Character.peon]: "forwardSmash", [Character.tinker]: "sideSpecial", [Character.kaelthas]: "downSpecial",
   [Character.murloc]: "neutralSpecial", [Character.grom]: "sideSpecial", [Character.anubarak]: "neutralSpecial",
   [Character.malfurion]: "downSpecial", [Character.medivh]: "neutralSpecial", [Character.ladyVashj]: "downSpecial", [Character.archimonde]: "downSpecial", [Character.butcher]: "forwardSmash",
+  [Character.tyrande]: "sideSpecial",
 };
 
 function ultimateClip(character: number, grounded: boolean): HeroClip {

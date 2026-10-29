@@ -276,6 +276,8 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   special.parasol = sourceSpecial.parasol;
   special.guarded = sourceSpecial.guarded;
   special.egg = sourceSpecial.egg;
+  special.empoweredShots = sourceSpecial.empoweredShots;
+  special.empoweredFrames = sourceSpecial.empoweredFrames;
   copyFighterProjectiles(target, source);
   const bear: Bear = target.bear;
   if ((source.restingGroups & REST_BEAR) === 0) {
@@ -786,6 +788,8 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = special.parasol, b = sourceSpecial.parasol; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.guarded !== sourceSpecial.guarded) return false;
   if (special.egg !== sourceSpecial.egg) return false;
+  { const a = special.empoweredShots, b = sourceSpecial.empoweredShots; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.empoweredFrames, b = sourceSpecial.empoweredFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (!sameFighterProjectiles(target, source)) return false;
   if ((target.restingGroups & source.restingGroups & REST_BEAR) === 0) {
     const bear = target.bear;
@@ -1431,6 +1435,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     if (special.parasol !== 0) sink.int(prefix, "specialParasol", special.parasol);
     sink.int(prefix, "specialGuarded", special.guarded ? 1 : 0);
     sink.int(prefix, "specialEgg", special.egg ? 1 : 0);
+    if (special.empoweredShots !== 0) sink.int(prefix, "specialEmpoweredShots", special.empoweredShots);
+    if (special.empoweredFrames !== 0) sink.int(prefix, "specialEmpoweredFrames", special.empoweredFrames);
     if (status.divineFrames !== 0) sink.int(prefix, "divineFrames", status.divineFrames);
   }
   if (status.cursedBy !== undefined) sink.int(prefix, "cursedBy", status.cursedBy ?? -1);

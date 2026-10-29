@@ -544,6 +544,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Archimonde the Defiler | ledge-get-up | 2: Walk | 160.5 | 38.5 | up; 96.1/63.2 |
 | Archimonde the Defiler | ledge-roll | 2: Walk | 160.7 | 38.6 | forward; 160.2/133.7 |
 | Archimonde the Defiler | ledge-attack | 6: Attack - 1 | 195.4 | 72.9 | both; 195.1/126.0 |
+| Tyrande Whisperwind | walk | 8: Walk | 105.0 | 40.0 | forward; 98.7/82.1 |
+| Tyrande Whisperwind | dash | 8: Walk | 104.3 | 39.6 | forward; 97.4/82.6 |
+| Tyrande Whisperwind | run | 8: Walk | 103.6 | 37.7 | forward; 92.6/77.2 |
+| Tyrande Whisperwind | turn | 33: Tyrande turn | 105.7 | 32.0 | back; 80.9/105.7 |
+| Tyrande Whisperwind | brake | 34: Tyrande stop | 23.5 | 8.7 | in place; 22.1/12.7 |
+| Tyrande Whisperwind | jump-squat | 35: Tyrande jumpSquat | 62.4 | 21.7 | down; 56.5/23.8 |
+| Tyrande Whisperwind | roll-forward | 43: Tyrande rollForward | 141.6 | 61.4 | forward; 76.0/111.2 |
+| Tyrande Whisperwind | roll-back | 44: Tyrande rollBackward | 140.9 | 61.3 | back; 112.1/75.9 |
+| Tyrande Whisperwind | spot-dodge | 50: Tyrande spotDodge | 108.5 | 29.9 | in place; 37.2/87.5 |
+| Tyrande Whisperwind | air-dodge | 41: Tyrande airDodge | 118.8 | 28.7 | in place; 38.1/85.9 |
+| Tyrande Whisperwind | tech | 42: Tyrande tech | 127.7 | 43.9 | in place; 79.5/96.9 |
+| Tyrande Whisperwind | tech-forward | 45: Tyrande techForward | 138.9 | 65.5 | forward; 136.9/121.0 |
+| Tyrande Whisperwind | tech-back | 46: Tyrande techBackward | 146.8 | 60.3 | back; 129.7/108.0 |
+| Tyrande Whisperwind | get-up | 52: Tyrande getUp | 120.6 | 42.1 | up; 117.9/82.9 |
+| Tyrande Whisperwind | get-up-forward | 47: Tyrande getUpRollForward | 138.9 | 65.4 | forward; 136.7/121.3 |
+| Tyrande Whisperwind | get-up-back | 48: Tyrande getUpRollBackward | 147.2 | 60.2 | back; 129.2/109.1 |
+| Tyrande Whisperwind | get-up-attack | 53: Tyrande getUpAttack | 170.6 | 58.7 | both; 142.2/124.7 |
+| Tyrande Whisperwind | ledge-get-up | 55: Tyrande ledgeClimb | 147.9 | 73.0 | up; 142.8/0.0 |
+| Tyrande Whisperwind | ledge-roll | 49: Tyrande ledgeRoll | 138.9 | 65.6 | forward; 137.0/121.1 |
+| Tyrande Whisperwind | ledge-attack | 56: Tyrande ledgeAttack | 194.0 | 81.3 | both; 119.0/122.7 |
 | the Butcher | walk | 1: Walk | 155.6 | 42.4 | forward; 149.6/143.5 |
 | the Butcher | dash | 1: Walk | 154.4 | 36.5 | forward; 146.7/71.9 |
 | the Butcher | run | 1: Walk | 165.7 | 37.4 | forward; 138.6/164.6 |

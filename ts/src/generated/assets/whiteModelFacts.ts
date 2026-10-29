@@ -28,6 +28,8 @@ import * as shadowHunter from "./white-facts/shadow-hunter";
 import * as uther from "./white-facts/uther";
 import * as ladyVashj from "./white-facts/lady-vashj";
 import * as archimonde from "./white-facts/archimonde";
+import * as tyrande from "./white-facts/tyrande";
+import * as butcher from "./white-facts/butcher";
 export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...rifleman.whiteModelFacts,
   ...illidan.whiteModelFacts,
@@ -56,4 +58,6 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...uther.whiteModelFacts,
   ...ladyVashj.whiteModelFacts,
   ...archimonde.whiteModelFacts,
+  ...tyrande.whiteModelFacts,
+  ...butcher.whiteModelFacts,
 };

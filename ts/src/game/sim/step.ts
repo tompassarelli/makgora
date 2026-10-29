@@ -42,6 +42,7 @@ import {
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
 import { heroEgg, heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps, jumpCancelHeroSpecial } from "./specials/engine";
+import { tickEmpowered } from "./specials/empowered";
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { closeParasol, endParasolAerial, parasolFall, reopenParasol } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
@@ -204,6 +205,7 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
     const remaining = cooldowns[action] ?? 0;
     if (remaining !== 0) cooldowns[action] = max(0, remaining - 1);
   }
+  tickEmpowered(f);
   if (attack.style !== undefined) {
     attack.frame++;
     if (attack.frame >= attack.duration) {

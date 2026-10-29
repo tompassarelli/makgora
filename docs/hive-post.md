@@ -67,6 +67,7 @@ Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](ht
 - Created by Tompas (Tom Passarelli). Code, design, animation and stage dressing are our own, written in TypeScript and compiled to Warcraft III's Lua. Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License).
 - The Lich King model by [Kwaliti](https://www.hiveworkshop.com/members/kwaliti.136001/), from [Hive Workshop](https://www.hiveworkshop.com/threads/the-lich-king.154837/). Used with credit as the author permits ([Kwaliti's usage statement](https://www.hiveworkshop.com/profile-posts/951524/)).
 - Thrall is [Warchief Thrall Dismounted](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Grom Hellscream; we reanimated every move on it.
+- Tyrande Dismounted SD by Retera, from [Hive Workshop](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/), open source, reanimated for Smashcraft as the author allows.
 - The menu cursors, wordmark and stage-select art are Smashcraft originals; the pinching-hand cursor was made with AI assistance.
 - Music: Before the First Strike by Tom Passarelli, made with Google Lyria.
 - Murloc sound from World of Warcraft, Blizzard Entertainment.

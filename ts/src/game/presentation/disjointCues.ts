@@ -44,6 +44,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.medivh]: ARCANE_FLARE,
   [Character.archimonde]: FIRE_FLARE,
   [Character.butcher]: NEUTRAL_FLARE,
+  [Character.tyrande]: ARCANE_FLARE,
   [Character.anubarak]: IMPALE_SPIKES,
 };
 

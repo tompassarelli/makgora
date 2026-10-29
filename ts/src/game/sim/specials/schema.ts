@@ -5,6 +5,8 @@ import type { HitEffect } from "../hitRegions";
 import type { AppliedStatus } from "../appliedStatus";
 import type { HurtPose } from "../hurtboxes";
 import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volleys";
+import type { CastWindows, FrameWindow } from "./castWindows";
+export type { FrameWindow } from "./castWindows";
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
 export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
@@ -19,11 +21,6 @@ export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
 export const Relocation = { placed: 1, behindLocked: 4 } as const;
 export type Relocation = (typeof Relocation)[keyof typeof Relocation];
-
-export interface FrameWindow {
-  readonly first: number;
-  readonly last: number;
-}
 
 export interface SpecialMotion extends FrameWindow {
   readonly velocityX: number;
@@ -171,6 +168,7 @@ export interface SpecialProjectile {
   readonly bounce?: ProjectileBounce | undefined;
   /** A body it reaches, unshielded and unreflected, is caught and reeled in over `reelFrames` into its owner's grab hold. */
   readonly latch?: { readonly reelFrames: number } | undefined;
+  readonly pierces?: true | undefined;
 }
 
 export interface SpecialBeam {
@@ -287,7 +285,7 @@ export interface SpecialCharge {
   readonly releases?: true | undefined;
 }
 
-export interface AuthoredSpecial {
+export interface AuthoredSpecial extends CastWindows {
 
   readonly variants?: readonly AuthoredSpecial[] | undefined;
 

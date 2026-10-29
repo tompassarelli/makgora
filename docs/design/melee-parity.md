@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-546 rows: 492 parity, 36 deviations, 18 open.
+561 rows: 507 parity, 36 deviations, 18 open.
 
 ## Deviations from Melee
 
@@ -218,7 +218,7 @@ deviation's reason, issue and decision date are written.
 | Normal landing lag, the most common value across the cast `normal-landing-lag` | 4 | [4](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [down.ts:29](../../ts/src/game/sim/down.ts#L29) `EMPTY_LANDING_LAG` | parity |
 | L-cancel, probed on every aerial `l-cancel` | every aerial lands with the halved lag, with no input | [an L, R or Z press within 7 frames before landing halves an aerial's landing lag](https://www.ssbwiki.com/L-cancel) | [moves.ts:116](../../ts/src/game/sim/moves.ts#L116) `attackLandingLag` | deviation: an input chore on every aerial with no decision in it (Tom 2026-10-06, #54) |
 | Aerial auto-cancel windows, probed headless on Maiev's up air, modelled on Fox's `aerial-auto-cancel` | Fox's up air <8 25>: landing on frames 7 and 25 takes the normal landing lag, on frames 8 and 24 its own | [Fox's up air <8 25>: landing on frames 7 and 25 takes the normal landing lag, on frames 8 and 24 its own](https://www.fightcore.gg) | [moves.ts:133](../../ts/src/game/sim/moves.ts#L133) `landsInAutoCancel` | parity |
-| Edge cancel `edge-cancel` | landing lag ends when the fighter slides off an edge | [landing lag ends when the fighter slides off an edge](https://www.ssbwiki.com/Edge_cancel) | [step.ts:315](../../ts/src/game/sim/step.ts#L315) `slideOffEdge` | parity |
+| Edge cancel `edge-cancel` | landing lag ends when the fighter slides off an edge | [landing lag ends when the fighter slides off an edge](https://www.ssbwiki.com/Edge_cancel) | [step.ts:317](../../ts/src/game/sim/step.ts#L317) `slideOffEdge` | parity |
 | Teeter at an edge, and the teeter cancel `teeter` | either facing, a fighter in landing lag, standing or ending a dash with the stick not held toward the edge stops and teeters; held toward it, the fighter slides off | [only a fighter facing the edge with forward not held teeters; facing away it slides off or edge-slips](https://www.ssbwiki.com/Edge_cancel) | [teeter.ts:34](../../ts/src/game/sim/teeter.ts#L34) `teeterAtEdge` | deviation: Melee's teeter is one forward-facing animation; a symmetric rule leaves no hidden facing rule deciding the result (docs/gameplay-design.md, Teeter and the teeter cancel) (Tom 2026-10-26, #458) |
 | Stick tilt that walks a fighter off instead of teetering `teeter-walk-off-stick` | 0.4 toward the edge, the end of the slow walk | [not documented: no public page states the tilt; SmashWiki says only that the stick must pass a certain amount](https://www.ssbwiki.com/Teeter) | [teeter.ts:34](../../ts/src/game/sim/teeter.ts#L34) `teeterAtEdge` | open: ours; no public source gives Melee's value (#293) |
 | A landing with the stick not held toward the edge teeters whatever its speed `teeter-landing-speed` | teeters at any speed, its landing lag ended | [only a fighter moving sufficiently slowly stays teetering](https://www.ssbwiki.com/Edge_cancel) | [teeter.ts:34](../../ts/src/game/sim/teeter.ts#L34) `teeterAtEdge` | deviation: SmashWiki gives no speed; one facing rule reads at a glance (docs/gameplay-design.md, Teeter and the teeter cancel) (Tom 2026-10-26, #458) |
@@ -807,6 +807,26 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Run speed `archimonde-run` | 1.54 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Walk speed `archimonde-walk` | 1.12 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `archimonde-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+
+### Tyrande Whisperwind
+
+| Row | Ours | Melee | Code | Status |
+|---|---|---|---|---|
+| Weight `tyrande-weight` | 84 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Gravity `tyrande-gravity` | 0.23 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Terminal speed `tyrande-terminal` | 2.8 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Fast-fall speed `tyrande-fast-fall` | 3.4 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Jump squat frames `tyrande-jump-squat` | 3 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Full jump velocity `tyrande-full-jump` | 3.68 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Short jump velocity `tyrande-short-jump` | 2.1 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Double jump velocity, against fighters with one double jump `tyrande-double-jump` | 4.416 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air speed `tyrande-air-speed` | 1 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Air acceleration `tyrande-air-acceleration` | 0.08 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air friction `tyrande-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Initial dash speed `tyrande-dash` | 2 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Run speed `tyrande-run` | 2.3 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Walk speed `tyrande-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Traction `tyrande-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
 ### the Butcher
 

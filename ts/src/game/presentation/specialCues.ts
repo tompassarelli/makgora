@@ -309,6 +309,12 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     up: { spell: "Hook Swing", startup: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)), active: cue("Abilities\\Weapons\\MeatwagonMissile\\MeatwagonMissile.mdx", "hand", f32(0.5)) },
     down: { spell: "Rot", startup: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)), active: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "body", f32(0.6)) },
   },
+  [Character.tyrande]: {
+    neutral: { spell: "Searing Arrows", startup: cue("Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl", "hand", f32(0.6)), active: cue("Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl", "hand", f32(0.6)) },
+    side: { spell: "Trueshot Aura", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\TrueshotAura\\TrueshotAura.mdx", "feet", f32(0.8)) },
+    up: { spell: "Moonlight Leap", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdx", "feet", f32(0.6)) },
+    down: { spell: "Elune's Grace", startup: ARCANE, active: cue("Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdx", "body", f32(0.8)) },
+  },
   [Character.anubarak]: {
     neutral: { spell: "Impale", startup: BURROW, active: cue("Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", "ahead", f32(0.6)) },
     side: { spell: "Burrow Hunt", startup: BURROW, active: cue("Objects\\Spawnmodels\\Undead\\UCancelDeath\\UCancelDeath.mdx", "feet", f32(0.5)) },

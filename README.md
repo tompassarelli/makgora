@@ -27,7 +27,7 @@ Status and next work: [roadmap #16](https://github.com/tompassarelli/smashcraft/
 Smashcraft is an independent fan game inspired by Super Smash Bros. Melee, not
 affiliated with or endorsed by Blizzard Entertainment or Nintendo. It is
 built with our own code and animations on Warcraft III's unit models, alongside
-the community model credited below. The map plays only inside your own copy of
+the community models credited below. The map plays only inside your own copy of
 Warcraft III; it never replaces the game.
 
 - **Respect copyright and publisher IP.** The map uses Warcraft III's own
@@ -90,6 +90,11 @@ The Scourge wall behind Naxxramas is the
 [Undead Walls Pack by Kuzakani](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
 (Hive Workshop), an original model tagged open source, used with credit to
 Kuzakani and Hive Workshop.
+
+Tyrande is [Tyrande Dismounted SD by Retera](https://www.hiveworkshop.com/threads/tyrande-dismounted-sd.328533/)
+(Hive Workshop), open source, built in Retera Model Studio from Warcraft III's
+own textures and reanimated by us as the author allows, with credit to Retera
+and Hive Workshop.
 
 ## License
 

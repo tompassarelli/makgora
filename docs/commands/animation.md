@@ -434,6 +434,16 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   gate; other ground clips are set on the floor by their lowest vertex), requires
   every other clip unchanged, and writes `evilsylvanas.mdx` for the `hero-models` shard.
 
+- Tyrande animation authoring (from the repository root):
+  `bun tools/animations/tyrande-clips.ts STOCK_TYRANDE.mdx PRIVATE_OUTPUT`
+  appends her bow strikes, kicks (down tilt, dash knee, down smash split kick,
+  neutral air, back air, down air stomp), casts, recovery, paired grabs and nine
+  damage reactions to Retera's `TyrandeDismountedSD.mdx`, preserving its 13 stock
+  sequences, and writes `TyrandeDismountedSD.mdx` for the `tyrande` shard of
+  `hero-models`. Sylvanas and Tyrande share the bow-rig gestures, movement,
+  grabs and pain set in smashcraft:tools/animations/bow-rig-clips.ts; the
+  in-place `CLIP...` form works as Sylvanas's does.
+
 - Cairne animation authoring (from the repository root):
   `bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx PRIVATE_OUTPUT`
   appends the complete halberd kit, recovery, paired grabs and nine pain clips

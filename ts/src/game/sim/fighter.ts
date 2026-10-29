@@ -281,6 +281,8 @@ interface Special {
 
   guarded: boolean;
   egg: boolean;
+  empoweredShots: number;
+  empoweredFrames: number;
 }
 
 export interface Projectile {
@@ -717,6 +719,8 @@ export function createFighter(character: Character, startX: number, facing: numb
       parasol: ParasolState.none,
       guarded: false,
       egg: false,
+      empoweredShots: 0,
+      empoweredFrames: 0,
     },
     projectiles: repeat(PROJECTILE_CAPACITY, () => emptyProjectile()),
     projectileSlots: 0,

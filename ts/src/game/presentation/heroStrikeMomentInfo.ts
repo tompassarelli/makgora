@@ -24,6 +24,7 @@ import { shadowHunterStrikeMoments } from "../fighters/shadow-hunter/strikeMomen
 import { sylvanasStrikeMoments } from "../fighters/sylvanas/strikeMoments";
 import { thrallStrikeMoments } from "../fighters/thrall/strikeMoments";
 import { tinkerStrikeMoments } from "../fighters/tinker/strikeMoments";
+import { tyrandeStrikeMoments } from "../fighters/tyrande/strikeMoments";
 import { utherStrikeMoments } from "../fighters/uther/strikeMoments";
 import { wardenStrikeMoments } from "../fighters/warden/strikeMoments";
 
@@ -56,6 +57,7 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.sylvanas]: sylvanasStrikeMoments,
   [Character.thrall]: thrallStrikeMoments,
   [Character.tinker]: tinkerStrikeMoments,
+  [Character.tyrande]: tyrandeStrikeMoments,
   [Character.uther]: utherStrikeMoments,
   [Character.warden]: wardenStrikeMoments,
 };

@@ -43,6 +43,7 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.ladyVashj]: { neutral: { status: true }, side: { mana: true }, ultimate: { status: true } },
   [Character.archimonde]: { down: { status: true } },
   [Character.butcher]: { down: { status: true }, ultimate: { heal: true } },
+  [Character.tyrande]: {},
 };
 
 const NO_TRAITS: TraitSet = {};

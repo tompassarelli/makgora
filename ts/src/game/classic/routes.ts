@@ -365,6 +365,18 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     ],
     ending: ["Fresh meat, all of it. The workshop will be busy for a year.", "The Lich King wanted a servant. He got a butcher.", "Hook, reel, carve. Simple work for a simple soul."],
   },
+  {
+    fighter: C.tyrande, boss: BossKind.archimonde,
+    story: "Tyrande leads the Sentinels from Ashenvale to Mount Hyjal, holding every pass until the World Tree's trap can close on the Legion.",
+    fights: [
+      fight(C.thrall, 3, "Your people cut our forest, orc. Give me one reason not to answer them with arrows."),
+      fight(C.jaina, 11, "The humans have come a long way to die in our woods, priestess. Let me prove we came to fight."),
+      fight(C.demonHunter, 10, "You freed me, Tyrande. Do not expect me to thank you with obedience."),
+      fight([C.dreadlord, C.lich], 14, "The Scourge has drawn first blood in your forest. Your goddess sleeps tonight."),
+      fight(C.malfurion, 10, "Hyjal will need every arrow you have, my love. Show me you are ready."),
+    ],
+    ending: ["Archimonde fell at the World Tree's roots, and Elune's light did not falter.", "Hyjal stands. Ashenvale will grow back.", "The Sentinels return to the shadows of the forest. Watch the treeline."],
+  },
 ];
 
 export const CLASSIC_CHARACTERS: readonly Character[] = CLASSIC_ROUTES.map(route => route.fighter);

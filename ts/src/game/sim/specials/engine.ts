@@ -44,6 +44,7 @@ import { stackedArmor } from "../stackPassive";
 import { gazeAt } from "../gaze";
 import { ownedCount } from "./ownedProjectiles";
 import { applySelfHeal } from "./selfHeal";
+import { empoweredVariant, readyEmpowered, spendEmpowered } from "./empowered";
 
 
 const DIAGONAL = 0.7071067690849304;
@@ -138,10 +139,11 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   if (move.armor?.shell === true && f.status.armorFrames > 0) return undefined;
   if (move.oncePerAirtime === true && airborne && (f.special.airtimeUses & (1 << slot)) !== 0) return undefined;
   if (move.command?.order === CompanionOrder.lunge && !companionReady(f, move.command.slot)) return undefined;
-  if (!projectilesFit(f, move)) return undefined;
+  const variant = empoweredVariant(f, move);
+  if (!projectilesFit(f, specialForm(kit, form, variant))) return undefined;
   choice.slot = slot;
   choice.form = form;
-  choice.variant = 0;
+  choice.variant = variant;
   return choice;
 }
 
@@ -164,6 +166,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   const move = specialForm(specialKit(specials, chosen.slot), chosen.form, chosen.variant);
   const { special } = f;
   endDivineShield(f);
+  spendEmpowered(f, specialForm(specialKit(specials, chosen.slot), chosen.form), chosen.variant);
   special.form = chosen.form;
   special.variant = chosen.variant;
   special.grabFrame = 0;
@@ -1008,6 +1011,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.gaze !== undefined && world !== undefined) gazeAt(world, f, move.gaze, frame);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);
+  readyEmpowered(f, move, frame);
   applySelfHeal(f, move.selfHeal, frame);
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
