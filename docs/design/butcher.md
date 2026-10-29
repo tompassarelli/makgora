@@ -114,6 +114,15 @@ the live value is the row times the factor (`BALANCE_DAMAGE` and
 `BALANCE_GROWTH` in his moves.ts). Rot, Dismember's drain and the pummel are
 not scaled.
 
+The field after the retune (main f84192f62a, balance run 40818368946 on its
+probe branch, same field, 11,424 matches) puts him at 58%, inside the 40–60%
+band. His shares barely moved: aerials 22%/15%/42%/6%/15%, air share 6%,
+approach 82%, ranged 4%, specials 20%/15%/8%/0%; Butcher's Charge is still his
+top damage share (24%) and forward smash his top kill move (37%). The spam
+probe found a degenerate line: Butcher's Charge used alone wins 92% of 1,344
+matches against Expert, over the gate's 45% spam limit, so the charge's armour
+and bump are the next tuning target.
+
 Path draft for Tom to correct (#358):
 
 ```ceiling-plan
