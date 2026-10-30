@@ -59,6 +59,7 @@ import { type LoreClears, loreClears } from "../classic/loreClears";
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
+import { MainMenuButton } from "./mainMenuButton";
 import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
@@ -197,6 +198,7 @@ export class SelectionPanel {
   private readonly tutorial: TutorialMenuFrames;
   readonly credits: CreditsMenu;
   readonly community: CommunityMenu;
+  private readonly mainMenu: MainMenuButton;
 
   private tutorialOpen = false;
   private tutorialOffered = false;
@@ -294,6 +296,7 @@ export class SelectionPanel {
       target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native", box));
     this.credits = new CreditsMenu(gameUi(), root, suffix, version, participantId);
     this.community = new CommunityMenu(gameUi(), root, suffix, participantId);
+    this.mainMenu = new MainMenuButton(root, suffix, participantId);
     this.credits.onOpen = () => this.community.close();
     this.community.onOpen = () => this.credits.close();
     this.rules = createClassicRules(root, suffix, ruleClick, matchRules);
@@ -328,6 +331,8 @@ export class SelectionPanel {
     bindPrototype(this.community, CommunityMenu.prototype);
     this.credits.bindActions();
     this.community.bindActions();
+    bindPrototype(this.mainMenu, MainMenuButton.prototype);
+    this.mainMenu.bindActions();
     const suffix = I2S(this.participantId);
     bindSyncHandler(`ui.selection.${suffix}.drop`, (_, data) => this.acceptDrop(data));
     bindSyncHandler(`ui.selection.${suffix}.cpuDrop`, (_, data) => this.acceptCpuDrop(data));
@@ -344,6 +349,7 @@ export class SelectionPanel {
     BlzDestroyFrame(this.tutorial.root);
     this.credits.destroy();
     this.community.destroy();
+    this.mainMenu.destroy();
     BlzDestroyFrame(this.bullseye);
     for (const frames of this.hands) destroyHandFrames(frames);
     if (this.cpu.root !== undefined) BlzDestroyFrame(this.cpu.root);
@@ -476,11 +482,18 @@ export class SelectionPanel {
     const target = focus[index];
     if (target === undefined) return false;
     if (target.kind === "teamBattle" || target.kind === "friendlyFire" || target.kind === "team") return this.toggleFocus(target, action);
-    if (target.kind === "settings") {
-      if (action === Action.attack) this.openCpuSettings(target.slot);
-      return action === Action.attack || action === Action.moveLeft || action === Action.moveRight;
-    }
+    if (target.kind === "mainMenu" || target.kind === "settings") return this.pressMenuButton(target, action);
     return this.chooseFocus(game, target, action);
+  }
+
+  private pressMenuButton(target: MenuFocus, action: Action): boolean {
+    const attack = action === Action.attack;
+    if (target.kind === "mainMenu") {
+      if (attack) this.actions.openMainMenu(this.participantId);
+      return attack;
+    }
+    if (attack) this.openCpuSettings(target.slot);
+    return attack || action === Action.moveLeft || action === Action.moveRight;
   }
 
   private toggleFocus(target: MenuFocus, action: Action): boolean {
@@ -539,7 +552,7 @@ export class SelectionPanel {
   // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean, restOpen = panel): void {
     const drawn = pointed && this.menuCursorAllowed;
-    const over = overAny(x, y, [this.clicks, this.credits, this.community, this.controlHit]);
+    const over = overAny(x, y, [this.clicks, this.credits, this.community, this.mainMenu, this.controlHit]);
     const hover = menuHover(drawn, over, this.drag.hover !== undefined);
     const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, restOpen, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
     this.localPanel = panel;
@@ -736,6 +749,7 @@ export class SelectionPanel {
 
   private showCards(game: Readonly<MatchState>, sessionWins: Readonly<Slots<number>>, x: number, y: number): number | undefined {
     const { participantId, menuFocus } = this;
+    this.mainMenu.focus(menuFocus?.kind === "mainMenu");
     const remoteChips = this.handChannel.carriedChips(game, this.now);
     let carried: number | undefined;
     for (const slot of PARTICIPANT_SLOTS) {

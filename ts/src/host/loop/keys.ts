@@ -1,6 +1,7 @@
 import { NATIVE_PREFLIGHT_KEY, inputPreflightLine } from "../../game/input/nativePreflight";
 import { INPUT_PREFLIGHT_FILE } from "../../game/core/gameFiles";
-import { cameraKey, returnPauseMenu, pauseCameraKey, pauseHeldKeys } from "./pauseCamera";
+import { cameraKey, pauseHeldKeys } from "./pauseCamera";
+import { type ChordKeys, chordComplete, chordKeys, noteChordKey } from "../../game/input/pauseChord";
 
 
 import { Action } from "../../game/input/actions";
@@ -22,7 +23,7 @@ import { clearCapturedInputs } from "./inputs";
 import { journalEpoch } from "./journal";
 import { chatBusy, requestPause } from "./journalPause";
 import { Key, keyEventAllowed, syncKeyEvents } from "./keyEvents";
-import { back, choose, confirm, journalMenuKey, openSettingsScreen, resultKey } from "./menus";
+import { back, choose, confirm, journalMenuKey, openSettingsScreen, openTitle, resultKey } from "./menus";
 import { makePreview } from "./preview";
 import { exportProbe, probeIntegrity, probeRecording, startProbe } from "./responseProbe";
 import { type ShellState, activeRollback, cancelPendingPlaytest, keepShellMomentEnd, localSlot, playsOnKeyboard } from "./state";
@@ -51,10 +52,16 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
   if (epoch?.journal.editbox !== undefined && chatBusy(epoch.journal)) return;
   if (epoch !== undefined && playing && epoch.journal.barrier.request !== undefined) return;
   if (s.session.paused) s.pauseKeysHeld = pauseHeldKeys(s.participants[slot].bindings.bindings).filter(key => osKeyDown(key));
+  if (playing && s.session.paused && chordComplete(pauseChordKeys(s, slot), s.participants[slot].bindings.bindings)) {
+    exitPausedMatch(s);
+    return;
+  }
+  const wasPaused = s.session.paused;
   const deferred = epoch !== undefined && playing;
   const consumed = !s.session.startHeld[slot] && views(s).selections[slot].consumeStart();
   const action = startKeyDown(s.session, slot, s.game.phase, consumed || views(s).settings[slot].isOpen(), deferred);
   if (action === "togglePause") {
+    if (!wasPaused) s.pausedBy = slot;
     if (epoch !== undefined && deferred) requestPause(s, epoch.rollback, epoch.journal, !s.session.paused);
     else {
       clearCapturedInputs(s);
@@ -67,7 +74,12 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
 }
 
 
-function exitPausedMatch(s: ShellState, title: boolean): void {
+function pauseChordKeys(s: ShellState, slot: ParticipantSlot): ChordKeys {
+  s.pauseChord ??= [chordKeys(), chordKeys(), chordKeys(), chordKeys()];
+  return s.pauseChord[slot];
+}
+
+function exitPausedMatch(s: ShellState, title = false): void {
   ownConfirmedState(s);
   keepShellMomentEnd(s);
   endReplaySegment(s);
@@ -78,7 +90,7 @@ function exitPausedMatch(s: ShellState, title: boolean): void {
   leaveTutorial(s.game);
   s.game.run.active = false;
   s.session.paused = false;
-  const menu = s.pauseMenu ??= { choice: 0, shown: false, title: false };
+  const menu = s.pauseMenu ??= { shown: false, title: false };
   menu.shown = false;
   menu.title = title;
   s.titleAwaitRelease = title;
@@ -95,26 +107,14 @@ export function selectPauseMenu(s: ShellState, actor: number, choice: number): v
     return;
   }
   if (s.game.phase !== Phase.match || !s.session.paused) return;
-  if (choice === 0) {
-    startDown(s, actor);
-    startKeyUp(s.session, actor);
-  } else exitPausedMatch(s, choice === 2);
+  if (choice === 0) exitPausedMatch(s);
 }
 
-function pausedMatchKeyDown(s: ShellState, slot: ParticipantSlot, key: number, menu: Action | undefined): void {
-  if (GetTriggerPlayer() === GetLocalPlayer() && pauseCameraKey(key)) {
-    if (s.rollback?.journal?.editbox === undefined || playsOnKeyboard(s.rollback.journal, slot)) cameraKey(s, key, true);
-    return;
-  }
-  if (GetTriggerPlayer() === GetLocalPlayer()) returnPauseMenu(s);
-  const pause = s.pauseMenu ??= { choice: 0, shown: true, title: false };
+function pausedMatchKeyDown(s: ShellState, slot: ParticipantSlot, key: number): void {
+  const { bindings } = s.participants[slot].bindings;
+  noteChordKey(pauseChordKeys(s, slot), bindings, key, true);
+  if (GetTriggerPlayer() === GetLocalPlayer() && (s.rollback?.journal?.editbox === undefined || playsOnKeyboard(s.rollback.journal, slot))) cameraKey(s, bindings, key, true);
   if (key === Key.f2 && s.game.training) s.trainingHints = !s.trainingHints;
-  else if (menu === Action.moveUp) pause.choice = pause.choice === 0 ? 2 : pause.choice - 1;
-  else if (menu === Action.moveDown) pause.choice = pause.choice === 2 ? 0 : pause.choice + 1;
-  else if (key === Key.escape || menu === Action.special) exitPausedMatch(s, false);
-  else if (menu === Action.attack) {
-    selectPauseMenu(s, slot, pause.choice);
-  }
 }
 
 function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = false): void {
@@ -144,7 +144,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     return;
   }
   if (s.game.phase === Phase.match && s.session.paused) {
-    pausedMatchKeyDown(s, slot, key, menu);
+    pausedMatchKeyDown(s, slot, key);
     return;
   }
   if (key === Key.escape && bindings.capture !== undefined) {
@@ -160,6 +160,10 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     return;
   }
   if (key === Key.escape && (views(s).selections[slot].credits.close() || views(s).selections[slot].community.close())) return;
+  if (key === Key.escape && s.game.phase === Phase.characterMenu && bindings.ready) {
+    openTitle(s, slot);
+    return;
+  }
   if (key === Key.f1) return;
   if (!bindings.ready) return;
   if (key === 13 && s.game.phase !== Phase.match) return;
@@ -199,7 +203,9 @@ function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false
     return;
   }
   if (s.game.phase === Phase.match && s.session.paused) {
-    if (GetTriggerPlayer() === GetLocalPlayer()) cameraKey(s, key, false);
+    const { bindings } = s.participants[slot].bindings;
+    noteChordKey(pauseChordKeys(s, slot), bindings, key, false);
+    if (GetTriggerPlayer() === GetLocalPlayer()) cameraKey(s, bindings, key, false);
     return;
   }
   if (journalOwnsKey(s, slot, key)) return;

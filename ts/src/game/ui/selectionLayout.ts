@@ -11,15 +11,17 @@ export const SELECT_GAP = f32(0.006);
 const headerBox = (x: number, width: number) => ({ x, y: HEADER_BUTTON_TOP, width, height: HEADER_BUTTON_HEIGHT }) as const;
 const after = (box: { readonly x: number; readonly width: number }): number => f32(f32(box.x + box.width) + SELECT_GAP);
 
-export const START_BUTTON = headerBox(SELECT_LEFT, f32(0.18));
+export const START_BUTTON = headerBox(SELECT_LEFT, f32(0.145));
 
-export const SETTINGS_BOX = headerBox(after(START_BUTTON), f32(0.115));
+export const SETTINGS_BOX = headerBox(after(START_BUTTON), f32(0.105));
 
-export const MOVES_BOX = headerBox(after(SETTINGS_BOX), f32(0.085));
+export const MOVES_BOX = headerBox(after(SETTINGS_BOX), f32(0.08));
 
-const PANEL_BUTTON_WIDTH = f32(0.107);
+export const MAIN_MENU_BOX = headerBox(after(MOVES_BOX), f32(0.08));
 
-export const TUTORIAL_BOX = headerBox(after(MOVES_BOX), PANEL_BUTTON_WIDTH);
+const PANEL_BUTTON_WIDTH = f32(0.095);
+
+export const TUTORIAL_BOX = headerBox(after(MAIN_MENU_BOX), PANEL_BUTTON_WIDTH);
 
 export const CREDITS_BOX = headerBox(after(TUTORIAL_BOX), PANEL_BUTTON_WIDTH);
 

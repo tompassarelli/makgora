@@ -1,14 +1,15 @@
 import { isParticipantSlot } from "../../game/input/participants";
-import { cancelRematchCountdown, humanActive } from "../../game/lobby/lobbyState";
+import { Phase, cancelRematchCountdown, humanActive } from "../../game/lobby/lobbyState";
 import { startKeyUp } from "../../game/match/controls";
 import { warcraftChatOpen } from "../../platform/editboxJournal";
-import { KEYBOARD_PAUSE_PREFIX } from "./keyEvents";
+import { KEYBOARD_PAUSE_PREFIX, Key } from "./keyEvents";
 import { startDown } from "./keys";
 import { type ShellState, localSlot } from "./state";
 
 
 export function onPauseKeyDown(s: ShellState): void {
   const slot = GetPlayerId(GetTriggerPlayer());
+  if (GetHandleId(BlzGetTriggerPlayerKey()) === Key.escape && s.game.phase !== Phase.match) return;
   const chatting = s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame);
   if (!isParticipantSlot(slot) || slot !== localSlot() || !humanActive(s.game, slot) || chatting) return;
   BlzSendSyncData(KEYBOARD_PAUSE_PREFIX, "");

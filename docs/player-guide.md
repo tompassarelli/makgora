@@ -19,7 +19,7 @@ stocks, rematches, and configurable controls.
 For solo practice, place only your own fighter chip and press Y, then choose
 a stage and press Y again. Leave the CPU chip unplaced. Practice has no timer
 or opponent, and falling off the stage respawns you without ending the session.
-Press Backspace to pause, then Escape to return to fighter selection. Place the CPU
+Press Esc to pause, then hold L, R and A and press Start (Esc or Backspace on a keyboard) to return to fighter selection. Place the CPU
 chip before starting when you want a bot match instead. Below each CPU card,
 Opponent settings lets you choose Rook, Ember, Flint, Vale, Kite or Wren,
 then Rookie, Beginner, Intermediate, Advanced or Expert difficulty. Each
@@ -33,7 +33,7 @@ fighter or stage changes, New Match and automatic rematches.
 
 At fighter selection, any player can change Stocks, Time, Endless and
 Automatic rematch. No time limit removes the clock. Endless also removes
-the stock limit; pause and press Escape to leave. Automatic rematch keeps
+the stock limit; pause and press the reset combination (L, R, A and Start) to leave. Automatic rematch keeps
 the same fighters, stage and rules, with a visible five-second countdown
 after the result. A player can stop it with a menu control, then choose the
 next match. It starts off.
@@ -62,10 +62,23 @@ fighter or stage; U goes back. Menus always follow your own bindings, and the
 arrow keys work too. Drag a
 character chip from the active player card onto the roster. New Match retains
 selections. On the selection screens Y confirms character/stage selection and chooses the next match after
-a result. Backspace pauses or resumes an active match (Start on a controller); while
+a result. Esc or Backspace pauses or resumes an active match (Start on a controller); while
 the Warcraft chat box is open, typing never pauses, moves or attacks. Pausing freezes combat and
 match time while keeping input handling live. Enter is reserved for Warcraft
 chat.
+
+The pause screen leaves the frozen match in view under four camera corner
+brackets. A plate at the top right reads PLAYER 1 PAUSE (the pausing player's
+number) with the match clock above it, and F10 names the Warcraft menu. At the
+bottom left a control-stick emblem says the stick moves the camera: the stick
+(your movement keys on a keyboard) pans and the C-stick (your C-up and C-down
+keys) zooms, within the stage bounds, on your own screen only, and the view snaps
+back when the match resumes. The plate at the bottom right shows
+L + R + A + START over RESET MATCH: hold two shield buttons (shield, light shield or the
+second trigger) and Attack, then press Start (Esc or Backspace), or click the plate,
+to return to fighter selection. On a keyboard the plate names the keys you bound
+to those actions. Start, Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
+the Main menu button, Esc, or by moving the menu focus down to Main menu and pressing Attack (the pad's A). H on the pause screen is reserved for the new-player hints toggle; G hides the HUD for a clean screenshot.
 
 At fighter selection, up/down (W/S on WASD, Space/E on Box) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
@@ -92,7 +105,7 @@ rebind. On Custom the bottom row adds Rename, which names the selected slot, and
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
-bring back your saved ones. Y binds to any action and stays Start on fighter and stage select; Backspace (Pause) is reserved for rebinding; F6 and F7
+bring back your saved ones. Y binds to any action and stays Start on fighter and stage select; Backspace and Escape (Pause) are reserved for rebinding; F6 and F7
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
 is refused and the screen names what it is reserved for. Ctrl+T starts a developer input trace.
 

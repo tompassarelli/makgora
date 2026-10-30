@@ -5,7 +5,7 @@ import { startNativeSoak } from "../../platform/nativeSoak";
 import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
 import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
-import { PARTICIPANT_SLOTS } from "../../game/input/participants";
+import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participants";
 import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
@@ -157,6 +157,7 @@ function sessionReceipt(s: ShellState, actor: number, message: string, requests:
     return receipt;
   }
   if (message.startsWith("-dev shield-energy ")) return shieldEnergyReceipt(s, message);
+  if (message.startsWith("-dev pause ")) return pauseReceipt(s, message);
   return matchStartReceipt(s, actor, message, requests);
 }
 
@@ -176,6 +177,19 @@ function matchStartReceipt(s: ShellState, actor: number, message: string, reques
     return "dev: camera match";
   }
   return quickMatchReceipt(s, actor, message, requests);
+}
+
+// Capture maps play pads inside the map, so the pause screen's keyboard or pad look is chosen here instead of read from the connected controller.
+function pauseReceipt(s: ShellState, message: string): string | undefined {
+  const [, , look, player] = message.split(" ");
+  const slot = player === undefined ? 0 : S2I(player) - 1;
+  if ((look !== "keyboard" && look !== "pad") || !isParticipantSlot(slot) || s.game.phase !== Phase.match) return undefined;
+  s.dev.pauseLook = look;
+  s.pausedBy = slot;
+  s.session.paused = true;
+  pauseMatchPresentation(s, true, true);
+  renderPersistentPresentation(s);
+  return `dev: pause ${look} ${slot + 1}`;
 }
 
 function shieldEnergyReceipt(s: ShellState, message: string): string | undefined {

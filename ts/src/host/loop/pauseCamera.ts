@@ -5,59 +5,76 @@ import { stageBounds } from "../../game/sim/stageBounds";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { Phase, stageClock } from "../../game/lobby/lobbyState";
 import type { ShellState } from "./state";
-import { type KeyBindings, pauseMenuKeys } from "../../game/input/keyBindings";
+import { Action } from "../../game/input/actions";
+import { type KeyBindings, inputAction } from "../../game/input/keyBindings";
+import { chordAction, pausedInputKeys } from "../../game/input/pauseChord";
 
 export interface PauseCamera {
   readonly saved: MatchCamera;
   readonly aspect: number;
   tilt: number;
   hideHud: boolean;
-  using: boolean;
-  readonly held: boolean[];
+  readonly held: Map<number, number>;
 }
 
-export const PAUSE_CAMERA_KEYS = [0x49, 0x4a, 0x4b, 0x4c, 0xbb, 0xbd, 0x6b, 0x6d, 0x4f, 0x50, 0x48];
-export const pauseCameraKey = (key: number): boolean => PAUSE_CAMERA_KEYS.includes(key);
-export const pauseHeldKeys = (bindings: Readonly<KeyBindings>): number[] => [...pauseMenuKeys(bindings), ...PAUSE_CAMERA_KEYS];
+export const CameraControl = { left: 0, right: 1, up: 2, down: 3, zoomIn: 4, zoomOut: 5, tiltUp: 6, tiltDown: 7, hideHud: 8 } as const;
+type CameraControl = (typeof CameraControl)[keyof typeof CameraControl];
+
+const LEGACY_KEYS: Readonly<Record<number, CameraControl>> = {
+  0x25: CameraControl.left, 0x26: CameraControl.up, 0x27: CameraControl.right, 0x28: CameraControl.down,
+  0x4a: CameraControl.left, 0x4c: CameraControl.right, 0x49: CameraControl.up, 0x4b: CameraControl.down,
+  0xbb: CameraControl.zoomIn, 0x6b: CameraControl.zoomIn, 0xbd: CameraControl.zoomOut, 0x6d: CameraControl.zoomOut,
+  0x4f: CameraControl.tiltUp, 0x50: CameraControl.tiltDown, 0x47: CameraControl.hideHud,
+};
+
+const ACTION_CONTROLS: Readonly<Record<number, CameraControl>> = {
+  [Action.moveLeft]: CameraControl.left, [Action.moveRight]: CameraControl.right, [Action.moveUp]: CameraControl.up, [Action.moveDown]: CameraControl.down,
+  [Action.cUp]: CameraControl.zoomIn, [Action.cDown]: CameraControl.zoomOut,
+};
+
+// A key bound to an action keeps that action's meaning; only unbound keys fall back to the fixed camera keys (the typed journal path passes no bindings).
+export function pauseCameraControl(bindings: Readonly<KeyBindings> | undefined, key: number): CameraControl | undefined {
+  const action = bindings === undefined ? undefined : inputAction(bindings, key);
+  return action === undefined ? LEGACY_KEYS[key] : ACTION_CONTROLS[action];
+}
+
+export const pausedKeyUsed = (bindings: Readonly<KeyBindings>, key: number): boolean => pauseCameraControl(bindings, key) !== undefined || chordAction(bindings, key) !== undefined;
+export const pauseHeldKeys = (bindings: Readonly<KeyBindings>): number[] => pausedInputKeys(bindings);
 export const pauseHudHidden = (s: Readonly<ShellState>): boolean => (s.build.devConsole && s.promoHudHidden === true) || (s.session.paused && s.pauseCamera?.hideHud === true);
 
 export function beginPauseCamera(s: ShellState, aspect: number): void {
   if (s.pauseCamera !== undefined) return;
   const saved = createMatchCamera();
   copyMatchCamera(saved, s.camera);
-  s.pauseCamera = { saved, aspect, tilt: 0.0, hideHud: false, using: false, held: [] };
+  s.pauseCamera = { saved, aspect, tilt: 0.0, hideHud: false, held: new Map() };
 }
 
-
-export function cameraKey(s: ShellState, key: number, down: boolean): boolean {
-  if (!pauseCameraKey(key) || !s.session.paused || s.game.phase !== Phase.match) return false;
+export function cameraKey(s: ShellState, bindings: Readonly<KeyBindings> | undefined, key: number, down: boolean): boolean {
+  const control = pauseCameraControl(bindings, key);
+  if (control === undefined || !s.session.paused || s.game.phase !== Phase.match) return false;
   const camera = s.pauseCamera;
   if (camera === undefined) return true;
-  if (down && !camera.held[key]) {
-    camera.using = true;
-    if (key === 0x48) camera.hideHud = !camera.hideHud;
-    else {
-      camera.held[key] = true;
-      advancePauseCamera(s, camera.aspect);
-    }
+  if (!down) camera.held.delete(key);
+  else if (control === CameraControl.hideHud) {
+    if (!camera.held.has(key)) camera.hideHud = !camera.hideHud;
+    camera.held.set(key, control);
+  } else if (!camera.held.has(key)) {
+    camera.held.set(key, control);
+    advancePauseCamera(s, camera.aspect);
   }
-  camera.held[key] = down;
   return true;
-}
-
-
-export function returnPauseMenu(s: ShellState): void {
-  if (s.pauseCamera !== undefined) s.pauseCamera.using = false;
 }
 
 export function advancePauseCamera(s: ShellState, aspect: number): void {
   const camera = s.pauseCamera;
   if (camera === undefined) return;
-  const held = (key: number): number => camera.held[key] ? 1 : 0;
-  const x = held(0x4c) - held(0x4a);
-  const z = held(0x49) - held(0x4b);
-  const zoom = held(0xbd) + held(0x6d) - held(0xbb) - held(0x6b);
-  const tilt = held(0x4f) - held(0x50);
+  const counts: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  camera.held.forEach(control => { counts[control] = 1; });
+  const held = (control: CameraControl): number => counts[control] ?? 0;
+  const x = held(CameraControl.right) - held(CameraControl.left);
+  const z = held(CameraControl.up) - held(CameraControl.down);
+  const zoom = held(CameraControl.zoomOut) - held(CameraControl.zoomIn);
+  const tilt = held(CameraControl.tiltUp) - held(CameraControl.tiltDown);
   if (x === 0 && z === 0 && zoom === 0 && tilt === 0) return;
   s.camera.x = f32(s.camera.x + x * 12.0);
   s.camera.z = f32(s.camera.z + z * 12.0);
@@ -92,9 +109,7 @@ export function servicePauseCameraControls(s: ShellState): void {
   for (let index = 0; index < controls.length; index++) {
     const key = controls.charAt(index);
     const code = key === "=" ? 0xbb : key === "-" ? 0xbd : key.toUpperCase().charCodeAt(0);
-    if (pauseCameraKey(code)) {
-      cameraKey(s, code, true);
-      cameraKey(s, code, false);
-    } else returnPauseMenu(s);
+    cameraKey(s, undefined, code, true);
+    cameraKey(s, undefined, code, false);
   }
 }

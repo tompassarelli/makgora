@@ -148,7 +148,7 @@ export class EditboxIngress {
         cursor = end + 1;
       } else {
         const key = text.charAt(cursor);
-        if ("ijklop-=h enu".includes(key)) controls += key;
+        if ("ijklop-=g enu".includes(key)) controls += key;
         else journal += key;
         cursor++;
       }

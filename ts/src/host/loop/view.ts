@@ -56,6 +56,7 @@ import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { warcraftMenuOpen } from "./warcraftMenu";
 import { presentedMatch } from "./presentedMatch";
+import { EMPTY_PAUSE_VIEW, pauseView } from "./pauseView";
 import { type UiObjects, menuControlHit, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
@@ -304,6 +305,8 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
 
 export function pauseMatchPresentation(s: ShellState, paused: boolean, immediately = false): void {
   s.resumePresentationUntil = undefined;
+  s.pauseChord = undefined;
+  if (!paused) s.pausedBy = undefined;
   if (paused && s.game.phase === Phase.match) {
     const height = BlzGetLocalClientHeight();
     beginPauseCamera(s, height > 0 ? I2R(BlzGetLocalClientWidth()) / I2R(height) : 16.0 / 9.0);
@@ -597,13 +600,14 @@ export function renderUi(s: ShellState): void {
   const { game } = s;
   const ui = views(s);
   const selecting = game.phase === Phase.characterMenu || game.phase === Phase.stageMenu;
-  const menu = s.pauseMenu ??= { choice: 0, shown: false, title: false };
+  const menu = s.pauseMenu ??= { shown: false, title: false };
   const paused = game.phase === Phase.match && s.session.paused;
-  if (paused && !menu.shown) menu.choice = 0;
   menu.shown = paused;
   const local = localParticipantSlot(s);
   const localKeys = s.participants[local ?? 0].bindings.bindings;
-  ui.pause.update(paused && s.pauseCamera?.using !== true && s.dev.shieldEnergyCapture?.pending !== false, menu.choice, menu.title, localKeys, game.training, s.trainingHints === true);
+  ui.pause.update(menu.title);
+  const screenShown = paused && s.dev.shieldEnergyCapture?.pending !== false;
+  ui.pauseScreen.update(screenShown, screenShown ? pauseView(s, localKeys) : EMPTY_PAUSE_VIEW);
   const localFighter = local !== undefined && s.participants[local].body !== undefined && isActive(s.world, local) ? fighterAt(s.world, local) : undefined;
   const showMatch = !paused && !pauseHudHidden(s) && !selecting && !(local !== undefined && ui.settings[local].isOpen());
   for (const slot of PARTICIPANT_SLOTS) {

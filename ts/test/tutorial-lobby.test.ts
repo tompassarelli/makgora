@@ -52,7 +52,11 @@ test("one of two players starts the Tutorial, quits it partway, and both lobbies
     clients.client(slot).run(() => { paused = shell().session.paused; });
     return paused;
   }));
-  tap(Key.escape);
+  const hold = [0x51, 0x45, Key.n];
+  for (const key of hold) clients.key(0, key, 0, true);
+  clients.frames(3);
+  tap(Key.backspace);
+  for (const key of hold) clients.key(0, key, 0, false);
   until("fighter selection", () => HUMANS.every(slot => lobby(slot).phase === Phase.characterMenu));
   for (const slot of HUMANS) expect(lobby(slot)).toEqual({ phase: Phase.characterMenu, training: false, lesson: NO_LESSON, other });
   for (const client of clients.clients) expect(client.errors).toEqual([]);

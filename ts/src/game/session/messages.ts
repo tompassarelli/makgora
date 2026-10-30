@@ -86,9 +86,9 @@ export function rulesSummary(game: Readonly<MatchState>): string {
   return game.automaticRematch ? `${matchRules}  ·  Automatic rematch` : matchRules;
 }
 
-const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Backspace");
+const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Esc");
 const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
-const PLAYING_HELP_BACKSPACE = "Backspace: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
+const PLAYING_HELP_BACKSPACE = "Esc: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
 export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
 
 
@@ -108,7 +108,7 @@ export function matchHelp(game: Readonly<MatchState>, paused: boolean, start: St
     if (local.ledge.state === LedgeState.hang) return "Ledge: Up or toward stage to climb; Jump to leap; Shield to roll; Attack to strike.\nDown or away from stage lets go.";
   }
   if (!playing) return rematchStatus(game, start);
-  if (paused) return `PAUSED — Press ${pauseControl(start)} to resume. Combat is frozen.${game.practice || game.endless || game.training ? "\nEscape: back to fighter selection." : ""}`;
+  if (paused) return `PAUSED — Press ${pauseControl(start)} to resume. Combat is frozen.`;
   return start === "Start" ? PLAYING_HELP_START : PLAYING_HELP_BACKSPACE;
 }
 

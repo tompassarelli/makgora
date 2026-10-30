@@ -41,7 +41,7 @@ export type CardButton = { kind: "costume"; slot: number } | { kind: "team"; slo
 
 export const cardPalette = (game: Readonly<MatchState>, slot: number): number => game.teamBattle && fighterActive(game, slot) ? at(game.teamChoices, slot) : slot;
 
-export type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "friendlyFire"; readonly slot: number };
+export type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "friendlyFire" | "mainMenu"; readonly slot: number };
 export function menuFocusList(game: Readonly<MatchState>, participantId: number): MenuFocus[] {
   const focus: MenuFocus[] = [];
   if (humanFighterActive(game, participantId)) focus.push({ kind: "fighter", slot: participantId });
@@ -54,6 +54,7 @@ export function menuFocusList(game: Readonly<MatchState>, participantId: number)
     for (const slot of PARTICIPANT_SLOTS) if (canChooseComputer(game, participantId, slot)) focus.push({ kind: "team", slot });
     focus.push({ kind: "friendlyFire", slot: participantId });
   }
+  focus.push({ kind: "mainMenu", slot: participantId });
   return focus;
 }
 

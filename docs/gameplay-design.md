@@ -1105,6 +1105,13 @@ four specials on the ground and in the air.
   attack with a direction is a tilt, and Strong + a direction where the ground state allows a smash is a smash, and
   attack while holding Strong is the up smash
   (smashcraft:docs/physics.md, "Prototype attack phases").
+- **Pause screen** (owner, 30 Oct): the pause screen follows Melee's. The frozen
+  match stays in view with no dimming box or menu; corner brackets frame it, a
+  plate names the pausing player, and the reset plate shows L + R + A + Start.
+  Only that combination (or a click on the plate) leaves the match, so a stray
+  button never ends it; Start, Esc or Backspace resumes. The stick pans and the
+  C-stick zooms a camera that is local to the pausing client and restored on resume, so
+  it adds nothing to synced state.
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in
   smashcraft:docs/physics.md, "Grounded knockdown and jab resets", as the

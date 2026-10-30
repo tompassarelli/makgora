@@ -35,6 +35,7 @@ import { ClassicStep, continueClassic, quitClassic, skipToClassicBoss, startClas
 import { LORE_BATTLES, LoreStep, continueLore, startLore } from "../../game/classic/loreBattles";
 import { clearParticipantInputs, controlsAvailable, currentComputerMask, currentHumanMask } from "./inputs";
 import { startMatch } from "./matchStart";
+import { syncKeyEvents } from "./keyEvents";
 import { cancelStageLoad, requestStageLoad, stageLoading } from "./stageLoad";
 import { endReplaySegment } from "./replays";
 import { makePreview } from "./preview";
@@ -139,6 +140,19 @@ export function confirm(s: ShellState, slot: ParticipantSlot, clicked = false): 
     if (next === Phase.match) startMatch(s);
     else makePreview(s);
   }
+}
+
+export function openTitle(s: ShellState, slot: ParticipantSlot): void {
+  if (s.game.phase !== Phase.characterMenu || !humanActive(s.game, slot) || stageLoading(s)) return;
+  const menu = s.pauseMenu ??= { shown: false, title: false };
+  menu.title = true;
+  s.titleAwaitRelease = false;
+  syncKeyEvents(s);
+}
+
+export function onMainMenu(s: ShellState): void {
+  const slot = GetPlayerId(GetTriggerPlayer());
+  if (isParticipantSlot(slot)) openTitle(s, slot);
 }
 
 export function back(s: ShellState, slot: ParticipantSlot): void {
@@ -256,6 +270,7 @@ export function panelActions(): PanelActions {
         makePreview(s);
       }),
       openSettings: participant => withSlot(participant, openSettingsScreen),
+      openMainMenu: participant => withSlot(participant, openTitle),
       start: participant => withSlot(participant, (s, slot) => {
         if (s.game.phase === Phase.characterMenu) confirm(s, slot);
       }),

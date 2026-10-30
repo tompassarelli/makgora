@@ -45,6 +45,7 @@
     "test/rifleman-removed.test.ts",
     "test/y-capture.test.ts",
     "test/y-strong.test.ts",
+    "test/pause-screen.test.ts",
     "test/dash-feet.test.ts",
     "test/illidan-gait.test.ts",
     "test/menu-journey.test.ts",

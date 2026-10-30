@@ -61,6 +61,7 @@ import { MeterGlow } from "../../game/render/meterGlow";
 import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
 import { ClassicPresentation } from "../../game/render/classicPresentation";
 import { PauseMenu } from "../../game/ui/pauseMenu";
+import { PauseScreen } from "../../game/ui/pauseScreen";
 import { duoRole } from "../../game/sim/fighter";
 
 
@@ -89,6 +90,7 @@ interface FighterRenderers {
 
 export interface UiObjects {
   pause: PauseMenu;
+  pauseScreen: PauseScreen;
   items: ItemPresentation;
   auras: AuraPresentation;
   orbs: OrbPresentation;
@@ -157,6 +159,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     results,
     chat: new ChatPanel(CHAT_STYLE),
     pause: new PauseMenu(selectPause),
+    pauseScreen: new PauseScreen(selectPause),
     items: new ItemPresentation(s.origin),
     auras: new AuraPresentation(s.origin),
     orbs: new OrbPresentation(s.origin),
@@ -277,6 +280,12 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     bindPrototype(ui.pause, PauseMenu.prototype);
     ui.pause.bindActions(selectPause);
   }
+  const retainedScreen: { readonly pauseScreen?: PauseScreen } = ui;
+  if (retainedScreen.pauseScreen === undefined) ui.pauseScreen = new PauseScreen(selectPause);
+  else {
+    bindPrototype(ui.pauseScreen, PauseScreen.prototype);
+    ui.pauseScreen.bindActions(selectPause);
+  }
   const retainedItems: { readonly items?: ItemPresentation } = ui;
   if (retainedItems.items === undefined) ui.items = new ItemPresentation(s.origin);
   else bindPrototype(ui.items, ItemPresentation.prototype);
@@ -374,8 +383,8 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 
 
 export function menuControlHit(ui: UiObjects, slot: ParticipantSlot): MenuControlHit {
-  return { over(x: number, y: number): boolean { const settings = ui.settings[slot].over(x, y), pause = ui.pause.over(x, y), results = ui.results.over(x, y);
-    return settings || pause || results;
+  return { over(x: number, y: number): boolean { const settings = ui.settings[slot].over(x, y), pause = ui.pause.over(x, y), screen = ui.pauseScreen.over(x, y), results = ui.results.over(x, y);
+    return settings || pause || screen || results;
   } };
 }
 

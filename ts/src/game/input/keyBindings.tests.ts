@@ -136,7 +136,7 @@ test("a saved WASD layout still on the earlier defaults (Space and 8 on Jump) mo
 });
 
 test("the pad layer keeps its own keys, and a layout binds a pad key only to the action the pad gives it [k2 property]", () => {
-  assertEquals(PAD_LAYER.map(({ key }) => key).join(""), "cvt123456`[]='," + ".-\\");
+  assertEquals(PAD_LAYER.map(({ key }) => key).join(""), "cvt123456/`[]='," + ".-\\");
   for (const preset of BINDING_PRESETS) {
     for (const { code: padCode, action } of PAD_LAYER) {
       const bound = actionFor(presetBindings(preset), padCode);

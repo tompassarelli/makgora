@@ -8,7 +8,7 @@ import { Action } from "../../game/input/actions";
 import { type KeyBindings, menuAction } from "../../game/input/keyBindings";
 import { type ShellState, activeRollback } from "./state";
 
-import { pauseCameraKey } from "./pauseCamera";
+import { pausedKeyUsed } from "./pauseCamera";
 
 export const KEY_DOWN = "shell.keyDown";
 export const KEY_UP = "shell.keyUp";
@@ -17,6 +17,7 @@ export const KEY_START_UP = "shell.keyStartUp";
 export const KEY_PAUSE_DOWN = "shell.keyPauseDown";
 export const KEYBOARD_PAUSE = "shell.keyboardPause";
 export const KEYBOARD_PAUSE_PREFIX = "SC_KP";
+export const MAIN_MENU = "shell.mainMenu";
 
 
 export const Key = {
@@ -26,6 +27,7 @@ export const Key = {
 export interface KeyEventPolicy {
   enabled: boolean;
   escapeOnly: boolean;
+  paused: boolean;
 }
 
 export interface KeyTriggerPair<T> {
@@ -47,13 +49,14 @@ export function ensureKeyTriggerPair<T>(pair: KeyTriggerPair<T>, create: () => T
 export function syncKeyEventPolicy(policy: KeyEventPolicy, rollbackMatch: boolean, paused: boolean, title: boolean): void {
   policy.enabled = !rollbackMatch || paused;
   policy.escapeOnly = paused || title;
+  policy.paused = paused;
 }
 
 export function keyEventAllowed(policy: Readonly<KeyEventPolicy>, key: number, bindings: Readonly<KeyBindings>): boolean {
   if (!policy.enabled) return false;
   if (!policy.escapeOnly) return true;
   const menu = menuAction(bindings, key);
-  return pauseCameraKey(key) || key === Key.escape || key === Key.f2 || (menu !== undefined && menu !== Action.moveLeft && menu !== Action.moveRight);
+  return (policy.paused && pausedKeyUsed(bindings, key)) || key === Key.escape || key === Key.f2 || (menu !== undefined && menu !== Action.moveLeft && menu !== Action.moveRight);
 }
 
 

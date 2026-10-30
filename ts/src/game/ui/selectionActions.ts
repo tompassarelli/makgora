@@ -14,6 +14,7 @@ export interface SelectionActions {
   cycleMode(actorId: number, fighterSlot: number): void;
   recallChoice(actorId: number, chipSlot: number): void;
   openSettings(participantId: number): void;
+  openMainMenu(participantId: number): void;
   start(participantId: number): void;
   changeStocks(participantId: number, direction: -1 | 1): void;
   changeTime(participantId: number, direction: -1 | 1): void;

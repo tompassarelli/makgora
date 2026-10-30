@@ -27,6 +27,7 @@ import { isScenario, type Scenario } from "./build";
 
 export interface DevSettings {
   shieldEnergyCapture?: ShieldEnergyCapture;
+  pauseLook?: "keyboard" | "pad" | undefined;
 
   stageChoice?: number | undefined;
   rollback: number;

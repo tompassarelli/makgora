@@ -18,6 +18,11 @@ import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 
 
+export function formatClock(seconds: number): string {
+  const remainder = imod(seconds, 60);
+  return `${I2S(idiv(seconds, 60))}:${remainder < 10 ? "0" : ""}${I2S(remainder)}`;
+}
+
 export class MatchClock {
   private readonly label: framehandle;
   private shownVisible = false;
@@ -44,8 +49,7 @@ export class MatchClock {
     }
     if (this.shownSeconds === seconds) return;
     this.shownSeconds = seconds;
-    const remainder = imod(seconds, 60);
-    BlzFrameSetText(this.label, `${I2S(idiv(seconds, 60))}:${remainder < 10 ? "0" : ""}${I2S(remainder)}`);
+    BlzFrameSetText(this.label, formatClock(seconds));
   }
 }
 

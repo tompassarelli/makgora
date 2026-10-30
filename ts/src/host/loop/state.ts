@@ -270,11 +270,14 @@ interface KeyEvents {
   up: trigger | undefined;
   enabled: boolean;
   escapeOnly: boolean;
+  paused: boolean;
 }
 
 export interface ShellState {
   pauseCamera?: import("./pauseCamera").PauseCamera | undefined;
-  pauseMenu?: { choice: number; shown: boolean; title: boolean };
+  pauseMenu?: { shown: boolean; title: boolean };
+  pauseChord?: Slots<import("../../game/input/pauseChord").ChordKeys> | undefined;
+  pausedBy?: ParticipantSlot | undefined;
   resultFocus?: number[] | undefined;
   titleAwaitRelease?: boolean;
   trainingHints?: boolean;
@@ -454,7 +457,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
     probe: createResponseProbe(build.id),
     rollback: isShadow(input) ? rollback(input, setup.playback, setup.editbox) : undefined,
-    keyEvents: { down: undefined, up: undefined, enabled: true, escapeOnly: false }, localKeys: keyTracker(), readyMarkerWritten: false, restartRequested: false,
+    keyEvents: { down: undefined, up: undefined, enabled: true, escapeOnly: false, paused: false }, localKeys: keyTracker(), readyMarkerWritten: false, restartRequested: false,
     diagnostic: createReplaySnapshot(), moment: momentSaves(), replay: replayRecording(),
   };
 

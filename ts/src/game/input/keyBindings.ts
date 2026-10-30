@@ -58,7 +58,7 @@ const RESERVED_KEYS: readonly number[] = [8, 13, 27, 112, 116, 117, 118];
 const RESERVED_REASONS: Readonly<Record<number, string>> = {
   8: "Backspace is reserved for Pause",
   13: "Enter is reserved for Warcraft chat",
-  27: "Escape is reserved for cancel",
+  27: "Escape is reserved for Pause and cancel",
   112: "F1 is reserved for this screen",
   116: "F5 is reserved for Warcraft shortcuts",
   117: "F6 is reserved for Warcraft shortcuts",
@@ -200,22 +200,6 @@ export function menuAction(bindings: Readonly<KeyBindings>, key: number): Action
   const action = inputAction(bindings, key);
   return action !== undefined && MENU_ACTIONS.includes(action) ? action : undefined;
 }
-
-const PAUSE_MENU_ACTIONS: readonly Action[] = [Action.moveUp, Action.moveDown, Action.attack, Action.special];
-
-export function pauseMenuKeys(bindings: Readonly<KeyBindings>): number[] {
-  const keys = [0x26, 0x28];
-  for (const action of PAUSE_MENU_ACTIONS) {
-    for (const slot of [0, 1] as const) {
-      const key = keyFor(bindings, action, slot);
-      if (key !== undefined) keys.push(key);
-    }
-    const pad = padLayerKey(action).code;
-    if (actionFor(bindings, pad) === undefined) keys.push(pad);
-  }
-  return keys;
-}
-
 
 function bindSlot(keys: number[], index: number, key: number): boolean {
   if (key !== EMPTY) {
