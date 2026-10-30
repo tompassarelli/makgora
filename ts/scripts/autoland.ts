@@ -1,7 +1,8 @@
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { ATTESTED, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, jobReads, jobsMatter, laneSince, listedRuns, openRuns, sinceMisses, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
+import { ATTESTED, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, jobReads, jobsMatter, laneSince, listedRuns, openRuns, sinceMisses, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree, type Resolution } from "./autolandCore";
+import { rebaseLane, run, type Stages } from "./autolandRebase";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
@@ -29,8 +30,7 @@ const familyTree = (directory: string): Tree => {
   return new Map(files.map((file) => [file, new Bun.CryptoHasher("sha256").update(readFileSync(join(directory, file))).digest("hex")]));
 };
 
-async function resolveCommand(file: string, store: string): Promise<void> {
-  const stages = readList(file, isStages);
+async function resolveStages(stages: readonly Stages[], store: string): Promise<{ readonly resolution: Resolution; readonly note: string }> {
   const located = (family: string, hash: string): string | undefined => { const directory = join(store, family, hash); return hash !== "" && existsSync(directory) ? directory : undefined; };
   const conflicts: Conflict[] = stages.map(({ path, base, ours, theirs }) => {
     const family = pinFamily(path);
@@ -40,7 +40,7 @@ async function resolveCommand(file: string, store: string): Promise<void> {
     return { path, sides: { base: b ?? new Map(), ours: o ?? new Map(), theirs: t ?? new Map() } };
   });
   const resolution = resolveConflicts(conflicts);
-  if (!resolution.resolve) { console.log(`flag\t${resolution.why}`); return; }
+  if (!resolution.resolve) return { resolution, note: resolution.why };
   const notes: string[] = [];
   for (const pin of resolution.pins) {
     const { storeFamily } = await import("./wisp/buildInputs");
@@ -63,8 +63,26 @@ async function resolveCommand(file: string, store: string): Promise<void> {
     writeFileSync(pin.path, `${pin.hash}\n`);
     notes.push(`${pin.path} merged to ${pin.hash.slice(0, 12)}`);
   }
-  console.log(["resolve", [...notes, ...resolution.reports.map((path) => `${path} regenerated`)].join("; "), ...resolution.reports].join("\t"));
+  return { resolution, note: [...notes, ...[...resolution.reports, ...resolution.code].map((path) => `${path} regenerated`)].join("; ") };
 }
+
+async function resolveCommand(file: string, store: string): Promise<void> {
+  const { resolution, note } = await resolveStages(readList(file, isStages), store);
+  console.log(resolution.resolve ? ["resolve", note, ...resolution.reports, ...resolution.code].join("\t") : `flag\t${note}`);
+}
+
+function regenerateCode(paths: readonly string[]): string | undefined {
+  const steps = [["bun", "install", "--frozen-lockfile"], ["bun", "run", "generate"]] as const;
+  for (const [command, ...args] of steps) {
+    const result = run("ts", command, ...args);
+    if (!result.ok) return `${[command, ...args].join(" ")} failed after the rebase: ${(result.out + result.err).trim().split("\n").slice(-3).join(" ")}`;
+  }
+  run(".", "git", "add", "-A", "--", "ts/src/generated");
+  if (run(".", "git", "diff", "--cached", "--quiet").ok) return undefined;
+  const commit = run(".", "git", "commit", "-q", "-m", `Regenerate ${paths.join(" ")} after the rebase`);
+  return commit.ok ? undefined : `committing the regenerated files failed: ${commit.err.trim()}`;
+}
+
 
 const readTree = (file: string): Tree => new Map(readFileSync(file, "utf8").split("\0").filter(Boolean).map((entry) => {
   const tab = entry.indexOf("\t");
@@ -75,7 +93,7 @@ if (import.meta.main) {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,
-    options: { conflicts: { type: "string" }, bodies: { type: "string" }, store: { type: "string" }, rebased: { type: "string" }, lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" }, messages: { type: "string" }, body: { type: "string" }, results: { type: "string" }, sha: { type: "string" }, jobs: { type: "string" }, attempt: { type: "string" }, solo: { type: "string" }, self: { type: "string" }, summary: { type: "string" }, pushes: { type: "string" }, lists: { type: "string" } },
+    options: { conflicts: { type: "string" }, bodies: { type: "string" }, store: { type: "string" }, onto: { type: "string" }, rebased: { type: "string" }, lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" }, messages: { type: "string" }, body: { type: "string" }, results: { type: "string" }, sha: { type: "string" }, jobs: { type: "string" }, attempt: { type: "string" }, solo: { type: "string" }, self: { type: "string" }, summary: { type: "string" }, pushes: { type: "string" }, lists: { type: "string" } },
   });
   const command = positionals[0];
   const now = Date.parse(values.now ?? new Date().toISOString());
@@ -133,6 +151,9 @@ if (import.meta.main) {
   } else if (command === "resolve") {
     if (values.conflicts === undefined) throw new Error("resolve needs --conflicts FILE");
     await resolveCommand(values.conflicts, values.store ?? join(process.env.HOME ?? "", ".local/share/smashcraft-build-inputs/store"));
+  } else if (command === "rebase") {
+    const store = values.store ?? join(process.env.HOME ?? "", ".local/share/smashcraft-build-inputs/store");
+    console.log(JSON.stringify(await rebaseLane({ repo: process.cwd(), onto: values.onto ?? "autoland", resolve: (stages) => resolveStages(stages, store), regenerate: regenerateCode })));
   } else if (command === "train-step") {
     console.log(trainStep(positionals.slice(1).map((flag) => flag === "land")));
   } else if (command === "refs") {

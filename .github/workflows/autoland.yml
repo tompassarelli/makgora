@@ -271,32 +271,19 @@ jobs:
             fi
             lane_base=$(git rev-parse autoland)
             git checkout -q --detach "$tip"
-            if ! git merge-base --is-ancestor autoland HEAD && ! git rebase -q autoland > rebase.log 2>&1; then
-              conflicted=""; resolved=""; why="the rebase stopped without a file conflict"
-              for _ in $(seq 20); do
-                files=$(git diff --name-only --diff-filter=U)
-                [ -n "$files" ] || break
-                conflicted="$conflicted $files"
-                for file in $files; do
-                  jq -n --arg path "$file" --arg base "$(git show ":1:$file" 2>/dev/null)" --arg ours "$(git show ":2:$file" 2>/dev/null)" --arg theirs "$(git show ":3:$file" 2>/dev/null)" '$ARGS.named'
-                done | jq -s . > conflicts.json
-                IFS=$'\t' read -r action note reports <<< "$(bun ts/scripts/autoland.ts resolve --conflicts conflicts.json || printf 'flag\tresolving failed')"
-                if [ "$action" != resolve ]; then why="$note"; break; fi
-                for report in $reports; do git checkout -q --ours -- "$report"; done
-                git add -- $files
-                resolved="$resolved${resolved:+; }$note"
-                if GIT_EDITOR=true git rebase --continue >> rebase.log 2>&1; then why=""; break; fi
-              done
-              files=$(echo $conflicted)
+            if ! git merge-base --is-ancestor autoland HEAD; then
+              rebased=$(bun ts/scripts/autoland.ts rebase --onto autoland || printf '{"ok":false,"why":"rebasing failed","files":"","resolved":""}')
+              why=$(jq -r 'if .ok then "" else .why end' <<< "$rebased"); files=$(jq -r .files <<< "$rebased"); resolved=$(jq -r .resolved <<< "$rebased")
               if [ -n "$why" ]; then
-                git rebase --abort
                 git checkout -q autoland
-                refuse "$branch" "$tip" "rebasing onto main and the branches ahead of it conflicts in $files" "${files:-$(tail -20 rebase.log)}"
+                refuse "$branch" "$tip" "rebasing onto main and the branches ahead of it conflicts in $files" "$files"
                 flag "$branch" "$tip" "conflicts in \`$files\` when rebased onto main ${base:0:10}. Not auto-resolved: $why. Push a rebased fix to the branch." alarm
                 continue
               fi
-              echo "Auto-resolved generated conflicts of \`$branch\`: $resolved" >> "$GITHUB_STEP_SUMMARY"
-              flag "$branch" "$tip" "conflicted in generated \`$files\` when rebased onto main ${base:0:10}; Autoland auto-resolved it ($resolved) and continues with the lane."
+              if [ -n "$files" ]; then
+                echo "Auto-resolved generated conflicts of \`$branch\`: $resolved" >> "$GITHUB_STEP_SUMMARY"
+                flag "$branch" "$tip" "conflicted in generated \`$files\` when rebased onto main ${base:0:10}; Autoland auto-resolved it ($resolved) and continues with the lane."
+              fi
             fi
             direct=retest
             [ -z "$passed_tree" ] || direct=$(passed "$tip" "$passed_base" "$passed_tree" autoland HEAD)
@@ -780,7 +767,7 @@ jobs:
             for file in $files; do jq -n --arg path "$file" '{path: $path, base: "", ours: "", theirs: ""}'; done | jq -s . > conflicts.json
             IFS=$'\t' read -r action note _ <<< "$(bun ts/scripts/autoland.ts resolve --conflicts conflicts.json --store /nonexistent || printf 'flag\tresolving failed')"
             if [ "$action" = resolve ]; then
-              echo "\`$branch\` (${tip:0:10}) conflicts with main ${base:0:10} only in generated reports: its test regenerates them" >> "$GITHUB_STEP_SUMMARY"
+              echo "\`$branch\` (${tip:0:10}) conflicts with main ${base:0:10} only in generated reports and tables: its test regenerates them" >> "$GITHUB_STEP_SUMMARY"
               continue
             fi
             files=$(echo $files)
