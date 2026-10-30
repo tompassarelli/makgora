@@ -95,8 +95,7 @@ function strikeFrames(special: Readonly<AuthoredSpecial>): { readonly first: num
 
 function releasedShowcase(slot: string, code: number, special: Readonly<AuthoredSpecial>, frame: number, charging: readonly number[] | undefined): ShowcaseMove {
   const strikes = strikeFrames(special), first = frame + 1 + strikes.first, last = frame + 1 + strikes.last;
-  const gap = (special.regions ?? []).length === 0 ? specialGap(special) : undefined;
-  return { slot, kind: "special", code, first, end: frame + special.endFrame, release: frame, charging, swing: [first + floorDiv(last - first, 2), last], gap };
+  return { slot, kind: "special", code, first, end: frame + special.endFrame, release: frame, charging, swing: [first + floorDiv(last - first, 2), last], gap: specialGap(special) };
 }
 
 function aimedReleases(slot: string, code: number, special: Readonly<AuthoredSpecial>): ShowcaseMove[] {

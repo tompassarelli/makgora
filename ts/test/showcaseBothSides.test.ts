@@ -71,3 +71,12 @@ test("a crossed row strikes the foe from the front, then from behind, in the hea
     }
   }
 }, 60_000);
+
+test("a released special with hit regions stands the foe inside its furthest strike, not at the default spacing [k1 scenario]", () => {
+  const rows = showcaseRows(SELECTABLE_CHARACTERS.find(character => fighterSlug(character) === "peon") ?? SELECTABLE_CHARACTERS[0]!).filter(({ move }) => move.slot === "neutral_b" && move.release !== undefined);
+  expect(rows.length).toBe(2);
+  for (const { move } of rows) {
+    expect(move.gap).toBeGreaterThan(0);
+    expect(move.gap).toBeLessThan(200);
+  }
+});
