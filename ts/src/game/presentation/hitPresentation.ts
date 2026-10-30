@@ -42,7 +42,7 @@ export function impactModel(kind: number): string {
     case IMPACT_FIRE_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_SLASH_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_ARCANE_HIT: return IMPACT_HIT_MODEL;
-    case IMPACT_ICE_HIT: return "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
+    case IMPACT_ICE_HIT: return "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx";
     default: return "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx";
   }
 }

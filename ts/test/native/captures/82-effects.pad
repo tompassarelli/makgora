@@ -35,7 +35,7 @@
 308 a capture
 320 a capture
 # case 5
-#! cue 360-362 case 5: sound=FrostNova effect=FrostNovaTarget
+#! cue 360-362 case 5: sound=FrostNova effect=FrostArmorDamage
 360 a chat -dev effects 5
 362 a capture
 368 a capture
