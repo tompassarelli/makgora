@@ -10,7 +10,7 @@ import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { MAX_INPUT_DELAY } from "../src/game/netcode/fixedSchedule";
-import { autoDelay, delayPolicy, observeRtt, rttEstimate } from "../src/game/netcode/delayPolicy";
+import { autoDelay, delayPolicy, observeRtt, rttEstimate } from "wisp/src/netcode/delay";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { install, startBuild } from "../src/platform/main";
 import { installSessionRates } from "../src/host/loop/sessionRates";
@@ -129,7 +129,7 @@ const field = (seconds: readonly Fields[], name: string): number[] => seconds.ma
 function linkDelay(rttMs: number): number {
   const estimate = rttEstimate();
   observeRtt(estimate, rttMs);
-  return autoDelay(delayPolicy(WINDOW), estimate);
+  return autoDelay(delayPolicy(WINDOW, MAX_INPUT_DELAY), estimate);
 }
 
 function coversTrip(rttMs: number): void {

@@ -6,14 +6,14 @@ import { type MatchState, firstHumanSlot, humanActive, humanCount } from "../../
 import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, type RttEstimate, agreedDelay, chosenDelay, connectionPoor, correctDelay,
   correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rttEstimate, smoothedRttMs, stepManualDelay,
-} from "../../game/netcode/delayPolicy";
-import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
+} from "wisp/src/netcode/delay";
+import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { MENU_STYLE, NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
 import type { LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
-import { type MachineRate, machineRate, noteMachineSecond, slowMachineText } from "../../game/netcode/machineRate";
+import { type MachineRate, machineRate, noteMachineSecond } from "wisp/src/netcode/rate";
 import { type Roster, isActive } from "../../game/sim/roster";
 import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from "./handleLedger";
 
@@ -28,6 +28,8 @@ const HOST_MARK = "h";
 const NO_HOST_DELAY = -2;
 const FREEZING_TEXT = "|cffffcc00Freezing: inputs late, host can raise input delay|r";
 const SECOND = 60;
+const slowMachineText = (slot: number, fps: number): string =>
+  `P${slot + 1}'s machine is running slow (${fps} fps) — the match runs at its pace`;
 export const POP_UNITS = 20;
 const POP_BUCKETS = 1024;
 
@@ -73,7 +75,7 @@ export interface NetDelay {
 }
 
 export function createNetDelay(window: number): NetDelay {
-  const policy = delayPolicy(window);
+  const policy = delayPolicy(window, MAX_INPUT_DELAY);
   return {
     policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
@@ -108,7 +110,7 @@ export function hostDelayFrom(net: NetDelay, game: Readonly<MatchState>, sender:
   if (isHost(game, sender) && (manual === AUTO_DELAY || isFixedDelay(manual))) net.manual = manual;
 }
 
-export const nextManualDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, direction: -1 | 1): number => stepManualDelay(net.manual, autoMatchDelay(net, game), direction);
+export const nextManualDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, direction: -1 | 1): number => stepManualDelay(net.policy, net.manual, autoMatchDelay(net, game), direction);
 
 export function sendHostDelay(manual: number): void {
   BlzSendSyncData(DELAY_PREFIX, `${HOST_MARK}${I2S(manual)}`);

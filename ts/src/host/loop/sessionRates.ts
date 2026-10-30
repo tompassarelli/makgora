@@ -3,8 +3,8 @@ import { floorMod, idiv } from "wisp/src/sim/intMath";
 import { Phase } from "../../game/lobby/lobbyState";
 import { sourceVersion } from "../../game/shell/sourceVersion";
 import { sessionRatesFile, sessionRatesHeader } from "../../game/core/gameFiles";
-import { smoothedRttMs } from "../../game/netcode/delayPolicy";
-import { secondFps } from "../../game/netcode/machineRate";
+import { smoothedRttMs } from "wisp/src/netcode/delay";
+import { secondFps } from "wisp/src/netcode/rate";
 import { noteLocalSecond, takeNetRates } from "./netDelay";
 import { type Rollback, activeRollback, shellState } from "./state";
 

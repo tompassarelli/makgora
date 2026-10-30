@@ -34,7 +34,7 @@ import { resetToStartingSelection, startDevClassic, startDevLore, startQuickMatc
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";
 import { type ShellState, localSlot } from "./state";
-import { AUTO_DELAY } from "../../game/netcode/delayPolicy";
+import { AUTO_DELAY } from "wisp/src/netcode/delay";
 import { MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { isHost, sendHostDelay } from "./netDelay";
 import { views } from "./ui";

@@ -39,7 +39,7 @@ import { cancelStageLoad, requestStageLoad, stageLoading } from "./stageLoad";
 import { endReplaySegment } from "./replays";
 import { makePreview } from "./preview";
 import { type ShellState, cancelPendingPlaytest, keepShellMomentEnd, localSlot, shell } from "./state";
-import { AUTO_DELAY } from "../../game/netcode/delayPolicy";
+import { AUTO_DELAY } from "wisp/src/netcode/delay";
 import { isHost, nextManualDelay, sendHostDelay } from "./netDelay";
 import type { PanelActions } from "./ui";
 import { clearMatchEffects, views } from "./ui";
