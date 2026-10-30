@@ -207,21 +207,23 @@ export function beginMatch(clients: Lockstep, match: SoakMatch, frame: () => voi
 
 
 export function matchView(journaled: (slot: number) => number | undefined): Pick<SoakDriver, "observe" | "confirmed" | "bodies"> {
-  const stalled = new Map<HeadlessClient, { progress: number | undefined; frames: number }>();
+  const stalled = new Map<HeadlessClient, { progress: number | undefined; frames: number; told: string | undefined }>();
   return {
     observe: (client) => {
       const s = shell();
       const playing = s.game.phase === Phase.match && !s.session.paused;
       const progress = playing ? s.runtime.simulationFrame : undefined;
-      const last = stalled.get(client) ?? { progress: undefined, frames: 0 };
-      last.frames = progress === last.progress ? last.frames + 1 : 0;
+      const last = stalled.get(client) ?? { progress: undefined, frames: 0, told: undefined };
+      if (progress === last.progress) last.frames++;
+      else Object.assign(last, { frames: 0, told: undefined });
       last.progress = progress;
+      if (last.frames >= 30) last.told ??= client.frames.shownText().find((text) => text.includes("Waiting for"));
       stalled.set(client, last);
       const sent = journaled(client.slot);
       return {
         progress,
 
-        waiting: last.frames >= 30 ? client.frames.shownText().find((text) => text.includes("Waiting for")) : undefined,
+        waiting: last.told,
         ...(playing && sent !== undefined ? { backlog: sent - s.runtime.simulationFrame } : {}),
         over: s.game.phase === Phase.result,
       };
