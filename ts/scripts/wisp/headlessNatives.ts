@@ -86,6 +86,10 @@ export const smashcraftNativeBehavior = (client?: unknown) => ({
   QuestSetTitle: (entry: unknown, title: string) => { const found = questEntry(client, entry); if (found !== undefined) found.title = title; },
   QuestSetDescription: (entry: unknown, description: string) => { const found = questEntry(client, entry); if (found !== undefined) found.description = description; },
   PanCameraToTimed: (x: number, y: number) => SetCameraPosition(x, y),
+  BlzConvertColor: (a: number, r: number, g: number, b: number) => {
+    const argb = ((a * 256 + r) * 256 + g) * 256 + b;
+    return argb >= 2147483648 ? argb - 4294967296 : argb;
+  },
 
   GetLocationX: () => 0,
   GetLocationY: () => 0,
