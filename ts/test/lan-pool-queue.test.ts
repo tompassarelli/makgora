@@ -13,6 +13,8 @@ afterEach(() => {
   for (const cleanup of cleanups.splice(0)) cleanup();
 });
 
+const PAIR = 93;
+
 const sandbox = () => {
   const folder = mkdtempSync(join(tmpdir(), "smashcraft-lan-pool-"));
   cleanups.push(() => rmSync(folder, { recursive: true, force: true }));
@@ -32,6 +34,12 @@ const sandbox = () => {
   writeFileSync(packager, "");
   writeFileSync(`${packager}.source-sha256`, `${packagerSource()}\n`);
   writeFileSync(`${packager}.stormlib-gc-root`, "");
+  for (const side of ["a", "b"]) {
+    const install = join(folder, "data/wisp/lan/clients", `lan${PAIR}${side}`, "pfx/drive_c/Program Files (x86)/Warcraft III");
+    mkdirSync(join(install, "_retail_/x86_64"), { recursive: true });
+    writeFileSync(join(install, "_retail_/x86_64/Warcraft III.exe"), "");
+    writeFileSync(join(install, ".build.info"), "");
+  }
   const { NORTH_FLEET_SESSION: _session, XDG_CACHE_HOME: _cache, ...inherited } = process.env;
   return {
     ...inherited,
@@ -47,7 +55,6 @@ const sandbox = () => {
   };
 };
 
-const PAIR = 93;
 const HELD_SECONDS = 3;
 
 test("two smashcraft sessions waiting on a held pair get it one at a time, in the order they asked, through wisp's queue [k5 boundary lan-pool-queue]", async () => {

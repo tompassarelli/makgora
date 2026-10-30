@@ -3,11 +3,11 @@ import { Glob } from "bun";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BTN_A, BTN_START, EV_ABS, EV_KEY } from "../scripts/integrity/linuxInput";
-import { type PadStep, parsePadScript } from "../scripts/integrity/padScript";
+import { type PadStep, parsePadScript, withoutCaptureMapLines } from "../scripts/integrity/padScript";
 
 const PADS = join(import.meta.dir, "native/pads");
 
-const parsed = (path: string): readonly PadStep[] => parsePadScript(readFileSync(join(PADS, path), "utf8"));
+const parsed = (path: string): readonly PadStep[] => parsePadScript(withoutCaptureMapLines(readFileSync(join(PADS, path), "utf8")));
 
 const presses = (steps: readonly PadStep[], code: number): number[] =>
   steps.flatMap((step) => step.kind === "edge" && step.edges.some((edge) => edge.type === EV_KEY && edge.code === code && edge.value === 1) ? [step.frame] : []);

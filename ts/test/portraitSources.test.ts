@@ -8,14 +8,15 @@ import { assetsView, readManifest } from "../scripts/wisp/buildInputs";
 import { RENDERED_FIGHTERS, fighterRenderName } from "../src/game/roster/kits";
 import { RECEIPTS, sourceModelHash, stalePortraits } from "../scripts/portraitParts";
 
+const hosted = process.env.GITHUB_ACTIONS === "true";
 const assets = assetsView(Effect.runSync(readManifest()));
 const renders = join(assets, "fighter-renders");
 
-test("every fighter's stored portraits record the hash of the model input they were rendered from [k5 boundary stored-portrait-sources]", () => {
+test.skipIf(hosted)("every fighter's stored portraits record the hash of the model input they were rendered from [k5 boundary stored-portrait-sources]", () => {
   expect(stalePortraits(assets, renders)).toEqual([]);
 });
 
-test("a model swap, or a receipt with no recorded hash, is reported against its fighter [k2 property]", () => {
+test.skipIf(hosted)("a model swap, or a receipt with no recorded hash, is reported against its fighter [k2 property]", () => {
   const character = RENDERED_FIGHTERS[0]!, name = fighterRenderName(character);
   const swapped = mkdtempSync(join(tmpdir(), "portrait-sources-"));
   mkdirSync(join(swapped, RECEIPTS));

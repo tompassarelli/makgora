@@ -5,6 +5,11 @@ import { dirname, join } from "node:path";
 import { GENERATED_CODE, resolveConflicts } from "../scripts/autolandCore";
 import { rebaseLane } from "../scripts/autolandRebase";
 
+for (const role of ["AUTHOR", "COMMITTER"]) {
+  process.env[`GIT_${role}_NAME`] = "lane";
+  process.env[`GIT_${role}_EMAIL`] = "lane@example.invalid";
+}
+
 const GENERATED = "ts/src/generated/state/fighterState.ts";
 const HEROES = ["chen", "murloc", "tyrande"] as const;
 

@@ -25,6 +25,10 @@ export type PadStep =
 const axis = (value: number) => Math.max(-32768, Math.min(32767, Math.round(value * 32767)));
 
 
+export const CAPTURE_MAP_LINE = /^\s*\S+\s+[ab]\s+(?:chat|move|brace|cross|hold)(?:\s|$)/;
+
+export const withoutCaptureMapLines = (script: string): string => script.split("\n").filter((line) => !CAPTURE_MAP_LINE.test(line)).join("\n");
+
 export function parsePadScript(text: string): readonly PadStep[] {
   const steps: PadStep[] = [];
   let previous = 0;

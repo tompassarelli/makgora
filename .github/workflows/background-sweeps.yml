@@ -39,7 +39,7 @@ jobs:
         run: |
           runner=$(jq -er '.background | select(type == "string" and length > 0)' ts/runner-routing.json)
           echo "runner=$runner" >> "$GITHUB_OUTPUT"
-  # Every sweep outside GATE_SWEEPS (ts/src/game/core/gateSweeps.ts) and the
+  # The host test suite (ts/test), every sweep outside GATE_SWEEPS (ts/src/game/core/gateSweeps.ts) and the
   # per-pair worst-frame census (#405), at most two jobs at once so it never
   # crowds a landing's gate run. Census shard N plays every CENSUS_SHARDS-th fighter of the
   # roster; the census job judges the joined pairs.
@@ -52,6 +52,7 @@ jobs:
       max-parallel: 2
       matrix:
         include:
+          - { kind: bun, name: "host tests" }
           - { kind: census, shard: 0, name: "census 0" }
           - { kind: census, shard: 1, name: "census 1" }
           - { kind: census, shard: 2, name: "census 2" }
@@ -85,6 +86,7 @@ jobs:
         working-directory: ts
         timeout-minutes: 25
         env:
+          SWEEPS: ""
           TEST_JUNIT_DIR: build/sweep-listing
       - if: matrix.kind == 'lua'
         run: mkdir -p ts/build/sweep-listing

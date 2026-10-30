@@ -32,7 +32,7 @@ import { capture, loadClients } from "wisp/scripts/warcraft/desktop";
 import { type Frame, decodePpm, encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
-import { parsePadScript } from "./integrity/padScript";
+import { CAPTURE_MAP_LINE, parsePadScript, withoutCaptureMapLines } from "./integrity/padScript";
 import { STAMP_CELL } from "../src/game/core/drawnStamp";
 import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
 import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
@@ -70,11 +70,10 @@ export function silhouetteOf(path: string, lines: readonly string[]): Silhouette
 }
 
 export function fixtureOf(path: string, script: string): CaptureFixture {
-  const chat = /^\s*\S+\s+[ab]\s+(?:chat|move|brace|cross|hold)(?:\s|$)/;
   const lines = script.split("\n");
   const silhouette = silhouetteOf(path, lines);
-  if (lines.some(line => chat.test(line) && line.trim().startsWith("+"))) fail(`${path}: a chat line needs an absolute frame`);
-  const frames = [...new Set(parsePadScript(lines.filter(line => !chat.test(line)).join("\n")).filter(step => step.kind === "capture").map(step => step.frame))].sort((a, b) => a - b);
+  if (lines.some(line => CAPTURE_MAP_LINE.test(line) && line.trim().startsWith("+"))) fail(`${path}: a chat line needs an absolute frame`);
+  const frames = [...new Set(parsePadScript(withoutCaptureMapLines(script)).filter(step => step.kind === "capture").map(step => step.frame))].sort((a, b) => a - b);
   if (frames.length === 0) fail(`${path}: no capture lines`);
   if (frames[0] === 0) fail(`${path}: a capture at frame 0 can't be held`);
   if (silhouette !== undefined && (frames.at(-1) ?? 0) >= SILHOUETTE_HIDDEN_FRAME) fail(`${path}: a silhouette capture frame must be below ${SILHOUETTE_HIDDEN_FRAME}`);

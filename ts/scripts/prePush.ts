@@ -83,6 +83,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
     ...(mapInputs ? [{ name: "private map-build inputs", directory: "ts", args: ["scripts/wisp.ts", "map", "build", "--profile", "playable", "--edition", "classic", "--inputs-only"], fix: "regenerate and store the missing inputs before landing (smashcraft:docs/build-inputs.md).", hosted: false, privateStore: true }] : []),
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
+      { name: "stored portraits match their models", directory: "ts", args: ["test", "test/portraitSources.test.ts"], fix: "re-render the listed fighters with bun scripts/fighterPortraits.ts PRIVATE_OUTPUT --only NAME and store the result as fighter-renders (smashcraft:docs/design/fighter-portraits.md).", hosted: false, privateStore: true },
     ] : []),
     ...(cueModels ? [
       { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true, localFix: true },

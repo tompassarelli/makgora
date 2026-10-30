@@ -3,7 +3,7 @@
 - Tiers: the edit loop runs locally and aims at under 60 s: `bun wisp dev`
   on each save (type errors of the saved files, their affected unit tests and
   journeys, then the whole type check; smashcraft:docs/commands/dev.md). The
-  landing gate runs the landing checks a lane's diff can reach on the landing machine, and main's CI runs the full suite on each landed commit (smashcraft:docs/ci.md, "Landing"). After landing, Background sweeps runs every sweep
+  landing gate runs the landing checks a lane's diff can reach on the landing machine, and Background sweeps runs the host test suite (`bun run test`) on each landed commit (smashcraft:docs/ci.md, "Landing"). After landing, Background sweeps runs every sweep
   on the landed SHA. Nightly or on dispatch: Playtest, Memory soak, Headless
   pads, Balance and Perf; Effect upgrade runs weekly.
 
