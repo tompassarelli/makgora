@@ -8,5 +8,5 @@ export const dreadlordLook = (kit: KitNormals): HeroLook => ({
   portrait: "ReplaceableTextures\\CommandButtons\\BTNHeroDreadLord.blp",
   clips: dreadlordClipTable(kit),
   fallback: DREADLORD_FALLBACK_CLIP, defeat: "death",
-  commandGrab: { travel: DREADLORD_POUNCE_CLIPS.travel, hold: DREADLORD_POUNCE_CLIPS.bite, recovery: DREADLORD_POUNCE_CLIPS.recovery },
+  commandGrab: { travel: DREADLORD_POUNCE_CLIPS.travel, hold: DREADLORD_POUNCE_CLIPS.bite, recovery: DREADLORD_POUNCE_CLIPS.recovery, travelStartsAtMotion: true },
 });

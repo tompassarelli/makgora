@@ -94,6 +94,8 @@ export interface CommandGrabClips {
   readonly travel: HeroClip;
   readonly hold: HeroClip;
   readonly recovery: HeroClip;
+  /** The travel clip waits on its first pose until the first motion frame instead of playing from frame 1. */
+  readonly travelStartsAtMotion?: true | undefined;
 }
 
 export interface HeroDefinition {

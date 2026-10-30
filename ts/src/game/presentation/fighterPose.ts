@@ -238,7 +238,7 @@ function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean
   const holding = caught > 0 && f.special.frame < caught + grab.holdFrames;
   const recovering = !holding && (caught > 0 || f.special.frame > charge);
   const phase = holding ? "hold" : recovering ? "recovery" : "travel";
-  const first = holding ? caught : recovering ? caught > 0 ? caught + grab.holdFrames : charge + 1 : 1;
+  const first = holding ? caught : recovering ? caught > 0 ? caught + grab.holdFrames : charge + 1 : clips.travelStartsAtMotion === true ? move.motion?.[0]?.first ?? 1 : 1;
   playIndex(pose, `commandGrab-${phase}`, clips[phase].index);
   pose.clipTime = f32(f32(Math.max(0, f.special.frame - first) * FRAME_SECONDS) * commandGrabSqueeze(clips[phase].seconds, grab, holding, caught > 0));
   return true;

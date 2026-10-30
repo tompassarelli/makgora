@@ -7,6 +7,7 @@ import { Character } from "../../sim/codes";
 const POUNCE = [Action.special, Action.moveRight];
 const TOUCHING_GAP = 60.0;
 const DIVE_GAP = 150.0;
+const POUNCE_WINDUP = 4;
 const WATCHED_FRAMES = 100;
 const LAST_PRESS_DELAY = 20;
 const JUMP_HOLD_FRAMES = 3;
@@ -55,7 +56,7 @@ function followUp(victimDamage: number, delay: number): Followed {
   return { freeAt, victimFreeAt, reachedAt, peak, drift: Math.abs(peakX - biteX) };
 }
 
-test("Vampiric Pounce catches a fighter the dive touches on its first frame and bites a few frames later, healing the Dreadlord [k1 scenario]", () => {
+test("Vampiric Pounce catches a fighter the dive touches on its first travel frame and bites a few frames later, healing the Dreadlord [k1 scenario]", () => {
   const s = pounceScene(TOUCHING_GAP, 0.0);
   const owner = fighter(s, 0);
   const victim = fighter(s, 1);
@@ -67,7 +68,7 @@ test("Vampiric Pounce catches a fighter the dive touches on its first frame and 
     if (caughtAt === 0 && owner.special.grabFrame > 0) caughtAt = tick;
     if (bitAt === 0 && victim.status.damage > 0) bitAt = tick;
   }
-  assertEquals(caughtAt, 1, "caught on the first frame of the dive");
+  assertEquals(caughtAt, POUNCE_WINDUP + 1, "caught on the first travel frame after the windup");
   assertGreaterThan(bitAt - caughtAt, 2);
   assertLessThan(bitAt - caughtAt, 6);
   assertEquals(owner.status.damage, OWNER_DAMAGE - BITE_HEAL);
