@@ -20,7 +20,7 @@ const WORKFLOW = "farm-test.yml";
 const POLL = "3 seconds";
 const PASSING = new Set(["success", "skipped"]);
 const RUN_URL = /\/actions\/runs\/(\d+)/;
-const NOT_YET = /HTTP 404/;
+const TRANSIENT = /HTTP (404|50[234])/;
 
 /** A landing's verdict from the check jobs alone, since the merge job only summarises them: failed once one fails, passed once all pass. */
 export function checksVerdict(state: RunState, groups: readonly Group[] = GROUPS): "passed" | "failed" | "pending" {
@@ -70,8 +70,8 @@ const awaitChecks = (repo: string, id: number, groups: readonly Group[]) => Effe
   const token = yield* run(["gh", "auth", "token"]);
   for (;;) {
     const verdict = checksVerdict(yield* fetchRunState(repo, id, token).pipe(
-      // GitHub answers 404 for a just-dispatched run's jobs until it lists them.
-      Effect.retry({ while: (failure) => NOT_YET.test(failure.message), schedule: Schedule.spaced(POLL).pipe(Schedule.upTo({ duration: "1 minute" })) }),
+      // GitHub answers 404 for a just-dispatched run's jobs until it lists them, and a passing 502, 503 or 504 under load.
+      Effect.retry({ while: (failure) => TRANSIENT.test(failure.message), schedule: Schedule.spaced(POLL).pipe(Schedule.upTo({ duration: "1 minute" })) }),
     ), groups);
     if (verdict !== "pending") return verdict;
     yield* Effect.sleep(POLL);
