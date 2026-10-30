@@ -1,0 +1,21 @@
+# Illidan's charged forward smash facing right (#783): Strong and Attack held 100 frames (the roundhouse's charge opens on attack frame 11), then released into the roundhouse. Captures cover the windup, the charge hold, the full charge and the release.
+#! chat -dev quick hero illidan
+#! preset melee
+300 a press LB
+300 a press A
+#! expect a 300-303 applied attack 1 style 4
+306 a capture
+314 a capture
+340 a capture
+370 a capture
+399 a capture
+400 a release A
+400 a release LB
+400 a capture
+403 a capture
+406 a capture
+410 a capture
+414 a capture
+420 a capture
+500 a press VIEW
+570 a release VIEW
