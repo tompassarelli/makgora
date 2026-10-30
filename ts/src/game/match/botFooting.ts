@@ -3,6 +3,7 @@
 
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
+import { SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import type { AuthoredSpecial } from "../sim/specials/schema";
@@ -196,7 +197,8 @@ function slideAfter(speed: number, traction: number, walkSpeed: number, steps: n
 export function horizontalAhead(f: Readonly<Fighter>, frames: number, stage: number, matchFrame: number): number {
   const { x, z, deltaX } = f.motion;
   const straight = f32(x + f32(deltaX * frames));
-  if (f.motion.grounded || stage < 0 || deltaX === 0.0) return straight;
+  if (f.motion.grounded) return committedOnGround(f) ? slideOnGround(f, frames) : straight;
+  if (stage < 0 || deltaX === 0.0) return straight;
   const deck = deckIndexUnder(stage, matchFrame, x, z);
   if (deck < 0) return straight;
   const deckZ = surfaceZAt(stage, deck, matchFrame, x);
@@ -209,6 +211,22 @@ export function horizontalAhead(f: Readonly<Fighter>, frames: number, stage: num
   const landed = f32(x + f32(deltaX * landing));
   const rest = deltaX < 0 ? f32(landed - slide) : f32(landed + slide);
   return Math.max(surfaceLeft(stage, deck, matchFrame), Math.min(surfaceRight(stage, deck, matchFrame), rest));
+}
+
+
+function committedOnGround(f: Readonly<Fighter>): boolean {
+  return f.launch.hitstun <= 0 && f.dodge.groundFrame === 0 && f.special.action === SpecialAction.none && (f.landing.lag > 0 || f.attack.style !== undefined);
+}
+
+
+function slideOnGround(f: Readonly<Fighter>, frames: number): number {
+  const { x } = f.motion;
+  const frozen = f.launch.hitlag > 0;
+  const deltaX = frozen ? f.motion.vx : f.motion.deltaX;
+  const speed = Math.abs(deltaX);
+  const { traction, walkSpeed } = f.tuning.physics;
+  const slide = slideAfter(speed, traction, restingTraction(f, traction) > traction ? walkSpeed : speed, frozen ? Math.max(0, frames - f.launch.hitlag + 1) : frames);
+  return deltaX < 0 ? f32(x - slide) : f32(x + slide);
 }
 
 
