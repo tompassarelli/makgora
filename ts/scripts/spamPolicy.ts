@@ -6,14 +6,20 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "../src/game/input/attackBuffer";
+import { reactionDelay } from "../src/game/match/botPlay";
 import { moveReaches } from "../src/game/match/botMoves";
+import { perceivedHeldFighter } from "../src/game/match/botPerception";
+import { cpuSkill } from "../src/game/match/cpuSkill";
+import type { MatchState } from "../src/game/lobby/lobbyState";
+import type { ParticipantSlot } from "../src/game/input/participants";
+import type { PacingAndPresentation } from "../src/game/match/pacingAndPresentation";
 import { groundGatedStyle } from "../src/game/sim/attacks";
 import { AttackStyle, GrabAction, SpecialAction } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
 import { GameplanSpecial } from "../src/game/sim/gameplan";
 import { attackStartupFrames } from "../src/game/sim/moves";
-import type { Controls } from "../src/game/sim/roster";
+import { type Controls, type Roster, fighterAt } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 
 const AERIALS: readonly number[] = [AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir];
@@ -96,6 +102,14 @@ function press(f: Readonly<Fighter>, target: Readonly<Fighter>, move: number, fr
 
 
 
+
+/** The target as the spammer's own computer skill would see it: the same perception delay an Expert's defense waits. */
+export function perceivedTarget(match: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<PacingAndPresentation>, slot: ParticipantSlot, frame: number): Readonly<Fighter> {
+  const f = fighterAt(world, slot);
+  const skill = cpuSkill(match.cpuResolvedOpponents[slot], match.cpuTiers[slot]);
+  const delay = reactionDelay(match, world, runtime, f, slot, frame, skill);
+  return perceivedHeldFighter(runtime.botMemory, 1 - slot, frame, delay) ?? fighterAt(world, 1 - slot);
+}
 
 export function spamOnly(f: Readonly<Fighter>, target: Readonly<Fighter>, move: number, stage: number, frame: number, input: Controls, commands: AttackBuffer): void {
   const holding = f.grab.action !== GrabAction.none;

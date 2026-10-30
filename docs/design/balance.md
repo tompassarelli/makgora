@@ -67,6 +67,16 @@ until it does, and an aerial is jumped for near the target
 orders on every soak stage, 40 matches a pair (800 a fighter, a 95% interval
 of about +-3.5 points), in the same farm run as the field.
 
+The spammer perceives its target as late as the Expert it plays: it reads the
+target from the same observation history at the perception delay its own
+Wren Expert skill would wait (smashcraft:ts/scripts/spamPolicy.ts
+`perceivedTarget`), so its reach, spacing and facing use the target's old
+position while its own body is read live. The probe models a human mashing
+one move, who reacts late too; zero delay against an Expert that sees 16 or
+more frames late measured the asymmetry, not the move. The 45% line and the
+probe's move choice are unchanged, and a fighter still over the line is a
+real failure for the retune (decided 2026-10-30, #790).
+
 ## Field report
 
 Beside each fighter's win rate the field prints, from the simulation state

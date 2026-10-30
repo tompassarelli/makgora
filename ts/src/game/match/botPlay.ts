@@ -240,7 +240,7 @@ function avoidTeamContact(game: Readonly<MatchState>, world: Readonly<Roster>, s
   }
 }
 
-function reactionDelay(game: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<BotRuntime>, fighter: Readonly<Fighter>, slot: ParticipantSlot, frame: number, skill: CpuSkill, floor = cpuReactionFloor(fighter, skill)): number {
+export function reactionDelay(game: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<BotRuntime>, fighter: Readonly<Fighter>, slot: ParticipantSlot, frame: number, skill: CpuSkill, floor = cpuReactionFloor(fighter, skill)): number {
   const cue = perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, floor, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "expert");
   // Only information old enough for this kind of answer may affect its seeded delay.
   const key = cue === undefined ? 0 : cue.attack.serial * 31 + cue.special.action * 17

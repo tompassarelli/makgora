@@ -42,7 +42,7 @@ import { type Roster, copyControls, fighterAt, neutralControls } from "../src/ga
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import soak from "./wisp/soak";
 import { admitsThroughHelper, runAdmitted } from "./heavyCapacity";
-import { spamOnly } from "./spamPolicy";
+import { perceivedTarget, spamOnly } from "./spamPolicy";
 import { campInput, campOf } from "./campPolicy";
 import baseline from "./balanceBaseline.json";
 import { currentKit, currentComputerCode } from "./balanceKit";
@@ -455,7 +455,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
         clearAttackBuffer(produced.commands[slot]);
         if (slot === 0 || slot === 1) produceComputerInput(match, world, runtime, slot, frame, produced.inputs[slot], produced.commands[slot], options.skills?.[slot]);
         const only = slot === 0 || slot === 1 ? spam[slot] : undefined;
-        if (only !== undefined) spamOnly(fighterAt(world, slot), fighterAt(world, 1 - slot), only, stage, frame, produced.inputs[slot], produced.commands[slot]);
+        if (only !== undefined) spamOnly(fighterAt(world, slot), perceivedTarget(match, world, runtime, slot, frame), only, stage, frame, produced.inputs[slot], produced.commands[slot]);
         if (camps !== undefined && (slot === 0 || slot === 1)) campInput(camps[slot], fighterAt(world, slot), fighterAt(world, 1 - slot), stage, frame, produced.inputs[slot], produced.commands[slot]);
       }
       if (!captureFrame(row, frame, world.mask, produced, runtime)) throw new Error(`capture refused frame ${frame}`);
