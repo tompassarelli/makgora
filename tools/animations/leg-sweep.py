@@ -100,33 +100,36 @@ def body():
 
 
 def stomp():
-    tilt, turns, lift = 30, 1, 12
+    tilt, lift, turn_frames = 30, 12, 10
     rest()
     gesture, pelvis = joint('root').parent, joint('pelvis').head.copy()
     hips = {s: joint(f'hip.{s}').head.copy() for s in 'LR'}
     shoulders = {s: joint(f'shoulder.{s}').head.copy() for s in 'LR'}
     leg = {s: (joint(f'knee.{s}').head - hips[s]).length + (joint(f'ankle.{s}').head - joint(f'knee.{s}').head).length for s in 'LR'}
-    arm = {s: (joint(f'elbow.{s}').head - shoulders[s]).length + (joint(f'wrist.{s}').head - joint(f'elbow.{s}').head).length for s in 'LR'}
 
     def eased(t):
         c = max(0.0, min(1.0, t))
         return c * c * (3 - 2 * c)
 
     def spin(frame):
-        return 360 * turns * eased((frame - 1) / (last + 3))
+        return 360 * eased((frame - contact) / turn_frames)
 
     def pose(frame):
         rest()
-        w = eased(frame / 3) * (1 - eased((frame - last - 3) / 12))
+        w = eased(frame / contact) * (1 - eased((frame - last - 2) / 8))
+        snap = max(0.0, min(1.0, frame - contact + 1))
         joint('root').location += Vector((0, 0, lift * w))
         update()
         for s, sign in (('L', 1), ('R', -1)):
-            foot = hips[s] + Vector((0, -sign * (abs(hips[s].y - pelvis.y) - 5), -leg[s]))
-            reach(s, joint(f'ankle.{s}').head.lerp(foot, w), Vector((1, 0, 0)))
-            turn(joint(f'ankle.{s}'), Quaternion(PITCH, radians(50 * w)))
-            hand = shoulders[s] + Vector((-4, sign * 4, arm[s] * 0.96))
-            chain(joint(f'shoulder.{s}'), joint(f'elbow.{s}'), joint(f'wrist.{s}'), joint(f'wrist.{s}').head.lerp(hand, w), Vector((-1, sign * 0.3, 0)))
-        turn(joint('head'), Quaternion(PITCH, radians(-8 * w)))
+            side = -sign * (abs(hips[s].y - pelvis.y) - 5)
+            tucked = hips[s] + Vector((8, side, -leg[s] * 0.55))
+            straight = hips[s] + Vector((0, side, -leg[s]))
+            reach(s, joint(f'ankle.{s}').head.lerp(tucked.lerp(straight, snap), w), Vector((1, 0, 0)))
+            turn(joint(f'ankle.{s}'), Quaternion(PITCH, radians(50 * w * snap)))
+            hip = Vector((pelvis.x - 10, pelvis.y - sign * (abs(shoulders[s].y - pelvis.y) + 3), pelvis.z + 2))
+            chain(joint(f'shoulder.{s}'), joint(f'elbow.{s}'), joint(f'wrist.{s}'), joint(f'wrist.{s}').head.lerp(hip, w), Vector((-1, -sign * 0.5, 0)))
+        turn(joint('chest'), Quaternion(PITCH, radians(tilt * 0.5 * w)))
+        turn(joint('head'), Quaternion(PITCH, radians(tilt * 0.5 * w)))
         centre = joint('pelvis').head.copy()
         turn(gesture, Quaternion(PITCH, radians(-tilt * w)) @ Quaternion(YAW, radians(spin(frame))))
         joint('root').matrix = Matrix.Translation(centre - joint('pelvis').head) @ joint('root').matrix
@@ -143,8 +146,8 @@ def stomp():
             previous[name] = q
             entry['rotation'].append([q.x, q.y, q.z, q.w])
             entry['translation'].append(list(bones[name].location))
-        ankle, wrist = joint('ankle.R').head, joint('wrist.R').head
-        print(f'STOMP frame {frame}: spin {spin(frame):.0f} ankle.R ({ankle.x:.1f}, {ankle.z:.1f}) wrist.R ({wrist.x:.1f}, {wrist.z:.1f})', flush=True)
+        ankle, wrist, blade = joint('ankle.R').head, joint('wrist.R').head, joint('weapon').head
+        print(f'STOMP frame {frame}: spin {spin(frame):.0f} ankle.R ({ankle.x:.1f}, {ankle.z:.1f}) wrist.R ({wrist.x:.1f}, {wrist.z:.1f}) blade ({blade.x:.1f}, {blade.z:.1f})', flush=True)
     open(keys_path, 'w').write(json.dumps(out))
     print('STOMP_KEYS', keys_path, frames + 1, 'frames', flush=True)
 
