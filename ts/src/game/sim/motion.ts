@@ -15,10 +15,17 @@ import { type FighterPhysics, WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 
 
 const WORLD_VALUE_MEMO_LIMIT = 512;
-const worldValueInput: Record<number, number> = {};
-const worldValueResult: Record<number, number> = {};
-const originalValueInput: Record<number, number> = {};
-const originalValueResult: Record<number, number> = {};
+// Lua grows a table by rehashing every power of two of its keys, so each memo is filled whole at load to keep that rehash out of a frame (#787).
+function filledMemo(empty: number): Record<number, number> {
+  const memo: Record<number, number> = {};
+  for (let slot = 0; slot < WORLD_VALUE_MEMO_LIMIT; slot++) memo[slot] = empty;
+  return memo;
+}
+
+const worldValueInput = filledMemo(Number.NaN);
+const worldValueResult = filledMemo(0.0);
+const originalValueInput = filledMemo(Number.NaN);
+const originalValueResult = filledMemo(0.0);
 
 function worldValue(original: number): number {
 
