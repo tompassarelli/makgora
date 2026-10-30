@@ -1,0 +1,1 @@
+{"model":"Abilities\\Weapons\\WyvernSpear\\WyvernSpearMissile.mdx","facts":{"geosets":1,"triangles":26,"lights":0,"bounds":{"min":[-98.392,-12.52,-11.361],"max":[25.76,12.58,13.595]},"emitters":[{"kind":"ribbon","name":"BlizRibbon02","whileShown":true,"onDeath":true,"visible":true,"rate":25,"lifespan":0.2,"reach":[{"min":[-103.902,-4.273,-5.813],"max":[-91.902,7.727,6.187]}]}]}}

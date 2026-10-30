@@ -1,0 +1,1 @@
+{"model":"Objects\\InventoryItems\\PotofGold\\PotofGold.mdx","facts":{"geosets":5,"triangles":72,"lights":0,"bounds":{"min":[-47.518,-54.035,29.681],"max":[59.248,53.193,120.406]},"emitters":[{"kind":"particle","name":"BlizParticle03","whileShown":true,"onDeath":true,"visible":true,"rate":18,"lifespan":0.7,"reach":[{"min":[-32.756,-37.986,-3.191],"max":[42.53,37.3,108.846]}]}]}}

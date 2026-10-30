@@ -1,0 +1,1 @@
+{"model":"war3mapImported\\WarchiefThrallDismountedV2.mdx","facts":{"geosets":19,"triangles":2006,"lights":0,"bounds":{"min":[-160.545,-161.283,-0.09],"max":[161.346,160.609,174.275]},"emitters":[{"kind":"ribbon","name":"BlizRibbon01","whileShown":true,"onDeath":true,"visible":true,"rate":35,"lifespan":0.35,"reach":[{"min":[31.67,-68.957,43.227],"max":[71.67,-28.957,83.227]}]}]}}
