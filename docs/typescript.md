@@ -383,7 +383,10 @@ victim holds. `--starter` sweeps only the named starters ("up throw",
 "jab reset") and skips the links. Run three at once, one per attacker,
 inside the capacity scope: on 6 October, on a shared machine, Archer's took
 11 minutes, Illidan's 13 and the Rifleman's 28, most of it checking his
-trap loops against every DI.
+trap loops against every DI. A Murlocs attacker is seated with Grgl (a free slot
+takes him), and one victim's sixteen starters take about 40 minutes on one
+core, so `.github/workflows/agency.yml` (`gh workflow run agency.yml -f ref=main
+-f attacker=Murlocs`) runs every victim and starter group as its own hosted job.
 
 `bun wisp soak --helper BIN [--matches N] [--seconds S]` plays matches through
 the real input path instead (smashcraft:ts/test/soak/helper.ts): each player

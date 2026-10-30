@@ -1,0 +1,97 @@
+name: Agency
+
+# `bun wisp agency --attacker NAME` on free hosted runners: one job per victim
+# and starter group, because the whole sweep is hours of one core and the
+# command fails when a loop holds a victim against every held DI direction.
+# Dispatch it with `gh workflow run agency.yml -f ref=main -f attacker=Murlocs`.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, branch or tag to sweep
+        default: main
+      attacker:
+        description: The attacker's name as `bun wisp agency --attacker` takes it
+        default: Murlocs
+      victims:
+        description: JSON array of victim names; empty sweeps every fighter
+        default: ""
+      tag:
+        description: Names the run so the one dispatched can be found
+        default: ""
+
+run-name: Agency ${{ inputs.attacker }} ${{ inputs.ref }} ${{ inputs.tag }}
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      jobs: ${{ steps.plan.outputs.jobs }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ hashFiles('ts/bun.lock') }}
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - id: plan
+        working-directory: ts
+        env:
+          VICTIMS: ${{ inputs.victims }}
+        run: |
+          all=$(bun -e 'const { FIGHTERS } = await import("./scripts/agencySweep.ts"); console.log(JSON.stringify(FIGHTERS.map(({ name }) => name)))')
+          groups='[{"name":"quick","starters":["jab","forward tilt","down tilt","forward smash"]},{"name":"up tilt","starters":["up tilt"]},{"name":"smashes and specials","starters":["up smash","down smash","neutral special","side special"]},{"name":"up and down special","starters":["up special","down special","jab reset"]},{"name":"throws","starters":["forward throw","back throw","up throw","down throw"]}]'
+          jobs=$(jq -c -n --argjson all "$all" --argjson given "${VICTIMS:-null}" --argjson groups "$groups" '[($given // $all)[] as $victim | $groups[] | {victim: $victim, group: .name, starters: .starters}]')
+          echo "jobs=$jobs" >> "$GITHUB_OUTPUT"
+          jq -r 'length' <<< "$jobs"
+
+  sweep:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    name: ${{ matrix.victim }} ${{ matrix.group }}
+    strategy:
+      fail-fast: false
+      # The account runs 20 jobs at once across every repository.
+      max-parallel: 12
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.jobs) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ hashFiles('ts/bun.lock') }}
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - working-directory: ts
+        env:
+          ATTACKER: ${{ inputs.attacker }}
+          VICTIM: ${{ matrix.victim }}
+          STARTERS: ${{ toJSON(matrix.starters) }}
+        run: |
+          starters=()
+          while IFS= read -r name; do starters+=(--starter "$name"); done < <(jq -r '.[]' <<< "$STARTERS")
+          bun wisp agency --attacker "$ATTACKER" --victim "$VICTIM" "${starters[@]}" | tee "$RUNNER_TEMP/agency.txt"
+          exit "${PIPESTATUS[0]}"
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: agency-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/agency.txt
+          retention-days: 7
