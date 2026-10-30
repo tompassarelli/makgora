@@ -1,4 +1,5 @@
 import { pairedWithin } from "../duoLocks";
+import { callVariant } from "../duoPartner";
 import type { Fighter } from "../fighter";
 import type { Roster } from "../roster";
 import type { AuthoredSpecial } from "./schema";
@@ -23,7 +24,9 @@ export function empoweredVariant(f: Readonly<Fighter>, move: Readonly<AuthoredSp
 
 export function castVariant(world: Roster | undefined, f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): number {
   const paired = move.pairedVariant;
-  return paired !== undefined && world !== undefined && pairedWithin(world, f, paired.within) ? paired.variant : empoweredVariant(f, move);
+  const called = callVariant(world, f, move);
+  if (called !== undefined) return called;
+  return paired !== undefined && world !== undefined && pairedWithin(world, f, paired.within, paired.heldWithin) ? paired.variant : empoweredVariant(f, move);
 }
 
 export function spendEmpowered(f: Fighter, base: Readonly<AuthoredSpecial>, variant: number): void {

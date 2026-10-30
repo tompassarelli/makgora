@@ -5,6 +5,7 @@ import { type AttackBuffer, type AttackCommand, clearAttackBuffer, queueAttack }
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { MURLOC_DUO } from "../fighters/murloc/duo";
 import { canStartAttack } from "../sim/conditions";
+import { canHit } from "../sim/teams";
 import { DuoOrder, DuoRole } from "../sim/codes";
 import type { Duo, Fighter } from "../sim/fighter";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
@@ -121,8 +122,21 @@ function clearFrame(ring: number[], base: number): void {
   ring[base + 3] = 0;
 }
 
+const flip = (value: number): number => 0 - value;
+
+function mirrorSides(controls: Controls): void {
+  controls.specialX = flip(controls.specialX);
+  controls.dodgeX = flip(controls.dodgeX);
+  controls.sdiX = flip(controls.sdiX);
+  controls.grabThrowX = flip(controls.grabThrowX);
+  controls.groundDodgeDirection = flip(controls.groundDodgeDirection);
+  controls.getupDirection = flip(controls.getupDirection);
+  controls.cStickX = flip(controls.cStickX);
+  controls.cStickSideFlick = flip(controls.cStickSideFlick);
+}
+
 /** Reads the frame at `base` into a partner's controls, and queues its command on `frame` so the attack buffer's grace covers a press the partner cannot start yet. */
-export function unpackFrame(ring: readonly number[], base: number, controls: Controls, commands: AttackBuffer, frame: number): void {
+export function unpackFrame(ring: readonly number[], base: number, controls: Controls, commands: AttackBuffer, frame: number, mirror = false): void {
   const flags = at(ring, base);
   const sticks = at(ring, base + 1);
   const directions = at(ring, base + 2);
@@ -173,9 +187,10 @@ export function unpackFrame(ring: readonly number[], base: number, controls: Con
   controls.verticalDirection = untrit(directions, 26);
   controls.attackRequested = false;
   controls.resetPressed = false;
+  if (mirror) mirrorSides(controls);
   if (!has(command, COMMAND_PRESENT)) return;
   queued.style = field(command, COMMAND_STYLE_SHIFT, 15);
-  queued.facing = untrit(command, COMMAND_FACING_SHIFT) as AttackCommand["facing"];
+  queued.facing = (mirror ? flip(untrit(command, COMMAND_FACING_SHIFT)) : untrit(command, COMMAND_FACING_SHIFT)) as AttackCommand["facing"];
   queued.frame = frame;
   queued.mayCharge = has(command, COMMAND_MAY_CHARGE);
   queued.cStick = has(command, COMMAND_C_STICK);
@@ -196,17 +211,52 @@ const separates = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage:
 const reunited = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): boolean =>
   gapBetween(partner, leader) <= MURLOC_DUO.resyncDistance && !separates(partner, leader, stage) && canStartAttack(partner) && canStartAttack(leader);
 
-/** Moves the order between copy and separated; the other orders belong to the specials that set them. */
+const facingOf = (value: number): number => value < 0 ? -1 : 1;
+
+/** Moves the order between copy, hold, regroup and separated; the others belong to the specials that set them. */
 function advanceOrder(duo: Duo, partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): void {
-  if (duo.order !== DuoOrder.copy && duo.order !== DuoOrder.separated) return;
+  const { order } = duo;
+  if (order !== DuoOrder.copy && order !== DuoOrder.separated && order !== DuoOrder.hold && order !== DuoOrder.regroup) return;
   duo.orderFrame++;
-  if (duo.order === DuoOrder.copy && separates(partner, leader, stage)) {
-    duo.order = DuoOrder.separated;
-    duo.orderFrame = 0;
-  } else if (duo.order === DuoOrder.separated && reunited(partner, leader, stage)) {
-    duo.order = DuoOrder.copy;
-    duo.orderFrame = 0;
+  let next: DuoOrder = order;
+  if (order === DuoOrder.copy) {
+    if (separates(partner, leader, stage)) next = DuoOrder.separated;
+  } else if (order === DuoOrder.hold) {
+    if (offstage(partner, stage) && standsOnStage(leader, stage)) next = DuoOrder.separated;
+    else if (duo.orderFrame >= MURLOC_DUO.holdFrames) next = DuoOrder.regroup;
+  } else if (reunited(partner, leader, stage)) next = DuoOrder.copy;
+  if (next === order) return;
+  duo.order = next;
+  duo.orderFrame = 0;
+}
+
+/** The nearest foe by x decides which way a held partner faces; a foe level with it, or none, leaves the leader's facing. */
+function holdFacing(world: Roster, slot: number, partner: Readonly<Fighter>, leader: Readonly<Fighter>): number {
+  let best = Infinity;
+  let side = 0;
+  for (const other of PARTICIPANT_SLOTS) {
+    if (other === slot || !isActive(world, other) || !canHit(world, slot, other)) continue;
+    const foe = fighterAt(world, other);
+    if (foe.status.out) continue;
+    const dx = f32(foe.motion.x - partner.motion.x);
+    const gap = Math.abs(dx);
+    if (gap < best) {
+      best = gap;
+      side = dx < 0 ? -1 : 1;
+    } else if (gap === best && side !== (dx < 0 ? -1 : 1)) side = 0;
   }
+  return side === 0 || best === 0 ? leader.facing : side;
+}
+
+/** A held partner copies the leader in place: no walk, run or drift, its left and right turned to face the nearest foe. */
+function driveHeld(world: Roster, slot: number, partner: Fighter, leader: Readonly<Fighter>, ring: readonly number[], controls: FrameControls, read: number, frame: number): void {
+  if (partner.motion.grounded && canStartAttack(partner)) partner.facing = facingOf(holdFacing(world, slot, partner, leader));
+  const input = at(controls.inputs, slot);
+  unpackFrame(ring, read, input, at(controls.commands, slot), frame, partner.facing !== leader.facing);
+  input.diStickX = 0.0;
+  input.driftStickX = 0.0;
+  input.direction = 0;
+  input.walking = false;
 }
 
 /** A separated partner recovers by the bots' full-skill chooser, which reads only the fighter's state once the salt is 0, then walks or hops to the leader. */
@@ -232,7 +282,7 @@ function driveSeparated(partner: Readonly<Fighter>, leader: Readonly<Fighter>, i
   }
 }
 
-/** Before the status mask each frame, every partner in the copy order takes its leader's controls from MURLOC_DUO.delayFrames ago, takes neutral controls while the leader holds a foe, and in the separated order drives itself. */
+/** Before the status mask each frame, every partner in the copy or hold order takes its leader's controls from MURLOC_DUO.delayFrames ago (a held one in place, facing the nearest foe), takes neutral controls while the leader holds a foe, and in the separated and regroup orders drives itself. */
 export function drivePartners(world: Roster, controls: FrameControls, frame: number, stage: number, stageFrame: number): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
@@ -247,12 +297,13 @@ export function drivePartners(world: Roster, controls: FrameControls, frame: num
     else packFrame(duo.ring, write, at(controls.inputs, duo.link), at(controls.commands, duo.link), frame);
     const read = imod(duo.head + RING_FRAMES - MURLOC_DUO.delayFrames, RING_FRAMES) * WORDS_PER_FRAME;
     duo.head = imod(duo.head + 1, RING_FRAMES);
-    if (duo.order === DuoOrder.separated) {
+    if (duo.order === DuoOrder.separated || duo.order === DuoOrder.regroup) {
       driveSeparated(partner, leader, controls.inputs[slot], stage, stageFrame);
       clearAttackBuffer(controls.commands[slot]);
-    } else if (holding || duo.order !== DuoOrder.copy) {
+    } else if (holding || (duo.order !== DuoOrder.copy && duo.order !== DuoOrder.hold)) {
       copyControls(controls.inputs[slot], NEUTRAL);
       clearAttackBuffer(controls.commands[slot]);
-    } else unpackFrame(duo.ring, read, controls.inputs[slot], controls.commands[slot], frame);
+    } else if (duo.order === DuoOrder.hold) driveHeld(world, slot, partner, leader, duo.ring, controls, read, frame);
+    else unpackFrame(duo.ring, read, controls.inputs[slot], controls.commands[slot], frame);
   }
 }

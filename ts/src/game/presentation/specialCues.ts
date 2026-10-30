@@ -163,7 +163,8 @@ const WIND_WALK_BODY = { red: 255, green: 255, blue: 255, alpha: 120 };
 const WIND_WALK_COUNTER: Cue = { ...cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", 1.0), sound: "WindWalk" };
 const STORM = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "hand", 1.0);
 // Warcraft discards the first seek after selecting an animation, so this held stand ring keeps its default sequence.
-const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / f32(187.05800313601685))), sequence: undefined, pitch: 0.0, timeScale: 0.0, sound: "ThunderClap" };
+export const STANCE_RING_MODEL = "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx";
+const THUNDER_CLAP_CUE: Cue = { ...cue(STANCE_RING_MODEL, "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / f32(187.05800313601685))), sequence: undefined, pitch: 0.0, timeScale: 0.0, sound: "ThunderClap" };
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
 // Her own Shadow Strike vortex loops on her body through the 20-frame hold, following the crouch that draws her model back from her position, so the dash reads apart from Fel Rush's green coil.
 const SHADOW_DASH_TELL: Cue = { ...cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "body", f32(1.1)), anchorFrames: [0.0, -9.0, -18.0, -27.0, ...Array.from({ length: 16 }, () => -36.0)].map((x) => ({ x, z: 50.0 })) };

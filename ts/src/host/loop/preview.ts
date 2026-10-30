@@ -29,6 +29,7 @@ function removeFighters(s: ShellState): void {
   }
   const ui = views(s);
   ui.frost.clear();
+  ui.stance.clear();
   ui.placed.clear();
   ui.special.clear();
   ui.elements.clear();

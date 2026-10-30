@@ -6,7 +6,7 @@ import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProject
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { murlocHit } from "./moves";
 
-export const NET = { damage: 3.0, radius: 30.0, within: 120.0, baseFrames: 30, framesPerPercent: 0.25, maxFrames: 75, hits: 3, immunityFrames: 120 } as const;
+export const NET = { damage: 3.0, radius: 30.0, within: 120.0, heldWithin: 260.0, baseFrames: 30, framesPerPercent: 0.25, maxFrames: 75, hits: 3, immunityFrames: 120 } as const;
 export const NET_ROOT: AppliedStatus = {
   kind: HeroStatusKind.root, frames: NET.baseFrames, group: HeroStatusGroup.chill, immunityFrames: NET.immunityFrames,
   perPercent: { frames: NET.framesPerPercent, cap: NET.maxFrames }, hits: NET.hits,
@@ -21,7 +21,7 @@ const NET_SHOT: SpecialProjectile = {
 };
 const ensnare = (air: boolean): AuthoredSpecial => {
   const cast = (shot: SpecialProjectile): AuthoredSpecial => ({ endFrame: 36, landingLag: air ? 18 : undefined, projectiles: [shot] });
-  return { ...cast(SNARE), variants: [cast(NET_SHOT)], pairedVariant: { variant: 1, within: NET.within } };
+  return { ...cast(SNARE), variants: [cast(NET_SHOT)], pairedVariant: { variant: 1, within: NET.within, heldWithin: NET.heldWithin } };
 };
 export const BELLY_SLIDE = { damage: 5.0, speed: 11.0, firstFrame: 8, lastFrame: 22 } as const;
 const bellySlide = (air: boolean): AuthoredSpecial => ({
@@ -43,11 +43,13 @@ const TIDAL_SURF: AuthoredSpecial = {
 };
 
 export const REVIVE = { frame: 40, endFrame: 50, offsetX: 60.0 } as const;
-const MRGLGLGL: AuthoredSpecial = { endFrame: REVIVE.endFrame, groundOnly: true, revive: { frame: REVIVE.frame, offsetX: REVIVE.offsetX } };
+export const ORDER = { frame: 6, endFrame: 20 } as const;
+const REVIVE_CAST: AuthoredSpecial = { endFrame: REVIVE.endFrame, groundOnly: true, revive: { frame: REVIVE.frame, offsetX: REVIVE.offsetX } };
+const MRGLGLGL: AuthoredSpecial = { endFrame: ORDER.endFrame, groundOnly: true, order: { frame: ORDER.frame }, variants: [REVIVE_CAST] };
 
 export const MURLOC_SPECIALS: FighterSpecials = {
   neutral: { name: "Net", description: "Throw a net that slows the first enemy it reaches. With Grgl in step and near, both nets are wider and root the foe for a few hits. Shield it or jump it.", ground: ensnare(false), air: ensnare(true) },
   side: { name: "Belly Slide", description: "Belly-slide forward into a hit, and Grgl follows five frames later. A raised shield stops the slide.", ground: bellySlide(false), air: bellySlide(true) },
   up: { name: "Tidal Surf", description: "Ride a wave upward and steer it, carrying a Grgl within reach to the full height, then fall helpless.", ground: TIDAL_SURF },
-  down: { name: "Mrglglgl!", description: "With Grgl down, call him back at 0% beside Mrgl, once a stock. A hit while calling cancels it unspent.", ground: MRGLGLGL },
+  down: { name: "Mrglglgl!", description: "Tap to make Grgl hold his ground, facing the nearest foe, and tap again to bring him back. With Grgl down, call him back at 0% beside Mrgl, once a stock. A hit while calling cancels it unspent.", ground: MRGLGLGL },
 };

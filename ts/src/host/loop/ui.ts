@@ -9,6 +9,7 @@ import { costumeFor } from "../../game/lobby/lobbyState";
 import { AgencyMarker } from "../../game/render/agencyMarker";
 import { FighterAgencyForecast } from "../../game/presentation/fighterAgency";
 import { FrostEffects } from "../../game/render/frostEffects";
+import { StanceRingEffects } from "../../game/render/stanceRingEffects";
 import { ElementEffects } from "../../game/render/elementEffects";
 import { SpecialCueEffects } from "../../game/render/specialCueEffects";
 import { MeterCueEffects } from "../../game/render/meterCueEffects";
@@ -106,6 +107,7 @@ export interface UiObjects {
   readonly combat: CombatEffects;
   readonly criticals: CriticalStrikeText;
   readonly frost: FrostEffects;
+  readonly stance: StanceRingEffects;
   readonly placed: PlacedObjectEffects;
   readonly special: SpecialEffects;
   readonly fighters: Slots<FighterRenderers | undefined>;
@@ -172,6 +174,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     combat: combat = new CombatEffects(s.origin),
     criticals: new CriticalStrikeText(s.origin),
     frost: new FrostEffects(s.origin),
+    stance: new StanceRingEffects(s.origin),
     placed: new PlacedObjectEffects(s.origin),
     special: new SpecialEffects(s.origin),
     fighters: [undefined, undefined, undefined, undefined],
@@ -309,6 +312,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   ui.stage.bindActions(actions.stage);
   bindPrototype(ui.combat, CombatEffects.prototype);
   bindPrototype(ui.frost, FrostEffects.prototype);
+  bindPrototype(ui.stance, StanceRingEffects.prototype);
   bindPrototype(ui.placed, PlacedObjectEffects.prototype);
   ui.placed.bindNestedCode();
   bindPrototype(ui.special, SpecialEffects.prototype);
@@ -372,6 +376,7 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 export function clearMatchEffects(s: ShellState): void {
   const ui = views(s);
   ui.frost.clear();
+  ui.stance.clear();
   ui.criticals.clear();
   ui.placed.clear();
   ui.elements.clear();

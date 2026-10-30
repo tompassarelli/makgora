@@ -473,6 +473,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     ui.special.presentSummons(runtime.summons, live, slot);
     if (live !== undefined) ui.frost.present(live, slot);
     else ui.frost.hideSlot(slot);
+    ui.stance.present(live, slot);
     if (live !== undefined) ui.elements.present(live, slot);
     else ui.elements.hideSlot(slot);
     if (live !== undefined) ui.placed.present(live, slot);

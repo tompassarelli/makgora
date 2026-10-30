@@ -289,7 +289,7 @@ export interface SpecialCharge {
 export interface AuthoredSpecial extends CastWindows {
 
   readonly variants?: readonly AuthoredSpecial[] | undefined;
-  readonly pairedVariant?: { readonly variant: number; readonly within: number } | undefined;
+  readonly pairedVariant?: { readonly variant: number; readonly within: number; readonly heldWithin: number } | undefined;
   readonly name?: string | undefined;
 
   readonly endFrame: number;
@@ -392,7 +392,7 @@ export interface AuthoredSpecial extends CastWindows {
 
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
-  readonly selfHeal?: SelfHeal | undefined; readonly revive?: { readonly frame: number; readonly offsetX: number } | undefined;
+  readonly selfHeal?: SelfHeal | undefined; readonly revive?: { readonly frame: number; readonly offsetX: number } | undefined; readonly order?: { readonly frame: number } | undefined;
 
   readonly charge?: SpecialCharge | undefined;
 

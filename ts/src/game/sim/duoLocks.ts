@@ -18,7 +18,7 @@ export function inLivePair(world: Roster, slot: number): boolean {
   return link >= 0 && isActive(world, link);
 }
 
-export function pairedWithin(world: Roster, fighter: Readonly<Fighter>, distance: number): boolean {
+export function pairedWithin(world: Roster, fighter: Readonly<Fighter>, distance: number, heldDistance: number): boolean {
   const slot = world.fighters.indexOf(fighter);
   if (slot < 0 || !inLivePair(world, slot)) return false;
   const other = fighterAt(world, world.linked[slot] ?? -1);
@@ -26,7 +26,8 @@ export function pairedWithin(world: Roster, fighter: Readonly<Fighter>, distance
   const otherDuo = other.duo;
   if (duo === undefined || otherDuo === undefined) return false;
   const order = duo.role === DuoRole.partner ? duo.order : otherDuo.order;
-  return order === DuoOrder.copy && !other.status.out && Math.abs(f32(fighter.motion.x - other.motion.x)) <= distance;
+  const apart = Math.abs(f32(fighter.motion.x - other.motion.x));
+  return !other.status.out && (order === DuoOrder.copy ? apart <= distance : order === DuoOrder.hold && apart <= heldDistance);
 }
 
 export function isPartnerBody(world: Roster, slot: number): boolean {

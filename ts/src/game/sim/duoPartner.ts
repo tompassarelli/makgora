@@ -1,5 +1,5 @@
 import { blastFighterFields } from "../../generated/state/fighterState";
-import { DuoRole } from "./codes";
+import { DuoOrder, DuoRole } from "./codes";
 import { type Fighter, mutableDuo } from "./fighter";
 import { setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt, isActive } from "./roster";
@@ -25,8 +25,35 @@ export function partnerReturns(world: Roster, slot: number, x: number): void {
 
 export type ReviveSpec = { readonly frame: number; readonly offsetX: number } | undefined;
 
-export function reviveBlocked(world: Roster | undefined, leader: Readonly<Fighter>, revive: ReviveSpec): boolean {
-  return revive !== undefined && (world === undefined || !reviveReady(world, leader));
+export type OrderSpec = { readonly frame: number } | undefined;
+
+/** A cast that calls the partner needs a linked partner either in the match, to be ordered, or out of it with the revive unspent. */
+export function partnerCallBlocked(world: Roster | undefined, leader: Readonly<Fighter>, move: { readonly order?: OrderSpec; readonly revive?: ReviveSpec }): boolean {
+  if (move.order === undefined && move.revive === undefined) return false;
+  return world === undefined || !(orderReady(world, leader) || reviveReady(world, leader));
+}
+
+/** The first variant of a calling cast is the revive, taken when the partner is out. */
+export function callVariant(world: Roster | undefined, leader: Readonly<Fighter>, move: { readonly order?: OrderSpec }): number | undefined {
+  return move.order !== undefined && world !== undefined && reviveReady(world, leader) ? 1 : undefined;
+}
+
+/** Whether the leader has a linked partner in the match to order. */
+export function orderReady(world: Roster, leader: Readonly<Fighter>): boolean {
+  const { duo } = leader;
+  return duo !== undefined && duo.role === DuoRole.leader && isActive(world, duo.link) && !fighterAt(world, duo.link).status.out;
+}
+
+export function orderOnFrame(world: Roster | undefined, leader: Readonly<Fighter>, order: OrderSpec, frame: number): void {
+  if (order?.frame === frame && world !== undefined && orderReady(world, leader)) toggleOrder(world, leader);
+}
+
+/** Hold becomes Regroup; Copy, Regroup and Separated become Hold. A tossed or fainted partner takes no order. */
+function toggleOrder(world: Roster, leader: Readonly<Fighter>): void {
+  const duo = mutableDuo(fighterAt(world, leader.duo?.link ?? -1));
+  if (duo.order === DuoOrder.tossed || duo.order === DuoOrder.fainted) return;
+  duo.order = duo.order === DuoOrder.hold ? DuoOrder.regroup : DuoOrder.hold;
+  duo.orderFrame = 0;
 }
 
 export function reviveOnFrame(world: Roster | undefined, leader: Fighter, revive: ReviveSpec, frame: number, stage: number, matchFrame: number): void {

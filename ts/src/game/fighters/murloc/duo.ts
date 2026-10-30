@@ -12,6 +12,7 @@ export const MURLOC_DUO = {
   resyncDistance: 60.0,
   hopHeight: 110.0,
   hopReach: 300.0,
+  holdFrames: 600,
 } as const;
 
 function lowestFreeSlot(world: Readonly<Roster>): number {

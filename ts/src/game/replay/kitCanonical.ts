@@ -208,6 +208,7 @@ function writeSpecialEffects(move: Readonly<AuthoredSpecial>, name: string, resu
     int("revive.frame", move.revive.frame);
     real("revive.offsetX", move.revive.offsetX);
   }
+  if (move.order !== undefined) int("order.frame", move.order.frame);
   if (move.refreshesAir === true) int("refreshesAir", 1);
   if (move.jumpWindow !== undefined) {
     int("jumpWindow.first", move.jumpWindow.first);
