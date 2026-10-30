@@ -154,9 +154,11 @@ Where Smashcraft keeps its own rule, and why:
   out of dash frames 1–3,).
 - The forward-smash window applies to every initial dash, including dash backs.
 - Smashes come only from the Strong button (#186, after Rivals of Aether's
-  strong attack): Strong + A gives the up, down or forward smash (forward with
-  no direction too; in the air, Strong + A gives the aerial for that
-  direction, the neutral air with none), and holding Strong or A charges it.
+  strong attack): on the ground Strong + A is always the up smash, whatever
+  direction is held or none (Tom, 2026-10-30; before, it was the smash for the
+  held direction and the forward smash with none); in the air, Strong + A gives
+  the aerial for that direction, the neutral air with none; holding Strong or A
+  charges it.
   Strong is a pure modifier (#489, Tom's rule of 26 Oct 2026): alone it never
   attacks. Strong + a direction is the smash, with no A press (#548, Tom's
   rule of 26 Oct 2026, reversing #489's moving-state rule), in every ground
@@ -170,8 +172,11 @@ Where Smashcraft keeps its own rule, and why:
   or turn), Strong + a direction starts nothing, no dash attack and no tilt,
   and the direction moves the fighter as it would without Strong: down in a
   run still brakes into a crouch, and a fresh direction from that crouch then
-  smashes. Strong + A still gives the smash the state allows and otherwise
-  what A gives without Strong (the dash attack in a run or past the window).
+  smashes. Strong + A is the up smash in every ground state, a run and every
+  dash frame included, so it never gives a tilt or the dash attack. Strong
+  is read as held on the same frame as the direction or earlier; Strong tapped
+  and released before the direction does nothing (Tom, 2026-10-30, declining a
+  12-frame window after release).
   Standing still (stand or crouch), Strong works like a C-stick
   (#325): while it is held, the directions do not move the fighter (no walk,
   dash, crouch or tap jump) until Strong is released. Shield, Special (Strong +
@@ -181,11 +186,11 @@ Where Smashcraft keeps its own rule, and why:
   [Hit Box guide](https://www.hitboxarcade.com/blogs/hit-box/getting-started-with-rivals-of-aether-on-hit-box)).
   A smash in the dash-smash window (dash frames 1–3, up and down smashes too)
   starts in place, with the dash's speed dropped. Rivals' Strong alone, with no direction, is
-  the forward strong; ours needs A for it, so that holding Strong to aim and
-  holding Strong with Special do not start a forward smash.
+  the forward strong; ours starts nothing without a direction or A, so that
+  holding Strong to aim and holding Strong with Special do not start a smash.
   A direction + A is a tilt from stand, walk or crouch. A fresh flick dashes on its first frame
   and no tilt comes out of a dash (Tom, 2026-10-28): a direction + A on any dash frame, like out
-  of a run, is the dash attack, and only Strong + a direction smashes on dash frames 1–3.
+  of a run, is the dash attack, and only Strong + a direction, or Strong + A (the up smash), smashes on dash frames 1–3.
   Strong + B with a direction is the ordinary special; A + B at a full ultimate meter
   stays the ultimate, Strong held or not, and below a full meter it is the
   plain special. On the ground the C-stick gives tilts, not smashes (Tom,
@@ -1094,8 +1099,8 @@ four specials on the ground and in the air.
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
 - **Attack inputs** (owner; Strong since #186): neutral attack is the jab,
-  attack with a direction is a tilt, and Strong + a direction (or attack
-  while holding Strong) where the ground state allows a smash is a smash
+  attack with a direction is a tilt, and Strong + a direction where the ground state allows a smash is a smash, and
+  attack while holding Strong is the up smash
   (smashcraft:docs/physics.md, "Prototype attack phases").
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in

@@ -177,10 +177,12 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   const directionPressed = (pressed & MOVEMENT_ACTIONS) !== 0;
   const strongAimed = strongSmash && (aimX !== 0 || aimZ !== 0) && (directionPressed || (pressed & STRONG_BIT) !== 0)
     && strongSmashOpen(fighter, normalAttackStyle(aimX, aimZ, false, true, false));
-  if (destination.attackPressed || ((held & ATTACK_BIT) !== 0 && directionPressed) || strongAimed) {
+  const attackQueued = destination.attackPressed || ((held & ATTACK_BIT) !== 0 && directionPressed);
+  if (attackQueued || strongAimed) {
     const shieldGrab = fighter.motion.grounded && (fighter.shield.raised || destination.shield);
+    const strongUp = attackQueued && strong && fighter.motion.grounded && !shieldGrab;
     queueAttack(attacks, {
-      style: normalAttackStyle(aimX, aimZ, destination.walking, strong, shieldGrab),
+      style: strongUp ? AttackStyle.upSmash : normalAttackStyle(aimX, aimZ, destination.walking, strong, shieldGrab),
       facing: sign(aimX), frame, mayCharge: true, cStick: false,
     });
   }

@@ -192,14 +192,14 @@ test("Strong + up with no A press out of jump squat gives the up smash on the gr
   }
 });
 
-test("Strong + A inside the dash-smash window gives that direction's smash [k1 scenario]", () => {
+test("Strong + A inside the dash-smash window gives the up smash with no other direction and with up or down held [k1 scenario]", () => {
   for (const key of [0, U, D]) {
     const { owner, press } = keyboard();
     press(R);
     assertEquals(owner.ground.action, GroundAction.dash);
     assertTrue(owner.ground.actionFrame <= DASH_SMASH_LAST_FRAME);
     press(R | key | S | A);
-    assertEquals(owner.attack.style, smashFor(key));
+    assertEquals(owner.attack.style, AttackStyle.upSmash);
   }
 });
 
@@ -233,7 +233,7 @@ test("A with a direction on every dash frame through the dash attack's last fram
   assertTrue(dashFrames > DASH_SMASH_LAST_FRAME);
 });
 
-test("Strong + A in a run gives what A gives without Strong, the dash attack, for forward and down, and Strong + up + A gives the up smash [k1 scenario]", () => {
+test("Strong + A in a run gives the up smash with forward or down held, where A alone gives the dash attack, and with up held [k1 scenario]", () => {
   for (const key of [0, D]) {
     const strong = keyboard(), plain = keyboard();
     strong.press(R);
@@ -242,9 +242,9 @@ test("Strong + A in a run gives what A gives without Strong, the dash attack, fo
     runUntil(plain, R, running);
     strong.press(R | key | S | A);
     plain.press(R | key | A);
-    assertTrue(strong.owner.attack.style !== undefined);
-    assertEquals(strong.owner.attack.style, plain.owner.attack.style);
-    assertTrue(strong.owner.attack.style !== smashFor(key));
+    assertTrue(plain.owner.attack.style !== AttackStyle.upSmash);
+    assertEquals(strong.owner.attack.style, AttackStyle.upSmash);
+    assertTrue(strong.owner.motion.grounded);
   }
   const { owner, press } = keyboard();
   press(R);
@@ -253,7 +253,7 @@ test("Strong + A in a run gives what A gives without Strong, the dash attack, fo
   assertEquals(owner.attack.style, AttackStyle.upSmash);
 });
 
-test("Out of a dash at any frame Strong + up + A is the up smash directly while forward and down past the smash window stay what A gives without Strong, and an up smash out of jump squat still starts after a dash and out of shield [k1 scenario]", () => {
+test("Out of a dash at any frame Strong + up + A is the up smash directly and forward and down past the smash window are the up smash too where A alone gives something else, and an up smash out of jump squat still starts after a dash and out of shield [k1 scenario]", () => {
   const direct = keyboard();
   direct.press(R);
   runUntil(direct, R, pastDashSmash);
@@ -267,8 +267,8 @@ test("Out of a dash at any frame Strong + up + A is the up smash directly while 
     runUntil(plain, R, pastDashSmash);
     strong.press(R | key | S | A);
     plain.press(R | key | A);
-    assertTrue(strong.owner.attack.style !== smashFor(key));
-    assertEquals(strong.owner.attack.style, plain.owner.attack.style);
+    assertTrue(plain.owner.attack.style !== AttackStyle.upSmash);
+    assertEquals(strong.owner.attack.style, AttackStyle.upSmash);
   }
   const cancelled = keyboard();
   cancelled.press(R);
@@ -311,15 +311,15 @@ test("With the walk modifier held, Strong + each direction with no A press gives
   for (const key of [0, U, D]) {
     const strong = walking();
     strong.press(W | R | key | S | A);
-    assertEquals(strong.owner.attack.style, smashFor(key));
+    assertEquals(strong.owner.attack.style, AttackStyle.upSmash);
   }
 });
 
-test("Strong alone standing is no attack, Strong pressed while crouched on held down is the down smash, Strong + A with no direction is the forward smash the way the fighter faces, and in the air Strong + A + direction stays that aerial while Strong + direction alone stays nothing [k1 scenario]", () => {
+test("Strong alone standing is no attack, Strong pressed while crouched on held down is the down smash, Strong + A with no direction is the up smash, and in the air Strong + A + direction stays that aerial while Strong + direction alone stays nothing [k1 scenario]", () => {
   const neutral = keyboard();
   neutral.owner.facing = -1;
   neutral.press(S | A);
-  assertEquals(neutral.owner.attack.style, AttackStyle.forwardSmash);
+  assertEquals(neutral.owner.attack.style, AttackStyle.upSmash);
   assertEquals(neutral.owner.facing, -1);
   const lone = keyboard();
   assertFalse(lone.press(S).queued);
@@ -413,12 +413,12 @@ test("A Strong smash fires on the frame Strong is released while its direction i
   }
 });
 
-test("A smash begun with the attack button and Strong keeps charging while attack is held after the stick is released, and fires when attack is released [k1 scenario]", () => {
+test("An up smash begun with the attack button and Strong keeps charging while attack is held after the stick is released, and fires when attack is released [k1 scenario]", () => {
   for (const key of [R, U, D]) {
     const keys = keyboard();
     keys.press(S);
     keys.press(S | A | key);
-    assertEquals(keys.owner.attack.style, smashFor(key));
+    assertEquals(keys.owner.attack.style, AttackStyle.upSmash);
     for (let i = 0; i < 400 && !keys.owner.attack.smashCharging; i++) keys.press(S | A | key);
     for (let i = 0; i < 20; i++) keys.press(S | A);
     assertTrue(keys.owner.attack.smashCharging);
@@ -426,5 +426,55 @@ test("A smash begun with the attack button and Strong keeps charging while attac
     keys.press(S);
     assertFalse(keys.owner.attack.smashCharging);
     assertEquals(keys.owner.attack.smashChargeFrames, charge);
+  }
+});
+
+test("Strong held then Attack is the up smash on the ground with no direction held and with a side, up or down held, with Attack pressed on the same frame as Strong or after it, where Attack alone gives a tilt or jab [k1 scenario]", () => {
+  for (const key of [0, R, L, U, D]) {
+    for (const together of [true, false]) {
+      const { owner, press } = keyboard();
+      const x = owner.motion.x;
+      if (!together) press(S);
+      assertTrue(press(S | key | A).queued);
+      assertEquals(owner.attack.style, AttackStyle.upSmash);
+      assertEquals(owner.attack.frame, 0);
+      assertEquals(owner.motion.x, x);
+      assertEquals(owner.facing, key === L ? -1 : 1);
+    }
+  }
+  const plain = keyboard();
+  plain.press(A);
+  assertEquals(plain.owner.attack.style, AttackStyle.jab);
+});
+
+test("Strong held then forward or down is that direction's smash with no Attack, and Strong held with Special and no direction is the neutral special, not a smash [k1 scenario]", () => {
+  for (const [key, style] of [[R, AttackStyle.forwardSmash], [D, AttackStyle.downSmash]] as const) {
+    const { owner, press } = keyboard();
+    press(S);
+    assertTrue(press(S | key).queued);
+    assertEquals(owner.attack.style, style);
+  }
+  const special = keyboard();
+  special.press(S);
+  const cast = special.press(S | B);
+  assertTrue(cast.special);
+  assertFalse(cast.queued);
+  assertEquals(special.owner.attack.style, undefined);
+});
+
+test("Strong tapped and released then a direction on the next frame starts no smash and moves the fighter as without Strong [k1 scenario]", () => {
+  for (const key of [R, L, U, D]) {
+    const strong = keyboard(), plain = keyboard();
+    strong.press(S);
+    strong.press(0);
+    assertFalse(strong.press(key).queued);
+    plain.press(0);
+    plain.press(0);
+    plain.press(key);
+    assertEquals(strong.owner.attack.style, undefined);
+    assertEquals(strong.owner.ground.action, plain.owner.ground.action);
+    assertEquals(strong.owner.jump.squat, plain.owner.jump.squat);
+    assertEquals(strong.owner.motion.crouching, plain.owner.motion.crouching);
+    assertEquals(strong.owner.motion.vx, plain.owner.motion.vx);
   }
 });
