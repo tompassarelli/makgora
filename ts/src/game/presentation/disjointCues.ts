@@ -61,6 +61,17 @@ export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly Att
 };
 
 
+export const FLARE_REGIONS: { readonly [character: number]: { readonly [style: number]: (index: number) => boolean } } = {
+  [Character.lich]: {
+    [AttackStyle.neutralAir]: index => index % 12 === 0 || index % 12 === 2 || index % 12 === 4 || index % 12 === 8,
+    [AttackStyle.forwardAir]: index => index % 3 === 1,
+  },
+};
+
+export function flareRegionShown(character: Character, style: AttackStyle, index: number): boolean {
+  return FLARE_REGIONS[character]?.[style]?.(index) ?? true;
+}
+
 export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
   if (DISJOINT_CUES[fighter.character] === undefined) return [];
   const reach = REACH_CUE_NORMALS[fighter.character] ?? [], signature = SIGNATURE_CUE_NORMALS[fighter.character] ?? [];

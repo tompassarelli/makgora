@@ -3,7 +3,7 @@ import { Character, SpecialAction } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
 import { authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
-import { DISJOINT_CUES, disjointNormals, hitAreaPose, normalAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
+import { DISJOINT_CUES, disjointNormals, flareRegionShown, hitAreaPose, normalAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
 
 
@@ -45,6 +45,7 @@ export class HitAreaEffects {
       for (let index = 0; index < count; index++) {
         if (fighter.character === Character.warden && fighter.special.action === SpecialAction.heroDown) continue;
         if (!normal && runningHeroSpecial(fighter)?.beam !== undefined) continue;
+        if (normal && !flareRegionShown(fighter.character, style, index)) continue;
         const pose = normal ? normalAreaPose(fighter, style, index, this.region, this.pose) : hitAreaPose(fighter, specialAreaRegion(fighter, index), this.pose);
         if (!pose.visible) continue;
         const model = this.models[shown];
