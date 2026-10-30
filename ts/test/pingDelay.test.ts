@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { autoDelay, delayPolicy, observeRtt, rttEstimate, smoothedRttMs } from "wisp/src/netcode/delay";
 import { createNetDelay, handMeasuredRtt, measuredDelay, noteEcho, noteSent } from "../src/host/loop/netDelay";
-import { MAX_INPUT_DELAY } from "../src/game/netcode/fixedSchedule";
+import { MAX_INPUT_DELAY } from "../src/game/netcode/inputSchedule";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 
 const WINDOW = PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.rollback : 0;
