@@ -286,7 +286,7 @@ bun wisp anim capture wait ID [--minutes N]
 bun wisp anim capture status
 ```
 
-`MOVE` is an `anim score` move name (`up-air`, `side-special`, `ultimate`) or a movement row (`jump-squat`, `short-hop`, `full-hop`).
+`MOVE` is an `anim score` move name (`up-air`, `side-special`, `ultimate`), a movement row (`jump-squat`, `short-hop`, `full-hop`) or the `run` row (a full-tilt stick from standing, eight frames across the dash burst and one and a bit run cycles; the mover starts 60 units behind the middle and the target 260 ahead so a run in either facing stays in frame, #798).
 `enqueue` refuses a lane with uncommitted tracked changes, because the frames
 are of the committed revision. Each job captures the move's showcase row in
 both facings at the lane's revision. `wait` prints the result: `sheet.png`

@@ -685,6 +685,13 @@ re-records with `bun scripts/locomotionLock.ts --record` and names the gait in a
 `Locomotion-Change: illidan run: why` trailer, without which pre-push refuses
 the new record.
 
+His run is a lean sprint (#798): `bun tools/animations/illidan-lean-run.ts
+PRIVATE_ASSETS PRIVATE_OUTPUT take2` re-keys `Locomotion Run` and the dash burst
+on the stock clips, pitching the torso 72 degrees so the head leads the hips,
+sweeping both arms straight back and sliding the glaives low behind the hips
+and clear of the body (0 blade-in-body frames on `grip-zoom-strips`). Tom
+approved take 2 by default on gate 129 (2026-10-30).
+
 Run `bun tools/animations/package-illidan.ts PRIVATE_OUTPUT --metadata-only`,
 store `illidan-animation`, refresh the original clip pool, then regenerate
 stride and motion facts with `bun wisp view motion --assets PRIVATE_ASSETS`.
