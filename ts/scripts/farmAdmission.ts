@@ -1,7 +1,7 @@
 import { Effect, Schema } from "effect";
-import { BunRuntime } from "@effect/platform-bun";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
 import { NO_FREE_SLOTS } from "./farmWait";
+import { runStepOutputs } from "./stepOutputs";
 
 export const Jobs = Schema.Struct({ jobs: Schema.Array(Schema.Struct({
   name: Schema.String, status: Schema.String, conclusion: Schema.NullOr(Schema.String),
@@ -70,6 +70,6 @@ export const runnerAdmission = (repo: string, excludeRun: number) => Effect.gen(
   return { parallel, reserve, measurement };
 });
 
-if (import.meta.main) BunRuntime.runMain(runnerAdmission(process.env.GITHUB_REPOSITORY ?? "", Number(process.env.GITHUB_RUN_ID)).pipe(
+if (import.meta.main) runStepOutputs(runnerAdmission(process.env.GITHUB_REPOSITORY ?? "", Number(process.env.GITHUB_RUN_ID)).pipe(
   Effect.tap((admission) => Effect.sync(() => console.log(`parallel=${admission.parallel}\nadmission=${admission.measurement}`))),
 ));

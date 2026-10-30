@@ -1,11 +1,11 @@
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BunRuntime } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { runnerAdmission } from "./farmAdmission";
+import { runStepOutputs } from "./stepOutputs";
 import { JOB_SECONDS, measuredSeconds, ofKind, shardWork, type Work } from "./balanceShards";
 
 const Timings = Schema.Record(Schema.String, Schema.Finite);
@@ -62,4 +62,4 @@ const main = Effect.gen(function*() {
   console.log(`parallel=${admission.parallel}\nadmission=${admission.measurement}; timings from ${samples.length} measured artifacts\nshards=${JSON.stringify(fields)}\nceilings=${JSON.stringify(ceilings)}\nprobes=${JSON.stringify(probes)}\njobs=${fields.length}`);
 });
 
-if (import.meta.main) BunRuntime.runMain(main);
+if (import.meta.main) runStepOutputs(main);
