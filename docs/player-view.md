@@ -96,6 +96,8 @@ effect destroyed in view whose death animation emits. It reads:
     --extractor ../build/animation-assets/casc-extract --storage "WARCRAFT_III_DIR"
   ```
 
+  Landing runs `bun wisp view models --check`, which lists every scene model
+  without facts and the `--only` command that measures them.
   After deleting a scene model, `bun wisp view models --prune` removes its
   old measurement while retaining current models. A new model still needs
   the full measurement command.

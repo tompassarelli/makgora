@@ -1,7 +1,7 @@
 # View
 
 - Player view: `bun wisp view scene DATA_DIR...` and `bun wisp view frame
-  FRAME.ppm...` report what a player would see wrong; `view models --prune` removes facts for deleted models without remeasurement; `view models` rewrites
+  FRAME.ppm...` report what a player would see wrong; `view models --prune` removes facts for deleted models without remeasurement; `view models --check` refuses, at landing, when a scene model has no facts; `view models` rewrites
   the model facts they read; `view models ... --only MODEL,...` refreshes only the named rows (smashcraft:docs/player-view.md); `view strikes --assets DIR`
   rewrites the hero strike moments swings and specials align to
   (smashcraft:docs/fighter-animation-work.md, "Hero swing alignment"); `view strikes --check`

@@ -78,10 +78,14 @@ const MODEL_TABLE = MODEL_FACTS_DIRECTORY;
 
 
 const models = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
-  if (args.length === 1 && args[0] === "--prune") {
+  if (args.length === 1 && (args[0] === "--prune" || args[0] === "--check")) {
     const named = new Set(SMASHCRAFT_SCENE.kinds.flatMap(kind => kind.models).filter(model => model !== ""));
-    const missing = [...named].filter(model => MODEL_FACTS[model] === undefined);
-    if (missing.length > 0) return yield* new UsageFailure({ problem: `new models need a full measurement: ${missing.join(", ")}` });
+    const missing = [...named].filter(model => MODEL_FACTS[model] === undefined).sort();
+    if (missing.length > 0) return yield* new UsageFailure({ problem: `${missing.length} scene models have no facts; measure them with bun wisp view models --assets "$(bun wisp inputs path assets)" --summon "$(bun wisp inputs path summon)" --extractor CASC_EXTRACT --storage WARCRAFT_DIR --only "${missing.join(",")}"` });
+    if (args[0] === "--check") {
+      yield* Console.log(`${named.size} scene models measured`);
+      return;
+    }
     const kept = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([model]) => named.has(model)));
     yield* Effect.try({ try: () => writeModelFacts(kept), catch: cause => new MapBuildFailure({ operation: "write model facts", path: MODEL_TABLE, cause }) });
     yield* Console.log(`Kept ${named.size} measured models: ${MODEL_TABLE}`);
