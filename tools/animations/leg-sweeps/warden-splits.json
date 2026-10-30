@@ -1,0 +1,9 @@
+{"margin": 40, "sides": {"Mesh41": 1, "Mesh42": 1}, "clear": [["Mesh46", ["Mesh46"]], ["Mesh45", ["Mesh45"]], ["Mesh06", ["Mesh06"]], ["Mesh24", ["Mesh24"]], ["Mesh41", ["Mesh41", "Mesh44"]], ["Mesh32", ["Mesh44"]], ["Mesh42", ["Mesh42"]], ["Object08", ["Bone_Hand_R", "Bone_Arm1_R"]]], "beats": [
+  [0, {}],
+  [3, {"drop": -20, "travel": 0, "lean": 6, "chest": 8, "foot": [30, 0, 22], "plantX": -22, "plantZ": 6, "knee": 0.6, "kickArm": -30, "plantArm": -30}],
+  ["contact", {"drop": -36, "travel": 0, "lean": 4, "chest": 6, "foot": [70, 0, 6], "plantX": -62, "plantZ": 9, "toe": -25, "plantToe": 0, "kickArm": 40, "plantArm": 40}],
+  ["last", {"drop": -38, "travel": 0, "lean": 4, "chest": 6, "foot": [72, 0, 6], "plantX": -64, "plantZ": 9, "toe": -25, "plantToe": 0, "kickArm": 45, "plantArm": 45}],
+  [22, {"drop": -38, "travel": 0, "lean": 4, "chest": 6, "foot": [72, 0, 6], "plantX": -64, "plantZ": 9, "toe": -25, "plantToe": 0, "kickArm": 40, "plantArm": 40}],
+  [32, {"drop": -22, "travel": 0, "lean": 4, "chest": 6, "foot": [40, 0, 14], "plantX": -34, "plantZ": 6, "kickArm": 10, "plantArm": 10}],
+  ["end", {}]
+]}

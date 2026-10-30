@@ -133,6 +133,15 @@ its frame data, damage, angle and knockback are unchanged.
   cloak. The two floor capsules are unchanged (reach 105), and 92% of her
   drawn lower leg sits inside them on both active frames.
 
+- Down smash, the splits (#518): Fox's down smash through the parity mapping
+  (`maiev-down-smash-timing`, `maiev-down-smash-angle`). From a crouch she drops
+  until her hips sit 16 above the floor, the left (front) leg driven out in front and the right leg out
+  behind it along the floor on the first active frame, arms out, the skirt flaps
+  and cloak lifted clear so both legs show; she holds it through the active
+  frames and rises to ready. Beats are `tools/animations/leg-sweeps/warden-splits.json`,
+  baked with `leg-sweep.py --splits` and spliced by `rekey-clip.ts`. Each leg has
+  one capsule, 10 high and radius 14 (it was 10), so at least 90% of the drawn lower leg sits inside it on every active frame.
+
 ## Identity guard
 
 What she keeps, so she does not become Fox in a costume:
