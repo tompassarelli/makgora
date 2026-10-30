@@ -16,6 +16,8 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { type ShellState, activeRollback, localSlot } from "./state";
 import { views } from "./ui";
 import { type InputTrace, beginInputTrace, closeTraceWindow, finishInputTrace, traceInput, traceParticipantWindow, traceSeconds } from "./trace";
+import { knownFrame } from "wisp/src/netcode/shadowSchedule";
+import { nextCaptureTarget } from "../../game/netcode/inputSchedule";
 
 const bit = (value: boolean) => (value ? "1" : "0");
 
@@ -150,8 +152,8 @@ export function traceTick(s: ShellState): void {
       }
       const { schedule } = rollback;
       closeTraceWindow(trace, {
-        known: schedule.knownThrough(), confirmed: schedule.nextConfirmedFrame() - 1, rollback: schedule.rollbackFrames(),
-        speculative: schedule.speculativeFrame(), target: schedule.captureTarget(), batchPending: rollback.keyboard?.outgoing.size() ?? rollback.journal?.outgoing.pending() ?? 0,
+        known: knownFrame(schedule), confirmed: schedule.nextConfirmed - 1, rollback: schedule.window,
+        speculative: schedule.nextSpeculative, target: nextCaptureTarget(schedule), batchPending: rollback.keyboard?.outgoing.size() ?? rollback.journal?.outgoing.pending() ?? 0,
       }, rollback.journal?.readyMask ?? 0);
     }
   }

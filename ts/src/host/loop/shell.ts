@@ -65,6 +65,7 @@ import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";
 import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/nativeSoak";
 import { afterProbedTick, beforeProbedTick } from "./tickProbe";
 import { advanceHandleLedger, handleLedger, installHandleLedger } from "./handleLedger";
+import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -123,7 +124,7 @@ function gameTick(s: ShellState): void {
     if (editbox !== undefined && s.game.phase !== Phase.match) serviceJournalEnd(s, epoch.rollback, epoch.journal);
   }
   const rollback = activeRollback(s);
-  probe.probeBegin(s.probe, s.runtime.simulationFrame, rollback?.schedule.speculativeFrame() ?? -1, rollback?.schedule.knownThrough() ?? -1, s.game.phase);
+  probe.probeBegin(s.probe, s.runtime.simulationFrame, rollback?.schedule.nextSpeculative ?? -1, rollback === undefined ? -1 : knownFrame(rollback.schedule), s.game.phase);
   traceTick(s);
   for (const slot of PARTICIPANT_SLOTS) {
     const participant = s.participants[slot];

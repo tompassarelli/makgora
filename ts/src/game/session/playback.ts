@@ -10,7 +10,7 @@ import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import type { MatchFrameInput } from "../match/frameInput";
 import type { MatchState } from "../lobby/lobbyState";
 import type { ReplayState } from "../replay/snapshot";
-import type { ShadowInputSchedule } from "../netcode/shadowSchedule";
+import { type InputSchedule } from "../netcode/inputSchedule";
 import type { Roster } from "../sim/roster";
 
 
@@ -34,7 +34,7 @@ export interface RollbackPlayback {
 
 
 
-  reconcile(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, match: SpeculativeMatch): Reconciliation;
+  reconcile(schedule: InputSchedule, epoch: number, localPlayer: number, match: SpeculativeMatch): Reconciliation;
 
 
 
@@ -48,7 +48,7 @@ export interface RollbackPlayback {
 
 
 
-  catchUp(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, match: SpeculativeMatch, budget: number, stopBefore: number | undefined, executed: SpeculativeFrameObserver): boolean;
+  catchUp(schedule: InputSchedule, epoch: number, localPlayer: number, match: SpeculativeMatch, budget: number, stopBefore: number | undefined, executed: SpeculativeFrameObserver): boolean;
 
 
 
@@ -60,9 +60,9 @@ export interface RollbackPlayback {
 
 
 
-  rewind(schedule: ShadowInputSchedule, epoch: number, frame: number, match: SpeculativeMatch): boolean;
+  rewind(schedule: InputSchedule, epoch: number, frame: number, match: SpeculativeMatch): boolean;
 
-  rebase(schedule: ShadowInputSchedule, epoch: number, frame: number): boolean;
+  rebase(schedule: InputSchedule, epoch: number, frame: number): boolean;
 
   visitWorlds(visit: (world: Roster) => void): void;
 

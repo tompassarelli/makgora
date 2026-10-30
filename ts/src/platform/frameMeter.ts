@@ -18,7 +18,7 @@ const PERF_COMMAND = "-dev perf";
 function speculativeFrame(): number {
   const state = shellState();
   const rollback = state === undefined ? undefined : activeRollback(state);
-  return rollback?.schedule.speculativeFrame() ?? -1;
+  return rollback?.schedule.nextSpeculative ?? -1;
 }
 
 const CAPTURE_STAMPS = [

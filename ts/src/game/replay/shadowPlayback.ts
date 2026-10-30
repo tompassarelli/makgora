@@ -12,7 +12,8 @@ import {
   hasNetworkRows,
 } from "../match/frameInput";
 import { humanActive } from "../lobby/lobbyState";
-import type { ShadowInputSchedule } from "../netcode/shadowSchedule";
+import { completeConfirmed, completeSpeculative, knownFrame, lateFrom, mayAdvanceSpeculativeFor, readConfirmed, rememberResolvedInput, resolveSpeculative } from "wisp/src/netcode/shadowSchedule";
+import { type InputSchedule, acceptedInput, participantMask } from "../netcode/inputSchedule";
 import { type CorrectionResult, type ReplayHistory, ReplayCorrections } from "./history";
 import type { ReplayState } from "./snapshot";
 
@@ -64,9 +65,9 @@ export class ShadowInputPlayback {
    * frame stopBefore, an acknowledged pause frontier. The schedule still
    * bounds prediction by its rollback window.
    */
-  catchUpSpeculative(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory, stepBudget: number, stopBefore?: number): boolean {
-    for (let steps = 0; steps < stepBudget && schedule.mayAdvanceSpeculativeFor(localPlayer); steps++) {
-      if (stopBefore !== undefined && schedule.speculativeFrame() >= stopBefore) break;
+  catchUpSpeculative(schedule: InputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory, stepBudget: number, stopBefore?: number): boolean {
+    for (let steps = 0; steps < stepBudget && mayAdvanceSpeculativeFor(schedule, localPlayer); steps++) {
+      if (stopBefore !== undefined && schedule.nextSpeculative >= stopBefore) break;
       if (!this.advanceSpeculative(schedule, epoch, localPlayer, live, history)) return false;
     }
     return true;
@@ -76,31 +77,31 @@ export class ShadowInputPlayback {
    * Records and runs the next speculative frame from rows the service owner
    * already sampled and sent. It never polls, sends or touches presentation.
    */
-  advanceSpeculative(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory, executed?: (frame: number, local: Readonly<InputRow>) => void): boolean {
+  advanceSpeculative(schedule: InputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory, executed?: (frame: number, local: Readonly<InputRow>) => void): boolean {
     const { match, world, controls, runtime } = live;
-    if (schedule.participantMask() !== match.humanMask || epoch !== this.current) return false;
-    const frame = schedule.speculativeFrame();
+    if (participantMask(schedule) !== match.humanMask || epoch !== this.current) return false;
+    const frame = schedule.nextSpeculative;
     if (frame !== runtime.simulationFrame + 1) return false;
-    const resolution = schedule.resolveSpeculative(epoch, localPlayer, this.inputs);
+    const resolution = resolveSpeculative(schedule, epoch, localPlayer, this.inputs);
     if (resolution === undefined) return false;
     if (!captureNetworkFrame(this.row, frame, this.inputs, world, match.humanMask)) return false;
     const saved = resolution === "speculative" ? history.saveSpeculative(epoch, this.row, live) : history.save(epoch, this.row, live);
     if (!saved || !executeMatchFrame(this.row, match, world, controls, runtime, frame)) return false;
     const local = this.inputs[localPlayer];
     if (local !== undefined) executed?.(frame, local);
-    if (local !== undefined) this.observer?.speculativeFrameRan(epoch, localPlayer, frame, local, schedule.speculativeFrame());
-    return schedule.completeSpeculative(epoch, frame);
+    if (local !== undefined) this.observer?.speculativeFrameRan(epoch, localPlayer, frame, local, schedule.nextSpeculative);
+    return completeSpeculative(schedule, epoch, frame);
   }
 
   /** Runs the next confirmed frame in caller-owned state distinct from the speculative world. */
-  advanceConfirmed(schedule: ShadowInputSchedule, epoch: number, live: ReplayState, history: ReplayHistory): boolean {
+  advanceConfirmed(schedule: InputSchedule, epoch: number, live: ReplayState, history: ReplayHistory): boolean {
     const { match, world, controls, runtime } = live;
-    const frame = schedule.nextConfirmedFrame();
-    if (schedule.participantMask() !== match.humanMask || epoch !== this.current || frame !== runtime.simulationFrame + 1) return false;
-    if (!schedule.readConfirmed(epoch, this.inputs)) return false;
+    const frame = schedule.nextConfirmed;
+    if (participantMask(schedule) !== match.humanMask || epoch !== this.current || frame !== runtime.simulationFrame + 1) return false;
+    if (!readConfirmed(schedule, epoch, this.inputs)) return false;
     if (!captureNetworkFrame(this.confirmedRow, frame, this.inputs, world, match.humanMask)) return false;
     if (!history.save(epoch, this.confirmedRow, live) || !executeMatchFrame(this.confirmedRow, match, world, controls, runtime, frame)) return false;
-    return schedule.completeConfirmed(epoch, frame);
+    return completeConfirmed(schedule, epoch, frame);
   }
 
   /**
@@ -111,7 +112,7 @@ export class ShadowInputPlayback {
    * whose remote rows have all arrived is final: the local row is the one
    * the player captured and sent.
    */
-  reconcile(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory): CorrectionResult {
+  reconcile(schedule: InputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory): CorrectionResult {
     return this.reconcileRows(schedule, epoch, localPlayer, live, history, true);
   }
 
@@ -120,25 +121,25 @@ export class ShadowInputPlayback {
    * which spreads a deep correction over several callbacks while live state
    * keeps running the present. Returns the earliest changed frame.
    */
-  amend(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory): CorrectionResult {
+  amend(schedule: InputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory): CorrectionResult {
     return this.reconcileRows(schedule, epoch, localPlayer, live, history, false);
   }
 
-  private reconcileRows(schedule: ShadowInputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory, replay: boolean): CorrectionResult {
+  private reconcileRows(schedule: InputSchedule, epoch: number, localPlayer: number, live: ReplayState, history: ReplayHistory, replay: boolean): CorrectionResult {
     const { match, world } = live;
-    if (schedule.participantMask() !== match.humanMask || epoch !== this.current || schedule.epoch() !== epoch || !humanActive(match, localPlayer)) return "rejected";
-    const packets = schedule.acceptedPackets();
+    if (participantMask(schedule) !== match.humanMask || epoch !== this.current || schedule.epoch !== epoch || !humanActive(match, localPlayer)) return "rejected";
+    const packets = schedule.acceptedPackets;
     if (packets === this.reconciledPackets) return "unchanged";
     const { actual, correctionRow, corrections } = this;
     corrections.clear();
     // Frames before the first correctable one are authoritative and never
     // change. This playback records only network rows of every human, so
     // the latest of them alone gives each slot its prediction basis.
-    const retained = Math.max(history.firstRetainedFrame(), schedule.firstAcceptedFrame(), history.firstCorrectableFrame() - 1);
+    const retained = Math.max(history.firstRetainedFrame(), schedule.fixed.ledger.retainedFrom, history.firstCorrectableFrame() - 1);
     const lastFrame = history.lastRecordedFrame();
     let firstFrame = lastFrame + 1;
     for (const slot of PARTICIPANT_SLOTS) {
-      const lowest = schedule.takeLowestAccepted(slot);
+      const lowest = lateFrom(schedule, slot);
       const first = this.reconciledPackets === undefined ? retained : Math.max(retained, lowest);
       this.changedFrom[slot] = first;
       if (!humanActive(match, slot) || first > lastFrame) continue;
@@ -147,7 +148,7 @@ export class ShadowInputPlayback {
       const previous = history.inputRow(epoch, first - 1);
       if (previous !== undefined && hasNetworkRows(previous)) copyNetworkRow(previous, slot, actual[slot]);
     }
-    const known = schedule.knownThrough();
+    const known = knownFrame(schedule);
     for (let frame = firstFrame; frame <= lastFrame; frame++) {
       const stored = history.inputRow(epoch, frame);
       if (stored === undefined || stored.mask !== world.mask) return "rejected";
@@ -159,7 +160,7 @@ export class ShadowInputPlayback {
       let changed = 0;
       for (const slot of PARTICIPANT_SLOTS) {
         if (!humanActive(match, slot) || frame < this.changedFrom[slot]) continue;
-        const accepted = schedule.accepted(epoch, slot, frame);
+        const accepted = acceptedInput(schedule, slot, frame);
         if (accepted !== undefined) {
           copyInput(actual[slot], accepted);
         } else if (slot === localPlayer) {
@@ -171,7 +172,7 @@ export class ShadowInputPlayback {
       }
       // A row that ran on the inputs it keeps changes nothing in history.amend; one now wholly accepted only stops being correctable.
       let allAccepted = true;
-      if (frame > known) for (const slot of PARTICIPANT_SLOTS) if (allAccepted && slot !== localPlayer && humanActive(match, slot) && schedule.accepted(epoch, slot, frame) === undefined) allAccepted = false;
+      if (frame > known) for (const slot of PARTICIPANT_SLOTS) if (allAccepted && slot !== localPlayer && humanActive(match, slot) && acceptedInput(schedule, slot, frame) === undefined) allAccepted = false;
       if (changed === 0) {
         if (allAccepted && !history.settle(epoch, frame)) return "rejected";
         continue;
@@ -187,7 +188,7 @@ export class ShadowInputPlayback {
       for (const slot of PARTICIPANT_SLOTS) {
         if (!humanActive(match, slot)) continue;
         copyNetworkRow(correctionRow, slot, actual[slot]);
-        schedule.rememberResolvedInput(slot, actual[slot]);
+        rememberResolvedInput(schedule, slot, actual[slot]);
       }
     }
     return result;

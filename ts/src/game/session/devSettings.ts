@@ -7,7 +7,7 @@ import { resetMatchOrbs } from "../sim/orbState";
 
 
 
-import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../netcode/fixedSchedule";
+import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../netcode/inputSchedule";
 import { parseDecimal } from "../netcode/journal/decimal";
 import { MAX_BATCH } from "../netcode/journal/transport";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../input/participants";

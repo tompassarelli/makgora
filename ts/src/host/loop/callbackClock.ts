@@ -89,7 +89,7 @@ function noteRollbacks(probe: CallbackClock, now: number): void {
   const rollback = s === undefined ? undefined : activeRollback(s);
   if (rollback === undefined) return;
   const { net, schedule } = rollback;
-  probe.rollbacks.push(`r ${probe.callbacks} t=${microseconds(now)} f=${schedule.speculativeFrame()} cf=${schedule.nextConfirmedFrame()} dl=${rollback.delay} rb=${net.corrections} rbf=${net.replayed} rbd=${net.deepest}`);
+  probe.rollbacks.push(`r ${probe.callbacks} t=${microseconds(now)} f=${schedule.nextSpeculative} cf=${schedule.nextConfirmed} dl=${rollback.delay} rb=${net.corrections} rbf=${net.replayed} rbd=${net.deepest}`);
 }
 
 function noteKeyEvent(probe: CallbackClock, down: boolean, now: number): void {

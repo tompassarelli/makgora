@@ -35,7 +35,7 @@ import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";
 import { type ShellState, localSlot } from "./state";
 import { AUTO_DELAY } from "wisp/src/netcode/delay";
-import { MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/fixedSchedule";
+import { MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/inputSchedule";
 import { isHost, sendHostDelay } from "./netDelay";
 import { views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";

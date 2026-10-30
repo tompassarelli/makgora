@@ -6,7 +6,7 @@ import { type InputRow, emptyInput } from "./inputRow";
 
 
 
-export type ParticipantInputs = readonly [InputRow, InputRow, InputRow, InputRow];
+export type ParticipantInputs = [InputRow, InputRow, InputRow, InputRow];
 
 export const PARTICIPANT_CAPACITY: ParticipantInputs["length"] = 4;
 export const PARTICIPANT_SLOTS = [0, 1, 2, 3] as const;

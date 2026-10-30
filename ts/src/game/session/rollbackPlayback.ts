@@ -11,6 +11,7 @@ import type { ReplayState } from "../replay/snapshot";
 import type { MatchFrameInput } from "../match/frameInput";
 import type { Roster } from "../sim/roster";
 import type { RollbackPlayback, SpeculativeMatch } from "./playback";
+import { mayAdvanceSpeculativeFor, rewindSpeculative } from "wisp/src/netcode/shadowSchedule";
 
 interface MutableReplayState {
   world: ReplayState["world"];
@@ -61,8 +62,8 @@ class ReplayHistoryPlayback implements RollbackPlayback {
   ): boolean {
     if (epoch !== this.current) return false;
     const state = this.bind(match);
-    for (let steps = 0; steps < budget && schedule.mayAdvanceSpeculativeFor(localPlayer); steps++) {
-      const frame = schedule.speculativeFrame();
+    for (let steps = 0; steps < budget && mayAdvanceSpeculativeFor(schedule, localPlayer); steps++) {
+      const frame = schedule.nextSpeculative;
       if (stopBefore !== undefined && frame >= stopBefore) break;
       if (!this.playback.advanceSpeculative(schedule, epoch, localPlayer, state, this.history, executed)) return false;
     }
@@ -71,8 +72,8 @@ class ReplayHistoryPlayback implements RollbackPlayback {
 
   rewind(schedule: Parameters<RollbackPlayback["rewind"]>[0], epoch: number, frame: number, match: SpeculativeMatch): boolean {
     if (epoch !== this.current) return false;
-    if (frame >= schedule.speculativeFrame()) return true;
-    if (!this.history.truncate(epoch, frame, this.bind(match)) || !schedule.rewindSpeculative(epoch, frame)) return false;
+    if (frame >= schedule.nextSpeculative) return true;
+    if (!this.history.truncate(epoch, frame, this.bind(match)) || !rewindSpeculative(schedule, epoch, frame)) return false;
     this.playback.forgetReconciliation();
     return true;
   }
@@ -82,10 +83,10 @@ class ReplayHistoryPlayback implements RollbackPlayback {
   }
 
   rebase(schedule: Parameters<RollbackPlayback["rebase"]>[0], epoch: number, frame: number): boolean {
-    if (epoch !== this.current || frame !== schedule.nextConfirmedFrame()) return false;
-    if (!schedule.rewindSpeculative(epoch, frame)) return false;
+    if (epoch !== this.current || frame !== schedule.nextConfirmed) return false;
+    if (!rewindSpeculative(schedule, epoch, frame)) return false;
     const history = new ReplayHistory();
-    if (!history.beginEpoch(epoch, frame, schedule.rollbackFrames())) return false;
+    if (!history.beginEpoch(epoch, frame, schedule.window)) return false;
     this.repeatedBefore += this.history.repeatedComputerDecisions();
     this.rerunBefore += this.history.rerunComputerDecisions();
     this.history = history;

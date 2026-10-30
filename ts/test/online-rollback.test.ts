@@ -9,7 +9,7 @@ import { DEFAULT_PRESET, keyFor, presetBindings } from "../src/game/input/keyBin
 import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
-import { MAX_INPUT_DELAY } from "../src/game/netcode/fixedSchedule";
+import { MAX_INPUT_DELAY } from "../src/game/netcode/inputSchedule";
 import { autoDelay, delayPolicy, observeRtt, rttEstimate } from "wisp/src/netcode/delay";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { install, startBuild } from "../src/platform/main";

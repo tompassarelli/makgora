@@ -1,6 +1,8 @@
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { SyncDelivery } from "wisp/src/headless/lockstep";
+import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
+import type { InputSchedule } from "../../src/game/netcode/inputSchedule";
 
 export interface LagSpikes {
   readonly first: number;
@@ -30,7 +32,7 @@ interface DepthShell {
   readonly rollback?: {
     readonly window: number;
     readonly net: { readonly depths: readonly number[] };
-    readonly schedule: { knownThrough(): number; nextConfirmedFrame(): number; speculativeFrame(): number };
+    readonly schedule: InputSchedule;
   };
 }
 
@@ -44,12 +46,12 @@ function rollbackOf(client: HeadlessClient): DepthShell["rollback"] {
 
 export function confirmedLag(client: HeadlessClient): number | undefined {
   const rollback = rollbackOf(client);
-  return rollback === undefined ? undefined : rollback.schedule.knownThrough() - rollback.schedule.nextConfirmedFrame() + 1;
+  return rollback === undefined ? undefined : knownFrame(rollback.schedule) - rollback.schedule.nextConfirmed + 1;
 }
 
 export function framesRun(client: HeadlessClient): { readonly confirmed: number; readonly speculative: number } | undefined {
   const rollback = rollbackOf(client);
-  return rollback === undefined ? undefined : { confirmed: rollback.schedule.nextConfirmedFrame(), speculative: rollback.schedule.speculativeFrame() };
+  return rollback === undefined ? undefined : { confirmed: rollback.schedule.nextConfirmed, speculative: rollback.schedule.nextSpeculative };
 }
 
 export function deepestRollback(client: HeadlessClient): { readonly window: number; readonly deepest: number; readonly corrections: number } | undefined {

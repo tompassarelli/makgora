@@ -7,8 +7,7 @@ import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, type RttEstimate, agreedDelay, chosenDelay, connectionPoor, correctDelay,
   autoDelay, correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, resetRtt, rttEstimate, smoothedRttMs, stepManualDelay,
 } from "wisp/src/netcode/delay";
-import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/fixedSchedule";
-import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
+import { type FixedDelay, MAX_INPUT_DELAY, PENDING_CAPACITY, isFixedDelay } from "../../game/netcode/inputSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { MENU_STYLE, NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
 import type { LobbyNet } from "../../game/ui/selectionActions";

@@ -2,7 +2,7 @@ import { assertEquals, assertLessThan, test } from "wisp/src/runtime/testing";
 import { AUTO_DELAY, agreedDelay, autoDelay, delayPolicy, observeRtt, rttEstimate, stepManualDelay } from "wisp/src/netcode/delay";
 import { PLAYABLE_BUILD } from "../../game/session/currentBuild";
 import { createMatchState, setHumanCount } from "../../game/lobby/lobbyState";
-import { MAX_INPUT_DELAY } from "../../game/netcode/fixedSchedule";
+import { MAX_INPUT_DELAY } from "../../game/netcode/inputSchedule";
 import { createNetDelay, hostDelayFrom, matchDelay } from "./netDelay";
 
 const window = PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.rollback : 0;

@@ -8,7 +8,7 @@
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import type { InputRow } from "../../input/inputRow";
 import { type InputPacket, decodeInputMessage, decodePacket } from "../../input/wire";
-import { FUTURE_LIMIT } from "../ledger";
+import { FUTURE_LIMIT } from "wisp/src/netcode/ledger";
 import { parseDecimal } from "./decimal";
 
 export type JournalRead =

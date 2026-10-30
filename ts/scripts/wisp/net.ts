@@ -2,7 +2,10 @@ import { join } from "node:path";
 import type { NetGame } from "wisp/scripts/wisp/net/peer";
 import type { StandaloneInput, StandaloneNetSession } from "wisp/scripts/wisp/standalone";
 import type { LockstepLink } from "wisp/src/headless/lockstep";
+import { pendingRow, windowHalted } from "wisp/src/netcode/shadowSchedule";
+import { PARTICIPANT_CAPACITY } from "../../src/game/input/participants";
 import { Phase } from "../../src/game/lobby/lobbyState";
+import { type InputSchedule, acceptedInput, remoteAccepted } from "../../src/game/netcode/inputSchedule";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
@@ -112,7 +115,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
             net.attach(shell(), slot);
             const { rollback } = shell();
             if (measuredRtt !== undefined && rollback !== undefined) handMeasuredRtt(rollback.net, measuredRtt);
-            presses.attach(shell(), () => tick);
+            presses.attach(shell());
             setHumanCount(shell().game, 2);
             for (const command of chat) applyDeveloperCommand(shell(), command.startsWith("-dev fighter ") && Number(command.split(" ")[2]) <= 2 ? Number(command.split(" ")[2]) - 1 : 0, command);
           });
@@ -129,6 +132,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
         }
         tick++;
         lockstep.frames(1);
+        presses.poll(tick);
         presses.drawn(tick, lastPhase === Phase.match);
         if (client.errors.length > 0) throw new Error(client.errors.join("\n"));
         client.run(() => {
@@ -162,11 +166,7 @@ interface NetcodeShell {
     readonly window: number;
     readonly delay: number;
     readonly net: object;
-    readonly schedule: {
-      speculativeFrame(): number; remoteThrough(slot: number): number; windowHalted(slot: number): boolean; captureTarget(): number | undefined;
-      captureLocal(epoch: number, sample: { readonly pressed: number }): number;
-      acceptSynchronized(sender: number, packet: { readonly epoch: number; readonly firstFrame: number; readonly rows: readonly { readonly pressed: number }[] }): string;
-    };
+    readonly schedule: InputSchedule;
     readonly playback: {
       reconcile(...args: [unknown, unknown, unknown, { readonly runtime: { readonly simulationFrame: number } }]): "unchanged" | "rejected" | { readonly replayedFrom: number };
       catchUp(...args: unknown[]): boolean;
@@ -196,15 +196,15 @@ function netcodeStats() {
         return result;
       };
       playback.catchUp = (...args: unknown[]) => {
-        const before = schedule.speculativeFrame();
+        const before = schedule.nextSpeculative;
         const advanced = catchUp(...args);
-        if (schedule.windowHalted(slot) && schedule.speculativeFrame() === before) stalls++;
+        if (windowHalted(schedule, slot) && schedule.nextSpeculative === before) stalls++;
         return advanced;
       };
       read = () => {
         window = rollback.window;
         delay = rollback.delay;
-        return { speculative: schedule.speculativeFrame(), confirmed: schedule.remoteThrough(slot) };
+        return { speculative: schedule.nextSpeculative, confirmed: remoteAccepted(schedule, slot) };
       };
     },
     sample() {
@@ -227,49 +227,56 @@ function pressStats(slot: number) {
   const captured: { frame: number; pressed: number; tick: number; frontier: number; drawnTick: number; pressTicks: number[] }[] = [];
   const received: Record<number, Record<number, number>> = {};
   let conflicts = 0, unmatched = 0, delay = 0, endFrame = 0;
-  let schedule: NonNullable<NetcodeShell["rollback"]>["schedule"] | undefined;
+  let rollback: NonNullable<NetcodeShell["rollback"]> | undefined;
+  let epoch = -1, scanned = 0;
+  const receivedThrough: number[] = [];
   return {
-    attach(state: NetcodeShell, now: () => number) {
-      const rollback = state.rollback;
+    attach(state: NetcodeShell) {
+      rollback = state.rollback;
       if (rollback === undefined) throw new Error("net: the build has no rollback");
-      schedule = rollback.schedule;
-      const own = rollback.schedule, captureLocal = own.captureLocal.bind(own), accept = own.acceptSynchronized.bind(own);
-      own.captureLocal = (epoch, sample) => {
-        const target = own.captureTarget(), frontier = own.speculativeFrame();
-        const result = captureLocal(epoch, sample);
-        if (result === 0 && target !== undefined && sample.pressed !== 0) {
-          delay = rollback.delay;
-          const pressTicks: number[] = [];
-          const row = { frame: target, pressed: sample.pressed, tick: now(), frontier, drawnTick: -1, pressTicks };
-          for (let index = 0; index < pending.length;) {
-            const press = pending[index];
-            if (press === undefined) break;
-            if ((sample.pressed & press.bit) !== 0) { pressTicks.push(press.tick); pending.splice(index, 1); } else index++;
-          }
-          if (pressTicks.length === 0) unmatched++;
-          captured.push(row);
+    },
+    poll(tick: number) {
+      if (rollback === undefined) return;
+      const { schedule } = rollback;
+      if (schedule.epoch !== epoch) {
+        epoch = schedule.epoch;
+        scanned = 0;
+        receivedThrough.length = 0;
+      }
+      delay = rollback.delay;
+      for (let frame = scanned + 1; frame <= schedule.nextSpeculative + delay; frame++) {
+        const sample = pendingRow(schedule, epoch, frame);
+        if (sample === undefined) break;
+        scanned = frame;
+        if (sample.pressed === 0) continue;
+        const pressTicks: number[] = [];
+        for (let index = 0; index < pending.length;) {
+          const press = pending[index];
+          if (press === undefined) break;
+          if ((sample.pressed & press.bit) !== 0) { pressTicks.push(press.tick); pending.splice(index, 1); } else index++;
         }
-        return result;
-      };
-      own.acceptSynchronized = (sender, packet) => {
-        const receipt = accept(sender, packet);
-        if (receipt === "accepted") packet.rows.forEach((row, index) => {
-          if (row.pressed === 0) return;
-          const rows = received[sender] ??= {};
-          const frame = packet.firstFrame + index;
-          if (rows[frame] !== undefined && rows[frame] !== row.pressed) conflicts++;
-          rows[frame] = row.pressed;
-        });
-        return receipt;
-      };
+        if (pressTicks.length === 0) unmatched++;
+        captured.push({ frame, pressed: sample.pressed, tick, frontier: frame - delay, drawnTick: -1, pressTicks });
+      }
+      for (let sender = 0; sender < PARTICIPANT_CAPACITY; sender++) {
+        const known = schedule.fixed.ledger.through[sender] ?? 0;
+        const rows = received[sender] ??= {};
+        for (let frame = Math.max((receivedThrough[sender] ?? 0) + 1, schedule.fixed.ledger.retainedFrom); frame <= known; frame++) {
+          const pressed = acceptedInput(schedule, sender, frame)?.pressed ?? 0;
+          if (pressed === 0) continue;
+          if (rows[frame] !== undefined && rows[frame] !== pressed) conflicts++;
+          rows[frame] = pressed;
+        }
+        receivedThrough[sender] = known;
+      }
     },
     press(key: number, tick: number) {
       const action = actionFor(BINDINGS, key);
       if (action !== undefined) pending.push({ bit: 1 << action, tick });
     },
     drawn(tick: number, playing: boolean) {
-      if (schedule === undefined) return;
-      const ran = schedule.speculativeFrame();
+      if (rollback === undefined) return;
+      const ran = rollback.schedule.nextSpeculative;
       if (playing) endFrame = Math.max(endFrame, ran);
       for (let index = captured.length - 1; index >= 0; index--) {
         const row = captured[index];

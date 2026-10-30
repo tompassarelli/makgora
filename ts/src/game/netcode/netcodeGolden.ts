@@ -5,8 +5,9 @@ import { type InputRow, emptyInput, inputRow, sameInput } from "../input/inputRo
 import { PARTICIPANT_CAPACITY, participantActive, participantInputs } from "../input/participants";
 import { type InputPacket, encodePacket } from "../input/wire";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
-import { FUTURE_LIMIT } from "./ledger";
-import { ShadowInputSchedule } from "./shadowSchedule";
+import { FUTURE_LIMIT } from "wisp/src/netcode/ledger";
+import { awaitedSlots, beginShadowEpoch, captureLocal, captureLocalAt, completeConfirmed, completeSpeculative, knownFrame, lateFrom, readConfirmed, rememberResolvedInput, resolveSpeculative, rewindSpeculative, windowHalted } from "wisp/src/netcode/shadowSchedule";
+import { type InputSchedule, acceptPacket, acceptedInput, inputSchedule, nextCaptureTarget, participantMask, receivePacket, remoteAccepted } from "./inputSchedule";
 
 interface Plan {
   readonly name: string;
@@ -77,7 +78,7 @@ function bump(table: Map<string, number>, key: string): void {
 }
 
 class Run {
-  private readonly schedule = new ShadowInputSchedule();
+  private readonly schedule = inputSchedule();
   private readonly next: (this: void) => number;
   private readonly receipts = new Map<string, number>();
   private readonly captures = new Map<string, number>();
@@ -102,7 +103,7 @@ class Run {
     this.next = lcg(plan.seed);
     this.delay = plan.delay;
     out.push(`scenario ${plan.name} seed=${plan.seed} delay=${plan.delay} window=${plan.window} mask=${plan.mask} local=${plan.local}`);
-    if (!this.schedule.beginEpoch(this.epoch, this.delay, plan.window, plan.mask)) throw new Error(`${plan.name}: epoch 1 refused`);
+    if (!beginShadowEpoch(this.schedule, this.epoch, this.delay, plan.window, plan.mask)) throw new Error(`${plan.name}: epoch 1 refused`);
   }
 
   play(): void {
@@ -120,7 +121,7 @@ class Run {
   }
 
   private offer(sender: number, packet: InputPacket, wire: boolean): void {
-    const receipt = wire ? this.schedule.receiveSynchronized(sender, encodePacket(packet)) : this.schedule.acceptSynchronized(sender, packet);
+    const receipt = wire ? receivePacket(this.schedule, sender, encodePacket(packet)) : acceptPacket(this.schedule, sender, packet);
     bump(this.receipts, receipt);
     if (receipt !== "accepted") this.out.push(`c${this.callback} s${sender} e${packet.epoch} f${packet.firstFrame} ${receipt}`);
   }
@@ -135,7 +136,7 @@ class Run {
     if (change === undefined || this.callback !== change.callback) return;
     this.epoch++;
     this.delay = change.delay;
-    const begun = this.schedule.beginEpoch(this.epoch, this.delay, this.plan.window, change.mask);
+    const begun = beginShadowEpoch(this.schedule, this.epoch, this.delay, this.plan.window, change.mask);
     this.out.push(`c${this.callback} epoch ${this.epoch} delay=${this.delay} mask=${change.mask} begun=${begun}`);
     this.epochStart = this.callback;
     this.ran.clear();
@@ -143,7 +144,7 @@ class Run {
 
   private send(): void {
     const { plan, epoch, delay } = this;
-    const mask = this.schedule.participantMask();
+    const mask = participantMask(this.schedule);
     for (let sender = 0; sender < PARTICIPANT_CAPACITY; sender++) {
       if (!participantActive(mask, sender)) continue;
       const first = Math.max(1, this.callback - this.epochStart + delay);
@@ -170,7 +171,7 @@ class Run {
 
   private inject(): void {
     const { plan, epoch, delay, schedule } = this;
-    const known = schedule.knownThrough();
+    const known = knownFrame(schedule);
     const sender = floorMod(plan.local + 1, PARTICIPANT_CAPACITY);
     const sample = rowOf(plan.seed, sender, known + 1, delay);
     const from = (first: number, packetEpoch: number = epoch) => packetOf(plan.seed, sender, packetEpoch, first, delay);
@@ -181,21 +182,21 @@ class Run {
     this.offer(sender, from(known + 1, epoch - 1), false);
     this.offer(7, from(known + 1), false);
     this.offer(sender, { epoch, firstFrame: known + 1, rows: [sample, sample, sample] }, false);
-    bump(this.receipts, schedule.receiveSynchronized(sender, "!!"));
-    const target = schedule.captureTarget() ?? 0;
+    bump(this.receipts, receivePacket(schedule, sender, "!!"));
+    const target = nextCaptureTarget(schedule) ?? 0;
     const assigned = rowOf(plan.seed, plan.local, target, delay);
-    this.capture("at-assigned", schedule.captureLocalAt(epoch, target, assigned));
-    this.capture("at-conflict", schedule.captureLocalAt(epoch, target, differentRow(assigned)));
-    this.capture("at-history", schedule.captureLocalAt(epoch, 1, sample));
-    this.capture("at-ahead", schedule.captureLocalAt(epoch, schedule.nextConfirmedFrame() + FUTURE_LIMIT, sample));
-    this.capture("at-epoch", schedule.captureLocalAt(epoch + 5, target, sample));
+    this.capture("at-assigned", captureLocalAt(schedule, epoch, target, assigned));
+    this.capture("at-conflict", captureLocalAt(schedule, epoch, target, differentRow(assigned)));
+    this.capture("at-history", captureLocalAt(schedule, epoch, 1, sample));
+    this.capture("at-ahead", captureLocalAt(schedule, epoch, schedule.nextConfirmed + FUTURE_LIMIT, sample));
+    this.capture("at-epoch", captureLocalAt(schedule, epoch + 5, target, sample));
   }
 
   private mispredicted(frame: number): boolean {
     const used = this.ran.get(frame);
     if (used === undefined) return false;
     for (let sender = 0; sender < PARTICIPANT_CAPACITY; sender++) {
-      const accepted = this.schedule.accepted(this.epoch, sender, frame);
+      const accepted = acceptedInput(this.schedule, sender, frame);
       const predicted = used[sender];
       if (sender !== this.plan.local && accepted !== undefined && predicted !== undefined && !sameInput(accepted, predicted)) return true;
     }
@@ -206,18 +207,18 @@ class Run {
     const { schedule, epoch } = this;
     let lowest = Number.MAX_SAFE_INTEGER;
     for (let sender = 0; sender < PARTICIPANT_CAPACITY; sender++) {
-      const taken = schedule.takeLowestAccepted(sender);
+      const taken = lateFrom(schedule, sender);
       if (sender !== this.plan.local && taken < lowest) lowest = taken;
     }
-    for (let frame = lowest; frame < schedule.speculativeFrame(); frame++) {
+    for (let frame = lowest; frame < schedule.nextSpeculative; frame++) {
       if (!this.mispredicted(frame)) continue;
-      const depth = schedule.speculativeFrame() - frame;
-      if (!schedule.rewindSpeculative(epoch, frame)) return;
+      const depth = schedule.nextSpeculative - frame;
+      if (!rewindSpeculative(schedule, epoch, frame)) return;
       this.rollbacks++;
       if (depth > this.deepest) this.deepest = depth;
       if (this.firstLate < 0) this.firstLate = frame;
       this.out.push(`c${this.callback} rollback from=${frame} depth=${depth}`);
-      for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) schedule.rememberResolvedInput(slot, schedule.accepted(epoch, slot, frame - 1) ?? emptyInput());
+      for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) rememberResolvedInput(schedule, slot, acceptedInput(schedule, slot, frame - 1) ?? emptyInput());
       return;
     }
   }
@@ -225,40 +226,40 @@ class Run {
   private speculate(): void {
     const { plan, epoch, delay, schedule } = this;
     for (let ranFrames = 0; ranFrames < CATCH_UP; ranFrames++) {
-      const target = schedule.captureTarget();
-      if (target !== undefined) this.capture("local", schedule.captureLocal(epoch, rowOf(plan.seed, plan.local, target, delay)));
-      const frame = schedule.speculativeFrame();
-      if (schedule.resolveSpeculative(epoch, plan.local, this.inputs) === undefined) {
-        if (schedule.windowHalted(plan.local)) this.hold(frame);
+      const target = nextCaptureTarget(schedule);
+      if (target !== undefined) this.capture("local", captureLocal(schedule, epoch, rowOf(plan.seed, plan.local, target, delay)));
+      const frame = schedule.nextSpeculative;
+      if (resolveSpeculative(schedule, epoch, plan.local, this.inputs) === undefined) {
+        if (windowHalted(schedule, plan.local)) this.hold(frame);
         return;
       }
       this.ran.set(frame, this.inputs.map((row) => ({ ...row })));
-      schedule.completeSpeculative(epoch, frame);
+      completeSpeculative(schedule, epoch, frame);
     }
   }
 
   private hold(frame: number): void {
     this.held++;
     if (this.firstHold < 0) this.firstHold = this.callback;
-    if (frame + 1 + this.delay - (this.schedule.nextConfirmedFrame() - 1) > FUTURE_LIMIT) this.futureHeld++;
+    if (frame + 1 + this.delay - (this.schedule.nextConfirmed - 1) > FUTURE_LIMIT) this.futureHeld++;
   }
 
   private confirm(): void {
     const { schedule, epoch } = this;
-    while (schedule.readConfirmed(epoch, this.inputs)) {
-      const frame = schedule.nextConfirmedFrame();
+    while (readConfirmed(schedule, epoch, this.inputs)) {
+      const frame = schedule.nextConfirmed;
       for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
         const row = at(this.inputs, slot);
         this.confirmedSum = floorMod(this.confirmedSum * 31 + row.held * 3 + row.axisX + 200 + slot, 1000003);
       }
-      schedule.completeConfirmed(epoch, frame);
+      completeConfirmed(schedule, epoch, frame);
       this.confirmedFrames++;
     }
   }
 
   private log(): void {
     const { schedule } = this;
-    this.out.push(`c${this.callback} K=${schedule.knownThrough()} spec=${schedule.speculativeFrame()} conf=${schedule.nextConfirmedFrame()} confirmed=${this.confirmedFrames} sum=${this.confirmedSum} awaited=${schedule.awaitedSlots()} remote=${schedule.remoteThrough(this.plan.local)} packets=${schedule.acceptedPackets()}`);
+    this.out.push(`c${this.callback} K=${knownFrame(schedule)} spec=${schedule.nextSpeculative} conf=${schedule.nextConfirmed} confirmed=${this.confirmedFrames} sum=${this.confirmedSum} awaited=${awaitedSlots(schedule)} remote=${remoteAccepted(schedule, this.plan.local)} packets=${schedule.acceptedPackets}`);
   }
 
   private summarize(): void {

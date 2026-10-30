@@ -9,9 +9,11 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
+import type { RowCodec } from "wisp/src/netcode/codec";
+import type { WireReader } from "wisp/src/netcode/wire";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { ALL_ACTIONS } from "./actions";
-import { type Direction, type InputRow, emptyInput, isInputRow, predictInto, sameInput } from "./inputRow";
+import { type Direction, type InputRow, copyInput, emptyInput, isInputRow, predictInto, sameInput } from "./inputRow";
 
 export const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 
@@ -468,3 +470,18 @@ export class TransportDecoder {
     return true;
   }
 }
+
+export const INPUT_ROW_CODEC: RowCodec<InputRow> = {
+  neutral: emptyInput,
+  copy: copyInput,
+  same: sameInput,
+  hold: predictInto,
+  urgent: (row) => row.pressed !== 0,
+  write: (row) => encodeRecord(row),
+  read: (wire: WireReader, _previous, target) => {
+    const reader = new Reader(wire.text, wire.offset);
+    const read = readRecord(reader, target);
+    wire.offset = reader.offset;
+    return read;
+  },
+};

@@ -13,7 +13,8 @@ import { createFrameControls } from "../match/controls";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { Phase, copyMatchState, createMatchState, fighterActive, fighterMask, setParticipants } from "../lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../match/step";
-import { ShadowInputSchedule } from "../netcode/shadowSchedule";
+import { beginShadowEpoch, captureLocalAt, mayAdvanceConfirmed } from "wisp/src/netcode/shadowSchedule";
+import { type InputSchedule, acceptPacket, inputSchedule } from "../netcode/inputSchedule";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
@@ -80,11 +81,11 @@ test("four fighters: speculative history matches the confirmed world through lat
   copyMatchState(confirmedGame, game);
   const live = lobby(game);
   const confirmed = lobby(confirmedGame);
-  const schedule = new ShadowInputSchedule();
+  const schedule = inputSchedule();
   const playback = new ShadowInputPlayback();
   const history = new ReplayHistory();
   const confirmedHistory = new ReplayHistory();
-  assertTrue(schedule.beginEpoch(epoch, 0, 24, 3));
+  assertTrue(beginShadowEpoch(schedule, epoch, 0, 24, 3));
   assertTrue(playback.beginEpoch(epoch));
   assertTrue(history.beginEpoch(epoch, 1, 24));
   assertTrue(confirmedHistory.beginEpoch(epoch, 1));
@@ -110,15 +111,15 @@ test("four fighters: speculative history matches the confirmed world through lat
   let compared = 0;
   let first: string | undefined;
   for (let t = 1; t <= frames + 40; t++) {
-    if (t <= frames) schedule.captureLocalAt(epoch, t, assertDefined(rows[0]?.[t], "local row"));
+    if (t <= frames) captureLocalAt(schedule, epoch, t, assertDefined(rows[0]?.[t], "local row"));
     for (const slot of [0, 1]) {
       while ((delivered[slot] ?? 0) < frames && (arrival[slot]?.[delivered[slot] ?? 0] ?? Infinity) <= t) {
         const frame = (delivered[slot] ?? 0) + 1;
-        assertEquals(schedule.acceptSynchronized(slot, assertDefined(inputPacket(epoch, frame, [assertDefined(rows[slot]?.[frame], "row")]), "packet")), "accepted");
+        assertEquals(acceptPacket(schedule, slot, assertDefined(inputPacket(epoch, frame, [assertDefined(rows[slot]?.[frame], "row")]), "packet")), "accepted");
         delivered[slot] = frame;
       }
     }
-    for (let steps = 0; steps < 6 && schedule.mayAdvanceConfirmed(); steps++) assertTrue(playback.advanceConfirmed(schedule, epoch, confirmed, confirmedHistory));
+    for (let steps = 0; steps < 6 && mayAdvanceConfirmed(schedule); steps++) assertTrue(playback.advanceConfirmed(schedule, epoch, confirmed, confirmedHistory));
     assertTrue(playback.reconcile(schedule, epoch, 0, live, history) !== "rejected");
     assertTrue(playback.catchUpSpeculative(schedule, epoch, 0, live, history, 6));
     const c = confirmed.runtime.simulationFrame;

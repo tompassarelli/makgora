@@ -34,7 +34,7 @@ export function requestPause(s: ShellState, rollback: Rollback, journal: Journal
   const { source } = journal;
   if (source === undefined || journal.barrier.request !== undefined || (!wantPaused && chatBusy(journal))) return;
 
-  const target = wantPaused ? startFrame : rollback.schedule.nextConfirmedFrame();
+  const target = wantPaused ? startFrame : rollback.schedule.nextConfirmed;
   writeJournalFile(controlFile(journalIdentity(s, rollback.epoch), source.controlSequenceNumber(), wantPaused ? "PAUSE" : "RESUME", target ?? source.expectedFrame()));
   requestRound(journal.barrier, wantPaused ? "PREPARE" : "RESUME", target);
   if (startFrame !== undefined && !rollback.playback.rewind(rollback.schedule, rollback.epoch, startFrame, rollback.speculative)) {
@@ -120,7 +120,7 @@ export function sendPauseCommit(s: ShellState, rollback: Rollback, journal: Jour
 export function commitPauseAtFrame(s: ShellState, rollback: Rollback, journal: Journal): void {
   const frame = agreedFrame(journal.barrier);
   if (frame === undefined) return;
-  const next = rollback.schedule.nextConfirmedFrame();
+  const next = rollback.schedule.nextConfirmed;
   if (next < frame) return;
   if (next > frame) {
     failJournal(s, rollback, journal, "pause acknowledgment arrived after its frame boundary");
@@ -128,7 +128,7 @@ export function commitPauseAtFrame(s: ShellState, rollback: Rollback, journal: J
   }
   const paused = pausing(journal.barrier);
   s.session.paused = paused;
-  if (!paused) paceResume(journal.barrier, rollback.schedule.speculativeFrame());
+  if (!paused) paceResume(journal.barrier, rollback.schedule.nextSpeculative);
   pauseMatchPresentation(s, paused);
   syncKeyEvents(s);
   setStatus(s, paused ? pausedMessage(startControl(s)) : "Resumed.", paused ? LASTING : 1.0);
@@ -202,5 +202,5 @@ export function pauseRequestEvent(s: ShellState): void {
 
   const frame = wire.length === expected.length + 10 && wire.startsWith(expected) ? parseDecimal(wire.substring(expected.length)) : undefined;
   if (frame === undefined) return;
-  requestPause(s, rollback, journal, true, frame >= rollback.schedule.nextConfirmedFrame() ? frame : undefined);
+  requestPause(s, rollback, journal, true, frame >= rollback.schedule.nextConfirmed ? frame : undefined);
 }

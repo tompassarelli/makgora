@@ -105,7 +105,7 @@ may_use = ["lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "
 name = "replay"
 paths = ["ts/src/game/replay/**"]
 responsibility = "Replay files, tapes, moments and the viewer driver."
-may_use = ["match", "lobby", "roster", "snapshot", "sim", "input", "core", "generated"]
+may_use = ["match", "lobby", "roster", "snapshot", "sim", "input", "netcode", "core", "generated"]
 
 [[module]]
 name = "netcode"

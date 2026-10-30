@@ -7,6 +7,7 @@ import { smoothedRttMs } from "wisp/src/netcode/delay";
 import { secondFps } from "wisp/src/netcode/rate";
 import { noteLocalSecond, takeNetRates } from "./netDelay";
 import { type Rollback, activeRollback, shellState } from "./state";
+import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -196,7 +197,7 @@ function wrapNatives(rates: SessionRates): void {
   }
 }
 
-export const realFrameDebt = (rollback: Rollback): number => rollback.keyboard === undefined ? 0 : rollback.keyboard.real.due - rollback.schedule.speculativeFrame();
+export const realFrameDebt = (rollback: Rollback): number => rollback.keyboard === undefined ? 0 : rollback.keyboard.real.due - rollback.schedule.nextSpeculative;
 
 function findClock(): ((this: void) => number) | undefined {
   if (typeof os !== "object" || os === null || typeof os.clock !== "function") return undefined;
@@ -248,8 +249,8 @@ function sampleHeld(rates: SessionRates, held: boolean): void {
 function sampleMatch(rates: SessionRates, rollback: Rollback, paused: boolean): void {
   const second = rates.second;
   const { schedule } = rollback;
-  const spec = schedule.speculativeFrame();
-  const conf = schedule.nextConfirmedFrame();
+  const spec = schedule.nextSpeculative;
+  const conf = schedule.nextConfirmed;
   sampleDrift(rates, rollback.epoch, spec, paused);
   if (rollback.epoch === rates.epoch) {
     if (spec > rates.lastSpec) second.spec += spec - rates.lastSpec;
@@ -314,8 +315,8 @@ function rateTokens(rates: SessionRates): string[] {
   const phase = s === undefined ? -1 : s.game.phase;
   const match = s === undefined ? -1 : s.replay.serial;
   const rollback = s === undefined ? undefined : activeRollback(s);
-  const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
-  const window = rollback === undefined ? [] : [`cf=${rollback.schedule.nextConfirmedFrame()}`, `kn=${rollback.schedule.knownThrough()}`, `win=${rollback.window}`, `dl=${rollback.delay}`, `ping=${smoothedRttMs(rollback.net.estimate)}`, `drift=${rates.drift}`, `due=${realFrameDebt(rollback)}`, botLine(rates, rollback), ...takeNetRates(rollback.net).split(" ")];
+  const frame = s === undefined ? -1 : rollback?.schedule.nextSpeculative ?? s.runtime.simulationFrame;
+  const window = rollback === undefined ? [] : [`cf=${rollback.schedule.nextConfirmed}`, `kn=${knownFrame(rollback.schedule)}`, `win=${rollback.window}`, `dl=${rollback.delay}`, `ping=${smoothedRttMs(rollback.net.estimate)}`, `drift=${rates.drift}`, `due=${realFrameDebt(rollback)}`, botLine(rates, rollback), ...takeNetRates(rollback.net).split(" ")];
   return [
     `cb=${second.ticks}`, `dr=${second.draws}`, `dru=${microseconds(second.draw)}`, `ev=${second.events}`, `sim=${second.sim}`, `spec=${second.spec}`, `conf=${second.conf}`, `held=${second.held}`, `stall=${second.stalled}`,
     `gap=${gap}`, `gmax=${second.gapMax}`, `gms=${gameMs(rates)}`, `lua=${microseconds(second.lua)}`, `tk=${tick}`, `tkmax=${microseconds(second.tickMax)}`, `send=${second.sends}`, `recv=${second.received}`, `rown=${second.receivedOwn}`,

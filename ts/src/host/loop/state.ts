@@ -21,14 +21,13 @@ import { type MatchState, REMATCH_COUNTDOWN_SECONDS, createMatchState } from "..
 import { matchSpawnX } from "../../game/match/step";
 import { createMatchCamera, type MatchCamera } from "../../game/sim/matchCamera";
 import type { HeldCamera } from "./heldCamera";
-import type { FixedDelay } from "../../game/netcode/fixedSchedule";
+import { type FixedDelay, type InputSchedule, PENDING_CAPACITY, inputSchedule } from "../../game/netcode/inputSchedule";
 import { type NetDelay, createNetDelay } from "./netDelay";
 import { InputBatch } from "../../game/netcode/inputBatch";
 import type { KeyboardMailbox } from "../../game/netcode/journal/keyboard";
 import type { MatchLifecycle } from "../../game/netcode/journal/lifecycle";
 import type { JournalInputSource } from "../../game/netcode/journal/source";
 import { DEFAULT_BATCH, OutgoingInput } from "../../game/netcode/journal/transport";
-import { PENDING_CAPACITY, ShadowInputSchedule } from "../../game/netcode/shadowSchedule";
 import type { WorldOrigin } from "../../game/render/effects";
 import type { DriftingPiece } from "../../game/presentation/driftingScenery";
 import { type ModelSoundCursor, ORIGINAL_MODEL_SOUNDS, createModelSoundCursor } from "../../game/render/modelSounds";
@@ -194,7 +193,7 @@ export interface Rollback {
 
   batch: number;
   readonly net: NetDelay;
-  readonly schedule: ShadowInputSchedule;
+  readonly schedule: InputSchedule;
   readonly playback: RollbackPlayback;
   readonly speculative: SpeculativeMatch;
   readonly seed: ReplayState;
@@ -415,7 +414,7 @@ function journal(ingress: JournalIngress, editbox: EditboxIngress | undefined): 
 function rollback(mode: ShadowInputMode, playback: RollbackPlayback, editbox: EditboxIngress | undefined): Rollback {
   return {
     mode, active: false, epoch: 0, delay: mode.delay, window: mode.rollback, batch: DEFAULT_BATCH, net: createNetDelay(mode.rollback),
-    schedule: new ShadowInputSchedule(), playback,
+    schedule: inputSchedule(), playback,
     speculative: { world: speculativeRoster(), game: createMatchState(), controls: createBufferedFrameControls(), runtime: createPacingAndPresentation() },
     seed: createReplaySnapshot(), accepted: participantInputs(), sendFailed: false,
     keyboard: mode.kind === "keyboard"

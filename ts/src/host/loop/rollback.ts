@@ -12,8 +12,9 @@ import { startKeyUp } from "../../game/match/controls";
 import { captureNetworkFrame, resetMatchFrameInput } from "../../game/match/frameInput";
 import { Phase, humanActive } from "../../game/lobby/lobbyState";
 import { observedFrameLegalActions, observedFrameStartedActions } from "../../game/match/step";
-import { Capture } from "../../game/netcode/capture";
-import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
+import { awaitedSlots, beginShadowEpoch, captureLocal, completeConfirmed, confirmedLimit, hasLocalRow, knownFrame, mayAdvanceConfirmed, readConfirmed, windowHalted } from "wisp/src/netcode/shadowSchedule";
+import { Capture } from "wisp/src/netcode/capture";
+import { PENDING_CAPACITY, acceptPacket, nextCaptureTarget, remoteAccepted } from "../../game/netcode/inputSchedule";
 import { floorMod } from "wisp/src/sim/intMath";
 import { setRosterMask } from "../../game/sim/roster";
 import { at } from "wisp/src/runtime/lookup";
@@ -79,8 +80,8 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   beginNetEpoch(rollback.net);
   rollback.window = s.dev.rollback;
   rollback.batch = s.dev.batch;
-  if (!schedule.beginEpoch(rollback.epoch, rollback.delay, rollback.window, s.game.humanMask)) return false;
-  if (!rollback.playback.beginEpoch(rollback.epoch, schedule.rollbackFrames())) return false;
+  if (!beginShadowEpoch(schedule, rollback.epoch, rollback.delay, rollback.window, s.game.humanMask)) return false;
+  if (!rollback.playback.beginEpoch(rollback.epoch, schedule.window)) return false;
   resetEchoRing(s.trace);
   rollback.sendFailed = false;
   rollback.stalled = 0;
@@ -185,8 +186,8 @@ function captureKeyboard(s: ShellState, rollback: Rollback, keyboard: KeyboardRo
   if (trace.active) trace.window.localPolls++;
   const held = s.session.paused ? 0 : pollLocalKeys(s);
   samplePad(keyboard.capture, held, pollPad(s));
-  if (probeRecording(probe)) probePoll(probe, held, keyboard.capture.row.pressed, keyboard.capture.row.released, schedule.captureTarget());
-  const target = schedule.captureTarget();
+  if (probeRecording(probe)) probePoll(probe, held, keyboard.capture.row.pressed, keyboard.capture.row.released, nextCaptureTarget(schedule));
+  const target = nextCaptureTarget(schedule);
   if (s.session.paused || rollback.sendFailed || target === undefined) {
     sendBatch(s, rollback, keyboard);
     return;
@@ -197,7 +198,7 @@ function captureKeyboard(s: ShellState, rollback: Rollback, keyboard: KeyboardRo
     queueKeyboardRows(s, rollback, keyboard, true);
     return;
   }
-  const result = schedule.captureLocal(epoch, keyboard.capture.row);
+  const result = captureLocal(schedule, epoch, keyboard.capture.row);
   probeCapture(probe, result);
   if (result === Capture.alreadyCaptured) {
     keyboard.lastTarget = target;
@@ -212,7 +213,7 @@ function captureKeyboard(s: ShellState, rollback: Rollback, keyboard: KeyboardRo
   if (probeRecording(probe)) {
     const row = keyboard.capture.row;
     const slot = localSlot();
-    probeInput(probe, "capture", epoch, slot, target, row.held, row.pressed, row.released, schedule.speculativeFrame());
+    probeInput(probe, "capture", epoch, slot, target, row.held, row.pressed, row.released, schedule.nextSpeculative);
     if (rollback.predictionHeld && row.pressed !== 0) probeIntegrity(probe, `held ${epoch} ${slot} ${target}`);
   }
   if (trace.active) trace.window.localCaptures++;
@@ -241,8 +242,8 @@ function queueKeyboardRows(s: ShellState, rollback: Rollback, keyboard: Keyboard
 
 function stepConfirmed(s: ShellState, rollback: Rollback): boolean {
   const { schedule, epoch, accepted } = rollback;
-  const frame = schedule.nextConfirmedFrame();
-  if (!schedule.readConfirmed(epoch, accepted)) return false;
+  const frame = schedule.nextConfirmed;
+  if (!readConfirmed(schedule, epoch, accepted)) return false;
   if (!captureNetworkFrame(s.frameInput, frame, accepted, s.world, s.game.humanMask)) return false;
   applyFrame(s);
   if (s.build.epochProbe === true && epochChecksumDue(s.probe, frame)) probeIntegrity(s.probe, checksumRow(s, epoch, frame));
@@ -250,11 +251,11 @@ function stepConfirmed(s: ShellState, rollback: Rollback): boolean {
     for (const slot of PARTICIPANT_SLOTS) {
       if (!humanActive(s.game, slot)) continue;
       const row = accepted[slot];
-      probeInput(s.probe, "confirmed", epoch, slot, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
+      probeInput(s.probe, "confirmed", epoch, slot, frame, row.held, row.pressed, row.released, schedule.nextSpeculative);
       if (row.pressed !== 0) probeIntegrity(s.probe, `legal ${epoch} ${slot} ${frame} ${row.pressed} ${row.pressed & observedFrameLegalActions[slot]} ${row.pressed & observedFrameStartedActions[slot]}`);
     }
   }
-  return s.runtime.simulationFrame === frame && schedule.completeConfirmed(epoch, frame);
+  return s.runtime.simulationFrame === frame && completeConfirmed(schedule, epoch, frame);
 }
 
 
@@ -266,7 +267,7 @@ function observeSpeculativeFrame(frame: number, local: Readonly<InputRow>): void
   const slot = localSlot();
   if (rollback === undefined || !isParticipantSlot(slot) || !probeRecording(s.probe)) return;
   const { epoch, schedule } = rollback;
-  probeInput(s.probe, "predict", epoch, slot, frame, local.held, local.pressed, local.released, schedule.speculativeFrame());
+  probeInput(s.probe, "predict", epoch, slot, frame, local.held, local.pressed, local.released, schedule.nextSpeculative);
   if (local.pressed !== 0) probeIntegrity(s.probe, `action ${epoch} ${slot} ${frame} ${local.pressed} ${local.pressed & observedFrameLegalActions[slot]} ${local.pressed & observedFrameStartedActions[slot]}`);
 }
 
@@ -281,7 +282,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const { schedule, epoch, keyboard, journal, speculative } = rollback;
   const { trace, probe } = s;
   const known = rollback.knownBefore;
-  rollback.knownBefore = schedule.knownThrough();
+  rollback.knownBefore = knownFrame(schedule);
   rollback.repairedFrames = 0;
   if (keyboard !== undefined && (s.game.phase !== Phase.match || s.session.paused)) pauseRealFrames(keyboard.real);
   if (s.game.phase !== Phase.match) {
@@ -326,16 +327,16 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     probeIntegrity(probe, `rollback ${epoch} ${depth}`);
     traceInput(trace, `rollback from ${reconciled.replayedFrom} depth ${depth}`);
   }
-  const confirmable = Math.min(schedule.confirmedFrame(), known);
-  const confirmSteps = confirmedBudget(confirmable - schedule.nextConfirmedFrame() + 1, journal !== undefined);
+  const confirmable = Math.min(confirmedLimit(schedule), known);
+  const confirmSteps = confirmedBudget(confirmable - schedule.nextConfirmed + 1, journal !== undefined);
 
 
 
-  const lastConfirmed = Math.min(confirmable, schedule.nextConfirmedFrame() + confirmSteps - 1, stopAt === undefined ? Number.POSITIVE_INFINITY : stopAt - 1);
+  const lastConfirmed = Math.min(confirmable, schedule.nextConfirmed + confirmSteps - 1, stopAt === undefined ? Number.POSITIVE_INFINITY : stopAt - 1);
   const pending = rollback.playback.pendingRepair(epoch);
   const behind = pending === undefined ? 0 : lastConfirmed + 2 - pending;
   const whole = wholeRepairCost(speculative.world);
-  const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.speculativeFrame() - pending, whole);
+  const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.nextSpeculative - pending, whole);
   const repaired = rollback.playback.repair(epoch, speculative, Math.max(repair.frames, behind), Math.max(repair.cost, behind * whole));
   endFrameSection(RECONCILE_SECTION);
   if (repaired === "rejected") {
@@ -348,7 +349,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     traceInput(trace, `repaired through ${speculative.runtime.simulationFrame}`);
   }
   let steps = 0;
-  while (s.game.phase === Phase.match && schedule.mayAdvanceConfirmed() && schedule.nextConfirmedFrame() <= known && steps < confirmSteps && (stopAt === undefined || schedule.nextConfirmedFrame() < stopAt)) {
+  while (s.game.phase === Phase.match && mayAdvanceConfirmed(schedule) && schedule.nextConfirmed <= known && steps < confirmSteps && (stopAt === undefined || schedule.nextConfirmed < stopAt)) {
     beginFrameSection(CONFIRMED_SECTION);
     const stepped = stepConfirmed(s, rollback);
     endFrameSection(CONFIRMED_SECTION);
@@ -366,7 +367,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
 
 
   if (s.game.phase === Phase.match) {
-    const before = schedule.speculativeFrame();
+    const before = schedule.nextSpeculative;
 
     const paced = journal === undefined ? undefined : resumePresentationHeld(s) ? journal.barrier.paced : pacedStop(journal.barrier);
     const speculativeStop = stopAt === undefined ? paced : paced === undefined ? stopAt : Math.min(stopAt, paced);
@@ -374,32 +375,32 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     beginFrameSection(SPECULATIVE_SECTION);
     let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
     endFrameSection(SPECULATIVE_SECTION);
-    const due = keyboard === undefined ? 0 : realFramesDue(keyboard.real, rollback.epochCallbacks, schedule.speculativeFrame() - 1, realSeconds());
-    if (advanced && keyboard !== undefined && schedule.speculativeFrame() > before && keyboardCatchesUp(schedule.speculativeFrame(), due, schedule.rollbackFrames(), schedule.remoteThrough(slot), steps, repaired)) {
+    const due = keyboard === undefined ? 0 : realFramesDue(keyboard.real, rollback.epochCallbacks, schedule.nextSpeculative - 1, realSeconds());
+    if (advanced && keyboard !== undefined && schedule.nextSpeculative > before && keyboardCatchesUp(schedule.nextSpeculative, due, schedule.window, remoteAccepted(schedule, slot), steps, repaired)) {
       captureKeyboard(s, rollback, keyboard);
       beginFrameSection(SPECULATIVE_SECTION);
       advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, 1, presentationStop, observeSpeculativeFrame);
       endFrameSection(SPECULATIVE_SECTION);
     }
-    const after = schedule.speculativeFrame();
+    const after = schedule.nextSpeculative;
     if (journal !== undefined) settlePace(journal.barrier, after);
-    const halted = schedule.windowHalted(slot);
+    const halted = windowHalted(schedule, slot);
     const blocked = halted && after === before;
     if (halted) rollback.predictionHeld = true;
 
 
-    else if (keyboard !== undefined ? keyboard.capture.row.pressed === 0 : !schedule.hasLocalRow(slot)) rollback.predictionHeld = false;
+    else if (keyboard !== undefined ? keyboard.capture.row.pressed === 0 : !hasLocalRow(schedule, slot)) rollback.predictionHeld = false;
     if (trace.active) {
       trace.window.speculativeSteps += after - before;
       if (!advanced) trace.window.speculativeFailures++;
       else if (blocked) trace.window.windowBlocks++;
     }
-    if (blocked) probeIntegrity(probe, `stall ${epoch} ${after} ${schedule.remoteThrough(slot)}`);
+    if (blocked) probeIntegrity(probe, `stall ${epoch} ${after} ${remoteAccepted(schedule, slot)}`);
 
     const holding = stopAt !== undefined || journal?.barrier.request !== undefined;
-    noteWaiting(rollback, after > before || holding ? 0 : schedule.awaitedSlots(), STALL_NOTICE_CALLBACKS);
+    noteWaiting(rollback, after > before || holding ? 0 : awaitedSlots(schedule), STALL_NOTICE_CALLBACKS);
   } else noteWaiting(rollback, 0, 0);
-  probeAdvance(probe, s.runtime.simulationFrame, schedule.speculativeFrame(), correction);
+  probeAdvance(probe, s.runtime.simulationFrame, schedule.nextSpeculative, correction);
 }
 
 
@@ -408,18 +409,18 @@ function receivePacket(s: ShellState, rollback: Rollback, sender: number, packet
   const { schedule } = rollback;
   const receivedCallback = trace.ticks;
   const receivedSeconds = trace.active ? traceSeconds(trace) : 0.0;
-  const receipt = schedule.acceptSynchronized(sender, packet);
+  const receipt = acceptPacket(schedule, sender, packet);
   const local = sender === localSlot();
   for (let index = 0; index < packet.rows.length; index++) {
     const row = packet.rows[index];
     if (row === undefined) continue;
     const frame = packet.firstFrame + index;
     if (receipt === "accepted") {
-      probeInput(probe, "receive", packet.epoch, sender, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
+      probeInput(probe, "receive", packet.epoch, sender, frame, row.held, row.pressed, row.released, schedule.nextSpeculative);
       if (local) probeTransportReceive(probe, packet.epoch, frame);
       else noteCallbackClockRemoteRow(sender, frame, row.pressed);
     }
-    if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, sender, local, frame, schedule.speculativeFrame());
+    if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, sender, local, frame, schedule.nextSpeculative);
     if (trace.active && local) recordEcho(trace, packet.epoch, frame, receivedCallback, receivedSeconds);
     if (receipt === "accepted" && !local && row.pressed !== 0) traceInput(trace, `received participant ${sender} frame ${frame} pressed ${row.pressed}`);
   }

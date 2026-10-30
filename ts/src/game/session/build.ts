@@ -1,6 +1,6 @@
 
 
-import type { FixedDelay } from "../netcode/fixedSchedule";
+import { type FixedDelay } from "../netcode/inputSchedule";
 
 
 export type JournalIngress = "files" | "keyboard" | "editbox";

@@ -9,12 +9,14 @@ import { commitEdges, resetKeys, sampleKeys } from "../../game/input/keyboardCap
 import { isParticipantSlot } from "../../game/input/participants";
 import { INPUT_LAST_FRAME, type InputPacket } from "../../game/input/wire";
 import { Phase, fighterMask, humanActive } from "../../game/lobby/lobbyState";
-import { Capture } from "../../game/netcode/capture";
+import { captureLocalAt, othersThrough } from "wisp/src/netcode/shadowSchedule";
+import { remoteAccepted } from "../../game/netcode/inputSchedule";
+import { FUTURE_LIMIT } from "wisp/src/netcode/ledger";
+import { Capture } from "wisp/src/netcode/capture";
 import type { JournalInputSource, JournalRead } from "../../game/netcode/journal/source";
 import { TEXT_WINDOW } from "../../game/netcode/journal/text";
 import { readVocabularyPacket } from "../../game/netcode/journal/vocabulary";
 import { isMomentRequest } from "../../game/replay/moment";
-import { FUTURE_LIMIT } from "../../game/netcode/ledger";
 import { type JournalIdentity, type MenuPhase, endFile, failureFile, menuFile, quiescentFile, startFile, transportReadyFile } from "../../game/session/journalFiles";
 import { KEYBOARD_FALLBACK_MESSAGE } from "../../game/session/messages";
 import { CATCH_UP_FRAMES } from "../../game/session/playback";
@@ -211,7 +213,7 @@ function nextPacketText(s: ShellState, rollback: Rollback, journal: Journal): st
 
 
 function sampleKeyboard(s: ShellState, rollback: Rollback, journal: Journal): void {
-  if (journal.keyStop === undefined) journal.keyClock = rollback.schedule.othersThrough(localSlot(), journal.keyClock + 1);
+  if (journal.keyStop === undefined) journal.keyClock = othersThrough(rollback.schedule, localSlot(), journal.keyClock + 1);
 
   const chatting = journal.editbox?.chatOpen() === true;
   sampleKeys(journal.keys, chatting ? 0 : pollLocalKeys(s));
@@ -250,7 +252,7 @@ export function serviceJournalInput(s: ShellState, rollback: Rollback, journal: 
 
 
   for (let admitted = 0; admitted < CATCH_UP_FRAMES; ) {
-    const latest = Math.min(INPUT_LAST_FRAME, schedule.nextConfirmedFrame() - 1 + FUTURE_LIMIT);
+    const latest = Math.min(INPUT_LAST_FRAME, schedule.nextConfirmed - 1 + FUTURE_LIMIT);
     if (source.expectedFrame() > latest) return;
     let result: JournalRead;
     if (keyboard) {
@@ -279,8 +281,8 @@ export function serviceJournalInput(s: ShellState, rollback: Rollback, journal: 
       if (row === undefined) return;
       const frame = packet.firstFrame + index;
 
-      if (frame - schedule.remoteThrough(slot) > schedule.rollbackFrames()) rollback.predictionHeld = true;
-      const captured = schedule.captureLocalAt(rollback.epoch, frame, row);
+      if (frame - remoteAccepted(schedule, slot) > schedule.window) rollback.predictionHeld = true;
+      const captured = captureLocalAt(schedule, rollback.epoch, frame, row);
       if (captured === Capture.tooFarAhead || captured === Capture.pendingFull) return;
       if (captured !== Capture.captured && captured !== Capture.alreadyCaptured) {
         failJournal(s, rollback, journal, "original frame could not be admitted");
@@ -288,7 +290,7 @@ export function serviceJournalInput(s: ShellState, rollback: Rollback, journal: 
       }
       if (captured !== Capture.captured) continue;
       probePoll(s.probe, row.held, row.pressed, row.released, frame);
-      probeInput(s.probe, "capture", rollback.epoch, slot, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
+      probeInput(s.probe, "capture", rollback.epoch, slot, frame, row.held, row.pressed, row.released, schedule.nextSpeculative);
       if (rollback.predictionHeld && row.pressed !== 0) probeIntegrity(s.probe, `held ${rollback.epoch} ${slot} ${frame}`);
       if (s.trace.active) s.trace.window.localCaptures++;
       if (row.pressed !== 0) traceInput(s.trace, `admitted frame ${frame} pressed ${row.pressed}`);

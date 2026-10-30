@@ -4,9 +4,9 @@
 
 
 import type { InputRow } from "../../input/inputRow";
-import { type InputMessage, type InputPacket, decodeInputMessage, decodePacket, encodeInputMessage } from "../../input/wire";
-import { FrameRing } from "../frameRing";
-import { FUTURE_LIMIT } from "../ledger";
+import { type InputMessage, INPUT_ROW_CODEC, type InputPacket, decodeInputMessage, decodePacket, encodeInputMessage } from "../../input/wire";
+import { frameRing, ringClear, ringRelease, ringRow, ringStore, ringVacant } from "wisp/src/netcode/frameRing";
+import { FUTURE_LIMIT } from "wisp/src/netcode/ledger";
 
 
 export const DEFAULT_BATCH = 6;
@@ -30,7 +30,7 @@ export function decodeTransport(wire: string): readonly InputPacket[] | undefine
 
 export class OutgoingInput {
 
-  private readonly rows = new FrameRing(FUTURE_LIMIT);
+  private readonly rows = frameRing(INPUT_ROW_CODEC, FUTURE_LIMIT);
   private epoch = 0;
   private nextUnsent = 1;
   private admitted = 0;
@@ -42,7 +42,7 @@ export class OutgoingInput {
 
 
   begin(epoch: number, firstFrame: number): void {
-    this.rows.clear();
+    ringClear(this.rows);
     this.epoch = epoch;
     this.nextUnsent = firstFrame;
     this.admitted = firstFrame - 1;
@@ -55,8 +55,8 @@ export class OutgoingInput {
 
 
   admit(frame: number, row: Readonly<InputRow>): boolean {
-    if (frame !== this.admitted + 1 || !this.rows.vacant(frame)) return false;
-    this.rows.store(frame, row);
+    if (frame !== this.admitted + 1 || !ringVacant(this.rows, frame)) return false;
+    ringStore(INPUT_ROW_CODEC, this.rows, frame, row);
     this.admitted = frame;
     if (row.pressed !== 0) this.pressPending = true;
     return true;
@@ -84,7 +84,7 @@ export class OutgoingInput {
 
 
   sent(message: InputMessage, batch: number): void {
-    for (let frame = message.firstFrame; frame <= message.lastFrame; frame++) this.rows.release(frame);
+    for (let frame = message.firstFrame; frame <= message.lastFrame; frame++) ringRelease(this.rows, frame);
     this.nextUnsent = message.lastFrame + 1;
     this.gap = this.idle;
     this.idle = 0;
@@ -95,7 +95,7 @@ export class OutgoingInput {
 
 
   private row(frame: number): Readonly<InputRow> {
-    const row = this.rows.row(frame);
+    const row = ringRow(this.rows, frame);
     if (row === undefined) throw new Error(`admitted input for frame ${frame} is missing`);
     return row;
   }
