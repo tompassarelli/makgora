@@ -214,7 +214,7 @@ const reunited = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: 
 
 const facingOf = (value: number): number => value < 0 ? -1 : 1;
 
-/** Moves the order between copy, hold, regroup, separated and tossed, which ends on landing in hold or falling away separated; the others belong to the specials that set them. */
+/** Moves the order between copy, hold, regroup, separated and tossed, which ends on landing in copy or falling away separated; the others belong to the specials that set them. */
 function advanceOrder(duo: Duo, partner: Fighter, leader: Readonly<Fighter>, stage: number): void {
   const { order } = duo;
   if (order !== DuoOrder.copy && order !== DuoOrder.separated && order !== DuoOrder.hold && order !== DuoOrder.regroup && order !== DuoOrder.tossed) return;
@@ -222,7 +222,7 @@ function advanceOrder(duo: Duo, partner: Fighter, leader: Readonly<Fighter>, sta
   let next: DuoOrder = order;
   if (order === DuoOrder.tossed) {
     if (partner.motion.grounded) {
-      next = DuoOrder.hold;
+      next = DuoOrder.copy;
       partner.motion.vx = 0.0;
     }
     else if (partner.status.out || partner.launch.hitstun > 0 || partner.motion.z < mainDeckZ(stage)) next = DuoOrder.separated;
@@ -289,7 +289,9 @@ function driveSeparated(partner: Readonly<Fighter>, leader: Readonly<Fighter>, i
   }
 }
 
-/** Before the status mask each frame, every partner in the copy or hold order takes its leader's controls from MURLOC_DUO.delayFrames ago (a held one in place, facing the nearest foe), takes neutral controls while the leader holds a foe, and in the separated and regroup orders drives itself. */
+const copiesLeader = (order: DuoOrder): boolean => order === DuoOrder.copy || order === DuoOrder.hold || order === DuoOrder.tossed;
+
+/** Before the status mask each frame, every partner in the copy or hold order takes its leader's controls from MURLOC_DUO.delayFrames ago (a held one in place, facing the nearest foe), a tossed one takes them as pressed this frame, takes neutral controls while the leader holds a foe, and in the separated and regroup orders drives itself. */
 export function drivePartners(world: Roster, controls: FrameControls, frame: number, stage: number, stageFrame: number): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
@@ -310,10 +312,10 @@ export function drivePartners(world: Roster, controls: FrameControls, frame: num
     if (duo.order === DuoOrder.separated || duo.order === DuoOrder.regroup) {
       driveSeparated(partner, leader, controls.inputs[slot], stage, stageFrame);
       clearAttackBuffer(controls.commands[slot]);
-    } else if (holding || (duo.order !== DuoOrder.copy && duo.order !== DuoOrder.hold)) {
+    } else if (holding || !copiesLeader(duo.order)) {
       copyControls(controls.inputs[slot], NEUTRAL);
       clearAttackBuffer(controls.commands[slot]);
     } else if (duo.order === DuoOrder.hold) driveHeld(world, slot, partner, leader, duo.ring, controls, read, frame);
-    else unpackFrame(duo.ring, read, controls.inputs[slot], controls.commands[slot], frame);
+    else unpackFrame(duo.ring, duo.order === DuoOrder.tossed ? write : read, controls.inputs[slot], controls.commands[slot], frame);
   }
 }

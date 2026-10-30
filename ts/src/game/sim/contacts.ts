@@ -10,7 +10,7 @@ import { catalogHero } from "./tuning";
 export const BANISH_SPELL_DAMAGE = f32(1.3);
 import { isDownDamageState } from "./conditions";
 import { DOWN_DAMAGE_RESET_THRESHOLD } from "./down";
-import { type Fighter, duoRole, mutableVictim } from "./fighter";
+import { type Fighter, duoRole, isTossed, mutableVictim } from "./fighter";
 import { HitElement, type HitEffect, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import {
   applyDirectionalInfluence,
@@ -316,7 +316,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     const source = fighterAt(world, contact.source);
     const { damage } = contact.effect;
     const shieldHit = contact.effect.shieldDamage ?? damage;
-    if (contact.direct) source.launch.hitlag = max(source.launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
+    if (contact.direct && !isTossed(source)) source.launch.hitlag = max(source.launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
     if (contact.blocked) {
       if (contact.kind === ContactKind.damageOnly) continue;
       const pairBlock = contact.source !== slot && inLivePair(world, contact.source);

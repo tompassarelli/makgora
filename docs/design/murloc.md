@@ -214,7 +214,7 @@ the Murlocs.
 | Side B: Belly Slide | Mrgl slides and Grgl copies five frames later: two hits of 5%, one per body (Grgl's at ×0.75). Both stop at a raised shield, which punishes them | One slide: 10 mana; slides f8–22 at 11/frame, about 165 units; 5% contact f8–22; ends f32; air landing 20 |
 | Up B: Tidal Surf | One steerable wave carries both bodies if Grgl is within 120 units on frame 6: 340 units with three 2% hits, then helpless | A Grgl beyond 120 units is left behind and casts his own solo surf (220 units), as a partner who misses the rope does. Solo Mrgl rises 220 units |
 | Down B: "Mrglglgl!" | Grgl alive. Tap: order Hold. Tap again: Regroup. Hold B 20 frames: leader swap | Grgl dead: revive. A 50-frame cast, then Grgl surfaces beside Mrgl at the pair's percent. Once per stock; a hit during the cast cancels it without spending it |
-| Grab with Grgl in reach | With no foe in grab reach and Grgl actionable within 40 units, Mrgl lifts Grgl. The throw direction tosses him as a body projectile: 6%, one hit per target, about 300 units. He lands in Hold | Normal grab |
+| Grab with Grgl in reach | With no foe in grab reach and Grgl actionable within 40 units, Mrgl lifts Grgl. The throw direction tosses him as a body projectile: 8% base (6% after Grgl's ×0.75), one hit per target, about 375 units (forward speed 17.75, lift 16; up 3/20; down 4/-6). He carries no stun or lag: his body's hit gives him no hitlag, he lands with no landing lag, and from the frame after release he takes Mrgl's controls as pressed that frame (an air jump, an attack or an air dodge) while Mrgl stays in his own throw end lag. He lands back on the player's copied input (Copy), not in Hold, and the separate and regroup rules bring him back when he is far from Mrgl | Normal grab |
 | Ultimate: Mrgllgll Swarm | A tide of murlocs rushes across the stage. Designed only: ultimates remain off under the current match rules | Same |
 
 **Hold.** Grgl plants. He copies attacks, specials, shield and jumps in place,
@@ -232,7 +232,7 @@ frames. Offstage, a swap can save Mrgl by sending Grgl to the fall: a real
 trade.
 
 **Toss.** The lift and throw above, on a 150-frame cooldown. A tossed Grgl
-cannot be lifted again until he lands, and hits each target once per toss.
+cannot be lifted again until he lands, and hits each target once per toss. Before 2026-10-30 the forward toss carried about 300 units (speed 16, lift 14) and Grgl took hitlag from his own hit and landing lag; Tom asked for no lag on Grgl and a longer throw.
 
 **Handoff.** After Mrgl's throw, Grgl's grab (copied or from Hold) may regrab
 the victim, and the same holds the other way, within the lock table's limits.

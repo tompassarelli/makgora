@@ -4,7 +4,7 @@ import { roundToFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, DamageLanding, DownState, ParasolState, SpecialAction } from "./codes";
 import { isFloorTeching, isTumbling } from "./conditions";
-import { type Fighter } from "./fighter";
+import { type Fighter, isTossed } from "./fighter";
 import { clearDash, landWavedash } from "./groundMovement";
 import { MAX_GROUNDED_KNOCKBACK_ON_LANDING, airborneDamageLandingReaction, decayKnockback } from "./knockback";
 import { RIFLEMAN_BLASTER_AIR_FRAMES, RIFLEMAN_BLASTER_LANDING_LAG, attackLandingLag, isAerialAttack, landsInAutoCancel, landsIntoAttack } from "./moves";
@@ -89,7 +89,7 @@ function emptyLandingLag(f: Readonly<Fighter>): number {
 
 
 function landsWithoutLag(f: Readonly<Fighter>): boolean {
-  return airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0 || carriesChargeAcrossLanding(f)
+  return isTossed(f) || airShotLandingLag(f.special) === 0 || runningHeroSpecial(f)?.landingLag === 0 || carriesChargeAcrossLanding(f)
     || landsBeforeSwing(runningHeroSpecial(f), f.special.frame);
 }
 

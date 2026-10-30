@@ -579,6 +579,11 @@ export function duoRole(fighter: Readonly<Fighter>): DuoRole {
   return fighter.duo?.role ?? DuoRole.solo;
 }
 
+/** Whether the fighter is a partner body in flight from its leader's toss. */
+export function isTossed(fighter: Readonly<Fighter>): boolean {
+  return fighter.duo?.role === DuoRole.partner && fighter.duo.order === DuoOrder.tossed;
+}
+
 export function mutableDuo(fighter: Fighter): Duo {
   if (fighter.duo === undefined) fighter.duo = createDuo();
   return fighter.duo;
