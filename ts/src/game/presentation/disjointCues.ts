@@ -1,4 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
+import { imod } from "wisp/src/sim/intMath";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion } from "../sim/hitRegions";
@@ -63,8 +64,8 @@ export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly Att
 
 export const FLARE_REGIONS: { readonly [character: number]: { readonly [style: number]: (index: number) => boolean } } = {
   [Character.lich]: {
-    [AttackStyle.neutralAir]: index => index % 12 === 0 || index % 12 === 2 || index % 12 === 4 || index % 12 === 8,
-    [AttackStyle.forwardAir]: index => index % 3 === 1,
+    [AttackStyle.neutralAir]: index => { const slot = imod(index, 12); return slot === 0 || slot === 2 || slot === 4 || slot === 8; },
+    [AttackStyle.forwardAir]: index => imod(index, 3) === 1,
   },
 };
 
