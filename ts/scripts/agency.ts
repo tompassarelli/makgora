@@ -330,7 +330,7 @@ export function situationKey(state: Readonly<ReplayState>, victim: number): stri
       attack.style ?? -1, attack.frame, attack.cooldown, special.action, special.frame, grab.action, grab.frame,
       grab.owner === undefined ? -1 : grab.owner === victim ? 0 : 1, grab.target === undefined ? -1 : grab.target === victim ? 0 : 1,
       down.state, down.frame, down.waitRemaining, dodge.airDodging ? dodge.airFrame : -1, dodge.groundFrame, shield.raised ? 1 : 0, shield.stun,
-      shield.breakState, jump.remaining, jump.squat, ledge.state, ledge.frame, f.landing.lag, status.frozenFrames, status.freezeImmunityFrames, status.invincible, status.out ? 1 : 0,
+      shield.breakState, shield.breakFrame, rounded(shield.breakRemaining, 1), jump.remaining, jump.squat, ledge.state, ledge.frame, f.landing.lag, status.frozenFrames, status.freezeImmunityFrames, status.invincible, status.out ? 1 : 0,
 
       grab.grabbedFrames > 0 ? grab.grabbedFrames : -1,
       status.respawn, rounded(shield.energy, 1), f.freezeTrap.life, f.freezeTrap.arming, f.freezeTrap.cooldown, f.bear.life, special.cooldowns.join(" "), f.projectiles.map(({ life }) => life).join(" "),
