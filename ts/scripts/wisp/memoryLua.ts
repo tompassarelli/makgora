@@ -29,6 +29,7 @@ declare const arg: Readonly<Record<number, string | undefined>>;
 const [bundlePath, declarationsPath, minutesText = "30", matchesText, firstText = "0"] = [arg[1], arg[2], arg[3], arg[4], arg[5]];
 if (bundlePath === undefined || declarationsPath === undefined) throw new Error("usage: lua memory.lua MAP_LUA WARCRAFT_D_TS [MINUTES]");
 const FRAMES_PER_MINUTE = 3600;
+const RIGHT_ARROW = 0x27;
 const totalFrames = Number(minutesText) * FRAMES_PER_MINUTE;
 const nativeSequence = matchesText === "native";
 const releaseMatches = matchesText === undefined || nativeSequence ? undefined : Number(matchesText);
@@ -182,7 +183,10 @@ while (releaseMatches === undefined ? clients.frame < totalFrames : matches < re
 
     until("fighter selection", 20 * 60, () => gameOf(host).phase === Phase.characterMenu, (index) => {
 
-      if (floorMod(index, 30) === 0) clients.press(floorMod(floorDiv(index, 30), 2), Key.y);
+      if (floorMod(index, 30) !== 0) return;
+      const player = floorMod(floorDiv(index, 30), 2);
+      clients.press(player, RIGHT_ARROW);
+      clients.press(player, Key.y);
     });
     for (let index = 0; index < 60; index++) frame();
     if (releaseMatches === undefined) census(`kind=menu lineup=${lineup}`);
