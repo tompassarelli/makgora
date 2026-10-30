@@ -46,7 +46,7 @@ different frames on the side of its first hit, braced to take that hit
 without knockback, then moved to the other side with its hit record cleared
 the frame before its second hit opens, and sampled at that hit after the
 first hit's hitlag, so both hits show; a command grab at its lunge plus three
-quarters of its strike. A ground move or special that hits both sides at once,
+quarters of its strike. A ground move whose front and back regions open on the same frame, reach about as far each way and stay active a frame longer (the splits) stands the braced dummy in front, then crosses it behind during the first hit's hitlag so the next active frame strikes it from behind, in both rows. Any other ground move or special that hits both sides at once,
 reaching at least three quarters as far behind as ahead, stands the dummy in
 front in the right-facing row and behind in the left-facing row, so the two
 rows show both sides. A special that rushes forward until it meets a body also

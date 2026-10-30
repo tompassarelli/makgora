@@ -143,15 +143,36 @@ function groundPlacement(move: Readonly<AuthoredMove> | undefined, style: Attack
   if (move === undefined || move.regions.length === 0) return { gap: reachGap(move) };
   if (style === AttackStyle.upTilt || style === AttackStyle.upSmash) return overheadPlacement(move, character);
   if (style === AttackStyle.forwardTiltUp) return risenPlacement(move);
-  if (style !== AttackStyle.downSmash) return twoSided(move);
+  const sides = bothSides(move);
+  if (sides === undefined) return twoSided(move);
+  if (opens(sides.ahead) === opens(sides.behind)) return crossedPlacement(move, sides) ?? twoSided(move);
+  return style === AttackStyle.downSmash ? staggeredPlacement(move, sides) : twoSided(move);
+}
+
+interface Sides { readonly ahead: readonly MoveRegion[]; readonly behind: readonly MoveRegion[] }
+type Crossing = { readonly gap: number | undefined; readonly cross?: { readonly frame: number; readonly gap: number }; readonly swing?: readonly number[] };
+
+const opens = (regions: readonly MoveRegion[]): number => Math.min(...regions.map((region) => region.firstFrame));
+const closes = (regions: readonly MoveRegion[]): number => Math.max(...regions.map((region) => region.lastFrame));
+
+function bothSides(move: Readonly<AuthoredMove>): Sides | undefined {
   const ahead = move.regions.filter((region) => centreX(region) > 0.0), behind = move.regions.filter((region) => centreX(region) < 0.0);
-  const opens = (regions: readonly MoveRegion[]) => Math.min(...regions.map((region) => region.firstFrame));
-  if (ahead.length === 0 || behind.length === 0 || opens(ahead) === opens(behind)) return twoSided(move);
+  return ahead.length === 0 || behind.length === 0 ? undefined : { ahead, behind };
+}
+
+function staggeredPlacement(move: Readonly<AuthoredMove>, { ahead, behind }: Sides): Crossing {
   const [early, late] = opens(ahead) < opens(behind) ? [ahead, behind] : [behind, ahead];
   const lateGap = regionGap(late, move.travelX ?? 0.0);
   if (lateGap === undefined || opens(late) - opens(early) < 2) return { gap: lateGap };
   const contact = opens(late) + ordinaryHitlagFrames(Math.max(...early.map((region) => region.hit.effect.damage)));
   return { gap: regionGap(early, move.travelX ?? 0.0), cross: { frame: opens(late) - 1, gap: lateGap }, swing: [contact, contact + 2] };
+}
+
+function crossedPlacement(move: Readonly<AuthoredMove>, { ahead, behind }: Sides): Crossing | undefined {
+  const travel = move.travelX ?? 0.0, backGap = regionGap(behind, travel), frame = opens(behind) + 1;
+  if (backGap === undefined || behindGap(move.regions, reachGap(move)) === undefined || closes(behind) < frame || closes(ahead) < frame) return undefined;
+  const contact = frame + ordinaryHitlagFrames(Math.max(...ahead.map((region) => region.hit.effect.damage)));
+  return { gap: regionGap(ahead, travel), cross: { frame, gap: backGap }, swing: [contact, contact + 2] };
 }
 
 function overheadPlacement(move: Readonly<AuthoredMove>, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined } {
