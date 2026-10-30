@@ -1,14 +1,8 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { Console, Effect, Schema } from "effect";
+import { Console, Effect } from "effect";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
-import { acceptanceSummary, runAcceptance, runFourFighters } from "../netAcceptance";
-
-class NetAcceptFailure extends Schema.TaggedError<NetAcceptFailure, { readonly brand: unique symbol }>()("NetAcceptFailure", { problem: Schema.String }) {
-  override get message(): string {
-    return this.problem;
-  }
-}
+import { NetAcceptFailure, acceptanceSummary, runAcceptance, runFourFighters } from "../netAcceptance";
 
 /** `net-accept`: wisp#112's online acceptance, full matches between two processes through Wisp's delay and loss proxy. */
 export const netAccept: Command = (args) => Effect.gen(function*() {

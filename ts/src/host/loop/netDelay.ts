@@ -5,7 +5,7 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, firstHumanSlot, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, type RttEstimate, agreedDelay, chosenDelay, connectionPoor, correctDelay,
-  correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rttEstimate, smoothedRttMs, stepManualDelay,
+  autoDelay, correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, resetRtt, rttEstimate, smoothedRttMs, stepManualDelay,
 } from "wisp/src/netcode/delay";
 import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
@@ -71,13 +71,14 @@ export interface NetDelay {
   readonly correction: DelayCorrection;
   readonly second: { held: number; arrivals: number; deep: number };
   pingDelay: number;
+  measured: boolean;
   manual: number;
 }
 
 export function createNetDelay(window: number): NetDelay {
   const policy = delayPolicy(window, MAX_INPUT_DELAY);
   return {
-    policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
+    policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, measured: false, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
     echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, rollbacks: 0, replayedFrom: -1, replayedDepth: 0, deepest: 0,
@@ -191,7 +192,26 @@ export function noteEcho(net: NetDelay, frame: number): void {
   net.echoes++;
   net.echoSum += echo;
   // Warcraft relays each sync message through the host, so a row's echo age is the remote row's age too: the round trip is twice it.
-  observeRtt(net.estimate, floorDiv(echo * 100, 3));
+  if (!net.measured) observeRtt(net.estimate, floorDiv(echo * 100, 3));
+}
+
+/**
+ * The round trip the transport measured end to end (wisp:host/net/peer.ts), handed over before the match. Under the lockstep link a sync row's echo
+ * is a whole number of turns and sees only the turn delay, so from here the echoes no longer move the estimate; returns the delay it sets.
+ */
+export function handMeasuredRtt(net: NetDelay, rttMs: number): number {
+  resetRtt(net.estimate);
+  observeRtt(net.estimate, rttMs);
+  net.measured = true;
+  net.pingDelay = autoDelay(net.policy, net.estimate);
+  return net.pingDelay;
+}
+
+/** The delay `handMeasuredRtt` will set, for a caller that must report it before the map's state exists. */
+export function measuredDelay(window: number, rttMs: number): number {
+  const estimate = rttEstimate();
+  observeRtt(estimate, rttMs);
+  return autoDelay(delayPolicy(window, MAX_INPUT_DELAY), estimate);
 }
 
 export function beginNetEpoch(net: NetDelay): void {
@@ -358,7 +378,7 @@ export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>):
     hostDelayFrom(net, game, slot, message.host);
     return;
   }
-  if (message.ping >= 0 && GetTriggerPlayer() === GetLocalPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - message.ping) * 100, 3));
+  if (message.ping >= 0 && !net.measured && GetTriggerPlayer() === GetLocalPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - message.ping) * 100, 3));
   if (slot < 0 || slot >= net.proposals.length) return;
   if (isFixedDelay(message.delay)) net.proposals[slot] = Math.max(DEFAULT_DELAY, message.delay);
   if (message.echo >= 0) net.slotEchoMs[slot] = message.echo;

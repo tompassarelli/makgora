@@ -82,6 +82,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
     interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number } }
     const { shell }: { shell(): State & NetcodeShell } = await import(join(platform, "../host/loop/state.ts"));
     const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "../host/loop/diagnostics.ts"));
+    const { handMeasuredRtt, measuredDelay }: { handMeasuredRtt(net: object, rttMs: number): number; measuredDelay(window: number, rttMs: number): number } = await import(join(platform, "../host/loop/netDelay.ts"));
     const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import(join(import.meta.dir, "../../src/game/lobby/lobbyState.ts"));
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
@@ -96,14 +97,21 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
     const net = netcodeStats();
     const presses = pressStats(slot);
     let tick = 0;
+    let measuredRtt: number | undefined;
     return {
       client,
       input: (input) => { latest = input; },
       start: () => lockstep.start(),
+      measured: (rttMs) => {
+        measuredRtt = rttMs;
+        return measuredDelay(PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.rollback : 0, rttMs);
+      },
       step: () => {
         if (lockstep.frame === SETUP_FRAME) {
           client.run(() => {
             net.attach(shell(), slot);
+            const { rollback } = shell();
+            if (measuredRtt !== undefined && rollback !== undefined) handMeasuredRtt(rollback.net, measuredRtt);
             presses.attach(shell(), () => tick);
             setHumanCount(shell().game, 2);
             for (const command of chat) applyDeveloperCommand(shell(), command.startsWith("-dev fighter ") && Number(command.split(" ")[2]) <= 2 ? Number(command.split(" ")[2]) - 1 : 0, command);
@@ -153,6 +161,7 @@ interface NetcodeShell {
     readonly active: boolean;
     readonly window: number;
     readonly delay: number;
+    readonly net: object;
     readonly schedule: {
       speculativeFrame(): number; remoteThrough(slot: number): number; windowHalted(slot: number): boolean; captureTarget(): number | undefined;
       captureLocal(epoch: number, sample: { readonly pressed: number }): number;

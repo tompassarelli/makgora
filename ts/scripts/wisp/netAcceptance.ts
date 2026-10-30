@@ -2,10 +2,15 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
-import { NetFailure } from "wisp/scripts/wisp/net/peer";
 import { runProxy } from "wisp/scripts/wisp/net/proxy";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { SELECTABLE_CHARACTERS, fighterKey } from "../../src/game/roster/kits";
+
+export class NetAcceptFailure extends Schema.TaggedError<NetAcceptFailure, { readonly brand: unique symbol }>()("NetAcceptFailure", { problem: Schema.String }) {
+  override get message(): string {
+    return this.problem;
+  }
+}
 
 const MATCH_START = 300;
 const BUTTONS = ["A", "A", "A", "X", "X", "B", "RB"] as const;
@@ -144,7 +149,7 @@ export const runFourFighters = (options: { readonly frames: number; readonly see
         probe.close();
         return port;
       },
-      catch: (cause) => new NetFailure({ problem: `finding a proxy UDP port: ${String(cause)}` }),
+      catch: (cause) => new NetAcceptFailure({ problem: `finding a proxy UDP port: ${String(cause)}` }),
     });
     yield* Effect.forkScoped(runProxy({ listen: proxyPort, to: { address: "127.0.0.1", port: options.port }, oneWayMs: rttMs / 2, loss: options.loss, seed: options.seed }, (line) => {
       writeFileSync(join(directory, "proxy.log"), `${line}\n`);
@@ -156,9 +161,9 @@ export const runFourFighters = (options: { readonly frames: number; readonly see
       const run = yield* captureProcess("play --standalone", pad, [process.execPath, "scripts/wisp.ts", "play", "--standalone", ...role, "--script", pad, "--frames", `${options.frames}`, "--out", out]);
       writeFileSync(join(directory, `${name}.log`), `${run.stdout}\n${run.stderr}`);
       const measured = /^net: slot \d+, round trip (\d+(?:\.\d+)?) ms, turn delay .*$/m.exec(run.stderr);
-      if (measured === null || measured[1] === undefined) return yield* new NetFailure({ problem: `${name}: no measured round trip at requested ${rttMs} ms` });
+      if (measured === null || measured[1] === undefined) return yield* new NetAcceptFailure({ problem: `${name}: no measured round trip at requested ${rttMs} ms` });
       yield* Console.log(`${name} ${measured[0]}`);
-      if (run.exitCode !== 0) return yield* new NetFailure({ problem: `${name}: standalone exited ${run.exitCode}: ${run.stderr.trim()}` });
+      if (run.exitCode !== 0) return yield* new NetAcceptFailure({ problem: `${name}: standalone exited ${run.exitCode}: ${run.stderr.trim()}` });
       const measuredRttMs = Number(measured[1]);
       return { side: name, rttMs, loss: options.loss, measuredRttMs, exitCode: run.exitCode, display: decodeDisplay(yield* Effect.promise(() => Bun.file(join(out, "standalone.json")).text())) };
     });
