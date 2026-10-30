@@ -246,7 +246,7 @@ smashcraft:tools/animations/). No audio is copied into the repository.
 | Effort grunts | AnimSounds | 9 `*Effort*` labels | Voice on smashes: Crypt Lord, Lich, Beastmaster, Brewmaster, Warden, goblin. |
 | Missile launch and hit | AnimSounds | about 58 launch, 55 hit | Projectile specials' perform and hit. |
 | Spell cast and target | AnimSounds, AbilitySounds | about 150 | Specials' signature sounds: Storm Bolt, Thunder Clap, Impale, Blink, Fan of Knives, Mirror Image, Wind Walk, Rain of Fire, Banish. |
-| Footsteps, bodyfall, water steps | AnimSounds | 15 | Already used for movement (#82); water steps for Murloc's Tidal Rush. |
+| Footsteps, bodyfall, water steps | AnimSounds | 15 | Already used for movement (#82); water steps for Murloc's Belly Slide. |
 | Deaths | AnimSounds | 283 | Hurt cries come from the models' own Death sequence ([hurtVoice.ts](../../ts/src/game/presentation/hurtVoice.ts)). |
 | Unit voices | UnitAckSounds | 1,452 | What 354, Yes 254, YesAttack 240, Ready 226, Pissed 203, Warcry 175. Ready and Warcry already play at selection and results; Warcry is the signature-special voice. |
 | Interface and cinematic | UISounds, AmbienceSounds | about 300 | Match cues (#361), not moves. |

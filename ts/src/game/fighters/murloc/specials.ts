@@ -14,10 +14,11 @@ const ensnare = (air: boolean): AuthoredSpecial => ({
     life: 40, radius: 18.0, effect: murlocHit(4.995458602905273, 35, 45.10895538330078, 16.0), reflectable: true, limit: 1, status: CHILL,
   }],
 });
-const tidalRush = (air: boolean): AuthoredSpecial => ({
+export const BELLY_SLIDE = { damage: 5.0, speed: 11.0, firstFrame: 8, lastFrame: 22 } as const;
+const bellySlide = (air: boolean): AuthoredSpecial => ({
   endFrame: 32, landingLag: air ? 20 : undefined,
-  motion: [{ ...frames(8, 22), velocityX: 11.0, velocityZ: 0.0, stopsAtShield: true }],
-  regions: [heroRegion(8, 22, { x1: 10.0, z1: 22.0, x2: 46.0, z2: 22.0, radius: 18.0 }, murlocHit(9.990917205810547, 40, 72.17433166503906, 22.0))],
+  motion: [{ ...frames(BELLY_SLIDE.firstFrame, BELLY_SLIDE.lastFrame), velocityX: BELLY_SLIDE.speed, velocityZ: 0.0, stopsAtShield: true }],
+  regions: [heroRegion(BELLY_SLIDE.firstFrame, BELLY_SLIDE.lastFrame, { x1: 10.0, z1: 22.0, x2: 46.0, z2: 22.0, radius: 18.0 }, murlocHit(BELLY_SLIDE.damage, 40, 72.17433166503906, 22.0))],
 });
 const tideSpout = (speed: number, drift: number): AuthoredSpecial => ({
   endFrame: 34, oncePerAirtime: true, helpless: true, facesStick: true,
@@ -39,7 +40,7 @@ const DISEASE_CLOUD: AuthoredSpecial = {
 
 export const MURLOC_SPECIALS: FighterSpecials = {
   neutral: { name: "Ensnare", description: "Throw a net that slows the first enemy it reaches. Shield it or jump it.", ground: ensnare(false), air: ensnare(true) },
-  side: { name: "Tidal Rush", description: "Belly-slide forward into a hit. A raised shield stops the slide.", ground: tidalRush(false), air: tidalRush(true) },
+  side: { name: "Belly Slide", description: "Belly-slide forward into a hit, and Grgl follows five frames later. A raised shield stops the slide.", ground: bellySlide(false), air: bellySlide(true) },
   up: { name: "Tide Spout", description: "Ride a water spout upward and steer it, then fall helpless.", ground: tideSpout(17.0, 6.0) },
   down: { name: "Disease Cloud", description: "Leave a small plague cloud that poisons enemies standing in it; jumping clears it.", ground: DISEASE_CLOUD, air: { ...DISEASE_CLOUD, groundOnly: false, landingLag: 20,
     projectiles: DISEASE_CLOUD.projectiles?.map(shot => ({ model: shot.model, spawnFrame: shot.spawnFrame,

@@ -295,7 +295,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.murloc]: {
     neutral: { spell: "Ensnare", startup: MURGUL, active: cue("Abilities\\Spells\\Orc\\Ensnare\\EnsnareTarget.mdx", "hand", 0.75) },
-    side: { spell: "Tidal Rush", startup: MURGUL, active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
+    side: { spell: "Belly Slide", startup: MURGUL, active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
     up: { spell: "Tide Spout", startup: MURGUL, active: timed(cue("Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdx", "feet", 1.0), "birth", 0.0) },
     down: { spell: "Disease Cloud", startup: MURGUL, active: cue(MURLOC_SWAMP_MIST_MODEL, "feet", 0.75) },
   },

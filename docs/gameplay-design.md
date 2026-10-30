@@ -1051,7 +1051,7 @@ One rule for every fighter's four specials
 | Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Ascension of the Damned, Far Sight, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
 | Cairne | side: Bloodhoof Gore (rush); up: Spirit Lift (recovery) |
 | Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
-| Murloc | side: Tidal Rush (rush); up: Tide Spout (recovery) |
+| Murloc | side: Belly Slide (rush); up: Tide Spout (recovery) |
 | Grom | side: Gorehowl Rush (rush); up: Blood Leap (recovery) |
 | Anub'arak | side: Burrow Hunt (rush); up: Crypt Eruption (recovery) |
 | Malfurion | side: Stag Charge (rush); up: Dream Ascent (recovery) |

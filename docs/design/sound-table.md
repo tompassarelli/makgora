@@ -244,7 +244,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalMediumChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalLightChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalLightChopMetal |  |
 | Neutral special: Ensnare | EnsnareMissile | Ensnare | Ensnare + CrushingWaveDamage | MetalLightChopMetal |  |
-| Side special: Tidal Rush | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
+| Side special: Belly Slide | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Up special: Tide Spout | CrushingWave | WaterElementalMissile | WaterElementalMissile + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Down special: Disease Cloud | Parasite | PoisonArrowHit | PoisonArrowHit + CrushingWaveDamage | MetalLightChopMetal |  |
 
