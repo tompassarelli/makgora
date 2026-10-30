@@ -1546,3 +1546,21 @@ retained fighters against their source and clip hashes. Store that pool with
 `bun wisp inputs add original-clips-static-lights PRIVATE_POOL --all`, then run
 `bun wisp view motion --assets PRIVATE_ASSETS` from `ts/` for the assembled roster.
 Native launches remain a separate playtest.
+
+## Mal'Ganis short hop and full hop — 2026-10-30
+
+Tom's playtest called both hops badly animated. The old hop drew one fixed 24-frame tuck (`Jump Motion jump`, 0.4 s) for both:
+his short hop is 19 frames airborne (10 rising, 9 falling) and his full hop 33 (16 and 17), after a 3-frame jump squat, so the
+short hop's clip ended early in the fall and the full hop's clip ended 9 airborne frames before the landing, where the pose
+popped to the stock Stand Ready with wings and legs stiff (`off clip` 9). The tuck never moved the wings, held one silhouette
+through rise, apex and fall, and began 0.178 body heights from the squat's last frame (2.25 times the squat's own sharpest
+step, 0.079). Recorded: `hops` in `bun wisp anim score --fighter dreadlord` (smashcraft:docs/animation-scorecard.md).
+
+`tools/animations/hop-clips.ts` authors `Jump Motion shortHop` (19 frames) and `Jump Motion fullHop` (33) on his Classic
+rig, one clip per airtime. The first four frames ease from the jump squat's own last pose into the push (legs drive straight,
+chest opens, wings cocked then driven down), the wings lift to a raised-wing apex, flare as a brake through the fall and
+settle to his stand pose by the landing. Production plays the clip for the held or released jump key through the landing
+(`advanceJumpClip`); the old `jump` clip, his wing-beat double jump and every other clip draw identically (the generator
+checks 70 unrelated sequences). Hop rows after: short hop pop 1.08, full hop 0.83, off clip 0, mid-rise to mid-fall
+difference 0.126 and 0.129 body heights. Take 1 failed the pop line (0.178: the clip began from the idle pose, not the
+squat's); take 2 blends from the squat's last pose.

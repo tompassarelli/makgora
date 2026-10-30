@@ -76,7 +76,7 @@ export type HeroPose =
   | "neutralAir" | "forwardAir" | "backAir" | "upAir" | "downAir" | "getUpAttack"
   | "ledgeHang" | "ledgeClimb" | "ledgeRoll" | "ledgeAttack"
   | "knockdown" | "getUp" | "downDamage" | "rollForward" | "rollBackward" | "spotDodge"
-  | "jump" | "doubleJump" | "fallSpecial" | "specialFloat"
+  | "jump" | "shortHop" | "fullHop" | "doubleJump" | "fallSpecial" | "specialFloat"
 
   | "wallJump" | "wallTech"
   | "damageGround" | "damageAir" | "damageTumble" | "damageShield"

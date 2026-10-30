@@ -62,6 +62,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   fighter's double jump in the style smashcraft:docs/design/animation-reference.md picks (Blademaster keeps his #230 flip) and retains other jump bindings; `--no-preview`
   skips silhouette sheets. Store the changed model family and refresh both body
   timelines and clip metadata before using the generated bindings.
+  `bun tools/animations/hop-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Mal'Ganis's short-hop and full-hop clips
+  (`Jump Motion shortHop`, `Jump Motion fullHop`) on his Classic rig, each as long as the hop's measured airtime
+  in frames (`HOPS`: 19 and 33, from `sampleHop`): a coil released into a wing down-stroke and leg drive at takeoff, a raised-wing apex, and a
+  wing-braked fall that settles to his stand pose at landing. It appends them, or re-keys them in place on a rerun, keeps every other
+  clip identical (his old `jump` and his wing-beat double jump included) and writes the generated
+  smashcraft:ts/src/game/presentation/hopClipInfo.ts; then store the family and run `bun wisp inputs derive --fighter dreadlord`.
+  Production plays the clip for the hop's held or released jump button through the landing (`advanceJumpClip`).
   `bun tools/animations/tumble-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors the
   tumble (Melee's DamageFall, played once hitstun ends while still airborne) for
   Blademaster, Mountain King, Lich, Shadow Hunter, Pit Lord and Beastmaster, whose

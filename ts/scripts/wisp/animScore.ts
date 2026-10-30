@@ -235,6 +235,29 @@ export function scoreDoubleJump(stand: ScoreFrame, first: readonly ScoreFrame[],
 }
 
 
+export const HOP_THRESHOLDS = { offClip: 0, pop: 1.25, phases: 0.03 } as const;
+
+export interface HopScore { readonly pass: boolean; readonly offClip: number; readonly pop: number; readonly phases: number }
+
+export function scoreHop(stand: ScoreFrame, frames: readonly ScoreFrame[], clips: readonly string[], squatFrames: number, airFrames: number): HopScore {
+  const height = bodyHeight(stand), takeoff = squatFrames, landing = squatFrames + airFrames;
+  const airClip = clips[takeoff];
+  const step = (frame: number) => {
+    const a = frames[frame - 1], b = frames[frame];
+    return a === undefined || b === undefined ? 0 : meanVertexDistance(a, b) / height;
+  };
+  let offClip = 0, squat = 0, hop = 0;
+  for (let frame = takeoff; frame < landing; frame++) if (clips[frame] !== airClip) offClip++;
+  for (let frame = 1; frame < takeoff; frame++) squat = Math.max(squat, step(frame));
+  for (let frame = takeoff; frame <= landing && frame < frames.length; frame++) hop = Math.max(hop, step(frame));
+  const pop = squat === 0 ? Infinity : hop / squat;
+  const rise = frames[takeoff + Math.floor(airFrames / 4)], fall = frames[takeoff + Math.floor(airFrames * 3 / 4)];
+  const phases = rise === undefined || fall === undefined ? 0 : meanVertexDistance(rise, fall) / height;
+  const t = HOP_THRESHOLDS;
+  return { pass: offClip <= t.offClip && pop <= t.pop && phases >= t.phases, offClip, pop, phases };
+}
+
+
 export function meanVertexDistance(a: ScoreFrame, b: ScoreFrame): number {
   let sum = 0, count = 0;
   const vertices = Math.min(a.drawn.length, b.drawn.length);

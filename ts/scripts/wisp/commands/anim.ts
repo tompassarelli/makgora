@@ -21,8 +21,8 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/ga
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
-import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, type ScoreFrame, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
-import { type CrouchClipKind, type SampledCue, type SampledMove, SCORED_NORMALS, SCORED_SPECIALS, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
+import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, HOP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, type ScoreFrame, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreHop, scoreLedgeHang, scoreMove } from "../animScore";
+import { type CrouchClipKind, type SampledCue, type SampledMove, SCORED_NORMALS, SCORED_SPECIALS, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleHop, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { CAMERA_LIFT, heldOffset, judgeCamera, judgeCrop, judgeFacing, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, JUMP_LINES, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGE_LINES, clipIdentity, judgePanel, judgedLine, judgementKey, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
@@ -245,6 +245,20 @@ const score: Command = (args) => Effect.gen(function*() {
     for (const row of jumps) yield* Console.log(`${row.fighter.padEnd(22)} ${mark(row.pass).padEnd(5)} ${row.firstClip.padEnd(22)} -> ${row.secondClip.padEnd(24)} angle ${n(row.angle).padStart(6)} contrast ${n3(row.contrast)} segments ${row.segments}`);
     yield* Console.log(`${jumps.filter((row) => row.pass).length}/${jumps.length} pass (${line.title}); ${jumpTable}`);
   }
+
+  const hops = yield* Effect.forEach(fighters, (character) => attempt(`hops ${fighterSlug(character)}`, async () => {
+    const body = await loadBody(assets, character);
+    return (["short", "full"] as const).map((kind) => {
+      const sample = sampleHop(body, character, kind);
+      return { fighter: fighterSlug(character), kind, squat: sample.squatFrames, rise: sample.riseFrames, air: sample.airFrames, clip: sample.clips[sample.squatFrames] ?? "none", ...scoreHop(sample.stand, sample.frames, sample.clips, sample.squatFrames, sample.airFrames) };
+    });
+  }));
+  const hopRows = hops.flat();
+  const hopTable = yield* movementTable("hop", "fighter\thop\tpass\tsquat\trise\tair\tclip\toff clip\tpop\tphases", hopRows.map((row) => [row.fighter, row.kind, mark(row.pass), row.squat, row.rise, row.air, row.clip, row.offClip, n3(row.pop), n3(row.phases)].join("\t")));
+  const h = HOP_THRESHOLDS;
+  yield* Console.log(`\nhops (short hop and full hop from the ground, by airtime in frames: every airborne frame on one clip (off clip <= ${h.offClip}), largest one-frame mesh change from takeoff to landing <= ${h.pop} times the jump squat's own sharpest step (pop), mid-rise against mid-fall pose difference >= ${h.phases} body heights (phases)):`);
+  for (const row of hopRows) yield* Console.log(`${row.fighter.padEnd(22)} ${row.kind.padEnd(5)} ${mark(row.pass).padEnd(5)} squat ${row.squat} rise ${row.rise} air ${row.air} clip ${row.clip.padEnd(24)} off clip ${row.offClip} pop ${n3(row.pop)} phases ${n3(row.phases)}`);
+  yield* Console.log(`${hopRows.filter((row) => row.pass).length}/${hopRows.length} hops pass; ${hopTable}`);
 }).pipe(Effect.provide(BunServices.layer));
 
 

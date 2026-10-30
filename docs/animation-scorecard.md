@@ -120,6 +120,20 @@ from ledge hang as its own line: the fighter hangs on the right ledge of stage
 0 for 30 frames, jumps off it, and the midair jump's rise is compared with the
 ledge jump's rise on the same columns and thresholds.
 
+`build/anim-score/LOOK-hop.tsv` scores each fighter's short hop and full hop from the
+ground (the jump key pressed and released on the first frame, or held), sampled from the
+press through the landing and 12 settled frames. `squat`, `rise` and `air` are the
+simulation's own frames (the jump squat, the frames still rising, and the frames airborne),
+so a clip's length can be read against them. A hop passes when every airborne frame is
+drawn by one clip (`off clip` 0: a stock stand pose drawn for part of the fall fails), the
+largest one-frame mean drawn-vertex change from the first airborne frame through the landing
+frame is at most 1.25 times the sharpest one-frame change inside the fighter's own jump squat (`pop`: no
+step in the hop is sharper than the squat's own compression), and the mid-rise and mid-fall
+poses differ by at least 0.03 body heights (`phases`). The cold reader on the Classic motion
+strips of `jump-squat`, `short-hop` and `full-hop` (`--move FIGHTER:MOVE`, strip frames
+at the far camera's scale) stays the bar. The thresholds are first values calibrated on
+Mal'Ganis's old hop (pop 2.25, a stock stand pose in the fall) and new hop (pop 0.84 to 1.09) (2026-10-30) and are Tom's to tune.
+
 The silhouette centre is a visible mass proxy, rather than a physical
 mass-weighted centre. Missing limb names use body travel; the stored `limb`
 column makes this inspectable. The independent weight judgement catches
@@ -142,7 +156,7 @@ margin, never enlarged. The camera holds
 still at the middle of the move's height range, as a match camera does, so a
 drop or rise shows in the tiles; it follows only travel that would put the body
 more than 50 pixels from that height, so flight does not crop the body
-out of its strip; a movement strip (crouch, ledge hang, double jump)
+out of its strip; a movement strip (crouch, ledge hang, double jump, jump squat, short hop, full hop)
 keeps the widest framing and instead holds the camera on the drawn floor and grows upward so a jump shows
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record

@@ -1,9 +1,9 @@
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../src/game/sim/ledge";
 import type { Character } from "../../src/game/sim/codes";
-import { type CrouchSample, type JumpSample, type LedgeSample, sampleCrouch, sampleJumps, sampleLedgeHang } from "./animScoreSample";
+import { type CrouchSample, type HopSample, type JumpSample, type LedgeSample, sampleCrouch, sampleHop, sampleJumps, sampleLedgeHang } from "./animScoreSample";
 import type { DrawnModel } from "./drawnModel";
 
-export const MOVEMENT_MOVES = ["crouch", "ledge-hang", "double-jump"] as const;
+export const MOVEMENT_MOVES = ["crouch", "ledge-hang", "double-jump", "jump-squat", "short-hop", "full-hop"] as const;
 export type MovementMove = (typeof MOVEMENT_MOVES)[number];
 
 export const isMovementMove = (move: string): move is MovementMove => (MOVEMENT_MOVES as readonly string[]).includes(move);
@@ -18,7 +18,19 @@ export const crouchFrames = (sample: CrouchSample) => grounded([sample.standSeco
 export const ledgeFrames = (sample: LedgeSample) => grounded(spread(sample.hangSeconds, 4));
 export const doubleJumpFrames = (sample: JumpSample): MovementFrames => ({ seconds: spread(sample.secondSeconds, 6), heights: spread(sample.secondHeights, 6) });
 
+const HOP_STRIP_FRAMES = 8;
+const SQUAT_STRIP_AIR_FRAMES = 2;
+
+export const hopFrames = (sample: HopSample, from: number, to: number, count: number): MovementFrames => {
+  const at = spread(Array.from({ length: to - from + 1 }, (_, index) => from + index), count);
+  return { seconds: at.map((index) => sample.seconds[index] ?? 0), heights: at.map((index) => sample.heights[index] ?? 0) };
+};
+export const jumpSquatFrames = (sample: HopSample) => hopFrames(sample, 0, sample.squatFrames + SQUAT_STRIP_AIR_FRAMES - 1, sample.squatFrames + SQUAT_STRIP_AIR_FRAMES);
+export const hopStripFrames = (sample: HopSample) => hopFrames(sample, sample.squatFrames - 1, sample.squatFrames + sample.airFrames - 1, HOP_STRIP_FRAMES);
+
 export function movementFrames(move: MovementMove, model: DrawnModel, character: Character): MovementFrames {
+  if (move === "jump-squat") return jumpSquatFrames(sampleHop(model, character, "full"));
+  if (move === "short-hop" || move === "full-hop") return hopStripFrames(sampleHop(model, character, move === "short-hop" ? "short" : "full"));
   if (move === "crouch") return crouchFrames(sampleCrouch(model, character));
   if (move === "ledge-hang") return ledgeFrames(sampleLedgeHang(model, character));
   return doubleJumpFrames(sampleJumps(model, character));
@@ -52,6 +64,9 @@ export const MOVEMENT_EXPECTED: Readonly<Record<MovementMove, string>> = {
   "crouch": "a crouch: a visibly lower silhouette than standing, held",
   "ledge-hang": "a ledge hang: hands or weapon at the ledge, body below it, facing the stage",
   "double-jump": "a double jump in a named style, such as a twist or flip, distinct from the first jump",
+  "jump-squat": "a jump squat: the body compresses toward the floor, then pushes off it",
+  "short-hop": "a short hop: a crouch and push-off, a low rise, an apex and a fall to the floor",
+  "full-hop": "a full hop: a crouch and push-off, a high rise, an apex and a fall to the floor",
 };
 
 const COLD_READ_BATCH = 9;

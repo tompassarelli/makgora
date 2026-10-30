@@ -149,6 +149,7 @@ Stock attack and cast sequences: "Spell", "Spell Slam", "Attack - 1", "Attack - 
 | Grab, pummel, throws | grab: paired grab grab; pummel: paired grab pummel; f-throw: paired grab throwforward; b-throw: paired grab throwback; u-throw: paired grab throwup; d-throw: paired grab throwdown | Keep: paired holder and victim gestures meet on a contact frame; no stock sequence holds a victim |
 | Get-up, ledge attacks | get-up: recovery getupattack; ledge: recovery ledgeattack | Keep: they start lying down or hanging; no stock sequence does |
 | Specials | N: spell (stock); N air: spell (stock); S: attack - 2 (stock); S air: attack - 2 (stock); U: stand - 2 (stock); U air: stand - 2 (stock); D: spell (stock); D air: spell (stock) | Already stock |
+| Short hop, full hop | shortHop, fullHop: hop clips authored on his Classic rig (`tools/animations/hop-clips.ts`) | Keep: the stock "Stand - 2" wing stretch the old hop tucked on is a ground sequence with no rise, apex or fall; each hop clip is as long as its airtime |
 
 ### Shadow Hunter
 

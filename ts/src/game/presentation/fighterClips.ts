@@ -14,6 +14,7 @@ import * as assets from "./fighterAssetInfo";
 import { RECOVERY_CLIPS } from "./recoveryClipInfo";
 import { DRILL_CLIPS } from "./drillClipInfo";
 import { DOWN_AIR_CLIPS } from "./downAirClipInfo";
+import { HOP_CLIPS } from "./hopClipInfo";
 import { JUMP_CLIPS } from "./jumpClipInfo";
 import { MOVEMENT_CLIPS } from "./movementClipInfo";
 import { TUMBLE_CLIPS } from "./tumbleClipInfo";
@@ -159,7 +160,7 @@ function recoveryTables(): Readonly<Record<number, HeroClipTable>> {
     const id = Number(character);
     tables[id] = { ...(ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...recovery, ...drills[id] };
   }
-  for (const layer of [GRAB_CLIPS, DOWN_AIR_CLIPS, JUMP_CLIPS, MOVEMENT_CLIPS, ROSTER_ATTACK_CLIPS]) overlay(tables, layer);
+  for (const layer of [GRAB_CLIPS, DOWN_AIR_CLIPS, JUMP_CLIPS, HOP_CLIPS, MOVEMENT_CLIPS, ROSTER_ATTACK_CLIPS]) overlay(tables, layer);
   tables[Character.blademaster] = { ...tables[Character.blademaster], ...BLADEMASTER_AUTHORED_CLIPS };
   tables[Character.shadowHunter] = { ...tables[Character.shadowHunter], ...SHADOW_HUNTER_AUTHORED_CLIPS };
   overlay(tables, TUMBLE_CLIPS);

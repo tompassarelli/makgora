@@ -190,6 +190,19 @@ export function advanceFighterPose(
   pose.rate = fighter.launch.hitlag > 0 || charging || stopped ? 0.0 : rate;
 }
 
+const hopPose = (f: Readonly<Fighter>): HeroPose => {
+  const table = clips.characterClips(f.character);
+  return table.fullHop !== undefined && table.shortHop !== undefined ? f.jump.held ? "fullHop" : "shortHop" : "jump";
+};
+const jumpPose = (pose: Readonly<FighterPose>, f: Readonly<Fighter>): HeroPose => pose.doubleJumpAnimation ? "doubleJump" : hopPose(f);
+const HOP_FALL_SLACK_FRAMES = 6;
+
+const hopClipFrames = (f: Readonly<Fighter>): number => {
+  const pose = hopPose(f);
+  return pose === "jump" ? JUMP_CLIP_FRAMES : Math.round(clips.clipFor(f.character, pose).seconds / FRAME_SECONDS);
+};
+const hopFrames = (f: Readonly<Fighter>): number => hopPose(f) === "jump" ? JUMP_CLIP_FRAMES : hopClipFrames(f) + HOP_FALL_SLACK_FRAMES;
+
 function advanceJumpClip(pose: FighterPose, f: Readonly<Fighter>, phase: AttackPhase, wasOut: boolean, jumped: boolean): void {
   const busy = f.motion.grounded || f.launch.hitstun > 0 || f.dodge.airDodging || phase !== AttackPhase.none
     || f.special.action !== SpecialAction.none || f.down.state !== DownState.none
@@ -197,7 +210,7 @@ function advanceJumpClip(pose: FighterPose, f: Readonly<Fighter>, phase: AttackP
   if (busy) pose.jumpAnimationRemaining = 0;
   else if (jumped && !wasOut) {
     pose.doubleJumpAnimation = f.jump.isDouble;
-    pose.jumpAnimationRemaining = pose.doubleJumpAnimation ? DOUBLE_JUMP_CLIP_FRAMES : JUMP_CLIP_FRAMES;
+    pose.jumpAnimationRemaining = pose.doubleJumpAnimation ? DOUBLE_JUMP_CLIP_FRAMES : hopFrames(f);
     pose.animation = "";
   } else if (pose.jumpAnimationRemaining > 0 && f.launch.hitlag <= 0) pose.jumpAnimationRemaining--;
 
@@ -337,7 +350,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   const stateRate = illidan ? selectIllidanAction(pose, f, charging) : selectTableAction(pose, f, table, charging);
   if (stateRate !== undefined) return stateRate;
   if (pose.jumpAnimationRemaining > 0) {
-    playIndex(pose, "jump", clips.clipFor(character, pose.doubleJumpAnimation ? "doubleJump" : "jump").index);
+    playIndex(pose, "jump", clips.clipFor(character, jumpPose(pose, f)).index);
     return rate;
   }
 
@@ -605,7 +618,7 @@ function actionRate(pose: Readonly<FighterPose>, f: Readonly<Fighter>, phase: At
   if (pose.jumpAnimationRemaining > 0) {
     return pose.doubleJumpAnimation
       ? clipRate(clips.clipFor(character, "doubleJump").seconds, DOUBLE_JUMP_CLIP_FRAMES)
-      : clipRate(clips.clipFor(character, "jump").seconds, JUMP_CLIP_FRAMES);
+      : clipRate(clips.clipFor(character, jumpPose(pose, f)).seconds, hopClipFrames(f));
   }
   return attackRate(f, phase);
 }
