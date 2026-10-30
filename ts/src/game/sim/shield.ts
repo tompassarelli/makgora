@@ -3,10 +3,14 @@
 
 import { max, min } from "../core/numbers";
 import { addFloat32, divideFloat32, fusedMultiplyAddFloat32, multiplyFloat32, roundToFloat32, subtractFloat32, toInt } from "wisp/src/sim/binary32";
-import { GroundAction, ParryBuffer, ShieldBreak } from "./codes";
+import { DownState, GroundAction, ParryBuffer, ShieldBreak } from "./codes";
+import { isGroundDodging } from "./conditions";
+import { DASH_GUARD_EARLY_FRAMES, groundOptionOpen } from "./groundMovement";
 import { type Fighter, SHIELD_MAX, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES } from "./fighter";
+import { observeActionDecision, observeActionStart } from "./observations";
 import { integerHitPower } from "./knockback";
-import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
+import { advanceShieldTilt, shieldCenterX, shieldCenterZ } from "./shieldTilt";
+import { GroundOption } from "./stickZones";
 import { AIR_RECOIL_DECAY, AIR_RECOIL_SQUARED_CUTOFF, decayedAirMotion, retainedOriginal, setMeleeRecoil } from "./motion";
 import type { Controls } from "./roster";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
@@ -313,4 +317,66 @@ export function shieldCircleIntersects(target: Fighter, oldX: number, oldZ: numb
 export function raiseShield(f: Fighter): void {
   f.shield.perfectActionFrames = 0;
   if (f.motion.grounded && f.ground.action === GroundAction.dash) f.motion.vx = 0.0;
+}
+
+const GUARD_BITS = 768;
+const LATE_DASH_GUARD_GRAB_WINDOW = 3;
+
+function guardCanStart(f: Fighter, input: Readonly<Controls>): boolean {
+  const { shield, motion } = f;
+  return (input.shield || input.shieldPressed) && (shield.raised || shield.energy > 0) && f.down.state === DownState.none
+    && f.launch.hitstun <= 0 && motion.grounded && !isGroundDodging(f) && shield.stun <= 0 && f.landing.lag <= 0
+    && shield.releaseLag <= 0 && f.attack.cooldown <= 0 && f.jump.squat <= 0
+    && (shield.raised || groundOptionOpen(f, GroundOption.shield));
+}
+
+function holdShield(f: Fighter, input: Readonly<Controls>, forcedShield: boolean, shieldCanStart: boolean): boolean {
+  const { shield } = f;
+  if (forcedShield) return true;
+  if (shield.raised && !input.shield && shield.heldFrames < SHIELD_MIN_HOLD_FRAMES) {
+    shield.heldFrames++;
+    return true;
+  }
+  if (shieldCanStart) {
+    shield.heldFrames++;
+    return true;
+  }
+  if (shield.raised && !input.shield) {
+    shield.releaseLag = shield.perfectActionFrames > 0 ? 0 : SHIELD_RELEASE_LAG_FRAMES;
+    shield.heldFrames = 0;
+  }
+  return false;
+}
+
+function pressShield(f: Fighter, input: Readonly<Controls>, forcedShield: boolean, wantsShield: boolean): void {
+  const { shield } = f;
+  const fullPress = wantsShield && input.shieldPressed && input.shieldStrength >= 1;
+  if (fullPress && !forcedShield && shield.triggerAge < SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES
+    && shield.heldFrames <= SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES) {
+    shield.reflectFrames = SHIELD_REFLECTOR_ACTIVE_FRAMES;
+    shield.perfectFrames = SHIELD_PERFECT_ACTIVE_FRAMES;
+  } else if (fullPress && forcedShield && !shield.redParryTried) {
+    shield.redParryTried = true;
+    shield.reflectFrames = SHIELD_RED_PARRY_FRAMES;
+    shield.perfectFrames = SHIELD_RED_PARRY_FRAMES;
+  }
+  if (wantsShield && input.shield && !forcedShield && !shield.drainResumePending) shield.strength = input.shieldStrength;
+}
+
+export function advanceGuard(f: Fighter, input: Readonly<Controls>, forcedShield: boolean): boolean {
+  const { shield, motion, ground } = f;
+  const shieldCanStart = guardCanStart(f, input);
+  if (shieldCanStart) observeActionDecision(GUARD_BITS);
+  const wantsShield = holdShield(f, input, forcedShield, shieldCanStart);
+  const lateDashGuardEntry = wantsShield && !shield.raised && motion.grounded
+    && (ground.action === GroundAction.run || (ground.action === GroundAction.dash && ground.actionFrame > DASH_GUARD_EARLY_FRAMES));
+  if (wantsShield && !shield.raised) raiseShield(f);
+  else if (wantsShield && !forcedShield && shield.perfectActionFrames > 0) shield.perfectActionFrames--;
+  else if (!wantsShield && shield.releaseLag <= 0) shield.perfectActionFrames = 0;
+  shield.raised = wantsShield;
+  advanceShieldTilt(f, input);
+  if (shieldCanStart && shield.raised) observeActionStart(GUARD_BITS);
+  pressShield(f, input, forcedShield, wantsShield);
+  if (lateDashGuardEntry) ground.dashGrabWindow = LATE_DASH_GUARD_GRAB_WINDOW;
+  return wantsShield;
 }

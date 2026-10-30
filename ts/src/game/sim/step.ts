@@ -5,7 +5,7 @@
 import { max, min } from "../core/numbers";
 import { divideFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, DownState, GroundAction, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
+import { Character, DownState, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
 import {
   SPOT_DODGE_FRAMES,
   GROUND_ROLL_FRAMES,
@@ -34,13 +34,11 @@ import {
   FAST_FALL_INPUT_WINDOW,
   type Fighter,
   PLATFORM_DROP_INPUT_WINDOW,
-  SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES,
   TURNAROUND_SPECIAL_WINDOW_FRAMES,
   WALL_JUMP_FLICK_FRAMES,
   WALL_TECH_JUMP_INPUT_WINDOW_FRAMES,
 } from "./fighter";
-import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
-import { GroundOption } from "./stickZones";
+import { advanceGroundMovement, clearDash, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
 import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
 import { heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps } from "./specials/heroMotion";
 import { tickEmpowered } from "./specials/empowered";
@@ -64,7 +62,6 @@ import {
   totalVelocityX,
   totalVelocityZ,
 } from "./motion";
-import { observeActionDecision, observeActionStart } from "./observations";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies, travelBeforeLedge } from "./travelStop";
@@ -72,11 +69,7 @@ import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, 
 import { beginCarryJump, carryThrowRequested, isCarrying, limitCarrySpeed, lowerCarryJump } from "./cargoCarry";
 import { moveTravelStep } from "./heroMoves";
 import {
-  SHIELD_MIN_HOLD_FRAMES,
-  SHIELD_PERFECT_ACTIVE_FRAMES,
-  SHIELD_REFLECTOR_ACTIVE_FRAMES,
-  SHIELD_RED_PARRY_FRAMES,
-  SHIELD_RELEASE_LAG_FRAMES,
+  advanceGuard,
   advanceShieldInputClocks,
   bufferParryOption,
   decayShieldMotion,
@@ -84,10 +77,8 @@ import {
   shieldDrain,
   shieldDrainShouldResume,
   clearPowershield,
-  raiseShield,
 } from "./shield";
 import { advanceShieldBreak, beginShieldBreak } from "./shieldBreak";
-import { advanceShieldTilt } from "./shieldTilt";
 import { applyAutomaticSmashDirectionalInfluence, applySmashDirectionalInfluence, discardPendingSmashDirectionalInfluence, renewSmashDirectionalInfluenceString } from "./smashDirectionalInfluence";
 import * as stageSurfaces from "./stage";
 
@@ -126,12 +117,6 @@ import {
   takeParryOption,
   tickHitlag,
 } from "./motionSteps";
-
-
-const LATE_DASH_GUARD_GRAB_WINDOW = 3;
-
-const GUARD_BITS = 768;
-
 
 function attackStartupTravel(world: Roster, slot: number, stage: number, matchFrame: number): number {
   const f = fighterAt(world, slot);
@@ -279,54 +264,6 @@ function advanceGroundDodge(f: Fighter, groundDodgeStarted: boolean): void {
     dodge.groundEntryFacing = 0;
     f.motion.vx = 0.0;
   }
-}
-
-
-function advanceGuard(f: Fighter, input: Readonly<Controls>, forcedShield: boolean): boolean {
-  const { shield, motion, ground } = f;
-  const shieldCanStart = (input.shield || input.shieldPressed) && (shield.raised || shield.energy > 0) && f.down.state === DownState.none
-    && f.launch.hitstun <= 0 && motion.grounded && !isGroundDodging(f) && shield.stun <= 0 && f.landing.lag <= 0
-    && shield.releaseLag <= 0 && f.attack.cooldown <= 0 && f.jump.squat <= 0
-    && (shield.raised || groundOptionOpen(f, GroundOption.shield));
-  if (shieldCanStart) observeActionDecision(GUARD_BITS);
-  let wantsShield = forcedShield;
-  if (!forcedShield) {
-    if (shield.raised && !input.shield && shield.heldFrames < SHIELD_MIN_HOLD_FRAMES) {
-      wantsShield = true;
-      shield.heldFrames++;
-    } else {
-      wantsShield = shieldCanStart;
-      if (wantsShield) {
-        shield.heldFrames++;
-      } else if (shield.raised && !input.shield) {
-
-        shield.releaseLag = shield.perfectActionFrames > 0 ? 0 : SHIELD_RELEASE_LAG_FRAMES;
-        shield.heldFrames = 0;
-      }
-    }
-  }
-  const lateDashGuardEntry = wantsShield && !shield.raised && motion.grounded
-    && (ground.action === GroundAction.run || (ground.action === GroundAction.dash && ground.actionFrame > DASH_GUARD_EARLY_FRAMES));
-  if (wantsShield && !shield.raised) raiseShield(f);
-  else if (wantsShield && !forcedShield && shield.perfectActionFrames > 0) shield.perfectActionFrames--;
-  else if (!wantsShield && shield.releaseLag <= 0) shield.perfectActionFrames = 0;
-  shield.raised = wantsShield;
-  advanceShieldTilt(f, input);
-  if (shieldCanStart && shield.raised) observeActionStart(GUARD_BITS);
-  const fullPress = wantsShield && input.shieldPressed && input.shieldStrength >= 1;
-  if (fullPress && !forcedShield && shield.triggerAge < SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES
-    && shield.heldFrames <= SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES) {
-    shield.reflectFrames = SHIELD_REFLECTOR_ACTIVE_FRAMES;
-    shield.perfectFrames = SHIELD_PERFECT_ACTIVE_FRAMES;
-  } else if (fullPress && forcedShield && !shield.redParryTried) {
-
-    shield.redParryTried = true;
-    shield.reflectFrames = SHIELD_RED_PARRY_FRAMES;
-    shield.perfectFrames = SHIELD_RED_PARRY_FRAMES;
-  }
-  if (wantsShield && input.shield && !forcedShield && !shield.drainResumePending) shield.strength = input.shieldStrength;
-  if (lateDashGuardEntry) ground.dashGrabWindow = LATE_DASH_GUARD_GRAB_WINDOW;
-  return wantsShield;
 }
 
 
