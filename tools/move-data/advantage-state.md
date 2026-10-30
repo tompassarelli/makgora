@@ -336,17 +336,17 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Kael'thas Sunstrider | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas Sunstrider | heavy | up throw | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out short hop, forward air | 2/1 in up smash, out forward smash | 1/1 in dash, dash attack, out short hop, forward air |
 | Kael'thas Sunstrider | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
-| Murlocs | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Murlocs | light | forward throw | 0/0 | 1/0 | 1/0 | 0/0 KD |
 | Murlocs | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Murlocs | light | up throw | 1/1 in short hop, up air, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air |
 | Murlocs | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murlocs | medium | forward throw | 0/0 | 1/0 | 0/0 KD | 0/0 KD |
-| Murlocs | medium | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murlocs | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 in up smash, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack |
+| Murlocs | medium | forward throw | 0/0 | 1/0 | 1/1 | 0/0 KD |
+| Murlocs | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Murlocs | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out dash, dash attack |
 | Murlocs | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murlocs | heavy | forward throw | 0/0 | 1/1 | 0/0 KD | 0/0 KD |
+| Murlocs | heavy | forward throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
 | Murlocs | heavy | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Murlocs | heavy | up throw | 1/1 in short hop, up air, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 in up smash, out short hop, forward air |
+| Murlocs | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 KD in up smash, out down smash | 1/1 in up smash, out short hop, forward air |
 | Murlocs | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
