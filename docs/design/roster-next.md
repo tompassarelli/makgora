@@ -278,7 +278,7 @@ Provisional body: weight 118, the tallest capsule, slow run, low air speed.
 - Forward air: a downward claw arc (14/3/28; 13%).
 - Back air: a tail lash, his strongest aerial (12/3/28; 15%).
 - Up air: an overhead clap (9/4/24; 11%).
-- Down air: a stomp with a meteor on the clean hit (18/4/32; 14%).
+- Down air: a stomp with a meteor on the clean hit (16/4/30; 14%).
 
 **Grabs:** a long-reaching claw grab, with recovery five frames longer than
 the shared value. The pummel is a crushing grip. Forward throw: a fel blast

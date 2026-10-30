@@ -2064,3 +2064,7 @@ Expert gameplan: Choose and execute blink/raven movement, aerial routes and spel
 
 Neutral air, split by timing: strong hit clean, frames 8-9, 6%; weak hit late, frames 10-13, 4.2%. An arcane ring strongest as it forms, lingering as weak cover.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
+
+## Archimonde the Defiler (#664)
+
+Down air: first active frame 18 to 16, so 16/4/30 (was 18/4/32); damage, angles, hit regions and the 26-frame landing lag are unchanged. At 18 a short hop pressed on frame 2 or 3 after takeoff (20 airborne frames) landed before the first active frame, so the shared short-hop down-air check in `ts/src/game/sim/shortHopAerials.tests.ts` failed for him in both facings (#762). The two hit regions and the hurtbox pose move two frames earlier with it; 17/4/31 still missed on press 3.

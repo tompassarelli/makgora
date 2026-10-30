@@ -50,7 +50,7 @@ export const ARCHIMONDE_MOVES: FighterMoves = {
       [AttackStyle.forwardSmash]: reach(18, 26, 140.0, 70.0), [AttackStyle.upSmash]: reach(16, 25, 20.0, 260.0),
       [AttackStyle.downSmash]: reach(15, 23, 120.0, 30.0), [AttackStyle.neutralAir]: reach(7, 15, 70.0, 110.0, 30.0),
       [AttackStyle.forwardAir]: reach(12, 18, 120.0, 100.0), [AttackStyle.backAir]: reach(10, 16, -140.0, 85.0, 20.0),
-      [AttackStyle.upAir]: reach(7, 14, 20.0, 240.0), [AttackStyle.downAir]: reach(16, 22, 20.0, -10.0, 22.0),
+      [AttackStyle.upAir]: reach(7, 14, 20.0, 240.0), [AttackStyle.downAir]: reach(14, 20, 20.0, -10.0, 22.0),
       [AttackStyle.grab]: reach(7, 12, 130.0, 125.0),
     },
   },
@@ -74,9 +74,9 @@ export const ARCHIMONDE_MOVES: FighterMoves = {
     [AttackStyle.forwardAir]: heroMove(14, 3, 28, 22, FORWARD_AIR),
     [AttackStyle.backAir]: heroMove(12, 3, 28, 20, [heroRegion(12, 14, capsule(-40.0, 92.0, -159.0, 80.0, 56.0), hit(15.0, "KILL", 35, -1.0, HitElement.normal))]),
     [AttackStyle.upAir]: heroMove(9, 4, 24, 16, [heroRegion(9, 12, capsule(-70.0, 215.0, 70.0, 215.0, 57.0), hit(11.0, "LAUNCH", 85, 1.0, HitElement.normal))]),
-    [AttackStyle.downAir]: heroMove(18, 4, 32, 26, [
-      heroRegion(18, 19, capsule(0.0, 45.0, 10.0, -1.0, 65.0), hit(14.0, "SPIKE", 270, 1.0, HitElement.normal), hit(14.0, "LAUNCH", 55, 1.0, HitElement.normal)),
-      heroRegion(20, 21, capsule(0.0, 45.0, 10.0, 3.0, 55.0), hit(10.0, "POKE", 70, 1.0, HitElement.normal)),
+    [AttackStyle.downAir]: heroMove(16, 4, 30, 26, [
+      heroRegion(16, 17, capsule(0.0, 45.0, 10.0, -1.0, 65.0), hit(14.0, "SPIKE", 270, 1.0, HitElement.normal), hit(14.0, "LAUNCH", 55, 1.0, HitElement.normal)),
+      heroRegion(18, 19, capsule(0.0, 45.0, 10.0, 3.0, 55.0), hit(10.0, "POKE", 70, 1.0, HitElement.normal)),
     ]),
     [AttackStyle.grab]: heroMove(9, 2, 34, 0, [heroRegion(9, 10, capsule(30.0, 130.0, 150.0, 122.0, 15.0), { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false })]),
     [AttackStyle.getupAttack]: heroMove(17, 3, 30, 0, [heroRegion(17, 19, capsule(-120.0, 22.0, 120.0, 22.0, 22.0), hit(8.0, "POKE", 35))]),
