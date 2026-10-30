@@ -43,7 +43,6 @@ test("Each client draws one hand per connected human at the last synced position
         assertEquals(hand?.slot, slot);
         assertEquals(hand?.pose.state, expected.state);
         assertEquals(hand?.pose.chip, expected.chip);
-        assertEquals(hand?.badge, `P${slot + 1}`);
         assertEquals(hand?.colour, BADGE_COLOURS[slot]);
         assertEquals(hand?.colour, slotColor(slot).rgb);
         const tolerance = slot === local ? 0.0 : POSITION_STEP;

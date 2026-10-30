@@ -16,11 +16,8 @@ export interface HandPose {
 export interface DrawnHand {
   readonly slot: number;
   readonly pose: HandPose & { readonly state: HandState };
-  readonly badge: string;
   readonly colour: number;
 }
-
-export const handBadge = (slot: number): string => `P${slot + 1}`;
 
 export const HIDDEN_HAND: HandPose = { state: undefined, chip: undefined, x: 0.0, y: 0.0 };
 
@@ -103,7 +100,7 @@ export class SelectionHands {
       const glide = this.glides[slot];
       const pose = slot === this.localSlot ? local : glide === undefined ? HIDDEN_HAND : glideAt(glide, now);
       if (pose.state === undefined || !humanPresent(game, slot)) continue;
-      hands.push({ slot, pose: { ...pose, state: pose.state }, badge: handBadge(slot), colour: slotColor(slot).rgb });
+      hands.push({ slot, pose: { ...pose, state: pose.state }, colour: slotColor(slot).rgb });
     }
     return hands;
   }

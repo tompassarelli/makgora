@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
-import { bullseyeLeft, bullseyeSize, bullseyeTop, carriedChipLeft, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor, readyChipSize } from "./selectionDrag";
+import { bullseyeLeft, bullseyeSize, bullseyeTop, carriedChipLeft, carriedChipSize, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
 
 test("The select cursor is the default hand off the tiles, the fanned hand over a tile with no chip, and the pinch with a chip, and the stock cursor shows only where no hand is drawn [k2 property]", () => {
@@ -92,15 +92,15 @@ test("Every hand state keeps its hotspot inside the hand frame and moves the fra
   }
 });
 
-test("A carried chip stays centred on the pinch with its top rim inside the pinch hand's frame and no wider than the gauntlet [k2 property]", () => {
+test("A carried chip is centred on the pinch point and narrower than the gauntlet [k2 property]", () => {
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
     const size = handSize(grid);
-    const chip = readyChipSize(grid);
+    const chip = carriedChipSize(grid);
     const x = f32(0.4);
     const y = f32(0.3);
     assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - x) < f32(0.00001));
-    assertTrue(carriedChipTop(y, chip) < handTop(y, "pinch", size) && carriedChipTop(y, chip) > y);
+    assertTrue(Math.abs(carriedChipTop(y, chip) - chip / 2 - y) < f32(0.00001));
     assertTrue(chip < size * HAND_ART_COLUMNS / HAND_TEXELS);
   }
 });
