@@ -223,6 +223,7 @@ export function onKeyDown(s: ShellState): void {
   const slot = triggerSlot();
   const key = GetHandleId(BlzGetTriggerPlayerKey());
   if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyDownEvent(s.localKeys, key, activeRollback(s) !== undefined && s.game.phase === Phase.match && !s.session.paused);
+  if (slot !== undefined && key === Key.f10) views(s).selections[slot].wakeStockCursor();
   if (key === NATIVE_PREFLIGHT_KEY.code) {
     if (slot === localSlot()) writeLines(INPUT_PREFLIGHT_FILE, [inputPreflightLine(s.build.id)]);
     return;

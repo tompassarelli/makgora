@@ -198,6 +198,11 @@ export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holding
   stock: warcraftMenuOpen || (cursorAllowed && !cursorDrawn),
 });
 
+// F10 wakes Warcraft's cursor from the key event itself, since a single-player Game Menu stops the map's timers and no update runs until it closes; the wake holds until the menu's frames are seen or this many updates pass.
+export const GAME_MENU_WAKE_UPDATES = 30;
+
+export const gameMenuWake = (updatesLeft: number, warcraftMenuOpen: boolean): number => warcraftMenuOpen ? 0 : Math.max(0, updatesLeft - 1);
+
 // Melee holds its token at the pinch with the fingers over its lower part: the token's visible disc is about 0.82 of the glove's width (51 px against 62 in Tom's reference), and the chip texture's disc is 232 of its 256 texels while the gauntlet is 202 of the hand's 256.
 export const CARRIED_CHIP_HAND_SHARE = f32(0.71);
 

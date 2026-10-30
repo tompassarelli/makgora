@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
-import { bullseyeLeft, bullseyeSize, bullseyeTop, carriedChipLeft, carriedChipSize, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
+import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipSize, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
 
 test("The select cursor is the default hand off the tiles, the fanned hand over a tile with no chip, and the pinch with a chip, and the stock cursor shows only where no hand is drawn [k2 property]", () => {
@@ -36,6 +36,25 @@ test("A Warcraft menu open over select hides every drawn cursor and shows Warcra
         }
       }
     }
+  }
+});
+
+test("An F10 wake keeps Warcraft's cursor shown until the Game Menu's frames are seen, then hands the cursor back once they close, and lapses after its updates if no menu opens [k2 property]", () => {
+  for (const stage of [false, true]) {
+    let wake = GAME_MENU_WAKE_UPDATES;
+    for (let update = 1; update < GAME_MENU_WAKE_UPDATES; update++) {
+      wake = gameMenuWake(wake, false);
+      assertTrue(menuCursor(true, true, false, undefined, stage, wake > 0).stock);
+    }
+    wake = gameMenuWake(wake, false);
+    assertEquals(wake, 0);
+    assertEquals(menuCursor(true, true, false, undefined, stage, wake > 0).stock, false);
+
+    wake = gameMenuWake(GAME_MENU_WAKE_UPDATES, true);
+    assertEquals(wake, 0);
+    assertTrue(menuCursor(true, true, false, undefined, stage, true).stock);
+    wake = gameMenuWake(wake, false);
+    assertEquals(menuCursor(true, true, false, undefined, stage, wake > 0).stock, false);
   }
 });
 
