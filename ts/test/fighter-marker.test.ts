@@ -4,7 +4,7 @@ import { Phase, fighterColor, humanFighterActive } from "../src/game/lobby/lobby
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { fighterAt, isActive } from "../src/game/sim/roster";
-import { FighterMarker, markerName, markerNumberContext } from "../src/game/ui/fighterMarker";
+import { FighterMarker, markerName, markerNameText, markerNumberContext } from "../src/game/ui/fighterMarker";
 import { colourCode, damageText, percentText } from "../src/game/ui/plateLayout";
 import { slotColor } from "../src/game/ui/slotColors";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
@@ -122,4 +122,10 @@ test("a marker shows a Battle.net name without its #number tag [k5 boundary batt
   expect(markerName(true, "Pilot#1234")).toBe("Pilot");
   expect(markerName(true, "Player 1")).toBe("Player 1");
   expect(markerName(false, "Pilot#1234")).toBe("CPU");
+});
+
+test("a partner body's marker draws no name line while its leader's marker keeps the coloured player name [k5 boundary partner-marker-name]", () => {
+  const rgb = slotColor(1).rgb;
+  expect(markerNameText(true, true, "Pilot#1234", rgb)).toBe("");
+  expect(markerNameText(false, true, "Pilot#1234", rgb)).toBe(`${colourCode(rgb)}Pilot|r`);
 });

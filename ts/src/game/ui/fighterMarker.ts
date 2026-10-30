@@ -10,7 +10,6 @@ export const MARKER_WIDTH = unitsForPixels(220);
 export const MARKER_HEIGHT = unitsForPixels(170);
 export const MARKER_CLEARANCE = unitsForPixels(16);
 export const MARKER_NAME_LENGTH = 12;
-const PARTNER_MARKER_NAME = "GRGL";
 
 const ARROW_WIDTH_PX = 40;
 const ARROW_HEIGHT_PX = 40;
@@ -32,6 +31,8 @@ const markerContext = (slot: number): number => 1200 + slot * 20;
 export const markerNumberContext = (slot: number): number => markerContext(slot) + 3;
 
 export const markerName = (human: boolean, playerName: string): string => human ? (playerName.split("#")[0] ?? "").substring(0, MARKER_NAME_LENGTH) : "CPU";
+
+export const markerNameText = (partner: boolean, human: boolean, playerName: string, rgb: number): string => partner ? "" : `${colourCode(rgb)}${markerName(human, playerName)}|r`;
 
 
 export function spreadMarkers(x: number[], y: readonly number[], shown: readonly boolean[]): void {
@@ -108,7 +109,7 @@ export class FighterMarker {
     if (this.shownHuman !== human || this.shownPartner !== partner) {
       this.shownHuman = human;
       this.shownPartner = partner;
-      this.playerName = partner ? PARTNER_MARKER_NAME : markerName(human, GetPlayerName(Player(this.slot)));
+      this.playerName = GetPlayerName(Player(this.slot));
       this.shownColor = undefined;
     }
     if (shown !== this.shown) {
@@ -120,7 +121,7 @@ export class FighterMarker {
     if (this.shownColor !== color) {
       this.shownColor = color;
       BlzFrameSetTexture(this.arrow, `war3mapImported\\MarkerArrow${I2S(color)}.tga`, 0, true);
-      BlzFrameSetText(this.name, `${colourCode(slotColor(color).rgb)}${this.playerName}|r`);
+      BlzFrameSetText(this.name, markerNameText(partner, human, this.playerName, slotColor(color).rgb));
     }
     this.showDamage(damage);
     const moved = x !== this.shownX || y !== this.shownY;
