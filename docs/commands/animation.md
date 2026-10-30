@@ -211,14 +211,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   poses the beats in `tools/animations/leg-sweeps/FIGHTER.json` (planted support foot, swept ankle on a floor arc,
   hip twist, listed cloth folded clear of the floor), and `... --keys KEYS.json` re-keys the clip production plays
   for the move in place, refusing an unrelated clip change, a frame below the stand or a lower leg outside the hit region.
-  Illidan's down air is Falco's tilted stomp, authored in Blender the same way (#512):
+  Illidan's down air is Falco's tilted, twirling stomp, authored in Blender the same way (#512):
   `... rekey-clip.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character 2 --pose downAir --limb R --rig RIG.json`, then
-  `blender ... --python tools/animations/leg-sweep.py -- RIG.json KEYS.json illidan --stomp` bakes a knee chamber
-  on frames 1-4 that snaps to one compact spindle on the first active frame, legs straight and together with the
-  toes pointed, both arms down with the glaives trailing behind his hips, head and chest leaned with the body, leaned
-  back 30 degrees so his feet lead down and forward, held, then unwound in eight frames to his aerial ready pose; it
-  does not twirl, because a turn about the tilted axis read as a forward air in three native viewer rounds;
-  `... --keys KEYS.json` re-keys the clip in place.
+  `blender ... --python tools/animations/leg-sweep.py -- RIG.json KEYS.json illidan --stomp` bakes one compact spindle, legs
+  straight and together with the toes pointed and both arms raised close over his head so the glaives trail above
+  him, leaned back 30 degrees about his pelvis so his feet lead down and forward, and turned once about that long
+  axis through the strike, then unwound to his aerial ready pose; `... --keys KEYS.json` re-keys the clip in place.
   Store the output as `illidan-animation` and run `package-illidan.ts PRIVATE_OUTPUT --metadata-only`.
   Illidan's forward smash is a spinning roundhouse kick authored the same way:
   `... rekey-clip.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character 2 --pose forwardSmash --limb R --rig RIG.json`, then
