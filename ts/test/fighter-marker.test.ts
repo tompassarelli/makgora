@@ -4,7 +4,7 @@ import { Phase, fighterColor, humanFighterActive } from "../src/game/lobby/lobby
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { fighterAt, isActive } from "../src/game/sim/roster";
-import { FighterMarker, markerName, markerNameText, markerNumberContext } from "../src/game/ui/fighterMarker";
+import { FighterMarker, markerName, markerNameText, markerNumberContext, markerNumberRisePx } from "../src/game/ui/fighterMarker";
 import { colourCode, damageText, percentText } from "../src/game/ui/plateLayout";
 import { slotColor } from "../src/game/ui/slotColors";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
@@ -128,4 +128,11 @@ test("a partner body's marker draws no name line while its leader's marker keeps
   const rgb = slotColor(1).rgb;
   expect(markerNameText(true, true, "Pilot#1234", rgb)).toBe("");
   expect(markerNameText(false, true, "Pilot#1234", rgb)).toBe(`${colourCode(rgb)}Pilot|r`);
+});
+
+test("a partner body's percent sits on its arrow with no name line reserved while a leader's keeps the name line [k5 boundary partner-percent-gap]", () => {
+  const solo = markerNumberRisePx(false);
+  const partner = markerNumberRisePx(true);
+  expect(solo - partner).toBe(40);
+  expect(partner).toBe(40);
 });

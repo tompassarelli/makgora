@@ -32,6 +32,8 @@ export const markerNumberContext = (slot: number): number => markerContext(slot)
 
 export const markerName = (human: boolean, playerName: string): string => human ? (playerName.split("#")[0] ?? "").substring(0, MARKER_NAME_LENGTH) : "CPU";
 
+export const markerNumberRisePx = (partner: boolean): number => ARROW_HEIGHT_PX + (partner ? 0 : NAME_HEIGHT_PX);
+
 export const markerNameText = (partner: boolean, human: boolean, playerName: string, rgb: number): string => partner ? "" : `${colourCode(rgb)}${markerName(human, playerName)}|r`;
 
 
@@ -109,6 +111,7 @@ export class FighterMarker {
     if (this.shownHuman !== human || this.shownPartner !== partner) {
       this.shownHuman = human;
       this.shownPartner = partner;
+      this.placeNumber();
       this.playerName = GetPlayerName(Player(this.slot));
       this.shownColor = undefined;
     }
@@ -153,7 +156,7 @@ export class FighterMarker {
 
   private placeNumber(): void {
     const right = this.shownX + unitsForPixels(NUMBER_RIGHT_PX + this.jolt.dx);
-    const bottom = this.shownY + unitsForPixels(ARROW_HEIGHT_PX + NAME_HEIGHT_PX - this.jolt.dy);
+    const bottom = this.shownY + unitsForPixels(markerNumberRisePx(this.shownPartner === true) - this.jolt.dy);
     BlzFrameSetAbsPoint(this.damage, FRAMEPOINT_BOTTOMRIGHT, right, bottom);
   }
 
