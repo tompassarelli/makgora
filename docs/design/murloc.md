@@ -355,6 +355,10 @@ After (dc96043e, same field and seeds): 46% over 8568 matches; balance score
 23.7 to 9.7, with the profile misses (back air 40%, up air 5%, Ensnare 19%,
 Tidal Rush 20%) left for later tuning.
 
+First reading after the shared percent (Mrgl and Grgl on one damage percent, 8fd779e4b2): the Murlocs-only balance run 41045054196 at fb0c81f284, all 30 Murlocs pairs, 408 matches a pair, Wren Expert. The runner pool refused the full-roster dispatch at admission, and a main-lane dispatch cancelled it once, so the narrower `--matchups` run supplied the reading: Murlocs 28% over 12,240 matches (3,381 wins, 8,859 losses) against the 45-55% win band's 40-60% fighter bar, with 4% against Chen Stormstout and 10% against Pit Lord. No move exceeded the 40% damage share (dash attack 26%). The pair's census figure at that commit was 332,300 instructions against the 329,200 baseline, inside the census gate's 10% margin.
+
+One tuning round (f6dce7477f): damage x1.2 on forward, up and down tilt, dash attack, the three smashes and forward, back and up air; growth x1.1 on the smashes and the three aerials; nothing in the lock rules, caps, cooldowns or the net changed. The same 30 pairs (run 41047421223): 48% over 12,240 matches (5,824 wins, 6,416 losses); the top damage share is dash attack at 28%; the profile misses left are matchups (Chen Stormstout 14%, Akama 27%, Butcher 28% below 30%; Goblin Tinker 71%, Kael'thas 73%, Warden 76%, Sylvanas 80% above 70%) and air 21% (25%-55%).  The pair's census figure after the round is 332,700 instructions (37.6 KB allocation), 1.1% over the 329,200 baseline: value tuning does not move it, the rise came with the shared percent.
+
 ## Signature strong/weak move (#389)
 
 Neutral air, split by timing: strong hit clean, frames 5-6, 8%; weak hit late, frames 7-10, 5.6%. A flailing spin strongest at its first slap; the rest is a scrappy weak wall.
