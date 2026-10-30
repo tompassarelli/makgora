@@ -19,4 +19,13 @@ export const hudChecks = (pass: readonly Rule[]): NativeCheck[] => [
   { id: "meter-hud-4p-full", closes: "smashcraft HUD meter display (Tom 2026-10-28)", map: "presentation", session: "meter-hud-4p", after: "meter-hud-4p-ultimate", capture: [{ kind: "frames", name: "panels", client: "a", count: 6, everyMs: 120 }],
     setup: [{ chat: "-dev meter 100" }, { waitMs: 500 }],
     pass, look: "Both meters full on all four panels: bright blue EX cells with halos, full gold bars breathing between gold and orange across the frames." },
+  { id: "match-clock-default", closes: "smashcraft match clock reads like the Smash timer (2026-10-31)", map: "presentation", session: "match-clock", capture: [{ kind: "frames", name: "clock", client: "a", count: 3, everyMs: 700 }],
+    setup: [{ waitMs: 4000 }],
+    pass, look: "At top centre a large white MM:SS countdown with a thick dark outline, such as 06:5x, and smaller white hundredths digits to its right on the same baseline; the hundredths differ between frames and the minutes and seconds count down." },
+  { id: "match-clock-light-sky", closes: "smashcraft match clock reads like the Smash timer (2026-10-31)", map: "presentation", session: "match-clock", capture: [{ kind: "frames", name: "clock", client: "a", count: 2, everyMs: 700 }],
+    setup: [{ chat: "-dev reset" }, { chat: "-dev quick stage 3" }, { waitMs: 5000 }],
+    pass, look: "On Durotar Skies the clock at top centre is still readable over the light sky: white digits, thick dark outline, smaller hundredths to the right." },
+  { id: "match-clock-dark-stage", closes: "smashcraft match clock reads like the Smash timer (2026-10-31)", map: "presentation", session: "match-clock", capture: [{ kind: "frames", name: "clock", client: "a", count: 2, everyMs: 700 }],
+    setup: [{ chat: "-dev reset" }, { chat: "-dev quick stage 4" }, { waitMs: 5000 }],
+    pass, look: "On Naxxramas the clock at top centre is readable over the dark stage: white digits, thick dark outline, smaller hundredths to the right." },
 ];

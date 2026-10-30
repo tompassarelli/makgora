@@ -19,7 +19,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/
 import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
-import { DEFAULT_RESULT_PICK, Phase, costumeFor, costumeTintFor, fighterColor, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { DEFAULT_RESULT_PICK, Phase, costumeFor, costumeTintFor, fighterColor, humanActive, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPoint, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -624,7 +624,7 @@ export function renderUi(s: ShellState): void {
     ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), warcraftMenuOpen(s), s.sessionWins.counts, clockSeconds(s.trace), menuControlHit(ui, slot));
     ui.settings[slot].update();
   }
-  ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
+  ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), game.remainingFrames);
   ui.match.presentCountdown(game, showMatch);
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
   const hints = localHints(s);

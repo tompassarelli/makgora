@@ -2,8 +2,8 @@ import { Action } from "../../game/input/actions";
 import { type KeyBindings, keyNames } from "../../game/input/keyBindings";
 import { PAD_PRESENT_KEY } from "../../game/input/padCapture";
 import { chordLabels } from "../../game/input/pauseChord";
-import { remainingSeconds, timedMatch } from "../../game/lobby/lobbyState";
-import { formatClock } from "../../game/ui/matchHud";
+import { timedMatch } from "../../game/lobby/lobbyState";
+import { clockMain, clockSeconds } from "../../game/ui/clockReadout";
 import type { PauseView } from "../../game/ui/pauseScreen";
 import { osKeyDown } from "../../platform/osKeys";
 import { localHints, localHintsKey } from "./hints";
@@ -22,7 +22,7 @@ export function pauseView(s: Readonly<ShellState>, bindings: Readonly<KeyBinding
   const pad = s.dev.pauseLook === undefined ? BlzIsLocalClientActive() && osKeyDown(PAD_PRESENT_KEY) : s.dev.pauseLook === "pad";
   return {
     player: s.pausedBy === undefined ? undefined : s.pausedBy + 1,
-    clock: timedMatch(s.game) ? formatClock(remainingSeconds(s.game)) : undefined,
+    clock: timedMatch(s.game) ? clockMain(clockSeconds(s.game.remainingFrames)) : undefined,
     pad,
     chord: chordLabels(bindings),
     camera: pad ? PAD_CAMERA : keyboardCamera(bindings),

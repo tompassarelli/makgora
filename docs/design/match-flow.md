@@ -56,6 +56,13 @@ chooses a new match through fighter selection. An automatic rematch preserves
 fighters, slot modes, stage and rules, while resetting combat and the clock.
 A player leaving cancels the countdown.
 
+The match clock sits at top centre in the Smash timer layout: large white
+MM:SS in the menu font with a thick dark outline, and the hundredths in smaller
+digits on the same baseline to its right. Hundredths come from the 60 Hz frame
+count and round up, so 342.85 s reads 05:42 with 85, 59.99 s reads 00:59 with
+99 and the last frame before the end reads 00:00 with 01. The pause screen
+shows the same MM:SS.
+
 **No time limit** removes only the clock. **Endless** additionally removes the
 stock end: fighters respawn after knockouts, the HUD hides stocks and time,
 and any player can pause and press Escape to return to fighter selection.

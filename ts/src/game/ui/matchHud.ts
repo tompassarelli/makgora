@@ -1,7 +1,6 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { idiv, imod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
@@ -16,40 +15,90 @@ import { attachOutline, createOutline, createTemplateOutline, destroyOutline, se
 import { unitsForPixels } from "./portraitFrames";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
+import { clockHundredths, clockMain, clockSeconds, hundredthsLabel } from "./clockReadout";
 
 
-export function formatClock(seconds: number): string {
-  const remainder = imod(seconds, 60);
-  return `${I2S(idiv(seconds, 60))}:${remainder < 10 ? "0" : ""}${I2S(remainder)}`;
+const CLOCK_LEVEL = 21;
+const CLOCK_OUTLINE_PX = 4;
+const CLOCK_BASELINE_LIFT = f32(0.0047);
+const CLOCK_TEMPLATE_SIZE = f32(0.036);
+const CLOCK_DIGIT_SIZE = f32(0.05);
+const CLOCK_HUNDREDTHS_SIZE = f32(0.0275);
+const CLOCK_TOP = f32(0.59);
+const CLOCK_SPLIT_X = f32(0.452);
+const CLOCK_GAP = f32(0.004);
+const CLOCK_MAIN_BOX = { width: f32(0.2), height: f32(0.06) } as const;
+const CLOCK_HUNDREDTHS_BOX = { width: f32(0.06), height: f32(0.04) } as const;
+const CLOCK_FILL = "|cffffffff";
+const CLOCK_RIM = "|cff0a0608";
+
+interface ClockBox {
+  readonly width: number;
+  readonly height: number;
 }
 
-export class MatchClock {
+class ClockDigits {
   private readonly label: framehandle;
-  private shownVisible = false;
-  private shownSeconds: number | undefined;
+  private readonly rim: readonly framehandle[];
 
-  constructor() {
-    this.label = createText("MatchClock", gameUi(), 890);
-    placeTopLeft(this.label, f32(0.65), f32(0.568));
-    BlzFrameSetSize(this.label, f32(0.12), f32(0.032));
-    BlzFrameSetFont(this.label, MENU_FONT, f32(0.02), 1);
-    BlzFrameSetTextAlignment(this.label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+  constructor(context: number, size: number, box: ClockBox, left: number, top: number, horizontal: textaligntype) {
+    const scale = f32(size / CLOCK_TEMPLATE_SIZE);
+    this.rim = createTemplateOutline("SmashcraftDamageOutline", gameUi(), context, CLOCK_LEVEL, scale);
+    this.label = BlzCreateFrame("SmashcraftDamage", gameUi(), 0, context);
+    BlzFrameSetScale(this.label, scale);
+    BlzFrameSetSize(this.label, f32(box.width / scale), f32(box.height / scale));
+    placeTopLeft(this.label, left, top);
+    BlzFrameSetTextAlignment(this.label, TEXT_JUSTIFY_BOTTOM, horizontal);
+    BlzFrameSetLevel(this.label, CLOCK_LEVEL);
     BlzFrameSetEnable(this.label, false);
-    BlzFrameSetVisible(this.label, false);
+    attachOutline(this.rim, this.label, f32(CLOCK_OUTLINE_PX / scale), TEXT_JUSTIFY_BOTTOM, horizontal);
+    this.show(false);
+  }
+
+  show(visible: boolean): void {
+    BlzFrameSetVisible(this.label, visible);
+    showOutline(this.rim, visible);
+  }
+
+  setText(text: string): void {
+    BlzFrameSetText(this.label, `${CLOCK_FILL}${text}|r`);
+    setOutlineText(this.rim, `${CLOCK_RIM}${text}|r`);
   }
 
   destroy(): void {
     BlzDestroyFrame(this.label);
+    destroyOutline(this.rim);
+  }
+}
+
+export class MatchClock {
+  private readonly main = new ClockDigits(890, CLOCK_DIGIT_SIZE, CLOCK_MAIN_BOX, f32(CLOCK_SPLIT_X - CLOCK_MAIN_BOX.width), CLOCK_TOP, TEXT_JUSTIFY_RIGHT);
+  private readonly hundredths = new ClockDigits(891, CLOCK_HUNDREDTHS_SIZE, CLOCK_HUNDREDTHS_BOX, f32(CLOCK_SPLIT_X + CLOCK_GAP), f32(CLOCK_TOP - CLOCK_MAIN_BOX.height + CLOCK_HUNDREDTHS_BOX.height + CLOCK_BASELINE_LIFT), TEXT_JUSTIFY_LEFT);
+  private shownVisible = false;
+  private shownSeconds: number | undefined;
+  private shownHundredths: number | undefined;
+
+  destroy(): void {
+    this.main.destroy();
+    this.hundredths.destroy();
   }
 
-  update(visible: boolean, seconds: number): void {
+  update(visible: boolean, frames: number): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
-      BlzFrameSetVisible(this.label, visible);
+      this.main.show(visible);
+      this.hundredths.show(visible);
     }
-    if (this.shownSeconds === seconds) return;
-    this.shownSeconds = seconds;
-    BlzFrameSetText(this.label, formatClock(seconds));
+    const seconds = clockSeconds(frames);
+    if (this.shownSeconds !== seconds) {
+      this.shownSeconds = seconds;
+      this.main.setText(clockMain(seconds));
+    }
+    const hundredths = clockHundredths(frames);
+    if (this.shownHundredths !== hundredths) {
+      this.shownHundredths = hundredths;
+      this.hundredths.setText(hundredthsLabel(hundredths));
+    }
   }
 }
 

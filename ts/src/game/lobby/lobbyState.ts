@@ -3,7 +3,7 @@ import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumeP
 import { PLAYABLE_CHARACTERS, isMatchCharacter, nextCharacterIn, DEFAULT_FIGHTER } from "../roster/kits";
 import { type CostumeTint, costumeIndex, costumeOf, costumesFor } from "../roster/costumes";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
-import { floorDiv, floorMod } from "wisp/src/sim/intMath";
+import { floorMod } from "wisp/src/sim/intMath";
 import { type MatchCamera, createMatchCamera, copyMatchCamera } from "../sim/matchCamera";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantMask, isParticipantSlot, participantActive } from "../input/participants";
 import { Character, ItemKind, itemBit } from "../sim/codes";
@@ -598,7 +598,6 @@ export const timedMatch = (game: Readonly<MatchState>): boolean => !game.practic
 
 export const keepsStocks = (game: Readonly<MatchState>): boolean => game.practice || game.endless || game.training;
 
-export const remainingSeconds = (game: Readonly<MatchState>): number => floorDiv(game.remainingFrames + MATCH_TICKS_PER_SECOND - 1, MATCH_TICKS_PER_SECOND);
 
 
 export const START_HOLD_FRAMES = 3 * MATCH_TICKS_PER_SECOND;
