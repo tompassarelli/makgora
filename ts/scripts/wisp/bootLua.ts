@@ -12,10 +12,11 @@ const BOOT_POINTER: readonly (readonly [number, number])[] = [[960, 540], [380, 
 const SELECT_FRAMES = 12;
 const START_FRAMES = 240;
 
-// The Lua32 half of `bun wisp map boot`: both clients pass the first-run Controls screen where the build shows it and settle on character select.
-const [bundlePath, declarationsPath] = [arg[1], arg[2]];
-if (bundlePath === undefined || declarationsPath === undefined) throw new Error("usage: lua boot.lua MAP_LUA WARCRAFT_D_TS");
-const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: smashcraftNativeBehavior }, readFile(bundlePath), readFile(declarationsPath));
+// The Lua32 half of `bun wisp map boot`, one process per player slot (ARG 3) so the clients' starts run side by side: its client passes the first-run Controls screen where the build shows it and settles on character select.
+const [bundlePath, declarationsPath, slotText] = [arg[1], arg[2], arg[3]];
+const slot = Number(slotText);
+if (bundlePath === undefined || declarationsPath === undefined || !Number.isInteger(slot)) throw new Error("usage: lua boot.lua MAP_LUA WARCRAFT_D_TS SLOT");
+const clients = luaLockstep({ players: [slot], filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: smashcraftNativeBehavior }, readFile(bundlePath), readFile(declarationsPath));
 const problems: string[] = [];
 const [booted, failure] = pcall(() => {
   clients.start();

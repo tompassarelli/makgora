@@ -62,15 +62,21 @@ const shippedBundle = (map: string, scratch: string) => Effect.gen(function*() {
   return path;
 });
 
-const runBoot = (bundle: string) => Effect.scoped(Effect.gen(function*() {
+const BOOT_SLOTS = [0, 1];
+
+const runSlot = (bundle: string, slot: number) => Effect.scoped(Effect.gen(function*() {
   const lua = yield* stockLua.pipe(Effect.mapError((problem) => new MapBootFailure({ problem })));
   const declarations = join(tsDirectory, "node_modules/wisp/src/natives/warcraft.d.ts");
-  const child = yield* ChildProcess.make(lua, [DRIVER, bundle, declarations], { cwd: tsDirectory, stdin: "ignore" });
+  const child = yield* ChildProcess.make(lua, [DRIVER, bundle, declarations, String(slot)], { cwd: tsDirectory, stdin: "ignore" });
   const [output, errors, code] = yield* Effect.all([Stream.mkString(Stream.decodeText(child.stdout)), Stream.mkString(Stream.decodeText(child.stderr)), child.exitCode], { concurrency: "unbounded" });
   return { output: `${output}${errors}`.trimEnd(), passed: code === 0 && output.includes("done problems=0") };
 })).pipe(
   Effect.provide(BunServices.layer),
   Effect.mapError((cause) => new MapBootFailure({ problem: `running the boot check: ${describeCause(cause)}` })),
+);
+
+const runBoot = (bundle: string) => Effect.forEach(BOOT_SLOTS, (slot) => runSlot(bundle, slot), { concurrency: "unbounded" }).pipe(
+  Effect.map((runs) => ({ output: runs.map(({ output }) => output).join("\n"), passed: runs.every(({ passed }) => passed) })),
 );
 
 export const bootCheck = (map: string | undefined) => Effect.scoped(Effect.gen(function*() {

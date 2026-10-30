@@ -11,7 +11,7 @@
   names (`map build`'s `--base`, `--container`, `--assets`, `--summon` override one);
   `bun wisp map rebuild MAP.w3x` replaces only its script.
   `bun wisp map boot [MAP.w3x]` starts a playable build's own script (or, without a
-  map, the playable build compiled from the checkout) on two headless clients in
+  map, the playable build compiled from the checkout) on two headless clients (one Lua process per player slot, side by side) in
   32-bit Lua, passes the first-run Controls screen, moves the pointer across
   character select, and fails on any thrown error or a hidden select panel. It
   runs before every landing (the farm's boot job), on main's CI, and on each
