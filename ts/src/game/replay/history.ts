@@ -25,7 +25,7 @@ import { copyAttackBuffer, sameAttackBuffer } from "../input/attackBuffer";
 import { copyMatchState } from "../lobby/lobbyState";
 import { copyPacingAndPresentation } from "../match/pacingAndPresentation";
 import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
-import { apartFromOthers, authoredMotionApartFromOthers, matchScopable, scopedStepHeld } from "./scopedRepair";
+import { apartFromOthers, authoredMotionApartFromOthers, matchScopable, scopeOf, scopedStepHeld, withLinked } from "./scopedRepair";
 import { sameReplayState } from "./difference";
 import { sameMatchCamera } from "../sim/matchCamera";
 import { firstFighterPoseDifference } from "../presentation/fighterPose";
@@ -43,9 +43,13 @@ export function wholeRepairCost(world: Readonly<Roster>): number {
 /** How repairs choose fighter-scoped steps: by the eligibility tests, never, or always (a test's broken eligibility). */
 export type ScopedRepair = "auto" | "off" | "force";
 
-/** One bit per changed slot, or the single slot in a one-bit mask. */
-const soleSlot = (mask: number): number | undefined => {
-  for (const slot of PARTICIPANT_SLOTS) if (mask === 1 << slot) return slot;
+/** The scope (a fighter and the body linked to it) that holds every slot of a nonzero mask, if one does. */
+const soleScope = (world: Readonly<Roster>, mask: number): number | undefined => {
+  for (const slot of PARTICIPANT_SLOTS) {
+    if ((mask & 1 << slot) === 0) continue;
+    const scope = scopeOf(world, slot);
+    return (mask & ~scope) === 0 ? scope : undefined;
+  }
   return undefined;
 };
 
@@ -141,6 +145,22 @@ const firstHuman = (state: Readonly<ReplayState>): number | undefined => {
   return undefined;
 };
 
+/** The scope a repaired frame may play: with no fighter changed yet any human's, else the one holding every changed fighter. */
+function changedScope(state: Readonly<ReplayState>, dirty: number): number | undefined {
+  const human = dirty === 0 ? firstHuman(state) : undefined;
+  const scope = human === undefined ? soleScope(state.world, dirty) : scopeOf(state.world, human);
+  return scope !== undefined && (state.world.mask & scope) === scope && matchScopable(state.match) ? scope : undefined;
+}
+
+/** Every computer outside `scope` repeats its decision from the earlier run. */
+function othersRepeat(state: Readonly<ReplayState>, scope: number, repeated: RepeatedComputers | undefined): boolean {
+  for (const other of PARTICIPANT_SLOTS) {
+    if (participantActive(scope, other) || !isActive(state.world, other) || !computerActive(state.match, other)) continue;
+    if (repeated === undefined || !participantActive(repeated.mask, other)) return false;
+  }
+  return true;
+}
+
 export class ReplayHistory {
   private readonly snapshots = repeat(REPLAY_HISTORY_CAPACITY, createReplaySnapshot);
   private spare = createReplaySnapshot();
@@ -155,14 +175,14 @@ export class ReplayHistory {
   private repairShown = 0;
   /** Slots whose rows the pending repair has met changed so far. */
   private repairInputs = 0;
-  private readonly scope: ScopedFrame = { slot: 0, after: createReplaySnapshot(), reused: 0 };
+  private readonly scope: ScopedFrame = { mask: 0, after: createReplaySnapshot(), reused: 0 };
   private scopedSteps = 0;
   /**
-   * After a held scoped step: the frame after it and its slot, whose state and
-   * earlier-run fighter that step already proved apart from the others.
+   * After a held scoped step: the frame after it and its scope, whose state and
+   * earlier-run fighters that step already proved apart from the others.
    */
   private provenFrame = -1;
-  private provenSlot = -1;
+  private provenScope = 0;
   scopedRepair: ScopedRepair = "auto";
   /** Tests see each scoped frame: the state before it (its snapshot), its row and the state it reached. */
   observeScoped: ((frame: number, before: Readonly<ReplayState>, row: MatchFrameInput, after: Readonly<ReplayState>) => void) | undefined;
@@ -433,9 +453,9 @@ export class ReplayHistory {
       const first = frame === resumed;
       const slot = this.slotOf(frame);
       const unchanged = state.world.mask & ~this.repairDirty;
-      const dirty = this.repairDirty | at(this.changed, slot);
+      const dirty = this.repairDirty | withLinked(state.world, at(this.changed, slot));
       const repeated = this.repeatedComputers(frame, state, first, unchanged);
-      const scoped = this.scopedSlot(frame, state, repeated, dirty);
+      const scoped = this.scopedBodies(frame, state, repeated, dirty);
       const price = scoped === undefined ? whole : REPAIR_SCOPED_COST;
       if (steps > 0 && spent + price > cost) break;
       spent += price;
@@ -511,33 +531,29 @@ export class ReplayHistory {
   }
 
   /**
-   * The one fighter frame `frame` may play alone: the correction changed only
-   * it, the frame's earlier run reached the next snapshot, every computer
-   * repeats its decision, and in neither run can it touch another fighter.
+   * The fighters frame `frame` may play alone, one fighter and the body linked
+   * to it: the correction changed only them, the frame's earlier run reached
+   * the next snapshot, every computer repeats its decision, and in neither run
+   * can they touch another fighter.
    * Reads the frame's snapshot before the repair rewrites it. A held scoped
    * step on the frame before already proved the first two distance tests.
    */
-  private scopedSlot(frame: number, state: Readonly<ReplayState>, repeated: RepeatedComputers | undefined, dirty: number): number | undefined {
-    const proven = frame === this.provenFrame ? this.provenSlot : -1;
+  private scopedBodies(frame: number, state: Readonly<ReplayState>, repeated: RepeatedComputers | undefined, dirty: number): number | undefined {
+    const proven = frame === this.provenFrame ? this.provenScope : 0;
     this.provenFrame = -1;
     if (this.scopedRepair === "off" || frame + 1 >= this.nextFrame || !this.follows[this.slotOf(frame + 1)]) return undefined;
-    // With no fighter changed yet, any human may play the frame.
-    const slot = dirty === 0 ? firstHuman(state) : soleSlot(dirty);
-    if (slot === undefined || !isActive(state.world, slot) || !matchScopable(state.match)) return undefined;
-    for (const other of PARTICIPANT_SLOTS) {
-      if (other === slot || !isActive(state.world, other) || !computerActive(state.match, other)) continue;
-      if (repeated === undefined || !participantActive(repeated.mask, other)) return undefined;
-    }
-    if (this.scopedRepair === "force") return slot;
+    const scope = changedScope(state, dirty);
+    if (scope === undefined || !othersRepeat(state, scope, repeated)) return undefined;
+    if (this.scopedRepair === "force") return scope;
     const after = this.snapshotAt(frame + 1).world;
     const earlier = this.snapshotAt(frame).world;
-    if (slot !== proven) {
-      if (!apartFromOthers(slot, fighterAt(state.world, slot), state.world)) return undefined;
-      if (!apartFromOthers(slot, fighterAt(earlier, slot), state.world)) return undefined;
+    if (scope !== proven) {
+      if (!apartFromOthers(scope, state.world, state.world)) return undefined;
+      if (!apartFromOthers(scope, earlier, state.world)) return undefined;
     }
-    if (!apartFromOthers(slot, fighterAt(after, slot), after)) return undefined;
-    if (!authoredMotionApartFromOthers(slot, fighterAt(state.world, slot), after)) return undefined;
-    return slot;
+    if (!apartFromOthers(scope, after, after)) return undefined;
+    if (!authoredMotionApartFromOthers(scope, state.world, after)) return undefined;
+    return scope;
   }
 
   /** Runs one repaired frame, scoped to `scoped` when its result holds, otherwise whole; `framed` when its earlier run reached the next snapshot from an equal camera. */
@@ -545,18 +561,18 @@ export class ReplayHistory {
     const row = this.inputAt(frame);
     if (scoped !== undefined) {
       const after = this.snapshotAt(frame + 1);
-      this.scope.slot = scoped;
+      this.scope.mask = scoped;
       this.scope.after = after;
-      this.scope.reused = state.world.mask & ~this.repairShown & ~(1 << scoped);
+      this.scope.reused = state.world.mask & ~this.repairShown & ~scoped;
       if (!executeMatchFrame(row, state.match, state.world, state.controls, state.runtime, frame, repeated, this.scope)) return false;
-      const held = this.scopedRepair === "force" || (apartFromOthers(scoped, fighterAt(state.world, scoped), state.world) && scopedStepHeld(scoped, state.match, state.world, after.match));
+      const held = this.scopedRepair === "force" || (apartFromOthers(scoped, state.world, state.world) && scopedStepHeld(scoped, state.match, state.world, after.match));
       if (held) {
         // The state's other fighters are the next snapshot's, so its proofs carry to the next frame.
         if (this.scopedRepair === "auto" && state.world.mask === after.world.mask) {
           this.provenFrame = frame + 1;
-          this.provenSlot = scoped;
+          this.provenScope = scoped;
         }
-        this.repairShown |= 1 << scoped;
+        this.repairShown |= scoped;
         this.scopedSteps++;
         this.observeScoped?.(frame, this.snapshotAt(frame), row, state);
         return true;
@@ -588,22 +604,22 @@ export class ReplayHistory {
   }
 
   /**
-   * After a whole step: the corrected fighter, when every other one came out
-   * as the next snapshot holds it, so later frames may scope again; otherwise
-   * every fighter. Comparing fighters costs about a third of a step, so it
+   * After a whole step: the corrected fighter and the body linked to it, when
+   * every other one came out as the next snapshot holds it, so later frames
+   * may scope again; otherwise every fighter. Comparing fighters costs about a third of a step, so it
    * runs only while the corrected fighter is clear of the others.
    */
   private changedFighters(frame: number, state: Readonly<ReplayState>): number {
     const mask = state.world.mask;
-    const corrected = soleSlot(this.repairInputs);
+    const corrected = soleScope(state.world, this.repairInputs);
     if (this.scopedRepair === "off" || corrected === undefined || frame + 2 >= this.nextFrame || !matchScopable(state.match)) return mask;
     const snapshot = this.snapshotAt(frame + 1);
-    if (snapshot.world.mask !== mask || !apartFromOthers(corrected, fighterAt(state.world, corrected), state.world)) return mask;
+    if (snapshot.world.mask !== mask || !apartFromOthers(corrected, state.world, state.world)) return mask;
     for (const slot of PARTICIPANT_SLOTS) {
-      if (slot === corrected || !isActive(state.world, slot)) continue;
+      if (participantActive(corrected, slot) || !isActive(state.world, slot)) continue;
       if (!sameAttackBuffer(state.controls.commands[slot], snapshot.controls.commands[slot]) || !sameFighterState(fighterAt(state.world, slot), fighterAt(snapshot.world, slot))) return mask;
     }
-    return 1 << corrected;
+    return corrected;
   }
 
   /**

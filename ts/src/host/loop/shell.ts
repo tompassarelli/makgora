@@ -53,6 +53,7 @@ import { type Rollback, type ShellState, activeRollback, createShellState, keepS
 import { endReplaySegment, serviceReplay } from "./replays";
 import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../game/session/pauseBarrier";
 import { clearMatchEffects, createUi, recreateUi, views } from "./ui";
+import { findWarcraftMenuFrames } from "./warcraftMenu";
 import { registerChatEvents, registerChatHistoryKey } from "wisp/src/ui/chatPanel";
 import { resultsView } from "../../game/presentation/matchCues";
 import * as view from "./view";
@@ -371,6 +372,7 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   });
   copyMatchState(s.game, startingSelection(build.scenario));
   s.startingChoicesReady = s.game.computerMask === 0;
+  findWarcraftMenuFrames();
   createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
   s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
   view.drawStage(s);
@@ -458,6 +460,7 @@ export function installShell(): void {
   on(STAGE_READY, withShell(stageReadyEvent));
   const s = shellState();
   if (s?.ui !== undefined) {
+    findWarcraftMenuFrames();
     recreateUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
     s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
   }

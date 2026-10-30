@@ -1,4 +1,4 @@
-import { copyAttackBuffer, queueAttack, sameAttackBuffer } from "../input/attackBuffer";
+import { clearAttackBuffer, copyAttackBuffer, queueAttack, sameAttackBuffer } from "../input/attackBuffer";
 import { adaptInput } from "./inputAdapter";
 import { type InputRow, copyInput, sameInput } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type ParticipantInputs, type ParticipantSlot, type Slots, isParticipantMask, isParticipantSlot, participantActive, participantInputs } from "../input/participants";
@@ -8,7 +8,7 @@ import { advanceSpecialEffect, clearSpecialEffectState } from "../presentation/s
 import { advanceSummons, clearSummonState } from "../presentation/summonState";
 import { advanceFighterPose, copyFighterPoseInto } from "../presentation/fighterPose";
 import { copySummonPoseInto } from "../presentation/summonPose";
-import { type Roster, copyControls, fighterAt, isActive, sameControls } from "../sim/roster";
+import { type Roster, copyControls, fighterAt, isActive, neutralControls, sameControls } from "../sim/roster";
 import { type FrameControls, createFrameControls } from "./controls";
 import type { PacingAndPresentation } from "./pacingAndPresentation";
 import { type MatchState, Phase, computerActive } from "../lobby/lobbyState";
@@ -134,6 +134,8 @@ const beforeShield: Slots<number> = [0.0, 0.0, 0.0, 0.0];
 
 
 
+const NEUTRAL = neutralControls();
+
 export interface RepeatedComputers {
   readonly mask: number;
   readonly after: Readonly<PacingAndPresentation>;
@@ -158,7 +160,11 @@ function prepareMatchFrame(row: MatchFrameInput, game: MatchState, world: Roster
         decision.decided = true;
         copyControls(decision.input, input);
         copyAttackBuffer(decision.commands, commands);
-      } else adaptInput(row.network[slot], fighterAt(world, slot), frame, row.values.inputs[slot], row.values.commands[slot]);
+      } else if (participantActive(row.networkMask, slot)) adaptInput(row.network[slot], fighterAt(world, slot), frame, row.values.inputs[slot], row.values.commands[slot]);
+      else {
+        copyControls(row.values.inputs[slot], NEUTRAL);
+        clearAttackBuffer(row.values.commands[slot]);
+      }
     } else runtime.botAttackDelays[slot] = row.botDelaysAfterInput[slot];
     copyControls(row.scratch.inputs[slot], row.values.inputs[slot]);
     row.scratch.commands[slot] = controls.commands[slot];
@@ -214,7 +220,7 @@ export function executeMatchFrame(row: MatchFrameInput, game: MatchState, world:
   advanceImpacts(runtime.impacts);
   stepMatch(game, world, row.scratch, frame, scope, earlier);
   for (const slot of PARTICIPANT_SLOTS) {
-    if (scope !== undefined && slot !== scope.slot) {
+    if (scope !== undefined && !participantActive(scope.mask, slot)) {
       observedFrameLegalActions[slot] = scope.after.runtime.observedLegal[slot];
       observedFrameStartedActions[slot] = scope.after.runtime.observedStarted[slot];
     }
@@ -225,7 +231,7 @@ export function executeMatchFrame(row: MatchFrameInput, game: MatchState, world:
     if (!isActive(world, slot)) { advanceSummons(runtime.summons, undefined, slot); continue; }
     const f = fighterAt(world, slot);
     finishImpactEventsAfter(runtime.frameImpacts[slot], f, world);
-    if (scope !== undefined && slot !== scope.slot && participantActive(scope.reused, slot)) {
+    if (scope !== undefined && !participantActive(scope.mask, slot) && participantActive(scope.reused, slot)) {
       emitImpacts(runtime.impacts, runtime.frameImpacts[slot], frame, slot);
       reusePresentation(runtime, scope.after, slot);
       continue;

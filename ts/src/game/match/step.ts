@@ -136,7 +136,7 @@ function requestedStyle(style: number | undefined): AttackStyle | undefined {
 
 
 export interface StepScope {
-  slot: number;
+  mask: number;
   after: Readonly<{ world: Roster; controls: FrameControls }>;
 }
 
@@ -173,7 +173,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     }
   }
   const mask = world.mask;
-  if (scope !== undefined) setRosterMask(world, 1 << scope.slot);
+  if (scope !== undefined) setRosterMask(world, scope.mask);
   carryOnMovingDecks(world, stage, stageFrame);
   advanceCurses(world, stage, stageFrame);
   drivePartners(world, controls, frame, stage, stageFrame);
@@ -289,7 +289,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   if (scope !== undefined) {
     setRosterMask(world, mask);
     for (const slot of PARTICIPANT_SLOTS) {
-      if (slot === scope.slot || !isActive(world, slot)) continue;
+      if ((scope.mask & 1 << slot) !== 0 || !isActive(world, slot)) continue;
       copyFighterState(fighterAt(world, slot), fighterAt(scope.after.world, slot), mask);
       copyAttackBuffer(controls.commands[slot], scope.after.controls.commands[slot]);
     }
@@ -299,7 +299,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   // The camera follows from itself, the stage and the fighters it frames, so an earlier run that stepped them and framed the same ones reached it; training may move fighters after it.
   if (earlier !== undefined && !game.training && earlier.match.phase === Phase.match && earlier.match.stageChoice === game.stageChoice && sameCameraSubjects(world, earlier.world)) copyMatchCamera(game.camera, earlier.match.camera);
   else advanceMatchCamera(game.camera, world, game.stageChoice);
-  advanceOffscreenDamage(world, game.camera, game.practice || game.training, scope === undefined ? mask : 1 << scope.slot);
+  advanceOffscreenDamage(world, game.camera, game.practice || game.training, scope === undefined ? mask : scope.mask);
   if (game.training) advanceTrainingReadout(game.trainer, world, game.humanFighterMask, game.computerMask);
   if (game.training && tutorialOn(game.trainer)) advanceTutorial(game.trainer, world, game.humanFighterMask, game.computerMask, game.orbs);
   advanceClock(game, world);

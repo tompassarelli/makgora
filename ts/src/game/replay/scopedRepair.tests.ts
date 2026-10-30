@@ -3,6 +3,7 @@ import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runt
 import { attackBuffer } from "../input/attackBuffer";
 import { participantInputs } from "../input/participants";
 import { captureNetworkFrame, createMatchFrameInput, resetMatchFrameInput } from "../match/frameInput";
+import { seatMurlocPartners } from "../fighters/murloc/duo";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
@@ -12,20 +13,21 @@ import { REPLAY_MAX_CORRECTION_FRAMES } from "./limits";
 import { type TapeWorld, captureTape, createTapeWorld, executeTapeRow } from "./tapeWorld";
 
 /**
- * Pit Lord stands 800 units from a Warden; her stick turns every 10 frames
- * and her rows arrive 4 frames late, so each turn is mispredicted and
- * repaired. Returns the scoped steps the repairs took and the first
+ * Pit Lord stands 800 units from a Warden or another foe; its stick turns
+ * every 10 frames and its rows arrive 4 frames late, so each turn is
+ * mispredicted and repaired. Returns the scoped steps the repairs took and the first
  * difference from the same match repaired whole.
  */
-function repairedAgainstWhole(cursed: boolean): { scoped: number; difference: string | undefined } {
+function repairedAgainstWhole(cursed: boolean, target: Character = Character.warden): { scoped: number; difference: string | undefined } {
   const late = 4;
   const world = (): TapeWorld => {
     const tape = createTapeWorld({ stocks: 99, humans: 2 });
     const pitLord = createFighter(Character.pitLord, -400.0, 1);
-    const warden = createFighter(Character.warden, 400.0, -1);
-    if (cursed) warden.status.cursedBy = 0;
-    for (const fighter of [pitLord, warden]) fighter.status.stocks = 99;
-    const live = { ...tape.live, world: createRoster(3, [pitLord, warden]) };
+    const foe = createFighter(target, 400.0, -1);
+    if (cursed) foe.status.cursedBy = 0;
+    for (const fighter of [pitLord, foe]) fighter.status.stocks = 99;
+    const live = { ...tape.live, world: createRoster(3, [pitLord, foe]) };
+    seatMurlocPartners(live.world);
     for (const slot of [0, 1] as const) live.controls.commands[slot] = attackBuffer(4);
     return { live, snapshot: tape.snapshot };
   };
@@ -75,4 +77,10 @@ test("A repair never plays a cursed fighter apart from her curse's owner, so she
   assertEquals(free.difference, undefined);
   const cursed = repairedAgainstWhole(true);
   assertEquals(cursed.difference, undefined);
+});
+
+test("A repair plays a Murloc and the partner copying his stick as one scope, so both end as when every fighter is repaired [k1 scenario]", () => {
+  const murlocs = repairedAgainstWhole(false, Character.murloc);
+  assertGreaterThan(murlocs.scoped, 0);
+  assertEquals(murlocs.difference, undefined);
 });

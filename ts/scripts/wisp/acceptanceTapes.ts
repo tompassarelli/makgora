@@ -540,6 +540,21 @@ const WARDEN: MatchScript = {
 };
 
 
+const MURLOCS: MatchScript = {
+  characters: [Character.demonHunter, Character.murloc], stage: 0, stocks: 3, minutes: 0, frames: 540,
+  holds: [[
+    [40, 2, ATTACK], [90, 12, SHIELD_LEFT], [150, 2, ATTACK], [220, 2, GRAB], [300, 2, SPECIAL], [380, 10, SHIELD_RIGHT], [460, 2, ATTACK],
+  ], [
+    [20, 2, ATTACK], [60, 3, JUMP], [66, 2, ATTACK], [100, 6, TOWARD], [110, 2, C_RIGHT], [140, 2, GRAB], [146, 4, AWAY],
+    [190, 2, SPECIAL], [230, 4, TOWARD], [231, 2, SPECIAL], [270, 14, SHIELD_LEFT], [320, 3, JUMP], [326, 4, UP], [327, 2, SPECIAL],
+    [400, 8, DOWN], [402, 2, ATTACK], [440, 2, DOWN, SPECIAL], [500, 2, C_DOWN],
+  ]],
+  approaches: [[[1, 60], [200, 45], [420, 45]], [[80, 45], [130, 45], [250, 45], [380, 45], [480, 45]]],
+  rollbacks: [[24, 50], [84, 120], [144, 180], [236, 270], [330, 370], [404, 450], [500, 540]],
+  predictions: [[60, 72], [140, 152], [230, 242], [400, 412]],
+};
+
+
 const ULTIMATE_PAIRS: readonly (readonly [keyof typeof Character, keyof typeof Character])[] = [
   ["murloc", "grom"], ["cairne", "pitLord"], ["lichKing", "sylvanas"], ["tinker", "kaelthas"], ["shadowHunter", "warden"], ["mountainKing", "demonHunter"],
   ["rifleman", "blademaster"], ["lich", "uther"], ["dreadlord", "beastmaster"], ["thrall", "jaina"], ["chen", "peon"], ["anubarak", "malfurion"], ["medivh", "ladyVashj"],
@@ -627,6 +642,7 @@ export function generateTapes(): Map<string, string> {
     ["lich-king", recordTape("The Lich King's blast, soul-banking jabs, a Val'kyr carry mashed against, Defile, Ascension, Harvest Soul and Quake against the Illidan, with replays.", [LICH_KING])],
     ["beastmaster", recordTape("Beastmaster's bear summoned, commanded, recalled and followed, his axe, Hawk Lift, normals and a throw against the Illidan, with replays.", [BEASTMASTER])],
     ["warden", recordTape("Warden's specials with poison and an aimed Blink, normals and a throw against the Illidan, with replays.", [WARDEN])],
+    ["murlocs", recordTape("Mrgl and Grgl copying him five frames late: normals, a grab, specials and shield against the Illidan, with Mrgl's corrected predictions and replays.", [MURLOCS])],
     ["uther", recordTape("Uther's Holy Light, Devotion Aura armour, Divine Shield, free Hammer of the Righteous and normals against the Illidan, with replays.", [UTHER])],
     ["moving-platforms", recordTape("Moving decks, jumping, dropping through, predictions and rollback over complete path cycles.", [{
       characters: [Character.demonHunter, Character.rifleman], stage: 3, stocks: 3, minutes: 0, frames: 620,

@@ -1,6 +1,6 @@
 // Fighter-scoped repair (#168): while a correction has changed one fighter
-// only, a repaired frame plays that fighter alone and takes every other
-// fighter from the earlier run's next snapshot. The tests here are loose
+// and the body linked to it only, a repaired frame plays them alone and takes
+// every other fighter from the earlier run's next snapshot. The tests here are loose
 // (distances and states, not exact contact shapes): a pair passes when
 // neither can reach the other this frame.
 import { f32 } from "wisp/src/sim/f32";
@@ -220,25 +220,48 @@ export function fightersApart(a: Readonly<Fighter>, b: Readonly<Fighter>): boole
   return apartPair(a.motion.x, a.motion.z, b.motion.x, b.motion.z, strikeReach(a), strikeReach(b));
 }
 
-/** `slot` is apart from every other active fighter of `others`, and no curse links it to one: a curse ticks, lifts and summons from both fighters at any distance. */
-export function apartFromOthers(slot: number, fighter: Readonly<Fighter>, others: Readonly<Roster>): boolean {
-  for (const other of PARTICIPANT_SLOTS) {
-    if (other === slot || !isActive(others, other)) continue;
-    const target = fighterAt(others, other);
-    if (fighter.status.cursedBy === other || target.status.cursedBy === slot) return false;
-    if (!fightersApart(fighter, target)) return false;
+/** The bodies a scoped step plays together: `slot` and the body linked to it, whose controls it drives. */
+export function scopeOf(world: Readonly<Roster>, slot: number): number {
+  const link = world.linked[slot] ?? -1;
+  return link < 0 ? 1 << slot : 1 << slot | 1 << link;
+}
+
+/** `mask` with the body linked to each of its slots. */
+export function withLinked(world: Readonly<Roster>, mask: number): number {
+  let scope = mask;
+  for (const slot of PARTICIPANT_SLOTS) if ((mask & 1 << slot) !== 0) scope |= scopeOf(world, slot);
+  return scope;
+}
+
+const inScope = (scope: number, slot: number): boolean => (scope & 1 << slot) !== 0;
+
+/** Every body of `scope` in `bodies` is apart from every other active fighter of `others`, and no curse links them: a curse ticks, lifts and summons from both fighters at any distance. */
+export function apartFromOthers(scope: number, bodies: Readonly<Roster>, others: Readonly<Roster>): boolean {
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (!inScope(scope, slot) || !isActive(bodies, slot)) continue;
+    const fighter = fighterAt(bodies, slot);
+    for (const other of PARTICIPANT_SLOTS) {
+      if (inScope(scope, other) || !isActive(others, other)) continue;
+      const target = fighterAt(others, other);
+      if (fighter.status.cursedBy === other || target.status.cursedBy === slot) return false;
+      if (!fightersApart(fighter, target)) return false;
+    }
   }
   return true;
 }
 
-export function authoredMotionApartFromOthers(slot: number, fighter: Readonly<Fighter>, others: Readonly<Roster>): boolean {
-  const step = authoredStartupStep(fighter);
-  if (step === 0.0) return true;
-  const x = f32(fighter.motion.x + step);
-  for (const other of PARTICIPANT_SLOTS) {
-    if (other === slot || !isActive(others, other)) continue;
-    const target = fighterAt(others, other);
-    if (!apartPair(x, fighter.motion.z, target.motion.x, target.motion.z, strikeReach(fighter), strikeReach(target))) return false;
+export function authoredMotionApartFromOthers(scope: number, bodies: Readonly<Roster>, others: Readonly<Roster>): boolean {
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (!inScope(scope, slot) || !isActive(bodies, slot)) continue;
+    const fighter = fighterAt(bodies, slot);
+    const step = authoredStartupStep(fighter);
+    if (step === 0.0) continue;
+    const x = f32(fighter.motion.x + step);
+    for (const other of PARTICIPANT_SLOTS) {
+      if (inScope(scope, other) || !isActive(others, other)) continue;
+      const target = fighterAt(others, other);
+      if (!apartPair(x, fighter.motion.z, target.motion.x, target.motion.z, strikeReach(fighter), strikeReach(target))) return false;
+    }
   }
   return true;
 }
@@ -254,7 +277,7 @@ export function matchScopable(game: Readonly<MatchState>): boolean {
  * from its camera, which the step moved itself), and the camera counts every
  * other fighter offscreen exactly as the earlier run's did.
  */
-export function scopedStepHeld(slot: number, game: Readonly<MatchState>, world: Readonly<Roster>, after: Readonly<MatchState>): boolean {
+export function scopedStepHeld(scope: number, game: Readonly<MatchState>, world: Readonly<Roster>, after: Readonly<MatchState>): boolean {
   if (game.phase !== after.phase || game.winner !== after.winner || game.timedOut !== after.timedOut) return false;
   if (game.remainingFrames !== after.remainingFrames || game.matchFrame !== after.matchFrame) return false;
   const items = game.items;
@@ -263,7 +286,7 @@ export function scopedStepHeld(slot: number, game: Readonly<MatchState>, world: 
     || items.spawnSerial !== was.spawnSerial || items.pickupSerial !== was.pickupSerial || items.lastTaker !== was.lastTaker) return false;
   if (firstOrbsDifference(game.orbs, after.orbs) !== undefined) return false;
   for (const other of PARTICIPANT_SLOTS) {
-    if (other === slot || !isActive(world, other)) continue;
+    if (inScope(scope, other) || !isActive(world, other)) continue;
     const { x, z } = fighterAt(world, other).motion;
     if (countsOffscreen(game.camera, x, z) !== countsOffscreen(after.camera, x, z)) return false;
   }
