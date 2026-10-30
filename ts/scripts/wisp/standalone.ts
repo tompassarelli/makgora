@@ -51,9 +51,24 @@ const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Blademaster", "-dev fi
 const FOUR_FIGHTER_STOCKS = 99;
 
 
+/** A script whose first line is this stays on character select instead of starting a match, so a scene check can draw the selection screen. Its other lines are `STEP BUTTON`, which holds that button (attack, special, jump, left and so on) for 3 steps from STEP, and `STEP click X Y`, which clicks at X, Y of Warcraft's 0.8 by 0.6 screen once at STEP; a click on Done closes the controls panel that opens first. */
+const SELECTION_SCRIPT = "#! select";
+
+const selectionLines = (script: string) => script.split("\n").map(line => line.trim().split(/\s+/)).filter(([step]) => /^\d+$/.test(step ?? ""));
+
+const selectionPresses = (script: string): readonly { readonly step: number; readonly button: string }[] =>
+  selectionLines(script).flatMap(([step, button]) => button !== undefined && ACTIONS[button] !== undefined ? [{ step: Number(step), button }] : []);
+
+const selectionClicks = (script: string): readonly { readonly step: number; readonly x: number; readonly y: number }[] =>
+  selectionLines(script).flatMap(([step, verb, x, y]) => verb === "click" ? [{ step: Number(step), x: Number(x), y: Number(y) }] : []);
+
 export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
   const { script, presentation, fourFighters = false } = options;
-  const runtime = installHeadless(script === undefined || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS);
+  const selection = script?.startsWith(SELECTION_SCRIPT) === true;
+  const driven = script !== undefined && !selection;
+  const presses = selection ? selectionPresses(script) : [], clicks = selection ? selectionClicks(script) : [];
+  let steps = 0;
+  const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS);
   try {
 
     const platform = join(import.meta.dir, "../../src/platform");
@@ -66,14 +81,14 @@ export async function createStandaloneSession(options: { readonly script?: strin
     const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import(join(platform, "../host/loop/menus.ts"));
     const build = { ...PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
-    const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = script === undefined ? undefined : await import(join(platform, "nativeDriver.ts"));
+    const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = !driven ? undefined : await import(join(platform, "nativeDriver.ts"));
     const driverBuild = { ...NATIVE_DRIVER_BUILD, ...(presentation === undefined ? {} : { presentation }) };
-    const driver: MapEntry | undefined = script === undefined ? undefined : presentation === undefined ? await import(join(platform, "../host/entries/nativeDriverMain.ts")) : {
+    const driver: MapEntry | undefined = !driven ? undefined : presentation === undefined ? await import(join(platform, "../host/entries/nativeDriverMain.ts")) : {
       install() { main.install(driverBuild); driverApi?.installSmashcraftNativeDriver(); },
       start() { main.startBuild(driverBuild); driverApi?.installSmashcraftNativeDriver(); driverApi?.startSmashcraftNativeDriver(); },
     };
     const driverCommand = driverApi?.nativeDriverCommand;
-    const clients = runtime.clients(driver ?? { install: () => main.install(build), start: () => main.startBuild(build) }, script === undefined ? [0] : [0, 1], { keepCalls: 0 });
+    const clients = runtime.clients(driver ?? { install: () => main.install(build), start: () => main.startBuild(build) }, !driven ? [0] : [0, 1], { keepCalls: 0 });
     clients.start();
     clients.frames(30);
     const client = clients.client(0);
@@ -90,10 +105,11 @@ export async function createStandaloneSession(options: { readonly script?: strin
       state.game.stockCount = FOUR_FIGHTER_STOCKS;
       startQuickMatch(state, 0, undefined, Character.demonHunter, FOUR_FIGHTER_STOCKS);
     });
+    else if (selection) client.run(() => undefined);
     else if (script === undefined) client.run(() => applyDeveloperCommand(shell(), 0, "-dev quick cpu wren expert hero illidan"));
     else clients.everywhere(() => driverCommand?.(script));
-    if (value(() => shell().game.phase) !== Phase.match) throw new Error("standalone match did not start");
-    if (script !== undefined) clients.everywhere(() => driverCommand?.("resume"));
+    if (!selection && value(() => shell().game.phase) !== Phase.match) throw new Error("standalone match did not start");
+    if (driven) clients.everywhere(() => driverCommand?.("resume"));
     let held = new Set<number>();
     let beat = 0, beatHeld = 0;
     let closed = false;
@@ -109,8 +125,10 @@ export async function createStandaloneSession(options: { readonly script?: strin
           if (beatTap !== 0) deliverKey(client, 0, beatTap, 0, true);
           beatHeld = hold;
           tap = beatTap;
-        } else if (script === undefined) {
-          const next = heldKeys(input);
+        } else if (!driven) {
+          const now = steps++;
+          for (const click of clicks) if (click.step === now) clients.click(0, click.x, click.y);
+          const next = heldKeys(selection ? { buttons: presses.filter(press => now >= press.step && now < press.step + 3).map(press => press.button), axisX: 0, axisY: 0 } : input);
           for (const key of held) if (!next.has(key)) deliverKey(client, 0, key, 0, false);
           for (const key of next) if (!held.has(key)) deliverKey(client, 0, key, 0, true);
           held = next;
