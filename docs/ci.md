@@ -292,16 +292,27 @@ tests that run measured, so a removed or renamed test stops holding a shard of
 its own; a new test runs on its name's hash shard until its first measurement.
 
 Everything runs from source: no private build inputs, no `.w3x` build.
-Runner placement comes from the reviewed `ts/runner-routing.json` file. Autoland reports and farm-test
-Bun, Lua32 and check jobs use hosted runners (`premerge`). Balance, background
-sweeps and the census use `background`, also hosted (`ubuntu-latest`). Background sweeps on main coalesce, whether pushed, dispatched or scheduled: a running sweep finishes, and a newer main replaces only the queued one, so the next run covers the newest main; runs on other refs never coalesce. The `farm-runner` dispatch
-input measures an alternative box for even Bun/Lua jobs on the first attempt;
-retries ignore that override and select the plan's hosted output directly, including
-when the original plan job's outputs are reused. No repository variable
-controls runner placement. Farm and background planners read the workflow
+Runner placement comes from the reviewed `ts/runner-routing.json` file and one
+script, `ts/scripts/runnerRoute.ts`, which the workflow revision's own plan or
+`route` job runs. Trusted jobs (Autoland's reports, farm-test's check groups
+except perf, CI's filtered checks and development loop, Balance and Background
+sweeps) take the self-hosted `farm-big` runners by default and fall back to
+`ubuntu-latest` when the farm is full: the script counts the repository's
+unfinished jobs asking for the `farm-big` label (the runners API needs an
+admin token the workflow lacks) and picks the farm only while the idle count,
+`capacity` minus that, covers the jobs the stage will start at once (at most
+`capacity`). Only `push`, `workflow_dispatch` and `schedule` events can pick the farm: a
+`pull_request` or `pull_request_target` event (a fork's included) never runs the
+script and every expression keeps its `ubuntu-latest` fallback, and a retry
+(run attempt above 1) goes hosted too. Perf and the commit-metrics smoke job
+stay hosted because they measure frame time, and the Windows, `sudo`, `cargo`
+and `/dev/uinput` jobs stay hosted because the farm image has none of them. The `farm-runner`
+dispatch input on Autoland, Farm test and Balance names the runner label for the
+trusted jobs in place of the choice: `-f farm-runner=ubuntu-latest` forces
+hosted runners, which is how to exercise the fallback. Background sweeps on main coalesce, whether pushed, dispatched or scheduled: a running sweep finishes, and a newer main replaces only the queued one, so the next run covers the newest main; runs on other refs never coalesce. Keep `capacity` equal to the number of
+smashcraft runners registered on gex45 (11). Planners read the workflow
 revision's file, so measuring an older commit or bisecting a failing shard
-does not depend on that old source containing current routing policy. Delete obsolete runner variables only after these
-workflow versions are live on main.
+does not depend on that old source containing current routing policy.
 
 The Autoland sweep below is the only automatic canceller; the laptop job watchdog was removed after it cancelled healthy runs on stale code (#466, #513).
 

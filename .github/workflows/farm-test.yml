@@ -17,7 +17,7 @@ on:
         description: Names the run so `bun wisp farm test` can find the one it dispatched
         default: ""
       farm-runner:
-        description: One-off runner measurement for even shard jobs; normal and retry jobs use hosted runners
+        description: Runner label for every check job except perf, in place of the farm-first routing in ts/runner-routing.json (ubuntu-latest forces hosted runners)
         default: ""
       checks:
         description: JSON array of the check groups to run (safe-push's landing selection), such as ["corpus","static"]; empty runs those the changed paths reach
@@ -64,12 +64,40 @@ env:
   FARM_GROUPS: boot perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus computer-0 computer-1 types clean-room static
 
 jobs:
+  route:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      runner: ${{ steps.route.outputs.runner }}
+    steps:
+      - if: github.event_name != 'pull_request' && github.event_name != 'pull_request_target'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: ts
+      - if: github.event_name != 'pull_request' && github.event_name != 'pull_request_target'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - if: github.event_name != 'pull_request' && github.event_name != 'pull_request_target'
+        run: bun install --frozen-lockfile --ignore-scripts
+        working-directory: ts
+      - id: route
+        if: github.event_name != 'pull_request' && github.event_name != 'pull_request_target'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FARM_INPUT: ${{ inputs.farm-runner }}
+          CHECKS: ${{ inputs.checks }}
+        run: |
+          want=14
+          [ -z "$CHECKS" ] || want=$(jq -r length <<< "$CHECKS")
+          bun ts/scripts/runnerRoute.ts --class premerge --override "$FARM_INPUT" --want "$want" | tee -a "$GITHUB_STEP_SUMMARY" >> "$GITHUB_OUTPUT"
+
   plan:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       sha: ${{ steps.plan.outputs.sha }}
-      hosted-runner: ${{ steps.plan.outputs.hosted-runner }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -97,13 +125,9 @@ jobs:
       - id: plan
         working-directory: ts
         env:
-          FARM: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && github.run_attempt == 1 && inputs.farm-runner || '' }}
           BASE: ${{ inputs.base }}
         run: |
           git -c gc.auto=0 fetch -q --depth 1 origin "$GITHUB_SHA"
-          HOSTED=$(git show "$GITHUB_SHA:ts/runner-routing.json" | jq -er '.premerge | select(type == "string" and length > 0)')
-          echo "hosted-runner=$HOSTED" >> "$GITHUB_OUTPUT"
-          pool() { jq -c -n --arg farm "$FARM" --arg hosted "$HOSTED" "[range($1) | if \$farm != \"\" and . % 2 == 0 then \$farm else \$hosted end]"; }
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           if [ -f farm-timings.json ]; then
             jq '.lua |= with_entries(select(.key | (startswith("check: ") or startswith("parity corpus: ") or . == "stack-trace profile TypeScript frames") | not))' farm-timings.json > plan-timings.json
@@ -127,7 +151,8 @@ jobs:
   # A group runs when the `checks` input names it, or, without one, when a changed path reaches it
   # (smashcraft:ts/scripts/landingChecks.ts). A `checks` input starts only the groups it names, so a landing's gate run takes no hosted runner for the others and queues behind fewer jobs. parity-N replays one quarter of the tapes by measured replay cost and lua runs parity numeric and the stack-trace profile beside them; computer-N checks half of the roster's computer-fighter coverage by `CPU_COVERAGE_SHARD`; static is the clean room, the kind-tag, ledger and type check with the effect-kit check reading its output (one type-check, not two), the cue models and the Autoland suite parity check.
   checks:
-    runs-on: ubuntu-latest
+    needs: route
+    runs-on: ${{ matrix.group != 'perf' && github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && needs.route.outputs.runner || 'ubuntu-latest' }}
     timeout-minutes: 30
     strategy:
       fail-fast: false

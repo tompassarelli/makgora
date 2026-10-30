@@ -215,6 +215,8 @@ jobs:
         working-directory: ts
       # verdict: test (needs the suite), tested (up to 2 train lanes, each its passed-alone tree past main commits that miss its paths), check (the pre-push gate failed) or none.
       - id: build
+        env:
+          FARM_INPUT: ${{ inputs.farm-runner }}
         run: |
           set +e -uo pipefail
           out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
@@ -232,7 +234,7 @@ jobs:
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
           git config core.hooksPath .githooks
           git fetch -q origin '+refs/heads/claude/*:refs/remotes/origin/claude/*'
-          premerge=$(jq -er '.premerge | select(type == "string" and length > 0)' ts/runner-routing.json) || exit 1
+          premerge=$(cd ts && bun scripts/runnerRoute.ts --routing runner-routing.json --class premerge --override "$FARM_INPUT" --want 3 | tee -a "$GITHUB_STEP_SUMMARY" | sed -n 's/^runner=//p') && [ -n "$premerge" ] || exit 1
           out premerge-runner "$premerge"
           base=$(git rev-parse origin/main)
           out base "$base"

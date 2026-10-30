@@ -23,6 +23,30 @@ env:
   SWEEP_PLACEMENT: gate
 
 jobs:
+  route:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      runner: ${{ steps.route.outputs.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: ts
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: bun install --frozen-lockfile --ignore-scripts
+        working-directory: ts
+      - id: route
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun ts/scripts/runnerRoute.ts --class premerge --want 2 | tee -a "$GITHUB_STEP_SUMMARY" >> "$GITHUB_OUTPUT"
+
   # This commit's p95 frame cost, allocation and map script size on main, in the job summary and log (`grep commit-metrics`).
   smoke:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -94,8 +118,9 @@ jobs:
         working-directory: ts
 
   filtered-checks:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    needs: route
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    runs-on: ${{ needs.route.outputs.runner || 'ubuntu-latest' }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -121,10 +146,13 @@ jobs:
         run: git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check
 
   development-loop:
-    runs-on: ubuntu-latest
+    needs: route
+    if: ${{ !cancelled() }}
+    runs-on: ${{ github.event_name != 'pull_request' && needs.route.outputs.runner || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
-      - name: Install stock texture converter
+      - if: runner.environment == 'github-hosted'
+        name: Install stock texture converter
         run: sudo apt-get update -q && sudo apt-get install -y -q imagemagick
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
