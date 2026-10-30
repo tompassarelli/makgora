@@ -63,7 +63,7 @@ export const MURLOC_MOVES: FighterMoves = {
     [AttackStyle.upTilt]: heroMove(5, 4, 18, 0, [heroRegion(5, 8, claw(20.0, 60.0, -30.0, 88.0, 14.0), ordinary(8.742053031921387, 90, 81.19612121582031, 22.0))]),
     [AttackStyle.downTilt]: heroMove(5, 3, 16, 0, [heroRegion(5, 7, claw(18.0, 12.0, 66.0, 18.0, 12.0), ordinary(7.493188381195068, 80, 81.19612121582031, 22.0))]),
     [AttackStyle.dashAttack]: heroMove(6, 12, 20, 0, [heroRegion(6, 17, claw(16.0, 10.0, 108.0, -6.0, 16.0), ordinary(11.239782333374023, 55))]),
-    [AttackStyle.forwardSmash]: heroMove(14, 3, 36, 0, [heroRegion(14, 16, claw(30.0, 44.0, 23.0, 70.0, 16.0), ordinary(17.167999267578125, 35, 107.0719985961914, 26.0))]),
+    [AttackStyle.forwardSmash]: heroMove(14, 3, 36, 0, [heroRegion(14, 16, claw(24.0, 40.0, 86.0, 40.0, 12.0), ordinary(17.167999267578125, 35, 107.0719985961914, 26.0))]),
     [AttackStyle.upSmash]: heroMove(11, 4, 34, 0, [heroRegion(11, 14, claw(0.0, 60.0, -30.0, 84.0, 16.0), ordinary(18.732969284057617, 90, 94.72880554199219, 26.0))]),
     [AttackStyle.downSmash]: heroMove(12, 4, 34, 0, [heroRegion(12, 15, claw(18.0, 10.0, 74.0, 10.0, 12.0), ordinary(16.235240936279297, 25, 94.72880554199219, 26.0))]),
     [AttackStyle.neutralAir]: cleanLateMove(heroMove(3, 6, 16, 8, [heroRegion(3, 8, claw(40.0, 48.0, 64.0, 10.0, 16.0), ordinary(5.0, 55, 50.0, 14.0))]), 2),

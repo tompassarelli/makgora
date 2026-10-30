@@ -222,6 +222,19 @@ spear down on each hit, fixed the return ratio but failed line 2's overshoot
 sim's frame data of 6, 18 and 3 frames (a 26-frame clip); the box asked for the
 exception as the jabs carry it.
 
+Murloc's forward smash ships with line 5 below 4. It is a Blender take
+(`tools/animations/murloc-stabs.py`) that swings the spear back under him and
+over into a level swing along the stage, every joint turning about the
+side-view axis. Tom found the earlier clip swiping toward the camera
+(2026-10-30): its hand fit solved only the hand's side-view position, so the
+spear swept 105 units in depth. Lines 1 to 4 pass (`bun wisp anim score --fighter
+murloc`: body share 0.29, mass shift 0.34, end error 0.00, jump 0.02, overshoot
+0.22, contrast 0.45). One bare judge scored take 1 at readability 2, weight 3,
+anticipation 3, follow-through 3 and character 3, and read the contact as a
+curled ball. Take 2 kept him side-on in a longer lunge and scored 3, 2, 3, 3,
+3, but it failed lines 1 and 2 (mass shift 0.41 with body share 0.27, jump
+0.05). Both takes are spent, so take 1 ships under the box's line 5 exception.
+
 Grom's dash attack ships with line 5 at 3: the judge medians on readability,
 weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
 lines 1 to 4 pass (#344). The take limit is spent; take B and the later

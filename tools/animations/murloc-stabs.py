@@ -9,6 +9,9 @@ deeper and lunging further. The rapid jab pokes on each of its hit windows from 
 for the finisher. In recovery the spear pulls back along the line, lowers and returns to ready at an even
 arc-length pace.
 
+Forward smash swings the spear back under him and over into a level swing along the stage: every joint turns about
+the side-view axis, so the blade stays in the side plane in both facings.
+
   blender --background --factory-startup --python tools/animations/murloc-stabs.py -- POSE RIG.json KEYS.json
 """
 import os
@@ -74,8 +77,72 @@ def bake_drill():
     print('MURLOC_DRILL_KEYS', pose_name, keys_path, frames + 1, 'frames', flush=True)
 
 
+SMASHES = {
+    'forwardSmash': dict(
+        spin=-360,
+        keys=[(0, None, {}),
+              (3, (-20, 24), dict(pitch=-150, travel=-6, drop=-2, lean=-6, chest=-8, head=6, twist=-15, leftArm=25, squash=-0.05, stretch=0.05,
+                                  front=-10, kneeFront=10, back=25, kneeBack=30, footBack=-10)),
+              (7, (-40, 88), dict(pitch=-205, travel=-12, drop=-3, lean=-12, chest=-14, head=10, twist=-30, leftArm=40, squash=-0.1, stretch=0.08,
+                                  front=-15, kneeFront=15, back=35, kneeBack=40, footBack=-15)),
+              (11, (-44, 92), dict(pitch=-200, travel=-14, drop=-4, lean=-14, chest=-16, head=10, twist=-35, leftArm=45, squash=-0.12, stretch=0.1,
+                                   front=-18, kneeFront=18, back=38, kneeBack=45, footBack=-15)),
+              (13, (84, 48), dict(pitch=-355, travel=22, drop=-4, lean=20, chest=14, head=-12, twist=30, leftArm=-70, stretch=0.3, squash=-0.15,
+                                  front=-55, kneeFront=45, footFront=-20, back=40, kneeBack=0)),
+              (15, (90, 30), dict(pitch=-378, travel=25, drop=-5, lean=24, chest=18, head=-12, twist=34, leftArm=-75, stretch=0.32, squash=-0.16,
+                                  front=-58, kneeFront=48, footFront=-20, back=42, kneeBack=0)),
+              (22, (74, 4), dict(pitch=-410, travel=22, drop=-6, lean=28, chest=24, head=-8, twist=28, leftArm=-60, stretch=0.2, squash=-0.08,
+                                 front=-50, kneeFront=50, footFront=-15, back=40, kneeBack=10))],
+        ramp=0.15),
+}
+
+
+def bake_smash():
+    smash = SMASHES[pose_name]
+    ready = {'pitch': rig.hanging}
+
+    def bound(arm, elbow):
+        return min(70.0, max(-180.0, arm)), min(10.0, max(-140.0, elbow))
+
+    def aimed(p, goal):
+        def error(arm, elbow):
+            rig.pose({**p, 'arm': arm, 'elbow': elbow})
+            point = rig.tip()
+            return (point.x - goal[0]) ** 2 + (point.z - goal[1]) ** 2 + 0.01 * (elbow + 40) ** 2
+        best = min((error(arm, elbow), arm, elbow) for arm in range(-180, 71, 15) for elbow in range(-140, 11, 10))
+        for step in (6, 2, 0.5):
+            _, arm, elbow = best
+            best = min((error(*bound(arm + i * step, elbow + j * step)), *bound(arm + i * step, elbow + j * step))
+                       for i in (-2, -1, 0, 1, 2) for j in (-2, -1, 0, 1, 2))
+        return {**p, 'arm': best[1], 'elbow': best[2]}
+
+    beats = [(frame, ready if goal is None else aimed(p, goal)) for frame, goal, p in smash['keys']]
+    end = beats[-1][0]
+    rested = {'pitch': rig.hanging + smash.get('spin', 0)}
+    along = rig.arc(lambda u: blend(beats[-1][1], rested, u))
+
+    def at(frame):
+        if frame > end:
+            return blend(beats[-1][1], rested, along(glide((frame - end) / (frames - end), smash['ramp'])))
+        for (a, pa), (b, pb) in zip(beats, beats[1:]):
+            if a <= frame <= b:
+                t = (frame - a) / (b - a)
+                return blend(pa, pb, t * t * (3 - 2 * t) if b - a > 2 else t)
+        return beats[-1][1]
+
+    for frame in range(frames + 1):
+        rig.pose(at(frame))
+        point = rig.tip()
+        print('MURLOC_SMASH_TIP', pose_name, frame, round(point.x, 1), round(point.z, 1), flush=True)
+    rig.bake(at, keys_path)
+    print('MURLOC_SMASH_KEYS', pose_name, keys_path, frames + 1, 'frames', flush=True)
+
+
 if pose_name == 'downAir':
     bake_drill()
+    sys.exit(0)
+if pose_name in SMASHES:
+    bake_smash()
     sys.exit(0)
 
 coil = dict(twist=-25, lean=-10, chest=-6, head=8, leftArm=35, stretch=-0.12, squash=0.1,
