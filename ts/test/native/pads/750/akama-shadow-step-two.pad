@@ -1,0 +1,42 @@
+# #750: each Akama slow-walks to his edge (a left, b right), turns to face the stage, back-jumps and double-jumps out past the drop, then holds up B: the first Shadow Step drops straight down beside the stage, and in the aim window he turns across for a shorter second step that snaps him to the ledge, a facing right and b facing left.
+#! chat -dev quick pair akama / akama
+20 a stick -0.3 0
+20 b stick 0.3 0
+340 a stick 0 0
+340 b stick 0 0
+350 a stick 0.3 0
+350 b stick -0.3 0
+351 a stick 0 0
+351 b stick 0 0
+358 a capture
+358 b capture
+360 a stick -1 0
+360 b stick 1 0
+360 a tap B 2
+360 b tap B 2
+378 a tap B 2
+378 b tap B 2
+390 a stick 0 0
+390 b stick 0 0
+400 a stick 0 1
+400 b stick 0 1
+400 a tap X 45
+400 b tap X 45
+404 a capture
+404 b capture
+406 a stick -0.08 -1
+406 b stick 0.08 -1
+414 a capture
+414 b capture
+424 a capture
+424 b capture
+428 a stick 1 -0.1
+428 b stick -1 -0.1
+432 a capture
+432 b capture
+438 a capture
+438 b capture
+446 a capture
+446 b capture
+450 a press VIEW
+514 a release VIEW
