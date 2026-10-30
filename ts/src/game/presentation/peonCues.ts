@@ -60,7 +60,8 @@ export function peonExtraCues(character: Character): readonly SackCues[] {
 }
 
 function goldSackCueState(fighter: Readonly<Fighter>): PeonCueState<never> {
-  const { form, frame, hit } = fighter.special;
+  const { form, frame } = fighter.special;
+  const { hit } = fighter.attack;
   const branch = form >= FOLLOW_UP_FORM ? idiv(form, FOLLOW_UP_FORM) - 1 : -1;
   if (branch > GOLD_SACK_CHARGE.stages) return { cues: undefined, phase: "none" };
   if (branch < 0) {
