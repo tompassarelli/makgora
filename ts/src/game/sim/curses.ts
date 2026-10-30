@@ -41,7 +41,6 @@ export function curseOnStockLoss(world: Roster, slot: number): void {
     const curse = curseOf(owner);
     if (curse !== undefined && !owner.status.out && owner.status.summonFrames === 0 && !summonAlive(owner, curse)) {
       owner.status.summonFrames = curse.summonDelay;
-      owner.status.summonX = victim.motion.x;
     }
   }
   liftCurse(victim);
@@ -56,7 +55,7 @@ function summon(owner: Fighter, curse: Readonly<SpecialCurse>, stage: number, ma
   const inset = max(spec.radius, spec.companion?.bite.radius ?? 0.0);
   const left = f32((decked ? surfaceLeft(stage, MAIN_DECK, matchFrame) : mainDeckLeft(stage)) + inset);
   const right = f32((decked ? surfaceRight(stage, MAIN_DECK, matchFrame) : mainDeckRight(stage)) - inset);
-  const x = left <= right ? min(right, max(left, owner.status.summonX)) : f32(f32(left + right) * 0.5);
+  const x = left <= right ? min(right, max(left, f32(f32(mainDeckLeft(stage) + mainDeckRight(stage)) * 0.5))) : f32(f32(left + right) * 0.5);
   const z = decked ? surfaceZAt(stage, MAIN_DECK, matchFrame, x) : mainDeckZAt(stage, x);
   const slot = spec.slot ?? 0;
   placeOne(owner, spec, slot, 1, 0.0, undefined);
@@ -67,7 +66,6 @@ function summon(owner: Fighter, curse: Readonly<SpecialCurse>, stage: number, ma
   placed.direction = owner.motion.x < x ? -1 : 1;
   placed.mode = CompanionMode.stunned;
   spawnHeroProjectileAt(owner, curse.portal, x, f32(z + curse.portal.offsetZ), placed.direction, false, owner.attack.serial + 1);
-  owner.status.summonX = 0.0;
 }
 
 export function advanceCurses(world: Roster, stage: number, matchFrame: number): void {

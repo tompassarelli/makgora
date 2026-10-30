@@ -202,7 +202,6 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.curseFrames !== actual.status.curseFrames) return "curseFrames";
   if (expected.status.healed !== actual.status.healed) return "healed";
   if (expected.status.summonFrames !== actual.status.summonFrames) return "summonFrames";
-  if (expected.status.summonX !== actual.status.summonX) return "summonX";
   if (expected.status.buff !== actual.status.buff) return "buff";
   if (expected.status.buffFrames !== actual.status.buffFrames) return "buffFrames";
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).spec !== at(actual.projectiles, i).spec) return `projectileSpec[${i}]`;

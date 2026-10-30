@@ -444,7 +444,6 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.curseFrames = sourceStatus.curseFrames;
   status.healed = sourceStatus.healed;
   status.summonFrames = sourceStatus.summonFrames;
-  status.summonX = sourceStatus.summonX;
   status.buff = sourceStatus.buff;
   status.buffFrames = sourceStatus.buffFrames;
   status.condition = sourceStatus.condition;
@@ -943,7 +942,6 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.curseFrames, b = sourceStatus.curseFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.healed, b = sourceStatus.healed; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.summonFrames, b = sourceStatus.summonFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-  { const a = status.summonX, b = sourceStatus.summonX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buff, b = sourceStatus.buff; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.buffFrames, b = sourceStatus.buffFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (status.manaShield !== sourceStatus.manaShield) return false;
@@ -1443,7 +1441,6 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   if (status.curseFrames !== 0) sink.int(prefix, "curseFrames", status.curseFrames);
   if (status.healed !== 0 || 1 / status.healed < 0) sink.real(prefix, "healed", status.healed);
   if (status.summonFrames !== 0) sink.int(prefix, "summonFrames", status.summonFrames);
-  if (status.summonX !== 0 || 1 / status.summonX < 0) sink.real(prefix, "summonX", status.summonX);
   if (status.buff !== 0 || status.buffFrames !== 0) {
     sink.int(prefix, "buff", status.buff);
     sink.int(prefix, "buffFrames", status.buffFrames);
@@ -1576,7 +1573,6 @@ export function blastFighterFields(f: Fighter): void {
   status.curseFrames = 0;
   status.healed = 0.0;
   status.summonFrames = 0;
-  status.summonX = 0.0;
   status.buff = ItemKind.none;
   status.buffFrames = 0;
   status.poisonStacks = 0;

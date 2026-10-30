@@ -9,7 +9,7 @@ export const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | und
   [Character.lich]: "A frost wyrm sweeps straight ahead at body height. Jump or shield it.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead, then fights at your side. Break it or keep away from its flames.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
-  [Character.pitLord]: "Marks the nearest foe in range with Doom, then a fel bolt lands on them through any shield: they burn 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal where they fell and fights for him. Dodge as the bolt lands or get out of range; smash him through his armor; kill him first to lift the curse.",
+  [Character.pitLord]: "Marks the nearest foe in range with Doom, then a fel bolt lands on them through any shield: they burn 1% a second until they lose a stock, then a Doom Guard steps out of a fel portal at the middle of the stage and fights for him. Dodge as the bolt lands or get out of range; smash him through his armor; kill him first to lift the curse.",
   [Character.beastmaster]: "His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low.",
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",

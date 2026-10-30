@@ -453,7 +453,6 @@ interface Status {
   curseFrames: number;
   healed: number;
   summonFrames: number;
-  summonX: number;
 
 
   buff: number;
@@ -755,7 +754,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     platform: { downHeld: false, downAge: 3, dropConsumed: false },
     cannon: { held: undefined, firing: undefined, cooldown: 0, passing: false },
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
-    status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorKnockback: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, healed: 0.0, summonFrames: 0, summonX: 0.0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0, manaShield: false, petrifyIn: 0, petrified: false, petrifyDamage: 0.0, aura: false, auraFrames: 0, slowFrames: 0, slowScale: 0.0, stacks: 0, struckBy: undefined },
+    status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorKnockback: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, healed: 0.0, summonFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0, manaShield: false, petrifyIn: 0, petrified: false, petrifyDamage: 0.0, aura: false, auraFrames: 0, slowFrames: 0, slowScale: 0.0, stacks: 0, struckBy: undefined },
     meter: { ultimate: 0 },
     placed: createPlacedObject(),
     pack: packFrom(spares, packLength(character)),

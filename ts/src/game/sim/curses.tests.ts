@@ -14,7 +14,7 @@ import { fillMeter } from "./meter";
 import { setWorldMotionValue } from "./motion";
 import { fighterAt } from "./roster";
 import { CompanionMode, type SpecialCurse } from "./specials/schema";
-import { surfaceRight, surfaceZAt } from "./stage";
+import { SLOPE_TEST_STAGE, mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceCount, surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 
 const ULTIMATE = maskOf(Action.attack, Action.special);
 const FOE_AHEAD = 60.0;
@@ -133,9 +133,11 @@ test("The Pit Lord losing a stock first lifts his curse and no Doom Guard comes 
   assertFalse(guard(d).life > 0);
 });
 
-test("A Doom Guard steps out of a fel portal exactly 60 frames after the doomed foe's stock loss, as they respawn, on the main deck nearest where they fell [k1 scenario]", () => {
+function guardLandingAt(stage: number, foeLossX: number, pitLordX: number): { readonly d: Duel; readonly frame: number } {
   const d = cursedDuel();
-  loseStock(d, d.foe);
+  d.state.match.stageChoice = stage;
+  moveTo(d.pitLord, pitLordX, mainDeckZAt(stage, pitLordX));
+  loseStock(d, d.foe, foeLossX);
   const lost = d.tick;
   while (d.tick < lost + d.doom.summonDelay - 1) {
     step(d);
@@ -143,15 +145,31 @@ test("A Doom Guard steps out of a fel portal exactly 60 frames after the doomed 
   }
   step(d);
   assertEquals(d.tick - lost, 60);
-  const placed = guard(d);
-  assertTrue(summonAlive(d.pitLord, d.doom));
-  assertEquals(placed.mode, CompanionMode.stunned);
-  const frame = d.state.match.matchFrame;
-  const x = f32(surfaceRight(0, 0, frame) - Math.max(d.doom.summon.radius, d.doom.summon.companion?.bite.radius ?? 0.0));
-  assertEquals(placed.x, x);
-  assertEquals(placed.z, surfaceZAt(0, 0, frame, x));
-  assertEquals(placed.durability, d.doom.summon.durability);
-  assertTrue(d.pitLord.projectiles.some(shot => shot.life > 0 && shot.spec === d.doom.portal));
+  return { d, frame: d.state.match.matchFrame };
+}
+
+function nearestFloorToCentre(d: Duel, stage: number, frame: number): number {
+  const inset = Math.max(d.doom.summon.radius, d.doom.summon.companion?.bite.radius ?? 0.0);
+  const centre = f32(f32(mainDeckLeft(stage) + mainDeckRight(stage)) * 0.5);
+  return Math.min(surfaceRight(stage, 0, frame) - inset, Math.max(surfaceLeft(stage, 0, frame) + inset, centre));
+}
+
+test("A Doom Guard steps out of a fel portal at the stage centre, 60 frames after the doomed foe's stock loss, whichever side they fell and the Pit Lord stands, on every stage [k1 scenario]", () => {
+  for (let stage = 0; stage <= SLOPE_TEST_STAGE; stage++) {
+    if (surfaceCount(stage) === 0) continue;
+    for (const [foeLossX, pitLordX] of [[-OFF_STAGE, -100.0], [OFF_STAGE, 100.0], [OFF_STAGE, -100.0]] as const) {
+      const { d, frame } = guardLandingAt(stage, foeLossX, pitLordX);
+      const placed = guard(d);
+      assertTrue(summonAlive(d.pitLord, d.doom));
+      assertEquals(placed.mode, CompanionMode.stunned);
+      const x = f32(nearestFloorToCentre(d, stage, frame));
+      assertEquals(placed.x, x);
+      assertEquals(placed.z, surfaceZAt(stage, 0, frame, x));
+      assertEquals(placed.durability, d.doom.summon.durability);
+      const portal = d.pitLord.projectiles.find(shot => shot.life > 0 && shot.spec === d.doom.portal);
+      assertEquals(assertDefined(portal, "the fel portal").x, x);
+    }
+  }
 });
 
 test("Only one Doom Guard at a time: a second doomed stock loss while one is out summons nothing more [k1 scenario]", () => {
