@@ -13,6 +13,7 @@ export interface Roster {
   teamBattle: boolean;
   friendlyFire: boolean;
   readonly teamChoices: Slots<Team>;
+  readonly linked: Slots<number>;
 
   readonly grabPaused: boolean[];
   readonly fighters: (Fighter | undefined)[];
@@ -27,7 +28,7 @@ export function createRoster(mask: number, fighters: readonly Fighter[] = []): R
     rosterFighters[slot] = fighters[slot];
   }
   const roster: Roster = {
-    mask, active: [false, false, false, false], teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
+    mask, active: [false, false, false, false], teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1], linked: [-1, -1, -1, -1],
     grabPaused,
     fighters: rosterFighters,
   };

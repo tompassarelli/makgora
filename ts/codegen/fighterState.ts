@@ -198,6 +198,7 @@ const GROUP_GUARDS: Readonly<Partial<Record<Guard, () => string>>> = {
   buff: () => "status.buff !== 0 || status.buffFrames !== 0",
   condition: () => "status.condition !== 0 || anyNonzero(status.conditionImmunity)",
   poison: () => "status.poisonFrames !== 0",
+  duo: () => "duo.role !== 0",
 };
 
 const ELEMENT_GUARDS: Readonly<Partial<Record<Guard, () => string>>> = {

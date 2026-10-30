@@ -9,5 +9,5 @@ export function sameTeam(world: Readonly<Roster>, first: number, second: number)
 }
 
 export function canHit(world: Readonly<Roster>, first: number, second: number): boolean {
-  return first !== second && (!sameTeam(world, first, second) || world.friendlyFire);
+  return first !== second && world.linked[first] !== second && (!sameTeam(world, first, second) || world.friendlyFire);
 }

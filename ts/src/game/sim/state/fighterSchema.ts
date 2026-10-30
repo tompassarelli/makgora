@@ -3,7 +3,7 @@ export type CopyForm = "plain" | "retained" | "none";
 export type SameForm = "signedZero" | "signedZeroOptional" | "plain" | "sameReal" | "none";
 export type CanonKit = "moves" | "specials" | "placedSpec" | "projectileSpec";
 export type CanonWriter = "int" | "real" | "bool" | "boolAsInt" | "flagInt" | "flagBool" | "optionalInt" | "slotRef" | "digest" | "specText";
-export type Guard = "specials" | "companion" | "condition" | "poison" | "buff" | "beamPair" | "nonzero" | "nonzeroSigned" | "cooldownSlot" | "defined";
+export type Guard = "specials" | "companion" | "condition" | "poison" | "buff" | "beamPair" | "nonzero" | "nonzeroSigned" | "cooldownSlot" | "duo" | "defined";
 export type ArrayLayout = "fieldMajor" | "animalMajor" | "scalarArray";
 
 export interface CanonColumn {
@@ -60,6 +60,9 @@ export interface FighterArray {
 
 export const FIGHTER_CONSTANTS: Readonly<Record<string, string>> = {
   PARTICIPANT_CAPACITY: "input/participants",
+  DUO_RING_INTS: "sim/fighter",
+  DuoOrder: "sim/codes",
+  DuoRole: "sim/codes",
   HERO_STATUS_GROUPS: "sim/codes",
   SPECIAL_ACTION_CAPACITY: "sim/codes",
   PROJECTILE_CAPACITY: "sim/fighter",
@@ -115,6 +118,8 @@ export const FIGHTER_GROUPS: readonly FighterGroup[] = [
   { key: "status", type: "Status", local: "status" },
   { key: "meter", type: "Meter", local: "meter" },
   { key: "pack", type: "PlacedObject", local: "placed", rest: "REST_PLACED" },
+  { key: "duo", type: "Duo", local: "duo" },
+  { key: "victim", type: "Victim", local: "victim" },
 ];
 
 export const FIGHTER_ARRAYS: readonly FighterArray[] = [
@@ -125,6 +130,7 @@ export const FIGHTER_ARRAYS: readonly FighterArray[] = [
   { path: "status.conditionImmunity", capacity: "HERO_STATUS_GROUPS", layout: "scalarArray", bound: "capacity", fallback: "0", index: "i" },
   { path: "pack", capacity: "PACK_CAPACITY", layout: "animalMajor", index: "animal" },
   { path: "placed.struck", capacity: "PARTICIPANT_CAPACITY", layout: "scalarArray", bound: "capacity", index: "slot" },
+  { path: "duo.ring", capacity: "DUO_RING_INTS", layout: "scalarArray", bound: "capacity", fallback: "0", index: "i" },
   { path: "pack[].struck", capacity: "PARTICIPANT_CAPACITY", layout: "scalarArray", bound: "capacity", index: "slot" },
 ];
 
@@ -172,6 +178,8 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "cannonFiring", "cannonCooldown", "cannonPassing", "waterIn", "waterFrames", "waterEntries", "waterHydraFrame", "waterHydraX",
   "waterHydraStrikeFrame", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "projectileBounces[${i}]", "projectileHomeward[${i}]",
   "projectileLastStruck[${i}]", "grabReel", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy",
+  "duoRole", "duoLink", "duoRing[${i}]", "duoHead", "duoOrder", "duoOrderFrame", "duoReviveSpent", "duoSwapCooldown", "duoTossCooldown",
+  "victimDuoChain", "victimDuoFree", "victimNetImmune", "victimGrabImmuneDuo", "victimHandoffs",
 ];
 
 export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -200,6 +208,8 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   water: ["inWater", "frames", "entries", "hydraFrame", "hydraX", "hydraStrikeFrame"],
   status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "healed", "summonFrames", "buff", "buffFrames", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy"],
   meter: ["ex", "ultimate"],
+  duo: ["role", "link", "ring[]", "head", "order", "orderFrame", "reviveSpent", "swapCooldown", "tossCooldown"],
+  victim: ["duoChain", "duoFree", "netImmune", "grabImmuneDuo", "handoffs"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "surface"],
   projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "lastStruck"],
 };
@@ -610,4 +620,18 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "status.slowScale", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "slowScale", writer: "real", when: ["nonzeroSigned"] }, diff: "slowScale", respawn: { blast: "0.0", respawn: "0.0" } },
   { path: "status.stacks", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "stacks", writer: "int", when: ["nonzero"] }, diff: "stacks", respawn: { blast: "0", respawn: "0" } },
   { path: "status.struckBy", type: "optionalInt", init: "undefined", copy: "plain", same: "signedZeroOptional", canon: { name: "struckBy", writer: "optionalInt", when: ["defined"] }, diff: { name: "struckBy", absent: -1 }, respawn: { blast: "undefined", respawn: "undefined" } },
+  { path: "duo.role", type: "enum", init: "DuoRole.solo", copy: "plain", same: "signedZero", canon: { name: "duo.role", writer: "int", when: ["nonzero"] }, diff: "duoRole", respawn: "keep" },
+  { path: "duo.link", type: "int", init: "-1", copy: "plain", same: "signedZero", canon: { name: "duo.link", writer: "int", when: ["duo"] }, diff: "duoLink", respawn: "keep" },
+  { path: "duo.ring[]", type: "int", init: "repeat(DUO_RING_INTS, () => 0)", copy: "plain", same: "signedZero", canon: { name: "duo.ring[${i}]", writer: "int", when: ["duo"] }, diff: "duoRing[${i}]", respawn: { blast: "0", respawn: "0" } },
+  { path: "duo.head", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "duo.head", writer: "int", when: ["duo"] }, diff: "duoHead", respawn: { blast: "0", respawn: "0" } },
+  { path: "duo.order", type: "enum", init: "DuoOrder.copy", copy: "plain", same: "signedZero", canon: { name: "duo.order", writer: "int", when: ["duo"] }, diff: "duoOrder", respawn: { blast: "DuoOrder.copy", respawn: "DuoOrder.copy" } },
+  { path: "duo.orderFrame", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "duo.orderFrame", writer: "int", when: ["duo"] }, diff: "duoOrderFrame", respawn: { blast: "0", respawn: "0" } },
+  { path: "duo.reviveSpent", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "duo.reviveSpent", writer: "boolAsInt", when: ["duo"] }, diff: "duoReviveSpent", respawn: { blast: "false", respawn: "false" } },
+  { path: "duo.swapCooldown", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "duo.swapCooldown", writer: "int", when: ["duo"] }, diff: "duoSwapCooldown", respawn: { blast: "0", respawn: "0" } },
+  { path: "duo.tossCooldown", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "duo.tossCooldown", writer: "int", when: ["duo"] }, diff: "duoTossCooldown", respawn: { blast: "0", respawn: "0" } },
+  { path: "victim.duoChain", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.duoChain", writer: "int", when: ["nonzero"] }, diff: "victimDuoChain", respawn: { blast: "0", respawn: "0" } },
+  { path: "victim.duoFree", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.duoFree", writer: "int", when: ["nonzero"] }, diff: "victimDuoFree", respawn: { blast: "0", respawn: "0" } },
+  { path: "victim.netImmune", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.netImmune", writer: "int", when: ["nonzero"] }, diff: "victimNetImmune", respawn: { blast: "0", respawn: "0" } },
+  { path: "victim.grabImmuneDuo", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.grabImmuneDuo", writer: "int", when: ["nonzero"] }, diff: "victimGrabImmuneDuo", respawn: { blast: "0", respawn: "0" } },
+  { path: "victim.handoffs", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.handoffs", writer: "int", when: ["nonzero"] }, diff: "victimHandoffs", respawn: { blast: "0", respawn: "0" } },
 ];

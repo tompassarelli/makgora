@@ -335,6 +335,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
     bool("world.friendlyFire", world.friendlyFire);
     for (const slot of PARTICIPANT_SLOTS) int(`world.slot${slot}.team`, world.teamChoices[slot]);
   }
+  for (const slot of PARTICIPANT_SLOTS) if (world.linked[slot] !== -1) int(`world.slot${slot}.linked`, world.linked[slot]);
   int("match.humanCount", match.humanCount);
   int("match.humanMask", match.humanMask);
   int("match.humanFighterMask", match.humanFighterMask);

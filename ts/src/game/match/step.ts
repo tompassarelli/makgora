@@ -40,6 +40,7 @@ import { copyFighterState } from "../../generated/state/fighterState";
 import { type MatchState, Phase, advanceClock, holdingStart, humanFighterActive, keepsStocks, resolveStocks, stageClock } from "../lobby/lobbyState";
 import { advanceItems } from "./centreItem";
 import { advanceOrbs } from "./orbs";
+import { seatMurlocPartners } from "../fighters/murloc/duo";
 
 import { bossClock, collectBossContacts, strikeBoss } from "../classic/bosses";
 import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../classic/configuredMatch";
@@ -87,6 +88,7 @@ export function initializeMatchFighters(game: Readonly<MatchState>, world: Roste
     }
   }
   applyConfiguredStart(game, world);
+  seatMurlocPartners(world);
 }
 
 

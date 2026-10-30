@@ -4,7 +4,7 @@ import { PARTICIPANT_CAPACITY } from "../../game/input/participants";
 import { canonicalSlot } from "../../game/replay/canonical";
 import { fighterMovesCanonical, fighterSpecialsCanonical } from "../../game/replay/kitCanonical";
 import { HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY } from "../../game/sim/codes";
-import { PROJECTILE_CAPACITY, placedObject } from "../../game/sim/fighter";
+import { DUO_RING_INTS, PROJECTILE_CAPACITY, placedObject } from "../../game/sim/fighter";
 import { at } from "wisp/src/runtime/lookup";
 
 function differentSlot(left: number | undefined, right: number | undefined, expectedMask: number, actualMask: number): boolean {
@@ -354,5 +354,19 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.slowScale !== actual.status.slowScale) return "slowScale";
   if (expected.status.stacks !== actual.status.stacks) return "stacks";
   if ((expected.status.struckBy ?? -1) !== (actual.status.struckBy ?? -1)) return "struckBy";
+  if (expected.duo.role !== actual.duo.role) return "duoRole";
+  if (expected.duo.link !== actual.duo.link) return "duoLink";
+  for (let i = 0; i < DUO_RING_INTS; i++) if ((expected.duo.ring[i] ?? 0) !== (actual.duo.ring[i] ?? 0)) return `duoRing[${i}]`;
+  if (expected.duo.head !== actual.duo.head) return "duoHead";
+  if (expected.duo.order !== actual.duo.order) return "duoOrder";
+  if (expected.duo.orderFrame !== actual.duo.orderFrame) return "duoOrderFrame";
+  if (expected.duo.reviveSpent !== actual.duo.reviveSpent) return "duoReviveSpent";
+  if (expected.duo.swapCooldown !== actual.duo.swapCooldown) return "duoSwapCooldown";
+  if (expected.duo.tossCooldown !== actual.duo.tossCooldown) return "duoTossCooldown";
+  if (expected.victim.duoChain !== actual.victim.duoChain) return "victimDuoChain";
+  if (expected.victim.duoFree !== actual.victim.duoFree) return "victimDuoFree";
+  if (expected.victim.netImmune !== actual.victim.netImmune) return "victimNetImmune";
+  if (expected.victim.grabImmuneDuo !== actual.victim.grabImmuneDuo) return "victimGrabImmuneDuo";
+  if (expected.victim.handoffs !== actual.victim.handoffs) return "victimHandoffs";
   return undefined;
 }

@@ -40,6 +40,7 @@ export function firstStateDifference(expected: Readonly<ReplayState>, actual: Re
   if (expected.world.teamBattle !== actual.world.teamBattle) return "world.teamBattle";
   if (expected.world.friendlyFire !== actual.world.friendlyFire) return "world.friendlyFire";
   for (const slot of PARTICIPANT_SLOTS) if (expected.world.teamChoices[slot] !== actual.world.teamChoices[slot]) return `world.slot${slot}.team`;
+  for (const slot of PARTICIPANT_SLOTS) if (expected.world.linked[slot] !== actual.world.linked[slot]) return `world.slot${slot}.linked`;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(expected.world, slot)) continue;
     const fighter = firstFighterDifference(fighterAt(expected.world, slot), fighterAt(actual.world, slot), expected.world.mask, actual.world.mask);
@@ -161,6 +162,7 @@ export function firstPoseDifference(expected: Readonly<ReplayState>, actual: Rea
   if (expected.world.teamBattle !== actual.world.teamBattle) return "world.teamBattle";
   if (expected.world.friendlyFire !== actual.world.friendlyFire) return "world.friendlyFire";
   for (const slot of PARTICIPANT_SLOTS) if (expected.world.teamChoices[slot] !== actual.world.teamChoices[slot]) return `world.slot${slot}.team`;
+  for (const slot of PARTICIPANT_SLOTS) if (expected.world.linked[slot] !== actual.world.linked[slot]) return `world.slot${slot}.linked`;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(expected.world, slot)) continue;
     const pose = firstFighterPoseDifference(expected.runtime.poses[slot], actual.runtime.poses[slot], expected.world, actual.world);
