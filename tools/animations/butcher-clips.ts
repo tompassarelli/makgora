@@ -1,5 +1,3 @@
-import { BunRuntime } from "../../ts/node_modules/@effect/platform-bun/dist/index.js";
-import { Effect, Schema } from "effect";
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
@@ -11,7 +9,6 @@ import type { HeroDefinition, HeroPose } from "../../ts/src/game/sim/heroes/hero
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, rotated, tracks } from "./original-clips";
-class ClipFailure extends Schema.TaggedError<ClipFailure>()("ClipFailure", { cause: Schema.Unknown }) {}
 
 type Point = readonly [number, number, number];
 interface Gesture {
@@ -244,4 +241,4 @@ async function generate(): Promise<void> {
   console.log(`BUTCHER_CLIPS_PASS ${b.records.length} authored clips; ${source.Sequences.length} stock sequences retained; private output ${output}`);
 }
 
-BunRuntime.runMain(Effect.tryPromise({ try: generate, catch: cause => new ClipFailure({ cause }) }));
+await generate();

@@ -1,8 +1,6 @@
 import { NO_GLOBAL_SEQ, type KeyVector } from './animVector';
 
 
-import { BunRuntime } from "../../ts/node_modules/@effect/platform-bun/dist/index.js";
-import { Effect, Schema } from "effect";
 import { mkdirSync } from "node:fs";
 import { join, resolve, relative } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
@@ -17,8 +15,7 @@ import { GROUND_ROLL_FRAMES } from "../../ts/src/game/sim/conditions";
 import { seconds } from "./asset-info";
 import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
-class ClipFailure extends Schema.TaggedError<ClipFailure>()("ClipFailure", { cause: Schema.Unknown }) {}
-BunRuntime.runMain(Effect.tryPromise({ try: async () => {
+await (async () => {
 const args = process.argv.slice(2), [input, output] = args.slice(0, 2).map(p => resolve(p));
 const option = (name: string) => { const at = args.indexOf(name); return at < 0 ? undefined : resolve(args[at + 1] ?? ""); };
 const rigOutput = option("--rig"), bakedKeys = option("--keys");
@@ -268,4 +265,4 @@ for(const [index,sequence] of source.Sequences.entries()) if(!authored.has(index
 for(const pose of ["dashAttack","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","downSmash","backAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","getUp","getUpAttack","grab","grabHold","pummel","throwForward","throwBack","throwUp","throwDown"]){const i=actions.findIndex(a=>a.pose===pose);if(i<0)continue;const action=actions[i]!,sequence=records[i]!.index;const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Medivh ${pose}`,finalDrawn,panels,5).png);}
 await Bun.write(join(output,"medivh-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,appended:records.length,records},null,2)+"\n");console.log(`MEDIVH_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; private output ${output}`);
 
-}, catch: cause => new ClipFailure({ cause }) }));
+})();

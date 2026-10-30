@@ -1,6 +1,4 @@
 import { NO_GLOBAL_SEQ, type KeyVector } from './animVector';
-import { BunRuntime } from "../../ts/node_modules/@effect/platform-bun/dist/index.js";
-import { Effect, Schema } from "effect";
 import { mkdirSync } from "node:fs";
 import { join, resolve, relative } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
@@ -18,7 +16,6 @@ import { UTHER_SPECIAL_SWINGS } from "../../ts/src/game/fighters/uther/specials"
 import { seconds } from "./asset-info";
 import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
-class ClipFailure extends Schema.TaggedError<ClipFailure>()("ClipFailure", { cause: Schema.Unknown }) {}
 const args = process.argv.slice(2), [input, output] = args.slice(0, 2).map(p => resolve(p));
 const replaced = args.slice(2) as HeroPose[], inPlace = replaced.length > 0;
 const project = resolve(import.meta.dir, "../..");
@@ -266,4 +263,4 @@ const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{re
  await writeSheets(checkStockUnchanged(bytes));
 await Bun.write(join(output,"uther-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,appended:records.length,records},null,2)+"\n");console.log(`UTHER_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; private output ${output}`);
 }
-BunRuntime.runMain(Effect.tryPromise({ try: generate, catch: cause => new ClipFailure({ cause }) }));
+await generate();

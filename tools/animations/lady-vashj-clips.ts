@@ -1,6 +1,4 @@
 import { NO_GLOBAL_SEQ } from './animVector';
-import { BunRuntime } from "../../ts/node_modules/@effect/platform-bun/dist/index.js";
-import { Effect, Schema } from "effect";
 import { mkdirSync } from "node:fs";
 import { join, resolve, relative } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
@@ -15,7 +13,6 @@ import { GROUND_ROLL_FRAMES } from "../../ts/src/game/sim/conditions";
 import { seconds } from "./asset-info";
 import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
-class ClipFailure extends Schema.TaggedError<ClipFailure>()("ClipFailure", { cause: Schema.Unknown }) {}
 
 type Point = readonly [number, number, number];
 interface Gesture {
@@ -347,12 +344,22 @@ for (const facing of [1, -1]) { const file = join(sheets, `pain-${facing > 0 ? "
   return written;
 }
 
+const STOCK_SEQUENCES = 14;
+function stockCut(model: mdx.Model): mdx.Model {
+  if (model.Sequences.length <= STOCK_SEQUENCES) return model;
+  ensure(model.Sequences.slice(STOCK_SEQUENCES).every(s => s.Name.startsWith("Lady Vashj ")), "Expected the stock or shipped Lady Vashj");
+  const end = Math.max(...model.Sequences.slice(0, STOCK_SEQUENCES).map(s => s.Interval[1]));
+  model.Sequences.length = STOCK_SEQUENCES;
+  tracks(model, t => { if (!onGlobalClock(t)) t.Keys = t.Keys.filter(k => k.Frame <= end); });
+  return parseSource(encodeVerified(model));
+}
+
 async function generate(): Promise<void> {
 const args = process.argv.slice(2), [input, output] = args.slice(0, 2).map(p => resolve(p));
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/lady-vashj-clips.ts STOCK_LADY_VASHJ.mdx PRIVATE_OUTPUT");
-const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
-ensure(source.Sequences.length === 14 && source.Bones.some(b => b.Name === "Bone_Tail_05") && source.Bones.some(b => b.Name === "Bow"), "Expected the original classic Lady Vashj");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/lady-vashj-clips.ts LADY_VASHJ.mdx PRIVATE_OUTPUT");
+const source = stockCut(parseSource(await Bun.file(input).arrayBuffer())), model = structuredClone(source);
+ensure(source.Sequences.length === STOCK_SEQUENCES && source.Bones.some(b => b.Name === "Bone_Tail_05") && source.Bones.some(b => b.Name === "Bow"), "Expected the original classic Lady Vashj");
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.ladyVashj);
 const actions = authoredActions(hero), damage = damageActions();
@@ -373,4 +380,4 @@ await Bun.write(join(output, "lady-vashj-clips.json"), JSON.stringify({ stockSeq
 console.log(`LADY_VASHJ_CLIPS_PASS ${b.records.length} authored clips; ${source.Sequences.length} stock sequences retained; kit timing ${hero ? "from the registered kit" : "from roster-next.md"}; private output ${output}`);
 }
 
-BunRuntime.runMain(Effect.tryPromise({ try: generate, catch: cause => new ClipFailure({ cause }) }));
+await generate();
