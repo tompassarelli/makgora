@@ -165,6 +165,41 @@ the cuff and three curled fingers unchanged. `wc3-hand-pinch.png`, his authored
 closed-fist pinch, is no longer read by the build; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
 `selection-assets` family and commit its hash with the source change.
 
+### Warcraft's own cursor
+
+Warcraft draws its own cursor over every menu and dialog the map cannot cover
+(the F10 Game Menu and its submenus, Options, chat, results). The cursor is a
+model (`UI\Cursor\HumanCursor.mdx` and the Orc, NightElf, Undead and Forsaken
+ones, named by each race's `Cursor` skin key) that samples one 256x128 texture,
+`UI\Cursor\<Race>Cursor.blp`, as an 8x4 grid of 32 px cells. Classic honours a
+map import at that stock texture path: the map build imports the same BLP at
+all five paths (`gameCursorImports` in ts/scripts/wisp/mapArtImports.ts), so the
+gauntlet replaces the stock art for this map only. Checked natively on a gex45
+pair (2026-10-30): a texture with magenta cells at the stock path showed as the
+cursor over the Game Menu, while a `war3mapSkin.txt` `Cursor=` key pointing at an
+imported model had no effect.
+
+The grid and the click point are the stock model's: the pointer cells (row 0
+all eight columns, and row 3 columns 0, 3 and 4) put the click point 8 px right
+of and 1 px below the cell's corner, and the 30x30 px the model samples from
+each cell cannot be moved by a texture; the target cells (row 2, and row 3
+columns 1 and 2) centre on the click point; row 3 columns 5 to 7 are the edge
+scroll arrows. `tools/selection/gameCursorArt.ts` fills them: the point gauntlet,
+mirrored so its index fingertip lands on the click point with the hand running
+right and down from it (the art points up and right, and the cell holds only
+7 px left of the click point), the bullseye ring for target, cyan for a
+selectable target, red with a slash for an invalid one, and a pale arrow for scrolling.
+It writes `GameCursor.tga` into the `selection-assets` family, which is not
+imported as a TGA. A texture override changes only the art: it cannot move the
+click point, resize the cursor or add states.
+
+Character and stage select hide Warcraft's cursor and draw their own hand or
+bullseye; while any Warcraft menu or chat is open over them (an `EscMenuMainPanel`,
+`EscMenuOptionsPanel` or `EscMenuOptionsConfirmDialog` frame, or the chat entry, is
+visible, read locally by `warcraftMenuOpen` in ts/src/host/loop/warcraftMenu.ts)
+they hide their own and enable Warcraft's cursor, which is the gauntlet here, and
+restore theirs when it closes.
+
 ## Other shared paths
 
 - The LAN pool's ~/.local/state/wisp/lan/ and each client's CustomMapData

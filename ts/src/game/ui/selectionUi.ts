@@ -152,6 +152,7 @@ export class SelectionPanel {
   private now = 0.0;
   private cursorEnabled: boolean | undefined;
   private menuCursorAllowed = true;
+  private warcraftMenuOpen = false;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
   private readonly roster: Roster = { grid: rosterGrid(ROSTER_TILES), selectable: 0, chips: this.chips };
@@ -522,7 +523,7 @@ export class SelectionPanel {
   }
 
   private showHand(drawn: boolean, carried: number | undefined, x: number, y: number): void {
-    const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, this.drag.hover, this.game?.phase === Phase.stageMenu);
+    const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, this.drag.hover, this.game?.phase === Phase.stageMenu, this.warcraftMenuOpen);
     this.localHand = hand === undefined ? HIDDEN_HAND : { state: hand, chip: hand === "pinch" ? carried : undefined, x, y };
     this.presentHands();
     BlzFrameSetVisible(this.bullseye, bullseye);
@@ -592,13 +593,14 @@ export class SelectionPanel {
     presentDelayControls(this.delay, net.hostControl);
   }
 
-  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, sessionWins: Readonly<Slots<number>>, now: number): void {
+  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, warcraftMenuOpen: boolean, sessionWins: Readonly<Slots<number>>, now: number): void {
     this.game = game;
     this.now = now;
     this.settingsOpen = loading || settingsOpen;
     if (this.choosing() === undefined) this.cpuSlot = undefined;
     if (!this.ownsLocalClient()) return;
     this.menuCursorAllowed = menuCursorAllowed;
+    this.warcraftMenuOpen = warcraftMenuOpen;
     const { participantId, drag } = this;
     const visible = this.choosing() !== undefined;
     const cpuOpen = visible && this.cpuSlot !== undefined;

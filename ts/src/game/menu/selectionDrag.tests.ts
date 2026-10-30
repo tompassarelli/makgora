@@ -10,12 +10,29 @@ test("The select cursor is the default hand off the tiles, the fanned hand over 
       for (const holding of [false, true]) {
         for (const hovering of [false, true]) {
           const hover = hovering ? 0 : undefined;
-          const cursor = menuCursor(allowed, drawn, holding, hover, false);
+          const cursor = menuCursor(allowed, drawn, holding, hover, false, false);
           assertFalse(cursor.bullseye);
           assertEquals(cursor.stock, allowed && !drawn);
           if (!drawn) assertEquals(cursor.hand, undefined);
           else assertEquals(cursor.hand, holding ? "pinch" : hover === undefined ? "point" : "fan");
           assertFalse(cursor.stock && cursor.hand !== undefined);
+        }
+      }
+    }
+  }
+});
+
+test("A Warcraft menu open over select hides every drawn cursor and shows Warcraft's cursor whatever else holds, and closing it restores the hand [k2 property]", () => {
+  for (const allowed of [false, true]) {
+    for (const drawn of [false, true]) {
+      for (const holding of [false, true]) {
+        for (const stage of [false, true]) {
+          const hover = holding ? 0 : undefined;
+          const open = menuCursor(allowed, drawn, holding, hover, stage, true);
+          assertEquals(open.hand, undefined);
+          assertFalse(open.bullseye);
+          assertTrue(open.stock);
+          assertEquals(menuCursor(allowed, drawn, holding, hover, stage, false).stock, allowed && !drawn);
         }
       }
     }
@@ -28,11 +45,11 @@ test("Stage select draws the bullseye instead of any hand wherever a cursor is d
       for (const holding of [false, true]) {
         for (const hovering of [false, true]) {
           const hover = hovering ? 0 : undefined;
-          const stage = menuCursor(allowed, drawn, holding, hover, true);
+          const stage = menuCursor(allowed, drawn, holding, hover, true, false);
           assertEquals(stage.bullseye, drawn);
           assertEquals(stage.hand, undefined);
           assertEquals(stage.stock, allowed && !drawn);
-          assertEquals(menuCursor(allowed, drawn, holding, hover, false).bullseye, false);
+          assertEquals(menuCursor(allowed, drawn, holding, hover, false, false).bullseye, false);
         }
       }
     }

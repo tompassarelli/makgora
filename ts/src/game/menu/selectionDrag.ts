@@ -191,11 +191,11 @@ export interface MenuCursor {
   readonly stock: boolean;
 }
 
-// The gauntlet replaces the stock cursor on character select and the bullseye does on stage select; the stock one only returns where neither is drawn.
-export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: RosterTile | undefined, stageSelect: boolean): MenuCursor => ({
-  hand: !cursorDrawn || stageSelect ? undefined : holdingChip ? "pinch" : hover === undefined ? "point" : "fan",
-  bullseye: cursorDrawn && stageSelect,
-  stock: cursorAllowed && !cursorDrawn,
+// The gauntlet replaces the stock cursor on character select and the bullseye does on stage select; the stock cursor, which the map draws as the gauntlet, only returns where neither is drawn or while a Warcraft menu is open over them.
+export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: RosterTile | undefined, stageSelect: boolean, warcraftMenuOpen: boolean): MenuCursor => ({
+  hand: !cursorDrawn || stageSelect || warcraftMenuOpen ? undefined : holdingChip ? "pinch" : hover === undefined ? "point" : "fan",
+  bullseye: cursorDrawn && stageSelect && !warcraftMenuOpen,
+  stock: warcraftMenuOpen || (cursorAllowed && !cursorDrawn),
 });
 
 // A carried chip rides above the pinch with its lower rim just over the thumb and index tips, like Melee's token.
