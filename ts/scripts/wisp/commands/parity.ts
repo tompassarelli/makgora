@@ -18,6 +18,7 @@ import { step } from "wisp/scripts/wisp/timings";
 
 import { tapeCosts, tapes } from "./tapes";
 import { corpus } from "../corpus";
+import { standaloneParity } from "../standaloneParity";
 import { reconcileFourFighters } from "../../fourFighters";
 import { reconcilePlayable } from "../../playable";
 import { join } from "node:path";
@@ -57,7 +58,8 @@ export const parity: Command = ([mode, ...args]) => {
     }
     case "tapes": return args[0] === "costs" ? tapeCosts(args.slice(1)).pipe(step("tape replay costs")) : tapes(args);
     case "corpus": return corpus(args).pipe(step("native corpus replay"));
-    default: return Effect.fail(new UsageFailure({ problem: "parity takes numeric, tapes or corpus" }));
+    case "standalone": return standaloneParity(args).pipe(step("standalone window parity"));
+    default: return Effect.fail(new UsageFailure({ problem: "parity takes numeric, tapes, corpus or standalone" }));
   }
 };
 

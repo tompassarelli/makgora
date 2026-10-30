@@ -21,6 +21,15 @@ updated the expected damage after the CPU changes. This is the CPU fixture for
 standalone/native comparisons. Map assets are read from the existing private
 inputs, with stock assets cached outside the repository.
 
+`bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native,pool-predicted` (smashcraft#806)
+plays the pad in the standalone window's headless session under each
+presentation and compares every frame's fighter digest with the native
+client's recording of the same pad under that presentation. A native recording
+is a corpus recording (`ts/test/corpus/STAMP/{a,b}`) whose `session.json` adds
+`"pad": "test/native/pads/cpu-expert.pad"` and `"presentation": "native"`; the
+command fails when a presentation has none. Without recordings, the same pad
+plays to identical digests under `native` and `pool-predicted` (1100 frames).
+
 `bun wisp play --standalone --four-fighters --frames 7200 --out DIR` is
 wisp#48's frame-rate measurement. It runs one game copy, as live play does:
 Illidan on the bot beat's keys against computer Rifleman, Illidan and Warden,

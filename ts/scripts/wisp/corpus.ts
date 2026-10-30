@@ -46,17 +46,19 @@ const REPLAY_FILE = /^smashcraft-replay-(\d+)(?:-(\d+))?\.txt$/;
 interface Session {
   readonly commit?: string;
   readonly dirty?: boolean;
+  readonly pad?: string;
+  readonly presentation?: string;
 }
 
 
-interface Recording {
+export interface Recording {
   readonly id: string;
   readonly path: string;
   readonly session: Session;
 }
 
 
-interface Replay {
+export interface Replay {
 
   readonly recording: Recording;
   readonly client: string;
@@ -70,10 +72,16 @@ interface Replay {
 function readSession(path: string): Session {
   try {
     const parsed: unknown = JSON.parse(readFileSync(join(path, "session.json"), "utf8"));
-    if (typeof parsed !== "object" || parsed === null || !("git" in parsed)) return {};
+    if (typeof parsed !== "object" || parsed === null) return {};
+    const padded = {
+      ...("pad" in parsed && typeof parsed.pad === "string" ? { pad: parsed.pad } : {}),
+      ...("presentation" in parsed && typeof parsed.presentation === "string" ? { presentation: parsed.presentation } : {}),
+    };
+    if (!("git" in parsed)) return padded;
     const git: unknown = parsed.git;
-    if (typeof git !== "object" || git === null) return {};
+    if (typeof git !== "object" || git === null) return padded;
     return {
+      ...padded,
       ...("commit" in git && typeof git.commit === "string" ? { commit: git.commit } : {}),
       ...("dirty" in git && typeof git.dirty === "boolean" ? { dirty: git.dirty } : {}),
     };
@@ -125,7 +133,7 @@ export function assembleReplays(recordings: readonly Recording[]): { readonly re
 }
 
 
-function joinedLines(replay: Replay): string[] | string {
+export function joinedLines(replay: Replay): string[] | string {
   const folder = join(tmpdir(), `smashcraft-corpus-${process.pid}-${replay.recording.id}-${replay.client}-${basename(replay.manifest, ".txt")}`);
   mkdirSync(folder, { recursive: true });
   try {

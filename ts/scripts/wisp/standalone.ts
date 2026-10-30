@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
 import { installHeadless } from "wisp/scripts/wisp/headless";
+import { describeDigestDifference, digestDifference, frameDigest } from "../../src/game/replay/frameDigest";
 import { Action } from "../../src/game/input/actions";
 import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { Phase } from "../../src/game/lobby/lobbyState";
@@ -50,13 +51,13 @@ const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Rifleman", "-dev fight
 const FOUR_FIGHTER_STOCKS = 99;
 
 
-export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean }> {
+export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
   const { script, presentation, fourFighters = false } = options;
   const runtime = installHeadless(script === undefined || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS);
   try {
 
     const platform = join(import.meta.dir, "../../src/platform");
-    interface State { readonly game: { readonly phase: number; stockCount: number }; readonly runtime: { readonly simulationFrame: number } }
+    interface State { readonly game: { readonly phase: number; stockCount: number }; readonly runtime: { readonly simulationFrame: number }; readonly world: Parameters<typeof frameDigest>[0] }
     const { shell }: { shell(): State } = await import(join(platform, "../host/loop/state.ts"));
     const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "../host/loop/diagnostics.ts"));
     const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
@@ -120,6 +121,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
       },
       checksum: () => value(() => confirmedChecksum(shell())),
       frame: () => value(() => presentation === "pool-predicted" ? drawnFrame(shell()).frame : shell().runtime.simulationFrame),
+      digest: () => value(() => ({ frame: shell().runtime.simulationFrame, digest: frameDigest(shell().world, shell().runtime.simulationFrame) })),
+      difference: (recorded) => value(() => describeDigestDifference(digestDifference(shell().world, shell().runtime.simulationFrame, recorded))),
       finished: () => value(() => shell().game.phase === Phase.result),
       close() { if (!closed) { closed = true; runtime.restore(); } },
     };
