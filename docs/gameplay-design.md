@@ -92,7 +92,17 @@ Run at its run frame only with the stick past 0.625 forward.
 #392's platform bands reuse the deadzone, the 0.6875 crouch threshold and the
 0.6625 jump threshold ([Platforms](#platforms)).
 
-The tilt modifier shortens the stick as a box controller's modifier does
+Two modifiers shape the stick, as a B0XX-style layout does (Tom's design, 2026-10-30):
+
+| Held | Effect | Default key |
+|---|---|---|
+| Mod X | Reduces only the horizontal value, to the tilt X value below: walking, forward tilts, and a steep up-diagonal when up and a side are held, x = ±0.3125 and up 0.7375, the mirror of Mod Y's, about 67 degrees above horizontal (`MOD_X_UP_DIAGONAL`) | K |
+| Mod Y | Reduces only the vertical value, to the tilt Z value below: up and down tilts, and the shallow wall-ride diagonal on every diagonal, up or down, x = ±0.7375 and up or down 0.3125, about 23 degrees from horizontal (`MOD_Y_DIAGONAL`) | ; |
+| Both | Reduces both axes, the tilt modifier described next: the all-purpose tilt, for shield tilting | K and ; |
+
+The eight-way aimed specials still read either diagonal as a diagonal, and Wing Ascent and steered flights take the angle given. A pad's right-stick tilt holds both.
+
+The tilt modifier (both held) shortens the stick as a box controller's modifier does
 (#282) and gives the largest shield tilt that never rolls, spot dodges or
 jumps: the input adapter scales each axis so a full press sends x = ±0.6875,
 up 0.65 and down −0.675, one Melee stick unit (0.0125) inside roll and spot

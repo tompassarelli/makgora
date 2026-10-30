@@ -45,7 +45,7 @@ const PERIOD = 190;
 const SLASH = 191;
 const OPEN_BRACKET = 219;
 const CLOSE_BRACKET = 221;
-const MOD_X_KEY = SEMICOLON;
+const MOD_Y_KEY = SEMICOLON;
 
 const code = (character: string) => character.charCodeAt(0);
 
@@ -98,12 +98,12 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.cRight, code("L"));
   bind(Action.cUp, custom ? MINUS : code("0"));
   bind(Action.cDown, code("P"));
-  bind(Action.walk, code("K"));
+  bind(Action.modX, code("K"));
   bind(Action.lightShield, code(wasd ? "E" : "A"));
   bind(Action.shortHop, code("I"));
   if (custom) bind(Action.strong, code("0"));
   else bind(Action.strong, code("9"));
-  bind(Action.modX, MOD_X_KEY);
+  bind(Action.modY, MOD_Y_KEY);
   return { keys };
 }
 
@@ -120,9 +120,9 @@ export function previousStandardKeys(): number[] {
   bind(Action.lightShield, code("A"), EMPTY);
   bind(Action.cUp, code("J"), EMPTY);
   bind(Action.cDown, code("H"), EMPTY);
-  bind(Action.walk, code("P"), EMPTY);
+  bind(Action.modX, code("P"), EMPTY);
   bind(Action.strong, code("9"), code("X"));
-  bind(Action.modX, EMPTY, EMPTY);
+  bind(Action.modY, EMPTY, EMPTY);
   return keys;
 }
 
@@ -265,8 +265,8 @@ export function unboundActions(bindings: Readonly<KeyBindings>): Action[] {
 
 const CURRENT_SAVE = "KC";
 const FIRST_SAVE_WITH_START = "KB";
-const SLOTS_BEFORE_MOD_X = (Action.strong + 1) * 2;
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_X - 2, K5: SLOTS_BEFORE_MOD_X - 2, K6: SLOTS_BEFORE_MOD_X, K7: SLOTS_BEFORE_MOD_X, K8: SLOTS_BEFORE_MOD_X, K9: SLOTS_BEFORE_MOD_X, KA: SLOTS_BEFORE_MOD_X, KB: SLOTS_BEFORE_MOD_X, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const SLOTS_BEFORE_MOD_Y = (Action.strong + 1) * 2;
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_Y - 2, K5: SLOTS_BEFORE_MOD_Y - 2, K6: SLOTS_BEFORE_MOD_Y, K7: SLOTS_BEFORE_MOD_Y, K8: SLOTS_BEFORE_MOD_Y, K9: SLOTS_BEFORE_MOD_Y, KA: SLOTS_BEFORE_MOD_Y, KB: SLOTS_BEFORE_MOD_Y, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 
@@ -300,12 +300,12 @@ function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
     if (version !== "KA") upgradeToPreviousKeys(bindings, version);
     replacePreviousPreset(bindings);
   }
-  bindModXDefault(bindings);
+  bindModYDefault(bindings);
 }
 
-function bindModXDefault(bindings: KeyBindings): void {
-  const unbound = keyFor(bindings, Action.modX, 0) === undefined && keyFor(bindings, Action.modX, 1) === undefined;
-  if (unbound && !bindings.keys.includes(MOD_X_KEY)) rebind(bindings, Action.modX, 0, MOD_X_KEY);
+function bindModYDefault(bindings: KeyBindings): void {
+  const unbound = keyFor(bindings, Action.modY, 0) === undefined && keyFor(bindings, Action.modY, 1) === undefined;
+  if (unbound && !bindings.keys.includes(MOD_Y_KEY)) rebind(bindings, Action.modY, 0, MOD_Y_KEY);
 }
 
 function upgradeToPreviousKeys(bindings: KeyBindings, version: string): void {
@@ -329,10 +329,10 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
   }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
   if (first(Action.shortHop) === undefined && free(code("I"))) rebind(bindings, Action.shortHop, 0, code("I"));
-  if (version === "K1" && free(code("P"))) rebind(bindings, Action.walk, 0, code("P"));
+  if (version === "K1" && free(code("P"))) rebind(bindings, Action.modX, 0, code("P"));
 
   if (first(Action.grab) === code("L") && free(code("O"))) rebind(bindings, Action.grab, 0, code("O"));
-  if (first(Action.walk) === SEMICOLON && free(code("P"))) rebind(bindings, Action.walk, 0, code("P"));
+  if (first(Action.modX) === SEMICOLON && free(code("P"))) rebind(bindings, Action.modX, 0, code("P"));
 
   if (first(Action.moveLeft) === code("S") && first(Action.moveRight) === code("F") && first(Action.moveDown) === code("D")
     && first(Action.leftTrigger) === code("A") && free(code("Q"), code("W"), code("E"), code("R"))) {
@@ -385,11 +385,11 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.cRight]: "C-right",
   [Action.cUp]: "C-up",
   [Action.cDown]: "C-down",
-  [Action.walk]: "Walk",
+  [Action.modX]: "Mod X (walk, steep angles)",
   [Action.lightShield]: "Light shield",
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
   [Action.strong]: "Strong (smash, EX special)",
-  [Action.modX]: "Mod X",
+  [Action.modY]: "Mod Y (shallow angles, wall ride)",
 };
 
 export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
@@ -407,11 +407,11 @@ export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
   [Action.cRight]: "C-right",
   [Action.cUp]: "C-up",
   [Action.cDown]: "C-down",
-  [Action.walk]: "Walk",
+  [Action.modX]: "Mod X",
   [Action.lightShield]: "Light sh.",
   [Action.shortHop]: "Hop",
   [Action.strong]: "Strong",
-  [Action.modX]: "Mod X",
+  [Action.modY]: "Mod Y",
 };
 
 const KEY_NAMES: Readonly<Record<number, string>> = {

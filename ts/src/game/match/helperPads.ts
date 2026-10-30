@@ -3,13 +3,15 @@
 // (controller/src/main.rs), read as a journal packet, carried in the
 // synchronized input message and adapted by the match frame executor.
 import { assertDefined, assertTrue } from "wisp/src/runtime/testing";
-import { Action, bit, has } from "../input/actions";
+import { Action, bit, has, maskOf } from "../input/actions";
 import { type InputRow, copyInput, inputRow } from "../input/inputRow";
 import { participantInputs } from "../input/participants";
 import { decodeInputMessage, encodeInputMessage, encodePacket, inputPacket } from "../input/wire";
 import { JournalInputSource } from "../netcode/journal/source";
 import { captureNetworkFrame, executeMatchFrame } from "./frameInput";
 import type { TestMatch } from "./testMatch";
+
+const TILT = maskOf(Action.modX, Action.modY);
 
 const EPOCH = 3;
 const RAW = 32767;
@@ -49,7 +51,7 @@ function heldActions(pad: Pad): number {
   if (pad.attack === true) held |= bit(Action.attack);
   if (pad.special === true) held |= bit(Action.special);
   if (pad.jump === true) held |= bit(Action.jump);
-  if (pad.tilt === true) held |= bit(Action.walk);
+  if (pad.tilt === true) held |= TILT;
   if (pad.shortHop === true) held |= bit(Action.shortHop);
   if (pad.strong === true) held |= bit(Action.strong);
   if (x < -STICK_DIGITAL) held |= bit(Action.moveLeft);
@@ -60,7 +62,7 @@ function heldActions(pad: Pad): number {
   if (raw(pad.cx) < -C_STICK_DIGITAL) held |= bit(Action.cLeft);
   if (raw(pad.cy) > C_STICK_DIGITAL) held |= bit(Action.cUp);
   if (raw(pad.cy) < -C_STICK_DIGITAL) held |= bit(Action.cDown);
-  if (pad.rightStickTilts === true && Math.max(Math.abs(raw(pad.cx)), Math.abs(raw(pad.cy))) > C_STICK_DIGITAL) held |= bit(Action.walk);
+  if (pad.rightStickTilts === true && Math.max(Math.abs(raw(pad.cx)), Math.abs(raw(pad.cy))) > C_STICK_DIGITAL) held |= TILT;
   if (pad.trigger === true && RAW > TRIGGER_DIGITAL) held |= bit(Action.leftTrigger);
   if (pad.rightTrigger === true && RAW > TRIGGER_DIGITAL) held |= bit(Action.rightTrigger);
   return held;

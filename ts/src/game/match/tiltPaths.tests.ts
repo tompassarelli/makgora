@@ -12,7 +12,7 @@ import { fighterAt } from "../sim/roster";
 import { advanceFighterPose, createFighterPose } from "../presentation/fighterPose";
 import { sweep } from "../core/sweep";
 
-const A = maskOf(Action.attack), WALK = maskOf(Action.walk), D = maskOf(Action.moveDown), R = maskOf(Action.moveRight), U = maskOf(Action.moveUp);
+const A = maskOf(Action.attack), WALK = maskOf(Action.modX, Action.modY), D = maskOf(Action.moveDown), R = maskOf(Action.moveRight), U = maskOf(Action.moveUp);
 const CR = maskOf(Action.cRight), CL = maskOf(Action.cLeft), CU = maskOf(Action.cUp), CD = maskOf(Action.cDown);
 
 const idle = (frames: number): RowFields[] => Array.from({ length: frames }, () => ({}));

@@ -4,7 +4,7 @@ import { copyInput, emptyInput, sameInput } from "./inputRow";
 import { commitEdges, keyboardCapture, sampleKeys } from "./keyboardCapture";
 import { TransportDecoder, encodeInputMessage, encodePacket, inputPacket, packetSizeInRange } from "./wire";
 
-const M = bit(Action.modX), U = bit(Action.moveUp), R = bit(Action.moveRight), J = bit(Action.jump);
+const M = bit(Action.modY), U = bit(Action.moveUp), R = bit(Action.moveRight), J = bit(Action.jump);
 
 test("keyboard rows with Mod X held, tapped and held with up and a side reach every peer unchanged as I4 packets and I5 messages, and rows without it keep the companion's bytes [k1 scenario]", () => {
   const capture = keyboardCapture();

@@ -57,7 +57,7 @@
       "bit": 13
     },
     {
-      "name": "walk",
+      "name": "modX",
       "bit": 14
     },
     {
@@ -73,7 +73,7 @@
       "bit": 17
     },
     {
-      "name": "modX",
+      "name": "modY",
       "bit": 18
     }
   ],
@@ -121,7 +121,12 @@
     {
       "key": "6",
       "code": 54,
-      "action": "walk"
+      "action": "modX"
+    },
+    {
+      "key": "/",
+      "code": 191,
+      "action": "modY"
     },
     {
       "key": "`",

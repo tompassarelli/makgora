@@ -252,7 +252,7 @@ function walkSettles(character: Character, maximum: number): number {
   const s = solo(0, character, -560.0);
   const f = fighter(s);
   f.motion.vx = (maximum + 0.4) * WORLD_UNITS_PER_MELEE_UNIT;
-  for (let n = 1; n <= 20; n++) frame(s, [Action.moveRight, Action.walk]);
+  for (let n = 1; n <= 20; n++) frame(s, [Action.moveRight, Action.modX]);
   return melee(f.motion.vx);
 }
 

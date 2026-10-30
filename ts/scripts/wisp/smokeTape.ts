@@ -59,7 +59,7 @@ function afterReset(name: string, presses: readonly Press[], frames: number, exp
   return { name, presses: [RESET, { at: DROP_AT, keys: [key(Action.moveDown)], hold: 6 }, ...presses.map((press) => ({ ...press, at: press.at + RESET_LEAD }))], frames: frames + RESET_LEAD, ...(expect === undefined ? {} : { expect }) };
 }
 
-export const approachStep = (slot: number, frames: number): SmokeStep => ({ name: "approach", presses: [{ at: 0, keys: [key(Action.walk), key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft)], hold: frames }], frames });
+export const approachStep = (slot: number, frames: number): SmokeStep => ({ name: "approach", presses: [{ at: 0, keys: [key(Action.modX), key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft)], hold: frames }], frames });
 
 export const strikeStep = (slot: number, approach: number): SmokeStep => {
   const toward = key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft);
@@ -89,14 +89,14 @@ export function smokeMoves(facing: 1 | -1): readonly SmokeStep[] {
   const away = facing > 0 ? Action.moveLeft : Action.moveRight;
   const smashToward = facing > 0 ? Action.cRight : Action.cLeft;
   const smashAway = facing > 0 ? Action.cLeft : Action.cRight;
-  const walk = key(Action.walk);
+  const tilt = [key(Action.modX), key(Action.modY)];
   const move = (name: string, presses: readonly Press[], expect: MoveClass, frames = 60) => afterReset(name, presses, frames, expect);
   const aerial = (name: string, press: Action, style: AttackStyle) => move(name, [tap([key(Action.jump)], 5), { at: 12, keys: [key(press)], hold: 4 }], attack(style));
   return [
     move("Jab", [tap([key(Action.attack)])], attack(AttackStyle.jab, AttackStyle.shot, AttackStyle.jab2, AttackStyle.jab3)),
-    move("Forward tilt", [tap([walk, key(toward), key(Action.attack)])], attack(AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown)),
-    move("Up tilt", [tap([walk, key(Action.moveUp), key(Action.attack)])], attack(AttackStyle.upTilt)),
-    move("Down tilt", [tap([walk, key(Action.moveDown), key(Action.attack)])], attack(AttackStyle.downTilt)),
+    move("Forward tilt", [tap([...tilt, key(toward), key(Action.attack)])], attack(AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown)),
+    move("Up tilt", [tap([...tilt, key(Action.moveUp), key(Action.attack)])], attack(AttackStyle.upTilt)),
+    move("Down tilt", [tap([...tilt, key(Action.moveDown), key(Action.attack)])], attack(AttackStyle.downTilt)),
     move("Forward smash", [tap([key(Action.strong), key(toward)])], attack(AttackStyle.forwardSmash)),
     move("Up smash", [tap([key(Action.strong), key(Action.moveUp)])], attack(AttackStyle.upSmash)),
     move("Down smash", [tap([key(Action.strong), key(Action.moveDown)])], attack(AttackStyle.downSmash)),

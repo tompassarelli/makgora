@@ -6,7 +6,7 @@ import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { groundState } from "../sim/groundMovement";
 import { isSmashAttack } from "../sim/moves";
 import { squareRoot } from "../sim/warcraftMath";
-import { MOD_X_UP_DIAGONAL, stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
+import { MOD_X_UP_DIAGONAL, MOD_Y_DIAGONAL, stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
 import { GroundOption, GroundState, SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE, groundOptionAllowed } from "../sim/stickZones";
 import { Action, bit, has, maskOf } from "../input/actions";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "../input/attackBuffer";
@@ -23,6 +23,7 @@ const MOVE_LEFT_BIT = bit(Action.moveLeft);
 const MOVE_RIGHT_BIT = bit(Action.moveRight);
 const MOVE_UP_BIT = bit(Action.moveUp);
 const MOD_X_BIT = bit(Action.modX);
+const MOD_Y_BIT = bit(Action.modY);
 const RIGHT_TRIGGER_BIT = bit(Action.rightTrigger);
 const SHORT_HOP_BIT = bit(Action.shortHop);
 const C_DOWN_BIT = bit(Action.cDown);
@@ -31,7 +32,6 @@ const C_RIGHT_BIT = bit(Action.cRight);
 const C_UP_BIT = bit(Action.cUp);
 const SPECIAL_BIT = bit(Action.special);
 const STRONG_BIT = bit(Action.strong);
-const WALK_BIT = bit(Action.walk);
 const GRAB_MASH_ACTIONS = maskOf(Action.attack, Action.special, Action.jump, Action.shortHop, Action.grab, Action.leftTrigger, Action.rightTrigger, Action.lightShield);
 const MOVEMENT_ACTIONS = maskOf(Action.moveLeft, Action.moveRight, Action.moveDown, Action.moveUp);
 const TRIGGERS = maskOf(Action.leftTrigger, Action.rightTrigger, Action.lightShield);
@@ -88,16 +88,28 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
     destination.diStickX = f32(destination.diStickX / length);
     destination.diStickZ = f32(destination.diStickZ / length);
   }
-  if ((held & MOD_X_BIT) !== 0 && aimX !== 0 && aimZ > 0) {
-    destination.diStickX = f32(aimX * MOD_X_UP_DIAGONAL.x);
-    destination.diStickZ = MOD_X_UP_DIAGONAL.z;
-    destination.driftStickX = destination.diStickX;
-  }
-  destination.walking = (held & WALK_BIT) !== 0;
-  if (destination.walking) {
+  const modX = (held & MOD_X_BIT) !== 0;
+  const modY = (held & MOD_Y_BIT) !== 0;
+  destination.walking = modX;
+  if (modX && modY) {
     destination.diStickX = tiltStickX(destination.diStickX);
     destination.diStickZ = tiltStickZ(destination.diStickZ);
     destination.driftStickX = tiltStickX(destination.driftStickX);
+  } else if (modX) {
+    if (aimX !== 0 && aimZ > 0) {
+      destination.diStickX = f32(aimX * MOD_X_UP_DIAGONAL.x);
+      destination.diStickZ = MOD_X_UP_DIAGONAL.z;
+      destination.driftStickX = destination.diStickX;
+    } else {
+      destination.diStickX = tiltStickX(destination.diStickX);
+      destination.driftStickX = tiltStickX(destination.driftStickX);
+    }
+  } else if (modY) {
+    if (aimX !== 0 && aimZ !== 0) {
+      destination.diStickX = f32(aimX * MOD_Y_DIAGONAL.x);
+      destination.diStickZ = f32(aimZ * MOD_Y_DIAGONAL.z);
+      destination.driftStickX = destination.diStickX;
+    } else destination.diStickZ = tiltStickZ(destination.diStickZ);
   }
   destination.sdiPulse = row.sdi;
   destination.sdiX = row.sdiX;
@@ -107,9 +119,9 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   const strong = ((held | pressed) & STRONG_BIT) !== 0;
   destination.specialPressed = (pressed & SPECIAL_BIT) !== 0;
   destination.ultimatePressed = ((pressed & SPECIAL_BIT) !== 0 && ((held | pressed) & ATTACK_BIT) !== 0) || ((pressed & ATTACK_BIT) !== 0 && (held & SPECIAL_BIT) !== 0);
-  destination.specialX = destination.specialPressed && !((held & WALK_BIT) !== 0 && row.specialZ === 0) ? row.specialX : 0;
+  destination.specialX = destination.specialPressed && !(modX && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
-  destination.down = (held & MOVE_DOWN_BIT) !== 0 && (held & WALK_BIT) === 0;
+  destination.down = (held & MOVE_DOWN_BIT) !== 0 && !modY;
   destination.shieldPressed = (pressed & TRIGGERS) !== 0;
   const leftPressure = row.triggerLeft > 0 ? row.triggerLeft : ((held | pressed) & LEFT_TRIGGER_BIT) !== 0 ? 255 : ((held | pressed) & LIGHT_SHIELD_BIT) !== 0 ? 77 : 0;
   const rightPressure = row.triggerRight > 0 ? row.triggerRight : ((held | pressed) & RIGHT_TRIGGER_BIT) !== 0 ? 255 : 0;
@@ -133,7 +145,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
     destination.driftStickX = 0.0;
     destination.down = false;
   }
-  const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && (pressed & WALK_BIT) !== 0 && ((held | pressed) & C_STICK) === 0;
+  const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && (pressed & MOD_X_BIT) !== 0 && ((held | pressed) & C_STICK) === 0;
   destination.airDodgePressed = destination.shieldPressed || tiltDodge;
   destination.dodgeX = destination.shieldPressed ? row.dodgeX : tiltDodge ? destination.direction : 0;
   destination.dodgeZ = destination.shieldPressed ? row.dodgeZ : tiltDodge ? destination.verticalDirection : 0;

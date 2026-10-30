@@ -1,4 +1,4 @@
-import { Action, bit } from "../src/game/input/actions";
+import { Action, bit, maskOf } from "../src/game/input/actions";
 import { type InputRow, inputRow } from "../src/game/input/inputRow";
 
 export interface Held {
@@ -17,7 +17,7 @@ export const NEUTRAL: Held = { buttons: 0, axisX: 0, axisZ: 0 };
 
 const BUTTONS: Readonly<Record<string, number>> = {
   attack: bit(Action.attack), special: bit(Action.special), jump: bit(Action.jump), grab: bit(Action.grab),
-  shield: bit(Action.leftTrigger), strong: bit(Action.strong), walk: bit(Action.walk), "short-hop": bit(Action.shortHop),
+  shield: bit(Action.leftTrigger), strong: bit(Action.strong), walk: maskOf(Action.modX, Action.modY), "short-hop": bit(Action.shortHop),
   "c-left": bit(Action.cLeft), "c-right": bit(Action.cRight), "c-up": bit(Action.cUp), "c-down": bit(Action.cDown),
 };
 

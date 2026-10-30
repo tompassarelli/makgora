@@ -43,7 +43,7 @@ const shields: readonly PadBinding[] = [
 
 const rightStick = (control: PadControl, action: Action, label: string): PadBinding[] => [
   when("rightStick", "smash", bind(control, action, label)),
-  { ...when("rightStick", "tilt", bind(control, action, label)), hold: [Action.walk] },
+  { ...when("rightStick", "tilt", bind(control, action, label)), hold: [Action.modX, Action.modY] },
 ];
 
 const shared: readonly PadBinding[] = [

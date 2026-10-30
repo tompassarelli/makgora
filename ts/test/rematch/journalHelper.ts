@@ -12,7 +12,7 @@ interface JournalClients {
   readonly frame: number;
   readonly clients: readonly (Pick<HeadlessClient, "slot" | "files" | "published"> & { readonly frames: Pick<HeadlessClient["frames"], "named" | "shown"> })[];
 }
-import { Action, bit } from "../../src/game/input/actions";
+import { Action, bit, maskOf } from "../../src/game/input/actions";
 import { type InputRow, inputRow } from "../../src/game/input/inputRow";
 import { encodeInputMessage, encodePacket, inputPacket } from "../../src/game/input/wire";
 import { decodeTransport } from "../../src/game/netcode/journal/transport";
@@ -37,7 +37,7 @@ const PULSES: readonly number[] = [
   bit(Action.leftTrigger),
   bit(Action.rightTrigger),
   bit(Action.grab),
-  bit(Action.walk),
+  maskOf(Action.modX, Action.modY),
   bit(Action.attack) | bit(Action.special),
 ];
 

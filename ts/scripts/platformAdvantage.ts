@@ -21,14 +21,14 @@ type Plan = (n: number) => Held;
 type RecordedPlan = readonly Held[];
 
 const UP_AIR: Held = [Action.moveUp, Action.attack];
-const TILT_UP_AIR: Held = [Action.walk, Action.moveUp, Action.attack];
+const TILT_UP_AIR: Held = [Action.modX, Action.modY, Action.moveUp, Action.attack];
 const DOWN_AIR: Held = [Action.moveDown, Action.attack];
 const NEUTRAL_AIR: Held = [Action.attack];
 const NEUTRAL: Held = [];
 
 
 function belowPlans(): Plan[] {
-  const plans: Plan[] = [(n) => (n === 1 ? [Action.strong, Action.moveUp] : []), (n) => (n === 1 ? [Action.walk, Action.moveUp, Action.attack] : [])];
+  const plans: Plan[] = [(n) => (n === 1 ? [Action.strong, Action.moveUp] : []), (n) => (n === 1 ? [Action.modX, Action.modY, Action.moveUp, Action.attack] : [])];
   for (const full of [true, false]) {
     for (const aerial of [UP_AIR, TILT_UP_AIR, NEUTRAL_AIR]) {
       for (let at = 2; at <= LATEST_AERIAL; at++) {

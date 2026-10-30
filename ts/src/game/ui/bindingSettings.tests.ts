@@ -52,27 +52,27 @@ const unbound = (settings: Readonly<BindingSettings>) => unboundActions(settings
 
 test("a rebind swaps with the action holding the key, Delete and the x clear a slot, reserved keys stay refused and Reset to layout restores the preset [k2 property]", () => {
   const settings = customSettings();
-  assertEquals(slots(settings, Action.walk), "K —", "Custom Walk");
+  assertEquals(slots(settings, Action.modX), "K —", "Custom Mod X");
   assertEquals(slots(settings, Action.strong), "0 —", "Custom Strong");
 
-  beginBindingCapture(settings, Action.walk, 0);
+  beginBindingCapture(settings, Action.modX, 0);
   assertEquals(captureBinding(settings, code("0")), true);
-  assertEquals(slots(settings, Action.walk), "0 —", "Walk after the swap");
+  assertEquals(slots(settings, Action.modX), "0 —", "Mod X after the swap");
   assertEquals(slots(settings, Action.strong), "K —", "Strong after the swap");
   assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.strong]}.`);
   assertEquals(settings.capture, undefined);
 
-  beginBindingCapture(settings, Action.walk, 0);
+  beginBindingCapture(settings, Action.modX, 0);
   captureBinding(settings, CLEAR_KEY);
-  assertEquals(slots(settings, Action.walk), "— —", "Walk after Delete");
-  assertEquals(unbound(settings), `${Action.walk}`);
-  assertEquals(settings.message, `${ACTION_LABELS[Action.walk]} is now unbound.`);
+  assertEquals(slots(settings, Action.modX), "— —", "Mod X after Delete");
+  assertEquals(unbound(settings), `${Action.modX}`);
+  assertEquals(settings.message, `${ACTION_LABELS[Action.modX]} is now unbound.`);
   assertEquals(settings.capture, undefined);
 
   clearKey(settings, code("K"));
   assertEquals(slots(settings, Action.strong), "— —", "Strong after its x");
   assertEquals(settings.message, `${ACTION_LABELS[Action.strong]} is now unbound.`);
-  assertEquals(unbound(settings), `${Action.walk},${Action.strong}`);
+  assertEquals(unbound(settings), `${Action.modX},${Action.strong}`);
   const before = encodeBindings(settings.bindings);
   clearKey(settings, code("C"));
   assertEquals(encodeBindings(settings.bindings), before, "clearing an unbound key");
@@ -103,10 +103,10 @@ test("the = and - keys capture as bindings, are named, and have a cap on the con
   const settings = customSettings();
   beginBindingCapture(settings, Action.attack, 0);
   assertEquals(captureBinding(settings, EQUALS), true);
-  beginBindingCapture(settings, Action.walk, 0);
+  beginBindingCapture(settings, Action.modX, 0);
   assertEquals(captureBinding(settings, MINUS), true);
   assertEquals(slots(settings, Action.attack), "= —", "Attack after binding =");
-  assertEquals(slots(settings, Action.walk), "- —", "Walk after binding -");
+  assertEquals(slots(settings, Action.modX), "- —", "Mod X after binding -");
   assertEquals(keyLabel(EQUALS), "=");
   assertEquals(keyLabel(MINUS), "-");
   const caps = keyboardCaps(f32(0.12), f32(0.465));
@@ -134,10 +134,10 @@ test("the [ and ] keys capture as bindings, are named, and have a cap on the con
   const settings = customSettings();
   beginBindingCapture(settings, Action.attack, 0);
   assertEquals(captureBinding(settings, OPEN_BRACKET), true);
-  beginBindingCapture(settings, Action.walk, 0);
+  beginBindingCapture(settings, Action.modX, 0);
   assertEquals(captureBinding(settings, CLOSE_BRACKET), true);
   assertEquals(slots(settings, Action.attack), "[ —", "Attack after binding [");
-  assertEquals(slots(settings, Action.walk), "] —", "Walk after binding ]");
+  assertEquals(slots(settings, Action.modX), "] —", "Mod X after binding ]");
   const caps = keyboardCaps(f32(0.12), f32(0.465));
   for (const key of [OPEN_BRACKET, CLOSE_BRACKET]) assertEquals(caps.filter(cap => cap.key === key).length, 1, `cap for ${keyLabel(key)}`);
   const rightEdge = Math.max(...caps.map(cap => cap.x + cap.width));

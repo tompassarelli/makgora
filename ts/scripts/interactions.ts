@@ -366,9 +366,9 @@ const WAIT = waiting("wait");
 const attack = (name: string, style: AttackStyle, held: (self: Fighter, other: Fighter) => Held): Option => ({ ...press(name, "attack", held), style });
 
 const JAB = attack("jab", AttackStyle.jab, () => [Action.attack]);
-const FTILT = attack("forward tilt", AttackStyle.forwardTilt, (self, other) => [Action.walk, towardOf(self, other), Action.attack]);
-const UTILT = attack("up tilt", AttackStyle.upTilt, () => [Action.walk, Action.moveUp, Action.attack]);
-const DTILT = attack("down tilt", AttackStyle.downTilt, () => [Action.walk, Action.moveDown, Action.attack]);
+const FTILT = attack("forward tilt", AttackStyle.forwardTilt, (self, other) => [Action.modX, Action.modY, towardOf(self, other), Action.attack]);
+const UTILT = attack("up tilt", AttackStyle.upTilt, () => [Action.modX, Action.modY, Action.moveUp, Action.attack]);
+const DTILT = attack("down tilt", AttackStyle.downTilt, () => [Action.modX, Action.modY, Action.moveDown, Action.attack]);
 const FSMASH = attack("forward smash", AttackStyle.forwardSmash, (self, other) => [Action.strong, towardOf(self, other)]);
 const USMASH = attack("up smash", AttackStyle.upSmash, () => [Action.strong, Action.moveUp]);
 const DSMASH = attack("down smash", AttackStyle.downSmash, () => [Action.strong, Action.moveDown]);

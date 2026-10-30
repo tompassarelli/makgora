@@ -138,10 +138,10 @@ lasts until the dash would become a run. On keyboard, hold down together with
 the back key: the diagonal counts as a light tilt (on a platform, a fresh down
 press drops you through it).
 
-Attacks buffer for six frames, including through jump squat. Hold K to walk; hold ; (Mod X) with up and a side for a shallow up-diagonal stick, about 23 degrees above horizontal, which Demon Hunter's Wing Ascent launches along and steered flights such as Kael'thas's phoenix turn toward, while the eight-way aimed specials still read it as a diagonal;
+Attacks buffer for six frames, including through jump squat. Two modifiers shape the stick (Tom's design, 2026-10-30). Mod X (K) reduces the horizontal value only: it walks, gives forward tilts, and with up and a side sends a steep up-diagonal about 67 degrees above horizontal. Mod Y (;) reduces the vertical value only: it gives up and down tilts, and with a side and up or down sends a shallow diagonal about 23 degrees from horizontal for wall rides. Hold both for the all-purpose tilt, which shields tilt with. Demon Hunter's Wing Ascent launches along either diagonal and steered flights such as Kael'thas's phoenix turn toward it, while the eight-way aimed specials still read it as a diagonal;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you
-pass through; so does down with the tilt modifier held. Held down keeps you crouching; attack gives down tilt and special
+pass through; so does down with Mod Y held. Held down keeps you crouching; attack gives down tilt and special
 gives down-B. Release down, then hard-press it to drop immediately. Analog
 inputs need a quick flick; keyboard inputs need a fresh down-key press. The
 drop consumes that press: held down never fast-falls. Return toward neutral

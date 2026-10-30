@@ -2310,7 +2310,7 @@ mod linux {
                 let Press::Key(key) = binding.press else { return None };
                 let &(_, action) = PAD_KEYS.iter().find(|(name, _)| *name == key.as_str())?;
                 let action = match action {
-                    ATTACK | SPECIAL | JUMP | SHORT_HOP | GRAB | WALK | STRONG => action,
+                    ATTACK | SPECIAL | JUMP | SHORT_HOP | GRAB | MOD_X | STRONG => action,
                     LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD if source == LT_SOURCE && action != RIGHT_TRIGGER => LEFT_TRIGGER,
                     LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD => RIGHT_TRIGGER,
                     _ => return None,
@@ -2325,7 +2325,7 @@ mod linux {
         let sources = s.sources | if s.lt > TRIGGER_PRESS_LEVEL { LT_SOURCE } else { 0 } | if s.rt > TRIGGER_PRESS_LEVEL { RT_SOURCE } else { 0 };
         let mut held = button_bits(s.preset).iter().filter(|(source, _)| sources & source != 0).fold(0, |held, (_, action)| held | action);
         let (x, y) = melee_stick(s.x, s.y);
-        if padbridge::stick::tap_jump(y, s.tap_jump, held & WALK != 0, held & (LEFT_TRIGGER | RIGHT_TRIGGER) != 0) {
+        if padbridge::stick::tap_jump(y, s.tap_jump, held & MOD_X != 0, held & (LEFT_TRIGGER | RIGHT_TRIGGER) != 0) {
             held |= JUMP;
         }
         if x < 0 {
@@ -2399,7 +2399,7 @@ mod linux {
             (PadPreset::Melee, [ATTACK, SPECIAL, JUMP, JUMP, STRONG, GRAB, 0]),
             (PadPreset::ZJump, [ATTACK, SPECIAL, GRAB, JUMP, STRONG, JUMP, 0]),
             (PadPreset::Tom, [ATTACK, GRAB, SPECIAL, JUMP, SHORT_HOP, STRONG, 0]),
-            (PadPreset::Script, [ATTACK, JUMP, SPECIAL, JUMP, WALK, GRAB, SHORT_HOP]),
+            (PadPreset::Script, [ATTACK, JUMP, SPECIAL, JUMP, MOD_X, GRAB, SHORT_HOP]),
         ] {
             let state = State { preset, ..State::default() };
             for (source, action) in [a, b, x, y, lb, rb, l3].into_iter().zip(expected) {
@@ -2832,7 +2832,7 @@ mod linux {
         assert_eq!(held(0, -22_937), C_UP);
         assert_eq!(held(0, 22_937), C_DOWN);
         let tom = |cx, cy| action_state(State { right_stick: padbridge::model::RightStick::Tilt, cx, cy, ..State::default() });
-        assert_eq!(tom(26_500, 0), WALK | C_RIGHT);
+        assert_eq!(tom(26_500, 0), MOD_X | MOD_Y | C_RIGHT);
         assert_eq!(tom(22_937, 0), 0);
     }
 

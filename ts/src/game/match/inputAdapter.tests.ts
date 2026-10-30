@@ -52,7 +52,7 @@ function onDeck(): Fighter {
   return f;
 }
 
-const tilt = (...actions: Action[]) => maskOf(Action.walk, ...actions);
+const tilt = (...actions: Action[]) => maskOf(Action.modX, Action.modY, ...actions);
 
 test("the tilt modifier sends each axis one Melee stick unit inside roll and spot dodge, tap jump and crouch, and still picks walk and the tilts [k3 measure #282]", () => {
   for (const [threshold, value] of [[SHIELD_DODGE_STICK_THRESHOLD, TILT_STICK_X], [TAP_JUMP_STICK_THRESHOLD, TILT_STICK_UP], [CROUCH_STICK_THRESHOLD, TILT_STICK_DOWN]] as const) {
@@ -192,4 +192,35 @@ test("a full hop under a platform with tilt + down rises through it into a down 
   assertEquals(diving.style, AttackStyle.downAir);
   assertFalse(diving.standsRising);
   assertTrue(diving.passed);
+});
+
+test("Mod X picks walking and the angled forward tilts, Mod Y picks the up and down tilts and clears the held down, and only Mod X with a shield held tilt-dodges [k1 scenario]", () => {
+  const fighter = createFighter(Character.rifleman, 0.0, 1);
+  const X = maskOf(Action.modX), Y = maskOf(Action.modY);
+  const styleOf = (held: number) => {
+    const driver = keyboardDriver(fighter);
+    driver.sample(0);
+    const input = driver.sample(held);
+    return { style: driver.attack(), walking: input.walking, down: input.down };
+  };
+  const forward = Action.moveRight, up = Action.moveUp, down = Action.moveDown, attack = Action.attack;
+  assertEquals(styleOf(X | maskOf(forward, attack)).style, AttackStyle.forwardTilt);
+  assertEquals(styleOf(X | maskOf(forward, up, attack)).style, AttackStyle.forwardTiltUp);
+  assertEquals(styleOf(X | maskOf(forward, down, attack)).style, AttackStyle.forwardTiltDown);
+  assertTrue(styleOf(X | maskOf(forward)).walking);
+  assertFalse(styleOf(Y | maskOf(forward)).walking);
+  assertEquals(styleOf(Y | maskOf(up, attack)).style, AttackStyle.upTilt);
+  assertEquals(styleOf(Y | maskOf(down, attack)).style, AttackStyle.downTilt);
+  assertTrue(styleOf(X | maskOf(down)).down);
+  assertFalse(styleOf(Y | maskOf(down)).down);
+  assertFalse(styleOf(X | Y | maskOf(down)).down);
+  const air = onDeck();
+  air.motion.grounded = false;
+  const dodgeWith = (modifier: number) => {
+    const driver = keyboardDriver(air);
+    driver.sample(maskOf(Action.rightTrigger));
+    return driver.sample(maskOf(Action.rightTrigger) | modifier).airDodgePressed;
+  };
+  assertTrue(dodgeWith(X));
+  assertFalse(dodgeWith(Y));
 });

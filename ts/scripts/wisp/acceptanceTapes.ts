@@ -36,7 +36,7 @@ SOURCES.set(STICK_JUMP, Action.jump);
 
 const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "8", JUMP_ALT = padSource(Action.jump), ATTACK = "N", SPECIAL = "U",
   GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = padSource(Action.rightTrigger), LIGHT_SHIELD = "A", C_LEFT = "J", C_LEFT_ALT = padSource(Action.cLeft), C_RIGHT = "L", C_UP = "0",
-  C_DOWN = "P", WALK = "K", SHORT_HOP = "I", STRONG = "9", STRONG_ALT = padSource(Action.strong), MOD_X = ";";
+  C_DOWN = "P", MOD_X = "K", SHORT_HOP = "I", STRONG = "9", STRONG_ALT = padSource(Action.strong), MOD_Y = ";";
 
 
 const TOWARD = "toward", AWAY = "away";
@@ -214,7 +214,7 @@ function playMatch(script: MatchScript, session: TapeSession, play: (...lines: s
         if (Math.abs(dx) <= approach.within || frame >= approach.at + APPROACH_FRAMES) approach.done = true;
         else {
           held.add(toward);
-          if (Math.abs(dx) <= approach.within + WALK_RANGE) held.add(WALK);
+          if (Math.abs(dx) <= approach.within + WALK_RANGE) held.add(MOD_X);
         }
       }
       let mask = 0;
@@ -289,7 +289,7 @@ const ACTIONS: MatchScript = {
   characters: [Character.demonHunter, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 410,
   holds: [[
     [1, 20, SHORT_HOP],
-    [30, 2, ATTACK], [40, 10, DOWN], [42, 2, ATTACK], [70, 6, WALK, TOWARD], [72, 2, ATTACK], [86, 4, UP, MOD_X],
+    [30, 2, ATTACK], [40, 10, DOWN], [42, 2, ATTACK], [70, 6, MOD_X, TOWARD], [72, 2, ATTACK], [86, 4, UP, MOD_Y],
     [87, 2, ATTACK], [100, 3, JUMP], [106, 2, ATTACK], [130, 14, JUMP_ALT], [134, 16, STICK_JUMP], [140, 2, ATTACK],
     [144, 2, DOWN], [165, 2, SPECIAL], [190, 2, GRAB], [200, 2, TOWARD], [215, 8, TOWARD], [217, 2, SPECIAL],
     [235, 20, SHIELD_LEFT], [241, 2, AWAY], [270, 12, SHIELD_RIGHT], [274, 2, DOWN], [290, 3, JUMP], [296, 6, UP],
@@ -299,9 +299,9 @@ const ACTIONS: MatchScript = {
     [1, 1, SHORT_HOP],
     [20, 24, SHIELD_RIGHT], [50, 2, ATTACK], [60, 2, GRAB], [84, 2, SHIELD_LEFT], [95, 4, JUMP], [101, 2, C_DOWN],
     [112, 2, SPECIAL], [126, 2, C_RIGHT], [150, 16, SHIELD_LEFT, SHIELD_RIGHT], [168, 14, STICK_JUMP],
-    [170, 8, JUMP_ALT], [174, 2, ATTACK], [186, 2, UP, MOD_X], [192, 2, ATTACK], [194, 2, SPECIAL], [196, 2, JUMP],
-    [210, 10, DOWN], [212, 2, SPECIAL], [230, 10, WALK, TOWARD], [232, 2, ATTACK], [250, 2, C_LEFT],
-    [262, 2, WALK, C_LEFT_ALT], [274, 2, C_UP], [278, 2, C_UP], [286, 10, TOWARD], [288, 2, GRAB], [300, 6, AWAY], [320, 6, SHIELD_LEFT],
+    [170, 8, JUMP_ALT], [174, 2, ATTACK], [186, 2, UP, MOD_Y], [192, 2, ATTACK], [194, 2, SPECIAL], [196, 2, JUMP],
+    [210, 10, DOWN], [212, 2, SPECIAL], [230, 10, MOD_X, TOWARD], [232, 2, ATTACK], [250, 2, C_LEFT],
+    [262, 2, MOD_X, C_LEFT_ALT], [274, 2, C_UP], [278, 2, C_UP], [286, 10, TOWARD], [288, 2, GRAB], [300, 6, AWAY], [320, 6, SHIELD_LEFT],
     [322, 2, DOWN], [334, 3, JUMP], [338, 2, SHIELD_LEFT], [350, 2, C_RIGHT], [372, 2, UP], [400, 2, SHIELD_RIGHT_ALT], [402, 2, LIGHT_SHIELD], [404, 2, STRONG, SPECIAL], [406, 2, LIGHT_SHIELD], [408, 2, STRONG_ALT, SPECIAL],
   ]],
   approaches: [
@@ -566,7 +566,7 @@ export function generateTapes(): Map<string, string> {
     ["edge-cancel-turnaround", recordTape("An aerial lands at the edge with the stick held toward it, the fighter slides off, the landing lag ends at once and the fighter turns back to catch the ledge, with predictions and rollback.", [{
       placement: "test-air 0 480 0",
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 120,
-      holds: [[[1, 1, LEFT, WALK], [3, 3, JUMP], [3, 30, RIGHT], [20, 2, ATTACK]], [[1, 120, SHIELD_LEFT]]],
+      holds: [[[1, 1, LEFT, MOD_X], [3, 3, JUMP], [3, 30, RIGHT], [20, 2, ATTACK]], [[1, 120, SHIELD_LEFT]]],
       approaches: [[], []], rollbacks: [[30, 60]], predictions: [[22, 28]], exercise: "edgeCancel",
     }])],
     ["edge-cancel-back-air", recordTape("An aerial lands at the edge, the cancel frees the fighter at once and a back air follows, with rollback.", [{
@@ -596,13 +596,13 @@ export function generateTapes(): Map<string, string> {
     ["shield-teeter", recordTape("A shielding fighter at the edge is pushed by repeated hits and stops at the edge in its shieldstun, with rollback.", [{
       placement: "test-air 0 592 0",
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 240,
-      holds: [[[1, 240, SHIELD_LEFT]], [[1, 6, RIGHT, WALK], [20, 2, ATTACK], [50, 2, ATTACK], [80, 2, ATTACK], [110, 2, ATTACK], [140, 2, ATTACK], [170, 2, ATTACK]]],
+      holds: [[[1, 240, SHIELD_LEFT]], [[1, 6, RIGHT, MOD_X], [20, 2, ATTACK], [50, 2, ATTACK], [80, 2, ATTACK], [110, 2, ATTACK], [140, 2, ATTACK], [170, 2, ATTACK]]],
       approaches: [[], [[1, 40]]], rollbacks: [[30, 60]], exercise: "shieldTeeter",
     }])],
     ["push-physics", recordTape("Walking overlapping bodies and striking a held shield, with predictions and rollback.", [{
       placement: "test-air 1 -215 0",
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 180,
-      holds: [[[10, 8, RIGHT, WALK], [24, 1, ATTACK], [70, 1, ATTACK], [100, 8, RIGHT, WALK], [120, 1, ATTACK]], [[1, 180, SHIELD_RIGHT]]],
+      holds: [[[10, 8, RIGHT, MOD_X], [24, 1, ATTACK], [70, 1, ATTACK], [100, 8, RIGHT, MOD_X], [120, 1, ATTACK]], [[1, 180, SHIELD_RIGHT]]],
       approaches: [[], []], rollbacks: [[1, 60], [65, 90], [95, 140]], predictions: [[10, 18], [24, 32]],
       exercise: "shieldPush",
     }])],
@@ -646,7 +646,7 @@ export function generateTapes(): Map<string, string> {
     ["uther", recordTape("Uther's Holy Light, Devotion Aura armour, Divine Shield, free Hammer of the Righteous and normals against the Illidan, with replays.", [UTHER])],
     ["moving-platforms", recordTape("Moving decks, jumping, dropping through, predictions and rollback over complete path cycles.", [{
       characters: [Character.demonHunter, Character.rifleman], stage: 3, stocks: 3, minutes: 0, frames: 620,
-      holds: [[[1, 20, RIGHT, WALK], [30, 10, JUMP], [180, 3, DOWN], [240, 10, JUMP], [400, 10, JUMP]], [[1, 10, JUMP], [140, 3, DOWN], [300, 10, JUMP]]],
+      holds: [[[1, 20, RIGHT, MOD_X], [30, 10, JUMP], [180, 3, DOWN], [240, 10, JUMP], [400, 10, JUMP]], [[1, 10, JUMP], [140, 3, DOWN], [300, 10, JUMP]]],
       approaches: [[], []], rollbacks: [[57, 120], [357, 420], [537, 600]], predictions: [[250, 260]],
     }])],
     ["patterned-platforms", recordTape("Two independently patterned platforms through full loops and lifts with rollback.", [{
@@ -657,10 +657,10 @@ export function generateTapes(): Map<string, string> {
     ["slopes", recordTape("Running, walking, jumping and landing on Yoshi's Story's sloped main deck, a tech and a fight on the slope, with predictions and rollback.", [{
       characters: [Character.demonHunter, Character.rifleman], stage: 6, stocks: 3, minutes: 0, frames: 760,
       holds: [[
-        [185, 40, LEFT, WALK], [228, 3, JUMP], [260, 36, RIGHT, WALK], [300, 3, JUMP], [330, 20, LEFT, WALK], [360, 2, ATTACK],
+        [185, 40, LEFT, MOD_X], [228, 3, JUMP], [260, 36, RIGHT, MOD_X], [300, 3, JUMP], [330, 20, LEFT, MOD_X], [360, 2, ATTACK],
         [400, 18, RIGHT], [430, 2, ATTACK], [470, 2, GRAB], [520, 3, JUMP], [526, 2, C_DOWN], [600, 2, DOWN, ATTACK],
       ], [
-        [185, 60, RIGHT, WALK], [250, 3, JUMP], [256, 6, LEFT], [290, 24, LEFT], [330, 2, ATTACK], [380, 14, SHIELD_LEFT],
+        [185, 60, RIGHT, MOD_X], [250, 3, JUMP], [256, 6, LEFT], [290, 24, LEFT], [330, 2, ATTACK], [380, 14, SHIELD_LEFT],
         [440, 2, ATTACK], [500, 2, SPECIAL],
       ]],
       approaches: [[[560, 45], [640, 45]], [[420, 45], [540, 45], [660, 45]]],

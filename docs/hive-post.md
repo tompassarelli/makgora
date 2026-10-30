@@ -10,7 +10,7 @@ Join the [Discord](https://discord.gg/JQGZs2UJR) if you'd like to play games som
 ## New in 0.2
 - **One meter and orbs:** a single ultimate meter, filled only by orbs that appear at centre stage every 30 seconds. Touch an orb or hit it with a normal attack; two make an ultimate.
 - **Melee feel:** Melee's movement and body numbers for every fighter, Melee auto-cancel windows and wavedash exits that walk.
-- **Controls:** WASD and Box layouts with Strong on 9, light shield on E (WASD) or A (Box), C-stick on J, L, 0 and P, Mod X on ;, and Shift bindable. Changing a key saves it to Custom.
+- **Controls:** WASD and Box layouts with Strong on 9, light shield on E (WASD) or A (Box), C-stick on J, L, 0 and P, Mod X on K, Mod Y on ;, and Shift bindable. Changing a key saves it to Custom.
 - **Fighters:** big reworks for Blademaster, Illidan, Maiev, Chen, Peon, Pit Lord and Kael'thas, and changes across most of the roster.
 
 **Full release notes:** [Smashcraft 0.2 on GitHub](https://github.com/tompassarelli/smashcraft/releases/tag/v0.2). Earlier versions: [all releases](https://github.com/tompassarelli/smashcraft/releases).

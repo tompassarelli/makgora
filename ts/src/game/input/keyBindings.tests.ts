@@ -8,12 +8,12 @@ const code = (character: string) => character.charCodeAt(0);
 const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
-test("every preset binds C-left to J, C-right to L, C-down to P and Walk to K, C-up to 0 (- on Custom), and Strong to 9 alone (0 on Custom) [k2 property]", () => {
+test("every preset binds C-left to J, C-right to L, C-down to P and Mod X to K, C-up to 0 (- on Custom), and Strong to 9 alone (0 on Custom) [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
     assertEquals(slots(preset, Action.cLeft), "J —", `${preset} C-left`);
     assertEquals(slots(preset, Action.cRight), "L —", `${preset} C-right`);
     assertEquals(slots(preset, Action.cDown), "P —", `${preset} C-down`);
-    assertEquals(slots(preset, Action.walk), "K —", `${preset} Walk`);
+    assertEquals(slots(preset, Action.modX), "K —", `${preset} Mod X`);
   }
   for (const preset of BINDING_PRESETS) assertEquals(slots(preset, Action.cUp), preset === "custom" ? "- —" : "0 —", `${preset} C-up`);
   assertEquals(slots("wasd", Action.strong), "9 —");
@@ -60,7 +60,7 @@ test("a custom profile saved before the C-stick rename loads with the same keys 
   set(Action.cRight, code("M"));
   set(Action.cUp, code("J"));
   set(Action.cDown, code("H"));
-  set(Action.walk, code("P"));
+  set(Action.modX, code("P"));
   set(Action.strong, code("0"));
   const loaded = decodeBindings(encodeBindings({ keys: before }));
   assertEquals(loaded?.keys.join(","), before.join(","));
@@ -147,32 +147,37 @@ test("the pad layer keeps its own keys, and a layout binds a pad key only to the
 });
 
 const SEMICOLON = 186;
+const SPACE = 32;
+const OLD_WALK_SLOT = 28;
+const OLD_MOD_X_SLOT = 36;
 const OLD_SLOTS = (Action.strong + 1) * 2;
 const oldSave = (version: string, keys: readonly number[]) => version + keys.slice(0, OLD_SLOTS).map((key) => String(key).padStart(3, "0")).join("");
-const withoutModX = (preset: BindingPreset) => presetBindings(preset).keys.slice(0, OLD_SLOTS);
+const withoutModY = (preset: BindingPreset) => presetBindings(preset).keys.slice(0, OLD_SLOTS);
 
-test("every preset binds Mod X to ; alone, which is no key the pad layer presses, and labels it Mod X on the controls screen [k2 property]", () => {
+test("every preset binds Mod Y to ; alone, which is no key the pad layer presses, and labels both modifiers on the controls screen [k2 property]", () => {
   const padKeys = PAD_LAYER.map(({ code: padCode }) => padCode);
   for (const preset of BINDING_PRESETS) {
-    assertEquals(slots(preset, Action.modX), "; —", `${preset} Mod X`);
-    assertEquals(padKeys.includes(keyFor(presetBindings(preset), Action.modX, 0) ?? 0), false, `${preset} Mod X is a pad key`);
+    assertEquals(slots(preset, Action.modY), "; —", `${preset} Mod Y`);
+    assertEquals(padKeys.includes(keyFor(presetBindings(preset), Action.modY, 0) ?? 0), false, `${preset} Mod Y is a pad key`);
   }
-  assertEquals(ACTION_LABELS[Action.modX], "Mod X");
+  assertEquals(ACTION_LABELS[Action.modX], "Mod X (walk, steep angles)");
   assertEquals(ACTION_KEY_LABELS[Action.modX], "Mod X");
+  assertEquals(ACTION_LABELS[Action.modY], "Mod Y (shallow angles, wall ride)");
+  assertEquals(ACTION_KEY_LABELS[Action.modY], "Mod Y");
 });
 
-test("a saved profile from before Mod X loads with every old key unchanged and ; on Mod X, in each old format and in the three-layout save [k2 property]", () => {
+test("a saved profile from before Mod X loads with every old key unchanged and ; on Mod Y, in each old format and in the three-layout save [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
-    const old = withoutModX(preset);
+    const old = withoutModY(preset);
     const loaded = decodeBindings(oldSave("KB", old));
     assertEquals(loaded?.keys.slice(0, OLD_SLOTS).join(","), old.join(","), `${preset} old keys`);
-    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0`, `${preset} Mod X`);
+    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0`, `${preset} Mod Y`);
   }
   for (const version of ["KA", "K9", "K8", "K7", "K6"]) {
-    const loaded = decodeBindings(oldSave(version, withoutModX("wasd")));
-    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0`, `${version} Mod X`);
+    const loaded = decodeBindings(oldSave(version, withoutModY("wasd")));
+    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0`, `${version} Mod Y`);
   }
-  const layouts = BINDING_PRESETS.map((preset) => oldSave("KB", withoutModX(preset))).join("");
+  const layouts = BINDING_PRESETS.map((preset) => oldSave("KB", withoutModY(preset))).join("");
   const loaded = decodeLayouts(`KL1${layouts}`);
   assertEquals(loaded?.active, "standard");
   for (const preset of BINDING_PRESETS) assertEquals(loaded?.layouts[preset].keys.join(","), presetBindings(preset).keys.join(","), `${preset} layout`);
@@ -180,8 +185,8 @@ test("a saved profile from before Mod X loads with every old key unchanged and ;
   assertEquals(decodeLayouts(encodeSlots(current))?.layouts.custom.keys.join(","), presetBindings("custom").keys.join(","));
 });
 
-test("an old save that already uses ; for another action keeps it there and leaves Mod X unbound [k2 property]", () => {
-  const old = withoutModX("standard");
+test("an old save that already uses ; for another action keeps it there and leaves Mod Y unbound [k2 property]", () => {
+  const old = withoutModY("standard");
   old[slotIndex(Action.cDown, 1)] = SEMICOLON;
   const loaded = decodeBindings(oldSave("KB", old));
   assertEquals(loaded?.keys.slice(0, OLD_SLOTS).join(","), old.join(","));
@@ -202,4 +207,21 @@ test("Left and Right Shift are labelled, bind to any action such as Shield, and 
   }
   const saved = decodeLayouts(encodeSlots({ layouts, active: "standard" }));
   for (const preset of BINDING_PRESETS) assertEquals(saved?.layouts[preset].keys.join(","), layouts[preset].keys.join(","), `${preset} layout save`);
+});
+
+test("a saved layout from before Mod Y, with the old Walk on SPACE, the old Mod X on K and C-right on ;, loads with SPACE on Mod X, K on Mod Y and ; still on C-right, alone and inside a layout save [k2 property]", () => {
+  const saved = presetBindings("wasd").keys.slice();
+  saved[OLD_WALK_SLOT] = SPACE;
+  saved[OLD_MOD_X_SLOT] = code("K");
+  saved[slotIndex(Action.cRight, 0)] = SEMICOLON;
+  const check = (bindings: { keys: number[] } | undefined, label: string) => {
+    assertEquals(keyFor(bindings!, Action.modX, 0), SPACE, `${label} Mod X`);
+    assertEquals(keyFor(bindings!, Action.modY, 0), code("K"), `${label} Mod Y`);
+    assertEquals(keyFor(bindings!, Action.cRight, 0), SEMICOLON, `${label} C-right`);
+    assertEquals(bindings!.keys.join(","), saved.join(","), `${label} every other key`);
+  };
+  check(decodeBindings(encodeBindings({ keys: saved })), "single save");
+  const layouts = presetLayouts();
+  layouts.wasd = { keys: saved };
+  check(decodeLayouts(encodeSlots({ layouts, active: "wasd" }))?.layouts.wasd, "layout save");
 });

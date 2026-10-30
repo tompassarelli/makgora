@@ -16,12 +16,12 @@ The Controller page offers padbridge's presets (its README has the
 table): **melee** (default; Melee's buttons by function: A attack, B special,
 X/Y jump, RB grab, both triggers shield, no walk or short-hop button),
 **z-jump** (RB jumps, X grabs) and **tom** (Tom's own: B and RB grab, X special,
-Y and LB jump, RT walk, LT shield, L3 short hop). Recorded pad scripts and test
-drivers use the hidden **script** preset (B/Y jump, X special, LB walk, both
-triggers shield). Holding walk, on a pad or the keyboard, shortens the stick
+Y and LB jump, RT Mod X, LT shield, L3 short hop). Recorded pad scripts and test
+drivers use the hidden **script** preset (B/Y jump, X special, LB Mod X, both
+triggers shield). Holding both modifiers, or a pad's right-stick tilt, shortens the stick
 like a box controller's modifier: a full press sends x = ±0.6875, up 0.65 and
 down −0.675, just inside roll and spot dodge, tap jump and crouch (#282,
-smashcraft:docs/gameplay-design.md, "Stick zones"). Holding **Mod X** (`;` on the keyboard, in every layout) with up and a side sends the box controller's shallow up-diagonal, x = ±0.7375 and up 0.3125 (about 23 degrees above horizontal, `MOD_X_UP_DIAGONAL` in `ts/src/game/sim/stick.ts`), for up-forward and up-back alike; it changes no other direction, and with walk held the walk scaling applies to those two values. A pad has no Mod X key: its stick already sends any angle, and the pad's Up is typed on `=` so `;` stays free for Mod X. A GameCube pad maps by its printed letters only in the SDL
+smashcraft:docs/gameplay-design.md, "Stick zones"). Holding **Mod Y** (`;` on the keyboard, in every layout) with a side and up or down sends the box controller's shallow diagonal, x = ±0.7375 and up or down 0.3125 (about 23 degrees from horizontal, `MOD_Y_DIAGONAL` in `ts/src/game/sim/stick.ts`), and holding **Mod X** (`K`) with up and a side sends the steep mirror, x = ±0.3125 and up 0.7375 (`MOD_X_UP_DIAGONAL`); each otherwise reduces only its own axis to the tilt value, and both together reduce both (Tom's design, 2026-10-30; smashcraft:docs/gameplay-design.md, "Stick zones"). A pad's Mod Y is typed on `/`, held with Mod X by the right-stick tilt; a pad's stick already sends any angle, and its Up is typed on `=` so `;` stays free for Mod Y. A GameCube pad maps by its printed letters only in the SDL
 helper; the service reads evdev and does not tell GameCube pads apart yet.
 
 ## 1. Controller acquisition

@@ -9,7 +9,7 @@
 
 
 
-import { Action, bit } from "../src/game/input/actions";
+import { Action, bit, maskOf } from "../src/game/input/actions";
 import { ATTACK_BUFFER_FRAMES } from "../src/game/input/attackBuffer";
 import { type InputRow, emptyInput, inputRow } from "../src/game/input/inputRow";
 import { createFrameControls } from "../src/game/match/controls";
@@ -73,7 +73,7 @@ interface Starter {
 }
 
 const ATTACK = bit(Action.attack);
-const WALK = bit(Action.walk);
+const WALK = maskOf(Action.modX, Action.modY);
 const SPECIAL = bit(Action.special);
 const GRAB = bit(Action.grab);
 

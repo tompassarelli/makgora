@@ -6,7 +6,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { Action, bit } from "../../src/game/input/actions";
+import { Action, bit, maskOf } from "../../src/game/input/actions";
 import type { InputRow } from "../../src/game/input/inputRow";
 import { decodePacket } from "../../src/game/input/wire";
 import { readEdges } from "./botFiles";
@@ -17,7 +17,7 @@ if (directory === undefined) throw new Error("usage: bun scripts/integrity/pad49
 const epoch = Number(epochText);
 
 const MOVES = bit(Action.moveLeft) | bit(Action.moveRight) | bit(Action.moveDown) | bit(Action.moveUp)
-  | bit(Action.cLeft) | bit(Action.cRight) | bit(Action.cUp) | bit(Action.cDown) | bit(Action.walk);
+  | bit(Action.cLeft) | bit(Action.cRight) | bit(Action.cUp) | bit(Action.cDown) | maskOf(Action.modX, Action.modY);
 
 let epochNs: number | undefined;
 let inEpoch = false;

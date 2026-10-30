@@ -8,12 +8,12 @@ import { type Fighter, createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
 import { DASH_ATTACK_LAST_FRAME, DASH_SMASH_LAST_FRAME } from "../sim/stickZones";
 import { lift } from "../sim/testDuel";
-import { Action, bit } from "../input/actions";
+import { Action, bit, maskOf } from "../input/actions";
 import { adaptInput } from "./inputAdapter";
 import { hasPendingAttack } from "../input/attackBuffer";
 import { commitEdges, keyboardCapture, sampleKeys } from "../input/keyboardCapture";
 
-const A = bit(Action.attack), S = bit(Action.strong), B = bit(Action.special), G = bit(Action.grab), W = bit(Action.walk), T = bit(Action.leftTrigger), J = bit(Action.jump);
+const A = bit(Action.attack), S = bit(Action.strong), B = bit(Action.special), G = bit(Action.grab), W = maskOf(Action.modX, Action.modY), T = bit(Action.leftTrigger), J = bit(Action.jump);
 const R = bit(Action.moveRight), L = bit(Action.moveLeft), U = bit(Action.moveUp), D = bit(Action.moveDown);
 
 interface Keyboard {

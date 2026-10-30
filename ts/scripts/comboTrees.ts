@@ -58,11 +58,11 @@ const stick = (x: Direction, z: Direction): Held => [
 function attackButtons(move: Move, self: Fighter, other: Fighter): Held {
   if (move.throw !== undefined || move.style === AttackStyle.grab) return [Action.grab];
   switch (move.style) {
-    case AttackStyle.forwardTilt: return [Action.walk, toward(self, other), Action.attack];
-    case AttackStyle.forwardTiltUp: return [Action.walk, toward(self, other), Action.moveUp, Action.attack];
-    case AttackStyle.forwardTiltDown: return [Action.walk, toward(self, other), Action.moveDown, Action.attack];
-    case AttackStyle.upTilt: return [Action.walk, Action.moveUp, Action.attack];
-    case AttackStyle.downTilt: return [Action.walk, Action.moveDown, Action.attack];
+    case AttackStyle.forwardTilt: return [Action.modX, Action.modY, toward(self, other), Action.attack];
+    case AttackStyle.forwardTiltUp: return [Action.modX, Action.modY, toward(self, other), Action.moveUp, Action.attack];
+    case AttackStyle.forwardTiltDown: return [Action.modX, Action.modY, toward(self, other), Action.moveDown, Action.attack];
+    case AttackStyle.upTilt: return [Action.modX, Action.modY, Action.moveUp, Action.attack];
+    case AttackStyle.downTilt: return [Action.modX, Action.modY, Action.moveDown, Action.attack];
     case AttackStyle.forwardSmash: return [Action.strong, toward(self, other)];
     case AttackStyle.upSmash: return [Action.strong, Action.moveUp];
     case AttackStyle.downSmash: return [Action.strong, Action.moveDown];

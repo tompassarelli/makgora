@@ -29,7 +29,7 @@ const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
 const KEY = {
   left: bound(Action.moveLeft), right: bound(Action.moveRight), down: bound(Action.moveDown), up: bound(Action.moveUp), jump: bound(Action.shortHop),
   attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shieldLeft: bound(Action.leftTrigger), shieldRight: bound(Action.rightTrigger),
-  cLeft: bound(Action.cLeft), cRight: bound(Action.cRight), cUp: bound(Action.cUp), cDown: bound(Action.cDown), walk: bound(Action.walk), strong: bound(Action.strong),
+  cLeft: bound(Action.cLeft), cRight: bound(Action.cRight), cUp: bound(Action.cUp), cDown: bound(Action.cDown), modX: bound(Action.modX), modY: bound(Action.modY), strong: bound(Action.strong),
 } as const;
 
 
@@ -59,9 +59,9 @@ const SPECIALS: readonly (readonly [string, number | undefined])[] = [["neutral 
 export const CENSUS_MOVES: readonly CensusMove[] = [
   { name: "jab", keys: [tap(0, KEY.attack)] },
   { name: "jab chain", keys: [tap(0, KEY.attack), tap(8, KEY.attack), tap(16, KEY.attack)] },
-  { name: "forward tilt", keys: [...hold(0, 3, KEY.walk, KEY.right), tap(2, KEY.attack)], style: AttackStyle.forwardTilt },
-  { name: "up tilt", keys: [...hold(0, 3, KEY.walk, KEY.up), tap(2, KEY.attack)], style: AttackStyle.upTilt },
-  { name: "down tilt", keys: [...hold(0, 3, KEY.walk, KEY.down), tap(2, KEY.attack)], style: AttackStyle.downTilt },
+  { name: "forward tilt", keys: [...hold(0, 3, KEY.modX, KEY.modY, KEY.right), tap(2, KEY.attack)], style: AttackStyle.forwardTilt },
+  { name: "up tilt", keys: [...hold(0, 3, KEY.modX, KEY.modY, KEY.up), tap(2, KEY.attack)], style: AttackStyle.upTilt },
+  { name: "down tilt", keys: [...hold(0, 3, KEY.modX, KEY.modY, KEY.down), tap(2, KEY.attack)], style: AttackStyle.downTilt },
   { name: "forward smash", keys: hold(0, 2, KEY.strong, KEY.right), style: AttackStyle.forwardSmash },
   { name: "up smash", keys: hold(0, 2, KEY.strong, KEY.up), style: AttackStyle.upSmash },
   { name: "down smash", keys: hold(0, 2, KEY.strong, KEY.down), style: AttackStyle.downSmash },

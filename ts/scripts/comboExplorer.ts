@@ -12,7 +12,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { Action, bit } from "../src/game/input/actions";
+import { Action, bit, maskOf } from "../src/game/input/actions";
 import { type ComboRoute, type ComboSetup, comboScene, heldRuns } from "../src/game/match/comboRoute";
 import { resetMatchFrameInput } from "../src/game/match/frameInput";
 import { setHumanMask } from "../src/game/lobby/lobbyState";
@@ -62,7 +62,7 @@ const ATTACK = bit(Action.attack);
 const SPECIAL = bit(Action.special);
 const JUMP = bit(Action.jump);
 const GRAB = bit(Action.grab);
-const WALK = bit(Action.walk);
+const WALK = maskOf(Action.modX, Action.modY);
 const STRONG = bit(Action.strong);
 const LEFT = bit(Action.moveLeft);
 const RIGHT = bit(Action.moveRight);

@@ -19,7 +19,7 @@ import { createNetStandalone, smashcraftMapHash } from "./net";
 
 const ACTIONS: Readonly<Record<string, Action>> = {
   attack: Action.attack, special: Action.special, jump: Action.jump,
-  grab: Action.grab, shield: Action.leftTrigger, walk: Action.walk,
+  grab: Action.grab, shield: Action.leftTrigger, walk: Action.modX,
   left: Action.moveLeft, right: Action.moveRight, up: Action.moveUp, down: Action.moveDown,
   cLeft: Action.cLeft, cRight: Action.cRight,
   cUp: Action.cUp, cDown: Action.cDown,

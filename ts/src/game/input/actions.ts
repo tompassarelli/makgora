@@ -18,11 +18,11 @@ export const Action = {
   cRight: 11,
   cUp: 12,
   cDown: 13,
-  walk: 14,
+  modX: 14,
   lightShield: 15,
   shortHop: 16,
   strong: 17,
-  modX: 18,
+  modY: 18,
 } as const;
 
 export type Action = (typeof Action)[keyof typeof Action];
