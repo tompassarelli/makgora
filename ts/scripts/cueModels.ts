@@ -2,7 +2,8 @@ import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { EffectCheckFailure, readEffectReport, CALIBRATION_SUMMARY, EFFECT_CALIBRATION } from "./wisp/effectVisibility";
-import { CUE_MODEL_RECORD, cueModels, formatEffectRecord, staleRecordRows, RECORD_COMMAND, effectRecordProblem, effectRecordUnknowns, effectFindings, effectCalibrationProblem } from "./wisp/cueModels";
+import { cueModels, formatEffectRecord, staleRecordRows, effectRecordProblem, effectRecordUnknowns, effectFindings, effectCalibrationProblem } from "./wisp/cueModels";
+import { CUE_MODEL_RECORD, RECORD_COMMAND } from "./wisp/cueInputs";
 import { readScreenCaptures } from "./classicEffectScreen";
 import { screenReport, screenAcceptanceProblem } from "./wisp/classicEffectScreen";
 

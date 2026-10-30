@@ -364,27 +364,6 @@ export async function checkEffects(read: (path: string) => Promise<Uint8Array | 
   return uses.map((use) => judgeUse(use, facts.get(use.model) ?? null));
 }
 
-export const EFFECT_PLAYBACK_INPUTS = ["ts/scripts/wisp/effectVisibility.ts", "ts/scripts/cueModels.ts", "ts/scripts/wisp/cueModels.ts", "ts/scripts/prePush.ts", "ts/src/host/loop/view.ts", "ts/src/game/presentation/specialCues.ts", "ts/src/game/presentation/attackCues.ts", "ts/src/game/presentation/projectileArt.ts", "ts/src/game/presentation/projectilePose.ts", "ts/wisp.lock", "ts/bun.lock", "ts/package.json", "typescript-toolchain.lock", "ts/src/game/render/specialCueEffects.ts", "ts/src/game/render/projectilePresentation.ts", "ts/src/game/render/hitAreaEffects.ts", "ts/src/game/render/specialEffects.ts", "ts/src/game/render/combatEffects.ts", "ts/src/game/render/placedObjectEffects.ts", "ts/src/game/render/summonPresentation.ts", "build-inputs/"];
-export function effectPlaybackInputs(root = join(import.meta.dir, "../../..")): string[] {
-  const transpiler = new Bun.Transpiler({ loader: "ts" });
-  const seen = new Set<string>(EFFECT_PLAYBACK_INPUTS);
-  const visit = (path: string) => {
-    const file = join(root, path);
-    if (!existsSync(file) || !/\.tsx?$/.test(path)) return;
-    for (const entry of transpiler.scanImports(readFileSync(file, "utf8"))) {
-      if (!entry.path.startsWith(".")) continue;
-      const base = join(dirname(file), entry.path);
-      const found = [base, `${base}.ts`, `${base}.tsx`, join(base, "index.ts")].find((candidate) => existsSync(candidate) && /\.tsx?$/.test(candidate));
-      if (found === undefined) continue;
-      const input = relative(root, found);
-      if (seen.has(input)) continue;
-      seen.add(input);
-      visit(input);
-    }
-  };
-  for (const path of EFFECT_PLAYBACK_INPUTS) visit(path);
-  return [...seen].sort();
-}
 const unpinnedImport = (model: string) => /^war3mapImported[\\/]/i.test(model) && !/-[0-9a-f]{64}\.mdx$/i.test(model);
 const importedModelsPin = (): string => { const file = join(import.meta.dir, "../../../build-inputs/imported-models"); return existsSync(file) ? readFileSync(file, "utf8").trim() : "unpinned"; };
 export const effectUseDigest = (use: EffectUse) => createHash("sha256").update(JSON.stringify(use)).digest("hex");

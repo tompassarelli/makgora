@@ -2,13 +2,13 @@ import { chmodSync, closeSync, constants, copyFileSync, existsSync, mkdirSync, m
 import { basename, dirname, join, relative } from "node:path";
 import { Effect } from "effect";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
-import { ImportGraph } from "wisp/scripts/wisp/importGraph";
 import { fighterSlug } from "../../src/game/roster/kits";
 import { fighters } from "../heroModelSource";
 import { stopBunProcess } from "../hostProcess";
 import { pruneWhiteTextures } from "../whiteImports";
 import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, type Pin, assetsView, listFiles, mergeShards, publish, readManifest, removeTree, seal, storeShards, unstoredPins, writeShardPins } from "./buildInputs";
 import { stockStorage } from "./renderAssetStore";
+import { STEP_TOOLS, type StepName, stepCode } from "./fighterArtCode";
 import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
@@ -23,24 +23,20 @@ interface Fighter { readonly character: number; readonly name: string; readonly 
 interface Work { readonly root: string; readonly checkout: string; readonly assets: string; readonly pool: string; readonly impact: string }
 
 interface Step {
-  readonly name: "clips" | "bodies" | "flashes" | "costumes";
+  readonly name: StepName;
   readonly tool: string;
   readonly output: Output;
   readonly args: (fighter: Fighter, work: Work) => readonly string[];
 }
 
 const STEPS: readonly Step[] = [
-  { name: "clips", tool: "tools/animations/export-original-clips.ts", output: "pool", args: (fighter, work) => ["--assets", work.assets, "--out", work.pool, "--only", fighter.name] },
-  { name: "bodies", tool: "tools/animations/timeline-models.ts", output: "pool", args: (fighter, work) => [work.assets, work.pool, fighter.name] },
-  { name: "flashes", tool: "tools/animations/white-flash-models.ts", output: "impact", args: (fighter, work) => [work.assets, work.impact, "--character", String(fighter.character)] },
-  { name: "costumes", tool: "tools/animations/costume-bodies.ts", output: "pool", args: (fighter, work) => [work.pool, fighter.name] },
+  { name: "clips", tool: STEP_TOOLS.clips, output: "pool", args: (fighter, work) => ["--assets", work.assets, "--out", work.pool, "--only", fighter.name] },
+  { name: "bodies", tool: STEP_TOOLS.bodies, output: "pool", args: (fighter, work) => [work.assets, work.pool, fighter.name] },
+  { name: "flashes", tool: STEP_TOOLS.flashes, output: "impact", args: (fighter, work) => [work.assets, work.impact, "--character", String(fighter.character)] },
+  { name: "costumes", tool: STEP_TOOLS.costumes, output: "pool", args: (fighter, work) => [work.pool, fighter.name] },
 ];
 
 const FAMILY: Readonly<Record<Output, Family>> = { pool: "original-clips-static-lights", impact: "impact-assets" };
-
-const GENERATED = [/^ts\/src\/generated\/clips\//, /^ts\/src\/generated\/costumes\//, /^ts\/src\/generated\/assets\/white-(models|facts)\//, /^ts\/src\/generated\/assets\/white(FighterModels|ModelFacts)\.ts$/];
-
-const LOCKS = ["ts/package.json", "ts/bun.lock", "tools/animations/package.json", "tools/animations/bun.lock"];
 
 export const DERIVED_PATHS = ["build-inputs/original-clips-static-lights", "build-inputs/impact-assets", "ts/src/generated/clips", "ts/src/generated/costumes", "ts/src/generated/assets", "ts/scripts/wisp/model-facts"];
 
@@ -61,16 +57,7 @@ function linkHeroModels(pin: Pin, fighter: Fighter, assets: string, target: stri
 
 const failure = (operation: string, path: string, cause: unknown) => new MapBuildFailure({ operation, path, cause: cause instanceof Error ? cause.message : String(cause) });
 
-function stepCode(tool: string): string[] {
-  const graph = new ImportGraph(projectRoot), entry = join(projectRoot, tool);
-  graph.add([entry]);
-  const files = [...graph.dependencies(entry)].map((path) => relative(projectRoot, path)).filter((path) => !GENERATED.some((pattern) => pattern.test(path)));
-  return [...files, ...LOCKS].sort();
-}
-
 const codeDigest = (tool: string) => sha256(...stepCode(tool).flatMap((path) => [path, readFileSync(join(projectRoot, path))]));
-
-export const derivedStepCode = (): ReadonlySet<string> => new Set(STEPS.flatMap((step) => stepCode(step.tool)));
 
 const STEP_FILES: Readonly<Record<Step["name"], { readonly files: (slug: string) => readonly string[]; readonly facts: readonly string[] }>> = {
   clips: { files: (slug) => [`ts/src/generated/clips/${slug}.ts`], facts: ["OriginalClip"] },
