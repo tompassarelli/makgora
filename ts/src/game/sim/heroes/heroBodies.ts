@@ -44,7 +44,7 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.cairne]: { ...body(f32(143.0 / 75.0), f32(f32(1.485) / f32(2.2)), f32(0.945), f32(1.75), f32(1.45)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.peon]: { ...body(f32(92.0 / 75.0), f32(f32(1.6) / f32(2.2)), f32(0.987), f32(0.88), f32(0.80)), traction: f32(0.05) },
   [Character.medivh]: { ...body(f32(0.90), f32(0.98), f32(1.20), f32(0.90), f32(1.10)), traction: f32(0.05) },
-  [Character.archimonde]: { ...body(f32(118.0 / 75.0), f32(0.70), f32(0.72), f32(1.70), f32(1.60)), dashRunFrame: 16, traction: f32(0.08) },
+  [Character.archimonde]: { ...body(f32(118.0 / 75.0), f32(0.80), f32(0.82), f32(1.45), f32(1.50)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.butcher]: { ...body(f32(116.0 / 75.0), f32(0.70), f32(0.78), f32(1.85), f32(1.30)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.tyrande]: { ...body(f32(92.0 / 75.0), f32(1.10), f32(1.0), f32(0.90), f32(0.88)), traction: f32(0.06) },
   [Character.akama]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
