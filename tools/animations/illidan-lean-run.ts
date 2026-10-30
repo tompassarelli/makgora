@@ -10,11 +10,12 @@ ensure(assetsArg && outputArg && variantArg, "usage: bun tools/animations/illida
 const [assets, output] = [assetsArg, outputArg].map(p => resolve(p));
 ensure(relative(resolve(import.meta.dir, "../.."), output).startsWith(".."), "Illidan art stays outside the checkout");
 
-interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number }
+interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number }
 const VARIANTS: Readonly<Record<string, Variant>> = {
-  low: { lean: 52, head: .55, pelvis: .4, sweep: 78, elbow: 8, hand: 46, splay: 14, swing: .35, bob: 2 },
-  fox: { lean: 42, head: .5, pelvis: .35, sweep: 66, elbow: 10, hand: 38, splay: 16, swing: .4, bob: 2 },
-  long: { lean: 34, head: .45, pelvis: .3, sweep: 58, elbow: 14, hand: 30, splay: 18, swing: .5, bob: 1.5 },
+  low: { lean: 52, head: .55, pelvis: .4, sweep: 78, elbow: 8, hand: 46, splay: 14, swing: .35, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0 },
+  fox: { lean: 42, head: .5, pelvis: .35, sweep: 66, elbow: 10, hand: 38, splay: 16, swing: .4, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0 },
+  long: { lean: 34, head: .45, pelvis: .3, sweep: 58, elbow: 14, hand: 30, splay: 18, swing: .5, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0 },
+  take2: { lean: 72, head: .62, pelvis: .3, sweep: 88, elbow: 2, hand: 90, splay: -14, swing: .3, bob: 1.5, slide: 26, slideR: 38, drop: 14, lateral: 12 },
 };
 const v = VARIANTS[variantArg];
 ensure(v, `${variantArg}: variants are ${Object.keys(VARIANTS).join(", ")}`);
@@ -110,6 +111,11 @@ function rewrite(name: "Locomotion Run" | "Locomotion Initial Dash Burst", ramp:
       previous = vector;
     }
     track.Keys = [...track.Keys.filter(k => k.Frame < start || k.Frame > end), ...fresh].sort((a, b) => a.Frame - b.Frame);
+  }
+  for (const blade of ["blade_base", "stand_blade_L"]) {
+    const track = node(blade).Translation as mdx.AnimVector | undefined;
+    ensure(track, `${blade}: no translation track`);
+    for (const key of track.Keys) if (key.Frame >= start && key.Frame <= end) { const vector = key.Vector as Float32Array; vector[0] = vector[0]! + v.slide + (blade === "blade_base" ? v.slideR : 0); vector[1] = vector[1]! + v.lateral; vector[2] = vector[2]! + v.drop; }
   }
   console.log("ILLIDAN_LEAN", name, variantArg, frames.length, "keys per bone");
 }
