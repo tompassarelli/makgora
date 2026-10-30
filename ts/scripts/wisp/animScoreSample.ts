@@ -179,7 +179,7 @@ export interface SampledMove {
   readonly regionOwners: readonly (RegionOwner | undefined)[];
 }
 
-export interface RegionOwner { readonly regions?: readonly MoveRegion[] | undefined; readonly beam?: unknown }
+export interface RegionOwner { readonly regions?: readonly MoveRegion[] | undefined; readonly beam?: unknown; readonly strikesWithProp?: true | undefined; readonly motion?: readonly { readonly stopsAtBody?: boolean | undefined }[] | undefined }
 
 export interface SampledCue { readonly x: number; readonly z: number; readonly scale: number; readonly age: number }
 

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { AttackStyle, Character } from '../../ts/src/game/sim/codes';
 import type { Capsule } from '../../ts/src/game/sim/geometry/contactGeometry';
@@ -30,6 +30,14 @@ export function farEnd(capsule: Capsule): Point {
 }
 const isPath = (capsule: Capsule) => 'path' in capsule && capsule.path === true;
 
+export type Striker = 'weapon' | 'prop' | 'body';
+export function striker(owner: RegionOwner | undefined): Striker {
+  if (owner?.strikesWithProp === true) return 'prop';
+  const strikes = (owner?.regions ?? []).flatMap(region => region.hit.strike === undefined ? [] : [region.hit.strike]);
+  const swept = strikes.length > 0 && strikes.every(isPath);
+  return swept || owner?.motion?.some(motion => motion.stopsAtBody === true) === true ? 'body' : 'weapon';
+}
+
 type Special = Readonly<AuthoredSpecial>;
 function specialPath(node: Special | undefined, owner: RegionOwner, path: readonly (string | number)[]): (string | number)[] | undefined {
   if (node === undefined) return undefined;
@@ -45,7 +53,7 @@ function specialPath(node: Special | undefined, owner: RegionOwner, path: readon
   return undefined;
 }
 
-function ownerKey(character: Character, move: string, owner: RegionOwner): string | undefined {
+export function ownerKey(character: Character, move: string, owner: RegionOwner): string | undefined {
   const hero = heroDefinition(character);
   const entry = SCORED_NORMALS.find(candidate => candidate.move === move);
   if (entry !== undefined && hero?.moves.normals[entry.style] === owner) return Object.entries(AttackStyle).find(([, style]) => style === entry.style)?.[0];
@@ -145,15 +153,33 @@ function wireKit(folder: string, name: string): void {
   writeFileSync(kit, lines.join('\n'));
 }
 
-export async function writeFits(character: Character, moves: readonly MoveFit[]): Promise<string> {
+function unwireKit(folder: string, name: string): void {
+  const kit = join(folder, 'kit.ts');
+  const text = readFileSync(kit, 'utf8')
+    .replace(new RegExp(`fitMoves\\((\\w+_MOVES), ${name}\\)`), '$1')
+    .replace(new RegExp(`fitSpecials\\((\\w+_SPECIALS), ${name}\\)`), '$1');
+  const lines = text.split('\n').filter(line => !(line.startsWith('import { fit') && line.endsWith('from "../../sim/weaponRegions";')) && line !== `import { ${name} } from "./weaponRegions";`);
+  writeFileSync(kit, lines.join('\n'));
+}
+
+export type WrittenFits = { readonly file: string; readonly dropped: readonly string[] };
+
+export async function writeFits(character: Character, moves: readonly MoveFit[], excluded: readonly string[]): Promise<WrittenFits> {
   const { folder, name } = kitOf(character);
   const file = join(folder, 'weaponRegions.ts');
   const existing: WeaponRegionFits = existsSync(file) ? (await import(file))[name] ?? {} : {};
   const fits: Record<string, MoveFit['frames']> = { ...existing } as Record<string, MoveFit['frames']>;
+  const dropped = excluded.filter(key => key in fits);
+  for (const key of dropped) delete fits[key];
   for (const move of moves) fits[move.key] = move.frames;
+  if (Object.keys(fits).length === 0) {
+    if (existsSync(file)) unlinkSync(file);
+    unwireKit(folder, name);
+    return { file, dropped };
+  }
   writeFileSync(file, renderFits(name, fits));
   wireKit(folder, name);
   if (moves.some(move => move.key.startsWith(ULTIMATE_FIT_PREFIX)) && !readFileSync(ULTIMATES, 'utf8').includes(name))
     throw new Error(`${file} fits the ultimate; apply it with fitUltimate(..., ${name}) in ts/src/game/sim/ultimates.ts`);
-  return file;
+  return { file, dropped };
 }

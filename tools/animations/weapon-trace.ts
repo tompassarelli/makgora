@@ -9,7 +9,7 @@ import { type SampledMove, loadBody, sampleFighter } from '../../ts/scripts/wisp
 import type { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
 import { assetsView, readManifest } from '../../ts/scripts/wisp/buildInputs';
 import { FIGHTER_RIGS } from './rigs';
-import { type Edge, type MoveFit, type Point, farEnd, fitMove, segmentDistance, writeFits } from './weapon-fit';
+import { type Edge, type MoveFit, type Point, farEnd, fitMove, ownerKey, segmentDistance, striker, writeFits } from './weapon-fit';
 
 const GAP_LIMIT = 20.0;
 const AERIAL_SIDE: Readonly<Record<string, number>> = { 'forward-air': 1, 'back-air': -1 };
@@ -18,7 +18,7 @@ const USAGE = 'usage: bun tools/animations/weapon-trace.ts [--fighter SLUG]... [
 type Weapon = { readonly name: string; readonly hand: number; readonly vertices: readonly number[] };
 type Shift = { readonly fighter: string; readonly move: string; readonly dx: number };
 type Gap = { readonly gap: number; readonly frame: number; readonly at: Point };
-type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly by: 'weapon' | 'limb' | 'spell'; readonly shifted: boolean; readonly turned: readonly number[] };
+type Row = { readonly fighter: string; readonly move: string; readonly weapons: string; readonly frames: readonly number[]; readonly tip: Gap; readonly reach: Gap; readonly by: 'weapon' | 'limb' | 'spell' | 'prop' | 'body'; readonly shifted: boolean; readonly turned: readonly number[] };
 
 const fails = (row: Row) => row.by === 'weapon' && (Math.max(row.tip.gap, row.reach.gap) > GAP_LIMIT || row.turned.length > 0);
 const worst = (row: Row) => Math.max(row.tip.gap, row.reach.gap);
@@ -88,10 +88,11 @@ function traceMove(model: DrawnModel, character: Character, weapons: readonly We
   const edges = frames.map(frame => weapons.map(weapon => edgeAt(model, weapon, sampled.seconds[frame] ?? 0)));
   const side = AERIAL_SIDE[sampled.move] ?? 0;
   const turned = side === 0 ? [] : frames.filter((_, index) => !(edges[index] ?? []).some(edge => edge.tip[0] * side > 0));
+  const struck = striker(sampled.regionOwners[frames[0] ?? 0]);
   const row: Row = {
     fighter, move: sampled.move, weapons: weapons.map(weapon => weapon.name).join('+'), frames,
     tip: tipGap(frames, regions, edges), reach: reachGap(frames, regions, edges),
-    by: LIMB_STRIKES[fighter]?.includes(sampled.move) === true ? 'limb' : SPELL_STRIKES[fighter]?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted, turned,
+    by: struck !== 'weapon' ? struck : LIMB_STRIKES[fighter]?.includes(sampled.move) === true ? 'limb' : SPELL_STRIKES[fighter]?.includes(sampled.move) === true ? 'spell' : 'weapon', shifted, turned,
   };
   return { row, sampled, edges };
 }
@@ -141,25 +142,46 @@ async function fitLoop(argv: readonly string[], assets: string): Promise<void> {
     if (regen.exitCode !== 0) throw new Error('bun wisp view strikes failed');
     const fit = Bun.spawnSync([...self, '--fit-once'], { stdout: 'inherit', stderr: 'inherit' });
     if (fit.exitCode !== 0) throw new Error(`weapon fit round ${round} failed`);
-    const written = (await Bun.file(fitReport).json()) as { readonly fitted: number };
-    console.log(`weapon fit round ${round}: ${written.fitted} moves refitted`);
-    if (written.fitted === 0) break;
+    const written = (await Bun.file(fitReport).json()) as { readonly fitted: number; readonly dropped: number };
+    console.log(`weapon fit round ${round}: ${written.fitted} moves refitted, ${written.dropped} fits dropped`);
+    if (written.fitted + written.dropped === 0) break;
   }
   process.exitCode = Bun.spawnSync(self, { stdout: 'inherit', stderr: 'inherit' }).exitCode;
 }
 
+type Change = { readonly fits: MoveFit[]; readonly excluded: string[] };
+
 async function fitFlagged(traced: readonly (Traced & { readonly character: Character })[]): Promise<number> {
-  const byFighter = new Map<Character, MoveFit[]>();
+  const byFighter = new Map<Character, Change>();
+  const change = (character: Character): Change => {
+    const found: Change = byFighter.get(character) ?? { fits: [], excluded: [] };
+    byFighter.set(character, found);
+    return found;
+  };
+  const excluded: string[] = [];
   for (const { row, sampled, edges, character } of traced) {
+    if (row.by === 'prop' || row.by === 'body') {
+      const owner = sampled.regionOwners[row.frames[0] ?? 0], key = owner === undefined ? undefined : ownerKey(character, sampled.move, owner);
+      excluded.push(`${row.fighter} ${row.move}`);
+      console.log(`excluded: ${row.fighter} ${row.move} strikes with its ${row.by}, not the traced weapon`);
+      if (key !== undefined) change(character).excluded.push(key);
+      continue;
+    }
     if (!fails(row)) continue;
     const fitted = fitMove(character, sampled, row.frames, edges);
     if (typeof fitted === 'string') console.log(`not fitted: ${row.fighter} ${row.move}: ${fitted}`);
-    else byFighter.set(character, [...byFighter.get(character) ?? [], fitted]);
+    else change(character).fits.push(fitted);
   }
-  for (const [character, moves] of byFighter) console.log(`fitted ${moves.map(move => move.key).join(', ')} into ${await writeFits(character, moves)}`);
-  const fitted = [...byFighter.values()].reduce((sum, moves) => sum + moves.length, 0);
-  await Bun.write(fitReport, JSON.stringify({ fitted }));
-  return fitted;
+  let fitted = 0, dropped = 0;
+  for (const [character, { fits, excluded: keys }] of byFighter) {
+    const written = await writeFits(character, fits, keys);
+    fitted += fits.length;
+    dropped += written.dropped.length;
+    if (fits.length > 0) console.log(`fitted ${fits.map(move => move.key).join(', ')} into ${written.file}`);
+    if (written.dropped.length > 0) console.log(`dropped the fit of ${written.dropped.join(', ')} from ${written.file}`);
+  }
+  await Bun.write(fitReport, JSON.stringify({ fitted, dropped, excluded }));
+  return fitted + dropped;
 }
 
 const argv = process.argv.slice(2);

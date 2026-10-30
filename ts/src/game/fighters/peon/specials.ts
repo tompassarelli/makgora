@@ -33,7 +33,7 @@ const goldSackSwing = (stage: number): AuthoredSpecial => {
   const radius = 14.0 + 2.0 * stage;
   const effect = peonHit(GOLD_SACK_DAMAGE[stage] ?? 8.0, 40, GOLD_SACK_GROWTH[stage] ?? 80.0, GOLD_SACK_BASE[stage] ?? 20.0);
   return {
-    name: "Gold Sack Bonk", endFrame: GOLD_SACK_ENDS[stage] ?? 51, landingLag: 14, swingsThroughLanding: true, spendsCharge: true,
+    name: "Gold Sack Bonk", strikesWithProp: true, endFrame: GOLD_SACK_ENDS[stage] ?? 51, landingLag: 14, swingsThroughLanding: true, spendsCharge: true,
     motion: stage === GOLD_SACK_CHARGE.stages ? [{ ...frames(GOLD_SACK_LUNGE.first, GOLD_SACK_LUNGE.last), velocityX: GOLD_SACK_LUNGE.speed, velocityZ: 0.0 }] : undefined,
     regions: Array.from({ length: count }, (_, index) => heroRegion(first + index, first + index, { ...goldSackArcAt(index, count), radius }, effect)),
   };
@@ -75,10 +75,10 @@ const LOG_REGIONS: readonly MoveRegion[] = [
 ];
 
 const LOG_HEAVE: AuthoredSpecial = {
-  endFrame: LOG_HEAVE_END, groundOnly: true, motion: [{ ...frames(1, LOG_HEAVE_END), velocityX: 0.0, velocityZ: 0.0 }], regions: LOG_REGIONS,
+  strikesWithProp: true, endFrame: LOG_HEAVE_END, groundOnly: true, motion: [{ ...frames(1, LOG_HEAVE_END), velocityX: 0.0, velocityZ: 0.0 }], regions: LOG_REGIONS,
 };
 
-const LOG_HEAVE_AIR: AuthoredSpecial = { endFrame: LOG_HEAVE_END, oncePerAirtime: true, landingLag: LOG_HEAVE_AIR_LANDING_LAG, regions: LOG_REGIONS };
+const LOG_HEAVE_AIR: AuthoredSpecial = { strikesWithProp: true, endFrame: LOG_HEAVE_END, oncePerAirtime: true, landingLag: LOG_HEAVE_AIR_LANDING_LAG, regions: LOG_REGIONS };
 
 const vault = (x: number, z: number): AuthoredSpecial => ({
   endFrame: 28, motion: [{ ...frames(8, 28), velocityX: 0.0, velocityZ: z, driftSpeed: x }],

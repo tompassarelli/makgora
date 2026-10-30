@@ -412,6 +412,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   applies with fitMoves and fitSpecials (an ultimate with fitUltimate in ts/src/game/sim/ultimates.ts). It regenerates
   the strike-moment table (`bun wisp view strikes`) before each round and repeats until no move fails, at most 6 rounds,
   then prints the trace; a move it cannot map is printed as `not fitted` with its reason (#614).
+  A special marked `strikesWithProp` (Peon's Log Heave and Gold Sack: the log and the sack on its pole strike, not the held pick), or
+  whose regions are all pass-through paths or whose motion stops at the first body, strikes with something other than the traced weapon: it is
+  reported as `prop` or `body`, never failed or fitted, printed as `excluded`, listed in build/anim-score/weapon-fit.json, and any fit it
+  already had is dropped from weaponRegions.ts (the file and its kit.ts wiring go when it was the last).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);

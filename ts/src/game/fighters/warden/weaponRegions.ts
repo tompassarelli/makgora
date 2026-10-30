@@ -18,11 +18,4 @@ export const WARDEN_WEAPON_REGIONS: { readonly [move: string]: { readonly [frame
     17: [[42, 106, -8, 168]],
     18: [[42, 106, -8, 168]],
   },
-  "special.side.ground": {
-    20: [[0, 48, 0, 48]],
-    21: [[0, 48, 0, 48]],
-    22: [[0, 48, 0, 48]],
-    23: [[0, 48, 0, 48]],
-    24: [[0, 48, 0, 48]],
-  },
 };

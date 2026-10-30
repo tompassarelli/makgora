@@ -5,6 +5,8 @@ import { airborne, fighter, frameRows, scene } from "../../match/padScene";
 import { Character, SpecialAction } from "../../sim/codes";
 import { canAttack } from "../../sim/conditions";
 import type { StrikeCapsule } from "../../sim/heroMoves";
+import { PEON_HERO } from "./kit";
+import type { AuthoredSpecial } from "../../sim/specials/schema";
 import { LOG_LENGTH, LOG_LYING_HEIGHT, LOG_PATH } from "./logPath";
 import { LOG_BUTT, LOG_HEAVE_AIR_LANDING_LAG, LOG_HEAVE_FIRST_ACTIVE, LOG_OVERHEAD, LOG_RISING, LOG_TIPPER } from "./specials";
 
@@ -165,4 +167,54 @@ test("Peon's air Log Heave ends on landing with 15 frames of landing lag [k3 mea
   }
   assertGreaterThan(free, LOG_HEAVE_AIR_LANDING_LAG - 2);
   assertLessThan(free, LOG_HEAVE_AIR_LANDING_LAG + 3);
+});
+
+const LOG_SAMPLES = 8;
+
+const outsideCapsule = (x: number, z: number, c: Readonly<StrikeCapsule>): number => {
+  const ux = c.x2 - c.x1, uz = c.z2 - c.z1, span = ux * ux + uz * uz;
+  const t = span === 0.0 ? 0.0 : Math.max(0.0, Math.min(1.0, ((x - c.x1) * ux + (z - c.z1) * uz) / span));
+  return Math.sqrt((x - c.x1 - ux * t) * (x - c.x1 - ux * t) + (z - c.z1 - uz * t) * (z - c.z1 - uz * t)) - c.radius;
+};
+
+const strikesAt = (special: AuthoredSpecial | undefined, frame: number) =>
+  (special?.regions ?? []).flatMap((region) => (frame - 1 >= region.firstFrame && frame - 1 <= region.lastFrame && region.hit.strike !== undefined ? [region.hit] : []));
+
+test("Peon's ground and air Log Heave hit regions cover the drawn log from grip to far end on every active frame, the tipper at the far end [k3 measure docs/design/peasant.md]", () => {
+  const side = PEON_HERO.specials?.side;
+  for (const [form, special] of [["ground", side?.ground], ["air", side?.air]] as const) {
+    for (const [index, log] of [...LOG_RISING, ...LOG_OVERHEAD].entries()) {
+      const frame = LOG_HEAVE_FIRST_ACTIVE + index;
+      const hits = strikesAt(special, frame);
+      assertEquals(hits.length > 0, true, `${form} frame ${frame} has hit regions`);
+      for (let step = 0; step <= LOG_SAMPLES; step++) {
+        const x = log.x1 + (log.x2 - log.x1) * step / LOG_SAMPLES, z = log.z1 + (log.z2 - log.z1) * step / LOG_SAMPLES;
+        assertEquals(hits.some((hit) => hit.strike !== undefined && outsideCapsule(x, z, hit.strike) <= ON_LOG), true, `${form} frame ${frame}: no hit region at ${step} of ${LOG_SAMPLES} along the log`);
+      }
+      if (index < LOG_RISING.length) {
+        assertEquals(hits.some((hit) => hit.effect.damage === LOG_TIPPER.damage && hit.strike !== undefined && outsideCapsule(log.x2, log.z2, hit.strike) <= ON_LOG), true, `${form} frame ${frame}: the tipper does not reach the log's far end`);
+      }
+    }
+  }
+});
+
+test("Peon's ground and air Log Heave hit a Rifleman standing at the log's far end on its first active frame [k3 measure docs/design/peasant.md]", () => {
+  const farEnd = LOG_RISING[0]?.x2 ?? 0.0;
+  const ground = scene(0, [{ character: Character.peon, x: 0.0, facing: 1 }, { character: Character.rifleman, x: farEnd, facing: -1 }]);
+  const groundFoe = fighter(ground, 1);
+  let groundFrame = 0;
+  for (let n = 1; n <= LOG_HEAVE_FIRST_ACTIVE + 3 && groundFoe.status.damage === 0.0; n++) {
+    frameRows(ground, [n === 1 ? [Action.moveRight, Action.special] : [], []]);
+    groundFrame = fighter(ground, 0).special.frame;
+  }
+  assertEquals(groundFoe.status.damage, LOG_TIPPER.damage, "ground tipper damage");
+  assertEquals(groundFrame, LOG_HEAVE_FIRST_ACTIVE, "ground hit frame");
+  const { foe, peon, run } = airHeave(AIR_HEIGHT, farEnd);
+  let airFrame = 0;
+  for (let n = 1; n <= LOG_HEAVE_FIRST_ACTIVE + 3 && foe.status.damage === 0.0; n++) {
+    run(1, n === 1 ? undefined : () => []);
+    airFrame = peon.special.frame;
+  }
+  assertEquals(foe.status.damage, LOG_TIPPER.damage, "air tipper damage");
+  assertEquals(airFrame, LOG_HEAVE_FIRST_ACTIVE, "air hit frame");
 });
