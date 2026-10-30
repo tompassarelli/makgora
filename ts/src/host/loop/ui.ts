@@ -374,9 +374,7 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 
 
 export function menuControlHit(ui: UiObjects, slot: ParticipantSlot): MenuControlHit {
-  return { over(x: number, y: number): boolean { const settings = ui.settings[slot].over(x, y), pause = ui.pause.over(x, y), results = ui.results.over(x, y);
-    return settings || pause || results;
-  } };
+  return { over(x: number, y: number): boolean { return ui.settings[slot].over(x, y) || ui.pause.over(x, y); } };
 }
 
 

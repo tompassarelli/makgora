@@ -7,8 +7,6 @@ import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { CREDITS_BOX } from "./selectionLayout";
 
-const CLOSE_BOX = { x: f32(0.32), y: f32(0.115), width: f32(0.16), height: f32(0.035) } as const;
-
 export type CreditsButton = { kind: "creditsOpen" } | { kind: "creditsClose" };
 
 export class CreditsMenu {
@@ -26,9 +24,9 @@ export class CreditsMenu {
     BlzFrameSetLevel(this.root, SELECT_LEVELS.credits);
     BlzFrameSetText(panelText(this.root, `MeleeCreditsTitle${suffix}`, f32(0.11), f32(0.52), f32(0.58), f32(0.03), f32(0.018), TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER), CREDITS_TITLE);
     BlzFrameSetText(panelText(this.root, `MeleeCreditsBody${suffix}`, f32(0.12), f32(0.485), f32(0.56), f32(0.34), f32(0.0105), TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT), creditsBody(version));
-    this.clicks.add(panelButton(this.root, CLOSE_BOX.x, CLOSE_BOX.y, CLOSE_BOX.width, CLOSE_BOX.height, "Close"), { kind: "creditsClose" }, "Close", "native", CLOSE_BOX);
+    this.clicks.add(panelButton(this.root, f32(0.32), f32(0.115), f32(0.16), f32(0.035), "Close"), { kind: "creditsClose" }, "Close", "native");
     BlzFrameSetVisible(this.root, false);
-    this.clicks.add(panelButton(rules, CREDITS_BOX.x, CREDITS_BOX.y, CREDITS_BOX.width, CREDITS_BOX.height, CREDITS_TITLE), { kind: "creditsOpen" }, CREDITS_TITLE, "native", CREDITS_BOX);
+    this.clicks.add(panelButton(rules, CREDITS_BOX.x, CREDITS_BOX.y, CREDITS_BOX.width, CREDITS_BOX.height, CREDITS_TITLE), { kind: "creditsOpen" }, CREDITS_TITLE, "native");
   }
 
   bindActions(): void {
@@ -41,14 +39,6 @@ export class CreditsMenu {
       this.state.open();
       this.onOpen();
     } else this.state.close();
-  }
-
-  opened(): boolean {
-    return this.state.isOpen;
-  }
-
-  over(x: number, y: number): boolean {
-    return this.clicks.over(x, y);
   }
 
   close(): boolean {
