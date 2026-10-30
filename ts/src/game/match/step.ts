@@ -18,7 +18,7 @@ import { updateProjectiles } from "../sim/projectiles";
 import { advanceAura } from "../sim/toggleAura";
 import { advancePlacedObjects } from "../sim/placedObjects";
 import { advanceCurses } from "../sim/curses";
-import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
+import { type Roster, copyControls, fighterAt, isActive, neutralControls, relinkPartners, setRosterMask } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, cancelShineForUpSmash, startFighterSpecial } from "../sim/specials";
 import { resolveHeroGuards } from "../sim/specials/guards";
@@ -71,6 +71,7 @@ export function configureMatchTeams(game: Readonly<MatchState>, world: Roster): 
   world.teamBattle = game.teamBattle && !game.training && !game.run.active;
   world.friendlyFire = game.friendlyFire;
   for (const slot of PARTICIPANT_SLOTS) world.teamChoices[slot] = game.teamChoices[slot];
+  relinkPartners(world);
 }
 
 export function initializeMatchFighters(game: Readonly<MatchState>, world: Roster): void {

@@ -58,6 +58,16 @@ export const isPartner = (roster: Roster, slot: number): boolean => roster.activ
 
 export const isContender = (roster: Roster, slot: number): boolean => roster.active[slot] === true && !isPartner(roster, slot);
 
+export function linkPartner(roster: Roster, partnerSlot: number, leaderSlot: number): void {
+  roster.teamChoices[partnerSlot] = roster.teamChoices[leaderSlot] ?? 0;
+  roster.linked[partnerSlot] = leaderSlot;
+  roster.linked[leaderSlot] = partnerSlot;
+}
+
+export function relinkPartners(roster: Roster): void {
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (isPartner(roster, slot)) linkPartner(roster, slot, fighterAt(roster, slot).duo?.link ?? -1);
+}
+
 export function hasLivePartner(roster: Roster, fighter: Readonly<Fighter>): boolean {
   const link = fighter.duo?.link ?? -1;
   return link >= 0 && isActive(roster, link) && !fighterAt(roster, link).status.out;

@@ -2,7 +2,7 @@ import { PARTICIPANT_SLOTS } from "../../input/participants";
 import { Character, DuoRole } from "../../sim/codes";
 import { type Fighter, createFighter, duoRole, mutableDuo } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
-import { type Roster, fighterAt, isActive, setRosterMask } from "../../sim/roster";
+import { type Roster, fighterAt, isActive, linkPartner, setRosterMask } from "../../sim/roster";
 import { authoredTuning } from "../../sim/tuning";
 
 export const MURLOC_DUO = {
@@ -38,9 +38,7 @@ function seatPartner(world: Roster, leaderSlot: number, partnerSlot: number): vo
   leaderDuo.role = DuoRole.leader;
   leaderDuo.link = partnerSlot;
   world.fighters[partnerSlot] = partner;
-  world.teamChoices[partnerSlot] = world.teamChoices[leaderSlot] ?? 0;
-  world.linked[partnerSlot] = leaderSlot;
-  world.linked[leaderSlot] = partnerSlot;
+  linkPartner(world, partnerSlot, leaderSlot);
   setRosterMask(world, world.mask | (1 << partnerSlot));
 }
 
