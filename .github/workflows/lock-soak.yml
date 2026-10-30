@@ -1,0 +1,68 @@
+name: Lock soak
+
+# `bun wisp soak --fighter NAME` on free hosted runners, one job per seed:
+# each plays its own fuzzed and computer matches with the lock-loop detector,
+# and the command fails on any finding. Dispatch it with
+# `gh workflow run lock-soak.yml -f ref=main -f fighter=murloc`.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, branch or tag to soak
+        default: main
+      fighter:
+        description: The fighter slug as `bun wisp soak --fighter` takes it
+        default: murloc
+      seeds:
+        description: JSON array of soak seeds, one job each
+        default: '[1,2,3,4,5,6,7,8]'
+      matches:
+        description: Matches each seed plays
+        default: "40"
+      tag:
+        description: Names the run so the one dispatched can be found
+        default: ""
+
+run-name: Lock soak ${{ inputs.fighter }} ${{ inputs.ref }} ${{ inputs.tag }}
+
+permissions:
+  contents: read
+
+jobs:
+  soak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    name: seed ${{ matrix.seed }}
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        seed: ${{ fromJSON(inputs.seeds) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ hashFiles('ts/bun.lock') }}
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - working-directory: ts
+        shell: bash
+        env:
+          FIGHTER: ${{ inputs.fighter }}
+          MATCHES: ${{ inputs.matches }}
+          SEED: ${{ matrix.seed }}
+        run: bun wisp soak --fighter "$FIGHTER" --matches "$MATCHES" --seed "$SEED" --workers 4 --minutes 30 --out "$RUNNER_TEMP/soak" | tee "$RUNNER_TEMP/soak.txt"
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lock-soak-${{ matrix.seed }}
+          path: |
+            ${{ runner.temp }}/soak.txt
+            ${{ runner.temp }}/soak
+          retention-days: 7
