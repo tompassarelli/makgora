@@ -1,4 +1,12 @@
-import { Action, bit } from "../game/input/actions";
+  if (kind === "hop" || kind === "run") {
+    const direction = facing === "left" ? -1 : 1;
+    mover.facing = direction;
+    if (kind === "run") {
+      mover.motion.x = -direction * S2R("60");
+      target.motion.x = direction * S2R("260");
+    }
+    return;
+  }import { Action, bit } from "../game/input/actions";
 import { sampleKeys, commitEdges, keyboardCapture, type KeyboardCapture } from "../game/input/keyboardCapture";
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../game/input/participants";
 import { copyInput } from "../game/input/inputRow";
