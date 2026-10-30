@@ -43,6 +43,15 @@ authored clips 9–89 export onto it unchanged, and whose silhouette or colour
 differs at match zoom. If none matches, the clips are retargeted onto the
 closest model. Definitive Edition art is never used (roster.md).
 
+Grgl model: `units\creeps\MurlocMutant\MurlocMutant.mdl`, bones match: yes.
+Probed 2026-10-30 through the CascLib extractor, classic layer only (no
+`_de`, `_hd` or `_v1` files). Against `Murloc.mdl` (37 bones, 9 sequences):
+`MurlocMutant` and `MurlocWarrior` have identical bone names, order, parents
+and vertices (only the texture differs), `MurlocFlesheater` has an extra
+`leg1` bone and different geometry, and `MurlocNightCrawler` has only 22
+bones. The Mutant's texture averages green against the Tiderunner's tan; the
+Warrior's red-brown is the fallback.
+
 The stock model has nine sequences: two stands, a ready stand (Stand -3), a
 walk, Attack - 1 (claw swipe), Attack Spell (a thrown arm), Death and two
 decays. Like Beastmaster's, moves share clips by motion.
