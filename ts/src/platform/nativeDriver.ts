@@ -1,12 +1,4 @@
-  if (kind === "hop" || kind === "run") {
-    const direction = facing === "left" ? -1 : 1;
-    mover.facing = direction;
-    if (kind === "run") {
-      mover.motion.x = -direction * S2R("60");
-      target.motion.x = direction * S2R("260");
-    }
-    return;
-  }import { Action, bit } from "../game/input/actions";
+import { Action, bit } from "../game/input/actions";
 import { sampleKeys, commitEdges, keyboardCapture, type KeyboardCapture } from "../game/input/keyboardCapture";
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../game/input/participants";
 import { copyInput } from "../game/input/inputRow";
@@ -312,7 +304,15 @@ function crossTarget(target: Fighter, args: readonly string[]): void {
 function stageScriptedMove(s: ShellState, slot: number, args: readonly string[]): void {
   const [kind, code = "", facing, gap = "500", lift] = args;
   const mover = fighterAt(s.world, slot), target = fighterAt(s.world, slot === 0 ? 1 : 0);
-  if (kind === "hop" || kind === "run") { mover.facing = facing === "left" ? -1 : 1; return; }
+  if (kind === "hop" || kind === "run") {
+    const direction = facing === "left" ? -1 : 1;
+    mover.facing = direction;
+    if (kind === "run") {
+      mover.motion.x = -direction * S2R("60");
+      target.motion.x = direction * S2R("260");
+    }
+    return;
+  }
   if (gap !== "-") {
     mover.motion.x = 0.0;
     target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
