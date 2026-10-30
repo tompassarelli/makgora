@@ -364,7 +364,7 @@ percents and escape, and the match's repro file. The rows don't replay the
 shell's own changes between frames (a pause or the match's end clears the
 attack buffers); the detector follows the match again from there.
 
-`bun wisp agency [--attacker NAME]... [--starter NAME]... [--out FILE]` is the sweep
+`bun wisp agency [--attacker NAME]... [--starter NAME]... [--victim NAME]... [--out FILE]` is the sweep
 (smashcraft:ts/scripts/agencySweep.ts): every fighter's grab and four
 throws, and a jab on a fighter lying after a missed tech, at 0-150% in
 steps of 10, its ground normals and specials at 0, 50, 100 and 150%, against

@@ -5,7 +5,7 @@ import { STAGE_GROUND_MODEL, STAGE_PLAGUE_MODEL } from "../../generated/stages/t
 import { SCOURGE_WALL_MODEL } from "../assets/importedModelInfo";
 
 const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
-const ZEPPELIN = "Units\\Creeps\\GoblinZeppelin\\GoblinZeppelin.mdx";
+export const ZEPPELIN ="Units\\Creeps\\GoblinZeppelin\\GoblinZeppelin.mdx";
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 const GATE = "Doodads\\Icecrown\\Terrain\\IceCrownGate\\IceCrownGate.mdx";
 const ARCHWAY = "Doodads\\Dungeon\\Structures\\DungeonArchway1\\DungeonArchway1.mdx";

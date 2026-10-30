@@ -21,6 +21,7 @@ import { AttackStyle, Character, DownState, GrabAction } from "../src/game/sim/c
 import { canAttack } from "../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { attackStartupFrames } from "../src/game/sim/moves";
+import { seatMurlocPartners } from "../src/game/fighters/murloc/duo";
 import { createRoster, fighterAt } from "../src/game/sim/roster";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { type AgencyReport, ESCAPE_FRAMES, type Loop, TIGHT_ESCAPE, agencyLetters, analyzeAgency, runFrame, sameGameplay, snapshotOf } from "./agency";
@@ -144,7 +145,9 @@ function match(world: ReplayState["world"], percent: number): ReplayState {
 
 
 export function standingMatch(attacker: Character, victim: Character, percent: number, gap: number): ReplayState {
-  const state = match(createRoster(3, [createFighter(attacker, -gap / 2, 1), createFighter(victim, gap / 2, -1)]), percent);
+  const world = createRoster(3, [createFighter(attacker, -gap / 2, 1), createFighter(victim, gap / 2, -1)]);
+  seatMurlocPartners(world);
+  const state = match(world, percent);
   for (let frame = 0; frame < SETTLE; frame++) runFrame(state, () => emptyInput());
   return state;
 }
@@ -326,13 +329,13 @@ function sweepStarter(start: Readonly<ReplayState>, attacker: string, victim: st
 
 
 
-export function sweepStarters(attackers: readonly Entry[] = FIGHTERS, only?: readonly string[]): StarterResult[] {
+export function sweepStarters(attackers: readonly Entry[] = FIGHTERS, only?: readonly string[], victims: readonly Entry[] = FIGHTERS): StarterResult[] {
   const results: StarterResult[] = [];
   const reset: Starter = { name: "jab reset", buttons: ATTACK, aim: "neutral" };
   const starters = STARTERS.filter(({ name }) => only === undefined || only.includes(name));
   const resets = only === undefined || only.includes(reset.name);
   for (const attacker of attackers) {
-    for (const victim of FIGHTERS) {
+    for (const victim of victims) {
       for (const percent of PERCENTS) {
         const coarse = percent % 50 === 0;
         for (const starter of starters) {

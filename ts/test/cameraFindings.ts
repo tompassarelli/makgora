@@ -4,7 +4,7 @@ import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { cameraPoint } from "../src/game/presentation/arenaCamera";
 import { fighterOffscreen } from "../src/game/presentation/fighterFraming";
-import { fighterAt, isActive } from "../src/game/sim/roster";
+import { fighterAt, isActive, isPartner } from "../src/game/sim/roster";
 import { shell } from "../src/host/loop/state";
 
 export class CameraFindings {
@@ -28,7 +28,7 @@ export class CameraFindings {
       const confirmed = fighterAt(s.world, slot);
       const before = previous.get(slot) ?? false;
       previous.set(slot, confirmed.status.out);
-      if (!before && confirmed.status.out) {
+      if (!before && confirmed.status.out && !isPartner(s.world, slot)) {
         this.stockLosses++;
 
 

@@ -62,7 +62,7 @@ function linkLines(links: readonly LinkResult[]): string[] {
 
 export const agency: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { attacker: { type: "string", multiple: true }, starter: { type: "string", multiple: true }, out: { type: "string" } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { attacker: { type: "string", multiple: true }, starter: { type: "string", multiple: true }, victim: { type: "string", multiple: true }, out: { type: "string" } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.attacker ?? [];
@@ -70,10 +70,15 @@ export const agency: Command = (args) => Effect.gen(function*() {
   if (attackers.length !== Math.max(1, names.length) && names.length > 0) {
     return yield* new UsageFailure({ problem: `--attacker takes ${FIGHTERS.map(({ name }) => name).join(", ")}` });
   }
+  const victimNames = parsed.victim ?? [];
+  const victims = victimNames.length === 0 ? FIGHTERS : FIGHTERS.filter(({ name }) => victimNames.includes(name));
+  if (victims.length !== Math.max(1, victimNames.length) && victimNames.length > 0) {
+    return yield* new UsageFailure({ problem: `--victim takes ${FIGHTERS.map(({ name }) => name).join(", ")}` });
+  }
   const only = parsed.starter;
   const unknown = only?.filter((name) => !STARTER_NAMES.includes(name)) ?? [];
   if (unknown.length > 0) return yield* new UsageFailure({ problem: `--starter takes ${STARTER_NAMES.join(", ")}` });
-  const starters = yield* Effect.sync(() => sweepStarters(attackers, only)).pipe(step(`starters of ${attackers.map(({ name }) => name).join(", ")}`));
+  const starters = yield* Effect.sync(() => sweepStarters(attackers, only, victims)).pipe(step(`starters of ${attackers.map(({ name }) => name).join(", ")}`));
   const links = only !== undefined ? [] : yield* Effect.sync(() => sweepComparisonLinks().filter(({ name }) => attackers.some((attacker) => name.startsWith(attacker.name))))
     .pipe(step("move comparisons' bounded true links"));
   if (parsed.out !== undefined) {

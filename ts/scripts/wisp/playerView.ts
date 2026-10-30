@@ -28,7 +28,8 @@ import { STAGE_DECK_PALETTES } from "../../src/game/assets/stagePalette";
 import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunterAssetInfo";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH, arenaFraming } from "../../src/game/presentation/arenaCamera";
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
-import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL } from "../../src/game/presentation/stageHazards";
+import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, WIND_STREAK_MODEL } from "../../src/game/presentation/stageHazards";
+import { ZEPPELIN } from "../../src/game/presentation/patrolStageScenery";
 import { allProjectileModels, SPECIAL_SLOTS } from "../../src/game/presentation/projectileArt";
 import { ELEMENTS, elementLook } from "../../src/game/presentation/elementLooks";
 import { allCueModels, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
@@ -117,6 +118,8 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
     { name: "stage cannon", models: [CANNON_MODEL] },
     { name: "stage hydra", models: [HYDRA_CREST_MODEL, HYDRA_RING_MODEL] },
     { name: "stage lava", models: [STAGE_LAVA_MODEL] },
+    { name: "stage wind", models: [WIND_STREAK_MODEL] },
+    { name: "stage patrol", models: [ZEPPELIN] },
     { name: "stage scenery", models: [...new Set(STAGE_CATALOG.flatMap(({ id }) => placedPieces(id).map(({ model }) => model))), STAGE_EDGE_LIGHT_MODEL] },
     { name: "pooled fighter", models: fighterModels },
     { name: "body flash", models: Object.values(WHITE_FIGHTER_MODELS) },
