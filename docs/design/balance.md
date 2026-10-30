@@ -263,8 +263,10 @@ fighter, within these bounds:
 
 ### Fixed baseline and feel
 
-`ts/scripts/balanceBaseline.json` records the actual authored values for all
-26 fighters when #355 lands. `currentKit` reads the same normal tables and
+`ts/scripts/balanceBaseline.json` records the actual authored values for every
+selectable fighter. `bun scripts/balanceFreeze.ts` (from `ts/`) rewrites it from
+`currentKit` and `currentFeel`, never by hand; `test/balanceBaseline.test.ts`
+fails when a kit key is renamed, added or dropped without re-running it. `currentKit` reads the same normal tables and
 special records as the game, including the original fighters' shared tables
 and numeric values in their special/projectile/summon/throw source. Damage,
 base knockback and growth stay within ±25%; startup, active, ending and
