@@ -111,7 +111,8 @@
   results.json land in DIR. It also accounts every scripted press: lost or
   extra presses, rows off their assigned frame (input delay) or different on
   the remote, and ticks from press to the local view running it, failing past
-  3. `--four-fighters` instead plays one two-player, two-computer match as
+  3. `--relay local` plays every match through a relay on this machine, the joiner
+  behind the proxy (wisp's relay peer room, smashcraft#808). `--four-fighters` instead plays one two-player, two-computer match as
   `play --standalone --host` and `--join` windows on this machine and fails on
   a frame-time p95 over 16.7 ms in either window; run it under an exclusive
   capacity lease.

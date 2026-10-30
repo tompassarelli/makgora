@@ -227,6 +227,9 @@ function netcodeStats() {
 
 const BINDINGS = presetBindings(DEFAULT_PRESET);
 
+// Each epoch numbers its frames from 1, so a second match in one run reuses frame numbers; a press report names a frame as epoch * EPOCH_STRIDE + frame.
+const EPOCH_STRIDE = 1 << 24;
+
 /** Every scripted key press during the match: the row it was captured into, the frame that row was assigned, the tick the local view first ran it, and every row received from each slot (wisp#112). */
 function pressStats(slot: number) {
   const pending: { readonly bit: number; readonly tick: number }[] = [];
@@ -266,7 +269,7 @@ function pressStats(slot: number) {
           if ((sample.pressed & press.bit) !== 0) { pressTicks.push(press.tick); pending.splice(index, 1); } else index++;
         }
         if (pressTicks.length === 0) unmatched++;
-        captured.push({ frame, pressed: sample.pressed, tick, frontier: frame - delay, drawnTick: -1, pressTicks });
+        captured.push({ frame: epoch * EPOCH_STRIDE + frame, pressed: sample.pressed, tick, frontier: epoch * EPOCH_STRIDE + frame - delay, drawnTick: -1, pressTicks });
       }
       for (let sender = 0; sender < PARTICIPANT_CAPACITY; sender++) {
         const known = schedule.fixed.ledger.through[sender] ?? 0;
@@ -274,8 +277,9 @@ function pressStats(slot: number) {
         for (let frame = Math.max((receivedThrough[sender] ?? 0) + 1, schedule.fixed.ledger.retainedFrom); frame <= known; frame++) {
           const pressed = acceptedInput(schedule, sender, frame)?.pressed ?? 0;
           if (pressed === 0) continue;
-          if (rows[frame] !== undefined && rows[frame] !== pressed) conflicts++;
-          rows[frame] = pressed;
+          const key = epoch * EPOCH_STRIDE + frame;
+          if (rows[key] !== undefined && rows[key] !== pressed) conflicts++;
+          rows[key] = pressed;
         }
         receivedThrough[sender] = known;
       }
@@ -286,7 +290,7 @@ function pressStats(slot: number) {
     },
     drawn(tick: number, playing: boolean) {
       if (rollback === undefined) return;
-      const ran = rollback.schedule.nextSpeculative;
+      const ran = rollback.schedule.epoch * EPOCH_STRIDE + rollback.schedule.nextSpeculative;
       if (playing) endFrame = Math.max(endFrame, ran);
       for (let index = captured.length - 1; index >= 0; index--) {
         const row = captured[index];

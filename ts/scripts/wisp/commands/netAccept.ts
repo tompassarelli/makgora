@@ -6,13 +6,16 @@ import { admit } from "../../heavyCapacity";
 import { usableCpus } from "../../usableCpus";
 import { NetAcceptFailure, acceptanceSummary, runAcceptance, runFourFighters } from "../netAcceptance";
 
-/** `net-accept`: wisp#112's online acceptance, full matches between two processes through Wisp's delay and loss proxy. */
+/** `net-accept`: wisp#112's online acceptance, full matches between two processes through Wisp's delay and loss proxy, direct or through a relay on this machine (smashcraft#808). */
 export const netAccept: Command = (args) => Effect.gen(function*() {
   const value = (name: string, fallback: number) => Number(flagValues(args, name)[0] ?? fallback);
   const out = flagValues(args, "out")[0];
   if (out === undefined) return yield* new UsageFailure({ problem: "net-accept needs --out DIR" });
   const rtts = (flagValues(args, "rtts")[0] ?? "0,60,120").split(",").map(Number);
-  const options = { matches: value("matches", 20), frames: value("frames", 7200), jobs: value("jobs", 3), loss: value("loss", 0.01), seed: value("seed", 112), out, rtts };
+  const relay = flagValues(args, "relay")[0];
+  if (relay !== undefined && relay !== "local") return yield* new UsageFailure({ problem: "net-accept --relay takes local, a relay on this machine" });
+  if (relay !== undefined && args.includes("--four-fighters")) return yield* new UsageFailure({ problem: "net-accept --four-fighters plays direct windows and takes no --relay" });
+  const options = { matches: value("matches", 20), frames: value("frames", 7200), jobs: value("jobs", 3), loss: value("loss", 0.01), seed: value("seed", 112), out, rtts, relay: relay === "local" ? "local" as const : undefined };
   if ([options.matches, options.frames, options.jobs, options.loss, options.seed, ...rtts].some((number) => !Number.isFinite(number))) return yield* new UsageFailure({ problem: "net-accept takes numbers" });
   if (rtts.some((rtt) => rtt < 0) || options.loss < 0 || options.loss > 1) return yield* new UsageFailure({ problem: "net-accept needs nonnegative round trips and loss between 0 and 1" });
   if (args.includes("--four-fighters")) {

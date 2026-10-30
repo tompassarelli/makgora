@@ -170,15 +170,15 @@ export const runFourFighters = (options: { readonly frames: number; readonly see
     return yield* Effect.all([side("host", ["--host", "--port", `${options.port}`]), Effect.sleep("3 seconds").pipe(Effect.andThen(side("join", ["--join", `127.0.0.1:${proxyPort}`])))], { concurrency: 2 });
   })), { concurrency: 1 }).pipe(Effect.map((runs) => runs.flat()));
 
-/** Runs every match as `net pair` through the delay and loss proxy, `jobs` at a time, and writes each pad, log and the summary to `out`. */
-export const runAcceptance = (options: { readonly matches: number; readonly frames: number; readonly jobs: number; readonly loss: number; readonly seed: number; readonly out: string; readonly rtts: readonly number[] }) =>
+/** Runs every match as `net pair` (with `relay`, through a relay on this machine) through the delay and loss proxy, `jobs` at a time, and writes each pad, log and the summary to `out`. */
+export const runAcceptance = (options: { readonly matches: number; readonly frames: number; readonly jobs: number; readonly loss: number; readonly seed: number; readonly out: string; readonly rtts: readonly number[]; readonly relay: "local" | undefined }) =>
   Effect.gen(function*() {
     mkdirSync(options.out, { recursive: true });
     const matches = acceptanceMatches(options.matches, options.rtts, options.seed);
     const results = yield* Effect.forEach(matches, (match) => Effect.gen(function*() {
       const pad = join(options.out, `match-${match.index}.pad`);
       writeFileSync(pad, acceptancePad(match, options.frames));
-      const command = [process.execPath, "scripts/wisp.ts", "net", "pair", "--script", pad, "--frames", `${options.frames}`, "--rtt", `${match.rttMs}`, "--loss", `${options.loss}`, "--seed", `${match.seed}`];
+      const command = [process.execPath, "scripts/wisp.ts", "net", "pair", "--script", pad, "--frames", `${options.frames}`, "--rtt", `${match.rttMs}`, "--loss", `${options.loss}`, "--seed", `${match.seed}`, ...(options.relay === undefined ? [] : ["--relay", options.relay])];
       const run = yield* captureProcess("net pair", pad, command).pipe(Effect.orElseSucceed(() => ({ exitCode: -1, stdout: "", stderr: "spawn failed" })));
       writeFileSync(join(options.out, `match-${match.index}.log`), `${run.stdout}\n${run.stderr}`);
       const host = sideResult(run.stdout, run.stderr, "host"), join_ = sideResult(run.stdout, run.stderr, "join");
