@@ -182,6 +182,25 @@ The retune follows the same rule, 13 points under 50% at about 0.6% of
 damage a point: the factors become ×0.968 on damage (×0.898 × 1.078) and
 ×1.06 on knockback growth (×1.112 × (1 − 0.6 × 0.078)).
 
+The field after this retune (main 7fc8921ee6, balance run 40976925290, same
+field, 12,240 of his matches) puts him at 42%, inside the 40–60% band: 5,184
+wins, 7,056 losses. His shares against the profile:
+
+- Archetype: grappler.
+- Aerials (neutral/forward/back/up/down): 20%/12%/45%/5%/18% of his aerials;
+  back air over its 15–40% target.
+- Air share of normals: 5% (target 10–35%).
+- Approach share of movement: 80% (target 25–55%).
+- Ranged share of damage: 4% (target 5–30%).
+- Specials (neutral/side/up/down, share of moves started): 4%/22%/5%/0%.
+- Damage by move: Butcher's Charge 32%, dash attack 19%, down tilt 14%,
+  forward tilt 10%. Stocks by move: forward smash 42%, dash attack 16%,
+  Butcher's Charge 13%.
+
+The spam probe still finds Butcher's Charge used alone winning 96% of 1,440
+matches against Expert, and his worst matchups sit outside 30–70%: Chen 3%,
+Pit Lord 11%, Anub'arak 14%, Shadow Hunter 23%, Dreadlord 26%, and Warden 90%.
+
 Path draft for Tom to correct (#358):
 
 ```ceiling-plan
