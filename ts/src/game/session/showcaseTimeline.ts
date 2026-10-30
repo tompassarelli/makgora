@@ -30,7 +30,7 @@ export interface ShowcaseMove {
   readonly first: number;
   readonly end: number;
   readonly gap?: number | undefined;
-  readonly run?: true | undefined;
+  readonly run?: number | undefined;
   readonly lift?: number | undefined;
   readonly incoming?: { readonly lead: number; readonly gap: number } | undefined;
   readonly again?: { readonly frame: number; readonly gap: number } | undefined;
