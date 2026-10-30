@@ -1,0 +1,28 @@
+# smashcraft#825: Mrgl and Grgl trade places with Down B (the swap splash), then the Peon runs in and jabs Grgl so the hit burst draws on his 0.9 body. Native captures only (bun scripts/nativeCapture.ts).
+#! chat -dev quick pair murloc / peon
+40 a stick 1 0
+46 a stick 0 0
+90 a stick 0 -1
+90 a tap X 2
+94 a stick 0 0
+97 a capture
+120 a stick -1 0
+134 a stick 0 0
+170 a stick 0 -1
+170 a press X
+192 a capture
+199 a capture
+200 b stick -1 0
+200 a release X
+200 a stick 0 0
+202 a capture
+206 a capture
+240 a capture
+242 b stick 0 0
+274 b tap A 2
+277 a capture
+279 a capture
+282 a capture
+288 a capture
+318 a press VIEW
+388 a release VIEW
