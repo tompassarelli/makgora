@@ -3,15 +3,15 @@ import { Console, Effect, Schema } from "effect";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 
 export const SCRATCH_PREFIXES = ["refs/heads/farm/", "refs/heads/probe/"] as const;
-export const PUSH_GRACE_MINUTES = 15;
+export const HEAD_GRACE_MINUTES = 180;
 
-export interface ScratchRef { readonly name: string; readonly tip: string; readonly pushedMinutesAgo: number | undefined }
+export interface ScratchRef { readonly name: string; readonly tip: string; readonly headMinutesAgo: number }
 export interface ActiveRun { readonly headBranch: string | null; readonly headSha: string; readonly title: string }
 
 export type Retirement = { readonly retire: boolean; readonly why: string };
 
 export function retirement(ref: ScratchRef, active: readonly ActiveRun[], openPulls: ReadonlySet<string>): Retirement {
-  if (ref.pushedMinutesAgo !== undefined && ref.pushedMinutesAgo < PUSH_GRACE_MINUTES) return { retire: false, why: `pushed ${Math.floor(ref.pushedMinutesAgo)} min ago, before a run can be dispatched on it` };
+  if (ref.headMinutesAgo < HEAD_GRACE_MINUTES) return { retire: false, why: `head committed or pushed ${Math.floor(ref.headMinutesAgo)} min ago, inside its ${HEAD_GRACE_MINUTES} min grace for a dispatch that may be waiting on a slot` };
   if (openPulls.has(ref.name)) return { retire: false, why: "an open pull request holds it" };
   const holder = active.find((run) => run.headBranch === ref.name || run.headSha === ref.tip || run.title.split(/\s+/).some((word) => word === ref.name || word === ref.tip));
   if (holder !== undefined) return { retire: false, why: `${holder.title} is still running on it` };
@@ -32,7 +32,7 @@ export const ghCli: Gh = (...args) => captureProcess("gh", args.join(" "), ["gh"
 );
 
 const Pages = <S extends Schema.Top>(item: S) => Schema.fromJsonString(Schema.Array(item));
-const RefPages = Pages(Schema.Struct({ data: Schema.Struct({ repository: Schema.Struct({ refs: Schema.Struct({ nodes: Schema.Array(Schema.Struct({ name: Schema.String, target: Schema.Struct({ oid: Schema.String }) })) }) }) }) }));
+const RefPages = Pages(Schema.Struct({ data: Schema.Struct({ repository: Schema.Struct({ refs: Schema.Struct({ nodes: Schema.Array(Schema.Struct({ name: Schema.String, target: Schema.Struct({ oid: Schema.String, committedDate: Schema.String }) })) }) }) }) }));
 const RunPages = Pages(Schema.Struct({ workflow_runs: Schema.Array(Schema.Struct({ head_branch: Schema.NullOr(Schema.String), head_sha: Schema.String, display_title: Schema.String })) }));
 const PullPages = Pages(Schema.Array(Schema.Struct({ head: Schema.Struct({ ref: Schema.String }) })));
 const EventPages = Pages(Schema.Array(Schema.Struct({ type: Schema.String, created_at: Schema.String, payload: Schema.Struct({ ref: Schema.optional(Schema.String) }) })));
@@ -50,12 +50,12 @@ const scratchRefs = (gh: Gh, repo: string, now: number) => Effect.gen(function*(
     }
   }
   for (const prefix of SCRATCH_PREFIXES) {
-    const query = `query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){refs(refPrefix:"${prefix}",first:100,after:$endCursor){nodes{name target{oid}} pageInfo{hasNextPage endCursor}}}}`;
+    const query = `query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){refs(refPrefix:"${prefix}",first:100,after:$endCursor){nodes{name target{oid ... on Commit{committedDate}}} pageInfo{hasNextPage endCursor}}}}`;
     const pages = yield* decode(RefPages, yield* gh("api", "graphql", "--paginate", "--slurp", "-f", `query=${query}`, "-f", `owner=${owner}`, "-f", `name=${name}`));
     for (const node of pages.flatMap((page) => page.data.repository.refs.nodes)) {
       const full = `${prefix}${node.name}`;
-      const at = pushed.get(full);
-      found.push({ name: full.slice("refs/heads/".length), tip: node.target.oid, pushedMinutesAgo: at === undefined ? undefined : (now - at) / 60000 });
+      const headAt = Math.max(Date.parse(node.target.committedDate), pushed.get(full) ?? Number.NEGATIVE_INFINITY);
+      found.push({ name: full.slice("refs/heads/".length), tip: node.target.oid, headMinutesAgo: (now - headAt) / 60000 });
     }
   }
   return found;

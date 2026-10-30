@@ -14,8 +14,10 @@
   every pushed `claude/` lane, including one pushed only to be measured.
   The Scratch retire workflow (smashcraft:.github/workflows/scratch-retire.yml)
   runs when any of these runs completes and deletes every `farm/` and `probe/`
-  branch no active run, open pull request or push under 15 minutes old holds;
-  the deletion line prints the `git push` that restores it.
+  branch that no active run or open pull request holds and whose head commit
+  was neither committed nor pushed within the 3-hour scratch grace (180 minutes,
+  `HEAD_GRACE_MINUTES`; it outlasts a dispatch that retries while the hosted
+  slots are full); the deletion line prints the `git push` that restores it.
   A newer run of the same shape on the same line (main, the lane or the
   scratch commit) cancels the older one (each `--matchups` run is its own shape,
   because GitHub refuses a run whose concurrency group holds a long pair list),
