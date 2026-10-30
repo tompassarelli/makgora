@@ -77,6 +77,16 @@
   live play defaults to `pool-predicted`, scripts to `native`.
   `--four-fighters --frames 7200 --out DIR` is wisp#48's 60 FPS measurement
   (one game copy, four fighters; smashcraft:docs/play.md).
+  `--window native` opens Wisp's Rust window instead of Chrome (`chrome` is the
+  default) and draws the stage, sky and fighters; it steps Smashcraft's default
+  session, so it refuses `--presentation`, `--four-fighters`,
+  `--player-assets-only`, `--host` and `--join`, and it loads the library named by
+  `WISP_WINDOW_LIBRARY` (wisp:docs/play.md, "Native window"). The vendored
+  package ships no built library: build it in a Wisp checkout with
+  `cd window && nix develop --command cargo build --release -p wisp-window`, and
+  run the play command inside that dev shell (`nix develop PATH/TO/wisp/window
+  --command ...`), which supplies the Wayland, X11 and Vulkan libraries the
+  window loads.
   Private map and Warcraft assets stay in the existing local asset store.
 - Host and join: `bun wisp play --standalone --host [--port N]` prints a join
   code and its direct addresses; the other player runs
