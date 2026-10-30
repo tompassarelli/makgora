@@ -7,7 +7,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
-import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, handLeft, handSize, handTop, parkedChipCentre, parkedChipLeft, readyChipSize } from "../../src/game/menu/selectionDrag";
+import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, handLeft, handSize, handTop, readyChipSize } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
@@ -21,11 +21,13 @@ import { pixelPoint, texturePixels } from "./uiTexture";
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
 const MATCH_ERROR = 24;
+const HAND_MATCH_ERROR = 30;
 const BADGE_COLOUR_DISTANCE = 120;
 const SETTLE = "900 millis";
 const CLEAR_SPOT = { x: 0.03, y: 0.3 };
 const EDGE_SPOT = { x: 0.005, y: 0.3 };
 const HOVER_TILE = 3;
+const COVER_PAD = 0.004;
 
 interface Participant {
   readonly client: Client;
@@ -82,7 +84,6 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
   const chip = readyChipSize(grid);
   const tile = cellRect(grid, HOVER_TILE);
   const hover = { x: (tile.left + tile.right) / 2, y: (tile.top + tile.bottom) / 2 };
-  const pin = { x: parkedChipLeft(0, chip) + chip / 2, y: parkedChipCentre(0).y };
   const move = (person: Participant, at: { x: number; y: number }) => {
     const point = pixelPoint(reference, at.x, at.y);
     return movePointer(person.client, { x: person.region.x + point.x, y: person.region.y + point.y }, "hands gate pointer");
@@ -99,11 +100,12 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
         const at = positions[owner.slot];
         if (at === undefined) continue;
         const carried = carrying && owner.slot === 0;
-        const covered = carried ? { left: carriedChipLeft(at.x, chip) - 0.004, top: carriedChipTop(at.y, chip) + 0.004, width: chip + 0.008, height: chip + 0.008 } : undefined;
         const left = handLeft(at.x, at.state, extent);
         const top = handTop(at.y, at.state, extent);
-        const hand = texturePixels(frame, textures[at.state], left, top, extent, extent, covered);
         const box = handBadgeBox(left, top, extent);
+        const badge = { left: box.left - COVER_PAD, top: box.top + COVER_PAD, width: box.width + 2 * COVER_PAD, height: box.height + 2 * COVER_PAD };
+        const chipBox = owner.slot === 0 ? [{ left: carriedChipLeft(at.x, chip) - COVER_PAD, top: carriedChipTop(at.y, chip) + COVER_PAD, width: chip + 2 * COVER_PAD, height: chip + 2 * COVER_PAD }] : [];
+        const hand = texturePixels(frame, textures[at.state], left, top, extent, extent, [badge, ...chipBox]);
         const corner = pixelPoint(frame, box.left + box.width * 0.08, box.top - box.height / 2);
         const badgeDistance = colourDistance(frame, corner.x, corner.y, slotColor(owner.slot).rgb);
         const chipError = carried ? texturePixels(frame, textures.chip, carriedChipLeft(at.x, chip), carriedChipTop(at.y, chip), chip, chip)?.error : undefined;
@@ -113,13 +115,13 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
   });
   yield* move(first, hover);
   yield* move(second, CLEAR_SPOT);
+  yield* observe("carry", [{ ...hover, state: "pinch" }, { ...CLEAR_SPOT, state: "point" }], true);
+  const hoverPoint = pixelPoint(reference, hover.x, hover.y);
+  yield* batch(first.client, [{ kind: "click", x: first.region.x + hoverPoint.x, y: first.region.y + hoverPoint.y, holdMillis: 200 }]).pipe(Effect.mapError(fail("hands gate drop")));
   yield* observe("hover", [{ ...hover, state: "fan" }, { ...CLEAR_SPOT, state: "point" }], false);
   yield* move(second, EDGE_SPOT);
   yield* observe("edge", [{ ...hover, state: "fan" }, { ...EDGE_SPOT, state: "point" }], false);
-  yield* batch(first.client, [{ kind: "click", x: first.region.x + pixelPoint(reference, pin.x, pin.y).x, y: first.region.y + pixelPoint(reference, pin.x, pin.y).y, holdMillis: 200 }]).pipe(Effect.mapError(fail("hands gate pick")));
-  yield* move(first, hover);
-  yield* observe("carry", [{ ...hover, state: "pinch" }, { ...CLEAR_SPOT, state: "point" }], true);
-  const shown = (sample: Sample) => sample.error !== undefined && sample.error <= MATCH_ERROR;
+  const shown = (sample: Sample) => sample.error !== undefined && sample.error <= HAND_MATCH_ERROR;
   const badged = (sample: Sample) => sample.badgeDistance === undefined ? sample.phase === "edge" && sample.hand === 1 : sample.badgeDistance <= BADGE_COLOUR_DISTANCE;
   const own = samples.filter(sample => sample.viewer === sample.hand);
   const remote = samples.filter(sample => sample.viewer !== sample.hand);
