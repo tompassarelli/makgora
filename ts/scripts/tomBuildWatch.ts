@@ -89,7 +89,7 @@ export interface WatchSteps<R> {
   readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
   readonly prepareBoot: Effect.Effect<void, never, R>;
   readonly boot: (built: Built) => Effect.Effect<string | undefined, never, R>;
-  readonly fetchInputs: Effect.Effect<void, PlayProblem, R>;
+  readonly fetchInputs: Effect.Effect<boolean, PlayProblem, R>;
   readonly tidy: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly install: (built: Built, held: string | undefined) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
@@ -136,14 +136,12 @@ export const missingInputs = ({ problem }: PlayProblem) => problem.includes(FETC
 
 const builtWithInputs = <R>(steps: WatchSteps<R>, sha: string) => Effect.gen(function*() {
   const started = yield* Clock.currentTimeMillis;
-  return yield* steps.build(sha).pipe(
-    Effect.catchIf(missingInputs, (missing) => steps.fetchInputs.pipe(
-      Effect.tapError(({ problem }) => Effect.sync(() => console.error(`Fetching build inputs failed: ${problem}`))),
-      Effect.mapError(() => missing),
-      Effect.andThen(Clock.currentTimeMillis),
-      Effect.flatMap((fetched) => steps.build(sha).pipe(Effect.map((built): Built => ({ ...built, stages: [{ name: "inputs-fetch", millis: fetched - started }, ...built.stages] })))),
-    )),
+  const fetched = yield* steps.fetchInputs.pipe(
+    Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Fetching build inputs failed: ${problem}`); return false; })),
   );
+  const fetching = (yield* Clock.currentTimeMillis) - started;
+  const built = yield* steps.build(sha);
+  return fetched ? { ...built, stages: [{ name: "inputs-fetch", millis: fetching }, ...built.stages] } : built;
 });
 
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
@@ -270,6 +268,7 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
   ),
   fetchInputs: runProcess(ChildProcess.make("bun", ["wisp", "inputs", "fetch", ...INPUT_HOSTS.filter((host) => host !== hostname())], { cwd: tsDirectory, stdin: "ignore" })).pipe(
     Effect.tap((text) => Effect.sync(() => console.log(text.trim()))),
+    Effect.map((text) => /^fetched /m.test(text)),
     Effect.mapError((cause) => new PlayProblem({ problem: `bun wisp inputs fetch: ${cause.message}` })),
   ),
   install: installBuild(documentsFolder(PLAYTEST_PREFIX)),

@@ -35,7 +35,7 @@ const landing = (fetchStores: boolean, failure: PlayProblem = unstored) => {
     fetchInputs: Effect.suspend(() => {
       calls.push("fetch");
       stored = fetchStores;
-      return fetchStores ? Effect.void : Effect.fail(new PlayProblem({ problem: "no host of gex45 stores these" }));
+      return fetchStores ? Effect.succeed(true) : Effect.fail(new PlayProblem({ problem: "no host of gex45 stores these" }));
     }),
     install: ({ version }, _held) => Effect.succeed({ version, path: "Maps/00-Smashcraft/map.w3x" }),
     notes: () => Effect.succeed("checklist.md"),
@@ -57,7 +57,7 @@ const run = (fetchStores: boolean, failure: PlayProblem = unstored) => {
 describe("tom build watcher", () => {
   test("a landing whose pinned input another host stored is fetched, then built and installed once [k1 scenario]", () => {
     const { outcome, calls, attempted } = run(true);
-    expect(calls).toEqual(["build", "fetch", "build"]);
+    expect(calls).toEqual(["fetch", "build"]);
     expect(outcome._tag).toBe("Success");
     expect(outcome._tag === "Success" && outcome.success).toContain("inputs-fetch=0.0,boot=0.0,maps-copy=0.0");
     expect(attempted).toBe(true);
@@ -65,7 +65,7 @@ describe("tom build watcher", () => {
 
   test("a landing whose input no store host has fails as before and stays unattempted for the next poll [k1 scenario]", () => {
     const { outcome, calls, attempted } = run(false);
-    expect(calls).toEqual(["build", "fetch"]);
+    expect(calls).toEqual(["fetch", "build"]);
     expect(outcome._tag === "Failure" && outcome.failure.problem).toBe(unstored.problem);
     expect(attempted).toBe(false);
   });
@@ -106,17 +106,36 @@ describe("tom build watcher", () => {
     }
   });
 
-  test("the outer bun-failed error carries the child's missing-input line so the watcher fetches and rebuilds [k1 scenario]", () => {
+  test("the outer bun-failed error carries the child's missing-input line so a sha whose inputs no host had is forgotten for the next poll [k1 scenario]", () => {
     expect(outer.problem).toContain(FETCH_HINT);
-    const { outcome, calls } = run(true, outer);
-    expect(calls).toEqual(["build", "fetch", "build"]);
-    expect(outcome._tag).toBe("Success");
+    const { outcome, calls, attempted } = run(false, outer);
+    expect(calls).toEqual(["fetch", "build"]);
+    expect(outcome._tag === "Failure" && outcome.failure.problem).toBe(outer.problem);
+    expect(attempted).toBe(false);
   });
 
-  test("an outer error from a non-input failure stays recorded as attempted and is not fetched [k1 scenario]", () => {
+  test("a landing that pins nothing new builds once with no inputs-fetch stage in its line [k1 scenario]", () => {
+    const directory = mkdtempSync(join(tmpdir(), "tom-build-"));
+    const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted"), refused: join(directory, "tom-build-refused.log") };
+    const calls: string[] = [];
+    const steps: WatchSteps<never> = {
+      ...landing(true).steps,
+      fetchInputs: Effect.sync(() => (calls.push("fetch"), false)),
+      build: () => Effect.sync(() => (calls.push("build"), { version: "0.1.0-main", source: "map.w3x", stages: [] })),
+    };
+    try {
+      const outcome = Effect.runSync(watchOnce(steps, files).pipe(Effect.result));
+      expect(calls).toEqual(["fetch", "build"]);
+      expect(outcome._tag === "Success" && outcome.success).not.toContain("inputs-fetch");
+    } finally {
+      rmSync(directory, { recursive: true });
+    }
+  });
+
+  test("an outer error from a non-input failure stays recorded as attempted even when the fetch before it failed [k1 scenario]", () => {
     const failure = preparationFailure("bun", "bun run build exited 1: error: type check failed");
-    const { outcome, calls, attempted } = run(true, failure);
-    expect(calls).toEqual(["build"]);
+    const { outcome, calls, attempted } = run(false, failure);
+    expect(calls).toEqual(["fetch", "build"]);
     expect(outcome._tag).toBe("Failure");
     expect(attempted).toBe(true);
   });

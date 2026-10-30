@@ -34,15 +34,16 @@ records the push to main, so it is the lane's pre-land gates. `cpu_pressure_peak
 is the host's `/proc/pressure/cpu` some avg10 peak during the build, `live_clients`
 the Warcraft III processes on the host, and `stages` the build's
 `[inputs-fetch=S,]checkout=S,bun-install=S,map-build=S,boot=S,maps-copy=S` (`inputs-fetch` is the
-failed first attempt plus the fetch of pinned inputs the store lacked, present only then); `-` is
+fetch of pinned inputs the store lacked, run before the build starts, present only then); `-` is
 unknown. A build above 20% pressure counts against neither budget: the watcher
 neither files nor closes a speed-budget issue for it. A failed build is in
 `journalctl --user -u smashcraft-tom-build`. Every sha the watcher starts is
 recorded in `~/.local/state/smashcraft/tom-build/attempted`, so it never builds
-a sha twice, even after a failure or restart. A build that finds a pinned input
-missing from the local store runs `bun wisp inputs fetch` for the store hosts in
-`INPUT_HOSTS` (gex45, skipping the host it runs on) and builds once more; if the
-input is still missing, the watcher forgets the sha so the next poll tries again.
+a sha twice, even after a failure or restart. Before each build the watcher runs `bun wisp inputs fetch` for the store hosts in
+`INPUT_HOSTS` (gex45, skipping the host it runs on), which copies only the pinned entries the local store
+lacks (0.5 s when none) and links every file whose bytes match a stored entry; the build then runs once.
+If the fetch fails and an input is still missing, the build fails with the missing input and the watcher
+forgets the sha so the next poll tries again.
 
 Before installing, the watcher runs `bun wisp map boot` on the built map (its check driver compiles beside the map build, so `boot=` in the stages is only what follows the build)
 (smashcraft:docs/commands/map.md). A map that does not reach character select is
