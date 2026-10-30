@@ -6,9 +6,9 @@ import { clearDash } from "./groundMovement";
 import { WALK_MIDDLE_STICK_THRESHOLD } from "./stickZones";
 import * as stageSurfaces from "./stage";
 
-export function canTeeter(f: Readonly<Fighter>): boolean {
+export function canTeeter(f: Readonly<Fighter>, canSteer = true): boolean {
   const { motion, launch, shield } = f;
-  return motion.grounded && !motion.crouching && f.attack.style === undefined && f.special.action === SpecialAction.none
+  return (canSteer || f.landing.lag > 0) && motion.grounded && !motion.crouching && f.attack.style === undefined && f.special.action === SpecialAction.none
     && f.ground.action !== GroundAction.turnRun && f.ground.pivotGraceFrames === 0
     && launch.hitstun <= 0 && f.down.state === DownState.none && f.jump.squat <= 0
     && launch.knockbackX === 0 && shield.pushbackX === 0 && shield.recoilX === 0;
@@ -31,9 +31,9 @@ function stopAtEdge(f: Fighter, stage: number, matchFrame: number, side: number)
   motion.vx = 0.0;
 }
 
-export function teeterAtEdge(f: Fighter, stage: number, matchFrame: number, horizontalStick: number): boolean {
+export function teeterAtEdge(f: Fighter, stage: number, matchFrame: number, horizontalStick: number, canSteer: boolean): boolean {
   const side = edgeSide(f, stage, matchFrame);
-  if (side === 0 || f32(horizontalStick * side) >= WALK_MIDDLE_STICK_THRESHOLD) return false;
+  if (side === 0 || (!canSteer && f.facing !== side) || f32(horizontalStick * side) >= WALK_MIDDLE_STICK_THRESHOLD) return false;
   stopAtEdge(f, stage, matchFrame, side);
   f.landing.lag = 0;
   clearDash(f);

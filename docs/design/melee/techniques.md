@@ -21,9 +21,10 @@ by traction ([Movement](movement.md#wavedash-and-waveland)). Players first
 described it in January 2002 ([SmashWiki](https://www.ssbwiki.com/Wavedash));
 the developers had noticed it during development and left it in
 ([Nintendo Power 228](https://www.sourcegaming.info/2015/09/06/nintendopower228/)).
-A slide carries the fighter off the edge instead of stopping it in a teeter: a backward wavedash
-off the stage snaps to the ledge, a forward one falls, and a platform's end is a plain fall
-([Landing slides leave the edge](../../physics.md#landing-slides-leave-the-edge), 2026-10-30).
+A slide that reaches an edge while still in landing lag stops in a teeter with the lag cancelled when
+the fighter faces the edge with the stick released, and goes over it when the stick is held toward
+the edge or his back is to it (a backward wavedash off the stage grabs the ledge, a platform's end is a plain fall)
+([Landing slides and the edge](../../physics.md#landing-slides-and-the-edge), 2026-10-30).
 
 ### Dash dance and moonwalk
 

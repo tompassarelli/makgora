@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { SELECTABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { type Character, LedgeState } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import type { Roster } from "./roster";
+import type { Controls, Roster } from "./roster";
 import * as stages from "./stage";
 import { controls } from "./testWorld";
 import { duelPair, lift, stepDuel } from "./testDuel";
@@ -16,6 +16,8 @@ const DROP = 4.0;
 const SETTLE_FRAMES = 3;
 const SLIDE_FRAMES = 260;
 const LEDGE_WINDOW = 40;
+const CATCH_FRAMES = 4;
+const HOLD_FRAMES = 12;
 
 interface Slide { readonly world: Roster; readonly f: Fighter; readonly stage: number; readonly deck: number; readonly side: number }
 
@@ -69,6 +71,28 @@ function slideDistance(character: Character, stage: number): number | undefined 
   return s.f.motion.grounded && s.f.motion.surface === deck ? f32(s.f.motion.x - from) : undefined;
 }
 
+function slide(s: Slide, input: Readonly<Controls>, deck: number): number {
+  let speed = 0.0;
+  for (let frame = 0; frame < LEDGE_WINDOW && s.f.motion.surface === deck && s.f.motion.x !== edgeOf(s.stage, deck, s.side); frame++) {
+    stepDuel(s.world, input, controls(), s.stage);
+    speed = f32(s.f.motion.deltaX * s.side);
+  }
+  return speed;
+}
+
+function left(s: Slide, deck: number): boolean {
+  return s.f.motion.surface !== deck && s.f.landing.lag === 0;
+}
+
+function awaitLedge(s: Slide): boolean {
+  for (let frame = 0; frame < CATCH_FRAMES && s.f.ledge.state !== LedgeState.hang; frame++) settle(s, 1);
+  return s.f.ledge.state === LedgeState.hang;
+}
+
+function fell(s: Slide, deck: number, hung: boolean, edge: number): boolean {
+  return (deck !== MAIN || (!hung && s.f.ledge.state === LedgeState.none)) && f32(s.f.motion.x * s.side) > f32(edge * s.side);
+}
+
 function check(problems: string[], ok: boolean, s: Slide, tag: string, what: string): void {
   if (ok) return;
   const { motion, ledge, landing } = s.f;
@@ -78,40 +102,49 @@ function check(problems: string[], ok: boolean, s: Slide, tag: string, what: str
 const report = (problems: readonly string[]): void => assertEquals(problems.slice(0, 5).join("\n"), "");
 
 for (const character of SELECTABLE_CHARACTERS) {
-  test(`Wavedash edge: ${fighterName(character)}'s waveland toward the edge in lag slides off, grabbing the ledge only with his back to it, and leaves a platform with no ledge to grab, in both facings on every stage [k1 scenario]`, () => {
+  test(`Wavedash edge: ${fighterName(character)}'s waveland in lag stops in a teeter at an edge he faces unless the stick is held toward it, and slides off an edge at his back with its speed, grabbing the main deck's ledge unless down is held, in both facings on every stage [k1 scenario]`, () => {
     const problems: string[] = [];
-    let grabs = 0;
-    let falls = 0;
-    let drops = 0;
+    let counts = { teeters: 0, forwards: 0, grabs: 0, falls: 0, held: 0 };
     for (const stage of stageList()) {
       for (const deck of slideSurfaces(stage)) {
         for (const side of [1, -1]) {
           for (const facing of [1, -1]) {
-            const s = waveland(character, stage, deck, side, facing, LAG_GAP);
-            assertGreaterThan(s.f.landing.lag, 0);
-            let hung = false;
-            for (let frame = 0; frame < LEDGE_WINDOW && !hung; frame++) {
-              settle(s, 1);
-              hung = s.f.ledge.state === LedgeState.hang;
-            }
+            const edge = edgeOf(stage, deck, side);
             const tag = `stage ${stage} deck ${deck} side ${side} facing ${facing}`;
-            check(problems, s.f.motion.surface !== deck && s.f.landing.lag === 0, s, tag, "left the surface");
-            if (deck === MAIN && facing === -side) {
-              check(problems, hung && s.f.ledge.side === side, s, tag, "grabbed the ledge");
-              grabs++;
+            const faces = facing === side;
+            const released = waveland(character, stage, deck, side, facing, LAG_GAP);
+            assertGreaterThan(released.f.landing.lag, 0);
+            const speed = slide(released, controls(), deck);
+            if (faces) {
+              const stopped = (): boolean => released.f.motion.grounded && released.f.motion.surface === deck && released.f.motion.x === edge && released.f.ledge.state === LedgeState.none;
+              check(problems, stopped() && released.f.landing.lag === 0 && released.f.motion.vx === 0.0, released, tag, "released: teetered at the edge with the lag cancelled");
+              settle(released, HOLD_FRAMES);
+              check(problems, stopped(), released, tag, "released: kept teetering");
+              counts.teeters++;
             } else {
-              check(problems, (deck !== MAIN || (!hung && s.f.ledge.state === LedgeState.none)) && f32(s.f.motion.x * side) > f32(edgeOf(stage, deck, side) * side), s, tag, "fell without a ledge");
-              if (deck === MAIN) falls++;
-              else drops++;
+              check(problems, left(released, deck) && speed > 0.0, released, tag, "released: slid off keeping its speed");
+              const hung = awaitLedge(released);
+              if (deck === MAIN) {
+                check(problems, hung && released.f.ledge.side === side, released, tag, "released: grabbed the ledge");
+                counts.grabs++;
+              } else {
+                check(problems, fell(released, deck, hung, edge), released, tag, "released: fell off the platform");
+                counts.falls++;
+              }
             }
+            const toward = waveland(character, stage, deck, side, facing, LAG_GAP);
+            const pull = faces ? controls({ direction: side }) : controls({ direction: side, down: true, verticalDirection: -1 });
+            const pace = slide(toward, pull, deck);
+            check(problems, left(toward, deck) && pace > 0.0, toward, tag, "held: slid off keeping its speed");
+            check(problems, fell(toward, deck, false, edge), toward, tag, "held: fell with no ledge catch");
+            if (faces) counts.forwards++;
+            else counts.held++;
           }
         }
       }
     }
     report(problems);
-    assertGreaterThan(grabs, 0);
-    assertGreaterThan(falls, 0);
-    assertGreaterThan(drops, 0);
+    for (const count of Object.values(counts)) assertGreaterThan(count, 0);
   });
 
   test(`Wavedash edge: ${fighterName(character)}'s wavedash that stops short of the edge on traction stays on the deck, in both facings [k1 scenario]`, () => {

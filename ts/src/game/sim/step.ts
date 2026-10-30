@@ -464,12 +464,12 @@ export function tickRecoveryClocks(f: Fighter): void {
 }
 
 export function moveAlongSurface(f: Fighter, stage: number, matchFrame: number, horizontalStick: number, dashEntry: number, canSteer: boolean, wantsShield: boolean, groundTakeoff: boolean): void {
-  const teeters = canSteer && !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f);
+  const teeters = !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f, canSteer);
   const pushedOnShield = shieldPressed(f);
   const grabHolds = grabHoldsEdge(f);
   moveHorizontally(f, stage, matchFrame, dashEntry);
   if (grabHolds) stopGrabAtEdge(f, stage, matchFrame);
-  else if (teeters) teeterAtEdge(f, stage, matchFrame, horizontalStick);
+  else if (teeters) teeterAtEdge(f, stage, matchFrame, horizontalStick, canSteer);
   else if (pushedOnShield) teeterShieldAtEdge(f, stage, matchFrame);
 }
 
