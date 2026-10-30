@@ -35,6 +35,10 @@ export function reserveP90(jobs: readonly Job[]): number {
   return 0;
 }
 
+export const GATE_RESERVE = 12;
+
+export const reserveFor = (jobs: readonly Job[]): number => Math.max(reserveP90(jobs), GATE_RESERVE);
+
 export const readJobs = (repo: string, id: number) => pages(Jobs, `repos/${repo}/actions/runs/${id}/jobs?per_page=100`).pipe(Effect.map((all) => all.flatMap((page) => page.jobs)));
 
 export const runnerAdmission = (repo: string, excludeRun: number) => Effect.gen(function*() {
@@ -44,7 +48,7 @@ export const runnerAdmission = (repo: string, excludeRun: number) => Effect.gen(
   const historyJobs: Job[] = [];
   let samples = 0, busy = 0;
   for (const item of recent) {
-    const workflows = yield* run(["gh", "api", `repos/${item.full_name}/actions/workflows?per_page=100`, "--jq", '.workflows[] | select(.name == "Autoland") | .id']);
+    const workflows = yield* run(["gh", "api", `repos/${item.full_name}/actions/workflows?per_page=100`, "--jq", '.workflows[] | select(.name == "Autoland" or .name == "Farm test") | .id']);
     for (const workflow of workflows.split("\n").filter(Boolean)) {
       const history = yield* decoded(Runs, yield* run(["gh", "api", `repos/${item.full_name}/actions/workflows/${workflow}/runs?status=completed&per_page=10`]));
       for (const prior of history.workflow_runs) { historyJobs.push(...yield* readJobs(item.full_name, prior.id)); samples++; }
@@ -57,10 +61,9 @@ export const runnerAdmission = (repo: string, excludeRun: number) => Effect.gen(
       }
     }
   }
-  const reserve = reserveP90(historyJobs);
-  if (reserve === 0) return yield* new FarmFailure({ problem: "No completed hosted Autoland jobs to measure the reserve" });
+  const reserve = reserveFor(historyJobs);
   const parallel = Math.max(0, 40 - busy - reserve);
-  const measurement = `Hosted admission: 40 - ${busy} busy - ${reserve} reserve = ${parallel} farm slots; reserve is time-weighted p90 concurrent hosted jobs across ${samples} Autoland runs in ${recent.length} recently active public repositories`;
+  const measurement = `Hosted admission: 40 - ${busy} busy - ${reserve} reserve = ${parallel} farm slots; reserve is the larger of ${GATE_RESERVE} and the time-weighted p90 concurrent hosted jobs across ${samples} Autoland and Farm test runs in ${recent.length} recently active public repositories`;
   console.error(measurement);
   if (parallel === 0) return yield* new FarmFailure({ problem: `${measurement}; no free capacity for a farm` });
   return { parallel, reserve, measurement };
