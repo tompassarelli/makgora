@@ -18,45 +18,62 @@ import { EYE_BEAM_GROUND_FRAMES, EYE_BEAM_GROUND_SHOT } from "../src/game/sim/ey
 import { currentKit } from "./balanceKit";
 import type { FeelValues, FeelSample } from "./balanceKit";
 
+const outcomes = new Map<string, boolean>();
 const cache = new Map<string, number | undefined>();
+
+function kills(effect: Readonly<HitEffect>, percent: number): boolean {
+  const key = `${JSON.stringify(effect)}@${percent}`;
+  const known = outcomes.get(key);
+  if (known !== undefined) return known;
+  const attacker = createFighter(Character.rifleman, -50, 1);
+  const target = createFighter(Character.rifleman, 0, -1);
+  target.motion.grounded = true;
+  target.motion.z = 0;
+  target.status.damage = percent;
+  const world = createRoster(2, [attacker, target]);
+  openDamageContacts();
+  applyAttackHit(world, 0, 1, AttackStyle.jab, 1, effect, true, false);
+  finishDamageContacts(world);
+  const input = neutralControls();
+  let out = false;
+  for (let frame = 0; frame < BALANCE_SPEC.feelFlightFrames && !out; frame++) {
+    advanceFighter(world, 1, 0, input, 0, frame);
+    out = target.status.out;
+  }
+  outcomes.set(key, out);
+  return out;
+}
 
 export function killPercent(effect: Readonly<HitEffect>): number | undefined {
   const key = JSON.stringify(effect);
   if (cache.has(key)) return cache.get(key);
-  const kills = (percent: number): boolean => {
-    const attacker = createFighter(Character.rifleman, -50, 1);
-    const target = createFighter(Character.rifleman, 0, -1);
-    target.motion.grounded = true;
-    target.motion.z = 0;
-    target.status.damage = percent;
-    const world = createRoster(2, [attacker, target]);
-    openDamageContacts();
-    applyAttackHit(world, 0, 1, AttackStyle.jab, 1, effect, true, false);
-    finishDamageContacts(world);
-    const input = neutralControls();
-    for (let frame = 0; frame < BALANCE_SPEC.feelFlightFrames; frame++) {
-      advanceFighter(world, 1, 0, input, 0, frame);
-      if (target.status.out) return true;
-    }
-    return false;
-  };
-  if (!kills(BALANCE_SPEC.feelMaxPercent)) { cache.set(key, undefined); return undefined; }
+  if (!kills(effect, BALANCE_SPEC.feelMaxPercent)) { cache.set(key, undefined); return undefined; }
   let low = 0;
   let high: number = BALANCE_SPEC.feelMaxPercent;
-  while (low < high) { const middle = Math.floor((low + high) / 2); if (kills(middle)) high = middle; else low = middle + 1; }
+  while (low < high) { const middle = Math.floor((low + high) / 2); if (kills(effect, middle)) high = middle; else low = middle + 1; }
   cache.set(key, low);
   return low;
 }
 
-const sample = (effect: Readonly<HitEffect>, recovery: number, aerial: boolean): FeelSample => {
-  const kill = killPercent(effect);
-  return { advantage: digitalShieldstunFrames(effect.damage, aerial) - recovery, ...(kill === undefined ? {} : { killPercent: kill }) };
-};
+export type KillMeasure = (path: string, effect: Readonly<HitEffect>) => number | undefined;
 
+export function killPercentNear(baseline: FeelValues): KillMeasure {
+  return (path, effect) => {
+    const before = baseline[path]?.killPercent;
+    if (before === undefined) return killPercent(effect);
+    const low = Math.ceil(before - before * BALANCE_SPEC.killFraction - 1e-8);
+    const high = Math.min(BALANCE_SPEC.feelMaxPercent, Math.floor(before + before * BALANCE_SPEC.killFraction + 1e-8));
+    return kills(effect, high) && (low === 0 || !kills(effect, low - 1)) ? before : killPercent(effect);
+  };
+}
 
-export function currentFeel(character: Character): FeelValues {
+export function currentFeel(character: Character, measure: KillMeasure = (_, effect) => killPercent(effect)): FeelValues {
   const tuning = authoredTuning(character);
   const out: Record<string, FeelSample> = {};
+  const put = (path: string, effect: Readonly<HitEffect>, recovery: number, aerial: boolean): void => {
+    const kill = measure(path, effect);
+    out[path] = { advantage: digitalShieldstunFrames(effect.damage, aerial) - recovery, ...(kill === undefined ? {} : { killPercent: kill }) };
+  };
   for (const style of Object.values(AttackStyle)) {
     if (style === AttackStyle.grab) continue;
     const aerial = isAerialAttack(style);
@@ -65,8 +82,8 @@ export function currentFeel(character: Character): FeelValues {
     for (let index = 0; index < authoredHitRegionCount(style, tuning.moves); index++) for (let frame = startup; frame < total; frame++) {
       const hit = authoredHitRegion(emptyHitRegion(), character, style, frame, 0, index, tuning.moves);
       if (hit.effect.damage > 0) {
-        out[`normal.${style}.hit.${index}`] = sample(hit.effect, aerial ? attackLandingLag(style, tuning.moves) : total - frame - 1, aerial);
-        if (hit.groundedEffect !== undefined) out[`normal.${style}.hit.${index}.grounded`] = sample(hit.groundedEffect, aerial ? attackLandingLag(style, tuning.moves) : total - frame - 1, aerial);
+        put(`normal.${style}.hit.${index}`, hit.effect, aerial ? attackLandingLag(style, tuning.moves) : total - frame - 1, aerial);
+        if (hit.groundedEffect !== undefined) put(`normal.${style}.hit.${index}.grounded`, hit.groundedEffect, aerial ? attackLandingLag(style, tuning.moves) : total - frame - 1, aerial);
         break;
       }
     }
@@ -80,15 +97,15 @@ export function currentFeel(character: Character): FeelValues {
     const actionEnd = "endFrame" in row && typeof row.endFrame === "number" ? row.endFrame : end;
     if ("firstFrame" in row && typeof row.firstFrame === "number" && "hit" in row && typeof row.hit === "object" && row.hit !== null) {
       const hit = row.hit;
-      if ("effect" in hit && isEffect(hit.effect) && hit.effect.damage > 0) out[path] = sample(hit.effect, actionEnd - row.firstFrame - 1, false);
-      if ("groundedEffect" in hit && isEffect(hit.groundedEffect)) out[`${path}.grounded`] = sample(hit.groundedEffect, actionEnd - row.firstFrame - 1, false);
+      if ("effect" in hit && isEffect(hit.effect) && hit.effect.damage > 0) put(path, hit.effect, actionEnd - row.firstFrame - 1, false);
+      if ("groundedEffect" in hit && isEffect(hit.groundedEffect)) put(`${path}.grounded`, hit.groundedEffect, actionEnd - row.firstFrame - 1, false);
     }
-    if ("spawnFrame" in row && typeof row.spawnFrame === "number" && "effect" in row && isEffect(row.effect)) out[path] = sample(row.effect, Math.max(0, actionEnd - row.spawnFrame), false);
+    if ("spawnFrame" in row && typeof row.spawnFrame === "number" && "effect" in row && isEffect(row.effect)) put(path, row.effect, Math.max(0, actionEnd - row.spawnFrame), false);
     for (const [name, child] of Object.entries(row)) visit(child, `${path}.${name}`, actionEnd);
   };
   visit(tuning.specials, "special", 0);
   for (const action of [GrabAction.throwForward, GrabAction.throwBack, GrabAction.throwUp, GrabAction.throwDown]) {
-    const kill = killPercent(authoredThrowEffect(action, tuning.moves));
+    const kill = measure(`throw.${action}`, authoredThrowEffect(action, tuning.moves));
     out[`throw.${action}`] = { advantage: 0, ...(kill === undefined ? {} : { killPercent: kill }) };
   }
   if (character === Character.rifleman || character === Character.demonHunter) {
@@ -102,15 +119,15 @@ export function currentFeel(character: Character): FeelValues {
       projectile.damageMultiplier = 1;
       const duration = kind === ProjectileKind.blaster ? number("RIFLEMAN_BLASTER_GROUND_FRAMES") : kind === ProjectileKind.recoil ? number("RIFLEMAN_RECOVERY_FRAMES") : EYE_BEAM_GROUND_FRAMES;
       const spawn = kind === ProjectileKind.blaster ? number("RIFLEMAN_BLASTER_GROUND_SHOT_FRAME") : kind === ProjectileKind.recoil ? specials.RIFLEMAN_RECOVERY_STARTUP_FRAMES : EYE_BEAM_GROUND_SHOT;
-      out[`special.projectile.${kind}`] = sample(originalProjectileEffect(projectile), duration - spawn, false);
+      put(`special.projectile.${kind}`, originalProjectileEffect(projectile), duration - spawn, false);
     }
     if (character === Character.rifleman) {
-      out["special.bear"] = sample(BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
+      put("special.bear", BEAR_SWIPE, specials.RIFLEMAN_BEAR_SUMMON_FRAMES - specials.RIFLEMAN_BEAR_CAST_FRAMES, false);
     } else {
       const rush = specials.felRushRegion(specials.FEL_RUSH_FIRST);
-      out["special.rush"] = sample(rush.effect, specials.FEL_RUSH_FRAMES - specials.FEL_RUSH_FIRST, false);
-      for (const grounded of [false,true]) out[`special.immolate.${grounded}`] = sample(specials.immolationRegion(grounded).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
-      out["special.dive"] = sample(specials.wingDiveRegion(specials.DEMONHUNTER_DIVE_FORM, 0).effect, specials.DEMONHUNTER_DIVE_FRAMES, false);
+      put("special.rush", rush.effect, specials.FEL_RUSH_FRAMES - specials.FEL_RUSH_FIRST, false);
+      for (const grounded of [false,true]) put(`special.immolate.${grounded}`, specials.immolationRegion(grounded).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
+      put("special.dive", specials.wingDiveRegion(specials.DEMONHUNTER_DIVE_FORM, 0).effect, specials.DEMONHUNTER_DIVE_FRAMES, false);
     }
   }
   return out;
