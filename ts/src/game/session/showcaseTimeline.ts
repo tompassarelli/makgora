@@ -42,7 +42,6 @@ export interface ShowcaseMove {
   readonly behind?: number | undefined;
   readonly samples?: readonly number[] | undefined;
   readonly jump?: { readonly frames: number } | undefined;
-  readonly run?: true | undefined;
   readonly aim?: { readonly frame: number; readonly until: number; readonly z: number } | undefined;
 }
 
