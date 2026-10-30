@@ -10,7 +10,7 @@ import { catalogHero } from "./tuning";
 export const BANISH_SPELL_DAMAGE = f32(1.3);
 import { isDownDamageState } from "./conditions";
 import { DOWN_DAMAGE_RESET_THRESHOLD } from "./down";
-import type { Fighter } from "./fighter";
+import { type Fighter, duoRole, mutableVictim } from "./fighter";
 import { HitElement, type HitEffect, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import {
   applyDirectionalInfluence,
@@ -152,7 +152,7 @@ export function collectDamageContact(
   contact.target = targetSlot;
   copyHitEffect(contact.effect, effect);
   if (sourceSlot !== targetSlot) {
-    const scale = catalogHero(source.character)?.damageScale?.(source.duo.role, hasLivePartner(world, source));
+    const scale = catalogHero(source.character)?.damageScale?.(duoRole(source), hasLivePartner(world, source));
     if (scale !== undefined) contact.effect.damage = f32(contact.effect.damage * scale);
   }
   const traits = contactTraits(source, kind, direct);
@@ -287,7 +287,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   const perfectShield = shield.perfectFrames > 0;
   const previousHitstun = launch.hitstun;
   const previousStriker = status.struckBy;
-  if (target.victim.duoChain >= DUO_CHAIN_CAP) {
+  if ((target.victim?.duoChain ?? 0) >= DUO_CHAIN_CAP) {
     for (let index = 0; index < batch.count; index++) {
       const contact = contactAt(index);
       if (contact.target === slot && contact.source !== slot && !contact.blocked && (contact.kind === ContactKind.launch || contact.kind === ContactKind.flinch) && inLivePair(world, contact.source)) contact.kind = ContactKind.damageOnly;
@@ -317,12 +317,12 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.blocked) {
       if (contact.kind === ContactKind.damageOnly) continue;
       const pairBlock = contact.source !== slot && inLivePair(world, contact.source);
-      const { victim } = target;
-      if (pairBlock && victim.shieldRun >= DUO_SHIELD_STUN_CAP) continue;
+      const shieldRun = target.victim?.shieldRun ?? 0;
+      if (pairBlock && shieldRun >= DUO_SHIELD_STUN_CAP) continue;
       if (!perfectShield && !(pairBlock && isPartnerBody(world, contact.source) && shield.stun > 0)) {
         const stun = shieldstunFrames(shieldHit, shield.strength, contact.sourceAerial);
-        shield.stun = max(shield.stun, pairBlock ? min(stun, DUO_SHIELD_STUN_CAP - victim.shieldRun) : stun);
-        if (pairBlock && victim.shieldRun === 0 && victim.shieldFree === 0) victim.shieldFree = 1;
+        shield.stun = max(shield.stun, pairBlock ? min(stun, DUO_SHIELD_STUN_CAP - shieldRun) : stun);
+        if (pairBlock && shieldRun === 0 && (target.victim?.shieldFree ?? 0) === 0) mutableVictim(target).shieldFree = 1;
       }
       launch.hitlag = max(launch.hitlag, ordinaryHitlagFrames(contact.hitlagDamage) + contact.strongHitlag);
       const pushback = shieldContactPushback(shieldHit, shield.strength, perfectShield);
@@ -417,8 +417,9 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   const chosen = contactAt(chosenIndex);
   const pairHit = chosen.source !== slot && inLivePair(world, chosen.source);
   if (pairHit && (chosen.kind === ContactKind.launch || chosen.kind === ContactKind.flinch)) {
-    target.victim.duoChain++;
-    target.victim.duoFree = 0;
+    const victim = mutableVictim(target);
+    victim.duoChain++;
+    victim.duoFree = 0;
   }
 
   const jabReset = chosen.kind !== ContactKind.throw && chosen.down && totalDamage <= DOWN_DAMAGE_RESET_THRESHOLD && (winner === undefined || damageLevelForKnockback(strongest) < 3);

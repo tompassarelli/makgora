@@ -61,6 +61,7 @@ import { MeterGlow } from "../../game/render/meterGlow";
 import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
 import { ClassicPresentation } from "../../game/render/classicPresentation";
 import { PauseMenu } from "../../game/ui/pauseMenu";
+import { duoRole } from "../../game/sim/fighter";
 
 
 interface FighterRenderers {
@@ -183,7 +184,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     if (!isParticipantSlot(slot)) return 0;
     if (!isActive(s.world, slot)) return costumeFor(s.game, slot);
     const fighter = fighterAt(s.world, slot);
-    return partnerLook(fighter.character, fighter.duo.role) === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME;
+    return partnerLook(fighter.character, duoRole(fighter)) === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME;
   };
   s.ui = ui;
   return ui;

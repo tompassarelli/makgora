@@ -22,7 +22,7 @@ import { PARTNER_COSTUME } from "../../src/game/presentation/model/costume";
 import { costumeClipModel } from "../../src/game/roster/costumes";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { AttackStyle, Character, DownState, DuoRole, GrabAction, ProjectileKind, SpecialAction } from "../../src/game/sim/codes";
-import type { Fighter } from "../../src/game/sim/fighter";
+import { duoRole, type Fighter } from "../../src/game/sim/fighter";
 import { isHeroSpecialAction } from "../../src/game/sim/specials/runningMove";
 import type { SpecialProjectile } from "../../src/game/sim/specials/schema";
 import { fighterName, selectableCharacterBySlug } from "../../src/game/roster/kits";
@@ -239,7 +239,7 @@ export function matchView(journaled: (slot: number) => number | undefined): Pick
         const out = (world: typeof s.world | undefined) => world !== undefined && isActive(world, slot) && fighterAt(world, slot).status.out;
         if (fighterAt(s.world, slot).status.stocks <= 0 || out(s.world) || out(predicted)) return [];
         const fighter = fighterAt(s.world, slot);
-        const partner = fighter.duo.role === DuoRole.partner;
+        const partner = duoRole(fighter) === DuoRole.partner;
         return [{ name: `${fighterName(fighter.character)}${partner ? " partner" : ""} (Player ${slot + 1})`, models: drawnModels(fighter.character, partner ? PARTNER_COSTUME : costumeFor(s.game, slot)) }];
       });
     },

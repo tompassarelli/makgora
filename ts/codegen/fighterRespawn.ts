@@ -16,10 +16,18 @@ export const respawnWalk = (phase: "blast" | "respawn", { use, capacity, groupLo
     locals.add(key);
     return groupLocal(key);
   };
+  let lazy: { readonly key: string; readonly from: number } | undefined;
   const close = () => {
     if (entries === undefined) return;
     lines.push("  }");
     entries = undefined;
+  };
+  const closeLazy = () => {
+    if (lazy === undefined) return;
+    close();
+    for (let line = lazy.from + 1; line < lines.length; line++) lines[line] = `  ${lines[line]}`;
+    lines.push("  }");
+    lazy = undefined;
   };
   // Values are emitted verbatim: Lua 5.3 keeps the integer 0 and the float 0.0 apart.
   const expression = (row: FighterFieldRow, value: string) => value.replace(/(^|[^.\w])([A-Za-z_]\w*)/g, (_, before: string, name: string) => {
@@ -34,6 +42,13 @@ export const respawnWalk = (phase: "blast" | "respawn", { use, capacity, groupLo
     const value = row.respawn[phase];
     if (value === undefined) continue;
     if (FIGHTER_GROUPS.some((group) => group.key === groupKey(row) && group.rest !== undefined)) throw new Error(`${row.path} sits in a resting group, so its ${phase} reset needs that group's rest helper`);
+    const key = groupKey(row);
+    if (lazy !== undefined && lazy.key !== key) closeLazy();
+    if (lazy === undefined && FIGHTER_GROUPS.some((group) => group.key === key && group.lazy !== undefined)) {
+      close();
+      lazy = { key, from: lines.length };
+      lines.push(`  if (${local(key)} !== undefined) {`);
+    }
     const array = arrayOf(row);
     const assigned = expression(row, value);
     if (array !== entries) close();
@@ -56,6 +71,7 @@ export const respawnWalk = (phase: "blast" | "respawn", { use, capacity, groupLo
     }
     lines.push(`    entry.${leaf(row, `${array.path}[].`)} = ${assigned};`);
   }
+  closeLazy();
   close();
   const declared = FIGHTER_GROUPS.filter((group) => locals.has(group.key)).map((group) => `  const ${group.local} = f.${group.key};`);
   return { locals: declared, body: lines };

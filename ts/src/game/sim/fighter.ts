@@ -480,7 +480,7 @@ interface Meter {
 
 export const DUO_RING_INTS = 32;
 
-interface Duo {
+export interface Duo {
   role: DuoRole;
   link: number;
   readonly ring: number[];
@@ -492,7 +492,7 @@ interface Duo {
   tossCooldown: number;
 }
 
-interface Victim {
+export interface Victim {
   duoChain: number;
   duoFree: number;
   netImmune: number;
@@ -552,13 +552,40 @@ export interface Fighter {
   readonly water: Readonly<Water>;
   readonly status: Status;
   readonly meter: Meter;
-  readonly duo: Duo;
-  readonly victim: Victim;
+  duo: Duo | undefined;
+  victim: Victim | undefined;
   readonly placed: Resting<PlacedObject>;
   readonly pack: readonly Resting<PlacedObject>[];
 }
 
 const repeat = <T>(count: number, make: () => T): T[] => Array.from({ length: count }, () => make());
+
+export function createDuo(): Duo {
+  return { role: DuoRole.solo, link: -1, ring: repeat(DUO_RING_INTS, () => 0), head: 0, order: DuoOrder.copy, orderFrame: 0, reviveSpent: false, swapCooldown: 0, tossCooldown: 0 };
+}
+
+export function createVictim(): Victim {
+  return { duoChain: 0, duoFree: 0, netImmune: 0, grabImmuneDuo: 0, handoffs: 0, handoffWindow: 0, shieldRun: 0, shieldFree: 0 };
+}
+
+/** A solo fighter holds no duo record and an unstruck one no victim record; readers take these resting values for them. */
+export const RESTING_DUO: Readonly<Duo> = createDuo();
+export const RESTING_VICTIM: Readonly<Victim> = createVictim();
+
+export function duoRole(fighter: Readonly<Fighter>): DuoRole {
+  return fighter.duo?.role ?? DuoRole.solo;
+}
+
+export function mutableDuo(fighter: Fighter): Duo {
+  if (fighter.duo === undefined) fighter.duo = createDuo();
+  return fighter.duo;
+}
+
+export function mutableVictim(fighter: Fighter): Victim {
+  if (fighter.victim === undefined) fighter.victim = createVictim();
+  return fighter.victim;
+}
+
 // One empty entry per participant (PARTICIPANT_CAPACITY), written out so Lua
 // sizes the array part: a copy's first writes into it allocate nothing (#400).
 const noSlots = (): (number | undefined)[] => [undefined, undefined, undefined, undefined];
@@ -785,8 +812,8 @@ export function createFighter(character: Character, startX: number, facing: numb
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorKnockback: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, healed: 0.0, summonFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0, manaShield: false, petrifyIn: 0, petrified: false, petrifyDamage: 0.0, aura: false, auraFrames: 0, slowFrames: 0, slowScale: 0.0, stacks: 0, struckBy: undefined },
     meter: { ultimate: 0 },
-    duo: { role: DuoRole.solo, link: -1, ring: repeat(DUO_RING_INTS, () => 0), head: 0, order: DuoOrder.copy, orderFrame: 0, reviveSpent: false, swapCooldown: 0, tossCooldown: 0 },
-    victim: { duoChain: 0, duoFree: 0, netImmune: 0, grabImmuneDuo: 0, handoffs: 0, handoffWindow: 0, shieldRun: 0, shieldFree: 0 },
+    duo: undefined,
+    victim: undefined,
     placed: createPlacedObject(),
     pack: packFrom(spares, packLength(character)),
   };

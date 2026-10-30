@@ -50,6 +50,7 @@ import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } fro
 import { BossKind } from "../classic/runState";
 import { advanceTrainingReadout, captureTrainingBefore, resetTrainingPositions } from "./training";
 import { advanceTutorial, beginLesson, captureTutorialBefore, tutorialOn } from "./tutorial";
+import { duoRole } from "../sim/fighter";
 
 export const observedFrameLegalActions: Slots<number> = [0, 0, 0, 0];
 export const observedFrameStartedActions: Slots<number> = [0, 0, 0, 0];
@@ -284,11 +285,11 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (inGrabContext(f)) clearAttackBuffer(controls.commands[slot]);
-    if (keepsStocks(game) && f.status.out && !beforeOut[slot] && f.duo.role !== DuoRole.partner) {
+    if (keepsStocks(game) && f.status.out && !beforeOut[slot] && duoRole(f) !== DuoRole.partner) {
       f.status.stocks = game.stockCount;
       f.status.respawn = 60;
     }
-    if (f.duo.role === DuoRole.leader) advanceDuoStocks(world, slot, beforeOut[slot]);
+    if (duoRole(f) === DuoRole.leader) advanceDuoStocks(world, slot, beforeOut[slot]);
   }
   if (scope !== undefined) {
     setRosterMask(world, mask);

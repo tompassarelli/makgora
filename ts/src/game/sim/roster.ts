@@ -54,12 +54,12 @@ export function isActive(roster: Roster, slot: number): boolean {
 }
 
 
-export const isPartner = (roster: Roster, slot: number): boolean => roster.active[slot] === true && roster.fighters[slot]?.duo.role === DuoRole.partner;
+export const isPartner = (roster: Roster, slot: number): boolean => roster.active[slot] === true && roster.fighters[slot]?.duo?.role === DuoRole.partner;
 
 export const isContender = (roster: Roster, slot: number): boolean => roster.active[slot] === true && !isPartner(roster, slot);
 
 export function hasLivePartner(roster: Roster, fighter: Readonly<Fighter>): boolean {
-  const link = fighter.duo.link;
+  const link = fighter.duo?.link ?? -1;
   return link >= 0 && isActive(roster, link) && !fighterAt(roster, link).status.out;
 }
 

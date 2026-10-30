@@ -406,7 +406,7 @@ export function applyAuthoredTuning(world: Roster): void {
   // By slot: in Lua a roster's empty slot is a nil that would end a for-of over its fighters.
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     const fighter = world.fighters[slot];
-    if (fighter !== undefined) fighter.tuning = authoredTuning(fighter.character, fighter.duo.role === DuoRole.partner);
+    if (fighter !== undefined) fighter.tuning = authoredTuning(fighter.character, fighter.duo?.role === DuoRole.partner);
   }
 }
 

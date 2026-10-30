@@ -6,7 +6,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { MURLOC_DUO } from "../fighters/murloc/duo";
 import { canStartAttack } from "../sim/conditions";
 import { DuoOrder, DuoRole } from "../sim/codes";
-import type { Fighter } from "../sim/fighter";
+import type { Duo, Fighter } from "../sim/fighter";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
 import { steerOnGround } from "./botFooting";
@@ -197,8 +197,7 @@ const reunited = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: 
   gapBetween(partner, leader) <= MURLOC_DUO.resyncDistance && !separates(partner, leader, stage) && canStartAttack(partner) && canStartAttack(leader);
 
 /** Moves the order between copy and separated; the other orders belong to the specials that set them. */
-function advanceOrder(partner: Fighter, leader: Readonly<Fighter>, stage: number): void {
-  const { duo } = partner;
+function advanceOrder(duo: Duo, partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): void {
   duo.orderFrame++;
   if (duo.order === DuoOrder.copy && separates(partner, leader, stage)) {
     duo.order = DuoOrder.separated;
@@ -238,9 +237,9 @@ export function drivePartners(world: Roster, controls: FrameControls, frame: num
     if (!isActive(world, slot)) continue;
     const partner = fighterAt(world, slot);
     const { duo } = partner;
-    if (duo.role !== DuoRole.partner || !isActive(world, duo.link)) continue;
+    if (duo === undefined || duo.role !== DuoRole.partner || !isActive(world, duo.link)) continue;
     const leader = fighterAt(world, duo.link);
-    advanceOrder(partner, leader, stage);
+    advanceOrder(duo, partner, leader, stage);
     const holding = leader.grab.target !== undefined;
     const write = duo.head * WORDS_PER_FRAME;
     if (holding) clearFrame(duo.ring, write);

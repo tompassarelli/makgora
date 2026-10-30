@@ -45,6 +45,13 @@ export interface FighterGroup {
   readonly type: string;
   readonly local: string;
   readonly rest?: string;
+  readonly lazy?: FighterLazy;
+}
+
+/** A group a fighter allocates only on first write; an absent group reads as its resting record. */
+export interface FighterLazy {
+  readonly resting: string;
+  readonly create: string;
 }
 
 export interface FighterArray {
@@ -118,8 +125,8 @@ export const FIGHTER_GROUPS: readonly FighterGroup[] = [
   { key: "status", type: "Status", local: "status" },
   { key: "meter", type: "Meter", local: "meter" },
   { key: "pack", type: "PlacedObject", local: "placed", rest: "REST_PLACED" },
-  { key: "duo", type: "Duo", local: "duo" },
-  { key: "victim", type: "Victim", local: "victim" },
+  { key: "duo", type: "Duo", local: "duo", lazy: { resting: "RESTING_DUO", create: "createDuo" } },
+  { key: "victim", type: "Victim", local: "victim", lazy: { resting: "RESTING_VICTIM", create: "createVictim" } },
 ];
 
 export const FIGHTER_ARRAYS: readonly FighterArray[] = [

@@ -54,7 +54,7 @@ test("A chain allows one handoff, and its second throw shuts both bodies out of 
   const world = trio();
   const foe = fighterAt(world, FOE);
   chain(world);
-  assertEquals(foe.victim.grabImmuneDuo, HANDOFF_IMMUNE_FRAMES, "the second throw sets the immunity");
+  assertEquals(foe.victim?.grabImmuneDuo ?? 0, HANDOFF_IMMUNE_FRAMES, "the second throw sets the immunity");
   assertEquals(grab(world, MRGL) || grab(world, GRGL), false, "neither body regrabs out of the second throw");
   settle(world, HANDOFF_IMMUNE_FRAMES - 1);
   assertEquals(grab(world, MRGL) || grab(world, GRGL), false, "89 frames on, both bodies are still shut out");
@@ -67,12 +67,12 @@ test("A repeat chain within 300 frames doubles the grab immunity to 180, and one
   const foe = fighterAt(world, FOE);
   chain(world);
   settle(world, HANDOFF_IMMUNE_FRAMES);
-  assertEquals(foe.victim.grabImmuneDuo, 0, "the first immunity has run out");
+  assertEquals(foe.victim?.grabImmuneDuo ?? 0, 0, "the first immunity has run out");
   chain(world);
-  assertEquals(foe.victim.grabImmuneDuo, HANDOFF_REPEAT_IMMUNE_FRAMES, "a repeat inside the window doubles it");
+  assertEquals(foe.victim?.grabImmuneDuo ?? 0, HANDOFF_REPEAT_IMMUNE_FRAMES, "a repeat inside the window doubles it");
   settle(world, HANDOFF_REPEAT_IMMUNE_FRAMES + HANDOFF_REPEAT_WINDOW_FRAMES);
   chain(world);
-  assertEquals(foe.victim.grabImmuneDuo, HANDOFF_IMMUNE_FRAMES, "a chain after the window is a first one again");
+  assertEquals(foe.victim?.grabImmuneDuo ?? 0, HANDOFF_IMMUNE_FRAMES, "a chain after the window is a first one again");
 });
 
 test("A throw nobody follows up does not count toward a later chain [k3 measure docs/design/murloc.md]", () => {
@@ -81,10 +81,10 @@ test("A throw nobody follows up does not count toward a later chain [k3 measure 
   assertEquals(grab(world, MRGL), true, "the leader grabs the foe");
   throwFoe(world, MRGL);
   settle(world, 1);
-  assertEquals(foe.victim.handoffs, 0, "the chain ended when the foe got up");
+  assertEquals(foe.victim?.handoffs ?? 0, 0, "the chain ended when the foe got up");
   assertEquals(grab(world, GRGL), true, "the partner grabs the standing foe");
   throwFoe(world, GRGL);
-  assertEquals(foe.victim.grabImmuneDuo, 0, "a lone throw sets no immunity");
+  assertEquals(foe.victim?.grabImmuneDuo ?? 0, 0, "a lone throw sets no immunity");
   assertEquals(grab(world, MRGL), true, "the leader can hand off out of it");
 });
 

@@ -74,9 +74,9 @@ function recover(state: ReplayState): Recovery {
   for (let tick = 1; tick <= WATCH_FRAMES; tick++) {
     advance(state, tick);
     const partner = fighterAt(state.world, PARTNER);
-    separated ||= partner.duo.order === DuoOrder.separated;
+    separated ||= partner.duo?.order === DuoOrder.separated;
     hung ||= partner.ledge.state === LedgeState.hang;
-    if (separated && resyncedAt < 0 && partner.duo.order === DuoOrder.copy) {
+    if (separated && resyncedAt < 0 && partner.duo?.order === DuoOrder.copy) {
       resyncedAt = tick;
       gapAtResync = Math.abs(partner.motion.x - fighterAt(state.world, LEADER).motion.x);
     }
@@ -101,7 +101,7 @@ test("A separated Grgl replays from a saved frame to the live checksum [k1 scena
     if (tick === saveTick) copyReplayState(saved, live);
     advance(live, tick);
   }
-  assertLessThan(0, fighterAt(live.world, PARTNER).duo.orderFrame);
+  assertLessThan(0, fighterAt(live.world, PARTNER).duo?.orderFrame ?? 0);
   const expected = canonicalState(live);
   const replay = duo();
   copyReplayState(replay, saved);

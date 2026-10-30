@@ -1,5 +1,5 @@
 import { FIGHTER_ARRAYS, FIGHTER_CONSTANTS, FIGHTER_FIELDS, FIGHTER_GROUPS, FIGHTER_SAME_ORDER } from "../src/game/sim/state/fighterSchema";
-import type { CanonColumn, CanonKit, FighterArray, FighterFieldRow, FighterGroup, Guard } from "../src/game/sim/state/fighterSchema";
+import type { CanonColumn, CanonKit, FighterArray, FighterFieldRow, FighterGroup, FighterLazy, Guard } from "../src/game/sim/state/fighterSchema";
 import { UNROLLED, sameLine, arrayOf, copyHalf, copyPart, copyValue, groupKey, inSameOrder, keeps, leaf, packWalk, restWalk, retainedSlots, rowsOf, sameTest, sourceLocal } from "./fighterStateRows";
 import { respawnWalk } from "./fighterRespawn";
 
@@ -173,10 +173,25 @@ const body = (mode: "copy" | "same", groups: readonly FighterGroup[] = FIGHTER_G
       restWalk(mode, lines, group, rows, use(group.rest, "sim/fighterRest"), (indent) => walk(mode)(lines, indent, group.local, sourceLocal(group.local), rows, `${group.key}.`, group.key), used);
       continue;
     }
+    if (group.lazy !== undefined) {
+      lazyWalk(mode, lines, group, group.lazy, (indent) => walk(mode)(lines, indent, group.local, sourceLocal(group.local), rows, `${group.key}.`, group.key));
+      continue;
+    }
     lines.push(`  const ${group.local} = target.${group.key};`, `  const ${sourceLocal(group.local)} = source.${group.key};`);
     walk(mode)(lines, "  ", group.local, sourceLocal(group.local), rows, `${group.key}.`, group.key);
   }
   return lines;
+};
+
+const lazyWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup, lazy: FighterLazy, walkInto: (indent: string) => void) => {
+  const resting = use(lazy.resting, "sim/fighter");
+  const { key, local } = group;
+  lines.push(`  if (target.${key} !== undefined || source.${key} !== undefined) {`);
+  if (mode === "copy") lines.push(`    if (target.${key} === undefined) target.${key} = ${use(lazy.create, "sim/fighter")}();`, `    const ${local} = target.${key};`);
+  else lines.push(`    const ${local} = target.${key} ?? ${resting};`);
+  lines.push(`    const ${sourceLocal(local)} = source.${key} ?? ${resting};`);
+  walkInto("    ");
+  lines.push("  }");
 };
 
 const imported = new Map<string, string>();
@@ -345,7 +360,7 @@ const canonWalk = (): { readonly locals: readonly string[]; readonly body: reado
     open.pop();
     lines.push(`${indentOf(open.length)}}`);
   }
-  const declared = FIGHTER_GROUPS.filter((group) => locals.has(group.key)).map((group) => `  const ${group.local} = fighter.${group.key};`);
+  const declared = FIGHTER_GROUPS.filter((group) => locals.has(group.key)).map((group) => `  const ${group.local} = fighter.${group.key}${group.lazy === undefined ? "" : ` ?? ${use(group.lazy.resting, "sim/fighter")}`};`);
   return { locals: declared, body: lines };
 };
 

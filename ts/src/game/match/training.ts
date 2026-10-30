@@ -10,7 +10,7 @@ import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/parti
 import { copyFighterState } from "../../generated/state/fighterState";
 import { AttackStyle, Character, DownState, DuoRole, LedgeState, SpecialAction } from "../sim/codes";
 import { attackActive, attackStartup, canAttack, canShieldGrab, isTumbling } from "../sim/conditions";
-import { type Fighter, PACK_CAPACITY, createFighter } from "../sim/fighter";
+import { type Fighter, PACK_CAPACITY, createFighter, duoRole } from "../sim/fighter";
 import { type Controls, type Roster, createRoster, fighterAt, isActive, isContender, neutralControls } from "../sim/roster";
 import { advanceFighterMotion } from "../sim/step";
 import { respawnFighter } from "../sim/stocks";
@@ -34,7 +34,7 @@ export function resetTrainingPositions(state: TrainingState, world: Roster, comp
     const f = fighterAt(world, slot);
     respawnFighter(world, slot, spawnX(slot));
     f.status.out = false;
-    if (f.duo.role === DuoRole.partner) f.status.stocks = 1;
+    if (duoRole(f) === DuoRole.partner) f.status.stocks = 1;
     f.status.respawn = 0;
     f.facing = spawnX(slot) < 0 ? 1 : -1;
     if (participantActive(computerMask, slot)) f.status.damage = f32(state.damage);

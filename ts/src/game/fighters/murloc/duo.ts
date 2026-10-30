@@ -1,6 +1,6 @@
 import { PARTICIPANT_SLOTS } from "../../input/participants";
 import { Character, DuoRole } from "../../sim/codes";
-import { createFighter } from "../../sim/fighter";
+import { createFighter, duoRole, mutableDuo } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { type Roster, fighterAt, isActive, setRosterMask } from "../../sim/roster";
 import { authoredTuning } from "../../sim/tuning";
@@ -29,10 +29,12 @@ function seatPartner(world: Roster, leaderSlot: number, partnerSlot: number): vo
   partner.motion.surface = leader.motion.surface;
   partner.motion.z = leader.motion.z;
   setWorldMotionValue(partner.motion.meleeZ, partner.motion.z);
-  partner.duo.role = DuoRole.partner;
-  partner.duo.link = leaderSlot;
-  leader.duo.role = DuoRole.leader;
-  leader.duo.link = partnerSlot;
+  const partnerDuo = mutableDuo(partner);
+  partnerDuo.role = DuoRole.partner;
+  partnerDuo.link = leaderSlot;
+  const leaderDuo = mutableDuo(leader);
+  leaderDuo.role = DuoRole.leader;
+  leaderDuo.link = partnerSlot;
   world.fighters[partnerSlot] = partner;
   world.teamChoices[partnerSlot] = world.teamChoices[leaderSlot] ?? 0;
   world.linked[partnerSlot] = leaderSlot;
@@ -45,7 +47,7 @@ export function seatMurlocPartners(world: Roster): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if ((participants & (1 << slot)) === 0) continue;
     const leader = fighterAt(world, slot);
-    if (leader.character !== Character.murloc || leader.duo.role !== DuoRole.solo) continue;
+    if (leader.character !== Character.murloc || duoRole(leader) !== DuoRole.solo) continue;
     const partnerSlot = lowestFreeSlot(world);
     if (partnerSlot >= 0) seatPartner(world, slot, partnerSlot);
   }

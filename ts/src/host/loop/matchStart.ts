@@ -33,6 +33,7 @@ import type { ShellState } from "./state";
 import { beginFighterRenderers, views } from "./ui";
 import { findWarcraftChat } from "../../platform/editboxJournal";
 import { LASTING, drawStage, pauseMatchPresentation, renderPersistentPresentation, setStatus } from "./view";
+import { duoRole } from "../../game/sim/fighter";
 
 export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario, stageSettings?: QuickStageSettings): void {
   delete s.dev.shieldEnergyCapture;
@@ -93,7 +94,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
     const participant = s.participants[slot];
     const fighter = fighterAt(s.world, slot);
     if (participant.body !== undefined) colorFighterBody(participant.body, slot, fighterColor(s.game, slot));
-    participant.pooled = beginFighterRenderers(s, slot, fighter.character, fighter.duo.role, pooled);
+    participant.pooled = beginFighterRenderers(s, slot, fighter.character, duoRole(fighter), pooled);
 
     if (!participant.pooled) continue;
     if (participant.body !== undefined) {

@@ -1,6 +1,6 @@
-import { FIGHTER_CONSTANTS, FIGHTER_DIFF_ORDER, FIGHTER_FIELDS, fighterDiffName } from "../src/game/sim/state/fighterSchema";
+import { FIGHTER_CONSTANTS, FIGHTER_DIFF_ORDER, FIGHTER_FIELDS, FIGHTER_GROUPS, fighterDiffName } from "../src/game/sim/state/fighterSchema";
 import type { CanonKit, FighterFieldRow } from "../src/game/sim/state/fighterSchema";
-import { arrayOf, leaf } from "./fighterStateRows";
+import { arrayOf, groupKey, leaf } from "./fighterStateRows";
 
 export const output = "src/generated/state/fighterDifference.ts";
 export const producer = "ts/codegen/fighterDifference.ts";
@@ -31,10 +31,17 @@ const recordCheck = (rows: readonly FighterFieldRow[], name: string, reported: s
   return `if (expected.${base} !== actual.${base} && (${keys.map((key) => `expected.${base}.${key} !== actual.${base}.${key}`).join(" || ")})) return ${reported};`;
 };
 
+const owner = (row: FighterFieldRow, fighter: "expected" | "actual", need: Need): string => {
+  const key = groupKey(row);
+  const lazy = FIGHTER_GROUPS.find((group) => group.key === key)?.lazy;
+  return lazy === undefined ? `${fighter}.${key}` : `(${fighter}.${key} ?? ${need(lazy.resting, "sim/fighter")})`;
+};
+
 const operand = (row: FighterFieldRow, fighter: "expected" | "actual", animal: boolean, need: Need): string => {
   const array = arrayOf(row);
-  if (array === undefined) return animal ? `${fighter}Placed.${row.path.slice("placed.".length)}` : `${fighter}.${row.path}`;
-  const prefix = animal ? `${fighter}Placed.${array.path.slice("placed.".length)}` : `${fighter}.${array.path}`;
+  const within = (path: string) => `${owner(row, fighter, need)}${path.slice(groupKey(row).length)}`;
+  if (array === undefined) return animal ? `${fighter}Placed.${row.path.slice("placed.".length)}` : within(row.path);
+  const prefix = animal ? `${fighter}Placed.${array.path.slice("placed.".length)}` : within(array.path);
   const module = FIGHTER_CONSTANTS[array.capacity];
   if (module === undefined) throw new Error(`no module for ${array.capacity}`);
   need(array.capacity, module);

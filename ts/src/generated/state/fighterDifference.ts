@@ -4,7 +4,7 @@ import { PARTICIPANT_CAPACITY } from "../../game/input/participants";
 import { canonicalSlot } from "../../game/replay/canonical";
 import { fighterMovesCanonical, fighterSpecialsCanonical } from "../../game/replay/kitCanonical";
 import { HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY } from "../../game/sim/codes";
-import { DUO_RING_INTS, PROJECTILE_CAPACITY, placedObject } from "../../game/sim/fighter";
+import { DUO_RING_INTS, PROJECTILE_CAPACITY, RESTING_DUO, RESTING_VICTIM, placedObject } from "../../game/sim/fighter";
 import { at } from "wisp/src/runtime/lookup";
 
 function differentSlot(left: number | undefined, right: number | undefined, expectedMask: number, actualMask: number): boolean {
@@ -354,22 +354,22 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.slowScale !== actual.status.slowScale) return "slowScale";
   if (expected.status.stacks !== actual.status.stacks) return "stacks";
   if ((expected.status.struckBy ?? -1) !== (actual.status.struckBy ?? -1)) return "struckBy";
-  if (expected.duo.role !== actual.duo.role) return "duoRole";
-  if (expected.duo.link !== actual.duo.link) return "duoLink";
-  for (let i = 0; i < DUO_RING_INTS; i++) if ((expected.duo.ring[i] ?? 0) !== (actual.duo.ring[i] ?? 0)) return `duoRing[${i}]`;
-  if (expected.duo.head !== actual.duo.head) return "duoHead";
-  if (expected.duo.order !== actual.duo.order) return "duoOrder";
-  if (expected.duo.orderFrame !== actual.duo.orderFrame) return "duoOrderFrame";
-  if (expected.duo.reviveSpent !== actual.duo.reviveSpent) return "duoReviveSpent";
-  if (expected.duo.swapCooldown !== actual.duo.swapCooldown) return "duoSwapCooldown";
-  if (expected.duo.tossCooldown !== actual.duo.tossCooldown) return "duoTossCooldown";
-  if (expected.victim.duoChain !== actual.victim.duoChain) return "victimDuoChain";
-  if (expected.victim.duoFree !== actual.victim.duoFree) return "victimDuoFree";
-  if (expected.victim.netImmune !== actual.victim.netImmune) return "victimNetImmune";
-  if (expected.victim.grabImmuneDuo !== actual.victim.grabImmuneDuo) return "victimGrabImmuneDuo";
-  if (expected.victim.handoffs !== actual.victim.handoffs) return "victimHandoffs";
-  if (expected.victim.handoffWindow !== actual.victim.handoffWindow) return "victimHandoffWindow";
-  if (expected.victim.shieldRun !== actual.victim.shieldRun) return "victimShieldRun";
-  if (expected.victim.shieldFree !== actual.victim.shieldFree) return "victimShieldFree";
+  if ((expected.duo ?? RESTING_DUO).role !== (actual.duo ?? RESTING_DUO).role) return "duoRole";
+  if ((expected.duo ?? RESTING_DUO).link !== (actual.duo ?? RESTING_DUO).link) return "duoLink";
+  for (let i = 0; i < DUO_RING_INTS; i++) if (((expected.duo ?? RESTING_DUO).ring[i] ?? 0) !== ((actual.duo ?? RESTING_DUO).ring[i] ?? 0)) return `duoRing[${i}]`;
+  if ((expected.duo ?? RESTING_DUO).head !== (actual.duo ?? RESTING_DUO).head) return "duoHead";
+  if ((expected.duo ?? RESTING_DUO).order !== (actual.duo ?? RESTING_DUO).order) return "duoOrder";
+  if ((expected.duo ?? RESTING_DUO).orderFrame !== (actual.duo ?? RESTING_DUO).orderFrame) return "duoOrderFrame";
+  if ((expected.duo ?? RESTING_DUO).reviveSpent !== (actual.duo ?? RESTING_DUO).reviveSpent) return "duoReviveSpent";
+  if ((expected.duo ?? RESTING_DUO).swapCooldown !== (actual.duo ?? RESTING_DUO).swapCooldown) return "duoSwapCooldown";
+  if ((expected.duo ?? RESTING_DUO).tossCooldown !== (actual.duo ?? RESTING_DUO).tossCooldown) return "duoTossCooldown";
+  if ((expected.victim ?? RESTING_VICTIM).duoChain !== (actual.victim ?? RESTING_VICTIM).duoChain) return "victimDuoChain";
+  if ((expected.victim ?? RESTING_VICTIM).duoFree !== (actual.victim ?? RESTING_VICTIM).duoFree) return "victimDuoFree";
+  if ((expected.victim ?? RESTING_VICTIM).netImmune !== (actual.victim ?? RESTING_VICTIM).netImmune) return "victimNetImmune";
+  if ((expected.victim ?? RESTING_VICTIM).grabImmuneDuo !== (actual.victim ?? RESTING_VICTIM).grabImmuneDuo) return "victimGrabImmuneDuo";
+  if ((expected.victim ?? RESTING_VICTIM).handoffs !== (actual.victim ?? RESTING_VICTIM).handoffs) return "victimHandoffs";
+  if ((expected.victim ?? RESTING_VICTIM).handoffWindow !== (actual.victim ?? RESTING_VICTIM).handoffWindow) return "victimHandoffWindow";
+  if ((expected.victim ?? RESTING_VICTIM).shieldRun !== (actual.victim ?? RESTING_VICTIM).shieldRun) return "victimShieldRun";
+  if ((expected.victim ?? RESTING_VICTIM).shieldFree !== (actual.victim ?? RESTING_VICTIM).shieldFree) return "victimShieldFree";
   return undefined;
 }

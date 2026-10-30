@@ -1,5 +1,6 @@
 import { Character, DuoOrder, DuoRole } from "./codes";
 import { type Roster, fighterAt, isActive } from "./roster";
+import { RESTING_DUO } from "./fighter";
 
 export const DuoPipState = { synced: 0, holding: 1, separated: 2, down: 3, reviveReady: 4, noRoom: 5 } as const;
 export type DuoPipState = (typeof DuoPipState)[keyof typeof DuoPipState];
@@ -13,16 +14,17 @@ const SCRATCH: readonly DuoPip[] = [0, 1, 2, 3].map(() => ({ state: DuoPipState.
 
 function read(world: Roster, slot: number, out: DuoPip): boolean {
   const leader = fighterAt(world, slot);
-  if (leader.character !== Character.murloc || leader.duo.role === DuoRole.partner) return false;
+  const duo = leader.duo ?? RESTING_DUO;
+  if (leader.character !== Character.murloc || duo.role === DuoRole.partner) return false;
   out.percent = 0;
-  if (leader.duo.role === DuoRole.solo) {
+  if (duo.role === DuoRole.solo) {
     out.state = DuoPipState.noRoom;
     return true;
   }
-  const link = leader.duo.link;
+  const link = duo.link;
   const partner = isActive(world, link) ? fighterAt(world, link) : undefined;
-  if (partner === undefined || partner.duo.role !== DuoRole.partner) {
-    out.state = leader.duo.reviveSpent ? DuoPipState.down : DuoPipState.reviveReady;
+  if (partner?.duo === undefined || partner.duo.role !== DuoRole.partner) {
+    out.state = duo.reviveSpent ? DuoPipState.down : DuoPipState.reviveReady;
     return true;
   }
   out.percent = partner.status.damage;

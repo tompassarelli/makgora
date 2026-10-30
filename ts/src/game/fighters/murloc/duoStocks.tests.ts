@@ -83,12 +83,12 @@ test("Grgl faints at 70.0% into a 30-frame knockdown then leaves [k3 measure doc
   const near = duel();
   at(near, PARTNER).status.damage = f32(69.9);
   steps(near, 2);
-  assertEquals(at(near, PARTNER).duo.order, DuoOrder.copy, "69.9% does not faint");
+  assertEquals(at(near, PARTNER).duo?.order, DuoOrder.copy, "69.9% does not faint");
   const d = duel();
   const stocks = at(d, LEADER).status.stocks;
   at(d, PARTNER).status.damage = 70.0;
   steps(d, 1);
-  assertEquals(at(d, PARTNER).duo.order, DuoOrder.fainted, "70.0% faints");
+  assertEquals(at(d, PARTNER).duo?.order, DuoOrder.fainted, "70.0% faints");
   assertEquals(at(d, PARTNER).down.state, DownState.wait, "Grgl is knocked down");
   steps(d, 28);
   assertEquals(at(d, PARTNER).status.out, false, "he is still down inside the 30 frames");
