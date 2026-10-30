@@ -159,3 +159,28 @@ does not pass yet:
   match clock restarts, and the walk shows almost no travel.
 
 Sheets and viewer notes: `~/.local/state/smashcraft/evidence/sc-664`.
+
+## Native re-capture (2026-10-31)
+
+The first cold reads missed Rain of Fire and Finger of Death because the
+showcase sampled them before their strikes (their first cue is the ring
+marker, 23 and 31 frames before the strike) and stood the dummy inside his
+body. The showcase now samples a special from its strike when the strike opens
+8 or more frames after its first cue, stands a foe-targeted special's dummy 220
+units away, and stands a wide fighter's dummy 50 units clear of the hurt
+capsule for side-on hits that reach it. Five shared-queue captures at
+c1ee7ff0 (Rain of Fire, Finger of Death, Bash, neutral air, forward air; both
+facings) were read by one fresh Opus cold viewer with opaque ids:
+
+- **Rain of Fire** reads: a fire column sent along the ground into the foe,
+  same in both facings; the rings before the strike read as a hit marker.
+- **Finger of Death** reads: lightning called down on a distant foe; the
+  growing ring hides the foe and the white flash hides his pose.
+- **Bash** reads weakly: a close two-hit burst at the foe's feet, with the foe
+  overlapping his body and the wind-up differing between facings.
+- **Neutral air** reads. **Forward air** does not: the starburst sits inside
+  his own body and hides which limb strikes.
+
+Still open for the native-check box: forward air and Bash staging, the other
+aerials, down smash, grab and the whiteout flashes, and a full 58-row reel at
+`--hold-ticks 24` read by three cold viewers.
