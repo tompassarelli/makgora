@@ -6,6 +6,8 @@ import { type Character, SurfaceContact } from "../sim/codes";
 import { HitElement } from "../sim/hitRegions";
 import { DodgeCue, type ImpactEvents, ImpactLanding, JumpCue } from "./impactEvents";
 import { STRONG_SPARK_SCALE, TIER_SPARK_SCALE } from "./moveTiers";
+import type { MatchCamera } from "../sim/matchCamera";
+import { cameraRay, rayPoint } from "./arenaCamera";
 
 
 export const IMPACT_HIT = 0;
@@ -37,6 +39,9 @@ export const IMPACT_KIND_COUNT = 24;
 export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
 export const KO_STAR_FRAMES = 108;
+export const STAR_KO_DEPTH = 1400.0;
+const STAR_KO_ENTRY_UP = 0.875;
+const STAR_KO_REST_UP = 0.375;
 export const KO_SCREEN_FRAMES = 100;
 export const SCREEN_KO_ONE_IN = 8;
 
@@ -354,7 +359,18 @@ const travel = (velocity: number, age: number): number => f32(f32(velocity * age
 const HIDDEN_IMPACT: Readonly<ImpactPose> = { visible: false, alpha: 0, scale: 0.0, x: 0.0, z: 0.0, pitch: 0.0 };
 
 
-export function projectImpact(state: Readonly<ImpactState>, i: number, out?: ImpactPose): Readonly<ImpactPose> {
+const starRay = { across: 0.0, up: 0.0 };
+const starPoint = { x: 0.0, z: 0.0 };
+
+function placeStarKo(camera: Readonly<MatchCamera>, originX: number, originZ: number, t: number): void {
+  cameraRay(camera, originX, 0.0, originZ, starRay);
+  const entryAcross = max(-camera.tangent, min(camera.tangent, starRay.across));
+  const entryUp = min(starRay.up, camera.tangent * STAR_KO_ENTRY_UP);
+  const remaining = 1.0 - t;
+  rayPoint(camera, entryAcross * remaining, entryUp * remaining + camera.tangent * STAR_KO_REST_UP * t, STAR_KO_DEPTH * t, starPoint);
+}
+
+export function projectImpact(state: Readonly<ImpactState>, i: number, camera: Readonly<MatchCamera>, out?: ImpactPose): Readonly<ImpactPose> {
   if (i < 0 || i >= IMPACT_COUNT) return HIDDEN_IMPACT;
   const age = state.ages[i];
   const kind = idiv(i, IMPACTS_PER_KIND);
@@ -364,7 +380,8 @@ export function projectImpact(state: Readonly<ImpactState>, i: number, out?: Imp
   const drift = at(state.drift, i);
   if (kind === IMPACT_STAR_KO) {
     const sparkle = f32(f32((age - KO_STAR_FLIGHT_FRAMES) * 1.0) / (KO_STAR_FRAMES - KO_STAR_FLIGHT_FRAMES));
-    return impactPose(out, toInt(f32(255 * f32(1.0 - sparkle))), f32(f32(0.6) + sparkle), f32(originX + drift * 75), f32(originZ + 180.0), 0.0);
+    placeStarKo(camera, originX, originZ, 1.0);
+    return impactPose(out, toInt(f32(255 * f32(1.0 - sparkle))), f32(f32(0.6) + sparkle), starPoint.x, starPoint.z, 0.0);
   }
   const strength = at(state.strength, i);
   const progress = f32(f32(age * 1.0) / impactLifetime(kind));
@@ -398,7 +415,7 @@ const HIDDEN_KO: Readonly<KoPose> = { visible: false, character: 1, owner: 0, al
 
 
 
-export function projectKo(state: Readonly<ImpactState>, i: number): Readonly<KoPose> {
+export function projectKo(state: Readonly<ImpactState>, i: number, camera: Readonly<MatchCamera>): Readonly<KoPose> {
   if (i < IMPACT_STAR_KO * IMPACTS_PER_KIND || i >= IMPACT_COUNT) return HIDDEN_KO;
   const age = state.ages[i];
   if (age === undefined) return HIDDEN_KO;
@@ -412,15 +429,16 @@ export function projectKo(state: Readonly<ImpactState>, i: number): Readonly<KoP
     if (age >= KO_STAR_FLIGHT_FRAMES) return HIDDEN_KO;
     const t = f32(f32(age * 1.0) / KO_STAR_FLIGHT_FRAMES);
     const remaining = f32(1.0 - t);
+    placeStarKo(camera, originX, originZ, t);
     return {
       visible: true,
       character,
       owner,
       alpha: 255,
       scale: f32(remaining * remaining),
-      x: f32(originX * f32(1.0 - f32(t * f32(0.7)))),
-      y: f32(1400 * t),
-      z: f32(originZ + f32(180 * t)),
+      x: starPoint.x,
+      y: f32(STAR_KO_DEPTH * t),
+      z: starPoint.z,
       pitch: f32(f32(drift * t) * f32(6.283185307)),
       yaw,
       roll: f32(t * f32(3.141592654)),

@@ -24,7 +24,9 @@ import {
   isContactImpact,
   projectImpact,
   projectKo,
+  STAR_KO_DEPTH,
 } from "../presentation/impactState";
+import { createMatchCamera, type MatchCamera } from "../sim/matchCamera";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
@@ -49,7 +51,6 @@ const KO_FIGHTERS = KO_VARIANTS.length;
 const KO_BODY_COUNT = IMPACTS_PER_KIND * 2 * KO_FIGHTERS;
 const STAR_KO_FIRST = IMPACT_STAR_KO * IMPACTS_PER_KIND;
 
-const STAR_KO_DEPTH = 1400.0;
 
 const SAME_HIT_FRAMES = 2;
 
@@ -119,6 +120,8 @@ export class CombatEffects {
   private parked: ParkedFlags | undefined;
 
   private readonly busyKinds: boolean[] = [];
+
+  private camera: Readonly<MatchCamera> = createMatchCamera();
 
   private readonly pose: ImpactPose = { visible: false, alpha: 0, scale: 0.0, x: 0.0, z: 0.0, pitch: 0.0 };
 
@@ -306,7 +309,8 @@ export class CombatEffects {
 
 
 
-  present(state: Readonly<ImpactState>, frame: number, confirmed: Readonly<ImpactState>, playing: boolean): void {
+  present(state: Readonly<ImpactState>, frame: number, confirmed: Readonly<ImpactState>, playing: boolean, camera: Readonly<MatchCamera>): void {
+    this.camera = camera;
     const shownAges = (this.shownAges ??= []);
     const parked = (this.parked ??= []);
     const count = this.impacts.length;
@@ -331,7 +335,7 @@ export class CombatEffects {
     const source = kind === IMPACT_STAR_KO || kind === IMPACT_SCREEN_KO ? confirmed : state;
     const age = source.ages[i];
 
-    const pose = playing && age !== undefined ? projectImpact(source, i, this.pose) : undefined;
+    const pose = playing && age !== undefined ? projectImpact(source, i, this.camera, this.pose) : undefined;
     if (pose === undefined || !pose.visible) {
 
       if (parked[i] !== true && (this.lateLive === 0 || this.late.ages[i] === undefined)) parkOnce(model, this, parked, i);
@@ -384,7 +388,7 @@ export class CombatEffects {
       }
       const model = this.koBodies[i];
       if (model === undefined) continue;
-      const pose = projectKo(confirmed, impact);
+      const pose = projectKo(confirmed, impact, this.camera);
       const variant = at(KO_VARIANTS, floorMod(i, KO_FIGHTERS));
       if (!pose.visible || pose.character !== variant.character || bodyCostume(pose.character, this.costumeOf(pose.owner)) !== variant.costume) {
         parkOnce(model, this, parked, IMPACT_COUNT + i);
@@ -472,7 +476,7 @@ export class CombatEffects {
           BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
           BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
         }
-        this.place(model, i, kind, projectImpact(late, i, this.pose), late.strength[i] ?? 0.0);
+        this.place(model, i, kind, projectImpact(late, i, this.camera, this.pose), late.strength[i] ?? 0.0);
       }
     }
     if (advance) advanceImpacts(late);

@@ -319,7 +319,7 @@ function effectsReceipt(s: ShellState, message: string): string | undefined {
   const ui = views(s);
   emitImpacts(s.runtime.impacts, events, 8, 0);
   ui.combat.presentConfirmed(s.devReceipts + 1, 4, events);
-  ui.combat.present(s.runtime.impacts, s.runtime.simulationFrame, s.runtime.impacts, true);
+  ui.combat.present(s.runtime.impacts, s.runtime.simulationFrame, s.runtime.impacts, true, s.camera);
   return `dev: effects ${index} ${scenario.model} ${scenario.sound}`;
 }
 

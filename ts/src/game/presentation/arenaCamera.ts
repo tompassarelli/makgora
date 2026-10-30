@@ -89,6 +89,25 @@ export interface ScreenPoint {
   row: number;
 }
 
+export interface CameraRay {
+  across: number;
+  up: number;
+}
+
+export function cameraRay(camera: Readonly<MatchCamera>, x: number, y: number, z: number, into: CameraRay = { across: 0.0, up: 0.0 }): Readonly<CameraRay> {
+  const dz = z - camera.z;
+  const depth = camera.distance + y * 0.9848077297210693 - dz * 0.1736481785774231;
+  into.across = (x - camera.x) / depth;
+  into.up = (y * 0.1736481785774231 + dz * 0.9848077297210693) / depth;
+  return into;
+}
+
+export function rayPoint(camera: Readonly<MatchCamera>, across: number, up: number, y: number, into: { x: number; z: number }): void {
+  const dz = (up * (camera.distance + y * 0.9848077297210693) - y * 0.1736481785774231) / (0.9848077297210693 + up * 0.1736481785774231);
+  into.x = camera.x + across * (camera.distance + y * 0.9848077297210693 - dz * 0.1736481785774231);
+  into.z = camera.z + dz;
+}
+
 export function cameraPoint(camera: Readonly<MatchCamera>, aspect: number, x: number, z: number, into: ScreenPoint = { column: 0.0, row: 0.0 }): Readonly<ScreenPoint> {
   const dz = z - camera.z;
   const depth = camera.distance - dz * 0.1736481785774231;

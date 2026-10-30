@@ -449,7 +449,7 @@ export function renderPersistentPresentation(s: ShellState): void {
   const ui = views(s);
   if (playing) markAgency(ui, world, stage, matchFrame, s.controls, (activeRollback(s)?.repairedFrames ?? 0) > 0);
   ui.classic?.present(game);
-  ui.combat.present(runtime.impacts, runtime.simulationFrame, s.runtime.impacts, playing);
+  ui.combat.present(runtime.impacts, runtime.simulationFrame, s.runtime.impacts, playing, s.camera);
   const roared = roaring(world, playing);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;

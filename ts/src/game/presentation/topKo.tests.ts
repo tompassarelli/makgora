@@ -2,8 +2,10 @@ import { imod } from "wisp/src/sim/intMath";
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Character } from "../sim/codes";
 import { createImpactEvents } from "./impactEvents";
-import { IMPACT_SCREEN_KO, IMPACT_STAR_KO, IMPACTS_PER_KIND, KO_STAR_FLIGHT_FRAMES, createImpactState, emitImpacts, projectKo, projectImpact, topKoKind } from "./impactState";
+import { IMPACT_SCREEN_KO, IMPACT_STAR_KO, IMPACTS_PER_KIND, KO_STAR_FLIGHT_FRAMES, STAR_KO_DEPTH, createImpactState, emitImpacts, projectKo, projectImpact, topKoKind } from "./impactState";
 import { presentStarKoTwinkle } from "./hitPresentation";
+import { cameraRay } from "./arenaCamera";
+import { createMatchCamera } from "../sim/matchCamera";
 
 const SEEDS = 1000;
 
@@ -29,22 +31,36 @@ test("A top KO spawns the kind topKoKind chose, in the slot's owner and characte
   }
 });
 
-test("A Star KO flight shrinks the fighter and carries it toward the screen centre, then hides it as the star glints [k1 scenario]", () => {
-  const state = createImpactState();
-  emitImpacts(state, { ...createImpactEvents(), koDirectionZ: 1.0, x: 400.0, z: 100.0, facing: -1 }, 0, 0);
+test("A Star KO flight shrinks the fighter toward the centre of the view the fighter left, then hides it as the star glints there, even when the camera has closed in below the KO point [k1 scenario]", () => {
   let frame = 0;
   while (topKoKind(frame, 0, 0) !== IMPACT_STAR_KO) frame++;
   const star = createImpactState();
-  emitImpacts(star, { ...createImpactEvents(), koDirectionZ: 1.0, x: 400.0, z: 100.0, facing: -1 }, frame, 0);
+  emitImpacts(star, { ...createImpactEvents(), koDirectionZ: 1.0, x: -300.0, z: 1128.0, facing: -1 }, frame, 0);
   const slot = IMPACT_STAR_KO * IMPACTS_PER_KIND;
-  const start = projectKo(star, slot);
-  star.ages[slot] = KO_STAR_FLIGHT_FRAMES / 2;
-  const middle = projectKo(star, slot);
-  assertTrue(middle.scale < start.scale && middle.x < start.x && middle.x > 0.0);
-  assertEquals(projectImpact(star, slot).visible, false);
+  const camera = createMatchCamera();
+  camera.x = 250.0;
+  camera.z = 100.0;
+  camera.tangent = 0.2679491937160492;
+  const ray = { across: 0.0, up: 0.0 };
+  const inView = (x: number, y: number, z: number): boolean => {
+    cameraRay(camera, x, y, z, ray);
+    return ray.up > -camera.tangent && ray.up < camera.tangent && ray.across > -camera.tangent && ray.across < camera.tangent;
+  };
+  let previous = projectKo(star, slot, camera);
+  for (let age = 1; age < KO_STAR_FLIGHT_FRAMES; age++) {
+    star.ages[slot] = age;
+    const pose = projectKo(star, slot, camera);
+    assertTrue(pose.visible && inView(pose.x, pose.y, pose.z));
+    assertTrue(pose.scale < previous.scale && pose.y > previous.y);
+    assertEquals(projectImpact(star, slot, camera).visible, false);
+    previous = pose;
+  }
+  cameraRay(camera, previous.x, previous.y, previous.z, ray);
+  assertTrue(ray.across > -0.03125 && ray.across < 0.03125 && ray.up > 0.0);
   star.ages[slot] = KO_STAR_FLIGHT_FRAMES;
-  assertEquals(projectKo(star, slot).visible, false);
-  assertEquals(projectImpact(star, slot).visible, true);
+  assertEquals(projectKo(star, slot, camera).visible, false);
+  const sparkle = projectImpact(star, slot, camera);
+  assertTrue(sparkle.visible && inView(sparkle.x, STAR_KO_DEPTH, sparkle.z));
 });
 
 test("The Star KO twinkle is a high-pitched Dispel Magic chime at the star's place on the KO sound class [k1 scenario]", () => {

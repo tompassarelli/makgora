@@ -229,7 +229,7 @@ export function sparkScenes(move: CueMove): { readonly scenes: RenderScene[]; re
     for (let tick = 0; tick < 24; tick++) {
       const renderer = combat;
       client.run(() => {
-        renderer.present(impacts, tick, impacts, true);
+        renderer.present(impacts, tick, impacts, true, near);
         SetCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
         SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, ARENA_CAMERA.angleOfAttack, 0.0);
         SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
