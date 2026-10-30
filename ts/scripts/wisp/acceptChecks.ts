@@ -17,6 +17,7 @@ import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, 
 import { gateChecks } from "./gateChecks";
 import { meterRimChecks } from "./meterRimChecks";
 import { hudChecks } from "./hudChecks";
+import { kaelFireArcaneChecks } from "./kaelFireArcaneChecks";
 import { ledgerCaptureChecks } from "./ledgerCaptureChecks";
 import { newestPresentation } from "./presentationInputs";
 
@@ -485,6 +486,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "wc3-melee-input-trace.txt on client a holds per-voice lines `frame F class C slot S live L` with every L <= 16.",
     },
     ...hudChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
+    ...kaelFireArcaneChecks([NO_IMPORT_FAILURES, NO_ERRORS]),
     ...heroes.map(({ name }): NativeCheck => ({
       id: `96-hero-${heroProfile(name).slice(5)}`,
       closes: "smashcraft#96 box 5",
