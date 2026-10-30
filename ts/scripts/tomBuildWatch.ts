@@ -130,13 +130,17 @@ const logged = (text: string) => Effect.sync(() => {
 
 export const missingInputs = ({ problem }: PlayProblem) => problem.includes(FETCH_HINT);
 
-const builtWithInputs = <R>(steps: WatchSteps<R>, sha: string) => steps.build(sha).pipe(
-  Effect.catchIf(missingInputs, (missing) => steps.fetchInputs.pipe(
-    Effect.tapError(({ problem }) => Effect.sync(() => console.error(`Fetching build inputs failed: ${problem}`))),
-    Effect.mapError(() => missing),
-    Effect.andThen(steps.build(sha)),
-  )),
-);
+const builtWithInputs = <R>(steps: WatchSteps<R>, sha: string) => Effect.gen(function*() {
+  const started = yield* Clock.currentTimeMillis;
+  return yield* steps.build(sha).pipe(
+    Effect.catchIf(missingInputs, (missing) => steps.fetchInputs.pipe(
+      Effect.tapError(({ problem }) => Effect.sync(() => console.error(`Fetching build inputs failed: ${problem}`))),
+      Effect.mapError(() => missing),
+      Effect.andThen(Clock.currentTimeMillis),
+      Effect.flatMap((fetched) => steps.build(sha).pipe(Effect.map((built): Built => ({ ...built, stages: [{ name: "inputs-fetch", millis: fetched - started }, ...built.stages] })))),
+    )),
+  );
+});
 
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
   const previous = lines(files.log).at(-1)?.split(" ")[1];

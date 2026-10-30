@@ -33,7 +33,8 @@ Land time is the commit's committer time; `land_to_main_s` ends when GitHub
 records the push to main, so it is the lane's pre-land gates. `cpu_pressure_peak`
 is the host's `/proc/pressure/cpu` some avg10 peak during the build, `live_clients`
 the Warcraft III processes on the host, and `stages` the build's
-`checkout=S,bun-install=S,map-build=S,maps-copy=S`; `-` is
+`[inputs-fetch=S,]checkout=S,bun-install=S,map-build=S,maps-copy=S` (`inputs-fetch` is the
+failed first attempt plus the fetch of pinned inputs the store lacked, present only then); `-` is
 unknown. A build above 20% pressure counts against neither budget: the watcher
 neither files nor closes a speed-budget issue for it. A failed build is in
 `journalctl --user -u smashcraft-tom-build`. Every sha the watcher starts is

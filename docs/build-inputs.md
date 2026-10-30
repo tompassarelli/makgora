@@ -48,7 +48,9 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   write only the local one, so a pin landed from one host names entries the others
   lack until they copy them. `bun wisp inputs fetch HOST...` (from smashcraft:ts/)
   copies every entry the checkout pins and this store lacks from the first named host
-  that holds it, over ssh as a tar stream into a staging folder beside the store,
+  that holds it, over ssh with rsync into a staging folder beside the store, hard-linking
+  every file whose bytes match one in the family's 20 newest stored entries so a re-pinned
+  entry moves only what changed,
   rehashes the copy, seals it and publishes it by one rename like `inputs add`
   (smashcraft:ts/scripts/wisp/inputsFetch.ts). A copy that hashes otherwise is
   refused. `map build`, `inputs check` and `inputs derive` name this command when

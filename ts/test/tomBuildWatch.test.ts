@@ -57,6 +57,7 @@ describe("tom build watcher", () => {
     const { outcome, calls, attempted } = run(true);
     expect(calls).toEqual(["build", "fetch", "build"]);
     expect(outcome._tag).toBe("Success");
+    expect(outcome._tag === "Success" && outcome.success).toContain("inputs-fetch=0.0,maps-copy=0.0");
     expect(attempted).toBe(true);
   });
 
