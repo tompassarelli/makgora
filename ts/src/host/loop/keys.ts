@@ -233,7 +233,8 @@ export function onKeyDown(s: ShellState): void {
 
 export function onKeyUp(s: ShellState): void {
   const slot = triggerSlot();
-  if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyUpEvent(s.localKeys, GetHandleId(BlzGetTriggerPlayerKey()));
+  const key = GetHandleId(BlzGetTriggerPlayerKey());
+  if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyUpEvent(s.localKeys, key);
   if (slot !== undefined) participantKeyUp(s, slot);
 }
 
