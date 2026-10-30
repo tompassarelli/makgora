@@ -57,3 +57,18 @@ test("Mal'Ganis's forward air rakes down in front of him: every active frame's c
     }
   }
 });
+
+test("Mal'Ganis's down air drives claws and hooves straight down: on every active frame, in either facing, a strike reaches below knee height and the lowest tip falls frame by frame [k2 property]", () => {
+  for (const facing of [1, -1]) {
+    const strikes = reaches(AttackStyle.downAir, facing);
+    assertEquals(strikes.length, ACTIVE * 2);
+    let previous = Infinity;
+    for (let frame = 0; frame < ACTIVE; frame++) {
+      const lowest = Math.min(...strikes.slice(frame * 2, frame * 2 + 2).map((strike) => Math.min(strike.nearZ, strike.farZ)));
+      assertTrue(lowest < 40.0);
+      assertTrue(lowest < previous);
+      previous = lowest;
+    }
+    for (const strike of strikes) assertTrue(strike.nearX > 0.0 && strike.farX > 0.0);
+  }
+});

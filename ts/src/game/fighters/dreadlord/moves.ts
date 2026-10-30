@@ -125,12 +125,20 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       capsule(0.0, 68.0, 0.0, f32(M - 12.0), 12.0),
       capsule(0.0, 68.0, -8.0, f32(M - 12.0), 12.0),
     ], dreadlordHit(9.021564483642578, "LAUNCH", 85))),
-    [AttackStyle.downAir]: heroMove(14, 4, 29, 20, path(14, [
-      capsule(-4.0, 40.0, -16.0, 0.0),
-      capsule(-8.0, 40.0, -20.0, 0.0),
-      capsule(-12.0, 40.0, -24.0, 0.0),
-      capsule(-16.0, 40.0, -28.0, 0.0),
-    ], dreadlordHit(13.532346725463867, "SPIKE", 270), dreadlordHit(13.532346725463867, "SPIKE", 55))),
+    [AttackStyle.downAir]: heroMove(14, 4, 29, 20, [
+      ...path(14, [
+        capsule(26.0, 77.0, 41.0, 40.0),
+        capsule(33.0, 62.0, 48.0, 23.0),
+        capsule(34.0, 50.0, 48.0, 12.0),
+        capsule(34.0, 44.0, 48.0, 5.0),
+      ], dreadlordHit(13.532346725463867, "SPIKE", 270), dreadlordHit(13.532346725463867, "SPIKE", 55)),
+      ...path(14, [
+        capsule(14.0, 41.0, 13.0, 14.0, HOOF_RADIUS),
+        capsule(15.0, 28.0, 13.0, 1.0, HOOF_RADIUS),
+        capsule(15.0, 18.0, 13.0, -9.0, HOOF_RADIUS),
+        capsule(15.0, 12.0, 13.0, -15.0, HOOF_RADIUS),
+      ], dreadlordHit(13.532346725463867, "SPIKE", 270), dreadlordHit(13.532346725463867, "SPIKE", 55)),
+    ]),
     [AttackStyle.grab]: heroMove(7, 3, 26, 0, path(7, [
       capsule(14.0, 35.0, f32(GRAB - 12.0), 40.0, 12.0),
       capsule(14.0, 35.0, f32(GRAB - 12.0), 35.0, 12.0),

@@ -27,7 +27,7 @@ const PLAN: Readonly<Record<number, readonly HeroPose[]>> = {
   4: ["jab", "jab2", "upTilt", "upSmash", "neutralAir", "upAir", "backAir", "dashAttack", "forwardAir", "downTilt", "downAir"],
   5: ["jab3", "forwardTiltDown", "downTilt", "neutralAir", "backAir", "downSmash", "dashAttack", "forwardAir", "upSmash", "upAir", "upTilt", "forwardTiltUp", "neutralSpecial", "jab", "jab2", "forwardTilt", "forwardSmash", "sideSpecial", "ultimate"],
   6: ["forwardTiltDown", "downTilt", "backAir", "downSpecial", "forwardTilt", "forwardTiltUp", "upTilt", "forwardSmash", "upSmash", "downSmash", "dashAttack", "forwardAir", "upAir"],
-  8: ["jab2", "jab3", "downTilt", "forwardSmash", "forwardAir", "backAir", "upAir", "upTilt", "neutralAir"],
+  8: ["jab2", "jab3", "downTilt", "forwardSmash", "forwardAir", "backAir", "upAir", "upTilt", "neutralAir", "downAir"],
   9: ["jab3", "forwardTilt", "forwardTiltUp", "upTilt", "dashAttack", "forwardAir", "upSmash", "upAir", "forwardSmash", "downTilt", "jab", "neutralSpecial"],
   10: ["forwardTilt", "forwardAir", "upAir", "neutralAir"],
   11: ["jab2", "jab3", "forwardTilt", "forwardTiltDown", "downTilt", "dashAttack", "backAir", "upSmash", "neutralAir", "upAir", "forwardAir", "downSpecial"],
@@ -62,7 +62,7 @@ const FIGHTER_CONTACT: Readonly<Record<number, Readonly<Record<string, readonly 
   2: { jab3: [-17, -69, 0, 3, 25, 1, -2, 40] },
   4: { downAir: [30, -60, 60, -30, 0, -60, 90, 0], jab: [-7, 1, 78, -1, -90, 15, 10, 1], jab2: [70, -2, -91, -18, -90, -13, 5, -25], upTilt: [34, -145, -103, 15, 35, -5, -1, 0], dashAttack: [30, 10, -60, -40, 0, 15, 20, 12] },
   6: { forwardTilt: [-10, -45, 5, -2, -1, 0, 0, 10], forwardTiltDown: [25, -70, 10, 0, 0, 0, 0, 12], downTilt: [20, -68, 15, -10, -10, 0, 0, 25], dashAttack: [28, -84, -5, 1, 2, 0, 0, 10] },
-  8: { jab2: [-12, -48, -42, 38, -20, 18, -8, 10], jab3: [3, -75, 80, -52, 25, 6, 35, 5], downTilt: [15, 35, 50, -15, -60, -83, 95, 10] },
+  8: { downAir: [30, -60, 60, -30, 0, -60, 90, 0], jab2: [-12, -48, -42, 38, -20, 18, -8, 10], jab3: [3, -75, 80, -52, 25, 6, 35, 5], downTilt: [15, 35, 50, -15, -60, -83, 95, 10] },
   9: { jab3: [23, -75, 45, -2, 25, -24, 35, 5], forwardTilt: [50, -75, 35, -15, 65, -18, 22, -20], dashAttack: [-48, -75, 65, -22, 50, -65, 100, 0], downTilt: [22, 35, 45, -15, -60, -40, 55, 0], jab: [8, -35, 30, -20, 10, 0, 0, 0], neutralSpecial: [-8, -75, 20, -32, 20, 0, 0, 0] },
   10: { forwardTilt: [32, -95, 35, -48, -22, -18, 22, 20] },
   11: {

@@ -149,6 +149,20 @@ elif move == 'forwardSmash':
     FINAL = DOWN
     LET_GO = lambda t: min(1, t / 0.3)
     RELEASE = lambda t: smooth(max(0, (t - 0.1) / 0.9))
+elif move == 'downAir':
+    HANDS = dict(aim=0, clawR=(0, 0), clawL=(0, 0))
+    RISE = dict(HANDS, dx=-2, dz=10, lean=-10, chest=-10, head=-4, wing=-8, handR=(8, 38), handL=(4, 34), footL=(12, -22), footR=(8, -24))
+    CROWN = dict(HANDS, dx=-6, dz=20, lean=-24, chest=-18, head=-8, wing=-16, handR=(-6, 62), handL=(-10, 58), footL=(2, -20), footR=(-2, -22))
+    PLUNGE = dict(HANDS, dx=2, dz=6, lean=22, chest=10, head=-4, wing=-46, handR=(6, -54), handL=(0, -52), footL=(-2, -66), footR=(-6, -68))
+    DRIVE = dict(HANDS, dx=4, dz=-6, lean=30, chest=14, head=-8, wing=-58, handR=(8, -72), handL=(2, -70), footL=(-4, -76), footR=(-8, -78))
+    DEEP = dict(HANDS, dx=4, dz=-16, lean=32, chest=16, head=-10, wing=-62, handR=(8, -78), handL=(2, -76), footL=(-4, -82), footR=(-8, -84))
+    HELD = dict(DEEP, dz=-22, handR=(8, -82), handL=(2, -80))
+    CATCH = dict(HANDS, dx=0, dz=2, lean=-4, chest=-4, head=0, wing=0, handR=(14, -24), handL=(10, -22), footL=(14, -30), footR=(10, -32))
+    BEATS = [(0, READY), (4, RISE), (contact - 2, CROWN), (contact, PLUNGE), (contact + 1, DRIVE), (contact + 2, DEEP), (last, HELD)]
+    AFTER = CATCH
+    FINAL = HELD
+    LET_GO = lambda t: 0.35 * t
+    RELEASE = lambda t: t
 else:
     raise SystemExit(f'unknown move {move}')
 
