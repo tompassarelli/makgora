@@ -26,21 +26,35 @@ wait 90, sink 120. Both turn amber for the last 30 frames
 of each authored wait. These are learnable authored schedules inspired by
 Randall and rising platforms; their exact retail movement is not asserted.
 
-The cannon's catch radius, hold, shot and immunity follow Kongo Jungle 64's
-GrOk.dat and Melee / ft/kinds/ftCommon/a Melee routine.c:
-within 15 Melee units, the first eligible fighter in slot order is caught;
-Attack or Special, or a 480-frame timeout, starts an 11-frame shot; the launch
-deals no damage and uses base knockback 180, followed by 16 frames of catch
-immunity. Its swing and lean are authored: x ±760 at z −390,
-5 world units per frame, leaning up to 15 degrees toward center. GrOk.dat's
-main deck is floor-only, so Melee's barrel fires up through it; Blackrock's
-has walls and an underside like every stage (#338), and a shot passes through
-them only while it carries the fighter up: from the shot until the fighter's
-feet are above the deck's top or it lands, its walls, underside and the
-body push-out ignore that fighter. The flag is fighter state, saved with
-rollback and the canonical state. The classic Warcraft TNT barrel shows the cannon;
-it turns red with a countdown during the shot, and a held player sees the
-fire controls and timeout warning. It can assist recovery but changes the
+The cannon is a recovery launcher (reworked 2026-10-31 at Tom's request; it
+once fired along the barrel's lean, which could send a fighter away from the
+stage). A barrel travels back and forth under Blackrock's underside, x ±480
+at z −500 (the underside's lowest edge is z −300, so the whole barrel sits
+clear of it), 5 world units per frame, a 384-frame lap, rocking a little as
+it goes; the rock is only drawn and the shot ignores it. A fighter whose
+position comes within 120 units of the barrel's centre is caught, the first
+eligible fighter in slot order. Attack or Special, or a 150-frame timeout,
+starts a 10-frame warning (the barrel turns red), then the shot: straight up
+whatever the barrel's lean, the fighter held in tumble and unable to act for a
+45-frame rise that eases out to a peak 240 above the deck, about a full hop.
+The rise keeps the x where the shot began, and every x on the path is inside
+the deck's ledges, so the fighter always ends over the stage. Warcraft's
+`ImmolationRedTarget.mdx` burns on the fighter for the whole rise. The flames
+end at the peak and the fighter falls in hitstun for 8 more frames, then acts;
+the beat is 8 frames, the middle of the 6 to 10 that read as "a moment after
+the flames" in play. The shot deals no damage, cannot kill and leaves 30 frames
+of catch immunity. Blackrock's main deck has walls and an underside like
+every stage (#338), and the rise passes through them: from the shot until the
+fighter's feet are above the deck's top, its walls, underside and the body
+push-out ignore that fighter. A held or rising fighter cannot be hit. The
+flag and the shot's frame are fighter state (`cannon.passing`,
+`cannon.firing`), saved with rollback and the canonical state. The classic
+Warcraft TNT barrel shows the cannon, and a held player sees the fire controls
+and timeout warning. Values are authored from the design brief and play, not
+from any game's files; the shape follows the public SmashWiki description of
+Kongo Jungle's barrel (catch on touch, fire on a press or after a wait) with
+its forced aim removed on purpose.
+The cannon can assist recovery but changes the
 route and timing; predictable hazards alone do not establish competitive
 legality (smashcraft:docs/design/stages.md).
 

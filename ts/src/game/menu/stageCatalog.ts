@@ -25,7 +25,7 @@ export const STAGE_CATALOG: readonly StageInfo[] = [
   { id: 3, name: "Durotar Skies", texture: "war3mapImported\\StageCardDurotar.blp", description: "Fight over Durotar's rocky spires.\nOne platform drifts from side to side." },
   { id: 4, name: "Naxxramas", texture: "war3mapImported\\StageCardNaxxramas.blp", description: "The Scourge citadel looms overhead.\nTwo platforms patrol their own routes." },
   { id: 14, name: "Hellfire Citadel", texture: "war3mapImported\\StageCardHellfire.blp", description: "Two steady platforms amid the fel spires.\nHold your ground against the Legion." },
-  { id: 12, name: "Blackrock", texture: "war3mapImported\\StageCardBlackrock.blp", description: "One forge platform above the molten depths.\nA swinging cannon offers a way back." },
+  { id: 12, name: "Blackrock", texture: "war3mapImported\\StageCardBlackrock.blp", description: "One forge platform above the molten depths.\nA cannon beneath the stage launches you back up." },
   { id: 13, name: "Ahn'Qiraj", texture: "war3mapImported\\StageCardAhnQiraj.blp", description: "An open arena among ancient Qiraji ruins.\nA rising platform breaks the silence." },
   { id: 6, name: "Stratholme", texture: "war3mapImported\\StageCardStratholme.blp", description: "Rooftops over a burning city at dusk.\nTwo low balconies, one high roof." },
   { id: 7, name: "Tomb of Sargeras", texture: "war3mapImported\\StageCardTomb.blp", description: "Sunken ruins awash in the tide.\nTwo platforms reach out past the edges." },

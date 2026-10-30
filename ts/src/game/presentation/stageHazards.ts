@@ -15,6 +15,8 @@ import {
 
 
 export const CANNON_MODEL = "Units\\Other\\TNTBarrel\\TNTBarrel.mdx";
+/** The barrel model stands on its origin; the held fighter sits this far above it, at the barrel's middle. */
+export const CANNON_MODEL_BASE = 75.0;
 export const WIND_STREAK_MODEL = "Abilities\\Spells\\Other\\Tornado\\Tornado_Target.mdx";
 export const WIND_STREAK_COUNT = 6;
 export const HYDRA_CREST_MODEL = "Units\\Creeps\\Hydra\\Hydra.mdx";
@@ -23,6 +25,13 @@ export const HYDRA_RING_MODEL = "Abilities\\Spells\\Undead\\DeathandDecay\\Death
 
 export function hydraWarningX(stage: number, water: Readonly<Fighter["water"]>): number | undefined {
   return hasTide(stage) && water.hydraFrame > 0 && water.hydraFrame < HYDRA_STRIKE_FRAME ? water.hydraX : undefined;
+}
+
+export function cannonWarned(world: Readonly<Roster>): boolean {
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (isActive(world, slot) && (fighterAt(world, slot).cannon.firing ?? CANNON_SHOT_FRAMES) < CANNON_SHOT_FRAMES) return true;
+  }
+  return false;
 }
 
 export const HYDRA_SUBMERGE_FRAMES = 18;
@@ -71,7 +80,7 @@ export function stageWarning(game: Readonly<MatchState>, world: Readonly<Roster>
       if (!isActive(world, slot)) continue;
       const { cannon } = fighterAt(world, slot);
       if (cannon.held === undefined) continue;
-      if (cannon.firing !== undefined) return `Cannon fires in ${CANNON_SHOT_FRAMES - cannon.firing} frames.`;
+      if (cannon.firing !== undefined) return cannon.firing >= CANNON_SHOT_FRAMES ? "" : `Cannon fires in ${CANNON_SHOT_FRAMES - cannon.firing} frames.`;
       if (CANNON_HOLD_FRAMES - cannon.held <= PLATFORM_CUE_FRAMES) return "Cannon fires soon. Press Attack or Special to fire now.";
       return "In the cannon: press Attack or Special to fire.";
     }

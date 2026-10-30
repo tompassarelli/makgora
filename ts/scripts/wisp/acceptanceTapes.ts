@@ -669,7 +669,7 @@ export function generateTapes(): Map<string, string> {
     ...([
       ["wind", 10, 1900, undefined, "pushed"],
       ["carried", 11, 940, "test-air 0 -210 285", "carried"],
-      ["cannon", 12, 650, "test-air 0 -760 -350", undefined],
+      ["cannon", 12, 650, "test-air 0 -460 -480", undefined],
       ["timed-lift", 13, 440, "test-air 0 0 125", "carried"],
     ] as const).map(([name, stage, frames, placement, exercise]) => [name, recordTape(`Deterministic ${name} hazard, controller presses, corrected predictions and rollback.`, [{
       characters: [Character.demonHunter, Character.rifleman], stage, stocks: 3, minutes: 0, frames,
@@ -682,7 +682,7 @@ export function generateTapes(): Map<string, string> {
     ...([
       ["hazards-off-carried", 11, 500, "test-air 0 0 125"],
       ["hazards-off-wind", 10, 700, undefined],
-      ["hazards-off-cannon", 12, 300, "test-air 0 -760 -350"],
+      ["hazards-off-cannon", 12, 300, "test-air 0 -460 -480"],
     ] as const).map(([name, stage, frames, placement]) => [name, recordTape(`Stage ${stage} with hazards off, controller presses, corrected predictions and rollback.`, [{
       characters: [Character.demonHunter, Character.rifleman], stage, stocks: 3, minutes: 0, frames, hazardsOff: true,
       ...(placement === undefined ? {} : { placement }),

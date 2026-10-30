@@ -17,8 +17,7 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { setWorldMotionValue } from "../src/game/sim/motion";
 import { uncancelledLandingLag } from "../src/game/sim/moves";
-import { CANNON_TEST_STAGE, WIND_TEST_STAGE, DRIFTING_DECK_STAGE, MAIN_DECK_BODY_SURFACES, SOLID_DECK_TEST_STAGE, solidSurfaceAt, mainDeckRight, mainDeckZ, surfaceZ } from "../src/game/sim/stage";
-import { CANNON_Z, cannonX } from "../src/game/sim/stageHazards";
+import { WIND_TEST_STAGE, DRIFTING_DECK_STAGE, MAIN_DECK_BODY_SURFACES, SOLID_DECK_TEST_STAGE, solidSurfaceAt, mainDeckRight, mainDeckZ, surfaceZ } from "../src/game/sim/stage";
 import { bodyTop } from "../src/game/sim/surfaces";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 import { type Scene, airborne, fighter, frame, frameRows, framesUntil, scene, solo, tumbling } from "../src/game/match/padScene";
@@ -719,23 +718,6 @@ const PLATFORMS: readonly Scenario[] = [
     const before = fighter(s).motion.x;
     frame(s, []);
     return { expected: 0.20000000298023224, actual: f32((fighter(s).motion.x - before) / WORLD_UNITS_PER_MELEE_UNIT), tolerance: 0.00001 };
-  } },
-  { area: "hazard", name: "Kongo barrel holds an untouched fighter for eight seconds", cite: "barrel shoot time 479 truncated and counted through zero", run: (c) => {
-    const s = solo(CANNON_TEST_STAGE, c, cannonX(1));
-    airborne(fighter(s), cannonX(1), CANNON_Z + 40.0);
-    frame(s, []);
-    let held = 0;
-    while (fighter(s).cannon.firing === undefined && held < 500) { frame(s, []); held++; }
-    return { expected: 480, actual: held };
-  } },
-  { area: "hazard", name: "Kongo barrel fires ten further frames after Attack with base knockback 180", cite: "barrel hit timer of 10 frames; base knockback 180", run: (c) => {
-    const s = solo(CANNON_TEST_STAGE, c, cannonX(1));
-    airborne(fighter(s), cannonX(1), CANNON_Z + 40.0);
-    frame(s, []);
-    frame(s, [Action.attack]);
-    let further = 0;
-    while (fighter(s).cannon.held !== undefined && further < 20) { frame(s, []); further++; }
-    return { expected: 5.400000095367432, actual: further === 10 ? f32(fighter(s).launch.diLaunchSpeed / WORLD_UNITS_PER_MELEE_UNIT) : -1, tolerance: 0.00001 };
   } },
   { area: "platform", name: "grounded fighter rides a moving floor in hitlag", cite: "a grounded fighter takes the floor line's displacement, before its hitlag return", run: (c) => {
     const s = solo(DRIFTING_DECK_STAGE, c, 0.0);

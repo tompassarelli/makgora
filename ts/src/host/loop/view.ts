@@ -38,7 +38,7 @@ import type { FighterPose } from "../../game/presentation/fighterPose";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { chatBox } from "../../game/ui/nativeChat";
 import { hideWarcraftChat } from "../../game/ui/warcraftChat";
-import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
+import { CANNON_MODEL, CANNON_MODEL_BASE, cannonWarned, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
 import { presentFighterMarkers } from "./fighterMarkers";
 import { drawnScale, lavaPiece } from "../../game/presentation/stageScenery";
@@ -49,7 +49,7 @@ import { type StartControl, matchHelp, matchStartNotice, resultNotice, waitingMe
 import { isIntangible } from "../../game/sim/conditions";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
-import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
+import { CANNON_Z, SEA_SURFACE_Z, cannonOn, cannonRock, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
 import { localParticipantSlot, presentedCueTrace, traceParticipant } from "./diagnostics";
 import { colorFighterBody, paintFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
@@ -186,7 +186,7 @@ export function drawStage(s: ShellState): void {
   }
   if (cannonOn(stage, stageFrame)) {
     s.stageCannon = AddSpecialEffect(CANNON_MODEL, origin.x + cannonX(stageFrame), origin.y);
-    BlzSetSpecialEffectPosition(s.stageCannon, origin.x + cannonX(stageFrame), origin.y, origin.z + CANNON_Z);
+    BlzSetSpecialEffectPosition(s.stageCannon, origin.x + cannonX(stageFrame), origin.y, origin.z + CANNON_Z - CANNON_MODEL_BASE);
     BlzSetSpecialEffectScale(s.stageCannon, 1.5);
   }
   for (let index = 0; index < 6; index++) {
@@ -421,11 +421,10 @@ export function renderPersistentPresentation(s: ShellState): void {
     BlzSetSpecialEffectColor(at(s.stageDecks, index), 255, warns ? 170 : 255, warns ? 40 : 255);
   }
   if (s.stageCannon !== undefined && cannonOn(drawn, matchFrame)) {
-    BlzSetSpecialEffectPosition(s.stageCannon, s.origin.x + cannonX(matchFrame), s.origin.y, s.origin.z + CANNON_Z);
-    BlzSetSpecialEffectPitch(s.stageCannon, cannonAim(matchFrame));
-    let firing = false;
-    for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot) && fighterAt(world, slot).cannon.firing !== undefined) firing = true;
-    BlzSetSpecialEffectColor(s.stageCannon, 255, firing ? 70 : 255, firing ? 40 : 255);
+    BlzSetSpecialEffectPosition(s.stageCannon, s.origin.x + cannonX(matchFrame), s.origin.y, s.origin.z + CANNON_Z - CANNON_MODEL_BASE);
+    BlzSetSpecialEffectPitch(s.stageCannon, cannonRock(matchFrame));
+    const warned = cannonWarned(world);
+    BlzSetSpecialEffectColor(s.stageCannon, 255, warned ? 70 : 255, warned ? 40 : 255);
   }
   presentLava(s, drawn, matchFrame);
   presentWind(s, drawn, matchFrame);

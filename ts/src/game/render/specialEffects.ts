@@ -2,6 +2,7 @@
 
 
 
+import { cannonRising } from "../sim/stageHazards";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL } from "../assets/impactAssetInfo";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type ImpactPresentationCursor, consumeImpactFrame, createImpactPresentationCursor, resetImpactPresentationCursor } from "../presentation/impactCursor";
@@ -40,6 +41,7 @@ interface SpecialSlot {
   readonly bear: SummonPresentation;
   readonly aura: effect;
   readonly felFlames: effect;
+  readonly cannonFlames: effect;
   readonly manaHand: effect;
   readonly wingTrail: effect;
   readonly drainFlash: effect;
@@ -71,7 +73,8 @@ const FROG = 6;
 export const HEX_FROG_MODEL = "units\\critters\\Frog\\Frog.mdx";
 const SILENCE = 7;
 const CURSE = 8;
-const SLOT_EFFECTS = 9;
+const CANNON_FLAMES = 9;
+const SLOT_EFFECTS = 10;
 /** Warcraft's Drain Mana lightning, the Blood Mage's own Siphon Mana beam. */
 const SIPHON_LIGHTNING = "DRAM";
 const LASER_LIGHTNING = "AFOD";
@@ -100,6 +103,7 @@ export class SpecialEffects {
       const bear = new SummonPresentation(SUMMON_BEAR, origin);
       const aura = AddSpecialEffect(IMPACT_ROLL_MODEL, x, y);
       const felFlames = AddSpecialEffect(STOCK_MODELS.immolationTarget, x, y);
+      const cannonFlames = AddSpecialEffect(STOCK_MODELS.cannonFlames, x, y);
       const manaHand = AddSpecialEffect(STOCK_MODELS.manaBurnTarget, x, y);
       const wingTrail = AddSpecialEffect(IMPACT_DUST_MODEL, x, y);
       const drainFlash = AddSpecialEffect(IMPACT_TECH_MODEL, x, y);
@@ -117,7 +121,7 @@ export class SpecialEffects {
       BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
+        bear, aura, felFlames, cannonFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -139,6 +143,7 @@ export class SpecialEffects {
       slot.bear.hide();
       this.park(slot.aura, index, AURA);
       this.park(slot.felFlames, index, FEL_FLAMES);
+      this.park(slot.cannonFlames, index, CANNON_FLAMES);
       this.park(slot.manaHand, index, MANA_HAND);
       this.park(slot.wingTrail, index, WING_TRAIL);
       this.park(slot.drainFlash, index, DRAIN_FLASH);
@@ -168,15 +173,16 @@ export class SpecialEffects {
   slotEffects(slot: number, into: effect[]): void {
     const effects = this.slots[slot];
     if (effects === undefined) return;
-    into.push(effects.aura, effects.felFlames, effects.manaHand, effects.wingTrail, effects.drainFlash, effects.silence, effects.curse, effects.frog);
+    into.push(effects.aura, effects.felFlames, effects.cannonFlames, effects.manaHand, effects.wingTrail, effects.drainFlash, effects.silence, effects.curse, effects.frog);
   }
 
   setPaused(paused: boolean): void {
     const scale = paused ? 0.0 : 1.0;
     this.stackPresentation.setPaused(paused);
     this.spellPass.setPaused(paused);
-    for (const { felFlames, manaHand, silence } of this.slots) {
+    for (const { felFlames, cannonFlames, manaHand, silence } of this.slots) {
       BlzSetSpecialEffectTimeScale(felFlames, scale);
+      BlzSetSpecialEffectTimeScale(cannonFlames, scale);
       BlzSetSpecialEffectTimeScale(manaHand, scale);
       BlzSetSpecialEffectTimeScale(silence, scale);
     }
@@ -251,6 +257,8 @@ export class SpecialEffects {
       if (fighter.status.out) this.park(manaHand, index, MANA_HAND);
       else this.showStun(fighter, index, manaHand);
     }
+    if (!fighter.status.out && cannonRising(fighter)) this.show(slot.cannonFlames, index, CANNON_FLAMES, fighter, 0.0, 60.0, f32(2.0));
+    else this.park(slot.cannonFlames, index, CANNON_FLAMES);
     slot.previousSpecial = action;
     slot.previousSpecialFrame = frame;
   }
@@ -393,7 +401,7 @@ export class SpecialEffects {
       this.releaseImmolationLoop(slot);
       KillSoundWhenDone(slot.immolationLoop);
       slot.bear.destroy();
-      for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog]) DestroyEffect(model);
+      for (const model of [slot.aura, slot.felFlames, slot.cannonFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog]) DestroyEffect(model);
       DestroyLightning(slot.siphon);
       DestroyLightning(slot.laser);
       DestroyLightning(slot.chain);

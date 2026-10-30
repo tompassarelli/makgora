@@ -6,18 +6,15 @@
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { DownState, LedgeState } from "./codes";
 import { inGrabContext } from "./conditions";
 import type { Fighter } from "./fighter";
-import { contactKnockback, installDamageLaunch, ordinaryHitstunFrames } from "./knockback";
 import { setWorldMotionValue } from "./motion";
 import { type Controls, type Roster, fighterAt, isActive } from "./roster";
 import { CANNON_TEST_STAGE, TOMB_OF_SARGERAS_STAGE, WIND_TEST_STAGE, mainDeckLeft, mainDeckRight, mainDeckZ, stageAtRest } from "./stage";
 import { stageBounds } from "./stageBounds";
 import { cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, interruptJumpOrDodge } from "./transitions";
 import { melee } from "./tuning";
-import { knockbackWeight } from "./itemBuffs";
 import { mutableCannon } from "./fighterRest";
 
 
@@ -161,24 +158,30 @@ export function tidePush(stage: number, frame: number, x: number, z: number): nu
 
 
 
-const CANNON_SWING_HALF_WIDTH = 760.0;
+const CANNON_SWING_HALF_WIDTH = 480.0;
 const CANNON_SWING_SPEED = 5.0;
 
-const CANNON_SWING_FRAMES = 304;
+const CANNON_SWING_FRAMES = 192;
 
-export const CANNON_Z = -390.0;
+/** Where a held fighter sits: below Blackrock's underside (its lowest edge is z -300) with the whole barrel clear of it. */
+export const CANNON_Z = -500.0;
 
-const CANNON_LEAN = 0.2617993950843811;
-/** GrOk.dat rframe_barrel_in: a fighter whose position comes this close to the cannon's center is caught. */
-const CANNON_CATCH_RADIUS = melee(15.0);
-/** GrOk.dat rframe_barrel_shoot_a 479, truncated to a whole frame and counted down through zero: the cannon fires by itself after this long. */
-export const CANNON_HOLD_FRAMES = 480;
-/** The shot leaves this many frames after it begins, its animation the warning (groldkongo.c stageGObj1_GObjProc, hit_timer > 0xA). */
-export const CANNON_SHOT_FRAMES = 11;
-/** GrOk.dat rradd_barrel_attack: base knockback, with no damage, growth or fixed knockback. */
-export const CANNON_BASE_KNOCKBACK = 180.0;
-/** Melee  bury_timer_unk2: frames after a shot before a cannon catches the fighter again. */
-export const CANNON_RECATCH_FRAMES = 16;
+/** The barrel only rocks as it travels; the shot ignores it. */
+const CANNON_ROCK = f32(0.12);
+/** A fighter whose position comes this close to the barrel's centre is caught. */
+const CANNON_CATCH_RADIUS = 120.0;
+/** The barrel fires by itself after this long, so nobody waits in it. */
+export const CANNON_HOLD_FRAMES = 150;
+/** The shot leaves this many frames after it begins, its warning to the held fighter. */
+export const CANNON_SHOT_FRAMES = 10;
+/** The rise lasts this many frames, flames on the fighter throughout. */
+export const CANNON_RISE_FRAMES = 45;
+/** The fighter peaks this far above the stage deck, about a full hop. */
+export const CANNON_PEAK_HEIGHT = 240.0;
+/** Frames of tumble after the flames end, so the fighter acts a beat later. */
+export const CANNON_BEAT_FRAMES = 8;
+/** Frames after a shot before a barrel catches the fighter again. */
+export const CANNON_RECATCH_FRAMES = 30;
 
 
 export function cannonX(frame: number): number {
@@ -188,8 +191,8 @@ export function cannonX(frame: number): number {
 }
 
 
-export function cannonAim(frame: number): number {
-  return f32(f32(-cannonX(frame) / CANNON_SWING_HALF_WIDTH) * CANNON_LEAN);
+export function cannonRock(frame: number): number {
+  return f32(f32(-cannonX(frame) / CANNON_SWING_HALF_WIDTH) * CANNON_ROCK);
 }
 
 export const hasCannon = (stage: number): boolean => stage === CANNON_TEST_STAGE;
@@ -200,14 +203,23 @@ export const cannonOn = (stage: number, frame: number): boolean => hasCannon(sta
 export const inStageCannon = (f: Readonly<Fighter>): boolean => f.cannon.held !== undefined;
 
 
+export const cannonRising = (f: Readonly<Fighter>): boolean => f.cannon.firing !== undefined && f.cannon.firing >= CANNON_SHOT_FRAMES;
+
+
+export function cannonRiseZ(stage: number, risen: number): number {
+  const left = f32(1.0 - f32(risen / CANNON_RISE_FRAMES));
+  return f32(CANNON_Z + f32(f32(mainDeckZ(stage) + CANNON_PEAK_HEIGHT - CANNON_Z) * f32(1.0 - f32(left * left))));
+}
+
+
 export function endCannonPass(f: Fighter, stage: number): void {
   if (f.cannon.passing && (f.motion.grounded || f.motion.z > mainDeckZ(stage))) mutableCannon(f).passing = false;
 }
 
-function holdAtCannon(f: Fighter, frame: number): void {
+function holdAt(f: Fighter, x: number, z: number): void {
   const { motion, launch } = f;
-  motion.x = cannonX(frame);
-  motion.z = CANNON_Z;
+  motion.x = x;
+  motion.z = z;
   setWorldMotionValue(motion.meleeX, motion.x);
   setWorldMotionValue(motion.meleeZ, motion.z);
   motion.vx = 0.0;
@@ -242,29 +254,27 @@ function catchFighter(world: Roster, slot: number, frame: number): void {
   cannon.held = 0;
   cannon.firing = undefined;
   cannon.passing = false;
-  holdAtCannon(f, frame);
+  holdAt(f, cannonX(frame), CANNON_Z);
 }
 
 
-function fire(f: Fighter, frame: number): void {
-  holdAtCannon(f, frame);
+function beginRise(f: Fighter): void {
+  mutableCannon(f).passing = true;
+  f.down.state = DownState.tumble;
+  f.down.frame = 0;
+  f.down.direction = 0;
+  f.down.faceUp = true;
+  f.launch.damageLevel = 3;
+}
+
+function release(f: Fighter, stage: number): void {
   const cannon = mutableCannon(f);
   cannon.held = undefined;
   cannon.firing = undefined;
   cannon.cooldown = CANNON_RECATCH_FRAMES;
-  cannon.passing = true;
-  const aim = cannonAim(frame);
-  const knockback = contactKnockback(f.status.damage, 0.0, knockbackWeight(f), 0.0, CANNON_BASE_KNOCKBACK, 1.0);
-  const { launch } = f;
-  launch.hitstun = ordinaryHitstunFrames(knockback);
-  launch.throwHitstun = false;
-  installDamageLaunch(f, knockback, meleeSin(aim), meleeCos(aim), false);
-  if (launch.damageLevel === 3) {
-    f.down.state = DownState.tumble;
-    f.down.frame = 0;
-    f.down.direction = 0;
-    f.down.faceUp = launch.knockbackZ >= 0;
-  }
+  cannon.passing = f.motion.z <= mainDeckZ(stage);
+  clearDownState(f);
+  f.launch.hitstun = CANNON_BEAT_FRAMES;
 }
 
 function canBeCaught(f: Readonly<Fighter>, frame: number): boolean {
@@ -296,9 +306,19 @@ export function advanceStageCannon(world: Roster, stage: number, frame: number, 
     cannon.held = held + 1;
     const input = inputs[slot];
     if (cannon.firing === undefined && (cannon.held >= CANNON_HOLD_FRAMES || input?.attackPressed === true || input?.specialPressed === true)) cannon.firing = 0;
-    if (cannon.firing !== undefined) cannon.firing++;
-    if (cannon.firing !== undefined && cannon.firing >= CANNON_SHOT_FRAMES) fire(f, frame);
-    else holdAtCannon(f, frame);
+    if (cannon.firing === undefined) {
+      holdAt(f, cannonX(frame), CANNON_Z);
+      continue;
+    }
+    cannon.firing++;
+    if (cannon.firing < CANNON_SHOT_FRAMES) {
+      holdAt(f, cannonX(frame), CANNON_Z);
+      continue;
+    }
+    if (cannon.firing === CANNON_SHOT_FRAMES) beginRise(f);
+    const risen = cannon.firing - CANNON_SHOT_FRAMES;
+    holdAt(f, f.motion.x, cannonRiseZ(stage, risen));
+    if (risen >= CANNON_RISE_FRAMES) release(f, stage);
   }
   if (occupied) return;
   for (const slot of PARTICIPANT_SLOTS) {
