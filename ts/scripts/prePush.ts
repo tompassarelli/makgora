@@ -84,6 +84,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
       { name: "stored portraits match their models", directory: "ts", args: ["test", "test/portraitSources.test.ts"], fix: "re-render the listed fighters with bun scripts/fighterPortraits.ts PRIVATE_OUTPUT --only NAME and store the result as fighter-renders (smashcraft:docs/design/fighter-portraits.md).", hosted: false, privateStore: true },
+      { name: "body-fade record names the bodies the clip table plays", directory: "ts", args: ["test", "test/bodyFades.test.ts"], fix: "re-record it with bun scripts/bodyFades.ts --record from ts/ and check that no down action newly fades (smashcraft:docs/commands/animation.md).", hosted: false },
     ] : []),
     ...(cueModels ? [
       { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true, localFix: true },
