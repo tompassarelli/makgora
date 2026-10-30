@@ -69,6 +69,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const fighterArt = changedFighters(paths, derivedStepCode());
   const locomotion = fighterArt.includes("illidan") || paths.some((path) => LOCOMOTION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   return [
+    ...(ts ? [{ name: "balance baseline holds the kit", directory: "ts", args: ["test", "test/balanceBaseline.test.ts"], fix: "keep the listed values inside the fixed bounds, or for an intended kit change re-freeze with bun scripts/balanceFreeze.ts from ts/ and name the change in the commit (smashcraft:docs/design/balance.md).", hosted: false }] : []),
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true, readsOnly: true }] : []),
     ...(ts ? [
       { name: "kind tags, parity ledger and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; for a ledger row, regenerate docs/design/melee-parity.md with bun wisp ledger or give the named row the status it now needs (docs/design/melee-parity-plan.md, \"Ledger\"); fix each type error.", hosted: true },
