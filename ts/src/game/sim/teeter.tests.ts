@@ -63,19 +63,22 @@ function holdsAtEdge(run: Run, frames: number): boolean {
   return true;
 }
 
-test("Teeter: a landing sliding to an edge with the stick neutral stops there and teeters in either facing, its lag ended, whether the lag is still running or already over [k1 scenario]", () => {
+test("Teeter: a landing slide whose lag is over when it reaches the edge teeters in either facing, and one still in lag slides off [k1 scenario]", () => {
   for (const facing of [1, -1]) {
-    for (const gap of [WAVELAND_IN_LAG, WAVELAND_TEETERS]) {
-      const run = waveland(gap, facing);
-      const edge = untilEdge(run, () => controls());
-      assertTrue(edge.teetered);
-      assertEquals(run.f.facing, facing);
-      assertEquals(edge.lag > 0, gap === WAVELAND_IN_LAG);
-      assertEquals(run.f.landing.lag, 0);
-      assertEquals(run.f.motion.vx, 0.0);
-      assertEquals(groundState(run.f), GroundState.stand);
-      assertTrue(holdsAtEdge(run, 30));
-    }
+    const late = waveland(WAVELAND_TEETERS, facing);
+    const edge = untilEdge(late, () => controls());
+    assertTrue(edge.teetered);
+    assertEquals(late.f.facing, facing);
+    assertEquals(edge.lag, 0);
+    assertEquals(late.f.landing.lag, 0);
+    assertEquals(late.f.motion.vx, 0.0);
+    assertEquals(groundState(late.f), GroundState.stand);
+    assertTrue(holdsAtEdge(late, 30));
+    const early = waveland(WAVELAND_IN_LAG, facing);
+    const off = untilEdge(early, () => controls());
+    assertFalse(off.teetered);
+    assertGreaterThan(off.lag, 0);
+    assertEquals(early.f.motion.surface, undefined);
   }
 });
 

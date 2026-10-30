@@ -181,6 +181,17 @@ function ledgeCandidate(f: Fighter, stage: number, input: Readonly<Controls>): n
   return below > box.lowest && belowBefore < box.highest ? side : 0;
 }
 
+export function wavedashLedgeSide(f: Readonly<Fighter>, stage: number, input: Readonly<Controls>): number {
+  const { motion } = f;
+  if (!motion.grounded || motion.surface !== 0 || !f.landing.wavedash || f.landing.lag <= 0 || input.down || f.launch.hitstun > 0 || f.status.out) return 0;
+  const side = motion.x > mainDeckRight(stage) ? 1 : motion.x < mainDeckLeft(stage) ? -1 : 0;
+  return side !== 0 && f.facing === -side ? side : 0;
+}
+
+export function catchWavedashLedge(world: Roster, slot: number, stage: number, side: number): boolean {
+  return side !== 0 && snapToLedge(world, slot, stage, side);
+}
+
 function ledgeDistance(f: Fighter, stage: number, side: number): number {
   const dx = f32(f.motion.x - ledgeX(stage, side));
   const dz = f32(f.motion.z - mainDeckZ(stage));

@@ -50,7 +50,7 @@ import { hopHeroStatus } from "./hexHop";
 import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpCancel } from "./specials";
 import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
-import { advanceLedge } from "./ledge";
+import { advanceLedge, catchWavedashLedge, wavedashLedgeSide } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
 import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, isSmashAttack, smashChargeFrame } from "./moves";
 import {
@@ -346,6 +346,19 @@ function slideOffEdge(f: Fighter): void {
   if (f.attack.style !== undefined) cancelAttack(f);
 }
 
+function leaveSurface(f: Fighter, world: Roster, slot: number, stage: number, input: Readonly<Controls>): void {
+  const { motion, jump } = f;
+  const catchSide = wavedashLedgeSide(f, stage, input);
+  if (motion.grounded) {
+    jump.remaining = min(jump.remaining, aerialJumps(f));
+    slideOffEdge(f);
+  }
+  motion.grounded = false;
+  motion.surface = undefined;
+  clearDash(f);
+  catchWavedashLedge(world, slot, stage, catchSide);
+}
+
 function moveHorizontally(f: Fighter, stage: number, matchFrame: number, dashEntryDisplacementAdjustment: number): void {
   const { motion, launch, shield, dodge } = f;
   if (isGroundDodging(f) && dodge.groundDirection !== 0) {
@@ -449,7 +462,7 @@ export function tickRecoveryClocks(f: Fighter): void {
 }
 
 export function moveAlongSurface(f: Fighter, stage: number, matchFrame: number, horizontalStick: number, dashEntry: number, canSteer: boolean, wantsShield: boolean, groundTakeoff: boolean): void {
-  const teeters = (canSteer || f.landing.lag > 0) && !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f);
+  const teeters = canSteer && !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f);
   const pushedOnShield = shieldPressed(f);
   const grabHolds = grabHoldsEdge(f);
   moveHorizontally(f, stage, matchFrame, dashEntry);
@@ -459,7 +472,7 @@ export function moveAlongSurface(f: Fighter, stage: number, matchFrame: number, 
 }
 
 export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, stage: number, matchFrame: number, input: Readonly<Controls>, oldX: number, oldZ: number, carried: number | undefined, horizontalStick: number): void {
-  const { motion, jump } = f;
+  const { motion } = f;
   if (!isGroundDodging(f)) moveMeleeX(f, windPush(stage, matchFrame, motion.x, motion.z));
   moveMeleeX(f, tauntPull(world, slot));
   const frameDeltaX = f32(motion.x - oldX);
@@ -476,13 +489,7 @@ export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, st
   } else if (!ascending && !contact) {
     const bodySide = leaveMainDeckBody(f, stage);
     if (wallSide === 0 && f32(bodySide * frameDeltaX) > 0) wallSide = bodySide;
-    if (motion.grounded) {
-      jump.remaining = min(jump.remaining, aerialJumps(f));
-      slideOffEdge(f);
-    }
-    motion.grounded = false;
-    motion.surface = undefined;
-    clearDash(f);
+    leaveSurface(f, world, slot, stage, input);
   }
   if (motion.grounded) {
     f.surfaceRecovery.wallJumpsUsed = 0;

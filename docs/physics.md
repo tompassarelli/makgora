@@ -830,6 +830,23 @@ diagonal motion, fast swept platform contact, sliding, and the exact recovery
 boundary. Numerical speed, decay, motion duration and native feel remain
 separate calibration work.
 
+### Landing slides leave the edge
+
+A wavedash or waveland slide, and every other landing slide, carries a fighter
+over the edge of the surface it is sliding along; only a fighter free to act
+teeters (walking or running to an edge, or letting a slide run out first). Melee's rule, from
+public sources: [Edge cancel](https://www.ssbwiki.com/Edge_cancel) says ledge-canceling
+"involves players sliding off a ledge either during landing lag or during a special move to cancel the animation" and
+that it "can be performed with any landing"; [Wavedash](https://www.ssbwiki.com/Wavedash)
+says "should the player fall off the stage with the wavedash, they will immediately grab onto the ledge" and that "a backwards wavedash towards the edge will topple the combatant over the side of the stage".
+Smashcraft's ledge catch needs the fighter facing away from the ledge, and a wavedash's speed (about 12 units a
+frame) would carry him past the catch box before he dropped into it, so a wavedash
+backward off the main deck snaps to the ledge on the frame it leaves the deck (unless down is held) and a forward one falls. A platform has no ledge,
+so a slide off its end is a plain fall with the air options. Before 2026-10-30 landing lag stopped the slide at
+the edge in a teeter; Tom asked on that date for the Melee behavior, first for the main
+deck's ledge and then for platforms (`teeters` in smashcraft:ts/src/game/sim/step.ts,
+smashcraft:ts/src/game/sim/edgeSlide.tests.ts).
+
 ### What the wavedash landing flows into
 
 The wavedash landing flows into a dash or a walk depending on whether the stick made a fresh
