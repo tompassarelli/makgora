@@ -30,6 +30,14 @@ is a corpus recording (`ts/test/corpus/STAMP/{a,b}`) whose `session.json` adds
 command fails when a presentation has none. Without recordings, the same pad
 plays to identical digests under `native` and `pool-predicted` (1100 frames).
 
+Record the native side on a LAN pair with the driver maps `bun wisp map build
+--profile native-driver` (presentation `native`) and `--profile
+native-driver-predicted` (`pool-predicted`): `lan fresh MAP --pair K --turn-ms 60`,
+send the pad to both clients' data directories with `bun scripts/showcase.ts
+send DIR "$(cat PAD)"`, `resume 1100`, then `reset` once both clients pause at
+frame 1100, which writes each client's `smashcraft-replay-N.txt` manifest and
+parts to copy into the recording's `a` and `b` folders.
+
 `bun wisp play --standalone --four-fighters --frames 7200 --out DIR` is
 wisp#48's frame-rate measurement. It runs one game copy, as live play does:
 Illidan on the bot beat's keys against computer Rifleman, Illidan and Warden,

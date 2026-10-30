@@ -38,6 +38,7 @@ export const bundleConfigs = {
   "soak-integrity": { entry: "src/host/entries/soakIntegrityMain.ts", bundle: "soak-integrity.lua" },
   "native-input": { entry: "src/host/entries/nativeInputMain.ts", bundle: "native-input.lua" },
   "native-driver": { entry: "src/host/entries/nativeDriverMain.ts", bundle: "native-driver.lua" },
+  "native-driver-predicted": { entry: "src/host/entries/nativeDriverPredictedMain.ts", bundle: "native-driver-predicted.lua" },
   "native-capture": { entry: "src/host/entries/nativeCaptureMain.ts", bundle: "native-capture.lua" },
   "voice-check": { entry: "src/host/entries/voiceCheckMain.ts", bundle: "voice-check.lua" },
   trailer: { entry: "src/host/entries/trailerMain.ts", bundle: "trailer.lua" },
