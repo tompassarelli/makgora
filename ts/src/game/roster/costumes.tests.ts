@@ -1,7 +1,9 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { copyMatchState, costumeFor, createMatchState, cycleCostume, selectCharacter } from "../lobby/lobbyState";
-import { Character } from "../sim/codes";
-import { bodyCostume, bodyVariants, costumeClipModel, costumesFor } from "./costumes";
+import { Character, DuoRole } from "../sim/codes";
+import { bodyCostume, bodyVariants, costumeClipModel, costumesFor, partnerLook } from "./costumes";
+import { f32 } from "wisp/src/sim/f32";
+import { PARTNER_COSTUME } from "../presentation/model/costume";
 import { fighterPortrait } from "./looks";
 import { PORTRAIT_KINDS } from "./kits";
 import { PARTICIPANT_SLOTS } from "../input/participants";
@@ -62,4 +64,17 @@ test("Grom's default costume is Fel: costume 0 draws the fel body, KO body and f
     assertEquals(fighterPortrait(Character.grom, kind, slot, 0), `war3mapImported\\Fighter${kind}GromHellscreamFel${suffix}.blp`);
     assertEquals(fighterPortrait(Character.grom, kind, slot, 1), `war3mapImported\\Fighter${kind}GromHellscream${suffix}.blp`);
   }
+});
+
+test("Murloc's partner look draws Grgl on his own timeline body at 0.9 scale, the leader on the shared one, and the KO pool holds both [k2 property]", () => {
+  const clip = originalClip(Character.murloc, 0);
+  const partner = partnerLook(Character.murloc, DuoRole.partner);
+  if (clip === undefined || partner === undefined) throw new Error("Murloc needs a timeline clip and a partner look");
+  const body = costumeBody(Character.murloc, PARTNER_COSTUME);
+  if (body === undefined) throw new Error("Murloc's partner look has no generated body");
+  assertEquals(costumeClipModel(Character.murloc, PARTNER_COSTUME, clip), body);
+  assertEquals(costumeClipModel(Character.murloc, 0, clip), clip.modelPath);
+  assertEquals(partner.scale, f32(0.9));
+  assertEquals(partnerLook(Character.murloc, DuoRole.leader), undefined);
+  assertEquals(bodyVariants([Character.murloc]).map(variant => variant.costume).join(","), `0,${PARTNER_COSTUME}`);
 });

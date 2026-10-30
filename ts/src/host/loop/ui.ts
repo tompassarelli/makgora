@@ -19,7 +19,10 @@ import type { ModelSoundSink } from "../../game/render/modelSounds";
 import { ProjectilePresentation } from "../../game/render/projectilePresentation";
 import { ShieldPresentation } from "../../game/render/shieldPresentation";
 import { SpecialEffects } from "../../game/render/specialEffects";
-import { Character } from "../../game/sim/codes";
+import { Character, type DuoRole } from "../../game/sim/codes";
+import { partnerLook } from "../../game/roster/costumes";
+import { PARTNER_COSTUME } from "../../game/presentation/model/costume";
+import { characterModelScale } from "../../game/presentation/modelScale";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
 import { sourceVersion } from "../../game/shell/sourceVersion";
@@ -176,7 +179,12 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     elements: new ElementEffects(s.origin),
     classic: new ClassicPresentation(s.origin),
   };
-  combat.costumeOf = (slot) => (isParticipantSlot(slot) ? costumeFor(s.game, slot) : 0);
+  combat.costumeOf = (slot) => {
+    if (!isParticipantSlot(slot)) return 0;
+    if (!isActive(s.world, slot)) return costumeFor(s.game, slot);
+    const fighter = fighterAt(s.world, slot);
+    return partnerLook(fighter.character, fighter.duo.role) === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME;
+  };
   s.ui = ui;
   return ui;
 }
@@ -219,10 +227,11 @@ function opponentCharacters(s: ShellState, slot: ParticipantSlot): Character[] {
   return characters;
 }
 
-export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, character: Character, pooled: boolean): boolean {
+export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, character: Character, role: DuoRole, pooled: boolean): boolean {
   const ui = views(s);
   endFighterRenderers(ui.fighters[slot]);
-  const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin, costumeFor(s.game, slot)) : undefined;
+  const partner = partnerLook(character, role);
+  const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin, partner === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME, f32(characterModelScale(character) * (partner?.scale ?? 1.0))) : undefined;
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
   const orbit = fighterOrbit(character), flight = fighterFlight(character);

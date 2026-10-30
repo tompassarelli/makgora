@@ -1,6 +1,8 @@
 export type { CostumeTint } from "../presentation/model/costume";
-import { type Costume, DEFAULT_COSTUMES, DEFAULT_COSTUME, MAX_COSTUMES } from "../presentation/model/costume";
+import { type Costume, DEFAULT_COSTUMES, DEFAULT_COSTUME, MAX_COSTUMES, PARTNER_COSTUME } from "../presentation/model/costume";
 import { heroLook } from "./looks";
+import { DuoRole } from "../sim/codes";
+import type { PartnerLook } from "../presentation/model/look";
 import { costumeBody } from "../../generated/costumes/costumeBodies";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 
@@ -21,6 +23,10 @@ export function costumeIndex(character: number, index: number): number {
   return index >= 0 && index < MAX_COSTUMES && index < authoredCostumes(character).length ? index : 0;
 }
 
+export function partnerLook(character: number, role: DuoRole): PartnerLook | undefined {
+  return role === DuoRole.partner ? heroLook(character)?.partner : undefined;
+}
+
 export function costumeClipModel(character: number, costume: number, clip: Readonly<FighterOriginalClip>): string {
   return clip.timeline === true ? costumeBody(character, costume) ?? clip.modelPath : clip.modelPath;
 }
@@ -37,5 +43,8 @@ export function bodyCostume(character: number, costume: number): number {
 }
 
 export function bodyVariants(characters: readonly number[]): readonly BodyVariant[] {
-  return characters.flatMap((character) => costumesFor(character).flatMap((_, costume) => (bodyCostume(character, costume) === costume ? [{ character, costume }] : [])));
+  return characters.flatMap((character) => [
+    ...costumesFor(character).flatMap((_, costume) => (bodyCostume(character, costume) === costume ? [{ character, costume }] : [])),
+    ...heroLook(character)?.partner === undefined ? [] : [{ character, costume: PARTNER_COSTUME }],
+  ]);
 }

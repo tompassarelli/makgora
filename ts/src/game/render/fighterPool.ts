@@ -20,7 +20,6 @@ import { type WorldOrigin, FIGHTER_PHASE_ALPHA, facingYaw, hideEffect, placeEffe
 import { damageTint } from "../presentation/hitPresentation";
 import { specialCueState } from "../presentation/specialCues";
 import { fighterModelReplaced } from "../presentation/fighterForm";
-import { characterModelScale } from "../presentation/modelScale";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
 import { costumeClipModel } from "../roster/costumes";
@@ -54,9 +53,10 @@ export class FighterPoolPresentation {
     participant: number,
     private readonly origin: WorldOrigin,
     costume: number,
+    scale: number,
   ) {
     const { x, y, z } = origin;
-    this.scale = characterModelScale(character);
+    this.scale = scale;
     const lightPath = originalLightPath(character);
     if (lightPath !== undefined) {
       const light = AddSpecialEffect(lightPath, x, y);

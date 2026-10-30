@@ -93,7 +93,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
     const participant = s.participants[slot];
     const fighter = fighterAt(s.world, slot);
     if (participant.body !== undefined) colorFighterBody(participant.body, slot, fighterColor(s.game, slot));
-    participant.pooled = beginFighterRenderers(s, slot, fighter.character, pooled);
+    participant.pooled = beginFighterRenderers(s, slot, fighter.character, fighter.duo.role, pooled);
 
     if (!participant.pooled) continue;
     if (participant.body !== undefined) {

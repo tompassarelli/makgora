@@ -45,6 +45,8 @@ import { WHITE_MODEL_FACTS } from "../../src/generated/assets/whiteModelFacts";
 import { WHITE_FIGHTER_MODELS } from "../../src/generated/assets/whiteFighterModels";
 import { STAGE_SKIES, stageSkyTexture } from "../stageSky";
 import { heroLook } from "../../src/game/roster/looks";
+import { costumeBody } from "../../src/generated/costumes/costumeBodies";
+import { PARTNER_COSTUME } from "../../src/game/presentation/model/costume";
 
 const FRAMES_PER_SECOND = 60;
 const seconds = (value: number) => value * FRAMES_PER_SECOND;
@@ -54,6 +56,7 @@ const range = (count: number) => Array.from({ length: count }, (_, index) => ind
 
 const fighterModels = CHARACTERS.flatMap((character) => [
   ...range(originalClipCount(character)).flatMap((index) => originalClip(character, index)?.modelPath ?? []),
+  ...range(PARTNER_COSTUME + 1).flatMap((costume) => costumeBody(character, costume) ?? []),
   ...[originalLightPath(character) ?? []].flat(),
 ]);
 
