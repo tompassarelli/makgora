@@ -6,7 +6,6 @@ import { ButtonClicks, createBackdrop, placeTopLeft } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { CREDITS_BOX } from "./selectionLayout";
-import { bindPrototype } from "../../platform/rebind";
 
 const CLOSE_BOX = { x: f32(0.32), y: f32(0.115), width: f32(0.16), height: f32(0.035) } as const;
 
@@ -33,7 +32,6 @@ export class CreditsMenu {
   }
 
   bindActions(): void {
-    bindPrototype(this.clicks, ButtonClicks.prototype);
     this.clicks.bindHandler((target, clicker) => this.click(target, clicker));
   }
 

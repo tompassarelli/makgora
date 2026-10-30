@@ -58,6 +58,7 @@ import { type LoreClears, loreClears } from "../classic/loreClears";
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
+import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
@@ -537,7 +538,8 @@ export class SelectionPanel {
   // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean): void {
     const drawn = pointed && this.menuCursorAllowed;
-    const hover = this.drag.hover ?? (drawn && this.overControl(x, y) ? 0 : undefined);
+    const over = overAny(x, y, [this.clicks, this.credits, this.community, this.controlHit]);
+    const hover = this.drag.hover ?? (drawn && over ? 0 : undefined);
     const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
     this.localPanel = panel;
     this.localHand = hand === undefined ? HIDDEN_HAND : { state: hand, chip: hand === "pinch" ? carried : undefined, x, y };
@@ -547,12 +549,6 @@ export class SelectionPanel {
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
     if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
     this.cursorEnabled = stock;
-  }
-
-  // Every list is asked whatever the pointer, so two clients make the same native calls.
-  private overControl(x: number, y: number): boolean {
-    const own = this.clicks.over(x, y), credits = this.credits.over(x, y), community = this.community.over(x, y), shared = this.controlHit.over(x, y);
-    return own || credits || community || shared;
   }
 
   private trackGameMenu(open: boolean): void {
@@ -654,7 +650,7 @@ export class SelectionPanel {
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
     if (pointed) this.dragChips(game, x, y);
     const carried = this.showCards(game, sessionWins, x, y);
-    const infoOpen = this.tutorialOpen || this.credits.opened() || this.community.opened();
+    const infoOpen = anyOpen(this.tutorialOpen, this.credits.opened(), this.community.opened());
     this.showHand(pointed, infoOpen ? undefined : carried, x, y, infoOpen);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
