@@ -337,7 +337,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   const stateRate = illidan ? selectIllidanAction(pose, f, charging) : selectTableAction(pose, f, table, charging);
   if (stateRate !== undefined) return stateRate;
   if (pose.jumpAnimationRemaining > 0) {
-    playIndex(pose, "jump", clips.clipFor(character, jumpPose(pose, f)).index);
+    playIndex(pose, "jump", clips.clipFor(character, jumpPose(pose.doubleJumpAnimation, f)).index);
     return rate;
   }
 
@@ -605,7 +605,7 @@ function actionRate(pose: Readonly<FighterPose>, f: Readonly<Fighter>, phase: At
   if (pose.jumpAnimationRemaining > 0) {
     return pose.doubleJumpAnimation
       ? clipRate(clips.clipFor(character, "doubleJump").seconds, DOUBLE_JUMP_CLIP_FRAMES)
-      : clipRate(clips.clipFor(character, jumpPose(pose, f)).seconds, hopClipFrames(f));
+      : clipRate(clips.clipFor(character, jumpPose(pose.doubleJumpAnimation, f)).seconds, hopClipFrames(f));
   }
   return attackRate(f, phase);
 }

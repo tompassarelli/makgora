@@ -244,7 +244,7 @@ const score: Command = (args) => Effect.gen(function*() {
   }
 
   const hops = (yield* Effect.forEach(fighters, (character) => attempt(`hops ${fighterSlug(character)}`, async () => hopRows(await loadBody(assets, character), character)))).flat();
-  for (const line of hopReport(hops, yield* movementTable("hop", HOP_TABLE_HEADER, hops.map(hopTableLine)))) yield* Console.log(line);
+  yield* Console.log(hopReport(hops, yield* movementTable("hop", HOP_TABLE_HEADER, hops.map(hopTableLine))).join("\n"));
 }).pipe(Effect.provide(BunServices.layer));
 
 
