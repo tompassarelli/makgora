@@ -42,7 +42,9 @@ normals and body box and live in `bun wisp ledger`.
 ## The visual rule
 
 **Every special is fire; every normal is arcane.** Normals are drawn with the
-three violet spheres that orbit him; specials are red and gold Warcraft fire.
+three spheres that orbit him, his stock green Blood Elf orbs (Tom chose these
+again on 2026-10-30 over a violet Void Walker missile); specials are red and
+gold Warcraft fire.
 "On fire" means "hits a banished fighter", so both players can read the
 Banish duel from colour alone, at match size.
 

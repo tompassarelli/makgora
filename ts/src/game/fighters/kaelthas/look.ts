@@ -8,7 +8,7 @@ export const kaelthasLook: HeroLook = {
   portrait: "ReplaceableTextures\\CommandButtons\\BTNHeroBloodElfPrince.blp",
   clips: KAELTHAS_CLIPS, damageClips: KAELTHAS_DAMAGE_CLIPS, fallback: KAELTHAS_FALLBACK, defeat: "death",
   cueReadNormals: [AttackStyle.dashAttack],
-  orbit: { model: "Abilities\\Weapons\\VoidWalkerMissile\\VoidWalkerMissile.mdx", count: 3, radius: 48.0, z: 78.0, periodFrames: 96, scale: f32(1.05) },
+  orbit: { model: "units\\human\\HeroBloodElf\\BloodElfBall.mdx", count: 3, radius: 48.0, z: 78.0, periodFrames: 96, scale: f32(1.4) },
   flight: {
     flames: "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", flamesScale: f32(0.7), flamesZ: 40.0,
     egg: "units\\human\\Phoenix\\PhoenixEgg.mdx", eggScale: f32(1.3),
