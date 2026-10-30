@@ -13,7 +13,10 @@ spindle, legs straight and together with the toes pointed and both arms raised c
 trails above, leaned back 30 degrees about the pelvis so the feet lead down and forward, and turned once about that
 long axis through the strike; it holds through the active frames, then unwinds to the aerial ready pose.
 
-  blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER [--stomp]
+`--splits` reads leg-sweeps/FIGHTER-splits.json instead and bakes a down smash from a `--pose downSmash` rig (#518): from a crouch the
+body drops to the floor with the kicking leg driven out in front and the planted leg out behind it on the same frames, then rises to ready.
+
+  blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER [--stomp|--splits]
 """
 import json
 import sys
@@ -179,7 +182,12 @@ def pose(p, lifts=None):
     reach(plant, planted, BODY.matrix.to_quaternion() @ BODY_REST @ POLE[plant] + Vector((p.get('plantKnee', 0), 0, 0)))
     fx, fy, fz = p.get('foot', (ANKLE[kick].x, 0, ANKLE[kick].z - FLOOR))
     reach(kick, Vector((fx, ANKLE[kick].y + fy * SIDE, FLOOR + fz)), BODY.matrix.to_quaternion() @ BODY_REST @ POLE[kick] + Vector((0, 0, p.get('knee', 0))))
+    for side, key in ((kick, 'shin'), (plant, 'plantShin')):
+        shin = joint(f'knee.{side}')
+        axis = (joint(f'ankle.{side}').head - shin.head).normalized()
+        turn(shin, Quaternion(axis, radians(p.get(key, 0))), shin.head.copy())
     turn(joint(f'ankle.{kick}'), Quaternion(PITCH, radians(p.get('toe', 0))))
+    turn(joint(f'ankle.{plant}'), Quaternion(PITCH, radians(p.get('plantToe', 0))))
     for side, key in ((kick, 'kickArm'), (plant, 'plantArm')):
         turn(joint(f'shoulder.{side}'), Quaternion(PITCH, radians(p.get(key, 0))))
         turn(joint(f'elbow.{side}'), Quaternion(PITCH, radians(p.get(key + 'Elbow', 0))))
@@ -238,7 +246,7 @@ def smoothed(searched):
 
 
 READY = {}
-OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}.json')).read())
+OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}{"-splits" if "--splits" in sys.argv else ""}.json')).read())
 BEATS = OWN['beats']
 MARGIN = OWN.get('margin', 0)
 MARGIN_DROP = 10

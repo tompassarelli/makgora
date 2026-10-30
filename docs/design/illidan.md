@@ -336,7 +336,13 @@ burn on contact (a fire hit), so the move still reads as Illidan's.
   6-10, interruptible from 46, charge between frames 2 and 3.
 - Both legs hit on the same frames: 13% at 25° away from him on each side,
   the shared down smash knockback. One capsule per leg from 12 to 92 out,
-  12 high, radius 13 (`ILLIDAN_MOVES` in `ts/src/game/sim/originalMoves.ts`).
+  21 high, radius 22 (`ILLIDAN_MOVES` in `ts/src/game/sim/originalMoves.ts`).
+  The capsule was 12 high with radius 13 until the clip was re-baked as the
+  splits (`tools/animations/leg-sweeps/illidan-splits.json`, `leg-sweep.py
+  --splits`): his drawn lower leg lies on the floor with the knee about 43
+  units up, and at 12/13 only 70% of it sat inside the capsule, 88% at 16/19.
+  The widening is a balance change; the farm balance pass is still to run
+  before this lands.
 
 Counterplay: the hitboxes sit at the floor, so a full jump or anything airborne
 above his knees clears it, and he has 35 frames of recovery after the kick for

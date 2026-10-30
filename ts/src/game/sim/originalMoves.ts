@@ -98,7 +98,7 @@ export const ILLIDAN_MOVES: FighterMoves = {
     },
     [AttackStyle.forwardSmash]: { ...heroMove(ROUNDHOUSE_FIRST_ACTIVE, ROUNDHOUSE_LEG.length, ROUNDHOUSE_RECOVERY, 0, roundhouseRegions(), ROUNDHOUSE_STEP, true), travelStopsAtLedge: true },
     [AttackStyle.downSmash]: splitsMove({
-      firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 12.0, reach: 92.0, height: 12.0, radius: 13.0,
+      firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 12.0, reach: 92.0, height: 21.0, radius: 22.0,
       front: FEL_KICK(false), back: FEL_KICK(true),
     }),
   },
