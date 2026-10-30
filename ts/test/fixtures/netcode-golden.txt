@@ -1,0 +1,797 @@
+scenario in-order seed=11 delay=2 window=7 mask=3 local=0
+c3 rollback from=3 depth=7
+c4 rollback from=4 depth=5
+c6 rollback from=6 depth=7
+c8 rollback from=8 depth=7
+c10 rollback from=10 depth=7
+c12 rollback from=12 depth=7
+c14 rollback from=14 depth=7
+c16 rollback from=16 depth=7
+c18 rollback from=18 depth=7
+c20 rollback from=20 depth=7
+c22 rollback from=22 depth=7
+c24 rollback from=24 depth=7
+c25 K=25 spec=33 conf=26 confirmed=25 sum=424660 awaited=3 remote=25 packets=46
+c26 rollback from=26 depth=7
+c28 rollback from=28 depth=7
+c30 rollback from=30 depth=7
+c32 rollback from=32 depth=7
+c34 rollback from=34 depth=7
+c36 rollback from=36 depth=7
+c38 rollback from=38 depth=7
+c40 rollback from=40 depth=7
+c42 rollback from=42 depth=7
+c44 rollback from=44 depth=7
+c46 rollback from=46 depth=7
+c48 rollback from=48 depth=7
+c50 rollback from=50 depth=7
+c50 K=50 spec=56 conf=51 confirmed=50 sum=735053 awaited=3 remote=50 packets=96
+c52 rollback from=52 depth=7
+c54 rollback from=54 depth=7
+c56 rollback from=56 depth=7
+c58 rollback from=58 depth=7
+c60 rollback from=60 depth=7
+c62 rollback from=62 depth=7
+c64 rollback from=64 depth=7
+c66 rollback from=66 depth=7
+c68 rollback from=68 depth=7
+c70 rollback from=70 depth=7
+c72 rollback from=72 depth=7
+c74 rollback from=74 depth=7
+c75 K=75 spec=83 conf=76 confirmed=75 sum=226225 awaited=3 remote=75 packets=146
+c76 rollback from=76 depth=7
+c78 rollback from=78 depth=7
+c80 rollback from=80 depth=7
+c82 rollback from=82 depth=7
+c84 rollback from=84 depth=7
+c86 rollback from=86 depth=7
+c88 rollback from=88 depth=7
+c90 rollback from=90 depth=7
+c92 rollback from=92 depth=7
+c94 rollback from=94 depth=7
+c96 rollback from=96 depth=7
+c98 rollback from=98 depth=7
+c100 rollback from=100 depth=7
+c100 K=100 spec=106 conf=101 confirmed=100 sum=412997 awaited=3 remote=100 packets=196
+c102 rollback from=102 depth=7
+c104 rollback from=104 depth=7
+c106 rollback from=106 depth=7
+c108 rollback from=108 depth=7
+c110 rollback from=110 depth=7
+c112 rollback from=112 depth=7
+c114 rollback from=114 depth=7
+c116 rollback from=116 depth=7
+c118 rollback from=118 depth=7
+c120 rollback from=120 depth=7
+c122 rollback from=122 depth=7
+c124 rollback from=124 depth=7
+c125 K=125 spec=133 conf=126 confirmed=125 sum=598675 awaited=3 remote=125 packets=246
+c126 rollback from=126 depth=7
+c128 rollback from=128 depth=7
+c130 rollback from=130 depth=7
+c132 rollback from=132 depth=7
+c134 rollback from=134 depth=7
+c136 rollback from=136 depth=7
+c138 rollback from=138 depth=7
+c140 rollback from=140 depth=7
+c142 rollback from=142 depth=7
+c144 rollback from=144 depth=7
+c146 rollback from=146 depth=7
+c148 rollback from=148 depth=7
+c150 rollback from=150 depth=7
+c150 K=150 spec=156 conf=151 confirmed=150 sum=12501 awaited=3 remote=150 packets=296
+c152 rollback from=152 depth=7
+c154 rollback from=154 depth=7
+c156 rollback from=156 depth=7
+c158 rollback from=158 depth=7
+c160 rollback from=160 depth=7
+c162 rollback from=162 depth=7
+c164 rollback from=164 depth=7
+c166 rollback from=166 depth=7
+c168 rollback from=168 depth=7
+c170 rollback from=170 depth=7
+c172 rollback from=172 depth=7
+c174 rollback from=174 depth=7
+c175 K=175 spec=183 conf=176 confirmed=175 sum=612374 awaited=3 remote=175 packets=346
+c176 rollback from=176 depth=7
+c178 rollback from=178 depth=7
+c180 rollback from=180 depth=7
+c182 rollback from=182 depth=7
+c184 rollback from=184 depth=7
+c186 rollback from=186 depth=7
+c188 rollback from=188 depth=7
+c190 rollback from=190 depth=7
+c192 rollback from=192 depth=7
+c194 rollback from=194 depth=7
+c196 rollback from=196 depth=7
+c198 rollback from=198 depth=7
+c200 rollback from=200 depth=7
+c200 K=200 spec=206 conf=201 confirmed=200 sum=284417 awaited=3 remote=200 packets=396
+c202 rollback from=202 depth=7
+c204 rollback from=204 depth=7
+c206 rollback from=206 depth=7
+c208 rollback from=208 depth=7
+c210 rollback from=210 depth=7
+c212 rollback from=212 depth=7
+c214 rollback from=214 depth=7
+c216 rollback from=216 depth=7
+c218 rollback from=218 depth=7
+c220 rollback from=220 depth=7
+c222 rollback from=222 depth=7
+c224 rollback from=224 depth=7
+c225 K=225 spec=233 conf=226 confirmed=225 sum=700424 awaited=3 remote=225 packets=446
+c226 rollback from=226 depth=7
+c228 rollback from=228 depth=7
+c230 rollback from=230 depth=7
+c232 rollback from=232 depth=7
+c234 rollback from=234 depth=7
+c236 rollback from=236 depth=7
+c238 rollback from=238 depth=7
+c240 rollback from=240 depth=7
+c242 rollback from=242 depth=7
+c244 rollback from=244 depth=7
+c246 rollback from=246 depth=7
+c248 rollback from=248 depth=7
+c250 rollback from=250 depth=7
+c250 K=250 spec=256 conf=251 confirmed=250 sum=144877 awaited=3 remote=250 packets=496
+c252 rollback from=252 depth=7
+c254 rollback from=254 depth=7
+c256 rollback from=256 depth=7
+c258 rollback from=258 depth=7
+c260 rollback from=260 depth=7
+c262 rollback from=262 depth=7
+c264 rollback from=264 depth=7
+c266 rollback from=266 depth=7
+c268 rollback from=268 depth=7
+c270 rollback from=270 depth=7
+c272 rollback from=272 depth=7
+c274 rollback from=274 depth=7
+c275 K=275 spec=283 conf=276 confirmed=275 sum=382882 awaited=3 remote=275 packets=546
+c276 rollback from=276 depth=7
+c278 rollback from=278 depth=7
+c280 rollback from=280 depth=7
+c282 rollback from=282 depth=7
+c284 rollback from=284 depth=7
+c286 rollback from=286 depth=7
+c288 rollback from=288 depth=7
+c290 rollback from=290 depth=7
+c292 rollback from=292 depth=7
+c294 rollback from=294 depth=7
+c296 rollback from=296 depth=7
+c298 rollback from=298 depth=7
+c300 rollback from=300 depth=7
+c300 K=300 spec=306 conf=301 confirmed=300 sum=365270 awaited=3 remote=300 packets=596
+receipts accepted=596
+captures local:0=307 local:1=1195
+rollbacks=150 deepest=7 firstLate=3 held=149 futureHeld=0 firstHold=2 limit=24
+scenario late-and-reordered seed=23 delay=3 window=7 mask=7 local=1
+c11 rollback from=4 depth=7
+c18 rollback from=10 depth=1
+c19 rollback from=9 depth=2
+c22 rollback from=4 depth=7
+c23 rollback from=8 depth=2
+c25 rollback from=12 depth=3
+c25 K=8 spec=16 conf=9 confirmed=8 sum=520923 awaited=4 remote=8 packets=36
+c31 rollback from=9 depth=7
+c35 rollback from=15 depth=7
+c39 rollback from=25 depth=2
+c40 rollback from=24 depth=3
+c41 rollback from=21 depth=6
+c44 rollback from=27 depth=7
+c50 K=35 spec=43 conf=36 confirmed=35 sum=242480 awaited=4 remote=35 packets=114
+c51 rollback from=39 depth=4
+c52 rollback from=36 depth=7
+c54 rollback from=44 depth=1
+c57 rollback from=42 depth=3
+c58 rollback from=46 depth=2
+c59 rollback from=45 depth=5
+c60 rollback from=48 depth=2
+c68 rollback from=48 depth=7
+c72 rollback from=60 depth=3
+c73 rollback from=57 depth=7
+c75 rollback from=60 depth=6
+c75 K=58 spec=66 conf=59 confirmed=58 sum=944150 awaited=4 remote=58 packets=198
+c77 rollback from=63 depth=3
+c82 rollback from=68 depth=4
+c87 rollback from=69 depth=7
+c88 rollback from=72 depth=3
+c89 rollback from=77 depth=1
+c91 rollback from=76 depth=2
+c92 rollback from=77 depth=5
+c93 rollback from=76 depth=6
+c96 rollback from=75 depth=7
+c100 K=82 spec=90 conf=83 confirmed=82 sum=780127 awaited=4 remote=82 packets=283
+c102 rollback from=84 depth=6
+c103 rollback from=89 depth=1
+c106 rollback from=87 depth=6
+c110 rollback from=97 depth=2
+c111 rollback from=93 depth=7
+c113 rollback from=96 depth=6
+c116 rollback from=102 depth=7
+c122 rollback from=105 depth=6
+c125 K=103 spec=111 conf=104 confirmed=103 sum=566745 awaited=4 remote=103 packets=369
+c132 rollback from=111 depth=7
+c138 rollback from=120 depth=7
+c142 rollback from=129 depth=5
+c145 rollback from=132 depth=2
+c150 rollback from=136 depth=4
+c150 K=135 spec=142 conf=136 confirmed=135 sum=902013 awaited=4 remote=135 packets=457
+c154 rollback from=142 depth=1
+c155 rollback from=140 depth=7
+c156 rollback from=141 depth=5
+c160 rollback from=147 depth=4
+c161 rollback from=144 depth=7
+c165 rollback from=151 depth=5
+c167 rollback from=154 depth=3
+c168 rollback from=153 depth=4
+c170 rollback from=150 depth=7
+c174 rollback from=160 depth=4
+c175 rollback from=162 depth=2
+c175 K=156 spec=164 conf=157 confirmed=156 sum=732779 awaited=4 remote=156 packets=538
+c181 rollback from=159 depth=7
+c184 rollback from=171 depth=6
+c186 rollback from=174 depth=5
+c190 rollback from=177 depth=3
+c196 rollback from=180 depth=6
+c197 rollback from=183 depth=3
+c200 K=185 spec=193 conf=186 confirmed=185 sum=833961 awaited=4 remote=185 packets=630
+c201 rollback from=192 depth=1
+c202 rollback from=186 depth=7
+c206 rollback from=192 depth=2
+c207 rollback from=195 depth=3
+c209 rollback from=196 depth=7
+c210 rollback from=200 depth=2
+c212 rollback from=198 depth=6
+c213 rollback from=198 depth=6
+c218 rollback from=203 depth=5
+c220 rollback from=201 depth=7
+c225 K=206 spec=214 conf=207 confirmed=206 sum=653764 awaited=4 remote=206 packets=718
+c228 rollback from=207 depth=7
+c230 rollback from=218 depth=1
+c232 rollback from=217 depth=6
+c237 rollback from=216 depth=7
+c242 rollback from=228 depth=5
+c243 rollback from=229 depth=4
+c246 rollback from=228 depth=7
+c248 rollback from=236 depth=4
+c249 rollback from=236 depth=5
+c250 rollback from=234 depth=7
+c250 K=234 spec=240 conf=235 confirmed=234 sum=751141 awaited=4 remote=234 packets=803
+c254 rollback from=240 depth=5
+c255 rollback from=244 depth=1
+c258 rollback from=240 depth=5
+c260 rollback from=246 depth=3
+c265 rollback from=249 depth=6
+c268 rollback from=252 depth=6
+c270 rollback from=256 depth=2
+c271 rollback from=256 depth=2
+c273 rollback from=255 depth=3
+c275 rollback from=261 depth=3
+c275 K=262 spec=267 conf=263 confirmed=262 sum=249702 awaited=4 remote=262 packets=895
+c277 rollback from=265 depth=5
+c278 rollback from=267 depth=3
+c283 rollback from=264 depth=7
+c286 rollback from=272 depth=4
+c288 rollback from=270 depth=6
+c296 rollback from=281 depth=2
+c297 rollback from=280 depth=3
+c298 rollback from=279 depth=4
+c299 rollback from=276 depth=7
+c300 K=284 spec=288 conf=285 confirmed=284 sum=154476 awaited=5 remote=284 packets=972
+c302 rollback from=285 depth=7
+c303 rollback from=288 depth=3
+c304 rollback from=290 depth=4
+c309 rollback from=289 depth=6
+c310 rollback from=288 depth=7
+c313 rollback from=301 depth=5
+c321 rollback from=304 depth=3
+c322 rollback from=300 depth=7
+c323 rollback from=303 depth=3
+c325 rollback from=306 depth=7
+c325 K=311 spec=312 conf=312 confirmed=311 sum=986657 awaited=4 remote=311 packets=1062
+c329 rollback from=312 depth=7
+c331 rollback from=317 depth=5
+c333 rollback from=321 depth=1
+c334 rollback from=315 depth=7
+c337 rollback from=324 depth=2
+c345 rollback from=330 depth=6
+c348 rollback from=332 depth=4
+c350 rollback from=337 depth=5
+c350 K=335 spec=343 conf=336 confirmed=335 sum=812552 awaited=1 remote=335 packets=1146
+c351 rollback from=336 depth=7
+c352 rollback from=340 depth=2
+c353 rollback from=344 depth=2
+c354 rollback from=339 depth=7
+c358 rollback from=346 depth=3
+c360 rollback from=342 depth=7
+c361 rollback from=345 depth=3
+c363 rollback from=351 depth=4
+c365 rollback from=352 depth=3
+c367 rollback from=354 depth=1
+c369 rollback from=348 depth=7
+c374 rollback from=359 depth=4
+c375 K=355 spec=363 conf=356 confirmed=355 sum=758006 awaited=4 remote=355 packets=1222
+c376 rollback from=357 depth=6
+c380 rollback from=368 depth=1
+c381 rollback from=366 depth=3
+c386 rollback from=369 depth=7
+c388 rollback from=376 depth=5
+c390 rollback from=375 depth=6
+c391 rollback from=380 depth=1
+c392 rollback from=378 depth=3
+c397 rollback from=384 depth=5
+c398 rollback from=385 depth=4
+c400 K=381 spec=389 conf=382 confirmed=381 sum=484768 awaited=4 remote=381 packets=1314
+receipts accepted=1314
+captures local:0=389 local:1=932
+rollbacks=141 deepest=7 firstLate=4 held=293 futureHeld=0 firstHold=2 limit=24
+scenario faults-and-leave seed=37 delay=2 window=7 mask=15 local=2
+c8 rollback from=3 depth=7
+c9 rollback from=3 depth=6
+c10 rollback from=3 depth=6
+c11 rollback from=8 depth=1
+c12 rollback from=7 depth=6
+c15 rollback from=12 depth=4
+c17 rollback from=12 depth=6
+c18 rollback from=14 depth=4
+c20 s2 e1 f17 conflict
+c21 rollback from=16 depth=5
+c22 s3 e1 f13 conflict
+c23 rollback from=18 depth=7
+c25 rollback from=21 depth=4
+c25 K=19 spec=27 conf=20 confirmed=19 sum=563704 awaited=1 remote=19 packets=78
+c26 rollback from=20 depth=7
+c27 s0 e1 f21 conflict
+c27 rollback from=24 depth=2
+c29 rollback from=25 depth=6
+c30 rollback from=24 depth=7
+c32 rollback from=28 depth=4
+c33 s2 e1 f26 conflict
+c33 rollback from=28 depth=4
+c35 s1 e1 f29 conflict
+c35 rollback from=30 depth=6
+c36 s1 e1 f30 conflict
+c36 rollback from=33 depth=3
+c37 rollback from=32 depth=7
+c38 rollback from=36 depth=2
+c39 rollback from=36 depth=3
+c40 s3 e1 f159 tooFarAhead
+c40 s3 e1 f160 tooFarAhead
+c40 s3 e0 f32 wrongEpoch
+c40 s7 e1 f32 wrongSender
+c40 s3 e1 f32 malformed
+c40 capture at-assigned 1
+c40 capture at-conflict 6
+c40 capture at-history 0
+c40 capture at-ahead 8
+c40 capture at-epoch 2
+c41 s3 e1 f32 conflict
+c42 rollback from=35 depth=7
+c44 rollback from=40 depth=5
+c45 s2 e1 f40 conflict
+c45 rollback from=40 depth=6
+c46 s3 e1 f40 conflict
+c46 rollback from=42 depth=4
+c49 rollback from=43 depth=6
+c50 rollback from=42 depth=7
+c50 K=44 spec=48 conf=45 confirmed=44 sum=552241 awaited=2 remote=44 packets=193
+c51 s0 e1 f47 conflict
+c52 s0 e1 f48 conflict
+c53 rollback from=48 depth=6
+c54 rollback from=48 depth=6
+c55 rollback from=49 depth=5
+c56 rollback from=52 depth=3
+c58 rollback from=54 depth=5
+c59 rollback from=54 depth=5
+c60 s3 e1 f51 conflict
+c60 rollback from=57 depth=3
+c61 rollback from=54 depth=7
+c62 rollback from=56 depth=4
+c64 s3 e1 f58 conflict
+c65 s1 e1 f55 conflict
+c65 rollback from=60 depth=5
+c66 rollback from=60 depth=5
+c69 rollback from=66 depth=4
+c71 rollback from=63 depth=7
+c73 s0 e1 f66 conflict
+c75 rollback from=72 depth=2
+c75 K=69 spec=77 conf=70 confirmed=69 sum=378960 awaited=3 remote=69 packets=299
+c77 rollback from=70 depth=7
+c80 s3 e1 f202 tooFarAhead
+c80 s3 e1 f203 tooFarAhead
+c80 s3 e1 f1 outOfHistory
+c80 s3 e0 f75 wrongEpoch
+c80 s7 e1 f75 wrongSender
+c80 s3 e1 f75 malformed
+c80 capture at-assigned 1
+c80 capture at-conflict 6
+c80 capture at-history 7
+c80 capture at-ahead 8
+c80 capture at-epoch 2
+c81 rollback from=78 depth=4
+c83 rollback from=78 depth=5
+c84 rollback from=77 depth=6
+c87 rollback from=84 depth=4
+c89 rollback from=84 depth=7
+c90 rollback from=88 depth=2
+c91 rollback from=85 depth=6
+c92 rollback from=84 depth=7
+c96 rollback from=91 depth=5
+c97 rollback from=92 depth=4
+c98 s0 e1 f92 conflict
+c98 rollback from=96 depth=2
+c99 s0 e1 f91 conflict
+c99 s0 e1 f95 conflict
+c100 K=95 spec=103 conf=96 confirmed=95 sum=472680 awaited=10 remote=95 packets=421
+c101 rollback from=96 depth=7
+c102 rollback from=100 depth=2
+c104 rollback from=96 depth=7
+c108 rollback from=102 depth=7
+c111 rollback from=105 depth=5
+c113 s1 e1 f106 conflict
+c113 rollback from=109 depth=6
+c114 rollback from=108 depth=7
+c117 rollback from=112 depth=5
+c119 rollback from=116 depth=1
+c120 s1 e1 f109 conflict
+c120 s3 e1 f241 tooFarAhead
+c120 s3 e1 f242 tooFarAhead
+c120 s3 e1 f1 outOfHistory
+c120 s3 e0 f114 wrongEpoch
+c120 s7 e1 f114 wrongSender
+c120 s3 e1 f114 malformed
+c120 capture at-assigned 1
+c120 capture at-conflict 6
+c120 capture at-history 7
+c120 capture at-ahead 8
+c120 capture at-epoch 2
+c120 rollback from=115 depth=5
+c121 rollback from=114 depth=7
+c123 rollback from=120 depth=4
+c125 K=117 spec=125 conf=118 confirmed=117 sum=703331 awaited=2 remote=117 packets=532
+c126 rollback from=119 depth=6
+c127 s1 e1 f120 conflict
+c128 s0 e1 f120 conflict
+c130 rollback from=126 depth=4
+c132 s1 e1 f121 conflict
+c132 rollback from=128 depth=4
+c133 rollback from=127 depth=5
+c134 rollback from=126 depth=7
+c136 rollback from=132 depth=4
+c139 rollback from=136 depth=4
+c140 rollback from=133 depth=7
+c141 s0 e1 f134 conflict
+c142 s2 e1 f135 conflict
+c142 rollback from=138 depth=4
+c143 rollback from=140 depth=2
+c144 s3 e1 f134 conflict
+c145 s1 e1 f136 conflict
+c145 rollback from=140 depth=6
+c146 s2 e1 f140 conflict
+c147 rollback from=144 depth=5
+c148 rollback from=144 depth=5
+c150 K=144 spec=152 conf=145 confirmed=144 sum=524353 awaited=3 remote=144 packets=645
+c152 rollback from=147 depth=7
+c154 rollback from=149 depth=6
+c155 rollback from=148 depth=7
+c158 rollback from=156 depth=3
+c160 s3 e1 f281 tooFarAhead
+c160 s3 e1 f282 tooFarAhead
+c160 s3 e1 f1 outOfHistory
+c160 s3 e0 f154 wrongEpoch
+c160 s7 e1 f154 wrongSender
+c160 s3 e1 f154 malformed
+c160 capture at-assigned 1
+c160 capture at-conflict 6
+c160 capture at-history 7
+c160 capture at-ahead 8
+c160 capture at-epoch 2
+c161 rollback from=156 depth=5
+c162 rollback from=154 depth=7
+c165 s3 e1 f160 conflict
+c165 rollback from=161 depth=2
+c167 s0 e1 f161 conflict
+c168 rollback from=162 depth=7
+c172 rollback from=168 depth=5
+c173 rollback from=168 depth=5
+c174 s0 e1 f166 conflict
+c175 K=169 spec=177 conf=170 confirmed=169 sum=313811 awaited=8 remote=169 packets=763
+c177 rollback from=174 depth=4
+c178 s2 e1 f171 conflict
+c178 rollback from=172 depth=6
+c180 rollback from=175 depth=3
+c181 rollback from=172 depth=7
+c182 rollback from=176 depth=2
+c184 rollback from=180 depth=5
+c186 rollback from=180 depth=5
+c189 rollback from=184 depth=5
+c190 rollback from=183 depth=6
+c191 rollback from=182 depth=7
+c192 rollback from=186 depth=2
+c193 s3 e1 f188 conflict
+c195 rollback from=189 depth=7
+c198 s3 e1 f192 conflict
+c199 rollback from=196 depth=3
+c200 s3 e1 f323 tooFarAhead
+c200 s3 e1 f324 tooFarAhead
+c200 s3 e1 f1 outOfHistory
+c200 s3 e0 f196 wrongEpoch
+c200 s7 e1 f196 wrongSender
+c200 s3 e1 f196 malformed
+c200 capture at-assigned 1
+c200 capture at-conflict 6
+c200 capture at-history 7
+c200 capture at-ahead 8
+c200 capture at-epoch 2
+c200 K=195 spec=203 conf=196 confirmed=195 sum=176858 awaited=2 remote=195 packets=881
+c202 rollback from=200 depth=3
+c203 rollback from=198 depth=5
+c204 s2 e1 f199 conflict
+c204 rollback from=196 depth=7
+c206 s1 e1 f200 conflict
+c208 s3 e1 f202 conflict
+c208 rollback from=203 depth=6
+c209 rollback from=204 depth=5
+c210 s2 e1 f202 conflict
+c210 s3 e1 f203 conflict
+c210 rollback from=204 depth=6
+c211 s2 e1 f204 conflict
+c213 rollback from=208 depth=4
+c214 s1 e1 f206 conflict
+c215 rollback from=210 depth=6
+c217 rollback from=211 depth=6
+c218 rollback from=210 depth=7
+c220 s1 e1 f210 conflict
+c220 s0 e1 f212 conflict
+c221 rollback from=216 depth=5
+c222 rollback from=216 depth=6
+c224 rollback from=217 depth=7
+c225 K=220 spec=228 conf=221 confirmed=220 sum=31939 awaited=2 remote=220 packets=996
+c228 s2 e1 f223 conflict
+c228 rollback from=222 depth=6
+c229 rollback from=222 depth=6
+c233 s3 e1 f225 conflict
+c234 rollback from=228 depth=7
+c235 s2 e1 f231 conflict
+c236 rollback from=231 depth=5
+c237 rollback from=232 depth=5
+c239 rollback from=236 depth=3
+c240 s3 e1 f362 tooFarAhead
+c240 s3 e1 f363 tooFarAhead
+c240 s3 e1 f1 outOfHistory
+c240 s3 e0 f235 wrongEpoch
+c240 s7 e1 f235 wrongSender
+c240 s3 e1 f235 malformed
+c240 capture at-assigned 1
+c240 capture at-conflict 6
+c240 capture at-history 7
+c240 capture at-ahead 8
+c240 capture at-epoch 2
+c241 rollback from=236 depth=6
+c243 s2 e1 f238 conflict
+c243 rollback from=240 depth=3
+c244 s2 e1 f236 conflict
+c244 rollback from=238 depth=6
+c247 rollback from=244 depth=6
+c248 rollback from=244 depth=6
+c250 epoch 2 delay=4 mask=14 begun=true
+c250 s3 e1 f239 wrongEpoch
+c250 s2 e1 f243 wrongEpoch
+c250 s2 e1 f247 wrongEpoch
+c250 K=4 spec=7 conf=5 confirmed=247 sum=695711 awaited=14 remote=4 packets=1105
+c251 s1 e1 f242 wrongEpoch
+c251 s1 e1 f243 wrongEpoch
+c251 s3 e1 f243 wrongEpoch
+c251 s2 e1 f244 wrongEpoch
+c251 s0 e1 f245 wrongSender
+c251 s3 e1 f247 wrongEpoch
+c251 s0 e1 f248 wrongSender
+c252 s1 e1 f239 wrongEpoch
+c252 s3 e1 f243 wrongEpoch
+c252 s3 e1 f246 wrongEpoch
+c253 s3 e1 f245 wrongEpoch
+c253 s3 e1 f248 wrongEpoch
+c253 s2 e1 f250 wrongEpoch
+c254 s1 e1 f244 wrongEpoch
+c254 s1 e1 f245 wrongEpoch
+c254 s0 e1 f246 wrongSender
+c254 s0 e1 f247 wrongSender
+c254 s2 e1 f249 wrongEpoch
+c254 s3 e1 f250 wrongEpoch
+c255 s1 e1 f246 wrongEpoch
+c255 s3 e1 f246 wrongEpoch
+c255 s2 e1 f248 wrongEpoch
+c255 s0 e1 f249 wrongSender
+c255 s1 e1 f250 wrongEpoch
+c256 s1 e1 f248 wrongEpoch
+c256 s2 e1 f248 wrongEpoch
+c256 s3 e1 f249 wrongEpoch
+c257 s1 e1 f245 wrongEpoch
+c257 s1 e1 f247 wrongEpoch
+c257 s0 e1 f250 wrongSender
+c257 s3 e1 f250 wrongEpoch
+c258 s1 e1 f250 wrongEpoch
+c258 rollback from=6 depth=6
+c259 s1 e1 f249 wrongEpoch
+c259 s3 e1 f249 wrongEpoch
+c259 rollback from=5 depth=7
+c260 s1 e1 f247 wrongEpoch
+c261 rollback from=7 depth=6
+c262 s1 e1 f249 wrongEpoch
+c262 rollback from=12 depth=1
+c266 s2 e2 f16 conflict
+c266 rollback from=13 depth=5
+c267 rollback from=12 depth=6
+c270 rollback from=18 depth=5
+c274 s2 e2 f22 conflict
+c275 rollback from=21 depth=7
+c275 K=21 spec=27 conf=22 confirmed=264 sum=759469 awaited=2 remote=21 packets=1171
+c276 rollback from=24 depth=3
+c280 s3 e2 f156 tooFarAhead
+c280 s3 e2 f157 tooFarAhead
+c280 s3 e1 f29 wrongEpoch
+c280 s7 e2 f29 wrongSender
+c280 s3 e2 f29 malformed
+c280 capture at-assigned 1
+c280 capture at-conflict 6
+c280 capture at-history 0
+c280 capture at-ahead 8
+c280 capture at-epoch 2
+c280 rollback from=28 depth=5
+c281 rollback from=30 depth=4
+c283 rollback from=30 depth=7
+c284 s1 e2 f29 conflict
+c287 rollback from=35 depth=4
+c293 rollback from=42 depth=6
+c295 rollback from=43 depth=5
+c296 rollback from=42 depth=6
+c300 K=46 spec=54 conf=47 confirmed=289 sum=838159 awaited=10 remote=46 packets=1261
+c301 s1 e2 f44 conflict
+c301 rollback from=48 depth=6
+c303 s3 e2 f51 conflict
+c303 rollback from=49 depth=7
+c304 s1 e2 f50 conflict
+c304 rollback from=54 depth=1
+c306 rollback from=54 depth=6
+c307 rollback from=56 depth=4
+c312 rollback from=60 depth=7
+c314 s3 e2 f60 conflict
+c314 rollback from=63 depth=4
+c318 rollback from=66 depth=5
+c320 s3 e2 f194 tooFarAhead
+c320 s3 e2 f195 tooFarAhead
+c320 s3 e1 f67 wrongEpoch
+c320 s7 e2 f67 wrongSender
+c320 s3 e2 f67 malformed
+c320 capture at-assigned 1
+c320 capture at-conflict 6
+c320 capture at-history 6
+c320 capture at-ahead 8
+c320 capture at-epoch 2
+c320 rollback from=66 depth=5
+c322 rollback from=70 depth=6
+c323 s1 e2 f68 conflict
+c323 rollback from=72 depth=4
+c324 rollback from=72 depth=5
+c325 K=72 spec=80 conf=73 confirmed=315 sum=742733 awaited=8 remote=72 packets=1348
+c329 rollback from=77 depth=6
+c331 rollback from=77 depth=7
+c332 s1 e2 f75 conflict
+c337 rollback from=84 depth=6
+c338 rollback from=84 depth=6
+c342 rollback from=91 depth=5
+c344 rollback from=91 depth=6
+c345 rollback from=90 depth=7
+c348 s2 e2 f93 conflict
+c348 rollback from=96 depth=6
+c350 K=97 spec=105 conf=98 confirmed=340 sum=130316 awaited=2 remote=97 packets=1431
+c352 rollback from=98 depth=7
+c354 s1 e2 f98 conflict
+c354 rollback from=103 depth=4
+c356 rollback from=102 depth=7
+c357 rollback from=105 depth=3
+c358 s1 e2 f103 conflict
+c359 s3 e2 f106 conflict
+c359 rollback from=108 depth=5
+c360 s3 e2 f236 tooFarAhead
+c360 s3 e2 f237 tooFarAhead
+c360 s3 e2 f1 outOfHistory
+c360 s3 e1 f109 wrongEpoch
+c360 s7 e2 f109 wrongSender
+c360 s3 e2 f109 malformed
+c360 capture at-assigned 1
+c360 capture at-conflict 6
+c360 capture at-history 7
+c360 capture at-ahead 8
+c360 capture at-epoch 2
+c360 rollback from=108 depth=5
+receipts accepted=1468 conflict=61 malformed=18 outOfHistory=6 tooFarAhead=18 wrongEpoch=42 wrongSender=15
+captures at-ahead:8=9 at-assigned:1=9 at-conflict:6=9 at-epoch:2=9 at-history:0=2 at-history:6=1 at-history:7=6 local:0=365 local:1=1101
+rollbacks=168 deepest=7 firstLate=3 held=237 futureHeld=0 firstHold=2 limit=24
+scenario window-held seed=41 delay=2 window=7 mask=3 local=0
+c25 K=2 spec=10 conf=3 confirmed=2 sum=722562 awaited=2 remote=2 packets=26
+c50 K=2 spec=10 conf=3 confirmed=2 sum=722562 awaited=2 remote=2 packets=55
+c63 rollback from=4 depth=6
+c64 rollback from=3 depth=7
+c67 rollback from=8 depth=5
+c72 rollback from=12 depth=7
+c75 rollback from=16 depth=6
+c75 K=16 spec=22 conf=17 confirmed=16 sum=47174 awaited=2 remote=16 packets=99
+c79 rollback from=20 depth=7
+c82 rollback from=24 depth=6
+c87 rollback from=28 depth=7
+c91 rollback from=32 depth=7
+c96 rollback from=36 depth=6
+c99 rollback from=40 depth=6
+c100 K=41 spec=49 conf=42 confirmed=41 sum=655031 awaited=2 remote=41 packets=161
+c103 rollback from=44 depth=5
+c106 rollback from=48 depth=6
+c110 rollback from=52 depth=7
+c115 rollback from=56 depth=6
+c119 rollback from=60 depth=6
+c122 rollback from=64 depth=5
+c125 K=66 spec=74 conf=67 confirmed=66 sum=210745 awaited=2 remote=66 packets=218
+c128 rollback from=68 depth=6
+c132 rollback from=72 depth=7
+c135 rollback from=76 depth=7
+c138 rollback from=80 depth=6
+c145 rollback from=84 depth=7
+c146 rollback from=88 depth=2
+c150 rollback from=92 depth=6
+c150 K=92 spec=98 conf=93 confirmed=92 sum=981998 awaited=2 remote=92 packets=275
+c154 rollback from=96 depth=7
+c158 rollback from=100 depth=5
+c163 rollback from=104 depth=7
+c168 rollback from=108 depth=6
+c172 rollback from=113 depth=6
+c173 rollback from=112 depth=7
+c175 K=115 spec=123 conf=116 confirmed=115 sum=498333 awaited=2 remote=115 packets=330
+c177 rollback from=116 depth=7
+c179 rollback from=120 depth=7
+c182 rollback from=124 depth=5
+c188 rollback from=129 depth=6
+c189 rollback from=128 depth=7
+c192 rollback from=132 depth=7
+c196 rollback from=136 depth=7
+c199 rollback from=140 depth=6
+c200 K=140 spec=148 conf=141 confirmed=140 sum=869151 awaited=2 remote=140 packets=385
+c203 rollback from=144 depth=7
+c209 rollback from=148 depth=7
+c210 rollback from=152 depth=2
+c217 rollback from=156 depth=7
+c218 rollback from=160 depth=2
+c223 rollback from=164 depth=6
+c225 K=167 spec=175 conf=168 confirmed=167 sum=868117 awaited=2 remote=167 packets=448
+c227 rollback from=168 depth=7
+c230 rollback from=172 depth=6
+c234 rollback from=176 depth=5
+c239 rollback from=180 depth=7
+c244 rollback from=184 depth=7
+c248 rollback from=188 depth=6
+c250 K=191 spec=199 conf=192 confirmed=191 sum=276157 awaited=2 remote=191 packets=500
+c253 rollback from=192 depth=7
+c255 rollback from=196 depth=5
+c260 rollback from=200 depth=7
+receipts accepted=521
+captures local:0=207 local:1=530
+rollbacks=53 deepest=7 firstLate=4 held=208 futureHeld=0 firstHold=2 limit=24
+scenario late-echo-stall-233 seed=53 delay=4 window=7 mask=1 local=0
+c25 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c50 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c75 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c100 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c125 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c150 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c175 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c200 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c225 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c250 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c275 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c300 K=4 spec=128 conf=5 confirmed=4 sum=751401 awaited=1 remote=2147483646 packets=0
+c325 K=29 spec=152 conf=30 confirmed=29 sum=228694 awaited=1 remote=2147483646 packets=25
+c350 K=54 spec=177 conf=55 confirmed=54 sum=666636 awaited=1 remote=2147483646 packets=50
+c375 K=79 spec=202 conf=80 confirmed=79 sum=196946 awaited=1 remote=2147483646 packets=75
+c400 K=104 spec=227 conf=105 confirmed=104 sum=898501 awaited=1 remote=2147483646 packets=100
+receipts accepted=120
+captures local:0=247 local:1=398
+rollbacks=0 deepest=0 firstLate=-1 held=399 futureHeld=399 firstHold=22 limit=24

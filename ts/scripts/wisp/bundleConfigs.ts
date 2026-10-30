@@ -53,6 +53,7 @@ export const bundleConfigs = {
   "viewer-lua": { entry: "src/game/replay/viewerDriver.ts", bundle: "viewer.lua", compilerOptions: { outDir: "build/viewer-lua", sourceMap: false } },
   handles: scriptProgram("scripts/wisp/handleBaselineLua.ts", "handles.lua", ["scripts/wisp/handleBaseline.ts", "scripts/wisp/handleCensus.ts", "scripts/wisp/memoryCensus.ts", "scripts/wisp/botMatch.ts"]),
   memory: scriptProgram("scripts/wisp/memoryLua.ts", "memory.lua", ["scripts/wisp/memoryCensus.ts", "scripts/wisp/handleCensus.ts", "scripts/wisp/botMatch.ts"]),
+  "netcode-golden": scriptProgram("test/golden/netcodeEntry.ts", "netcode-golden.lua", []),
   perf: scriptProgram("scripts/wisp/perfLua.ts", "perf.lua", ["scripts/wisp/botMatch.ts", "scripts/wisp/census.ts", "scripts/wisp/censusProfile.ts"]),
 } satisfies Record<string, BundleConfig>;
 type BundleName = keyof typeof bundleConfigs;
