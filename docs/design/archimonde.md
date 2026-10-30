@@ -184,3 +184,39 @@ facings) were read by one fresh Opus cold viewer with opaque ids:
 Still open for the native-check box: forward air and Bash staging, the other
 aerials, down smash, grab and the whiteout flashes, and a full 58-row reel at
 `--hold-ticks 24` read by three cold viewers.
+
+## Native check at 0ccb4d8340 (2026-10-31)
+
+Both native-check boxes were run on gex45 pair 1 through `nativeCapture.ts`
+(Classic, offline pool). Sheets, row key and viewer reads:
+`~/.local/state/smashcraft/evidence/sc-native-archi`.
+
+**Knockdown, lie and get-up (#823).** `archimonde-left.pad` and
+`archimonde-right.pad` captured 9 of 9 frames each, none missed. Two fresh
+cold viewers read one sheet per facing: both show the same sequence, with a
+fall, a hold low to the floor and a get-up to standing. The lie is a
+forward-pitched crouch with the tail raised, not flat on the floor, and the
+frame at 305 is translucent. The viewer's verdict was a weak pass on each
+facing, so the first box stays open: the pose needs to lie flatter and stay
+opaque.
+
+**Showcase reel (#664).** All 58 rows (every move, ultimate and movement row,
+both facings) captured at `--hold-ticks 24`: 462 of 462 frames after one
+resumed attempt that missed four. Three fresh Opus cold viewers read the 58
+sheets with opaque ids, 12 pass and 46 fail line 7. Passing: forward tilt,
+forward tilt down, Finger of Death, full hop (both facings), dash attack, jab 2,
+short hop and walk (one facing each). Failing, by cause:
+
+- The attacker overlaps the dummy so no limb reaches the spark: jab, forward
+  smash, up smash, up tilt, down tilt, forward tilt up, getup attack, grab,
+  back air, neutral air, forward air, up air, down air, ledge attack.
+- A white flash hides both bodies at contact: up smash, Bash, down air.
+- An effect lands on empty floor or the contact spark sits past the dummy's
+  far side: Rain of Fire, down smash, down air, back air, up tilt.
+- Jump squat, run and walk (left) read as a hop clipped by the frame edge or
+  a run in place with no travel; the dash and jab rows read as the attacker
+  passing through the dummy.
+
+Next: stage the dummy clear of his body for the ground and aerial normals,
+shorten or shrink the contact flash on the smashes, Bash and down air, and
+give the run row travel, then recapture the failing rows.
