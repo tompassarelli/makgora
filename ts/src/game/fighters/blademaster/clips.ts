@@ -61,7 +61,7 @@ const QUICKDRAW_STANCE: HeroClip = { ...BLADEMASTER_AUTHORED_CLIPS.neutralSpecia
 
 
 
-export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "neutralSpecialFollowUp" | "neutralSpecialFollowUpAir" | "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate" | "specialFloat">]: HeroClip } = {
+export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "neutralSpecialFollowUp" | "neutralSpecialFollowUpAir" | "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate" | "specialFloat" | "shortHop" | "fullHop">]: HeroClip } = {
   idle: COMBAT_STANCE,
   walk: sequence("Walk"),
   dash: sequence("Walk"),

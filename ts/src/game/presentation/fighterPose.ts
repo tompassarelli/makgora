@@ -21,6 +21,7 @@ import * as dh from "./demonHunterAssetInfo";
 import { disabledPose } from "./disabledPose";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
+import { hopClipFrames, hopFrames, JUMP_CLIP_FRAMES, jumpPose } from "./hopPose";
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
 import { pinnedSpecialSeconds, playsFollowUpPose, windUpRate } from "./specialPhase";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
@@ -41,7 +42,6 @@ import {
 
 
 const REACTION_CLIP_FRAMES = 24;
-const JUMP_CLIP_FRAMES = 24;
 const DOUBLE_JUMP_CLIP_FRAMES = 30;
 const SHIELD_RAISE_FRAMES = 4;
 
@@ -189,19 +189,6 @@ export function advanceFighterPose(
   const stopped = pose.animation === motionKey(IllidanLocomotion.stop) && pose.motion.transitionRemaining === 0;
   pose.rate = fighter.launch.hitlag > 0 || charging || stopped ? 0.0 : rate;
 }
-
-const hopPose = (f: Readonly<Fighter>): HeroPose => {
-  const table = clips.characterClips(f.character);
-  return table.fullHop !== undefined && table.shortHop !== undefined ? f.jump.held ? "fullHop" : "shortHop" : "jump";
-};
-const jumpPose = (pose: Readonly<FighterPose>, f: Readonly<Fighter>): HeroPose => pose.doubleJumpAnimation ? "doubleJump" : hopPose(f);
-const HOP_FALL_SLACK_FRAMES = 6;
-
-const hopClipFrames = (f: Readonly<Fighter>): number => {
-  const pose = hopPose(f);
-  return pose === "jump" ? JUMP_CLIP_FRAMES : Math.round(clips.clipFor(f.character, pose).seconds / FRAME_SECONDS);
-};
-const hopFrames = (f: Readonly<Fighter>): number => hopPose(f) === "jump" ? JUMP_CLIP_FRAMES : hopClipFrames(f) + HOP_FALL_SLACK_FRAMES;
 
 function advanceJumpClip(pose: FighterPose, f: Readonly<Fighter>, phase: AttackPhase, wasOut: boolean, jumped: boolean): void {
   const busy = f.motion.grounded || f.launch.hitstun > 0 || f.dodge.airDodging || phase !== AttackPhase.none

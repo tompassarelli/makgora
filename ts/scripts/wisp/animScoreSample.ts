@@ -87,7 +87,7 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
 
 const AFTER_FRAMES = 2;
-const LIMIT = 150;
+export const LIMIT = 150;
 
 
 export function gameplayPixelsPerUnit(): number {
@@ -138,18 +138,18 @@ export function skeletonOf(model: DrawnModel, character: Character): ScoreSkelet
   return { names, pelvis: find(PELVIS, exception?.pelvis), chest: find(CHEST, exception?.chest), limbs };
 }
 
-function timelineSeconds(character: Character, frame: PoseFrame): number {
+export function timelineSeconds(character: Character, frame: PoseFrame): number {
   const info = frame.clip === undefined ? undefined : originalClip(character, frame.clip);
   if (info === undefined) throw new Error(`${fighterSlug(character)}: frame ${frame.frame} shows no clip`);
   return info.startSeconds + frame.seconds;
 }
 
-function pose(model: DrawnModel, character: Character, frame: PoseFrame): ScoreFrame {
+export function pose(model: DrawnModel, character: Character, frame: PoseFrame): ScoreFrame {
   return { frame: frame.frame, ...model.posed(0, timelineSeconds(character, frame), 1) };
 }
 
 
-function step(world: Roster, input: Readonly<Controls>): void {
+export function step(world: Roster, input: Readonly<Controls>): void {
   const f = world.fighters[0];
   if (f === undefined) throw new Error("a sampled world has its fighter");
   advanceFighter(world, 0, 0, input, 0.0);
@@ -331,7 +331,7 @@ export interface CrouchSample {
 
 const CROUCH_HOLD_FRAMES = CROUCH_CLIP_FRAMES + 16;
 
-function clipLabel(character: Character, index: number | undefined): string {
+export function clipLabel(character: Character, index: number | undefined): string {
   if (index === undefined) return "none";
   const names = [...originalClipNames(character)].filter(([, at]) => at === index).map(([name]) => name);
   return names.find((name) => /crouch/i.test(name)) ?? names[0] ?? `#${index}`;
@@ -470,53 +470,6 @@ export function sampleJumps(model: DrawnModel, character: Character, start: Jump
   return { stand: pose(model, character, standing), first: phased(first), second: phased(second), firstSeconds: timeline(first), secondSeconds: timeline(second), secondHeights: phases(second).map((frame) => frame.z),
     firstClip: clipLabel(character, first[Math.floor(first.length / 2)]?.clip), secondClip: clipLabel(character, second[Math.floor(second.length / 2)]?.clip) };
 }
-
-export type HopKind = "short" | "full";
-
-export interface HopSample {
-  readonly kind: HopKind;
-  readonly stand: ScoreFrame;
-  readonly frames: readonly ScoreFrame[];
-  readonly seconds: readonly number[];
-  readonly heights: readonly number[];
-  readonly clips: readonly string[];
-  readonly squatFrames: number;
-  readonly riseFrames: number;
-  readonly airFrames: number;
-}
-
-const HOP_SETTLE_FRAMES = 12;
-
-export function sampleHop(model: DrawnModel, character: Character, kind: HopKind): HopSample {
-  const f = createFighter(character, 0.0, 1);
-  const world = createRoster(1, [f]);
-  const p = createFighterPose();
-  const advance = (input: Readonly<Controls>) => {
-    const serial = f.jump.serial;
-    step(world, input);
-    advanceFighterPose(p, f, world, input, false, f.jump.serial !== serial, false, false);
-    return capture(f, p);
-  };
-  const neutral = neutralControls(), held = { ...neutralControls(), jumpHeld: true }, press = { ...held, jumpPressed: true };
-  let standing = capture(f, p);
-  for (let tick = 0; tick < 30; tick++) standing = advance(neutral);
-  const frames: PoseFrame[] = [];
-  let squatFrames = 0, riseFrames = 0, airFrames = 0, settled = 0;
-  for (let tick = 0; tick < LIMIT; tick++) {
-    const frame = advance(tick === 0 ? press : kind === "full" ? held : neutral);
-    frames.push(frame);
-    if (!f.motion.grounded) {
-      airFrames++;
-      if (f.motion.vz > 0.0) riseFrames++;
-    } else if (airFrames > 0) {
-      if (++settled > HOP_SETTLE_FRAMES) break;
-    } else squatFrames++;
-  }
-  if (airFrames === 0) throw new Error(`${fighterSlug(character)}: the sampled ${kind} hop leaves the ground`);
-  return { kind, stand: pose(model, character, standing), frames: frames.map((frame) => pose(model, character, frame)), seconds: frames.map((frame) => timelineSeconds(character, frame)),
-    heights: frames.map((frame) => frame.z), clips: frames.map((frame) => clipLabel(character, frame.clip)), squatFrames, riseFrames, airFrames };
-}
-
 
 export function sampleFighter(model: DrawnModel, character: Character): SampledMove[] {
   const skeleton = skeletonOf(model, character);
