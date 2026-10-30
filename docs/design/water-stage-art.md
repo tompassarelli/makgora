@@ -76,6 +76,30 @@ the frame, interesting at its edges.
 - No bright highlight, shaft or lit gap directly behind the fighting area.
 - Frame time budget 8.3 ms at 2880x1920 on the laptop.
 
+## The sea, from Tom's Warcraft reference (2026-10-31)
+
+The reference, `tom-wc3-water-reference.png` (local, Warcraft III terrain water
+seen from above, not committed): a shallow turquoise band along the shore that
+ramps to deep blue, fine glittering ripples at one texel scale, and white foam
+waves breaking along the shoreline with a lighter wet edge behind them.
+
+- **Surface**: animate through Warcraft's own water texture frames, read at
+  runtime from the player's install (ReplaceableTextures/Water), never shipped.
+  Our StageWater tile stays the fallback where the install lacks them.
+- **Depth ramp**: shallow turquoise `#7fd0cf` at the deck, platform and stack
+  waterlines to deep `#1d5f74` at the horizon and below the deck line.
+- **Shoreline foam**: where water meets the deck, platform supports and the
+  backdrop stacks, a foam wave line (reference 4's hard inner edge) with a pale
+  wet band behind it; it moves with the tide and stops in the slack. One foam
+  line per waterline in the sim's edge list; placement is this stage's.
+- **Reflection and refraction**: a dimmed, rippled reflection of the backdrop
+  planes; refraction of the submerged deck and supports at 60%. Fighters and the
+  deck draw in front and the sea never tints them.
+- **Horizon**: edge-on; ripple scale shrinks toward the horizon and the sea
+  hazes to the sky's horizon colour in a thin bright line.
+- **Not native terrain water**: it hid fighters and the deck (reverted
+  2026-10-12); the sea stays the stage's own model and shader.
+
 ## Assets
 
 Original generated art and CC0 meshes only; sources and licences are in
