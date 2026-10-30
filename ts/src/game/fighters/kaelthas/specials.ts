@@ -6,7 +6,7 @@ import { frames, FollowUpInput, type AuthoredSpecial, type FighterSpecials, type
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { kaelCastBody, kaelHit } from "./moves";
 
-const AIR_LANDING_LAG = 23;
+const AIR_LANDING_LAG = 30;
 
 export const PYROBLAST_STARTUP_FRAMES = 21;
 export const PYROBLAST_STEER_FRAMES = 80;
@@ -56,16 +56,17 @@ export const FLAME_STRIKE_BURST: SpecialProjectile = {
   spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
   life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(11.0, 80, 80.0, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
 };
+export const FLAME_STRIKE_RELEASE_FRAME = 16;
 export const FLAME_STRIKE_ORB_FRAMES = 50;
 export const FLAME_STRIKE_ORB: SpecialProjectile = {
   model: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx",
-  spawnFrame: 6, offsetX: 52.0, offsetZ: 60.0, velocityX: 5.0, velocityZ: 0.0,
+  spawnFrame: FLAME_STRIKE_RELEASE_FRAME, offsetX: 52.0, offsetZ: 60.0, velocityX: 5.0, velocityZ: 0.0,
   life: FLAME_STRIKE_ORB_FRAMES, radius: 30.0, effect: kaelHit(0.0, 80), burstInto: FLAME_STRIKE_BURST, burstsOnStage: true,
   reflectable: false, limit: 1, steered: true,
 };
 export const FLAME_STRIKE_STEER: SpecialHeldOrb = { frame: FLAME_STRIKE_ORB.spawnFrame, acceleration: 0.375, maxSpeed: 12.0, climbSpeed: 5.0, erupts: FLAME_STRIKE_BURST };
 const flameStrike = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 34, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_ORB], heldOrb: FLAME_STRIKE_STEER, replacesLive: true,
+  endFrame: FLAME_STRIKE_RELEASE_FRAME + 28, landingLag, hurt: kaelCastBody(4, FLAME_STRIKE_RELEASE_FRAME + 18, 40.0, 66.0), projectiles: [FLAME_STRIKE_ORB], heldOrb: FLAME_STRIKE_STEER, replacesLive: true,
 });
 
 export const BANISH_FRAMES = 60;

@@ -57,9 +57,17 @@ function flyOrb(kael: Readonly<Fighter>, world: Roster, heldFrames: number, stee
   return { speeds, last };
 }
 
-test("Flame Strike's orb leaves Kael's hand on frame 6, a quarter sooner than the rune's frame 8, starts slow and gathers speed to 12 a frame, faster than the rune's 8 [k3 measure docs/design/kaelthas.md]", () => {
-  assertLessThan(FLAME_STRIKE_ORB.spawnFrame, OLD_RUNE_SPAWN_FRAME * f32(0.8) + 1.0);
-  assertEquals(FLAME_STRIKE_ORB.spawnFrame, 6);
+test("Flame Strike's orb leaves Kael's hand on frame 16, so cast point-blank it erupts no sooner than frame 16, later than the rune's frame 8, and starts slow and gathers speed to 12 a frame, faster than the rune's 8 [k3 measure docs/design/kaelthas.md]", () => {
+  assertGreaterThan(FLAME_STRIKE_ORB.spawnFrame, OLD_RUNE_SPAWN_FRAME);
+  const point = kaelDuel(60.0);
+  stepDuel(point.world, press);
+  let struck = 1;
+  while (point.target.status.damage === 0.0 && struck < 60) {
+    stepDuel(point.world, hold);
+    struck++;
+  }
+  assertGreaterThan(point.target.status.damage, 0.0);
+  assertEquals(struck, FLAME_STRIKE_ORB.spawnFrame);
   const { kael, world } = kaelDuel();
   stepDuel(world, press);
   let frames = 1;

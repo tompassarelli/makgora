@@ -1,0 +1,20 @@
+# smashcraft#796: Kael'thas casts Flame Strike right point-blank on a Mountain King standing still, so the cast pose reads before the orb leaves his hand and the pillar erupts on contact no sooner than frame 16 of the cast.
+#! chat -dev quick pair kael'thas sunstrider / mountain king
+250 a stick 1 0
+276 a stick 0 0
+338 a capture
+339 a stick 1 0
+340 a press X
+342 a stick 0 0
+342 a capture
+346 a capture
+350 a capture
+354 a capture
+355 a capture
+356 a capture
+357 a capture
+359 a capture
+363 a capture
+363 a release X
+393 a press VIEW
+463 a release VIEW

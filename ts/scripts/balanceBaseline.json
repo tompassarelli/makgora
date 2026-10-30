@@ -31863,9 +31863,9 @@
    "authored.specials.neutral.ground.followUps.0.special.endFrame": 36,
    "authored.specials.neutral.ground.followUps.0.special.hurt.0.firstFrame": 1,
    "authored.specials.neutral.ground.followUps.0.special.hurt.0.lastFrame": 36,
-   "authored.specials.side.ground.endFrame": 34,
+   "authored.specials.side.ground.endFrame": 43,
    "authored.specials.side.ground.hurt.0.firstFrame": 4,
-   "authored.specials.side.ground.hurt.0.lastFrame": 24,
+   "authored.specials.side.ground.hurt.0.lastFrame": 33,
    "authored.specials.side.ground.projectiles.0.effect.damage": 0,
    "authored.specials.side.ground.projectiles.0.effect.growth": 76.04872131347656,
    "authored.specials.side.ground.projectiles.0.effect.base": 20,
@@ -31891,10 +31891,10 @@
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.base": 0,
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.launchX": 0.1736481785774231,
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.launchZ": 0.9848077297210693,
-   "authored.specials.side.air.endFrame": 34,
-   "authored.specials.side.air.landingLag": 23,
+   "authored.specials.side.air.endFrame": 43,
+   "authored.specials.side.air.landingLag": 29,
    "authored.specials.side.air.hurt.0.firstFrame": 4,
-   "authored.specials.side.air.hurt.0.lastFrame": 24,
+   "authored.specials.side.air.hurt.0.lastFrame": 33,
    "authored.specials.side.air.projectiles.0.effect.damage": 0,
    "authored.specials.side.air.projectiles.0.effect.growth": 76.04872131347656,
    "authored.specials.side.air.projectiles.0.effect.base": 20,
@@ -32361,35 +32361,35 @@
     "advantage": -27
    },
    "special.side.ground.projectiles.0.burstInto": {
-    "advantage": -28,
+    "advantage": -37,
     "killPercent": 234
    },
    "special.side.ground.projectiles.0.burstInto.expiresInto": {
-    "advantage": -32
+    "advantage": -41
    },
    "special.side.ground.heldOrb.erupts": {
-    "advantage": -28,
+    "advantage": -37,
     "killPercent": 234
    },
    "special.side.ground.heldOrb.erupts.expiresInto": {
-    "advantage": -32
+    "advantage": -41
    },
    "special.side.air.projectiles.0": {
     "advantage": -27
    },
    "special.side.air.projectiles.0.burstInto": {
-    "advantage": -28,
+    "advantage": -37,
     "killPercent": 234
    },
    "special.side.air.projectiles.0.burstInto.expiresInto": {
-    "advantage": -32
+    "advantage": -41
    },
    "special.side.air.heldOrb.erupts": {
-    "advantage": -28,
+    "advantage": -37,
     "killPercent": 234
    },
    "special.side.air.heldOrb.erupts.expiresInto": {
-    "advantage": -32
+    "advantage": -41
    },
    "special.up.ground.regions.0": {
     "advantage": -36
