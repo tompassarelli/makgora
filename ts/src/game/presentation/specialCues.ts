@@ -176,8 +176,8 @@ const GLAIVE_GLINT: Cue = { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\Ho
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
 const VAMPIRIC = cue("Abilities\\Spells\\Undead\\UnholyFrenzy\\UnholyFrenzyTarget.mdx", "hand", f32(0.8));
-// The pounce winds up for 4 frames while red bats gather from behind into his chest, so the leap is read before it moves.
-const POUNCE_COIL: Cue = { ...cue("Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx", "body", f32(0.6)), color: [255, 60, 60], anchorFrames: [{ x: -95.0, z: 95.0 }, { x: -70.0, z: 80.0 }, { x: -45.0, z: 65.0 }, { x: -20.0, z: 55.0 }] };
+// The pounce winds up for 4 frames while a swarm of bats gathers from behind into his chest, so the leap is read before it moves.
+const POUNCE_COIL: Cue = { ...cue("Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx", "body", f32(0.6)), anchorFrames: [{ x: -95.0, z: 95.0 }, { x: -70.0, z: 80.0 }, { x: -45.0, z: 65.0 }, { x: -20.0, z: 55.0 }] };
 const KAEL_PHOENIX_CHARGE: MoveCues = { spell: "Phoenix", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "body", 0.5), active: cue("Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", "body", f32(0.6)) };
 // The flight is the phoenix itself: Kael's body is replaced by it until the flight ends.
 const KAEL_PHOENIX_FORM: MoveCues = { spell: "Phoenix", startup: KAEL_PHOENIX_CHARGE.active, active: { ...timed(cue("units\\human\\Phoenix\\Phoenix.mdx", "body", f32(0.55)), "stand", 0.0), replacesBody: true } };
