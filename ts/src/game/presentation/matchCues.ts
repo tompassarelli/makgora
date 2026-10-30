@@ -2,7 +2,7 @@
 
 
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
-import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, keepsStocks, winningMask } from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, cpuFighterRandom, humanFighterActive, keepsStocks, winningMask } from "../lobby/lobbyState";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { fighterName } from "../roster/kits";
@@ -128,10 +128,11 @@ export interface MenuObservation {
   hover: number | undefined;
   readonly choices: Slots<number>;
   readonly ready: Slots<boolean>;
+  readonly random: Slots<boolean>;
 }
 
 export function createMenuObservation(): MenuObservation {
-  return { phase: Phase.characterMenu, stage: 0, hover: undefined, choices: [0, 0, 0, 0], ready: [false, false, false, false] };
+  return { phase: Phase.characterMenu, stage: 0, hover: undefined, choices: [0, 0, 0, 0], ready: [false, false, false, false], random: [false, false, false, false] };
 }
 
 
@@ -150,6 +151,13 @@ export function createMenuCues(): MenuCues {
 
 
 
+function pickCue(before: Readonly<MenuObservation>, game: Readonly<MatchState>, slot: ParticipantSlot, cues: MenuCues): void {
+  if (!game.characterReadiness[slot]) return;
+  if (cpuFighterRandom(game, slot)) {
+    if (!before.ready[slot] || !before.random[slot]) cues.confirm = true;
+  } else if (!before.ready[slot] || before.random[slot] || before.choices[slot] !== game.characterChoices[slot]) cues.fighters.push(slot);
+}
+
 export function menuFrameCues(before: MenuObservation, game: Readonly<MatchState>, hover: number | undefined, cues: MenuCues): void {
   cues.hover = false;
   cues.confirm = false;
@@ -157,8 +165,7 @@ export function menuFrameCues(before: MenuObservation, game: Readonly<MatchState
   const { phase } = game;
   if (phase === Phase.characterMenu && before.phase === Phase.characterMenu) {
     for (const slot of PARTICIPANT_SLOTS) {
-      const ready = game.characterReadiness[slot];
-      if (ready && (!before.ready[slot] || before.choices[slot] !== game.characterChoices[slot])) cues.fighters.push(slot);
+      pickCue(before, game, slot, cues);
     }
     if (hover !== undefined && hover !== before.hover) cues.hover = true;
   }
@@ -170,6 +177,7 @@ export function menuFrameCues(before: MenuObservation, game: Readonly<MatchState
   for (const slot of PARTICIPANT_SLOTS) {
     before.choices[slot] = game.characterChoices[slot];
     before.ready[slot] = game.characterReadiness[slot];
+    before.random[slot] = cpuFighterRandom(game, slot);
   }
 }
 
