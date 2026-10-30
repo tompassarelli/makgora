@@ -94,6 +94,24 @@ SMASHES = {
               (22, (74, 4), dict(pitch=-410, travel=22, drop=-6, lean=28, chest=24, head=-8, twist=28, leftArm=-60, stretch=0.2, squash=-0.08,
                                  front=-50, kneeFront=50, footFront=-15, back=40, kneeBack=10))],
         ramp=0.15),
+    'upSmash': dict(
+        glide=14,
+        keys=[(0, None, {}),
+              (3, (46, -3), dict(pitch=rig.hanging, drop=-15, lean=6, chest=8, head=6, leftArm=-10, squash=-0.28, stretch=0.12,
+                                  front=-35, kneeFront=60, footFront=-20, back=40, kneeBack=72, footBack=-25)),
+              (9, (-14, 64), dict(pitch=90, drop=-13, lean=10, chest=14, head=10, leftArm=-25, squash=-0.26, stretch=0.14,
+                                  front=-40, kneeFront=74, footFront=-25, back=45, kneeBack=84, footBack=-30)),
+              (10, (2, 92), dict(pitch=91, drop=15, lean=-4, chest=-12, head=-16, leftArm=-140, squash=0.24, stretch=-0.08,
+                                 front=-5, back=5)),
+              (12, (4, 118), dict(pitch=90, drop=15, lean=-6, chest=-16, head=-22, leftArm=-155, squash=0.28, stretch=-0.1, front=-5, back=5)),
+              (14, (5, 117), dict(pitch=89, drop=14, lean=-6, chest=-15, head=-20, leftArm=-150, squash=0.26, stretch=-0.09, front=-5, back=5)),
+              (24, (5, 96), dict(pitch=86, drop=-2, lean=-2, chest=-6, head=-8, leftArm=-100, squash=0.06, stretch=-0.02,
+                                 front=-15, kneeFront=28, back=15, kneeBack=32)),
+              (32, (16, 72), dict(pitch=66, drop=-4, lean=4, chest=4, head=2, leftArm=-55, squash=-0.06, stretch=0.04,
+                                  front=-20, kneeFront=35, back=25, kneeBack=40, footBack=-10)),
+              (40, (38, 30), dict(pitch=25, drop=-2, lean=4, chest=4, head=2, leftArm=-25, squash=-0.03, stretch=0.02,
+                                  front=-12, kneeFront=20, back=15, kneeBack=22))],
+        ramp=0.06),
 }
 
 
@@ -117,13 +135,18 @@ def bake_smash():
         return {**p, 'arm': best[1], 'elbow': best[2]}
 
     beats = [(frame, ready if goal is None else aimed(p, goal)) for frame, goal, p in smash['keys']]
-    end = beats[-1][0]
+    end = smash.get('glide', beats[-1][0])
     rested = {'pitch': rig.hanging + smash.get('spin', 0)}
-    along = rig.arc(lambda u: blend(beats[-1][1], rested, u))
+    tail = [p for frame, p in beats if frame >= end] + [rested]
+
+    def through(u):
+        k = min(int(u * (len(tail) - 1)), len(tail) - 2)
+        return blend(tail[k], tail[k + 1], u * (len(tail) - 1) - k)
+    along = rig.arc(through)
 
     def at(frame):
         if frame > end:
-            return blend(beats[-1][1], rested, along(glide((frame - end) / (frames - end), smash['ramp'])))
+            return through(along(glide((frame - end) / (frames - end), smash['ramp'])))
         for (a, pa), (b, pb) in zip(beats, beats[1:]):
             if a <= frame <= b:
                 t = (frame - a) / (b - a)

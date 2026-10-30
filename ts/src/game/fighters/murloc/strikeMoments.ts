@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 
 export const murlocStrikeMoments = {
   0: { clip: 9, seconds: f32(0.067), end: f32(0.250) },
-  2: { clip: 18, seconds: f32(0.267), end: f32(0.800) },
+  2: { clip: 18, seconds: f32(0.200), end: f32(0.800) },
   3: { clip: 19, seconds: f32(0.150), end: f32(0.817) },
   4: { clip: 17, seconds: f32(0.250), end: f32(0.867) },
   6: { clip: 11, seconds: f32(0.117), end: f32(0.450) },

@@ -235,6 +235,18 @@ curled ball. Take 2 kept him side-on in a longer lunge and scored 3, 2, 3, 3,
 3, but it failed lines 1 and 2 (mass shift 0.41 with body share 0.27, jump
 0.05). Both takes are spent, so take 1 ships under the box's line 5 exception.
 
+Murloc's up smash ships with line 5 below 4. Tom asked for a point-first
+spear thrust straight up overhead with the same frame data (2026-10-30): a
+Blender take (`tools/animations/murloc-stabs.py`) dips, raises the spear
+upright in a crouch, hops and drives the point to the top of a hit column over
+his head. Lines 1 to 4 pass (`bun wisp anim score --fighter murloc`: body share
+0.29, mass shift 0.27, end error 0.00, jump 0.02, overshoot 0.18, contrast
+0.54). One bare judge scored readability 3, weight 2, anticipation 2,
+follow-through 3 and character 2, naming the thin spear against an unchanged
+hunched silhouette, the round body the jabs' exception already names. Earlier
+takes stopped at body share 0.287; a shallower windup dip passed it, the take
+limit is spent, and the take ships under the box's line 5 exception.
+
 Grom's dash attack ships with line 5 at 3: the judge medians on readability,
 weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
 lines 1 to 4 pass (#344). The take limit is spent; take B and the later
