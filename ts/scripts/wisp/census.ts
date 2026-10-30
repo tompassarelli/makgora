@@ -87,6 +87,11 @@ export const CENSUS_MOVES: readonly CensusMove[] = [
 ];
 
 
+// Murlocs: Down B orders and revives only on the ground, so the air press plays its keys and frames but never starts
+const GROUNDED_ONLY: Readonly<Partial<Record<Character, readonly string[]>>> = {
+  [Character.murloc]: ["air down special"],
+};
+
 const MOVE_FRAMES = 150;
 
 const BASELINE_FRAMES = 30;
@@ -219,8 +224,9 @@ export function playFighterCensus(clients: Lockstep, measure: PerfMeasure, fight
   for (const move of CENSUS_MOVES) {
     const [baseFirst, baseLast] = approach(clients);
     const [moveFirst, moveLast, started, style] = playMove(clients, move);
-    if (started === undefined) unstarted.push(move.name);
-    else if (move.style !== undefined && style !== move.style) mismatched.push(`${label}: ${move.name} started attack style ${style ?? "none"}, not ${move.style}`);
+    if (started === undefined) {
+      if (!(GROUNDED_ONLY[fighter] ?? []).includes(move.name)) unstarted.push(move.name);
+    } else if (move.style !== undefined && style !== move.style) mismatched.push(`${label}: ${move.name} started attack style ${style ?? "none"}, not ${move.style}`);
     print(`census\t${label}\t${move.name}\t${baseFirst}\t${baseLast}\t${moveFirst}\t${moveLast}\t${started ?? "never"}`);
   }
   const result = problemsOf(clients);

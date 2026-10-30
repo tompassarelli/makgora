@@ -18,7 +18,7 @@ pair	chen-stormstout vs rifleman	instructions=237000	alloc-kb=45.8
 pair	peon vs rifleman	instructions=234900	alloc-kb=25.2
 pair	goblin-tinker vs rifleman	instructions=239800	alloc-kb=31.9
 pair	kael'thas-sunstrider vs rifleman	instructions=230500	alloc-kb=25.9
-pair	murloc vs rifleman	instructions=225700	alloc-kb=26.3
+pair	murloc vs rifleman	instructions=329200	alloc-kb=37.6
 pair	grom-hellscream vs rifleman	instructions=228100	alloc-kb=24.9
 pair	malfurion-stormrage vs rifleman	instructions=182700	alloc-kb=43.2
 pair	medivh vs rifleman	instructions=222200	alloc-kb=48.6
