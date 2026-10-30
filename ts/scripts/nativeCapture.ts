@@ -40,7 +40,7 @@ import { encodePng } from "./wisp/hurtboxView";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
 import { nativeCaptureChunks } from "./nativeCaptureChunks";
-import { frameVerdict } from "./nativeCaptureVerdict";
+import { attemptEnding, frameVerdict } from "./nativeCaptureVerdict";
 
 export class CaptureFailure extends Schema.TaggedError<CaptureFailure, { readonly brand: unique symbol }>()("CaptureFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
@@ -354,7 +354,7 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
   const torn = log.filter(row => row.stamp === "torn").length;
   console.log(JSON.stringify({ captured: saved.size, wanted, missed: missed.length, screenCaptures: log.length, unreadable, torn, medianCaptureMs: [...log.map(row => row.captureMs)].sort((a, b) => a - b)[Math.floor(log.length / 2)] ?? 0 }));
   if (wrongSize.length > 0) return yield* new CaptureFailure({ problem: wrongSize.join("; ") });
-  if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}${row.phase === "held" ? "" : ` ${row.phase}`}`).join(", ")}` });
+  if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}${row.phase === "held" ? "" : ` ${row.phase}`}`).join(", ")}; ${attemptEnding(log, Date.now() - started >= minutes * 60000 ? minutes : undefined)}` });
 }));
 
 const plan = (args: readonly string[]) => Effect.gen(function*() {

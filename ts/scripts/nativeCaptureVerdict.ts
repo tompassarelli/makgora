@@ -73,3 +73,20 @@ export function frameStamp(frame: Frame): Stamp | undefined {
   const verdict = frameVerdict(frame);
   return "keep" in verdict ? verdict.keep : undefined;
 }
+
+const STALL_MS = 10000;
+
+export function attemptEnding(log: readonly { readonly ms: number; readonly stamp: string }[], spentMinutes: number | undefined): string {
+  const end = log.at(-1)?.ms ?? 0;
+  const stamped = log.filter(row => /^\d+\/\d+$/.test(row.stamp));
+  const last = stamped.at(-1);
+  const prefix = spentMinutes !== undefined ? `the ${spentMinutes}-minute attempt budget ran out` : "the attempt ended";
+  if (last === undefined) return `${prefix} before any frame stamp was readable`;
+  let since = last.ms;
+  for (let index = stamped.length - 1; index >= 0 && stamped[index]?.stamp === last.stamp; index--) since = stamped[index]?.ms ?? since;
+  const [script, frame] = last.stamp.split("/");
+  const held = end - since;
+  return held >= STALL_MS
+    ? `${prefix} with the frame stamp stuck at script ${script} frame ${frame} for ${Math.round(held / 1000)} s`
+    : `${prefix} while the frame stamp still advanced, last at script ${script} frame ${frame}`;
+}
