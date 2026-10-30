@@ -10,6 +10,9 @@ on:
       ref:
         description: Landed main commit to test
         default: ""
+      rebaseline:
+        description: "Fighter pairs, one per line (such as 'murloc vs rifleman'), whose rise over the prior census is a decided change: this run measures them without judging them and its artifact becomes their baseline"
+        default: ""
 
 permissions:
   contents: read
@@ -167,13 +170,18 @@ jobs:
           echo "::warning::No green Background census artifact from this instrument on main's last 60 first-parent commits: only coverage and absolute frame budgets apply"
       - name: Every fighter pair's worst frame within the margin of main's last green census (#405)
         working-directory: ts
+        env:
+          REBASELINE: ${{ inputs.rebaseline }}
         run: |
           cat census/census-*/census-pairs-*.txt > census-pairs.txt 2>/dev/null
           measured=$(wc -l < census-pairs.txt)
           expected=$(bun -e 'import { SELECTABLE_CHARACTERS } from "./src/game/roster/kits"; console.log(SELECTABLE_CHARACTERS.length)')
           [ "$measured" = "$expected" ] || { echo "::error title=Unmeasured::the census measured $measured of $expected fighter pairs: see the census jobs"; exit 1; }
           if [ -f prior/census-pairs.txt ]; then
-            bun wisp perf compare prior/census-pairs.txt census-pairs.txt
+            judged() { awk -F'\t' -v list="$REBASELINE" 'BEGIN { n = split(list, names, "\n"); for (i = 1; i <= n; i++) skip[names[i]] = 1 } !($2 in skip)' "$1"; }
+            judged prior/census-pairs.txt > prior-judged.txt
+            judged census-pairs.txt > census-judged.txt
+            bun wisp perf compare prior-judged.txt census-judged.txt
           fi
       - if: success() && needs.sweeps.result == 'success'
         uses: actions/upload-artifact@v4
