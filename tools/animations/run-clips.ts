@@ -11,6 +11,7 @@ import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { generateModelMDX as generateMDX } from "../../ts/scripts/mdxCodec";
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { drawnStrideOf } from "../../ts/scripts/wisp/drawnMotion";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, type Character } from "../../ts/src/game/sim/codes";
 import { GROUND_LOCOMOTION_RATE_CAP } from "../../ts/src/game/presentation/fighterLocomotion";
@@ -25,7 +26,7 @@ ensure(inputArg && outputArg && relative(project, output).startsWith("..") && op
 const fighter = fighters.get(character), rig = FIGHTER_RIGS.get(character);
 ensure(fighter && rig, `no fighter or canonical rig for character ${character}`);
 
-const DUTY = 0.46, RATE_TARGET = 4.6, REACH = 0.97, CROUCH = 0.1, BOB = 0.05, LIFT = 0.22, LEAN = 9, ELBOW = 62, ARM_SWING = 28;
+const DUTY = 0.46, RATE_TARGET = 4.4, REACH = 0.97, CROUCH = 0.1, BOB = 0.05, LIFT = 0.22, LEAN = 9, ELBOW = 62, ARM_SWING = 28;
 const rad = (degrees: number) => degrees * Math.PI / 180;
 const lateral = (degrees: number) => quat.setAxisAngle(quat.create(), [0, 1, 0], rad(degrees));
 const ms = (frame: number) => Math.round(frame * 1000 / 60);
@@ -161,19 +162,11 @@ for (const [i, sequence] of source.Sequences.entries()) for (const fraction of [
 }
 
 const duration = frames / 60, drawn = new DrawnModel(bytes, scale);
-const sampled = Array.from({ length: 61 }, (_, f) => drawn.triangles(index, duration * f / 60, 1));
-const first = sampled[0]!, floor = Math.min(...first.filter((_, k) => k % 2 === 1));
-let sum = 0, count = 0;
-for (let k = 0; k < first.length; k += 2) {
-  let low = 0, left = Infinity, right = -Infinity;
-  for (const vertices of sampled) { if ((vertices[k + 1] ?? Infinity) < floor + 15) low++; left = Math.min(left, vertices[k] ?? Infinity); right = Math.max(right, vertices[k] ?? -Infinity); }
-  if (low > 10) { sum += 2 * (right - left) / duration; count++; }
-}
-const stride = sum / Math.max(1, count), drawnRate = runSpeed / stride;
+const stride = drawnStrideOf(drawn, index, duration), drawnRate = runSpeed / stride;
 const ankleZ = (frame: number, l: Leg) => drawn.posed(index, frame / 60, 1).nodes[l.ankle * 2 + 1] ?? 0;
 const bodyOverFeet = Math.max(1, drawnRate / GROUND_LOCOMOTION_RATE_CAP);
 console.log(`RUN_CLIP ${fighter.name}: ${frames} frames, ${cadence.toFixed(2)} cycles/s at ${runSpeed.toFixed(0)} u/s, step ${step.toFixed(1)}, drawn stride ${stride.toFixed(1)} u/s, run rate ${drawnRate.toFixed(2)}x (cap ${GROUND_LOCOMOTION_RATE_CAP}), body/feet ${bodyOverFeet.toFixed(2)}, ankle z ${ankleZ(0, leg).toFixed(1)}`);
-if (!process.env.RUN_DEBUG) ensure(drawnRate <= GROUND_LOCOMOTION_RATE_CAP * 1.15, `${fighter.name}: run rate ${drawnRate.toFixed(2)} past the cap`);
+if (!process.env.RUN_DEBUG) ensure(drawnRate <= GROUND_LOCOMOTION_RATE_CAP, `${fighter.name}: run rate ${drawnRate.toFixed(2)} past the cap`);
 
 mkdirSync(dirname(join(output, fighter.source)), { recursive: true });
 await Bun.write(join(output, fighter.source), bytes); chmodSync(join(output, fighter.source), 0o644);

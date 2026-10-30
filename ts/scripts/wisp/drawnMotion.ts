@@ -132,17 +132,13 @@ export interface DrawnStride {
 }
 
 
-export function measureDrawnStride(bytes: ArrayBuffer, drawn: DrawnModel, character: Character, motion: "walk" | "run", model: string): DrawnStride {
-  const clip = groundLocomotionClip(character, motion === "walk" ? IllidanLocomotion.walk : IllidanLocomotion.run);
-  const sequence = clip === undefined ? undefined : parseModelMDX(bytes).Sequences[clip.index];
-  if (clip === undefined || sequence === undefined) throw new Error(`${character}/${motion}: no sequence`);
-  const seconds = ((sequence.Interval[1] ?? 0) - (sequence.Interval[0] ?? 0)) / 1000;
-  const samples = Array.from({ length: 61 }, (_, frame) => drawn.triangles(clip.index, seconds * frame / 60, 1));
+/** Foot travel in world units per second: grounded vertices that move, so a hem or pelvis dipping into the floor band does not dilute the feet. */
+export function drawnStrideOf(drawn: DrawnModel, clip: number, seconds: number): number {
+  const samples = Array.from({ length: 61 }, (_, frame) => drawn.triangles(clip, seconds * frame / 60, 1));
   const first = samples[0];
   if (first === undefined) throw new Error("no stride samples");
   const floor = Math.min(...first.filter((_, index) => index % 2 === 1));
-  let sum = 0;
-  let count = 0;
+  const speeds: number[] = [];
   for (let index = 0; index < first.length; index += 2) {
     let low = 0;
     let left = Infinity;
@@ -152,9 +148,19 @@ export function measureDrawnStride(bytes: ArrayBuffer, drawn: DrawnModel, charac
       left = Math.min(left, vertices[index] ?? Infinity);
       right = Math.max(right, vertices[index] ?? -Infinity);
     }
-    if (low > 10) { sum += 2 * (right - left) / seconds; count++; }
+    if (low > 10) speeds.push(2 * (right - left) / seconds);
   }
-  const stride = sum / Math.max(1, count);
+  const median = speeds.sort((x, y) => x - y)[speeds.length >> 1] ?? 0;
+  const moving = speeds.filter((speed) => speed >= median / 2);
+  return moving.reduce((sum, speed) => sum + speed, 0) / Math.max(1, moving.length);
+}
+
+export function measureDrawnStride(bytes: ArrayBuffer, drawn: DrawnModel, character: Character, motion: "walk" | "run", model: string): DrawnStride {
+  const clip = groundLocomotionClip(character, motion === "walk" ? IllidanLocomotion.walk : IllidanLocomotion.run);
+  const sequence = clip === undefined ? undefined : parseModelMDX(bytes).Sequences[clip.index];
+  if (clip === undefined || sequence === undefined) throw new Error(`${character}/${motion}: no sequence`);
+  const seconds = ((sequence.Interval[1] ?? 0) - (sequence.Interval[0] ?? 0)) / 1000;
+  const stride = drawnStrideOf(drawn, clip.index, seconds);
 
   const speed = character === Character.lich ? sequence.MoveSpeed : stride;
   if (!Number.isFinite(speed) || speed <= 0) throw new Error(`${character}/${motion}: no drawn stride`);

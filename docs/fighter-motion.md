@@ -64,9 +64,9 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Muradin Bronzebeard | ledge-get-up | 41: Recovery ledgeClimb | 112.3 | 64.2 | up; 110.7/0.0 |
 | Muradin Bronzebeard | ledge-roll | 42: Recovery ledgeRoll | 109.9 | 43.3 | forward; 71.0/83.6 |
 | Muradin Bronzebeard | ledge-attack | 43: Recovery ledgeAttack | 185.5 | 83.0 | both; 110.7/106.4 |
-| Maiev Shadowsong | walk | 2: Walk | 89.2 | 21.5 | forward; 88.6/85.0 |
-| Maiev Shadowsong | dash | 2: Walk | 82.3 | 21.1 | forward; 76.2/82.3 |
-| Maiev Shadowsong | run | 2: Walk | 66.4 | 26.4 | forward; 55.6/58.6 |
+| Maiev Shadowsong | walk | 2: Walk | 89.0 | 21.5 | forward; 88.6/85.1 |
+| Maiev Shadowsong | dash | 78: Movement run | 86.5 | 10.3 | forward; 81.5/85.0 |
+| Maiev Shadowsong | run | 78: Movement run | 79.9 | 13.9 | forward; 75.7/74.4 |
 | Maiev Shadowsong | turn | 12: Recovery turn | 128.1 | 27.2 | back; 128.1/90.5 |
 | Maiev Shadowsong | brake | 13: Recovery stop | 25.9 | 13.8 | in place; 18.8/20.4 |
 | Maiev Shadowsong | jump-squat | 14: Recovery jumpSquat | 42.8 | 19.4 | down; 41.8/22.1 |
@@ -384,26 +384,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Kael'thas Sunstrider | ledge-get-up | 43: Kaelthas ledgeClimb | 114.3 | 20.7 | up; 108.5/8.9 |
 | Kael'thas Sunstrider | ledge-roll | 71: Kaelthas ledgeRoll | 173.0 | 78.2 | forward; 138.3/102.3 |
 | Kael'thas Sunstrider | ledge-attack | 44: Kaelthas ledgeAttack | 68.1 | 11.1 | both; 55.2/19.3 |
-| Murloc | walk | 1: Walk | 126.7 | 32.7 | forward; 117.6/125.3 |
-| Murloc | dash | 1: Walk | 126.8 | 30.7 | forward; 110.1/125.1 |
-| Murloc | run | 1: Walk | 106.0 | 32.6 | forward; 101.1/88.5 |
-| Murloc | turn | 31: Murloc turn | 165.1 | 44.8 | back; 149.2/32.1 |
-| Murloc | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
-| Murloc | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
-| Murloc | roll-forward | 66: Murloc rollForward | 167.4 | 71.9 | forward; 71.6/157.4 |
-| Murloc | roll-back | 70: Murloc rollBackward | 166.3 | 71.1 | back; 157.3/71.6 |
-| Murloc | spot-dodge | 47: Murloc spotDodge | 77.2 | 23.0 | in place; 46.2/59.5 |
-| Murloc | air-dodge | 28: Murloc airDodge | 65.4 | 13.9 | in place; 45.5/55.4 |
-| Murloc | tech | 48: Murloc tech | 75.3 | 31.5 | in place; 24.5/47.5 |
-| Murloc | tech-forward | 67: Murloc techForward | 167.5 | 71.5 | forward; 71.5/157.5 |
-| Murloc | tech-back | 71: Murloc techBackward | 167.5 | 71.4 | back; 157.5/71.6 |
-| Murloc | get-up | 45: Murloc getUp | 111.1 | 44.9 | up; 73.6/77.5 |
-| Murloc | get-up-forward | 68: Murloc getUpRollForward | 147.7 | 60.7 | forward; 123.7/94.2 |
-| Murloc | get-up-back | 72: Murloc getUpRollBackward | 128.4 | 60.6 | back; 98.8/121.6 |
-| Murloc | get-up-attack | 46: Murloc getUpAttack | 134.6 | 49.8 | both; 133.3/39.7 |
-| Murloc | ledge-get-up | 41: Murloc ledgeClimb | 107.1 | 26.3 | up; 76.0/89.8 |
-| Murloc | ledge-roll | 69: Murloc ledgeRoll | 167.3 | 71.7 | forward; 71.6/157.2 |
-| Murloc | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
+| Murlocs | walk | 1: Walk | 126.7 | 32.7 | forward; 117.6/125.3 |
+| Murlocs | dash | 1: Walk | 126.8 | 30.7 | forward; 110.1/125.1 |
+| Murlocs | run | 1: Walk | 106.0 | 32.6 | forward; 101.1/88.5 |
+| Murlocs | turn | 31: Murloc turn | 165.1 | 44.8 | back; 149.2/32.1 |
+| Murlocs | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
+| Murlocs | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
+| Murlocs | roll-forward | 66: Murloc rollForward | 167.4 | 71.9 | forward; 71.6/157.4 |
+| Murlocs | roll-back | 70: Murloc rollBackward | 166.3 | 71.1 | back; 157.3/71.6 |
+| Murlocs | spot-dodge | 47: Murloc spotDodge | 77.2 | 23.0 | in place; 46.2/59.5 |
+| Murlocs | air-dodge | 28: Murloc airDodge | 65.4 | 13.9 | in place; 45.5/55.4 |
+| Murlocs | tech | 48: Murloc tech | 75.3 | 31.5 | in place; 24.5/47.5 |
+| Murlocs | tech-forward | 67: Murloc techForward | 167.5 | 71.5 | forward; 71.5/157.5 |
+| Murlocs | tech-back | 71: Murloc techBackward | 167.5 | 71.4 | back; 157.5/71.6 |
+| Murlocs | get-up | 45: Murloc getUp | 111.1 | 44.9 | up; 73.6/77.5 |
+| Murlocs | get-up-forward | 68: Murloc getUpRollForward | 147.7 | 60.7 | forward; 123.7/94.2 |
+| Murlocs | get-up-back | 72: Murloc getUpRollBackward | 128.4 | 60.6 | back; 98.8/121.6 |
+| Murlocs | get-up-attack | 46: Murloc getUpAttack | 134.6 | 49.8 | both; 133.3/39.7 |
+| Murlocs | ledge-get-up | 41: Murloc ledgeClimb | 107.1 | 26.3 | up; 76.0/89.8 |
+| Murlocs | ledge-roll | 69: Murloc ledgeRoll | 167.3 | 71.7 | forward; 71.6/157.2 |
+| Murlocs | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
 | Grom Hellscream | walk | 5: Walk | 121.9 | 50.4 | forward; 118.7/111.2 |
 | Grom Hellscream | dash | 5: Walk | 121.9 | 49.0 | forward; 118.7/109.6 |
 | Grom Hellscream | run | 5: Walk | 135.2 | 46.2 | forward; 134.4/132.1 |
@@ -524,9 +524,9 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Archimonde the Defiler | ledge-get-up | 2: Walk | 160.5 | 38.5 | up; 96.1/63.2 |
 | Archimonde the Defiler | ledge-roll | 2: Walk | 160.7 | 38.6 | forward; 160.2/133.7 |
 | Archimonde the Defiler | ledge-attack | 6: Attack - 1 | 195.4 | 72.9 | both; 195.1/126.0 |
-| Tyrande Whisperwind | walk | 8: Walk | 100.5 | 45.8 | forward; 99.5/80.6 |
-| Tyrande Whisperwind | dash | 8: Walk | 91.7 | 44.2 | forward; 90.0/78.5 |
-| Tyrande Whisperwind | run | 8: Walk | 103.4 | 39.7 | forward; 98.3/103.4 |
+| Tyrande Whisperwind | walk | 8: Walk | 100.0 | 45.7 | forward; 99.0/80.6 |
+| Tyrande Whisperwind | dash | 84: Movement run | 56.6 | 14.3 | forward; 55.5/56.0 |
+| Tyrande Whisperwind | run | 84: Movement run | 56.3 | 20.2 | forward; 44.8/47.2 |
 | Tyrande Whisperwind | turn | 37: Tyrande turn | 123.0 | 52.8 | back; 45.2/123.0 |
 | Tyrande Whisperwind | brake | 38: Tyrande stop | 25.3 | 11.4 | in place; 25.0/12.9 |
 | Tyrande Whisperwind | jump-squat | 39: Tyrande jumpSquat | 78.9 | 44.1 | down; 70.5/6.0 |
@@ -625,4 +625,4 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Alchemist (WIP) | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
 | Alchemist (WIP) | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
 
-Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Firelord and Lady Vashj. Warden (body 1.8x the capped feet), Tyrande (1.4x) and Jaina (1.15x) are grounded and their models carry a single stock Walk and no faster sequence, so they are candidates for an authored run.
+Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Firelord and Lady Vashj. Warden, Tyrande and Jaina are grounded and their models carry a single stock Walk, so Warden and Tyrande run on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Jaina (about 1.15x) is marginal and stays on her walk.

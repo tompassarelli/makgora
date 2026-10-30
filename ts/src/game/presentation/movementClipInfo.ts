@@ -16,6 +16,8 @@ export const MOVEMENT_CLIPS = {
   5: {
     crouch: { index: 72, seconds: f32(0.4) },
     ledgeHang: { index: 76, seconds: 1.0 },
+    run: { index: 78, seconds: f32(0.8833333) },
+    dash: { index: 78, seconds: f32(0.8833333) },
   },
   6: {
     crouch: { index: 64, seconds: f32(0.4) },
@@ -32,5 +34,9 @@ export const MOVEMENT_CLIPS = {
   11: {
     crouch: { index: 62, seconds: f32(0.4) },
     ledgeHang: { index: 63, seconds: 1.0 },
+  },
+  30: {
+    run: { index: 84, seconds: f32(0.5833333) },
+    dash: { index: 84, seconds: f32(0.5833333) },
   },
 } as const satisfies Readonly<Record<number, HeroClipTable>>;
