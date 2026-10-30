@@ -20,6 +20,8 @@ import { heroStanceFits, heroStanceSlot, pressHeroStance } from "./botHeroKit";
 
 const HISTORY_LIMIT = 128;
 export const BURN_MEMORY_FRAMES = 150;
+// Only a move that hits twice running is kept clear of (#412): after one hit the computer plays on, so a full ultimate meter still goes to its ultimate (#382).
+export const BURN_REPEATS = 2;
 const READ_CHOICES = [HabitChoice.attack, HabitChoice.shield, HabitChoice.jump, HabitChoice.retreat, HabitChoice.approach, HabitChoice.landing, HabitChoice.ledge] as const;
 
 const retained: number[] = [];
@@ -75,6 +77,7 @@ export interface BotStrategy {
   burnFrame: number;
   burnCount: number;
   burnGap: number;
+  blockFrame: number;
 
   readonly recentOptions: number[];
 }
@@ -84,10 +87,10 @@ const NO_HABITS: readonly number[] = [];
 const noRecentOptions = (): number[] => Array.from({ length: 2 * VARIETY_STARTS }, () => -1);
 
 export function createBotStrategy(): BotStrategy {
-  return { history: NO_HABITS, observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, recentOptions: noRecentOptions() };
+  return { history: NO_HABITS, observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, blockFrame: -1, recentOptions: noRecentOptions() };
 }
 
-export type SavedBotStrategy = Pick<BotStrategy, "observedFrame" | "opponent" | "lastChoice" | "lastContext" | "lastSerial" | "events" | "lastOption" | "recentOptions" | "burnHurt" | "burnStyle" | "burnCharacter" | "burnFrame" | "burnCount" | "burnGap"> & {
+export type SavedBotStrategy = Pick<BotStrategy, "observedFrame" | "opponent" | "lastChoice" | "lastContext" | "lastSerial" | "events" | "lastOption" | "recentOptions" | "burnHurt" | "burnStyle" | "burnCharacter" | "burnFrame" | "burnCount" | "burnGap" | "blockFrame"> & {
   readonly history: readonly SavedBotHabit[];
   readonly read: SavedBotRead | undefined;
 };
@@ -110,7 +113,7 @@ export function savedBotStrategy(state: Readonly<BotStrategy>): SavedBotStrategy
     actionStyle: state.readActionStyle,
     actionFacing: state.readActionFacing,
   } : undefined;
-  return { history, observedFrame: state.observedFrame, opponent: state.opponent, lastChoice: state.lastChoice, lastContext: state.lastContext, lastSerial: state.lastSerial, events: state.events, read, lastOption: state.lastOption, burnHurt: state.burnHurt, burnStyle: state.burnStyle, burnCharacter: state.burnCharacter, burnFrame: state.burnFrame, burnCount: state.burnCount, burnGap: state.burnGap, recentOptions: [...state.recentOptions] };
+  return { history, observedFrame: state.observedFrame, opponent: state.opponent, lastChoice: state.lastChoice, lastContext: state.lastContext, lastSerial: state.lastSerial, events: state.events, read, lastOption: state.lastOption, burnHurt: state.burnHurt, burnStyle: state.burnStyle, burnCharacter: state.burnCharacter, burnFrame: state.burnFrame, burnCount: state.burnCount, burnGap: state.burnGap, blockFrame: state.blockFrame, recentOptions: [...state.recentOptions] };
 }
 
 export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrategy {
@@ -131,6 +134,7 @@ export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrat
   state.burnFrame = saved.burnFrame;
   state.burnCount = saved.burnCount;
   state.burnGap = saved.burnGap;
+  state.blockFrame = saved.blockFrame;
   for (let index = 0; index < state.recentOptions.length; index++) state.recentOptions[index] = at(saved.recentOptions, index);
   if (saved.read !== undefined) {
     state.readActive = true;
@@ -163,6 +167,7 @@ export function copyBotStrategy(target: BotStrategy, source: Readonly<BotStrateg
   target.burnFrame = source.burnFrame;
   target.burnCount = source.burnCount;
   target.burnGap = source.burnGap;
+  target.blockFrame = source.blockFrame;
   const recent = source.recentOptions;
   const into = target.recentOptions;
   for (let index = 0; index < recent.length; index++) into[index] = recent[index] ?? 0;
@@ -189,7 +194,7 @@ function sameHistory(a: readonly number[], b: readonly number[]): boolean {
 export function sameBotStrategy(a: Readonly<BotStrategy>, b: Readonly<BotStrategy>): boolean {
   return sameHistory(a.history, b.history) && a.observedFrame === b.observedFrame && a.opponent === b.opponent && a.lastChoice === b.lastChoice
     && a.lastContext === b.lastContext && a.lastSerial === b.lastSerial && a.events === b.events && a.lastOption === b.lastOption
-    && a.burnHurt === b.burnHurt && a.burnStyle === b.burnStyle && a.burnCharacter === b.burnCharacter && a.burnFrame === b.burnFrame && a.burnCount === b.burnCount && a.burnGap === b.burnGap
+    && a.burnHurt === b.burnHurt && a.burnStyle === b.burnStyle && a.burnCharacter === b.burnCharacter && a.burnFrame === b.burnFrame && a.burnCount === b.burnCount && a.burnGap === b.burnGap && a.blockFrame === b.blockFrame
     && a.readActive === b.readActive && a.readChoice === b.readChoice && a.readContext === b.readContext && a.readExpectedFrame === b.readExpectedFrame
     && a.readExpires === b.readExpires && a.readConfidence === b.readConfidence && a.readActed === b.readActed && a.readActionFrame === b.readActionFrame
     && a.readActionSerial === b.readActionSerial && a.readActionStyle === b.readActionStyle && a.readActionFacing === b.readActionFacing;
@@ -201,7 +206,7 @@ export function clearBotStrategy(state: BotStrategy): void {
 
 
 export function botStrategyValues(state: Readonly<BotStrategy>): number[] {
-  const values = [state.observedFrame, state.opponent, state.lastChoice, state.lastContext, state.lastSerial, state.events, state.lastOption, state.burnHurt ? 1 : 0, state.burnStyle, state.burnCharacter, state.burnFrame, state.burnCount, state.burnGap,
+  const values = [state.observedFrame, state.opponent, state.lastChoice, state.lastContext, state.lastSerial, state.events, state.lastOption, state.burnHurt ? 1 : 0, state.burnStyle, state.burnCharacter, state.burnFrame, state.burnCount, state.burnGap, state.blockFrame,
     state.readActive ? 1 : 0, state.readActive ? state.readChoice : 0, state.readActive ? state.readContext : 0, state.readActive ? state.readExpectedFrame : 0, state.readActive ? state.readExpires : 0, state.readActive ? state.readConfidence : 0, state.readActive && state.readActed ? 1 : 0,
     state.readActive ? state.readActionFrame : -1, state.readActive ? state.readActionSerial : -1, state.readActive ? state.readActionStyle : -1, state.readActive ? state.readActionFacing : 0, floorDiv(state.history.length, HABIT_FIELDS)];
   for (const value of state.recentOptions) values.push(value);
@@ -230,8 +235,10 @@ export function learnBotHabit(state: BotStrategy, ownObserved: Readonly<Fighter>
   const hurt = (ownObserved.launch.hitlag > 0 || ownObserved.launch.hitstun > 0) && ownObserved.hits.lastAttacker === opponent;
   const struck = target.attack.style;
   if (struck !== undefined && struck !== AttackStyle.shot && struck !== AttackStyle.grab) {
-    if (hurt && !state.burnHurt) {
-      const repeated = struck === state.burnStyle && target.character === state.burnCharacter && observedFrame - state.burnFrame <= BURN_MEMORY_FRAMES;
+    const recent = target.character === state.burnCharacter && observedFrame - state.burnFrame <= BURN_MEMORY_FRAMES;
+    const stray = recent && struck !== state.burnStyle && state.burnCount >= BURN_REPEATS;
+    if (hurt && !state.burnHurt && !stray) {
+      const repeated = struck === state.burnStyle && recent;
       state.burnCount = repeated ? state.burnCount + 1 : 1;
       state.burnStyle = struck;
       state.burnCharacter = target.character;

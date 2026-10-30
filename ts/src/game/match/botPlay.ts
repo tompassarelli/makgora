@@ -23,7 +23,7 @@ import type { CpuTier } from "./cpuProfiles";
 import { type CpuSkill, cpuSkill, cpuReactionFloor, cpuReactionFrames, perceivedCpuSkill } from "./cpuSkill";
 import { FAST_BOT_HISTORY_FRAMES, BOT_HISTORY_FRAMES, type BotMemory, observeOpponents, perceivedOpponent, perceivedHeldFighter, commitBotDirection, samePerception } from "./botPerception";
 import { chooseDefense } from "./botDefense";
-import { burnedMove, keepClearOfBurn } from "./botBurn";
+import { burnedMove, keepClearOfBurn, punishBlockedBurn } from "./botBurn";
 import { choosePunish } from "./botPunish";
 import { chooseLedgeTrap } from "./botLedgeTrap";
 import { chooseRecoveryInput } from "./botRecovery";
@@ -402,8 +402,9 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   if (steerShotAtFoe(fighter, target, input)) return;
   if (target === undefined) return;
   if (skill.basicMoves === undefined && !game.training && waitAtLip(fighter, target, stage, skill, slot, frame, input)) return;
-  if (chooseDefense(fighter, target, stage, input, skill, observationAge)) return;
   const burned = burnedMove(runtime.botStrategies[slot], target, frame, observationAge);
+  if (skill.basicMoves === undefined && punishBlockedBurn(runtime.botStrategies[slot], burned, fighter, target, frame, input, commands)) return;
+  if (chooseDefense(fighter, target, stage, input, skill, observationAge)) return;
   // An opponent that can't act yet is punished before any pause or idle stretch.
   if (skill.basicMoves === undefined && choosePunish(fighter, target, stage, stageFrame, frame, skill, input, commands, observationAge, burned)) {
 

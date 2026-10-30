@@ -154,10 +154,13 @@ export function canStartAttackStyle(attacker: Fighter, style: AttackStyle | unde
 }
 
 
-export function attackStartup(f: Readonly<Fighter>, style: AttackStyle): number {
-  if (!f.attack.dashGrab) return attackStartupFrames(style, f.tuning.moves);
+export function dashGrabStartup(f: Readonly<Fighter>): number {
   const authoredGrab = f.tuning.moves?.normals[AttackStyle.grab];
   return authoredGrab === undefined ? f.tuning.dashGrab.startupFrames : authoredGrab.startupFrames + 3;
+}
+
+export function attackStartup(f: Readonly<Fighter>, style: AttackStyle): number {
+  return f.attack.dashGrab ? dashGrabStartup(f) : attackStartupFrames(style, f.tuning.moves);
 }
 
 

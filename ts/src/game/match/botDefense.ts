@@ -23,7 +23,7 @@ import type { DefenseOption } from "../sim/gameplan";
 import { type CpuSkill, FULL_SKILL } from "./cpuSkill";
 
 
-const SHIELD_RESERVE = 20.0;
+export const SHIELD_RESERVE = 20.0;
 
 const STRIKE_LOOKAHEAD = 12;
 
