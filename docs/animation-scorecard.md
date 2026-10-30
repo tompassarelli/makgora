@@ -247,6 +247,19 @@ hunched silhouette, the round body the jabs' exception already names. Earlier
 takes stopped at body share 0.287; a shallower windup dip passed it, the take
 limit is spent, and the take ships under the box's line 5 exception.
 
+Murloc's neutral air ships with line 5 below 4 (smashcraft#816). A Blender take
+(`tools/animations/murloc-stabs.py neutralAir`) draws the spear up behind him
+over the 3-frame startup, drives the point down and forward into the hit
+region's far end on the first active frame and carries it through, then
+draws it back to near ready by the last active frame so the recovery's frame
+change stays inside the aerial limit; frame data is unchanged (3/6/16, land
+8). Lines 1 to 4 pass in both facings (`bun wisp anim score --fighter murloc`:
+body share 0.31, mass shift 0.14, end error 0.00, jump 0.01, overshoot 0.40,
+contrast 0.41). One bare judge scored 2, 2, 2, 2, 3, naming a near-static
+body beside Falco's spinning neutral air; the jabs' round-body exception
+already covers that silhouette, and the pre-rework clip it replaces failed
+line 1 at 0.00. The first take passed lines 1 to 4, so it ships.
+
 Grom's dash attack ships with line 5 at 3: the judge medians on readability,
 weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
 lines 1 to 4 pass (#344). The take limit is spent; take B and the later

@@ -12,6 +12,9 @@ arc-length pace.
 Forward smash swings the spear back under him and over into a level swing along the stage: every joint turns about
 the side-view axis, so the blade stays in the side plane in both facings.
 
+Neutral air draws the spear up behind him, drives the point down and forward into the hit region and draws it back to
+near ready by the last active frame.
+
   blender --background --factory-startup --python tools/animations/murloc-stabs.py -- POSE RIG.json KEYS.json
 """
 import os
@@ -94,6 +97,18 @@ SMASHES = {
               (22, (74, 4), dict(pitch=-410, travel=22, drop=-6, lean=28, chest=24, head=-8, twist=28, leftArm=-60, stretch=0.2, squash=-0.08,
                                  front=-50, kneeFront=50, footFront=-15, back=40, kneeBack=10))],
         ramp=0.15),
+    'neutralAir': dict(
+        glide=8,
+        keys=[(0, None, {}),
+              (2, (-14, 78), dict(pitch=105, drop=3, lean=-14, chest=-12, head=8, leftArm=20, squash=0.16, stretch=-0.1,
+                                  front=-45, kneeFront=62, footFront=-15, back=42, kneeBack=70, footBack=-15)),
+              (3, (60, 16), dict(pitch=-57, drop=-8, travel=14, lean=22, chest=12, head=-10, leftArm=-60, squash=0.06, stretch=0.16,
+                                 front=-42, kneeFront=48, footFront=-15, back=36, kneeBack=55, footBack=-15)),
+              (5, (66, 10), dict(pitch=-60, drop=-9, travel=16, lean=26, chest=14, head=-12, leftArm=-65, squash=0.06, stretch=0.18,
+                                 front=-44, kneeFront=50, footFront=-15, back=38, kneeBack=58, footBack=-15)),
+              (8, (56, -2), dict(pitch=rig.hanging + 8, drop=-2, travel=3, lean=4, chest=3, head=-2, leftArm=-20, squash=0.03, stretch=0.02,
+                                 front=-10, kneeFront=14, back=10, kneeBack=14))],
+        ramp=0.1),
     'upSmash': dict(
         glide=14,
         keys=[(0, None, {}),
@@ -146,7 +161,8 @@ def bake_smash():
 
     def at(frame):
         if frame > end:
-            return through(along(glide((frame - end) / (frames - end), smash['ramp'])))
+            u = (frame - end) / (frames - end)
+            return through(along(1 - (1 - u) ** smash['out'] if 'out' in smash else glide(u, smash['ramp'])))
         for (a, pa), (b, pb) in zip(beats, beats[1:]):
             if a <= frame <= b:
                 t = (frame - a) / (b - a)

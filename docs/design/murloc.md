@@ -101,7 +101,7 @@ and action.
 | Forward smash | Two-claw lunge; finisher | 14/3/36; 16%; 98 | [Tiderunner claws][wc] | [Squirtle forward smash][sq] |
 | Up smash | Hop and point-first spear thrust straight up overhead, the hit a narrow column over his head fitted to the spear (2026-10-30) | 11/4/34; 15%; height 122 | [Tiderunner claws][wc] | [Squirtle up smash][sq] |
 | Down smash | Spinning sweep both sides | 12/4/34; 13%; ±86 | [Tiderunner claws][wc] | [Squirtle down smash][sq] |
-| Neutral air | Tucked spin; close escape; the fastest aerial | 3/6/16, land 8; 5% clean, 3% late; ±48 | [murloc swim][wc] | [Squirtle neutral air][sq], [Fox neutral air][fox] |
+| Neutral air | Point-first spear thrust down and forward from a tuck; close escape; the fastest aerial (2026-10-30) | 3/6/16, land 8; 5% clean, 3% late; ±48 | [murloc swim][wc] | [Squirtle neutral air][sq], [Fox neutral air][fox] |
 | Forward air | Claw rake ahead | 7/3/24, land 14; 10%; 80 | [Tiderunner claws][wc] | [Squirtle forward air][sq] |
 | Back air | Fin kick behind; strongest aerial | 8/3/24, land 14; 12%; −84 | [murloc swim][wc] | [Squirtle back air][sq] |
 | Up air | Overhead flip; juggle | 6/4/20, land 12; 9%; height 108 | [Tiderunner claws][wc] | [Squirtle up air][sq] |
