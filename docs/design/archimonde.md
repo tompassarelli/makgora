@@ -133,3 +133,29 @@ Still outside the 30-70% matchup band: Chen (5%), Pit Lord (12%), Anub'arak
 (17%), Jaina (25%), Cairne (26%) and Shadow Hunter (27%) on the low side,
 Warden (85%) and Sylvanas (85%) on the high side. His kills come from forward
 smash (56%). Approach, ranged and air shares remain the next balance work.
+
+## Native capture (2026-10-30)
+
+All 58 reel rows (every move, the ultimate and the movement rows, both
+facings) captured natively on a VM pair at bff11b1b90 with a 24-tick hold: 462
+of 462 frames, none missed. The default 6-tick hold missed 146 frames after
+four attempts, so Archimonde's reel needs `--hold-ticks 24`. Three fresh Opus
+cold viewers read the sheets with opaque row IDs. Line 7 of finished-move.md
+does not pass yet:
+
+- **Rain of Fire** reads as a dash with a green smear and one light column at
+  contact; the two ground pillars ahead of him are not read, and the right
+  facing shows a column the left lacks.
+- **Finger of Death** reads as a wind-up and a flash on the foe; the marked
+  ring and the lightning column are not read, and the facings differ in frame 2.
+- **Bash** reads as low sparks while the bodies overlap; the two fists into the
+  floor are not read, and a green ground glow outlasts the hits.
+- **Forward smash, jab, tilts and Fel Ascent** read as intended. **Down smash**
+  passes through the dummy and shows its spark on empty floor in frames 5 and 6;
+  **grab** reads as a whiff.
+- Aerials and several specials stack the dummy inside his body, so the hit is
+  unreadable; whiteout flashes hide the pose on back air and Finger of Death.
+- The first frames of the forward smash and ultimate rows come from before the
+  match clock restarts, and the walk shows almost no travel.
+
+Sheets and viewer notes: `~/.local/state/smashcraft/evidence/sc-664`.
