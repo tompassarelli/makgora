@@ -323,26 +323,29 @@ drain needs a body hit. Alternatives: **B, Shear as the jab finisher**
 seam); **C, Shear shrinks the target's shield** (rejected: shield health is a
 shared system with its own owner decisions, #102).
 
-### Down smash: the splits with Azzinoth's fel fire (picked, #518)
+### Down smash: a low two-sided sweep with Azzinoth's fel fire (picked, #518)
 
-Tom decided on 2026-10-26 that his down smash becomes Falco's: from a crouch he
-drops into the splits, one leg kicking out in front and one behind at the same
-instant, low along the floor, then rises back to stance. The kick replaces the
-thrown glaives of the Flames of Azzinoth; the Azzinoth fel fire stays as the
-burn on contact (a fire hit), so the move still reads as Illidan's.
+His down smash takes Falco's frames and hits low on both sides at once, and it
+reads as a low sweep to both sides. Tom first asked for the splits (2026-10-26);
+on 2026-10-31 he accepted the low sweep instead, after two takes showed the
+stock model's wing, body and glaive mass hiding his legs, so no viewer could
+read a split. The sweep replaces the thrown glaives of the Flames of Azzinoth;
+the Azzinoth fel fire stays as the burn on contact (a fire hit), so the move
+still reads as Illidan's.
 
 - Timing is Falco's through the parity mapping, pinned by ledger rows
   `illidan-down-smash-timing` and `illidan-down-smash-angle`: active frames
   6-10, interruptible from 46, charge between frames 2 and 3.
-- Both legs hit on the same frames: 13% at 25° away from him on each side,
-  the shared down smash knockback. One capsule per leg from 12 to 92 out,
+- Both sides hit on the same frames: 13% at 25° away from him on each side,
+  the shared down smash knockback. One capsule per side from 12 to 92 out,
   12 high, radius 13 (`ILLIDAN_MOVES` in `ts/src/game/sim/originalMoves.ts`).
 
 Counterplay: the hitboxes sit at the floor, so a full jump or anything airborne
-above his knees clears it, and he has 35 frames of recovery after the kick for
+above his knees clears it, and he has 35 frames of recovery after the sweep for
 a shield to punish. Alternatives: **B, keep the thrown glaives** (rejected:
-Tom asked for the splits); **C, a one-sided kick** (rejected: the splits hits
-both sides, which is the Melee move's point).
+Tom asked for a Falco down smash); **C, a one-sided kick** (rejected: hitting
+both sides is the Melee move's point); **D, the splits** (dropped 2026-10-31:
+the stock model hides the legs, so it reads as a sweep either way).
 
 ### Forward smash: spinning roundhouse kick (picked, 2026-10-28)
 
@@ -521,7 +524,7 @@ attackCues.ts and elementLooks.ts):
 | Fel Rush (frames 18–21, or to a shortened stop) | Illidan's Metamorphosis missile streak along the path and the green wing trail, which fade behind him; Maiev's Illusion leaves blink afterimages instead |
 | Shear (forward tilt, all angles) | Illidan's Metamorphosis missile where the glaive cuts (Demon Bolt impact until 28 Oct: its red zap texture strobed on and off, so a Shear sometimes flashed lightning) |
 | Roundhouse kick (forward smash) | Plague Cloud smoke curling at the kicking leg through the chamber and twist; on the hit frames a fel crescent swung up to the heel, a ribbon and a particle trail white-hot at the heel to dark green at its edge, shedding embers, that lingers and dissolves into smoke (tools/effects/felCrescent.ts); a clean hit on the shin, foot or heel lands as the fire hit's green flame burst, a knee hit as the normal spark |
-| Down smash, the splits | the fire hit's fel burn on the foe it kicks |
+| Down smash, the low two-sided sweep | the fire hit's fel burn on the foe it kicks |
 | Twin-glaive forward air | Illidan's missile trail |
 | Drain on hit (any victim) | Mana Burn target over the victim's head through that hit's hitlag and hitstun |
 
@@ -623,7 +626,7 @@ What he keeps, so he does not become Falco in a costume:
   Illusion (low and spiking where hers pops up), but it keeps the fel fire,
   the fel streak, and the earned, aimed second rush on a hit that hers lacks.
 - Warglaives: his normals keep their glaive reach, the twin-glaive forward air
-  and Azzinoth's fel fire on his split-kick down smash.
+  and Azzinoth's fel fire on his low two-sided down smash sweep.
 - Wing Ascent and the Wing Dive: his recovery keeps the ascent and its
   eight-way dive, which starts by itself on frame 19 when the stick changes zone. Since #519 the ascent aims and starts like Fire Bird, but it
   takes no charge and does not hit.

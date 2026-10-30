@@ -133,6 +133,16 @@ its frame data, damage, angle and knockback are unchanged.
   cloak. The two floor capsules are unchanged (reach 105), and 92% of her
   drawn lower leg sits inside them on both active frames.
 
+## Down smash: a low two-sided sweep (#518)
+
+Her down smash takes Fox's frames and hits low on both sides on the same
+frames, sending each foe away from her at 25° (ledger rows
+`maiev-down-smash-timing` and `maiev-down-smash-angle`), and it reads as a low
+sweep to both sides. Tom first asked for the splits (2026-10-26); on
+2026-10-31 he accepted the low sweep instead, after two takes showed the stock
+model's cloak, body and glaive mass hiding her legs, so no viewer could read a
+split.
+
 ## Identity guard
 
 What she keeps, so she does not become Fox in a costume:
