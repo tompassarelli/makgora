@@ -37,7 +37,7 @@ cancelling.
 | Peon | Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing | S0 W2 L27/E— | S0 W2 L15/E— | S0 W2 L3/E— | S0 W2 L—/E65 |
 | Goblin Tinker | drops one Clockwerk Goblin; lands into the grounded factory build | S1 W10 L27/E27 | S1 W10 L15/E15 | S1 W24 L3/E48 | S1 W10 L—/E36 |
 | Kael'thas Sunstrider | Banish curse in the air; lands into the grounded cast | S1 W12 L57/E36 | S1 W12 L26/E26 | S1 W12 L4/E36 | S1 W12 L—/E36 |
-| Murloc | small plague cloud at the cast point | S1 W14 L27/E27 | S1 W14 L15/E15 | S1 W14 L3/E38 | S1 W14 L—/E38 |
+| Murlocs | Mrglglgl! revives Grgl on the ground; refused in the air | R | R | R | R |
 | Grom Hellscream | aerial chop; lands into the grounded chop | S1 W20 L27/E27 | S1 W20 L15/E50 | S1 W20 L3/E50 | S1 W20 L—/E50 |
 | Malfurion Stormrage | downward branch; recall works while falling | S1 W26 L27/E27 | S1 W26 L15/E80 | S1 W26 L3/E80 | S1 W26 L—/E65 |
 | Medivh | Last Word holds height, blinks back and bursts | S0 W13 L59/E38 | S0 W13 L57/E38 | S0 W13 L43/E38 | S0 W13 L—/E38 |

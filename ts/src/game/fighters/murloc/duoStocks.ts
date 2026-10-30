@@ -1,30 +1,13 @@
-import { blastFighterFields } from "../../../generated/state/fighterState";
 import { DOWN_WAIT_FRAMES } from "../../sim/down";
 import { DownState, DuoOrder, LedgeState } from "../../sim/codes";
 import { inGrabContext } from "../../sim/conditions";
-import { respawnFighter } from "../../sim/stocks";
+import { partnerDeparts, partnerReturns } from "../../sim/duoPartner";
 import { type Roster, fighterAt, isActive } from "../../sim/roster";
-import { beginDownState, clearGrabLinks, clearOwnedFreezeTrap, clearSpecialOnStock } from "../../sim/transitions";
+import { beginDownState } from "../../sim/transitions";
 import { MURLOC_DUO } from "./duo";
 import { mutableDuo } from "../../sim/fighter";
 
 export const PARTNER_FAINT = { damage: 70.0, frames: 30 } as const;
-
-export function partnerDeparts(world: Roster, slot: number): void {
-  const f = fighterAt(world, slot);
-  if (f.status.out) return;
-  clearGrabLinks(world, slot);
-  clearSpecialOnStock(f);
-  clearOwnedFreezeTrap(f);
-  blastFighterFields(f);
-  f.status.stocks = 0;
-  f.status.respawn = 0;
-}
-
-export function partnerReturns(world: Roster, slot: number, x: number): void {
-  respawnFighter(world, slot, x);
-  fighterAt(world, slot).status.stocks = 1;
-}
 
 function faintsNow(world: Roster, slot: number): boolean {
   const f = fighterAt(world, slot);

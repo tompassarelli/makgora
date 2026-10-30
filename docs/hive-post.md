@@ -52,7 +52,7 @@ Controllers work through a separate, experimental helper, [padbridge](https://gi
 - Thrall's down-special slam still needs animation work.
 - Some animations are stiff, such as Mal'Ganis, Cairne's normals and Sylvanas's kicks.
 - Some hit areas do not match the drawn weapon exactly, for example Peon, Chen and Grom.
-- Murloc's Disease Cloud and a few other effects borrow another unit's look.
+- Murloc's Mrglglgl! revive and a few other effects borrow another unit's look.
 - Balance is still a first pass, and the shield bubble can differ slightly from where hits land.
 - The game runs at about 59 frames a second and can stutter briefly when your computer is busy.
 - Cairne's, Shadow Hunter's and Sylvanas's ultimates and the Gryphon Aerie moving platform are first versions.

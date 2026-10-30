@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
+import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { CHILL } from "../../sim/chill";
 import { heroRegion } from "../../sim/heroMoves";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
@@ -42,24 +42,12 @@ const TIDAL_SURF: AuthoredSpecial = {
   regions: SURF_HITS.map(({ first, last }, index) => heroRegion(first, last, { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 }, surfHit(index === SURF_HITS.length - 1))),
 };
 
-const PLAGUE: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
-const DISEASE_CLOUD: AuthoredSpecial = {
-  endFrame: 38, cooldownFrames: 150, groundOnly: true,
-  projectiles: [{
-    model: "war3mapImported\\MurlocSwampCloud.mdx",
-    spawnFrame: 14, offsetX: 40.0, offsetZ: 6.0, velocityX: 0.0, velocityZ: 0.0, life: 150, radius: 50.0,
-    effect: { ...murlocHit(2.4977293014526367, 80, 27.065372467041016, 30.0, false, HitElement.poison) },
-    reflectable: false, limit: 1, needsLineOfSight: true, status: PLAGUE,
-    pool: { every: 50, growth: 0.0, maxRadius: 50.0 },
-  }],
-};
+export const REVIVE = { frame: 40, endFrame: 50, offsetX: 60.0 } as const;
+const MRGLGLGL: AuthoredSpecial = { endFrame: REVIVE.endFrame, groundOnly: true, revive: { frame: REVIVE.frame, offsetX: REVIVE.offsetX } };
 
 export const MURLOC_SPECIALS: FighterSpecials = {
   neutral: { name: "Net", description: "Throw a net that slows the first enemy it reaches. With Grgl in step and near, both nets are wider and root the foe for a few hits. Shield it or jump it.", ground: ensnare(false), air: ensnare(true) },
   side: { name: "Belly Slide", description: "Belly-slide forward into a hit, and Grgl follows five frames later. A raised shield stops the slide.", ground: bellySlide(false), air: bellySlide(true) },
   up: { name: "Tidal Surf", description: "Ride a wave upward and steer it, carrying a Grgl within reach to the full height, then fall helpless.", ground: TIDAL_SURF },
-  down: { name: "Disease Cloud", description: "Leave a small plague cloud that poisons enemies standing in it; jumping clears it.", ground: DISEASE_CLOUD, air: { ...DISEASE_CLOUD, groundOnly: false, landingLag: 20,
-    projectiles: DISEASE_CLOUD.projectiles?.map(shot => ({ model: shot.model, spawnFrame: shot.spawnFrame,
-      offsetX: 0.0, offsetZ: 22.0, velocityX: 0.0, velocityZ: 0.0, life: shot.life,
-      radius: shot.radius, effect: shot.effect, reflectable: shot.reflectable, limit: shot.limit, status: shot.status })) } },
+  down: { name: "Mrglglgl!", description: "With Grgl down, call him back at 0% beside Mrgl, once a stock. A hit while calling cancels it unspent.", ground: MRGLGLGL },
 };

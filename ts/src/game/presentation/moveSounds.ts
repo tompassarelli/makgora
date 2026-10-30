@@ -8,7 +8,7 @@ import { heroDefinition } from "../roster/kits";
 import { originalFighterMoves } from "../sim/originalMoves";
 import { VERIFIED_STOCK_SOUND_LABELS } from "../../generated/assets/stockSoundInfo";
 import { elementLook } from "./elementLooks";
-import { murlocMoveVoices, warcryVoice } from "./matchAudio";
+import { murlocMoveVoices, murlocReviveVoices, warcryVoice } from "./matchAudio";
 import { SWING_SOUND, SoundTier, TIER_HIT_VOLUME, TIER_SWING_PITCH, TIER_SWING_VOLUME, moveTier } from "./moveTiers";
 
 export const SPECIAL_MOVE = 100;
@@ -150,7 +150,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.murloc]: {
     weapon: Weapon.claw, effort: murlocMoveVoices(), strong: "CrushingWaveDamage",
-    specials: [s("EnsnareMissile", "Ensnare"), { ...s("BigWaterStep", "CrushingWaveDamage"), voice: murlocMoveVoices() }, { ...s("CrushingWave", "WaterElementalMissile"), voice: murlocMoveVoices() }, s("Parasite", "PoisonArrowHit")],
+    specials: [s("EnsnareMissile", "Ensnare"), { ...s("BigWaterStep", "CrushingWaveDamage"), voice: murlocMoveVoices() }, { ...s("CrushingWave", "WaterElementalMissile"), voice: murlocMoveVoices() }, { ...s("BigWaterStep", "CrushingWaveDamage"), voice: murlocReviveVoices() }],
   },
   [Character.grom]: {
     weapon: Weapon.axe, strong: "CriticalStrike",

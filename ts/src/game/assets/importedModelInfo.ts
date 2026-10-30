@@ -25,10 +25,6 @@ export const VALKYR_MODEL = "Units\\Undead\\Banshee\\Banshee.mdx";
 
 export const GROM_BLOODLUST_MODEL = "war3mapImported\\GromBloodlustQuiet.mdx";
 
-export const MURLOC_SWAMP_CLOUD_MODEL = "war3mapImported\\MurlocSwampCloud.mdx";
-
-export const MURLOC_SWAMP_MIST_MODEL = "war3mapImported\\MurlocSwampMist.mdx";
-
 export const SCOURGE_WALL_MODEL = "war3mapImported\\UndeadWalls.mdx";
 
 export const TYRANDE_MODEL = "war3mapImported\\TyrandeDismountedV2.mdx";
@@ -39,8 +35,6 @@ export const TYRANDE_STOCK_SCALE = { unit: "TyrandeDismountedV2", scale: 1.0 } a
 
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
-  { entry: MURLOC_SWAMP_CLOUD_MODEL, file: "MurlocSwampCloud.mdx" },
-  { entry: MURLOC_SWAMP_MIST_MODEL, file: "MurlocSwampMist.mdx" },
   { entry: SCOURGE_WALL_MODEL, file: "UndeadWalls.mdx" },
   { entry: LICH_KING_MODEL, file: "LichKing2.mdx" },
   { entry: THRALL_MODEL_FILE, file: "WarchiefThrallDismountedV2.mdx", reanimated: true },

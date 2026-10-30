@@ -392,7 +392,7 @@ export interface AuthoredSpecial extends CastWindows {
 
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
-  readonly selfHeal?: SelfHeal | undefined;
+  readonly selfHeal?: SelfHeal | undefined; readonly revive?: { readonly frame: number; readonly offsetX: number } | undefined;
 
   readonly charge?: SpecialCharge | undefined;
 

@@ -236,17 +236,17 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Phoenix | PhoenixMissileLaunch | Fireball | Fireball + Fireball | WoodMediumBashMetal |  |
 | Down special: Banish | BanishCaster | BanishCaster | BanishCaster + Fireball | WoodMediumBashMetal |  |
 
-## Murloc
+## Murlocs
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
-| Jab, Second jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalLightSliceMetal |  |
+| Jab, Second jab, Third jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalLightSliceMetal |  |
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalMediumChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalLightChopFlesh | MetalMediumChopFlesh + CrushingWaveDamage | MetalLightChopMetal |  |
-| Neutral special: Ensnare | EnsnareMissile | Ensnare | Ensnare + CrushingWaveDamage | MetalLightChopMetal |  |
+| Neutral special: Net | EnsnareMissile | Ensnare | Ensnare + CrushingWaveDamage | MetalLightChopMetal |  |
 | Side special: Belly Slide | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Up special: Tidal Surf | CrushingWave | WaterElementalMissile | WaterElementalMissile + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
-| Down special: Disease Cloud | Parasite | PoisonArrowHit | PoisonArrowHit + CrushingWaveDamage | MetalLightChopMetal |  |
+| Down special: Mrglglgl! | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal | MurlocYes1 / MurlocWhat1 |
 
 ## Grom Hellscream
 
@@ -353,7 +353,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Neutral special: Shuriken Volley | FanOfKnives | FanOfKnivesHit | FanOfKnivesHit + CriticalStrike | MetalMediumSliceMetal |  |
 | Side special: Lunge |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
-| Up special: Rising Strike |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
+| Up special: Shadow Step |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Down special: Burst |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 
 ## Firelord (WIP)

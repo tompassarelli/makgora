@@ -204,6 +204,10 @@ function writeSpecialEffects(move: Readonly<AuthoredSpecial>, name: string, resu
   }
   if (move.cleanseFrame !== undefined) int("cleanseFrame", move.cleanseFrame);
   writeSelfHeal(int, real, move.selfHeal);
+  if (move.revive !== undefined) {
+    int("revive.frame", move.revive.frame);
+    real("revive.offsetX", move.revive.offsetX);
+  }
   if (move.refreshesAir === true) int("refreshesAir", 1);
   if (move.jumpWindow !== undefined) {
     int("jumpWindow.first", move.jumpWindow.first);

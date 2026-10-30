@@ -96,7 +96,8 @@ import { tauntPull } from "./taunt";
 // One local for the sea: this module is near Lua's 200-local limit.
 import * as sea from "./water";
 import { stickX } from "./stick";
-import { checkBlastZone, respawnFighter } from "./stocks";
+import { respawnFighter } from "./respawn";
+import { checkBlastZone } from "./stocks";
 import { advanceSurfaceRecovery, advanceWallJump, leaveMainDeckBody, resolveSolidSurfaceContacts } from "./surfaces";
 import { forwardRollTurnFrame, rollTravel } from "./geometry/rollTravel";
 import { advanceTechInput, techContactWindow } from "./geometry/techInput";

@@ -46,7 +46,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.peon]: "Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing",
   [Character.tinker]: "drops one Clockwerk Goblin; lands into the grounded factory build",
   [Character.kaelthas]: "Banish curse in the air; lands into the grounded cast",
-  [Character.murloc]: "small plague cloud at the cast point",
+  [Character.murloc]: "Mrglglgl! revives Grgl on the ground; refused in the air",
   [Character.grom]: "aerial chop; lands into the grounded chop",
   [Character.anubarak]: "downward beetle; recall works while falling",
   [Character.malfurion]: "downward branch; recall works while falling",

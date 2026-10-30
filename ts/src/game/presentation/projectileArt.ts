@@ -1,6 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
-import { MURLOC_SWAMP_CLOUD_MODEL } from "../assets/importedModelInfo";
 import { ANKH_BURST_MODEL } from "../../generated/assets/ankhAssetInfo";
 
 
@@ -131,7 +130,6 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx": { scale: f32(0.6) },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { scale: 1.0 },
   "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx": { scale: 0.5 },
-  [MURLOC_SWAMP_CLOUD_MODEL]: { scale: 1.0 },
   "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl": { scale: f32(0.6) },
   "units\\creeps\\QuillBeast\\QuillBeast.mdl": { scale: f32(0.9) },
   "units\\creeps\\GrizzlyBear\\GrizzlyBear.mdl": { scale: f32(0.7) },

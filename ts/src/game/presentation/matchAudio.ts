@@ -167,6 +167,9 @@ const MURLOC_MOVE_TAKES = 3;
 export const murlocMoveVoices = (): string[] =>
   Array.from({ length: MURLOC_MOVE_TAKES }, (_, take) => `${VOICES[Character.murloc][0]}MurlocYesAttack${take + 1}.flac`);
 
+export const murlocReviveVoices = (): string[] =>
+  ["Yes", "What"].map(line => `${VOICES[Character.murloc][0]}Murloc${line}1.flac`);
+
 function voice(character: Character, line: string): string {
   if (character === Character.murloc) return IMPORTED_MURLOC_GURGLE.path;
   if (character === Character.medivh || character === Character.archimonde) return line === "Ready" ? DIALOGUE_VOICES[character].ready : DIALOGUE_VOICES[character].warcry;

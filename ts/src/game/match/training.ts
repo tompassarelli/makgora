@@ -13,7 +13,7 @@ import { attackActive, attackStartup, canAttack, canShieldGrab, isTumbling } fro
 import { type Fighter, PACK_CAPACITY, createFighter, duoRole } from "../sim/fighter";
 import { type Controls, type Roster, createRoster, fighterAt, isActive, isContender, neutralControls } from "../sim/roster";
 import { advanceFighterMotion } from "../sim/step";
-import { respawnFighter } from "../sim/stocks";
+import { respawnFighter } from "../sim/respawn";
 import { botChoice } from "./botRandom";
 import { Advantage, LATCH_FIELDS, type LatchedPresses, PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState, clearTrainingReadout } from "./trainingState";
 
