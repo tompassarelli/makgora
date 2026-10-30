@@ -50,6 +50,7 @@ let matches = 0;
 let held = 0;
 let beat = 0;
 let nativeStart = 0;
+let firstDivergence: string | undefined;
 
 const census = (heading: string) => {
   collectgarbage("collect");
@@ -94,6 +95,10 @@ const frame = () => {
   clients.frames(1);
   if (tap !== 0) for (const player of clients.clients) for (const client of clients.clients) deliverKey(client, player.slot, tap, 0, false);
 
+  if (firstDivergence === undefined) {
+    const divergence = clients.firstDivergence();
+    if (divergence !== undefined) firstDivergence = `after frame ${clients.frame}, ${divergence}`;
+  }
   for (const client of clients.clients) client.forget(client.log.length);
   if (releaseMatches === undefined && floorMod(clients.frame - nativeStart, FRAMES_PER_MINUTE) === 0) census(`kind=minute minute=${floorDiv(clients.frame - nativeStart, FRAMES_PER_MINUTE)}`);
 };
@@ -142,7 +147,7 @@ if (nativeSequence) {
     previous = phase;
   }
   for (const client of clients.clients) for (const error of client.errors) errors.push(`p${client.slot}: ${error}`);
-  const divergence = clients.firstDivergence();
+  const divergence = firstDivergence;
   const checksums = clients.clients.map((client) => client.checksum());
   if (divergence !== undefined || checksums.some((checksum) => checksum !== checksums[0])) errors.push(`desync: ${divergence ?? checksums.join(" ")}`);
   for (const error of errors) print(`problem ${error}`);
@@ -193,7 +198,7 @@ while (releaseMatches === undefined ? clients.frame < totalFrames : matches < re
     lineup++;
   }
 }
-const divergence = clients.firstDivergence();
+const divergence = firstDivergence;
 const checksums = clients.clients.map((client) => client.checksum());
 if (divergence !== undefined || checksums.some((checksum) => checksum !== checksums[0])) errors.push(`desync: ${divergence ?? checksums.join(" ")}`);
 for (const client of clients.clients) for (const error of client.errors) errors.push(`p${client.slot}: ${error}`);
