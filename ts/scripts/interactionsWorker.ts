@@ -1,16 +1,23 @@
 
 
 
+import { DUO_FOES, duoRows } from "./duoInteractions";
 import { fighterNamed, interactionRows } from "./interactions";
 import { comboRows } from "./comboTrees";
 import { throwFighterNamed, throwRoleRows } from "./throwRoles";
 
 declare const self: Worker;
 
-type InteractionRequest = { readonly fighter: string; readonly combos: boolean } | { readonly throwRoles: string };
+type InteractionRequest = { readonly fighter: string; readonly combos: boolean } | { readonly throwRoles: string } | { readonly duoFoe: string };
 
 self.onmessage = (event: MessageEvent<InteractionRequest>) => {
   const request = event.data;
+  if ("duoFoe" in request) {
+    const foe = DUO_FOES.find((entry) => entry.name === request.duoFoe);
+    if (foe === undefined) throw new Error(`no fighter named ${request.duoFoe}`);
+    self.postMessage(duoRows(foe));
+    return;
+  }
   if ("throwRoles" in request) {
     const entry = throwFighterNamed(request.throwRoles);
     if (entry === undefined) throw new Error(`no fighter named ${request.throwRoles}`);

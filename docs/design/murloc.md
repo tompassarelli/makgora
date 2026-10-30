@@ -246,7 +246,7 @@ the Murlocs' weakness.
 
 ## Locks and infinites
 
-One rule prevents each loop the pair could build:
+One rule prevents each loop the pair could build. `bun wisp interactions --attacker Murlocs` plays the pair against every selectable fighter through the partner hold exclusion, the duo chain cap, the shieldstun cap, the partner hitstun rule, the linked-body rule, the handoff limits, the pummel carry and the toss, and fails if any rule is not reached or does not hold:
 
 | Risk | Rule that prevents it | Checked by |
 |---|---|---|

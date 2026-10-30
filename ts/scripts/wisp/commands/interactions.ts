@@ -12,6 +12,7 @@ import { join } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
+import { DUO_FOES, type DuoFoe, type DuoRow, duoReport } from "../../duoInteractions";
 import { FIGHTERS, type Row, fighterNamed, fighterPage, moveProfile, parseRows, rowChanges } from "../../interactions";
 import { type ComboRow, comboPage } from "../../comboTrees";
 import { THROW_FIGHTERS, type ThrowRoleRow, throwRolePage } from "../../throwRoles";
@@ -25,6 +26,8 @@ const throwsFile = join(directory, "throws.jsonl");
 const throwsPage = join(directory, "throws.md");
 
 const THROW_WORKERS = 3;
+const DUO_WORKERS = 3;
+const DUO_ATTACKER = "murlocs";
 
 interface FighterRows {
   readonly interactions: readonly Row[];
@@ -61,6 +64,12 @@ const playThrowRoles: Effect.Effect<ThrowRoleRow[], InteractionsFailure> = Effec
   THROW_FIGHTERS,
   (entry) => playWorker<ThrowRoleRow[]>(`${entry.name} throw roles`, { throwRoles: entry.name }),
   { concurrency: THROW_WORKERS },
+).pipe(Effect.map((results) => results.flat()));
+
+const playDuo = (foes: readonly DuoFoe[]): Effect.Effect<DuoRow[], InteractionsFailure> => Effect.forEach(
+  foes,
+  (foe) => playWorker<DuoRow[]>(`Murlocs against ${foe.name}`, { duoFoe: foe.name }),
+  { concurrency: DUO_WORKERS },
 ).pipe(Effect.map((results) => results.flat()));
 
 const jsonl = (rows: readonly (Row | ComboRow | ThrowRoleRow)[]): string => rows.map((row) => JSON.stringify(row)).join("\n") + "\n";
@@ -133,9 +142,22 @@ const profile = (spec: string) =>
     yield* Console.log(changes.length === 0 ? `${entry.name}'s graph is unchanged from ${rowsFile}` : [`Changes in ${entry.name}'s graph from ${rowsFile}:`, ...changes.map((line) => `  ${line}`)].join("\n"));
   });
 
+const duo = (attacker: string, foeName: string | undefined) =>
+  Effect.gen(function* () {
+    if (attacker.toLowerCase() !== DUO_ATTACKER) return yield* new UsageFailure({ problem: `--attacker takes ${DUO_ATTACKER}, the only pair; every other fighter is in the graph` });
+    const foes = foeName === undefined ? DUO_FOES : DUO_FOES.filter((foe) => foe.name.toLowerCase() === foeName.toLowerCase());
+    if (foes.length === 0) return yield* new UsageFailure({ problem: `--fighter takes a selectable fighter: ${DUO_FOES.map((foe) => foe.name).join(", ")}` });
+    const rows = yield* playDuo(foes).pipe(step(`the Murlocs duo against ${foes.length} selectable fighters`));
+    const { lines, problems } = duoReport(rows);
+    yield* Console.log([`The Murlocs duo against ${foes.map((foe) => foe.name).join(", ")}:`, ...lines.map((line) => `  ${line}`)].join("\n"));
+    if (problems.length > 0) return yield* new InteractionsFailure({ problems: [...problems, `${problems.length} unexpected duo interactions`] });
+    yield* Console.log("No unexpected duo interaction");
+  });
+
 export const interactions: Command = (args) => {
+  if (args[0] === "--attacker" && (args.length === 2 || (args.length === 4 && args[2] === "--fighter"))) return duo(args[1] ?? "", args[3]);
   if (args.length === 2 && args[0] === "--move") return profile(args[1] ?? "");
-  if (args.length > 1 || (args.length === 1 && args[0] !== "--check")) return Effect.fail(new UsageFailure({ problem: "interactions takes --check or --move FIGHTER:MOVE" }));
+  if (args.length > 1 || (args.length === 1 && args[0] !== "--check")) return Effect.fail(new UsageFailure({ problem: "interactions takes --check, --move FIGHTER:MOVE or --attacker Murlocs [--fighter NAME]" }));
   return Effect.gen(function* () {
     if (args[0] === "--check" && !(yield* graphWritten)) return yield* new InteractionsFailure({ problems: [notWritten] });
     const rows = yield* playFighters(FIGHTERS.map((entry) => entry.name)).pipe(step("every fighter's situations"));
