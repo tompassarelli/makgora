@@ -4,7 +4,8 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
 import { CPU_OPPONENT_COPY } from "./cpuOpponentCopy";
 import { createOpponentSettings } from "./opponentSettingsFrames";
-import { gameUi, setFrameText } from "./frames";
+import { type ClickBox, gameUi, setFrameText } from "./frames";
+import { CPU_SETTINGS_BOXES } from "./cpuSettingsLayout";
 import { titleCase } from "./selectionFrames";
 
 export interface CpuDefaults {
@@ -24,22 +25,22 @@ export interface CpuSettingsFrames {
   readonly steps: readonly framehandle[];
 }
 
-export function createCpuSettings(participantId: number, add: (frame: framehandle, target: CpuButton, text: string) => framehandle): CpuSettingsFrames {
+export function createCpuSettings(participantId: number, add: (frame: framehandle, target: CpuButton, text: string, box: ClickBox) => framehandle): CpuSettingsFrames {
   const cpu = createOpponentSettings(gameUi(), participantId);
   if (cpu === undefined) throw new Error("the Opponent settings frames did not load");
   BlzFrameSetLevel(cpu.root, SELECT_LEVELS.cpuSettings);
   const steps: framehandle[] = [];
-  const cpuButton = (frame: framehandle, button: CpuButton) => {
+  const cpuButton = (frame: framehandle, button: CpuButton, box: ClickBox) => {
     if (button.kind === "cpuStep") steps.push(frame);
-    return add(frame, button, button.kind === "cpuStep" ? button.direction < 0 ? "<" : ">" : frame === cpu.close ? "Close" : "Done");
+    return add(frame, button, button.kind === "cpuStep" ? button.direction < 0 ? "<" : ">" : frame === cpu.close ? "Close" : "Done", box);
   };
-  cpuButton(cpu.close, { kind: "cpuClose" });
-  cpuButton(cpu.opponentPrevious, { kind: "cpuStep", row: 0, direction: -1 });
-  cpuButton(cpu.opponentNext, { kind: "cpuStep", row: 0, direction: 1 });
-  cpuButton(cpu.difficultyPrevious, { kind: "cpuStep", row: 1, direction: -1 });
-  cpuButton(cpu.difficultyNext, { kind: "cpuStep", row: 1, direction: 1 });
+  cpuButton(cpu.close, { kind: "cpuClose" }, CPU_SETTINGS_BOXES.close);
+  cpuButton(cpu.opponentPrevious, { kind: "cpuStep", row: 0, direction: -1 }, CPU_SETTINGS_BOXES.opponentPrevious);
+  cpuButton(cpu.opponentNext, { kind: "cpuStep", row: 0, direction: 1 }, CPU_SETTINGS_BOXES.opponentNext);
+  cpuButton(cpu.difficultyPrevious, { kind: "cpuStep", row: 1, direction: -1 }, CPU_SETTINGS_BOXES.difficultyPrevious);
+  cpuButton(cpu.difficultyNext, { kind: "cpuStep", row: 1, direction: 1 }, CPU_SETTINGS_BOXES.difficultyNext);
   const values = [cpu.opponentValue, cpu.difficultyValue];
-  const done = cpuButton(cpu.done, { kind: "cpuClose" });
+  const done = cpuButton(cpu.done, { kind: "cpuClose" }, CPU_SETTINGS_BOXES.done);
   BlzFrameSetVisible(cpu.root, false);
   return { root: cpu.root, title: cpu.title, values, preview: cpu.preview, prompt: cpu.prompt, done, steps };
 }

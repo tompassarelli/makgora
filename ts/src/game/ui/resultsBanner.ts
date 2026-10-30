@@ -50,10 +50,14 @@ export class ResultsBanner {
       const button = BlzCreateFrame("ScriptDialogButton", this.root, 0, 0);
       placeTopLeft(button, choiceLeft(choice), CHOICE_TOP);
       BlzFrameSetSize(button, BUTTON_WIDTH, CHOICE_HEIGHT);
-      this.buttons.push(this.clicks.add(button, choice, at(RESULT_CHOICE_NAMES, choice), "native"));
+      this.buttons.push(this.clicks.add(button, choice, at(RESULT_CHOICE_NAMES, choice), "native", { x: choiceLeft(choice), y: CHOICE_TOP, width: BUTTON_WIDTH, height: CHOICE_HEIGHT }));
     }
     this.help = text("MatchResultsHelp", INNER_LEFT, f32(0.47), INNER_WIDTH, f32(0.018), MENU_STYLE.bodySize);
     BlzFrameSetVisible(this.root, false);
+  }
+
+  over(x: number, y: number): boolean {
+    return this.clicks.over(x, y);
   }
 
   bindActions(select: (choice: number, clicker: player) => void): void {

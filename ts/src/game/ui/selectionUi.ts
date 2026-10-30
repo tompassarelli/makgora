@@ -247,7 +247,7 @@ export class SelectionPanel {
     const headerButton = (box: typeof START_BUTTON, text: string, target: SelectionButton) => {
       const frame = panelButton(root, box.x, box.y, box.width, box.height, "");
       setFrameText(frame, text);
-      return this.clicks.add(frame, target, undefined, "native");
+      return this.clicks.add(frame, target, undefined, "native", box);
     };
     this.confirm = headerButton(START_BUTTON, "", { kind: "start" });
     this.settingsLabel = headerButton(SETTINGS_BOX, "Controls (F1)", { kind: "settings" });
@@ -268,7 +268,7 @@ export class SelectionPanel {
     const pageButton = (name: string, x: number, width: number, text: string, target: SelectionButton) => {
       const frame = page(BlzCreateFrameByType("GLUETEXTBUTTON", name, gameUi(), "ScriptDialogButton", 0), x, MOVES_BUTTON_TOP, width, MOVES_BUTTON_HEIGHT);
       setFrameText(frame, text);
-      return this.clicks.add(frame, target, undefined, "native");
+      return this.clicks.add(frame, target, undefined, "native", { x, y: MOVES_BUTTON_TOP, width, height: MOVES_BUTTON_HEIGHT });
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
     sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), RULE_HEIGHT);
@@ -283,13 +283,13 @@ export class SelectionPanel {
       pageButton(`MeleeMovesNext${suffix}`, f32(0.5), f32(0.1), ">", { kind: "movesStep", direction: 1 }),
     ];
 
-    this.cpu = createCpuSettings(participantId, (frame, target, text) => this.clicks.add(frame, target, text, "native"));
+    this.cpu = createCpuSettings(participantId, (frame, target, text, box) => this.clicks.add(frame, target, text, "native", box));
     const ruleClick = (frame: framehandle, target: RuleButton) => this.clicks.add(frame, target, undefined, "native");
     const matchRules = createMatchRules(root, suffix, ruleClick);
     this.delay = createDelayControls(root, ruleClick, DELAY_TEXT_SIZE);
     presentDelayControls(this.delay, false);
-    this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target) => this.clicks.add(frame, target,
-      target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native"));
+    this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target, box) => this.clicks.add(frame, target,
+      target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native", box));
     this.credits = new CreditsMenu(gameUi(), root, suffix, version, participantId);
     this.community = new CommunityMenu(gameUi(), root, suffix, participantId);
     this.credits.onOpen = () => this.community.close();
@@ -322,6 +322,8 @@ export class SelectionPanel {
     this.actions = actions;
     bindPrototype(this.clicks, ButtonClicks.prototype);
     this.clicks.bindHandler((button, clicker) => this.click(button, clicker), button => this.highlight(button));
+    bindPrototype(this.credits, CreditsMenu.prototype);
+    bindPrototype(this.community, CommunityMenu.prototype);
     this.credits.bindActions();
     this.community.bindActions();
     const suffix = I2S(this.participantId);
@@ -535,7 +537,7 @@ export class SelectionPanel {
   // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean): void {
     const drawn = pointed && this.menuCursorAllowed;
-    const hover = this.drag.hover ?? (drawn && this.controlHit.over(x, y) ? 0 : undefined);
+    const hover = this.drag.hover ?? (drawn && this.overControl(x, y) ? 0 : undefined);
     const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
     this.localPanel = panel;
     this.localHand = hand === undefined ? HIDDEN_HAND : { state: hand, chip: hand === "pinch" ? carried : undefined, x, y };
@@ -545,6 +547,12 @@ export class SelectionPanel {
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
     if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
     this.cursorEnabled = stock;
+  }
+
+  // Every list is asked whatever the pointer, so two clients make the same native calls.
+  private overControl(x: number, y: number): boolean {
+    const own = this.clicks.over(x, y), credits = this.credits.over(x, y), community = this.community.over(x, y), shared = this.controlHit.over(x, y);
+    return own || credits || community || shared;
   }
 
   private trackGameMenu(open: boolean): void {
@@ -646,7 +654,8 @@ export class SelectionPanel {
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
     if (pointed) this.dragChips(game, x, y);
     const carried = this.showCards(game, sessionWins, x, y);
-    this.showHand(pointed, this.tutorialOpen ? undefined : carried, x, y, this.tutorialOpen);
+    const infoOpen = this.tutorialOpen || this.credits.opened() || this.community.opened();
+    this.showHand(pointed, infoOpen ? undefined : carried, x, y, infoOpen);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);
