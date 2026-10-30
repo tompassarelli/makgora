@@ -114,6 +114,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 - [Input clock contract](input-clock-contract-20261004.md): how inputs get their frame.
 - [Warcraft API and netcode findings](warcraft-api-netcode-findings.md): engine behavior learned the hard way.
 - [Online play and companion direction](online-delivery.md): controller architecture choices.
+- [Online plan](online-plan.md): measurements of online play over a real network path.
 - [Cross-platform companion](controller-platforms.md) and [controller prior art](controller-prior-art.md).
 
 ## Building and testing
