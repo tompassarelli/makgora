@@ -81,13 +81,11 @@
   default) and draws the stage, sky and fighters; it steps Smashcraft's default
   session, so it refuses `--presentation`, `--four-fighters`, `--host` and
   `--join`; with `--map MAP.w3x --player-assets-only` its worker thread reads
-  the map's imports and the Warcraft install as Chrome does; and it loads the library named by
-  `WISP_WINDOW_LIBRARY` (wisp:docs/play.md, "Native window"). The vendored
-  package ships no built library: build it in a Wisp checkout with
-  `cd window && nix develop --command cargo build --release -p wisp-window`, and
-  run the play command inside that dev shell (`nix develop PATH/TO/wisp/window
-  --command ...`), which supplies the Wayland, X11 and Vulkan libraries the
-  window loads.
+  the map's imports and the Warcraft install as Chrome does. The command finds the window
+  library itself: `WISP_WINDOW_LIBRARY`, else the build of the vendored package's `window/` source in
+  `~/.cache/wisp/window`, which the first run builds with cargo (in the package's nix dev shell on
+  Linux, which links the Wayland, X11 and Vulkan libraries into the library, so no dev shell or
+  `LD_LIBRARY_PATH` is needed) (wisp:docs/native-window-plan.md, "Where a consumer gets the library").
   Private map and Warcraft assets stay in the existing local asset store.
 - Host and join: `bun wisp play --standalone --host [--port N]` prints a join
   code and its direct addresses; the other player runs

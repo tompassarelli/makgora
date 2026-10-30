@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
-import { Effect, Schema } from "effect";
+import { Effect, ManagedRuntime, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildInputs";
 import { ProcessFailure, runProcess } from "../hostProcess";
@@ -161,6 +161,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     yield* convertTexture(dds, png);
     return yield* read(png);
   });
+  const services = ManagedRuntime.make(BunServices.layer);
   const resolveAsset = (path: string, graphics: Graphics = "classic"): Promise<ResolvedRenderAsset> => {
     const normalized = `${graphics}:${key(path)}`;
     let promise = pending.get(normalized);
@@ -182,8 +183,8 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
       return yield* read(decoded);
     });
     const readers = {
-      map: (entry: string) => Effect.runPromise(resolveMap(entry).pipe(Effect.provide(BunServices.layer))),
-      stock: (entry: string) => Effect.runPromise(stockClassic(entry).pipe(Effect.provide(BunServices.layer))),
+      map: (entry: string) => services.runPromise(resolveMap(entry)),
+      stock: (entry: string) => services.runPromise(stockClassic(entry)),
     };
     if (promise === undefined) pending.set(normalized, promise = Effect.runPromise(resolveRenderAsset(readers, path, graphics)).then((result) => {
       const { bytes } = result;
