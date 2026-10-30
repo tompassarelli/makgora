@@ -4,6 +4,7 @@ export const POPCORN_CUE_MODELS: { readonly [model: string]: boolean | undefined
   "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx": true,
   "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx": true,
   "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx": true,
+  "Abilities\\Spells\\Other\\Transmute\\PileofGold.mdx": true,
   "Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx": true,
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": true,
   "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx": true,
