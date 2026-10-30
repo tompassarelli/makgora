@@ -1,0 +1,22 @@
+# smashcraft#796: Kael'thas casts Pyroblast right, steers it up and back around, and it strikes him, launching him along its flight with no damage.
+#! chat -dev quick pair kael'thas sunstrider / mountain king
+250 a stick 1 0
+252 a tap X 2
+254 a stick 0 0
+262 a capture
+268 a capture
+272 a stick -1 0
+278 a capture
+286 a capture
+294 a capture
+296 a stick -0.25 -0.9
+302 a capture
+310 a capture
+318 a capture
+324 a capture
+328 a capture
+334 a capture
+342 a capture
+350 a capture
+380 a press VIEW
+450 a release VIEW
