@@ -65,6 +65,13 @@ export function attackFall(style: AttackStyle | undefined, frame: number, moves?
 }
 
 
+export function skipFlurryWhenReleased(attack: { style: AttackStyle | undefined; frame: number }, attackHeld: boolean, moves?: FighterMoves): void {
+  const release = attack.style === undefined ? undefined : moves?.normals[attack.style]?.release;
+  if (release === undefined || attackHeld) return;
+  for (const gate of release.gates) if (attack.frame === gate) attack.frame = release.to - 1;
+}
+
+
 export function landsIntoAttack(style: AttackStyle | undefined, frame: number, moves?: FighterMoves): boolean {
   const move = style === undefined ? undefined : moves?.normals[style];
   return move?.landingHit !== undefined && frame >= move.startupFrames && frame < move.startupFrames + move.activeFrames;

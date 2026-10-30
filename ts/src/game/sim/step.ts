@@ -52,7 +52,7 @@ import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodg
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge, catchWavedashLedge, wavedashLedgeSide } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
-import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, isSmashAttack, smashChargeFrame } from "./moves";
+import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, isSmashAttack, skipFlurryWhenReleased, smashChargeFrame } from "./moves";
 import {
   addMeleeWorldValues,
   airDriftVelocity,
@@ -221,6 +221,7 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
   }
   tickEmpowered(f);
   if (attack.style !== undefined) {
+    skipFlurryWhenReleased(attack, input.attackHeld, f.tuning.moves);
     attack.frame++;
     if (attack.frame >= attack.duration) {
       attack.style = undefined;

@@ -93,7 +93,7 @@ and action.
 
 | Input | Gesture and role | Frames; damage; reach | Warcraft source | Smash reference |
 |---|---|---|---|---|
-| Jab 1 → 2 | Short point-first spear stab, then a second, longer stab | 3/2/11, 2% → 5/2/15, 4%; 70 → 78 | [Tiderunner claws][wc] | [Squirtle jab][sq] |
+| Jab 1 → 2 → flurry | Short stab, a quick second stab, then a flurry of fin slaps while the button stays held | 3/2/11, 2% → 4/2/12, 2% → slaps 3, 7, 11, 15, 19 and 23, 1% each, then a finisher at 27 (3 active, 14 recovery, 3%, 40°) | [Tiderunner claws][wc] | [Squirtle jab][sq], [Fox jab][fox] |
 | Forward tilt / angled | Stepping spear stab, shoulder and hips behind it (forward and down); upward claw swing; spacing poke | 6/3/19; 8%; 76 | [Tiderunner claws][wc] | [Squirtle forward tilt][sq] |
 | Up tilt | Overhead swipe; juggle starter | 5/4/18; 7%; height 102 | [Tiderunner claws][wc] | [Squirtle up tilt][sq] |
 | Down tilt | Floor claw; low launcher | 5/3/16; 6%; 70 | [Tiderunner claws][wc] | [Squirtle down tilt][sq] |
@@ -101,17 +101,55 @@ and action.
 | Forward smash | Two-claw lunge; finisher | 14/3/36; 16%; 98 | [Tiderunner claws][wc] | [Squirtle forward smash][sq] |
 | Up smash | Hop and overhead slash | 11/4/34; 15%; height 128 | [Tiderunner claws][wc] | [Squirtle up smash][sq] |
 | Down smash | Spinning sweep both sides | 12/4/34; 13%; ±86 | [Tiderunner claws][wc] | [Squirtle down smash][sq] |
-| Neutral air | Tucked spin; close escape | 5/6/20, land 12; 8%; ±48 | [murloc swim][wc] | [Squirtle neutral air][sq] |
+| Neutral air | Tucked spin; close escape; the fastest aerial | 3/6/16, land 8; 5% clean, 3% late; ±48 | [murloc swim][wc] | [Squirtle neutral air][sq], [Fox neutral air][fox] |
 | Forward air | Claw rake ahead | 7/3/24, land 14; 10%; 80 | [Tiderunner claws][wc] | [Squirtle forward air][sq] |
 | Back air | Fin kick behind; strongest aerial | 8/3/24, land 14; 12%; −84 | [murloc swim][wc] | [Squirtle back air][sq] |
 | Up air | Overhead flip; juggle | 6/4/20, land 12; 9%; height 108 | [Tiderunner claws][wc] | [Squirtle up air][sq] |
-| Down air | Stomping dive; air spike, ground lift | 12/3/28, land 18; 11%; −58 | [murloc swim][wc] | [Squirtle down air][sq] |
+| Down air | Spinning spear drill: five 1.5% hits every 3 frames from 6, then a 3% finisher at 21; slows the fall to 4 a frame | 6/18/3, land 3; 10.5%; −58 | [murloc swim][wc] | [Squirtle down air][sq], [Fox down air][fox] |
 | Grab / pummel | Short claw grab; shared pummel timing, 2% | Grab 7/2/24, reach 52 | [Tiderunner claws][wc] | [Squirtle grab][sq] |
 | Forward throw | Shove; spacing | release 12, recover 20; 7%, 40° | [Tiderunner claws][wc] | [Squirtle forward throw][sq] |
 | Back throw | Roll behind; edge position | release 14, recover 22; 9%, 40° back | [murloc swim][wc] | [Squirtle back throw][sq] |
 | Up throw | Head toss; juggle | release 12, recover 14; 6%, 90° | [Tiderunner claws][wc] | [Squirtle up throw][sq] |
 | Down throw | Belly-press; tech chase | release 16, recover 22; 6%, 70°, set knockback 90 | [murloc swim][wc] | [Squirtle down throw][sq] |
 | Get-up / ledge attack | Low sweep / forward claw | shared action timings; 6% / 6% | [Tiderunner claws][wc] | [Squirtle floor/ledge attacks][sq] |
+
+### Fast close-range normals (2026-10-30)
+
+Tom asked on 2026-10-30 for Murloc's close-range normals to become fast and
+multi-hit, like Fox's, as the first piece of the Murlocs rework: a flurry jab
+held by the attack button, a spinning drill down air that links into a grounded
+follow-up, and a very fast neutral air. Each hit is kept weak because Grgl will
+double them. Only relations come from SmashWiki's [Fox
+(SSBM)](https://www.ssbwiki.com/Fox_(SSBM)) pages: a rapid jab that repeats at
+a short fixed rate while held and ends with a finisher, a drill whose hits come
+every few frames and end on a launching hit, and a neutral air among the
+fastest in the cast. All values are original provisional Smashcraft values.
+
+- Flurry: jab 1 → jab 2 chain on taps as before; the third jab is the flurry.
+  While the attack button is held a slap lands every 4 frames (frames 3, 7, 11,
+  15, 19, 23), each its own hit window, 1% at 25° with base 12, no growth. A
+  release at any gap between slaps skips to the finisher, 2 frames of windup
+  later, so a tapped third jab is one slap and the finisher. The fixed length is
+  43 frames at most.
+- No lock: nothing in the flurry holds a victim. The slaps carry real knockback
+  and shared hitstun, so Melee-like rules apply: smash directional influence
+  from the victim drifts it out of reach (SmashWiki, [Smash directional
+  influence](https://www.ssbwiki.com/Smash_directional_influence)), and the
+  flurry has a fixed number of slaps (6), so it ends. The unit test checks a victim that pulses SDI away
+  takes fewer slaps than one standing still.
+- Drill: hits at frames 6, 9, 12, 15 and 18, then the finisher at 21 (3%, flat
+  on the ground at base 32), with the fall slowed to 4 a frame from frame 5 to
+  22. A grounded victim is hit flat (0°, base 14, 1.5%), so it stays on the floor
+  and shares hitstun rather than floating; the air hit pushes up at 90° with a
+  slight spike. Hitstun is the knockback times 0.4 rounded down, and landing from
+  a launch clears it, so a grounded victim must never be lifted: measured, the
+  flat slaps hold 5 frames of hitstun each, the flat finisher 16, and Murloc is
+  actionable with 6 left. Murloc's recovery after the drill is 3 frames, so a
+  short-hop drill on a standing foe leaves the foe in hitstun until Murloc can
+  jab, and the unit test checks that the jab connects.
+- Neutral air: first active frame 3 (the window, written here for the test: at
+  most frame 3), 6 active frames, clean for the first 2 (5%) and late after (3%),
+  16 frames total, landing lag 8.
 
 Launch classes: 70/18 for pokes, 90/22 for launchers, 105/26 for finishers
 (forward smash 112/26, back air 110/26),
@@ -273,6 +311,7 @@ is separated by more than 200 units or offstage, the standard anti-pair plan.
 
 [wc]: https://wowpedia.fandom.com/wiki/Murloc_(Warcraft_III)
 [sq]: https://www.ssbwiki.com/Squirtle_(SSBU)#Moveset
+[fox]: https://www.ssbwiki.com/Fox_(SSBM)
 
 ## Play-style profile
 

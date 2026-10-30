@@ -10,7 +10,7 @@ export const MURLOC_HERO: HeroDefinition = {
   name: "Murloc",
   purpose: "Small, light rushdown",
   weakness: "Short reach, early knockouts and a short recovery",
-  jab: { name: "Claw Flurry", description: "A quick claw poke, then a second swipe on another tap." },
+  jab: { name: "Claw Flurry", description: "Two quick stabs, then a flurry of fin slaps while the button is held." },
   complete: true,
   moves: MURLOC_MOVES,
   specials: MURLOC_SPECIALS,

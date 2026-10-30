@@ -42,6 +42,10 @@ function writeNormalMove(move: Readonly<AuthoredMove>, name: string, prefix: str
   if (move.travelFrames !== undefined) int(`${name}.travelFrames`, move.travelFrames);
   if (move.chainsFrom !== undefined) int(`${name}.chainsFrom`, move.chainsFrom);
   if (move.chargeFrame !== undefined) int(`${name}.chargeFrame`, move.chargeFrame);
+  if (move.release !== undefined) {
+    int(`${name}.release.to`, move.release.to);
+    for (let gate = 0; gate < move.release.gates.length; gate++) int(`${name}.release.gate${gate}`, move.release.gates[gate] ?? 0);
+  }
   writeFallPhases(move.fall ?? [], name, prefix, result);
   if (move.landingHit !== undefined) {
     int(`${name}.landingHit.first`, move.landingHit.firstFrame);

@@ -51,6 +51,8 @@ export interface AuthoredMove {
   readonly chainsFrom?: number | undefined;
 
   readonly chargeFrame?: number | undefined;
+  /** A flurry held by the attack button: at a `gates` frame without it held, the attack skips to frame `to` (the finisher). */
+  readonly release?: { readonly gates: readonly number[]; readonly to: number } | undefined;
 
   readonly fall?: readonly AuthoredFall[] | undefined;
 
