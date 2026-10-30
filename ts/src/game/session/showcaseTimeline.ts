@@ -180,7 +180,15 @@ function crossedPlacement(move: Readonly<AuthoredMove>, { ahead, behind }: Sides
 function overheadPlacement(move: Readonly<AuthoredMove>, character: Character): { readonly gap?: number | undefined; readonly lift?: number | undefined } {
   const body = hurtCapsule(character), top = Math.max(body.z1, body.z2) + body.radius;
   const highest = move.regions.reduce((best, region) => centreZ(region) > centreZ(best) ? region : best);
-  return centreZ(highest) - top > Math.abs(centreX(highest)) ? { gap: Math.floor(centreX(highest)), lift: Math.floor(centreZ(highest)) } : { gap: reachGap(move) };
+  if (centreZ(highest) - top > Math.abs(centreX(highest))) return { gap: Math.floor(centreX(highest)), lift: Math.floor(centreZ(highest)) };
+  const tip = move.regions.map((region) => strikeTip(region)).reduce((best, point) => point.z > best.z ? point : best);
+  return tip.z > top ? { gap: Math.floor(tip.x), lift: Math.floor(tip.z) } : { gap: reachGap(move) };
+}
+
+function strikeTip(region: MoveRegion): { readonly x: number; readonly z: number } {
+  const strike = region.hit.strike;
+  if (strike === undefined) return { x: centreX(region), z: region.hit.maxZ };
+  return strike.z1 > strike.z2 ? { x: strike.x1, z: strike.z1 } : { x: strike.x2, z: strike.z2 };
 }
 
 function risenPlacement(move: Readonly<AuthoredMove>): { readonly gap: number; readonly lift: number } {
@@ -231,6 +239,7 @@ function aerialPlacement(move: Readonly<AuthoredMove> | undefined, style: Attack
 
 function specialGap(special: Readonly<AuthoredSpecial>): number | undefined {
   if (special.radial === true) return radialGap(special);
+  if (special.gaze !== undefined) return Math.floor(special.gaze.range * 0.5625);
   let travel = 0.0;
   for (const segment of special.motion ?? []) travel += segment.velocityX * (segment.last - segment.first + 1);
   const projectile = special.projectiles?.[0];

@@ -250,8 +250,10 @@ function liftTarget(target: Fighter, z: number): void {
 function hangTarget(target: Fighter, z: number, frames: number): void {
   const gravity = target.tuning.physics.gravity;
   target.motion.grounded = false;
-  target.motion.z = max(0.0, f32(z - f32(gravity * f32(frames * (frames - 1) * 0.5))));
-  target.motion.vz = f32(gravity * frames);
+  const start = f32(z - f32(gravity * f32(frames * (frames - 1) * 0.5)));
+  const climbs = start >= 0.0;
+  target.motion.z = climbs ? start : max(0.0, z);
+  target.motion.vz = climbs ? f32(gravity * frames) : f32(f32(gravity * (frames + 1)) * 0.5);
 }
 
 export function startScriptedMove(s: ShellState, slot: number, kind: string | undefined, code: string, facing: string | undefined): void {
@@ -316,6 +318,7 @@ function stageScriptedMove(s: ShellState, slot: number, args: readonly string[])
   if (gap !== "-") {
     mover.motion.x = 0.0;
     target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
+    target.facing = facing === "left" ? 1 : -1;
   }
   startScriptedMove(s, slot, kind, code, facing);
   if (lift !== undefined && mover.motion.grounded) hangTarget(target, S2R(lift), mover.attack.style === undefined ? 0 : attackStartupFrames(mover.attack.style, mover.tuning.moves));

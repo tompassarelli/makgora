@@ -307,6 +307,13 @@ back, slowed by the reflect, within its life. The dummy first fires that
 projectile, timed to arrive in the middle of the reflect window, so the sheet
 shows the shot turned back into the dummy instead of only the cast.
 
+The dummy always faces the mover. An up tilt or up smash whose strike tip
+rises above the mover's head hangs the dummy with its feet at that tip, so it
+reaches the tip on the move's first active frame instead of standing inside
+the mover's body. A gaze stands the dummy just past half the cone's range
+ahead, where the cone has grown tall enough to catch it and the pair still
+fits the body crop (#843).
+
 `bun wisp anim capture serve [--pair K] [--hosts local|any] [--once] [--idle-minutes N]` runs the
 service from a checkout of main on gex45. Without `--pair` (or with `--pair
 auto`) it leases the next free pair from the shared pair queue (`bun wisp lan
