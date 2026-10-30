@@ -75,11 +75,11 @@ const rainOfFire = (air: boolean): AuthoredSpecial => {
   };
 };
 
-const ASCENT_RISE = h(f32(1.8));
+const ASCENT_RISE = h(f32(2.6));
 const ascentMotion = (rise: number): readonly SpecialMotion[] => [
   { ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0 },
-  { ...frames(10, 24), velocityX: 0.0, velocityZ: f32(rise / 15), driftSpeed: 2.0 },
-  { ...frames(25, 30), velocityX: 0.0, velocityZ: 0.0, driftSpeed: 2.0 },
+  { ...frames(10, 24), velocityX: 0.0, velocityZ: f32(rise / 15), driftSpeed: 6.0 },
+  { ...frames(25, 30), velocityX: 0.0, velocityZ: 0.0, driftSpeed: 6.0 },
 ];
 const felAscent = (rise: number): AuthoredSpecial => ({
   endFrame: 30, oncePerAirtime: true, helpless: true, landingLag: 28, facesStick: true,
