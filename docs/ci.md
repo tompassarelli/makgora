@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); every landing on main, pushed by `safe-push` or dispatched by Autoland, also runs the smoke job (the Classic frame budget, the same budget on the four-fighter 7-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the filtered-checks job (parity tapes and numeric, the stack-trace profile, the compiler and type-check benchmarks and effect-kit, unfiltered), so main gets the full suite after each landing (see Landing) |
 | Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
-| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (smashcraft:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (perf, rollback, parity-0 to parity-3, lua, corpus, computer-0 and computer-1, types, static), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; safe-push's landing runs it with the groups it selects, see Landing); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
+| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (smashcraft:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (perf, rollback, parity-0 to parity-3, lua, corpus, computer-0 and computer-1, types, clean-room, static), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; safe-push's landing runs it with the groups it selects, see Landing); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); without one in the last 60 commits, drift comparison warns and passes while roster coverage and absolute frame budgets still apply; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
@@ -47,8 +47,8 @@ fetch, rebase, scan and push:
    base on the `farm/SHA` branch safe-push published after its secret scan
    (`land.publish`, `SAFE_PUSH_LAND_REF`; without one it pushes the lane there
    itself), and passes once every check job has passed, polling the run every
-   3 s. The `static` group holds the clean
-   room, the kind-tag, ledger and type check, and the Autoland suite parity
+   3 s. The `clean-room` group holds the clean room and the `static` group holds
+   the cue models, the kind-tag, ledger and type check, and the Autoland suite parity
    check. The checks that read the private stores (fighter art, stored models,
    locomotion lock, strike moments, animation jitter, map-build inputs) cannot
    run on a hosted runner, so they run on the landing machine beside the farm
@@ -61,7 +61,7 @@ fetch, rebase, scan and push:
    artifact kept 7 days that every Farm test job looks up first (so Autoland's
    suite reuses it too, logging "Autoland reusing GROUP"), so a retry or a
    rebase onto a moved main reruns only the groups whose files changed. The
-   static group's inputs are every tracked file (the clean room reads any
+   clean-room group's inputs are every tracked file (the clean room reads any
    path), so it reruns on each change. When origin main moves while
    a run is in flight on files the lane also changes, the landing reruns it on
    the rebased tree, up to three times, then under the lock; a move on other

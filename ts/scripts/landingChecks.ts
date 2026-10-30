@@ -3,7 +3,7 @@ import { dirname, join, relative } from "node:path";
 
 const root = join(import.meta.dir, "../..");
 
-export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "computer-0", "computer-1", "types", "static"] as const;
+export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "computer-0", "computer-1", "types", "clean-room", "static"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export const FULL_SUITE_VARIABLE = "LAND_FULL_SUITE";
@@ -126,7 +126,7 @@ export const CHECKS: readonly LandingCheck[] = [
     reaches: [shared, imported(["ts/scripts/cpuCoverage.ts"])], farm: ["computer-0", "computer-1"], shardVariable: "CPU_COVERAGE_SHARD", here: "beside",
   },
   // The pre-push hook's own hosted checks (smashcraft:ts/scripts/prePush.ts), which the farm runs for a landing so its machine runs none of them.
-  { name: "clean room", command: ["bun", "scripts/cleanRoom.ts"], reaches: [pattern(/./, "any changed path")], farm: ["static"] },
+  { name: "clean room", command: ["bun", "scripts/cleanRoom.ts"], reaches: [pattern(/./, "any changed path")], farm: ["clean-room"] },
   {
     name: "kind tags, parity ledger and type-check ts",
     command: ["sh", "-c", "bun run check > build/typecheck.log 2>&1; code=$?; echo $code > build/typecheck.log.code; cat build/typecheck.log; exit $code"],
