@@ -191,6 +191,7 @@ def pose(p, lifts=None):
     for side, key in ((kick, 'kickArm'), (plant, 'plantArm')):
         turn(joint(f'shoulder.{side}'), Quaternion(PITCH, radians(p.get(key, 0))))
         turn(joint(f'elbow.{side}'), Quaternion(PITCH, radians(p.get(key + 'Elbow', 0))))
+        turn(joint(f'wrist.{side}'), Quaternion(PITCH, radians(p.get(key + 'Hand', 0))))
     found = {}
     for node, chain in OWN.get('clear', []):
         for turned in chain:
