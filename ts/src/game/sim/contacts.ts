@@ -4,6 +4,7 @@ import { max, min } from "../core/numbers";
 import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFloat32, toInt } from "wisp/src/sim/binary32";
 import { ContactKind, DownState, HeroStatusKind } from "./codes";
 import { f32 } from "wisp/src/sim/f32";
+import { catalogHero } from "./tuning";
 
 /** A Banished fighter takes this much more damage from any fighter's spells. */
 export const BANISH_SPELL_DAMAGE = f32(1.3);
@@ -25,7 +26,7 @@ import {
   victimHitlagFrames,
 } from "./knockback";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
-import { type Controls, type Roster, fighterAt, isActive } from "./roster";
+import { type Controls, type Roster, fighterAt, hasLivePartner, isActive } from "./roster";
 import { becomeEgg, hatchesOnHit } from "./specials/engine";
 import { repelSpell } from "./specials/spellImmunity";
 import {
@@ -150,6 +151,10 @@ export function collectDamageContact(
   contact.source = sourceSlot;
   contact.target = targetSlot;
   copyHitEffect(contact.effect, effect);
+  if (sourceSlot !== targetSlot) {
+    const scale = catalogHero(source.character)?.damageScale?.(source.duo.role, hasLivePartner(world, source));
+    if (scale !== undefined) contact.effect.damage = f32(contact.effect.damage * scale);
+  }
   const traits = contactTraits(source, kind, direct);
   if (traits.mana !== true) {
     contact.effect.manaDrain = undefined;

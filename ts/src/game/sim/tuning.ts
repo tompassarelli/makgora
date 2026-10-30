@@ -4,10 +4,10 @@
 import { multiplyFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
-import { AttackStyle, Character } from "./codes";
+import { AttackStyle, Character, DuoRole } from "./codes";
 import { attackDurationFramesForGrounding, attackStartupFrames } from "./moves";
 import type { Roster } from "./roster";
-import type { FighterMoves } from "./heroMoves";
+import type { FighterMoves, PartnerBody } from "./heroMoves";
 import type { AuthoredSpecial, FighterSpecials } from "./specials/schema";
 import { FIGHTER_ULTIMATES } from "./ultimates";
 import { fighterShield, heroBody } from "./heroes/heroBodies";
@@ -221,7 +221,7 @@ export function authoredPhysics(character: Character): FighterPhysics {
 }
 
 
-const REFERENCE_WEIGHT = 75.0;
+export const REFERENCE_WEIGHT = 75.0;
 /** What a hero's 1.00 air multiplier means: Ultimate's median air speed (#190; smashcraft:docs/gameplay-design.md, "Air drift and jump momentum"). */
 export const REFERENCE_AIR_SPEED = melee(1.0);
 
@@ -406,7 +406,7 @@ export function applyAuthoredTuning(world: Roster): void {
   // By slot: in Lua a roster's empty slot is a nil that would end a for-of over its fighters.
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     const fighter = world.fighters[slot];
-    if (fighter !== undefined) fighter.tuning = authoredTuning(fighter.character);
+    if (fighter !== undefined) fighter.tuning = authoredTuning(fighter.character, fighter.duo.role === DuoRole.partner);
   }
 }
 
@@ -442,6 +442,8 @@ export interface CatalogHero {
   readonly moves: FighterMoves;
   readonly specials?: FighterSpecials | undefined;
   readonly jab: { readonly name: string; readonly description: string };
+  readonly partner?: PartnerBody | undefined;
+  readonly damageScale?: ((role: number, partnerLive: boolean) => number) | undefined;
 }
 
 export interface CheckMotion { readonly physics: FighterPhysics; readonly ground: GroundMovementRules }
@@ -463,10 +465,10 @@ export function installCheckMotion(character: Character, motion: CheckMotion): v
   checkMotion[character] = motion;
 }
 
-export function authoredTuning(character: Character): FighterTuning {
+export function authoredTuning(character: Character, partner = false): FighterTuning {
   const hero = catalogHero(character);
   const check = checkMotion[character];
-  return {
+  const tuning: FighterTuning = {
     moves: hero?.moves ?? originalFighterMoves(character),
     specials: hero?.specials,
     ultimate: FIGHTER_ULTIMATES[character],
@@ -478,4 +480,7 @@ export function authoredTuning(character: Character): FighterTuning {
     tech: character === Character.demonHunter ? CAPTAIN_FALCON_TECH_TIMING : AUTHORED_TECH_TIMING,
     shieldBreak: AUTHORED_SHIELD_BREAK_TIMING,
   };
+  const body = partner ? hero?.partner : undefined;
+  if (body === undefined || tuning.moves === undefined) return tuning;
+  return { ...tuning, moves: body.moves(tuning.moves), physics: { ...tuning.physics, weight: f32(REFERENCE_WEIGHT * body.weight) } };
 }

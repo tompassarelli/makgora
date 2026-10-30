@@ -3,7 +3,7 @@
 
 import type { Character } from "../codes";
 import type { FighterGameplan } from "../gameplan";
-import type { FighterMoves } from "../heroMoves";
+import type { FighterMoves, PartnerBody } from "../heroMoves";
 import type { FighterSpecials } from "../specials/schema";
 
 
@@ -114,5 +114,9 @@ export interface HeroDefinition {
   readonly jab: NamedMove;
 
   readonly gameplan?: FighterGameplan | undefined;
+
+  readonly partner?: PartnerBody | undefined;
+
+  readonly damageScale?: ((role: number, partnerLive: boolean) => number) | undefined;
 }
 

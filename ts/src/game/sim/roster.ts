@@ -58,6 +58,12 @@ export const isPartner = (roster: Roster, slot: number): boolean => roster.activ
 
 export const isContender = (roster: Roster, slot: number): boolean => roster.active[slot] === true && !isPartner(roster, slot);
 
+export function hasLivePartner(roster: Roster, fighter: Readonly<Fighter>): boolean {
+  const link = fighter.duo.link;
+  return link >= 0 && isActive(roster, link) && !fighterAt(roster, link).status.out;
+}
+
+
 export function fighterAt(roster: Roster, slot: number): Fighter {
   const fighter = roster.fighters[slot];
   if (fighter === undefined) throw new Error(`no fighter in slot ${slot}`);

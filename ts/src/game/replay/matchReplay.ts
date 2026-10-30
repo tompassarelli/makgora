@@ -24,7 +24,7 @@ import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import { type MatchState, Phase } from "../lobby/lobbyState";
 import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuProfiles";
 import { isScenario } from "../session/build";
-import { Character } from "../sim/codes";
+import { Character, DuoRole } from "../sim/codes";
 import { type Fighter } from "../sim/fighter";
 import { authoredTuning } from "../sim/tuning";
 import { botStrategyValues } from "../match/botStrategy";
@@ -691,7 +691,8 @@ function restoreTuning(record: Readonly<Record<string, unknown>>): void {
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = fighters[slot];
     if (!isFields(fighter) || typeof fighter.character !== "number" || !isCharacter(fighter.character)) continue;
-    fighters[slot] = { ...fighter, tuning: authoredTuning(fighter.character) };
+    const partner = isFields(fighter.duo) && fighter.duo.role === DuoRole.partner;
+    fighters[slot] = { ...fighter, tuning: authoredTuning(fighter.character, partner) };
   }
 }
 

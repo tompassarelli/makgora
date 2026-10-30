@@ -3,6 +3,7 @@ import { Character } from "../../sim/codes";
 import type { HeroDefinition } from "../../sim/heroes/hero";
 import { MURLOC_GAMEPLAN } from "./gameplan";
 import { MURLOC_MOVES } from "./moves";
+import { MURLOC_PARTNER_BODY, murlocDamageScale } from "./partner";
 import { MURLOC_SPECIALS } from "./specials";
 
 export const MURLOC_HERO: HeroDefinition = {
@@ -16,4 +17,6 @@ export const MURLOC_HERO: HeroDefinition = {
   moves: MURLOC_MOVES,
   specials: MURLOC_SPECIALS,
   gameplan: MURLOC_GAMEPLAN,
+  partner: MURLOC_PARTNER_BODY,
+  damageScale: (role, partnerLive) => murlocDamageScale(role, partnerLive),
 };

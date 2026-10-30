@@ -3,6 +3,7 @@ import { Character, DuoRole } from "../../sim/codes";
 import { createFighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { type Roster, fighterAt, isActive, setRosterMask } from "../../sim/roster";
+import { authoredTuning } from "../../sim/tuning";
 
 export const MURLOC_DUO = {
   delayFrames: 5,
@@ -21,6 +22,7 @@ function lowestFreeSlot(world: Readonly<Roster>): number {
 function seatPartner(world: Roster, leaderSlot: number, partnerSlot: number): void {
   const leader = fighterAt(world, leaderSlot);
   const partner = createFighter(Character.murloc, leader.motion.x - leader.facing * MURLOC_DUO.partnerOffset, leader.facing);
+  partner.tuning = authoredTuning(Character.murloc, true);
   partner.status.stocks = leader.status.stocks > 0 ? 1 : 0;
   partner.status.out = leader.status.out;
   partner.motion.grounded = leader.motion.grounded;

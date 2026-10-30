@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Action, maskOf } from "../../input/actions";
 import { type RowFields, inputRow } from "../../input/inputRow";
@@ -60,6 +61,7 @@ test("A synced pair's Belly Slide hits a standing foe once per body, Mrgl first 
   assertEquals(hits[0]?.source, LEADER);
   assertEquals(hits[0]?.damage, 5.0);
   assertEquals(hits[1]?.source, PARTNER);
+  assertEquals(hits[1]?.damage, f32(5.0 * 0.75), "Grgl's slide hit deals three quarters of Mrgl's, 3.75%");
 });
 
 test("A raised shield stops both bodies' Belly Slides [k3 measure docs/design/murloc.md]", () => {

@@ -123,6 +123,13 @@ export interface FighterMoves {
 }
 
 
+/** A kit's partner body: the weight multiplier of the reference weight and the partner's version of its moves. */
+export interface PartnerBody {
+  readonly weight: number;
+  readonly moves: (base: FighterMoves) => FighterMoves;
+}
+
+
 export function heroMove(firstActive: number, active: number, recovery: number, landingLag: number, regions: readonly MoveRegion[], travelX?: number, travelStopsAtBody?: boolean): AuthoredMove {
   return { startupFrames: firstActive - 1, activeFrames: active, totalFrames: firstActive - 1 + active + recovery, landingLag, regions, travelX, travelStopsAtBody };
 }
