@@ -1,10 +1,10 @@
 
 
 type Color = readonly [number, number, number];
-interface StageSky { readonly stage: number; readonly theme: string; readonly zenith: Color; readonly horizon: Color; readonly nadir: Color; readonly cloud: number; readonly ribs?: number }
+interface StageSky { readonly stage: number; readonly theme: string; readonly zenith: Color; readonly horizon: Color; readonly nadir: Color; readonly cloud: number; readonly ribs?: number; readonly aurora?: Color }
 export const STAGE_SKIES: readonly StageSky[] = [
   { stage: 0, theme: "Sky", zenith: [42, 72, 116], horizon: [125, 157, 178], nadir: [20, 28, 43], cloud: 8 },
-  { stage: 2, theme: "Icecrown", zenith: [24, 39, 69], horizon: [85, 125, 158], nadir: [18, 27, 44], cloud: 12 },
+  { stage: 2, theme: "Icecrown", zenith: [10, 18, 32], horizon: [34, 62, 80], nadir: [14, 22, 34], cloud: 14, aurora: [18, 92, 78] },
   { stage: 11, theme: "Gryphon", zenith: [50, 77, 112], horizon: [150, 173, 182], nadir: [31, 42, 58], cloud: 14 },
   { stage: 3, theme: "Durotar", zenith: [73, 55, 63], horizon: [175, 128, 86], nadir: [38, 30, 32], cloud: 10 },
   { stage: 4, theme: "Naxxramas", zenith: [24, 16, 32], horizon: [40, 58, 42], nadir: [30, 62, 30], cloud: 0, ribs: 24 },
@@ -30,7 +30,8 @@ export function stageSkyTexture(sky: StageSky) {
     const phase = sky.ribs === undefined ? 0.5 : (x / width * sky.ribs) % 1;
     const rib = Math.min(phase, 1 - phase);
     const vault = sky.ribs === undefined || elevation < -0.05 ? 0 : rib < 0.08 ? 9 * (1 - rib / 0.08) : rib < 0.14 ? -5 : 0;
-    const color = from.map((channel, i) => Math.round(channel * (1 - mix) + (to[i] ?? channel) * mix + cloud + vault));
+    const band = sky.aurora === undefined || elevation < 0.2 ? 0 : Math.exp(-(((elevation - 0.52 - 0.09 * Math.sin(angle * 4)) / 0.13) ** 2)) * (0.55 + 0.45 * Math.sin(angle * 2.3 + 1));
+    const color = from.map((channel, i) => Math.round(channel * (1 - mix) + (to[i] ?? channel) * mix + cloud + vault + (sky.aurora?.[i] ?? 0) * band));
     bytes.set([color[2] ?? 0, color[1] ?? 0, color[0] ?? 0, 255], 18 + (y * width + x) * 4);
   }
   return { bytes, name: `StageSky-${hash(bytes)}.tga` };

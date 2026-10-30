@@ -2,7 +2,7 @@
 /** Original atmospheric skies; Nordrassil retains its stock aurora. */
 export const STAGE_SKY_MODELS: Readonly<Record<number, string>> = {
   0: "war3mapImported\\StageSky-3ea21e7af33222f5b0262d728156005e62cf58f0a91c85270e4e823b784e869d.mdx",
-  2: "war3mapImported\\StageSky-001d9efc0f60170d503e9896ba1818ee98903d7be1f7219eac1eba0206e5d933.mdx",
+  2: "war3mapImported\\StageSky-c092d76d04705c2e47a590eeea2ed4045b0805f9313367fbd2350d3179585e9d.mdx",
   11: "war3mapImported\\StageSky-c3a88e4c3b121d131d7676b51cf3276b50ce2653997f33010a0a1b55c1d7bed5.mdx",
   3: "war3mapImported\\StageSky-2f2c893f3ceed80677bba9a312d64e0808a7b02e969bd4312f3261f222daefc9.mdx",
   4: "war3mapImported\\StageSky-5efc9accb8cc5b66301b85c3c93a5309af3957e4922b7b453b31be340601be2d.mdx",
