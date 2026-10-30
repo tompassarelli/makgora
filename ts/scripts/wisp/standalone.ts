@@ -132,14 +132,12 @@ export async function createStandaloneSession(options: { readonly script?: strin
   }
 }
 
-const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
+export const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
   title: "Smashcraft",
   render: { ...render, preloadModels: ["Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx"] },
   create: createStandaloneSession,
   net: { mapHash: smashcraftMapHash, create: createNetStandalone },
 });
-
-export const SMASHCRAFT_STANDALONE: StandaloneGame = smashcraftStandalone(headlessRender());
 
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
 const TEXT_OPTIONS = new Set(["--script", "--map", "--out"]);
@@ -184,6 +182,8 @@ function playerAssetsOf(playerAssetsOnly: boolean, map: string | undefined): { r
   return { playerAssets: { map } };
 }
 
+const NATIVE_GAME_MODULE = join(import.meta.dir, "nativeGame.ts");
+
 export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const { runStandalone, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
   const net = standaloneNetArguments(args);
@@ -192,15 +192,16 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (typeof windowed === "string") return yield* new UsageFailure({ problem: windowed });
   const options = yield* Effect.try({ try: () => standaloneArguments(windowed.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
   const { playerAssets, ...run } = options;
-  if (windowed.window === "native" && (options.presentation !== undefined || options.fourFighters === true || playerAssets !== undefined)) {
-    return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --presentation, --four-fighters and --player-assets-only or use --window chrome" });
+  if (windowed.window === "native" && (options.presentation !== undefined || options.fourFighters === true)) {
+    return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --presentation and --four-fighters or use --window chrome" });
   }
   const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
+  const nativeModule = playerAssets === undefined ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?map=${encodeURIComponent(playerAssets.map)}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}) }) }, {
     ...run,
     ...(playerAssets === undefined ? {} : { gpuLease: false }),
     ...(net.net === undefined ? {} : { net: net.net }),
     ...(windowed.window === undefined ? {} : { window: windowed.window }),
-    ...(windowed.window === "native" ? { nativeGame: { module: import.meta.path, export: "SMASHCRAFT_STANDALONE" } } : {}),
+    ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "SMASHCRAFT_NATIVE_GAME" } } : {}),
   });
 });

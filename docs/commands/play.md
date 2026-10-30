@@ -79,8 +79,9 @@
   (one game copy, four fighters; smashcraft:docs/play.md).
   `--window native` opens Wisp's Rust window instead of Chrome (`chrome` is the
   default) and draws the stage, sky and fighters; it steps Smashcraft's default
-  session, so it refuses `--presentation`, `--four-fighters`,
-  `--player-assets-only`, `--host` and `--join`, and it loads the library named by
+  session, so it refuses `--presentation`, `--four-fighters`, `--host` and
+  `--join`; with `--map MAP.w3x --player-assets-only` its worker thread reads
+  the map's imports and the Warcraft install as Chrome does; and it loads the library named by
   `WISP_WINDOW_LIBRARY` (wisp:docs/play.md, "Native window"). The vendored
   package ships no built library: build it in a Wisp checkout with
   `cd window && nix develop --command cargo build --release -p wisp-window`, and
