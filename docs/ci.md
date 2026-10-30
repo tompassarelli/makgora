@@ -70,7 +70,7 @@ fetch, rebase, scan and push:
    local gate (`landingSelection`, smashcraft:ts/scripts/landingRun.ts `here`).
    `LAND_FULL_SUITE=1 safe-push --to main` forces every group.
    The landing's `checks` input starts a farm job only for the groups it names. With all ten started, 120 of 140 check jobs across 14 concurrent gate runs (2026-10-30, 01:20 to 01:34 UTC) were filtered-out groups that ran only setup (17 s each), hosted runners started about 15 jobs a minute, and the account held at most 16 running in that window (Pro allows 40), so one run's corpus and static jobs waited 113 s and 226 s behind other runs' idle jobs.
-   `bun scripts/landingCpu.ts run OUT.json -- safe-push --to main` from ts/
+   `cd /tmp && bun LANE/ts/scripts/landingCpu.ts run OUT.json -- bash -c "cd LANE && exec safe-push --to main"`
    splits a landing's local CPU seconds by stage. A scripts-only landing with
    a 60 to 80 s farm run spent 17 to 20 CPU s (2026-10-29): about 5 to 8 s in
    safe-push's own git calls, about 4 in its gates and scans, about 3 in the
