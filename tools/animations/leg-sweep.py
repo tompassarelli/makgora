@@ -8,10 +8,11 @@ out in front along the floor to full reach on the active frames with the hips an
 across, folded back into the crouch and risen to ready. Clip frame N is attack frame N;
 `rekey-clip.ts ... --keys KEYS.json` splices the baked frames into the shipped clip in place.
 
-`--stomp` bakes a down air from a `--pose downAir` rig instead, Falco's tilted, twirling stomp (#512): one compact
-spindle, legs straight and together with the toes pointed and both arms raised close over the head so a held weapon
-trails above, leaned back 30 degrees about the pelvis so the feet lead down and forward, and turned once about that
-long axis through the strike; it holds through the active frames, then unwinds to the aerial ready pose.
+`--stomp` bakes a down air from a `--pose downAir` rig instead, Falco's tilted, feet-first stomp (#512): a knee
+chamber on frames 1-4 snaps to one compact spindle on the first active frame, legs straight and together with the toes
+pointed and both arms down so the glaives trail behind his hips, leaned back 30 degrees about the pelvis so the feet lead down and forward; it holds through the active frames,
+then unwinds to the aerial ready pose. The turn about the long axis did not read in the side view (three native
+viewer rounds), so the stomp does not twirl.
 
   blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER [--stomp]
 """
@@ -100,7 +101,7 @@ def body():
 
 
 def stomp():
-    tilt, lift, turn_frames = 30, 12, 10
+    tilt, lift = 30, 12
     rest()
     gesture, pelvis = joint('root').parent, joint('pelvis').head.copy()
     hips = {s: joint(f'hip.{s}').head.copy() for s in 'LR'}
@@ -110,9 +111,6 @@ def stomp():
     def eased(t):
         c = max(0.0, min(1.0, t))
         return c * c * (3 - 2 * c)
-
-    def spin(frame):
-        return 360 * eased((frame - contact) / turn_frames)
 
     def pose(frame):
         rest()
@@ -131,7 +129,7 @@ def stomp():
         turn(joint('chest'), Quaternion(PITCH, radians(tilt * 0.5 * w)))
         turn(joint('head'), Quaternion(PITCH, radians(tilt * 0.5 * w)))
         centre = joint('pelvis').head.copy()
-        turn(gesture, Quaternion(PITCH, radians(-tilt * w)) @ Quaternion(YAW, radians(spin(frame))))
+        turn(gesture, Quaternion(PITCH, radians(-tilt * w)))
         joint('root').matrix = Matrix.Translation(centre - joint('pelvis').head) @ joint('root').matrix
         update()
 
@@ -147,7 +145,7 @@ def stomp():
             entry['rotation'].append([q.x, q.y, q.z, q.w])
             entry['translation'].append(list(bones[name].location))
         ankle, wrist, blade = joint('ankle.R').head, joint('wrist.R').head, joint('weapon').head
-        print(f'STOMP frame {frame}: spin {spin(frame):.0f} ankle.R ({ankle.x:.1f}, {ankle.z:.1f}) wrist.R ({wrist.x:.1f}, {wrist.z:.1f}) blade ({blade.x:.1f}, {blade.z:.1f})', flush=True)
+        print(f'STOMP frame {frame}: ankle.R ({ankle.x:.1f}, {ankle.z:.1f}) wrist.R ({wrist.x:.1f}, {wrist.z:.1f}) blade ({blade.x:.1f}, {blade.z:.1f})', flush=True)
     open(keys_path, 'w').write(json.dumps(out))
     print('STOMP_KEYS', keys_path, frames + 1, 'frames', flush=True)
 
