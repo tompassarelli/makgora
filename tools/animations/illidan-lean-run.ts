@@ -10,13 +10,14 @@ ensure(assetsArg && outputArg && variantArg, "usage: bun tools/animations/illida
 const [assets, output] = [assetsArg, outputArg].map(p => resolve(p));
 ensure(relative(resolve(import.meta.dir, "../.."), output).startsWith(".."), "Illidan art stays outside the checkout");
 
-interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number; readonly alternate: number; readonly cross: number; readonly counter: number; readonly pelvisYaw: number; readonly crouch: number; readonly knee: number; readonly shin: number }
-const GAIT = { alternate: 0, cross: 0, counter: 0, pelvisYaw: 0, crouch: 0, knee: 0, shin: 0 };
+interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number; readonly alternate: number; readonly cross: number; readonly counter: number; readonly pelvisYaw: number; readonly crouch: number; readonly knee: number; readonly shin: number; readonly handGuard: number }
+const GAIT = { alternate: 0, cross: 0, counter: 0, pelvisYaw: 0, crouch: 0, knee: 0, shin: 0, handGuard: 0 };
 const VARIANTS: Readonly<Record<string, Variant>> = {
   low: { lean: 52, head: .55, pelvis: .4, sweep: 78, elbow: 8, hand: 46, splay: 14, swing: .35, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   fox: { lean: 42, head: .5, pelvis: .35, sweep: 66, elbow: 10, hand: 38, splay: 16, swing: .4, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   long: { lean: 34, head: .45, pelvis: .3, sweep: 58, elbow: 14, hand: 30, splay: 18, swing: .5, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   take2: { lean: 72, head: .62, pelvis: .3, sweep: 88, elbow: 2, hand: 90, splay: -14, swing: .3, bob: 1.5, slide: 26, slideR: 38, drop: 14, lateral: 12, ...GAIT },
+  stalker2: { lean: 40, head: .3, pelvis: .45, sweep: 46, elbow: 14, hand: 90, splay: 16, swing: 0, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, alternate: 40, cross: 22, counter: 14, pelvisYaw: 8, crouch: 12, knee: 34, shin: 30, handGuard: -20 },
   stalker: { lean: 40, head: .3, pelvis: .45, sweep: 46, elbow: 14, hand: 20, splay: 16, swing: 0, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, alternate: 40, cross: 22, counter: 14, pelvisYaw: 8, crouch: 12, knee: 34, shin: 30 },
 };
 const v = VARIANTS[variantArg];
@@ -106,7 +107,7 @@ function rewrite(name: "Locomotion Run" | "Locomotion Initial Dash Burst", ramp:
       const raw = swingOf(s, side);
       const swing = v.alternate === 0 ? v.swing * raw : v.alternate * raw / reach[side]!;
       const guard = v.alternate === 0 ? 0 : (1 - raw / reach[side]!) / 2;
-      const a = v.sweep + swing, e = a + v.elbow, h = e + v.hand;
+      const a = v.sweep + swing, e = a + v.elbow, h = e + (v.alternate === 0 ? v.hand : v.hand + (v.handGuard - v.hand) * guard);
       const splay = (extra: number) => turn("x", sign * -(v.splay + extra - v.cross * guard));
       target.set(`Bone_Arm1_${side}`, times(root, turn("y", a), splay(0)));
       target.set(`Bone_Arm2_${side}`, times(root, turn("y", e), splay(-4)));
