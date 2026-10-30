@@ -139,10 +139,12 @@ const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame 
   net: { mapHash: smashcraftMapHash, create: createNetStandalone },
 });
 
+export const SMASHCRAFT_STANDALONE: StandaloneGame = smashcraftStandalone(headlessRender());
+
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
 const TEXT_OPTIONS = new Set(["--script", "--map", "--out"]);
 
-export function standaloneArguments(args: readonly string[]) {
+export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "chrome") {
   let frames: number | undefined;
   let presentation: MapBuild["presentation"] | undefined;
   const flags = new Set<string>(), texts = new Map<string, string>();
@@ -167,7 +169,7 @@ export function standaloneArguments(args: readonly string[]) {
     }
   }
   const script = texts.get("--script"), out = texts.get("--out"), map = texts.get("--map"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
-  if (headless && (frames === undefined || out === undefined)) throw new Error("--headless needs --frames N and --out DIR");
+  if (headless && (frames === undefined || (out === undefined && window === "chrome"))) throw new Error(window === "native" ? "--headless needs --frames N" : "--headless needs --frames N and --out DIR");
   const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
   if (fourFighters && script !== undefined) throw new Error("--four-fighters plays its own inputs; drop --script");
   return { ...(fourFighters ? { fourFighters } : {}), ...playerAssets, ...(script === undefined ? {} : { script }), ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
@@ -183,11 +185,22 @@ function playerAssetsOf(playerAssetsOnly: boolean, map: string | undefined): { r
 }
 
 export const standalonePlay: Command = (args) => Effect.gen(function*() {
-  const { runStandalone, standaloneNetArguments } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
+  const { runStandalone, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
   const net = standaloneNetArguments(args);
   if (typeof net === "string") return yield* new UsageFailure({ problem: net });
-  const options = yield* Effect.try({ try: () => standaloneArguments(net.rest), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
+  const windowed = standaloneWindowArgument(net.rest);
+  if (typeof windowed === "string") return yield* new UsageFailure({ problem: windowed });
+  const options = yield* Effect.try({ try: () => standaloneArguments(windowed.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
   const { playerAssets, ...run } = options;
+  if (windowed.window === "native" && (options.presentation !== undefined || options.fourFighters === true || playerAssets !== undefined)) {
+    return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --presentation, --four-fighters and --player-assets-only or use --window chrome" });
+  }
   const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
-  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}) }) }, { ...run, ...(playerAssets === undefined ? {} : { gpuLease: false }), ...(net.net === undefined ? {} : { net: net.net }) });
+  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}) }) }, {
+    ...run,
+    ...(playerAssets === undefined ? {} : { gpuLease: false }),
+    ...(net.net === undefined ? {} : { net: net.net }),
+    ...(windowed.window === undefined ? {} : { window: windowed.window }),
+    ...(windowed.window === "native" ? { nativeGame: { module: import.meta.path, export: "SMASHCRAFT_STANDALONE" } } : {}),
+  });
 });
