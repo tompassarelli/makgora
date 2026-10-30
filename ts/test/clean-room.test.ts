@@ -26,6 +26,11 @@ test("refuses retail-file provenance [k2 property]", () => {
     'const DODGE_DATA = "Fox/Falco animation frames (retail-action-lengths.json)";',
     "// Value from the cited NTSC 1.02 extraction.",
     "Each rule comes from the decompilation.",
+    "/** GrOp.dat yakumono_param: the shortest wait between gusts. */",
+    "/** GrOk.dat rframe_barrel_in: the catch radius. */",
+    "the shot leaves after groldkongo.c stageGObj1_GObjProc's timer",
+    "Melee's per-state interrupt lists (`ftCo_*_IASA`)",
+    "`Fighter_procUpdate` adds it to the position",
   ]) expect(refused(text)).toBe(true);
 });
 

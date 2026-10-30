@@ -8,13 +8,13 @@ to a fighter. Hazards show no text during play (#336); wind, platforms, the cann
 the lava warn on the stage itself. The loop and lift use smashcraft:ts/src/game/sim/stage.ts's moving
 platform paths, with the carry and landing rules in smashcraft:docs/physics.md.
 
-Wind follows Dream Land 64's Whispy data in Melee's GrOp.dat and
-Melee 600 calm frames, a 45-frame warning, then 274
-frames pushing 0.2 Melee units per frame, alternating right and left. Its box
-has Melee's inner offsets from center, outer offsets from the ledges and
-height −10 to 40 Melee units above the floor. Ground dodges skip it, as in
-`Fighter_procUpdate` in Melee
-Six stock Warcraft `Tornado_Target.mdx` ribbons sweep across the stage in the
+Nordrassil's wind is our own schedule, after SmashWiki's description of
+Whispy Woods as a weak, occasional stream that does not weaken with distance
+in Melee ([Whispy Woods](https://www.ssbwiki.com/Whispy_Woods)): 540 calm
+frames, a 60-frame warning, then 240 frames pushing 1 world unit per frame,
+alternating right and left. It covers the downwind half of the main deck,
+from the stage's centre to the downwind ledge, from 60 below the deck's top
+to 240 above it. Ground dodges skip it. Six stock Warcraft `Tornado_Target.mdx` ribbons sweep across the stage in the
 upcoming push direction throughout all 45 warning frames and the gust (#348).
 They stay collapsed beneath the scene while calm or with hazards off. This
 adds no imported assets and no warning text.

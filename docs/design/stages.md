@@ -45,8 +45,7 @@ Stage variance:
 - **Dream Land**: Whispy Woods' wind (Hazards, below).
 - **Fountain of Dreams**: the side platforms drift up and down independently
   at random, from just under the top platform to below the floor; there is no
-  tell of when or how far they will move (SmashWiki; Melee
-  draws their targets with a Melee routine).
+  tell of when or how far they will move (SmashWiki).
 - **Pokémon Stadium**: transforms between the neutral form and Fire, Grass,
   Rock and Water forms with walls and slopes; "frozen" Stadium is a mod that
   keeps the neutral form.

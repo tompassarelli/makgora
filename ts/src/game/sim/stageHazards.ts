@@ -23,26 +23,13 @@ import { mutableCannon } from "./fighterRest";
 export const WindPhase = { calm: 0, cue: 1, blowing: 2 } as const;
 export type WindPhase = (typeof WindPhase)[keyof typeof WindPhase];
 
-/** GrOp.dat yakumono_param: Whispy's shortest wait between gusts. */
-export const WIND_CALM_FRAMES = 600;
-/** Whispy's blow animation runs this long before the wind starts, its sound on the last of them. */
-export const WIND_CUE_FRAMES = 45;
-
-export const WIND_BLOW_FRAMES = 274;
+export const WIND_CALM_FRAMES = 540;
+export const WIND_CUE_FRAMES = 60;
+export const WIND_BLOW_FRAMES = 240;
 export const WIND_CYCLE_FRAMES = WIND_CALM_FRAMES + WIND_CUE_FRAMES + WIND_BLOW_FRAMES;
-/** GrOp.dat: Melee units a gust moves a fighter each frame. */
-export const WIND_SPEED = melee(0.20000000298023224);
-// Whispy gust bounds use GrOp.dat and Dream Land ledges at ±77.2713.
-
-
-
-
-const WIND_INNER_EDGE_RIGHT = melee(17.0);
-const WIND_INNER_EDGE_LEFT = melee(18.0);
-const WIND_OUTER_INSET_RIGHT = melee(1.2713000774383545);
-const WIND_OUTER_INSET_LEFT = melee(3.2713000774383545);
-const WIND_BOTTOM = melee(-10.0);
-const WIND_TOP = melee(40.0);
+export const WIND_SPEED = 1.0;
+const WIND_BOTTOM = -60.0;
+const WIND_TOP = 240.0;
 
 const windCycle = (frame: number) => floorMod(frame - 1, WIND_CYCLE_FRAMES);
 
@@ -68,11 +55,11 @@ const stageCenter = (stage: number) => f32(f32(mainDeckLeft(stage) + mainDeckRig
 
 
 export function windLeft(stage: number, direction: -1 | 1): number {
-  return direction > 0 ? f32(stageCenter(stage) - WIND_INNER_EDGE_RIGHT) : f32(mainDeckLeft(stage) + WIND_OUTER_INSET_LEFT);
+  return direction > 0 ? stageCenter(stage) : mainDeckLeft(stage);
 }
 
 export function windRight(stage: number, direction: -1 | 1): number {
-  return direction > 0 ? f32(mainDeckRight(stage) - WIND_OUTER_INSET_RIGHT) : f32(stageCenter(stage) + WIND_INNER_EDGE_LEFT);
+  return direction > 0 ? mainDeckRight(stage) : stageCenter(stage);
 }
 
 const windBottom = (stage: number): number => f32(mainDeckZ(stage) + WIND_BOTTOM);

@@ -1604,7 +1604,7 @@ the horizontal smash deadzone starts the jump. It enters the wall
 tech's state: motion stops, the fighter turns away, it is
 intangible for 14 frames, hangs 5, then launches as above. Each
 earlier wall jump since the fighter last stood on the ground scales the rise
-by 0.975. A fighter moved out of the deck's body (see above) counts
+by 0.96 ([SmashWiki, Wall jump](https://www.ssbwiki.com/Wall_jump)). A fighter moved out of the deck's body (see above) counts
 as against that wall.
 
 smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts checks the

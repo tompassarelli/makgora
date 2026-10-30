@@ -22,7 +22,7 @@ export const WALL_JUMP_INPUT_WINDOW_FRAMES = 130;
 /** how far from the wall the flick must push the stick. */
 export const WALL_JUMP_STICK_X = 0.800000011920929;
 /** each earlier wall jump since landing scales a wall jump's rise by this. */
-export const WALL_JUMP_REPEAT_RISE_SCALE = 0.9750000238418579;
+export const WALL_JUMP_REPEAT_RISE_SCALE = f32(0.96);
 
 const WALL_JUMP_AGE_LIMIT = 254;
 const WALL_JUMPS_USED_LIMIT = 255;
@@ -103,7 +103,7 @@ function wallTechJumpInputIsRecent(f: Fighter, input: Readonly<Controls>): boole
   return f.jump.inputAge < WALL_TECH_JUMP_INPUT_WINDOW_FRAMES || input.jumpPressed || input.verticalDirection > 0;
 }
 
-/** A wall jump's rise: each earlier wall jump since landing scales it by  (a Melee routine's powf). */
+/** A wall jump's rise: each earlier wall jump since landing scales it by 0.96 (ssbwiki.com/Wall_jump). */
 function wallJumpRise(speed: number, repeat: number): number {
   if (repeat === 0) return speed;
   let scale = 1.0;

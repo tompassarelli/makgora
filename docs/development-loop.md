@@ -309,10 +309,7 @@ smashcraft:build/wurst-tests/grab-stock-cleanup.log. Native grab-system behavior
 is not yet verified. On resume, the client changed from the inspected game
 menu to an active old-build match during navigation; automated input stopped
 to avoid competing with owner play. No restart or new-build launch is claimed.
-Reference a Melee routine counts at most one eligible-button contribution
-plus one remembered-axis-sign change per call; neutral does not clear those
-signs. Fighter input maps Z into A/trigger semantics. CaptureWait decrements
-the timer and processes mash before release. SmashWiki's Grab page supplies
+Fighter input maps Z into A/trigger semantics. SmashWiki's Grab page supplies
 the six-frame contribution and damage-dependent timer formula; caches are
 smashcraft:build/ref-Grab.html and smashcraft:build/ref-Mashing.html. Complete
 grab-context input, pummel, throw commitment/release, mash and snapshot state

@@ -278,9 +278,8 @@ Every fighter's jab is a two- or three-hit chain on repeated presses (#163).
 Repeatability is the jab's identity; a tilt never chains.
 
 **Melee's mechanism**:
-- A chain step needs a fresh A press, never a held button:
-  a Melee routine and `checkAttack12`/`checkAttack13` read
-  `pressed_buttons`.
+- A chain step needs a fresh A press, never a held button
+  ([SmashWiki, Jab](https://www.ssbwiki.com/Jab)).
 - A press is kept while a per-fighter input window counts down
   (smashcraft:references/melee-frame-data/character-attributes.csv, "Jab 2
   Window?" and "Jab 3 Window?"). The next jab starts only once the jab's
@@ -342,11 +341,8 @@ A swing's whoosh, its hit sound and its hit spark come in three sizes by move
 class, so a jab never sounds like a tilt (#163,
 smashcraft:ts/src/game/presentation/moveTiers.ts).
 
-- **Melee** stores a hit-sound kind and a severity (0-2) on every hitbox.
-  - a Melee routine plays a Melee routine[sfx_kind * 3 + sfx_severity]`.
-  - Shield hits pick one of three sounds by severity.
-  - The tier is authored per hitbox, not computed from damage.
-  - Swing sounds are plain script sound commands with no size rule.
+- **Melee**, heard in play: hit sounds come in light, medium and heavy
+  sizes by move, and shield hits in sizes too; swing sounds have no size rule.
 - **Ultimate**'s attack scripts give every hitbox `ATTACK_SOUND_LEVEL_S`,
   `_M` or `_L`.
   - Mario's jabs 1 and 2 are S and his jab 3 is M. His tilts are M and his

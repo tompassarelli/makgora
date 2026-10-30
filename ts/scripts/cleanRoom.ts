@@ -13,7 +13,8 @@ const OFFSET = String.raw`x(?!(?:11|32|64|86)(?![0-9A-F]))[0-9A-F]{2,4}`;
 export const REACH_RULES: readonly { readonly name: string; readonly pattern: RegExp; readonly within?: RegExp }[] = [
   { name: "a game-binary address or offset", pattern: /\bRVA\b|\+0x[0-9a-fA-F]{2,}\b|\b0x0*6[fF]{3}[0-9a-fA-F]{8}\b|\b0x80(?!000000\b)[0-9a-fA-F]{6}\b|\b80(?=[0-9A-F]*[A-F])[0-9A-F]{6}\b/ },
   { name: "a decompiled symbol name", pattern: /\b(?![a-zA-Z]{2,4}_80)[a-zA-Z][a-zA-Z0-9]*_80[0-9A-F]{6}\b|\b(?:ft|gr|it|mp|cm|lb|gm|pl|ef|mn|db)[A-Z]?[A-Za-z0-9]*_[A-Z][A-Za-z0-9_]*\b/ },
-  { name: "a Melee game-file name", pattern: /\bPlCo\b|\bPl[A-Z][a-z]\.dat\b|GALE01|\bmain\.dol\b/ },
+  { name: "a Melee game-file name", pattern: /\bPlCo\b|\b(?:Pl|Gr|Ty|If|Mn|Ef)[A-Z][A-Za-z0-9]{0,3}\.dat\b|GALE01|\bmain\.dol\b|\byakumono_param\b|\b(?:rframe|rradd)_[a-z]/ },
+  { name: "a decompiled function or source file", pattern: /\b\w+_GObjProc\b|\bFighter_proc[A-Z]\w*|\bftCo_|\bbury_timer|\b(?:gr|ft|it|lb|mp|gm)[a-z]{4,}\.c\b(?![\w(])|\bft\/kinds\// },
   { name: "an offset-named game field", pattern: new RegExp(String.raw`(?<![\\\w%])${OFFSET}_[A-Za-z]|[\x60"'.]${OFFSET}[\x60"']|(?<![\\\w%])x(?=[0-9A-F]{0,3}[A-F])[0-9A-F]{2,4}\b|\bftData[\s_]${OFFSET}\b`), within: /x[0-9A-F]{2}/ },
   { name: "a retail-file source", pattern: /\bcoll_data\b|\bretail-(?:roster|action-lengths)\b/ },
   { name: "an extraction or decompilation cited as a source", pattern: /\b(?:NTSC|PAL|1\.02|disc|retail|cited|Melee)\b[\w. '-]{0,24}?\bextract(?:ion|ed)\b|\b(?:from|per|cited?|via|in) (?:the |Melee's )?decomp(?:ilation|iled)?\b/i },
@@ -21,6 +22,10 @@ export const REACH_RULES: readonly { readonly name: string; readonly pattern: Re
 
 export const REACH_ALLOWLIST: readonly { readonly path: string; readonly rule: string; readonly reason: string }[] = [
   { path: "docs/delivery-goal.md", rule: "an extraction or decompilation cited as a source", reason: "states the clean-room policy and cites nothing" },
+  { path: "ts/src/game/sim/stageHazards.ts", rule: "a Melee game-file name", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
+  { path: "ts/src/game/sim/stageHazards.ts", rule: "a decompiled function or source file", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
+  { path: "docs/stage-hazards.md", rule: "a Melee game-file name", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
+  { path: "docs/stage-hazards.md", rule: "a decompiled function or source file", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
   { path: "repos/effect/pnpm-lock.yaml", rule: "an offset-named game field", reason: "upstream Effect lockfile: a base64 integrity hash ending in x and hex-looking characters" },
 ];
 

@@ -62,7 +62,7 @@ export type GroundOption = (typeof GroundOption)[keyof typeof GroundOption];
 const movingFast = (state: GroundState): boolean =>
   state === GroundState.dash || state === GroundState.run || state === GroundState.runBrake || state === GroundState.turnRun;
 
-/** Which zone of Melee's stick map a sample selects, in the priority order of a Melee routine (jump, dash, crouch, turn, walk). */
+/** Which zone of the stick map a sample selects, tried in Smashcraft's priority order (jump, dash, crouch, turn, walk); thresholds from SmashWiki (docs/design/melee-parity.md). */
 export function stickZone(x: number, z: number, sideAge: number, upAge: number, facing: number, state: GroundState): StickZone {
   const horizontal = Math.abs(x);
   const freshUp = upAge < TAP_JUMP_WINDOW;
@@ -79,7 +79,7 @@ export function stickZone(x: number, z: number, sideAge: number, upAge: number, 
   return horizontal < WALK_FAST_STICK_THRESHOLD ? StickZone.walkMiddle : StickZone.walkFast;
 }
 
-/** Melee's per-state interrupt lists (`ftCo_*_IASA`), reduced to the options Smashcraft gates; `frame` is the state's action frame. */
+/** Options each ground state accepts, after SmashWiki's Dash page (ssbwiki.com/Dash: a smash in the first 3 dash frames, a dash attack after them), reduced to the options Smashcraft gates; `frame` is the state's action frame. */
 export function groundOptionAllowed(state: GroundState, frame: number, option: GroundOption, turnCommandEndFrame: number): boolean {
   switch (state) {
     case GroundState.stand:

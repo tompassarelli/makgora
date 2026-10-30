@@ -13,47 +13,25 @@ second.
 
 ## Reference 1: Jungle Japes' river (Melee)
 
-Design targets for the river, set from SmashWiki's Jungle Japes page and from
-watching the game.
+Design targets for the river, set from SmashWiki's Jungle Japes page.
 
-| `yakumono_param` | Value | Use |
-| --- | --- | --- |
-| | −40.0 | River surface height. A fighter whose position is below it is in the river |
-| | −3.0 | Current: mu added to the fighter's x every frame in the river (leftward) |
-| | 80 | Klaptrap's shortest wait between swims, frames |
-| | 640 | Klaptrap's random extra wait, a Melee routine(640)`: 0–639 frames |
-| | −30.0, 30.0 | Klaptrap's random x range for each swim |
-
-- **Direction and strength.** a Melee routine is registered as the stage's
-  fighter "wind device". Each frame a fighter is
-  below y −40 it returns the vector (−3.0, 0, 0), which
-  `Fighter_procUpdate` adds straight to the
-  fighter's position after its own motion, as it adds Whispy's 0.2 mu wind.
-  The river moves a fighter 3.0 mu a frame, 180 mu a second, to the left, more
-  than three times the fastest air speed in Smashcraft's cast (0.88 mu).
-  Drifting against it is useless.
-- **Region.** The whole river below y −40; there is no horizontal limit. Only
-  x moves; gravity keeps pulling the fighter down.
-- **Escape.** Melee has no swimming: a fighter falls through the water
-  (SmashWiki: they "will simply fall to their death"). The only escape is up:
-  a double jump or recovery special that lifts the fighter back above y −40
-  ends the push that frame. SmashWiki calls getting caught "likely to result
-  in a KO as it is hard to get back on the stage."
-- **Where it carries you.** Left, toward the left blast line or down to the
-  bottom one, whichever the fighter reaches first.
-- **Tell.** Entering the river splashes (effect scaled by the fighter's size,
-  sound 410000); the river itself is the tell: always there, always one way.
-- **Klaptrap, the creature.** After 80 + 0–639 random frames it swims at a
-  random x between −30 and 30, its sounds on its animation frames 38 and 148
-  and 110 and 210. SmashWiki gives "every 8–17 seconds"
-  in Melee, 30% and a spike strong enough to KO anyone. Both its timing and
-  its place are random, so Smashcraft does not copy it.
-- **Later versions.** Brawl lets fighters swim and float, so the river carries
-  them "from the right platform to the left blast line in only a few seconds"
-  and the Klaptrap comes "consistently every 10 seconds"; Ultimate keeps the
-  leftward river and swimming, restores the Melee Klaptrap's one-hit spike,
-  and keeps the current with hazards off (SmashWiki, Jungle Japes). Brawl's
-  fixed ten-second Klaptrap is the learnable precedent.
+- **Direction and strength.** From Brawl on the river pulls fighters toward
+  the left blast line, from the right platform to the blast line "in only a
+  few seconds"; in Ultimate "the swift current will still carry players to
+  the left very quickly", sometimes before they can jump out. Drifting
+  against it is useless.
+- **Escape.** Melee has no swimming: a fighter who cannot recover "will
+  simply fall to their death". The only escape is up: a double jump or
+  recovery special back above the water.
+- **Tell.** The river itself is the tell: always there, always one way.
+- **Klaptrap, the creature.** SmashWiki gives "every 8-17 seconds" in Melee,
+  30% and a spike strong enough to KO anyone. Its timing is random, so
+  Smashcraft does not copy it.
+- **Later versions.** Brawl lets fighters swim and float, and the Klaptrap
+  comes "consistently every 10 seconds"; Ultimate keeps the leftward river
+  and swimming, restores the Melee Klaptrap's one-hit spike, and keeps the
+  current with hazards off (SmashWiki, Jungle Japes). Brawl's fixed
+  ten-second Klaptrap is the learnable precedent.
 
 Swimming in the later games (SmashWiki, Swimming): Brawl and Ultimate allow
 240 frames of swimming, 2.5 frames fewer per 1% damage, then 150 frames of
@@ -169,10 +147,9 @@ mirror-symmetric, so unlike Jungle Japes the current alternates, on a
 
 - **Region and push.** Every fighter in the water, across the whole width,
   is moved 4.8 a frame in the tide's direction, added to its position after
-  its own motion, exactly as Melee adds Jungle Japes' river and Whispy's wind
-  and as Smashcraft's wind already does (smashcraft:docs/stage-hazards.md).
+  its own motion, as Smashcraft's wind already does (smashcraft:docs/stage-hazards.md).
   Hitstun and hitlag don't stop it; it moves fighters only.
-- **Strength.** A quarter of Japes' 3.0 mu: from the ledge a floating fighter
+- **Strength.** "A few seconds" to the blast line, as SmashWiki puts Brawl's Japes current: from the ledge a floating fighter
   reaches the side blast line (±1,442.6) in 176 frames (2.9 s), from under the
   deck's centre in 301 (5.0 s). Swimming against it at 3.6 still loses 1.2 a
   frame, so swimming only buys time; swimming with it doubles the speed.
@@ -276,7 +253,6 @@ that file lands.
 
 ## Sources
 
-- Owner's Melee rev 2 disc, `GrGd.dat` `yakumono_param`; Melee, Melee, Melee (`Fighter_procUpdate` wind offset).
 - SmashWiki: [Jungle Japes](https://www.ssbwiki.com/Jungle_Japes), [Swimming](https://www.ssbwiki.com/Swimming), [Summit](https://www.ssbwiki.com/Summit), [Fish](https://www.ssbwiki.com/Fish), [Tortimer Island](https://www.ssbwiki.com/Tortimer_Island), [Pirate Ship](https://www.ssbwiki.com/Pirate_Ship), [Great Bay](https://www.ssbwiki.com/Great_Bay).
 - PlayStation All-Stars wiki: [Sandover Village](https://playstationallstars.fandom.com/wiki/Sandover_Village), [Lurker Shark](https://playstationallstars.fandom.com/wiki/Lurker_Shark).
 - [Rivals of Aether developer update, February 2015](https://rivalsofaether.com/developer-update-february-2015/) (Merchant Port); [McLeodGaming wiki, Merchant Port](https://mcleodgaming.fandom.com/wiki/Merchant_Port) (Fraymakers fill time); [Combo Breaker, Rivals of Aether II](https://combobreaker.org/cb_tournaments/roa2/) (stage list).
