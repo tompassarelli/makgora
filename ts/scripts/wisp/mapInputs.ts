@@ -12,7 +12,7 @@ import { step } from "wisp/scripts/wisp/timings";
 import type { FighterOriginalClip } from "../../src/generated/clips/fighterOriginalClip";
 import { originalClip, originalClipCount, originalLightPath } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { costumeBody } from "../../src/generated/costumes/costumeBodies";
-import { MAX_COSTUMES } from "../../src/game/presentation/model/costume";
+import { PARTNER_COSTUME } from "../../src/game/presentation/model/costume";
 import * as frostModels from "../../src/generated/assets/frostAssetInfo";
 import * as impactModels from "../../src/game/assets/impactAssetInfo";
 import { IMPORTED_MUSIC } from "../../src/game/assets/importedMusicInfo";
@@ -127,7 +127,7 @@ const costumePoolFiles = (pool: string): string[] =>
 export const ORIGINAL_CLIP_MODELS =[...new Set(Object.values(Character).filter(shipsInMap).flatMap((character) => {
   const light = originalLightPath(character);
   const clips = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "");
-  const costumes = Array.from({ length: MAX_COSTUMES }, (_, costume) => costumeBody(character, costume) ?? []).flat();
+  const costumes = Array.from({ length: PARTNER_COSTUME + 1 }, (_, costume) => costumeBody(character, costume) ?? []).flat();
   return [...clips, ...costumes, ...light === undefined ? [] : [light]];
 }))];
 

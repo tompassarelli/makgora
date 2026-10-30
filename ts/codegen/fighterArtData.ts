@@ -7,6 +7,7 @@ import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { AttackStyle, Character, SpecialAction } from "../src/game/sim/codes";
 import { WARDEN_MOVES } from "../src/game/fighters/warden/moves";
 import { HERO_ROSTER, fighterSlug } from "../src/game/roster/kits";
+import { PARTNER_COSTUME } from "../src/game/presentation/model/costume";
 
 export const output = "src/generated/fighterArtData.ts";
 export const rulesDirectory = "src/generated/fighter-art";
@@ -94,7 +95,9 @@ export function renderFighterRules(character: number): string {
   const blade = character === Character.warden
     ? [`  blade: {`, `    neutralAir: ${wardenBlade(AttackStyle.neutralAir)},`, `    forwardAir: ${wardenBlade(AttackStyle.forwardAir)},`, `  },`]
     : [];
-  const skins = (heroLook(character)?.costumes ?? []).flatMap((costume, index) => costume.skin === undefined ? [] : [`  { index: ${index}, textures: ${JSON.stringify(costume.skin.textures)} },`]);
+  const look = heroLook(character);
+  const skinned = [...(look?.costumes ?? []).map((costume, index) => ({ index, skin: costume.skin })), { index: PARTNER_COSTUME, skin: look?.partner?.skin }];
+  const skins = skinned.flatMap(({ index, skin }) => skin === undefined ? [] : [`  { index: ${index}, textures: ${JSON.stringify(skin.textures)} },`]);
   return [
     PRODUCER,
     "import type { FighterRules } from \"../fighterArtData\";",

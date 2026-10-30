@@ -1,5 +1,7 @@
 export const MAX_COSTUMES = 8;
 
+export const PARTNER_COSTUME = MAX_COSTUMES;
+
 export type CostumeTint = readonly [red: number, green: number, blue: number];
 
 /** Stock texture swaps, `from` path to `to` path, baked into a costume body built from the fighter's own timeline body (tools/animations/costume-bodies.ts). */

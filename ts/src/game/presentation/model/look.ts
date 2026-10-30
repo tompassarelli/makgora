@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { AttackStyle } from "../../sim/codes";
-import type { Costume } from "./costume";
+import type { Costume, CostumeSkin } from "./costume";
 import type { CommandGrabClips, HeroClip, HeroClipTable, HeroFollowUpPose, HeroPose } from "../../sim/heroes/hero";
 
 export interface HeroLook {
@@ -35,6 +35,13 @@ export interface HeroLook {
   readonly carry?: CarryLook | undefined;
 
   readonly costumes?: readonly Costume[] | undefined;
+
+  readonly partner?: PartnerLook | undefined;
+}
+
+export interface PartnerLook {
+  readonly skin: CostumeSkin;
+  readonly scale: number;
 }
 
 export interface CarryLook {
