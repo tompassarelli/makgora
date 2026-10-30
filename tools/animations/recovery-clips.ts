@@ -5,14 +5,17 @@ import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { Character } from "../../ts/src/game/sim/codes";
+import { DOWN_DAMAGE_FRAMES } from "../../ts/src/game/sim/down";
 import { authoredPhysics } from "../../ts/src/game/sim/tuning";
 import { seconds } from "./asset-info";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
 
-const [assets, output] = process.argv.slice(2).map(p => resolve(p));
-const metadataOnly = process.argv.includes("--metadata-only");
-ensure(assets && output, "usage: bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT");
+const args = process.argv.slice(2);
+const only = args.flatMap((arg, i) => args[i - 1] === "--fighter" ? [arg.toLowerCase()] : []);
+const [assets, output] = args.filter((arg, i) => !arg.startsWith("--") && args[i - 1] !== "--fighter").map(p => resolve(p));
+const metadataOnly = args.includes("--metadata-only");
+ensure(assets && output, "usage: bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--fighter NAME]... [--metadata-only]");
 const project = resolve(import.meta.dir, "../..");
 ensure(relative(project, output).startsWith(".."), "Derived models must stay outside the checkout");
 mkdirSync(output, { recursive: true });
@@ -33,6 +36,11 @@ const roll = (sign: number, down = false): readonly Phase[] => [
   { at: 0.86, roll: sign * 350, tuck: 0.18 },
   { at: 1, roll: sign * 360, tuck: 0 },
 ];
+const LYING_KNOCKDOWN = new Set<Character>([Character.archimonde]);
+const lying = (character: Character): Action[] => !LYING_KNOCKDOWN.has(character) ? [] : [
+  { pose: "knockdown", frames: 30, phases: [{ at: 0 }, { at: 0.35, roll: 55, tuck: 0.08 }, { at: 0.8, roll: 90 }, { at: 1, roll: 90 }] },
+  { pose: "downDamage", frames: DOWN_DAMAGE_FRAMES, phases: [{ at: 0, roll: 90 }, { at: 0.3, roll: 90, height: 10 }, { at: 1, roll: 90 }] },
+];
 function actions(character: Character): Action[] {
   const transitions: Action[] = [
     { pose: "turn", frames: 8, phases: [{ at: 0, yaw: 180 }, { at: 0.4, yaw: 110, lean: -15 }, { at: 1, yaw: 0 }] },
@@ -46,7 +54,7 @@ function actions(character: Character): Action[] {
     { pose: "getUpRollBackward", frames: 35, phases: roll(1, true) },
   ];
   if (character < 3) return transitions;
-  return [...transitions,
+  return [...lying(character), ...transitions,
     { pose: "rollForward", frames: 31, phases: roll(-1) },
     { pose: "rollBackward", frames: 31, phases: roll(1) },
     { pose: "spotDodge", frames: 22, phases: [{ at: 0 }, { at: 0.1, lean: -35, tuck: 0.22 }, { at: 0.7, lean: -35, tuck: 0.22 }, { at: 1 }] },
@@ -69,9 +77,11 @@ function quaternion(y: number, z: number): Float32Array<ArrayBuffer> {
   const a = y * Math.PI / 360, b = z * Math.PI / 360;
   return new Float32Array([-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)]);
 }
-const generated: string[] = [];
+const infoPath = join(project, "ts/src/game/presentation/recoveryClipInfo.ts");
+const generated = new Map<number, string[]>(only.length === 0 ? [] : [...(await Bun.file(infoPath).text()).matchAll(/^  (\d+): \{\n[\s\S]*?\n  \},$/gm)].map(block => [Number(block[1]), block[0].split("\n")] as const));
 const records: unknown[] = [];
 for (const [character, fighter] of fighters.entries()) {
+  if (only.length > 0 && !only.includes(fighter.name.toLowerCase())) continue;
   if (character === Character.demonHunter || character === Character.lichKing || character === Character.uther) continue;
   if (metadataOnly) {
     const model = parseSource(await Bun.file(join(output, fighter.source)).arrayBuffer());
@@ -81,7 +91,7 @@ for (const [character, fighter] of fighters.entries()) {
       ensure(sequence && sequence.NonLooping, `${fighter.name}/${action.pose}: retained action is missing or looping`);
       return `    ${action.pose}: { index: ${index}, seconds: ${seconds((sequence.Interval[1] - sequence.Interval[0]) / 1000)} },`;
     });
-    generated.push(`  ${character}: {`, ...bindings, "  },");
+    generated.set(character, [`  ${character}: {`, ...bindings, "  },"]);
     continue;
   }
   const source = parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer());
@@ -174,14 +184,14 @@ for (const [character, fighter] of fighters.entries()) {
   }
   chmodSync(join(output, fighter.source), 0o644);
   await Bun.write(join(output, fighter.source), encoded);
-  generated.push(`  ${character}: {`, ...bindings, "  },");
+  generated.set(character, [`  ${character}: {`, ...bindings, "  },"]);
   records.push({ fighter: fighter.name, source: fighter.source, originalSequences: source.Sequences.length, appended: actions(character).map(a => a.pose) });
   console.log(`RECOVERY_CLIPS_PASS ${fighter.name}: ${bindings.length} appended actions, existing ${source.Sequences.length} indices preserved`);
 }
-await Bun.write(join(project, "ts/src/game/presentation/recoveryClipInfo.ts"), [
+await Bun.write(infoPath, [
   "// Generated by tools/animations/recovery-clips.ts; regenerate instead of editing.",
   'import { f32 } from "wisp/src/sim/f32";',
   'import { type HeroClipTable } from "../sim/heroes/hero";', "",
-  "export const RECOVERY_CLIPS = {", ...generated, "} as const satisfies Readonly<Record<number, HeroClipTable>>;", "",
+  "export const RECOVERY_CLIPS = {", ...[...generated].toSorted(([a], [b]) => a - b).flatMap(([, lines]) => lines), "} as const satisfies Readonly<Record<number, HeroClipTable>>;", "",
 ].join("\n"));
 if (!metadataOnly) await Bun.write(join(output, "recovery-clips.json"), JSON.stringify(records, null, 2) + "\n");
