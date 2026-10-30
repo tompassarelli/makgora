@@ -35,7 +35,13 @@ const scales = (nodes: readonly mdx.Node[], millis: number): number[] =>
 
 /** A node scaled below this share of its first-clip size hides the mesh under it as surely as a fade. */
 const SHRUNK = 0.5;
-/** The share of the visible body's vertices under shrunk nodes that reads as the body vanishing; glow planes and props stay under it. */
+/** A root node whose pivot is lowered this many units under the floor carries the mesh beneath it; a fighter lying down keeps its root at the floor. */
+const SUNK = 25;
+
+/** Each parentless bone's and helper's pivot height above the floor at one instant; child heights stay `undefined`. */
+const heights = (nodes: readonly mdx.Node[], millis: number): (number | undefined)[] =>
+  nodes.map((node) => node.Parent !== undefined && node.Parent !== null && node.Parent >= 0 ? undefined : (node.PivotPoint[2] ?? 0) + (node.Translation === undefined ? 0 : vectorAt(node.Translation, millis, 0)[2] ?? 0));
+/** The share of the visible body's vertices under shrunk or sunk nodes that reads as the body vanishing; glow planes and props stay under it. */
 const HIDDEN_SHARE = 0.1;
 
 /** For each geoset, each vertex group's vertex count and the node indices (in `nodes`) it hangs under, through every ancestor. */
@@ -60,7 +66,7 @@ const opacities = (model: mdx.Model, millis: number): number[] =>
     return alphaAt(anim?.Alpha, millis) * Math.max(0, ...layers.map((layer) => alphaAt(layer.Alpha, millis)));
   });
 
-/** The clips of one body model during which a geoset visible in the model's first clip drops below the opacity it has there, or a tenth of its visible vertices hang under a bone or helper shrunk below half the size it has there. */
+/** The clips of one body model during which a geoset visible in the model's first clip drops below the opacity it has there, or a tenth of its visible vertices hang under a bone or helper shrunk below half the size it has there or a root lowered under the floor. */
 export function fadingClips(model: mdx.Model, windows: readonly (readonly [number, number])[]): number[] {
   const first = windows[0];
   if (first === undefined) return [];
@@ -69,9 +75,10 @@ export function fadingClips(model: mdx.Model, windows: readonly (readonly [numbe
   const visible = groups.reduce((total, geoset, at) => total + ((reference[at] ?? 0) > 0 ? geoset.reduce((sum, group) => sum + group.vertices, 0) : 0), 0);
   const fades = (millis: number) => opacities(model, millis).some((value, geoset) => (reference[geoset] ?? 0) > 0 && value < (reference[geoset] ?? 0) * FULL);
   const hidden = (millis: number) => {
-    const shrunk = scales(nodes, millis).map((value, node) => value < (size[node] ?? 1) * SHRUNK);
-    if (!shrunk.includes(true)) return false;
-    const under = groups.reduce((total, geoset, at) => total + ((reference[at] ?? 0) > 0 ? geoset.reduce((sum, group) => sum + (group.chain.some((node) => shrunk[node]) ? group.vertices : 0), 0) : 0), 0);
+    const now = heights(nodes, millis);
+    const hiding = scales(nodes, millis).map((value, node) => value < (size[node] ?? 1) * SHRUNK || (now[node] ?? 0) < -SUNK);
+    if (!hiding.includes(true)) return false;
+    const under = groups.reduce((total, geoset, at) => total + ((reference[at] ?? 0) > 0 ? geoset.reduce((sum, group) => sum + (group.chain.some((node) => hiding[node]) ? group.vertices : 0), 0) : 0), 0);
     return under > visible * HIDDEN_SHARE;
   };
   const fading: number[] = [];

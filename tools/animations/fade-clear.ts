@@ -9,6 +9,7 @@ const project = resolve(import.meta.dir, "../..");
 ensure(input && output && names.length > 0 && relative(project, resolve(output)).startsWith(".."), "usage: bun tools/animations/fade-clear.ts SHIPPED.mdx PRIVATE_OUTPUT SEQUENCE...");
 const ALPHA = /^\.(GeosetAnims\.\d+|Materials\.\d+\.Layers\.\d+)\.Alpha$/;
 const SCALING = /^\.(Bones|Helpers)\.\d+\.Scaling$/;
+const TRANSLATION = /^\.(Bones|Helpers)\.(\d+)\.Translation$/;
 const source = parseMDX(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 const windows = names.map((name) => {
   const found = model.Sequences.filter((sequence) => sequence.Name === name);
@@ -17,6 +18,7 @@ const windows = names.map((name) => {
 });
 const EPSILON = 1e-3;
 const SHRUNK = 0.5;
+const SUNK = 25;
 const inside = (frame: number) => windows.some(([start, end]) => frame >= start! && frame <= end!);
 const [openStart, openEnd] = model.Sequences[0]!.Interval;
 const keyAt = (key: mdx.AnimKeyframe, frame: number): mdx.AnimKeyframe => ({ ...key, Frame: frame, Vector: key.Vector.slice() });
@@ -49,9 +51,14 @@ tracks(model, (track, path) => {
     const level = opening ?? new Float32Array([1, 1, 1]);
     const size = Math.min(...Array.from(level));
     if (size > 0) hold(track, level, (key) => Math.min(...key.Vector) < size * SHRUNK);
+  } else if (TRANSLATION.test(path)) {
+    const [, group, index] = TRANSLATION.exec(path)!;
+    const node = model[group as "Bones" | "Helpers"][Number(index)]!;
+    const floor = -(node.PivotPoint[2] ?? 0) - SUNK;
+    if (node.Parent === undefined || node.Parent === null || node.Parent < 0) hold(track, opening ?? new Float32Array([0, 0, 0]), (key) => (key.Vector[2] ?? 0) < floor);
   }
 });
-ensure(cleared > 0, "no body geoset fades or shrinks in the named sequences");
+ensure(cleared > 0, "no body geoset fades, shrinks or sinks in the named sequences");
 
 const outside = (m: mdx.Model) => {
   const copy = structuredClone(m);
@@ -63,4 +70,4 @@ const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(resolve(output), { recursive: true });
 await Bun.write(join(resolve(output), basename(input)), bytes);
-console.log(`FADE_CLEAR_PASS ${cleared} alpha and scale tracks held at their opening level in ${names.join(", ")}; ${join(resolve(output), basename(input))}`);
+console.log(`FADE_CLEAR_PASS ${cleared} alpha, scale and root translation tracks held at their opening level in ${names.join(", ")}; ${join(resolve(output), basename(input))}`);

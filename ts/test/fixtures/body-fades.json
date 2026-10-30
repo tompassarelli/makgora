@@ -5,11 +5,16 @@
  },
  "demonHunter": {
   "body": "IllidanTimelineBody-ef56b827bb4d219510246db2cf23b7686f123dcdd778a8e2dd4034454986eb47.mdx",
-  "fading": []
+  "fading": [
+   53,
+   55
+  ]
  },
  "blademaster": {
   "body": "BlademasterTimelineBody-531ae4050660ca681299f115fa2583494885d9302762126f02132a2edb54aef8.mdx",
-  "fading": []
+  "fading": [
+   72
+  ]
  },
  "mountainKing": {
   "body": "MountainKingTimelineBody-64e9794c355ecfec55fc77081dc60387d911bf7d957b476dbb7f44274e490b41.mdx",
@@ -21,7 +26,8 @@
   "body": "WardenTimelineBody-601ba735db1221db247389942d850ac9836fda2bb3e056d4a2cfcc6791d5b35a.mdx",
   "fading": [
    8,
-   38
+   38,
+   76
   ]
  },
  "lich": {
@@ -49,18 +55,22 @@
    9,
    10,
    11,
-   12
+   12,
+   65
   ]
  },
  "beastmaster": {
   "body": "BeastmasterTimelineBody-ae5ba6794ff69129a9a7569ffd29c8b49d893a77b494f42d69729dde16888eac.mdx",
   "fading": [
-   8
+   8,
+   62
   ]
  },
  "lichKing": {
   "body": "LichKingTimelineBody-aed1e466ec47f3e05e84dc8ad32f2143d95b64162e55b489db6501c50f727fd9.mdx",
-  "fading": []
+  "fading": [
+   56
+  ]
  },
  "thrall": {
   "body": "ThrallTimelineBody-7359fcd99695c07b38a7259689a6226132197b319f4026af66403227385b4e61.mdx",
@@ -84,12 +94,14 @@
   "body": "ChenStormstoutTimelineBody-5a40fc9e6ed7ee916992a543a2b063bc06a1733bc71634cb333fddba056942ad.mdx",
   "fading": [
    7,
-   8
+   8,
+   44
   ]
  },
  "peon": {
   "body": "PeonTimelineBody-28d3500cc7c247d4f8dce6319437bde7a553793927e55f55024fad99296001d9.mdx",
   "fading": [
+   48,
    90,
    91,
    92,
@@ -114,11 +126,14 @@
  },
  "grom": {
   "body": "GromHellscreamTimelineBody-ca2e7b9b473bdc17b4c8793ce619ec81a9104e9769dd061674e20b4ce4ee763b.mdx",
-  "fading": []
+  "fading": [
+   32
+  ]
  },
  "anubarak": {
   "body": "AnubarakTimelineBody-f2d56bee1926675be5c241990f087ae43d4ef073b89e675fada3c9bc7cbf39b6.mdx",
   "fading": [
+   48,
    83
   ]
  },
@@ -142,10 +157,12 @@
  },
  "ladyVashj": {
   "body": "LadyVashjTimelineBody-590a568cd26d0f06eb9598061f58de9aaa0b0e11550b523100f757047bdfd46f.mdx",
-  "fading": []
+  "fading": [
+   48
+  ]
  },
  "archimonde": {
-  "body": "ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx",
+  "body": "ArchimondeTimelineBody-c99392eefda0de5ee99f1b1c41c64963f75fc0e75bf69f7da141f145d32d98d9.mdx",
   "fading": [
    5
   ]
