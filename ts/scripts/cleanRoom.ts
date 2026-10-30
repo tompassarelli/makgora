@@ -22,10 +22,6 @@ export const REACH_RULES: readonly { readonly name: string; readonly pattern: Re
 
 export const REACH_ALLOWLIST: readonly { readonly path: string; readonly rule: string; readonly reason: string }[] = [
   { path: "docs/delivery-goal.md", rule: "an extraction or decompilation cited as a source", reason: "states the clean-room policy and cites nothing" },
-  { path: "ts/src/game/sim/stageHazards.ts", rule: "a Melee game-file name", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
-  { path: "ts/src/game/sim/stageHazards.ts", rule: "a decompiled function or source file", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
-  { path: "docs/stage-hazards.md", rule: "a Melee game-file name", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
-  { path: "docs/stage-hazards.md", rule: "a decompiled function or source file", reason: "the barrel cannon's citations, removed by its relaunch rework (sc-cannon-launch, 2026-10-31)" },
   { path: "repos/effect/pnpm-lock.yaml", rule: "an offset-named game field", reason: "upstream Effect lockfile: a base64 integrity hash ending in x and hex-looking characters" },
 ];
 
