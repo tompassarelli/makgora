@@ -5,6 +5,7 @@ import { type AttackBuffer, type AttackCommand, clearAttackBuffer, queueAttack }
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { MURLOC_DUO } from "../fighters/murloc/duo";
 import { canStartAttack } from "../sim/conditions";
+import { advanceTossCooldown } from "../sim/duoToss";
 import { canHit } from "../sim/teams";
 import { DuoOrder, DuoRole } from "../sim/codes";
 import type { Duo, Fighter } from "../sim/fighter";
@@ -213,13 +214,19 @@ const reunited = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: 
 
 const facingOf = (value: number): number => value < 0 ? -1 : 1;
 
-/** Moves the order between copy, hold, regroup and separated; the others belong to the specials that set them. */
-function advanceOrder(duo: Duo, partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): void {
+/** Moves the order between copy, hold, regroup, separated and tossed, which ends on landing in hold or falling away separated; the others belong to the specials that set them. */
+function advanceOrder(duo: Duo, partner: Fighter, leader: Readonly<Fighter>, stage: number): void {
   const { order } = duo;
-  if (order !== DuoOrder.copy && order !== DuoOrder.separated && order !== DuoOrder.hold && order !== DuoOrder.regroup) return;
+  if (order !== DuoOrder.copy && order !== DuoOrder.separated && order !== DuoOrder.hold && order !== DuoOrder.regroup && order !== DuoOrder.tossed) return;
   duo.orderFrame++;
   let next: DuoOrder = order;
-  if (order === DuoOrder.copy) {
+  if (order === DuoOrder.tossed) {
+    if (partner.motion.grounded) {
+      next = DuoOrder.hold;
+      partner.motion.vx = 0.0;
+    }
+    else if (partner.status.out || partner.launch.hitstun > 0 || partner.motion.z < mainDeckZ(stage)) next = DuoOrder.separated;
+  } else if (order === DuoOrder.copy) {
     if (separates(partner, leader, stage)) next = DuoOrder.separated;
   } else if (order === DuoOrder.hold) {
     if (offstage(partner, stage) && standsOnStage(leader, stage)) next = DuoOrder.separated;
@@ -290,6 +297,7 @@ export function drivePartners(world: Roster, controls: FrameControls, frame: num
     const { duo } = partner;
     if (duo === undefined || duo.role !== DuoRole.partner || !isActive(world, duo.link)) continue;
     const leader = fighterAt(world, duo.link);
+    advanceTossCooldown(leader);
     advanceOrder(duo, partner, leader, stage);
     const holding = leader.grab.target !== undefined;
     const write = duo.head * WORDS_PER_FRAME;

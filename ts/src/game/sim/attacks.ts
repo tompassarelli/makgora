@@ -9,6 +9,8 @@ import { GroundOption, GroundState, groundOptionAllowed } from "./stickZones";
 import { attackPhase, attackStartup, attackActive, canStartAttackStyle, inEarlyAscent, inGrabContext, isIntangible, jabChainStep } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
 import { canBeGrabbedBy } from "./duoLocks";
+import { liftPartner, strikeWithTossed } from "./duoToss";
+import { alreadyHitRegion, recordHitRegion } from "./hitEntries";
 import type { Fighter } from "./fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, copyHitEffect, copyHitRegion, emptyHitRegion, SHARED_GRAB_REGION } from "./hitRegions";
 import { applyAttackHit } from "./hits";
@@ -50,27 +52,9 @@ export function meleeHitIntersectsShield(attacker: Fighter, target: Fighter, reg
 }
 
 
-function alreadyHitRegion(attackerSlot: number, attacker: Fighter, target: Fighter, window: number): boolean {
-  for (const entry of target.hits.entries) {
-    if (entry.attacker === attackerSlot && entry.attackSerial === attacker.attack.serial && entry.window >= window) return true;
-  }
-  return false;
-}
-
-function recordHitRegion(attackerSlot: number, attacker: Fighter, target: Fighter, region: Readonly<HitRegion>): void {
-  attacker.attack.hit = true;
-  const { hits } = target;
-  hits.lastAttacker = attackerSlot;
-  hits.lastAttackSerial = attacker.attack.serial;
-  hits.lastWindow = region.window;
-  for (const entry of hits.entries) {
-    if (entry.attacker === undefined || entry.attacker === attackerSlot) {
-      entry.attacker = attackerSlot;
-      entry.attackSerial = attacker.attack.serial;
-      entry.window = region.window;
-      return;
-    }
-  }
+function inGrabWindow(attacker: Readonly<Fighter>): boolean {
+  const startup = attackStartup(attacker, AttackStyle.grab);
+  return attacker.launch.hitlag <= 0 && attacker.attack.frame >= startup && attacker.attack.frame < startup + attackActive(attacker, AttackStyle.grab);
 }
 
 
@@ -250,7 +234,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
       if (forward.window > 0 && contactBetween(target, source).window > 0) {
         clashed[source] = true;
         clashed[target] = true;
-        recordHitRegion(source, fighterAt(world, source), fighterAt(world, target), forward);
+        recordHitRegion(source, fighterAt(world, source), fighterAt(world, target), forward.window);
       }
     }
   }
@@ -280,9 +264,13 @@ export function resolveAttacks(world: Roster, stage?: number): void {
     const contact = contactBetween(source, target);
     const attacker = fighterAt(world, source);
     const victim = fighterAt(world, target);
-    recordHitRegion(source, attacker, victim, contact);
+    recordHitRegion(source, attacker, victim, contact.window);
     applyAttackHit(world, source, target, AttackStyle.grab, at(facings, source), contact.effect, true, meleeHitIntersectsShield(attacker, victim, contact));
   }
+  for (let source = 0; source < PARTICIPANT_CAPACITY; source++) {
+    if (isActive(world, source) && styles[source] === AttackStyle.grab && !clashed[source] && !grabbed[source] && choices[source] === undefined && inGrabWindow(fighterAt(world, source))) liftPartner(world, source);
+  }
+  strikeWithTossed(world);
   for (let source = 0; source < PARTICIPANT_CAPACITY; source++) {
     if (!isActive(world, source) || grabbed[source]) continue;
     const f = fighterAt(world, source);
@@ -298,7 +286,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
       const contact = contactBetween(source, target);
       if (contact.window <= 0) continue;
       const victim = fighterAt(world, target);
-      recordHitRegion(source, f, victim, contact);
+      recordHitRegion(source, f, victim, contact.window);
       if (at(spent, source * PARTICIPANT_CAPACITY + target)) continue;
       attackCapsule(strikeCapsule, style, contact);
       const contactZ = f32(f.motion.z + f32(f32(strikeCapsule.z1 + strikeCapsule.z2) * 0.5));
