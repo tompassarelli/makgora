@@ -65,9 +65,10 @@ export const findExtractor = (options: Pick<RenderAssetOptions, "extractor"> = {
       ?? Array.from(new Bun.Glob("*/build/animation-assets/casc-extract").scanSync({ cwd: dirname(INPUTS_STORE), absolute: true }))[0];
 
 const mapSources = (options: RenderAssetOptions, mapImports: ((assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) | undefined) => Effect.gen(function*() {
-  const manifest = yield* readManifest();
-  const assets = options.assets ?? assetsView(manifest);
-  const imports = options.imports ?? (mapImports === undefined ? yield* new RenderAssetFailure({ problem: "no map imports given" }) : yield* mapImports(assets, manifest));
+  const imports = options.imports ?? (mapImports === undefined ? yield* new RenderAssetFailure({ problem: "no map imports given" }) : yield* Effect.gen(function*() {
+    const manifest = yield* readManifest();
+    return yield* mapImports(options.assets ?? assetsView(manifest), manifest);
+  }));
   return new Map(imports.map(({ entry, source }) => [key(entry), source]));
 }).pipe(Effect.mapError((cause) => cause instanceof RenderAssetFailure ? cause : new RenderAssetFailure({ problem: `read the map's imports: ${cause.message}` })));
 

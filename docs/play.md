@@ -21,6 +21,12 @@ updated the expected damage after the CPU changes. This is the CPU fixture for
 standalone/native comparisons. Map assets are read from the existing private
 inputs, with stock assets cached outside the repository.
 
+`--map MAP.w3x --player-assets-only` is how a player with no source tree runs
+the window: the map's imports come from the `.w3x` itself (unpacked once into
+`$XDG_CACHE_HOME/wisp/map-imports`, wisp:docs/play.md), stock art from the
+Warcraft install (`WC3_STORAGE`, extracted with `CASC_EXTRACTOR`), and neither
+the private build-input store nor a gpu machine-capacity lease is used.
+
 `bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native,pool-predicted` (smashcraft#806)
 plays the pad in the standalone window's headless session under each
 presentation and compares every frame's fighter digest with the native

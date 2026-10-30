@@ -5,9 +5,11 @@ import { PLAYABLE_BOUNDS, WORLD_BOUNDS } from "../../src/game/presentation/arena
 import { assetsView, readManifest, wholeFamily } from "./buildInputs";
 import { importedAssets } from "./mapInputs";
 import { storedPortraits } from "../portraitParts";
-import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
+import { ensurePackager, MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { mapCueModels } from "./cueModels";
 import type { Graphics, ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
+import { extractMapImports } from "wisp/scripts/wisp/mapImports";
+import { buildProject } from "./project";
 import { type RenderAssetOptions, renderAssetStore } from "./renderAssetStore";
 
 export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = mapCueModels()) {
@@ -24,14 +26,27 @@ export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly r
 });
 
 
+const arena = () => ({
+  unitModels: Object.fromEntries(Object.values(FIGHTER_OBJECTS).map(({ id, model }) => [id, model])),
+  // Warcraft draws no effects outside base-map world bounds (#297, #298).
+  terrain: { bounds: { minX: WORLD_BOUNDS.left, maxX: WORLD_BOUNDS.right, minY: WORLD_BOUNDS.front, maxY: WORLD_BOUNDS.back }, origin: [0.0, PLAYABLE_BOUNDS.centreY] as const },
+});
+
+/** Art for a player with no source tree: the downloaded map's own files, then the Warcraft install, and no private build-input store. */
+export const playerRender = (map: string) => Effect.gen(function*() {
+  const { packager } = buildProject();
+  yield* ensurePackager(packager);
+  const imports = yield* extractMapImports(map, packager);
+  const { resolveAsset, readAsset } = renderAssetStore({ imports });
+  return { ...arena(), resolveAsset, readAsset };
+});
+
 export function headlessRender(options: RenderAssetOptions = {}) {
   const { resolveAsset, readAsset } = renderAssetStore(options, (assets, manifest) => Effect.gen(function*() {
     return yield* importedAssets(assets, yield* wholeFamily(manifest, "summon"));
   }));
   return {
-    unitModels: Object.fromEntries(Object.values(FIGHTER_OBJECTS).map(({ id, model }) => [id, model])),
-    // Warcraft draws no effects outside base-map world bounds (#297, #298).
-    terrain: { bounds: { minX: WORLD_BOUNDS.left, maxX: WORLD_BOUNDS.right, minY: WORLD_BOUNDS.front, maxY: WORLD_BOUNDS.back }, origin: [0.0, PLAYABLE_BOUNDS.centreY] as const },
+    ...arena(),
     resolveAsset,
     readAsset,
     get portraits() {

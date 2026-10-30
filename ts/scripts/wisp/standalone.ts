@@ -14,7 +14,7 @@ import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/curr
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
-import { headlessRender } from "./headlessRender";
+import { headlessRender, playerRender } from "./headlessRender";
 import { createNetStandalone, smashcraftMapHash } from "./net";
 
 const ACTIONS: Readonly<Record<string, Action>> = {
@@ -132,43 +132,54 @@ export async function createStandaloneSession(options: { readonly script?: strin
   }
 }
 
-export const SMASHCRAFT_STANDALONE: StandaloneGame = {
+const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
   title: "Smashcraft",
-  render: { ...headlessRender(), preloadModels: ["Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx"] },
+  render: { ...render, preloadModels: ["Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx"] },
   create: createStandaloneSession,
   net: { mapHash: smashcraftMapHash, create: createNetStandalone },
-};
+});
+
+const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
+const TEXT_OPTIONS = new Set(["--script", "--map", "--out"]);
 
 export function standaloneArguments(args: readonly string[]) {
-  let script: string | undefined, out: string | undefined, frames: number | undefined;
+  let frames: number | undefined;
   let presentation: MapBuild["presentation"] | undefined;
-  let headless = false, fourFighters = false;
+  const flags = new Set<string>(), texts = new Map<string, string>();
   const captureFrames: number[] = [];
   for (let index = 0; index < args.length; index++) {
-    const arg = args[index];
+    const arg = String(args[index]);
     if (arg === "--standalone") continue;
-    if (arg === "--headless") { headless = true; continue; }
-    if (arg === "--four-fighters") { fourFighters = true; continue; }
-    if (arg === "--script" || arg === "--out" || arg === "--frames" || arg === "--capture-frames" || arg === "--presentation") {
-      const value = args[++index];
-      if (value === undefined || value.startsWith("--")) throw new Error(`${arg} needs a value`);
-      if (arg === "--presentation") {
-        if (value !== "native" && value !== "pool-confirmed" && value !== "pool-predicted") throw new Error("--presentation needs native, pool-confirmed or pool-predicted");
-        presentation = value;
-      } else if (arg === "--script") script = value;
-      else if (arg === "--out") out = value;
-      else if (arg === "--frames") {
-        if (!/^\d+$/.test(value) || Number(value) < 1) throw new Error("--frames needs a positive frame count");
-        frames = Number(value);
-      } else {
-        if (!/^\d+(,\d+)*$/.test(value)) throw new Error("--capture-frames needs comma-separated frame numbers");
-        captureFrames.push(...value.split(",").map(Number));
-      }
-    } else throw new Error(`unknown standalone option: ${arg}`);
+    if (FLAGS.has(arg)) { flags.add(arg); continue; }
+    if (!TEXT_OPTIONS.has(arg) && arg !== "--frames" && arg !== "--capture-frames" && arg !== "--presentation") throw new Error(`unknown standalone option: ${arg}`);
+    const value = args[++index];
+    if (value === undefined || value.startsWith("--")) throw new Error(`${arg} needs a value`);
+    if (TEXT_OPTIONS.has(arg)) texts.set(arg, value);
+    else if (arg === "--presentation") {
+      if (value !== "native" && value !== "pool-confirmed" && value !== "pool-predicted") throw new Error("--presentation needs native, pool-confirmed or pool-predicted");
+      presentation = value;
+    } else if (arg === "--frames") {
+      if (!/^\d+$/.test(value) || Number(value) < 1) throw new Error("--frames needs a positive frame count");
+      frames = Number(value);
+    } else {
+      if (!/^\d+(,\d+)*$/.test(value)) throw new Error("--capture-frames needs comma-separated frame numbers");
+      captureFrames.push(...value.split(",").map(Number));
+    }
   }
+  const script = texts.get("--script"), out = texts.get("--out"), map = texts.get("--map"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
   if (headless && (frames === undefined || out === undefined)) throw new Error("--headless needs --frames N and --out DIR");
+  const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
   if (fourFighters && script !== undefined) throw new Error("--four-fighters plays its own inputs; drop --script");
-  return { ...(fourFighters ? { fourFighters } : {}), ...(script === undefined ? {} : { script }), ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+  return { ...(fourFighters ? { fourFighters } : {}), ...playerAssets, ...(script === undefined ? {} : { script }), ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+}
+
+function playerAssetsOf(playerAssetsOnly: boolean, map: string | undefined): { readonly playerAssets?: { readonly map: string } } {
+  if (map === undefined) {
+    if (playerAssetsOnly) throw new Error("--player-assets-only reads the map's files; add --map MAP.w3x");
+    return {};
+  }
+  if (!playerAssetsOnly) throw new Error("--map is read only with --player-assets-only");
+  return { playerAssets: { map } };
 }
 
 export const standalonePlay: Command = (args) => Effect.gen(function*() {
@@ -176,5 +187,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const net = standaloneNetArguments(args);
   if (typeof net === "string") return yield* new UsageFailure({ problem: net });
   const options = yield* Effect.try({ try: () => standaloneArguments(net.rest), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  return yield* runStandalone({ ...SMASHCRAFT_STANDALONE, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}) }) }, { ...options, ...(net.net === undefined ? {} : { net: net.net }) });
+  const { playerAssets, ...run } = options;
+  const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
+  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}) }) }, { ...run, ...(playerAssets === undefined ? {} : { gpuLease: false }), ...(net.net === undefined ? {} : { net: net.net }) });
 });
