@@ -6,10 +6,12 @@ import { realParts, splitFiniteReal, writeCanonicalNumber } from "../replay/cano
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
-import { PROJECTILE_CAPACITY, createFighter, type Fighter, type Projectile } from "../sim/fighter";
+import { PROJECTILE_CAPACITY, createFighter, duoRole, type Fighter, type Projectile } from "../sim/fighter";
 import type { Bear, StageCannon } from "../sim/fighterRest";
 import { fighterAt, isActive, type Controls, type Roster } from "../sim/roster";
+import { DuoRole } from "../sim/codes";
 
+import { insideLip } from "./botCorner";
 import { botChoice } from "./botRandom";
 import { CPU_TIERS, type CpuTier } from "./cpuProfiles";
 import type { CpuDecisionPolicy } from "./cpuDecisionPolicy";
@@ -700,19 +702,32 @@ export function perceivedHeldFighter(memory: Readonly<BotMemory>, heldSlot: numb
   return perceivedFrame(memory, frame, delay)?.opponents[heldSlot];
 }
 
+const STRAY_GAP = 200.0;
+
+function strayPartner(sample: Readonly<BotObservationFrame>, world: Readonly<Roster>, candidate: ParticipantSlot, target: Readonly<Fighter>, stage: number): boolean {
+  if (duoRole(fighterAt(world, candidate)) !== DuoRole.partner) return false;
+  const leader = sample.opponents[world.linked[candidate] as ParticipantSlot];
+  if (leader === undefined || leader.status.out || Math.abs(f32(leader.motion.x - target.motion.x)) > STRAY_GAP) return true;
+  return !target.motion.grounded && insideLip(stage, target.motion.x) < 0.0;
+}
+
 /** The latest frame old enough to see; opponent selection also uses that observation. */
-export function perceivedOpponent(memory: Readonly<BotMemory>, own: Readonly<Fighter>, slot: ParticipantSlot, frame: number, delay: number, opponentMask: number): Readonly<Fighter> | undefined {
+export function perceivedOpponent(memory: Readonly<BotMemory>, world: Readonly<Roster>, own: Readonly<Fighter>, slot: ParticipantSlot, frame: number, delay: number, opponentMask: number, stage: number, preferStray: boolean): Readonly<Fighter> | undefined {
   const sample = perceivedFrame(memory, frame, delay);
   if (sample === undefined) return undefined;
+  const partnerSlot = own.duo?.role === DuoRole.leader ? own.duo.link : -1;
   let nearest: Readonly<Fighter> | undefined;
   let distance = 0.0;
+  let stray: Readonly<Fighter> | undefined;
+  let strayDistance = 0.0;
   for (const candidate of PARTICIPANT_SLOTS) {
     const target = sample.opponents[candidate];
-    if (candidate === slot || (opponentMask & (1 << candidate)) === 0 || target === undefined || target.status.out || target.status.stocks <= 0) continue;
+    if (candidate === slot || candidate === partnerSlot || (opponentMask & (1 << candidate)) === 0 || target === undefined || target.status.out || target.status.stocks <= 0) continue;
     const gap = Math.abs(f32(target.motion.x - own.motion.x));
     if (nearest === undefined || gap < distance) { nearest = target; distance = gap; }
+    if (preferStray && (stray === undefined || gap < strayDistance) && strayPartner(sample, world, candidate, target, stage)) { stray = target; strayDistance = gap; }
   }
-  return nearest;
+  return stray ?? nearest;
 }
 
 /** Neutral may brake immediately; it does not shorten the hold before the opposite direction. */

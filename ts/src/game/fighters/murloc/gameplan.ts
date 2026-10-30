@@ -4,11 +4,14 @@ import { type FighterGameplan, GameplanSpecial, GameplanThrow } from "../../sim/
 export const MURLOC_GAMEPLAN: FighterGameplan = {
   range: { near: 60.0, far: 140.0 },
   spacing: [
+    { move: AttackStyle.jab, near: 0.0, far: 50.0 },
     { move: AttackStyle.forwardTilt, near: 40.0, far: 85.0 },
     { move: AttackStyle.downTilt, near: 30.0, far: 70.0 },
-    { move: GameplanSpecial.side, near: 110.0, far: 200.0 },
-    { move: GameplanSpecial.neutral, near: 180.0, far: 330.0 },
-    { move: GameplanSpecial.down, near: 0.0, far: 80.0 },
+    { move: AttackStyle.neutralAir, near: 0.0, far: 55.0 },
+    { move: AttackStyle.downAir, near: 0.0, far: 40.0 },
+    { move: GameplanSpecial.side, near: 90.0, far: 190.0 },
+    { move: GameplanSpecial.neutral, near: 150.0, far: 320.0 },
+    { move: GameplanSpecial.up, near: 0.0, far: 70.0 },
   ],
   approach: [
     { via: "run", moves: [AttackStyle.dashAttack, AttackStyle.downTilt, AttackStyle.grab], weight: 3 },

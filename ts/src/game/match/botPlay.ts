@@ -31,6 +31,7 @@ import { guardOffstage, waitAtLip } from "./botEdgeGuard";
 import { escapeCorner, pokeGoal, pressCorner, pressEdgeCancel, steerEdgeCancel } from "./botCorner";
 import { holdAutoFollowUpOnDeck, pressHeroFollowUp } from "./botHeroKit";
 import { holdChannelOnFoe } from "./botChannel";
+import { holdsPartner, pressDuoCall, tossToward } from "./botDuo";
 import { dashIn, holdAimAtFoe, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial, steerShotAtFoe } from "./botKitOptions";
 import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "../lobby/lobbyState";
 import { trainingPartnerInput } from "./training";
@@ -239,8 +240,8 @@ function avoidTeamContact(game: Readonly<MatchState>, world: Readonly<Roster>, s
   }
 }
 
-function reactionDelay(game: Readonly<MatchState>, runtime: Readonly<BotRuntime>, fighter: Readonly<Fighter>, slot: ParticipantSlot, frame: number, skill: CpuSkill, floor = cpuReactionFloor(fighter, skill)): number {
-  const cue = perceivedOpponent(runtime.botMemory, fighter, slot, frame, floor, computerOpponentMask(game, slot));
+function reactionDelay(game: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<BotRuntime>, fighter: Readonly<Fighter>, slot: ParticipantSlot, frame: number, skill: CpuSkill, floor = cpuReactionFloor(fighter, skill)): number {
+  const cue = perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, floor, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "expert");
   // Only information old enough for this kind of answer may affect its seeded delay.
   const key = cue === undefined ? 0 : cue.attack.serial * 31 + cue.special.action * 17
     + (cue.motion.x < fighter.motion.x ? 1 : 2) + (cue.shield.raised ? 4 : 0)
@@ -269,9 +270,9 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   const skill = skillOverride ?? cpuSkill(opponent, tier);
   observeOpponents(runtime.botMemory, world, frame, observationFrames(game, skill));
   const fighter = fighterAt(world, slot);
-  const reactionFrames = reactionDelay(game, runtime, fighter, slot, frame, skill);
+  const reactionFrames = reactionDelay(game, world, runtime, fighter, slot, frame, skill);
   useMatchSeed(game.matchSeed);
-  const target = fighter.grab.target === undefined ? perceivedOpponent(runtime.botMemory, fighter, slot, frame, reactionFrames, computerOpponentMask(game, slot))
+  const target = fighter.grab.target === undefined || holdsPartner(fighter) ? perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, reactionFrames, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "expert")
     : perceivedHeldFighter(runtime.botMemory, fighter.grab.target, frame, reactionFrames);
   const strategy = runtime.botStrategies[slot];
   if (target !== undefined) {
@@ -312,6 +313,7 @@ export function sameComputerInputs(game: Readonly<MatchState>, world: Readonly<R
   if (game.stageChoice !== before.stageChoice || stageClock(game) !== stageClock(before)) return false;
   if (game.timeLimitMinutes !== before.timeLimitMinutes || game.remainingFrames !== before.remainingFrames) return false;
   const fighter = fighterAt(world, slot);
+  if (fighter.duo !== undefined) return false;
   const skill = cpuSkill(opponent, tier);
   useMatchSeed(game.matchSeed);
   const contest = orbContest(game, fighter, slot, skill) === orbContest(before, fighterAt(beforeWorld, slot), slot, skill);
@@ -323,12 +325,12 @@ export function sameComputerInputs(game: Readonly<MatchState>, world: Readonly<R
   if (!sameBotStrategy(runtime.botStrategies[slot], beforeRuntime.botStrategies[slot])) return false;
   if (observationFrames(game, skill) !== observationFrames(before, skill)) return false;
   const floor = cpuReactionFloor(fighter, skill);
-  const delay = reactionDelay(game, runtime, fighter, slot, frame, skill, floor);
+  const delay = reactionDelay(game, world, runtime, fighter, slot, frame, skill, floor);
   // With no delay the computer sees this frame's observation, which a rollback rewrites.
   if (delay < 1) return false;
   const earlier = fighterAt(beforeWorld, slot);
   // The newer cue only seeds the delay: a rewritten cue that yields the same delay decides the same.
-  if (!samePerception(runtime.botMemory, beforeRuntime.botMemory, slot, frame, floor) && reactionDelay(before, beforeRuntime, earlier, slot, frame, skill) !== delay) return false;
+  if (!samePerception(runtime.botMemory, beforeRuntime.botMemory, slot, frame, floor) && reactionDelay(before, beforeWorld, beforeRuntime, earlier, slot, frame, skill) !== delay) return false;
   if (!samePerception(runtime.botMemory, beforeRuntime.botMemory, slot, frame, delay)) return false;
   return fighterSame || sameFighterState(fighter, earlier);
 }
@@ -381,7 +383,9 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     return;
   }
   if (fighter.grab.target !== undefined) {
-    if (skill.basicMoves !== undefined) {
+    if (holdsPartner(fighter)) {
+      if (target !== undefined) tossToward(fighter, target, input);
+    } else if (skill.basicMoves !== undefined) {
       input.grabThrowX = fighter.facing;
       input.attackPressed = fighter.grab.action === GrabAction.carry;
     }
@@ -392,6 +396,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     input.mashPressed = floorMod(frame, skill.grabMashFrames) === 0;
     return;
   }
+  if (skill.basicMoves === undefined && target !== undefined && pressDuoCall(world, fighter, target, stage, skill, frame, input, commands)) return;
   if (skill.basicMoves === undefined && target !== undefined && (steerHeroBranches(fighter, target, skill, input) || pressHeroFollowUp(fighter, target, stage, stageFrame, input))) return;
   if (skill.basicMoves === undefined && target !== undefined && !game.training && guardOffstage(fighter, target, stage, skill, slot, frame, observationAge, input, commands)) return;
   const recovering = chooseRecoveryInput(fighter, stage, stageFrame, input, target, skill);
