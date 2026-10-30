@@ -1911,6 +1911,10 @@ Standing grab starts f10, the shared 96-unit envelope is active for three frames
 
 **Body and risk:** weight 1.28, ground speed 0.82 and air drift 0.75 of reference; stock Crypt Lord scale and visible shell define his hurt body. Burrow changes his visible pose and matching hurt parts rather than silently granting invulnerability. His opponent can react to the mound and emergence. No guaranteed grab loop: up/down throw follow-ups are positional choices with DI, jump and tech escape checks.
 
+### Field retune (#788, 30 October 2026)
+
+Balance run 41005739256 (b23aabef8a) put Anub'arak at 74.8% in the field and his dash attack spam at 94% against Expert, with the dash attack carrying 27% of his damage and 9,868 of his stocks taken. His dash attack drops to ×0.65 damage and ×0.65 knockback growth (14.87% to 9.66%, growth 80.9 to 52.6; first set to ×0.75, which the farm field read at 61%); every other move keeps its authored values. A local 120-match sample over twelve opponents read his field at 70% before the change and 55% at ×0.77, his dash spam 100% before and 37% at ×0.77.
+
 ### Play-style profile
 
 Ground-control draft: Impale makes prey jump into the crown; beetles pressure approaches while Burrow Hunt punishes a stationary guard. Slow aerials cover space, not repeated rushdown.

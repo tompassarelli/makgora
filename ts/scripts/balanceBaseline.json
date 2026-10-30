@@ -27665,15 +27665,15 @@
    "authored.moves.normals.0.landingLag": 0,
    "authored.moves.normals.0.regions.0.firstFrame": 3,
    "authored.moves.normals.0.regions.0.lastFrame": 4,
-   "authored.moves.normals.0.regions.0.hit.effect.damage": 3.513824939727783,
-   "authored.moves.normals.0.regions.0.hit.effect.growth": 48.25143051147461,
+   "authored.moves.normals.0.regions.0.hit.effect.damage": 2.529953956604004,
+   "authored.moves.normals.0.regions.0.hit.effect.growth": 34.741031646728516,
    "authored.moves.normals.0.regions.0.hit.effect.base": 12,
    "authored.moves.normals.0.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.0.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.0.regions.1.firstFrame": 3,
    "authored.moves.normals.0.regions.1.lastFrame": 4,
-   "authored.moves.normals.0.regions.1.hit.effect.damage": 3.513824939727783,
-   "authored.moves.normals.0.regions.1.hit.effect.growth": 48.25143051147461,
+   "authored.moves.normals.0.regions.1.hit.effect.damage": 2.529953956604004,
+   "authored.moves.normals.0.regions.1.hit.effect.growth": 34.741031646728516,
    "authored.moves.normals.0.regions.1.hit.effect.base": 12,
    "authored.moves.normals.0.regions.1.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.0.regions.1.hit.effect.launchZ": 0.5735759735107422,
@@ -27683,8 +27683,8 @@
    "authored.moves.normals.2.landingLag": 0,
    "authored.moves.normals.2.regions.0.firstFrame": 14,
    "authored.moves.normals.2.regions.0.lastFrame": 17,
-   "authored.moves.normals.2.regions.0.hit.effect.damage": 16.875,
-   "authored.moves.normals.2.regions.0.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.2.regions.0.hit.effect.damage": 12.15000057220459,
+   "authored.moves.normals.2.regions.0.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.2.regions.0.hit.effect.base": 30,
    "authored.moves.normals.2.regions.0.hit.effect.launchX": 0,
    "authored.moves.normals.2.regions.0.hit.effect.launchZ": 1,
@@ -27694,29 +27694,29 @@
    "authored.moves.normals.3.landingLag": 0,
    "authored.moves.normals.3.regions.0.firstFrame": 14,
    "authored.moves.normals.3.regions.0.lastFrame": 14,
-   "authored.moves.normals.3.regions.0.hit.effect.damage": 16.397850036621094,
-   "authored.moves.normals.3.regions.0.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.3.regions.0.hit.effect.damage": 11.806452751159668,
+   "authored.moves.normals.3.regions.0.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.3.regions.0.hit.effect.base": 28,
    "authored.moves.normals.3.regions.0.hit.effect.launchX": 0.766044020652771,
    "authored.moves.normals.3.regions.0.hit.effect.launchZ": 0.6427879929542542,
    "authored.moves.normals.3.regions.1.firstFrame": 15,
    "authored.moves.normals.3.regions.1.lastFrame": 15,
-   "authored.moves.normals.3.regions.1.hit.effect.damage": 16.397850036621094,
-   "authored.moves.normals.3.regions.1.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.3.regions.1.hit.effect.damage": 11.806452751159668,
+   "authored.moves.normals.3.regions.1.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.3.regions.1.hit.effect.base": 28,
    "authored.moves.normals.3.regions.1.hit.effect.launchX": 0.766044020652771,
    "authored.moves.normals.3.regions.1.hit.effect.launchZ": 0.6427879929542542,
    "authored.moves.normals.3.regions.2.firstFrame": 16,
    "authored.moves.normals.3.regions.2.lastFrame": 16,
-   "authored.moves.normals.3.regions.2.hit.effect.damage": 16.397850036621094,
-   "authored.moves.normals.3.regions.2.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.3.regions.2.hit.effect.damage": 11.806452751159668,
+   "authored.moves.normals.3.regions.2.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.3.regions.2.hit.effect.base": 28,
    "authored.moves.normals.3.regions.2.hit.effect.launchX": 0.766044020652771,
    "authored.moves.normals.3.regions.2.hit.effect.launchZ": 0.6427879929542542,
    "authored.moves.normals.3.regions.3.firstFrame": 17,
    "authored.moves.normals.3.regions.3.lastFrame": 19,
-   "authored.moves.normals.3.regions.3.hit.effect.damage": 16.397850036621094,
-   "authored.moves.normals.3.regions.3.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.3.regions.3.hit.effect.damage": 11.806452751159668,
+   "authored.moves.normals.3.regions.3.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.3.regions.3.hit.effect.base": 28,
    "authored.moves.normals.3.regions.3.hit.effect.launchX": -0.766044020652771,
    "authored.moves.normals.3.regions.3.hit.effect.launchZ": 0.6427879929542542,
@@ -27726,8 +27726,8 @@
    "authored.moves.normals.4.landingLag": 0,
    "authored.moves.normals.4.regions.0.firstFrame": 18,
    "authored.moves.normals.4.regions.0.lastFrame": 21,
-   "authored.moves.normals.4.regions.0.hit.effect.damage": 21.082950592041016,
-   "authored.moves.normals.4.regions.0.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.4.regions.0.hit.effect.damage": 15.17972469329834,
+   "authored.moves.normals.4.regions.0.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.4.regions.0.hit.effect.base": 28,
    "authored.moves.normals.4.regions.0.hit.effect.launchX": 0.766044020652771,
    "authored.moves.normals.4.regions.0.hit.effect.launchZ": 0.6427879929542542,
@@ -27748,15 +27748,15 @@
    "authored.moves.normals.6.landingLag": 0,
    "authored.moves.normals.6.regions.0.firstFrame": 8,
    "authored.moves.normals.6.regions.0.lastFrame": 10,
-   "authored.moves.normals.6.regions.0.hit.effect.damage": 10.541475296020508,
-   "authored.moves.normals.6.regions.0.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.6.regions.0.hit.effect.damage": 7.58986234664917,
+   "authored.moves.normals.6.regions.0.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.6.regions.0.hit.effect.base": 18,
    "authored.moves.normals.6.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.6.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.6.regions.1.firstFrame": 8,
    "authored.moves.normals.6.regions.1.lastFrame": 10,
-   "authored.moves.normals.6.regions.1.hit.effect.damage": 10.541475296020508,
-   "authored.moves.normals.6.regions.1.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.6.regions.1.hit.effect.damage": 7.58986234664917,
+   "authored.moves.normals.6.regions.1.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.6.regions.1.hit.effect.base": 18,
    "authored.moves.normals.6.regions.1.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.6.regions.1.hit.effect.launchZ": 0.5735759735107422,
@@ -27766,43 +27766,43 @@
    "authored.moves.normals.7.landingLag": 0,
    "authored.moves.normals.7.regions.0.firstFrame": 5,
    "authored.moves.normals.7.regions.0.lastFrame": 5,
-   "authored.moves.normals.7.regions.0.hit.effect.damage": 8,
-   "authored.moves.normals.7.regions.0.hit.effect.growth": 55,
+   "authored.moves.normals.7.regions.0.hit.effect.damage": 5.760000228881836,
+   "authored.moves.normals.7.regions.0.hit.effect.growth": 39.60000228881836,
    "authored.moves.normals.7.regions.0.hit.effect.base": 90,
    "authored.moves.normals.7.regions.0.hit.effect.launchX": 0.08715599775314331,
    "authored.moves.normals.7.regions.0.hit.effect.launchZ": 0.9961950182914734,
    "authored.moves.normals.7.regions.1.firstFrame": 6,
    "authored.moves.normals.7.regions.1.lastFrame": 6,
-   "authored.moves.normals.7.regions.1.hit.effect.damage": 8,
-   "authored.moves.normals.7.regions.1.hit.effect.growth": 55,
+   "authored.moves.normals.7.regions.1.hit.effect.damage": 5.760000228881836,
+   "authored.moves.normals.7.regions.1.hit.effect.growth": 39.60000228881836,
    "authored.moves.normals.7.regions.1.hit.effect.base": 90,
    "authored.moves.normals.7.regions.1.hit.effect.launchX": 0.08715599775314331,
    "authored.moves.normals.7.regions.1.hit.effect.launchZ": 0.9961950182914734,
    "authored.moves.normals.7.regions.2.firstFrame": 7,
    "authored.moves.normals.7.regions.2.lastFrame": 7,
-   "authored.moves.normals.7.regions.2.hit.effect.damage": 8,
-   "authored.moves.normals.7.regions.2.hit.effect.growth": 55,
+   "authored.moves.normals.7.regions.2.hit.effect.damage": 5.760000228881836,
+   "authored.moves.normals.7.regions.2.hit.effect.growth": 39.60000228881836,
    "authored.moves.normals.7.regions.2.hit.effect.base": 90,
    "authored.moves.normals.7.regions.2.hit.effect.launchX": 0.08715599775314331,
    "authored.moves.normals.7.regions.2.hit.effect.launchZ": 0.9961950182914734,
    "authored.moves.normals.7.regions.3.firstFrame": 8,
    "authored.moves.normals.7.regions.3.lastFrame": 8,
-   "authored.moves.normals.7.regions.3.hit.effect.damage": 8,
-   "authored.moves.normals.7.regions.3.hit.effect.growth": 55,
+   "authored.moves.normals.7.regions.3.hit.effect.damage": 5.760000228881836,
+   "authored.moves.normals.7.regions.3.hit.effect.growth": 39.60000228881836,
    "authored.moves.normals.7.regions.3.hit.effect.base": 90,
    "authored.moves.normals.7.regions.3.hit.effect.launchX": 0.08715599775314331,
    "authored.moves.normals.7.regions.3.hit.effect.launchZ": 0.9961950182914734,
    "authored.moves.normals.7.regions.4.firstFrame": 9,
    "authored.moves.normals.7.regions.4.lastFrame": 9,
-   "authored.moves.normals.7.regions.4.hit.effect.damage": 8,
-   "authored.moves.normals.7.regions.4.hit.effect.growth": 55,
+   "authored.moves.normals.7.regions.4.hit.effect.damage": 5.760000228881836,
+   "authored.moves.normals.7.regions.4.hit.effect.growth": 39.60000228881836,
    "authored.moves.normals.7.regions.4.hit.effect.base": 90,
    "authored.moves.normals.7.regions.4.hit.effect.launchX": 0.08715599775314331,
    "authored.moves.normals.7.regions.4.hit.effect.launchZ": 0.9961950182914734,
    "authored.moves.normals.7.regions.5.firstFrame": 10,
    "authored.moves.normals.7.regions.5.lastFrame": 10,
-   "authored.moves.normals.7.regions.5.hit.effect.damage": 8,
-   "authored.moves.normals.7.regions.5.hit.effect.growth": 55,
+   "authored.moves.normals.7.regions.5.hit.effect.damage": 5.760000228881836,
+   "authored.moves.normals.7.regions.5.hit.effect.growth": 39.60000228881836,
    "authored.moves.normals.7.regions.5.hit.effect.base": 90,
    "authored.moves.normals.7.regions.5.hit.effect.launchX": 0.08715599775314331,
    "authored.moves.normals.7.regions.5.hit.effect.launchZ": 0.9961950182914734,
@@ -27812,8 +27812,8 @@
    "authored.moves.normals.8.landingLag": 0,
    "authored.moves.normals.8.regions.0.firstFrame": 6,
    "authored.moves.normals.8.regions.0.lastFrame": 8,
-   "authored.moves.normals.8.regions.0.hit.effect.damage": 7.027649879455566,
-   "authored.moves.normals.8.regions.0.hit.effect.growth": 88.99707794189453,
+   "authored.moves.normals.8.regions.0.hit.effect.damage": 5.059907913208008,
+   "authored.moves.normals.8.regions.0.hit.effect.growth": 64.07789611816406,
    "authored.moves.normals.8.regions.0.hit.effect.base": 28,
    "authored.moves.normals.8.regions.0.hit.effect.launchX": 0.17364799976348877,
    "authored.moves.normals.8.regions.0.hit.effect.launchZ": 0.9848080277442932,
@@ -27823,15 +27823,15 @@
    "authored.moves.normals.9.landingLag": 0,
    "authored.moves.normals.9.regions.0.firstFrame": 8,
    "authored.moves.normals.9.regions.0.lastFrame": 10,
-   "authored.moves.normals.9.regions.0.hit.effect.damage": 10.541475296020508,
-   "authored.moves.normals.9.regions.0.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.9.regions.0.hit.effect.damage": 7.58986234664917,
+   "authored.moves.normals.9.regions.0.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.9.regions.0.hit.effect.base": 18,
    "authored.moves.normals.9.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.9.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.9.regions.1.firstFrame": 8,
    "authored.moves.normals.9.regions.1.lastFrame": 10,
-   "authored.moves.normals.9.regions.1.hit.effect.damage": 10.541475296020508,
-   "authored.moves.normals.9.regions.1.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.9.regions.1.hit.effect.damage": 7.58986234664917,
+   "authored.moves.normals.9.regions.1.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.9.regions.1.hit.effect.base": 18,
    "authored.moves.normals.9.regions.1.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.9.regions.1.hit.effect.launchZ": 0.5735759735107422,
@@ -27841,15 +27841,15 @@
    "authored.moves.normals.10.landingLag": 0,
    "authored.moves.normals.10.regions.0.firstFrame": 8,
    "authored.moves.normals.10.regions.0.lastFrame": 10,
-   "authored.moves.normals.10.regions.0.hit.effect.damage": 10.541475296020508,
-   "authored.moves.normals.10.regions.0.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.10.regions.0.hit.effect.damage": 7.58986234664917,
+   "authored.moves.normals.10.regions.0.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.10.regions.0.hit.effect.base": 18,
    "authored.moves.normals.10.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.10.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.10.regions.1.firstFrame": 8,
    "authored.moves.normals.10.regions.1.lastFrame": 10,
-   "authored.moves.normals.10.regions.1.hit.effect.damage": 10.541475296020508,
-   "authored.moves.normals.10.regions.1.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.10.regions.1.hit.effect.damage": 7.58986234664917,
+   "authored.moves.normals.10.regions.1.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.10.regions.1.hit.effect.base": 18,
    "authored.moves.normals.10.regions.1.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.10.regions.1.hit.effect.launchZ": 0.5735759735107422,
@@ -27866,8 +27866,8 @@
    "authored.moves.normals.12.regions.0.hit.effect.launchZ": 1,
    "authored.moves.normals.12.regions.1.firstFrame": 14,
    "authored.moves.normals.12.regions.1.lastFrame": 17,
-   "authored.moves.normals.12.regions.1.hit.effect.damage": 9,
-   "authored.moves.normals.12.regions.1.hit.effect.growth": 92,
+   "authored.moves.normals.12.regions.1.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.12.regions.1.hit.effect.growth": 66.24000549316406,
    "authored.moves.normals.12.regions.1.hit.effect.base": 32,
    "authored.moves.normals.12.regions.1.hit.effect.launchX": 0.766044020652771,
    "authored.moves.normals.12.regions.1.hit.effect.launchZ": 0.6427879929542542,
@@ -27877,15 +27877,15 @@
    "authored.moves.normals.13.landingLag": 10,
    "authored.moves.normals.13.regions.0.firstFrame": 13,
    "authored.moves.normals.13.regions.0.lastFrame": 14,
-   "authored.moves.normals.13.regions.0.hit.effect.damage": 20,
-   "authored.moves.normals.13.regions.0.hit.effect.growth": 100,
+   "authored.moves.normals.13.regions.0.hit.effect.damage": 14.40000057220459,
+   "authored.moves.normals.13.regions.0.hit.effect.growth": 72,
    "authored.moves.normals.13.regions.0.hit.effect.base": 26,
    "authored.moves.normals.13.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.13.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.13.regions.1.firstFrame": 13,
    "authored.moves.normals.13.regions.1.lastFrame": 29,
-   "authored.moves.normals.13.regions.1.hit.effect.damage": 6,
-   "authored.moves.normals.13.regions.1.hit.effect.growth": 80,
+   "authored.moves.normals.13.regions.1.hit.effect.damage": 4.320000171661377,
+   "authored.moves.normals.13.regions.1.hit.effect.growth": 57.60000228881836,
    "authored.moves.normals.13.regions.1.hit.effect.base": 18,
    "authored.moves.normals.13.regions.1.hit.effect.launchX": 0.7071070075035095,
    "authored.moves.normals.13.regions.1.hit.effect.launchZ": 0.7071070075035095,
@@ -27895,8 +27895,8 @@
    "authored.moves.normals.14.landingLag": 14,
    "authored.moves.normals.14.regions.0.firstFrame": 7,
    "authored.moves.normals.14.regions.0.lastFrame": 9,
-   "authored.moves.normals.14.regions.0.hit.effect.damage": 12.884025573730469,
-   "authored.moves.normals.14.regions.0.hit.effect.growth": 115.80342864990234,
+   "authored.moves.normals.14.regions.0.hit.effect.damage": 9.276498794555664,
+   "authored.moves.normals.14.regions.0.hit.effect.growth": 83.37847137451172,
    "authored.moves.normals.14.regions.0.hit.effect.base": 28,
    "authored.moves.normals.14.regions.0.hit.effect.launchX": -0.766044020652771,
    "authored.moves.normals.14.regions.0.hit.effect.launchZ": 0.6427879929542542,
@@ -27906,57 +27906,57 @@
    "authored.moves.normals.15.landingLag": 4,
    "authored.moves.normals.15.regions.0.firstFrame": 5,
    "authored.moves.normals.15.regions.0.lastFrame": 5,
-   "authored.moves.normals.15.regions.0.hit.effect.damage": 12,
-   "authored.moves.normals.15.regions.0.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.0.hit.effect.damage": 8.640000343322754,
+   "authored.moves.normals.15.regions.0.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.0.hit.effect.base": 80,
    "authored.moves.normals.15.regions.0.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.0.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.1.firstFrame": 6,
    "authored.moves.normals.15.regions.1.lastFrame": 6,
-   "authored.moves.normals.15.regions.1.hit.effect.damage": 12,
-   "authored.moves.normals.15.regions.1.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.1.hit.effect.damage": 8.640000343322754,
+   "authored.moves.normals.15.regions.1.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.1.hit.effect.base": 80,
    "authored.moves.normals.15.regions.1.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.1.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.2.firstFrame": 7,
    "authored.moves.normals.15.regions.2.lastFrame": 7,
-   "authored.moves.normals.15.regions.2.hit.effect.damage": 9,
-   "authored.moves.normals.15.regions.2.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.2.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.15.regions.2.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.2.hit.effect.base": 75,
    "authored.moves.normals.15.regions.2.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.2.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.3.firstFrame": 8,
    "authored.moves.normals.15.regions.3.lastFrame": 8,
-   "authored.moves.normals.15.regions.3.hit.effect.damage": 9,
-   "authored.moves.normals.15.regions.3.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.3.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.15.regions.3.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.3.hit.effect.base": 75,
    "authored.moves.normals.15.regions.3.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.3.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.4.firstFrame": 9,
    "authored.moves.normals.15.regions.4.lastFrame": 9,
-   "authored.moves.normals.15.regions.4.hit.effect.damage": 9,
-   "authored.moves.normals.15.regions.4.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.4.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.15.regions.4.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.4.hit.effect.base": 75,
    "authored.moves.normals.15.regions.4.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.4.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.5.firstFrame": 10,
    "authored.moves.normals.15.regions.5.lastFrame": 10,
-   "authored.moves.normals.15.regions.5.hit.effect.damage": 9,
-   "authored.moves.normals.15.regions.5.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.5.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.15.regions.5.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.5.hit.effect.base": 75,
    "authored.moves.normals.15.regions.5.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.5.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.6.firstFrame": 11,
    "authored.moves.normals.15.regions.6.lastFrame": 11,
-   "authored.moves.normals.15.regions.6.hit.effect.damage": 9,
-   "authored.moves.normals.15.regions.6.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.6.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.15.regions.6.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.6.hit.effect.base": 75,
    "authored.moves.normals.15.regions.6.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.6.hit.effect.launchZ": 1,
    "authored.moves.normals.15.regions.7.firstFrame": 12,
    "authored.moves.normals.15.regions.7.lastFrame": 12,
-   "authored.moves.normals.15.regions.7.hit.effect.damage": 9,
-   "authored.moves.normals.15.regions.7.hit.effect.growth": 70,
+   "authored.moves.normals.15.regions.7.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.15.regions.7.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.15.regions.7.hit.effect.base": 75,
    "authored.moves.normals.15.regions.7.hit.effect.launchX": 0,
    "authored.moves.normals.15.regions.7.hit.effect.launchZ": 1,
@@ -27966,37 +27966,37 @@
    "authored.moves.normals.16.landingLag": 13,
    "authored.moves.normals.16.regions.0.firstFrame": 13,
    "authored.moves.normals.16.regions.0.lastFrame": 15,
-   "authored.moves.normals.16.regions.0.hit.effect.damage": 15,
-   "authored.moves.normals.16.regions.0.hit.effect.growth": 82,
+   "authored.moves.normals.16.regions.0.hit.effect.damage": 10.800000190734863,
+   "authored.moves.normals.16.regions.0.hit.effect.growth": 59.040000915527344,
    "authored.moves.normals.16.regions.0.hit.effect.base": 30,
    "authored.moves.normals.16.regions.0.hit.effect.launchX": 0,
    "authored.moves.normals.16.regions.0.hit.effect.launchZ": -1,
-   "authored.moves.normals.16.regions.0.hit.groundedEffect.damage": 15,
-   "authored.moves.normals.16.regions.0.hit.groundedEffect.growth": 30,
+   "authored.moves.normals.16.regions.0.hit.groundedEffect.damage": 10.800000190734863,
+   "authored.moves.normals.16.regions.0.hit.groundedEffect.growth": 21.600000381469727,
    "authored.moves.normals.16.regions.0.hit.groundedEffect.base": 100,
    "authored.moves.normals.16.regions.0.hit.groundedEffect.launchX": 0.08715599775314331,
    "authored.moves.normals.16.regions.0.hit.groundedEffect.launchZ": 0.9961950182914734,
    "authored.moves.normals.16.regions.1.firstFrame": 16,
    "authored.moves.normals.16.regions.1.lastFrame": 17,
-   "authored.moves.normals.16.regions.1.hit.effect.damage": 9,
-   "authored.moves.normals.16.regions.1.hit.effect.growth": 70,
+   "authored.moves.normals.16.regions.1.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.16.regions.1.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.16.regions.1.hit.effect.base": 18,
    "authored.moves.normals.16.regions.1.hit.effect.launchX": 0.3420200049877167,
    "authored.moves.normals.16.regions.1.hit.effect.launchZ": -0.9396929740905762,
-   "authored.moves.normals.16.regions.1.hit.groundedEffect.damage": 9,
-   "authored.moves.normals.16.regions.1.hit.groundedEffect.growth": 40,
+   "authored.moves.normals.16.regions.1.hit.groundedEffect.damage": 6.4800004959106445,
+   "authored.moves.normals.16.regions.1.hit.groundedEffect.growth": 28.80000114440918,
    "authored.moves.normals.16.regions.1.hit.groundedEffect.base": 30,
    "authored.moves.normals.16.regions.1.hit.groundedEffect.launchX": 0.25881901383399963,
    "authored.moves.normals.16.regions.1.hit.groundedEffect.launchZ": 0.9659259915351868,
    "authored.moves.normals.16.regions.2.firstFrame": 13,
    "authored.moves.normals.16.regions.2.lastFrame": 17,
-   "authored.moves.normals.16.regions.2.hit.effect.damage": 9,
-   "authored.moves.normals.16.regions.2.hit.effect.growth": 70,
+   "authored.moves.normals.16.regions.2.hit.effect.damage": 6.4800004959106445,
+   "authored.moves.normals.16.regions.2.hit.effect.growth": 50.400001525878906,
    "authored.moves.normals.16.regions.2.hit.effect.base": 18,
    "authored.moves.normals.16.regions.2.hit.effect.launchX": 0.3420200049877167,
    "authored.moves.normals.16.regions.2.hit.effect.launchZ": -0.9396929740905762,
-   "authored.moves.normals.16.regions.2.hit.groundedEffect.damage": 9,
-   "authored.moves.normals.16.regions.2.hit.groundedEffect.growth": 40,
+   "authored.moves.normals.16.regions.2.hit.groundedEffect.damage": 6.4800004959106445,
+   "authored.moves.normals.16.regions.2.hit.groundedEffect.growth": 28.80000114440918,
    "authored.moves.normals.16.regions.2.hit.groundedEffect.base": 30,
    "authored.moves.normals.16.regions.2.hit.groundedEffect.launchX": 0.25881901383399963,
    "authored.moves.normals.16.regions.2.hit.groundedEffect.launchZ": 0.9659259915351868,
@@ -28006,15 +28006,15 @@
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 7,
    "authored.moves.normals.19.regions.0.lastFrame": 18,
-   "authored.moves.normals.19.regions.0.hit.effect.damage": 11.712750434875488,
-   "authored.moves.normals.19.regions.0.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.19.regions.0.hit.effect.damage": 7.758525848388672,
+   "authored.moves.normals.19.regions.0.hit.effect.growth": 55.40036392211914,
    "authored.moves.normals.19.regions.0.hit.effect.base": 18,
    "authored.moves.normals.19.regions.0.hit.effect.launchX": 0.5735759735107422,
    "authored.moves.normals.19.regions.0.hit.effect.launchZ": 0.8191519975662231,
    "authored.moves.normals.19.regions.1.firstFrame": 7,
    "authored.moves.normals.19.regions.1.lastFrame": 18,
-   "authored.moves.normals.19.regions.1.hit.effect.damage": 11.712750434875488,
-   "authored.moves.normals.19.regions.1.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.19.regions.1.hit.effect.damage": 7.758525848388672,
+   "authored.moves.normals.19.regions.1.hit.effect.growth": 55.40036392211914,
    "authored.moves.normals.19.regions.1.hit.effect.base": 18,
    "authored.moves.normals.19.regions.1.hit.effect.launchX": 0.5735759735107422,
    "authored.moves.normals.19.regions.1.hit.effect.launchZ": 0.8191519975662231,
@@ -28024,22 +28024,22 @@
    "authored.moves.normals.20.landingLag": 0,
    "authored.moves.normals.20.regions.0.firstFrame": 4,
    "authored.moves.normals.20.regions.0.lastFrame": 5,
-   "authored.moves.normals.20.regions.0.hit.effect.damage": 3.513824939727783,
-   "authored.moves.normals.20.regions.0.hit.effect.growth": 48.25143051147461,
+   "authored.moves.normals.20.regions.0.hit.effect.damage": 2.529953956604004,
+   "authored.moves.normals.20.regions.0.hit.effect.growth": 34.741031646728516,
    "authored.moves.normals.20.regions.0.hit.effect.base": 12,
    "authored.moves.normals.20.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.20.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.20.regions.1.firstFrame": 4,
    "authored.moves.normals.20.regions.1.lastFrame": 4,
-   "authored.moves.normals.20.regions.1.hit.effect.damage": 3.513824939727783,
-   "authored.moves.normals.20.regions.1.hit.effect.growth": 48.25143051147461,
+   "authored.moves.normals.20.regions.1.hit.effect.damage": 2.529953956604004,
+   "authored.moves.normals.20.regions.1.hit.effect.growth": 34.741031646728516,
    "authored.moves.normals.20.regions.1.hit.effect.base": 12,
    "authored.moves.normals.20.regions.1.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.20.regions.1.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.20.regions.2.firstFrame": 5,
    "authored.moves.normals.20.regions.2.lastFrame": 5,
-   "authored.moves.normals.20.regions.2.hit.effect.damage": 3.513824939727783,
-   "authored.moves.normals.20.regions.2.hit.effect.growth": 48.25143051147461,
+   "authored.moves.normals.20.regions.2.hit.effect.damage": 2.529953956604004,
+   "authored.moves.normals.20.regions.2.hit.effect.growth": 34.741031646728516,
    "authored.moves.normals.20.regions.2.hit.effect.base": 12,
    "authored.moves.normals.20.regions.2.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.20.regions.2.hit.effect.launchZ": 0.5735759735107422,
@@ -28049,15 +28049,15 @@
    "authored.moves.normals.21.landingLag": 0,
    "authored.moves.normals.21.regions.0.firstFrame": 6,
    "authored.moves.normals.21.regions.0.lastFrame": 8,
-   "authored.moves.normals.21.regions.0.hit.effect.damage": 5.856375217437744,
-   "authored.moves.normals.21.regions.0.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.21.regions.0.hit.effect.damage": 4.216590404510498,
+   "authored.moves.normals.21.regions.0.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.21.regions.0.hit.effect.base": 18,
    "authored.moves.normals.21.regions.0.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.21.regions.0.hit.effect.launchZ": 0.5735759735107422,
    "authored.moves.normals.21.regions.1.firstFrame": 6,
    "authored.moves.normals.21.regions.1.lastFrame": 8,
-   "authored.moves.normals.21.regions.1.hit.effect.damage": 5.856375217437744,
-   "authored.moves.normals.21.regions.1.hit.effect.growth": 83.63581085205078,
+   "authored.moves.normals.21.regions.1.hit.effect.damage": 4.216590404510498,
+   "authored.moves.normals.21.regions.1.hit.effect.growth": 60.2177848815918,
    "authored.moves.normals.21.regions.1.hit.effect.base": 18,
    "authored.moves.normals.21.regions.1.hit.effect.launchX": 0.8191519975662231,
    "authored.moves.normals.21.regions.1.hit.effect.launchZ": 0.5735759735107422,
@@ -28070,22 +28070,22 @@
    "authored.moves.throws.2.effect.launchZ": 0,
    "authored.moves.throws.3.contactFrame": 12,
    "authored.moves.throws.3.totalFrames": 33,
-   "authored.moves.throws.3.effect.damage": 9.370200157165527,
+   "authored.moves.throws.3.effect.damage": 6.746544361114502,
    "authored.moves.throws.3.effect.growth": 52,
    "authored.moves.throws.3.effect.base": 67,
    "authored.moves.throws.3.effect.launchX": 0.766044020652771,
    "authored.moves.throws.3.effect.launchZ": 0.6427879929542542,
    "authored.moves.throws.4.contactFrame": 16,
    "authored.moves.throws.4.totalFrames": 39,
-   "authored.moves.throws.4.effect.damage": 10.541475296020508,
+   "authored.moves.throws.4.effect.damage": 7.58986234664917,
    "authored.moves.throws.4.effect.growth": 33.5,
    "authored.moves.throws.4.effect.base": 72,
    "authored.moves.throws.4.effect.launchX": -0.766044020652771,
    "authored.moves.throws.4.effect.launchZ": 0.6427879929542542,
    "authored.moves.throws.5.contactFrame": 14,
    "authored.moves.throws.5.totalFrames": 25,
-   "authored.moves.throws.5.effect.damage": 8.198925018310547,
-   "authored.moves.throws.5.effect.growth": 42.890159606933594,
+   "authored.moves.throws.5.effect.damage": 5.903226375579834,
+   "authored.moves.throws.5.effect.growth": 30.880916595458984,
    "authored.moves.throws.5.effect.base": 50,
    "authored.moves.throws.5.effect.launchX": 0,
    "authored.moves.throws.5.effect.launchZ": 1,
@@ -28099,29 +28099,29 @@
    "authored.specials.neutral.ground.endFrame": 48,
    "authored.specials.neutral.ground.regions.0.firstFrame": 17,
    "authored.specials.neutral.ground.regions.0.lastFrame": 27,
-   "authored.specials.neutral.ground.regions.0.hit.effect.damage": 7.5,
-   "authored.specials.neutral.ground.regions.0.hit.effect.growth": 55,
+   "authored.specials.neutral.ground.regions.0.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.ground.regions.0.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.ground.regions.0.hit.effect.base": 20,
    "authored.specials.neutral.ground.regions.0.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.ground.regions.0.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.neutral.ground.regions.1.firstFrame": 17,
    "authored.specials.neutral.ground.regions.1.lastFrame": 27,
-   "authored.specials.neutral.ground.regions.1.hit.effect.damage": 7.5,
-   "authored.specials.neutral.ground.regions.1.hit.effect.growth": 55,
+   "authored.specials.neutral.ground.regions.1.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.ground.regions.1.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.ground.regions.1.hit.effect.base": 20,
    "authored.specials.neutral.ground.regions.1.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.ground.regions.1.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.neutral.ground.regions.2.firstFrame": 17,
    "authored.specials.neutral.ground.regions.2.lastFrame": 27,
-   "authored.specials.neutral.ground.regions.2.hit.effect.damage": 7.5,
-   "authored.specials.neutral.ground.regions.2.hit.effect.growth": 55,
+   "authored.specials.neutral.ground.regions.2.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.ground.regions.2.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.ground.regions.2.hit.effect.base": 20,
    "authored.specials.neutral.ground.regions.2.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.ground.regions.2.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.neutral.ground.regions.3.firstFrame": 17,
    "authored.specials.neutral.ground.regions.3.lastFrame": 27,
-   "authored.specials.neutral.ground.regions.3.hit.effect.damage": 7.5,
-   "authored.specials.neutral.ground.regions.3.hit.effect.growth": 55,
+   "authored.specials.neutral.ground.regions.3.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.ground.regions.3.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.ground.regions.3.hit.effect.base": 20,
    "authored.specials.neutral.ground.regions.3.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.ground.regions.3.hit.effect.launchZ": 0.42261800169944763,
@@ -28129,37 +28129,37 @@
    "authored.specials.neutral.air.landingLag": 20,
    "authored.specials.neutral.air.regions.0.firstFrame": 17,
    "authored.specials.neutral.air.regions.0.lastFrame": 27,
-   "authored.specials.neutral.air.regions.0.hit.effect.damage": 7.5,
-   "authored.specials.neutral.air.regions.0.hit.effect.growth": 55,
+   "authored.specials.neutral.air.regions.0.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.air.regions.0.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.air.regions.0.hit.effect.base": 20,
    "authored.specials.neutral.air.regions.0.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.air.regions.0.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.neutral.air.regions.1.firstFrame": 17,
    "authored.specials.neutral.air.regions.1.lastFrame": 27,
-   "authored.specials.neutral.air.regions.1.hit.effect.damage": 7.5,
-   "authored.specials.neutral.air.regions.1.hit.effect.growth": 55,
+   "authored.specials.neutral.air.regions.1.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.air.regions.1.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.air.regions.1.hit.effect.base": 20,
    "authored.specials.neutral.air.regions.1.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.air.regions.1.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.neutral.air.regions.2.firstFrame": 17,
    "authored.specials.neutral.air.regions.2.lastFrame": 27,
-   "authored.specials.neutral.air.regions.2.hit.effect.damage": 7.5,
-   "authored.specials.neutral.air.regions.2.hit.effect.growth": 55,
+   "authored.specials.neutral.air.regions.2.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.air.regions.2.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.air.regions.2.hit.effect.base": 20,
    "authored.specials.neutral.air.regions.2.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.air.regions.2.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.neutral.air.regions.3.firstFrame": 17,
    "authored.specials.neutral.air.regions.3.lastFrame": 27,
-   "authored.specials.neutral.air.regions.3.hit.effect.damage": 7.5,
-   "authored.specials.neutral.air.regions.3.hit.effect.growth": 55,
+   "authored.specials.neutral.air.regions.3.hit.effect.damage": 5.400000095367432,
+   "authored.specials.neutral.air.regions.3.hit.effect.growth": 39.60000228881836,
    "authored.specials.neutral.air.regions.3.hit.effect.base": 20,
    "authored.specials.neutral.air.regions.3.hit.effect.launchX": 0.9063079953193665,
    "authored.specials.neutral.air.regions.3.hit.effect.launchZ": 0.42261800169944763,
    "authored.specials.side.ground.endFrame": 50,
    "authored.specials.side.ground.regions.0.firstFrame": 9,
    "authored.specials.side.ground.regions.0.lastFrame": 23,
-   "authored.specials.side.ground.regions.0.hit.effect.damage": 11.25,
-   "authored.specials.side.ground.regions.0.hit.effect.growth": 60,
+   "authored.specials.side.ground.regions.0.hit.effect.damage": 8.100000381469727,
+   "authored.specials.side.ground.regions.0.hit.effect.growth": 43.20000076293945,
    "authored.specials.side.ground.regions.0.hit.effect.base": 50,
    "authored.specials.side.ground.regions.0.hit.effect.launchX": 0.17364799976348877,
    "authored.specials.side.ground.regions.0.hit.effect.launchZ": 0.9848080277442932,
@@ -28168,8 +28168,8 @@
    "authored.specials.side.air.landingLag": 22,
    "authored.specials.side.air.regions.0.firstFrame": 9,
    "authored.specials.side.air.regions.0.lastFrame": 23,
-   "authored.specials.side.air.regions.0.hit.effect.damage": 11.25,
-   "authored.specials.side.air.regions.0.hit.effect.growth": 60,
+   "authored.specials.side.air.regions.0.hit.effect.damage": 8.100000381469727,
+   "authored.specials.side.air.regions.0.hit.effect.growth": 43.20000076293945,
    "authored.specials.side.air.regions.0.hit.effect.base": 50,
    "authored.specials.side.air.regions.0.hit.effect.launchX": 0.17364799976348877,
    "authored.specials.side.air.regions.0.hit.effect.launchZ": 0.9848080277442932,
@@ -28178,40 +28178,40 @@
    "authored.specials.up.ground.endFrame": 40,
    "authored.specials.up.ground.regions.0.firstFrame": 7,
    "authored.specials.up.ground.regions.0.lastFrame": 21,
-   "authored.specials.up.ground.regions.0.hit.effect.damage": 9.370200157165527,
-   "authored.specials.up.ground.regions.0.hit.effect.growth": 80,
+   "authored.specials.up.ground.regions.0.hit.effect.damage": 6.746544361114502,
+   "authored.specials.up.ground.regions.0.hit.effect.growth": 57.60000228881836,
    "authored.specials.up.ground.regions.0.hit.effect.base": 27.878604888916016,
    "authored.specials.up.ground.regions.0.hit.effect.launchX": 0.3420200049877167,
    "authored.specials.up.ground.regions.0.hit.effect.launchZ": 0.9396929740905762,
    "authored.specials.up.ground.regions.1.firstFrame": 7,
    "authored.specials.up.ground.regions.1.lastFrame": 21,
-   "authored.specials.up.ground.regions.1.hit.effect.damage": 9.370200157165527,
-   "authored.specials.up.ground.regions.1.hit.effect.growth": 80,
+   "authored.specials.up.ground.regions.1.hit.effect.damage": 6.746544361114502,
+   "authored.specials.up.ground.regions.1.hit.effect.growth": 57.60000228881836,
    "authored.specials.up.ground.regions.1.hit.effect.base": 27.878604888916016,
    "authored.specials.up.ground.regions.1.hit.effect.launchX": 0.3420200049877167,
    "authored.specials.up.ground.regions.1.hit.effect.launchZ": 0.9396929740905762,
    "authored.specials.down.ground.endFrame": 12,
    "authored.specials.down.ground.followUps.0.special.endFrame": 24,
-   "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.damage": 3.75,
-   "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.damage": 2.700000047683716,
+   "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.base": 30,
    "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.ground.followUps.0.special.projectiles.0.effect.launchZ": 0.7071070075035095,
    "authored.specials.down.ground.followUps.1.special.endFrame": 24,
-   "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.damage": 5,
-   "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.damage": 3.6000001430511475,
+   "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.base": 30,
    "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.ground.followUps.1.special.projectiles.0.effect.launchZ": 0.7071070075035095,
    "authored.specials.down.ground.followUps.2.special.endFrame": 24,
-   "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.damage": 6.25,
-   "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.damage": 4.5,
+   "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.base": 30,
    "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.ground.followUps.2.special.projectiles.0.effect.launchZ": 0.7071070075035095,
    "authored.specials.down.ground.followUps.3.special.endFrame": 24,
-   "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.damage": 7.5,
-   "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.damage": 5.400000095367432,
+   "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.base": 30,
    "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.ground.followUps.3.special.projectiles.0.effect.launchZ": 0.7071070075035095,
@@ -28219,29 +28219,29 @@
    "authored.specials.down.air.landingLag": 18,
    "authored.specials.down.air.followUps.0.special.endFrame": 24,
    "authored.specials.down.air.followUps.0.special.landingLag": 18,
-   "authored.specials.down.air.followUps.0.special.projectiles.0.effect.damage": 3.75,
-   "authored.specials.down.air.followUps.0.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.air.followUps.0.special.projectiles.0.effect.damage": 2.700000047683716,
+   "authored.specials.down.air.followUps.0.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.air.followUps.0.special.projectiles.0.effect.base": 30,
    "authored.specials.down.air.followUps.0.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.air.followUps.0.special.projectiles.0.effect.launchZ": 0.7071070075035095,
    "authored.specials.down.air.followUps.1.special.endFrame": 24,
    "authored.specials.down.air.followUps.1.special.landingLag": 18,
-   "authored.specials.down.air.followUps.1.special.projectiles.0.effect.damage": 5,
-   "authored.specials.down.air.followUps.1.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.air.followUps.1.special.projectiles.0.effect.damage": 3.6000001430511475,
+   "authored.specials.down.air.followUps.1.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.air.followUps.1.special.projectiles.0.effect.base": 30,
    "authored.specials.down.air.followUps.1.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.air.followUps.1.special.projectiles.0.effect.launchZ": 0.7071070075035095,
    "authored.specials.down.air.followUps.2.special.endFrame": 24,
    "authored.specials.down.air.followUps.2.special.landingLag": 18,
-   "authored.specials.down.air.followUps.2.special.projectiles.0.effect.damage": 6.25,
-   "authored.specials.down.air.followUps.2.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.air.followUps.2.special.projectiles.0.effect.damage": 4.5,
+   "authored.specials.down.air.followUps.2.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.air.followUps.2.special.projectiles.0.effect.base": 30,
    "authored.specials.down.air.followUps.2.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.air.followUps.2.special.projectiles.0.effect.launchZ": 0.7071070075035095,
    "authored.specials.down.air.followUps.3.special.endFrame": 24,
    "authored.specials.down.air.followUps.3.special.landingLag": 18,
-   "authored.specials.down.air.followUps.3.special.projectiles.0.effect.damage": 7.5,
-   "authored.specials.down.air.followUps.3.special.projectiles.0.effect.growth": 40,
+   "authored.specials.down.air.followUps.3.special.projectiles.0.effect.damage": 5.400000095367432,
+   "authored.specials.down.air.followUps.3.special.projectiles.0.effect.growth": 28.80000114440918,
    "authored.specials.down.air.followUps.3.special.projectiles.0.effect.base": 30,
    "authored.specials.down.air.followUps.3.special.projectiles.0.effect.launchX": 0.7071070075035095,
    "authored.specials.down.air.followUps.3.special.projectiles.0.effect.launchZ": 0.7071070075035095,
@@ -28249,13 +28249,13 @@
    "normal.0.activeFrames": 2,
    "normal.0.endingFrames": 11,
    "normal.0.landingLag": 0,
-   "normal.0.hit.0.damage": 3.513824939727783,
-   "normal.0.hit.0.growth": 48.25143051147461,
+   "normal.0.hit.0.damage": 2.529953956604004,
+   "normal.0.hit.0.growth": 34.741031646728516,
    "normal.0.hit.0.base": 12,
    "normal.0.hit.0.launchX": 0.8191519975662231,
    "normal.0.hit.0.launchZ": 0.5735759735107422,
-   "normal.0.hit.1.damage": 3.513824939727783,
-   "normal.0.hit.1.growth": 48.25143051147461,
+   "normal.0.hit.1.damage": 2.529953956604004,
+   "normal.0.hit.1.growth": 34.741031646728516,
    "normal.0.hit.1.base": 12,
    "normal.0.hit.1.launchX": 0.8191519975662231,
    "normal.0.hit.1.launchZ": 0.5735759735107422,
@@ -28267,8 +28267,8 @@
    "normal.2.activeFrames": 4,
    "normal.2.endingFrames": 31,
    "normal.2.landingLag": 0,
-   "normal.2.hit.0.damage": 16.875,
-   "normal.2.hit.0.growth": 115.80342864990234,
+   "normal.2.hit.0.damage": 12.15000057220459,
+   "normal.2.hit.0.growth": 83.37847137451172,
    "normal.2.hit.0.base": 30,
    "normal.2.hit.0.launchX": 0,
    "normal.2.hit.0.launchZ": 1,
@@ -28276,23 +28276,23 @@
    "normal.3.activeFrames": 6,
    "normal.3.endingFrames": 32,
    "normal.3.landingLag": 0,
-   "normal.3.hit.0.damage": 16.397850036621094,
-   "normal.3.hit.0.growth": 115.80342864990234,
+   "normal.3.hit.0.damage": 11.806452751159668,
+   "normal.3.hit.0.growth": 83.37847137451172,
    "normal.3.hit.0.base": 28,
    "normal.3.hit.0.launchX": 0.766044020652771,
    "normal.3.hit.0.launchZ": 0.6427879929542542,
-   "normal.3.hit.1.damage": 16.397850036621094,
-   "normal.3.hit.1.growth": 115.80342864990234,
+   "normal.3.hit.1.damage": 11.806452751159668,
+   "normal.3.hit.1.growth": 83.37847137451172,
    "normal.3.hit.1.base": 28,
    "normal.3.hit.1.launchX": 0.766044020652771,
    "normal.3.hit.1.launchZ": 0.6427879929542542,
-   "normal.3.hit.2.damage": 16.397850036621094,
-   "normal.3.hit.2.growth": 115.80342864990234,
+   "normal.3.hit.2.damage": 11.806452751159668,
+   "normal.3.hit.2.growth": 83.37847137451172,
    "normal.3.hit.2.base": 28,
    "normal.3.hit.2.launchX": 0.766044020652771,
    "normal.3.hit.2.launchZ": 0.6427879929542542,
-   "normal.3.hit.3.damage": 16.397850036621094,
-   "normal.3.hit.3.growth": 115.80342864990234,
+   "normal.3.hit.3.damage": 11.806452751159668,
+   "normal.3.hit.3.growth": 83.37847137451172,
    "normal.3.hit.3.base": 28,
    "normal.3.hit.3.launchX": -0.766044020652771,
    "normal.3.hit.3.launchZ": 0.6427879929542542,
@@ -28300,8 +28300,8 @@
    "normal.4.activeFrames": 4,
    "normal.4.endingFrames": 34,
    "normal.4.landingLag": 0,
-   "normal.4.hit.0.damage": 21.082950592041016,
-   "normal.4.hit.0.growth": 115.80342864990234,
+   "normal.4.hit.0.damage": 15.17972469329834,
+   "normal.4.hit.0.growth": 83.37847137451172,
    "normal.4.hit.0.base": 28,
    "normal.4.hit.0.launchX": 0.766044020652771,
    "normal.4.hit.0.launchZ": 0.6427879929542542,
@@ -28313,13 +28313,13 @@
    "normal.6.activeFrames": 3,
    "normal.6.endingFrames": 21,
    "normal.6.landingLag": 0,
-   "normal.6.hit.0.damage": 10.541475296020508,
-   "normal.6.hit.0.growth": 83.63581085205078,
+   "normal.6.hit.0.damage": 7.58986234664917,
+   "normal.6.hit.0.growth": 60.2177848815918,
    "normal.6.hit.0.base": 18,
    "normal.6.hit.0.launchX": 0.8191519975662231,
    "normal.6.hit.0.launchZ": 0.5735759735107422,
-   "normal.6.hit.1.damage": 10.541475296020508,
-   "normal.6.hit.1.growth": 83.63581085205078,
+   "normal.6.hit.1.damage": 7.58986234664917,
+   "normal.6.hit.1.growth": 60.2177848815918,
    "normal.6.hit.1.base": 18,
    "normal.6.hit.1.launchX": 0.8191519975662231,
    "normal.6.hit.1.launchZ": 0.5735759735107422,
@@ -28327,33 +28327,33 @@
    "normal.7.activeFrames": 6,
    "normal.7.endingFrames": 15,
    "normal.7.landingLag": 0,
-   "normal.7.hit.0.damage": 8,
-   "normal.7.hit.0.growth": 55,
+   "normal.7.hit.0.damage": 5.760000228881836,
+   "normal.7.hit.0.growth": 39.60000228881836,
    "normal.7.hit.0.base": 90,
    "normal.7.hit.0.launchX": 0.08715599775314331,
    "normal.7.hit.0.launchZ": 0.9961950182914734,
-   "normal.7.hit.1.damage": 8,
-   "normal.7.hit.1.growth": 55,
+   "normal.7.hit.1.damage": 5.760000228881836,
+   "normal.7.hit.1.growth": 39.60000228881836,
    "normal.7.hit.1.base": 90,
    "normal.7.hit.1.launchX": 0.08715599775314331,
    "normal.7.hit.1.launchZ": 0.9961950182914734,
-   "normal.7.hit.2.damage": 8,
-   "normal.7.hit.2.growth": 55,
+   "normal.7.hit.2.damage": 5.760000228881836,
+   "normal.7.hit.2.growth": 39.60000228881836,
    "normal.7.hit.2.base": 90,
    "normal.7.hit.2.launchX": 0.08715599775314331,
    "normal.7.hit.2.launchZ": 0.9961950182914734,
-   "normal.7.hit.3.damage": 8,
-   "normal.7.hit.3.growth": 55,
+   "normal.7.hit.3.damage": 5.760000228881836,
+   "normal.7.hit.3.growth": 39.60000228881836,
    "normal.7.hit.3.base": 90,
    "normal.7.hit.3.launchX": 0.08715599775314331,
    "normal.7.hit.3.launchZ": 0.9961950182914734,
-   "normal.7.hit.4.damage": 8,
-   "normal.7.hit.4.growth": 55,
+   "normal.7.hit.4.damage": 5.760000228881836,
+   "normal.7.hit.4.growth": 39.60000228881836,
    "normal.7.hit.4.base": 90,
    "normal.7.hit.4.launchX": 0.08715599775314331,
    "normal.7.hit.4.launchZ": 0.9961950182914734,
-   "normal.7.hit.5.damage": 8,
-   "normal.7.hit.5.growth": 55,
+   "normal.7.hit.5.damage": 5.760000228881836,
+   "normal.7.hit.5.growth": 39.60000228881836,
    "normal.7.hit.5.base": 90,
    "normal.7.hit.5.launchX": 0.08715599775314331,
    "normal.7.hit.5.launchZ": 0.9961950182914734,
@@ -28361,8 +28361,8 @@
    "normal.8.activeFrames": 3,
    "normal.8.endingFrames": 20,
    "normal.8.landingLag": 0,
-   "normal.8.hit.0.damage": 7.027649879455566,
-   "normal.8.hit.0.growth": 88.99707794189453,
+   "normal.8.hit.0.damage": 5.059907913208008,
+   "normal.8.hit.0.growth": 64.07789611816406,
    "normal.8.hit.0.base": 28,
    "normal.8.hit.0.launchX": 0.17364799976348877,
    "normal.8.hit.0.launchZ": 0.9848080277442932,
@@ -28370,13 +28370,13 @@
    "normal.9.activeFrames": 3,
    "normal.9.endingFrames": 21,
    "normal.9.landingLag": 0,
-   "normal.9.hit.0.damage": 10.541475296020508,
-   "normal.9.hit.0.growth": 83.63581085205078,
+   "normal.9.hit.0.damage": 7.58986234664917,
+   "normal.9.hit.0.growth": 60.2177848815918,
    "normal.9.hit.0.base": 18,
    "normal.9.hit.0.launchX": 0.8191519975662231,
    "normal.9.hit.0.launchZ": 0.5735759735107422,
-   "normal.9.hit.1.damage": 10.541475296020508,
-   "normal.9.hit.1.growth": 83.63581085205078,
+   "normal.9.hit.1.damage": 7.58986234664917,
+   "normal.9.hit.1.growth": 60.2177848815918,
    "normal.9.hit.1.base": 18,
    "normal.9.hit.1.launchX": 0.8191519975662231,
    "normal.9.hit.1.launchZ": 0.5735759735107422,
@@ -28384,13 +28384,13 @@
    "normal.10.activeFrames": 3,
    "normal.10.endingFrames": 21,
    "normal.10.landingLag": 0,
-   "normal.10.hit.0.damage": 10.541475296020508,
-   "normal.10.hit.0.growth": 83.63581085205078,
+   "normal.10.hit.0.damage": 7.58986234664917,
+   "normal.10.hit.0.growth": 60.2177848815918,
    "normal.10.hit.0.base": 18,
    "normal.10.hit.0.launchX": 0.8191519975662231,
    "normal.10.hit.0.launchZ": 0.5735759735107422,
-   "normal.10.hit.1.damage": 10.541475296020508,
-   "normal.10.hit.1.growth": 83.63581085205078,
+   "normal.10.hit.1.damage": 7.58986234664917,
+   "normal.10.hit.1.growth": 60.2177848815918,
    "normal.10.hit.1.base": 18,
    "normal.10.hit.1.launchX": 0.8191519975662231,
    "normal.10.hit.1.launchZ": 0.5735759735107422,
@@ -28412,8 +28412,8 @@
    "normal.12.hit.0.base": 30,
    "normal.12.hit.0.launchX": 0,
    "normal.12.hit.0.launchZ": 1,
-   "normal.12.hit.1.damage": 9,
-   "normal.12.hit.1.growth": 92,
+   "normal.12.hit.1.damage": 6.4800004959106445,
+   "normal.12.hit.1.growth": 66.24000549316406,
    "normal.12.hit.1.base": 32,
    "normal.12.hit.1.launchX": 0.766044020652771,
    "normal.12.hit.1.launchZ": 0.6427879929542542,
@@ -28421,13 +28421,13 @@
    "normal.13.activeFrames": 17,
    "normal.13.endingFrames": 8,
    "normal.13.landingLag": 10,
-   "normal.13.hit.0.damage": 20,
-   "normal.13.hit.0.growth": 100,
+   "normal.13.hit.0.damage": 14.40000057220459,
+   "normal.13.hit.0.growth": 72,
    "normal.13.hit.0.base": 26,
    "normal.13.hit.0.launchX": 0.8191519975662231,
    "normal.13.hit.0.launchZ": 0.5735759735107422,
-   "normal.13.hit.1.damage": 6,
-   "normal.13.hit.1.growth": 80,
+   "normal.13.hit.1.damage": 4.320000171661377,
+   "normal.13.hit.1.growth": 57.60000228881836,
    "normal.13.hit.1.base": 18,
    "normal.13.hit.1.launchX": 0.7071070075035095,
    "normal.13.hit.1.launchZ": 0.7071070075035095,
@@ -28435,8 +28435,8 @@
    "normal.14.activeFrames": 3,
    "normal.14.endingFrames": 23,
    "normal.14.landingLag": 14,
-   "normal.14.hit.0.damage": 12.884025573730469,
-   "normal.14.hit.0.growth": 115.80342864990234,
+   "normal.14.hit.0.damage": 9.276498794555664,
+   "normal.14.hit.0.growth": 83.37847137451172,
    "normal.14.hit.0.base": 28,
    "normal.14.hit.0.launchX": -0.766044020652771,
    "normal.14.hit.0.launchZ": 0.6427879929542542,
@@ -28444,43 +28444,43 @@
    "normal.15.activeFrames": 8,
    "normal.15.endingFrames": 20,
    "normal.15.landingLag": 4,
-   "normal.15.hit.0.damage": 12,
-   "normal.15.hit.0.growth": 70,
+   "normal.15.hit.0.damage": 8.640000343322754,
+   "normal.15.hit.0.growth": 50.400001525878906,
    "normal.15.hit.0.base": 80,
    "normal.15.hit.0.launchX": 0,
    "normal.15.hit.0.launchZ": 1,
-   "normal.15.hit.1.damage": 12,
-   "normal.15.hit.1.growth": 70,
+   "normal.15.hit.1.damage": 8.640000343322754,
+   "normal.15.hit.1.growth": 50.400001525878906,
    "normal.15.hit.1.base": 80,
    "normal.15.hit.1.launchX": 0,
    "normal.15.hit.1.launchZ": 1,
-   "normal.15.hit.2.damage": 9,
-   "normal.15.hit.2.growth": 70,
+   "normal.15.hit.2.damage": 6.4800004959106445,
+   "normal.15.hit.2.growth": 50.400001525878906,
    "normal.15.hit.2.base": 75,
    "normal.15.hit.2.launchX": 0,
    "normal.15.hit.2.launchZ": 1,
-   "normal.15.hit.3.damage": 9,
-   "normal.15.hit.3.growth": 70,
+   "normal.15.hit.3.damage": 6.4800004959106445,
+   "normal.15.hit.3.growth": 50.400001525878906,
    "normal.15.hit.3.base": 75,
    "normal.15.hit.3.launchX": 0,
    "normal.15.hit.3.launchZ": 1,
-   "normal.15.hit.4.damage": 9,
-   "normal.15.hit.4.growth": 70,
+   "normal.15.hit.4.damage": 6.4800004959106445,
+   "normal.15.hit.4.growth": 50.400001525878906,
    "normal.15.hit.4.base": 75,
    "normal.15.hit.4.launchX": 0,
    "normal.15.hit.4.launchZ": 1,
-   "normal.15.hit.5.damage": 9,
-   "normal.15.hit.5.growth": 70,
+   "normal.15.hit.5.damage": 6.4800004959106445,
+   "normal.15.hit.5.growth": 50.400001525878906,
    "normal.15.hit.5.base": 75,
    "normal.15.hit.5.launchX": 0,
    "normal.15.hit.5.launchZ": 1,
-   "normal.15.hit.6.damage": 9,
-   "normal.15.hit.6.growth": 70,
+   "normal.15.hit.6.damage": 6.4800004959106445,
+   "normal.15.hit.6.growth": 50.400001525878906,
    "normal.15.hit.6.base": 75,
    "normal.15.hit.6.launchX": 0,
    "normal.15.hit.6.launchZ": 1,
-   "normal.15.hit.7.damage": 9,
-   "normal.15.hit.7.growth": 70,
+   "normal.15.hit.7.damage": 6.4800004959106445,
+   "normal.15.hit.7.growth": 50.400001525878906,
    "normal.15.hit.7.base": 75,
    "normal.15.hit.7.launchX": 0,
    "normal.15.hit.7.launchZ": 1,
@@ -28488,18 +28488,18 @@
    "normal.16.activeFrames": 5,
    "normal.16.endingFrames": 26,
    "normal.16.landingLag": 13,
-   "normal.16.hit.0.damage": 15,
-   "normal.16.hit.0.growth": 82,
+   "normal.16.hit.0.damage": 10.800000190734863,
+   "normal.16.hit.0.growth": 59.040000915527344,
    "normal.16.hit.0.base": 30,
    "normal.16.hit.0.launchX": 0,
    "normal.16.hit.0.launchZ": -1,
-   "normal.16.hit.1.damage": 9,
-   "normal.16.hit.1.growth": 70,
+   "normal.16.hit.1.damage": 6.4800004959106445,
+   "normal.16.hit.1.growth": 50.400001525878906,
    "normal.16.hit.1.base": 18,
    "normal.16.hit.1.launchX": 0.3420200049877167,
    "normal.16.hit.1.launchZ": -0.9396929740905762,
-   "normal.16.hit.2.damage": 9,
-   "normal.16.hit.2.growth": 70,
+   "normal.16.hit.2.damage": 6.4800004959106445,
+   "normal.16.hit.2.growth": 50.400001525878906,
    "normal.16.hit.2.base": 18,
    "normal.16.hit.2.launchX": 0.3420200049877167,
    "normal.16.hit.2.launchZ": -0.9396929740905762,
@@ -28525,13 +28525,13 @@
    "normal.19.activeFrames": 12,
    "normal.19.endingFrames": 19,
    "normal.19.landingLag": 0,
-   "normal.19.hit.0.damage": 11.712750434875488,
-   "normal.19.hit.0.growth": 83.63581085205078,
+   "normal.19.hit.0.damage": 7.758525848388672,
+   "normal.19.hit.0.growth": 55.40036392211914,
    "normal.19.hit.0.base": 18,
    "normal.19.hit.0.launchX": 0.5735759735107422,
    "normal.19.hit.0.launchZ": 0.8191519975662231,
-   "normal.19.hit.1.damage": 11.712750434875488,
-   "normal.19.hit.1.growth": 83.63581085205078,
+   "normal.19.hit.1.damage": 7.758525848388672,
+   "normal.19.hit.1.growth": 55.40036392211914,
    "normal.19.hit.1.base": 18,
    "normal.19.hit.1.launchX": 0.5735759735107422,
    "normal.19.hit.1.launchZ": 0.8191519975662231,
@@ -28539,18 +28539,18 @@
    "normal.20.activeFrames": 2,
    "normal.20.endingFrames": 13,
    "normal.20.landingLag": 0,
-   "normal.20.hit.0.damage": 3.513824939727783,
-   "normal.20.hit.0.growth": 48.25143051147461,
+   "normal.20.hit.0.damage": 2.529953956604004,
+   "normal.20.hit.0.growth": 34.741031646728516,
    "normal.20.hit.0.base": 12,
    "normal.20.hit.0.launchX": 0.8191519975662231,
    "normal.20.hit.0.launchZ": 0.5735759735107422,
-   "normal.20.hit.1.damage": 3.513824939727783,
-   "normal.20.hit.1.growth": 48.25143051147461,
+   "normal.20.hit.1.damage": 2.529953956604004,
+   "normal.20.hit.1.growth": 34.741031646728516,
    "normal.20.hit.1.base": 12,
    "normal.20.hit.1.launchX": 0.8191519975662231,
    "normal.20.hit.1.launchZ": 0.5735759735107422,
-   "normal.20.hit.2.damage": 3.513824939727783,
-   "normal.20.hit.2.growth": 48.25143051147461,
+   "normal.20.hit.2.damage": 2.529953956604004,
+   "normal.20.hit.2.growth": 34.741031646728516,
    "normal.20.hit.2.base": 12,
    "normal.20.hit.2.launchX": 0.8191519975662231,
    "normal.20.hit.2.launchZ": 0.5735759735107422,
@@ -28558,32 +28558,32 @@
    "normal.21.activeFrames": 3,
    "normal.21.endingFrames": 18,
    "normal.21.landingLag": 0,
-   "normal.21.hit.0.damage": 5.856375217437744,
-   "normal.21.hit.0.growth": 83.63581085205078,
+   "normal.21.hit.0.damage": 4.216590404510498,
+   "normal.21.hit.0.growth": 60.2177848815918,
    "normal.21.hit.0.base": 18,
    "normal.21.hit.0.launchX": 0.8191519975662231,
    "normal.21.hit.0.launchZ": 0.5735759735107422,
-   "normal.21.hit.1.damage": 5.856375217437744,
-   "normal.21.hit.1.growth": 83.63581085205078,
+   "normal.21.hit.1.damage": 4.216590404510498,
+   "normal.21.hit.1.growth": 60.2177848815918,
    "normal.21.hit.1.base": 18,
    "normal.21.hit.1.launchX": 0.8191519975662231,
    "normal.21.hit.1.launchZ": 0.5735759735107422,
-   "throw.3.effect.damage": 9.370200157165527,
+   "throw.3.effect.damage": 6.746544361114502,
    "throw.3.effect.growth": 52,
    "throw.3.effect.base": 67,
    "throw.3.effect.launchX": 0.766044020652771,
    "throw.3.effect.launchZ": 0.6427879929542542,
    "throw.3.contactFrame": 12,
    "throw.3.totalFrames": 33,
-   "throw.4.effect.damage": 10.541475296020508,
+   "throw.4.effect.damage": 7.58986234664917,
    "throw.4.effect.growth": 33.5,
    "throw.4.effect.base": 72,
    "throw.4.effect.launchX": -0.766044020652771,
    "throw.4.effect.launchZ": 0.6427879929542542,
    "throw.4.contactFrame": 16,
    "throw.4.totalFrames": 39,
-   "throw.5.effect.damage": 8.198925018310547,
-   "throw.5.effect.growth": 42.890159606933594,
+   "throw.5.effect.damage": 5.903226375579834,
+   "throw.5.effect.growth": 30.880916595458984,
    "throw.5.effect.base": 50,
    "throw.5.effect.launchX": 0,
    "throw.5.effect.launchZ": 1,
@@ -28600,79 +28600,79 @@
   "play": "{\"range\":{\"near\":40,\"far\":100},\"spacing\":[{\"move\":6,\"near\":60,\"far\":130},{\"move\":8,\"near\":30,\"far\":105},{\"move\":30,\"near\":60,\"far\":165},{\"move\":31,\"near\":60,\"far\":190},{\"move\":33,\"near\":180,\"far\":350}],\"approach\":[{\"via\":\"shoot\",\"moves\":[33],\"weight\":1},{\"via\":\"run\",\"moves\":[31],\"weight\":1},{\"via\":\"run\",\"moves\":[6,5,19],\"weight\":5},{\"via\":\"jump\",\"moves\":[12,13],\"weight\":3}],\"defense\":[\"shield\",\"roll\",\"jump\"],\"combos\":[{\"starter\":33,\"followUps\":[30]},{\"starter\":8,\"followUps\":[7,15]},{\"starter\":7,\"followUps\":[15,12]},{\"starter\":42,\"followUps\":[15]},{\"starter\":43,\"followUps\":[19,6]}],\"kills\":[{\"move\":4,\"fromPercent\":85},{\"move\":14,\"fromPercent\":100},{\"move\":2,\"fromPercent\":105}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"below\",\"far\"]}",
   "feel": {
    "normal.0.hit.0": {
-    "advantage": -9
-   },
-   "normal.0.hit.1": {
-    "advantage": -9
-   },
-   "normal.2.hit.0": {
-    "advantage": -25,
-    "killPercent": 100
-   },
-   "normal.3.hit.0": {
-    "advantage": -28,
-    "killPercent": 39
-   },
-   "normal.3.hit.1": {
-    "advantage": -27,
-    "killPercent": 39
-   },
-   "normal.3.hit.2": {
-    "advantage": -26,
-    "killPercent": 39
-   },
-   "normal.3.hit.3": {
-    "advantage": -25,
-    "killPercent": 39
-   },
-   "normal.4.hit.0": {
-    "advantage": -26,
-    "killPercent": 22
-   },
-   "normal.6.hit.0": {
-    "advantage": -17,
-    "killPercent": 121
-   },
-   "normal.6.hit.1": {
-    "advantage": -17,
-    "killPercent": 121
-   },
-   "normal.7.hit.0": {
-    "advantage": -15
-   },
-   "normal.7.hit.1": {
-    "advantage": -14
-   },
-   "normal.7.hit.2": {
-    "advantage": -13
-   },
-   "normal.7.hit.3": {
-    "advantage": -12
-   },
-   "normal.7.hit.4": {
-    "advantage": -11
-   },
-   "normal.7.hit.5": {
     "advantage": -10
    },
+   "normal.0.hit.1": {
+    "advantage": -10
+   },
+   "normal.2.hit.0": {
+    "advantage": -27,
+    "killPercent": 202
+   },
+   "normal.3.hit.0": {
+    "advantage": -31,
+    "killPercent": 101
+   },
+   "normal.3.hit.1": {
+    "advantage": -30,
+    "killPercent": 101
+   },
+   "normal.3.hit.2": {
+    "advantage": -29,
+    "killPercent": 101
+   },
+   "normal.3.hit.3": {
+    "advantage": -28,
+    "killPercent": 101
+   },
+   "normal.4.hit.0": {
+    "advantage": -29,
+    "killPercent": 72
+   },
+   "normal.6.hit.0": {
+    "advantage": -18,
+    "killPercent": 246
+   },
+   "normal.6.hit.1": {
+    "advantage": -18,
+    "killPercent": 246
+   },
+   "normal.7.hit.0": {
+    "advantage": -16
+   },
+   "normal.7.hit.1": {
+    "advantage": -15
+   },
+   "normal.7.hit.2": {
+    "advantage": -14
+   },
+   "normal.7.hit.3": {
+    "advantage": -13
+   },
+   "normal.7.hit.4": {
+    "advantage": -12
+   },
+   "normal.7.hit.5": {
+    "advantage": -11
+   },
    "normal.8.hit.0": {
-    "advantage": -17
+    "advantage": -18
    },
    "normal.9.hit.0": {
-    "advantage": -17,
-    "killPercent": 121
+    "advantage": -18,
+    "killPercent": 246
    },
    "normal.9.hit.1": {
-    "advantage": -17,
-    "killPercent": 121
+    "advantage": -18,
+    "killPercent": 246
    },
    "normal.10.hit.0": {
-    "advantage": -17,
-    "killPercent": 121
+    "advantage": -18,
+    "killPercent": 246
    },
    "normal.10.hit.1": {
-    "advantage": -17,
-    "killPercent": 121
+    "advantage": -18,
+    "killPercent": 246
    },
    "normal.11.hit.0": {
     "advantage": -27,
@@ -28682,73 +28682,61 @@
     "advantage": -4
    },
    "normal.12.hit.1": {
-    "advantage": -1,
-    "killPercent": 105
+    "advantage": -3,
+    "killPercent": 222
    },
    "normal.13.hit.0": {
-    "advantage": 3,
-    "killPercent": 34
+    "advantage": 0,
+    "killPercent": 94
    },
    "normal.13.hit.1": {
-    "advantage": -5,
-    "killPercent": 212
+    "advantage": -6
    },
    "normal.14.hit.0": {
-    "advantage": -5,
-    "killPercent": 58
+    "advantage": -7,
+    "killPercent": 124
    },
    "normal.15.hit.0": {
-    "advantage": 5,
-    "killPercent": 181
+    "advantage": 2
    },
    "normal.15.hit.1": {
-    "advantage": 5,
-    "killPercent": 181
+    "advantage": 2
    },
    "normal.15.hit.2": {
-    "advantage": 3,
-    "killPercent": 245
+    "advantage": 1
    },
    "normal.15.hit.3": {
-    "advantage": 3,
-    "killPercent": 245
+    "advantage": 1
    },
    "normal.15.hit.4": {
-    "advantage": 3,
-    "killPercent": 245
+    "advantage": 1
    },
    "normal.15.hit.5": {
-    "advantage": 3,
-    "killPercent": 245
+    "advantage": 1
    },
    "normal.15.hit.6": {
-    "advantage": 3,
-    "killPercent": 245
+    "advantage": 1
    },
    "normal.15.hit.7": {
-    "advantage": 3,
-    "killPercent": 245
+    "advantage": 1
    },
    "normal.16.hit.0": {
-    "advantage": -3,
-    "killPercent": 220
+    "advantage": -6
    },
    "normal.16.hit.0.grounded": {
-    "advantage": -3
+    "advantage": -6
    },
    "normal.16.hit.1": {
-    "advantage": -6,
-    "killPercent": 282
+    "advantage": -8
    },
    "normal.16.hit.1.grounded": {
-    "advantage": -6
+    "advantage": -8
    },
    "normal.16.hit.2": {
-    "advantage": -6,
-    "killPercent": 282
+    "advantage": -8
    },
    "normal.16.hit.2.grounded": {
-    "advantage": -6
+    "advantage": -8
    },
    "normal.17.hit.0": {
     "advantage": -18,
@@ -28759,109 +28747,93 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -24,
-    "killPercent": 127
+    "advantage": -25
    },
    "normal.19.hit.1": {
-    "advantage": -24,
-    "killPercent": 127
+    "advantage": -25
    },
    "normal.20.hit.0": {
-    "advantage": -11
+    "advantage": -12
    },
    "normal.20.hit.1": {
-    "advantage": -11
+    "advantage": -12
    },
    "normal.20.hit.2": {
-    "advantage": -10
+    "advantage": -11
    },
    "normal.21.hit.0": {
-    "advantage": -16,
-    "killPercent": 220
+    "advantage": -17
    },
    "normal.21.hit.1": {
-    "advantage": -16,
-    "killPercent": 220
+    "advantage": -17
    },
    "special.neutral.ground.regions.0": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.ground.regions.1": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.ground.regions.2": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.ground.regions.3": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.air.regions.0": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.air.regions.1": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.air.regions.2": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.neutral.air.regions.3": {
-    "advantage": -25,
-    "killPercent": 261
+    "advantage": -26
    },
    "special.side.ground.regions.0": {
-    "advantage": -34,
-    "killPercent": 288
+    "advantage": -35
    },
    "special.side.air.regions.0": {
-    "advantage": -34,
-    "killPercent": 288
+    "advantage": -35
    },
    "special.up.ground.regions.0": {
-    "advantage": -26,
-    "killPercent": 197
+    "advantage": -28
    },
    "special.up.ground.regions.1": {
-    "advantage": -26,
-    "killPercent": 197
+    "advantage": -28
    },
    "special.down.ground.followUps.0.special.projectiles.0": {
-    "advantage": -15
+    "advantage": -16
    },
    "special.down.ground.followUps.1.special.projectiles.0": {
-    "advantage": -14
-   },
-   "special.down.ground.followUps.2.special.projectiles.0": {
-    "advantage": -14
-   },
-   "special.down.ground.followUps.3.special.projectiles.0": {
-    "advantage": -13
-   },
-   "special.down.air.followUps.0.special.projectiles.0": {
     "advantage": -15
    },
-   "special.down.air.followUps.1.special.projectiles.0": {
+   "special.down.ground.followUps.2.special.projectiles.0": {
+    "advantage": -15
+   },
+   "special.down.ground.followUps.3.special.projectiles.0": {
     "advantage": -14
+   },
+   "special.down.air.followUps.0.special.projectiles.0": {
+    "advantage": -16
+   },
+   "special.down.air.followUps.1.special.projectiles.0": {
+    "advantage": -15
    },
    "special.down.air.followUps.2.special.projectiles.0": {
-    "advantage": -14
+    "advantage": -15
    },
    "special.down.air.followUps.3.special.projectiles.0": {
-    "advantage": -13
+    "advantage": -14
    },
    "throw.3": {
     "advantage": 0,
-    "killPercent": 130
+    "killPercent": 184
    },
    "throw.4": {
     "advantage": 0,
-    "killPercent": 182
+    "killPercent": 249
    },
    "throw.5": {
     "advantage": 0
@@ -31863,9 +31835,9 @@
    "authored.specials.neutral.ground.followUps.0.special.endFrame": 36,
    "authored.specials.neutral.ground.followUps.0.special.hurt.0.firstFrame": 1,
    "authored.specials.neutral.ground.followUps.0.special.hurt.0.lastFrame": 36,
-   "authored.specials.side.ground.endFrame": 43,
+   "authored.specials.side.ground.endFrame": 44,
    "authored.specials.side.ground.hurt.0.firstFrame": 4,
-   "authored.specials.side.ground.hurt.0.lastFrame": 33,
+   "authored.specials.side.ground.hurt.0.lastFrame": 34,
    "authored.specials.side.ground.projectiles.0.effect.damage": 0,
    "authored.specials.side.ground.projectiles.0.effect.growth": 76.04872131347656,
    "authored.specials.side.ground.projectiles.0.effect.base": 20,
@@ -31891,10 +31863,10 @@
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.base": 0,
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.launchX": 0.1736481785774231,
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.launchZ": 0.9848077297210693,
-   "authored.specials.side.air.endFrame": 43,
-   "authored.specials.side.air.landingLag": 29,
+   "authored.specials.side.air.endFrame": 44,
+   "authored.specials.side.air.landingLag": 30,
    "authored.specials.side.air.hurt.0.firstFrame": 4,
-   "authored.specials.side.air.hurt.0.lastFrame": 33,
+   "authored.specials.side.air.hurt.0.lastFrame": 34,
    "authored.specials.side.air.projectiles.0.effect.damage": 0,
    "authored.specials.side.air.projectiles.0.effect.growth": 76.04872131347656,
    "authored.specials.side.air.projectiles.0.effect.base": 20,
@@ -32361,35 +32333,35 @@
     "advantage": -27
    },
    "special.side.ground.projectiles.0.burstInto": {
-    "advantage": -37,
+    "advantage": -38,
     "killPercent": 234
    },
    "special.side.ground.projectiles.0.burstInto.expiresInto": {
-    "advantage": -41
+    "advantage": -42
    },
    "special.side.ground.heldOrb.erupts": {
-    "advantage": -37,
+    "advantage": -38,
     "killPercent": 234
    },
    "special.side.ground.heldOrb.erupts.expiresInto": {
-    "advantage": -41
+    "advantage": -42
    },
    "special.side.air.projectiles.0": {
     "advantage": -27
    },
    "special.side.air.projectiles.0.burstInto": {
-    "advantage": -37,
+    "advantage": -38,
     "killPercent": 234
    },
    "special.side.air.projectiles.0.burstInto.expiresInto": {
-    "advantage": -41
+    "advantage": -42
    },
    "special.side.air.heldOrb.erupts": {
-    "advantage": -37,
+    "advantage": -38,
     "killPercent": 234
    },
    "special.side.air.heldOrb.erupts.expiresInto": {
-    "advantage": -41
+    "advantage": -42
    },
    "special.up.ground.regions.0": {
     "advantage": -36
@@ -35723,8 +35695,8 @@
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 8,
    "authored.moves.normals.19.regions.0.lastFrame": 19,
-   "authored.moves.normals.19.regions.0.hit.effect.damage": 14.865119934082031,
-   "authored.moves.normals.19.regions.0.hit.effect.growth": 80.93789672851562,
+   "authored.moves.normals.19.regions.0.hit.effect.damage": 9.662327766418457,
+   "authored.moves.normals.19.regions.0.hit.effect.growth": 52.6096305847168,
    "authored.moves.normals.19.regions.0.hit.effect.base": 26,
    "authored.moves.normals.19.regions.0.hit.effect.launchX": 0.5735764503479004,
    "authored.moves.normals.19.regions.0.hit.effect.launchZ": 0.8191520571708679,
@@ -36042,8 +36014,8 @@
    "normal.19.activeFrames": 12,
    "normal.19.endingFrames": 21,
    "normal.19.landingLag": 0,
-   "normal.19.hit.0.damage": 14.865119934082031,
-   "normal.19.hit.0.growth": 80.93789672851562,
+   "normal.19.hit.0.damage": 9.662327766418457,
+   "normal.19.hit.0.growth": 52.6096305847168,
    "normal.19.hit.0.base": 26,
    "normal.19.hit.0.launchX": 0.5735764503479004,
    "normal.19.hit.0.launchZ": 0.8191520571708679,
@@ -36171,8 +36143,8 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -24,
-    "killPercent": 94
+    "advantage": -26,
+    "killPercent": 244
    },
    "normal.20.hit.0": {
     "advantage": -17,

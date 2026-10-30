@@ -181,6 +181,10 @@ icon, sounds and fire/cloud effects. Original staff, kick, stumble, paired
 throw and reaction clips are authored over that private stock input. No
 proprietary model or texture enters Git.
 
+## Field retune (#788, 30 October 2026)
+
+Balance run 41005739256 (b23aabef8a) put Chen at 93.3% in the field and his dash attack spam at 95% against Expert. His dash attack carried 16.8% of his damage and took 5,156 stocks; Breath of Fire 16.6%, side special 12.5%. A dash attack nerf alone moved him from 98% to 90% on a local sample, so the retune is across the kit: every damaging hit takes ×0.72 damage and ×0.72 knockback growth (`BALANCE_DAMAGE`, `BALANCE_GROWTH` in the kit's `moves.ts`; pummel, grab and the neutral air link keep their values), and the dash attack takes a further ×0.92 on both (`DASH_ATTACK_DAMAGE`, `DASH_ATTACK_GROWTH`), so its hit lands at 7.76% with growth 55.4 (first set to ×0.8, which the farm field read at 61%). A local 120-match sample over twelve opponents read his field at 95% before and 53% at ×0.81 with the same dash factor, his dash spam 96% before and 39%.
+
 ## Play-style profile
 
 Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Staff footwork and reads around heavy commitments.

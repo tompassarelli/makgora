@@ -6,8 +6,12 @@ import { hurtPart, type HurtPose } from "../../sim/hurtboxes";
 import type { HitEffect } from "../../sim/hitRegions";
 
 export const chenCapsule = (x1: number, z1: number, x2: number, z2: number, radius: number): StrikeCapsule => ({ x1, z1, x2, z2, radius });
+export const BALANCE_DAMAGE = f32(0.72);
+export const BALANCE_GROWTH = f32(0.72);
+export const DASH_ATTACK_DAMAGE = f32(0.92);
+export const DASH_ATTACK_GROWTH = f32(0.92);
 export const chenHit = (damage: number, growth: number, base: number, x: number, z: number, element: HitElement = HitElement.normal): Readonly<HitEffect> =>
-  ({ damage: growth === 0.0 ? damage : f32(damage * 1.25), growth, base, launchX: f32(x), launchZ: f32(z), electric: false, element });
+  ({ damage: growth === 0.0 ? damage : f32(f32(damage * 1.25) * BALANCE_DAMAGE), growth: f32(growth * BALANCE_GROWTH), base, launchX: f32(x), launchZ: f32(z), electric: false, element });
 const poke = (damage: number) => chenHit(damage, 83.63581085205078, 18.0, f32(0.819152), f32(0.573576));
 const tap = (damage: number) => chenHit(damage, 48.25143051147461, 12.0, f32(0.819152), f32(0.573576));
 const lift = (damage: number) => chenHit(damage, 88.99707794189453, 28.0, f32(0.173648), f32(0.984808));
@@ -20,7 +24,7 @@ const reach = (first: number, last: number, x: number, z: number): readonly Hurt
   [heroHurtPose(first, last, [body, hurtPart(x < 0 ? -12.0 : 12.0, 60.0, x, z, 11.0)])];
 const tilt = (height: number, length: number, tip: number) => heroMove(9, 3, 21, 0, [region(9, 11, 22.0, 58.0, 96.0, height, 12.0, poke(8.43317985534668)), region(9, 11, 96, height, length, tip, 12, poke(8.43317985534668))]);
 const exactHit = (damage: number, growth: number, base: number, x: number, z: number, element: HitElement = HitElement.normal): Readonly<HitEffect> =>
-  ({ damage, growth, base, launchX: f32(x), launchZ: f32(z), electric: element === HitElement.electric, element });
+  ({ damage: growth === 0.0 ? damage : f32(damage * BALANCE_DAMAGE), growth: f32(growth * BALANCE_GROWTH), base, launchX: f32(x), launchZ: f32(z), electric: element === HitElement.electric, element });
 export const NEUTRAL_AIR_SPIN = { first: 7, last: 9 } as const;
 export const NEUTRAL_AIR_SWEEP = { first: 15, last: 18 } as const;
 export const NEUTRAL_AIR_LINK: Readonly<HitEffect> = { ...exactHit(4.0, 0.0, 30.0, 0.0, 1.0), carry: true };
@@ -74,7 +78,7 @@ export const CHEN_MOVES: FighterMoves = {
     [AttackStyle.upTilt]: heroMove(UP_TILT_FIRST, UP_TILT_STAFF.length, 15, 0, UP_TILT_STAFF.map(([x1, z1, x2, z2], index) =>
       region(UP_TILT_FIRST + index, UP_TILT_FIRST + index, x1, z1, x2, z2, 13.0, UP_TILT_SCOOP))),
     [AttackStyle.downTilt]: heroMove(7, 3, 20, 0, [region(7, 9, 14.0, 22.0, 70.0, 16.0, 13.0, lift(5.622119903564453))]),
-    [AttackStyle.dashAttack]: heroMove(8, 12, 19, 0, [region(8, 19, 16.0, 42.0, 52.0, 68.0, 24.0, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152))), region(8, 19, 52, 68, 109, 106, 24, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152)))]),
+    [AttackStyle.dashAttack]: heroMove(8, 12, 19, 0, [region(8, 19, 16.0, 42.0, 52.0, 68.0, 24.0, chenHit(f32(9.370200157165527 * DASH_ATTACK_DAMAGE), f32(83.63581085205078 * DASH_ATTACK_GROWTH), 18.0, f32(0.573576), f32(0.819152))), region(8, 19, 52, 68, 109, 106, 24, chenHit(f32(9.370200157165527 * DASH_ATTACK_DAMAGE), f32(83.63581085205078 * DASH_ATTACK_GROWTH), 18.0, f32(0.573576), f32(0.819152)))]),
     [AttackStyle.forwardSmash]: heroMove(19, 4, 34, 0, [region(19, 22, 24.0, 66.0, 104.0, 48.0, 14.0, finish(16.86635971069336))]),
     [AttackStyle.upSmash]: heroMove(15, 4, 31, 0, [region(15, 18, 12.0, 62.0, 8.0, 122.0, 24.0, chenHit(13.5, 115.80342864990234, 30.0, 0.0, 1.0))]),
     [AttackStyle.downSmash]: heroMove(15, 6, 32, 0, [region(15, 15, 36, 63, 115, 48, 13.0, finish(13.118280410766602)), region(16, 16, 11, 41, 70, -9, 13.0, finish(13.118280410766602)), region(17, 17, -33, 44, -28, -31, 13.0, finish(13.118280410766602)), region(18, 20, -55, 78, -111, 21, 13.0, finish(13.118280410766602, true))]),
