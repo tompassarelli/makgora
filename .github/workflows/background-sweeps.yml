@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.ref == 'refs/heads/main' && 'background-sweeps-main' || format('background-sweeps-run-{0}', github.run_id) }}
+  group: ${{ github.ref == 'refs/heads/main' && (inputs.rebaseline || '') == '' && 'background-sweeps-main' || format('background-sweeps-run-{0}', github.run_id) }}
   cancel-in-progress: false
 
 env:
