@@ -7,9 +7,11 @@ import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
 import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, costumeFor } from "../lobby/lobbyState";
 import { costumeClipModel } from "../roster/costumes";
-import type { Character } from "../sim/codes";
+import { type Character, DuoRole } from "../sim/codes";
+import { duoRole } from "../sim/fighter";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { characterModelScale } from "../presentation/modelScale";
+import { PARTNER_COSTUME } from "../presentation/model/costume";
+import { bodyModelScale } from "../presentation/fighterScale";
 import { MatchCue, MENU_MUSIC, cueSound, interfaceSoundPaths, presentationSoundPaths, readyVoice, victoryAnimation, victoryMusic, warcryVoice } from "../presentation/matchAudio";
 import {
   type ResultsView, clearMatchTally, confirmedFrameCues, createCueObservation, createMatchTally, createMenuCues, createMenuObservation,
@@ -28,7 +30,7 @@ import { SoundBank, SoundKind } from "./soundBank";
 import { resultFighterPlacement } from "../presentation/arenaCamera";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
-import { defeatClip, resultPoseAt, type ResultClips } from "../presentation/resultPose";
+import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultClips } from "../presentation/resultPose";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -59,6 +61,7 @@ const createOrbSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady,
 interface VictoryPose {
   readonly character: Character;
   readonly costume: number;
+  readonly role: DuoRole;
   model: effect | undefined;
   modelPath: string | undefined;
   readonly clips: ResultClips;
@@ -87,6 +90,7 @@ export class MatchPresentation {
   private readonly sounds = new SoundBank();
   private readonly countdown: framehandle;
   private readonly poses: (VictoryPose | undefined)[] = [];
+  private readonly partners: (number | undefined)[] = [];
   private readonly resultSounds: sound[] = [];
   private resultEffectsMuted = false;
   private resultBurst = false;
@@ -246,10 +250,11 @@ export class MatchPresentation {
     if (this.resultView !== undefined) {
       this.resultFrames++;
       this.placeResultPoses();
-      for (const [index, row] of this.resultView.rows.entries()) {
+      const bodies = this.resultBodies(this.resultView);
+      for (const [index, row] of bodies.entries()) {
         if (!row.winner || this.resultFrames !== LEVEL_UP_FRAME) continue;
         this.resultBurst = true;
-        const placement = resultFighterPlacement(this.resultStage, index, this.resultView.rows.length);
+        const placement = resultFighterPlacement(this.resultStage, index, bodies.length);
         const burst = AddSpecialEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
         BlzSetSpecialEffectZ(burst, this.origin.z + placement.z);
         DestroyEffect(burst);
@@ -286,7 +291,10 @@ export class MatchPresentation {
     this.releasePoses();
     for (const slot of PARTICIPANT_SLOTS) {
       if (!isActive(world, slot)) continue;
-      const character = fighterAt(world, slot).character;
+      const fighter = fighterAt(world, slot);
+      const { character } = fighter;
+      const role = duoRole(fighter);
+      this.partners[slot] = role === DuoRole.leader ? world.linked[slot] : undefined;
       const winnerIndex = originalClipNamed(character, victoryAnimation(character));
       const idleIndex = originalClipNamed(character, "stand") ?? originalClipNamed(character, "stand -1")
         ?? originalClipNamed(character, "stand - 1") ?? originalClipNamed(character, "stand 1");
@@ -295,14 +303,19 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, costume: costumeFor(game, slot), model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) } };
+      this.poses[slot] = { character, costume: role === DuoRole.partner ? PARTNER_COSTUME : costumeFor(game, slot), role, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) } };
     }
+  }
+
+  private resultBodies(view: ResultsView): ResultBody[] {
+    return resultBodies(view.rows, slot => this.partners[slot]);
   }
 
   private placeResultPoses(): void {
     const view = this.resultView;
     if (view === undefined) return;
-    for (const [index, row] of view.rows.entries()) {
+    const bodies = this.resultBodies(view);
+    for (const [index, row] of bodies.entries()) {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
       const { clip, time } = resultPoseAt(pose.clips, row.winner, I2R(this.resultFrames) / 60.0);
@@ -321,10 +334,10 @@ export class MatchPresentation {
         BlzSetSpecialEffectTimeScale(pose.model, 0.0);
       }
       const model = pose.model;
-      const placement = resultFighterPlacement(this.resultStage, index, view.rows.length);
+      const placement = resultFighterPlacement(this.resultStage, index, bodies.length);
       BlzSetSpecialEffectPosition(model, this.origin.x + placement.x, this.origin.y, this.origin.z + placement.z);
       BlzSetSpecialEffectYaw(model, FACING_CAMERA);
-      BlzSetSpecialEffectScale(model, characterModelScale(pose.character));
+      BlzSetSpecialEffectScale(model, bodyModelScale(pose.character, pose.role));
       BlzSetSpecialEffectTime(model, time);
     }
   }
@@ -397,6 +410,7 @@ export class MatchPresentation {
         DestroyEffect(pose.model);
       }
       this.poses[slot] = undefined;
+      this.partners[slot] = undefined;
     }
   }
 

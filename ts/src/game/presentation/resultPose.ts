@@ -16,6 +16,11 @@ export interface ResultPose {
   readonly time: number;
 }
 
+export interface ResultBody {
+  readonly slot: number;
+  readonly winner: boolean;
+}
+
 const LAST_FRAME_SECONDS = 1.0 / 60.0;
 
 const modelTime = (clip: FighterOriginalClip, seconds: number): number => (clip.timeline === true ? clip.startSeconds : 0.0) + seconds;
@@ -44,4 +49,15 @@ export function resultPoseAt(clips: ResultClips, winning: boolean, seconds: numb
   const duration = clip.endSeconds - clip.startSeconds;
   if (holding || duration <= 0.0) return { clip, time: modelTime(clip, 0.0) };
   return { clip, time: modelTime(clip, clips.repeatVictory ? floorMod(seconds, duration) : seconds) };
+}
+
+/** The bodies a results screen poses, left to right: each result row's fighter followed by its duo partner, who shares the row's win or loss. */
+export function resultBodies(rows: readonly ResultBody[], partnerOf: (slot: number) => number | undefined): ResultBody[] {
+  const bodies: ResultBody[] = [];
+  for (const row of rows) {
+    bodies.push(row);
+    const partner = partnerOf(row.slot);
+    if (partner !== undefined) bodies.push({ slot: partner, winner: row.winner });
+  }
+  return bodies;
 }

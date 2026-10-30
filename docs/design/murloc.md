@@ -268,6 +268,14 @@ shared percent on 2026-10-30; its text also overlapped the name). The camera fra
 and a separated Grgl near a blast zone gets the off-screen indicator at
 partner size.
 
+At match end and on the results screen Grgl is posed beside Mrgl at his 0.9
+scale and plays the same sequence in step: the model's own `murloc victory`
+for a win, its death sequence for a loss (the pair shares the leader's result,
+Tom 2026-10-30). The results placement counts Grgl as a body, so the camera,
+the level-up burst and the spacing treat the pair as two fighters. Native
+checks `murlocs-win-right` and `murlocs-win-left` capture it with Mrgl in
+each starting facing.
+
 ## Home stage
 
 Tomb of Sargeras (stage 7, smashcraft:docs/design/home-stages.md): TFT's
