@@ -147,7 +147,7 @@ export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle, cStic
 }
 
 
-export function beginFighterAttack(world: Roster, slot: number, style: AttackStyle | undefined, mayCharge: boolean, cStick = false): void {
+export function beginFighterAttack(world: Roster, slot: number, style: AttackStyle | undefined, mayCharge: boolean, cStick = false, strongUp = false): void {
   if (style === undefined) return;
   const fighter = fighterAt(world, slot);
   const { grounded } = fighter.motion;
@@ -169,7 +169,7 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
     const pivot = action === AttackStyle.grab && fighter.ground.action === GroundAction.turnRun;
     const smashFromDash = grounded && fighter.ground.action === GroundAction.dash && isGroundSmash(action);
     const tiltFromMotion = grounded && cStick && groundOption(action) === GroundOption.tilt && !groundOptionOpen(fighter, GroundOption.tilt);
-    beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge);
+    beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge, strongUp);
     if (aerial) spendParasol(fighter);
     if (smashFromDash || tiltFromMotion) fighter.motion.vx = 0.0;
     fighter.attack.pivotGrab = pivot;

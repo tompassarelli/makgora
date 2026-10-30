@@ -312,6 +312,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
     bool(`commands[${slot}].mayCharge`, command.mayCharge);
     bool(`commands[${slot}].consumedMayCharge`, command.consumedMayCharge);
     if (command.cStick) bool(`commands[${slot}].cStick`, true);
+    if (command.strongUp) bool(`commands[${slot}].strongUp`, true);
   }
   int("match.phase", match.phase);
   bool("match.camera.initialized", match.camera.initialized);

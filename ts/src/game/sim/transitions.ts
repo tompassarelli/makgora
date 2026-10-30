@@ -99,6 +99,7 @@ export function cancelAttack(f: Fighter): void {
   attack.smashCharging = false;
   attack.smashChargeFrames = 0;
   attack.smashChargeAllowed = false;
+  attack.strongUp = false;
 }
 
 
@@ -299,6 +300,7 @@ export function beginDownState(f: Fighter, state: DownState, direction: number):
     attack.smashCharging = false;
     attack.smashChargeFrames = 0;
     attack.smashChargeAllowed = false;
+    attack.strongUp = false;
     attack.cooldown = DOWN_ATTACK_FRAMES;
   }
 }
@@ -333,7 +335,7 @@ export function cancelJumpSquat(f: Fighter): void {
 }
 
 
-export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: boolean): void {
+export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: boolean, strongUp = false): void {
   endDivineShield(attacker);
   const isDashGrab = style === DASH_GRAB_REQUEST;
   const resolvedStyle = isDashGrab ? AttackStyle.grab : style;
@@ -363,6 +365,7 @@ export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: bo
   attack.smashCharging = false;
   attack.smashChargeFrames = 0;
   attack.smashChargeAllowed = isSmashAttack(resolvedStyle) && mayCharge;
+  attack.strongUp = resolvedStyle === AttackStyle.upSmash && mayCharge && strongUp;
   attack.cooldown = attack.duration;
   if (attacker.tuning.moves?.normals[resolvedStyle]?.travelX !== undefined) attacker.motion.vx = 0.0;
 }

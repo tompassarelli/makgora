@@ -208,6 +208,7 @@ function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Reado
   attack.smashCharging = sourceAttack.smashCharging;
   attack.smashChargeFrames = sourceAttack.smashChargeFrames;
   attack.smashChargeAllowed = sourceAttack.smashChargeAllowed;
+  attack.strongUp = sourceAttack.strongUp;
   const hits = target.hits;
   const sourceHits = source.hits;
   let hit = 0;
@@ -744,6 +745,7 @@ function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   if (attack.smashCharging !== sourceAttack.smashCharging) return false;
   { const a = attack.smashChargeFrames, b = sourceAttack.smashChargeFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (attack.smashChargeAllowed !== sourceAttack.smashChargeAllowed) return false;
+  if (attack.strongUp !== sourceAttack.strongUp) return false;
   const hits = target.hits;
   const sourceHits = source.hits;
   let hit = 0;
@@ -1217,6 +1219,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.bool(prefix, "smashCharging", attack.smashCharging);
   sink.int(prefix, "smashChargeFrames", attack.smashChargeFrames);
   sink.bool(prefix, "smashChargeAllowed", attack.smashChargeAllowed);
+  if (attack.strongUp) sink.bool(prefix, "strongUp", true);
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
     sink.int(prefix, `projectileLife[${i}]`, projectile.life);
@@ -1622,6 +1625,7 @@ export function blastFighterFields(f: Fighter): void {
   attack.smashCharging = false;
   attack.smashChargeFrames = 0;
   attack.smashChargeAllowed = false;
+  attack.strongUp = false;
   status.frozenFrames = 0;
   status.freezeImmunityFrames = 0;
   status.out = true;
@@ -1780,6 +1784,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   attack.smashCharging = false;
   attack.smashChargeFrames = 0;
   attack.smashChargeAllowed = false;
+  attack.strongUp = false;
   visuals.manaDrained = 0;
   status.frozenFrames = 0;
   status.offscreenFrames = 0;

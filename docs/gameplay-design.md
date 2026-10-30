@@ -158,7 +158,10 @@ Where Smashcraft keeps its own rule, and why:
   direction is held or none (Tom, 2026-10-30; before, it was the smash for the
   held direction and the forward smash with none); in the air, Strong + A gives
   the aerial for that direction, the neutral air with none; holding Strong or A
-  charges it.
+  charges it, and a Strong + A up smash charges while either Strong or A is held,
+  firing when both are released or at the usual maximum charge (Tom, 2026-10-30;
+  before, it fired when A was released). The Strong + direction smashes charge
+  while Strong and their direction are held, as before.
   Strong is a pure modifier (#489, Tom's rule of 26 Oct 2026): alone it never
   attacks. Strong + a direction is the smash, with no A press (#548, Tom's
   rule of 26 Oct 2026, reversing #489's moving-state rule), in every ground

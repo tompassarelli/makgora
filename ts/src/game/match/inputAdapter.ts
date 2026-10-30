@@ -71,6 +71,11 @@ function strongHoldsSmash(fighter: Readonly<Fighter>, aimX: number, aimZ: number
   return style !== AttackStyle.forwardSmash || aimX === fighter.facing;
 }
 
+/** Whether the charging smash began as Strong + Attack, the up smash that held Strong alone keeps charging after Attack is released. */
+function strongUpHeld(fighter: Readonly<Fighter>): boolean {
+  return fighter.attack.strongUp && fighter.attack.style === AttackStyle.upSmash;
+}
+
 export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, frame: number, destination: Controls, attacks: AttackBuffer): void {
   const { held, pressed } = row;
   clearAttackBuffer(attacks);
@@ -161,7 +166,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.getupDirectionPressed = destination.getupDirection !== 0;
   destination.cStickUpFlick = (pressed & C_UP_BIT) !== 0;
   destination.cStickSideFlick = edgePair(pressed, Action.cLeft, Action.cRight);
-  destination.attackHeld = (held & ATTACK_BIT) !== 0 || ((held & STRONG_BIT) !== 0 && strongHoldsSmash(fighter, aimX, aimZ));
+  destination.attackHeld = (held & ATTACK_BIT) !== 0 || ((held & STRONG_BIT) !== 0 && (strongHoldsSmash(fighter, aimX, aimZ) || strongUpHeld(fighter)));
   destination.specialHeld = (held & SPECIAL_BIT) !== 0;
   const leftShield = (held & LEFT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerLeft);
   const rightShield = (held & RIGHT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerRight);
@@ -183,7 +188,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
     const strongUp = attackQueued && strong && fighter.motion.grounded && !shieldGrab;
     queueAttack(attacks, {
       style: strongUp ? AttackStyle.upSmash : normalAttackStyle(aimX, aimZ, destination.walking, strong, shieldGrab),
-      facing: sign(aimX), frame, mayCharge: true, cStick: false,
+      facing: sign(aimX), frame, mayCharge: true, cStick: false, strongUp,
     });
   }
   if ((pressed & GRAB_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.grab, facing: 0, frame, mayCharge: false, cStick: false });

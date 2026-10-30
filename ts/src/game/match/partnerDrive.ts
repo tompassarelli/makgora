@@ -20,7 +20,7 @@ export const RING_FRAMES = 8;
 export const WORDS_PER_FRAME = 4;
 
 const NEUTRAL = neutralControls();
-const queued: { -readonly [Field in keyof AttackCommand]: AttackCommand[Field] } = { style: 0, facing: 0, frame: 0, mayCharge: false, cStick: false };
+const queued: { -readonly [Field in keyof AttackCommand]: AttackCommand[Field] } = { style: 0, facing: 0, frame: 0, mayCharge: false, cStick: false, strongUp: false };
 
 const STICK_STEPS = 127;
 
@@ -61,6 +61,7 @@ const COMMAND_STYLE_SHIFT = 1;
 const COMMAND_FACING_SHIFT = 5;
 const COMMAND_MAY_CHARGE = 1 << 7;
 const COMMAND_C_STICK = 1 << 8;
+const COMMAND_STRONG_UP = 1 << 9;
 
 const field = (word: number, shift: number, mask: number): number => floorDiv(word, 1 << shift) & mask;
 const bit = (value: boolean, mask: number): number => value ? mask : 0;
@@ -113,7 +114,7 @@ export function packFrame(ring: number[], base: number, controls: Readonly<Contr
   ring[base + 2] = packDirections(controls);
   ring[base + 3] = command === undefined || command.frame !== frame ? 0
     : COMMAND_PRESENT | (command.style << COMMAND_STYLE_SHIFT) | (trit(command.facing) << COMMAND_FACING_SHIFT)
-      | bit(command.mayCharge, COMMAND_MAY_CHARGE) | bit(command.cStick, COMMAND_C_STICK);
+      | bit(command.mayCharge, COMMAND_MAY_CHARGE) | bit(command.cStick, COMMAND_C_STICK) | bit(command.strongUp === true, COMMAND_STRONG_UP);
 }
 
 function clearFrame(ring: number[], base: number): void {
@@ -195,6 +196,7 @@ export function unpackFrame(ring: readonly number[], base: number, controls: Con
   queued.frame = frame;
   queued.mayCharge = has(command, COMMAND_MAY_CHARGE);
   queued.cStick = has(command, COMMAND_C_STICK);
+  queued.strongUp = has(command, COMMAND_STRONG_UP);
   queueAttack(commands, queued);
 }
 

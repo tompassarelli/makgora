@@ -189,6 +189,7 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
     } else {
       attack.smashCharging = false;
       attack.smashChargeAllowed = false;
+      attack.strongUp = false;
     }
   } else if (f.motion.grounded && attack.style !== undefined && attack.smashChargeAllowed && isSmashAttack(attack.style)
     && input.attackHeld && attack.frame >= smashChargeFrame(attack.style, f.tuning.moves)) {
@@ -219,6 +220,7 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
       attack.smashCharging = false;
       attack.smashChargeFrames = 0;
       attack.smashChargeAllowed = false;
+      attack.strongUp = false;
     }
   }
   return false;

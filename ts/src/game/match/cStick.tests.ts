@@ -41,7 +41,6 @@ function keyboard(facing: 1 | -1): Keyboard {
 }
 
 const groundTilt = (key: number): AttackStyle => key === CU ? AttackStyle.upTilt : key === CD ? AttackStyle.downTilt : AttackStyle.forwardTilt;
-const groundSmash = (key: number): AttackStyle => key === U ? AttackStyle.upSmash : key === D ? AttackStyle.downSmash : AttackStyle.forwardSmash;
 
 test("a C-stick press on the ground is a forward, up or down tilt, turning the fighter first when it points behind, never a smash [k1 scenario]", () => {
   for (const facing of [1, -1] as const) {
@@ -68,12 +67,12 @@ test("a C-stick press in the air is the aerial in that direction, forward or bac
   }
 });
 
-test("Strong + A + each direction is still that direction's smash on the ground, standing and inside the dash-smash window [k1 scenario]", () => {
+test("Strong + A + each direction is the up smash on the ground, standing and inside the dash-smash window [k1 scenario]", () => {
   for (const facing of [1, -1] as const) {
     for (const key of [R, L, U, D]) {
       const { owner, press } = keyboard(facing);
       press(key | A | S);
-      assertEquals(owner.attack.style, groundSmash(key));
+      assertEquals(owner.attack.style, AttackStyle.upSmash);
     }
   }
   for (const key of [R | A | S, U | A | S]) {
@@ -81,7 +80,7 @@ test("Strong + A + each direction is still that direction's smash on the ground,
     press(R);
     assertTrue(owner.ground.action === GroundAction.dash && owner.ground.actionFrame + 1 <= DASH_SMASH_LAST_FRAME);
     press(key);
-    assertEquals(owner.attack.style, key === (U | A | S) ? AttackStyle.upSmash : AttackStyle.forwardSmash);
+    assertEquals(owner.attack.style, AttackStyle.upSmash);
   }
 });
 

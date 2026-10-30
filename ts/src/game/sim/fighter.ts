@@ -204,6 +204,7 @@ interface Attack {
   smashCharging: boolean;
   smashChargeFrames: number;
   smashChargeAllowed: boolean;
+  strongUp: boolean;
 }
 
 
@@ -749,6 +750,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       smashCharging: false,
       smashChargeFrames: 0,
       smashChargeAllowed: false,
+      strongUp: false,
     },
     hits: {
       entries: repeat(PARTICIPANT_CAPACITY, () => ({ attacker: undefined, attackSerial: 0, window: 0 })),

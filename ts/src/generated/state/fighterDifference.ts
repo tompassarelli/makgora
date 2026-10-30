@@ -119,6 +119,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.attack.smashCharging !== actual.attack.smashCharging) return "smashCharging";
   if (expected.attack.smashChargeFrames !== actual.attack.smashChargeFrames) return "smashChargeFrames";
   if (expected.attack.smashChargeAllowed !== actual.attack.smashChargeAllowed) return "smashChargeAllowed";
+  if (expected.attack.strongUp !== actual.attack.strongUp) return "strongUp";
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).life !== at(actual.projectiles, i).life) return `projectileLife[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).x !== at(actual.projectiles, i).x) return `projectileX[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).z !== at(actual.projectiles, i).z) return `projectileZ[${i}]`;

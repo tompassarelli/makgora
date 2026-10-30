@@ -18,6 +18,8 @@ export interface AttackCommand {
   readonly mayCharge: boolean;
 
   readonly cStick: boolean;
+
+  readonly strongUp?: boolean;
 }
 
 type StoredAttackCommand = { -readonly [Field in keyof AttackCommand]: AttackCommand[Field] };
@@ -45,10 +47,11 @@ interface AttackBufferCanonicalState {
   mayCharge: boolean;
   consumedMayCharge: boolean;
   cStick: boolean;
+  strongUp: boolean;
 }
 
 export function attackBuffer(graceFrames: number): AttackBuffer {
-  const request = (): StoredAttackCommand => ({ style: 0, facing: 0, frame: 0, mayCharge: false, cStick: false });
+  const request = (): StoredAttackCommand => ({ style: 0, facing: 0, frame: 0, mayCharge: false, cStick: false, strongUp: false });
   return { queued: request(), previous: request(), graceFrames: Math.max(0, graceFrames), pending: undefined, previousRequest: undefined, consumedFacing: 0, consumedMayCharge: false };
 }
 
@@ -58,6 +61,7 @@ function copyCommand(target: StoredAttackCommand, source: Readonly<AttackCommand
   target.frame = source.frame;
   target.mayCharge = source.mayCharge;
   target.cStick = source.cStick === true;
+  target.strongUp = source.strongUp === true;
 }
 
 function storeCommand(buffer: AttackBuffer, command: Readonly<AttackCommand>): void {
@@ -74,6 +78,7 @@ function clearCommand(command: StoredAttackCommand): void {
   command.frame = 0;
   command.mayCharge = false;
   command.cStick = false;
+  command.strongUp = false;
 }
 
 export function clearAttackBuffer(buffer: AttackBuffer): void {
@@ -96,6 +101,7 @@ export function attackBufferCanonicalState(buffer: Readonly<AttackBuffer>): Atta
     mayCharge: previous?.mayCharge ?? false,
     consumedMayCharge: buffer.consumedMayCharge,
     cStick: previous?.cStick ?? false,
+    strongUp: previous?.strongUp ?? false,
   };
 }
 
@@ -104,7 +110,7 @@ export function sameAttackBuffer(first: Readonly<AttackBuffer>, second: Readonly
   const b = attackBufferCanonicalState(second);
   return a.graceFrames === b.graceFrames && a.style === b.style && a.facing === b.facing
     && a.targetFrame === b.targetFrame && a.consumedFacing === b.consumedFacing
-    && a.mayCharge === b.mayCharge && a.consumedMayCharge === b.consumedMayCharge && a.cStick === b.cStick;
+    && a.mayCharge === b.mayCharge && a.consumedMayCharge === b.consumedMayCharge && a.cStick === b.cStick && a.strongUp === b.strongUp;
 }
 
 // Lua Object.assign skips undefined requests.

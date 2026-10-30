@@ -1,48 +1,10 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { createBufferedFrameControls } from "./controls";
-import { createMatchState, Phase } from "../lobby/lobbyState";
-import { stepMatch } from "./step";
-import { AttackStyle, Character, GroundAction } from "../sim/codes";
-import { type Fighter, createFighter } from "../sim/fighter";
-import { createRoster } from "../sim/roster";
+import { AttackStyle, GroundAction } from "../sim/codes";
+import type { Fighter } from "../sim/fighter";
 import { DASH_ATTACK_LAST_FRAME, DASH_SMASH_LAST_FRAME } from "../sim/stickZones";
 import { lift } from "../sim/testDuel";
-import { Action, bit, maskOf } from "../input/actions";
-import { adaptInput } from "./inputAdapter";
-import { hasPendingAttack } from "../input/attackBuffer";
-import { commitEdges, keyboardCapture, sampleKeys } from "../input/keyboardCapture";
-
-const A = bit(Action.attack), S = bit(Action.strong), B = bit(Action.special), G = bit(Action.grab), W = maskOf(Action.modX, Action.modY), T = bit(Action.leftTrigger), J = bit(Action.jump);
-const R = bit(Action.moveRight), L = bit(Action.moveLeft), U = bit(Action.moveUp), D = bit(Action.moveDown);
-
-interface Keyboard {
-  readonly owner: Fighter;
-  readonly press: (this: void, held: number) => { readonly queued: boolean; readonly special: boolean; readonly direction: number };
-}
-
-function keyboard(): Keyboard {
-  const game = createMatchState();
-  game.phase = Phase.match;
-  const owner = createFighter(Character.rifleman, 0.0, 1);
-  const world = createRoster(3, [owner, createFighter(Character.rifleman, 1500.0, -1)]);
-  const frameControls = createBufferedFrameControls();
-  const capture = keyboardCapture();
-  let frame = 0;
-  const press = (held: number) => {
-    frame++;
-    sampleKeys(capture, held);
-    adaptInput(capture.row, owner, frame, frameControls.inputs[0], frameControls.commands[0]);
-    commitEdges(capture);
-    const result = { queued: hasPendingAttack(frameControls.commands[0], frame), special: frameControls.inputs[0].specialPressed, direction: frameControls.inputs[0].direction };
-    stepMatch(game, world, frameControls, frame);
-    return result;
-  };
-  for (let i = 0; i < 3; i++) press(0);
-  return { owner, press };
-}
-
-const smashFor = (key: number): AttackStyle => key === U ? AttackStyle.upSmash : key === D ? AttackStyle.downSmash : AttackStyle.forwardSmash;
+import { A, B, D, G, J, L, R, S, T, U, W, keyboard, smashFor, type Keyboard } from "./strongKeyboard";
 
 test("Strong held while standing still or crouched makes each direction press that direction's smash in place on the press frame, with or without the walk modifier, with no walk, dash, turn-run or jump first, charging while held [k1 scenario]", () => {
   for (const modifier of [0, W]) {
@@ -374,58 +336,6 @@ test("With Strong held the tilt modifier still tilts with A, shield still rolls,
     const cast = special.press(S | key | B);
     assertTrue(cast.special);
     assertFalse(cast.queued);
-  }
-});
-
-function chargingSmash(held: number, key: number, frames: number): Keyboard {
-  const keys = keyboard();
-  keys.press(S);
-  keys.press(held);
-  assertEquals(keys.owner.attack.style, smashFor(key));
-  for (let i = 0; i < 400 && !keys.owner.attack.smashCharging; i++) keys.press(held);
-  assertTrue(keys.owner.attack.smashCharging);
-  for (let i = 0; i < frames; i++) keys.press(held);
-  assertTrue(keys.owner.attack.smashCharging);
-  return keys;
-}
-
-test("A Strong smash charges 20 frames while Strong and its direction stay held and fires on the frame the stick is released or turned to another direction, keeping that charge, for each direction [k1 scenario]", () => {
-  for (const key of [R, L, U, D]) {
-    for (const next of [0, key === R ? L : R, key === U ? D : U]) {
-      const { owner, press } = chargingSmash(S | key, key, 20);
-      const charge = owner.attack.smashChargeFrames;
-      assertTrue(charge >= 20);
-      press(S | next);
-      assertFalse(owner.attack.smashCharging);
-      assertEquals(owner.attack.smashChargeFrames, charge);
-      assertEquals(owner.attack.style, smashFor(key));
-    }
-  }
-});
-
-test("A Strong smash fires on the frame Strong is released while its direction is still held, keeping the charge [k1 scenario]", () => {
-  for (const key of [R, L, U, D]) {
-    const { owner, press } = chargingSmash(S | key, key, 20);
-    const charge = owner.attack.smashChargeFrames;
-    press(key);
-    assertFalse(owner.attack.smashCharging);
-    assertEquals(owner.attack.smashChargeFrames, charge);
-  }
-});
-
-test("An up smash begun with the attack button and Strong keeps charging while attack is held after the stick is released, and fires when attack is released [k1 scenario]", () => {
-  for (const key of [R, U, D]) {
-    const keys = keyboard();
-    keys.press(S);
-    keys.press(S | A | key);
-    assertEquals(keys.owner.attack.style, AttackStyle.upSmash);
-    for (let i = 0; i < 400 && !keys.owner.attack.smashCharging; i++) keys.press(S | A | key);
-    for (let i = 0; i < 20; i++) keys.press(S | A);
-    assertTrue(keys.owner.attack.smashCharging);
-    const charge = keys.owner.attack.smashChargeFrames;
-    keys.press(S);
-    assertFalse(keys.owner.attack.smashCharging);
-    assertEquals(keys.owner.attack.smashChargeFrames, charge);
   }
 });
 

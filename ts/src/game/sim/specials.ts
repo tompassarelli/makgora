@@ -134,6 +134,7 @@ function startSpecialAction(owner: Fighter, action: SpecialAction, duration: num
   attack.smashCharging = false;
   attack.smashChargeFrames = 0;
   attack.smashChargeAllowed = false;
+  attack.strongUp = false;
   owner.shield.raised = false;
   owner.shield.heldFrames = 0;
   attack.cooldown = max(attack.cooldown, duration);
