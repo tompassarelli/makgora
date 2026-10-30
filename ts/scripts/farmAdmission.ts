@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Schedule, Schema } from "effect";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
 import { NO_FREE_SLOTS } from "./farmWait";
 import { runStepOutputs } from "./stepOutputs";
@@ -40,7 +40,13 @@ export const GATE_RESERVE = 12;
 
 export const reserveFor = (jobs: readonly Job[]): number => Math.max(reserveP90(jobs), GATE_RESERVE);
 
-export const readJobs = (repo: string, id: number) => pages(Jobs, `repos/${repo}/actions/runs/${id}/jobs?per_page=100`).pipe(Effect.map((all) => all.flatMap((page) => page.jobs)));
+const SERVER_ERROR = /HTTP 5\d\d|stream error/i;
+
+// GitHub answers 502 or cancels the stream on one job listing in a long sample; a retry reads it, and one failed listing otherwise fails the whole plan step.
+export const readJobs = (repo: string, id: number) => pages(Jobs, `repos/${repo}/actions/runs/${id}/jobs?per_page=100`).pipe(
+  Effect.map((all) => all.flatMap((page) => page.jobs)),
+  Effect.retry({ while: (failure) => SERVER_ERROR.test(failure.message), schedule: Schedule.spaced("5 seconds"), times: 4 }),
+);
 
 export const runnerAdmission = (repo: string, excludeRun: number) => Effect.gen(function*() {
   const owner = repo.split("/")[0] ?? "";
