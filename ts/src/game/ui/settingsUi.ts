@@ -143,7 +143,7 @@ export class SettingsPanel {
       placeTopLeft(hotspot, x, y);
       BlzFrameSetSize(hotspot, width, height);
       BlzFrameSetLevel(hotspot, level + 2);
-      this.clicks.add(hotspot, target, undefined, "native");
+      this.clicks.add(hotspot, target, undefined, "native", { x, y, width, height });
       return { art, label, hotspot };
     };
     BlzFrameSetText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
@@ -182,6 +182,10 @@ export class SettingsPanel {
     BlzFrameSetVisible(root, false);
   }
 
+  over(x: number, y: number): boolean {
+    return this.open && this.clicks.over(x, y);
+  }
+
   private clearCross(root: framehandle, key: number, x: number, y: number): readonly framehandle[] {
     const cross = createText(`MeleeSettingsKeyClear${I2S(key)}${I2S(this.participantId)}`, root, this.participantId);
     BlzFrameSetSize(cross, CLEAR_SIZE, CLEAR_SIZE);
@@ -195,7 +199,7 @@ export class SettingsPanel {
     placeTopLeft(hit, x, y);
     BlzFrameSetSize(hit, CLEAR_SIZE, CLEAR_SIZE);
     BlzFrameSetLevel(hit, 35);
-    this.clicks.add(hit, { kind: "clear", key }, undefined, "native");
+    this.clicks.add(hit, { kind: "clear", key }, undefined, "native", { x, y, width: CLEAR_SIZE, height: CLEAR_SIZE });
     return [cross, hit];
   }
 

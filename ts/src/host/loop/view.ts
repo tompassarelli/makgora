@@ -616,7 +616,7 @@ export function renderUi(s: ShellState): void {
       ui.meterBars[slot].hud.update(false, 0, false, 0);
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
-    ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), warcraftMenuOpen(s), s.sessionWins.counts, clockSeconds(s.trace));
+    ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), warcraftMenuOpen(s), s.sessionWins.counts, clockSeconds(s.trace), (x, y) => ui.settings[slot].over(x, y) || ui.pause.over(x, y));
     ui.settings[slot].update();
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));

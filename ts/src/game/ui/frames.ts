@@ -94,10 +94,18 @@ export function highlightText(frame: framehandle, highlighted: boolean): void {
   BlzFrameSetText(frame, colored);
 }
 
+export interface ClickBox {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 interface Button<T> {
   readonly id: number;
   readonly frame: framehandle;
   readonly target: T;
+  readonly box: ClickBox | undefined;
 }
 
 
@@ -139,7 +147,7 @@ export class ButtonClicks<T> {
     });
   }
 
-  add(frame: framehandle, target: T, text?: string, hover: "events" | "native" = "events"): framehandle {
+  add(frame: framehandle, target: T, text?: string, hover: "events" | "native" = "events", box?: ClickBox): framehandle {
     if (text !== undefined) setFrameText(frame, text);
     BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_CONTROL_CLICK);
     // Warcraft dialog-button hover events displace the cursor and loop; use the built-in hover on those frames.
@@ -147,8 +155,19 @@ export class ButtonClicks<T> {
       BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_ENTER);
       BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_LEAVE);
     }
-    this.buttons.push({ id: GetHandleId(frame), frame, target });
+    this.buttons.push({ id: GetHandleId(frame), frame, target, box });
     return frame;
+  }
+
+  // Whether a shown button registered with a box lies under the pointer, for the menu hand to open over it; every button is asked about its visibility whatever the pointer, so clients with different mice make the same native calls.
+  over(x: number, y: number): boolean {
+    let over = false;
+    for (const { frame, box } of this.buttons) {
+      if (box === undefined) continue;
+      const shown = BlzFrameIsVisible(frame);
+      if (shown && x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height)) over = true;
+    }
+    return over;
   }
 
   refreshHover(): void {

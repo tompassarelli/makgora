@@ -1,4 +1,5 @@
 import { SELECT_LEVELS } from "./selectLevels";
+import { slotColor } from "./slotColors";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
@@ -151,6 +152,8 @@ export class SelectionPanel {
   private readonly hands: Slots<HandFrames>;
   private readonly handChannel: SelectionHands;
   private localHand: HandPose = HIDDEN_HAND;
+  private localPanel = false;
+  private controlUnder: (x: number, y: number) => boolean = () => false;
   private now = 0.0;
   private cursorEnabled: boolean | undefined;
   private menuCursorAllowed = true;
@@ -325,7 +328,7 @@ export class SelectionPanel {
   }
 
   destroy(): void {
-    if (this.ownsLocalClient()) this.showHand(false, undefined, 0.0, 0.0);
+    if (this.ownsLocalClient()) this.showHand(false, undefined, 0.0, 0.0, false);
     this.clicks.destroy();
     for (const trigger of this.syncTriggers) DestroyTrigger(trigger);
     for (const frame of this.movesFrames) BlzDestroyFrame(frame);
@@ -525,8 +528,12 @@ export class SelectionPanel {
     if (this.ownsLocalClient()) this.handChannel.receive(sender, data, this.now);
   }
 
-  private showHand(drawn: boolean, carried: number | undefined, x: number, y: number): void {
-    const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, this.drag.hover, this.game?.phase === Phase.stageMenu, this.warcraftMenuOpen);
+  // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
+  private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean): void {
+    const drawn = pointed && this.menuCursorAllowed;
+    const hover = this.drag.hover ?? (drawn && this.controlUnder(x, y) ? 0 : undefined);
+    const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
+    this.localPanel = panel;
     this.localHand = hand === undefined ? HIDDEN_HAND : { state: hand, chip: hand === "pinch" ? carried : undefined, x, y };
     this.presentHands();
     BlzFrameSetVisible(this.bullseye, bullseye);
@@ -553,13 +560,14 @@ export class SelectionPanel {
   private presentHands(): void {
     const { game, handChannel, localHand, now } = this;
     const choosing = this.choosing() !== undefined;
-    const data = handChannel.send(choosing ? localHand : HIDDEN_HAND, now);
+    const data = handChannel.send(choosing && !this.localPanel ? localHand : HIDDEN_HAND, now);
     if (data !== undefined) BlzSendSyncData("select-hand", data);
     const drawn = game === undefined ? [] : handChannel.drawn(game, localHand, now);
     for (const slot of PARTICIPANT_SLOTS) {
       const frames = this.hands[slot];
-      const hand = drawn.find(candidate => candidate.slot === slot);
-      presentHand(frames, hand !== undefined && (choosing || slot === this.participantId) ? hand : undefined, this.roster.grid);
+      const remote = drawn.find(candidate => candidate.slot === slot);
+      const local = slot === this.participantId && localHand.state !== undefined ? { slot, pose: { ...localHand, state: localHand.state }, colour: slotColor(slot).rgb } : undefined;
+      presentHand(frames, slot === this.participantId ? local : choosing ? remote : undefined, this.roster.grid);
     }
   }
 
@@ -610,7 +618,8 @@ export class SelectionPanel {
     presentDelayControls(this.delay, net.hostControl);
   }
 
-  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, warcraftMenuOpen: boolean, sessionWins: Readonly<Slots<number>>, now: number): void {
+  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, warcraftMenuOpen: boolean, sessionWins: Readonly<Slots<number>>, now: number, controlUnder: (x: number, y: number) => boolean): void {
+    this.controlUnder = controlUnder;
     this.game = game;
     this.now = now;
     this.settingsOpen = loading || settingsOpen;
@@ -633,7 +642,7 @@ export class SelectionPanel {
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
     if (pointed) this.dragChips(game, x, y);
     const carried = this.showCards(game, sessionWins, x, y);
-    this.showHand(pointed && !settingsOpen && !this.tutorialOpen, carried, x, y);
+    this.showHand(pointed, this.tutorialOpen ? undefined : carried, x, y, this.tutorialOpen);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);
@@ -665,18 +674,18 @@ export class SelectionPanel {
     const { drag } = this;
     if (!visible) {
       clearSelectionDrag(drag);
-      this.showHand(game.phase === Phase.stageMenu && pointed && !this.settingsOpen, undefined, x, y);
+      this.showHand(pointed, undefined, x, y, this.settingsOpen);
       return true;
     }
     if (cpuOpen && this.cpuSlot !== undefined) {
-      this.showHand(false, undefined, 0.0, 0.0);
+      this.showHand(pointed, undefined, x, y, true);
       BlzFrameSetVisible(this.root, false);
       clearSelectionDrag(drag);
       showCpuSettings(this.cpu, game, this.participantId, this.cpuSlot, this.cpuFocus, this.menuPrompt.text, CPU_DEFAULTS);
       return true;
     }
     if (this.movesOpen) {
-      this.showHand(false, undefined, 0.0, 0.0);
+      this.showHand(pointed, undefined, x, y, true);
       BlzFrameSetVisible(this.root, false);
       clearSelectionDrag(drag);
       this.showMoves();

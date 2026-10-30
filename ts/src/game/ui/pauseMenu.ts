@@ -2,8 +2,14 @@ import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
 import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText, styleMenuPanel } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
+import { boxContains } from "./selectionLayout";
 import { Action } from "../input/actions";
 import { type KeyBindings, keyNames } from "../input/keyBindings";
+
+const ROW_LEFT = f32(f32(0.092) + MENU_STYLE.bodyInset);
+const ROW_WIDTH = f32(f32(0.616) - 2 * MENU_STYLE.bodyInset);
+const ROW_HEIGHT = f32(0.036);
+const rowTop = (row: number, title: boolean): number => title ? f32(0.323) : f32(f32(0.359) - f32(row * ROW_HEIGHT));
 
 export class PauseMenu {
   private readonly root: framehandle;
@@ -16,6 +22,7 @@ export class PauseMenu {
   private readonly buttons: framehandle[] = [];
   private readonly clicks: ButtonClicks<number>;
   private hovered: number | undefined;
+  private shown = false;
   private title = false;
   private choice = 0;
 
@@ -26,8 +33,8 @@ export class PauseMenu {
     BlzFrameSetSize(this.root, f32(0.64), f32(0.53));
     BlzFrameSetLevel(this.root, 20);
     const backing = styleMenuPanel(this.root, "SmashcraftPause");
-    const rowLeft = f32(f32(0.092) + MENU_STYLE.bodyInset);
-    const rowWidth = f32(f32(0.616) - 2 * MENU_STYLE.bodyInset);
+    const rowLeft = ROW_LEFT;
+    const rowWidth = ROW_WIDTH;
     const label = (name: string, y: number, height: number, size: number, parent = this.root) => {
       const frame = createText(name, parent, 1801);
       placeTopLeft(frame, rowLeft, y);
@@ -39,7 +46,7 @@ export class PauseMenu {
     };
     this.heading = label("SmashcraftPauseHeading", f32(0.42), f32(0.04), MENU_STYLE.titleSize);
     for (let row = 0; row < 3; row++) {
-      const y = f32(f32(0.359) - f32(row * f32(0.036)));
+      const y = rowTop(row, false);
       const button = BlzCreateFrameByType("BUTTON", `SmashcraftPauseOption${I2S(row)}`, this.root, "", 1801);
       placeTopLeft(button, rowLeft, y);
       BlzFrameSetSize(button, rowWidth, f32(0.036));
@@ -54,6 +61,14 @@ export class PauseMenu {
     BlzFrameSetTextAlignment(this.controls, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
     BlzFrameSetPoint(this.controls, FRAMEPOINT_TOPLEFT, backing, FRAMEPOINT_TOPLEFT, f32(MENU_STYLE.bodyInset / controlsScale), f32(f32(-0.344) / controlsScale));
     BlzFrameSetVisible(this.root, false);
+  }
+
+  over(x: number, y: number): boolean {
+    if (!this.shown) return false;
+    for (let row = 0; row < (this.title ? 1 : this.buttons.length); row++) {
+      if (boxContains({ x: ROW_LEFT, y: rowTop(row, this.title), width: ROW_WIDTH, height: ROW_HEIGHT }, x, y)) return true;
+    }
+    return false;
   }
 
   bindActions(select: (choice: number, clicker: player) => void): void {
@@ -74,6 +89,7 @@ export class PauseMenu {
 
   update(paused: boolean, choice: number, title: boolean, bindings: Readonly<KeyBindings>, training = false, hints = false): void {
     BlzFrameSetVisible(this.root, paused || title);
+    this.shown = paused || title;
     if (!paused && !title) return;
     BlzFrameSetText(this.heading, `${MENU_STYLE.gold}${title ? "Smashcraft" : "Paused"}|r`);
     const titleChanged = this.title !== title;
@@ -88,9 +104,9 @@ export class PauseMenu {
       BlzFrameSetVisible(button, !title || row === 0);
       if (titleChanged) BlzFrameSetEnable(button, !title || row === 0);
       BlzFrameSetVisible(option, !title || row === 0);
-      const y = title ? f32(0.323) : f32(f32(0.359) - f32(row * f32(0.036)));
-      placeTopLeft(button, f32(f32(0.092) + MENU_STYLE.bodyInset), y);
-      placeTopLeft(option, f32(f32(0.092) + MENU_STYLE.bodyInset), y);
+      const y = rowTop(row, title);
+      placeTopLeft(button, ROW_LEFT, y);
+      placeTopLeft(option, ROW_LEFT, y);
     }
     BlzFrameSetText(this.help, `${MENU_STYLE.text}${title ? "A / Start / Click: Play" : "Stick / arrows: choose · A: select · Click: select\nStart / Y: resume · Escape: character select"}|r`);
     BlzFrameSetVisible(this.controlsTitle, !title);
