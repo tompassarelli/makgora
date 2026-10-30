@@ -11,6 +11,7 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS } from "./headless";
 import { heldKeys } from "./standalone";
+import { DONE_X, DONE_Y, controlsGreeted } from "./startControls";
 import { DEFAULT_PRESET, actionFor, presetBindings } from "../../src/game/input/keyBindings";
 
 const SETUP_FRAME = 30;
@@ -97,6 +98,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
     let held = new Set<number>();
     let lastPhase = -1;
+    let controlsClosed = false;
     const net = netcodeStats();
     const presses = pressStats(slot);
     let tick = 0;
@@ -120,6 +122,10 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
             for (const command of chat) applyDeveloperCommand(shell(), command.startsWith("-dev fighter ") && Number(command.split(" ")[2]) <= 2 ? Number(command.split(" ")[2]) - 1 : 0, command);
           });
           console.error(`net: fighter selection with ${humans} players at frame ${lockstep.frame}`);
+        }
+        if (!controlsClosed && lockstep.frame > SETUP_FRAME && controlsGreeted(client)) {
+          if (!lockstep.click(slot, DONE_X, DONE_Y)) throw new Error(`net: slot ${slot} has no Done button under the pointer`);
+          controlsClosed = true;
         }
         if (lockstep.frame >= SETUP_FRAME) {
           const next = heldKeys(scripted === undefined ? latest : scripted(lockstep.frame - SETUP_FRAME + 1));
@@ -246,7 +252,11 @@ function pressStats(slot: number) {
       delay = rollback.delay;
       for (let frame = scanned + 1; frame <= schedule.nextSpeculative + delay; frame++) {
         const sample = pendingRow(schedule, epoch, frame);
-        if (sample === undefined) break;
+        if (sample === undefined) {
+          if (frame >= schedule.nextSpeculative) break;
+          scanned = frame;
+          continue;
+        }
         scanned = frame;
         if (sample.pressed === 0) continue;
         const pressTicks: number[] = [];
