@@ -150,6 +150,94 @@ def stomp():
     print('STOMP_KEYS', keys_path, frames + 1, 'frames', flush=True)
 
 
+def splits():
+    rest()
+    trunk = body()
+    pelvis = joint('pelvis').head.copy()
+    hips = {s: joint(f'hip.{s}').head.copy() for s in 'LR'}
+    floor = min(joint(f'ankle.{s}').head.z for s in 'LR')
+    ankles = {s: joint(f'ankle.{s}').head.copy() for s in 'LR'}
+    shoulders = {s: joint(f'shoulder.{s}').head.copy() for s in 'LR'}
+    leg = {s: (joint(f'knee.{s}').head - hips[s]).length + (joint(f'ankle.{s}').head - joint(f'knee.{s}').head).length for s in 'LR'}
+    arm = {s: (joint(f'elbow.{s}').head - shoulders[s]).length + (joint(f'wrist.{s}').head - joint(f'elbow.{s}').head).length for s in 'LR'}
+    sit = OWN_SPLITS.get('sit', 6)
+    crouch, hold, rise = OWN_SPLITS.get('crouch', 0.3), OWN_SPLITS.get('hold', 16), OWN_SPLITS.get('rise', 36)
+
+    def eased(t):
+        c = max(0.0, min(1.0, t))
+        return c * c * (3 - 2 * c)
+
+    def depth(frame):
+        if frame <= 2:
+            return crouch * eased(frame / 2)
+        if frame <= contact:
+            return crouch + (1 - crouch) * eased((frame - 2) / max(1, contact - 2))
+        if frame <= hold:
+            return 1.0
+        return 1 - eased((frame - hold) / max(1, rise - hold))
+
+    knees = {s: (joint(f'knee.{s}').head - (hips[s] + ankles[s]) / 2).normalized() for s in 'LR'}
+    elbows = {s: (joint(f'elbow.{s}').head - (shoulders[s] + joint(f'wrist.{s}').head) / 2).normalized() for s in 'LR'}
+
+    def pose(frame, lifts=None):
+        rest()
+        w = depth(frame)
+        if w == 0:
+            return {}
+        drop = (pelvis.z - floor - sit) * w
+        trunk.location += Vector((0, 0, -drop))
+        update()
+        lean = OWN_SPLITS.get('lean', 8) * w
+        turn(joint('chest'), Quaternion(PITCH, radians(lean)))
+        turn(joint('head'), Quaternion(PITCH, radians(-lean * 0.6)))
+        front = 'R' if ankles['R'].x >= ankles['L'].x else 'L'
+        for s, sign in ((front, 1), ('L' if front == 'R' else 'R', -1)):
+            hip = joint(f'hip.{s}').head
+            target = Vector((hip.x + sign * leg[s] * 0.97, hips[s].y, floor + OWN_SPLITS.get('ankle', 0)))
+            goal = ankles[s].lerp(target, w)
+            reach(s, goal, knees[s].lerp(Vector((0, 0, 1)), w))
+            turn(joint(f'ankle.{s}'), Quaternion(PITCH, radians(OWN_SPLITS.get('toe', 80) * sign * w)))
+            shoulder = joint(f'shoulder.{s}').head
+            out = Vector((shoulder.x + sign * arm[s] * OWN_SPLITS.get('arm', 0.9), shoulders[s].y, shoulder.z + OWN_SPLITS.get('armUp', 14)))
+            chain(joint(f'shoulder.{s}'), joint(f'elbow.{s}'), joint(f'wrist.{s}'), joint(f'wrist.{s}').head.lerp(out, w), elbows[s].lerp(Vector((0, 0, -1)), w))
+        found = {}
+        for node, chain_ in CLEAR:
+            for turned in chain_:
+                key = f'{node}/{turned}'
+                if lifts is not None:
+                    turn(bones[turned], Quaternion(PITCH, radians(lifts.get(key, 0))))
+                    continue
+                cleared, found[key] = lift(bones[node], bones[turned], drop, OWN_SPLITS.get('margin', MARGIN))
+                if frame == contact:
+                    print(f'SPLITS lift {key} cleared {cleared} deg {found[key]} low {lowest(bones[node]) - floor:.1f} rest {REST_LOW[node] - floor:.1f}', flush=True)
+                if cleared:
+                    break
+        return found
+
+    out = {'frames': frames, 'nodes': [{'rotation': [], 'translation': []} for _ in created]}
+    previous = {}
+    searched = [pose(frame) for frame in range(frames + 1)]
+    for frame in range(frames + 1):
+        pose(frame, searched[frame])
+        for name, entry in zip(created, out['nodes']):
+            q = bones[name].rotation_quaternion.normalized()
+            if name in previous and previous[name].dot(q) < 0:
+                q.negate()
+            previous[name] = q
+            entry['rotation'].append([q.x, q.y, q.z, q.w])
+            entry['translation'].append(list(bones[name].location))
+        if frame == contact:
+            for b in bones:
+                if b.parent is None or all(c is not b for c in []):
+                    own = [(b.matrix @ (Vector(q) - Vector(nodes[b.name]['pivot']))).z for q in POINTS.get(b.name, [])]
+                    if own and min(own) < floor - 1:
+                        print(f'SPLITS sunk {b.name} {min(own) - floor:.1f} parent {b.parent.name if b.parent else None} head ({b.head.x - pelvis.x:.0f}, {b.head.y - pelvis.y:.0f}, {b.head.z - floor:.0f}) joints {[k for k, v in joints.items() if v == b.name]}', flush=True)
+        r, l, h = joint('ankle.R').head, joint('ankle.L').head, joint('pelvis').head
+        print(f'SPLITS frame {frame}: pelvis z {h.z - floor:.1f} ankle.R ({r.x - h.x:.1f}, {r.z - floor:.1f}) ankle.L ({l.x - h.x:.1f}, {l.z - floor:.1f})', flush=True)
+    open(keys_path, 'w').write(json.dumps(out))
+    print('SPLITS_KEYS', keys_path, frames + 1, 'frames', flush=True)
+
+
 if '--stomp' in sys.argv:
     stomp()
     sys.exit(0)
@@ -203,8 +291,8 @@ def lowest(b):
     return min(own + [lowest(c) for c in b.children], default=b.head.z)
 
 
-def lift(node, turned, drop):
-    start, floor = turned.matrix.copy(), REST_LOW[node.name] + MARGIN * min(1, drop / MARGIN_DROP)
+def lift(node, turned, drop, margin=None):
+    start, floor = turned.matrix.copy(), REST_LOW[node.name] + (MARGIN if margin is None else margin) * min(1, drop / MARGIN_DROP)
     tried = []
     sides = [SIDES[node.name]] if node.name in SIDES else [1, -1]
     for degrees in sorted((side * step for side in sides for step in range(91)), key=abs):
@@ -247,7 +335,14 @@ SETTLE = 3
 SIDES = dict(OWN.get('sides', {}))
 POINTS = spec['points']
 rest()
-REST_LOW = {node: lowest(bones[node]) for node, _ in OWN.get('clear', [])}
+OWN_SPLITS = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}-splits.json')).read()) if '--splits' in sys.argv else {}
+CLEAR = OWN.get('clear', []) + OWN_SPLITS.get('clear', [])
+REST_LOW = {node: lowest(bones[node]) for node, _ in CLEAR}
+
+if '--splits' in sys.argv:
+    splits()
+    sys.exit(0)
+
 
 def blend(a, b, t):
     out = {}
