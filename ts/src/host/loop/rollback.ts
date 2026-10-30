@@ -317,7 +317,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const correction = reconciled === "unchanged" ? 0 : reconciled.replayedFrom;
   if (reconciled !== "unchanged") {
     const depth = speculative.runtime.simulationFrame - reconciled.replayedFrom + 1;
-    noteDepth(rollback.net, depth);
+    noteDepth(rollback.net, depth, reconciled.replayedFrom);
     if (trace.active) {
       trace.window.corrections++;
       trace.window.replayedFrames += depth;

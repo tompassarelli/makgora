@@ -57,6 +57,9 @@ export interface NetDelay {
   echoMax: number;
   corrections: number;
   replayed: number;
+  rollbacks: number;
+  replayedFrom: number;
+  replayedDepth: number;
   deepest: number;
   readonly popX: number[];
   readonly popZ: number[];
@@ -75,7 +78,7 @@ export function createNetDelay(window: number): NetDelay {
     policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
-    echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, deepest: 0,
+    echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, rollbacks: 0, replayedFrom: -1, replayedDepth: 0, deepest: 0,
     popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0, manual: AUTO_DELAY,
   };
 }
@@ -252,8 +255,11 @@ export function takeNetRates(net: NetDelay): string {
   return text;
 }
 
-export function noteDepth(net: NetDelay, depth: number): void {
+export function noteDepth(net: NetDelay, depth: number, from: number): void {
   net.corrections++;
+  net.rollbacks++;
+  net.replayedFrom = from;
+  net.replayedDepth = depth;
   net.replayed += depth;
   net.deepest = Math.max(net.deepest, depth);
   net.depth = Math.max(net.depth, depth);

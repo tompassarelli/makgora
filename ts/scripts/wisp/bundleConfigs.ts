@@ -54,6 +54,7 @@ export const bundleConfigs = {
   handles: scriptProgram("scripts/wisp/handleBaselineLua.ts", "handles.lua", ["scripts/wisp/handleBaseline.ts", "scripts/wisp/handleCensus.ts", "scripts/wisp/memoryCensus.ts", "scripts/wisp/botMatch.ts"]),
   memory: scriptProgram("scripts/wisp/memoryLua.ts", "memory.lua", ["scripts/wisp/memoryCensus.ts", "scripts/wisp/handleCensus.ts", "scripts/wisp/botMatch.ts"]),
   "netcode-golden": scriptProgram("test/golden/netcodeEntry.ts", "netcode-golden.lua", []),
+  "online-golden": scriptProgram("test/golden/onlineEntry.ts", "online-golden.lua", ["scripts/wisp/botMatch.ts"]),
   perf: scriptProgram("scripts/wisp/perfLua.ts", "perf.lua", ["scripts/wisp/botMatch.ts", "scripts/wisp/census.ts", "scripts/wisp/censusProfile.ts"]),
 } satisfies Record<string, BundleConfig>;
 type BundleName = keyof typeof bundleConfigs;
