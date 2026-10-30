@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
-import { BANISH_SWIRL_COUNT, BANISH_SWIRL_MODEL, BANISH_SWIRL_SCALE } from "../fighters/kaelthas/look";
+import { BANISH_SWIRL_COUNT, BANISH_SWIRL_MODEL, BANISH_SWIRL_SCALE, BANISH_SWIRL_TINT } from "../fighters/kaelthas/look";
 import { type BanishSwirl, banishSwirl } from "../presentation/banishBeam";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue, placeEffect } from "./effects";
 
@@ -36,6 +36,7 @@ export class BanishBeamEffects {
       BlzSetSpecialEffectYaw(model, facingYaw(fighter.facing));
       BlzSetSpecialEffectScale(model, BANISH_SWIRL_SCALE * this.scale);
       BlzSetSpecialEffectAlpha(model, 255);
+      BlzSetSpecialEffectColor(model, BANISH_SWIRL_TINT[0], BANISH_SWIRL_TINT[1], BANISH_SWIRL_TINT[2]);
       if (starts) BlzSetSpecialEffectTime(model, f32(0.2));
       BlzSetSpecialEffectTimeScale(model, paused || fighter.launch.hitlag > 0 ? 0.0 : 1.0);
     }

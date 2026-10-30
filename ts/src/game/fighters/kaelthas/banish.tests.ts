@@ -29,7 +29,7 @@ function banishedAfter(gap: number): { frame: number; damage: number } {
 }
 
 function reachAndDelay(): void {
-  assertEquals(BANISH_DELAY_FRAMES, 18);
+  assertEquals(BANISH_DELAY_FRAMES, 20);
   assertEquals(BANISH_BEAM_FRAMES, 6);
   assertEquals(BANISH_BEAM.x2 - BANISH_BEAM.x1, BANISH_BEAM_REACH);
   assertEquals(BANISH_BEAM_REACH, f32(3.0 * BANISH_BODY_LENGTH));
@@ -77,7 +77,7 @@ function castsInTheAir(): void {
   assertTrue(banished);
 }
 
-test("Banish is a green beam three body lengths long after an 18-frame delay and 6 live frames, banishes for 60 frames, leaves 24 open after a whiff, and works in the air [k3 measure docs/design/kaelthas.md]", () => {
+test("Banish is a green beam three body lengths long after a 20-frame delay and 6 live frames, banishes for 60 frames, leaves 30 open after a whiff, and works in the air [k3 measure docs/design/kaelthas.md]", () => {
   reachAndDelay();
   whiffAndHitTiming();
   castsInTheAir();

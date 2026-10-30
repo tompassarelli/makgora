@@ -6,18 +6,18 @@ import { frames, FollowUpInput, type AuthoredSpecial, type FighterSpecials, type
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { kaelCastBody, kaelHit } from "./moves";
 
-const AIR_LANDING_LAG = 20;
+const AIR_LANDING_LAG = 23;
 
-export const PYROBLAST_STARTUP_FRAMES = 18;
+export const PYROBLAST_STARTUP_FRAMES = 21;
 export const PYROBLAST_STEER_FRAMES = 80;
 export const PYROBLAST_COAST_FRAMES = 14;
-export const PYROBLAST_MISS_RECOVERY = 40;
-export const PYROBLAST_HIT_RECOVERY = 18;
+export const PYROBLAST_MISS_RECOVERY = 46;
+export const PYROBLAST_HIT_RECOVERY = 21;
 export const PYROBLAST_SPEED = 7.5;
 export const PYROBLAST: SpecialProjectile = {
   model: "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx",
   spawnFrame: PYROBLAST_STARTUP_FRAMES, offsetX: 52.0, offsetZ: 60.0, velocityX: PYROBLAST_SPEED, velocityZ: 0.0,
-  life: PYROBLAST_STEER_FRAMES + PYROBLAST_COAST_FRAMES, radius: 22.0, effect: { ...kaelHit(17.0, 40, 80.0, 25.0), strong: true },
+  life: PYROBLAST_STEER_FRAMES + PYROBLAST_COAST_FRAMES, radius: 22.0, effect: { ...kaelHit(13.0, 40, 70.0, 25.0), strong: true },
   reflectable: true, limit: 1, steered: true,
 };
 export const PYROBLAST_STEER: SpecialSteeredShot = {
@@ -54,7 +54,7 @@ export const FLAME_STRIKE_BURST: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 155.0, modelOffsetZ: -50.0,
   modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_COLUMN_SECONDS.from, activeSeconds: FLAME_STRIKE_COLUMN_SECONDS.from, rate: FLAME_STRIKE_COLUMN_RATE },
   spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
-  life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(14.0, 80, 90.30785369873047, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
+  life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(11.0, 80, 80.0, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
 };
 export const FLAME_STRIKE_ORB_FRAMES = 50;
 export const FLAME_STRIKE_ORB: SpecialProjectile = {
@@ -65,14 +65,14 @@ export const FLAME_STRIKE_ORB: SpecialProjectile = {
 };
 export const FLAME_STRIKE_STEER: SpecialHeldOrb = { frame: FLAME_STRIKE_ORB.spawnFrame, acceleration: 0.375, maxSpeed: 12.0, climbSpeed: 5.0, erupts: FLAME_STRIKE_BURST };
 const flameStrike = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 30, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_ORB], heldOrb: FLAME_STRIKE_STEER, replacesLive: true,
+  endFrame: 34, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_ORB], heldOrb: FLAME_STRIKE_STEER, replacesLive: true,
 });
 
 export const BANISH_FRAMES = 60;
 export const BANISH: AppliedStatus = { kind: HeroStatusKind.banish, frames: BANISH_FRAMES, group: HeroStatusGroup.silence, immunityFrames: 240 };
-export const BANISH_DELAY_FRAMES = 18;
+export const BANISH_DELAY_FRAMES = 20;
 export const BANISH_BEAM_FRAMES = 6;
-export const BANISH_WHIFF_RECOVERY = 24;
+export const BANISH_WHIFF_RECOVERY = 30;
 const BODY = hurtCapsule(Character.kaelthas);
 export const BANISH_BODY_LENGTH = f32(BODY.z2 - BODY.z1);
 export const BANISH_BEAM_REACH = f32(3.0 * BANISH_BODY_LENGTH);
@@ -111,5 +111,5 @@ export const KAELTHAS_SPECIALS: FighterSpecials = {
   up: { name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
     ground: phoenix },
   down: { name: "Banish", description: "A green beam from his outstretched hand: whoever it touches turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
-    ground: banish(undefined), air: banish(18) },
+    ground: banish(undefined), air: banish(22) },
 };

@@ -186,7 +186,7 @@ test("Pyroblast: one ball at a time; special mashed through the cast lets it go 
   assertLessThan(firstBallFrames, PYROBLAST_COAST_FRAMES + 3);
 });
 
-test("Pyroblast: struck squarely it deals 17 percent and launches the foe away hard, and Kael recovers quickly [k3 measure docs/design/kaelthas.md]", () => {
+test("Pyroblast: struck squarely it deals 13 percent and launches the foe away hard, and Kael recovers quickly [k3 measure docs/design/kaelthas.md]", () => {
   const b = bout(KAEL_X + 300.0);
   castAndSpawn(b);
   let frames = 0;
@@ -194,8 +194,8 @@ test("Pyroblast: struck squarely it deals 17 percent and launches the foe away h
     step(b);
     frames++;
   }
-  assertEquals(b.foe.status.damage, 17.0);
-  assertGreaterThan(b.foe.launch.hitstun, 20);
+  assertEquals(b.foe.status.damage, 13.0);
+  assertGreaterThan(b.foe.launch.hitstun, 18);
   assertEquals(liveBalls(b.kael), 0);
   let recovery = 0;
   while (b.kael.special.action !== SpecialAction.none) {
@@ -207,7 +207,7 @@ test("Pyroblast: struck squarely it deals 17 percent and launches the foe away h
   assertGreaterThan(b.foe.motion.x, KAEL_X + 360.0);
 });
 
-test("Pyroblast: a shield takes the full 17 and drains far more than a light shot [k3 measure docs/design/kaelthas.md]", () => {
+test("Pyroblast: a shield takes the full 13 and drains far more than a light shot [k3 measure docs/design/kaelthas.md]", () => {
   const b = bout(KAEL_X + 300.0);
   const raise = controls({ shield: true });
   step(b, controls(), controls({ shield: true, shieldPressed: true }));
@@ -291,7 +291,7 @@ function sideKo(percent: number): boolean {
 
 test("Pyroblast: from centre stage it kills a Warden off the side at high percent but not at middling percent [k3 measure docs/design/kaelthas.md]", () => {
   assertFalse(sideKo(70));
-  assertTrue(sideKo(120));
+  assertTrue(sideKo(170));
 });
 
 test("Pyroblast: the steer window is 80 frames, a third longer than the 60 it had, and PK Thunder's 118-frame steer (frames 20-138) stays the longer [k3 measure docs/design/kaelthas.md]", () => {
