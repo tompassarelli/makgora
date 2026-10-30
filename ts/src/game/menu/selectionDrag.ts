@@ -198,9 +198,15 @@ export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holding
   stock: warcraftMenuOpen || (cursorAllowed && !cursorDrawn),
 });
 
+// Melee holds its token at the pinch with the fingers over its lower part: the token's visible disc is about 0.82 of the glove's width (51 px against 62 in Tom's reference), and the chip texture's disc is 232 of its 256 texels while the gauntlet is 202 of the hand's 256.
+export const CARRIED_CHIP_HAND_SHARE = f32(0.71);
+
+export const carriedChipSize = (grid: RosterGrid): number => f32(handSize(grid) * CARRIED_CHIP_HAND_SHARE);
+
+// A carried chip is centred on the pinch point under the hand, so the thumb and fingers draw over its lower part.
 export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);
 
-export const carriedChipTop = (y: number, size: number): number => y + size * f32(0.06);
+export const carriedChipTop = (y: number, size: number): number => y + size * f32(0.5);
 
 // A chip not yet on a fighter parks centred on this point of its player card.
 export const parkedChipCentre = (slot: number): { readonly x: number; readonly y: number } => ({ x: cardRight(slot, f32(0.126)), y: cardDown(f32(0.105)) });

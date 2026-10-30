@@ -8,7 +8,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
-import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
+import { carriedChipLeft, carriedChipSize, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
@@ -30,9 +30,6 @@ const COVER_MARGIN = 0.004;
 // Warcraft draws the cursor and the hand a frame or more after a move or click.
 const CURSOR_DRAW_ATTEMPTS = 6;
 
-// The carried chip is drawn over the hand, so the hand match skips the chip while it can be carried.
-const CHIP_OVER_HAND: ReadonlySet<string> = new Set(["pick", "after-pick", "carrying", "drop"]);
-
 const EXPECTED_STATE: Readonly<Record<string, HandState>> = { "positive-control": "point", edge: "point", "before-pick": "point", carrying: "pinch", "after-drop": "fan", sweep: "fan" };
 
 // The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip.
@@ -41,11 +38,11 @@ const EDGE_SPOT = { x: 0.005, y: 0.3 };
 const AFTER_DROP_RISE = 0.01;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
-const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number, covered?: UiRect) => {
+const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number) => {
   const left = handLeft(x, state, size);
   const top = handTop(y, state, size);
   const badge = handBadgeBox(left, top, size);
-  return texturePixels(frame, texture, left, top, size, size, covered === undefined ? [margined(badge.left, badge.top, badge.width, badge.height)] : [margined(badge.left, badge.top, badge.width, badge.height), covered]);
+  return texturePixels(frame, texture, left, top, size, size, margined(badge.left, badge.top, badge.width, badge.height));
 };
 
 export const measureCursorGate = (clientsFile: string, name: string, directory: string) => Effect.gen(function*() {
@@ -74,8 +71,8 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     const point = pixelPoint(frame, x, y);
     return movePointer(client, { x: region.x + point.x, y: region.y + point.y }, "cursor gate pointer");
   };
-  const drawnHand = (pixels: Frame, x: number, y: number, covered?: UiRect) => {
-    const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state, handExtent, covered) }));
+  const drawnHand = (pixels: Frame, x: number, y: number) => {
+    const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state, handExtent) }));
     const best = drawn.reduce((nearest, next) => (next.hand?.error ?? Infinity) < (nearest.hand?.error ?? Infinity) ? next : nearest);
     return { state: best.state, pinched: best.state === "pinch", hand: best.hand };
   };
@@ -87,7 +84,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     do {
       yield* Effect.sleep("50 millis");
       pixels = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
-      drawn = drawnHand(pixels, x, y, CHIP_OVER_HAND.has(phase) ? margined(carriedChipLeft(x, readyChipSize(grid)), carriedChipTop(y, readyChipSize(grid)), readyChipSize(grid), readyChipSize(grid)) : undefined);
+      drawn = drawnHand(pixels, x, y);
       attempts++;
     } while (((drawn.hand?.error ?? Infinity) > 24 || (phase !== "pick" && phase !== "drop" && drawn.pinched !== (phase === "carrying"))) && attempts < CURSOR_DRAW_ATTEMPTS);
     const elapsedMs = (yield* Clock.currentTimeMillis) - started;
@@ -95,7 +92,8 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     const error = hand?.error;
     const size = readyChipSize(grid);
     const pointerCover = margined(handLeft(x, state, handExtent), handTop(y, state, handExtent), handExtent, handExtent);
-    const chipError = phase === "carrying" ? textureError(pixels, texture.chip, carriedChipLeft(x, size), carriedChipTop(y, size), size, size)
+    const carriedSize = carriedChipSize(grid);
+    const chipError = phase === "carrying" ? textureError(pixels, texture.chip, carriedChipLeft(x, carriedSize), carriedChipTop(y, carriedSize), carriedSize, carriedSize, pointerCover)
       : phase === "after-drop" ? textureError(pixels, texture.chip, chipX(grid, 0, 0), chipY(grid, 0, 0), size, size, pointerCover)
       : phase === "before-pick" ? textureError(pixels, texture.chip, parkedChipLeft(0, size), parkedChipTop(size), size, size, pointerCover) : undefined;
     const bytes = encodePpm(pixels);

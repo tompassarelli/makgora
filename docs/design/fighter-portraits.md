@@ -196,9 +196,13 @@ canvas has texels four times finer than the old 64x64 one, so the engine's bilin
 sampling does not smear them. The hotspot sits exactly on the mouse position:
 texel (155.5, 6) for the pointing index fingertip, (171.75, 26) for the fanned
 hand's middle fingertip and (103, 38) for the gap between thumb and index
-tips. While a chip is carried the chip frame is raised above the hand
-(`SELECT_LEVELS.carriedChip`), so the chip stays whole in the pinch instead of
-disappearing behind the larger palm. The hand frames hang from the game UI at frame level
+tips. While a chip is carried its centre sits on that pinch point and the chip
+frame is drawn beneath the hand (`SELECT_LEVELS.carriedChip`, `carriedChipLeft`,
+`carriedChipTop`), so the thumb and fingers cover its lower part the way Melee's
+hand holds its token (Tom compared the two, 2026-10-30). The carried chip is
+0.71 of the hand's frame (`CARRIED_CHIP_HAND_SHARE`): in Melee's reference the
+token's disc is 51 px across a glove 62 px wide, 0.82, and the chip texture's disc
+is 232 of its 256 texels while the gauntlet is 202 of the hand's 256. The hand frames hang from the game UI at frame level
 200, above every
 selection panel. Scaling is nearest-neighbour only.
 The selection asset build is described in smashcraft:docs/build-inputs.md.
@@ -208,8 +212,11 @@ together once per 60 Hz tick from one mouse sample.
 
 Character select draws every connected human's hand, not only the local one
 (asked for 2026-10-30, after Melee's player hands): each hand carries a P1 to P4
-badge on its cuff, tinted in that slot's Warcraft colour (red, blue, teal,
-purple), and a pinching hand's chip is drawn at the hand. Each client knows only
+label in the slot's Warcraft colour (red, blue, teal, purple): the chip's own bold
+outlined lettering at the chip's own size, inverted (the text in the player
+colour, no disc and no box), rendered by `tools/selection/art/SelectionHandLabel.svg`
+and centred on texel (95, 148) of the hand canvas, and a pinching hand's chip is
+drawn at the hand. Each client knows only
 its own mouse (a pad's cursor is a mouse position too), so it sends its hand's
 state, carried chip and position as a six-character `select-hand` sync
 message (`ts/src/game/ui/selectionHands.ts`), only when the encoded pose

@@ -19,6 +19,7 @@ import {
   cardX,
   readyChipSize,
   carriedChipLeft,
+  carriedChipSize,
   carriedChipTop,
   parkedChipLeft,
   parkedChipTop,
@@ -207,7 +208,7 @@ export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag
   const carried = local || remote !== undefined;
   const hand = remote !== undefined && !local ? remote : { x, y };
   const chipChoice = tileOfCharacter(choice ?? DEFAULT_FIGHTER);
-  const size = readyChipSize(grid);
+  const size = carried ? carriedChipSize(grid) : readyChipSize(grid);
   BlzFrameSetSize(frames.chip, size, size);
   BlzFrameSetLevel(frames.chip, carried ? SELECT_LEVELS.carriedChip : SELECT_LEVELS.cardChip);
   placeTopLeft(

@@ -7,7 +7,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
-import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, handLeft, handSize, handTop, readyChipSize } from "../../src/game/menu/selectionDrag";
+import { HAND_STATES, type HandState, carriedChipLeft, carriedChipSize, carriedChipTop, handLeft, handSize, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
@@ -16,7 +16,7 @@ import { readTga, type Rgba } from "../blp";
 import { reachFighterSelect } from "./gateIntro";
 import { movePointer } from "./gatePointer";
 import { projectRoot } from "./project";
-import { edgeRoom, pixelPoint, texturePixels } from "./uiTexture";
+import { edgeRoom, pixelPoint, texturePixels, type UiRect } from "./uiTexture";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
@@ -47,11 +47,18 @@ interface Sample {
   readonly chipError: number | undefined;
 }
 
-const colourDistance = (frame: Frame, x: number, y: number, rgb: number): number | undefined => {
-  if (x < 0 || y < 0 || x >= frame.width || y >= frame.height) return undefined;
-  const at = (y * frame.width + x) * 3;
+const nearestColour = (frame: Frame, box: UiRect, rgb: number): number | undefined => {
+  const origin = pixelPoint(frame, box.left, box.top);
+  const width = Math.round(box.width * frame.height / 0.6);
+  const height = Math.round(box.height * frame.height / 0.6);
   const channels = [(rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255];
-  return channels.reduce((sum, channel, index) => sum + Math.abs((frame.rgb[at + index] ?? 0) - channel), 0);
+  let nearest: number | undefined;
+  for (let y = Math.max(0, origin.y); y < Math.min(frame.height, origin.y + height); y++) for (let x = Math.max(0, origin.x); x < Math.min(frame.width, origin.x + width); x++) {
+    const at = (y * frame.width + x) * 3;
+    const distance = channels.reduce((sum, channel, index) => sum + Math.abs((frame.rgb[at + index] ?? 0) - channel), 0);
+    if (nearest === undefined || distance < nearest) nearest = distance;
+  }
+  return nearest;
 };
 
 export const measureHandsGate = (clientsFile: string, directory: string) => Effect.gen(function*() {
@@ -81,7 +88,7 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
   const reference = yield* capture(first.client, first.region).pipe(Effect.mapError(fail("hands gate capture")));
   const grid = rosterGrid(ROSTER_TILES);
   const extent = handSize(grid);
-  const chip = readyChipSize(grid);
+  const chip = carriedChipSize(grid);
   const tile = cellRect(grid, HOVER_TILE);
   const hover = { x: (tile.left + tile.right) / 2, y: (tile.top + tile.bottom) / 2 };
   const move = (person: Participant, at: { x: number; y: number }) => {
@@ -104,11 +111,10 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
         const top = handTop(at.y, at.state, extent);
         const box = handBadgeBox(left, top, extent);
         const badge = { left: box.left - COVER_PAD, top: box.top + COVER_PAD, width: box.width + 2 * COVER_PAD, height: box.height + 2 * COVER_PAD };
-        const chipBox = owner.slot === 0 ? [{ left: carriedChipLeft(at.x, chip) - COVER_PAD, top: carriedChipTop(at.y, chip) + COVER_PAD, width: chip + 2 * COVER_PAD, height: chip + 2 * COVER_PAD }] : [];
-        const hand = texturePixels(frame, textures[at.state], left, top, extent, extent, [badge, ...chipBox]);
-        const corner = pixelPoint(frame, box.left + box.width * 0.08, box.top - box.height / 2);
-        const badgeDistance = colourDistance(frame, corner.x, corner.y, slotColor(owner.slot).rgb);
-        const chipError = carried ? texturePixels(frame, textures.chip, carriedChipLeft(at.x, chip), carriedChipTop(at.y, chip), chip, chip)?.error : undefined;
+        const handBox = { left: left - COVER_PAD, top: top + COVER_PAD, width: extent + 2 * COVER_PAD, height: extent + 2 * COVER_PAD };
+        const hand = texturePixels(frame, textures[at.state], left, top, extent, extent, badge);
+        const badgeDistance = nearestColour(frame, box, slotColor(owner.slot).rgb);
+        const chipError = carried ? texturePixels(frame, textures.chip, carriedChipLeft(at.x, chip), carriedChipTop(at.y, chip), chip, chip, handBox)?.error : undefined;
         samples.push({ file, sha256: createHash("sha256").update(bytes).digest("hex"), phase, viewer: viewer.slot, hand: owner.slot, state: at.state, error: hand?.error, badgeDistance, chipError });
       }
     }
