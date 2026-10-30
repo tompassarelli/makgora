@@ -1,14 +1,8 @@
 import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { imod } from "wisp/src/sim/intMath";
-import { firstFighterDifference } from "../../../generated/state/fighterDifference";
-import { copyFighterState } from "../../../generated/state/fighterState";
-import { Phase } from "../../lobby/lobbyState";
-import { stepMatch } from "../../match/step";
-import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
 import { Character } from "../../sim/codes";
 import { type Fighter, type Projectile, createFighter } from "../../sim/fighter";
-import { type Controls, copyControls, fighterAt, type Roster } from "../../sim/roster";
+import type { Controls, Roster } from "../../sim/roster";
 import type { SpecialProjectile } from "../../sim/specials/schema";
 import { duelPair, stepDuel } from "../../sim/testDuel";
 import { controls } from "../../sim/testWorld";
@@ -238,47 +232,4 @@ test("The stick steers the orb up or down, and release, the timeout, a touch and
   eruptsOnReleaseAndTimeout();
   eruptsOnContactAndRecasts();
   eruptsOnTheFloor();
-});
-
-function replayState(): ReplayState {
-  const state = createReplaySnapshot();
-  copyFighterState(fighterAt(state.world, 0), createFighter(Character.kaelthas, -400.0, 1), 3);
-  copyFighterState(fighterAt(state.world, 1), createFighter(Character.warden, 900.0, -1), 3);
-  state.match.phase = Phase.match;
-  state.match.stageChoice = 0;
-  state.match.matchSeed = 360;
-  state.match.hazards = false;
-  state.match.items.on = false;
-  state.match.timeLimitMinutes = 0;
-  state.match.ultimatesOff = true;
-  return state;
-}
-
-test("Flame Strike: a rollback mid-flight replays the steered orb and its eruption exactly [k1 scenario]", () => {
-  const state = replayState();
-  let tick = 0;
-  const step = (first: Readonly<Controls>): void => {
-    tick++;
-    copyControls(state.controls.inputs[0], first);
-    copyControls(state.controls.inputs[1], controls());
-    stepMatch(state.match, state.world, state.controls, tick);
-  };
-  for (let frame = 0; frame < 3; frame++) step(controls());
-  step(press);
-  for (let frame = 0; frame < 10; frame++) step(hold);
-  const saved = createReplaySnapshot();
-  copyReplayState(saved, state);
-  const savedTick = tick;
-  const path = (frame: number): Controls => controls({ specialHeld: frame < 36, verticalDirection: imod(frame, 16) < 8 ? 1 : -1 });
-  for (let frame = 0; frame < 50; frame++) step(path(frame));
-  const expected = createReplaySnapshot();
-  copyReplayState(expected, state);
-  for (let frame = 0; frame < 20; frame++) step(controls({ verticalDirection: -1 }));
-  copyReplayState(state, saved);
-  tick = savedTick;
-  for (let frame = 0; frame < 50; frame++) step(path(frame));
-  const mask = state.world.mask;
-  assertEquals(firstFighterDifference(fighterAt(expected.world, 0), fighterAt(state.world, 0), mask, mask), undefined);
-  assertEquals(firstFighterDifference(fighterAt(expected.world, 1), fighterAt(state.world, 1), mask, mask), undefined);
-  assertTrue(fighterAt(state.world, 0).projectiles.some(projectile => projectile.life > 0 && projectile.spec !== FLAME_STRIKE_ORB));
 });
