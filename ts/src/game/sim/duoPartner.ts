@@ -21,7 +21,9 @@ export function partnerDeparts(world: Roster, slot: number): void {
 
 export function partnerReturns(world: Roster, slot: number, x: number): void {
   respawnFighter(world, slot, x);
-  fighterAt(world, slot).status.stocks = 1;
+  const { status } = fighterAt(world, slot);
+  status.stocks = 1;
+  status.damage = fighterAt(world, world.linked[slot] ?? -1).status.damage;
 }
 
 export type ReviveSpec = { readonly frame: number; readonly offsetX: number } | undefined;
@@ -49,10 +51,10 @@ function orderOnFrame(world: Roster | undefined, leader: Readonly<Fighter>, orde
   if (order?.frame === frame && !held && world !== undefined && orderReady(world, leader)) toggleOrder(world, leader);
 }
 
-/** Hold becomes Regroup; Copy, Regroup and Separated become Hold. A tossed or fainted partner takes no order. */
+/** Hold becomes Regroup; Copy, Regroup and Separated become Hold. A tossed partner takes no order. */
 function toggleOrder(world: Roster, leader: Readonly<Fighter>): void {
   const duo = mutableDuo(fighterAt(world, leader.duo?.link ?? -1));
-  if (duo.order === DuoOrder.tossed || duo.order === DuoOrder.fainted) return;
+  if (duo.order === DuoOrder.tossed) return;
   duo.order = duo.order === DuoOrder.hold ? DuoOrder.regroup : DuoOrder.hold;
   duo.orderFrame = 0;
 }
@@ -68,7 +70,7 @@ export function reviveReady(world: Roster, leader: Readonly<Fighter>): boolean {
   return fighterAt(world, duo.link).status.out;
 }
 
-/** Brings the leader's out partner back at 0% on the floor `offsetX` behind it, or ahead of it when nothing is under that spot, and spends the leader's revive. */
+/** Brings the leader's out partner back at the pair's percent on the floor `offsetX` behind it, or ahead of it when nothing is under that spot, and spends the leader's revive. */
 export function revivePartner(world: Roster, leader: Fighter, offsetX: number, stage: number, matchFrame: number): void {
   if (!reviveReady(world, leader)) return;
   const duo = mutableDuo(leader);

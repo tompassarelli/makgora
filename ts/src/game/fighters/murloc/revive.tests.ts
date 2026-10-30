@@ -17,6 +17,7 @@ const FOE = 1;
 const PARTNER = 2;
 const CAST_START = 12;
 const FOE_AHEAD = 30.0;
+const PAIR_PERCENT = 30.0;
 
 const DOWN_SPECIAL: RowFields = { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 };
 const FOE_JAB: RowFields = { held: maskOf(Action.attack), pressed: maskOf(Action.attack) };
@@ -52,8 +53,9 @@ function run(state: ReplayState, from: number, to: number, casts: readonly numbe
   for (let tick = from; tick <= to; tick++) cast(state, tick, casts, foeJabFrom);
 }
 
-test("Down B with Grgl down brings him back at 0% beside Mrgl and spends the revive [k3 measure docs/design/murloc.md]", () => {
+test("Down B with Grgl down brings him back at the pair's percent beside Mrgl and spends the revive [k3 measure docs/design/murloc.md]", () => {
   const state = duel();
+  fighterAt(state.world, LEADER).status.damage = PAIR_PERCENT;
   fighterAt(state.world, PARTNER).status.damage = 55.0;
   let tick = 0;
   while (fighterAt(state.world, LEADER).special.frame < REVIVE.frame - 1) cast(state, ++tick, [CAST_START], undefined);
@@ -64,7 +66,8 @@ test("Down B with Grgl down brings him back at 0% beside Mrgl and spends the rev
   const partner = fighterAt(state.world, PARTNER);
   assertEquals(partner.status.out, false, "Grgl is back");
   assertEquals(partner.status.stocks, 1, "Grgl is alive");
-  assertEquals(partner.status.damage, 0.0, "he returns at 0%");
+  assertEquals(partner.status.damage, PAIR_PERCENT, "he returns at the pair's percent");
+  assertEquals(leader.status.damage, PAIR_PERCENT, "his return leaves the pair's percent alone");
   assertTrue(partner.motion.grounded);
   assertTrue(Math.abs(partner.motion.x - leader.motion.x) <= REVIVE.offsetX + 1.0);
   assertEquals(leader.duo?.reviveSpent, true, "the revive is spent");

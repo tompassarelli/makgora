@@ -173,7 +173,7 @@ hash all cover him.
 Grgl needs a free slot. Duels and three-player matches get him; when two
 Murlocs share a three-slot match, the lower slot gets the partner. A
 four-participant match (2v2 or a four-way free-for-all) plays the Murlocs as
-Mrgl alone under the solo rules, and the HUD pip reads "no room". Grgl in
+Mrgl alone under the solo rules, under a plate with his own name. Grgl in
 four-participant matches waits for body slots to split from participant slots.
 
 Delay: Grgl replays Mrgl's packed controls and attack command from five
@@ -189,8 +189,9 @@ readable way. While Mrgl holds a grab, Grgl gets neutral controls and cheers.
 |---|---|
 | Body | Character `murloc` with `fighters/murloc/partner.ts` tuning: hurt capsules and hit regions ×0.9, weight 0.80 (Mrgl 0.88), the same run and air speeds; model scale 0.9 |
 | Hits | Every Grgl hit deals ×0.75 damage with the same knockback formula. One hit per target per attack, per body |
-| Knockback and KO | Grgl has his own percent. A blast zone KOs him. He also faints at 70%: a 30-frame knockdown, then he leaves. Neither costs a stock |
-| Stock | Mrgl's stock is the only one. When Mrgl loses a stock, Grgl leaves at once and both respawn together, Grgl at 0% |
+| Percent | The pair has one percent. Every hit on either body adds to it, and knockback on whichever body is hit reads it. Grgl takes ×1.02 damage and knockback with his own weight kept ([Ice Climbers (SSBU)](https://www.ssbwiki.com/Ice_Climbers_(SSBU)): the partner sustains 1.02× damage and knockback). Grgl does not faint at any percent (decided 2026-10-30 after a playtest of 0.3-dev.349: with a shared percent the old 70% faint had no meaning) |
+| KO | A blast zone KOs Grgl on his own without costing a stock or changing the pair's percent; he returns on a revive at the pair's percent |
+| Stock | Mrgl's stock is the only one. When Mrgl loses a stock, Grgl leaves at once and both respawn together at 0% |
 | Ledge | Normal catch and regrab rules. Grgl's hang occupies the ledge against foes. He gets ledge intangibility on the first catch of an airtime only |
 | Shield | His own shield and shield HP. A break leaves him dizzy and easy to kill |
 | Grab | Grgl grabs, pummels and throws from copied or ordered input, and can be grabbed and thrown. While either body holds a foe, the other body's strikes skip that foe |
@@ -199,7 +200,7 @@ readable way. While Mrgl holds a grab, Grgl gets neutral controls and cheers.
 
 ### Solo Mrgl
 
-While no live Grgl exists (fainted, KOed, left behind by a blast zone or no
+While no live Grgl exists (KOed, left behind by a blast zone or no
 room in the match), Mrgl deals ×0.9 damage on every hit, throws the solo net,
 rides the solo Tidal Surf (220 units instead of 340), and has no orders, swap
 or toss. Down B becomes the revive. Killing Grgl is the standard plan against
@@ -212,7 +213,7 @@ the Murlocs.
 | Neutral B: Net | Both hold the net: radius 30 against the solo net's 18. A caught foe is rooted; mash-out takes 30 + damage/4 frames, capped at 75. The net breaks after 3 hits taken or at the 75-frame cap, whichever comes first. Shield it, jump it, or punish the throw at close range | The Huntsman's Ensnare: a net in a shallow arc that slows the first fighter it reaches (top speeds only, like Chill), no root. 10 mana; spawns f12 at x32/z40, 8/frame with a slight drop, life 40, radius 18; 4%; one live net; action ends f36; air landing 18 |
 | Side B: Belly Slide | Mrgl slides and Grgl copies five frames later: two hits of 5%, one per body (Grgl's at ×0.75). Both stop at a raised shield, which punishes them | One slide: 10 mana; slides f8–22 at 11/frame, about 165 units; 5% contact f8–22; ends f32; air landing 20 |
 | Up B: Tidal Surf | One steerable wave carries both bodies if Grgl is within 120 units on frame 6: 340 units with three 2% hits, then helpless | A Grgl beyond 120 units is left behind and casts his own solo surf (220 units), as a partner who misses the rope does. Solo Mrgl rises 220 units |
-| Down B: "Mrglglgl!" | Grgl alive. Tap: order Hold. Tap again: Regroup. Hold B 20 frames: leader swap | Grgl dead: revive. A 50-frame cast, then Grgl surfaces beside Mrgl at 0%. Once per stock; a hit during the cast cancels it without spending it |
+| Down B: "Mrglglgl!" | Grgl alive. Tap: order Hold. Tap again: Regroup. Hold B 20 frames: leader swap | Grgl dead: revive. A 50-frame cast, then Grgl surfaces beside Mrgl at the pair's percent. Once per stock; a hit during the cast cancels it without spending it |
 | Grab with Grgl in reach | With no foe in grab reach and Grgl actionable within 40 units, Mrgl lifts Grgl. The throw direction tosses him as a body projectile: 6%, one hit per target, about 300 units. He lands in Hold | Normal grab |
 | Ultimate: Mrgllgll Swarm | A tide of murlocs rushes across the stage. Designed only: ultimates remain off under the current match rules | Same |
 
@@ -223,8 +224,8 @@ Regroup is Down B again, or happens on its own after 600 frames. A stance ring
 on Grgl shows the order.
 
 **Swap.** Holding Down B for 20 frames exchanges the two bodies' motion only:
-position, velocity, grounded surface and jumps left. Identity, percent, shield
-and stock stay with each role, so Mrgl and Grgl visibly trade places with a
+position, velocity, grounded surface and jumps left. Identity, shield and stock
+stay with each role and the percent stays with the pair, so Mrgl and Grgl visibly trade places with a
 splash on both. The 12-frame startup leaves both bodies vulnerable. Swap is
 refused in hitstun, helpless, a grab or on the ledge, and its cooldown is 240
 frames. Offstage, a swap can save Mrgl by sending Grgl to the fall: a real
@@ -261,9 +262,9 @@ One rule prevents each loop the pair could build:
 
 ## Presentation
 
-The selection name is "Murlocs" and the HUD plate reads "Mrgl & Grgl", with a
-Grgl pip showing his percent and a state glyph: synced, holding, separated,
-down, revive ready or no room. The camera frames Grgl as any active fighter,
+The selection name is "Murlocs" and the HUD plate reads "Mrgl & Grgl" with
+the pair's one percent and no separate Grgl readout (the pip went with the
+shared percent on 2026-10-30; its text also overlapped the name). The camera frames Grgl as any active fighter,
 and a separated Grgl near a blast zone gets the off-screen indicator at
 partner size.
 

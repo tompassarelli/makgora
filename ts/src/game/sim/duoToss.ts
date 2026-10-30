@@ -43,7 +43,7 @@ function liftablePartner(world: Roster, ownerSlot: number): number | undefined {
   const partner = fighterAt(world, duo.link);
   const order = partner.duo?.order;
   if (partner.status.out || !partner.motion.grounded || !actionable(partner)) return undefined;
-  if (order === DuoOrder.tossed || order === DuoOrder.fainted) return undefined;
+  if (order === DuoOrder.tossed) return undefined;
   return Math.abs(f32(partner.motion.x - owner.motion.x)) <= TOSS.liftReach ? duo.link : undefined;
 }
 

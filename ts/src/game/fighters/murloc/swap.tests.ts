@@ -18,8 +18,7 @@ const FOE = 1;
 const PARTNER = 2;
 const LEADER_X = 100.0;
 const PARTNER_X = -100.0;
-const LEADER_PERCENT = 31.0;
-const PARTNER_PERCENT = 47.0;
+const PAIR_PERCENT = 31.0;
 const CAST_LENGTH = SWAP.frame + 2;
 
 const DOWN_SPECIAL: RowFields = { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 };
@@ -41,8 +40,8 @@ function duoMatch(): ReplayState {
   partner.motion.x = f32(PARTNER_X);
   setWorldMotionValue(partner.motion.meleeX, partner.motion.x);
   partner.facing = -1;
-  fighterAt(world, LEADER).status.damage = LEADER_PERCENT;
-  partner.status.damage = PARTNER_PERCENT;
+  fighterAt(world, LEADER).status.damage = PAIR_PERCENT;
+  partner.status.damage = PAIR_PERCENT;
   return { ...state, world };
 }
 
@@ -68,7 +67,7 @@ function wait(state: ReplayState, from: number, length: number): number {
   return from + length;
 }
 
-test("Holding Down B for the swap exchanges the two bodies' positions and leaves percent, stock and order with each [k3 measure docs/design/murloc.md]", () => {
+test("Holding Down B for the swap exchanges the two bodies' positions, keeps the pair's one percent and leaves stock and order with each [k3 measure docs/design/murloc.md]", () => {
   const state = duoMatch();
   let tick = holdDownSpecial(state, 12, CAST_LENGTH);
   tick = wait(state, tick, 20);
@@ -76,8 +75,8 @@ test("Holding Down B for the swap exchanges the two bodies' positions and leaves
   const partner = fighterAt(state.world, PARTNER);
   assertEquals(Math.abs(leader.motion.x - PARTNER_X) < 5.0, true, "Mrgl stands where Grgl stood");
   assertEquals(Math.abs(partner.motion.x - LEADER_X) < 5.0, true, "Grgl stands where Mrgl stood");
-  assertEquals(leader.status.damage, LEADER_PERCENT);
-  assertEquals(partner.status.damage, PARTNER_PERCENT);
+  assertEquals(leader.status.damage, PAIR_PERCENT);
+  assertEquals(partner.status.damage, PAIR_PERCENT);
   assertEquals(partner.duo?.order, DuoOrder.copy);
 });
 

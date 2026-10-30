@@ -57,7 +57,7 @@ const SCENES: readonly Scene[] = [
   { name: "Hold", leader: 0, holds: partner => partner.duo?.order === DuoOrder.hold, prepare: () => undefined, casts: [ORDER_TICK] },
   { name: "Hold from slot 1", leader: 1, holds: partner => partner.duo?.order === DuoOrder.hold, prepare: () => undefined, casts: [ORDER_TICK] },
   { name: "separated", leader: 0, holds: partner => partner.duo?.order === DuoOrder.separated, prepare: knockOff, casts: [] },
-  { name: "fainted", leader: 0, holds: partner => partner.status.out, prepare: state => partnerDeparts(state.world, PARTNER), casts: [] },
+  { name: "knocked out", leader: 0, holds: partner => partner.status.out, prepare: state => partnerDeparts(state.world, PARTNER), casts: [] },
 ];
 
 function tick(state: ReplayState, scene: Scene, frame: number): void {
@@ -80,7 +80,7 @@ function throughText(state: ReplayState): ReplayState {
   return restored;
 }
 
-test("A Murlocs duel replays equal from a saved mid-match state with Grgl in Hold, separated and fainted [k1 scenario]", () => {
+test("A Murlocs duel replays equal from a saved mid-match state with Grgl in Hold, separated and knocked out [k1 scenario]", () => {
   for (const scene of SCENES) {
     const live = duel(scene.leader);
     scene.prepare(live);

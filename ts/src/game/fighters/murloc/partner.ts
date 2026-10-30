@@ -6,6 +6,7 @@ import type { FighterHurtboxes, HurtPart, HurtPose } from "../../sim/hurtboxes";
 export const MURLOC_PARTNER = {
   bodyScale: f32(0.9),
   weight: f32(0.80),
+  taken: f32(1.02),
   partnerDamage: 0.75,
   soloDamage: f32(0.9),
 } as const;
@@ -70,7 +71,7 @@ function partnerOf(moves: FighterMoves): FighterMoves {
   return partnerMoves.scaled;
 }
 
-export const MURLOC_PARTNER_BODY: PartnerBody = { weight: MURLOC_PARTNER.weight, moves: (base) => partnerOf(base) };
+export const MURLOC_PARTNER_BODY: PartnerBody = { weight: MURLOC_PARTNER.weight, taken: MURLOC_PARTNER.taken, moves: (base) => partnerOf(base) };
 
 export function murlocDamageScale(role: number, partnerLive: boolean): number {
   if (role === DuoRole.partner) return MURLOC_PARTNER.partnerDamage;

@@ -1,5 +1,5 @@
 import { DEFAULT_FIGHTER } from "../../game/roster/kits";
-import { duoPipFor } from "../../game/sim/duoStatus";
+import { leadsDuo } from "../../game/sim/duoStatus";
 import { partnerOwner } from "../../game/sim/duoOwner";
 import { presentDrawnBody } from "./fighterDrawView";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
@@ -609,7 +609,7 @@ export function renderUi(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character), costumeFor(game, slot), duoPipFor(s.world, slot));
+      ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character), costumeFor(game, slot), leadsDuo(s.world, slot));
       ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained);
     } else {
       ui.huds[slot].update(false, DEFAULT_FIGHTER, slot, 0.0, 0);

@@ -266,6 +266,9 @@ function armorKnockback(world: Roster, target: Fighter, chosen: DamageContact, a
   return undefined;
 }
 
+const takenScale = (world: Roster, slot: number): number =>
+  isPartnerBody(world, slot) ? catalogHero(fighterAt(world, slot).character)?.partner?.taken ?? 1.0 : 1.0;
+
 function resolveDamageContacts(world: Roster, slot: number): void {
   const target = fighterAt(world, slot);
   const { launch, shield, status } = target;
@@ -302,7 +305,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       if (!perfectShield) shieldDamage = addFloat32(shieldDamage, contact.effect.shieldDamage ?? contact.effect.damage);
     } else {
       if (contact.source !== slot) status.struckBy = contact.source;
-      totalDamage = addFloat32(totalDamage, roundToFloat32(petrifiedDamage(target, shieldedDamage(target, contact.effect.damage, contact.kind))));
+      totalDamage = addFloat32(totalDamage, roundToFloat32(multiplyFloat32(petrifiedDamage(target, shieldedDamage(target, contact.effect.damage, contact.kind)), takenScale(world, slot))));
       damageObserver?.(contact.source, contact.target, contact.effect.damage);
     }
   }
@@ -351,7 +354,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.kind === ContactKind.flinch) flinch ??= index;
     if (contact.kind === ContactKind.launch || contact.kind === ContactKind.throw) {
       const weight = contact.kind === ContactKind.throw ? THROW_KNOCKBACK_WEIGHT : knockbackWeight(target);
-      const magnitude = effectKnockback(contact.effect, postHitPercent, damage, weight);
+      const magnitude = multiplyFloat32(effectKnockback(contact.effect, postHitPercent, damage, weight), takenScale(world, slot));
       const knockback = contact.kind === ContactKind.throw ? magnitude : hitContextKnockback(magnitude, contact.crouching, contact.smashCharging);
 
       if (knockback > strongest) {
