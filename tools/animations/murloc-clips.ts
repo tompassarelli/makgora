@@ -217,8 +217,10 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const index = existing >= 0 ? existing : model.Sequences.length;
   const start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
   if (existing >= 0) {
-    ensure(model.Sequences[index]!.Interval[1] === end, `${name}: timing changed`);
-    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > end); });
+    const was = model.Sequences[index]!.Interval[1]!;
+    ensure(end <= was, `${name}: retimed clip outruns its sequence`);
+    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > was); });
+    model.Sequences[index]!.Interval = new Uint32Array([start, end]);
   } else {
     cursor = end + 100;
     model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,

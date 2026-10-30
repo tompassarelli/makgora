@@ -22,6 +22,61 @@ pose_name, rig_path, keys_path = sys.argv[sys.argv.index('--') + 1:]
 rig = Rig(rig_path)
 frames, contact, last = rig.frames, rig.contact, rig.last
 
+
+def bake_drill():
+    rig.rest()
+    level = rig.floor()
+    hang = rig.hanging
+
+    def P(**kw):
+        return {'pitch': hang, **kw}
+    ready = P()
+
+    def beat(beats, frame):
+        for (a, pa), (b, pb) in zip(beats, beats[1:]):
+            if a <= frame <= b:
+                t = (frame - a) / (b - a)
+                return blend(pa, pb, t * t * (3 - 2 * t))
+        return beats[-1][1]
+
+    def aimed(p, goal):
+        return rig.reach(p, goal, level)
+
+    def drill():
+        over = P(drop=4, squash=0.12, stretch=-0.08, lean=-8, chest=-6, arm=-150, elbow=-20, leftArm=-120, leftElbow=-20, front=-30, kneeFront=40, back=40, kneeBack=60, footBack=-15, pitch=70)
+        body = P(drop=-4, lean=26, squash=0.14, stretch=-0.1, chest=10, head=-10, leftArm=-110, leftElbow=-25, front=-55, kneeFront=70, footFront=-20, back=55, kneeBack=75, footBack=-20, pitch=-90)
+        landed = P(squash=0.05, drop=-2)
+        wind = [(0, ready), (2, over), (4, P(drop=2, lean=10, squash=0.1, arm=-90, elbow=-10, leftArm=-100, front=-40, kneeFront=50, back=50, kneeBack=70, pitch=10))]
+
+        def drilled(frame, weight):
+            p = blend(landed, body, weight)
+            p['spin'] = 720.0 / 16 * min(frame - contact, 16)
+            p['pitch'] = hang + (-90 - hang) * weight
+            return aimed(p, (-10, -22)) if weight > 0.5 else p
+
+        def at(frame):
+            if frame < contact - 1:
+                return beat(wind, frame)
+            if frame == contact - 1:
+                return blend(wind[-1][1], body, 0.5)
+            if frame > 21:
+                return blend(ready, landed, (frames - 1 - frame) / (frames - 22.0))
+            return drilled(frame, 1.0 if frame <= 14 else max(0.0, 1 - (frame - 14) / 7.0))
+        return at
+
+    at = drill()
+    for frame in range(frames + 1):
+        rig.pose(at(frame))
+        tip = rig.tip()
+        print('MURLOC_DRILL_TIP', pose_name, frame, round(tip.x, 1), round(tip.z + rig.floor() - level, 1), flush=True)
+    rig.bake(at, keys_path)
+    print('MURLOC_DRILL_KEYS', pose_name, keys_path, frames + 1, 'frames', flush=True)
+
+
+if pose_name == 'downAir':
+    bake_drill()
+    sys.exit(0)
+
 coil = dict(twist=-25, lean=-10, chest=-6, head=8, leftArm=35, stretch=-0.12, squash=0.1,
             front=-10, kneeFront=10, back=30, kneeBack=40, footBack=-15, travel=-14, drop=-4)
 thrust = dict(twist=25, lean=14, chest=8, head=-10, leftArm=-55, stretch=0.35, squash=-0.2,

@@ -19,7 +19,7 @@ export const MURLOC_CLIPS = { idle: MURLOC_FALLBACK, walk: { index: 1, seconds: 
   forwardAir: { index: 21, seconds: f32(0.55), aligned: true },
   backAir: { index: 22, seconds: f32(0.567), aligned: true },
   upAir: { index: 23, seconds: f32(0.483), aligned: true },
-  downAir: { index: 24, seconds: f32(0.7), aligned: true },
+  downAir: { index: 24, seconds: f32(0.433), aligned: true },
   crouch: { index: 25, seconds: 0.5, aligned: true },
   landing: { index: 26, seconds: f32(0.133), aligned: true },
   shield: { index: 27, seconds: 0.5, aligned: true },

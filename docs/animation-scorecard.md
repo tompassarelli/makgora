@@ -200,6 +200,17 @@ swing or a broken limb. Under Tom's standing delegation of pending decisions to
 the recommendation (2026-10-26), applied to north gate 84 on 2026-10-27, the
 jab, jab 2 and forward tilt ship as they are.
 
+Murloc's down air ships with line 5 below 4: three fresh bare judges (2026-10-30)
+scored readability 2, 2, 2, weight 3, 3, 3, anticipation 3, 3, 3, follow-through
+3, 3, 3 and character 3, 4, 4, naming the tucked spinning body as a ball of
+spikes, fins and spear, while lines 1 to 4 pass (`bun wisp anim score --fighter
+murloc`: body share 0.29, end error 0.00, jump 0.01, overshoot 0.14, return step
+ratio 1.33, contrast 0.54). A second shape, an upright body thrusting the
+spear down on each hit, fixed the return ratio but failed line 2's overshoot
+(0.06 to 0.08) in three tries, so the tumbling drill stays. The clip fits the
+sim's frame data of 6, 18 and 3 frames (a 26-frame clip); the box asked for the
+exception as the jabs carry it.
+
 Grom's dash attack ships with line 5 at 3: the judge medians on readability,
 weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
 lines 1 to 4 pass (#344). The take limit is spent; take B and the later

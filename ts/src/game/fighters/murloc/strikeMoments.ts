@@ -16,7 +16,7 @@ export const murlocStrikeMoments = {
   13: { clip: 21, seconds: f32(0.367), end: f32(0.550) },
   14: { clip: 22, seconds: f32(0.217), end: f32(0.567) },
   15: { clip: 23, seconds: f32(0.083), end: f32(0.483) },
-  16: { clip: 24, seconds: f32(0.350), end: f32(0.700) },
+  16: { clip: 24, seconds: f32(0.100), end: f32(0.433) },
   17: { clip: 46, seconds: f32(0.700), end: f32(0.817) },
   19: { clip: 16, seconds: f32(0.200), end: f32(0.617) },
   20: { clip: 10, seconds: f32(0.100), end: f32(0.350) },

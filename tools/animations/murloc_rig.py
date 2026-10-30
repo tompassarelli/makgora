@@ -13,12 +13,12 @@ import bpy
 from mathutils import Matrix, Quaternion, Vector
 
 JOINTS = {
-    'lean': 'Bone_Root', 'twist': 'Bone_Waist', 'waist': 'Bone_Waist', 'chest': 'Bone_Chest', 'head': 'Bone_Head',
+    'lean': 'Bone_Root', 'spin': 'Bone_Root', 'twist': 'Bone_Waist', 'waist': 'Bone_Waist', 'chest': 'Bone_Chest', 'head': 'Bone_Head',
     'arm': 'Bone_Arm1_R', 'elbow': 'Bone_Arm2_R', 'leftArm': 'Bone_Arm1_L', 'leftElbow': 'Bone_Arm2_L',
     'front': 'Bone_Leg1_L', 'kneeFront': 'Bone_Leg2_L', 'footFront': 'Bone_Foot_L',
     'back': 'Bone_Leg1_R', 'kneeBack': 'Bone_Leg2_R', 'footBack': 'Bone_Foot_R',
 }
-ORDER = ['lean', 'twist', 'waist', 'chest', 'head', 'arm', 'elbow', 'leftArm', 'leftElbow',
+ORDER = ['lean', 'spin', 'twist', 'waist', 'chest', 'head', 'arm', 'elbow', 'leftArm', 'leftElbow',
          'front', 'kneeFront', 'footFront', 'back', 'kneeBack', 'footBack']
 HAND = 'Bone_Hand_R'
 BODY = ('Spine', 'chest', 'Head')
@@ -104,6 +104,21 @@ class Rig:
             scale[forward], scale[up] = 1 + p.get('stretch', 0), 1 + p.get('squash', 0)
             b.scale = Vector(scale)
         bpy.context.view_layer.update()
+
+    def reach(self, p, goal, level, weight=0.01):
+        def error(arm, elbow):
+            self.pose({**p, 'arm': arm, 'elbow': elbow})
+            point = self.tip() + Vector((0, 0, self.floor() - level))
+            return (point.x - goal[0]) ** 2 + (point.z - goal[1]) ** 2 + weight * (elbow + 40) ** 2
+
+        def limit(arm, elbow):
+            return min(70.0, max(-170.0, arm)), min(10.0, max(-130.0, elbow))
+        best = min((error(arm, elbow), arm, elbow) for arm in range(-170, 71, 15) for elbow in range(-120, 11, 10))
+        for step in (6, 2, 0.5):
+            _, arm, elbow = best
+            best = min((error(*limit(arm + i * step, elbow + j * step)), *limit(arm + i * step, elbow + j * step))
+                       for i in (-2, -1, 0, 1, 2) for j in (-2, -1, 0, 1, 2))
+        return {**p, 'arm': best[1], 'elbow': best[2]}
 
     def floor(self):
         return min(self.bones[JOINTS[foot]].head.z for foot in ('footFront', 'footBack'))
