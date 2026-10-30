@@ -14,6 +14,7 @@ import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { readTga, type Rgba } from "../blp";
 import { runProcess } from "../hostProcess";
+import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
 import { reachFighterSelect } from "./gateIntro";
 import { movePointer } from "./gatePointer";
 import { projectRoot } from "./project";
@@ -34,12 +35,17 @@ const CHIP_OVER_HAND: ReadonlySet<string> = new Set(["pick", "after-pick", "carr
 
 const EXPECTED_STATE: Readonly<Record<string, HandState>> = { "positive-control": "point", "before-pick": "point", carrying: "pinch", "after-drop": "fan", sweep: "fan" };
 
-// The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip.
-const CLEAR_SPOT = { x: 0.03, y: 0.3 };
+// The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip, and Warcraft squeezes a frame that crosses the left edge of its 4:3 area, so x keeps the hand inside it.
+const CLEAR_SPOT = { x: 0.07, y: 0.3 };
 const AFTER_DROP_RISE = 0.01;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
-const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number, covered?: UiRect) => texturePixels(frame, texture, handLeft(x, state, size), handTop(y, state, size), size, size, covered);
+const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number, covered?: UiRect) => {
+  const left = handLeft(x, state, size);
+  const top = handTop(y, state, size);
+  const badge = handBadgeBox(left, top, size);
+  return texturePixels(frame, texture, left, top, size, size, covered === undefined ? [margined(badge.left, badge.top, badge.width, badge.height)] : [margined(badge.left, badge.top, badge.width, badge.height), covered]);
+};
 
 export const measureCursorGate = (clientsFile: string, name: string, directory: string) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("cursor gate clients")));
