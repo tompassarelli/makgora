@@ -2,7 +2,7 @@ import { imod } from "wisp/src/sim/intMath";
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Character } from "../sim/codes";
 import { createImpactEvents } from "./impactEvents";
-import { IMPACT_SCREEN_KO, IMPACT_STAR_KO, IMPACTS_PER_KIND, KO_STAR_FLIGHT_FRAMES, STAR_KO_DEPTH, createImpactState, emitImpacts, projectKo, projectImpact, topKoKind } from "./impactState";
+import { IMPACT_SCREEN_KO, IMPACT_STAR_KO, IMPACTS_PER_KIND, KO_STAR_FLIGHT_FRAMES, KO_STAR_SPARKLE_LEAD, STAR_KO_DEPTH, createImpactState, emitImpacts, projectKo, projectImpact, topKoKind } from "./impactState";
 import { presentStarKoTwinkle } from "./hitPresentation";
 import { cameraRay } from "./arenaCamera";
 import { createMatchCamera } from "../sim/matchCamera";
@@ -52,9 +52,11 @@ test("A Star KO flight shrinks the fighter toward the centre of the view the fig
     const pose = projectKo(star, slot, camera);
     assertTrue(pose.visible && inView(pose.x, pose.y, pose.z));
     assertTrue(pose.scale < previous.scale && pose.y > previous.y);
-    assertEquals(projectImpact(star, slot, camera).visible, false);
+    assertEquals(projectImpact(star, slot, camera).visible, age >= KO_STAR_FLIGHT_FRAMES - KO_STAR_SPARKLE_LEAD);
+    if (age >= KO_STAR_FLIGHT_FRAMES - KO_STAR_SPARKLE_LEAD) assertTrue(inView(projectImpact(star, slot, camera).x, STAR_KO_DEPTH, projectImpact(star, slot, camera).z));
     previous = pose;
   }
+  assertTrue(previous.scale >= 0.25);
   cameraRay(camera, previous.x, previous.y, previous.z, ray);
   assertTrue(ray.across > -0.03125 && ray.across < 0.03125 && ray.up > 0.0);
   star.ages[slot] = KO_STAR_FLIGHT_FRAMES;

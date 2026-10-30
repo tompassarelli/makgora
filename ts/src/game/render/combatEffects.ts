@@ -22,6 +22,7 @@ import {
   createImpactState,
   emitImpacts,
   isContactImpact,
+  KO_STAR_FLIGHT_FRAMES,
   projectImpact,
   projectKo,
   STAR_KO_DEPTH,
@@ -358,11 +359,11 @@ export class CombatEffects {
     if (last === undefined || age !== undefined && age < last) {
       BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
       BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
-      if (kind === IMPACT_STAR_KO) {
-        this.soundFrame = frame;
-        this.soundsFrom = "every";
-        presentStarKoTwinkle(this.pose.x, this.pose.z, this.playSound);
-      }
+    }
+    if (kind === IMPACT_STAR_KO && age !== undefined && age >= KO_STAR_FLIGHT_FRAMES && (last === undefined || last < KO_STAR_FLIGHT_FRAMES || age < last)) {
+      this.soundFrame = frame;
+      this.soundsFrom = "every";
+      presentStarKoTwinkle(this.pose.x, this.pose.z, this.playSound);
     }
     shownAges[i] = age;
     if (age !== undefined) this.drawn(i, kind, frame - age);

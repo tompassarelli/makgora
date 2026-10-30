@@ -38,6 +38,8 @@ export const IMPACTS_PER_KIND = 8;
 export const IMPACT_KIND_COUNT = 24;
 export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
+export const KO_STAR_SPARKLE_LEAD = 6;
+const KO_STAR_FLIGHT_FLOOR = 0.25;
 export const KO_STAR_FRAMES = 108;
 export const STAR_KO_DEPTH = 1400.0;
 const STAR_KO_ENTRY_UP = 0.875;
@@ -374,12 +376,12 @@ export function projectImpact(state: Readonly<ImpactState>, i: number, camera: R
   if (i < 0 || i >= IMPACT_COUNT) return HIDDEN_IMPACT;
   const age = state.ages[i];
   const kind = idiv(i, IMPACTS_PER_KIND);
-  if (age === undefined || kind === IMPACT_SCREEN_KO || (kind === IMPACT_STAR_KO && age < KO_STAR_FLIGHT_FRAMES)) return HIDDEN_IMPACT;
+  if (age === undefined || kind === IMPACT_SCREEN_KO || (kind === IMPACT_STAR_KO && age < KO_STAR_FLIGHT_FRAMES - KO_STAR_SPARKLE_LEAD)) return HIDDEN_IMPACT;
   const originX = at(state.originX, i);
   const originZ = at(state.originZ, i);
   const drift = at(state.drift, i);
   if (kind === IMPACT_STAR_KO) {
-    const sparkle = f32(f32((age - KO_STAR_FLIGHT_FRAMES) * 1.0) / (KO_STAR_FRAMES - KO_STAR_FLIGHT_FRAMES));
+    const sparkle = f32(f32(max(0, age - KO_STAR_FLIGHT_FRAMES) * 1.0) / (KO_STAR_FRAMES - KO_STAR_FLIGHT_FRAMES));
     placeStarKo(camera, originX, originZ, 1.0);
     return impactPose(out, toInt(f32(255 * f32(1.0 - sparkle))), f32(f32(0.6) + sparkle), starPoint.x, starPoint.z, 0.0);
   }
@@ -435,7 +437,7 @@ export function projectKo(state: Readonly<ImpactState>, i: number, camera: Reado
       character,
       owner,
       alpha: 255,
-      scale: f32(remaining * remaining),
+      scale: f32(KO_STAR_FLIGHT_FLOOR + f32(f32(1.0 - KO_STAR_FLIGHT_FLOOR) * f32(remaining * remaining))),
       x: starPoint.x,
       y: f32(STAR_KO_DEPTH * t),
       z: starPoint.z,
