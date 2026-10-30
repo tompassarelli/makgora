@@ -188,6 +188,9 @@ the normals and body box and checked by `bun wisp ledger --check` and
   - Round 3, 50% (kept): Pyroblast 13%, growth 70, startup 21, recovery 21
     and 46; burst 11%, growth 80, burn 2%, cast ending on 34, landing lag 23;
     Banish's delay 20, whiff 30, landing lag 22.
+    The farm field on the landed change (balance run 41042046794) read
+    50.5% over 12,240 matches; Chen still beats him and Warden still loses
+    90% to him.
 
 - **The World of Warcraft and Heroes of the Storm spells** (a charged fire
   blast, a possession and the raid-boss lifting ring) are cut; Tom kept the
