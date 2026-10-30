@@ -6,7 +6,7 @@
 
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { ELEMENTS, HIT_CUES, type HitCueSeen, advanceHitCueSeen, elementLook, hitCueSeen } from "../presentation/elementLooks";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 
@@ -59,7 +59,7 @@ export class ElementEffects {
     const { launch, visuals } = fighter;
     const shown = !fighter.status.out && (launch.hitlag > 0 || launch.hitstun > 0) ? SHOWN.indexOf(visuals.hitElement) : -1;
     const parked = (this.parked ??= []);
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     for (let index = 0; index < SHOWN.length; index++) {
       const at = slot * SHOWN.length + index;
       const model = this.models[at];

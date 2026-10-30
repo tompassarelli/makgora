@@ -1,5 +1,5 @@
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import { SHURIKEN_GLOW_COLOR, SHURIKEN_GLOW_MODEL, SHURIKEN_GLOW_ON_HAND, shurikenGlowScale, shurikenGlowShown, shurikensStored } from "../presentation/shurikenCues";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
@@ -22,7 +22,7 @@ export class ShurikenGlowPresentation {
     }
     this.shown = true;
     const facing = fighterPoseFacing(fighter);
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     fitFighterPlacement(this.placement, fighter, stage);
     placeEffect(this.glow, this.origin.x + this.placement.x + SHURIKEN_GLOW_ON_HAND.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + SHURIKEN_GLOW_ON_HAND.z * scale);
     BlzSetSpecialEffectYaw(this.glow, facingYaw(facing));

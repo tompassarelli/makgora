@@ -1,6 +1,5 @@
 
 
-import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../../game/input/participants";
 import { CombatEffects } from "../../game/render/combatEffects";
 import { CriticalStrikeText } from "../../game/render/criticalStrikeText";
@@ -23,7 +22,7 @@ import { SpecialEffects } from "../../game/render/specialEffects";
 import { Character, type DuoRole } from "../../game/sim/codes";
 import { partnerLook } from "../../game/roster/costumes";
 import { PARTNER_COSTUME } from "../../game/presentation/model/costume";
-import { characterModelScale } from "../../game/presentation/modelScale";
+import { bodyModelScale } from "../../game/presentation/fighterScale";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
 import { sourceVersion } from "../../game/shell/sourceVersion";
@@ -235,11 +234,12 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   const ui = views(s);
   endFighterRenderers(ui.fighters[slot]);
   const partner = partnerLook(character, role);
-  const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin, partner === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME, f32(characterModelScale(character) * (partner?.scale ?? 1.0))) : undefined;
+  const bodyScale = bodyModelScale(character, role);
+  const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin, partner === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME, bodyScale) : undefined;
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
   const orbit = fighterOrbit(character), flight = fighterFlight(character);
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin), glow: new MeterGlow(character, s.origin), draw: createFighterDraw(),
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, bodyScale), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin, bodyScale), glow: new MeterGlow(character, s.origin, bodyScale), draw: createFighterDraw(),
     goldSack: character === Character.peon ? new GoldSackPresentation(s.origin) : undefined,
     shurikenGlow: character === Character.akama ? new ShurikenGlowPresentation(s.origin) : undefined,
     parasol: character === Character.chen ? new ParasolPresentation(s.origin) : undefined,

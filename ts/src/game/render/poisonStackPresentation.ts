@@ -1,5 +1,5 @@
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { STOCK_MODELS, type WorldOrigin, hideEffect, placeEffect } from "./effects";
@@ -60,7 +60,7 @@ export class PoisonStackPresentation {
     const glow = this.glow[slot];
     const burst = this.burst[slot];
     if (glow === undefined || burst === undefined) return;
-    const body = characterModelScale(fighter.character);
+    const body = fighterModelScale(fighter);
     const x = this.origin.x + fighter.motion.x;
     const z = this.origin.z + fighter.motion.z;
     const stacks = fighter.status.out ? 0 : fighter.status.poisonStacks;

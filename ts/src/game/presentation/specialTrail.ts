@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
-import { characterModelScale } from "./modelScale";
+import { fighterModelScale } from "./fighterScale";
 import { specialCueState } from "./specialCues";
 
 export const SPECIAL_TRAIL_FRAMES = 8;
@@ -27,7 +27,7 @@ export function specialTrail(fighter: Readonly<Fighter>, out: TrailLine): boolea
     const velocityZ = segment.freeAim === true ? fighter.motion.vz : segment.velocityZ;
     const frames = min(SPECIAL_TRAIL_FRAMES, frame - segment.first + 1);
     out.x1 = fighter.motion.x;
-    out.z1 = f32(fighter.motion.z + f32(TRAIL_BODY_HEIGHT * characterModelScale(fighter.character)));
+    out.z1 = f32(fighter.motion.z + f32(TRAIL_BODY_HEIGHT * fighterModelScale(fighter)));
     out.x2 = f32(out.x1 - f32(velocityX * frames));
     out.z2 = f32(out.z1 - f32(velocityZ * frames));
     return true;

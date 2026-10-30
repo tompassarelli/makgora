@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import { type ShockwaveRing, shockwaveRing } from "../presentation/shockwaveRing";
 import { terrorResisted } from "../presentation/terrorCues";
 import { HeroStatusKind } from "../sim/codes";
@@ -40,7 +40,7 @@ export class TerrorPresentation {
       return;
     }
     this.presentRing(fighter);
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     const x = this.origin.x + fighter.motion.x;
     const z = this.origin.z + fighter.motion.z;
     if (fighter.status.condition === HeroStatusKind.fear && !fighter.status.out) {

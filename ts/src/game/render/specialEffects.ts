@@ -28,7 +28,7 @@ import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { emptyCapsule } from "../sim/geometry/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
 import { emptyTrailLine, specialTrail } from "../presentation/specialTrail";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import { IMMOLATE_SOUNDS } from "../presentation/elementLooks";
 import { SummonPresentation } from "./summonPresentation";
 import { PoisonStackPresentation } from "./poisonStackPresentation";
@@ -185,7 +185,7 @@ export class SpecialEffects {
 
   private show(model: effect, slot: number, effect: number, fighter: Readonly<Fighter>, x: number, z: number, size: number): void {
     this.placed(slot, effect);
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     placeEffect(model, this.origin.x + fighter.motion.x + x * scale, this.front, this.origin.z + fighter.motion.z + z * scale);
     BlzSetSpecialEffectScale(model, size * scale);
     BlzSetSpecialEffectAlpha(model, 255);
@@ -364,7 +364,7 @@ export class SpecialEffects {
       this.hideSiphon(effects);
       return;
     }
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     const { x, z } = this.origin;
     const reach = tether === undefined ? 0.0 : min(1.0, f32(f32(fighter.attack.frame + 1) / f32(attackStartup(fighter, AttackStyle.grab) + 1)));
     const endX = victim !== undefined ? victim.lastX : fighter.motion.x + fighter.facing * f32((tether?.x2 ?? 0.0) * reach);

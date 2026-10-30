@@ -6,7 +6,7 @@ import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { heroLook } from "../roster/looks";
 import { type HitAreaPose, normalAreaPose } from "./disjointCues";
 import { flightFormShown } from "./flightLook";
-import { characterModelScale } from "./modelScale";
+import { fighterModelScale } from "./fighterScale";
 import type { OrbitLook } from "./model/look";
 
 export interface SpherePose {
@@ -42,7 +42,7 @@ export function thrownSphere(fighter: Readonly<Fighter>): Readonly<HitAreaPose> 
 export function spherePose(fighter: Readonly<Fighter>, orbit: Readonly<OrbitLook>, index: number, frame: number, out: SpherePose): SpherePose {
   out.visible = !fighter.status.out && !flightFormShown(fighter);
   if (!out.visible) return out;
-  const scale = characterModelScale(fighter.character);
+  const scale = fighterModelScale(fighter);
   out.scale = f32(orbit.scale * scale);
   const thrown = index === 0 ? thrownSphere(fighter) : undefined;
   if (thrown !== undefined) {

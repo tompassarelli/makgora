@@ -2,7 +2,6 @@ import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels"
 import { ARENA_CAMERA, FLOOR_HEIGHT } from "../presentation/arenaCamera";
 import { originalClip } from "../../generated/clips/fighterOriginalClipInfo";
 import type { FighterDraw } from "../presentation/fighterDraw";
-import { characterModelScale } from "../presentation/modelScale";
 import type { Character } from "../sim/codes";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { squareRoot } from "../sim/warcraftMath";
@@ -14,7 +13,7 @@ export class PosedWhiteModel {
   private readonly model: effect;
   private shown = false;
 
-  constructor(private readonly character: Character, private readonly origin: WorldOrigin) {
+  constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly bodyScale: number) {
     this.model = AddSpecialEffect(WHITE_FIGHTER_MODELS[character] ?? "", origin.x, origin.y);
     BlzSetSpecialEffectAnimationBlendTime(this.model, 0.0);
     BlzSetSpecialEffectAnimation(this.model, "Stand");
@@ -37,7 +36,7 @@ export class PosedWhiteModel {
     const length = squareRoot(towardX * towardX + towardY * towardY + towardZ * towardZ);
     const toward = length > Math.abs(lift) * 2.0 ? lift / length : 0.0;
     placeEffect(this.model, x + towardX * toward, y + towardY * toward, z + towardZ * toward);
-    BlzSetSpecialEffectScale(this.model, characterModelScale(this.character) * (1.0 - toward) * grow);
+    BlzSetSpecialEffectScale(this.model, this.bodyScale * (1.0 - toward) * grow);
     this.shown = true;
     return true;
   }

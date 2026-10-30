@@ -10,8 +10,8 @@ export class MeterGlow {
   private readonly model: PosedWhiteModel;
   private readonly height: number;
 
-  constructor(character: Character, origin: WorldOrigin) {
-    this.model = new PosedWhiteModel(character, origin);
+  constructor(character: Character, origin: WorldOrigin, bodyScale: number) {
+    this.model = new PosedWhiteModel(character, origin, bodyScale);
     this.height = meterGlowHeight(character);
   }
 

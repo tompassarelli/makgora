@@ -1,5 +1,5 @@
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { type WorldOrigin, hideEffect, placeEffect } from "./effects";
@@ -55,7 +55,7 @@ export class SpellPassPresentation {
       this.hide(slot);
       return;
     }
-    const body = characterModelScale(fighter.character);
+    const body = fighterModelScale(fighter);
     placeEffect(flash, this.origin.x + fighter.motion.x, this.origin.y - 12.0, this.origin.z + fighter.motion.z + FLASH_HEIGHT * body);
     BlzSetSpecialEffectScale(flash, f32(FLASH_SCALE * body));
   }

@@ -7,7 +7,7 @@ import {
   DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP,
   DEMONHUNTER_WING_STARTUP, FEL_RUSH_FIRST, FEL_RUSH_LAST, FEL_RUSH_TELL_LAST,
 } from "../sim/specials";
-import { characterModelScale } from "./modelScale";
+import { fighterModelScale } from "./fighterScale";
 
 export const DRAIN_FLASH_FRAMES = 12;
 
@@ -84,7 +84,7 @@ export const createStaticSpecialPose = (): StaticSpecialPose => ({ visible: fals
 /** The pose of a static special effect, written into out (a renderer keeps one so a frame allocates none). */
 export function projectSpecialEffect(state: Readonly<SpecialEffectState>, fighter: Readonly<Fighter> | undefined, slot: number, kind: StaticSpecial, out = createStaticSpecialPose()): Readonly<StaticSpecialPose> {
   if (fighter === undefined || fighter.status.out || (kind !== STATIC_DRAIN_FLASH && fighter.character !== Character.demonHunter)) return HIDDEN;
-  const scale = characterModelScale(fighter.character);
+  const scale = fighterModelScale(fighter);
   const { special, motion } = fighter;
   const felRush = special.action === SpecialAction.demonHunterFelRush;
   if (kind === STATIC_AURA) {

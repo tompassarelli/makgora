@@ -4,7 +4,7 @@ import { SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { steeredFlightLeft } from "../sim/specials/heroMotion";
 import { heroLook } from "../roster/looks";
-import { characterModelScale } from "./modelScale";
+import { fighterModelScale } from "./fighterScale";
 import type { FlightLook } from "./model/look";
 
 const LAST_EMBER = f32(0.15);
@@ -39,7 +39,7 @@ export const flightFormShown = (fighter: Readonly<Fighter>): boolean =>
 export function flightFlamesPose(fighter: Readonly<Fighter>, flight: Readonly<FlightLook>, out: FlightPose): FlightPose {
   const left = flightFlamesLeft(fighter);
   out.visible = left > 0.0;
-  const scale = characterModelScale(fighter.character);
+  const scale = fighterModelScale(fighter);
   out.z = f32(flight.flamesZ * scale);
   out.scale = f32(f32(flight.flamesScale * max(LAST_EMBER, left)) * scale);
   return out;
@@ -49,6 +49,6 @@ export function flightFlamesPose(fighter: Readonly<Fighter>, flight: Readonly<Fl
 export function eggPose(fighter: Readonly<Fighter>, flight: Readonly<FlightLook>, out: FlightPose): FlightPose {
   out.visible = eggShown(fighter);
   out.z = 0.0;
-  out.scale = f32(flight.eggScale * characterModelScale(fighter.character));
+  out.scale = f32(flight.eggScale * fighterModelScale(fighter));
   return out;
 }

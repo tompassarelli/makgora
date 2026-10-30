@@ -1,5 +1,5 @@
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import { GOLD_SACK_MODEL, GOLD_SACK_FULL_SCALE, GOLD_SACK_ON_BACK, goldSackStored } from "../presentation/peonCues";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
@@ -22,7 +22,7 @@ export class GoldSackPresentation {
     }
     this.shown = true;
     const facing = fighterPoseFacing(fighter);
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     fitFighterPlacement(this.placement, fighter, stage);
     placeEffect(this.sack, this.origin.x + this.placement.x + GOLD_SACK_ON_BACK.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + GOLD_SACK_ON_BACK.z * scale);
     BlzSetSpecialEffectYaw(this.sack, facingYaw(facing));

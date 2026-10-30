@@ -7,6 +7,7 @@ import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { mainDeckZ, solidSurfaceAt, solidSurfaceCount } from "../sim/stage";
 import { characterModelScale } from "./modelScale";
+import { fighterModelScale } from "./fighterScale";
 import { hitlagShake } from "./hitPresentation";
 
 interface BodyEnvelope {
@@ -65,7 +66,7 @@ export function fitFighterPlacement(out: FighterPlacement, fighter: Readonly<Fig
 
   if (motion.grounded || motion.z >= mainDeckZ(stage) || fighter.ledge.state !== LedgeState.none) return;
   const body = fighterBodyEnvelope(fighter.character);
-  const scale = characterModelScale(fighter.character);
+  const scale = fighterModelScale(fighter);
   const facing = fighterPoseFacing(fighter);
   const left = (facing > 0 ? body.left : -body.right) * scale;
   const right = (facing > 0 ? body.right : -body.left) * scale;

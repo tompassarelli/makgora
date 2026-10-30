@@ -12,7 +12,7 @@ import type { FighterBody } from "./state";
 import { FIGHTER_OBJECTS } from "../../game/objectData";
 import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
-import { characterModelScale } from "../../game/presentation/modelScale";
+import { fighterModelScale } from "../../game/presentation/fighterScale";
 
 
 const CROW_FORM = 0x416d7266;
@@ -40,7 +40,7 @@ export function placeFighterBody(body: FighterBody, fighter: Readonly<Fighter>, 
   SetUnitX(body.unit, origin.x + placement.x);
   SetUnitY(body.unit, origin.y);
   SetUnitFlyHeight(body.unit, FLOOR_HEIGHT + placement.z, 0.0);
-  const scale = characterModelScale(fighter.character);
+  const scale = fighterModelScale(fighter);
   SetUnitScale(body.unit, scale, scale, scale);
   BlzSetUnitFacingEx(body.unit, fighterPoseFacing(fighter) > 0 ? 0.0 : 180.0);
 }

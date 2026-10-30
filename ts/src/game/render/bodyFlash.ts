@@ -15,8 +15,8 @@ export class BodyFlash {
   private readonly model: PosedWhiteModel;
   private readonly state = createWhiteGlowState();
 
-  constructor(character: Character, origin: WorldOrigin) {
-    this.model = new PosedWhiteModel(character, origin);
+  constructor(character: Character, origin: WorldOrigin, bodyScale: number) {
+    this.model = new PosedWhiteModel(character, origin, bodyScale);
   }
 
   present(fighter: Readonly<Fighter> | undefined, draw: Readonly<FighterDraw>, drawn: boolean, frame: number, camera: Readonly<MatchCamera>): void {

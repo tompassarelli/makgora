@@ -1,4 +1,4 @@
-import { characterModelScale } from "../presentation/modelScale";
+import { fighterModelScale } from "../presentation/fighterScale";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { PARASOL_FOLD_FRAMES, PARASOL_GRIP, PARASOL_MODEL, parasolShown } from "../presentation/parasolLook";
 import type { Fighter } from "../sim/fighter";
@@ -40,7 +40,7 @@ export class ParasolPresentation {
   }
 
   private place(fighter: Readonly<Fighter>, draw: Readonly<FighterDraw>): void {
-    const scale = characterModelScale(fighter.character);
+    const scale = fighterModelScale(fighter);
     BlzSetSpecialEffectScale(this.parasol, scale);
     placeEffect(this.parasol, this.origin.x + draw.x + draw.facing * PARASOL_GRIP.x * scale, this.origin.y + draw.y, this.origin.z + draw.z + PARASOL_GRIP.z * scale);
   }
