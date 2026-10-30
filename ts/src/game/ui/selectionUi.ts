@@ -134,6 +134,10 @@ function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clears: Lor
   presentRuleVisibility(rules, game);
 }
 
+export interface MenuControlHit {
+  over(x: number, y: number): boolean;
+}
+
 export class SelectionPanel {
   private readonly tiles: framehandle[][] = [];
   private readonly tilePortraits: framehandle[] = [];
@@ -153,7 +157,7 @@ export class SelectionPanel {
   private readonly handChannel: SelectionHands;
   private localHand: HandPose = HIDDEN_HAND;
   private localPanel = false;
-  private controlUnder: (x: number, y: number) => boolean = () => false;
+  private controlHit: MenuControlHit = { over(): boolean { return false; } };
   private now = 0.0;
   private cursorEnabled: boolean | undefined;
   private menuCursorAllowed = true;
@@ -531,7 +535,7 @@ export class SelectionPanel {
   // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean): void {
     const drawn = pointed && this.menuCursorAllowed;
-    const hover = this.drag.hover ?? (drawn && this.controlUnder(x, y) ? 0 : undefined);
+    const hover = this.drag.hover ?? (drawn && this.controlHit.over(x, y) ? 0 : undefined);
     const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
     this.localPanel = panel;
     this.localHand = hand === undefined ? HIDDEN_HAND : { state: hand, chip: hand === "pinch" ? carried : undefined, x, y };
@@ -618,8 +622,8 @@ export class SelectionPanel {
     presentDelayControls(this.delay, net.hostControl);
   }
 
-  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, warcraftMenuOpen: boolean, sessionWins: Readonly<Slots<number>>, now: number, controlUnder: (x: number, y: number) => boolean): void {
-    this.controlUnder = controlUnder;
+  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, warcraftMenuOpen: boolean, sessionWins: Readonly<Slots<number>>, now: number, controlHit: MenuControlHit): void {
+    this.controlHit = controlHit;
     this.game = game;
     this.now = now;
     this.settingsOpen = loading || settingsOpen;

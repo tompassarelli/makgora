@@ -41,7 +41,7 @@ import { meterPlacement } from "../../game/ui/plateLayout";
 import { ButtonClicks, gameUi } from "../../game/ui/frames";
 import { ResultsBanner } from "../../game/ui/resultsBanner";
 import type { SelectionActions } from "../../game/ui/selectionActions";
-import { SelectionPanel } from "../../game/ui/selectionUi";
+import { type MenuControlHit, SelectionPanel } from "../../game/ui/selectionUi";
 import { type SettingsActions, SettingsPanel } from "../../game/ui/settingsUi";
 import { type StageActions, StagePanel } from "../../game/ui/stageUi";
 import type { ShellState } from "./state";
@@ -373,8 +373,8 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 }
 
 
-export function menuControlUnder(ui: UiObjects, slot: ParticipantSlot): (x: number, y: number) => boolean {
-  return (x, y) => ui.settings[slot].over(x, y) || ui.pause.over(x, y);
+export function menuControlHit(ui: UiObjects, slot: ParticipantSlot): MenuControlHit {
+  return { over(x: number, y: number): boolean { return ui.settings[slot].over(x, y) || ui.pause.over(x, y); } };
 }
 
 
