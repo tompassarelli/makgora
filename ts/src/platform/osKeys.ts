@@ -20,19 +20,21 @@ interface KeyTrack {
   roseAt: number;
   owed: number;
   owedAt: number;
+  eventHeld: boolean;
 }
 
 export interface KeyTracker {
   readonly keys: KeyTrack[];
   polls: number;
+  readonly read: (key: number) => boolean;
 }
 
-export const keyTracker = (): KeyTracker => ({ keys: [], polls: 0 });
+export const keyTracker = (read: (key: number) => boolean = osKeyDown): KeyTracker => ({ keys: [], polls: 0, read });
 
 function track(tracker: KeyTracker, key: number): KeyTrack {
   const known = tracker.keys[key];
   if (known !== undefined) return known;
-  const created: KeyTrack = { polledAt: 0, down: false, reported: false, rises: 0, roseAt: 0, owed: 0, owedAt: 0 };
+  const created: KeyTrack = { polledAt: 0, down: false, reported: false, rises: 0, roseAt: 0, owed: 0, owedAt: 0, eventHeld: false };
   tracker.keys[key] = created;
   return created;
 }
@@ -46,7 +48,7 @@ export function polledKeyDown(tracker: KeyTracker, key: number): boolean {
   const { polls } = tracker;
   if (known.polledAt === polls) return known.reported;
   if (polls - known.owedAt > MATCH_POLLS) known.owed = 0;
-  const down = osKeyDown(key);
+  const down = tracker.read(key);
   let reported = down;
   if (down && !known.down) {
     if (known.owed > 0) known.owed--;
@@ -66,6 +68,8 @@ export function polledKeyDown(tracker: KeyTracker, key: number): boolean {
 
 export function noteKeyDownEvent(tracker: KeyTracker, key: number, pressable: boolean): void {
   const known = track(tracker, key);
+  if (known.eventHeld) return;
+  known.eventHeld = true;
   if (known.rises > 0 && tracker.polls - known.roseAt <= MATCH_POLLS) {
     known.rises--;
     return;
@@ -74,4 +78,8 @@ export function noteKeyDownEvent(tracker: KeyTracker, key: number, pressable: bo
   if (!pressable) return;
   known.owed++;
   known.owedAt = tracker.polls;
+}
+
+export function noteKeyUpEvent(tracker: KeyTracker, key: number): void {
+  track(tracker, key).eventHeld = false;
 }

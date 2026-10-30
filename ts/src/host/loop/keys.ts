@@ -29,7 +29,7 @@ import { type ShellState, activeRollback, cancelPendingPlaytest, keepShellMoment
 import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
-import { noteKeyDownEvent, osKeyDown } from "../../platform/osKeys";
+import { noteKeyDownEvent, noteKeyUpEvent, osKeyDown } from "../../platform/osKeys";
 
 
 function journalOwnsKey(s: ShellState, slot: ParticipantSlot, key: number): boolean {
@@ -233,6 +233,7 @@ export function onKeyDown(s: ShellState): void {
 
 export function onKeyUp(s: ShellState): void {
   const slot = triggerSlot();
+  if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyUpEvent(s.localKeys, GetHandleId(BlzGetTriggerPlayerKey()));
   if (slot !== undefined) participantKeyUp(s, slot);
 }
 
