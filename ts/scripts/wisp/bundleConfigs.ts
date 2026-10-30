@@ -57,6 +57,7 @@ export const bundleConfigs = {
   "netcode-golden": scriptProgram("test/golden/netcodeEntry.ts", "netcode-golden.lua", []),
   "online-golden": scriptProgram("test/golden/onlineEntry.ts", "online-golden.lua", ["scripts/wisp/botMatch.ts"]),
   perf: scriptProgram("scripts/wisp/perfLua.ts", "perf.lua", ["scripts/wisp/botMatch.ts", "scripts/wisp/census.ts", "scripts/wisp/censusProfile.ts"]),
+  boot: scriptProgram("scripts/wisp/bootLua.ts", "boot.lua", ["scripts/wisp/botMatch.ts"]),
 } satisfies Record<string, BundleConfig>;
 type BundleName = keyof typeof bundleConfigs;
 

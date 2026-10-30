@@ -3,7 +3,7 @@ import { dirname, join, relative } from "node:path";
 
 const root = join(import.meta.dir, "../..");
 
-export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "computer-0", "computer-1", "types", "clean-room", "static"] as const;
+export const GROUPS = ["boot", "perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "computer-0", "computer-1", "types", "clean-room", "static"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export const FULL_SUITE_VARIABLE = "LAND_FULL_SUITE";
@@ -79,6 +79,12 @@ export interface LandingCheck {
 }
 
 export const CHECKS: readonly LandingCheck[] = [
+  // A map can build and still throw before character select in Warcraft's Lua, so the boot check runs before landing.
+  {
+    name: "the playable map boots to character select in 32-bit Lua",
+    command: ["bun", "wisp", "map", "boot"],
+    reaches: [shared, luaBuild, wispCli], farm: ["boot"], here: "beside", outputs: "playable",
+  },
   {
     name: "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic",
     command: ["sh", "-c", "bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf"],

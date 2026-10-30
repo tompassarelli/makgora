@@ -40,6 +40,9 @@ jobs:
           bun-version: 1.3.13
       - run: bun install --frozen-lockfile
         working-directory: ts
+      - name: the playable map boots to character select in 32-bit Lua
+        run: bun wisp map boot
+        working-directory: ts
       - name: four-fighter p99 <= 10 ms and worst <= 14 ms in Classic
         run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf
         working-directory: ts

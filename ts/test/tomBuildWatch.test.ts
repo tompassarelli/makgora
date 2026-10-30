@@ -29,6 +29,7 @@ const landing = (fetchStores: boolean, failure: PlayProblem = unstored) => {
       calls.push("build");
       return stored ? Effect.succeed({ version: "0.1.0-main", source: "map.w3x", stages: [] }) : Effect.fail(failure);
     }),
+    boot: () => Effect.succeed(undefined),
     tidy: Effect.succeed(undefined),
     fetchInputs: Effect.suspend(() => {
       calls.push("fetch");
@@ -44,7 +45,7 @@ const landing = (fetchStores: boolean, failure: PlayProblem = unstored) => {
 
 const run = (fetchStores: boolean, failure: PlayProblem = unstored) => {
   const directory = mkdtempSync(join(tmpdir(), "tom-build-"));
-  const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted") };
+  const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted"), refused: join(directory, "tom-build-refused.log") };
   const { steps, calls } = landing(fetchStores, failure);
   const outcome = Effect.runSync(watchOnce(steps, files).pipe(Effect.result));
   const attempted = attemptedShas(files).has(SHA);
@@ -79,7 +80,7 @@ describe("tom build watcher", () => {
     writeFileSync(source, "next");
     let running: string | undefined = "Warcraft III is running in Tom's prefix (pid 42)";
     const client = Effect.sync(() => running);
-    const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted") };
+    const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted"), refused: join(directory, "tom-build-refused.log") };
     const steps: WatchSteps<never> = {
       ...landing(true).steps,
       held: client,
@@ -117,5 +118,27 @@ describe("tom build watcher", () => {
     expect(calls).toEqual(["build"]);
     expect(outcome._tag).toBe("Failure");
     expect(attempted).toBe(true);
+  });
+
+  test("a built map that does not boot keeps the installed build, writes no build line and logs why it was refused [k1 scenario]", () => {
+    const directory = mkdtempSync(join(tmpdir(), "tom-build-"));
+    const files: WatchFiles = { log: join(directory, "tom-build.log"), attempts: join(directory, "attempted"), refused: join(directory, "tom-build-refused.log") };
+    let installed = false;
+    const steps: WatchSteps<never> = {
+      ...landing(true).steps,
+      build: () => Effect.succeed({ version: "0.3-dev.460", source: "map.w3x", stages: [] }),
+      boot: () => Effect.succeed("map.w3x does not reach character select: problem the map threw before character select settled"),
+      install: ({ version }) => Effect.sync(() => { installed = true; return { version, path: "Maps/00-Smashcraft/map.w3x" }; }),
+    };
+    try {
+      const outcome = Effect.runSync(watchOnce(steps, files).pipe(Effect.result));
+      expect(outcome._tag === "Success" && outcome.success).toBeUndefined();
+      expect(installed).toBe(false);
+      expect(existsSync(files.log)).toBe(false);
+      expect(attemptedShas(files).has(SHA)).toBe(true);
+      expect(readFileSync(files.refused, "utf8")).toMatch(new RegExp(`^\\S+ ${SHA} 0.3-dev.460 map.w3x does not reach character select: problem the map threw`));
+    } finally {
+      rmSync(directory, { recursive: true });
+    }
   });
 });

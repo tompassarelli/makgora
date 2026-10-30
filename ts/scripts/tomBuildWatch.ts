@@ -19,6 +19,7 @@ import { withPressure } from "wisp/scripts/wisp/testRunner";
 
 export const TOM_BUILD_LOG = join(homedir(), ".local/state/agents/handoffs/tom-build.log");
 export const TOM_BUILD_ATTEMPTS = join(homedir(), ".local/state/smashcraft/tom-build/attempted");
+export const TOM_BUILD_REFUSED = join(homedir(), ".local/state/agents/handoffs/tom-build-refused.log");
 const POLL = "10 seconds";
 export const BUILD_BUDGET_SECONDS = 20;
 export const LAND_TO_MAPS_BUDGET_SECONDS = 360;
@@ -86,6 +87,7 @@ export interface WatchSteps<R> {
   readonly measured: <A>(work: Effect.Effect<A, PlayProblem, R>) => Effect.Effect<readonly [A, Load], PlayProblem, R>;
   readonly held: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
+  readonly boot: (built: Built) => Effect.Effect<string | undefined, never, R>;
   readonly fetchInputs: Effect.Effect<void, PlayProblem, R>;
   readonly tidy: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly install: (built: Built, held: string | undefined) => Effect.Effect<Installed, PlayProblem, R>;
@@ -96,6 +98,7 @@ export interface WatchSteps<R> {
 export interface WatchFiles {
   readonly log: string;
   readonly attempts: string;
+  readonly refused: string;
 }
 
 const lines = (path: string) => existsSync(path) ? readFileSync(path, "utf8").split("\n").filter((line) => line !== "") : [];
@@ -154,6 +157,11 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const [built, load] = yield* steps.measured(builtWithInputs(steps, sha)).pipe(
     Effect.tapError((problem) => missingInputs(problem) ? forget(files.attempts, sha) : Effect.void),
   );
+  const refusal = yield* steps.boot(built);
+  if (refusal !== undefined) {
+    yield* append(files.refused, `${new Date(yield* Clock.currentTimeMillis).toISOString()} ${sha} ${built.version.replaceAll(" ", "-")} ${refusal}`);
+    return yield* logged(`Keeping the installed build: ${sha.slice(0, 7)} (${built.version}) does not boot: ${refusal}`);
+  }
   const held = yield* steps.held;
   if (held !== undefined) console.log(`Installing ${sha.slice(0, 7)} beside the older builds, tidy deferred: ${held}`);
   const copying = yield* Clock.currentTimeMillis;
@@ -249,6 +257,10 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     const version = buildLabel(file);
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, source, stages });
   })),
+  boot: ({ source }) => runProcess(ChildProcess.make("bun", ["wisp", "map", "boot", source], { cwd: tsDirectory, stdin: "ignore" })).pipe(
+    Effect.as(undefined),
+    Effect.catch((cause) => Effect.succeed(cause.message.replaceAll(/\s+/g, " ").slice(-600))),
+  ),
   fetchInputs: runProcess(ChildProcess.make("bun", ["wisp", "inputs", "fetch", ...INPUT_HOSTS.filter((host) => host !== hostname())], { cwd: tsDirectory, stdin: "ignore" })).pipe(
     Effect.tap((text) => Effect.sync(() => console.log(text.trim()))),
     Effect.mapError((cause) => new PlayProblem({ problem: `bun wisp inputs fetch: ${cause.message}` })),
@@ -284,5 +296,5 @@ const reportBudget = (sha: string, timing: Timing) => Effect.gen(function*() {
 if (import.meta.main) {
   const { predict, args } = costPrediction(process.argv.slice(2));
   if (args.length > 0) throw new Error("tomBuildWatch takes only --predict-cost");
-  BunRuntime.runMain(watch(hostSteps(predict), { log: TOM_BUILD_LOG, attempts: TOM_BUILD_ATTEMPTS }, watcherCurrent).pipe(Effect.provide(BunServices.layer)));
+  BunRuntime.runMain(watch(hostSteps(predict), { log: TOM_BUILD_LOG, attempts: TOM_BUILD_ATTEMPTS, refused: TOM_BUILD_REFUSED }, watcherCurrent).pipe(Effect.provide(BunServices.layer)));
 }

@@ -10,6 +10,14 @@
   Both build the TypeScript map from the private inputs smashcraft:build-inputs/
   names (`map build`'s `--base`, `--container`, `--assets`, `--summon` override one);
   `bun wisp map rebuild MAP.w3x` replaces only its script.
+  `bun wisp map boot [MAP.w3x]` starts a playable build's own script (or, without a
+  map, the playable build compiled from the checkout) on two headless clients in
+  32-bit Lua, passes the first-run Controls screen, moves the pointer across
+  character select, and fails on any thrown error or a hidden select panel. It
+  runs before every landing (the farm's boot job), on main's CI, and on each
+  Tom build before it is installed (smashcraft:tools/tom-build/README.md), because
+  a map that builds can still open to an empty screen: 0.3-dev.460 passed
+  `Boolean` as a callback, which is nil in Lua, and every select update threw.
   All three commands resolve every special, attack, contact-accent and projectile
   cue model through the renderer's real asset resolver.
   A missing path fails the build before replacing the map.

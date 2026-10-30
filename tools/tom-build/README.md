@@ -44,6 +44,12 @@ missing from the local store runs `bun wisp inputs fetch` for the store hosts in
 `INPUT_HOSTS` (gex45, skipping the host it runs on) and builds once more; if the
 input is still missing, the watcher forgets the sha so the next poll tries again.
 
+Before installing, the watcher runs `bun wisp map boot` on the built map
+(smashcraft:docs/commands/map.md). A map that does not reach character select is
+not installed: the previous build stays in Maps/00-Smashcraft, the journal says
+why, and `~/.local/state/agents/handoffs/tom-build-refused.log` gets one line
+`<utc> <sha> <version> <reason>`.
+
 Each install replaces the previous build in Maps/00-Smashcraft and removes any
 `Smashcraft X.Y-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
 smashcraft:docs/play.md).

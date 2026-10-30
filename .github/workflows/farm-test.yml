@@ -61,7 +61,7 @@ permissions:
 
 env:
   SWEEP_PLACEMENT: gate
-  FARM_GROUPS: perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus computer-0 computer-1 types clean-room static
+  FARM_GROUPS: boot perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus computer-0 computer-1 types clean-room static
 
 jobs:
   plan:
@@ -132,7 +132,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: ${{ fromJson(inputs.checks != '' && inputs.checks || '["perf","rollback","parity-0","parity-1","parity-2","parity-3","lua","corpus","computer-0","computer-1","types","clean-room","static"]') }}
+        group: ${{ fromJson(inputs.checks != '' && inputs.checks || '["boot","perf","rollback","parity-0","parity-1","parity-2","parity-3","lua","corpus","computer-0","computer-1","types","clean-room","static"]') }}
     name: ${{ matrix.group }}
     steps:
       - if: ${{ !contains(fromJson('["corpus","computer-0","computer-1","static"]'), matrix.group) }}
