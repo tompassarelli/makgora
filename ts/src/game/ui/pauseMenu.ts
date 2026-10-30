@@ -97,7 +97,7 @@ export class PauseMenu {
     BlzFrameSetVisible(this.controls, !title);
     const [shield, special, attack, jump, up, down, strong] = [Action.leftTrigger, Action.special, Action.attack, Action.jump, Action.moveUp, Action.moveDown, Action.strong].map((action) => keyNames(bindings, action));
     const sides = `${keyNames(bindings, Action.moveLeft)}/${keyNames(bindings, Action.moveRight)}`;
-    BlzFrameSetText(this.controls, MENU_STYLE.text + `${keyNames(bindings, Action.leftTrigger)}: full shield · ${keyNames(bindings, Action.lightShield)}: light shield · ${keyNames(bindings, Action.modX)}: Mod X (walk, steep) · ${keyNames(bindings, Action.modY)}: Mod Y (shallow) · ${keyNames(bindings, Action.shortHop)}: short hop · ${keyNames(bindings, Action.strong)}: strong\n`
+    BlzFrameSetText(this.controls, MENU_STYLE.text + `${keyNames(bindings, Action.leftTrigger)}: full shield · ${keyNames(bindings, Action.lightShield)}: light shield · ${keyNames(bindings, Action.modX)}: walk (steep) · ${keyNames(bindings, Action.modY)}: Mod Y (shallow) · ${keyNames(bindings, Action.shortHop)}: short hop · ${keyNames(bindings, Action.strong)}: strong\n`
       + `${shield} just before landing: tech (hold ${sides} to roll)\n`
       + `${strong} + direction: smash · ${attack} + ${special}: Ultimate (full meter; touch or hit the centre orb to fill it)\n`
       + `${shield} + ${sides}: roll · ${shield} + ${down}: dodge\n`

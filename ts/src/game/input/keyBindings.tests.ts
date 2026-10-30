@@ -160,8 +160,8 @@ test("every preset binds Mod Y to ; alone, which is no key the pad layer presses
     assertEquals(slots(preset, Action.modY), "; —", `${preset} Mod Y`);
     assertEquals(padKeys.includes(keyFor(presetBindings(preset), Action.modY, 0) ?? 0), false, `${preset} Mod Y is a pad key`);
   }
-  assertEquals(ACTION_LABELS[Action.modX], "Mod X (walk, steep angles)");
-  assertEquals(ACTION_KEY_LABELS[Action.modX], "Mod X");
+  assertEquals(ACTION_LABELS[Action.modX], "Walk (and steep angles)");
+  assertEquals(ACTION_KEY_LABELS[Action.modX], "Walk");
   assertEquals(ACTION_LABELS[Action.modY], "Mod Y (shallow angles, wall ride)");
   assertEquals(ACTION_KEY_LABELS[Action.modY], "Mod Y");
 });
