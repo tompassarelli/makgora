@@ -2,6 +2,8 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
+import { admit } from "../../heavyCapacity";
+import { usableCpus } from "../../usableCpus";
 import { NetAcceptFailure, acceptanceSummary, runAcceptance, runFourFighters } from "../netAcceptance";
 
 /** `net-accept`: wisp#112's online acceptance, full matches between two processes through Wisp's delay and loss proxy. */
@@ -10,7 +12,7 @@ export const netAccept: Command = (args) => Effect.gen(function*() {
   const out = flagValues(args, "out")[0];
   if (out === undefined) return yield* new UsageFailure({ problem: "net-accept needs --out DIR" });
   const rtts = (flagValues(args, "rtts")[0] ?? "0,60,120").split(",").map(Number);
-  const options = { matches: value("matches", 20), frames: value("frames", 7200), jobs: value("jobs", 5), loss: value("loss", 0.01), seed: value("seed", 112), out, rtts };
+  const options = { matches: value("matches", 20), frames: value("frames", 7200), jobs: value("jobs", 3), loss: value("loss", 0.01), seed: value("seed", 112), out, rtts };
   if ([options.matches, options.frames, options.jobs, options.loss, options.seed, ...rtts].some((number) => !Number.isFinite(number))) return yield* new UsageFailure({ problem: "net-accept takes numbers" });
   if (rtts.some((rtt) => rtt < 0) || options.loss < 0 || options.loss > 1) return yield* new UsageFailure({ problem: "net-accept needs nonnegative round trips and loss between 0 and 1" });
   if (args.includes("--four-fighters")) {
@@ -20,7 +22,12 @@ export const netAccept: Command = (args) => Effect.gen(function*() {
     if (slow.length > 0) return yield* new NetAcceptFailure({ problem: `presented p95 over 16.7 ms or failed: ${slow.map((side) => side.side).join(", ")}` });
     return;
   }
-  const rows = yield* runAcceptance(options);
+  const rounds = Math.ceil(options.matches / options.jobs);
+  const leased = yield* admit(options.jobs <= 1 ? "moderate" : "heavy", "smashcraft:net-accept", Math.min(3600, rounds * Math.ceil(options.frames / 30 + 60)));
+  if (leased !== undefined) return leased === 0 ? undefined : yield* new NetAcceptFailure({ problem: `net-accept exited ${leased} in its capacity lease` });
+  const jobs = Math.min(options.jobs, Math.max(1, Math.floor(usableCpus() / 2)));
+  if (jobs < options.jobs) yield* Console.log(`net-accept: --jobs ${options.jobs} capped to ${jobs}, one match per two CPUs of ${usableCpus()}`);
+  const rows = yield* runAcceptance({ ...options, jobs });
   const summary = acceptanceSummary(rows);
   writeFileSync(join(out, "summary.json"), JSON.stringify(summary, null, 1));
   for (const line of summary) yield* Console.log(JSON.stringify(line));
