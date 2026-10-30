@@ -4,7 +4,7 @@ import { HAND_TEXELS } from "../core/handArt";
 import type { RosterGrid } from "../menu/selectionGrid";
 import { SELECT_LEVELS } from "./selectLevels";
 import { art } from "./selectionFrames";
-import { createBackdrop, createText, gameUi, placeTopLeft, setFrameText, sizeText } from "./frames";
+import { consoleUi, createBackdrop, createText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { type DrawnHand, handBadge } from "./selectionHands";
 import { slotColor } from "./slotColors";
 
@@ -28,15 +28,16 @@ export function handBadgeBox(left: number, top: number, size: number): { readonl
   return { left: f32(left + f32(BADGE_LEFT * unit)), top: f32(top - f32(BADGE_TOP * unit)), width: f32(BADGE_WIDTH * unit), height: f32(BADGE_HEIGHT * unit) };
 }
 
+// Engine: Warcraft squeezes a game-UI child whose frame crosses the edge of the 4:3 area, so the hand hangs off ConsoleUIBackdrop and runs off the edge at full size like an OS cursor.
 export function createHandFrames(grid: RosterGrid, suffix: string, slot: number): HandFrames {
   const size = handSize(grid);
   const state = (hand: HandState) => {
-    const frame = art(gameUi(), `MeleeHand${TEXTURE_NAMES[hand]}${suffix}_${I2S(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);
+    const frame = art(consoleUi(), `MeleeHand${TEXTURE_NAMES[hand]}${suffix}_${I2S(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);
     BlzFrameSetLevel(frame, SELECT_LEVELS.hand);
     BlzFrameSetVisible(frame, false);
     return frame;
   };
-  const badge = createBackdrop(`MeleeHandBadge${suffix}_${I2S(slot)}`, gameUi(), 0);
+  const badge = createBackdrop(`MeleeHandBadge${suffix}_${I2S(slot)}`, consoleUi(), 0);
   BlzFrameSetTexture(badge, slotColor(slot).texture, 0, true);
   BlzFrameSetLevel(badge, SELECT_LEVELS.handBadge);
   BlzFrameSetEnable(badge, false);

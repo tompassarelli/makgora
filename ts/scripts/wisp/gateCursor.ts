@@ -33,10 +33,11 @@ const CURSOR_DRAW_ATTEMPTS = 6;
 // The carried chip is drawn over the hand, so the hand match skips the chip while it can be carried.
 const CHIP_OVER_HAND: ReadonlySet<string> = new Set(["pick", "after-pick", "carrying", "drop"]);
 
-const EXPECTED_STATE: Readonly<Record<string, HandState>> = { "positive-control": "point", "before-pick": "point", carrying: "pinch", "after-drop": "fan", sweep: "fan" };
+const EXPECTED_STATE: Readonly<Record<string, HandState>> = { "positive-control": "point", edge: "point", "before-pick": "point", carrying: "pinch", "after-drop": "fan", sweep: "fan" };
 
-// The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip, and Warcraft squeezes a frame that crosses the left edge of its 4:3 area, so x keeps the hand inside it.
-const CLEAR_SPOT = { x: 0.07, y: 0.3 };
+// The hand is larger than the chips it lifts, so the chip checks that cannot be seen past it sample the pointer clear of the chip.
+const CLEAR_SPOT = { x: 0.03, y: 0.3 };
+const EDGE_SPOT = { x: 0.005, y: 0.3 };
 const AFTER_DROP_RISE = 0.01;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
@@ -116,6 +117,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   const negativeControlError = cursorPixels(controlFrame, texture.point, 0.4, 0.56, "point", handExtent)?.error;
   if (!control.visible || negativeControlError === undefined || negativeControlError <= 24) return yield* new AcceptFailure({ operation: "cursor gate calibration", problem: `positive error=${control.error}; negative error=${negativeControlError}` });
   yield* sample("before-pick", CLEAR_SPOT.x, CLEAR_SPOT.y);
+  yield* sample("edge", EDGE_SPOT.x, EDGE_SPOT.y);
   yield* clickThrough("pick", pin.x, pin.y);
   yield* sample("after-pick", pin.x, pin.y);
   const first = cellRect(grid, 0);
