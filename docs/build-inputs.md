@@ -153,8 +153,16 @@ approved for public shipping (2026-10-30). They come from his three JPEGs on a
 flat dark background; `bun tools/selection/key-hand-states.ts <folder of the
 JPEGs>` keys the background to transparency (outline kept), aligns the cuffs and
 writes the three PNGs on one canvas. The normal `bun tools/selection/build-art.ts`
-point-scales them into `SelectionHandPoint.tga`, `SelectionHandFan.tga` and
-`SelectionHandPinch.tga`, each a 256x256 canvas; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
+point-scales the pointing and fanned art into `SelectionHandPoint.tga` and
+`SelectionHandFan.tga`, and the pinch into `SelectionHandPinch.tga`, each a
+256x256 canvas. The pinch frame is derived from Tom's authored pointing art
+(2026-10-30), not drawn or imported: `tools/selection/pinch-hand.ts` cuts the
+index finger out of `wc3-hand-point.png`, swings it about its knuckle 70 degrees
+toward the thumb at 0.62 of its length (nearest-neighbour sampling only),
+redraws the outline gap at the knuckle in the art's own dark outline colour and
+keeps every other pixel of his drawing, so the index tip meets the thumb tip with
+the cuff and three curled fingers unchanged. `wc3-hand-pinch.png`, his authored
+closed-fist pinch, is no longer read by the build; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
 `selection-assets` family and commit its hash with the source change.
 
 ## Other shared paths

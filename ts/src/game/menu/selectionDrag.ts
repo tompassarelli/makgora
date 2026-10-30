@@ -168,7 +168,7 @@ export const handSize = (grid: RosterGrid): number => f32(f32(grid.cellHeight) *
 const HAND_HOTSPOT: Readonly<Record<HandState, { readonly x: number; readonly y: number }>> = {
   point: { x: 155.5, y: 6 },
   fan: { x: 171.75, y: 26 },
-  pinch: { x: 103, y: 38 },
+  pinch: { x: 75, y: 36.5 },
 };
 
 export const handLeft = (x: number, state: HandState, size: number): number => x - f32(HAND_HOTSPOT[state].x / HAND_TEXELS) * size;
@@ -198,9 +198,10 @@ export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holding
   stock: cursorAllowed && !cursorDrawn,
 });
 
-export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);
+// A carried chip rides above the pinch with its lower rim just over the thumb and index tips, like Melee's token.
+export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.45);
 
-export const carriedChipTop = (y: number, size: number): number => y + size * f32(0.06);
+export const carriedChipTop = (y: number, size: number): number => y + size * f32(0.875);
 
 // A chip not yet on a fighter parks centred on this point of its player card.
 export const parkedChipCentre = (slot: number): { readonly x: number; readonly y: number } => ({ x: cardRight(slot, f32(0.126)), y: cardDown(f32(0.105)) });

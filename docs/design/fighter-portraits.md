@@ -171,7 +171,11 @@ gauntlet) with Tom's steel gauntlet in three states: the default pointing hand
 (`SelectionHandPoint`) wherever the hand is neither over a fighter tile nor
 holding a chip, the open fanned hand (`SelectionHandFan`) over a fighter tile
 with no chip, and the pinch (`SelectionHandPinch`) while a chip is carried,
-with the chip's top rim between thumb and fingertip. The stock cursor is hidden
+with the index and thumb tips meeting at the chip's lower rim, the way Melee's
+hand holds its token (Tom compared the two, 2026-10-30). The pinch is the
+pointing hand with its index finger swung down to the thumb tip, derived from
+Tom's pointing art by `tools/selection/pinch-hand.ts` (smashcraft:docs/build-inputs.md).
+The stock cursor is hidden
 (`BlzEnableCursor`) whenever a gauntlet is drawn, never both; the hidden state
 is asserted every update and the shown state is sent once when it returns.
 Stage select draws no hand: its cursor is a soft bullseye, a thin glowing pale-blue
@@ -193,10 +197,12 @@ tall against a 125-pixel tile at 1080p; the old pinch hand was 38.5 pixels. The 
 canvas has texels four times finer than the old 64x64 one, so the engine's bilinear
 sampling does not smear them. The hotspot sits exactly on the mouse position:
 texel (155.5, 6) for the pointing index fingertip, (171.75, 26) for the fanned
-hand's middle fingertip and (103, 38) for the gap between thumb and index
-tips. While a chip is carried the chip frame is raised above the hand
-(`SELECT_LEVELS.carriedChip`), so the chip stays whole in the pinch instead of
-disappearing behind the larger palm. The hand frames hang from the game UI at frame level
+hand's middle fingertip and (75, 36.5) for the point where the thumb and index
+tips meet. While a chip is carried the chip frame is raised above the hand
+(`SELECT_LEVELS.carriedChip`) and rides above the pinch point, centred 5% of its
+width right of it with its lower rim 10 texels below the fingertips
+(`carriedChipLeft`, `carriedChipTop`), so the chip stays whole and the
+fingertips stay readable under its rim. The hand frames hang from the game UI at frame level
 200, above every
 selection panel. Scaling is nearest-neighbour only.
 The selection asset build is described in smashcraft:docs/build-inputs.md.
