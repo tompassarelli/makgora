@@ -155,7 +155,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
     [AttackStyle.forwardSmash]: heroMove(15, 3, 30, 0, tipped(15, [[18.0, 69.0, 135.0, 85.0], [18.0, 68.0, 145.0, 79.0], [18.0, 68.0, 150.0, 75.0]], BLADE_RADIUS, 30.0, wardenHit(12.212287902832031, "KILL", 40), wardenHit(9.159215927124023, "KILL", 40))),
     [AttackStyle.upSmash]: UP_SMASH,
     [AttackStyle.downSmash]: splitsMove({
-      firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 10.0, reach: f32(S + 6.0), height: 10.0, radius: 10.0,
+      firstActive: 6, active: 5, recovery: 35, chargeFrame: 1, hip: 10.0, reach: f32(S + 6.0), height: 10.0, radius: 13.0,
       front: { ...downSmashHit(wardenHit(12.0, "EDGE", 25)), element: HitElement.normal },
       back: { ...downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0)), element: HitElement.normal },
     }),

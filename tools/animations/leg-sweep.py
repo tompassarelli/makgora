@@ -8,13 +8,16 @@ out in front along the floor to full reach on the active frames with the hips an
 across, folded back into the crouch and risen to ready. Clip frame N is attack frame N;
 `rekey-clip.ts ... --keys KEYS.json` splices the baked frames into the shipped clip in place.
 
+`--splits` reads leg-sweeps/FIGHTER-splits.json instead and bakes a down smash from a `--pose downSmash` rig (#518): from a crouch the
+body drops to the floor with the kicking leg driven out in front and the planted leg out behind it on the same frames, then rises to ready.
+
 `--stomp` bakes a down air from a `--pose downAir` rig instead, Falco's tilted, feet-first stomp (#512): a knee
 chamber on frames 1-4 snaps to one compact spindle on the first active frame, legs straight and together with the toes
 pointed and both arms down so the glaives trail behind his hips, leaned back 30 degrees about the pelvis so the feet lead down and forward; it holds through the active frames,
 then unwinds to the aerial ready pose. The turn about the long axis did not read in the side view (three native
 viewer rounds), so the stomp does not twirl.
 
-  blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER [--stomp]
+  blender --background --factory-startup --python tools/animations/leg-sweep.py -- RIG.json KEYS.json FIGHTER [--stomp|--splits]
 """
 import json
 import sys
@@ -180,7 +183,12 @@ def pose(p, lifts=None):
     reach(plant, planted, BODY.matrix.to_quaternion() @ BODY_REST @ POLE[plant] + Vector((p.get('plantKnee', 0), 0, 0)))
     fx, fy, fz = p.get('foot', (ANKLE[kick].x, 0, ANKLE[kick].z - FLOOR))
     reach(kick, Vector((fx, ANKLE[kick].y + fy * SIDE, FLOOR + fz)), BODY.matrix.to_quaternion() @ BODY_REST @ POLE[kick] + Vector((0, 0, p.get('knee', 0))))
+    for side, key in ((kick, 'shin'), (plant, 'plantShin')):
+        shin = joint(f'knee.{side}')
+        axis = (joint(f'ankle.{side}').head - shin.head).normalized()
+        turn(shin, Quaternion(axis, radians(p.get(key, 0))), shin.head.copy())
     turn(joint(f'ankle.{kick}'), Quaternion(PITCH, radians(p.get('toe', 0))))
+    turn(joint(f'ankle.{plant}'), Quaternion(PITCH, radians(p.get('plantToe', 0))))
     for side, key in ((kick, 'kickArm'), (plant, 'plantArm')):
         turn(joint(f'shoulder.{side}'), Quaternion(PITCH, radians(p.get(key, 0))))
         turn(joint(f'elbow.{side}'), Quaternion(PITCH, radians(p.get(key + 'Elbow', 0))))
@@ -239,7 +247,7 @@ def smoothed(searched):
 
 
 READY = {}
-OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}.json')).read())
+OWN = json.loads(open(__file__.replace('leg-sweep.py', f'leg-sweeps/{fighter}{"-splits" if "--splits" in sys.argv else ""}.json')).read())
 BEATS = OWN['beats']
 MARGIN = OWN.get('margin', 0)
 MARGIN_DROP = 10

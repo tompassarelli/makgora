@@ -1,0 +1,9 @@
+{"beats": [
+  [0, {}],
+  [3, {"drop": -28, "travel": -6, "lean": 6, "chest": 8, "foot": [28, 0, 26], "plantX": -22, "plantZ": 8, "knee": 0.6, "kickArm": -30, "plantArm": -30}],
+  ["contact", {"drop": -60, "travel": 4, "lean": 4, "chest": 6, "foot": [75, 0, 5], "plantX": -70, "plantZ": 10, "toe": 25, "kickArm": 40, "plantArm": 40}],
+  ["last", {"drop": -62, "travel": 8, "lean": 4, "chest": 6, "foot": [77, 0, 5], "plantX": -72, "plantZ": 10, "toe": 25, "kickArm": 45, "plantArm": 45}],
+  [22, {"drop": -62, "travel": 8, "lean": 4, "chest": 6, "foot": [77, 0, 5], "plantX": -72, "plantZ": 10, "toe": 25, "kickArm": 40, "plantArm": 40}],
+  [32, {"drop": -30, "travel": 2, "lean": 4, "chest": 6, "foot": [36, 0, 18], "plantX": -30, "plantZ": 8, "kickArm": 10, "plantArm": 10}],
+  ["end", {}]
+]}
