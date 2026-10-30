@@ -92,16 +92,15 @@ test("Every hand state keeps its hotspot inside the hand frame and moves the fra
   }
 });
 
-test("A carried chip rides above the pinch with its lower rim just below the fingertips, near the pinch's column and no wider than the gauntlet [k2 property]", () => {
+test("A carried chip stays centred on the pinch with its top rim inside the pinch hand's frame and no wider than the gauntlet [k2 property]", () => {
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
     const size = handSize(grid);
     const chip = readyChipSize(grid);
     const x = f32(0.4);
     const y = f32(0.3);
-    assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - x) < chip * f32(0.1));
-    assertTrue(carriedChipTop(y, chip) - chip < y && carriedChipTop(y, chip) - chip > y - chip * f32(0.2));
-    assertTrue(carriedChipTop(y, chip) > handTop(y, "pinch", size));
+    assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - x) < f32(0.00001));
+    assertTrue(carriedChipTop(y, chip) < handTop(y, "pinch", size) && carriedChipTop(y, chip) > y);
     assertTrue(chip < size * HAND_ART_COLUMNS / HAND_TEXELS);
   }
 });

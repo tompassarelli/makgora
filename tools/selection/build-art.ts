@@ -12,7 +12,6 @@ import { Effect } from '../../ts/node_modules/effect/dist/index.js';
 import { ChildProcess } from '../../ts/node_modules/effect/dist/process/index.js';
 import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-bun/dist/index.js';
 import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
-import { derivePinch } from './pinch-art';
 import { findExtractor, stockStorage } from '../../ts/scripts/wisp/renderAssetStore';
 import { gameCursorArt } from './gameCursorArt';
 
@@ -54,14 +53,9 @@ BunRuntime.runMain(Effect.gen(function*() {
     yield* render(`MarkerArrow${slot}`, 'MarkerArrow.svg', { ARROW_COLOR: hex(color.rgb) }, false);
     yield* run(['magick', join(output, `HudPlate${slot}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `HudPlateMirror${slot}.tga`)}`]);
   }
-  const scratch = join(output, '.pinch-scratch');
-  yield* Effect.try({ try: () => mkdirSync(scratch, { recursive: true }), catch: ioFailure });
-  const pinchPng = join(scratch, 'wc3-hand-pinch.png');
-  yield* derivePinch(join(source, 'wc3-hand-point.png'), scratch, pinchPng);
-  for (const [pose, art] of [['Point', join(source, 'wc3-hand-point.png')], ['Fan', join(source, 'wc3-hand-fan.png')], ['Pinch', pinchPng]] as const) {
-    yield* run(['magick', art, '-filter', 'point', '-resize', `${HAND_ART_COLUMNS}x${HAND_ART_ROWS}!`, '-background', 'none', '-gravity', 'northwest', '-splice', `${HAND_MARGIN}x${HAND_MARGIN}`, '-extent', `${HAND_TEXELS}x${HAND_TEXELS}`, '-depth', '8', `TGA:${join(output, `SelectionHand${pose}.tga`)}`]);
+  for (const [pose, art] of [['Point', 'point'], ['Fan', 'fan'], ['Pinch', 'pinch']] as const) {
+    yield* run(['magick', join(source, `wc3-hand-${art}.png`), '-filter', 'point', '-resize', `${HAND_ART_COLUMNS}x${HAND_ART_ROWS}!`, '-background', 'none', '-gravity', 'northwest', '-splice', `${HAND_MARGIN}x${HAND_MARGIN}`, '-extent', `${HAND_TEXELS}x${HAND_TEXELS}`, '-depth', '8', `TGA:${join(output, `SelectionHand${pose}.tga`)}`]);
   }
-  yield* Effect.try({ try: () => rmSync(scratch, { recursive: true }), catch: ioFailure });
   yield* gameCursorArt(source, output, run);
   yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);
   for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionBullseye', 'SelectionThreeBridges']) {
