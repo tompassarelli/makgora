@@ -6,6 +6,6 @@ export interface RunShowcaseMove { readonly slot: string; readonly kind: "run"; 
 
 /** A full-tilt stick from standing: the dash burst, then the run, sampled across the burst and one and a bit run cycles. */
 export function runShowcases(): RunShowcaseMove[] {
-  const end = RUN_SAMPLE_TICKS[RUN_SAMPLE_TICKS.length - 1]!;
+  const end = Math.max(...RUN_SAMPLE_TICKS);
   return RUN_MOVES.map(({ slot }) => ({ slot, kind: "run", code: 0, first: 0, end, samples: RUN_SAMPLE_TICKS, run: true }));
 }
