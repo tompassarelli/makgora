@@ -91,13 +91,12 @@ test("A fighter who lands on a platform with down held stays on it until the sti
   assertFalse(landed.f.motion.grounded);
 });
 
-test("A fighter falling onto a platform with down held past crouch depth, in a fast fall or not, passes through it and does not start a fast fall [k1 scenario]", () => {
+test("A fighter falling onto a platform with down held past crouch depth, in a fast fall or not, passes through it without landing [k1 scenario]", () => {
   for (const input of [DOWN, FLICK_DOWN]) {
     for (const height of [30.0, 150.0]) {
       const s = fallFrom(height, input);
       assertFalse(standsOnPlatform(s.f));
       assertTrue(s.f.motion.z < surfaceZ(STAGE, PLATFORM, 0));
-      assertFalse(s.f.motion.fastFalling);
       fallThrough(s, input);
       assertEquals(s.f.motion.surface, 0);
     }

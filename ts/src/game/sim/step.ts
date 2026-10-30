@@ -485,7 +485,7 @@ export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, st
 
   const ascending = edge === EdgePass.none && !teleportsThisFrame(f) && platforms.mountPlatform(f, stage, matchFrame, input);
   const landing = edge === EdgePass.land ? 0 : edge !== EdgePass.none || ascending ? undefined : landingDeck(f, stage, matchFrame, oldX, oldZ, carried);
-  const contact = platforms.beginPlatformContact(f, stage, matchFrame, input, landing);
+  const contact = platforms.passesThroughPlatform(f, stage, input, landing);
   if (landing !== undefined && !contact) {
     finishLanding(f, stage, matchFrame, input, landing, false);
   } else if (!ascending && !contact) {

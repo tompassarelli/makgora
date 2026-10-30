@@ -1359,9 +1359,17 @@ held past crouch depth (below −0.6875, so the tilt modifier's −0.675 does no
 drop) passes through, as in Melee, unless an aerial is active, which lands
 (Tom, 2026-10-30, reversing his 2026-10-28 rule; [SmashWiki, Soft
 platform](https://www.ssbwiki.com/Soft_platform)). Fast falling and letting the
-stick go before contact lands. Drops consume Down until a neutral reset and
-fresh press, so a drop never starts fast fall by itself. Other falling contact
-lands; platforms still have no walls or underside.
+stick go before contact lands. The pass-through is decided only by the stick
+at the frame the fighter reaches the deck, and it is not a contact: the
+crossing frame keeps the fighter's height, vertical speed and fast fall, and
+consumes no input, so a fresh Down inside the fast-fall window still starts a
+fast fall (2026-10-30: the contact had snapped fighters 1 unit under the deck
+at zero vertical speed and cancelled fast fall; from 6 units above at −1 a
+frame, a fast fall took 9 to 13 frames to reach 40 units under the deck and
+now takes 3 to 4, a plain fall 10 to 15 and now 8 to 12, every fighter on
+every fixed pass-through deck). A standing drop consumes Down until a neutral
+reset and fresh press, so it never starts fast fall by itself. Other falling
+contact lands; platforms still have no walls or underside.
 
 ## Ground traction by fighter
 

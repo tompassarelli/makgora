@@ -905,9 +905,9 @@ animations and their frames from #103/#392.
 - Falling onto a platform with down held past crouch depth (below −0.6875;
   the tilt modifier's −0.675 does not drop), in a fast fall or not, passes
   through it, as in Melee, unless an aerial is active, which lands. Fast
-  falling and letting the stick go before contact lands as usual. The drop
-  consumes that down input like a standing drop and never starts a fast fall
-  (Tom, 2026-10-30, reversing his 2026-10-28 rule that a fall with down held
+  falling and letting the stick go before contact lands as usual. The fighter
+  keeps its height, vertical speed and fast fall through the crossing frame,
+  and the pass-through consumes no input (Tom, 2026-10-30, reversing his 2026-10-28 rule that a fall with down held
   lands; [SmashWiki, Soft platform](https://www.ssbwiki.com/Soft_platform)).
 - Tom’s two-platform route is falling down air → drop → up air → drop →
   double jump → rising up air through the platform → down air.
