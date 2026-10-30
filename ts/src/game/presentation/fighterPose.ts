@@ -19,7 +19,7 @@ import { INITIAL_DASH_FRAMES, SHIELD_BREAK_LAND_FRAMES, SHIELD_BREAK_STAND_FRAME
 import { DamagePose, contactDamageClip, damagePose } from "./damagePose";
 import * as dh from "./demonHunterAssetInfo";
 import { disabledPose } from "./disabledPose";
-import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
+import type { CommandGrabClips, HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
 import { hopClipFrames, hopFrames, JUMP_CLIP_FRAMES, jumpPose } from "./hopPose";
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
@@ -227,6 +227,9 @@ function commandGrabSqueeze(clipSeconds: number, grab: Readonly<CommandGrab>, ho
 }
 
 
+const travelStart = (clips: Readonly<CommandGrabClips>, motionStart: number | undefined): number => clips.travelStartsAtMotion === true ? motionStart ?? 1 : 1;
+
+
 function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean {
   if (f.special.action === SpecialAction.none || f.grab.owner !== undefined || f.launch.hitstun !== 0) return false;
   const clips = heroLook(f.character)?.commandGrab;
@@ -238,7 +241,7 @@ function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean
   const holding = caught > 0 && f.special.frame < caught + grab.holdFrames;
   const recovering = !holding && (caught > 0 || f.special.frame > charge);
   const phase = holding ? "hold" : recovering ? "recovery" : "travel";
-  const first = holding ? caught : recovering ? caught > 0 ? caught + grab.holdFrames : charge + 1 : clips.travelStartsAtMotion === true ? move.motion?.[0]?.first ?? 1 : 1;
+  const first = holding ? caught : recovering ? caught > 0 ? caught + grab.holdFrames : charge + 1 : travelStart(clips, move.motion?.[0]?.first);
   playIndex(pose, `commandGrab-${phase}`, clips[phase].index);
   pose.clipTime = f32(f32(Math.max(0, f.special.frame - first) * FRAME_SECONDS) * commandGrabSqueeze(clips[phase].seconds, grab, holding, caught > 0));
   return true;
