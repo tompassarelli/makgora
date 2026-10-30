@@ -208,8 +208,8 @@ export const CARRIED_CHIP_HAND_SHARE = f32(0.71);
 
 export const carriedChipSize = (grid: RosterGrid): number => f32(handSize(grid) * CARRIED_CHIP_HAND_SHARE);
 
-// A carried chip is centred over the pinch point, lifted just far enough that its lettering clears the knuckles, and drawn under the hand so the thumb and fingers cover its lower part.
-export const CARRIED_CHIP_LIFT = f32(0.12);
+// A carried chip sits just below the pinch point, drawn under the hand so the thumb and fingers cover its upper part.
+export const CARRIED_CHIP_LIFT = f32(-0.12);
 
 export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);
 

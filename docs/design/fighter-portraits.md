@@ -205,9 +205,9 @@ canvas has texels four times finer than the old 64x64 one, so the engine's bilin
 sampling does not smear them. The hotspot sits exactly on the mouse position:
 texel (155.5, 6) for the pointing index fingertip, (171.75, 26) for the fanned
 hand's middle fingertip and (103, 38) for the gap between thumb and index
-tips. While a chip is carried its centre sits just over that pinch point (lifted 0.12 of the chip so its lettering clears the knuckles) and the chip
+tips. While a chip is carried its centre sits just below that pinch point (lowered 0.12 of the chip; Tom asked for it lower on 2026-10-30) and the chip
 frame is drawn beneath the hand (`SELECT_LEVELS.carriedChip`, `carriedChipLeft`,
-`carriedChipTop`), so the thumb and fingers cover its lower part the way Melee's
+`carriedChipTop`), so the thumb and fingers cover its upper part the way Melee's
 hand holds its token (Tom compared the two, 2026-10-30). The carried chip is
 0.71 of the hand's frame (`CARRIED_CHIP_HAND_SHARE`): in Melee's reference the
 token's disc is 51 px across a glove 62 px wide, 0.82, and the chip texture's disc
