@@ -80,7 +80,7 @@ fetch, rebase, scan and push:
    The single heaviest process was north dep-gate (1.56 CPU s, one git show per
    manifest and lock file); it now reads a revision with one ls-tree and one
    cat-file --batch (north 8fb73d9c19) and takes 0.20 CPU s in the same kind of
-   landing.
+   landing. `bun scripts/landingCpu.ts report OUT.json 20` lists the 20 heaviest processes of a recorded run.
 2. **After landing.** The push to main runs CI's smoke, filtered-checks,
    development-loop and code-health jobs, one run per landed commit (CI's
    concurrency is per SHA on main), plus Background sweeps, Auto-close and
