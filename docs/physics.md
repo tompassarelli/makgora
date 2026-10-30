@@ -1794,7 +1794,11 @@ Shield roll, then Attack. Held directions alone never choose an option. The
 catch tick only anchors, so options start on subsequent ticks. Jump launches
 inward at the character's ordinary air-speed cap and full-jump launch speed,
 keeping the restored air jump. Release starts outward at 2 world units/tick
-and downward at 2. Climb/roll/attack interpolate from the hang point to the
+and downward at 2. A fresh C-stick flick away from the stage releases the same way as the
+stick away (Tom asked for the C-stick drop on 2026-10-30; C toward the stage does
+nothing). A release leaves with a regular fall: down held through the drop does
+not fast-fall, and only a fresh down press after the drop does (Tom asked for
+this on 2026-10-30). Climb/roll/attack interpolate from the hang point to the
 platform over 12 ticks, ending respectively 24/140/64 units inward. Their
 whole actions last 25/36/40 ticks after entry; ordinary actions remain locked
 until completion. The ledge attack deals 7 damage on action ticks 16–18,

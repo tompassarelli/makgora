@@ -3,7 +3,7 @@ import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, DownState, LedgeState, ParasolState, ShieldBreak, SpecialAction } from "./codes";
 import { inGrabContext, isTumbling } from "./conditions";
-import type { Fighter } from "./fighter";
+import { type Fighter, PLATFORM_DROP_INPUT_WINDOW } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { LEDGE_ATTACK_FRAMES } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -325,7 +325,7 @@ export function advanceLedge(world: Roster, slot: number, stage: number, input: 
 
     if (ledge.frame > 0) {
       const intoStage = input.getupDirectionPressed && input.getupDirection === -ledge.side;
-      const away = input.getupDirectionPressed && input.getupDirection === ledge.side;
+      const away = (input.getupDirectionPressed && input.getupDirection === ledge.side) || input.cStickSideFlick === ledge.side;
       if (input.jumpPressed) {
         motion.vx = f32(-ledge.side * speedBuffed(f, f.tuning.physics.airSpeed));
         motion.vz = jumpBuffed(f, f.tuning.physics.fullJumpSpeed);
@@ -341,6 +341,8 @@ export function advanceLedge(world: Roster, slot: number, stage: number, input: 
       if (away || input.ledgeVerticalPressed < 0) {
         motion.vx = f32(ledge.side * 2.0);
         motion.vz = -2.0;
+        motion.fastFallDownHeld = true;
+        motion.fastFallInputAge = PLATFORM_DROP_INPUT_WINDOW;
         leaveLedge(f);
         return;
       }
