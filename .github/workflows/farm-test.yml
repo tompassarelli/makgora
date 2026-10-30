@@ -25,6 +25,9 @@ on:
       full:
         description: Set to 1 to run every check of the selected groups, not only those the changed paths reach (LAND_FULL_SUITE=1)
         default: ""
+      fresh:
+        description: Set to 1 to run the selected groups even when they passed before on the same inputs, to measure a group's run-to-run variance
+        default: ""
   # Autoland (autoland.yml) runs the suites for a rebased branch inside its own run.
   workflow_call:
     inputs:
@@ -44,6 +47,9 @@ on:
         type: string
         default: ""
       full:
+        type: string
+        default: ""
+      fresh:
         type: string
         default: ""
 
@@ -154,6 +160,7 @@ jobs:
           BASE: ${{ inputs.base }}
           CHECKS: ${{ inputs.checks }}
           FULL: ${{ inputs.full }}
+          FRESH: ${{ inputs.fresh }}
           GROUP: ${{ matrix.group }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -179,7 +186,7 @@ jobs:
           if [ "$run" = true ]; then
             key=$(git ls-tree -r --full-tree HEAD | (cd ts && bun scripts/landingInputs.ts "$GROUP" "$RUNNER_TEMP/changed") 2>/dev/null) || key=
             echo "key=$key" >> "$GITHUB_OUTPUT"
-            [ -z "$key" ] || passed=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=farm-pass-$GROUP-$key&per_page=100" --jq '[.artifacts[] | select(.expired | not)] | length' 2>/dev/null || echo 0)
+            [ -z "$key" ] || [ "$FRESH" = 1 ] || passed=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=farm-pass-$GROUP-$key&per_page=100" --jq '[.artifacts[] | select(.expired | not)] | length' 2>/dev/null || echo 0)
             if [ "${passed:-0}" -gt 0 ]; then
               run=false
               echo "$GROUP reused: it passed before on inputs $key" > "skipped-check-$GROUP.txt"
