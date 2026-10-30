@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-const RUN_SAMPLE_TICKS = [2, 6, 10, 14, 20, 26, 32, 40] as const;
+const RUN_SAMPLE_TICKS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40] as const;
 const WALK_SAMPLE_TICKS = [10, 14, 18, 22, 26, 30, 34, 38] as const;
 
 export const RUN_MOVES = [
