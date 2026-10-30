@@ -451,6 +451,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.conditionFrames = sourceStatus.conditionFrames;
   status.conditionGroup = sourceStatus.conditionGroup;
   status.conditionImmunityFrames = sourceStatus.conditionImmunityFrames;
+  status.conditionHits = sourceStatus.conditionHits;
   const conditionImmunityCopy = status.conditionImmunity;
   const sourceConditionImmunityCopy = sourceStatus.conditionImmunity;
   conditionImmunityCopy[0] = sourceConditionImmunityCopy[0] ?? 0;
@@ -954,6 +955,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.conditionFrames, b = sourceStatus.conditionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.conditionGroup, b = sourceStatus.conditionGroup; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.conditionImmunityFrames, b = sourceStatus.conditionImmunityFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.conditionHits, b = sourceStatus.conditionHits; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const conditionImmunityCopy = status.conditionImmunity;
   const sourceConditionImmunityCopy = sourceStatus.conditionImmunity;
   if ((conditionImmunityCopy[0] ?? 0) !== (sourceConditionImmunityCopy[0] ?? 0)) return false;
@@ -1507,6 +1509,9 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
     sink.int(prefix, "conditionFrames", status.conditionFrames);
     sink.int(prefix, "conditionGroup", status.conditionGroup);
     sink.int(prefix, "conditionImmunityFrames", status.conditionImmunityFrames);
+  }
+  if (status.conditionHits !== 0) sink.int(prefix, "conditionHits", status.conditionHits);
+  if (status.condition !== 0 || anyNonzero(status.conditionImmunity)) {
     for (let i = 0; i < HERO_STATUS_GROUPS; i++) {
       sink.int(prefix, `conditionImmunity[${i}]`, status.conditionImmunity[i] ?? 0);
     }
@@ -1885,6 +1890,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.conditionFrames = 0;
   status.conditionGroup = 0;
   status.conditionImmunityFrames = 0;
+  status.conditionHits = 0;
   for (let i = 0; i < HERO_STATUS_GROUPS; i++) status.conditionImmunity[i] = 0;
   status.poisonFrames = 0;
   status.poisonEvery = 0;

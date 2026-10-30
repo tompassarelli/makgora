@@ -21,7 +21,7 @@ import { toggleAuraOnFrame } from "../toggleAura";
 import { gazeAt } from "../gaze";
 import { ownedCount } from "./ownedProjectiles";
 import { applySelfHeal } from "./selfHeal";
-import { empoweredVariant, readyEmpowered, spendEmpowered } from "./empowered";
+import { castVariant, readyEmpowered, spendEmpowered } from "./empowered";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, applyWindows, projectileAnchor } from "./runningMove";
 import { recallProjectiles, projectilesFit, spawnHeroProjectile, spawnHeroProjectileAt, burstProjectiles, endLiveCasts, holdAim } from "./heroProjectiles";
 import { swingFullCharge, holdCharge, throwFullDroppingCharge } from "./heroForms";
@@ -69,7 +69,7 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   if (move.armor?.shell === true && f.status.armorFrames > 0) return undefined;
   if (move.oncePerAirtime === true && airborne && (f.special.airtimeUses & (1 << slot)) !== 0) return undefined;
   if (move.command?.order === CompanionOrder.lunge && !companionReady(f, move.command.slot)) return undefined;
-  const variant = empoweredVariant(f, move);
+  const variant = castVariant(world, f, move);
   if (!projectilesFit(f, specialForm(kit, form, variant))) return undefined;
   choice.slot = slot;
   choice.form = form;

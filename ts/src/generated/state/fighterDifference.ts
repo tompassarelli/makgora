@@ -167,6 +167,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.conditionFrames !== actual.status.conditionFrames) return "conditionFrames";
   if (expected.status.conditionGroup !== actual.status.conditionGroup) return "conditionGroup";
   if (expected.status.conditionImmunityFrames !== actual.status.conditionImmunityFrames) return "conditionImmunityFrames";
+  if (expected.status.conditionHits !== actual.status.conditionHits) return "conditionHits";
   for (let i = 0; i < HERO_STATUS_GROUPS; i++) if ((expected.status.conditionImmunity[i] ?? 0) !== (actual.status.conditionImmunity[i] ?? 0)) return `conditionImmunity[${i}]`;
   if (expected.status.poisonFrames !== actual.status.poisonFrames) return "poisonFrames";
   if (expected.status.poisonEvery !== actual.status.poisonEvery) return "poisonEvery";

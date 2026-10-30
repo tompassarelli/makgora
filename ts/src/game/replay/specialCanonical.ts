@@ -3,6 +3,7 @@ import { writePierce } from "./empowerCanonical";
 import { at } from "wisp/src/runtime/lookup";
 import type { HitEffect } from "../sim/hitRegions";
 import type { SpecialCompanion, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
+import type { AppliedStatus } from "../sim/appliedStatus";
 
 export const bit = (flag: boolean | undefined): number => (flag === true ? 1 : 0);
 
@@ -21,6 +22,26 @@ const downVelocityCanonical = (spec: Readonly<SpecialProjectile>, prefix: string
 
 const ledgeLatchCanonical = (spec: Readonly<SpecialProjectile>, prefix: string): readonly string[] =>
   spec.latchesLedge === true ? [canonicalInt(`${prefix}.latchesLedge`, 1)] : [];
+
+function appliedStatusCanonical(status: Readonly<AppliedStatus>, prefix: string): readonly string[] {
+  const result: string[] = [];
+  const int = (name: string, value: number) => { result.push(canonicalInt(`${prefix}.status.${name}`, value)); };
+  const real = (name: string, value: number) => { result.push(canonicalRealField(`${prefix}.status.${name}`, value)); };
+  int("kind", status.kind);
+  int("frames", status.frames);
+  int("group", status.group);
+  int("immunityFrames", status.immunityFrames);
+  if (status.hits !== undefined) int("hits", status.hits);
+  if (status.perPercent !== undefined) {
+    real("perPercent.frames", status.perPercent.frames);
+    int("perPercent.cap", status.perPercent.cap);
+  }
+  if (status.tick !== undefined) {
+    int("tick.every", status.tick.every);
+    real("tick.damage", status.tick.damage);
+  }
+  return result;
+}
 
 export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, prefix: string): string {
   const result: string[] = [];
@@ -46,16 +67,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
   if (spec.catchHeal !== undefined) {
     real("catchHeal.heal", spec.catchHeal.heal);
   }
-  if (spec.status !== undefined) {
-    int("status.kind", spec.status.kind);
-    int("status.frames", spec.status.frames);
-    int("status.group", spec.status.group);
-    int("status.immunityFrames", spec.status.immunityFrames);
-    if (spec.status.tick !== undefined) {
-      int("status.tick.every", spec.status.tick.every);
-      real("status.tick.damage", spec.status.tick.damage);
-    }
-  }
+  if (spec.status !== undefined) result.push(...appliedStatusCanonical(spec.status, prefix));
   int("needsLineOfSight", bit(spec.needsLineOfSight));
   result.push(...ledgeLatchCanonical(spec, prefix));
   if (spec.returns !== undefined) {

@@ -289,7 +289,7 @@ export interface SpecialCharge {
 export interface AuthoredSpecial extends CastWindows {
 
   readonly variants?: readonly AuthoredSpecial[] | undefined;
-
+  readonly pairedVariant?: { readonly variant: number; readonly within: number } | undefined;
   readonly name?: string | undefined;
 
   readonly endFrame: number;

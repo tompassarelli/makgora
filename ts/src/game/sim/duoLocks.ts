@@ -1,7 +1,9 @@
 import { PARTICIPANT_CAPACITY } from "../input/participants";
-import { DuoRole } from "./codes";
+import { f32 } from "wisp/src/sim/f32";
+import { DuoOrder, DuoRole } from "./codes";
 import { max } from "../core/numbers";
 import { canBeGrabbed, canStartAttack } from "./conditions";
+import type { Fighter } from "./fighter";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { RESTING_VICTIM, duoRole, mutableVictim } from "./fighter";
 
@@ -14,6 +16,17 @@ export const DUO_SHIELD_FREE_FRAMES = 10;
 export function inLivePair(world: Roster, slot: number): boolean {
   const link = world.linked[slot] ?? -1;
   return link >= 0 && isActive(world, link);
+}
+
+export function pairedWithin(world: Roster, fighter: Readonly<Fighter>, distance: number): boolean {
+  const slot = world.fighters.indexOf(fighter);
+  if (slot < 0 || !inLivePair(world, slot)) return false;
+  const other = fighterAt(world, world.linked[slot] ?? -1);
+  const duo = fighter.duo;
+  const otherDuo = other.duo;
+  if (duo === undefined || otherDuo === undefined) return false;
+  const order = duo.role === DuoRole.partner ? duo.order : otherDuo.order;
+  return order === DuoOrder.copy && !other.status.out && Math.abs(f32(fighter.motion.x - other.motion.x)) <= distance;
 }
 
 export function isPartnerBody(world: Roster, slot: number): boolean {

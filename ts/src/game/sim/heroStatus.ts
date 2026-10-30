@@ -72,7 +72,8 @@ const RULES: { readonly [kind: number]: StatusRules | undefined } = {
 
 
 function refuses(f: Readonly<Fighter>, status: Readonly<AppliedStatus>): boolean {
-  return (f.status.conditionImmunity[status.group] ?? 0) > 0 || (status.groundedOnly === true && !f.motion.grounded);
+  return (f.status.conditionImmunity[status.group] ?? 0) > 0 || (status.groundedOnly === true && !f.motion.grounded)
+    || (status.hits !== undefined && f.status.condition === status.kind);
 }
 
 export function heldFrames(status: Readonly<AppliedStatus>, percent: number): number {
@@ -108,6 +109,8 @@ function stackPoison(f: Fighter, status: Readonly<AppliedStatus>): void {
 }
 
 
+const hitsToBreak = (status: Readonly<AppliedStatus>): number => status.hits ?? 0;
+
 export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): void {
   const { status: state } = f;
 
@@ -137,6 +140,7 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
   if (refuses(f, status)) return;
   state.condition = status.kind;
   state.conditionFrames = heldFrames(status, state.damage);
+  state.conditionHits = hitsToBreak(status);
   if (RULES[status.kind]?.mashMinimum !== undefined) clearMash(f.grab);
   state.conditionGroup = status.group;
   state.conditionImmunityFrames = status.immunityFrames;
@@ -167,6 +171,7 @@ function endHeroStatus(f: Fighter): void {
   status.conditionImmunity[status.conditionGroup] = max(status.conditionImmunity[status.conditionGroup] ?? 0, status.conditionImmunityFrames);
   status.condition = HeroStatusKind.none;
   status.conditionFrames = 0;
+  status.conditionHits = 0;
 }
 
 
@@ -190,7 +195,9 @@ export function cleansePoisonAndSlow(f: Fighter): void {
 
 
 export function damageEndsHeroStatus(f: Fighter): void {
-  if (rules(f)?.endsOnDamage === true) endHeroStatus(f);
+  if (rules(f)?.endsOnDamage !== true) return;
+  if (f.status.conditionHits > 1) f.status.conditionHits--;
+  else endHeroStatus(f);
 }
 
 
@@ -222,6 +229,7 @@ export function clearHeroStatus(f: Fighter): void {
   const { status } = f;
   status.condition = HeroStatusKind.none;
   status.conditionFrames = 0;
+  status.conditionHits = 0;
   status.conditionGroup = 0;
   status.conditionImmunityFrames = 0;
   for (let group = 0; group < HERO_STATUS_GROUPS; group++) status.conditionImmunity[group] = 0;

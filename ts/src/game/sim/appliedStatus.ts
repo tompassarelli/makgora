@@ -17,4 +17,6 @@ export interface AppliedStatus {
   readonly groundedOnly?: true | undefined;
 
   readonly stacks?: { readonly cap: number } | undefined;
+
+  readonly hits?: number | undefined;
 }
