@@ -34,7 +34,9 @@
   owner's recently active public repositories and reserves the time-weighted
   p90 concurrent hosted jobs from the latest ten completed Autoland runs per
   repository. Its matrix admits `40 - busy - reserve` jobs and refuses when
-  no slots remain. The measurement is printed in the plan and the command's
+  no slots remain; `--wait` then re-dispatches with a backoff (60 s doubling to 10 min, one
+  line per wait) until admitted or `--wait-minutes N` (180 by default) pass, and without
+  `--wait` the refusal fails at once naming the shortage. The measurement is printed in the plan and the command's
   final report. The account runs 40 jobs at once (GitHub Pro; wisp:docs/ci.md,
   "Runner capacity and waiting"). Work is packed across four cores by measured
   CPU time into jobs of at most 15 predicted minutes. Long ceiling panels and

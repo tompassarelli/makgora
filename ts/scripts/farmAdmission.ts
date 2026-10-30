@@ -1,6 +1,7 @@
 import { Effect, Schema } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
+import { NO_FREE_SLOTS } from "./farmWait";
 
 export const Jobs = Schema.Struct({ jobs: Schema.Array(Schema.Struct({
   name: Schema.String, status: Schema.String, conclusion: Schema.NullOr(Schema.String),
@@ -65,7 +66,7 @@ export const runnerAdmission = (repo: string, excludeRun: number) => Effect.gen(
   const parallel = Math.max(0, 40 - busy - reserve);
   const measurement = `Hosted admission: 40 - ${busy} busy - ${reserve} reserve = ${parallel} farm slots; reserve is the larger of ${GATE_RESERVE} and the time-weighted p90 concurrent hosted jobs across ${samples} Autoland and Farm test runs in ${recent.length} recently active public repositories`;
   console.error(measurement);
-  if (parallel === 0) return yield* new FarmFailure({ problem: `${measurement}; no free capacity for a farm` });
+  if (parallel === 0) return yield* new FarmFailure({ problem: `${measurement}; ${NO_FREE_SLOTS}` });
   return { parallel, reserve, measurement };
 });
 

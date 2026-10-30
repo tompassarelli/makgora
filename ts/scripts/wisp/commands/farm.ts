@@ -23,6 +23,7 @@ import { Effect } from "effect";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import { FarmFailure, type RunState, currentRepo, dispatch, farmTest, resolveRef, run, runTag, waitFor } from "wisp/scripts/wisp/farm";
 import { type Admission, type FarmWorkflow, admit, revertedBy } from "../../farmGuard";
+import { WAIT_MINUTES, isSlotShortage, untilAdmitted } from "../../farmWait";
 
 const WORKFLOWS = { balance: "balance.yml", pads: "headless-pads.yml", perf: "perf.yml", memory: "memory-soak.yml" } as const;
 type Job = keyof typeof WORKFLOWS;
@@ -59,6 +60,15 @@ const unmatchedPads = (sha: string, names: readonly string[]) => Effect.gen(func
   });
 });
 
+
+const SHORTAGE_LINE = /Hosted admission:.*no free capacity for a farm/;
+
+const slotRefusal = (repo: string, id: number, state: RunState) => Effect.gen(function*() {
+  if (!state.jobs.some((job) => job.name === "plan" && job.conclusion === "failure")) return undefined;
+  const log = yield* run(["gh", "run", "view", String(id), "-R", repo, "--log-failed"]).pipe(Effect.orElseSucceed(() => ""));
+  const line = log.split("\n").find(isSlotShortage);
+  return line === undefined ? undefined : SHORTAGE_LINE.exec(line)?.[0] ?? line;
+});
 
 const balanceResult =(repo: string, id: number, state: RunState) => Effect.gen(function*() {
   const folder = mkdtempSync(join(tmpdir(), "farm-balance-"));
@@ -135,7 +145,7 @@ const memoryResult = (repo: string, id: number, state: RunState, matches?: numbe
 export const farm: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
     try: () => parseArgs({ args: [...args], allowPositionals: true, options: {
-      ref: { type: "string" }, lane: { type: "string" }, wait: { type: "boolean" }, out: { type: "string" }, opponent: { type: "string" }, tier: { type: "string" }, "per-pair": { type: "string" }, seeds: { type: "string" }, matchups: { type: "string" }, probe: { type: "string" }, minutes: { type: "string" }, matches: { type: "string" }, only: { type: "string", multiple: true },
+      ref: { type: "string" }, lane: { type: "string" }, wait: { type: "boolean" }, out: { type: "string" }, opponent: { type: "string" }, tier: { type: "string" }, "per-pair": { type: "string" }, seeds: { type: "string" }, matchups: { type: "string" }, probe: { type: "string" }, minutes: { type: "string" }, matches: { type: "string" }, only: { type: "string", multiple: true }, "wait-minutes": { type: "string" },
     } }),
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
@@ -154,14 +164,22 @@ export const farm: Command = (args) => Effect.gen(function*() {
   yield* Effect.scoped(Effect.gen(function*() {
     const { ref, scratch } = verdict.kind === "dispatch" ? { ref: admitted.sha, scratch: undefined } : yield* resolveRef(parsed.values.ref, repo);
     const lane = verdict.kind === "dispatch" ? verdict.lane : `farm/${ref.slice(0, 12)}`;
-    const tag = runTag();
-    const inputs = job === "balance"
+    const inputsFor = (tag: string) => job === "balance"
       ? { ref, lane, opponent: parsed.values.opponent ?? "wren", tier: parsed.values.tier ?? "expert", "per-pair": parsed.values["per-pair"] ?? "400", seeds: parsed.values.seeds ?? "100", matchups: parsed.values.matchups ?? "", probe: parsed.values.probe ?? "40", tag }
       : job === "perf" ? { ref, lane, runs: JSON.stringify(runs), tag } : job === "memory" ? { ref, lane, minutes: parsed.values.minutes ?? "30", matches: parsed.values.matches ?? "", tag } : { ref, lane, dirs: parsed.values.only?.join(" ") ?? ".", tag };
     const started = performance.now();
-    const found = yield* dispatch(repo, workflow, inputs);
-    if (parsed.values.wait !== true && scratch === undefined && job !== "perf") return;
-    const state = yield* waitFor(repo, found.databaseId);
+    const awaiting = parsed.values.wait === true || scratch !== undefined || job === "perf";
+    const waitMinutes = parsed.values.wait === true ? Number(parsed.values["wait-minutes"] ?? WAIT_MINUTES) : 0;
+    const waited = yield* untilAdmitted(() => Effect.gen(function*() {
+      const found = yield* dispatch(repo, workflow, inputsFor(runTag()));
+      if (!awaiting) return { value: undefined, refusal: undefined };
+      const state = yield* waitFor(repo, found.databaseId);
+      const refusal = job === "balance" ? yield* slotRefusal(repo, found.databaseId, state) : undefined;
+      return { value: { found, state }, refusal };
+    }), waitMinutes);
+    if (!waited.admitted) return yield* new FarmFailure({ problem: `not admitted to the hosted runners${waited.waits === 0 ? "" : ` after ${waited.waits} waits`}: ${waited.refusal}${parsed.values.wait === true ? "" : "; pass --wait to wait for free slots"}` });
+    if (waited.value === undefined) return;
+    const { found, state } = waited.value;
     console.error(`${((performance.now() - started) / 60000).toFixed(1)} min from dispatch to the result`);
     if (job === "balance") yield* balanceResult(repo, found.databaseId, state);
     else if (job === "perf") yield* perfResult(repo, found.databaseId, state, runs, parsed.values.out);
