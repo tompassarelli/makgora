@@ -16,7 +16,7 @@ import { readTga, type Rgba } from "../blp";
 import { reachFighterSelect } from "./gateIntro";
 import { movePointer } from "./gatePointer";
 import { projectRoot } from "./project";
-import { pixelPoint, texturePixels } from "./uiTexture";
+import { edgeRoom, pixelPoint, texturePixels } from "./uiTexture";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
@@ -119,14 +119,16 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
   const hoverPoint = pixelPoint(reference, hover.x, hover.y);
   yield* batch(first.client, [{ kind: "click", x: first.region.x + hoverPoint.x, y: first.region.y + hoverPoint.y, holdMillis: 200 }]).pipe(Effect.mapError(fail("hands gate drop")));
   yield* observe("hover", [{ ...hover, state: "fan" }, { ...CLEAR_SPOT, state: "point" }], false);
-  yield* move(second, EDGE_SPOT);
-  yield* observe("edge", [{ ...hover, state: "fan" }, { ...EDGE_SPOT, state: "point" }], false);
+  if (edgeRoom(reference, handLeft(EDGE_SPOT.x, "point", extent))) {
+    yield* move(second, EDGE_SPOT);
+    yield* observe("edge", [{ ...hover, state: "fan" }, { ...EDGE_SPOT, state: "point" }], false);
+  }
   const shown = (sample: Sample) => sample.error !== undefined && sample.error <= HAND_MATCH_ERROR;
   const badged = (sample: Sample) => sample.badgeDistance === undefined ? sample.phase === "edge" && sample.hand === 1 : sample.badgeDistance <= BADGE_COLOUR_DISTANCE;
   const own = samples.filter(sample => sample.viewer === sample.hand);
   const remote = samples.filter(sample => sample.viewer !== sample.hand);
   const chips = samples.filter(sample => sample.chipError !== undefined);
-  const pass = samples.length === 12 && samples.every(shown) && samples.every(badged) && chips.length === 2 && chips.every(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR);
+  const pass = samples.length === (edgeRoom(reference, handLeft(EDGE_SPOT.x, "point", extent)) ? 12 : 8) && samples.every(shown) && samples.every(badged) && chips.length === 2 && chips.every(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR);
   const modified = yield* Clock.currentTimeMillis;
   const text = `SMASHCRAFT GATE hands samples=${samples.length} own=${own.filter(shown).length} remote=${remote.filter(shown).length} badges=${samples.filter(badged).length} chips=${chips.filter(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR).length} pass=${pass ? 1 : 0}`;
   yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: MATCH_ERROR, badgeDistance: BADGE_COLOUR_DISTANCE, handStates: HAND_STATES, samples }, undefined, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "hands gate evidence", problem: String(cause) }) });

@@ -18,7 +18,7 @@ import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
 import { reachFighterSelect } from "./gateIntro";
 import { movePointer } from "./gatePointer";
 import { projectRoot } from "./project";
-import { type UiRect, pixelPoint, texturePixels } from "./uiTexture";
+import { type UiRect, edgeRoom, pixelPoint, texturePixels } from "./uiTexture";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
@@ -117,7 +117,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   const negativeControlError = cursorPixels(controlFrame, texture.point, 0.4, 0.56, "point", handExtent)?.error;
   if (!control.visible || negativeControlError === undefined || negativeControlError <= 24) return yield* new AcceptFailure({ operation: "cursor gate calibration", problem: `positive error=${control.error}; negative error=${negativeControlError}` });
   yield* sample("before-pick", CLEAR_SPOT.x, CLEAR_SPOT.y);
-  yield* sample("edge", EDGE_SPOT.x, EDGE_SPOT.y);
+  if (edgeRoom(frame, handLeft(EDGE_SPOT.x, "point", handExtent))) yield* sample("edge", EDGE_SPOT.x, EDGE_SPOT.y);
   yield* clickThrough("pick", pin.x, pin.y);
   yield* sample("after-pick", pin.x, pin.y);
   const first = cellRect(grid, 0);

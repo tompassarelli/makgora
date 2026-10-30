@@ -77,3 +77,6 @@ export function texturePixels(frame: Frame, full: Rgba, x: number, y: number, ui
   }
   return Number.isFinite(best) ? { error: best, pixels: bestPixels, matchedPixels: bestMatchedPixels } : undefined;
 }
+
+// A hand that runs off the left of the 4:3 area is whole on screen only when the window has that much margin beside the area; in a 4:3 window the screen clips it.
+export const edgeRoom = (frame: Frame, left: number): boolean => (frame.width - frame.height * 4 / 3) / 2 >= -left * frame.height / 0.6 + 3;
