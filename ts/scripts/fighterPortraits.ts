@@ -13,7 +13,9 @@ import { createStandaloneSession, NEUTRAL_INPUT } from './wisp/standalone';
 import { headlessRender } from './wisp/headlessRender';
 import { assetsView, readManifest } from './wisp/buildInputs';
 import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/roster/kits';
-import { fighterPortrait, portraitCostumes, portraitOutfit } from '../src/game/roster/looks';
+import { fighterPortrait, heroLook, portraitCostumes, portraitOutfit } from '../src/game/roster/looks';
+import { costumeBody } from '../src/generated/costumes/costumeBodies';
+import { PARTNER_COSTUME } from '../src/game/presentation/model/costume';
 import { costumesFor } from '../src/game/roster/costumes';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';
@@ -117,15 +119,22 @@ class PortraitFailure extends Schema.TaggedError<PortraitFailure, { readonly bra
 
 const withoutFog = ({ fog: _fog, ...environment }: RenderScene['environment']) => environment;
 
-/** The fighter alone at the origin in its match Stand pose, under the stage's light without sky or fog. */
+/** A duo's partner stands behind the leader and to image right, in model units of the leader's scale, turned this many degrees further toward image right. */
+const PARTNER_PLACE = { across: 34, behind: 24, turn: 25 };
+const partnerModel = (character: number): string | undefined => heroLook(characterOf(character))?.partner === undefined ? undefined : costumeBody(characterOf(character), PARTNER_COSTUME);
+
+/** The fighter alone at the origin in its match Stand pose, under the stage's light without sky or fog; a duo's partner stands behind it. */
 const portraitScene = (scene: RenderScene, character: number, frame: { x: number; z: number; height: number }, variant: number, pose?: Portrait): RenderScene => {
   // Player one's fighter stands left of centre, facing right.
   const body = scene.effects.find((effect) => effect.x < -100 && Math.abs(effect.yaw) < 0.01 && !effect.model.includes('OriginalLight'));
   if (body === undefined) throw new Error(`${fighterName(characterOf(character))}: no fighter body in ${scene.effects.map((effect) => effect.model).join(', ')}`);
   const distance = frame.height * 1.1 / (2 * Math.tan(FOV * Math.PI / 360));
+  const partner = partnerModel(character), partnerScale = heroLook(characterOf(character))?.partner?.scale ?? 1;
+  const posed = { ...body, x: 0, y: 0, z: 0, yaw: pose?.yaw ?? 0, teamColor: at(VARIANTS, variant).team, ...(pose?.elapsed === undefined ? {} : { animationElapsed: pose.elapsed }), ...(correctionOf(character).clock === undefined ? {} : { animationClock: correctionOf(character).clock }) };
+  const behind = partner === undefined ? [] : [{ ...posed, model: partner, handle: { ...posed.handle, id: posed.handle.id - 1 }, scale: body.scale * partnerScale, x: PARTNER_PLACE.across * body.scale, y: PARTNER_PLACE.behind * body.scale, yaw: posed.yaw + PARTNER_PLACE.turn * Math.PI / 180 }];
   return {
     ...scene, frame: frameOf(character, variant), client: 0, units: [], ui: [], textTags: [], filter: undefined,
-    effects: [{ ...body, x: 0, y: 0, z: 0, yaw: pose?.yaw ?? 0, teamColor: at(VARIANTS, variant).team, ...(pose?.elapsed === undefined ? {} : { animationElapsed: pose.elapsed }), ...(correctionOf(character).clock === undefined ? {} : { animationClock: correctionOf(character).clock }) }],
+    effects: [posed, ...behind],
     environment: { ...withoutFog(scene.environment), skyVisible: false, dayNight: { ...scene.environment.dayNight, unit: lightPath(at(LIGHT_PASSES, 0)) } },
     // The camera's right is (sin rotation, -cos rotation) on the ground.
     camera: { x: frame.x * Math.sin(ROTATION * Math.PI / 180), y: -frame.x * Math.cos(ROTATION * Math.PI / 180), fields: {
@@ -250,12 +259,12 @@ interface Portrait { readonly elapsed: number; readonly yaw: number; readonly an
  * crops moved right and down by these head sizes, centring a lopsided silhouette) and `flipped`
  * (the head bone's local up axis points down on screen, so the upright check reverses it).
  */
-interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly clock?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
+interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly clock?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly shift?: readonly [number, number]; readonly duo?: { readonly zoom: number; readonly shift: readonly [number, number] }; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
 const CORRECTIONS: Readonly<Record<string, Correction>> = {
   "Anub'arak": { zoom: 0.6, angle: -30 },
   Lich: { lift: 1.3, zoom: 1.2 },
   ChenStormstout: { zoom: 1.3 },
-  Murloc: { zoom: 1.47, shift: [0.03, -0.46], clock: 1.5 },
+  Murloc: { zoom: 1.47, shift: [0.03, -0.46], clock: 1.5, duo: { zoom: 1.2, shift: [0, -0.2] } },
   PitLord: { lift: 1.3 },
   Tyrande: { turn: -15 },
   Illidan: { zoom: 1.35 },
@@ -386,6 +395,14 @@ function portraitPose(bytes: Uint8Array, character: number, animation: string | 
 
 /** A fighter's head in the 1024 px render: the centre and larger side of its projected mesh, and whether its crown draws above its chin. */
 interface Head { readonly x: number; readonly y: number; readonly size: number; readonly upright: boolean }
+/** How a duo's tile and bust frame both heads: the box around them, magnified by `zoom` and moved by `shift` head sizes. */
+interface DuoCrop { readonly found: Head; readonly zoom: number; readonly shift: readonly [number, number] }
+
+const withinBoth = (a: Head, b: Head): Head => {
+  const left = Math.min(a.x - a.size / 2, b.x - b.size / 2), right = Math.max(a.x + a.size / 2, b.x + b.size / 2);
+  const top = Math.min(a.y - a.size / 2, b.y - b.size / 2), bottom = Math.max(a.y + a.size / 2, b.y + b.size / 2);
+  return { x: (left + right) / 2, y: (top + bottom) / 2, size: Math.max(right - left, bottom - top), upright: a.upright && b.upright };
+};
 
 /**
  * The head's place and size in the 1024 px render: its mesh (headOf) posed at
@@ -393,14 +410,14 @@ interface Head { readonly x: number; readonly y: number; readonly size: number; 
  * draws with). Framing the head mesh rather than the body's bounds keeps
  * weapons, wings and shoulders from pulling the crop off the face.
  */
-function headBox(bytes: Uint8Array, scene: RenderScene, height: number, flipped = false): Head | undefined {
+function headBox(bytes: Uint8Array, scene: RenderScene, height: number, flipped = false, which = 0): Head | undefined {
   const model = parseMDX(bytes.slice().buffer);
   const head = headOf(model);
-  const pose = scene.effects[0];
+  const pose = scene.effects[which];
   if (head === undefined || pose === undefined) return undefined;
   const { state } = posedAt(model, sequenceOf(model, pose.animation), Math.round(pose.animationElapsed * 1000));
   const pitch = (scene.camera.fields.CAMERA_FIELD_ANGLE_OF_ATTACK ?? 0) * Math.PI / 180, pixels = RESOLUTION / (height * 1.1);
-  const placed = (local: Vector): Vector => [(local[0] * Math.cos(pose.yaw) - local[1] * Math.sin(pose.yaw)) * pose.scale, (local[0] * Math.sin(pose.yaw) + local[1] * Math.cos(pose.yaw)) * pose.scale, local[2] * pose.scale];
+  const placed = (local: Vector): Vector => [(local[0] * Math.cos(pose.yaw) - local[1] * Math.sin(pose.yaw)) * pose.scale + pose.x, (local[0] * Math.sin(pose.yaw) + local[1] * Math.cos(pose.yaw)) * pose.scale + pose.y, local[2] * pose.scale + pose.z];
   // Rotation 90: the camera's right is +x and its up is (0, -sin pitch, cos pitch).
   const project = (local: Vector) => { const world = placed(local); return RESOLUTION / 2 - (-(world[1] - scene.camera.y) * Math.sin(pitch) + (world[2] - (scene.camera.fields.CAMERA_FIELD_ZOFFSET ?? 0)) * Math.cos(pitch)) * pixels; };
   const xs: number[] = [], ys: number[] = [], everyHeight: [number, number, boolean][] = [];
@@ -457,7 +474,7 @@ const TGA = ['-depth', '8', '-compress', 'none'];
  * tiles and busts frame head and shoulders around the head mesh (headBox), stock
  * icons the head alone; without a head, the silhouette's top sixth stands in.
  */
-function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0]): { readonly upright: boolean; readonly bust: { readonly size: number; readonly left: number; readonly top: number } } {
+function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0], duo?: DuoCrop): { readonly upright: boolean; readonly bust: { readonly size: number; readonly left: number; readonly top: number } } {
   const box = run(['magick', raw, '-alpha', 'extract', '-threshold', '10%', '-format', '%@', 'info:']).trim();
   const bounds = box.match(/(\d+)x(\d+)\+(\d+)\+(\d+)/);
   if (bounds === null) throw new Error(`${raw}: nothing drawn`);
@@ -465,11 +482,12 @@ function crops(raw: string, directory: string, name: string, suffix: string, kin
   const band = run(['magick', raw, '-alpha', 'extract', '-threshold', '10%', '-crop', `${RESOLUTION}x${Math.max(1, Math.round(h / 10))}+0+${y}`, '+repage', '-format', '%@', 'info:']).trim().match(/(\d+)x\d+\+(\d+)\+/);
   const placed = found ?? { x: band === null ? x + w / 2 : Number(band[2]) + Number(band[1]) / 2, y: y + h / 12, size: h / 6 };
   const head = { ...placed, x: placed.x + shift[0] * placed.size, y: placed.y + shift[1] * placed.size };
-  const window = (side: number, above: number) => {
+  const pair = duo === undefined ? undefined : { ...duo.found, x: duo.found.x + duo.shift[0] * duo.found.size, y: duo.found.y + duo.shift[1] * duo.found.size };
+  const window = (side: number, above: number, around = head) => {
     const size = Math.round(Math.max(64, Math.min(RESOLUTION, side)));
-    return { size, left: Math.max(0, Math.min(RESOLUTION - size, Math.round(head.x - size / 2))), top: Math.max(0, Math.min(RESOLUTION - size, Math.round(head.y - size * above))) };
+    return { size, left: Math.max(0, Math.min(RESOLUTION - size, Math.round(around.x - size / 2))), top: Math.max(0, Math.min(RESOLUTION - size, Math.round(around.y - size * above))) };
   };
-  const bust = window(2.6 * head.size / zoom, 0.42), portrait = `${bust.size}x${bust.size}+${bust.left}+${bust.top}`;
+  const bust = pair === undefined ? window(2.6 * head.size / zoom, 0.42) : window(2.6 * pair.size / (duo?.zoom ?? 1), 0.42, pair), portrait = `${bust.size}x${bust.size}+${bust.left}+${bust.top}`;
   const file = (kind: PortraitKind) => join(directory, `Fighter${kind}${name}${suffix}.tga`);
   if (kinds.includes('Card')) {
     const inner = Math.round(CARD_TEXTURE_PX * 0.94);
@@ -509,7 +527,7 @@ await Effect.runPromise(Effect.gen(function*() {
     } finally { session.close(); }
   }
   const stock = headlessRender({ assets });
-  const bodies = new Map([...captured].map(([character, scene]) => [at(portraitScene(scene, character, { x: 0, z: 0, height: 1 }, 0).effects, 0).model.toLowerCase(), character]));
+  const bodies = new Map([...captured].flatMap(([character, scene]) => portraitScene(scene, character, { x: 0, z: 0, height: 1 }, 0).effects.map((effect) => [effect.model.toLowerCase(), character] as const)));
   const project = { ...stock, width: DRAWN, height: DRAWN,
     resolveAsset: async (...args: Parameters<typeof stock.resolveAsset>) => {
       const pass = LIGHT_PASSES.find((candidate) => lightPath(candidate) === args[0]);
@@ -582,7 +600,12 @@ await Effect.runPromise(Effect.gen(function*() {
       const scene = required(scenes.get(frame), 'scene'), body = at(scene.effects, 0);
       const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
       const kept = kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS);
-      const cut = crops(raw, into, name, suffix, kept, bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(character).shift);
+      const height = required(heights.get(character), 'height'), tuned = correctionOf(character);
+      const lead = bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, height, tuned.flipped);
+      const partner = scene.effects[1], partnerBytes = partner === undefined ? undefined : (yield* Effect.promise(() => project.resolveAsset(partner.model, graphics))).bytes;
+      const behind = partnerBytes === undefined || lead === undefined ? undefined : headBox(partnerBytes, scene, height, tuned.flipped, 1);
+      const duo = lead === undefined || behind === undefined || tuned.duo === undefined ? undefined : { found: withinBoth(lead, behind), ...tuned.duo };
+      const cut = crops(raw, into, name, suffix, kept, lead, required(poses.get(character), 'pose').zoom, tuned.shift, duo);
       if (!cut.upright) upsideDown.push(`${graphics} ${name}${suffix}`);
       if (graphics === 'classic' && into === portraits && kept.includes('Bust') && bytes !== undefined) {
         const nodes = new Set(parseMDX(bytes.slice().buffer).Nodes.flatMap((node) => node === undefined ? [] : [node.Name]));
