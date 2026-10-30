@@ -41,6 +41,7 @@ import { type MatchState, Phase, advanceClock, holdingStart, humanFighterActive,
 import { advanceItems } from "./centreItem";
 import { advanceOrbs } from "./orbs";
 import { seatMurlocPartners } from "../fighters/murloc/duo";
+import { drivePartners } from "./partnerDrive";
 
 import { bossClock, collectBossContacts, strikeBoss } from "../classic/bosses";
 import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../classic/configuredMatch";
@@ -175,6 +176,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   if (scope !== undefined) setRosterMask(world, 1 << scope.slot);
   carryOnMovingDecks(world, stage, stageFrame);
   advanceCurses(world, stage, stageFrame);
+  drivePartners(world, controls, frame);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
