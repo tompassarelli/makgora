@@ -87,7 +87,8 @@ function traceMove(model: DrawnModel, character: Character, weapons: readonly We
     shifted && index === 0 && slot === 0 ? { ...capsule, x1: capsule.x1 + shift.dx, x2: capsule.x2 + shift.dx } : capsule));
   const edges = frames.map(frame => weapons.map(weapon => edgeAt(model, weapon, sampled.seconds[frame] ?? 0)));
   const side = AERIAL_SIDE[sampled.move] ?? 0;
-  const turned = side === 0 ? [] : frames.filter((_, index) => !(edges[index] ?? []).some(edge => edge.tip[0] * side > 0));
+  const reaches = (edge: readonly Edge[]) => edge.flatMap(each => [each.grip[0], each.tip[0]]).reduce((far, x) => Math.abs(x) > Math.abs(far) ? x : far, 0) * side > 0;
+  const turned = side === 0 ? [] : frames.filter((_, index) => !(edges[index] ?? []).some(edge => edge.tip[0] * side > 0) && !reaches(edges[index] ?? []));
   const struck = striker(sampled.regionOwners[frames[0] ?? 0]);
   const row: Row = {
     fighter, move: sampled.move, weapons: weapons.map(weapon => weapon.name).join('+'), frames,
