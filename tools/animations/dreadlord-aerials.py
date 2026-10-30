@@ -1,4 +1,4 @@
-"""Blender boundary: author Mal'Ganis's forward and back air, so the two aerials strike on opposite sides with different limbs.
+"""Blender boundary: author Mal'Ganis's forward and back air and his forward smash, so the two aerials strike on opposite sides with different limbs and the smash is a planted double claw rake.
 
 The rig comes from `attack-gesture-clips.ts PRIVATE_ASSETS OUT --character 8 --replace-pose backAir|forwardAir --rig RIG.json`:
 every node becomes a bone with identity rest orientation, so a bone's local rotation and location are the model's own
@@ -10,7 +10,11 @@ the late hit, then pulls the legs in and settles.
 forwardAir: he draws his right claw up behind his head with his knees tucked and his chest leaning back, rakes it
 over and down through the space in front of him as his chest pitches forward, carries it low past his knees and settles.
 
-  blender --background --factory-startup --python tools/animations/dreadlord-aerials.py -- backAir|forwardAir RIG.json KEYS.json
+forwardSmash: he plants his hooves wide, arches back with the wings raised, the right claw drawn up behind his head and the
+left drawn low behind his hip, holds that charge, then whips forward so both claws cross in an X in front of him through the
+active frames (right high to low, left low to high), carries them through and settles.
+
+  blender --background --factory-startup --python tools/animations/dreadlord-aerials.py -- backAir|forwardAir|forwardSmash RIG.json KEYS.json
 """
 import json
 import sys
@@ -92,9 +96,14 @@ def reach(upper, lower, end, x, z, bend):
 
 rest()
 relative = lambda root, end: (bones[end].head.x - bones[root].head.x, bones[end].head.z - bones[root].head.z)
-READY = dict(dx=0, dz=0, lean=0, chest=0, head=0, wing=0,
+PLANT = move == 'forwardSmash'
+CLAW_LENGTH = 32
+rest_foot = {side: (bones[f'Bone_Foot_{side}'].head.x, bones[f'Bone_Foot_{side}'].head.z) for side in 'LR'}
+READY = dict(aim=0, clawR=(0, 0), clawL=(0, 0), dx=0, dz=0, lean=0, chest=0, head=0, wing=0,
              handR=relative('Bone_Arm1_R', 'Bone_Hand_R'), handL=relative('Bone_Arm1_L', 'Bone_Hand_L'),
              footL=relative('Bone_Leg1_L', 'Bone_Foot_L'), footR=relative('Bone_Leg1_R', 'Bone_Foot_R'))
+if PLANT:
+    READY.update(footL=(0, 0), footR=(0, 0))
 
 if move == 'backAir':
     TUCK = dict(dx=0, dz=6, lean=8, chest=6, head=-4, wing=4, handR=(6, -30), handL=(2, -32), footL=(16, -14), footR=(12, -16))
@@ -122,6 +131,24 @@ elif move == 'forwardAir':
     FINAL = SINK
     LET_GO = lambda t: 0.5 * t
     RELEASE = lambda t: min(1, t / 0.9)
+elif move == 'forwardSmash':
+    HANDS = dict(aim=0, clawR=(0, 0), clawL=(0, 0))
+    COIL = dict(HANDS, dx=-3, dz=-4, lean=-8, chest=-8, head=3, wing=-14, handR=(-10, 38), handL=(-10, -34), footL=(10, 0), footR=(-8, 0))
+    CHARGE = dict(HANDS, dx=-6, dz=-7, lean=-14, chest=-12, head=6, wing=-20, handR=(-22, 46), handL=(-18, -40), footL=(12, 0), footR=(-12, 0))
+    SHUDDER = dict(CHARGE, dx=-7, dz=-8, lean=-16, chest=-14, wing=-22, handR=(-24, 48), handL=(-20, -42))
+    HOLD = dict(CHARGE, dx=-6, dz=-7, lean=-15, chest=-13, wing=-21, handR=(-23, 47), handL=(-19, -41))
+    WHIP = dict(HANDS, dx=3, dz=-6, lean=6, chest=0, head=2, wing=-4, handR=(24, 40), handL=(22, -40), footL=(12, 0), footR=(-12, 0))
+    BODY = dict(dx=12, dz=-10, lean=24, chest=16, head=-2, footL=(16, 0), footR=(-14, 0), handR=(0, 0), handL=(0, 0), aim=1)
+    STRIKE = dict(BODY, wing=26, clawR=(92, 61), clawL=(92, 28))
+    SECOND = dict(BODY, dx=15, wing=28, clawR=(102, 55), clawL=(102, 35))
+    CROSS = dict(BODY, dx=18, wing=30, clawR=(110, 46), clawL=(110, 46))
+    DOWN = dict(BODY, dx=20, wing=32, clawR=(116, 36), clawL=(116, 56))
+    CARRY = dict(BODY, dx=12, dz=-6, lean=18, chest=12, head=0, wing=16, clawR=(104, 22), clawL=(104, 66))
+    BEATS = [(0, READY), (5, COIL), (8, CHARGE), (10, SHUDDER), (12, HOLD), (contact - 2, SHUDDER), (contact - 1, WHIP), (contact, STRIKE), (contact + 1, SECOND), (contact + 2, CROSS), (last, DOWN)]
+    AFTER = CARRY
+    FINAL = DOWN
+    LET_GO = lambda t: min(1, t / 0.3)
+    RELEASE = lambda t: smooth(max(0, (t - 0.1) / 0.9))
 else:
     raise SystemExit(f'unknown move {move}')
 
@@ -169,10 +196,17 @@ def pose(p):
     for side in 'LR':
         hip = bones[f'Bone_Leg1_{side}'].head
         dx, dz = p[f'foot{side}']
-        reach(f'Bone_Leg1_{side}', f'Bone_Leg2_{side}', f'Bone_Foot_{side}', hip.x + dx, hip.z + dz, (1, 0, 0.3))
+        x, z = (rest_foot[side][0] + dx, rest_foot[side][1] + dz) if PLANT else (hip.x + dx, hip.z + dz)
+        reach(f'Bone_Leg1_{side}', f'Bone_Leg2_{side}', f'Bone_Foot_{side}', x, z, (1, 0, 0.3))
     for side in 'RL':
         shoulder = bones[f'Bone_Arm1_{side}'].head
         dx, dz = p[f'hand{side}']
+        if p['aim']:
+            cx, cz = p[f'claw{side}']
+            gx, gz = cx - shoulder.x, cz - shoulder.z
+            length = (gx * gx + gz * gz) ** 0.5
+            far = max(length - CLAW_LENGTH, 6) / length
+            dx, dz = dx * (1 - p['aim']) + gx * far * p['aim'], dz * (1 - p['aim']) + gz * far * p['aim']
         reach(f'Bone_Arm1_{side}', f'Bone_Arm2_{side}', f'Bone_Hand_{side}', shoulder.x + dx, shoulder.z + dz, (-0.3, 0, -1))
 
 
@@ -186,7 +220,7 @@ previous = {}
 for frame in range(frames + 1):
     pose(at(frame))
     if '--debug' in sys.argv:
-        print('DBG', frame, 'clawR', point(CLAW['R']), 'handR', point('Bone_Hand_R'), 'footL', point('Bone_Foot_L'), 'footR', point('Bone_Foot_R'),
+        print('DBG', frame, 'clawR', point(CLAW['R']), 'clawL', point(CLAW['L']), 'shR', point('Bone_Arm1_R'), 'handR', point('Bone_Hand_R'), 'footL', point('Bone_Foot_L'), 'footR', point('Bone_Foot_R'),
               'kneeR', point('Bone_Leg2_R'), 'hipR', point('Bone_Leg1_R'), 'head', point('Bone_Head'), 'wingtip', point('Mesh75'), point('Mesh68'))
     w = settled(frame)
     for name, entry in zip(created, out['nodes']):
