@@ -11,10 +11,10 @@ import { readFileSync } from "node:fs";
 import { Console, Effect, Option, Schema } from "effect";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
-import { MenuFailure, installMenuPage, reportedMenus } from "wisp/scripts/wisp/menus";
+import { MenuFailure, reportedMenus } from "wisp/scripts/wisp/menus";
 import { readJoinCode } from "../joinCode";
 import { newestPlayable } from "../mapLibrary";
-import { retailFolder, setUpMenuPage } from "../menuPageSetup";
+import { installPage, setUpMenuPage } from "../menuPageSetup";
 import { hostMatch, joinMatch } from "../online";
 import { PLAYTEST_PREFIX, clientState, gameFilesLayer } from "../project";
 import { PLAYTEST } from "./play";
@@ -84,7 +84,7 @@ const startLine = Effect.callback<void>((resume) => {
 
 const menusOf = (install: Install, repair: boolean) => Effect.gen(function*() {
 
-  if (repair) yield* installMenuPage(retailFolder(install.prefix), install.menuReportPort).pipe(Effect.ignore);
+  if (repair) yield* installPage(install.prefix, install.menuReportPort).pipe(Effect.ignore);
   const menus = yield* reportedMenus(install.menuReportPort);
   if (menus === undefined) return yield* new MenuFailure({ operation: "find the menus", problem: `no menu page reported to 127.0.0.1:${install.menuReportPort} within 3 s` });
   return menus;

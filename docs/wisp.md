@@ -76,7 +76,10 @@ scripts' checks per hour remain separate #312 measurements.
 In `~/.local/state/smashcraft/clients.json`, a client may set
 `"menuReportPort": 47123`. That port must match the port used by
 `bun wisp menus install RETAIL_DIR --port 47123` for its Wine prefix.
-Use a distinct port for each installed page. A client without a configured
+Use a distinct port for each installed page. `online setup` and `--repair`
+refuse a prefix under the LAN pool's `wisp/lan/clients/` (symlinks resolved):
+the pool writes those pages, so a playtest uses its own client or takes the
+pair through `wisp lan lease take`. A client without a configured
 port, or whose page does not report within 3 seconds, can't host: `fresh`
 and `play` stop rather than create a game by clicks, which Battle.net lists
 publicly. Installing the page and enabling Allow Local Files requires the

@@ -4,8 +4,9 @@
 
 
 
-import { copyFileSync, existsSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { copyFileSync, existsSync, readFileSync, realpathSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { Effect } from "effect";
 import { prefixUse, serverDirectoryName } from "wisp/scripts/warcraft/battleNet";
 import { runPlatformSync } from "wisp/scripts/platform/layer";
@@ -13,6 +14,25 @@ import { ProcessTable } from "wisp/scripts/platform/services";
 import { MenuFailure, installMenuPage } from "wisp/scripts/wisp/menus";
 
 export const retailFolder = (prefix: string) => join(prefix, "drive_c/Program Files (x86)/Warcraft III/_retail_");
+
+const resolved = (path: string) => {
+  try {
+    return realpathSync(path);
+  } catch {
+    return resolve(path);
+  }
+};
+
+export const poolClientsRoot = () => join(process.env["XDG_DATA_HOME"] ?? join(homedir(), ".local/share"), "wisp/lan/clients");
+
+export const inLanPool = (prefix: string, root = poolClientsRoot()) => {
+  const inside = relative(resolved(root), resolved(prefix));
+  return inside !== "" && !inside.startsWith("..") && !isAbsolute(inside);
+};
+
+export const installPage = (prefix: string, reportPort: number) => inLanPool(prefix)
+  ? Effect.fail(new MenuFailure({ operation: "install the menu page", problem: `${prefix} is a LAN pool client whose page the pool writes; a playtest uses its own client or takes the pair through \`wisp lan lease take\`` }))
+  : installMenuPage(retailFolder(prefix), reportPort);
 
 const KEY = "[Software\\\\Blizzard Entertainment\\\\Warcraft III]";
 const VALUE = `"Allow Local Files"=dword:00000001`;
@@ -57,7 +77,7 @@ export type SetupResult = "ready" | "page written; close Warcraft III and Battle
 
 
 export const setUpMenuPage = (prefix: string, reportPort: number) => Effect.gen(function*() {
-  yield* installMenuPage(retailFolder(prefix), reportPort);
+  yield* installPage(prefix, reportPort);
   const userReg = join(prefix, "user.reg");
   const current = yield* Effect.try({
     try: () => readFileSync(userReg, "utf8"),
