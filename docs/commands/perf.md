@@ -49,10 +49,13 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   over the prior run, naming the pair. Pairs the run skipped are not judged; a
   pair without a prior row, a fighter added since, fails when it rises more
   than the margin over the prior's costliest pair (#682). Background sweeps checks full roster coverage
-  and fetches pairs from a successful Background run on the nearest first-parent
-  main commit in the last 60 commits, excluding the current run. Without a prior
-  artifact it warns and passes drift comparison; coverage and absolute frame
-  budgets still apply. Joined pairs are uploaded after sweeps and census pass,
+  and fetches pairs from the newest successful Background run on main whose
+  artifact is for a first-parent main commit within the 30-day artifact
+  retention, excluding the current run. When this instrument has green
+  artifacts but none is live (all expired) the run fails with `NoPrior` until a
+  `rebaseline` dispatch decides the rise (#836); an instrument with no
+  artifact at all, such as a new Wisp build, warns and passes drift comparison.
+  Coverage and absolute frame budgets always apply. Joined pairs are uploaded after sweeps and census pass,
   retained for 30 days, and used only once the whole Background run succeeds.
   The margin's source: five farm census runs
   of all 26 pairs (2026-10-10) gave identical worst-frame instructions and

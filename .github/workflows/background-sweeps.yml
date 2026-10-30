@@ -149,27 +149,39 @@ jobs:
         run: echo "key=taps-land-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h', 'ts/node_modules/wisp/src/headless/luaPerf.ts') }}" >> "$GITHUB_OUTPUT"
       - name: Fetch main's last green Background census pairs
         working-directory: ts
-        timeout-minutes: 3
+        timeout-minutes: 5
         env:
           GH_TOKEN: ${{ github.token }}
           INSTRUMENT: ${{ steps.instrument.outputs.key }}
+          REBASELINE: ${{ inputs.rebaseline }}
         run: |
-          git -c gc.auto=0 fetch -q --depth 60 origin main
-          for commit in $(git rev-list --first-parent -n 60 FETCH_HEAD); do
-            gh api --paginate "repos/$GITHUB_REPOSITORY/actions/artifacts?name=census-pairs-$INSTRUMENT-$commit&per_page=100" --jq '.artifacts[] | select((.expired | not) and .workflow_run.head_branch == "main") | [.id, .workflow_run.id] | @tsv' > prior-artifacts.tsv
-            while read -r artifact run; do
+          git -c gc.auto=0 fetch -q --shallow-since="$(date -u -d '31 days ago' +%F)" origin main
+          git rev-list --first-parent FETCH_HEAD > main-commits.txt
+          seen=false
+          for page in $(seq 1 30); do
+            runs=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/background-sweeps.yml/runs?branch=main&status=success&per_page=100&page=$page" --jq '.workflow_runs[].id')
+            [ -n "$runs" ] || break
+            for run in $runs; do
               [ "$run" != "$GITHUB_RUN_ID" ] || continue
-              green=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq '.conclusion == "success" and .path == ".github/workflows/background-sweeps.yml"')
-              [ "$green" = true ] || continue
-              mkdir -p prior
-              gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact/zip" > prior/pairs.zip
-              unzip -q -o prior/pairs.zip -d prior
-              test -s prior/census-pairs.txt
-              echo "Census rise check against main $commit (Background run $run, artifact $artifact)"
-              exit 0
-            done < prior-artifacts.tsv
+              gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?per_page=100" --jq '.artifacts[] | select(.name | startswith("census-pairs-'"$INSTRUMENT"'-")) | [.name, .id, .expired] | @tsv' > run-artifacts.tsv
+              while IFS=$'\t' read -r name artifact expired; do
+                seen=true
+                commit=${name#census-pairs-"$INSTRUMENT"-}
+                [ "$expired" = false ] && grep -qx "$commit" main-commits.txt || continue
+                mkdir -p prior
+                gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact/zip" > prior/pairs.zip
+                unzip -q -o prior/pairs.zip -d prior
+                test -s prior/census-pairs.txt
+                echo "Census rise check against main $commit (Background run $run, artifact $artifact)"
+                exit 0
+              done < run-artifacts.tsv
+            done
           done
-          echo "::warning::No green Background census artifact from this instrument on main's last 60 first-parent commits: only coverage and absolute frame budgets apply"
+          if [ "$seen" = true ] && [ -z "$REBASELINE" ]; then
+            echo "::error title=NoPrior::this instrument's green census artifacts exist but none is still live on main's history, so a rise cannot be judged: dispatch Background sweeps with the rebaseline input to decide it"
+            exit 1
+          fi
+          echo "::warning::No green Background census artifact from this instrument on main: only coverage and absolute frame budgets apply"
       - name: Every fighter pair's worst frame within the margin of main's last green census (#405)
         working-directory: ts
         env:
