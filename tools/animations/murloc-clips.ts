@@ -44,7 +44,7 @@ const everyFrame = (keys: readonly Key[]): Key[] => keys.flatMap((key, i) => {
   return Array.from({ length: next.frame - key.frame }, (_, step) => ({ frame: key.frame + step,
     g: Object.fromEntries(fields.map(field => [field, (key.g[field] ?? 0) + ((next.g[field] ?? 0) - (key.g[field] ?? 0)) * step / (next.frame - key.frame)])) }));
 });
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; keys?: readonly Key[]; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
+interface Action { pose: HeroPose; append?: boolean; frames: number; contact: number; gesture: Gesture; keys?: readonly Key[]; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
 const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
@@ -73,6 +73,11 @@ const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, numbe
 for (const [pose, style, gesture, target] of normals) {
   const move = kitMoves.normals[style]; ensure(move, `${pose}: missing timing`);
   actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture, target, air: pose.endsWith("Air") });
+}
+const rapid = kitMoves.normals[AttackStyle.jab3];
+if (inPlace && replaced.includes("jab3")) {
+  ensure(rapid, "jab3: missing timing");
+  actions.push({ pose: "jab3", append: true, frames: rapid.totalFrames, contact: rapid.startupFrames, gesture: forward });
 }
 const couched: Gesture = { arm: -75, elbow: -120, hand: 0, pelvis: -5, leftElbow: -20 };
 Object.assign(actions.find(action => action.pose === "dashAttack")!, { target: undefined, keys: everyFrame([
@@ -174,7 +179,7 @@ const skeleton = (["Bones", "Helpers"] as const).flatMap(kind => source[kind].ma
 const restKey = (path: string) => { const track = originals.get(path); return track && !globalClock(track) ? track.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])?.Vector : undefined; };
 if (rigOutput) {
   const action = actions.find(a => a.pose === replaced[0]); ensure(action, `${replaced[0]}: not an authored ${fighterName} pose`);
-  const style = normals.find(normal => normal[0] === action.pose)?.[1], move = style === undefined ? undefined : kitMoves.normals[style];
+  const style = action.pose === "jab3" ? AttackStyle.jab3 : normals.find(normal => normal[0] === action.pose)?.[1], move = style === undefined ? undefined : kitMoves.normals[style];
   const at = (path: string) => { const v = restKey(path); return v ? Array.from(v) : null; };
   const spearNodes = new Set(source.Nodes.flatMap(node => node && ["Hand1", "Blade"].includes(node.Name) ? [node.ObjectId] : []));
   const spear = source.Geosets.flatMap(geoset => Array.from({ length: geoset.Vertices.length / 3 }, (_, v) => v).filter(v =>
@@ -183,7 +188,7 @@ if (rigOutput) {
   const span = spear.flatMap(a => spear.map(b => [a, b] as const)).reduce((best, pair) => Math.hypot(...pair[0].map((x, i) => x - pair[1][i]!)) > Math.hypot(...best[0].map((x, i) => x - best[1][i]!)) ? pair : best);
   const bladePivot = source.PivotPoints[source.Nodes.find(node => node?.Name === "Blade")!.ObjectId]!;
   const [butt, blade] = Math.hypot(...span[0].map((x, i) => x - bladePivot[i]!)) > Math.hypot(...span[1].map((x, i) => x - bladePivot[i]!)) ? [span[1], span[0]] : span;
-  await Bun.write(rigOutput, JSON.stringify({ frames: action.frames, contact: action.contact, active: move?.activeFrames ?? 1, blade: blade.map((x, i) => x - butt[i]!), tip: blade,
+  await Bun.write(rigOutput, JSON.stringify({ frames: action.frames, contact: action.contact, active: move?.activeFrames ?? 1, hits: move?.regions.map(region => [region.firstFrame, region.lastFrame]) ?? [], blade: blade.map((x, i) => x - butt[i]!), tip: blade,
     nodes: skeleton.map(({ node, path }) => ({ name: node.Name, parent: skeleton.findIndex(s => s.node.ObjectId === node.Parent), pivot: Array.from(source.PivotPoints[node.ObjectId]!), rotation: at(`${path}.Rotation`), translation: at(`${path}.Translation`) })) }));
   console.log(`MURLOC_RIG ${action.pose} ${rigOutput}`); process.exit(0);
 }
@@ -213,7 +218,7 @@ if (inPlace && !painOnly) damageActions.length = 0;
 for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const name = ordinal < actions.length ? `${fighterName} ${action.pose}` : `${fighterName} Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   const existing = inPlace ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
-  ensure(!inPlace || existing >= 0, `${name}: shipped sequence missing`);
+  ensure(!inPlace || existing >= 0 || action.append, `${name}: shipped sequence missing`);
   const index = existing >= 0 ? existing : model.Sequences.length;
   const start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
   if (existing >= 0) {

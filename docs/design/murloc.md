@@ -93,8 +93,8 @@ and action.
 
 | Input | Gesture and role | Frames; damage; reach | Warcraft source | Smash reference |
 |---|---|---|---|---|
-| Jab 1 → 2 → flurry | Short stab, a quick second stab, then a flurry of fin slaps while the button stays held | 3/2/11, 2% → 4/2/12, 2% → slaps 3, 7, 11, 15, 19 and 23, 1% each, then a finisher at 27 (3 active, 14 recovery, 3%, 40°) | [Tiderunner claws][wc] | [Squirtle jab][sq], [Fox jab][fox] |
-| Forward tilt / angled | Stepping spear stab, shoulder and hips behind it (forward and down); upward claw swing; spacing poke | 6/3/19; 8%; 76 | [Tiderunner claws][wc] | [Squirtle forward tilt][sq] |
+| Jab 1 → 2 → flurry | Short point-first spear stab, a quick second stab, then a flurry of quick spear pokes while the button stays held | 3/2/11, 2% → 4/2/12, 2% → slaps 3, 7, 11, 15, 19 and 23, 1% each, then a finisher at 27 (3 active, 14 recovery, 3%, 40°) | [Tiderunner claws][wc] | [Squirtle jab][sq], [Fox jab][fox] |
+| Forward tilt / angled | Long reaching spear poke, the body leaning in behind it to the far end of the hit (forward), stepping spear stab (down); upward claw swing; spacing poke | 6/3/19; 8%; 76 | [Tiderunner claws][wc] | [Squirtle forward tilt][sq] |
 | Up tilt | Overhead swipe; juggle starter | 5/4/18; 7%; height 102 | [Tiderunner claws][wc] | [Squirtle up tilt][sq] |
 | Down tilt | Floor claw; low launcher | 5/3/16; 6%; 70 | [Tiderunner claws][wc] | [Squirtle down tilt][sq] |
 | Dash attack | Belly-flop with a 48-unit slide | 7/5/26; 9%; 76 | [murloc swim][wc] | [Squirtle dash attack][sq] |
@@ -125,7 +125,7 @@ a short fixed rate while held and ends with a finisher, a drill whose hits come
 every few frames and end on a launching hit, and a neutral air among the
 fastest in the cast. All values are original provisional Smashcraft values.
 
-- Flurry: jab 1 → jab 2 chain on taps as before; the third jab is the flurry.
+- Flurry: jab 1 → jab 2 chain on taps as before; the third jab is the flurry. Jab 1, jab 2 and each flurry hit are drawn as point-first spear pokes, and the forward tilt as a longer reaching poke (Tom, 2026-10-30).
   While the attack button is held a slap lands every 4 frames (frames 3, 7, 11,
   15, 19, 23), each its own hit window, 1% at 25° with base 12, no growth. A
   release at any gap between slaps skips to the finisher, 2 frames of windup

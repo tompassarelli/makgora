@@ -200,6 +200,17 @@ swing or a broken limb. Under Tom's standing delegation of pending decisions to
 the recommendation (2026-10-26), applied to north gate 84 on 2026-10-27, the
 jab, jab 2 and forward tilt ship as they are.
 
+On 2026-10-30 Tom asked for the jabs to become point-first pokes in the
+forward tilt's motion, the held rapid jab a flurry of pokes rather than fin
+slaps, and the forward tilt a longer reaching poke. The re-authored jab, jab 2,
+rapid jab and forward tilt pass lines 1 to 4 (`bun wisp anim score --fighter
+murloc`: body share 1.00, 0.99, 1.00 and 0.91, mass shift 0.28, 0.29, 0.25 and
+0.26, jump 0.03, 0.03, 0.03 and 0.04, contrast 0.37, 0.37, 0.37 and 0.58), and
+ship under this exception with the rapid jab added: one bare judge scored them
+2 to 3 on every line, again naming the round, hunched body. The scorer samples
+the rapid jab with the attack button held, so its row measures the whole
+flurry.
+
 Murloc's down air ships with line 5 below 4: three fresh bare judges (2026-10-30)
 scored readability 2, 2, 2, weight 3, 3, 3, anticipation 3, 3, 3, follow-through
 3, 3, 3 and character 3, 4, 4, naming the tucked spinning body as a ball of

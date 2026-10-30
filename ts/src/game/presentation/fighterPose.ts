@@ -164,6 +164,7 @@ export function advanceFighterPose(
   const phase = attackPhase(fighter);
   const charging = fighter.attack.smashCharging || (fighter.attack.smashChargeAllowed && controls.attackHeld && isSmashAttack(fighter.attack.style));
   if (attacked && phase !== AttackPhase.none && !charging) selectAttackClip(pose, fighter);
+  if (phase !== AttackPhase.none) followFlurryClock(pose, fighter);
   advanceIllidanMotion(pose.motion, fighter, controls, world);
   if (hit) {
     pose.motion.escapeRemaining = 0;
@@ -188,6 +189,11 @@ export function advanceFighterPose(
 
   const stopped = pose.animation === motionKey(IllidanLocomotion.stop) && pose.motion.transitionRemaining === 0;
   pose.rate = fighter.launch.hitlag > 0 || charging || stopped ? 0.0 : rate;
+}
+
+function followFlurryClock(pose: FighterPose, f: Readonly<Fighter>): void {
+  const { style, frame } = f.attack;
+  if (style !== undefined && f.tuning.moves?.normals[style]?.release !== undefined) pose.clipTime = f32(frame * FRAME_SECONDS);
 }
 
 function advanceJumpClip(pose: FighterPose, f: Readonly<Fighter>, phase: AttackPhase, wasOut: boolean, jumped: boolean): void {

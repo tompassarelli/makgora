@@ -137,7 +137,7 @@ Akama, Firelord and Goblin Alchemist are selectable now as stand-ins on the shar
 
 Murloc ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),
 requested by Tom on 8 October 2026, is a small, light rushdown; his kit,
-body and gameplan are in [murloc.md](murloc.md). His close-range normals are fast and multi-hit (Tom, 2026-10-30): a held fin-slap jab flurry, a five-hit spear drill down air that links into a grounded jab, and a frame-3 neutral air; frame data is in the Murloc kit table.
+body and gameplan are in [murloc.md](murloc.md). His close-range normals are fast and multi-hit (Tom, 2026-10-30): a held spear-poke jab flurry, a five-hit spear drill down air that links into a grounded jab, and a frame-3 neutral air; frame data is in the Murloc kit table.
 
 Build order is a recommendation, not permission to delete or overwrite ongoing work. Finish or checkpoint the current synchronization milestone before integrating new gameplay into that branch. A first overnight pass should finish one or two complete heroes and reusable move primitives; it should not report all fifteen finished because character-select entries exist.
 

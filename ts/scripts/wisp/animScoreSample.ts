@@ -216,7 +216,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   if (entry.aerial) { f.motion.grounded = false; f.motion.z = 900.0; }
   if (entry.style === AttackStyle.dashAttack) { f.ground.action = GroundAction.run; f.motion.vx = f.tuning.physics.runSpeed; }
   const p = createFighterPose();
-  const input = neutralControls();
+  const input = { ...neutralControls(), attackHeld: f.tuning.moves?.normals[entry.style]?.release !== undefined };
   beginFighterAttack(world, 0, entry.style, false);
   if (f.attack.style !== entry.style) return undefined;
   advanceFighterPose(p, f, world, input, false, false, true, false);

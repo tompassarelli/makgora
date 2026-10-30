@@ -5,7 +5,8 @@ export const MURLOC_MODEL_FILE = "units\\creeps\\Murloc\\Murloc.mdl";
 export const MURLOC_FALLBACK: HeroClip = { index: 2, seconds: 1.0 };
 export const MURLOC_CLIPS = { idle: MURLOC_FALLBACK, walk: { index: 1, seconds: f32(0.667) }, dash: { index: 1, seconds: f32(0.667) }, run: { index: 1, seconds: f32(0.667) }, ko: { index: 6, seconds: f32(1.667) },
   jab: { index: 9, seconds: 0.25, aligned: true },
-  jab2: { index: 10, seconds: f32(0.35), aligned: true },
+  jab2: { index: 10, seconds: f32(0.283), aligned: true },
+  jab3: { index: 92, seconds: f32(0.717), aligned: true },
   forwardTilt: { index: 11, seconds: f32(0.45), aligned: true },
   forwardTiltUp: { index: 12, seconds: f32(0.45), aligned: true },
   forwardTiltDown: { index: 13, seconds: f32(0.45), aligned: true },
