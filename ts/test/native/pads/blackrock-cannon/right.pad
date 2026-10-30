@@ -1,0 +1,19 @@
+# Blackrock cannon, facing right: a runs off the right ledge, drops under the stage, double-jumps back into the barrel, fires it and rises in flames; the strip runs from just before the catch to the first action after the flames.
+#! chat -dev quick stage 12
+20 a stick 1 0
+95 a stick -1 0
+125 a tap B 1
+177 a capture
+181 a capture
+191 a capture
+200 a tap A 2
+203 a capture
+209 a capture
+217 a capture
+225 a capture
+233 a capture
+241 a capture
+249 a capture
+253 a capture
+257 a capture
+265 a capture
