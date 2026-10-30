@@ -176,7 +176,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   if (scope !== undefined) setRosterMask(world, 1 << scope.slot);
   carryOnMovingDecks(world, stage, stageFrame);
   advanceCurses(world, stage, stageFrame);
-  drivePartners(world, controls, frame);
+  drivePartners(world, controls, frame, stage, stageFrame);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);

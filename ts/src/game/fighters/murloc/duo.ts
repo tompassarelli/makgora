@@ -7,6 +7,10 @@ import { type Roster, fighterAt, isActive, setRosterMask } from "../../sim/roste
 export const MURLOC_DUO = {
   delayFrames: 5,
   partnerOffset: 60.0,
+  separateDistance: 260.0,
+  resyncDistance: 60.0,
+  hopHeight: 110.0,
+  hopReach: 300.0,
 } as const;
 
 function lowestFreeSlot(world: Readonly<Roster>): number {

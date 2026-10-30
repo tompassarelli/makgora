@@ -4,8 +4,14 @@ import { floorDiv, imod } from "wisp/src/sim/intMath";
 import { type AttackBuffer, type AttackCommand, clearAttackBuffer, queueAttack } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { MURLOC_DUO } from "../fighters/murloc/duo";
+import { canStartAttack } from "../sim/conditions";
 import { DuoOrder, DuoRole } from "../sim/codes";
+import type { Fighter } from "../sim/fighter";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
+import { mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
+import { steerOnGround } from "./botFooting";
+import { useMatchSeed } from "./botRandom";
+import { chooseRecoveryInput } from "./botRecovery";
 import type { FrameControls } from "./controls";
 
 export const RING_FRAMES = 8;
@@ -176,20 +182,75 @@ export function unpackFrame(ring: readonly number[], base: number, controls: Con
   queueAttack(commands, queued);
 }
 
-/** Before the status mask each frame, every partner in the copy order takes its leader's controls from MURLOC_DUO.delayFrames ago, and takes neutral controls while the leader holds a foe. */
-export function drivePartners(world: Roster, controls: FrameControls, frame: number): void {
+const offstage = (f: Readonly<Fighter>, stage: number): boolean =>
+  !f.motion.grounded && (f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage) || f.motion.z < mainDeckZ(stage));
+
+const standsOnStage = (f: Readonly<Fighter>, stage: number): boolean =>
+  f.motion.grounded && f.motion.x >= mainDeckLeft(stage) && f.motion.x <= mainDeckRight(stage);
+
+const gapBetween = (a: Readonly<Fighter>, b: Readonly<Fighter>): number => Math.abs(f32(a.motion.x - b.motion.x));
+
+const separates = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): boolean =>
+  gapBetween(partner, leader) > MURLOC_DUO.separateDistance || (offstage(partner, stage) && standsOnStage(leader, stage));
+
+const reunited = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): boolean =>
+  gapBetween(partner, leader) <= MURLOC_DUO.resyncDistance && !separates(partner, leader, stage) && canStartAttack(partner) && canStartAttack(leader);
+
+/** Moves the order between copy and separated; the other orders belong to the specials that set them. */
+function advanceOrder(partner: Fighter, leader: Readonly<Fighter>, stage: number): void {
+  const { duo } = partner;
+  duo.orderFrame++;
+  if (duo.order === DuoOrder.copy && separates(partner, leader, stage)) {
+    duo.order = DuoOrder.separated;
+    duo.orderFrame = 0;
+  } else if (duo.order === DuoOrder.separated && reunited(partner, leader, stage)) {
+    duo.order = DuoOrder.copy;
+    duo.orderFrame = 0;
+  }
+}
+
+/** A separated partner recovers by the bots' full-skill chooser, which reads only the fighter's state once the salt is 0, then walks or hops to the leader. */
+function driveSeparated(partner: Readonly<Fighter>, leader: Readonly<Fighter>, input: Controls, stage: number, stageFrame: number): void {
+  copyControls(input, NEUTRAL);
+  if (partner.status.out) return;
+  useMatchSeed(0);
+  if (chooseRecoveryInput(partner, stage, stageFrame, input)) return;
+  const dx = f32(leader.motion.x - partner.motion.x);
+  const dz = f32(leader.motion.z - partner.motion.z);
+  if (!partner.motion.grounded) {
+    input.direction = dx < 0 ? -1 : 1;
+    return;
+  }
+  steerOnGround(partner, stage, leader.motion.x, input);
+  if (partner.jump.squat > 0) {
+    input.jumpHeld = dz > MURLOC_DUO.hopHeight;
+    return;
+  }
+  if (dz > MURLOC_DUO.hopHeight && Math.abs(dx) < MURLOC_DUO.hopReach) {
+    input.jumpPressed = true;
+    input.jumpHeld = true;
+  }
+}
+
+/** Before the status mask each frame, every partner in the copy order takes its leader's controls from MURLOC_DUO.delayFrames ago, takes neutral controls while the leader holds a foe, and in the separated order drives itself. */
+export function drivePartners(world: Roster, controls: FrameControls, frame: number, stage: number, stageFrame: number): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const partner = fighterAt(world, slot);
     const { duo } = partner;
     if (duo.role !== DuoRole.partner || !isActive(world, duo.link)) continue;
-    const holding = fighterAt(world, duo.link).grab.target !== undefined;
+    const leader = fighterAt(world, duo.link);
+    advanceOrder(partner, leader, stage);
+    const holding = leader.grab.target !== undefined;
     const write = duo.head * WORDS_PER_FRAME;
     if (holding) clearFrame(duo.ring, write);
     else packFrame(duo.ring, write, at(controls.inputs, duo.link), at(controls.commands, duo.link), frame);
     const read = imod(duo.head + RING_FRAMES - MURLOC_DUO.delayFrames, RING_FRAMES) * WORDS_PER_FRAME;
     duo.head = imod(duo.head + 1, RING_FRAMES);
-    if (holding || duo.order !== DuoOrder.copy) {
+    if (duo.order === DuoOrder.separated) {
+      driveSeparated(partner, leader, controls.inputs[slot], stage, stageFrame);
+      clearAttackBuffer(controls.commands[slot]);
+    } else if (holding || duo.order !== DuoOrder.copy) {
       copyControls(controls.inputs[slot], NEUTRAL);
       clearAttackBuffer(controls.commands[slot]);
     } else unpackFrame(duo.ring, read, controls.inputs[slot], controls.commands[slot], frame);
