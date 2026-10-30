@@ -11,6 +11,7 @@ import { heroCueWindows } from "../presentation/cueWindows";
 import { SHIELD_PROJECTILE_SPEED_MULTIPLIER } from "../sim/shield";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ordinaryHitlagFrames } from "../sim/knockback";
+import { hopShowcases } from "./hopShowcase";
 
 export const SHOWCASE_FIRST_FRAME = 40;
 export const SHOWCASE_SPECIAL_SLOTS: readonly string[] = ["neutral_b", "side_b", "up_b", "down_b"];
@@ -23,7 +24,7 @@ const INCOMING_BODY = 40;
 
 export interface ShowcaseMove {
   readonly slot: string;
-  readonly kind: "normal" | "special" | "ultimate";
+  readonly kind: "normal" | "special" | "ultimate" | "hop";
   readonly code: number;
   readonly first: number;
   readonly end: number;
@@ -37,6 +38,8 @@ export interface ShowcaseMove {
   readonly cross?: { readonly frame: number; readonly gap: number } | undefined;
   readonly hold?: { readonly frame: number; readonly frames: number } | undefined;
   readonly behind?: number | undefined;
+  readonly samples?: readonly number[] | undefined;
+  readonly jump?: { readonly frames: number } | undefined;
   readonly aim?: { readonly frame: number; readonly until: number; readonly z: number } | undefined;
 }
 
@@ -60,6 +63,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
     else moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), behind: special === undefined ? undefined : specialBehind(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
+  moves.push(...hopShowcases(character));
   return moves;
 }
 
@@ -228,7 +232,7 @@ function radialGap(special: Readonly<AuthoredSpecial>): number | undefined {
 
 export function showcaseFrames(move: ShowcaseMove): number[] {
   const duration = Math.max(8, move.end);
-  const samples = move.kind === "ultimate" ? [1, Math.max(2, floorDiv(move.first, 2)), move.first, Math.round(duration / 3), Math.round(duration * 2 / 3), duration, duration + 2, duration + 300]
+  const samples = move.samples !== undefined ? [...move.samples] : move.kind === "ultimate" ? [1, Math.max(2, floorDiv(move.first, 2)), move.first, Math.round(duration / 3), Math.round(duration * 2 / 3), duration, duration + 2, duration + 300]
     : [...(move.charging ?? []), ...(move.swing ?? []), 1, Math.max(2, floorDiv(move.first, 2)), move.first - 2, move.first, move.first + 1, move.first + 3, Math.round((move.first + 3 + duration) / 2), duration];
   const frames: number[] = [];
   for (const sample of samples.sort((a, b) => a - b)) frames.push(Math.max(SHOWCASE_FIRST_FRAME + sample, (frames[frames.length - 1] ?? SHOWCASE_FIRST_FRAME) + 1));

@@ -33,7 +33,7 @@ refuses unless every held stamp and status equals the timeline frame for frame.
 
 `bun wisp native-capture reel --out PRIVATE_DIR [--fighter SLUG] [--hold-ticks N]`
 prepares Classic motion-reel pad scripts from the current roster and authored
-normals, four ground specials and ultimate. Each fighter directory is one
+normals, four ground specials, ultimate and three movement rows (`jump-squat`, `short-hop`, `full-hop`, #760). A movement row taps the jump button on the mover's pad for one tick (short hop) or holds it past the jump squat (full hop and jump squat) and captures eight frames from the squat's last tick through the landing, with the squat and airtime the simulation measures for that fighter (`hopTimeline`, no dummy staging). Each fighter directory is one
 capture-map batch. The timeline stands the dummy where the move's hit reads:
 a ground move at three quarters of its reach; an up air at the middle of its
 highest region and a down air at the middle of its lowest, so the hit reads
@@ -286,7 +286,7 @@ bun wisp anim capture wait ID [--minutes N]
 bun wisp anim capture status
 ```
 
-`MOVE` is an `anim score` move name (`up-air`, `side-special`, `ultimate`).
+`MOVE` is an `anim score` move name (`up-air`, `side-special`, `ultimate`) or a movement row (`jump-squat`, `short-hop`, `full-hop`).
 `enqueue` refuses a lane with uncommitted tracked changes, because the frames
 are of the committed revision. Each job captures the move's showcase row in
 both facings at the lane's revision. `wait` prints the result: `sheet.png`

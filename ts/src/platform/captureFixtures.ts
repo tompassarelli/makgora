@@ -37,6 +37,7 @@ function timedInputs(move: Readonly<ShowcaseMove>, facing: "right" | "left"): Ti
     ...(move.cross === undefined ? [] : [inputAt(move.cross.frame, `a cross ${facing} ${move.cross.gap}`)]),
     ...(move.hold === undefined ? [] : [inputAt(move.hold.frame, `a hold ${move.hold.frames}`)]),
     ...(move.release === undefined ? [] : [inputAt(move.release, "a release X")]),
+    ...(move.jump === undefined ? [] : [inputAt(0, `a tap B ${move.jump.frames}`)]),
     ...(move.aim === undefined ? [] : [inputAt(move.aim.frame, `a stick 0 ${move.aim.z}`), inputAt(move.aim.until, "a stick 0 0")]),
   ];
 }
