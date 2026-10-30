@@ -20,11 +20,12 @@
   a new native box there, next to the issue it closes, instead of a hand procedure.
   A `chat` setup step that starts with `-dev ` waits for every client's command
   receipt; any other text is typed as a plain chat line.
-  Development-map profiles rebuild the script into the newest complete
-  `native-acceptance-YYYYMMDD` set under smashcraft-build-inputs (its
-  presentation .w3x and .w3x.base.lua). When accept reports that the map
-  does not carry a model, build a new dated set with `bun wisp map build
-  --profile main` rather than overwriting an old one.
+  Development-map profiles rebuild the script into the most recently built
+  complete `native-acceptance-YYYYMMDD-SHA` set under smashcraft-build-inputs
+  (its presentation .w3x and .w3x.base.lua; the map file's time picks it, not
+  the name). When accept reports that the map does not carry a model, build a
+  new set named by the date and the commit with `bun wisp map build --profile
+  main` rather than overwriting an old one.
   Move smoke (#32): one check pair per fighter pair, `gate-moves-NN` and
   `gate-specials-spot-NN` for NN 01-13 (smashcraft:ts/scripts/wisp/smokeShards.ts),
   so each shard is one session and one match that fits a 5-minute native run.
