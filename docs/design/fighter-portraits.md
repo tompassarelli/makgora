@@ -30,6 +30,14 @@ own size or smaller, never stretched past it:
 | grid tile | 256 px tile render | at most 256 px (scales down with roster size) |
 | off-screen bubble | 256 px tile render | 128 px |
 
+## Live cards in the native window
+
+Wisp's native window draws a SPRITE frame's model into the frame's rectangle at screen
+resolution, so a player card there shows its chosen fighter's idle as a live, lit 3D render
+instead of the 384 px baked card (smashcraft:ts/src/game/ui/liveCard.ts, enabled only by
+smashcraft:ts/scripts/wisp/nativeGame.ts; the Warcraft build and Chrome keep the baked card).
+The grid tiles keep their baked renders, drawn at their texture size or smaller.
+
 ## Generating
 
 `bun scripts/fighterPortraits.ts PRIVATE_OUTPUT` (from ts/, through the

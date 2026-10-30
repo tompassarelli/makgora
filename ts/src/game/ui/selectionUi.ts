@@ -763,7 +763,7 @@ export class SelectionPanel {
       const palette = cardPalette(game, slot);
       presentCardTeam(frames, game, slot, participantId, menuFocus, active, human, teamsShown, palette);
       presentCardTag(frames, game, slot, participantId, menuFocus, active, human);
-      presentCardStatus(frames, game, slot, active, ready, human, choice, palette, sessionWins[slot], this.net.echoes);
+      presentCardStatus(frames, game, slot, active, ready, human, choice, palette, sessionWins[slot], this.net.echoes, this.now);
       presentCardCpu(frames, game, slot, menuFocus, active, human, CPU_DEFAULTS);
       presentCardCostume(frames, game, slot, participantId, active && ready, choice);
       if (presentCardChip(frames, this.drag, this.roster.grid, slot, active, ready, human, choice, x, y, remoteChips[slot])) carried = slot;

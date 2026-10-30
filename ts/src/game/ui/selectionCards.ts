@@ -35,6 +35,7 @@ import { costumeIndex, costumesFor } from "../roster/costumes";
 import { MAX_COSTUMES } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setFrameText } from "./frames";
+import { presentLiveFighter } from "./liveCard";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
 
 export type CardButton = { kind: "costume"; slot: number } | { kind: "team"; slot: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number };
@@ -70,6 +71,7 @@ export interface CardFrames {
   readonly team: framehandle;
   readonly teamLabel: framehandle;
   readonly portrait: framehandle;
+  readonly render: framehandle;
   readonly costume: framehandle;
   readonly dots: readonly framehandle[];
   readonly name: framehandle;
@@ -96,6 +98,10 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   add(team, { kind: "team", slot });
   const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, cardDown(f32(0.008)), teamArea.width, cardSize(f32(0.019)), TAG_SIZE);
   const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), cardRight(slot, f32(0.029)), cardDown(f32(0.03)), cardSize(f32(0.102)), cardSize(f32(0.102)));
+  const render = BlzCreateFrameByType("SPRITE", `MeleeRender${name}`, root, "", 0);
+  placeTopLeft(render, cardRight(slot, f32(0.029)), cardDown(f32(0.03)));
+  BlzFrameSetSize(render, cardSize(f32(0.102)), cardSize(f32(0.102)));
+  BlzFrameSetVisible(render, false);
   const dotArea = costumeDotsBox(slot);
   const dotSize = cardSize(COSTUME_DOT);
   const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
@@ -120,7 +126,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   setFrameText(settingsLabel, "Opponent settings");
   add(settings, { kind: "cpuSettings", slot });
   const summary = label(root, `MeleeCpuSummary${name}`, cardRight(slot, f32(0.004)), cardDown(f32(0.136)), cardSize(f32(0.152)), cardSize(f32(0.031)), BAR_TEXT);
-  return { card, tag, mode, team, teamLabel, portrait, costume, dots, name: name_, status, wins, chip, summary, settings, settingsLabel };
+  return { card, tag, mode, team, teamLabel, portrait, render, costume, dots, name: name_, status, wins, chip, summary, settings, settingsLabel };
 }
 
 export function presentCardTeam(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, menuFocus: MenuFocus | undefined, active: boolean, human: boolean, teamsShown: boolean, palette: number): void {
@@ -141,11 +147,12 @@ export function presentCardTag(frames: CardFrames, game: Readonly<MatchState>, s
   BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));
 }
 
-export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, palette: number, sessionWins: number, echoes: readonly string[]): void {
-  BlzFrameSetVisible(frames.portrait, active && ready);
-  BlzFrameSetVisible(frames.name, active && ready);
-  const winsShown = active && ready && sessionWins > 0;
-  presentSessionWinsFrames(frames.wins, sessionWins, active && ready);
+export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, palette: number, sessionWins: number, echoes: readonly string[], now: number): void {
+  const shown = active && ready;
+  BlzFrameSetVisible(frames.portrait, shown);
+  BlzFrameSetVisible(frames.name, shown);
+  const winsShown = shown && sessionWins > 0;
+  presentSessionWinsFrames(frames.wins, sessionWins, shown);
   const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}${at(echoes, slot)}`;
   setFrameText(frames.status, statusText);
   placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins)}`);
@@ -153,6 +160,7 @@ export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>
     BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, palette, choice === undefined || choice < 0 ? 0 : costumeIndex(choice, game.costumeChoices[slot] ?? 0)), 0, true);
     setFrameText(frames.name, nameText(choice));
   }
+  presentLiveFighter(frames.render, frames.portrait, shown, choice, game.costumeChoices[slot] ?? 0, now);
 }
 
 const COSTUME_DOT = f32(0.011);

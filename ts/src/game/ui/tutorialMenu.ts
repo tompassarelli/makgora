@@ -79,4 +79,7 @@ export function markTutorialSeen(): void {
 
 export const tutorialAvailable = (game: Readonly<MatchState>): boolean => humanCount(game) > 0;
 
-export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => !seen && tutorialAvailable(game);
+/** Whether a first-time player is offered the tutorial on opening character select; the standalone session turns it off to open at a clean menu. */
+export const tutorialOffers = { enabled: true };
+
+export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => tutorialOffers.enabled && !seen && tutorialAvailable(game);

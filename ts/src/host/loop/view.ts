@@ -26,6 +26,7 @@ import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPo
 import { beginPauseCamera, advancePauseCamera, pauseCameraAngle, pauseHudHidden } from "./pauseCamera";
 import { type MatchCamera, copyMatchCamera } from "../../game/sim/matchCamera";
 import { applyHeldCamera } from "./heldCamera";
+import { aimArenaCamera } from "./arenaShot";
 
 import { advanceMatchCamera } from "../../game/sim/matchCamera";
 import { stageBounds } from "../../game/sim/stageBounds";
@@ -506,7 +507,7 @@ export function renderPersistentPresentation(s: ShellState): void {
 
 const meter = escapeMeterView();
 
-function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect: number, angle: number, duration: number): void {
+function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect: number, angle: number, duration: number, rotation: number = ARENA_CAMERA.rotation): void {
   const { x: centerX, y: centerY } = s.origin;
   const targetX = centerX + framing.x;
   if (duration > 0.0) {
@@ -516,7 +517,7 @@ function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect:
     const right = centerX + bounds.right;
     SetCameraBounds(left, centerY, right, centerY, left, centerY, right, centerY);
   } else SetCameraBounds(targetX, centerY, targetX, centerY, targetX, centerY, targetX, centerY);
-  SetCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
+  SetCameraField(CAMERA_FIELD_ROTATION, rotation, 0.0);
   SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, angle, 0.0);
   SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, framing.distance, duration);
   SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + framing.z, duration);
@@ -535,9 +536,7 @@ export function lockArenaCamera(s: ShellState): void {
   if (game.phase !== Phase.result && !game.camera.initialized) advanceMatchCamera(s.previewCamera, world, game.stageChoice);
   const height = BlzGetLocalClientHeight();
   const aspect = height > 0 ? I2R(BlzGetLocalClientWidth()) / I2R(height) : 16.0 / 9.0;
-  if (game.phase === Phase.result) resultCamera(s.camera, game.stageChoice, aspect, views(s).match.resultFrames, PARTICIPANT_SLOTS.filter(slot => isActive(world, slot)).length);
-  else if (s.session.paused && s.pauseCamera !== undefined) advancePauseCamera(s, aspect);
-  else localCamera(s.camera, game.camera.initialized ? game.camera : s.previewCamera, game.stageChoice, aspect);
+  const orbit = aimArenaCamera(s, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
   if (s.viewExtreme !== undefined) ClearTextMessages();
   if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
@@ -556,7 +555,7 @@ export function lockArenaCamera(s: ShellState): void {
   finalCamera(framing, game.stageChoice);
   probeCamera(s.probe, game.camera, framing, centerX, FLOOR_HEIGHT);
   const duration = s.cameraTween === true && game.phase === Phase.match && !s.session.paused ? FRAME_SECONDS : 0.0;
-  applyArenaCamera(s, framing, aspect, pauseCameraAngle(s), duration);
+  applyArenaCamera(s, framing, aspect, orbit.angle, duration, orbit.rotation);
   shakeRoarCamera(world, game.phase, s.session.paused, FLOOR_HEIGHT + framing.z);
   if (s.build.analogPadDiagnostic === true) {
 
