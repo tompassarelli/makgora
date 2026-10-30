@@ -1,6 +1,7 @@
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { DuoRole } from "./codes";
-import { canStartAttack } from "./conditions";
+import { max } from "../core/numbers";
+import { canBeGrabbed, canStartAttack } from "./conditions";
 import { type Roster, fighterAt, isActive } from "./roster";
 
 export const DUO_CHAIN_CAP = 12;
@@ -33,6 +34,9 @@ export function advanceDuoLocks(world: Roster): void {
     if (!isActive(world, slot)) continue;
     const fighter = fighterAt(world, slot);
     const { victim } = fighter;
+    if (victim.grabImmuneDuo > 0) victim.grabImmuneDuo--;
+    if (victim.handoffWindow > 0) victim.handoffWindow--;
+    if (victim.handoffs > 0 && fighter.launch.hitstun <= 0 && fighter.grab.owner === undefined) victim.handoffs = 0;
     if (victim.duoChain > 0) {
       if (!canStartAttack(fighter)) victim.duoFree = 0;
       else if (++victim.duoFree >= DUO_CHAIN_FREE_FRAMES) {
@@ -50,4 +54,35 @@ export function advanceDuoLocks(world: Roster): void {
       }
     }
   }
+}
+
+export const HANDOFF_THROWS_PER_CHAIN = 2;
+export const HANDOFF_IMMUNE_FRAMES = 90;
+export const HANDOFF_REPEAT_IMMUNE_FRAMES = 180;
+export const HANDOFF_REPEAT_WINDOW_FRAMES = 300;
+
+/** A pair body may grab the foe its linked body just threw, while that foe is still in throw hitstun and the chain has a handoff left. */
+export function canBeGrabbedBy(world: Roster, grabberSlot: number, targetSlot: number): boolean {
+  const target = fighterAt(world, targetSlot);
+  if (!inLivePair(world, grabberSlot)) return canBeGrabbed(target);
+  const { victim, launch } = target;
+  if (victim.grabImmuneDuo > 0) return false;
+  if (victim.handoffs > 0 && victim.handoffs < HANDOFF_THROWS_PER_CHAIN && launch.throwHitstun && launch.hitstun > 0) return target.status.frozenFrames <= 0;
+  return canBeGrabbed(target);
+}
+
+/** The pummel count a new grab starts from: a handoff carries the thrower's count to the regrabbing body. */
+export function handoffPummels(world: Roster, grabberSlot: number, targetSlot: number): number {
+  if (!inLivePair(world, grabberSlot) || fighterAt(world, targetSlot).victim.handoffs <= 0) return 0;
+  return max(fighterAt(world, grabberSlot).grab.pummels, fighterAt(world, world.linked[grabberSlot] ?? -1).grab.pummels);
+}
+
+/** Counts a pair body's throw in the foe's chain; the second throw ends the chain and shuts both bodies out of grabbing the foe, for twice as long on a repeat inside the window. */
+export function recordPairThrow(world: Roster, throwerSlot: number, targetSlot: number): void {
+  if (!inLivePair(world, throwerSlot)) return;
+  const { victim } = fighterAt(world, targetSlot);
+  if (++victim.handoffs < HANDOFF_THROWS_PER_CHAIN) return;
+  victim.grabImmuneDuo = victim.handoffWindow > 0 ? HANDOFF_REPEAT_IMMUNE_FRAMES : HANDOFF_IMMUNE_FRAMES;
+  victim.handoffWindow = HANDOFF_REPEAT_WINDOW_FRAMES;
+  victim.handoffs = 0;
 }

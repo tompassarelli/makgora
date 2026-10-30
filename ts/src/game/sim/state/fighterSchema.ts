@@ -179,7 +179,7 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "waterHydraStrikeFrame", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "projectileBounces[${i}]", "projectileHomeward[${i}]",
   "projectileLastStruck[${i}]", "grabReel", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy",
   "duoRole", "duoLink", "duoRing[${i}]", "duoHead", "duoOrder", "duoOrderFrame", "duoReviveSpent", "duoSwapCooldown", "duoTossCooldown",
-  "victimDuoChain", "victimDuoFree", "victimNetImmune", "victimGrabImmuneDuo", "victimHandoffs", "victimShieldRun", "victimShieldFree",
+  "victimDuoChain", "victimDuoFree", "victimNetImmune", "victimGrabImmuneDuo", "victimHandoffs", "victimHandoffWindow", "victimShieldRun", "victimShieldFree",
 ];
 
 export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -209,7 +209,7 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "healed", "summonFrames", "buff", "buffFrames", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy"],
   meter: ["ex", "ultimate"],
   duo: ["role", "link", "ring[]", "head", "order", "orderFrame", "reviveSpent", "swapCooldown", "tossCooldown"],
-  victim: ["duoChain", "duoFree", "netImmune", "grabImmuneDuo", "handoffs", "shieldRun", "shieldFree"],
+  victim: ["duoChain", "duoFree", "netImmune", "grabImmuneDuo", "handoffs", "handoffWindow", "shieldRun", "shieldFree"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "surface"],
   projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "lastStruck"],
 };
@@ -634,6 +634,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "victim.netImmune", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.netImmune", writer: "int", when: ["nonzero"] }, diff: "victimNetImmune", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.grabImmuneDuo", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.grabImmuneDuo", writer: "int", when: ["nonzero"] }, diff: "victimGrabImmuneDuo", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.handoffs", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.handoffs", writer: "int", when: ["nonzero"] }, diff: "victimHandoffs", respawn: { blast: "0", respawn: "0" } },
+  { path: "victim.handoffWindow", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.handoffWindow", writer: "int", when: ["nonzero"] }, diff: "victimHandoffWindow", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.shieldRun", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.shieldRun", writer: "int", when: ["nonzero"] }, diff: "victimShieldRun", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.shieldFree", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.shieldFree", writer: "int", when: ["nonzero"] }, diff: "victimShieldFree", respawn: { blast: "0", respawn: "0" } },
 ];

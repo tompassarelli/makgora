@@ -3,8 +3,8 @@ import { canHit } from "./teams";
 import { max } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, ContactKind, GrabAction, SpecialAction } from "./codes";
-import { canBeGrabbed } from "./conditions";
 import { collectDamageContact } from "./contacts";
+import { canBeGrabbedBy, handoffPummels } from "./duoLocks";
 import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
 import type { AppliedStatus } from "./appliedStatus";
@@ -28,7 +28,7 @@ export function catchTarget(world: Roster, attackerSlot: number, targetSlot: num
   clearGrabLinks(world, attackerSlot);
   clearGrabLinks(world, targetSlot);
   attacker.grab.target = targetSlot;
-  attacker.grab.pummels = 0;
+  attacker.grab.pummels = handoffPummels(world, attackerSlot, targetSlot);
   attacker.grab.queuedThrow = GrabAction.none;
   target.grab.owner = attackerSlot;
   target.visuals.grab++;
@@ -60,7 +60,7 @@ export function applyAttackHit(
   if (attackerSlot !== targetSlot && !canHit(world, attackerSlot, targetSlot)) return;
   const target = fighterAt(world, targetSlot);
   if (style === AttackStyle.grab) {
-    if (canBeGrabbed(target)) catchTarget(world, attackerSlot, targetSlot);
+    if (canBeGrabbedBy(world, attackerSlot, targetSlot)) catchTarget(world, attackerSlot, targetSlot);
     return;
   }
   collectDamageContact(world, attackerSlot, targetSlot, effect, facing, ContactKind.launch, directContact, undefined, shieldContact, status, contactZ);

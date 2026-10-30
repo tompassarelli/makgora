@@ -4,6 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { Character, ContactKind, GrabAction } from "./codes";
+import { recordPairThrow } from "./duoLocks";
 import { finishDamageContacts, openDamageContacts, queueDamageContact } from "./contacts";
 import type { FighterMoves } from "./heroMoves";
 import { copyHitEffect, emptyHitEffect, type HitEffect } from "./hitRegions";
@@ -102,6 +103,7 @@ function releaseThrow(world: Roster, ownerSlot: number, targetSlot: number, targ
   target.grab.owner = undefined;
   target.grab.grabbedFrames = 0;
   clearMash(target.grab);
+  recordPairThrow(world, ownerSlot, targetSlot);
   const authored = owner.tuning.moves?.throws[action];
   const effect = authoredThrowEffect(action, owner.tuning.moves);
   const direction = authored !== undefined ? owner.facing : action === GrabAction.throwBack ? -owner.facing : owner.facing;

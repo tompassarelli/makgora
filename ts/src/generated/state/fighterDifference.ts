@@ -368,6 +368,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.victim.netImmune !== actual.victim.netImmune) return "victimNetImmune";
   if (expected.victim.grabImmuneDuo !== actual.victim.grabImmuneDuo) return "victimGrabImmuneDuo";
   if (expected.victim.handoffs !== actual.victim.handoffs) return "victimHandoffs";
+  if (expected.victim.handoffWindow !== actual.victim.handoffWindow) return "victimHandoffWindow";
   if (expected.victim.shieldRun !== actual.victim.shieldRun) return "victimShieldRun";
   if (expected.victim.shieldFree !== actual.victim.shieldFree) return "victimShieldFree";
   return undefined;

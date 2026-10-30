@@ -6,8 +6,9 @@ import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, AttackStyle, Character, DASH_GRAB_REQUEST, GroundAction } from "./codes";
 import { groundOptionOpen, groundState } from "./groundMovement";
 import { GroundOption, GroundState, groundOptionAllowed } from "./stickZones";
-import { attackPhase, attackStartup, attackActive, canBeGrabbed, canStartAttackStyle, inEarlyAscent, inGrabContext, isIntangible, jabChainStep } from "./conditions";
+import { attackPhase, attackStartup, attackActive, canStartAttackStyle, inEarlyAscent, inGrabContext, isIntangible, jabChainStep } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
+import { canBeGrabbedBy } from "./duoLocks";
 import type { Fighter } from "./fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, copyHitEffect, copyHitRegion, emptyHitRegion, SHARED_GRAB_REGION } from "./hitRegions";
 import { applyAttackHit } from "./hits";
@@ -97,7 +98,7 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
 
   const grabsDivine = attack.style === AttackStyle.grab && target.status.divineFrames > 0;
   if (attacker.status.out || attacker.launch.hitlag > 0 || target.status.out || (isIntangible(target) && !grabsDivine) || belowStandingPlatform(attacker, target, stage)) return false;
-  if (attack.style === AttackStyle.grab && !canBeGrabbed(target)) return false;
+  if (attack.style === AttackStyle.grab && !canBeGrabbedBy(world, attackerSlot, targetSlot)) return false;
   if (attack.style === AttackStyle.grab) {
     const startup = attackStartup(attacker, attack.style);
     const active = attackActive(attacker, attack.style);

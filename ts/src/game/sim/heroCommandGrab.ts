@@ -8,7 +8,8 @@ import { imod } from "wisp/src/sim/intMath";
 import type { HitEffect } from "./hitRegions";
 import { emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { ContactKind } from "./codes";
-import { canBeGrabbed, inGrabContext, isIntangible } from "./conditions";
+import { inGrabContext, isIntangible } from "./conditions";
+import { canBeGrabbedBy } from "./duoLocks";
 import { queueDamageContact } from "./contacts";
 import type { Fighter } from "./fighter";
 import { runningHeroSpecial } from "./specials/runningMove";
@@ -38,7 +39,7 @@ function caughtTarget(world: Roster, slot: number, owner: Readonly<Fighter>, shi
   for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
     if (!canHit(world, slot, target) || !isActive(world, target)) continue;
     const victim = fighterAt(world, target);
-    if (victim.status.out || (isIntangible(victim) && victim.status.divineFrames <= 0) || !canBeGrabbed(victim) || inGrabContext(victim)) continue;
+    if (victim.status.out || (isIntangible(victim) && victim.status.divineFrames <= 0) || !canBeGrabbedBy(world, slot, target) || inGrabContext(victim)) continue;
     if (!grabTouchesBody(strike, victim) || repelSpell(victim)) continue;
     if (shieldable && victim.shield.raised) continue;
     const distance = Math.abs(f32(victim.motion.x - owner.motion.x));
