@@ -198,6 +198,7 @@ const reunited = (partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: 
 
 /** Moves the order between copy and separated; the other orders belong to the specials that set them. */
 function advanceOrder(duo: Duo, partner: Readonly<Fighter>, leader: Readonly<Fighter>, stage: number): void {
+  if (duo.order !== DuoOrder.copy && duo.order !== DuoOrder.separated) return;
   duo.orderFrame++;
   if (duo.order === DuoOrder.copy && separates(partner, leader, stage)) {
     duo.order = DuoOrder.separated;
