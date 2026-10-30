@@ -81,6 +81,12 @@ fetch, rebase, scan and push:
    manifest and lock file); it now reads a revision with one ls-tree and one
    cat-file --batch (north 8fb73d9c19) and takes 0.20 CPU s in the same kind of
    landing. `bun scripts/landingCpu.ts report OUT.json 20` lists the 20 heaviest processes of a recorded run.
+   After that, the heaviest process of a docs-only landing was landingFarm.ts at
+   2.7 CPU s of 12.4 (2026-10-30), 2.2 s of it start-up loading the check selection's modules;
+   the selection now reads its inputs from smashcraft:ts/scripts/wisp/cueInputs.ts
+   and smashcraft:ts/scripts/wisp/fighterArtCode.ts, which load neither the effect
+   models nor the fighter-art derivation, and a landing whose groups are all reused
+   takes 1.4 CPU s there instead of 2.6.
 2. **After landing.** The push to main runs CI's smoke, filtered-checks,
    development-loop and code-health jobs, one run per landed commit (CI's
    concurrency is per SHA on main), plus Background sweeps, Auto-close and
