@@ -178,6 +178,11 @@ export function servicePauseRequest(s: ShellState, rollback: Rollback, journal: 
   else consumeEditbox(s, rollback, journal);
 }
 
+function notePauser(s: ShellState): void {
+  const sender = GetPlayerId(GetTriggerPlayer());
+  if (isParticipantSlot(sender)) s.pausedBy = sender;
+}
+
 export function pauseRequestEvent(s: ShellState): void {
   const epoch = journalEpoch(s);
   if (epoch === undefined) return;
@@ -202,5 +207,6 @@ export function pauseRequestEvent(s: ShellState): void {
 
   const frame = wire.length === expected.length + 10 && wire.startsWith(expected) ? parseDecimal(wire.substring(expected.length)) : undefined;
   if (frame === undefined) return;
+  notePauser(s);
   requestPause(s, rollback, journal, true, frame >= rollback.schedule.nextConfirmed ? frame : undefined);
 }
