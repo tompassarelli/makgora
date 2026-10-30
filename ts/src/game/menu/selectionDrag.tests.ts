@@ -92,7 +92,7 @@ test("Every hand state keeps its hotspot inside the hand frame and moves the fra
   }
 });
 
-test("A carried chip is centred on the pinch point and narrower than the gauntlet [k2 property]", () => {
+test("A carried chip is centred over the pinch point with its lower rim below it, and narrower than the gauntlet [k2 property]", () => {
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
     const size = handSize(grid);
@@ -100,7 +100,8 @@ test("A carried chip is centred on the pinch point and narrower than the gauntle
     const x = f32(0.4);
     const y = f32(0.3);
     assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - x) < f32(0.00001));
-    assertTrue(Math.abs(carriedChipTop(y, chip) - chip / 2 - y) < f32(0.00001));
+    assertTrue(Math.abs(carriedChipTop(y, chip) - chip / 2 - y) < chip * f32(0.15));
+    assertTrue(carriedChipTop(y, chip) - chip < y);
     assertTrue(chip < size * HAND_ART_COLUMNS / HAND_TEXELS);
   }
 });
