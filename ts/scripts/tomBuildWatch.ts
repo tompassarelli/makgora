@@ -87,6 +87,7 @@ export interface WatchSteps<R> {
   readonly measured: <A>(work: Effect.Effect<A, PlayProblem, R>) => Effect.Effect<readonly [A, Load], PlayProblem, R>;
   readonly held: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
+  readonly prepareBoot: Effect.Effect<void, never, R>;
   readonly boot: (built: Built) => Effect.Effect<string | undefined, never, R>;
   readonly fetchInputs: Effect.Effect<void, PlayProblem, R>;
   readonly tidy: Effect.Effect<string | undefined, PlayProblem, R>;
@@ -154,10 +155,12 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   yield* append(files.attempts, sha);
   if (decision === "red") return yield* logged(`Skipping ${sha.slice(0, 7)}: its checks failed`);
   const started = yield* Clock.currentTimeMillis;
-  const [built, load] = yield* steps.measured(builtWithInputs(steps, sha)).pipe(
+  const [built, load] = yield* steps.measured(Effect.all([builtWithInputs(steps, sha), steps.prepareBoot], { concurrency: "unbounded" }).pipe(Effect.map(([built]) => built))).pipe(
     Effect.tapError((problem) => missingInputs(problem) ? forget(files.attempts, sha) : Effect.void),
   );
+  const booting = yield* Clock.currentTimeMillis;
   const refusal = yield* steps.boot(built);
+  const booted = yield* Clock.currentTimeMillis;
   if (refusal !== undefined) {
     yield* append(files.refused, `${new Date(yield* Clock.currentTimeMillis).toISOString()} ${sha} ${built.version.replaceAll(" ", "-")} ${refusal}`);
     return yield* logged(`Keeping the installed build: ${sha.slice(0, 7)} (${built.version}) does not boot: ${refusal}`);
@@ -169,7 +172,7 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const finished = yield* Clock.currentTimeMillis;
   const landed = yield* steps.landedAt(sha);
   const onMain = yield* steps.onMain(sha);
-  const timing: Timing = { landed, onMain, started, finished, stages: [...built.stages, { name: "maps-copy", millis: finished - copying }], load };
+  const timing: Timing = { landed, onMain, started, finished, stages: [...built.stages, { name: "boot", millis: booted - booting }, { name: "maps-copy", millis: finished - copying }], load };
   const line = buildLine(sha, installed, timing);
   yield* append(files.log, line);
   yield* steps.budget(sha, timing);
@@ -257,6 +260,10 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     const version = buildLabel(file);
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, source, stages });
   })),
+  prepareBoot: runProcess(ChildProcess.make("bun", ["wisp", "map", "boot", "--driver"], { cwd: tsDirectory, stdin: "ignore" })).pipe(
+    Effect.catch((cause) => Effect.sync(() => console.error(`Boot check driver not prepared: ${cause.message}`))),
+    Effect.asVoid,
+  ),
   boot: ({ source }) => runProcess(ChildProcess.make("bun", ["wisp", "map", "boot", source], { cwd: tsDirectory, stdin: "ignore" })).pipe(
     Effect.as(undefined),
     Effect.catch((cause) => Effect.succeed(cause.message.replaceAll(/\s+/g, " ").slice(-600))),

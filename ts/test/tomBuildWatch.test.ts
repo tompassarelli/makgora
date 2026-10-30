@@ -29,6 +29,7 @@ const landing = (fetchStores: boolean, failure: PlayProblem = unstored) => {
       calls.push("build");
       return stored ? Effect.succeed({ version: "0.1.0-main", source: "map.w3x", stages: [] }) : Effect.fail(failure);
     }),
+    prepareBoot: Effect.void,
     boot: () => Effect.succeed(undefined),
     tidy: Effect.succeed(undefined),
     fetchInputs: Effect.suspend(() => {
@@ -58,7 +59,7 @@ describe("tom build watcher", () => {
     const { outcome, calls, attempted } = run(true);
     expect(calls).toEqual(["build", "fetch", "build"]);
     expect(outcome._tag).toBe("Success");
-    expect(outcome._tag === "Success" && outcome.success).toContain("inputs-fetch=0.0,maps-copy=0.0");
+    expect(outcome._tag === "Success" && outcome.success).toContain("inputs-fetch=0.0,boot=0.0,maps-copy=0.0");
     expect(attempted).toBe(true);
   });
 

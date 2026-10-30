@@ -1,5 +1,5 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Effect, Schema, Stream } from "effect";
@@ -11,7 +11,8 @@ import { runProcess } from "wisp/scripts/wisp/hostProcess";
 import { step } from "wisp/scripts/wisp/timings";
 import { bundleConfig } from "./bundleConfigs";
 import { stockLua } from "./luaRuntimes";
-import { buildProject, tsDirectory } from "./project";
+import { mapBuildKey } from "./mapBuildKey";
+import { buildProject, projectRoot, tsDirectory } from "./project";
 
 export class MapBootFailure extends Schema.TaggedError<MapBootFailure, { readonly brand: unique symbol }>()("MapBootFailure", { problem: Schema.String }) {
   override get message(): string {
@@ -28,10 +29,24 @@ export function mapBundle(script: string): string | undefined {
   return end < 0 ? undefined : script.slice(start, end);
 }
 
+// wisp:host/compile/mapBuild.ts compileCacheDirectory is not exported; the boot driver shares the map build's compile cache so an unchanged source tree is not compiled again.
+const compileCacheDirectory = () => process.env.WISP_COMPILE_CACHE || join(homedir(), ".cache/wisp/compile");
+
 const compile = (config: string) => Effect.try({
-  try: () => report(mapCompiler(config)()),
+  try: () => report(mapCompiler(config, undefined, compileCacheDirectory())()),
   catch: (cause) => new MapBootFailure({ problem: `compiling ${config}: ${describeCause(cause)}` }),
 }).pipe(Effect.flatMap((problems) => (problems === "" ? Effect.void : Effect.fail(new MapBootFailure({ problem: problems })))));
+
+const DRIVER = join(tsDirectory, "build/boot.lua");
+const DRIVER_KEY = `${DRIVER}.key`;
+
+export const compileBootDriver = Effect.gen(function*() {
+  const key = yield* mapBuildKey(projectRoot, ["boot-driver"]).pipe(Effect.mapError((cause) => new MapBootFailure({ problem: `keying the boot check: ${describeCause(cause)}` })));
+  const current = existsSync(DRIVER) && existsSync(DRIVER_KEY) && readFileSync(DRIVER_KEY, "utf8") === key;
+  if (current) return;
+  yield* compile(bundleConfig("boot")).pipe(step("compile the boot check"));
+  writeFileSync(DRIVER_KEY, key);
+});
 
 const shippedBundle = (map: string, scratch: string) => Effect.gen(function*() {
   const packager = buildProject().packager;
@@ -50,7 +65,7 @@ const shippedBundle = (map: string, scratch: string) => Effect.gen(function*() {
 const runBoot = (bundle: string) => Effect.scoped(Effect.gen(function*() {
   const lua = yield* stockLua.pipe(Effect.mapError((problem) => new MapBootFailure({ problem })));
   const declarations = join(tsDirectory, "node_modules/wisp/src/natives/warcraft.d.ts");
-  const child = yield* ChildProcess.make(lua, [join(tsDirectory, "build/boot.lua"), bundle, declarations], { cwd: tsDirectory, stdin: "ignore" });
+  const child = yield* ChildProcess.make(lua, [DRIVER, bundle, declarations], { cwd: tsDirectory, stdin: "ignore" });
   const [output, errors, code] = yield* Effect.all([Stream.mkString(Stream.decodeText(child.stdout)), Stream.mkString(Stream.decodeText(child.stderr)), child.exitCode], { concurrency: "unbounded" });
   return { output: `${output}${errors}`.trimEnd(), passed: code === 0 && output.includes("done problems=0") };
 })).pipe(
@@ -66,7 +81,7 @@ export const bootCheck = (map: string | undefined) => Effect.scoped(Effect.gen(f
   const bundle = map === undefined
     ? yield* compile(buildProject("playable").configPath).pipe(step("compile the playable build"), Effect.as(buildProject("playable").bundlePath))
     : yield* shippedBundle(map, scratch);
-  yield* compile(bundleConfig("boot")).pipe(step("compile the boot check"));
+  yield* compileBootDriver;
   const { output, passed } = yield* runBoot(bundle).pipe(step("boot to character select in 32-bit Lua"));
   yield* Console.log(output);
   if (!passed) {

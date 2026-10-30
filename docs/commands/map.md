@@ -18,6 +18,9 @@
   Tom build before it is installed (smashcraft:tools/tom-build/README.md), because
   a map that builds can still open to an empty screen: 0.3-dev.460 passed
   `Boolean` as a callback, which is nil in Lua, and every select update threw.
+  Its check driver compiles through the map build's compile cache and is reused while
+  the checkout's tree is unchanged; `bun wisp map boot --driver` compiles it alone, which
+  the Tom build watcher runs beside the map build so the compile is off the critical path.
   All three commands resolve every special, attack, contact-accent and projectile
   cue model through the renderer's real asset resolver.
   A missing path fails the build before replacing the map.

@@ -23,7 +23,7 @@ import { checkCueModels, headlessRender } from "../headlessRender";
 import { writePlaytestCost } from "../playtestCost";
 import { PREDICT_COST, TOM_EDITION, costPrediction, playableBuildArgs } from "../greenBuilds";
 import { insideTomsLibrary } from "../mapLibrary";
-import { bootCheck } from "../mapBoot";
+import { bootCheck, compileBootDriver } from "../mapBoot";
 
 
 export const profileOptions = (args: readonly string[]) => Effect.gen(function*() {
@@ -159,8 +159,10 @@ const release = (args: readonly string[]) => {
   return buildArgs === undefined ? Effect.fail(new UsageFailure({ problem: "map release --name NAME --out OUT.w3x [--commit SHA] [--predict-cost]" })) : repairPackager().pipe(Effect.andThen(build(buildArgs)));
 };
 
-const boot: Command = (args) => args.length > 1 || args[0]?.startsWith("-") === true
-  ? Effect.fail(new UsageFailure({ problem: "map boot [MAP.w3x]" }))
+const boot: Command = (args) => args.length === 1 && args[0] === "--driver"
+  ? compileBootDriver
+  : args.length > 1 || args[0]?.startsWith("-") === true
+  ? Effect.fail(new UsageFailure({ problem: "map boot [MAP.w3x | --driver]" }))
   : (args[0] === undefined ? bootCheck(undefined) : repairPackager().pipe(Effect.andThen(bootCheck(args[0]))));
 
 export const map: Command = ([verb, ...args]) => verb === "boot" ? boot(args) : verb === "release" ? release(args) : verb === "build" ? (args.includes("--inputs-only") ? build(args) : repairPackager().pipe(Effect.andThen(build(args)))) : verb === "rebuild" ? repairPackager().pipe(Effect.andThen(rebuild(args))) : Effect.fail(new UsageFailure({ problem: "map takes release, build, rebuild or boot" }));
