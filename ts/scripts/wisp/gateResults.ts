@@ -94,7 +94,7 @@ export const dismissFirstRunPanels = (d: Driver, client: Client) => Effect.gen(f
   for (let pass = 0; pass <= FIRST_RUN_PANELS; pass++) {
     const seen = yield* d.words(client, yield* d.shot(client));
     const notNow = seen.find(word => word.text === "Not");
-    const picker = seen.some(word => /^Recalibrate/i.test(word.text));
+    const picker = seen.some(word => /^(Recalibrate|edits|layout|done|customi[sz]e|recommended)/i.test(word.text));
     if (notNow === undefined && !picker) return;
     if (pass === FIRST_RUN_PANELS) return yield* new AcceptFailure({ operation: "results gate first-run panels", problem: `${client.name} still shows ${picker ? "the controls picker" : "the tutorial offer"} after ${FIRST_RUN_PANELS} dismissals` });
     const region = yield* d.view(client);

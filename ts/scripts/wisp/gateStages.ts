@@ -35,6 +35,8 @@ export const measureStagesGate = (clientsFile: string, directory: string, restar
     const tile = tilePoint(id);
     const target = yield* d.at(host, tile.x, tile.y);
     yield* batch(host, [{ kind: "click", ...target, holdMillis: 200 }, { kind: "wait", millis: 600 }]).pipe(Effect.mapError(fail(`stages gate pick ${name}`)));
+    yield* d.hover(host, tile.x, tile.y);
+    yield* Effect.sleep("400 millis");
     const frames = [yield* d.save("stage-select.ppm", yield* d.shot(host))];
     const match = yield* pressStartUntil(d, host, "BLOCKED", select.epoch + 1, MATCH_WAIT_SECONDS).pipe(Effect.option);
     if (match._tag === "Some") {
