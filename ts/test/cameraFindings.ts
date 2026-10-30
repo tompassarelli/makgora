@@ -3,7 +3,7 @@ import type { HeadlessClient } from "wisp/src/headless/client";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { cameraPoint } from "../src/game/presentation/arenaCamera";
-import { fighterFrame } from "../src/game/presentation/fighterFraming";
+import { fighterOffscreen } from "../src/game/presentation/fighterFraming";
 import { fighterAt, isActive } from "../src/game/sim/roster";
 import { shell } from "../src/host/loop/state";
 
@@ -39,12 +39,7 @@ export class CameraFindings {
         if (bodyVisible) findings.push({ detector: "visible-ko", text: `Player ${slot + 1} lost a stock while drawn in the fighting view` });
       }
       const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
-      const point = cameraPoint(s.camera, aspect, fighter?.motion.x ?? 0, (fighter?.motion.z ?? 0) + 60);
-      const body = fighter === undefined ? undefined : fighterFrame(fighter.character);
-      const outside = fighter !== undefined && body !== undefined && [body.bottom, body.top].some((above) => [-body.right, body.right].some((side) => {
-        const edge = cameraPoint(s.camera, aspect, fighter.motion.x + side, fighter.motion.z + above);
-        return edge.column < 0 || edge.column > 1 || edge.row < 0 || edge.row > 1;
-      }));
+      const outside = fighter !== undefined && fighterOffscreen(s.camera, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
       const needsBubble = game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside;
       if (needsBubble) this.offscreenFrames++;
       for (const [name, context] of [[`OffscreenPortrait${slot}`, 920 + slot * 2], [`OffscreenArrow${slot}`, 921 + slot * 2]] as const) {
