@@ -35,7 +35,7 @@ import { changesAimZone, chargedAimX, chargedAimZ } from "./specials/aimZone";
 import { heroContactFacing } from "./specials/radial";
 import { advanceHeroSpecial, endCancelledSpecial, heroSpecialCancelOpen, enterUltimate, chooseHeroSpecial, enterHeroSpecial, steerHeroSpecial } from "./specials/engine";
 import { followUpOnContact, followUpHeroSpecial } from "./specials/heroForms";
-import { holdHoveringUltimate, faceHeldStick, relocateHeroSpecial, stopHeroMotionAtBodies } from "./specials/heroMotion";
+import { holdHoveringUltimate, riderPaused, faceHeldStick, relocateHeroSpecial, stopHeroMotionAtBodies } from "./specials/heroMotion";
 import { heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield } from "./specials/heroContact";
 import { isHeroSpecialAction, runningHeroSpecial } from "./specials/runningMove";
 import { mutableBear } from "./fighterRest";
@@ -657,7 +657,7 @@ function endSpecialAction(owner: Fighter, helpless: boolean): void {
 
 function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number, input: Readonly<Controls> | undefined, world: Roster): void {
   const { special, motion } = owner;
-  if (special.action === SpecialAction.none || owner.launch.hitlag > 0) return;
+  if (special.action === SpecialAction.none || owner.launch.hitlag > 0 || riderPaused(world, owner)) return;
   if (isHeroSpecialAction(special.action)) followUpOnContact(owner);
   special.frame++;
   if (isHeroSpecialAction(special.action)) {

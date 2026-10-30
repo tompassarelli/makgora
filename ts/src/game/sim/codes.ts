@@ -63,6 +63,8 @@ export type GrabAction = (typeof GrabAction)[keyof typeof GrabAction];
 export const LedgeState = { none: 0, hang: 1, climb: 2, roll: 3, attack: 4, tether: 5 } as const;
 export type LedgeState = (typeof LedgeState)[keyof typeof LedgeState];
 
+export const SpecialCarry = { none: 0, carrier: 1, rider: 2 } as const;
+export type SpecialCarry = (typeof SpecialCarry)[keyof typeof SpecialCarry];
 export const DuoRole = { solo: 0, leader: 1, partner: 2 } as const;
 export type DuoRole = (typeof DuoRole)[keyof typeof DuoRole];
 

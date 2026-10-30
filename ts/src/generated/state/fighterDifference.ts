@@ -195,6 +195,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.special.parasol !== actual.special.parasol) return "specialParasol";
   if (expected.special.guarded !== actual.special.guarded) return "specialGuarded";
   if (expected.special.egg !== actual.special.egg) return "specialEgg";
+  if (expected.special.carry !== actual.special.carry) return "specialCarry";
   if (expected.special.empoweredShots !== actual.special.empoweredShots) return "specialEmpoweredShots";
   if (expected.special.empoweredFrames !== actual.special.empoweredFrames) return "specialEmpoweredFrames";
   if (expected.status.divineFrames !== actual.status.divineFrames) return "divineFrames";

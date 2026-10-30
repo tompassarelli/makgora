@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "../itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "../heroStatus";
-import { SpecialAction } from "../codes";
+import { SpecialAction, SpecialCarry } from "../codes";
 import { openParasol } from "../parasol";
 import { type Fighter, mutablePlacedObject, placedObject } from "../fighter";
 import { type FighterSpecials, type AuthoredSpecial, type FrameWindow, CompanionMode, CompanionOrder, type SpecialKit, type SpecialPlacement, type SpecialProjectile, type SpecialEgg, SpecialForm, SpecialSlot, specialForm, specialKit } from "./schema";
@@ -102,6 +102,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   special.hit = false;
   special.guarded = false;
   special.seekTarget = 0;
+  special.carry = SpecialCarry.none;
   special.cooldowns[SpecialAction.heroNeutral + chosen.slot] = move.cooldownFrames ?? 0;
   if (move.replacesLive === true) endLiveCasts(f, specialKit(specials, chosen.slot));
   if (move.oncePerAirtime === true) special.airtimeUses |= 1 << chosen.slot;
@@ -222,6 +223,7 @@ function endHeroSpecial(f: Fighter, move: Readonly<AuthoredSpecial>): void {
   openParasol(f, move.parasol === true);
   f.special.action = SpecialAction.none;
   f.special.frame = 0;
+  f.special.carry = SpecialCarry.none;
   releaseCommandGrabLock(f, move);
 }
 

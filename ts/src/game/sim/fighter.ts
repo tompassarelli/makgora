@@ -12,6 +12,7 @@ import {
   DownState,
   DuoOrder,
   DuoRole,
+  SpecialCarry,
   GrabAction,
   GroundAction,
   LedgeState,
@@ -283,6 +284,7 @@ interface Special {
 
   guarded: boolean;
   egg: boolean;
+  carry: SpecialCarry;
   empoweredShots: number;
   empoweredFrames: number;
 }
@@ -774,6 +776,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       parasol: ParasolState.none,
       guarded: false,
       egg: false,
+      carry: SpecialCarry.none,
       empoweredShots: 0,
       empoweredFrames: 0,
     },

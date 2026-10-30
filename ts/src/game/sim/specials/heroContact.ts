@@ -11,6 +11,7 @@ import { type Roster, fighterAt, isActive } from "../roster";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "../shield";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { type Capsule, emptyCapsule, placeCapsule } from "../geometry/contactGeometry";
+import { SpecialCarry } from "../codes";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { squareRoot } from "../warcraftMath";
@@ -158,7 +159,7 @@ export function heroStrikeMeetsShield(owner: Readonly<Fighter>, target: Readonly
 
 export function heroSpecialContact(owner: Readonly<Fighter>, target: Readonly<Fighter>, alreadyHit: boolean): Readonly<HitRegion> {
   const move = runningHeroSpecial(owner);
-  if (move === undefined || alreadyHit || owner.launch.hitlag > 0 || target.status.out || isIntangible(target)) return NO_HIT_REGION;
+  if (move === undefined || alreadyHit || owner.launch.hitlag > 0 || owner.special.carry === SpecialCarry.rider || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const regions = move.regions ?? [];
   const anchor = projectileAnchor(owner, move.regionOrigin);
   if (move.regionOrigin !== undefined && anchor === undefined) return NO_HIT_REGION;

@@ -1,9 +1,9 @@
 import { sameTeam } from "../teams";
 import { max, min } from "../../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
-import { SpecialAction } from "../codes";
+import { DuoRole, SpecialAction, SpecialCarry } from "../codes";
 import { mutableProjectile } from "../fighterProjectiles";
-import { type Fighter, type Projectile, mutablePlacedObject } from "../fighter";
+import { type Fighter, type Projectile, duoRole, mutablePlacedObject } from "../fighter";
 import { type AuthoredSpecial, type SpecialMotion, type SpecialSteer, type SpecialSteeredShot, FOLLOW_UP_FORM, Relocation } from "./schema";
 import { castFloating, floatsNow } from "./airFloat";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
@@ -15,6 +15,7 @@ import { squareRoot } from "../warcraftMath";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, projectileAnchor } from "./runningMove";
 import { strike } from "./heroContact";
 
+type SpecialRide = NonNullable<SpecialMotion["ride"]>;
 const DIAGONAL = 0.7071067690849304;
 
 export function seekTargetSlot(world: Roster, owner: Readonly<Fighter>): number {
@@ -197,9 +198,64 @@ function stickVelocity(segment: Readonly<SpecialMotion>, input: Readonly<Control
   }
 }
 
+function linkedSlot(f: Readonly<Fighter>): number {
+  return f.duo?.link ?? -1;
+}
+
+function riderOf(world: Roster, f: Readonly<Fighter>): Fighter | undefined {
+  if (duoRole(f) !== DuoRole.leader || !isActive(world, linkedSlot(f))) return undefined;
+  const rider = fighterAt(world, linkedSlot(f));
+  return rider.status.out ? undefined : rider;
+}
+
+function boardsRider(f: Readonly<Fighter>, rider: Readonly<Fighter>, ride: Readonly<SpecialRide>): boolean {
+  const dx = f32(rider.motion.x - f.motion.x);
+  const dz = f32(rider.motion.z - f.motion.z);
+  return rider.special.action === f.special.action && rider.special.form === f.special.form && rider.special.variant === f.special.variant
+    && rider.launch.hitlag <= 0 && f32(f32(dx * dx) + f32(dz * dz)) <= f32(ride.reach * ride.reach);
+}
+
+function decideRide(f: Fighter, world: Roster, ride: Readonly<SpecialRide>): void {
+  const rider = riderOf(world, f);
+  f.special.carry = SpecialCarry.none;
+  if (rider === undefined || !boardsRider(f, rider, ride)) return;
+  f.special.carry = SpecialCarry.carrier;
+  rider.special.carry = SpecialCarry.rider;
+  rider.special.frame = linkedSlot(f) > world.fighters.indexOf(f) ? f32(f.special.frame - 1) : f.special.frame;
+}
+
+function carryRider(f: Fighter, world: Roster, ride: Readonly<SpecialRide>): void {
+  const rider = riderOf(world, f);
+  if (rider === undefined || rider.special.carry !== SpecialCarry.rider) return;
+  const { motion } = rider;
+  const side = motion.x < f.motion.x ? -1 : 1;
+  const wantX = f32(f32(f.motion.x + f.motion.vx) + f32(side * ride.offset));
+  const wantZ = f32(f.motion.z + f.motion.vz);
+  motion.vx = f32(f.motion.vx + min(ride.catchUp, max(-ride.catchUp, f32(f32(wantX - motion.x) - f.motion.vx))));
+  motion.vz = f32(f.motion.vz + min(ride.catchUp, max(-ride.catchUp, f32(f32(wantZ - motion.z) - f.motion.vz))));
+  rider.facing = f.facing;
+  motion.grounded = false;
+  motion.surface = undefined;
+}
+
+export function riderPaused(world: Roster, f: Fighter): boolean {
+  if (f.special.carry !== SpecialCarry.rider) return false;
+  const carrier = isActive(world, linkedSlot(f)) ? fighterAt(world, linkedSlot(f)) : undefined;
+  if (carrier === undefined || carrier.special.carry !== SpecialCarry.carrier || carrier.special.action !== f.special.action) {
+    f.special.carry = SpecialCarry.none;
+    return false;
+  }
+  if (carrier.launch.hitlag <= 0) return false;
+  f.motion.vx = 0.0;
+  f.motion.vz = 0.0;
+  return true;
+}
+
 function segmentFlight(f: Fighter, segment: Readonly<SpecialMotion>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
   const { motion } = f;
   scriptedVelocity(f, segment);
+  if (segment.ride !== undefined && world !== undefined && frame === segment.first) decideRide(f, world, segment.ride);
+  if (segment.ride !== undefined && f.special.carry !== SpecialCarry.carrier) flight.z = segment.ride.aloneVelocityZ;
   stickVelocity(segment, input);
   if (segment.steer !== undefined) {
     steerFlight(f, segment.steer, frame === segment.first, input);
@@ -213,11 +269,13 @@ function segmentFlight(f: Fighter, segment: Readonly<SpecialMotion>, frame: numb
   }
   motion.vx = flight.x;
   motion.vz = flight.z;
+  if (segment.ride !== undefined && world !== undefined) carryRider(f, world, segment.ride);
 }
 
 export function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
   holdHoveringUltimate(f);
   if (f.special.grabFrame > 0 && move.commandGrab !== undefined) return;
+  if (f.special.carry === SpecialCarry.rider) return;
   if (!ultimateHovers(f) && fallsFreely(f, move, frame)) return;
   for (const segment of move.motion ?? []) {
     if (frame < segment.first || frame > segment.last) continue;

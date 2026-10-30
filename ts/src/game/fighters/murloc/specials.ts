@@ -20,11 +20,18 @@ const bellySlide = (air: boolean): AuthoredSpecial => ({
   motion: [{ ...frames(BELLY_SLIDE.firstFrame, BELLY_SLIDE.lastFrame), velocityX: BELLY_SLIDE.speed, velocityZ: 0.0, stopsAtShield: true }],
   regions: [heroRegion(BELLY_SLIDE.firstFrame, BELLY_SLIDE.lastFrame, { x1: 10.0, z1: 22.0, x2: 46.0, z2: 22.0, radius: 18.0 }, murlocHit(BELLY_SLIDE.damage, 40, 72.17433166503906, 22.0))],
 });
-const tideSpout = (speed: number, drift: number): AuthoredSpecial => ({
+const SURF_REACH = 120.0;
+const SURF_HITS = [{ first: 6, last: 8 }, { first: 9, last: 11 }, { first: 12, last: 14 }];
+const surfHit = (last: boolean) => last ? murlocHit(2.0, 80, 63.15253829956055, 30.0) : murlocHit(2.0, 90, 0.0, 14.0);
+const TIDAL_SURF: AuthoredSpecial = {
   endFrame: 34, oncePerAirtime: true, helpless: true, facesStick: true,
-  motion: [{ ...frames(1, 5), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(6, 25), velocityX: 0.0, velocityZ: speed, driftSpeed: drift }],
-  regions: [heroRegion(6, 14, { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 }, murlocHit(6.244323253631592, 80, 63.15253829956055, 30.0))],
-});
+  rehits: SURF_HITS.slice(1).map(({ first }) => first + 1),
+  motion: [
+    { ...frames(1, 5), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(6, 25), velocityX: 0.0, velocityZ: 17.0, driftSpeed: 6.0, ride: { reach: SURF_REACH, offset: 30.0, catchUp: 30.0, aloneVelocityZ: 11.0 } },
+  ],
+  regions: SURF_HITS.map(({ first, last }, index) => heroRegion(first, last, { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 }, surfHit(index === SURF_HITS.length - 1))),
+};
 
 const PLAGUE: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
 const DISEASE_CLOUD: AuthoredSpecial = {
@@ -41,7 +48,7 @@ const DISEASE_CLOUD: AuthoredSpecial = {
 export const MURLOC_SPECIALS: FighterSpecials = {
   neutral: { name: "Ensnare", description: "Throw a net that slows the first enemy it reaches. Shield it or jump it.", ground: ensnare(false), air: ensnare(true) },
   side: { name: "Belly Slide", description: "Belly-slide forward into a hit, and Grgl follows five frames later. A raised shield stops the slide.", ground: bellySlide(false), air: bellySlide(true) },
-  up: { name: "Tide Spout", description: "Ride a water spout upward and steer it, then fall helpless.", ground: tideSpout(17.0, 6.0) },
+  up: { name: "Tidal Surf", description: "Ride a wave upward and steer it, carrying a Grgl within reach to the full height, then fall helpless.", ground: TIDAL_SURF },
   down: { name: "Disease Cloud", description: "Leave a small plague cloud that poisons enemies standing in it; jumping clears it.", ground: DISEASE_CLOUD, air: { ...DISEASE_CLOUD, groundOnly: false, landingLag: 20,
     projectiles: DISEASE_CLOUD.projectiles?.map(shot => ({ model: shot.model, spawnFrame: shot.spawnFrame,
       offsetX: 0.0, offsetZ: 22.0, velocityX: 0.0, velocityZ: 0.0, life: shot.life,

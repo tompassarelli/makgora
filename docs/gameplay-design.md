@@ -1051,7 +1051,7 @@ One rule for every fighter's four specials
 | Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Ascension of the Damned, Far Sight, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
 | Cairne | side: Bloodhoof Gore (rush); up: Spirit Lift (recovery) |
 | Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
-| Murloc | side: Belly Slide (rush); up: Tide Spout (recovery) |
+| Murloc | side: Belly Slide (rush); up: Tidal Surf (recovery) |
 | Grom | side: Gorehowl Rush (rush); up: Blood Leap (recovery) |
 | Anub'arak | side: Burrow Hunt (rush); up: Crypt Eruption (recovery) |
 | Malfurion | side: Stag Charge (rush); up: Dream Ascent (recovery) |
@@ -2686,7 +2686,7 @@ Expert field.
 | Peon | Worksite Launch | 8 | 0 | 22 | 355 / 358 | guided | 55 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
 | Goblin Tinker | Rocket Boots | 7 | 0 | 19 | 521 / 501 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
 | Kael'thas Sunstrider | Phoenix | 13 | 0 | 15 | 731 / 864 | steered (launch 8-way, 12 frames) | 121 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 191/208 |
-| Murloc | Tide Spout | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
+| Murloc | Tidal Surf | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
 | Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 189/208 |
 | Malfurion Stormrage | Dream Ascent | 10 | 0 | 29 | 434 / 413 | guided | 61 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
 | Medivh | Raven Flight | 9 | 0 | 21 | 373 / 460 | aimed (8-way, 8 frames) | 51 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |

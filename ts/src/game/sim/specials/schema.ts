@@ -55,6 +55,7 @@ export interface SpecialMotion extends FrameWindow {
   readonly seek?: { readonly speed: number; readonly turnCos: number; readonly turnSin: number } | undefined;
 
   readonly steer?: SpecialSteer | undefined;
+  readonly ride?: { readonly reach: number; readonly offset: number; readonly catchUp: number; readonly aloneVelocityZ: number } | undefined;
 }
 
 export interface SpecialSteer {
