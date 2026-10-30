@@ -4,6 +4,7 @@
 | --- | --- | --- |
 | CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); every landing on main, pushed by `safe-push` or dispatched by Autoland, also runs the smoke job (the Classic frame budget, the same budget on the four-fighter 7-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the filtered-checks job (parity tapes and numeric, the stack-trace profile, the compiler and type-check benchmarks and effect-kit, unfiltered), so main gets the full suite after each landing (see Landing) |
 | Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
+| Revert red main (smashcraft:.github/workflows/revert-red.yml) | dispatch by Main is red with the failed run's ID | reverts a landing whose parent was green when no green run of that workflow follows within 15 minutes (see Sheriff) |
 | Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (smashcraft:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (boot, perf, rollback, parity-0 to parity-3, lua, corpus, computer-0 and computer-1, types, clean-room, static), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; safe-push's landing runs it with the groups it selects, see Landing); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: the host test suite (`bun run test` in ts/, every ts/test file outside the sweeps), every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); without one in the last 60 commits, drift comparison warns and passes while roster coverage and absolute frame budgets still apply; a decided rise rebaselines through the dispatch input `rebaseline` (smashcraft:docs/commands/perf.md); a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (smashcraft:docs/commands/soak.md) |
@@ -413,6 +414,24 @@ newer finished run exists:
   measurements and budgets, parity, development-loop checks, type checks and
   every other step are unsupported. Multiple measured failed steps or an
   infrastructure-ambiguous run also report without reverting.
+
+- **Timed revert.** A failed CI or Background sweeps run the sheriff left alone
+  (an unsupported step, a multi-step failure, a lane the sheriff could not
+  confirm) also starts "Revert red main"
+  (smashcraft:.github/workflows/revert-red.yml, which runs
+  smashcraft:ts/scripts/revertRed.ts). It reverts only when the run before it
+  that finished was green, belonged to an ancestor and exactly one commit
+  landed since (a red parent or several unverified commits revert nothing),
+  the landing is not a revert or merge and changes nothing under
+  `.github/workflows/`, and no green run of that workflow finished within 15
+  minutes of the red run's end (a newer run still going is waited for, up to 30
+  minutes more). Then, with the landing still on main and no revert of it on
+  top, it pushes a new commit titled `Revert "SUBJECT"` with a `Reverts:
+  FULL_SHA` trailer, starts main's CI, comments on each issue the landing's
+  message references and on its pull requests naming the failing jobs and the
+  run, and reopens a referenced issue the landing had closed. A revert
+  conflict reverts nothing and leaves "main is red" standing. The author's lane
+  re-lands the fixed change.
 
 The attributed range can span several Autoland trains: it starts at the
 preceding finished successful run of the same workflow on main and ends at

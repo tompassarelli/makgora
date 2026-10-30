@@ -66,7 +66,8 @@ failing tests and the first failing commit; the pre-push gate prints that list
 on every push. Its runs post no issue comments; each run's summary and
 annotation say red, still red or green again (`gh run view RUN_ID`). A red main is not "already failing": before landing, check
 whether your change touches a listed test, and if your commit broke main, fix
-it first.
+it first. A landing that turned a green main red with no green run within 15
+minutes is reverted by a new `Revert` commit (smashcraft:docs/ci.md, "Sheriff").
 A push to a `claude/**` branch (a cloud worker's) lands on main by itself
 when its full suite adds no failure to main's, and otherwise its run fails
 with the reason in its job summary and annotation (smashcraft:docs/ci.md, "Autoland").
