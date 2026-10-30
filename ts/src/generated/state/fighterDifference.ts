@@ -292,6 +292,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.surfaceRecovery.contactNormalZ !== actual.surfaceRecovery.contactNormalZ) return "surfaceContactNormalZ";
   if (expected.dodge.airMotionFrames !== actual.dodge.airMotionFrames) return "airDodgeTime";
   if (expected.landing.lag !== actual.landing.lag) return "landingLag";
+  if (expected.landing.buffering !== actual.landing.buffering) return "landingBuffering";
   if (expected.landing.wavedash !== actual.landing.wavedash) return "landingWavedash";
   if (expected.landing.dashBuffer !== actual.landing.dashBuffer) return "landingDashBuffer";
   if (expected.landing.heldSide !== actual.landing.heldSide) return "landingHeldSide";

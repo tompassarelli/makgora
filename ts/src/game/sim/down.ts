@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, DamageLanding, DownState, ParasolState, SpecialAction } from "./codes";
 import { isFloorTeching, isTumbling } from "./conditions";
 import { type Fighter, isTossed } from "./fighter";
-import { clearDash, landWavedash } from "./groundMovement";
+import { beginLandingBuffer, clearDash } from "./groundMovement";
 import { MAX_GROUNDED_KNOCKBACK_ON_LANDING, airborneDamageLandingReaction, decayKnockback } from "./knockback";
 import { RIFLEMAN_BLASTER_AIR_FRAMES, RIFLEMAN_BLASTER_LANDING_LAG, attackLandingLag, isAerialAttack, landsInAutoCancel, landsIntoAttack } from "./moves";
 import { clearMotionValue, setWorldMotionValue, totalVelocityX } from "./motion";
@@ -139,6 +139,10 @@ function hatchEgg(f: Fighter): boolean {
   return true;
 }
 
+function bufferLanding(f: Fighter, airborne: boolean, input: Readonly<Controls>): void {
+  if (airborne && f.motion.grounded && f.landing.lag > 0 && f.down.state === DownState.none) beginLandingBuffer(f, stickX(input));
+}
+
 export function finishLanding(f: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, landing: number, fromAsdi: boolean): void {
   const { motion, launch, landing: landingState, dodge } = f;
   if (reboundsOffFloor(f, fromAsdi)) {
@@ -157,7 +161,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   f.ledge.grabs = 0;
   if (dodge.airDodging) {
     landingState.lag = AIR_DODGE_LANDING_LAG;
-    landWavedash(f);
+    landingState.wavedash = true;
     dodge.airDodging = false;
     dodge.airFrame = 0;
   }
@@ -193,7 +197,10 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
   if (!isHeroSpecialAction(f.special.action)) f.special.airtimeUses = f.tuning.specials === undefined ? f.special.airtimeUses & FEL_RUSH_IN_PROGRESS : 0;
   f.special.airtimeUses &= ~LEDGE_TETHER_BITS;
   if (f.jump.squat <= 0) f.jump.remaining = groundedJumps(f);
-  if (hatchEgg(f)) return;
+  if (hatchEgg(f)) {
+    bufferLanding(f, !wasGrounded, input);
+    return;
+  }
   if (isTumbling(f)) {
     const launchDirection = totalVelocityX(f) < 0 ? -1 : 1;
     launch.hitstun = 0;
@@ -224,6 +231,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
     launch.hitstun = 0;
     launch.throwHitstun = false;
   }
+  bufferLanding(f, !wasGrounded, input);
 }
 
 function startDownWait(f: Fighter, remainingFrames: number): void {

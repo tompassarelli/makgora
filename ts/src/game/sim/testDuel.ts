@@ -1,6 +1,6 @@
 
 
-import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer } from "../input/attackBuffer";
+import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer, queueAttack } from "../input/attackBuffer";
 import { type FrameControls, createBufferedFrameControls, createFrameControls } from "../match/controls";
 import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
@@ -100,4 +100,13 @@ export function specialToEnd(world: Roster, owner: Fighter, second: Readonly<Con
     last = owner.special.frame;
   }
   return { last, jump };
+}
+
+/** Queues the attack command the input layer would send for `style` on the next stepDuel frame. */
+export function queueDuelAttack(world: Roster, style: number, facing: -1 | 1, slot = 0): void {
+  const match = duelMatches.get(world);
+  if (match === undefined) throw new Error("queueDuelAttack needs a world that has been stepped with stepDuel");
+  const buffer = match.controls.commands[slot];
+  if (buffer === undefined) throw new Error("no attack buffer for slot");
+  queueAttack(buffer, { style, facing, frame: match.frame + 1, mayCharge: false, cStick: false });
 }

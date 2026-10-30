@@ -877,10 +877,12 @@ smashcraft:ts/src/game/sim/step.ts, `teeterAtEdge` in smashcraft:ts/src/game/sim
 `wavedashLedgeSide` in smashcraft:ts/src/game/sim/ledge.ts, tests in
 smashcraft:ts/src/game/sim/edgeSlide.tests.ts and smashcraft:ts/src/game/sim/teeter.tests.ts).
 
-### What the wavedash landing flows into
+### What a lagged landing flows into
 
-The wavedash landing flows into a dash or a walk depending on whether the stick made a fresh
-press during the 10 ticks of air-dodge landing lag (smashcraft:ts/src/game/sim/groundMovement.ts). The
+Every landing that sets landing lag (an aerial, an air dodge, an empty or helpless landing, a hatched
+egg or a landed air shot; a landing with no lag is unchanged) flows into a dash or a walk depending on
+whether the stick made a fresh press during the whole landing lag, the 10 ticks of an air dodge
+included (smashcraft:ts/src/game/sim/groundMovement.ts). The
 landing records the side the stick held as it touched down. Releasing that
 side, or crossing to the other, frees the stick; a press past the 0.8 dash
 threshold within three ticks of crossing the smash deadzone, at any tick of
@@ -895,8 +897,10 @@ traction down to it. As in Melee, a held stick gives a walk because no smash
 input happened. Before 28 Oct a full stick (every keyboard press) held through
 the lag dashed on the first actionable tick, and an analog re-press below full
 during the lag walked unless it landed in the last three ticks. The buffer
-fields are rollback state (`landing.wavedash`, `landing.dashBuffer`,
-`landing.heldSide`).
+fields are rollback state (`landing.buffering`, set on every lagged landing and cleared when the lag
+ends; `landing.dashBuffer`; `landing.heldSide`). `landing.wavedash` stays the air-dodge landing mark
+that the orb and ledge rules read. The rule was first written for wavedash landings only (28 Oct) and
+generalised to every lagged landing on Tom's request (30 Oct); a dash gains no new cancel options.
 
 The 18-world-unit speed is an independently chosen research tuning value
 (3 times the rendering scale of 6), not a sourced Melee parameter. At the former

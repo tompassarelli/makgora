@@ -130,6 +130,12 @@ further than most after a run, a dash or a moonwalk; Thrall, Mannoroth, Cairne
 and Anub'arak stop shortest. Landing slides, wavedashes included, brake hard
 until the fighter is down to walking speed, then glide to a stop.
 
+After any landing with landing lag, an aerial, an air dodge or a helpless landing, the stick decides
+the exit. A direction you were already holding as you touched down and keep holding walks out when the
+lag ends. Releasing the stick and pressing a direction again, or crossing straight to the other side,
+at any moment of the lag buffers a dash that way (forward or back), which starts on the first frame you
+can act. Landings with no lag are unchanged.
+
 To moonwalk, dash and then tilt the stick lightly backward without smashing
 it: your fighter keeps facing forward in its dash while it slows and slides back. Hold
 the light tilt for three frames, after which you can push the stick fully

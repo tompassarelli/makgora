@@ -38,7 +38,7 @@ import {
   WALL_JUMP_FLICK_FRAMES,
   WALL_TECH_JUMP_INPUT_WINDOW_FRAMES,
 } from "./fighter";
-import { advanceGroundMovement, clearDash, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
+import { advanceGroundMovement, clearDash, readLandingExit, restingTraction, wantsCrouch } from "./groundMovement";
 import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
 import { heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps } from "./specials/heroMotion";
 import { tickEmpowered } from "./specials/empowered";

@@ -332,6 +332,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   const landing = target.landing;
   const sourceLanding = source.landing;
   landing.lag = sourceLanding.lag;
+  landing.buffering = sourceLanding.buffering;
   landing.wavedash = sourceLanding.wavedash;
   landing.dashBuffer = sourceLanding.dashBuffer;
   landing.heldSide = sourceLanding.heldSide;
@@ -855,6 +856,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   const landing = target.landing;
   const sourceLanding = source.landing;
   { const a = landing.lag, b = sourceLanding.lag; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  if (landing.buffering !== sourceLanding.buffering) return false;
   if (landing.wavedash !== sourceLanding.wavedash) return false;
   { const a = landing.dashBuffer, b = sourceLanding.dashBuffer; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = landing.heldSide, b = sourceLanding.heldSide; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1325,6 +1327,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "surface", motion.surface ?? -1);
   sink.int(prefix, "airDodgeTime", dodge.airMotionFrames);
   sink.int(prefix, "landingLag", landing.lag);
+  if (landing.buffering) sink.bool(prefix, "landingBuffering", true);
   if (landing.wavedash) sink.bool(prefix, "landingWavedash", true);
   if (landing.dashBuffer !== 0) sink.int(prefix, "landingDashBuffer", landing.dashBuffer);
   if (landing.heldSide !== 0) sink.int(prefix, "landingHeldSide", landing.heldSide);
@@ -1810,6 +1813,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.invincible = RESPAWN_INVINCIBLE_FRAMES;
   dodge.airMotionFrames = 0;
   landing.lag = 0;
+  landing.buffering = false;
   landing.wavedash = false;
   landing.dashBuffer = 0;
   landing.heldSide = 0;

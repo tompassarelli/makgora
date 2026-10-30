@@ -23,7 +23,7 @@ import {
   TURNAROUND_SPECIAL_WINDOW_FRAMES,
   WALL_JUMP_FLICK_FRAMES,
 } from "./fighter";
-import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, readWavedashExit, restingTraction, wantsCrouch } from "./groundMovement";
+import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, readLandingExit, restingTraction, stickSideOf, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
 import { heroMotionPassesPlatforms, heroSpecialJumps } from "./specials/heroMotion";
 import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
@@ -80,8 +80,6 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { aerialJumps, heavyFall, jumpBuffed, speedBuffed } from "./itemBuffs";
 
 const FAST_FALL_DOWN_THRESHOLD = 0.6625000238418579;
-/** the stick crosses this sideways to count as a fresh flick. */
-const STICK_SMASH_DEADZONE_X = 0.25;
 /** tumble ends on a flick at least this far sideways, on the frame it crosses the deadzone. */
 const TUMBLE_EXIT_STICK_X = 0.800000011920929;
 const STEERING_BITS = 16399;
@@ -91,10 +89,10 @@ export function readStickFrame(f: Fighter, input: Readonly<Controls>, horizontal
   const downHeld = isDownHeld(input);
   motion.fastFallInputAge = downHeld ? (motion.fastFallDownHeld ? min(PLATFORM_DROP_INPUT_WINDOW, motion.fastFallInputAge + 1) : 0) : PLATFORM_DROP_INPUT_WINDOW;
   motion.fastFallDownHeld = downHeld;
-  const stickSide = horizontalStick >= STICK_SMASH_DEADZONE_X ? 1 : horizontalStick <= -STICK_SMASH_DEADZONE_X ? -1 : 0;
+  const stickSide = stickSideOf(horizontalStick);
   const tumbleExitFlick = stickSide !== 0 && stickSide !== motion.previousStickSide && Math.abs(horizontalStick) >= TUMBLE_EXIT_STICK_X;
   motion.stickSideAge = stickSide === 0 ? WALL_JUMP_FLICK_FRAMES : stickSide === motion.previousStickSide ? min(WALL_JUMP_FLICK_FRAMES, motion.stickSideAge + 1) : 0;
-  readWavedashExit(f, stickSide, horizontalStick);
+  readLandingExit(f, stickSide, horizontalStick);
   platforms.trackPlatformInput(f, input);
   motion.previousStickSide = stickSide;
   if (input.direction !== 0) {
