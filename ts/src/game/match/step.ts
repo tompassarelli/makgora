@@ -4,7 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
 import { pushFighterBodies } from "../sim/bodyPush";
 import { beginFighterAttack, resolveAttacks } from "../sim/attacks";
-import { AttackStyle, DASH_GRAB_REQUEST } from "../sim/codes";
+import { AttackStyle, DASH_GRAB_REQUEST, DuoRole } from "../sim/codes";
 import { clearDash } from "../sim/groundMovement";
 import { canStartAttackStyle, cancelsJumpSquat, inGrabContext } from "../sim/conditions";
 import { collectLavaContacts } from "../sim/lava";
@@ -43,6 +43,7 @@ import { advanceItems } from "./centreItem";
 import { advanceOrbs } from "./orbs";
 import { seatMurlocPartners } from "../fighters/murloc/duo";
 import { drivePartners } from "./partnerDrive";
+import { advanceDuoStocks } from "../fighters/murloc/duoStocks";
 
 import { bossClock, collectBossContacts, strikeBoss } from "../classic/bosses";
 import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../classic/configuredMatch";
@@ -283,10 +284,11 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (inGrabContext(f)) clearAttackBuffer(controls.commands[slot]);
-    if (keepsStocks(game) && f.status.out && !beforeOut[slot]) {
+    if (keepsStocks(game) && f.status.out && !beforeOut[slot] && f.duo.role !== DuoRole.partner) {
       f.status.stocks = game.stockCount;
       f.status.respawn = 60;
     }
+    if (f.duo.role === DuoRole.leader) advanceDuoStocks(world, slot, beforeOut[slot]);
   }
   if (scope !== undefined) {
     setRosterMask(world, mask);

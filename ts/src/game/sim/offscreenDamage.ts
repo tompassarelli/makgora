@@ -3,7 +3,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { outsideCamera, wellInsideCamera, type MatchCamera } from "./matchCamera";
-import { fighterAt, isActive, type Roster } from "./roster";
+import { fighterAt, isContender, type Roster } from "./roster";
 
 
 export const countsOffscreen = (camera: Readonly<MatchCamera>, x: number, z: number): boolean =>
@@ -11,7 +11,7 @@ export const countsOffscreen = (camera: Readonly<MatchCamera>, x: number, z: num
 
 export function advanceOffscreenDamage(world: Roster, camera: Readonly<MatchCamera>, practice: boolean, slots: number = world.mask): void {
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot) || !participantActive(slots, slot)) continue;
+    if (!isContender(world, slot) || !participantActive(slots, slot)) continue;
     const { motion, status } = fighterAt(world, slot);
     if (practice || status.out) {
       status.offscreenFrames = 0;

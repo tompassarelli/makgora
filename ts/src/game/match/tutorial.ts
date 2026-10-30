@@ -14,7 +14,7 @@ import { ultimateCharged } from "../sim/meter";
 import { ORB_INTERVAL_FRAMES } from "../sim/orbs";
 import type { MatchOrbs } from "../sim/orbState";
 import { spawnOrb } from "./orbs";
-import { type Roster, fighterAt, isActive } from "../sim/roster";
+import { type Roster, fighterAt, isContender } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
 import {
   MATCH_TICKS_PER_SECOND, type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectCpuCharacter, selectStage,
@@ -84,7 +84,7 @@ export function beginLesson(state: TrainingState, world: Roster, playerMask: num
   if (info === undefined) return;
   state.damage = info.partnerDamage;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (participantActive(computerMask, slot)) f.status.damage = f32(info.partnerDamage);
   }
@@ -105,7 +105,7 @@ let beforePickup = 0;
 export function captureTutorialBefore(world: Roster, orbs: Readonly<MatchOrbs>): void {
   beforePickup = orbs.pickupSerial;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     beforeGround[slot] = f.ground.action;
     beforeJump[slot] = f.jump.serial;
@@ -122,7 +122,7 @@ export function captureTutorialBefore(world: Roster, orbs: Readonly<MatchOrbs>):
 
 function playersOtherwiseAttacking(world: Roster, playerMask: number): boolean {
   return PARTICIPANT_SLOTS.some(slot => {
-    if (!isActive(world, slot) || !participantActive(playerMask, slot)) return false;
+    if (!isContender(world, slot) || !participantActive(playerMask, slot)) return false;
     const f = fighterAt(world, slot);
     return f.attack.style !== undefined || (f.special.action !== SpecialAction.none && f.special.action !== SpecialAction.heroUltimate);
   });
@@ -139,7 +139,7 @@ function newSpecial(state: TrainingState, special: SpecialAction): number {
 function countAction(state: TrainingState, action: LessonAction, world: Roster, playerMask: number, computerMask: number, orbs: Readonly<MatchOrbs>): number {
   let count = action === LessonAction.orb && orbs.pickupSerial !== beforePickup && orbs.lastTaker >= 0 && participantActive(playerMask, orbs.lastTaker) ? 1 : 0;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     const player = participantActive(playerMask, slot);
     const partner = participantActive(computerMask === 0 ? playerMask : computerMask, slot);
@@ -164,7 +164,7 @@ function countAction(state: TrainingState, action: LessonAction, world: Roster, 
 function wantsOrb(lesson: Readonly<Lesson>, world: Roster, playerMask: number): boolean {
   if (lesson.action === LessonAction.orb) return true;
   if (lesson.action !== LessonAction.ultimate) return false;
-  return PARTICIPANT_SLOTS.some(slot => isActive(world, slot) && participantActive(playerMask, slot) && !ultimateCharged(fighterAt(world, slot)) && fighterAt(world, slot).special.action !== SpecialAction.heroUltimate);
+  return PARTICIPANT_SLOTS.some(slot => isContender(world, slot) && participantActive(playerMask, slot) && !ultimateCharged(fighterAt(world, slot)) && fighterAt(world, slot).special.action !== SpecialAction.heroUltimate);
 }
 
 

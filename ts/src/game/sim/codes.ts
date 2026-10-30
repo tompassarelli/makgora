@@ -66,7 +66,7 @@ export type LedgeState = (typeof LedgeState)[keyof typeof LedgeState];
 export const DuoRole = { solo: 0, leader: 1, partner: 2 } as const;
 export type DuoRole = (typeof DuoRole)[keyof typeof DuoRole];
 
-export const DuoOrder = { copy: 0, hold: 1, regroup: 2, separated: 3, tossed: 4 } as const;
+export const DuoOrder = { copy: 0, hold: 1, regroup: 2, separated: 3, tossed: 4, fainted: 5 } as const;
 export type DuoOrder = (typeof DuoOrder)[keyof typeof DuoOrder];
 
 

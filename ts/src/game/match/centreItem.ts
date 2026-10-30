@@ -13,7 +13,7 @@ import { ALL_ITEMS_MASK, AttackStyle, ITEM_KINDS, ItemKind, itemBit } from "../s
 import { canStartAttackStyle, inGrabContext } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { applyItemBuff } from "../sim/itemBuffs";
-import { type Roster, fighterAt, isActive } from "../sim/roster";
+import { type Roster, fighterAt, isContender } from "../sim/roster";
 import { mainDeckZAt } from "../sim/stage";
 import { bodyTop } from "../sim/surfaces";
 import { melee } from "../sim/tuning";
@@ -126,7 +126,7 @@ export function advanceItems(game: MatchState, world: Roster, controls: FrameCon
   if (items.kind === ItemKind.none) return;
   const deckZ = mainDeckZAt(game.stageChoice, 0.0);
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (f.status.out || f.status.frozenFrames > 0 || inGrabContext(f)) continue;
     const commands = controls.commands[slot];

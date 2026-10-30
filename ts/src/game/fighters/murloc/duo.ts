@@ -21,7 +21,7 @@ function lowestFreeSlot(world: Readonly<Roster>): number {
 function seatPartner(world: Roster, leaderSlot: number, partnerSlot: number): void {
   const leader = fighterAt(world, leaderSlot);
   const partner = createFighter(Character.murloc, leader.motion.x - leader.facing * MURLOC_DUO.partnerOffset, leader.facing);
-  partner.status.stocks = leader.status.stocks;
+  partner.status.stocks = leader.status.stocks > 0 ? 1 : 0;
   partner.status.out = leader.status.out;
   partner.motion.grounded = leader.motion.grounded;
   partner.motion.surface = leader.motion.surface;

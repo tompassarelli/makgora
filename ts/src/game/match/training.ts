@@ -8,10 +8,10 @@ import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import type { Direction } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
 import { copyFighterState } from "../../generated/state/fighterState";
-import { AttackStyle, Character, DownState, LedgeState, SpecialAction } from "../sim/codes";
+import { AttackStyle, Character, DownState, DuoRole, LedgeState, SpecialAction } from "../sim/codes";
 import { attackActive, attackStartup, canAttack, canShieldGrab, isTumbling } from "../sim/conditions";
 import { type Fighter, PACK_CAPACITY, createFighter } from "../sim/fighter";
-import { type Controls, type Roster, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
+import { type Controls, type Roster, createRoster, fighterAt, isActive, isContender, neutralControls } from "../sim/roster";
 import { advanceFighterMotion } from "../sim/step";
 import { respawnFighter } from "../sim/stocks";
 import { botChoice } from "./botRandom";
@@ -34,6 +34,7 @@ export function resetTrainingPositions(state: TrainingState, world: Roster, comp
     const f = fighterAt(world, slot);
     respawnFighter(world, slot, spawnX(slot));
     f.status.out = false;
+    if (f.duo.role === DuoRole.partner) f.status.stocks = 1;
     f.status.respawn = 0;
     f.facing = spawnX(slot) < 0 ? 1 : -1;
     if (participantActive(computerMask, slot)) f.status.damage = f32(state.damage);
@@ -52,7 +53,7 @@ const beforeForm: Slots<number> = [0, 0, 0, 0];
 
 export function captureTrainingBefore(world: Roster): void {
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     beforeSerial[slot] = f.attack.serial;
     beforeHit[slot] = f.visuals.hit;
@@ -66,15 +67,15 @@ export function captureTrainingBefore(world: Roster): void {
 
 function attackerOf(world: Roster, defender: number): number {
   const last = fighterAt(world, defender).hits.lastAttacker;
-  if (last !== undefined && last !== defender && isActive(world, last)) return last;
-  for (const slot of PARTICIPANT_SLOTS) if (slot !== defender && isActive(world, slot)) return slot;
+  if (last !== undefined && last !== defender && isContender(world, last)) return last;
+  for (const slot of PARTICIPANT_SLOTS) if (slot !== defender && isContender(world, slot)) return slot;
   return -1;
 }
 
 
 export function advanceTrainingReadout(state: TrainingState, world: Roster, playerMask: number, computerMask: number): void {
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (participantActive(computerMask, slot) && beforeOut[slot] && !f.status.out) f.status.damage = f32(state.damage);
     const style = f.attack.style;
@@ -99,7 +100,7 @@ export function advanceTrainingReadout(state: TrainingState, world: Roster, play
   }
   if (state.measureFrames >= 0) state.measureFrames++;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     const hit = f.visuals.hit !== beforeHit[slot];
     const shielded = f.visuals.shield !== beforeShield[slot];

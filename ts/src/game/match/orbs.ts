@@ -3,12 +3,12 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { gainUltimate, ultimateCharged } from "../sim/meter";
 import { ORB_GAIN, ORB_INTERVAL_FRAMES, collectsOrb, orbPoint, orbsActive, playedFrames, respawning, touchesOrb } from "../sim/orbs";
-import { type Roster, fighterAt, isActive } from "../sim/roster";
+import { type Roster, fighterAt, isContender } from "../sim/roster";
 import type { MatchState } from "../lobby/lobbyState";
 import type { MatchOrbs } from "../sim/orbState";
 
 function anyRespawning(world: Roster): boolean {
-  for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot) && respawning(fighterAt(world, slot))) return true;
+  for (const slot of PARTICIPANT_SLOTS) if (isContender(world, slot) && respawning(fighterAt(world, slot))) return true;
   return false;
 }
 
@@ -33,7 +33,7 @@ export function advanceOrbs(game: MatchState, world: Roster): void {
   let taker = -1;
   let nearest = 0.0;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (!collectsOrb(f) || !touchesOrb(f, point)) continue;
     const gap = Math.abs(f32(f.motion.x - point.x));

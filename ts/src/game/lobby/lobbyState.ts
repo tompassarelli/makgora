@@ -11,7 +11,7 @@ import { scheduleMatchItems } from "../match/centreItem";
 import { type MatchOrbs, copyMatchOrbs, createMatchOrbs, resetMatchOrbs } from "../sim/orbState";
 import { lobbyMatchSeed, nextMatchSeed } from "../match/botRandom";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, drawCpuFighter, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
-import { type Roster, fighterAt, isActive } from "../sim/roster";
+import { type Roster, fighterAt, isActive, isContender } from "../sim/roster";
 import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
 import { type Team } from "../sim/teams";
 import { f32 } from "wisp/src/sim/f32";
@@ -720,7 +720,7 @@ export function participantLeft(game: MatchState, slot: number, world: Roster): 
   let survivor: ParticipantSlot | undefined;
   let contested = false;
   for (const fighter of PARTICIPANT_SLOTS) {
-    if (isActive(world, fighter) && !participantActive(game.departedMask, fighter) && fighterAt(world, fighter).status.stocks > 0) {
+    if (isContender(world, fighter) && !participantActive(game.departedMask, fighter) && fighterAt(world, fighter).status.stocks > 0) {
       if (survivor !== undefined && (!game.teamBattle || game.teamChoices[survivor] !== game.teamChoices[fighter])) contested = true;
       survivor = fighter;
     }
@@ -732,7 +732,7 @@ export function participantLeft(game: MatchState, slot: number, world: Roster): 
 function resolveRemaining(game: MatchState, world: Roster): void {
   let survivor: ParticipantSlot | undefined;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot) || participantActive(game.departedMask, slot) || fighterAt(world, slot).status.stocks <= 0) continue;
+    if (!isContender(world, slot) || participantActive(game.departedMask, slot) || fighterAt(world, slot).status.stocks <= 0) continue;
     if (survivor !== undefined && (!game.teamBattle || game.teamChoices[survivor] !== game.teamChoices[slot])) return;
     survivor = slot;
   }
@@ -757,7 +757,7 @@ export function advanceClock(game: MatchState, world: Roster): void {
     let tied = false;
     let seen = 0;
     for (const slot of PARTICIPANT_SLOTS) {
-      if (!isActive(world, slot) || participantActive(game.departedMask, slot)) continue;
+      if (!isContender(world, slot) || participantActive(game.departedMask, slot)) continue;
       const team = game.teamChoices[slot];
       const bit = 1 << team;
       if ((seen & bit) !== 0) continue;
@@ -765,7 +765,7 @@ export function advanceClock(game: MatchState, world: Roster): void {
       let stocks = 0;
       let damage = 0.0;
       for (const member of PARTICIPANT_SLOTS) {
-        if (!isActive(world, member) || participantActive(game.departedMask, member) || game.teamChoices[member] !== team) continue;
+        if (!isContender(world, member) || participantActive(game.departedMask, member) || game.teamChoices[member] !== team) continue;
         const fighter = fighterAt(world, member);
         stocks += fighter.status.stocks;
         if (fighter.status.stocks > 0) damage = f32(damage + fighter.status.damage);
@@ -784,7 +784,7 @@ export function advanceClock(game: MatchState, world: Roster): void {
   let best: ParticipantSlot | undefined;
   let tied = false;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const fighter = fighterAt(world, slot);
     if (best === undefined) { best = slot; continue; }
     const leader = fighterAt(world, best);

@@ -4,7 +4,7 @@
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
 import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, cpuFighterRandom, humanFighterActive, keepsStocks, winningMask } from "../lobby/lobbyState";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { type Roster, fighterAt, isActive } from "../sim/roster";
+import { type Roster, fighterAt, isActive, isContender } from "../sim/roster";
 import { fighterName } from "../roster/kits";
 import { MatchCue } from "./matchAudio";
 import { ULTIMATE_METER_FRAMES, ultimateCharged } from "../sim/meter";
@@ -80,7 +80,7 @@ export function confirmedFrameCues(before: Readonly<CueObservation>, game: Reado
     if (isActive(world, slot) && before.meter[slot] < ULTIMATE_METER_FRAMES && ultimateCharged(fighterAt(world, slot))) cues.push(MatchCue.meterReady);
   }
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot) || before.out[slot]) continue;
+    if (!isContender(world, slot) || before.out[slot]) continue;
     const fighter = fighterAt(world, slot);
     if (!fighter.status.out) continue;
     tally.falls[slot]++;
@@ -105,7 +105,7 @@ const percent = (damage: number): string => `${Math.floor(damage)}%`;
 export function resultRows(game: Readonly<MatchState>, world: Readonly<Roster>, tally: Readonly<MatchTally>): ResultRow[] {
   const rows: ResultRow[] = [];
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!isActive(world, slot)) continue;
+    if (!isContender(world, slot)) continue;
     const fighter = fighterAt(world, slot);
     const winner = (winningMask(game) & (1 << slot)) !== 0;
     const stocks = game.endless ? "" : `Stocks ${fighter.status.stocks}  ·  `;

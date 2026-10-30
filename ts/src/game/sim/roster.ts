@@ -1,3 +1,4 @@
+import { DuoRole } from "./codes";
 
 
 import type { Fighter } from "./fighter";
@@ -52,6 +53,10 @@ export function isActive(roster: Roster, slot: number): boolean {
   return roster.active[slot] === true;
 }
 
+
+export const isPartner = (roster: Roster, slot: number): boolean => roster.active[slot] === true && roster.fighters[slot]?.duo.role === DuoRole.partner;
+
+export const isContender = (roster: Roster, slot: number): boolean => roster.active[slot] === true && !isPartner(roster, slot);
 
 export function fighterAt(roster: Roster, slot: number): Fighter {
   const fighter = roster.fighters[slot];
