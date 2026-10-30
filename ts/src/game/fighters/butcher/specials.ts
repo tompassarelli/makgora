@@ -39,9 +39,10 @@ const meatHook = (air: boolean): AuthoredSpecial => ({
   endFrame: HOOK_CHARGE.hold + 2, landingLag: air ? AIR_LANDING_LAG : undefined, charge: HOOK_CHARGE, followUps: hookFollowUps(air),
 });
 
-export const CHARGE_ARMOR = { ...frames(8, 20), maxDamage: 5.0, perStack: 1.0 } as const;
+export const CHARGE_ARMOR = { ...frames(8, 14), maxDamage: 3.0, perStack: 1.0 } as const;
+export const CHARGE_END_FRAME = 64;
 const butchersCharge = (air: boolean): AuthoredSpecial => ({
-  endFrame: 44, landingLag: air ? AIR_LANDING_LAG : undefined,
+  endFrame: CHARGE_END_FRAME, landingLag: air ? AIR_LANDING_LAG : undefined,
   hurt: butcherReachBody(8, 22, 60.0, 60.0),
   armor: CHARGE_ARMOR,
   motion: [{ ...frames(1, 7), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(8, 20), velocityX: 15.0, velocityZ: 0.0, stopsAtBody: true, stopsAtShield: true }, { ...frames(21, 22), velocityX: 0.0, velocityZ: 0.0 }],

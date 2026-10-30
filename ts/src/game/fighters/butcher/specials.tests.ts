@@ -17,9 +17,9 @@ import { mainDeckLeft, mainDeckRight } from "../../sim/stage";
 import { GRAB_HOLD_DISTANCE } from "../../sim/moves";
 import { knockbackWeight } from "../../sim/itemBuffs";
 import { CHARGED_AIM_FRAMES } from "../../sim/specials/schema";
-import { HOOK_CHARGE, HOOK_FLIGHT_FRAMES, HOOK_REEL_FRAMES, HOOK_SPEED, ROT } from "./specials";
+import { CHARGE_ARMOR, HOOK_CHARGE, HOOK_FLIGHT_FRAMES, HOOK_REEL_FRAMES, HOOK_SPEED, ROT } from "./specials";
 
-type Press = "hook" | "hookHold" | "hookShield" | "aimUp" | "aimDown" | "rot" | "swing" | "backThrow" | "dismember" | "shield" | "none";
+type Press = "hook" | "hookHold" | "hookShield" | "aimUp" | "aimDown" | "rot" | "swing" | "backThrow" | "charge" | "dismember" | "shield" | "none";
 type Script = (tick: number) => readonly [Press, Press];
 
 interface Duel {
@@ -38,6 +38,7 @@ const ROWS: Readonly<Record<Press, Parameters<typeof inputRow>[0]>> = {
   rot: { held: maskOf(Action.moveDown, Action.special), pressed: maskOf(Action.special), axisZ: -127, specialZ: -1 },
   swing: { held: maskOf(Action.moveUp, Action.special), pressed: maskOf(Action.special), axisZ: 127, specialZ: 1 },
   backThrow: { held: maskOf(Action.moveLeft), pressed: maskOf(Action.moveLeft), axisX: -127 },
+  charge: { held: maskOf(Action.moveRight, Action.special), pressed: maskOf(Action.special), axisX: 127, specialX: 1 },
   dismember: { held: maskOf(Action.special, Action.attack), pressed: maskOf(Action.special, Action.attack) },
   shield: { held: maskOf(Action.rightTrigger), pressed: maskOf(Action.rightTrigger) },
   none: {},
@@ -353,4 +354,23 @@ test("Only the first air Meat Hook of an airborne stretch can tether: a second t
   assertTrue(!tether.reeled);
   assertTrue(!tether.hung);
   assertLessThan(tether.z, -500.0);
+});
+
+test("Butcher's Charge armours only its first rush frames against hits up to 3% and ends 63 frames after the press, leaving a whiff to punish [k3 measure docs/design/butcher.md]", () => {
+  const d = duel({ foeAhead: 900.0 });
+  let armourMax = 0.0;
+  let armourFrames = 0;
+  let endedAt: number | undefined;
+  for (let tick = 1; tick <= 100; tick++) {
+    step(d, [tick === 3 ? "charge" : "none", "none"]);
+    if (d.butcher.status.armorFrames > 0) {
+      armourFrames++;
+      armourMax = d.butcher.status.armorMaxDamage;
+    }
+    if (tick > 3 && endedAt === undefined && d.butcher.special.action === SpecialAction.none) endedAt = tick - 3;
+  }
+  assertEquals(armourMax, CHARGE_ARMOR.maxDamage);
+  assertEquals(CHARGE_ARMOR.maxDamage, 3.0);
+  assertLessThan(armourFrames, 10);
+  assertEquals(endedAt, 63);
 });

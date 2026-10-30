@@ -84,6 +84,9 @@ Specials:
 - **Butcher's Charge** (side). A belly-led rush on frames 8–20 that stops at
   bodies and shields, with armour over the same frames against hits up to 5%
   plus 1% per Flesh Heap stack, and a bump for 11%. 44 frames.
+  (Retune for #766, 2026-10-30: armour on frames 8–14 only against hits up to
+  3% plus 1% per stack, and 64 frames in all, so a block or whiff leaves 42
+  frames after the rush for the foe to punish. Field results below.)
 - **Hook Swing** (up). The hook flies up and ahead. If a free ledge lies
   inside its reach on frames 6–20, the move ends and he is reeled to the
   ledge over 12 frames into ledge hang (`LedgeState.tether`, rollback state);
