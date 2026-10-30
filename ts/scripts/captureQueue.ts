@@ -5,6 +5,7 @@ import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { HOP_MOVES } from "../src/game/session/hopShowcase";
+import { RUN_MOVES } from "../src/game/session/runShowcase";
 import { SCORED_NORMALS, SCORED_SPECIALS } from "./wisp/animScoreSample";
 
 export class CaptureQueueFailure extends Schema.TaggedError<CaptureQueueFailure, { readonly brand: unique symbol }>()("CaptureQueueFailure", { problem: Schema.String }) {
@@ -29,7 +30,7 @@ export type Result = typeof Result.Type;
 
 const SPECIAL_SLOTS: Readonly<Record<string, string>> = { "neutral-special": "neutral_b", "side-special": "side_b", "up-special": "up_b", "down-special": "down_b", ultimate: "ultimate" };
 export const showcaseSlot = (move: string): string => SPECIAL_SLOTS[move] ?? move.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
-export const capturableMove = (move: string): boolean => [...SCORED_NORMALS, ...SCORED_SPECIALS, ...HOP_MOVES].some(row => row.move === move);
+export const capturableMove = (move: string): boolean => [...SCORED_NORMALS, ...SCORED_SPECIALS, ...HOP_MOVES, ...RUN_MOVES].some(row => row.move === move);
 
 export const writeAtomic = (path: string, text: string) => {
   writeFileSync(`${path}.tmp`, text);
@@ -55,7 +56,7 @@ const attempt = <A>(problem: string, run: () => A | Promise<A>) =>
 export const newJob = (input: { readonly lane: string; readonly fighter: string; readonly move: string; readonly crop: string | undefined; readonly dummy?: string | undefined; readonly cwd: string; readonly rev: string; readonly now: Date }) => Effect.gen(function*() {
   if (!/^[a-z0-9][a-z0-9-]{0,40}$/.test(input.lane)) return yield* fail("--lane is a lowercase lane name such as sc-568");
   if (!SELECTABLE_CHARACTERS.some(character => fighterSlug(character) === input.fighter)) return yield* fail(`unknown fighter ${input.fighter}`);
-  if (!capturableMove(input.move)) return yield* fail(`unknown move ${input.move}; use an anim score move name such as up-air, side-special or short-hop`);
+  if (!capturableMove(input.move)) return yield* fail(`unknown move ${input.move}; use an anim score move name such as up-air, side-special, short-hop or run`);
   if (input.dummy !== undefined && !SELECTABLE_CHARACTERS.some(character => fighterSlug(character) === input.dummy)) return yield* fail(`unknown dummy ${input.dummy}`);
   const crop = input.crop?.split(",").map(Number);
   if (crop !== undefined && (crop.length !== 4 || !crop.every(value => Number.isInteger(value) && value >= 0))) return yield* fail("--crop takes X,Y,W,H in whole captured-screen pixels");

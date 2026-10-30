@@ -38,6 +38,7 @@ function timedInputs(move: Readonly<ShowcaseMove>, facing: "right" | "left"): Ti
     ...(move.hold === undefined ? [] : [inputAt(move.hold.frame, `a hold ${move.hold.frames}`)]),
     ...(move.release === undefined ? [] : [inputAt(move.release, "a release X")]),
     ...(move.jump === undefined ? [] : [inputAt(0, `a tap B ${move.jump.frames}`)]),
+    ...(move.run === undefined ? [] : [inputAt(0, `a stick ${facing === "left" ? -1 : 1} 0`)]),
     ...(move.aim === undefined ? [] : [inputAt(move.aim.frame, `a stick 0 ${move.aim.z}`), inputAt(move.aim.until, "a stick 0 0")]),
   ];
 }

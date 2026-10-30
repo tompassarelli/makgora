@@ -12,6 +12,7 @@ import { SHIELD_PROJECTILE_SPEED_MULTIPLIER } from "../sim/shield";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ordinaryHitlagFrames } from "../sim/knockback";
 import { hopShowcases } from "./hopShowcase";
+import { runShowcases } from "./runShowcase";
 
 export const SHOWCASE_FIRST_FRAME = 40;
 export const SHOWCASE_SPECIAL_SLOTS: readonly string[] = ["neutral_b", "side_b", "up_b", "down_b"];
@@ -24,11 +25,12 @@ const INCOMING_BODY = 40;
 
 export interface ShowcaseMove {
   readonly slot: string;
-  readonly kind: "normal" | "special" | "ultimate" | "hop";
+  readonly kind: "normal" | "special" | "ultimate" | "hop" | "run";
   readonly code: number;
   readonly first: number;
   readonly end: number;
   readonly gap?: number | undefined;
+  readonly run?: true | undefined;
   readonly lift?: number | undefined;
   readonly incoming?: { readonly lead: number; readonly gap: number } | undefined;
   readonly again?: { readonly frame: number; readonly gap: number } | undefined;
@@ -40,6 +42,7 @@ export interface ShowcaseMove {
   readonly behind?: number | undefined;
   readonly samples?: readonly number[] | undefined;
   readonly jump?: { readonly frames: number } | undefined;
+  readonly run?: true | undefined;
   readonly aim?: { readonly frame: number; readonly until: number; readonly z: number } | undefined;
 }
 
@@ -64,6 +67,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   moves.push(...hopShowcases(character));
+  moves.push(...runShowcases());
   return moves;
 }
 
