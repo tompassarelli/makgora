@@ -204,6 +204,16 @@ The spam probe still finds Butcher's Charge used alone winning 96% of 1,440
 matches against Expert, and his worst matchups sit outside 30–70%: Chen 3%,
 Pit Lord 11%, Anub'arak 14%, Shadow Hunter 23%, Dreadlord 26%, and Warden 90%.
 
+The Charge retune (#766, 2026-10-30; balance run 41009267216 on probe/sc-766-charge-b,
+same field, 12,240 of his matches): the spam probe for Butcher's Charge fell
+from 96% to 13% of 1,440 matches. The charge change alone (armour on frames
+8–14 against hits up to 3%, 64 frames in all; run 40992168488 on the first
+probe branch) took his field to 37%, under the band, so his damage factor
+returned to 1.0 (the authored rows) and his knockback growth factor became 1.04
+(from ×0.968 and ×1.06), by the retune rule at about 0.6% of damage a point.
+He now sits at 42% (5,118 wins, 7,122 losses), inside the 40–60% band. Side
+special is still his top damage share (32%).
+
 Path draft for Tom to correct (#358):
 
 ```ceiling-plan
