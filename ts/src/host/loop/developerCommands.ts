@@ -77,6 +77,7 @@ function resetDeveloperPresentation(s: ShellState): void {
   clearCaptureStage(s);
   s.promoHudHidden = false;
   clearVisualCapture(localSlot());
+  s.dev.pauseLook = undefined;
   clearCloaks(s);
   pauseMatchPresentation(s, s.session.paused);
 }
@@ -181,16 +182,13 @@ function matchStartReceipt(s: ShellState, actor: number, message: string, reques
   return quickMatchReceipt(s, actor, message, requests);
 }
 
-// Capture maps play pads inside the map, so the pause screen's keyboard or pad look is chosen here instead of read from the connected controller.
+// Capture maps play pads inside the map and stop counting frames while paused, so this draws the pause screen over the running match, in the keyboard or pad look chosen here instead of read from the connected controller.
 function pauseReceipt(s: ShellState, message: string): string | undefined {
   const [, , look, player] = message.split(" ");
   const slot = player === undefined ? 0 : S2I(player) - 1;
   if ((look !== "keyboard" && look !== "pad") || !isParticipantSlot(slot) || s.game.phase !== Phase.match) return undefined;
   s.dev.pauseLook = look;
   s.pausedBy = slot;
-  s.session.paused = true;
-  pauseMatchPresentation(s, true, true);
-  renderPersistentPresentation(s);
   return `dev: pause ${look} ${slot + 1}`;
 }
 

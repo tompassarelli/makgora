@@ -16,6 +16,8 @@ function keyboardCamera(bindings: Readonly<KeyBindings>): string {
   return `Camera: ${move} move · ${keyNames(bindings, Action.cUp)} / ${keyNames(bindings, Action.cDown)} zoom`;
 }
 
+export const pauseScreenUp = (s: Readonly<ShellState>): boolean => s.session.paused || s.dev.pauseLook !== undefined;
+
 export function pauseView(s: Readonly<ShellState>, bindings: Readonly<KeyBindings>): PauseView {
   const pad = s.dev.pauseLook === undefined ? BlzIsLocalClientActive() && osKeyDown(PAD_PRESENT_KEY) : s.dev.pauseLook === "pad";
   return {

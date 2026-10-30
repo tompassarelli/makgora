@@ -57,7 +57,7 @@ import { localDevice, localHints } from "./hints";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { warcraftMenuOpen } from "./warcraftMenu";
 import { presentedMatch } from "./presentedMatch";
-import { EMPTY_PAUSE_VIEW, pauseView } from "./pauseView";
+import { EMPTY_PAUSE_VIEW, pauseScreenUp, pauseView } from "./pauseView";
 import { type UiObjects, layoutHuds, menuControlHit, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
@@ -602,7 +602,7 @@ export function renderUi(s: ShellState): void {
   const ui = views(s);
   const selecting = game.phase === Phase.characterMenu || game.phase === Phase.stageMenu;
   const menu = s.pauseMenu ??= { shown: false, title: false };
-  const paused = game.phase === Phase.match && s.session.paused;
+  const paused = game.phase === Phase.match && pauseScreenUp(s);
   menu.shown = paused;
   const local = localParticipantSlot(s);
   const localKeys = s.participants[local ?? 0].bindings.bindings;
