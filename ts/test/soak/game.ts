@@ -17,9 +17,11 @@ import { originalClip, originalClipCount } from "../../src/generated/clips/fight
 import { Action, bit } from "../../src/game/input/actions";
 import { INPUT_ROW_NUMBERS, type InputRow, emptyInput, inputRow, loadInputNumbers } from "../../src/game/input/inputRow";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
-import { MATCH_TICKS_PER_SECOND, Phase } from "../../src/game/lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, costumeFor } from "../../src/game/lobby/lobbyState";
+import { PARTNER_COSTUME } from "../../src/game/presentation/model/costume";
+import { costumeClipModel } from "../../src/game/roster/costumes";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
-import { AttackStyle, Character, DownState, GrabAction, ProjectileKind, SpecialAction } from "../../src/game/sim/codes";
+import { AttackStyle, Character, DownState, DuoRole, GrabAction, ProjectileKind, SpecialAction } from "../../src/game/sim/codes";
 import type { Fighter } from "../../src/game/sim/fighter";
 import { isHeroSpecialAction } from "../../src/game/sim/specials/runningMove";
 import type { SpecialProjectile } from "../../src/game/sim/specials/schema";
@@ -36,6 +38,7 @@ import { LockWatch, type RecordedRows } from "../../scripts/lockWatch";
 import { JournalHelpers } from "../rematch/journalHelper";
 import { SOAK_BUTTONS, STICK_DEAD_ZONE } from "./controller";
 import { CameraFindings } from "../cameraFindings";
+import { DuoPlateFindings } from "../duoPlateFindings";
 import { heroLook } from "../../src/game/roster/looks";
 
 const STAGES: Readonly<Record<string, number>> = { "sky-deck": 0, "three-bridges": 1, "frozen-throne": 2, "drifting-deck": 3, "patterned-decks": 4, "wind": 10, "carried": 11, "cannon": 12, "timed-lift": 13, "hellfire": 14, "stratholme": 6, "tomb-of-sargeras": 7 };
@@ -55,6 +58,11 @@ const clipModels = (character: Character) => {
   const look = heroLook(character);
   if (look !== undefined) return [look.model];
   return Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "").filter((path) => path !== "");
+};
+
+const drawnModels = (character: Character, costume: number): readonly string[] => {
+  const clips = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)).flatMap((clip) => (clip === undefined ? [] : [costumeClipModel(character, costume, clip)]));
+  return [...new Set([...clipModels(character), ...clips])];
 };
 
 const sign = (value: number) => (value > STICK_DEAD_ZONE ? 1 : value < -STICK_DEAD_ZONE ? -1 : 0);
@@ -230,8 +238,9 @@ export function matchView(journaled: (slot: number) => number | undefined): Pick
         if (!isActive(s.world, slot)) return [];
         const out = (world: typeof s.world | undefined) => world !== undefined && isActive(world, slot) && fighterAt(world, slot).status.out;
         if (fighterAt(s.world, slot).status.stocks <= 0 || out(s.world) || out(predicted)) return [];
-        const character = s.game.characterChoices[slot];
-        return [{ name: `${fighterName(character)} (Player ${slot + 1})`, models: clipModels(character) }];
+        const fighter = fighterAt(s.world, slot);
+        const partner = fighter.duo.role === DuoRole.partner;
+        return [{ name: `${fighterName(fighter.character)}${partner ? " partner" : ""} (Player ${slot + 1})`, models: drawnModels(fighter.character, partner ? PARTNER_COSTUME : costumeFor(s.game, slot)) }];
       });
     },
   };
@@ -251,9 +260,10 @@ const recordedRows: RecordedRows = (frame, slot) => {
 function lockLoops(): Pick<SoakDriver, "findings"> {
   const watch = new LockWatch();
   const camera = new CameraFindings();
+  const plate = new DuoPlateFindings();
   return {
     findings: (client) => {
-      const cameraProblems = camera.observe(client);
+      const cameraProblems = [...camera.observe(client), ...plate.observe(client)];
       if (client.slot !== 0) return cameraProblems;
       const s = shell();
       return [...cameraProblems, ...watch.advance({ world: s.world, match: s.game, controls: s.controls, runtime: s.runtime }, recordedRows).map((text) => ({ detector: "lock-loop", text }))];

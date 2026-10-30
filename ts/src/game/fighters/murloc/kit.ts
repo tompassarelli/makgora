@@ -8,6 +8,7 @@ import { MURLOC_SPECIALS } from "./specials";
 export const MURLOC_HERO: HeroDefinition = {
   character: Character.murloc,
   name: "Murloc",
+  displayName: "Murlocs",
   purpose: "Small, light rushdown",
   weakness: "Short reach, early knockouts and a short recovery",
   jab: { name: "Claw Flurry", description: "Two quick stabs, then a flurry of fin slaps while the button is held." },

@@ -10,6 +10,7 @@ export const MARKER_WIDTH = unitsForPixels(220);
 export const MARKER_HEIGHT = unitsForPixels(170);
 export const MARKER_CLEARANCE = unitsForPixels(16);
 export const MARKER_NAME_LENGTH = 12;
+const PARTNER_MARKER_NAME = "GRGL";
 
 const ARROW_WIDTH_PX = 40;
 const ARROW_HEIGHT_PX = 40;
@@ -63,6 +64,7 @@ export class FighterMarker {
   private shown = false;
   private shownColor: number | undefined;
   private shownHuman: boolean | undefined;
+  private shownPartner: boolean | undefined;
   private playerName = "";
   private shownDamage: string | undefined;
   private shownPercent: string | undefined;
@@ -102,10 +104,11 @@ export class FighterMarker {
   }
 
 
-  update(shown: boolean, color: number, human: boolean, damage: number, x: number, y: number): void {
-    if (this.shownHuman !== human) {
+  update(shown: boolean, color: number, human: boolean, partner: boolean, damage: number, x: number, y: number): void {
+    if (this.shownHuman !== human || this.shownPartner !== partner) {
       this.shownHuman = human;
-      this.playerName = markerName(human, GetPlayerName(Player(this.slot)));
+      this.shownPartner = partner;
+      this.playerName = partner ? PARTNER_MARKER_NAME : markerName(human, GetPlayerName(Player(this.slot)));
       this.shownColor = undefined;
     }
     if (shown !== this.shown) {

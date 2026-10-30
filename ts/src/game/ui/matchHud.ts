@@ -5,11 +5,13 @@ import { idiv, imod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
+import type { DuoPip } from "../sim/duoStatus";
+import { DUO_TITLE, duoHasPartner, duoPipText } from "./duoPip";
 import { fighterName, DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
   DOOM_MARK_TEXTURE, PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
-  panelLayout, percentOutlineText, percentText, plateLeft, stepJolt,
+  panelLayout, percentOutlineText, percentText, plateLeft, shownPercent, stepJolt,
 } from "./plateLayout";
 import { attachOutline, createOutline, createTemplateOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
 import { unitsForPixels } from "./portraitFrames";
@@ -58,6 +60,7 @@ export class FighterHud {
   private readonly damage: framehandle;
   private readonly percent: framehandle;
   private readonly name: framehandle;
+  private readonly pip: framehandle;
   private readonly stocks: readonly framehandle[];
 
   private readonly stockCount: framehandle;
@@ -70,6 +73,11 @@ export class FighterHud {
   private shownTint: CostumeTint | undefined;
   private shownCostume: number | undefined;
   private shownMirrored: boolean | undefined;
+  private shownTitleCharacter: number | undefined;
+  private shownDuoTitle: boolean | undefined;
+  private shownPipVisible: boolean | undefined;
+  private shownPipState: number | undefined;
+  private shownPipPercent: number | undefined;
 
   private shownVisible: boolean | undefined;
   private shownDamage: string | undefined;
@@ -104,6 +112,9 @@ export class FighterHud {
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
     BlzFrameSetFont(this.name, MENU_FONT, f32(0.0072), 1);
     BlzFrameSetEnable(this.name, false);
+    this.pip = createText(`FighterHUDPip${suffix}`, parent, context + 14);
+    BlzFrameSetFont(this.pip, MENU_FONT, f32(0.0072), 1);
+    BlzFrameSetEnable(this.pip, false);
     const stocks: framehandle[] = [];
     for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
       const icon = createBackdrop(`FighterHUDStock${suffix}_${I2S(index)}`, parent, context + 5 + index);
@@ -118,7 +129,7 @@ export class FighterHud {
     BlzFrameSetTexture(this.doomMark, DOOM_MARK_TEXTURE, 0, true);
     BlzFrameSetEnable(this.doomMark, false);
     this.body = [this.plate, this.portrait, this.damage, this.percent, this.name];
-    for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark]) BlzFrameSetLevel(frame, 21);
+    for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark, this.pip]) BlzFrameSetLevel(frame, 21);
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     this.layout(slot, count);
@@ -132,6 +143,7 @@ export class FighterHud {
     for (const icon of this.stocks) BlzDestroyFrame(icon);
     BlzDestroyFrame(this.stockCount);
     BlzDestroyFrame(this.doomMark);
+    BlzDestroyFrame(this.pip);
   }
 
 
@@ -149,6 +161,8 @@ export class FighterHud {
     placeBox(this.doomMark, left, panel.doom);
     placeBox(this.name, left, panel.name);
     BlzFrameSetTextAlignment(this.name, TEXT_JUSTIFY_MIDDLE, inner);
+    placeBox(this.pip, left, panel.pip);
+    BlzFrameSetTextAlignment(this.pip, TEXT_JUSTIFY_MIDDLE, panel.mirrored ? TEXT_JUSTIFY_LEFT : TEXT_JUSTIFY_RIGHT);
     this.stocks.forEach((icon, index) => {
       const box = panel.stocks[index];
       if (box !== undefined) placeBox(icon, left, box);
@@ -159,7 +173,7 @@ export class FighterHud {
   }
 
 
-  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false, tint?: CostumeTint, costume = 0): void {
+  update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false, tint?: CostumeTint, costume = 0, duo?: Readonly<DuoPip>): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);
@@ -173,9 +187,10 @@ export class FighterHud {
       this.shownMirrored = this.panel.mirrored;
       BlzFrameSetTexture(this.plate, `war3mapImported\\HudPlate${this.panel.mirrored ? "Mirror" : ""}${I2S(color)}.tga`, 0, true);
       BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color, costume), 0, true);
-      BlzFrameSetText(this.name, fighterName(character).toUpperCase());
       for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color, costume), 0, true);
     }
+    this.showTitle(character, duo !== undefined && duoHasPartner(duo.state));
+    this.showPip(visible ? duo : undefined);
     if (this.shownTint !== tint) {
       this.shownTint = tint;
       paintCostume(this.portrait, tint);
@@ -186,6 +201,27 @@ export class FighterHud {
     this.showCursed(visible && cursed);
   }
 
+
+  private showTitle(character: Character, duoTitle: boolean): void {
+    if (this.shownTitleCharacter === character && this.shownDuoTitle === duoTitle) return;
+    this.shownTitleCharacter = character;
+    this.shownDuoTitle = duoTitle;
+    BlzFrameSetText(this.name, duoTitle ? DUO_TITLE : fighterName(character).toUpperCase());
+  }
+
+  private showPip(duo: Readonly<DuoPip> | undefined): void {
+    const visible = duo !== undefined;
+    if (this.shownPipVisible !== visible) {
+      this.shownPipVisible = visible;
+      BlzFrameSetVisible(this.pip, visible);
+    }
+    if (duo === undefined) return;
+    const percent = shownPercent(duo.percent);
+    if (this.shownPipState === duo.state && this.shownPipPercent === percent) return;
+    this.shownPipState = duo.state;
+    this.shownPipPercent = percent;
+    BlzFrameSetText(this.pip, duoPipText(duo.state, duo.percent));
+  }
 
   private showDamage(damage: number): void {
     if (this.shownDamageValue === damage) return;

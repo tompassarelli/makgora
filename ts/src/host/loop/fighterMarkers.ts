@@ -6,6 +6,7 @@ import { overheadAnchorZ, standingTopZ } from "../../game/presentation/escapeMet
 import { fighterOffscreen } from "../../game/presentation/fighterFraming";
 import type { MatchCamera } from "../../game/sim/matchCamera";
 import { fighterAt, isActive } from "../../game/sim/roster";
+import { partnerOwner } from "../../game/sim/duoOwner";
 import { MARKER_CLEARANCE, spreadMarkers } from "../../game/ui/fighterMarker";
 import { unitsForPixels } from "../../game/ui/portraitFrames";
 import { pauseHudHidden } from "./pauseCamera";
@@ -35,6 +36,7 @@ export function presentFighterMarkers(s: ShellState, framing: Readonly<MatchCame
   spreadMarkers(X, Y, SHOWN);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
-    views(s).markers[slot].update(SHOWN[slot] === true, fighterColor(game, slot), humanFighterActive(game, slot),fighter?.status.damage ?? 0.0, X[slot] ?? 0.0, Y[slot] ?? 0.0);
+    const owner = partnerOwner(fighter, slot);
+    views(s).markers[slot].update(SHOWN[slot] === true, fighterColor(game, owner), humanFighterActive(game, slot), owner !== slot, fighter?.status.damage ?? 0.0, X[slot] ?? 0.0, Y[slot] ?? 0.0);
   }
 }

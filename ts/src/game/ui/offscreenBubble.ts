@@ -20,6 +20,8 @@ function bubblePosition(column: number, row: number): { readonly column: number;
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
 
+const PARTNER_BUBBLE_SCALE = f32(0.75);
+
 export class OffscreenBubble {
   private readonly portrait: framehandle;
   private readonly arrow: framehandle;
@@ -28,6 +30,7 @@ export class OffscreenBubble {
   private color: number | undefined;
   private tint: CostumeTint | undefined;
   private costume = 0;
+  private partner: boolean | undefined;
 
   constructor(slot: number) {
 
@@ -44,13 +47,20 @@ export class OffscreenBubble {
     }
   }
 
-  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, tint?: CostumeTint, costume = 0): void {
+  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, tint?: CostumeTint, costume = 0, partner = false): void {
     if (visible !== this.visible) {
       this.visible = visible;
       BlzFrameSetVisible(this.portrait, visible);
       BlzFrameSetVisible(this.arrow, visible);
     }
     if (!visible) return;
+    if (this.partner !== partner) {
+      this.partner = partner;
+      const scale = partner ? PARTNER_BUBBLE_SCALE : 1.0;
+      BlzFrameSetSize(this.portrait, OFFSCREEN_PORTRAIT * scale, OFFSCREEN_PORTRAIT * scale);
+      BlzFrameSetSize(this.arrow, f32(0.027) * scale, f32(0.027) * scale);
+      BlzFrameSetFont(this.arrow, MENU_FONT, f32(0.021) * scale, 0);
+    }
     if (this.character !== character || this.color !== color) {
       this.character = character;
       this.color = color;
@@ -64,8 +74,9 @@ export class OffscreenBubble {
     const x = f32(0.4) + (position.column - 0.5) * aspect * f32(0.6);
     const y = (1.0 - position.row) * f32(0.6);
     BlzFrameSetAbsPoint(this.portrait, FRAMEPOINT_CENTER, x, y);
-    const arrowX = Math.abs(column - 0.5) > Math.abs(row - 0.5) ? (column > 0.5 ? f32(0.032) : -f32(0.032)) : 0.0;
-    const arrowY = arrowX === 0 ? (row > 0.5 ? -f32(0.032) : f32(0.032)) : 0.0;
+    const reach = partner ? f32(0.032) * PARTNER_BUBBLE_SCALE : f32(0.032);
+    const arrowX = Math.abs(column - 0.5) > Math.abs(row - 0.5) ? (column > 0.5 ? reach : -reach) : 0.0;
+    const arrowY = arrowX === 0 ? (row > 0.5 ? -reach : reach) : 0.0;
     BlzFrameSetAbsPoint(this.arrow, FRAMEPOINT_CENTER, x + arrowX, y + arrowY);
     BlzFrameSetText(this.arrow, position.arrow);
   }
