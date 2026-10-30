@@ -191,9 +191,13 @@ export interface MenuCursor {
   readonly stock: boolean;
 }
 
-// The gauntlet replaces the stock cursor on character select and the bullseye does on stage select; the stock cursor, which the map draws as the gauntlet, only returns where neither is drawn or while a Warcraft menu is open over them.
-export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: RosterTile | undefined, stageSelect: boolean, warcraftMenuOpen: boolean): MenuCursor => ({
-  hand: !cursorDrawn || stageSelect || warcraftMenuOpen ? undefined : holdingChip ? "pinch" : hover === undefined ? "point" : "fan",
+export type MenuHover = "tile" | "control";
+
+export const menuHover = (drawn: boolean, overControl: boolean, overTile: boolean): MenuHover | undefined => drawn && overControl ? "control" : overTile ? "tile" : undefined;
+
+// The gauntlet replaces the stock cursor on character select and the bullseye does on stage select; the stock cursor, which the map draws as the gauntlet, only returns where neither is drawn or while a Warcraft menu is open over them. The pointing hand shows over a clickable control; the open hand shows over a roster tile and rests in every menu panel, while the select screen rests on the pointing hand.
+export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: MenuHover | undefined, panelResting: boolean, stageSelect: boolean, warcraftMenuOpen: boolean): MenuCursor => ({
+  hand: !cursorDrawn || stageSelect || warcraftMenuOpen ? undefined : holdingChip ? "pinch" : hover === "control" ? "point" : hover === "tile" || panelResting ? "fan" : "point",
   bullseye: cursorDrawn && stageSelect && !warcraftMenuOpen,
   stock: warcraftMenuOpen || (cursorAllowed && !cursorDrawn),
 });

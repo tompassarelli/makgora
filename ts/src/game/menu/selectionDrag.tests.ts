@@ -4,18 +4,20 @@ import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
 import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipSize, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
 
-test("The select cursor is the default hand off the tiles, the fanned hand over a tile with no chip, and the pinch with a chip, and the stock cursor shows only where no hand is drawn [k2 property]", () => {
+test("The cursor is the pointing hand over a control, the open hand over a tile and resting in a menu panel, the pointing hand resting on the select screen, the pinch with a chip, and the stock cursor shows only where no hand is drawn [k2 property]", () => {
   for (const allowed of [false, true]) {
     for (const drawn of [false, true]) {
       for (const holding of [false, true]) {
-        for (const hovering of [false, true]) {
-          const hover = hovering ? 0 : undefined;
-          const cursor = menuCursor(allowed, drawn, holding, hover, false, false);
+        for (const kind of ["none", "tile", "control"] as const) {
+          const hover = kind === "none" ? undefined : kind;
+          for (const panel of [false, true]) {
+          const cursor = menuCursor(allowed, drawn, holding, hover, panel, false, false);
           assertFalse(cursor.bullseye);
           assertEquals(cursor.stock, allowed && !drawn);
           if (!drawn) assertEquals(cursor.hand, undefined);
-          else assertEquals(cursor.hand, holding ? "pinch" : hover === undefined ? "point" : "fan");
+          else assertEquals(cursor.hand, holding ? "pinch" : hover === "control" ? "point" : hover === "tile" || panel ? "fan" : "point");
           assertFalse(cursor.stock && cursor.hand !== undefined);
+          }
         }
       }
     }
@@ -27,12 +29,12 @@ test("A Warcraft menu open over select hides every drawn cursor and shows Warcra
     for (const drawn of [false, true]) {
       for (const holding of [false, true]) {
         for (const stage of [false, true]) {
-          const hover = holding ? 0 : undefined;
-          const open = menuCursor(allowed, drawn, holding, hover, stage, true);
+          const hover = holding ? "tile" : undefined;
+          const open = menuCursor(allowed, drawn, holding, hover, false, stage, true);
           assertEquals(open.hand, undefined);
           assertFalse(open.bullseye);
           assertTrue(open.stock);
-          assertEquals(menuCursor(allowed, drawn, holding, hover, stage, false).stock, allowed && !drawn);
+          assertEquals(menuCursor(allowed, drawn, holding, hover, false, stage, false).stock, allowed && !drawn);
         }
       }
     }
@@ -44,17 +46,17 @@ test("An F10 wake keeps Warcraft's cursor shown until the Game Menu's frames are
     let wake = GAME_MENU_WAKE_UPDATES;
     for (let update = 1; update < GAME_MENU_WAKE_UPDATES; update++) {
       wake = gameMenuWake(wake, false);
-      assertTrue(menuCursor(true, true, false, undefined, stage, wake > 0).stock);
+      assertTrue(menuCursor(true, true, false, undefined, false, stage, wake > 0).stock);
     }
     wake = gameMenuWake(wake, false);
     assertEquals(wake, 0);
-    assertEquals(menuCursor(true, true, false, undefined, stage, wake > 0).stock, false);
+    assertEquals(menuCursor(true, true, false, undefined, false, stage, wake > 0).stock, false);
 
     wake = gameMenuWake(GAME_MENU_WAKE_UPDATES, true);
     assertEquals(wake, 0);
-    assertTrue(menuCursor(true, true, false, undefined, stage, true).stock);
+    assertTrue(menuCursor(true, true, false, undefined, false, stage, true).stock);
     wake = gameMenuWake(wake, false);
-    assertEquals(menuCursor(true, true, false, undefined, stage, wake > 0).stock, false);
+    assertEquals(menuCursor(true, true, false, undefined, false, stage, wake > 0).stock, false);
   }
 });
 
@@ -63,12 +65,12 @@ test("Stage select draws the bullseye instead of any hand wherever a cursor is d
     for (const drawn of [false, true]) {
       for (const holding of [false, true]) {
         for (const hovering of [false, true]) {
-          const hover = hovering ? 0 : undefined;
-          const stage = menuCursor(allowed, drawn, holding, hover, true, false);
+          const hover = hovering ? "tile" : undefined;
+          const stage = menuCursor(allowed, drawn, holding, hover, false, true, false);
           assertEquals(stage.bullseye, drawn);
           assertEquals(stage.hand, undefined);
           assertEquals(stage.stock, allowed && !drawn);
-          assertEquals(menuCursor(allowed, drawn, holding, hover, false, false).bullseye, false);
+          assertEquals(menuCursor(allowed, drawn, holding, hover, false, false, false).bullseye, false);
         }
       }
     }

@@ -9,7 +9,7 @@ import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { type MatchState, humanCount } from "../lobby/lobbyState";
 import { LESSONS, lessonChoiceText } from "../match/tutorial";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
-import { createBackdrop, createText, placeTopLeft } from "./frames";
+import { type ClickBox, createBackdrop, createText, placeTopLeft } from "./frames";
 import { TUTORIAL_BOX } from "./selectionLayout";
 
 export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; direction: -1 | 1 } | { kind: "tutorialStart" } | { kind: "tutorialClose" };
@@ -34,16 +34,16 @@ function text(parent: framehandle, name: string, x: number, y: number, width: nu
   return frame;
 }
 
-function button(parent: framehandle, x: number, y: number, width: number, height: number, label: string): framehandle {
+function button(parent: framehandle, x: number, y: number, width: number, height: number, label: string, target: TutorialButton, add: (frame: framehandle, target: TutorialButton, box: ClickBox) => framehandle): framehandle {
   const frame = BlzCreateFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(frame, x, y);
   BlzFrameSetSize(frame, width, height);
   BlzFrameSetText(frame, label);
-  return frame;
+  return add(frame, target, { x, y, width, height });
 }
 
 
-export function createTutorialMenu(owner: framehandle, rules: framehandle, suffix: string, add: (frame: framehandle, target: TutorialButton) => framehandle): TutorialMenuFrames {
+export function createTutorialMenu(owner: framehandle, rules: framehandle, suffix: string, add: (frame: framehandle, target: TutorialButton, box: ClickBox) => framehandle): TutorialMenuFrames {
   const root = createBackdrop(`MeleeTutorialMenu${suffix}`, owner, 0);
   BlzFrameSetTexture(root, PANEL_TEXTURE, 0, true);
   placeTopLeft(root, f32(0.2), f32(0.47));
@@ -52,13 +52,13 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   BlzFrameSetText(text(root, `MeleeTutorialTitle${suffix}`, f32(0.21), f32(0.46), f32(0.38), f32(0.03), f32(0.018)), "Tutorial");
   BlzFrameSetText(text(root, `MeleeTutorialBody${suffix}`, f32(0.215), f32(0.43), f32(0.37), f32(0.05), f32(0.011)),
     `New to Smashcraft? Learn the basics in ${LESSONS.length} short lessons with a training partner. Pick any lesson to play it again.`);
-  add(button(root, f32(0.23), f32(0.37), f32(0.03), f32(0.03), "−"), { kind: "tutorialStep", direction: -1 });
+  button(root, f32(0.23), f32(0.37), f32(0.03), f32(0.03), "−", { kind: "tutorialStep", direction: -1 }, add);
   const lesson = text(root, `MeleeTutorialLesson${suffix}`, f32(0.26), f32(0.37), f32(0.28), f32(0.03), f32(0.012));
-  add(button(root, f32(0.54), f32(0.37), f32(0.03), f32(0.03), "+"), { kind: "tutorialStep", direction: 1 });
-  add(button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial"), { kind: "tutorialStart" });
-  add(button(root, f32(0.41), f32(0.315), f32(0.16), f32(0.035), "Not now"), { kind: "tutorialClose" });
+  button(root, f32(0.54), f32(0.37), f32(0.03), f32(0.03), "+", { kind: "tutorialStep", direction: 1 }, add);
+  button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial", { kind: "tutorialStart" }, add);
+  button(root, f32(0.41), f32(0.315), f32(0.16), f32(0.035), "Not now", { kind: "tutorialClose" }, add);
   BlzFrameSetVisible(root, false);
-  const open = add(button(rules, TUTORIAL_BOX.x, TUTORIAL_BOX.y, TUTORIAL_BOX.width, TUTORIAL_BOX.height, "Tutorial"), { kind: "tutorialOpen" });
+  const open = button(rules, TUTORIAL_BOX.x, TUTORIAL_BOX.y, TUTORIAL_BOX.width, TUTORIAL_BOX.height, "Tutorial", { kind: "tutorialOpen" }, add);
   return { root, lesson, open };
 }
 
