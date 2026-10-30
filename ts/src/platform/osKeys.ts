@@ -26,10 +26,10 @@ interface KeyTrack {
 export interface KeyTracker {
   readonly keys: KeyTrack[];
   polls: number;
-  readonly read: (key: number) => boolean;
+  readonly read: (this: void, key: number) => boolean;
 }
 
-export const keyTracker = (read: (key: number) => boolean = osKeyDown): KeyTracker => ({ keys: [], polls: 0, read });
+export const keyTracker = (read: (this: void, key: number) => boolean = osKeyDown): KeyTracker => ({ keys: [], polls: 0, read });
 
 function track(tracker: KeyTracker, key: number): KeyTrack {
   const known = tracker.keys[key];

@@ -5,7 +5,7 @@ const SEMICOLON = 0xba;
 
 function trackedKey() {
   let held = false;
-  const tracker = keyTracker(() => held);
+  const tracker = keyTracker((key) => held && key === SEMICOLON);
   const polls: boolean[] = [];
   const poll = (count = 1) => {
     for (let index = 0; index < count; index++) {
