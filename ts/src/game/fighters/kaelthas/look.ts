@@ -3,6 +3,10 @@ import { KAELTHAS_CLIPS, KAELTHAS_DAMAGE_CLIPS, KAELTHAS_FALLBACK, KAELTHAS_MODE
 import { AttackStyle } from "../../sim/codes";
 import type { HeroLook } from "../../presentation/model/look";
 
+export const BANISH_SWIRL_MODEL = "Abilities\\Spells\\Human\\Banish\\BanishTarget.mdx";
+export const BANISH_SWIRL_COUNT = 6;
+export const BANISH_SWIRL_SCALE = f32(0.4);
+
 export const kaelthasLook: HeroLook = {
   model: KAELTHAS_MODEL_FILE, objectId: 0x6d666b74,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNHeroBloodElfPrince.blp",

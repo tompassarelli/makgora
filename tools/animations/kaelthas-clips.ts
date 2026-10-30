@@ -117,9 +117,9 @@ const RAW_STRIKES: Partial<Record<HeroPose, Strike>> = {
   sideSpecial: { late: 1, w: { ...LOAD, tx: -45, lean: -20, arm: -93, leftArm: -93 },
     c: { ...STEP, tx: 20, lean: 14, arm: -93, leftArm: -93 }, o: { ...STEP, tx: 25, lean: 16, arm: -93, leftArm: -93 },
     r: { tx: -6, lean: -4, arm: -40, leftArm: -40 } },
-  downSpecial: { late: 1, w: { ...LOAD, tx: -62, lean: -8, arm: -110, yaw: 20, leftArm: -40 },
-    c: { ...STEP, tx: 24, lean: 8, arm: -110, yaw: 20, leftArm: 35 }, o: { ...STEP, tx: 27, lean: 18, arm: -112, yaw: 24, leftArm: 40 },
-    r: { tx: -7, lean: -5, arm: -40, leftArm: -10 } },
+  downSpecial: { late: 1, w: { thigh: 8, knee: -20, leftThigh: -10, leftKnee: -22, tx: -10, lean: -6, arm: -150, elbow: -60, yaw: 12, leftArm: 8 },
+    c: { thigh: 6, knee: -12, leftThigh: -8, leftKnee: -12, tx: 6, lean: 6, arm: -92, elbow: 0, yaw: 16, leftArm: 8 }, o: { thigh: 6, knee: -12, leftThigh: -8, leftKnee: -12, tx: 9, lean: 8, arm: -94, elbow: 0, yaw: 18, leftArm: 8 },
+    r: { tx: -2, lean: -3, arm: -40, elbow: -20, leftArm: 5 } },
 };
 const OVERSHOOT: Partial<Record<HeroPose, number>> = { jab: 2, jab2: 4, forwardTilt: 3, forwardTiltUp: 4.5, forwardTiltDown: 4.5, upTilt: 3, downTilt: 3,
   forwardSmash: 0.5, upSmash: 1, downSmash: 1, neutralAir: 1, forwardAir: 1, backAir: 1, upAir: 1, downAir: 1, neutralSpecial: 1.1, sideSpecial: 1.1, downSpecial: 1.3 };
@@ -208,14 +208,17 @@ const PHOENIX: Key[] = [
   { frame: 84, g: {} },
 ];
 
+// Banish's clip fills the stock slot it was authored in; the frames after it hold the closing pose.
+const BANISH_CLIP_FRAMES = 41;
 for (const [pose, key] of [["neutralSpecial", "neutral"], ["sideSpecial", "side"], ["upSpecial", "up"], ["downSpecial", "down"]] as const) {
   const special = KAELTHAS_SPECIALS[key]!;
   for (const air of [false, true]) {
     const form = air ? special.air ?? special.ground : special.ground;
     const first = key === "neutral" || key === "side" ? form.projectiles![0]!.spawnFrame : (form.regions![0]!.firstFrame + 1);
     const last = key === "neutral" || key === "side" ? first : form.regions![0]!.lastFrame + 1;
-    const keys = key === "up" ? PHOENIX : strikeKeys(form.endFrame, first, last - first + 1, STRIKES[pose]!);
-    actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, frames: form.endFrame, contact: first, gesture: keys[2]!.g, keys, air, float: key === "up" });
+    const frames = key === "down" ? Math.min(form.endFrame, BANISH_CLIP_FRAMES) : form.endFrame;
+    const keys = key === "up" ? PHOENIX : strikeKeys(frames, first, last - first + 1, STRIKES[pose]!);
+    actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, frames, contact: first, gesture: keys[2]!.g, keys, air, float: key === "up" });
   }
 }
 const damageActions: Action[] = [];

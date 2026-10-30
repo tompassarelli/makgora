@@ -74,8 +74,8 @@ export const KAELTHAS_CLIPS = { idle: KAELTHAS_FALLBACK, walk: { index: 2, secon
   sideSpecialAir: { index: 78, seconds: f32(0.633), aligned: true },
   upSpecial: { index: 79, seconds: f32(1.4), aligned: true },
   upSpecialAir: { index: 80, seconds: f32(1.4), aligned: true },
-  downSpecial: { index: 81, seconds: f32(0.6), aligned: true },
-  downSpecialAir: { index: 82, seconds: f32(0.6), aligned: true },
+  downSpecial: { index: 81, seconds: f32(0.683), aligned: true },
+  downSpecialAir: { index: 82, seconds: f32(0.683), aligned: true },
 } as const satisfies HeroClipTable;
 export const KAELTHAS_DAMAGE_CLIPS: readonly HeroClip[] = [
   { index: 83, seconds: f32(0.4), aligned: true },

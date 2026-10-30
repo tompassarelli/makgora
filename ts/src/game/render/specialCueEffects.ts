@@ -13,6 +13,7 @@ import { CUE_ANCHORS, MISSING_CUE_MODEL, type Cue } from "../presentation/specia
 import { shownCueState } from "../presentation/shownCueState";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue, parkOnce, placeEffect } from "./effects";
 import { HitAreaEffects } from "./hitAreaEffects";
+import { BanishBeamEffects } from "./banishBeamEffects";
 import { POPCORN_CUE_MODELS } from "../presentation/cueEmitterInfo";
 import { modelFailed } from "wisp/src/platform/modelFailures";
 import { idiv } from "wisp/src/sim/intMath";
@@ -57,6 +58,7 @@ export class SpecialCueEffects {
   private readonly missingParked: ParkedFlags = [];
   private readonly reported: Record<string, boolean | undefined> = {};
   private readonly areas: HitAreaEffects;
+  private readonly banish: BanishBeamEffects | undefined;
   private readonly cues: CueModel[] = [];
   private parked: ParkedFlags | undefined;
 
@@ -84,6 +86,7 @@ export class SpecialCueEffects {
     this.areas = new HitAreaEffects(character, origin);
     this.front = origin.y - 12.0;
     this.scale = characterModelScale(character);
+    if (character === Character.kaelthas) this.banish = new BanishBeamEffects(origin, this.front, this.scale);
     for (const shown of fighterRenderedCues(character)) {
       const cue = shown;
       if (cue.sound !== undefined && this.cueSounds[cue.sound] === undefined) this.cueSounds[cue.sound] = CreateSoundFromLabel(cue.sound, false, true, true, 10, 10);
@@ -104,6 +107,7 @@ export class SpecialCueEffects {
   clear(): void {
     parkOnce(this.missing, this.origin, this.missingParked, 0);
     this.areas.clear();
+    this.banish?.clear();
     const parked = (this.parked ??= []);
     for (let index = 0; index < this.cues.length; index++) {
       const entry = this.cues[index];
@@ -177,6 +181,7 @@ export class SpecialCueEffects {
 
   present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
     this.areas.present(fighter, playing, paused);
+    this.banish?.present(fighter, playing, paused);
     let cue: Cue | undefined;
     let x = 0.0;
     let z = 0.0;
@@ -376,6 +381,7 @@ export class SpecialCueEffects {
 
   setPaused(paused: boolean): void {
     this.areas.setPaused(paused);
+    this.banish?.setPaused(paused);
     const parked = (this.parked ??= []);
     for (let index = 0; index < this.cues.length; index++) {
       const entry = this.cues[index];
@@ -386,6 +392,7 @@ export class SpecialCueEffects {
 
   weaponEffects(into: effect[]): void {
     this.areas.drawnEffects(into);
+    this.banish?.drawnEffects(into);
   }
 
   drawnEffects(into: effect[]): void {
@@ -394,11 +401,13 @@ export class SpecialCueEffects {
     for (const { model } of this.popcorn) into.push(model);
     for (const voices of Object.values(this.voices)) for (const model of voices?.models ?? []) into.push(model);
     this.areas.drawnEffects(into);
+    this.banish?.drawnEffects(into);
   }
 
   destroy(): void {
     this.clear();
     this.areas.destroy();
+    this.banish?.destroy();
     DestroyEffect(this.missing);
     for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) KillSoundWhenDone(sound);
     for (const { model } of this.cues) DestroyEffect(model);

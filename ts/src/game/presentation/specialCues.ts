@@ -14,7 +14,7 @@ import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { commandGrabHolding } from "../sim/specials/commandGrabLock";
 import { HERO_ROSTER } from "../roster/kits";
-import { PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
+import { BANISH_DELAY_FRAMES, PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { GOLD_SACK_SLOT_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
   DEMONHUNTER_BACKFLIP_FORM,
@@ -48,6 +48,7 @@ import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
 import { SHADOW_STEP_CUES } from "./shadowStepCues";
 import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
 import { slotCues } from "./slotCues";
+import { BANISH_SWIRL_MODEL } from "../fighters/kaelthas/look";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -298,7 +299,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Pyroblast", startup: { ...cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.25), scaleEnd: f32(0.9), scaleFrames: PYROBLAST_STARTUP_FRAMES }, active: drawn("Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx", "hand") },
     side: { spell: "Flame Strike", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: drawn("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", "ahead") },
     up: KAEL_PHOENIX_CHARGE,
-    down: { spell: "Banish", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: cue("Abilities\\Spells\\Human\\Banish\\BanishTarget.mdx", "hand", 0.5) },
+    down: { spell: "Banish", startup: { ...cue(BANISH_SWIRL_MODEL, "hand", f32(0.2)), scaleEnd: f32(0.5), scaleFrames: BANISH_DELAY_FRAMES }, active: cue(BANISH_SWIRL_MODEL, "hand", 0.5) },
   },
   [Character.murloc]: {
     neutral: { spell: "Ensnare", startup: MURGUL, active: cue("Abilities\\Spells\\Orc\\Ensnare\\EnsnareTarget.mdx", "hand", 0.75) },

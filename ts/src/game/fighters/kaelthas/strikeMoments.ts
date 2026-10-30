@@ -23,5 +23,5 @@ export const kaelthasStrikeMoments = {
   100: { clip: 75, seconds: f32(0.267), end: f32(0.633) },
   101: { clip: 77, seconds: f32(0.167), end: f32(0.633) },
   102: { clip: 79, seconds: f32(0.117), end: f32(1.400) },
-  103: { clip: 81, seconds: f32(0.200), end: f32(0.600) },
+  103: { clip: 81, seconds: f32(0.300), end: f32(0.683) },
 };
