@@ -23,6 +23,23 @@ export const fighterSelectChecks = (pass: readonly Rule[]): NativeCheck[] => [
     look: "Cards 1-3 show Illidan, Jaina and the Firelord, and their roster grid tiles, each a head-and-shoulders bust at about the roster's head size, none a small figure floating in its tile or chip; the computer card's preview sits centred in its preview area above its summary.",
   },
   {
+    id: "797-murloc-select", closes: "smashcraft#797", map: "fighter-select", session: "797-murloc-portrait",
+    setup: [
+      { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
+      { chat: "-dev fighter 1 Murloc", client: "a" }, { chat: "-dev fighter 2 Illidan", client: "b" }, { waitMs: 1500 },
+    ],
+    capture: [{ kind: "frames", name: "murloc-select", client: "a" }, { kind: "frames", name: "murloc-select", client: "b" }],
+    pass,
+    look: "On both clients player 1's roster tile and card show both Murlocs, Grgl standing behind and to image right of Mrgl, both faces readable.",
+  },
+  {
+    id: "797-murloc-match", closes: "smashcraft#797", map: "fighter-select", session: "797-murloc-portrait",
+    setup: [{ chat: "-dev stage 2", client: "a" }, { waitMs: 1500 }, { keys: ["y"], client: "a" }, { waitMs: 600 }, { keys: ["y"], client: "a" }, { waitMs: 9000 }],
+    capture: [{ kind: "frames", name: "murloc-match", client: "a" }, { kind: "frames", name: "murloc-match", client: "b" }],
+    pass,
+    look: "Both clients draw player 1's match plate bust with both Murlocs, Grgl behind and to image right of Mrgl, both faces readable.",
+  },
+  {
     id: "434-chat-fighter-select", closes: "smashcraft#566", map: "fighter-select", session: "434-chat-select",
     setup: [
       { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Rifleman", client: "b" },
