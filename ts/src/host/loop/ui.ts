@@ -373,6 +373,11 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 }
 
 
+export function menuControlUnder(ui: UiObjects, slot: ParticipantSlot): (x: number, y: number) => boolean {
+  return (x, y) => ui.settings[slot].over(x, y) || ui.pause.over(x, y);
+}
+
+
 export function clearMatchEffects(s: ShellState): void {
   const ui = views(s);
   ui.frost.clear();

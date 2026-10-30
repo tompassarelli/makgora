@@ -56,7 +56,7 @@ import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { warcraftMenuOpen } from "./warcraftMenu";
 import { presentedMatch } from "./presentedMatch";
-import { type UiObjects, pauseEffects, views } from "./ui";
+import { type UiObjects, menuControlUnder, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera, probeWaiting } from "./responseProbe";
@@ -616,7 +616,7 @@ export function renderUi(s: ShellState): void {
       ui.meterBars[slot].hud.update(false, 0, false, 0);
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
-    ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), warcraftMenuOpen(s), s.sessionWins.counts, clockSeconds(s.trace), (x, y) => ui.settings[slot].over(x, y) || ui.pause.over(x, y));
+    ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), warcraftMenuOpen(s), s.sessionWins.counts, clockSeconds(s.trace), menuControlUnder(ui, slot));
     ui.settings[slot].update();
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
