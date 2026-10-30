@@ -134,8 +134,8 @@ need.
 **Verdict: flo can't host a Smashcraft game for two clients without
 W3Champions.** It isn't a self-serve host. A Smashcraft game on flo needs
 W3Champions to add the map, or a self-hosted flo that would first have to
-rebuild the closed 3.0 support. Direct play stays on Battle.net password
-lobbies (Phase 4).
+rebuild the closed 3.0 support. Players meet online in Wisp's own window
+over its relay instead (Direct play, below).
 
 - **How it hosts.** The controller creates a game (`CreateGame` or
   `CreateGameAsBot`) on a node with a `Wc3Map` named by its path, SHA-1 and
@@ -389,6 +389,13 @@ and smashcraft:ts/src/host/loop/replays.ts writes.
   segment.
 
 ## Direct play (Phase 4)
+
+Retired as a player feature on 2026-10-31: Smashcraft provides no online play
+inside the Warcraft client, so the client's Online page offers only Wisp's
+own window over its relay (smashcraft-client#28; wisp:docs/clean-room.md,
+"Smashcraft Servers (stopped)"). The commands below remain developer and test
+tools for our own clients; Battle.net custom games in Warcraft's own menus are
+unaffected.
 
 Two players meet in a private Battle.net custom game, found by a join code.
 No Smashcraft server is involved, and players are their Battle.net names.

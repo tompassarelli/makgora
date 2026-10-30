@@ -55,15 +55,18 @@ version in any Maps folder (Download included).
 
 ## Commands (Smashcraft tools)
 
-Online play drives Warcraft III's menus through Wisp, so it needs Smashcraft's
+Online play runs Wisp's own window over its relay, so it needs Smashcraft's
 tools: a checkout's ts/ with its dependencies installed. The client runs, in
 that folder:
 
-- `bun wisp online setup`, `bun wisp online host [--repair]` and
-  `bun wisp online join CODE [--repair]`
-  ([direct play](design/client.md#direct-play-phase-4)). Standard output is
-  lines for players, ending in a match or a failure; standard error is the
-  technical log; a waiting host reads `start` on standard input.
+- `bun wisp play --standalone --host --relay nearest` and
+  `bun wisp play --standalone --join CODE`
+  ([Online](commands/online.md)). Standard output is lines for players;
+  standard error is the technical log, apart from the relay round-trip line
+  the client shows.
+
+The client never starts or drives Warcraft III for online play
+(smashcraft-client#28, 2026-10-31).
 
 Without the tools the client's Online page says it isn't set up; History,
 Stats, Replays, the controller and Play need nothing from this repository at
