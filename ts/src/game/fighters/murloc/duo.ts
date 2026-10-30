@@ -1,6 +1,6 @@
 import { PARTICIPANT_SLOTS } from "../../input/participants";
 import { Character, DuoRole } from "../../sim/codes";
-import { createFighter, duoRole, mutableDuo } from "../../sim/fighter";
+import { type Fighter, createFighter, duoRole, mutableDuo } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { type Roster, fighterAt, isActive, setRosterMask } from "../../sim/roster";
 import { authoredTuning } from "../../sim/tuning";
@@ -13,6 +13,7 @@ export const MURLOC_DUO = {
   hopHeight: 110.0,
   hopReach: 300.0,
   holdFrames: 600,
+  swapCooldown: 240,
 } as const;
 
 function lowestFreeSlot(world: Readonly<Roster>): number {
@@ -53,3 +54,6 @@ export function seatMurlocPartners(world: Roster): void {
     if (partnerSlot >= 0) seatPartner(world, slot, partnerSlot);
   }
 }
+
+export const swapSplashing = (f: Readonly<Fighter>, frames: number): boolean =>
+  !f.status.out && f.duo !== undefined && f.duo.swapCooldown > MURLOC_DUO.swapCooldown - frames;

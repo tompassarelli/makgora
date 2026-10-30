@@ -28,6 +28,9 @@ function widenByEvents(active: Span, move: Readonly<AuthoredSpecial>): void {
   for (const placement of specialPlacements(move)) widen(active, placement.frame, placement.frame);
   if (move.burst !== undefined) widen(active, move.burst.frame, move.burst.frame);
   if (move.ritual !== undefined) widen(active, move.ritual.frame, move.ritual.frame);
+  if (move.order !== undefined) widen(active, move.order.frame, move.order.frame);
+  if (move.revive !== undefined) widen(active, move.revive.frame, move.revive.frame);
+  if (move.swap !== undefined) widen(active, move.swap.frame, move.swap.frame);
   if (move.commandGrab !== undefined) widen(active, move.commandGrab.first, move.commandGrab.last);
   if (move.targetedStrike !== undefined) widen(active, move.targetedStrike.frame, move.targetedStrike.frame);
   if (move.guard !== undefined) widen(active, move.guard.first, move.guard.last);

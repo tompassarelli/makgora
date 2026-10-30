@@ -298,6 +298,8 @@ export function drivePartners(world: Roster, controls: FrameControls, frame: num
     if (duo === undefined || duo.role !== DuoRole.partner || !isActive(world, duo.link)) continue;
     const leader = fighterAt(world, duo.link);
     advanceTossCooldown(leader);
+    if (duo.swapCooldown > 0) duo.swapCooldown--;
+    if (leader.duo !== undefined && leader.duo.swapCooldown > 0) leader.duo.swapCooldown--;
     advanceOrder(duo, partner, leader, stage);
     const holding = leader.grab.target !== undefined;
     const write = duo.head * WORDS_PER_FRAME;

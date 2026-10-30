@@ -9,7 +9,8 @@ import type { Fighter } from "../sim/fighter";
 import { FOLLOW_UP_FORM } from "../sim/specials/schema";
 import { ATTACK_CUES, type AttackCueState, attackCueState, fighterRenderedCues } from "../presentation/attackCues";
 import { characterModelScale } from "../presentation/modelScale";
-import { CUE_ANCHORS, MISSING_CUE_MODEL, type Cue, specialCueState } from "../presentation/specialCues";
+import { CUE_ANCHORS, MISSING_CUE_MODEL, type Cue } from "../presentation/specialCues";
+import { shownCueState } from "../presentation/shownCueState";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue, parkOnce, placeEffect } from "./effects";
 import { HitAreaEffects } from "./hitAreaEffects";
 import { POPCORN_CUE_MODELS } from "../presentation/cueEmitterInfo";
@@ -26,6 +27,8 @@ interface CueModel {
 }
 
 export const POPCORN_VOICES = 2;
+
+const cueKey = (fighter: Readonly<Fighter>): number => fighter.special.action * 100 + fighter.special.form + fighter.special.variant * 100000;
 
 interface PopcornVoices {
   readonly models: effect[];
@@ -122,10 +125,10 @@ export class SpecialCueEffects {
 
   confirm(fighter: Readonly<Fighter> | undefined, playing: boolean, now: number): void {
     this.popcornNow = now;
-    const state = fighter === undefined || !playing ? undefined : specialCueState(fighter);
+    const state = fighter === undefined || !playing ? undefined : shownCueState(fighter);
     let cue = state?.cues === undefined || state.phase === "none" ? undefined
       : state.phase === "startup" ? state.cues.startup : state.cues.active;
-    let key = fighter === undefined ? 0 : fighter.special.action * 100 + fighter.special.form;
+    let key = fighter === undefined ? 0 : cueKey(fighter);
     if (fighter !== undefined && state !== undefined && cue === undefined) {
       const attack = attackCueState(fighter, this.confirmedAttack);
       if (attack.cue !== undefined) {
@@ -182,14 +185,14 @@ export class SpecialCueEffects {
     let attackNamed = false;
     let strikeScale = 1.0;
     if (fighter !== undefined && playing) {
-      const special = specialCueState(fighter);
+      const special = shownCueState(fighter);
       if (special.cues !== undefined && special.phase !== "none") {
         cue = special.phase === "startup" ? special.cues.startup : special.cues.active;
         cueName = `${special.cues.spell} ${special.phase}`;
         const anchor = CUE_ANCHORS[cue.anchor];
         x = anchor.x * this.scale;
         z = anchor.z * this.scale;
-        key = fighter.special.action * 100 + fighter.special.form;
+        key = cueKey(fighter);
         if (cue.rebirthFrames !== undefined) key += 1000000 * (1 + idiv(fighter.special.frame, cue.rebirthFrames));
       } else {
         const attack = attackCueState(fighter, this.attack);

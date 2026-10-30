@@ -21,7 +21,7 @@ import { toggleAuraOnFrame } from "../toggleAura";
 import { gazeAt } from "../gaze";
 import { ownedCount } from "./ownedProjectiles";
 import { applySelfHeal } from "./selfHeal";
-import { orderOnFrame, partnerCallBlocked, reviveOnFrame } from "../duoPartner";
+import { duoCastOnFrame, partnerCallBlocked, reviveOnFrame } from "../duoPartner";
 import { castVariant, readyEmpowered, spendEmpowered } from "./empowered";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, applyWindows, projectileAnchor } from "./runningMove";
 import { recallProjectiles, projectilesFit, spawnHeroProjectile, spawnHeroProjectileAt, burstProjectiles, endLiveCasts, holdAim } from "./heroProjectiles";
@@ -254,7 +254,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   readyEmpowered(f, move, frame);
   applySelfHeal(f, move.selfHeal, frame);
   reviveOnFrame(world, f, move.revive, frame, stage, matchFrame);
-  orderOnFrame(world, f, move.order, frame);
+  duoCastOnFrame(world, f, move, frame, input);
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
   applyMotion(f, move, frame, input, world);

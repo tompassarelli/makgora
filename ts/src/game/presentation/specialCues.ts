@@ -37,6 +37,7 @@ import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { GROM_BLOODLUST_MODEL } from "../assets/importedModelInfo";
+import { joined, variantAt } from "./variantCues";
 import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
 import { HOOK_MODEL } from "../fighters/butcher/specials";
 import { HOOK_LINK_MODEL } from "./hookChain";
@@ -191,6 +192,11 @@ const FINGER_GLOW = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialA
 const HOWL_INHALE: Cue = { ...FEL, scale: f32(0.25), scaleEnd: f32(1.2), scaleFrames: HOWL_FIRST - 1, color: [160, 20, 10], sound: "HowlOfTerror", anchorFrames: Array.from({ length: HOWL_FIRST }, () => ({ x: 38.0, z: 118.0 })) };
 const HOWL_ROAR: Cue = { ...cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "feet", f32(HOWL_REACH / f32(440.0))), color: [255, 60, 30] };
 const MURGUL = cue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx", "hand", f32(0.6));
+const SWAP_SPLASH = timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0);
+const MRGLGLGL_ORDER: MoveCues = { spell: "Mrglglgl! order", startup: MURGUL, active: cue(STANCE_RING_MODEL, "feet", f32(0.4)) };
+const MRGLGLGL_REVIVE: MoveCues = { spell: "Mrglglgl! revive", startup: MURGUL, active: cue("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", "feet", 0.75) };
+const MRGLGLGL_SWAP: MoveCues = { spell: "Mrglglgl! swap", startup: MURGUL, active: SWAP_SPLASH };
+export const SWAP_SPLASH_CUES: MoveCues = { spell: "Mrglglgl! splash", startup: SWAP_SPLASH, active: SWAP_SPLASH };
 const BEAST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", "hand", f32(0.6));
 const QUIET_BEAST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.6));
 const BREW = cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdx", "hand", f32(0.6));
@@ -298,7 +304,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Ensnare", startup: MURGUL, active: cue("Abilities\\Spells\\Orc\\Ensnare\\EnsnareTarget.mdx", "hand", 0.75) },
     side: { spell: "Belly Slide", startup: MURGUL, active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
     up: { spell: "Tidal Surf", startup: MURGUL, active: timed(cue("Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdx", "feet", 1.0), "birth", 0.0) },
-    down: { spell: "Mrglglgl!", startup: MURGUL, active: cue("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", "feet", 0.75) },
+    down: MRGLGLGL_ORDER,
   },
   [Character.medivh]: {
     neutral: { spell: "Arcane Omen", startup: ARCANE, active: cue("Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", "hand", 0.5) },
@@ -441,6 +447,7 @@ export type BranchCue = MoveCues | "slot" | "none";
 export interface HeroBranchCues {
   readonly recall?: BranchCue | undefined;
   readonly followUps?: readonly BranchCue[] | undefined;
+  readonly variants?: readonly BranchCue[] | undefined;
 }
 
 const branch = (spell: string, startup: Cue, active: Cue): MoveCues => ({ spell, startup, active });
@@ -450,6 +457,7 @@ const HAMMERFALL_CUES: MoveCues = { ...branch("Hammerfall", HAMMERFALL_GLOW, HAM
 
 
 export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: HeroBranchCues } } = {
+  [Character.murloc]: { down: { variants: [MRGLGLGL_REVIVE, MRGLGLGL_SWAP] } },
   [Character.malfurion]: { down: { recall: "slot" } },
   [Character.anubarak]: { down: { recall: "slot" } },
   [Character.jaina]: {
@@ -559,7 +567,7 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
   if (action >= SpecialAction.heroNeutral && action <= SpecialAction.heroDown) {
     const move = runningHeroSpecial(fighter);
     const slot = SPECIAL_SLOTS[action - SpecialAction.heroNeutral] ?? "neutral";
-    const branchCue = heroBranchCue(HERO_BRANCH_CUES[fighter.character]?.[slot], fighter.special.form);
+    const branchCue = heroBranchCue(HERO_BRANCH_CUES[fighter.character]?.[slot], fighter.special.form, fighter.special.variant);
     if (branchCue === "none") return NONE;
     cues = branchCue === undefined || branchCue === "slot" ? HERO_CUES[fighter.character]?.[slot] : branchCue;
     windows = move === undefined ? undefined : heroCueWindows(move, cues?.active === THUNDER_CLAP_CUE ? 1 : ACTIVE_CUE_FRAMES);
@@ -601,7 +609,7 @@ export function fighterBranchCues(character: Character): readonly MoveCues[] {
   for (const slot of SPECIAL_SLOTS) {
     const branches = HERO_BRANCH_CUES[character]?.[slot];
     add(branches?.recall);
-    for (const cue of branches?.followUps ?? []) add(cue);
+    for (const cue of joined(branches?.followUps, branches?.variants)) add(cue);
   }
   for (const action of ORIGINAL_ACTIONS[character] ?? []) for (const branch of Object.values(ORIGINAL_BRANCH_CUES[action] ?? {})) add(branch.cues);
   return out;
@@ -623,10 +631,10 @@ export function fighterOwnCues(character: Character): readonly Cue[] {
 }
 
 
-export function heroBranchCue(branches: Readonly<HeroBranchCues> | undefined, form: number): BranchCue | undefined {
+export function heroBranchCue(branches: Readonly<HeroBranchCues> | undefined, form: number, variant: number): BranchCue | undefined {
   if (form >= FOLLOW_UP_FORM) return branches?.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1];
   if (form === SpecialForm.recall) return branches?.recall;
-  return undefined;
+  return variantAt(branches?.variants, variant);
 }
 
 

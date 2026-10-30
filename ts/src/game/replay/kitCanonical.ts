@@ -209,6 +209,14 @@ function writeSpecialEffects(move: Readonly<AuthoredSpecial>, name: string, resu
     real("revive.offsetX", move.revive.offsetX);
   }
   if (move.order !== undefined) int("order.frame", move.order.frame);
+  if (move.swapHold !== undefined) {
+    int("swapHold.frame", move.swapHold.frame);
+    int("swapHold.variant", move.swapHold.variant);
+  }
+  if (move.swap !== undefined) {
+    int("swap.frame", move.swap.frame);
+    int("swap.cooldown", move.swap.cooldown);
+  }
   if (move.refreshesAir === true) int("refreshesAir", 1);
   if (move.jumpWindow !== undefined) {
     int("jumpWindow.first", move.jumpWindow.first);
