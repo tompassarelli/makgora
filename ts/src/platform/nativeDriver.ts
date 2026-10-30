@@ -277,7 +277,7 @@ export function startScriptedMove(s: ShellState, slot: number, kind: string | un
     input.specialZ = direction === 2 ? 1 : direction === 3 ? -1 : 0;
     chargeScriptedMeter(fighter, kind);
     if (!startFighterSpecial(fighter, s.game.stageChoice, frame, input, s.world)) throw new Error("native driver: move did not start");
-  } else throw new Error("native driver: move needs normal, special, ultimate or hop");
+  } else throw new Error("native driver: move needs normal, special, ultimate, hop or run");
 }
 
 export function beforeNativeDriverTick(s: ShellState): boolean {
@@ -304,7 +304,7 @@ function crossTarget(target: Fighter, args: readonly string[]): void {
 function stageScriptedMove(s: ShellState, slot: number, args: readonly string[]): void {
   const [kind, code = "", facing, gap = "500", lift] = args;
   const mover = fighterAt(s.world, slot), target = fighterAt(s.world, slot === 0 ? 1 : 0);
-  if (kind === "hop") { mover.facing = facing === "left" ? -1 : 1; return; }
+  if (kind === "hop" || kind === "run") { mover.facing = facing === "left" ? -1 : 1; return; }
   if (gap !== "-") {
     mover.motion.x = 0.0;
     target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
