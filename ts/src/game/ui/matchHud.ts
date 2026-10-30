@@ -142,8 +142,8 @@ export class FighterHud {
   }
 
 
-  layout(position: number, count: number): void {
-    const left = plateLeft(position, count);
+  layout(position: number, count: number, hints = false): void {
+    const left = plateLeft(position, count, hints);
     const panel = panelLayout(position, count);
     this.left = left;
     this.panel = panel;

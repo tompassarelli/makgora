@@ -9,7 +9,7 @@ import { trainingReadout } from "../session/messages";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { Phase, requestStageSelect, selectCharacter } from "../lobby/lobbyState";
-import { DAMAGE_DARK_FROM, SHAKE_FRAMES, type PlateBox, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, percentText, plateLeft, stepJolt } from "./plateLayout";
+import { DAMAGE_DARK_FROM, SHAKE_FRAMES, type PlateBox, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, percentText, plateLeft, stepJolt, HINT_STRIP_CELL, hintStripLeft } from "./plateLayout";
 import { unitsForPixels } from "./portraitFrames";
 
 const channels = (colour: number): readonly number[] => [imod(idiv(colour, 65536), 256), imod(idiv(colour, 256), 256), imod(colour, 256)];
@@ -91,5 +91,24 @@ test("the ultimate bar is a long thin strip under the damage number, clear of th
       const damage = boxSpan(left, panel.damage);
       assertEquals(bar.top <= damage.bottom + unitsForPixels(4), true, `${where}: bar is under the damage number`);
     }
+  }
+});
+
+const SCREEN_WIDTH = f32(0.8);
+const PLATE_WIDTH = unitsForPixels(544);
+
+test("with hints on the strip sits between the player panels, centred for two and four players, clear of every panel and inside the screen, and with hints off the panels keep their even spacing [k2 property]", () => {
+  for (const count of [2, 3, 4]) {
+    const strip = { left: hintStripLeft(count), right: hintStripLeft(count) + HINT_STRIP_CELL };
+    for (let position = 0; position < count; position++) {
+      const left = plateLeft(position, count, true);
+      assertEquals(left >= 0 && left + PLATE_WIDTH <= SCREEN_WIDTH, true, `${count} players, panel ${position} inside the screen`);
+      const clear = position < count - idiv(count, 2) ? left + PLATE_WIDTH <= strip.left + unitsForPixels(8) : left >= strip.right - unitsForPixels(8);
+      assertEquals(clear, true, `${count} players, panel ${position} clear of the strip`);
+    }
+    if (count !== 3) assertEquals(Math.abs((strip.left + strip.right) / 2 - SCREEN_WIDTH / 2) < f32(0.001), true, `${count} players: strip centred`);
+    const steps = [];
+    for (let position = 1; position < count; position++) steps.push(plateLeft(position, count) - plateLeft(position - 1, count));
+    for (const step of steps) assertEquals(Math.abs(step - (steps[0] ?? 0)) < f32(0.0001), true, `${count} players: even spacing with hints off`);
   }
 });

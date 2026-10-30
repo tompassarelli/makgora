@@ -1112,6 +1112,18 @@ four specials on the ground and in the air.
   button never ends it; Start, Esc or Backspace resumes. The stick pans and the
   C-stick zooms a camera that is local to the pausing client and restored on resume, so
   it adds nothing to synced state.
+- **New-player mode** (owner, 30 Oct): on for a fresh profile. In a match a
+  compact strip sits at the bottom centre between the player panels (p1 [strip]
+  p2 for two players, p1 p2 [strip] p3 p4 for four) and lists the local
+  player's own move, jump, attack, special, shield, grab, Strong, Mod X, Mod Y and pause
+  keys as bound (pad buttons for a controller), ending with "H: hide". With it
+  off the panels return to their even spacing with no gap. It shows only in
+  matches. H, the Controls screen's "New-player hints" button and the pause
+  screen's line toggle it, and the setting is saved with the profile (`encodeLayouts`,
+  save version KN, which an older KM save loads as on). Esc pauses and resumes
+  like Backspace and Start; it is a keyboard event on the pause trigger, not the
+  end-cinematic event, and it does not open Warcraft's F10 menu, which the pause
+  screen names for leaving the game.
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in
   smashcraft:docs/physics.md, "Grounded knockdown and jab resets", as the

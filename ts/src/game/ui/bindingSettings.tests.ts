@@ -2,7 +2,7 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
 import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
-import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts, layoutSave } from "../input/layoutSave";
+import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts, layoutSave, presetLayouts } from "../input/layoutSave";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -25,11 +25,13 @@ import {
   pickBindingPreset,
   resetToLayout,
   saveBindingSettings,
+  toggleNewPlayerHints,
 } from "./bindingSettings";
 import { PLAYER_FILE_CAPACITY } from "../core/gameFiles";
 import { keyboardCaps } from "./keyboardLayout";
 
 const BACKSPACE = 0x08;
+const ESCAPE = 0x1b;
 const F6 = 0x75;
 const F7 = 0x76;
 const EQUALS = 0xbb;
@@ -78,7 +80,7 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(encodeBindings(settings.bindings), before, "clearing an unbound key");
 
   beginBindingCapture(settings, Action.attack, 0);
-  for (const key of [BACKSPACE, F6, F7]) {
+  for (const key of [BACKSPACE, ESCAPE, F6, F7]) {
     assertEquals(captureBinding(settings, key), true);
     assertEquals(settings.message, `${reservedReason(key)}. Press another key.`);
     assertEquals(encodeBindings(settings.bindings), before, `reserved ${keyLabel(key)}`);
@@ -341,7 +343,7 @@ test("three Custom slots each keep their own keys and name through a save, and t
   const longest = createBindingSettings(0, { load: () => undefined, readLocal: () => undefined, save: () => undefined });
   longest.ready = true;
   for (const custom of longest.customs) custom.name = "W".repeat(SLOT_NAME_LIMIT);
-  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1 });
+  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1, hints: true });
   assertEquals(full.length <= PLAYER_FILE_CAPACITY, true, `${full.length} characters fit ${PLAYER_FILE_CAPACITY}`);
   assertEquals(decodeLayouts(full)?.customs.map(custom => custom.name).join(","), longest.customs.map(custom => custom.name).join(","), "longest names round-trip");
 });
@@ -410,4 +412,26 @@ test("Delete profile empties the selected Custom slot to the stock Custom keys w
   assertEquals(reloaded?.customs[1]?.name, "");
   assertEquals(reloaded?.customs[1]?.bindings.keys.join(","), presetBindings("custom").keys.join(","));
   assertEquals(reloaded?.customs[0]?.name, "Keep");
+});
+
+test("a fresh profile has new-player hints on, turning them off is saved with the profile and a load brings it back off, and an older save without the setting loads with hints on [k2 property]", () => {
+  const saved: string[] = [];
+  const empty: BindingLoadResult = { kind: "empty" };
+  const settings = createBindingSettings(0, { load: (_owner, complete) => complete(saved.length === 0 ? empty : { kind: "loaded", encoded: saved[saved.length - 1] ?? "" }), readLocal: () => empty, save: (_owner, encoded) => { saved.push(encoded); } });
+  initializeBindingSettings(settings);
+  assertEquals(settings.hints, true, "fresh profile");
+  toggleNewPlayerHints(settings);
+  assertEquals(settings.hints, false, "turned off");
+  assertEquals(saved.length, 1, "saved at once");
+  assertEquals(decodeLayouts(saved[0] ?? "")?.hints, false, "saved as off");
+
+  const again = createBindingSettings(0, { load: (_owner, complete) => complete({ kind: "loaded", encoded: saved[0] ?? "" }), readLocal: () => empty, save: () => undefined });
+  initializeBindingSettings(again);
+  assertEquals(again.hints, false, "off after a load");
+  toggleNewPlayerHints(again);
+  assertEquals(again.hints, true, "on again");
+
+  const current = encodeLayouts(layoutSave(presetLayouts(), "wasd", false));
+  const older = "KM" + current.slice(2, 4) + current.slice(5);
+  assertEquals(decodeLayouts(older)?.hints, true, "a save from before the setting");
 });

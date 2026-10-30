@@ -6,6 +6,7 @@ import { remainingSeconds, timedMatch } from "../../game/lobby/lobbyState";
 import { formatClock } from "../../game/ui/matchHud";
 import type { PauseView } from "../../game/ui/pauseScreen";
 import { osKeyDown } from "../../platform/osKeys";
+import { localHints, localHintsKey } from "./hints";
 import type { ShellState } from "./state";
 
 const PAD_CAMERA = "Camera: stick moves · C-stick zooms";
@@ -24,6 +25,8 @@ export function pauseView(s: Readonly<ShellState>, bindings: Readonly<KeyBinding
     chord: chordLabels(bindings),
     camera: pad ? PAD_CAMERA : keyboardCamera(bindings),
     pauseKey: "Esc",
+    hints: localHints(s),
+    hintsKey: localHintsKey(s),
   };
 }
 

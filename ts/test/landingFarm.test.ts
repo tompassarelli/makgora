@@ -13,7 +13,7 @@ const CODES = ["ts/src/game/sim/codes.ts"];
 
 test("a landing's farm groups are those its reached checks run in, leaving the Lua parity checks and the frame budgets to main's CI unless a shared root reaches them [k2 property]", () => {
   expect(landingGroups(["docs/ci.md"])).toEqual(["clean-room"]);
-  expect(landingGroups(CODES)).toEqual(["computer-0", "computer-1", "clean-room", "static"]);
+  expect(landingGroups(CODES)).toEqual(["boot", "computer-0", "computer-1", "clean-room", "static"]);
   expect(landingGroups(["ts/bun.lock"])).toEqual([...GROUPS]);
   expect(landingGroups(["docs/ci.md"], true)).toEqual([...GROUPS]);
 });

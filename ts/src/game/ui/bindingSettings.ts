@@ -63,6 +63,7 @@ export interface BindingSettings {
   layouts: LayoutBindings;
   customs: readonly CustomSlot[];
   slot: number;
+  hints: boolean;
   bindings: KeyBindings;
 
   ready: boolean;
@@ -79,8 +80,8 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  const { layouts, customs, slot } = layoutSave(presetLayouts(), DEFAULT_PRESET);
-  return { owner, persistence, layouts, customs, slot, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", fromProfile: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, revision: 0, message: "Loading controls..." };
+  const { layouts, customs, slot, hints } = layoutSave(presetLayouts(), DEFAULT_PRESET);
+  return { owner, persistence, layouts, customs, slot, hints, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", fromProfile: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, revision: 0, message: "Loading controls..." };
 }
 
 
@@ -95,6 +96,7 @@ function adopt(settings: BindingSettings, save: LayoutSave): void {
   settings.layouts = save.layouts;
   settings.customs = save.customs;
   settings.slot = save.slot;
+  settings.hints = save.hints;
   settings.layout = save.active;
   settings.picking = false;
   settings.naming = false;
@@ -283,10 +285,21 @@ export function resetToLayout(settings: BindingSettings): void {
 export function saveBindingSettings(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.capture = undefined;
-  settings.persistence.save(settings.owner, encodeLayouts({ layouts: settings.layouts, active: settings.layout, customs: settings.customs, slot: settings.slot }));
+  settings.persistence.save(settings.owner, encodeLayouts({ layouts: settings.layouts, active: settings.layout, customs: settings.customs, slot: settings.slot, hints: settings.hints }));
   settings.profile = "saved";
   settings.fromProfile = true;
   settings.message = "Controls saved for next time.";
+}
+
+export const HINTS_KEY = 0x48;
+
+export const hintsKeyFree = (settings: Readonly<BindingSettings>): boolean => actionFor(settings.bindings, HINTS_KEY) === undefined;
+
+export function toggleNewPlayerHints(settings: BindingSettings): void {
+  if (!settings.ready) return;
+  settings.hints = !settings.hints;
+  saveBindingSettings(settings);
+  settings.message = settings.hints ? "New-player hints are on." : "New-player hints are off.";
 }
 
 export function cancelBindingCapture(settings: BindingSettings): void {

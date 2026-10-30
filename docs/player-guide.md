@@ -107,7 +107,13 @@ select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
 bring back your saved ones. Y binds to any action and stays Start on fighter and stage select; Backspace and Escape (Pause) are reserved for rebinding; F6 and F7
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
-is refused and the screen names what it is reserved for. Ctrl+T starts a developer input trace.
+is refused and the screen names what it is reserved for.
+
+New-player hints are on until you turn them off. In a match a small strip at the bottom centre,
+between the player panels, lists your own keys (your controller's buttons on a pad) for move, jump,
+attack, special, shield, grab, Strong, Mod X, Mod Y and Esc to pause. Press H in a match, click "New-player
+hints" on the Controls screen or on the pause screen to hide it, and the choice is saved with your
+profile. If you bind H to an action, the strip drops its "H: hide" line and the buttons still work. Ctrl+T starts a developer input trace.
 
 Help: type -help (or -commands) in chat for every player command, one line
 each, or press F9 for the quest log's Controls (your current layout and how to

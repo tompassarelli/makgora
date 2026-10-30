@@ -31,7 +31,8 @@ import { callbackMatchTick } from "./frame";
 import { clearAllInputs, clearParticipantInputs, currentHumanMask } from "./inputs";
 import { INPUT_PREFIX, journalEpoch, publishMenu, serviceJournalEnd } from "./journal";
 import * as journalPause from "./journalPause";
-import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, MAIN_MENU, Key, registerKey, syncKeyEvents } from "./keyEvents";
+import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEY_HINTS_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, MAIN_MENU, Key, registerKey, syncKeyEvents } from "./keyEvents";
+import { onHintsKeyDown } from "./hints";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
 import { onDevCommand } from "./developerCommands";
@@ -306,6 +307,9 @@ function createTriggers(s: ShellState): void {
   registerKey(s, pauseDown, Key.backspace, true);
   registerKey(s, pauseDown, Key.escape, true);
   TriggerAddAction(pauseDown, trampoline(KEY_PAUSE_DOWN));
+  const hintsDown = CreateTrigger();
+  registerKey(s, hintsDown, Key.h, true);
+  TriggerAddAction(hintsDown, trampoline(KEY_HINTS_DOWN));
   syncTrigger(s, KEYBOARD_PAUSE_PREFIX, KEYBOARD_PAUSE, true);
   syncTrigger(s, MAIN_MENU_PREFIX, MAIN_MENU, true);
   syncKeyEvents(s);
@@ -439,6 +443,7 @@ export function installShell(): void {
   on(KEY_START_DOWN, withShell(onStartKeyDown));
   on(KEY_START_UP, withShell(onStartKeyUp));
   on(KEY_PAUSE_DOWN, withShell(onPauseKeyDown));
+  on(KEY_HINTS_DOWN, withShell(onHintsKeyDown));
   on(KEYBOARD_PAUSE, withShell(onKeyboardPause));
   on(MAIN_MENU, withShell(onMainMenu));
   on(INPUT, withShell(receiveInput));

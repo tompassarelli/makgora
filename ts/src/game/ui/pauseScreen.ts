@@ -33,6 +33,7 @@ export interface PauseView {
   readonly camera: string;
   readonly pauseKey: string;
   readonly hints?: boolean | undefined;
+  readonly hintsKey?: boolean | undefined;
 }
 
 type Place = (edges: Edges) => readonly [number, number, number, number];
@@ -140,7 +141,7 @@ export class PauseScreen {
     }
     BlzFrameSetText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${I2S(view.player)} PAUSE`}|r`);
     BlzFrameSetText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
-    const hints = view.hints === undefined ? "" : `\nNew-player hints: ${view.hints ? "on" : "off"} (H)`;
+    const hints = view.hints === undefined ? "" : `\nNew-player hints: ${view.hints ? "on" : "off"}${view.hintsKey === true ? " (H)" : ""}`;
     BlzFrameSetText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${hints}|r`);
     BlzFrameSetText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
     BlzFrameSetText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);

@@ -133,6 +133,8 @@ function developerRequests(s: ShellState, actor: number, message: string) {
 
 type DeveloperRequests = ReturnType<typeof developerRequests>;
 
+const LOOK_COMMANDS = ["-dev pause ", "-dev hints "];
+
 function sessionReceipt(s: ShellState, actor: number, message: string, requests: DeveloperRequests): string | undefined {
   const { fighterSetup, showcase, lore, classic } = requests;
   if (fighterSetup !== undefined) return fighterSetup;
@@ -157,7 +159,7 @@ function sessionReceipt(s: ShellState, actor: number, message: string, requests:
     return receipt;
   }
   if (message.startsWith("-dev shield-energy ")) return shieldEnergyReceipt(s, message);
-  if (message.startsWith("-dev pause ")) return pauseReceipt(s, message);
+  if (LOOK_COMMANDS.some(prefix => message.startsWith(prefix))) return lookReceipt(s, message);
   return matchStartReceipt(s, actor, message, requests);
 }
 
@@ -190,6 +192,17 @@ function pauseReceipt(s: ShellState, message: string): string | undefined {
   pauseMatchPresentation(s, true, true);
   renderPersistentPresentation(s);
   return `dev: pause ${look} ${slot + 1}`;
+}
+
+function lookReceipt(s: ShellState, message: string): string | undefined {
+  return message.startsWith("-dev pause ") ? pauseReceipt(s, message) : hintsReceipt(s, message);
+}
+
+function hintsReceipt(s: ShellState, message: string): string | undefined {
+  const look = message.slice("-dev hints ".length);
+  if (look !== "keyboard" && look !== "pad") return undefined;
+  s.dev.hintsLook = look;
+  return `dev: hints ${look}`;
 }
 
 function shieldEnergyReceipt(s: ShellState, message: string): string | undefined {

@@ -53,11 +53,12 @@ import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind
 import { localParticipantSlot, presentedCueTrace, traceParticipant } from "./diagnostics";
 import { colorFighterBody, paintFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
+import { localDevice, localHints } from "./hints";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { warcraftMenuOpen } from "./warcraftMenu";
 import { presentedMatch } from "./presentedMatch";
 import { EMPTY_PAUSE_VIEW, pauseView } from "./pauseView";
-import { type UiObjects, menuControlHit, pauseEffects, views } from "./ui";
+import { type UiObjects, layoutHuds, menuControlHit, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera, probeWaiting } from "./responseProbe";
@@ -626,6 +627,9 @@ export function renderUi(s: ShellState): void {
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
   ui.match.presentCountdown(game, showMatch);
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
+  const hints = localHints(s);
+  if (ui.hints.laidFor !== hints) layoutHuds(s, hints);
+  ui.hints.update(showMatch && hints && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s));
   ui.classic?.updateCard(game);
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;
   if (cleared !== undefined && localSlot() === game.run.player) loreClears().mark(cleared.id);

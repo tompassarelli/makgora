@@ -18,10 +18,12 @@ export interface LayoutSave {
   readonly active: BindingPreset;
   readonly customs: readonly CustomSlot[];
   readonly slot: number;
+  readonly hints: boolean;
 }
 
 const LAYOUT_SAVE = "KL";
 const SLOTS_SAVE = "KM";
+const HINTS_SAVE = "KN";
 
 export function slotName(typed: string): string {
   let name = "";
@@ -41,15 +43,15 @@ export function presetLayouts(): LayoutBindings {
   return { wasd: presetBindings("wasd"), standard: presetBindings("standard"), custom: presetBindings("custom") };
 }
 
-export function layoutSave(layouts: LayoutBindings, active: BindingPreset): LayoutSave {
+export function layoutSave(layouts: LayoutBindings, active: BindingPreset, hints = true): LayoutSave {
   const customs: CustomSlot[] = [];
   for (let slot = 0; slot < CUSTOM_SLOT_COUNT; slot++) customs.push({ bindings: slot === 0 ? layouts.custom : presetBindings("custom"), name: "" });
-  return { layouts, active, customs, slot: 0 };
+  return { layouts, active, customs, slot: 0, hints };
 }
 
-export function encodeLayouts({ layouts, active, customs, slot }: LayoutSave): string {
+export function encodeLayouts({ layouts, active, customs, slot, hints }: LayoutSave): string {
   const custom = customs.map(({ bindings, name }) => encodeBindings(bindings) + String(name.length).padStart(2, "0") + name).join("");
-  return SLOTS_SAVE + BINDING_PRESETS.indexOf(active) + slot + encodeBindings(layouts.wasd) + encodeBindings(layouts.standard) + custom;
+  return HINTS_SAVE + BINDING_PRESETS.indexOf(active) + slot + (hints ? 1 : 0) + encodeBindings(layouts.wasd) + encodeBindings(layouts.standard) + custom;
 }
 
 interface Cursor {
@@ -90,11 +92,13 @@ function decodeOneCustom(saved: string, active: BindingPreset): LayoutSave | und
   return cursor.at === saved.length ? layoutSave(layouts, active) : undefined;
 }
 
-function decodeCustomSlots(saved: string, active: BindingPreset): LayoutSave | undefined {
+function decodeCustomSlots(saved: string, active: BindingPreset, withHints: boolean): LayoutSave | undefined {
   const slot = DIGITS.indexOf(saved.charAt(3));
   if (slot < 0 || slot >= CUSTOM_SLOT_COUNT) return undefined;
+  const hintsDigit = withHints ? saved.charAt(4) : "1";
+  if (hintsDigit !== "0" && hintsDigit !== "1") return undefined;
   const layouts = presetLayouts();
-  const cursor = { saved, at: 4 };
+  const cursor = { saved, at: withHints ? 5 : 4 };
   for (const preset of ["wasd", "standard"] as const) {
     const bindings = readBindings(cursor, preset);
     if (bindings === undefined) return undefined;
@@ -110,7 +114,7 @@ function decodeCustomSlots(saved: string, active: BindingPreset): LayoutSave | u
   const chosen = customs[slot];
   if (chosen === undefined || cursor.at !== saved.length) return undefined;
   layouts.custom = chosen.bindings;
-  return { layouts, active, customs, slot };
+  return { layouts, active, customs, slot, hints: hintsDigit === "1" };
 }
 
 export function decodeLayouts(saved: string): LayoutSave | undefined {
@@ -118,5 +122,6 @@ export function decodeLayouts(saved: string): LayoutSave | undefined {
   const active = BINDING_PRESETS[DIGITS.indexOf(saved.charAt(2))];
   if (active === undefined) return undefined;
   if (version === LAYOUT_SAVE) return decodeOneCustom(saved, active);
-  return version === SLOTS_SAVE ? decodeCustomSlots(saved, active) : undefined;
+  if (version === SLOTS_SAVE) return decodeCustomSlots(saved, active, false);
+  return version === HINTS_SAVE ? decodeCustomSlots(saved, active, true) : undefined;
 }

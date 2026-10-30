@@ -75,10 +75,29 @@ export const panelMirrored = (position: number, count: number): boolean => count
 export const panelLayout = (position: number, count: number): PanelLayout => panelMirrored(position, count) ? RIGHT_PANEL : LEFT_PANEL;
 
 
-export function plateLeft(position: number, count: number): number {
-  const spacing = f32(0.76) / count;
-  return f32(0.02) + spacing * (position + 0.5) - unitsForPixels(PLATE_WIDTH_PX) / 2;
+const ROW_LEFT = f32(0.02);
+const ROW_WIDTH = f32(0.76);
+const HINTS_ROW_LEFT = f32(0.005);
+const HINTS_ROW_WIDTH = f32(0.79);
+export const HINT_STRIP_CELL = f32(0.12);
+
+const leftGroup = (count: number): number => count - idiv(count, 2);
+
+function rowLeft(hints: boolean): number {
+  return hints ? HINTS_ROW_LEFT : ROW_LEFT;
 }
+
+function cellWidth(count: number, hints: boolean): number {
+  return hints ? (HINTS_ROW_WIDTH - HINT_STRIP_CELL) / count : ROW_WIDTH / count;
+}
+
+// The strip's cell sits between the left-facing panels and the mirrored ones: p1 [keys] p2, p1 p2 [keys] p3 p4.
+export function plateLeft(position: number, count: number, hints = false): number {
+  const gap = hints && position >= leftGroup(count) ? HINT_STRIP_CELL : 0.0;
+  return rowLeft(hints) + cellWidth(count, hints) * (position + 0.5) + gap - unitsForPixels(PLATE_WIDTH_PX) / 2;
+}
+
+export const hintStripLeft = (count: number): number => HINTS_ROW_LEFT + cellWidth(count, true) * leftGroup(count);
 
 
 export const boxLeft = (left: number, box: PlateBox): number => left + unitsForPixels(box.x);
@@ -93,8 +112,8 @@ export interface PlateRect {
 
 const plateRect = (left: number, box: PlateBox): PlateRect => ({ left: boxLeft(left, box), centerY: boxTop(box) - unitsForPixels(box.height) / 2, width: unitsForPixels(box.width), height: unitsForPixels(box.height) });
 
-export function meterPlacement(position: number, count: number): PlateRect {
-  return plateRect(plateLeft(position, count), panelLayout(position, count).ultimateBar);
+export function meterPlacement(position: number, count: number, hints = false): PlateRect {
+  return plateRect(plateLeft(position, count, hints), panelLayout(position, count).ultimateBar);
 }
 
 

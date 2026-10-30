@@ -11,6 +11,7 @@ import { copyControls, isActive, neutralControls, setRosterMask } from "../../ga
 import { createFighterBody, removeFighterBody } from "./fighterBody";
 import { clearAllInputs } from "./inputs";
 import type { ShellState } from "./state";
+import { localHints } from "./hints";
 import { endFighter, layoutHuds, views } from "./ui";
 
 const NEUTRAL = neutralControls();
@@ -42,7 +43,7 @@ export function makePreview(s: ShellState): void {
   removeFighters(s);
   for (const slot of PARTICIPANT_SLOTS) copyControls(s.produced.inputs[slot], NEUTRAL);
   setRosterMask(s.world, fighterMask(s.game));
-  layoutHuds(s);
+  layoutHuds(s, localHints(s));
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(s.world, slot)) continue;
     const x = matchSpawnX(slot, s.world.mask);
