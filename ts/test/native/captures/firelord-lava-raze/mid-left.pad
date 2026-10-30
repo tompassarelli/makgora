@@ -3,7 +3,8 @@
 #! cue 310-330 column: effect=FlameStrike1
 #! chat -dev quick hero firelord hit-areas
 250 a stick 1 0
-272 a stick -1 0
+282 a stick -1 0
+284 a stick 0 0
 286 a stick -1 -1
 290 a tap X 2
 291 a capture
