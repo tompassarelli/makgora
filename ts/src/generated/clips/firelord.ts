@@ -4,17 +4,17 @@ import { f32 } from "wisp/src/sim/f32";
 import type { FighterOriginalClip } from "./fighterOriginalClip";
 
 export const clips: readonly FighterOriginalClip[] = [
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(2.167), endSeconds: f32(4.333), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(4.667), endSeconds: f32(8.667), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(12.333), endSeconds: f32(13.333), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: 14.0, endSeconds: f32(15.167), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: 16.0, endSeconds: f32(17.167), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(17.833), endSeconds: 21.5, looping: true, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(23.333), endSeconds: 24.5, looping: false, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: 28.0, endSeconds: 30.0, looping: true, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(30.667), endSeconds: f32(31.833), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(33.333), endSeconds: 36.0, looping: false, timeline: true },
-  { modelPath: "war3mapImported\\FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx", startSeconds: f32(36.667), endSeconds: f32(38.667), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(2.167), endSeconds: f32(4.333), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(4.667), endSeconds: f32(8.667), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(12.333), endSeconds: f32(13.333), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: 14.0, endSeconds: f32(15.167), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: 16.0, endSeconds: f32(17.167), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(17.833), endSeconds: 21.5, looping: true, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(23.333), endSeconds: 24.5, looping: false, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: 28.0, endSeconds: 30.0, looping: true, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(30.667), endSeconds: f32(31.833), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(33.333), endSeconds: 36.0, looping: false, timeline: true },
+  { modelPath: "war3mapImported\\FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx", startSeconds: f32(36.667), endSeconds: f32(38.667), looping: false, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([

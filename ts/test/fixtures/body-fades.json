@@ -8,12 +8,8 @@
   "fading": []
  },
  "blademaster": {
-  "body": "BlademasterTimelineBody-337610dc33e5183f382254fafecabc0724b10ace06b44199e172104175d869d6.mdx",
-  "fading": [
-   11,
-   12,
-   13
-  ]
+  "body": "BlademasterTimelineBody-94921e53355e2babeed2011041a78c3f652c8992e4c4ef93030b53724770fef9.mdx",
+  "fading": []
  },
  "mountainKing": {
   "body": "MountainKingTimelineBody-739e167078aa48d614c34aba93809893ff7567c3a7cc24bae1ace6b417475d2b.mdx",
@@ -27,35 +23,28 @@
   ]
  },
  "lich": {
-  "body": "LichTimelineBody-854ef9e8fbf26bc16474ec8404bb61fc93cc771774fe16de8b5c5a4939000697.mdx",
+  "body": "LichTimelineBody-73ae09d7d6c9c5a89b803cbd05a05df7a07d3d1268287b4347cbc67774cdd68e.mdx",
   "fading": [
    7,
-   8,
    9,
    10
   ]
  },
  "dreadlord": {
-  "body": "DreadlordTimelineBody-4703684805de7da5fd83e99a45d915e143ad5257b37add08ab1ebbccef27fbd0.mdx",
-  "fading": [
-   7,
-   8,
-   11
-  ]
+  "body": "DreadlordTimelineBody-6c6784b2c94b9e6a897e2eba3f8d3cfd326003a3af9218d3f453f91b633aa18f.mdx",
+  "fading": []
  },
  "shadowHunter": {
-  "body": "ShadowHunterTimelineBody-08ae2c2e168989794315e1525999931e4abb128482a63a975c7521083dff8354.mdx",
+  "body": "ShadowHunterTimelineBody-2b4db5400ae2f034c9142c62e2bd781182c130f624bd40cae6d7d6a863ee4974.mdx",
   "fading": [
-   4,
    10,
    11,
    12
   ]
  },
  "pitLord": {
-  "body": "PitLordTimelineBody-dedcdb9eaa64c5bb4b55c3317acb3cd6b5a673726826e0aa79b20fc6fe58cd55.mdx",
+  "body": "PitLordTimelineBody-cecec431b4dad400d66c2fc93ef2eae2e493290968a293c915772b02e2625e4b.mdx",
   "fading": [
-   8,
    9,
    10,
    11,
@@ -64,9 +53,8 @@
   ]
  },
  "beastmaster": {
-  "body": "BeastmasterTimelineBody-5e47b79b47e036f7e806cfec65efc81265110a0bafab8452038c375a6ff9922d.mdx",
+  "body": "BeastmasterTimelineBody-bec215a05ebdc931f199906a21ab53576b25c2f9e0d9ab424392eaef166a3e1f.mdx",
   "fading": [
-   7,
    8
   ]
  },
@@ -168,19 +156,16 @@
   ]
  },
  "butcher": {
-  "body": "ButcherTimelineBody-c9e9052414a75bfc63a8405cea040a5dde0835b7f1b0f7f32312fb98a8d9ccb1.mdx",
-  "fading": [
-   5
-  ]
+  "body": "ButcherTimelineBody-4809ac618ee0ab8fbbd850f98501e82d5f18453ec28377cf9353dee0d5810dbc.mdx",
+  "fading": []
  },
  "akama": {
   "body": "AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx",
   "fading": []
  },
  "firelord": {
-  "body": "FirelordTimelineBody-904379e9e6ff09e8acd77f529ee2197481a5b857cc89b3e71377270947364e4f.mdx",
+  "body": "FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx",
   "fading": [
-   9,
    10
   ]
  },

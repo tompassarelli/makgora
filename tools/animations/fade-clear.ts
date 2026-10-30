@@ -14,20 +14,32 @@ const windows = names.map((name) => {
   ensure(found.length === 1, `${name}: expected exactly one such sequence`);
   return found[0]!.Interval;
 });
+const EPSILON = 1e-3;
 const inside = (frame: number) => windows.some(([start, end]) => frame >= start! && frame <= end!);
+const [openStart, openEnd] = model.Sequences[0]!.Interval;
+const keyAt = (key: mdx.AnimKeyframe, frame: number): mdx.AnimKeyframe => ({ ...key, Frame: frame, Vector: key.Vector.slice() });
 
 let cleared = 0;
 tracks(model, (track, path) => {
   if (!ALPHA.test(path) || onGlobalClock(track)) return;
-  const keys = track.Keys.filter((key) => inside(key.Frame));
-  const fades = keys.some((key, index) => (key.Vector[0] ?? 1) >= 1 && keys.slice(index + 1).some((later) => (later.Vector[0] ?? 1) < 1));
-  if (!fades) return;
-  for (const key of keys) {
-    key.Vector[0] = 1;
-    key.InTan?.fill(0);
-    key.OutTan?.fill(0);
+  const level = track.Keys.find((key) => key.Frame >= openStart! && key.Frame <= openEnd!)?.Vector[0] ?? 1;
+  if (level <= 0) return;
+  let changed = false;
+  for (const [start, end] of windows) {
+    const keys = track.Keys.filter((key) => key.Frame >= start! && key.Frame <= end!);
+    if (keys.some((key) => (key.Vector[0] ?? 1) < level - EPSILON)) {
+      for (const key of keys) {
+        key.Vector[0] = level;
+        key.InTan?.fill(0);
+        key.OutTan?.fill(0);
+      }
+      if (!keys.some((key) => key.Frame === end)) track.Keys.push(keyAt(keys[keys.length - 1]!, end!));
+      if (!keys.some((key) => key.Frame === start)) track.Keys.push(keyAt(keys[0]!, start!));
+      track.Keys.sort((x, y) => x.Frame - y.Frame);
+      changed = true;
+    }
   }
-  cleared++;
+  if (changed) cleared++;
 });
 ensure(cleared > 0, "no body geoset fades in the named sequences");
 
