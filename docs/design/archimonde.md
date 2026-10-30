@@ -14,8 +14,8 @@ heavy, huge punishes, a recovery edge-guards punish), not his numbers.
   two attacks and a spell. Every pose maps onto one of them until his
   authored clips land.
 - **Size.** Draw scale 1.45; weight 118, the heaviest in the roster. His hurt
-  capsule is the tallest in the roster (1.70 times the reference height, 0.72
-  of its width), slow run, low air speed, traction 0.08. His shield sits at
+  capsule is the tallest of the heavies (height 1.50 times the reference, width
+  1.45 times), slow run (0.80), low air speed (0.82), traction 0.08. His shield sits at
   height 100 with radius 168.
 - **Voice.** He has no stock unit soundset, so his ready and warcry lines are
   campaign dialogue (`N07Archimonde04` and `U08Archimonde20`), the way
@@ -35,10 +35,10 @@ Specials:
   position and heats toward the strike. On frame 32 a lightning column strikes it: 16% at 70°, growth
   102, active through frame 37. The whole action lasts 58 frames.- **Rain of Fire** (side). Two pillars, 170 and 310 units ahead, hit on
   frames 24 and 36; a burning ring marks each from frame 1 and becomes a flame column the size of its hit region on the hit frame. Each covers the full stage
-  height at its x for 9%.- **Fel Ascent** (up). He rises 1.8 reference heights over frames 10–24 with
-  little steering. A fel column below him hits for 7% over frames 10–20. Once
-  per airtime, it ends helpless, with 28 landing frames. This is the roster's
-  shortest heavy recovery, by design.- **Bash** (down). Two hammer-fists into the floor, on frames 16–18 and
+  height at its x for 9%.- **Fel Ascent** (up). He rises 2.6 reference heights over frames 10–24 with
+  some steering (drift 6). A fel column below him hits for 7% over frames 10–20. Once
+  per airtime, it ends helpless, with 28 landing frames. This is among the roster's
+  shortest heavy recoveries, by design.- **Bash** (down). Two hammer-fists into the floor, on frames 16–18 and
   24–26. A grounded foe within 90 units takes 6% and is stunned for 30 frames
   by the first, with no launch; the second takes 6% and launches them at 45°
   out of the stun. The stun is the shared stun status that ends on damage,
@@ -104,3 +104,32 @@ bait-and-punish):
 His kills come from forward smash (50%), Finger of Death (11%) and dash
 attack (10%). 43% of his stocks are lost more than 3 s after a hit. His worst matchups are Chen (3%), Pit Lord (4%),
 Jaina (15%) and Cairne (17%); he beats Mountain King (76%) and Warden (72%).
+
+## Balance pass (2026-10-30)
+
+The first measurement's 34% led to three field runs over his 30 matchups
+(`--matchups`, Wren Expert, 400 matches a pair, probe skipped). Holding him at
+range with a shoot-only approach, retreat-leaning defense and `whenStale: hold`
+made him worse (25% wins, GitHub run
+[41069772700](https://github.com/tompassarelli/smashcraft/actions/runs/41069772700)),
+so the gameplan stays as authored. A longer, steerable Fel Ascent (rise 1.8 to
+2.6 reference heights, drift 2 to 6) reached 36% (run
+[41080144005](https://github.com/tompassarelli/smashcraft/actions/runs/41080144005)):
+41% of his stocks were lost more than 3 s after a hit. A smaller hurt body
+(width 1.70 to 1.45, height 1.60 to 1.50 times the reference) with faster run
+(0.70 to 0.80) and air speed (0.72 to 0.82) reached **45% wins** (run
+[41082799550](https://github.com/tompassarelli/smashcraft/actions/runs/41082799550),
+12240 matches), inside the 40-60% band. Shares at that run:
+
+- archetype bait-and-punish
+- air share of normals 6% (band 10-35)
+- aerials n/f/b/u/d 30/12/39/3/16% (up air under its 5-30 band)
+- approach share of movement 83% (band 25-55)
+- ranged share of damage 4% (band 20-50)
+- specials n/s/u/d 7/23/8/4% of moves (side over its 5-20 band, up at the
+  band's 8% edge)
+
+Still outside the 30-70% matchup band: Chen (5%), Pit Lord (12%), Anub'arak
+(17%), Jaina (25%), Cairne (26%) and Shadow Hunter (27%) on the low side,
+Warden (85%) and Sylvanas (85%) on the high side. His kills come from forward
+smash (56%). Approach, ranged and air shares remain the next balance work.
