@@ -59,6 +59,50 @@ Each claim below names its source: a repository file, a cited document, or a
 measured capture. **Unmeasured** marks a lever whose 3.0 behaviour no
 Smashcraft capture has shown yet; *(guess)* marks an inference.
 
+## Art quality rubric: stage, fighter and effect art
+
+The judged half of the remaster bar. Wisp's `remaster_check` example
+(wisp:docs/native-window-plan.md, "Remaster at load") measures what a texture
+upscaler can change; this rubric judges everything a person authors or
+dresses: a stage's scenery and deck, a fighter's skin or model, an effect.
+It comes from a professional artist's annotated critique of an AI-remastered
+building set (shared by Tom, 2026-10-31), which named what makes remade art
+fail. That set is a list of faults to avoid, not an asset source: Smashcraft
+uses Classic models only (roster.md).
+
+The test the critique sets: the Classic art, stretched and blurry as it is,
+still conveys its concept (a rough cobblestone wall reads as a stone wall, a
+cap matches the mortar). Remade art keeps that concept and adds craft. More
+polygons or more resolution alone look flat and sterile; a good stylised
+remake keeps one palette in which materials look distinct but share hue hints,
+a subtle top-down gradient, uneven believable damage and bold readable corners,
+balancing realism and artistic vision.
+
+**How to judge.** Capture at gameplay side-view zoom, in both facings, near
+and far camera, beside the Classic original captured the same way (Original
+and Remastered art switch without a restart in the window's F10 options). Look
+at the capture, not the model viewer: a pose or scene that reads in one view
+can fail in the other. Record each line below as pass or fail with one clause
+of evidence; a fail is fixed or filed before the art ships. A cold reader who
+has not seen the original names what each piece is; a piece they cannot name
+fails line 1.
+
+| | Line | Fails when |
+| --- | --- | --- |
+| 1 | **Same concept as Classic** | A cold reader names a different object, material or mood than the Classic art gives, or a Classic landmark no longer reads at gameplay zoom |
+| 2 | **One palette** | Materials drift to hues the original never used, or a piece sits apart from its neighbours; distinct materials should still share hue hints. Hue and saturation drift of a remastered texture is also measured: `remaster_check` fails it past 3 degrees or 0.03 |
+| 3 | **Believable materials at their scale** | A texture reads blurry with no volume, as cheap procedural noise in place of painted detail (wood grain that is a filter, stone with no mortar), or at the wrong scale (shingles the size of doors, planks wider than the fighter) |
+| 4 | **Clean joins** | Kitbashed parts overlap with visible joins, z-fight, show baking artefacts, or leave a visible seam where a texture tiles or an atlas island meets its neighbour |
+| 5 | **No repetition in view** | The same block, plank or prop repeats identically within one frame (vary rotation, damage, scale or trim) |
+| 6 | **Details read as real things** | A part has no plausible function or structure (a pipe that is plainly a plank, stones stuck on at random, damage placed evenly rather than where wear would collect) |
+| 7 | **Finished from every angle shown** | Any part the stage's cameras reveal is missing, unwrapped, stretched, untextured or left at a placeholder, including undersides, backs and the far end of a deck |
+| 8 | **Readable at distance** | Corners and silhouettes are not bold enough to read at far camera, or fine detail makes the fighter's band harder to see (see the fighter L* check above) |
+
+Effects follow the same lines with their own reading: line 1 is whether the
+effect's shape, colour and timing say what the move does; line 4 is no hard
+quad edges or clipped sprites; line 5 is no frame-for-frame repeats inside one
+animation. Judge them in a motion strip (AGENTS.md), not a still.
+
 ## The renderer is fixed
 
 A map ships data and a Lua script; it can't ship shaders or change the

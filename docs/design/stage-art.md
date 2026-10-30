@@ -506,6 +506,7 @@ it before contrast.ts and the judge.
 | C | **Underside**: the deck's body and underside read against the lower sky (ΔE00 ≥ 15, rule 10) | smashcraft:ts/src/game/assets/stagePalette.tests.ts |
 | D | **Depth layers**: three bands, each farther one lower in contrast and closer to the fog colour (rules 4, 6) | look; fog test in smashcraft:ts/test/player-view.test.ts |
 | E | **Playfield vs background**: walking surface ≥ 40 luma from the fog (rule 10); fighter contrast not reduced by the stage's atmosphere | stagePalette tests; `bun tools/stage/contrast.ts` |
+| F | **Art quality**: concept same as Classic, one palette, believable materials at scale, clean joins, no repeats in view, finished from every shown angle | the judged rubric in [visual quality](visual-quality.md#art-quality-rubric-stage-fighter-and-effect-art), both facings; remastered textures also pass Wisp `remaster_check` |
 
 ## Warcraft limits
 
