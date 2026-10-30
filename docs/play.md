@@ -46,7 +46,7 @@ parts to copy into the recording's `a` and `b` folders.
 
 `bun wisp play --standalone --four-fighters --frames 7200 --out DIR` is
 wisp#48's frame-rate measurement. It runs one game copy, as live play does:
-Illidan on the bot beat's keys against computer Rifleman, Illidan and Warden,
+Illidan on the bot beat's keys against computer Blademaster, Illidan and Warden,
 99 stocks and a two-minute clock, so four fighters stay on stage. It prints
 the frame timing summary (the target is a p95 frame time of at most 16.7 ms);
 `DIR/standalone.json` keeps every frame's timing. Add `--headless` to run it

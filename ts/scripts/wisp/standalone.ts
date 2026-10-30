@@ -47,7 +47,7 @@ export function heldKeys(input: StandaloneInput): Set<number> {
 
 
 
-const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Rifleman", "-dev fighter 3 Illidan", "-dev fighter 4 Warden", "-dev time 2"];
+const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Blademaster", "-dev fighter 3 Illidan", "-dev fighter 4 Warden", "-dev time 2"];
 const FOUR_FIGHTER_STOCKS = 99;
 
 
