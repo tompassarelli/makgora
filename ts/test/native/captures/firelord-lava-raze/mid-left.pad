@@ -1,0 +1,20 @@
+# Firelord's Lava Raze facing left, stick down and forward: a glowing crack opens two steps ahead from match frame 303 and a lava column erupts there on 313, hitting for four frames.
+#! cue 300-313 crack: effect=FlameStrikeTarget
+#! cue 310-330 column: effect=FlameStrike1
+#! chat -dev quick hero firelord hit-areas
+250 a stick 1 0
+272 a stick -1 0
+286 a stick -1 -1
+290 a tap X 2
+291 a capture
+298 a capture
+304 a capture
+307 a capture
+311 a capture
+313 a capture
+314 a capture
+316 a capture
+318 a capture
+322 a capture
+326 a capture
+328 a stick 0 0

@@ -429,7 +429,8 @@ function authoredParts(moves: readonly AuthoredSpecial[], projectiles: Map<strin
   const projectile = (spec: SpecialProjectile | undefined) => {
     if (spec === undefined) return;
     projectiles.set(specialProjectileCanonical(spec, ""), spec);
-    if (spec.burstInto !== undefined) projectiles.set(specialProjectileCanonical(spec.burstInto, ""), spec.burstInto);
+    projectile(spec.burstInto);
+    projectile(spec.expiresInto);
   };
   const move = (special: AuthoredSpecial | undefined): void => {
     if (special === undefined) return;

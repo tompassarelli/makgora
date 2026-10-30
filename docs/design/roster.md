@@ -1330,7 +1330,7 @@ Selectable now as a stand-in on the shared placeholder moveset ([standins.md](st
 | Neutral B | **Incinerating Ember:** straight projectile at 0.10H/frame, life 35, radius 0.16H; 5 damage, POKE at 35 degrees. Consecutive body hits add one heat mark, max 3, expiring 180 frames after the latest hit. The third hit consumes marks and adds 3 damage plus LAUNCH at 65 degrees instead of normal POKE; no secondary area explosion. One active, reflectable. | Spawn f21, end f45; 3 mana |
 | Side B | **Lava Spawn:** ground-only summon 0.6H ahead, 10 durability, 240-frame life. Remains stationary and fires in placement-facing direction at ages 60 and 150: speed 0.08H/frame, life 25, radius 0.15H, 5 damage, POKE at 40 degrees, reflectable. One spawn, no splitting; recast recalls it. | Summon f30, end f57; 22 mana initial, 0 recall |
 | Up B | **Flame Jet:** 2.0H upward movement, up to 0.45H lateral, attached one-hit flame attack for 8 damage, LAUNCH at 80 degrees. Free version 1.4H with no hitbox. | Hit f11–16, movement through f31, then helpless; 15 mana |
-| Down B | **Molten Patch:** ground-only place a visible 0.65H-radius zone 0.7H ahead. Arms after 24 frames, lasts 120 more. Target can take one hit per 60 frames, maximum two total, each 4 damage, POKE at 70 degrees. One patch, cannot be refreshed while active, does not pass through platforms, no damage to shields beyond ordinary hit behavior. | Place f26, end f52; 20 mana |
+| Down B | **Lava Raze:** three Shadowraze-style lava eruptions at 1x, 2x and 3x a 0.7H step ahead of his front, picked by the stick as the crack opens: down or no direction (back and up read the same) erupts one step ahead, down and forward two, forward three. A glowing crack opens on the ground at the aimed spot, and the stick is read on that frame only. The eruption is a 0.35H-radius molten column, so the three spots tile with no gap; it sits on the ground below the spot, does not appear past a ledge, and from the air lands on the floor below the aimed point. 12 damage at every distance, LAUNCH at 85 degrees, one hit per cast, shieldable. | Crack f14, eruption hits f23–26, end f48 (air landing lag 20); 20 mana |
 
 Lava Spawn has no body collision or auto-aim and uses the same owner-stun/grab attack suppression as the other pets. Existing projectiles remain independent after firing. Heat marks are per source and target; reflected Embers belong to the reflector and cannot consume someone else’s marks.
 
@@ -1347,7 +1347,9 @@ Standing grab 9/2/26, reach 0.60H. Pummel: ember squeeze, no extra heat mark.
 
 **Ultimate — Volcano:** ground-only f40 startup creates a volcano 1.3H ahead, 25 durability, life 180. Three eruptions at ages 30, 90, and 150, radius 0.85H, each 9 damage, LAUNCH at 80 degrees. No random rocks or full-map targeting. Destroying the volcano ends later eruptions. Owner’s casting action ends f78. Each eruption has a 20-frame visible warning; cannot hit through solid platforms.
 
-**Required counterplay test:** lava fire plus Molten Patch leaves an aerial route and cannot cause indefinite shieldstun. Heat marks create a readable incentive to avoid the third hit without giving normals hidden explosions.
+Down B was Molten Patch, a ground zone 0.7H ahead; Tom replaced it on 2026-10-30 with Lava Raze, after Nevermore's Shadowraze in Dota, and picked the three distances by stick. The numbers are the proposed ones, unchanged. Mana is a trait tag only, so the 20 is not charged yet.
+
+**Required counterplay test:** lava fire plus Lava Raze leaves an aerial route and cannot cause indefinite shieldstun. Heat marks create a readable incentive to avoid the third hit without giving normals hidden explosions.
 
 ## Lich King
 

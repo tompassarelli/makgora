@@ -43,6 +43,18 @@ function appliedStatusCanonical(status: Readonly<AppliedStatus>, prefix: string)
   return result;
 }
 
+function aimedSpotCanonical(spec: Readonly<SpecialProjectile>, prefix: string): string {
+  const result: string[] = [];
+  const real = (name: string, value: number) => { result.push(canonicalRealField(`${prefix}.${name}`, value)); };
+  if (spec.aimedReach !== undefined) {
+    real("aimedReach.near", spec.aimedReach.near);
+    real("aimedReach.mid", spec.aimedReach.mid);
+    real("aimedReach.far", spec.aimedReach.far);
+  }
+  if (spec.onlyOnFloor !== undefined) real("onlyOnFloor.reach", spec.onlyOnFloor.reach);
+  return result.join("");
+}
+
 export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, prefix: string): string {
   const result: string[] = [];
   const int = (name: string, value: number) => { result.push(canonicalInt(`${prefix}.${name}`, value)); };
@@ -84,6 +96,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
     real("homing.maxRise", spec.homing.maxRise);
   }
   writePierce(int, spec);
+  result.push(aimedSpotCanonical(spec, prefix));
   if (spec.burstInto !== undefined) result.push(specialProjectileCanonical(spec.burstInto, `${prefix}.burstInto`));
   if (spec.expiresInto !== undefined) result.push(specialProjectileCanonical(spec.expiresInto, `${prefix}.expiresInto`));
   return result.join("");

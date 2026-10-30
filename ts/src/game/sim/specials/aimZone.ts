@@ -41,7 +41,7 @@ export function steerAim(special: Fighter["special"], move: Readonly<AuthoredSpe
   if (freeAims(move) && aimFree(special, input)) return;
   const x = chargedAimX(input);
   const z = chargedAimZ(input);
-  if (x === 0 && z === 0) return;
+  if (x === 0 && z === 0 && move.liveAim !== true) return;
   special.aimX = x;
   special.aimZ = z;
 }

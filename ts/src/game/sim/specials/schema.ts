@@ -151,6 +151,12 @@ export interface SpecialProjectile {
   /** Pulls a spot over the void back along the caster's facing to this far inside the farthest ledge under him, when he stands on or over a floor. */
   readonly ledgeInset?: number | undefined;
 
+  /** Spawns at one of these distances ahead of the caster, not at `offsetX`, by the move's aim: `far` when it points forward and not down, `mid` when down and forward, `near` otherwise. */
+  readonly aimedReach?: { readonly near: number; readonly mid: number; readonly far: number } | undefined;
+
+  /** Spawns only where a floor lies under its spot, on that floor: within `reach` of the caster's feet while he stands, at any depth below him in the air. */
+  readonly onlyOnFloor?: { readonly reach: number } | undefined;
+
   /** Spawns at the move's live mark of this spec, offset from it, and not at all once that mark is gone. */
   readonly atMark?: SpecialProjectile | undefined;
 
@@ -287,15 +293,12 @@ export interface AuthoredSpecial extends CastWindows {
   readonly variants?: readonly AuthoredSpecial[] | undefined;
   readonly pairedVariant?: { readonly variant: number; readonly within: number; readonly heldWithin: number } | undefined;
   readonly name?: string | undefined;
-
   readonly endFrame: number;
 
   readonly cooldownFrames?: number | undefined;
-
   readonly heldOrb?: SpecialHeldOrb | undefined;
 
   readonly steersShot?: SpecialSteeredShot | undefined;
-
   readonly replacesLive?: true | undefined;
 
   readonly regions?: readonly MoveRegion[] | undefined;
@@ -304,92 +307,72 @@ export interface AuthoredSpecial extends CastWindows {
   readonly motion?: readonly SpecialMotion[] | undefined;
   readonly projectiles?: readonly SpecialProjectile[] | undefined;
   readonly intangible?: FrameWindow | undefined;
-
   readonly airStall?: FrameWindow | undefined;
   readonly airFloat?: { readonly sink: number; readonly rise: number } | undefined;
   readonly armor?: SpecialArmor | undefined;
   readonly guard?: SpecialGuard | undefined;
-
   readonly defensiveUse?: boolean | undefined;
 
   readonly confirmOnly?: boolean | undefined;
-
   readonly groundOnly?: boolean | undefined;
 
   readonly needsFloorBelow?: true | undefined;
-
   readonly airHoldFrames?: number | undefined;
 
   readonly oncePerAirtime?: boolean | undefined;
-
   readonly helpless?: boolean | undefined;
 
   readonly catchesLedge?: true | undefined;
-
   readonly helplessOnMiss?: boolean | undefined;
   readonly parasol?: true | undefined;
-
   readonly landingLag?: number | undefined;
   readonly swingsThroughLanding?: true | undefined;
   readonly carriesChargeOnLanding?: true | undefined;
-
   readonly fallLandingLag?: number | undefined;
 
   readonly aimFrames?: number | undefined;
+  /** Through `aimFrames` its aim is the stick as held each frame, neutral included, where an ordinary aim keeps the last direction pointed. */
+  readonly liveAim?: true | undefined;
   readonly facesStick?: boolean | undefined;
-
   readonly hurt?: readonly HurtPose[] | undefined;
 
   readonly placement?: SpecialPlacement | undefined;
   readonly summons?: readonly SpecialPlacement[] | undefined;
-
   readonly recall?: boolean | undefined;
 
   readonly command?: { readonly frame: number; readonly order: CompanionOrder; readonly slot?: number | undefined } | undefined;
-
   readonly recallsProjectiles?: boolean | undefined;
   readonly commandGrab?: CommandGrab | undefined;
   readonly targetedStrike?: TargetedStrike | undefined;
-
   readonly strikeStatus?: AppliedStatus | undefined;
 
   readonly cleanseFrame?: number | undefined;
-
   readonly followUps?: readonly SpecialFollowUp[] | undefined;
 
   readonly burst?: { readonly frame: number; readonly from: SpecialProjectile; readonly into: SpecialProjectile } | undefined;
-
   readonly ritual?: { readonly frame: number } | undefined;
 
   /** Frames on which each target may be struck again. */
   readonly rehits?: readonly number[] | undefined;
-
   readonly egg?: SpecialEgg | undefined;
 
   /** Its user gets back her air jump and air-once specials whenever it ends, as a landing would give. */
   readonly refreshesAir?: true | undefined;
-
   readonly refire?: FrameWindow | undefined;
   readonly channel?: SpecialChannel | undefined;
   readonly shorten?: FrameWindow | undefined;
-
   readonly jumpCancelFrame?: number | undefined;
 
   readonly jumpWindow?: FrameWindow | undefined;
-
   /** Opponents' specials and ultimates pass through its user over these frames: no damage, knockback, hitlag or status, and a projectile flies on. */
   readonly spellImmune?: FrameWindow | undefined;
-
   readonly turnsAround?: true | undefined;
   readonly radial?: true | undefined;
-
   /** Started on the ground it keeps the ground speed it had and slides on traction; started in the air it stops horizontally. */
   readonly groundMomentum?: true | undefined;
-
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
   readonly selfHeal?: SelfHeal | undefined; readonly revive?: { readonly frame: number; readonly offsetX: number } | undefined; readonly order?: { readonly frame: number } | undefined; readonly swapHold?: { readonly frame: number; readonly variant: number } | undefined; readonly swap?: { readonly frame: number; readonly cooldown: number } | undefined;
-
   readonly charge?: SpecialCharge | undefined;
 
   readonly spendsCharge?: true | undefined;
