@@ -51,13 +51,13 @@ test("The bullseye is centred on the mouse and moves one for one with it at ever
   }
 });
 
-test("The gauntlet is drawn at 0.85 to 0.95 of a roster tile's height at every grid size, one size for all three states, never squashed [k2 property]", () => {
+test("The gauntlet is drawn at 0.67 to 0.77 of a roster tile's height at every grid size, one size for all three states, never squashed [k2 property]", () => {
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
     const size = handSize(grid);
     const height = size * HAND_ART_ROWS / HAND_TEXELS;
     const width = size * HAND_ART_COLUMNS / HAND_TEXELS;
-    assertTrue(height >= f32(0.85) * grid.cellHeight && height <= f32(0.95) * grid.cellHeight);
+    assertTrue(height >= f32(0.67) * grid.cellHeight && height <= f32(0.77) * grid.cellHeight);
     assertTrue(Math.abs(width / height - HAND_ART_COLUMNS / HAND_ART_ROWS) < f32(1e-6));
     assertTrue(Math.abs(HAND_ART_COLUMNS / HAND_ART_ROWS - 732 / 900) < f32(0.002));
   }

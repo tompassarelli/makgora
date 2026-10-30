@@ -64,7 +64,7 @@ export function chipY(grid: RosterGrid, slot: number, choice: number): number {
   return cellRect(grid, choice).top - (slot < 2 ? f32(0.01) : f32(0.066)) * grid.scale;
 }
 
-export const readyChipSize = (grid: RosterGrid): number => grid.cellWidth * f32(0.65);
+export const readyChipSize = (grid: RosterGrid): number => grid.cellWidth * f32(0.52);
 
 export const CARD_SCALE = f32(0.86);
 export const CARD_WIDTH = f32(f32(0.16) * CARD_SCALE);
@@ -159,7 +159,7 @@ export const HAND_STATES = ["point", "fan", "pinch"] as const;
 export type HandState = (typeof HAND_STATES)[number];
 
 // Melee draws one hand over most of a roster tile: the gauntlet is this share of a tile's height, so it holds at every grid scale and UI scale.
-export const HAND_TILE_HEIGHT = f32(0.9);
+export const HAND_TILE_HEIGHT = f32(0.72);
 
 // SelectionHand textures are drawn square, sized so the gauntlet rows span HAND_TILE_HEIGHT of a tile.
 export const handSize = (grid: RosterGrid): number => f32(f32(grid.cellHeight) * HAND_TILE_HEIGHT * HAND_TEXELS / HAND_ART_ROWS);

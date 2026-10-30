@@ -161,10 +161,11 @@ the same on every client.
 
 ## Selection cursor
 
-Ready chips use a frame 65% of the roster tile width at every resolution and
-UI scale. The authored chip's 237-pixel rim spans a 256-pixel canvas, so its
-visible diameter is 60.18% of a tile, within #346's 55–70% reference band.
-The pointer target follows that frame size; the P1/P2 labels keep their art.
+Ready chips use a frame 52% of the roster tile width at every resolution and
+UI scale (65% until Tom asked for hands and chips about a fifth smaller after
+playing with them, 2026-10-30). The authored chip's 237-pixel rim spans a
+256-pixel canvas, so its visible diameter is 48.1% of a tile, below #346's
+55–70% reference band by that request. The pointer target follows that frame size; the P1/P2 labels keep their art.
 
 The fighter select and stage menus replace the stock Warcraft cursor (the Human
 gauntlet) with Tom's steel gauntlet in three states: the default pointing hand
@@ -190,10 +191,11 @@ Each state is the same 256x256 texture with the cuff and palm in the same place,
 so a state change never jumps; the gauntlet is 202x248 texels at (4, 4), the 732x900
 keyed PNGs point-scaled uniformly (202/248 against the art's 0.813). It is drawn
 square at Melee's hand-to-tile proportion (asked for 2026-10-30, from a Melee
-character-select screenshot): the gauntlet is 0.9 of a roster tile's height
+character-select screenshot) and then 20% smaller after Tom played with it
+(2026-10-30): the gauntlet is 0.72 of a roster tile's height
 (`HAND_TILE_HEIGHT` in `selectionDrag.ts`, measured from the roster grid's cell
-height so it holds at every grid size and UI scale), about 0.87 of its width, 113 pixels
-tall against a 125-pixel tile at 1080p; the old pinch hand was 38.5 pixels. The 256x256
+height so it holds at every grid size and UI scale), about 0.7 of its width, 90 pixels
+tall against a 125-pixel tile at 1080p (113 before the reduction); the old pinch hand was 38.5 pixels. The 256x256
 canvas has texels four times finer than the old 64x64 one, so the engine's bilinear
 sampling does not smear them. The hotspot sits exactly on the mouse position:
 texel (155.5, 6) for the pointing index fingertip, (171.75, 26) for the fanned
