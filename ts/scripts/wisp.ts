@@ -54,7 +54,7 @@ const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Pr
   repro: { usage: "repro FILE [--view] [--test NAME] [--shrink [--out FILE]] [--frame N --out FILE] [--diff-frame N|previous]", load: async () => (await import("./wisp/commands/repro")).repro },
   replay: { usage: "replay FILE [--out JOINED]", load: async () => (await import("./wisp/commands/replay")).replay },
   net: {
-    usage: "net host [--port N] | join ADDRESS:PORT | pair  --script FILE.pad --frames N [--delay FRAMES] [--freeze-at F] [--quit-at F] [--rtt MS] [--loss P] [--seed N] | proxy --listen PORT --to ADDRESS:PORT [--rtt MS] [--loss P]   (one slot per process over Wisp's UDP lockstep; wisp:docs/network-model.md)",
+    usage: "net host [--port N | --relay REGION|ADDRESS:PORT [--humans N]] | join CODE|ADDRESS:PORT | pair [--relay local --humans N] --script FILE.pad --frames N [--delay FRAMES] [--freeze-at F] [--quit-at F] [--rtt MS] [--loss P] [--seed N] | proxy --listen PORT --to ADDRESS:PORT [--rtt MS] [--loss P]   (one slot per process over Wisp's UDP lockstep; wisp:docs/network-model.md)",
     load: async () => (await import("wisp/scripts/wisp/commands/net")).makeNet(async (args) => {
       const { flagValues } = await import("wisp/scripts/wisp/command");
       const [script] = flagValues(args, "script");

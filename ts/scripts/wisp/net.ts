@@ -29,9 +29,9 @@ export function padEdges(script: string): { readonly setup: string; readonly edg
     if (source === "") continue;
     const [frameText = "", player, action = "", ...args] = source.split(/\s+/);
     const frame = frameText.startsWith("+") ? previous + Number(frameText.substring(1)) : Number(frameText);
-    if (!Number.isInteger(frame) || (player !== "a" && player !== "b")) throw new Error(`invalid pad line ${source}`);
+    if (!Number.isInteger(frame) || (player === undefined || !["a", "b", "c", "d"].includes(player))) throw new Error(`invalid pad line ${source}`);
     previous = frame;
-    const slot = player === "a" ? 0 : 1;
+    const slot = ["a", "b", "c", "d"].indexOf(player);
     if (action === "tap") {
       edges.push({ frame, slot, action: "press", args }, { frame: frame + Number(args[1] ?? 1), slot, action: "release", args });
     } else edges.push({ frame, slot, action, args });
@@ -60,7 +60,7 @@ export function padInputs(edges: readonly PadEdge[], slot: number) {
 
 /** The keyboard build, one slot per process, each pressing its own pad's keys and running its `#! chat` lines at frame 30 (wisp:docs/network-model.md). */
 export function padNetGame(script: string): NetGame {
-  return { create: (link, slot) => createNetStandalone(link, slot, { script }) };
+  return { create: (link, slot, humans) => createNetStandalone(link, slot, humans, { script }) };
 }
 
 /** sha256 over every map source file, path and content in path order: two players with different sources get different hashes. */
@@ -78,7 +78,7 @@ export async function smashcraftMapHash(): Promise<string> {
 const PHASE_NAMES = new Map<number, string>(Object.entries(Phase).map(([name, value]) => [value, name]));
 
 /** One player of a hosted or joined match: both humans meet at fighter selection, and each presses its window's input or its pad script. */
-export async function createNetStandalone(link: LockstepLink, slot: number, options: { readonly script?: string } = {}): Promise<StandaloneNetSession> {
+export async function createNetStandalone(link: LockstepLink, slot: number, humans: number, options: { readonly script?: string } = {}): Promise<StandaloneNetSession> {
   const runtime = installHeadless(PREDICTED_HEADLESS);
   try {
     const platform = join(import.meta.dir, "../../src/platform");
@@ -89,7 +89,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
     const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import(join(import.meta.dir, "../../src/game/lobby/lobbyState.ts"));
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
-    const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: [0, 1], link, keepCalls: 0 });
+    const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: Array.from({ length: humans }, (_, member) => member), link, keepCalls: 0 });
     const client = lockstep.client(slot);
     const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
     const scripted = options.script === undefined ? undefined : padInputs(padEdges(options.script).edges, slot);
@@ -116,10 +116,10 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
             const { rollback } = shell();
             if (measuredRtt !== undefined && rollback !== undefined) handMeasuredRtt(rollback.net, measuredRtt);
             presses.attach(shell());
-            setHumanCount(shell().game, 2);
+            setHumanCount(shell().game, humans);
             for (const command of chat) applyDeveloperCommand(shell(), command.startsWith("-dev fighter ") && Number(command.split(" ")[2]) <= 2 ? Number(command.split(" ")[2]) - 1 : 0, command);
           });
-          console.error(`net: fighter selection with 2 players at frame ${lockstep.frame}`);
+          console.error(`net: fighter selection with ${humans} players at frame ${lockstep.frame}`);
         }
         if (lockstep.frame >= SETUP_FRAME) {
           const next = heldKeys(scripted === undefined ? latest : scripted(lockstep.frame - SETUP_FRAME + 1));

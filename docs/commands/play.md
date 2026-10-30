@@ -94,6 +94,13 @@
   `--rtt`/`--loss` add Wisp's delay and loss proxy, `--freeze-at F` and
   `--quit-at F` drill a silent or departing joiner. `net host` and `net join
   ADDRESS:PORT` run one side each (wisp#110).
+- Up to four humans through a relay peer room: `bun wisp net pair --humans 4
+  --relay local --script PAD --frames N` starts a relay on this machine (the
+  binary `WISP_RELAY_BIN` names, else cargo builds wisp's relay/) and plays four
+  processes, slot 0 hosting and the rest joining by its code; pads a to d press slots
+  0 to 3 and a slot without a pad presses nothing. The last line says whether the
+  checksums match on all four (wisp#99). `net host --relay REGION|ADDRESS:PORT
+  --humans N` and `net join CODE` run one side each.
 - Online acceptance: `bun wisp net-accept --out DIR` plays 20 full three-stock
   matches as `net pair` runs, 5 at a time, cycling 0, 60 and 120 ms round trip
   with 1% loss, each with seeded fighters, stage and pad scripts for both
