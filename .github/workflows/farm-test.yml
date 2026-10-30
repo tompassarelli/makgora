@@ -55,7 +55,7 @@ permissions:
 
 env:
   SWEEP_PLACEMENT: gate
-  FARM_GROUPS: perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus types static
+  FARM_GROUPS: perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus computer-0 computer-1 types static
 
 jobs:
   plan:
@@ -115,14 +115,14 @@ jobs:
   # adds its last output lines to the summary.
   # Checks need no shard plan, so they start beside it on the dispatched ref (Autoland passes an exact SHA).
   # A group runs when the `checks` input names it, or, without one, when a changed path reaches it
-  # (smashcraft:ts/scripts/landingChecks.ts). A `checks` input starts only the groups it names, so a landing's gate run takes no hosted runner for the others and queues behind fewer jobs. parity-N replays one quarter of the tapes by measured replay cost and lua runs parity numeric and the stack-trace profile beside them; static is the clean room, the kind-tag, ledger and type check, and the Autoland suite parity check.
+  # (smashcraft:ts/scripts/landingChecks.ts). A `checks` input starts only the groups it names, so a landing's gate run takes no hosted runner for the others and queues behind fewer jobs. parity-N replays one quarter of the tapes by measured replay cost and lua runs parity numeric and the stack-trace profile beside them; computer-N checks half of the roster's computer-fighter coverage by `CPU_COVERAGE_SHARD`; static is the clean room, the kind-tag, ledger and type check with the effect-kit check reading its output (one type-check, not two), the cue models and the Autoland suite parity check.
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        group: ${{ fromJson(inputs.checks != '' && inputs.checks || '["perf","rollback","parity-0","parity-1","parity-2","parity-3","lua","corpus","types","static"]') }}
+        group: ${{ fromJson(inputs.checks != '' && inputs.checks || '["perf","rollback","parity-0","parity-1","parity-2","parity-3","lua","corpus","computer-0","computer-1","types","static"]') }}
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4

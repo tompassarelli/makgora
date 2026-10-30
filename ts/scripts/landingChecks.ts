@@ -3,7 +3,7 @@ import { dirname, join, relative } from "node:path";
 
 const root = join(import.meta.dir, "../..");
 
-export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "types", "static"] as const;
+export const GROUPS = ["perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "computer-0", "computer-1", "types", "static"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export const FULL_SUITE_VARIABLE = "LAND_FULL_SUITE";
@@ -118,23 +118,25 @@ export const CHECKS: readonly LandingCheck[] = [
   {
     name: "cue models and Classic effect record current for this tree",
     command: ["bun", "scripts/cueModels.ts"],
-    reaches: [shared, luaBuild, pattern(TYPES, "read by the cue models")], farm: ["corpus"],
-  },
-  {
-    name: "effect-kit check",
-    command: ["sh", "-c", "git clone -q --depth 1 https://github.com/tompassarelli/north \"$RUNNER_TEMP/north\" && cd .. && bun \"$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs\" check"],
-    reaches: [shared, pattern(TYPES, "read by effect-kit")], farm: ["corpus"],
+    reaches: [shared, luaBuild, pattern(TYPES, "read by the cue models")], farm: ["static"],
   },
   {
     name: "every selectable computer fighter is active",
     command: ["bun", "scripts/cpuCoverage.ts"],
-    reaches: [shared, imported(["ts/scripts/cpuCoverage.ts"])], farm: ["corpus"], here: "beside",
+    reaches: [shared, imported(["ts/scripts/cpuCoverage.ts"])], farm: ["computer-0", "computer-1"], shardVariable: "CPU_COVERAGE_SHARD", here: "beside",
   },
   // The pre-push hook's own hosted checks (smashcraft:ts/scripts/prePush.ts), which the farm runs for a landing so its machine runs none of them.
   { name: "clean room", command: ["bun", "scripts/cleanRoom.ts"], reaches: [pattern(/./, "any changed path")], farm: ["static"] },
   {
     name: "kind tags, parity ledger and type-check ts",
-    command: ["bun", "run", "check"], reaches: [pattern(TYPE_CHECKED, "under ts/ or the toolchain lock")], farm: ["static"],
+    command: ["sh", "-c", "bun run check > build/typecheck.log 2>&1; code=$?; echo $code > build/typecheck.log.code; cat build/typecheck.log; exit $code"],
+    reaches: [pattern(TYPE_CHECKED, "under ts/ or the toolchain lock")], farm: ["static"], outputs: "typecheck",
+  },
+  // Reads the type-check output the check before it saved, so the static group type-checks once.
+  {
+    name: "effect-kit check",
+    command: ["sh", "-c", "log=$PWD/build/typecheck.log && curl -fsS -o \"$RUNNER_TEMP/effect-kit.mjs\" https://raw.githubusercontent.com/tompassarelli/north/main/agent-machinery/scripts/effect-kit.mjs && cd .. && EFFECT_KIT_TYPECHECK_LOG=\"$log\" bun \"$RUNNER_TEMP/effect-kit.mjs\" check"],
+    reaches: [shared, pattern(TYPES, "read by effect-kit")], farm: ["static"], outputs: "typecheck",
   },
   {
     name: "Autoland suite covers the farm suite",
