@@ -1,11 +1,14 @@
 import { appendFileSync, closeSync, cpSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { homedir, hostname } from "node:os";
+import { hostname } from "node:os";
 import { join } from "node:path";
 import { Console, Effect, Fiber, Schema } from "effect";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import { SELECTABLE_CHARACTERS, fighterKey, fighterName, fighterSlug } from "../src/game/roster/kits";
 import { CaptureQueueFailure, Job, type Result, git, queueDirectory, showcaseSlot, writeAtomic } from "./captureQueue";
-import { type RemoteHost, builtMapKey, fetchFolder, manifestAt, remoteHost, runThere, sendFile, shipStoredMap } from "./captureQueueRemote";
+import { reuseStore } from "wisp/scripts/wisp/mapReuse";
+import { builtMapKey } from "./captureQueueRemote";
+import { queueOnLaptop } from "./captureQueueLaptop";
+import { lanState, pairDefaults } from "./captureQueuePair";
 import { fanGroups } from "./captureQueueFan";
 import { peerSpec } from "./captureQueuePeers";
 import { pairAgentStatus } from "./pairAgentStatus";
@@ -27,9 +30,8 @@ const BODY_CROP: readonly number[] = [330, 40, 660, 480];
 const FACING_ARROW = { right: "10,14 34,14 34,6 50,20 34,34 34,26 10,26", left: "50,14 26,14 26,6 10,20 26,34 26,26 50,26" } as const;
 type Facing = keyof typeof FACING_ARROW;
 interface PadRow { readonly fixture: string; readonly facing: Facing }
-const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
 
-interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly checkout: Checkout; readonly remote?: RemoteHost }
+interface Settings { readonly pair: number; readonly desktop: string; readonly capacity: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly checkout: Checkout; readonly remote?: { readonly name: string } }
 interface Group { commit: string; readonly jobs: Job[] }
 
 const logTo = (file: string) => (row: Record<string, unknown>) => Effect.sync(() => {
@@ -217,7 +219,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     yield* log({ step: "lease", group: index, host: leased.remote?.name ?? hostname(), pair: leased.pair, lanes: group.jobs.map(job => job.lane) });
     const captured = performance.now();
     const ran = yield* (leased.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(leased.pair), "--desktop", leased.desktop, "--capacity", leased.capacity, "--clients-file", leased.clientsFile, "--client", leased.client, "--install", leased.install, "--minutes", String(captureMinutes(identity.fixtures.length))], settings.checkout.ts, logFile)
-      : captureThere(leased, leased.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) })).pipe(Effect.result);
+      : captureThere(leased.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) }, leased.pair, leased.client)).pipe(Effect.result);
     yield* log({ step: "capture", group: index, host: leased.remote?.name ?? hostname(), seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
     const checkpoint = join(frames, "checkpoint.json");
@@ -238,29 +240,11 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
   }).pipe(Effect.ensuring(git(settings.checkout.root, ["worktree", "remove", "--force", source], true).pipe(Effect.ignore)));
 });
 
-/** Runs a group's capture batch on the pair's host: its stored map goes into that host's map store under the same key, the batch runs from that host's main checkout and its frames come back to `native-INDEX`. */
-const captureThere = (settings: Settings, host: RemoteHost, group: { readonly batch: string; readonly index: number; readonly directory: string; readonly logFile: string; readonly manifest: string; readonly plan: string; readonly log: ReturnType<typeof logTo>; readonly minutes: number }) => Effect.gen(function*() {
+/** Queues a group's capture batch for the pair's host, which pulls the stored map, plan and manifest from here, runs the batch and sends its frames back to `native-INDEX`; this host waits for that job to end. */
+const captureThere = (host: { readonly name: string }, group: { readonly batch: string; readonly index: number; readonly directory: string; readonly logFile: string; readonly manifest: string; readonly plan: string; readonly log: ReturnType<typeof logTo>; readonly minutes: number }, pair: number, client: string) => Effect.gen(function*() {
   const key = yield* attempt("read the map build key", () => builtMapKey(group.logFile));
   if (key === undefined) return yield* fail(`the map build of group ${group.index} logged no stored map build; see ${group.logFile}`);
-  const there = join(host.home, ".local/state/smashcraft/capture-queue/remote", `${group.batch}-g${group.index}`);
-  const map = yield* shipStoredMap(host, key, group.logFile);
-  yield* group.log({ step: "ship", group: group.index, host: host.name, key, map });
-  const plan = yield* attempt("read the plan", () => JSON.parse(readFileSync(group.plan, "utf8")) as { readonly rows: readonly Record<string, unknown>[] });
-  const remotePlan = `${group.plan.replace(/\.json$/, "")}.${host.name.replaceAll(/[^\w.-]/g, "_")}.json`;
-  yield* attempt("write the remote plan", () => writeAtomic(remotePlan, `${JSON.stringify({ ...plan, rows: plan.rows.map(row => ({ ...row, map, manifest: join(there, "manifest.json") })) })}\n`));
-  const remoteManifest = `${group.manifest.replace(/\.json$/, "")}.${host.name.replaceAll(/[^\w.-]/g, "_")}.json`;
-  yield* attempt("write the remote manifest", () => writeAtomic(remoteManifest, manifestAt(readFileSync(group.manifest, "utf8"), map)));
-  yield* sendFile(host, remoteManifest, join(there, "manifest.json"), group.logFile);
-  yield* sendFile(host, remotePlan, join(there, "plan.json"), group.logFile);
-  const north = join(host.home, "code/north/main/harness/skills");
-  const ran = yield* runThere(host, join(host.home, process.env.SMASHCRAFT_REMOTE_CHECKOUT ?? "code/smashcraft/main", "ts"), ["bun", "scripts/nativeCapture.ts", "batch", "--plan", join(there, "plan.json"), "--out", join(there, "native"), "--pair", String(settings.pair),
-    "--desktop", join(north, "private-desktop-development/scripts/private-desktop.sh"), "--capacity", join(north, "machine-capacity/scripts/machine-capacity.mjs"),
-    "--clients-file", join(host.home, ".local/state/wisp/lan/clients.json"), "--client", settings.client,
-    "--install", join(host.home, `.local/share/wisp/lan/clients/${settings.client}/pfx/drive_c/Program Files (x86)/Warcraft III`), "--minutes", String(group.minutes)], group.logFile).pipe(Effect.result);
-  const fetched = fetchFolder(host, join(there, "native"), join(group.directory, `native-${group.index}`), group.logFile);
-  if (ran._tag === "Success") return yield* fetched;
-  yield* Effect.ignore(fetched);
-  return yield* ran.failure;
+  yield* queueOnLaptop(host.name, { origin: hostname(), originStore: reuseStore(), key, plan: group.plan, manifest: group.manifest, out: join(group.directory, `native-${group.index}`), work: `${group.batch}-g${group.index}`, pair, client, minutes: group.minutes }, group.log);
 });
 
 const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: readonly Job[], ensurePool: Effect.Effect<unknown, CaptureQueueFailure, R>) => Effect.gen(function*() {
@@ -284,15 +268,8 @@ const runBatch = <R>(settings: Settings, hosts: Hosts, maxPairs: number, jobs: r
 const settingsOf = (args: readonly string[], checkout: Checkout): Settings | undefined => {
   const pair = Number(option(args, "--pair"));
   if (!Number.isInteger(pair) || pair < 0) return undefined;
-  const north = join(homedir(), "code/north/main/harness/skills");
-  const client = option(args, "--client") ?? `lan${pair}a`;
-  return {
-    pair, client, checkout,
-    desktop: option(args, "--desktop") ?? join(north, "private-desktop-development/scripts/private-desktop.sh"),
-    capacity: option(args, "--capacity") ?? join(north, "machine-capacity/scripts/machine-capacity.mjs"),
-    clientsFile: option(args, "--clients-file") ?? join(lanState, "clients.json"),
-    install: option(args, "--install") ?? join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`),
-  };
+  const own = pairDefaults(pair, option(args, "--client"));
+  return { pair, client: own.client, checkout, desktop: option(args, "--desktop") ?? own.desktop, capacity: option(args, "--capacity") ?? own.capacity, clientsFile: option(args, "--clients-file") ?? own.clientsFile, install: option(args, "--install") ?? own.install };
 };
 
 type Hosts = "local" | "any";
@@ -323,9 +300,8 @@ const leasePair = (checkout: Checkout, hosts: Hosts, owner: string) => Effect.ac
 
 const groupSettings = (settings: Settings, hosts: Hosts, owner: string) => Effect.gen(function*() {
   const slot = yield* leasePair(settings.checkout, hosts, owner);
-  const client = `lan${slot.pair}a`;
-  const remote = slot.host === hostname() ? undefined : yield* remoteHost(slot.host);
-  return { pair: slot.pair, checkout: settings.checkout, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client, install: join(homedir(), `.local/share/wisp/lan/clients/${client}/pfx/drive_c/Program Files (x86)/Warcraft III`), ...(remote === undefined ? {} : { remote }) } satisfies Settings;
+  const own = pairDefaults(slot.pair);
+  return { pair: slot.pair, checkout: settings.checkout, desktop: settings.desktop, capacity: settings.capacity, clientsFile: settings.clientsFile, client: own.client, install: own.install, ...(slot.host === hostname() ? {} : { remote: { name: slot.host } }) } satisfies Settings;
 });
 
 export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(function*() {
@@ -338,7 +314,7 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   const leased = auto ? yield* leasePair(checkout, hosts, "capture-queue") : undefined;
   const args = leased === undefined ? given : [...given.filter((arg, index) => !(pairs.includes(index) || pairs.includes(index - 1))), "--pair", String(leased.pair)];
   const local = settingsOf(args, checkout);
-  const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: yield* remoteHost(leased.host) };
+  const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: { name: leased.host } };
   const once = args.includes("--once");
   const idleMinutes = Number(option(args, "--idle-minutes") ?? "30");
   if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0 || !Number.isInteger(maxPairs) || maxPairs < 1) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--max-pairs N] [--once] [--idle-minutes N] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });

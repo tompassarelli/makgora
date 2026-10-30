@@ -320,14 +320,16 @@ auto`) it leases the next free pair from the shared pair queue (`bun wisp lan
 lease`, wisp:docs/lan.md#leasing-a-pair) and gives it back when it stops, so
 several services and other native requests land on different pairs. With
 `--hosts any` the lease may hand out a pair of another host (`$WISP_PAIR_REMOTE`,
-whose host name is the ssh destination, such as `tom@10.77.0.2=0,1` for the
-laptop while `laptop status` says available). The service then builds each
-map here as usual, copies its stored build over ssh into that host's
-`~/.cache/wisp/maps` under the same key, runs `nativeCapture.ts batch` there
-from `~/code/smashcraft/main/ts` with that host's own private desktop, clients
-and installs, and copies the frames back before writing the sheets; the batch
-log records a `ship` step with the host and key ([remote
-run](../../ts/scripts/captureQueueRemote.ts)). It takes every pending job and folds
+such as `whiterabbit=0,1` for the laptop while `laptop status` says available). The
+service then builds each map here as usual and queues the batch as a `laptop` job
+on the ledger. The laptop's `north laptop-runner` takes it and runs
+`captureQueuePull.ts` from `~/code/smashcraft/main/ts`: it pulls the stored build
+over its own ssh to this host into `~/.cache/wisp/maps` under the same key, with
+the plan and manifest, runs `nativeCapture.ts batch` on its own private desktop,
+clients and installs, and pushes the frames back to `native-INDEX` here, so the
+laptop needs no inbound ssh. The service waits for the job to end before writing
+the sheets; the batch log records a `queue` step with the host, job and key
+([laptop job](../../ts/scripts/captureQueueLaptop.ts)). It takes every pending job and folds
 the lanes' revisions into as few merged revisions as it can. A lane joins a
 merge only when its own changed files and its fighter's `build-inputs` entries
 are byte-identical to its revision, so the clip is exactly the lane's. Lanes
