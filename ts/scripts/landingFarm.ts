@@ -23,10 +23,10 @@ const RUN_URL = /\/actions\/runs\/(\d+)/;
 const NOT_YET = /HTTP 404/;
 
 /** A landing's verdict from the check jobs alone, since the merge job only summarises them: failed once one fails, passed once all pass. */
-export function checksVerdict(state: RunState): "passed" | "failed" | "pending" {
-  const checks = state.jobs.filter(({ name }) => (GROUPS as readonly string[]).includes(name));
+export function checksVerdict(state: RunState, groups: readonly Group[] = GROUPS): "passed" | "failed" | "pending" {
+  const checks = state.jobs.filter(({ name }) => (groups as readonly string[]).includes(name));
   if (checks.some(({ status, conclusion }) => status === "completed" && !PASSING.has(conclusion))) return "failed";
-  if (checks.length === GROUPS.length && checks.every(({ status, conclusion }) => status === "completed" && PASSING.has(conclusion))) return "passed";
+  if (checks.length === groups.length && checks.every(({ status, conclusion }) => status === "completed" && PASSING.has(conclusion))) return "passed";
   if (state.status === "completed") return state.conclusion === "success" ? "passed" : "failed";
   return "pending";
 }
@@ -66,13 +66,13 @@ const fetchRunState = (repo: string, id: number, token: string) => Effect.tryPro
   })),
 );
 
-const awaitChecks = (repo: string, id: number) => Effect.gen(function*() {
+const awaitChecks = (repo: string, id: number, groups: readonly Group[]) => Effect.gen(function*() {
   const token = yield* run(["gh", "auth", "token"]);
   for (;;) {
     const verdict = checksVerdict(yield* fetchRunState(repo, id, token).pipe(
       // GitHub answers 404 for a just-dispatched run's jobs until it lists them.
       Effect.retry({ while: (failure) => NOT_YET.test(failure.message), schedule: Schedule.spaced(POLL).pipe(Schedule.upTo({ duration: "1 minute" })) }),
-    ));
+    ), groups);
     if (verdict !== "pending") return verdict;
     yield* Effect.sleep(POLL);
   }
@@ -82,10 +82,10 @@ const farmRun: FarmRunner = (head, base, groups, full) => Effect.scoped(Effect.g
   const repo = yield* currentRepo;
   const published = process.env.SAFE_PUSH_LAND_REF ?? "";
   const { ref, scratch } = published === "" ? yield* resolveRef(head, repo) : { ref: yield* run(["git", "rev-parse", `${head}^{commit}`]), scratch: published };
-  const found = yield* dispatchRun(repo, { ref, base, checks: groups.join(","), ...(full ? { full: "1" } : {}), tag: runTag() }, scratch ?? "main");
+  const found = yield* dispatchRun(repo, { ref, base, checks: JSON.stringify(groups), ...(full ? { full: "1" } : {}), tag: runTag() }, scratch ?? "main");
   yield* Console.error(`landing farm: ${found.url}`);
   const started = performance.now();
-  const verdict = yield* awaitChecks(repo, found.databaseId);
+  const verdict = yield* awaitChecks(repo, found.databaseId, groups);
   const seconds = ((performance.now() - started) / 1000).toFixed(0);
   if (verdict === "passed") return yield* Console.error(`landing farm: ${groups.join(", ")} passed on ${ref.slice(0, 12)} (${seconds} s): ${found.url}`);
   const state = yield* waitFor(repo, found.databaseId);

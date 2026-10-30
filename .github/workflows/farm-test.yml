@@ -20,7 +20,7 @@ on:
         description: One-off runner measurement for even shard jobs; normal and retry jobs use hosted runners
         default: ""
       checks:
-        description: Comma-separated check groups to run (safe-push's landing selection); empty runs those the changed paths reach
+        description: JSON array of the check groups to run (safe-push's landing selection), such as ["corpus","static"]; empty runs those the changed paths reach
         default: ""
       full:
         description: Set to 1 to run every check of the selected groups, not only those the changed paths reach (LAND_FULL_SUITE=1)
@@ -122,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: ${{ fromJson(inputs.checks != '' && format('["{0}"]', replace(inputs.checks, ',', '","')) || '["perf","rollback","parity-0","parity-1","parity-2","parity-3","lua","corpus","types","static"]') }}
+        group: ${{ fromJson(inputs.checks != '' && inputs.checks || '["perf","rollback","parity-0","parity-1","parity-2","parity-3","lua","corpus","types","static"]') }}
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -156,7 +156,7 @@ jobs:
           if [ -n "$base" ] && [ "$FULL" != 1 ]; then git diff --name-only "$base" HEAD > "$RUNNER_TEMP/changed"; else echo unknown > "$RUNNER_TEMP/changed"; fi
           sed 's/^/changed: /' "$RUNNER_TEMP/changed"
           if [ -n "$CHECKS" ]; then
-            selected=$(echo "$CHECKS" | tr ',' '\n')
+            selected=$(jq -r '.[]' <<< "$CHECKS")
             echo "selected by the checks input: $CHECKS"
           else
             selected=$(cd ts && bun scripts/landingChecks.ts groups < "$RUNNER_TEMP/changed")
@@ -264,7 +264,7 @@ jobs:
           fallback "$zero" '"the merge step did not finish: see its log"'
           : > problems.txt
           for group in $FARM_GROUPS; do
-            [ -z "$CHECKS" ] || tr ',' '\n' <<< "$CHECKS" | grep -qxF "$group" || continue
+            [ -z "$CHECKS" ] || jq -e --arg group "$group" 'index($group)' <<< "$CHECKS" > /dev/null || continue
             [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
           done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt

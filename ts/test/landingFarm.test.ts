@@ -58,4 +58,10 @@ test("a landing passes once every check job passes, without the merge job, and f
   expect(checksVerdict(state(2, "failure"))).toBe("failed");
   expect(checksVerdict(state(GROUPS.length, "skipped"))).toBe("passed");
   expect(checksVerdict({ status: "completed", conclusion: "cancelled", jobs: [] })).toBe("failed");
+  const named = ["corpus", "static"] as const;
+  const only = (...states: readonly [string, string][]) => ({ status: "in_progress", conclusion: "", jobs: states.map(([name, conclusion]) => ({ name, status: conclusion === "" ? "in_progress" : "completed", conclusion })) });
+  expect(checksVerdict(only(["corpus", "success"], ["static", ""]), named)).toBe("pending");
+  expect(checksVerdict(only(["corpus", "success"], ["static", "success"]), named)).toBe("passed");
+  expect(checksVerdict(only(["corpus", "success"]), named)).toBe("pending");
+  expect(checksVerdict(only(["corpus", "failure"], ["static", ""]), named)).toBe("failed");
 });
