@@ -41,11 +41,14 @@ normals and body box and live in `bun wisp ledger`.
 
 ## The visual rule
 
-**Every special is fire; every normal is arcane.** Normals are drawn with the
-three spheres that orbit him, his stock green Blood Elf orbs (Tom chose these
-again on 2026-10-30 over a violet Void Walker missile); specials are red and
-gold Warcraft fire.
-"On fire" means "hits a banished fighter", so both players can read the
+**Every special is fire, except Banish; every normal is arcane.** Normals are
+drawn with the three spheres that orbit him, his stock green Blood Elf orbs
+(Tom chose these again on 2026-10-30 over a violet Void Walker missile);
+specials are red and gold Warcraft fire. Banish is the one exception: Tom
+asked on 2026-10-30 for it to be a green swirling beam from an outstretched
+hand, matching the Warcraft III Banish icon, so the curse reads as a different
+school from his fire. "On fire" still means "hits a banished fighter", so both
+players can read the
 Banish duel from colour alone, at match size.
 
 ## Gameplan
@@ -55,9 +58,11 @@ Banish duel from colour alone, at match size.
    shields, but every frame he steers he cannot defend himself, a hit on him
    puts it out, and a miss leaves him open for a long time. The opponent
    chooses to outrun it, shield it and pay for it, or rush the rooted caster.
-2. **Draw the rune where they will be.** Flame Strike slides a bold ground
-   rune outward while he holds and casts on release; a tap casts at a short
-   default distance. The opponent has about 30 to 40 frames to read it. The
+2. **Fly the orb where they will be.** Flame Strike sends a fire orb forward
+   that starts slow and gathers speed while he holds, and the stick climbs or
+   sinks it. Release, touching a fighter or shield, the floor, or the 50-frame
+   timeout erupts the pillar where the orb is; a tap erupts it at his hand.
+   The opponent reads the orb in flight. The
    burst carries the knockback and heavy shield damage; the lingering burn
    is flinchless chip that zones without comboing. One pillar at a time;
    recasting replaces it.
@@ -79,9 +84,9 @@ dash in early and beat him before the fire arrives.
 
 | Input | What it does and the decision | Counterplay | Prior art |
 |---|---|---|---|
-| Neutral: **Pyroblast** | About 18 frames of windup gathering fire in his hands, then one slow heavy fireball he steers with the stick for up to 60 frames, turning about 6 degrees a frame (PK Thunder's sharp turns), while he stands rooted on the ground or sinks slowly in the air. Special or shield lets it go: it flies straight about 14 frames and fizzles. 17%, launches at 40 degrees and kills off the side at high percent; 17 shield damage. One at a time, reflectable. Connecting leaves 18 frames of recovery; a miss (timed out, let go, reflected) leaves 40. | Outrun it, rush and hit Kael while he steers (that puts it out), or shield it and punish the long recovery; reflect it back at him. | [Ness's PK Thunder][pkthunder] (a steered projectile with a rooted caster) |
-| Side: **Flame Strike** | Hold to slide the rune outward, release to cast; tap for a short default cast. About 30 to 40 frames from rune to burst, then the pillar stands 0.6 s (36 frames: a 6-frame burst, a 30-frame burn) and its column plays out inside that window. The burst launches and crushes shields; the burn is flinchless chip. One pillar, a recast replaces it, no cooldown. Castable in the air and offstage: his edgeguard. | Leave the rune, roll past it, or punish the cast from outside its line; a shield survives the burst but invites the grab. | [Ness's PK Flash][pkflash] (a placed delayed burst); [Robin's Arcfire][arcfire] (a lingering pillar that zones) |
-| Down: **Banish** | A curse that turns the victim ethereal for 60 frames (the duration sweep kept 60: over 12,240 matches a duration Kael won 49.0% at 45 frames, 49.7% at 60 and 50.2% at 90, a spread inside the field's noise, so the middle value stays). They lose normals, grabs and shield, but still move, jump, air dodge and cast their specials. Only spells reach them, at +30%. | Space outside it or shield it; banished, keep away and fight with your specials; his spheres cannot touch you. | [Mewtwo's Disable][disable] (a status that removes options) |
+| Neutral: **Pyroblast** | About 18 frames of windup gathering fire in his hands, then one slow heavy fireball he steers with the stick for up to 80 frames (it was 60), turning about 6 degrees a frame (PK Thunder's sharp turns), while he stands rooted on the ground or sinks slowly in the air. Steered back into him after 16 frames of flight, it launches him along its heading for 36 frames at 11 units a frame, intangible for the first 18, with no damage, and leaves him helpless if he ends in the air (PK Thunder 2's self-hit). Special or shield lets it go: it flies straight about 14 frames and fizzles. 17%, launches at 40 degrees and kills off the side at high percent; 17 shield damage. One at a time, reflectable. Connecting leaves 18 frames of recovery; a miss (timed out, let go, reflected) leaves 40. | Outrun it, rush and hit Kael while he steers (that puts it out), or shield it and punish the long recovery; reflect it back at him. | [Ness's PK Thunder][pkthunder] (a steered projectile with a rooted caster) |
+| Side: **Flame Strike** | Hold to fly a fire orb: it leaves his hand on frame 6 (the rune left on frame 8) at 5 a frame, gains 0.375 a frame up to 12 (the rune slid 8), and the stick climbs or sinks it up to 5 a frame. Release, touching a fighter or shield, the floor, or 50 frames in the air erupts the pillar at the orb. The pillar stands 0.6 s (36 frames: a 6-frame burst, a 30-frame burn) and its column plays out inside that window. The burst launches and crushes shields; the burn is flinchless chip. One pillar, a recast replaces it, no cooldown. Castable in the air and offstage: his edgeguard. | Dodge or shield the orb, roll past the pillar, or punish the cast from outside its line; a shield survives the burst but invites the grab. | [Ness's PK Flash][pkflash] (a placed delayed burst); [Robin's Arcfire][arcfire] (a lingering pillar that zones) |
+| Down: **Banish** | He sticks out one hand and, after an 18-frame delay, a green beam shoots straight ahead from it, three of his body lengths long and live for 6 frames; it is a hit region along the beam, not a projectile, and deals no damage. A fighter it touches turns ethereal for 60 frames (the duration sweep kept 60: over 12,240 matches a duration Kael won 49.0% at 45 frames, 49.7% at 60 and 50.2% at 90, a spread inside the field's noise, so the middle value stays). They lose normals, grabs and shield, but still move, jump, air dodge and cast their specials. Only spells reach them, at +30%. | Space outside it or shield it; banished, keep away and fight with your specials; his spheres cannot touch you. | [Mewtwo's Disable][disable] (a status that removes options) |
 | Up: **Phoenix** | He becomes the phoenix and steers with momentum, not snapping. The flames burn down as the visible timer; when they are gone he falls helpless. Hit mid-flight, he becomes an egg that falls fast and helpless and hatches on landing. The phoenix body has a weak contact hitbox. | Hit the flight to make the egg, then cover where it lands; the burning-down flames show how far he can still go. | [Fox's Fire Fox][firefox] (a committed fire recovery), [Peach's Parasol][parasol] (steerable float) |
 | Grab: **Siphon Mana** | A long, slow tether grab, punishable on whiff, with an ordinary pummel; no heal, no meter drain. His answer to a shield held against Flame Strike. | Read it and jump or spot dodge; punish the whiff. | [Samus's grapple][grapple] (long tether grab with whiff lag) |
 
@@ -145,6 +150,26 @@ the normals and body box and checked by `bun wisp ledger --check` and
 | Forward / up throw | Spacing and reset; they set up the rune rather than kill. |
 
 ## Cuts and why
+
+- **Pyroblast and Flame Strike redesign** (Tom's playtest, 2026-10-30).
+  Pyroblast now steers for 80 frames instead of 60, a third longer, and can
+  strike Kael himself like Ness's PK Thunder 2; Flame Strike's ground rune is
+  replaced by a steerable fire orb like Zelda's Din's Fire, with a startup 25%
+  shorter (frame 6 for 8) and an orb faster than the rune. The numbers
+  SmashWiki gives for the Melee originals are durations, not speeds: PK Thunder
+  runs frames 20 to 138; PK Thunder 2's self-hit lasts frames 1 to 36 (a clean
+  hit 1 to 10), grants intangibility in the first half, sends Ness opposite
+  the side he was hit on, and ends helpless in the air ([PK Thunder][pkthunder],
+  [Ness (SSBM)][nessmelee]); Din's Fire "can be directed up or down with the
+  control stick", explodes "after a time or when the button is released" and
+  "charges as it travels" ([Din's Fire][dinsfire]). It publishes no speed,
+  acceleration or damage for the self-hit, so the speeds here (11 a frame for
+  36 frames, about 400 units, short of Phoenix's 600) are original values,
+  and the self-hit deals Kael nothing because PK Thunder 2 deals Ness nothing.
+- **Banish became a beam** (Tom, 2026-10-30): the close curse capsule on
+  frames 12 to 14 of 36 is replaced by a hand-out cast, an 18-frame delay and
+  a 6-frame beam three body lengths long, with 24 frames of recovery after a
+  whiff. The statuses, 60 frames and 240-frame immunity are unchanged.
 
 - **The World of Warcraft and Heroes of the Storm spells** (a charged fire
   blast, a possession and the raid-boss lifting ring) are cut; Tom kept the
@@ -215,6 +240,8 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 [mw]: https://www.ssbwiki.com/Mewtwo_(SSBU)
 [pkflash]: https://www.ssbwiki.com/PK_Flash
 [pkthunder]: https://www.ssbwiki.com/PK_Thunder
+[nessmelee]: https://www.ssbwiki.com/Ness_(SSBM)
+[dinsfire]: https://www.ssbwiki.com/Din%27s_Fire
 [arcfire]: https://www.ssbwiki.com/Arcfire
 [disable]: https://www.ssbwiki.com/Disable
 [firefox]: https://www.ssbwiki.com/Fire_Fox

@@ -14,6 +14,7 @@ import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { squareRoot } from "../warcraftMath";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, projectileAnchor } from "./runningMove";
 import { strike } from "./heroContact";
+import { enterFollowUp } from "./heroForms";
 
 type SpecialRide = NonNullable<SpecialMotion["ride"]>;
 const DIAGONAL = 0.7071067690849304;
@@ -342,6 +343,24 @@ function rootCaster(f: Fighter, steer: Readonly<SpecialSteeredShot>): void {
   if (!motion.grounded) motion.vz = -steer.fallSpeed;
 }
 
+function shotStrikesCaster(f: Readonly<Fighter>, ball: Readonly<Projectile>, steer: Readonly<SpecialSteeredShot>): boolean {
+  const self = steer.selfHit;
+  const spec = ball.spec;
+  if (self === undefined || spec === undefined || f32(spec.life - ball.life) < self.armedAfter) return false;
+  const dx = f32(ball.x - f.motion.x);
+  const dz = f32(ball.z - f32(f.motion.z + self.bodyZ));
+  return f32(f32(dx * dx) + f32(dz * dz)) <= f32(self.radius * self.radius);
+}
+
+function launchCaster(f: Fighter, ball: Projectile, launch: Readonly<AuthoredSpecial>): void {
+  const { special } = f;
+  special.aimX = ball.velocityX;
+  special.aimZ = ball.velocityZ;
+  ball.life = 0;
+  special.form += FOLLOW_UP_FORM;
+  enterFollowUp(f, launch);
+}
+
 export function holdSteeredShot(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Controls> | undefined): boolean {
   const steer = move.steersShot;
   const shot = move.projectiles?.[0];
@@ -351,6 +370,11 @@ export function holdSteeredShot(f: Fighter, move: Readonly<AuthoredSpecial>, inp
     index++;
     if (projectile.life <= 0 || projectile.spec !== shot) continue;
     const ball = mutableProjectile(f, index);
+    const launch = move.followUps?.[0]?.special;
+    if (launch !== undefined && shotStrikesCaster(f, ball, steer)) {
+      launchCaster(f, ball, launch);
+      return true;
+    }
     if (ball.life > steer.coast && (input?.specialPressed === true || input?.shieldPressed === true)) ball.life = steer.coast;
     else if (ball.life > steer.coast && input !== undefined) steerShot(ball, steer, input, f.facing);
     rootCaster(f, steer);

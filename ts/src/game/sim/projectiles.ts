@@ -478,7 +478,15 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       }
       if (nearest === undefined && stage !== undefined && (projectile.kind === ProjectileKind.hero)
         && projectileMeetsStage(stage, matchFrame, fromX, fromZ, projectile.x, projectile.z)) {
-        projectile.life = 0;
+        const burst = projectile.spec?.burstsOnStage === true ? projectile.spec.burstInto : undefined;
+        projectile.life = burst?.life ?? 0;
+        if (burst !== undefined) {
+          projectile.spec = burst;
+          projectile.x = fromX;
+          projectile.z = fromZ;
+          projectile.velocityX = 0.0;
+          projectile.velocityZ = 0.0;
+        }
         continue;
       }
       const pool = projectile.kind === ProjectileKind.hero ? projectile.spec?.pool : undefined;

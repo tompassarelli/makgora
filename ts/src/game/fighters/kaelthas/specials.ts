@@ -1,14 +1,15 @@
 import { f32 } from "wisp/src/sim/f32";
-import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
+import { Character, HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
+import { hurtCapsule } from "../../sim/geometry/contactGeometry";
 import { heroRegion, type StrikeCapsule } from "../../sim/heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, type SpecialSteeredShot } from "../../sim/specials/schema";
+import { frames, FollowUpInput, type AuthoredSpecial, type FighterSpecials, type SpecialHeldOrb, type SpecialProjectile, type SpecialSteeredShot } from "../../sim/specials/schema";
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { kaelCastBody, kaelHit } from "./moves";
 
 const AIR_LANDING_LAG = 20;
 
 export const PYROBLAST_STARTUP_FRAMES = 18;
-export const PYROBLAST_STEER_FRAMES = 60;
+export const PYROBLAST_STEER_FRAMES = 80;
 export const PYROBLAST_COAST_FRAMES = 14;
 export const PYROBLAST_MISS_RECOVERY = 40;
 export const PYROBLAST_HIT_RECOVERY = 18;
@@ -22,10 +23,19 @@ export const PYROBLAST: SpecialProjectile = {
 export const PYROBLAST_STEER: SpecialSteeredShot = {
   frame: PYROBLAST_STARTUP_FRAMES, turnCos: 0.9945219159126282, turnSin: 0.10452846437692642,
   coast: PYROBLAST_COAST_FRAMES, fallSpeed: 1.5, hitRecovery: PYROBLAST_HIT_RECOVERY,
+  selfHit: { armedAfter: 16, radius: 44.0, bodyZ: 40.0 },
+};
+export const PYROBLAST_SELF_LAUNCH_FRAMES = 36;
+export const PYROBLAST_SELF_LAUNCH_SPEED = 11.0;
+export const PYROBLAST_SELF_LAUNCH: AuthoredSpecial = {
+  endFrame: PYROBLAST_SELF_LAUNCH_FRAMES, helpless: true, intangible: frames(1, PYROBLAST_SELF_LAUNCH_FRAMES / 2),
+  hurt: kaelCastBody(1, PYROBLAST_SELF_LAUNCH_FRAMES, 44.0, 64.0),
+  motion: [{ ...frames(1, PYROBLAST_SELF_LAUNCH_FRAMES), velocityX: 0.0, velocityZ: 0.0, aimedSpeed: PYROBLAST_SELF_LAUNCH_SPEED, freeAim: true }],
 };
 const pyroblast: AuthoredSpecial = {
   endFrame: PYROBLAST_STARTUP_FRAMES + PYROBLAST_MISS_RECOVERY, hurt: kaelCastBody(6, PYROBLAST_STARTUP_FRAMES + 8, 44.0, 64.0),
   projectiles: [PYROBLAST], steersShot: PYROBLAST_STEER,
+  followUps: [{ window: frames(0, 0), special: PYROBLAST_SELF_LAUNCH, input: FollowUpInput.guard }],
 };
 
 // FlameStrike1.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the pillar plays that stretch across its burst and burn frames.
@@ -46,22 +56,32 @@ export const FLAME_STRIKE_BURST: SpecialProjectile = {
   spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
   life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(14.0, 80, 90.30785369873047, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
 };
-export const FLAME_STRIKE_RUNE: SpecialProjectile = {
-  model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx",
-  spawnFrame: 8, offsetX: 80.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0, dropsToFloor: true,
-  life: 34, activeFrom: 35, radius: 45.0, effect: kaelHit(0.0, 80), expiresInto: FLAME_STRIKE_BURST, reflectable: false, limit: 1, cancelOnInterrupt: true,
+export const FLAME_STRIKE_ORB_FRAMES = 50;
+export const FLAME_STRIKE_ORB: SpecialProjectile = {
+  model: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx",
+  spawnFrame: 6, offsetX: 52.0, offsetZ: 60.0, velocityX: 5.0, velocityZ: 0.0,
+  life: FLAME_STRIKE_ORB_FRAMES, radius: 30.0, effect: kaelHit(0.0, 80), burstInto: FLAME_STRIKE_BURST, burstsOnStage: true,
+  reflectable: false, limit: 1, steered: true,
 };
-export const FLAME_STRIKE_AIM = { frame: FLAME_STRIKE_RUNE.spawnFrame, reach: 320.0, speed: 8.0 } as const;
+export const FLAME_STRIKE_STEER: SpecialHeldOrb = { frame: FLAME_STRIKE_ORB.spawnFrame, acceleration: 0.375, maxSpeed: 12.0, climbSpeed: 5.0, erupts: FLAME_STRIKE_BURST };
 const flameStrike = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 30, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_RUNE], aim: FLAME_STRIKE_AIM, replacesLive: true,
+  endFrame: 30, landingLag, hurt: kaelCastBody(4, 24, 40.0, 66.0), projectiles: [FLAME_STRIKE_ORB], heldOrb: FLAME_STRIKE_STEER, replacesLive: true,
 });
 
 export const BANISH_FRAMES = 60;
 export const BANISH: AppliedStatus = { kind: HeroStatusKind.banish, frames: BANISH_FRAMES, group: HeroStatusGroup.silence, immunityFrames: 240 };
-const CURSE: StrikeCapsule = { x1: 25.0, z1: 62.0, x2: 110.0, z2: 62.0, radius: 20.0 };
+export const BANISH_DELAY_FRAMES = 18;
+export const BANISH_BEAM_FRAMES = 6;
+export const BANISH_WHIFF_RECOVERY = 24;
+const BODY = hurtCapsule(Character.kaelthas);
+export const BANISH_BODY_LENGTH = f32(BODY.z2 - BODY.z1);
+export const BANISH_BEAM_REACH = f32(3.0 * BANISH_BODY_LENGTH);
+const BEAM_HAND_X = 30.0;
+export const BANISH_BEAM: StrikeCapsule = { x1: BEAM_HAND_X, z1: 62.0, x2: f32(BEAM_HAND_X + BANISH_BEAM_REACH), z2: 62.0, radius: 12.0 };
+const BEAM_LAST_FRAME = BANISH_DELAY_FRAMES + BANISH_BEAM_FRAMES - 1;
 const banish = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 36, landingLag, hurt: kaelCastBody(8, 22, 46.0, 62.0),
-  regions: [heroRegion(12, 14, CURSE, kaelHit(3.254040002822876, 35, 0.0, 30.0))], strikeStatus: BANISH,
+  endFrame: BEAM_LAST_FRAME + BANISH_WHIFF_RECOVERY, landingLag, hurt: kaelCastBody(8, BEAM_LAST_FRAME, 46.0, 62.0),
+  regions: [heroRegion(BANISH_DELAY_FRAMES, BEAM_LAST_FRAME, BANISH_BEAM, kaelHit(0.0, 35, 0.0, 30.0))], strikeStatus: BANISH,
 });
 
 export const PHOENIX_STARTUP_FRAMES = 12;
@@ -84,12 +104,12 @@ const phoenix: AuthoredSpecial = {
 };
 
 export const KAELTHAS_SPECIALS: FighterSpecials = {
-  neutral: { name: "Pyroblast", description: "A slow, heavy fireball he steers with the stick while he stands rooted; special or shield lets it go. It hits hard and cracks shields, but a miss leaves him open. One at a time.",
+  neutral: { name: "Pyroblast", description: "A slow, heavy fireball he steers with the stick for longer than most while he stands rooted; special or shield lets it go. Steered back into him it launches him along its flight. It hits hard and cracks shields, but a miss leaves him open. One at a time.",
     ground: pyroblast },
-  side: { name: "Flame Strike", description: "Hold to slide a rune outward, release to call a pillar of fire onto it; the pillar lingers and burns. Over open air it stands at Kael's height. One at a time.",
+  side: { name: "Flame Strike", description: "Hold to send a fire orb forward that gathers speed and climbs or sinks with the stick; release, touch or timeout erupts the pillar of fire where it is, and the pillar lingers and burns. One at a time.",
     ground: flameStrike(undefined), air: flameStrike(AIR_LANDING_LAG) },
   up: { name: "Phoenix", description: "Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing.",
     ground: phoenix },
-  down: { name: "Banish", description: "A close curse: the victim turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
+  down: { name: "Banish", description: "A green beam from his outstretched hand: whoever it touches turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell.",
     ground: banish(undefined), air: banish(18) },
 };

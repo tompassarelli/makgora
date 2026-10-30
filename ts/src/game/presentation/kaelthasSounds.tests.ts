@@ -5,7 +5,7 @@ import type { Controls, Roster } from "../sim/roster";
 import { attackStartupFrames } from "../sim/moves";
 import { duelPair, stepDuel } from "../sim/testDuel";
 import { controls, testBeginAttacks } from "../sim/testWorld";
-import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURST, FLAME_STRIKE_RUNE } from "../fighters/kaelthas/specials";
+import { FLAME_STRIKE_BURST, FLAME_STRIKE_STEER } from "../fighters/kaelthas/specials";
 import { KAELTHAS_MOVES } from "../fighters/kaelthas/moves";
 import { type ImpactEvents, captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "./impactEvents";
 import { presentFighterSounds } from "./hitPresentation";
@@ -47,22 +47,22 @@ function step(run: SoundReplay, input: Readonly<Controls>): { readonly own: stri
 
 const sounds = (heard: readonly string[], label: string): boolean => heard.some((sound) => soundFiles(label).includes(sound));
 
-test("Flame Strike's rune sounds once when the held cast is released, never on press, and the burst sounds Flame Strike on the foe it strikes [k1 scenario]", () => {
+test("Flame Strike's cast sounds once when the held cast is released, never on press, and the burst sounds Flame Strike on the foe it strikes [k1 scenario]", () => {
   assertTrue(soundFiles("FlameStrikeTarget").length > 0 && soundFiles("FlameStrike").length > 0);
-  const run = replay(FLAME_STRIKE_RUNE.offsetX + HELD_FRAMES * FLAME_STRIKE_AIM.speed);
+  const run = replay(-300.0);
   const cast: number[] = [];
-  let release = -1, burstHeard = false, burstFrame = -1;
+  let release = -1, burstHeard = false;
   for (let frame = 0; frame < 120 && !burstHeard; frame++) {
-    const input = frame === 0 ? press : frame <= FLAME_STRIKE_AIM.frame + HELD_FRAMES ? hold : idle;
+    const input = frame === 0 ? press : frame <= FLAME_STRIKE_STEER.frame + HELD_FRAMES ? hold : idle;
+    if (frame === FLAME_STRIKE_STEER.frame + HELD_FRAMES + 1) run.target.motion.x = run.kael.projectiles.find((projectile) => projectile.life > 0)?.x ?? 0.0;
     const heard = step(run, input);
-    if (release < 0 && run.kael.special.frame > FLAME_STRIKE_AIM.frame) release = run.frame;
+    if (release < 0 && run.kael.special.frame > FLAME_STRIKE_STEER.frame) release = run.frame;
     if (sounds(heard.own, "FlameStrikeTarget")) cast.push(run.frame);
-    if (burstFrame < 0 && run.kael.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === FLAME_STRIKE_BURST)) burstFrame = run.frame;
     burstHeard = sounds(heard.struck, "FlameStrike");
   }
-  assertTrue(release > FLAME_STRIKE_AIM.frame + HELD_FRAMES);
+  assertTrue(release > FLAME_STRIKE_STEER.frame + HELD_FRAMES);
   assertEquals(cast.join(), `${release}`, "the cast sounds on the release frame alone");
-  assertTrue(burstFrame > 0 && burstHeard && run.frame >= burstFrame);
+  assertTrue(burstHeard && run.frame >= release);
 });
 
 test("Siphon Mana sounds once, on the frame its tether goes out [k1 scenario]", () => {
@@ -71,18 +71,4 @@ test("Siphon Mana sounds once, on the frame its tether goes out [k1 scenario]", 
   const heard: number[] = [];
   for (let frame = 0; frame < 60; frame++) if (sounds(step(run, idle).own, "SiphonManaCaster")) heard.push(run.kael.attack.frame);
   assertEquals(heard.join(), `${attackStartupFrames(AttackStyle.grab, KAELTHAS_MOVES)}`);
-});
-
-test("Flame Strike's wind-up sounds once, 15 frames before the pillar bursts, even when the pillar strikes nobody [k1 scenario]", () => {
-  assertTrue(soundFiles("RainOfFireWave").length > 0);
-  const run = replay(900.0);
-  const windUp: number[] = [];
-  let burstFrame = -1;
-  for (let frame = 0; frame < 120; frame++) {
-    const input = frame === 0 ? press : frame <= FLAME_STRIKE_AIM.frame + HELD_FRAMES ? hold : idle;
-    if (sounds(step(run, input).own, "RainOfFireWave")) windUp.push(run.frame);
-    if (burstFrame < 0 && run.kael.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === FLAME_STRIKE_BURST)) burstFrame = run.frame;
-  }
-  assertTrue(burstFrame > 0 && run.target.status.damage === 0.0);
-  assertEquals(windUp.join(), `${burstFrame - 15}`);
 });

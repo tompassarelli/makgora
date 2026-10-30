@@ -414,7 +414,7 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
   const { special } = fighter;
   const slot = specialSlot(special.action);
   const started = special.action !== events.previousSpecialAction || special.frame < events.previousSpecialFrame || special.form !== events.previousSpecialForm;
-  const aim = slot >= 0 ? runningHeroSpecial(fighter)?.aim : undefined;
+  const aim = slot >= 0 ? runningHeroSpecial(fighter)?.heldOrb : undefined;
   if (present && slot >= 0 && (aim === undefined ? started : special.frame === aim.frame + 1 && (started || special.frame !== events.previousSpecialFrame))) {
     events.perform = specialMove(slot);
     events.performSerial = attack.serial + jump.serial + visuals.hit;

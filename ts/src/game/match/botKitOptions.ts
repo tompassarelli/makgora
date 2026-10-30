@@ -8,7 +8,7 @@ import { canAttack } from "../sim/conditions";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { aimedProjectile, steeredShot } from "../sim/specials/heroProjectiles";
+import { heldOrbProjectile, steeredShot } from "../sim/specials/heroProjectiles";
 import { companionReady, specialCooldownReady } from "../sim/specials/engine";
 import { isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/runningMove";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
@@ -321,9 +321,16 @@ function aimDive(input: Controls, aimX: number, aimZ: number): void {
   input.verticalDirection = aimZ;
 }
 
+const ORB_RELEASE_REACH = 40.0;
+
 export function holdAimAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): void {
-  const rune = aimedProjectile(f);
-  if (rune !== undefined) input.specialHeld = target !== undefined && f32(f32(target.motion.x - rune.x) * f.facing) > 0.0;
+  const orb = heldOrbProjectile(f);
+  if (orb === undefined) return;
+  const ahead = target === undefined ? 0.0 : f32(f32(target.motion.x - orb.x) * f.facing);
+  input.specialHeld = ahead > ORB_RELEASE_REACH;
+  input.diStickValid = false;
+  const dz = target === undefined ? 0.0 : f32(f32(target.motion.z + SHOT_AIM_HEIGHT) - orb.z);
+  input.verticalDirection = Math.abs(dz) <= SHOT_AIM_DEAD ? 0 : dz < 0 ? -1 : 1;
 }
 
 export function steerShotAtFoe(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, input: Controls): boolean {

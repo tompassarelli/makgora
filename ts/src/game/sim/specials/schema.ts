@@ -7,6 +7,8 @@ import type { HurtPose } from "../hurtboxes";
 import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volleys";
 import type { CastWindows, FrameWindow, SpecialChannel } from "./castWindows";
 import type { SpecialBeam } from "./specialBeam";
+import type { SpecialSteer, SpecialSteeredShot } from "./shotSteering";
+export type { SpecialSelfHit, SpecialSteer, SpecialSteeredShot } from "./shotSteering";
 export type { FrameWindow } from "./castWindows";
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
@@ -58,21 +60,13 @@ export interface SpecialMotion extends FrameWindow {
   readonly ride?: { readonly reach: number; readonly offset: number; readonly catchUp: number; readonly aloneVelocityZ: number } | undefined;
 }
 
-export interface SpecialSteer {
-  readonly launchSpeed: number;
-  readonly speed: number;
-  readonly acceleration: number;
-  readonly turnCos: number;
-  readonly turnSin: number;
-}
-
-export interface SpecialSteeredShot {
+/** The move's first projectile flies on while the special button is held: it gains `acceleration` a frame up to `maxSpeed`, the stick's vertical sets its climb up to `climbSpeed`, and on release or at the end of its life it becomes `erupts` where it is. */
+export interface SpecialHeldOrb {
   readonly frame: number;
-  readonly turnCos: number;
-  readonly turnSin: number;
-  readonly coast: number;
-  readonly fallSpeed: number;
-  readonly hitRecovery: number;
+  readonly acceleration: number;
+  readonly maxSpeed: number;
+  readonly climbSpeed: number;
+  readonly erupts: SpecialProjectile;
 }
 
 export interface SpecialEgg {
@@ -169,6 +163,8 @@ export interface SpecialProjectile {
   readonly burstInto?: SpecialProjectile | undefined;
   readonly burn?: { readonly every: number } | undefined;
   readonly steered?: true | undefined;
+  /** Where the stage stops it, it becomes its `burstInto` at its last free spot. */
+  readonly burstsOnStage?: true | undefined;
   readonly fan?: readonly ProjectileVelocity[] | undefined;
   readonly bounce?: ProjectileBounce | undefined;
   /** A body it reaches, unshielded and unreflected, is caught and reeled in over `reelFrames` into its owner's grab hold. */
@@ -296,7 +292,7 @@ export interface AuthoredSpecial extends CastWindows {
 
   readonly cooldownFrames?: number | undefined;
 
-  readonly aim?: { readonly frame: number; readonly reach: number; readonly speed: number } | undefined;
+  readonly heldOrb?: SpecialHeldOrb | undefined;
 
   readonly steersShot?: SpecialSteeredShot | undefined;
 

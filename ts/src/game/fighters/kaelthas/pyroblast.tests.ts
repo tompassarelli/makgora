@@ -13,9 +13,11 @@ import { applyAttackHit } from "../../sim/hits";
 import { stageBounds } from "../../sim/stageBounds";
 import { type Controls, copyControls, fighterAt } from "../../sim/roster";
 import { controls } from "../../sim/testWorld";
+import { squareRoot } from "../../sim/warcraftMath";
 import { kaelHit } from "./moves";
-import { PYROBLAST, PYROBLAST_COAST_FRAMES, PYROBLAST_HIT_RECOVERY, PYROBLAST_MISS_RECOVERY, PYROBLAST_SPEED, PYROBLAST_STARTUP_FRAMES, PYROBLAST_STEER, PYROBLAST_STEER_FRAMES } from "./specials";
+import { PYROBLAST, PYROBLAST_COAST_FRAMES, PYROBLAST_HIT_RECOVERY, PYROBLAST_MISS_RECOVERY, PYROBLAST_SELF_LAUNCH_FRAMES, PYROBLAST_SELF_LAUNCH_SPEED, PYROBLAST_SPEED, PYROBLAST_STARTUP_FRAMES, PYROBLAST_STEER, PYROBLAST_STEER_FRAMES } from "./specials";
 
+const lengthOf = (x: number, z: number): number => squareRoot(f32(f32(x * x) + f32(z * z)));
 const KAEL_X = -400.0;
 const FAR_FOE_X = 900.0;
 const TURN_COS = f32(0.994);
@@ -290,4 +292,86 @@ function sideKo(percent: number): boolean {
 test("Pyroblast: from centre stage it kills a Warden off the side at high percent but not at middling percent [k3 measure docs/design/kaelthas.md]", () => {
   assertFalse(sideKo(70));
   assertTrue(sideKo(120));
+});
+
+test("Pyroblast: the steer window is 80 frames, a third longer than the 60 it had, and PK Thunder's 118-frame steer (frames 20-138) stays the longer [k3 measure docs/design/kaelthas.md]", () => {
+  assertEquals(PYROBLAST_STEER_FRAMES, 80);
+  assertEquals(PYROBLAST.life, PYROBLAST_STEER_FRAMES + PYROBLAST_COAST_FRAMES);
+  assertLessThan(PYROBLAST_STEER_FRAMES, 138 - 20);
+});
+
+interface SelfHit {
+  readonly b: Bout;
+  readonly headingX: number;
+  readonly headingZ: number;
+}
+
+function steerBackIntoKael(air: boolean): SelfHit {
+  const b = bout();
+  if (air) {
+    b.kael.motion.grounded = false;
+    b.kael.motion.surface = undefined;
+    b.kael.motion.z = 600.0;
+  }
+  castAndSpawn(b);
+  let headingX = 0.0;
+  let headingZ = 0.0;
+  for (let frame = 0; frame < PYROBLAST_STEER_FRAMES && b.kael.special.form === 0; frame++) {
+    const shot = ball(b.kael);
+    if (shot === undefined) break;
+    headingX = shot.velocityX;
+    headingZ = shot.velocityZ;
+    const wantX = frame < 20 ? 0.0 : f32(b.kael.motion.x - shot.x);
+    const wantZ = frame < 20 ? 0.0 : f32(f32(b.kael.motion.z + 40.0) - shot.z);
+    step(b, stick(wantX < -20.0 ? -1 : wantX > 20.0 ? 1 : 0, wantZ < -20.0 ? -1 : wantZ > 20.0 ? 1 : 0));
+  }
+  return { b, headingX, headingZ };
+}
+
+function launchesKaelAlongTheFlight(): void {
+  const { b, headingX, headingZ } = steerBackIntoKael(true);
+  assertEquals(b.kael.special.form, 6, "the self-hit is the move's follow-up");
+  assertEquals(ball(b.kael), undefined, "the ball is spent on him");
+  assertEquals(b.kael.status.damage, 0.0, "PK Thunder 2 deals Ness no damage, and Pyroblast deals Kael none");
+  const speed = lengthOf(headingX, headingZ);
+  const start = { x: b.kael.motion.x, z: b.kael.motion.z };
+  for (let frame = 0; frame < PYROBLAST_SELF_LAUNCH_FRAMES - 4; frame++) step(b);
+  const flown = { x: f32(b.kael.motion.x - start.x), z: f32(b.kael.motion.z - start.z) };
+  assertGreaterThan(lengthOf(flown.x, flown.z), f32(0.8) * PYROBLAST_SELF_LAUNCH_SPEED * (PYROBLAST_SELF_LAUNCH_FRAMES - 4));
+  assertGreaterThan(f32(f32(flown.x * headingX) + f32(flown.z * headingZ)) / (lengthOf(flown.x, flown.z) * speed), f32(0.95));
+  assertEquals(b.kael.status.damage, 0.0);
+  for (let frame = 0; frame < 12; frame++) step(b);
+  assertEquals(b.kael.special.action, SpecialAction.none);
+  assertTrue(b.kael.special.fall);
+}
+
+function replaysTheLaunchAfterRollback(): void {
+  const { b } = steerBackIntoKael(true);
+  for (let frame = 0; frame < 6; frame++) step(b);
+  const saved = createReplaySnapshot();
+  copyReplayState(saved, b.state);
+  const savedTick = b.tick;
+  for (let frame = 0; frame < 30; frame++) step(b, stick(1, 1));
+  const expected = createReplaySnapshot();
+  copyReplayState(expected, b.state);
+  for (let frame = 0; frame < 9; frame++) step(b, stick(-1, -1));
+  copyReplayState(b.state, saved);
+  b.tick = savedTick;
+  for (let frame = 0; frame < 30; frame++) step(b, stick(1, 1));
+  const mask = b.state.world.mask;
+  assertEquals(firstFighterDifference(fighterAt(expected.world, 0), b.kael, mask, mask), undefined);
+}
+
+function waitsBeforeStrikingTheCaster(): void {
+  const b = bout();
+  castAndSpawn(b);
+  for (let frame = 0; frame < 10; frame++) step(b);
+  assertEquals(b.kael.special.form, 0);
+  assertTrue(ball(b.kael) !== undefined);
+}
+
+test("Pyroblast: steered back into Kael it launches him along its flight without damage, helpless in the air, replays exactly after a rollback, and cannot strike him before 16 frames of flight [k1 scenario]", () => {
+  launchesKaelAlongTheFlight();
+  replaysTheLaunchAfterRollback();
+  waitsBeforeStrikingTheCaster();
 });

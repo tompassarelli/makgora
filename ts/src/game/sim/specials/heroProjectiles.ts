@@ -188,22 +188,23 @@ export function endLiveCasts(f: Fighter, kit: Readonly<SpecialKit>): void {
   }
 }
 
-export function holdAim(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Controls> | undefined, stage: number, matchFrame: number): boolean {
-  const aim = move.aim;
-  const rune = move.projectiles?.[0];
-  if (aim === undefined || rune === undefined || input?.specialHeld !== true || f.special.frame !== aim.frame + 1) return false;
+export function holdOrb(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Controls> | undefined): boolean {
+  const orb = move.heldOrb;
+  const spec = move.projectiles?.[0];
+  if (orb === undefined || spec === undefined || f.special.frame !== orb.frame + 1) return false;
   let index = -1;
   for (const projectile of f.projectiles) {
     index++;
-    if (projectile.life <= 0 || projectile.spec !== rune) continue;
-    const x = f32(projectile.x + f32(f.facing * aim.speed));
-    if (f32(f32(x - f.motion.x) * f.facing) > aim.reach) return false;
-    const held = mutableProjectile(f, index);
-    held.x = markX(f, rune, stage, matchFrame, x);
-    held.life = rune.life;
-    held.z = floorBelow(stage, matchFrame, held.x, f.motion.z) ?? f.motion.z;
-    held.surface = riddenDeck(rune, undefined, stage, matchFrame, held.x, held.z);
-    f.special.frame = aim.frame;
+    if (projectile.life <= 0 || projectile.spec !== spec) continue;
+    const flying = mutableProjectile(f, index);
+    if (input?.specialHeld !== true || flying.life <= 1) {
+      eruptOrb(flying, orb.erupts);
+      return false;
+    }
+    const stick = input.diStickValid ? input.diStickZ : input.verticalDirection;
+    flying.velocityX = f32(f.facing * min(orb.maxSpeed, f32(Math.abs(flying.velocityX) + orb.acceleration)));
+    flying.velocityZ = f32(min(1.0, Math.max(-1.0, stick)) * orb.climbSpeed);
+    f.special.frame = orb.frame;
     f.special.lockFrames++;
     f.attack.cooldown++;
     return true;
@@ -211,14 +212,21 @@ export function holdAim(f: Fighter, move: Readonly<AuthoredSpecial>, input: Read
   return false;
 }
 
+function eruptOrb(orb: Projectile, pillar: Readonly<SpecialProjectile>): void {
+  orb.spec = pillar;
+  orb.velocityX = 0.0;
+  orb.velocityZ = 0.0;
+  orb.life = pillar.life + 1;
+}
+
 export function steeredShot(f: Readonly<Fighter>): Readonly<Projectile> | undefined {
   const move = runningHeroSpecial(f);
   return move?.steersShot === undefined || f.special.frame !== move.steersShot.frame ? undefined : projectileAnchor(f, move.projectiles?.[0]);
 }
 
-export function aimedProjectile(f: Readonly<Fighter>): Readonly<Projectile> | undefined {
+export function heldOrbProjectile(f: Readonly<Fighter>): Readonly<Projectile> | undefined {
   const move = runningHeroSpecial(f);
-  return move?.aim === undefined || f.special.frame !== move.aim.frame ? undefined : projectileAnchor(f, move.projectiles?.[0]);
+  return move?.heldOrb === undefined || f.special.frame !== move.heldOrb.frame ? undefined : projectileAnchor(f, move.projectiles?.[0]);
 }
 
 export function agesWithMove(owner: Readonly<Fighter>, projectile: Readonly<Projectile>): boolean {

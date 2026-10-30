@@ -24,7 +24,7 @@ import { applySelfHeal } from "./selfHeal";
 import { duoCastOnFrame, partnerCallBlocked, reviveOnFrame } from "../duoPartner";
 import { castVariant, readyEmpowered, spendEmpowered } from "./empowered";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, applyWindows, projectileAnchor } from "./runningMove";
-import { recallProjectiles, projectilesFit, spawnHeroProjectile, spawnHeroProjectileAt, burstProjectiles, endLiveCasts, holdAim } from "./heroProjectiles";
+import { recallProjectiles, projectilesFit, spawnHeroProjectile, spawnHeroProjectileAt, burstProjectiles, endLiveCasts, holdOrb } from "./heroProjectiles";
 import { swingFullCharge, holdCharge, throwFullDroppingCharge } from "./heroForms";
 import { seekTargetSlot, seeks, applyMotion, holdSteeredShot, faceHeldStick } from "./heroMotion";
 import { trackBeam } from "./heroContact";
@@ -236,7 +236,7 @@ function shortenOnPress(f: Fighter, window: Readonly<FrameWindow> | undefined, i
 export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Controls>, world?: Roster, matchFrame = 0): void {
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
-  if (holdAim(f, move, input, stage, matchFrame) || holdCharge(f, move.charge)) return;
+  if (holdOrb(f, move, input) || holdCharge(f, move.charge)) return;
   if (holdSteeredShot(f, move, input)) return;
   advanceRefire(f, move.refire, input);
   advanceChannel(f, move.channel, input);

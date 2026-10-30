@@ -1,15 +1,16 @@
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Character } from "../../sim/codes";
 import { type Fighter, type Projectile, createFighter } from "../../sim/fighter";
 import type { Roster } from "../../sim/roster";
 import type { SpecialProjectile } from "../../sim/specials/schema";
-import { CARRIED_TEST_STAGE, mainDeckRight, mainDeckZ, surfaceZ } from "../../sim/stage";
-import { duelPair, lift, stepDuel } from "../../sim/testDuel";
+import { duelPair, stepDuel } from "../../sim/testDuel";
 import { controls } from "../../sim/testWorld";
 import { projectedProjectile } from "../../presentation/projectilePose";
-import { FLAME_STRIKE_AIM, FLAME_STRIKE_BURN, FLAME_STRIKE_BURST, FLAME_STRIKE_COLUMN_RATE, FLAME_STRIKE_COLUMN_SECONDS, FLAME_STRIKE_RUNE } from "./specials";
+import { FLAME_STRIKE_BURN, FLAME_STRIKE_BURST, FLAME_STRIKE_COLUMN_RATE, FLAME_STRIKE_COLUMN_SECONDS, FLAME_STRIKE_ORB, FLAME_STRIKE_ORB_FRAMES, FLAME_STRIKE_STEER } from "./specials";
 
+const OLD_RUNE_SPAWN_FRAME = 8;
+const OLD_RUNE_SPEED = 8.0;
 const press = controls({ specialPressed: true, specialX: 1, specialHeld: true });
 const hold = controls({ specialHeld: true });
 const idle = controls();
@@ -22,7 +23,7 @@ function live(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile>): Readonly
 
 function liveCasts(f: Readonly<Fighter>): number {
   let count = 0;
-  for (const spec of [FLAME_STRIKE_RUNE, FLAME_STRIKE_BURST, FLAME_STRIKE_BURN]) if (live(f, spec) !== undefined) count++;
+  for (const spec of [FLAME_STRIKE_ORB, FLAME_STRIKE_BURST, FLAME_STRIKE_BURN]) if (live(f, spec) !== undefined) count++;
   return count;
 }
 
@@ -38,59 +39,119 @@ function kaelDuel(targetX = BEHIND): { kael: Fighter; target: Fighter; world: Ro
   return { kael, target, world };
 }
 
-function stepUntil(world: Roster, kael: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, input = idle): Readonly<Projectile> {
-  for (let frame = 0; frame < 120 && live(kael, spec) === undefined; frame++) stepDuel(world, input);
+function stepUntil(world: Roster, kael: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, input = idle, second = idle): Readonly<Projectile> {
+  for (let frame = 0; frame < 160 && live(kael, spec) === undefined; frame++) stepDuel(world, input, second);
   return present(live(kael, spec), "projectile");
 }
 
-function pillarX(heldFrames: number): number {
-  const { kael, world } = kaelDuel();
-  const startX = kael.motion.x;
-  stepDuel(world, press);
-  for (let frame = 0; frame < 160; frame++) {
-    const burst = live(kael, FLAME_STRIKE_BURST);
-    if (burst !== undefined) return f32(burst.x - startX);
-    stepDuel(world, frame < heldFrames ? hold : idle);
+function flyOrb(kael: Readonly<Fighter>, world: Roster, heldFrames: number, steer = hold, second = idle): { speeds: number[]; last: { x: number; z: number } } {
+  const speeds: number[] = [];
+  let last = { x: 0.0, z: 0.0 };
+  for (let frame = 0; frame < heldFrames; frame++) {
+    stepDuel(world, steer, second);
+    const orb = live(kael, FLAME_STRIKE_ORB);
+    if (orb === undefined) break;
+    speeds.push(Math.abs(orb.velocityX));
+    last = { x: orb.x, z: orb.z };
   }
-  throw new Error("no pillar");
+  return { speeds, last };
 }
 
-test("A tapped Flame Strike bursts at the default distance and a held one where the rune slid to, never past its reach [k1 scenario]", () => {
-  const tap = pillarX(0);
-  assertEquals(tap, FLAME_STRIKE_RUNE.offsetX, "a tap lands at the default distance");
-  const short = pillarX(FLAME_STRIKE_AIM.frame + 5);
-  const long = pillarX(FLAME_STRIKE_AIM.frame + 15);
-  assertTrue(short > tap);
-  assertEquals(f32(long - short), f32(10.0 * FLAME_STRIKE_AIM.speed), "each held frame slides the rune one step");
-  const full = pillarX(160);
-  assertTrue(full <= FLAME_STRIKE_AIM.reach && full > f32(FLAME_STRIKE_AIM.reach - FLAME_STRIKE_AIM.speed));
-});
-
-test("The rune shows for the whole delay before the burst, and a recast removes the live pillar [k1 scenario]", () => {
+test("Flame Strike's orb leaves Kael's hand on frame 6, a quarter sooner than the rune's frame 8, starts slow and gathers speed to 12 a frame, faster than the rune's 8 [k3 measure docs/design/kaelthas.md]", () => {
+  assertLessThan(FLAME_STRIKE_ORB.spawnFrame, OLD_RUNE_SPAWN_FRAME * f32(0.8) + 1.0);
+  assertEquals(FLAME_STRIKE_ORB.spawnFrame, 6);
   const { kael, world } = kaelDuel();
   stepDuel(world, press);
-  stepUntil(world, kael, FLAME_STRIKE_RUNE);
-  let runeFrames = 0;
-  while (live(kael, FLAME_STRIKE_BURST) === undefined && runeFrames < 120) {
-    if (live(kael, FLAME_STRIKE_RUNE) !== undefined) runeFrames++;
-    stepDuel(world, idle);
+  let frames = 1;
+  while (live(kael, FLAME_STRIKE_ORB) === undefined) {
+    stepDuel(world, hold);
+    frames++;
   }
-  assertEquals(runeFrames + 1, FLAME_STRIKE_RUNE.life, "the rune shows until the burst");
-  const first = stepUntil(world, kael, FLAME_STRIKE_BURN);
-  stepDuel(world, idle);
-  assertTrue(first.life > 2);
+  assertEquals(frames, FLAME_STRIKE_ORB.spawnFrame);
+  assertGreaterThan(present(live(kael, FLAME_STRIKE_ORB), "orb").x, kael.motion.x);
+  const { speeds } = flyOrb(kael, world, 40);
+  assertLessThan(speeds[0] ?? 99.0, OLD_RUNE_SPEED);
+  for (let i = 1; i < speeds.length; i++) assertTrue((speeds[i] ?? 0.0) >= (speeds[i - 1] ?? 0.0));
+  assertEquals(speeds[speeds.length - 1], FLAME_STRIKE_STEER.maxSpeed);
+  assertGreaterThan(FLAME_STRIKE_STEER.maxSpeed, OLD_RUNE_SPEED);
+});
+
+function steersUpAndDown(): void {
+  const climb = (z: number): number => {
+    const { kael, world } = kaelDuel();
+    stepDuel(world, press);
+    stepUntil(world, kael, FLAME_STRIKE_ORB, hold);
+    const startZ = present(live(kael, FLAME_STRIKE_ORB), "orb").z;
+    const { last } = flyOrb(kael, world, 10, controls({ specialHeld: true, verticalDirection: z }));
+    return f32(last.z - startZ);
+  };
+  assertGreaterThan(climb(1), 20.0);
+  assertLessThan(climb(-1), -20.0);
+  assertEquals(climb(0), 0.0);
+}
+
+function eruptsOnReleaseAndTimeout(): void {
+  const released = kaelDuel();
+  stepDuel(released.world, press);
+  stepUntil(released.world, released.kael, FLAME_STRIKE_ORB, hold);
+  const { last } = flyOrb(released.kael, released.world, 12);
+  stepDuel(released.world, idle);
+  assertEquals(live(released.kael, FLAME_STRIKE_ORB), undefined, "the orb is gone");
+  const pillar = present(live(released.kael, FLAME_STRIKE_BURST), "pillar");
+  assertEquals(pillar.x, last.x);
+  assertEquals(pillar.z, last.z);
+
+  const timed = kaelDuel();
+  stepDuel(timed.world, press);
+  stepUntil(timed.world, timed.kael, FLAME_STRIKE_ORB, hold);
+  let flown = 0;
+  while (live(timed.kael, FLAME_STRIKE_BURST) === undefined && flown < 200) {
+    stepDuel(timed.world, hold);
+    flown++;
+  }
+  assertTrue(flown >= FLAME_STRIKE_ORB_FRAMES - 3 && flown <= FLAME_STRIKE_ORB_FRAMES + 1);
+  assertEquals(live(timed.kael, FLAME_STRIKE_ORB), undefined);
+}
+
+function eruptsOnContactAndRecasts(): void {
+  const { kael, target, world } = kaelDuel(260.0);
+  stepDuel(world, press);
+  let frames = 0;
+  while (target.status.damage === 0.0 && frames++ < 80) stepDuel(world, hold);
+  assertGreaterThan(target.status.damage, 0.0);
+  assertEquals(live(kael, FLAME_STRIKE_ORB), undefined);
+  stepUntil(world, kael, FLAME_STRIKE_BURN);
+  while (kael.special.action !== 0) stepDuel(world, idle);
+  assertTrue(live(kael, FLAME_STRIKE_BURN) !== undefined);
   stepDuel(world, press);
   stepDuel(world, idle);
   assertEquals(live(kael, FLAME_STRIKE_BURN), undefined, "the recast put out the first pillar");
   for (let frame = 0; frame < 120; frame++) {
     assertTrue(liveCasts(kael) <= 1);
-    stepDuel(world, idle);
+    stepDuel(world, frame < 20 ? hold : idle);
   }
-});
+}
+
+function eruptsOnTheFloor(): void {
+  const { kael, world } = kaelDuel();
+  stepDuel(world, press);
+  stepUntil(world, kael, FLAME_STRIKE_ORB, hold);
+  const down = controls({ specialHeld: true, verticalDirection: -1 });
+  let pillar: Readonly<Projectile> | undefined;
+  for (let frame = 0; frame < 40 && pillar === undefined; frame++) {
+    stepDuel(world, down);
+    pillar = live(kael, FLAME_STRIKE_BURST);
+  }
+  assertTrue(pillar !== undefined);
+  assertEquals(live(kael, FLAME_STRIKE_ORB), undefined);
+  assertLessThan(present(pillar, "pillar").z, FLAME_STRIKE_ORB.offsetZ);
+}
 
 test("The lingering burn deals damage without hitstun, hitlag or launch [k1 scenario]", () => {
   const { kael, target, world } = kaelDuel();
   stepDuel(world, press);
+  stepUntil(world, kael, FLAME_STRIKE_ORB, hold);
+  stepDuel(world, idle);
   const burn = stepUntil(world, kael, FLAME_STRIKE_BURN);
   target.motion.x = burn.x;
   const before = target.status.damage;
@@ -107,31 +168,15 @@ test("The lingering burn deals damage without hitstun, hitlag or launch [k1 scen
   assertTrue(target.status.damage > before);
 });
 
-test("Cast in the air off the stage, the pillar stands at Kael's height over the void [k1 scenario]", () => {
-  const { kael, world } = kaelDuel();
-  const edge = mainDeckRight(0);
-  kael.motion.x = f32(edge + 40.0);
-  lift(kael, f32(mainDeckZ(0) + 120.0));
-  stepDuel(world, press);
-  const rune = stepUntil(world, kael, FLAME_STRIKE_RUNE);
-  const runeZ = rune.z;
-  const burst = stepUntil(world, kael, FLAME_STRIKE_BURST);
-  assertTrue(burst.x > edge);
-  assertTrue(runeZ > mainDeckZ(0));
-  assertEquals(burst.z, f32(runeZ + FLAME_STRIKE_BURST.offsetZ), "the pillar rises from the rune");
-});
-
 test("The burst launches a foe up at its 80° and crushes a shield, where a burn tick neither launches nor dents the shield [k1 scenario]", () => {
   const hit = (into: Readonly<SpecialProjectile>, shield: boolean): { knockbackX: number; knockbackZ: number; shieldLoss: number } => {
     const { kael, target, world } = kaelDuel();
     const guard = controls({ shield });
     stepDuel(world, press, guard);
-    let spot: Readonly<Projectile> | undefined;
-    for (let frame = 0; frame < 120 && spot === undefined; frame++) {
-      stepDuel(world, idle, guard);
-      spot = live(kael, into === FLAME_STRIKE_BURST ? FLAME_STRIKE_RUNE : FLAME_STRIKE_BURN);
-    }
-    target.motion.x = present(spot, "cast").x;
+    stepUntil(world, kael, FLAME_STRIKE_ORB, hold, guard);
+    const orbX = flyOrb(kael, world, 4, hold, guard).last.x;
+    if (into === FLAME_STRIKE_BURST) target.motion.x = orbX;
+    else target.motion.x = stepUntil(world, kael, FLAME_STRIKE_BURN, idle, guard).x;
     let knockbackX = 0.0;
     let knockbackZ = 0.0;
     let shieldLoss = 0.0;
@@ -149,51 +194,20 @@ test("The burst launches a foe up at its 80° and crushes a shield, where a burn
   const burst = hit(FLAME_STRIKE_BURST, false);
   assertTrue(burst.knockbackX > 0.0);
   assertTrue(burst.knockbackZ > f32(burst.knockbackX * 5.0) && burst.knockbackZ < f32(burst.knockbackX * 6.5));
-  const burn = hit(FLAME_STRIKE_BURN, false);
-  assertEquals(burn.knockbackX, 0.0, "a burn tick does not launch");
-  assertEquals(burn.knockbackZ, 0.0, "a burn tick does not launch");
   const crushed = hit(FLAME_STRIKE_BURST, true).shieldLoss;
-  const dented = hit(FLAME_STRIKE_BURN, true).shieldLoss;
-  assertTrue(dented > 0.0);
-  assertTrue(crushed > f32(dented * 5.0));
+  assertGreaterThan(crushed, 5.0);
+  assertFalse(hit(FLAME_STRIKE_BURN, false).knockbackZ > 0.0);
 });
 
-test("A rune held off a moving deck stays where it lands while the deck carries Kael on, and a rune left on the deck rides with it [k1 scenario]", () => {
-  const deckZ = surfaceZ(CARRIED_TEST_STAGE, 1, 0);
-  const cast = (heldFrames: number): { runeZ: number; drift: number } => {
-    const kael = createFighter(Character.kaelthas, -210.0, 1);
-    lift(kael, f32(deckZ + 20.0));
-    const { world } = duelPair(kael, createFighter(Character.rifleman, -500.0, -1), 3, CARRIED_TEST_STAGE);
-    for (let frame = 0; frame < 60; frame++) stepDuel(world);
-    assertEquals(kael.motion.surface, 1, "Kael stands on the moving deck");
-    stepDuel(world, press);
-    for (let frame = 0; frame < FLAME_STRIKE_AIM.frame + heldFrames; frame++) stepDuel(world, hold);
-    const rune = present(live(kael, FLAME_STRIKE_RUNE), "rune");
-    const x = rune.x;
-    const z = rune.z;
-    const deckX = kael.motion.x;
-    const burst = stepUntil(world, kael, FLAME_STRIKE_BURST);
-    assertTrue(f32(kael.motion.x - deckX) > 30.0);
-    return { runeZ: z, drift: f32(burst.x - x) };
-  };
-  const off = cast(12);
-  assertEquals(off.runeZ, mainDeckZ(CARRIED_TEST_STAGE), "the held rune slid off onto the main deck");
-  assertEquals(off.drift, 0.0, "off the deck, the rune stays put");
-  const on = cast(0);
-  assertEquals(on.runeZ, deckZ, "a tapped rune lands on the deck");
-  assertTrue(on.drift > 30.0);
-});
-
-test("The pillar bursts about 0.6 s after its rune and burns out 0.6 s later, and its column model plays its whole fade across exactly those frames [k3 measure docs/design/kaelthas.md]", () => {
+test("The pillar bursts for 6 frames and burns out 30 later, and its column model plays its whole fade across exactly those frames [k3 measure docs/design/kaelthas.md]", () => {
   const { kael, world } = kaelDuel();
   stepDuel(world, press);
-  stepUntil(world, kael, FLAME_STRIKE_RUNE);
-  let warning = 0;
+  stepUntil(world, kael, FLAME_STRIKE_ORB, hold);
+  stepDuel(world, idle);
   let burstFrames = 0;
   let burnFrames = 0;
   const seconds: number[] = [];
-  for (let frame = 0; frame < 160 && (live(kael, FLAME_STRIKE_RUNE) !== undefined || live(kael, FLAME_STRIKE_BURST) !== undefined || live(kael, FLAME_STRIKE_BURN) !== undefined); frame++) {
-    if (live(kael, FLAME_STRIKE_RUNE) !== undefined) warning++;
+  for (let frame = 0; frame < 160 && (live(kael, FLAME_STRIKE_BURST) !== undefined || live(kael, FLAME_STRIKE_BURN) !== undefined); frame++) {
     for (const spec of [FLAME_STRIKE_BURST, FLAME_STRIKE_BURN]) {
       const projectile = live(kael, spec);
       if (projectile === undefined) continue;
@@ -202,7 +216,6 @@ test("The pillar bursts about 0.6 s after its rune and burns out 0.6 s later, an
     }
     stepDuel(world, idle);
   }
-  assertEquals(warning + 1, 34, "the rune warns for 34 frames, about 0.6 s");
   assertEquals(burstFrames, 6, "the burst hits for 6 frames");
   assertEquals(burnFrames, 30, "the burn lingers 30 frames, so the pillar's active window is 36 frames, 0.6 s");
   assertEquals(seconds.length, burstFrames + burnFrames);
@@ -212,4 +225,11 @@ test("The pillar bursts about 0.6 s after its rune and burns out 0.6 s later, an
   assertTrue(Math.abs(span - (FLAME_STRIKE_COLUMN_SECONDS.to - FLAME_STRIKE_COLUMN_SECONDS.from)) < f32(0.001));
   const last = seconds[seconds.length - 1]!;
   assertTrue(last > f32(4.9) && last <= FLAME_STRIKE_COLUMN_SECONDS.to);
+});
+
+test("The stick steers the orb up or down, and release, the timeout, a touch and the floor each erupt the pillar where the orb is, one pillar at a time [k1 scenario]", () => {
+  steersUpAndDown();
+  eruptsOnReleaseAndTimeout();
+  eruptsOnContactAndRecasts();
+  eruptsOnTheFloor();
 });

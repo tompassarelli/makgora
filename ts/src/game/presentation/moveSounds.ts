@@ -145,7 +145,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.kaelthas]: {
     weapon: Weapon.blunt, strong: "Fireball",
-    specials: [s("FireballLaunch", "FlameStrike"), { ...s("FlameStrikeTarget", "FlameStrike"), fuse: "RainOfFireWave" }, s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
+    specials: [s("FireballLaunch", "FlameStrike"), s("FlameStrikeTarget", "FlameStrike"), s("PhoenixMissileLaunch", "Fireball"), s("BanishCaster", "BanishCaster")],
     normals: { [AttackStyle.grab]: { perform: "SiphonManaCaster" } },
   },
   [Character.murloc]: {
