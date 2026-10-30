@@ -20,6 +20,10 @@ export const SHOWCASE_FACINGS: readonly ("right" | "left")[] = ["right", "left"]
 const CHARGED_SHOWCASE_GAP = 70;
 const SHOWCASE_DEFAULT_GAP = 500;
 const SHOWCASE_DUMMY_MIDDLE = 60;
+const SHOWCASE_WIDE_BODY_RADIUS = 30;
+const SHOWCASE_BODY_CLEARANCE = 50;
+const SHOWCASE_LATE_STRIKE = 8;
+const SHOWCASE_FOE_GAP = 220;
 const INCOMING_GAP = 300;
 const INCOMING_BODY = 40;
 
@@ -57,12 +61,12 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const original = heroDefinition(character) === undefined;
   const normals = Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined
     || (original && code !== AttackStyle.grab && code !== AttackStyle.dashAttack));
-  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? aerialPlacement(tuning.moves?.normals[code], code) : groundPlacement(tuning.moves?.normals[code], code, character)) }));
+  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? aerialPlacement(tuning.moves?.normals[code], code, character) : groundPlacement(tuning.moves?.normals[code], code, character)) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : heldShowcases(slot, code, special);
     if (charged !== undefined) moves.push(...charged);
-    else moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120, gap: special === undefined ? undefined : specialGap(special), behind: special === undefined ? undefined : specialBehind(special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
+    else moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : specialFirst(special), end: special?.endFrame ?? 120, gap: special === undefined ? undefined : foeGap(special) ?? clearOfBody(character, specialGap(special), special), behind: special === undefined ? undefined : clearOfBody(character, specialBehind(special), special), ...rushShowcase(special), incoming: special === undefined || tuning.specials === undefined ? undefined : incomingShot(special, tuning.specials) });
   });
   if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame, gap: specialGap(tuning.ultimate) });
   moves.push(...hopShowcases(character));
@@ -232,9 +236,31 @@ function aerialContact(move: Readonly<AuthoredMove> | undefined, style: AttackSt
   return move?.regions.reduce<MoveRegion | undefined>((best, region) => best === undefined || better(region, best) ? region : best, undefined);
 }
 
-function aerialPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle): { readonly gap: number | undefined; readonly lift: number | undefined } {
+function aerialPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap: number | undefined; readonly lift: number | undefined } {
   const region = aerialContact(move, style);
-  return region === undefined ? { gap: undefined, lift: undefined } : { gap: Math.floor(centreX(region)), lift: Math.floor(centreZ(region) - SHOWCASE_DUMMY_MIDDLE) };
+  if (region === undefined) return { gap: undefined, lift: undefined };
+  const gap = Math.floor(centreX(region)), lift = Math.floor(centreZ(region) - SHOWCASE_DUMMY_MIDDLE);
+  const beside = lift > -SHOWCASE_DUMMY_MIDDLE / 2 && lift < hurtCapsule(character).z2 / 2;
+  return { gap: beside ? clearOfBody(character, gap, move?.regions) : gap, lift };
+}
+
+function clearOfBody(character: Character, gap: number | undefined, source: Readonly<AuthoredSpecial> | readonly MoveRegion[] | undefined): number | undefined {
+  const radius = hurtCapsule(character).radius, clear = radius + SHOWCASE_BODY_CLEARANCE;
+  if (gap === undefined || radius <= SHOWCASE_WIDE_BODY_RADIUS || Math.abs(gap) >= clear) return gap;
+  const regions = source === undefined ? [] : "length" in source ? source : source.regions ?? [];
+  const reach = gap < 0 ? Math.max(...regions.map((region) => -region.hit.minX)) : Math.max(...regions.map((region) => region.hit.maxX));
+  return reach < clear ? gap : Math.floor(gap < 0 ? -clear : clear);
+}
+
+function foeGap(special: Readonly<AuthoredSpecial>): number | undefined {
+  return special.projectiles?.some((shot) => shot.atFoe === true) === true ? SHOWCASE_FOE_GAP : undefined;
+}
+
+function specialFirst(special: Readonly<AuthoredSpecial>): number {
+  const cue = heroCueWindows(special).active.first;
+  if ((special.regions ?? []).length === 0) return cue;
+  const strike = strikeFrames(special).first;
+  return strike - cue >= SHOWCASE_LATE_STRIKE ? strike : cue;
 }
 
 function specialGap(special: Readonly<AuthoredSpecial>): number | undefined {
