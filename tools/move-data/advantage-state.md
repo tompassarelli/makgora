@@ -294,7 +294,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Chen Stormstout | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Chen Stormstout | medium | up throw | 2/1 in side special, out dash, dash attack | 1/1 in short hop, side special, out dash, dash attack | 2/1 in up smash, out down smash | 1/1 in down smash, out forward smash |
+| Chen Stormstout | medium | up throw | 2/1 in side special, out dash, dash attack | 1/1 in side special, out dash, dash attack | 2/1 in up smash, out down smash | 1/1 in down smash, out forward smash |
 | Chen Stormstout | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -302,15 +302,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Chen Stormstout | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | light | up throw | 1/1 in down special, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air |
+| Peon | light | up throw | 1/1 in down special, out side special | 1/1 in up smash, out side special | 1/4 in up smash, out side special KO | 1/1 in up smash, out short hop, forward air |
 | Peon | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | medium | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out dash, dash attack | 1/1 in down special, out short hop, forward air | 1/1 in down special, out short hop, forward air |
+| Peon | medium | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out side special | 1/1 in down special, out side special | 1/3 in down special, out side special KO |
 | Peon | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | heavy | up throw | 1/1 in down special, out short hop, down special | 1/1 in down special, out short hop, down special | 1/1 in up smash, out short hop, down special | 1/1 in up smash, out short hop, down special |
+| Peon | heavy | up throw | 1/1 in down special, out short hop, down special | 1/1 in down special, out side special | 2/1 in up smash, out side special | 1/1 in up smash, out short hop, down special |
 | Peon | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Goblin Tinker | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Goblin Tinker | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
