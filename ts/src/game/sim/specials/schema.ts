@@ -17,7 +17,7 @@ export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 
 export const FOLLOW_UP_FORM = 6;
 
-export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4, guard: 5, release: 6 } as const;
+export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3, auto: 4, guard: 5, release: 6, held: 7 } as const;
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
 export const Relocation = { placed: 1, behindLocked: 4 } as const;
@@ -27,6 +27,8 @@ export interface SpecialMotion extends FrameWindow {
   readonly velocityX: number;
   readonly velocityZ: number;
   readonly aimedSpeed?: number | undefined;
+  /** Flies its aimed speed along the stick at any angle, not one of eight directions; its move then keeps the stick as aim, unrounded. */
+  readonly freeAim?: true | undefined;
 
   readonly model?: string | undefined;
   readonly aimedTilt?: { readonly x: number; readonly z: number } | undefined;

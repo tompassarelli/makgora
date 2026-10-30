@@ -44,6 +44,7 @@ import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { SYLVANAS_SPECIALS } from "../fighters/sylvanas/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
 import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
+import { SHADOW_STEP_CUES } from "./shadowStepCues";
 import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
 import { slotCues } from "./slotCues";
 
@@ -117,6 +118,8 @@ export interface MoveCues {
   readonly active: Cue;
   /** The fighter's own body tint and alpha while either cue shows. */
   readonly body?: { readonly red: number; readonly green: number; readonly blue: number; readonly alpha: number } | undefined;
+  /** The fighter is not drawn while intangible. */
+  readonly vanishes?: true | undefined;
   readonly trail?: true | undefined;
 }
 
@@ -210,7 +213,7 @@ export const PEON_REST_CUES: MoveCues = {
 
 
 export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: MoveCues } } = {
-  [Character.akama]: { neutral: SHURIKEN_CHARGE_CUES },
+  [Character.akama]: { neutral: SHURIKEN_CHARGE_CUES, up: SHADOW_STEP_CUES },
   [Character.malfurion]: {
     neutral: { spell: "Entangling Roots", startup: NATURE, active: cue("Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", "ahead", f32(0.35)) },
     side: { spell: "Stag Charge", startup: NATURE, active: { ...cue("units\\critters\\BlackStagMale\\BlackStagMale.mdx", "feet", 1.0), sequence: "walk", seconds: 0.0, replacesBody: true } },

@@ -38,9 +38,30 @@ export function changesAimZone(f: Readonly<Fighter>, x: number, z: number): bool
 }
 
 export function steerAim(special: Fighter["special"], move: Readonly<AuthoredSpecial>, input: Readonly<Controls>): void {
+  if (freeAims(move) && aimFree(special, input)) return;
   const x = chargedAimX(input);
   const z = chargedAimZ(input);
   if (x === 0 && z === 0) return;
   special.aimX = x;
   special.aimZ = z;
+}
+
+export function freeAims(move: Readonly<AuthoredSpecial>): boolean {
+  for (const segment of move.motion ?? []) if (segment.freeAim === true) return true;
+  return false;
+}
+
+export function aimFree(special: Fighter["special"], input: Readonly<Controls>): boolean {
+  if (!input.diStickValid || (input.diStickX === 0.0 && input.diStickZ === 0.0)) return false;
+  special.aimX = input.diStickX;
+  special.aimZ = input.diStickZ;
+  return true;
+}
+
+export function startAim(special: Fighter["special"], move: Readonly<AuthoredSpecial>, input: Readonly<Controls>): void {
+  const aimX = input.specialX !== 0 ? input.specialX : input.direction;
+  const aimZ = input.specialZ !== 0 ? input.specialZ : input.verticalDirection;
+  special.aimX = aimX < 0 ? -1 : aimX > 0 ? 1 : 0;
+  special.aimZ = aimZ < 0 ? -1 : aimZ > 0 ? 1 : 0;
+  if (freeAims(move)) aimFree(special, input);
 }

@@ -2,82 +2,22 @@ import { assertEquals, assertGreaterThan, assertLessThan, test } from "wisp/src/
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
-import { Action, maskOf } from "../../input/actions";
-import { adaptInput } from "../../match/inputAdapter";
-import { inputRow } from "../../input/inputRow";
-import { Phase } from "../../lobby/lobbyState";
-import { stepMatch } from "../../match/step";
 import { canonicalState } from "../../replay/canonical";
-import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
+import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
-import { setWorldMotionValue } from "../../sim/motion";
-import { fighterAt } from "../../sim/roster";
 import { cancelSpecialState, clearSpecialOnStock } from "../../sim/transitions";
 import { type SpecialKit, FOLLOW_UP_FORM, chargeStage } from "../../sim/specials/schema";
 import { standinSpecials } from "../standin/specials";
 import { AKAMA_HERO } from "./kit";
+import { type Duel, type Press, duel, idle, lift, step } from "./testDuel";
 import { SHURIKEN_CHARGE, SHURIKEN_DAMAGE, SHURIKEN_FIRST, SHURIKEN_GAP, SHURIKEN_MOST, SHURIKEN_NEUTRAL, SHURIKEN_SPREAD, shurikenCount } from "./specials";
 
 const HOLD = SHURIKEN_CHARGE.hold;
 const FULL = SHURIKEN_CHARGE.full;
 const NEAR = 70.0;
 const FAR = 700.0;
-
-type Press = "press" | "hold" | "shield" | "jump" | "none";
-
-interface Duel {
-  readonly state: ReplayState;
-  readonly akama: Fighter;
-  readonly foe: Fighter;
-  tick: number;
-}
-
-function duel(foeAhead: number): Duel {
-  const state = createReplaySnapshot();
-  const akama = fighterAt(state.world, 0);
-  const foe = fighterAt(state.world, 1);
-  copyFighterState(akama, createFighter(Character.akama, 0.0, 1), 3);
-  copyFighterState(foe, createFighter(Character.peon, foeAhead, -1), 3);
-  state.match.phase = Phase.match;
-  state.match.stageChoice = 0;
-  state.match.matchSeed = 1;
-  state.match.hazards = false;
-  state.match.items.on = false;
-  state.match.timeLimitMinutes = 0;
-  state.match.ultimatesOff = true;
-  return { state, akama, foe, tick: 0 };
-}
-
-const PRESSES: Readonly<Record<Press, { readonly held: number; readonly pressed: number }>> = {
-  press: { held: maskOf(Action.special), pressed: maskOf(Action.special) },
-  hold: { held: maskOf(Action.special), pressed: 0 },
-  shield: { held: maskOf(Action.special) | maskOf(Action.rightTrigger), pressed: maskOf(Action.rightTrigger) },
-  jump: { held: maskOf(Action.special) | maskOf(Action.jump), pressed: maskOf(Action.jump) },
-  none: { held: 0, pressed: 0 },
-};
-
-function step(d: Duel, press: Press): void {
-  d.tick++;
-  const row = inputRow(PRESSES[press]);
-  if (row === undefined) throw new Error("Akama input row");
-  adaptInput(row, d.akama, d.tick, d.state.controls.inputs[0], d.state.controls.commands[0]);
-  stepMatch(d.state.match, d.state.world, d.state.controls, d.tick);
-}
-
-function idle(d: Duel, frames: number): void {
-  for (let frame = 0; frame < frames; frame++) step(d, "none");
-}
-
-function lift(fighter: Fighter, height: number): void {
-  fighter.motion.z = height;
-  fighter.motion.vz = 0.0;
-  fighter.motion.grounded = false;
-  fighter.motion.surface = undefined;
-  setWorldMotionValue(fighter.motion.meleeZ, fighter.motion.z);
-  setWorldMotionValue(fighter.motion.meleeVelocityZ, fighter.motion.vz);
-}
 
 function charge(d: Duel, ticks: number): void {
   step(d, "press");
@@ -238,7 +178,6 @@ function outline(kit: SpecialKit | undefined): string {
 test("Akama's other specials stay the stand-in's [k3 measure docs/design/standins.md]", () => {
   const shared = standinSpecials(Character.akama, { bolt: "", burst: "" });
   assertEquals(outline(AKAMA_HERO.specials?.side), outline(shared.side));
-  assertEquals(outline(AKAMA_HERO.specials?.up), outline(shared.up));
   assertEquals(outline(AKAMA_HERO.specials?.down), outline(shared.down));
   assertEquals(AKAMA_HERO.specials?.neutral.name, "Shuriken Volley");
 });

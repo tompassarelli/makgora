@@ -148,7 +148,7 @@ function followUpPressed(f: Readonly<Fighter>, followUp: Readonly<SpecialFollowU
   const kind = followUp.input ?? FollowUpInput.special;
   const x = chargedAimX(input);
   const z = chargedAimZ(input);
-  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special ? input.specialPressed : kind === FollowUpInput.release ? !input.specialHeld : kind === FollowUpInput.auto && changesAimZone(f, x, z);
+  const pressed = kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special ? input.specialPressed : kind === FollowUpInput.release ? !input.specialHeld : kind === FollowUpInput.held ? input.specialHeld : kind === FollowUpInput.auto && changesAimZone(f, x, z);
   const stick = followUp.stick;
   return pressed && (stick === undefined || (Math.abs(x) === stick.x && z === stick.z));
 }

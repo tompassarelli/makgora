@@ -165,10 +165,17 @@ export function heroFloats(f: Readonly<Fighter>): boolean {
 
 const flight = { x: 0.0, z: 0.0 };
 
-function scriptedVelocity(f: Readonly<Fighter>, segment: Readonly<SpecialMotion>): void {
+function scriptedVelocity(f: Fighter, segment: Readonly<SpecialMotion>): void {
   const { special } = f;
   flight.x = f32(f.facing * segment.velocityX);
   flight.z = segment.velocityZ;
+  if (segment.freeAim === true && segment.aimedSpeed !== undefined && (special.aimX !== 0 || special.aimZ !== 0)) {
+    const length = squareRoot(f32(f32(special.aimX * special.aimX) + f32(special.aimZ * special.aimZ)));
+    flight.x = f32(f32(special.aimX / length) * segment.aimedSpeed);
+    flight.z = f32(f32(special.aimZ / length) * segment.aimedSpeed);
+    if (flight.x !== 0.0 && (special.aimX < 0) !== (f.facing < 0)) f.facing = special.aimX < 0 ? -1 : 1;
+    return;
+  }
   if (segment.aimedSpeed !== undefined && (special.aimX !== 0 || special.aimZ !== 0)) {
     const scale = special.aimX !== 0 && special.aimZ !== 0 ? f32(segment.aimedSpeed * DIAGONAL) : segment.aimedSpeed;
     flight.x = f32(special.aimX * scale);

@@ -1,5 +1,5 @@
 import { releaseCommandGrabLock } from "./commandGrabLock";
-import { steerAim } from "./aimZone";
+import { startAim, steerAim } from "./aimZone";
 import { max, min } from "../../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
@@ -97,10 +97,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   special.form = chosen.form;
   special.variant = chosen.variant;
   special.grabFrame = 0;
-  const aimX = input.specialX !== 0 ? input.specialX : input.direction;
-  const aimZ = input.specialZ !== 0 ? input.specialZ : input.verticalDirection;
-  special.aimX = aimX < 0 ? -1 : aimX > 0 ? 1 : 0;
-  special.aimZ = aimZ < 0 ? -1 : aimZ > 0 ? 1 : 0;
+  startAim(special, move, input);
   for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
   special.hit = false;
   special.guarded = false;

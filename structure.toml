@@ -61,7 +61,7 @@ may_use = ["core"]
 [[module]]
 name = "fighter-kit"
 paths = ["ts/src/game/fighters/*/kit.ts", "ts/src/game/fighters/*/moves.ts", "ts/src/game/fighters/*/specials.ts", "ts/src/game/fighters/*/ultimate.ts", "ts/src/game/fighters/*/gameplan.ts", "ts/src/game/fighters/*/duo.ts",
-         "ts/src/game/fighters/warden/spin.ts",
+         "ts/src/game/fighters/warden/spin.ts", "ts/src/game/fighters/akama/shadowStep.ts",
          "ts/src/game/sim/heroes/groundNormals.ts", "ts/src/game/sim/heroes/heroBodies.ts", "ts/src/game/sim/heroes/multiHit.ts",
          "ts/src/game/sim/heroes/authoring.ts", "ts/src/game/sim/heroes/hero.ts", "ts/src/game/stages/*/deck.ts"]
 responsibility = "One fighter's (or stage's) gameplay data and hooks: frame data, specials, ultimate, gameplan, body, traits, deck geometry."

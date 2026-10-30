@@ -19,6 +19,6 @@ export const akamaStrikeMoments = {
   19: { clip: 6, seconds: f32(0.617), end: f32(1.000) },
   20: { clip: 6, seconds: f32(0.617), end: f32(1.000) },
   101: { clip: 5, seconds: f32(0.500), end: f32(1.000) },
-  102: { clip: 7, seconds: f32(0.283), end: f32(1.000) },
+  102: { clip: 7, seconds: f32(0.583), end: f32(1.000) },
   103: { clip: 7, seconds: f32(0.583), end: f32(1.000) },
 };

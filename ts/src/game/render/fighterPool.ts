@@ -225,6 +225,7 @@ export class FighterPoolPresentation {
       blue = body.blue;
       alpha = body.alpha;
     }
+    if (transformation.cues?.vanishes === true && isIntangible(fighter)) alpha = 0;
     if (fighterModelReplaced(fighter)) alpha = 0;
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
       BlzSetSpecialEffectColor(model, red, green, blue);

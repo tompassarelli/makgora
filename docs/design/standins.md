@@ -12,7 +12,7 @@ players know he is a placeholder.
 
 | Fighter | Code | Stock model | Real kit |
 | --- | --- | --- | --- |
-| Akama | 32 | `units\other\DranaiAkama\DranaiAkama` | Neutral B is his own Shuriken Volley ([roster.md, Akama](roster.md#akama-neutral-b-tom-2026-10-30)); the rest is not designed yet |
+| Akama | 32 | `units\other\DranaiAkama\DranaiAkama` | Neutral B is his own Shuriken Volley ([roster.md, Akama](roster.md#akama-neutral-b-tom-2026-10-30)) and up B his own Shadow Step ([roster.md](roster.md#akama-up-b-tom-2026-10-30)); the rest is not designed yet |
 | Firelord | 33 | `Units\Creeps\HeroFlameLord\HeroFlameLord` | [roster.md, Firelord](roster.md#firelord) |
 | Goblin Alchemist | 34 | `Units\Creeps\HeroGoblinAlchemist\HeroGoblinAlchemist` | [roster.md, Goblin Alchemist](roster.md#goblin-alchemist) |
 
@@ -28,7 +28,7 @@ draw.
   attack, three smashes, five aerials with automatic half landing lag, a grab,
   pummel and four throws. Frame data follows the roster's middleweight
   bands; forward smash, up smash and back air are the kill moves.
-- Specials: Bolt (neutral, a straight reflectable shot; Akama's neutral is his own Shuriken Volley), Lunge (side, a short
+- Specials: Bolt (neutral, a straight reflectable shot; Akama's neutral and up are his own Shuriken Volley and Shadow Step), Lunge (side, a short
   rush that a shield stops), Rising Strike (up, a hitting rise into helpless
   fall) and Burst (down, a blast on both sides).
 - No ultimate: the ultimate table is optional and a stand-in has none.

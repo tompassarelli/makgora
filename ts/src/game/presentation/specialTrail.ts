@@ -23,8 +23,8 @@ export function specialTrail(fighter: Readonly<Fighter>, out: TrailLine): boolea
   const motion = runningHeroSpecial(fighter)?.motion ?? [];
   for (const segment of motion) {
     if (frame < segment.first || frame > segment.last || (segment.velocityX === 0.0 && segment.velocityZ === 0.0)) continue;
-    const velocityX = f32(fighter.facing * segment.velocityX);
-    const velocityZ = segment.velocityZ;
+    const velocityX = segment.freeAim === true ? fighter.motion.vx : f32(fighter.facing * segment.velocityX);
+    const velocityZ = segment.freeAim === true ? fighter.motion.vz : segment.velocityZ;
     const frames = min(SPECIAL_TRAIL_FRAMES, frame - segment.first + 1);
     out.x1 = fighter.motion.x;
     out.z1 = f32(fighter.motion.z + f32(TRAIL_BODY_HEIGHT * characterModelScale(fighter.character)));

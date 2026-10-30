@@ -10,16 +10,17 @@ export interface StandinIdentity {
   readonly displayName?: string | undefined;
   readonly effects: StandinEffects;
   readonly neutral?: SpecialKit | undefined;
+  readonly up?: SpecialKit | undefined;
 }
 
-export function standinHero({ character, name, displayName, effects, neutral }: StandinIdentity): HeroDefinition {
+export function standinHero({ character, name, displayName, effects, neutral, up }: StandinIdentity): HeroDefinition {
   const shared = standinSpecials(character, effects);
   return {
     character, name, displayName: `${displayName ?? name} (WIP)`,
     purpose: "Work-in-progress stand-in: a plain middleweight moveset until his own kit lands",
     weakness: "No signature tools yet: every move is the shared stand-in's",
     complete: true,
-    moves: standinMoves(character), specials: neutral === undefined ? shared : { ...shared, neutral }, gameplan: STANDIN_GAMEPLAN,
+    moves: standinMoves(character), specials: { ...shared, neutral: neutral ?? shared.neutral, up: up ?? shared.up }, gameplan: STANDIN_GAMEPLAN,
     jab: { name: "Stand-in Jab", description: "Two quick strikes ahead." },
   };
 }
