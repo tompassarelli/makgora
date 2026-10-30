@@ -1,0 +1,42 @@
+# Knockdown fixture: Pit Lord up-smashes Lich at 45% so it tumbles, lands without teching, lies past its Death clip's stock shrink, then stands with stick up; its whole body stays opaque and full size from the fall through the getup (fade-warden, 2026-10-30).
+#! chat -dev setup quick pair pit lord / lich;percent 2 45
+20 a stick 1 0
+46 a stick 0 0
+80 a stick 0 1
+80 a press LB
+82 a stick 0 0
+82 a release LB
+234 b capture
+240 b capture
+246 b capture
+247 b capture
+251 b capture
+255 b capture
+259 b capture
+263 b capture
+267 b capture
+271 b capture
+281 b capture
+296 b capture
+308 b capture
+314 b capture
+320 b capture
+326 b capture
+332 b capture
+338 b capture
+344 b capture
+346 b stick 0 1
+346 b capture
+348 b stick 0 0
+349 b capture
+353 b capture
+357 b capture
+361 b capture
+365 b capture
+369 b capture
+373 b capture
+377 b capture
+381 b capture
+385 b capture
+426 b press VIEW
+496 b release VIEW

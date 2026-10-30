@@ -5,7 +5,7 @@ import { characterClips } from "../src/game/presentation/fighterClips";
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { Character } from "../src/game/sim/codes";
 
-const KNOWN_FADING = ["warden"];
+const KNOWN_FADING: string[] = [];
 
 const fadingActions = (name: string): string[] => {
   const character = Character[name as keyof typeof Character];

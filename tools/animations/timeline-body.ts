@@ -103,19 +103,29 @@ export function timelineBody(source: mdx.Model, sequences: readonly mdx.Sequence
         const added: mdx.AnimKeyframe[] = [];
         const flatHandle = (vector: Float32Array | Int32Array) => path.endsWith('Rotation') || track.LineType === mdx.LineType.Bezier
             ? new Float32Array(vector) : new Float32Array(vector.length);
+        const held = (edge: mdx.AnimKeyframe | undefined, frame: number): mdx.AnimKeyframe => {
+            const key: mdx.AnimKeyframe = edge === undefined ? { Frame: frame, Vector: new Float32Array(defaults) } : { ...structuredClone(edge), Frame: frame };
+            if (track.LineType >= mdx.LineType.Hermite) {
+                key.InTan = flatHandle(key.Vector);
+                key.OutTan = flatHandle(key.Vector);
+            }
+            return key;
+        };
+        const played = (frame: number) => sequences.some(sequence => frame >= sequence.Interval[0] && frame <= sequence.Interval[1]);
         for (const sequence of sequences) {
             const [start, end] = sequence.Interval;
             const active = keys.filter(key => key.Frame >= start && key.Frame <= end);
             for (const [frame, edge, incoming] of [[start, active[0], true], [end, active.at(-1), false]] as const) {
                 if (keys.some(key => key.Frame === frame)) continue;
-                const key: mdx.AnimKeyframe = edge === undefined ? { Frame: frame, Vector: new Float32Array(defaults) } : { ...structuredClone(edge), Frame: frame };
-                if (track.LineType >= mdx.LineType.Hermite) {
-                    key.InTan = flatHandle(key.Vector);
-                    key.OutTan = flatHandle(key.Vector);
-
-                    if (edge !== undefined) edge[incoming ? 'InTan' : 'OutTan'] = flatHandle(edge.Vector);
-                }
-                added.push(key);
+                added.push(held(edge, frame));
+                if (edge !== undefined && track.LineType >= mdx.LineType.Hermite) edge[incoming ? 'InTan' : 'OutTan'] = flatHandle(edge.Vector);
+            }
+            // A clip start stored as f32 can sample just below its window, so the millisecond before each window holds the window's start value.
+            const before = start - 1;
+            if (before >= 0 && !played(before) && !keys.some(key => key.Frame === before)) {
+                const startKey = active[0]?.Frame === start ? active[0] : added.find(key => key.Frame === start);
+                added.push(held(startKey, before));
+                if (startKey !== undefined && track.LineType >= mdx.LineType.Hermite) startKey.InTan = flatHandle(startKey.Vector);
             }
         }
         track.Keys = [...keys, ...added].sort((a, b) => a.Frame - b.Frame);

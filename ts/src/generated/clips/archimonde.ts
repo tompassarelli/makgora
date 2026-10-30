@@ -4,15 +4,15 @@ import { f32 } from "wisp/src/sim/f32";
 import type { FighterOriginalClip } from "./fighterOriginalClip";
 
 export const clips: readonly FighterOriginalClip[] = [
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(0.167), endSeconds: f32(1.667), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(1.833), endSeconds: f32(4.767), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(11.167), endSeconds: f32(12.167), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(14.667), endSeconds: f32(17.8), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(17.967), endSeconds: f32(20.3), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(31.7), endSeconds: f32(35.033), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(51.133), endSeconds: f32(52.1), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(54.333), endSeconds: f32(55.433), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx", startSeconds: f32(56.667), endSeconds: f32(57.667), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(0.167), endSeconds: f32(1.667), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(1.833), endSeconds: f32(4.767), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(11.167), endSeconds: f32(12.167), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(14.667), endSeconds: f32(17.8), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(17.967), endSeconds: f32(20.3), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(31.7), endSeconds: f32(35.033), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(51.133), endSeconds: f32(52.1), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(54.333), endSeconds: f32(55.433), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx", startSeconds: f32(56.667), endSeconds: f32(57.667), looping: false, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([

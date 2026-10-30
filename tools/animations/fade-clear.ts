@@ -8,6 +8,7 @@ const [input, output, ...names] = process.argv.slice(2);
 const project = resolve(import.meta.dir, "../..");
 ensure(input && output && names.length > 0 && relative(project, resolve(output)).startsWith(".."), "usage: bun tools/animations/fade-clear.ts SHIPPED.mdx PRIVATE_OUTPUT SEQUENCE...");
 const ALPHA = /^\.(GeosetAnims\.\d+|Materials\.\d+\.Layers\.\d+)\.Alpha$/;
+const SCALING = /^\.(Bones|Helpers)\.\d+\.Scaling$/;
 const source = parseMDX(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 const windows = names.map((name) => {
   const found = model.Sequences.filter((sequence) => sequence.Name === name);
@@ -15,33 +16,42 @@ const windows = names.map((name) => {
   return found[0]!.Interval;
 });
 const EPSILON = 1e-3;
+const SHRUNK = 0.5;
 const inside = (frame: number) => windows.some(([start, end]) => frame >= start! && frame <= end!);
 const [openStart, openEnd] = model.Sequences[0]!.Interval;
 const keyAt = (key: mdx.AnimKeyframe, frame: number): mdx.AnimKeyframe => ({ ...key, Frame: frame, Vector: key.Vector.slice() });
 
 let cleared = 0;
-tracks(model, (track, path) => {
-  if (!ALPHA.test(path) || onGlobalClock(track)) return;
-  const level = track.Keys.find((key) => key.Frame >= openStart! && key.Frame <= openEnd!)?.Vector[0] ?? 1;
-  if (level <= 0) return;
+const hold = (track: mdx.AnimVector, level: ArrayLike<number>, drops: (key: mdx.AnimKeyframe) => boolean) => {
   let changed = false;
   for (const [start, end] of windows) {
     const keys = track.Keys.filter((key) => key.Frame >= start! && key.Frame <= end!);
-    if (keys.some((key) => (key.Vector[0] ?? 1) < level - EPSILON)) {
-      for (const key of keys) {
-        key.Vector[0] = level;
-        key.InTan?.fill(0);
-        key.OutTan?.fill(0);
-      }
-      if (!keys.some((key) => key.Frame === end)) track.Keys.push(keyAt(keys[keys.length - 1]!, end!));
-      if (!keys.some((key) => key.Frame === start)) track.Keys.push(keyAt(keys[0]!, start!));
-      track.Keys.sort((x, y) => x.Frame - y.Frame);
-      changed = true;
+    if (!keys.some(drops)) continue;
+    for (const key of keys) {
+      key.Vector.set(level);
+      key.InTan?.fill(0);
+      key.OutTan?.fill(0);
     }
+    if (!keys.some((key) => key.Frame === end)) track.Keys.push(keyAt(keys[keys.length - 1]!, end!));
+    if (!keys.some((key) => key.Frame === start)) track.Keys.push(keyAt(keys[0]!, start!));
+    track.Keys.sort((x, y) => x.Frame - y.Frame);
+    changed = true;
   }
   if (changed) cleared++;
+};
+tracks(model, (track, path) => {
+  if (onGlobalClock(track)) return;
+  const opening = track.Keys.find((key) => key.Frame >= openStart! && key.Frame <= openEnd!)?.Vector;
+  if (ALPHA.test(path)) {
+    const level = opening?.[0] ?? 1;
+    if (level > 0) hold(track, [level], (key) => (key.Vector[0] ?? 1) < level - EPSILON);
+  } else if (SCALING.test(path)) {
+    const level = opening ?? new Float32Array([1, 1, 1]);
+    const size = Math.min(...Array.from(level));
+    if (size > 0) hold(track, level, (key) => Math.min(...key.Vector) < size * SHRUNK);
+  }
 });
-ensure(cleared > 0, "no body geoset fades in the named sequences");
+ensure(cleared > 0, "no body geoset fades or shrinks in the named sequences");
 
 const outside = (m: mdx.Model) => {
   const copy = structuredClone(m);
@@ -53,4 +63,4 @@ const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(resolve(output), { recursive: true });
 await Bun.write(join(resolve(output), basename(input)), bytes);
-console.log(`FADE_CLEAR_PASS ${cleared} alpha tracks held at full in ${names.join(", ")}; ${join(resolve(output), basename(input))}`);
+console.log(`FADE_CLEAR_PASS ${cleared} alpha and scale tracks held at their opening level in ${names.join(", ")}; ${join(resolve(output), basename(input))}`);

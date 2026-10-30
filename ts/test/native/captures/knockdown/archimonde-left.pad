@@ -1,0 +1,42 @@
+# Knockdown fixture: Pit Lord up-smashes Archimonde at 45% so it tumbles, lands without teching, lies past its Death clip's stock shrink, then stands with stick up; its whole body stays opaque and full size from the fall through the getup (fade-warden, 2026-10-30).
+#! chat -dev setup quick pair pit lord / archimonde;percent 2 45
+20 a stick 1 0
+52 a stick 0 0
+80 a stick 0 1
+80 a press LB
+82 a stick 0 0
+82 a release LB
+186 b capture
+192 b capture
+198 b capture
+199 b capture
+203 b capture
+207 b capture
+211 b capture
+215 b capture
+219 b capture
+223 b capture
+233 b capture
+248 b capture
+260 b capture
+266 b capture
+272 b capture
+278 b capture
+284 b capture
+290 b capture
+296 b capture
+298 b stick 0 1
+298 b capture
+300 b stick 0 0
+301 b capture
+305 b capture
+309 b capture
+313 b capture
+317 b capture
+321 b capture
+325 b capture
+329 b capture
+333 b capture
+337 b capture
+378 b press VIEW
+448 b release VIEW

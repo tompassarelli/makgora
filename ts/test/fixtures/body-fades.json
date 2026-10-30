@@ -1,41 +1,42 @@
 {
  "rifleman": {
-  "body": "RiflemanTimelineBody-1e78b9403effafda7a8d7498ac9a6d6dad17aa4dc29e566f5fd497666b7e2814.mdx",
+  "body": "RiflemanTimelineBody-8b9750ab541fbd830e11ddfdd28a26778c232b83594fac339d7b411ef5b5ff97.mdx",
   "fading": []
  },
  "demonHunter": {
-  "body": "IllidanTimelineBody-f385b7022065d344d42ba4373d07d67587a16e5db60e96d6ee2aaae50d5c304c.mdx",
+  "body": "IllidanTimelineBody-ef56b827bb4d219510246db2cf23b7686f123dcdd778a8e2dd4034454986eb47.mdx",
   "fading": []
  },
  "blademaster": {
-  "body": "BlademasterTimelineBody-94921e53355e2babeed2011041a78c3f652c8992e4c4ef93030b53724770fef9.mdx",
+  "body": "BlademasterTimelineBody-531ae4050660ca681299f115fa2583494885d9302762126f02132a2edb54aef8.mdx",
   "fading": []
  },
  "mountainKing": {
-  "body": "MountainKingTimelineBody-739e167078aa48d614c34aba93809893ff7567c3a7cc24bae1ace6b417475d2b.mdx",
-  "fading": []
+  "body": "MountainKingTimelineBody-64e9794c355ecfec55fc77081dc60387d911bf7d957b476dbb7f44274e490b41.mdx",
+  "fading": [
+   11
+  ]
  },
  "warden": {
-  "body": "WardenTimelineBody-c62ed9a09850fd87f372aa09142742bed825214becb7ce78f6158b34416c07bf.mdx",
+  "body": "WardenTimelineBody-601ba735db1221db247389942d850ac9836fda2bb3e056d4a2cfcc6791d5b35a.mdx",
   "fading": [
    8,
-   9
+   38
   ]
  },
  "lich": {
-  "body": "LichTimelineBody-73ae09d7d6c9c5a89b803cbd05a05df7a07d3d1268287b4347cbc67774cdd68e.mdx",
+  "body": "LichTimelineBody-64504e06a7d36eb8d0f9f2c9c5f3f03adc59d931c9af4bebd315856826be732f.mdx",
   "fading": [
    7,
-   9,
-   10
+   9
   ]
  },
  "dreadlord": {
-  "body": "DreadlordTimelineBody-6c6784b2c94b9e6a897e2eba3f8d3cfd326003a3af9218d3f453f91b633aa18f.mdx",
+  "body": "DreadlordTimelineBody-717fe194ab5ae5c974aee2a506831f38f11c7e40a86ad27d19eff1af55dfec3f.mdx",
   "fading": []
  },
  "shadowHunter": {
-  "body": "ShadowHunterTimelineBody-2b4db5400ae2f034c9142c62e2bd781182c130f624bd40cae6d7d6a863ee4974.mdx",
+  "body": "ShadowHunterTimelineBody-08dcf1551fb9a1f28780b9b7816ccc7bc382b79e0c7548ab3f423e3adf12b636.mdx",
   "fading": [
    10,
    11,
@@ -43,111 +44,114 @@
   ]
  },
  "pitLord": {
-  "body": "PitLordTimelineBody-cecec431b4dad400d66c2fc93ef2eae2e493290968a293c915772b02e2625e4b.mdx",
+  "body": "PitLordTimelineBody-453234a7b010231c9504829d7e3b4d56365929f0c2ffe24c0ec7eaa71549601c.mdx",
   "fading": [
    9,
    10,
    11,
-   12,
-   13
+   12
   ]
  },
  "beastmaster": {
-  "body": "BeastmasterTimelineBody-bec215a05ebdc931f199906a21ab53576b25c2f9e0d9ab424392eaef166a3e1f.mdx",
+  "body": "BeastmasterTimelineBody-ae5ba6794ff69129a9a7569ffd29c8b49d893a77b494f42d69729dde16888eac.mdx",
   "fading": [
    8
   ]
  },
  "lichKing": {
-  "body": "LichKingTimelineBody-f97c9e92dcb87b5bec05ec1aaa856ecf33f51fd39096b1400d32c4cc66651a39.mdx",
+  "body": "LichKingTimelineBody-aed1e466ec47f3e05e84dc8ad32f2143d95b64162e55b489db6501c50f727fd9.mdx",
   "fading": []
  },
  "thrall": {
-  "body": "ThrallTimelineBody-83b2a29c91e0702b3a223558bacfcca18d453974b27b9462a03fb73f63a9cc06.mdx",
+  "body": "ThrallTimelineBody-7359fcd99695c07b38a7259689a6226132197b319f4026af66403227385b4e61.mdx",
   "fading": []
  },
  "jaina": {
-  "body": "JainaProudmooreTimelineBody-97ba9adac5d8f4ff571e200dafdb20a9feba2f6c3372a6f494b54cc5912b5bf2.mdx",
+  "body": "JainaProudmooreTimelineBody-b90fb718d32f6a0ccdba06869b48a4c99b01a194e25728c1bf35b77c1df67b7e.mdx",
   "fading": []
  },
  "sylvanas": {
-  "body": "SylvanasWindrunnerTimelineBody-0d3d3a747a6be9980e1c1f701aa9e625b607eb5bf8347645ab6184a592dfb3b7.mdx",
+  "body": "SylvanasWindrunnerTimelineBody-8a39358d28779291d2eac86a4e9f65554c812916de93e9c8e5c43ceeb791defb.mdx",
   "fading": [
    10
   ]
  },
  "cairne": {
-  "body": "CairneBloodhoofTimelineBody-f93bfb4873096d74802376ffed76f81a788d2a91c8e1ac502f2eca7c531072f7.mdx",
+  "body": "CairneBloodhoofTimelineBody-fc2671d326e0acb71d84fcf4ad950274284f8876bd3144414e7359f80f3bb9b1.mdx",
   "fading": []
  },
  "chen": {
-  "body": "ChenStormstoutTimelineBody-d167f824f018efacecd4693d058fc6c507e4d65a17100784e8a7d9238fe53ee9.mdx",
+  "body": "ChenStormstoutTimelineBody-5a40fc9e6ed7ee916992a543a2b063bc06a1733bc71634cb333fddba056942ad.mdx",
   "fading": [
    7,
    8
   ]
  },
  "peon": {
-  "body": "PeonTimelineBody-28aa6cc2288c84d61b29dbdc16f983d8b42af0591a48caad399e1fce8c6202cf.mdx",
-  "fading": []
+  "body": "PeonTimelineBody-28d3500cc7c247d4f8dce6319437bde7a553793927e55f55024fad99296001d9.mdx",
+  "fading": [
+   90,
+   91,
+   92,
+   93,
+   94,
+   95
+  ]
  },
  "tinker": {
-  "body": "GoblinTinkerTimelineBody-b4da6b24bdf546c3333c941965bca1411ae4ae6e34cb243ca3060f6bdc7340b1.mdx",
+  "body": "GoblinTinkerTimelineBody-319bfe1cda3703e89ed57761a4729273a82a1835e805b39093aca280e83241c6.mdx",
   "fading": [
-   32,
-   33
+   32
   ]
  },
  "kaelthas": {
-  "body": "KaelthasSunstriderTimelineBody-7e08bd448d73cba7a63bcd66656e63ea32fba1bd3afdb961bdef3c1a9ee0cd92.mdx",
+  "body": "KaelthasSunstriderTimelineBody-409b477dce1a00f8019a95b46fc65e9262cf288586d93d3b1374435546021794.mdx",
   "fading": []
  },
  "murloc": {
-  "body": "MurlocTimelineBody-45ce71a5c1ba20673ed4f77eea0ec445035c5553b283d0a1ecd8b54979553d21.mdx",
+  "body": "MurlocTimelineBody-71e834fd0ecfc5370a75e5291652d5d02fa6c14f50fff80aeac76c244b22b406.mdx",
   "fading": []
  },
  "grom": {
-  "body": "GromHellscreamTimelineBody-e557fdf5cd9887aa20c42753b8d17c94bf4029922047a00248759cdff598771f.mdx",
+  "body": "GromHellscreamTimelineBody-ca2e7b9b473bdc17b4c8793ce619ec81a9104e9769dd061674e20b4ce4ee763b.mdx",
   "fading": []
  },
  "anubarak": {
-  "body": "AnubarakTimelineBody-a7394093a6ead061a975044d2c0a5337af928ae331bb6bb98402eeea5118275d.mdx",
+  "body": "AnubarakTimelineBody-f2d56bee1926675be5c241990f087ae43d4ef073b89e675fada3c9bc7cbf39b6.mdx",
   "fading": [
    83
   ]
  },
  "malfurion": {
-  "body": "MalfurionStormrageTimelineBody-b35d3eef28c2c357f7d054e270fc4e4c544f538eafff08c29c26a7a79f7f2d40.mdx",
+  "body": "MalfurionStormrageTimelineBody-961881515325d193cd54598e35051d82e0065916ce318c987e03a4baa04c9f85.mdx",
   "fading": [
    5,
-   6,
-   7
+   6
   ]
  },
  "medivh": {
-  "body": "MedivhTimelineBody-271a597afaeae4393924e68156080074d8c96377600008f5c997e473e46d732b.mdx",
+  "body": "MedivhTimelineBody-e1172e29d162ca39212bcfd96be0d22654cb981f9e34ebc9174f324469ea0816.mdx",
   "fading": [
    90,
    91
   ]
  },
  "uther": {
-  "body": "UtherTimelineBody-3918c0ac0a8736d3fcbfc1c82848bb3b9da408ded4e4dd9e4270d8fef2494f54.mdx",
+  "body": "UtherTimelineBody-f7a2ca1d78118781511d7145582892b0f0bc74d34e0cc8463ed4de988034b8a0.mdx",
   "fading": []
  },
  "ladyVashj": {
-  "body": "LadyVashjTimelineBody-149680302d5c0be62e67c61a91d26e50828b321a76cbd95d886b1971081167de.mdx",
+  "body": "LadyVashjTimelineBody-590a568cd26d0f06eb9598061f58de9aaa0b0e11550b523100f757047bdfd46f.mdx",
   "fading": []
  },
  "archimonde": {
-  "body": "ArchimondeTimelineBody-bd337e56c78accd81101cec582f51551159732b6075aeb47352331ea0c3d776f.mdx",
+  "body": "ArchimondeTimelineBody-64c2314a02fec570f1882766bfff89a1edcefb0c00d7c5f870e7addcdb7452b8.mdx",
   "fading": [
-   5,
-   6
+   5
   ]
  },
  "tyrande": {
-  "body": "TyrandeTimelineBody-e1ef839bd37d58b95b7b0381d6140a00bb8021f8d70a6ec56a0be817bb07f630.mdx",
+  "body": "TyrandeTimelineBody-4a0205c4c7340e8c061298b065722da6cfaf6ebd830d9aef27fc8887ca3c5552.mdx",
   "fading": [
    4,
    5,
@@ -156,21 +160,21 @@
   ]
  },
  "butcher": {
-  "body": "ButcherTimelineBody-4809ac618ee0ab8fbbd850f98501e82d5f18453ec28377cf9353dee0d5810dbc.mdx",
+  "body": "ButcherTimelineBody-cff275ccfb40bfbd5f5d42bc947105ebb4dfed27462155f3933b15ff8faa113c.mdx",
   "fading": []
  },
  "akama": {
-  "body": "AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx",
+  "body": "AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx",
   "fading": []
  },
  "firelord": {
-  "body": "FirelordTimelineBody-484dcf3dda340cebe044fbd6466045329d705baeecb49f7e06775c87d82f75f2.mdx",
+  "body": "FirelordTimelineBody-f7f003addced54a637e61adc4d0ed29e787449fd7d6db6ad677e6f22a93ae299.mdx",
   "fading": [
    10
   ]
  },
  "alchemist": {
-  "body": "GoblinAlchemistTimelineBody-6b81c71b668aeb114beea093c52129efabc9fe16e5ab5271b706db21c5008c7c.mdx",
+  "body": "GoblinAlchemistTimelineBody-2219d36ddd27a336c08177432870e5dcb36b60d4a385d9e5dda8c775f92e8606.mdx",
   "fading": []
  }
 }

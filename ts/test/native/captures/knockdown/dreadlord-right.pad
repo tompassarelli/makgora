@@ -1,0 +1,42 @@
+# Knockdown fixture: Pit Lord up-smashes Dreadlord at 45% so it tumbles, lands without teching, lies past its Death clip's stock shrink, then stands with stick up; its whole body stays opaque and full size from the fall through the getup (fade-warden, 2026-10-30).
+#! chat -dev setup quick pair dreadlord / pit lord;percent 1 45
+20 b stick -1 0
+52 b stick 0 0
+80 b stick 0 1
+80 b press LB
+82 b stick 0 0
+82 b release LB
+201 a capture
+207 a capture
+213 a capture
+214 a capture
+218 a capture
+222 a capture
+226 a capture
+230 a capture
+234 a capture
+238 a capture
+248 a capture
+263 a capture
+275 a capture
+281 a capture
+287 a capture
+293 a capture
+299 a capture
+305 a capture
+311 a capture
+313 a stick 0 1
+313 a capture
+315 a stick 0 0
+316 a capture
+320 a capture
+324 a capture
+328 a capture
+332 a capture
+336 a capture
+340 a capture
+344 a capture
+348 a capture
+352 a capture
+393 a press VIEW
+463 a release VIEW

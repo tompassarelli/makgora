@@ -14,19 +14,43 @@ const STORE = join(homedir(), ".local/share/smashcraft-build-inputs/store");
 const FRAME_MILLISECONDS = 1000 / 60;
 const FULL = 1 - 1e-3;
 
-const alphaAt = (alpha: number | mdx.AnimVector | undefined, millis: number): number => {
-  if (alpha === undefined || typeof alpha === "number") return alpha ?? 1;
-  const keys = alpha.Keys;
+const vectorAt = (track: mdx.AnimVector, millis: number, rest: number): number[] => {
+  const keys = track.Keys;
   const first = keys[0], last = keys[keys.length - 1];
-  if (first === undefined || last === undefined) return 1;
-  if (millis <= first.Frame) return first.Vector[0] ?? 1;
-  if (millis >= last.Frame) return last.Vector[0] ?? 1;
+  if (first === undefined || last === undefined) return [rest];
+  if (millis <= first.Frame) return Array.from(first.Vector);
+  if (millis >= last.Frame) return Array.from(last.Vector);
   const after = keys.findIndex((key) => key.Frame >= millis), before = keys[after - 1], next = keys[after];
-  if (before === undefined || next === undefined) return 1;
-  const step = alpha.LineType === 0 ? 0 : (millis - before.Frame) / (next.Frame - before.Frame);
-  const from = before.Vector[0] ?? 1;
-  return from + ((next.Vector[0] ?? 1) - from) * step;
+  if (before === undefined || next === undefined) return [rest];
+  const step = track.LineType === 0 ? 0 : (millis - before.Frame) / (next.Frame - before.Frame);
+  return Array.from(before.Vector, (from, axis) => from + ((next.Vector[axis] ?? rest) - from) * step);
 };
+
+const alphaAt = (alpha: number | mdx.AnimVector | undefined, millis: number): number =>
+  alpha === undefined || typeof alpha === "number" ? alpha ?? 1 : vectorAt(alpha, millis, 1)[0] ?? 1;
+
+/** Each bone's and helper's smallest scale axis at one instant. */
+const scales = (nodes: readonly mdx.Node[], millis: number): number[] =>
+  nodes.map((node) => node.Scaling === undefined ? 1 : Math.min(...vectorAt(node.Scaling, millis, 1)));
+
+/** A node scaled below this share of its first-clip size hides the mesh under it as surely as a fade. */
+const SHRUNK = 0.5;
+/** The share of the visible body's vertices under shrunk nodes that reads as the body vanishing; glow planes and props stay under it. */
+const HIDDEN_SHARE = 0.1;
+
+/** For each geoset, each vertex group's vertex count and the node indices (in `nodes`) it hangs under, through every ancestor. */
+function vertexChains(model: mdx.Model, nodes: readonly mdx.Node[]): { readonly vertices: number; readonly chain: readonly number[] }[][] {
+  const index = new Map(nodes.map((node, at) => [node.ObjectId, at]));
+  const ancestors = (objectId: number): number[] => {
+    const chain: number[] = [];
+    for (let at = index.get(objectId); at !== undefined && !chain.includes(at); at = index.get(nodes[at]!.Parent ?? -1)) chain.push(at);
+    return chain;
+  };
+  return model.Geosets.map((geoset) => geoset.Groups.map((group, matrix) => ({
+    vertices: geoset.VertexGroup.reduce((count, used) => count + (used === matrix ? 1 : 0), 0),
+    chain: [...new Set(group.flatMap(ancestors))],
+  })));
+}
 
 /** Each geoset's drawn opacity at one instant: its animated opacity times its layers'. */
 const opacities = (model: mdx.Model, millis: number): number[] =>
@@ -36,16 +60,25 @@ const opacities = (model: mdx.Model, millis: number): number[] =>
     return alphaAt(anim?.Alpha, millis) * Math.max(0, ...layers.map((layer) => alphaAt(layer.Alpha, millis)));
   });
 
-/** The clips of one body model during which a geoset visible in the model's first clip drops below the opacity it has there. */
+/** The clips of one body model during which a geoset visible in the model's first clip drops below the opacity it has there, or a tenth of its visible vertices hang under a bone or helper shrunk below half the size it has there. */
 export function fadingClips(model: mdx.Model, windows: readonly (readonly [number, number])[]): number[] {
   const first = windows[0];
   if (first === undefined) return [];
-  const reference = opacities(model, first[0]);
+  const nodes = [...model.Bones, ...model.Helpers], groups = vertexChains(model, nodes);
+  const reference = opacities(model, first[0]), size = scales(nodes, first[0]);
+  const visible = groups.reduce((total, geoset, at) => total + ((reference[at] ?? 0) > 0 ? geoset.reduce((sum, group) => sum + group.vertices, 0) : 0), 0);
+  const fades = (millis: number) => opacities(model, millis).some((value, geoset) => (reference[geoset] ?? 0) > 0 && value < (reference[geoset] ?? 0) * FULL);
+  const hidden = (millis: number) => {
+    const shrunk = scales(nodes, millis).map((value, node) => value < (size[node] ?? 1) * SHRUNK);
+    if (!shrunk.includes(true)) return false;
+    const under = groups.reduce((total, geoset, at) => total + ((reference[at] ?? 0) > 0 ? geoset.reduce((sum, group) => sum + (group.chain.some((node) => shrunk[node]) ? group.vertices : 0), 0) : 0), 0);
+    return under > visible * HIDDEN_SHARE;
+  };
   const fading: number[] = [];
   windows.forEach(([start, end], clip) => {
     for (let millis = start; millis <= end + FRAME_MILLISECONDS; millis += FRAME_MILLISECONDS) {
-      const now = opacities(model, Math.min(millis, end));
-      if (now.some((value, geoset) => (reference[geoset] ?? 0) > 0 && value < (reference[geoset] ?? 0) * FULL)) { fading.push(clip); return; }
+      const at = Math.min(millis, end);
+      if (fades(at) || hidden(at)) { fading.push(clip); return; }
     }
   });
   return fading;

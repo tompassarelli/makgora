@@ -4,17 +4,17 @@ import { f32 } from "wisp/src/sim/f32";
 import type { FighterOriginalClip } from "./fighterOriginalClip";
 
 export const clips: readonly FighterOriginalClip[] = [
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(3.333), endSeconds: f32(4.833), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(6.667), endSeconds: f32(9.667), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(16.7), endSeconds: f32(17.4), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: 20.0, endSeconds: 22.0, looping: false, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(23.333), endSeconds: f32(24.333), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(26.667), endSeconds: f32(27.667), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: 30.0, endSeconds: 31.0, looping: false, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(36.667), endSeconds: f32(37.667), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(43.333), endSeconds: f32(47.6), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: 50.0, endSeconds: f32(52.167), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\AkamaTimelineBody-2a428c9f908091007e052f9c92b5a74478bdb41f9c21cac2637f1d41ff60db67.mdx", startSeconds: f32(66.667), endSeconds: f32(68.667), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(3.333), endSeconds: f32(4.833), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(6.667), endSeconds: f32(9.667), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(16.7), endSeconds: f32(17.4), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: 20.0, endSeconds: 22.0, looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(23.333), endSeconds: f32(24.333), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(26.667), endSeconds: f32(27.667), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: 30.0, endSeconds: 31.0, looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(36.667), endSeconds: f32(37.667), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(43.333), endSeconds: f32(47.6), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: 50.0, endSeconds: f32(52.167), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\AkamaTimelineBody-4d52be08c8624bef601bbe33f4c85c875d71edab8548aa303bdea4e25e021bb8.mdx", startSeconds: f32(66.667), endSeconds: f32(68.667), looping: false, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
