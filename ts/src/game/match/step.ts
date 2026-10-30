@@ -9,6 +9,7 @@ import { clearDash } from "../sim/groundMovement";
 import { canStartAttackStyle, cancelsJumpSquat, inGrabContext } from "../sim/conditions";
 import { collectLavaContacts } from "../sim/lava";
 import { beginDamageContacts, finishDamageContacts } from "../sim/contacts";
+import { advanceDuoLocks } from "../sim/duoLocks";
 import { advanceGrabs, captureGrabPauses, resolveGrabs } from "../sim/grabs";
 import { resolveLedges } from "../sim/ledge";
 import { carryOnMovingDecks } from "../sim/movingDecks";
@@ -277,6 +278,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   }
   finishDamageContacts(world);
   resolveGrabs(world);
+  advanceDuoLocks(world);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);

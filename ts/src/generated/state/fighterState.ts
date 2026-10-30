@@ -549,6 +549,8 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   victim.netImmune = sourceVictim.netImmune;
   victim.grabImmuneDuo = sourceVictim.grabImmuneDuo;
   victim.handoffs = sourceVictim.handoffs;
+  victim.shieldRun = sourceVictim.shieldRun;
+  victim.shieldFree = sourceVictim.shieldFree;
 }
 
 export function copyFighterState(target: Fighter, source: Readonly<Fighter>, activeMask: number): void {
@@ -1020,6 +1022,8 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = victim.netImmune, b = sourceVictim.netImmune; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = victim.grabImmuneDuo, b = sourceVictim.grabImmuneDuo; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = victim.handoffs, b = sourceVictim.handoffs; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = victim.shieldRun, b = sourceVictim.shieldRun; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = victim.shieldFree, b = sourceVictim.shieldFree; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   return true;
 }
 
@@ -1550,6 +1554,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   if (victim.netImmune !== 0) sink.int(prefix, "victim.netImmune", victim.netImmune);
   if (victim.grabImmuneDuo !== 0) sink.int(prefix, "victim.grabImmuneDuo", victim.grabImmuneDuo);
   if (victim.handoffs !== 0) sink.int(prefix, "victim.handoffs", victim.handoffs);
+  if (victim.shieldRun !== 0) sink.int(prefix, "victim.shieldRun", victim.shieldRun);
+  if (victim.shieldFree !== 0) sink.int(prefix, "victim.shieldFree", victim.shieldFree);
 }
 
 export function blastFighterFields(f: Fighter): void {
@@ -1657,6 +1663,8 @@ export function blastFighterFields(f: Fighter): void {
   victim.netImmune = 0;
   victim.grabImmuneDuo = 0;
   victim.handoffs = 0;
+  victim.shieldRun = 0;
+  victim.shieldFree = 0;
 }
 
 export function respawnFighterFields(f: Fighter, startX: number): void {
@@ -1886,4 +1894,6 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   victim.netImmune = 0;
   victim.grabImmuneDuo = 0;
   victim.handoffs = 0;
+  victim.shieldRun = 0;
+  victim.shieldFree = 0;
 }
