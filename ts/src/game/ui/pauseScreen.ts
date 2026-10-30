@@ -32,6 +32,7 @@ export interface PauseView {
   readonly chord: ChordLabels;
   readonly camera: string;
   readonly pauseKey: string;
+  readonly hints?: boolean | undefined;
 }
 
 type Place = (edges: Edges) => readonly [number, number, number, number];
@@ -95,7 +96,7 @@ export class PauseScreen {
     }
     this.nameText = this.label("NameText", f32(MENU_STYLE.headerSize * 1.5), edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.05)) - f32(0.008)), NAME_WIDTH, f32(0.03)], TEXT_JUSTIFY_CENTER);
     this.clockText = this.label("Clock", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.022))), NAME_WIDTH, f32(0.02)], TEXT_JUSTIFY_RIGHT);
-    this.menuText = this.label("Menu", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.1))), NAME_WIDTH, f32(0.02)], TEXT_JUSTIFY_RIGHT);
+    this.menuText = this.label("Menu", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.1))), NAME_WIDTH, f32(0.034)], TEXT_JUSTIFY_RIGHT);
     this.emblem();
     this.cameraText = this.label("Camera", MENU_STYLE.bodySize, edges => [f32(edges.left + MARGIN + f32(0.1)), f32(edges.bottom + MARGIN + f32(0.062)), f32(0.3), f32(0.04)], TEXT_JUSTIFY_LEFT);
     this.plate("Reset", PLATE, edges => resetPlateBox(edges));
@@ -139,7 +140,8 @@ export class PauseScreen {
     }
     BlzFrameSetText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${I2S(view.player)} PAUSE`}|r`);
     BlzFrameSetText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
-    BlzFrameSetText(this.menuText, `${MENU_STYLE.text}F10: Warcraft menu  ·  G: hide HUD|r`);
+    const hints = view.hints === undefined ? "" : `\nNew-player hints: ${view.hints ? "on" : "off"} (H)`;
+    BlzFrameSetText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${hints}|r`);
     BlzFrameSetText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
     BlzFrameSetText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);
   }
