@@ -194,7 +194,7 @@ jobs:
           path: skipped-check-${{ matrix.group }}.txt
           retention-days: 3
       # Each group keeps its own Lua32 builds: parity's include the toward-zero variant.
-      - if: steps.scope.outputs.run == 'true'
+      - if: steps.scope.outputs.run == 'true' && !contains(fromJson('["computer-0","computer-1","clean-room","static"]'), matrix.group)
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
