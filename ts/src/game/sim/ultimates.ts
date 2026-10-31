@@ -147,7 +147,7 @@ const INFERNAL: SpecialCompanion = {
   stunFrames: 24, leash: 900.0, leashFrames: 120,
 };
 const INFERNAL_PLACEMENT: SpecialPlacement = {
-  frame: 40, offsetX: 0.0, radius: INFERNAL_RADIUS, height: 170.0, durability: 30.0, life: 300,
+  frame: 40, offsetX: 0.0, radius: INFERNAL_RADIUS, height: 170.0, durability: 30.0, life: 480,
   fireAges: [30, 60, 90, 120, 150, 180, 210, 240, 270], shot: INFERNAL_IMMOLATION, aura: true, atMark: INFERNO_MARK, companion: INFERNAL,
   model: { path: "Units\\Demon\\Infernal\\Infernal.mdl", height: 240.0, alpha: 255 },
 };
