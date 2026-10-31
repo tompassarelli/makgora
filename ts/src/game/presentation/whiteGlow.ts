@@ -40,9 +40,13 @@ export function whiteGlowAlpha(state: WhiteGlowState, fighter: Readonly<Fighter>
     if (region !== undefined && fighter.special.frame > region.firstFrame && fighter.special.frame <= region.firstFrame + 3) return 230;
   }
   if (fighter.special.action === SpecialAction.heroUltimate && fighter.special.frame <= ULTIMATE_FLASH_FRAMES) return 230;
-  if (remaining > 0 && state.total >= HEAVY_HITLAG_FRAMES) {
+  if (remaining > 0 && state.total >= HEAVY_HITLAG_FRAMES && struck(fighter)) {
     return floorMod(state.total - remaining, 4) < 2 ? 220 : 100;
   }
   if (!fighter.attack.smashCharging) return 0;
   return floorMod(fighter.attack.smashChargeFrames, WHITE_GLOW_PERIOD) < WHITE_GLOW_PERIOD / 2 ? 190 : 0;
+}
+
+function struck(fighter: Readonly<Fighter>): boolean {
+  return fighter.launch.hitstun > 0 || fighter.launch.throwHitstun;
 }
