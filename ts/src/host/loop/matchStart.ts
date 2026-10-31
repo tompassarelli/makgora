@@ -34,6 +34,7 @@ import { beginFighterRenderers, views } from "./ui";
 import { findWarcraftChat } from "../../platform/editboxJournal";
 import { LASTING, drawStage, pauseMatchPresentation, renderPersistentPresentation, setStatus } from "./view";
 import { duoRole } from "../../game/sim/fighter";
+import { setBodyTimeScale, showBody } from "wisp/game/bodies";
 
 export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario, stageSettings?: QuickStageSettings): void {
   delete s.dev.shieldEnergyCapture;
@@ -98,8 +99,8 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
 
     if (!participant.pooled) continue;
     if (participant.body !== undefined) {
-      SetUnitTimeScale(participant.body.unit, 0.0);
-      ShowUnit(participant.body.unit, false);
+      setBodyTimeScale(participant.body.unit, 0.0);
+      showBody(participant.body.unit, false);
     }
     confirmModelSounds(s.sounds, s.sounds.epoch ?? 0, 0, slot, fighter, s.runtime.poses[slot], ui.sounds);
   }

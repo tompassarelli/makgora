@@ -3,6 +3,7 @@ import { isActive } from "../../game/sim/roster";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
 import { effectScale, effectX, effectY, effectZ, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { bodyHidden, setBodyTeamGlow, showBody } from "wisp/game/bodies";
 
 export interface HiddenFighter {
   unitShown: boolean;
@@ -83,8 +84,8 @@ export function concealFighter(s: ShellState, slot: ParticipantSlot): void {
   const hidden = s.hiddenFighters[slot];
   if (hidden === undefined) return;
   const body = s.participants[slot].body;
-  if (body !== undefined && hidden.body) ShowUnit(body.unit, false);
-  if (body !== undefined && hidden.bare) BlzShowUnitTeamGlow(body.unit, false);
+  if (body !== undefined && hidden.body) showBody(body.unit, false);
+  if (body !== undefined && hidden.bare) setBodyTeamGlow(body.unit, false);
   if (hidden.body || hidden.bare) for (const model of fighterEffects(s, slot)) setEffectScale(model, 0.0);
   if (hidden.cues) concealCues(s, slot);
 }
@@ -113,7 +114,7 @@ export function hideCues(s: ShellState, slot: ParticipantSlot, hidden: boolean):
   const body = s.participants[slot].body;
   if (body === undefined || !isActive(s.world, slot)) return false;
   const was = s.hiddenFighters[slot];
-  s.hiddenFighters[slot] = cloaked(was, { cues: hidden }, was?.unitShown ?? !IsUnitHidden(body.unit));
+  s.hiddenFighters[slot] = cloaked(was, { cues: hidden }, was?.unitShown ?? !bodyHidden(body.unit));
   if (hidden) concealFighter(s, slot);
   else revealCues(s, slot);
   return true;
@@ -124,13 +125,13 @@ export function hideFighter(s: ShellState, slot: ParticipantSlot, hidden: boolea
   if (body === undefined || !isActive(s.world, slot)) return false;
   const was = s.hiddenFighters[slot];
   if (hidden) {
-    s.hiddenFighters[slot] = cloaked(was, { body: true }, was?.body === true ? was.unitShown : !IsUnitHidden(body.unit));
+    s.hiddenFighters[slot] = cloaked(was, { body: true }, was?.body === true ? was.unitShown : !bodyHidden(body.unit));
     concealFighter(s, slot);
     return true;
   }
   if (was === undefined || !was.body) return true;
   s.hiddenFighters[slot] = cloaked(was, { body: false }, was.unitShown);
-  ShowUnit(body.unit, was.unitShown);
+  showBody(body.unit, was.unitShown);
   if (body.dizzyShown) setEffectScale(body.dizzy, 1.0);
   s.ui?.fighters[slot]?.pool?.redraw();
   return true;
@@ -146,7 +147,7 @@ export function bareFighter(s: ShellState, slot: ParticipantSlot, bare: boolean)
   }
   if (was === undefined || !was.bare) return;
   s.hiddenFighters[slot] = cloaked(was, { bare: false }, was.unitShown);
-  if (body !== undefined) BlzShowUnitTeamGlow(body.unit, true);
+  if (body !== undefined) setBodyTeamGlow(body.unit, true);
 }
 
 export function clearCloaks(s: ShellState): void {

@@ -9,6 +9,7 @@ import { hideFighter } from "./fighterCloak";
 import type { ShellState } from "./state";
 import { renderPersistentPresentation } from "./view";
 import { player } from "wisp/game/players";
+import { setBodyAnimation, setBodyAnimationIndex, setBodyTimeScale } from "wisp/game/bodies";
 
 function removeLane(s: ShellState, slot: ParticipantSlot): void {
   const staged = s.captureBodies[slot];
@@ -56,12 +57,12 @@ export function renderCaptureStage(s: ShellState): void {
     const { body } = staged;
     const { pose } = lane;
     if (staged.loop !== lane.loops || body.renderedSelection !== pose.selectionSerial) {
-      if (pose.clipIndex !== undefined) SetUnitAnimationByIndex(body.unit, pose.clipIndex);
-      else SetUnitAnimation(body.unit, pose.clipName);
+      if (pose.clipIndex !== undefined) setBodyAnimationIndex(body.unit, pose.clipIndex);
+      else setBodyAnimation(body.unit, pose.clipName);
       body.renderedSelection = pose.selectionSerial;
       staged.loop = lane.loops;
     }
-    SetUnitTimeScale(body.unit, pose.rate);
+    setBodyTimeScale(body.unit, pose.rate);
     placeFighterBody(body, lane.fighter, s.origin, s.game.stageChoice);
   }
 }

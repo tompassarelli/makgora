@@ -68,6 +68,7 @@ import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentatio
 import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
 import { clearTextMessages, createFrameByType, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment } from "wisp/game/frames";
 import { panCameraTo, setCameraBounds, setCameraField, setCameraPosition } from "wisp/game/view";
+import { setBodyAnimation, setBodyAnimationIndex, setBodyTimeScale, showBody } from "wisp/game/bodies";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -268,23 +269,23 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   colorFighterBody(body, slot, fighterColor(s.game, slot));
   const hidden = s.hiddenFighters[slot];
   const cloaked = hidden?.body === true;
-  if (!cloaked && wasOut && !fighter.status.out) ShowUnit(body.unit, true);
+  if (!cloaked && wasOut && !fighter.status.out) showBody(body.unit, true);
   else if (!cloaked && !wasOut && fighter.status.out) {
-    ShowUnit(body.unit, false);
+    showBody(body.unit, false);
   }
   const { pooled } = participant;
   if (hidden !== undefined && cloaked) hidden.unitShown = !pooled && !fighter.status.out && !inCannonBarrel(fighter);
-  else ShowUnit(body.unit, !pooled && !fighter.status.out && !inCannonBarrel(fighter));
+  else showBody(body.unit, !pooled && !fighter.status.out && !inCannonBarrel(fighter));
   if (body.renderedSelection !== pose.selectionSerial) {
     if (!pooled) {
 
       const cry = gateCry(body.cry ??= createCryGate(), s.runtime.simulationFrame, fighter, pose.clipIndex, pose.clipName);
       const standIn = cry === CryDecision.standIn ? cryStandIn(fighter.character) : undefined;
-      if (standIn !== undefined) SetUnitAnimationByIndex(body.unit, standIn);
+      if (standIn !== undefined) setBodyAnimationIndex(body.unit, standIn);
       else if (cry === CryDecision.keep) {
 
-      } else if (pose.clipIndex !== undefined) SetUnitAnimationByIndex(body.unit, pose.clipIndex);
-      else SetUnitAnimation(body.unit, pose.clipName);
+      } else if (pose.clipIndex !== undefined) setBodyAnimationIndex(body.unit, pose.clipIndex);
+      else setBodyAnimation(body.unit, pose.clipName);
     }
     body.renderedSelection = pose.selectionSerial;
     const reaction = damagePose(fighter);
@@ -293,7 +294,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
       traceParticipant(s, slot, `damage pose ${reaction} hitlag ${launch.hitlag} hitstun ${launch.hitstun} x ${R2S(motion.x)} z ${R2S(motion.z)} launch ${R2S(launch.knockbackX)}:${R2S(launch.knockbackZ)}`);
     }
   }
-  if (!pooled) SetUnitTimeScale(body.unit, pose.rate);
+  if (!pooled) setBodyTimeScale(body.unit, pose.rate);
   if (fighter.status.out) return;
   placeFighterBody(body, fighter, s.origin, s.game.stageChoice);
   const tint = damageTint(fighter);
@@ -333,7 +334,7 @@ function setMatchPresentationPaused(s: ShellState, paused: boolean): void {
   for (const slot of PARTICIPANT_SLOTS) {
     const { body } = s.participants[slot];
     if (body === undefined || !isActive(s.world, slot)) continue;
-    if (paused) SetUnitTimeScale(body.unit, 0.0);
+    if (paused) setBodyTimeScale(body.unit, 0.0);
     else if (!fighterAt(s.world, slot).status.out) renderFighter(s, slot, s.runtime.poses[slot], false);
   }
   pauseEffects(s, paused);

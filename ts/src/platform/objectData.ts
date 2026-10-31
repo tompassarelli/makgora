@@ -1,18 +1,19 @@
 import { FILE_IO_OBJECT, type FighterObject } from "../game/objectData";
+import { setAbilityTooltip, setBodyAttackCooldown, setBodyBlendTime, setBodyMoveSpeed, setBodyName, setBodyScale, setBodySelectionScale } from "wisp/game/bodies";
 
 
 export function applyFighterObject(whichUnit: unit, definition: FighterObject): void {
-  BlzSetUnitName(whichUnit, definition.name);
-  SetUnitScale(whichUnit, definition.scale, definition.scale, definition.scale);
-  SetUnitBlendTime(whichUnit, definition.blendTime);
-  BlzSetUnitRealField(whichUnit, UNIT_RF_SELECTION_SCALE, definition.selectionScale);
-  SetUnitMoveSpeed(whichUnit, definition.moveSpeed);
-  BlzSetUnitAttackCooldown(whichUnit, definition.attackCooldown, 0);
+  setBodyName(whichUnit, definition.name);
+  setBodyScale(whichUnit, definition.scale, definition.scale, definition.scale);
+  setBodyBlendTime(whichUnit, definition.blendTime);
+  setBodySelectionScale(whichUnit, definition.selectionScale);
+  setBodyMoveSpeed(whichUnit, definition.moveSpeed);
+  setBodyAttackCooldown(whichUnit, definition.attackCooldown);
 }
 
 
 export function applyFileIoObject(): void {
   for (let level = 0; level < FILE_IO_OBJECT.levels; level++) {
-    BlzSetAbilityTooltip(FILE_IO_OBJECT.id, FILE_IO_OBJECT.tooltip, level);
+    setAbilityTooltip(FILE_IO_OBJECT.id, FILE_IO_OBJECT.tooltip, level);
   }
 }

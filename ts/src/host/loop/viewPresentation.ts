@@ -15,6 +15,7 @@ import { presentedCueTrace } from "./diagnostics";
 import type { UiObjects } from "./ui";
 import type { ShellState } from "./state";
 import { setEffectColor, setEffectPitch, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { showBody } from "wisp/game/bodies";
 
 export function presentStageMotion(s: ShellState, drawn: number, matchFrame: number, world: Readonly<Roster>): void {
   const beforePlatform = framesUntilPlatformMoves(drawn, matchFrame);
@@ -76,7 +77,7 @@ function presentSlotBody(s: ShellState, ui: UiObjects, slot: ParticipantSlot, ga
   const renderers = ui.fighters[slot];
   if (s.game.phase === Phase.result) {
     const body = s.participants[slot].body;
-    if (body !== undefined) ShowUnit(body.unit, false);
+    if (body !== undefined) showBody(body.unit, false);
   }
   const posed = ui.match.posing === slot ? undefined : live;
   if (renderers !== undefined) presentDrawnBody(renderers, fighter, game.phase !== Phase.result && ui.match.posing !== slot, posed, runtime.poses[slot], game.stageChoice, runtime.simulationFrame, matchFrame, game.camera, game.ultimatesOff);

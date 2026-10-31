@@ -73,6 +73,7 @@ import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
 import { enableFog, enableFogMask, setCameraSmoothing, setTimeOfDay, setTimeOfDayScale } from "wisp/game/view";
 import { addLeaveEvent, eventPlayer, localPlayer, player, playerSlot, setPlayerColor } from "wisp/game/players";
 import { addSyncEvent } from "wisp/game/sync";
+import { locationX, locationY, mapCenter, removeLocation, showBody } from "wisp/game/bodies";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -227,7 +228,7 @@ function presentMatchFlow(s: ShellState): void {
   if (!match.tick()) return;
   const posing = match.posing;
   const body = posing === undefined ? undefined : s.participants[posing]?.body;
-  if (body !== undefined) ShowUnit(body.unit, false);
+  if (body !== undefined) showBody(body.unit, false);
 }
 
 function controlsCommand(s: ShellState): void {
@@ -360,10 +361,10 @@ function createTriggers(s: ShellState): void {
 
 
 function worldOrigin(): { x: number; y: number; z: number } {
-  const center = GetRectCenter(GetPlayableMapRect());
+  const center = mapCenter();
   // Engine: terrain water can change GetLocationZ at the map centre, so the arena stands at a fixed height over the base map's ground (z 0).
-  const origin = { x: GetLocationX(center), y: GetLocationY(center), z: FLOOR_HEIGHT };
-  RemoveLocation(center);
+  const origin = { x: locationX(center), y: locationY(center), z: FLOOR_HEIGHT };
+  removeLocation(center);
   return origin;
 }
 

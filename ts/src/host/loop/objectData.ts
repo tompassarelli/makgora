@@ -6,6 +6,7 @@ import { confirmedChecksum } from "./diagnostics";
 import { shellState } from "./state";
 import { objectDataReceiptFile } from "../../game/core/gameFiles";
 import { localPlayer, playerSlot } from "wisp/game/players";
+import { bodyAttackCooldown, bodyKind, bodyMoveSpeed } from "wisp/game/bodies";
 
 // install() runs on the same synchronized frame on every client.
 export function installObjectData(): void {
@@ -16,12 +17,12 @@ export function installObjectData(): void {
   for (const participant of s.participants) {
     const body = participant.body;
     if (body === undefined) continue;
-    const id = GetUnitTypeId(body.unit);
+    const id = bodyKind(body.unit);
     for (const character of FIGHTER_OBJECT_ORDER) {
       const definition = FIGHTER_OBJECTS[character];
       if (definition.id !== id) continue;
       applyFighterObject(body.unit, definition);
-      fields.push(`slot ${participant.slot} unit ${id} handle ${GetHandleId(body.unit)} speed ${GetUnitMoveSpeed(body.unit)} cooldown ${BlzGetUnitAttackCooldown(body.unit, 0)}`);
+      fields.push(`slot ${participant.slot} unit ${id} handle ${GetHandleId(body.unit)} speed ${bodyMoveSpeed(body.unit)} cooldown ${bodyAttackCooldown(body.unit)}`);
     }
   }
   if (!s.build.devConsole) return;

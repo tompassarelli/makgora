@@ -14,6 +14,7 @@ import type { ShellState } from "./state";
 import { localHints } from "./hints";
 import { endFighter, layoutHuds, views } from "./ui";
 import { player } from "wisp/game/players";
+import { setBodyAnimation } from "wisp/game/bodies";
 
 const NEUTRAL = neutralControls();
 
@@ -52,6 +53,6 @@ export function makePreview(s: ShellState): void {
     s.world.fighters[slot] = fighter;
     const body = createFighterBody(player(slot), fighter, s.origin);
     s.participants[slot].body = body;
-    SetUnitAnimation(body.unit, "stand");
+    setBodyAnimation(body.unit, "stand");
   }
 }

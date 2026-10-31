@@ -15,6 +15,7 @@ import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { fighterModelScale } from "../../game/presentation/fighterScale";
 import { createEffect, destroyEffect, setEffectPosition, setEffectScale } from "wisp/game/effects";
 import { player as playerOf, setPlayerColor } from "wisp/game/players";
+import { addBodyAbility, createBody, pauseBody, removeBody, removeBodyAbility, setBodyColor, setBodyFacing, setBodyHeight, setBodyInvulnerable, setBodyPathing, setBodyScale, setBodyTint, setBodyX, setBodyY } from "wisp/game/bodies";
 
 
 const CROW_FORM = 0x416d7266;
@@ -29,34 +30,34 @@ export function colorFighterBody(body: FighterBody, slot: number, color: number)
   if (body.color === color) return;
   body.color = color;
   setPlayerColor(playerOf(slot), color);
-  SetUnitColor(body.unit, ConvertPlayerColor(color));
+  setBodyColor(body.unit, color);
 }
 
 export function paintFighterBody(body: FighterBody, red: number, green: number, blue: number, alpha: number, tint: CostumeTint | undefined): void {
-  if (tint === undefined) SetUnitVertexColor(body.unit, red, green, blue, alpha);
-  else SetUnitVertexColor(body.unit, floorDiv(red * tint[0], 255), floorDiv(green * tint[1], 255), floorDiv(blue * tint[2], 255), alpha);
+  if (tint === undefined) setBodyTint(body.unit, red, green, blue, alpha);
+  else setBodyTint(body.unit, floorDiv(red * tint[0], 255), floorDiv(green * tint[1], 255), floorDiv(blue * tint[2], 255), alpha);
 }
 
 export function placeFighterBody(body: FighterBody, fighter: Readonly<Fighter>, origin: WorldOrigin, stage = 0): void {
   fitFighterPlacement(placement, fighter, stage);
-  SetUnitX(body.unit, origin.x + placement.x);
-  SetUnitY(body.unit, origin.y);
-  SetUnitFlyHeight(body.unit, FLOOR_HEIGHT + placement.z, 0.0);
+  setBodyX(body.unit, origin.x + placement.x);
+  setBodyY(body.unit, origin.y);
+  setBodyHeight(body.unit, FLOOR_HEIGHT + placement.z, 0.0);
   const scale = fighterModelScale(fighter);
-  SetUnitScale(body.unit, scale, scale, scale);
-  BlzSetUnitFacingEx(body.unit, fighterPoseFacing(fighter) > 0 ? 0.0 : 180.0);
+  setBodyScale(body.unit, scale, scale, scale);
+  setBodyFacing(body.unit, fighterPoseFacing(fighter) > 0 ? 0.0 : 180.0);
 }
 
 export function createFighterBody(owner: player, fighter: Readonly<Fighter>, origin: WorldOrigin): FighterBody {
   const definition = FIGHTER_OBJECTS[fighter.character];
-  const unit = CreateUnit(owner, definition.id, origin.x + fighter.motion.x, origin.y, fighter.facing > 0 ? 0.0 : 180.0);
+  const unit = createBody(owner, definition.id, origin.x + fighter.motion.x, origin.y, fighter.facing > 0 ? 0.0 : 180.0);
   applyFighterObject(unit, definition);
-  SetUnitInvulnerable(unit, true);
-  SetUnitPathing(unit, false);
-  UnitAddAbility(unit, CROW_FORM);
-  UnitRemoveAbility(unit, CROW_FORM);
-  UnitAddAbility(unit, LOCUST);
-  PauseUnit(unit, true);
+  setBodyInvulnerable(unit, true);
+  setBodyPathing(unit, false);
+  addBodyAbility(unit, CROW_FORM);
+  removeBodyAbility(unit, CROW_FORM);
+  addBodyAbility(unit, LOCUST);
+  pauseBody(unit, true);
   // Online, Warcraft handles must be born on the same turn on every client, so the dizzy stars are made with the body and only shown and hidden on drawn frames.
   const dizzy = createEffect(DIZZY_MODEL, origin.x, origin.y);
   hideEffect(dizzy, origin);
@@ -85,5 +86,5 @@ export function renderDizzy(body: FighterBody, fighter: Readonly<Fighter>, playi
 
 export function removeFighterBody(body: FighterBody): void {
   destroyEffect(body.dizzy);
-  RemoveUnit(body.unit);
+  removeBody(body.unit);
 }
