@@ -27,6 +27,8 @@ export interface SceneryPiece {
   readonly matrixScale?: readonly [number, number, number];
   readonly color?: readonly [number, number, number];
   readonly flying?: true;
+  /** The model plays its floating idle; a still piece holds its first frame so a stacked spire does not bob. */
+  readonly still?: true;
 }
 
 /** The native window's painted sky for a stage, which keeps one time of day: the zenith colour, the cloud cover, the sun's (or moon's) place and colour, and how far stars and a horizon glow show. Colours are 0 to 1; the horizon is the fog's colour. */
@@ -79,24 +81,24 @@ const FROZEN_THRONE: StageScenery = {
   fog: { start: 5000.0, end: 11000.0, red: 0.375, green: 0.625, blue: 0.875 },
   floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [56, 72, 92] },
   pieces: [
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -420.0, scale: 1.0, yaw: 270.0, matrixScale: [10.0, 5.0, 2.5], color: [36, 50, 72] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -344.0, scale: 1.0, yaw: 270.0, matrixScale: [9.25, 4.625, 2.5], color: [39, 54, 76] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -268.0, scale: 1.0, yaw: 270.0, matrixScale: [8.5, 4.25, 2.5], color: [47, 63, 86] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -192.0, scale: 1.0, yaw: 270.0, matrixScale: [7.75, 3.875, 2.5], color: [58, 75, 98] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -116.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 3.5, 2.5], color: [71, 90, 114] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -40.0, scale: 1.0, yaw: 270.0, matrixScale: [6.25, 3.125, 2.5], color: [86, 108, 132] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 36.0, scale: 1.0, yaw: 270.0, matrixScale: [5.5, 2.75, 2.5], color: [103, 128, 153] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 112.0, scale: 1.0, yaw: 270.0, matrixScale: [4.75, 2.375, 2.5], color: [122, 150, 176] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 188.0, scale: 1.0, yaw: 270.0, matrixScale: [4.0, 2.0, 2.5], color: [142, 174, 201] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 264.0, scale: 1.0, yaw: 270.0, matrixScale: [3.25, 1.625, 2.5], color: [165, 200, 228] },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -420.0, scale: 1.0, yaw: 270.0, matrixScale: [10.0, 5.0, 2.5], color: [36, 50, 72], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -344.0, scale: 1.0, yaw: 270.0, matrixScale: [9.25, 4.625, 2.5], color: [39, 54, 76], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -268.0, scale: 1.0, yaw: 270.0, matrixScale: [8.5, 4.25, 2.5], color: [47, 63, 86], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -192.0, scale: 1.0, yaw: 270.0, matrixScale: [7.75, 3.875, 2.5], color: [58, 75, 98], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -116.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 3.5, 2.5], color: [71, 90, 114], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -40.0, scale: 1.0, yaw: 270.0, matrixScale: [6.25, 3.125, 2.5], color: [86, 108, 132], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 36.0, scale: 1.0, yaw: 270.0, matrixScale: [5.5, 2.75, 2.5], color: [103, 128, 153], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 112.0, scale: 1.0, yaw: 270.0, matrixScale: [4.75, 2.375, 2.5], color: [122, 150, 176], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 188.0, scale: 1.0, yaw: 270.0, matrixScale: [4.0, 2.0, 2.5], color: [142, 174, 201], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: 264.0, scale: 1.0, yaw: 270.0, matrixScale: [3.25, 1.625, 2.5], color: [165, 200, 228], still: true },
     { model: "Doodads\\Icecrown\\Props\\IceCrownObelisk\\IceCrownObelisk0.mdx", x: 0.0, y: 2100.0, z: 300.0, scale: 2.5, yaw: 270.0, color: [60, 75, 100] },
     { model: "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx", x: -120.0, y: 2100.0, z: 300.0, scale: 2.25, yaw: 270.0, color: [90, 100, 120] },
     { model: "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx", x: 120.0, y: 2100.0, z: 300.0, scale: 2.25, yaw: 270.0, color: [90, 100, 120] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1520.0, z: -220.0, scale: 1.0, yaw: 270.0, matrixScale: [13.0, 2.5, 1.25], color: [190, 215, 235] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1480.0, z: -165.0, scale: 1.0, yaw: 270.0, matrixScale: [11.0, 2.5, 1.25], color: [190, 215, 235] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1440.0, z: -110.0, scale: 1.0, yaw: 270.0, matrixScale: [9.0, 2.5, 1.25], color: [190, 215, 235] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1400.0, z: -55.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 2.5, 1.25], color: [190, 215, 235] },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1360.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [5.0, 2.5, 1.25], color: [190, 215, 235] },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1520.0, z: -220.0, scale: 1.0, yaw: 270.0, matrixScale: [13.0, 2.5, 1.25], color: [190, 215, 235], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1480.0, z: -165.0, scale: 1.0, yaw: 270.0, matrixScale: [11.0, 2.5, 1.25], color: [190, 215, 235], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1440.0, z: -110.0, scale: 1.0, yaw: 270.0, matrixScale: [9.0, 2.5, 1.25], color: [190, 215, 235], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1400.0, z: -55.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 2.5, 1.25], color: [190, 215, 235], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1360.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [5.0, 2.5, 1.25], color: [190, 215, 235], still: true },
     { model: "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx", x: -190.0, y: 1300.0, z: 0.0, scale: 3.5, yaw: 270.0, color: [90, 100, 120] },
     { model: "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx", x: 190.0, y: 1300.0, z: 0.0, scale: 3.5, yaw: 270.0, color: [90, 100, 120] },
     { model: "Doodads\\Icecrown\\Rocks\\Icecrown_Crystal\\Icecrown_Crystal3.mdx", x: -260.0, y: 1500.0, z: -250.0, scale: 3.25, yaw: 0.0, color: [80, 135, 165] },

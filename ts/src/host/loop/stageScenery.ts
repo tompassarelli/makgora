@@ -45,6 +45,7 @@ function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: animt
   BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
   if (drawn.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
   BlzPlaySpecialEffect(effect, animation);
+  if (piece.still === true) BlzSetSpecialEffectTimeScale(effect, 0.0);
   return effect;
 }
 
