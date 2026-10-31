@@ -17,9 +17,9 @@ const ZIGGURAT = "buildings\\other\\NerubianZiggurat\\NerubianZiggurat.mdx";
 const MESA_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires0.mdx";
 const DUNE_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires2.mdx";
 const LOW_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires1.mdx";
-const GRANITE_NEAR = [150, 156, 162] as const;
-const GRANITE_MID = [190, 196, 204] as const;
-const GRANITE_FAR = [220, 226, 234] as const;
+const GRANITE_NEAR = [51, 50, 55] as const;
+const GRANITE_MID = [72, 71, 80] as const;
+const GRANITE_FAR = [100, 106, 122] as const;
 
 export const NORDRASSIL_SCENERY: StageScenery = {
   farZ: 13000.0,

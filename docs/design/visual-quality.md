@@ -789,6 +789,50 @@ Tom's references; every other stage keeps the limit at 0.
 Ideas: a hue-aware separation term (chroma against the backdrop's chroma) would
 credit the warm fighters on this stage, whose lightness bands overlap the haze.
 
+### Gryphon Aerie backdrop rock (31 Oct 2026)
+
+Tom's shot of the native window (build 0.3-dev.587) read the rock hills behind
+and beside the deck as pale teal-grey at fighter brightness. The brightness
+was the generated crags' own tints (`GRANITE_NEAR/MID/FAR` in
+`hazardStageScenery.ts`, 150,156,162 / 190,196,204 / 220,226,234, used by
+Gryphon alone) under the native window's light. Cause, by A/B of native window
+captures on gex45 at the same match tick (near camera, Mrgl & Grgl against
+Illidan, pinned Wisp e62becb7, fighter mask through `tools/stage/contrast.ts`;
+fighter L\* / ring around the fighters L\* / picture mean L\* / share of pixels
+above L\* 60):
+
+| Window | Fighter | Ring | Mean | Above 60 |
+| --- | --- | --- | --- | --- |
+| rim off (`RIM` 0) | 40.1 | 32.9 | 22.3 | 4.7% |
+| rim before 00f4c4ac (0.22) | 40.6 | 33.8 | 22.5 | 4.7% |
+| pinned, strong rim | 44.3 | 39.4 | 24.6 | 7.5% |
+| pinned, day-night light chunk dropped (bfb5c6ee reverted) | 44.2 | 39.2 | 24.5 | 7.8% |
+| pinned, Original art (`WISP_REMASTER=off`) | 44.1 | 39.5 | 24.6 | 7.6% |
+
+The strong rim of wisp 00f4c4ac is the brightening: it lifts the faceted rocks'
+ring by 6.5 L\* and the fighters by 4.2, so the fighter-to-ring gap falls from
+7.2 to 4.9. The day-night light fix and the art setting change nothing on this
+stage. On Durotar Skies and Nordrassil the same rim lifted the ring by 1.5 and
+1.4 L\* and the fighters by 3.6 (wisp's own captures), so the rim helps
+dark-sky stages and over-lifts rock-heavy ones. Wisp is unchanged; whether to
+cap the rim on stage pieces is for look-lead and Tom.
+
+Gryphon's own fix darkens and cools the rock rows (near 51,50,55, mid
+72,71,80, far 100,106,122; the deck, aviary, Blacksmith, lip and GA-4 fog are
+untouched). Same view and tick, strong rim: fighter 39.4, ring 25.0 (gap 14.4,
+was 4.9), picture mean 14.9, 1.0% of pixels above L\* 60 (was 7.5%). Three cold
+viewers shown the after shot named both fighters and looked at Illidan first.
+`--separation` with a silhouette mask taken from the scene minus the
+fighters-hidden capture (the fighters-alone mask merges the damage and name
+labels into Illidan's blob) reads one fighter, because the Murloc blob is under
+the tool's 25% size cut: Illidan, fighter band 27.9–48.2 against backdrop band
+4.9–28.2, gap −0.3 L\*, which fails the limit of 0. The overlap is the lit deck
+top and the Blacksmith behind him, not rock: darkening the near row from
+78,76,82 to 51,50,55 left the band unchanged. Dimming the Blacksmith, and a
+far-camera and second-pair-order capture, are not done. Captures:
+~/.local/state/smashcraft/shots/gryphon/ (the sky draws black in the native
+window with no sky look, a separate item).
+
 ### Nordrassil atmosphere (#294)
 
 NO-3 softens the far World Tree's roots with teal-green height fog: style 3,
