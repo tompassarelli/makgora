@@ -61,23 +61,39 @@ const shadowguard = (projectile: SpecialProjectile, landingLag: number | undefin
   projectiles: [projectile],
 });
 
-const ASCENT_FRAMES = 23;
+export const WYRM_SUMMON_FRAMES = 9;
+export const WYRM_RIDE = frames(WYRM_SUMMON_FRAMES + 1, WYRM_SUMMON_FRAMES + 40);
+const WYRM_RIDE_FRAMES = WYRM_RIDE.last - WYRM_RIDE.first + 1;
+export const WYRM_RISE = f32(h(f32(2.4)) / WYRM_RIDE_FRAMES);
+export const WYRM_LIFT = f32(h(f32(0.5)) / WYRM_RIDE_FRAMES);
+export const WYRM_DRIFT = f32(h(f32(1.3)) / WYRM_RIDE_FRAMES);
+export const WYRM_DISMOUNT_FRAMES = 7;
+export const WYRM_BREATH_FRAMES = [14, 26, 38] as const;
+export const WYRM_BREATH_LIFE = 16;
+export const WYRM_BREATH_SPEED = 9.0;
+export const WYRM_BREATH_REACH = 60.0;
 
+const wyrmBreath = (spawnFrame: number): SpecialProjectile => ({
+  model: "Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdx",
+  spawnFrame, offsetX: 0.0, offsetZ: 30.0, velocityX: 0.0, velocityZ: 0.0,
+  life: WYRM_BREATH_LIFE, radius: h(f32(0.25)), effect: hit(5.0, "POKE", 45), reflectable: false, limit: 1,
+  breath: { speed: WYRM_BREATH_SPEED, reach: WYRM_BREATH_REACH },
+});
+export const WYRM_BREATHS = WYRM_BREATH_FRAMES.map((frame) => wyrmBreath(frame));
 
-
-
-
-
-function ascension(height: number, steer: number): AuthoredSpecial {
-  return {
-    endFrame: 46,
-    facesStick: true,
-    motion: [{ ...frames(8, 30), velocityX: 0.0, velocityZ: f32(h(height) / ASCENT_FRAMES), driftSpeed: f32(h(steer) / ASCENT_FRAMES) }],
-    regions: [heroRegion(8, 30, capsule(0.0, 50.0, 0.0, 190.0, 62.0), hit(11.25, "LAUNCH", 80))],
-    oncePerAirtime: true,
-    helpless: true,
-  };
-}
+const FROST_WYRM: AuthoredSpecial = {
+  endFrame: WYRM_RIDE.last + WYRM_DISMOUNT_FRAMES,
+  facesStick: true,
+  turnsAround: true,
+  aimFrames: WYRM_RIDE.last,
+  motion: [
+    { ...frames(1, WYRM_SUMMON_FRAMES), velocityX: 0.0, velocityZ: 0.0 },
+    { ...WYRM_RIDE, velocityX: 0.0, velocityZ: WYRM_RISE, driftSpeed: WYRM_DRIFT, liftSpeed: WYRM_LIFT },
+  ],
+  projectiles: WYRM_BREATHS,
+  oncePerAirtime: true,
+  helpless: true,
+};
 
 
 
@@ -132,9 +148,9 @@ export const LICH_KING_SPECIALS: FighterSpecials = {
     air: deathGrip(AIR_LANDING_LAG),
   },
   up: {
-    name: "Ascension of the Damned",
-    description: "An ice column lifts him in a frost vortex, then a helpless fall.",
-    ground: ascension(f32(2.7), f32(1.15)),
+    name: "Frost Wyrm",
+    description: "A Frost Wyrm rises under him and carries him up, steered by the stick, breathing frost where he aims; then he leaps off, helpless.",
+    ground: FROST_WYRM,
 
   },
   down: {

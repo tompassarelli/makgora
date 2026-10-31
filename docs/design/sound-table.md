@@ -138,7 +138,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 + HeroDeathKnightAttack1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Neutral special: Val'kyr Shadowguard | DarkSummoningMissileLaunch | DarkSummoningTarget | DarkSummoningTarget + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Side special: Death Grip | DeathCoil | Ensnare | Ensnare + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
-| Up special: Ascension of the Damned | FrostArmor | FrostBoltHit | FrostBoltHit + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
+| Up special: Frost Wyrm | FrostWyrmAttack1 | FrostBoltHit | FrostBoltHit + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Down special: Harvest Soul | DarkRitual | DarkSummoningTarget | DarkSummoningTarget + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 
 ## Thrall

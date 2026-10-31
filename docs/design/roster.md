@@ -1451,9 +1451,24 @@ the Val'kyr to neutral and made the side special Death Grip.
   pull for 90 frames after. In the air it pulls to his height and he lands
   with 20 frames of landing lag. Sounds: the stock DeathCoil cast and
   Ensnare on the catch.
-- **Ascension of the Damned** (up, 15 mana): an ice column lifts him 2H over
-  frames 8-30, steered 0.35H, inside a frost vortex that strikes once (9),
-  then a helpless fall. The free form rises 1.3H with no vortex.
+- **Frost Wyrm** (up; Tom's design, 1 Nov 2026, numbers delegated): the
+  stock Classic Frost Wyrm (Units\Undead\FrostWyrm) rises under him through
+  a 9-frame summon while he hangs in place, and he rides it seated on its back
+  over frames 10-49. It climbs 2.4H over the ride,
+  the stick adding or taking 0.5H and steering 1.3H across (analog), and he
+  turns to face a held side. On frames 14, 26 and 38 the wyrm breathes a
+  frost cone 60 units out along the stick's eight-way aim (straight ahead
+  with no aim): each breath flies 9 a frame for 16 frames, radius 0.25H, and
+  strikes once for 5% at 45 degrees away (POKE), so it clears an edge-guarder
+  without killing. The ride always rises, so it catches no ledge; he leaps
+  off on frame 50 and falls helpless from frame 56, ledge catch as usual.
+  A hit knocks him off and the wyrm and any live breath go with the ride;
+  a lost stock or the match ending clears them the same way. Specials are
+  free since the ultimate meter change (29 Oct), so there is one form; the
+  breath belongs to the ride and does not count against his projectile cap.
+  Sounds: FrostWyrmAttack1 on the summon, FrostBoltHit on a breath hit.
+  It replaces Ascension of the Damned (an ice column rising 2.7H in 23 frames
+  inside an 11.25% vortex).
 - **Harvest Soul** (down; Tom's design, 1 Nov, replacing Defile; numbers
   delegated): hold the button and from frame 15 a soul tether (the stock Drain
   Life lightning) joins his hand to the nearest foe at any range, through

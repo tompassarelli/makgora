@@ -49,6 +49,7 @@ import { SHADOW_STEP_CUES } from "./shadowStepCues";
 import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
 import { slotCues } from "./slotCues";
 import { BANISH_SWIRL_MODEL } from "../fighters/kaelthas/look";
+import { WYRM_RIDE, WYRM_SUMMON_FRAMES } from "../fighters/lich-king/specials";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -212,6 +213,16 @@ const NATURE = cue("Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.
 export const FROST_ARMOR_SHELL_MODEL = "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget.mdx";
 
 const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6));
+
+const WYRM_SEAT_Z = -20.0;
+const WYRM_SEAT_X = -10.0;
+const WYRM_SUMMON_DROP = 20.0;
+const FROST_WYRM_MOUNT: Cue = {
+  ...timed(cue("Units\\Undead\\FrostWyrm\\FrostWyrm.mdx", "feet", f32(0.9)), "walk", 0.0),
+  anchorFrames: Array.from({ length: WYRM_RIDE.last }, (_, index) => ({
+    x: WYRM_SEAT_X, z: index < WYRM_SUMMON_FRAMES ? f32(WYRM_SEAT_Z - f32((WYRM_SUMMON_FRAMES - 1 - index) * WYRM_SUMMON_DROP)) : WYRM_SEAT_Z,
+  })),
+};
 
 const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.4));
 
@@ -409,7 +420,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   [Character.lichKing]: {
     neutral: { spell: "Val'kyr Shadowguard", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdx", "ahead", f32(0.8)) },
     side: { spell: "Death Grip", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.8)) },
-    up: { spell: "Ascension of the Damned", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", "body", 0.5) },
+    up: { spell: "Frost Wyrm", startup: FROST_WYRM_MOUNT, active: FROST_WYRM_MOUNT },
     down: { spell: "Harvest Soul", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdx", "hand", f32(0.7)) },
   },
   [Character.beastmaster]: {

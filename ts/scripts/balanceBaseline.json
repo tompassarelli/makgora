@@ -21623,14 +21623,22 @@
    "authored.specials.side.air.projectiles.0.effect.base": 0,
    "authored.specials.side.air.projectiles.0.effect.launchX": 0,
    "authored.specials.side.air.projectiles.0.effect.launchZ": 0,
-   "authored.specials.up.ground.endFrame": 46,
-   "authored.specials.up.ground.regions.0.firstFrame": 7,
-   "authored.specials.up.ground.regions.0.lastFrame": 29,
-   "authored.specials.up.ground.regions.0.hit.effect.damage": 11.25,
-   "authored.specials.up.ground.regions.0.hit.effect.growth": 80.75,
-   "authored.specials.up.ground.regions.0.hit.effect.base": 20,
-   "authored.specials.up.ground.regions.0.hit.effect.launchX": 0.1736481785774231,
-   "authored.specials.up.ground.regions.0.hit.effect.launchZ": 0.9848077297210693,
+   "authored.specials.up.ground.endFrame": 56,
+   "authored.specials.up.ground.projectiles.0.effect.damage": 5,
+   "authored.specials.up.ground.projectiles.0.effect.growth": 63.75,
+   "authored.specials.up.ground.projectiles.0.effect.base": 18,
+   "authored.specials.up.ground.projectiles.0.effect.launchX": 0.7071067690849304,
+   "authored.specials.up.ground.projectiles.0.effect.launchZ": 0.7071067690849304,
+   "authored.specials.up.ground.projectiles.1.effect.damage": 5,
+   "authored.specials.up.ground.projectiles.1.effect.growth": 63.75,
+   "authored.specials.up.ground.projectiles.1.effect.base": 18,
+   "authored.specials.up.ground.projectiles.1.effect.launchX": 0.7071067690849304,
+   "authored.specials.up.ground.projectiles.1.effect.launchZ": 0.7071067690849304,
+   "authored.specials.up.ground.projectiles.2.effect.damage": 5,
+   "authored.specials.up.ground.projectiles.2.effect.growth": 63.75,
+   "authored.specials.up.ground.projectiles.2.effect.base": 18,
+   "authored.specials.up.ground.projectiles.2.effect.launchX": 0.7071067690849304,
+   "authored.specials.up.ground.projectiles.2.effect.launchZ": 0.7071067690849304,
    "authored.specials.down.ground.endFrame": 16,
    "authored.specials.down.ground.followUps.0.special.endFrame": 14,
    "authored.specials.down.ground.followUps.1.special.endFrame": 4,
@@ -22577,9 +22585,14 @@
    "special.side.air.projectiles.0": {
     "advantage": -21
    },
-   "special.up.ground.regions.0": {
-    "advantage": -32,
-    "killPercent": 243
+   "special.up.ground.projectiles.0": {
+    "advantage": -38
+   },
+   "special.up.ground.projectiles.1": {
+    "advantage": -26
+   },
+   "special.up.ground.projectiles.2": {
+    "advantage": -14
    },
    "special.down.ground.followUps.2.special.placement.mark": {
     "advantage": -37

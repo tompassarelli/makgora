@@ -32,7 +32,7 @@ export function projectilesFit(f: Readonly<Fighter>, move: Readonly<AuthoredSpec
   const projectiles = move.projectiles ?? [];
   if (projectiles.length === 0) return true;
   let threats = 0;
-  for (let index = 0; index < projectiles.length; index++) if (!decorates(at(projectiles, index))) threats++;
+  for (let index = 0; index < projectiles.length; index++) if (!decorates(at(projectiles, index)) && at(projectiles, index).breath === undefined) threats++;
   if (ownedCount(f, undefined) + threats > HERO_PROJECTILE_CAP) return false;
   for (let index = 0; index < projectiles.length; index++) {
     const spec = at(projectiles, index);
@@ -124,9 +124,29 @@ function spawnX(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, dra
   return foe !== undefined ? foe.motion.x : markX(owner, spec, stage, matchFrame, f32(owner.motion.x + f32(owner.facing * aimedOffset(owner, spec))));
 }
 
+const DIAGONAL = 0.7071067690849304;
+const breathVelocity = { velocityX: 0.0, velocityZ: 0.0 };
+
+function spawnBreath(owner: Fighter, spec: Readonly<SpecialProjectile>, breath: NonNullable<SpecialProjectile["breath"]>, serial: number): void {
+  const { aimX, aimZ } = owner.special;
+  const diagonal = aimX !== 0 && aimZ !== 0;
+  const unaimed = aimX === 0 && aimZ === 0;
+  const towardX = unaimed ? owner.facing : diagonal ? f32(aimX * DIAGONAL) : aimX;
+  const towardZ = unaimed ? 0.0 : diagonal ? f32(aimZ * DIAGONAL) : aimZ;
+  const x = f32(owner.motion.x + f32(towardX * breath.reach));
+  const z = f32(f32(owner.motion.z + spec.offsetZ) + f32(towardZ * breath.reach));
+  breathVelocity.velocityX = f32(f32(owner.facing * towardX) * breath.speed);
+  breathVelocity.velocityZ = f32(towardZ * breath.speed);
+  spawnHeroProjectileAt(owner, spec, x, z, owner.facing, false, serial, undefined, breathVelocity);
+}
+
 const aimedDown = (owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>): Readonly<ProjectileVelocity> | undefined => (owner.special.aimZ < 0 ? spec.downVelocity : undefined);
 
 export function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, serial: number, stage: number, matchFrame: number, world?: Roster): void {
+  if (spec.breath !== undefined) {
+    spawnBreath(owner, spec, spec.breath, serial);
+    return;
+  }
   const drawn = projectileAnchor(owner, spec.atMark);
   if (spec.atMark !== undefined && drawn === undefined) return;
   const foe = spec.atFoe === true ? nearestFoe(world, owner) : undefined;

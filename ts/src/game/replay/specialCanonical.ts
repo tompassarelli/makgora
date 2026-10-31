@@ -52,6 +52,10 @@ function aimedSpotCanonical(spec: Readonly<SpecialProjectile>, prefix: string): 
     real("aimedReach.far", spec.aimedReach.far);
   }
   if (spec.unfloored !== undefined) real("unfloored.within", spec.unfloored.within);
+  if (spec.breath !== undefined) {
+    real("breath.speed", spec.breath.speed);
+    real("breath.reach", spec.breath.reach);
+  }
   if (spec.launchesFromCentre === true) result.push(canonicalInt(`${prefix}.launchesFromCentre`, 1));
   return result.join("");
 }
