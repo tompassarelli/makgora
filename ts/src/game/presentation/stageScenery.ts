@@ -110,7 +110,7 @@ const FROZEN_THRONE: StageScenery = {
     { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 2800.0, y: 3000.0, z: -800.0, scale: 4.0, yaw: 140.0, color: [45, 58, 80] },
     { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: -340.0, y: 60.0, z: 0.0, scale: 0.625, yaw: 270.0, color: [44, 56, 76] },
     { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 340.0, y: 60.0, z: 0.0, scale: 0.625, yaw: 270.0, color: [44, 56, 76] },
-    { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 0.0, y: 60.0, z: 0.0, scale: 1.25, yaw: 270.0, color: [44, 56, 76] },
+    { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 0.0, y: 60.0, z: 0.0, scale: 1.25, yaw: 270.0, matrixScale: [0.5, 0.5, 1.0], color: [44, 56, 76] },
     { model: STAGE_SNOW_MODEL, x: 0.0, y: 4000.0, z: 0.0, scale: 1.0, yaw: 0.0 },
   ],
 };

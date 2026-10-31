@@ -58,3 +58,13 @@ The throne is a dark high-backed chair on the spire's dais, centred behind the d
 ## Stair in-game capture (#897)
 
 The restored stair was captured in a real Warcraft III pool pair at near match zoom, Shadow Hunter first and Chen Stormstout first, on the checkout's development map (31 Oct 2026; `bun wisp accept --only '897-*' --pair K --map STAGED.w3x`, frames in `~/.local/state/smashcraft/shots/ft-stair-ingame/` on gex45). One cold viewer in a fresh session saw the ice tiers rising from the deck's back edge to the throne block but called the link weak (the tiers meet the throne base without a landing, and two thin floating ice slivers connect to nothing), and said the fighters are not the clearest shapes: the cyan crystals behind the throne, the two skull braziers and the arch are brighter than the small, low fighters. The fighters-first half of the box is open.
+
+## Take 4 status
+
+Tom's native-window playtest (2026-11-01, map 0.3-dev.702) found the skull pillars floating, no throne and junk in the back.
+
+- The skull pillars were the two `IceTorch` braziers: they stood at deck height 1300 units behind the deck's middle with nothing under them, so they hang in the air in Classic as well. They are removed, and `frozenThroneContrast.test.ts` now fails when a prop near the deck stands neither on the deck nor on an ice floe's top.
+- The magenta clusters were the braziers' particle flame. Classic draws it as a few small dim dots in the emitter's own magenta; the native window draws a dense column of large bright puffs. That is a Wisp emitter-scale difference, recorded on wisp#178; Classic does not tint particles by the effect colour, so tinting them is not the fix.
+- The translucent shards were the eight crystals; they are removed (layer 8).
+- The throne was hidden behind the top platform's thick dark stem and matched the sky. The chair is pale ice, and the centre stem is as slim as the side stems (matrix scale 0.5 across), so the high back, arms and crown read on either side of it.
+- Captures: `~/.local/state/smashcraft/shots/throne-window/` (before-near, after-near, after2-near; native window, near match camera).
