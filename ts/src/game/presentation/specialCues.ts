@@ -163,6 +163,7 @@ const drawn = (model: string, anchor: CueAnchor): Cue => ({ model, anchor, scale
 const BLOODLUST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.8));
 // The Blademaster gathers wind and fades into Wind Walk rather than borrowing the Shaman's Bloodlust (#499).
 const WIND_GATHER = cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.4));
+const WIND_WHIRL: Cue = { ...cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "feet", f32(0.8)), color: [120, 200, 255] };
 const WIND_WALK = cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", f32(0.8));
 const WIND_WALK_BODY = { red: 255, green: 255, blue: 255, alpha: 120 };
 const WIND_WALK_COUNTER: Cue = { ...cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", 1.0), sound: "WindWalk" };
@@ -360,7 +361,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   [Character.blademaster]: {
     neutral: QUICKDRAW_STANCE_CUES,
     side: { spell: "Mirror Image", startup: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), active: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageDeathCaster.mdx", "body", 1.0) },
-    up: { spell: "Rising Whirlwind", startup: WIND_GATHER, active: cue("Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", "body", f32(0.6)) },
+    up: { spell: "Rising Whirlwind", startup: WIND_GATHER, active: WIND_WHIRL },
     down: { spell: "Wind Walk", startup: WIND_WALK, active: WIND_WALK, body: WIND_WALK_BODY },
   },
   [Character.mountainKing]: {

@@ -33,7 +33,7 @@ export const ATTACK_CUES: { readonly [character: number]: { readonly [style: num
     [AttackStyle.neutralAir]: [{ name: "Blade Wheel", fromActive: 0, cue: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(0.7)) }],
   },
   [Character.grom]: {
-    [AttackStyle.neutralAir]: [{ name: "Axe Whirl", fromActive: 0, cue: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(0.7)) }],
+    [AttackStyle.neutralAir]: [{ name: "Axe Whirl", fromActive: 0, cue: { ...cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(2.2)), color: [150, 210, 255] } }],
   },
   [Character.warden]: {
     [AttackStyle.downAir]: [{ name: "Falling Knives", fromActive: 0, cue: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx", f32(0.3)) }],
