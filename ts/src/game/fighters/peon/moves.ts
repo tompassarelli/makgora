@@ -29,8 +29,8 @@ const arm = (first: number, last: number, shoulderX: number, shoulderZ: number, 
 const tilt = (z: number) => heroMove(8, 3, 19, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 10.239999771118164, 40));
 const FORWARD_SMASH = peonHit(20.479999542236328, 40, 122.13999938964844, 28.0);
 const DIVE_FIRST = 8, DIVE_CLEAN_LAST = 10, SLIDE_LAST = 15;
-const DIVE = peonHit(11.263999938964844, 70);
-const SLIDE = peonHit(7.168000221252441, 40, 88.6500015258789, 18.0);
+const DIVE = peonHit(12.800000190734863, 70);
+const SLIDE = peonHit(8.199999809265137, 40, 88.6500015258789, 18.0);
 const diveRegions = (first: number, last: number, effect: Readonly<HitEffect>, bodyX: number, bodyRadius: number, tipX: number, tipRadius: number): readonly MoveRegion[] => [
   heroRegion(first, last, blade(bodyX, 22.0, f32(bodyX + 56.0), 20.0, bodyRadius), effect),
   heroRegion(first, last, blade(f32(bodyX + 56.0), 18.0, tipX, 14.0, tipRadius), effect),
@@ -79,8 +79,8 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, axe(7, [[25.0, 75.0, 16.0, 119.0, 10.0], [25.0, 73.0, 20.0, 118.0, 10.0], [26.0, 72.0, 23.0, 117.0, 10.0], [26.0, 71.0, 26.0, 116.0, 10.0]], peonHit(8.192000389099121, 85, 68.94999694824219, 40.0))),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
     [AttackStyle.dashAttack]: travelThrough(heroMove(DIVE_FIRST, SLIDE_LAST - DIVE_FIRST + 1, 20, 0, [
-      ...diveRegions(DIVE_FIRST, DIVE_CLEAN_LAST, DIVE, 4.0, 25.0, 104.0, 14.0),
-      ...diveRegions(DIVE_CLEAN_LAST + 1, SLIDE_LAST, SLIDE, 20.0, 20.0, 116.0, 10.0),
+      ...diveRegions(DIVE_FIRST, DIVE_CLEAN_LAST, DIVE, 4.0, 25.0, 104.0, 17.0),
+      ...diveRegions(DIVE_CLEAN_LAST + 1, SLIDE_LAST, SLIDE, 20.0, 20.0, 116.0, 13.0),
     ], 150.0, true), SLIDE_LAST),
     [AttackStyle.forwardSmash]: heroMove(22, 3, 35, 0, [
       ...tipper(axe(22, [[40.0, 52.0, 65.0, 68.0, 8.0], [34.0, 51.0, 61.0, 51.0, 8.0]], FORWARD_SMASH), 0.25),

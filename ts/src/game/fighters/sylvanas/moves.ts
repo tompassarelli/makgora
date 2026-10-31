@@ -11,7 +11,7 @@ export const sylvanasHit = (damage: number, angle: Parameters<typeof groundHit>[
   groundHit(damage, angle, growth, base, HitElement.dark, behind);
 const bow = (first: number, active: number, recovery: number, landing: number, strike: StrikeCapsule, effect: Readonly<HitEffect>, groundedEffect?: Readonly<HitEffect>): AuthoredMove =>
   heroMove(first, active, recovery, landing, [heroRegion(first, first + active - 1, strike, effect, groundedEffect)]);
-const frontTilt = (height: number): AuthoredMove => bow(9, 3, 18, 0, sylvanasStrike(22.0, 54.0, 104.0, height), sylvanasHit(8.748000144958496, 40));
+const frontTilt = (height: number): AuthoredMove => bow(9, 3, 18, 0, sylvanasStrike(22.0, 54.0, 104.0, height, 26.0), sylvanasHit(8.748000144958496, 40));
 const NOTHING = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 const SPIKE = { ...sylvanasHit(10.692000389099121, 90, 103.0999984741211, 24.0), launchZ: -1.0 };
 
