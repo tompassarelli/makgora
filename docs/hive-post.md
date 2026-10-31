@@ -43,9 +43,9 @@ Rebind any key on the Controls screen, or press **F1** before a match. The full 
 Controllers work through a separate, experimental helper, [padbridge](https://github.com/tompassarelli/padbridge/releases/latest), which turns a pad into keys while Warcraft III is in front.
 
 ## Requirements
-- Warcraft III 3.0, with Graphics set to Classic.
+- Warcraft III: Reforged (3.0 or newer), installed, with Graphics set to Classic. Older Warcraft III installs without Reforged do not work.
 - A keyboard. About 66 MB of map download.
-- Your own copy of Warcraft III.
+- Your own copy of Warcraft III: Reforged. Smashcraft checks that the game is installed, not who owns it.
 
 ## Known issues
 - Some effects are still hard to read, for example Lich King's down special and ultimate.

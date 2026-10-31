@@ -24,8 +24,12 @@ inputs, with stock assets cached outside the repository.
 `--map MAP.w3x --player-assets-only` is how a player with no source tree runs
 the window: the map's imports come from the `.w3x` itself (unpacked once into
 `$XDG_CACHE_HOME/wisp/map-imports`, wisp:docs/play.md), stock art from the
-Warcraft install (`WC3_STORAGE`, extracted with `CASC_EXTRACTOR`), and neither
-the private build-input store nor a gpu machine-capacity lease is used.
+Warcraft III: Reforged install (found as wisp:docs/play.md, "Warcraft III: Reforged
+is required", describes: `--storage DIR`, then `WC3_STORAGE`, then the Windows
+registry and Program Files or the Wine prefixes under Steam, Lutris and Bottles;
+extracted with `CASC_EXTRACTOR`), and neither the private build-input store nor a
+gpu machine-capacity lease is used. Reforged is required: a pre-Reforged 1.x
+install is refused, and Wisp checks that the install is present, not who owns it.
 
 `bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native,pool-predicted` (smashcraft#806)
 plays the pad in the standalone window's headless session under each
