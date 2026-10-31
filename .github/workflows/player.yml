@@ -44,7 +44,7 @@ jobs:
         if: matrix.name == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libudev-dev libasound2-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libvulkan-dev libstorm-dev cmake g++ zip
+          sudo apt-get install -y libudev-dev libasound2-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libvulkan-dev libbz2-dev zlib1g-dev cmake g++ zip
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: ts/node_modules/wisp/window
@@ -57,13 +57,16 @@ jobs:
           if [ "${{ matrix.name }}" = windows ]; then
             cp ts/node_modules/wisp/native/windows/map-pack.exe "$RUNNER_TEMP/tools/map-pack.exe"
           else
-            gcc -O2 ts/node_modules/wisp/native/map-pack.c -o "$RUNNER_TEMP/tools/map-pack" -Wl,-Bstatic -lstorm -Wl,-Bdynamic -lz -lbz2 -lstdc++
+            git clone --depth 1 --branch v9.31 https://github.com/ladislav-zezula/StormLib "$RUNNER_TEMP/stormlib"
+            cmake -S "$RUNNER_TEMP/stormlib" -B "$RUNNER_TEMP/storm-build" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+            cmake --build "$RUNNER_TEMP/storm-build" --parallel
+            gcc -O2 -I"$RUNNER_TEMP/stormlib/src" ts/node_modules/wisp/native/map-pack.c "$(find "$RUNNER_TEMP/storm-build" -name libstorm.a | head -1)" -lz -lbz2 -lstdc++ -o "$RUNNER_TEMP/tools/map-pack"
           fi
       - name: CASC extractor
         run: |
           git clone https://github.com/ladislav-zezula/CascLib "$RUNNER_TEMP/casclib"
           git -C "$RUNNER_TEMP/casclib" checkout "$CASCLIB_COMMIT"
-          cmake -S tools/player -B "$RUNNER_TEMP/casc-build" -DCMAKE_BUILD_TYPE=Release -DCASCLIB_SOURCE="$RUNNER_TEMP/casclib"
+          cmake -S tools/player -B "$RUNNER_TEMP/casc-build" -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCASCLIB_SOURCE="$RUNNER_TEMP/casclib"
           cmake --build "$RUNNER_TEMP/casc-build" --config Release --target casc-extract
           built=$(find "$RUNNER_TEMP/casc-build" -name 'casc-extract*' -type f \( -name casc-extract -o -name casc-extract.exe \) | head -1)
           cp "$built" "$RUNNER_TEMP/tools/"
