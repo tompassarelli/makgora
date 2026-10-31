@@ -12,7 +12,6 @@ const SPIRES2 = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires2.mdx";
 const SPIRES7 = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
 const SPIRES8 = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires8.mdx";
 const BASALT = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx";
-const MAGMA = "Doodads\\Outland\\Rocks\\Outland_MagmaRock\\Outland_MagmaRock0.mdx";
 const TRAP = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
 const PILLAR = "Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx";
 const OBELISK = "Doodads\\Ruins\\Props\\RuinsObelisk\\RuinsObelisk1.mdx";
@@ -167,29 +166,10 @@ export const BLACKROCK_SCENERY: StageScenery = {
     { model: SPIRES2, x: 2400.0, y: 5000.0, z: -1494.0, scale: 4.5, yaw: 165.0, matrixScale: [2.25, 1.0, 1.25] },
     { model: SPIRES0, x: 3275.0, y: 5100.0, z: -1635.0, scale: 4.0, yaw: 200.0, matrixScale: [2.25, 1.0, 1.25] },
     { model: BASALT, x: -2500.0, y: 4800.0, z: -1600.0, scale: 7.0, yaw: 190.0, matrixScale: [1.75, 1.0, 5.5], color: [30, 28, 30] },
+    { model: BASALT, x: -3300.0, y: 4000.0, z: -1550.0, scale: 6.0, yaw: 20.0, matrixScale: [2.25, 1.0, 2.5], color: [30, 28, 30] },
+    { model: BASALT, x: 3200.0, y: 4050.0, z: -1550.0, scale: 6.0, yaw: 150.0, matrixScale: [2.25, 1.0, 2.0], color: [30, 28, 30] },
     { model: TRAP, x: 2000.0, y: 4550.0, z: 880.0, scale: 2.0, yaw: 0.0 },
     { model: PILLAR, x: -2800.0, y: 4550.0, z: 930.0, scale: 1.25, yaw: 0.0 },
-    { model: MAGMA, x: -3900.0, y: 3650.0, z: -1650.0, scale: 4.0, yaw: 185.0, matrixScale: [2.5, 1.0, 3.0] },
-    { model: MAGMA, x: -2650.0, y: 3500.0, z: -1569.0, scale: 4.5, yaw: 170.0, matrixScale: [2.25, 1.0, 2.25] },
-    { model: MAGMA, x: -1350.0, y: 3700.0, z: -1578.0, scale: 3.75, yaw: 200.0, matrixScale: [2.5, 1.0, 3.25] },
-    { model: MAGMA, x: 800.0, y: 3550.0, z: -1594.0, scale: 4.25, yaw: 165.0, matrixScale: [2.5, 1.0, 2.5] },
-    { model: MAGMA, x: 2050.0, y: 3700.0, z: -1600.0, scale: 4.0, yaw: 195.0, matrixScale: [2.25, 1.0, 3.0] },
-    { model: MAGMA, x: 4000.0, y: 3500.0, z: -1638.0, scale: 5.0, yaw: 175.0, matrixScale: [2.5, 1.0, 2.25] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock3.mdx", x: -3600.0, y: 1450.0, z: -1400.0, scale: 5.5, yaw: 20.0, matrixScale: [1.5, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite2.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 3.0, yaw: 160.0, matrixScale: [2.75, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock3.mdx", x: -1400.0, y: 1500.0, z: -1400.0, scale: 4.5, yaw: 250.0, matrixScale: [1.75, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite2.mdx", x: -300.0, y: 1700.0, z: -1400.0, scale: 2.25, yaw: 80.0, matrixScale: [3.5, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock3.mdx", x: 800.0, y: 1550.0, z: -1400.0, scale: 4.5, yaw: 310.0, matrixScale: [1.75, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite2.mdx", x: 1900.0, y: 1600.0, z: -1400.0, scale: 2.75, yaw: 200.0, matrixScale: [3.0, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock3.mdx", x: 3000.0, y: 1450.0, z: -1400.0, scale: 5.25, yaw: 120.0, matrixScale: [1.5, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite2.mdx", x: 4000.0, y: 1650.0, z: -1400.0, scale: 3.25, yaw: 340.0, matrixScale: [2.5, 1.0, 1.25], color: [80, 60, 56] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite0.mdx", x: -4000.0, y: 2600.0, z: -1400.0, scale: 5.25, yaw: 190.0, matrixScale: [2.25, 1.0, 1.25], color: [120, 90, 80] },
-    { model: "Doodads\\Underground\\Rocks\\UndergroundStalagmite\\UndergroundStalagmite1.mdx", x: -2800.0, y: 2900.0, z: -1400.0, scale: 5.25, yaw: 40.0, matrixScale: [2.75, 1.0, 1.25], color: [120, 90, 80] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite0.mdx", x: -1500.0, y: 2700.0, z: -1400.0, scale: 4.25, yaw: 300.0, matrixScale: [3.0, 1.0, 1.25], color: [120, 90, 80] },
-    { model: "Doodads\\Underground\\Rocks\\UndergroundStalagmite\\UndergroundStalagmite1.mdx", x: -200.0, y: 3000.0, z: -1400.0, scale: 4.25, yaw: 130.0, matrixScale: [3.5, 1.0, 1.25], color: [120, 90, 80] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite0.mdx", x: 1100.0, y: 2800.0, z: -1400.0, scale: 4.5, yaw: 220.0, matrixScale: [2.75, 1.0, 1.25], color: [120, 90, 80] },
-    { model: "Doodads\\Underground\\Rocks\\UndergroundStalagmite\\UndergroundStalagmite1.mdx", x: 2400.0, y: 2650.0, z: -1400.0, scale: 5.25, yaw: 70.0, matrixScale: [2.75, 1.0, 1.25], color: [120, 90, 80] },
-    { model: "Doodads\\Dungeon\\Rocks\\DungeonStalagmite\\DungeonStalagmite0.mdx", x: 3500.0, y: 2950.0, z: -1400.0, scale: 5.25, yaw: 260.0, matrixScale: [2.25, 1.0, 1.25], color: [120, 90, 80] },
   ],
 };
 
