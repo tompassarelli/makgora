@@ -191,7 +191,7 @@ function aimUpSpecial(f: Readonly<Fighter>, stage: number, side: number, input: 
   }
   if (f.special.action !== SpecialAction.heroUp) return;
   const move = runningHeroSpecial(f);
-  if (move?.motion?.some((segment) => segment.steer !== undefined) === true) {
+  if (move?.motion?.some((segment) => segment.steer !== undefined || segment.liftSpeed !== undefined) === true) {
     steerUpSpecial(f, stage, side, input);
     return;
   }
