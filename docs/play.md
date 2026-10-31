@@ -63,6 +63,25 @@ the frame timing summary (the target is a p95 frame time of at most 16.7 ms);
 `DIR/standalone.json` keeps every frame's timing. Add `--headless` to run it
 without a window. Run it under an exclusive capacity lease.
 
+`--stage NAME` picks the four-fighter match's stage by its stage-select name,
+read without case, spaces or punctuation (`--stage tomb-of-sargeras`).
+`--rollback N` runs the last N frames again after every step, from the state
+kept before them, as a rollback match at N frames of delay does; the frame
+digests stay those of the straight run (test/forcedReplay.test.ts). With
+`--window native`, `DIR/standalone.json` carries `stageMs.sim` (the map's
+step), `stageMs.rollback` (zero without `--rollback`), `stageMs.scene` (the
+headless client to the scene), `encodeMs`, `parseMs`, `cpuEncodeMs` and
+`gpuPassMs` for each pass the GPU timed.
+
+`bun scripts/perf-window.ts` is wisp#183's benchmark: the native four-fighter
+match on Blackrock, Tomb of Sargeras, Stratholme and Naxxramas at each graphics
+preset (Low, Medium, High, Ultra), each run in its own 1920x1080 private
+desktop under a gpu capacity lease taken for that run only. It prints one
+markdown table per preset, with the CPU pressure each run saw, and keeps the
+runs and `perf-window.md` under `build/perf-window/`. It refuses to start while
+the gpu lease is held for gaming (DEFER_GAMING). `--preset`, `--stage`,
+`--frames`, `--rollback` and `--out` narrow or change the runs.
+
 Add `--presentation native|pool-confirmed|pool-predicted` to select the map's
 fighter presentation. Live play defaults to `pool-predicted`; scripted play
 defaults to `native` and keeps the same authored pad driver in every profile.

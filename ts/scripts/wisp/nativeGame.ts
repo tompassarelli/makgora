@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import { headlessRender, playerRender } from "./headlessRender";
 import { livePortraits } from "../../src/game/ui/liveCard";
 import type { MapBuild } from "../../src/game/session/build";
+import type { StageTile } from "../../src/game/menu/stageCatalog";
 import { type StandaloneStart, createStandaloneSession, smashcraftStandalone } from "./standalone";
 
 livePortraits.enabled = true;
@@ -16,12 +17,14 @@ const start = (query.get("start") ?? "match") as StandaloneStart;
 const chosen = query.get("chosen") ?? undefined;
 const presentation = (query.get("presentation") ?? undefined) as MapBuild["presentation"];
 const digestFile = query.get("digests") ?? undefined;
+const stage = query.get("stage"), rollback = query.get("rollback");
+const match = { ...(query.get("fourFighters") === null ? {} : { fourFighters: true }), ...(stage === null ? {} : { stage: Number(stage) as StageTile }), ...(rollback === null ? {} : { rollback: Number(rollback) }) };
 const savedFiles = query.get("save") === null ? undefined : join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "smashcraft/native-files");
 
 export const SMASHCRAFT_NATIVE_GAME = {
   ...smashcraftStandalone(playerMap === null ? headlessRender() : await Effect.runPromise(playerRender(playerMap))),
   create: async (session: Parameters<typeof createStandaloneSession>[0]) => {
-    const created = await createStandaloneSession({ ...session, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }) });
+    const created = await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }) });
     if (digestFile === undefined) return created;
     const rows: string[] = [];
     return {

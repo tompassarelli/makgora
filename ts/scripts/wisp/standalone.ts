@@ -15,6 +15,7 @@ import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { Phase, cycleSlotMode, selectCharacter, selectCpuCharacter, setCpuOpponent, setCpuTier, setStocks } from "../../src/game/lobby/lobbyState";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { Character } from "../../src/game/sim/codes";
+import { STAGE_CATALOG, type StageTile } from "../../src/game/menu/stageCatalog";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { DIZZY_MODEL } from "../../src/host/loop/fighterBody";
@@ -84,8 +85,30 @@ function addCpuOpponent(game: Parameters<typeof cycleSlotMode>[0]): void {
 const QUICK_MATCH = "-dev quick cpu wren expert hero illidan";
 const SELECT_SETTLE_STEPS = 30;
 
-export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean; readonly stage?: number; readonly start?: StandaloneStart; readonly chosen?: string; readonly savedFiles?: string } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
-  const { script, presentation, fourFighters = false, stage = 0, start = "match", chosen, savedFiles } = options;
+const squashed = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** The stage tile a `--stage` name picks, read without case, spaces or punctuation, so "tomb-of-sargeras" is Tomb of Sargeras. */
+export function stageNamed(name: string): StageTile {
+  const found = STAGE_CATALOG.find(stage => squashed(stage.name) === squashed(name));
+  if (found === undefined) throw new Error(`--stage names no stage: ${name}; the stages are ${STAGE_CATALOG.map(stage => stage.name).join(", ")}`);
+  return found.id;
+}
+
+export interface StandaloneSessionOptions {
+  readonly script?: string;
+  readonly presentation?: MapBuild["presentation"];
+  readonly fourFighters?: boolean;
+  /** The four-fighter match's stage; the first tile when absent. */
+  readonly stage?: StageTile;
+  /** Runs the last this many frames again after each step, as a rollback match at that many frames of delay does; the `rollback` stage times it. */
+  readonly rollback?: number;
+  readonly start?: StandaloneStart;
+  readonly chosen?: string;
+  readonly savedFiles?: string;
+}
+
+export async function createStandaloneSession(options: StandaloneSessionOptions = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string; replayed(): number }> {
+  const { script, presentation, fourFighters = false, stage = 0, rollback = 0, start = "match", chosen, savedFiles } = options;
   const scripted = script?.startsWith(SELECTION_SCRIPT) === true;
   const selection = scripted || start === "select";
   const driven = script !== undefined && !scripted;
@@ -109,6 +132,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
     const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import("../../src/host/loop/drawnFrame");
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
     const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import("../../src/host/loop/menus");
+    const { createForcedReplay, replayLatest }: { createForcedReplay(depth: number): object; replayLatest(replay: object, state: State): number } = await import("../../src/host/loop/forcedReplay");
     const build = { ...PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
     const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = !driven ? undefined : await import("../../src/platform/nativeDriver");
@@ -155,6 +179,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
     let beat = 0, beatHeld = 0;
     let closed = false;
     let settling = 0;
+    const replay = rollback > 0 ? createForcedReplay(rollback) : undefined;
+    let simMs = 0, rollbackMs = 0, replayed = 0;
     return {
       client,
       step(input) {
@@ -178,7 +204,17 @@ export async function createStandaloneSession(options: { readonly script?: strin
           for (const key of next) if (!held.has(key)) deliverKey(client, 0, key, 0, true);
           held = next;
         }
+        const simStart = performance.now();
         clients.frames(1);
+        const rollbackStart = performance.now();
+        simMs = rollbackStart - simStart;
+        if (replay !== undefined) {
+          let ran = 0;
+          client.run(() => { ran = replayLatest(replay, shell()); });
+          if (ran < 0) throw new Error("forced replay could not run a kept frame again");
+          replayed += ran;
+        }
+        rollbackMs = replay === undefined ? 0 : performance.now() - rollbackStart;
         if (start === "select" && ++settling <= SELECT_SETTLE_STEPS) client.run(() => { for (const panel of views(shell()).settings) { panel.endPreview(); if (panel.isOpen()) panel.close(); } });
         if (tap !== 0) deliverKey(client, 0, tap, 0, false);
         for (const current of clients.clients) if (current.errors.length > 0) throw new Error(current.errors.join("\n"));
@@ -188,6 +224,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
       digest: () => value(() => ({ frame: shell().runtime.simulationFrame, digest: frameDigest(shell().world, shell().runtime.simulationFrame) })),
       difference: (recorded) => value(() => describeDigestDifference(digestDifference(shell().world, shell().runtime.simulationFrame, recorded))),
       finished: () => value(() => shell().game.phase === Phase.result),
+      stages: () => ({ sim: simMs, rollback: rollbackMs }),
+      replayed: () => replayed,
       close() { if (!closed) { closed = true; release(); } },
     };
   } catch (error) {
@@ -210,10 +248,10 @@ export const smashcraftStandalone = (render: StandaloneGame["render"]): Standalo
 });
 
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
-const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage"]);
+const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage", "--stage"]);
 
 export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "chrome") {
-  let frames: number | undefined;
+  let frames: number | undefined, rollback: number | undefined;
   let presentation: MapBuild["presentation"] | undefined;
   const flags = new Set<string>(), texts = new Map<string, string>();
   const captureFrames: number[] = [];
@@ -221,7 +259,7 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
     const arg = String(args[index]);
     if (arg === "--standalone") continue;
     if (FLAGS.has(arg)) { flags.add(arg); continue; }
-    if (!TEXT_OPTIONS.has(arg) && arg !== "--frames" && arg !== "--capture-frames" && arg !== "--presentation") throw new Error(`unknown standalone option: ${arg}`);
+    if (!TEXT_OPTIONS.has(arg) && arg !== "--frames" && arg !== "--rollback" && arg !== "--capture-frames" && arg !== "--presentation") throw new Error(`unknown standalone option: ${arg}`);
     const value = args[++index];
     if (value === undefined || value.startsWith("--")) throw new Error(`${arg} needs a value`);
     if (TEXT_OPTIONS.has(arg)) texts.set(arg, value);
@@ -231,6 +269,9 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
     } else if (arg === "--frames") {
       if (!/^\d+$/.test(value) || Number(value) < 1) throw new Error("--frames needs a positive frame count");
       frames = Number(value);
+    } else if (arg === "--rollback") {
+      if (!/^\d+$/.test(value) || Number(value) < 1) throw new Error("--rollback needs a positive frame count");
+      rollback = Number(value);
     } else {
       if (!/^\d+(,\d+)*$/.test(value)) throw new Error("--capture-frames needs comma-separated frame numbers");
       captureFrames.push(...value.split(",").map(Number));
@@ -241,7 +282,10 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
   if (headless && (frames === undefined || (out === undefined && window === "chrome"))) throw new Error(window === "native" ? "--headless needs --frames N" : "--headless needs --frames N and --out DIR");
   const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
   if (fourFighters && script !== undefined) throw new Error("--four-fighters plays its own inputs; drop --script");
-  return { ...(fourFighters ? { fourFighters } : {}), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+  const stageName = texts.get("--stage");
+  if (stageName !== undefined && !fourFighters) throw new Error("--stage picks the --four-fighters match's stage; add --four-fighters");
+  const stage = stageName === undefined ? undefined : stageNamed(stageName);
+  return { ...(fourFighters ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
 }
 
 function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
@@ -278,10 +322,8 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const counted = standaloneEmulatedCallsArgument(windowed.rest);
   if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  const { playerAssets, start, chosen, digests, storage, ...run } = options;
-  if (windowed.window === "native" && options.fourFighters === true) {
-    return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --four-fighters or use --window chrome" });
-  }
+  const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, ...run } = options;
+  const match = { ...(fourFighters === true ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }) };
   const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
   const query = new URLSearchParams();
   if (playerAssets !== undefined) query.set("map", playerAssets.map);
@@ -289,11 +331,14 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (!options.headless) query.set("save", "1");
   if (chosen !== undefined) query.set("chosen", chosen);
   if (options.presentation !== undefined) query.set("presentation", options.presentation);
+  if (options.fourFighters === true) query.set("fourFighters", "1");
+  if (options.stage !== undefined) query.set("stage", String(options.stage));
+  if (options.rollback !== undefined) query.set("rollback", String(options.rollback));
   if (digests !== undefined) query.set("digests", digests);
   const compiled = !import.meta.path.endsWith(".ts");
   if (compiled) process.env.SMASHCRAFT_NATIVE_QUERY = query.toString();
   const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
-  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}), ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
+  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
     ...run,
     reforged: storage === undefined ? {} : { storage },
     ...(playerAssets === undefined ? {} : { gpuLease: false }),
