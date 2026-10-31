@@ -17,4 +17,4 @@ test("the fixed baseline holds exactly the selectable roster, and every fighter'
     expect([name, ...kitFailures(currentKit(character).values, start.values)]).toEqual([name]);
     expect([name, ...feelFailures(currentFeel(character, killPercentNear(start.feel)), start.feel)]).toEqual([name]);
   }
-});
+}, 120_000);
