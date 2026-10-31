@@ -1,10 +1,10 @@
-# The Butcher
+# Stitches
 
-The Butcher is a heavy ranged grappler: a stitched Scourge abomination who
+Stitches is a heavy ranged grappler: a stitched Scourge abomination who
 flings a hook across the stage, reels the foe into his hands and throws them.
-Tom asked for him (2026-10-28); his spec is the Butcher section of
+Tom asked for him (2026-10-28); his spec is Stitches section of
 smashcraft:docs/design/roster-next.md, and his name was decided on
-2026-10-29 (the Butcher everywhere, code slug `butcher`, character code 31).
+2026-10-29 (Stitches everywhere, code slug `butcher`, character code 31).
 His kit takes ideas only from the hero-arena butcher; no name, model, sound
 or text from another game appears. All combat values are original,
 provisional Smashcraft tuning. The Melee anchor is Donkey Kong's role, a heavy
@@ -19,7 +19,7 @@ grappler with strong throws who is combo food, not his numbers.
   rides `Bone_Hand_R` and the hook chain `Bone_Hand_L`.
 - **Authored clips.** `tools/animations/butcher-clips.ts` appends eighteen
   clips to the stock model, timed from his kit: the smashes and their charge
-  hold, up tilt, dash attack, every aerial, the Meat Hook wind-up and throw, Butcher's Charge and
+  hold, up tilt, dash attack, every aerial, the Meat Hook wind-up and throw, Stitches' Charge and
   Dismember. Up moves hold the cleaver overhead through their active frames,
   back air lashes the cleaver straight behind him at body height with the
   back leg kicking out, the down smash spreads both weapons low to both
@@ -81,7 +81,7 @@ Specials:
   reaches first takes the strike instead, and the aim window's 30 degrees
   aim it at a ledge above or below. The computer throws it when a tap at
   some aim crosses the ledge, and aims it in the window.
-- **Butcher's Charge** (side). A belly-led rush on frames 8–20 that stops at
+- **Stitches' Charge** (side). A belly-led rush on frames 8–20 that stops at
   bodies and shields, with armour over the same frames against hits up to 5%
   plus 1% per Flesh Heap stack, and a bump for 11%. 44 frames.
   (Retune for #766, 2026-10-30: armour on frames 8–14 only against hits up to
@@ -97,10 +97,10 @@ Specials:
   their ground speed by 15%, and costs him 1% every 20 frames. It goes off
   with his stock. The on state and its clock are rollback state.
 - **Flesh Heap** (passive). Each KO he scores and each throw he lands adds a
-  stack, up to 5; each adds 3% weight and 1% to Butcher's Charge's armour.
+  stack, up to 5; each adds 3% weight and 1% to Stitches' Charge's armour.
   He loses every stack with a stock. A KO goes to the fighter who last
   damaged the falling one. Flesh Heap is the one passive in the roster: the
-  roster's no-passives rule (Tom, 9 October 2026) predates the Butcher plan,
+  roster's no-passives rule (Tom, 9 October 2026) predates Stitches plan,
   which names Flesh Heap as part of his kit.
 - **Dismember** (ultimate). After a 20-frame cleaver raise he lunges on
   frames 21–28. A raised shield stops the lunge, and intangible foes slip it.
@@ -109,7 +109,7 @@ Specials:
   A whiff ends at frame 78.
 
 The cargo carry in roster-next is not built: Peon already owns the roster's
-carry, and a carry would turn the Butcher's forward throw into a hoist.
+carry, and a carry would turn Stitches' forward throw into a hoist.
 
 His home stage is Naxxramas (4), the Scourge's abomination workshop. His
 Classic route ends at the Lich King.
@@ -144,7 +144,7 @@ profile above:
 - Approach share of movement: 82% (target 25–55%).
 - Ranged share of damage: 4% (target 5–30%).
 - Specials (neutral/side/up/down, share of moves started): 20%/15%/8%/0%.
-- Damage by move: Butcher's Charge 24%, grab 16%, dash attack 12%, down tilt
+- Damage by move: Stitches' Charge 24%, grab 16%, dash attack 12%, down tilt
   11%. Stocks by move: forward smash 34%, grab 21%, dash attack 10%.
 
 The retune follows the roster retune rule (balance.md, "Roster retune"): 17
@@ -159,9 +159,9 @@ not scaled.
 The field after the retune (main f84192f62a, balance run 40818368946 on its
 probe branch, same field, 11,424 matches) puts him at 58%, inside the 40–60%
 band. His shares barely moved: aerials 22%/15%/42%/6%/15%, air share 6%,
-approach 82%, ranged 4%, specials 20%/15%/8%/0%; Butcher's Charge is still his
+approach 82%, ranged 4%, specials 20%/15%/8%/0%; Stitches' Charge is still his
 top damage share (24%) and forward smash his top kill move (37%). The spam
-probe found a degenerate line: Butcher's Charge used alone wins 92% of 1,344
+probe found a degenerate line: Stitches' Charge used alone wins 92% of 1,344
 matches against Expert, over the gate's 45% spam limit, so the charge's armour
 and bump are the next tuning target.
 
@@ -177,9 +177,9 @@ plans after the field merged) put him at 37%, under the band: 4,409 wins,
 - Approach share of movement: 80% (target 25–55%).
 - Ranged share of damage: 4% (target 5–30%).
 - Specials (neutral/side/up/down, share of moves started): 4%/22%/5%/0%.
-- Damage by move: Butcher's Charge 32%, dash attack 19%, down tilt 14%,
+- Damage by move: Stitches' Charge 32%, dash attack 19%, down tilt 14%,
   forward tilt 10%. Stocks by move: forward smash 43%, dash attack 14%,
-  Butcher's Charge 12%.
+  Stitches' Charge 12%.
 
 The retune follows the same rule, 13 points under 50% at about 0.6% of
 damage a point: the factors become ×0.968 on damage (×0.898 × 1.078) and
@@ -196,16 +196,16 @@ wins, 7,056 losses. His shares against the profile:
 - Approach share of movement: 80% (target 25–55%).
 - Ranged share of damage: 4% (target 5–30%).
 - Specials (neutral/side/up/down, share of moves started): 4%/22%/5%/0%.
-- Damage by move: Butcher's Charge 32%, dash attack 19%, down tilt 14%,
+- Damage by move: Stitches' Charge 32%, dash attack 19%, down tilt 14%,
   forward tilt 10%. Stocks by move: forward smash 42%, dash attack 16%,
-  Butcher's Charge 13%.
+  Stitches' Charge 13%.
 
-The spam probe still finds Butcher's Charge used alone winning 96% of 1,440
+The spam probe still finds Stitches' Charge used alone winning 96% of 1,440
 matches against Expert, and his worst matchups sit outside 30–70%: Chen 3%,
 Pit Lord 11%, Anub'arak 14%, Shadow Hunter 23%, Dreadlord 26%, and Warden 90%.
 
 The Charge retune (#766, 2026-10-30; balance run 41009267216 on probe/sc-766-charge-b,
-same field, 12,240 of his matches): the spam probe for Butcher's Charge fell
+same field, 12,240 of his matches): the spam probe for Stitches' Charge fell
 from 96% to 13% of 1,440 matches. The charge change alone (armour on frames
 8–14 against hits up to 3%, 64 frames in all; run 40992168488 on the first
 probe branch) took his field to 37%, under the band, so his damage factor

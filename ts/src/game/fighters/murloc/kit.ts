@@ -1,4 +1,3 @@
-
 import { Character } from "../../sim/codes";
 import type { HeroDefinition } from "../../sim/heroes/hero";
 import { MURLOC_GAMEPLAN } from "./gameplan";
@@ -11,7 +10,7 @@ import { MURLOC_WEAPON_REGIONS } from "./weaponRegions";
 export const MURLOC_HERO: HeroDefinition = {
   character: Character.murloc,
   name: "Murloc",
-  displayName: "Murlocs",
+  displayName: "Mrgl & Grgl",
   purpose: "Small, light rushdown",
   weakness: "Short reach, early knockouts and a short recovery",
   jab: { name: "Claw Flurry", description: "Two quick stabs, then a flurry of fin slaps while the button is held." },

@@ -71,7 +71,7 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   frame now changes state, so the census's rollback re-simulates through the
   landing (Tyrande's air side special 44k to 141k instructions above baseline,
   Cairne 207600 to 296600 worst frame) (#826).
-  The Murloc pair's baseline is a three-body measurement: a Murlocs match seats
+  The Mrgl & Grgl pair's baseline is a three-body measurement: a Mrgl & Grgl match seats
   Mrgl, Grgl and the rifleman, so the pair's worst frame, a headless-timer frame
   holding two whole 1/60 ticks, is about 2 x 162k instructions instead of
   2 x 121k before the duo (242000 to about 329600). Per frame, `bun wisp perf

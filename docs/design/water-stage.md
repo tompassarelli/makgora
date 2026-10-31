@@ -110,7 +110,7 @@ two end platforms overhanging the sea, a distant Naga temple and waterfall.
 In The Frozen Throne's "Terror of the Tides" Maiev hunts Illidan across the
 Broken Isles by sea and into the Tomb, and in "Rise of the Naga" Illidan calls
 Lady Vashj's naga up out of the ocean. It is the Warden's home stage; the
-Murloc (smashcraft:docs/design/murloc.md), a coastal creep with no home stage
+Mrgl & Grgl (smashcraft:docs/design/murloc.md), a coastal creep with no home stage
 yet, belongs here when he becomes selectable. No new stage, collision layout
 or catalog tile is needed.
 

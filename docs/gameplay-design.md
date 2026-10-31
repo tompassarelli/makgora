@@ -1069,7 +1069,7 @@ One rule for every fighter's four specials
 | Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Ascension of the Damned, Far Sight, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
 | Cairne | side: Bloodhoof Gore (rush); up: Spirit Lift (recovery) |
 | Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
-| Murloc | side: Belly Slide (rush); up: Tidal Surf (recovery) |
+| Mrgl & Grgl | side: Belly Slide (rush); up: Tidal Surf (recovery) |
 | Grom | side: Gorehowl Rush (rush); up: Blood Leap (recovery) |
 | Anub'arak | side: Burrow Hunt (rush); up: Crypt Eruption (recovery) |
 | Malfurion | side: Stag Charge (rush); up: Dream Ascent (recovery) |
@@ -1752,7 +1752,7 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Peon | Forward smash (pick point) | Position |
 | Tinker | Forward smash (claw at full extension) | Position |
 | Kael'thas | Forward smash (phoenix flame at the tip) | Position |
-| Murloc | Neutral air (flailing spin) | Timing |
+| Mrgl & Grgl | Neutral air (flailing spin) | Timing |
 | Grom | Forward smash (Gorehowl's blade) | Position |
 | Malfurion | Forward smash (Wrath at the staff's tip) | Position |
 | Medivh | Neutral air (arcane ring) | Timing |
@@ -2512,7 +2512,7 @@ amount never varies.
   nor while rolling, tumbling, in hitstun or hitlag, KO'd or
   respawn-invincible; in those states the orb passes through. Projectiles
   never collect it. Every fighter standing under the orb reaches it (from the
-  shortest, Murloc, to the tallest, Illidan, about 159), and so does a jump
+  shortest, Mrgl & Grgl, to the tallest, Illidan, about 159), and so does a jump
   through it. If several fighters touch it on the same frame, the one whose
   body centre is horizontally nearest the orb takes it; on an exact tie the
   lowest player slot takes it. The step is deterministic and identical on
@@ -2575,7 +2575,7 @@ kits set it.
 | Long, committed route | Rifleman, Blademaster, Tinker, Kael'thas | 480–640 | 480–900 | 780 | 920 |
 | Vertical, route mixups | Warden, Lich, Shadow Hunter, Thrall, Jaina, Chen | 400–560 | 320–600 | 700 | 840 |
 | Drifting, wide approach | Illidan, Dreadlord, Beastmaster, Sylvanas | 380–520 | 600–900 | 680 | 920 |
-| Heavy, exposed approach | Mountain King, Forsaken Paladin, Pit Lord, Lich King, Cairne, Peon, Murloc | 320–440 | 320–480 | 620 | 740 |
+| Heavy, exposed approach | Mountain King, Forsaken Paladin, Pit Lord, Lich King, Cairne, Peon, Mrgl & Grgl | 320–440 | 320–480 | 620 | 740 |
 
 [spec #252] With empty mana, an up special reaches at least 240 units on each
 axis, and the full recovery envelope reaches at least 500 units deep and 640
@@ -2723,7 +2723,7 @@ Expert field.
 | Peon | Worksite Launch | 8 | 0 | 22 | 355 / 358 | guided | 55 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
 | Goblin Tinker | Rocket Boots | 7 | 0 | 19 | 521 / 501 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
 | Kael'thas Sunstrider | Phoenix | 13 | 0 | 15 | 731 / 864 | steered (launch 8-way, 12 frames) | 121 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 191/208 |
-| Murloc | Tidal Surf | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
+| Mrgl & Grgl | Tidal Surf | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 197/208 |
 | Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 189/208 |
 | Malfurion Stormrage | Dream Ascent | 10 | 0 | 29 | 434 / 413 | guided | 61 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 180/208 |
 | Medivh | Raven Flight | 9 | 0 | 21 | 373 / 460 | aimed (8-way, 8 frames) | 51 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 196/208 |

@@ -157,7 +157,7 @@ computers actually convert, and are reported, not scored.
 `bun wisp combos [--fighter NAME]... [--jobs N]` measures the fighter's
 available punish rather than its computer player's choices. It plays ordinary
 controller inputs through the match frame executor. Each of 21 fighters is
-measured against Murloc, Rifleman and Cairne (light, middle and heavy bodies)
+measured against Mrgl & Grgl, Rifleman and Cairne (light, middle and heavy bodies)
 at the centre and ledge of stage 0: 126 units. Every landing opener is searched
 at 0–180% in 10% steps and five held DI directions: out, up, down, in and none.
 The defender's result is the least damaging of the attacker's best routes
@@ -403,7 +403,7 @@ are still outside the band; Rifleman rose to 77.3%.
 
 Step 2 multiplies on top of step 1 (same field, same seeds). Fighters kept at
 or under step 1's feel-lock count use half the kill-percent compensation; the
-others keep it all. Kobold, Murloc, Lich, Medivh and Pit Lord keep their
+others keep it all. Kobold, Mrgl & Grgl, Lich, Medivh and Pit Lord keep their
 forward smash. Rifleman's ground blaster deals 3 instead of 4 (9 frames of
 flinch instead of 12) and his bear swipes for 7.9 instead of 9.3, with growth
 raised so it still kills near its old percent; his normals stay the reference.
@@ -601,7 +601,7 @@ rate was. A cooldown counts from the cast, so it cuts the spam rate while
 Expert's mixed play barely notices: Black Arrow 52 frames, Frost Nova 46 and
 Flame Strike 72. Between main 4bc5834452 (run 41172461896) and the candidate
 (run 41173676469) the probe moved Sylvanas 78.8% to 16.1%, Lich 54.2% to 27.7%
-and Kael'thas 26.7% to 26.5%, and Butcher stayed at 11.0%. Frost Nova's
+and Kael'thas 26.7% to 26.5%, and Stitches stayed at 11.0%. Frost Nova's
 cooldown also delays its press-again burst, so keep it close to the 41-frame
 cast. The refit of Sylvanas's bow (61a1934ec7) took forward smash from 142 to
 76 reach, so its radius and the dash attack's go from 8 to 34, forward tilt's

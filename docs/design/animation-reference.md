@@ -147,7 +147,7 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | Peon | scramble | Comic worker: legs pedal and arms flail as he tumbles once forward. |
 | Goblin Tinker | heave | His claw pack thrusts him up: legs dangle and the body tilts forward. |
 | Kael'thas | float | Vain prince: arms spread like the phoenix's wings as he turns once backward. |
-| Murloc | front flip | Small, wet and bouncy: a quick tumbling flip. |
+| Mrgl & Grgl | front flip | Small, wet and bouncy: a quick tumbling flip. |
 | Grom | front flip | Reckless berserker: the axe leads a forward somersault. |
 | Anub'arak | heave | An insect lord: carapace pitches up and claws splay; no humanoid flip. |
 | Malfurion | front flip | A druid's forward flip over his staff, antlers and robe sweeping. |

@@ -343,7 +343,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
   },
   {
     fighter: C.butcher, boss: BossKind.lichKing,
-    story: "The Butcher lumbers out of the Naxxramas flesh-works with a fresh hook and an empty larder, and Lordaeron is full of meat.",
+    story: "Stitches lumbers out of the Naxxramas flesh-works with a fresh hook and an empty larder, and Lordaeron is full of meat.",
     fights: [
       fight(C.peon, 3, "Work work? No. Not for you. Never for you."),
       fight(C.uther, 6, "The Light will cleanse what Kel'Thuzad stitched together, abomination."),

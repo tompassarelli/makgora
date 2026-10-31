@@ -1381,14 +1381,14 @@ Each hero grips the ground by its body type, in Melee units a frame
 (smashcraft:ts/src/game/sim/heroes/heroBodies.ts): Jaina 0.03, a slow runner
 on frost, is the roster's Luigi; the other robed casters 0.04-0.06
 (Malfurion 0.04, Medivh 0.05, Kael'thas 0.055, Lich 0.06); Sylvanas and Peon
-0.05; Murloc 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
+0.05; Mrgl & Grgl 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
 Warden, Shadow Hunter, Dreadlord, Grom); sturdy fighters 0.065
 (Mountain King, Forsaken Paladin, Beastmaster, Lich King, Chen, Tinker);
 Thrall 0.07; Pit Lord, Cairne and Anub'arak 0.08. Rifleman and Illidan keep
 Fox's and Captain Falcon's 0.08. Melee spans 0.025 (Luigi) to 0.1 (Peach,
 Link, Zelda, Pichu) and gives its low traction to slow runners
 (smashcraft:docs/design/melee/movement.md); so do we: no hero runs faster than
-2.2 with traction under 0.055, which keeps the longest run brake (Murloc's)
+2.2 with traction under 0.055, which keeps the longest run brake (Mrgl & Grgl's)
 at 47 units against Melee's longest, Luigi's 36, and the 32 every fast runner
 had before. Every hero is at or below the 0.08 all fighters shared before
 15 Oct, so run brakes, dash stops and moonwalks are as long or longer.
@@ -1417,7 +1417,7 @@ measured in the headless sim:
 | --- | ---: | ---: | ---: | ---: |
 | Jaina (0.03, 0.80) | 54.4 | 65.3 | 7.0 | 19.6 |
 | Malfurion (0.04, 1.31) | 54.4 | 55.8 | 19.4 | 39.6 |
-| Murloc (0.055, 1.60) | 54.4 | 44.3 | 31.9 | 46.9 |
+| Mrgl & Grgl (0.055, 1.60) | 54.4 | 44.3 | 31.9 | 46.9 |
 | Blademaster (0.06, 1.60) | 54.4 | 41.0 | 31.6 | 42.6 |
 | Chen (0.065, 1.16) | 54.4 | 33.0 | 15.2 | 18.9 |
 | Thrall (0.07, 1.09) | 54.4 | 29.9 | 13.2 | 15.2 |

@@ -99,7 +99,7 @@ head mesh binds nearly his whole small body, and Chen take a `zoom` and `shift` 
 `CORRECTIONS` that bring their heads to about the size of the roster's others (playtest, 2026-10-29).
 The custom-game preview uses the red and blue player cards.
 
-Murlocs show both of the duo in the tile, card and bust (Tom asked for it,
+Mrgl & Grgl show both of the duo in the tile, card and bust (Tom asked for it,
 2026-10-30): Mrgl stands in front on the stock Murloc body and Grgl behind him
 and to image right on his partner costume body (`PARTNER_COSTUME`, the
 MurlocMutant skin at 0.9 scale, as the match draws him), both turned toward the

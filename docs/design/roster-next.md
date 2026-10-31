@@ -1,4 +1,4 @@
-# Next roster change: Uther, Lady Vashj, Archimonde, Tyrande, the Butcher, dismounted Thrall
+# Next roster change: Uther, Lady Vashj, Archimonde, Tyrande, Stitches, dismounted Thrall
 
 Tom's request (28 October 2026), with two additions the same day: Uther
 replaces Forsaken Paladin, Lady Vashj replaces Kobold, Archimonde, Tyrande and
@@ -22,7 +22,7 @@ Issues:
 [Lady Vashj (#663)](https://github.com/tompassarelli/smashcraft/issues/663),
 [Archimonde (#664)](https://github.com/tompassarelli/smashcraft/issues/664),
 [Tyrande (#665)](https://github.com/tompassarelli/smashcraft/issues/665),
-[the Butcher (#666)](https://github.com/tompassarelli/smashcraft/issues/666),
+[Stitches (#666)](https://github.com/tompassarelli/smashcraft/issues/666),
 [dismounted Thrall (#667)](https://github.com/tompassarelli/smashcraft/issues/667).
 
 ## Models and source terms
@@ -37,13 +37,13 @@ Sequence and bone lists come from each file's `SEQS` and `BONE` chunks.
 | Uther | `units\human\Uther\Uther.mdl` (portrait `Uther_portrait`) | Classic Paladin biped, 34 bones; `Hammer` bone; the same skeleton names as `HeroPaladin`, not Forsaken Paladin's 121-joint rig | Stand ×3, Stand Ready, Attack ×2, Spell, Stand Channel, Stand Victory, Walk, Death |
 | Lady Vashj | `units\naga\LadyVashj\LadyVashj.mdl` (portrait `LadyVashj_portrait`); byte-identical to `HeroNagaSeaWitch` | Naga: five tail bones and no legs, four arms, `Bow`, `Arrow`, two head snakes | Stand, Walk, Stand Ready, Attack, Spell, Death, and swim variants of each |
 | Archimonde | `units\demon\Warlock\Warlock.mdl` (portrait `Warlock_portrait`), the model Classic mode's Archimonde boss already draws at 2.6× | Biped with a four-bone tail and cape, 47 bones | Stand ×2, Walk, Attack ×2, Spell, Spell Slam, Death |
-| the Butcher | `units\undead\Abomination\Abomination.mdl` (portrait `Abomination_portrait`) | 36 bones. Only `Leg_L`, `Leg_R`, `Head` and the two `Chain` bones are named; the arms, cleaver and hook sit on `Mesh*` and `Object*` nodes that need mapping by hand | Stand ×3, Walk, Attack ×2, Stand Channel, Death, Decay |
+| Stitches | `units\undead\Abomination\Abomination.mdl` (portrait `Abomination_portrait`) | 36 bones. Only `Leg_L`, `Leg_R`, `Head` and the two `Chain` bones are named; the arms, cleaver and hook sit on `Mesh*` and `Object*` nodes that need mapping by hand | Stand ×3, Walk, Attack ×2, Stand Channel, Death, Decay |
 | Tyrande | Hive: `TyrandeDismountedV2.mdx` (below), johnwar's Re-Classic dismounted body, replacing Retera's first model (#712). Stock Tyrande is the mounted `HeroMoonPriestess`; there is no stock `units\nightelf\Tyrande` model | Read on download (Re-Classic intake below): night-elf biped, 62 nodes; `Bone_Root`, `Bone_Pelvis`, `Bone_Chest`, `Bone_Head`, both arm chains, `Bone_Hand_L`, both leg chains and feet. No `Bone_Hand_R`: the bow is `Cylinder02` under `Bone_Hand_L`, with `Arrow` and `Arrow01` nodes | Stand - 1, Stand - 2, Stand - 3, Stand - 5, Death, Attack - 1, Attack - 2, Spell, Walk, Dissipate, Stand Hit, Stand Victory, Stand Ready, and four Portrait sequences |
 | Thrall | Hive: `WarchiefThrallDismountedV2.mdx` (below), replacing the mounted `units\orc\Thrall\Thrall.mdl` | Built on a Grom Hellscream base, and confirmed a full biped on download (H1 intake below): 73 nodes and 45 bones, with `Bone_Root`, `Pelvis`, `Chest`, `Head`, both arm chains with hands, both leg chains with feet, `Bone_Sword` and `axe`, plus portrait face nodes, attachment refs (`Weapon Ref`, `Hand Right Ref` and the rest) and two collision spheres | Stand - 1..3, Stand Alternate - 1..3, Stand Ready, Stand Ready Alternate, Walk, Attack - 1..3, Attack Alternate - 1..4, Attack Slam Alternate, Spell, Spell Second, Spell Slam, Spell Throw, Stand Channel, Spell Channel, Death, Dissipate, and six Portrait sequences. No Stand Victory or Stand Hit |
 
 Command icons resolve as `.dds` in Classic storage: `BTNHeroPaladin`
 (Uther), `BTNNagaSeaWitch` (Vashj), `BTNArchimonde`, `BTNPriestessOfTheMoon`
-(Tyrande), `BTNAbomination` (the Butcher) and `BTNThrall` all exist. There is
+(Tyrande), `BTNAbomination` (Stitches) and `BTNThrall` all exist. There is
 no `BTNUther`, `BTNLadyVashj` or `BTNTyrande`.
 
 The spell effects named in the kits below were found in the same storage:
@@ -127,7 +127,7 @@ the guard admits it and never on Tom's desktop.
 
 ## Shared rules for every new fighter
 
-- Character codes are append-only and checksum-canonical (sim/codes.ts): Uther 27, Lady Vashj 28, Archimonde 29, Tyrande 30, the Butcher 31. Codes 7 and 26 are deleted with their fighters and never reused. Every all-fighter loop iterates `Object.values(Character)`, and `STRIKE_SLOTS` sizes by the largest code, so a gap is safe.
+- Character codes are append-only and checksum-canonical (sim/codes.ts): Uther 27, Lady Vashj 28, Archimonde 29, Tyrande 30, Stitches 31. Codes 7 and 26 are deleted with their fighters and never reused. Every all-fighter loop iterates `Object.values(Character)`, and `STRIKE_SLOTS` sizes by the largest code, so a gap is safe.
 - Each fighter is a `ts/src/game/fighters/<slug>/` directory (clips, gameplan, kit, look, moves, specials, strikeMoments), a rig file in tools/animations/rigs/, a `<slug>-clips.ts` clip producer, a home stage, a Classic route, a design doc `docs/design/<slug>.md` with its `balance-profile` and `ceiling-plan` blocks, and an ultimate row in ultimates.md. Per-fighter data stays in the fighter's own files (AGENTS.md).
 - Motion is authored on the canonical humanoid rig (#366). Shared movement, defence, damage, ledge and grab-victim clips then reach every biped through its rig map. The work per fighter is its attack and special clips plus anything its body cannot share.
 - Every move meets [the finished-move bar](finished-move.md): a visible effect, a body-driven motion, mirror symmetry, despawn, weapon in hand, stock idle and a cold-viewer read. Hit regions follow the drawn weapon under #508's `weapon-trace.ts`.
@@ -344,7 +344,7 @@ them (5% + 3%). Down throw: a floor plant for a tech chase (5%).
 **Assets and animation:** the Hive model's 287 polygons use stock textures.
 On download we read its bones and sequences. If its bones are biped-named, it
 maps onto the canonical rig like any stock biped; if they are unnamed, the
-mapping is by hand as for the Butcher (+3-4 h). It has no portrait, so its
+mapping is by hand as for Stitches (+3-4 h). It has no portrait, so its
 HUD and select bust come from the fighter-portrait pipeline
 (ts/scripts/fighterPortraits.ts) rendering the model itself, and its command
 icon is `BTNPriestessOfTheMoon`. Home stage: Nordrassil (10), Hyjal's
@@ -352,9 +352,9 @@ defence. Classic route: the Night Elf campaign, ending at Archimonde.
 
 **Size: 26-36 worker-hours,** including the download and input publish (H1).
 
-## The Butcher
+## Stitches
 
-**Name (decided 29 October 2026):** the Butcher everywhere, with the code
+**Name (decided 29 October 2026):** Stitches everywhere, with the code
 slug `butcher`. The alternative was "Pudge", the DotA hero's name, which
 Valve's Dota trademarks cover. Tom's gate took the recommended default, so
 no Valve name appears in the map or on the Hive page, and the hook, the rot
@@ -364,7 +364,7 @@ cloud and the stock Abomination body still make him recognisable.
 he reels the foe in, and smells it.
 
 **Role:** a heavy grappler built around a reel-in command grab. Peon and
-Dreadlord grapple at close range; the Butcher grapples at range, so every
+Dreadlord grapple at close range; Stitches grapples at range, so every
 hook he misses is a long, punishable whiff, and he is the easiest fighter in
 the roster to combo. **Melee anchor:** Donkey Kong, a heavy grappler with a
 huge body and strong throws who is combo food (Melee weight 114).
@@ -396,10 +396,10 @@ and a 60-frame cap.
 
 **Specials:**
 - Neutral, **Meat Hook:** on frame 14 he flings the hook (`MeatwagonMissile` head, with a chain-lightning line along the chain bones) 420 units straight ahead over 16 frames. A hit latches and reels the foe to him in 14 frames into his grab hold, where any throw follows. The hook is a projectile command grab: shields stop it, it can be reflected, and a whiff leaves 40 frames of recovery. The latch, reel and grab states are rollback state.
-- Side, **Butcher's Charge:** a belly-led rush with armour on frames 8-20 against hits up to 5% plus 1% per Flesh Heap stack, ending in a bump (11%). Shield stops it.
+- Side, **Stitches' Charge:** a belly-led rush with armour on frames 8-20 against hits up to 5% plus 1% per Flesh Heap stack, ending in a bump (11%). Shield stops it.
 - Up, **Hook Swing:** the hook flies diagonally upward. If it touches a ledge in its first 20 frames, it tethers and reels him to the ledge into ledge hang. Otherwise it is a short rise with a hit (6%) that ends helpless. The ledge tether is new in the engine: a sim/ledge.ts state, rollback-snapshotted, with bot recovery support in match/botRecovery.ts.
 - Down, **Rot**, a toggle with a 10-frame switch: a poison cloud (`PlagueCloudCaster`) around him hurts foes within 90 units 1% every 10 frames and slows their ground speed by 15%, and it costs him 1% every 20 frames. The toggle's on state is rollback state. Counterplay: keep out of the cloud, since he bleeds while it runs.
-- Passive, **Flesh Heap:** each KO he scores and each throw he lands adds a stack, up to 5. Each stack adds 3% weight and armour to Butcher's Charge. He loses every stack on losing a stock. The stack count is rollback state and shows as a growing stack of gore on his HUD plate.
+- Passive, **Flesh Heap:** each KO he scores and each throw he lands adds a stack, up to 5. Each stack adds 3% weight and armour to Stitches' Charge. He loses every stack on losing a stock. The stack count is rollback state and shows as a growing stack of gore on his HUD plate.
 - Ultimate, **Dismember:** after a 20-frame cleaver raise, a lunge grabs a foe in front of him. Unlike an ordinary grab, it can be shielded and dodged on its startup frames, as ultimates.md requires. On a catch he channels for 90 frames, dealing 4% every 15 frames (24%) and healing himself the same amount, with the foe pinned and no mash escape. A whiff leaves him open for 50 frames.
 
 **Assets and animation:** the stock Abomination needs no import. Its arms,
@@ -474,7 +474,7 @@ titles only, so the new issues keep both names out of their titles.
 
 Tasks:
 - **H1, Hive inputs (1-2 h):** download both Hive models through the private browser once the capacity guard admits it, read their bones and sequences, and publish them with `bun wisp inputs add`. Thrall and Tyrande cannot start their clips before it.
-- **Six fighter lanes:** Uther with Forsaken Paladin's removal, Lady Vashj with Kobold's removal, Archimonde, Tyrande, the Butcher and Thrall. They are independent of each other. All of them append rows to the same registries (sim/codes.ts, rigs/index.ts, roster/kits.ts and looks.ts, homeStages.ts) and regenerate shared files, so each lane rebases onto main before landing, and Autoland regenerates the generated files (#613).
+- **Six fighter lanes:** Uther with Forsaken Paladin's removal, Lady Vashj with Kobold's removal, Archimonde, Tyrande, Stitches and Thrall. They are independent of each other. All of them append rows to the same registries (sim/codes.ts, rigs/index.ts, roster/kits.ts and looks.ts, homeStages.ts) and regenerate shared files, so each lane rebases onto main before landing, and Autoland regenerates the generated files (#613).
 - **I1, roster integration (3-5 h, after the last lane):** one farm balance pass across all 29 fighters, the census and map-size baselines, the 26-to-29 text in AGENTS.md and roster.md, the Hive page's roster and credits, and one native round over the six changed fighters, each run under five minutes.
 
 Animation needs the private build inputs and native checks need the VM pool,
@@ -483,7 +483,7 @@ the cloud lane. Three lanes run at a time, in two waves. The longest lanes go
 first, so the second wave is shorter:
 
 - Account a: Lady Vashj (34-46) then Thrall (16-24): 50-70 h.
-- Account b: the Butcher (34-46) then Uther (22-30): 56-76 h.
+- Account b: Stitches (34-46) then Uther (22-30): 56-76 h.
 - Account c: Archimonde (26-34) then Tyrande (26-36): 52-70 h.
 
 H1 runs as a side task inside the first wave, so Thrall and Tyrande find their
@@ -492,7 +492,7 @@ models ready.
 **Total size: 158-216 worker-hours** (about 187 at the midpoints) across the
 six fighters, plus 4-7 h for H1 and I1.
 
-**Critical path:** the Butcher (34-46 h), then Uther
+**Critical path:** Stitches (34-46 h), then Uther
 (22-30 h) on the same account, then roster integration (3-5 h): about
 60-80 worker-hours end to end. With one lane per account in each wave, the
 other two accounts finish inside that span. Uther moves to the front of

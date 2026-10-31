@@ -264,7 +264,7 @@ sim/projectiles.ts; tests in sim/eyeBeam.tests.ts.
 
 **Alternative B, keep Mana Burn and add the beam as a separate move**
 (rejected: Tom replaced it). **Alternative C, a beam from his eyes with a
-thin hit band** (rejected: from his 140 eye line it would miss Murloc,
+thin hit band** (rejected: from his 140 eye line it would miss Mrgl & Grgl,
 Peon, Rifleman, Mountain King and Tinker standing).
 
 ## Up and down specials (kept)
@@ -352,7 +352,7 @@ the stock model hides the legs, so it reads as a sweep either way).
 Tom asked on 28 Oct, while playtesting, for a forward smash with more reach,
 perhaps a roundhouse, that steps forward the way Falco's forward smash does.
 The proxy set the numbers on his behalf. Fel Lunge (below) is replaced: its
-glaive strike started 88 units up, so it passed over Rifleman and Murloc,
+glaive strike started 88 units up, so it passed over Rifleman and Mrgl & Grgl,
 and a 40-70 unit lunge read as a second Fel Rush.
 
 He chambers his right knee, turns his hips over and snaps the leg out level
@@ -398,7 +398,7 @@ the follow-through and back to his stance (`ILLIDAN_MOVES` in
   step now reaches with the hitbox still on the drawn heel; frame 12, the active
   frames, damage, angles and kill percents are unchanged. The kick sits at chest
   height so the clean hit still lands on the short fighters (Rifleman, Mountain
-  King, Peon, Murloc). No fighter is short enough to duck the leg.
+  King, Peon, Mrgl & Grgl). No fighter is short enough to duck the leg.
 
 Counterplay: 11 frames of startup with an obvious chamber, and 24 frames of
 recovery after the kick for a shield to punish. The leg is a hurtbox while it

@@ -72,7 +72,7 @@ Reply in this thread or open an issue at [Issues · tompassarelli/smashcraft](ht
 - Tyrande model: [Tyrande Whisperwind (Re-Classic)](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission; every move reanimated for Smashcraft
 - Naxxramas wall model: [Undead Walls Pack](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/) by Kuzakani, from Hive Workshop, used with credit
 - Cursors, wordmark & stage-select art: Smashcraft originals (the pinching-hand cursor made with AI assistance)
-- Murloc sound: World of Warcraft, Blizzard Entertainment
+- Mrgl & Grgl sound: World of Warcraft, Blizzard Entertainment
 - Source: [GitHub - tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft) (MIT License), written in TypeScript and compiled to Warcraft III's Lua.
 - Warcraft III, its unit models, icons and sounds belong to Blizzard Entertainment. Smashcraft is an independent fan project, not affiliated with or endorsed by Blizzard Entertainment or Nintendo.
 - Melee's feel comes from public frame data: [SmashWiki](https://www.ssbwiki.com/) and [Smashboards](https://smashboards.com/).

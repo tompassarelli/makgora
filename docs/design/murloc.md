@@ -1,6 +1,6 @@
-# Murlocs
+# Mrgl & Grgl
 
-The Murlocs are a pair: the leader Mrgl, whom the player drives, and his
+The Mrgl & Grgl are a pair: the leader Mrgl, whom the player drives, and his
 partner Grgl, a smaller murloc who copies Mrgl's inputs five frames late, in
 the manner of Melee's Ice Climbers. Tom asked on 2026-10-30 to rework the
 single Murloc into this duo: fast, multi-hit and annoying up close, light and
@@ -116,7 +116,7 @@ and action.
 ### Fast close-range normals (2026-10-30)
 
 Tom asked on 2026-10-30 for Murloc's close-range normals to become fast and
-multi-hit, like Fox's, as the first piece of the Murlocs rework: a flurry jab
+multi-hit, like Fox's, as the first piece of the Mrgl & Grgl rework: a flurry jab
 held by the attack button, a spinning drill down air that links into a grounded
 follow-up, and a very fast neutral air. Each hit is kept weak because Grgl will
 double them. Only relations come from SmashWiki's [Fox
@@ -171,8 +171,8 @@ blast-zone KOs, ledges, shields, grabs, techs, the camera and the canonical
 hash all cover him.
 
 Grgl needs a free slot. Duels and three-player matches get him; when two
-Murlocs share a three-slot match, the lower slot gets the partner. A
-four-participant match (2v2 or a four-way free-for-all) plays the Murlocs as
+Mrgl & Grgl share a three-slot match, the lower slot gets the partner. A
+four-participant match (2v2 or a four-way free-for-all) plays the Mrgl & Grgl as
 Mrgl alone under the solo rules, under a plate with his own name. Grgl in
 four-participant matches waits for body slots to split from participant slots.
 
@@ -204,7 +204,7 @@ While no live Grgl exists (KOed, left behind by a blast zone or no
 room in the match), Mrgl deals ×0.9 damage on every hit, throws the solo net,
 rides the solo Tidal Surf (220 units instead of 340), and has no orders, swap
 or toss. Down B becomes the revive. Killing Grgl is the standard plan against
-the Murlocs.
+the Mrgl & Grgl.
 
 ## Specials and orders
 
@@ -242,7 +242,7 @@ after the double jump, spends the remaining aerial jump and ends helpless.
 Walking off a ledge keeps the aerial jump. A separated Grgl recovers alone
 with his own surf. The bodies are light and the solo surf is short, so
 edge-guards on the surf's path, early kills and picking off a stray Grgl are
-the Murlocs' weakness.
+the Mrgl & Grgl' weakness.
 
 ## Locks and infinites
 
@@ -262,7 +262,7 @@ One rule prevents each loop the pair could build. `bun wisp interactions --attac
 
 ## Presentation
 
-The selection name is "Murlocs" and the HUD plate reads "Mrgl & Grgl" with
+The selection name is "Mrgl & Grgl" and the HUD plate reads "Mrgl & Grgl" with
 the pair's one percent and no separate Grgl readout (the pip went with the
 shared percent on 2026-10-30; its text also overlapped the name). The camera frames Grgl as any active fighter,
 and a separated Grgl near a blast zone gets the off-screen indicator at
@@ -281,20 +281,20 @@ each starting facing.
 Tomb of Sargeras (stage 7, smashcraft:docs/design/home-stages.md): TFT's
 "Terror of the Tides" puts murlocs and the naga's mur'gul thralls on the
 Broken Isles' shores around the tomb, and the stage's shallow tide floor and
-waterfall are a murloc's coast. The Murlocs share it with the Warden. No new
+waterfall are a murloc's coast. The Mrgl & Grgl share it with the Warden. No new
 stage or asset is needed.
 
 ## Position in the roster
 
-The Murlocs are the cast's small rushdown and its only pair. Rifleman,
-Kael'thas and Lich win from range; the Murlocs close with dash, Belly Slide
+The Mrgl & Grgl are the cast's small rushdown and its only pair. Rifleman,
+Kael'thas and Lich win from range; the Mrgl & Grgl close with dash, Belly Slide
 and the Net, and a held Grgl cuts off their retreat. Blademaster and Warden
-also rush but with longer weapons; the Murlocs trade reach for the smallest
+also rush but with longer weapons; the Mrgl & Grgl trade reach for the smallest
 hurt bodies, the fastest normals and two bodies' worth of hits. Mountain
 King, Forsaken Paladin, Pit Lord, Thrall and Cairne survive trades and
-out-reach them; the Murlocs win by starting combos, pincering and losing
+out-reach them; the Mrgl & Grgl win by starting combos, pincering and losing
 nothing on a whiff. Peon and Shadow Hunter fight around placed objects; the
-Murlocs place a body instead. They die early, have a short solo recovery and
+Mrgl & Grgl place a body instead. They die early, have a short solo recovery and
 cannot shield-pressure past the 30-frame cap: Belly Slide stops at a shield
 and is punished. Without Grgl, Mrgl is a weaker solo rushdown until he
 revives him.
@@ -363,11 +363,11 @@ After (dc96043e, same field and seeds): 46% over 8568 matches; balance score
 23.7 to 9.7, with the profile misses (back air 40%, up air 5%, Ensnare 19%,
 Tidal Rush 20%) left for later tuning.
 
-First reading after the shared percent (Mrgl and Grgl on one damage percent, 8fd779e4b2): the Murlocs-only balance run 41045054196 at fb0c81f284, all 30 Murlocs pairs, 408 matches a pair, Wren Expert. The runner pool refused the full-roster dispatch at admission, and a main-lane dispatch cancelled it once, so the narrower `--matchups` run supplied the reading: Murlocs 28% over 12,240 matches (3,381 wins, 8,859 losses) against the 45-55% win band's 40-60% fighter bar, with 4% against Chen Stormstout and 10% against Pit Lord. No move exceeded the 40% damage share (dash attack 26%). The pair's census figure at that commit was 332,300 instructions against the 329,200 baseline, inside the census gate's 10% margin.
+First reading after the shared percent (Mrgl and Grgl on one damage percent, 8fd779e4b2): the Mrgl & Grgl-only balance run 41045054196 at fb0c81f284, all 30 Mrgl & Grgl pairs, 408 matches a pair, Wren Expert. The runner pool refused the full-roster dispatch at admission, and a main-lane dispatch cancelled it once, so the narrower `--matchups` run supplied the reading: Mrgl & Grgl 28% over 12,240 matches (3,381 wins, 8,859 losses) against the 45-55% win band's 40-60% fighter bar, with 4% against Chen Stormstout and 10% against Pit Lord. No move exceeded the 40% damage share (dash attack 26%). The pair's census figure at that commit was 332,300 instructions against the 329,200 baseline, inside the census gate's 10% margin.
 
-One tuning round (f6dce7477f): damage x1.2 on forward, up and down tilt, dash attack, the three smashes and forward, back and up air; growth x1.1 on the smashes and the three aerials; nothing in the lock rules, caps, cooldowns or the net changed. The same 30 pairs (run 41047421223): 48% over 12,240 matches (5,824 wins, 6,416 losses); the top damage share is dash attack at 28%; the profile misses left are matchups (Chen Stormstout 14%, Akama 27%, Butcher 28% below 30%; Goblin Tinker 71%, Kael'thas 73%, Warden 76%, Sylvanas 80% above 70%) and air 21% (25%-55%).  The pair's census figure after the round is 332,700 instructions (37.6 KB allocation), 1.1% over the 329,200 baseline: value tuning does not move it, the rise came with the shared percent.
+One tuning round (f6dce7477f): damage x1.2 on forward, up and down tilt, dash attack, the three smashes and forward, back and up air; growth x1.1 on the smashes and the three aerials; nothing in the lock rules, caps, cooldowns or the net changed. The same 30 pairs (run 41047421223): 48% over 12,240 matches (5,824 wins, 6,416 losses); the top damage share is dash attack at 28%; the profile misses left are matchups (Chen Stormstout 14%, Akama 27%, Stitches 28% below 30%; Goblin Tinker 71%, Kael'thas 73%, Warden 76%, Sylvanas 80% above 70%) and air 21% (25%-55%).  The pair's census figure after the round is 332,700 instructions (37.6 KB allocation), 1.1% over the 329,200 baseline: value tuning does not move it, the rise came with the shared percent.
 
-The round landed on main as 2988ca4979, seven commits after the toss rework (5317f8dc81). The full-roster run 41048924811 measured 5317f8dc81, before the round, so its Murlocs 27.2% is the untuned pair: it matches the first reading (dash attack 26% of damage, Chen Stormstout 3%, Pit Lord 10%) and not the round's. The toss rework did not move the rate. The computer duo still fits the new orders: a toss now lands Grgl in copy, which `pressToss` accepts and `pressOrder` leaves alone unless a pincer calls Hold. The same 30 pairs on main with both the round and the toss rework (e8785f9a25, run 41069783385): 49% over 12,240 matches (6,054 wins, 6,186 losses); the top damage share is dash attack at 23%, so no numbers changed. Matchups outside 30%-70%: Chen Stormstout 15%, Sylvanas 83%, Warden 80%.
+The round landed on main as 2988ca4979, seven commits after the toss rework (5317f8dc81). The full-roster run 41048924811 measured 5317f8dc81, before the round, so its Mrgl & Grgl 27.2% is the untuned pair: it matches the first reading (dash attack 26% of damage, Chen Stormstout 3%, Pit Lord 10%) and not the round's. The toss rework did not move the rate. The computer duo still fits the new orders: a toss now lands Grgl in copy, which `pressToss` accepts and `pressOrder` leaves alone unless a pincer calls Hold. The same 30 pairs on main with both the round and the toss rework (e8785f9a25, run 41069783385): 49% over 12,240 matches (6,054 wins, 6,186 losses); the top damage share is dash attack at 23%, so no numbers changed. Matchups outside 30%-70%: Chen Stormstout 15%, Sylvanas 83%, Warden 80%.
 
 ## Signature strong/weak move (#389)
 

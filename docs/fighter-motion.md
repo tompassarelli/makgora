@@ -384,26 +384,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Kael'thas Sunstrider | ledge-get-up | 43: Kaelthas ledgeClimb | 114.3 | 20.7 | up; 108.5/8.9 |
 | Kael'thas Sunstrider | ledge-roll | 71: Kaelthas ledgeRoll | 173.0 | 78.2 | forward; 138.3/102.3 |
 | Kael'thas Sunstrider | ledge-attack | 44: Kaelthas ledgeAttack | 68.1 | 11.1 | both; 55.2/19.3 |
-| Murlocs | walk | 1: Walk | 126.7 | 32.7 | forward; 117.6/125.3 |
-| Murlocs | dash | 1: Walk | 126.8 | 30.7 | forward; 110.1/125.1 |
-| Murlocs | run | 1: Walk | 106.0 | 32.6 | forward; 101.1/88.5 |
-| Murlocs | turn | 31: Murloc turn | 165.1 | 44.8 | back; 149.2/32.1 |
-| Murlocs | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
-| Murlocs | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
-| Murlocs | roll-forward | 66: Murloc rollForward | 167.4 | 71.9 | forward; 71.6/157.4 |
-| Murlocs | roll-back | 70: Murloc rollBackward | 166.3 | 71.1 | back; 157.3/71.6 |
-| Murlocs | spot-dodge | 47: Murloc spotDodge | 77.2 | 23.0 | in place; 46.2/59.5 |
-| Murlocs | air-dodge | 28: Murloc airDodge | 65.4 | 13.9 | in place; 45.5/55.4 |
-| Murlocs | tech | 48: Murloc tech | 75.3 | 31.5 | in place; 24.5/47.5 |
-| Murlocs | tech-forward | 67: Murloc techForward | 167.5 | 71.5 | forward; 71.5/157.5 |
-| Murlocs | tech-back | 71: Murloc techBackward | 167.5 | 71.4 | back; 157.5/71.6 |
-| Murlocs | get-up | 45: Murloc getUp | 111.1 | 44.9 | up; 73.6/77.5 |
-| Murlocs | get-up-forward | 68: Murloc getUpRollForward | 147.7 | 60.7 | forward; 123.7/94.2 |
-| Murlocs | get-up-back | 72: Murloc getUpRollBackward | 128.4 | 60.6 | back; 98.8/121.6 |
-| Murlocs | get-up-attack | 46: Murloc getUpAttack | 134.6 | 49.8 | both; 133.3/39.7 |
-| Murlocs | ledge-get-up | 41: Murloc ledgeClimb | 107.1 | 26.3 | up; 76.0/89.8 |
-| Murlocs | ledge-roll | 69: Murloc ledgeRoll | 167.3 | 71.7 | forward; 71.6/157.2 |
-| Murlocs | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
+| Mrgl & Grgl | walk | 1: Walk | 126.7 | 32.7 | forward; 117.6/125.3 |
+| Mrgl & Grgl | dash | 1: Walk | 126.8 | 30.7 | forward; 110.1/125.1 |
+| Mrgl & Grgl | run | 1: Walk | 106.0 | 32.6 | forward; 101.1/88.5 |
+| Mrgl & Grgl | turn | 31: Murloc turn | 165.1 | 44.8 | back; 149.2/32.1 |
+| Mrgl & Grgl | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
+| Mrgl & Grgl | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
+| Mrgl & Grgl | roll-forward | 66: Murloc rollForward | 167.4 | 71.9 | forward; 71.6/157.4 |
+| Mrgl & Grgl | roll-back | 70: Murloc rollBackward | 166.3 | 71.1 | back; 157.3/71.6 |
+| Mrgl & Grgl | spot-dodge | 47: Murloc spotDodge | 77.2 | 23.0 | in place; 46.2/59.5 |
+| Mrgl & Grgl | air-dodge | 28: Murloc airDodge | 65.4 | 13.9 | in place; 45.5/55.4 |
+| Mrgl & Grgl | tech | 48: Murloc tech | 75.3 | 31.5 | in place; 24.5/47.5 |
+| Mrgl & Grgl | tech-forward | 67: Murloc techForward | 167.5 | 71.5 | forward; 71.5/157.5 |
+| Mrgl & Grgl | tech-back | 71: Murloc techBackward | 167.5 | 71.4 | back; 157.5/71.6 |
+| Mrgl & Grgl | get-up | 45: Murloc getUp | 111.1 | 44.9 | up; 73.6/77.5 |
+| Mrgl & Grgl | get-up-forward | 68: Murloc getUpRollForward | 147.7 | 60.7 | forward; 123.7/94.2 |
+| Mrgl & Grgl | get-up-back | 72: Murloc getUpRollBackward | 128.4 | 60.6 | back; 98.8/121.6 |
+| Mrgl & Grgl | get-up-attack | 46: Murloc getUpAttack | 134.6 | 49.8 | both; 133.3/39.7 |
+| Mrgl & Grgl | ledge-get-up | 41: Murloc ledgeClimb | 107.1 | 26.3 | up; 76.0/89.8 |
+| Mrgl & Grgl | ledge-roll | 69: Murloc ledgeRoll | 167.3 | 71.7 | forward; 71.6/157.2 |
+| Mrgl & Grgl | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
 | Grom Hellscream | walk | 5: Walk | 121.9 | 50.4 | forward; 118.7/111.2 |
 | Grom Hellscream | dash | 5: Walk | 121.9 | 49.0 | forward; 118.7/109.6 |
 | Grom Hellscream | run | 5: Walk | 135.2 | 46.2 | forward; 134.4/132.1 |
@@ -544,26 +544,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Tyrande Whisperwind | ledge-get-up | 59: Tyrande ledgeClimb | 148.7 | 90.0 | up; 137.6/0.0 |
 | Tyrande Whisperwind | ledge-roll | 53: Tyrande ledgeRoll | 159.1 | 82.1 | forward; 157.9/134.4 |
 | Tyrande Whisperwind | ledge-attack | 60: Tyrande ledgeAttack | 187.4 | 126.2 | both; 135.2/154.0 |
-| Butcher | walk | 1: Walk | 155.6 | 42.4 | forward; 149.6/143.5 |
-| Butcher | dash | 1: Walk | 154.4 | 36.5 | forward; 146.7/71.9 |
-| Butcher | run | 1: Walk | 165.7 | 37.4 | forward; 138.6/164.6 |
-| Butcher | turn | 1: Walk | 86.0 | 13.0 | back; 85.9/43.7 |
-| Butcher | brake | 1: Walk | 64.5 | 10.4 | in place; 63.9/37.8 |
-| Butcher | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
-| Butcher | roll-forward | 1: Walk | 155.5 | 42.3 | forward; 149.8/143.5 |
-| Butcher | roll-back | 1: Walk | 155.5 | 42.3 | back; 143.5/149.8 |
-| Butcher | spot-dodge | 7: Stand - 3 | 359.3 | 60.1 | in place; 137.3/203.2 |
-| Butcher | air-dodge | 7: Stand - 3 | 360.0 | 60.3 | in place; 138.6/203.2 |
-| Butcher | tech | 0: Stand - 1 | 57.1 | 12.6 | in place; 21.1/19.6 |
-| Butcher | tech-forward | 0: Stand - 1 | 57.1 | 12.6 | forward; 21.1/19.6 |
-| Butcher | tech-back | 0: Stand - 1 | 57.1 | 12.6 | back; 19.6/21.1 |
-| Butcher | get-up | 7: Stand - 3 | 359.9 | 60.2 | up; 323.1/90.9 |
-| Butcher | get-up-forward | 0: Stand - 1 | 57.1 | 12.6 | forward; 21.1/19.6 |
-| Butcher | get-up-back | 0: Stand - 1 | 57.1 | 12.6 | back; 19.6/21.1 |
-| Butcher | get-up-attack | 4: Attack -2 | 397.1 | 74.2 | both; 356.8/207.5 |
-| Butcher | ledge-get-up | 1: Walk | 155.1 | 42.3 | up; 84.3/58.4 |
-| Butcher | ledge-roll | 1: Walk | 155.5 | 42.4 | forward; 149.4/143.6 |
-| Butcher | ledge-attack | 2: Attack | 371.8 | 93.9 | both; 317.8/325.1 |
+| Stitches | walk | 1: Walk | 155.6 | 42.4 | forward; 149.6/143.5 |
+| Stitches | dash | 1: Walk | 154.4 | 36.5 | forward; 146.7/71.9 |
+| Stitches | run | 1: Walk | 165.7 | 37.4 | forward; 138.6/164.6 |
+| Stitches | turn | 1: Walk | 86.0 | 13.0 | back; 85.9/43.7 |
+| Stitches | brake | 1: Walk | 64.5 | 10.4 | in place; 63.9/37.8 |
+| Stitches | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
+| Stitches | roll-forward | 1: Walk | 155.5 | 42.3 | forward; 149.8/143.5 |
+| Stitches | roll-back | 1: Walk | 155.5 | 42.3 | back; 143.5/149.8 |
+| Stitches | spot-dodge | 7: Stand - 3 | 359.3 | 60.1 | in place; 137.3/203.2 |
+| Stitches | air-dodge | 7: Stand - 3 | 360.0 | 60.3 | in place; 138.6/203.2 |
+| Stitches | tech | 0: Stand - 1 | 57.1 | 12.6 | in place; 21.1/19.6 |
+| Stitches | tech-forward | 0: Stand - 1 | 57.1 | 12.6 | forward; 21.1/19.6 |
+| Stitches | tech-back | 0: Stand - 1 | 57.1 | 12.6 | back; 19.6/21.1 |
+| Stitches | get-up | 7: Stand - 3 | 359.9 | 60.2 | up; 323.1/90.9 |
+| Stitches | get-up-forward | 0: Stand - 1 | 57.1 | 12.6 | forward; 21.1/19.6 |
+| Stitches | get-up-back | 0: Stand - 1 | 57.1 | 12.6 | back; 19.6/21.1 |
+| Stitches | get-up-attack | 4: Attack -2 | 397.1 | 74.2 | both; 356.8/207.5 |
+| Stitches | ledge-get-up | 1: Walk | 155.1 | 42.3 | up; 84.3/58.4 |
+| Stitches | ledge-roll | 1: Walk | 155.5 | 42.4 | forward; 149.4/143.6 |
+| Stitches | ledge-attack | 2: Attack | 371.8 | 93.9 | both; 317.8/325.1 |
 | Akama (WIP) | walk | 2: Walk | 110.5 | 52.0 | forward; 88.7/107.4 |
 | Akama (WIP) | dash | 2: Walk | 109.3 | 50.4 | forward; 87.9/105.6 |
 | Akama (WIP) | run | 2: Walk | 118.4 | 44.6 | forward; 106.5/118.4 |

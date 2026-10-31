@@ -65,7 +65,7 @@ const rot: AuthoredSpecial = { endFrame: 10, toggleAura: ROT };
 export const BUTCHER_SPECIALS: FighterSpecials = {
   neutral: { name: "Meat Hook", description: "Hold to wind the hook up and release to throw: a tap flings it a short way, a full hold about twice as far, and for a moment after the release the stick angles the throw up or down. It catches the first foe it reaches and reels them into his hands. A shield stops it, and a miss leaves him wide open. Shield keeps the charge for the next press. Thrown in the air, the first hook of each jump that reaches the ledge ahead reels him onto it.",
     ground: meatHook(false), air: meatHook(true) },
-  side: { name: "Butcher's Charge", description: "A belly-first rush that shrugs off light hits and bowls the foe over. Shield it or hit him hard.",
+  side: { name: "Stitches' Charge", description: "A belly-first rush that shrugs off light hits and bowls the foe over. Shield it or hit him hard.",
     ground: butchersCharge(false), air: butchersCharge(true) },
   up: { name: "Hook Swing", description: "He flings the hook up and ahead: if it bites the ledge it reels him there; otherwise he hops a short way and falls helpless.",
     ground: hookSwing },

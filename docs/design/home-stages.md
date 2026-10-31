@@ -19,7 +19,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Warden | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": Maiev hunts Illidan to the Broken Isles and into the Tomb of Sargeras. |
 | Malfurion Stormrage | Tomb of Sargeras | 7 | Malfurion follows Illidan and Maiev through the Broken Isles in TFT. |
 | Lich | Naxxramas | 4 | Kel'Thuzad, raised as a lich in RoC, rules the Scourge necropolis Naxxramas. |
-| the Butcher | Naxxramas | 4 | The Scourge stitches its abominations together in Naxxramas's flesh-works. |
+| Stitches | Naxxramas | 4 | The Scourge stitches its abominations together in Naxxramas's flesh-works. |
 | Uther | Stratholme | 6 | RoC's "The Culling": Uther refuses to purge Stratholme and leaves Arthas at its gates. |
 | Dreadlord | Stratholme | 6 | RoC's "The Culling": the dreadlord Mal'Ganis waits for Arthas in the plagued city. |
 | Shadow Hunter | Durotar Skies | 3 | Vol'jin's Darkspear trolls settle Durotar's coast beside Thrall's orcs. |
@@ -42,7 +42,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Peon | Durotar Skies | 3 | Orc peons build the Horde settlements. |
 | Goblin Tinker | Durotar Skies | 3 | Goblin engineers supply the Horde with machinery. |
 | Kael'thas Sunstrider | Hellfire Citadel | 14 | Kael follows Illidan into Outland. |
-| Murloc | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": murlocs and the naga's mur'gul thralls hold the Broken Isles' shores around the tomb; its tide floor is their water. |
+| Mrgl & Grgl | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": murlocs and the naga's mur'gul thralls hold the Broken Isles' shores around the tomb; its tide floor is their water. |
 | Grom Hellscream | Durotar Skies | 3 | Grom's Warsong clan fought beside Thrall's Horde in Kalimdor before his final charge at Mannoroth. |
 
 Ahn'Qiraj and Sky Deck (test) are home to no fighter. A stage may host

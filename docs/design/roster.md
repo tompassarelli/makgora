@@ -1,10 +1,12 @@
 # Smashcraft roster
 
-> **Frozen (26 October 2026):** Forsaken Paladin was frozen pending replacement, and Uther replaced him on 28 October 2026 ([uther.md](uther.md)). `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, keeps listing him until Tom lifts it. The remaining planned additions, Tyrande, the Butcher and a dismounted Thrall, are in [roster-next.md](roster-next.md) (28 October 2026).
+> **Frozen (26 October 2026):** Forsaken Paladin was frozen pending replacement, and Uther replaced him on 28 October 2026 ([uther.md](uther.md)). `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, keeps listing him until Tom lifts it. The remaining planned additions, Tyrande, Stitches and a dismounted Thrall, are in [roster-next.md](roster-next.md) (28 October 2026).
 
 > **Removed (30 October 2026):** Sniper, the original Rifleman, left the game at Tom's decision: he is on no select grid, computer, Random, Classic or Lore Battle list, and the map carries none of his art, model or object data. Character code 1 stays as the base Rifleman body that headless tests use as a fixed reference target and training dummy (`HARNESS_ONLY_FIGHTERS` in `ts/src/game/roster/kits.ts`).
 
 > **Reinstated (30 October 2026):** Tom reversed his 29 October cut and Anub'arak is back in the roster as he was before the removal, with character code 23 again his; he sits at the end of the Undead group on the select grid, after Mal'Ganis.
+
+> **Renames (31 October 2026):** Tom asked for the Butcher to be shown to players as Stitches and for the Murloc to be shown as the duo Mrgl & Grgl, on the select card, portrait, damage panel, results, computer lines, announcer text, menus, credits and these docs. The internal names stay: the `Character.butcher` and `Character.murloc` codes, `HeroDefinition.name` (the developer-command key "Butcher" and "Murloc"), the `butcher` and `murloc` source folders, generated art, clip and sound paths, and the `interactions --attacker Murlocs` option.
 
 > **Select grid order (30 October 2026):** the character select grid lists the fighters by faction in reading order, Human, Orc, Undead, Night Elf, Burning Legion, then Neutral, with the Random tile last; `SELECT_GRID_ORDER` in `ts/src/game/ui/selectionLayout.ts` holds the order and `selectionFrames.tests.ts` pins it. Chen sits with the Neutral fighters (Tom, 30 October 2026).
 
@@ -135,9 +137,9 @@ Tom's idea on 2026-10-30: Akama's up B is **Shadow Step**, a two-leg invisible t
 | Up B | **Shadow Step:** he dissolves into shadow smoke on frames 1 to 12, intangible from frame 8, and the stick sets his heading at any angle until frame 12. Frames 13 to 22 he travels unseen along that heading at 0.25H a frame, 2.5H in all, marked by a thin smoke streak along the path. He reappears on frame 23 with an arrival slash for 6% at a 20 degree launch (a small hit at a low angle, after Vanish's reappearance hit of 5%). If special is still held on frame 26 he stays visible and vulnerable for 8 frames to aim with the stick, dissolves for 4 frames (intangible from the tenth frame of the second leg), and steps again for 6 frames at the same speed, 1.5H, which is 60% of the first step, with a second arrival slash. Releasing special before frame 26 ends the move at the first arrival. At most two steps, then a helpless fall. Total reach is about 4H, a little beyond Sheik's Vanish, paid for by the visible aim window between the steps. A step that reaches a free ledge snaps to it, on either leg: a path entering the stage lip within 0.5H below the top and ending within 0.5H of the ledge catches it, as Blink does; deeper entry lands him or stops against the stage. One use per airtime; landing lag 24 after the helpless fall. 0 mana | Leg one: dissolve f1 to 12, intangible f8 to 22, travel f13 to 22, slash f23 to 25, hold check f26, end f36 (10 recovery frames after the slash). Leg two: aim f1 to 8, intangible f10 to 18, travel f13 to 18, slash f19 to 21, end f32 |
 Akama, Firelord and Goblin Alchemist are selectable now as stand-ins on the shared placeholder moveset ([standins.md](standins.md)); the sections below are their real kits, not yet built.
 
-Murloc ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),
+Mrgl & Grgl ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),
 requested by Tom on 8 October 2026, is a small, light rushdown; his kit,
-body and gameplan are in [murloc.md](murloc.md). His close-range normals are fast and multi-hit (Tom, 2026-10-30): a held spear-poke jab flurry, a five-hit spear drill down air that links into a grounded jab, and a frame-3 neutral air. His up smash is a point-first spear thrust straight up overhead whose hit is a column over his head reaching 122 (2026-10-30, was a rearward arc to 100); frame data is in the Murloc kit table.
+body and gameplan are in [murloc.md](murloc.md). His close-range normals are fast and multi-hit (Tom, 2026-10-30): a held spear-poke jab flurry, a five-hit spear drill down air that links into a grounded jab, and a frame-3 neutral air. His up smash is a point-first spear thrust straight up overhead whose hit is a column over his head reaching 122 (2026-10-30, was a rearward arc to 100); frame data is in the Mrgl & Grgl kit table.
 
 Build order is a recommendation, not permission to delete or overwrite ongoing work. Finish or checkpoint the current synchronization milestone before integrating new gameplay into that branch. A first overnight pass should finish one or two complete heroes and reusable move primitives; it should not report all fifteen finished because character-select entries exist.
 
@@ -220,14 +222,14 @@ ceiling of **12 world units/frame**.
 
 The four over-limit fighters retain their strict speed order, above Shadow
 Hunter's unchanged 13.728 run and 11.856 dash: Blademaster < Dreadlord <
-Murloc < Warden. Their explicit overrides preserve the existing walk
+Mrgl & Grgl < Warden. Their explicit overrides preserve the existing walk
 multiplier and all other movement properties.
 
 | Fighter | Run before → after | Entry dash before → after |
 | --- | ---: | ---: |
 | Blademaster | 14.256 → 13.74 | 12.312 → 11.892 |
 | Dreadlord | 14.520 → 13.76 | 12.540 → 11.928 |
-| Murloc | 14.784 → 13.79999828338623 | 12.768 → 11.999999046325684 |
+| Mrgl & Grgl | 14.784 → 13.79999828338623 | 12.768 → 11.999999046325684 |
 | Warden | 15.048 → 13.799999237060547 | 12.996 → 12 |
 
 Values in this table other than the ceiling are rounded for readability.
@@ -1573,7 +1575,7 @@ launched at 23° and killed sooner than his forward smash, and the forward
 smash dealt 9% where this section commits to 10. Dash attack now launches
 at 60° (damage 9, base 20, growth 95 unchanged); forward smash's glaive
 swing deals 10%. Measured from the centre of stage 0, no DI, against
-Rifleman / Murloc / Cairne: uncharged forward smash kills from 145 / 137 /
+Rifleman / Mrgl & Grgl / Cairne: uncharged forward smash kills from 145 / 137 /
 190% before and 131 / 124 / 173% after; fully charged Eye Blast is
 unchanged at 77 / 76 / 114%. 9 Oct, #379: forward smash became Fel Lunge,
 a short lunge with no beam (uncharged 128 / 122 / 171%, fully charged 94 /
@@ -1989,7 +1991,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Peon | Tool strikes, a heaved log and chosen building | Pillage meter refund and stock heal bank |
 | Tinker | Claw pack, factory placement and tracking Laser | Banked Engineering Upgrade |
 | Kael'thas | Sphere gestures and explicit spell choices | Ordinary-hit meter steal |
-| Murloc | Small visible body, quick claws and leap pressure | Ordinary-hit meter steal |
+| Mrgl & Grgl | Small visible body, quick claws and leap pressure | Ordinary-hit meter steal |
 
 | Cairne move | Gesture and purpose | Startup / active / recovery; damage and launch |
 | --- | --- | --- |

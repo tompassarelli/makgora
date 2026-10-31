@@ -5,7 +5,7 @@ import { BUTCHER_MOVES } from "./moves";
 import { BUTCHER_SPECIALS } from "./specials";
 
 export const BUTCHER_HERO: HeroDefinition = {
-  character: Character.butcher, name: "Butcher", displayName: "Butcher",
+  character: Character.butcher, name: "Butcher", displayName: "Stitches",
   purpose: "Heavy ranged grappler: a reel-in hook that turns any spacing into a throw",
   weakness: "The widest body in the roster, combo food, and every missed hook is a long opening",
   complete: true,

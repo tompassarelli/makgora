@@ -103,7 +103,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`; Chen's hang turns his left wrist rather than the staff, since the staff's own pivot is off the grip and turning it pulls the shaft out of his fist (#525).
-  `bun tools/animations/butcher-clips.ts STOCK_ABOMINATION.mdx PRIVATE_OUTPUT` appends the Butcher's eighteen authored clips to the stock Classic Abomination, aims the cleaver and hook arms by search toward per-frame targets, writes per-pose sheets in both facings and regenerates `ts/src/game/fighters/butcher/clips.ts`.
+  `bun tools/animations/butcher-clips.ts STOCK_ABOMINATION.mdx PRIVATE_OUTPUT` appends Stitches' eighteen authored clips to the stock Classic Abomination, aims the cleaver and hook arms by search toward per-frame targets, writes per-pose sheets in both facings and regenerates `ts/src/game/fighters/butcher/clips.ts`.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace aerials|up-air|forward-air|counter|back-air|quickdraw]`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the double-jump flip, and re-authors two clips in place from the move's own blade tables:
@@ -179,7 +179,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   re-authors only those clips in place at their indices, fits a retimed clip
   before the next sequence, rewrites its binding and checks every other pose is unchanged.
   `bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx PRIVATE_OUTPUT` appends the
-  Murloc's normal, special, paired throw, recovery and nine pain gestures to the
+  Mrgl & Grgl's normal, special, paired throw, recovery and nine pain gestures to the
   stock Tiderunner, preserves its nine sequences and writes both-facing sheets;
   run it twice for a fresh clip table, since its reach search reads the table.
   Given the shipped model and `pain` instead, it re-authors only the nine pain

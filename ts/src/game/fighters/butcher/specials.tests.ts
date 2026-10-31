@@ -356,7 +356,7 @@ test("Only the first air Meat Hook of an airborne stretch can tether: a second t
   assertLessThan(tether.z, -500.0);
 });
 
-test("Butcher's Charge armours only its first rush frames against hits up to 3% and ends 63 frames after the press, leaving a whiff to punish [k3 measure docs/design/butcher.md]", () => {
+test("Stitches' Charge armours only its first rush frames against hits up to 3% and ends 63 frames after the press, leaving a whiff to punish [k3 measure docs/design/butcher.md]", () => {
   const d = duel({ foeAhead: 900.0 });
   let armourMax = 0.0;
   let armourFrames = 0;

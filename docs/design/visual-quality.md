@@ -827,7 +827,7 @@ was 4.9), picture mean 14.9, 1.0% of pixels above L\* 60 (was 7.5%). Three cold
 viewers shown the after shot named both fighters and looked at Illidan first.
 `--separation` with a silhouette mask taken from the scene minus the
 fighters-hidden capture (the fighters-alone mask merges the damage and name
-labels into Illidan's blob) reads one fighter, because the Murloc blob is under
+labels into Illidan's blob) reads one fighter, because the Mrgl & Grgl blob is under
 the tool's 25% size cut: Illidan, fighter band 27.9–48.2 against backdrop band
 4.9–28.2, gap −0.3 L\*, which fails the limit of 0. The overlap is the lit deck
 top and the Blacksmith behind him, not rock: darkening the near row from

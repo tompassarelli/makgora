@@ -26,7 +26,7 @@ by keyword):
 | The windup is a stumble, tumble or forward pitch, not a coil | 13 | A coil that rocks back on bent knees |
 
 Ten of those judgements gave follow-through 4 (Kael'thas, Goblin Tinker and
-Murloc), and their notes name a body that carries through the active window
+Mrgl & Grgl), and their notes name a body that carries through the active window
 and "settles gradually" or "smoothly" to stance.
 
 ## Pose sequence
@@ -81,7 +81,7 @@ The scorer's lines 1–4 must still pass (`bun wisp anim score --fighter F`):
 
 - **Line 1, body share ≥ 0.90.** The shoulder must travel with the tip from
   the deepest pullback to contact, projected on the line from the
-  contact-frame chest to the hit region's far end. On Murloc (#345) a contact
+  contact-frame chest to the hit region's far end. On Mrgl & Grgl (#345) a contact
   root offset above about `tx` 22 tilted that line steeply and dropped body
   share to 0.69–0.74, and pulling the spear back with the arm kept line 1 only
   while contact stayed at about `tx` 22. On Kael'thas a coil that sank the
@@ -91,7 +91,7 @@ The scorer's lines 1–4 must still pass (`bun wisp anim score --fighter F`):
 - **Line 2, overshoot ≥ 0.029.** The tip carries past its contact position
   along its incoming direction; drive does this.
 - **Line 3, peak and hold.** Before gate 37 (2026-10-26) the tip's reach had to
-  peak within two frames of contact; on Murloc any later forward key moved the
+  peak within two frames of contact; on Mrgl & Grgl any later forward key moved the
   peak to 10, 18, 32 or 33 and failed, which is why reach had to peak by frame
   7. Since be28d6138 a dash attack's peak may fall as late as `L + 2`, no pose
   may hold within 5% of body height for more than 9 frames, and the return's

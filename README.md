@@ -78,7 +78,7 @@ Where to look next:
 - Animation & Stages: Tom Passarelli (Tompas)
 - Music: Tom Passarelli (with Google Lyria)
 - Cursors, wordmark & stage-select art: Smashcraft originals (the pinching-hand cursor made with AI assistance)
-- Murloc sound: World of Warcraft, Blizzard Entertainment
+- Mrgl & Grgl sound: World of Warcraft, Blizzard Entertainment
 
 Lich King model: [The Lich King by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
 (Hive Workshop), used with credit as the author permits. Kwaliti's

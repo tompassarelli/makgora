@@ -417,7 +417,7 @@ Strong + a direction on dash frames 1–3 is the forward or down smash.
 centre of stage 0 with no DI against Rifleman:
 - Mountain King's charge hit centred inside his torso, so the push kept
   every body narrower than Cairne out of reach: it missed Rifleman and
-  Murloc at every spacing. Its hit now sits 4 units forward; at 60% it
+  Mrgl & Grgl at every spacing. Its hit now sits 4 units forward; at 60% it
   sends Rifleman 209 units up with him 24 frames ahead, and kills from
   125%.
 - Lich King's Death Knight's Charge and Chen's belly stumble launched at

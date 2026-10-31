@@ -74,8 +74,8 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 1, speaker: "Thrall", intro: "The humans have found our camps. Break through, and we sail west!",
   }),
   battle({
-    id: "murlocs-tomb", title: "The Murloc's Tomb of Sargeras", player: C.murloc, against: [C.warden], tier: "rookie", stage: 7,
-    win: survive, minutes: 1, playerStocks: 2, opponentStocks: 3, speaker: "Murloc", intro: "Mrglglgl! The jailor wants the shiny tomb back!",
+    id: "murlocs-tomb", title: "Mrgl & Grgl's Tomb of Sargeras", player: C.murloc, against: [C.warden], tier: "rookie", stage: 7,
+    win: survive, minutes: 1, playerStocks: 2, opponentStocks: 3, speaker: "Mrgl & Grgl", intro: "Mrglglgl! The jailor wants the shiny tomb back!",
   }),
   battle({
     id: "darkspear", title: "The Darkspear Rescue", player: C.shadowHunter, against: [C.murloc], tier: "beginner", stage: 3,

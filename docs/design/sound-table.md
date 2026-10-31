@@ -236,7 +236,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Phoenix | PhoenixMissileLaunch | Fireball | Fireball + Fireball | WoodMediumBashMetal |  |
 | Down special: Banish | BanishCaster | BanishCaster | BanishCaster + Fireball | WoodMediumBashMetal |  |
 
-## Murlocs
+## Mrgl & Grgl
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -332,7 +332,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Moonlight Leap | BlinkCaster | WoodLightBashFlesh | WoodLightBashFlesh + WoodHeavyBashFlesh | WoodMediumBashMetal |  |
 | Down special: Elune's Grace | ManaShieldCastSound | Defend | Defend + WoodHeavyBashFlesh | WoodMediumBashMetal |  |
 
-## Butcher
+## Stitches
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -340,7 +340,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavyChopFlesh | MetalHeavyChopFlesh + RelentlessCleave | MetalHeavyChopMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumChopFlesh | MetalHeavyChopFlesh + RelentlessCleave | MetalMediumChopMetal |  |
 | Neutral special: Meat Hook | AxeMissileLaunch | MeatWagonMissileHit | MeatWagonMissileHit + RelentlessCleave | MetalMediumChopMetal |  |
-| Side special: Butcher's Charge | MeatWagonAttack1 | RockHeavyBashFlesh | RockHeavyBashFlesh + RelentlessCleave | MetalMediumChopMetal |  |
+| Side special: Stitches' Charge | MeatWagonAttack1 | RockHeavyBashFlesh | RockHeavyBashFlesh + RelentlessCleave | MetalMediumChopMetal |  |
 | Up special: Hook Swing | AxeMissileLaunch | AxeMissileHit | AxeMissileHit + RelentlessCleave | MetalMediumChopMetal |  |
 | Down special: Rot | Cannibalize | Cannibalize | Cannibalize + RelentlessCleave | MetalMediumChopMetal |  |
 

@@ -34,7 +34,7 @@ smash, neutral air, the four specials), kept outside the repository under
 | Peon | 20 | 20/20 | 15/20 | 18-peon.ogg |
 | Goblin Tinker | 21 | 21/21 | 17/21 | 19-goblin-tinker.ogg |
 | Kael'thas Sunstrider | 22 | 22/22 | 19/22 | 20-kael-thas-sunstrider.ogg |
-| Murloc | 22 | 22/22 | 18/22 | 21-murloc.ogg |
+| Mrgl & Grgl | 22 | 22/22 | 18/22 | 21-murloc.ogg |
 | Grom Hellscream | 22 | 22/22 | 19/22 | 22-grom-hellscream.ogg |
 | Kobold | 22 | 22/22 | 18/22 | 23-kobold.ogg |
 | Malfurion Stormrage | 20 | 20/20 | 16/20 | 24-malfurion-stormrage.ogg |

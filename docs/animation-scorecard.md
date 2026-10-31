@@ -188,7 +188,7 @@ match size.
 `bun wisp anim prescreen --fighter SLUG --move MOVE [--threshold N]` is an optional step before a take goes to native capture (#614): it renders the move's judge images at the match camera's framing (`anim judge prepare`), sends them to one cold viewer through the bare `anim judge run` call and prints `stop` when the mean of the viewer's five lines is below 3 (a point under the line-5 bar of 4) and `go` otherwise, with the render, viewer and wall seconds. It only stops early: a `go` passes nothing, native capture and the three cold viewers still decide the box, and it changes no scorecard line, bar, two-take rule or `judge.jsonl` record. Its results append to `build/anim-prescreen/prescreen.jsonl` and never count as judgements.
 
 Named exceptions ship a move whose line 5 stays below 4 after every
-measured line passes. Murloc's jab, jab 2, forward tilt and down-angled
+measured line passes. Mrgl & Grgl's jab, jab 2, forward tilt and down-angled
 forward tilt ship with line 5 below 4 (3 on the tilts; 2 on readability and
 anticipation for the jabs, 3 on the rest): Tom's decision of 2026-10-26 via north
 gate 76, after five Blender takes failed to lift it and judges kept naming
@@ -211,7 +211,7 @@ ship under this exception with the rapid jab added: one bare judge scored them
 the rapid jab with the attack button held, so its row measures the whole
 flurry.
 
-Murloc's down air ships with line 5 below 4: three fresh bare judges (2026-10-30)
+Mrgl & Grgl's down air ships with line 5 below 4: three fresh bare judges (2026-10-30)
 scored readability 2, 2, 2, weight 3, 3, 3, anticipation 3, 3, 3, follow-through
 3, 3, 3 and character 3, 4, 4, naming the tucked spinning body as a ball of
 spikes, fins and spear, while lines 1 to 4 pass (`bun wisp anim score --fighter
@@ -222,7 +222,7 @@ spear down on each hit, fixed the return ratio but failed line 2's overshoot
 sim's frame data of 6, 18 and 3 frames (a 26-frame clip); the box asked for the
 exception as the jabs carry it.
 
-Murloc's forward smash ships with line 5 below 4. It is a Blender take
+Mrgl & Grgl's forward smash ships with line 5 below 4. It is a Blender take
 (`tools/animations/murloc-stabs.py`) that swings the spear back under him and
 over into a level swing along the stage, every joint turning about the
 side-view axis. Tom found the earlier clip swiping toward the camera
@@ -235,7 +235,7 @@ curled ball. Take 2 kept him side-on in a longer lunge and scored 3, 2, 3, 3,
 3, but it failed lines 1 and 2 (mass shift 0.41 with body share 0.27, jump
 0.05). Both takes are spent, so take 1 ships under the box's line 5 exception.
 
-Murloc's up smash ships with line 5 below 4. Tom asked for a point-first
+Mrgl & Grgl's up smash ships with line 5 below 4. Tom asked for a point-first
 spear thrust straight up overhead with the same frame data (2026-10-30): a
 Blender take (`tools/animations/murloc-stabs.py`) dips, raises the spear
 upright in a crouch, hops and drives the point to the top of a hit column over
@@ -247,7 +247,7 @@ hunched silhouette, the round body the jabs' exception already names. Earlier
 takes stopped at body share 0.287; a shallower windup dip passed it, the take
 limit is spent, and the take ships under the box's line 5 exception.
 
-Murloc's neutral air ships with line 5 below 4 (smashcraft#816). A Blender take
+Mrgl & Grgl's neutral air ships with line 5 below 4 (smashcraft#816). A Blender take
 (`tools/animations/murloc-stabs.py neutralAir`) draws the spear up behind him
 over the 3-frame startup, drives the point down and forward into the hit
 region's far end on the first active frame and carries it through, then
@@ -268,7 +268,7 @@ judged. Tom's standing delegation of pending decisions to the recommendation
 (2026-10-26) was applied on 2026-10-27 by the smashcraft triage lead, which
 recommended shipping it as a named exception.
 
-Murloc's dash attack ships with line 5 at 3: the judge medians on readability,
+Mrgl & Grgl's dash attack ships with line 5 at 3: the judge medians on readability,
 weight and anticipation are 3, and follow-through and character are 4, while
 lines 1 to 4 pass on origin/main (`bun wisp anim score --fighter murloc`: body
 share 0.69, mass shift 0.81, end error 0.01, jump 0.03, overshoot 0.19,
@@ -276,7 +276,7 @@ contrast 0.45). Both takes were judged and neither passed line 5, so the take
 that landed is take 2, a deeper coil into a long flat lunge. Tom accepted it as
 judged on 2026-10-26 (north gate 73), with no further takes (#345, landed as
 653571a588). The judges read the windup as brief and the body as a cluttered
-blob across frames, which the triage traced to Murloc's round, spiky body at
+blob across frames, which the triage traced to Mrgl & Grgl's round, spiky body at
 tile size rather than to the spear.
 
 Illidan's down tilt ships with line 5 at 3: the judge medians on readability,
@@ -355,7 +355,7 @@ specials, up special included, are carried by the body and keep body share.
 
 A dash attack is not a tilt (the proxy's ruling of 2026-10-26 under Tom's
 delegated judged-box rulings of 2026-10-25): three cold judges failed
-Medivh's and Murloc's dash attacks for lacking a weapon draw-back (#343,
+Medivh's and Mrgl & Grgl's dash attacks for lacking a weapon draw-back (#343,
 #345), while the tilt rule scored every Medivh candidate that drew the staff
 back below .90 (behind the hip .56, cocked upward .78). It keeps the tilt
 class's values apart from body share, which is measured from the windup frame:
