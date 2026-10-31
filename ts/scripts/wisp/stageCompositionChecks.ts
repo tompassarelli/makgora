@@ -139,7 +139,7 @@ const STAIR_PAIR_ORDERS = [["ab", SEPARATION_PAIR], ["ba", "Chen Stormstout / Sh
 export const FROZEN_THRONE_STAIR_CHECKS: readonly NativeCheck[] = STAIR_PAIR_ORDERS.map(([order, pair]): NativeCheck => ({
   id: `897-stair-${order}`, closes: "smashcraft#897 box 1", map: "presentation", session: "presentation",
   setup: [
-    { chat: "-dev reset" }, { chat: "-dev items off" }, { chat: "-dev drops off" }, { chat: "-dev hazards off" },
+    { chat: "-dev reset" },
     { chat: `-dev quick stage ${STAIR_STAGE} pair ${pair}` }, { waitMs: 5000 }, { keys: ["BackSpace"], client: "a" },
     { chat: "-dev view near" }, { keys: ["h"], client: "a" }, { waitMs: 20000 },
   ],
