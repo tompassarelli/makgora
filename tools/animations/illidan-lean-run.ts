@@ -10,8 +10,8 @@ ensure(assetsArg && outputArg && variantArg, "usage: bun tools/animations/illida
 const [assets, output] = [assetsArg, outputArg].map(p => resolve(p));
 ensure(relative(resolve(import.meta.dir, "../.."), output).startsWith(".."), "Illidan art stays outside the checkout");
 
-interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number; readonly alternate: number; readonly cross: number; readonly counter: number; readonly pelvisYaw: number; readonly crouch: number; readonly knee: number; readonly shin: number; readonly handGuard: number; readonly burst: number }
-const GAIT = { alternate: 0, cross: 0, counter: 0, pelvisYaw: 0, crouch: 0, knee: 0, shin: 0, handGuard: 0, burst: .55 };
+interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number; readonly alternate: number; readonly cross: number; readonly counter: number; readonly pelvisYaw: number; readonly crouch: number; readonly knee: number; readonly shin: number; readonly handGuard: number; readonly burst: number; readonly burstSwing: number }
+const GAIT = { alternate: 0, cross: 0, counter: 0, pelvisYaw: 0, crouch: 0, knee: 0, shin: 0, handGuard: 0, burst: .55, burstSwing: 1 };
 const VARIANTS: Readonly<Record<string, Variant>> = {
   low: { lean: 52, head: .55, pelvis: .4, sweep: 78, elbow: 8, hand: 46, splay: 14, swing: .35, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   fox: { lean: 42, head: .5, pelvis: .35, sweep: 66, elbow: 10, hand: 38, splay: 16, swing: .4, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
@@ -105,7 +105,7 @@ function rewrite(name: "Locomotion Run" | "Locomotion Initial Dash Burst", ramp:
     }
     for (const { side, sign } of ARMS) {
       const raw = swingOf(s, side);
-      const swing = v.alternate === 0 ? v.swing * raw : v.alternate * raw / reach[side]!;
+      const swing = v.alternate === 0 ? v.swing * raw : v.alternate * (ramp ? v.burstSwing : 1) * raw / reach[side]!;
       const guard = v.alternate === 0 ? 0 : (1 - raw / reach[side]!) / 2;
       const a = v.sweep + swing, e = a + v.elbow, h = e + (v.alternate === 0 ? v.hand : v.hand + (v.handGuard - v.hand) * guard);
       const splay = (extra: number) => turn("x", sign * -(v.splay + extra - v.cross * guard));
