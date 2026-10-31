@@ -1425,18 +1425,31 @@ Grab 9/2/30. Throws: forward 10 (EDGE), back 12 (KILL), up 8 (JUGGLE), and
 
 ### B specials
 
-- **Howling Blast** (neutral, 15 mana): a wide frost gust leaves on frame 22
-  at 0.072H a frame and flies 53 frames, about 3.7H (35% farther than the
-  frame-28, 0.08H, 36-frame version); end lag 28 frames; reflectable.
-  Landing in the air finishes the same cast on the ground, blast and armor on
-  their frames, with no landing lag.
-- **Val'kyr Shadowguard** (side, 20 mana): a Val'kyr flies out on frame 14
-  and seizes the first body she reaches (a shield stops her; she can't be
-  reflected). The victim is carried 3 units a frame the way she flew, rising,
+Howling Blast, his neutral special until 1 Nov, left the kit when Tom moved
+the Val'kyr to neutral and made the side special Death Grip.
+
+- **Val'kyr Shadowguard** (neutral, 20 mana; side until Tom moved her on
+  1 Nov, unchanged): a Val'kyr flies out on frame 26 at 5 units a frame for
+  60 frames and seizes the first body she reaches (a shield stops her; a
+  reflector turns her back). The victim is carried 3 units a frame the way she flew, rising,
   for 100 frames, with no control. Mashing frees them, never before frame 20;
   any damaging hit, his own included, drops the carry; then 240 frames immune.
   (Tom delegated, 7 Oct): she carries toward the edge he faces rather than the
   nearest one, so the player aims the drop and the victim can read it.
+- **Death Grip** (side, 150-frame cooldown; Tom's design, 1 Nov, after the
+  World of Warcraft death knight's pull): a death coil (the stock Death Coil
+  missile) leaves his hand on frame 16 at 24 units a frame for 12 frames,
+  reaching about 2.6H; end lag through frame 40. The first body it reaches
+  takes 4 damage with no knockback and is yanked over 10 frames to 70 units
+  in front of him at his height, a shackle chain (the stock Aerial Shackles
+  lightning) joining them, then stays stunned for 18 frames from the frame it
+  arrives; nobody can grab it in that stun and any hit ends it. He is free
+  7 frames before it up close and 17 from the far end, so his jab follows a
+  close grip and his tilts a far one, never a smash or a throw. A shield stops the coil, nothing
+  reflects it, the stage blocks the pull, and the victim is immune to another
+  pull for 90 frames after. In the air it pulls to his height and he lands
+  with 20 frames of landing lag. Sounds: the stock DeathCoil cast and
+  Ensnare on the catch.
 - **Ascension of the Damned** (up, 15 mana): an ice column lifts him 2H over
   frames 8-30, steered 0.35H, inside a frost vortex that strikes once (9),
   then a helpless fall. The free form rises 1.3H with no vortex.
@@ -1462,7 +1475,8 @@ the authored clips land; his voice is the game's Evil Arthas set, whose
 selection line is "What" (the campaign unit has no Ready line).
 
 **Gameplan** (lichKingGameplan.ts, #105): he holds the sweep's tip spacing,
-makes the target act with Howling Blast and Defile, starts tech chases from
+pulls a zoning foe into his blade with Death Grip and follows with a tilt,
+makes the target act with Defile, starts tech chases from
 Frozen Ground and Harvest Soul, and kills with the smashes, his back air and a
 Val'kyr carry near the ledge.
 

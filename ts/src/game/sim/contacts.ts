@@ -481,7 +481,7 @@ function applyContactStatuses(world: Roster, slot: number): void {
     if (contact.target !== slot || contact.blocked || contact.status === undefined) continue;
     const target = fighterAt(world, slot);
     if (contact.source !== slot && inLivePair(world, contact.source) && isPartnerBody(world, contact.source) && target.status.condition === contact.status.kind) continue;
-    applyHeroStatus(target, contact.status);
+    applyHeroStatus(target, contact.status, contact.source);
 
     if (target.status.condition === HeroStatusKind.carried && contact.status.kind === HeroStatusKind.carried) target.facing = contact.facing < 0 ? 1 : -1;
   }

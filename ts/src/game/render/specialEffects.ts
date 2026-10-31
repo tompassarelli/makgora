@@ -54,6 +54,8 @@ interface SpecialSlot {
   siphonShown: boolean;
   readonly laser: Beam;
   readonly chain: Beam;
+  readonly grip: Beam;
+  gripShown: boolean;
   laserShown: boolean;
   lastX: number;
   lastZ: number;
@@ -81,6 +83,7 @@ const SLOT_EFFECTS = 10;
 const SIPHON_LIGHTNING = "DRAM";
 const LASER_LIGHTNING = "AFOD";
 const CHAIN_LIGHTNING = "CLPB";
+const GRIP_LIGHTNING = "LEAS";
 
 export class SpecialEffects {
   private readonly slots: readonly SpecialSlot[];
@@ -118,12 +121,14 @@ export class SpecialEffects {
       setBeamColor(laser, 1.0, 1.0, 1.0, 0.0);
       const chain = createBeam(CHAIN_LIGHTNING, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       setBeamColor(chain, 1.0, 1.0, 1.0, 0.0);
+      const grip = createBeam(GRIP_LIGHTNING, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
+      setBeamColor(grip, 1.0, 1.0, 1.0, 0.0);
       setEffectTimeScale(aura, 0.0);
       setEffectTimeScale(wingTrail, 0.0);
       setEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = soundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, cannonFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
+        bear, aura, felFlames, cannonFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, grip, gripShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -154,6 +159,7 @@ export class SpecialEffects {
       this.park(slot.frog, index, FROG);
       this.hideSiphon(slot);
       this.hideLaser(slot);
+      this.hideGrip(slot);
       slot.previousSpecial = SpecialAction.none;
       slot.previousSpecialFrame = 0;
       this.releaseImmolationLoop(slot);
@@ -207,7 +213,7 @@ export class SpecialEffects {
   }
 
   private showStun(fighter: Readonly<Fighter>, index: number, manaHand: Effect): void {
-    if (fighter.status.condition === HeroStatusKind.stun) this.show(manaHand, index, MANA_HAND, fighter, 0.0, 175.0, f32(0.6));
+    if (fighter.status.condition === HeroStatusKind.stun || (fighter.status.condition === HeroStatusKind.gripped && fighter.status.pullBy === undefined)) this.show(manaHand, index, MANA_HAND, fighter, 0.0, 175.0, f32(0.6));
     else this.park(manaHand, index, MANA_HAND);
   }
 
@@ -284,6 +290,7 @@ export class SpecialEffects {
     if (fighter === undefined) {
       this.hideSiphon(effects);
       this.hideLaser(effects);
+      this.hideGrip(effects);
       this.park(effects.aura, slot, AURA);
       this.park(effects.wingTrail, slot, WING_TRAIL);
       this.park(effects.drainFlash, slot, DRAIN_FLASH);
@@ -293,6 +300,7 @@ export class SpecialEffects {
     effects.lastZ = fighter.motion.z;
     this.presentSiphon(effects, fighter);
     this.presentLaser(effects, fighter);
+    this.presentGrip(effects, fighter);
     this.applyStatic(effects.aura, slot, AURA, projectSpecialEffect(state, fighter, slot, STATIC_AURA, this.pose));
     this.applyStatic(effects.wingTrail, slot, WING_TRAIL, projectSpecialEffect(state, fighter, slot, STATIC_WING_TRAIL, this.pose));
     this.applyStatic(effects.drainFlash, slot, DRAIN_FLASH, projectSpecialEffect(state, fighter, slot, STATIC_DRAIN_FLASH, this.pose));
@@ -339,6 +347,26 @@ export class SpecialEffects {
     moveBeam(effects.chain, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
     setBeamColor(effects.chain, 1.0, 1.0, 1.0, 1.0);
     effects.laserShown = true;
+  }
+
+  private hideGrip(slot: SpecialSlot): void {
+    if (!slot.gripShown) return;
+    setBeamColor(slot.grip, 1.0, 1.0, 1.0, 0.0);
+    slot.gripShown = false;
+  }
+
+  private presentGrip(effects: SpecialSlot, fighter: Readonly<Fighter>): void {
+    const by = fighter.status.pullBy;
+    const puller = by === undefined ? undefined : this.slots[by];
+    if (puller === undefined || fighter.status.out) {
+      this.hideGrip(effects);
+      return;
+    }
+    const toward = fighter.motion.x < puller.lastX ? -1.0 : 1.0;
+    const { x, z } = this.origin;
+    moveBeam(effects.grip, x + puller.lastX + toward * 40.0, this.front, z + puller.lastZ + 70.0, x + fighter.motion.x, this.front, z + fighter.motion.z + 60.0);
+    setBeamColor(effects.grip, f32(0.6), 1.0, f32(0.7), 1.0);
+    effects.gripShown = true;
   }
 
   /** While Siphon Mana reaches out or holds its victim, a drain beam joins Kael's hand to the victim's chest. */
@@ -407,6 +435,7 @@ export class SpecialEffects {
       destroyBeam(slot.siphon);
       destroyBeam(slot.laser);
       destroyBeam(slot.chain);
+      destroyBeam(slot.grip);
     }
   }
 }

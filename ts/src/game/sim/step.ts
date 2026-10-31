@@ -328,7 +328,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const direction = movementDirection(f, input, carrying);
   applyTumbleExit(f, tumbleExitFlick);
   hopHeroStatus(f, slot, stage, matchFrame);
-  const authoredMotion = authoredMotionHeld(f);
+  const authoredMotion = authoredMotionHeld(f, world);
   const authoredHeight = authoredMotion || demonHunterHoldsHeight(f) || heroFloats(f);
   const egg = heroEgg(f);
   const canSteer = canSteerFrame(f, authoredMotion, egg, dodgeActive, smashChargePaused);

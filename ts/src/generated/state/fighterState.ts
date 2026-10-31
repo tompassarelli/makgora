@@ -490,6 +490,9 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   status.slowScale = sourceStatus.slowScale;
   status.stacks = sourceStatus.stacks;
   status.struckBy = sourceStatus.struckBy;
+  status.pullBy = sourceStatus.pullBy;
+  status.pullFrames = sourceStatus.pullFrames;
+  status.pullHold = sourceStatus.pullHold;
   const meter = target.meter;
   const sourceMeter = source.meter;
   meter.ultimate = sourceMeter.ultimate;
@@ -1019,6 +1022,9 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = status.slowScale, b = sourceStatus.slowScale; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.stacks, b = sourceStatus.stacks; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = status.struckBy, b = sourceStatus.struckBy; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.pullBy, b = sourceStatus.pullBy; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.pullFrames, b = sourceStatus.pullFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.pullHold, b = sourceStatus.pullHold; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const meter = target.meter;
   const sourceMeter = source.meter;
   { const a = meter.ultimate, b = sourceMeter.ultimate; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
@@ -1608,6 +1614,9 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   if (status.slowScale !== 0 || 1 / status.slowScale < 0) sink.real(prefix, "slowScale", status.slowScale);
   if (status.stacks !== 0) sink.int(prefix, "stacks", status.stacks);
   if (status.struckBy !== undefined) sink.int(prefix, "struckBy", status.struckBy ?? -1);
+  if (status.pullBy !== undefined) sink.int(prefix, "pullBy", status.pullBy ?? -1);
+  if (status.pullFrames !== 0) sink.int(prefix, "pullFrames", status.pullFrames);
+  if (status.pullHold !== 0 || 1 / status.pullHold < 0) sink.real(prefix, "pullHold", status.pullHold);
   if (duo.role !== 0) sink.int(prefix, "duo.role", duo.role);
   if (duo.role !== 0) {
     sink.int(prefix, "duo.link", duo.link);
@@ -1734,6 +1743,9 @@ export function blastFighterFields(f: Fighter): void {
   status.slowScale = 0.0;
   status.stacks = 0;
   status.struckBy = undefined;
+  status.pullBy = undefined;
+  status.pullFrames = 0;
+  status.pullHold = 0.0;
   if (duo !== undefined) {
     for (let i = 0; i < DUO_RING_INTS; i++) duo.ring[i] = 0;
     duo.head = 0;
@@ -1982,6 +1994,9 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   status.slowScale = 0.0;
   status.stacks = 0;
   status.struckBy = undefined;
+  status.pullBy = undefined;
+  status.pullFrames = 0;
+  status.pullHold = 0.0;
   if (duo !== undefined) {
     for (let i = 0; i < DUO_RING_INTS; i++) duo.ring[i] = 0;
     duo.head = 0;

@@ -34,7 +34,7 @@ The named Smash moves are visual references, not copied animation assets or shar
 | Shadow Hunter | Spirit Glaive (traveling spell), Serpent Ward (traveling spell), Hex (traveling spell) | Melee Link boomerang |
 | Pit Lord | Howl of Terror, Fel Spit (traveling spell) | Ultimate Hero Flame Slash |
 | Beastmaster | Wild Axes (traveling spell), Summon Bear (traveling spell), Summon Quilbeast (traveling spell) | Melee Link forward smash |
-| Lich King | Ascension of the Damned, Howling Blast (traveling spell), Val'kyr Shadowguard (traveling spell), Defile (placed field / burst) | Ultimate Hero Flame Slash / Kacrackle Slash |
+| Lich King | Ascension of the Damned, Val'kyr Shadowguard (traveling spell), Death Grip (traveling spell, pulls), Defile (placed field / burst) | Ultimate Hero Flame Slash / Kacrackle Slash |
 | Rifleman | Blaster, recoil recovery shot, Summon Bear swipe, Freeze Trap | Melee Ness PK Fire; Ultimate Robin Arcfire |
 | Illidan | Mana Burn, Fel Rush, Wing Dive, Immolation on the ground and in the air | Ultimate Hero Kafrizz / Flame Slash; Melee Zelda Din’s Fire |
 

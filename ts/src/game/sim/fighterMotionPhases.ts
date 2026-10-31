@@ -4,7 +4,7 @@ import { Character, LedgeState, ShieldBreak, SurfaceContact } from "./codes";
 import { SPOT_DODGE_FRAMES, GROUND_ROLL_FRAMES, WALL_TECH_STARTUP_FRAMES, inGrabContext, isForwardGroundRoll } from "./conditions";
 import { type Fighter } from "./fighter";
 import { heroMotionHolds } from "./specials/heroMotion";
-import { carryHeroStatus } from "./heroStatus";
+import { carryHeroStatus, pullHeroStatus } from "./heroStatus";
 import { demonHunterAuthoredMotion } from "./specials";
 import { beginAirDodge } from "./jumpsAndDodges";
 import { advanceLedge } from "./ledge";
@@ -115,8 +115,8 @@ export function movementDirection(f: Fighter, input: Readonly<Controls>, carryin
   return carrying && carryThrowRequested(f, input) ? 0 : input.direction;
 }
 
-export function authoredMotionHeld(f: Fighter): boolean {
-  return carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
+export function authoredMotionHeld(f: Fighter, world: Roster): boolean {
+  return pullHeroStatus(world, f) || carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
 }
 
 export function airborneDrill(f: Fighter): AuthoredFall | undefined {

@@ -10,7 +10,7 @@ import { advanceMash, clearMash } from "./mash";
 import { aerialJumps } from "./itemBuffs";
 import type { Fighter } from "./fighter";
 import { type AttackBuffer, clearAttackBuffer } from "../input/attackBuffer";
-import { type Controls, copyControls, neutralControls } from "./roster";
+import { type Controls, type Roster, copyControls, fighterAt, neutralControls } from "./roster";
 import { cancelAttack, cancelSpecialState } from "./transitions";
 import { HERO_STATUS_GROUPS, HeroStatusKind, type HeroStatusGroup, SpecialAction } from "./codes";
 import type { AppliedStatus } from "./appliedStatus";
@@ -65,6 +65,7 @@ const RULES: { readonly [kind: number]: StatusRules | undefined } = {
   [HeroStatusKind.chill]: { blocksActions: false, blocksSpecials: false, endsOnDamage: false },
   [HeroStatusKind.stun]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
   [HeroStatusKind.fear]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
+  [HeroStatusKind.gripped]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true },
 
 
   [HeroStatusKind.carried]: { blocksActions: true, blocksSpecials: true, endsOnDamage: true, mashMinimum: 20, carry: { speed: 3.0, rise: 0.5 } },
@@ -111,7 +112,7 @@ function stackPoison(f: Fighter, status: Readonly<AppliedStatus>): void {
 
 const hitsToBreak = (status: Readonly<AppliedStatus>): number => status.hits ?? 0;
 
-export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): void {
+export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>, source?: number): void {
   const { status: state } = f;
 
   if (status.kind === HeroStatusKind.poison) {
@@ -144,6 +145,7 @@ export function applyHeroStatus(f: Fighter, status: Readonly<AppliedStatus>): vo
   if (RULES[status.kind]?.mashMinimum !== undefined) clearMash(f.grab);
   state.conditionGroup = status.group;
   state.conditionImmunityFrames = status.immunityFrames;
+  startPull(f, status.pull, source);
 
   if (RULES[status.kind]?.blocksActions === true) {
     cancelAttack(f);
@@ -168,6 +170,7 @@ function igniteSoaked(f: Fighter, ignite: Readonly<AppliedStatus>["ignite"]): vo
 function endHeroStatus(f: Fighter): void {
   const { status } = f;
   if (status.condition === HeroStatusKind.none) return;
+  endPull(f);
   status.conditionImmunity[status.conditionGroup] = max(status.conditionImmunity[status.conditionGroup] ?? 0, status.conditionImmunityFrames);
   status.condition = HeroStatusKind.none;
   status.conditionFrames = 0;
@@ -220,6 +223,7 @@ export function advanceHeroConditions(f: Fighter): void {
     if (left > 0) status.conditionImmunity[group] = left - 1;
   }
   if (status.condition === HeroStatusKind.none) return;
+  if (status.pullBy !== undefined) return;
   status.conditionFrames--;
   if (status.conditionFrames <= 0) endHeroStatus(f);
 }
@@ -240,6 +244,7 @@ export function clearHeroStatus(f: Fighter): void {
   status.poisonStackFrames = 0;
   status.soakFrames = 0;
   status.soakLevel = 0;
+  endPull(f);
 }
 
 const NEUTRAL = neutralControls();
@@ -299,4 +304,41 @@ export function heroStatusFall(f: Readonly<Fighter>): number {
 
 export function heroStatusHop(f: Readonly<Fighter>): StatusRules["hop"] {
   return rules(f)?.hop;
+}
+
+function startPull(f: Fighter, pull: Readonly<AppliedStatus>["pull"], source: number | undefined): void {
+  const { status } = f;
+  status.pullBy = pull === undefined ? undefined : source;
+  status.pullFrames = status.pullBy === undefined ? 0 : pull?.frames ?? 0;
+  status.pullHold = status.pullBy === undefined ? 0.0 : pull?.hold ?? 0.0;
+}
+
+function endPull(f: Fighter): void {
+  f.status.pullBy = undefined;
+  f.status.pullFrames = 0;
+  f.status.pullHold = 0.0;
+}
+
+export function pullHeroStatus(world: Roster, f: Fighter): boolean {
+  const { status, motion } = f;
+  const by = status.pullBy;
+  if (by === undefined || f.launch.hitstun > 0) return false;
+  const owner = fighterAt(world, by);
+  motion.fastFalling = false;
+  if (owner.status.out || status.pullFrames <= 0) {
+    endPull(f);
+    motion.vx = 0.0;
+    motion.vz = 0.0;
+    return true;
+  }
+  const toX = f32(owner.motion.x + f32(owner.facing * status.pullHold));
+  motion.vx = f32(f32(toX - motion.x) / status.pullFrames);
+  motion.vz = f32(f32(owner.motion.z - motion.z) / status.pullFrames);
+  if (motion.grounded && motion.vz > 0.0) {
+    motion.grounded = false;
+    motion.surface = undefined;
+  }
+  f.facing = owner.motion.x < motion.x ? -1 : 1;
+  status.pullFrames--;
+  return true;
 }

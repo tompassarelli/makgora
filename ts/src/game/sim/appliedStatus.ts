@@ -19,4 +19,6 @@ export interface AppliedStatus {
   readonly stacks?: { readonly cap: number } | undefined;
 
   readonly hits?: number | undefined;
+
+  readonly pull?: { readonly frames: number; readonly hold: number } | undefined;
 }

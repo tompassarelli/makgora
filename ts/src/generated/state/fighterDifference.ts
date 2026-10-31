@@ -369,6 +369,9 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.status.slowScale !== actual.status.slowScale) return "slowScale";
   if (expected.status.stacks !== actual.status.stacks) return "stacks";
   if ((expected.status.struckBy ?? -1) !== (actual.status.struckBy ?? -1)) return "struckBy";
+  if ((expected.status.pullBy ?? -1) !== (actual.status.pullBy ?? -1)) return "pullBy";
+  if (expected.status.pullFrames !== actual.status.pullFrames) return "pullFrames";
+  if (expected.status.pullHold !== actual.status.pullHold) return "pullHold";
   if ((expected.duo ?? RESTING_DUO).role !== (actual.duo ?? RESTING_DUO).role) return "duoRole";
   if ((expected.duo ?? RESTING_DUO).link !== (actual.duo ?? RESTING_DUO).link) return "duoLink";
   for (let i = 0; i < DUO_RING_INTS; i++) if (((expected.duo ?? RESTING_DUO).ring[i] ?? 0) !== ((actual.duo ?? RESTING_DUO).ring[i] ?? 0)) return `duoRing[${i}]`;

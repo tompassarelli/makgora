@@ -21595,49 +21595,30 @@
    "authored.moves.throws.6.effect.base": 0,
    "authored.moves.throws.6.effect.launchX": 0.3420201539993286,
    "authored.moves.throws.6.effect.launchZ": 0.9396926164627075,
-   "authored.specials.neutral.ground.endFrame": 50,
-   "authored.specials.neutral.ground.hurt.0.firstFrame": 1,
-   "authored.specials.neutral.ground.hurt.0.lastFrame": 2,
-   "authored.specials.neutral.ground.hurt.1.firstFrame": 3,
-   "authored.specials.neutral.ground.hurt.1.lastFrame": 5,
-   "authored.specials.neutral.ground.hurt.2.firstFrame": 6,
-   "authored.specials.neutral.ground.hurt.2.lastFrame": 7,
-   "authored.specials.neutral.ground.hurt.3.firstFrame": 8,
-   "authored.specials.neutral.ground.hurt.3.lastFrame": 9,
-   "authored.specials.neutral.ground.hurt.4.firstFrame": 10,
-   "authored.specials.neutral.ground.hurt.4.lastFrame": 12,
-   "authored.specials.neutral.ground.hurt.5.firstFrame": 13,
-   "authored.specials.neutral.ground.hurt.5.lastFrame": 14,
-   "authored.specials.neutral.ground.hurt.6.firstFrame": 15,
-   "authored.specials.neutral.ground.hurt.6.lastFrame": 16,
-   "authored.specials.neutral.ground.hurt.7.firstFrame": 17,
-   "authored.specials.neutral.ground.hurt.7.lastFrame": 19,
-   "authored.specials.neutral.ground.hurt.8.firstFrame": 20,
-   "authored.specials.neutral.ground.hurt.8.lastFrame": 21,
-   "authored.specials.neutral.ground.hurt.9.firstFrame": 22,
-   "authored.specials.neutral.ground.hurt.9.lastFrame": 24,
-   "authored.specials.neutral.ground.hurt.10.firstFrame": 25,
-   "authored.specials.neutral.ground.hurt.10.lastFrame": 27,
-   "authored.specials.neutral.ground.hurt.11.firstFrame": 28,
-   "authored.specials.neutral.ground.hurt.11.lastFrame": 30,
-   "authored.specials.neutral.ground.hurt.12.firstFrame": 31,
-   "authored.specials.neutral.ground.hurt.12.lastFrame": 33,
-   "authored.specials.neutral.ground.hurt.13.firstFrame": 34,
-   "authored.specials.neutral.ground.hurt.13.lastFrame": 38,
-   "authored.specials.neutral.ground.projectiles.0.effect.damage": 7.5,
-   "authored.specials.neutral.ground.projectiles.0.effect.growth": 63.75,
-   "authored.specials.neutral.ground.projectiles.0.effect.base": 18,
-   "authored.specials.neutral.ground.projectiles.0.effect.launchX": 0.7660444378852844,
-   "authored.specials.neutral.ground.projectiles.0.effect.launchZ": 0.6427876353263855,
-   "authored.specials.side.ground.endFrame": 52,
-   "authored.specials.side.ground.projectiles.0.effect.damage": 5,
+   "authored.specials.neutral.ground.endFrame": 52,
+   "authored.specials.neutral.ground.projectiles.0.effect.damage": 5,
+   "authored.specials.neutral.ground.projectiles.0.effect.growth": 0,
+   "authored.specials.neutral.ground.projectiles.0.effect.base": 0,
+   "authored.specials.neutral.ground.projectiles.0.effect.launchX": 0,
+   "authored.specials.neutral.ground.projectiles.0.effect.launchZ": 0,
+   "authored.specials.neutral.air.endFrame": 52,
+   "authored.specials.neutral.air.landingLag": 20,
+   "authored.specials.neutral.air.projectiles.0.effect.damage": 5,
+   "authored.specials.neutral.air.projectiles.0.effect.growth": 0,
+   "authored.specials.neutral.air.projectiles.0.effect.base": 0,
+   "authored.specials.neutral.air.projectiles.0.effect.launchX": 0,
+   "authored.specials.neutral.air.projectiles.0.effect.launchZ": 0,
+   "authored.specials.side.ground.endFrame": 40,
+   "authored.specials.side.ground.cooldownFrames": 150,
+   "authored.specials.side.ground.projectiles.0.effect.damage": 4,
    "authored.specials.side.ground.projectiles.0.effect.growth": 0,
    "authored.specials.side.ground.projectiles.0.effect.base": 0,
    "authored.specials.side.ground.projectiles.0.effect.launchX": 0,
    "authored.specials.side.ground.projectiles.0.effect.launchZ": 0,
-   "authored.specials.side.air.endFrame": 52,
+   "authored.specials.side.air.endFrame": 40,
+   "authored.specials.side.air.cooldownFrames": 150,
    "authored.specials.side.air.landingLag": 20,
-   "authored.specials.side.air.projectiles.0.effect.damage": 5,
+   "authored.specials.side.air.projectiles.0.effect.damage": 4,
    "authored.specials.side.air.projectiles.0.effect.growth": 0,
    "authored.specials.side.air.projectiles.0.effect.base": 0,
    "authored.specials.side.air.projectiles.0.effect.launchX": 0,
@@ -22212,7 +22193,7 @@
    "throw.6.contactFrame": 24,
    "throw.6.totalFrames": 50
   },
-  "play": "{\"range\":{\"near\":110,\"far\":185},\"spacing\":[{\"move\":6,\"near\":105,\"far\":190},{\"move\":8,\"near\":80,\"far\":150},{\"move\":30,\"near\":200,\"far\":400},{\"move\":31,\"near\":120,\"far\":260}],\"approach\":[{\"via\":\"shoot\",\"moves\":[30,6],\"weight\":2},{\"via\":\"shoot\",\"moves\":[33,7,5]},{\"via\":\"run\",\"moves\":[19,5]}],\"defense\":[\"shield\",\"retreat\",\"shield\",\"jump\"],\"combos\":[{\"starter\":8,\"followUps\":[6,5]},{\"starter\":7,\"followUps\":[15,7]},{\"starter\":42,\"followUps\":[15]},{\"starter\":43,\"followUps\":[6,33]}],\"kills\":[{\"move\":4,\"fromPercent\":75},{\"move\":2,\"fromPercent\":90},{\"move\":14,\"fromPercent\":100},{\"move\":31,\"fromPercent\":80},{\"move\":41,\"fromPercent\":120}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"close\",\"air\"]}",
+  "play": "{\"range\":{\"near\":110,\"far\":185},\"spacing\":[{\"move\":6,\"near\":105,\"far\":190},{\"move\":8,\"near\":80,\"far\":150},{\"move\":31,\"near\":200,\"far\":330},{\"move\":30,\"near\":120,\"far\":260}],\"approach\":[{\"via\":\"shoot\",\"moves\":[31,6],\"weight\":2},{\"via\":\"shoot\",\"moves\":[33,7,5]},{\"via\":\"run\",\"moves\":[19,5]}],\"defense\":[\"shield\",\"retreat\",\"shield\",\"jump\"],\"combos\":[{\"starter\":8,\"followUps\":[6,5]},{\"starter\":7,\"followUps\":[15,7]},{\"starter\":42,\"followUps\":[15]},{\"starter\":31,\"followUps\":[6,7,8]},{\"starter\":43,\"followUps\":[6,33]}],\"kills\":[{\"move\":4,\"fromPercent\":75},{\"move\":2,\"fromPercent\":90},{\"move\":14,\"fromPercent\":100},{\"move\":30,\"fromPercent\":80},{\"move\":41,\"fromPercent\":120}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"close\",\"air\"]}",
   "feel": {
    "normal.0.hit.0": {
     "advantage": -12
@@ -22569,14 +22550,16 @@
     "killPercent": 268
    },
    "special.neutral.ground.projectiles.0": {
-    "advantage": -23,
-    "killPercent": 236
+    "advantage": -22
+   },
+   "special.neutral.air.projectiles.0": {
+    "advantage": -22
    },
    "special.side.ground.projectiles.0": {
-    "advantage": -22
+    "advantage": -21
    },
    "special.side.air.projectiles.0": {
-    "advantage": -22
+    "advantage": -21
    },
    "special.up.ground.regions.0": {
     "advantage": -32,
@@ -29176,7 +29159,7 @@
    "authored.moves.normals.17.regions.2.hit.effect.launchZ": 0.7071067690849304,
    "authored.moves.normals.19.startupFrames": 7,
    "authored.moves.normals.19.activeFrames": 8,
-   "authored.moves.normals.19.totalFrames": 34,
+   "authored.moves.normals.19.totalFrames": 35,
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 7,
    "authored.moves.normals.19.regions.0.lastFrame": 9,
@@ -29956,7 +29939,7 @@
    "normal.18.hit.0.launchZ": 0.7071067690849304,
    "normal.19.startupFrames": 7,
    "normal.19.activeFrames": 8,
-   "normal.19.endingFrames": 19,
+   "normal.19.endingFrames": 20,
    "normal.19.landingLag": 0,
    "normal.19.hit.0.damage": 11.263999938964844,
    "normal.19.hit.0.growth": 88.6500015258789,
@@ -30270,19 +30253,19 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -20,
+    "advantage": -21,
     "killPercent": 152
    },
    "normal.19.hit.1": {
-    "advantage": -20,
+    "advantage": -21,
     "killPercent": 152
    },
    "normal.19.hit.2": {
-    "advantage": -18,
+    "advantage": -19,
     "killPercent": 161
    },
    "normal.19.hit.3": {
-    "advantage": -18,
+    "advantage": -19,
     "killPercent": 161
    },
    "normal.20.hit.0": {

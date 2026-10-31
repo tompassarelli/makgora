@@ -30,5 +30,6 @@ export function disabledPose(f: Readonly<Fighter>, table: Readonly<HeroClipTable
   const illidan = f.character === Character.demonHunter;
   if (f.status.condition === HeroStatusKind.fear) return hold("cowering", illidan ? ILLIDAN_COWER : table.crouch, COWER_HOLD_FRAMES);
   if (f.status.condition === HeroStatusKind.stun) return hold("stunned", illidan ? ILLIDAN_STUN : table.dizzy, 0);
+  if (f.status.condition === HeroStatusKind.gripped) return f.status.pullBy === undefined ? hold("stunned", illidan ? ILLIDAN_STUN : table.dizzy, 0) : hold("gripped", table.damageAir, 0);
   return undefined;
 }

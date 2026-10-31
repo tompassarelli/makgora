@@ -14,7 +14,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | --- | --- | --- | --- | --- | --- |
 | Jab, Second jab, Third jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalLightSliceMetal |  |
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavySliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalHeavySliceMetal |  |
-| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
+| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack, Attack | BattleNetWooshStereo1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
 | Neutral special: Eye Beam | DemonHunterMissileLaunch | DemonHunterMissileHit | DemonHunterMissileHit + DemonHunterMissileHit | MetalMediumSliceMetal |  |
 | Side special: Fel Rush | DemonHunterMissileLaunch | MetalHeavySliceFlesh | MetalHeavySliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
 | Up special: Wing Ascent | DemonHunterMissileHit | MetalMediumSliceFlesh | MetalMediumSliceFlesh + DemonHunterMissileHit | MetalMediumSliceMetal |  |
@@ -136,8 +136,8 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Jab, Second jab, Third jab | BattleNetWooshStereo1 | MetalLightSliceFlesh | MetalHeavySliceFlesh + FrostWyrmAttack1 | MetalLightSliceMetal |  |
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 + HeroDeathKnightAttack1 | MetalHeavySliceFlesh | MetalHeavySliceFlesh + FrostWyrmAttack1 | MetalHeavySliceMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 + HeroDeathKnightAttack1 | MetalMediumSliceFlesh | MetalHeavySliceFlesh + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
-| Neutral special: Howling Blast | BreathOfFrost | FrostBoltHit | FrostBoltHit + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
-| Side special: Val'kyr Shadowguard | DarkSummoningMissileLaunch | DarkSummoningTarget | DarkSummoningTarget + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
+| Neutral special: Val'kyr Shadowguard | DarkSummoningMissileLaunch | DarkSummoningTarget | DarkSummoningTarget + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
+| Side special: Death Grip | DeathCoil | Ensnare | Ensnare + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Up special: Ascension of the Damned | FrostArmor | FrostBoltHit | FrostBoltHit + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Down special: Defile | DeathPactTarget | FrostWyrmAttack1 | FrostWyrmAttack1 + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 
@@ -218,7 +218,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | --- | --- | --- | --- | --- | --- |
 | Jab, Second jab, Third jab | BattleNetWooshStereo1 | WoodMediumBashFlesh | MetalHeavyBashFlesh + ClusterRocketsImpact | WoodMediumBashMetal |  |
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavyBashFlesh | MetalHeavyBashFlesh + ClusterRocketsImpact | MetalHeavyBashMetal |  |
-| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 | MetalMediumBashFlesh | MetalHeavyBashFlesh + ClusterRocketsImpact | MetalMediumBashMetal |  |
+| Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack, Attack | BattleNetWooshStereo1 | MetalMediumBashFlesh | MetalHeavyBashFlesh + ClusterRocketsImpact | MetalMediumBashMetal |  |
 | Neutral special: Cluster Rockets | ClusterRocketsLaunch | ClusterRocketsImpact | ClusterRocketsImpact + ClusterRocketsImpact | MetalMediumBashMetal |  |
 | Side special: Laser | HeroTinkerMorph | SearingArrowHit | SearingArrowHit + ClusterRocketsImpact | MetalMediumBashMetal |  |
 | Up special: Rocket Boots | ClusterRocketsLaunch | MetalMediumBashFlesh | MetalMediumBashFlesh + ClusterRocketsImpact | MetalMediumBashMetal |  |
@@ -362,6 +362,11 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | --- | --- | --- | --- | --- | --- |
 
 ## Alchemist (WIP)
+
+| Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
+| --- | --- | --- | --- | --- | --- |
+
+## Onyxia
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
