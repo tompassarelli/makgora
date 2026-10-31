@@ -11,7 +11,7 @@ const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 test("every ice floe of the Frozen Throne spire and stair is placed still [k2 property]", () => {
   const floes = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model === FLOE);
-  expect(floes.length).toBeGreaterThanOrEqual(15);
+  expect(floes.length).toBeGreaterThanOrEqual(10);
   expect(floes.every(piece => piece.still === true)).toBe(true);
 });
 
@@ -22,7 +22,7 @@ test("the shell stops the animation of each still Frozen Throne piece the moment
 
   const placed = placedPieces(FROZEN_THRONE_STAGE);
   const stills = placed.flatMap((piece, index) => (piece.still === true ? [index] : []));
-  expect(stills.length).toBeGreaterThanOrEqual(15);
+  expect(stills.length).toBeGreaterThanOrEqual(10);
   const poses = client.effectPoses();
   expect(poses.map(pose => pose.model)).toEqual(placed.map(piece => piece.model));
   expect(poses.flatMap((pose, index) => (pose.timeScale === 0 ? [index] : []))).toEqual(stills);

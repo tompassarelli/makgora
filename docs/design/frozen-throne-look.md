@@ -18,12 +18,12 @@ Layer order, back to front:
 
 1. Sky: dark teal gradient with a dim green aurora band, original 256x128 texture (`ts/scripts/stageSky.ts`, `aurora`).
 2. Snow: the existing drifting-snow model.
-3. Throne spire: ten stock ice floes stacked and narrowing from dark at the foot to pale at the top (y 2100, z -420 to 262), crowned by an `IceCrownObelisk` seat between two `IceTorch` pylons at z 300; the foot hides behind the deck and the colour climbs from near-black teal to pale ice so the lit seat is the first thing the eye reaches.
+3. Throne: a high-backed dark chair standing on the top of a six-floe ice spire (y 2020 to 2150, base z -327): a tall back slab (`IceFloe3`), a crown of one `IceCrownObelisk` between two `IceCrownPillar` spikes above it, two armrest slabs and a seat slab in front, all in dark saronite blue so the chair reads as a silhouette against the cyan glow behind it. The foot of the spire hides behind the deck.
 4. Great arch: one huge `IC_IceArch` at y 4800 framing the spire.
 5. Far ice spires: Glacier2 and Glacier5 stretched tall, left and right.
-6. Stair: five stacked stock ice floes narrowing upward, a plain stepped snow ramp, centred at y 1400 to 1520, tinted to a mid steel-blue (#875).
-7. Stair pillars: two `IceTorch` towers flanking the stair head.
-8. Crystal clusters: eight `Icecrown_Crystal3` either side of the stair, tinted cyan.
+6. Stair: none in take 3; the first stair's floes covered the throne's seat and arms at the near zoom, so the spire's pale top steps are the throne's dais.
+7. Dais pillars: two `IceTorch` towers at x of 400 each side, clear of the throne.
+8. Crystal clusters: eight `Icecrown_Crystal3` standing behind the throne (y 2450 to 2550), tinted cyan: the backlight the throne's silhouette is read against.
 9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 2500 to 2900, dark, pushed clear of the deck ends (#875).
 10. Floor: the existing ground under the deck, tinted deep navy so it is not a flat grey field (#875). The native window takes the sky from the distance fog, so the fog is a deep blue (0.15625, 0.28125, 0.453125) that keeps the sky quiet behind the fighters.
 
@@ -31,8 +31,8 @@ The two side ledges are the same stock ice floe tinted steel-blue (`stockPlatfor
 
 ## Element map
 
-- Throne on an ice spire: original tiered spire from stock `North_IceFloe3` slabs with an obelisk seat and two pylons; the stock `FrozenThrone` model is a closed rock dome with its throne inside, so it is not used (take 2, 2026-10-31).
-- Snowy stair: original stepped ramp built from stock ice floes (generic shape).
+- Throne on an ice spire: a chair composed from stock pieces (take 3, 2026-10-31). Take 2's obelisk seat between two pylons read as three towers. The stock `FrozenThrone` model was tried at its natural proportions and at 0.5, 1.3, 1.6, 2 and 3 times (y 2400 to 3600): it is a ring of cliff with a runed ice crystal on a pillar and a stair inside, so at match zoom it reads as a cave, a monolith or a stair, never a chair, and the cliff fills the far zoom, so it is not used.
+- Snowy stair: not built in take 3 (see layer 6).
 - Chained pillars: stock `IceTorch` towers; chains between them are not built (no stock chain model, and models cannot roll).
 - Bone or ice arches: stock `IC_IceArch`.
 - Icecrown gothic towers: stock `IceCrownObelisk`, `IceCrownPillar`.
@@ -44,3 +44,13 @@ The two side ledges are the same stock ice floe tinted steel-blue (`stockPlatfor
 ## Take 1 status
 
 Headless Wisp renders at near and far match zoom, then Classic native captures on gex45 (one match zoom, one fighter facing each way, 31 Oct 2026), were judged; Tom reviewed the native capture at match zoom and approved landing take 1 (2026-10-31). Take 2 owes the throne on a tall spire as the centrepiece, chains, mist, snow, a real wide frame and three cold viewers.
+
+## Take 3 status
+
+The throne is a dark high-backed chair on the spire's dais, centred behind the deck (2026-10-31, Tom asked when the backdrop gets a readable throne). It follows FT-1 (silhouette and layering) and FT-2 (the dark mass reads against a luminous blue backlight).
+
+- Chair: a back slab, a three-spike crown (`IceCrownObelisk` between two `IceCrownPillar`), two armrest slabs and a seat slab, all uniform or axis-scaled stock pieces with binary32 scales. The chair is scaled to 0.75 of its first size because the native window's match zoom crops anything above about 520 units over the dais; at full size the crown left the frame.
+- The cyan crystals moved behind the chair (y 2450 to 2550); in front of it their translucent glow washed the chair out.
+- `matrixScale` order for these floes is depth, lateral, height (lateral is the second entry).
+- Checks: `bun tools/stage/contrast.ts --stock-light 2` passes; `headlessSeparation.ts` reports the same negative band gap as before the change on every row, and a smaller one on all twelve rows compared (it fails on origin/main too and is not the landing gate).
+- Captures: before and after, both pair orders, in the Wisp native window and the headless renderer under `~/.local/state/smashcraft/shots/ft-throne/`.

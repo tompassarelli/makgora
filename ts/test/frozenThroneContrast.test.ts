@@ -13,8 +13,8 @@ test("no Frozen Throne tower stands within reach of the deck's ends [k2 property
 });
 
 test("the Frozen Throne's crystals, stair and side ledges are tinted below the fighters' brightness [k2 property]", () => {
-  const tinted = placedPieces(FROZEN_THRONE_STAGE).filter(piece => /Crystal3|IceFloe3/.test(piece.model) && piece.y < 2000);
-  expect(tinted.length).toBeGreaterThanOrEqual(13);
+  const tinted = placedPieces(FROZEN_THRONE_STAGE).filter(piece => /Crystal3|IceFloe3/.test(piece.model) && piece.y < 3000);
+  expect(tinted.length).toBeGreaterThanOrEqual(18);
   expect(tinted.every(piece => piece.color !== undefined && Math.max(...piece.color) <= FIGHTER_DIM)).toBe(true);
   for (const index of [1, 2, 3]) {
     const parts = platformParts(FROZEN_THRONE_STAGE, index);
