@@ -19,7 +19,6 @@ export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; 
 
 const SEEN_FILE = "SmashcraftTutorial.pld";
 const SEEN = "seen";
-export const NOT_NOW_LABEL = "Not now";
 export const NOT_NOW_BOX = { x: f32(0.41), y: f32(0.315), width: f32(0.16), height: f32(0.035) } as const;
 
 export interface TutorialMenuFrames {
@@ -61,7 +60,7 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   const lesson = text(root, `MeleeTutorialLesson${suffix}`, f32(0.26), f32(0.37), f32(0.28), f32(0.03), f32(0.012));
   button(root, f32(0.54), f32(0.37), f32(0.03), f32(0.03), "+", { kind: "tutorialStep", direction: 1 }, add);
   button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial", { kind: "tutorialStart" }, add);
-  button(root, NOT_NOW_BOX.x, NOT_NOW_BOX.y, NOT_NOW_BOX.width, NOT_NOW_BOX.height, NOT_NOW_LABEL, { kind: "tutorialClose" }, add);
+  button(root, NOT_NOW_BOX.x, NOT_NOW_BOX.y, NOT_NOW_BOX.width, NOT_NOW_BOX.height, "Not now", { kind: "tutorialClose" }, add);
   setFrameVisible(root, false);
   const open = button(rules, TUTORIAL_BOX.x, TUTORIAL_BOX.y, TUTORIAL_BOX.width, TUTORIAL_BOX.height, "Tutorial", { kind: "tutorialOpen" }, add);
   return { root, lesson, open };
@@ -108,12 +107,3 @@ export const tutorialAvailable = (game: Readonly<MatchState>): boolean => humanC
 export const tutorialOffers = { enabled: true };
 
 export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => tutorialOffers.enabled && !seen && tutorialAvailable(game);
-
-export const TUTORIAL_OFFER = "tutorial-offer";
-
-// Keys answer an open prompt on every client, and only this client knows its seen file, so the prompt opens through a sync event.
-export function offerTutorial(game: Readonly<MatchState>, seen: boolean): void {
-  if (offersTutorial(game, seen)) BlzSendSyncData(TUTORIAL_OFFER, "1");
-}
-
-export const acceptsTutorialOffer = (open: boolean, choosing: Readonly<MatchState> | undefined): boolean => open || choosing !== undefined;
