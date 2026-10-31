@@ -57,6 +57,14 @@ function placementPaths(character: Character): string[] {
   return paths;
 }
 
+function burrowDepth(placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>): number {
+  const frames = spec.walks?.riseFrames ?? 0;
+  if (frames <= 0) return 0.0;
+  if (placed.mode === CompanionMode.burrowed) return f32(spec.height * f32(Math.min(placed.modeFrame + 1, frames) / frames));
+  if (placed.mode === CompanionMode.rising) return f32(spec.height * f32(Math.max(frames - placed.modeFrame - 1, 0) / frames));
+  return 0.0;
+}
+
 function placedAlpha(placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>, look: PlacedLook): number {
   if (placed.mode === CompanionMode.vanished) return VANISHED_ALPHA;
   const left = f32(Math.max(0.0, placed.durability) / spec.durability);
@@ -183,10 +191,15 @@ export class PlacedObjectEffects {
       this.hideModel(slot);
       return;
     }
+    const depth = burrowDepth(placed, spec);
+    if (depth >= spec.height) {
+      this.hideModel(slot);
+      return;
+    }
     const parked = (this.parked ??= []);
     parked[slot] = false;
     const { x, y, z } = this.origin;
-    placeEffect(model, x + placed.x, y, z + placed.z);
+    placeEffect(model, x + placed.x, y, z + f32(placed.z - depth));
     const turn = look.turn ?? 0.0;
     setEffectYaw(model, placed.direction > 0 ? -turn : f32(f32(3.14159274) + turn));
     const bear = placed === fighter.placed ? bearState(fighter) : undefined;

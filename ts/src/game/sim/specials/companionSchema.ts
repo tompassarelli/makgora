@@ -11,5 +11,5 @@ export interface CompanionBody {
 export const CompanionOrder = { lunge: 1, return: 2 } as const;
 export type CompanionOrder = (typeof CompanionOrder)[keyof typeof CompanionOrder];
 
-export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4 } as const;
+export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4, burrowed: 5, rising: 6 } as const;
 export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];

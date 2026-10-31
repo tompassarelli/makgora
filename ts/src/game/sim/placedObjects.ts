@@ -25,6 +25,7 @@ import { max, min } from "../core/numbers";
 import { surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 import { squareRootFloat32 } from "wisp/src/sim/binary32";
 import { splitSpawns } from "./specials/spawnSplit";
+import { untouchable, walkPlaced } from "./placedWalk";
 
 
 const ORIGINAL_PROJECTILE_RADIUS = 12.0;
@@ -249,13 +250,14 @@ export function advancePlacedObjects(world: Roster, stage: number, matchFrame: n
         placed.life = 0;
         continue;
       }
+      if (spec.walks !== undefined) walkPlaced(world, ownerSlot, placed, animal, spec.walks, spec.radius, stage, matchFrame);
       const crumble = spec.crumble ?? 0;
       placeBody(placed, spec);
       if (placed.mode === CompanionMode.vanished && spec.windWalk !== undefined && ++placed.modeFrame >= spec.windWalk.frames) {
         placed.mode = CompanionMode.follow;
         placed.modeFrame = 0;
       }
-      for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY && placed.life > crumble && placed.mode !== CompanionMode.vanished; sourceSlot++) {
+      for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY && placed.life > crumble && !untouchable(placed); sourceSlot++) {
         if (!canHit(world, sourceSlot, ownerSlot) || !isActive(world, sourceSlot)) continue;
         const source = fighterAt(world, sourceSlot);
         if (source.status.out) continue;

@@ -249,10 +249,23 @@ export interface SpecialPlacement {
   readonly aimedSpeed?: number | undefined;
   readonly splits?: { readonly afterHits: number; readonly into: number; readonly apart: number; readonly half: SpecialPlacement } | undefined;
   readonly refusedWhileOut?: true | undefined;
+  readonly walks?: PlacementWalk | undefined;
 
   readonly companion?: SpecialCompanion | undefined;
   readonly taunt?: { readonly radius: number; readonly pull: number } | undefined;
   readonly windWalk?: { readonly frames: number; readonly hop: number } | undefined;
+}
+
+/** It walks its floor to stay between `near` and `far` of its owner on the nearest foe's side and within `range` of that foe, goes under with an owner who dives through a resurfacing special and comes up beside him, and re-forms beside an owner it has stood on another floor from for `strandedFrames`. */
+export interface PlacementWalk {
+  readonly near: number;
+  readonly far: number;
+  readonly spacing: number;
+  readonly speed: number;
+  readonly range: number;
+  readonly strandedFrames: number;
+  readonly underFrames: number;
+  readonly riseFrames: number;
 }
 
 export interface SpecialCompanion {

@@ -2,7 +2,7 @@ import { canonicalInt, canonicalRealField } from "./canonicalNumbers";
 import { writePierce } from "./empowerCanonical";
 import { at } from "wisp/src/runtime/lookup";
 import type { HitEffect } from "../sim/hitRegions";
-import type { SpecialCompanion, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
+import type { PlacementWalk, SpecialCompanion, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import type { AppliedStatus } from "../sim/appliedStatus";
 
 export const bit = (flag: boolean | undefined): number => (flag === true ? 1 : 0);
@@ -145,6 +145,7 @@ function writePlacementRules(spec: Readonly<SpecialPlacement>, prefix: string, r
   if (spec.aimed === true) int("aimed", 1);
   if (spec.aimedSpeed !== undefined) real("aimedSpeed", spec.aimedSpeed);
   if (spec.refusedWhileOut === true) int("refusedWhileOut", 1);
+  if (spec.walks !== undefined) writeWalk(spec.walks, prefix, result);
   if (spec.splits !== undefined) {
     int("splits.afterHits", spec.splits.afterHits);
     int("splits.into", spec.splits.into);
@@ -154,6 +155,18 @@ function writePlacementRules(spec: Readonly<SpecialPlacement>, prefix: string, r
   if (spec.crumble !== undefined) int("crumble", spec.crumble);
   result.push(optionalField(`${prefix}.taunt.radius`, spec.taunt?.radius, canonicalRealField), optionalField(`${prefix}.taunt.pull`, spec.taunt?.pull, canonicalRealField));
   result.push(optionalField(`${prefix}.windWalk.frames`, spec.windWalk?.frames, canonicalInt), optionalField(`${prefix}.windWalk.hop`, spec.windWalk?.hop, canonicalRealField));
+}
+
+function writeWalk(walk: Readonly<PlacementWalk>, prefix: string, result: string[]): void {
+  const { int, real } = fieldWriters(prefix, result);
+  real("walks.near", walk.near);
+  real("walks.far", walk.far);
+  real("walks.spacing", walk.spacing);
+  real("walks.speed", walk.speed);
+  real("walks.range", walk.range);
+  int("walks.strandedFrames", walk.strandedFrames);
+  int("walks.underFrames", walk.underFrames);
+  int("walks.riseFrames", walk.riseFrames);
 }
 
 function writeCompanion(partner: Readonly<SpecialCompanion>, prefix: string, result: string[]): void {
