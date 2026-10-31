@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
 import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText, styleMenuPanel } from "./frames";
+import { GAME_TITLE } from "./title";
 import { MENU_STYLE } from "./hudLayout";
 import { boxContains } from "./selectionLayout";
 import { createFrameByType, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
@@ -33,7 +34,7 @@ export class PauseMenu {
       if (parent === this.root) setFrameLevel(frame, 21);
       return frame;
     };
-    setFrameText(label("SmashcraftPauseHeading", f32(0.42), f32(0.04), MENU_STYLE.titleSize), `${MENU_STYLE.gold}Smashcraft|r`);
+    setFrameText(label("SmashcraftPauseHeading", f32(0.42), f32(0.04), MENU_STYLE.titleSize), `${MENU_STYLE.gold}${GAME_TITLE}|r`);
     const button = createFrameByType("BUTTON", "SmashcraftPauseOption0", this.root, "", 1801);
     placeTopLeft(button, ROW_LEFT, ROW_TOP);
     setFrameSize(button, ROW_WIDTH, ROW_HEIGHT);

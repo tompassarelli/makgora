@@ -1,4 +1,38 @@
-# Smashcraft 0.1.0 promotion drafts
+# Promotion drafts
+
+Private drafts for Tom to approve before anything is posted under his name. `PROJECT_URL` is the Mak'gora project thread drafted in [hive-project.md](hive-project.md) and `PATREON_URL` the Patreon page; both are filled in once they exist.
+
+## Mak'gora 0.3.0: Hive thread reply
+
+Posted as a reply in the map's Hive thread after the 0.3.0 map is uploaded (BBCode):
+
+```
+[B]Mak'gora 0.3.0 is out[/B]
+Smashcraft is now [B]Mak'gora[/B]. New in 0.3:
+[LIST]
+[*]Onyxia joins as Lady Katrana Prestor, who can reveal the black dragon
+[*]Up to eight costumes per fighter
+[*]New-player mode with your keys on screen, and a longer Tutorial
+[*]New names: Samuro, Rokhan, Mannoroth, Arthas, Stitches, and the duo Mrgl & Grgl
+[*]Reworks for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar, and darker stage backdrops
+[/LIST]
+Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL], and a ranked ladder is coming. News and the roadmap: [URL="PROJECT_URL"]Mak'gora project page[/URL]. Games and feedback: [URL="https://discord.gg/JQGZs2UJR"]Discord[/URL].
+```
+
+## Mak'gora 0.3.0: Discord announcement
+
+**Mak'gora 0.3.0 is out!** Smashcraft has a new name: Mak'gora.
+
+New in 0.3: Onyxia joins (Lady Katrana Prestor, who can reveal the black dragon), up to eight costumes per fighter, a new-player mode that shows your keys on screen, a longer Tutorial, the new names Samuro, Rokhan, Mannoroth, Arthas, Stitches and Mrgl & Grgl, and reworks for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar.
+
+Download: https://www.hiveworkshop.com/threads/smashcraft.375492/ (put the map in your Warcraft III Maps folder, Graphics on Classic, open it from Custom Game). Controllers work through padbridge: https://github.com/tompassarelli/padbridge/releases/latest
+
+A ranked ladder is coming. Project page: PROJECT_URL · Patreon: PATREON_URL
+
+Post your games, clips and bugs here. — Tompas
+
+# Smashcraft 0.1.0 promotion drafts (history)
+
 
 Private drafts for Tom to post after [the release gates](https://github.com/tompassarelli/smashcraft/issues/346) pass and the map is uploaded to Hive Workshop. These describe the intended 0.1.0 release, not a release available today. The existing [GitHub Issues channel](https://github.com/tompassarelli/smashcraft/issues) is the feedback destination. Download links use the Hive Workshop placeholder; Tom can substitute the map page once it exists. GitHub repositories hold code only, with no map release attachments. Controls, installation and the restart caveat come from [the player guide](player-guide.md).
 The live Hive Workshop page is written in [hive-post.md](hive-post.md) (smashcraft:docs/hive-post.md); `bun run hive:post` in ts/ prints it as Hive BBCode to paste into the page editor (smashcraft:ts/scripts/hivePost.ts): `#` is the centred title and the next line its subtitle, `##` a section heading, `###` a bold label, `-` and `1.` lists, and `**bold**`, `*italic*`, `code` and links convert inline.

@@ -99,8 +99,8 @@ impl Tracker {
         };
         Some(Session {
             key: format!("{}/s{}/{}", menu.build, menu.slot, self.generation),
-            summary: format!("Smashcraft {}, player {}, {phase}", menu.build, menu.slot + 1),
-            shown: Some(model::Session { map: "Smashcraft".into(), phase: shown, player: Some(menu.slot + 1) }),
+            summary: format!("Mak'gora {}, player {}, {phase}", menu.build, menu.slot + 1),
+            shown: Some(model::Session { map: "Mak'gora".into(), phase: shown, player: Some(menu.slot + 1) }),
         })
     }
 
@@ -163,7 +163,7 @@ impl Profile for Smashcraft {
     }
 
     fn title(&self) -> &str {
-        "Smashcraft"
+        "Mak'gora"
     }
 
     fn session(&mut self, game: &Game) -> Option<Session> {
@@ -188,7 +188,7 @@ impl Profile for Smashcraft {
         match &self.keys {
             Some(keys) => Some(Session {
                 key: format!("{}/keys/{}", keys.build, self.keys_generation),
-                summary: format!("Smashcraft {} on keys", keys.build),
+                summary: format!("Mak'gora {} on keys", keys.build),
                 shown: self.tracker.menu().filter(|menu| menu.build == keys.build)
                     .and_then(|_| self.tracker.session()).and_then(|session| session.shown),
             }),

@@ -16,6 +16,7 @@ import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
 import { type Edition, installName, playableBuildArgs } from "./greenBuilds";
 import { MAP_FOLDER } from "./mapLibrary";
+import { GAME_TITLE } from "../../src/game/ui/title";
 import { projectRoot } from "./project";
 
 const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -50,12 +51,12 @@ export function releaseTarget(described: string | undefined): string | undefined
 }
 
 export function buildName(tags: readonly string[], target: string, build: number): string {
-  if (tags.includes(`v${target}`)) return `Smashcraft ${target}`;
+  if (tags.includes(`v${target}`)) return `${GAME_TITLE} ${target}`;
   const candidates = tags.flatMap((tag) => {
     const [version, number = ""] = tag.slice(1).split("-rc.");
     return tag.startsWith("v") && version === target && /^\d+$/.test(number) ? [Number(number)] : [];
   });
-  if (candidates.length > 0) return `Smashcraft ${target} RC-${Math.max(...candidates)}`;
+  if (candidates.length > 0) return `${GAME_TITLE} ${target} RC-${Math.max(...candidates)}`;
   return installName(target, build);
 }
 

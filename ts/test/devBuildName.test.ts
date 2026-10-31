@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync, mkdirSync 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { PLAYABLE_FILE, TOM_EDITION, parseInstalled } from "../scripts/wisp/greenBuilds";
+import { PLAYABLE_FILE, TOM_EDITION, buildLabel, parseInstalled } from "../scripts/wisp/greenBuilds";
 import { build, releaseBuildArgs } from "../scripts/wisp/commands/map";
 import { playName, playableMapBuild } from "../scripts/wisp/currentPlaytest";
 import { OLD_FOLDER, installLatest, library, pendingTidy } from "../scripts/wisp/mapLibrary";
@@ -34,16 +34,16 @@ test("a dev build is named for the next release and the first-parent commits sin
     git(repo, "checkout", "-q", "main");
     git(repo, "merge", "-q", "--no-ff", "-m", "merge side", "side");
     const merged = head(repo);
-    expect(await name(repo, first)).toBe("Smashcraft 0.2-dev.1");
-    expect(await name(repo, second)).toBe("Smashcraft 0.2-dev.2");
-    expect(await name(repo, merged)).toBe("Smashcraft 0.2-dev.3");
-    expect(await name(repo, "v0.1.5")).toBe("Smashcraft 0.1.5");
+    expect(await name(repo, first)).toBe("Mak'gora 0.2-dev.1");
+    expect(await name(repo, second)).toBe("Mak'gora 0.2-dev.2");
+    expect(await name(repo, merged)).toBe("Mak'gora 0.2-dev.3");
+    expect(await name(repo, "v0.1.5")).toBe("Mak'gora 0.1.5");
     git(repo, "tag", "v0.2");
-    expect(await name(repo, head(repo))).toBe("Smashcraft 0.2");
+    expect(await name(repo, head(repo))).toBe("Mak'gora 0.2");
     commit(repo, "after the next release");
-    expect(await name(repo, head(repo))).toBe("Smashcraft 0.3-dev.1");
+    expect(await name(repo, head(repo))).toBe("Mak'gora 0.3-dev.1");
     git(repo, "tag", "v0.3-rc.2");
-    expect(await name(repo, head(repo))).toBe("Smashcraft 0.3 RC-2");
+    expect(await name(repo, head(repo))).toBe("Mak'gora 0.3 RC-2");
   } finally {
     rmSync(repo, { recursive: true, force: true });
   }
@@ -58,6 +58,9 @@ test("a dev build file name parses back to its version and number, and a release
   expect(parseInstalled("Smashcraft 0.1.4.w3x")).toEqual({ version: [0, 1, 4], build: undefined, candidate: undefined });
   expect(parseInstalled("Smashcraft 0.1.5 RC-2.w3x")).toEqual({ version: [0, 1, 5], build: undefined, candidate: 2 });
   expect(PLAYABLE_FILE.exec("Smashcraft 0.1.5-dev c9e5fbd.w3x")).toBeNull();
+  expect(parseInstalled("Mak'gora 0.3.0.w3x")).toEqual({ version: [0, 3, 0], build: undefined, candidate: undefined });
+  expect(buildLabel("Mak'gora 0.4-dev.7.w3x")).toBe("0.4-dev.7");
+  expect(buildLabel("Smashcraft 0.3-dev.692.w3x")).toBe("0.3-dev.692");
 });
 
 test("installing a dev build leaves the latest release and the newest dev build at the top of the Maps folder and moves older releases to old/ [k5 boundary maps-folder]", () => {

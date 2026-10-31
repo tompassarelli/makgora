@@ -3,7 +3,7 @@ import type { MapDeclaration } from "wisp/scripts/mapInfo";
 export const SMASHCRAFT_MAP = {
   author: "Tompas",
 
-  description: "Warcraft heroes in a platform fight for up to four. Community: tompassarelli.github.io/smashcraft.",
+  description: "Warcraft heroes in a platform fight for 1-4 players. Controllers work. Ranked ladder coming. Project page: Mak'gora on Hive Workshop. Discord: discord.gg/JQGZs2UJR.",
   suggestedPlayers: "1-4",
   players: [
     { id: 0, name: "Player 1" },

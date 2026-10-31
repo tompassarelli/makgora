@@ -1,6 +1,6 @@
 export const COMMUNITY_TITLE = "Community";
 
-export const GITHUB_PAGE = "github.com/tompassarelli/smashcraft";
+export const GITHUB_PAGE = "github.com/tompassarelli/makgora";
 export const DISCORD_INVITE = "discord.gg/JQGZs2UJR";
 
 export const communityUrl = (page: string): string => `https://${page}`;

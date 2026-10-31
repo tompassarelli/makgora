@@ -1,3 +1,4 @@
+import { GAME_TITLE } from "../../src/game/ui/title";
 import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -53,7 +54,7 @@ export function playtestChecklist({ version, sha, previous, date, commits, issue
   const calls = issues.filter(({ number }) => touched.has(number)).sort((a, b) => a.number - b.number)
     .flatMap((issue) => directionCalls(issue).map((call) => `- [ ] #${issue.number} ${issue.title}: ${call}`));
   return [
-    `# Playtest notes: Smashcraft ${version}`,
+    `# Playtest notes: ${GAME_TITLE} ${version}`,
     "",
     `- Build: ${sha.slice(0, SHORT_COMMIT)} (${sha})`,
     `- Since: ${previous === undefined ? "no earlier installed build" : previous.slice(0, SHORT_COMMIT)}`,

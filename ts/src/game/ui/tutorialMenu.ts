@@ -3,6 +3,7 @@
 
 
 
+import { GAME_TITLE } from "./title";
 import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
@@ -57,7 +58,7 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   setFrameLevel(root, SELECT_LEVELS.tutorial);
   setFrameText(text(root, `MeleeTutorialTitle${suffix}`, f32(0.21), f32(0.46), f32(0.38), f32(0.03), f32(0.018)), "Tutorial");
   setFrameText(text(root, `MeleeTutorialBody${suffix}`, f32(0.215), f32(0.43), f32(0.37), f32(0.05), f32(0.011)),
-    `New to Smashcraft? Learn the basics in ${LESSONS.length} short lessons with a training partner. Pick any lesson to play it again.`);
+    `New to ${GAME_TITLE}? Learn the basics in ${LESSONS.length} short lessons with a training partner. Pick any lesson to play it again.`);
   button(root, f32(0.23), f32(0.37), f32(0.03), f32(0.03), "−", { kind: "tutorialStep", direction: -1 }, add);
   const lesson = text(root, `MeleeTutorialLesson${suffix}`, f32(0.26), f32(0.37), f32(0.28), f32(0.03), f32(0.012));
   button(root, f32(0.54), f32(0.37), f32(0.03), f32(0.03), "+", { kind: "tutorialStep", direction: 1 }, add);

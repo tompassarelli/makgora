@@ -375,7 +375,7 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   if (shellState() !== undefined) return;
   hideOriginFrames(true);
 
-  if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
+  if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "The game's menus could not load. Restart the game.");
   enableSelections(false, false);
   enableUserControl(true);
   enableFog(false);
