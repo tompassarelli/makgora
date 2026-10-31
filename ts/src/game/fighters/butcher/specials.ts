@@ -65,10 +65,10 @@ export const ROT_RADIUS = 90.0;
 export const ROT_PATCH_FRAMES = 150;
 export const ROT_PATCH_LIMIT = 12;
 export const ROT_PATCH_EVERY = 12;
-const ROT_PATCH_MODEL = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
+const ROT_PATCH_MODEL = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx";
 
 export const ROT_PATCH: SpecialProjectile = {
-  model: ROT_PATCH_MODEL, modelRadius: 150.0, spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
+  model: ROT_PATCH_MODEL, modelRadius: 50.0, spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
   life: ROT_PATCH_FRAMES, activeFrom: ROT_PATCH_FRAMES + 1, radius: f32(f32(0.4) * ROT_RADIUS), effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.poison), reflectable: false, limit: ROT_PATCH_LIMIT,
 };
 

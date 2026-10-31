@@ -1,18 +1,18 @@
-# Stitches' Rot trail facing left: Rot goes on, he runs left away from the foe and leaves a rot patch every 12 frames, then the foe runs left through the trail and is burned and slowed on it.
-#! cue 270-446 patches: effect=DeathAndDecayTarget
+# Stitches' Rot trail facing left: Rot goes on, he walks away from the foe and leaves a rot patch every 12 frames, then the foe runs left through the trail and is burned and slowed on it.
+#! cue 270-446 patches: effect=PlagueCloudCaster
 #! chat -dev setup quick pair butcher / medivh;lives 3 3
 250 a stick 0 -1
 256 a tap X 2
-270 a stick -1 0
+270 a stick -0.6 0
 284 a capture
-300 a stick 0 0
-304 a capture
-318 b stick -1 0
-326 a capture
-338 a capture
-350 a capture
-356 b stick 0 0
-362 a capture
-380 a capture
-400 a capture
-420 a capture
+298 a capture
+312 a capture
+330 a stick 0 0
+334 a capture
+340 b stick -1 0
+346 a capture
+356 a capture
+366 b stick 0 0
+372 a capture
+390 a capture
+410 a capture

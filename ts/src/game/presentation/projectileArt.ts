@@ -177,6 +177,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": { x: 0.0, z: 0.0, sequence: "spell" },
   "Units\\Undead\\Locust\\Locust.mdx": { x: 0.0, z: 0.0, sequence: "walk" },
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { x: 0.0, z: f32(-59.4), loopFrames: 12, disc: [150, 70, 230] },
+  "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx": { x: 0.0, z: 0.0, sequence: "stand", height: f32(0.4) },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25 },
   [ELUNE_SHIMMER]: { x: 0.0, z: 0.0, disc: [205, 225, 255], discVertical: true },
   [HOOK_MODEL]: { x: -20.0, z: 0.0 },

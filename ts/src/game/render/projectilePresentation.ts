@@ -25,6 +25,7 @@ import { clearEffectSubAnimations, createBeam, createEffect, destroyBeam, destro
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
+  "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx",
   "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx",
   "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx",
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx",
