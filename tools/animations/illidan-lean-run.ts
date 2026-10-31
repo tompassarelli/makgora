@@ -17,7 +17,7 @@ const VARIANTS: Readonly<Record<string, Variant>> = {
   fox: { lean: 42, head: .5, pelvis: .35, sweep: 66, elbow: 10, hand: 38, splay: 16, swing: .4, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   long: { lean: 34, head: .45, pelvis: .3, sweep: 58, elbow: 14, hand: 30, splay: 18, swing: .5, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   take2: { lean: 72, head: .62, pelvis: .3, sweep: 88, elbow: 2, hand: 90, splay: -14, swing: .3, bob: 1.5, slide: 26, slideR: 38, drop: 14, lateral: 12, ...GAIT },
-  stalker2: { lean: 40, head: .3, pelvis: .45, sweep: 46, elbow: 14, hand: 90, splay: 16, swing: 0, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, alternate: 40, cross: 22, counter: 14, pelvisYaw: 8, crouch: 12, knee: 34, shin: 30, handGuard: -20 },
+  stalker2: { ...GAIT, lean: 40, head: .3, pelvis: .45, sweep: 46, elbow: 14, hand: 90, splay: 16, swing: 0, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, alternate: 40, cross: 22, counter: 14, pelvisYaw: 8, crouch: 12, knee: 34, shin: 30, handGuard: -20 },
   stalker: { lean: 40, head: .3, pelvis: .45, sweep: 46, elbow: 14, hand: 20, splay: 16, swing: 0, bob: 1.5, slide: 0, slideR: 0, drop: 0, lateral: 0, alternate: 40, cross: 22, counter: 14, pelvisYaw: 8, crouch: 12, knee: 34, shin: 30 },
 };
 const v = { ...VARIANTS[variantArg], ...JSON.parse(process.env.ILLIDAN_VARIANT ?? "{}") } as Variant;
