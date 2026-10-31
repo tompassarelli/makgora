@@ -9,7 +9,7 @@ export const prestorLook: HeroLook = standinLook({
   model: PRESTOR_MODEL, objectId: 0x6d666f80,
   portrait: "ReplaceableTextures\\CommandButtons\\BTNSorceress.blp",
   clips: {
-    stand: { index: 0, seconds: f32(1.334) }, ready: { index: 0, seconds: f32(1.334) }, walk: { index: 6, seconds: 2.0, stance: 192.0 },
+    stand: { index: 0, seconds: f32(1.334) }, ready: { index: 0, seconds: f32(1.334) }, walk: { index: 6, seconds: 2.0 },
     attack: { index: 2, seconds: f32(1.4) }, attack2: { index: 2, seconds: f32(1.4) }, spell: { index: 3, seconds: f32(2.733) },
     death: { index: 4, seconds: 3.5 }, dissipate: { index: 5, seconds: 2.0 },
   },
