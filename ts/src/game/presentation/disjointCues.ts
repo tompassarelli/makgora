@@ -20,7 +20,8 @@ const NATURE_FLARE: Cue = { ...FIRE_FLARE, model: "Abilities\\Spells\\NightElf\\
 const IMPALE_SPIKES: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", scale: f32(1.0), sequence: "birth", seconds: f32(0.4) };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
 const NOVA_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", scale: f32(0.38), sequence: "birth", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
-const VASHJ_TRAIL: Cue = { ...NEUTRAL_FLARE, model: VASHJ_TRAIL_MODEL, scale: f32(0.35), seconds: f32(0.2), timeScale: 0.0 };
+export const VASHJ_TRAIL_SCALE = f32(0.9);
+const VASHJ_TRAIL: Cue = { ...NEUTRAL_FLARE, model: VASHJ_TRAIL_MODEL, scale: VASHJ_TRAIL_SCALE, seconds: f32(0.2), timeScale: 0.0 };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.rifleman]: NEUTRAL_FLARE,

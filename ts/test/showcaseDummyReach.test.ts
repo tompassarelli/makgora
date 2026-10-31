@@ -12,6 +12,7 @@ import { showcaseFixtures } from "../src/platform/captureFixtures";
 import { DISJOINT_CUES, disjointNormals } from "../src/game/presentation/disjointCues";
 import { createFighter } from "../src/game/sim/fighter";
 import { VASHJ_TRAIL_MODEL } from "../src/game/sim/ultimates";
+import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS } from "../src/game/presentation/projectileArt";
 
 const vashj = Character.ladyVashj;
 const upSmash = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.upSmash;
@@ -102,4 +103,18 @@ test("Lady Vashj's back air stages the dummy behind her, on the side its hit lau
   const rows = showcaseRows(vashj).filter(row => row.move.kind === "normal" && row.move.code === AttackStyle.backAir);
   expect(rows.length).toBe(2);
   for (const { move, facing } of rows) expect(`${facing} behind ${(move.gap ?? 0) <= -body.radius * 3}`).toBe(`${facing} behind true`);
+});
+
+
+test("Lady Vashj's trail is drawn at least 0.9 large, the size that shows beside the hit spark, and her gaze beams drift apart into a cone with the trail drawn the same size [k2 property]", () => {
+  const cue = DISJOINT_CUES[vashj];
+  expect(cue?.scale).toBeGreaterThanOrEqual(0.9);
+  expect(PROJECTILE_DRAW_CUES[VASHJ_TRAIL_MODEL]?.scale).toBe(cue?.scale);
+  expect(PROJECTILE_DRAW_OFFSETS[VASHJ_TRAIL_MODEL]?.seconds).toBe(cue?.seconds);
+  const beams = (authoredTuning(vashj).ultimate?.projectiles ?? []).filter(shot => shot.model === VASHJ_TRAIL_MODEL && shot.spawnFrame === 21);
+  const drifts = beams.map(shot => shot.velocityZ).sort((a, b) => a - b);
+  expect(drifts.length).toBeGreaterThanOrEqual(5);
+  expect(drifts[0]).toBeLessThan(0);
+  expect(drifts[drifts.length - 1]).toBeGreaterThan(0);
+  for (const shot of beams) expect(shot.velocityX).toBeGreaterThan(Math.abs(shot.velocityZ));
 });

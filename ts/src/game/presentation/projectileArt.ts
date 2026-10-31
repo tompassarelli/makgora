@@ -9,7 +9,7 @@ import { ANKH_BURST_MODEL } from "../../generated/assets/ankhAssetInfo";
 import { Character, ProjectileKind } from "../sim/codes";
 import type { Projectile } from "../sim/fighter";
 import { HERO_ROSTER, heroDefinition } from "../roster/kits";
-import { FIGHTER_ULTIMATES } from "../sim/ultimates";
+import { FIGHTER_ULTIMATES, VASHJ_TRAIL_MODEL } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile, TargetedStrike } from "../sim/specials/schema";
 import { specialPlacements } from "../sim/specials/placements";
 import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
@@ -131,6 +131,7 @@ export function allProjectileModels(): readonly string[] {
 }
 
 export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined; readonly color?: readonly [number, number, number] | undefined } | undefined } = {
+  [VASHJ_TRAIL_MODEL]: { scale: f32(0.9) },
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { scale: f32(0.16) },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { scale: f32(1.2) },
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": { scale: 1.5 },
@@ -162,6 +163,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
 };
 
 export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined; readonly fuse?: Fuse | undefined } | undefined } = {
+  [VASHJ_TRAIL_MODEL]: { x: 0.0, z: 0.0, seconds: f32(0.2) },
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { x: 0.0, z: 0.0, sequence: "birth", disc: [155, 225, 255], discVertical: true },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { x: 0.0, z: 0.0, disc: [255, 215, 115] },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { x: 0.0, z: 0.0, roll: f32(1.570796327) },

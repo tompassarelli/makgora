@@ -394,7 +394,7 @@ const MEDIVH: AuthoredSpecial = {
 
 export const VASHJ_TRAIL_MODEL = "Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx";
 
-const GAZE_STREAKS: readonly SpecialProjectile[] = [200.0, 380.0].map(offset => mark(VASHJ_TRAIL_MODEL, 21, 40, offset, 120.0));
+const GAZE_STREAKS: readonly SpecialProjectile[] = [21, 33].flatMap(spawn => [-6.0, -3.0, 0.0, 3.0, 6.0].map(drift => ({ ...mark(VASHJ_TRAIL_MODEL, spawn, 20, 40.0, 120.0), velocityX: 24.0, velocityZ: drift })));
 
 const LADY_VASHJ: AuthoredSpecial = {
   name: "Gaze of Azshara", endFrame: 72,
