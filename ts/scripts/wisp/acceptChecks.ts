@@ -339,8 +339,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...STAGE_ENTRY_CHECKS,
     ...FLOATING_STAGE_CHECKS,
     ...STAGE_FOG_CHECKS,
-    ...FIGHTER_SEPARATION_CHECKS,
-    ...FROZEN_THRONE_STAIR_CHECKS,
+    ...FIGHTER_SEPARATION_CHECKS, ...FROZEN_THRONE_STAIR_CHECKS,
     ...contactLightChecks,
     ...slashLightChecks,
     {
