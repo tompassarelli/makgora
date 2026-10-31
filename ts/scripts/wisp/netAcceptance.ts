@@ -5,6 +5,7 @@ import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { runProxy } from "wisp/scripts/wisp/net/proxy";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { SELECTABLE_CHARACTERS, fighterKey } from "../../src/game/roster/kits";
+import { EPOCH_STRIDE } from "./net";
 
 export class NetAcceptFailure extends Schema.TaggedError<NetAcceptFailure, { readonly brand: unique symbol }>()("NetAcceptFailure", { problem: Schema.String }) {
   override get message(): string {
@@ -88,7 +89,7 @@ const RollbackReport = Schema.Struct({ window: Schema.Finite, delay: Schema.Fini
 const decodeRollback = Schema.decodeUnknownSync(Schema.fromJsonString(RollbackReport));
 const CapturedRow = Schema.Struct({ frame: Schema.Finite, pressed: Schema.Finite, tick: Schema.Finite, frontier: Schema.Finite, drawnTick: Schema.Finite, pressTicks: Schema.Array(Schema.Finite) });
 const PressReport = Schema.Struct({
-  slot: Schema.Finite, delay: Schema.Finite, endFrame: Schema.Finite, conflicts: Schema.Finite, unmatched: Schema.Finite, lost: Schema.Finite, captured: Schema.Array(CapturedRow),
+  slot: Schema.Finite, delay: Schema.Finite, endFrames: Schema.Record(Schema.String, Schema.Finite), conflicts: Schema.Finite, unmatched: Schema.Finite, lost: Schema.Finite, captured: Schema.Array(CapturedRow),
   received: Schema.Record(Schema.String, Schema.Record(Schema.String, Schema.Finite)),
 });
 const decodePresses = Schema.decodeUnknownSync(Schema.fromJsonString(PressReport));
@@ -196,7 +197,7 @@ export function pressAccounting(local: SideResult, remote: SideResult) {
   if (report === undefined) return { presses: 0, lost: 1, extra: 1, offFrame: 1, remoteMismatch: 1, afterEnd: 0, drawn: [], delay: 0 };
   const remoteRows = remote.presses?.received[`${report.slot}`] ?? {};
   const ownFrames = new Set(report.captured.map((row) => row.frame));
-  const afterEnd = (row: typeof CapturedRow.Type) => row.drawnTick < 0 && row.frame >= report.endFrame;
+  const afterEnd = (row: typeof CapturedRow.Type) => row.drawnTick < 0 && row.frame >= (report.endFrames[`${Math.floor(row.frame / EPOCH_STRIDE)}`] ?? 0);
   const drawn = report.captured.filter((row) => !afterEnd(row)).flatMap((row) => row.pressTicks.map((tick) => row.drawnTick < 0 ? Infinity : row.drawnTick - tick));
   return {
     presses: report.captured.reduce((sum, row) => sum + row.pressTicks.length, 0), lost: report.lost,

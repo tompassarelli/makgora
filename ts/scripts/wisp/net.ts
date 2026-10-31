@@ -228,14 +228,27 @@ function netcodeStats() {
 const BINDINGS = presetBindings(DEFAULT_PRESET);
 
 // Each epoch numbers its frames from 1, so a second match in one run reuses frame numbers; a press report names a frame as epoch * EPOCH_STRIDE + frame.
-const EPOCH_STRIDE = 1 << 24;
+export const EPOCH_STRIDE = 1 << 24;
+
+export interface CapturedPress { readonly frame: number; readonly pressed: number; readonly tick: number; readonly frontier: number; drawnTick: number; readonly pressTicks: number[] }
+
+/** Marks drawn at `tick` every undrawn row of `epoch` before `nextSpeculative`; a row an earlier epoch never ran stays undrawn, because that match ended before it. */
+export function markDrawn(captured: readonly CapturedPress[], epoch: number, nextSpeculative: number, tick: number): void {
+  const ran = epoch * EPOCH_STRIDE + nextSpeculative;
+  for (let index = captured.length - 1; index >= 0; index--) {
+    const row = captured[index];
+    if (row === undefined || row.drawnTick >= 0) break;
+    if (row.frame < ran && row.frame >= epoch * EPOCH_STRIDE) row.drawnTick = tick;
+  }
+}
 
 /** Every scripted key press during the match: the row it was captured into, the frame that row was assigned, the tick the local view first ran it, and every row received from each slot (wisp#112). */
 function pressStats(slot: number) {
   const pending: { readonly bit: number; readonly tick: number }[] = [];
-  const captured: { frame: number; pressed: number; tick: number; frontier: number; drawnTick: number; pressTicks: number[] }[] = [];
+  const captured: CapturedPress[] = [];
   const received: Record<number, Record<number, number>> = {};
-  let conflicts = 0, unmatched = 0, delay = 0, endFrame = 0;
+  let conflicts = 0, unmatched = 0, delay = 0;
+  const endFrames: Record<number, number> = {};
   let rollback: NonNullable<NetcodeShell["rollback"]> | undefined;
   let epoch = -1, scanned = 0;
   const receivedThrough: number[] = [];
@@ -290,14 +303,10 @@ function pressStats(slot: number) {
     },
     drawn(tick: number, playing: boolean) {
       if (rollback === undefined) return;
-      const ran = rollback.schedule.epoch * EPOCH_STRIDE + rollback.schedule.nextSpeculative;
-      if (playing) endFrame = Math.max(endFrame, ran);
-      for (let index = captured.length - 1; index >= 0; index--) {
-        const row = captured[index];
-        if (row === undefined || row.drawnTick >= 0) break;
-        if (row.frame < ran) row.drawnTick = tick;
-      }
+      const { epoch: current, nextSpeculative } = rollback.schedule;
+      if (playing) endFrames[current] = Math.max(endFrames[current] ?? 0, current * EPOCH_STRIDE + nextSpeculative);
+      markDrawn(captured, current, nextSpeculative, tick);
     },
-    report: () => ({ slot, delay, endFrame, conflicts, unmatched, lost: pending.length, lostTicks: pending.map((press) => press.tick), captured, received }),
+    report: () => ({ slot, delay, endFrames, conflicts, unmatched, lost: pending.length, lostTicks: pending.map((press) => press.tick), captured, received }),
   };
 }
