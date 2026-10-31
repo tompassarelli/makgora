@@ -1,7 +1,7 @@
 // Usage: bun scripts/poseDrift.ts [--frames N] [--only SLUG]
 // Plays each selectable fighter through an Expert CPU match on the real fighter pool with Wisp's effect store, drawing one 1/60 s frame after every
 // presentation tick as the game does, and reports how far the shown body's clock sits from the clip time the pool jumped it to (in frames), and
-// whether the shown body's global-sequence clock runs.
+// whether the shown body's global-sequence clock runs. A clip's opening frame cannot be jumped before its start, so it is counted apart and the rest must sit within 0.01 frame.
 import { parseArgs } from "node:util";
 import { clearAttackBuffer } from "../src/game/input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
@@ -34,6 +34,8 @@ bindWorld({ effects, players: undefined, log: undefined } as unknown as World);
 interface Report {
   readonly name: string;
   frames: number;
+  openingFrames: number;
+  openingDrift: number;
   minDrift: number;
   maxDrift: number;
   clockRuns: boolean;
@@ -50,7 +52,7 @@ for (const [index, character] of characters.entries()) {
   const pool = new FighterPoolPresentation(character, 0, origin, 0, 1.0);
   if (!pool.admitted()) throw new Error(`${fighterSlug(character)}: no pooled body`);
   const draw = createFighterDraw();
-  const report: Report = { name: fighterSlug(character), frames: 0, minDrift: Infinity, maxDrift: -Infinity, clockRuns: false };
+  const report: Report = { name: fighterSlug(character), frames: 0, openingFrames: 0, openingDrift: 0, minDrift: Infinity, maxDrift: -Infinity, clockRuns: false };
   const bodies: effect[] = [];
   pool.drawnEffects(bodies);
   effects.draw(FRAME_SECONDS);
@@ -79,15 +81,21 @@ for (const [index, character] of characters.entries()) {
     if (clip === undefined || state === undefined) continue;
     const drift = (state.animationElapsed - ((clip.timeline ? clip.startSeconds : 0) + draw.seconds)) / FRAME_SECONDS;
     report.frames++;
-    report.minDrift = Math.min(report.minDrift, drift);
-    report.maxDrift = Math.max(report.maxDrift, drift);
+    if (draw.seconds < FRAME_SECONDS - 1e-6) {
+      report.openingFrames++;
+      report.openingDrift = Math.max(report.openingDrift, drift);
+    }
+    else {
+      report.minDrift = Math.min(report.minDrift, drift);
+      report.maxDrift = Math.max(report.maxDrift, drift);
+    }
     if (clock !== undefined && state.animationClock !== clock) report.clockRuns = true;
     clock = state.animationClock;
   }
   pool.destroy();
   reports.push(report);
-  console.log(`${report.name.padEnd(18)} frames ${String(report.frames).padStart(5)} drift ${report.minDrift.toFixed(3)}..${report.maxDrift.toFixed(3)} frames, global clock ${report.clockRuns ? "runs" : "frozen"}`);
+  console.log(`${report.name.padEnd(18)} frames ${String(report.frames).padStart(5)} (${report.openingFrames} opening, up to ${report.openingDrift.toFixed(3)}) drift ${report.minDrift.toFixed(3)}..${report.maxDrift.toFixed(3)} frames, global clock ${report.clockRuns ? "runs" : "frozen"}`);
 }
 const worst = Math.max(...reports.map((report) => Math.max(Math.abs(report.minDrift), Math.abs(report.maxDrift))));
 console.log(`${reports.length} fighters, worst drift ${worst.toFixed(3)} frames, ${reports.filter((report) => report.clockRuns).length} with a running global clock`);
-process.exit(worst <= 1.0 + 1e-3 ? 0 : 1);
+process.exit(worst <= 0.01 ? 0 : 1);

@@ -27,8 +27,9 @@ import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEff
 import { player } from "wisp/game/players";
 
 const PETRIFIED_GREY = 150;
-// Warcraft freezes global sequences at time scale 0, so a shown body runs and is re-jumped to its clip time every frame.
+// Warcraft freezes global sequences at time scale 0, so a shown body runs, jumped one frame behind its clip time so the frame it then advances lands on it.
 const RUNNING = 1.0;
+const FRAME_SECONDS = 1.0 / 60.0;
 const HELD = 0.0;
 const CHILL_TINT = { red: 120, green: 190, blue: 255 };
 
@@ -167,7 +168,8 @@ export class FighterPoolPresentation {
       this.yaw = yaw;
       this.pitch = pitch;
     }
-    setEffectTime(model, (clip.timeline ? clip.startSeconds : 0.0) + seconds);
+    const base = clip.timeline ? clip.startSeconds : 0.0;
+    setEffectTime(model, base + Math.max(0.0, seconds - FRAME_SECONDS));
     if (this.light !== undefined) {
       placeEffect(this.light, x, y, z);
       if (this.lightYaw !== yaw) {

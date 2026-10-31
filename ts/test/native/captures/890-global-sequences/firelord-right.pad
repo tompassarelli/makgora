@@ -1,0 +1,10 @@
+# Firelord standing facing right for 60 frames: his flames run on the body's global sequences, so they should move between captures 10 frames apart instead of standing still.
+#! chat -dev quick hero firelord
+250 a stick 1 0
+254 a stick 0 0
+270 a capture
+280 a capture
+290 a capture
+300 a capture
+310 a capture
+320 a capture
