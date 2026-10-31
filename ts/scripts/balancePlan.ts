@@ -9,6 +9,7 @@ import { runStepOutputs } from "./stepOutputs";
 import { JOB_SECONDS, measuredSeconds, ofKind, shardWork, type Work } from "./balanceShards";
 
 const Timings = Schema.Record(Schema.String, Schema.Finite);
+const TIMING_RUNS = 6;
 const Runs = Schema.Struct({ workflow_runs: Schema.Array(Schema.Struct({ id: Schema.Finite })) });
 const Artifacts = Schema.Struct({ artifacts: Schema.Array(Schema.Struct({ id: Schema.Finite, name: Schema.String, expired: Schema.Boolean, workflow_run: Schema.Struct({ id: Schema.Finite }) })) });
 
@@ -17,7 +18,7 @@ const timingSamples = (repo: string, keys: readonly string[]) => Effect.acquireU
   (folder) => Effect.gen(function*() {
     const balanceRuns = yield* decoded(Runs, yield* run(["gh", "api", `repos/${repo}/actions/workflows/balance.yml/runs?status=completed&per_page=30`]));
     const named = yield* decoded(Artifacts, yield* run(["gh", "api", `repos/${repo}/actions/artifacts?name=balance-timings&per_page=30`]));
-    const runs = [...new Set([...balanceRuns.workflow_runs.map((prior) => prior.id), ...named.artifacts.filter((artifact) => !artifact.expired).map((artifact) => artifact.workflow_run.id)])].toSorted((a, b) => b - a);
+    const runs = [...new Set([...balanceRuns.workflow_runs.map((prior) => prior.id), ...named.artifacts.filter((artifact) => !artifact.expired).map((artifact) => artifact.workflow_run.id)])].toSorted((a, b) => b - a).slice(0, TIMING_RUNS);
     const samples: Record<string, number>[] = [];
     const covered = new Set<string>();
     for (const id of runs) {
@@ -43,7 +44,10 @@ const main = Effect.gen(function*() {
   const requested = (process.env.MATCHUPS ?? "").split(",").filter(Boolean);
   if (requested.some((pair) => !allPairs.includes(pair))) return yield* new FarmFailure({ problem: "Unknown or reversed fighter matchup" });
   const pairs = requested.length === 0 ? allPairs : allPairs.filter((pair) => requested.includes(pair));
-  const samples = yield* timingSamples(repo, [...pairs.map((pair) => `shard/${pair}`), ...pairs.map((pair) => `ceiling/${pair}`), ...slugs.map((slug) => `probe/${slug}`)]);
+  const samples = yield* timingSamples(repo, [...pairs.map((pair) => `shard/${pair}`), ...pairs.map((pair) => `ceiling/${pair}`), ...slugs.map((slug) => `probe/${slug}`)]).pipe(
+    Effect.timeout("90 seconds"),
+    Effect.orElseSucceed(() => []),
+  );
   const measured = measuredSeconds(pairs, ofKind(samples, "shard"));
   const measuredCeiling = measuredSeconds(pairs, ofKind(samples, "ceiling"));
   const measuredProbe = measuredSeconds(slugs, ofKind(samples, "probe"));
