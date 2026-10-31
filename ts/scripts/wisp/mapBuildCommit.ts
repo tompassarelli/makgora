@@ -16,9 +16,17 @@ export const commitMismatch = (map: string, mapCommit: string | undefined, check
   mapCommit === undefined || checkoutCommit === undefined || mapCommit === checkoutCommit ? undefined
     : `${map} was built from Smashcraft ${mapCommit.slice(0, 10)} and this checkout is at ${checkoutCommit.slice(0, 10)}; play a map built from ${checkoutCommit.slice(0, 10)}, or check out ${mapCommit.slice(0, 10)}`;
 
+declare const PLAYER_COMMIT: string | undefined;
+
+/** The commit this code was built from: stamped into a packaged player at build time, else the checkout's HEAD. */
+const codeCommit = Effect.gen(function*() {
+  if (typeof PLAYER_COMMIT === "string") return PLAYER_COMMIT;
+  const checkout = yield* Effect.option(runProcess(ChildProcess.make("git", ["-C", projectRoot, "rev-parse", "HEAD"])).pipe(Effect.provide(BunServices.layer)));
+  return Option.getOrUndefined(checkout);
+});
+
 export const mapCommitMismatch = (map: string, imports: readonly { readonly entry: string; readonly source: string }[]) => Effect.gen(function*() {
   const script = imports.find((entry) => entry.entry.toLowerCase() === "war3map.lua");
   const mapCommit = script === undefined ? undefined : stampedCommit(readFileSync(script.source, "latin1"));
-  const checkout = yield* Effect.option(runProcess(ChildProcess.make("git", ["-C", projectRoot, "rev-parse", "HEAD"])).pipe(Effect.provide(BunServices.layer)));
-  return commitMismatch(map, mapCommit, Option.getOrUndefined(checkout));
+  return commitMismatch(map, mapCommit, yield* codeCommit);
 });

@@ -1,0 +1,84 @@
+name: Player build
+
+# The packaged player (smashcraft#807): the compiled play command, Wisp's native window library, the map packager and the CASC extractor, for Linux and Windows.
+# Nothing here is published; the package is a run artifact.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "sc-807-**"]
+    paths: ["ts/scripts/player*.ts", "ts/scripts/wisp/**", "ts/src/**", "tools/player/**", ".github/workflows/player.yml", "map-version", "ts/wisp.lock", "ts/vendor/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: player-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CASCLIB_COMMIT: 38a34665624b8775bb875274b36191b21c38d97b
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+          - os: windows-latest
+            name: windows
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: bun install --frozen-lockfile --ignore-scripts
+        working-directory: ts
+      - name: Linux libraries
+        if: matrix.name == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev libasound2-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libvulkan-dev libstorm-dev cmake g++ zip
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ts/node_modules/wisp/window
+      - name: Wisp window library
+        run: cargo build --release --locked
+        working-directory: ts/node_modules/wisp/window
+      - name: Map packager
+        run: |
+          mkdir -p "$RUNNER_TEMP/tools"
+          if [ "${{ matrix.name }}" = windows ]; then
+            cp ts/node_modules/wisp/native/windows/map-pack.exe "$RUNNER_TEMP/tools/map-pack.exe"
+          else
+            gcc -O2 ts/node_modules/wisp/native/map-pack.c -o "$RUNNER_TEMP/tools/map-pack" -Wl,-Bstatic -lstorm -Wl,-Bdynamic -lz -lbz2 -lstdc++
+          fi
+      - name: CASC extractor
+        run: |
+          git clone https://github.com/ladislav-zezula/CascLib "$RUNNER_TEMP/casclib"
+          git -C "$RUNNER_TEMP/casclib" checkout "$CASCLIB_COMMIT"
+          cmake -S tools/player -B "$RUNNER_TEMP/casc-build" -DCMAKE_BUILD_TYPE=Release -DCASCLIB_SOURCE="$RUNNER_TEMP/casclib"
+          cmake --build "$RUNNER_TEMP/casc-build" --config Release --target casc-extract
+          built=$(find "$RUNNER_TEMP/casc-build" -name 'casc-extract*' -type f \( -name casc-extract -o -name casc-extract.exe \) | head -1)
+          cp "$built" "$RUNNER_TEMP/tools/"
+      - name: Build the package
+        run: |
+          library=$(find ts/node_modules/wisp/window/target/release -maxdepth 1 \( -name libwisp_window.so -o -name wisp_window.dll \) | head -1)
+          bun scripts/playerBuild.ts --out "$RUNNER_TEMP/package/smashcraft-play-${{ matrix.name }}" --library "$PWD/$library" --tools "$RUNNER_TEMP/tools" --commit "$GITHUB_SHA"
+        working-directory: ts
+      - name: Run it where Bun is not on the path
+        run: |
+          cd "$RUNNER_TEMP/package/smashcraft-play-${{ matrix.name }}"
+          ext=""; [ "${{ matrix.name }}" = windows ] && ext=.exe; PATH=/usr/bin:/bin:/c/Windows/System32 "./smashcraft-play$ext" --version | tee "$RUNNER_TEMP/version.txt"
+          grep -q "$GITHUB_SHA" "$RUNNER_TEMP/version.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smashcraft-play-${{ matrix.name }}
+          path: ${{ runner.temp }}/package/smashcraft-play-${{ matrix.name }}
+          if-no-files-found: error
