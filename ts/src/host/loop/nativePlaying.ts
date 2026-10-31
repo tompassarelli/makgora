@@ -7,5 +7,5 @@ export function announcePlaying(s: ShellState): void {
   const playing = s.game.phase === Phase.match || s.game.phase === Phase.result;
   if (announced.get(s) === playing) return;
   announced.set(s, playing);
-  WispSetPlaying(playing);
+  if (typeof WispSetPlaying === "function") WispSetPlaying(playing);
 }

@@ -18,7 +18,7 @@ import { fighterModelScale } from "../../game/presentation/fighterScale";
 const CROW_FORM = 0x416d7266;
 
 const LOCUST = 0x416c6f63;
-const DIZZY_MODEL = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx";
+export const DIZZY_MODEL = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx";
 
 
 const placement = { x: 0.0, z: 0.0 };
