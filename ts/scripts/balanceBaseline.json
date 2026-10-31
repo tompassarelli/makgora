@@ -27934,8 +27934,8 @@
    "authored.specials.side.ground.endFrame": 50,
    "authored.specials.side.ground.regions.0.firstFrame": 9,
    "authored.specials.side.ground.regions.0.lastFrame": 23,
-   "authored.specials.side.ground.regions.0.hit.effect.damage": 8.100000381469727,
-   "authored.specials.side.ground.regions.0.hit.effect.growth": 43.20000076293945,
+   "authored.specials.side.ground.regions.0.hit.effect.damage": 11.25,
+   "authored.specials.side.ground.regions.0.hit.effect.growth": 60,
    "authored.specials.side.ground.regions.0.hit.effect.base": 50,
    "authored.specials.side.ground.regions.0.hit.effect.launchX": 0.17364799976348877,
    "authored.specials.side.ground.regions.0.hit.effect.launchZ": 0.9848080277442932,
@@ -27944,8 +27944,8 @@
    "authored.specials.side.air.landingLag": 22,
    "authored.specials.side.air.regions.0.firstFrame": 9,
    "authored.specials.side.air.regions.0.lastFrame": 23,
-   "authored.specials.side.air.regions.0.hit.effect.damage": 8.100000381469727,
-   "authored.specials.side.air.regions.0.hit.effect.growth": 43.20000076293945,
+   "authored.specials.side.air.regions.0.hit.effect.damage": 11.25,
+   "authored.specials.side.air.regions.0.hit.effect.growth": 60,
    "authored.specials.side.air.regions.0.hit.effect.base": 50,
    "authored.specials.side.air.regions.0.hit.effect.launchX": 0.17364799976348877,
    "authored.specials.side.air.regions.0.hit.effect.launchZ": 0.9848080277442932,
@@ -28568,10 +28568,12 @@
     "advantage": -26
    },
    "special.side.ground.regions.0": {
-    "advantage": -35
+    "advantage": -34,
+    "killPercent": 288
    },
    "special.side.air.regions.0": {
-    "advantage": -35
+    "advantage": -34,
+    "killPercent": 288
    },
    "special.up.ground.regions.0": {
     "advantage": -28
