@@ -99,7 +99,7 @@ const FROZEN_THRONE: StageScenery = {
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1440.0, z: -110.0, scale: 1.0, yaw: 270.0, matrixScale: [9.0, 2.5, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1400.0, z: -55.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 2.5, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1360.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [5.0, 2.5, 1.25], color: [64, 82, 104], still: true },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1979.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [1.2, 2.5, 1.25], color: [64, 82, 104], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1973.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [1.25, 2.5, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Icecrown\\Structures\\IC_IceArch\\IC_IceArch.mdx", x: 0.0, y: 4800.0, z: -1500.0, scale: 7.5, yaw: 270.0, color: [46, 60, 82] },
     { model: "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier2.mdx", x: -2300.0, y: 5200.0, z: -2200.0, scale: 5.0, yaw: 60.0, matrixScale: [1.25, 1.0, 2.25], color: [44, 64, 90] },
     { model: "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier5.mdx", x: 2300.0, y: 5000.0, z: -2200.0, scale: 5.0, yaw: 20.0, matrixScale: [1.25, 1.0, 2.5], color: [44, 64, 90] },
