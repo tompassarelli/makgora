@@ -53,7 +53,7 @@ export const STRATHOLME_SCENERY: StageScenery = {
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall135_2_Ruined\\CityBuildingSmall135_2_Ruined.mdx", x: -400.0, y: 5700.0, z: -1300.0, scale: 3.5, yaw: 40.0, color: [60, 64, 76] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_135_Ruined\\CityBuildingLarge_135_Ruined.mdx", x: 3000.0, y: 6100.0, z: -1300.0, scale: 4.5, yaw: 300.0, color: [60, 64, 76] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall90_1_Ruined\\CityBuildingSmall90_1_Ruined.mdx", x: 4000.0, y: 5700.0, z: -1300.0, scale: 5.0, yaw: 160.0, color: [60, 64, 76] },
-    { model: TOWN_FIRE, x: -3400.0, y: 6000.0, z: -600.0, scale: 3.25, yaw: 20.0 },
+    { model: TOWN_FIRE, x: -3400.0, y: 6000.0, z: -750.0, scale: 2.5, yaw: 20.0, color: [90, 60, 50] },
     { model: TOWN_FIRE, x: 3500.0, y: 6300.0, z: -500.0, scale: 2.5, yaw: 200.0 },
     { model: TOWN_FIRE, x: 2100.0, y: 7400.0, z: -400.0, scale: 3.5, yaw: 110.0 },
     { model: HILL, x: -1000.0, y: 7800.0, z: -1500.0, scale: 18.0, yaw: 30.0, matrixScale: [2.0, 1.0, 1.0], color: [110, 86, 76] },

@@ -41,7 +41,7 @@ function tileFace(face: DeckFace, tileSize = 128): { corners: number[][]; uv: nu
 
 export function texturedDeckMdl(faces: readonly DeckFace[], materials: PlatformMaterialSet, palette: DeckPalette): string {
   const tomb = materials.body.texture === "Textures\\RuinsNatural.blp";
-  const textures = parts.map(part => tomb ? { ...materials[part], ...(part === "top" ? { tint: [244, 222, 176] as const, tileSize: 256 } : {}), ...(part === "body" || part === "underside" ? { tileSize: 4096 } : {}) } : materials[part]);
+  const textures = parts.map(part => tomb ? { ...materials[part], ...(part === "top" || part === "lip" ? { tileSize: 512 } : {}), ...(part === "body" || part === "underside" ? { tileSize: 4096 } : {}) } : materials[part]);
   if (tomb) faces = faces.flatMap(face => {
     if (face.material < 2) return [face];
     return tileFace(face, 140).map(({ corners }) => ({ ...face, corners: corners.map(([x = 0, y = 0, z = 0]) => {

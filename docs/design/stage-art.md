@@ -484,11 +484,18 @@ Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
   colonnade at varied heights with fires among them and dark hills beyond,
   no rock spires. Below the deck: ruined houses, an archway, the fountain
   and a small house around two fires, so the middle reads lit and full.
+  The leftmost burning building (x -3400) is a smaller, lower, dimmed ember
+  since 31 Oct 2026, because its full-brightness flame competed with the
+  fighters behind the play space.
 - **Tomb of Sargeras.** Keeps its sea. Adds the sunken temple (a Naga tidal
   guardian tower rising from the water on the left and broken archways in
   the far water) and the Broken Isles silhouette, low green peaks in the
   far haze. Nothing new stands in the water near the deck, where a pillar
   top reads as a ledge.
+  The main deck is one emerald stone: its top, lip and body share the
+  RuinsNatural rock in emerald tints (lip lightest, body darkest), so the deck
+  reads as stone with a visible edge and never as the teal water beside it
+  (31 Oct 2026).
 
 ### Art checklist
 
@@ -591,7 +598,7 @@ it a distant landmark rather than a foreground wall. The Frozen Throne's
 | Naxxramas | Brinstar's dark enclosed cavern over a glowing basin: a closed Scourge hall of tall arches and spiked pillars under a dark violet vault, over green plague slime. |
 | Hellfire Citadel | Northern Cave's separated rock planes and Rivals' recessed scenery: one distant gate, descending rock field, restrained green haze beneath violet upper sky. |
 | Blackrock | Brinstar's charcoal upper cavern and warm lower basin: original smoke-grey/rust sky replaces red winter clouds; right basalt landmark counterweighted by a lower left crag. Fire accents are 1.25–1.5 scale below the deck, and the small cart gives industrial scale. |
-| Ahn'Qiraj | Battlefield's asymmetric architectural skyline: distant left obelisk at scale 4.5, lower right broken arch at scale 4, recessed fallen wall and low stones. Sand horizon and desaturated mauve zenith separate the gold deck edge from sky. |
+| Ahn'Qiraj | Battlefield's asymmetric architectural skyline: distant left obelisk at scale 4.5, lower right broken arch at scale 4, recessed fallen wall and low stones. Sand horizon and desaturated mauve zenith separate the gold deck edge from sky. Since 31 Oct 2026 the sky, fog, floor and every piece tint sit one value step brighter than the first dark pass (Tom found it a touch too dark), the fighters still the lit shapes. |
 
 Original skies use one seamless inward sphere of 1,024 triangles and one
 256×128 texture each, no particles, lights or animated tracks. Sky draws
