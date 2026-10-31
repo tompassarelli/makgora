@@ -1,7 +1,8 @@
 import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
 import { COMMUNITY_TITLE, communityBody } from "./community";
-import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./frames";
+import { PANEL_TEXTURE } from "./hudLayout";
+import { ButtonClicks, createBackdrop, placeTopLeft } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { COMMUNITY_BOX } from "./selectionLayout";
@@ -19,7 +20,7 @@ export class CommunityMenu {
   constructor(owner: framehandle, rules: framehandle, suffix: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.community.${suffix}.click`, (target, clicker) => this.click(target, clicker));
     this.root = createBackdrop(`MeleeCommunityMenu${suffix}`, owner, 0);
-    styleMenuPanel(this.root, `MeleeCommunityPanel${suffix}`);
+    BlzFrameSetTexture(this.root, PANEL_TEXTURE, 0, true);
     placeTopLeft(this.root, f32(0.2), f32(0.47));
     BlzFrameSetSize(this.root, f32(0.4), f32(0.2));
     BlzFrameSetLevel(this.root, SELECT_LEVELS.community);

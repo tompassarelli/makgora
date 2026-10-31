@@ -171,7 +171,6 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   views(s).selections[slot].menuBindings(bindings.bindings);
   const editbox = s.rollback?.journal?.editbox !== undefined;
   if (editbox && game.phase !== Phase.match && journalMenuKey(s, slot, key)) return;
-  if (key === Key.escape && game.phase === Phase.characterMenu && views(s).selections[slot].menuAction(Action.special)) return;
   if (key === Key.escape && game.phase === Phase.stageMenu) {
     back(s, slot);
     return;
