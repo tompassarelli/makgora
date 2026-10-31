@@ -1,5 +1,5 @@
 import { preloadModels, preloadSkies } from "../../game/presentation/stagePreload";
-import { drawnScale, driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery, type SceneryPiece } from "../../game/presentation/stageScenery";
+import { drawnScale, driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery, type SceneryPiece, type StageSkyLook } from "../../game/presentation/stageScenery";
 import { driftPose, type DriftingPiece } from "../../game/presentation/driftingScenery";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState, StageDrifter } from "./state";
@@ -63,6 +63,12 @@ export function presentDrifters(s: ShellState): void {
   }
 }
 
+function drawStageSkyLook(look: StageSkyLook | undefined): void {
+  if (typeof WispSetSkyLook !== "function") return;
+  if (look === undefined) { WispResetSkyLook(); return; }
+  WispSetSkyLook(look.zenith[0], look.zenith[1], look.zenith[2], look.cover, look.sunAzimuth, look.sunElevation, look.sun[0], look.sun[1], look.sun[2], look.stars, look.glow);
+}
+
 export function drawStageScenery(s: ShellState): void {
   for (const effect of [...(s.stageScenery ?? []), ...s.stageDrifters.map(drifter => drifter.effect)]) {
 
@@ -73,6 +79,7 @@ export function drawStageScenery(s: ShellState): void {
 
   BlzShowTerrain(false);
   SetSkyModel(scenery.sky);
+  drawStageSkyLook(scenery.skyLook);
   SetDayNightModels(STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT);
   s.stageFogHidden = false;
   drawStageFog(s);

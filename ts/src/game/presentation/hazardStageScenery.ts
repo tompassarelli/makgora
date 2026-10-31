@@ -28,6 +28,7 @@ const GRANITE_FAR = [220, 226, 234] as const;
 export const NORDRASSIL_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[10] ?? "",
+  skyLook: { zenith: [0.04, 0.07, 0.094], cover: 0.45, sunAzimuth: 70, sunElevation: 28, sun: [0.16, 0.26, 0.24], stars: 0.8, glow: 0.15 },
   tint: [34, 46, 42],
   fog: { start: 5000.0, end: 5300.0, red: 0.0625, green: 0.09375, blue: 0.078125 },
   heightFog: { start: 5500.0, end: 11000.0, density: 0.25, heightStart: -2600.0, heightEnd: -600.0, maxDensity: 0.5, drawOverSky: false },

@@ -265,9 +265,19 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     `matrixScale`; buildings and props stand on a stretched stock rock of the
     stage's kind (Barrens rock, Icecrown glacier, Ruins rock).
     smashcraft:ts/test/player-view.test.ts enforces it for every stage.
-12. **The sky is one smooth gradient; the horizon sits at or below the deck.**
-    The brightest region and the busiest clouds stay out of the deck's height
-    band; the lower sky is the abyss colour the atmosphere fades to.
+12. **The sky is one smooth gradient with soft painted cloud over it; the
+    horizon sits at or below the deck.** The brightest region and the busiest
+    clouds stay out of the deck's height band; the lower sky is the abyss
+    colour the atmosphere fades to. In the native window a stage's sky look
+    (`skyLook` on its scenery: zenith, cloud cover, the sun's or moon's place
+    and colour, stars, horizon glow) paints up to three drifting cloud layers
+    with lit tops, shaded bellies, sun shafts and parallax on the camera's
+    pan, over the same gradient; the horizon colour is the fog's (rule 6). A
+    stage keeps one time of day: night stages set stars and a dim moon, dusk
+    stages a low sun and a glow band, and clouds stay below the fighters in
+    value and saturation, never lighter than the horizon haze by more than
+    the sun's rim. Looks: Durotar Skies is dusk, Nordrassil a deep teal
+    night, Stratholme night over a burning city, Tomb of Sargeras overcast.
     Naxxramas is indoors: its sky is a ribbed vault, dark violet a few
     degrees above a green-lit horizon, so the hall reads as closed.
 13. **Hazards are deterministic and trackable** (Tom, 8 Oct, #274). A stage
