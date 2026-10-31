@@ -11,5 +11,5 @@ export const STAGE_SKY_MODELS: Readonly<Record<number, string>> = {
   12: "war3mapImported\\StageSky-56040f98ef724d03bf2acfa7cfa864123d9d7fbfb27476865853631f56ab4fda.mdx",
   6: "war3mapImported\\StageSky-2f85251a53b3f8c5cba65643ed19cfc85ae7f166aa346684168ecc016933b883.mdx",
   7: "war3mapImported\\StageSky-4144d99e4c338deba06dd135d6272f006bb35a5c0c6f51fc75de1691be1f5e09.mdx",
-  13: "war3mapImported\\StageSky-4029f5225ead2dcc44d18d8c14d60349bb273fa26383f365d88b1efffa0e3c04.mdx",
+  13: "war3mapImported\\StageSky-f1d9c473f78141300ee4ca5154c15ac959ee362ce75fde36aa529ff794b64f18.mdx",
 };

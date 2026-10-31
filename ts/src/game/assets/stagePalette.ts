@@ -171,7 +171,7 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
       tint: [224, 184, 126],
     },
   } },
-  { stage: TIMED_TEST_STAGE, theme: "Qiraji", palette: { top: [255, 244, 222], lip: [236, 226, 250], body: [204, 194, 232], underside: [180, 172, 210] }, materials: {
+  { stage: TIMED_TEST_STAGE, theme: "Qiraji", palette: { top: [238, 212, 164], lip: [208, 188, 244], body: [166, 146, 210], underside: [134, 118, 176] }, materials: {
     top: { texture: "Textures\\RuinsDoodads1.blp", crop: [0.203125, 0, 0.28125, 0.46875] },
     lip: { texture: "TerrainArt\\Dalaran\\Dalaran_BrickTiles.blp" },
     body: { texture: "TerrainArt\\Dalaran\\Dalaran_BrickTiles.blp" },
@@ -181,7 +181,7 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
       lip: { texture: "TerrainArt\\Dalaran\\Dalaran_BrickTiles.blp" },
       body: { texture: "TerrainArt\\Dalaran\\Dalaran_SquareTiles.blp" },
       underside: { texture: "TerrainArt\\Dalaran\\Dalaran_SquareTiles.blp" },
-      tint: [255, 244, 222],
+      tint: [238, 212, 164],
     },
   } },
 ];
