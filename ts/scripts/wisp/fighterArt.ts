@@ -7,7 +7,7 @@ import { fighters } from "../heroModelSource";
 import { stopBunProcess } from "../hostProcess";
 import { pruneWhiteTextures } from "../whiteImports";
 import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, type Pin, assetsView, listFiles, mergeShards, publish, readManifest, removeTree, seal, storeShards, unstoredPins, writeShardPins } from "./buildInputs";
-import { stockStorage } from "./renderAssetStore";
+import { reforgedStorage } from "./renderAssetStore";
 import { STEP_TOOLS, type StepName, stepCode } from "./fighterArtCode";
 import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
@@ -149,7 +149,7 @@ export const planFighters = (names: readonly string[], rebuild: boolean) => Effe
   if (unknown.length > 0) return yield* failure("choose fighters", names.join(","), `unknown fighters ${unknown.join(", ")}; choose from ${roster.map(({ name }) => name).join(", ")}`);
   const chosen = names.length === 0 ? roster : roster.filter((fighter) => names.some((name) => named(fighter, name)));
   const code = STEPS.map((step) => codeDigest(step.tool));
-  const stock = yield* Effect.try({ try: () => readFileSync(join(stockStorage(), ".build.info")), catch: (cause) => failure("read stock build info", stockStorage(), cause) });
+  const stock = yield* Effect.try({ try: () => readFileSync(join(reforgedStorage(), ".build.info")), catch: (cause) => failure("read stock build info", "Warcraft III: Reforged install", cause) });
   const shared = sha256(stock, JSON.stringify(manifest["imported-models"]));
   const plans = yield* Effect.forEach(chosen, (fighter) => Effect.tryPromise({
     try: async () => {

@@ -205,7 +205,7 @@ export const smashcraftStandalone = (render: StandaloneGame["render"]): Standalo
 });
 
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
-const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests"]);
+const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage"]);
 
 export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "chrome") {
   let frames: number | undefined;
@@ -232,11 +232,11 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
     }
   }
   const startOptions = startArguments(texts);
-  const script = texts.get("--script"), digests = digestsOf(texts, window), out = texts.get("--out"), map = texts.get("--map"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
+  const script = texts.get("--script"), digests = digestsOf(texts, window), out = texts.get("--out"), map = texts.get("--map"), storage = texts.get("--storage"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
   if (headless && (frames === undefined || (out === undefined && window === "chrome"))) throw new Error(window === "native" ? "--headless needs --frames N" : "--headless needs --frames N and --out DIR");
   const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
   if (fourFighters && script !== undefined) throw new Error("--four-fighters plays its own inputs; drop --script");
-  return { ...(fourFighters ? { fourFighters } : {}), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+  return { ...(fourFighters ? { fourFighters } : {}), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
 }
 
 function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
@@ -272,7 +272,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const counted = standaloneEmulatedCallsArgument(windowed.rest);
   if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  const { playerAssets, start, chosen, digests, ...run } = options;
+  const { playerAssets, start, chosen, digests, storage, ...run } = options;
   if (windowed.window === "native" && options.fourFighters === true) {
     return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --four-fighters or use --window chrome" });
   }
@@ -287,6 +287,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const nativeModule = query.size === 0 ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}), ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
     ...run,
+    reforged: storage === undefined ? {} : { storage },
     ...(playerAssets === undefined ? {} : { gpuLease: false }),
     ...(counted.emulatedCalls === undefined ? {} : { emulatedCalls: counted.emulatedCalls }),
     ...(net.net === undefined ? {} : { net: net.net }),

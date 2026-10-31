@@ -9,6 +9,7 @@ import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildIn
 import { ProcessFailure, runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
 import { resolveRenderAsset, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
+import { discoverInstall, ReforgedRequired } from "wisp/scripts/wisp/reforgedInstall";
 
 export const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
 const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
@@ -42,10 +43,16 @@ export interface StockBuild {
 
 export type MapImports = readonly { readonly entry: string; readonly source: string }[];
 
-export const stockStorage = () => process.env.WC3_STORAGE ?? join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/Program Files (x86)/Warcraft III");
+export const reforgedStorage = () => {
+  const found = discoverInstall();
+  if (found instanceof ReforgedRequired) throw found;
+  return found.storage;
+};
 
 const attempt = <A>(operation: string, run: () => A | Promise<A>) =>
   Effect.tryPromise({ try: async () => run(), catch: (cause) => new RenderAssetFailure({ problem: `${operation}: ${cause instanceof Error ? cause.message : String(cause)}` }) });
+
+export const locateStorage = (options: Pick<RenderAssetOptions, "storage">) => attempt("find the Warcraft III: Reforged install", () => options.storage ?? reforgedStorage());
 
 const read = (path: string) => attempt(`read ${path}`, async () => {
   const file = Bun.file(path);
@@ -73,14 +80,14 @@ const mapSources = (options: RenderAssetOptions, mapImports: ((assets: string, m
 }).pipe(Effect.mapError((cause) => cause instanceof RenderAssetFailure ? cause : new RenderAssetFailure({ problem: `read the map's imports: ${cause.message}` })));
 
 export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: (assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) {
-  const storage = options.storage ?? stockStorage();
+  const storageOf = Effect.runSync(Effect.cached(locateStorage(options)));
   const manifestPath = options.manifest ?? process.env.WC3_ASSET_MANIFEST;
   const used = new Map<string, { readonly sha256: string; readonly bytes: number }>();
   let stockInfo: StockBuild | undefined;
   let temporaries = 0;
   const temporary = (target: string) => `${target}.${process.pid}.${++temporaries}.tmp`;
 
-  const stockCache = Effect.runSync(Effect.cached(readStockBuild(storage).pipe(Effect.flatMap((build) => attempt("open the stock cache", () => {
+  const stockCache = Effect.runSync(Effect.cached(storageOf.pipe(Effect.flatMap(readStockBuild), Effect.flatMap((build) => attempt("open the stock cache", () => {
     stockInfo = build;
     const directory = join(options.cache ?? PRIVATE, "stock", stockInfo.buildInfoSha256);
     mkdirSync(directory, { recursive: true });
@@ -139,6 +146,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
       if (existing !== undefined) return existing;
     }
     const directory = yield* stockCache;
+    const storage = yield* storageOf;
     const cache = join(directory, normalized);
     const cached = yield* read(cache);
     if (cached !== undefined) return cached;

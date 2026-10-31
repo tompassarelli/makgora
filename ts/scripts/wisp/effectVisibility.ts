@@ -28,7 +28,7 @@ import { HOWL_TARGET_MODEL, RESIST_FLASH_MODEL } from "../../src/game/render/ter
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
 import { headlessRender } from "./headlessRender";
-import { readStockBuild, stockStorage, type RenderAssetOptions } from "./renderAssetStore";
+import { locateStorage, readStockBuild, type RenderAssetOptions } from "./renderAssetStore";
 import { heroLook } from "../../src/game/roster/looks";
 import { meterCueFit, meterCueMoves } from "../../src/game/presentation/meterCues";
 
@@ -383,7 +383,7 @@ const TEXTURE = /\.(blp|tga|dds|png|tif)$/i;
 
 /** Reads every Classic effect model from the Warcraft III install's storage, extracting what no render has cached yet, so the facts depend on the build alone. */
 export const readEffectReport = Effect.fnUntraced(function*(options: RenderAssetOptions = {}) {
-  const build = yield* readStockBuild(options.storage ?? stockStorage()).pipe(Effect.mapError((failure) => new EffectCheckFailure({ problem: `Classic stock: ${failure.message}` })));
+  const build = yield* locateStorage(options).pipe(Effect.flatMap(readStockBuild), Effect.mapError((failure) => new EffectCheckFailure({ problem: `Classic stock: ${failure.message}` })));
   const { Version: version, "Build Key": buildKey } = build.fields;
   if (version === undefined || !CLASSIC_BUILDS.includes(version) || buildKey === undefined || buildKey === "") return yield* new EffectCheckFailure({ problem: `Classic calibration needs a ${CLASSIC_BUILDS.join(" or ")} build, got ${version ?? "none"} in ${build.storage}` });
   const info = `${version}\t${buildKey}`;

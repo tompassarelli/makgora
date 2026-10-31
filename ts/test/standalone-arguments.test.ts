@@ -24,3 +24,10 @@ test("--digests names the file the native window writes its frame digests to, an
   expect(standaloneArguments(["--digests", "digests.txt"], "native").digests).toBe("digests.txt");
   expect(() => standaloneArguments(["--digests", "digests.txt"])).toThrow("add --window native");
 });
+
+test("--storage names the Warcraft III: Reforged folder Wisp looks at first [k2 property]", () => {
+  expect(standaloneArguments(["--storage", "/games/Warcraft III"]).storage).toBe("/games/Warcraft III");
+  expect(standaloneArguments([]).storage).toBeUndefined();
+  expect(() => standaloneArguments(["--storage"])).toThrow("--storage needs a value");
+  expect(() => standaloneArguments(["--storage", "--headless"])).toThrow("--storage needs a value");
+});
