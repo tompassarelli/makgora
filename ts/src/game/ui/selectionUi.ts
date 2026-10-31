@@ -62,7 +62,7 @@ import { CreditsMenu } from "./creditsMenu";
 import { MainMenuButton } from "./mainMenuButton";
 import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
-import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
+import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, isTutorialButton, offersTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
@@ -376,14 +376,7 @@ export class SelectionPanel {
     else if (button.kind === "cpuSettings") this.openCpuSettings(button.slot);
     else if (button.kind === "cpuStep") this.stepCpu(button.row, button.direction);
     else if (button.kind === "cpuClose") this.closeCpuSettings();
-    else if (button.kind === "tutorialOpen") this.tutorialOpen = true;
-    else if (button.kind === "tutorialStep") this.actions.stepTutorial(this.participantId, button.direction);
-    else if (button.kind === "tutorialStart" || button.kind === "tutorialClose") {
-      this.tutorialOpen = false;
-      if (this.ownsLocalClient()) this.markSeen();
-      if (button.kind === "tutorialStart") this.actions.startTutorial(this.participantId);
-      else this.actions.closeTutorial(this.participantId);
-    }
+    else if (isTutorialButton(button)) this.tutorialOpen = pressTutorialButton(button, this.actions, this.participantId, () => this.markSeen());
     else applyRuleButton(this.actions, this.participantId, button);
   }
 
@@ -471,6 +464,7 @@ export class SelectionPanel {
       this.cpuFocus = cpuMenuFocus(this.cpuFocus, action, () => this.closeCpuSettings(), (row, direction) => this.stepCpu(row, direction));
       return true;
     }
+    if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
     const focus = menuFocusList(game, this.participantId);
     if (focus.length === 0) return false;
     let index = focus.findIndex(item => item.kind === this.menuFocus?.kind && item.slot === this.menuFocus.slot);
@@ -484,6 +478,11 @@ export class SelectionPanel {
     if (target.kind === "teamBattle" || target.kind === "friendlyFire" || target.kind === "team") return this.toggleFocus(target, action);
     if (target.kind === "mainMenu" || target.kind === "settings") return this.pressMenuButton(target, action);
     return this.chooseFocus(game, target, action);
+  }
+
+  private answerTutorial(button: TutorialButton | undefined): boolean {
+    if (button !== undefined) this.click(button, Player(this.participantId));
+    return true;
   }
 
   private pressMenuButton(target: MenuFocus, action: Action): boolean {
@@ -793,6 +792,7 @@ export class SelectionPanel {
   private openMoves(): void {
     const game = this.game;
     this.movesCharacter = (game === undefined ? undefined : characterFor(game, this.participantId)) ?? DEFAULT_FIGHTER;
+    this.tutorialOpen = false;
     this.movesOpen = true;
   }
 

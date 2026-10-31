@@ -5,12 +5,14 @@
 
 import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
+import { Action } from "../input/actions";
 import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { type MatchState, humanCount } from "../lobby/lobbyState";
 import { LESSONS, lessonChoiceText } from "../match/tutorial";
-import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
-import { type ClickBox, createBackdrop, createText, placeTopLeft } from "./frames";
+import { MENU_FONT } from "./hudLayout";
+import { type ClickBox, createBackdrop, createText, placeTopLeft, styleMenuPanel } from "./frames";
 import { TUTORIAL_BOX } from "./selectionLayout";
+import type { SelectionActions } from "./selectionActions";
 
 export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; direction: -1 | 1 } | { kind: "tutorialStart" } | { kind: "tutorialClose" };
 
@@ -45,7 +47,7 @@ function button(parent: framehandle, x: number, y: number, width: number, height
 
 export function createTutorialMenu(owner: framehandle, rules: framehandle, suffix: string, add: (frame: framehandle, target: TutorialButton, box: ClickBox) => framehandle): TutorialMenuFrames {
   const root = createBackdrop(`MeleeTutorialMenu${suffix}`, owner, 0);
-  BlzFrameSetTexture(root, PANEL_TEXTURE, 0, true);
+  styleMenuPanel(root, `MeleeTutorialPanel${suffix}`);
   placeTopLeft(root, f32(0.2), f32(0.47));
   BlzFrameSetSize(root, f32(0.4), f32(0.2));
   BlzFrameSetLevel(root, SELECT_LEVELS.tutorial);
@@ -60,6 +62,28 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   BlzFrameSetVisible(root, false);
   const open = button(rules, TUTORIAL_BOX.x, TUTORIAL_BOX.y, TUTORIAL_BOX.width, TUTORIAL_BOX.height, "Tutorial", { kind: "tutorialOpen" }, add);
   return { root, lesson, open };
+}
+
+export function tutorialKeyButton(action: Action): TutorialButton | undefined {
+  if (action === Action.attack) return { kind: "tutorialStart" };
+  if (action === Action.special) return { kind: "tutorialClose" };
+  if (action === Action.moveLeft || action === Action.moveRight) return { kind: "tutorialStep", direction: action === Action.moveLeft ? -1 : 1 };
+  return undefined;
+}
+
+export const isTutorialButton = (button: { readonly kind: string }): button is TutorialButton => button.kind.startsWith("tutorial");
+
+// Whether the prompt is still open after the button.
+export function pressTutorialButton(button: TutorialButton, actions: SelectionActions, participantId: number, markSeen: () => void): boolean {
+  if (button.kind === "tutorialOpen") return true;
+  if (button.kind === "tutorialStep") {
+    actions.stepTutorial(participantId, button.direction);
+    return true;
+  }
+  markSeen();
+  if (button.kind === "tutorialStart") actions.startTutorial(participantId);
+  else actions.closeTutorial(participantId);
+  return false;
 }
 
 export function showTutorialLesson(frames: TutorialMenuFrames, lesson: number): void {
