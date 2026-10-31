@@ -1,6 +1,7 @@
 import type { StandaloneGame, StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
 import { join } from "node:path";
 import type { MapEntry } from "wisp/src/headless/client";
+import { createPointerFeed } from "wisp/src/headless/pointer";
 import { Effect } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
@@ -133,6 +134,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
     }
     if (!selection && value(() => shell().game.phase) !== Phase.match) throw new Error("standalone match did not start");
     if (driven) clients.everywhere(() => driverCommand?.("resume"));
+    const feedPointer = createPointerFeed(clients, 0);
     let held = new Set<number>();
     let beat = 0, beatHeld = 0;
     let closed = false;
@@ -152,6 +154,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
         } else if (!driven) {
           const now = steps++;
           for (const click of clicks) if (click.step === now) clients.click(0, click.x, click.y);
+          if (!scripted && input.pointer !== undefined) feedPointer(input.pointer);
           const next = heldKeys(scripted ? { buttons: presses.filter(press => now >= press.step && now < press.step + 3).map(press => press.button), axisX: 0, axisY: 0 } : input);
           for (const key of held) if (!next.has(key)) deliverKey(client, 0, key, 0, false);
           for (const key of next) if (!held.has(key)) deliverKey(client, 0, key, 0, true);
