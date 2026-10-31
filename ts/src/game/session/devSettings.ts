@@ -328,7 +328,28 @@ export const QUICK_CPU_STOCKS = 3;
 
 export interface QuickCpuProfile { readonly opponent: CpuOpponentChoice; readonly tier: CpuTier }
 
-export function quickMatchCpuProfile(message: string): QuickCpuProfile | undefined {
+const QUICK_CPU_STAGE_WORD = " stage ";
+const QUICK_CPU_HOLD_WORD = " hold";
+
+export const quickMatchCpuHold = (message: string): boolean => message.startsWith(QUICK_CPU_COMMAND) && message.endsWith(QUICK_CPU_HOLD_WORD);
+
+const withoutQuickCpuHold = (message: string): string => quickMatchCpuHold(message) ? message.substring(0, message.length - QUICK_CPU_HOLD_WORD.length) : message;
+
+export function quickMatchCpuStage(whole: string): number | undefined {
+  const message = withoutQuickCpuHold(whole);
+  if (!message.startsWith(QUICK_CPU_COMMAND)) return undefined;
+  const at = message.indexOf(QUICK_CPU_STAGE_WORD);
+  const stage = at < 0 ? undefined : commandInteger(message.substring(at + QUICK_CPU_STAGE_WORD.length));
+  return stage !== undefined && selectableStage(stage) ? stage : undefined;
+}
+
+const withoutQuickCpuOptions = (whole: string): string => {
+  const message = withoutQuickCpuHold(whole);
+  return quickMatchCpuStage(message) === undefined ? message : message.substring(0, message.indexOf(QUICK_CPU_STAGE_WORD));
+};
+
+export function quickMatchCpuProfile(whole: string): QuickCpuProfile | undefined {
+  const message = withoutQuickCpuOptions(whole);
   if (!message.startsWith(QUICK_CPU_COMMAND)) return undefined;
   const rest = message.substring(QUICK_CPU_COMMAND.length);
   const marker = rest.indexOf(" hero ");
@@ -342,7 +363,8 @@ export function quickMatchCpuProfile(message: string): QuickCpuProfile | undefin
 }
 
 
-export function quickMatchCpuHero(message: string): Character | undefined {
+export function quickMatchCpuHero(whole: string): Character | undefined {
+  const message = withoutQuickCpuOptions(whole);
   const marker = message.indexOf(" hero ", QUICK_CPU_COMMAND.length);
   return message.startsWith(QUICK_CPU_COMMAND) && marker >= 0 ? heroAfter(message, message.substring(0, marker + 6)) : undefined;
 }

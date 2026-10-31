@@ -4,6 +4,7 @@ import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { MARKER_HEIGHT, MARKER_WIDTH } from "../src/game/ui/fighterMarker";
 import { MATCH_CLOCK_BOX, MATCH_COUNTDOWN_BOX, MATCH_NOTICE_BOX, type TextBox } from "../src/game/ui/hudLayout";
 import { clearNoticePlace } from "../src/game/ui/noticeLayout";
+import { quickMatchCpuHero, quickMatchCpuHold, quickMatchCpuProfile, quickMatchCpuStage } from "../src/game/session/devSettings";
 import { install, startBuild } from "../src/platform/main";
 import { shellState } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
@@ -46,12 +47,12 @@ test("the pre-match line moves clear of every fighter marker, the clock and the 
   expect(settled).toEqual(kept);
 });
 
-test("the start-hold line on screen shares no rectangle with a fighter's damage, percent or name tag [k1 scenario]", () => {
+function holdNoticeClear(stage: number): void {
   const clients = headless.clients({ install, start: () => startBuild({ ...PLAYABLE_BUILD, id: "typescript-notice-clear", devConsole: true }) }, [0]);
   const client = clients.client(0);
   clients.start();
   clients.frames(120);
-  clients.chat(0, "-dev quick cpu wren expert hero illidan");
+  clients.chat(0, `-dev quick cpu wren expert hero illidan stage ${stage} hold`);
   let phase = -1;
   for (let frame = 0; frame < 600 && phase !== Phase.match; frame++) {
     clients.frames(1);
@@ -59,11 +60,10 @@ test("the start-hold line on screen shares no rectangle with a fighter's damage,
   }
   expect(phase).toBe(Phase.match);
   client.run(() => {
-    const s = shellState();
-    if (s === undefined) return;
-    s.game.startHold = 600;
-    s.game.matchFrame = 0;
+    const game = shellState()?.game;
+    if (game !== undefined) expect([game.stageChoice, game.startHold > 0]).toEqual([stage, true]);
   });
+
   let sawNotice = false;
   for (let frame = 0; frame < SPAWN_FRAMES; frame++) {
     clients.frames(1);
@@ -83,4 +83,23 @@ test("the start-hold line on screen shares no rectangle with a fighter's damage,
   }
   expect(sawNotice).toBe(true);
   expect(client.errors).toEqual([]);
+}
+
+test("the start-hold line on Durotar Skies shares no rectangle with a fighter's damage, percent or name tag, the clock or the countdown [k1 scenario]", () => holdNoticeClear(3), 60000);
+
+test("the start-hold line on Tomb of Sargeras shares no rectangle with a fighter's damage, percent or name tag, the clock or the countdown [k1 scenario]", () => holdNoticeClear(7), 60000);
+
+test("a quick CPU command takes an optional stage and hold in either spelling of the match without changing its fighter or profile [k1 scenario]", () => {
+  const plain = "-dev quick cpu wren expert hero illidan";
+  expect(quickMatchCpuStage(plain)).toBeUndefined();
+  expect(quickMatchCpuStage(`${plain} stage 7`)).toBe(7);
+  expect(quickMatchCpuStage(`${plain} stage 3 hold`)).toBe(3);
+  expect(quickMatchCpuStage(`${plain} stage 999`)).toBeUndefined();
+  expect(quickMatchCpuHold(plain)).toBe(false);
+  expect(quickMatchCpuHold(`${plain} stage 3 hold`)).toBe(true);
+  for (const message of [plain, `${plain} stage 3`, `${plain} stage 3 hold`, `${plain} hold`]) {
+    expect(quickMatchCpuProfile(message)).toEqual({ opponent: "wren", tier: "expert" });
+    expect(quickMatchCpuHero(message)).toBe(quickMatchCpuHero(plain));
+  }
+  expect(quickMatchCpuHero(plain)).toBeDefined();
 });

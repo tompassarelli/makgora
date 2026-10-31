@@ -6,11 +6,11 @@ import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases"
 import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participants";
-import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
+import { Phase, START_HOLD_FRAMES, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { costumeOf } from "../../game/roster/costumes";
-import { METER_COMMAND, captureRequest, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickHeroCostume, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPairCostumes, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
+import { METER_COMMAND, captureRequest, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuHold, quickMatchCpuProfile, quickMatchCpuStage, quickMatchHero, quickHeroCostume, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPairCostumes, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterKey } from "../../game/roster/kits";
 import { devReceiptFile } from "../../game/session/journalFiles";
 import { applyFighterSetup } from "../../game/session/fighterSetup";
@@ -235,7 +235,8 @@ function quickMatchReceipt(s: ShellState, actor: number, message: string, reques
   if (quickCpu !== undefined) {
     const receipt = `dev: quick match cpu ${quickCpu}`;
     prepareQuickCpu(s.game, quickCpu, quickMatchCpuHero(message));
-    startQuickMatch(s, 0, s.build.scenario, undefined, QUICK_CPU_STOCKS);
+    startQuickMatch(s, quickMatchCpuStage(message) ?? 0, s.build.scenario, undefined, QUICK_CPU_STOCKS);
+    if (quickMatchCpuHold(message)) s.game.startHold = START_HOLD_FRAMES;
     return receipt;
   }
   if (quickStage !== undefined) {
