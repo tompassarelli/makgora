@@ -8,7 +8,7 @@
 - **New names:** Samuro, Rokhan, Mannoroth, Arthas and Stitches, and Murloc is now the duo Mrgl & Grgl.
 - **New-player mode** shows your own keys on screen, and the Tutorial now teaches specials, EX specials and the ultimate.
 - **Menus:** a gauntlet cursor, a Melee-style pause screen and chat on the select screens.
-- **Reworks** for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar, darker stage backdrops so the fighters read first, and Blackrock's barrel is now a recovery launcher.
+- **Reworks** for Thrall, Mal'Ganis, Ragnaros, Stitches and Rexxar, darker stage backdrops so the fighters read first, and Blackrock's barrel is now a recovery launcher.
 **Controllers:** play with a pad through [padbridge](https://github.com/tompassarelli/padbridge/releases/latest), which turns the pad into keys while Warcraft III is in front.
 **Ranked ladder coming:** a ladder with ratings is next on the roadmap; follow the project page for news.
 Join the [Discord](https://discord.gg/JQGZs2UJR) if you'd like to play games sometime and/or contribute. [Project page](PROJECT_URL) · [Patreon](PATREON_URL) · [Release notes and source](https://github.com/tompassarelli/makgora) · [Report a bug](https://github.com/tompassarelli/makgora/issues)

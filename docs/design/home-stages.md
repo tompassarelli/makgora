@@ -32,7 +32,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Archimonde the Defiler | Nordrassil | 10 | RoC's final battle: the Burning Legion's lord climbs Mount Hyjal to take the World Tree. |
 | Tyrande Whisperwind | Nordrassil | 10 | RoC's night elf campaign: the High Priestess holds the passes of Hyjal until the World Tree's trap closes on Archimonde. |
 | Akama | Hellfire Citadel | 14 | TFT's "Lord of Outland": Akama's Broken join Illidan in Outland and storm Magtheridon's citadel beside him. |
-| Firelord | Blackrock | 12 | The Firelord is a mercenary of fire elementals, and Blackrock Mountain's molten forges are the hottest ground in Khaz Modan. |
+| Ragnaros | Blackrock | 12 | Ragnaros is a mercenary of fire elementals, and Blackrock Mountain's molten forges are the hottest ground in Khaz Modan. |
 | Goblin Alchemist | Durotar Skies | 3 | Goblin merchants and alchemists sell to Thrall's Horde from Durotar's new settlements. Hidden from selection since 2026-10-31; the row stays so the release roster switch restores him. |
 | Onyxia | Blackrock | 12 | The broodmother of the black dragonflight; Deathwing's brood holds Blackrock Mountain, and her brother Nefarian rules its spire. |
 | Thrall | Durotar Skies | 3 | Thrall leads the founding of Durotar. |
@@ -41,7 +41,7 @@ smashcraft:ts/src/game/menu/stageCatalog.ts.
 | Cairne Bloodhoof | Durotar Skies | 3 | Cairne and the tauren help Thrall establish the Horde homeland. |
 | Chen Stormstout | Durotar Skies | 3 | Chen accompanies Rexxar in The Founding of Durotar. |
 | Peon | Durotar Skies | 3 | Orc peons build the Horde settlements. |
-| Goblin Tinker | Durotar Skies | 3 | Goblin engineers supply the Horde with machinery. |
+| Gazlowe | Durotar Skies | 3 | Goblin engineers supply the Horde with machinery. |
 | Kael'thas Sunstrider | Hellfire Citadel | 14 | Kael follows Illidan into Outland. |
 | Mrgl & Grgl | Tomb of Sargeras | 7 | TFT's "Terror of the Tides": murlocs and the naga's mur'gul thralls hold the Broken Isles' shores around the tomb; its tide floor is their water. |
 | Grom Hellscream | Durotar Skies | 3 | Grom's Warsong clan fought beside Thrall's Horde in Kalimdor before his final charge at Mannoroth. |

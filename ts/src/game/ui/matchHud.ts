@@ -4,8 +4,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character } from "../sim/codes";
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
-import { DUO_TITLE } from "./duoTitle";
-import { fighterName, DEFAULT_FIGHTER } from "../roster/kits";
+import { hudTitle } from "./duoTitle";
+import { DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
   DOOM_MARK_TEXTURE, PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
@@ -249,7 +249,7 @@ export class FighterHud {
     if (this.shownTitleCharacter === character && this.shownDuoTitle === duoTitle) return;
     this.shownTitleCharacter = character;
     this.shownDuoTitle = duoTitle;
-    setFrameText(this.name, duoTitle ? DUO_TITLE : fighterName(character).toUpperCase());
+    setFrameText(this.name, hudTitle(character, duoTitle));
   }
 
   private showDamage(damage: number): void {

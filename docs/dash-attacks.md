@@ -25,7 +25,7 @@ by keyword):
 | The striking limb or weapon is small or lost against the body | 35 | Present it outside the body line |
 | The windup is a stumble, tumble or forward pitch, not a coil | 13 | A coil that rocks back on bent knees |
 
-Ten of those judgements gave follow-through 4 (Kael'thas, Goblin Tinker and
+Ten of those judgements gave follow-through 4 (Kael'thas, Gazlowe and
 Mrgl & Grgl), and their notes name a body that carries through the active window
 and "settles gradually" or "smoothly" to stance.
 

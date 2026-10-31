@@ -605,7 +605,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `peon-walk` | 1.16364 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `peon-traction` | 0.05 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Goblin Tinker
+### Gazlowe
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -845,7 +845,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `akama-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `akama-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Firelord (WIP)
+### Ragnaros (WIP)
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|

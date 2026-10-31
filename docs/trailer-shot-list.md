@@ -34,7 +34,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 | 7 | Jaina Proudmoore (zoner) / Rifleman (zoner), both Expert CPUs | Gryphon Aerie (11) | promo-gryphon-aerie.pad | 1660-1980 | match camera, HUD hidden | Edge-guard: Rifleman reaches the ledge (1682), is hit as he climbs (1721, 131%) and loses the stock; respawn on 1964. |
 | 8 | Medivh (mobility trickster) / Malfurion Stormrage (zoner), both Expert CPUs | Nordrassil (10) | promo-nordrassil.pad | 1740-1840 | match camera, HUD hidden | Ledge play: Malfurion hangs on the ledge (1766), Medivh takes a hit to 90% (1783) and Malfurion climbs back (1811). |
 | 9 | Dreadlord (grappler) / Forsaken Paladin (bait-and-punish), both Expert CPUs | Stratholme (6) | promo-stratholme.pad | 1480-1660 | match camera, HUD hidden | Forsaken Paladin recovers to the ledge twice (1502, 1605); Dreadlord punishes the first climb (1543, 94%). |
-| 10 | Goblin Tinker (setplay) / Mountain King (heavy) | Gryphon Aerie (11) | tinker-laser.pad | 60-140 | match camera, HUD on | Tinker Laser: the arms glow from the side special (70) and the beam catches Mountain King (92). |
+| 10 | Gazlowe (setplay) / Mountain King (heavy) | Gryphon Aerie (11) | tinker-laser.pad | 60-140 | match camera, HUD on | Tinker Laser: the arms glow from the side special (70) and the beam catches Mountain King (92). |
 | 11 | Shadow Hunter (setplay) / Beastmaster (setplay) | Naxxramas (4) | shadow-hunter-hex.pad | 50-320 | match camera, HUD on | Shadow Hunter's Hex (60) shuts down Beastmaster's mashed attacks, a forward smash lands (143-153), then Beastmaster calls Bear (260). |
 | 12 | Peon (grappler) / Grom Hellscream (rushdown) | Blackrock (12) | peon-grab-throw.pad | 40-115 | match camera, HUD on | Peon dashes in, grabs Grom (70) and throws him (84). |
 | 13 | Mountain King (heavy) / Cairne Bloodhoof (heavy), both ultimate meters full | Durotar Skies (3) | ex-thunder-clap.pad | 250-340 | match camera, HUD on (the meters matter) | Both fighters wear the gold full-meter glow; Mountain King casts Thunder Clap (260). |
@@ -46,7 +46,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 - Stages: all ten selectable stages (smashcraft:ts/src/game/menu/stageCatalog.ts)
   appear at least once, each as a promo shot.
 - Roster: all 26 selectable fighters appear; the six without a promo shot
-  (Kael'thas Sunstrider, Grom Hellscream, Goblin Tinker, Shadow Hunter,
+  (Kael'thas Sunstrider, Grom Hellscream, Gazlowe, Shadow Hunter,
   Beastmaster, Peon) carry the scripted shots.
 - Systems: Expert computers on both sides of every promo shot (the CPU);
   knockouts, a failed recovery and edge-guards (shots 1-7); ledge play

@@ -145,7 +145,7 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | Cairne | knee lift | A giant tauren: knees drive up under his halberd, no flip. |
 | Chen | cannonball | Round brewmaster: a tight tuck that rolls once forward, keg and all. |
 | Peon | scramble | Comic worker: legs pedal and arms flail as he tumbles once forward. |
-| Goblin Tinker | heave | His claw pack thrusts him up: legs dangle and the body tilts forward. |
+| Gazlowe | heave | His claw pack thrusts him up: legs dangle and the body tilts forward. |
 | Kael'thas | float | Vain prince: arms spread like the phoenix's wings as he turns once backward. |
 | Mrgl & Grgl | front flip | Small, wet and bouncy: a quick tumbling flip. |
 | Grom | front flip | Reckless berserker: the axe leads a forward somersault. |

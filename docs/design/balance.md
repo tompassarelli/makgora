@@ -398,7 +398,7 @@ the live value is that row times the factor below.
 
 The same field on this retune puts 12 of 26 inside 45–55%. The low end moved
 up (Kobold 29.9→35.3%, Anub'arak 30.7→37.0%, Dreadlord 31.8→39.6%) and the
-high end down (Goblin Tinker 62.7→54.9%, Grom 65.9→61.4%), but 14 fighters
+high end down (Gazlowe 62.7→54.9%, Grom 65.9→61.4%), but 14 fighters
 are still outside the band; Rifleman rose to 77.3%.
 
 Step 2 multiplies on top of step 1 (same field, same seeds). Fighters kept at
@@ -490,7 +490,7 @@ every change inside its ±25% and ±3-frame bounds.
 31cc0b9e96 (Balance run 39091849148, 400 a pair) put Rifleman at 65% with
 his dash attack at 25% of his damage and its spam probe winning 81%,
 Blademaster 64%, Kael'thas 63% (forward smash 60% of his KOs), Illidan 61%,
-Cairne 57% and Dreadlord 56%; Lich King 36%, Goblin Tinker 37%, Forsaken
+Cairne 57% and Dreadlord 56%; Lich King 36%, Gazlowe 37%, Forsaken
 Paladin 40%, Thrall and Shadow Hunter 43%, Pit Lord 44% and Mountain King
 45%. Rifleman's dash attack starts 2 frames later (first active 11, total
 unchanged) and deals 8.25 instead of 10.23 with growth 114, so it kills at
@@ -501,7 +501,7 @@ forward smash is unchanged. Kael'thas's forward smash deals 15.5 instead of
 Cairne's War Stomp (9.75) and Dreadlord's pounce bite
 (11.75) deal about 6% less. Lich King's forward smash comes partly back,
 24.75/20.5, Frostmourne Sweep goes to 15 and his dash attack's growth to 88.
-Goblin Tinker's forward tilts (7.5), dash attack (9.375), forward smash
+Gazlowe's forward tilts (7.5), dash attack (9.375), forward smash
 (15.75) and rockets (3.75), Forsaken Paladin's forward tilt and dash attack
 (14.75), Thrall's forward tilts (13.25), down tilt (9.75) and dash attack
 (13.75), Shadow Hunter's forward tilts (11.75) and down tilt (8.5), and
@@ -514,7 +514,7 @@ and every change inside its ±25% and ±3-frame bounds.
 24 Oct 2026 (#45 pass 3, 45–55% Wren field, frames only). After the #223
 aerial refits, the Wren Expert field on aacadefb0a (Balance run 40124983073,
 400 a pair) put Blademaster at 61%, Cairne 58%, Kael'thas 56% and
-Malfurion, Anub'arak and Beastmaster at 55.1–55.4%; Goblin Tinker 36% and
+Malfurion, Anub'arak and Beastmaster at 55.1–55.4%; Gazlowe 36% and
 Shadow Hunter 44%. Pass 2's damage raises had left Tinker where he was, so
 this pass moves recovery frames and keeps every kill percent. Blademaster's
 forward tilt recovers 2 frames later and his dash attack 1; Wind Walk ends at

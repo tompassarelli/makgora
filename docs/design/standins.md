@@ -2,7 +2,7 @@
 
 A stand-in is a selectable placeholder: a fighter on his stock Classic model and
 stock clips, playing one shared, plain moveset until his own kit is designed
-and built. Tom asked for Akama, Firelord and Goblin Alchemist as stand-ins
+and built. Tom asked for Akama, Ragnaros and Goblin Alchemist as stand-ins
 (2026-10-29), with their real kits to follow.
 
 The select tile and the match HUD show each stand-in's name with "(WIP)", so
@@ -13,7 +13,7 @@ players know he is a placeholder.
 | Fighter | Code | Stock model | Real kit |
 | --- | --- | --- | --- |
 | Akama | 32 | `units\other\DranaiAkama\DranaiAkama` | Neutral B is his own Shuriken Volley ([roster.md, Akama](roster.md#akama-neutral-b-tom-2026-10-30)) and up B his own Shadow Step ([roster.md](roster.md#akama-up-b-tom-2026-10-30)); the rest is not designed yet |
-| Firelord | 33 | `Units\Creeps\HeroFlameLord\HeroFlameLord` | Side B is his own Submerge, Up B his own Lava Surf and Down B his own Lava Raze ([roster.md, Firelord](roster.md#firelord)); the rest is not built yet |
+| Ragnaros | 33 | `Units\Creeps\HeroFlameLord\HeroFlameLord` | Side B is his own Submerge, Up B his own Lava Surf and Down B his own Lava Raze ([roster.md, Ragnaros](roster.md#ragnaros)); the rest is not built yet |
 | Goblin Alchemist | 34 | `Units\Creeps\HeroGoblinAlchemist\HeroGoblinAlchemist` | [roster.md, Goblin Alchemist](roster.md#goblin-alchemist) |
 
 ## The shared moveset
@@ -30,7 +30,7 @@ draw.
   bands; forward smash, up smash and back air are the kill moves.
 - Specials: Bolt (neutral, a straight reflectable shot; Akama's neutral and up are his own Shuriken Volley and Shadow Step), Lunge (side, a short
   rush that a shield stops), Rising Strike (up, a hitting rise into helpless
-  fall) and Burst (down, a blast on both sides; Firelord's side is his own Submerge, his up his own Lava Surf and his down his own Lava Raze).
+  fall) and Burst (down, a blast on both sides; Ragnaros's side is his own Submerge, his up his own Lava Surf and his down his own Lava Raze).
 - No ultimate: the ultimate table is optional and a stand-in has none.
 - Every pose is drawn with the model's own stock stand, walk, attack and spell
   clips; damage reactions flinch on his ready stand.

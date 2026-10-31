@@ -212,7 +212,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Worksite Launch | CatapultAttack1 | WoodMediumBashFlesh | WoodMediumBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Down special: Rest | CreepSleep | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 
-## Goblin Tinker
+## Gazlowe
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -356,7 +356,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Shadow Step |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Down special: Burst |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 
-## Firelord (WIP)
+## Ragnaros (WIP)
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |

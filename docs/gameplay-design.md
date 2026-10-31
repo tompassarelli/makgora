@@ -2108,7 +2108,7 @@ smashcraft:ts/test/projectile-rules.test.ts and in this section, with its
 reason. Current departures:
 
 - **Beastmaster's down special (Quilbeast), Jaina Proudmoore's down special
-  (Water Elemental) and Goblin Tinker's down special (Pocket Factory), rule 2,
+  (Water Elemental) and Gazlowe's down special (Pocket Factory), rule 2,
   for the summon's shots only.** The commitment is the placement: the summon
   itself can be hit or destroyed, and the summoner's recovery is already past
   when the shot reaches the shield. At point blank the shots reach the shield
@@ -2638,7 +2638,7 @@ The branch's up-special and empty-mana measurements are kept there too.
 | Cairne Bloodhoof | 583 / 764 | 647 / 808 |
 | Chen Stormstout | 583 / 815 | 820 / 918 |
 | Peon | 621 / 793 | 653 / 793 |
-| Goblin Tinker | 647 / 830 | 820 / 940 |
+| Gazlowe | 647 / 830 | 820 / 940 |
 | Kael'thas Sunstrider | 621 / 889 | 794 / 940 |
 
 `GAME_TESTS=upSpecialRecovery bun test test/game.test.ts` measures each
@@ -2729,7 +2729,7 @@ Expert field.
 | Cairne Bloodhoof | Spirit Lift | 11 | 0 | 22 | 363 / 367 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 233/256 |
 | Chen Stormstout | Storm Rise | 8 | 0 | 19 | 503 / 869 | guided | 110 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 232/256 |
 | Peon | Worksite Launch | 8 | 0 | 22 | 355 / 358 | guided | 55 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 224/256 |
-| Goblin Tinker | Rocket Boots | 7 | 0 | 19 | 521 / 501 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 245/256 |
+| Gazlowe | Rocket Boots | 7 | 0 | 19 | 521 / 501 | guided | 72 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 245/256 |
 | Kael'thas Sunstrider | Phoenix | 13 | 0 | 15 | 731 / 864 | steered (launch 8-way, 12 frames) | 121 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 239/256 |
 | Mrgl & Grgl | Tidal Surf | 6 | 0 | 18 | 257 / 304 | guided | 47 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 235/256 |
 | Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 237/256 |
@@ -2741,7 +2741,7 @@ Expert field.
 | Tyrande Whisperwind | Moonlight Leap | 6 | 0 | 18 | 289 / 267 | guided | 47 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 228/256 |
 | Stitches | Hook Swing | -1 | 0 | 17 | 232 / 155 | guided | 6 | read down air (offstage launch, KO at 40%), projectile | 207/256 |
 | Akama (WIP) | Shadow Step | 13 | 14 | 33 | 329 / 333 | aimed (8-way, 12 frames) | 6 | read down air (offstage launch, KO at 40%) | 238/256 |
-| Firelord (WIP) | Lava Surf | 6 | 0 | 18 | 435 / 288 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 242/256 |
+| Ragnaros (WIP) | Lava Surf | 6 | 0 | 18 | 435 / 288 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 242/256 |
 | Alchemist (WIP) | Rising Strike | 10 | 0 | 29 | 426 / 411 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 221/256 |
 | Onyxia | Shadow Ascent | 8 | 0 | 18 | 285 / 280 | guided | 44 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 224/256 |
 

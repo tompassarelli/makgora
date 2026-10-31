@@ -16,7 +16,7 @@ Smashcraft is now [B]Mak'gora[/B]. New in 0.3:
 [*]Up to eight costumes per fighter
 [*]New-player mode with your keys on screen, and a longer Tutorial
 [*]New names: Samuro, Rokhan, Mannoroth, Arthas, Stitches, and the duo Mrgl & Grgl
-[*]Reworks for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar, and darker stage backdrops
+[*]Reworks for Thrall, Mal'Ganis, Ragnaros, Stitches and Rexxar, and darker stage backdrops
 [/LIST]
 Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL], and a ranked ladder is coming. News and the roadmap: [URL="PROJECT_URL"]Mak'gora project page[/URL]. Games and feedback: [URL="https://discord.gg/JQGZs2UJR"]Discord[/URL].
 ```
@@ -25,7 +25,7 @@ Controllers work through [URL="https://github.com/tompassarelli/padbridge/releas
 
 **Mak'gora 0.3 is out!** Smashcraft has a new name: Mak'gora.
 
-New in 0.3: Onyxia joins (Lady Katrana Prestor, who can reveal the black dragon), up to eight costumes per fighter, a new-player mode that shows your keys on screen, a longer Tutorial, the new names Samuro, Rokhan, Mannoroth, Arthas, Stitches and Mrgl & Grgl, and reworks for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar.
+New in 0.3: Onyxia joins (Lady Katrana Prestor, who can reveal the black dragon), up to eight costumes per fighter, a new-player mode that shows your keys on screen, a longer Tutorial, the new names Samuro, Rokhan, Mannoroth, Arthas, Stitches and Mrgl & Grgl, and reworks for Thrall, Mal'Ganis, Ragnaros, Stitches and Rexxar.
 
 Download: https://www.hiveworkshop.com/threads/smashcraft.375492/ (put the map in your Warcraft III Maps folder, Graphics on Classic, open it from Custom Game). Controllers work through padbridge: https://github.com/tompassarelli/padbridge/releases/latest
 

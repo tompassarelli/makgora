@@ -291,7 +291,7 @@ Stock attack and cast sequences: "Attack", "attack gold", "Attack Lumber", "Atta
 | Get-up, ledge attacks | get-up: peon getupattack; ledge: peon ledgeattack | Keep: they start lying down or hanging; no stock sequence does |
 | Specials | N: peon neutralspecial; N air: peon neutralspecial; S: peon sidespecial; S air: peon sidespecial; U: peon upspecial; U air: peon upspecial; D: peon downspecial; D air: peon downspecial | Keep: each special has its own authored gesture; the model has one generic cast ("Spell" or "Spell Slam"), not one per special |
 
-### Goblin Tinker
+### Gazlowe
 
 Stock attack and cast sequences: "Attack - 1", "Spell One", "Spell Two", "Spell Three", "Spell Slam", "Attack Alternate - 1", "Spell One Alternate", "Spell Two Alternate", "Spell Three Alternate", "Spell Slam Alternate".
 

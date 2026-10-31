@@ -1509,7 +1509,7 @@ generator output. Native inspection decides whether either clock setting
 actually blends from the interrupted pose and reaches the held target;
 successful compilation alone establishes no native interpolation claim.
 
-## Goblin Tinker
+## Gazlowe
 
 From the repository root:
 

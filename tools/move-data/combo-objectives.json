@@ -49,7 +49,7 @@
     "Cairne Bloodhoof": { "forward": "positional", "back": "kill throw", "up": "combo starter", "down": "tech-chase starter" },
     "Chen Stormstout": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Peon": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
-    "Goblin Tinker": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
+    "Gazlowe": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Kael'thas Sunstrider": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Murloc": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },
     "Grom Hellscream": { "forward": "positional", "back": "positional", "up": "combo starter", "down": "tech-chase starter" },

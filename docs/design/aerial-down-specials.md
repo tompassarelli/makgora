@@ -35,7 +35,7 @@ cancelling.
 | Cairne Bloodhoof | War Stomp: Endurance armor while falling, two-sided stomp, 26 landing frames | S1 W1 L31/E31 | S1 W1 L15/E15 | S1 W1 L3/E3 | S1 W1 L—/E62 |
 | Chen Stormstout | Earth stance armor in the air; lands into the grounded stance | S1 W62 L27/E80 | S1 W62 L15/E80 | S1 W62 L3/E80 | S1 W62 L—/E65 |
 | Peon | Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing | S0 W2 L27/E— | S0 W2 L15/E— | S0 W2 L3/E— | S0 W2 L—/E65 |
-| Goblin Tinker | drops one Clockwerk Goblin; lands into the grounded factory build | S1 W10 L27/E27 | S1 W10 L15/E15 | S1 W24 L3/E48 | S1 W10 L—/E36 |
+| Gazlowe | drops one Clockwerk Goblin; lands into the grounded factory build | S1 W10 L27/E27 | S1 W10 L15/E15 | S1 W24 L3/E48 | S1 W10 L—/E36 |
 | Kael'thas Sunstrider | Banish curse in the air; lands into the grounded cast | S1 W12 L57/E36 | S1 W12 L26/E26 | S1 W12 L4/E36 | S1 W12 L—/E36 |
 | Mrgl & Grgl | Mrglglgl! revives Grgl on the ground; refused in the air | R | R | R | R |
 | Grom Hellscream | aerial chop; lands into the grounded chop | S1 W20 L27/E27 | S1 W20 L15/E50 | S1 W20 L3/E50 | S1 W20 L—/E50 |

@@ -20,7 +20,7 @@ export const fighterSelectChecks = (pass: readonly Rule[]): NativeCheck[] => [
     ],
     capture: [{ kind: "frames", name: "portrait-chips", client: "a" }],
     pass,
-    look: "Cards 1-3 show Illidan, Jaina and the Firelord, and their roster grid tiles, each a head-and-shoulders bust at about the roster's head size, none a small figure floating in its tile or chip; the computer card's preview sits centred in its preview area above its summary.",
+    look: "Cards 1-3 show Illidan, Jaina and Ragnaros, and their roster grid tiles, each a head-and-shoulders bust at about the roster's head size, none a small figure floating in its tile or chip; the computer card's preview sits centred in its preview area above its summary.",
   },
   {
     id: "797-murloc-select", closes: "smashcraft#797", map: "fighter-select", session: "797-murloc-portrait",

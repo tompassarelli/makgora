@@ -1,4 +1,4 @@
-# Goblin Tinker
+# Gazlowe
 
 Tinker is a heavyweight gadget fighter. A destructible Pocket Factory sends
 Clockwerk Goblins along the floor; rockets challenge jumps; a tracking Laser
@@ -7,6 +7,8 @@ readable wind-up and long end lag. He wins by
 standing near his machinery and loses space while replacing it. His short
 claws cannot contest a sword at its tip. All combat values below are original,
 provisional Smashcraft tuning; references establish roles, not copied hitboxes.
+
+Tom asked on 2026-11-01 to show this fighter to players as Gazlowe. Gazlowe is Warcraft's goblin engineer, and Heroes of the Storm built his kit from the same Tinker toolset (laser, turrets, Robo-Goblin). Only the display name changed: the Character code, the hero key "Goblin Tinker", the slug goblin-tinker, folders, generated art and the balance baseline keys keep their internal names.
 
 ## Research and body
 

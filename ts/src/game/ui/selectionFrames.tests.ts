@@ -1,8 +1,10 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { rosterGrid } from "../menu/selectionGrid";
-import { fighterSlug, PLAYABLE_CHARACTERS } from "../roster/kits";
+import { fighterKey, fighterSlug, PLAYABLE_CHARACTERS } from "../roster/kits";
+import { Character } from "../sim/codes";
+import { hudTitle } from "./duoTitle";
 import { RANDOM_FIGHTER } from "../lobby/lobbyState";
-import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, tileOfCharacter } from "./selectionFrames";
+import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, nameText, tileLabel, tileOfCharacter } from "./selectionFrames";
 
 const FACTION_ORDER = [
   "thrall", "grom-hellscream", "cairne-bloodhoof", "beastmaster", "blademaster", "shadow-hunter", "peon",
@@ -34,4 +36,15 @@ test("Every playable fighter owns exactly one select grid tile, and each tile ma
   }
   for (let tile = 0; tile < ROSTER_TILES; tile++) assertEquals(tileOfCharacter(characterOfTile(tile)), tile);
   assertTrue(tileOfCharacter(RANDOM_FIGHTER) === RANDOM_FIGHTER_TILE);
+});
+
+test("A select card, a roster tile and the match HUD plate show Ragnaros and Gazlowe, never the internal Firelord and Goblin Tinker keys [k1 scenario]", () => {
+  assertEquals(nameText(Character.firelord), "Ragnaros (WIP)");
+  assertEquals(hudTitle(Character.firelord, false), "RAGNAROS (WIP)");
+  assertEquals(tileLabel(tileOfCharacter(Character.firelord)), "Ragnaros (WIP)");
+  assertEquals(nameText(Character.tinker), "Gazlowe");
+  assertEquals(hudTitle(Character.tinker, false), "GAZLOWE");
+  assertEquals(tileLabel(tileOfCharacter(Character.tinker)), "Gazlowe");
+  assertEquals(fighterKey(Character.firelord), "Firelord");
+  assertEquals(fighterKey(Character.tinker), "Goblin Tinker");
 });

@@ -31,7 +31,7 @@ downward contact and recovery poses, fitted to the existing move frames.
 | Cairne Bloodhoof | 0 | -25 / 57.7 | Cairne downAir #27 | Melee Captain Falcon and Ganondorf two-foot stomp | Pass → Pass: two-handed overhead halberd slam driven straight down beneath him, replacing the hoof stomp (#96) |
 | Chen Stormstout | 12 | -27 / 44.32 | Chen downAir #27 | Staff strike below the waist | Pass: authored downward contact reviewed in both facings |
 | Peon | 10 | -31 / 35.68 | Peon downAir #37 | Axe head driven downward | Pass: authored downward contact reviewed in both facings |
-| Goblin Tinker | 0 | -44 / 39.82 | Tinker downAir #39 | Mechanical claws pointed below the goblin | Pass: authored downward contact reviewed in both facings |
+| Gazlowe | 0 | -44 / 39.82 | Tinker downAir #39 | Mechanical claws pointed below the goblin | Pass: authored downward contact reviewed in both facings |
 | Kael'thas Sunstrider | 0 | -28 / 54.88 | Kaelthas downAir #26 | Fire sphere cast below the torso | Pass: authored downward contact reviewed in both facings |
 
 Sources: [Link in Melee](https://www.ssbwiki.com/Link_(SSBM)),

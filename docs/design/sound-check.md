@@ -32,7 +32,7 @@ smash, neutral air, the four specials), kept outside the repository under
 | Cairne Bloodhoof | 20 | 20/20 | 16/20 | 16-cairne-bloodhoof.ogg |
 | Chen Stormstout | 21 | 21/21 | 17/21 | 17-chen-stormstout.ogg |
 | Peon | 20 | 20/20 | 15/20 | 18-peon.ogg |
-| Goblin Tinker | 21 | 21/21 | 17/21 | 19-goblin-tinker.ogg |
+| Gazlowe | 21 | 21/21 | 17/21 | 19-goblin-tinker.ogg |
 | Kael'thas Sunstrider | 22 | 22/22 | 19/22 | 20-kael-thas-sunstrider.ogg |
 | Mrgl & Grgl | 22 | 22/22 | 18/22 | 21-murloc.ogg |
 | Grom Hellscream | 22 | 22/22 | 19/22 | 22-grom-hellscream.ogg |

@@ -12,7 +12,7 @@ export const VICTORY_UNJOINTED: Readonly<Record<string, string>> = {
 export const VICTORY_SEAM_DEBT: Readonly<Record<string, string>> = {
     Illidan: 'his right arm opens its seam at frame 75 as the V drops',
     Rokhan: 'his raised arms pull out of the shoulders through the cheer',
-    'Goblin Tinker': 'his raised arm pulls out of its shoulder',
+    Gazlowe: 'his raised arm pulls out of its shoulder',
     Medivh: 'his raised arm pulls out of its shoulder',
     Uther: 'the stock Stand Victory lifts his right arm 0.32 shoulder widths out of its pauldron',
 };

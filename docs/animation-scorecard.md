@@ -368,7 +368,7 @@ tip from the move's first frame, so a fighter whose ready pose carries the
 weapon behind the shoulder (Grom's axe) passed only by starting with the weapon
 already thrust forward, and nine fresh judges then read his windup as a flick
 (anticipation 2 and 3). Measured from the windup, the four dash attacks whose
-three judges score 4 on every line give body shares of 1.00 (Goblin Tinker,
+three judges score 4 on every line give body shares of 1.00 (Gazlowe,
 Malfurion), .83 (Kael'thas) and .25 (Medivh, staff drawn behind the hip); 90%
 of the smallest, rounded outward, sets the line at .22, and a dash attack whose
 shoulder stays planted still scores 0.

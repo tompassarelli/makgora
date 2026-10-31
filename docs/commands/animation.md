@@ -336,7 +336,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   recovery, paired throws and nine pain reactions. It writes the private
   model, both-facing silhouette sheets, clip metadata and measured stride;
   `--no-pool` leaves pooled export to the combined roster pass
-  (smashcraft:docs/fighter-animation-work.md, "Goblin Tinker"). Given the shipped
+  (smashcraft:docs/fighter-animation-work.md, "Gazlowe"). Given the shipped
   model instead, `pain` re-keys the nine pain cells and `rekey POSE...` re-keys the
   named clips in place at their shipped indices and lengths, leaving every other
   sequence unchanged. A phase's `travel` moves the whole drawn body forward by that

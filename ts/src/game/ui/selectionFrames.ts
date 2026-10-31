@@ -27,7 +27,7 @@ export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.sylvanas]: "Sylvanas",
   [Character.cairne]: "Cairne",
   [Character.chen]: "Chen",
-  [Character.tinker]: "Tinker",
+  [Character.tinker]: "Gazlowe",
   [Character.kaelthas]: "Kael'thas",
   [Character.grom]: "Grom",
   [Character.malfurion]: "Malfurion",

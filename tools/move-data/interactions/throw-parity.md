@@ -422,22 +422,22 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Peon | down | 30 | 6 | 32 | 26 | 17 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Peon | down | 60 | 6 | 32 | 26 | 17 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Peon | down | 90 | 6 | 32 | 26 | 17 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Goblin Tinker | forward | 0 | 5 | 28 | 23 | 14 | 8.3, 0 | 71.8 at 35° |
-| Goblin Tinker | forward | 30 | 8 | 31 | 23 | 14 | 8.3, 0 | 77.7 at 35° |
-| Goblin Tinker | forward | 60 | 10 | 33 | 23 | 14 | 8.3, 0 | 83.7 at 35°, tumble, knockdown at +14 |
-| Goblin Tinker | forward | 90 | 12 | 35 | 23 | 14 | 8.3, 0 | 89.6 at 35°, tumble, knockdown at +15 |
-| Goblin Tinker | back | 0 | 3 | 29 | 26 | 18 | -8.3, 0 | 74.3 at 150° |
-| Goblin Tinker | back | 30 | 5 | 31 | 26 | 18 | -8.3, 0 | 78.6 at 150° |
-| Goblin Tinker | back | 60 | 7 | 33 | 26 | 18 | -8.3, 0 | 83 at 150°, tumble, knockdown at +12 |
-| Goblin Tinker | back | 90 | 8 | 34 | 26 | 18 | -8.3, 0 | 87.3 at 150°, tumble, knockdown at +13 |
-| Goblin Tinker | up | 0 | 15 | 25 | 10 | 15 | 8.3, 10.8 | 63.3 at 85° |
-| Goblin Tinker | up | 30 | 19 | 29 | 10 | 15 | 8.3, 10.8 | 72.6 at 85° |
-| Goblin Tinker | up | 60 | 22 | 32 | 10 | 15 | 8.3, 10.8 | 81.9 at 85°, tumble, knockdown at +28 |
-| Goblin Tinker | up | 90 | 26 | 36 | 10 | 15 | 8.3, 10.8 | 91.3 at 85°, tumble, knockdown at +32 |
-| Goblin Tinker | down | 0 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Goblin Tinker | down | 30 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Goblin Tinker | down | 60 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Goblin Tinker | down | 90 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Gazlowe | forward | 0 | 5 | 28 | 23 | 14 | 8.3, 0 | 71.8 at 35° |
+| Gazlowe | forward | 30 | 8 | 31 | 23 | 14 | 8.3, 0 | 77.7 at 35° |
+| Gazlowe | forward | 60 | 10 | 33 | 23 | 14 | 8.3, 0 | 83.7 at 35°, tumble, knockdown at +14 |
+| Gazlowe | forward | 90 | 12 | 35 | 23 | 14 | 8.3, 0 | 89.6 at 35°, tumble, knockdown at +15 |
+| Gazlowe | back | 0 | 3 | 29 | 26 | 18 | -8.3, 0 | 74.3 at 150° |
+| Gazlowe | back | 30 | 5 | 31 | 26 | 18 | -8.3, 0 | 78.6 at 150° |
+| Gazlowe | back | 60 | 7 | 33 | 26 | 18 | -8.3, 0 | 83 at 150°, tumble, knockdown at +12 |
+| Gazlowe | back | 90 | 8 | 34 | 26 | 18 | -8.3, 0 | 87.3 at 150°, tumble, knockdown at +13 |
+| Gazlowe | up | 0 | 15 | 25 | 10 | 15 | 8.3, 10.8 | 63.3 at 85° |
+| Gazlowe | up | 30 | 19 | 29 | 10 | 15 | 8.3, 10.8 | 72.6 at 85° |
+| Gazlowe | up | 60 | 22 | 32 | 10 | 15 | 8.3, 10.8 | 81.9 at 85°, tumble, knockdown at +28 |
+| Gazlowe | up | 90 | 26 | 36 | 10 | 15 | 8.3, 10.8 | 91.3 at 85°, tumble, knockdown at +32 |
+| Gazlowe | down | 0 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Gazlowe | down | 30 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Gazlowe | down | 60 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Gazlowe | down | 90 | 6 | 32 | 26 | 19 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Kael'thas Sunstrider | forward | 0 | 7 | 26 | 19 | 14 | 8.3, 0 | 66.7 at 25° |
 | Kael'thas Sunstrider | forward | 30 | 10 | 29 | 19 | 14 | 8.3, 0 | 73.2 at 25° |
 | Kael'thas Sunstrider | forward | 60 | 12 | 31 | 19 | 14 | 8.3, 0 | 79.6 at 25° |

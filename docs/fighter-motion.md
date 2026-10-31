@@ -344,26 +344,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Peon | ledge-get-up | 64: Peon ledgeClimb | 103.6 | 63.9 | up; 98.9/1.0 |
 | Peon | ledge-roll | 58: Peon ledgeRoll | 109.1 | 60.4 | forward; 58.2/98.8 |
 | Peon | ledge-attack | 65: Peon ledgeAttack | 171.7 | 70.6 | both; 71.1/44.3 |
-| Goblin Tinker | walk | 0: Walk | 97.4 | 30.3 | forward; 94.3/94.7 |
-| Goblin Tinker | dash | 0: Walk | 97.5 | 29.8 | forward; 94.2/93.8 |
-| Goblin Tinker | run | 0: Walk | 99.8 | 27.3 | forward; 99.6/78.7 |
-| Goblin Tinker | turn | 53: Tinker turn | 152.7 | 41.2 | back; 116.5/152.7 |
-| Goblin Tinker | brake | 54: Tinker stop | 32.8 | 14.9 | in place; 25.1/10.6 |
-| Goblin Tinker | jump-squat | 55: Tinker jumpSquat | 60.7 | 16.6 | down; 40.5/54.9 |
-| Goblin Tinker | roll-forward | 65: Tinker rollForward | 172.0 | 81.7 | forward; 128.7/163.0 |
-| Goblin Tinker | roll-back | 66: Tinker rollBackward | 172.0 | 81.4 | back; 162.9/127.8 |
-| Goblin Tinker | spot-dodge | 63: Tinker spotDodge | 92.1 | 28.8 | in place; 14.4/60.0 |
-| Goblin Tinker | air-dodge | 64: Tinker airDodge | 90.7 | 21.4 | in place; 11.3/64.9 |
-| Goblin Tinker | tech | 75: Tinker tech | 137.8 | 57.1 | in place; 90.1/105.0 |
-| Goblin Tinker | tech-forward | 67: Tinker techForward | 199.5 | 86.0 | forward; 94.9/191.2 |
-| Goblin Tinker | tech-back | 68: Tinker techBackward | 199.0 | 86.0 | back; 191.7/95.7 |
-| Goblin Tinker | get-up | 74: Tinker getUp | 126.1 | 58.1 | up; 125.5/92.8 |
-| Goblin Tinker | get-up-forward | 69: Tinker getUpRollForward | 199.7 | 85.9 | forward; 95.1/191.2 |
-| Goblin Tinker | get-up-back | 70: Tinker getUpRollBackward | 198.8 | 86.0 | back; 191.7/95.7 |
-| Goblin Tinker | get-up-attack | 76: Tinker getUpAttack | 208.3 | 77.3 | both; 96.5/175.0 |
-| Goblin Tinker | ledge-get-up | 78: Tinker ledgeClimb | 149.0 | 75.6 | up; 125.2/9.4 |
-| Goblin Tinker | ledge-roll | 71: Tinker ledgeRoll | 199.7 | 85.9 | forward; 95.1/191.2 |
-| Goblin Tinker | ledge-attack | 79: Tinker ledgeAttack | 153.4 | 79.3 | both; 124.5/22.6 |
+| Gazlowe | walk | 0: Walk | 97.4 | 30.3 | forward; 94.3/94.7 |
+| Gazlowe | dash | 0: Walk | 97.5 | 29.8 | forward; 94.2/93.8 |
+| Gazlowe | run | 0: Walk | 99.8 | 27.3 | forward; 99.6/78.7 |
+| Gazlowe | turn | 53: Tinker turn | 152.7 | 41.2 | back; 116.5/152.7 |
+| Gazlowe | brake | 54: Tinker stop | 32.8 | 14.9 | in place; 25.1/10.6 |
+| Gazlowe | jump-squat | 55: Tinker jumpSquat | 60.7 | 16.6 | down; 40.5/54.9 |
+| Gazlowe | roll-forward | 65: Tinker rollForward | 172.0 | 81.7 | forward; 128.7/163.0 |
+| Gazlowe | roll-back | 66: Tinker rollBackward | 172.0 | 81.4 | back; 162.9/127.8 |
+| Gazlowe | spot-dodge | 63: Tinker spotDodge | 92.1 | 28.8 | in place; 14.4/60.0 |
+| Gazlowe | air-dodge | 64: Tinker airDodge | 90.7 | 21.4 | in place; 11.3/64.9 |
+| Gazlowe | tech | 75: Tinker tech | 137.8 | 57.1 | in place; 90.1/105.0 |
+| Gazlowe | tech-forward | 67: Tinker techForward | 199.5 | 86.0 | forward; 94.9/191.2 |
+| Gazlowe | tech-back | 68: Tinker techBackward | 199.0 | 86.0 | back; 191.7/95.7 |
+| Gazlowe | get-up | 74: Tinker getUp | 126.1 | 58.1 | up; 125.5/92.8 |
+| Gazlowe | get-up-forward | 69: Tinker getUpRollForward | 199.7 | 85.9 | forward; 95.1/191.2 |
+| Gazlowe | get-up-back | 70: Tinker getUpRollBackward | 198.8 | 86.0 | back; 191.7/95.7 |
+| Gazlowe | get-up-attack | 76: Tinker getUpAttack | 208.3 | 77.3 | both; 96.5/175.0 |
+| Gazlowe | ledge-get-up | 78: Tinker ledgeClimb | 149.0 | 75.6 | up; 125.2/9.4 |
+| Gazlowe | ledge-roll | 71: Tinker ledgeRoll | 199.7 | 85.9 | forward; 95.1/191.2 |
+| Gazlowe | ledge-attack | 79: Tinker ledgeAttack | 153.4 | 79.3 | both; 124.5/22.6 |
 | Kael'thas Sunstrider | walk | 2: Walk | 92.3 | 25.1 | forward; 90.7/92.2 |
 | Kael'thas Sunstrider | dash | 2: Walk | 86.9 | 24.2 | forward; 75.2/86.5 |
 | Kael'thas Sunstrider | run | 2: Walk | 76.8 | 20.2 | forward; 68.1/76.4 |
@@ -584,26 +584,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Akama (WIP) | ledge-get-up | 2: Walk | 110.3 | 51.9 | up; 65.3/86.5 |
 | Akama (WIP) | ledge-roll | 2: Walk | 110.5 | 52.0 | forward; 88.7/107.4 |
 | Akama (WIP) | ledge-attack | 5: Attack - 1HVar1 | 271.2 | 75.0 | both; 127.9/191.3 |
-| Firelord (WIP) | walk | 2: Walk | 105.6 | 41.2 | forward; 63.3/97.2 |
-| Firelord (WIP) | dash | 2: Walk | 87.2 | 32.5 | forward; 60.8/80.7 |
-| Firelord (WIP) | run | 2: Walk | 160.1 | 42.7 | forward; 95.7/144.2 |
-| Firelord (WIP) | turn | 2: Walk | 29.8 | 13.4 | back; 27.3/26.7 |
-| Firelord (WIP) | brake | 2: Walk | 34.7 | 14.9 | in place; 30.0/30.3 |
-| Firelord (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
-| Firelord (WIP) | roll-forward | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.1 |
-| Firelord (WIP) | roll-back | 2: Walk | 105.6 | 41.2 | back; 97.1/63.6 |
-| Firelord (WIP) | spot-dodge | 8: Stand Ready | 22.6 | 6.3 | in place; 15.6/16.4 |
-| Firelord (WIP) | air-dodge | 8: Stand Ready | 22.7 | 6.4 | in place; 15.8/16.4 |
-| Firelord (WIP) | tech | 0: Stand | 22.6 | 6.4 | in place; 16.1/16.4 |
-| Firelord (WIP) | tech-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
-| Firelord (WIP) | tech-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
-| Firelord (WIP) | get-up | 8: Stand Ready | 22.7 | 6.3 | up; 22.2/12.3 |
-| Firelord (WIP) | get-up-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
-| Firelord (WIP) | get-up-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
-| Firelord (WIP) | get-up-attack | 4: Attack - 2 | 199.5 | 66.9 | both; 103.5/196.6 |
-| Firelord (WIP) | ledge-get-up | 2: Walk | 105.7 | 41.1 | up; 50.9/61.6 |
-| Firelord (WIP) | ledge-roll | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.7 |
-| Firelord (WIP) | ledge-attack | 3: Attack | 220.7 | 66.1 | both; 129.6/220.5 |
+| Ragnaros (WIP) | walk | 2: Walk | 105.6 | 41.2 | forward; 63.3/97.2 |
+| Ragnaros (WIP) | dash | 2: Walk | 87.2 | 32.5 | forward; 60.8/80.7 |
+| Ragnaros (WIP) | run | 2: Walk | 160.1 | 42.7 | forward; 95.7/144.2 |
+| Ragnaros (WIP) | turn | 2: Walk | 29.8 | 13.4 | back; 27.3/26.7 |
+| Ragnaros (WIP) | brake | 2: Walk | 34.7 | 14.9 | in place; 30.0/30.3 |
+| Ragnaros (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
+| Ragnaros (WIP) | roll-forward | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.1 |
+| Ragnaros (WIP) | roll-back | 2: Walk | 105.6 | 41.2 | back; 97.1/63.6 |
+| Ragnaros (WIP) | spot-dodge | 8: Stand Ready | 22.6 | 6.3 | in place; 15.6/16.4 |
+| Ragnaros (WIP) | air-dodge | 8: Stand Ready | 22.7 | 6.4 | in place; 15.8/16.4 |
+| Ragnaros (WIP) | tech | 0: Stand | 22.6 | 6.4 | in place; 16.1/16.4 |
+| Ragnaros (WIP) | tech-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
+| Ragnaros (WIP) | tech-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
+| Ragnaros (WIP) | get-up | 8: Stand Ready | 22.7 | 6.3 | up; 22.2/12.3 |
+| Ragnaros (WIP) | get-up-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
+| Ragnaros (WIP) | get-up-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
+| Ragnaros (WIP) | get-up-attack | 4: Attack - 2 | 199.5 | 66.9 | both; 103.5/196.6 |
+| Ragnaros (WIP) | ledge-get-up | 2: Walk | 105.7 | 41.1 | up; 50.9/61.6 |
+| Ragnaros (WIP) | ledge-roll | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.7 |
+| Ragnaros (WIP) | ledge-attack | 3: Attack | 220.7 | 66.1 | both; 129.6/220.5 |
 | Alchemist (WIP) | walk | 4: Walk 1 | 114.4 | 31.2 | forward; 107.5/108.9 |
 | Alchemist (WIP) | dash | 4: Walk 1 | 100.6 | 29.9 | forward; 91.9/93.0 |
 | Alchemist (WIP) | run | 4: Walk 1 | 98.1 | 38.0 | forward; 82.8/57.1 |
@@ -665,4 +665,4 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Onyxia | ledge-roll | 3: Walk | 182.8 | 15.1 | forward; 118.8/28.9 |
 | Onyxia | ledge-attack | 1: Attack 1 | 186.9 | 51.5 | both; 87.7/55.8 |
 
-Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Firelord and Lady Vashj. Warden, Tyrande and Jaina are grounded and their models carry a single stock Walk, so Tyrande runs on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on that clip (`--walk`), which her stride lock holds at 3.38x with no slide, and runs and dashes on her stock Walk, which needs 6.17x at run speed and 5.36x at dash speed, so her cap is 6.25x (groundLocomotionRateCap) instead of 5x and her feet stay on the ground at both (Tom asked for this split on 2026-10-31). Jaina (about 1.15x) is marginal and stays on her walk.
+Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Ragnaros and Lady Vashj. Warden, Tyrande and Jaina are grounded and their models carry a single stock Walk, so Tyrande runs on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on that clip (`--walk`), which her stride lock holds at 3.38x with no slide, and runs and dashes on her stock Walk, which needs 6.17x at run speed and 5.36x at dash speed, so her cap is 6.25x (groundLocomotionRateCap) instead of 5x and her feet stay on the ground at both (Tom asked for this split on 2026-10-31). Jaina (about 1.15x) is marginal and stays on her walk.
