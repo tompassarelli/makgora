@@ -66,13 +66,14 @@ jobs:
         run: |
           git clone https://github.com/ladislav-zezula/CascLib "$RUNNER_TEMP/casclib"
           git -C "$RUNNER_TEMP/casclib" checkout "$CASCLIB_COMMIT"
-          cmake -S tools/player -B "$RUNNER_TEMP/casc-build" -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCASCLIB_SOURCE="$RUNNER_TEMP/casclib"
+          extra=(); [ "${{ matrix.name }}" = linux ] && extra=("-DCMAKE_CXX_FLAGS=-DLPDWORD=DWORD*")
+          cmake -S tools/player -B "$RUNNER_TEMP/casc-build" "${extra[@]}" -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCASCLIB_SOURCE="$RUNNER_TEMP/casclib"
           cmake --build "$RUNNER_TEMP/casc-build" --config Release --target casc-extract
           built=$(find "$RUNNER_TEMP/casc-build" -name 'casc-extract*' -type f \( -name casc-extract -o -name casc-extract.exe \) | head -1)
           cp "$built" "$RUNNER_TEMP/tools/"
       - name: Build the package
         run: |
-          library=$(find ts/node_modules/wisp/window/target/release -maxdepth 1 \( -name libwisp_window.so -o -name wisp_window.dll \) | head -1)
+          library=$(find node_modules/wisp/window/target/release -maxdepth 1 \( -name libwisp_window.so -o -name wisp_window.dll \) | head -1)
           bun scripts/playerBuild.ts --out "$RUNNER_TEMP/package/smashcraft-play-${{ matrix.name }}" --library "$PWD/$library" --tools "$RUNNER_TEMP/tools" --commit "$GITHUB_SHA"
         working-directory: ts
       - name: Run it where Bun is not on the path
