@@ -1,0 +1,23 @@
+# Firelord's Submerge facing right: a Lava Raze one step ahead leaves a scorch of embers on the floor from match frame 301, he runs past it, then sinks on 362 and comes up on the scorch on 374, 12 frames later.
+#! cue 270-283 crack: effect=FlameStrikeTarget
+#! cue 280-300 column: effect=FlameStrike1
+#! cue 296-481 crater: effect=FlameStrikeEmbers
+#! chat -dev quick hero firelord hit-areas
+250 a stick 1 0
+256 a stick 0 -1
+260 a tap X 2
+276 a capture
+284 a capture
+302 a capture
+310 a capture
+318 a stick 1 0
+340 a capture
+362 a tap X 2
+364 a capture
+368 a capture
+372 a capture
+375 a capture
+378 a capture
+386 a capture
+400 a capture
+410 a stick 0 0
