@@ -392,7 +392,7 @@ const MEDIVH: AuthoredSpecial = {
 };
 
 
-export const VASHJ_TRAIL_MODEL = "Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx";
+export const VASHJ_TRAIL_MODEL = "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx";
 
 const GAZE_STREAKS: readonly SpecialProjectile[] = [21, 33].flatMap(spawn => [-6.0, -3.0, 0.0, 3.0, 6.0].map(drift => ({ ...mark(VASHJ_TRAIL_MODEL, spawn, 20, 40.0, 120.0), velocityX: 24.0, velocityZ: drift })));
 

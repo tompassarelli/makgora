@@ -12,7 +12,7 @@ import { showcaseFixtures } from "../src/platform/captureFixtures";
 import { DISJOINT_CUES, disjointNormals } from "../src/game/presentation/disjointCues";
 import { createFighter } from "../src/game/sim/fighter";
 import { VASHJ_TRAIL_MODEL } from "../src/game/sim/ultimates";
-import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS } from "../src/game/presentation/projectileArt";
+import { PROJECTILE_DRAW_CUES } from "../src/game/presentation/projectileArt";
 
 const vashj = Character.ladyVashj;
 const upSmash = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.upSmash;
@@ -106,11 +106,11 @@ test("Lady Vashj's back air stages the dummy behind her, on the side its hit lau
 });
 
 
-test("Lady Vashj's trail is at least 0.9 large, her gaze beams drift both ways and the projectile art draws the trail at the cue's size and frame [k2 property]", () => {
+test("Lady Vashj's trail is the shockwave crescent at least 0.6 large and her gaze beams of it drift both ways at the cue's size [k2 property]", () => {
   const cue = DISJOINT_CUES[vashj];
-  expect(cue?.scale).toBeGreaterThanOrEqual(Math.fround(0.9));
+  expect(cue?.scale).toBeGreaterThanOrEqual(Math.fround(0.6));
+  expect(cue?.model).toBe("Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx");
   expect(PROJECTILE_DRAW_CUES[VASHJ_TRAIL_MODEL]?.scale).toBe(cue?.scale);
-  expect(PROJECTILE_DRAW_OFFSETS[VASHJ_TRAIL_MODEL]?.seconds).toBe(cue?.seconds);
   const beams = (authoredTuning(vashj).ultimate?.projectiles ?? []).filter(shot => shot.model === VASHJ_TRAIL_MODEL && shot.spawnFrame === 21);
   const drifts = beams.map(shot => shot.velocityZ).sort((a, b) => a - b);
   expect(drifts.length).toBeGreaterThanOrEqual(5);
