@@ -54,6 +54,7 @@ import type { UiObjects } from "./ui";
 import type { NativePadCapture } from "./analogPad";
 import type { HiddenFighter } from "./fighterCloak";
 import { type KeyTracker, keyTracker } from "../../platform/osKeys";
+import { localPlayer, playerSlot } from "wisp/game/players";
 
 
 export interface StageDrifter {
@@ -478,7 +479,7 @@ export function activeRollback(state: Readonly<ShellState>): Rollback | undefine
 }
 
 export function localSlot(): number {
-  return GetPlayerId(GetLocalPlayer());
+  return playerSlot(localPlayer());
 }
 
 

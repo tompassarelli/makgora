@@ -2,6 +2,7 @@
 
 import { frameCostClockFile } from "../../game/core/gameFiles";
 import { displayText } from "wisp/game/frames";
+import { localPlayer, playerSlot } from "wisp/game/players";
 declare const os: { readonly clock?: () => number } | undefined;
 
 const WORK_ITERATIONS = 100000;
@@ -34,9 +35,9 @@ export function probeFrameCostClock(): void {
     + ` os.delta=${osBefore === undefined || osAfter === undefined ? "n/a" : seconds(osAfter - osBefore)}`
     + ` timer.before=${seconds(timerBefore)} timer.after=${seconds(timerAfter)}`
     + ` timer.delta=${seconds(timerAfter - timerBefore)} work=${I2S(work)}`;
-  displayText(GetLocalPlayer(), 0.0, 0.0, message);
+  displayText(localPlayer(), 0.0, 0.0, message);
   PreloadGenClear();
   PreloadGenStart();
   Preload(message);
-  PreloadGenEnd(frameCostClockFile(GetPlayerId(GetLocalPlayer())));
+  PreloadGenEnd(frameCostClockFile(playerSlot(localPlayer())));
 }

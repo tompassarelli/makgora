@@ -14,6 +14,7 @@ import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { fighterModelScale } from "../../game/presentation/fighterScale";
 import { createEffect, destroyEffect, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { player as playerOf, setPlayerColor } from "wisp/game/players";
 
 
 const CROW_FORM = 0x416d7266;
@@ -27,7 +28,7 @@ const placement = { x: 0.0, z: 0.0 };
 export function colorFighterBody(body: FighterBody, slot: number, color: number): void {
   if (body.color === color) return;
   body.color = color;
-  SetPlayerColor(Player(slot), ConvertPlayerColor(color));
+  setPlayerColor(playerOf(slot), color);
   SetUnitColor(body.unit, ConvertPlayerColor(color));
 }
 

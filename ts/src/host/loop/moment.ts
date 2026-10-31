@@ -9,6 +9,7 @@ import { beginMomentSave, continueMomentSave, isMomentRequest, momentInput, mome
 import { journalIngress } from "../../game/session/build";
 import { consumeEditbox, peekEditbox } from "./journal";
 import { type Journal, type Rollback, type ShellState, localSlot } from "./state";
+import { eventPlayer, playerSlot } from "wisp/game/players";
 
 export const SAVE_MOMENT = "shell.saveMoment";
 
@@ -27,7 +28,7 @@ function saveMoment(s: ShellState): void {
 
 
 export function momentKey(s: ShellState): void {
-  if (journalIngress(s.build) !== "keyboard" && GetPlayerId(GetTriggerPlayer()) === localSlot()) saveMoment(s);
+  if (journalIngress(s.build) !== "keyboard" && playerSlot(eventPlayer()) === localSlot()) saveMoment(s);
 }
 
 

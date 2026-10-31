@@ -5,6 +5,7 @@ import { applyFighterObject, applyFileIoObject } from "../../platform/objectData
 import { confirmedChecksum } from "./diagnostics";
 import { shellState } from "./state";
 import { objectDataReceiptFile } from "../../game/core/gameFiles";
+import { localPlayer, playerSlot } from "wisp/game/players";
 
 // install() runs on the same synchronized frame on every client.
 export function installObjectData(): void {
@@ -26,7 +27,7 @@ export function installObjectData(): void {
   if (!s.build.devConsole) return;
   const text = fields.join("\n");
   const objectChecksum = checksum(text.length, index => text.charCodeAt(index));
-  writeLines(objectDataReceiptFile(GetPlayerId(GetLocalPlayer())), [
+  writeLines(objectDataReceiptFile(playerSlot(localPlayer())), [
     `object-data frame ${s.runtime.simulationFrame} objects ${objectChecksum} state ${confirmedChecksum(s)}`,
     ...fields,
   ]);

@@ -14,6 +14,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/
 import type { MatchCamera } from "../../game/sim/matchCamera";
 import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { cameraField, cameraTargetX } from "wisp/game/view";
+import { localPlayer, playerSlot } from "wisp/game/players";
 
 const ROW_LIMIT = 7200;
 const PAGE_ROWS = 150;
@@ -294,7 +295,7 @@ export function probeTransportReceive(probe: ResponseProbe | undefined, epoch: n
 function stampEdge(probe: ResponseProbe, stage: "poll" | "present"): void {
   const row = currentRow(probe);
   if (!probe.recording || !probe.edgeStamps || probe.exporting || row === undefined || probe.row === undefined) return;
-  const slot = GetPlayerId(GetLocalPlayer());
+  const slot = playerSlot(localPlayer());
   writeLines(edgeStampFile(slot, probe.run, probe.row, stage), [
     `EDGE v=1 build=${probe.build} local=${slot} run=${probe.run} row=${probe.row} stage=${stage} held=${row.held ?? -1} pressed=${row.pressed ?? -1} released=${row.released ?? -1} active=${BlzIsLocalClientActive() ? 1 : 0} native_ms=${R2S(nowMs(probe))}`,
   ]);
@@ -396,7 +397,7 @@ export function probePresent(probe: ResponseProbe | undefined, confirmedShield: 
 
 export function exportProbePage(probe: ResponseProbe): void {
   if (!probe.exporting) return;
-  const slot = GetPlayerId(GetLocalPlayer());
+  const slot = playerSlot(localPlayer());
   const first = probe.page * PAGE_ROWS;
   const last = first + PAGE_ROWS;
   const lines = [

@@ -9,6 +9,7 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type ShellState, localSlot } from "./state";
 import { osKeyDown } from "../../platform/osKeys";
 import { createEvents, onEvents } from "wisp/game/events";
+import { eventPlayer, localPlayer, player } from "wisp/game/players";
 
 export const PAD_MOUSE = "shell.padMouse";
 
@@ -29,7 +30,7 @@ export function createPadTriggers(s: ShellState): void {
   if (s.pad === undefined || (s.build.analogPadDiagnostic !== true && s.build.analogPad !== "cursor")) return;
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanActive(s.game, slot)) TriggerRegisterPlayerEvent(trigger, Player(slot), EVENT_PLAYER_MOUSE_MOVE);
+    if (humanActive(s.game, slot)) TriggerRegisterPlayerEvent(trigger, player(slot), EVENT_PLAYER_MOUSE_MOVE);
   }
   onEvents(trigger, trampoline(PAD_MOUSE));
 }
@@ -42,7 +43,7 @@ export function padMouse(s: ShellState): void {
     pad.mouse.push(`mouse ${pad.mouseEvents} ${s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock)} ${pad.syncEvents}`);
   }
 
-  if (GetTriggerPlayer() !== GetLocalPlayer() || !pressed(PAD_ACTIVE_KEY)) return;
+  if (eventPlayer() !== localPlayer() || !pressed(PAD_ACTIVE_KEY)) return;
   const point = { x: f32(BlzGetTriggerPlayerMouseX()), y: f32(BlzGetTriggerPlayerMouseY()) };
   if (pressed(0x21)) {
     pad.calibration.first = point;

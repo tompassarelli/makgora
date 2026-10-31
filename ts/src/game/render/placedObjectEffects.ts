@@ -16,6 +16,7 @@ import { bearState } from "../presentation/bearFeedback";
 import { BearFeedback } from "./bearFeedback";
 import { bindPrototype } from "../../platform/rebind";
 import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectBlendTime, setEffectPitch, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { player } from "wisp/game/players";
 
 
 const PLACED_OBJECT_MODEL = "Units\\Orc\\SerpentWard\\SerpentWard.mdx";
@@ -105,7 +106,7 @@ export class PlacedObjectEffects {
           parkOnce(model, this.origin, [], 0);
           looks[path] = model;
         }
-        if (path === imagePath) setEffectTeamColor(model, Player(slot));
+        if (path === imagePath) setEffectTeamColor(model, player(slot));
       }
       prepared[index] = looks;
       parked[index] = false;

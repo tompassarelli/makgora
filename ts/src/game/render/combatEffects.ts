@@ -47,7 +47,7 @@ import { heroLook } from "../roster/looks";
 import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes";
 import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
-
+import { player } from "wisp/game/players";
 
 const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
 const KO_FIGHTERS = KO_VARIANTS.length;
@@ -412,7 +412,7 @@ export class CombatEffects {
   private colourKo(model: effect, i: number, owner: number): void {
     if (this.koOwners[i] === owner) return;
     this.koOwners[i] = owner;
-    setEffectTeamColor(model, Player(owner));
+    setEffectTeamColor(model, player(owner));
   }
 
   private tint(model: effect, i: number, kind: number, strength: number): void {

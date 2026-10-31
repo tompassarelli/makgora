@@ -6,6 +6,7 @@ import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { COMMUNITY_BOX } from "./selectionLayout";
 import { destroyFrame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { player as playerOf } from "wisp/game/players";
 
 const CLOSE_BOX = { x: f32(0.32), y: f32(0.305), width: f32(0.16), height: f32(0.03) } as const;
 
@@ -36,7 +37,7 @@ export class CommunityMenu {
   }
 
   private click(button: CommunityButton, clicker: player): void {
-    if (clicker !== Player(this.participantId)) return;
+    if (clicker !== playerOf(this.participantId)) return;
     if (button.kind === "communityOpen") {
       this.state.open();
       this.onOpen();

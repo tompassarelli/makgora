@@ -10,6 +10,7 @@ import { type ShellState, activeRollback } from "./state";
 
 import { pausedKeyUsed } from "./pauseCamera";
 import { createEvents, onEvents } from "wisp/game/events";
+import { player } from "wisp/game/players";
 
 export const KEY_DOWN = "shell.keyDown";
 export const KEY_UP = "shell.keyUp";
@@ -69,7 +70,7 @@ const KEY_META_MASKS: readonly number[] = [META_NONE, META_SHIFT];
 export function registerKey(s: Readonly<ShellState>, trigger: trigger, key: number, down: boolean): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!humanActive(s.game, slot)) continue;
-    for (const meta of KEY_META_MASKS) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), meta, down);
+    for (const meta of KEY_META_MASKS) BlzTriggerRegisterPlayerKeyEvent(trigger, player(slot), ConvertOsKeyType(key), meta, down);
   }
 }
 

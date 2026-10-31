@@ -17,6 +17,7 @@ import { type Roster, isActive } from "../../game/sim/roster";
 import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from "./handleLedger";
 import { createEvents, onEvents } from "wisp/game/events";
 import { setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { eventPlayer, localPlayer, player, playerSlot } from "wisp/game/players";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
@@ -368,10 +369,10 @@ export function sendHandleLedger(game: Readonly<MatchState>): void {
 }
 
 export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>): void {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   const data = BlzGetTriggerSyncData();
   if (data.substring(0, 1) === LEDGER_MARK) {
-    receiveLedgerReport(handleLedger(), GetPlayerId(GetLocalPlayer()), slot, data);
+    receiveLedgerReport(handleLedger(), playerSlot(localPlayer()), slot, data);
     return;
   }
   const message = parseDelayMessage(data);
@@ -379,7 +380,7 @@ export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>):
     hostDelayFrom(net, game, slot, message.host);
     return;
   }
-  if (message.ping >= 0 && !net.measured && GetTriggerPlayer() === GetLocalPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - message.ping) * 100, 3));
+  if (message.ping >= 0 && !net.measured && eventPlayer() === localPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - message.ping) * 100, 3));
   if (slot < 0 || slot >= net.proposals.length) return;
   if (isFixedDelay(message.delay)) net.proposals[slot] = Math.max(DEFAULT_DELAY, message.delay);
   if (message.echo >= 0) net.slotEchoMs[slot] = message.echo;
@@ -389,6 +390,6 @@ export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>):
 
 export function registerDelayProposals(handler: string): void {
   const trigger = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), DELAY_PREFIX, false);
+  for (const slot of PARTICIPANT_SLOTS) BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), DELAY_PREFIX, false);
   onEvents(trigger, trampoline(handler));
 }

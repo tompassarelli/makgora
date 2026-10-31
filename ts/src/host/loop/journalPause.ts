@@ -18,6 +18,7 @@ import { syncKeyEvents } from "./keyEvents";
 import { traceInput } from "./trace";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
 import { startControl } from "./viewHud";
+import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
 
 export const CHAT_CLOSED_PREFIX = "SC_JH";
@@ -100,7 +101,7 @@ export function receiveControlAckEvent(s: ShellState): void {
   const epoch = journalEpoch(s);
   if (epoch === undefined) return;
   const { rollback, journal } = epoch;
-  const receipt = receiveControlAck(journal.barrier, s.game.humanMask, rollback.epoch, GetPlayerId(GetTriggerPlayer()), BlzGetTriggerSyncData());
+  const receipt = receiveControlAck(journal.barrier, s.game.humanMask, rollback.epoch, playerSlot(eventPlayer()), BlzGetTriggerSyncData());
   if (typeof receipt === "object") failJournal(s, rollback, journal, receipt.failure);
   else if (receipt === "complete") {
     const request = journal.barrier.request;
@@ -142,18 +143,18 @@ export function commitPauseAtFrame(s: ShellState, rollback: Rollback, journal: J
 
 export function chatEntered(s: ShellState): void {
   const epoch = journalEpoch(s);
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (epoch === undefined || !isParticipantSlot(slot)) return;
   const { journal } = epoch;
   if (s.game.phase !== Phase.match || journal.failed || !humanActive(s.game, slot) || journal.chatRequested[slot]) return;
   journal.chatRequested[slot] = true;
   journal.chatSerial[slot]++;
-  if (GetTriggerPlayer() === GetLocalPlayer()) journal.editbox?.requestChat(journal.chatSerial[slot]);
+  if (eventPlayer() === localPlayer()) journal.editbox?.requestChat(journal.chatSerial[slot]);
 }
 
 export function chatClosedEvent(s: ShellState): void {
   const epoch = journalEpoch(s);
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (epoch === undefined || !isParticipantSlot(slot)) return;
   const { rollback, journal } = epoch;
   if (BlzGetTriggerSyncData() === `${rollback.epoch}|${journal.chatSerial[slot]}`) journal.chatRequested[slot] = false;
@@ -180,7 +181,7 @@ export function servicePauseRequest(s: ShellState, rollback: Rollback, journal: 
 }
 
 function notePauser(s: ShellState): void {
-  const sender = GetPlayerId(GetTriggerPlayer());
+  const sender = playerSlot(eventPlayer());
   if (isParticipantSlot(sender)) s.pausedBy = sender;
 }
 
@@ -189,7 +190,7 @@ export function pauseRequestEvent(s: ShellState): void {
   if (epoch === undefined) return;
   const { rollback, journal } = epoch;
   if (s.game.phase !== Phase.match || journal.failed || journal.source === undefined) return;
-  if (!humanActive(s.game, GetPlayerId(GetTriggerPlayer()))) return;
+  if (!humanActive(s.game, playerSlot(eventPlayer()))) return;
   const wire = BlzGetTriggerSyncData();
   const epochPrefix = `JP1${padDecimal(rollback.epoch, 10)}`;
   if (journal.barrier.request !== undefined) {

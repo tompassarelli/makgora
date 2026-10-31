@@ -9,6 +9,7 @@ import { startMatch } from "./matchStart";
 import type { ShellState } from "./state";
 import { views } from "./ui";
 import { drawStage } from "./view";
+import { eventPlayer, playerSlot } from "wisp/game/players";
 
 export const STAGE_READY = "shell.stageReady";
 
@@ -51,5 +52,5 @@ export function serviceStageLoad(s: ShellState): void {
 
 export function stageReadyEvent(s: ShellState): void {
   const load = s.stageLoad;
-  if (load !== undefined && stageReported(load, GetPlayerId(GetTriggerPlayer()), BlzGetTriggerSyncData())) finishStageLoad(s);
+  if (load !== undefined && stageReported(load, playerSlot(eventPlayer()), BlzGetTriggerSyncData())) finishStageLoad(s);
 }

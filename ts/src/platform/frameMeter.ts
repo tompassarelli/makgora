@@ -13,6 +13,7 @@ import { activeRollback, shellState } from "../host/loop/state";
 import { FRAME_SECTIONS } from "../host/loop/frameSections";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayTimedText } from "wisp/game/frames";
+import { eventPlayer, player } from "wisp/game/players";
 
 
 const PERF_COMMAND = "-dev perf";
@@ -40,7 +41,7 @@ function captureCommand(): void {
   const frames = parseDecimal(text);
   if (frames === undefined || `${frames}` !== text) throw new Error("capture needs a whole frame count");
   const run = startFrameCostCapture(frames);
-  displayTimedText(GetTriggerPlayer(), 0, 0, 5, `dev: capture run=${run} frames=${frames} match-frame=${state.game.matchFrame}`);
+  displayTimedText(eventPlayer(), 0, 0, 5, `dev: capture run=${run} frames=${frames} match-frame=${state.game.matchFrame}`);
 }
 
 
@@ -61,6 +62,6 @@ export function startMatchFrameMeter(): void {
   });
   on(CAPTURE_HANDLER, captureCommand);
   const chat = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), CAPTURE_COMMAND, false);
+  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, player(slot), CAPTURE_COMMAND, false);
   onEvents(chat, trampoline(CAPTURE_HANDLER));
 }

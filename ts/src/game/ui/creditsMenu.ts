@@ -6,6 +6,7 @@ import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { CREDITS_BOX } from "./selectionLayout";
 import { destroyFrame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { player as playerOf } from "wisp/game/players";
 
 const CLOSE_BOX = { x: f32(0.32), y: f32(0.115), width: f32(0.16), height: f32(0.035) } as const;
 
@@ -36,7 +37,7 @@ export class CreditsMenu {
   }
 
   private click(button: CreditsButton, clicker: player): void {
-    if (clicker !== Player(this.participantId)) return;
+    if (clicker !== playerOf(this.participantId)) return;
     if (button.kind === "creditsOpen") {
       this.state.open();
       this.onOpen();

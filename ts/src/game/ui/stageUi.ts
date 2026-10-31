@@ -19,6 +19,7 @@ import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
 import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
 import { destroyEvents } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { localPlayer, playerSlot } from "wisp/game/players";
 
 
 
@@ -91,7 +92,7 @@ export class StagePanel {
     controls: MenuControls,
   ) {
     const journal = controls === "journal";
-    this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.hover(button));
+    this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, playerSlot(clicker)), button => this.hover(button));
     const dialogButton = (parent: framehandle, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
       this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
     this.backdrop = createWindowBackdrop("MeleeStageBackdrop", MENU_STYLE.panelTexture, 800);
@@ -154,7 +155,7 @@ export class StagePanel {
     this.actions = actions;
     bindPrototype(this.clicks, ButtonClicks.prototype);
     bindPrototype(this.preview, StageCard.prototype);
-    this.clicks.bindHandler((button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.hover(button));
+    this.clicks.bindHandler((button, clicker) => this.click(button, playerSlot(clicker)), button => this.hover(button));
     bindSyncHandler("ui.stage.drop", (sender, data) => {
       const choice = S2I(data);
       if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
@@ -206,7 +207,7 @@ export class StagePanel {
 
 
   update(game: Readonly<MatchState>): void {
-    const enabled = game.phase === Phase.stageMenu && humanActive(game, GetPlayerId(GetLocalPlayer()));
+    const enabled = game.phase === Phase.stageMenu && humanActive(game, playerSlot(localPlayer()));
     if (this.lastPhase !== game.phase) {
       setFrameVisible(this.root, enabled);
       setFrameVisible(this.backdrop, enabled);

@@ -42,7 +42,12 @@ const censusFighter = SELECTABLE_CHARACTERS.find((character) => run === `census-
 const censusStage = run.startsWith("census-stage-") ? Number(run.substring("census-stage-".length)) : undefined;
 
 const profileText = os.getenv("PERF_PROFILE_FRAMES");
-const measured = (headless: LuaHeadlessMap, play: (this: void, clients: Lockstep, measure: PerfMeasure) => { readonly problems: number; readonly lines: readonly string[] }, delivery?: SyncDelivery) => {
+const measured = (headless: LuaHeadlessMap, played: (this: void, clients: Lockstep, measure: PerfMeasure) => { readonly problems: number; readonly lines: readonly string[] }, delivery?: SyncDelivery) => {
+  const play = (clients: Lockstep, measure: PerfMeasure) => {
+    const result = played(clients, measure);
+    const divergence = clients.firstDivergence();
+    return divergence === undefined || result.lines.some((line) => line.startsWith("desync: ")) ? result : { problems: result.problems + 1, lines: [...result.lines, `desync: ${divergence}`] };
+  };
   if (profileText === undefined) return runLuaPerfWith(headless, bundle, declarations, play, delivery === undefined ? options : { ...options, delivery });
   const frames = new Set<number>();
   for (const text of profileText.split(",")) if (text !== "") frames.add(Number(text));

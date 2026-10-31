@@ -7,6 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
 import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, frameEnabled, frameVisible, namedFrame, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
+import { eventPlayer, localPlayer, player as playerOf, playerSlot } from "wisp/game/players";
 
 
 export type MenuControls = "journal" | "keyboard";
@@ -78,7 +79,7 @@ export function fitToWindow(frame: framehandle): void {
 
 
 function releaseFocus(frame: framehandle, clicker: player): void {
-  if (GetLocalPlayer() !== clicker) return;
+  if (localPlayer() !== clicker) return;
   const enabled = frameEnabled(frame);
   setFrameEnabled(frame, !enabled);
   setFrameEnabled(frame, enabled);
@@ -130,12 +131,12 @@ export class ButtonClicks<T> {
     this.hover = hover;
     on(this.name, () => {
       const id = GetHandleId(eventFrame());
-      const clicker = GetTriggerPlayer();
+      const clicker = eventPlayer();
       for (const button of this.buttons) {
         if (button.id !== id) continue;
         const event = eventFrameEvent();
         if (event !== FRAMEEVENT_CONTROL_CLICK) {
-          if (GetLocalPlayer() !== clicker) return;
+          if (localPlayer() !== clicker) return;
           if (this.hovered !== undefined) highlightText(this.hovered.frame, false);
           this.hovered = event === FRAMEEVENT_MOUSE_ENTER ? button : undefined;
           this.refreshHover();
@@ -184,7 +185,7 @@ export class ButtonClicks<T> {
 
 export function createSyncTrigger(name: string, prefix: string, senders: readonly number[], handle: (sender: number, data: string) => void): trigger {
   const trigger = createEvents();
-  for (const sender of senders) BlzTriggerRegisterPlayerSyncEvent(trigger, Player(sender), prefix, false);
+  for (const sender of senders) BlzTriggerRegisterPlayerSyncEvent(trigger, playerOf(sender), prefix, false);
   onEvents(trigger, trampoline(name));
   bindSyncHandler(name, handle);
   return trigger;
@@ -192,5 +193,5 @@ export function createSyncTrigger(name: string, prefix: string, senders: readonl
 
 
 export function bindSyncHandler(name: string, handle: (sender: number, data: string) => void): void {
-  on(name, () => handle(GetPlayerId(GetTriggerPlayer()), BlzGetTriggerSyncData()));
+  on(name, () => handle(playerSlot(eventPlayer()), BlzGetTriggerSyncData()));
 }

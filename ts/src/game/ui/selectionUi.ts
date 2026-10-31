@@ -73,6 +73,7 @@ import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfi
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
 import { destroyEvents } from "wisp/game/events";
 import { createFrameByType, destroyFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { localPlayer, player as playerOf } from "wisp/game/players";
 
 
 type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
@@ -357,7 +358,7 @@ export class SelectionPanel {
   }
 
   private click(button: SelectionButton, clicker: player): void {
-    if (clicker !== Player(this.participantId)) return;
+    if (clicker !== playerOf(this.participantId)) return;
     if (this.cpuSlot !== undefined && button.kind !== "cpuStep" && button.kind !== "cpuClose") return;
     if (button.kind === "tile") this.clickTile(button.tile);
     else if (button.kind === "team" || button.kind === "costume" || button.kind === "mode") this.clickCard(button);
@@ -500,7 +501,7 @@ export class SelectionPanel {
   }
 
   private answerTutorial(button: TutorialButton | undefined): boolean {
-    if (button !== undefined) this.click(button, Player(this.participantId));
+    if (button !== undefined) this.click(button, playerOf(this.participantId));
     return true;
   }
 
@@ -612,7 +613,7 @@ export class SelectionPanel {
   }
 
   private ownsLocalClient(): boolean {
-    return GetLocalPlayer() === Player(this.participantId);
+    return localPlayer() === playerOf(this.participantId);
   }
 
   private sendPlacement({ slot, tile }: Placement): void {

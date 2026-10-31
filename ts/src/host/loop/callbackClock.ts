@@ -6,6 +6,7 @@ import { KEY_DOWN, KEY_UP } from "./keyEvents";
 import { DRAW_EVENT, burstAlpha, drawnAlpha } from "./betweenFrames";
 import { activeRollback, shellState } from "./state";
 import { displayText } from "wisp/game/frames";
+import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
 const TICK = "shell.tick";
@@ -95,9 +96,9 @@ function noteRollbacks(probe: CallbackClock, now: number): void {
 
 function noteKeyEvent(probe: CallbackClock, down: boolean, now: number): void {
   if (GetHandleId(BlzGetTriggerPlayerKey()) !== probe.key || probe.events.length >= MAX_EVENTS) return;
-  const player = GetTriggerPlayer();
-  if (player === GetLocalPlayer()) probe.events.push(`${down ? "d" : "u"} ${microseconds(now)} ${osKeyDown(probe.key) ? 1 : 0} ${probe.callbacks}`);
-  else probe.events.push(`${down ? "D" : "U"} ${microseconds(now)} ${GetPlayerId(player)} ${probe.callbacks}`);
+  const player = eventPlayer();
+  if (player === localPlayer()) probe.events.push(`${down ? "d" : "u"} ${microseconds(now)} ${osKeyDown(probe.key) ? 1 : 0} ${probe.callbacks}`);
+  else probe.events.push(`${down ? "D" : "U"} ${microseconds(now)} ${playerSlot(player)} ${probe.callbacks}`);
 }
 
 function clockNow(): number | undefined {
@@ -124,7 +125,7 @@ function finish(probe: CallbackClock): void {
   probe.records.push(probe.record);
   probe.bursts.push(probe.burstRecord);
   DestroyTimer(probe.gameClock);
-  const slot = GetPlayerId(GetLocalPlayer());
+  const slot = playerSlot(localPlayer());
   PreloadGenClear();
   PreloadGenStart();
   Preload(`callback-clock v=3 run=${probe.run} slot=${slot} key=${probe.key} callbacks=${probe.callbacks}`);
@@ -133,7 +134,7 @@ function finish(probe: CallbackClock): void {
   for (const record of probe.events) Preload(record);
   for (const record of probe.bursts) Preload(record);
   PreloadGenEnd(callbackClockFile(slot, probe.run));
-  displayText(GetLocalPlayer(), 0.0, 0.0, `callback-clock run=${probe.run} callbacks=${probe.callbacks} written`);
+  displayText(localPlayer(), 0.0, 0.0, `callback-clock run=${probe.run} callbacks=${probe.callbacks} written`);
 }
 
 export function probeCallbackClock(key: number, callbacks: number): boolean {

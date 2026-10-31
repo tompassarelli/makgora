@@ -13,6 +13,7 @@ import { clearAllInputs } from "./inputs";
 import type { ShellState } from "./state";
 import { localHints } from "./hints";
 import { endFighter, layoutHuds, views } from "./ui";
+import { player } from "wisp/game/players";
 
 const NEUTRAL = neutralControls();
 
@@ -49,7 +50,7 @@ export function makePreview(s: ShellState): void {
     const x = matchSpawnX(slot, s.world.mask);
     const fighter = createFighter(characterFor(s.game, slot) ?? DEFAULT_FIGHTER, x, x < 0 ? 1 : -1);
     s.world.fighters[slot] = fighter;
-    const body = createFighterBody(Player(slot), fighter, s.origin);
+    const body = createFighterBody(player(slot), fighter, s.origin);
     s.participants[slot].body = body;
     SetUnitAnimation(body.unit, "stand");
   }

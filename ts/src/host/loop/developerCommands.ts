@@ -42,10 +42,11 @@ import { ownConfirmedState } from "./confirmedState";
 import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } from "./view";
 import { clearTextMessages, displayText } from "wisp/game/frames";
 import { setTerrainFogHeight, setTerrainFogOverSky } from "wisp/game/view";
+import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
 
 export function onDevCommand(s: ShellState): void {
-  applyDeveloperCommand(s, GetPlayerId(GetTriggerPlayer()), GetEventPlayerChatString());
+  applyDeveloperCommand(s, playerSlot(eventPlayer()), GetEventPlayerChatString());
 }
 
 
@@ -378,13 +379,13 @@ function desyncReceipt(actor: number): string {
   const slot = actor;
   const receipt = `dev: desync from player ${slot + 1}'s client`;
   // Creating a handle on one client alone diverges Warcraft's handle counter and tempest checksum.
-  if (slot === GetPlayerId(GetLocalPlayer())) CreateTimer();
+  if (slot === playerSlot(localPlayer())) CreateTimer();
   return receipt;
 }
 
 function writeDeveloperReceipt(s: ShellState, receipt: string): void {
   s.devReceipts++;
-  if (s.build.receiptsOnScreen && !s.promoHudHidden) displayText(GetLocalPlayer(), 0.0, 0.0, receipt);
+  if (s.build.receiptsOnScreen && !s.promoHudHidden) displayText(localPlayer(), 0.0, 0.0, receipt);
   const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.devStep, s.devSteps, s.dev, s.game, s.sessionWins.counts);
   writeLines(file.name, file.lines);
 }

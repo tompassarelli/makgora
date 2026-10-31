@@ -8,6 +8,7 @@ import { createFighterBody, placeFighterBody, removeFighterBody } from "./fighte
 import { hideFighter } from "./fighterCloak";
 import type { ShellState } from "./state";
 import { renderPersistentPresentation } from "./view";
+import { player } from "wisp/game/players";
 
 function removeLane(s: ShellState, slot: ParticipantSlot): void {
   const staged = s.captureBodies[slot];
@@ -35,7 +36,7 @@ export function applyCaptureCommand(s: ShellState, request: CaptureRequest): str
   if (lane === undefined) return undefined;
   removeLane(s, request.slot);
   s.capture.lanes[request.slot] = lane;
-  s.captureBodies[request.slot] = { body: createFighterBody(Player(request.slot), lane.fighter, s.origin), loop: -1 };
+  s.captureBodies[request.slot] = { body: createFighterBody(player(request.slot), lane.fighter, s.origin), loop: -1 };
   for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) hideFighter(s, slot, true);
   s.promoHudHidden = true;
   return `dev: capture ${fighterSlug(request.character)} ${request.move} ${request.facing} ${request.slot}`;

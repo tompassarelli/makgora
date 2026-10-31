@@ -45,6 +45,7 @@ import { isHost, nextManualDelay, sendHostDelay } from "./netDelay";
 import type { PanelActions } from "./ui";
 import { clearMatchEffects, views } from "./ui";
 import { announce, pauseMatchPresentation, setStatus } from "./view";
+import { eventPlayer, playerSlot } from "wisp/game/players";
 
 
 export function choose(s: ShellState, slot: ParticipantSlot, direction: -1 | 1): void {
@@ -151,7 +152,7 @@ export function openTitle(s: ShellState, slot: ParticipantSlot): void {
 }
 
 export function onMainMenu(s: ShellState): void {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (isParticipantSlot(slot)) openTitle(s, slot);
 }
 

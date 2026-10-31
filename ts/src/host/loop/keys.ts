@@ -31,6 +31,7 @@ import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
 import { noteKeyDownEvent, noteKeyUpEvent, osKeyDown } from "../../platform/osKeys";
+import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
 
 function journalOwnsKey(s: ShellState, slot: ParticipantSlot, key: number): boolean {
@@ -113,7 +114,7 @@ export function selectPauseMenu(s: ShellState, actor: number, choice: number): v
 function pausedMatchKeyDown(s: ShellState, slot: ParticipantSlot, key: number): void {
   const { bindings } = s.participants[slot].bindings;
   noteChordKey(pauseChordKeys(s, slot), bindings, key, true);
-  if (GetTriggerPlayer() === GetLocalPlayer() && (s.rollback?.journal?.editbox === undefined || playsOnKeyboard(s.rollback.journal, slot))) cameraKey(s, bindings, key, true);
+  if (eventPlayer() === localPlayer() && (s.rollback?.journal?.editbox === undefined || playsOnKeyboard(s.rollback.journal, slot))) cameraKey(s, bindings, key, true);
   if (key === Key.f2 && s.game.training) s.trainingHints = !s.trainingHints;
 }
 
@@ -206,7 +207,7 @@ function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false
   if (s.game.phase === Phase.match && s.session.paused) {
     const { bindings } = s.participants[slot].bindings;
     noteChordKey(pauseChordKeys(s, slot), bindings, key, false);
-    if (GetTriggerPlayer() === GetLocalPlayer()) cameraKey(s, bindings, key, false);
+    if (eventPlayer() === localPlayer()) cameraKey(s, bindings, key, false);
     return;
   }
   if (journalOwnsKey(s, slot, key)) return;
@@ -222,14 +223,14 @@ function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false
 }
 
 function triggerSlot(): ParticipantSlot | undefined {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   return isParticipantSlot(slot) ? slot : undefined;
 }
 
 export function onKeyDown(s: ShellState): void {
   const slot = triggerSlot();
   const key = GetHandleId(BlzGetTriggerPlayerKey());
-  if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyDownEvent(s.localKeys, key, activeRollback(s) !== undefined && s.game.phase === Phase.match && !s.session.paused);
+  if (eventPlayer() === localPlayer()) noteKeyDownEvent(s.localKeys, key, activeRollback(s) !== undefined && s.game.phase === Phase.match && !s.session.paused);
   if (slot !== undefined && key === Key.f10) views(s).selections[slot].wakeStockCursor();
   if (key === NATIVE_PREFLIGHT_KEY.code) {
     if (slot === localSlot()) writeLines(INPUT_PREFLIGHT_FILE, [inputPreflightLine(s.build.id)]);
@@ -241,7 +242,7 @@ export function onKeyDown(s: ShellState): void {
 export function onKeyUp(s: ShellState): void {
   const slot = triggerSlot();
   const key = GetHandleId(BlzGetTriggerPlayerKey());
-  if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyUpEvent(s.localKeys, key);
+  if (eventPlayer() === localPlayer()) noteKeyUpEvent(s.localKeys, key);
   if (slot !== undefined) participantKeyUp(s, slot);
 }
 

@@ -29,6 +29,7 @@ import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { START_HINT } from "./helpText";
 import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { eventPlayer, localPlayer, player as playerOf } from "wisp/game/players";
 
 export interface SettingsActions {
   closeSettings(participantId: number): void;
@@ -112,7 +113,7 @@ export class SettingsPanel {
     readonly participantId: number,
   ) {
     const suffix = I2S(participantId);
-    this.local = GetLocalPlayer() === Player(participantId);
+    this.local = localPlayer() === playerOf(participantId);
     this.clicks = new ButtonClicks(`ui.settings.${suffix}.click`, (button, clicker) => this.click(button, clicker));
     const root = createBackdrop(`MeleeSettingsRoot${suffix}`, gameUi(), participantId);
     setFrameLevel(styleMenuPanel(root, `MeleeSettingsRoot${suffix}`), 30);
@@ -223,7 +224,7 @@ export class SettingsPanel {
 
   private bindNameEvents(): void {
     on(this.nameEvent(), () => {
-      if (GetTriggerPlayer() !== Player(this.participantId)) return;
+      if (eventPlayer() !== playerOf(this.participantId)) return;
       nameSlot(this.settings, eventFrameText());
       if (eventFrameEvent() === FRAMEEVENT_EDITBOX_ENTER) endNaming(this.settings);
     });
@@ -244,7 +245,7 @@ export class SettingsPanel {
 
   private click(button: SettingsButton, clicker: player): void {
     const { settings } = this;
-    if (clicker !== Player(this.participantId) || !settings.ready) return;
+    if (clicker !== playerOf(this.participantId) || !settings.ready) return;
     leaveSlotModes(settings, button.kind);
     this.press(button);
   }

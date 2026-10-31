@@ -71,6 +71,7 @@ import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
 import { enableFog, enableFogMask, setCameraSmoothing, setTimeOfDay, setTimeOfDayScale } from "wisp/game/view";
+import { addLeaveEvent, eventPlayer, localPlayer, player, playerSlot, setPlayerColor } from "wisp/game/players";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -229,11 +230,11 @@ function presentMatchFlow(s: ShellState): void {
 }
 
 function controlsCommand(s: ShellState): void {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (!isParticipantSlot(slot) || !humanActive(s.game, slot)) return;
   const settings = s.participants[slot].bindings;
   if (!settings.ready) return;
-  const announce = (message: string): void => displayText(Player(slot), 0, 0, message);
+  const announce = (message: string): void => displayText(player(slot), 0, 0, message);
   if (GetEventPlayerChatString() === SAVE_CONTROLS) {
     saveBindingSettings(settings);
     announce(settings.message);
@@ -244,7 +245,7 @@ function controlsCommand(s: ShellState): void {
 
 function playerLeft(s: ShellState): void {
   ownConfirmedState(s);
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   playerFilesOwnerLeft(slot);
   if (!humanPresent(s.game, slot)) return;
   const wasMatch = s.game.phase === Phase.match;
@@ -280,7 +281,7 @@ function playerLeft(s: ShellState): void {
 function developerChord(s: ShellState, key: number, handler: string): void {
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), 2, true);
+    if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, player(slot), ConvertOsKeyType(key), 2, true);
   }
   onEvents(trigger, trampoline(handler));
 }
@@ -288,7 +289,7 @@ function developerChord(s: ShellState, key: number, handler: string): void {
 function syncTrigger(s: ShellState, prefix: string, handler: string, humansOnly: boolean): void {
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!humansOnly || humanActive(s.game, slot)) BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), prefix, false);
+    if (!humansOnly || humanActive(s.game, slot)) BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), prefix, false);
   }
   onEvents(trigger, trampoline(handler));
 }
@@ -327,7 +328,7 @@ function createTriggers(s: ShellState): void {
   }
   if (s.build.devConsole) {
     const chat = createEvents();
-    for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), "-dev ", false);
+    for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, player(slot), "-dev ", false);
     onEvents(chat, trampoline(DEV_COMMAND));
   }
   const received = createEvents();
@@ -338,17 +339,17 @@ function createTriggers(s: ShellState): void {
   onEvents(history, trampoline(CHAT_HISTORY));
   const controls = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    TriggerRegisterPlayerChatEvent(controls, Player(slot), SAVE_CONTROLS, true);
-    TriggerRegisterPlayerChatEvent(controls, Player(slot), LOAD_CONTROLS, true);
+    TriggerRegisterPlayerChatEvent(controls, player(slot), SAVE_CONTROLS, true);
+    TriggerRegisterPlayerChatEvent(controls, player(slot), LOAD_CONTROLS, true);
   }
   onEvents(controls, trampoline(CONTROLS_COMMAND));
   const clip = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(clip, Player(slot), SAVE_MOMENT_COMMAND, true);
+  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(clip, player(slot), SAVE_MOMENT_COMMAND, true);
   onEvents(clip, trampoline(SAVE_MOMENT));
   syncTrigger(s, PLAYTEST_PREFIX, PLAYTEST, true);
   syncTrigger(s, STAGE_READY_PREFIX, STAGE_READY, true);
   const leave = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerEvent(leave, Player(slot), EVENT_PLAYER_LEAVE);
+  for (const slot of PARTICIPANT_SLOTS) addLeaveEvent(leave, player(slot));
   onEvents(leave, trampoline(PLAYER_LEFT));
   holdGameSpeed();
   const tick = CreateTimer();
@@ -370,14 +371,14 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   if (shellState() !== undefined) return;
   hideOriginFrames(true);
 
-  if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(GetLocalPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
+  if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
   BlzEnableSelections(false, false);
   EnableUserControl(true);
   enableFog(false);
   enableFogMask(false);
 
 
-  for (const slot of PARTICIPANT_SLOTS) SetPlayerColor(Player(slot), ConvertPlayerColor(slot));
+  for (const slot of PARTICIPANT_SLOTS) setPlayerColor(player(slot), slot);
   const s = createShellState(build, {
     origin, frames: view.createStatusFrames(), persistence: bindingFiles, playback,
     editbox: journalIngress(build) === "editbox" ? new EditboxIngress() : undefined,
@@ -385,8 +386,8 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   copyMatchState(s.game, startingSelection(build.scenario));
   s.startingChoicesReady = s.game.computerMask === 0;
   findWarcraftMenuFrames();
-  createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
-  s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
+  createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, playerSlot(clicker), choice));
+  s.ui?.results.bindActions((choice, clicker) => pickResult(s, playerSlot(clicker), choice));
   view.drawStage(s);
   setCameraSmoothing(0.0);
   setTimeOfDay(12.0);
@@ -475,8 +476,8 @@ export function installShell(): void {
   const s = shellState();
   if (s?.ui !== undefined) {
     findWarcraftMenuFrames();
-    recreateUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
-    s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
+    recreateUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, playerSlot(clicker), choice));
+    s.ui?.results.bindActions((choice, clicker) => pickResult(s, playerSlot(clicker), choice));
   }
 
   if (s !== undefined && s.moment === undefined) s.moment = momentSaves();

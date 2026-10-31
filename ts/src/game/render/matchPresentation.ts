@@ -33,6 +33,7 @@ import { originalClip, originalClipNamed } from "../../generated/clips/fighterOr
 import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultClips } from "../presentation/resultPose";
 import { createEffect, destroyEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
 import { setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { player } from "wisp/game/players";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -330,7 +331,7 @@ export class MatchPresentation {
         pose.model = createEffect(modelPath, this.origin.x, this.origin.y);
         pose.modelPath = modelPath;
         hideEffect(pose.model, this.origin);
-        setEffectTeamColor(pose.model, Player(row.slot));
+        setEffectTeamColor(pose.model, player(row.slot));
         setEffectBlendTime(pose.model, 0.0);
         setEffectAnimation(pose.model, "Stand");
         setEffectTimeScale(pose.model, 0.0);

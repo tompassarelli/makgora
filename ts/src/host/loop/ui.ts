@@ -65,6 +65,7 @@ import { PauseMenu } from "../../game/ui/pauseMenu";
 import { PauseScreen } from "../../game/ui/pauseScreen";
 import { HintStrip } from "../../game/ui/hintStrip";
 import { duoRole } from "../../game/sim/fighter";
+import { player as playerOf, playerControl, playerSlotState } from "wisp/game/players";
 
 
 interface FighterRenderers {
@@ -227,8 +228,8 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
 function sharedPlay(): boolean {
   let humans = 0;
   for (const slot of PARTICIPANT_SLOTS) {
-    const player = Player(slot);
-    if (GetPlayerController(player) === MAP_CONTROL_USER && GetPlayerSlotState(player) === PLAYER_SLOT_STATE_PLAYING) humans++;
+    const player = playerOf(slot);
+    if (playerControl(player) === MAP_CONTROL_USER && playerSlotState(player) === PLAYER_SLOT_STATE_PLAYING) humans++;
   }
   return humans > 1;
 }

@@ -8,6 +8,7 @@ import { warcraftChatOpen } from "../../platform/editboxJournal";
 import { localParticipantSlot } from "./diagnostics";
 import { type ShellState, localSlot } from "./state";
 import { views } from "./ui";
+import { eventPlayer, playerSlot } from "wisp/game/players";
 
 export function localHints(s: Readonly<ShellState>): boolean {
   const local = localParticipantSlot(s);
@@ -25,7 +26,7 @@ export function localHintsKey(s: Readonly<ShellState>): boolean {
 }
 
 export function onHintsKeyDown(s: ShellState): void {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (!isParticipantSlot(slot) || slot !== localSlot() || s.game.phase !== Phase.match || !humanActive(s.game, slot)) return;
   if (s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame)) return;
   const settings = s.participants[slot].bindings;

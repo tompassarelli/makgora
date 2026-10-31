@@ -8,6 +8,7 @@ import { secondFps } from "wisp/src/netcode/rate";
 import { noteLocalSecond, takeNetRates } from "./netDelay";
 import { type Rollback, activeRollback, shellState } from "./state";
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
+import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -129,7 +130,7 @@ function shortName(rates: SessionRates, path: unknown): string {
 
 function tagFor(rates: SessionRates, kind: Kind, source: unknown): string | undefined {
   if (kind === "eff" || kind === "snd") return `${kind === "eff" ? "e" : "s"}:${shortName(rates, source)}`;
-  if (kind === "unit") return `u:p${source === undefined ? "?" : GetPlayerId(source as player)}`;
+  if (kind === "unit") return `u:p${source === undefined ? "?" : playerSlot(source as player)}`;
   return undefined;
 }
 
@@ -452,7 +453,7 @@ function account(rates: SessionRates, name: string, spent: number, now: number):
   }
   else if (name === INPUT) {
     second.received++;
-    if (GetTriggerPlayer() === GetLocalPlayer()) second.receivedOwn++;
+    if (eventPlayer() === localPlayer()) second.receivedOwn++;
   }
   if (rates.clock === undefined ? second.ticks >= FALLBACK_TICKS : now - rates.secondStarted >= 1) closeSecond(rates, now);
 }

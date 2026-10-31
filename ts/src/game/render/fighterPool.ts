@@ -24,6 +24,7 @@ import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
 import { costumeClipModel } from "../roster/costumes";
 import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { player } from "wisp/game/players";
 
 const PETRIFIED_GREY = 150;
 const CHILL_TINT = { red: 120, green: 190, blue: 255 };
@@ -73,7 +74,7 @@ export class FighterPoolPresentation {
       const clip = originalClip(character, index);
       if (clip === undefined) break;
       const model = createEffect(costumeClipModel(character, costume, clip), x, y);
-      setEffectTeamColor(model, Player(participant));
+      setEffectTeamColor(model, player(participant));
       setEffectBlendTime(model, 0.0);
       setEffectAnimation(model, "Stand");
       setEffectTimeScale(model, 0.0);

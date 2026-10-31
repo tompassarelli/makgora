@@ -9,6 +9,7 @@ import { readChunk, readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { LOBBY_COUNTER_FILE, PLAYER_FILE_CHUNK } from "../../game/core/gameFiles";
 import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
 import { createEvents, onEvents } from "wisp/game/events";
+import { eventPlayer, localPlayer, player, playerSlot, playerSlotState } from "wisp/game/players";
 
 export const PLAYER_FILE_RECEIVED = "shell.playerFileReceived";
 const MORE_PREFIX = "SC_FL";
@@ -33,7 +34,7 @@ function files(): PlayerFileQueue {
 const localBindingsText = (): string => globalThis.__smashcraftSavedBindings ?? readChunks(BINDINGS_FILE).join("");
 
 function sendFile(owner: number): void {
-  if (GetLocalPlayer() !== Player(owner)) return;
+  if (localPlayer() !== player(owner)) return;
   const text = localBindingsText();
   let offset = 0;
   while (text.length - offset > CHUNK) {
@@ -45,7 +46,7 @@ function sendFile(owner: number): void {
 
 
 export function playerFileReceived(): void {
-  const owner = GetPlayerId(GetTriggerPlayer());
+  const owner = playerSlot(eventPlayer());
   const data = BlzGetTriggerSyncData();
   if (BlzGetTriggerSyncPrefix() !== LAST_PREFIX) {
     receivePlayerFileChunk(files(), owner, data, false, sendFile);
@@ -75,8 +76,8 @@ export function startPlayerFiles(): void {
   delete files().lobbyCounters;
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), MORE_PREFIX, false);
-    BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), LAST_PREFIX, false);
+    BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), MORE_PREFIX, false);
+    BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), LAST_PREFIX, false);
   }
   onEvents(trigger, trampoline(PLAYER_FILE_RECEIVED));
 }
@@ -89,18 +90,18 @@ function chunks(text: string): string[] {
 
 export const bindingFiles: BindingPersistence = {
   load(owner, complete) {
-    if (GetPlayerSlotState(Player(owner)) !== PLAYER_SLOT_STATE_PLAYING) {
+    if (playerSlotState(player(owner)) !== PLAYER_SLOT_STATE_PLAYING) {
       complete({ kind: "unavailable" });
       return;
     }
     enqueuePlayerFile(files(), owner, complete, sendFile);
   },
   readLocal(owner) {
-    if (GetLocalPlayer() !== Player(owner)) return undefined;
+    if (localPlayer() !== player(owner)) return undefined;
     const text = localBindingsText();
     return text === "" ? { kind: "empty" } : { kind: "loaded", encoded: text };
   },
   save(owner, encoded) {
-    if (GetLocalPlayer() === Player(owner) && writeChunks(BINDINGS_FILE, chunks(encoded))) globalThis.__smashcraftSavedBindings = encoded;
+    if (localPlayer() === player(owner) && writeChunks(BINDINGS_FILE, chunks(encoded))) globalThis.__smashcraftSavedBindings = encoded;
   },
 };

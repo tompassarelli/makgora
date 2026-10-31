@@ -10,6 +10,7 @@ import { MATCH_RECORD_INDEX_FILE, matchRecordFile } from "../../game/core/gameFi
 import { type ShellState, localSlot } from "./state";
 import { views } from "./ui";
 import { exportPad } from "./analogPad";
+import { player, playerName } from "wisp/game/players";
 
 declare global {
 
@@ -50,6 +51,6 @@ export function writeMatchRecord(s: ShellState): void {
   const serial = s.replay.recordSerial ?? claimMatchSerial(s);
   s.replay.recordSerial = undefined;
   const players: Slots<string | undefined> = [undefined, undefined, undefined, undefined];
-  for (const slot of PARTICIPANT_SLOTS) players[slot] = GetPlayerName(Player(slot));
+  for (const slot of PARTICIPANT_SLOTS) players[slot] = playerName(player(slot));
   writeLines(matchRecordFile(serial), matchRecordLines({ build: s.build.id, serial, local: localSlot(), players }, s.game, s.world, views(s).match.tally));
 }

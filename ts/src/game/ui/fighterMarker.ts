@@ -6,6 +6,7 @@ import { createBackdrop, createText, consoleUi } from "./frames";
 import { MENU_FONT, markerArrowTexture } from "./hudLayout";
 import { attachOutline, createOutline, createTemplateOutline, setOutlineText } from "./textOutline";
 import { createFrame, createFrameByType, destroyFrame, setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { player, playerName as playerNameOf } from "wisp/game/players";
 
 export const MARKER_WIDTH = unitsForPixels(220);
 export const MARKER_HEIGHT = unitsForPixels(170);
@@ -113,7 +114,7 @@ export class FighterMarker {
       this.shownHuman = human;
       this.shownPartner = partner;
       this.placeNumber();
-      this.playerName = GetPlayerName(Player(this.slot));
+      this.playerName = playerNameOf(player(this.slot));
       this.shownColor = undefined;
     }
     if (shown !== this.shown) {

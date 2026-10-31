@@ -7,6 +7,7 @@ import type { ShellState } from "./state";
 import { views } from "./ui";
 import { pauseMatchPresentation, renderPersistentPresentation } from "./view";
 import { writeLines } from "wisp/src/platform/fileio";
+import { localPlayer, playerSlot } from "wisp/game/players";
 
 
 export function startAgencyFixture(s: ShellState, message: string): string | undefined {
@@ -32,6 +33,6 @@ export function startAgencyFixture(s: ShellState, message: string): string | und
     markers.push(`p${slot}=${agency},ice=${fighter.status.frozenFrames},hitlag=${fighter.launch.hitlag}`);
   }
   const receipt = `dev: agency ${words[2]} ${words[3]} ${s.session.paused ? "paused" : "running"} ${markers.join(" ")}`;
-  writeLines(`smashcraft-agency-p${GetPlayerId(GetLocalPlayer())}.txt`, [receipt]);
+  writeLines(`smashcraft-agency-p${playerSlot(localPlayer())}.txt`, [receipt]);
   return receipt;
 }

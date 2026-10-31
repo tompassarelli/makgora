@@ -5,10 +5,11 @@ import { warcraftChatOpen } from "../../platform/editboxJournal";
 import { KEYBOARD_PAUSE_PREFIX, Key } from "./keyEvents";
 import { startDown } from "./keys";
 import { type ShellState, localSlot } from "./state";
+import { eventPlayer, playerSlot } from "wisp/game/players";
 
 
 export function onPauseKeyDown(s: ShellState): void {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (GetHandleId(BlzGetTriggerPlayerKey()) === Key.escape && s.game.phase !== Phase.match) return;
   const chatting = s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame);
   if (!isParticipantSlot(slot) || slot !== localSlot() || !humanActive(s.game, slot) || chatting) return;
@@ -16,7 +17,7 @@ export function onPauseKeyDown(s: ShellState): void {
 }
 
 export function onKeyboardPause(s: ShellState): void {
-  const slot = GetPlayerId(GetTriggerPlayer());
+  const slot = playerSlot(eventPlayer());
   if (!isParticipantSlot(slot) || !humanActive(s.game, slot)) return;
   if (s.pauseMenu?.title) {
     s.pauseMenu.title = false;

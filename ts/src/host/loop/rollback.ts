@@ -45,6 +45,7 @@ import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
 import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
 import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
+import { eventPlayer, playerSlot } from "wisp/game/players";
 
 
 const STALL_NOTICE_CALLBACKS = 20;
@@ -434,7 +435,7 @@ export function receiveInput(s: ShellState): void {
   const rollback = s.rollback;
   s.trace.rawSyncEvents++;
   if (rollback === undefined) return;
-  const sender = GetPlayerId(GetTriggerPlayer());
+  const sender = playerSlot(eventPlayer());
   const wire = BlzGetTriggerSyncData();
   if (rollback.journal !== undefined && receiveLifecycle(s, rollback, rollback.journal, sender, wire)) return;
   if (!rollback.active || !humanActive(s.game, sender)) return;
