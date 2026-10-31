@@ -1,6 +1,6 @@
 # Mak'gora: project hub
 
-Draft of the Hive Workshop Map Development thread that serves as Mak'gora's project page, for Tom to approve before it is posted under his name. The thread title is **Mak'gora**. `PATREON_URL` is the placeholder for the Patreon page; once the thread exists, its address replaces `PROJECT_URL` in [hive-post.md](hive-post.md) and the promotion drafts. Paste the BBCode below through the editor's Toggle BB code.
+Draft of the Hive Workshop Map Development thread that serves as Mak'gora's project page, for Tom to approve before it is posted under his name. The thread title is **Mak'gora**. `PATREON_URL` is the placeholder for the Patreon page; once the thread exists, its address replaces `PROJECT_URL` in [hive-post.md](hive-post.md) and the promotion drafts. Paste the BBCode below through the editor's Toggle BB code. The release is 0.3 and is unreleased; see [promotion-drafts.md](promotion-drafts.md) for its status.
 
 ## Thread text (BBCode)
 
@@ -11,7 +11,7 @@ Draft of the Hive Workshop Map Development thread that serves as Mak'gora's proj
 [B]Pick a Warcraft hero, fight across floating stages and knock your rivals off the screen.[/B] Mak'gora is a free fan-made platform fighter for 1 to 4 players, built as a Warcraft III custom map with Melee-style movement, 31 fighters, computer opponents, a tutorial and a training mode. It was called Smashcraft until 0.3.
 
 [SIZE=5][B]Play[/B][/SIZE]
-[URL="https://www.hiveworkshop.com/threads/smashcraft.375492/"]Download Mak'gora 0.3.1 from its map page[/URL], put it in your Warcraft III Maps folder, set Graphics to Classic and open it from Custom Game. Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL].
+[URL="https://www.hiveworkshop.com/threads/smashcraft.375492/"]Download Mak'gora 0.3 from its map page[/URL], put it in your Warcraft III Maps folder, set Graphics to Classic and open it from Custom Game. Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL].
 
 [SIZE=5][B]Roadmap[/B][/SIZE]
 [LIST]

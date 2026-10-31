@@ -2,12 +2,14 @@
 
 Private drafts for Tom to approve before anything is posted under his name. `PROJECT_URL` is the Mak'gora project thread drafted in [hive-project.md](hive-project.md) and `PATREON_URL` the Patreon page; both are filled in once they exist.
 
-## Mak'gora 0.3.1: Hive thread reply
+Mak'gora 0.3 is unreleased: nothing of 0.3 has been published, and the `v0.3` tag is cut only when Tom decides to release, which names its build `Mak'gora 0.3.w3x`. Until then builds are `Mak'gora 0.3-dev.N`. Two tags pushed early on 2026-10-31 were removed from origin on 2026-11-01 because no release used them (Tom's direction, 2026-11-01): `v0.3.0`, tag object 48e402df69fbc8e67d6236e0ffefe23da1c280d0 on commit 06729a41b9b61c38a18410db1faf10f96f9b72bb (the rename to Mak'gora), and `v0.3.1`, tag object bba2957ab866d672ccb9cbd89779b598e4d486a3 on commit 9bf3e613f69ee8bfdae118e462c41fb7c476fdad (the Mak'gora loading-screen art). To restore one, run `git tag -a v0.3.1 9bf3e613f69ee8bfdae118e462c41fb7c476fdad -m "Mak'gora 0.3.1"` and push it with `safe-push --tag v0.3.1`.
 
-Posted as a reply in the map's Hive thread after the 0.3.1 map is uploaded (BBCode):
+## Mak'gora 0.3: Hive thread reply
+
+Posted as a reply in the map's Hive thread after the 0.3 map is uploaded (BBCode):
 
 ```
-[B]Mak'gora 0.3.1 is out[/B]
+[B]Mak'gora 0.3 is out[/B]
 Smashcraft is now [B]Mak'gora[/B]. New in 0.3:
 [LIST]
 [*]Onyxia joins as Lady Katrana Prestor, who can reveal the black dragon
@@ -19,9 +21,9 @@ Smashcraft is now [B]Mak'gora[/B]. New in 0.3:
 Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL], and a ranked ladder is coming. News and the roadmap: [URL="PROJECT_URL"]Mak'gora project page[/URL]. Games and feedback: [URL="https://discord.gg/JQGZs2UJR"]Discord[/URL].
 ```
 
-## Mak'gora 0.3.1: Discord announcement
+## Mak'gora 0.3: Discord announcement
 
-**Mak'gora 0.3.1 is out!** Smashcraft has a new name: Mak'gora.
+**Mak'gora 0.3 is out!** Smashcraft has a new name: Mak'gora.
 
 New in 0.3: Onyxia joins (Lady Katrana Prestor, who can reveal the black dragon), up to eight costumes per fighter, a new-player mode that shows your keys on screen, a longer Tutorial, the new names Samuro, Rokhan, Mannoroth, Arthas, Stitches and Mrgl & Grgl, and reworks for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar.
 
