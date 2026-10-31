@@ -1,5 +1,5 @@
-# #167 Lich King Howling Blast: a frost gust that travels and hits b. Captured as the gust spawns
-# (frame 28). Lich King a against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
+# #167 Lich King Val'kyr Shadowguard, his neutral special since 1 Nov: she flies out and seizes b. Captured as
+# she spawns (frame 26). Lich King a against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
 540 b stick -1 0
@@ -10,5 +10,4 @@
 1000 a press VIEW
 1070 a release VIEW
 #! expect a 600 special 13 form 0
-# 15f63cc099 lengthened the cast (gust on frame 28, was 19; d3593d53b0 had moved it from 16) and ff10a6871c (#46) raised the gust from 6.0 to 7.5 (trace: run 40081270959).
-#! expect b 628 damage 7.500
+#! expect b 629 damage 5.000
