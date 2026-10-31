@@ -347,6 +347,7 @@ export interface AuthoredSpecial extends CastWindows {
   readonly swingsThroughLanding?: true | undefined;
   readonly carriesChargeOnLanding?: true | undefined;
   readonly fallLandingLag?: number | undefined;
+  readonly whiffLandingLag?: number | undefined;
 
   readonly aimFrames?: number | undefined;
   /** Picks the aim on the press from the stick's recent motion, the first listed motion the stick history completed within its window, else `otherwise`; the stick after the press does not steer it. Aims are facing-relative in x. */

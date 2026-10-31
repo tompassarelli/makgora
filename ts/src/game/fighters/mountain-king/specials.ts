@@ -33,9 +33,10 @@ const RUSH_HURT = [hurtPose(13, 18, [hurtCapsule(Character.mountainKing), hurtPa
 
 
 const LEAP_DELAY = 2;
-const leap = (distance: number): readonly SpecialMotion[] => chargedAngleMotion(distance, 16).map((segment, index) =>
+const LEAP_TRAVEL = 12;
+const leap = (distance: number): readonly SpecialMotion[] => chargedAngleMotion(distance, LEAP_TRAVEL).map((segment, index) =>
   index === 0 ? { ...segment, last: segment.last + LEAP_DELAY } : { ...segment, first: segment.first + LEAP_DELAY, last: segment.last + LEAP_DELAY });
-const FULL_LEAP = leap(heights(f32(2.7)));
+const FULL_LEAP = leap(heights(f32(3.0)));
 const THUNDER_LEAP = hit(8.645519256591797, "LAUNCH", 80, false, HitElement.electric);
 const LEAP_HAMMER = capsule(26.0, 41.0, 110.0, -5.0, 16.0);
 
@@ -43,28 +44,32 @@ const LEAP_HAMMER = capsule(26.0, 41.0, 110.0, -5.0, 16.0);
 
 
 
-const PLUNGE = heights(f32(0.16));
+export const PLUNGE = heights(f32(0.24));
+const HANG = 2;
 const HAMMERFALL_DAMAGE = 12.968278884887695;
 const HAMMERFALL_GROUNDED = hit(10.806899070739746, "LAUNCH", 55, false, HitElement.electric);
 const HAMMERFALL_HAMMER = capsule(4.0, 10.0, 4.0, -24.0, 20.0);
 export const HAMMERFALL_LANDING_LAG = 24;
+export const HAMMERFALL_WHIFF_LANDING_LAG = 40;
 export const THUNDER_LEAP_LANDING_LAG = 11;
 const HAMMERFALL: AuthoredSpecial = {
   name: "Hammerfall",
 
   endFrame: 70,
-  motion: [{ ...frames(1, 3), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(4, 70), velocityX: 0.0, velocityZ: -PLUNGE }],
-  regions: [heroRegion(4, 70, HAMMERFALL_HAMMER, hit(HAMMERFALL_DAMAGE, "SPIKE", 270, false, HitElement.electric), HAMMERFALL_GROUNDED)],
+  motion: [{ ...frames(1, HANG), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(HANG + 1, 70), velocityX: 0.0, velocityZ: -PLUNGE }],
+  regions: [heroRegion(HANG + 1, 70, HAMMERFALL_HAMMER, hit(HAMMERFALL_DAMAGE, "SPIKE", 270, false, HitElement.electric), HAMMERFALL_GROUNDED)],
   landingLag: HAMMERFALL_LANDING_LAG,
+  whiffLandingLag: HAMMERFALL_WHIFF_LANDING_LAG,
   helpless: true,
 };
 
 const DIAGONAL = f32(0.7071067811865476);
 const DIVE_PIVOT = 45.0;
-export const THUNDER_LEAP_DIVE_FRAME = 27;
+export const THUNDER_LEAP_DIVE_FRAME = CHARGED_AIM_FRAMES + LEAP_DELAY + LEAP_TRAVEL + 1;
 const DIVE_WINDOW = frames(THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_DIVE_FRAME);
-const DIVE_LAST = 15;
-const DIVE_END = 33;
+export const DIVE_TRAVEL = 9;
+const DIVE_LAST = HANG + DIVE_TRAVEL;
+const DIVE_END = DIVE_LAST + 18;
 const diveHammer = (aimX: number, aimZ: number): StrikeCapsule => {
   const turn = (x: number, z: number): { readonly x: number; readonly z: number } => ({
     x: f32(f32(f32(-aimZ) * x) - f32(aimX * f32(z - DIVE_PIVOT))),
@@ -77,10 +82,10 @@ const diveHammer = (aimX: number, aimZ: number): StrikeCapsule => {
 const dive = (aimX: number, aimZ: number, angle: Parameters<typeof hit>[2], last: number, endFrame: number): AuthoredSpecial => ({
   ...HAMMERFALL,
   endFrame,
-  motion: [{ ...frames(1, 3), velocityX: 0.0, velocityZ: 0.0 },
-    { ...frames(4, last), velocityX: f32(aimX * PLUNGE), velocityZ: f32(aimZ * PLUNGE) },
+  motion: [{ ...frames(1, HANG), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(HANG + 1, last), velocityX: f32(aimX * PLUNGE), velocityZ: f32(aimZ * PLUNGE) },
     { ...frames(last + 1, last + 1), velocityX: 0.0, velocityZ: 0.0 }],
-  regions: [heroRegion(4, last, diveHammer(aimX, aimZ), hit(HAMMERFALL_DAMAGE, aimZ < 0 ? "SPIKE" : "LAUNCH", angle, false, HitElement.electric), HAMMERFALL_GROUNDED)],
+  regions: [heroRegion(HANG + 1, last, diveHammer(aimX, aimZ), hit(HAMMERFALL_DAMAGE, aimZ < 0 ? "SPIKE" : "LAUNCH", angle, false, HitElement.electric), HAMMERFALL_GROUNDED)],
 });
 const diveBranch = (x: number, z: number, special: AuthoredSpecial): SpecialFollowUp => ({ window: DIVE_WINDOW, input: FollowUpInput.auto, stick: { x, z }, special });
 const HAMMERFALL_DIVES: readonly SpecialFollowUp[] = [
@@ -167,7 +172,7 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
     name: "Thunder Leap",
     description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, change direction at the top and he dives hammer first that way on his own as Hammerfall, in any of the eight directions other than the one he leapt. Keep the stick where it was, or let it go, and he falls helpless instead.",
     ground: {
-      endFrame: 30,
+      endFrame: THUNDER_LEAP_DIVE_FRAME + 3,
       regions: [heroRegion(11, 16, LEAP_HAMMER, THUNDER_LEAP)],
       aimFrames: CHARGED_AIM_FRAMES,
       motion: FULL_LEAP,

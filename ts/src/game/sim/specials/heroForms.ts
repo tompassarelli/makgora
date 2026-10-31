@@ -57,7 +57,9 @@ function landFromSpecialFall(f: Fighter): void {
   if (specials === undefined) return;
   for (let slot = SpecialSlot.neutral; slot <= SpecialSlot.down; slot++) {
     if ((f.special.airtimeUses & (1 << slot)) === 0) continue;
-    const lag = specialForm(specialKit(specials, slot), SpecialForm.air, f.special.variant).fallLandingLag;
+    const kit = specialKit(specials, slot);
+    const whiff = f.special.fall && !f.special.hit ? specialForm(kit, f.special.form, f.special.variant).whiffLandingLag : undefined;
+    const lag = whiff ?? specialForm(kit, SpecialForm.air, f.special.variant).fallLandingLag;
     if (lag !== undefined) f.landing.lag = max(f.landing.lag, lag);
   }
 }
@@ -126,7 +128,7 @@ export function landHeroSpecial(f: Fighter): boolean {
   f.special.frame = 0;
   f.special.lockFrames = 0;
   f.attack.cooldown = 0;
-  f.landing.lag = max(f.landing.lag, move.landingLag);
+  f.landing.lag = max(f.landing.lag, move.whiffLandingLag !== undefined && !f.special.hit ? move.whiffLandingLag : move.landingLag);
   return true;
 }
 

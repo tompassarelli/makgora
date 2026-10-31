@@ -14,7 +14,7 @@ import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { type Controls, fighterAt, neutralControls } from "../../sim/roster";
 import { holdAutoFollowUpOnDeck, pressHeroFollowUp } from "../../match/botHeroKit";
-import { CLAP_REACH, HAMMERFALL_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
+import { CLAP_REACH, HAMMERFALL_WHIFF_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
 import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
 
@@ -197,7 +197,7 @@ function control(aim: Direction): Leap {
   return leap;
 }
 
-test("Thunder Leap's top does nothing without a change of direction: the stick at rest or still in the leap's own zone starts no dive, he falls helpless, and a special press from frame 18 to 30 changes nothing [k1 scenario]", () => {
+test("Thunder Leap's top does nothing without a change of direction: the stick at rest or still in the leap's own zone starts no dive, he falls helpless, and a special press from frame 18 on changes nothing [k1 scenario]", () => {
   for (const aim of [UP, UP_RIGHT, RIGHT]) {
     const baseline = control(aim);
     assertEquals(baseline.dived, false, `${aim.name}: with the stick at rest there is no dive`);
@@ -219,7 +219,7 @@ test("Thunder Leap's top does nothing without a change of direction: the stick a
   }
 });
 
-test("Thunder Leap dives on frame 27 on its own in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
+test("Thunder Leap dives on frame 23 on its own in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
   for (const direction of DIRECTIONS) {
     if (direction === UP) continue;
     const early = leapToTop(UP, frame => frame === FIRE_STEP_FRAME - 1 ? holding(direction, true) : REST);
@@ -436,7 +436,7 @@ function landingLagAfter(leapHeight: number | undefined, aimZ: number, dive: boo
   return -1;
 }
 
-test("Mountain King lands from Thunder Leap in 11 frames of landing lag after its helpless fall and when he lands during the move, and from the Hammerfall dive in its own 24 [k3 measure docs/gameplay-design.md]", () => {
+test("Mountain King lands from Thunder Leap in 11 frames of landing lag after its helpless fall and when he lands during the move, and from a Hammerfall dive that hits no one in its whiff lag of 40 [k3 measure docs/gameplay-design.md]", () => {
   const lags = {
     fall: landingLagAfter(undefined, 1, false),
     midMove: landingLagAfter(AIR_HEIGHT, -1, false),
@@ -444,7 +444,7 @@ test("Mountain King lands from Thunder Leap in 11 frames of landing lag after it
   };
   assertEquals(lags.fall, THUNDER_LEAP_LANDING_LAG, "landing from the helpless fall");
   assertEquals(lags.midMove, THUNDER_LEAP_LANDING_LAG, "landing during the leap");
-  assertEquals(lags.dive, HAMMERFALL_LANDING_LAG, "landing from the dive keeps its own lag");
+  assertEquals(lags.dive, HAMMERFALL_WHIFF_LANDING_LAG, "landing from a whiffed dive pays the whiff lag");
 });
 
 const BOT_LEAP_XS = [-600.0, -450.0, -300.0, 0.0, 300.0, 450.0, 600.0] as const;

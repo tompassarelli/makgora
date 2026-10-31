@@ -2705,7 +2705,7 @@ Expert field.
 |---|---|---:|---:|---:|---:|---|---:|---|---:|
 | Illidan | Wing Ascent | 7 | 4 | 29 | 425 / 685 | aimed (any angle, frame 7), aimed dive branch (8-way) | 46 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 237/256 |
 | Samuro | Rising Whirlwind | 13 | 0 | 59 | 579 / 584 | aimed (8-way, 12 frames) | 69 | read down air (offstage launch, KO at 40%), reaction aerial | 236/256 |
-| Muradin Bronzebeard | Thunder Leap | 11 | 0 | 32 | 355 / 359 | aimed (8-way, 8 frames) | 50 | read down air (offstage launch, KO at 40%), reaction aerial | 236/256 |
+| Muradin Bronzebeard | Thunder Leap | 11 | 0 | 47 | 395 / 399 | aimed (8-way, 8 frames) | 47 | read down air (offstage launch, KO at 40%), reaction aerial | 237/256 |
 | Maiev Shadowsong | Blink | 9 | 4 | 508 (teleport) | 507 / 511 | aimed (8-way, 8 frames) | 39 | read down air (spike, KO at 40%), reaction aerial | 242/256 |
 | Kel'Thuzad | Spectral Ascent | 10 | 0 | 20 | 564 / 502 | guided | 83 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 229/256 |
 | Uther | Hammer of the Righteous | 6 | 0 | 24 | 288 / 277 | guided | 38 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 232/256 |

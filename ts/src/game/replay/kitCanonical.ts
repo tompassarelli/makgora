@@ -179,6 +179,7 @@ function writeSpecialBase(move: Readonly<AuthoredSpecial>, name: string, result:
   int("helpless", bit(move.helpless));
   int("landingLag", move.landingLag ?? -1);
   if (move.fallLandingLag !== undefined) int("fallLandingLag", move.fallLandingLag);
+  if (move.whiffLandingLag !== undefined) int("whiffLandingLag", move.whiffLandingLag);
   if (move.facesStick === true) int("facesStick", 1);
   writeAimByMotion(move, name, result);
 }

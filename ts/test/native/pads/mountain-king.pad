@@ -12,7 +12,7 @@
 330 a press X
 331 a stick 0 0
 380 a release X
-# Thunder Leap, Hammerfall on its own at the top (frame 27): the stick pulled down from the leap's up, no special press.
+# Thunder Leap, Hammerfall on its own at the top (frame 23): the stick pulled down from the leap's up, no special press.
 # View held a second: the first of two moments the parity check replays.
 500 a press VIEW
 570 a release VIEW
@@ -29,11 +29,11 @@
 # 56fabe5c68 slows the clap's shockwave to 0.85x and 70b72f2c9a set it to 7.565 (trace: run 39007977184).
 #! expect b 393 damage 18.372 hitlag 5 hitstun 21
 #! expect a 600 special 15 form 0
-#! expect a 624 special-form 6 action 15
-#! expect a 645 special 0 form 6
+#! expect a 620 special-form 6 action 15
+#! expect a 635 special 0 form 6
 #! scene a StormBoltMissile
 #! scene a ThunderClapCaster
-621 a stick 0 -1
-630 a stick 0 0
+617 a stick 0 -1
+626 a stick 0 0
 1000 a press VIEW
 1070 a release VIEW

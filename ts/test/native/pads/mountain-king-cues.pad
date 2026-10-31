@@ -94,7 +94,7 @@
 #! expect a 450 special 13 form 0
 #! expect a 796 special 14 form 1
 #! expect a 880 special 15 form 0
-#! expect a 904 special-form 6 action 15
+#! expect a 900 special-form 6 action 15
 # Startup and active cues of each special and branch and both missiles.
 #! scene a ForkedLightningTarget
 #! scene a DefendCaster
@@ -106,7 +106,7 @@
 #! scene a StormBoltMissile
 #! scene a ShockwaveMissile
 897 a capture
-901 a stick 0 -1
-910 a stick 0 0
+897 a stick 0 -1
+906 a stick 0 0
 1000 a press VIEW
 1070 a release VIEW

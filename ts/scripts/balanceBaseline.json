@@ -6971,7 +6971,7 @@
    "authored.specials.side.air.regions.0.hit.effect.launchZ": 0.5735764503479004,
    "authored.specials.side.air.hurt.0.firstFrame": 13,
    "authored.specials.side.air.hurt.0.lastFrame": 18,
-   "authored.specials.up.ground.endFrame": 30,
+   "authored.specials.up.ground.endFrame": 26,
    "authored.specials.up.ground.regions.0.firstFrame": 10,
    "authored.specials.up.ground.regions.0.lastFrame": 15,
    "authored.specials.up.ground.regions.0.hit.effect.damage": 8.645519256591797,
@@ -6980,9 +6980,9 @@
    "authored.specials.up.ground.regions.0.hit.effect.launchX": 0.1736481785774231,
    "authored.specials.up.ground.regions.0.hit.effect.launchZ": 0.9848077297210693,
    "authored.specials.up.ground.landingLag": 11,
-   "authored.specials.up.ground.followUps.0.special.endFrame": 33,
-   "authored.specials.up.ground.followUps.0.special.regions.0.firstFrame": 3,
-   "authored.specials.up.ground.followUps.0.special.regions.0.lastFrame": 14,
+   "authored.specials.up.ground.followUps.0.special.endFrame": 29,
+   "authored.specials.up.ground.followUps.0.special.regions.0.firstFrame": 2,
+   "authored.specials.up.ground.followUps.0.special.regions.0.lastFrame": 10,
    "authored.specials.up.ground.followUps.0.special.regions.0.hit.effect.damage": 12.968278884887695,
    "authored.specials.up.ground.followUps.0.special.regions.0.hit.effect.growth": 107.59937286376953,
    "authored.specials.up.ground.followUps.0.special.regions.0.hit.effect.base": 22,
@@ -6994,9 +6994,9 @@
    "authored.specials.up.ground.followUps.0.special.regions.0.hit.groundedEffect.launchX": 0.5735764503479004,
    "authored.specials.up.ground.followUps.0.special.regions.0.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.specials.up.ground.followUps.0.special.landingLag": 24,
-   "authored.specials.up.ground.followUps.1.special.endFrame": 33,
-   "authored.specials.up.ground.followUps.1.special.regions.0.firstFrame": 3,
-   "authored.specials.up.ground.followUps.1.special.regions.0.lastFrame": 14,
+   "authored.specials.up.ground.followUps.1.special.endFrame": 29,
+   "authored.specials.up.ground.followUps.1.special.regions.0.firstFrame": 2,
+   "authored.specials.up.ground.followUps.1.special.regions.0.lastFrame": 10,
    "authored.specials.up.ground.followUps.1.special.regions.0.hit.effect.damage": 12.968278884887695,
    "authored.specials.up.ground.followUps.1.special.regions.0.hit.effect.growth": 107.59937286376953,
    "authored.specials.up.ground.followUps.1.special.regions.0.hit.effect.base": 22,
@@ -7008,9 +7008,9 @@
    "authored.specials.up.ground.followUps.1.special.regions.0.hit.groundedEffect.launchX": 0.5735764503479004,
    "authored.specials.up.ground.followUps.1.special.regions.0.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.specials.up.ground.followUps.1.special.landingLag": 24,
-   "authored.specials.up.ground.followUps.2.special.endFrame": 33,
-   "authored.specials.up.ground.followUps.2.special.regions.0.firstFrame": 3,
-   "authored.specials.up.ground.followUps.2.special.regions.0.lastFrame": 14,
+   "authored.specials.up.ground.followUps.2.special.endFrame": 29,
+   "authored.specials.up.ground.followUps.2.special.regions.0.firstFrame": 2,
+   "authored.specials.up.ground.followUps.2.special.regions.0.lastFrame": 10,
    "authored.specials.up.ground.followUps.2.special.regions.0.hit.effect.damage": 12.968278884887695,
    "authored.specials.up.ground.followUps.2.special.regions.0.hit.effect.growth": 107.59937286376953,
    "authored.specials.up.ground.followUps.2.special.regions.0.hit.effect.base": 22,
@@ -7023,7 +7023,7 @@
    "authored.specials.up.ground.followUps.2.special.regions.0.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.specials.up.ground.followUps.2.special.landingLag": 24,
    "authored.specials.up.ground.followUps.3.special.endFrame": 70,
-   "authored.specials.up.ground.followUps.3.special.regions.0.firstFrame": 3,
+   "authored.specials.up.ground.followUps.3.special.regions.0.firstFrame": 2,
    "authored.specials.up.ground.followUps.3.special.regions.0.lastFrame": 69,
    "authored.specials.up.ground.followUps.3.special.regions.0.hit.effect.damage": 12.968278884887695,
    "authored.specials.up.ground.followUps.3.special.regions.0.hit.effect.growth": 113.26249694824219,
@@ -7037,7 +7037,7 @@
    "authored.specials.up.ground.followUps.3.special.regions.0.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.specials.up.ground.followUps.3.special.landingLag": 24,
    "authored.specials.up.ground.followUps.4.special.endFrame": 70,
-   "authored.specials.up.ground.followUps.4.special.regions.0.firstFrame": 3,
+   "authored.specials.up.ground.followUps.4.special.regions.0.firstFrame": 2,
    "authored.specials.up.ground.followUps.4.special.regions.0.lastFrame": 69,
    "authored.specials.up.ground.followUps.4.special.regions.0.hit.effect.damage": 12.968278884887695,
    "authored.specials.up.ground.followUps.4.special.regions.0.hit.effect.growth": 113.26249694824219,
@@ -8466,47 +8466,47 @@
     "killPercent": 86
    },
    "special.up.ground.regions.0": {
-    "advantage": -14,
+    "advantage": -10,
     "killPercent": 232
    },
    "special.up.ground.followUps.0.special.regions.0": {
-    "advantage": -22,
+    "advantage": -19,
     "killPercent": 157
    },
    "special.up.ground.followUps.0.special.regions.0.grounded": {
-    "advantage": -23,
+    "advantage": -20,
     "killPercent": 98
    },
    "special.up.ground.followUps.1.special.regions.0": {
-    "advantage": -22,
+    "advantage": -19,
     "killPercent": 76
    },
    "special.up.ground.followUps.1.special.regions.0.grounded": {
-    "advantage": -23,
+    "advantage": -20,
     "killPercent": 98
    },
    "special.up.ground.followUps.2.special.regions.0": {
-    "advantage": -22,
+    "advantage": -19,
     "killPercent": 68
    },
    "special.up.ground.followUps.2.special.regions.0.grounded": {
-    "advantage": -23,
+    "advantage": -20,
     "killPercent": 98
    },
    "special.up.ground.followUps.3.special.regions.0": {
-    "advantage": -59,
+    "advantage": -60,
     "killPercent": 194
    },
    "special.up.ground.followUps.3.special.regions.0.grounded": {
-    "advantage": -60,
+    "advantage": -61,
     "killPercent": 98
    },
    "special.up.ground.followUps.4.special.regions.0": {
-    "advantage": -59,
+    "advantage": -60,
     "killPercent": 194
    },
    "special.up.ground.followUps.4.special.regions.0.grounded": {
-    "advantage": -60,
+    "advantage": -61,
     "killPercent": 98
    },
    "special.down.ground.regions.0": {
