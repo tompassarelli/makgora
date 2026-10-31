@@ -10,7 +10,7 @@ import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, t
 import { reforgedStorage } from "./renderAssetStore";
 import { STEP_TOOLS, type StepName, stepCode } from "./fighterArtCode";
 import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
-import { withLocks } from "./fileLock";
+import { withLock } from "./fileLock";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
 import { projectRoot } from "./project";
@@ -142,6 +142,9 @@ export interface FighterPlan { readonly fighter: Fighter; readonly keys: readonl
 const stepStored = (index: number, key: string) => existsSync(join(DERIVED_STORE, STEPS[index]!.name, key));
 
 const LOCK_HOLDER = "SMASHCRAFT_DERIVE_LOCK_HOLDER";
+
+const withLocks = <A, E, R>(locks: readonly { readonly path: string; readonly waiting: string }[], effect: Effect.Effect<A, E, R>): Effect.Effect<A, E, R> =>
+  [...locks].sort((a, b) => a.path.localeCompare(b.path)).reduceRight<Effect.Effect<A, E, R>>((inner, lock) => withLock(lock.path, lock.waiting, inner), effect);
 
 export const withStepLocks = <A, E, R>(plans: readonly FighterPlan[], rebuild: boolean, use: (plans: readonly FighterPlan[]) => Effect.Effect<A, E, R>) => {
   if (process.env[LOCK_HOLDER] !== undefined) return use(plans);

@@ -37,6 +37,3 @@ export const withLock = <A, E, R>(path: string, waiting: string, effect: Effect.
     () => effect,
     (fd) => Effect.sync(() => closeSync(fd)),
   );
-
-export const withLocks = <A, E, R>(locks: readonly { readonly path: string; readonly waiting: string }[], effect: Effect.Effect<A, E, R>): Effect.Effect<A, E, R> =>
-  [...locks].sort((a, b) => a.path.localeCompare(b.path)).reduceRight<Effect.Effect<A, E, R>>((inner, lock) => withLock(lock.path, lock.waiting, inner), effect);
