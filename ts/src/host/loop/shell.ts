@@ -109,6 +109,7 @@ function gameTick(s: ShellState): void {
   beforeProbedTick(s);
   if (!beforeNativeDriverTick(s)) {
     writeReadyMarker(s);
+    serviceReplay(s);
     return;
   }
   if (s.build.pausePositionProbe && s.game.phase === Phase.match && s.probe?.run === 0) probe.startProbe(s.probe, false);
