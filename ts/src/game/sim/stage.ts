@@ -10,6 +10,8 @@ import { melee } from "./tuning";
 import { squareRoot } from "./warcraftMath";
 
 
+export const SKY_STAGE = 0;
+
 export const SOLID_DECK_TEST_STAGE = 5;
 
 export const FROZEN_THRONE_STAGE = 2;

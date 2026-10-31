@@ -8,7 +8,7 @@ import { STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL } from "./stageHazards";
 import { placedPieces, stageScenery } from "./stageScenery";
 import { platformParts } from "./stockPlatforms";
-import { CARRIED_TEST_STAGE, TOMB_OF_SARGERAS_STAGE, surfacePass } from "../sim/stage";
+import { CARRIED_TEST_STAGE, SKY_STAGE, TOMB_OF_SARGERAS_STAGE, surfacePass } from "../sim/stage";
 import { f32 } from "wisp/src/sim/f32";
 import { stageEdgeLight, STAGE_EDGE_LIGHT_MODEL } from "./stageEdgeLights";
 
@@ -56,16 +56,19 @@ export function stageModels(stage: number): string[] {
 }
 
 
+/** Every stage a match can start on: the selectable ones and the Sky stage, which the tutorial and a developer quick match play on. */
+export const PRELOAD_STAGES: readonly number[] = [SKY_STAGE, ...STAGE_CATALOG.map(({ id }) => id)];
+
 export function preloadModels(): string[] {
   const models: string[] = [];
-  for (const { id } of STAGE_CATALOG) for (const model of stageModels(id)) if (!models.includes(model)) models.push(model);
+  for (const id of PRELOAD_STAGES) for (const model of stageModels(id)) if (!models.includes(model)) models.push(model);
   return models;
 }
 
 /** Each distinct sky of every selectable stage. */
 export function preloadSkies(): string[] {
   const skies: string[] = [];
-  for (const { id } of STAGE_CATALOG) {
+  for (const id of PRELOAD_STAGES) {
     const { sky } = stageScenery(id);
     if (!skies.includes(sky)) skies.push(sky);
   }
