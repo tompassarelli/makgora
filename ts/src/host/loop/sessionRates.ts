@@ -8,6 +8,7 @@ import { secondFps } from "wisp/src/netcode/rate";
 import { noteLocalSecond, takeNetRates } from "./netDelay";
 import { type Rollback, activeRollback, shellState } from "./state";
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
+import { createTimer, gameSpeed as clockGameSpeed, localElapsed, startTimer } from "wisp/game/clock";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
@@ -161,7 +162,7 @@ function released(rates: SessionRates, kind: Kind, value: unknown): void {
 const gameSpeeds = (): readonly gamespeed[] => [MAP_SPEED_SLOWEST, MAP_SPEED_SLOW, MAP_SPEED_NORMAL, MAP_SPEED_FAST, MAP_SPEED_FASTEST];
 
 function gameSpeed(): string {
-  const speed = GetGameSpeed();
+  const speed = clockGameSpeed();
   return `gs=${gameSpeeds().indexOf(speed)}`;
 }
 
@@ -270,7 +271,7 @@ function sampleMatch(rates: SessionRates, rollback: Rollback, paused: boolean): 
 
 function gameSeconds(rates: SessionRates): number {
   const reference = rates.gameClock;
-  return reference === undefined ? 0 : rates.gamePeriods * GAME_CLOCK_PERIOD + TimerGetElapsed(reference);
+  return reference === undefined ? 0 : rates.gamePeriods * GAME_CLOCK_PERIOD + localElapsed(reference);
 }
 
 function gameMs(rates: SessionRates): number {
@@ -282,9 +283,9 @@ function gameMs(rates: SessionRates): number {
 
 function startGameClock(rates: SessionRates): void {
   if (rates.gameClock !== undefined) return;
-  const reference = CreateTimer();
+  const reference = createTimer();
   rates.gameClock = reference;
-  TimerStart(reference, GAME_CLOCK_PERIOD, true, () => { rates.gamePeriods++; });
+  startTimer(reference, GAME_CLOCK_PERIOD, true, () => { rates.gamePeriods++; });
 }
 
 function elapsedMs(rates: SessionRates, now: number): number {

@@ -5,6 +5,7 @@ import { RATES_RECORD_CHARS } from "./sessionRates";
 import { KEY_DOWN, KEY_UP } from "./keyEvents";
 import { DRAW_EVENT, burstAlpha, drawnAlpha } from "./betweenFrames";
 import { activeRollback, shellState } from "./state";
+import { createTimer, destroyTimer, localElapsed, startTimer } from "wisp/game/clock";
 import { displayText } from "wisp/game/frames";
 import { eventKey } from "wisp/game/input";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
@@ -81,7 +82,7 @@ function noteBurst(probe: CallbackClock, now: number, draw: boolean): void {
   const { burst } = probe;
   if (burst.last > 0 && now - burst.last > BURST_GAP) closeBurst(probe);
   burst.last = now;
-  burst.game = TimerGetElapsed(probe.gameClock);
+  burst.game = localElapsed(probe.gameClock);
   burst.alpha = burstAlpha();
   burst.drawn = drawnAlpha();
   if (draw) burst.draws++;
@@ -126,7 +127,7 @@ function finish(probe: CallbackClock): void {
   closeBurst(probe);
   probe.records.push(probe.record);
   probe.bursts.push(probe.burstRecord);
-  DestroyTimer(probe.gameClock);
+  destroyTimer(probe.gameClock);
   const slot = playerSlot(localPlayer());
   clearFileLines();
   startFile();
@@ -144,8 +145,8 @@ export function probeCallbackClock(key: number, callbacks: number): boolean {
   const table = globalThis.__smashcraftDispatch;
   if (clock === undefined || table === undefined || active !== undefined) return false;
   runs++;
-  const gameClock = CreateTimer();
-  TimerStart(gameClock, 3600.0, false, () => {});
+  const gameClock = createTimer();
+  startTimer(gameClock, 3600.0, false, () => {});
   const probe: CallbackClock = {
     run: runs, key, limit: callbacks < MAX_CALLBACKS ? callbacks : MAX_CALLBACKS, gameClock, records: [], rollbacks: [], events: [], bursts: [],
     burst: { last: 0, game: 0, alpha: 0, drawn: 0, draws: 0, ticks: 0 }, record: "k 0", burstRecord: "b", callbacks: 0, last: 0, down: false,

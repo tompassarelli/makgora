@@ -45,6 +45,7 @@ import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
 import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
 import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
+import { localElapsed } from "wisp/game/clock";
 import { eventPlayer, playerSlot } from "wisp/game/players";
 import { sendSync, syncData } from "wisp/game/sync";
 
@@ -73,7 +74,7 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
     s.pad.mouse.length = 0;
     s.pad.mouseEvents = 0;
     s.pad.syncEvents = 0;
-    s.pad.startedAt = s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock);
+    s.pad.startedAt = s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock);
   }
   const { schedule, speculative } = rollback;
   rollback.epoch++;

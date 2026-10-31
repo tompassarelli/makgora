@@ -6,6 +6,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { type CaptureFixture, showcaseFixtures } from "../../platform/captureFixtures";
 import { captureTick, restartCapture } from "../loop/captureRunner";
 import { shellState } from "../loop/state";
+import { createTimer, startTimer } from "wisp/game/clock";
 
 const TICK = "showcase.demo";
 
@@ -34,5 +35,5 @@ export function start(this: void): void {
   installSmashcraftNativeDriver();
   startSmashcraftNativeDriver([0]);
   on(TICK, tick);
-  TimerStart(CreateTimer(), f32(0.01666666753590107), true, trampoline(TICK));
+  startTimer(createTimer(), f32(0.01666666753590107), true, trampoline(TICK));
 }

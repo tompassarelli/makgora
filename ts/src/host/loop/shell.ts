@@ -68,6 +68,7 @@ import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/native
 import { afterProbedTick, beforeProbedTick } from "./tickProbe";
 import { advanceHandleLedger, handleLedger, installHandleLedger } from "./handleLedger";
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
+import { createTimer, startTimer } from "wisp/game/clock";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
 import { addChatEvent, addKeyEvent, chatText, enableSelections, enableUserControl, osKey } from "wisp/game/input";
@@ -355,8 +356,8 @@ function createTriggers(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) addLeaveEvent(leave, player(slot));
   onEvents(leave, trampoline(PLAYER_LEFT));
   holdGameSpeed();
-  const tick = CreateTimer();
-  TimerStart(tick, FRAME_SECONDS, true, trampoline(TICK));
+  const tick = createTimer();
+  startTimer(tick, FRAME_SECONDS, true, trampoline(TICK));
   startFrameClock(tick);
 }
 

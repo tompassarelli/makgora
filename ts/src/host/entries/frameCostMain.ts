@@ -1,6 +1,7 @@
 
 import { runFrameCostBenchmark } from "../../game/replay/frameCostBenchmark";
 import { frameCostFile } from "../../game/core/gameFiles";
+import { createTimer, startTimer } from "wisp/game/clock";
 import { debugMessage } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
@@ -9,7 +10,7 @@ import { formatInt, formatRealWidth } from "wisp/game/text";
 declare const os: { readonly clock: (this: void) => number };
 
 export function start(source: string): void {
-  TimerStart(CreateTimer(), 2.0, false, () => {
+  startTimer(createTimer(), 2.0, false, () => {
     const result = runFrameCostBenchmark(() => os.clock());
     if (result === undefined) throw new Error("frame-cost TypeScript workload failed");
     clearFileLines();

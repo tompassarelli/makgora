@@ -5,6 +5,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { renderClockFile } from "../../game/core/gameFiles";
+import { createTimer, destroyTimer, localElapsed, pauseTimer, startTimer } from "wisp/game/clock";
 import { displayText } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
@@ -106,10 +107,10 @@ export function probeRenderClock(): void {
   const run = runs;
   const step = clockStep();
   const gap = step * 2.0 > MIN_FRAME_GAP ? step * 2.0 : MIN_FRAME_GAP;
-  const reference = CreateTimer();
-  const zero = CreateTimer();
-  const fast = CreateTimer();
-  const stop = CreateTimer();
+  const reference = createTimer();
+  const zero = createTimer();
+  const fast = createTimer();
+  const stop = createTimer();
   const zeroSamples: Candidate = { name: "period0", clock: [], game: [], cost: [], callbacks: 0 };
   const fastSamples: Candidate = { name: "period1024", clock: [], game: [], cost: [], callbacks: 0 };
   const record = (candidate: Candidate) => {
@@ -117,20 +118,20 @@ export function probeRenderClock(): void {
     if (candidate.clock.length >= MAX_SAMPLES) return;
     const started = now();
     candidate.clock.push(started);
-    candidate.game.push(TimerGetElapsed(reference));
+    candidate.game.push(localElapsed(reference));
     candidate.cost.push(now() - started);
   };
-  TimerStart(reference, 3600.0, false, () => {});
-  TimerStart(zero, 0.0, true, () => record(zeroSamples));
-  TimerStart(fast, FAST_PERIOD, true, () => record(fastSamples));
-  TimerStart(stop, PROBE_GAME_SECONDS, false, () => {
-    PauseTimer(zero);
-    PauseTimer(fast);
-    PauseTimer(reference);
-    DestroyTimer(zero);
-    DestroyTimer(fast);
-    DestroyTimer(reference);
-    DestroyTimer(stop);
+  startTimer(reference, 3600.0, false, () => {});
+  startTimer(zero, 0.0, true, () => record(zeroSamples));
+  startTimer(fast, FAST_PERIOD, true, () => record(fastSamples));
+  startTimer(stop, PROBE_GAME_SECONDS, false, () => {
+    pauseTimer(zero);
+    pauseTimer(fast);
+    pauseTimer(reference);
+    destroyTimer(zero);
+    destroyTimer(fast);
+    destroyTimer(reference);
+    destroyTimer(stop);
     const lines = [`render-clock run=${formatInt(run)} clock=${step > 0 ? "running" : "unavailable"}`
       + ` clock-step-us=${formatRealWidth(step * 1000000.0, 1, 2)} burst-gap-threshold-ms=${ms(gap)}`];
     for (const candidate of [zeroSamples, fastSamples]) for (const line of summarize(candidate, gap)) lines.push(line);

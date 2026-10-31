@@ -8,6 +8,7 @@ import { humanActive, humanFighterActive } from "../../game/lobby/lobbyState";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type ShellState, localSlot } from "./state";
 import { osKeyDown } from "../../platform/osKeys";
+import { localElapsed } from "wisp/game/clock";
 import { createEvents, onEvents } from "wisp/game/events";
 import { addPointerMoveEvent, eventPointerX, eventPointerY, windowFocused } from "wisp/game/input";
 import { eventPlayer, localPlayer, player } from "wisp/game/players";
@@ -41,7 +42,7 @@ export function padMouse(s: ShellState): void {
   if (pad === undefined) return;
   if (s.build.analogPadDiagnostic === true) {
     pad.mouseEvents++;
-    pad.mouse.push(`mouse ${pad.mouseEvents} ${s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock)} ${pad.syncEvents}`);
+    pad.mouse.push(`mouse ${pad.mouseEvents} ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} ${pad.syncEvents}`);
   }
 
   if (eventPlayer() !== localPlayer() || !pressed(PAD_ACTIVE_KEY)) return;
@@ -50,11 +51,11 @@ export function padMouse(s: ShellState): void {
     pad.calibration.first = point;
     pad.calibration.last = undefined;
     pad.packet = undefined;
-    if (s.build.analogPadDiagnostic === true) writeLines(`smashcraft-pad-calibration-p${localSlot()}.txt`, [`corner start ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
+    if (s.build.analogPadDiagnostic === true) writeLines(`smashcraft-pad-calibration-p${localSlot()}.txt`, [`corner start ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
   } else if (pressed(0x22)) {
     pad.calibration.last = point;
     pad.packet = undefined;
-    if (s.build.analogPadDiagnostic === true) writeLines(`smashcraft-pad-calibration-p${localSlot()}.txt`, [`corner end ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
+    if (s.build.analogPadDiagnostic === true) writeLines(`smashcraft-pad-calibration-p${localSlot()}.txt`, [`corner end ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
   } else if (s.build.analogPad === "cursor") {
     pad.packet = cursorWorldPacket(pad.calibration, point.x, point.y);
   }
@@ -81,7 +82,7 @@ export function recordPadRow(s: ShellState, epoch: number, frame: number, row: R
   const packet = pollPad(s);
   const valid = packet === undefined ? undefined : decodePad(packet);
   const wire = inputPacket(epoch, frame, [row]);
-  if (wire !== undefined) pad.rows.push(`row ${epoch} ${frame} ${valid === undefined ? -1 : packet} ${encodePacket(wire)} ${s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock)}`);
+  if (wire !== undefined) pad.rows.push(`row ${epoch} ${frame} ${valid === undefined ? -1 : packet} ${encodePacket(wire)} ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)}`);
 }
 
 
@@ -90,7 +91,7 @@ export function exportPad(s: ShellState): void {
   if (pad === undefined || s.build.analogPadDiagnostic !== true) return;
   const epoch = s.rollback?.epoch ?? 0;
   writeLines(`smashcraft-pad-${s.build.analogPad}-e${epoch}-p${localSlot()}.txt`, [
-    `pad ${s.build.id} epoch ${epoch} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents} rows ${pad.rows.length} started ${pad.startedAt} finished ${s.trace.clockPeriods * 1000.0 + TimerGetElapsed(s.trace.clock)}`,
+    `pad ${s.build.id} epoch ${epoch} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents} rows ${pad.rows.length} started ${pad.startedAt} finished ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)}`,
     ...pad.rows,
     ...pad.mouse,
   ]);

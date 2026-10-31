@@ -1,6 +1,7 @@
 
 
 import { frameCostClockFile } from "../../game/core/gameFiles";
+import { createTimer, destroyTimer, localElapsed, startTimer } from "wisp/game/clock";
 import { displayText } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
@@ -22,16 +23,16 @@ function readOsClock(): number | undefined {
 export function probeFrameCostClock(): void {
   const hasOs = typeof os !== "undefined";
   const hasOsClock = hasOs && typeof os.clock === "function";
-  const timer = CreateTimer();
-  TimerStart(timer, 3600.0, false, () => {});
+  const timer = createTimer();
+  startTimer(timer, 3600.0, false, () => {});
 
   const osBefore = hasOsClock ? readOsClock() : undefined;
-  const timerBefore = TimerGetElapsed(timer);
+  const timerBefore = localElapsed(timer);
   let work = 0;
   for (let i = 0; i < WORK_ITERATIONS; i++) work = (work + i) | 0;
-  const timerAfter = TimerGetElapsed(timer);
+  const timerAfter = localElapsed(timer);
   const osAfter = hasOsClock ? readOsClock() : undefined;
-  DestroyTimer(timer);
+  destroyTimer(timer);
 
   const message = `frame-cost-clock os=${hasOs ? "present" : "missing"} os.clock=${hasOsClock ? "present" : "missing"}`
     + ` os.delta=${osBefore === undefined || osAfter === undefined ? "n/a" : seconds(osAfter - osBefore)}`

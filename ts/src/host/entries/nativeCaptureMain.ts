@@ -5,6 +5,7 @@ import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { CAPTURE_FIXTURES } from "../../platform/captureFixtures";
 import { captureTick } from "../loop/captureRunner";
+import { createTimer, startTimer } from "wisp/game/clock";
 
 const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted", receiptsOnScreen: false };
 const TICK = "capture.fixtures";
@@ -21,5 +22,5 @@ export function install(this: void): void {
 export function start(this: void): void {
   startBuild(BUILD);
   on(TICK, tick);
-  TimerStart(CreateTimer(), f32(0.01666666753590107), true, trampoline(TICK));
+  startTimer(createTimer(), f32(0.01666666753590107), true, trampoline(TICK));
 }

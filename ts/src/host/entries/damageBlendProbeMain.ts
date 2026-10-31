@@ -5,6 +5,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import { facingYaw } from "../../game/render/effects";
 import { DAMAGE_BLEND_PROBE_MODELS } from "../../platform/damageBlendProbeModels";
+import { createTimer, startTimer } from "wisp/game/clock";
 import { createEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { setCameraField, setCameraPosition } from "wisp/game/view";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
@@ -47,7 +48,7 @@ export function start(this: void): void {
   setCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: 1450.0, z: 50.0 }), 0.0);
   setCameraPosition(0.0, 0.0);
   let frame = 0;
-  TimerStart(CreateTimer(), f32(1.0 / 60.0), true, () => {
+  startTimer(createTimer(), f32(1.0 / 60.0), true, () => {
     const phase = floorMod(frame, 180);
     if (phase === 0) {
       for (const entry of cases) {

@@ -1,6 +1,7 @@
 import { trampoline } from "wisp/src/platform/dispatch";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { effectMotion } from "../../game/render/effects";
+import { createTimer, localElapsed, startTimer } from "wisp/game/clock";
 
 
 export const DRAW_EVENT = "shell.draw";
@@ -44,7 +45,7 @@ export function drawAtBurstTime(on: boolean): void {
   if (!on) motion.smoothing = false;
   if (!on || frames.drawing) return;
   frames.drawing = true;
-  TimerStart(CreateTimer(), DRAW_PERIOD, true, trampoline(DRAW_EVENT));
+  startTimer(createTimer(), DRAW_PERIOD, true, trampoline(DRAW_EVENT));
 }
 
 
@@ -63,7 +64,7 @@ export function beginPresentedFrame(moving: boolean): void {
 export function burstAlpha(): number {
   const { tick } = state();
   if (tick === undefined) return -1.0;
-  const ticks = TimerGetElapsed(tick) / FRAME_SECONDS;
+  const ticks = localElapsed(tick) / FRAME_SECONDS;
   return ticks - Math.floor(ticks);
 }
 

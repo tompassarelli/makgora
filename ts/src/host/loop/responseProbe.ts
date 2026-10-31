@@ -12,6 +12,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { edgeStampFile, responsePageFile } from "../../game/core/gameFiles";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import type { MatchCamera } from "../../game/sim/matchCamera";
+import { createTimer, localElapsed, startTimer } from "wisp/game/clock";
 import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { windowFocused } from "wisp/game/input";
 import { cameraField, cameraTargetX } from "wisp/game/view";
@@ -134,7 +135,7 @@ export function createResponseProbe(build: string): ResponseProbe {
   const probe: ResponseProbe = {
     build, recording: false, exporting: false, edgeStamps: false, previousHeld: undefined, edgePairs: 0, edgeDropped: 0,
     pendingEdgeRow: undefined, rows: 0, row: undefined, run: 0, page: 0, polls: 0, captures: 0, advances: 0, presentations: 0,
-    clock: CreateTimer(), exportTimer: CreateTimer(), clockPeriods: 0, startedAt: 0.0, marker,
+    clock: createTimer(), exportTimer: createTimer(), clockPeriods: 0, startedAt: 0.0, marker,
     service: [],
     integrity: [], integrityDropped: 0, serviceSerial: 0,
     transportSent: 0, transportReceived: 0, transportUnmatched: 0, transportDropped: 0,
@@ -142,14 +143,14 @@ export function createResponseProbe(build: string): ResponseProbe {
     transport: [], transportOrder: [],
     epoch: undefined, seenEpoch: undefined, incomplete: [],
   };
-  TimerStart(probe.clock, 1000.0, true, () => { probe.clockPeriods++; });
-  TimerStart(probe.exportTimer, f32(0.1), true, trampoline(PROBE_EXPORT));
+  startTimer(probe.clock, 1000.0, true, () => { probe.clockPeriods++; });
+  startTimer(probe.exportTimer, f32(0.1), true, trampoline(PROBE_EXPORT));
   return probe;
 }
 
 export const probeRecording = (probe: ResponseProbe | undefined): probe is ResponseProbe => probe?.recording === true;
 
-const nowMs = (probe: ResponseProbe) => (probe.clockPeriods * 1000.0 + TimerGetElapsed(probe.clock) - probe.startedAt) * 1000.0;
+const nowMs = (probe: ResponseProbe) => (probe.clockPeriods * 1000.0 + localElapsed(probe.clock) - probe.startedAt) * 1000.0;
 
 function currentRow(probe: ResponseProbe | undefined): ServiceRow | undefined {
   return probe?.row === undefined ? undefined : probe.service[probe.row];
@@ -171,7 +172,7 @@ export function startProbe(probe: ResponseProbe, edgeStamps: boolean, epoch?: nu
   if (probe.exporting) return;
   if (probe.service.length === 0) for (let index = 0; index < ROW_LIMIT; index++) probe.service.push(serviceRow());
   if (probe.transport.length === 0) for (let index = 0; index < TRANSPORT_LIMIT; index++) probe.transport.push(vacantStamp());
-  probe.startedAt = probe.clockPeriods * 1000.0 + TimerGetElapsed(probe.clock);
+  probe.startedAt = probe.clockPeriods * 1000.0 + localElapsed(probe.clock);
   probe.epoch = epoch;
   probe.integrity.length = 0;
   probe.integrityDropped = 0;

@@ -40,6 +40,7 @@ import { isHost, sendHostDelay } from "./netDelay";
 import { views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } from "./view";
+import { createTimer } from "wisp/game/clock";
 import { clearTextMessages, displayText } from "wisp/game/frames";
 import { chatText } from "wisp/game/input";
 import { setTerrainFogHeight, setTerrainFogOverSky } from "wisp/game/view";
@@ -381,7 +382,7 @@ function desyncReceipt(actor: number): string {
   const slot = actor;
   const receipt = `dev: desync from player ${slot + 1}'s client`;
   // Creating a handle on one client alone diverges Warcraft's handle counter and tempest checksum.
-  if (slot === playerSlot(localPlayer())) CreateTimer();
+  if (slot === playerSlot(localPlayer())) createTimer();
   return receipt;
 }
 

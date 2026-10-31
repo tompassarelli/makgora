@@ -8,6 +8,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { type ParticipantSlot, type Slots, isParticipantSlot } from "../../game/input/participants";
 import { writeLines } from "wisp/src/platform/fileio";
 import type { StateChecksumFold } from "../../game/replay/canonical";
+import { createTimer, localElapsed, startTimer } from "wisp/game/clock";
 import { formatReal } from "wisp/game/text";
 
 const ECHO_CAPACITY = 256;
@@ -121,20 +122,20 @@ const CLOCK_PERIOD = 1000.0;
 
 export function inputTrace(capacity: number): InputTrace {
   const trace: InputTrace = {
-    clock: CreateTimer(), clockPeriods: 0, startedAt: undefined, finishedAt: undefined, active: false, ticks: 0, pausedTicks: 0, limit: undefined, capacity, lines: [], dropped: 0,
+    clock: createTimer(), clockPeriods: 0, startedAt: undefined, finishedAt: undefined, active: false, ticks: 0, pausedTicks: 0, limit: undefined, capacity, lines: [], dropped: 0,
     lastAxes: undefined, lastDodge: undefined, lastLandingLag: undefined, rawSyncEvents: 0, window: traceWindow(),
     echoes: Array.from({ length: ECHO_CAPACITY }, () => ({ epoch: -1, frame: undefined, callback: 0, seconds: 0.0 })),
     echoPending: 0,
     checksum: undefined,
   };
-  TimerStart(trace.clock, CLOCK_PERIOD, true, () => {
+  startTimer(trace.clock, CLOCK_PERIOD, true, () => {
     trace.clockPeriods++;
   });
   return trace;
 }
 
 export function clockSeconds(trace: Readonly<InputTrace>): number {
-  return trace.clockPeriods * CLOCK_PERIOD + TimerGetElapsed(trace.clock);
+  return trace.clockPeriods * CLOCK_PERIOD + localElapsed(trace.clock);
 }
 
 

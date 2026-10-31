@@ -31,6 +31,7 @@ import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
 import { noteKeyDownEvent, noteKeyUpEvent, osKeyDown } from "../../platform/osKeys";
+import { restartMatch } from "wisp/game/clock";
 import { eventKey } from "wisp/game/input";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
@@ -264,7 +265,7 @@ const fromFirstHuman = (s: Readonly<ShellState>) => triggerSlot() === firstHuman
 export function onDeveloperRestart(s: ShellState): void {
   if (!fromFirstHuman(s) || s.restartRequested) return;
   s.restartRequested = true;
-  RestartGame(false);
+  restartMatch(false);
 }
 
 
