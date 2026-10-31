@@ -58,3 +58,15 @@ test("every raised Frozen Throne platform stands on a pedestal under its middle 
     expect(pedestals.some(piece => Math.abs(piece.x - middle) <= 20)).toBe(true);
   }
 });
+
+test("the Frozen Throne's top stair tier ends on a landing at its own height that runs under the dais [k2 property]", () => {
+  const floes = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model === FLOE && piece.x === 0 && piece.y >= 1300 && piece.y < 2000 && piece.matrixScale?.[1] === 2.5);
+  const top = floes.filter(piece => piece.y < 1700).sort((a, b) => b.z - a.z)[0];
+  const landing = floes.find(piece => piece.y > 1800);
+  expect(top).toBeDefined();
+  expect(landing).toBeDefined();
+  expect(landing?.z).toBe(top?.z);
+  expect(landing?.matrixScale?.[2]).toBe(top?.matrixScale?.[2]);
+  const dais = placedPieces(FROZEN_THRONE_STAGE).find(piece => piece.model === FLOE && piece.x === 0 && piece.y === 2020);
+  expect(landing?.y ?? 0).toBeLessThan(dais?.y ?? 0);
+});
