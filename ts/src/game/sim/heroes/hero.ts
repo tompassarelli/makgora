@@ -66,6 +66,8 @@ export type JabChainPose = "jab2" | "jab3";
 
 
 
+export type BoardRidePose = "upSpecialBoard" | "upSpecialRide" | "upSpecialDismount";
+
 export type HeroPose =
   | "idle" | "walk"
   | "turn" | "stop" | "jumpSquat"
@@ -85,6 +87,7 @@ export type HeroPose =
   | "victimPummel" | "victimThrowForward" | "victimThrowBack" | "victimThrowUp" | "victimThrowDown"
   | "neutralSpecial" | "sideSpecial" | "upSpecial" | "downSpecial"
   | "neutralSpecialAir" | "sideSpecialAir" | "upSpecialAir" | "downSpecialAir" | "ultimate"
+  | BoardRidePose
   | HeroFollowUpPose;
 
 

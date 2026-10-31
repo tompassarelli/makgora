@@ -16,7 +16,7 @@ import { BLADEMASTER_AUTHORED_CLIPS } from "../../presentation/blademasterClipIn
 import { DOWN_AIR_CLIPS } from "../../presentation/downAirClipInfo";
 import { JUMP_CLIPS } from "../../presentation/jumpClipInfo";
 import { TUMBLE_CLIPS } from "../../presentation/tumbleClipInfo";
-import type { HeroClip, HeroFollowUpPose, HeroPose } from "../../sim/heroes/hero";
+import type { BoardRidePose, HeroClip, HeroFollowUpPose, HeroPose } from "../../sim/heroes/hero";
 
 
 const BLADEMASTER_SEQUENCES = [
@@ -61,7 +61,7 @@ const QUICKDRAW_STANCE: HeroClip = { ...BLADEMASTER_AUTHORED_CLIPS.neutralSpecia
 
 
 
-export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "neutralSpecialFollowUp" | "neutralSpecialFollowUpAir" | "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate" | "specialFloat" | "shortHop" | "fullHop">]: HeroClip } = {
+export const BLADEMASTER_CLIPS: { readonly [pose in Exclude<HeroPose, Exclude<HeroFollowUpPose, "neutralSpecialFollowUp" | "neutralSpecialFollowUpAir" | "sideSpecialFollowUp" | "sideSpecialFollowUpAir" | "downSpecialFollowUp" | "downSpecialFollowUpAir"> | "jab3" | "ultimate" | "specialFloat" | "shortHop" | "fullHop" | BoardRidePose>]: HeroClip } = {
   idle: COMBAT_STANCE,
   walk: sequence("Walk"),
   dash: sequence("Walk"),

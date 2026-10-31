@@ -66,7 +66,8 @@ export interface SpecialMotion extends FrameWindow {
   readonly seek?: { readonly speed: number; readonly turnCos: number; readonly turnSin: number } | undefined;
 
   readonly steer?: SpecialSteer | undefined;
-  readonly ride?: { readonly reach: number; readonly offset: number; readonly catchUp: number; readonly aloneVelocityZ: number } | undefined;
+  readonly board?: { readonly catchUp: number; readonly drop: number } | undefined;
+  readonly dismount?: { readonly push: number } | undefined;
 }
 
 /** The move's first projectile flies on while the special button is held: it gains `acceleration` a frame up to `maxSpeed`, the stick's vertical sets its climb up to `climbSpeed`, and on release or at the end of its life it becomes `erupts` where it is. */
@@ -323,6 +324,7 @@ export interface AuthoredSpecial extends CastWindows {
   readonly strikesWithProp?: true | undefined;
   readonly variants?: readonly AuthoredSpecial[] | undefined;
   readonly pairedVariant?: { readonly variant: number; readonly within: number; readonly heldWithin: number } | undefined;
+  readonly link?: { readonly frame: number; readonly reach: number; readonly variant: number } | undefined;
   readonly name?: string | undefined;
   readonly endFrame: number;
 

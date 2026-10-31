@@ -31,12 +31,15 @@ const bellySlide = (air: boolean): AuthoredSpecial => ({
   motion: [{ ...frames(BELLY_SLIDE.firstFrame, BELLY_SLIDE.lastFrame), velocityX: BELLY_SLIDE.speed, velocityZ: 0.0, stopsAtShield: true }],
   regions: [heroRegion(BELLY_SLIDE.firstFrame, BELLY_SLIDE.lastFrame, { x1: 10.0, z1: 22.0, x2: 46.0, z2: 22.0, radius: 18.0 }, murlocHit(BELLY_SLIDE.damage, 40, 72.17433166503906, 22.0))],
 });
-const SURF_REACH = 120.0;
+export const SURF = { reach: 120.0, soloRise: 11.0, linkedRise: 17.0, rideFirst: 6, soloLast: 25, linkedLast: 31, boardDrop: 60.0, push: 14.5 } as const;
 const SURF_HITS = [{ first: 6, last: 8 }, { first: 9, last: 11 }, { first: 12, last: 14 }];
 const surfHit = (last: boolean) => last ? murlocHit(2.0, 80, 63.15253829956055, 30.0) : murlocHit(2.0, 90, 0.0, 14.0);
 const TIDAL_SURF = surfRide({
-  endFrame: 34, windUp: 5, rideFrames: { first: 6, last: 25 }, rise: 17.0, drift: 6.0,
-  carry: { reach: SURF_REACH, offset: 30.0, catchUp: 30.0, aloneVelocityZ: 11.0 },
+  endFrame: 34, windUp: 5, rideFrames: { first: SURF.rideFirst, last: SURF.soloLast }, rise: SURF.soloRise, drift: 6.0,
+  linked: {
+    reach: SURF.reach, endFrame: 40, rideLast: SURF.linkedLast, rise: SURF.linkedRise,
+    board: { catchUp: 30.0, drop: SURF.boardDrop }, backflip: { velocityX: -4.0, velocityZ: 7.0 }, push: SURF.push,
+  },
   hits: SURF_HITS, hitEffect: surfHit, region: { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 },
 });
 

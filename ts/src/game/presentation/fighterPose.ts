@@ -32,6 +32,7 @@ import { FRAME_SECONDS } from "./frameClock";
 import { selectCrouchClip } from "./crouchPose";
 import { type PoseClip, selectFighterClipIndex, selectFighterClipName } from "./poseClip";
 import { peonSpecialPose } from "./peonPose";
+import { duoSurfPose } from "./duoSurfPose";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { heroLook } from "../roster/looks";
 import {
@@ -336,7 +337,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     return rate;
   }
   if (f.special.action !== SpecialAction.none && f.launch.hitstun === 0) {
-    const peon = peonSpecialPose(f);
+    const peon = peonSpecialPose(f) ?? duoSurfPose(f);
     if (peon !== undefined) {
       playIndex(pose, peon.key, peon.clip);
       pose.clipTime = peon.time;

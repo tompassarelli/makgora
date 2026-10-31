@@ -44,7 +44,7 @@ const everyFrame = (keys: readonly Key[]): Key[] => keys.flatMap((key, i) => {
   return Array.from({ length: next.frame - key.frame }, (_, step) => ({ frame: key.frame + step,
     g: Object.fromEntries(fields.map(field => [field, (key.g[field] ?? 0) + ((next.g[field] ?? 0) - (key.g[field] ?? 0)) * step / (next.frame - key.frame)])) }));
 });
-interface Action { pose: HeroPose; append?: boolean; frames: number; contact: number; gesture: Gesture; keys?: readonly Key[]; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
+interface Action { pose: HeroPose; append?: boolean; squash?: readonly [number, number, number]; frames: number; contact: number; gesture: Gesture; keys?: readonly Key[]; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
 const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
@@ -144,6 +144,13 @@ for (const [pose, key, gesture, contact, target] of [
     actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, frames: form.endFrame, contact: release, gesture: air ? { ...gesture, thigh: 30, leftThigh: -35 } : gesture, target, air });
   }
 }
+const linkedSurf = kitSpecials.up!.ground.variants![0]!;
+const dismountFirst = linkedSurf.motion!.find(segment => segment.dismount !== undefined)!.first;
+actions.push({ pose: "upSpecialBoard", append: true, frames: 30, contact: 1, hold: true, air: true, squash: [2.0, 1.4, 0.25],
+  gesture: { chest: 10, head: -20, arm: -95, leftArm: -95, thigh: -85, leftThigh: -85, knee: 40 } });
+actions.push({ pose: "upSpecialRide", append: true, frames: 30, contact: 1, hold: true, air: true,
+  gesture: { yaw: 70, chest: 20, head: -10, arm: -80, elbow: -20, leftArm: 70, leftElbow: -20, thigh: 40, knee: -60, leftThigh: -35 } });
+actions.push({ pose: "upSpecialDismount", append: true, frames: linkedSurf.endFrame - dismountFirst + 1, contact: 3, roll: -1, air: true, gesture: { ...brace, arm: -150, leftArm: -150 } });
 const damageActions: Action[] = [];
 for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; strength++) {
   const gain = [0.7, 0.9, 1.3][strength]!, stretch = [0.8, 1, 1.2][strength]!;
@@ -237,10 +244,11 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
-    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]); if (!first) return;
     const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path), moved = /^\.(Bones|Helpers)\.(\d+)\.Translation$/.exec(path);
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
     const rootTranslation = moved !== null && source[moved[1] as "Bones" | "Helpers"][Number(moved[2])]!.Name === "Bone_Root";
+    const scaled = /^\.(Bones|Helpers)\.(\d+)\.Scaling$/.exec(path), bodyScale = scaled !== null && ["Spine", "chest", "Head"].includes(source[scaled[1] as "Bones" | "Helpers"][Number(scaled[2])]!.Name);
+    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? (bodyScale && action.squash ? { Frame: stand.Interval[0]!, Vector: Float32Array.of(1, 1, 1) } : undefined); if (!first) return;
     for (const frame of phaseFrames) {
       let Vector = first.Vector.slice();
       const keyed = action.keys?.find(key => key.frame === frame)?.g;
@@ -249,6 +257,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       else if (keyed) {
         if (node) { const [y, z] = joint(node.Name, keyed); Vector = rotated(first.Vector, y, z); }
         else if (rootTranslation) { Vector[0] = Vector[0]! + (keyed.tx ?? 0); Vector[2] = Vector[2]! + (keyed.tz ?? 0); }
+      } else if (bodyScale && action.squash) { const t = amount(frame); Vector = Float32Array.from(action.squash.map((s, i) => (first.Vector[i] ?? 1) * (1 + (s - 1) * t)));
       } else if (node) { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }

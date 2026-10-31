@@ -214,7 +214,7 @@ the Mrgl & Grgl.
 |---|---|---|
 | Neutral B: Net | Both hold the net: radius 30 against the solo net's 18. A caught foe is rooted; mash-out takes 30 + damage/4 frames, capped at 75. The net breaks after 3 hits taken or at the 75-frame cap, whichever comes first. Shield it, jump it, or punish the throw at close range | The Huntsman's Ensnare: a net in a shallow arc that slows the first fighter it reaches (top speeds only, like Chill), no root. 10 mana; spawns f12 at x32/z40, 8/frame with a slight drop, life 40, radius 18; 4%; one live net; action ends f36; air landing 18 |
 | Side B: Belly Slide | Mrgl slides and Grgl copies five frames later: two hits of 5%, one per body (Grgl's at ×0.75). Both stop at a raised shield, which punishes them | One slide: 10 mana; slides f8–22 at 11/frame, about 165 units; 5% contact f8–22; ends f32; air landing 20 |
-| Up B: Tidal Surf | One steerable wave carries both bodies if Grgl is within 120 units on frame 6: 340 units with three 2% hits, then helpless | A Grgl beyond 120 units is left behind and casts his own solo surf (220 units), as a partner who misses the rope does. Solo Mrgl rises 220 units |
+| Up B: Tidal Surf | Linked surf if Grgl is copying the cast within 120 units on frame 6: Grgl lies flat as a surfboard 60 units under Mrgl and one steerable wave carries both 442 units (26 frames at 17 a frame), with three 2% hits on frames 6-14. On frame 32 Mrgl backflips off him (4 back, 7 up) while Grgl is kicked on along the travel at 14.5 a frame, about 0.7 heights, and both fall helpless | A Grgl beyond 120 units is left behind and casts his own solo surf (220 units), as a partner who misses the rope does. Solo Mrgl rises 220 units |
 | Down B: "Mrglglgl!" | Grgl alive. Tap: order Hold. Tap again: Regroup. Hold B 20 frames: leader swap | Grgl dead: revive. A 50-frame cast, then Grgl surfaces beside Mrgl at the pair's percent. Once per stock; a hit during the cast cancels it without spending it |
 | Grab with Grgl in reach | With no foe in grab reach and Grgl actionable within 40 units, Mrgl lifts Grgl. The throw direction tosses him as a body projectile: 8% base (6% after Grgl's ×0.75), one hit per target, about 375 units (forward speed 17.75, lift 16; up 3/20; down 4/-6). He carries no stun or lag: his body's hit gives him no hitlag, he lands with no landing lag, and from the frame after release he takes Mrgl's controls as pressed that frame (an air jump, an attack or an air dodge) while Mrgl stays in his own throw end lag. He lands back on the player's copied input (Copy), not in Hold, and the separate and regroup rules bring him back when he is far from Mrgl | Normal grab |
 | Ultimate: Mrgllgll Swarm | A tide of murlocs rushes across the stage. Designed only: ultimates remain off under the current match rules | Same |
@@ -239,8 +239,42 @@ cannot be lifted again until he lands, and hits each target once per toss. Befor
 **Handoff.** After Mrgl's throw, Grgl's grab (copied or from Hold) may regrab
 the victim, and the same holds the other way, within the lock table's limits.
 
+**Linked surf.** Tom asked on 2026-11-01 for the duo's up special to work as a
+linked pair recovery: Grgl becomes a surfboard Mrgl rides for about twice the
+solo distance, and Mrgl backflips off at the end, sending Grgl a little ahead.
+Until then one wave carried both bodies side by side for 340 units. The link
+test stays as it was: Grgl copies the cast five frames late, so frame 6, the
+ride's first frame, is the first on which he can be checked, and a Grgl within
+120 units that runs the same cast boards. Both bodies then take the linked
+variant of the move from that frame. The numbers and why:
+
+- 442 units of rise (17 a frame for 26 frames, frames 6-31), twice the 220-unit
+  solo surf as asked; the solo surf keeps 11 a frame for 20 frames.
+- Grgl rides 60 units under Mrgl's feet, the height of his flattened board pose,
+  so Mrgl is drawn standing on him; he closes on that spot at up to 30 units a
+  frame, so a Grgl who boards from 120 units away is under Mrgl two frames later.
+- The hits stay three 2% hits on frames 6-14: the longer ride is a recovery, and
+  more hits on it would make the linked surf an out-of-shield option too.
+- The dismount on frame 32: Mrgl gets 4 back and 7 up, a small backward rise of
+  about 20 units, and Grgl leaves at 14.5 a frame along the direction the wave
+  was going, about 0.7 heights (between 0.5 and 0.8 as asked), so he ends ahead
+  of Mrgl. The move ends on frame 40 (eight frames after, as the solo surf's nine).
+- Both end helpless, not Grgl recovering on his own: Grgl has already spent his
+  up special on the shared cast and rides 442 units plus his kick, so a second
+  surf from him would give the duo a recovery no edge-guard could cover. Either
+  body can grab a ledge in reach once falling; from 500 units under the deck,
+  Mrgl takes the ledge from 160 units out and Grgl from 240, and from 600 units
+  neither reaches it.
+- A hit on either body mid-ride breaks the link: the struck one takes the hit as
+  usual and the other stops where he is (velocity zeroed) and falls helpless, so
+  an edge-guarder who catches the board can spike Grgl and drop Mrgl with him.
+- The recovery table in [gameplay-design.md](../gameplay-design.md) measures each
+  up special with no partner, so the duo's row (257 / 304, 235 of 256 mixed
+  returns, regenerated with this change and unmoved) is the solo surf. Linked, the
+  wave rises 442 units before the dismount.
+
 Recovery: the duo's Tidal Surf reaches the ledge from below and beside it
-after the double jump, spends the remaining aerial jump and ends helpless.
+after the double jump, spends the remaining aerial jump and ends helpless; linked, it rises 442 units with both bodies, and its counterplay is the board: one hit on Grgl ends both.
 Walking off a ledge keeps the aerial jump. A separated Grgl recovers alone
 with his own surf. The bodies are light and the solo surf is short, so
 edge-guards on the surf's path, early kills and picking off a stray Grgl are

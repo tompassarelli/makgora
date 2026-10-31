@@ -77,6 +77,9 @@ export const MURLOC_CLIPS = { idle: MURLOC_FALLBACK, walk: { index: 1, seconds: 
   upSpecialAir: { index: 78, seconds: f32(0.567), aligned: true },
   downSpecial: { index: 79, seconds: f32(0.633), aligned: true },
   downSpecialAir: { index: 80, seconds: f32(0.633), aligned: true },
+  upSpecialBoard: { index: 93, seconds: 0.5, aligned: true },
+  upSpecialRide: { index: 94, seconds: 0.5, aligned: true },
+  upSpecialDismount: { index: 95, seconds: f32(0.15), aligned: true },
 } as const satisfies HeroClipTable;
 export const MURLOC_DAMAGE_CLIPS: readonly HeroClip[] = [
   { index: 81, seconds: f32(0.4), aligned: true },
